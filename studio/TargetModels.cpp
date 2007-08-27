@@ -1,0 +1,324 @@
+/*
+	Aseba - an event-based middleware for distributed robot control
+	Copyright (C) 2006 - 2007:
+		Stephane Magnenat <stephane at magnenat dot net>
+		(http://stephane.magnenat.net)
+		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
+		Laboratory of Robotics Systems, EPFL, Lausanne
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	any other version as decided by the two original authors
+	Stephane Magnenat and Valentin Longchamp.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "TargetModels.h"
+#include <QtDebug>
+
+namespace Aseba
+{
+	TargetVariablesModel::TargetVariablesModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent) :
+		QAbstractTableModel(parent),
+		descriptionRead(descriptionRead),
+		descriptionWrite(descriptionWrite)
+	{
+		Q_ASSERT(descriptionRead);
+	}
+	
+	int TargetVariablesModel::rowCount(const QModelIndex & /* parent */) const
+	{
+		return descriptionRead->namedVariables.size();
+	}
+	
+	int TargetVariablesModel::columnCount(const QModelIndex & /* parent */) const
+	{
+		return 2;
+	}
+	
+	QVariant TargetVariablesModel::data(const QModelIndex &index, int role) const
+	{
+		if (!index.isValid() || role != Qt::DisplayRole)
+			return QVariant();
+		if (index.column() == 0)
+			return QString::fromUtf8(descriptionRead->namedVariables[index.row()].name.c_str());
+		else
+			return descriptionRead->namedVariables[index.row()].size;
+	}
+	
+	QVariant TargetVariablesModel::headerData(int section, Qt::Orientation orientation, int role) const
+	{
+		Q_UNUSED(section)
+		Q_UNUSED(orientation)
+		Q_UNUSED(role)
+		return QVariant();
+	}
+	
+	Qt::ItemFlags TargetVariablesModel::flags(const QModelIndex & /*index*/) const
+	{
+		if (descriptionWrite)
+			return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+		else
+			return Qt::ItemIsEnabled;
+	}
+	
+	bool TargetVariablesModel::setData(const QModelIndex &index, const QVariant &value, int role)
+	{
+		Q_ASSERT(descriptionWrite);
+		if (index.isValid() && role == Qt::EditRole)
+		{
+			// check for valid identifiers
+			if (index.column() == 0)
+			{
+				QString name = value.toString();
+				bool ok = !name.isEmpty();
+				if (ok && (name[0].isLetter() || name[0] == '_'))
+				{
+					for (int i = 1; i < name.size(); i++)
+						if (!(name[i].isLetterOrNumber() || name[i] == '_'))
+							return false;
+					
+					descriptionWrite->namedVariables[index.row()].name = name.toUtf8().data();
+					emit dataChanged(index, index);
+					return true;
+				}
+			}
+			else
+			{
+				unsigned size;
+				bool ok;
+				size = value.toUInt(&ok);
+				if (ok)
+				{
+					descriptionWrite->namedVariables[index.row()].size = size;
+					emit dataChanged(index, index);
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		return false;
+	}
+	
+	void TargetVariablesModel::addVariable()
+	{
+		Q_ASSERT(descriptionWrite);
+		
+		unsigned position = descriptionWrite->namedVariables.size();
+		beginInsertRows(QModelIndex(), position, position);
+		
+		TargetDescription::NamedVariable newVariable("unnamed", 1);
+		descriptionWrite->namedVariables.insert(descriptionWrite->namedVariables.begin() + position, 1, newVariable);
+	
+		endInsertRows();
+	}
+	
+	void TargetVariablesModel::delVariable(int index)
+	{
+		beginRemoveRows(QModelIndex(), index, index);
+		
+		descriptionWrite->namedVariables.erase(descriptionWrite->namedVariables.begin() + index);
+		
+		endRemoveRows();
+	}
+	
+	
+	
+	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent) :
+		QAbstractTableModel(parent),
+		descriptionRead(descriptionRead),
+		descriptionWrite(descriptionWrite)
+	{
+		Q_ASSERT(descriptionRead);
+	}
+	
+	int TargetFunctionsModel::rowCount(const QModelIndex & /* parent */) const
+	{
+		return descriptionRead->nativeFunctions.size();
+	}
+	
+	int TargetFunctionsModel::columnCount(const QModelIndex & /* parent */) const
+	{
+		return 2;
+	}
+	
+	QVariant TargetFunctionsModel::data(const QModelIndex &index, int role) const
+	{
+		if (!index.isValid() || role != Qt::DisplayRole)
+			return QVariant();
+		
+		if (index.column() == 0)
+		{
+			return QString::fromUtf8(descriptionRead->nativeFunctions[index.row()].name.c_str());
+		}
+		else
+		{
+			QString argumentList;
+			for (size_t i = 0; i < descriptionRead->nativeFunctions[index.row()].argumentsSize.size(); i++)
+			{
+				argumentList += QString("%0").arg(descriptionRead->nativeFunctions[index.row()].argumentsSize[i]);
+				argumentList += " ";
+			}
+			if (argumentList.isEmpty())
+				argumentList = tr("0 arg");
+			return argumentList;
+		}
+	}
+	
+	QVariant TargetFunctionsModel::headerData(int section, Qt::Orientation orientation, int role) const
+	{
+		Q_UNUSED(section)
+		Q_UNUSED(orientation)
+		Q_UNUSED(role)
+		return QVariant();
+	}
+	
+	Qt::ItemFlags TargetFunctionsModel::flags(const QModelIndex & index) const
+	{
+		if (descriptionWrite)
+		{
+			if (index.column() == 0)
+				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+			else
+				return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+		}
+		else
+			return Qt::ItemIsEnabled;
+	}
+	
+	bool TargetFunctionsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+	{
+		Q_ASSERT(descriptionWrite);
+		if (index.isValid() && role == Qt::EditRole)
+		{
+			// check for valid identifiers
+			if (index.column() == 0)
+			{
+				QString name = value.toString();
+				bool ok = !name.isEmpty();
+				if (ok && (name[0].isLetter() || name[0] == '_'))
+				{
+					for (int i = 1; i < name.size(); i++)
+						if (!(name[i].isLetterOrNumber() || name[i] == '_'))
+							return false;
+					
+					descriptionWrite->nativeFunctions[index.row()].name = name.toUtf8().data();
+					emit dataChanged(index, index);
+					return true;
+				}
+			}
+			else
+			{
+				// do nothing there, see setParameterData(...)
+			}
+			
+			return false;
+		}
+		return false;
+	}
+	
+	void TargetFunctionsModel::dataChangedExternally(const QModelIndex &index)
+	{
+		emit dataChanged(index, index);
+	}
+	
+	void TargetFunctionsModel::addFunction()
+	{
+		Q_ASSERT(descriptionWrite);
+		
+		unsigned position = descriptionWrite->nativeFunctions.size();
+		beginInsertRows(QModelIndex(), position, position);
+		
+		TargetDescription::NativeFunction newFunction;
+		newFunction.name = "unnamed";
+		descriptionWrite->nativeFunctions.insert(descriptionWrite->nativeFunctions.begin() + position, 1, newFunction);
+	
+		endInsertRows();
+	}
+	
+	void TargetFunctionsModel::delFunction(int index)
+	{
+		beginRemoveRows(QModelIndex(), index, index);
+		
+		descriptionWrite->nativeFunctions.erase(descriptionWrite->nativeFunctions.begin() + index);
+		
+		endRemoveRows();
+	}
+	
+	
+	TargetMemoryModel::TargetMemoryModel(QObject *parent) :
+		QAbstractTableModel(parent)
+	{
+		
+	}
+	
+	int TargetMemoryModel::rowCount(const QModelIndex & /* parent */) const
+	{
+		return variablesData.size();
+	}
+	
+	int TargetMemoryModel::columnCount(const QModelIndex & /* parent */) const
+	{
+		return 3;
+	}
+	
+	QVariant TargetMemoryModel::data(const QModelIndex &index, int role) const
+	{
+		Q_ASSERT(variablesNames.size() == variablesData.size());
+		if (!index.isValid() || role != Qt::DisplayRole)
+			return QVariant();
+		switch (index.column())
+		{
+			case 0: return QString("%0").arg(index.row(), 0, 16);
+			case 1: return variablesData[index.row()];
+			case 2: return QString::fromUtf8(variablesNames[index.row()].c_str());
+			default: return QVariant();
+		}
+	}
+	
+	QVariant TargetMemoryModel::headerData(int section, Qt::Orientation orientation, int role) const
+	{
+		Q_UNUSED(section)
+		Q_UNUSED(orientation)
+		Q_UNUSED(role)
+		return QVariant();
+	}
+	
+	Qt::ItemFlags TargetMemoryModel::flags(const QModelIndex & index) const
+	{
+		switch (index.column())
+		{
+			case 0: return Qt::ItemIsEnabled;
+			case 1: return Qt::ItemIsEnabled;
+			case 2: return 0;
+			default: return 0;
+		}
+	}
+	
+	void TargetMemoryModel::setVariablesNames(const VariablesNamesVector &names)
+	{
+		variablesNames = names;
+		variablesData.resize(variablesNames.size());
+		reset();
+	}
+	
+	void TargetMemoryModel::setVariablesData(unsigned start, const VariablesDataVector &data)
+	{
+		Q_ASSERT(start + data.size() <= variablesData.size());
+		
+		if (data.size() > 0)
+		{
+			copy(data.begin(), data.end(), variablesData.begin() + start);
+			emit dataChanged(index(start, 1), index(start + data.size() - 1, 1));
+		}
+	}
+}; // Aseba

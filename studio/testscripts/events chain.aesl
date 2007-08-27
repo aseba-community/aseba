@@ -1,0 +1,21 @@
+<!DOCTYPE aesl-source>
+<network>
+    <node name="left motor" >var a = 0
+
+ontimer
+
+emit 1
+
+onevent 4
+
+a = a + 1</node>
+    <node name="right motor" >onevent 1
+
+emit 2</node>
+    <node name="proximity sensors" >onevent 2
+
+emit 3</node>
+    <node name="distance sensors" >onevent 3
+
+emit 4</node>
+</network>

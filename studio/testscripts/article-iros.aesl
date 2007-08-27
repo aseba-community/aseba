@@ -1,0 +1,29 @@
+<!DOCTYPE aesl-source>
+<network>
+    <event name="ObstacleDetected" />
+    <node name="left motor" ></node>
+    <node name="right motor" ></node>
+    <node name="proximity sensors" ></node>
+    <node name="distance sensors" ># periodically
+ontimer
+
+var maxValue = 32767
+var maxIndex = 0
+var i = 0
+var params[2]
+
+# find if something is close
+while i &lt; 180 do
+	if args[i] &lt; maxValue then
+		maxValue = distances[i]
+		maxIndex = i
+	end
+end
+
+# if so, send an event with direction and dist
+if maxValue &lt; 32767 then
+	params[0] = maxIndex
+	params[1] = maxValue
+	emit ObstacleDetected params
+end</node>
+</network>

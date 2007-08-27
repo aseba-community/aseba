@@ -1,0 +1,11 @@
+all:
+	$(MAKE) -C vm builddir=pic30 prefix=pic30-elf-
+	$(MAKE) -C can builddir=pic30 prefix=pic30-elf-
+
+clean:
+	$(MAKE) -C vm builddir=pic30 clean
+	$(MAKE) -C can clean builddir=pic30
+
+distclean:
+	$(MAKE) -C vm builddir=pic30 distclean
+	$(MAKE) -C can builddir=pic30 distclean

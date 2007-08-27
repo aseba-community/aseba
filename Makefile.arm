@@ -1,0 +1,26 @@
+all:
+	$(MAKE) -C utils builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C compiler builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C can builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C switch builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C msg builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C dump builddir=arm prefix=arm-angstrom-linux-gnueabi-
+	$(MAKE) -C cmd builddir=arm prefix=arm-angstrom-linux-gnueabi-
+
+clean:
+	$(MAKE) -C utils builddir=arm clean
+	$(MAKE) -C compiler builddir=arm clean
+	$(MAKE) -C can clean builddir=arm
+	$(MAKE) -C switch clean builddir=arm
+	$(MAKE) -C msg clean builddir=arm
+	$(MAKE) -C dump clean builddir=arm
+	$(MAKE) -C cmd clean builddir=arm
+
+distclean:
+	$(MAKE) -C utils builddir=arm distclean
+	$(MAKE) -C compiler builddir=arm distclean
+	$(MAKE) -C can builddir=arm distclean
+	$(MAKE) -C switch builddir=arm distclean
+	$(MAKE) -C msg builddir=arm distclean
+	$(MAKE) -C dump builddir=arm distclean
+	$(MAKE) -C cmd builddir=arm distclean

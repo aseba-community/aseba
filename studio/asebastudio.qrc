@@ -1,0 +1,35 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>images/ok.png</file>
+	<file>images/no.png</file>
+	<file>images/filenew.png</file>
+	<file>images/fileopen.png</file>
+	<file>images/filesave.png</file>
+	<file>images/filesaveas.png</file>
+	<file>images/exit.png</file>
+	<file>images/editcopy.png</file>
+	<file>images/editcut.png</file>
+	<file>images/editpaste.png</file>
+	<file>images/undo.png</file>
+	<file>images/redo.png</file>
+	<file>images/view_text.png</file>
+	<file>images/add.png</file>
+	<file>images/remove.png</file>
+	<file>images/edit.png</file>
+	<file>images/play.png</file>
+	<file>images/fastforward.png</file>
+	<file>images/upload.png</file>
+	<file>images/pause.png</file>
+	<file>images/step.png</file>
+	<file>images/stop.png</file>
+	<file>images/rescan.png</file>
+	<file>images/edit-blue.png</file>
+	<file>images/up.png</file>
+	<file>images/down.png</file>
+	<file>images/info.png</file>
+	<file>images/warning.png</file>
+	<file>images/reset.png</file>
+	<file>images/newmsg.png</file>
+	<file>images/network.png</file>
+</qresource>
+</RCC>
