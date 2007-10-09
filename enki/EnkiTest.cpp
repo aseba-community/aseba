@@ -23,13 +23,22 @@
 
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
+#include <viewer/Viewer.h>
 #include "AsebaMarxbot.h"
 #include <iostream>
+#include <QtGui>
+#include <QtDebug>
+
 
 int main(int argc, char *argv[])
 {
+	QApplication app(argc, argv);
+	
 	// Create the world
 	Enki::World world(200, 200);
+	
+	// Create viewer
+	Enki::ViewerWidget viewer(&world);
 	
 	// Create a Khepera and position it
 	Enki::AsebaMarxbot *marXbot = new Enki::AsebaMarxbot();
@@ -38,13 +47,9 @@ int main(int argc, char *argv[])
 	// objects are garbage collected by the world on destruction
 	world.addObject(marXbot);
 	
-	// Run for some times
-	while (true)
-	{
-		// step of 50 ms
-		world.step(0.05);
-		std::cout << "\rmarXbot pos is (" << marXbot->pos.x << "," << marXbot->pos.y << ")              ";
-		std::cout.flush();
-	}
+	viewer.setWindowTitle("Aseba Enki");
+	viewer.show();
+	
+	return app.exec();
 }
 

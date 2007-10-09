@@ -847,7 +847,8 @@ namespace Aseba
 			compilationMessageBox->hide();
 			NodeTab *tab = polymorphic_downcast<NodeTab *>(nodes->currentWidget());
 			
-			if (tab->errorPos < 0)
+			//if (tab->errorPos < 0)
+			if (1)
 			{
 				// recompile with verbose
 				std::istringstream is(std::string(tab->editor->toPlainText().toUtf8()));
@@ -855,7 +856,8 @@ namespace Aseba
 				BytecodeVector bytecode;
 				Error error;
 				tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, compilationMessages, true);
-				compilationMessageBox->setDetailedText(QString::fromUtf8(compilationMessages.str().c_str()));
+				//compilationMessageBox->setDetailedText(QString::fromUtf8(compilationMessages.str().c_str()));
+				compilationMessageBox->setInformativeText(QString::fromUtf8(compilationMessages.str().c_str()));
 				compilationMessageBox->setIcon(QMessageBox::Information);
 			}
 			else

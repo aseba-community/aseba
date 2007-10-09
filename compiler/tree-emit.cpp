@@ -224,7 +224,7 @@ namespace Aseba
 	{
 		unsigned short bytecode;
 		
-		if ((abs(value) >> 13) == 0)
+		if ((abs(value) >> 11) == 0)
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
 			bytecode |= ((unsigned)value) & 0x0fff;

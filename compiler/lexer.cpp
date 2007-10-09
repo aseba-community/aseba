@@ -61,7 +61,7 @@ namespace Aseba
 			case TOKEN_STR_onevent: return "onevent keyword";
 			case TOKEN_STR_ontimer: return "ontimer keyword";
 			case TOKEN_STRING_LITERAL: return "string";
-			case TOKEN_INT_LITERAL: return "natural";
+			case TOKEN_INT_LITERAL: return "integer";
 			case TOKEN_PAR_OPEN: return "( (open parenthesis)";
 			case TOKEN_PAR_CLOSE: return ") (close parenthesis)";
 			case TOKEN_BRACKET_OPEN: return "[ (open bracket)";
@@ -87,17 +87,14 @@ namespace Aseba
 	//! Return a string representation of the token
 	std::string Compiler::Token::toString() const
 	{
-		std::string s;
-		std::ostringstream oss(s);
+		std::ostringstream oss;
 		oss << "Line: " << pos.row + 1 << " Col: " << pos.column + 1 << " : ";
-		s += oss.str();
-		s += typeName();
-		if (!sValue.empty())
-		{
-			s += " : ";
-			s += sValue;
-		}
-		return s;
+		oss << typeName();
+		if (type == TOKEN_INT_LITERAL)
+			oss << " : " << iValue;
+		if (type == TOKEN_STRING_LITERAL)
+			oss << " : " << sValue;
+		return oss.str();
 	}
 	
 	
@@ -109,16 +106,20 @@ namespace Aseba
 		SourcePos pos(0, 0, 0);
 		const unsigned tabSize = 4;
 		
+		// tokenize text source
 		while (source.good())
 		{
 			int c = source.get();
+			
+			if (c == EOF)
+				break;
+			
 			pos.column++;
 			pos.character++;
 			
 			switch (c)
 			{
 				// simple cases of one character
-				case EOF: tokens.push_back(Token(Token::TOKEN_END_OF_STREAM, pos)); return;
 				case ' ': break;
 				//case '\t': pos.column += tabSize - 1; break;
 				case '\t': break;
@@ -273,6 +274,27 @@ namespace Aseba
 				break;
 			} // switch (c)
 		} // while (source.good())
+		
+		// merge unary minus and literals
+		for (std::deque<Token>::iterator it = tokens.begin(); it != tokens.end(); )
+		{
+			std::deque<Token>::iterator prevIt = it;
+			++it;
+			
+			if (it == tokens.end())
+				break;
+			
+			if (*prevIt == Token::TOKEN_OP_NEG)
+			{
+				if (*it == Token::TOKEN_INT_LITERAL)
+				{
+					prevIt->type = Token::TOKEN_INT_LITERAL;
+					prevIt->iValue = -it->iValue;
+					it = tokens.erase(it);
+				}
+			}
+		}
+		
 		tokens.push_back(Token(Token::TOKEN_END_OF_STREAM, pos));
 	}
 	

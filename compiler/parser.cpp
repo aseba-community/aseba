@@ -47,20 +47,20 @@ namespace Aseba
 				);
 	}
 	
-	//! Check if next token is an unsigned 15 bits int literal. If so, return it, if not, throw an exception
-	int Compiler::expectInt15Literal() const
+	//! Check if next token is a signed 16 bits int literal. If so, return it, if not, throw an exception
+	int Compiler::expectInt16Literal() const
 	{
 		expect(Token::TOKEN_INT_LITERAL);
-		if (tokens.front().iValue > 32767)
+		if ((tokens.front().iValue > 32767) || (tokens.front().iValue < -32768))
 			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [0;32767] range")
+				FormatableString("Integer value %0 out of [-32768;32767] range")
 					.arg(tokens.front().iValue)
 				);
 		return tokens.front().iValue;
 	}
 	
 	//! Check if next token is an unsigned 12 bits int literal. If so, return it, if not, throw an exception
-	unsigned Compiler::expectInt12Literal() const
+	unsigned Compiler::expectUInt12Literal() const
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue > 4095)
@@ -91,7 +91,7 @@ namespace Aseba
 				throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
 		}
 		else
-			eventId = expectInt12Literal();
+			eventId = expectUInt12Literal();
 		return eventId;
 	}
 	
@@ -219,7 +219,7 @@ namespace Aseba
 			
 			for (unsigned i = 0; i < varSize; i++)
 			{
-				int value = expectInt15Literal();
+				int value = expectInt16Literal();
 				
 				block->children.push_back(new ImmediateNode(tokens.front().pos, value));
 				block->children.push_back(new StoreNode(tokens.front().pos, varAddr + i));
@@ -524,7 +524,7 @@ namespace Aseba
 			
 			case Token::TOKEN_INT_LITERAL:
 			{
-				int value = expectInt15Literal();
+				int value = expectInt16Literal();
 				tokens.pop_front();
 				return new ImmediateNode(pos, value);
 			}

@@ -175,9 +175,10 @@ namespace Aseba
 				
 			} type; //!< type of this token
 			std::string sValue; //!< string version of the value
-			unsigned iValue; //!< int version of the value, 0 if not applicable
+			int iValue; //!< int version of the value, 0 if not applicable
 			SourcePos pos;//!< position of token in source code
 			
+			Token() : type(TOKEN_END_OF_STREAM), iValue(0) {}
 			Token(Type type, SourcePos pos = SourcePos(), const std::string& value = "");
 			const char* typeName() const;
 			std::string toString() const;
@@ -193,8 +194,8 @@ namespace Aseba
 	protected:
 		void internalCompilerError() const;
 		void expect(const Token::Type& type) const;
-		int expectInt15Literal() const;
-		unsigned expectInt12Literal() const;
+		int expectInt16Literal() const;
+		unsigned expectUInt12Literal() const;
 		unsigned expectEventId() const;
 		bool isOneOf(const Token::Type *types, size_t length) const;
 		void expectOneOf(const Token::Type *types, size_t length) const;
