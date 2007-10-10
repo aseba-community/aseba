@@ -18,4 +18,4 @@ PRE_TARGETDEPS = ../compiler/libaeslc.a ../vm/build-local/libasebavm.a
 # SOURCES += RemoteBluetoothTarget.cpp LocalVirtualMachine.cpp 
 
 HEADERS += ClickableLabel.h MainWindow.h AeslEditor.h Target.h TcpTarget.h TargetModels.h CustomDelegate.h FunctionParametersDialog.h ../compiler/compiler.h ../vm/vm.h
-SOURCES += ClickableLabel.cpp MainWindow.cpp AeslEditor.cpp TcpTarget.cpp TargetModels.cpp CustomDelegate.cpp FunctionParametersDialog.cpp main.cpp
+SOURCES += ClickableLabel.cpp MainWindow.cpp AeslEditor.cpp Target.cpp TcpTarget.cpp TargetModels.cpp CustomDelegate.cpp FunctionParametersDialog.cpp main.cpp

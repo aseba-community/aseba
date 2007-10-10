@@ -26,6 +26,7 @@
 
 #include "../common/types.h"
 #include "../common/consts.h"
+#include "../compiler/compiler.h"
 #include <vector>
 #include <string>
 
@@ -148,19 +149,8 @@ namespace Aseba
 		virtual operator const char * () const { return "presence"; }
 	};
 	
-	class Description : public Message
+	class Description : public Message, public TargetDescription
 	{
-	public:
-		std::string nodeName;
-		
-		uint16 bytecodeSize;
-		
-		uint16 stackSize;
-		
-		uint16 variablesSize;
-		std::vector<std::string> variablesNames;
-		std::vector<uint16> variablesSizes;
-		
 	public:
 		Description() : Message(ASEBA_MESSAGE_DESCRIPTION) { }
 		

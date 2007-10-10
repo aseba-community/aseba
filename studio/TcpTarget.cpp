@@ -82,15 +82,6 @@ namespace Aseba
 		}
 	}
 	
-	const QString TcpTarget::getName(unsigned node) const
-	{
-		NodesMap::const_iterator nodeIt = nodes.find(node);
-		if (nodeIt != nodes.end())
-			return nodeIt->second.name;
-		else
-			return QString("node %0").arg(node);
-	}
-	
 	const TargetDescription * const TcpTarget::getConstDescription(unsigned node) const
 	{
 		NodesMap::const_iterator nodeIt = nodes.find(node);
@@ -260,23 +251,11 @@ namespace Aseba
 		
 		// create node
 		Node& node = nodes[id];
-		node.name = QString::fromUtf8(description->nodeName.c_str());
 		
 		// copy description into it
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
-		node.description.bytecodeSize = description->bytecodeSize;
-		node.description.variablesSize = description->variablesSize;
-		node.description.stackSize = description->stackSize;
-		for (size_t i = 0; i < description->variablesNames.size(); i++)
-			node.description.namedVariables.push_back(
-				TargetDescription::NamedVariable(
-					description->variablesNames[i],
-					description->variablesSizes[i]
-				)
-			);
-		
-		// TODO: native functions
+		node.description = *description;
 		
 		// attach debugger
 		// AttachDebugger(id).serialize(socketDescriptor());

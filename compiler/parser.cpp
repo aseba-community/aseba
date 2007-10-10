@@ -592,7 +592,7 @@ namespace Aseba
 		expect(Token::TOKEN_PAR_OPEN);
 		tokens.pop_front();
 		
-		if (function.argumentsSize.size() == 0)
+		if (function.parameters.size() == 0)
 		{
 			if (tokens.front() != Token::TOKEN_PAR_CLOSE)
 				throw Error(tokens.front().pos, FormatableString("Function %0 requires no argument, some are used").arg(funcName));
@@ -600,12 +600,14 @@ namespace Aseba
 		}
 		else
 		{
+			// TODO: use template
+			
 			// trees for arguments
-			for (unsigned i = 0; i < function.argumentsSize.size(); i++)
+			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-					throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.argumentsSize.size()).arg(i));
+					throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
 				else
 					expect(Token::TOKEN_STRING_LITERAL);
 				
@@ -619,25 +621,25 @@ namespace Aseba
 				// check if variable size is correct
 				unsigned varAddr = varIt->second.first;
 				unsigned varSize = varIt->second.second;
-				if (varSize != function.argumentsSize[i])
-					throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, function definition demands size %3").arg(varName).arg(funcName).arg(varSize).arg(function.argumentsSize[i]));
+				if (varSize != function.parameters[i].size)
+					throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, function definition demands size %3").arg(varName).arg(funcName).arg(varSize).arg(function.parameters[i].size));
 				
 				// store variable address
 				callNode->argumentsAddr.push_back(varAddr);
 				tokens.pop_front();
 				
 				// parse comma or end parenthesis
-				if (i + 1 == function.argumentsSize.size())
+				if (i + 1 == function.parameters.size())
 				{
 					if (tokens.front() == Token::TOKEN_COMMA)
-						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.argumentsSize.size()));
+						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.parameters.size()));
 					else
 						expect(Token::TOKEN_PAR_CLOSE);
 				}
 				else
 				{
 					if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.argumentsSize.size()).arg(i + 1));
+						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i + 1));
 					else
 						expect(Token::TOKEN_COMMA);
 				}

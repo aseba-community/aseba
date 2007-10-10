@@ -85,10 +85,10 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	uint16 size;
 	switch (vm->nodeId)
 	{
-		case 1: size = 6 + 11 + (8 + 15); break;
-		case 2: size = 6 + 12 + (8 + 15); break;
-		case 3: size = 6 + 18 + (8 + 20); break;
-		case 4: size = 6 + 17 + (6 + 15); break;
+		case 1: size = 8 + 11 + (8 + 15); break;
+		case 2: size = 8 + 12 + (8 + 15); break;
+		case 3: size = 8 + 18 + (8 + 20); break;
+		case 4: size = 8 + 17 + (6 + 15); break;
 		default: assert(false); break;
 	}
 	socket->write(&size, 2);
@@ -111,6 +111,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	socket->write(&vm->stackSize, 2);
 	socket->write(&vm->variablesSize, 2);
 	
+	// write list of variables
 	switch (vm->nodeId)
 	{
 		case 1:
@@ -120,17 +121,17 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 			size = 3;
 			socket->write(&size, 2);
 			
-			AsebaWriteString(socket, "args");
 			size = 32;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "args");
 			
-			AsebaWriteString(socket, "speed");
 			size = 1;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "speed");
 			
-			AsebaWriteString(socket, "odo");
 			size = 2;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "odo");
 		}
 		break;
 		
@@ -140,17 +141,17 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 			size = 3;
 			socket->write(&size, 2);
 			
-			AsebaWriteString(socket, "args");
 			size = 32;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "args");
 			
-			AsebaWriteString(socket, "bumpers");
 			size = 24;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "bumpers");
 			
-			AsebaWriteString(socket, "ground");
 			size = 12;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "ground");
 		}
 		break;
 		
@@ -160,18 +161,22 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 			size = 2;
 			socket->write(&size, 2);
 			
-			AsebaWriteString(socket, "args");
 			size = 32;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "args");
 			
-			AsebaWriteString(socket, "distances");
 			size = 180;
 			socket->write(&size, 2);
+			AsebaWriteString(socket, "distances");
 		}
 		break;
 		
 		default: assert(false);	break;
 	}
+	
+	// write native functions
+	size = 0;
+	socket->write(&size, 2);
 	
 	socket->flush();
 }

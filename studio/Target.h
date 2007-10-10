@@ -88,7 +88,7 @@ namespace Aseba
 	
 	public:
 		//! Return the name of a node. Returned value is always valid if node exists
-		virtual const QString getName(unsigned node) const = 0;
+		const QString getName(unsigned node) const;
 		
 		//! Return a constant description of a node. Returned value is always valid if node exists
 		virtual const TargetDescription * const getConstDescription(unsigned node) const = 0;
@@ -100,6 +100,7 @@ namespace Aseba
 		virtual void sendEvent(unsigned id, const VariablesDataVector &data) = 0;
 		
 		// variables
+		
 		//! Set part of variables memory
 		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector &data) = 0;
 		

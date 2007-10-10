@@ -48,7 +48,6 @@ namespace Aseba
 		virtual void connect();
 		virtual void disconnect();
 		
-		virtual const QString getName(unsigned node) const;
 		virtual const TargetDescription * const getConstDescription(unsigned node) const;
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);

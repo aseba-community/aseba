@@ -49,17 +49,29 @@ namespace Aseba
 		//! Description of target VM named variable
 		struct NamedVariable
 		{
-			NamedVariable(const std::string &name, unsigned size) : name(name), size(size) {}
-			std::string name; //!< name of variable
+			NamedVariable(const std::string &name, unsigned size) : size(size), name(name) {}
+			NamedVariable() {}
+			
 			unsigned size; //!< size of variable in words
+			std::string name; //!< name of variable
+		};
+		
+		//! Typed parameter of native functions
+		struct NativeFunctionParameter
+		{
+			int size; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
+			std::string name; //!< name of the parameter
 		};
 		
 		//! Description of target VM native function
 		struct NativeFunction
 		{
-			std::string name; //!< name of function
-			std::vector<unsigned> argumentsSize; //!< for each argument of the function, its size in words
+			std::string name; //!< name of the function
+			std::string description; //!< description (some short documentation) of the function
+			std::vector<NativeFunctionParameter> parameters; //!< for each argument of the function, its size in words or, if negative, its template ID
 		};
+		
+		std::string name; //!< node name
 		
 		unsigned bytecodeSize; //!< total amount of bytecode space
 		unsigned variablesSize; //!< total amount of variables space

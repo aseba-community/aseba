@@ -148,29 +148,39 @@ namespace Aseba
 	
 	int TargetFunctionsModel::columnCount(const QModelIndex & /* parent */) const
 	{
-		return 2;
+		return 1;
 	}
 	
 	QVariant TargetFunctionsModel::data(const QModelIndex &index, int role) const
 	{
-		if (!index.isValid() || role != Qt::DisplayRole)
+		if (!index.isValid() ||
+			(role != Qt::DisplayRole && role != Qt::ToolTipRole && role != Qt::WhatsThisRole))
 			return QVariant();
 		
-		if (index.column() == 0)
+		if (role == Qt::DisplayRole)
 		{
 			return QString::fromUtf8(descriptionRead->nativeFunctions[index.row()].name.c_str());
 		}
 		else
 		{
-			QString argumentList;
-			for (size_t i = 0; i < descriptionRead->nativeFunctions[index.row()].argumentsSize.size(); i++)
+			// tooltip, display detailed information with pretty print of template parameters
+			const TargetDescription::NativeFunction& function = descriptionRead->nativeFunctions[index.row()];
+			QString text;
+			text += QString("<b>%0</b>(").arg(QString::fromUtf8(function.name.c_str()));
+			for (size_t i = 0; i < function.parameters.size(); i++)
 			{
-				argumentList += QString("%0").arg(descriptionRead->nativeFunctions[index.row()].argumentsSize[i]);
-				argumentList += " ";
+				text += QString("%0").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
+				if (function.parameters[i].size > 0)
+					text += QString("<%0>").arg(function.parameters[i].size);
+				else if (function.parameters[i].size < 0)
+					text += QString("<T%0>").arg(-function.parameters[i].size);
+				
+				if (i + 1 < function.parameters.size())
+					text += QString(", ");
 			}
-			if (argumentList.isEmpty())
-				argumentList = tr("0 arg");
-			return argumentList;
+			
+			text += QString("<br/>%0").arg(QString::fromUtf8(function.description.c_str()));
+			return text;
 		}
 	}
 	

@@ -329,43 +329,82 @@ namespace Aseba
 	
 	void Description::serializeSpecific()
 	{
-		add(nodeName);
+		add(name);
+		
 		add(bytecodeSize);
 		add(stackSize);
 		add(variablesSize);
 		
-		assert(variablesNames.size() == variablesSizes.size());
-		add(static_cast<uint16>(variablesNames.size()));
-		for (size_t i = 0; i < variablesNames.size(); i++)
+		add(static_cast<uint16>(namedVariables.size()));
+		for (size_t i = 0; i < namedVariables.size(); i++)
 		{
-			add(variablesNames[i]);
-			add(variablesSizes[i]);
+			add(namedVariables[i].size);
+			add(namedVariables[i].name);
+		}
+		
+		add(static_cast<uint16>(nativeFunctions.size()));
+		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		{
+			add(nativeFunctions[i].name);
+			add(nativeFunctions[i].description);
+			
+			add(static_cast<uint16>(nativeFunctions[i].parameters.size()));
+			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
+			{
+				add(nativeFunctions[i].parameters[j].size);
+				add(nativeFunctions[i].parameters[j].name);
+			}
 		}
 	}
 	
 	void Description::deserializeSpecific()
 	{
-		nodeName = get<string>();
+		name = get<string>();
+		
 		bytecodeSize = get<uint16>();
 		stackSize = get<uint16>();
 		variablesSize = get<uint16>();
 		
-		uint16 namedVariablesCount = get<uint16>();
-		variablesNames.resize(namedVariablesCount);
-		variablesSizes.resize(namedVariablesCount);
-		for (size_t i = 0; i < variablesNames.size(); i++)
+		namedVariables.resize(get<uint16>());
+		for (size_t i = 0; i < namedVariables.size(); i++)
 		{
-			variablesNames[i] = get<string>();
-			variablesSizes[i] = get<uint16>();
+			namedVariables[i].size = get<uint16>();
+			namedVariables[i].name = get<string>();
+		}
+		
+		nativeFunctions.resize(get<uint16>());
+		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		{
+			nativeFunctions[i].name = get<string>();
+			nativeFunctions[i].description = get<string>();
+			
+			nativeFunctions[i].parameters.resize(get<uint16>());
+			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
+			{
+				nativeFunctions[i].parameters[j].size = get<sint16>();
+				nativeFunctions[i].parameters[j].name = get<string>();
+			}
 		}
 	}
 	
 	void Description::dumpSpecific(ostream &stream)
 	{
-		stream << "Node " << nodeName << "\n";
+		stream << "Node " << name << "\n";
 		stream << "bytecode " << bytecodeSize << ", stack " << stackSize << ", variables " << variablesSize;
-		for (size_t i = 0; i < variablesNames.size(); i++)
-			stream << "\n\t" << variablesNames[i] << " : " << variablesSizes[i];
+		for (size_t i = 0; i < namedVariables.size(); i++)
+			stream << "\n\t" << namedVariables[i].name << " : " << namedVariables[i].size;
+		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		{
+			stream << "\n\t" << nativeFunctions[i].name << " (";
+			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
+			{
+				stream << nativeFunctions[i].parameters[j].name;
+				stream << "<" << nativeFunctions[i].parameters[j].size << ">";
+				if (j + 1 < nativeFunctions[i].parameters.size())
+					stream << ", ";
+			}
+			stream << " : " << nativeFunctions[i].description;
+		}
 	}
 	
 	//
