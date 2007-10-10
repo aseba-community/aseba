@@ -25,6 +25,7 @@
 #include "tree.h"
 #include "../utils/FormatableString.h"
 #include <memory>
+#include <valarray>
 #include <iostream>
 #include <cassert>
 
@@ -600,7 +601,11 @@ namespace Aseba
 		}
 		else
 		{
-			// TODO: use template
+			// count the number of template parameters and build array
+			int min = 0;
+			for (unsigned i = 0; i < function.parameters.size(); i++)
+				min = std::min(function.parameters[i].size, min);
+			std::valarray<int> templateParameters(-1, -min);
 			
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
@@ -621,8 +626,29 @@ namespace Aseba
 				// check if variable size is correct
 				unsigned varAddr = varIt->second.first;
 				unsigned varSize = varIt->second.second;
-				if (varSize != function.parameters[i].size)
-					throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, function definition demands size %3").arg(varName).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+				if (function.parameters[i].size > 0)
+				{
+					if (varSize != function.parameters[i].size)
+						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, function definition demands size %3").arg(varName).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+				}
+				else if (function.parameters[i].size < 0)
+				{
+					int templateIndex = -function.parameters[i].size - 1;
+					if (templateParameters[templateIndex] < 0)
+					{
+						// template not initialised, store
+						templateParameters[templateIndex] = varSize;
+					}
+					else if (templateParameters[templateIndex] != varSize)
+					{
+						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, while previous instance of the template parameter was of size %3").arg(varName).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+					}
+				}
+				else
+				{
+					// any size, store variable size
+					callNode->argumentsAddr.push_back(varSize);
+				}
 				
 				// store variable address
 				callNode->argumentsAddr.push_back(varAddr);
@@ -645,6 +671,11 @@ namespace Aseba
 				}
 				tokens.pop_front();
 			} // for
+			
+			// store template parameters size when initialized
+			for (unsigned i = 0; i < templateParameters.size(); i++)
+				if (templateParameters[i] >= 0)
+					callNode->argumentsAddr.push_back(templateParameters[i]);
 		} // if
 		
 		// return the node for the function call
