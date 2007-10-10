@@ -30,6 +30,7 @@
 #include <net/if.h>
 #include <net/ethernet.h>
 #include <netpacket/packet.h>
+#include <signal.h>
 #include <iostream>
 #include <set>
 #include <valarray>
@@ -240,6 +241,18 @@ namespace Aseba
 					// we got exception, so socket list is dirty, get out of this loop
 					return;
 				}
+				catch (Exception::FileDescriptorError e)
+				{
+					if (verbose)
+					{
+						dumpTime(std::cout);
+						std::cout << "Socket error: FD " << e.fd << " error " << e.errNumber << std::endl;
+					}
+					closeConnection(e.fd);
+					
+					// we got exception, so socket list is dirty, get out of this loop
+					return;
+				}
 			}
 		}
 	}
@@ -388,6 +401,9 @@ int main(int argc, char *argv[])
 	char *canIface = "can0";
 	
 	int argCounter = 1;
+	
+	// do not quit on fd close, use our exception instead
+	signal(SIGPIPE, SIG_IGN);
 	
 	while (argCounter < argc)
 	{
