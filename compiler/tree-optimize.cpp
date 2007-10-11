@@ -39,6 +39,8 @@ namespace Aseba
 				it = children.erase(it);
 				continue;
 			}
+			else
+				*it = optimizedChild;
 			
 			// special case for empty blocks
 			if (dynamic_cast<BlockNode *>(*it) && (*it)->children.empty())

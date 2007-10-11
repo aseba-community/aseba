@@ -25,6 +25,8 @@
 #define TARGET_MODELS_H
 
 #include <QAbstractTableModel>
+#include <QVector>
+#include <QString>
 #include "../compiler/compiler.h"
 
 
@@ -103,7 +105,7 @@ namespace Aseba
 		void setVariablesData(unsigned start, const VariablesDataVector &data);
 		
 	private:
-		VariablesNamesVector variablesNames;
+		QVector<QString> variablesNames;
 		VariablesDataVector variablesData;
 	};
 }; // Aseba

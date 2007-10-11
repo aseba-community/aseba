@@ -132,11 +132,28 @@ namespace Aseba
 		{
 			int pos = uData->properties["errorPos"].toInt();
 			int len = 0;
-			while (pos + len < text.length())
-				if (!text[pos + len].isLetter())
-					break;
+			
+			if (pos + len < text.length())
+			{
+				if (text[pos + len].isDigit())
+				{
+					// find length of number
+					while (pos + len < text.length())
+						if (!text[pos + len].isDigit())
+							break;
+						else
+							len++;
+				}
 				else
-					len++;
+				{
+					// find length of word
+					while (pos + len < text.length())
+						if (!text[pos + len].isLetter() && (text[pos + len] != '_'))
+							break;
+						else
+							len++;
+				}
+			}
 			len = len > 0 ? len : 1;
 			setFormat(pos, len, Qt::red);
 		}

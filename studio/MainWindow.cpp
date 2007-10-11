@@ -91,9 +91,8 @@ namespace Aseba
 	void MemoryTableView::resizeColumnsToContents ()
 	{
 		QFontMetrics fm(font());
-		setColumnWidth(0, fm.width("FFFF"));
+		setColumnWidth(0, fm.width("it is long text [9]"));
 		setColumnWidth(1, fm.width("-888888"));
-		setColumnWidth(2, fm.width("it is long text"));
 	}
 	
 	NodeTab::NodeTab(Target *target, const EventsNamesVector *eventsNames, int id, QWidget *parent) :
@@ -633,7 +632,7 @@ namespace Aseba
 	{
 		QString fileName = path;
 	
-		if (fileName.isNull())
+		if (fileName.isEmpty())
 			fileName = QFileDialog::getOpenFileName(this,
 				tr("Open Script"), "", "AESL scripts (*.aesl)");
 		
@@ -699,11 +698,11 @@ namespace Aseba
 	{
 		QString fileName = previousFileName;
 		
-		if (fileName.isNull())
+		if (fileName.isEmpty())
 			fileName = QFileDialog::getSaveFileName(this,
 				tr("Save Script"), actualFileName, "AESL scripts (*.aesl)");
 		
-		if (fileName.isNull())
+		if (fileName.isEmpty())
 			return;
 		
 		if (fileName.lastIndexOf(".") < 0)

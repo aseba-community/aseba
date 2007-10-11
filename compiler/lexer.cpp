@@ -139,25 +139,25 @@ namespace Aseba
 				
 				// special case for comment
 				case '#':
+				{
+					while ((c != '\n') && (c != '\r') && (c != EOF))
 					{
-						while ((c != '\n') && (c != '\r') && (c != EOF))
-						{
-							if (c == '\t')
-								pos.column += tabSize;
-							else
-								pos.column++;
-							c = source.get();
-							pos.character++;
-						}
-						if (c == '\n')
-						{
-							pos.row++;
-							pos.column = 0;
-						}
-						else if (c == '\r')
-							pos.column = 0;
+						if (c == '\t')
+							pos.column += tabSize;
+						else
+							pos.column++;
+						c = source.get();
+						pos.character++;
 					}
-					break;
+					if (c == '\n')
+					{
+						pos.row++;
+						pos.column = 0;
+					}
+					else if (c == '\r')
+						pos.column = 0;
+				}
+				break;
 				
 				// cases that require one character look-ahead
 				case '!':
@@ -274,26 +274,6 @@ namespace Aseba
 				break;
 			} // switch (c)
 		} // while (source.good())
-		
-		// merge unary minus and literals
-		for (std::deque<Token>::iterator it = tokens.begin(); it != tokens.end(); )
-		{
-			std::deque<Token>::iterator prevIt = it;
-			++it;
-			
-			if (it == tokens.end())
-				break;
-			
-			if (*prevIt == Token::TOKEN_OP_NEG)
-			{
-				if (*it == Token::TOKEN_INT_LITERAL)
-				{
-					prevIt->type = Token::TOKEN_INT_LITERAL;
-					prevIt->iValue = -it->iValue;
-					it = tokens.erase(it);
-				}
-			}
-		}
 		
 		tokens.push_back(Token(Token::TOKEN_END_OF_STREAM, pos));
 	}

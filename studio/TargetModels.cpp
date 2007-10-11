@@ -278,7 +278,7 @@ namespace Aseba
 	
 	int TargetMemoryModel::columnCount(const QModelIndex & /* parent */) const
 	{
-		return 3;
+		return 2;
 	}
 	
 	QVariant TargetMemoryModel::data(const QModelIndex &index, int role) const
@@ -288,9 +288,8 @@ namespace Aseba
 			return QVariant();
 		switch (index.column())
 		{
-			case 0: return QString("%0").arg(index.row(), 0, 16);
+			case 0: return variablesNames[index.row()];
 			case 1: return variablesData[index.row()];
-			case 2: return QString::fromUtf8(variablesNames[index.row()].c_str());
 			default: return QVariant();
 		}
 	}
@@ -307,16 +306,32 @@ namespace Aseba
 	{
 		switch (index.column())
 		{
-			case 0: return Qt::ItemIsEnabled;
+			case 0: return 0;
 			case 1: return Qt::ItemIsEnabled;
-			case 2: return 0;
 			default: return 0;
 		}
 	}
 	
 	void TargetMemoryModel::setVariablesNames(const VariablesNamesVector &names)
 	{
-		variablesNames = names;
+		variablesNames.resize(names.size());
+		
+		QString name;
+		unsigned counter = 0;
+		for (size_t i = 0; i < names.size(); i++)
+		{
+			QString newName = QString::fromUtf8(names[i].c_str());
+			if (newName != name)
+			{
+				name = newName;
+				counter = 0;
+			}
+			else
+				counter++;
+			if (!name.isEmpty())
+				variablesNames[i] = QString("%0[%1]").arg(name).arg(counter);
+		}
+		
 		variablesData.resize(variablesNames.size());
 		reset();
 	}

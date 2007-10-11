@@ -108,6 +108,7 @@ namespace Aseba
 		// optimization
 		try
 		{
+			// TODO: optimize unary -
 			program = program->optimize(dump);
 		}
 		catch (Error error)

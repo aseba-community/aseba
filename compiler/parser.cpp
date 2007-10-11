@@ -220,12 +220,8 @@ namespace Aseba
 			
 			for (unsigned i = 0; i < varSize; i++)
 			{
-				int value = expectInt16Literal();
-				
-				block->children.push_back(new ImmediateNode(tokens.front().pos, value));
+				block->children.push_back(parseShiftExpression());
 				block->children.push_back(new StoreNode(tokens.front().pos, varAddr + i));
-				
-				tokens.pop_front();
 				
 				if (i + 1 < varSize)
 				{
