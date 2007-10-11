@@ -163,6 +163,11 @@ namespace Aseba
 		// panel
 		
 		// buttons
+		QHBoxLayout *executionTitleLayout = new QHBoxLayout;
+		executionTitleLayout->addWidget(new QLabel(tr("<b>Execution</b>")));
+		executionModeLabel = new QLabel(tr("unknown"));
+		executionTitleLayout->addWidget(executionModeLabel);
+		
 		debugButton = new QPushButton(QIcon(":/images/upload.png"), tr("Debug"));
 		resetButton = new QPushButton(QIcon(":/images/reset.png"), tr("Reset"));
 		resetButton->setEnabled(false);
@@ -206,7 +211,7 @@ namespace Aseba
 		
 		// panel
 		QVBoxLayout *panelLayout = new QVBoxLayout;
-		panelLayout->addWidget(new QLabel(tr("<b>Execution</b>")));
+		panelLayout->addLayout(executionTitleLayout);
 		panelLayout->addWidget(debugButton);
 		panelLayout->addWidget(resetButton);
 		panelLayout->addWidget(runInterruptButton);
@@ -408,7 +413,7 @@ namespace Aseba
 		
 		if (mode == Target::EXECUTION_RUN)
 		{
-			compilationResultText->setText(tr("Running"));
+			executionModeLabel->setText(tr("running"));
 			
 			runInterruptButton->setText(tr("Pause"));
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
@@ -417,7 +422,7 @@ namespace Aseba
 		}
 		else if (mode == Target::EXECUTION_STEP_BY_STEP)
 		{
-			compilationResultText->setText(tr("Executing step by step"));
+			executionModeLabel->setText(tr("step by step"));
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
@@ -426,7 +431,7 @@ namespace Aseba
 		}
 		else if (mode == Target::EXECUTION_STOP)
 		{
-			compilationResultText->setText(tr("Stopped"));
+			executionModeLabel->setText(tr("stopped"));
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
@@ -646,7 +651,7 @@ namespace Aseba
 		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
 			int noNodeCount = 0;
-			openedFileName = fileName;
+			actualFileName = fileName;
 			QDomNode domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
 			{
@@ -685,18 +690,32 @@ namespace Aseba
 		recompileAll();
 	}
 	
-	void MainWindow::saveFile(const QString &path)
+	void MainWindow::save()
 	{
-		QString fileName = path;
+		saveFile(actualFileName);
+	}
+	
+	void MainWindow::saveFile(const QString &previousFileName)
+	{
+		QString fileName = previousFileName;
 		
 		if (fileName.isNull())
 			fileName = QFileDialog::getSaveFileName(this,
-				tr("Save Script"), openedFileName, "AESL scripts (*.aesl)");
+				tr("Save Script"), actualFileName, "AESL scripts (*.aesl)");
+		
+		if (fileName.isNull())
+			return;
+		
+		if (fileName.lastIndexOf(".") < 0)
+			fileName += ".aesl";
 		
 		QFile file(fileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
 			return;
 		
+		actualFileName = fileName;
+		
+		// initiate DOM tree
 		QDomDocument document("aesl-source");
 		QDomElement root = document.createElement("network");
 		document.appendChild(root);
@@ -1191,8 +1210,10 @@ namespace Aseba
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Open..."), 
 							this, SLOT(openFile()),
 							QKeySequence(tr("Ctrl+O", "File|Open")));
+		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
+							this, SLOT(saveFile()));
 		fileMenu->addAction(QIcon(":/images/filesave.png"), tr("&Save..."),
-							this, SLOT(saveFile()),
+							this, SLOT(save()),
 							QKeySequence(tr("Ctrl+S", "File|Save")));
 		fileMenu->addSeparator();
 		fileMenu->addAction(QIcon(":/images/network.png"), tr("Connect to &target"),

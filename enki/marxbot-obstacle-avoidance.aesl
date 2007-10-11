@@ -5,7 +5,7 @@
     <node name="left motor" >speed = 300
 
 onevent ObstacleDetected
-speed = 300 + (args[0] - args[1])
+speed = 300 + (args[0] - args[1]) * 4
 
 onevent FreeOfObstacle
 speed = 300
@@ -13,7 +13,7 @@ speed = 300
     <node name="right motor" >speed = 300
 
 onevent ObstacleDetected
-speed = 300 + (args[0] + args[1])
+speed = 300 + (args[0] + args[1]) * 4
 
 onevent FreeOfObstacle
 speed = 300</node>
@@ -24,7 +24,7 @@ speed = 300</node>
 # vector field obstacle avoidance
 var vectorX[24] = -254, -241, -212, -168, -113,  -50, 17, 82, 142, 192, 229, 250, 254, 241, 212,  168, 113, 50, -17, -82, -142, -192, -229, -250
 var vectorY[24] = -17, -82, -142, -192, -229, -250, -254, -241, -212, -168, -113, -50, 17, 82  , 142, 192, 229, 250, 254, 241, 212, 168, 113, 50
-var threshold = 100
+var threshold = 80
 
 ontimer
 
@@ -39,7 +39,7 @@ eventBuffer[1] = ret
 shift = 0
 call mac(eventBuffer, eventBuffer, ret, shift)
 
-when ret > threshold + 20 do
+if ret > threshold + 10 then
 	emit ObstacleDetected eventBuffer
 end
 when ret &lt; threshold + -20 do

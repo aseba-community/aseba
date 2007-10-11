@@ -101,6 +101,7 @@ namespace Aseba
 		QLabel *compilationResultImage;
 		QLabel *compilationResultText;
 		
+		QLabel *executionModeLabel;
 		QPushButton *debugButton;
 		QPushButton *resetButton;
 		QPushButton *runInterruptButton;
@@ -116,7 +117,6 @@ namespace Aseba
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
 		
-		QString openedFileName; //!< name of opened file, "" if new
 		Compiler compiler; //!< Aesl compiler
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		VariablesNamesVector variablesNames; //!< names of variables resulting of last successfull compilation
@@ -136,7 +136,8 @@ namespace Aseba
 		void about();
 		void newFile();
 		void openFile(const QString &path = QString());
-		void saveFile(const QString &path = QString());
+		void save();
+		void saveFile(const QString &previousFileName = QString());
 		
 		void debugAll();
 		void resetAll();
@@ -209,7 +210,7 @@ namespace Aseba
 		QAction *redoAct;
 		
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
-		QString openedFileName; //!< name of opened file, "" if new
+		QString actualFileName; //!< name of opened file, "" if new
 		Compiler compiler; //!< Aesl compiler
 		Target *target;
 	};
