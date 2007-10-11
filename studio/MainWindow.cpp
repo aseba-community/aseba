@@ -302,8 +302,7 @@ namespace Aseba
 		
 		// compile
 		std::istringstream is(std::string(editor->toPlainText().toUtf8()));
-		std::ostringstream compilationMessages;
-		bool result = compiler.compile(is, bytecode, variablesNames, allocatedVariablesCount, error, compilationMessages);
+		bool result = compiler.compile(is, bytecode, variablesNames, allocatedVariablesCount, error);
 		if (result)
 		{
 			vmMemoryModel->setVariablesNames(variablesNames);
@@ -592,7 +591,7 @@ namespace Aseba
 		
 		// cosmetic dix-up
 		setWindowTitle(tr("Aseba Studio"));
-		resize(620,440);
+		resize(1000,700);
 		
 		// connect to target
 		target->connect();
@@ -899,7 +898,7 @@ namespace Aseba
 			std::ostringstream compilationMessages;
 			BytecodeVector bytecode;
 			Error error;
-			bool result = tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, compilationMessages, true);
+			bool result = tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, &compilationMessages);
 			
 			if (result)
 				compilationMessageBox->text->setText(
@@ -987,13 +986,16 @@ namespace Aseba
 	{
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
 		if (id < eventsNames.size())
-			text += tr(" %0 : ").arg(QString::fromStdString(eventsNames[id]));
+			text += tr("\n%0 : ").arg(QString::fromStdString(eventsNames[id]));
 		else
-			text += tr(" event %0 : ").arg(id);
+			text += tr("\nevent %0 : ").arg(id);
 		for (size_t i = 0; i < data.size(); i++)
 			text += QString("%0 ").arg(data[i]);
+		
+		if (logger->count() > 50)
+			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
-		logger->scrollToItem(item);
+		logger->scrollToBottom();
 	}
 	
 	//! A node did an access out of array bounds exception.
@@ -1009,10 +1011,13 @@ namespace Aseba
 		}
 		
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += tr(" %0: array access out of bounds at line %1, index %2").arg(target->getName(node)).arg(line + 1).arg(index);
+		text += tr("\n%0:%1: access out of memory (%2/%3)").arg(target->getName(node)).arg(line + 1).arg(index).arg(target->getConstDescription(node)->variablesSize);
+		
+		if (logger->count() > 50)
+			delete logger->takeItem(0);
 		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
 		item->setData(Qt::UserRole, QPoint(node, line));
-		logger->scrollToItem(item);
+		logger->scrollToBottom();
 		
 		tab->executionModeChanged(Target::EXECUTION_STOP);
 	}
@@ -1030,10 +1035,13 @@ namespace Aseba
 		}
 		
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += tr(" %0: division by zero at line %1").arg(target->getName(node)).arg(line + 1);
+		text += tr("\n%0:%1: division by zero").arg(target->getName(node)).arg(line + 1);
+		
+		if (logger->count() > 50)
+			delete logger->takeItem(0);
 		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
 		item->setData(Qt::UserRole, QPoint(node, line));
-		logger->scrollToItem(item);
+		logger->scrollToBottom();
 		
 		tab->executionModeChanged(Target::EXECUTION_STOP);
 	}
@@ -1128,20 +1136,22 @@ namespace Aseba
 		previousActiveTab = 0;
 		nodes = new QTabWidget;
 		nodes->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-		setCentralWidget(nodes);
 		
-		QDockWidget* eventsDock = new QDockWidget(tr("Events"), this);
+		QSplitter *splitter = new QSplitter();
+		splitter->addWidget(nodes);
+		setCentralWidget(splitter);
+		
 		QWidget* eventsDockWidget = new QWidget;
-		//eventsDockWidget->setContentsMargins(0,0,0,0);
-		QHBoxLayout* eventsDockLayout = new QHBoxLayout(eventsDockWidget);
+		QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
 		
-		QVBoxLayout* eventsAddRemoveLayout = new QVBoxLayout;
+		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;
+		eventsAddRemoveLayout->addWidget(new QLabel(tr("<b>Events</b>")));
+		eventsAddRemoveLayout->addStretch();
 		addEventNameButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
 		eventsAddRemoveLayout->addWidget(addEventNameButton);
 		removeEventNameButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		removeEventNameButton->setEnabled(false);
 		eventsAddRemoveLayout->addWidget(removeEventNameButton);
-		eventsAddRemoveLayout->addStretch();
 		
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
 		
@@ -1152,11 +1162,12 @@ namespace Aseba
 		
 		logger = new QListWidget;
 		logger->setMinimumSize(80,80);
+		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		eventsDockLayout->addWidget(logger, 3);
 		
-		eventsDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-		eventsDock->setWidget(eventsDockWidget);
-		addDockWidget(Qt::BottomDockWidgetArea, eventsDock);
+		splitter->addWidget(eventsDockWidget);
+		
+		splitter->setSizes(QList<int>() << 800 << 200);
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);

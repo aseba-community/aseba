@@ -45,7 +45,7 @@ namespace Aseba
 		virtual ~Node();
 		
 		//! Optimize this node, reture true if any optimization was successful
-		virtual Node* optimize(std::ostream& dump) = 0;
+		virtual Node* optimize(std::ostream* dump) = 0;
 		//! Generate bytecode
 		virtual void emit(PreLinkBytecode& bytecodes) const = 0;
 		
@@ -65,7 +65,7 @@ namespace Aseba
 	{
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Block"; }
 	};
@@ -77,7 +77,7 @@ namespace Aseba
 	{
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Assign"; }
 	};
@@ -94,7 +94,7 @@ namespace Aseba
 		
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -109,7 +109,7 @@ namespace Aseba
 		
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -122,7 +122,7 @@ namespace Aseba
 		
 		ContextSwitcherNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -136,7 +136,7 @@ namespace Aseba
 		
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -150,7 +150,7 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 		
@@ -165,7 +165,7 @@ namespace Aseba
 	{
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "UnaryArithmetic: -"; }
 	};
@@ -180,7 +180,7 @@ namespace Aseba
 		
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -193,7 +193,7 @@ namespace Aseba
 		
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -206,7 +206,7 @@ namespace Aseba
 		
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -221,7 +221,7 @@ namespace Aseba
 		
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -236,7 +236,7 @@ namespace Aseba
 		
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -250,7 +250,7 @@ namespace Aseba
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		
-		virtual Node* optimize(std::ostream& dump);
+		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};

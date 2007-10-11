@@ -201,7 +201,7 @@ namespace Aseba
 		Compiler() { targetDescription = 0; eventsNames = 0; }
 		void setTargetDescription(const TargetDescription *description) { targetDescription = description; }
 		void setEventsNames(const EventsNamesVector *names) { eventsNames = names; }
-		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream &dump, bool verbose = false);
+		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
 	protected:
 		void internalCompilerError() const;

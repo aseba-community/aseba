@@ -55,7 +55,7 @@ namespace Aseba
 	//! \param dump stream to send dump messages to
 	//! \param verbose if true, produce full dump
 	//! \return returns true on success 
-	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream &dump, bool verbose)
+	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
 	{
 		Node *program;
 		unsigned indent = 0;
@@ -79,11 +79,11 @@ namespace Aseba
 			return false;
 		}
 		
-		if (verbose)
+		if (dump)
 		{
-			dump << "Dumping tokens:\n";
-			dumpTokens(dump);
-			dump << "\n\n";
+			*dump << "Dumping tokens:\n";
+			dumpTokens(*dump);
+			*dump << "\n\n";
 		}
 		
 		// parsing
@@ -97,18 +97,17 @@ namespace Aseba
 			return false;
 		}
 		
-		if (verbose)
+		if (dump)
 		{
-			dump << "Syntax tree before optimisation:\n" << std::endl;
-			program->dump(dump, indent);
-			dump << "\n\n";
-			dump << "Optimizations:\n" << std::endl;
+			*dump << "Syntax tree before optimisation:\n" << std::endl;
+			program->dump(*dump, indent);
+			*dump << "\n\n";
+			*dump << "Optimizations:\n" << std::endl;
 		}
 		
 		// optimization
 		try
 		{
-			// TODO: optimize unary -
 			program = program->optimize(dump);
 		}
 		catch (Error error)
@@ -118,12 +117,12 @@ namespace Aseba
 			return false;
 		}
 		
-		if (verbose)
+		if (dump)
 		{
-			dump << "\n\n";
-			dump << "Syntax tree after optimization:" << std::endl;
-			program->dump(dump, indent);
-			dump << "\n\n";
+			*dump << "\n\n";
+			*dump << "Syntax tree after optimization:" << std::endl;
+			program->dump(*dump, indent);
+			*dump << "\n\n";
 		}
 		
 		// fill variables names vector
@@ -149,11 +148,11 @@ namespace Aseba
 		// linking (flattening of complex structure into linear vector)
 		link(preLinkBytecode, bytecode);
 		
-		if (verbose)
+		if (dump)
 		{
-			dump << "Bytecode:" << std::endl;
-			disassemble(bytecode, dump);
-			dump << "\n\n";
+			*dump << "Bytecode:" << std::endl;
+			disassemble(bytecode, *dump);
+			*dump << "\n\n";
 		}
 		
 		return true;

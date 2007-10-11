@@ -28,7 +28,7 @@
 
 namespace Aseba
 {
-	Node* BlockNode::optimize(std::ostream& dump)
+	Node* BlockNode::optimize(std::ostream* dump)
 	{
 		for (NodesVector::iterator it = children.begin(); it != children.end();)
 		{
@@ -56,7 +56,7 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* AssignmentNode::optimize(std::ostream& dump)
+	Node* AssignmentNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -65,7 +65,7 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* IfWhenNode::optimize(std::ostream& dump)
+	Node* IfWhenNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -85,7 +85,8 @@ namespace Aseba
 		
 		if (trueBlock->children.empty() && (!falseBlock || falseBlock->children.empty()))
 		{
-			dump << sourcePos.toString() << ": if removed because it contained no statement.\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": if removed because it contained no statement.\n";
 			delete this;
 			return NULL;
 		}
@@ -93,7 +94,7 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* WhileNode::optimize(std::ostream& dump)
+	Node* WhileNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -104,7 +105,8 @@ namespace Aseba
 		
 		if (children[2]->children.empty())
 		{
-			dump << sourcePos.toString() << ": while removed because it contained no statement.\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": while removed because it contained no statement.\n";
 			delete this;
 			return NULL;
 		}
@@ -112,17 +114,17 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* ContextSwitcherNode::optimize(std::ostream& dump)
+	Node* ContextSwitcherNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
-	Node* EmitNode::optimize(std::ostream& dump)
+	Node* EmitNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
-	Node* BinaryArithmeticNode::optimize(std::ostream& dump)
+	Node* BinaryArithmeticNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -151,7 +153,8 @@ namespace Aseba
 				default: assert(false);
 			}
 			
-			dump << sourcePos.toString() << ": binary arithmetic expression simplified\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": binary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
@@ -163,20 +166,22 @@ namespace Aseba
 			{
 				op = ASEBA_OP_SHIFT_LEFT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
-				dump << sourcePos.toString() << ": multiplication transformed to left shift\n";
+				if (dump)
+					*dump << sourcePos.toString() << ": multiplication transformed to left shift\n";
 			}
 			else if (op == ASEBA_OP_DIV)
 			{
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
-				dump << sourcePos.toString() << ": division transformed to right shift\n";
+				if (dump)
+					*dump << sourcePos.toString() << ": division transformed to right shift\n";
 			}
 		}
 		
 		return this;
 	}
 	
-	Node* UnaryArithmeticNode::optimize(std::ostream& dump)
+	Node* UnaryArithmeticNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -188,7 +193,8 @@ namespace Aseba
 			int value = -immediateChild->value;
 			SourcePos pos = sourcePos;
 			
-			dump << sourcePos.toString() << ": unary arithmetic expression simplified\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": unary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, value);
 		}
@@ -196,22 +202,22 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* ImmediateNode::optimize(std::ostream& dump)
+	Node* ImmediateNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
-	Node* LoadNode::optimize(std::ostream& dump)
+	Node* LoadNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
-	Node* StoreNode::optimize(std::ostream& dump)
+	Node* StoreNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
-	Node* ArrayReadNode::optimize(std::ostream& dump)
+	Node* ArrayReadNode::optimize(std::ostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
@@ -232,7 +238,8 @@ namespace Aseba
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
 			
-			dump << sourcePos.toString() << ": array access transformed to single variable access\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": array access transformed to single variable access\n";
 			delete this;
 			return new LoadNode(pos, varAddr);
 		}
@@ -240,7 +247,7 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* ArrayWriteNode::optimize(std::ostream& dump)
+	Node* ArrayWriteNode::optimize(std::ostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
@@ -261,7 +268,8 @@ namespace Aseba
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
 			
-			dump << sourcePos.toString() << ": array access transformed to single variable access\n";
+			if (dump)
+				*dump << sourcePos.toString() << ": array access transformed to single variable access\n";
 			delete this;
 			return new StoreNode(pos, varAddr);
 		}
@@ -269,7 +277,7 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* CallNode::optimize(std::ostream& dump)
+	Node* CallNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
