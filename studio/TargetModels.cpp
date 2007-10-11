@@ -179,7 +179,7 @@ namespace Aseba
 					text += QString(", ");
 			}
 			
-			text += QString("<br/>%0").arg(QString::fromUtf8(function.description.c_str()));
+			text += QString(")<br/>%0").arg(QString::fromUtf8(function.description.c_str()));
 			return text;
 		}
 	}

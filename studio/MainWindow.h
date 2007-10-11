@@ -30,6 +30,7 @@ namespace Aseba
 	class TargetMemoryModel;
 	class AeslEditor;
 	class AeslHighlighter;
+	class CompilationLogDialog;
 	
 	class MemoryTableView : public QTableView
 	{
@@ -180,6 +181,7 @@ namespace Aseba
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
+		void hideEvent(QHideEvent * event);
 		
 		// data members
 		QTabWidget* nodes;
@@ -206,7 +208,7 @@ namespace Aseba
 		QAction *undoAct;
 		QAction *redoAct;
 		
-		QMessageBox *compilationMessageBox; //!< box to show last compilation messages
+		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		QString openedFileName; //!< name of opened file, "" if new
 		Compiler compiler; //!< Aesl compiler
 		Target *target;

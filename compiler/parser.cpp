@@ -602,10 +602,10 @@ namespace Aseba
 		else
 		{
 			// count the number of template parameters and build array
-			int min = 0;
+			int minTemplateId = 0;
 			for (unsigned i = 0; i < function.parameters.size(); i++)
-				min = std::min(function.parameters[i].size, min);
-			std::valarray<int> templateParameters(-1, -min);
+				minTemplateId = std::min(function.parameters[i].size, minTemplateId);
+			std::valarray<int> templateParameters(-1, -minTemplateId);
 			
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
@@ -641,7 +641,7 @@ namespace Aseba
 					}
 					else if (templateParameters[templateIndex] != varSize)
 					{
-						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, while previous instance of the template parameter was of size %3").arg(varName).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, while a previous instance of the template parameter was of size %3").arg(varName).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
 					}
 				}
 				else

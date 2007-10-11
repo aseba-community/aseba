@@ -28,6 +28,7 @@
 #include <cassert>
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 
 /*!	\file Marxbot.cpp
 	\brief Implementation of the aseba-enabled marXbot robot
@@ -83,12 +84,13 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	
 	// write sizes (basic + nodeName + variables)
 	uint16 size;
+	sint16 ssize;
 	switch (vm->nodeId)
 	{
-		case 1: size = 8 + 11 + (8 + 15); break;
-		case 2: size = 8 + 12 + (8 + 15); break;
-		case 3: size = 8 + 18 + (8 + 20); break;
-		case 4: size = 8 + 17 + (6 + 15); break;
+		case 1: size = 8 + 11 + (8 + 15) + 42; break;
+		case 2: size = 8 + 12 + (8 + 15) + 42; break;
+		case 3: size = 8 + 18 + (8 + 20) + 42; break;
+		case 4: size = 8 + 17 + (6 + 15) + 42; break;
 		default: assert(false); break;
 	}
 	socket->write(&size, 2);
@@ -175,15 +177,57 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	}
 	
 	// write native functions
-	size = 0;
+	size = 1;
 	socket->write(&size, 2);
+	
+	// mac (42 bytes)
+	AsebaWriteString(socket, "mac");
+	AsebaWriteString(socket, "MAC+RS");
+	size = 4;
+	socket->write(&size, 2);
+	ssize = -1;
+	socket->write(&ssize, 2);
+	AsebaWriteString(socket, "src1");
+	socket->write(&ssize, 2);
+	AsebaWriteString(socket, "src2");
+	ssize = 1;
+	socket->write(&ssize, 2);
+	AsebaWriteString(socket, "dest");	
+	socket->write(&ssize, 2);
+	AsebaWriteString(socket, "shift");
 	
 	socket->flush();
 }
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	// no native functions for now
+	switch (id)
+	{
+		case 0:
+		{
+			// variable pos
+			int src1 = vm->stack[0];
+			int src2 = vm->stack[1];
+			int dest = vm->stack[2];
+			int shift = vm->variables[vm->stack[3]];
+			
+			// variable size
+			int length = vm->stack[4];
+			
+			long long int res = 0;
+			
+			for (int i = 0; i < length; i++)
+			{
+				res += (int)vm->variables[src1++] * (int)vm->variables[src2++];
+			}
+			res >>= shift;
+			vm->variables[dest] = (sint16)res;
+		}
+		break;
+		
+		default: assert(false); break;
+	}
+	// only one native functions for now
 }
 
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)

@@ -402,7 +402,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		{
 			// call native function
 			AsebaNativeFunction(vm, bytecode & 0x0fff);
-			vm->sp = 0;
+			vm->sp = -1;
 			
 			// increment PC
 			vm->pc ++;

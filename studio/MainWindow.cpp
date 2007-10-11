@@ -41,6 +41,35 @@ using std::copy;
 
 namespace Aseba
 {
+	class CompilationLogDialog: public QDialog
+	{
+	public:
+		 CompilationLogDialog(QWidget *parent) :
+		 	QDialog(parent)
+		{
+			QFont font;
+			font.setFamily("");
+			font.setStyleHint(QFont::TypeWriter);
+			font.setFixedPitch(true);
+			font.setPointSize(10);
+			
+			text = new QTextEdit;
+			text->setFont(font);
+			text->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+			text->setReadOnly(true);
+			
+			QVBoxLayout* layout = new QVBoxLayout(this);
+			layout->addWidget(text);
+			
+			//setStandardButtons(QMessageBox::Ok);
+			setWindowTitle(tr("Aseba Studio: Output of last compilation"));
+			setModal(false);
+			setSizeGripEnabled(true);
+		}
+	
+		QTextEdit *text;
+	};
+
 	QSize MemoryTableView::minimumSizeHint() const
 	{
 		QSize size( QTableView::sizeHint() );
@@ -64,7 +93,7 @@ namespace Aseba
 		QFontMetrics fm(font());
 		setColumnWidth(0, fm.width("FFFF"));
 		setColumnWidth(1, fm.width("-888888"));
-		setColumnWidth(2, fm.width("this is long text"));
+		setColumnWidth(2, fm.width("it is long text"));
 	}
 	
 	NodeTab::NodeTab(Target *target, const EventsNamesVector *eventsNames, int id, QWidget *parent) :
@@ -159,21 +188,20 @@ namespace Aseba
 		vmMemoryView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		vmMemoryView->resizeColumnsToContents();
 		vmMemoryView->resizeRowsToContents();
-		vmMemoryView->setMinimumSize( vmMemoryView->minimumSizeHint() );
+		
 		
 		// functions
 		vmFunctionsView = new QTableView;
 		vmFunctionsView->setShowGrid(false);
 		vmFunctionsView->verticalHeader()->hide();
 		vmFunctionsView->horizontalHeader()->hide();
+		vmFunctionsView->setMinimumSize(QSize(50,40));
 		vmFunctionsView->setModel(vmFunctionsModel);
-		vmFunctionsView->setSelectionMode(QAbstractItemView::SingleSelection);
-		vmFunctionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 		vmFunctionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+		vmFunctionsView->setSelectionMode(QAbstractItemView::NoSelection);	
 		vmFunctionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmFunctionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		vmFunctionsView->resizeColumnsToContents();
-		vmFunctionsView->setMinimumWidth(50);
 		vmFunctionsView->resizeRowsToContents();
 		
 		// panel
@@ -184,13 +212,13 @@ namespace Aseba
 		panelLayout->addWidget(runInterruptButton);
 		panelLayout->addWidget(nextButton);
 		panelLayout->addLayout(memoryTitleLayout);
-		panelLayout->addWidget(vmMemoryView);
+		panelLayout->addWidget(vmMemoryView, 3);
 		panelLayout->addWidget(new QLabel(tr("<b>Native Functions</b>")));
-		//panelLayout->addWidget(vmFunctionsView);
+		panelLayout->addWidget(vmFunctionsView, 1);
 		
 		QHBoxLayout *layout = new QHBoxLayout;
-		layout->addLayout(panelLayout);
-		layout->addLayout(editorLayout);
+		layout->addLayout(panelLayout, 1);
+		layout->addLayout(editorLayout, 8);
 		setLayout(layout);
 	}
 	
@@ -284,7 +312,7 @@ namespace Aseba
 		}
 		else
 		{
-			compilationResultText->setText(tr(error.toString().c_str()));
+			compilationResultText->setText(QString::fromUtf8(error.toString().c_str()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
 			debugButton->setEnabled(false);
 			emit uploadReadynessChanged();
@@ -847,23 +875,25 @@ namespace Aseba
 			compilationMessageBox->hide();
 			NodeTab *tab = polymorphic_downcast<NodeTab *>(nodes->currentWidget());
 			
-			if (tab->errorPos < 0)
-			{
-				// recompile with verbose
-				std::istringstream is(std::string(tab->editor->toPlainText().toUtf8()));
-				std::ostringstream compilationMessages;
-				BytecodeVector bytecode;
-				Error error;
-				tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, compilationMessages, true);
-				compilationMessageBox->setDetailedText(QString::fromUtf8(compilationMessages.str().c_str()));
-				compilationMessageBox->setIcon(QMessageBox::Information);
-			}
+			
+			// recompile with verbose
+			std::istringstream is(std::string(tab->editor->toPlainText().toUtf8()));
+			std::ostringstream compilationMessages;
+			BytecodeVector bytecode;
+			Error error;
+			bool result = tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, compilationMessages, true);
+			
+			if (result)
+				compilationMessageBox->text->setText(
+					tr("Compilation success.\n\n") +
+					QString::fromUtf8(compilationMessages.str().c_str())
+				);
 			else
-			{
-				compilationMessageBox->setText(tab->compilationResultText->text());
-				compilationMessageBox->setDetailedText("");
-				compilationMessageBox->setIcon(QMessageBox::Warning);
-			}
+				compilationMessageBox->text->setText(
+					QString::fromUtf8(error.toString().c_str()) + ".\n\n" +
+					QString::fromUtf8(compilationMessages.str().c_str())
+				);
+			
 			compilationMessageBox->show();
 		}
 	}
@@ -943,7 +973,7 @@ namespace Aseba
 		else
 			text += tr(" event %0 : ").arg(id);
 		for (size_t i = 0; i < data.size(); i++)
-			text += QString("%0").arg(data[i]);
+			text += QString("%0 ").arg(data[i]);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 		logger->scrollToItem(item);
 	}
@@ -1111,12 +1141,7 @@ namespace Aseba
 		addDockWidget(Qt::BottomDockWidgetArea, eventsDock);
 		
 		// dialog box
-		compilationMessageBox = new QMessageBox(this);
-		compilationMessageBox->setStandardButtons(QMessageBox::Ok);
-		compilationMessageBox->setWindowTitle(tr("Aseba Studio: Output of last compilation"));
-		compilationMessageBox->setModal(false);
-		//compilationMessageBox->setSizeGripEnabled(true);
-		// TODO : find a way to make it resizable
+		compilationMessageBox = new CompilationLogDialog(this);
 	}
 	
 	void MainWindow::setupConnections()
@@ -1255,6 +1280,11 @@ namespace Aseba
 		menuBar()->addMenu(helpMenu);
 		helpMenu->addAction(tr("&About"), this, SLOT(about()));
 		helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
+	}
+	
+	void MainWindow::hideEvent(QHideEvent * event)
+	{
+		compilationMessageBox->hide();
 	}
 }; // Aseba
 
