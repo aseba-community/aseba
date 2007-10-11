@@ -23,6 +23,7 @@
 
 #include "TargetModels.h"
 #include <QtDebug>
+#include <QtGui>
 
 namespace Aseba
 {
@@ -179,7 +180,19 @@ namespace Aseba
 					text += QString(", ");
 			}
 			
-			text += QString(")<br/>%0").arg(QString::fromUtf8(function.description.c_str()));
+			QMap<QString, QString> dict;
+			dict["&"] = tr("and");
+			dict["MAC"] = tr("Multiply and Accumulate");
+			dict["RS"] = tr("Right Shift");
+			
+			QStringList phrases = QString::fromUtf8(function.description.c_str()).split(' ');
+			
+			for (int i = 0; i < phrases.size(); ++i)
+				if (dict.contains(phrases[i]))
+					phrases[i] = dict[phrases[i]];
+			
+			text += QString(")<br/>") + phrases.join(" ");
+			
 			return text;
 		}
 	}

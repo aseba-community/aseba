@@ -87,10 +87,10 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	sint16 ssize;
 	switch (vm->nodeId)
 	{
-		case 1: size = 8 + 11 + (8 + 15) + 42; break;
-		case 2: size = 8 + 12 + (8 + 15) + 42; break;
-		case 3: size = 8 + 18 + (8 + 20) + 42; break;
-		case 4: size = 8 + 17 + (6 + 15) + 42; break;
+		case 1: size = 8 + 11 + (8 + 15) + 44; break;
+		case 2: size = 8 + 12 + (8 + 15) + 44; break;
+		case 3: size = 8 + 18 + (8 + 20) + 44; break;
+		case 4: size = 8 + 17 + (6 + 15) + 44; break;
 		default: assert(false); break;
 	}
 	socket->write(&size, 2);
@@ -182,7 +182,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	
 	// mac (42 bytes)
 	AsebaWriteString(socket, "mac");
-	AsebaWriteString(socket, "MAC+RS");
+	AsebaWriteString(socket, "MAC & RS");
 	size = 4;
 	socket->write(&size, 2);
 	ssize = -1;
