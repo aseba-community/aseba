@@ -423,13 +423,15 @@ void AsebaVMStep(AsebaVMState *vm)
 uint16 AsebaVMStepBreakpoint(AsebaVMState *vm)
 {
 	uint16 i;
-	AsebaVMStep(vm);
 	for (i = 0; i < vm->breakpointsCount; i++)
+	{
 		if (vm->breakpoints[i] == vm->pc)
 		{
 			AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 			return 1;
 		}
+	}
+	AsebaVMStep(vm);
 	return 0;
 }
 
@@ -479,6 +481,8 @@ uint16 AsebaVMRun(AsebaVMState *vm)
 	// if we are running step by step, just return either
 	if (AsebaMaskIsSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK))
 		return 0;
+	
+	printf("%p: %d bkpt\n", vm, vm->breakpointsCount);
 	
 	// run until something stops the vm
 	if (vm->breakpointsCount)

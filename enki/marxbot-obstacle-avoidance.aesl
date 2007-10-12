@@ -42,7 +42,7 @@ call mac(eventBuffer, eventBuffer, ret, shift)
 if ret > threshold + 10 then
 	emit ObstacleDetected eventBuffer
 end
-when ret &lt; threshold + -20 do
+when ret &lt; threshold - 20 do
 	emit FreeOfObstacle
 end
 	</node>
