@@ -420,11 +420,9 @@ void AsebaVMStep(AsebaVMState *vm)
 /*! Execute on bytecode of the current VM thread and check for potential breakpoints.
 	Return 1 if breakpoint was seen, 0 otherwise.
 	VM must be ready for run otherwise trashes may occur. */
-uint16 AsebaVMStepBreakpoint(AsebaVMState *vm)
+uint16 AsebaVMCheckBreakpoint(AsebaVMState *vm)
 {
 	uint16 i;
-	// TODO: this is buggy in both case (step before and after), rethink logic
-	AsebaVMStep(vm);
 	for (i = 0; i < vm->breakpointsCount; i++)
 	{
 		if (vm->breakpoints[i] == vm->pc)
@@ -458,17 +456,18 @@ void AsebaDebugBreakpointRun(AsebaVMState *vm)
 {
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 	
-	// breakpoints, check at each step and poll the mask
+	// breakpoints, check before each step and poll the mask
 	while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
 		AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK)
 	)
 	{
-		if (AsebaVMStepBreakpoint(vm) != 0)
+		if (AsebaVMCheckBreakpoint(vm) != 0)
 		{
 			AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 			AsebaVMSendExecutionStateChanged(vm);
 			return;
 		}
+		AsebaVMStep(vm);
 	}
 	
 	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
@@ -593,7 +592,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		case ASEBA_MESSAGE_STEP:
 		if (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 		{
-			AsebaVMStepBreakpoint(vm);
+			AsebaVMStep(vm);
 			AsebaVMSendExecutionStateChanged(vm);
 		}
 		break;

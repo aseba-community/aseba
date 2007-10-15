@@ -214,12 +214,12 @@ namespace Aseba
 				else if (eventId == ASEBA_EVENT_PERIODIC)
 					dump << "periodic:   ";
 				else if (eventId < eventsNames->size())
-					dump << "event " << (*eventsNames)[eventId] << " : ";
+					dump << "event " << (*eventsNames)[eventId] << ": ";
 				else
-					dump << "event " << std::setw(3) << eventId << ":  ";
+					dump << "event " << eventId << ":  ";
+				dump << "\n";
 			}
-			else
-				dump << "            ";
+			dump << "    ";
 			dump << pc << " (" << bytecode[pc].line << ") : ";
 			switch (bytecode[pc] >> 12)
 			{
