@@ -112,8 +112,11 @@ typedef struct
 	call to this function. */
 void AsebaVMInit(AsebaVMState *vm, uint16 nodeId);
 
+/*!	Return the starting address of an event, or 0 if the event is not handled */
+uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event);
+
 /*! Setup VM to execute an thread.
-	If event is not managed, VM is not ready for run. */
+	If event is not handled, VM is not ready for run. */
 void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
 
 /*! Run the VM depending on the current execution mode.
@@ -125,7 +128,7 @@ uint16 AsebaVMRun(AsebaVMState *vm);
 uint16 AsebaVMIsExecutingThread(AsebaVMState *vm);
 
 /*! Execute a debug action from a debug message. 
-	dataLength is given in number of uint16 */
+	dataLength is given in number of uint16. */
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength);
 
 // Functions implemented outside by the io layer

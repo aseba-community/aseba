@@ -52,6 +52,35 @@ void AsebaVMInit(AsebaVMState *vm, uint16 nodeId)
 	AsebaSendDescription(vm);
 }
 
+uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event)
+{
+	uint16 eventVectorSize = vm->bytecode[0];
+	uint16 i;
+
+	// look into event vectors and if event match execute corresponding bytecode
+	for (i = 1; i < eventVectorSize; i += 2)
+		if (vm->bytecode[i] == event)
+			return vm->bytecode[i + 1];
+	return 0;
+}
+
+
+void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
+{
+	uint16 address = AsebaVMGetEventAddress(vm, event);
+	if (!address)
+		return;
+	
+	vm->pc = address;
+	vm->sp = -1;
+	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
+	
+	// if we are in step by step, notify
+	if (AsebaMaskIsSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK))
+		AsebaVMSendExecutionStateChanged(vm);
+}
+
+/*
 void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 {
 	uint16 eventVectorSize = vm->bytecode[0];
@@ -76,6 +105,7 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
 	#endif
 }
+*/
 
 /*! Execute one bytecode of the current VM thread.
 	VM must be ready for run otherwise trashes may occur. */

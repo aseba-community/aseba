@@ -430,13 +430,17 @@ namespace Enki
 			// create event
 			Event event;
 			event.id = type;
-			
-			for (size_t i = 0; i < buffer.size(); i++)
+			for (size_t i = 0; i < buffer.size(); i+=2)
 				event.data.push_back(*dataPtr++);
 			
-			// push event in queus
+			// for each module
 			for (size_t i = 0; i < modules.size(); i++)
-				modules[i]->eventsQueue.push_back(event);
+			{
+				unsigned short address = AsebaVMGetEventAddress(&modules[i]->vm, type);
+				// push event in queue if there is code to handle it
+				if (address)
+					modules[i]->eventsQueue.push_back(event);
+			}
 		}
 		else
 		{
