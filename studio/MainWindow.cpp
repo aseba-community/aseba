@@ -417,6 +417,9 @@ namespace Aseba
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
 			
 			nextButton->setEnabled(false);
+			
+			if (clearEditorProperty("active"))
+				rehighlight();
 		}
 		else if (mode == Target::EXECUTION_STEP_BY_STEP)
 		{

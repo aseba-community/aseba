@@ -80,33 +80,6 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 		AsebaVMSendExecutionStateChanged(vm);
 }
 
-/*
-void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
-{
-	uint16 eventVectorSize = vm->bytecode[0];
-	uint16 i;
-	
-	// look into event vectors and if event match execute corresponding bytecode
-	for (i = 1; i < eventVectorSize; i += 2)
-	{
-		if (vm->bytecode[i] == event)
-		{
-			vm->pc = vm->bytecode[i + 1];
-			vm->sp = -1;
-			AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
-			
-			// if we are in step by step, notify
-			if (AsebaMaskIsSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK))
-				AsebaVMSendExecutionStateChanged(vm);
-			return;
-		}
-	}
-	#ifdef ASEBA_ASSERT
-	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
-	#endif
-}
-*/
-
 /*! Execute one bytecode of the current VM thread.
 	VM must be ready for run otherwise trashes may occur. */
 void AsebaVMStep(AsebaVMState *vm)
