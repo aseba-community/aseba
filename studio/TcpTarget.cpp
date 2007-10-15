@@ -234,8 +234,7 @@ namespace Aseba
 	
 	void TcpTarget::connectionClosed(void)
 	{
-		for (NodesMap::const_iterator it = nodes.begin(); it != nodes.end(); ++it)
-			emit nodeDisconnected(it->first);
+		emit networkDisconnected();
 		nodes.clear();
 		killTimer(netTimer);
 	}

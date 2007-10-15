@@ -157,6 +157,7 @@ namespace Aseba
 		
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
+		void networkDisconnected();
 		
 		void userEvent(unsigned id, const VariablesDataVector &data);
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);

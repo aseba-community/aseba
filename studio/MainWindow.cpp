@@ -981,6 +981,19 @@ namespace Aseba
 		delete tab;
 	}
 	
+	//! The network connection has been cut: all nodes have disconnected.
+	void MainWindow::networkDisconnected()
+	{
+		disconnect(nodes, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+		std::vector<QWidget *> widgets(nodes->count());
+		for (int i = 0; i < nodes->count(); i++)
+			widgets[i] = nodes->widget(i);
+		nodes->clear();
+		for (size_t i = 0; i < widgets.size(); i++)
+			delete widgets[i];
+		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
+	}
+	
 	//! A user event has arrived from the network.
 	void MainWindow::userEvent(unsigned id, const VariablesDataVector &data)
 	{
@@ -1194,6 +1207,7 @@ namespace Aseba
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target, SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
+		connect(target, SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)));

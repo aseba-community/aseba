@@ -42,13 +42,17 @@ namespace Aseba
 			currentBytecode->push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), (*currentBytecode)[currentBytecodeSize-1].line));
 		
 		// clear empty entries and add missing STOP
-		for (std::map<unsigned, BytecodeVector>::iterator it = begin(); it != end(); ++it)
+		for (std::map<unsigned, BytecodeVector>::iterator it = begin(); it != end();)
 		{
-			size_t bytecodeSize = it->second.size();
+			std::map<unsigned, BytecodeVector>::iterator curIt = it;
+			++it;
+			size_t bytecodeSize = curIt->second.size();
 			if (bytecodeSize == 0)
-				erase(it);
-			else if ((it->second[bytecodeSize-1].bytecode >> 12) != ASEBA_BYTECODE_STOP)
-				it->second.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), it->second[bytecodeSize-1].line));
+			{
+				erase(curIt);
+			}
+			else if ((curIt->second[bytecodeSize-1].bytecode >> 12) != ASEBA_BYTECODE_STOP)
+				curIt->second.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), curIt->second[bytecodeSize-1].line));
 		}
 	}
 	

@@ -296,7 +296,11 @@ namespace Aseba
 	
 	bool NetworkClient::connect(const std::string &host, unsigned short port)
 	{
-		disconnect();
+		if (isConnected())
+		{
+			disconnect();
+			connectionClosed();
+		}
 	
 		remoteAddress = socketHelper.resolve(host, port);
 		socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -392,7 +396,7 @@ namespace Aseba
 					incomingData();
 				} while (recv(socket, &c, 1, MSG_PEEK | MSG_DONTWAIT) == 1);
 			}
-			catch (Exception::SocketDisconnected e)
+			catch (Exception::SocketException e)
 			{
 				connectionClosed();
 				netRun = false;
@@ -480,7 +484,7 @@ namespace Aseba
 		FD_SET(serverSocket->socket, &rfds);
 		nfds = std::max(serverSocket->socket, nfds);
 	
-		// select !!
+		// select
 		int ret;
 		if (block)
 		{
@@ -516,7 +520,7 @@ namespace Aseba
 						incomingData(*oldIt);
 					} while (recv((*oldIt)->socket, &c, 1, MSG_PEEK | MSG_DONTWAIT) == 1);
 				}
-				catch (Exception::SocketDisconnected e)
+				catch (Exception::SocketException e)
 				{
 					connectionClosed(e.socket);
 					closeSocket(e.socket);
@@ -557,7 +561,7 @@ namespace Aseba
 			{
 				incomingConnection(socket);
 			}
-			catch (Exception::SocketDisconnected e)
+			catch (Exception::SocketException e)
 			{
 				connectionClosed(e.socket);
 				closeSocket(e.socket);
