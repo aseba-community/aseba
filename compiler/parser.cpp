@@ -290,7 +290,7 @@ namespace Aseba
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
 		const Token::Type elseEndTypes[2] = { Token::TOKEN_STR_else, Token::TOKEN_STR_end };
-		const Token::Type conditionTypes[4] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_SMALLER };
+		const Token::Type conditionTypes[6] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
 		
@@ -302,7 +302,7 @@ namespace Aseba
 		ifNode->children.push_back(parseShiftExpression());
 		
 		// comparison
-		expectOneOf(conditionTypes, 4);
+		expectOneOf(conditionTypes, 6);
 		ifNode->comparaison = static_cast<AsebaComparaison>(tokens.front() - Token::TOKEN_OP_EQUAL);
 		tokens.pop_front();
 		
@@ -617,15 +617,39 @@ namespace Aseba
 				SourcePos varPos = tokens.front().pos;
 				VariablesMap::const_iterator varIt = variablesMap.find(varName);
 				if (varIt == variablesMap.end())
-					throw Error(varPos, FormatableString("Argument %0 of function %1 is not a defined variable").arg(varName).arg(funcName));
+					throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is not a defined variable").arg(i).arg(varName).arg(funcName));
+				
+				// check if it is a const array access
+				tokens.pop_front();
+				unsigned varAddr = varIt->second.first;
+				unsigned varSize;
+				if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+				{
+					tokens.pop_front();
+					expect(Token::TOKEN_INT_LITERAL);
+					
+					// check if single value access is out of bounds
+					unsigned index = tokens.front().iValue;
+					if (index >= varSize)
+						throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
+					
+					tokens.pop_front();
+					expect(Token::TOKEN_BRACKET_CLOSE);
+					tokens.pop_front();
+					
+					varAddr += index;
+					varSize = 1;
+				}
+				else
+				{
+					varSize = varIt->second.second;
+				}
 				
 				// check if variable size is correct
-				unsigned varAddr = varIt->second.first;
-				unsigned varSize = varIt->second.second;
 				if (function.parameters[i].size > 0)
 				{
-					if (varSize != function.parameters[i].size)
-						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, function definition demands size %3").arg(varName).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+					if (varSize != (unsigned)function.parameters[i].size)
+						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is of size %3, function definition demands size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size));
 				}
 				else if (function.parameters[i].size < 0)
 				{
@@ -635,9 +659,9 @@ namespace Aseba
 						// template not initialised, store
 						templateParameters[templateIndex] = varSize;
 					}
-					else if (templateParameters[templateIndex] != varSize)
+					else if ((unsigned)templateParameters[templateIndex] != varSize)
 					{
-						throw Error(varPos, FormatableString("Argument %0 of function %1 is of size %2, while a previous instance of the template parameter was of size %3").arg(varName).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is of size %3, while a previous instance of the template parameter was of size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
 					}
 				}
 				else
@@ -648,7 +672,6 @@ namespace Aseba
 				
 				// store variable address
 				callNode->argumentsAddr.push_back(varAddr);
-				tokens.pop_front();
 				
 				// parse comma or end parenthesis
 				if (i + 1 == function.parameters.size())

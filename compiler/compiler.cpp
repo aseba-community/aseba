@@ -276,8 +276,8 @@ namespace Aseba
 				
 				case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
 				dump << "CONDITIONAL_BRANCH ";
-				dump << comparaisonOperatorToString((AsebaComparaison)(bytecode[pc] & 0x3)) << " ";
-				if (bytecode[pc] & (1 << 2))
+				dump << comparaisonOperatorToString((AsebaComparaison)(bytecode[pc] & 0x7)) << " ";
+				if (bytecode[pc] & (1 << 3))
 					dump << "(edge) ";
 				dump << ((signed short)bytecode[pc+1]) << " ";
 				dump << ((signed short)bytecode[pc+2]) << "\n";

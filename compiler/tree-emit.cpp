@@ -118,7 +118,7 @@ namespace Aseba
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH);
 		bytecode |= comparaison;
-		bytecode |= edgeSensitive ? (1 << 2) : 0;
+		bytecode |= edgeSensitive ? (1 << 3) : 0;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.currentBytecode->push_back(BytecodeElement(3, sourcePos.row));
 		

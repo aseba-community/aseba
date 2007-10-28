@@ -84,7 +84,9 @@ typedef enum
 	ASEBA_CMP_EQUAL = 0,
 	ASEBA_CMP_NOT_EQUAL = 1,
 	ASEBA_CMP_BIGGER_THAN = 2,
-	ASEBA_CMP_SMALLER_THAN = 3
+	ASEBA_CMP_BIGGER_EQUAL_THAN = 3,
+	ASEBA_CMP_SMALLER_THAN = 4,
+	ASEBA_CMP_SMALLER_EQUAL_THAN = 5
 } AsebaComparaison;
 
 /*! List of masks for flags in AsebaVMState */

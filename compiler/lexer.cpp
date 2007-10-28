@@ -72,7 +72,9 @@ namespace Aseba
 			case TOKEN_OP_EQUAL: return "== (equal to)";
 			case TOKEN_OP_NOT_EQUAL: return "!= (not equal to)";
 			case TOKEN_OP_BIGGER: return "> (bigger than)";
+			case TOKEN_OP_BIGGER_EQUAL: return ">= (bigger or equal than)";
 			case TOKEN_OP_SMALLER: return "< (smaller than)";
+			case TOKEN_OP_SMALLER_EQUAL: return "<= (smaller or equal than)";
 			case TOKEN_OP_SHIFT_LEFT: return "<< (shift left)";
 			case TOKEN_OP_SHIFT_RIGHT: return ">> (shift right)";
 			case TOKEN_OP_ADD: return "+ (plus)";
@@ -192,6 +194,13 @@ namespace Aseba
 						pos.column++;
 						pos.character++;
 					}
+					else if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_SMALLER_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
 					else
 						tokens.push_back(Token(Token::TOKEN_OP_SMALLER, pos));
 				break;
@@ -200,6 +209,13 @@ namespace Aseba
 					if (source.peek() == '>')
 					{
 						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_BIGGER_EQUAL, pos));
 						source.get();
 						pos.column++;
 						pos.character++;

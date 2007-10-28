@@ -34,7 +34,9 @@ namespace Aseba
 			case ASEBA_CMP_EQUAL: return "=="; break;
 			case ASEBA_CMP_NOT_EQUAL: return "!="; break;
 			case ASEBA_CMP_BIGGER_THAN: return ">"; break;
+			case ASEBA_CMP_BIGGER_EQUAL_THAN: return ">="; break;
 			case ASEBA_CMP_SMALLER_THAN: return "<"; break;
+			case ASEBA_CMP_SMALLER_EQUAL_THAN: return "<="; break;
 			default: return "? (comparaison)";
 		}
 	}

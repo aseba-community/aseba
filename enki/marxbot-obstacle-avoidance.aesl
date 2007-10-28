@@ -30,19 +30,17 @@ ontimer
 
 var eventBuffer[2]
 
-var ret
+var activation
 var shift = 11
-call mac(bumpers, vectorX, ret, shift)
-eventBuffer[0] = ret
-call mac(bumpers, vectorY, ret, shift)
-eventBuffer[1] = ret
+call mac(bumpers, vectorX, eventBuffer[0], shift)
+call mac(bumpers, vectorY, eventBuffer[1], shift)
 shift = 0
-call mac(eventBuffer, eventBuffer, ret, shift)
+call mac(eventBuffer, eventBuffer, activation, shift)
 
-if ret > threshold + 10 then
+if activation > threshold then
 	emit ObstacleDetected eventBuffer
 end
-when ret &lt; threshold - 20 do
+when activation &lt;= threshold do
 	emit FreeOfObstacle
 end
 	</node>

@@ -350,16 +350,18 @@ void AsebaVMStep(AsebaVMState *vm)
 			valueOne = vm->stack[vm->sp - 1];
 			valueTwo = vm->stack[vm->sp];
 			vm->sp -= 2;
-			switch (bytecode & 0x3)
+			switch (bytecode & 0x7)
 			{
 				case ASEBA_CMP_EQUAL: conditionResult = valueOne == valueTwo; break;
 				case ASEBA_CMP_NOT_EQUAL: conditionResult = valueOne != valueTwo; break;
 				case ASEBA_CMP_BIGGER_THAN: conditionResult = valueOne > valueTwo; break;
+				case ASEBA_CMP_BIGGER_EQUAL_THAN: conditionResult = valueOne >= valueTwo; break;
 				case ASEBA_CMP_SMALLER_THAN: conditionResult = valueOne < valueTwo; break;
+				case ASEBA_CMP_SMALLER_EQUAL_THAN: conditionResult = valueOne <= valueTwo; break;
 			}
 			
 			// is the condition really true ?
-			if (conditionResult && !(GET_BIT(bytecode, 2) && GET_BIT(bytecode, 4)))
+			if (conditionResult && !(GET_BIT(bytecode, 3) && GET_BIT(bytecode, 4)))
 			{
 				// if true disp
 				disp = (sint16)vm->bytecode[vm->pc + 1];
