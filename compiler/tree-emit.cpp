@@ -26,6 +26,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+
 	//! Add init event and point to currentBytecode it
 	PreLinkBytecode::PreLinkBytecode()
 	{
@@ -308,14 +311,22 @@ namespace Aseba
 	{
 		unsigned short bytecode;
 		
+		// emit code for children. They might contain code to store constants somewhere
+		for (size_t i = 0; i < children.size(); i++)
+			children[i]->emit(bytecodes);
+		
 		// generate load for arguments
 		for (unsigned i = 0; i < argumentsAddr.size(); i++)
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | argumentsAddr[i];
 			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 		}
+		
 		// generate call itself
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CALL) | funcId;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
+	/*@}*/
+	
 }; // Aseba

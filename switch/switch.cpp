@@ -44,6 +44,9 @@
 namespace Aseba 
 {
 	extern int canfd;
+	
+	/** \addtogroup switch */
+	/*@{*/
 
 	Switch::Switch(int port, const char *canIface, bool verbose, bool dump) :
 		verbose(verbose),
@@ -382,6 +385,8 @@ namespace Aseba
 		close (socketNb);
 		connectList.erase(socketNb);
 	}
+	
+	/*@}*/
 };
 
 //! Show usage

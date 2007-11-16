@@ -35,6 +35,9 @@ class QSocketNotifier;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class Message;
 	
 	class TcpTarget: public Target, public NetworkClient
@@ -107,6 +110,8 @@ namespace Aseba
 		NodesMap nodes;
 		int netTimer;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

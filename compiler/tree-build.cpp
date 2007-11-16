@@ -25,12 +25,17 @@
 
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+	
+	//! Destructor, delete all children.
 	Node::~Node()
 	{
 		for (size_t i = 0; i < children.size(); i++)
 			delete children[i];
 	}
 	
+	//! Constructor
 	ContextSwitcherNode::ContextSwitcherNode(const SourcePos& sourcePos, unsigned eventId) :
 		Node(sourcePos),
 		eventId(eventId)
@@ -38,6 +43,7 @@ namespace Aseba
 	
 	}
 	
+	//! Constructor
 	BinaryArithmeticNode::BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right) :
 		Node(sourcePos),
 		op(op)
@@ -79,6 +85,7 @@ namespace Aseba
 		);
 	}
 	
+	//! Constructor
 	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
@@ -88,6 +95,7 @@ namespace Aseba
 	
 	}
 	
+	//! Constructor
 	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
@@ -97,10 +105,14 @@ namespace Aseba
 	
 	}
 	
+	//! Constructor
 	CallNode::CallNode(const SourcePos& sourcePos, unsigned funcId) :
 		Node(sourcePos),
 		funcId(funcId)
 	{
 	
 	}
+	
+	/*@}*/
+	
 }; // Aseba

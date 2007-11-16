@@ -32,9 +32,11 @@
 #include <iomanip>
 #include <memory>
 
-
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+
 	//! Return the string version of this position
 	std::string SourcePos::toString() const
 	{
@@ -48,6 +50,25 @@ namespace Aseba
 			return "";
 	}
 	
+	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
+	Compiler::Compiler()
+	{
+		targetDescription = 0;
+		eventsNames = 0;
+	}
+	
+	//! Set the description of the target as returned by the microcontroller. You must call this function before any call to compile().
+	void Compiler::setTargetDescription(const TargetDescription *description)
+	{
+		targetDescription = description;
+	}
+	
+	//! Set the names of the events globally defined.
+	void Compiler::setEventsNames(const EventsNamesVector *names)
+	{
+		eventsNames = names;
+	}
+	
 	//! Compile a new condition
 	//! \param source stream to read the source code from
 	//! \param bytecode destination array for bytecode
@@ -57,6 +78,8 @@ namespace Aseba
 	//! \return returns true on success 
 	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
 	{
+		assert(targetDescription);
+		
 		Node *program;
 		unsigned indent = 0;
 		
@@ -158,6 +181,7 @@ namespace Aseba
 		return true;
 	}
 	
+	//! Create the final bytecode for a microcontroller
 	void Compiler::link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const
 	{
 		bytecode.clear();
@@ -187,6 +211,7 @@ namespace Aseba
 			std::back_inserter(bytecode));
 	}
 	
+	//! Disassemble a microcontroller bytecode and dump it
 	void Compiler::disassemble(BytecodeVector& bytecode, std::ostream& dump) const
 	{
 		// address of threads
@@ -332,4 +357,7 @@ namespace Aseba
 			functionsMap[targetDescription->nativeFunctions[i].name] = i;
 		}
 	}
+	
+	/*@}*/
+	
 } // Aseba

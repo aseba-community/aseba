@@ -31,11 +31,9 @@ ontimer
 var eventBuffer[2]
 
 var activation
-var shift = 11
-call mac(bumpers, vectorX, eventBuffer[0], shift)
-call mac(bumpers, vectorY, eventBuffer[1], shift)
-shift = 0
-call mac(eventBuffer, eventBuffer, activation, shift)
+call mac(bumpers, vectorX, eventBuffer[0], 11)
+call mac(bumpers, vectorY, eventBuffer[1], 11)
+call mac(eventBuffer, eventBuffer, activation, 0)
 
 if activation > threshold then
 	emit ObstacleDetected eventBuffer

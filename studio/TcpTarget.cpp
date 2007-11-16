@@ -33,6 +33,9 @@ using std::copy;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	enum InNextState
 	{
 		NOT_IN_NEXT,
@@ -399,4 +402,6 @@ namespace Aseba
 		
 		return -1;
 	}
+	
+	/*@}*/
 }

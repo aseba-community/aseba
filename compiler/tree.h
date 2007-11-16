@@ -30,8 +30,13 @@
 #include <string>
 #include <ostream>
 
+
+
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+
 	//! Return the string corresponding to the comparaison operator
 	std::string comparaisonOperatorToString(AsebaComparaison op);
 	//! Return the string corresponding to the binary operator
@@ -40,8 +45,9 @@ namespace Aseba
 	//! An abstract node of syntax tree
 	struct Node
 	{
+		//! Constructor
 		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
-		//! Delete children upon destruction
+		
 		virtual ~Node();
 		
 		//! Optimize this node, reture true if any optimization was successful
@@ -63,6 +69,7 @@ namespace Aseba
 	//! Node for "block", i.e. a vector of statements
 	struct BlockNode : Node
 	{
+		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -70,11 +77,12 @@ namespace Aseba
 		virtual std::string toString() const { return "Block"; }
 	};
 	
-	//! Node for assignation
+	//! Node for assignation.
 	//! children[0] is store code
 	//! children[1] expression to store
 	struct AssignmentNode : Node
 	{
+		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -82,7 +90,7 @@ namespace Aseba
 		virtual std::string toString() const { return "Assign"; }
 	};
 	
-	//! Node for "if" and "when"
+	//! Node for "if" and "when".
 	//! children[0] is left part of conditional expression
 	//! children[1] is right part of conditional expression
 	//! children[2] is true block
@@ -92,6 +100,7 @@ namespace Aseba
 		AsebaComparaison comparaison; //!< type of condition
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		
+		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -99,7 +108,7 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for "while"
+	//! Node for "while".
 	//! children[0] is left part of conditional expression
 	//! children[1] is right part of conditional expression
 	//! children[2] is block
@@ -107,6 +116,7 @@ namespace Aseba
 	{
 		AsebaComparaison comparaison; //!< type of condition
 		
+		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -127,13 +137,14 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for "emit"
+	//! Node for "emit".
 	struct EmitNode : Node
 	{
 		unsigned eventId; //!< id of event to emit
 		unsigned arrayAddr; //!< address of the first element of the array to send
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument
 		
+		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -141,7 +152,7 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for binary arithmetic
+	//! Node for binary arithmetic.
 	//! children[0] is left expression
 	//! children[1] is right expression
 	struct BinaryArithmeticNode : Node
@@ -159,10 +170,11 @@ namespace Aseba
 		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 	};
 	
-	//! Node for unary arithmetic, only minus for now
+	//! Node for unary arithmetic, only minus for now.
 	//! children[0] is the expression to negate
 	struct UnaryArithmeticNode : Node
 	{
+		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -178,6 +190,7 @@ namespace Aseba
 	{
 		int value; //!< value to push on stack
 		
+		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -185,12 +198,13 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for loading a variable on stack
+	//! Node for loading a variable on stack.
 	//! no children
 	struct LoadNode : Node
 	{
 		unsigned varAddr; //!< address of variable to load from
 		
+		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -198,12 +212,13 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for storing a variable from stack
+	//! Node for storing a variable from stack.
 	//! no children
 	struct StoreNode : Node
 	{
 		unsigned varAddr; //!< address of variable to store to
 		
+		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
 		virtual Node* optimize(std::ostream* dump);
@@ -211,7 +226,7 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for reading from an array
+	//! Node for reading from an array.
 	//! children[0] is the index in the array
 	struct ArrayReadNode : Node
 	{
@@ -254,6 +269,9 @@ namespace Aseba
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
+	
+	/*@}*/
+	
 }; // Aseba
 
 #endif

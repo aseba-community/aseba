@@ -32,6 +32,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class TargetDescription;
 	
 	class TargetVariablesModel: public QAbstractTableModel
@@ -108,6 +111,8 @@ namespace Aseba
 		QVector<QString> variablesNames;
 		VariablesDataVector variablesData;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

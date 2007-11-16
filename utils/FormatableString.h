@@ -29,6 +29,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup utils */
+	/*@{*/
+	
 	/*!
 	* string that can be used for argument substitution.
 	* Example :
@@ -114,6 +117,8 @@ namespace Aseba
 			*/
 			FormatableString& operator=(const std::string& str) ;
 	};
+	
+	/*@}*/
 }
 
 #endif // FORMATABLESTRING_H //

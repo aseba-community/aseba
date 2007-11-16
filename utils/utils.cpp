@@ -28,6 +28,10 @@
 
 namespace Aseba
 {
+	/** \addtogroup utils */
+	/*@{*/
+
+	//! Read count data from the file descriptor fd to buffer buf, return an exception if something got wrong
 	void read(int fd, void *buf, size_t count)
 	{
 		char *ptr = (char *)buf;
@@ -50,6 +54,7 @@ namespace Aseba
 		}
 	}
 	
+	//! Write count data to the file descriptor fd from buffer buf, return an exception if something got wrong
 	void write(int fd, const void *buf, size_t count)
 	{
 		const char *ptr = (const char *)buf;
@@ -72,6 +77,7 @@ namespace Aseba
 		}
 	}
 	
+	//! Dump the current time to a stream
 	void dumpTime(std::ostream &stream)
 	{
 		stream << "[";
@@ -82,4 +88,6 @@ namespace Aseba
 		stream << timeString;
 		stream << "] ";
 	}
+	
+	/*@}*/
 }

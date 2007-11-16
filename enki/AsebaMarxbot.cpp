@@ -40,6 +40,8 @@
 typedef std::map<AsebaVMState*, Aseba::Socket*>  VmSocketMap;
 static VmSocketMap asebaSocketMaps;
 
+//int stepCounter = 0;
+
 extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
 {
 	Aseba::Socket* socket = asebaSocketMaps[vm];
@@ -51,6 +53,7 @@ extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16
 	socket->write(&id, 2);
 	socket->write(data, size);
 	socket->flush();
+	std::cout << "event " << id << std::endl;
 }
 
 extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
@@ -322,6 +325,8 @@ namespace Enki
 	
 	void AsebaMarxbot::step(double dt)
 	{
+		//stepCounter++;
+		//std::cerr << stepCounter << std::endl;
 		/*
 			Values mapping
 			

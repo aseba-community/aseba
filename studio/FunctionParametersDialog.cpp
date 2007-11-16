@@ -27,6 +27,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	FunctionParametersDialog::FunctionParametersDialog(const QString &name, const std::vector<unsigned> &parameters)
 	{
 		QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -152,5 +155,7 @@ namespace Aseba
 		parametersTable->resizeColumnToContents(1);
 		parametersTable->resizeColumnToContents(2);
 	}
+	
+	/*@}*/
 }
 

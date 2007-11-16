@@ -42,6 +42,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup utils */
+	/*@{*/
+	
 	class Socket;
 	
 	namespace Exception
@@ -248,6 +251,8 @@ namespace Aseba
 		//! Called when connection to client is closed on socket. Must be implemented by subclass
 		virtual void connectionClosed(Socket *socket) = 0;
 	};
+	
+	/*@}*/
 }
 
 #endif

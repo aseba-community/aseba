@@ -26,6 +26,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	SpinBoxDelegate::SpinBoxDelegate(QObject *parent) :
 		QItemDelegate(parent)
 	{
@@ -66,4 +69,6 @@ namespace Aseba
 	{
 		editor->setGeometry(option.rect);
 	}
+	
+	/*@}*/
 }; // Aseba

@@ -28,6 +28,13 @@
 
 namespace Aseba
 {
+	/**
+	\defgroup switch Software router of messages
+	
+	Connect to a physical CAN interface if present.
+	*/
+	/*@{*/
+
 	/*! Route Aseba messages on the TCP part of the network. */
 	class Switch
 	{
@@ -105,6 +112,7 @@ namespace Aseba
 			bool dump;
 	};
 	
+	/*@}*/
 };
 
 #endif

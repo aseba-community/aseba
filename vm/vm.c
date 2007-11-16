@@ -29,10 +29,15 @@
 	Implementation of Aseba Virtual Machine
 */
 
+/** \addtogroup vm */
+/*@{*/
 
 // TODO: potentially replace by more efficient native asm instruction
+//! Return true if bit b of v is 1
 #define GET_BIT(v, b) (((v) >> (b)) & 0x1)
+//! Set bit b of v to 1
 #define BIT_SET(v, b) ((v) |= (1 << (b)))
+//! Set bit b of v to 0
 #define BIT_CLR(v, b) ((v) &= (~(1 << (b))))
 
 void AsebaVMSendExecutionStateChanged(AsebaVMState *vm);
@@ -659,4 +664,4 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	}
 }
 
-
+/*@}*/

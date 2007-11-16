@@ -28,6 +28,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+	
 	Node* BlockNode::optimize(std::ostream* dump)
 	{
 		for (NodesVector::iterator it = children.begin(); it != children.end();)
@@ -281,4 +284,7 @@ namespace Aseba
 	{
 		return this;
 	}
+	
+	/*@}*/
+	
 }; // Aseba

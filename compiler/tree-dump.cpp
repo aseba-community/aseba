@@ -27,6 +27,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+	
 	std::string comparaisonOperatorToString(AsebaComparaison op)
 	{
 		switch (op)
@@ -142,4 +145,7 @@ namespace Aseba
 			s += FormatableString(", arg %0 is addr %1").arg(i).arg(argumentsAddr[i]);
 		return s;
 	}
+	
+	/*@}*/
+	
 }; // Aseba

@@ -26,6 +26,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	AeslHighlighter::AeslHighlighter(AeslEditor *editor, QTextDocument *parent) :
 		QSyntaxHighlighter(parent),
 		editor(editor)
@@ -210,4 +213,6 @@ namespace Aseba
 		}
 		delete menu;
 	}
+	
+	/*@}*/
 }; // Aseba

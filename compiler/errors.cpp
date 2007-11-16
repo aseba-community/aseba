@@ -26,6 +26,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup compiler */
+	/*@{*/
+	
 	//! Return the string version of this error
 	std::string Error::toString() const
 	{
@@ -36,4 +39,7 @@ namespace Aseba
 			oss << "Error : " << message;
 		return oss.str();
 	}
+	
+	/*@}*/
+	
 }; // Aseba

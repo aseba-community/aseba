@@ -41,6 +41,9 @@ using std::copy;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class CompilationLogDialog: public QDialog
 	{
 	public:
@@ -1334,5 +1337,7 @@ namespace Aseba
 	{
 		compilationMessageBox->hide();
 	}
+	
+	/*@}*/
 }; // Aseba
 

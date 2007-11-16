@@ -32,7 +32,12 @@
 
 namespace Aseba
 {
-	
+	/**
+	\defgroup msg Messages exchanged over the network
+	*/
+	/*@{*/
+
+	//! Parent class of any message exchanged over the network
 	class Message
 	{
 	public:
@@ -62,7 +67,7 @@ namespace Aseba
 		size_t readPos;
 	};
 	
-	
+	//! Any message sent by a script on a node
 	class UserMessage : public Message
 	{
 	public:
@@ -80,6 +85,7 @@ namespace Aseba
 		virtual operator const char * () const { return "user message"; }
 	};
 	
+	//! Message for bootloader: description of the flash memory layout
 	class BootloaderDescription : public Message
 	{
 	public:
@@ -97,6 +103,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader description"; }
 	};
 	
+	//! Message for bootloader: data from the flash
 	class BootloaderDataRead : public Message
 	{
 	public:
@@ -112,6 +119,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader page data read"; }
 	};
 	
+	//! Message for bootloader: acknowledge, with optional error code
 	class BootloaderAck : public Message
 	{
 	public:
@@ -137,6 +145,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader ack"; }
 	};
 	
+	//! Request nodes to send their description
 	class Presence : public Message
 	{
 	public:
@@ -149,6 +158,7 @@ namespace Aseba
 		virtual operator const char * () const { return "presence"; }
 	};
 	
+	//! Description of a node
 	class Description : public Message, public TargetDescription
 	{
 	public:
@@ -161,6 +171,7 @@ namespace Aseba
 		virtual operator const char * () const { return "description"; }
 	};
 	
+	//! A node has disconnected from the network
 	class Disconnected : public Message
 	{
 	public:
@@ -173,6 +184,7 @@ namespace Aseba
 		virtual operator const char * () const { return "disconnected"; }
 	};
 	
+	//! Content of some variables
 	class Variables : public Message
 	{
 	public:
@@ -189,6 +201,7 @@ namespace Aseba
 		virtual operator const char * () const { return "variables"; }
 	};
 	
+	//! Exception: an array acces attempted to read past memory
 	class ArrayAccessOutOfBounds : public Message
 	{
 	public:
@@ -205,6 +218,7 @@ namespace Aseba
 		virtual operator const char * () const { return "array access out of bounds"; }
 	};
 	
+	//! Exception: division by zero
 	class DivisionByZero : public Message
 	{
 	public:
@@ -220,6 +234,7 @@ namespace Aseba
 		virtual operator const char * () const { return "division by zero"; }
 	};
 	
+	//! The Program Counter or the flags have changed
 	class ExecutionStateChanged : public Message
 	{
 	public:
@@ -236,6 +251,7 @@ namespace Aseba
 		virtual operator const char * () const { return "execution state"; }
 	};
 	
+	//! A breakpoint has been set
 	class BreakpointSetResult : public Message
 	{
 	public:
@@ -253,7 +269,7 @@ namespace Aseba
 	};
 	
 	
-	//! Cammands messages talk to a specific node
+	//! Commands messages talk to a specific node
 	class CmdMessage : public Message
 	{
 	public:
@@ -269,6 +285,7 @@ namespace Aseba
 		virtual operator const char * () const { return "command message super class"; }
 	};
 	
+	//! Message for bootloader: reset node
 	class BootloaderReset : public CmdMessage
 	{
 	public:
@@ -279,6 +296,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader reset"; }
 	};
 	
+	//! Message for bootloader: read a page of flash
 	class BootloaderReadPage : public CmdMessage
 	{
 	public:
@@ -295,6 +313,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader read page"; }
 	};
 	
+	//! Message for bootloader: write a page of flash
 	class BootloaderWritePage : public CmdMessage
 	{
 	public:
@@ -311,6 +330,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader write page"; }
 	};
 	
+	//! Message for bootloader: data for flash
 	class BootloaderPageDataWrite : public CmdMessage
 	{
 	public:
@@ -327,7 +347,7 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader page data write"; }
 	};
 	
-	
+	//! Upload bytecode to a node
 	class SetBytecode : public CmdMessage
 	{
 	public:
@@ -344,6 +364,7 @@ namespace Aseba
 		virtual operator const char * () const { return "set bytecode"; }
 	};
 	
+	//! Reset a node
 	class Reset : public CmdMessage
 	{
 	public:
@@ -354,6 +375,7 @@ namespace Aseba
 		virtual operator const char * () const { return "reset"; }
 	};
 	
+	//! Run a node
 	class Run : public CmdMessage
 	{
 	public:
@@ -364,6 +386,7 @@ namespace Aseba
 		virtual operator const char * () const { return "run"; }
 	};
 	
+	//! Pause a node
 	class Pause : public CmdMessage
 	{
 	public:
@@ -374,6 +397,7 @@ namespace Aseba
 		virtual operator const char * () const { return "pause"; }
 	};
 	
+	//! Step a node
 	class Step : public CmdMessage
 	{
 	public:
@@ -384,6 +408,7 @@ namespace Aseba
 		virtual operator const char * () const { return "step"; }
 	};
 	
+	//! Stop a node
 	class Stop : public CmdMessage
 	{
 	public:
@@ -394,6 +419,7 @@ namespace Aseba
 		virtual operator const char * () const { return "stop"; }
 	};
 	
+	//! Request the current execution state of a node
 	class GetExecutionState : public CmdMessage
 	{
 	public:
@@ -404,6 +430,7 @@ namespace Aseba
 		virtual operator const char * () const { return "get execution state"; }
 	};
 	
+	//! Set a breakpoint on a node
 	class BreakpointSet : public CmdMessage
 	{
 	public:
@@ -420,6 +447,7 @@ namespace Aseba
 		virtual operator const char * () const { return "breakpoint set"; }
 	};
 	
+	//! Clear a breakpoint on a node
 	class BreakpointClear : public CmdMessage
 	{
 	public:
@@ -436,6 +464,7 @@ namespace Aseba
 		virtual operator const char * () const { return "breakpoint clear"; }
 	};
 	
+	//! Clear all breakpoints on a node
 	class BreakpointClearAll : public CmdMessage
 	{
 	public:
@@ -446,6 +475,7 @@ namespace Aseba
 		virtual operator const char * () const { return "breakpoint clear all"; }
 	};
 	
+	//! Read some variables from a node
 	class GetVariables : public CmdMessage
 	{
 	public:
@@ -463,6 +493,7 @@ namespace Aseba
 		virtual operator const char * () const { return "get variables"; }
 	};
 	
+	//! Set some variables on a node
 	class SetVariables : public CmdMessage
 	{
 	public:
@@ -480,6 +511,8 @@ namespace Aseba
 		virtual void dumpSpecific(std::ostream &stream);
 		virtual operator const char * () const { return "set variables"; }
 	};
+	
+	/*@}*/
 }
 
 #endif

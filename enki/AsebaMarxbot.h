@@ -49,7 +49,7 @@ namespace Enki
 	*/
 	class AsebaMarxbot : public Marxbot, public Aseba::NetworkClient
 	{
-	protected:
+	private:
 		struct Event
 		{
 			unsigned short id;

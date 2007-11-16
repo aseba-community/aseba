@@ -10,6 +10,9 @@ class QTableWidget;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	//! Dialog that let the user choose setup parameters for functions
 	class FunctionParametersDialog : public QDialog
 	{
@@ -36,6 +39,8 @@ namespace Aseba
 		QPushButton *addParameterButton;
 		QPushButton *delParameterButton;
 	};
+	
+	/*@}*/
 }
 
 #endif

@@ -31,6 +31,20 @@ extern "C" {
 
 #include "../common/types.h"
 
+/**
+	\defgroup can Transport layer over CAN bus
+	
+	This layer is able to transmit messages of arbitrary length
+	(up to the available amount of memory) over a serie of 8 bytes
+	CAN frames. If the message is under 8 bytes, the layer uses
+	a single frame.
+	
+	The layer does not uses acknowledgment, instead it trusts the
+	CAN checksum mechanism to ensure that other nodes on the CAN bus
+	received the data correctly.
+*/
+/*@{*/
+
 // Network
 
 /*!	the data that physically go on the CAN bus. Used to communicate with the CAN data layer */
@@ -83,6 +97,8 @@ void AsebaCanFrameReceived(const CanFrame *frame);
 
 /*! Data layer should call this function when the CAN frame (max 8 bytes) was sent successfully */
 void AsebaCanFrameSent();
+
+/*@}*/
 
 #ifdef __cplusplus
 }

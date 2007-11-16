@@ -35,6 +35,9 @@ class QTextDocument;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+
 	class AeslEditor;
 	
 	class AeslHighlighter : public QSyntaxHighlighter
@@ -81,6 +84,8 @@ namespace Aseba
 	public:
 		bool debugging;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

@@ -50,6 +50,8 @@ struct AsebaCan
 	
 } asebaCan = { 0, 0, NULL, NULL, NULL, NULL };
 
+/** \addtogroup can */
+/*@{*/
 
 /*! Returned the minimum number of multiple of height to fit v */
 uint16 AsebaCanGetMinMultipleOfHeight(uint16 v)
@@ -285,3 +287,4 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 	}
 }
 
+/*@}*/

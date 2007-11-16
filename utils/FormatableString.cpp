@@ -32,6 +32,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup utils */
+	/*@{*/
+	
 	void FormatableString::proceedReplace(const std::string &replacement)
 	{
 		std::ostringstream search;
@@ -97,4 +100,6 @@ namespace Aseba
 		this->argLevel = 0;
 		return (*this);
 	}
+	
+	/*@}*/
 }

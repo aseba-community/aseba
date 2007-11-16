@@ -27,6 +27,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	TargetVariablesModel::TargetVariablesModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent) :
 		QAbstractTableModel(parent),
 		descriptionRead(descriptionRead),
@@ -359,4 +362,6 @@ namespace Aseba
 			emit dataChanged(index(start, 1), index(start + data.size() - 1, 1));
 		}
 	}
+	
+	/*@}*/
 }; // Aseba

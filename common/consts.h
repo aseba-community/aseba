@@ -24,6 +24,11 @@
 #ifndef __ASEBA_CONSTS_H
 #define __ASEBA_CONSTS_H
 
+/**
+	\defgroup common Constants and types common to all subsystems
+*/
+/*@{*/
+
 /*! default port used by aseba */
 enum
 {
@@ -159,5 +164,7 @@ typedef enum
 	ASEBA_DEST_DEBUG = 0,
 	ASEBA_DEST_INVALID = 0xFFFF
 } AsebaMessagesDests;
+
+/*@}*/
 
 #endif

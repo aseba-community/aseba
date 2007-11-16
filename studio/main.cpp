@@ -24,6 +24,10 @@
 #include <QApplication>
 #include "MainWindow.h"
 
+/**
+	\defgroup studio Integrated Development Editor
+*/
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);

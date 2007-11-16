@@ -28,20 +28,28 @@
 
 namespace Aseba
 {
+	/**
+	\defgroup utils General helper functions and classes
+	*/
+	/*@{*/
+
 	namespace Exception
 	{
+		//! Parent class of exceptions on file descriptors
 		struct FileDescriptor
 		{
 			FileDescriptor(int fd) : fd(fd) {}
 			int fd;
 		};
 	
+		//! An access on a file descriptor produced an error
 		struct FileDescriptorError : public FileDescriptor
 		{
 			FileDescriptorError(int fd, int errNumber) : FileDescriptor(fd), errNumber(errNumber) {}
 			int errNumber;
 		};
 		
+		//! A file descriptor has been closed
 		struct FileDescriptorClosed : public FileDescriptor
 		{
 			FileDescriptorClosed(int fd) : FileDescriptor(fd) {}
@@ -53,6 +61,8 @@ namespace Aseba
 	void write(int fd, const void *buf, size_t count);
 	
 	void dumpTime(std::ostream &stream);
+	
+	/*@}*/
 	
 };
 

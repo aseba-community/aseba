@@ -31,13 +31,13 @@
 #include <utility>
 #include <istream>
 
-// TODO :
-// - code generation
-// - linking and external bytecode representation
-// - test and debug in VM
-
 namespace Aseba
 {
+	/**
+		\defgroup compiler AESL Compiler
+	*/
+	/*@{*/
+
 	// pre-declaration
 	struct Node;
 	struct ProgramNode;
@@ -200,9 +200,9 @@ namespace Aseba
 		};
 	
 	public:
-		Compiler() { targetDescription = 0; eventsNames = 0; }
-		void setTargetDescription(const TargetDescription *description) { targetDescription = description; }
-		void setEventsNames(const EventsNamesVector *names) { eventsNames = names; }
+		Compiler();
+		void setTargetDescription(const TargetDescription *description);
+		void setEventsNames(const EventsNamesVector *names);
 		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
 	protected:
@@ -230,7 +230,6 @@ namespace Aseba
 		Node* parseOnEvent();
 		Node* parseOnTimer();
 		Node* parseEvent();
-		Node* parseCondition();
 		Node* parseShiftExpression();
 		Node* parseAddExpression();
 		Node* parseMultExpression();
@@ -251,6 +250,9 @@ namespace Aseba
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const EventsNamesVector *eventsNames; //!< names of events
 	}; // Compiler
+	
+	/*@}*/
+	
 }; // Aseba
 
 #endif

@@ -31,6 +31,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup switch */
+	/*@{*/
+	
 	imxCANFrameHeader::imxCANFrameHeader()
 	{
 		memset(this, 0, sizeof(*this));
@@ -77,8 +80,10 @@ namespace Aseba
 		stream << "\n";
 	}
 	
+	//! File descriptor corresponding to the physical CAN device
 	int canfd;
 	
+	//! Send a CAN frame on the CAN file descriptor.
 	void sendFrame(const CanFrame *frame)
 	{
 		imxCANFrame sendFrame = *frame;
@@ -87,6 +92,7 @@ namespace Aseba
 		::AsebaCanFrameSent();
 	}
 	
+	//! Return if there is free room for more frames in the physical CAN device.
 	int isFrameRoom()
 	{
 		pollfd CANpoll = {canfd, POLLOUT, 0};
@@ -97,14 +103,18 @@ namespace Aseba
 		else
 			return (CANpoll.revents & POLLOUT);
 	}
-		
+	
+	//! Called when received Packet got dropped.
 	void receivedPacketDropped()
 	{
 		std::cerr << "Received Packet got dropped" << std::endl;
 	}
-		
+	
+	//! Called when sent Packet got dropped.
 	void sentPacketDropped()
 	{
 		std::cerr << "Sent Packet got dropped" << std::endl;
 	}
+	
+	/*@}*/
 };

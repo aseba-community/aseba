@@ -30,6 +30,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class TargetDescription;
 	
 	//! The interface to an aseba network. Used to interact with the nodes
@@ -137,6 +140,8 @@ namespace Aseba
 		//! Remove all breakpoints in a node
 		virtual void clearBreakpoints(unsigned node) = 0;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

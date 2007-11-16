@@ -25,31 +25,39 @@
 #define __POWER_OF_TWO_H
 
 // helper functions for power of two numbers
-
-//! Return true if number is a power of two
-template <typename T>
-bool isPOT(T number)
+namespace Aseba
 {
-	if (number == 0)
-		return true;
-	while ((number & 1) == 0)
-		number >>= 1;
-	return number == 1;
-}
-
-//! If number is a power of two, number = (1 << shift) and this function returns shift, otherwise return value is undefined
-template <typename T>
-unsigned shiftFromPOT(T number)
-{
-	unsigned i = 0;
-	if (number == 0)
-		return 0;
-	while ((number & 1) == 0)
+	/** \addtogroup compiler */
+	/*@{*/
+	
+	//! Return true if number is a power of two
+	template <typename T>
+	bool isPOT(T number)
 	{
-		number >>= 1;
-		i++;
+		if (number == 0)
+			return true;
+		while ((number & 1) == 0)
+			number >>= 1;
+		return number == 1;
 	}
-	return i;
-}
+	
+	//! If number is a power of two, number = (1 << shift) and this function returns shift, otherwise return value is undefined
+	template <typename T>
+	unsigned shiftFromPOT(T number)
+	{
+		unsigned i = 0;
+		if (number == 0)
+			return 0;
+		while ((number & 1) == 0)
+		{
+			number >>= 1;
+			i++;
+		}
+		return i;
+	}
+
+	/*@}*/
+	
+}; // Aseba
 
 #endif

@@ -1,0 +1,47 @@
+/**
+	\mainpage
+	
+	\section Introduction
+	
+	Aseba is an event-based robot framework that allows distributed control and efficient resources exploitation of multi microcontrollers mobile robots. Aseba provides hardware modularity, better efficiency, and improved scalability by embedding a lightweight virtual machine in each microcontroller and providing an Integrated Development Environment to develop and debug the whole robot from a single place.
+	
+	A short presentation is available at http://stephane.magnenat.net/data/aseba-presentation.pdf and a 6 pages article at http://stephane.magnenat.net/data/aseba-iros2007-workshop.pdf .
+	
+	For more informations about Aseba, please have a look at its homepage at http://mobots.epfl.ch/aseba.html .
+	
+	\section Architecture
+	
+	\image html architecture.png
+	
+	This figure shows a high level scheme of the architecture. It consists of the following modules:
+	- first, a common communication bus for \ref msg. On our physical robot, it is a CAN bus and messages are transmitted through a \ref can.
+	- nodes, that use the \ref vm. On our physical robot, they are microcontrollers. In the simulator
+	- studio, which is the \ref studio, containing the \ref compiler
+	- switch, which is a \ref switch that connects the physical CAN bus (when available) and the software nodes through TCP.
+	- dump, a command line logger.
+	- cmd, a command line tool to flash microcontrollers.
+	
+	In addition, there are \ref common and \ref utils.
+	
+	\section Compilation
+	
+	In this Developer Preview, the robot is simulated using the Enki simulator (http://home.gna.org/enki). We provide Enki in this package.
+	
+	This Developer Preview uses cmake (http://www.cmake.org) and Qt 4 (http://trolltech.com/products/qt). To compile it on Unix, type:
+	\verbatim cmake . \endverbatim
+	and then
+	\verbatim make \endverbatim
+	in Aseba top level directory. On Windows, cmake comes with a GUI. For more
+	informations on cmake, please refer to its manual.
+	
+	\section Test
+	
+	To test aseba, first launch the switch:
+	\verbatim switch/asebaswitch \endverbatim
+	Then the Enki simulator:
+	\verbatim enki/asebaenki \endverbatim
+	Then studio, the IDE:
+	\verbatim studio/asebastudio \endverbatim
+	
+	You can then open \c enki/marxbot-obstacle-avoidance.aesl from studio.
+*/

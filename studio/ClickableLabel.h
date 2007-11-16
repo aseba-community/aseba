@@ -26,15 +26,23 @@
 
 #include <QLabel>
 
-class ClickableLabel : public QLabel
+namespace Aseba
 {
-	Q_OBJECT
+	/** \addtogroup studio */
+	/*@{*/
+
+	class ClickableLabel : public QLabel
+	{
+		Q_OBJECT
+		
+	signals:
+		void clicked();
+		
+	protected:
+		void mouseReleaseEvent(QMouseEvent * event);
+	};
 	
-signals:
-	void clicked();
-	
-protected:
-	void mouseReleaseEvent(QMouseEvent * event);
-};
+	/*@}*/
+}
 
 #endif

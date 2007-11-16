@@ -25,6 +25,9 @@ class QListWidgetItem;
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class TargetVariablesModel;
 	class TargetFunctionsModel;
 	class TargetMemoryModel;
@@ -215,6 +218,8 @@ namespace Aseba
 		Compiler compiler; //!< Aesl compiler
 		Target *target;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

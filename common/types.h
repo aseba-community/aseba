@@ -26,12 +26,18 @@
 
 #include <stdlib.h>
 
+/** \addtogroup common */
+/*@{*/
+
 /* Typedefs to be able to run aseba-mcu on 32 bits plateforms too */
-typedef signed long sint32;
-typedef unsigned long uint32;
-typedef signed short sint16;
-typedef unsigned short uint16;
-typedef signed char sint8;
-typedef unsigned char uint8;
+
+typedef signed long sint32;			//!< 32 bits signed integer
+typedef unsigned long uint32;		//!< 32 bits unsigned integer
+typedef signed short sint16;		//!< 16 bits signed integer
+typedef unsigned short uint16;		//!< 16 bits unsigned integer
+typedef signed char sint8;			//!< 8 bits signed integer
+typedef unsigned char uint8;		//!< 8 bits unsigned integer
+
+/*@}*/
 
 #endif

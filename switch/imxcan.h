@@ -29,6 +29,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup switch */
+	/*@{*/
+	
 	//! The header of a CAN frame as seen by the iMX CAN Linux driver
 	struct imxCANFrameHeader
 	{
@@ -71,6 +74,7 @@ namespace Aseba
 	
 	void sentPacketDropped();
 
+	/*@}*/
 };
 
 #endif //IMXCAN

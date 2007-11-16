@@ -28,6 +28,9 @@
 
 namespace Aseba
 {
+	/** \addtogroup studio */
+	/*@{*/
+	
 	class SpinBoxDelegate : public QItemDelegate
 	{
 		Q_OBJECT
@@ -45,6 +48,8 @@ namespace Aseba
 		void updateEditorGeometry(QWidget *editor,
 			const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	};
+	
+	/*@}*/
 }; // Aseba
 
 #endif

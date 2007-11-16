@@ -597,6 +597,9 @@ namespace Aseba
 		}
 		else
 		{
+			// we store constants for this call at the end of memory
+			unsigned localConstsAddr = targetDescription->variablesSize;
+			
 			// count the number of template parameters and build array
 			int minTemplateId = 0;
 			for (unsigned i = 0; i < function.parameters.size(); i++)
@@ -606,43 +609,65 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
+				const Token::Type argTypes[2] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
 					throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
 				else
-					expect(Token::TOKEN_STRING_LITERAL);
+					expectOneOf(argTypes, 2);
 				
-				// check if variable exists
-				std::string varName = tokens.front().sValue;
-				SourcePos varPos = tokens.front().pos;
-				VariablesMap::const_iterator varIt = variablesMap.find(varName);
-				if (varIt == variablesMap.end())
-					throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is not a defined variable").arg(i).arg(varName).arg(funcName));
-				
-				// check if it is a const array access
-				tokens.pop_front();
-				unsigned varAddr = varIt->second.first;
+				// we need to fill those two variables
+				unsigned varAddr;
 				unsigned varSize;
-				if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+				SourcePos varPos = tokens.front().pos;
+				
+				if (tokens.front() == Token::TOKEN_STRING_LITERAL)
 				{
-					tokens.pop_front();
-					expect(Token::TOKEN_INT_LITERAL);
+					// we have a variable access, check if variable exists
+					std::string varName = tokens.front().sValue;
+					VariablesMap::const_iterator varIt = variablesMap.find(varName);
+					if (varIt == variablesMap.end())
+						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is not a defined variable").arg(i).arg(varName).arg(funcName));
 					
-					// check if single value access is out of bounds
-					unsigned index = tokens.front().iValue;
-					if (index >= varSize)
-						throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
+					// store variable address
+					varAddr = varIt->second.first;
 					
+					// check if it is a const array access
 					tokens.pop_front();
-					expect(Token::TOKEN_BRACKET_CLOSE);
-					tokens.pop_front();
-					
-					varAddr += index;
-					varSize = 1;
+					if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+					{
+						tokens.pop_front();
+						expect(Token::TOKEN_INT_LITERAL);
+						
+						// check if single value access is out of bounds
+						unsigned index = tokens.front().iValue;
+						if (index >= varSize)
+							throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
+						
+						tokens.pop_front();
+						expect(Token::TOKEN_BRACKET_CLOSE);
+						tokens.pop_front();
+						
+						varAddr += index;
+						varSize = 1;
+					}
+					else
+					{
+						varSize = varIt->second.second;
+					}
 				}
 				else
 				{
-					varSize = varIt->second.second;
+					// we have inline integer, we need to store it and pass the address
+					// we store it at the end of the variable space, we test if there is no overflow
+					if (localConstsAddr <= freeVariableIndex)
+						throw Error(varPos, "No more free variable space for constant");
+					varAddr = --localConstsAddr;
+					varSize = 1;
+					callNode->children.push_back(new ImmediateNode(varPos, tokens.front().iValue));
+					callNode->children.push_back(new StoreNode(varPos, varAddr));
+					tokens.pop_front();
 				}
 				
 				// check if variable size is correct

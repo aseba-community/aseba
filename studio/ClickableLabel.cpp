@@ -23,8 +23,16 @@
 
 #include "ClickableLabel.h"
 
-void ClickableLabel::mouseReleaseEvent(QMouseEvent * event)
+namespace Aseba
 {
-	QLabel::mouseReleaseEvent(event);
-	emit clicked();
+	/** \addtogroup studio */
+	/*@{*/
+	
+	void ClickableLabel::mouseReleaseEvent(QMouseEvent * event)
+	{
+		QLabel::mouseReleaseEvent(event);
+		emit clicked();
+	}
+
+	/*@}*/
 }

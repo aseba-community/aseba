@@ -35,9 +35,28 @@ extern "C" {
 	Definition of Aseba Virtual Machine
 */
 
+/**
+	\defgroup vm Virtual Machine
+	
+Glue logic must implement:
+
+\verbatim
+if (debug command queue is not empty)
+	execute debug command
+else if (executing a thread)
+	run VM
+else if (event queue is not empty)
+	fetch event
+	run VM
+else
+	sleep until something happens
+\endverbatim
+*/
+/*@{*/
+
 enum
 {
-	ASEBA_MAX_BREAKPOINTS = 16
+	ASEBA_MAX_BREAKPOINTS = 16		//!< maximum number of simultaneous breakpoints the target supports
 };
 
 /*! This structure contains the state of the Aseba VM.
@@ -91,19 +110,6 @@ typedef struct
 
 // Functions provided by aseba-core
 
-/*
-	Glue logic must implement:
-
-	if (debug command queue is not empty)
-		execute debug command
-	else if (executing a thread)
-		run VM
-	else if (event queue is not empty)
-		fetch event
-		run VM
-	else
-		sleep until something happens
-*/
 
 /*! Init some variables that are not initialized otherwise.
 	This is not sufficient to have a working VM.
@@ -169,6 +175,8 @@ typedef enum
 void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason);
 
 #endif /* ASEBA_ASSERT */
+
+/*@}*/
 
 #ifdef __cplusplus
 } /* closing brace for extern "C" */
