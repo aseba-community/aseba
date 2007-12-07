@@ -23,75 +23,73 @@
 
 #include "../msg/msg.h"
 #include "../utils/utils.h"
-#include <sys/socket.h>
+#include <dashel/streams.h>
 #include <time.h>
-#include <netdb.h>
-#include <errno.h>
 #include <iostream>
+
+namespace Aseba
+{
+	using namespace Streams;
+	using namespace std;
+	
+	/**
+	\defgroup dump Message dumper
+	*/
+	/*@{*/
+	
+	//! A simple message dumper.
+	//! This class calls Aseba::Message::dump() for each message
+	class Dump : public Client
+	{
+	public:
+		Dump(const string& target) : Client(target)
+		{
+		}
+	
+	protected:
+		virtual void incomingData(Stream *stream)
+		{
+			Message *message = Message::receive(stream);
+			
+			dumpTime(cout);
+			if (message)
+				message->dump(cout);
+			else
+				cout << "unknown message received";
+			cout << std::endl;
+		}
+		
+		virtual void connectionClosed(Stream *stream)
+		{
+			dumpTime(cerr);
+			cout << stream->getTargetName() << " closed connection" << endl;
+		}
+	};
+	
+	/*@}*/
+}
 
 int main(int argc, char *argv[])
 {
-	const char *address = "localhost";
-	uint16_t port = ASEBA_DEFAULT_PORT;
+	const char *target = ASEBA_DEFAULT_TARGET;
 	
 	if (argc >= 2)
-		address = argv[1];
-	if (argc >= 3)
-		port = static_cast<uint16_t>(atoi(argv[2]));
-	
-	// fill server description structure
-	struct sockaddr_in serverAddress;
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_port = htons(port);
-	
-	// get server ip
-	struct hostent *hostp = gethostbyname(address);
-	if (!hostp)
-	{
-		Aseba::dumpTime(std::cerr);
-		std::cerr << "Cannot get address of server: " << strerror(errno) << std::endl;
-		return 1;
-	}
-	memcpy(&serverAddress.sin_addr, hostp->h_addr, sizeof(serverAddress.sin_addr));
-	
-	// create socket
-	int socket = ::socket(AF_INET, SOCK_STREAM, 0);
-	if (socket < 0)
-	{
-		Aseba::dumpTime(std::cerr);
-		std::cerr << "Cannot create socket: " << strerror(errno) << std::endl;
-		return 2;
-	}
-	
-	// connect
-	int ret = connect(socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-	if (ret < 0)
-	{
-		Aseba::dumpTime(std::cerr);
-		std::cerr << "Connection to server failed: " << strerror(errno) << std::endl;
-		return 3;
-	}
+		target = argv[1];
 	
 	try
 	{
-		while (true)
-		{
-			Aseba::Message *message = Aseba::Message::receive(socket);
-			
-			Aseba::dumpTime(std::cout);
-			if (message)
-				message->dump(std::cout);
-			else
-				std::cout << "unknown message received";
-			std::cout << std::endl;
-		}
+		Aseba::Dump dump(target);
+		dump.run();
 	}
-	catch (Aseba::Exception::FileDescriptorClosed e)
+	catch (Streams::InvalidTargetDescription e)
 	{
-		Aseba::dumpTime(std::cerr);
-		std::cerr << "Server closed connection" << std::endl;
-		close(socket);
+		std::cerr << "Invalid target description " << target << std::endl;
 	}
+	catch (Streams::ConnectionError e)
+	{
+		std::cerr << "Can't connect to " << target << std::endl;
+	}
+	
 	
 	return 0;
 }

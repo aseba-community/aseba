@@ -5,6 +5,7 @@
 		(http://stephane.magnenat.net)
 		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
 		Laboratory of Robotics Systems, EPFL, Lausanne
+		Sebastian Gerlach
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

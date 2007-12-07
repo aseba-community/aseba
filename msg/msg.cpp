@@ -27,11 +27,14 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <dashel/streams.h>
 
 using namespace std;
 
 namespace Aseba
 {
+	using namespace Streams;
+	
 	//! Static class that fills a table of known messages types in its constructor
 	class MessageTypesInitializer
 	{
@@ -126,25 +129,25 @@ namespace Aseba
 	
 	}
 	
-	void Message::serialize(int fd)
+	void Message::serialize(Stream* stream)
 	{
 		rawData.resize(0);
 		serializeSpecific();
 		assert(rawData.size() + 2 < 65536);
 		uint16 len = static_cast<uint16>(rawData.size());
-		Aseba::write(fd, &len, 2);
-		Aseba::write(fd, &source, 2);
-		Aseba::write(fd, &type, 2);
-		Aseba::write(fd, &rawData[0], rawData.size());
+		stream->write(&len, 2);
+		stream->write(&source, 2);
+		stream->write(&type, 2);
+		stream->write(&rawData[0], rawData.size());
 	}
 	
-	Message *Message::receive(int fd)
+	Message *Message::receive(Stream* stream)
 	{
 		// read header
 		uint16 len, source, type;
-		Aseba::read(fd, &len, 2);
-		Aseba::read(fd, &source, 2);
-		Aseba::read(fd, &type, 2);
+		stream->read(&len, 2);
+		stream->read(&source, 2);
+		stream->read(&type, 2);
 		
 		// create message
 		Message *message = messageTypesInitializer.createMessage(type);
@@ -153,7 +156,7 @@ namespace Aseba
 		message->source = source;
 		message->type = type;
 		message->rawData.resize(len);
-		Aseba::read(fd, &message->rawData[0], len);
+		stream->read(&message->rawData[0], len);
 		message->readPos = 0;
 		
 		// deserialize it

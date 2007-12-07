@@ -25,14 +25,15 @@
 #include "../msg/msg.h"
 #include <algorithm>
 #include <boost/cast.hpp>
+#include <dashel/streams.h>
 #include<iostream>
-
-using namespace boost;
-using std::copy;
-
 
 namespace Aseba
 {
+	using namespace boost;
+	using std::copy;
+	using namespace Streams;
+
 	/** \addtogroup studio */
 	/*@{*/
 	
@@ -49,7 +50,8 @@ namespace Aseba
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
-	TcpTarget::TcpTarget()
+	TcpTarget::TcpTarget() :
+		Client(ASEBA_DEFAULT_TARGET)
 	{
 		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::TcpTarget::receivedDescription;
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::TcpTarget::receivedDisconnected;
@@ -59,29 +61,28 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::TcpTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
 		&Aseba::TcpTarget::receivedBreakpointSetResult;
+		
+		// Send presence query
+		Presence().serialize(stream);
+		stream->flush();
+		netTimer = startTimer(20);
 	}
 	
 	TcpTarget::~TcpTarget()
 	{
+		killTimer(netTimer);
 		disconnect();
 	}
-	
-	void TcpTarget::connect()
-	{
-		// TODO: do a connection box
 		
-		NetworkClient::connect("localhost", ASEBA_DEFAULT_PORT);
-	}
-	
 	void TcpTarget::disconnect()
 	{
 		// detach all nodes
 		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			//DetachDebugger(node->first).serialize(socketDescriptor());
-			BreakpointClearAll(node->first).serialize(socketDescriptor());
-			Run(node->first).serialize(socketDescriptor());
-			flush();
+			//DetachDebugger(node->first).serialize(stream);
+			BreakpointClearAll(node->first).serialize(stream);
+			Run(node->first).serialize(stream);
+			stream->flush();
 		}
 	}
 	
@@ -105,44 +106,44 @@ namespace Aseba
 		setBytecodeMessage.bytecode.resize(bytecode.size());
 		copy(bytecode.begin(), bytecode.end(), setBytecodeMessage.bytecode.begin());
 		
-		setBytecodeMessage.serialize(socketDescriptor());
-		flush();
+		setBytecodeMessage.serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
-		UserMessage(id, data).serialize(socketDescriptor());
-		flush();
+		UserMessage(id, data).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
-		SetVariables(node, start, data).serialize(socketDescriptor());
-		flush();
+		SetVariables(node, start, data).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
-		GetVariables(node, start, length).serialize(socketDescriptor());
-		flush();
+		GetVariables(node, start, length).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::reset(unsigned node)
 	{
-		Reset(node).serialize(socketDescriptor());
-		flush();
+		Reset(node).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::run(unsigned node)
 	{
-		Run(node).serialize(socketDescriptor());
-		flush();
+		Run(node).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::pause(unsigned node)
 	{
-		Pause(node).serialize(socketDescriptor());
-		flush();
+		Pause(node).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::next(unsigned node)
@@ -155,14 +156,14 @@ namespace Aseba
 		GetExecutionState getExecutionStateMessage;
 		getExecutionStateMessage.dest = node;
 		
-		getExecutionStateMessage.serialize(socketDescriptor());
-		flush();
+		getExecutionStateMessage.serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::stop(unsigned node)
 	{
-		Stop(node).serialize(socketDescriptor());
-		flush();
+		Stop(node).serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::setBreakpoint(unsigned node, unsigned line)
@@ -174,8 +175,8 @@ namespace Aseba
 			breakpointSetMessage.pc = pc;
 			breakpointSetMessage.dest = node;
 			
-			breakpointSetMessage.serialize(socketDescriptor());
-			flush();
+			breakpointSetMessage.serialize(stream);
+			stream->flush();
 		}
 	}
 	
@@ -188,8 +189,8 @@ namespace Aseba
 			breakpointClearMessage.pc = pc;
 			breakpointClearMessage.dest = node;
 			
-			breakpointClearMessage.serialize(socketDescriptor());
-			flush();
+			breakpointClearMessage.serialize(stream);
+			stream->flush();
 		}
 	}
 	
@@ -198,27 +199,19 @@ namespace Aseba
 		BreakpointClearAll breakpointClearAllMessage;
 		breakpointClearAllMessage.dest = node;
 		
-		breakpointClearAllMessage.serialize(socketDescriptor());
-		flush();
+		breakpointClearAllMessage.serialize(stream);
+		stream->flush();
 	}
 	
 	void TcpTarget::timerEvent(QTimerEvent *event)
 	{
 		Q_UNUSED(event);
-		step();
+		step(0);
 	}
 	
-	void TcpTarget::connectionEstablished()
+	void TcpTarget::incomingData(Stream *stream)
 	{
-		// Send presence query
-		Presence().serialize(socketDescriptor());
-		flush();
-		netTimer = startTimer(20);
-	}
-	
-	void TcpTarget::incomingData()
-	{
-		Message *message = Message::receive(socketDescriptor());
+		Message *message = Message::receive(stream);
 		
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
 		if (messageHandler == messagesHandlersMap.end())
@@ -235,11 +228,11 @@ namespace Aseba
 		delete message;
 	}
 	
-	void TcpTarget::connectionClosed(void)
+	void TcpTarget::connectionClosed(Stream* stream)
 	{
+		Q_UNUSED(stream);
 		emit networkDisconnected();
 		nodes.clear();
-		killTimer(netTimer);
 	}
 	
 	void TcpTarget::receivedDescription(Message *message)
@@ -260,7 +253,7 @@ namespace Aseba
 		node.description = *description;
 		
 		// attach debugger
-		// AttachDebugger(id).serialize(socketDescriptor());
+		// AttachDebugger(id).serialize(stream);
 		// flush();
 		emit nodeConnected(id);
 	}
@@ -319,8 +312,8 @@ namespace Aseba
 						node.lineInNext = line;
 						node.steppingInNext = WAITING_LINE_CHANGE;
 						
-						Step(ess->source).serialize(socketDescriptor());
-						flush();
+						Step(ess->source).serialize(stream);
+						stream->flush();
 					}
 					else if (node.steppingInNext == WAITING_LINE_CHANGE)
 					{
@@ -333,8 +326,8 @@ namespace Aseba
 						}
 						else
 						{
-							Step(ess->source).serialize(socketDescriptor());
-							flush();
+							Step(ess->source).serialize(stream);
+							stream->flush();
 						}
 					}
 					else

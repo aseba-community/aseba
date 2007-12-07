@@ -30,6 +30,11 @@
 #include <vector>
 #include <string>
 
+namespace Streams
+{
+	class Stream;
+}
+
 namespace Aseba
 {
 	/**
@@ -48,8 +53,8 @@ namespace Aseba
 		Message(uint16 type);
 		virtual ~Message();
 		
-		void serialize(int fd);
-		static Message *receive(int fd);
+		void serialize(Streams::Stream* stream);
+		static Message *receive(Streams::Stream* stream);
 		void dump(std::ostream &stream);
 		
 	protected:

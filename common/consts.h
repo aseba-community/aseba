@@ -35,6 +35,9 @@ enum
 	ASEBA_DEFAULT_PORT = 33333
 };
 
+/*! default target for aseba */
+#define ASEBA_DEFAULT_TARGET "tcp:localhost:33333"
+
 /*! max number of connection to aseba switch */
 enum
 {

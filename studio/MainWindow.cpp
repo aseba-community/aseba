@@ -588,7 +588,7 @@ namespace Aseba
 		QMainWindow(parent)
 	{
 		// create target
-		target = new TcpTarget;
+		target = new TcpTarget();
 		
 		// create gui
 		setupWidgets();
@@ -598,9 +598,6 @@ namespace Aseba
 		// cosmetic dix-up
 		setWindowTitle(tr("Aseba Studio"));
 		resize(1000,700);
-		
-		// connect to target
-		target->connect();
 	}
 	
 	MainWindow::~MainWindow()
@@ -1246,10 +1243,10 @@ namespace Aseba
 							this, SLOT(save()),
 							QKeySequence(tr("Ctrl+S", "File|Save")));
 		fileMenu->addSeparator();
-		fileMenu->addAction(QIcon(":/images/network.png"), tr("Connect to &target"),
+		/*fileMenu->addAction(QIcon(":/images/network.png"), tr("Connect to &target"),
 							target, SLOT(connect()),
 							QKeySequence(tr("Ctrl+T", "File|Connect to target")));
-		fileMenu->addSeparator();
+		fileMenu->addSeparator();*/
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("E&xit"),
 							qApp, SLOT(quit()),
 							QKeySequence(tr("Ctrl+Q", "File|Exit")));

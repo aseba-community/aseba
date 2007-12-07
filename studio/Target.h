@@ -87,9 +87,9 @@ namespace Aseba
 		//! Virtual destructor.
 		virtual ~Target() { }
 	
-	public slots:
+	/*public slots:
 		//! Try to connect to the aseba network.
-		virtual void connect() = 0;
+		virtual void connect() = 0;*/
 	
 	public:
 		//! Return the name of a node. Returned value is always valid if node exists

@@ -44,4 +44,8 @@
 	\verbatim studio/asebastudio \endverbatim
 	
 	You can then open \c enki/marxbot-obstacle-avoidance.aesl from studio.
+	
+	You can rotate the 3D view by moving mouse while pressing right button.
+	You can move the 3D view by moving mouse while pressing right button and shift.
+	You can change the height in the 3D view by moving mouse wheel while pressing shift.
 */

@@ -26,12 +26,17 @@
 
 #include "Target.h"
 #include "../common/consts.h"
-#include "../utils/network.h"
 #include <QString>
 #include <QTcpSocket>
 #include <map>
+#include <dashel/streams.h>
 
 class QSocketNotifier;
+
+namespace Streams
+{
+	class Stream;
+}
 
 namespace Aseba
 {
@@ -40,7 +45,7 @@ namespace Aseba
 	
 	class Message;
 	
-	class TcpTarget: public Target, public NetworkClient
+	class TcpTarget: public Target, public Streams::Client
 	{
 		Q_OBJECT
 		
@@ -48,7 +53,6 @@ namespace Aseba
 		TcpTarget();
 		~TcpTarget();
 		
-		virtual void connect();
 		virtual void disconnect();
 		
 		virtual const TargetDescription * const getConstDescription(unsigned node) const;
@@ -72,9 +76,8 @@ namespace Aseba
 		
 	protected:
 		virtual void timerEvent(QTimerEvent *event);
-		virtual void connectionEstablished(void);
-		virtual void incomingData(void);
-		virtual void connectionClosed(void);
+		virtual void incomingData(Streams::Stream *stream);
+		virtual void connectionClosed(Streams::Stream *stream);
 		
 	protected:
 		void receivedDescription(Message *message);
