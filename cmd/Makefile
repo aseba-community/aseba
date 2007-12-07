@@ -12,7 +12,7 @@ target = asebacmd
 CXXFLAGS +=-g -Wall
 CXX = $(prefix)g++
 LDFLAGS = -L$(SRCDIR)/../msg/build-$(builddir)/ -L$(SRCDIR)/../utils/build-$(builddir)/ 
-LDLIBS = -lasebamsg -lasebautils
+LDLIBS = -lasebamsg -lasebautils -ldasheld
 
 $(target): $(objects)
 	$(CXX) $(objects) $(LDFLAGS) $(LDLIBS) -o $@

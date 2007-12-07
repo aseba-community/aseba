@@ -23,11 +23,8 @@
 
 #include "../msg/msg.h"
 #include "../utils/utils.h"
+#include <dashel/streams.h>
 #include "HexFile.h"
-#include <sys/socket.h>
-#include <time.h>
-#include <netdb.h>
-#include <errno.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -35,6 +32,7 @@
 
 namespace Aseba 
 {
+	using namespace Streams;
 	using namespace std;
 	
 	//! Show list of known commands
@@ -50,7 +48,7 @@ namespace Aseba
 	void dumpHelp(ostream &stream, const char *programName)
 	{
 		stream << "Aseba cmd, send message over the aseba network, usage:\n";
-		stream << programName << " [-a address] [-p port] [cmd destId (args)] ... [cmd destId (args)]\n";
+		stream << programName << " [-t target] [cmd destId (args)] ... [cmd destId (args)]\n";
 		stream << "where cmd is one af the following:\n";
 		dumpCommandList(stream);
 	}
@@ -128,55 +126,19 @@ namespace Aseba
 		exit(13);
 	}
 	
-	//! Open a TCP connection, exit on failure
-	int openConnection(const char *address, uint16_t port)
-	{
-		// fill server description structure
-		struct sockaddr_in serverAddress;
-		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_port = htons(port);
-		
-		// get server ip
-		struct hostent *hostp = gethostbyname(address);
-		if (!hostp)
-		{
-			cerr << "Cannot get address of server: " << strerror(errno) << endl;
-			exit(1);
-		}
-		memcpy(&serverAddress.sin_addr, hostp->h_addr, sizeof(serverAddress.sin_addr));
-		
-		// create socket
-		int socket = ::socket(AF_INET, SOCK_STREAM, 0);
-		if (socket < 0)
-		{
-			cerr << "Cannot create socket: " << strerror(errno) << endl;
-			exit(2);
-		}
-		
-		// connect
-		int ret = connect(socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-		if (ret < 0)
-		{
-			cerr << "Connection to server failed: " << strerror(errno) << endl;
-			exit(3);
-		}
-		
-		return socket;
-	}
-	
 	//! Manage interactions with an aseba-compatible bootloader
 	class BootloaderInterface
 	{
 	public:
 		//! Create an interface to bootloader with id dest using a socket
-		BootloaderInterface(int socket, int dest) :
-			socket(socket),
+		BootloaderInterface(Stream* stream, int dest) :
+			stream(stream),
 			dest(dest)
 		{
 			// Wait until the bootloader answers
 			while (true)
 			{
-				Message *message = Message::receive(socket);
+				Message *message = Message::receive(stream);
 				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
 				if (bDescMessage && (bDescMessage->source == dest))
 				{
@@ -209,13 +171,13 @@ namespace Aseba
 			BootloaderReadPage message;
 			message.dest = dest;
 			message.pageNumber = pageNumber;
-			message.serialize(socket);
+			message.serialize(stream);
 			unsigned dataRead = 0;
 			
 			// get data
 			while (true)
 			{
-				Message *message = Message::receive(socket);
+				Message *message = Message::receive(stream);
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
@@ -258,21 +220,21 @@ namespace Aseba
 			BootloaderWritePage writePage;
 			writePage.dest = dest;
 			writePage.pageNumber = pageNumber;
-			writePage.serialize(socket);
+			writePage.serialize(stream);
 			
 			// write data
 			for (unsigned dataWritten = 0; dataWritten < pageSize;)
 			{
 				BootloaderPageDataWrite pageData;
 				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
-				pageData.serialize(socket);
+				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
 			}
 			
 			// wait ack
 			while (true)
 			{
-				Message *message = Message::receive(socket);
+				Message *message = Message::receive(stream);
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
@@ -364,7 +326,7 @@ namespace Aseba
 		}
 	
 	protected:
-		int socket;
+		Stream* stream;
 		int dest;
 		unsigned pageSize;
 		unsigned pagesStart;
@@ -372,7 +334,7 @@ namespace Aseba
 	};
 	
 	//! Process a command, return the number of arguments eaten (not counting the command itself)
-	int processCommand(int socket, int argc, char *argv[])
+	int processCommand(Stream* stream, int argc, char *argv[])
 	{
 		const char *cmd = argv[0];
 		int argEaten = 0;
@@ -380,7 +342,7 @@ namespace Aseba
 		if (strcmp(cmd, "presence") == 0)
 		{
 			Presence message;
-			message.serialize(socket);
+			message.serialize(stream);
 		}
 		else if (strcmp(cmd, "rdpage") == 0)
 		{
@@ -389,7 +351,7 @@ namespace Aseba
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
 			
-			BootloaderInterface bootloader(socket, atoi(argv[1]));
+			BootloaderInterface bootloader(stream, atoi(argv[1]));
 			
 			vector<uint8> data(bootloader.getPageSize());
 			if (bootloader.readPage(atoi(argv[2]), &data[0]))
@@ -413,7 +375,7 @@ namespace Aseba
 			// try to write hex file
 			try
 			{
-				BootloaderInterface bootloader(socket, atoi(argv[1]));
+				BootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.writeHex(argv[2]);
 			}
 			catch (HexFile::Error &e)
@@ -431,7 +393,7 @@ namespace Aseba
 			// try to read hex file
 			try
 			{
-				BootloaderInterface bootloader(socket, atoi(argv[1]));
+				BootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.readHex(argv[2]);
 			}
 			catch (HexFile::Error &e)
@@ -448,25 +410,16 @@ namespace Aseba
 
 int main(int argc, char *argv[])
 {
-	const char *address = "localhost";
-	uint16_t port = ASEBA_DEFAULT_PORT;
+	const char *target = ASEBA_DEFAULT_TARGET;
 	int argCounter = 1;
 	
-	//
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
-		if (strcmp(arg, "-p") == 0)
+		if (strcmp(arg, "-t") == 0)
 		{
 			if (++argCounter < argc)
-				port = static_cast<uint16_t>(atoi(argv[argCounter]));
-			else
-				Aseba::errorMissingArgument(argv[0]);
-		}
-		else if (strcmp(arg, "-a") == 0)
-		{
-			if (++argCounter < argc)
-				address = argv[argCounter];
+				target = argv[argCounter];
 			else
 				Aseba::errorMissingArgument(argv[0]);
 		}
@@ -477,26 +430,17 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			// aseba command
-			if (argCounter + 2 > argc)
-				Aseba::errorMissingArgument(argv[0]);
-			
-			// open connection to switch
-			int socket = Aseba::openConnection(address, port);
+			Streams::Client client(target);
 			
 			// process command
 			try
 			{
-				 argCounter += Aseba::processCommand(socket, argc - argCounter, &argv[argCounter]);
+				 argCounter += Aseba::processCommand(client.getStream(), argc - argCounter, &argv[argCounter]);
 			}
-			catch (Aseba::Exception::FileDescriptorClosed e)
+			catch (Streams::StreamException e)
 			{
 				Aseba::errorServerDisconnected();
 			}
-			
-			// close connection properly
-			shutdown(socket, SHUT_RDWR);
-			close(socket);
 		}
 		argCounter++;
 	}
