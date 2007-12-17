@@ -12,7 +12,7 @@ target = asebaswitch
 CXXFLAGS +=-g -Wall
 CXX = $(prefix)g++
 LDFLAGS = -L$(SRCDIR)/../utils/build-$(builddir)/ -L$(SRCDIR)/../can/build-$(builddir)/
-LDLIBS = -lasebautils -lasebacan
+LDLIBS = -lasebautils -lasebacan -ldasheld
 
 $(target): $(objects)
 	$(CXX) $(objects) $(LDFLAGS) $(LDLIBS) -o $@

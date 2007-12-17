@@ -32,6 +32,10 @@ namespace Aseba
 	/** \addtogroup switch */
 	/*@{*/
 	
+	/*
+	// TODO: temporary disabled until new translator CAN interface
+	// we should replace this by a translatorcan file
+	
 	//! The header of a CAN frame as seen by the iMX CAN Linux driver
 	struct imxCANFrameHeader
 	{
@@ -64,7 +68,7 @@ namespace Aseba
 		operator CanFrame() const;
 		//! Dump the content of this CAN frame to a stream
 		void dump(std::ostream &stream);
-	};
+	};*/
 	
 	void sendFrame (const CanFrame *frame);
 	
@@ -73,7 +77,7 @@ namespace Aseba
 	void receivedPacketDropped();
 	
 	void sentPacketDropped();
-
+	
 	/*@}*/
 };
 

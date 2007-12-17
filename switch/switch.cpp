@@ -21,17 +21,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <errno.h>
-#include <sys/ioctl.h> 
-#include <net/if.h>
-#include <net/ethernet.h>
-#include <netpacket/packet.h>
-#include <signal.h>
+#include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <set>
 #include <valarray>
 #include <iterator>
@@ -43,246 +35,75 @@
 
 namespace Aseba 
 {
-	extern int canfd;
+	using namespace std;
+	using namespace Streams;
 	
 	/** \addtogroup switch */
 	/*@{*/
 
-	Switch::Switch(int port, const char *canIface, bool verbose, bool dump) :
+	Switch::Switch(int port, const char* canTarget, bool verbose, bool dump) :
+		canTarget(canTarget),
 		verbose(verbose),
 		dump(dump)
 	{
-		serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-		if (serverSocket < 0)
-		{
-			std::cerr << "Cannot create server socket: " << strerror(errno) << std::endl;
-			exit(1);
-		}
-		int on = 1;
-		setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+		ostringstream oss;
+		oss << "tcp:port=" << port;
+		listen(oss.str());
 		
-		// The local address of the serverSocket
-		struct sockaddr_in loc_addr;
-		loc_addr.sin_family = AF_INET;
-		loc_addr.sin_port = htons(port);
-		loc_addr.sin_addr.s_addr = INADDR_ANY;
-
-		if (bind(serverSocket, (struct sockaddr *)(&loc_addr), sizeof(struct sockaddr_in)) < 0)
+		try
 		{
-			std::cerr << "Cannot bind server socket: " << strerror(errno) << std::endl;
-			close(serverSocket);
-			exit(2);
+			listen(canTarget);
 		}
-		
-		canConnected = canConnect(canIface);
+		catch (InvalidTargetDescription e)
+		{
+			cerr << "Invalid CAN target " <<  canTarget << endl;
+		}
+		catch (ConnectionError e)
+		{
+			cerr << "Cannot open CAN target " <<  canTarget << endl;
+		}
 	}
 	
-	Switch::~Switch()
-	{
-		if (canConnected)
-		{
-			shutdown(canSocket, SHUT_RDWR);
-			close(canSocket);
-		}
-		shutdown(serverSocket, SHUT_RDWR);
-		close (serverSocket);
-	}
+	extern Stream* canStream;
 	
-	bool Switch::canConnect(const char *canIface)
+	void Switch::incomingConnection(Stream *stream)
 	{
-		Switch::canSocket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-		if (canSocket < 0) 
+		if (stream->getTargetName() == canTarget)
 		{
-			std::cerr << "Cannot create CAN socket: " << strerror(errno) << std::endl;
-			if (verbose)
-			{
-				if (errno == EPERM)
-					std::cerr << "Try to run it as root" << std::endl;
-				std::cerr << "Nothing is going to be transfered to the CAN modules" << std::endl;
-			}
-			return false;
-		}
-		
-		struct ifreq req;
-		strcpy(req.ifr_name, canIface);
-		if (ioctl(canSocket, SIOCGIFINDEX, &req))
-		{
-			std::cerr << "Cannot ioctl CAN socket: " << strerror(errno) << std::endl;
-			if (verbose)
-			{
-				if (errno == ENODEV)
-					//we have no can interface
-					std::cerr << "CAN interface " << canIface << " does not exist" << std::endl;
-				std::cerr << "Nothing is going to be transfered to the CAN modules" << std::endl;
-			}
-			close(canSocket);
-			return false;
+			canStream = stream;
+			::AsebaCanInit(IMX_CAN_ID, sendFrame, isFrameRoom, receivedPacketDropped, sentPacketDropped);
+			cout << "CAN connection to " << stream->getTargetName() << endl;
 		}
 		else
 		{
-			struct sockaddr_ll sal;
-			sal.sll_protocol = htons(ETH_P_ALL);
-			sal.sll_family = AF_PACKET;
-			sal.sll_ifindex = req.ifr_ifindex;
-			if (bind(canSocket, (struct sockaddr *) &sal, sizeof(struct sockaddr_ll))) 
+			if (verbose)
 			{
-				std::cerr << "Cannot bind CAN socket: " << strerror(errno) << std::endl;
-				if (verbose)
-					std::cerr << "Nothing is going to be transfered to the CAN modules" << std::endl;
-				close(canSocket);
-				return false;
-			}
-			
-			canfd = canSocket;
-			::AsebaCanInit(IMX_CAN_ID, sendFrame, isFrameRoom, receivedPacketDropped, sentPacketDropped);
-			return true;
-		}
-	}
-	
-	void Switch::buildSelectList()
-	{
-
-		/* First put together fd_set for select(), which will
-		consist of the serverSocket variable in case a new connection
-		is coming in, plus all the sockets we have already
-		accepted. */
-		
-		/* FD_ZERO() clears out the fd_set called sockets, so that
-		it doesn't contain any file descriptors. */
-		FD_ZERO(&socketsRead);
-
-		/* FD_SET() adds the file descriptor "serverSocket" to the fd_set,
-		so that select() will return if a connection comes in
-		on that socket (which means you have to do accept(), etc. */
-		FD_SET(serverSocket, &socketsRead);
-		highSocket = serverSocket;
-		
-		// We add the CAN socket to the sockets to be listened
-		if (canConnected)
-		{
-			FD_SET(canSocket, &socketsRead);
-			highSocket = canSocket;
-		}
-
-		/* Loops through all the possible connections and adds
-		those sockets to the fd_set */
-		for(std::set<int>::iterator it = connectList.begin(); it != connectList.end(); ++it)
-		{
-			FD_SET(*it, &socketsRead);
-			if (*it > highSocket)
-				highSocket = *it;
-		}
-	}
-	
-	void Switch::run()
-	{
-		listen(serverSocket, ASEBA_MAX_SWITCH_CONN);
-		if (verbose)
-		{
-			dumpTime(std::cout);
-			std::cout << "Aseba switch waiting for connection" << std::endl;
-		}
-		
-		while (1)
-		{
-			int nbAdd = (canConnected ? 1 : 2);
-			buildSelectList();
-			
-			// Timeout for select
-			struct timeval timeout;
-			timeout.tv_sec = 1;
-			timeout.tv_usec = 0;
-			int rdySockets = select(highSocket+nbAdd, &socketsRead, (fd_set *) 0, (fd_set *) 0, &timeout);
-			if (rdySockets < 0)
-			{
-				dumpTime(std::cerr);
-				std::cerr << "Select returned an error" << std::endl;
-				exit(3);
-			}
-			else if (rdySockets == 0)
-			{
-				// Nothing to read
-				//std::cout << "." << std::endl;
-			}
-			else
-			{
-				//std::cout << "read" << std::endl;
-				manageSockets();
-				//std::cout << "readSockets" << std::endl;
+				dumpTime(cout);
+				cout << "Incoming connection from " << stream->getTargetName() << endl;
 			}
 		}
 	}
 	
-	void Switch::manageSockets()
+	void Switch::incomingData(Stream *stream)
 	{
-		/* If a client is trying to connect() to our listening
-		serverSocket, select() will consider that as the socket
-		being 'readable'. Thus, if the listening socket is
-		part of the fd_set, we need to accept a new connection. */
-		if (FD_ISSET(serverSocket, &socketsRead))
-			newConnection();
-		
-		/* if we have a frame to read on the can socket, we manage it */
-		if (canConnected && FD_ISSET(canSocket, &socketsRead))
+		if (stream == canStream)
 			manageCanFrame();
-
-		/* Now check connectList for available data */
-		/* Run through our sockets and check to see if anything
-		happened with them, if so 'service' them. */
-		for (std::set<int>::iterator it = connectList.begin(); it != connectList.end(); ++it)
-		{
-			if (FD_ISSET(*it, &socketsRead))
-			{
-				try
-				{
-					forwardDataFrom(*it);
-				}
-				catch (Exception::FileDescriptorClosed e)
-				{
-					closeConnection(e.fd);
-					
-					// we got exception, so socket list is dirty, get out of this loop
-					return;
-				}
-				catch (Exception::FileDescriptorError e)
-				{
-					if (verbose)
-					{
-						dumpTime(std::cout);
-						std::cout << "Socket error: FD " << e.fd << " error " << e.errNumber << std::endl;
-					}
-					closeConnection(e.fd);
-					
-					// we got exception, so socket list is dirty, get out of this loop
-					return;
-				}
-			}
-		}
+		else
+			forwardDataFrom(stream);
 	}
 	
-	void Switch::newConnection()
+	void Switch::connectionClosed(Stream *stream)
 	{
-		/* We have a new connection coming in!  We'll
-		try to find a spot for it in connectlist. */
-		struct sockaddr_in sockAddr;
-		socklen_t sockAddrLen = sizeof (struct sockaddr_in);
-		int connection = accept(serverSocket, (sockaddr *)&sockAddr, &sockAddrLen);
-		if (connection < 0)
-		{
-			dumpTime(std::cerr);
-			std::cerr << "Cannot accept connection: " << strerror(errno) << std::endl;
-			return;
-		}
-		
-		connectList.insert(connection);
+		if (stream == canStream)
+			canStream = 0;
 		if (verbose)
 		{
-			dumpTime(std::cout);
-			std::cout << "Connection accepted from " << inet_ntoa(sockAddr.sin_addr) << " : FD " << connection << std::endl;
+			dumpTime(cout);
+			cout << "Connection closed to " << stream->getTargetName() << endl;
 		}
 	}
 	
-	void Switch::forwardDataFrom(const int socketNb)
+	void Switch::forwardDataFrom(Stream *stream)
 	{
 		// max packet length is 65533
 		// packet source and packet type is not counted in len,
@@ -290,29 +111,41 @@ namespace Aseba
 		uint16 len;
 		
 		// read the transfer size
-		Aseba::read(socketNb, &len, 2);
+		stream->read(&len, 2);
 		
 		// allocate the read buffer and do socket read
 		std::valarray<uint8> readbuff((uint8)0, len + 4);
-		Aseba::read(socketNb, &readbuff[0], len + 4);
+		stream->read(&readbuff[0], len + 4);
 		
 		if (dump)
 		{
-			std::cout << "Read on socket ";
+			std::cout << "Read on stream ";
 			for(unsigned int i = 0; i < readbuff.size(); i++)
 				std::cout << (unsigned)readbuff[i] << " ";
 			std::cout << std::endl;
 		}
 		
-		// write on all connected sockets
-		for (std::set<int>::iterator it = connectList.begin(); it != connectList.end(); ++it)
+		// write on all connected streams
+		for (StreamsList::iterator it = transferStreams.begin(); it != transferStreams.end();++it)
 		{
-			Aseba::write(*it, &len, 2);
-			Aseba::write(*it, &readbuff[0], len + 4);
+			Stream* destStream = *it;
+			if (destStream != canStream)
+			{
+				try
+				{
+					destStream->write(&len, 2);
+					destStream->write(&readbuff[0], len + 4);
+					destStream->flush();
+				}
+				catch (StreamException e)
+				{
+					// if this stream has a problem, ignore it for now, and let next select disconnect it
+				}
+			}
 		}
 		
-		// write on the canSocket too
-		if (canConnected)
+		// write on the CAN stream too
+		if (canStream)
 		{
 			// we drop the source when we send on CAN
 			while (::AsebaCanSend(&readbuff[2], len + 2) == 0)
@@ -323,10 +156,12 @@ namespace Aseba
 	
 	void Switch::manageCanFrame()
 	{
+		
 		/*	1) read the 8 bytes
 			2) add them to the current AsebaCanPacket (AsebaCanFrameReceived)
 			3) if the AsebaCanPacket is complete, forward it ! */
-		
+		/*
+		// TODO: adapt this to new translator
 		// read on CAN BUS
 		imxCANFrame receivedFrame;
 		Aseba::read(canSocket, &receivedFrame, sizeof(imxCANFrame));
@@ -372,18 +207,7 @@ namespace Aseba
 				}
 			}
 		}
-	}
-	
-	void Switch::closeConnection(const int socketNb)
-	{
-		if (verbose)
-		{
-			dumpTime(std::cout);
-			std::cout << "Connection closed: FD " << socketNb << std::endl;
-		}
-		shutdown(socketNb, SHUT_RDWR);
-		close (socketNb);
-		connectList.erase(socketNb);
+		*/
 	}
 	
 	/*@}*/
@@ -403,12 +227,9 @@ int main(int argc, char *argv[])
 {
 	unsigned int port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;
-	char *canIface = "can0";
+	const char* canTarget = "ser";
 	
 	int argCounter = 1;
-	
-	// do not quit on fd close, use our exception instead
-	signal(SIGPIPE, SIG_IGN);
 	
 	while (argCounter < argc)
 	{
@@ -428,10 +249,10 @@ int main(int argc, char *argv[])
 			dumpHelp(std::cout, argv[0]);
 			return 0;
 		}
-		else 
+		else
 		{
 			if (argCounter == 1)
-				canIface = argv[1];
+				canTarget = argv[1];
 			else
 			{
 				std::cout << "error: bad argument" << std::endl;
@@ -442,7 +263,7 @@ int main(int argc, char *argv[])
 		argCounter++;
 	}
 	
-	Aseba::Switch aswitch(port, canIface, verbose, false);
+	Aseba::Switch aswitch(port, canTarget, verbose, false);
 	aswitch.run();
 	
 	return 0;

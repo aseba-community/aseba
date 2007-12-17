@@ -5,7 +5,7 @@ else
 
 VPATH = $(SRCDIR)
 
-sources = utils.cpp network.cpp FormatableString.cpp
+sources = utils.cpp FormatableString.cpp
 objects = $(patsubst %.cpp,%.o,$(sources))
 target = libasebautils.a
 

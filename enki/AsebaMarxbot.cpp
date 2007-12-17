@@ -37,53 +37,53 @@
 // Implementation of aseba glue code
 
 // map for aseba glue code
-typedef std::map<AsebaVMState*, Aseba::Socket*>  VmSocketMap;
+typedef std::map<AsebaVMState*, Enki::AsebaMarxbot*>  VmSocketMap;
 static VmSocketMap asebaSocketMaps;
 
 //int stepCounter = 0;
 
 extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
 {
-	Aseba::Socket* socket = asebaSocketMaps[vm];
-	assert(socket);
+	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	assert(stream);
 	
 	// write message
-	socket->write(&size, 2);
-	socket->write(&vm->nodeId, 2);
-	socket->write(&id, 2);
-	socket->write(data, size);
-	socket->flush();
+	stream->write(&size, 2);
+	stream->write(&vm->nodeId, 2);
+	stream->write(&id, 2);
+	stream->write(data, size);
+	stream->flush();
 	std::cout << "event " << id << std::endl;
 }
 
 extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {
-	Aseba::Socket* socket = asebaSocketMaps[vm];
-	assert(socket);
+	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	assert(stream);
 	
 	// write message
 	uint16 size = length * 2 + 2;
 	uint16 id = ASEBA_MESSAGE_VARIABLES;
-	socket->write(&size, 2);
-	socket->write(&vm->nodeId, 2);
-	socket->write(&id, 2);
-	socket->write(&start, 2);
-	socket->write(vm->variables + start, length * 2);
-	socket->flush();
+	stream->write(&size, 2);
+	stream->write(&vm->nodeId, 2);
+	stream->write(&id, 2);
+	stream->write(&start, 2);
+	stream->write(vm->variables + start, length * 2);
+	stream->flush();
 }
 
-void AsebaWriteString(Aseba::Socket *socket, const char *s)
+void AsebaWriteString(Streams::Stream* stream, const char *s)
 {
 	size_t len = strlen(s);
 	uint8 lenUint8 = static_cast<uint8>(strlen(s));
-	socket->write(&lenUint8, 1);
-	socket->write(s, len);
+	stream->write(&lenUint8, 1);
+	stream->write(s, len);
 }
 
 extern "C" void AsebaSendDescription(AsebaVMState *vm)
 {
-	Aseba::Socket* socket = asebaSocketMaps[vm];
-	assert(socket);
+	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	assert(stream);
 	
 	// write sizes (basic + nodeName + variables)
 	uint16 size;
@@ -96,25 +96,25 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		case 4: size = 8 + 17 + (6 + 15) + 44; break;
 		default: assert(false); break;
 	}
-	socket->write(&size, 2);
-	socket->write(&vm->nodeId, 2);
+	stream->write(&size, 2);
+	stream->write(&vm->nodeId, 2);
 	uint16 id = ASEBA_MESSAGE_DESCRIPTION;
-	socket->write(&id, 2);
+	stream->write(&id, 2);
 	
 	// write node name
 	switch (vm->nodeId)
 	{
-		case 1: AsebaWriteString(socket, "left motor"); break;
-		case 2: AsebaWriteString(socket, "right motor"); break;
-		case 3: AsebaWriteString(socket, "proximity sensors"); break;
-		case 4: AsebaWriteString(socket, "distance sensors"); break;
+		case 1: AsebaWriteString(stream, "left motor"); break;
+		case 2: AsebaWriteString(stream, "right motor"); break;
+		case 3: AsebaWriteString(stream, "proximity sensors"); break;
+		case 4: AsebaWriteString(stream, "distance sensors"); break;
 		default: assert(false); break;
 	}
 	
 	// write sizes
-	socket->write(&vm->bytecodeSize, 2);
-	socket->write(&vm->stackSize, 2);
-	socket->write(&vm->variablesSize, 2);
+	stream->write(&vm->bytecodeSize, 2);
+	stream->write(&vm->stackSize, 2);
+	stream->write(&vm->variablesSize, 2);
 	
 	// write list of variables
 	switch (vm->nodeId)
@@ -124,19 +124,19 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		{
 			// motors
 			size = 3;
-			socket->write(&size, 2);
+			stream->write(&size, 2);
 			
 			size = 32;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "args");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "args");
 			
 			size = 1;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "speed");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "speed");
 			
 			size = 2;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "odo");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "odo");
 		}
 		break;
 		
@@ -144,19 +144,19 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		{
 			// proximity sensors
 			size = 3;
-			socket->write(&size, 2);
+			stream->write(&size, 2);
 			
 			size = 32;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "args");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "args");
 			
 			size = 24;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "bumpers");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "bumpers");
 			
 			size = 12;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "ground");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "ground");
 		}
 		break;
 		
@@ -164,15 +164,15 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		{
 			// distance sensors
 			size = 2;
-			socket->write(&size, 2);
+			stream->write(&size, 2);
 			
 			size = 32;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "args");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "args");
 			
 			size = 180;
-			socket->write(&size, 2);
-			AsebaWriteString(socket, "distances");
+			stream->write(&size, 2);
+			AsebaWriteString(stream, "distances");
 		}
 		break;
 		
@@ -181,25 +181,25 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	
 	// write native functions
 	size = 1;
-	socket->write(&size, 2);
+	stream->write(&size, 2);
 	
 	// mac (42 bytes)
-	AsebaWriteString(socket, "mac");
-	AsebaWriteString(socket, "MAC & RS");
+	AsebaWriteString(stream, "mac");
+	AsebaWriteString(stream, "MAC & RS");
 	size = 4;
-	socket->write(&size, 2);
+	stream->write(&size, 2);
 	ssize = -1;
-	socket->write(&ssize, 2);
-	AsebaWriteString(socket, "src1");
-	socket->write(&ssize, 2);
-	AsebaWriteString(socket, "src2");
+	stream->write(&ssize, 2);
+	AsebaWriteString(stream, "src1");
+	stream->write(&ssize, 2);
+	AsebaWriteString(stream, "src2");
 	ssize = 1;
-	socket->write(&ssize, 2);
-	AsebaWriteString(socket, "dest");	
-	socket->write(&ssize, 2);
-	AsebaWriteString(socket, "shift");
+	stream->write(&ssize, 2);
+	AsebaWriteString(stream, "dest");	
+	stream->write(&ssize, 2);
+	AsebaWriteString(stream, "shift");
 	
-	socket->flush();
+	stream->flush();
 }
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
@@ -266,6 +266,8 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 
 namespace Enki
 {
+	using namespace Streams;
+	
 	AsebaMarxbot::Module::Module()
 	{
 		bytecode.resize(512);
@@ -279,11 +281,9 @@ namespace Enki
 		amountOfTimerEventInQueue = 0;
 	}
 	
-	AsebaMarxbot::AsebaMarxbot(const std::string &host, unsigned short port) 
+	AsebaMarxbot::AsebaMarxbot(const std::string &target) :
+		Client(target)
 	{
-		// connect
-		connect(host, port);
-		
 		// setup modules specific data
 		leftMotor.vm.variables = reinterpret_cast<sint16 *>(&leftMotorVariables);
 		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(sint16);
@@ -384,7 +384,7 @@ namespace Enki
 		{
 			bool wasActivity = false;
 			
-			Aseba::NetworkClient::step();
+			Client::step();
 			
 			for (size_t i = 0; i < modules.size(); i++)
 			{
@@ -414,16 +414,16 @@ namespace Enki
 		}
 	}
 	
-	void AsebaMarxbot::incomingData()
+	void AsebaMarxbot::incomingData(Stream *stream)
 	{
 		unsigned short len;
 		unsigned short type;
 		unsigned short source;
-		read(&len, 2);
-		read(&source, 2);
-		read(&type, 2);
+		stream->read(&len, 2);
+		stream->read(&source, 2);
+		stream->read(&type, 2);
 		std::valarray<unsigned char> buffer(static_cast<size_t>(len));
-		read(&buffer[0], buffer.size());
+		stream->read(&buffer[0], buffer.size());
 		
 		signed short *dataPtr = reinterpret_cast<signed short *>(&buffer[0]);
 		
@@ -468,14 +468,9 @@ namespace Enki
 		}
 	}
 	
-	void AsebaMarxbot::connectionEstablished()
+	void AsebaMarxbot::connectionClosed(Stream *stream)
 	{
-		// do nothing in addition to what is done by NetworkClient
-	}
-	
-	void AsebaMarxbot::connectionClosed()
-	{
-		// do nothing in addition to what is done by NetworkClient
+		// do nothing in addition to what is done by Client
 	}
 }
 

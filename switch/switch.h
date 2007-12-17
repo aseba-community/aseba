@@ -24,92 +24,52 @@
 #ifndef ASEBA_SWITCH
 #define ASEBA_SWITCH
 
-#include <set>
+#include <dashel/streams.h>
 
 namespace Aseba
 {
 	/**
 	\defgroup switch Software router of messages
 	
-	Connect to a physical CAN interface if present.
+	Connects to a physical CAN interface if present.
 	*/
 	/*@{*/
 
-	/*! Route Aseba messages on the TCP part of the network. */
-	class Switch
+	/*! Route Aseba messages on the TCP part of the network.
+		The switch is not thread-safe because it stores a pointer to the CAN stream
+		outside this object. This is required to interface with the aseba CAN
+		C library.
+	*/
+	class Switch: public Streams::Server
 	{
 		public:
-			/*! create the switch, listen to TCP on port and try to open CAN interface.
-			 * @param port TCP port to listen to
-			 * @param canIface the name of the CAN interface
-			 * @param verbose should we print a notification on each message
-			 * @param dump should we dump content of CAN messages
-			 */
-			Switch(int port, const char *canIface, bool verbose, bool dump);
+			/*! Creates the switch, listen to TCP on port and try to open CAN interface.
+				@param port TCP port to listen to
+				@param canTarget the name of the CAN target
+				@param verbose should we print a notification on each message
+				@param dump should we dump content of CAN messages
+			*/
+			Switch(int port, const char* canTarget, bool verbose, bool dump);
 			
-			/*! release all ressources */
-			~Switch();
+			/*! Forwards the data received for a connections to the other ones.
+				@param stream the stream the packet was received from
+			*/
+			void forwardDataFrom(Streams::Stream* stream);
 
-			/*! connects a socket to the CAN interface if available
-			 * and then initializes the aseba CAN network layer
-			 * @param canIface the name of the CAN interface
-			 * @return true if the socket could be connected, false otherwise
-			 */
-			bool canConnect(const char *canIface);
-
-			/*! builds a list of file descriptors for the select call
-			 */
-			void buildSelectList();
-
-			/*! actual main running loop of the switch, never returns
-			 */
-			void run();
-
-			/*! manage the sockets when something is readable on the
-			 * listening list accoding to select()
-			 */
-			void manageSockets();
-
-			/*! adds a new socket to our listening list */
-			void newConnection();
-	
-			/*! closes a connection in the listening list */
-			void closeConnection(const int socketNb);
-
-			/*! forwards the data received for a connections to the other ones
-			 * @param socketNb the fd the packet was received from
-			 */
-			void forwardDataFrom(const int socketNb);
-
-			/*! reads a CAN frame from the CAN socket and sends it to the
-			 * aseba CAN network layer
-			 */
+			/*! Reads a CAN frame from the CAN socket and sends it to the
+				aseba CAN network layer.
+			*/
 			void manageCanFrame();
+			
+		private:
+			virtual void incomingConnection(Streams::Stream *stream);
+			virtual void incomingData(Streams::Stream *stream);
+			virtual void connectionClosed(Streams::Stream *stream);
 
 		private:
-			/*! The socket file descritor we are listening to */
-			int serverSocket;
-			
-			/*! the CAN socket fd */
-			int canSocket;
-
-			/*! socket file descriptor needed by select */
-			int highSocket;
-
-			/*! Socket file descriptors we want to wake up for, using select() */
-			fd_set socketsRead;
-
-			/*! List of connected sockets (fd) */
-			std::set<int> connectList;
-
-			/*! true if CAN interface is connected */
-			bool canConnected;
-			
-			/*! should we print a notification on each message */
-			bool verbose;
-
-			/*! should we dump content of CAN messages */
-			bool dump;
+			std::string canTarget; //!< target for CAN
+			bool verbose; //!< should we print a notification on each message
+			bool dump; //!< should we dump content of CAN messages
 	};
 	
 	/*@}*/

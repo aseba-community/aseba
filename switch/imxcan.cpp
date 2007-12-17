@@ -31,8 +31,14 @@
 
 namespace Aseba
 {
+	using namespace std;
+	using namespace Streams;
+	
 	/** \addtogroup switch */
 	/*@{*/
+	/*
+	// TODO: temporary disabled until new translator CAN interface
+	// we should replace this by a translatorcan file
 	
 	imxCANFrameHeader::imxCANFrameHeader()
 	{
@@ -79,29 +85,30 @@ namespace Aseba
 			stream << std::hex << (unsigned)data[i] << " ";
 		stream << "\n";
 	}
-	
+	*/
 	//! File descriptor corresponding to the physical CAN device
-	int canfd;
+	Stream* canStream = 0;
 	
 	//! Send a CAN frame on the CAN file descriptor.
 	void sendFrame(const CanFrame *frame)
 	{
-		imxCANFrame sendFrame = *frame;
+		/*imxCANFrame sendFrame = *frame;
 		//sendFrame.dump(std::cout);
-		Aseba::write(canfd, &sendFrame, sizeof(imxCANFrame));
+		Aseba::write(canfd, &sendFrame, sizeof(imxCANFrame));*/
 		::AsebaCanFrameSent();
 	}
 	
 	//! Return if there is free room for more frames in the physical CAN device.
 	int isFrameRoom()
 	{
-		pollfd CANpoll = {canfd, POLLOUT, 0};
+		/*pollfd CANpoll = {canfd, POLLOUT, 0};
 		
 		int ret = poll(&CANpoll, 1, 100);
 		if (ret <= 0)
 			return 0;
 		else
-			return (CANpoll.revents & POLLOUT);
+			return (CANpoll.revents & POLLOUT);*/
+		return 1;
 	}
 	
 	//! Called when received Packet got dropped.
