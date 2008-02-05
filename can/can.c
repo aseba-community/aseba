@@ -136,7 +136,7 @@ static void AsebaCanRecvQueueFreeFrames(uint16 id)
 		if (CANID_TO_ID(asebaCan.recvQueue[i].id) == id)
 			asebaCan.recvQueue[i].used = 0;
 		
-		i = (i + 1) % ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
+		i = (i + 1) & ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
 	}
 }
 
@@ -232,7 +232,7 @@ int AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 			break;
 		}
 		
-		i = (i + 1) % ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
+		i = (i + 1) & ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
 	}
 	
 	// if we haven't found anything
@@ -258,7 +258,7 @@ int AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 		if (i == stopPos)
 			break;
 		
-		i = (i + 1) % ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
+		i = (i + 1) & ASEBA_CAN_RECV_QUEUE_FRAME_COUNT_MASK;
 	}
 
 	// garbage collect
