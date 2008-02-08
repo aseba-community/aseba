@@ -26,84 +26,41 @@
 #include <sstream>
 #include <set>
 #include <valarray>
+#include <vector>
 #include <iterator>
 #include "switch.h"
 #include "../common/consts.h"
+#include "../common/types.h"
 #include "../utils/utils.h"
-#include "../can/can.h"
-#include "imxcan.h"
 
 namespace Aseba 
 {
 	using namespace std;
-	using namespace Streams;
+	using namespace Dashel;
 	
 	/** \addtogroup switch */
 	/*@{*/
 
-	Switch::Switch(int port, const char* canTarget, bool verbose, bool dump) :
-		canTarget(canTarget),
+	//! Broadcast messages form any data stream to all others data streams including itself.
+	Switch::Switch(unsigned port, bool verbose, bool dump) :
 		verbose(verbose),
 		dump(dump)
 	{
 		ostringstream oss;
-		oss << "tcp:port=" << port;
-		listen(oss.str());
-		
-		try
-		{
-			listen(canTarget);
-		}
-		catch (InvalidTargetDescription e)
-		{
-			cerr << "Invalid CAN target " <<  canTarget << endl;
-		}
-		catch (ConnectionError e)
-		{
-			cerr << "Cannot open CAN target " <<  canTarget << endl;
-		}
+		oss << "tcpin:port=" << port;
+		connect(oss.str());
 	}
-	
-	extern Stream* canStream;
 	
 	void Switch::incomingConnection(Stream *stream)
 	{
-		if (stream->getTargetName() == canTarget)
+		if (verbose)
 		{
-			canStream = stream;
-			::AsebaCanInit(IMX_CAN_ID, sendFrame, isFrameRoom, receivedPacketDropped, sentPacketDropped);
-			cout << "CAN connection to " << stream->getTargetName() << endl;
-		}
-		else
-		{
-			if (verbose)
-			{
-				dumpTime(cout);
-				cout << "Incoming connection from " << stream->getTargetName() << endl;
-			}
+			dumpTime(cout);
+			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
 	}
 	
 	void Switch::incomingData(Stream *stream)
-	{
-		if (stream == canStream)
-			manageCanFrame();
-		else
-			forwardDataFrom(stream);
-	}
-	
-	void Switch::connectionClosed(Stream *stream)
-	{
-		if (stream == canStream)
-			canStream = 0;
-		if (verbose)
-		{
-			dumpTime(cout);
-			cout << "Connection closed to " << stream->getTargetName() << endl;
-		}
-	}
-	
-	void Switch::forwardDataFrom(Stream *stream)
 	{
 		// max packet length is 65533
 		// packet source and packet type is not counted in len,
@@ -126,88 +83,32 @@ namespace Aseba
 		}
 		
 		// write on all connected streams
-		for (StreamsList::iterator it = transferStreams.begin(); it != transferStreams.end();++it)
+		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
 			Stream* destStream = *it;
-			if (destStream != canStream)
+			try
 			{
-				try
-				{
-					destStream->write(&len, 2);
-					destStream->write(&readbuff[0], len + 4);
-					destStream->flush();
-				}
-				catch (StreamException e)
-				{
-					// if this stream has a problem, ignore it for now, and let next select disconnect it
-				}
+				destStream->write(&len, 2);
+				destStream->write(&readbuff[0], len + 4);
+				destStream->flush();
 			}
-		}
-		
-		// write on the CAN stream too
-		if (canStream)
-		{
-			// we drop the source when we send on CAN
-			while (::AsebaCanSend(&readbuff[2], len + 2) == 0)
-				// we sleep if CAN queue is full
-				usleep(10000);
+			catch (DashelException e)
+			{
+				// if this stream has a problem, ignore it for now, and let Hub call connectionClosed later.
+			}
 		}
 	}
 	
-	void Switch::manageCanFrame()
+	void Switch::connectionClosed(Stream *stream, bool abnormal)
 	{
-		
-		/*	1) read the 8 bytes
-			2) add them to the current AsebaCanPacket (AsebaCanFrameReceived)
-			3) if the AsebaCanPacket is complete, forward it ! */
-		/*
-		// TODO: adapt this to new translator
-		// read on CAN BUS
-		imxCANFrame receivedFrame;
-		Aseba::read(canSocket, &receivedFrame, sizeof(imxCANFrame));
-		
-		if (dump)
-			receivedFrame.dump(std::cout);
-		
-		// check if it is what we have written ourself (could happen according to Philippe)
-		if (receivedFrame.header.id == IMX_CAN_ID)
+		if (verbose)
 		{
-			if (verbose)
-				std::cout << "dropping CAN ID from IMX_CAN_ID" << std::endl;
-			return;
+			dumpTime(cout);
+			if (abnormal)
+				cout << "Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+			else
+				cout << "Normal connection closed to " << stream->getTargetName() << endl;
 		}
-		
-		// translation to aseba canFrame
-		CanFrame asebaCanFrame = receivedFrame;
-		::AsebaCanFrameReceived(&asebaCanFrame);
-		
-		// forward all completed aseba net packets
-		while (true)
-		{
-			uint8 asebaCanRecvBuffer[ASEBA_MAX_PACKET_SIZE];
-			uint16 source;
-			uint16 packetSize = ::AsebaCanRecv(asebaCanRecvBuffer, ASEBA_MAX_PACKET_SIZE, &source);
-			if (packetSize <= 0)
-				break;
-			
-			// forward completed packet
-			for(std::set<int>::iterator it = connectList.begin(); it != connectList.end(); ++it)
-			{
-				try
-				{
-					uint16 netPacketSize = packetSize - 2;	// type is not counted on net size
-					Aseba::write(*it, &netPacketSize, 2);
-					Aseba::write(*it, &source, 2);
-					Aseba::write(*it, asebaCanRecvBuffer, packetSize);
-				}
-				catch (Exception::FileDescriptorClosed e)
-				{
-					closeConnection(*it);
-					return;
-				}
-			}
-		}
-		*/
 	}
 	
 	/*@}*/
@@ -217,17 +118,20 @@ namespace Aseba
 void dumpHelp(std::ostream &stream, const char *programName)
 {
 	stream << "Aseba switch, connects aseba components together, usage:\n";
-	stream << programName << " <can> [options]\n";
-	stream << "Options:" << std::endl;
-	stream << "-v, --verbose:	makes the switch verbose" << std::endl;
-	stream << "-p port:		listens to incoming connection on this port" << std::endl;	
+	stream << programName << " [options] [additional targets]*\n";
+	stream << "Options:\n";
+	stream << "-v, --verbose   : makes the switch verbose\n";
+	stream << "-d, --dump      : makes the switch dumping all data\n";
+	stream << "-p port         : listens to incoming connection on this port\n";
+	stream << "Additional targets are any valid Dashel targets." << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
-	unsigned int port = ASEBA_DEFAULT_PORT;
+	unsigned port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;
-	const char* canTarget = "ser";
+	bool dump = false;
+	std::vector<std::string> additionalTargets;
 	
 	int argCounter = 1;
 	
@@ -238,7 +142,11 @@ int main(int argc, char *argv[])
 		if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
 		{
 			verbose = true;
-		} 
+		}
+		else if ((strcmp(arg, "-d") == 0) || (strcmp(arg, "--dump") == 0))
+		{
+			dump = true;
+		}
 		else if (strcmp(arg, "-p") == 0)
 		{
 			arg = argv[++argCounter];
@@ -251,19 +159,14 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			if (argCounter == 1)
-				canTarget = argv[1];
-			else
-			{
-				std::cout << "error: bad argument" << std::endl;
-				dumpHelp(std::cout, argv[0]);
-				return 1;
-			}
+			additionalTargets.push_back(argv[argCounter]);
 		}
 		argCounter++;
 	}
 	
-	Aseba::Switch aswitch(port, canTarget, verbose, false);
+	Aseba::Switch aswitch(port, verbose, dump);
+	for (size_t i = 0; i < additionalTargets.size(); i++)
+		aswitch.connect(additionalTargets[i]);
 	aswitch.run();
 	
 	return 0;

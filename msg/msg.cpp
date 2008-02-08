@@ -27,13 +27,13 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-#include <dashel/streams.h>
+#include <dashel/dashel.h>
 
 using namespace std;
 
 namespace Aseba
 {
-	using namespace Streams;
+	using namespace Dashel;
 	
 	//! Static class that fills a table of known messages types in its constructor
 	class MessageTypesInitializer

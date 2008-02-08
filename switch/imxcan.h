@@ -32,6 +32,8 @@ namespace Aseba
 	/** \addtogroup switch */
 	/*@{*/
 	
+	// TODO: TO BE REMOVED
+	
 	/*
 	// TODO: temporary disabled until new translator CAN interface
 	// we should replace this by a translatorcan file
