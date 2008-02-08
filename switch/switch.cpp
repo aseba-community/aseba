@@ -164,10 +164,17 @@ int main(int argc, char *argv[])
 		argCounter++;
 	}
 	
-	Aseba::Switch aswitch(port, verbose, dump);
-	for (size_t i = 0; i < additionalTargets.size(); i++)
-		aswitch.connect(additionalTargets[i]);
-	aswitch.run();
+	try
+	{
+		Aseba::Switch aswitch(port, verbose, dump);
+		for (size_t i = 0; i < additionalTargets.size(); i++)
+			aswitch.connect(additionalTargets[i]);
+		aswitch.run();
+	}
+	catch(Dashel::DashelException e)
+	{
+		std::cerr << e.reason << " " << e.sysMessage << std::endl;
+	}
 	
 	return 0;
 }

@@ -23,16 +23,17 @@
 
 #include "../msg/msg.h"
 #include "../utils/utils.h"
-#include <dashel/streams.h>
+#include <dashel/dashel.h>
 #include "HexFile.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <iterator>
+#include <cassert>
 
 namespace Aseba 
 {
-	using namespace Streams;
+	using namespace Dashel;
 	using namespace std;
 	
 	//! Show list of known commands
@@ -406,6 +407,20 @@ namespace Aseba
 		
 		return argEaten;
 	}
+	
+	class Cmd : public Hub
+	{
+	public:
+		Stream* stream;
+		
+	public:
+		Cmd() : Hub(), stream(0) { }
+		
+		void incomingConnection(Stream *stream)
+		{
+			this->stream = stream;
+		}
+	};
 }
 
 int main(int argc, char *argv[])
@@ -430,14 +445,17 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			Streams::Client client(target);
+			Aseba::Cmd client;
+			client.connect(target);
+			assert(client.stream);
+			Dashel::Stream* stream = client.stream;
 			
 			// process command
 			try
 			{
-				 argCounter += Aseba::processCommand(client.getStream(), argc - argCounter, &argv[argCounter]);
+				 argCounter += Aseba::processCommand(stream, argc - argCounter, &argv[argCounter]);
 			}
-			catch (Streams::StreamException e)
+			catch (Dashel::DashelException e)
 			{
 				Aseba::errorServerDisconnected();
 			}

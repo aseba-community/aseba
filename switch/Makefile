@@ -9,10 +9,10 @@ sources = switch.cpp
 objects = $(patsubst %.cpp,%.o,$(sources))
 target = asebaswitch
 
-CXXFLAGS +=-g -Wall `pkg-config --cflags hal` 
+CXXFLAGS +=-g -Wall `pkg-config --cflags hal`
 CXX = $(prefix)g++
 LDFLAGS = -L$(SRCDIR)/../utils/build-$(builddir)/ -L$(SRCDIR)/../can/build-$(builddir)/ 
-LDLIBS = -lasebautils -lasebacan -ldasheld `pkg-config --libs hal` 
+LDLIBS = -lasebautils -lasebacan -ldasheld `pkg-config --libs hal`
 
 $(target): $(objects)
 	$(CXX) $(objects) $(LDFLAGS) $(LDLIBS) -o $@

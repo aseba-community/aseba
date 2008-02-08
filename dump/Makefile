@@ -9,10 +9,10 @@ sources = dump.cpp
 objects = $(patsubst %.cpp,%.o,$(sources))
 target = asebadump
 
-CXXFLAGS +=-g -Wall
+CXXFLAGS +=-g -Wall `pkg-config --cflags hal`
 CXX = $(prefix)g++
 LDFLAGS = -L$(SRCDIR)/../msg/build-$(builddir)/ -L$(SRCDIR)/../utils/build-$(builddir)/
-LDLIBS = -lasebamsg -lasebautils -ldasheld
+LDLIBS = -lasebamsg -lasebautils -ldasheld `pkg-config --libs hal`
 
 $(target): $(objects)
 	$(CXX) $(objects) $(LDFLAGS) $(LDLIBS) -o $@

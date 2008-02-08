@@ -23,13 +23,13 @@
 
 #include "../msg/msg.h"
 #include "../utils/utils.h"
-#include <dashel/streams.h>
+#include <dashel/dashel.h>
 #include <time.h>
 #include <iostream>
 
 namespace Aseba
 {
-	using namespace Streams;
+	using namespace Dashel;
 	using namespace std;
 	
 	/**
@@ -39,15 +39,21 @@ namespace Aseba
 	
 	//! A simple message dumper.
 	//! This class calls Aseba::Message::dump() for each message
-	class Dump : public Client
+	class Dump : public Hub
 	{
 	public:
-		Dump(const string& target) : Client(target)
+		Dump(const string& target)
 		{
+			connect(target);
 		}
 	
 	protected:
-		virtual void incomingData(Stream *stream)
+		void incomingConnection(Stream *stream)
+		{
+			cout << "Connected to " << stream->getTargetName() << endl;
+		}
+		
+		void incomingData(Stream *stream)
 		{
 			Message *message = Message::receive(stream);
 			
@@ -59,10 +65,14 @@ namespace Aseba
 			cout << std::endl;
 		}
 		
-		virtual void connectionClosed(Stream *stream)
+		void connectionClosed(Stream *stream, bool abnormal)
 		{
 			dumpTime(cerr);
-			cout << stream->getTargetName() << " closed connection" << endl;
+			cout << "Connection closed to " << stream->getTargetName();
+			if (abnormal)
+				cout << " : " << stream->getFailReason();
+			cout << endl;
+			stop();
 		}
 	};
 	
@@ -81,15 +91,10 @@ int main(int argc, char *argv[])
 		Aseba::Dump dump(target);
 		dump.run();
 	}
-	catch (Streams::InvalidTargetDescription e)
+	catch(Dashel::DashelException e)
 	{
-		std::cerr << "Invalid target description " << target << std::endl;
+		std::cerr << e.reason << " " << e.sysMessage << std::endl;
 	}
-	catch (Streams::ConnectionError e)
-	{
-		std::cerr << "Can't connect to " << target << std::endl;
-	}
-	
 	
 	return 0;
 }
