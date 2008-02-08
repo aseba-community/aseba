@@ -29,11 +29,11 @@
 #include <QString>
 #include <QTcpSocket>
 #include <map>
-#include <dashel/streams.h>
+#include <dashel/dashel.h>
 
 class QSocketNotifier;
 
-namespace Streams
+namespace Dashel
 {
 	class Stream;
 }
@@ -45,7 +45,7 @@ namespace Aseba
 	
 	class Message;
 	
-	class TcpTarget: public Target, public Streams::Client
+	class TcpTarget: public Target, public Dashel::Hub
 	{
 		Q_OBJECT
 		
@@ -76,8 +76,9 @@ namespace Aseba
 		
 	protected:
 		virtual void timerEvent(QTimerEvent *event);
-		virtual void incomingData(Streams::Stream *stream);
-		virtual void connectionClosed(Streams::Stream *stream);
+		virtual void incomingConnection(Dashel::Stream *stream);
+		virtual void incomingData(Dashel::Stream *stream);
+		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		
 	protected:
 		void receivedDescription(Message *message);
@@ -111,6 +112,7 @@ namespace Aseba
 		
 		MessagesHandlersMap messagesHandlersMap;
 		NodesMap nodes;
+		Dashel::Stream* stream;
 		int netTimer;
 	};
 	

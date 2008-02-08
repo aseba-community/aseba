@@ -25,14 +25,13 @@
 #include "../msg/msg.h"
 #include <algorithm>
 #include <boost/cast.hpp>
-#include <dashel/streams.h>
 #include<iostream>
 
 namespace Aseba
 {
 	using namespace boost;
 	using std::copy;
-	using namespace Streams;
+	using namespace Dashel;
 
 	/** \addtogroup studio */
 	/*@{*/
@@ -51,7 +50,7 @@ namespace Aseba
 	}
 	
 	TcpTarget::TcpTarget() :
-		Client(ASEBA_DEFAULT_TARGET)
+		stream(0)
 	{
 		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::TcpTarget::receivedDescription;
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::TcpTarget::receivedDisconnected;
@@ -62,10 +61,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
 		&Aseba::TcpTarget::receivedBreakpointSetResult;
 		
-		// Send presence query
-		Presence().serialize(stream);
-		stream->flush();
-		netTimer = startTimer(20);
+		Hub::connect(ASEBA_DEFAULT_TARGET);
 	}
 	
 	TcpTarget::~TcpTarget()
@@ -209,6 +205,16 @@ namespace Aseba
 		step(0);
 	}
 	
+	void TcpTarget::incomingConnection(Stream *stream)
+	{
+		this->stream = stream;
+		
+		// Send presence query
+		Presence().serialize(stream);
+		stream->flush();
+		netTimer = startTimer(20);
+	}
+	
 	void TcpTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
@@ -228,7 +234,7 @@ namespace Aseba
 		delete message;
 	}
 	
-	void TcpTarget::connectionClosed(Stream* stream)
+	void TcpTarget::connectionClosed(Stream* stream, bool abnormal)
 	{
 		Q_UNUSED(stream);
 		emit networkDisconnected();

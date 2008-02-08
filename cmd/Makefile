@@ -9,7 +9,7 @@ sources = cmd.cpp HexFile.cpp
 objects = $(patsubst %.cpp,%.o,$(sources))
 target = asebacmd
 
-CXXFLAGS +=-g -Wall `pkg-config --cflags hal`
+CXXFLAGS +=-g -Wall
 CXX = $(prefix)g++
 LDFLAGS = -L$(SRCDIR)/../msg/build-$(builddir)/ -L$(SRCDIR)/../utils/build-$(builddir)/ 
 LDLIBS = -lasebamsg -lasebautils -ldasheld `pkg-config --libs hal`
