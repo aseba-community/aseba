@@ -30,7 +30,7 @@
 #endif
 #include "../vm/vm.h"
 #include "../common/consts.h"
-#include <dashel/streams.h>
+#include <dashel/dashel.h>
 #include <deque>
 
 /*!	\file AsebaMarxbot.h
@@ -49,7 +49,7 @@ namespace Enki
 		The feature is provided by inheriting from a Network server
 		\ingroup robot
 	*/
-	class AsebaMarxbot : public Marxbot, public Streams::Client
+	class AsebaMarxbot : public Marxbot, public Dashel::Hub
 	{
 	private:
 		struct Event
@@ -110,6 +110,7 @@ namespace Enki
 		std::vector<Module *> modules;
 		
 	public:
+		
 		//! Constructor, connect to a host and register VMs
 		AsebaMarxbot(const std::string &target = ASEBA_DEFAULT_TARGET);
 		//! Destructor, unregister VMs
@@ -117,8 +118,12 @@ namespace Enki
 		//! In addition to DifferentialWheeled::step(), update aseba variables and initiate periodic events.
 		virtual void step(double dt);
 		
-		virtual void incomingData(Streams::Stream *stream);
-		virtual void connectionClosed(Streams::Stream *stream);
+		virtual void incomingConnection(Dashel::Stream *stream);
+		virtual void incomingData(Dashel::Stream *stream);
+		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+		
+		// this must be public because of bindings to C functions
+		Dashel::Stream* stream;
 	};
 
 }

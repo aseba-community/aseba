@@ -44,7 +44,7 @@ static VmSocketMap asebaSocketMaps;
 
 extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
 {
-	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
 	assert(stream);
 	
 	// write message
@@ -58,7 +58,7 @@ extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16
 
 extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {
-	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
 	assert(stream);
 	
 	// write message
@@ -72,7 +72,7 @@ extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length
 	stream->flush();
 }
 
-void AsebaWriteString(Streams::Stream* stream, const char *s)
+void AsebaWriteString(Dashel::Stream* stream, const char *s)
 {
 	size_t len = strlen(s);
 	uint8 lenUint8 = static_cast<uint8>(strlen(s));
@@ -82,7 +82,7 @@ void AsebaWriteString(Streams::Stream* stream, const char *s)
 
 extern "C" void AsebaSendDescription(AsebaVMState *vm)
 {
-	Streams::Stream* stream = asebaSocketMaps[vm]->getStream();
+	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
 	assert(stream);
 	
 	// write sizes (basic + nodeName + variables)
@@ -266,7 +266,7 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 
 namespace Enki
 {
-	using namespace Streams;
+	using namespace Dashel;
 	
 	AsebaMarxbot::Module::Module()
 	{
@@ -281,8 +281,7 @@ namespace Enki
 		amountOfTimerEventInQueue = 0;
 	}
 	
-	AsebaMarxbot::AsebaMarxbot(const std::string &target) :
-		Client(target)
+	AsebaMarxbot::AsebaMarxbot(const std::string &target)
 	{
 		// setup modules specific data
 		leftMotor.vm.variables = reinterpret_cast<sint16 *>(&leftMotorVariables);
@@ -306,6 +305,9 @@ namespace Enki
 		asebaSocketMaps[&rightMotor.vm] = this;
 		asebaSocketMaps[&proximitySensors.vm] = this;
 		asebaSocketMaps[&distanceSensors.vm] = this;
+		
+		// connect to target
+		Hub::connect(target);
 		
 		// init VM
 		AsebaVMInit(&leftMotor.vm, 1);
@@ -384,7 +386,7 @@ namespace Enki
 		{
 			bool wasActivity = false;
 			
-			Client::step();
+			Hub::step();
 			
 			for (size_t i = 0; i < modules.size(); i++)
 			{
@@ -412,6 +414,11 @@ namespace Enki
 			if (!wasActivity)
 				break;
 		}
+	}
+	
+	void AsebaMarxbot::incomingConnection(Stream *stream)
+	{
+		this->stream = stream;
 	}
 	
 	void AsebaMarxbot::incomingData(Stream *stream)
@@ -468,7 +475,7 @@ namespace Enki
 		}
 	}
 	
-	void AsebaMarxbot::connectionClosed(Stream *stream)
+	void AsebaMarxbot::connectionClosed(Stream *stream, bool abnormal)
 	{
 		// do nothing in addition to what is done by Client
 	}
