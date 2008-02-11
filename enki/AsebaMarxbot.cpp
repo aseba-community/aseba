@@ -407,7 +407,7 @@ namespace Enki
 				}
 				
 				// try to run, notice if anything was run
-				if (AsebaVMRun(&modules[i]->vm))
+				if (AsebaVMRun(&modules[i]->vm, 65535))
 					wasActivity = true;
 			}
 			
@@ -466,7 +466,7 @@ namespace Enki
 					std::cerr << "AsebaMarxbot::incomingData() : fatal error: received event: " << type;
 					std::cerr << std::dec << std::noshowbase;
 					std::cerr << " of size " << buffer.size();
-					std::cerr << ", which is not a power of two." << std::endl;
+					std::cerr << ", which is not a multiple of two." << std::endl;
 					assert(false);
 				}
 				for (size_t i = 0; i < modules.size(); i++)

@@ -127,8 +127,9 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
 
 /*! Run the VM depending on the current execution mode.
 	Either run or step, depending of the current mode.
+	If stepsLimit > 0, execute at maximim stepsLimit
 	Return 1 if anything was executed, 0 otherwise. */
-uint16 AsebaVMRun(AsebaVMState *vm);
+uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit);
 
 /*! Return 1 if VM is currently executing a thread */
 uint16 AsebaVMIsExecutingThread(AsebaVMState *vm);

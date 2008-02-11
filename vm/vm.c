@@ -446,44 +446,80 @@ uint16 AsebaVMCheckBreakpoint(AsebaVMState *vm)
 }
 
 /*! Run without support of breakpoints.
-	Only check ASEBA_VM_EVENT_RUNNING_MASK to exit on interrupts. */
-void AsebaDebugBareRun(AsebaVMState *vm)
+	Check ASEBA_VM_EVENT_RUNNING_MASK to exit on interrupts or stepsLimit if > 0. */
+void AsebaDebugBareRun(AsebaVMState *vm, uint16 stepsLimit)
 {
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 	
-	// no breakpoint, still poll the mask
-	while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
-		AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK)
-	)
-		AsebaVMStep(vm);
+	if (stepsLimit > 0)
+	{
+		// no breakpoint, still poll the mask and check stepsLimit
+		while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
+			AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK) &&
+			stepsLimit
+		)
+		{
+			AsebaVMStep(vm);
+			stepsLimit--;
+		}
+	}
+	else
+	{
+		// no breakpoint, only poll the mask
+		while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
+			AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK) 
+		)
+			AsebaVMStep(vm);
+	}
 	
 	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 }
 
 /*! Run with support of breakpoints.
 	Also check ASEBA_VM_EVENT_RUNNING_MASK to exit on interrupts. */
-void AsebaDebugBreakpointRun(AsebaVMState *vm)
+void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
 {
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 	
-	// breakpoints, check before each step and poll the mask
-	while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
-		AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK)
-	)
+	if (stepsLimit > 0)
 	{
-		if (AsebaVMCheckBreakpoint(vm) != 0)
+		// breakpoints, check before each step, poll the mask, and check stepsLimit
+		while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
+			AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK) &&
+			stepsLimit
+		)
 		{
-			AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
-			AsebaVMSendExecutionStateChanged(vm);
-			return;
+			if (AsebaVMCheckBreakpoint(vm) != 0)
+			{
+				AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
+				AsebaVMSendExecutionStateChanged(vm);
+				return;
+			}
+			AsebaVMStep(vm);
+			stepsLimit--;
 		}
-		AsebaVMStep(vm);
+	}
+	else
+	{
+		// breakpoints, check before each step and poll the mask
+		while (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK) &&
+			AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK)
+		)
+		{
+			if (AsebaVMCheckBreakpoint(vm) != 0)
+			{
+				AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
+				AsebaVMSendExecutionStateChanged(vm);
+				return;
+			}
+			AsebaVMStep(vm);
+		}
 	}
 	
 	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 }
 
-uint16 AsebaVMRun(AsebaVMState *vm)
+uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit)
 {
 	// if there is nothing to execute, just return
 	if (AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
@@ -495,9 +531,9 @@ uint16 AsebaVMRun(AsebaVMState *vm)
 	
 	// run until something stops the vm
 	if (vm->breakpointsCount)
-		AsebaDebugBreakpointRun(vm);
+		AsebaDebugBreakpointRun(vm, stepsLimit);
 	else
-		AsebaDebugBareRun(vm);
+		AsebaDebugBareRun(vm, stepsLimit);
 	
 	return 1;
 }
