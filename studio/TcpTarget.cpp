@@ -25,7 +25,8 @@
 #include "../msg/msg.h"
 #include <algorithm>
 #include <boost/cast.hpp>
-#include<iostream>
+#include <iostream>
+#include <QInputDialog>
 
 namespace Aseba
 {
@@ -61,7 +62,9 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
 		&Aseba::TcpTarget::receivedBreakpointSetResult;
 		
-		Hub::connect(ASEBA_DEFAULT_TARGET);
+		QString target = QInputDialog::getText(0, "Aseba Target Selection", "Please enter an Aseba target", QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
+		
+		Hub::connect(target.toStdString());
 	}
 	
 	TcpTarget::~TcpTarget()

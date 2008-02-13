@@ -461,6 +461,7 @@ void AsebaDebugBareRun(AsebaVMState *vm, uint16 stepsLimit)
 		{
 			AsebaVMStep(vm);
 			stepsLimit--;
+			// TODO : send exception event on step limits overflow
 		}
 	}
 	else
@@ -497,6 +498,7 @@ void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
 			}
 			AsebaVMStep(vm);
 			stepsLimit--;
+			// TODO : send exception event on step limits overflow
 		}
 	}
 	else

@@ -337,15 +337,23 @@ namespace Aseba
 		for (size_t i = 0; i < names.size(); i++)
 		{
 			QString newName = QString::fromUtf8(names[i].c_str());
+			bool singleVariable = false;
 			if (newName != name)
 			{
 				name = newName;
+				if ((i+1 < names.size()) && (QString::fromUtf8(names[i+1].c_str()) != newName))
+					singleVariable = true;
 				counter = 0;
 			}
 			else
 				counter++;
 			if (!name.isEmpty())
-				variablesNames[i] = QString("%0[%1]").arg(name).arg(counter);
+			{
+				if (singleVariable)
+					variablesNames[i] = name;
+				else
+					variablesNames[i] = QString("%0[%1]").arg(name).arg(counter);
+			}
 		}
 		
 		variablesData.resize(variablesNames.size());
