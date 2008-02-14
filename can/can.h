@@ -52,8 +52,8 @@ typedef struct
 {
 	uint8 data[8]; /*!< data payload */
 	unsigned id:11; /*!< CAN identifier */
-	unsigned used:1; /*!< when frame is in a circular buffer, tell if it frame is used */
 	unsigned len:4; /*!< amount of bytes used in data */
+	unsigned used:1; /*!< when frame is in a circular buffer, tell if it frame is used */
 } CanFrame;
 
 /*! Pointer to a void function */
