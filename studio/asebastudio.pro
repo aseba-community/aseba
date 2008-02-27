@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-LIBS += -L../compiler -L../vm/build-local -L../msg/build-local -L../utils/build-local -laeslc -lasebavm -lasebamsg -lasebautils -ldasheld `pkg-config --libs hal`
+LIBS += -L../compiler -L../vm/build-local -L../msg/build-local -L../utils/build-local -laeslc -lasebavm -lasebamsg -lasebautils -ldashel `pkg-config --libs hal`
 CONFIG += qt warn_on debug
 QT += network xml
 RESOURCES = asebastudio.qrc
@@ -19,3 +19,4 @@ PRE_TARGETDEPS = ../compiler/libaeslc.a ../vm/build-local/libasebavm.a
 
 HEADERS += ClickableLabel.h MainWindow.h AeslEditor.h Target.h TcpTarget.h TargetModels.h CustomDelegate.h FunctionParametersDialog.h ../compiler/compiler.h ../vm/vm.h
 SOURCES += ClickableLabel.cpp MainWindow.cpp AeslEditor.cpp Target.cpp TcpTarget.cpp TargetModels.cpp CustomDelegate.cpp FunctionParametersDialog.cpp main.cpp
+TRANSLATIONS = asebastudio_fr.ts

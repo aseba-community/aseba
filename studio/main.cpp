@@ -22,6 +22,10 @@
 */
 
 #include <QApplication>
+#include <QTextCodec>
+#include <QTranslator>
+#include <QString>
+#include <QLocale>
 #include "MainWindow.h"
 
 /**
@@ -31,6 +35,17 @@
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	
+	QTranslator qtTranslator;
+	qtTranslator.load("qt_" + QLocale::system().name());
+	app.installTranslator(&qtTranslator);
+	
+	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	
+	QTranslator translator;
+	translator.load(QString("asebastudio_") + QLocale::system().name());
+	app.installTranslator(&translator);
+	
 	Aseba::MainWindow window;
 	window.show();
 	//window.loadDefaultFile();

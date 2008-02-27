@@ -62,7 +62,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
 		&Aseba::TcpTarget::receivedBreakpointSetResult;
 		
-		QString target = QInputDialog::getText(0, "Aseba Target Selection", "Please enter an Aseba target", QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
+		QString target = QInputDialog::getText(0, tr("Aseba Target Selection"), tr("Please enter an Aseba target"), QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
 		
 		Hub::connect(target.toStdString());
 	}

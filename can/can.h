@@ -50,7 +50,7 @@ extern "C" {
 /*!	the data that physically go on the CAN bus. Used to communicate with the CAN data layer */
 typedef struct
 {
-	uint8 data[8]; /*!< data payload */
+	uint8 data[8] __attribute__((aligned(sizeof(int)))); /*!< data payload */
 	unsigned id:11; /*!< CAN identifier */
 	unsigned len:4; /*!< amount of bytes used in data */
 	unsigned used:1; /*!< when frame is in a circular buffer, tell if it frame is used */

@@ -309,7 +309,7 @@ namespace Aseba
 		if (result)
 		{
 			vmMemoryModel->setVariablesNames(variablesNames);
-			compilationResultText->setText(tr("Compilation success"));
+			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			debugButton->setEnabled(true);
 			emit uploadReadynessChanged();
@@ -616,8 +616,8 @@ namespace Aseba
 	{
 		QMessageBox::about(this, tr("About Aseba Studio"),
 					tr(	"<p>Aseba pre-release</p>" \
-						"<p>(c) 2006-2007 Stephane Magnenat</p>" \
-						"<p>Mobots group - LSRO1 - EPFL</p>"));
+						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a></p>" \
+						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>"));
 	}
 	
 	void MainWindow::newFile()
@@ -820,7 +820,7 @@ namespace Aseba
 	void MainWindow::sendEvent()
 	{
 		bool ok;
-		int id = QInputDialog::getInteger(this, tr("Initiate event code"),
+		int id = QInputDialog::getInteger(this, tr("Send an event"),
 											tr("Event identifier:"), 0, 0, 16383, 1, &ok);
 		if (ok)
 		{
@@ -905,7 +905,7 @@ namespace Aseba
 			
 			if (result)
 				compilationMessageBox->text->setText(
-					tr("Compilation success.\n\n") +
+					tr("Compilation success.") + QString("\n\n") + 
 					QString::fromUtf8(compilationMessages.str().c_str())
 				);
 			else
@@ -1002,7 +1002,7 @@ namespace Aseba
 	{
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
 		if (id < eventsNames.size())
-			text += tr("\n%0 : ").arg(QString::fromStdString(eventsNames[id]));
+			text += QString("\n%0 : ").arg(QString::fromStdString(eventsNames[id]));
 		else
 			text += tr("\nevent %0 : ").arg(id);
 		for (size_t i = 0; i < data.size(); i++)
@@ -1027,7 +1027,7 @@ namespace Aseba
 		}
 		
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += tr("\n%0:%1: access out of memory (%2/%3)").arg(target->getName(node)).arg(line + 1).arg(index).arg(target->getConstDescription(node)->variablesSize);
+		text += "\n" + tr("%0:%1: access out of memory (%2/%3)").arg(target->getName(node)).arg(line + 1).arg(index).arg(target->getConstDescription(node)->variablesSize);
 		
 		if (logger->count() > 50)
 			delete logger->takeItem(0);
@@ -1051,7 +1051,7 @@ namespace Aseba
 		}
 		
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += tr("\n%0:%1: division by zero").arg(target->getName(node)).arg(line + 1);
+		text += "\n" + tr("%0:%1: division by zero").arg(target->getName(node)).arg(line + 1);
 		
 		if (logger->count() > 50)
 			delete logger->takeItem(0);
@@ -1247,9 +1247,9 @@ namespace Aseba
 							target, SLOT(connect()),
 							QKeySequence(tr("Ctrl+T", "File|Connect to target")));
 		fileMenu->addSeparator();*/
-		fileMenu->addAction(QIcon(":/images/exit.png"), tr("E&xit"),
+		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
 							qApp, SLOT(quit()),
-							QKeySequence(tr("Ctrl+Q", "File|Exit")));
+							QKeySequence(tr("Ctrl+Q", "File|Quit")));
 		
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
