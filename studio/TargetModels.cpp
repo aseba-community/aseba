@@ -25,6 +25,8 @@
 #include <QtDebug>
 #include <QtGui>
 
+#include "TargetModels.moc"
+
 namespace Aseba
 {
 	/** \addtogroup studio */

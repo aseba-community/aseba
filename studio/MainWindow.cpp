@@ -36,6 +36,8 @@
 #include <QTabWidget>
 #include <boost/cast.hpp>
 
+#include "MainWindow.moc"
+
 using namespace boost;
 using std::copy;
 

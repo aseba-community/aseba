@@ -25,6 +25,8 @@
 #include "CustomDelegate.h"
 #include <QtGui>
 
+#include "FunctionParametersDialog.moc"
+
 namespace Aseba
 {
 	/** \addtogroup studio */

@@ -24,6 +24,8 @@
 #include "AeslEditor.h"
 #include <QtGui>
 
+#include "AeslEditor.moc"
+
 namespace Aseba
 {
 	/** \addtogroup studio */

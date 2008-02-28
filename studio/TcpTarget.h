@@ -27,11 +27,9 @@
 #include "Target.h"
 #include "../common/consts.h"
 #include <QString>
-#include <QTcpSocket>
 #include <map>
 #include <dashel/dashel.h>
 
-class QSocketNotifier;
 
 namespace Dashel
 {

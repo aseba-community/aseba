@@ -28,6 +28,8 @@
 #include <iostream>
 #include <QInputDialog>
 
+#include "TcpTarget.moc"
+
 namespace Aseba
 {
 	using namespace boost;

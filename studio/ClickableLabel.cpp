@@ -23,6 +23,8 @@
 
 #include "ClickableLabel.h"
 
+#include "ClickableLabel.moc"
+
 namespace Aseba
 {
 	/** \addtogroup studio */
