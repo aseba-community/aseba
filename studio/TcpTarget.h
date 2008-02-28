@@ -28,7 +28,7 @@
 #include "../common/consts.h"
 #include <QString>
 #include <map>
-#include <dashel/dashel.h>
+#include <dashel.h>
 
 
 namespace Dashel

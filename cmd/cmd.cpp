@@ -23,7 +23,7 @@
 
 #include "../msg/msg.h"
 #include "../utils/utils.h"
-#include <dashel/dashel.h>
+#include <dashel.h>
 #include "HexFile.h"
 #include <iostream>
 #include <fstream>
