@@ -407,20 +407,6 @@ namespace Aseba
 		
 		return argEaten;
 	}
-	
-	class Cmd : public Hub
-	{
-	public:
-		Stream* stream;
-		
-	public:
-		Cmd() : Hub(), stream(0) { }
-		
-		void incomingConnection(Stream *stream)
-		{
-			this->stream = stream;
-		}
-	};
 }
 
 int main(int argc, char *argv[])
@@ -445,10 +431,9 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			Aseba::Cmd client;
-			client.connect(target);
-			assert(client.stream);
-			Dashel::Stream* stream = client.stream;
+			Dashel::Hub client;
+			Dashel::Stream* stream = client.connect(target);
+			assert(stream);
 			
 			// process command
 			try

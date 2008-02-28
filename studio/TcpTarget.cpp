@@ -74,7 +74,12 @@ namespace Aseba
 		
 		QString target = QInputDialog::getText(0, tr("Aseba Target Selection"), tr("Please enter an Aseba target"), QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
 		
-		Hub::connect(target.toStdString());
+		stream = Hub::connect(target.toStdString());
+		
+		// Send presence query
+		Presence().serialize(stream);
+		stream->flush();
+		netTimer = startTimer(20);
 	}
 	
 	TcpTarget::~TcpTarget()
@@ -216,16 +221,6 @@ namespace Aseba
 	{
 		Q_UNUSED(event);
 		step(0);
-	}
-	
-	void TcpTarget::incomingConnection(Stream *stream)
-	{
-		this->stream = stream;
-		
-		// Send presence query
-		Presence().serialize(stream);
-		stream->flush();
-		netTimer = startTimer(20);
 	}
 	
 	void TcpTarget::incomingData(Stream *stream)

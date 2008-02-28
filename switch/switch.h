@@ -64,7 +64,7 @@ namespace Aseba
 			void manageCanFrame();
 			
 		private:
-			virtual void incomingConnection(Dashel::Stream *stream);
+			virtual void connectionCreated(Dashel::Stream *stream);
 			virtual void incomingData(Dashel::Stream *stream);
 			virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 

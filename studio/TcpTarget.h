@@ -74,7 +74,6 @@ namespace Aseba
 		
 	protected:
 		virtual void timerEvent(QTimerEvent *event);
-		virtual void incomingConnection(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		

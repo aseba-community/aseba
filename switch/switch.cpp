@@ -51,7 +51,7 @@ namespace Aseba
 		connect(oss.str());
 	}
 	
-	void Switch::incomingConnection(Stream *stream)
+	void Switch::connectionCreated(Stream *stream)
 	{
 		if (verbose)
 		{

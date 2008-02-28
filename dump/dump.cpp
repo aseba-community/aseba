@@ -44,14 +44,10 @@ namespace Aseba
 	public:
 		Dump(const string& target)
 		{
-			connect(target);
+			cout << "Connected to " << connect(target)->getTargetName() << endl;
 		}
 	
 	protected:
-		void incomingConnection(Stream *stream)
-		{
-			cout << "Connected to " << stream->getTargetName() << endl;
-		}
 		
 		void incomingData(Stream *stream)
 		{

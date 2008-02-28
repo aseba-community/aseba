@@ -307,7 +307,7 @@ namespace Enki
 		asebaSocketMaps[&distanceSensors.vm] = this;
 		
 		// connect to target
-		Hub::connect(target);
+		stream = Hub::connect(target);
 		
 		// init VM
 		AsebaVMInit(&leftMotor.vm, 1);
