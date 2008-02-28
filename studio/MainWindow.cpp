@@ -33,16 +33,24 @@
 #include <QtXml>
 #include <sstream>
 #include <iostream>
+#include <cassert>
 #include <QTabWidget>
-#include <boost/cast.hpp>
 
 #include "MainWindow.moc"
 
-using namespace boost;
 using std::copy;
 
 namespace Aseba
 {
+	//! Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
+	template<typename Derived, typename Base>
+	inline Derived polymorphic_downcast(Base base)
+	{
+		Derived derived = dynamic_cast<Derived>(base);
+		assert(derived);
+		return derived;
+	}
+	
 	/** \addtogroup studio */
 	/*@{*/
 	

@@ -24,17 +24,25 @@
 #include "TcpTarget.h"
 #include "../msg/msg.h"
 #include <algorithm>
-#include <boost/cast.hpp>
 #include <iostream>
+#include <cassert>
 #include <QInputDialog>
 
 #include "TcpTarget.moc"
 
 namespace Aseba
 {
-	using namespace boost;
 	using std::copy;
 	using namespace Dashel;
+	
+	//! Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
+	template<typename Derived, typename Base>
+	inline Derived polymorphic_downcast(Base base)
+	{
+		Derived derived = dynamic_cast<Derived>(base);
+		assert(derived);
+		return derived;
+	}
 
 	/** \addtogroup studio */
 	/*@{*/
