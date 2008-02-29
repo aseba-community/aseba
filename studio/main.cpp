@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 	
 	QTranslator translator;
-	translator.load(QString("asebastudio_") + QLocale::system().name());
+	translator.load(QString(":/asebastudio_") + QLocale::system().name());
 	app.installTranslator(&translator);
 	
 	Aseba::MainWindow window;
