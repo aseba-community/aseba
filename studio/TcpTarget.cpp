@@ -77,7 +77,7 @@ namespace Aseba
 		stream = Hub::connect(target.toStdString());
 		
 		// Send presence query
-		Presence().serialize(stream);
+		GetDescription().serialize(stream);
 		stream->flush();
 		netTimer = startTimer(20);
 	}
@@ -226,6 +226,8 @@ namespace Aseba
 	void TcpTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
+		message->dump(std::cout);
+		std::cout << std::endl;
 		
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
 		if (messageHandler == messagesHandlersMap.end())

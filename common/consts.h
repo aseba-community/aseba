@@ -145,7 +145,7 @@ typedef enum
 	ASEBA_MESSAGE_BREAKPOINT_SET_RESULT,
 	
 	/* from IDE to all nodes */
-	ASEBA_MESSAGE_PRESENCE = 0xA000,
+	ASEBA_MESSAGE_GET_DESCRIPTION = 0xA000,
 	
 	/* from IDE to a specific node */
 	ASEBA_MESSAGE_SET_BYTECODE,

@@ -52,9 +52,6 @@ void AsebaVMInit(AsebaVMState *vm, uint16 nodeId)
 	// fill with no event
 	vm->bytecode[0] = 0;
 	memset(vm->variables, 0, vm->variablesSize*sizeof(sint16));
-	
-	// notify the network of our existance
-	AsebaSendDescription(vm);
 }
 
 uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event)
@@ -599,7 +596,7 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
 {
 	// react to global presence
-	if (id == ASEBA_MESSAGE_PRESENCE)
+	if (id == ASEBA_MESSAGE_GET_DESCRIPTION)
 	{
 		AsebaSendDescription(vm);
 		return;

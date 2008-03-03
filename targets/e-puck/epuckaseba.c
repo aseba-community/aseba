@@ -95,8 +95,6 @@ void initRobot()
 	// init stuff
 	e_init_port();
 	e_init_motors();
-	e_uart1_int_clr_addr = &vmState.flags;
-	e_uart1_int_clr_mask = ~ASEBA_VM_EVENT_RUNNING_MASK;
 	e_init_uart1();
 	e_init_uart2();
 	e_init_prox();
@@ -112,16 +110,13 @@ void initRobot()
 void initAseba()
 {
 	// VM
-	AsebaVMInit(&vmState, 1);
 	vmState.bytecodeSize = vmBytecodeSize;
 	vmState.bytecode = vmBytecode;
 	vmState.variablesSize = vmVariablesSize;
 	vmState.variables = (sint16 *)&ePuckVariables;
 	vmState.stackSize = vmStackSize;
 	vmState.stack = vmStack;
-	
-	// no event
-	vmState.bytecode[0] = 0;
+	AsebaVMInit(&vmState, 1);
 }
 
 int uartIsChar()
@@ -192,30 +187,30 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 
 void AsebaSendDescription(AsebaVMState *vm)
 {
-	uartSendUInt16(72);
+	uartSendUInt16(73);
 	uartSendUInt16(vm->nodeId);
 	uartSendUInt16(ASEBA_MESSAGE_DESCRIPTION);
 	
 	uartSendString("e-puck");			// 7
 	
 	uartSendUInt16(vmBytecodeSize);		// 2
-	uartSendUInt16(vmVariablesSize);	// 2
 	uartSendUInt16(vmStackSize);		// 2
+	uartSendUInt16(vmVariablesSize);	// 2
 	
 	uartSendUInt16(6);					// 2
 	
-	uartSendString("args");				// 5
 	uartSendUInt16(argsSize);			// 2
+	uartSendString("args");				// 5
+	uartSendUInt16(1);					// 2
 	uartSendString("leftSpeed");		// 10
 	uartSendUInt16(1);					// 2
 	uartSendString("rightSpeed");		// 11
-	uartSendUInt16(1);					// 2
+	uartSendUInt16(8);					// 2
 	uartSendString("leds");				// 5
 	uartSendUInt16(8);					// 2
 	uartSendString("prox");				// 5
 	uartSendUInt16(8);					// 2
-	uartSendString("ambiant");			// 7
-	uartSendUInt16(8);					// 2
+	uartSendString("ambiant");			// 8
 	
 	uartSendUInt16(0);					// 2
 		// TODO : add native functions
@@ -231,6 +226,7 @@ void AsebaDebugHandleCommands()
 {
 	if (uartIsChar())
 	{
+		LED7 = 1;
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
@@ -241,7 +237,7 @@ void AsebaDebugHandleCommands()
 		if (type == ASEBA_MESSAGE_SET_BYTECODE)
 		{
 			data = vmState.bytecode;
-			while (i < vmBytecodeSize && i < len/2)
+			while (i < vmBytecodeSize && i < len / 2)
 			{
 				data[i] = uartGetUInt16();
 				i++;
@@ -250,7 +246,7 @@ void AsebaDebugHandleCommands()
 		else
 		{
 			data = ePuckVariables.args;
-			while (i < argsSize && i < len/2)
+			while (i < argsSize && i < len / 2)
 			{
 				data[i] = uartGetUInt16();
 				i++;
@@ -258,9 +254,10 @@ void AsebaDebugHandleCommands()
 		}
 		
 		// drop excessive data
-		while (i < len)
+		while (i < len / 2)
 		{
 			uartGetUInt16();
+			i++;
 			// TODO: blink a led
 		}
 		
@@ -270,7 +267,9 @@ void AsebaDebugHandleCommands()
 		}
 		else if (type >= 0xA000)
 		{
+			LED0 = 1;
 			AsebaVMDebugMessage(&vmState, type, data, len);
+			LED1 = 1;
 		}
 	}
 }
@@ -278,8 +277,16 @@ void AsebaDebugHandleCommands()
 
 int main()
 {
-	initAseba();
 	initRobot();
+	LED4 = 1;
+	initAseba();
+	LED6 = 1;
+	int i;
+	for (i = 0; i < 14; i++)
+	{
+		uartGetUInt8();
+	}
+	LED5 = 1;
 	d("epuck aseba debug\r\n");
 	while (1)
 	{

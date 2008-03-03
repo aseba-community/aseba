@@ -342,7 +342,7 @@ namespace Aseba
 		
 		if (strcmp(cmd, "presence") == 0)
 		{
-			Presence message;
+			GetDescription message;
 			message.serialize(stream);
 		}
 		else if (strcmp(cmd, "rdpage") == 0)

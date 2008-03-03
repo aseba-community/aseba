@@ -54,7 +54,7 @@ namespace Aseba
 			registerMessageType<ExecutionStateChanged>(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED);
 			registerMessageType<BreakpointSetResult>(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT);
 			
-			registerMessageType<Presence>(ASEBA_MESSAGE_PRESENCE);
+			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
 			
 			registerMessageType<BootloaderReset>(ASEBA_MESSAGE_BOOTLOADER_RESET);
 			registerMessageType<BootloaderReadPage>(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE);

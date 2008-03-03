@@ -151,10 +151,10 @@ namespace Aseba
 	};
 	
 	//! Request nodes to send their description
-	class Presence : public Message
+	class GetDescription : public Message
 	{
 	public:
-		Presence() : Message(ASEBA_MESSAGE_PRESENCE) { }
+		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION) { }
 		
 	protected:
 		virtual void serializeSpecific() {}
