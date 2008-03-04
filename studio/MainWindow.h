@@ -195,6 +195,7 @@ namespace Aseba
 		// events
 		QPushButton* addEventNameButton;
 		QPushButton* removeEventNameButton;
+		QPushButton* sendEventButton;
 		QListWidget* logger;
 		QListWidget* eventsNamesList;
 		EventsNamesVector eventsNames;
@@ -204,7 +205,6 @@ namespace Aseba
 		QAction* resetAllAct;
 		QAction* runAllAct;
 		QAction* pauseAllAct;
-		QAction* sendEventAct;
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;

@@ -829,14 +829,12 @@ namespace Aseba
 	
 	void MainWindow::sendEvent()
 	{
-		bool ok;
-		int id = QInputDialog::getInteger(this, tr("Send an event"),
-											tr("Event identifier:"), 0, 0, 16383, 1, &ok);
-		if (ok)
-		{
-			VariablesDataVector data;
-			target->sendEvent((unsigned)id, data);
-		}
+		VariablesDataVector data;
+		target->sendEvent((unsigned)eventsNamesList->currentRow(), data);
+		/*
+			TODO: get events arguments
+			TODO: type events with size first?
+		*/
 	}
 	
 	void MainWindow::logEntryDoubleClicked(QListWidgetItem * item)
@@ -952,6 +950,7 @@ namespace Aseba
 	void MainWindow::eventsNamesSelectionChanged()
 	{
 		removeEventNameButton->setEnabled(!eventsNamesList->selectedItems ().isEmpty());
+		sendEventButton->setEnabled(!eventsNamesList->selectedItems ().isEmpty());
 	}
 	
 	void MainWindow::rebuildEventsNames()
@@ -960,8 +959,8 @@ namespace Aseba
 		for (int i = 0; i < eventsNamesList->count (); ++i)
 		{
 			QListWidgetItem *item = eventsNamesList->item(i);
-			if (item)
-				eventsNames.push_back(item->text().toStdString ());
+			assert(item);
+			eventsNames.push_back(item->text().toStdString ());
 		}
 	}
 	
@@ -1170,14 +1169,18 @@ namespace Aseba
 		QWidget* eventsDockWidget = new QWidget;
 		QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
 		
-		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;
-		eventsAddRemoveLayout->addWidget(new QLabel(tr("<b>Events</b>")));
+		eventsDockLayout->addWidget(new QLabel(tr("<b>Events</b>")));
+		
+		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;;
 		eventsAddRemoveLayout->addStretch();
 		addEventNameButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
 		eventsAddRemoveLayout->addWidget(addEventNameButton);
 		removeEventNameButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		removeEventNameButton->setEnabled(false);
 		eventsAddRemoveLayout->addWidget(removeEventNameButton);
+		sendEventButton = new QPushButton(QPixmap(QString(":/images/newmsg.png")), "");
+		sendEventButton->setEnabled(false);
+		eventsAddRemoveLayout->addWidget(sendEventButton);
 		
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
 		
@@ -1210,12 +1213,13 @@ namespace Aseba
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
-		connect(sendEventAct, SIGNAL(triggered()), SLOT(sendEvent()));
 		
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
+		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
 		connect(eventsNamesList, SIGNAL(itemSelectionChanged()), SLOT(eventsNamesSelectionChanged()));
+		connect(eventsNamesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(sendEvent()));
 		
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
@@ -1304,9 +1308,6 @@ namespace Aseba
 		pauseAllAct = new QAction(QIcon(":/images/pause.png"), tr("&Pause all"), this);
 		pauseAllAct->setShortcut(tr("F10", "Debug|Pause all"));
 		
-		sendEventAct = new QAction(QIcon(":/images/newmsg.png"), tr("&Send event"), this);
-		sendEventAct->setShortcut(tr("F11", "Debug|Send event"));
-		
 		// Debug toolbar
 		QToolBar* globalToolBar = addToolBar(tr("Debug"));
 		globalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -1314,7 +1315,6 @@ namespace Aseba
 		globalToolBar->addAction(resetAllAct);
 		globalToolBar->addAction(runAllAct);
 		globalToolBar->addAction(pauseAllAct);
-		globalToolBar->addAction(sendEventAct);
 		
 		// Debug menu
 		QMenu *debugMenu = new QMenu(tr("&Debug"), this);
@@ -1323,8 +1323,6 @@ namespace Aseba
 		debugMenu->addAction(resetAllAct);
 		debugMenu->addAction(runAllAct);
 		debugMenu->addAction(pauseAllAct);
-		debugMenu->addSeparator();
-		debugMenu->addAction(sendEventAct);
 		
 		// Compilation menu
 		QMenu *compilationMenu = new QMenu(tr("&Compilation"), this);
