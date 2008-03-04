@@ -67,15 +67,24 @@ void updateRobotVariables()
 	unsigned i;
 	
 	// motor
-	e_set_speed_left(ePuckVariables.leftSpeed);
-	e_set_speed_right(ePuckVariables.rightSpeed);
+	static int leftSpeed = 0, rightSpeed = 0;
+	if (ePuckVariables.leftSpeed != leftSpeed)
+	{
+		leftSpeed = ePuckVariables.leftSpeed;
+		e_set_speed_left(leftSpeed);
+	}
+	if (ePuckVariables.rightSpeed != rightSpeed)
+	{
+		rightSpeed = ePuckVariables.rightSpeed;
+		e_set_speed_right(rightSpeed);
+	}
 	
 	// leds and prox
 	for (i = 0; i < 8; i++)
 	{
 		e_set_led(i, ePuckVariables.leds[i]);
 		ePuckVariables.ambiant[i] = e_get_ambient_light(i);
-		ePuckVariables.prox[i] = e_get_prox(i) - ePuckVariables.ambiant[i];
+		ePuckVariables.prox[i] = e_get_prox(i);
 	}
 }
 
@@ -226,7 +235,6 @@ void AsebaDebugHandleCommands()
 {
 	if (uartIsChar())
 	{
-		LED7 = 1;
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
@@ -267,9 +275,7 @@ void AsebaDebugHandleCommands()
 		}
 		else if (type >= 0xA000)
 		{
-			LED0 = 1;
 			AsebaVMDebugMessage(&vmState, type, data, len);
-			LED1 = 1;
 		}
 	}
 }
@@ -278,15 +284,14 @@ void AsebaDebugHandleCommands()
 int main()
 {
 	initRobot();
-	LED4 = 1;
 	initAseba();
-	LED6 = 1;
 	int i;
+	LED5 = 1;
 	for (i = 0; i < 14; i++)
 	{
 		uartGetUInt8();
 	}
-	LED5 = 1;
+	LED5 = 0;
 	d("epuck aseba debug\r\n");
 	while (1)
 	{
