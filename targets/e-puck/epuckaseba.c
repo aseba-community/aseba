@@ -26,6 +26,8 @@
 #include <e_init_port.h>
 #include <e_led.h>
 #include <e_motors.h>
+#include <e_agenda.h>
+#include <e_po3030k.h>
 #include <e_uart_char.h>
 #include <e_prox.h>
 #include <e_accelerometer.h>
@@ -41,6 +43,21 @@
 #define vmStackSize 32
 #define argsSize 32
 
+unsigned int cam_data[60];
+
+/*#define CAM_RED(pixel) ( 3 * ((pixel & 0xF800) >> 11))
+#define CAM_GREEN(pixel) ( 3 * ((pixel & 0x7E0) >> 6))
+#define CAM_BLUE(pixel) ( 3 * ((pixel & 0x1F)))*/
+
+// we receive the data as big endian and read them as little, so we have to acces the bit the right way
+#define CAM_RED(pixel) ( 3 * (((pixel) >> 3) & 0x1f))
+
+#define CAM_GREEN(pixel) ((3 * ((((pixel) & 0x7) << 3) | ((pixel) >> 13))) >> 1)
+
+#define CAM_BLUE(pixel) ( 3 * (((pixel) >> 8) & 0x1f))
+
+#define CLAMP(v, vmin, vmax) ((v) < (vmin) ? (vmin) : (v) > (vmax) ? (vmax) : (v))
+
 // data
 struct EPuckVariables
 {
@@ -54,6 +71,10 @@ struct EPuckVariables
 	// prox
 	sint16 prox[8];
 	sint16 ambiant[8];
+	// camera
+	sint16 camR[60];
+	sint16 camG[60];
+	sint16 camB[60];
 	// free space
 	sint16 freeSpace[64];
 } ePuckVariables;
@@ -65,17 +86,17 @@ AsebaVMState vmState;
 void updateRobotVariables()
 {
 	unsigned i;
-	
+	LED1 = 1;
 	// motor
 	static int leftSpeed = 0, rightSpeed = 0;
 	if (ePuckVariables.leftSpeed != leftSpeed)
 	{
-		leftSpeed = ePuckVariables.leftSpeed;
+		leftSpeed = CLAMP(ePuckVariables.leftSpeed, -1000, 1000);
 		e_set_speed_left(leftSpeed);
 	}
 	if (ePuckVariables.rightSpeed != rightSpeed)
 	{
-		rightSpeed = ePuckVariables.rightSpeed;
+		rightSpeed = CLAMP(ePuckVariables.rightSpeed, -1000, 1000);
 		e_set_speed_right(rightSpeed);
 	}
 	
@@ -86,11 +107,19 @@ void updateRobotVariables()
 		ePuckVariables.ambiant[i] = e_get_ambient_light(i);
 		ePuckVariables.prox[i] = e_get_prox(i);
 	}
-}
-
-void d(const char *s)
-{
-	e_send_uart2_char(s, strlen(s));
+	
+	// camera
+	if(e_po3030k_is_img_ready())
+	{
+		for(i = 0; i < 60; i++)
+		{
+			ePuckVariables.camR[i] = CAM_RED(cam_data[i]);
+			ePuckVariables.camG[i] = CAM_GREEN(cam_data[i]);
+			ePuckVariables.camB[i] = CAM_BLUE(cam_data[i]);
+		}
+		e_po3030k_launch_capture((char *)cam_data);
+	}
+	LED1 = 0;
 }
 
 void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
@@ -102,11 +131,16 @@ void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 void initRobot()
 {
 	// init stuff
+	LED0 = 1;
 	e_init_port();
+	e_start_agendas_processing();
 	e_init_motors();
 	e_init_uart1();
-	e_init_uart2();
 	e_init_prox();
+	e_po3030k_init_cam();
+	e_po3030k_config_cam(640/2-4,0,4,480,4,8,RGB_565_MODE);
+	e_po3030k_write_cam_registers();
+	e_po3030k_launch_capture((char *)cam_data);
 
 	// reset if power on (some problem for few robots)
 	if (RCONbits.POR)
@@ -114,6 +148,7 @@ void initRobot()
 		RCONbits.POR = 0;
 		RESET();
 	}
+	LED0 = 0;
 }
 
 void initAseba()
@@ -196,7 +231,7 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 
 void AsebaSendDescription(AsebaVMState *vm)
 {
-	uartSendUInt16(73);
+	uartSendUInt16(94);
 	uartSendUInt16(vm->nodeId);
 	uartSendUInt16(ASEBA_MESSAGE_DESCRIPTION);
 	
@@ -206,7 +241,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 	uartSendUInt16(vmStackSize);		// 2
 	uartSendUInt16(vmVariablesSize);	// 2
 	
-	uartSendUInt16(6);					// 2
+	uartSendUInt16(9);					// 2
 	
 	uartSendUInt16(argsSize);			// 2
 	uartSendString("args");				// 5
@@ -220,6 +255,12 @@ void AsebaSendDescription(AsebaVMState *vm)
 	uartSendString("prox");				// 5
 	uartSendUInt16(8);					// 2
 	uartSendString("ambiant");			// 8
+	uartSendUInt16(60);					// 2
+	uartSendString("camR");				// 5
+	uartSendUInt16(60);					// 2
+	uartSendString("camG");				// 5
+	uartSendUInt16(60);					// 2
+	uartSendString("camB");				// 5
 	
 	uartSendUInt16(0);					// 2
 		// TODO : add native functions
@@ -292,7 +333,6 @@ int main()
 		uartGetUInt8();
 	}
 	LED5 = 0;
-	d("epuck aseba debug\r\n");
 	while (1)
 	{
 		updateRobotVariables();
