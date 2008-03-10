@@ -28,8 +28,8 @@
 #ifndef ASEBA_ASSERT
 #define ASEBA_ASSERT
 #endif
-#include "../vm/vm.h"
-#include "../common/consts.h"
+#include "../../vm/vm.h"
+#include "../../common/consts.h"
 #include <dashel.h>
 #include <deque>
 

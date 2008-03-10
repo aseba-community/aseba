@@ -22,7 +22,7 @@
 */
 
 #include "AsebaMarxbot.h"
-#include "../common/consts.h"
+#include "../../common/consts.h"
 #include <set>
 #include <map>
 #include <cassert>
