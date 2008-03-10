@@ -58,8 +58,7 @@ add_subdirectory(cmd)
 
 add_subdirectory(dump)
 
-add_subdirectory(enki)
-
 add_subdirectory(studio)
 
+add_subdirectory(targets/enki-marxbot)
 
