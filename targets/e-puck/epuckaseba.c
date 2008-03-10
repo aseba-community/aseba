@@ -20,6 +20,13 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+	WARNING: you have to change the size of the UART 1 e-puck reception buffer to hold
+	at the biggest possible packet (probably bytecode + header). Otherwise if you set
+	a new bytecode while busy (for instance while sending description), you might end up
+	in a dead-lock.
+*/
+
 #include <p30f6014a.h>
 
 #include <e_epuck_ports.h>
@@ -44,10 +51,6 @@
 #define argsSize 32
 
 unsigned int cam_data[60];
-
-/*#define CAM_RED(pixel) ( 3 * ((pixel & 0xF800) >> 11))
-#define CAM_GREEN(pixel) ( 3 * ((pixel & 0x7E0) >> 6))
-#define CAM_BLUE(pixel) ( 3 * ((pixel & 0x1F)))*/
 
 // we receive the data as big endian and read them as little, so we have to acces the bit the right way
 #define CAM_RED(pixel) ( 3 * (((pixel) >> 3) & 0x1f))
@@ -316,7 +319,7 @@ void AsebaDebugHandleCommands()
 		}
 		else if (type >= 0xA000)
 		{
-			AsebaVMDebugMessage(&vmState, type, data, len);
+			AsebaVMDebugMessage(&vmState, type, data, len / 2);
 		}
 	}
 }
