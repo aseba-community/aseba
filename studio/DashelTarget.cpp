@@ -21,14 +21,17 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "AsebaTarget.h"
+#include "DashelTarget.h"
 #include "../msg/msg.h"
 #include <algorithm>
 #include <iostream>
+#include <ostream>
+#include <sstream>
 #include <cassert>
 #include <QInputDialog>
+#include <QtGui>
 
-#include "AsebaTarget.moc"
+#include "DashelTarget.moc"
 
 namespace Aseba
 {
@@ -47,6 +50,123 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
+	DashelConnectionDialog::DashelConnectionDialog()
+	{
+		QVBoxLayout* mainLayout = new QVBoxLayout(this);
+		
+		netGroupBox = new QGroupBox("Network (TCP)");
+		netGroupBox->setCheckable(true);
+		QGridLayout* netLayout = new QGridLayout;
+		netLayout->addWidget(new QLabel(tr("Host")), 0, 0);
+		netLayout->addWidget(new QLabel(tr("Port")), 0, 1);
+		host = new QLineEdit(ASEBA_DEFAULT_HOST);
+		netLayout->addWidget(host, 1, 0);
+		port = new QSpinBox();
+		port->setMinimum(0);
+		port->setMaximum(65535);
+		port->setValue(ASEBA_DEFAULT_PORT);
+		netLayout->addWidget(port, 1, 1);
+		netGroupBox->setLayout(netLayout);
+		connect(netGroupBox, SIGNAL(clicked()), SLOT(netGroupChecked()));
+		mainLayout->addWidget(netGroupBox);
+		
+		serialGroupBox = new QGroupBox("Serial");
+		serialGroupBox->setCheckable(true);
+		serialGroupBox->setChecked(false);
+		QHBoxLayout* serialLayout = new QHBoxLayout();
+		serial = new QListWidget();
+		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
+		PortsMap ports = SerialPortEnumerator::getPorts();
+		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
+		{
+			QListWidgetItem* item = new QListWidgetItem(QString(it->second.second.c_str()));
+			item->setData(Qt::UserRole, QVariant(QString(it->second.first.c_str())));
+			serial->addItem(item);
+		//
+		}
+		serial->setSelectionMode(QAbstractItemView::SingleSelection);
+		serialLayout->addWidget(serial);
+		connect(serial, SIGNAL(itemSelectionChanged()), SLOT(setupOkStateFromListSelection()));
+		serialGroupBox->setLayout(serialLayout);
+		connect(serialGroupBox, SIGNAL(clicked()), SLOT(serialGroupChecked()));
+		mainLayout->addWidget(serialGroupBox);
+		
+		customGroupBox = new QGroupBox("Custom");
+		customGroupBox->setCheckable(true);
+		customGroupBox->setChecked(false);
+		QHBoxLayout* customLayout = new QHBoxLayout();
+		custom = new QLineEdit(ASEBA_DEFAULT_TARGET);
+		customLayout->addWidget(custom);
+		customGroupBox->setLayout(customLayout);
+		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
+		mainLayout->addWidget(customGroupBox);
+		
+		QHBoxLayout* buttonLayout = new QHBoxLayout();
+		connectButton = new QPushButton(QIcon(":/images/ok.png"), tr("Connect"));
+		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
+		buttonLayout->addWidget(connectButton);
+		QPushButton* cancelButton = new QPushButton(QIcon(":/images/no.png"), tr("Cancel"));
+		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
+		buttonLayout->addWidget(cancelButton);
+		mainLayout->addLayout(buttonLayout);
+		
+		setWindowTitle("Aseba Target Selection");
+	}
+	
+	std::string DashelConnectionDialog::getTarget()
+	{
+		if (netGroupBox->isChecked())
+		{
+			std::ostringstream oss;
+			oss << "tcp:host=" << host->text().toStdString() << ";port=" << port->value();
+			return oss.str();
+		}
+		else if (serialGroupBox->isChecked())
+		{
+			QString target("ser:device=%0");
+			return target.arg(serial->selectionModel()->selectedRows().first().data(Qt::UserRole).toString()).toStdString();
+		}
+		else if (customGroupBox->isChecked())
+		{
+			return custom->text().toStdString();
+		}
+		else
+		{
+			assert(false);
+		}
+	}
+	
+	
+
+	void DashelConnectionDialog::netGroupChecked()
+	{
+		netGroupBox->setChecked(true);
+		serialGroupBox->setChecked(false);
+		customGroupBox->setChecked(false);
+		setupOkStateFromListSelection();
+	}
+	
+	void DashelConnectionDialog::serialGroupChecked()
+	{
+		netGroupBox->setChecked(false);
+		serialGroupBox->setChecked(true);
+		customGroupBox->setChecked(false);
+		setupOkStateFromListSelection();
+	}
+	
+	void DashelConnectionDialog::customGroupChecked()
+	{
+		netGroupBox->setChecked(false);
+		serialGroupBox->setChecked(false);
+		customGroupBox->setChecked(true);
+		setupOkStateFromListSelection();
+	}
+	
+	void DashelConnectionDialog::setupOkStateFromListSelection()
+	{
+		connectButton->setEnabled(serial->selectionModel()->hasSelection() || (!serialGroupBox->isChecked()));
+	}
+	
 	enum InNextState
 	{
 		NOT_IN_NEXT,
@@ -54,27 +174,42 @@ namespace Aseba
 		WAITING_LINE_CHANGE
 	};
 	
-	AsebaTarget::Node::Node()
+	DashelTarget::Node::Node()
 	{
 		steppingInNext = NOT_IN_NEXT;
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
-	AsebaTarget::AsebaTarget() :
+	DashelTarget::DashelTarget() :
 		stream(0)
 	{
-		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::AsebaTarget::receivedDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::AsebaTarget::receivedDisconnected;
-		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::AsebaTarget::receivedVariables;
-		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::AsebaTarget::receivedArrayAccessOutOfBounds;
-		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::AsebaTarget::receivedDivisionByZero;
-		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::AsebaTarget::receivedExecutionStateChanged;
+		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
+		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
+		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
+		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
+		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
-		&Aseba::AsebaTarget::receivedBreakpointSetResult;
+		&Aseba::DashelTarget::receivedBreakpointSetResult;
 		
-		QString target = QInputDialog::getText(0, tr("Aseba Target Selection"), tr("Please enter an Aseba target"), QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
-		
-		stream = Hub::connect(target.toStdString());
+		DashelConnectionDialog targetSelector;
+		while (true)
+		{
+			if (targetSelector.exec() == QDialog::Rejected)
+				exit(0);
+			
+			try
+			{
+				qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
+				stream = Hub::connect(targetSelector.getTarget());
+				break;
+			}
+			catch (DashelException e)
+			{
+				
+				// exception, try again
+			}
+		}
 		
 		// Send presence query
 		GetDescription().serialize(stream);
@@ -82,13 +217,13 @@ namespace Aseba
 		netTimer = startTimer(20);
 	}
 	
-	AsebaTarget::~AsebaTarget()
+	DashelTarget::~DashelTarget()
 	{
 		killTimer(netTimer);
 		disconnect();
 	}
 		
-	void AsebaTarget::disconnect()
+	void DashelTarget::disconnect()
 	{
 		// detach all nodes
 		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -100,7 +235,7 @@ namespace Aseba
 		}
 	}
 	
-	const TargetDescription * const AsebaTarget::getConstDescription(unsigned node) const
+	const TargetDescription * const DashelTarget::getConstDescription(unsigned node) const
 	{
 		NodesMap::const_iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -108,7 +243,7 @@ namespace Aseba
 		return &(nodeIt->second.description);
 	}
 	
-	void AsebaTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
+	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
 	{
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -124,43 +259,43 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void AsebaTarget::sendEvent(unsigned id, const VariablesDataVector &data)
+	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
 		UserMessage(id, data).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
+	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
 		SetVariables(node, start, data).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::getVariables(unsigned node, unsigned start, unsigned length)
+	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
 		GetVariables(node, start, length).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::reset(unsigned node)
+	void DashelTarget::reset(unsigned node)
 	{
 		Reset(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::run(unsigned node)
+	void DashelTarget::run(unsigned node)
 	{
 		Run(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::pause(unsigned node)
+	void DashelTarget::pause(unsigned node)
 	{
 		Pause(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::next(unsigned node)
+	void DashelTarget::next(unsigned node)
 	{
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -174,13 +309,13 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void AsebaTarget::stop(unsigned node)
+	void DashelTarget::stop(unsigned node)
 	{
 		Stop(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void AsebaTarget::setBreakpoint(unsigned node, unsigned line)
+	void DashelTarget::setBreakpoint(unsigned node, unsigned line)
 	{
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -194,7 +329,7 @@ namespace Aseba
 		}
 	}
 	
-	void AsebaTarget::clearBreakpoint(unsigned node, unsigned line)
+	void DashelTarget::clearBreakpoint(unsigned node, unsigned line)
 	{
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -208,7 +343,7 @@ namespace Aseba
 		}
 	}
 	
-	void AsebaTarget::clearBreakpoints(unsigned node)
+	void DashelTarget::clearBreakpoints(unsigned node)
 	{
 		BreakpointClearAll breakpointClearAllMessage;
 		breakpointClearAllMessage.dest = node;
@@ -217,13 +352,13 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void AsebaTarget::timerEvent(QTimerEvent *event)
+	void DashelTarget::timerEvent(QTimerEvent *event)
 	{
 		Q_UNUSED(event);
 		step(0);
 	}
 	
-	void AsebaTarget::incomingData(Stream *stream)
+	void DashelTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
 		message->dump(std::cout);
@@ -244,14 +379,14 @@ namespace Aseba
 		delete message;
 	}
 	
-	void AsebaTarget::connectionClosed(Stream* stream, bool abnormal)
+	void DashelTarget::connectionClosed(Stream* stream, bool abnormal)
 	{
 		Q_UNUSED(stream);
 		emit networkDisconnected();
 		nodes.clear();
 	}
 	
-	void AsebaTarget::receivedDescription(Message *message)
+	void DashelTarget::receivedDescription(Message *message)
 	{
 		Description *description = polymorphic_downcast<Description *>(message);
 		unsigned id = description->source;
@@ -274,14 +409,14 @@ namespace Aseba
 		emit nodeConnected(id);
 	}
 	
-	void AsebaTarget::receivedVariables(Message *message)
+	void DashelTarget::receivedVariables(Message *message)
 	{
 		Variables *variables = polymorphic_downcast<Variables *>(message);
 		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 	
-	void AsebaTarget::receivedArrayAccessOutOfBounds(Message *message)
+	void DashelTarget::receivedArrayAccessOutOfBounds(Message *message)
 	{
 		ArrayAccessOutOfBounds *aa = polymorphic_downcast<ArrayAccessOutOfBounds *>(message);
 		
@@ -290,7 +425,7 @@ namespace Aseba
 			emit arrayAccessOutOfBounds(aa->source, line, aa->index);
 	}
 	
-	void AsebaTarget::receivedDivisionByZero(Message *message)
+	void DashelTarget::receivedDivisionByZero(Message *message)
 	{
 		DivisionByZero *dz = polymorphic_downcast<DivisionByZero *>(message);
 		
@@ -299,7 +434,7 @@ namespace Aseba
 			emit divisionByZero(dz->source, line);
 	}
 	
-	void AsebaTarget::receivedExecutionStateChanged(Message *message)
+	void DashelTarget::receivedExecutionStateChanged(Message *message)
 	{
 		ExecutionStateChanged *ess = polymorphic_downcast<ExecutionStateChanged *>(message);
 		
@@ -367,21 +502,21 @@ namespace Aseba
 		}
 	}
 	
-	void AsebaTarget::receivedDisconnected(Message *message)
+	void DashelTarget::receivedDisconnected(Message *message)
 	{
 		Disconnected *disconnected = polymorphic_downcast<Disconnected *>(message);
 		
 		emit nodeDisconnected(disconnected->source);
 	}
 	
-	void AsebaTarget::receivedBreakpointSetResult(Message *message)
+	void DashelTarget::receivedBreakpointSetResult(Message *message)
 	{
 		BreakpointSetResult *bsr = polymorphic_downcast<BreakpointSetResult *>(message);
 		unsigned node = bsr->source;
 		emit breakpointSetResult(node, getLineFromPC(node, bsr->pc), bsr->success);
 	}
 	
-	int AsebaTarget::getPCFromLine(unsigned node, unsigned line)
+	int DashelTarget::getPCFromLine(unsigned node, unsigned line)
 	{
 		// first lookup node
 		NodesMap::const_iterator nodeIt = nodes.find(node);
@@ -397,7 +532,7 @@ namespace Aseba
 		return -1;
 	}
 	
-	int AsebaTarget::getLineFromPC(unsigned node, unsigned pc)
+	int DashelTarget::getLineFromPC(unsigned node, unsigned pc)
 	{
 		// first lookup node
 		NodesMap::const_iterator nodeIt = nodes.find(node);

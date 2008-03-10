@@ -23,7 +23,7 @@
 
 #include "MainWindow.h"
 #include "ClickableLabel.h"
-#include "AsebaTarget.h"
+#include "DashelTarget.h"
 #include "TargetModels.h"
 #include "CustomDelegate.h"
 #include "FunctionParametersDialog.h"
@@ -598,7 +598,7 @@ namespace Aseba
 		QMainWindow(parent)
 	{
 		// create target
-		target = new AsebaTarget();
+		target = new DashelTarget();
 		
 		// create gui
 		setupWidgets();

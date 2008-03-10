@@ -10,7 +10,7 @@ if (QT4_FOUND)
 		MainWindow.cpp
 		TargetModels.cpp
 		ClickableLabel.cpp
-		AsebaTarget.cpp
+		DashelTarget.cpp
 		CustomDelegate.cpp
 		main.cpp
 		Target.cpp)

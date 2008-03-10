@@ -28,9 +28,15 @@
 #include "Target.h"
 #include "../common/consts.h"
 #include <QString>
+#include <QDialog>
 #include <map>
 #include <dashel.h>
 
+class QPushButton;
+class QGroupBox;
+class QLineEdit;
+class QSpinBox;
+class QListWidget;
 
 namespace Dashel
 {
@@ -42,15 +48,40 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class Message;
+	class DashelConnectionDialog : public QDialog
+	{
+		Q_OBJECT
+		
+	protected:
+		QPushButton* connectButton;
+		QGroupBox* netGroupBox;
+		QLineEdit* host;
+		QSpinBox* port;
+		QGroupBox* serialGroupBox;
+		QListWidget* serial;
+		QGroupBox* customGroupBox;
+		QLineEdit* custom;
+		
+	public:
+		DashelConnectionDialog();
+		std::string getTarget();
+		
+	public slots:
+		void netGroupChecked();
+		void serialGroupChecked();
+		void customGroupChecked();
+		void setupOkStateFromListSelection();
+	};
 	
-	class AsebaTarget: public Target, public Dashel::Hub
+	class Message;	
+	
+	class DashelTarget: public Target, public Dashel::Hub
 	{
 		Q_OBJECT
 		
 	public:
-		AsebaTarget();
-		~AsebaTarget();
+		DashelTarget();
+		~DashelTarget();
 		
 		virtual void disconnect();
 		
@@ -104,7 +135,7 @@ namespace Aseba
 			ExecutionMode executionMode; //!< last known execution mode if this node
 		};
 		
-		typedef void (AsebaTarget::*MessageHandler)(Message *message);
+		typedef void (DashelTarget::*MessageHandler)(Message *message);
 		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
 		typedef std::map<unsigned, Node> NodesMap;
 		
