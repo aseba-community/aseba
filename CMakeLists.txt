@@ -62,3 +62,5 @@ add_subdirectory(studio)
 
 add_subdirectory(targets/enki-marxbot)
 
+add_subdirectory(targets/vrcs)
+

@@ -23,7 +23,7 @@
 
 #include "MainWindow.h"
 #include "ClickableLabel.h"
-#include "TcpTarget.h"
+#include "AsebaTarget.h"
 #include "TargetModels.h"
 #include "CustomDelegate.h"
 #include "FunctionParametersDialog.h"
@@ -598,7 +598,7 @@ namespace Aseba
 		QMainWindow(parent)
 	{
 		// create target
-		target = new TcpTarget();
+		target = new AsebaTarget();
 		
 		// create gui
 		setupWidgets();

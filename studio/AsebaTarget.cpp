@@ -21,14 +21,14 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "TcpTarget.h"
+#include "AsebaTarget.h"
 #include "../msg/msg.h"
 #include <algorithm>
 #include <iostream>
 #include <cassert>
 #include <QInputDialog>
 
-#include "TcpTarget.moc"
+#include "AsebaTarget.moc"
 
 namespace Aseba
 {
@@ -54,23 +54,23 @@ namespace Aseba
 		WAITING_LINE_CHANGE
 	};
 	
-	TcpTarget::Node::Node()
+	AsebaTarget::Node::Node()
 	{
 		steppingInNext = NOT_IN_NEXT;
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
-	TcpTarget::TcpTarget() :
+	AsebaTarget::AsebaTarget() :
 		stream(0)
 	{
-		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::TcpTarget::receivedDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::TcpTarget::receivedDisconnected;
-		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::TcpTarget::receivedVariables;
-		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::TcpTarget::receivedArrayAccessOutOfBounds;
-		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::TcpTarget::receivedDivisionByZero;
-		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::TcpTarget::receivedExecutionStateChanged;
+		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::AsebaTarget::receivedDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::AsebaTarget::receivedDisconnected;
+		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::AsebaTarget::receivedVariables;
+		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::AsebaTarget::receivedArrayAccessOutOfBounds;
+		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::AsebaTarget::receivedDivisionByZero;
+		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::AsebaTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
-		&Aseba::TcpTarget::receivedBreakpointSetResult;
+		&Aseba::AsebaTarget::receivedBreakpointSetResult;
 		
 		QString target = QInputDialog::getText(0, tr("Aseba Target Selection"), tr("Please enter an Aseba target"), QLineEdit::Normal, ASEBA_DEFAULT_TARGET);
 		
@@ -82,13 +82,13 @@ namespace Aseba
 		netTimer = startTimer(20);
 	}
 	
-	TcpTarget::~TcpTarget()
+	AsebaTarget::~AsebaTarget()
 	{
 		killTimer(netTimer);
 		disconnect();
 	}
 		
-	void TcpTarget::disconnect()
+	void AsebaTarget::disconnect()
 	{
 		// detach all nodes
 		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -100,7 +100,7 @@ namespace Aseba
 		}
 	}
 	
-	const TargetDescription * const TcpTarget::getConstDescription(unsigned node) const
+	const TargetDescription * const AsebaTarget::getConstDescription(unsigned node) const
 	{
 		NodesMap::const_iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -108,7 +108,7 @@ namespace Aseba
 		return &(nodeIt->second.description);
 	}
 	
-	void TcpTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
+	void AsebaTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
 	{
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -124,43 +124,43 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void TcpTarget::sendEvent(unsigned id, const VariablesDataVector &data)
+	void AsebaTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
 		UserMessage(id, data).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
+	void AsebaTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
 		SetVariables(node, start, data).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::getVariables(unsigned node, unsigned start, unsigned length)
+	void AsebaTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
 		GetVariables(node, start, length).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::reset(unsigned node)
+	void AsebaTarget::reset(unsigned node)
 	{
 		Reset(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::run(unsigned node)
+	void AsebaTarget::run(unsigned node)
 	{
 		Run(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::pause(unsigned node)
+	void AsebaTarget::pause(unsigned node)
 	{
 		Pause(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::next(unsigned node)
+	void AsebaTarget::next(unsigned node)
 	{
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -174,13 +174,13 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void TcpTarget::stop(unsigned node)
+	void AsebaTarget::stop(unsigned node)
 	{
 		Stop(node).serialize(stream);
 		stream->flush();
 	}
 	
-	void TcpTarget::setBreakpoint(unsigned node, unsigned line)
+	void AsebaTarget::setBreakpoint(unsigned node, unsigned line)
 	{
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -194,7 +194,7 @@ namespace Aseba
 		}
 	}
 	
-	void TcpTarget::clearBreakpoint(unsigned node, unsigned line)
+	void AsebaTarget::clearBreakpoint(unsigned node, unsigned line)
 	{
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -208,7 +208,7 @@ namespace Aseba
 		}
 	}
 	
-	void TcpTarget::clearBreakpoints(unsigned node)
+	void AsebaTarget::clearBreakpoints(unsigned node)
 	{
 		BreakpointClearAll breakpointClearAllMessage;
 		breakpointClearAllMessage.dest = node;
@@ -217,13 +217,13 @@ namespace Aseba
 		stream->flush();
 	}
 	
-	void TcpTarget::timerEvent(QTimerEvent *event)
+	void AsebaTarget::timerEvent(QTimerEvent *event)
 	{
 		Q_UNUSED(event);
 		step(0);
 	}
 	
-	void TcpTarget::incomingData(Stream *stream)
+	void AsebaTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
 		message->dump(std::cout);
@@ -244,14 +244,14 @@ namespace Aseba
 		delete message;
 	}
 	
-	void TcpTarget::connectionClosed(Stream* stream, bool abnormal)
+	void AsebaTarget::connectionClosed(Stream* stream, bool abnormal)
 	{
 		Q_UNUSED(stream);
 		emit networkDisconnected();
 		nodes.clear();
 	}
 	
-	void TcpTarget::receivedDescription(Message *message)
+	void AsebaTarget::receivedDescription(Message *message)
 	{
 		Description *description = polymorphic_downcast<Description *>(message);
 		unsigned id = description->source;
@@ -274,14 +274,14 @@ namespace Aseba
 		emit nodeConnected(id);
 	}
 	
-	void TcpTarget::receivedVariables(Message *message)
+	void AsebaTarget::receivedVariables(Message *message)
 	{
 		Variables *variables = polymorphic_downcast<Variables *>(message);
 		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 	
-	void TcpTarget::receivedArrayAccessOutOfBounds(Message *message)
+	void AsebaTarget::receivedArrayAccessOutOfBounds(Message *message)
 	{
 		ArrayAccessOutOfBounds *aa = polymorphic_downcast<ArrayAccessOutOfBounds *>(message);
 		
@@ -290,7 +290,7 @@ namespace Aseba
 			emit arrayAccessOutOfBounds(aa->source, line, aa->index);
 	}
 	
-	void TcpTarget::receivedDivisionByZero(Message *message)
+	void AsebaTarget::receivedDivisionByZero(Message *message)
 	{
 		DivisionByZero *dz = polymorphic_downcast<DivisionByZero *>(message);
 		
@@ -299,7 +299,7 @@ namespace Aseba
 			emit divisionByZero(dz->source, line);
 	}
 	
-	void TcpTarget::receivedExecutionStateChanged(Message *message)
+	void AsebaTarget::receivedExecutionStateChanged(Message *message)
 	{
 		ExecutionStateChanged *ess = polymorphic_downcast<ExecutionStateChanged *>(message);
 		
@@ -367,21 +367,21 @@ namespace Aseba
 		}
 	}
 	
-	void TcpTarget::receivedDisconnected(Message *message)
+	void AsebaTarget::receivedDisconnected(Message *message)
 	{
 		Disconnected *disconnected = polymorphic_downcast<Disconnected *>(message);
 		
 		emit nodeDisconnected(disconnected->source);
 	}
 	
-	void TcpTarget::receivedBreakpointSetResult(Message *message)
+	void AsebaTarget::receivedBreakpointSetResult(Message *message)
 	{
 		BreakpointSetResult *bsr = polymorphic_downcast<BreakpointSetResult *>(message);
 		unsigned node = bsr->source;
 		emit breakpointSetResult(node, getLineFromPC(node, bsr->pc), bsr->success);
 	}
 	
-	int TcpTarget::getPCFromLine(unsigned node, unsigned line)
+	int AsebaTarget::getPCFromLine(unsigned node, unsigned line)
 	{
 		// first lookup node
 		NodesMap::const_iterator nodeIt = nodes.find(node);
@@ -397,7 +397,7 @@ namespace Aseba
 		return -1;
 	}
 	
-	int TcpTarget::getLineFromPC(unsigned node, unsigned pc)
+	int AsebaTarget::getLineFromPC(unsigned node, unsigned pc)
 	{
 		// first lookup node
 		NodesMap::const_iterator nodeIt = nodes.find(node);

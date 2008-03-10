@@ -16,7 +16,7 @@ while i &lt; 60 do
 	i = i + 1
 end
 meanV = meanV / 60
-var threshold = (3 * meanV + minV) / 4
+var threshold = (meanV + 3 * minV) / 4
 
 var minPos = 0
 var minCount = 0

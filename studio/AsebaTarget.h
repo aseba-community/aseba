@@ -1,3 +1,4 @@
+
 /*
 	Aseba - an event-based middleware for distributed robot control
 	Copyright (C) 2006 - 2007:
@@ -43,13 +44,13 @@ namespace Aseba
 	
 	class Message;
 	
-	class TcpTarget: public Target, public Dashel::Hub
+	class AsebaTarget: public Target, public Dashel::Hub
 	{
 		Q_OBJECT
 		
 	public:
-		TcpTarget();
-		~TcpTarget();
+		AsebaTarget();
+		~AsebaTarget();
 		
 		virtual void disconnect();
 		
@@ -103,7 +104,7 @@ namespace Aseba
 			ExecutionMode executionMode; //!< last known execution mode if this node
 		};
 		
-		typedef void (TcpTarget::*MessageHandler)(Message *message);
+		typedef void (AsebaTarget::*MessageHandler)(Message *message);
 		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
 		typedef std::map<unsigned, Node> NodesMap;
 		
