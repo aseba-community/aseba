@@ -81,7 +81,10 @@ struct EPuckVariables
 	// free space
 	sint16 freeSpace[64];
 } ePuckVariables;
-uint16 vmBytecode[vmBytecodeSize];
+// physical bytecode isize is one word bigger than really used for byte code because this
+// buffer is also used to receive the data
+// the maximum packet size we have is the whole bytecode + the dest id
+uint16 vmBytecode[vmBytecodeSize+1];
 sint16 vmStack[vmStackSize];
 AsebaVMState vmState;
 
@@ -89,7 +92,7 @@ AsebaVMState vmState;
 void updateRobotVariables()
 {
 	unsigned i;
-	LED1 = 1;
+	//LED1 = 1;
 	// motor
 	static int leftSpeed = 0, rightSpeed = 0;
 	if (ePuckVariables.leftSpeed != leftSpeed)
@@ -122,7 +125,7 @@ void updateRobotVariables()
 		}
 		e_po3030k_launch_capture((char *)cam_data);
 	}
-	LED1 = 0;
+	//LED1 = 0;
 }
 
 void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
@@ -282,14 +285,15 @@ void AsebaDebugHandleCommands()
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
-		sint16* data;
+		uint16* data;
 		unsigned i = 0;
 		
 		// read data into the right place
 		if (type == ASEBA_MESSAGE_SET_BYTECODE)
 		{
 			data = vmState.bytecode;
-			while (i < vmBytecodeSize && i < len / 2)
+			// the maximum packet size we have is the whole bytecode + the dest id
+			while (i < (vmBytecodeSize + 1) && i < len / 2)
 			{
 				data[i] = uartGetUInt16();
 				i++;
@@ -297,7 +301,7 @@ void AsebaDebugHandleCommands()
 		}
 		else
 		{
-			data = ePuckVariables.args;
+			data = (uint16*)ePuckVariables.args;
 			while (i < argsSize && i < len / 2)
 			{
 				data[i] = uartGetUInt16();
