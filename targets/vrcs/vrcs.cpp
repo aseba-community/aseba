@@ -210,7 +210,11 @@ namespace Enki
 		void connectionClosed(Dashel::Stream *stream, bool abnormal)
 		{
 			if (stream == this->stream)
+			{
 				this->stream = 0;
+				// clear breakpoints
+				vm.breakpointsCount = 0;
+			}
 			qDebug() << this << " : Client has disconnected.";
 		}
 		
