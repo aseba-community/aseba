@@ -1,10 +1,18 @@
 /*
-	Aseba - an event-based middleware for distributed robot control
-	Copyright (C) 2006 - 2007:
+	VRCS - Virtual Robot Challenge System
+	Copyright (C) 1999 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
-		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
-		Laboratory of Robotics Systems, EPFL, Lausanne
+	3D models
+	Copyright (C) 2008:
+		Basilio Noris
+	Aseba - an event-based framework for distributed robot control
+	Copyright (C) 2006 - 2008:
+		Stephane Magnenat <stephane at magnenat dot net>
+		(http://stephane.magnenat.net)
+		Mobots group (http://mobots.epfl.ch)
+		Laboratory of Robotics Systems (http://lsro.epfl.ch)
+		EPFL, Lausanne (http://www.epfl.ch)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -35,10 +43,25 @@
 #include <QtGui>
 #include <QtDebug>
 
+static void initTexturesResources()
+{
+	Q_INIT_RESOURCE(vrcs_textures);
+}
 
-//#define SIMPLIFIED_EPUCK
+//! Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
+template<typename Derived, typename Base>
+inline Derived polymorphic_downcast(Base base)
+{
+	Derived derived = dynamic_cast<Derived>(base);
+	assert(derived);
+	return derived;
+}
+
+
+#define SIMPLIFIED_EPUCK
 
 // Definition of the aseba glue
+
 
 namespace Enki
 {
@@ -55,19 +78,33 @@ namespace Enki
 	#define EPUCK_FEEDER_INITIAL_ENERGY		10
 	#define EPUCK_FEEDER_THRESHOLD_HIDE		2
 	#define EPUCK_FEEDER_THRESHOLD_SHOW		4
-	#define EPUCK_FEEDER_RADIUS				6
-	#define EPUCK_FEEDER_RANGE				12
+	#define EPUCK_FEEDER_RADIUS				5
+	#define EPUCK_FEEDER_RADIUS_DEAD		6
+	#define EPUCK_FEEDER_RANGE				10
+	
 	#define EPUCK_FEEDER_COLOR_ACTIVE		Color::blue
 	#define EPUCK_FEEDER_COLOR_INACTIVE		Color::red
+	#define EPUCK_FEEDER_COLOR_DEAD			Color::gray
+	
 	#define EPUCK_FEEDER_D_ENERGY			4
 	#define EPUCK_FEEDER_RECHARGE_RATE		0.5
 	#define EPUCK_FEEDER_MAX_ENERGY			100
+	
+	#define EPUCK_FEEDER_LIFE_SPAN			60
+	#define EPUCK_FEEDER_DEATH_SPAN			10
 	
 	#define EPUCK_INITIAL_ENERGY			10
 	#define EPUCK_ENERGY_CONSUMPTION_RATE	1
 	
 	#define DEATH_ANIMATION_STEPS			30
 	#define PORT_BASE						ASEBA_DEFAULT_PORT
+	
+	extern GLint GenFeederBase();
+	extern GLint GenFeederCharge0();
+	extern GLint GenFeederCharge1();
+	extern GLint GenFeederCharge2();
+	extern GLint GenFeederCharge3();
+	extern GLint GenFeederRing();
 	
 	class FeedableEPuck: public EPuck
 	{
@@ -303,34 +340,62 @@ namespace Enki
 	{
 	public:
 		double energy;
+		double age;
+		bool alive;
 
 	public :
-		EPuckFeeding(Robot *owner) : energy(EPUCK_FEEDER_INITIAL_ENERGY)
+		EPuckFeeding(Robot *owner, double age) : energy(EPUCK_FEEDER_INITIAL_ENERGY), age(age)
 		{
 			r = EPUCK_FEEDER_RANGE;
 			this->owner = owner;
+			alive = true;
 		}
 		
 		void objectStep (double dt, PhysicalObject *po, World *w)
 		{
-			FeedableEPuck *epuck = dynamic_cast<FeedableEPuck *>(po);
-			if (epuck && energy > 0)
+			if (alive)
 			{
-				double dEnergy = dt * EPUCK_FEEDER_D_ENERGY;
-				epuck->energy += dEnergy;
-				energy -= dEnergy;
-				if (energy < EPUCK_FEEDER_THRESHOLD_HIDE)
-					owner->color = EPUCK_FEEDER_COLOR_INACTIVE;
+				FeedableEPuck *epuck = dynamic_cast<FeedableEPuck *>(po);
+				if (epuck && energy > 0)
+				{
+					double dEnergy = dt * EPUCK_FEEDER_D_ENERGY;
+					epuck->energy += dEnergy;
+					energy -= dEnergy;
+					if (energy < EPUCK_FEEDER_THRESHOLD_HIDE)
+						owner->color = EPUCK_FEEDER_COLOR_INACTIVE;
+				}
 			}
 		}
 		
 		void finalize(double dt)
 		{
-			if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy+dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
-				owner->color = EPUCK_FEEDER_COLOR_ACTIVE;
-			energy += EPUCK_FEEDER_RECHARGE_RATE * dt;
-			if (energy > EPUCK_FEEDER_MAX_ENERGY)
-				energy = EPUCK_FEEDER_MAX_ENERGY;
+			age += dt;
+			if (alive)
+			{
+				if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy+dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
+					owner->color = EPUCK_FEEDER_COLOR_ACTIVE;
+				energy += EPUCK_FEEDER_RECHARGE_RATE * dt;
+				if (energy > EPUCK_FEEDER_MAX_ENERGY)
+					energy = EPUCK_FEEDER_MAX_ENERGY;
+				
+				if (age > EPUCK_FEEDER_LIFE_SPAN)
+				{
+					alive = false;
+					age = 0;
+					owner->color = EPUCK_FEEDER_COLOR_DEAD;
+					owner->r = EPUCK_FEEDER_RADIUS_DEAD;
+				}
+			}
+			else
+			{
+				if (age > EPUCK_FEEDER_DEATH_SPAN)
+				{
+					alive = true;
+					age = 0;
+					owner->color = EPUCK_FEEDER_COLOR_ACTIVE;
+					owner->r = EPUCK_FEEDER_RADIUS;
+				}
+			}
 		}
 	};
 	
@@ -340,13 +405,189 @@ namespace Enki
 		EPuckFeeding feeding;
 	
 	public:
-		EPuckFeeder() : feeding(this)
+		EPuckFeeder(double age) : feeding(this, age)
 		{
 			r = EPUCK_FEEDER_RADIUS;
 			height = 5;
 			mass = -1;
 			addLocalInteraction(&feeding);
-			//color = EPUCK_FEEDER_COLOR_ACTIVE;
+			color = EPUCK_FEEDER_COLOR_ACTIVE;
+		}
+	};
+	
+	class FeederModel : public ViewerWidget::CustomRobotModel
+	{
+	public:
+		FeederModel(ViewerWidget* viewer)
+		{
+			textures.resize(2);
+			textures[0] = viewer->bindTexture(QPixmap(QString(":/textures/feeder.png")), GL_TEXTURE_2D);
+			textures[1] = viewer->bindTexture(QPixmap(QString(":/textures/feederr.png")), GL_TEXTURE_2D, GL_LUMINANCE8);
+			lists.resize(6);
+			lists[0] = GenFeederBase();
+			lists[1] = GenFeederCharge0();
+			lists[2] = GenFeederCharge1();
+			lists[3] = GenFeederCharge2();
+			lists[4] = GenFeederCharge3();
+			lists[5] = GenFeederRing();
+		}
+		
+		void cleanup(ViewerWidget* viewer)
+		{
+			for (int i = 0; i < textures.size(); i++)
+				viewer->deleteTexture(textures[i]);
+			for (int i = 0; i < lists.size(); i++)
+				glDeleteLists(lists[i], 1);
+		}
+		
+		virtual void draw(PhysicalObject* object) const
+		{
+			EPuckFeeder* feeder = polymorphic_downcast<EPuckFeeder*>(object);
+			double age = feeder->feeding.age;
+			bool alive = feeder->feeding.alive;
+			
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, textures[0]);
+			
+			glPushMatrix();
+			double disp;
+			if (age < M_PI/2)
+			{
+				//glTranslated(0, 0, -0.2);
+				if (alive)
+					disp = -1 + sin(age);
+				else
+					disp = -sin(age);
+			}
+			else
+			{
+				if (alive)
+					disp = 0;
+				else
+					disp = -1;
+			}
+			
+			glTranslated(0, 0, 4.3*disp-0.2);
+			
+			// body
+			glColor3d(1, 1, 1);
+			glCallList(lists[0]);
+			
+			// ring
+			glColor3d(0.6+object->color.components[0]-0.3*object->color.components[1]-0.3*object->color.components[2], 0.6+object->color.components[1]-0.3*object->color.components[0]-0.3*object->color.components[2], 0.6+object->color.components[2]-0.3*object->color.components[0]-0.3*object->color.components[1]);
+			glCallList(lists[5]);
+			
+			// food
+			glColor3d(0.3, 0.3, 1);
+			int foodAmount = (int)((feeder->feeding.energy * 5) / (EPUCK_FEEDER_MAX_ENERGY + 0.001));
+			assert(foodAmount <= 4);
+			for (int i = 0; i < foodAmount; i++)
+				glCallList(lists[1+i]);
+			
+			glPopMatrix();
+			
+			// shadow
+			glColor3d(1, 1, 1);
+			glBindTexture(GL_TEXTURE_2D, textures[1]);
+			glDisable(GL_LIGHTING);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+			
+			// bottom shadow
+			glPushMatrix();
+			// disable writing of z-buffer
+			glDepthMask( GL_FALSE );
+			glTranslated(0, 0, 0.001);
+			//glScaled(1-disp*0.1, 1-disp*0.1, 1);
+			glBegin(GL_QUADS);
+			glTexCoord2f(1.f, 0.f);
+			glVertex2f(-7.5f, -7.5f);
+			glTexCoord2f(1.f, 1.f);
+			glVertex2f(7.5f, -7.5f);
+			glTexCoord2f(0.f, 1.f);
+			glVertex2f(7.5f, 7.5f);
+			glTexCoord2f(0.f, 0.f);
+			glVertex2f(-7.5f, 7.5f);
+			glEnd();
+			glDepthMask( GL_TRUE );
+			glPopMatrix();
+			
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable(GL_BLEND);
+			glEnable(GL_LIGHTING);
+			
+			glDisable(GL_TEXTURE_2D);
+			
+			/*glCallList(lists[1]);
+			
+			//glColor3d(1-object->color.components[0], 1+object->color.components[1], 1+object->color.components[2]);
+			glColor3d(0.6+object->color.components[0]-0.3*object->color.components[1]-0.3*object->color.components[2], 0.6+object->color.components[1]-0.3*object->color.components[0]-0.3*object->color.components[2], 0.6+object->color.components[2]-0.3*object->color.components[0]-0.3*object->color.components[1]);
+			glCallList(lists[2]);
+			
+			glColor3d(1, 1, 1);
+			
+			// wheels
+			glPushMatrix();
+			glRotated((fmod(dw->leftOdometry, wheelCirc) * 360) / wheelCirc, 0, 1, 0);
+			glCallList(lists[3]);
+			glPopMatrix();
+			
+			glPushMatrix();
+			glRotated((fmod(dw->rightOdometry, wheelCirc) * 360) / wheelCirc, 0, 1, 0);
+			glCallList(lists[4]);
+			glPopMatrix();
+			
+			// shadow
+			glBindTexture(GL_TEXTURE_2D, textures[1]);
+			glDisable(GL_LIGHTING);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+			
+			// bottom shadow
+			glPushMatrix();
+			// disable writing of z-buffer
+			glDepthMask( GL_FALSE );
+			glTranslated(0, 0, -wheelRadius+0.01);
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.49f, 0.01f);
+			glVertex2f(-5.f, -5.f);
+			glTexCoord2f(0.49f, 0.49f);
+			glVertex2f(5.f, -5.f);
+			glTexCoord2f(0.01f, 0.49f);
+			glVertex2f(5.f, 5.f);
+			glTexCoord2f(0.01f, 0.01f);
+			glVertex2f(-5.f, 5.f);
+			glEnd();
+			glDepthMask( GL_TRUE );
+			glPopMatrix();
+			
+			// wheel shadow
+			glPushMatrix();
+			glScaled(radiosityScale, radiosityScale, radiosityScale);
+			glTranslated(0, -0.025, 0);
+			glCallList(lists[3]);
+			glPopMatrix();
+			
+			glPushMatrix();
+			glScaled(radiosityScale, radiosityScale, radiosityScale);
+			glTranslated(0, 0.025, 0);
+			glCallList(lists[4]);
+			glPopMatrix();
+			
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable(GL_BLEND);
+			glEnable(GL_LIGHTING);
+			
+			glDisable(GL_TEXTURE_2D);*/
+		}
+		
+		virtual void drawSpecial(PhysicalObject* object, int param) const
+		{
+			/*glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+			glDisable(GL_TEXTURE_2D);
+			glCallList(lists[0]);
+			glDisable(GL_BLEND);*/
 		}
 	};
 
@@ -356,7 +597,10 @@ namespace Enki
 		GLuint mobotsLogo;
 		
 	public:
-		VRCSViewer(World* world) : ViewerWidget(world) { }
+		VRCSViewer(World* world) : ViewerWidget(world)
+		{
+			initTexturesResources();
+		}
 		
 	protected:
 		void drawQuad2D(double x, double y, double w, double ar)
@@ -381,6 +625,13 @@ namespace Enki
 			mobotsLogo = bindTexture(QPixmap(QString("mobots.png")), GL_TEXTURE_2D);
 		}
 		
+		void renderObjectsTypesHook()
+		{
+			// render vrcs specific static types
+			managedObjects[&typeid(EPuckFeeder)] = new FeederModel(this);
+			managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
+		}
+		
 		void displayObjectHook(PhysicalObject *object)
 		{
 			FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
@@ -395,6 +646,9 @@ namespace Enki
 				glTranslated(0, 0, 2. * dist);
 				userData->drawSpecial(object);
 			}
+			/*FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
+			{
+			}*/
 		}
 		
 		void sceneCompletedHook()
@@ -426,7 +680,7 @@ namespace Enki
 				pos += 22;
 			}
 			
-			// display logos
+			/*// display logos
 			glDisable(GL_DEPTH_TEST);
 			
 			glMatrixMode(GL_PROJECTION);
@@ -447,7 +701,7 @@ namespace Enki
 			glEnable(GL_CULL_FACE);
 			glDisable(GL_TEXTURE_2D);
 			
-			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);*/
 		}
 	};
 }
@@ -639,22 +893,22 @@ int main(int argc, char *argv[])
 	// Add feeders
 	Enki::EPuckFeeder* feeders[4];
 	
-	feeders[0] = new Enki::EPuckFeeder;
+	feeders[0] = new Enki::EPuckFeeder(0);
 	feeders[0]->pos.x = 40;
 	feeders[0]->pos.y = 40;
 	world.addObject(feeders[0]);
 	
-	feeders[1] = new Enki::EPuckFeeder;
+	feeders[1] = new Enki::EPuckFeeder(15);
 	feeders[1]->pos.x = 100;
 	feeders[1]->pos.y = 40;
 	world.addObject(feeders[1]);
 	
-	feeders[2] = new Enki::EPuckFeeder;
+	feeders[2] = new Enki::EPuckFeeder(45);
 	feeders[2]->pos.x = 40;
 	feeders[2]->pos.y = 100;
 	world.addObject(feeders[2]);
 	
-	feeders[3] = new Enki::EPuckFeeder;
+	feeders[3] = new Enki::EPuckFeeder(30);
 	feeders[3]->pos.x = 100;
 	feeders[3]->pos.y = 100;
 	world.addObject(feeders[3]);

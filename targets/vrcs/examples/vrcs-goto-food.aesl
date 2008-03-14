@@ -1,0 +1,37 @@
+<!DOCTYPE aesl-source>
+<network>
+    <node name="e-puck" >leftSpeed = 100
+rightSpeed = 100
+
+ontimer
+
+var maxBlueVal = 0
+var maxBluePos = 0
+var i = 0
+while i &lt; 3 do
+        if camB[i] > maxBlueVal then
+                maxBluePos = i
+                maxBlueVal = camB[i]
+        end
+        i = i + 1
+end
+
+if maxBluePos == 0 then
+        leftSpeed = 0
+        rightSpeed = 13
+else
+        if maxBluePos == 1 then
+                leftSpeed = 10
+                rightSpeed = 10
+        else
+                leftSpeed = 13
+                rightSpeed = 0
+        end
+end
+
+if maxBlueVal &lt;= 50 then
+        leftSpeed = -10
+        rightSpeed = -5
+end
+</node>
+</network>
