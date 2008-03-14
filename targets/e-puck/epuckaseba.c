@@ -42,8 +42,8 @@
 #include <string.h>
 
 #define ASEBA_ASSERT
-#include "../../vm/vm.h"
-#include "../../common/consts.h"
+#include "vm.h"
+#include "consts.h"
 
 #define vmBytecodeSize 256
 #define vmVariablesSize (sizeof(struct EPuckVariables) / sizeof(sint16))
@@ -51,6 +51,8 @@
 #define argsSize 32
 
 unsigned int cam_data[60];
+
+extern int prox_done;
 
 // we receive the data as big endian and read them as little, so we have to acces the bit the right way
 #define CAM_RED(pixel) ( 3 * (((pixel) >> 3) & 0x1f))
@@ -64,6 +66,10 @@ unsigned int cam_data[60];
 // data
 struct EPuckVariables
 {
+	// NodeID
+	sint16 id;
+	// source
+	sint16 source;
 	// args
 	sint16 args[argsSize];
 	// motor
@@ -92,7 +98,6 @@ AsebaVMState vmState;
 void updateRobotVariables()
 {
 	unsigned i;
-	//LED1 = 1;
 	// motor
 	static int leftSpeed = 0, rightSpeed = 0;
 	if (ePuckVariables.leftSpeed != leftSpeed)
@@ -125,7 +130,6 @@ void updateRobotVariables()
 		}
 		e_po3030k_launch_capture((char *)cam_data);
 	}
-	//LED1 = 0;
 }
 
 void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
@@ -137,7 +141,6 @@ void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 void initRobot()
 {
 	// init stuff
-	LED0 = 1;
 	e_init_port();
 	e_start_agendas_processing();
 	e_init_motors();
@@ -154,19 +157,22 @@ void initRobot()
 		RCONbits.POR = 0;
 		RESET();
 	}
-	LED0 = 0;
 }
 
 void initAseba()
 {
 	// VM
+	int selector = SELECTOR0 | (SELECTOR1 << 1) | (SELECTOR2 << 2);
 	vmState.bytecodeSize = vmBytecodeSize;
 	vmState.bytecode = vmBytecode;
 	vmState.variablesSize = vmVariablesSize;
 	vmState.variables = (sint16 *)&ePuckVariables;
 	vmState.stackSize = vmStackSize;
 	vmState.stack = vmStack;
-	AsebaVMInit(&vmState, 1);
+	ePuckVariables.id = selector + 1;
+	AsebaVMInit(&vmState, selector + 1);
+	e_led_clear();
+	e_set_led(selector,1);
 }
 
 int uartIsChar()
@@ -237,18 +243,24 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 
 void AsebaSendDescription(AsebaVMState *vm)
 {
-	uartSendUInt16(94);
+	char name[] = "e-puck 0";
+	uartSendUInt16(110);
 	uartSendUInt16(vm->nodeId);
 	uartSendUInt16(ASEBA_MESSAGE_DESCRIPTION);
 	
-	uartSendString("e-puck");			// 7
+	name[7] += vm->nodeId;
+	uartSendString(name);				// 9
 	
 	uartSendUInt16(vmBytecodeSize);		// 2
 	uartSendUInt16(vmStackSize);		// 2
 	uartSendUInt16(vmVariablesSize);	// 2
 	
-	uartSendUInt16(9);					// 2
-	
+	uartSendUInt16(11);					// 2
+
+	uartSendUInt16(1);					// 2
+	uartSendString("id");				// 3
+	uartSendUInt16(1);					// 2
+	uartSendString("source");			// 7
 	uartSendUInt16(argsSize);			// 2
 	uartSendString("args");				// 5
 	uartSendUInt16(1);					// 2
@@ -280,33 +292,51 @@ void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 
 void AsebaDebugHandleCommands()
 {
+	BODY_LED = 1;
 	if (uartIsChar())
 	{
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
-		uint16* data;
 		unsigned i = 0;
+
+		ePuckVariables.source = source;
 		
 		// read data into the right place
 		if (type == ASEBA_MESSAGE_SET_BYTECODE)
 		{
-			data = vmState.bytecode;
-			// the maximum packet size we have is the whole bytecode + the dest id
-			while (i < (vmBytecodeSize + 1) && i < len / 2)
+			uint16 dest = uartGetUInt16();
+			i++;
+			if (dest == vmState.nodeId)
 			{
-				data[i] = uartGetUInt16();
-				i++;
+				vmBytecode[0] = dest;
+				// the maximum packet size we have is the whole bytecode + the dest id
+				while (i < (vmBytecodeSize + 1) && i < len / 2)
+				{
+					vmBytecode[i] = uartGetUInt16();
+					i++;
+				}
+				AsebaVMDebugMessage(&vmState, type, vmBytecode, len / 2);
 			}
 		}
-		else
+		else if (type < 0x8000)
 		{
-			data = (uint16*)ePuckVariables.args;
 			while (i < argsSize && i < len / 2)
 			{
-				data[i] = uartGetUInt16();
+				ePuckVariables.args[i] = uartGetUInt16();
 				i++;
 			}
+			AsebaVMSetupEvent(&vmState, type);
+		}
+		else if (type >= 0xA000)
+		{
+			uint16 cmdArgs[len / 2];
+			while (i < len / 2)
+			{
+				cmdArgs[i] = uartGetUInt16();
+				i++;
+			}
+			AsebaVMDebugMessage(&vmState, type, cmdArgs, len / 2);
 		}
 		
 		// drop excessive data
@@ -314,39 +344,37 @@ void AsebaDebugHandleCommands()
 		{
 			uartGetUInt16();
 			i++;
-			// TODO: blink a led
-		}
-		
-		if (type < 0x8000)
-		{
-			AsebaVMSetupEvent(&vmState, type);
-		}
-		else if (type >= 0xA000)
-		{
-			AsebaVMDebugMessage(&vmState, type, data, len / 2);
 		}
 	}
+	BODY_LED = 0;
 }
 
 
 int main()
-{
-	initRobot();
-	initAseba();
+{	
 	int i;
-	LED5 = 1;
+	initRobot();
+	
+
+	do {
+		initAseba();
+	} while(!uartIsChar());
+
 	for (i = 0; i < 14; i++)
 	{
 		uartGetUInt8();
 	}
-	LED5 = 0;
 	while (1)
 	{
 		updateRobotVariables();
 		AsebaDebugHandleCommands();
-		AsebaVMRun(&vmState, 100);
-		if (!AsebaVMIsExecutingThread(&vmState))
+		AsebaVMRun(&vmState, 1000);
+		if (!AsebaVMIsExecutingThread(&vmState) && prox_done)
+		{
+			prox_done = 0;
+			ePuckVariables.source = vmState.nodeId;
 			AsebaVMSetupEvent(&vmState, ASEBA_EVENT_PERIODIC);
+		}
 	}
 	
 	return 0;

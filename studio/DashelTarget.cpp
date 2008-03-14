@@ -355,7 +355,7 @@ namespace Aseba
 	void DashelTarget::timerEvent(QTimerEvent *event)
 	{
 		Q_UNUSED(event);
-		step(0);
+		while (step(0)) { }
 	}
 	
 	void DashelTarget::incomingData(Stream *stream)
