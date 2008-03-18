@@ -30,7 +30,7 @@
 #include <QString>
 #include <QDialog>
 #include <map>
-#include <dashel.h>
+#include <dashel/dashel.h>
 
 class QPushButton;
 class QGroupBox;

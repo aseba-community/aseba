@@ -27,7 +27,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-#include <dashel.h>
+#include <dashel/dashel.h>
 
 using namespace std;
 

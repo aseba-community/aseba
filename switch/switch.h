@@ -24,7 +24,7 @@
 #ifndef ASEBA_SWITCH
 #define ASEBA_SWITCH
 
-#include <dashel.h>
+#include <dashel/dashel.h>
 
 namespace Aseba
 {
