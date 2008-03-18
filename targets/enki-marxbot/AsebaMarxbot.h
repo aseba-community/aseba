@@ -30,7 +30,7 @@
 #endif
 #include "../../vm/vm.h"
 #include "../../common/consts.h"
-#include <dashel.h>
+#include <dashel/dashel.h>
 #include <deque>
 
 /*!	\file AsebaMarxbot.h
