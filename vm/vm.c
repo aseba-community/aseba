@@ -20,8 +20,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "vm.h"
 #include "../common/consts.h"
+#include "../common/types.h"
+#include "vm.h"
 #include <string.h>
 
 /**
@@ -198,8 +199,8 @@ void AsebaVMStep(AsebaVMState *vm)
 			#ifndef ASEBA_NO_ARRAY_CHECK
 			if (variableIndex >= vm->variablesSize)
 			{
-				AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
 				uint16 buffer[2];
+				AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
 				buffer[0] = vm->pc;
 				buffer[1] = variableIndex;
 				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, sizeof(buffer));

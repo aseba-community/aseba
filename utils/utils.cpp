@@ -22,7 +22,7 @@
 */
 
 #include <cstdlib>
-#include <unistd.h>
+#include <time.h>
 #include <errno.h>
 #include "utils.h"
 
