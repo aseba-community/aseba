@@ -33,7 +33,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class TargetDescription;
+	struct TargetDescription;
 	
 	//! The interface to an aseba network. Used to interact with the nodes
 	class Target: public QObject

@@ -33,6 +33,10 @@
 
 #include <DashelTarget.moc>
 
+#ifdef WIN32 // for Sleep
+#include <windows.h>
+#endif
+
 namespace Aseba
 {
 	using std::copy;
@@ -133,6 +137,7 @@ namespace Aseba
 		else
 		{
 			assert(false);
+			return "";
 		}
 	}
 	
