@@ -31,7 +31,7 @@
 #include <QInputDialog>
 #include <QtGui>
 
-#include "DashelTarget.moc"
+#include <DashelTarget.moc>
 
 namespace Aseba
 {

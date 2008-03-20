@@ -19,7 +19,7 @@ if (QT4_FOUND)
 	
 	qt4_add_resources(resfiles asebastudio.qrc)
 	
-	include_directories (${QT_INCLUDE_DIR} ${QT_QTXML_INCLUDE_DIR})
+	include_directories (${QT_INCLUDE_DIR} ${QT_QTXML_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/studio)
 	
 	add_executable(asebastudio ${studio_SRCS} ${resfiles})
 	

@@ -36,7 +36,7 @@
 #include <cassert>
 #include <QTabWidget>
 
-#include "MainWindow.moc"
+#include <MainWindow.moc>
 
 using std::copy;
 

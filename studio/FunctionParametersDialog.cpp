@@ -25,7 +25,7 @@
 #include "CustomDelegate.h"
 #include <QtGui>
 
-#include "FunctionParametersDialog.moc"
+#include <FunctionParametersDialog.moc>
 
 namespace Aseba
 {

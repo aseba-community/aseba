@@ -23,7 +23,7 @@
 
 #include "Target.h"
 
-#include "Target.moc"
+#include <Target.moc>
 
 namespace Aseba
 {

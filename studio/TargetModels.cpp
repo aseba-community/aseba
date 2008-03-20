@@ -25,7 +25,7 @@
 #include <QtDebug>
 #include <QtGui>
 
-#include "TargetModels.moc"
+#include <TargetModels.moc>
 
 namespace Aseba
 {

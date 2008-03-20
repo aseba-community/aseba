@@ -756,7 +756,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		uint16 size;
 		sint16 ssize;
 		
-		size = 7 + (8 + 87) + 2;
+		size = 7 + (8 + 89) + 2;
 		stream->write(&size, 2);
 		stream->write(&vm->nodeId, 2);
 		uint16 id = ASEBA_MESSAGE_DESCRIPTION;
@@ -773,7 +773,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		size = 10;
 		stream->write(&size, 2);
 		
-		// 80
+		// 82
 		
 		// 12
 		size = 1;
@@ -800,10 +800,10 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		stream->write(&size, 2);
 		AsebaWriteString(stream, "colorB");
 		
-		// 5
+		// 7
 		size = 8;
 		stream->write(&size, 2);
-		AsebaWriteString(stream, "ir");
+		AsebaWriteString(stream, "prox");
 		
 		// 7
 		#ifdef SIMPLIFIED_EPUCK

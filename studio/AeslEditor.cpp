@@ -24,7 +24,7 @@
 #include "AeslEditor.h"
 #include <QtGui>
 
-#include "AeslEditor.moc"
+#include <AeslEditor.moc>
 
 namespace Aseba
 {

@@ -24,7 +24,7 @@
 #include "CustomDelegate.h"
 #include <QtGui>
 
-#include "CustomDelegate.moc"
+#include <CustomDelegate.moc>
 
 namespace Aseba
 {

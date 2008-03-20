@@ -23,7 +23,7 @@
 
 #include "ClickableLabel.h"
 
-#include "ClickableLabel.moc"
+#include <ClickableLabel.moc>
 
 namespace Aseba
 {
