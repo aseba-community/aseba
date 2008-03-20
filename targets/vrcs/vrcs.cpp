@@ -252,7 +252,10 @@ namespace Enki
 				// clear breakpoints
 				vm.breakpointsCount = 0;
 			}
-			qDebug() << this << " : Client has disconnected.";
+			if (abnormal)
+				qDebug() << this << " : Client has disconnected unexpectedly.";
+			else
+				qDebug() << this << " : Client has disconnected properly.";
 		}
 		
 		double toDoubleClamp(sint16 val, double mul, double min, double max)

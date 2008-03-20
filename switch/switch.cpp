@@ -76,7 +76,7 @@ namespace Aseba
 		
 		if (dump)
 		{
-			std::cout << "Read on stream ";
+			std::cout << "Read " << len + 4 << " on stream " << stream << " : ";
 			for(unsigned int i = 0; i < readbuff.size(); i++)
 				std::cout << (unsigned)readbuff[i] << " ";
 			std::cout << std::endl;
@@ -95,6 +95,7 @@ namespace Aseba
 			catch (DashelException e)
 			{
 				// if this stream has a problem, ignore it for now, and let Hub call connectionClosed later.
+				std::cerr << "error while writing" << std::endl;
 			}
 		}
 	}

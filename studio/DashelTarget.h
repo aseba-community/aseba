@@ -143,6 +143,7 @@ namespace Aseba
 		NodesMap nodes;
 		Dashel::Stream* stream;
 		int netTimer;
+		bool quitting;
 	};
 	
 	/*@}*/

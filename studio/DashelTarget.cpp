@@ -215,12 +215,20 @@ namespace Aseba
 		GetDescription().serialize(stream);
 		stream->flush();
 		netTimer = startTimer(20);
+		quitting = false;
 	}
 	
 	DashelTarget::~DashelTarget()
 	{
+		quitting = true;
 		killTimer(netTimer);
 		disconnect();
+		#ifdef WIN32
+		Sleep(200);
+		#else
+		usleep(200000);
+		#endif
+		step(0);
 	}
 		
 	void DashelTarget::disconnect()
@@ -364,18 +372,20 @@ namespace Aseba
 		message->dump(std::cout);
 		std::cout << std::endl;
 		
-		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
-		if (messageHandler == messagesHandlersMap.end())
+		if (!quitting)
 		{
-			UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
-			if (userMessage)
-				emit userEvent(userMessage->type, userMessage->data);
+			MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
+			if (messageHandler == messagesHandlersMap.end())
+			{
+				UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+				if (userMessage)
+					emit userEvent(userMessage->type, userMessage->data);
+			}
+			else
+			{
+				(this->*(messageHandler->second))(message);
+			}
 		}
-		else
-		{
-			(this->*(messageHandler->second))(message);
-		}
-		
 		delete message;
 	}
 	
