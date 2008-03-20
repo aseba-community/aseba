@@ -138,7 +138,8 @@ namespace Aseba
 		stream->write(&len, 2);
 		stream->write(&source, 2);
 		stream->write(&type, 2);
-		stream->write(&rawData[0], rawData.size());
+		if(rawData.size())
+			stream->write(&rawData[0], rawData.size());
 	}
 	
 	Message *Message::receive(Stream* stream)
@@ -156,7 +157,8 @@ namespace Aseba
 		message->source = source;
 		message->type = type;
 		message->rawData.resize(len);
-		stream->read(&message->rawData[0], len);
+		if (len)
+			stream->read(&message->rawData[0], len);
 		message->readPos = 0;
 		
 		// deserialize it
