@@ -476,7 +476,7 @@ namespace Aseba
 		
 		std::auto_ptr<Node> node(parseUnaryExpression());
 		
-		while (isOneOf(opTypes, 2))
+		while (isOneOf(opTypes, 3))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
