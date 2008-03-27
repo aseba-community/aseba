@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
 	
 	Aseba::MainWindow window;
 	window.show();
-	//window.loadDefaultFile();
 	return app.exec();
 }
 

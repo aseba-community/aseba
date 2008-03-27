@@ -133,12 +133,12 @@ namespace Aseba
 	public:
 		MainWindow(QWidget *parent = 0);
 		~MainWindow();
-		void loadDefaultFile();
-	
+
 	private slots:
 		void about();
 		void newFile();
 		void openFile(const QString &path = QString());
+		void openRecentFile();
 		void save();
 		void saveFile(const QString &previousFileName = QString());
 		
@@ -182,7 +182,8 @@ namespace Aseba
 		void rebuildEventsNames();
 		void recompileAll();
 		
-		// initialisation code
+		// gui initialisation code
+		void regenerateOpenRecentMenu();
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
@@ -205,6 +206,9 @@ namespace Aseba
 		QAction* resetAllAct;
 		QAction* runAllAct;
 		QAction* pauseAllAct;
+		
+		// open recent actions
+		QMenu *openRecentMenu;
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;

@@ -16,7 +16,7 @@ while i &lt; 60 do
 	i = i + 1
 end
 meanV = meanV / 60
-var threshold = (meanV + 3 * minV) / 4
+var threshold = (3 * meanV + minV) / 4
 
 var minPos = 0
 var minCount = 0
@@ -43,6 +43,9 @@ if minCount > 0 then
 	deltaDist = 10 - (lastBlack - firstBlack)
 end
 
-leftSpeed = deltaPos * 4 + deltaDist
-rightSpeed = -deltaPos * 4 + deltaDist</node>
+if deltaDist > 0 then
+	deltaDist = deltaDist * 2
+end
+leftSpeed = deltaPos * 4 + deltaDist * 8
+rightSpeed = -deltaPos * 4 + deltaDist * 8</node>
 </network>

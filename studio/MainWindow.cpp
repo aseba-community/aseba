@@ -615,19 +615,19 @@ namespace Aseba
 		delete target;
 	}
 	
-	void MainWindow::loadDefaultFile()
-	{
-		/*QFile file("testscripts/default.aesl");
-		if (file.open(QFile::ReadOnly | QFile::Text))
-			editor->setPlainText(file.readAll());*/
-	}
+	#ifndef SVN_REV
+	#define SVN_REV "unknown, please configure your build system to set SVN_REV correctly"
+	#endif
 	
 	void MainWindow::about()
 	{
 		QMessageBox::about(this, tr("About Aseba Studio"),
 					tr(	"<p>Aseba pre-release</p>" \
+						"<ul><li>Aseba build " \
+						SVN_REV \
+						"</li><li>Dashel build %0</li></ul>" \
 						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a></p>" \
-						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>"));
+						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>").arg(Dashel::getSVNRevision().c_str()));
 	}
 	
 	void MainWindow::newFile()
@@ -685,20 +685,42 @@ namespace Aseba
 				}
 				domNode = domNode.nextSibling();
 			}
+			
+			// check if there was some matching problem
 			if (noNodeCount)
 				QMessageBox::warning(this,
 					tr("Loading"),
 					tr("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount)
 				);
+			
+			// update recent files
+			QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+			QStringList recentFiles = settings.value("recent files").toStringList();
+			if (recentFiles.contains(fileName))
+				recentFiles.removeAt(recentFiles.indexOf(fileName));
+			recentFiles.push_front(fileName);
+			const int maxRecentFiles = 8;
+			if (recentFiles.size() > maxRecentFiles)
+				recentFiles.pop_back();
+			settings.setValue("recent files", recentFiles);
+			regenerateOpenRecentMenu();
 		}
 		else
 			QMessageBox::warning(this,
 				tr("Loading"),
-				tr("Error in source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)
+				tr("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)
 			);
 		file.close();
 		
 		recompileAll();
+		
+		
+	}
+	
+	void MainWindow::openRecentFile()
+	{
+		QAction* entry = polymorphic_downcast<QAction*>(sender());
+		openFile(entry->text());
 	}
 	
 	void MainWindow::save()
@@ -1239,6 +1261,17 @@ namespace Aseba
 		connect(target, SIGNAL(breakpointSetResult(unsigned, unsigned, bool)), SLOT(breakpointSetResult(unsigned, unsigned, bool)));
 	}
 	
+	void MainWindow::regenerateOpenRecentMenu()
+	{
+		openRecentMenu->clear();
+		
+		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QStringList recentFiles = settings.value("recent files").toStringList();
+		
+		for (int i = 0; i < recentFiles.size(); i++)
+			openRecentMenu->addAction(recentFiles.at(i), this, SLOT(openRecentFile()));
+	}
+	
 	void MainWindow::setupMenu()
 	{
 		// File menu
@@ -1251,6 +1284,10 @@ namespace Aseba
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Open..."), 
 							this, SLOT(openFile()),
 							QKeySequence(tr("Ctrl+O", "File|Open")));
+		openRecentMenu = new QMenu(tr("Open &Recent"));
+		regenerateOpenRecentMenu();
+		fileMenu->addMenu(openRecentMenu)->setIcon(QIcon(":/images/fileopen.png"));
+		
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
 							this, SLOT(saveFile()));
 		fileMenu->addAction(QIcon(":/images/filesave.png"), tr("&Save..."),
