@@ -23,6 +23,7 @@
 
 #include "AsebaMarxbot.h"
 #include "../../common/consts.h"
+#include "../../vm/natives.h"
 #include <set>
 #include <map>
 #include <cassert>
@@ -39,6 +40,18 @@
 // map for aseba glue code
 typedef std::map<AsebaVMState*, Enki::AsebaMarxbot*>  VmSocketMap;
 static VmSocketMap asebaSocketMaps;
+
+static const unsigned nativeFunctionsCount = 2;
+static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
+{
+	AsebaNative_vecdot,
+	AsebaNative_vecstat
+};
+static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+{
+	&AsebaNativeDescription_vecdot,
+	&AsebaNativeDescription_vecstat
+};
 
 //int stepCounter = 0;
 
@@ -80,20 +93,40 @@ void AsebaWriteString(Dashel::Stream* stream, const char *s)
 	stream->write(s, len);
 }
 
+void AsebaWriteNativeFunctionDescription(Dashel::Stream* stream, const AsebaNativeFunctionDescription* description)
+{
+	AsebaWriteString(stream, description->name);
+	AsebaWriteString(stream, description->doc);
+	stream->write(description->argumentCount);
+	for (unsigned i = 0; i < description->argumentCount; i++)
+	{
+		stream->write(description->arguments[i].size);
+		AsebaWriteString(stream, description->arguments[i].name);
+	}
+}
+
 extern "C" void AsebaSendDescription(AsebaVMState *vm)
 {
 	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
 	assert(stream);
+	
+	// compute the size of all native functions inside description
+	unsigned nativeFunctionSizes = 2;
+	for (unsigned i = 0; i < nativeFunctionsCount; i++)
+	{
+		nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
+		std::cout << i << " : " << AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]) << "\n";
+	}
 	
 	// write sizes (basic + nodeName + variables)
 	uint16 size;
 	sint16 ssize;
 	switch (vm->nodeId)
 	{
-		case 1: size = 8 + 11 + (8 + 15) + 44; break;
-		case 2: size = 8 + 12 + (8 + 15) + 44; break;
-		case 3: size = 8 + 18 + (8 + 20) + 44; break;
-		case 4: size = 8 + 17 + (6 + 15) + 44; break;
+		case 1: size = 8 + 11 + (8 + 15) + nativeFunctionSizes; break;
+		case 2: size = 8 + 12 + (8 + 15) + nativeFunctionSizes; break;
+		case 3: size = 8 + 18 + (8 + 20) + nativeFunctionSizes; break;
+		case 4: size = 8 + 17 + (6 + 15) + nativeFunctionSizes; break;
 		default: assert(false); break;
 	}
 	stream->write(&size, 2);
@@ -180,24 +213,12 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	}
 	
 	// write native functions
-	size = 1;
+	size = nativeFunctionsCount;
 	stream->write(&size, 2);
 	
-	// mac (42 bytes)
-	AsebaWriteString(stream, "mac");
-	AsebaWriteString(stream, "MAC & RS");
-	size = 4;
-	stream->write(&size, 2);
-	ssize = -1;
-	stream->write(&ssize, 2);
-	AsebaWriteString(stream, "src1");
-	stream->write(&ssize, 2);
-	AsebaWriteString(stream, "src2");
-	ssize = 1;
-	stream->write(&ssize, 2);
-	AsebaWriteString(stream, "dest");	
-	stream->write(&ssize, 2);
-	AsebaWriteString(stream, "shift");
+	// write all native functions descriptions
+	for (unsigned i = 0; i < nativeFunctionsCount; i++)
+		AsebaWriteNativeFunctionDescription(stream, nativeFunctionsDescriptions[i]);
 	
 	stream->flush();
 }

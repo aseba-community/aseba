@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based middleware for distributed robot control
-	Copyright (C) 2006 - 2007:
+	Copyright (C) 2006 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
@@ -21,8 +21,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ASEBA_MCU_H
-#define __ASEBA_MCU_H
+#ifndef __ASEBA_VM_H
+#define __ASEBA_VM_H
 
 #ifdef __cplusplus
 extern "C" {
