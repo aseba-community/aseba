@@ -34,6 +34,7 @@
 #endif
 
 #include <../../vm/vm.h>
+#include "../../vm/natives.h"
 #include <../../common/consts.h>
 #include <dashel/dashel.h>
 #include <enki/PhysicalEngine.h>
@@ -71,6 +72,18 @@ namespace Enki
 // map for aseba glue code
 typedef QMap<AsebaVMState*, Enki::AsebaFeedableEPuck*>  VmEPuckMap;
 static VmEPuckMap asebaEPuckMap;
+
+static const unsigned nativeFunctionsCount = 2;
+static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
+{
+	AsebaNative_vecdot,
+	AsebaNative_vecstat
+};
+static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+{
+	&AsebaNativeDescription_vecdot,
+	&AsebaNativeDescription_vecstat
+};
 
 
 namespace Enki
@@ -749,17 +762,34 @@ void AsebaWriteString(Dashel::Stream* stream, const char *s)
 	stream->write(s, len);
 }
 
+void AsebaWriteNativeFunctionDescription(Dashel::Stream* stream, const AsebaNativeFunctionDescription* description)
+{
+	AsebaWriteString(stream, description->name);
+	AsebaWriteString(stream, description->doc);
+	stream->write(description->argumentCount);
+	for (unsigned i = 0; i < description->argumentCount; i++)
+	{
+		stream->write(description->arguments[i].size);
+		AsebaWriteString(stream, description->arguments[i].name);
+	}
+}
+
 extern "C" void AsebaSendDescription(AsebaVMState *vm)
 {
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
 	
 	if (stream)
 	{
+		// compute the size of all native functions inside description
+		unsigned nativeFunctionSizes = 0;
+		for (unsigned i = 0; i < nativeFunctionsCount; i++)
+			nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
+	
 		// write sizes (basic + nodeName + sizes + native functions)
 		uint16 size;
 		sint16 ssize;
 		
-		size = 7 + (8 + 89) + 2;
+		size = 7 + (8 + 89) + 2 + nativeFunctionSizes;
 		stream->write(&size, 2);
 		stream->write(&vm->nodeId, 2);
 		uint16 id = ASEBA_MESSAGE_DESCRIPTION;
@@ -841,8 +871,12 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		AsebaWriteString(stream, "energy");
 		
 		// write native functions
-		size = 0;
+		size = nativeFunctionsCount;
 		stream->write(&size, 2);
+		
+		// write all native functions descriptions
+		for (unsigned i = 0; i < nativeFunctionsCount; i++)
+			AsebaWriteNativeFunctionDescription(stream, nativeFunctionsDescriptions[i]);
 		
 		stream->flush();
 	}
@@ -850,8 +884,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	// no native functions
-	assert(false);
+	nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)

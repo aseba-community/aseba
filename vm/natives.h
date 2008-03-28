@@ -55,7 +55,7 @@ typedef struct
 	const char* name;	/*!< name of the function */
 	const char* doc;	/*!< documentation of the function */
 	uint16 argumentCount; /*!< amount of arguments to the function */
-	AsebaNativeFunctionArgumentDescription arguments[0];	/*!< arguments */
+	AsebaNativeFunctionArgumentDescription arguments[];	/*!< arguments */
 } AsebaNativeFunctionDescription;
 
 /*! Return the size of the description of a native function */

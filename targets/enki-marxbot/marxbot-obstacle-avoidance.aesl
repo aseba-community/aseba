@@ -31,9 +31,9 @@ ontimer
 var eventBuffer[2]
 
 var activation
-call mac(bumpers, vectorX, eventBuffer[0], 11)
-call mac(bumpers, vectorY, eventBuffer[1], 11)
-call mac(eventBuffer, eventBuffer, activation, 0)
+call vecdot(bumpers, vectorX, eventBuffer[0], 11)
+call vecdot(bumpers, vectorY, eventBuffer[1], 11)
+call vecdot(eventBuffer, eventBuffer, activation, 0)
 
 if activation > threshold then
 	emit ObstacleDetected eventBuffer

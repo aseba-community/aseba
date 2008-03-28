@@ -33,7 +33,6 @@
 /** \addtogroup vm */
 /*@{*/
 
-
 uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* description)
 {
 	uint16 size = 0;

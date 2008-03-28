@@ -111,12 +111,9 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	assert(stream);
 	
 	// compute the size of all native functions inside description
-	unsigned nativeFunctionSizes = 2;
+	unsigned nativeFunctionSizes = 0;
 	for (unsigned i = 0; i < nativeFunctionsCount; i++)
-	{
 		nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
-		std::cout << i << " : " << AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]) << "\n";
-	}
 	
 	// write sizes (basic + nodeName + variables)
 	uint16 size;
@@ -225,33 +222,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	switch (id)
-	{
-		case 0:
-		{
-			// variable pos
-			int src1 = vm->stack[0];
-			int src2 = vm->stack[1];
-			int dest = vm->stack[2];
-			int shift = vm->variables[vm->stack[3]];
-			
-			// variable size
-			int length = vm->stack[4];
-			
-			long long int res = 0;
-			
-			for (int i = 0; i < length; i++)
-			{
-				res += (int)vm->variables[src1++] * (int)vm->variables[src2++];
-			}
-			res >>= shift;
-			vm->variables[dest] = (sint16)res;
-		}
-		break;
-		
-		default: assert(false); break;
-	}
-	// only one native functions for now
+	nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
