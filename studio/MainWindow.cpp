@@ -698,15 +698,7 @@ namespace Aseba
 				);
 			
 			// update recent files
-			QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
-			QStringList recentFiles = settings.value("recent files").toStringList();
-			if (recentFiles.contains(fileName))
-				recentFiles.removeAt(recentFiles.indexOf(fileName));
-			recentFiles.push_front(fileName);
-			const int maxRecentFiles = 8;
-			if (recentFiles.size() > maxRecentFiles)
-				recentFiles.pop_back();
-			settings.setValue("recent files", recentFiles);
+			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
 		}
 		else
@@ -751,6 +743,7 @@ namespace Aseba
 			return;
 		
 		actualFileName = fileName;
+		updateRecentFiles(fileName);
 		
 		// initiate DOM tree
 		QDomDocument document("aesl-source");
@@ -1274,6 +1267,20 @@ namespace Aseba
 		
 		for (int i = 0; i < recentFiles.size(); i++)
 			openRecentMenu->addAction(recentFiles.at(i), this, SLOT(openRecentFile()));
+	}
+	
+	void MainWindow::updateRecentFiles(const QString& fileName)
+	{
+		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QStringList recentFiles = settings.value("recent files").toStringList();
+		if (recentFiles.contains(fileName))
+			recentFiles.removeAt(recentFiles.indexOf(fileName));
+		recentFiles.push_front(fileName);
+		const int maxRecentFiles = 8;
+		if (recentFiles.size() > maxRecentFiles)
+			recentFiles.pop_back();
+		settings.setValue("recent files", recentFiles);
+			
 	}
 	
 	void MainWindow::setupMenu()

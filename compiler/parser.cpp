@@ -157,6 +157,7 @@ namespace Aseba
 		{
 			case Token::TOKEN_STR_if: return parseIfWhen(false);
 			case Token::TOKEN_STR_when: return parseIfWhen(true);
+			case Token::TOKEN_STR_for: return parseFor();
 			case Token::TOKEN_STR_while: return parseWhile();
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_ontimer: return parseOnTimer();
@@ -338,10 +339,111 @@ namespace Aseba
 		return ifNode.release();
 	}
 	
+	//! Parse "for" grammar element.
+	Node* Compiler::parseFor()
+	{
+		// eat "for"
+		SourcePos whilePos = tokens.front().pos;
+		tokens.pop_front();
+		
+		// variable
+		expect(Token::TOKEN_STRING_LITERAL);
+		std::string varName = tokens.front().sValue;
+		SourcePos varPos = tokens.front().pos;
+		VariablesMap::const_iterator varIt = variablesMap.find(varName);
+		
+		// check if variable exists
+		if (varIt == variablesMap.end())
+			throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
+		unsigned varAddr = varIt->second.first;
+		tokens.pop_front();
+		
+		// in keyword
+		expect(Token::TOKEN_STR_in);
+		tokens.pop_front();
+		
+		// range start index
+		int rangeStartIndex = expectInt16Literal();
+		SourcePos rangeStartIndexPos = tokens.front().pos;
+		tokens.pop_front();
+		
+		// : keyword
+		expect(Token::TOKEN_COLON);
+		tokens.pop_front();
+		
+		// range end index
+		int rangeEndIndex = expectInt16Literal();
+		SourcePos rangeEndIndexPos = tokens.front().pos;
+		tokens.pop_front();
+		
+		// check for step
+		int step = 1;
+		if (tokens.front() == Token::TOKEN_STR_step)
+		{
+			tokens.pop_front();
+			if (tokens.front() == Token::TOKEN_OP_NEG)
+			{
+				tokens.pop_front();
+				step = -expectInt16Literal();
+			}
+			else
+				step = expectInt16Literal();
+			if (step == 0)
+				throw Error(tokens.front().pos, "Null steps are not allowed in for loops");
+			tokens.pop_front();
+		}
+		
+		// check conditions
+		if (step > 0)
+		{
+			if (rangeStartIndex > rangeEndIndex)
+				throw Error(rangeStartIndexPos, "Start index must be lower than end index in increasing loops");
+		}
+		else
+		{
+			if (rangeStartIndex < rangeEndIndex)
+				throw Error(rangeStartIndexPos, "Start index must be higher than end index in decreasing loops");
+		}
+		
+		// do keyword
+		expect(Token::TOKEN_STR_do);
+		tokens.pop_front();
+		
+		// create enclosing block and initial variable state
+		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
+		blockNode->children.push_back(new ImmediateNode(rangeStartIndexPos, rangeStartIndex));
+		blockNode->children.push_back(new StoreNode(varPos, varAddr));
+		
+		// create while and condition
+		WhileNode* whileNode = new WhileNode(whilePos);
+		blockNode->children.push_back(whileNode);
+		whileNode->children.push_back(new LoadNode(varPos, varAddr));
+		if (rangeStartIndex <= rangeEndIndex)
+			whileNode->comparaison = ASEBA_CMP_SMALLER_EQUAL_THAN;
+		else
+			whileNode->comparaison = ASEBA_CMP_BIGGER_EQUAL_THAN;
+		whileNode->children.push_back(new ImmediateNode(rangeEndIndexPos, rangeEndIndex));
+		
+		// block and end keyword
+		whileNode->children.push_back(new BlockNode(tokens.front().pos));
+		while (tokens.front() != Token::TOKEN_STR_end)
+			whileNode->children[2]->children.push_back(parseBlockStatement());
+		
+		// increment variable
+		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
+		whileNode->children[2]->children.push_back(assignmentNode);
+		assignmentNode->children.push_back(new StoreNode(varPos, varAddr));
+		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, new LoadNode(varPos, varAddr), new ImmediateNode(varPos, step)));
+		
+		tokens.pop_front();
+		
+		return blockNode.release();
+	}
+	
 	//! Parse "while" grammar element.
 	Node* Compiler::parseWhile()
 	{
-		const Token::Type conditionTypes[4] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_SMALLER };
+		const Token::Type conditionTypes[6] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
 		
@@ -352,7 +454,7 @@ namespace Aseba
 		whileNode->children.push_back(parseShiftExpression());
 		
 		// comparison
-		expectOneOf(conditionTypes, 4);
+		expectOneOf(conditionTypes, 6);
 		whileNode->comparaison = static_cast<AsebaComparaison>(tokens.front() - Token::TOKEN_OP_EQUAL);
 		tokens.pop_front();
 		

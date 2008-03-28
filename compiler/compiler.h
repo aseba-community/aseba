@@ -154,6 +154,9 @@ namespace Aseba
 				TOKEN_END_OF_STREAM = 0,
 				TOKEN_STR_when,
 				TOKEN_STR_emit,
+				TOKEN_STR_for,
+				TOKEN_STR_in,
+				TOKEN_STR_step,
 				TOKEN_STR_while,
 				TOKEN_STR_do,
 				TOKEN_STR_if,
@@ -226,6 +229,7 @@ namespace Aseba
 		Node* parseVarDef();
 		Node* parseAssignment();
 		Node* parseIfWhen(bool edgeSensitive);
+		Node* parseFor();
 		Node* parseWhile();
 		Node* parseOnEvent();
 		Node* parseOnTimer();

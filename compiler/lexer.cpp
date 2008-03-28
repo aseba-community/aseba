@@ -51,6 +51,9 @@ namespace Aseba
 			case TOKEN_END_OF_STREAM: return "end of stream";
 			case TOKEN_STR_when: return "when keyword";
 			case TOKEN_STR_emit: return "emit keyword";
+			case TOKEN_STR_for: return "for keyword";
+			case TOKEN_STR_in: return "in keyword";
+			case TOKEN_STR_step: return "step keyword";
 			case TOKEN_STR_while: return "while keyword";
 			case TOKEN_STR_do: return "do keyword";
 			case TOKEN_STR_if: return "if keyword";
@@ -261,6 +264,12 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_when, pos));
 						else if (s == "emit")
 							tokens.push_back(Token(Token::TOKEN_STR_emit, pos));
+						else if (s == "for")
+							tokens.push_back(Token(Token::TOKEN_STR_for, pos));
+						else if (s == "in")
+							tokens.push_back(Token(Token::TOKEN_STR_in, pos));
+						else if (s == "step")
+							tokens.push_back(Token(Token::TOKEN_STR_step, pos));
 						else if (s == "while")
 							tokens.push_back(Token(Token::TOKEN_STR_while, pos));
 						else if (s == "do")

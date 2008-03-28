@@ -184,6 +184,7 @@ namespace Aseba
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
+		void updateRecentFiles(const QString& fileName);
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
