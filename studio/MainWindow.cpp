@@ -352,7 +352,7 @@ namespace Aseba
 		// stop target if currently in debugging mode
 		if (editor->debugging)
 		{
-			target->stop(id);
+			//target->stop(id);
 			doRehighlight = true;
 			editor->debugging = false;
 			resetButton->setEnabled(false);
