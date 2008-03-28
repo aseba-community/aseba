@@ -42,6 +42,8 @@ using std::copy;
 
 namespace Aseba
 {
+	#define ASEBA_SVN_REV "$Revision$"
+	
 	//! Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
 	template<typename Derived, typename Base>
 	inline Derived polymorphic_downcast(Base base)
@@ -623,11 +625,13 @@ namespace Aseba
 	{
 		QMessageBox::about(this, tr("About Aseba Studio"),
 					tr(	"<p>Aseba pre-release</p>" \
-						"<ul><li>Aseba build " \
-						SVN_REV \
-						"</li><li>Dashel build %0</li></ul>" \
+						"<ul><li>Aseba " \
+						ASEBA_SVN_REV \
+						"</li><li>Dashel "\
+						DASHEL_SVN_REV \
+						"</li></ul>" \
 						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a></p>" \
-						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>").arg(Dashel::getSVNRevision().c_str()));
+						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>"));
 	}
 	
 	void MainWindow::newFile()

@@ -1,10 +1,6 @@
 find_package(Qt4)
 
 if (QT4_FOUND)
-	find_package(Subversion REQUIRED)
-	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} aseba)
-	add_definitions(-DSVN_REV=\\"${aseba_WC_REVISION}\\")
-
 	include(${QT_USE_FILE})
 	
 	set(studio_SRCS
