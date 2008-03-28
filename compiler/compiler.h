@@ -219,7 +219,7 @@ namespace Aseba
 		void buildMaps();
 		void tokenize(std::istream& source);
 		void dumpTokens(std::ostream &dest) const;
-		void link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const;
+		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const;
 		void disassemble(BytecodeVector& bytecode, std::ostream& dump) const;
 		
 	protected:

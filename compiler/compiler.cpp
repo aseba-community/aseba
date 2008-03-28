@@ -169,7 +169,11 @@ namespace Aseba
 		preLinkBytecode.fixup();
 		
 		// linking (flattening of complex structure into linear vector)
-		link(preLinkBytecode, bytecode);
+		if (!link(preLinkBytecode, bytecode))
+		{
+			errorDescription = Error(SourcePos(), "Script too big for target bytecode size.");
+			return false;
+		}
 		
 		if (dump)
 		{
@@ -182,7 +186,7 @@ namespace Aseba
 	}
 	
 	//! Create the final bytecode for a microcontroller
-	void Compiler::link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const
+	bool Compiler::link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const
 	{
 		bytecode.clear();
 		
@@ -209,6 +213,9 @@ namespace Aseba
 			std::copy(it->second.begin(),
 			it->second.end(),
 			std::back_inserter(bytecode));
+		
+		// check size
+		return bytecode.size() <= targetDescription->bytecodeSize;
 	}
 	
 	//! Disassemble a microcontroller bytecode and dump it
