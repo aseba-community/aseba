@@ -761,7 +761,7 @@ namespace Aseba
 								throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
 							tokens.pop_front();
 							
-							len = endIndex - startIndex;
+							len = endIndex - startIndex + 1;
 						}
 						
 						expect(Token::TOKEN_BRACKET_CLOSE);
