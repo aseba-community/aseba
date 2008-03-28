@@ -639,21 +639,38 @@ namespace Aseba
 					{
 						tokens.pop_front();
 						expect(Token::TOKEN_INT_LITERAL);
+						unsigned startIndex = tokens.front().iValue;
+						unsigned len = 1;
 						
-						// check if single value access is out of bounds
-						unsigned index = tokens.front().iValue;
-						if (index >= varSize)
+						// check if first index is within bounds
+						if (startIndex >= varIt->second.second)
 							throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
-						
 						tokens.pop_front();
+						
+						// do we have array subscript?
+						if (tokens.front() == Token::TOKEN_COLON)
+						{
+							tokens.pop_front();
+							expect(Token::TOKEN_INT_LITERAL);
+							
+							// check if second index is within bounds
+							unsigned endIndex = tokens.front().iValue;
+							if (endIndex >= varIt->second.second)
+								throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
+							tokens.pop_front();
+							
+							len = endIndex - startIndex;
+						}
+						
 						expect(Token::TOKEN_BRACKET_CLOSE);
 						tokens.pop_front();
 						
-						varAddr += index;
-						varSize = 1;
+						varAddr += startIndex;
+						varSize = len;
 					}
 					else
 					{
+						// full array
 						varSize = varIt->second.second;
 					}
 				}
