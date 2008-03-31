@@ -76,9 +76,9 @@ namespace Aseba
 		
 		if (dump)
 		{
-			std::cout << "Read " << len + 4 << " on stream " << stream << " : ";
+			std::cout << "Read " << std::dec << len + 4 << " on stream " << stream << " : ";
 			for(unsigned int i = 0; i < readbuff.size(); i++)
-				std::cout << (unsigned)readbuff[i] << " ";
+				std::cout << std::hex << (unsigned)readbuff[i] << " ";
 			std::cout << std::endl;
 		}
 		

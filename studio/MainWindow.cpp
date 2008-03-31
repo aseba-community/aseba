@@ -134,6 +134,7 @@ namespace Aseba
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
 		// get the value of the variables
+		recompile();
 		refreshMemoryClicked();
 	}
 	

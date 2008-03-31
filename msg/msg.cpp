@@ -408,7 +408,7 @@ namespace Aseba
 				if (j + 1 < nativeFunctions[i].parameters.size())
 					stream << ", ";
 			}
-			stream << " : " << nativeFunctions[i].description;
+			stream << ") : " << nativeFunctions[i].description;
 		}
 	}
 	
