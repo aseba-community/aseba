@@ -234,5 +234,44 @@ namespace Aseba
 		delete menu;
 	}
 	
+	void AeslEditor::keyPressEvent(QKeyEvent * event)
+	{
+		if ((event->key() == Qt::Key_Tab) && textCursor().hasSelection())
+		{
+			QTextCursor cursor(document()->findBlock(textCursor().selectionStart()));
+			
+			cursor.beginEditBlock();
+			
+			while (cursor.position() < textCursor().selectionEnd())
+			{
+				cursor.movePosition(QTextCursor::StartOfLine);
+				if (event->modifiers() & Qt::ControlModifier)
+				{
+					cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+					if (cursor.selectedText() == "\t")
+						cursor.removeSelectedText();
+				}
+				else
+					cursor.insertText("\t");
+				cursor.movePosition(QTextCursor::Down);
+				cursor.movePosition(QTextCursor::EndOfLine);
+			}
+			
+			cursor.movePosition(QTextCursor::StartOfLine);
+			if (event->modifiers() & Qt::ControlModifier)
+			{
+				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+				if (cursor.selectedText() == "\t")
+					cursor.removeSelectedText();
+			}
+			else
+				cursor.insertText("\t");
+				
+			cursor.endEditBlock();
+			return;
+		}
+		QTextEdit::keyPressEvent(event);
+	}
+	
 	/*@}*/
 }; // Aseba

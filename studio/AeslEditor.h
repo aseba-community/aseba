@@ -84,6 +84,9 @@ namespace Aseba
 	
 	public:
 		bool debugging;
+	
+	protected:
+		virtual void keyPressEvent(QKeyEvent * event);
 	};
 	
 	/*@}*/
