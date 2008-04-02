@@ -29,20 +29,12 @@
 namespace Aseba
 {
 	/**
-	\defgroup switch Software router of messages
-	
-	Connects to a physical CAN interface if present.
+	\defgroup switch Software router of messages.
 	*/
 	/*@{*/
 
-	/*! Route Aseba messages on the TCP part of the network.
-		
-		TODO: should we remove CAN out of this class and put it inside the translator.
-		The switch is not thread-safe because it stores a pointer to the CAN stream
-		outside this object. This is required to interface with the aseba CAN
-		C library.
-		
-		The caller of this class must listen
+	/*!
+		Route Aseba messages on the TCP part of the network.
 	*/
 	class Switch: public Dashel::Hub
 	{
@@ -50,18 +42,15 @@ namespace Aseba
 			/*! Creates the switch, listen to TCP on port.
 				@param verbose should we print a notification on each message
 				@param dump should we dump content of each message
+				@param forward should we only forward messages instead of transmit them back to the sender
 			*/
-			Switch(unsigned port, bool verbose, bool dump);
+			Switch(unsigned port, bool verbose, bool dump, bool forward);
 			
 			/*! Forwards the data received for a connections to the other ones.
+				If forward is false, transmit it back to the sender too.
 				@param stream the stream the packet was received from
 			*/
 			void forwardDataFrom(Dashel::Stream* stream);
-			
-			/*! Reads a CAN frame from the CAN socket and sends it to the
-				aseba CAN network layer.
-			*/
-			void manageCanFrame();
 			
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
@@ -71,6 +60,7 @@ namespace Aseba
 		private:
 			bool verbose; //!< should we print a notification on each message
 			bool dump; //!< should we dump content of CAN messages
+			bool forward; //!< should we only forward messages instead of transmit them back to the sender
 	};
 	
 	/*@}*/

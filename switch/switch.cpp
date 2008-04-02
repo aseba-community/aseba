@@ -42,9 +42,10 @@ namespace Aseba
 	/*@{*/
 
 	//! Broadcast messages form any data stream to all others data streams including itself.
-	Switch::Switch(unsigned port, bool verbose, bool dump) :
+	Switch::Switch(unsigned port, bool verbose, bool dump, bool forward) :
 		verbose(verbose),
-		dump(dump)
+		dump(dump),
+		forward(forward)
 	{
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
@@ -86,6 +87,10 @@ namespace Aseba
 		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
 			Stream* destStream = *it;
+			
+			if ((forward) && (destStream == stream))
+				continue;
+			
 			try
 			{
 				destStream->write(&len, 2);
@@ -122,7 +127,8 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << programName << " [options] [additional targets]*\n";
 	stream << "Options:\n";
 	stream << "-v, --verbose   : makes the switch verbose\n";
-	stream << "-d, --dump      : makes the switch dumping all data\n";
+	stream << "-d, --dump      : makes the switch dump all data\n";
+	stream << "-f, --forward   : makes the switch only forward messages, not transmit them back to the sender.\n";
 	stream << "-p port         : listens to incoming connection on this port\n";
 	stream << "Additional targets are any valid Dashel targets." << std::endl;
 }
@@ -132,6 +138,7 @@ int main(int argc, char *argv[])
 	unsigned port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;
 	bool dump = false;
+	bool forward = false;
 	std::vector<std::string> additionalTargets;
 	
 	int argCounter = 1;
@@ -147,6 +154,10 @@ int main(int argc, char *argv[])
 		else if ((strcmp(arg, "-d") == 0) || (strcmp(arg, "--dump") == 0))
 		{
 			dump = true;
+		}
+		else if ((strcmp(arg, "-f") == 0) || (strcmp(arg, "--forward") == 0))
+		{
+			forward = true;
 		}
 		else if (strcmp(arg, "-p") == 0)
 		{
@@ -167,7 +178,7 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::Switch aswitch(port, verbose, dump);
+		Aseba::Switch aswitch(port, verbose, dump, forward);
 		for (size_t i = 0; i < additionalTargets.size(); i++)
 			aswitch.connect(additionalTargets[i]);
 		aswitch.run();
