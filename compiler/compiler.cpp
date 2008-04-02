@@ -54,7 +54,7 @@ namespace Aseba
 	Compiler::Compiler()
 	{
 		targetDescription = 0;
-		eventsNames = 0;
+		commonDefinitions = 0;
 	}
 	
 	//! Set the description of the target as returned by the microcontroller. You must call this function before any call to compile().
@@ -63,10 +63,10 @@ namespace Aseba
 		targetDescription = description;
 	}
 	
-	//! Set the names of the events globally defined.
-	void Compiler::setEventsNames(const EventsNamesVector *names)
+	//! Set the common definitions, such as events or some constants
+	void Compiler::setCommonDefinitions(const CommonDefinitions *definitions)
 	{
-		eventsNames = names;
+		commonDefinitions = definitions;
 	}
 	
 	//! Compile a new condition
@@ -245,8 +245,8 @@ namespace Aseba
 					dump << "init:       ";
 				else if (eventId == ASEBA_EVENT_PERIODIC)
 					dump << "periodic:   ";
-				else if (eventId < eventsNames->size())
-					dump << "event " << (*eventsNames)[eventId] << ": ";
+				else if (eventId < commonDefinitions->events.size())
+					dump << "event " << commonDefinitions->events[eventId].name << ": ";
 				else
 					dump << "event " << eventId << ":  ";
 				dump << "\n";
@@ -320,8 +320,8 @@ namespace Aseba
 				{
 					unsigned eventId = (bytecode[pc] & 0x0fff);
 					dump << "EMIT ";
-					if (eventId < eventsNames->size())
-						dump << (*eventsNames)[eventId];
+					if (eventId < commonDefinitions->events.size())
+						dump << commonDefinitions->events[eventId].name;
 					else
 						dump << eventId;
 					dump << " addr " << bytecode[pc+1] << " size " << bytecode[pc+2] << "\n";

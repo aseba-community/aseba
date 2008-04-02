@@ -136,8 +136,27 @@ namespace Aseba
 	//! Vector of names of variables
 	typedef std::vector<std::string> VariablesNamesVector;
 	
-	//! Vector of names of events
-	typedef std::vector<std::string> EventsNamesVector;
+	//! Description of an event
+	struct EventDescription
+	{
+		//! Create a filled description 
+		EventDescription(const std::string& name, unsigned size) : name(name), size(size) {}
+		
+		std::string name; //!< name of the event
+		unsigned size; //!< size of the event
+	};
+	
+	//! Vector of events descriptions
+	typedef std::vector<EventDescription> EventsDescriptionsVector;
+	
+	//! Definitions common to several nodes, such as events or some constants
+	struct CommonDefinitions
+	{
+		EventsDescriptionsVector events;
+		
+		//! Clear all the content
+		void clear() { events.clear(); }
+	};
 	
 	//! Vector of data of variables
 	typedef std::vector<short int> VariablesDataVector;
@@ -205,7 +224,7 @@ namespace Aseba
 	public:
 		Compiler();
 		void setTargetDescription(const TargetDescription *description);
-		void setEventsNames(const EventsNamesVector *names);
+		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
 	protected:
@@ -239,6 +258,8 @@ namespace Aseba
 		Node* parseMultExpression();
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
+		
+		void parseReadVarArrayAccess(unsigned* addr, unsigned* size);
 	
 	protected:
 		//! Lookup table for variables name => (pos, size))
@@ -252,7 +273,7 @@ namespace Aseba
 		FunctionsMap functionsMap; //!< functions lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable
 		const TargetDescription *targetDescription; //!< description of the target VM
-		const EventsNamesVector *eventsNames; //!< names of events
+		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
 	}; // Compiler
 	
 	/*@}*/

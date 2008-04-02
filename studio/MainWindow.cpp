@@ -110,7 +110,7 @@ namespace Aseba
 		setColumnWidth(1, fm.width("-888888"));
 	}
 	
-	NodeTab::NodeTab(Target *target, const EventsNamesVector *eventsNames, int id, QWidget *parent) :
+	NodeTab::NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QWidget(parent),
 		id(id),
 		target(target)
@@ -122,7 +122,7 @@ namespace Aseba
 		
 		// create models
 		compiler.setTargetDescription(target->getConstDescription(id));
-		compiler.setEventsNames(eventsNames);
+		compiler.setCommonDefinitions(commonDefinitions);
 		vmFunctionsModel = new TargetFunctionsModel(target->getConstDescription(id), 0);
 		vmMemoryModel = new TargetMemoryModel();
 		
@@ -664,8 +664,8 @@ namespace Aseba
 		if (!file.open(QFile::ReadOnly))
 			return;
 		
-		eventsNames.clear();
-		eventsNamesList->clear();
+		commonDefinitions.clear();
+		eventsDescriptionsList->clear();
 		
 		QDomDocument document("aesl-source");
 		QString errorMsg;
@@ -691,8 +691,8 @@ namespace Aseba
 					}
 					else if (element.tagName() == "event")
 					{
-						eventsNamesList->addItem(element.attribute("name"));
-						eventsNames.push_back(element.attribute("name").toStdString());
+						eventsDescriptionsList->addItem(element.attribute("name"));
+						commonDefinitions.events.push_back(EventDescription(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
 					}
 				}
 				domNode = domNode.nextSibling();
@@ -759,10 +759,11 @@ namespace Aseba
 		document.appendChild(root);
 		
 		// events
-		for (size_t i = 0; i < eventsNames.size(); i++)
+		for (size_t i = 0; i < commonDefinitions.events.size(); i++)
 		{
 			QDomElement element = document.createElement("event");
-			element.setAttribute("name", QString::fromStdString(eventsNames[i]));
+			element.setAttribute("name", QString::fromStdString(commonDefinitions.events[i].name));
+			element.setAttribute("size", QString::number(commonDefinitions.events[i].size));
 			root.appendChild(element);
 		}
 		
@@ -857,7 +858,7 @@ namespace Aseba
 	void MainWindow::sendEvent()
 	{
 		VariablesDataVector data;
-		target->sendEvent((unsigned)eventsNamesList->currentRow(), data);
+		target->sendEvent((unsigned)eventsDescriptionsList->currentRow(), data);
 		/*
 			TODO: get events arguments
 			TODO: type events with size first?
@@ -959,7 +960,7 @@ namespace Aseba
 		QString eventName = QInputDialog::getText(this, tr("Add a new event"), tr("Name:"), QLineEdit::Normal, "", &ok);
 		if (ok && !eventName.isEmpty())
 		{
-			eventsNamesList->addItem(eventName);
+			eventsDescriptionsList->addItem(eventName);
 			rebuildEventsNames();
 			
 			recompileAll();
@@ -968,26 +969,26 @@ namespace Aseba
 	
 	void MainWindow::removeEventNameClicked()
 	{
-		delete eventsNamesList->takeItem(eventsNamesList->currentRow());
+		delete eventsDescriptionsList->takeItem(eventsDescriptionsList->currentRow());
 		rebuildEventsNames();
 		
 		recompileAll();
 	}
 	
-	void MainWindow::eventsNamesSelectionChanged()
+	void MainWindow::eventsDescriptionsSelectionChanged()
 	{
-		removeEventNameButton->setEnabled(!eventsNamesList->selectedItems ().isEmpty());
-		sendEventButton->setEnabled(!eventsNamesList->selectedItems ().isEmpty());
+		removeEventNameButton->setEnabled(!eventsDescriptionsList->selectedItems ().isEmpty());
+		sendEventButton->setEnabled(!eventsDescriptionsList->selectedItems ().isEmpty());
 	}
 	
 	void MainWindow::rebuildEventsNames()
 	{
-		eventsNames.clear();
-		for (int i = 0; i < eventsNamesList->count (); ++i)
+		commonDefinitions.events.clear();
+		for (int i = 0; i < eventsDescriptionsList->count (); ++i)
 		{
-			QListWidgetItem *item = eventsNamesList->item(i);
+			QListWidgetItem *item = eventsDescriptionsList->item(i);
 			assert(item);
-			eventsNames.push_back(item->text().toStdString ());
+			commonDefinitions.events.push_back(EventDescription(item->text().toStdString(), 0));
 		}
 	}
 	
@@ -1004,7 +1005,7 @@ namespace Aseba
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
-		NodeTab* tab = new NodeTab(target, &eventsNames, node);
+		NodeTab* tab = new NodeTab(target, &commonDefinitions, node);
 		connect(tab, SIGNAL(uploadReadynessChanged()), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 	}
@@ -1037,8 +1038,8 @@ namespace Aseba
 	void MainWindow::userEvent(unsigned id, const VariablesDataVector &data)
 	{
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		if (id < eventsNames.size())
-			text += QString("\n%0 : ").arg(QString::fromStdString(eventsNames[id]));
+		if (id < commonDefinitions.events.size())
+			text += QString("\n%0 : ").arg(QString::fromStdString(commonDefinitions.events[id].name));
 		else
 			text += tr("\nevent %0 : ").arg(id);
 		for (size_t i = 0; i < data.size(); i++)
@@ -1211,10 +1212,10 @@ namespace Aseba
 		
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
 		
-		eventsNamesList = new QListWidget;
-		eventsNamesList->setMinimumSize(80,80);
-		eventsNamesList->setSelectionMode(QAbstractItemView::SingleSelection);
-		eventsDockLayout->addWidget(eventsNamesList, 1);
+		eventsDescriptionsList = new QListWidget;
+		eventsDescriptionsList->setMinimumSize(80,80);
+		eventsDescriptionsList->setSelectionMode(QAbstractItemView::SingleSelection);
+		eventsDockLayout->addWidget(eventsDescriptionsList, 1);
 		
 		logger = new QListWidget;
 		logger->setMinimumSize(80,80);
@@ -1247,8 +1248,8 @@ namespace Aseba
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
 		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
-		connect(eventsNamesList, SIGNAL(itemSelectionChanged()), SLOT(eventsNamesSelectionChanged()));
-		connect(eventsNamesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(sendEvent()));
+		connect(eventsDescriptionsList, SIGNAL(itemSelectionChanged()), SLOT(eventsNamesSelectionChanged()));
+		connect(eventsDescriptionsList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(sendEvent()));
 		
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));

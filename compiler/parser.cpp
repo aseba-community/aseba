@@ -75,24 +75,22 @@ namespace Aseba
 	//! Check if next token is a valid event id. That is either an unsigned 12 bits int literal or a known event string identifier
 	unsigned Compiler::expectEventId() const
 	{
-		assert(eventsNames);
+		assert(commonDefinitions);
+		
+		expect(Token::TOKEN_STRING_LITERAL);
 		
 		unsigned eventId = 0xFFFF;
-		if (tokens.front() == Token::TOKEN_STRING_LITERAL)
-		{
-			const std::string & eventName = tokens.front().sValue;
-			for (size_t i = 0; i < eventsNames->size(); ++i)
-				if ((*eventsNames)[i] == eventName)
-				{
-					eventId = i;
-					break;
-				}
-			
-			if (eventId == 0xFFFF)
-				throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
-		}
-		else
-			eventId = expectUInt12Literal();
+		const std::string & eventName = tokens.front().sValue;
+		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
+			if (commonDefinitions->events[i].name == eventName)
+			{
+				eventId = i;
+				break;
+			}
+		
+		if (eventId == 0xFFFF)
+			throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
+		
 		return eventId;
 	}
 	
@@ -509,20 +507,10 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// event argument
-		if (tokens.front() == Token::TOKEN_STRING_LITERAL)
+		unsigned eventSize = commonDefinitions->events[emitNode->eventId].size;
+		if (eventSize > 0)
 		{
-			std::string varName = tokens.front().sValue;
-			SourcePos varPos = tokens.front().pos;
-			VariablesMap::const_iterator varIt = variablesMap.find(varName);
-			
-			// check if variable exists
-			if (varIt == variablesMap.end())
-				throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
-			
-			emitNode->arrayAddr = varIt->second.first;
-			emitNode->arraySize = varIt->second.second;
-			
-			tokens.pop_front();
+			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);
 		}
 		else
 		{
@@ -531,6 +519,65 @@ namespace Aseba
 		}
 		
 		return emitNode.release();
+	}
+	
+	//! Parse access to variable, arrray, or array subscript
+	void Compiler::parseReadVarArrayAccess(unsigned* addr, unsigned* size)
+	{
+		expect(Token::TOKEN_STRING_LITERAL);
+		
+		// we have a variable access, check if variable exists
+		SourcePos varPos = tokens.front().pos;
+		std::string varName = tokens.front().sValue;
+		VariablesMap::const_iterator varIt = variablesMap.find(varName);
+		if (varIt == variablesMap.end())
+			throw Error(varPos, FormatableString("%0 is not a defined variable").arg(varName));
+		
+		// store variable address
+		*addr = varIt->second.first;
+		
+		// check if it is a const array access
+		tokens.pop_front();
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+		{
+			tokens.pop_front();
+			expect(Token::TOKEN_INT_LITERAL);
+			unsigned startIndex = tokens.front().iValue;
+			unsigned len = 1;
+			
+			// check if first index is within bounds
+			if (startIndex >= varIt->second.second)
+				throw Error(tokens.front().pos, FormatableString("access of array %0 out of bounds").arg(varName));
+			tokens.pop_front();
+			
+			// do we have array subscript?
+			if (tokens.front() == Token::TOKEN_COLON)
+			{
+				tokens.pop_front();
+				expect(Token::TOKEN_INT_LITERAL);
+				
+				// check if second index is within bounds
+				unsigned endIndex = tokens.front().iValue;
+				if (endIndex >= varIt->second.second)
+					throw Error(tokens.front().pos, FormatableString("access of array %0 out of bounds").arg(varName));
+				if (endIndex < startIndex)
+					throw Error(tokens.front().pos, FormatableString("end of range index must be lower or equal to start of range index"));
+				tokens.pop_front();
+				
+				len = endIndex - startIndex + 1;
+			}
+			
+			expect(Token::TOKEN_BRACKET_CLOSE);
+			tokens.pop_front();
+			
+			*addr += startIndex;
+			*size = len;
+		}
+		else
+		{
+			// full array
+			*size = varIt->second.second;
+		}
 	}
 	
 	//! Parse "shift_expression" grammar element.
@@ -726,55 +773,7 @@ namespace Aseba
 				
 				if (tokens.front() == Token::TOKEN_STRING_LITERAL)
 				{
-					// we have a variable access, check if variable exists
-					std::string varName = tokens.front().sValue;
-					VariablesMap::const_iterator varIt = variablesMap.find(varName);
-					if (varIt == variablesMap.end())
-						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is not a defined variable").arg(i).arg(varName).arg(funcName));
-					
-					// store variable address
-					varAddr = varIt->second.first;
-					
-					// check if it is a const array access
-					tokens.pop_front();
-					if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-					{
-						tokens.pop_front();
-						expect(Token::TOKEN_INT_LITERAL);
-						unsigned startIndex = tokens.front().iValue;
-						unsigned len = 1;
-						
-						// check if first index is within bounds
-						if (startIndex >= varIt->second.second)
-							throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
-						tokens.pop_front();
-						
-						// do we have array subscript?
-						if (tokens.front() == Token::TOKEN_COLON)
-						{
-							tokens.pop_front();
-							expect(Token::TOKEN_INT_LITERAL);
-							
-							// check if second index is within bounds
-							unsigned endIndex = tokens.front().iValue;
-							if (endIndex >= varIt->second.second)
-								throw Error(tokens.front().pos, FormatableString("Argument %0 (%1) of function %2 access array %3 out of bounds").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varName));
-							tokens.pop_front();
-							
-							len = endIndex - startIndex + 1;
-						}
-						
-						expect(Token::TOKEN_BRACKET_CLOSE);
-						tokens.pop_front();
-						
-						varAddr += startIndex;
-						varSize = len;
-					}
-					else
-					{
-						// full array
-						varSize = varIt->second.second;
-					}
+					parseReadVarArrayAccess(&varAddr, &varSize);
 				}
 				else
 				{

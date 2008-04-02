@@ -48,7 +48,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		NodeTab(Target *target, const EventsNamesVector *eventsNames, int id, QWidget *parent = 0);
+		NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned nodeId() const { return id; }
 		
@@ -157,7 +157,7 @@ namespace Aseba
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();
-		void eventsNamesSelectionChanged();
+		void eventsDescriptionsSelectionChanged();
 		
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
@@ -201,8 +201,8 @@ namespace Aseba
 		QPushButton* sendEventButton;
 		QListWidget* logger;
 		QPushButton* clearLogger;
-		QListWidget* eventsNamesList;
-		EventsNamesVector eventsNames;
+		QListWidget* eventsDescriptionsList;
+		CommonDefinitions commonDefinitions;
 		
 		// global buttons
 		QAction* loadAllAct;
