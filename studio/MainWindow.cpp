@@ -183,7 +183,7 @@ namespace Aseba
 		executionModeLabel = new QLabel(tr("unknown"));
 		executionTitleLayout->addWidget(executionModeLabel);
 		
-		debugButton = new QPushButton(QIcon(":/images/upload.png"), tr("Debug"));
+		loadButton = new QPushButton(QIcon(":/images/upload.png"), tr("Load"));
 		resetButton = new QPushButton(QIcon(":/images/reset.png"), tr("Reset"));
 		resetButton->setEnabled(false);
 		runInterruptButton = new QPushButton(QIcon(":/images/play.png"), tr("Run"));
@@ -227,7 +227,7 @@ namespace Aseba
 		// panel
 		QVBoxLayout *panelLayout = new QVBoxLayout;
 		panelLayout->addLayout(executionTitleLayout);
-		panelLayout->addWidget(debugButton);
+		panelLayout->addWidget(loadButton);
 		panelLayout->addWidget(resetButton);
 		panelLayout->addWidget(runInterruptButton);
 		panelLayout->addWidget(nextButton);
@@ -245,7 +245,7 @@ namespace Aseba
 	void NodeTab::setupConnections()
 	{
 		// execution
-		connect(debugButton, SIGNAL(clicked()), SLOT(debugClicked()));
+		connect(loadButton, SIGNAL(clicked()), SLOT(loadClicked()));
 		connect(resetButton, SIGNAL(clicked()), SLOT(resetClicked()));
 		connect(runInterruptButton, SIGNAL(clicked()), SLOT(runInterruptClicked()));
 		connect(nextButton, SIGNAL(clicked()), SLOT(nextClicked()));
@@ -256,6 +256,7 @@ namespace Aseba
 		connect(editor, SIGNAL(cursorPositionChanged() ), SLOT(cursorMoved()));
 		connect(editor, SIGNAL(breakpointSet(unsigned)), SLOT(setBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointCleared(unsigned)), SLOT(clearBreakpoint(unsigned)));
+		connect(editor, SIGNAL(breakpointClearedAll()), SLOT(breakpointClearedAll()));
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
@@ -267,7 +268,7 @@ namespace Aseba
 		target->reset(id);
 	}
 	
-	void NodeTab::debugClicked()
+	void NodeTab::loadClicked()
 	{
 		if (errorPos == -1)
 		{
@@ -324,7 +325,7 @@ namespace Aseba
 			vmMemoryModel->setVariablesNames(variablesNames);
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			debugButton->setEnabled(true);
+			loadButton->setEnabled(true);
 			emit uploadReadynessChanged();
 			
 			errorPos = -1;
@@ -333,7 +334,7 @@ namespace Aseba
 		{
 			compilationResultText->setText(QString::fromUtf8(error.toString().c_str()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
-			debugButton->setEnabled(false);
+			loadButton->setEnabled(false);
 			emit uploadReadynessChanged();
 			
 			// we have an error, set the correct user data
@@ -406,6 +407,12 @@ namespace Aseba
 	{
 		rehighlight();
 		target->clearBreakpoint(id, line);
+	}
+	
+	void NodeTab::breakpointClearedAll()
+	{
+		rehighlight();
+		target->clearBreakpoints(id);
 	}
 	
 	void NodeTab::executionPosChanged(unsigned line)
@@ -786,13 +793,13 @@ namespace Aseba
 		}
 	}
 	
-	void MainWindow::debugAll()
+	void MainWindow::loadAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
-			tab->debugClicked();
+			tab->loadClicked();
 		}
 	}
 	
@@ -837,14 +844,14 @@ namespace Aseba
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
 			
-			if (!tab->debugButton->isEnabled())
+			if (!tab->loadButton->isEnabled())
 			{
 				ready = false;
 				break;
 			}
 		}
 		
-		debugAllAct->setEnabled(ready);
+		loadAllAct->setEnabled(ready);
 	}
 	
 	void MainWindow::sendEvent()
@@ -1229,7 +1236,7 @@ namespace Aseba
 		connect(logger, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(logEntryDoubleClicked(QListWidgetItem *)));
 		
 		// global actions
-		connect(debugAllAct, SIGNAL(triggered()), SLOT(debugAll()));
+		connect(loadAllAct, SIGNAL(triggered()), SLOT(loadAll()));
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
@@ -1345,8 +1352,8 @@ namespace Aseba
 		editMenu->addAction(redoAct);
 		editMenu->addSeparator();
 		
-		debugAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Debug all"), this);
-		debugAllAct->setShortcut(tr("F7", "Debug|Debug all"));
+		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
+		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
 		
 		resetAllAct = new QAction(QIcon(":/images/reset.png"), tr("&Reset all"), this);
 		resetAllAct->setShortcut(tr("F8", "Debug|Reset all"));
@@ -1360,7 +1367,7 @@ namespace Aseba
 		// Debug toolbar
 		QToolBar* globalToolBar = addToolBar(tr("Debug"));
 		globalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-		globalToolBar->addAction(debugAllAct);
+		globalToolBar->addAction(loadAllAct);
 		globalToolBar->addAction(resetAllAct);
 		globalToolBar->addAction(runAllAct);
 		globalToolBar->addAction(pauseAllAct);
@@ -1368,7 +1375,7 @@ namespace Aseba
 		// Debug menu
 		QMenu *debugMenu = new QMenu(tr("&Debug"), this);
 		menuBar()->addMenu(debugMenu);
-		debugMenu->addAction(debugAllAct);
+		debugMenu->addAction(loadAllAct);
 		debugMenu->addAction(resetAllAct);
 		debugMenu->addAction(runAllAct);
 		debugMenu->addAction(pauseAllAct);

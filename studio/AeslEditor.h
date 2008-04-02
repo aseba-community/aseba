@@ -75,6 +75,7 @@ namespace Aseba
 	signals:
 		void breakpointSet(unsigned line);
 		void breakpointCleared(unsigned line);
+		void breakpointClearedAll();
 		
 	public:
 		AeslEditor() { debugging = false; }

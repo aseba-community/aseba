@@ -182,9 +182,13 @@ namespace Aseba
 			breakpointAction = menu->addAction(tr("Clear breakpoint"));
 		else
 			breakpointAction = menu->addAction(tr("Set breakpoint"));
+		QAction *breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
 		
 		// execute menu
-		if (menu->exec(e->globalPos()) == breakpointAction)
+		QAction* selectedAction = menu->exec(e->globalPos());
+		
+		// do actions
+		if (selectedAction == breakpointAction)
 		{
 			// modify editor state
 			if (breakpointPresent)
@@ -213,6 +217,19 @@ namespace Aseba
 					uData->properties.insert("breakpointPending", QVariant());
 				emit breakpointSet(cursorForPosition(e->pos()).blockNumber());
 			}
+		}
+		if (selectedAction == breakpointClearAllAction)
+		{
+			for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
+			{
+				AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
+				if (uData)
+				{
+					uData->properties.remove("breakpoint");
+					uData->properties.remove("breakpointPending");
+				}
+			}
+			emit breakpointClearedAll();
 		}
 		delete menu;
 	}

@@ -63,7 +63,7 @@ namespace Aseba
 		
 	protected slots:
 		void resetClicked();
-		void debugClicked();
+		void loadClicked();
 		void runInterruptClicked();
 		void nextClicked();
 		void refreshMemoryClicked();
@@ -77,6 +77,7 @@ namespace Aseba
 		void clearExecutionErrors();
 		void setBreakpoint(unsigned line);
 		void clearBreakpoint(unsigned line);
+		void breakpointClearedAll();
 		
 		void executionPosChanged(unsigned line);
 		void executionModeChanged(Target::ExecutionMode mode);
@@ -105,7 +106,7 @@ namespace Aseba
 		QLabel *compilationResultText;
 		
 		QLabel *executionModeLabel;
-		QPushButton *debugButton;
+		QPushButton *loadButton;
 		QPushButton *resetButton;
 		QPushButton *runInterruptButton;
 		QPushButton *nextButton;
@@ -142,7 +143,7 @@ namespace Aseba
 		void save();
 		void saveFile(const QString &previousFileName = QString());
 		
-		void debugAll();
+		void loadAll();
 		void resetAll();
 		void runAll();
 		void pauseAll();
@@ -203,7 +204,7 @@ namespace Aseba
 		EventsNamesVector eventsNames;
 		
 		// global buttons
-		QAction* debugAllAct;
+		QAction* loadAllAct;
 		QAction* resetAllAct;
 		QAction* runAllAct;
 		QAction* pauseAllAct;
