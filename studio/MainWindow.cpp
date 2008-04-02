@@ -1220,6 +1220,8 @@ namespace Aseba
 		logger->setMinimumSize(80,80);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		eventsDockLayout->addWidget(logger, 3);
+		clearLogger = new QPushButton(tr("Clear"));
+		eventsDockLayout->addWidget(clearLogger);
 		
 		splitter->addWidget(eventsDockWidget);
 		
@@ -1247,6 +1249,9 @@ namespace Aseba
 		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
 		connect(eventsNamesList, SIGNAL(itemSelectionChanged()), SLOT(eventsNamesSelectionChanged()));
 		connect(eventsNamesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(sendEvent()));
+		
+		// logger
+		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
 		
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));

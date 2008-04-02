@@ -200,6 +200,7 @@ namespace Aseba
 		QPushButton* removeEventNameButton;
 		QPushButton* sendEventButton;
 		QListWidget* logger;
+		QPushButton* clearLogger;
 		QListWidget* eventsNamesList;
 		EventsNamesVector eventsNames;
 		
