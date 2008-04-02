@@ -159,7 +159,7 @@ namespace Aseba
 			case Token::TOKEN_STR_while: return parseWhile();
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_ontimer: return parseOnTimer();
-			case Token::TOKEN_STR_emit: return parseEvent();
+			case Token::TOKEN_STR_emit: return parseEmit();
 			case Token::TOKEN_STR_call: return parseFunctionCall();
 			default: return parseAssignment();
 		}
@@ -495,7 +495,7 @@ namespace Aseba
 	}
 	
 	//! Parse "event" grammar element
-	Node* Compiler::parseEvent()
+	Node* Compiler::parseEmit()
 	{
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
@@ -511,6 +511,8 @@ namespace Aseba
 		if (eventSize > 0)
 		{
 			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);
+			if (emitNode->arraySize != eventSize)
+				throw Error(pos, FormatableString("Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
 		}
 		else
 		{

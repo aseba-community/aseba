@@ -252,7 +252,7 @@ namespace Aseba
 		Node* parseWhile();
 		Node* parseOnEvent();
 		Node* parseOnTimer();
-		Node* parseEvent();
+		Node* parseEmit();
 		Node* parseShiftExpression();
 		Node* parseAddExpression();
 		Node* parseMultExpression();
