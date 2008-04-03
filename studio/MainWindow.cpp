@@ -351,7 +351,7 @@ namespace Aseba
 			}
 		}
 		
-		// stop target if currently in debugging mode
+		// clear bearkpoints of target if currently in debugging mode
 		if (editor->debugging)
 		{
 			//target->stop(id);
@@ -361,6 +361,7 @@ namespace Aseba
 			runInterruptButton->setEnabled(false);
 			nextButton->setEnabled(false);
 			target->clearBreakpoints(id);
+			// TODO: should we set breakpoints to pending to notify the user that breakpoints are not valid any more ?
 		}
 		
 		if (doRehighlight)
@@ -483,6 +484,7 @@ namespace Aseba
 	
 	void NodeTab::reSetBreakpoints()
 	{
+		target->clearBreakpoints(id);
 		QTextBlock block = editor->document()->begin();
 		unsigned lineCounter = 0;
 		while (block != editor->document()->end())
