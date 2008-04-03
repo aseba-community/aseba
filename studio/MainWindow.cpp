@@ -318,7 +318,7 @@ namespace Aseba
 		bool doRehighlight = clearEditorProperty("errorPos");
 		
 		// compile
-		std::istringstream is(std::string(editor->toPlainText().toUtf8()));
+		std::istringstream is(editor->toPlainText().toStdString());
 		bool result = compiler.compile(is, bytecode, variablesNames, allocatedVariablesCount, error);
 		if (result)
 		{
@@ -332,7 +332,7 @@ namespace Aseba
 		}
 		else
 		{
-			compilationResultText->setText(QString::fromUtf8(error.toString().c_str()));
+			compilationResultText->setText(QString::fromStdString(error.toString()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
 			loadButton->setEnabled(false);
 			emit uploadReadynessChanged();
@@ -861,13 +861,49 @@ namespace Aseba
 	{
 		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
+		
 		unsigned eventId = currentRow.row();
-		VariablesDataVector data;
+		QString eventName = QString::fromStdString(commonDefinitions.events[eventId].name);
+		int argsCount = commonDefinitions.events[eventId].value;
+		VariablesDataVector data(argsCount);
+		
+		if (argsCount > 0)
+		{
+			QString argList;
+			while (true)
+			{
+				bool ok;
+				argList = QInputDialog::getText(this, tr("Specify event arguments"), tr("Please specify the %0 arguments of event %1").arg(argsCount).arg(eventName), QLineEdit::Normal, argList, &ok);
+				if (ok)
+				{
+					QStringList args = argList.split(QRegExp("[\\s,]+"), QString::SkipEmptyParts);
+					if (args.size() != argsCount)
+					{
+						QMessageBox::warning(this,
+							tr("Wrong number of arguments"),
+							tr("You gave %0 arguments where event %1 requires %2").arg(args.size()).arg(eventName).arg(argsCount)
+						);
+						continue;
+					}
+					for (int i = 0; i < args.size(); i++)
+					{
+						data[i] = args.at(i).toShort(&ok);
+						if (!ok)
+						{
+							QMessageBox::warning(this,
+								tr("Invalid value"),
+								tr("Invalid value for argument %0 of event %1").arg(i).arg(eventName)
+							);
+							break;
+						}
+					}
+					if (ok)
+						break;
+				}
+			}
+		}
+		
 		target->sendEvent(eventId, data);
-		/*
-			TODO: get events arguments
-			TODO: type events with size first?
-		*/
 	}
 	
 	void MainWindow::sendEventIf(const QModelIndex &index)
@@ -944,7 +980,7 @@ namespace Aseba
 			
 			
 			// recompile with verbose
-			std::istringstream is(std::string(tab->editor->toPlainText().toUtf8()));
+			std::istringstream is(tab->editor->toPlainText().toStdString());
 			std::ostringstream compilationMessages;
 			BytecodeVector bytecode;
 			Error error;
@@ -953,12 +989,12 @@ namespace Aseba
 			if (result)
 				compilationMessageBox->text->setText(
 					tr("Compilation success.") + QString("\n\n") + 
-					QString::fromUtf8(compilationMessages.str().c_str())
+					QString::fromStdString(compilationMessages.str())
 				);
 			else
 				compilationMessageBox->text->setText(
-					QString::fromUtf8(error.toString().c_str()) + ".\n\n" +
-					QString::fromUtf8(compilationMessages.str().c_str())
+					QString::fromStdString(error.toString()) + ".\n\n" +
+					QString::fromStdString(compilationMessages.str())
 				);
 			
 			compilationMessageBox->show();
