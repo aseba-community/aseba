@@ -298,6 +298,12 @@ namespace Aseba
 	
 	void DashelTarget::run(unsigned node)
 	{
+		NodesMap::iterator nodeIt = nodes.find(node);
+		assert(nodeIt != nodes.end());
+		
+		qDebug() << "execution mode = " << nodeIt->second.executionMode ;
+		if (nodeIt->second.executionMode == EXECUTION_STEP_BY_STEP)
+			Step(node).serialize(stream);
 		Run(node).serialize(stream);
 		stream->flush();
 	}
@@ -500,14 +506,19 @@ namespace Aseba
 						assert(false);
 					// we can safely return here, all case that require
 					// emitting signals have been handeled
+					node.executionMode = mode;
 					return;
 				}
 			}
 			else
+			{
 				mode = EXECUTION_STOP;
+			}
 		}
 		else
+		{
 			mode = EXECUTION_RUN;
+		}
 		
 		emit executionModeChanged(ess->source, mode);
 		if (node.executionMode != mode)

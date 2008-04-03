@@ -488,14 +488,14 @@ void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
 			stepsLimit
 		)
 		{
-			AsebaVMStep(vm);
-			stepsLimit--;
 			if (AsebaVMCheckBreakpoint(vm) != 0)
 			{
 				AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 				AsebaVMSendExecutionStateChanged(vm);
 				return;
 			}
+			AsebaVMStep(vm);
+			stepsLimit--;
 			// TODO : send exception event on step limits overflow
 		}
 	}
@@ -506,13 +506,13 @@ void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
 			AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK)
 		)
 		{
-			AsebaVMStep(vm);
 			if (AsebaVMCheckBreakpoint(vm) != 0)
 			{
 				AsebaMaskSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 				AsebaVMSendExecutionStateChanged(vm);
 				return;
 			}
+			AsebaVMStep(vm);
 		}
 	}
 	
