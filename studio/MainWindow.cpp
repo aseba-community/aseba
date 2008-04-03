@@ -870,6 +870,12 @@ namespace Aseba
 		*/
 	}
 	
+	void MainWindow::sendEventIf(const QModelIndex &index)
+	{
+		if (index.column() == 0)
+			sendEvent();
+	}
+	
 	void MainWindow::logEntryDoubleClicked(QListWidgetItem * item)
 	{
 		if (item->data(Qt::UserRole).type() == QVariant::Point)
@@ -1260,7 +1266,7 @@ namespace Aseba
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
 		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
-		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEvent()));
+		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
 		
 		// logger
