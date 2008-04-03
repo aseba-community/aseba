@@ -5,9 +5,9 @@ if (QT4_FOUND)
 	
 	set(studio_SRCS
 		AeslEditor.cpp
-		FunctionParametersDialog.cpp
 		MainWindow.cpp
 		TargetModels.cpp
+		NamedValuesVectorModel.cpp
 		ClickableLabel.cpp
 		DashelTarget.cpp
 		CustomDelegate.cpp

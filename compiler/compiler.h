@@ -136,26 +136,45 @@ namespace Aseba
 	//! Vector of names of variables
 	typedef std::vector<std::string> VariablesNamesVector;
 	
-	//! Description of an event
-	struct EventDescription
+	//! A name - value pair
+	struct NamedValue
 	{
-		//! Create a filled description 
-		EventDescription(const std::string& name, unsigned size) : name(name), size(size) {}
+		//! Create a filled pair
+		NamedValue(const std::string& name, int value) : name(name), value(value) {}
 		
-		std::string name; //!< name of the event
-		unsigned size; //!< size of the event
+		std::string name; //!< name part of the pair
+		int value; //!< value part of the pair
+	};
+	
+	//! An event description is a name - value pair
+	typedef NamedValue EventDescription;
+	
+	//! An constant definition is a name - value pair
+	typedef NamedValue ConstantDefinition;
+	
+	//! Generic vector of name - value pairs
+	//typedef std::vector<NamedValue> NamedValuesVector;
+	struct NamedValuesVector: public std::vector<NamedValue>
+	{
+		bool contains(const std::string& s) const;
 	};
 	
 	//! Vector of events descriptions
-	typedef std::vector<EventDescription> EventsDescriptionsVector;
+	typedef NamedValuesVector EventsDescriptionsVector;
+	
+	//! Vector of constants definitions
+	typedef NamedValuesVector ConstantsDefinitions;
 	
 	//! Definitions common to several nodes, such as events or some constants
 	struct CommonDefinitions
 	{
+		//! All defined events
 		EventsDescriptionsVector events;
+		//! All globally defined constants
+		ConstantsDefinitions constants;
 		
 		//! Clear all the content
-		void clear() { events.clear(); }
+		void clear() { events.clear(); constants.clear(); }
 	};
 	
 	//! Vector of data of variables

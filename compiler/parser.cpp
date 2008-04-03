@@ -507,7 +507,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// event argument
-		unsigned eventSize = commonDefinitions->events[emitNode->eventId].size;
+		unsigned eventSize = commonDefinitions->events[emitNode->eventId].value;
 		if (eventSize > 0)
 		{
 			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);

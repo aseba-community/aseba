@@ -21,33 +21,43 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CUSTOM_DELEGATE_H
-#define CUSTOM_DELEGATE_H
+#ifndef NAMED_VALUES_VECTOR_MODEL_H
+#define NAMED_VALUES_VECTOR_MODEL_H
 
-#include <QItemDelegate>
+#include <QAbstractTableModel>
+#include <QVector>
+#include <QString>
+#include "../compiler/compiler.h"
+
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class SpinBoxDelegate : public QItemDelegate
+	class NamedValuesVectorModel: public QAbstractTableModel
 	{
 		Q_OBJECT
 	
 	public:
-		SpinBoxDelegate(int minValue, int maxValue, QObject *parent = 0);
-	
-		QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-			const QModelIndex &index) const;
-	
-		void setEditorData(QWidget *editor, const QModelIndex &index) const;
-		void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-	
-		void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-	protected:
-		int minValue;
-		int maxValue;
+		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		
+		int rowCount(const QModelIndex &parent = QModelIndex()) const;
+		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		
+		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+		Qt::ItemFlags flags(const QModelIndex & index) const;
+		
+		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		
+	public slots:
+		void addNamedValue(const NamedValue& namedValue);
+		void delNamedValue(int index);
+		void clear();
+		
+	private:
+		NamedValuesVector* namedValues;
 	};
 	
 	/*@}*/

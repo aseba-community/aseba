@@ -31,16 +31,17 @@ namespace Aseba
 	class TargetVariablesModel;
 	class TargetFunctionsModel;
 	class TargetMemoryModel;
+	class NamedValuesVectorModel;
 	class AeslEditor;
 	class AeslHighlighter;
 	class CompilationLogDialog;
 	
-	class MemoryTableView : public QTableView
+	class FixedWidthTableView : public QTableView
 	{
 	public:
 		QSize minimumSizeHint() const;
 		QSize sizeHint() const;
-		void resizeColumnsToContents ();
+		void resizeColumnsToLongestContents(const QStringList& longestContents);
 	};
 	
 	class NodeTab : public QWidget
@@ -113,7 +114,7 @@ namespace Aseba
 		QPushButton *refreshMemoryButton;
 		
 		TargetMemoryModel *vmMemoryModel;
-		MemoryTableView *vmMemoryView;
+		FixedWidthTableView *vmMemoryView;
 		
 		TargetFunctionsModel *vmFunctionsModel;
 		QTableView *vmFunctionsView;
@@ -175,13 +176,14 @@ namespace Aseba
 		
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
 	
+		void recompileAll();
+	
 	private:
 		// utility functions
 		int getIndexFromId(unsigned node);
 		NodeTab* getTabFromId(unsigned node);
 		NodeTab* getTabFromName(const QString& name);
-		void rebuildEventsNames();
-		void recompileAll();
+		
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
@@ -191,7 +193,7 @@ namespace Aseba
 		void setupMenu();
 		void hideEvent(QHideEvent * event);
 		
-		// data members
+		// tabs
 		QTabWidget* nodes;
 		NodeTab* previousActiveTab;
 		
@@ -201,8 +203,11 @@ namespace Aseba
 		QPushButton* sendEventButton;
 		QListWidget* logger;
 		QPushButton* clearLogger;
-		QListWidget* eventsDescriptionsList;
-		CommonDefinitions commonDefinitions;
+		FixedWidthTableView* eventsDescriptionsView;
+		
+		// models
+		NamedValuesVectorModel* eventsDescriptionsModel;
+		NamedValuesVectorModel* constantsDefinitionsModel;
 		
 		// global buttons
 		QAction* loadAllAct;
@@ -220,8 +225,12 @@ namespace Aseba
 		QAction *undoAct;
 		QAction *redoAct;
 		
+		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		QString actualFileName; //!< name of opened file, "" if new
+		
+		// compiler and source code related stuff
+		CommonDefinitions commonDefinitions;
 		Compiler compiler; //!< Aesl compiler
 		Target *target;
 	};

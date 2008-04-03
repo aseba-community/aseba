@@ -31,8 +31,10 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	SpinBoxDelegate::SpinBoxDelegate(QObject *parent) :
-		QItemDelegate(parent)
+	SpinBoxDelegate::SpinBoxDelegate(int minValue, int maxValue, QObject *parent) :
+		QItemDelegate(parent),
+		minValue(minValue),
+		maxValue(maxValue)
 	{
 	}
  
@@ -41,8 +43,8 @@ namespace Aseba
 		const QModelIndex &/* index */) const
 	{
 		QSpinBox *editor = new QSpinBox(parent);
-		editor->setMinimum(1);
-		editor->setMaximum(8192);
+		editor->setMinimum(minValue);
+		editor->setMaximum(maxValue);
 		editor->installEventFilter(const_cast<SpinBoxDelegate*>(this));
 	
 		return editor;

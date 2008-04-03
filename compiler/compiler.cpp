@@ -50,6 +50,14 @@ namespace Aseba
 			return "";
 	}
 	
+	bool NamedValuesVector::contains(const std::string& s) const
+	{
+		for (size_t i = 0; i < size(); i++)
+			if ((*this)[i].name == s)
+				return true;
+		return false;
+	}
+	
 	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
 	Compiler::Compiler()
 	{

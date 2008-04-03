@@ -25,8 +25,8 @@
 #include "ClickableLabel.h"
 #include "DashelTarget.h"
 #include "TargetModels.h"
+#include "NamedValuesVectorModel.h"
 #include "CustomDelegate.h"
-#include "FunctionParametersDialog.h"
 #include "AeslEditor.h"
 #include "../common/consts.h"
 #include <QtGui>
@@ -85,7 +85,7 @@ namespace Aseba
 		QTextEdit *text;
 	};
 
-	QSize MemoryTableView::minimumSizeHint() const
+	QSize FixedWidthTableView::minimumSizeHint() const
 	{
 		QSize size( QTableView::sizeHint() );
 		int width = 0;
@@ -98,16 +98,16 @@ namespace Aseba
 		return size;
 	}
 	
-	QSize MemoryTableView::sizeHint() const
+	QSize FixedWidthTableView::sizeHint() const
 	{
 		return minimumSizeHint();
 	}
 	
-	void MemoryTableView::resizeColumnsToContents ()
+	void FixedWidthTableView::resizeColumnsToLongestContents(const QStringList& longestContents)
 	{
 		QFontMetrics fm(font());
-		setColumnWidth(0, fm.width("it is long text [9]"));
-		setColumnWidth(1, fm.width("-888888"));
+		for (int i = 0; i < longestContents.size(); ++i)
+			setColumnWidth(i, fm.width(longestContents.at(i)));
 	}
 	
 	NodeTab::NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
@@ -197,7 +197,7 @@ namespace Aseba
 		memoryTitleLayout->addWidget(new QLabel(tr("<b>Memory</b>")));
 		memoryTitleLayout->addWidget(refreshMemoryButton);
 		
-		vmMemoryView = new MemoryTableView;
+		vmMemoryView = new FixedWidthTableView;
 		vmMemoryView->setShowGrid(false);
 		vmMemoryView->verticalHeader()->hide();
 		vmMemoryView->horizontalHeader()->hide();
@@ -206,7 +206,7 @@ namespace Aseba
 		vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
 		vmMemoryView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmMemoryView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-		vmMemoryView->resizeColumnsToContents();
+		vmMemoryView->resizeColumnsToLongestContents(QStringList() << "it is a long text [9]" << "-888888");
 		vmMemoryView->resizeRowsToContents();
 		
 		
@@ -610,6 +610,10 @@ namespace Aseba
 		// create target
 		target = new DashelTarget();
 		
+		// create models
+		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, this);
+		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		
 		// create gui
 		setupWidgets();
 		setupMenu();
@@ -664,8 +668,7 @@ namespace Aseba
 		if (!file.open(QFile::ReadOnly))
 			return;
 		
-		commonDefinitions.clear();
-		eventsDescriptionsList->clear();
+		eventsDescriptionsModel->clear();
 		
 		QDomDocument document("aesl-source");
 		QString errorMsg;
@@ -691,8 +694,7 @@ namespace Aseba
 					}
 					else if (element.tagName() == "event")
 					{
-						eventsDescriptionsList->addItem(element.attribute("name"));
-						commonDefinitions.events.push_back(EventDescription(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
+						eventsDescriptionsModel->addNamedValue(NamedValue(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
 					}
 				}
 				domNode = domNode.nextSibling();
@@ -763,7 +765,7 @@ namespace Aseba
 		{
 			QDomElement element = document.createElement("event");
 			element.setAttribute("name", QString::fromStdString(commonDefinitions.events[i].name));
-			element.setAttribute("size", QString::number(commonDefinitions.events[i].size));
+			element.setAttribute("size", QString::number(commonDefinitions.events[i].value));
 			root.appendChild(element);
 		}
 		
@@ -857,8 +859,11 @@ namespace Aseba
 	
 	void MainWindow::sendEvent()
 	{
+		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
+		Q_ASSERT(currentRow.isValid());
+		unsigned eventId = currentRow.row();
 		VariablesDataVector data;
-		target->sendEvent((unsigned)eventsDescriptionsList->currentRow(), data);
+		target->sendEvent(eventId, data);
 		/*
 			TODO: get events arguments
 			TODO: type events with size first?
@@ -960,36 +965,32 @@ namespace Aseba
 		QString eventName = QInputDialog::getText(this, tr("Add a new event"), tr("Name:"), QLineEdit::Normal, "", &ok);
 		if (ok && !eventName.isEmpty())
 		{
-			eventsDescriptionsList->addItem(eventName);
-			rebuildEventsNames();
-			
-			recompileAll();
+			if (commonDefinitions.events.contains(eventName.toStdString()))
+			{
+				QMessageBox::warning(this, tr("Event already exists"), tr("Event %0 already exists.").arg(eventName));
+			}
+			else
+			{
+				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdString(), 0));
+				recompileAll();
+			}
 		}
 	}
 	
 	void MainWindow::removeEventNameClicked()
 	{
-		delete eventsDescriptionsList->takeItem(eventsDescriptionsList->currentRow());
-		rebuildEventsNames();
+		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
+		Q_ASSERT(currentRow.isValid());
+		eventsDescriptionsModel->delNamedValue(currentRow.row());
 		
 		recompileAll();
 	}
 	
 	void MainWindow::eventsDescriptionsSelectionChanged()
 	{
-		removeEventNameButton->setEnabled(!eventsDescriptionsList->selectedItems ().isEmpty());
-		sendEventButton->setEnabled(!eventsDescriptionsList->selectedItems ().isEmpty());
-	}
-	
-	void MainWindow::rebuildEventsNames()
-	{
-		commonDefinitions.events.clear();
-		for (int i = 0; i < eventsDescriptionsList->count (); ++i)
-		{
-			QListWidgetItem *item = eventsDescriptionsList->item(i);
-			assert(item);
-			commonDefinitions.events.push_back(EventDescription(item->text().toStdString(), 0));
-		}
+		bool isSelected = eventsDescriptionsView->selectionModel()->currentIndex().isValid();
+		removeEventNameButton->setEnabled(isSelected);
+		sendEventButton->setEnabled(isSelected);
 	}
 	
 	void MainWindow::recompileAll()
@@ -1212,10 +1213,20 @@ namespace Aseba
 		
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
 		
-		eventsDescriptionsList = new QListWidget;
-		eventsDescriptionsList->setMinimumSize(80,80);
-		eventsDescriptionsList->setSelectionMode(QAbstractItemView::SingleSelection);
-		eventsDockLayout->addWidget(eventsDescriptionsList, 1);
+		eventsDescriptionsView = new FixedWidthTableView;
+		eventsDescriptionsView->setShowGrid(false);
+		eventsDescriptionsView->verticalHeader()->hide();
+		eventsDescriptionsView->horizontalHeader()->hide();
+		eventsDescriptionsView->setModel(eventsDescriptionsModel);
+		eventsDescriptionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+		eventsDescriptionsView->setSelectionMode(QAbstractItemView::SingleSelection);
+		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, 255, this));
+		eventsDescriptionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+		eventsDescriptionsView->resizeColumnsToLongestContents(QStringList() << "an event name" << "255###");
+		eventsDescriptionsView->resizeRowsToContents();
+		
+		eventsDockLayout->addWidget(eventsDescriptionsView, 1);
 		
 		logger = new QListWidget;
 		logger->setMinimumSize(80,80);
@@ -1226,7 +1237,7 @@ namespace Aseba
 		
 		splitter->addWidget(eventsDockWidget);
 		
-		splitter->setSizes(QList<int>() << 800 << 200);
+		splitter->setSizes(QList<int>() << 800 << 150);
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);
@@ -1248,8 +1259,9 @@ namespace Aseba
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
 		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
-		connect(eventsDescriptionsList, SIGNAL(itemSelectionChanged()), SLOT(eventsNamesSelectionChanged()));
-		connect(eventsDescriptionsList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(sendEvent()));
+		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
+		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEvent()));
+		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
 		
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
