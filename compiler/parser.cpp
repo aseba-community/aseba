@@ -60,6 +60,28 @@ namespace Aseba
 		return tokens.front().iValue;
 	}
 	
+	//! Check if next toxen is a valid constant
+	int Compiler::expectConstant() const
+	{
+		expect(Token::TOKEN_STRING_LITERAL);
+		for (size_t i = 0; i < commonDefinitions->constants.size(); ++i)
+			if (commonDefinitions->constants[i].name == tokens.front().sValue)
+				return commonDefinitions->constants[i].value;
+		
+		throw Error(tokens.front().pos, FormatableString("Constant %0 not defined").arg(tokens.front().sValue));
+		
+		return 0;
+	}
+	
+	//! Check and return either a signed 16 bits integer or the value of a valid constant
+	int Compiler::expectInt16LiteralOrConstant() const
+	{
+		if (tokens.front() == Token::TOKEN_INT_LITERAL)
+			return expectInt16Literal();
+		else
+			return expectConstant();
+	}
+	
 	//! Check if next token is an unsigned 12 bits int literal. If so, return it, if not, throw an exception
 	unsigned Compiler::expectUInt12Literal() const
 	{
@@ -188,10 +210,10 @@ namespace Aseba
 		{
 			tokens.pop_front();
 			
-			expect(Token::TOKEN_INT_LITERAL);
-			varSize = tokens.front().iValue;
-			if (varSize == 0)
-				throw Error(tokens.front().pos, "Error, arrays must have a non-zero size");
+			int value = expectInt16LiteralOrConstant();
+			if (value <= 0)
+				throw Error(tokens.front().pos, "Arrays must have a non-zero positive size");
+			varSize = (unsigned)value;
 			tokens.pop_front();
 			
 			expect(Token::TOKEN_BRACKET_CLOSE);
@@ -361,7 +383,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range start index
-		int rangeStartIndex = expectInt16Literal();
+		int rangeStartIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeStartIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
@@ -370,7 +392,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range end index
-		int rangeEndIndex = expectInt16Literal();
+		int rangeEndIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeEndIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
@@ -382,10 +404,10 @@ namespace Aseba
 			if (tokens.front() == Token::TOKEN_OP_NEG)
 			{
 				tokens.pop_front();
-				step = -expectInt16Literal();
+				step = -expectInt16LiteralOrConstant();
 			}
 			else
-				step = expectInt16Literal();
+				step = expectInt16LiteralOrConstant();
 			if (step == 0)
 				throw Error(tokens.front().pos, "Null steps are not allowed in for loops");
 			tokens.pop_front();
@@ -543,8 +565,11 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
 			tokens.pop_front();
-			expect(Token::TOKEN_INT_LITERAL);
-			unsigned startIndex = tokens.front().iValue;
+			
+			int value = expectInt16LiteralOrConstant();
+			if (value < 0)
+				throw Error(tokens.front().pos, "array index must be positive");
+			unsigned startIndex = (unsigned)value;
 			unsigned len = 1;
 			
 			// check if first index is within bounds
@@ -556,10 +581,13 @@ namespace Aseba
 			if (tokens.front() == Token::TOKEN_COLON)
 			{
 				tokens.pop_front();
-				expect(Token::TOKEN_INT_LITERAL);
+				
+				value = expectInt16LiteralOrConstant();
+				if (value < 0)
+					throw Error(tokens.front().pos, "array index must be positive");
 				
 				// check if second index is within bounds
-				unsigned endIndex = tokens.front().iValue;
+				unsigned endIndex = (unsigned)value;
 				if (endIndex >= varIt->second.second)
 					throw Error(tokens.front().pos, FormatableString("access of array %0 out of bounds").arg(varName));
 				if (endIndex < startIndex)
@@ -680,38 +708,49 @@ namespace Aseba
 			case Token::TOKEN_STRING_LITERAL:
 			{
 				std::string varName = tokens.front().sValue;
-				SourcePos varPos = tokens.front().pos;
-				VariablesMap::const_iterator varIt = variablesMap.find(varName);
-				
-				// check if variable exists
-				if (varIt == variablesMap.end())
-					throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
-				
-				unsigned varAddr = varIt->second.first;
-				unsigned varSize = varIt->second.second;
-				
-				tokens.pop_front();
-				
-				// check if it is an array access
-				if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+				// if too slow, switch to a map
+				if (commonDefinitions->constants.contains(varName))
 				{
+					int value = expectConstant();
 					tokens.pop_front();
-					
-					std::auto_ptr<Node> array(new ArrayReadNode(pos, varAddr, varSize, varName));
-				
-					array->children.push_back(parseShiftExpression());
-
-					expect(Token::TOKEN_BRACKET_CLOSE);
-					tokens.pop_front();
-				
-					return array.release();
+					return new ImmediateNode(pos, value);
 				}
 				else
 				{
-					if (varSize != 1)
-						throw Error(varPos, FormatableString("Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
+					std::string varName = tokens.front().sValue;
+					SourcePos varPos = tokens.front().pos;
+					VariablesMap::const_iterator varIt = variablesMap.find(varName);
 					
-					return new LoadNode(pos, varAddr);
+					// check if variable exists
+					if (varIt == variablesMap.end())
+						throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
+					
+					unsigned varAddr = varIt->second.first;
+					unsigned varSize = varIt->second.second;
+					
+					tokens.pop_front();
+					
+					// check if it is an array access
+					if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+					{
+						tokens.pop_front();
+						
+						std::auto_ptr<Node> array(new ArrayReadNode(pos, varAddr, varSize, varName));
+					
+						array->children.push_back(parseShiftExpression());
+	
+						expect(Token::TOKEN_BRACKET_CLOSE);
+						tokens.pop_front();
+					
+						return array.release();
+					}
+					else
+					{
+						if (varSize != 1)
+							throw Error(varPos, FormatableString("Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
+						
+						return new LoadNode(pos, varAddr);
+					}
 				}
 			}
 			
@@ -773,21 +812,22 @@ namespace Aseba
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
 				
-				if (tokens.front() == Token::TOKEN_STRING_LITERAL)
+				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (commonDefinitions->constants.contains(tokens.front().sValue)))
 				{
-					parseReadVarArrayAccess(&varAddr, &varSize);
-				}
-				else
-				{
+					int value = expectInt16LiteralOrConstant();
 					// we have inline integer, we need to store it and pass the address
 					// we store it at the end of the variable space, we test if there is no overflow
 					if (localConstsAddr <= freeVariableIndex)
 						throw Error(varPos, "No more free variable space for constant");
 					varAddr = --localConstsAddr;
 					varSize = 1;
-					callNode->children.push_back(new ImmediateNode(varPos, tokens.front().iValue));
+					callNode->children.push_back(new ImmediateNode(varPos, value));
 					callNode->children.push_back(new StoreNode(varPos, varAddr));
 					tokens.pop_front();
+				}
+				else
+				{
+					parseReadVarArrayAccess(&varAddr, &varSize);
 				}
 				
 				// check if variable size is correct

@@ -162,6 +162,10 @@ namespace Aseba
 		void removeEventNameClicked();
 		void eventsDescriptionsSelectionChanged();
 		
+		void addConstantClicked();
+		void removeConstantClicked();
+		void constantsSelectionChanged();
+		
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
 		void networkDisconnected();
@@ -206,6 +210,11 @@ namespace Aseba
 		QListWidget* logger;
 		QPushButton* clearLogger;
 		FixedWidthTableView* eventsDescriptionsView;
+		
+		// constants
+		QPushButton* addConstantButton;
+		QPushButton* removeConstantButton;
+		FixedWidthTableView* constantsView;
 		
 		// models
 		NamedValuesVectorModel* eventsDescriptionsModel;

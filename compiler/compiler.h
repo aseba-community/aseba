@@ -153,7 +153,6 @@ namespace Aseba
 	typedef NamedValue ConstantDefinition;
 	
 	//! Generic vector of name - value pairs
-	//typedef std::vector<NamedValue> NamedValuesVector;
 	struct NamedValuesVector: public std::vector<NamedValue>
 	{
 		bool contains(const std::string& s) const;
@@ -250,6 +249,8 @@ namespace Aseba
 		void internalCompilerError() const;
 		void expect(const Token::Type& type) const;
 		int expectInt16Literal() const;
+		int expectConstant() const;
+		int expectInt16LiteralOrConstant() const;
 		unsigned expectUInt12Literal() const;
 		unsigned expectEventId() const;
 		bool isOneOf(const Token::Type *types, size_t length) const;

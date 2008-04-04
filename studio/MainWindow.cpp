@@ -712,6 +712,10 @@ namespace Aseba
 					{
 						eventsDescriptionsModel->addNamedValue(NamedValue(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
 					}
+					else if (element.tagName() == "constant")
+					{
+						constantsDefinitionsModel->addNamedValue(NamedValue(element.attribute("name").toStdString(), element.attribute("value").toInt()));
+					}
 				}
 				domNode = domNode.nextSibling();
 			}
@@ -782,6 +786,15 @@ namespace Aseba
 			QDomElement element = document.createElement("event");
 			element.setAttribute("name", QString::fromStdString(commonDefinitions.events[i].name));
 			element.setAttribute("size", QString::number(commonDefinitions.events[i].value));
+			root.appendChild(element);
+		}
+		
+		// constants
+		for (size_t i = 0; i < commonDefinitions.constants.size(); i++)
+		{
+			QDomElement element = document.createElement("constant");
+			element.setAttribute("name", QString::fromStdString(commonDefinitions.constants[i].name));
+			element.setAttribute("value", QString::number(commonDefinitions.constants[i].value));
 			root.appendChild(element);
 		}
 		
@@ -1051,6 +1064,39 @@ namespace Aseba
 		sendEventButton->setEnabled(isSelected);
 	}
 	
+	void MainWindow::addConstantClicked()
+	{
+		bool ok;
+		QString constantName = QInputDialog::getText(this, tr("Add a new constant"), tr("Name:"), QLineEdit::Normal, "", &ok);
+		if (ok && !constantName.isEmpty())
+		{
+			if (commonDefinitions.constants.contains(constantName.toStdString()))
+			{
+				QMessageBox::warning(this, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(constantName));
+			}
+			else
+			{
+				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdString(), 0));
+				recompileAll();
+			}
+		}
+	}
+	
+	void MainWindow::removeConstantClicked()
+	{
+		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
+		Q_ASSERT(currentRow.isValid());
+		constantsDefinitionsModel->delNamedValue(currentRow.row());
+		
+		recompileAll();
+	}
+	
+	void MainWindow::constantsSelectionChanged()
+	{
+		bool isSelected = constantsView->selectionModel()->currentIndex().isValid();
+		removeConstantButton->setEnabled(isSelected);
+	}
+	
 	void MainWindow::recompileAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -1256,6 +1302,34 @@ namespace Aseba
 		QWidget* eventsDockWidget = new QWidget;
 		QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
 		
+		eventsDockLayout->addWidget(new QLabel(tr("<b>Constants</b>")));
+		
+		QHBoxLayout* constantsAddRemoveLayout = new QHBoxLayout;;
+		constantsAddRemoveLayout->addStretch();
+		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
+		constantsAddRemoveLayout->addWidget(addConstantButton);
+		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
+		removeConstantButton->setEnabled(false);
+		constantsAddRemoveLayout->addWidget(removeConstantButton);
+		
+		eventsDockLayout->addLayout(constantsAddRemoveLayout);
+		
+		constantsView = new FixedWidthTableView;
+		constantsView->setShowGrid(false);
+		constantsView->verticalHeader()->hide();
+		constantsView->horizontalHeader()->hide();
+		constantsView->setModel(constantsDefinitionsModel);
+		constantsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+		constantsView->setSelectionMode(QAbstractItemView::SingleSelection);
+		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
+		constantsView->setMinimumHeight(100);
+		constantsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+		constantsView->resizeColumnsToLongestContents(QStringList() << "constant___" << "-888888##");
+		constantsView->resizeRowsToContents();
+		
+		eventsDockLayout->addWidget(constantsView, 1);
+		
 		eventsDockLayout->addWidget(new QLabel(tr("<b>Events</b>")));
 		
 		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;;
@@ -1280,6 +1354,7 @@ namespace Aseba
 		eventsDescriptionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, 255, this));
+		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		eventsDescriptionsView->resizeColumnsToLongestContents(QStringList() << "an event name" << "255###");
 		eventsDescriptionsView->resizeRowsToContents();
@@ -1287,7 +1362,7 @@ namespace Aseba
 		eventsDockLayout->addWidget(eventsDescriptionsView, 1);
 		
 		logger = new QListWidget;
-		logger->setMinimumSize(80,80);
+		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		eventsDockLayout->addWidget(logger, 3);
 		clearLogger = new QPushButton(tr("Clear"));
@@ -1323,6 +1398,12 @@ namespace Aseba
 		
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
+		
+		// constants
+		connect(addConstantButton, SIGNAL(clicked()), SLOT(addConstantClicked()));
+		connect(removeConstantButton, SIGNAL(clicked()), SLOT(removeConstantClicked()));
+		connect(constantsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(constantsSelectionChanged()));
+		connect(constantsDefinitionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
 		
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
