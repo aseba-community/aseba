@@ -78,16 +78,22 @@ namespace Aseba
 		bool isBreakpointPending = uData && uData->properties.contains("breakpointPending");
 		bool isBreakpoint = uData && uData->properties.contains("breakpoint");
 		
+		QColor breakpointPendingColor(255, 240, 178);
+		QColor breakpointColor(255, 211, 178);
+		QColor activeColor(220, 220, 255);
+		QColor errorColor(240, 100, 100);
+		
 		if (isBreakpointPending)
 		{
 			QTextCharFormat format;
-			format.setBackground(QColor(255, 236, 200));
+			format.setBackground(breakpointPendingColor);
 			setFormat(0, text.length(), format);
 		}
 		if (isBreakpoint)
 		{
 			QTextCharFormat format;
-			format.setBackground(QColor(255, 231, 185));
+			//format.setBackground(QColor(255, 231, 185));
+			format.setBackground(breakpointColor);
 			setFormat(0, text.length(), format);
 		}
 		if (editor->debugging)
@@ -95,13 +101,13 @@ namespace Aseba
 			if (isActive)
 			{
 				QTextCharFormat format;
-				format.setBackground(QColor(220, 220, 255));
+				format.setBackground(activeColor);
 				setFormat(0, text.length(), format);
 			}
 			if (isExecutionError)
 			{
 				QTextCharFormat format;
-				format.setBackground(QColor(240, 0, 0));
+				format.setBackground(errorColor);
 				setFormat(0, text.length(), format);
 			}
 		}
@@ -117,15 +123,15 @@ namespace Aseba
 				QTextCharFormat format = rule.format;
 				
 				if (isBreakpointPending)
-					format.setBackground(QColor(255, 236, 200));
+					format.setBackground(breakpointPendingColor);
 				if (isBreakpoint)
-					format.setBackground(QColor(255, 231, 185));
+					format.setBackground(breakpointColor);
 				if (editor->debugging)
 				{
 					if (isActive)
-						format.setBackground(QColor(220, 220, 255));
+						format.setBackground(activeColor);
 					if (isExecutionError)
-						format.setBackground(QColor(240, 0, 0));
+						format.setBackground(errorColor);
 				}
 				
 				setFormat(index, length, format);

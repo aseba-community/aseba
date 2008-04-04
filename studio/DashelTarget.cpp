@@ -301,7 +301,6 @@ namespace Aseba
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
 		
-		qDebug() << "execution mode = " << nodeIt->second.executionMode ;
 		if (nodeIt->second.executionMode == EXECUTION_STEP_BY_STEP)
 			Step(node).serialize(stream);
 		Run(node).serialize(stream);

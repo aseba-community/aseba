@@ -93,6 +93,7 @@ namespace Aseba
 		bool setEditorProperty(const QString &property, const QVariant &value, unsigned line, bool removeOld = false);
 		bool clearEditorProperty(const QString &property, unsigned line);
 		bool clearEditorProperty(const QString &property);
+		void switchEditorProperty(const QString &oldProperty, const QString &newProperty);
 		
 	protected:
 		unsigned id;

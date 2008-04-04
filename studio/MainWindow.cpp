@@ -355,13 +355,14 @@ namespace Aseba
 		if (editor->debugging)
 		{
 			//target->stop(id);
+			// when code is changed, remove breakpoints from target but keep them locally as pending for next code load
 			doRehighlight = true;
 			editor->debugging = false;
 			resetButton->setEnabled(false);
 			runInterruptButton->setEnabled(false);
 			nextButton->setEnabled(false);
 			target->clearBreakpoints(id);
-			// TODO: should we set breakpoints to pending to notify the user that breakpoints are not valid any more ?
+			switchEditorProperty("breakpoint", "breakpointPending");
 		}
 		
 		if (doRehighlight)
@@ -490,7 +491,7 @@ namespace Aseba
 		while (block != editor->document()->end())
 		{
 			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
-			if (uData && uData->properties.contains("breakpoint"))
+			if (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending")))
 				target->setBreakpoint(id, lineCounter);
 			block = block.next();
 			lineCounter++;
@@ -603,7 +604,20 @@ namespace Aseba
 		return changed;
 	}
 	
-	
+	void NodeTab::switchEditorProperty(const QString &oldProperty, const QString &newProperty)
+	{
+		QTextBlock block = editor->document()->begin();
+		while (block != editor->document()->end())
+		{
+			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			if (uData && uData->properties.contains(oldProperty))
+			{
+				uData->properties.remove(oldProperty);
+				uData->properties[newProperty] = QVariant();
+			}
+			block = block.next();
+		}
+	}
 	
 	
 	MainWindow::MainWindow(QWidget *parent) :
