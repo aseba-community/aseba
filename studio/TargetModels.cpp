@@ -356,6 +356,10 @@ namespace Aseba
 				else
 					variablesNames[i] = QString("%0[%1]").arg(name).arg(counter);
 			}
+			else
+			{
+				variablesNames[i] = "";
+			}
 		}
 		
 		variablesData.resize(variablesNames.size());

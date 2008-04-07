@@ -158,6 +158,7 @@ namespace Aseba
 		
 		// fill variables names vector
 		variablesNames.resize(targetDescription->variablesSize, "");
+		fill(variablesNames.begin(), variablesNames.end(), "");
 		for (VariablesMap::const_iterator it = variablesMap.begin(); it != variablesMap.end(); ++it)
 		{
 			unsigned pos = it->second.first;
