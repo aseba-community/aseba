@@ -22,17 +22,16 @@ if (QT4_FOUND)
 	
 	include_directories(${ENKI_INCLUDE_DIR})
 	
-	set(vrcs_SRCS vrcs.cpp objects/food_base.cpp  objects/food_charge0.cpp  objects/food_charge1.cpp  objects/food_charge2.cpp  objects/food_charge3.cpp  objects/food_ring.cpp)
+	set(challenge_SRCS challenge.cpp objects/food_base.cpp  objects/food_charge0.cpp  objects/food_charge1.cpp  objects/food_charge2.cpp  objects/food_charge3.cpp  objects/food_ring.cpp)
 	
-	qt4_automoc(${vrcs_SRCS})
+	qt4_automoc(${challenge_SRCS})
 	
-	qt4_add_resources(vrcs_RCC_SRCS vrcs-textures.qrc)
+	qt4_add_resources(challenge_RCC_SRCS challenge-textures.qrc)
 	
 	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} .)
 	
-	add_executable(vrcs ${vrcs_SRCS} ${vrcs_RCC_SRCS})
-	#add_executable(vrcs ${vrcs_SRCS} )
+	add_executable(asebachallenge ${challenge_SRCS} ${challenge_RCC_SRCS})
 	
-	target_link_libraries(vrcs aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES}  ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+	target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES}  ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 
 endif (QT4_FOUND)
