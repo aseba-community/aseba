@@ -84,7 +84,7 @@ namespace Aseba
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
 			QListWidgetItem* item = new QListWidgetItem(QString(it->second.second.c_str()));
-			item->setData(Qt::UserRole, QVariant(QString(it->second.first.c_str())));
+			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
 			serial->addItem(item);
 		//
 		}
