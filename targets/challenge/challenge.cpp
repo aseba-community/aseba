@@ -1,5 +1,5 @@
 /*
-	VRCS - Virtual Robot Challenge System
+	Challenge - Virtual Robot Challenge System
 	Copyright (C) 1999 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
@@ -513,7 +513,7 @@ namespace Enki
 			glPushMatrix();
 			// disable writing of z-buffer
 			glDepthMask( GL_FALSE );
-			glTranslated(0, 0, 0.001);
+			glEnable(GL_POLYGON_OFFSET_FILL);
 			//glScaled(1-disp*0.1, 1-disp*0.1, 1);
 			glBegin(GL_QUADS);
 			glTexCoord2f(1.f, 0.f);
@@ -525,6 +525,7 @@ namespace Enki
 			glTexCoord2f(0.f, 0.f);
 			glVertex2f(-7.5f, 7.5f);
 			glEnd();
+			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDepthMask( GL_TRUE );
 			glPopMatrix();
 			
@@ -533,68 +534,6 @@ namespace Enki
 			glEnable(GL_LIGHTING);
 			
 			glDisable(GL_TEXTURE_2D);
-			
-			/*glCallList(lists[1]);
-			
-			//glColor3d(1-object->color.components[0], 1+object->color.components[1], 1+object->color.components[2]);
-			glColor3d(0.6+object->color.components[0]-0.3*object->color.components[1]-0.3*object->color.components[2], 0.6+object->color.components[1]-0.3*object->color.components[0]-0.3*object->color.components[2], 0.6+object->color.components[2]-0.3*object->color.components[0]-0.3*object->color.components[1]);
-			glCallList(lists[2]);
-			
-			glColor3d(1, 1, 1);
-			
-			// wheels
-			glPushMatrix();
-			glRotated((fmod(dw->leftOdometry, wheelCirc) * 360) / wheelCirc, 0, 1, 0);
-			glCallList(lists[3]);
-			glPopMatrix();
-			
-			glPushMatrix();
-			glRotated((fmod(dw->rightOdometry, wheelCirc) * 360) / wheelCirc, 0, 1, 0);
-			glCallList(lists[4]);
-			glPopMatrix();
-			
-			// shadow
-			glBindTexture(GL_TEXTURE_2D, textures[1]);
-			glDisable(GL_LIGHTING);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-			
-			// bottom shadow
-			glPushMatrix();
-			// disable writing of z-buffer
-			glDepthMask( GL_FALSE );
-			glTranslated(0, 0, -wheelRadius+0.01);
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.49f, 0.01f);
-			glVertex2f(-5.f, -5.f);
-			glTexCoord2f(0.49f, 0.49f);
-			glVertex2f(5.f, -5.f);
-			glTexCoord2f(0.01f, 0.49f);
-			glVertex2f(5.f, 5.f);
-			glTexCoord2f(0.01f, 0.01f);
-			glVertex2f(-5.f, 5.f);
-			glEnd();
-			glDepthMask( GL_TRUE );
-			glPopMatrix();
-			
-			// wheel shadow
-			glPushMatrix();
-			glScaled(radiosityScale, radiosityScale, radiosityScale);
-			glTranslated(0, -0.025, 0);
-			glCallList(lists[3]);
-			glPopMatrix();
-			
-			glPushMatrix();
-			glScaled(radiosityScale, radiosityScale, radiosityScale);
-			glTranslated(0, 0.025, 0);
-			glCallList(lists[4]);
-			glPopMatrix();
-			
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glDisable(GL_BLEND);
-			glEnable(GL_LIGHTING);
-			
-			glDisable(GL_TEXTURE_2D);*/
 		}
 		
 		virtual void drawSpecial(PhysicalObject* object, int param) const
@@ -607,13 +546,13 @@ namespace Enki
 		}
 	};
 
-	class VRCSViewer : public ViewerWidget
+	class ChallengeViewer : public ViewerWidget
 	{
 	protected:
 		GLuint mobotsLogo;
 		
 	public:
-		VRCSViewer(World* world) : ViewerWidget(world)
+		ChallengeViewer(World* world) : ViewerWidget(world)
 		{
 			initTexturesResources();
 		}
@@ -960,10 +899,10 @@ int main(int argc, char *argv[])
 	}
 	
 	// Create viewer
-	Enki::VRCSViewer viewer(&world);
+	Enki::ChallengeViewer viewer(&world);
 	
 	// Show and run
-	viewer.setWindowTitle("VRCS - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowTitle("Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.show();
 	
 	return app.exec();
