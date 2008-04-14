@@ -561,6 +561,7 @@ namespace Enki
 		
 		titleFont = QFont("SF Old Republic SC", 20);
 		entryFont = QFont("SF Old Republic SC", 23);
+		labelFont = QFont("SF Old Republic SC", 16);
 		
 		QVBoxLayout *vLayout = new QVBoxLayout;
 		QHBoxLayout *hLayout = new QHBoxLayout;
@@ -711,6 +712,7 @@ namespace Enki
 	void ChallengeViewer::sceneCompletedHook()
 	{
 		// create a map with names and scores
+		qglColor(Qt::black);
 		QMultiMap<int, QStringList> scores;
 		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
 		{
@@ -720,6 +722,7 @@ namespace Enki
 				QStringList entry;
 				entry << epuck->name << QString::number(epuck->port) << QString::number((int)epuck->energy) << QString::number((int)epuck->score);
 				scores.insert((int)epuck->score, entry);
+				renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, labelFont);
 			}
 		}
 		

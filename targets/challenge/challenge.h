@@ -52,6 +52,7 @@ namespace Enki
 		
 		QFont titleFont;
 		QFont entryFont;
+		QFont labelFont;
 		
 	public:
 		ChallengeViewer(World* world, int ePuckCount);

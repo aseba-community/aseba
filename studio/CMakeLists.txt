@@ -25,7 +25,7 @@ if (QT4_FOUND)
 	# Only include the qtmain lib if we are on the windows platform
 	if (WIN32)
 		target_link_libraries(asebastudio aseba ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTXML_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS})
-	elseif (WIN32)
+	else (WIN32)
 		target_link_libraries(asebastudio aseba ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS})
 	endif (WIN32)
 	
