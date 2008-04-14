@@ -39,10 +39,11 @@
 #include <dashel/dashel.h>
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
-#include <viewer/Viewer.h>
 #include <iostream>
 #include <QtGui>
 #include <QtDebug>
+#include "challenge.h"
+#include <challenge.moc>
 
 static void initTexturesResources()
 {
@@ -174,6 +175,7 @@ namespace Enki
 			sint16 energy;
 			sint16 user[1024];
 		} variables;
+		int port;
 		
 		//std::deque<Event> eventsQueue;
 		//unsigned amountOfTimerEventInQueue;
@@ -196,7 +198,8 @@ namespace Enki
 			vm.variables = reinterpret_cast<sint16 *>(&variables);
 			vm.variablesSize = sizeof(variables) / sizeof(sint16);
 			
-			Dashel::Hub::connect(QString("tcpin:port=%1").arg(PORT_BASE+id).toStdString());
+			port = PORT_BASE+id;
+			Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
 			
 			AsebaVMInit(&vm, 1);
 			
@@ -546,121 +549,210 @@ namespace Enki
 		}
 	};
 
-	class ChallengeViewer : public ViewerWidget
+	// Challenge Viewer
+	
+	ChallengeViewer::ChallengeViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
 	{
-	protected:
-		GLuint mobotsLogo;
+		initTexturesResources();
+		QVBoxLayout *vLayout = new QVBoxLayout;
+		QHBoxLayout *hLayout = new QHBoxLayout;
 		
-	public:
-		ChallengeViewer(World* world) : ViewerWidget(world)
+		hLayout->addStretch();
+		addRobotButton = new QPushButton(tr("Add a new robot"));
+		hLayout->addWidget(addRobotButton);
+		delRobotButton = new QPushButton(tr("Remove all robots"));
+		hLayout->addWidget(delRobotButton);
+		autoCameraButtons = new QCheckBox(tr("Auto camera"));
+		hLayout->addWidget(autoCameraButtons);
+		hideButtons = new QCheckBox(tr("Auto hide"));
+		hLayout->addWidget(hideButtons);
+		hLayout->addStretch();
+		vLayout->addLayout(hLayout);
+		vLayout->addStretch();
+		setLayout(vLayout);
+		
+		// TODO: setup transparent with style sheet
+		connect(addRobotButton, SIGNAL(clicked()), SLOT(addNewRobot()));
+		connect(delRobotButton, SIGNAL(clicked()), SLOT(removeRobot()));
+		
+		setMouseTracking(true);
+		setAttribute(Qt::WA_OpaquePaintEvent);
+		setAttribute(Qt::WA_NoSystemBackground);
+		resize(780, 560);
+	}
+	
+	void ChallengeViewer::addNewRobot()
+	{
+		bool ok;
+		QString eventName = QInputDialog::getText(this, tr("Add a new robot"), tr("Robot name:"), QLineEdit::Normal, "", &ok);
+		if (ok && !eventName.isEmpty())
 		{
-			initTexturesResources();
+			// TODO change ePuckCount to port
+			Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ePuckCount++);
+			epuck->pos.x = Enki::random.getRange(120)+10;
+			epuck->pos.y = Enki::random.getRange(120)+10;
+			epuck->name = eventName;
+			world->addObject(epuck);
+		}
+	}
+	
+	void ChallengeViewer::removeRobot()
+	{
+		std::set<AsebaFeedableEPuck *> toFree;
+		// TODO: for now, remove all robots; later, show a gui box to choose which robot to remove
+		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		{
+			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
+			if (epuck)
+				toFree.insert(epuck);
 		}
 		
-	protected:
-		void drawQuad2D(double x, double y, double w, double ar)
+		for (std::set<AsebaFeedableEPuck *>::iterator it = toFree.begin(); it != toFree.end(); ++it)
 		{
-			double thisAr = (double)width() / (double)height();
-			double h = (w * thisAr) / ar;
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 1);
-			glVertex2d(x, y);
-			glTexCoord2d(1, 1);
-			glVertex2d(x+w, y);
-			glTexCoord2d(1, 0);
-			glVertex2d(x+w, y+h);
-			glTexCoord2d(0, 0);
-			glVertex2d(x, y+h);
-			glEnd();
+			world->removeObject(*it);
+			delete *it;
 		}
-		
-		void initializeGL()
-		{
-			ViewerWidget::initializeGL();
-			mobotsLogo = bindTexture(QPixmap(QString("mobots.png")), GL_TEXTURE_2D);
-		}
-		
-		void renderObjectsTypesHook()
-		{
-			// render vrcs specific static types
-			managedObjects[&typeid(EPuckFeeder)] = new FeederModel(this);
-			managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-		}
-		
-		void displayObjectHook(PhysicalObject *object)
-		{
-			FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
-			if ((epuck) && (epuck->diedAnimation >= 0))
-			{
-				ViewerUserData *userData = dynamic_cast<ViewerUserData *>(epuck->userData);
-				assert(userData);
-				
-				double dist = (double)(DEATH_ANIMATION_STEPS - epuck->diedAnimation);
-				double coeff =  (double)(epuck->diedAnimation) / DEATH_ANIMATION_STEPS;
-				glColor3d(0.2*coeff, 0.2*coeff, 0.2*coeff);
-				glTranslated(0, 0, 2. * dist);
-				userData->drawSpecial(object);
-			}
-			/*FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
-			{
-			}*/
-		}
-		
-		void sceneCompletedHook()
-		{
-			qglColor(Qt::black);
-			QFont font;
-			font.setPixelSize(18);
-			
-			// create a map with names and scores
-			QMultiMap<int, QPair<QString, int> > scores;
-			for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
-			{
-				FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(*it);
-				if (epuck)
-				{
-					scores.insert((int)epuck->score, qMakePair<QString, int>(epuck->name, (int)epuck->energy));
-					renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, font);
-				}
-			}
-			
-			// display this map
-			QMapIterator<int, QPair<QString, int> > it(scores);
-			it.toBack();
-			int pos = 0;
-			while (it.hasPrevious())
-			{
-				it.previous();
-				renderText(5, 22+pos, QString("%0\tpt. %1\tenergy. %2").arg(it.value().first).arg(it.key()).arg(it.value().second), font);
-				pos += 22;
-			}
-			
-			/*// display logos
-			glDisable(GL_DEPTH_TEST);
-			
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			gluOrtho2D(0, 1, 1, 0);
-			
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			
-			glEnable(GL_TEXTURE_2D);
-			glDisable(GL_CULL_FACE);
-			glEnable(GL_BLEND);
-			
-			glBindTexture(GL_TEXTURE_2D, mobotsLogo);
-			drawQuad2D(0.05, 0.05, 0.2, 1.48125);
-			
-			glDisable(GL_BLEND);
-			glEnable(GL_CULL_FACE);
-			glDisable(GL_TEXTURE_2D);
-			
-			glEnable(GL_DEPTH_TEST);*/
-		}
-	};
-}
+	}
 
+	void ChallengeViewer::timerEvent(QTimerEvent * event)
+	{
+		if (autoCameraButtons->isChecked())
+		{
+			altitude =60;
+			yaw += 0.002;
+			pos = QPointF(-world->w/2 + 80*sin(yaw+M_PI/2), -world->h/2 + 80*cos(yaw+M_PI/2));
+			if (yaw > 2*M_PI)
+				yaw -= 2*M_PI;
+			pitch = M_PI/4;
+		}
+		ViewerWidget::timerEvent(event);
+	}
+
+	void ChallengeViewer::mouseMoveEvent ( QMouseEvent * event )
+	{
+		bool isInButtonArea = event->y() < addRobotButton->y() + addRobotButton->height() + 10;
+		if (hideButtons->isChecked())
+		{
+			if (isInButtonArea && !addRobotButton->isVisible())
+			{
+				addRobotButton->show();
+				delRobotButton->show();
+				autoCameraButtons->show();
+				hideButtons->show();
+			}
+			if (!isInButtonArea && addRobotButton->isVisible())
+			{
+				addRobotButton->hide();
+				delRobotButton->hide();
+				autoCameraButtons->hide();
+				hideButtons->hide();
+			}
+		}
+		
+		ViewerWidget::mouseMoveEvent(event);
+	}
+	
+	void ChallengeViewer::drawQuad2D(double x, double y, double w, double ar)
+	{
+		double thisAr = (double)width() / (double)height();
+		double h = (w * thisAr) / ar;
+		glBegin(GL_QUADS);
+		glTexCoord2d(0, 1);
+		glVertex2d(x, y);
+		glTexCoord2d(1, 1);
+		glVertex2d(x+w, y);
+		glTexCoord2d(1, 0);
+		glVertex2d(x+w, y+h);
+		glTexCoord2d(0, 0);
+		glVertex2d(x, y+h);
+		glEnd();
+	}
+	
+	void ChallengeViewer::initializeGL()
+	{
+		ViewerWidget::initializeGL();
+		mobotsLogo = bindTexture(QPixmap(QString("mobots.png")), GL_TEXTURE_2D);
+	}
+	
+	void ChallengeViewer::renderObjectsTypesHook()
+	{
+		// render vrcs specific static types
+		managedObjects[&typeid(EPuckFeeder)] = new FeederModel(this);
+		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
+	}
+	
+	void ChallengeViewer::displayObjectHook(PhysicalObject *object)
+	{
+		FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
+		if ((epuck) && (epuck->diedAnimation >= 0))
+		{
+			ViewerUserData *userData = dynamic_cast<ViewerUserData *>(epuck->userData);
+			assert(userData);
+			
+			double dist = (double)(DEATH_ANIMATION_STEPS - epuck->diedAnimation);
+			double coeff =  (double)(epuck->diedAnimation) / DEATH_ANIMATION_STEPS;
+			glColor3d(0.2*coeff, 0.2*coeff, 0.2*coeff);
+			glTranslated(0, 0, 2. * dist);
+			userData->drawSpecial(object);
+		}
+		/*FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
+		{
+		}*/
+	}
+	
+	void ChallengeViewer::sceneCompletedHook()
+	{
+		qglColor(Qt::black);
+		QFont font;
+		font.setPixelSize(18);
+		
+		// create a map with names and scores
+		QMultiMap<int, QPair<QString, int> > scores;
+		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		{
+			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
+			if (epuck)
+			{
+				scores.insert((int)epuck->score, qMakePair<QString, int>(QString("%0 (%1)").arg(epuck->name).arg(epuck->port), (int)epuck->energy));
+				renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, font);
+			}
+		}
+		
+		// display this map
+		QMapIterator<int, QPair<QString, int> > it(scores);
+		it.toBack();
+		int pos = 0;
+		while (it.hasPrevious())
+		{
+			it.previous();
+			renderText(5, 52+pos, QString("%0\tpt. %1\tenergy. %2").arg(it.value().first).arg(it.key()).arg(it.value().second), font);
+			pos += 22;
+		}
+		
+		/*// display logos
+		glDisable(GL_DEPTH_TEST);
+		
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluOrtho2D(0, 1, 1, 0);
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		
+		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		
+		glBindTexture(GL_TEXTURE_2D, mobotsLogo);
+		drawQuad2D(0.05, 0.05, 0.2, 1.48125);
+		
+		glDisable(GL_BLEND);
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_TEXTURE_2D);
+		
+		glEnable(GL_DEPTH_TEST);*/
+	}
+}
 
 // Implementation of aseba glue code
 
@@ -889,6 +981,7 @@ int main(int argc, char *argv[])
 	world.addObject(feeders[3]);
 	
 	// Add e-puck
+	int ePuckCount = 0;
 	for (int i = 1; i < argc; i++)
 	{
 		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(i-1);
@@ -896,10 +989,11 @@ int main(int argc, char *argv[])
 		epuck->pos.y = Enki::random.getRange(120)+10;
 		epuck->name = argv[i];
 		world.addObject(epuck);
+		ePuckCount++;
 	}
 	
 	// Create viewer
-	Enki::ChallengeViewer viewer(&world);
+	Enki::ChallengeViewer viewer(&world, ePuckCount);
 	
 	// Show and run
 	viewer.setWindowTitle("Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");

@@ -28,7 +28,7 @@ if (QT4_FOUND)
 	
 	qt4_add_resources(challenge_RCC_SRCS challenge-textures.qrc)
 	
-	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} .)
+	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/targets/challenge .)
 	
 	add_executable(asebachallenge ${challenge_SRCS} ${challenge_RCC_SRCS})
 	
