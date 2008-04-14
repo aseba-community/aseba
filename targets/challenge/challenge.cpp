@@ -554,6 +554,14 @@ namespace Enki
 	ChallengeViewer::ChallengeViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
 	{
 		initTexturesResources();
+		
+		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
+		Q_ASSERT(res != -1);
+		//qDebug() << QFontDatabase::applicationFontFamilies(res);
+		
+		titleFont = QFont("SF Old Republic SC", 20);
+		entryFont = QFont("SF Old Republic SC", 23);
+		
 		QVBoxLayout *vLayout = new QVBoxLayout;
 		QHBoxLayout *hLayout = new QHBoxLayout;
 		
@@ -612,18 +620,19 @@ namespace Enki
 			world->removeObject(*it);
 			delete *it;
 		}
+		ePuckCount = 0;
 	}
 
 	void ChallengeViewer::timerEvent(QTimerEvent * event)
 	{
 		if (autoCameraButtons->isChecked())
 		{
-			altitude =60;
+			altitude = 70;
 			yaw += 0.002;
-			pos = QPointF(-world->w/2 + 80*sin(yaw+M_PI/2), -world->h/2 + 80*cos(yaw+M_PI/2));
+			pos = QPointF(-world->w/2 + 120*sin(yaw+M_PI/2), -world->h/2 + 120*cos(yaw+M_PI/2));
 			if (yaw > 2*M_PI)
 				yaw -= 2*M_PI;
-			pitch = M_PI/4;
+			pitch = M_PI/7	;
 		}
 		ViewerWidget::timerEvent(event);
 	}
@@ -671,7 +680,6 @@ namespace Enki
 	void ChallengeViewer::initializeGL()
 	{
 		ViewerWidget::initializeGL();
-		mobotsLogo = bindTexture(QPixmap(QString("mobots.png")), GL_TEXTURE_2D);
 	}
 	
 	void ChallengeViewer::renderObjectsTypesHook()
@@ -702,55 +710,134 @@ namespace Enki
 	
 	void ChallengeViewer::sceneCompletedHook()
 	{
-		qglColor(Qt::black);
-		QFont font;
-		font.setPixelSize(18);
-		
 		// create a map with names and scores
-		QMultiMap<int, QPair<QString, int> > scores;
+		QMultiMap<int, QStringList> scores;
 		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
 		{
 			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
 			if (epuck)
 			{
-				scores.insert((int)epuck->score, qMakePair<QString, int>(QString("%0 (%1)").arg(epuck->name).arg(epuck->port), (int)epuck->energy));
-				renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, font);
+				QStringList entry;
+				entry << epuck->name << QString::number(epuck->port) << QString::number((int)epuck->energy) << QString::number((int)epuck->score);
+				scores.insert((int)epuck->score, entry);
 			}
 		}
 		
-		// display this map
-		QMapIterator<int, QPair<QString, int> > it(scores);
+		// build score texture
+		QImage scoreBoard(512, 256, QImage::Format_ARGB32);
+		scoreBoard.setDotsPerMeterX(2350);
+		scoreBoard.setDotsPerMeterY(2350);
+		QPainter painter(&scoreBoard);
+		//painter.fillRect(scoreBoard.rect(), QColor(224,224,255,196));
+		painter.fillRect(scoreBoard.rect(), QColor(224,255,224,196));
+		
+		// draw lines
+		painter.setBrush(Qt::NoBrush);
+		QPen pen(Qt::black);
+		pen.setWidth(2);
+		painter.setPen(pen);
+		painter.drawRect(scoreBoard.rect());
+		pen.setWidth(1);
+		painter.setPen(pen);
+		painter.drawLine(22, 34, 504, 34);
+		painter.drawLine(312, 12, 312, 247);
+		painter.drawLine(312, 240, 504, 240);
+		
+		// draw title
+		painter.setFont(titleFont);
+		painter.drawText(35, 28, "name");
+		painter.drawText(200, 28, "port");
+		painter.drawText(324, 28, "energy");
+		painter.drawText(430, 28, "points");
+		
+		// display entries
+		QMapIterator<int, QStringList> it(scores);
+		
 		it.toBack();
-		int pos = 0;
+		int pos = 61;
 		while (it.hasPrevious())
 		{
 			it.previous();
-			renderText(5, 52+pos, QString("%0\tpt. %1\tenergy. %2").arg(it.value().first).arg(it.key()).arg(it.value().second), font);
-			pos += 22;
+			painter.drawText(200, pos, it.value().at(1));
+			pos += 24;
 		}
 		
-		/*// display logos
-		glDisable(GL_DEPTH_TEST);
+		it.toBack();
+		painter.setFont(entryFont);
+		pos = 61;
+		while (it.hasPrevious())
+		{
+			it.previous();
+			painter.drawText(35, pos, it.value().at(0));
+			painter.drawText(335, pos, it.value().at(2));
+			painter.drawText(445, pos, it.value().at(3));
+			pos += 24;
+		}
 		
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluOrtho2D(0, 1, 1, 0);
-		
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		
+		glDisable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
-		glDisable(GL_CULL_FACE);
+		GLuint tex = bindTexture(scoreBoard, GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		glBindTexture(GL_TEXTURE_2D, mobotsLogo);
-		drawQuad2D(0.05, 0.05, 0.2, 1.48125);
+		glCullFace(GL_FRONT);
+		glColor4d(1, 1, 1, 0.75);
+		for (int i = 0; i < 4; i++)
+		{
+			glPushMatrix();
+			glTranslated(world->w/2, world->h/2, 50);
+			glRotated(90*i, 0, 0, 1);
+			glBegin(GL_QUADS);
+			glTexCoord2d(0, 0);
+			glVertex3d(-20, -20, 0);
+			glTexCoord2d(1, 0);
+			glVertex3d(20, -20, 0);
+			glTexCoord2d(1, 1);
+			glVertex3d(20, -20, 20);
+			glTexCoord2d(0, 1);
+			glVertex3d(-20, -20, 20);
+			glEnd();
+			glPopMatrix();
+		}
 		
-		glDisable(GL_BLEND);
-		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glColor3d(1, 1, 1);
+		for (int i = 0; i < 4; i++)
+		{
+			glPushMatrix();
+			glTranslated(world->w/2, world->h/2, 50);
+			glRotated(90*i, 0, 0, 1);
+			glBegin(GL_QUADS);
+			glTexCoord2d(0, 0);
+			glVertex3d(-20, -20, 0);
+			glTexCoord2d(1, 0);
+			glVertex3d(20, -20, 0);
+			glTexCoord2d(1, 1);
+			glVertex3d(20, -20, 20);
+			glTexCoord2d(0, 1);
+			glVertex3d(-20, -20, 20);
+			glEnd();
+			glPopMatrix();
+		}
+		
+		deleteTexture(tex);
+		
 		glDisable(GL_TEXTURE_2D);
+		glColor4d(7./8.,7./8.,1,0.75);
+		glPushMatrix();
+		glTranslated(world->w/2, world->h/2, 50);
+		glBegin(GL_QUADS);
+		glVertex3d(-20,-20,20);
+		glVertex3d(20,-20,20);
+		glVertex3d(20,20,20);
+		glVertex3d(-20,20,20);
 		
-		glEnable(GL_DEPTH_TEST);*/
+		glVertex3d(-20,20,0);
+		glVertex3d(20,20,0);
+		glVertex3d(20,-20,0);
+		glVertex3d(-20,-20,0);
+		glEnd();
+		glPopMatrix();
 	}
 }
 

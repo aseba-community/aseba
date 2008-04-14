@@ -45,11 +45,13 @@ namespace Enki
 		
 	protected:
 		int ePuckCount;
-		GLuint mobotsLogo;
 		QPushButton* addRobotButton;
 		QPushButton* delRobotButton;
 		QCheckBox* autoCameraButtons;
 		QCheckBox* hideButtons;
+		
+		QFont titleFont;
+		QFont entryFont;
 		
 	public:
 		ChallengeViewer(World* world, int ePuckCount);
