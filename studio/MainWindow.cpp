@@ -56,34 +56,28 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class CompilationLogDialog: public QDialog
+	 CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
+	 	QDialog(parent)
 	{
-	public:
-		 CompilationLogDialog(QWidget *parent) :
-		 	QDialog(parent)
-		{
-			QFont font;
-			font.setFamily("");
-			font.setStyleHint(QFont::TypeWriter);
-			font.setFixedPitch(true);
-			font.setPointSize(10);
-			
-			text = new QTextEdit;
-			text->setFont(font);
-			text->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
-			text->setReadOnly(true);
-			
-			QVBoxLayout* layout = new QVBoxLayout(this);
-			layout->addWidget(text);
-			
-			//setStandardButtons(QMessageBox::Ok);
-			setWindowTitle(tr("Aseba Studio: Output of last compilation"));
-			setModal(false);
-			setSizeGripEnabled(true);
-		}
-	
-		QTextEdit *text;
-	};
+		QFont font;
+		font.setFamily("");
+		font.setStyleHint(QFont::TypeWriter);
+		font.setFixedPitch(true);
+		font.setPointSize(10);
+		
+		text = new QTextEdit;
+		text->setFont(font);
+		text->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+		text->setReadOnly(true);
+		
+		QVBoxLayout* layout = new QVBoxLayout(this);
+		layout->addWidget(text);
+		
+		//setStandardButtons(QMessageBox::Ok);
+		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
+		setModal(false);
+		setSizeGripEnabled(true);
+	}
 
 	QSize FixedWidthTableView::minimumSizeHint() const
 	{

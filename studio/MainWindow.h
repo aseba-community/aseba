@@ -36,6 +36,16 @@ namespace Aseba
 	class AeslHighlighter;
 	class CompilationLogDialog;
 	
+	class CompilationLogDialog: public QDialog
+	{
+		Q_OBJECT
+		
+	public:
+		CompilationLogDialog(QWidget *parent);
+		
+		QTextEdit *text;
+	};
+	
 	class FixedWidthTableView : public QTableView
 	{
 	public:
