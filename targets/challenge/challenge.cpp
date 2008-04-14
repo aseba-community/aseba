@@ -954,6 +954,15 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	
+	// Translation support
+	QTranslator qtTranslator;
+	qtTranslator.load("qt_" + QLocale::system().name());
+	app.installTranslator(&qtTranslator);
+	
+	QTranslator translator;
+	translator.load(QString(":/asebachallenge_") + QLocale::system().name());
+	app.installTranslator(&translator);
+	
 	// Create the world
 	Enki::World world(140, 140);
 	

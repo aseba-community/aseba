@@ -205,7 +205,7 @@ namespace Aseba
 			
 			try
 			{
-				qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
+				//qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
 				stream = Hub::connect(targetSelector.getTarget());
 				break;
 			}
@@ -379,8 +379,8 @@ namespace Aseba
 	void DashelTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
-		message->dump(std::cout);
-		std::cout << std::endl;
+		//message->dump(std::cout);
+		//std::cout << std::endl;
 		
 		if (!quitting)
 		{
