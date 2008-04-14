@@ -1,0 +1,13 @@
+Source:aseba
+Maintainer: Stephane Magnenat <stephane@nospam.magnenant.net>
+Section:devel
+Priority:optional
+Standards-Version: 3.7.2
+
+Package:aseba
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Aseba is an event-based framework for distributed mobile robots control.
+ Its core is a lightweight virtual machine, small enough to run on any 16 bits microcontroller.
+ In Aseba, those microcontrollers are linked in a network and all their programs are developed
+ and debugged from a single application, Aseba Studio.

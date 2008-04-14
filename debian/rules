@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+
+#build: clean
+#	mkdir debian/build
+#	cd debian/build && cmake -D CMAKE_BUILD_TYPE=relwithdebuginfo ../..
+#	cd debian/build && $(MAKE)
+
+clean:
+	rm -rf debian/files debian/substvars debian/tmp debian/build
+
+binary: binary-arch binary-indep
+
+binary-indep:
+
+binary-arch:
+	rm -rf debian/tmp
+	install -d debian/tmp/DEBIAN
+	install -d debian/tmp/usr/bin
+	install -d debian/tmp/usr/share/doc/aseba
+#	cp changelog debian/tmp/usr/share/doc/aseba/changelog
+	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
+	cp debian/copyright debian/tmp/usr/share/doc/aseba
+	cp ${ASEBA_BUILD_DIR}/studio/asebastudio debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/switch/asebaswitch debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/dump/asebadump debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/cmd/asebacmd debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/targets/challenge/asebachallenge debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/targets/enki-marxbot/asebamarxbot debian/tmp/usr/bin
+	dpkg-shlibdeps debian/tmp/usr/bin/*
+	dpkg-gencontrol -isp
+	chown -R root.root debian/tmp
+	chmod -R o-s,go=u,go-ws debian/tmp
+	dpkg-gencontrol
+	dpkg --build debian/tmp ..
