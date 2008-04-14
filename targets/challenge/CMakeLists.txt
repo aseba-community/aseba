@@ -32,6 +32,11 @@ if (QT4_FOUND)
 	
 	add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS})
 	
-	target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES}  ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+	
+	if (WIN32)
+		target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+	elseif (WIN32)
+		target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+	endif (WIN32)
 
 endif (QT4_FOUND)
