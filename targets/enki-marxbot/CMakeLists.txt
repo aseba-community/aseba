@@ -32,7 +32,7 @@ if (QT4_FOUND)
 	
 	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} .)
 	
-	add_executable(asebamarxbot ${enki_SRCS})
+	add_executable(asebamarxbot WIN32 ${enki_SRCS})
 	
 	target_link_libraries(asebamarxbot aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES}  ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 

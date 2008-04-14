@@ -30,7 +30,7 @@ if (QT4_FOUND)
 	
 	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/targets/challenge .)
 	
-	add_executable(asebachallenge ${challenge_SRCS} ${challenge_RCC_SRCS})
+	add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS})
 	
 	target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES}  ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 

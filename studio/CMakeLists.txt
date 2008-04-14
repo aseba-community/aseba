@@ -20,7 +20,7 @@ if (QT4_FOUND)
 	
 	include_directories (${QT_INCLUDE_DIR} ${QT_QTXML_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/studio)
 	
-	add_executable(asebastudio ${studio_SRCS} ${resfiles})
+	add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles})
 	
 	target_link_libraries(asebastudio aseba ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS})
 	
