@@ -1078,7 +1078,7 @@ namespace Aseba
 	
 	void MainWindow::removeConstantClicked()
 	{
-		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
+		QModelIndex currentRow = constantsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
 		constantsDefinitionsModel->delNamedValue(currentRow.row());
 		
