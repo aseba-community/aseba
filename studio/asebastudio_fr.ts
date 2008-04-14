@@ -28,6 +28,49 @@
     </message>
 </context>
 <context>
+    <name>Aseba::DashelConnectionDialog</name>
+    <message>
+        <location filename="DashelTarget.cpp" line="61"/>
+        <source>Network (TCP)</source>
+        <translation>réseau (TCP)</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="64"/>
+        <source>Host</source>
+        <translation>hôte</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="65"/>
+        <source>Port</source>
+        <translation>port</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="77"/>
+        <source>Serial</source>
+        <translation>port série</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="98"/>
+        <source>Custom</source>
+        <translation>personnalisé</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="109"/>
+        <source>Connect</source>
+        <translation>Connecter</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="112"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location filename="DashelTarget.cpp" line="117"/>
+        <source>Aseba Target Selection</source>
+        <translation>Choix d&apos;une cible Aseba</translation>
+    </message>
+</context>
+<context>
     <name>Aseba::FunctionParametersDialog</name>
     <message>
         <location filename="FunctionParametersDialog.cpp" line="71"/>
@@ -544,6 +587,80 @@ event %0 : </source>
         <location filename="TcpTarget.cpp" line="65"/>
         <source>Please enter an Aseba target</source>
         <translation type="obsolete">Veuillez entrer une cible Aseba</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="37"/>
+        <source>Native function %0 (sp = %1)</source>
+        <translation>Fonction native %0 (sp = %1)</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="38"/>
+        <source>Native function called</source>
+        <translation>Fonction native appelée</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="48"/>
+        <source>Assertion at 0x%0 (sp = %2):
+</source>
+        <translation type="unfinished">Assertion at 0x%0 (sp = %2):(new line)</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="51"/>
+        <source>unknown</source>
+        <translation>inconnu</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="52"/>
+        <source>unknown arithmetic binary operator</source>
+        <translation>opérateur arithmétique binaire inconnu</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="53"/>
+        <source>unknown bytecode</source>
+        <translation>bytecode inconnu</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="54"/>
+        <source>execution stack underflow</source>
+        <translation>pile d&apos;exécution vide (underflow)</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="55"/>
+        <source>stack overflow</source>
+        <translation>pile d&apos;exécution pleine (overflow)</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="56"/>
+        <source>out of variables bounds</source>
+        <translation>hors des limites des variables</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="57"/>
+        <source>out of bytecode bounds</source>
+        <translation>hors des limites du bytecode</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="58"/>
+        <source>step called while not thread running</source>
+        <translation>step appelé alors qu&apos;aucun thread ne fonctionnait</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="59"/>
+        <source>a breakpoint has been set out of bytecode bounds</source>
+        <translation>un point d&apos;arrêt a été mis hors des limites du bytecode</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="60"/>
+        <source>unknown assert define, your code seems broken</source>
+        <translation>assertion inconnue, votre code semble cassé</translation>
+    </message>
+    <message>
+        <location filename="LocalVirtualMachine.cpp" line="64"/>
+        <source>VM Assertion Failed</source>
+        <translation>Assertion de la VM, échec</translation>
     </message>
 </context>
 </TS>

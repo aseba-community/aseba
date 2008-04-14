@@ -58,7 +58,7 @@ namespace Aseba
 	{
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
-		netGroupBox = new QGroupBox("Network (TCP)");
+		netGroupBox = new QGroupBox(tr("Network (TCP)"));
 		netGroupBox->setCheckable(true);
 		QGridLayout* netLayout = new QGridLayout;
 		netLayout->addWidget(new QLabel(tr("Host")), 0, 0);
@@ -74,7 +74,7 @@ namespace Aseba
 		connect(netGroupBox, SIGNAL(clicked()), SLOT(netGroupChecked()));
 		mainLayout->addWidget(netGroupBox);
 		
-		serialGroupBox = new QGroupBox("Serial");
+		serialGroupBox = new QGroupBox(tr("Serial"));
 		serialGroupBox->setCheckable(true);
 		serialGroupBox->setChecked(false);
 		QHBoxLayout* serialLayout = new QHBoxLayout();
@@ -95,7 +95,7 @@ namespace Aseba
 		connect(serialGroupBox, SIGNAL(clicked()), SLOT(serialGroupChecked()));
 		mainLayout->addWidget(serialGroupBox);
 		
-		customGroupBox = new QGroupBox("Custom");
+		customGroupBox = new QGroupBox(tr("Custom"));
 		customGroupBox->setCheckable(true);
 		customGroupBox->setChecked(false);
 		QHBoxLayout* customLayout = new QHBoxLayout();
@@ -114,7 +114,7 @@ namespace Aseba
 		buttonLayout->addWidget(cancelButton);
 		mainLayout->addLayout(buttonLayout);
 		
-		setWindowTitle("Aseba Target Selection");
+		setWindowTitle(tr("Aseba Target Selection"));
 	}
 	
 	std::string DashelConnectionDialog::getTarget()
