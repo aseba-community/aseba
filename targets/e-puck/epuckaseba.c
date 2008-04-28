@@ -36,23 +36,27 @@
 #include <e_agenda.h>
 #include <e_po3030k.h>
 #include <e_uart_char.h>
+#include <e_ad_conv.h>
 #include <e_prox.h>
-#include <e_accelerometer.h>
+#include <e_acc.h>
+
 
 #include <string.h>
 
 #define ASEBA_ASSERT
 #include "vm.h"
 #include "consts.h"
+#include "natives.h"
 
-#define vmBytecodeSize 256
+#define vmBytecodeSize 1024
 #define vmVariablesSize (sizeof(struct EPuckVariables) / sizeof(sint16))
 #define vmStackSize 32
 #define argsSize 32
 
-unsigned int cam_data[60];
 
-extern int prox_done;
+unsigned int __attribute((far)) cam_data[60];
+
+
 
 // we receive the data as big endian and read them as little, so we have to acces the bit the right way
 #define CAM_RED(pixel) ( 3 * (((pixel) >> 3) & 0x1f))
@@ -80,13 +84,16 @@ struct EPuckVariables
 	// prox
 	sint16 prox[8];
 	sint16 ambiant[8];
+	// acc
+	sint16 acc[3];
 	// camera
+	sint16 camLine;
 	sint16 camR[60];
 	sint16 camG[60];
 	sint16 camB[60];
 	// free space
-	sint16 freeSpace[64];
-} ePuckVariables;
+	sint16 freeSpace[256];
+} __attribute__ ((far)) ePuckVariables;
 // physical bytecode isize is one word bigger than really used for byte code because this
 // buffer is also used to receive the data
 // the maximum packet size we have is the whole bytecode + the dest id
@@ -95,11 +102,25 @@ sint16 vmStack[vmStackSize];
 AsebaVMState vmState;
 
 
+#define nativeFunctionsCount 2
+static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
+{
+	AsebaNative_vecdot,
+	AsebaNative_vecstat
+};
+static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+{
+	&AsebaNativeDescription_vecdot,
+	&AsebaNativeDescription_vecstat
+};
+
 void updateRobotVariables()
 {
 	unsigned i;
+	static int camline = 640/2-4;
 	// motor
 	static int leftSpeed = 0, rightSpeed = 0;
+
 	if (ePuckVariables.leftSpeed != leftSpeed)
 	{
 		leftSpeed = CLAMP(ePuckVariables.leftSpeed, -1000, 1000);
@@ -116,9 +137,12 @@ void updateRobotVariables()
 	{
 		e_set_led(i, ePuckVariables.leds[i]);
 		ePuckVariables.ambiant[i] = e_get_ambient_light(i);
-		ePuckVariables.prox[i] = e_get_prox(i);
+		ePuckVariables.prox[i] =  e_get_calibrated_prox(i);
 	}
 	
+	for(i = 0; i < 3; i++)
+		ePuckVariables.acc[i] = e_get_acc(i);
+
 	// camera
 	if(e_po3030k_is_img_ready())
 	{
@@ -128,9 +152,19 @@ void updateRobotVariables()
 			ePuckVariables.camG[i] = CAM_GREEN(cam_data[i]);
 			ePuckVariables.camB[i] = CAM_BLUE(cam_data[i]);
 		}
+		if(camline != ePuckVariables.camLine) {
+			camline = ePuckVariables.camLine;
+			e_po3030k_config_cam(camline,0,4,480,4,8,RGB_565_MODE);
+			e_po3030k_set_ref_exposure(160);
+			e_po3030k_set_ww(0);
+			e_po3030k_set_mirror(1,1);
+			e_po3030k_write_cam_registers();
+		}
 		e_po3030k_launch_capture((char *)cam_data);
 	}
 }
+
+
 
 void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 {
@@ -145,9 +179,12 @@ void initRobot()
 	e_start_agendas_processing();
 	e_init_motors();
 	e_init_uart1();
-	e_init_prox();
+	e_init_ad_scan(0);
 	e_po3030k_init_cam();
 	e_po3030k_config_cam(640/2-4,0,4,480,4,8,RGB_565_MODE);
+	e_po3030k_set_ref_exposure(160);
+	e_po3030k_set_ww(0);
+	e_po3030k_set_mirror(1,1);
 	e_po3030k_write_cam_registers();
 	e_po3030k_launch_capture((char *)cam_data);
 
@@ -169,8 +206,9 @@ void initAseba()
 	vmState.variables = (sint16 *)&ePuckVariables;
 	vmState.stackSize = vmStackSize;
 	vmState.stack = vmStack;
-	ePuckVariables.id = selector + 1;
 	AsebaVMInit(&vmState, selector + 1);
+	ePuckVariables.id = selector + 1;
+	ePuckVariables.camLine = 640/2-4;
 	e_led_clear();
 	e_set_led(selector,1);
 }
@@ -218,6 +256,20 @@ void uartSendString(const char *s)
 	while (e_uart1_sending());
 }
 
+void uartSendNativeFunction(const AsebaNativeFunctionDescription* description)
+{
+	unsigned int i;
+	uartSendString(description->name);
+	uartSendString(description->doc);
+	uartSendUInt16(description->argumentCount);
+	for (i = 0; i < description->argumentCount; i++)
+	{
+		uartSendUInt16(description->arguments[i].size);
+		uartSendString(description->arguments[i].name);
+	}
+}
+
+
 ////
 
 void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
@@ -244,7 +296,13 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 void AsebaSendDescription(AsebaVMState *vm)
 {
 	char name[] = "e-puck 0";
-	uartSendUInt16(110);
+	unsigned int i;
+	unsigned nativeFunctionSizes = 0;
+
+	for (i = 0; i < nativeFunctionsCount; i++)
+		nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
+
+	uartSendUInt16(126+nativeFunctionSizes);
 	uartSendUInt16(vm->nodeId);
 	uartSendUInt16(ASEBA_MESSAGE_DESCRIPTION);
 	
@@ -255,7 +313,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 	uartSendUInt16(vmStackSize);		// 2
 	uartSendUInt16(vmVariablesSize);	// 2
 	
-	uartSendUInt16(11);					// 2
+	uartSendUInt16(13);					// 2
 
 	uartSendUInt16(1);					// 2
 	uartSendString("id");				// 3
@@ -273,6 +331,10 @@ void AsebaSendDescription(AsebaVMState *vm)
 	uartSendString("prox");				// 5
 	uartSendUInt16(8);					// 2
 	uartSendString("ambiant");			// 8
+	uartSendUInt16(3);					// 2 		
+	uartSendString("acc");				// 4
+	uartSendUInt16(1);					// 2
+	uartSendString("camLine");			// 8		
 	uartSendUInt16(60);					// 2
 	uartSendString("camR");				// 5
 	uartSendUInt16(60);					// 2
@@ -280,13 +342,15 @@ void AsebaSendDescription(AsebaVMState *vm)
 	uartSendUInt16(60);					// 2
 	uartSendString("camB");				// 5
 	
-	uartSendUInt16(0);					// 2
-		// TODO : add native functions
+	uartSendUInt16(nativeFunctionsCount);	// 2
+
+	for (i = 0; i < nativeFunctionsCount; i++)
+		 uartSendNativeFunction(nativeFunctionsDescriptions[i]);
 }
 
 void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	// TODO : add native functions
+	nativeFunctions[id](vm);
 }
 
 
@@ -345,6 +409,9 @@ void AsebaDebugHandleCommands()
 			uartGetUInt16();
 			i++;
 		}
+		/* Drop last even byte */
+		if(len & 0x1) 
+			uartGetUInt8();
 	}
 	BODY_LED = 0;
 }
@@ -364,14 +431,15 @@ int main()
 	{
 		uartGetUInt8();
 	}
+	e_calibrate_ir();
+	e_acc_calibr();
 	while (1)
 	{
 		updateRobotVariables();
 		AsebaDebugHandleCommands();
 		AsebaVMRun(&vmState, 1000);
-		if (!AsebaVMIsExecutingThread(&vmState) && prox_done)
+		if (!AsebaVMIsExecutingThread(&vmState))
 		{
-			prox_done = 0;
 			ePuckVariables.source = vmState.nodeId;
 			AsebaVMSetupEvent(&vmState, ASEBA_EVENT_PERIODIC);
 		}
