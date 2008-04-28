@@ -362,56 +362,26 @@ void AsebaDebugHandleCommands()
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
+		uint8 recvDataBuffer[ASEBA_MAX_PACKET_SIZE];
 		unsigned i = 0;
-
-		ePuckVariables.source = source;
 		
-		// read data into the right place
-		if (type == ASEBA_MESSAGE_SET_BYTECODE)
+		for (i = 0; i < len; i++)
+			recvDataBuffer[i] = uartGetUInt8();
+		
+		ePuckVariables.source = source;
+		if (type < 0x8000)
 		{
-			uint16 dest = uartGetUInt16();
-			i++;
-			if (dest == vmState.nodeId)
-			{
-				vmBytecode[0] = dest;
-				// the maximum packet size we have is the whole bytecode + the dest id
-				while (i < (vmBytecodeSize + 1) && i < len / 2)
-				{
-					vmBytecode[i] = uartGetUInt16();
-					i++;
-				}
-				AsebaVMDebugMessage(&vmState, type, vmBytecode, len / 2);
-			}
-		}
-		else if (type < 0x8000)
-		{
-			while (i < argsSize && i < len / 2)
-			{
-				ePuckVariables.args[i] = uartGetUInt16();
-				i++;
-			}
+			// user message
+			for (i = 0; (i < argsSize) && (i < len / 2); i++)
+				ePuckVariables.args[i] = ((uint16*)recvDataBuffer)[i];
 			AsebaVMSetupEvent(&vmState, type);
 		}
-		else if (type >= 0xA000)
+		else
 		{
-			uint16 cmdArgs[len / 2];
-			while (i < len / 2)
-			{
-				cmdArgs[i] = uartGetUInt16();
-				i++;
-			}
-			AsebaVMDebugMessage(&vmState, type, cmdArgs, len / 2);
+			
+			// debug message
+			AsebaVMDebugMessage(&vmState, type, (uint16*)recvDataBuffer, len / 2);
 		}
-		
-		// drop excessive data
-		while (i < len / 2)
-		{
-			uartGetUInt16();
-			i++;
-		}
-		/* Drop last even byte */
-		if(len & 0x1) 
-			uartGetUInt8();
 	}
 	BODY_LED = 0;
 }
