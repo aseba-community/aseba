@@ -362,7 +362,7 @@ void AsebaDebugHandleCommands()
 		uint16 len = uartGetUInt16();
 		uint16 source = uartGetUInt16();
 		uint16 type = uartGetUInt16();
-		uint8 recvDataBuffer[ASEBA_MAX_PACKET_SIZE];
+		static uint8 recvDataBuffer[ASEBA_MAX_PACKET_SIZE]; // Want on the heap, 512 is too much on the stack
 		unsigned i = 0;
 		
 		for (i = 0; i < len; i++)
