@@ -71,8 +71,12 @@ typedef void (*AsebaCanSendFrameFP)(const CanFrame *frame);
 	@param isFrameRoomFP pointer to a function that returns if the data layer is ready to send frames
 	@param receivedPacketDroppedFP pointer to a function that is called when a received packet has been dropped, for various reasons but mostly related to insufficient memory
 	@param sentPacketDroppedFP pointer to a function that is called when a sent packet has been dropped (AsebaCanSend() returned 0), for various reasons but mostly related to insufficient memory
+	@param sendQueue pointer to send queue data
+	@param sendQueueSize number of frame in sendQueue
+	@param recvQueue pointer to receive queue data
+	@param recvQueueSize number of frame in recvQueue
 */
-void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP, AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP);
+void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP, AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP, CanFrame* sendQueue, size_t sendQueueSize, CanFrame* recvQueue, size_t recvQueueSize);
 
 /*! Send data as an aseba packet.
 	@param data pointer to the data to send
