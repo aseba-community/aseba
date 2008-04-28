@@ -29,11 +29,8 @@
 */
 /*@{*/
 
-/*! default port used by aseba */
-enum
-{
-	ASEBA_DEFAULT_PORT = 33333
-};
+/*! version of aseba protocol */
+#define ASEBA_PROTOCOL_VERSION 1
 
 /*! default listen target for aseba */
 #define ASEBA_DEFAULT_LISTEN_TARGET "tcpin:33333"
@@ -46,6 +43,7 @@ enum
 
 /*! default port for aseba */
 #define ASEBA_DEFAULT_PORT 33333
+
 
 /*! List of bytecodes identifiers */
 typedef enum

@@ -154,12 +154,15 @@ namespace Aseba
 	class GetDescription : public Message
 	{
 	public:
-		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION) { }
+		uint16 version;
+		
+	public:
+		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION), version(ASEBA_PROTOCOL_VERSION) { }
 		
 	protected:
-		virtual void serializeSpecific() {}
-		virtual void deserializeSpecific() {}
-		virtual void dumpSpecific(std::ostream &) {}
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::ostream &);
 		virtual operator const char * () const { return "presence"; }
 	};
 	
@@ -356,11 +359,12 @@ namespace Aseba
 	class SetBytecode : public CmdMessage
 	{
 	public:
+		uint16 start;
 		std::vector<uint16> bytecode;
 		
 	public:
-		SetBytecode() : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, ASEBA_DEST_INVALID) { }
-		SetBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest) { }
+		SetBytecode() : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, ASEBA_DEST_INVALID), start(0) { }
+		SetBytecode(uint16 dest, uint16 start) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest), start(start) { }
 		
 	protected:
 		virtual void serializeSpecific();

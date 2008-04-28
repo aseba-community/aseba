@@ -120,10 +120,10 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	sint16 ssize;
 	switch (vm->nodeId)
 	{
-		case 1: size = 8 + 11 + (8 + 15) + nativeFunctionSizes; break;
-		case 2: size = 8 + 12 + (8 + 15) + nativeFunctionSizes; break;
-		case 3: size = 8 + 18 + (8 + 20) + nativeFunctionSizes; break;
-		case 4: size = 8 + 17 + (6 + 15) + nativeFunctionSizes; break;
+		case 1: size = 8 + 11 + 2 + (8 + 15) + nativeFunctionSizes; break;
+		case 2: size = 8 + 12 + 2 + (8 + 15) + nativeFunctionSizes; break;
+		case 3: size = 8 + 18 + 2 + (8 + 20) + nativeFunctionSizes; break;
+		case 4: size = 8 + 17 + 2 + (6 + 15) + nativeFunctionSizes; break;
 		default: assert(false); break;
 	}
 	stream->write(&size, 2);
@@ -131,7 +131,7 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 	uint16 id = ASEBA_MESSAGE_DESCRIPTION;
 	stream->write(&id, 2);
 	
-	// write node name
+	// write node name and protocol version
 	switch (vm->nodeId)
 	{
 		case 1: AsebaWriteString(stream, "left motor"); break;
@@ -140,6 +140,8 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		case 4: AsebaWriteString(stream, "distance sensors"); break;
 		default: assert(false); break;
 	}
+	uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
+	stream->write(&protocolVersion, 2);
 	
 	// write sizes
 	stream->write(&vm->bytecodeSize, 2);

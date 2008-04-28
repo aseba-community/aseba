@@ -614,9 +614,15 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	{
 		case ASEBA_MESSAGE_SET_BYTECODE:
 		{
+			uint16 start = data[0];
+			uint16 length = dataLength - 1;
 			uint16 i;
-			for (i = 0; i < dataLength; i++)
-				vm->bytecode[i] = data[i];
+			#ifdef ASEBA_ASSERT
+			if (start + length > vm->bytecodeSize)
+				AsebaAssert(vm, ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS);
+			#endif
+			for (i = 0; i < length; i++)
+				vm->bytecode[start+i] = data[i+1];
 		}
 		// There is no break here because we want to do a reset after a set bytecode
 		
@@ -691,7 +697,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 				AsebaAssert(vm, ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS);
 			#endif
 			for (i = 0; i < length; i++)
-				vm->variables[i+start] = data[i+1];
+				vm->variables[start+i] = data[i+1];
 		}
 		break;
 		

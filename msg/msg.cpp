@@ -352,9 +352,27 @@ namespace Aseba
 	
 	//
 	
+	void GetDescription::serializeSpecific()
+	{
+		add(version);
+	}
+	
+	void GetDescription::deserializeSpecific()
+	{
+		version = get<uint16>();
+	}
+	
+	void GetDescription::dumpSpecific(std::ostream &stream)
+	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
 	void Description::serializeSpecific()
 	{
 		add(name);
+		add(protocolVersion);
 		
 		add(bytecodeSize);
 		add(stackSize);
@@ -385,6 +403,7 @@ namespace Aseba
 	void Description::deserializeSpecific()
 	{
 		name = get<string>();
+		protocolVersion = get<uint16>();
 		
 		bytecodeSize = get<uint16>();
 		stackSize = get<uint16>();
@@ -414,7 +433,7 @@ namespace Aseba
 	
 	void Description::dumpSpecific(ostream &stream)
 	{
-		stream << "Node " << name << "\n";
+		stream << "Node " << name << " using protocol version " << protocolVersion << "\n";
 		stream << "bytecode " << bytecodeSize << ", stack " << stackSize << ", variables " << variablesSize;
 		for (size_t i = 0; i < namedVariables.size(); i++)
 			stream << "\n\t" << namedVariables[i].name << " : " << namedVariables[i].size;
@@ -630,6 +649,7 @@ namespace Aseba
 	{
 		CmdMessage::serializeSpecific();
 		
+		add(start);
 		for (size_t i = 0; i < bytecode.size(); i++)
 			add(bytecode[i]);
 	}
@@ -638,6 +658,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific();
 		
+		start = get<uint16>();
 		bytecode.resize((rawData.size() - readPos) / 2);
 		for (size_t i = 0; i < bytecode.size(); i++)
 			bytecode[i] = get<uint16>();
@@ -647,7 +668,7 @@ namespace Aseba
 	{
 		CmdMessage::dumpSpecific(stream);
 		
-		stream << "bytecode of size " << bytecode.size();
+		stream << bytecode.size() << "words of bytecode of starting at " << start;
 	}
 	
 	//

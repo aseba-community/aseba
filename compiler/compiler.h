@@ -72,6 +72,7 @@ namespace Aseba
 		};
 		
 		std::string name; //!< node name
+		unsigned protocolVersion; //!< version of the aseba protocol
 		
 		unsigned bytecodeSize; //!< total amount of bytecode space
 		unsigned variablesSize; //!< total amount of variables space

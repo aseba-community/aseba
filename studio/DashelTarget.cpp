@@ -263,12 +263,28 @@ namespace Aseba
 		
 		nodeIt->second.debugBytecode = bytecode;
 		
-		SetBytecode setBytecodeMessage;
-		setBytecodeMessage.dest = node;
-		setBytecodeMessage.bytecode.resize(bytecode.size());
-		copy(bytecode.begin(), bytecode.end(), setBytecodeMessage.bytecode.begin());
+		unsigned bytecodePayloadSize = ASEBA_MAX_PACKET_SIZE - 6 - 4;
+		unsigned bytecodeStart = 0;
+		unsigned bytecodeCount = bytecode.size();
 		
-		setBytecodeMessage.serialize(stream);
+		while (bytecodeCount > bytecodePayloadSize)
+		{
+			SetBytecode setBytecodeMessage(node, bytecodeStart);
+			setBytecodeMessage.bytecode.resize(bytecodePayloadSize);
+			copy(bytecode.begin()+bytecodeStart, bytecode.begin()+bytecodeStart+bytecodePayloadSize, setBytecodeMessage.bytecode.begin());
+			setBytecodeMessage.serialize(stream);
+			
+			bytecodeStart += bytecodePayloadSize;
+			bytecodeCount -= bytecodePayloadSize;
+		}
+		
+		{
+			SetBytecode setBytecodeMessage(node, bytecodeStart);
+			setBytecodeMessage.bytecode.resize(bytecodeCount);
+			copy(bytecode.begin()+bytecodeStart, bytecode.end(), setBytecodeMessage.bytecode.begin());
+			setBytecodeMessage.serialize(stream);
+		}
+		
 		stream->flush();
 	}
 	

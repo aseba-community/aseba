@@ -910,14 +910,16 @@ extern "C" void AsebaSendDescription(AsebaVMState *vm)
 		uint16 size;
 		sint16 ssize;
 		
-		size = 7 + (8 + 89) + 2 + nativeFunctionSizes;
+		size = (7 + 2) + (8 + 89) + 2 + nativeFunctionSizes;
 		stream->write(&size, 2);
 		stream->write(&vm->nodeId, 2);
 		uint16 id = ASEBA_MESSAGE_DESCRIPTION;
 		stream->write(&id, 2);
 		
-		// write node name
+		// write node name and protocol version
 		AsebaWriteString(stream, "e-puck");
+		uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
+		stream->write(&protocolVersion, 2);
 		
 		// write sizes
 		stream->write(&vm->bytecodeSize, 2);
