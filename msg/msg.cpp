@@ -23,7 +23,6 @@
 
 #include "msg.h"
 #include "../utils/utils.h"
-#include <cassert>
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -133,8 +132,16 @@ namespace Aseba
 	{
 		rawData.resize(0);
 		serializeSpecific();
-		assert(rawData.size() + 2 < 65536);
 		uint16 len = static_cast<uint16>(rawData.size());
+		
+		if (len + 6 > ASEBA_MAX_PACKET_SIZE)
+		{
+			cerr << "Message::serialize() : fatal error: message size exceed maximum packet size.\n";
+			cerr << "message size: " << len + 6 << ", maximum packet size: " << ASEBA_MAX_PACKET_SIZE << ", message type: " << type;
+			cerr << endl;
+			abort();
+		}
+		
 		stream->write(&len, 2);
 		stream->write(&source, 2);
 		stream->write(&type, 2);
@@ -169,7 +176,7 @@ namespace Aseba
 			cerr << "Message::receive() : fatal error: message not fully read.\n";
 			cerr << "readPos: " << message->readPos << ", rawData size: " << message->rawData.size();
 			cerr << endl;
-			assert(false);
+			abort();
 		}
 		
 		return message;
@@ -195,7 +202,14 @@ namespace Aseba
 	template<>
 	void Message::add(const string& val)
 	{
-		assert(val.length() <= 255);
+		if (val.length() > 255)
+		{
+			cerr << "Message::add<string>() : fatal error, string length exceeds 255 characters.\n";
+			cerr << "string size: " << val.length();
+			cerr << endl;
+			abort();
+		}
+		
 		add(static_cast<uint8>(val.length()));
 		for (size_t i = 0; i < val.length(); i++)
 			add(val[i]);
@@ -209,7 +223,7 @@ namespace Aseba
 			cerr << "Message<" << typeid(T).name() << ">::get() : fatal error: attempt to overread.\n";
 			cerr << "readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
 			cerr << endl;
-			assert(false);
+			abort();
 		}
 		
 		size_t pos = readPos;
@@ -241,7 +255,13 @@ namespace Aseba
 	
 	void UserMessage::deserializeSpecific()
 	{
-		assert(rawData.size() % 2 == 0);
+		if (rawData.size() % 2 != 0)
+		{
+			cerr << "UserMessage::deserializeSpecific() : fatal error: odd size.\n";
+			cerr << "message size: " << rawData.size() << ", message type: " << type;
+			cerr << endl;
+			abort();
+		}
 		data.resize(rawData.size() / 2);
 		
 		for (size_t i = 0; i < data.size(); i++)

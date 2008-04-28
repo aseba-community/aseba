@@ -47,23 +47,6 @@ enum
 /*! default port for aseba */
 #define ASEBA_DEFAULT_PORT 33333
 
-/*! max number of connection to aseba switch */
-enum
-{
-	ASEBA_MAX_SWITCH_CONN = 12
-};
-
-/*! max allowed size for an aseba packet */
-enum
-{
-	ASEBA_MAX_PACKET_SIZE = 65535
-};
-
-enum
-{
-	IMX_CAN_ID = 0x00FF
-};
-
 /*! List of bytecodes identifiers */
 typedef enum
 {
@@ -176,6 +159,12 @@ typedef enum
 	ASEBA_DEST_DEBUG = 0,
 	ASEBA_DEST_INVALID = 0xFFFF
 } AsebaMessagesDests;
+
+/*! Limits for static buffers allocation */
+typedef enum
+{
+	ASEBA_MAX_PACKET_SIZE = 512+6	/*!< maximum size an aseba packet is allowed to be, including all its aseab headers */
+} AsebaLimits;
 
 /*@}*/
 

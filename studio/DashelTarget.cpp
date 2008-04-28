@@ -286,6 +286,13 @@ namespace Aseba
 	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
+		unsigned variablesPayloadSize = ASEBA_MAX_PACKET_SIZE - 6 - 2;
+		while (length > variablesPayloadSize)
+		{
+			GetVariables(node, start, variablesPayloadSize).serialize(stream);
+			start += variablesPayloadSize;
+			length -= variablesPayloadSize;
+		}
 		GetVariables(node, start, length).serialize(stream);
 		stream->flush();
 	}
