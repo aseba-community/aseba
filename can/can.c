@@ -14,7 +14,7 @@
 #define ASEBA_MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 /*!	This contains the state of the CAN implementation of Aseba network */
-struct AsebaCan
+static struct AsebaCan
 {
 	// data
 	uint16 id; /*!< identifier of this node on CAN */
@@ -36,6 +36,8 @@ struct AsebaCan
 	size_t recvQueueSize;
 	uint16 recvQueueInsertPos;
 	uint16 recvQueueConsumePos;
+
+	uint16 insideSendQueueToPhysicalLayer;
 	
 } asebaCan;
 
