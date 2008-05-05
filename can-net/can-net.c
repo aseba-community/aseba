@@ -1,4 +1,4 @@
-#include "can.h"
+#include "can-net.h"
 #include <stdlib.h>
 #include <string.h>
 
