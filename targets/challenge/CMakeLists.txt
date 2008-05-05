@@ -1,22 +1,7 @@
 find_package(Qt4)
-find_package(OpenGL REQUIRED)
 
-if (QT4_FOUND)
-
-	find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h
-		/usr/include/enki
-		/usr/local/include/enki
-	)
-
-	find_library(ENKI_LIBRARY enki
-		/usr/lib
-		/usr/local/lib
-	)
-	
-	find_library(ENKI_VIEWER_LIBRARY enkiviewer
-		/usr/lib
-		/usr/local/lib
-	)
+if (QT4_FOUND AND ENKI_FOUND)
+	find_package(OpenGL REQUIRED)
 	
 	include(${QT_USE_FILE})
 	
@@ -39,4 +24,4 @@ if (QT4_FOUND)
 		target_link_libraries(asebachallenge aseba ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 	endif (WIN32)
 
-endif (QT4_FOUND)
+endif (QT4_FOUND AND ENKI_FOUND)

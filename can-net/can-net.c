@@ -165,6 +165,11 @@ void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP 
 
 int AsebaCanSend(const uint8 *data, size_t size)
 {
+	return AsebaCanSendSpecificSource(data, size, asebaCan.id);
+}
+
+int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
+{
 	// send everything we can to maximize the space in the buffer
 	AsebaCanSendQueueToPhysicalLayer();
 	
@@ -179,19 +184,19 @@ int AsebaCanSend(const uint8 *data, size_t size)
 	// insert
 	if (size <= 8)
 	{
-		AsebaCanSendQueueInsert(TO_CANID(TYPE_SMALL_PACKET, asebaCan.id), data, size);
+		AsebaCanSendQueueInsert(TO_CANID(TYPE_SMALL_PACKET, source), data, size);
 	}
 	else
 	{
 		size_t pos = 8;
 		
-		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_START, asebaCan.id), data, 8);
+		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_START, source), data, 8);
 		while (pos + 8 < size)
 		{
-			AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_NORMAL, asebaCan.id), data + pos, 8);
+			AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_NORMAL, source), data + pos, 8);
 			pos += 8;
 		}
-		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_STOP, asebaCan.id), data + pos, size - pos);
+		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_STOP, source), data + pos, size - pos);
 	}
 	
 	// send everything we can to minimize the transmission delay

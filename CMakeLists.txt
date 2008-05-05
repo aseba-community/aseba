@@ -33,6 +33,26 @@ else (WIN32)
 	endif (APPLE)
 endif (WIN32)
 
+# Enki
+
+find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h
+	/usr/include/enki
+	/usr/local/include/enki
+)
+
+find_library(ENKI_LIBRARY enki
+	/usr/lib
+	/usr/local/lib
+)
+
+find_library(ENKI_VIEWER_LIBRARY enkiviewer
+	/usr/lib
+	/usr/local/lib
+)
+
+if (${ENKI_INCLUDE_DIR} AND ${ENKI_LIBRARY} AND ${ENKI_VIEWER_LIBRARY})
+	set(ENKI_FOUND)
+endif (${ENKI_INCLUDE_DIR} AND ${ENKI_LIBRARY} AND ${ENKI_VIEWER_LIBRARY})
 # Aseba itself
 
 add_definitions(-DASEBA_ASSERT)

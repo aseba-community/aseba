@@ -85,6 +85,14 @@ void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP 
 */
 int AsebaCanSend(const uint8 *data, size_t size);
 
+/*! Send data as an aseba packet.
+	@param data pointer to the data to send
+	@param size amount of data to send
+	@param source identifier to use as source
+	@return 1 on success, 0 on failure
+*/
+int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source);
+
 /*! Copy data from a received packet to the caller-provided buffer.
 	Remove the packet from the reception queue afterwards.
 	@param data pointer where to copy the data
