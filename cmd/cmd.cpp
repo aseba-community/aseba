@@ -40,6 +40,7 @@ namespace Aseba
 	void dumpCommandList(ostream &stream)
 	{
 		stream << "* presence : broadcast presence message\n";
+		stream << "* usermsg: user message [type] [length in 16 bit words]\n";
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
 		stream << "* whex : write hex file [dest] [file name]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
@@ -345,6 +346,22 @@ namespace Aseba
 			GetDescription message;
 			message.serialize(stream);
 		}
+		else if (strcmp(cmd, "usermsg") == 0)
+		{
+			// first arg is type, second is length
+			if (argc < 3)
+				errorMissingArgument(argv[0]);
+			argEaten = 2;
+			uint16 type = atoi(argv[1]);
+			uint16 length = atoi(argv[2]);
+			
+			UserMessage::DataVector data(length);
+			for (size_t i = 0; i < length; i++)
+				data[i] = i;
+			
+			UserMessage message(type, data);
+			message.serialize(stream);
+		}
 		else if (strcmp(cmd, "rdpage") == 0)
 		{
 			// first arg is dest, second is page number
@@ -439,6 +456,7 @@ int main(int argc, char *argv[])
 			try
 			{
 				 argCounter += Aseba::processCommand(stream, argc - argCounter, &argv[argCounter]);
+				 stream->flush();
 			}
 			catch (Dashel::DashelException e)
 			{
