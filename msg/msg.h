@@ -39,6 +39,9 @@ namespace Aseba
 {
 	/**
 	\defgroup msg Messages exchanged over the network
+		
+		Aseba messages payload data must be 512 bytes or smaller, which means that the total
+		packets size (len + source + type + payload) must be 518 bytes or smaller.
 	*/
 	/*@{*/
 
