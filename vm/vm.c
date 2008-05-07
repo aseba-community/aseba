@@ -43,9 +43,8 @@
 
 void AsebaVMSendExecutionStateChanged(AsebaVMState *vm);
 
-void AsebaVMInit(AsebaVMState *vm, uint16 nodeId)
+void AsebaVMInit(AsebaVMState *vm)
 {
-	vm->nodeId = nodeId;
 	vm->pc = 0;
 	vm->flags = 0;
 	vm->breakpointsCount = 0;
@@ -538,6 +537,7 @@ uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit)
 	return 1;
 }
 
+
 uint16 AsebaVMIsExecutingThread(AsebaVMState *vm)
 {
 	return AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
@@ -596,6 +596,7 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
 {
+	
 	// react to global presence
 	if (id == ASEBA_MESSAGE_GET_DESCRIPTION)
 	{
@@ -606,7 +607,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	// check if we are the destination, return otherwise
 	if (data[0] != vm->nodeId)
 		return;
-	
+
 	data++;
 	dataLength--;
 	

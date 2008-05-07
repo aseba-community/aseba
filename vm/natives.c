@@ -33,6 +33,26 @@
 /** \addtogroup vm */
 /*@{*/
 
+uint16 AsebaNativeGetVMDescriptionSize(AsebaVMDescription* description)
+{
+	uint16 size = 0;
+	uint16 i;
+
+	size += strlen(description->name) + 1;
+	size += 6;
+	
+	size += 2;
+	for (i = 0; description->variables[i].size; i++)
+	{
+		size += 2;
+		size += strlen(description->variables[i].name) + 1;
+	}
+	
+	size += 2;
+	
+	return size;
+}
+
 uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* description)
 {
 	uint16 size = 0;
@@ -42,7 +62,7 @@ uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* des
 	size += strlen(description->doc) + 1;
 	size += 2;
 	
-	for (i = 0; i < description->argumentCount; i++)
+	for (i = 0; description->arguments[i].size; i++)
 	{
 		size += 2;
 		size += strlen(description->arguments[i].name) + 1;
@@ -77,12 +97,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
 	"vecdot",
 	"scalar product",
-	4,
 	{
 		{ -1, "src1" },
 		{ -1, "src2" },
 		{ 1, "dest" },
 		{ 1, "shift" },
+		{ 0, "" }
 	}
 };
 
@@ -125,12 +145,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
 	"vecstat",
 	"statistics",
-	4,
 	{
 		{ -1, "src" },
 		{ 1, "min" },
 		{ 1, "max" },
 		{ 1, "mean" },
+		{ 0, "" }
 	}
 };
 

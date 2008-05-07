@@ -111,12 +111,12 @@ typedef struct
 // Functions provided by aseba-core
 
 
-/*! Init some variables that are not initialized otherwise.
+/*! Setup the execution status of the VM.
 	This is not sufficient to have a working VM.
-	bytecode, variables and stack must be set outside this function.
-	Furthermore, bytecode array must be allocated before any
-	call to this function. */
-void AsebaVMInit(AsebaVMState *vm, uint16 nodeId);
+	nodeId and bytecode, variables, and stack along with their sizes must be set outside this function.
+	The content of the variable array is zeroed by this function.
+*/
+void AsebaVMInit(AsebaVMState *vm);
 
 /*!	Return the starting address of an event, or 0 if the event is not handled */
 uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event);
