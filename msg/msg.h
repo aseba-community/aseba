@@ -279,6 +279,22 @@ namespace Aseba
 		virtual operator const char * () const { return "breakpoint set result"; }
 	};
 	
+	//! A node as produced an error specific to it
+	class NodeSpecificError : public Message
+	{
+	public:
+		std::string message;
+		
+	public:
+		NodeSpecificError() : Message(ASEBA_MESSAGE_NODE_SPECIFIC_ERROR) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::ostream &);
+		virtual operator const char * () const { return "node specific error"; }
+	};
+	
 	
 	//! Commands messages talk to a specific node
 	class CmdMessage : public Message

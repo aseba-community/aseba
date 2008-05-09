@@ -52,6 +52,7 @@ namespace Aseba
 			registerMessageType<DivisionByZero>(ASEBA_MESSAGE_DIVISION_BY_ZERO);
 			registerMessageType<ExecutionStateChanged>(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED);
 			registerMessageType<BreakpointSetResult>(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT);
+			registerMessageType<NodeSpecificError>(ASEBA_MESSAGE_NODE_SPECIFIC_ERROR);
 			
 			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
 			
@@ -550,6 +551,23 @@ namespace Aseba
 	void BreakpointSetResult::dumpSpecific(ostream &stream)
 	{
 		stream << "pc " << pc << ", success " << success;
+	}
+	
+	//
+	
+	void NodeSpecificError::serializeSpecific()
+	{
+		add(message);
+	}
+	
+	void NodeSpecificError::deserializeSpecific()
+	{
+		message = get<std::string>();
+	}
+	
+	void NodeSpecificError::dumpSpecific(ostream &stream)
+	{
+		stream << message;
 	}
 	
 	//
