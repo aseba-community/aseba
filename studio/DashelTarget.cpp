@@ -193,6 +193,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
 		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
+		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
 		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
 		&Aseba::DashelTarget::receivedBreakpointSetResult;
@@ -465,7 +466,10 @@ namespace Aseba
 		
 		int line = getLineFromPC(aa->source, aa->pc);
 		if (line >= 0)
+		{
 			emit arrayAccessOutOfBounds(aa->source, line, aa->index);
+			emit executionModeChanged(aa->source, EXECUTION_STOP);
+		}
 	}
 	
 	void DashelTarget::receivedDivisionByZero(Message *message)
@@ -474,7 +478,22 @@ namespace Aseba
 		
 		int line = getLineFromPC(dz->source, dz->pc);
 		if (line >= 0)
+		{
 			emit divisionByZero(dz->source, line);
+			emit executionModeChanged(dz->source, EXECUTION_STOP);
+		}
+	}
+	
+	void DashelTarget::receivedNodeSpecificError(Message *message)
+	{
+		NodeSpecificError *nse = polymorphic_downcast<NodeSpecificError *>(message);
+		
+		int line = getLineFromPC(nse->source, nse->pc);
+		if (line >= 0)
+		{
+			emit nodeSpecificError(nse->source, line, QString::fromUtf8(nse->message.c_str()));
+			emit executionModeChanged(nse->source, EXECUTION_STOP);
+		}
 	}
 	
 	void DashelTarget::receivedExecutionStateChanged(Message *message)

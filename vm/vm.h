@@ -138,6 +138,9 @@ uint16 AsebaVMIsExecutingThread(AsebaVMState *vm);
 	dataLength is given in number of uint16. */
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength);
 
+/*! Can be called by glue code (including native functions), to stop vm and emit a node specific error */
+void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message);
+
 // Functions implemented outside by the transport layer
 
 /*! Called by AsebaStep if there is a message (not an user event) to send.

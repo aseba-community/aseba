@@ -183,6 +183,7 @@ namespace Aseba
 		void userEvent(unsigned id, const VariablesDataVector &data);
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
 		void divisionByZero(unsigned node, unsigned line);
+		void nodeSpecificError(unsigned node, unsigned line, const QString& message);
 		
 		void executionPosChanged(unsigned node, unsigned line);
 		void executionModeChanged(unsigned node, Target::ExecutionMode mode);

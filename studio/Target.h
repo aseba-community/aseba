@@ -69,6 +69,8 @@ namespace Aseba
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
 		//! A node did a division by zero exception.
 		void divisionByZero(unsigned node, unsigned line);
+		//! A node has produced an error specific to it
+		void nodeSpecificError(unsigned node, unsigned line, const QString& message);
 		
 		//! The program counter of a node has changed, causing a change of position in source code.
 		void executionPosChanged(unsigned node, unsigned line);

@@ -1150,6 +1150,8 @@ namespace Aseba
 		logger->scrollToBottom();
 	}
 	
+	// TODO: factorize error code
+	
 	//! A node did an access out of array bounds exception.
 	void MainWindow::arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index)
 	{
@@ -1170,8 +1172,6 @@ namespace Aseba
 		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
 		item->setData(Qt::UserRole, QPoint(node, line));
 		logger->scrollToBottom();
-		
-		tab->executionModeChanged(Target::EXECUTION_STOP);
 	}
 	
 	//! A node did a division by zero exception.
@@ -1194,8 +1194,28 @@ namespace Aseba
 		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
 		item->setData(Qt::UserRole, QPoint(node, line));
 		logger->scrollToBottom();
+	}
+	
+	//! A node has produced an error specific to it
+	void MainWindow::nodeSpecificError(unsigned node, unsigned line, const QString& message)
+	{
+		NodeTab* tab = getTabFromId(node);
+		Q_ASSERT(tab);
 		
-		tab->executionModeChanged(Target::EXECUTION_STOP);
+		if (tab->setEditorProperty("executionError", QVariant(), line, true))
+		{
+			tab->rehighlighting = true;
+			tab->highlighter->rehighlight();
+		}
+		
+		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
+		text += "\n" + tr("%0:%1: %2").arg(target->getName(node)).arg(line + 1).arg(message);
+		
+		if (logger->count() > 50)
+			delete logger->takeItem(0);
+		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
+		item->setData(Qt::UserRole, QPoint(node, line));
+		logger->scrollToBottom();
 	}
 	
 	
@@ -1407,6 +1427,7 @@ namespace Aseba
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)));
 		connect(target, SIGNAL(divisionByZero(unsigned, unsigned)), SLOT(divisionByZero(unsigned, unsigned)));
+		connect(target, SIGNAL(nodeSpecificError(unsigned, unsigned, QString)), SLOT(nodeSpecificError(unsigned, unsigned, QString)));
 		
 		connect(target, SIGNAL(executionPosChanged(unsigned, unsigned)), SLOT(executionPosChanged(unsigned, unsigned)));
 		connect(target, SIGNAL(executionModeChanged(unsigned, Target::ExecutionMode)), SLOT(executionModeChanged(unsigned, Target::ExecutionMode)));

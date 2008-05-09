@@ -115,6 +115,7 @@ namespace Aseba
 		void receivedVariables(Message *message);
 		void receivedArrayAccessOutOfBounds(Message *message);
 		void receivedDivisionByZero(Message *message);
+		void receivedNodeSpecificError(Message *message);
 		void receivedExecutionStateChanged(Message *message);
 		void receivedBreakpointSetResult(Message *message);
 		

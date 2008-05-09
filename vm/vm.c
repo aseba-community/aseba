@@ -199,9 +199,9 @@ void AsebaVMStep(AsebaVMState *vm)
 			if (variableIndex >= vm->variablesSize)
 			{
 				uint16 buffer[2];
-				AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
 				buffer[0] = vm->pc;
 				buffer[1] = variableIndex;
+				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, sizeof(buffer));
 				break;
 			}
@@ -422,6 +422,20 @@ void AsebaVMStep(AsebaVMState *vm)
 		#endif
 		break;
 	} // switch bytecode...
+}
+
+void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
+{
+	uint16 msgLen = strlen(message);
+	
+	vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+	
+	uint8* buffer = (uint8*)alloca(msgLen+3);
+	((uint16*)buffer)[0] = vm->pc;
+	buffer[2] = (uint8)msgLen;
+	memcpy(buffer+3, message, msgLen);
+	
+	AsebaSendMessage(vm, ASEBA_MESSAGE_NODE_SPECIFIC_ERROR, buffer, msgLen+3);
 }
 
 /*! Execute on bytecode of the current VM thread and check for potential breakpoints.
