@@ -188,12 +188,12 @@ void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP 
 	asebaCan.sendQueueLock = 0;
 }
 
-int AsebaCanSend(const uint8 *data, size_t size)
+uint16 AsebaCanSend(const uint8 *data, size_t size)
 {
 	return AsebaCanSendSpecificSource(data, size, asebaCan.id);
 }
 
-int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
+uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 {
 	// send everything we can to maximize the space in the buffer
 	AsebaCanSendQueueToPhysicalLayer();
@@ -237,7 +237,7 @@ void AsebaCanFrameSent()
 		AsebaCanSendQueueToPhysicalLayer();
 }
 
-int AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
+uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 {
 	int stopPos = -1;
 	uint16 stopId;

@@ -83,7 +83,7 @@ void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP 
 	@param size amount of data to send
 	@return 1 on success, 0 on failure
 */
-int AsebaCanSend(const uint8 *data, size_t size);
+uint16 AsebaCanSend(const uint8 *data, size_t size);
 
 /*! Send data as an aseba packet.
 	@param data pointer to the data to send
@@ -91,7 +91,7 @@ int AsebaCanSend(const uint8 *data, size_t size);
 	@param source identifier to use as source
 	@return 1 on success, 0 on failure
 */
-int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source);
+uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source);
 
 /*! Copy data from a received packet to the caller-provided buffer.
 	Remove the packet from the reception queue afterwards.
@@ -100,7 +100,7 @@ int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source);
 	@param source the identifier of the source of the received packet
 	@return the amount of data copied. 0 if no data were available.
 */
-int AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
+uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
 
 // to be called by data layer on interrupts
 

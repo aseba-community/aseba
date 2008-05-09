@@ -66,6 +66,7 @@ add_definitions(-DASEBA_ASSERT)
 add_library(aseba
 	vm/vm.c
 	vm/natives.c
+	transport/buffer/vm-buffer.c
 	utils/FormatableString.cpp
 	utils/utils.cpp
 	compiler/compiler.cpp
