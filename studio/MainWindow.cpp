@@ -923,6 +923,8 @@ namespace Aseba
 					if (ok)
 						break;
 				}
+				else
+					return;
 			}
 		}
 		
