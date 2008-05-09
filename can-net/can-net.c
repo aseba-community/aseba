@@ -13,7 +13,6 @@
 
 #define ASEBA_MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-#define barrier() __asm__ __volatile__("": : :"memory")
 
 /*!	This contains the state of the CAN implementation of Aseba network */
 static struct AsebaCan
@@ -39,7 +38,7 @@ static struct AsebaCan
 	uint16 recvQueueInsertPos;
 	uint16 recvQueueConsumePos;
 
-	uint16 insideSendQueueToPhysicalLayer;
+	uint16 volatile sendQueueLock;
 	
 } asebaCan;
 
@@ -93,19 +92,25 @@ static void AsebaCanSendQueueInsert(uint16 canid, const uint8 *data, size_t size
 static void AsebaCanSendQueueToPhysicalLayer()
 {
 	uint16 temp;
-	asebaCan.insideSendQueueToPhysicalLayer = 1;
-	barrier();
+	
 	while (asebaCan.isFrameRoomFP() && (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos))
 	{
+		asebaCan.sendQueueLock = 1;
+		if(!(asebaCan.isFrameRoomFP() && (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos))) 
+		{
+			asebaCan.sendQueueLock = 0;
+			continue;
+		}
+		
 		asebaCan.sendFrameFP(asebaCan.sendQueue + asebaCan.sendQueueConsumePos);
 		
 		temp = asebaCan.sendQueueConsumePos + 1;
 		if (temp >= asebaCan.sendQueueSize)
 			temp = 0;
 		asebaCan.sendQueueConsumePos = temp; 
+		asebaCan.sendQueueLock = 0;
 	}
-	barrier();
-	asebaCan.insideSendQueueToPhysicalLayer = 0;
+
 }
 
 /*! Returned the maximum number of used frames in the reception queue*/
@@ -179,6 +184,8 @@ void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP 
 	asebaCan.recvQueueSize = recvQueueSize;
 	asebaCan.recvQueueInsertPos = 0;
 	asebaCan.recvQueueConsumePos = 0;
+	
+	asebaCan.sendQueueLock = 0;
 }
 
 int AsebaCanSend(const uint8 *data, size_t size)
@@ -226,7 +233,7 @@ int AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 void AsebaCanFrameSent()
 {
 	// send everything we can if we are currently not sending
-	if (!asebaCan.insideSendQueueToPhysicalLayer)
+	if (!asebaCan.sendQueueLock)
 		AsebaCanSendQueueToPhysicalLayer();
 }
 
