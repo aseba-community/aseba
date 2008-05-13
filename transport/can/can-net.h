@@ -102,8 +102,13 @@ uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 */
 uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
 
+// to be implemented by the glue 
+
 /*! Busy wait until the can buffer has room. At worst, can be an empty function */
 void AsebaIdle(void);
+
+/*! Return true if VM will ignore the packet, false otherwise */
+uint16 AsebaShouldDropPacket(uint16 source, const uint8* data);
 
 // to be called by data layer on interrupts
 

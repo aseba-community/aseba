@@ -18,7 +18,7 @@ extern "C" {
 	* AsebaSendDescription()
 	
 	This helper provides to the glue code:
-	* AsebaDebugHandleCommands()
+	* AsebaProcessIncomingEvents()
 	
 	This helper requires from the lower level transport layer:
 	* AsebaSendBuffer()
@@ -37,7 +37,7 @@ extern "C" {
 // functions this helper provides
 
 /*! Read messages and process messages from transport layer, if any */
-void AsebaDebugHandleCommands(AsebaVMState *vm);
+void AsebaProcessIncomingEvents(AsebaVMState *vm);
 
 // functions this helper needs
 
@@ -47,7 +47,7 @@ extern uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, ui
 
 extern const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm);
 
-extern const AsebaNativeFunctionDescription** AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm);
+extern const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm);
 
 /*@}*/
 

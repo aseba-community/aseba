@@ -721,4 +721,25 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	}
 }
 
+uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data)
+{
+	uint16 type = ((const uint16*)data)[0];
+	if (type < 0x8000)
+	{
+		// user message
+		return !AsebaVMGetEventAddress(vm, type);
+	}
+	else if (type >= 0xA000)
+	{
+		// debug message
+		uint16 dest = ((const uint16*)data)[1];
+		if (type == ASEBA_MESSAGE_GET_DESCRIPTION)
+			return 0;
+		
+		// check it is for us
+		return dest != vm->nodeId;
+	}
+	return 1;
+}	
+
 /*@}*/

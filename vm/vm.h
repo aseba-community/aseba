@@ -141,6 +141,9 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 /*! Can be called by glue code (including native functions), to stop vm and emit a node specific error */
 void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message);
 
+/*! Return non-zero if VM will ignore the packet, 0 otherwise */
+uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data);
+
 // Functions implemented outside by the transport layer
 
 /*! Called by AsebaStep if there is a message (not an user event) to send.

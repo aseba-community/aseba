@@ -314,18 +314,57 @@ uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 
 void AsebaCanFrameReceived(const CanFrame *frame)
 {
-	uint16 temp;
+	#define MAX_DROPPING_SOURCE 20
+	static uint16 dropping[MAX_DROPPING_SOURCE];
+	uint16 source = CANID_TO_ID(frame->id);
+	
+	// check whether this packet should be filtered or not
+	if (CANID_TO_TYPE(frame->id) == TYPE_SMALL_PACKET)
+	{
+		if (AsebaShouldDropPacket(source, frame->data))
+			return;
+	}
+	else if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_START)
+	{
+		if (AsebaShouldDropPacket(source, frame->data))
+		{
+			uint16 i;
+			for (i = 0; i < MAX_DROPPING_SOURCE; i++)
+			{
+				if (dropping[i] == 0)
+				{
+					dropping[i] = source + 1;
+					return;
+				}
+			}
+		}
+	}
+	else
+	{
+		uint16 i;
+		for (i = 0; i < MAX_DROPPING_SOURCE; i++)
+		{
+			if (dropping[i] == source + 1)
+			{
+				if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP)
+					dropping[i] = 0;
+				return;
+			}
+		}
+	}
+	
 	if (AsebaCanRecvQueueGetMinFreeFrames() <= 1)
 	{
 		// if packet is stop, free associated frames, otherwise this could lead to everlasting used frames
 		if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP)
-			AsebaCanRecvQueueFreeFrames(CANID_TO_ID(frame->id));
+			AsebaCanRecvQueueFreeFrames(source);
 		
 		// notify user
 		asebaCan.receivedPacketDroppedFP();
 	}
 	else
 	{
+		uint16 temp;
 		// store and increment pos
 		asebaCan.recvQueue[asebaCan.recvQueueInsertPos] = *frame;
 		asebaCan.recvQueue[asebaCan.recvQueueInsertPos].used = 1;

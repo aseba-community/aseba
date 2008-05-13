@@ -83,7 +83,7 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 void AsebaSendDescription(AsebaVMState *vm)
 {
 	const AsebaVMDescription *vmDescription = AsebaGetVMDescription(vm);
-	const AsebaNativeFunctionDescription** nativeFunctionsDescription = AsebaGetNativeFunctionsDescriptions(vm);
+	const AsebaNativeFunctionDescription* const * nativeFunctionsDescription = AsebaGetNativeFunctionsDescriptions(vm);
 	
 	uint16 i = 0;
 	buffer_pos = 0;
@@ -132,7 +132,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 	AsebaSendBuffer(vm, buffer, buffer_pos);
 }
 
-void AsebaDebugHandleCommands(AsebaVMState *vm)
+void AsebaProcessIncomingEvents(AsebaVMState *vm)
 {
 	uint16 source;
 	const AsebaVMDescription *desc = AsebaGetVMDescription(vm);
