@@ -36,6 +36,7 @@
 #include <../../vm/vm.h>
 #include "../../vm/natives.h"
 #include <../../common/consts.h>
+#include <../../transport/buffer/vm-buffer.h>
 #include <dashel/dashel.h>
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
@@ -44,6 +45,9 @@
 #include <QtDebug>
 #include "challenge.h"
 #include <challenge.moc>
+#include <string.h>
+
+#define SIMPLIFIED_EPUCK
 
 static void initTexturesResources()
 {
@@ -59,11 +63,7 @@ inline Derived polymorphic_downcast(Base base)
 	return derived;
 }
 
-
-#define SIMPLIFIED_EPUCK
-
 // Definition of the aseba glue
-
 
 namespace Enki
 {
@@ -74,18 +74,19 @@ namespace Enki
 typedef QMap<AsebaVMState*, Enki::AsebaFeedableEPuck*>  VmEPuckMap;
 static VmEPuckMap asebaEPuckMap;
 
-static const unsigned nativeFunctionsCount = 2;
-static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
+static AsebaNativeFunctionPointer nativeFunctions[] =
 {
 	AsebaNative_vecdot,
 	AsebaNative_vecstat
 };
-static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 {
 	&AsebaNativeDescription_vecdot,
-	&AsebaNativeDescription_vecstat
+	&AsebaNativeDescription_vecstat,
+	0
 };
 
+extern AsebaVMDescription vmDescription;
 
 namespace Enki
 {
@@ -177,15 +178,16 @@ namespace Enki
 		} variables;
 		int port;
 		
-		//std::deque<Event> eventsQueue;
-		//unsigned amountOfTimerEventInQueue;
+		uint16 lastMessageSource;
+		std::valarray<uint8> lastMessageData;
 		
-			
 	public:
 		AsebaFeedableEPuck(int id) :
 			stream(0)
 		{
 			asebaEPuckMap[&vm] = this;
+			
+			vm.nodeId = 1;
 			
 			bytecode.resize(512);
 			vm.bytecode = &bytecode[0];
@@ -201,7 +203,7 @@ namespace Enki
 			port = PORT_BASE+id;
 			Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
 			
-			AsebaVMInit(&vm, 1);
+			AsebaVMInit(&vm);
 			
 			variables.colorG = 100;
 		}
@@ -229,33 +231,14 @@ namespace Enki
 		
 		void incomingData(Dashel::Stream *stream)
 		{
-			unsigned short len;
-			unsigned short type;
-			unsigned short source;
+			uint16 len;
 			stream->read(&len, 2);
-			stream->read(&source, 2);
-			stream->read(&type, 2);
-			std::valarray<unsigned char> buffer(static_cast<size_t>(len));
-			stream->read(&buffer[0], buffer.size());
+			stream->read(&lastMessageSource, 2);
+			lastMessageData.resize(len+2);
+			stream->read(&lastMessageData[0], lastMessageData.size());
 			
-			signed short *dataPtr = reinterpret_cast<signed short *>(&buffer[0]);
-			
-			// we only handle debug message
-			if (type >= 0xA000)
-			{
-				// not bootloader
-				if (buffer.size() % 2 != 0)
-				{
-					qDebug() << this << " : ";
-					std::cerr << std::hex << std::showbase;
-					std::cerr << "AsebaMarxbot::incomingData() : fatal error: received event: " << type;
-					std::cerr << std::dec << std::noshowbase;
-					std::cerr << " of size " << buffer.size();
-					std::cerr << ", which is not a multiple of two." << std::endl;
-					assert(false);
-				}
-				AsebaVMDebugMessage(&vm, type, reinterpret_cast<uint16 *>(dataPtr), buffer.size() / 2);
-			}
+			if (*((uint16*)&lastMessageData[0]) >= 0xA000)
+				AsebaProcessIncomingEvents(&vm);
 			else
 				qDebug() << this << " : Non debug event dropped.";
 		}
@@ -846,163 +829,37 @@ namespace Enki
 
 // Implementation of aseba glue code
 
-extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
 	assert(stream);
 	
-	// write message
-	stream->write(&size, 2);
+	uint16 len = length - 2;
+	stream->write(&len, 2);
 	stream->write(&vm->nodeId, 2);
-	stream->write(&id, 2);
-	stream->write(data, size);
+	stream->write(data, length);
+	std::cout << "send len = " << length <<std::endl;
 	stream->flush();
 }
 
-extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
+extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
 {
-	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
-	assert(stream);
-	
-	// write message
-	uint16 size = length * 2 + 2;
-	uint16 id = ASEBA_MESSAGE_VARIABLES;
-	stream->write(&size, 2);
-	stream->write(&vm->nodeId, 2);
-	stream->write(&id, 2);
-	stream->write(&start, 2);
-	stream->write(vm->variables + start, length * 2);
-	stream->flush();
-}
-
-void AsebaWriteString(Dashel::Stream* stream, const char *s)
-{
-	size_t len = strlen(s);
-	uint8 lenUint8 = static_cast<uint8>(strlen(s));
-	stream->write(&lenUint8, 1);
-	stream->write(s, len);
-}
-
-void AsebaWriteNativeFunctionDescription(Dashel::Stream* stream, const AsebaNativeFunctionDescription* description)
-{
-	AsebaWriteString(stream, description->name);
-	AsebaWriteString(stream, description->doc);
-	stream->write(description->argumentCount);
-	for (unsigned i = 0; i < description->argumentCount; i++)
+	if (asebaEPuckMap[vm]->lastMessageData.size())
 	{
-		stream->write(description->arguments[i].size);
-		AsebaWriteString(stream, description->arguments[i].name);
+		*source = asebaEPuckMap[vm]->lastMessageSource;
+		memcpy(data, &asebaEPuckMap[vm]->lastMessageData[0], asebaEPuckMap[vm]->lastMessageData.size());
 	}
+	return asebaEPuckMap[vm]->lastMessageData.size();
 }
 
-extern "C" void AsebaSendDescription(AsebaVMState *vm)
+extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
-	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
-	
-	if (stream)
-	{
-		// compute the size of all native functions inside description
-		unsigned nativeFunctionSizes = 0;
-		for (unsigned i = 0; i < nativeFunctionsCount; i++)
-			nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
-	
-		// write sizes (basic + nodeName + sizes + native functions)
-		uint16 size;
-		sint16 ssize;
-		
-		size = (7 + 2) + (8 + 89) + 2 + nativeFunctionSizes;
-		stream->write(&size, 2);
-		stream->write(&vm->nodeId, 2);
-		uint16 id = ASEBA_MESSAGE_DESCRIPTION;
-		stream->write(&id, 2);
-		
-		// write node name and protocol version
-		AsebaWriteString(stream, "e-puck");
-		uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
-		stream->write(&protocolVersion, 2);
-		
-		// write sizes
-		stream->write(&vm->bytecodeSize, 2);
-		stream->write(&vm->stackSize, 2);
-		stream->write(&vm->variablesSize, 2);
-		
-		size = 10;
-		stream->write(&size, 2);
-		
-		// 82
-		
-		// 12
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "leftSpeed");
-		
-		// 13
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "rightSpeed");
-		
-		// 9
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "colorR");
-		
-		// 9
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "colorG");
-		
-		// 9
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "colorB");
-		
-		// 7
-		size = 8;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "prox");
-		
-		// 7
-		#ifdef SIMPLIFIED_EPUCK
-		size = 3;
-		#else
-		size = 60;
-		#endif
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "camR");
-		
-		// 7
-		#ifdef SIMPLIFIED_EPUCK
-		size = 3;
-		#else
-		size = 60;
-		#endif
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "camG");
-		
-		// 7
-		#ifdef SIMPLIFIED_EPUCK
-		size = 3;
-		#else
-		size = 60;
-		#endif
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "camB");
-		
-		// 9
-		size = 1;
-		stream->write(&size, 2);
-		AsebaWriteString(stream, "energy");
-		
-		// write native functions
-		size = nativeFunctionsCount;
-		stream->write(&size, 2);
-		
-		// write all native functions descriptions
-		for (unsigned i = 0; i < nativeFunctionsCount; i++)
-			AsebaWriteNativeFunctionDescription(stream, nativeFunctionsDescriptions[i]);
-		
-		stream->flush();
-	}
+	return &vmDescription;
+}
+
+extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescriptions;
 }
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
@@ -1038,7 +895,7 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	std::cerr << ".\npc = " << vm->pc << ", sp = " << vm->sp;
 	std::cerr << "\nResetting VM" << std::endl;
 	assert(false);
-	AsebaVMInit(vm, vm->nodeId);
+	AsebaVMInit(vm);
 }
 
 

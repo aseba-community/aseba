@@ -7,7 +7,7 @@ if (QT4_FOUND AND ENKI_FOUND)
 	
 	include_directories(${ENKI_INCLUDE_DIR})
 	
-	set(challenge_SRCS challenge.cpp objects/food_base.cpp  objects/food_charge0.cpp  objects/food_charge1.cpp  objects/food_charge2.cpp  objects/food_charge3.cpp  objects/food_ring.cpp)
+	set(challenge_SRCS challenge.cpp challenge-vm-description.c objects/food_base.cpp  objects/food_charge0.cpp  objects/food_charge1.cpp  objects/food_charge2.cpp  objects/food_charge3.cpp  objects/food_ring.cpp)
 	
 	qt4_automoc(${challenge_SRCS})
 	

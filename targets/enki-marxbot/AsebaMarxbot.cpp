@@ -47,64 +47,53 @@ static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
 	AsebaNative_vecdot,
 	AsebaNative_vecstat
 };
+
 static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
 {
 	&AsebaNativeDescription_vecdot,
-	&AsebaNativeDescription_vecstat
+	&AsebaNativeDescription_vecstat,
+	0
 };
 
-//int stepCounter = 0;
+// TODO: add VM description
 
-extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
+extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
-	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
-	assert(stream);
-	
-	// write message
-	stream->write(&size, 2);
-	stream->write(&vm->nodeId, 2);
-	stream->write(&id, 2);
-	stream->write(data, size);
-	stream->flush();
-	std::cout << "event " << id << std::endl;
-}
-
-extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
-{
-	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
-	assert(stream);
-	
-	// write message
-	uint16 size = length * 2 + 2;
-	uint16 id = ASEBA_MESSAGE_VARIABLES;
-	stream->write(&size, 2);
-	stream->write(&vm->nodeId, 2);
-	stream->write(&id, 2);
-	stream->write(&start, 2);
-	stream->write(vm->variables + start, length * 2);
-	stream->flush();
-}
-
-void AsebaWriteString(Dashel::Stream* stream, const char *s)
-{
-	size_t len = strlen(s);
-	uint8 lenUint8 = static_cast<uint8>(strlen(s));
-	stream->write(&lenUint8, 1);
-	stream->write(s, len);
-}
-
-void AsebaWriteNativeFunctionDescription(Dashel::Stream* stream, const AsebaNativeFunctionDescription* description)
-{
-	AsebaWriteString(stream, description->name);
-	AsebaWriteString(stream, description->doc);
-	stream->write(description->argumentCount);
-	for (unsigned i = 0; i < description->argumentCount; i++)
+	// TODO
+	switch (vm->nodeId)
 	{
-		stream->write(description->arguments[i].size);
-		AsebaWriteString(stream, description->arguments[i].name);
+		case 1: // TODO
+		case 2: // TODO
+		case 3: // TODO
+		case 4: // TODO
 	}
 }
 
+extern "C" const AsebaNativeFunctionDescription** AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescriptions;
+}
+
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+{
+	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
+	assert(stream);
+	
+	uint16 size = length - 2; // type is not part of length
+	stream->write(&size, 2);
+	stream->write(&vm->nodeId, 2);
+	stream->write(data, length);
+	stream->flush();
+}
+
+extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+{
+	// TODO
+}
+
+
+
+// TODO switch to clean description
 extern "C" void AsebaSendDescription(AsebaVMState *vm)
 {
 	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
