@@ -128,7 +128,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "Options:\n";
 	stream << "-v, --verbose   : makes the switch verbose\n";
 	stream << "-d, --dump      : makes the switch dump all data\n";
-	stream << "-f, --forward   : makes the switch only forward messages, not transmit them back to the sender.\n";
+	stream << "-l, --loop      : makes the switch transmit messages back to the send, not only forward them.\n";
 	stream << "-p port         : listens to incoming connection on this port\n";
 	stream << "Additional targets are any valid Dashel targets." << std::endl;
 }
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 	unsigned port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;
 	bool dump = false;
-	bool forward = false;
+	bool forward = true;
 	std::vector<std::string> additionalTargets;
 	
 	int argCounter = 1;
@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
 		{
 			dump = true;
 		}
-		else if ((strcmp(arg, "-f") == 0) || (strcmp(arg, "--forward") == 0))
+		else if ((strcmp(arg, "-l") == 0) || (strcmp(arg, "--loop") == 0))
 		{
-			forward = true;
+			forward = false;
 		}
 		else if (strcmp(arg, "-p") == 0)
 		{
