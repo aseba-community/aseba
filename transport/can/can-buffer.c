@@ -8,7 +8,7 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 
 uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
 {
-	return AsebaCanRecv(data, length, source);
+	return AsebaCanRecv(data, maxLength, source);
 }
 
 
