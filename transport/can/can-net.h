@@ -102,6 +102,9 @@ uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 */
 uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
 
+/*! Busy wait until the can buffer has room. At worst, can be an empty function */
+void AsebaIdle(void);
+
 // to be called by data layer on interrupts
 
 /*! Data layer should call this function when a new CAN frame (max 8 bytes) is available */
