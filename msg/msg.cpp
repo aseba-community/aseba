@@ -175,7 +175,7 @@ namespace Aseba
 		if (message->readPos != message->rawData.size())
 		{
 			cerr << "Message::receive() : fatal error: message not fully read.\n";
-			cerr << "readPos: " << message->readPos << ", rawData size: " << message->rawData.size();
+			cerr << "type: " << type << ", readPos: " << message->readPos << ", rawData size: " << message->rawData.size();
 			cerr << endl;
 			abort();
 		}
@@ -222,7 +222,7 @@ namespace Aseba
 		if (readPos + sizeof(T) > rawData.size())
 		{
 			cerr << "Message<" << typeid(T).name() << ">::get() : fatal error: attempt to overread.\n";
-			cerr << "readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
+			cerr << "type: " << type << ", readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
 			cerr << endl;
 			abort();
 		}
