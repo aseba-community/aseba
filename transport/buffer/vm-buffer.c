@@ -119,10 +119,10 @@ void AsebaSendDescription(AsebaVMState *vm)
 		uint16 j;
 		buffer_add_string(nativeFunctionsDescription[i]->name);
 		buffer_add_string(nativeFunctionsDescription[i]->doc);
-		for (j = 0; j < nativeFunctionsDescription[i]->arguments[j].size; j++)
+		for (j = 0; nativeFunctionsDescription[i]->arguments[j].size; j++)
 			;
 		buffer_add_uint16(j);
-		for (j = 0; j < nativeFunctionsDescription[i]->arguments[j].size; j++)
+		for (j = 0; nativeFunctionsDescription[i]->arguments[j].size; j++)
 		{
 			buffer_add_uint16(nativeFunctionsDescription[i]->arguments[j].size);
 			buffer_add_string(nativeFunctionsDescription[i]->arguments[j].name);

@@ -92,12 +92,12 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 {
-	"veccopy",
+	"vecfill",
 	"fill vector with constant",
 	{
 		{ -1, "dest" },
 		{ 1, "value" },
-		{ 0, "" }
+		{ 0, 0 }
 	}
 };
 
@@ -126,7 +126,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 	{
 		{ -1, "dest" },
 		{ -1, "src" },
-		{ 0, "" }
+		{ 0, 0 }
 	}
 };
 
@@ -162,7 +162,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 		{ -1, "src2" },
 		{ 1, "dest" },
 		{ 1, "shift" },
-		{ 0, "" }
+		{ 0, 0 }
 	}
 };
 
@@ -211,7 +211,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 		{ 1, "min" },
 		{ 1, "max" },
 		{ 1, "mean" },
-		{ 0, "" }
+		{ 0, 0 }
 	}
 };
 
