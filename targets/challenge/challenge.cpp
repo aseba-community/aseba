@@ -76,11 +76,15 @@ static VmEPuckMap asebaEPuckMap;
 
 static AsebaNativeFunctionPointer nativeFunctions[] =
 {
+	AsebaNative_vecfill,
+	AsebaNative_veccopy,
 	AsebaNative_vecdot,
-	AsebaNative_vecstat
+	AsebaNative_vecstat,
 };
 static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 {
+	&AsebaNativeDescription_vecfill,
+	&AsebaNativeDescription_veccopy,
 	&AsebaNativeDescription_vecdot,
 	&AsebaNativeDescription_vecstat,
 	0

@@ -79,6 +79,17 @@ typedef struct
 /*! Return the size of the description of a native functions */
 uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* description);
 
+// standard natives functions
+
+/*! Function to fill all the elements of a vector to a specific value*/
+void AsebaNative_vecfill(AsebaVMState *vm);
+/*! Description of AsebaNative_vecfill */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecfill;
+
+/*! Function to copy a vector */
+void AsebaNative_veccopy(AsebaVMState *vm);
+/*! Description of AsebaNative_veccopy */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
 
 /*! Function to perform a dot product on a vector */
 void AsebaNative_vecdot(AsebaVMState *vm);

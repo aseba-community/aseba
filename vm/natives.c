@@ -71,6 +71,66 @@ uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* des
 	return size;
 }
 
+// standard natives functions
+
+void AsebaNative_vecfill(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 value = vm->stack[1];
+	
+	// variable size
+	uint16 length = vm->stack[2];
+	
+	uint16 i;
+	
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[value];
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
+{
+	"veccopy",
+	"fill vector with constant",
+	{
+		{ -1, "dest" },
+		{ 1, "value" },
+		{ 0, "" }
+	}
+};
+
+
+void AsebaNative_veccopy(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 src = vm->stack[1];
+	
+	// variable size
+	uint16 length = vm->stack[2];
+	
+	uint16 i;
+	
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[src++];
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
+{
+	"veccopy",
+	"copy vector content",
+	{
+		{ -1, "dest" },
+		{ -1, "src" },
+		{ 0, "" }
+	}
+};
+
+
 void AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
@@ -105,6 +165,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 		{ 0, "" }
 	}
 };
+
 
 void AsebaNative_vecstat(AsebaVMState *vm)
 {
