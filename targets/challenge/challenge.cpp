@@ -838,7 +838,6 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	stream->write(&len, 2);
 	stream->write(&vm->nodeId, 2);
 	stream->write(data, length);
-	std::cout << "send len = " << length <<std::endl;
 	stream->flush();
 }
 

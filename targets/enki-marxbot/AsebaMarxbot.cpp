@@ -24,12 +24,14 @@
 #include "AsebaMarxbot.h"
 #include "../../common/consts.h"
 #include "../../vm/natives.h"
+#include <../../transport/buffer/vm-buffer.h>
 #include <set>
 #include <map>
 #include <cassert>
 #include <cstring>
 #include <algorithm>
 #include <iostream>
+#include <QString>
 
 /*!	\file Marxbot.cpp
 	\brief Implementation of the aseba-enabled marXbot robot
@@ -41,46 +43,26 @@
 typedef std::map<AsebaVMState*, Enki::AsebaMarxbot*>  VmSocketMap;
 static VmSocketMap asebaSocketMaps;
 
-static const unsigned nativeFunctionsCount = 2;
-static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
+static AsebaNativeFunctionPointer nativeFunctions[] =
 {
 	AsebaNative_vecdot,
 	AsebaNative_vecstat
 };
 
-static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 {
 	&AsebaNativeDescription_vecdot,
 	&AsebaNativeDescription_vecstat,
 	0
 };
 
-// TODO: add VM description
-
-extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
-{
-	// TODO
-	switch (vm->nodeId)
-	{
-		case 1: // TODO
-		case 2: // TODO
-		case 3: // TODO
-		case 4: // TODO
-	}
-}
-
-extern "C" const AsebaNativeFunctionDescription** AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
-{
-	return nativeFunctionsDescriptions;
-}
-
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
 	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
 	assert(stream);
 	
-	uint16 size = length - 2; // type is not part of length
-	stream->write(&size, 2);
+	uint16 len = length - 2;
+	stream->write(&len, 2);
 	stream->write(&vm->nodeId, 2);
 	stream->write(data, length);
 	stream->flush();
@@ -88,127 +70,32 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 
 extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
 {
-	// TODO
+	if (asebaSocketMaps[vm]->lastMessageData.size())
+	{
+		*source = asebaSocketMaps[vm]->lastMessageSource;
+		memcpy(data, &asebaSocketMaps[vm]->lastMessageData[0], asebaSocketMaps[vm]->lastMessageData.size());
+	}
+	return asebaSocketMaps[vm]->lastMessageData.size();
 }
 
-
-
-// TODO switch to clean description
-extern "C" void AsebaSendDescription(AsebaVMState *vm)
+extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
-	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
-	assert(stream);
-	
-	// compute the size of all native functions inside description
-	unsigned nativeFunctionSizes = 0;
-	for (unsigned i = 0; i < nativeFunctionsCount; i++)
-		nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
-	
-	// write sizes (basic + nodeName + variables)
-	uint16 size;
-	sint16 ssize;
 	switch (vm->nodeId)
 	{
-		case 1: size = 8 + 11 + 2 + (8 + 15) + nativeFunctionSizes; break;
-		case 2: size = 8 + 12 + 2 + (8 + 15) + nativeFunctionSizes; break;
-		case 3: size = 8 + 18 + 2 + (8 + 20) + nativeFunctionSizes; break;
-		case 4: size = 8 + 17 + 2 + (6 + 15) + nativeFunctionSizes; break;
-		default: assert(false); break;
-	}
-	stream->write(&size, 2);
-	stream->write(&vm->nodeId, 2);
-	uint16 id = ASEBA_MESSAGE_DESCRIPTION;
-	stream->write(&id, 2);
-	
-	// write node name and protocol version
-	switch (vm->nodeId)
-	{
-		case 1: AsebaWriteString(stream, "left motor"); break;
-		case 2: AsebaWriteString(stream, "right motor"); break;
-		case 3: AsebaWriteString(stream, "proximity sensors"); break;
-		case 4: AsebaWriteString(stream, "distance sensors"); break;
-		default: assert(false); break;
-	}
-	uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
-	stream->write(&protocolVersion, 2);
-	
-	// write sizes
-	stream->write(&vm->bytecodeSize, 2);
-	stream->write(&vm->stackSize, 2);
-	stream->write(&vm->variablesSize, 2);
-	
-	// write list of variables
-	switch (vm->nodeId)
-	{
-		case 1:
-		case 2:
-		{
-			// motors
-			size = 3;
-			stream->write(&size, 2);
-			
-			size = 32;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "args");
-			
-			size = 1;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "speed");
-			
-			size = 2;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "odo");
-		}
+		case 1: // TODO
+		case 2: // TODO
+		case 3: // TODO
+		case 4: // TODO
 		break;
-		
-		case 3:
-		{
-			// proximity sensors
-			size = 3;
-			stream->write(&size, 2);
-			
-			size = 32;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "args");
-			
-			size = 24;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "bumpers");
-			
-			size = 12;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "ground");
-		}
-		break;
-		
-		case 4:
-		{
-			// distance sensors
-			size = 2;
-			stream->write(&size, 2);
-			
-			size = 32;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "args");
-			
-			size = 180;
-			stream->write(&size, 2);
-			AsebaWriteString(stream, "distances");
-		}
-		break;
-		
-		default: assert(false);	break;
 	}
-	
-	// write native functions
-	size = nativeFunctionsCount;
-	stream->write(&size, 2);
-	
-	// write all native functions descriptions
-	for (unsigned i = 0; i < nativeFunctionsCount; i++)
-		AsebaWriteNativeFunctionDescription(stream, nativeFunctionsDescriptions[i]);
-	
-	stream->flush();
+	std::cerr << "simulation broken until we define the variables availables in the physical robot" << std::endl;
+	assert(false);
+	return 0; // FIXME
+}
+
+extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescriptions;
 }
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
@@ -244,12 +131,14 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	std::cerr << ".\npc = " << vm->pc << ", sp = " << vm->sp;
 	std::cerr << "\nResetting VM" << std::endl;
 	assert(false);
-	AsebaVMInit(vm, vm->nodeId);
+	AsebaVMInit(vm);
 }
 
 namespace Enki
 {
 	using namespace Dashel;
+	
+	int AsebaMarxbot::marxbotNumber = 0;
 	
 	AsebaMarxbot::Module::Module()
 	{
@@ -260,25 +149,27 @@ namespace Enki
 		stack.resize(64);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
-		amountOfTimerEventInQueue = 0;
 	}
 	
 	AsebaMarxbot::AsebaMarxbot(const std::string &target)
 	{
 		// setup modules specific data
+		leftMotor.vm.nodeId = 1;
 		leftMotor.vm.variables = reinterpret_cast<sint16 *>(&leftMotorVariables);
 		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(sint16);
 		modules.push_back(&leftMotor);
 		
+		rightMotor.vm.nodeId = 2;
 		rightMotor.vm.variables = reinterpret_cast<sint16 *>(&rightMotorVariables);
 		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(sint16);
 		modules.push_back(&rightMotor);
 		
+		proximitySensors.vm.nodeId = 3;
 		proximitySensors.vm.variables = reinterpret_cast<sint16 *>(&proximitySensorVariables);
 		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(sint16);
 		modules.push_back(&proximitySensors);
 		
+		distanceSensors.vm.nodeId = 4;
 		distanceSensors.vm.variables = reinterpret_cast<sint16 *>(&distanceSensorVariables);
 		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(sint16);
 		modules.push_back(&distanceSensors);
@@ -292,11 +183,15 @@ namespace Enki
 		// connect to target
 		stream = Hub::connect(target);
 		
+		int port = ASEBA_DEFAULT_PORT + marxbotNumber;
+		Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+		marxbotNumber++;
+		
 		// init VM
-		AsebaVMInit(&leftMotor.vm, 1);
-		AsebaVMInit(&rightMotor.vm, 2);
-		AsebaVMInit(&proximitySensors.vm, 3);
-		AsebaVMInit(&distanceSensors.vm, 4);
+		AsebaVMInit(&leftMotor.vm);
+		AsebaVMInit(&rightMotor.vm);
+		AsebaVMInit(&proximitySensors.vm);
+		AsebaVMInit(&distanceSensors.vm);
 	}
 	
 	AsebaMarxbot::~AsebaMarxbot()
@@ -352,50 +247,24 @@ namespace Enki
 				distanceSensorVariables.distances[i] = static_cast<sint16>(rotatingDistanceSensor.zbuffer[i]);
 		}
 		
-		// push on timer events
-		Event onTimer;
-		onTimer.id = ASEBA_EVENT_PERIODIC;
+		// do a network step
+		Hub::step();
+		
 		for (size_t i = 0; i < modules.size(); i++)
 		{
-			if (modules[i]->amountOfTimerEventInQueue == 0)
-			{
-				modules[i]->eventsQueue.push_back(onTimer);
-				modules[i]->amountOfTimerEventInQueue++;
-			}
-		}
-		
-		// process all events
-		while (true)
-		{
-			bool wasActivity = false;
+			AsebaVMState* vm = &(modules[i]->vm);
 			
-			Hub::step();
+			/* no queue for now
+			// process all incoming events as long as 
+			while (!AsebaVMIsExecutingThread(vm) && !events.empty())
+				AsebaProcessIncomingEvents(&(modules[i]->vm));
+			*/
 			
-			for (size_t i = 0; i < modules.size(); i++)
-			{
-				// if events in queue and not blocked in a thread, execute new thread
-				if (!modules[i]->eventsQueue.empty() && !AsebaVMIsExecutingThread(&modules[i]->vm))
-				{
-					// copy event to vm
-					BaseVariables *vars = reinterpret_cast<BaseVariables*>(modules[i]->vm.variables);
-					const Event &event = modules[i]->eventsQueue.front();
-					size_t amount = std::min(event.data.size(), sizeof(vars->args) / sizeof(sint16));
-					std::copy(event.data.begin(), event.data.begin() + amount, vars->args);
-					AsebaVMSetupEvent(&modules[i]->vm, event.id);
-					
-					// pop event
-					if (event.id == ASEBA_EVENT_PERIODIC)
-						modules[i]->amountOfTimerEventInQueue--;
-					modules[i]->eventsQueue.pop_front();
-				}
-				
-				// try to run, notice if anything was run
-				if (AsebaVMRun(&modules[i]->vm, 65535))
-					wasActivity = true;
-			}
+			// run VM with a periodic event if nothing else is currently running
+			if (!AsebaVMIsExecutingThread(vm))
+				AsebaVMSetupEvent(vm, ASEBA_EVENT_PERIODIC);
 			
-			if (!wasActivity)
-				break;
+			AsebaVMRun(vm, 65535);
 		}
 	}
 	
@@ -406,56 +275,14 @@ namespace Enki
 	
 	void AsebaMarxbot::incomingData(Stream *stream)
 	{
-		unsigned short len;
-		unsigned short type;
-		unsigned short source;
+		uint16 len;
 		stream->read(&len, 2);
-		stream->read(&source, 2);
-		stream->read(&type, 2);
-		std::valarray<unsigned char> buffer(static_cast<size_t>(len));
-		stream->read(&buffer[0], buffer.size());
+		stream->read(&lastMessageSource, 2);
+		lastMessageData.resize(len+2);
+		stream->read(&lastMessageData[0], lastMessageData.size());
 		
-		signed short *dataPtr = reinterpret_cast<signed short *>(&buffer[0]);
-		
-		if (type < 0x8000)
-		{
-			// user type queue
-			assert(buffer.size() % 2 == 0);
-			
-			// create event
-			Event event;
-			event.id = type;
-			for (size_t i = 0; i < buffer.size(); i+=2)
-				event.data.push_back(*dataPtr++);
-			
-			// for each module
-			for (size_t i = 0; i < modules.size(); i++)
-			{
-				unsigned short address = AsebaVMGetEventAddress(&modules[i]->vm, type);
-				// push event in queue if there is code to handle it
-				if (address)
-					modules[i]->eventsQueue.push_back(event);
-			}
-		}
-		else
-		{
-			// debug message
-			if (type >= 0xA000)
-			{
-				// not bootloader
-				if (buffer.size() % 2 != 0)
-				{
-					std::cerr << std::hex << std::showbase;
-					std::cerr << "AsebaMarxbot::incomingData() : fatal error: received event: " << type;
-					std::cerr << std::dec << std::noshowbase;
-					std::cerr << " of size " << buffer.size();
-					std::cerr << ", which is not a multiple of two." << std::endl;
-					assert(false);
-				}
-				for (size_t i = 0; i < modules.size(); i++)
-					AsebaVMDebugMessage(&modules[i]->vm, type, reinterpret_cast<uint16 *>(dataPtr), buffer.size() / 2);
-			}
-		}
+		for (size_t i = 0; i < modules.size(); i++)
+			AsebaProcessIncomingEvents(&(modules[i]->vm));
 	}
 	
 	void AsebaMarxbot::connectionClosed(Stream *stream, bool abnormal)
