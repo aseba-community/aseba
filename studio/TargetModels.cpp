@@ -325,9 +325,29 @@ namespace Aseba
 		switch (index.column())
 		{
 			case 0: return 0;
-			case 1: return Qt::ItemIsEnabled;
+			case 1: return Qt::ItemIsEnabled | Qt::ItemIsEditable;
 			default: return 0;
 		}
+	}
+	
+	bool TargetMemoryModel::setData(const QModelIndex &index, const QVariant &value, int role)
+	{
+		if (index.isValid() && role == Qt::EditRole)
+		{
+			if (index.column() == 1)
+			{
+				int variableValue;
+				bool ok;
+				variableValue = value.toInt(&ok);
+				Q_ASSERT(ok);
+				
+				variablesData[index.row()] = variableValue;
+				emit variableValueChanged(index.row(), variableValue);
+				
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	void TargetMemoryModel::setVariablesNames(const VariablesNamesVector &names)

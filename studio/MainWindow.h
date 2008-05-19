@@ -79,6 +79,9 @@ namespace Aseba
 		void nextClicked();
 		void refreshMemoryClicked();
 		
+		void setVariableValue(unsigned, int);
+		void insertVariableName(const QModelIndex &);
+		
 		void editorContentChanged();
 		void recompile();
 		

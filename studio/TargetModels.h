@@ -103,9 +103,14 @@ namespace Aseba
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
+		bool setData(const QModelIndex &index, const QVariant &value, int role);
+	
 	public slots:
 		void setVariablesNames(const VariablesNamesVector &names);
 		void setVariablesData(unsigned start, const VariablesDataVector &data);
+	
+	signals:
+		void variableValueChanged(unsigned index, int value);
 		
 	private:
 		QVector<QString> variablesNames;

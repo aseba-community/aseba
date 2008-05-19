@@ -198,7 +198,8 @@ namespace Aseba
 		vmMemoryView->setModel(vmMemoryModel);
 		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
-		vmMemoryView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		vmMemoryView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
+		//vmMemoryView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmMemoryView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		vmMemoryView->resizeColumnsToLongestContents(QStringList() << "it is a long text [9]" << "-888888");
 		vmMemoryView->resizeRowsToContents();
@@ -244,6 +245,10 @@ namespace Aseba
 		connect(runInterruptButton, SIGNAL(clicked()), SLOT(runInterruptClicked()));
 		connect(nextButton, SIGNAL(clicked()), SLOT(nextClicked()));
 		connect(refreshMemoryButton, SIGNAL(clicked()), SLOT(refreshMemoryClicked()));
+		
+		// memory
+		connect(vmMemoryModel, SIGNAL(variableValueChanged(unsigned, int)), SLOT(setVariableValue(unsigned, int)));
+		connect(vmMemoryView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(insertVariableName(const QModelIndex &)));
 		
 		// editor
 		connect(editor, SIGNAL(textChanged()), SLOT(editorContentChanged()));
@@ -291,6 +296,20 @@ namespace Aseba
 	void NodeTab::refreshMemoryClicked()
 	{
 		target->getVariables(id, 0, allocatedVariablesCount);
+	}
+	
+	void NodeTab::setVariableValue(unsigned index, int value)
+	{
+		VariablesDataVector data(1, value);
+		target->setVariables(id, index, data);
+	}
+	
+	void NodeTab::insertVariableName(const QModelIndex &index)
+	{
+		if ((index.column() == 0) && (index.row() < variablesNames.size()))
+		{
+			editor->insertPlainText(QString::fromUtf8(variablesNames[index.row()].c_str()));
+		}
 	}
 	
 	void NodeTab::editorContentChanged()
@@ -587,7 +606,7 @@ namespace Aseba
 				if (uData->properties.isEmpty())
 				{
 					// garbage collect UserData
-					delete uData;
+					//delete uData;
 					block.setUserData(0);
 				}
 				changed = true;
