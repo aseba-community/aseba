@@ -242,6 +242,7 @@ namespace Aseba
 	
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
+		// handle tab and control tab
 		if ((event->key() == Qt::Key_Tab) && textCursor().hasSelection())
 		{
 			QTextCursor cursor(document()->findBlock(textCursor().selectionStart()));
@@ -276,7 +277,25 @@ namespace Aseba
 			cursor.endEditBlock();
 			return;
 		}
-		QTextEdit::keyPressEvent(event);
+		
+		// handle indentation and new line
+		if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+		{
+			QString headingSpace("\n");
+			const QString &line = textCursor().block().text();
+			for (size_t i = 0; i < line.length(); i++)
+			{
+				if (line[i].isSpace())
+					headingSpace += line[i];
+				else
+					break;
+					
+			}
+			insertPlainText(headingSpace);
+		}
+		else
+			QTextEdit::keyPressEvent(event);
+		
 	}
 	
 	/*@}*/
