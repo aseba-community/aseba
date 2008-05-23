@@ -547,7 +547,6 @@ namespace Aseba
 					if (uData->properties.isEmpty())
 					{
 						// garbage collect UserData
-						delete uData;
 						block.setUserData(0);
 					}
 					changed = true;
@@ -579,7 +578,6 @@ namespace Aseba
 					if (uData->properties.isEmpty())
 					{
 						// garbage collect UserData
-						delete uData;
 						block.setUserData(0);
 					}
 					changed = true;
@@ -607,7 +605,6 @@ namespace Aseba
 				if (uData->properties.isEmpty())
 				{
 					// garbage collect UserData
-					//delete uData;
 					block.setUserData(0);
 				}
 				changed = true;

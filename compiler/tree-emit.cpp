@@ -133,12 +133,18 @@ namespace Aseba
 		else
 			bytecodes.currentBytecode->push_back(BytecodeElement(3 + btb.size(), sourcePos.row));
 		
+		
 		std::copy(btb.begin(), btb.end(), std::back_inserter(*bytecodes.currentBytecode));
 		
 		if (children.size() == 4)
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP) | bfb.size() + 1;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode , sourcePos.row));
+			unsigned short jumpLine;
+			if (btb.size())
+				jumpLine = (btb.end()-1)->line;
+			else
+				jumpLine = sourcePos.row;
+			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode , jumpLine));
 			
 			std::copy(bfb.begin(), bfb.end(), std::back_inserter(*bytecodes.currentBytecode));
 		}
