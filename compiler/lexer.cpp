@@ -73,6 +73,9 @@ namespace Aseba
 			case TOKEN_COLON: return ": (colon)";
 			case TOKEN_COMMA: return ", (comma)";
 			case TOKEN_ASSIGN: return "= (assignation)";
+			case TOKEN_OP_OR: return "or";
+			case TOKEN_OP_AND: return "and";
+			case TOKEN_OP_NOT: return "not";
 			case TOKEN_OP_EQUAL: return "== (equal to)";
 			case TOKEN_OP_NOT_EQUAL: return "!= (not equal to)";
 			case TOKEN_OP_BIGGER: return "> (bigger than)";
@@ -290,6 +293,12 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
 						else if (s == "ontimer")
 							tokens.push_back(Token(Token::TOKEN_STR_ontimer, pos));
+						else if (s == "or")
+							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
+						else if (s == "and")
+							tokens.push_back(Token(Token::TOKEN_OP_AND, pos));
+						else if (s == "not")
+							tokens.push_back(Token(Token::TOKEN_OP_NOT, pos));
 						else
 							tokens.push_back(Token(Token::TOKEN_STRING_LITERAL, pos, s));
 					}

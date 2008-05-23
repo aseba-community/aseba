@@ -30,31 +30,28 @@ namespace Aseba
 	/** \addtogroup compiler */
 	/*@{*/
 	
-	std::string comparaisonOperatorToString(AsebaComparaison op)
-	{
-		switch (op)
-		{
-			case ASEBA_CMP_EQUAL: return "=="; break;
-			case ASEBA_CMP_NOT_EQUAL: return "!="; break;
-			case ASEBA_CMP_BIGGER_THAN: return ">"; break;
-			case ASEBA_CMP_BIGGER_EQUAL_THAN: return ">="; break;
-			case ASEBA_CMP_SMALLER_THAN: return "<"; break;
-			case ASEBA_CMP_SMALLER_EQUAL_THAN: return "<="; break;
-			default: return "? (comparaison)";
-		}
-	}
-	
 	std::string binaryOperatorToString(AsebaBinaryOperator op)
 	{
 		switch (op)
 		{
-			case ASEBA_OP_SHIFT_LEFT: return "<<"; break;
-			case ASEBA_OP_SHIFT_RIGHT: return ">>"; break;
-			case ASEBA_OP_ADD: return "+"; break;
-			case ASEBA_OP_SUB: return "-"; break;
-			case ASEBA_OP_MULT: return "*"; break;
-			case ASEBA_OP_DIV: return "/"; break;
-			case ASEBA_OP_MOD: return "modulo"; break;
+			case ASEBA_OP_SHIFT_LEFT: return "<<";
+			case ASEBA_OP_SHIFT_RIGHT: return ">>";
+			case ASEBA_OP_ADD: return "+";
+			case ASEBA_OP_SUB: return "-";
+			case ASEBA_OP_MULT: return "*";
+			case ASEBA_OP_DIV: return "/";
+			case ASEBA_OP_MOD: return "modulo";
+			
+			case ASEBA_OP_EQUAL: return "==";
+			case ASEBA_OP_NOT_EQUAL: return "!=";
+			case ASEBA_OP_BIGGER_THAN: return ">";
+			case ASEBA_OP_BIGGER_EQUAL_THAN: return ">=";
+			case ASEBA_OP_SMALLER_THAN: return "<";
+			case ASEBA_OP_SMALLER_EQUAL_THAN: return "<=";
+			
+			case ASEBA_OP_OR: return "or"; break;
+			case ASEBA_OP_AND: return "and"; break;
+			
 			default: return "? (binary operator)";
 		}
 	}
@@ -77,14 +74,14 @@ namespace Aseba
 			s += "When: ";
 		else
 			s += "If: ";
-		s += comparaisonOperatorToString(comparaison);
+		s += binaryOperatorToString(op);
 		return s;
 	}
 	
 	std::string WhileNode::toString() const
 	{
 		std::string s = "While: ";
-		s += comparaisonOperatorToString(comparaison);
+		s += binaryOperatorToString(op);
 		return s;
 	};
 	

@@ -37,8 +37,6 @@ namespace Aseba
 	/** \addtogroup compiler */
 	/*@{*/
 
-	//! Return the string corresponding to the comparaison operator
-	std::string comparaisonOperatorToString(AsebaComparaison op);
 	//! Return the string corresponding to the binary operator
 	std::string binaryOperatorToString(AsebaBinaryOperator op);
 	
@@ -91,13 +89,13 @@ namespace Aseba
 	};
 	
 	//! Node for "if" and "when".
-	//! children[0] is left part of conditional expression
-	//! children[1] is right part of conditional expression
+	//! children[0] is left part of expression
+	//! children[1] is right part of expression
 	//! children[2] is true block
 	//! children[3] is false block
 	struct IfWhenNode : Node
 	{
-		AsebaComparaison comparaison; //!< type of condition
+		AsebaBinaryOperator op; //!< operator
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		
 		//! Constructor
@@ -109,12 +107,12 @@ namespace Aseba
 	};
 	
 	//! Node for "while".
-	//! children[0] is left part of conditional expression
-	//! children[1] is right part of conditional expression
+	//! children[0] is left part of expression
+	//! children[1] is right part of expression
 	//! children[2] is block
 	struct WhileNode : Node
 	{
-		AsebaComparaison comparaison; //!< type of condition
+		AsebaBinaryOperator op; //!< operator
 		
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
@@ -161,10 +159,13 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
 		
+		void deMorganNotRemoval();
+		
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 		
+		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromAddExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);

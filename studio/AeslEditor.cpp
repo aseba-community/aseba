@@ -45,7 +45,8 @@ namespace Aseba
 						<< "\\bfor\\b" << "\\bin\\b" << "\\bstep\\b"
 						<< "\\bif\\b" << "\\bthen\\b" << "\\belse\\b"
 						<< "\\bend\\b" << "\\bvar\\b" << "\\bcall\\b"
-						<< "\\bonevent\\b" << "\\bontimer\\b" << "\\bwhen\\b";
+						<< "\\bonevent\\b" << "\\bontimer\\b" << "\\bwhen\\b"
+						<< "\\band\\b" << "\\bor\\b" << "\\bnot\\b" ;
 		foreach (QString pattern, keywordPatterns)
 		{
 			rule.pattern = QRegExp(pattern);

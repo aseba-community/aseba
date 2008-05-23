@@ -82,6 +82,47 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 		AsebaVMSendExecutionStateChanged(vm);
 }
 
+static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16 valueTwo, uint16 op)
+{
+	switch (op)
+	{
+		case ASEBA_OP_SHIFT_LEFT: return valueOne << valueTwo;
+		case ASEBA_OP_SHIFT_RIGHT: return valueOne >> valueTwo;
+		case ASEBA_OP_ADD: return valueOne + valueTwo;
+		case ASEBA_OP_SUB: return valueOne - valueTwo;
+		case ASEBA_OP_MULT: return valueOne * valueTwo;
+		case ASEBA_OP_DIV:
+			// check division by zero
+			if (valueTwo == 0)
+			{
+				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+				AsebaSendMessage(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &(vm->pc), sizeof(vm->pc));
+				return 0;
+			}
+			else
+			{
+				return valueOne / valueTwo;
+			}
+		case ASEBA_OP_MOD: return valueOne % valueTwo;
+		
+		case ASEBA_OP_EQUAL: return valueOne == valueTwo;
+		case ASEBA_OP_NOT_EQUAL: return valueOne != valueTwo;
+		case ASEBA_OP_BIGGER_THAN: return valueOne > valueTwo;
+		case ASEBA_OP_BIGGER_EQUAL_THAN: return valueOne >= valueTwo;
+		case ASEBA_OP_SMALLER_THAN: return valueOne < valueTwo;
+		case ASEBA_OP_SMALLER_EQUAL_THAN: return valueOne <= valueTwo;
+		
+		case ASEBA_OP_OR: return valueOne || valueTwo;
+		case ASEBA_OP_AND: return valueOne && valueTwo;
+		
+		default:
+		#ifdef ASEBA_ASSERT
+		AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR);
+		#endif
+		break;
+	}
+}
+
 /*! Execute one bytecode of the current VM thread.
 	VM must be ready for run otherwise trashes may occur. */
 void AsebaVMStep(AsebaVMState *vm)
@@ -285,30 +326,8 @@ void AsebaVMStep(AsebaVMState *vm)
 			valueOne = vm->stack[vm->sp - 1];
 			valueTwo = vm->stack[vm->sp];
 			
-			// check division by zero
-			if (((bytecode & 0x00ff) == ASEBA_OP_DIV) && (valueTwo == 0))
-			{
-				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
-				AsebaSendMessage(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &(vm->pc), sizeof(vm->pc));
-				break;
-			}
-			
-			// do operations
-			switch (bytecode & 0x00ff)
-			{
-				case ASEBA_OP_SHIFT_LEFT: opResult = valueOne << valueTwo; break;
-				case ASEBA_OP_SHIFT_RIGHT: opResult = valueOne >> valueTwo; break;
-				case ASEBA_OP_ADD: opResult = valueOne + valueTwo; break;
-				case ASEBA_OP_SUB: opResult = valueOne - valueTwo; break;
-				case ASEBA_OP_MULT: opResult = valueOne * valueTwo; break;
-				case ASEBA_OP_DIV: opResult = valueOne / valueTwo; break;
-				case ASEBA_OP_MOD: opResult = valueOne % valueTwo; break;
-				default:
-				#ifdef ASEBA_ASSERT
-				AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR);
-				#endif
-				break;
-			};
+			// do operation
+			opResult = AsebaVMDoBinaryOperation(vm, valueOne, valueTwo, bytecode & ASEBA_BINARY_OPERATOR_MASK);
 			
 			// write result
 			vm->sp--;
@@ -351,19 +370,11 @@ void AsebaVMStep(AsebaVMState *vm)
 			// evaluate condition
 			valueOne = vm->stack[vm->sp - 1];
 			valueTwo = vm->stack[vm->sp];
+			conditionResult = AsebaVMDoBinaryOperation(vm, valueOne, valueTwo, bytecode & ASEBA_BINARY_OPERATOR_MASK);
 			vm->sp -= 2;
-			switch (bytecode & 0x7)
-			{
-				case ASEBA_CMP_EQUAL: conditionResult = valueOne == valueTwo; break;
-				case ASEBA_CMP_NOT_EQUAL: conditionResult = valueOne != valueTwo; break;
-				case ASEBA_CMP_BIGGER_THAN: conditionResult = valueOne > valueTwo; break;
-				case ASEBA_CMP_BIGGER_EQUAL_THAN: conditionResult = valueOne >= valueTwo; break;
-				case ASEBA_CMP_SMALLER_THAN: conditionResult = valueOne < valueTwo; break;
-				case ASEBA_CMP_SMALLER_EQUAL_THAN: conditionResult = valueOne <= valueTwo; break;
-			}
 			
 			// is the condition really true ?
-			if (conditionResult && !(GET_BIT(bytecode, 3) && GET_BIT(bytecode, 4)))
+			if (conditionResult && !(GET_BIT(bytecode, ASEBA_IF_IS_WHEN_BIT) && GET_BIT(bytecode, ASEBA_IF_WAS_TRUE_BIT)))
 			{
 				// if true disp
 				disp = (sint16)vm->bytecode[vm->pc + 1];
@@ -376,9 +387,9 @@ void AsebaVMStep(AsebaVMState *vm)
 			
 			// write back condition result
 			if (conditionResult)
-				BIT_SET(vm->bytecode[vm->pc], 4);
+				BIT_SET(vm->bytecode[vm->pc], ASEBA_IF_WAS_TRUE_BIT);
 			else
-				BIT_CLR(vm->bytecode[vm->pc], 4);
+				BIT_CLR(vm->bytecode[vm->pc], ASEBA_IF_WAS_TRUE_BIT);
 			
 			// check pc
 			#ifdef ASEBA_ASSERT

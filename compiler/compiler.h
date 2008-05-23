@@ -42,6 +42,7 @@ namespace Aseba
 	struct Node;
 	struct ProgramNode;
 	struct StatementNode;
+	struct BinaryArithmeticNode;
 	
 	//! Description of target VM
 	struct TargetDescription
@@ -214,6 +215,9 @@ namespace Aseba
 				TOKEN_COLON,
 				TOKEN_COMMA,
 				TOKEN_ASSIGN,
+				TOKEN_OP_OR,
+				TOKEN_OP_AND,
+				TOKEN_OP_NOT,
 				TOKEN_OP_EQUAL,
 				TOKEN_OP_NOT_EQUAL,
 				TOKEN_OP_BIGGER,
@@ -254,8 +258,10 @@ namespace Aseba
 		int expectInt16LiteralOrConstant() const;
 		unsigned expectUInt12Literal() const;
 		unsigned expectEventId() const;
-		bool isOneOf(const Token::Type *types, size_t length) const;
-		void expectOneOf(const Token::Type *types, size_t length) const;
+		template <int length>
+		bool isOneOf(const Token::Type types[length]) const;
+		template <int length>
+		void expectOneOf(const Token::Type types[length]) const;
 		void buildMaps();
 		void tokenize(std::istream& source);
 		void dumpTokens(std::ostream &dest) const;
@@ -264,8 +270,11 @@ namespace Aseba
 		
 	protected:
 		Node* parseProgram();
+		
 		Node* parseStatement();
+		
 		Node* parseBlockStatement();
+		
 		Node* parseVarDef();
 		Node* parseAssignment();
 		Node* parseIfWhen(bool edgeSensitive);
@@ -274,6 +283,13 @@ namespace Aseba
 		Node* parseOnEvent();
 		Node* parseOnTimer();
 		Node* parseEmit();
+		
+		BinaryArithmeticNode* parseOr();
+		BinaryArithmeticNode* parseAnd();
+		BinaryArithmeticNode* parseNot();
+		
+		BinaryArithmeticNode* parseCondition();
+		
 		Node* parseShiftExpression();
 		Node* parseAddExpression();
 		Node* parseMultExpression();

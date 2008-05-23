@@ -67,25 +67,34 @@ typedef enum
 /*! List of binary operators */
 typedef enum
 {
-	ASEBA_OP_SHIFT_LEFT = 0,
-	ASEBA_OP_SHIFT_RIGHT = 1,
-	ASEBA_OP_ADD = 2,
-	ASEBA_OP_SUB = 3,
-	ASEBA_OP_MULT = 4,
-	ASEBA_OP_DIV = 5,
-	ASEBA_OP_MOD = 6
+	// arithmetic
+	ASEBA_OP_SHIFT_LEFT = 0x0,
+	ASEBA_OP_SHIFT_RIGHT,
+	ASEBA_OP_ADD,
+	ASEBA_OP_SUB,
+	ASEBA_OP_MULT,
+	ASEBA_OP_DIV,
+	ASEBA_OP_MOD,
+	// comparison
+	ASEBA_OP_EQUAL,
+	ASEBA_OP_NOT_EQUAL,
+	ASEBA_OP_BIGGER_THAN,
+	ASEBA_OP_BIGGER_EQUAL_THAN,
+	ASEBA_OP_SMALLER_THAN,
+	ASEBA_OP_SMALLER_EQUAL_THAN,
+	// logic
+	ASEBA_OP_OR,
+	ASEBA_OP_AND,
+	ASEBA_OP_NOT	// < not used for the VM, only for parsing, reduced by compiler using de Morgan and comparison inversion
 } AsebaBinaryOperator;
 
-/*! List of comparaisons */
-typedef enum
-{
-	ASEBA_CMP_EQUAL = 0,
-	ASEBA_CMP_NOT_EQUAL = 1,
-	ASEBA_CMP_BIGGER_THAN = 2,
-	ASEBA_CMP_BIGGER_EQUAL_THAN = 3,
-	ASEBA_CMP_SMALLER_THAN = 4,
-	ASEBA_CMP_SMALLER_EQUAL_THAN = 5
-} AsebaComparaison;
+/*! Mask of available binary operators */
+#define ASEBA_BINARY_OPERATOR_MASK 0xf
+
+/*! Bit inside if opcode that indicates it is a when condition */
+#define ASEBA_IF_IS_WHEN_BIT 4
+/*! Bit inside if opcode that indicates that the last evaluation was true */
+#define ASEBA_IF_WAS_TRUE_BIT 5
 
 /*! List of masks for flags in AsebaVMState */
 typedef enum

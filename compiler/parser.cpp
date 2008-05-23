@@ -29,6 +29,19 @@
 #include <iostream>
 #include <cassert>
 
+#define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
+#define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))
+
+// Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
+template<typename Derived, typename Base>
+static inline Derived polymorphic_downcast(Base base)
+{
+	Derived derived = dynamic_cast<Derived>(base);
+	if (!derived)
+		abort();
+	return derived;
+}
+
 namespace Aseba
 {
 	//! There is a bug in the compiler, ask for a bug report
@@ -117,7 +130,8 @@ namespace Aseba
 	}
 	
 	//! Return true if next token is of the following types
-	bool Compiler::isOneOf(const Token::Type *types, size_t length) const
+	template <int length>
+	bool Compiler::isOneOf(const Token::Type types[length]) const
 	{
 		for (size_t i = 0; i < length; i++)
 		{
@@ -128,9 +142,10 @@ namespace Aseba
 	}
 	
 	//! Check if next token is of one of the following types, produce an exception otherwise
-	void Compiler::expectOneOf(const Token::Type *types, size_t length) const
+	template <int length>
+	void Compiler::expectOneOf(const Token::Type types[length]) const
 	{
-		if (!isOneOf(types, length))
+		if (!isOneOf<length>(types))
 		{
 			std::string errorMessage("Expecting one of");
 			for (size_t i = 0; i < length; i++)
@@ -306,12 +321,13 @@ namespace Aseba
 		
 		return assignement.release();
 	}
+
 	
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
-		const Token::Type elseEndTypes[2] = { Token::TOKEN_STR_else, Token::TOKEN_STR_end };
-		const Token::Type conditionTypes[6] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
+		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_end };
+		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
 		
@@ -319,16 +335,15 @@ namespace Aseba
 		ifNode->edgeSensitive = edgeSensitive;
 		tokens.pop_front();
 		
-		// left part of conditional expression
-		ifNode->children.push_back(parseShiftExpression());
+		// condition
+		BinaryArithmeticNode* operation = parseOr();
 		
-		// comparison
-		expectOneOf(conditionTypes, 6);
-		ifNode->comparaison = static_cast<AsebaComparaison>(tokens.front() - Token::TOKEN_OP_EQUAL);
-		tokens.pop_front();
-		
-		// right part of conditional expression
-		ifNode->children.push_back(parseShiftExpression());
+		// fold top most condition inside the if node
+		ifNode->children.push_back(operation->children[0]);
+		ifNode->children.push_back(operation->children[1]);
+		ifNode->op = operation->op;
+		operation->children.clear();
+		delete operation;
 		
 		// then keyword
 		if (edgeSensitive)
@@ -339,7 +354,7 @@ namespace Aseba
 		
 		// parse true condition
 		ifNode->children.push_back(new BlockNode(tokens.front().pos));
-		while (!isOneOf(elseEndTypes, 2))
+		while (!IS_ONE_OF(elseEndTypes))
 			ifNode->children[2]->children.push_back(parseBlockStatement());
 		
 		// parse false condition (only for if)
@@ -439,9 +454,9 @@ namespace Aseba
 		blockNode->children.push_back(whileNode);
 		whileNode->children.push_back(new LoadNode(varPos, varAddr));
 		if (rangeStartIndex <= rangeEndIndex)
-			whileNode->comparaison = ASEBA_CMP_SMALLER_EQUAL_THAN;
+			whileNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
-			whileNode->comparaison = ASEBA_CMP_BIGGER_EQUAL_THAN;
+			whileNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
 		whileNode->children.push_back(new ImmediateNode(rangeEndIndexPos, rangeEndIndex));
 		
 		// block and end keyword
@@ -463,23 +478,22 @@ namespace Aseba
 	//! Parse "while" grammar element.
 	Node* Compiler::parseWhile()
 	{
-		const Token::Type conditionTypes[6] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
+		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
 		
 		// eat "while"
 		tokens.pop_front();
 		
-		// left part of conditional expression
-		whileNode->children.push_back(parseShiftExpression());
+		// condition
+		BinaryArithmeticNode* operation = parseOr();
 		
-		// comparison
-		expectOneOf(conditionTypes, 6);
-		whileNode->comparaison = static_cast<AsebaComparaison>(tokens.front() - Token::TOKEN_OP_EQUAL);
-		tokens.pop_front();
-		
-		// right part of conditional expression
-		whileNode->children.push_back(parseShiftExpression());
+		// fold top most condition inside the if node
+		whileNode->children.push_back(operation->children[0]);
+		whileNode->children.push_back(operation->children[1]);
+		whileNode->op = operation->op;
+		operation->children.clear();
+		delete operation;
 		
 		// do keyword
 		expect(Token::TOKEN_STR_do);
@@ -610,14 +624,98 @@ namespace Aseba
 		}
 	}
 	
+	//! Parse "or" grammar element.
+	BinaryArithmeticNode* Compiler::parseOr()
+	{
+		std::auto_ptr<BinaryArithmeticNode> node(parseAnd());
+		
+		while (tokens.front() == Token::TOKEN_OP_OR)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseAnd();
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_OR, node.release(), subExpression));
+		}
+		
+		return node.release();
+	}
+	
+	//! Parse "and" grammar element.
+	BinaryArithmeticNode* Compiler::parseAnd()
+	{
+		std::auto_ptr<BinaryArithmeticNode> node(parseNot());
+		
+		while (tokens.front() == Token::TOKEN_OP_AND)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseNot();
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_AND, node.release(), subExpression));
+		}
+		
+		return node.release();
+	}
+	
+	//! Parse "not" grammar element.
+	BinaryArithmeticNode* Compiler::parseNot()
+	{
+		// eat all trailing not
+		bool odd = false;
+		while (tokens.front() == Token::TOKEN_OP_NOT)
+		{
+			odd = !odd;
+			tokens.pop_front();
+		}
+		
+		std::auto_ptr<BinaryArithmeticNode> expression;
+		
+		// recurse on parenthesis
+		if (tokens.front() == Token::TOKEN_PAR_OPEN)
+		{
+			tokens.pop_front();
+			
+			expression.reset(parseOr());
+			
+			expect(Token::TOKEN_PAR_CLOSE);
+			tokens.pop_front();
+		}
+		else
+		{
+			expression.reset(parseCondition());
+		}
+		
+		// apply de Morgan to remove the not
+		if (odd)
+			expression->deMorganNotRemoval();
+		
+		return expression.release();
+	}
+	
+	//! Parse "condition" grammar element.
+	BinaryArithmeticNode* Compiler::parseCondition()
+	{
+		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
+		
+		std::auto_ptr<Node> left(parseShiftExpression());
+		
+		EXPECT_ONE_OF(conditionTypes);
+		SourcePos conditionPos = tokens.front().pos;
+		Compiler::Token::Type op = tokens.front();
+		tokens.pop_front();
+		
+		Node* right(parseShiftExpression());
+		
+		return BinaryArithmeticNode::fromComparison(conditionPos, op, left.release(), right);
+	}
+	
 	//! Parse "shift_expression" grammar element.
 	Node *Compiler::parseShiftExpression()
 	{
-		const Token::Type opTypes[2] = { Token::TOKEN_OP_SHIFT_LEFT, Token::TOKEN_OP_SHIFT_RIGHT };
+		const Token::Type opTypes[] = { Token::TOKEN_OP_SHIFT_LEFT, Token::TOKEN_OP_SHIFT_RIGHT };
 		
 		std::auto_ptr<Node> node(parseAddExpression());
 		
-		while (isOneOf(opTypes, 2))
+		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
@@ -632,11 +730,11 @@ namespace Aseba
 	//! Parse "add_expression" grammar element.
 	Node *Compiler::parseAddExpression()
 	{
-		const Token::Type opTypes[2] = { Token::TOKEN_OP_ADD, Token::TOKEN_OP_NEG };
+		const Token::Type opTypes[] = { Token::TOKEN_OP_ADD, Token::TOKEN_OP_NEG };
 		
 		std::auto_ptr<Node> node(parseMultExpression());
 		
-		while (isOneOf(opTypes, 2))
+		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
@@ -651,11 +749,11 @@ namespace Aseba
 	//! Parse "mult_expression" grammar element.
 	Node *Compiler::parseMultExpression()
 	{
-		const Token::Type opTypes[3] = { Token::TOKEN_OP_MULT, Token::TOKEN_OP_DIV, Token::TOKEN_OP_MOD };
+		const Token::Type opTypes[] = { Token::TOKEN_OP_MULT, Token::TOKEN_OP_DIV, Token::TOKEN_OP_MOD };
 		
 		std::auto_ptr<Node> node(parseUnaryExpression());
 		
-		while (isOneOf(opTypes, 3))
+		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
@@ -670,9 +768,9 @@ namespace Aseba
 	//! Parse "unary_expression" grammar element.
 	Node *Compiler::parseUnaryExpression()
 	{
-		const Token::Type acceptableTypes[4] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
 		
-		expectOneOf(acceptableTypes, 4);
+		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
 		
 		switch (tokens.front())
@@ -799,13 +897,13 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
-				const Token::Type argTypes[2] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
 				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
 					throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
 				else
-					expectOneOf(argTypes, 2);
+					EXPECT_ONE_OF(argTypes);
 				
 				// we need to fill those two variables
 				unsigned varAddr;

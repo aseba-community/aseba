@@ -306,7 +306,7 @@ namespace Aseba
 				
 				case ASEBA_BYTECODE_BINARY_ARITHMETIC:
 				dump << "BINARY_ARITHMETIC ";
-				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & 0xf)) << "\n";
+				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & ASEBA_BINARY_OPERATOR_MASK)) << "\n";
 				pc++;
 				break;
 				
@@ -317,8 +317,8 @@ namespace Aseba
 				
 				case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
 				dump << "CONDITIONAL_BRANCH ";
-				dump << comparaisonOperatorToString((AsebaComparaison)(bytecode[pc] & 0x7)) << " ";
-				if (bytecode[pc] & (1 << 3))
+				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & ASEBA_BINARY_OPERATOR_MASK)) << " ";
+				if (bytecode[pc] & (1 << ASEBA_IF_IS_WHEN_BIT))
 					dump << "(edge) ";
 				dump << ((signed short)bytecode[pc+1]) << " ";
 				dump << ((signed short)bytecode[pc+2]) << "\n";

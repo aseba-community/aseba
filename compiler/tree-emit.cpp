@@ -39,10 +39,13 @@ namespace Aseba
 	//! Fixup prelinked bytecodes by making sure each vector has at least a STOP token
 	void PreLinkBytecode::fixup()
 	{
+		/*
+		seems useless as generic functions does it afterwards
 		// add terminal STOP
 		size_t currentBytecodeSize = currentBytecode->size();
 		if (currentBytecodeSize > 0)
 			currentBytecode->push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), (*currentBytecode)[currentBytecodeSize-1].line));
+		*/
 		
 		// clear empty entries and add missing STOP
 		for (std::map<unsigned, BytecodeVector>::iterator it = begin(); it != end();)
@@ -120,8 +123,8 @@ namespace Aseba
 		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.currentBytecode));
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH);
-		bytecode |= comparaison;
-		bytecode |= edgeSensitive ? (1 << 3) : 0;
+		bytecode |= op;
+		bytecode |= edgeSensitive ? (1 << ASEBA_IF_IS_WHEN_BIT) : 0;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.currentBytecode->push_back(BytecodeElement(3, sourcePos.row));
 		
@@ -181,7 +184,7 @@ namespace Aseba
 		
 		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.currentBytecode));
 		
-		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH) | comparaison;
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH) | op;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.currentBytecode->push_back(BytecodeElement(3, sourcePos.row));
 		bytecodes.currentBytecode->push_back(BytecodeElement(3 + bb.size() + 1, sourcePos.row));
