@@ -113,6 +113,7 @@ namespace Aseba
 		void variableValueChanged(unsigned index, int value);
 		
 	private:
+		friend class MainWindow;
 		QVector<QString> variablesNames;
 		VariablesDataVector variablesData;
 	};

@@ -826,6 +826,43 @@ namespace Aseba
 		document.save(out, 4);
 	}
 	
+	void MainWindow::exportMemoriesContent()
+	{
+		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), "", "All Files (*.*);;CSV files (*.csv);;Text files (*.txt)");
+		
+		QFile file(exportFileName);
+		if (!file.open(QFile::WriteOnly | QFile::Truncate))
+			return;
+		
+		QTextStream out(&file);
+		
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			
+			std::string oldName;
+			bool first = true;
+			for (int j = 0; j < tab->variablesNames.size(); j++)
+			{
+				const std::string& name = tab->variablesNames[j];
+				if (!name.empty())
+				{
+					if (name != oldName)
+					{
+						if (first)
+							first = false;
+						else
+							out << "\n";
+						out << target->getName(tab->nodeId()) << "." << QString::fromUtf8(name.c_str());
+						oldName = name;
+					}
+					out << ", " << tab->vmMemoryModel->variablesData[j];
+				}
+			}
+		}
+	}
+	
 	void MainWindow::resetAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -1508,6 +1545,9 @@ namespace Aseba
 							target, SLOT(connect()),
 							QKeySequence(tr("Ctrl+T", "File|Connect to target")));
 		fileMenu->addSeparator();*/
+		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Export &memories content..."),
+							this, SLOT(exportMemoriesContent()));
+		fileMenu->addSeparator();
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
 							qApp, SLOT(quit()),
 							QKeySequence(tr("Ctrl+Q", "File|Quit")));

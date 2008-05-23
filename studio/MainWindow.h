@@ -157,6 +157,7 @@ namespace Aseba
 		void openRecentFile();
 		void save();
 		void saveFile(const QString &previousFileName = QString());
+		void exportMemoriesContent();
 		
 		void loadAll();
 		void resetAll();
