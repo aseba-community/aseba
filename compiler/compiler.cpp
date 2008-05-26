@@ -320,9 +320,8 @@ namespace Aseba
 				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & ASEBA_BINARY_OPERATOR_MASK)) << " ";
 				if (bytecode[pc] & (1 << ASEBA_IF_IS_WHEN_BIT))
 					dump << "(edge) ";
-				dump << ((signed short)bytecode[pc+1]) << " ";
-				dump << ((signed short)bytecode[pc+2]) << "\n";
-				pc += 3;
+				dump << ((signed short)bytecode[pc+1]) << "\n";
+				pc += 2;
 				break;
 				
 				case ASEBA_BYTECODE_EMIT:

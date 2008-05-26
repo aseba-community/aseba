@@ -126,12 +126,11 @@ namespace Aseba
 		bytecode |= op;
 		bytecode |= edgeSensitive ? (1 << ASEBA_IF_IS_WHEN_BIT) : 0;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(3, sourcePos.row));
 		
 		if (children.size() == 4)
-			bytecodes.currentBytecode->push_back(BytecodeElement(3 + btb.size() + 1, sourcePos.row));
+			bytecodes.currentBytecode->push_back(BytecodeElement(2 + btb.size() + 1, sourcePos.row));
 		else
-			bytecodes.currentBytecode->push_back(BytecodeElement(3 + btb.size(), sourcePos.row));
+			bytecodes.currentBytecode->push_back(BytecodeElement(2 + btb.size(), sourcePos.row));
 		
 		
 		std::copy(btb.begin(), btb.end(), std::back_inserter(*bytecodes.currentBytecode));
@@ -192,13 +191,12 @@ namespace Aseba
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH) | op;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(3, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(3 + bb.size() + 1, sourcePos.row));
+		bytecodes.currentBytecode->push_back(BytecodeElement(2 + bb.size() + 1, sourcePos.row));
 		
 		std::copy(bb.begin(), bb.end(), std::back_inserter(*bytecodes.currentBytecode));
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP);
-		bytecode |= ((unsigned)(-(int)(ble.size() + bre.size() + bb.size() + 3))) & 0x0fff;
+		bytecode |= ((unsigned)(-(int)(ble.size() + bre.size() + bb.size() + 2))) & 0x0fff;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	

@@ -377,12 +377,12 @@ void AsebaVMStep(AsebaVMState *vm)
 			if (conditionResult && !(GET_BIT(bytecode, ASEBA_IF_IS_WHEN_BIT) && GET_BIT(bytecode, ASEBA_IF_WAS_TRUE_BIT)))
 			{
 				// if true disp
-				disp = (sint16)vm->bytecode[vm->pc + 1];
+				disp = 2;
 			}
 			else
 			{
 				// if false disp
-				disp = (sint16)vm->bytecode[vm->pc + 2];
+				disp = (sint16)vm->bytecode[vm->pc + 1];
 			}
 			
 			// write back condition result
