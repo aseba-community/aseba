@@ -75,7 +75,8 @@ namespace Aseba
 			registerMessageType<BreakpointClearAll>(ASEBA_MESSAGE_BREAKPOINT_CLEAR_ALL);
 			registerMessageType<GetVariables>(ASEBA_MESSAGE_GET_VARIABLES);
 			registerMessageType<SetVariables>(ASEBA_MESSAGE_SET_VARIABLES);
-			registerMessageType<SaveBytecode>(ASEBA_MESSAGE_SAVE_BYTECODE);
+			registerMessageType<WriteBytecode>(ASEBA_MESSAGE_WRITE_BYTECODE);
+			registerMessageType<ResetIntoBootloader>(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER);
 		}
 		
 		//! Register a message type by storing a pointer to its constructor

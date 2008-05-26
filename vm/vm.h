@@ -144,7 +144,7 @@ void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message);
 /*! Return non-zero if VM will ignore the packet, 0 otherwise */
 uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data);
 
-// Functions implemented outside by the transport layer
+// Functions implemented outside by the glue/transport layer
 
 /*! Called by AsebaStep if there is a message (not an user event) to send.
 	size is given in number of bytes. */
@@ -159,6 +159,11 @@ void AsebaSendDescription(AsebaVMState *vm);
 /*! Called by AsebaStep to perform a native function call. */
 void AsebaNativeFunction(AsebaVMState *vm, uint16 id);
 
+/*! Called by AsebaVMDebugMessage when VM must write its bytecode to flash, write an empty function to leave feature unsupported */
+void AsebaWriteBytecode();
+
+/*! Called by AsebaVMDebugMessage when VM must restart the node and enter to the bootloader, write an empty function to leave feature unsupported */
+void AsebaResetIntoBootloader();
 
 // Function optionally implemented
 

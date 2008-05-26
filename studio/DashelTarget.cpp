@@ -292,7 +292,7 @@ namespace Aseba
 	
 	void DashelTarget::writeBytecode(unsigned node)
 	{
-		SaveBytecode(node).serialize(stream);
+		WriteBytecode(node).serialize(stream);
 		stream->flush();
 	}
 	

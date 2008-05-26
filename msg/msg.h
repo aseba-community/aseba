@@ -541,17 +541,31 @@ namespace Aseba
 	};
 	
 	//! Save the current bytecode of a node
-	class SaveBytecode : public CmdMessage
+	class WriteBytecode : public CmdMessage
 	{
 	public:
-		SaveBytecode() : CmdMessage(ASEBA_MESSAGE_SAVE_BYTECODE, ASEBA_DEST_INVALID) { }
-		SaveBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_SAVE_BYTECODE, dest) { }
+		WriteBytecode() : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, ASEBA_DEST_INVALID) { }
+		WriteBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, dest) { }
 		
 	protected:
 		virtual void serializeSpecific() { }
 		virtual void deserializeSpecific() { }
 		virtual void dumpSpecific(std::ostream &stream) { }
 		virtual operator const char * () const { return "save bytecode"; }
+	};
+	
+	//! Reset a node into its bootloader, if present; otherwise do nothing
+	class ResetIntoBootloader : public CmdMessage
+	{
+	public:
+		ResetIntoBootloader() : CmdMessage(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER, ASEBA_DEST_INVALID) { }
+		ResetIntoBootloader(uint16 dest) : CmdMessage(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER, dest) { }
+		
+	protected:
+		virtual void serializeSpecific() { }
+		virtual void deserializeSpecific() { }
+		virtual void dumpSpecific(std::ostream &stream) { }
+		virtual operator const char * () const { return "reset into bootloader"; }
 	};
 	/*@}*/
 }

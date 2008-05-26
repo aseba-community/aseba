@@ -878,6 +878,14 @@ extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 	nativeFunctions[id](vm);
 }
 
+extern "C" void AsebaWriteBytecode()
+{
+}
+
+extern "C" void AsebaResetIntoBootloader()
+{
+}
+
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 {
 	std::cerr << "\nFatal error: ";
