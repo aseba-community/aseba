@@ -32,6 +32,7 @@
 #include "../common/consts.h"
 #include "../common/types.h"
 #include "../utils/utils.h"
+#include "../msg/msg.h"
 
 namespace Aseba 
 {
@@ -117,6 +118,17 @@ namespace Aseba
 		}
 	}
 	
+	void Switch::broadcastDummyUserMessage()
+	{
+		Aseba::UserMessage uMsg;
+		uMsg.type = 0;
+		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
+		{
+			uMsg.serialize(*it);
+			(*it)->flush();
+		}
+	}
+	
 	/*@}*/
 };
 
@@ -181,6 +193,13 @@ int main(int argc, char *argv[])
 		Aseba::Switch aswitch(port, verbose, dump, forward);
 		for (size_t i = 0; i < additionalTargets.size(); i++)
 			aswitch.connect(additionalTargets[i]);
+		/*
+		Uncomment this and comment aswitch.run() to flood all pears with dummy user messages
+		while (1)
+		{
+			aswitch.step(0);
+			aswitch.broadcastMessage();
+		}*/
 		aswitch.run();
 	}
 	catch(Dashel::DashelException e)

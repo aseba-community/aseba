@@ -205,7 +205,15 @@ namespace Enki
 			vm.variablesSize = sizeof(variables) / sizeof(sint16);
 			
 			port = PORT_BASE+id;
-			Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+			try
+			{
+				Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+			}
+			catch (Dashel::DashelException e)
+			{
+				QMessageBox::critical(0, QApplication::tr("Aseba Challenge"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.sysMessage.c_str()));
+				abort();
+			}
 			
 			AsebaVMInit(&vm);
 			

@@ -52,6 +52,9 @@ namespace Aseba
 			*/
 			void forwardDataFrom(Dashel::Stream* stream);
 			
+			/*!	Send a dummy user message to all connected pears. */
+			void broadcastDummyUserMessage();
+			
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
 			virtual void incomingData(Dashel::Stream *stream);
