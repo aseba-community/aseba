@@ -103,6 +103,9 @@ namespace Aseba
 		//! Upload bytecode to target.
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode) = 0;
 		
+		//! Save the bytecode currently on target
+		virtual void writeBytecode(unsigned node) = 0;
+		
 		//! Send an event to the aseba network.
 		virtual void sendEvent(unsigned id, const VariablesDataVector &data) = 0;
 		

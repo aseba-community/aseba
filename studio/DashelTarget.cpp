@@ -290,6 +290,12 @@ namespace Aseba
 		stream->flush();
 	}
 	
+	void DashelTarget::writeBytecode(unsigned node)
+	{
+		SaveBytecode(node).serialize(stream);
+		stream->flush();
+	}
+	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
 		UserMessage(id, data).serialize(stream);

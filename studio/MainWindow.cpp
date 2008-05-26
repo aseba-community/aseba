@@ -299,6 +299,15 @@ namespace Aseba
 		target->getVariables(id, 0, allocatedVariablesCount);
 	}
 	
+	void NodeTab::writeBytecode()
+	{
+		if (errorPos == -1)
+		{
+			loadClicked();
+			target->writeBytecode(id);
+		}
+	}
+	
 	void NodeTab::setVariableValue(unsigned index, int value)
 	{
 		VariablesDataVector data(1, value);
@@ -340,7 +349,7 @@ namespace Aseba
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			loadButton->setEnabled(true);
-			emit uploadReadynessChanged();
+			emit uploadReadynessChanged(true);
 			
 			errorPos = -1;
 		}
@@ -349,7 +358,7 @@ namespace Aseba
 			compilationResultText->setText(QString::fromStdString(error.toString()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
 			loadButton->setEnabled(false);
-			emit uploadReadynessChanged();
+			emit uploadReadynessChanged(false);
 			
 			// we have an error, set the correct user data
 			if (error.pos.valid)
@@ -932,6 +941,7 @@ namespace Aseba
 		}
 		
 		loadAllAct->setEnabled(ready);
+		writeAllBytecodesAct->setEnabled(ready);
 	}
 	
 	void MainWindow::sendEvent()
@@ -1157,12 +1167,24 @@ namespace Aseba
 		}
 	}
 	
+	void MainWindow::writeAllBytecodes()
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			tab->writeBytecode();
+		}
+	}
+	
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
 		NodeTab* tab = new NodeTab(target, &commonDefinitions, node);
-		connect(tab, SIGNAL(uploadReadynessChanged()), SLOT(uploadReadynessChanged()));
+		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
+		
+		regenerateToolsMenus();
 	}
 	
 	//! A node has disconnected from the network.
@@ -1174,6 +1196,8 @@ namespace Aseba
 		
 		nodes->removeTab(index);
 		delete tab;
+		
+		regenerateToolsMenus();
 	}
 	
 	//! The network connection has been cut: all nodes have disconnected.
@@ -1516,7 +1540,25 @@ namespace Aseba
 		if (recentFiles.size() > maxRecentFiles)
 			recentFiles.pop_back();
 		settings.setValue("recent files", recentFiles);
+	}
+	
+	void MainWindow::regenerateToolsMenus()
+	{
+		writeBytecodeMenu->clear();
+		
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
 			
+			QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
+			
+			connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
+		}
+		
+		writeBytecodeMenu->addSeparator();
+		
+		writeAllBytecodesAct = writeBytecodeMenu->addAction(tr("...inside all nodes"), this, SLOT(writeAllBytecodes()));
 	}
 	
 	void MainWindow::setupMenu()
@@ -1617,6 +1659,13 @@ namespace Aseba
 		compilationMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show messages"),
 							this, SLOT(showCompilationMessages()),
 							QKeySequence(tr("Ctrl+M", "Compilation|Show messages")));
+		
+		// Tool menu
+		QMenu *toolMenu = new QMenu(tr("&Tools"), this);
+		menuBar()->addMenu(toolMenu);
+		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
+		toolMenu->addMenu(writeBytecodeMenu);
+		regenerateToolsMenus();
 		
 		// Help menu
 		QMenu *helpMenu = new QMenu(tr("&Help"), this);

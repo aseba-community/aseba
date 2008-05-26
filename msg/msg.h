@@ -540,6 +540,19 @@ namespace Aseba
 		virtual operator const char * () const { return "set variables"; }
 	};
 	
+	//! Save the current bytecode of a node
+	class SaveBytecode : public CmdMessage
+	{
+	public:
+		SaveBytecode() : CmdMessage(ASEBA_MESSAGE_SAVE_BYTECODE, ASEBA_DEST_INVALID) { }
+		SaveBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_SAVE_BYTECODE, dest) { }
+		
+	protected:
+		virtual void serializeSpecific() { }
+		virtual void deserializeSpecific() { }
+		virtual void dumpSpecific(std::ostream &stream) { }
+		virtual operator const char * () const { return "save bytecode"; }
+	};
 	/*@}*/
 }
 

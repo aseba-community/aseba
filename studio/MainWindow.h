@@ -66,7 +66,7 @@ namespace Aseba
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
 	
 	signals:
-		void uploadReadynessChanged();
+		void uploadReadynessChanged(bool);
 	
 	protected:
 		void setupWidgets();
@@ -78,6 +78,8 @@ namespace Aseba
 		void runInterruptClicked();
 		void nextClicked();
 		void refreshMemoryClicked();
+		
+		void writeBytecode();
 		
 		void setVariableValue(unsigned, int);
 		void insertVariableName(const QModelIndex &);
@@ -198,6 +200,7 @@ namespace Aseba
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
 	
 		void recompileAll();
+		void writeAllBytecodes();
 	
 	private:
 		// utility functions
@@ -209,6 +212,7 @@ namespace Aseba
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
 		void updateRecentFiles(const QString& fileName);
+		void regenerateToolsMenus();
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
@@ -243,6 +247,10 @@ namespace Aseba
 		
 		// open recent actions
 		QMenu *openRecentMenu;
+		
+		// tools
+		QMenu *writeBytecodeMenu;
+		QAction *writeAllBytecodesAct;
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;

@@ -88,6 +88,7 @@ namespace Aseba
 		virtual const TargetDescription * const getConstDescription(unsigned node) const;
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
+		virtual void writeBytecode(unsigned node);
 		
 		virtual void sendEvent(unsigned id, const VariablesDataVector &data);
 		
