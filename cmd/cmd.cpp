@@ -44,6 +44,7 @@ namespace Aseba
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
 		stream << "* whex : write hex file [dest] [file name]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
+		stream << "* reset: switch user/bootloader mode [dest]\n";
 	}
 	
 	//! Show usage
@@ -152,9 +153,6 @@ namespace Aseba
 				}
 				delete message;
 			}
-			pageSize = 2048;
-			pagesStart = 0;
-			pagesCount = 64;
 		}
 		
 		//! Return the size of a page
@@ -174,6 +172,7 @@ namespace Aseba
 			message.dest = dest;
 			message.pageNumber = pageNumber;
 			message.serialize(stream);
+			stream->flush();
 			unsigned dataRead = 0;
 			
 			// get data
@@ -223,17 +222,10 @@ namespace Aseba
 			writePage.dest = dest;
 			writePage.pageNumber = pageNumber;
 			writePage.serialize(stream);
+			stream->flush();
 			
-			// write data
-			for (unsigned dataWritten = 0; dataWritten < pageSize;)
-			{
-				BootloaderPageDataWrite pageData;
-				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
-				pageData.serialize(stream);
-				dataWritten += sizeof(pageData.data);
-			}
-			
-			// wait ack
+			cout << "Writing page " << pageNumber << endl;
+			// wait ACK
 			while (true)
 			{
 				Message *message = Message::receive(stream);
@@ -244,11 +236,47 @@ namespace Aseba
 				{
 					uint16 errorCode = ackMessage->errorCode;
 					delete message;
-					return errorCode == BootloaderAck::SUCCESS;
+					if(errorCode == BootloaderAck::SUCCESS)
+						break;
+					else
+						return false;
 				}
 				
 				delete message;
 			}
+			
+			// write data
+			for (unsigned dataWritten = 0; dataWritten < pageSize;)
+			{
+				BootloaderPageDataWrite pageData;
+				pageData.dest = dest;
+				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
+				pageData.serialize(stream);
+				stream->flush();
+				dataWritten += sizeof(pageData.data);
+				cout << "." << std::flush;
+				
+				while (true)
+				{
+					Message *message = Message::receive(stream);
+					
+					// handle ack
+					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+					if (ackMessage && (ackMessage->source == dest))
+					{
+						uint16 errorCode = ackMessage->errorCode;
+						delete message;
+						if(errorCode == BootloaderAck::SUCCESS)
+							break;
+						else
+							return false;
+					}
+					
+					delete message;
+				}
+			}
+			cout << "done" << endl;
+			return true;
 		}
 		
 		//! Write an hex file
@@ -280,11 +308,13 @@ namespace Aseba
 				
 					// if page does not exists, create it
 					if (pageMap.find(pageIndex) == pageMap.end())
-						pageMap[pageIndex] = vector<uint8>((uint8)0, pageSize);
-					
+					{
+						std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+						pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
+					}
 					// copy data
 					unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
-					copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, &(pageMap[pageIndex][byteIndex]));
+					copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
 					
 					// increment chunk data pointer
 					chunkDataIndex += amountToCopy;
@@ -345,6 +375,7 @@ namespace Aseba
 		{
 			GetDescription message;
 			message.serialize(stream);
+			stream->flush();
 		}
 		else if (strcmp(cmd, "usermsg") == 0)
 		{
@@ -361,6 +392,7 @@ namespace Aseba
 			
 			UserMessage message(type, data);
 			message.serialize(stream);
+			stream->flush();
 		}
 		else if (strcmp(cmd, "rdpage") == 0)
 		{
@@ -419,6 +451,45 @@ namespace Aseba
 				errorHexFile(e.toString());
 			}
 		}
+		else if (strcmp(cmd, "reset") == 0)
+		{
+			uint16 dest;
+			
+			if(argc < 2)
+				errorMissingArgument(argv[0]);
+			argEaten = 1;
+			
+			dest = atoi(argv[1]);
+			
+			BootloaderReset msg(dest);
+			msg.serialize(stream);
+			stream->flush();
+			
+			// Wait ack from bootloader (mean we got out of it)
+			// Or bootloader description (mean we just entered it)
+			while (true)
+			{
+				Message *message = Message::receive(stream);
+				
+				// handle ack
+				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+				BootloaderDescription * bMessage = dynamic_cast<BootloaderDescription *>(message);
+				if (ackMessage && (ackMessage->source == dest))
+				{
+					cout << "Device is now in user-code" << endl;
+					delete message;
+					break;
+				} 
+				else if (bMessage && (message->source == dest))
+				{
+					cout << "Device is now in bootloader" << endl;
+					delete message;
+					break;
+				}
+				
+				delete message;
+			}
+		}	
 		else
 			errorUnknownCommand(cmd);
 		
