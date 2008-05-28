@@ -54,6 +54,13 @@ typedef struct
 	AsebaVariableDescription variables[];	/*!< named variables, terminated by a variable of size 0 */
 } AsebaVMDescription;
 
+/*! Description of a local event */
+typedef struct
+{
+	const char* name;	/*!< name of the function */
+	const char* doc;	/*!< documentation of the local event */
+} AsebaLocalEventDescription;
+
 /*! Signature of a native function */
 typedef void (*AsebaNativeFunctionPointer)(AsebaVMState *vm);
 

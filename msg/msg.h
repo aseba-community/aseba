@@ -169,7 +169,7 @@ namespace Aseba
 		virtual operator const char * () const { return "presence"; }
 	};
 	
-	//! Description of a node, native functions are omitted and further received by other messages
+	//! Description of a node, local events and native functions are omitted and further received by other messages
 	class Description : public Message, public TargetDescription
 	{
 	public:
@@ -180,6 +180,19 @@ namespace Aseba
 		virtual void deserializeSpecific();
 		virtual void dumpSpecific(std::ostream &stream);
 		virtual operator const char * () const { return "description"; }
+	};
+	
+	//! Description of a local event available on a node, the description of the node itself must have been sent first
+	class LocalEventDescription : public Message, public TargetDescription::LocalEvent
+	{
+	public:
+		LocalEventDescription() : Message(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::ostream &stream);
+		virtual operator const char * () const { return "local event"; }
 	};
 	
 	//! Description of a native function available on a node, the description of the node itself must have been sent first

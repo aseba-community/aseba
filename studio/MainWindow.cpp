@@ -205,6 +205,7 @@ namespace Aseba
 		
 		// functions
 		vmFunctionsView = new QTableView;
+		vmFunctionsView->setMinimumHeight(40);
 		vmFunctionsView->setShowGrid(false);
 		vmFunctionsView->verticalHeader()->hide();
 		vmFunctionsView->horizontalHeader()->hide();
@@ -219,8 +220,14 @@ namespace Aseba
 		
 		// local events
 		vmLocalEvents = new QListWidget;
+		vmLocalEvents->setMinimumHeight(40);
+		vmLocalEvents->setSelectionMode(QAbstractItemView::NoSelection);	
 		for (size_t i = 0; i < compiler.getTargetDescription()->localEvents.size(); i++)
-			vmLocalEvents->addItem(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].c_str()));
+		{
+			QListWidgetItem* item = new QListWidgetItem(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].name.c_str()));
+			item->setToolTip(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].description.c_str()));
+			vmLocalEvents->addItem(item);
+		}
 		
 		// toolbox
 		QToolBox* toolBox = new QToolBox;

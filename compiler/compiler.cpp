@@ -265,7 +265,7 @@ namespace Aseba
 					{
 						int index = ASEBA_EVENT_LOCAL_EVENTS_START - eventId;
 						if (index < targetDescription->localEvents.size())
-							dump << "event " << targetDescription->localEvents[index] << ": ";
+							dump << "event " << targetDescription->localEvents[index].name << ": ";
 						else
 							dump << "unknown local event " << index << ":  ";
 					}

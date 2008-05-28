@@ -134,7 +134,7 @@ namespace Aseba
 		// try first local
 		const std::string & eventName = tokens.front().sValue;
 		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
-			if (targetDescription->localEvents[i] == eventName)
+			if (targetDescription->localEvents[i].name == eventName)
 			{
 				return ASEBA_EVENT_LOCAL_EVENTS_START - i;
 			}

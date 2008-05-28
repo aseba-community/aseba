@@ -79,6 +79,31 @@ namespace Aseba
 	{
 		Q_OBJECT
 		
+	protected:
+		struct Node
+		{
+			Node();
+			
+			QString name; //!< name of node
+			TargetDescription description; //!< description of node
+			int localEventsReceptionCounter; //!< what is the status of the reception of local events
+			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
+			BytecodeVector debugBytecode; //!< bytecode with debug information
+			unsigned steppingInNext; //!< state of node when in next and stepping
+			unsigned lineInNext; //!< line of node to execute when in next and stepping
+			ExecutionMode executionMode; //!< last known execution mode if this node
+		};
+		
+		typedef void (DashelTarget::*MessageHandler)(Message *message);
+		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
+		typedef std::map<unsigned, Node> NodesMap;
+		
+		MessagesHandlersMap messagesHandlersMap;
+		NodesMap nodes;
+		Dashel::Stream* stream;
+		int netTimer;
+		bool quitting;
+		
 	public:
 		DashelTarget();
 		~DashelTarget();
@@ -112,6 +137,7 @@ namespace Aseba
 		
 	protected:
 		void receivedDescription(Message *message);
+		void receivedLocalEventDescription(Message *message);
 		void receivedNativeFunctionDescription(Message *message);
 		void receivedDisconnected(Message *message);
 		void receivedVariables(Message *message);
@@ -122,32 +148,9 @@ namespace Aseba
 		void receivedBreakpointSetResult(Message *message);
 		
 	protected:
+		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
 		int getPCFromLine(unsigned node, unsigned line);
 		int getLineFromPC(unsigned node, unsigned pc);
-		
-	protected:
-		struct Node
-		{
-			Node();
-			
-			QString name; //!< name of node
-			TargetDescription description; //!< description of node
-			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
-			BytecodeVector debugBytecode; //!< bytecode with debug information
-			unsigned steppingInNext; //!< state of node when in next and stepping
-			unsigned lineInNext; //!< line of node to execute when in next and stepping
-			ExecutionMode executionMode; //!< last known execution mode if this node
-		};
-		
-		typedef void (DashelTarget::*MessageHandler)(Message *message);
-		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
-		typedef std::map<unsigned, Node> NodesMap;
-		
-		MessagesHandlersMap messagesHandlersMap;
-		NodesMap nodes;
-		Dashel::Stream* stream;
-		int netTimer;
-		bool quitting;
 	};
 	
 	/*@}*/

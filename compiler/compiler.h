@@ -54,7 +54,14 @@ namespace Aseba
 			NamedVariable() {}
 			
 			unsigned size; //!< size of variable in words
-			std::string name; //!< name of variable
+			std::string name; //!< name of the variable
+		};
+		
+		//! Description of local event;
+		struct LocalEvent
+		{
+			std::string name; //!< name of the event
+			std::string description; //!< description (some short documentation) of the event
 		};
 		
 		//! Typed parameter of native functions
@@ -80,7 +87,7 @@ namespace Aseba
 		unsigned stackSize; //!< depth of execution stack
 		
 		std::vector<NamedVariable> namedVariables; //!< named variables
-		std::vector<std::string> localEvents; //!< events available locally on target
+		std::vector<LocalEvent> localEvents; //!< events available locally on target
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
 		TargetDescription() { variablesSize = bytecodeSize = stackSize = 0; }

@@ -189,6 +189,7 @@ namespace Aseba
 		stream(0)
 	{
 		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION] = &Aseba::DashelTarget::receivedLocalEventDescription;
 		messagesHandlersMap[ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION] = &Aseba::DashelTarget::receivedNativeFunctionDescription;
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
@@ -410,8 +411,8 @@ namespace Aseba
 	void DashelTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
-		//message->dump(std::cout);
-		//std::cout << std::endl;
+		message->dump(std::cout);
+		std::cout << std::endl;
 		
 		if (!quitting)
 		{
@@ -455,11 +456,25 @@ namespace Aseba
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
 		node.description = *description;
+		node.localEventsReceptionCounter = 0;
 		node.nativeFunctionReceptionCounter = 0;
 		
-		// we will emit the connected signal only when we have received all native functions
-		if (node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size())
-			emit nodeConnected(id);
+		emitNodeConnectedIfDescriptionComplete(id, node);
+	}
+	
+	void DashelTarget::receivedLocalEventDescription(Message *message)
+	{
+		LocalEventDescription *description = polymorphic_downcast<LocalEventDescription *>(message);
+		unsigned id = description->source;
+		
+		// we must have received a description first
+		Q_ASSERT(nodes.find(id) != nodes.end());
+		Node& node = nodes[id];
+		
+		// copy description into array
+		node.description.localEvents[node.localEventsReceptionCounter++] = *description;
+		
+		emitNodeConnectedIfDescriptionComplete(id, node);
 	}
 	
 	void DashelTarget::receivedNativeFunctionDescription(Message *message)
@@ -474,8 +489,14 @@ namespace Aseba
 		// copy description into array
 		node.description.nativeFunctions[node.nativeFunctionReceptionCounter++] = *description;
 		
-		// we will emit the connected signal only when we have received all native functions
-		if (node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size())
+		emitNodeConnectedIfDescriptionComplete(id, node);
+	}
+	
+	bool DashelTarget::emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node)
+	{
+		// we will emit the connected signal only when we have received all local events and native functions
+		if ((node.localEventsReceptionCounter == node.description.localEvents.size()) &&
+			(node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size()))
 			emit nodeConnected(id);
 	}
 	

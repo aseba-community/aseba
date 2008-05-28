@@ -868,9 +868,9 @@ extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 	return &vmDescription;
 }
 
-static const char* const localEvents[] = { "timer", NULL };
+static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { NULL, NULL }};
 
-extern "C" const char* const * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
 {
 	return localEvents;
 }

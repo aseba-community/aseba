@@ -46,6 +46,7 @@ namespace Aseba
 			registerMessageType<BootloaderAck>(ASEBA_MESSAGE_BOOTLOADER_ACK);
 			
 			registerMessageType<Description>(ASEBA_MESSAGE_DESCRIPTION);
+			registerMessageType<LocalEventDescription>(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION);
 			registerMessageType<NativeFunctionDescription>(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION);
 			registerMessageType<Disconnected>(ASEBA_MESSAGE_DISCONNECTED);
 			registerMessageType<Variables>(ASEBA_MESSAGE_VARIABLES);
@@ -390,10 +391,7 @@ namespace Aseba
 		}
 		
 		add(static_cast<uint16>(localEvents.size()));
-		for (size_t i = 0; i < localEvents.size(); i++)
-		{
-			add(localEvents[i]);
-		}
+		// local events are sent separately
 		
 		add(static_cast<uint16>(nativeFunctions.size()));
 		// native functions are sent separately
@@ -416,10 +414,7 @@ namespace Aseba
 		}
 		
 		localEvents.resize(get<uint16>());
-		for (size_t i = 0; i < localEvents.size(); i++)
-		{
-			localEvents[i] = get<string>();
-		}
+		// local events are received separately
 		
 		nativeFunctions.resize(get<uint16>());
 		// native functions are received separately
@@ -432,12 +427,30 @@ namespace Aseba
 		for (size_t i = 0; i < namedVariables.size(); i++)
 			stream << "\n\t" << namedVariables[i].name << " : " << namedVariables[i].size;
 		
-		stream << "local events: " << localEvents.size();
-		for (size_t i = 0; i < localEvents.size(); i++)
-			stream << "\n\t" << localEvents[i];
+		stream << "\nlocal events: " << localEvents.size() << "\n";
+		// local events are available separately
 		
 		stream << "native functions: " << nativeFunctions.size();
 		// native functions are available separately
+	}
+	
+	//
+	
+	void LocalEventDescription::serializeSpecific()
+	{
+		add(name);
+		add(description);
+	}
+	
+	void LocalEventDescription::deserializeSpecific()
+	{
+		name = get<string>();
+		description = get<string>();
+	}
+	
+	void LocalEventDescription::dumpSpecific(std::ostream &stream)
+	{
+		stream << name << " : " << description;
 	}
 	
 	//
