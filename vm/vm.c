@@ -119,7 +119,7 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 		#ifdef ASEBA_ASSERT
 		AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR);
 		#endif
-		break;
+		return 0;
 	}
 }
 
