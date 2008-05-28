@@ -80,30 +80,29 @@ namespace Aseba
 		setSizeGripEnabled(true);
 	}
 
-	QSize FixedWidthTableView::minimumSizeHint() const
+
+	FixedWidthTableView::FixedWidthTableView()
 	{
-		QSize size( QTableView::sizeHint() );
-		int width = 0;
-		
-		for (int c = 0; c < model ()->columnCount(); ++c)
-			width += columnWidth( c );
-		
-		
-		size.setWidth( width + style()->pixelMetric(QStyle::PM_ScrollBarExtent) + 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
-		return size;
+		col1Width = 50;
+		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	}
 	
-	QSize FixedWidthTableView::sizeHint() const
+	void FixedWidthTableView::setSecondColumnLongestContent(const QString& content)
 	{
-		return minimumSizeHint();
-	}
-	
-	void FixedWidthTableView::resizeColumnsToLongestContents(const QStringList& longestContents)
-	{
+		Q_ASSERT(model ()->columnCount() == 2);
 		QFontMetrics fm(font());
-		for (int i = 0; i < longestContents.size(); ++i)
-			setColumnWidth(i, fm.width(longestContents.at(i)));
+		col1Width = fm.width(content);
 	}
+	
+	void FixedWidthTableView::resizeEvent ( QResizeEvent * event )
+	{
+		Q_ASSERT(model ()->columnCount() == 2);
+		int col0Width = event->size().width() - col1Width;
+		setColumnWidth(0, col0Width);
+		setColumnWidth(1, col1Width);
+	}
+	
+	//////
 	
 	NodeTab::NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QWidget(parent),
@@ -200,9 +199,7 @@ namespace Aseba
 		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
 		vmMemoryView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
-		//vmMemoryView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-		vmMemoryView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-		vmMemoryView->resizeColumnsToLongestContents(QStringList() << "it is a long text [9]" << "-888888");
+		vmMemoryView->setSecondColumnLongestContent("-888888##");
 		vmMemoryView->resizeRowsToContents();
 		
 		
@@ -220,6 +217,14 @@ namespace Aseba
 		vmFunctionsView->resizeColumnsToContents();
 		vmFunctionsView->resizeRowsToContents();
 		
+		// local events
+		vmLocalEvents = new QListWidget;
+		
+		// toolbox
+		QToolBox* toolBox = new QToolBox;
+		toolBox->addItem(vmFunctionsView, tr("Native Functions"));
+		toolBox->addItem(vmLocalEvents, tr("Local Events"));
+		
 		// panel
 		QVBoxLayout *panelLayout = new QVBoxLayout;
 		panelLayout->addLayout(executionTitleLayout);
@@ -229,8 +234,7 @@ namespace Aseba
 		panelLayout->addWidget(nextButton);
 		panelLayout->addLayout(memoryTitleLayout);
 		panelLayout->addWidget(vmMemoryView, 3);
-		panelLayout->addWidget(new QLabel(tr("<b>Native Functions</b>")));
-		panelLayout->addWidget(vmFunctionsView, 1);
+		panelLayout->addWidget(toolBox, 1);
 		
 		QHBoxLayout *layout = new QHBoxLayout;
 		layout->addLayout(panelLayout, 1);
@@ -1418,8 +1422,7 @@ namespace Aseba
 		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
-		constantsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-		constantsView->resizeColumnsToLongestContents(QStringList() << "constant___" << "-888888##");
+		constantsView->setSecondColumnLongestContent("-888888##");
 		constantsView->resizeRowsToContents();
 		
 		eventsDockLayout->addWidget(constantsView, 1);
@@ -1449,8 +1452,7 @@ namespace Aseba
 		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, (ASEBA_MAX_PACKET_SIZE-6)/2, this));
 		eventsDescriptionsView->setMinimumHeight(100);
-		eventsDescriptionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-		eventsDescriptionsView->resizeColumnsToLongestContents(QStringList() << "an event name" << "255###");
+		eventsDescriptionsView->setSecondColumnLongestContent("255###");
 		eventsDescriptionsView->resizeRowsToContents();
 		
 		eventsDockLayout->addWidget(eventsDescriptionsView, 1);

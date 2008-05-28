@@ -48,10 +48,15 @@ namespace Aseba
 	
 	class FixedWidthTableView : public QTableView
 	{
+	protected:
+		int col1Width;
+		
 	public:
-		QSize minimumSizeHint() const;
-		QSize sizeHint() const;
-		void resizeColumnsToLongestContents(const QStringList& longestContents);
+		FixedWidthTableView();
+		void setSecondColumnLongestContent(const QString& content);
+	
+	protected:
+		virtual void resizeEvent ( QResizeEvent * event );
 	};
 	
 	class NodeTab : public QWidget
@@ -134,6 +139,8 @@ namespace Aseba
 		
 		TargetFunctionsModel *vmFunctionsModel;
 		QTableView *vmFunctionsView;
+		
+		QListWidget* vmLocalEvents;
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
