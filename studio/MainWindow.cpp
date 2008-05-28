@@ -219,6 +219,8 @@ namespace Aseba
 		
 		// local events
 		vmLocalEvents = new QListWidget;
+		for (size_t i = 0; i < compiler.getTargetDescription()->localEvents.size(); i++)
+			vmLocalEvents->addItem(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].c_str()));
 		
 		// toolbox
 		QToolBox* toolBox = new QToolBox;

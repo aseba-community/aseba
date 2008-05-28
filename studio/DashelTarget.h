@@ -112,6 +112,7 @@ namespace Aseba
 		
 	protected:
 		void receivedDescription(Message *message);
+		void receivedNativeFunctionDescription(Message *message);
 		void receivedDisconnected(Message *message);
 		void receivedVariables(Message *message);
 		void receivedArrayAccessOutOfBounds(Message *message);
@@ -131,6 +132,7 @@ namespace Aseba
 			
 			QString name; //!< name of node
 			TargetDescription description; //!< description of node
+			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
 			BytecodeVector debugBytecode; //!< bytecode with debug information
 			unsigned steppingInNext; //!< state of node when in next and stepping
 			unsigned lineInNext; //!< line of node to execute when in next and stepping

@@ -80,6 +80,7 @@ namespace Aseba
 		unsigned stackSize; //!< depth of execution stack
 		
 		std::vector<NamedVariable> namedVariables; //!< named variables
+		std::vector<std::string> localEvents; //!< events available locally on target
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
 		TargetDescription() { variablesSize = bytecodeSize = stackSize = 0; }
@@ -205,7 +206,6 @@ namespace Aseba
 				TOKEN_STR_var,
 				TOKEN_STR_call,
 				TOKEN_STR_onevent,
-				TOKEN_STR_ontimer,
 				TOKEN_STRING_LITERAL,
 				TOKEN_INT_LITERAL,
 				TOKEN_PAR_OPEN,
@@ -247,6 +247,7 @@ namespace Aseba
 	public:
 		Compiler();
 		void setTargetDescription(const TargetDescription *description);
+		const TargetDescription *getTargetDescription() const { return targetDescription;}
 		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
@@ -257,7 +258,8 @@ namespace Aseba
 		int expectConstant() const;
 		int expectInt16LiteralOrConstant() const;
 		unsigned expectUInt12Literal() const;
-		unsigned expectEventId() const;
+		unsigned expectGlobalEventId() const;
+		unsigned expectAnyEventId() const;
 		template <int length>
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
@@ -281,7 +283,6 @@ namespace Aseba
 		Node* parseFor();
 		Node* parseWhile();
 		Node* parseOnEvent();
-		Node* parseOnTimer();
 		Node* parseEmit();
 		
 		BinaryArithmeticNode* parseOr();

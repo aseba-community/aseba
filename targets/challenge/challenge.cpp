@@ -345,7 +345,7 @@ namespace Enki
 			
 			// run VM with a periodic event if nothing else is currently running
 			if (!AsebaVMIsExecutingThread(&vm))
-				AsebaVMSetupEvent(&vm, ASEBA_EVENT_PERIODIC);
+				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 			AsebaVMRun(&vm, 65535);
 		}
 	};
@@ -866,6 +866,13 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
 	return &vmDescription;
+}
+
+static const char* const localEvents[] = { "timer", NULL };
+
+extern "C" const char* const * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+{
+	return localEvents;
 }
 
 extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)

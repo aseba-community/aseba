@@ -111,7 +111,7 @@ typedef enum
 typedef enum
 {
 	ASEBA_EVENT_INIT = 0xFFFF,
-	ASEBA_EVENT_PERIODIC = 0xFFFE,
+	ASEBA_EVENT_LOCAL_EVENTS_START = 0xFFFE,
 } AsebaSpecialEventId;
 
 /*! Return a bare bytecode from its identifier */
@@ -133,6 +133,7 @@ typedef enum
 	
 	/* from a specific node */
 	ASEBA_MESSAGE_DESCRIPTION = 0x9000,
+	ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION,
 	ASEBA_MESSAGE_DISCONNECTED,
 	ASEBA_MESSAGE_VARIABLES,
 	ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS,

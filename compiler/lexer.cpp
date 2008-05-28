@@ -63,7 +63,6 @@ namespace Aseba
 			case TOKEN_STR_var: return "var keyword";
 			case TOKEN_STR_call: return "call keyword";
 			case TOKEN_STR_onevent: return "onevent keyword";
-			case TOKEN_STR_ontimer: return "ontimer keyword";
 			case TOKEN_STRING_LITERAL: return "string";
 			case TOKEN_INT_LITERAL: return "integer";
 			case TOKEN_PAR_OPEN: return "( (open parenthesis)";
@@ -291,8 +290,6 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_call, pos));
 						else if (s == "onevent")
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
-						else if (s == "ontimer")
-							tokens.push_back(Token(Token::TOKEN_STR_ontimer, pos));
 						else if (s == "or")
 							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
 						else if (s == "and")

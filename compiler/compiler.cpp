@@ -252,12 +252,25 @@ namespace Aseba
 				unsigned eventId = eventAddr[pc];
 				if (eventId == ASEBA_EVENT_INIT)
 					dump << "init:       ";
-				else if (eventId == ASEBA_EVENT_PERIODIC)
-					dump << "periodic:   ";
-				else if (eventId < commonDefinitions->events.size())
-					dump << "event " << commonDefinitions->events[eventId].name << ": ";
 				else
-					dump << "event " << eventId << ":  ";
+				{
+					if (eventId < 0x1000)
+					{
+						if (eventId < commonDefinitions->events.size())
+							dump << "event " << commonDefinitions->events[eventId].name << ": ";
+						else
+							dump << "unknown global event " << eventId << ":  ";
+					}
+					else
+					{
+						int index = ASEBA_EVENT_LOCAL_EVENTS_START - eventId;
+						if (index < targetDescription->localEvents.size())
+							dump << "event " << targetDescription->localEvents[index] << ": ";
+						else
+							dump << "unknown local event " << index << ":  ";
+					}
+				}
+					
 				dump << "\n";
 			}
 			dump << "    ";

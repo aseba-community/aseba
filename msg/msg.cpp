@@ -46,6 +46,7 @@ namespace Aseba
 			registerMessageType<BootloaderAck>(ASEBA_MESSAGE_BOOTLOADER_ACK);
 			
 			registerMessageType<Description>(ASEBA_MESSAGE_DESCRIPTION);
+			registerMessageType<NativeFunctionDescription>(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION);
 			registerMessageType<Disconnected>(ASEBA_MESSAGE_DISCONNECTED);
 			registerMessageType<Variables>(ASEBA_MESSAGE_VARIABLES);
 			registerMessageType<ArrayAccessOutOfBounds>(ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS);
@@ -388,19 +389,14 @@ namespace Aseba
 			add(namedVariables[i].name);
 		}
 		
-		add(static_cast<uint16>(nativeFunctions.size()));
-		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		add(static_cast<uint16>(localEvents.size()));
+		for (size_t i = 0; i < localEvents.size(); i++)
 		{
-			add(nativeFunctions[i].name);
-			add(nativeFunctions[i].description);
-			
-			add(static_cast<uint16>(nativeFunctions[i].parameters.size()));
-			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
-			{
-				add(nativeFunctions[i].parameters[j].size);
-				add(nativeFunctions[i].parameters[j].name);
-			}
+			add(localEvents[i]);
 		}
+		
+		add(static_cast<uint16>(nativeFunctions.size()));
+		// native functions are sent separately
 	}
 	
 	void Description::deserializeSpecific()
@@ -419,39 +415,70 @@ namespace Aseba
 			namedVariables[i].name = get<string>();
 		}
 		
-		nativeFunctions.resize(get<uint16>());
-		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		localEvents.resize(get<uint16>());
+		for (size_t i = 0; i < localEvents.size(); i++)
 		{
-			nativeFunctions[i].name = get<string>();
-			nativeFunctions[i].description = get<string>();
-			
-			nativeFunctions[i].parameters.resize(get<uint16>());
-			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
-			{
-				nativeFunctions[i].parameters[j].size = get<sint16>();
-				nativeFunctions[i].parameters[j].name = get<string>();
-			}
+			localEvents[i] = get<string>();
 		}
+		
+		nativeFunctions.resize(get<uint16>());
+		// native functions are received separately
 	}
 	
 	void Description::dumpSpecific(ostream &stream)
 	{
 		stream << "Node " << name << " using protocol version " << protocolVersion << "\n";
-		stream << "bytecode " << bytecodeSize << ", stack " << stackSize << ", variables " << variablesSize;
+		stream << "bytecode: " << bytecodeSize << ", stack: " << stackSize << ", variables: " << variablesSize;
 		for (size_t i = 0; i < namedVariables.size(); i++)
 			stream << "\n\t" << namedVariables[i].name << " : " << namedVariables[i].size;
-		for (size_t i = 0; i < nativeFunctions.size(); i++)
+		
+		stream << "local events: " << localEvents.size();
+		for (size_t i = 0; i < localEvents.size(); i++)
+			stream << "\n\t" << localEvents[i];
+		
+		stream << "native functions: " << nativeFunctions.size();
+		// native functions are available separately
+	}
+	
+	//
+	
+	void NativeFunctionDescription::serializeSpecific()
+	{
+		add(name);
+		add(description);
+		
+		add(static_cast<uint16>(parameters.size()));
+		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			stream << "\n\t" << nativeFunctions[i].name << " (";
-			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); j++)
-			{
-				stream << nativeFunctions[i].parameters[j].name;
-				stream << "<" << nativeFunctions[i].parameters[j].size << ">";
-				if (j + 1 < nativeFunctions[i].parameters.size())
-					stream << ", ";
-			}
-			stream << ") : " << nativeFunctions[i].description;
+			add(parameters[j].size);
+			add(parameters[j].name);
 		}
+	}
+	
+	void NativeFunctionDescription::deserializeSpecific()
+	{
+		name = get<string>();
+		description = get<string>();
+		
+		parameters.resize(get<uint16>());
+		for (size_t j = 0; j < parameters.size(); j++)
+		{
+			parameters[j].size = get<sint16>();
+			parameters[j].name = get<string>();
+		}
+	}
+	
+	void NativeFunctionDescription::dumpSpecific(std::ostream &stream)
+	{
+		stream << name << " (";
+		for (size_t j = 0; j < parameters.size(); j++)
+		{
+			stream << parameters[j].name;
+			stream << "<" << parameters[j].size << ">";
+			if (j + 1 < parameters.size())
+				stream << ", ";
+		}
+		stream << ") : " << description;
 	}
 	
 	//

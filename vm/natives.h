@@ -54,10 +54,6 @@ typedef struct
 	AsebaVariableDescription variables[];	/*!< named variables, terminated by a variable of size 0 */
 } AsebaVMDescription;
 
-/*! Return the size of the description of the VM, exluding the native functions themselves, but including their numbers */
-uint16 AsebaNativeGetVMDescriptionSize(AsebaVMDescription* description);
-
-
 /*! Signature of a native function */
 typedef void (*AsebaNativeFunctionPointer)(AsebaVMState *vm);
 
@@ -75,9 +71,6 @@ typedef struct
 	const char* doc;	/*!< documentation of the function */
 	AsebaNativeFunctionArgumentDescription arguments[];	/*!< arguments, terminated by an element of size 0 */
 } AsebaNativeFunctionDescription;
-
-/*! Return the size of the description of a native functions */
-uint16 AsebaNativeFunctionGetDescriptionSize(AsebaNativeFunctionDescription* description);
 
 // standard natives functions
 

@@ -102,6 +102,13 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
+static const char* const localEvents[] = { "timer", NULL };
+
+extern "C" const char* const * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+{
+	return localEvents;
+}
+
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
 	nativeFunctions[id](vm);
@@ -274,7 +281,7 @@ namespace Enki
 			
 			// run VM with a periodic event if nothing else is currently running
 			if (!AsebaVMIsExecutingThread(vm))
-				AsebaVMSetupEvent(vm, ASEBA_EVENT_PERIODIC);
+				AsebaVMSetupEvent(vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 			
 			AsebaVMRun(vm, 65535);
 		}

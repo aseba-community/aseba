@@ -89,8 +89,6 @@ namespace Aseba
 	{
 		if (eventId == ASEBA_EVENT_INIT)
 			return "ContextSwitcher: to init";
-		else if (eventId == ASEBA_EVENT_PERIODIC)
-			return "ContextSwitcher: to periodic";
 		else
 			return FormatableString("ContextSwitcher: to event %0").arg(eventId);
 	}

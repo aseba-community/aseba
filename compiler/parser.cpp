@@ -107,26 +107,40 @@ namespace Aseba
 		return tokens.front().iValue;
 	}
 	
-	//! Check if next token is a valid event id. That is either an unsigned 12 bits int literal or a known event string identifier
-	unsigned Compiler::expectEventId() const
+	//! Check if next token is a known global event identifier
+	unsigned Compiler::expectGlobalEventId() const
 	{
 		assert(commonDefinitions);
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		unsigned eventId = 0xFFFF;
 		const std::string & eventName = tokens.front().sValue;
 		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
 			if (commonDefinitions->events[i].name == eventName)
 			{
-				eventId = i;
-				break;
+				return i;
 			}
 		
-		if (eventId == 0xFFFF)
-			throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
+		throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
+	}
+	
+	//! Check if next token is a known local or global event identifier
+	unsigned Compiler::expectAnyEventId() const
+	{
+		assert(targetDescription);
 		
-		return eventId;
+		expect(Token::TOKEN_STRING_LITERAL);
+		
+		// try first local
+		const std::string & eventName = tokens.front().sValue;
+		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
+			if (targetDescription->localEvents[i] == eventName)
+			{
+				return ASEBA_EVENT_LOCAL_EVENTS_START - i;
+			}
+			
+		// then global
+		return expectGlobalEventId();
 	}
 	
 	//! Return true if next token is of the following types
@@ -195,7 +209,6 @@ namespace Aseba
 			case Token::TOKEN_STR_for: return parseFor();
 			case Token::TOKEN_STR_while: return parseWhile();
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
-			case Token::TOKEN_STR_ontimer: return parseOnTimer();
 			case Token::TOKEN_STR_emit: return parseEmit();
 			case Token::TOKEN_STR_call: return parseFunctionCall();
 			default: return parseAssignment();
@@ -515,19 +528,10 @@ namespace Aseba
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		
-		unsigned eventId = expectEventId();
+		unsigned eventId = expectAnyEventId();
 		tokens.pop_front();
 		
 		return new ContextSwitcherNode(pos, eventId);
-	}
-	
-	//! Parse "ontimer" grammar element
-	Node* Compiler::parseOnTimer()
-	{
-		SourcePos pos = tokens.front().pos;
-		tokens.pop_front();
-		
-		return new ContextSwitcherNode(pos, ASEBA_EVENT_PERIODIC);
 	}
 	
 	//! Parse "event" grammar element
@@ -539,7 +543,7 @@ namespace Aseba
 		std::auto_ptr<EmitNode> emitNode(new EmitNode(pos));
 		
 		// event id
-		emitNode->eventId = expectEventId();
+		emitNode->eventId = expectGlobalEventId();
 		tokens.pop_front();
 		
 		// event argument

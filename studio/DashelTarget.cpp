@@ -182,7 +182,6 @@ namespace Aseba
 	
 	DashelTarget::Node::Node()
 	{
-		steppingInNext = NOT_IN_NEXT;
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
@@ -190,6 +189,7 @@ namespace Aseba
 		stream(0)
 	{
 		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION] = &Aseba::DashelTarget::receivedNativeFunctionDescription;
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
@@ -421,6 +421,8 @@ namespace Aseba
 				UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
 				if (userMessage)
 					emit userEvent(userMessage->type, userMessage->data);
+				else
+					qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 16).arg(message->source);
 			}
 			else
 			{
@@ -453,11 +455,28 @@ namespace Aseba
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
 		node.description = *description;
+		node.nativeFunctionReceptionCounter = 0;
 		
-		// attach debugger
-		// AttachDebugger(id).serialize(stream);
-		// flush();
-		emit nodeConnected(id);
+		// we will emit the connected signal only when we have received all native functions
+		if (node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size())
+			emit nodeConnected(id);
+	}
+	
+	void DashelTarget::receivedNativeFunctionDescription(Message *message)
+	{
+		NativeFunctionDescription *description = polymorphic_downcast<NativeFunctionDescription *>(message);
+		unsigned id = description->source;
+		
+		// we must have received a description first
+		Q_ASSERT(nodes.find(id) != nodes.end());
+		Node& node = nodes[id];
+		
+		// copy description into array
+		node.description.nativeFunctions[node.nativeFunctionReceptionCounter++] = *description;
+		
+		// we will emit the connected signal only when we have received all native functions
+		if (node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size())
+			emit nodeConnected(id);
 	}
 	
 	void DashelTarget::receivedVariables(Message *message)
