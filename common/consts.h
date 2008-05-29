@@ -175,7 +175,7 @@ typedef enum
 /*! Limits for static buffers allocation */
 typedef enum
 {
-	ASEBA_MAX_PACKET_SIZE = 512+6	/*!< maximum size an aseba packet is allowed to be (in byte), including all its aseab headers */
+	ASEBA_MAX_PACKET_SIZE = 512+6	/*!< maximum size an aseba packet is allowed to be (in byte), including all its aseba headers, but not the source and the length */
 } AsebaLimits;
 
 /*@}*/

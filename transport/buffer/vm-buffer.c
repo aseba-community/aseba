@@ -23,6 +23,7 @@
 #include "vm-buffer.h"
 #include "../../common/consts.h"
 #include <string.h>
+#include <assert.h>
 
 static unsigned char buffer[ASEBA_MAX_PACKET_SIZE];
 static unsigned buffer_pos;
@@ -31,7 +32,15 @@ static void buffer_add(const uint8* data, uint16 len)
 {
 	uint16 i = 0;
 	while (i < len)
+	{
+		/* uncomment this to check for buffer overflow in sent packets
+		if (buffer_pos >= ASEBA_MAX_PACKET_SIZE)
+		{
+			printf("buffer pos %d max size %d\n", buffer_pos, ASEBA_MAX_PACKET_SIZE);
+			abort();
+		}*/
 		buffer[buffer_pos++] = data[i++];
+	}
 }
 
 static void buffer_add_uint8(uint8 value)
