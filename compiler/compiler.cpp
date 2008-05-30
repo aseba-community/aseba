@@ -199,8 +199,6 @@ namespace Aseba
 	{
 		bytecode.clear();
 		
-		// add trailing stop
-		
 		// event vector table size
 		unsigned addr = preLinkBytecode.size() * 2 + 1;
 		bytecode.push_back(addr);
