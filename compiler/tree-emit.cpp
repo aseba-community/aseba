@@ -39,15 +39,12 @@ namespace Aseba
 	//! Fixup prelinked bytecodes by making sure each vector has at least a STOP token
 	void PreLinkBytecode::fixup()
 	{
-		/*
-		seems useless as generic functions does it afterwards
 		// add terminal STOP
 		size_t currentBytecodeSize = currentBytecode->size();
 		if (currentBytecodeSize > 0)
 			currentBytecode->push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), (*currentBytecode)[currentBytecodeSize-1].line));
-		*/
 		
-		// clear empty entries and add missing STOP
+		// clear empty entries
 		for (std::map<unsigned, BytecodeVector>::iterator it = begin(); it != end();)
 		{
 			std::map<unsigned, BytecodeVector>::iterator curIt = it;
@@ -57,8 +54,8 @@ namespace Aseba
 			{
 				erase(curIt);
 			}
-			else if ((curIt->second[bytecodeSize-1].bytecode >> 12) != ASEBA_BYTECODE_STOP)
-				curIt->second.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), curIt->second[bytecodeSize-1].line));
+			/*else if ((curIt->second[bytecodeSize-1].bytecode >> 12) != ASEBA_BYTECODE_STOP)
+				curIt->second.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), curIt->second[bytecodeSize-1].line));*/
 		}
 	}
 	
