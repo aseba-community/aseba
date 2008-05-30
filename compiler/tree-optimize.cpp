@@ -153,7 +153,8 @@ namespace Aseba
 				case ASEBA_OP_MULT: result = valueOne * valueTwo; break;
 				case ASEBA_OP_DIV: result = valueOne / valueTwo; break;
 				case ASEBA_OP_MOD: result = valueOne % valueTwo; break;
-				default: assert(false);
+				default: return this;
+				//default: assert(false);
 			}
 			
 			if (dump)
