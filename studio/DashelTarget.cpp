@@ -195,6 +195,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
 		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
+		messagesHandlersMap[ASEBA_MESSAGE_EVENT_EXECUTION_KILLED] = &Aseba::DashelTarget::receivedEventExecutionKilled;
 		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
 		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
@@ -528,6 +529,17 @@ namespace Aseba
 		{
 			emit divisionByZero(dz->source, line);
 			emit executionModeChanged(dz->source, EXECUTION_STOP);
+		}
+	}
+	
+	void DashelTarget::receivedEventExecutionKilled(Message *message)
+	{
+		EventExecutionKilled *eek = polymorphic_downcast<EventExecutionKilled *>(message);
+		
+		int line = getLineFromPC(eek->source, eek->pc);
+		if (line >= 0)
+		{
+			emit eventExecutionKilled(eek->source, line);
 		}
 	}
 	

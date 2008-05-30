@@ -52,6 +52,7 @@ namespace Aseba
 			registerMessageType<Variables>(ASEBA_MESSAGE_VARIABLES);
 			registerMessageType<ArrayAccessOutOfBounds>(ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS);
 			registerMessageType<DivisionByZero>(ASEBA_MESSAGE_DIVISION_BY_ZERO);
+			registerMessageType<EventExecutionKilled>(ASEBA_MESSAGE_EVENT_EXECUTION_KILLED);
 			registerMessageType<NodeSpecificError>(ASEBA_MESSAGE_NODE_SPECIFIC_ERROR);
 			registerMessageType<ExecutionStateChanged>(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED);
 			registerMessageType<BreakpointSetResult>(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT);
@@ -551,6 +552,23 @@ namespace Aseba
 	}
 	
 	void DivisionByZero::dumpSpecific(ostream &stream)
+	{
+		stream << "pc " << pc;
+	}
+	
+	//
+	
+	void EventExecutionKilled::serializeSpecific()
+	{
+		add(pc);
+	}
+	
+	void EventExecutionKilled::deserializeSpecific()
+	{
+		pc = get<uint16>();
+	}
+	
+	void EventExecutionKilled::dumpSpecific(ostream &stream)
 	{
 		stream << "pc " << pc;
 	}

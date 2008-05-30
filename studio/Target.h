@@ -69,6 +69,8 @@ namespace Aseba
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
 		//! A node did a division by zero exception.
 		void divisionByZero(unsigned node, unsigned line);
+		//! A new event was run and the current killed on a node
+		void eventExecutionKilled(unsigned node, unsigned line);
 		//! A node has produced an error specific to it
 		void nodeSpecificError(unsigned node, unsigned line, const QString& message);
 		

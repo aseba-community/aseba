@@ -73,6 +73,10 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 	if (!address)
 		return;
 	
+	// if currently executing a thread, notify kill
+	if (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+		AsebaSendMessage(vm, ASEBA_MESSAGE_EVENT_EXECUTION_KILLED, &(vm->pc), 2);
+	
 	vm->pc = address;
 	vm->sp = -1;
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
@@ -239,6 +243,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			#ifndef ASEBA_NO_ARRAY_CHECK
 			if (variableIndex >= vm->variablesSize)
 			{
+				// TODO: really check array access bounds and not memory bounds
 				uint16 buffer[2];
 				buffer[0] = vm->pc;
 				buffer[1] = variableIndex;
@@ -563,11 +568,6 @@ uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit)
 }
 
 
-uint16 AsebaVMIsExecutingThread(AsebaVMState *vm)
-{
-	return AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
-}
-
 /*! Set a breakpoint at a specific location. */
 uint8 AsebaVMSetBreakpoint(AsebaVMState *vm, uint16 pc)
 {
@@ -728,11 +728,11 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		break;
 		
 		case ASEBA_MESSAGE_WRITE_BYTECODE:
-		AsebaWriteBytecode();
+		AsebaWriteBytecode(vm);
 		break;
 		
 		case ASEBA_MESSAGE_RESET_INTO_BOOTLOADER:
-		AsebaResetIntoBootloader();
+		AsebaResetIntoBootloader(vm);
 		break;
 		
 		default:

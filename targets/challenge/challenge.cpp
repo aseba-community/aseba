@@ -343,10 +343,12 @@ namespace Enki
 			// do a network step
 			Hub::step();
 			
-			// run VM with a periodic event if nothing else is currently running
-			if (!AsebaVMIsExecutingThread(&vm))
-				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
+			// run VM
 			AsebaVMRun(&vm, 65535);
+			
+			// reschedule a periodic event if we are not in step by step
+			if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 		}
 	};
 	
@@ -885,11 +887,11 @@ extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 	nativeFunctions[id](vm);
 }
 
-extern "C" void AsebaWriteBytecode()
+extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
 {
 }
 
-extern "C" void AsebaResetIntoBootloader()
+extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
 {
 }
 

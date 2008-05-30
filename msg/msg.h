@@ -271,6 +271,22 @@ namespace Aseba
 		virtual operator const char * () const { return "division by zero"; }
 	};
 	
+	//! Exception: an event execution was killed by a new event
+	class EventExecutionKilled : public Message
+	{
+	public:
+		uint16 pc;
+		
+	public:
+		EventExecutionKilled() : Message(ASEBA_MESSAGE_EVENT_EXECUTION_KILLED) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::ostream &stream);
+		virtual operator const char * () const { return "event execution killed"; }
+	};
+	
 	//! A node as produced an error specific to it
 	class NodeSpecificError : public Message
 	{

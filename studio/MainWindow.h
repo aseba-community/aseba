@@ -76,7 +76,10 @@ namespace Aseba
 	protected:
 		void setupWidgets();
 		void setupConnections();
-		
+	
+	public slots:
+		void clearExecutionErrors();
+	
 	protected slots:
 		void resetClicked();
 		void loadClicked();
@@ -95,7 +98,6 @@ namespace Aseba
 		void cursorMoved();
 		void goToError();
 		
-		void clearExecutionErrors();
 		void setBreakpoint(unsigned line);
 		void clearBreakpoint(unsigned line);
 		void breakpointClearedAll();
@@ -174,6 +176,8 @@ namespace Aseba
 		void pauseAll();
 		void stopAll();
 		
+		void clearAllExecutionError();
+		
 		void uploadReadynessChanged();
 		void tabChanged(int);
 		void sendEvent();
@@ -196,6 +200,7 @@ namespace Aseba
 		void userEvent(unsigned id, const VariablesDataVector &data);
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
 		void divisionByZero(unsigned node, unsigned line);
+		void eventExecutionKilled(unsigned node, unsigned line);
 		void nodeSpecificError(unsigned node, unsigned line, const QString& message);
 		
 		void executionPosChanged(unsigned node, unsigned line);
@@ -214,7 +219,7 @@ namespace Aseba
 		int getIndexFromId(unsigned node);
 		NodeTab* getTabFromId(unsigned node);
 		NodeTab* getTabFromName(const QString& name);
-		
+		void addErrorEvent(unsigned node, unsigned line, const QString& message);
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();

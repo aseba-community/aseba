@@ -277,7 +277,7 @@ namespace Aseba
 	
 	void NodeTab::resetClicked()
 	{
-		clearEditorProperty("executionError");
+		clearExecutionErrors();
 		target->reset(id);
 	}
 	
@@ -938,6 +938,17 @@ namespace Aseba
 		}
 	}
 	
+	void MainWindow::clearAllExecutionError()
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			
+			tab->clearExecutionErrors();
+		}
+	}
+	
 	void MainWindow::uploadReadynessChanged()
 	{
 		bool ready = true;
@@ -1243,54 +1254,32 @@ namespace Aseba
 		logger->scrollToBottom();
 	}
 	
-	// TODO: factorize error code
-	
 	//! A node did an access out of array bounds exception.
 	void MainWindow::arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index)
 	{
-		NodeTab* tab = getTabFromId(node);
-		Q_ASSERT(tab);
-		
-		if (tab->setEditorProperty("executionError", QVariant(), line, true))
-		{
-			tab->rehighlighting = true;
-			tab->highlighter->rehighlight();
-		}
-		
-		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += "\n" + tr("%0:%1: access out of memory (%2/%3)").arg(target->getName(node)).arg(line + 1).arg(index).arg(target->getConstDescription(node)->variablesSize);
-		
-		if (logger->count() > 50)
-			delete logger->takeItem(0);
-		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
-		item->setData(Qt::UserRole, QPoint(node, line));
-		logger->scrollToBottom();
+		addErrorEvent(node, line, tr("access out of memory (%2/%3)").arg(index).arg(target->getConstDescription(node)->variablesSize));
 	}
 	
 	//! A node did a division by zero exception.
 	void MainWindow::divisionByZero(unsigned node, unsigned line)
 	{
-		NodeTab* tab = getTabFromId(node);
-		Q_ASSERT(tab);
-		
-		if (tab->setEditorProperty("executionError", QVariant(), line, true))
-		{
-			tab->rehighlighting = true;
-			tab->highlighter->rehighlight();
-		}
-		
-		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		text += "\n" + tr("%0:%1: division by zero").arg(target->getName(node)).arg(line + 1);
-		
-		if (logger->count() > 50)
-			delete logger->takeItem(0);
-		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
-		item->setData(Qt::UserRole, QPoint(node, line));
-		logger->scrollToBottom();
+		addErrorEvent(node, line, tr("division by zero"));
+	}
+	
+	//! A new event was run and the current killed on a node
+	void MainWindow::eventExecutionKilled(unsigned node, unsigned line)
+	{
+		addErrorEvent(node, line, tr("event execution killed"));
 	}
 	
 	//! A node has produced an error specific to it
 	void MainWindow::nodeSpecificError(unsigned node, unsigned line, const QString& message)
+	{
+		addErrorEvent(node, line, message);
+	}
+	
+	//! Generic part of error events reporting
+	void MainWindow::addErrorEvent(unsigned node, unsigned line, const QString& message)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
@@ -1503,6 +1492,7 @@ namespace Aseba
 		
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
+		connect(clearLogger, SIGNAL(clicked()), SLOT(clearAllExecutionError()));
 		
 		// constants
 		connect(addConstantButton, SIGNAL(clicked()), SLOT(addConstantClicked()));
@@ -1518,6 +1508,7 @@ namespace Aseba
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)));
 		connect(target, SIGNAL(divisionByZero(unsigned, unsigned)), SLOT(divisionByZero(unsigned, unsigned)));
+		connect(target, SIGNAL(eventExecutionKilled(unsigned, unsigned)), SLOT(eventExecutionKilled(unsigned, unsigned)));
 		connect(target, SIGNAL(nodeSpecificError(unsigned, unsigned, QString)), SLOT(nodeSpecificError(unsigned, unsigned, QString)));
 		
 		connect(target, SIGNAL(executionPosChanged(unsigned, unsigned)), SLOT(executionPosChanged(unsigned, unsigned)));

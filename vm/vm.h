@@ -131,9 +131,6 @@ void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
 	Return 1 if anything was executed, 0 otherwise. */
 uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit);
 
-/*! Return 1 if VM is currently executing a thread */
-uint16 AsebaVMIsExecutingThread(AsebaVMState *vm);
-
 /*! Execute a debug action from a debug message. 
 	dataLength is given in number of uint16. */
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength);
@@ -160,10 +157,10 @@ void AsebaSendDescription(AsebaVMState *vm);
 void AsebaNativeFunction(AsebaVMState *vm, uint16 id);
 
 /*! Called by AsebaVMDebugMessage when VM must write its bytecode to flash, write an empty function to leave feature unsupported */
-void AsebaWriteBytecode();
+void AsebaWriteBytecode(AsebaVMState *vm);
 
 /*! Called by AsebaVMDebugMessage when VM must restart the node and enter to the bootloader, write an empty function to leave feature unsupported */
-void AsebaResetIntoBootloader();
+void AsebaResetIntoBootloader(AsebaVMState *vm);
 
 // Function optionally implemented
 
