@@ -407,13 +407,29 @@ namespace Aseba
 	{
 		Q_UNUSED(event);
 		step(0);
+		
+		// send only 20 latest user events
+		if (userEventsQueue.size() > 20)
+			emit userEventsDropped(userEventsQueue.size() - 20);
+		while (userEventsQueue.size())
+		{
+			delete userEventsQueue.head();
+			userEventsQueue.dequeue();
+		}
+		
+		while (!userEventsQueue.isEmpty())
+		{
+			emit userEvent(userEventsQueue.head()->type, userEventsQueue.head()->data);
+			userEventsQueue.dequeue();
+		}
 	}
 	
 	void DashelTarget::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
-		message->dump(std::cout);
-		std::cout << std::endl;
+		bool deleteMessage = true;
+		//message->dump(std::cout);
+		//std::cout << std::endl;
 		
 		if (!quitting)
 		{
@@ -422,7 +438,10 @@ namespace Aseba
 			{
 				UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
 				if (userMessage)
-					emit userEvent(userMessage->type, userMessage->data);
+				{
+					userEventsQueue.enqueue(userMessage);
+					deleteMessage = false;
+				}
 				else
 					qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 16).arg(message->source);
 			}
@@ -431,7 +450,9 @@ namespace Aseba
 				(this->*(messageHandler->second))(message);
 			}
 		}
-		delete message;
+		
+		if (deleteMessage)
+			delete message;
 	}
 	
 	void DashelTarget::connectionClosed(Stream* stream, bool abnormal)

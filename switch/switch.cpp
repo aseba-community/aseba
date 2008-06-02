@@ -122,6 +122,7 @@ namespace Aseba
 	{
 		Aseba::UserMessage uMsg;
 		uMsg.type = 0;
+		//for (int i = 0; i < 80; i++)
 		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
 			uMsg.serialize(*it);
@@ -197,8 +198,8 @@ int main(int argc, char *argv[])
 		Uncomment this and comment aswitch.run() to flood all pears with dummy user messages
 		while (1)
 		{
-			aswitch.step(0);
-			aswitch.broadcastMessage();
+			aswitch.step(10);
+			aswitch.broadcastDummyUserMessage();
 		}*/
 		aswitch.run();
 	}

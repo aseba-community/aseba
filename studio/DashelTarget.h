@@ -29,6 +29,7 @@
 #include "../common/consts.h"
 #include <QString>
 #include <QDialog>
+#include <QQueue>
 #include <map>
 #include <dashel/dashel.h>
 
@@ -37,6 +38,7 @@ class QGroupBox;
 class QLineEdit;
 class QSpinBox;
 class QListWidget;
+
 
 namespace Dashel
 {
@@ -73,7 +75,8 @@ namespace Aseba
 		void setupOkStateFromListSelection();
 	};
 	
-	class Message;	
+	class Message;
+	class UserMessage;
 	
 	class DashelTarget: public Target, public Dashel::Hub
 	{
@@ -98,6 +101,7 @@ namespace Aseba
 		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
 		typedef std::map<unsigned, Node> NodesMap;
 		
+		QQueue<UserMessage *> userEventsQueue;
 		MessagesHandlersMap messagesHandlersMap;
 		NodesMap nodes;
 		Dashel::Stream* stream;

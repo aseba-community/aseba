@@ -1254,6 +1254,18 @@ namespace Aseba
 		logger->scrollToBottom();
 	}
 	
+	//! Some user events have been dropped, i.e. not sent to the gui
+	void MainWindow::userEventsDropped(unsigned amount)
+	{
+		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
+		text += QString("\n%0 user events not shown").arg(amount);
+		
+		if (logger->count() > 50)
+			delete logger->takeItem(0);
+		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
+		logger->scrollToBottom();
+	}
+	
 	//! A node did an access out of array bounds exception.
 	void MainWindow::arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index)
 	{
@@ -1506,6 +1518,7 @@ namespace Aseba
 		connect(target, SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
+		connect(target, SIGNAL(userEventsDropped(unsigned)), SLOT(userEventsDropped(unsigned)));
 		connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned)));
 		connect(target, SIGNAL(divisionByZero(unsigned, unsigned)), SLOT(divisionByZero(unsigned, unsigned)));
 		connect(target, SIGNAL(eventExecutionKilled(unsigned, unsigned)), SLOT(eventExecutionKilled(unsigned, unsigned)));

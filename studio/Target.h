@@ -64,6 +64,8 @@ namespace Aseba
 		
 		//! A user event has arrived from the network.
 		void userEvent(unsigned id, const VariablesDataVector &data);
+		//! Some user events have been dropped, i.e. not sent to the gui
+		void userEventsDropped(unsigned amount);
 		
 		//! A node did an access out of array bounds exception.
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
