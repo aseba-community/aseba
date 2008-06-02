@@ -26,6 +26,16 @@
 #include "../utils/FormatableString.h"
 #include <cassert>
 
+// Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
+template<typename Derived, typename Base>
+static inline Derived polymorphic_downcast(Base base)
+{
+	Derived derived = dynamic_cast<Derived>(base);
+	if (!derived)
+		abort();
+	return derived;
+}
+
 namespace Aseba
 {
 	/** \addtogroup compiler */
@@ -74,18 +84,48 @@ namespace Aseba
 		assert(children[0]);
 		children[1] = children[1]->optimize(dump);
 		assert(children[1]);
-		children[2] = children[2]->optimize(dump);
-		assert(children[2]);
 		
-		Node *trueBlock = children[2];
+		Node *trueBlock = children[1];
 		Node *falseBlock = 0;
-		if (children.size() > 3)
+		if (children.size() > 2)
 		{
-			children[3] = children[3]->optimize(dump);
-			assert(children[3]);
-			falseBlock = children[3];
+			children[2] = children[2]->optimize(dump);
+			assert(children[2]);
+			falseBlock = children[2];
 		}
 		
+		// check for if on constants
+		ImmediateNode* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
+		if (constantExpression)
+		{
+			if (constantExpression->value != 0)
+			{
+				if (dump)
+					*dump << sourcePos.toString() << ": if test removed because condition was always true.\n";
+				children[1] = 0;
+				delete this;
+				return trueBlock;
+			}
+			else if (falseBlock)
+			{
+				if (dump)
+					*dump << sourcePos.toString() << ": if test removed because condition was always false.\n";
+				// false block
+				children[2] = 0;
+				delete this;
+				return falseBlock;
+			}
+			else
+			{
+				// no false block
+				if (dump)
+					*dump << sourcePos.toString() << ": if removed because condition was always false and no code was associated.\n";
+				delete this;
+				return NULL;
+			}
+		}
+		
+		// check remove
 		if (trueBlock->children.empty() && (!falseBlock || falseBlock->children.empty()))
 		{
 			if (dump)
@@ -93,8 +133,34 @@ namespace Aseba
 			delete this;
 			return NULL;
 		}
-		else
-			return this;
+		
+		// fold operation inside if
+		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		FoldedIfWhenNode *foldedNode = new FoldedIfWhenNode(sourcePos);
+		foldedNode->edgeSensitive = edgeSensitive;
+		foldedNode->op = operation->op;
+		foldedNode->children.push_back(operation->children[0]);
+		foldedNode->children.push_back(operation->children[1]);
+		operation->children.clear();
+		foldedNode->children.push_back(children[1]);
+		children[1] = 0;
+		if (children.size() > 2)
+		{
+			foldedNode->children.push_back(children[2]);
+			children[2] = 0;
+		}
+		
+		if (dump)
+			*dump << sourcePos.toString() << ": if condition folded inside node.\n";
+		
+		delete this;
+		
+		return foldedNode;
+	}
+	
+	Node* FoldedIfWhenNode::optimize(std::ostream* dump)
+	{
+		assert(false);
 	}
 	
 	Node* WhileNode::optimize(std::ostream* dump)
@@ -103,18 +169,54 @@ namespace Aseba
 		assert(children[0]);
 		children[1] = children[1]->optimize(dump);
 		assert(children[1]);
-		children[2] = children[2]->optimize(dump);
-		assert(children[2]);
 		
-		if (children[2]->children.empty())
+		// check for loops on constants
+		ImmediateNode* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
+		if (constantExpression)
+		{
+			if (constantExpression->value != 0)
+			{
+				throw Error(sourcePos, "Infinite loops not allowed.");
+			}
+			else
+			{
+				if (dump)
+					*dump << sourcePos.toString() << ": while removed because condition is always false.\n";
+				delete this;
+				return NULL;
+			}
+		}
+		
+		// check for loops with empty content
+		if (children[1]->children.empty())
 		{
 			if (dump)
 				*dump << sourcePos.toString() << ": while removed because it contained no statement.\n";
 			delete this;
 			return NULL;
 		}
-		else
-			return this;
+		
+		// fold operation inside loop
+		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		FoldedWhileNode *foldedNode = new FoldedWhileNode(sourcePos);
+		foldedNode->op = operation->op;
+		foldedNode->children.push_back(operation->children[0]);
+		foldedNode->children.push_back(operation->children[1]);
+		operation->children.clear();
+		foldedNode->children.push_back(children[1]);
+		children[1] = 0;
+		
+		if (dump)
+			*dump << sourcePos.toString() << ": while condition folded inside node.\n";
+		
+		delete this;
+		
+		return foldedNode;
+	}
+	
+	Node* FoldedWhileNode::optimize(std::ostream* dump)
+	{
+		assert(false);
 	}
 	
 	Node* ContextSwitcherNode::optimize(std::ostream* dump)
@@ -151,10 +253,25 @@ namespace Aseba
 				case ASEBA_OP_ADD: result = valueOne + valueTwo; break;
 				case ASEBA_OP_SUB: result = valueOne - valueTwo; break;
 				case ASEBA_OP_MULT: result = valueOne * valueTwo; break;
-				case ASEBA_OP_DIV: result = valueOne / valueTwo; break;
+				case ASEBA_OP_DIV: 
+					if (valueTwo == 0)
+						throw Error(sourcePos, "Division by zero.");
+					else
+						result = valueOne / valueTwo;
+				break;
 				case ASEBA_OP_MOD: result = valueOne % valueTwo; break;
-				default: return this;
-				//default: assert(false);
+				
+				case ASEBA_OP_EQUAL: result = valueOne == valueTwo; break;
+				case ASEBA_OP_NOT_EQUAL: result = valueOne != valueTwo; break;
+				case ASEBA_OP_BIGGER_THAN: result = valueOne > valueTwo; break;
+				case ASEBA_OP_BIGGER_EQUAL_THAN: result = valueOne >= valueTwo; break;
+				case ASEBA_OP_SMALLER_THAN: result = valueOne < valueTwo; break;
+				case ASEBA_OP_SMALLER_EQUAL_THAN: result = valueOne <= valueTwo; break;
+				
+				case ASEBA_OP_OR: result = valueOne || valueTwo; break;
+				case ASEBA_OP_AND: result = valueOne && valueTwo; break;
+				
+				default: assert(false);
 			}
 			
 			if (dump)

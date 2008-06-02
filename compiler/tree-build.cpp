@@ -41,8 +41,10 @@ namespace Aseba
 	//! Destructor, delete all children.
 	Node::~Node()
 	{
+		// we assume that if children is 0, another node has taken ownership of it
 		for (size_t i = 0; i < children.size(); i++)
-			delete children[i];
+			if (children[i])
+				delete children[i];
 	}
 	
 	//! Constructor

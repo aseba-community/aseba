@@ -73,6 +73,11 @@ namespace Aseba
 	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
+		assert(false);
+	}
+	
+	void FoldedIfWhenNode::emit(PreLinkBytecode& bytecodes) const
+	{
 		unsigned short bytecode;
 		
 		/*
@@ -147,6 +152,11 @@ namespace Aseba
 	}
 	
 	void WhileNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		assert(false);
+	}
+	
+	void FoldedWhileNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode;
 		

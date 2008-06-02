@@ -349,14 +349,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// condition
-		BinaryArithmeticNode* operation = parseOr();
-		
-		// fold top most condition inside the if node
-		ifNode->children.push_back(operation->children[0]);
-		ifNode->children.push_back(operation->children[1]);
-		ifNode->op = operation->op;
-		operation->children.clear();
-		delete operation;
+		ifNode->children.push_back(parseOr());
 		
 		// then keyword
 		if (edgeSensitive)
@@ -368,7 +361,7 @@ namespace Aseba
 		// parse true condition
 		ifNode->children.push_back(new BlockNode(tokens.front().pos));
 		while (!IS_ONE_OF(elseEndTypes))
-			ifNode->children[2]->children.push_back(parseBlockStatement());
+			ifNode->children[1]->children.push_back(parseBlockStatement());
 		
 		// parse false condition (only for if)
 		if (!edgeSensitive && (tokens.front() == Token::TOKEN_STR_else))
@@ -377,7 +370,7 @@ namespace Aseba
 			
 			ifNode->children.push_back(new BlockNode(tokens.front().pos));
 			while (tokens.front() != Token::TOKEN_STR_end)
-				ifNode->children[3]->children.push_back(parseBlockStatement());
+				ifNode->children[2]->children.push_back(parseBlockStatement());
 		}
 		
 		// end keyword
@@ -479,21 +472,23 @@ namespace Aseba
 		// create while and condition
 		WhileNode* whileNode = new WhileNode(whilePos);
 		blockNode->children.push_back(whileNode);
-		whileNode->children.push_back(new LoadNode(varPos, varAddr));
+		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+		comparisonNode->children.push_back(new LoadNode(varPos, varAddr));
 		if (rangeStartIndex <= rangeEndIndex)
-			whileNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
+			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
-			whileNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		whileNode->children.push_back(new ImmediateNode(rangeEndIndexPos, rangeEndIndex));
+			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
+		comparisonNode->children.push_back(new ImmediateNode(rangeEndIndexPos, rangeEndIndex));
+		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
 		whileNode->children.push_back(new BlockNode(tokens.front().pos));
 		while (tokens.front() != Token::TOKEN_STR_end)
-			whileNode->children[2]->children.push_back(parseBlockStatement());
+			whileNode->children[1]->children.push_back(parseBlockStatement());
 		
 		// increment variable
 		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
-		whileNode->children[2]->children.push_back(assignmentNode);
+		whileNode->children[1]->children.push_back(assignmentNode);
 		assignmentNode->children.push_back(new StoreNode(varPos, varAddr));
 		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, new LoadNode(varPos, varAddr), new ImmediateNode(varPos, step)));
 		
@@ -513,14 +508,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// condition
-		BinaryArithmeticNode* operation = parseOr();
-		
-		// fold top most condition inside the if node
-		whileNode->children.push_back(operation->children[0]);
-		whileNode->children.push_back(operation->children[1]);
-		whileNode->op = operation->op;
-		operation->children.clear();
-		delete operation;
+		whileNode->children.push_back(parseOr());
 		
 		// do keyword
 		expect(Token::TOKEN_STR_do);
@@ -529,7 +517,7 @@ namespace Aseba
 		// block and end keyword
 		whileNode->children.push_back(new BlockNode(tokens.front().pos));
 		while (tokens.front() != Token::TOKEN_STR_end)
-			whileNode->children[2]->children.push_back(parseBlockStatement());
+			whileNode->children[1]->children.push_back(parseBlockStatement());
 		
 		tokens.pop_front();
 		

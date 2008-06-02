@@ -89,13 +89,11 @@ namespace Aseba
 	};
 	
 	//! Node for "if" and "when".
-	//! children[0] is left part of expression
-	//! children[1] is right part of expression
-	//! children[2] is true block
-	//! children[3] is false block
+	//! children[0] is expression
+	//! children[1] is true block
+	//! children[2] is false block
 	struct IfWhenNode : Node
 	{
-		AsebaBinaryOperator op; //!< operator
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		
 		//! Constructor
@@ -106,16 +104,47 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
+	//! Node for "if" and "when" with operator folded inside.
+	//! children[0] is left part of expression
+	//! children[1] is right part of expression
+	//! children[2] is true block
+	//! children[3] is false block
+	struct FoldedIfWhenNode : Node
+	{
+		AsebaBinaryOperator op; //!< operator
+		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
+		
+		//! Constructor
+		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		
+		virtual Node* optimize(std::ostream* dump);
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::string toString() const;
+	};
+	
 	//! Node for "while".
+	//! children[0] is expression
+	//! children[1] is block
+	struct WhileNode : Node
+	{
+		//! Constructor
+		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		
+		virtual Node* optimize(std::ostream* dump);
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::string toString() const;
+	};
+	
+	//! Node for "while" with operator folded inside.
 	//! children[0] is left part of expression
 	//! children[1] is right part of expression
 	//! children[2] is block
-	struct WhileNode : Node
+	struct FoldedWhileNode : Node
 	{
 		AsebaBinaryOperator op; //!< operator
 		
 		//! Constructor
-		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -157,6 +186,7 @@ namespace Aseba
 	{
 		AsebaBinaryOperator op; //!< operator
 		
+		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
 		
 		void deMorganNotRemoval();

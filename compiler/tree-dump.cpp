@@ -74,11 +74,27 @@ namespace Aseba
 			s += "When: ";
 		else
 			s += "If: ";
+		return s;
+	}
+	
+	std::string FoldedIfWhenNode::toString() const
+	{
+		std::string s;
+		if (edgeSensitive)
+			s += "Folded When: ";
+		else
+			s += "Folded If: ";
 		s += binaryOperatorToString(op);
 		return s;
 	}
 	
 	std::string WhileNode::toString() const
+	{
+		std::string s = "While: ";
+		return s;
+	};
+	
+	std::string FoldedWhileNode::toString() const
 	{
 		std::string s = "While: ";
 		s += binaryOperatorToString(op);
