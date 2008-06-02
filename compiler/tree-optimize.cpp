@@ -101,7 +101,7 @@ namespace Aseba
 			if (constantExpression->value != 0)
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test removed because condition was always true.\n";
+					*dump << sourcePos.toString() << ": if test removed because condition was always true\n";
 				children[1] = 0;
 				delete this;
 				return trueBlock;
@@ -109,7 +109,7 @@ namespace Aseba
 			else if (falseBlock)
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test removed because condition was always false.\n";
+					*dump << sourcePos.toString() << ": if test removed because condition was always false\n";
 				// false block
 				children[2] = 0;
 				delete this;
@@ -119,7 +119,7 @@ namespace Aseba
 			{
 				// no false block
 				if (dump)
-					*dump << sourcePos.toString() << ": if removed because condition was always false and no code was associated.\n";
+					*dump << sourcePos.toString() << ": if removed because condition was always false and no code was associated\n";
 				delete this;
 				return NULL;
 			}
@@ -129,7 +129,7 @@ namespace Aseba
 		if (trueBlock->children.empty() && (!falseBlock || falseBlock->children.empty()))
 		{
 			if (dump)
-				*dump << sourcePos.toString() << ": if removed because it contained no statement.\n";
+				*dump << sourcePos.toString() << ": if removed because it contained no statement\n";
 			delete this;
 			return NULL;
 		}
@@ -151,7 +151,7 @@ namespace Aseba
 		}
 		
 		if (dump)
-			*dump << sourcePos.toString() << ": if condition folded inside node.\n";
+			*dump << sourcePos.toString() << ": if condition folded inside node\n";
 		
 		delete this;
 		
@@ -176,12 +176,12 @@ namespace Aseba
 		{
 			if (constantExpression->value != 0)
 			{
-				throw Error(sourcePos, "Infinite loops not allowed.");
+				throw Error(sourcePos, "Infinite loops not allowed");
 			}
 			else
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": while removed because condition is always false.\n";
+					*dump << sourcePos.toString() << ": while removed because condition is always false\n";
 				delete this;
 				return NULL;
 			}
@@ -191,7 +191,7 @@ namespace Aseba
 		if (children[1]->children.empty())
 		{
 			if (dump)
-				*dump << sourcePos.toString() << ": while removed because it contained no statement.\n";
+				*dump << sourcePos.toString() << ": while removed because it contained no statement\n";
 			delete this;
 			return NULL;
 		}
@@ -207,7 +207,7 @@ namespace Aseba
 		children[1] = 0;
 		
 		if (dump)
-			*dump << sourcePos.toString() << ": while condition folded inside node.\n";
+			*dump << sourcePos.toString() << ": while condition folded inside node\n";
 		
 		delete this;
 		
