@@ -411,7 +411,14 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range start index
-		int rangeStartIndex = expectInt16LiteralOrConstant();
+		int rangeStartIndex;
+		if (tokens.front() == Token::TOKEN_OP_NEG)
+		{
+			tokens.pop_front();
+			rangeStartIndex = -expectInt16LiteralOrConstant();
+		}
+		else
+			rangeStartIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeStartIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
@@ -420,7 +427,14 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range end index
-		int rangeEndIndex = expectInt16LiteralOrConstant();
+		int rangeEndIndex;
+		if (tokens.front() == Token::TOKEN_OP_NEG)
+		{
+			tokens.pop_front();
+			rangeEndIndex = -expectInt16LiteralOrConstant();
+		}
+		else
+			rangeEndIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeEndIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
