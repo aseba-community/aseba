@@ -140,10 +140,10 @@ namespace Aseba
 		serializeSpecific();
 		uint16 len = static_cast<uint16>(rawData.size());
 		
-		if (len + 6 > ASEBA_MAX_PACKET_SIZE)
+		if (len + 2 > ASEBA_MAX_PACKET_SIZE)
 		{
 			cerr << "Message::serialize() : fatal error: message size exceed maximum packet size.\n";
-			cerr << "message size: " << len + 6 << ", maximum packet size: " << ASEBA_MAX_PACKET_SIZE << ", message type: " << type;
+			cerr << "message payload size: " << len + 2 << ", maximum packet size: " << ASEBA_MAX_PACKET_SIZE << ", message type: " << hex << showbase << type << dec << noshowbase;
 			cerr << endl;
 			abort();
 		}

@@ -247,7 +247,7 @@ namespace Aseba
 		
 		QHBoxLayout *layout = new QHBoxLayout;
 		layout->addLayout(panelLayout, 1);
-		layout->addLayout(editorLayout, 8);
+		layout->addLayout(editorLayout, 4);
 		setLayout(layout);
 	}
 	

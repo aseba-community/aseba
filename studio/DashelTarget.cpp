@@ -411,7 +411,7 @@ namespace Aseba
 		// send only 20 latest user events
 		if (userEventsQueue.size() > 20)
 			emit userEventsDropped(userEventsQueue.size() - 20);
-		while (userEventsQueue.size())
+		while (userEventsQueue.size() > 20)
 		{
 			delete userEventsQueue.head();
 			userEventsQueue.dequeue();
