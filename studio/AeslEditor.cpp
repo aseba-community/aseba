@@ -206,7 +206,6 @@ namespace Aseba
 				if (uData->properties.isEmpty())
 				{
 					// garbage collect UserData
-					delete uData;
 					block.setUserData(0);
 				}
 				emit breakpointCleared(cursorForPosition(e->pos()).blockNumber());
