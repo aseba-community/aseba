@@ -32,6 +32,9 @@
 #include <algorithm>
 #include <iostream>
 #include <QString>
+#include <QApplication>
+#include <QMessageBox>
+#include <QDebug>
 
 /*!	\file Marxbot.cpp
 	\brief Implementation of the aseba-enabled marXbot robot
@@ -82,19 +85,23 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 	return asebaSocketMaps[vm]->lastMessageData.size();
 }
 
+extern AsebaVMDescription vmLeftMotorDescription;
+extern AsebaVMDescription vmRightMotorDescription;
+extern AsebaVMDescription vmProximitySensorsDescription;
+extern AsebaVMDescription vmDistanceSensorsDescription;
+
 extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
 	switch (vm->nodeId)
 	{
-		case 1: // TODO
-		case 2: // TODO
-		case 3: // TODO
-		case 4: // TODO
-		break;
+		case 1: return &vmLeftMotorDescription;
+		case 2: return &vmRightMotorDescription;
+		case 3: return &vmProximitySensorsDescription;
+		case 4: return &vmDistanceSensorsDescription;
+		default: break;
 	}
-	std::cerr << "simulation broken until we define the variables availables in the physical robot" << std::endl;
 	assert(false);
-	return 0; // FIXME
+	return 0;
 }
 
 extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
@@ -170,25 +177,30 @@ namespace Enki
 		vm.stackSize = stack.size();
 	}
 	
-	AsebaMarxbot::AsebaMarxbot(const std::string &target)
+	AsebaMarxbot::AsebaMarxbot() :
+		stream(0)
 	{
 		// setup modules specific data
 		leftMotor.vm.nodeId = 1;
+		leftMotorVariables.id = 1;
 		leftMotor.vm.variables = reinterpret_cast<sint16 *>(&leftMotorVariables);
 		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(sint16);
 		modules.push_back(&leftMotor);
 		
 		rightMotor.vm.nodeId = 2;
+		rightMotorVariables.id = 2;
 		rightMotor.vm.variables = reinterpret_cast<sint16 *>(&rightMotorVariables);
 		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(sint16);
 		modules.push_back(&rightMotor);
 		
 		proximitySensors.vm.nodeId = 3;
+		proximitySensorVariables.id = 3;
 		proximitySensors.vm.variables = reinterpret_cast<sint16 *>(&proximitySensorVariables);
 		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(sint16);
 		modules.push_back(&proximitySensors);
 		
 		distanceSensors.vm.nodeId = 4;
+		distanceSensorVariables.id = 4;
 		distanceSensors.vm.variables = reinterpret_cast<sint16 *>(&distanceSensorVariables);
 		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(sint16);
 		modules.push_back(&distanceSensors);
@@ -200,10 +212,16 @@ namespace Enki
 		asebaSocketMaps[&distanceSensors.vm] = this;
 		
 		// connect to target
-		stream = Hub::connect(target);
-		
 		int port = ASEBA_DEFAULT_PORT + marxbotNumber;
-		Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+		try
+		{
+			stream = Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+		}
+		catch (Dashel::DashelException e)
+		{
+			QMessageBox::critical(0, QApplication::tr("Aseba Marxbot"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.sysMessage.c_str()));
+			abort();
+		}
 		marxbotNumber++;
 		
 		// init VM
@@ -288,9 +306,19 @@ namespace Enki
 		}
 	}
 	
-	void AsebaMarxbot::incomingConnection(Stream *stream)
+	void AsebaMarxbot::connectionCreated(Dashel::Stream *stream)
 	{
-		this->stream = stream;
+		std::string targetName = stream->getTargetName();
+		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
+		{
+			qDebug() << this << " : New client connected.";
+			if (this->stream)
+			{
+				closeStream(this->stream);
+				qDebug() << this << " : Disconnected old client.";
+			}
+			this->stream = stream;
+		}
 	}
 	
 	void AsebaMarxbot::incomingData(Stream *stream)
@@ -305,9 +333,19 @@ namespace Enki
 			AsebaProcessIncomingEvents(&(modules[i]->vm));
 	}
 	
-	void AsebaMarxbot::connectionClosed(Stream *stream, bool abnormal)
+	void AsebaMarxbot::connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
-		// do nothing in addition to what is done by Client
+		if (stream == this->stream)
+		{
+			this->stream = 0;
+			// clear breakpoints
+			for (size_t i = 0; i < modules.size(); i++)
+				(modules[i]->vm).breakpointsCount = 0;
+		}
+		if (abnormal)
+			qDebug() << this << " : Client has disconnected unexpectedly.";
+		else
+			qDebug() << this << " : Client has disconnected properly.";
 	}
 }
 

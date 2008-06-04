@@ -458,8 +458,10 @@ namespace Aseba
 	void DashelTarget::connectionClosed(Stream* stream, bool abnormal)
 	{
 		Q_UNUSED(stream);
-		emit networkDisconnected();
-		nodes.clear();
+		QMessageBox::critical(0, tr("Connection closed"), tr("Warning, connection closed, save your work and quit Studio."));
+		// temporary disabling this dynamism as aseba is still in development
+		//emit networkDisconnected();
+		//nodes.clear();
 	}
 	
 	void DashelTarget::receivedDescription(Message *message)

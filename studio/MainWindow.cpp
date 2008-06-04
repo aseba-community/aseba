@@ -1592,11 +1592,12 @@ namespace Aseba
 		regenerateOpenRecentMenu();
 		fileMenu->addMenu(openRecentMenu)->setIcon(QIcon(":/images/fileopen.png"));
 		
-		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
-							this, SLOT(saveFile()));
 		fileMenu->addAction(QIcon(":/images/filesave.png"), tr("&Save..."),
 							this, SLOT(save()),
 							QKeySequence(tr("Ctrl+S", "File|Save")));
+		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
+							this, SLOT(saveFile()));
+		
 		fileMenu->addSeparator();
 		/*fileMenu->addAction(QIcon(":/images/network.png"), tr("Connect to &target"),
 							target, SLOT(connect()),

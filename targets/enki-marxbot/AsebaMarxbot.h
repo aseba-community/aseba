@@ -70,11 +70,15 @@ namespace Enki
 		
 		struct BaseVariables
 		{
+			sint16 id;
+			sint16 source;
 			sint16 args[32];
 		};
 		
 		struct MotorVariables
 		{
+			sint16 id;
+			sint16 source;
 			sint16 args[32];
 			sint16 speed;
 			sint16 odo[2];
@@ -83,6 +87,8 @@ namespace Enki
 		
 		struct ProximitySensorVariables
 		{
+			sint16 id;
+			sint16 source;
 			sint16 args[32];
 			sint16 bumpers[24];
 			sint16 ground[12];
@@ -91,6 +97,8 @@ namespace Enki
 		
 		struct DistanceSensorVariables
 		{
+			sint16 id;
+			sint16 source;
 			sint16 args[32];
 			sint16 distances[180];
 			sint16 user[44];
@@ -117,13 +125,13 @@ namespace Enki
 	public:
 		
 		//! Constructor, connect to a host and register VMs
-		AsebaMarxbot(const std::string &target = ASEBA_DEFAULT_TARGET);
+		AsebaMarxbot();
 		//! Destructor, unregister VMs
 		virtual ~AsebaMarxbot();
 		//! In addition to DifferentialWheeled::step(), update aseba variables and initiate periodic events.
 		virtual void step(double dt);
 		
-		virtual void incomingConnection(Dashel::Stream *stream);
+		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		

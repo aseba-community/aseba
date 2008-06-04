@@ -10,6 +10,7 @@ if (QT4_FOUND AND ENKI_FOUND)
 	set(enki_SRCS
 		AsebaMarxbot.cpp
 		EnkiMarxbot.cpp
+		AsebaMarxbot-vm-descriptions.c
 	)
 	
 	qt4_automoc(${enki_SRCS})
