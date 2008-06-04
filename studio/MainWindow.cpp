@@ -676,7 +676,7 @@ namespace Aseba
 		setupMenu();
 		setupConnections();
 		
-		// cosmetic dix-up
+		// cosmetic fix-up
 		setWindowTitle(tr("Aseba Studio"));
 		resize(1000,700);
 	}
@@ -1025,6 +1025,7 @@ namespace Aseba
 		}
 		
 		target->sendEvent(eventId, data);
+		userEvent(eventId, data);
 	}
 	
 	void MainWindow::sendEventIf(const QModelIndex &index)
