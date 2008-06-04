@@ -92,13 +92,71 @@ AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 	}
 };
 
+void AsebaNative_vecadd(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 src1 = vm->stack[1];
+	uint16 src2 = vm->stack[2];
+	
+	// variable size
+	uint16 length = vm->stack[3];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[src1++] + vm->variables[src2++];
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
+{
+	"vecadd",
+	"add two vectors",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_vecsub(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 src1 = vm->stack[1];
+	uint16 src2 = vm->stack[2];
+	
+	// variable size
+	uint16 length = vm->stack[3];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[src1++] - vm->variables[src2++];
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
+{
+	"vecsub",
+	"substract two vectors",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
 
 void AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 src1 = vm->stack[0];
-	uint16 src2 = vm->stack[1];
-	sint32 dest = vm->stack[2];
+	uint16 dest = vm->stack[0];
+	uint16 src1 = vm->stack[1];
+	uint16 src2 = vm->stack[2];
 	sint32 shift = vm->variables[vm->stack[3]];
 	
 	// variable size
@@ -118,11 +176,11 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
 	"vecdot",
-	"scalar product",
+	"scalar product between two vectors",
 	{
+		{ 1, "dest" },
 		{ -1, "src1" },
 		{ -1, "src2" },
-		{ 1, "dest" },
 		{ 1, "shift" },
 		{ 0, 0 }
 	}
@@ -167,7 +225,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
 	"vecstat",
-	"statistics",
+	"statistics on a vector",
 	{
 		{ -1, "src" },
 		{ 1, "min" },

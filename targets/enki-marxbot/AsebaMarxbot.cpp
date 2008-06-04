@@ -50,6 +50,8 @@ static AsebaNativeFunctionPointer nativeFunctions[] =
 {
 	AsebaNative_vecfill,
 	AsebaNative_veccopy,
+	AsebaNative_vecadd,
+	AsebaNative_vecsub,
 	AsebaNative_vecdot,
 	AsebaNative_vecstat
 };
@@ -58,6 +60,8 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 {
 	&AsebaNativeDescription_vecfill,
 	&AsebaNativeDescription_veccopy,
+	&AsebaNativeDescription_vecadd,
+	&AsebaNativeDescription_vecsub,
 	&AsebaNativeDescription_vecdot,
 	&AsebaNativeDescription_vecstat,
 	0
@@ -215,7 +219,7 @@ namespace Enki
 		int port = ASEBA_DEFAULT_PORT + marxbotNumber;
 		try
 		{
-			stream = Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+			Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
 		}
 		catch (Dashel::DashelException e)
 		{

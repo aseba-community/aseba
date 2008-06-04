@@ -105,7 +105,7 @@ namespace Aseba
 	//////
 	
 	NodeTab::NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
-		QWidget(parent),
+		QSplitter(parent),
 		id(id),
 		target(target)
 	{
@@ -245,10 +245,18 @@ namespace Aseba
 		panelLayout->addWidget(vmMemoryView, 3);
 		panelLayout->addWidget(toolBox, 1);
 		
-		QHBoxLayout *layout = new QHBoxLayout;
+		/*QHBoxLayout *layout = new QLayout;
 		layout->addLayout(panelLayout, 1);
 		layout->addLayout(editorLayout, 4);
-		setLayout(layout);
+		setLayout(layout);*/
+		QWidget *panelWidget = new QWidget;
+		panelWidget->setLayout(panelLayout);
+		addWidget(panelWidget);
+		QWidget *editorWidget = new QWidget;
+		editorWidget->setLayout(editorLayout);
+		addWidget(editorWidget);
+		setStretchFactor(0, 1);
+		setStretchFactor(1, 3);
 	}
 	
 	void NodeTab::setupConnections()
@@ -1475,8 +1483,7 @@ namespace Aseba
 		eventsDockLayout->addWidget(clearLogger);
 		
 		splitter->addWidget(eventsDockWidget);
-		
-		splitter->setSizes(QList<int>() << 800 << 150);
+		splitter->setSizes(QList<int>() << 600 << 150);
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);

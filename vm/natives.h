@@ -91,6 +91,16 @@ void AsebaNative_veccopy(AsebaVMState *vm);
 /*! Description of AsebaNative_veccopy */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
 
+/*! Function to add two vectors */
+void AsebaNative_vecadd(AsebaVMState *vm);
+/*! Description of AsebaNative_vecadd */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecadd;
+
+/*! Function to substract two vectors */
+void AsebaNative_vecsub(AsebaVMState *vm);
+/*! Description of AsebaNative_vecsub */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
+
 /*! Function to perform a dot product on a vector */
 void AsebaNative_vecdot(AsebaVMState *vm);
 /*! Description of AsebaNative_vecdot */

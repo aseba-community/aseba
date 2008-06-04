@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QItemSelection>
 #include <QTableView>
+#include <QSplitter>
 
 #include "CustomDelegate.h"
 
@@ -59,7 +60,7 @@ namespace Aseba
 		virtual void resizeEvent ( QResizeEvent * event );
 	};
 	
-	class NodeTab : public QWidget
+	class NodeTab : public QSplitter
 	{
 		Q_OBJECT
 		
