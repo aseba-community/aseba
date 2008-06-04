@@ -184,16 +184,19 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 		uint16 payloadSize = (amount-2)/2;
 		if (type < 0x8000)
 		{
-			// user message
-			// by convention. the source begin at variables, address 1
-			// then it's followed by the args
-			uint16 argPos = desc->variables[1].size;
-			uint16 argsSize = desc->variables[2].size;
-			uint16 i;
-			vm->variables[argPos++] = source;
-			for (i = 0; (i < argsSize) && (i < payloadSize); i++)
-				vm->variables[argPos + i] = payload[i];
-			AsebaVMSetupEvent(vm, type);
+			// user message, only process if we are not stepping inside an event
+			if (AsebaMaskIsClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+			{
+				// by convention. the source begin at variables, address 1
+				// then it's followed by the args
+				uint16 argPos = desc->variables[1].size;
+				uint16 argsSize = desc->variables[2].size;
+				uint16 i;
+				vm->variables[argPos++] = source;
+				for (i = 0; (i < argsSize) && (i < payloadSize); i++)
+					vm->variables[argPos + i] = payload[i];
+				AsebaVMSetupEvent(vm, type);
+			}
 		}
 		else
 		{
