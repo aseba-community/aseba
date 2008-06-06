@@ -44,9 +44,10 @@
 #include <string.h>
 
 #define ASEBA_ASSERT
-#include "vm.h"
-#include "consts.h"
-#include "natives.h"
+#include "vm/vm.h"
+#include "common/consts.h"
+#include "vm/natives.h"
+#include "transport/buffer/vm-buffer.h"
 
 #define vmBytecodeSize 1024
 #define vmVariablesSize (sizeof(struct EPuckVariables) / sizeof(sint16))
@@ -55,7 +56,6 @@
 
 
 unsigned int __attribute((far)) cam_data[60];
-
 
 
 // we receive the data as big endian and read them as little, so we have to acces the bit the right way
@@ -68,6 +68,20 @@ unsigned int __attribute((far)) cam_data[60];
 #define CLAMP(v, vmin, vmax) ((v) < (vmin) ? (vmin) : (v) > (vmax) ? (vmax) : (v))
 
 // data
+
+/*** In your code, put "SET_EVENT(EVENT_NUMBER)" when you want to trigger an 
+	 event. This macro is interrupt-safe, you can call it anywhere you want.
+***/
+#define SET_EVENT(event) do {events_flags |= 1 << event;} while(0)
+#define CLEAR_EVENT(event) do {events_flags &= ~(1 << event);} while(0)
+#define IS_EVENT(event) (events_flags & (1 << event))
+
+/* VM */
+
+/* The number of opcode an aseba script can have */
+#define VM_BYTECODE_SIZE 1024
+#define VM_STACK_SIZE 32
+
 struct EPuckVariables
 {
 	// NodeID
@@ -94,26 +108,165 @@ struct EPuckVariables
 	// free space
 	sint16 freeSpace[256];
 } __attribute__ ((far)) ePuckVariables;
-// physical bytecode isize is one word bigger than really used for byte code because this
-// buffer is also used to receive the data
-// the maximum packet size we have is the whole bytecode + the dest id
-uint16 vmBytecode[vmBytecodeSize+1];
-sint16 vmStack[vmStackSize];
-AsebaVMState vmState;
 
+char name[] = "e-puck0";
 
-#define nativeFunctionsCount 2
-static AsebaNativeFunctionPointer nativeFunctions[nativeFunctionsCount] =
-{
-	AsebaNative_vecdot,
-	AsebaNative_vecstat
+AsebaVMDescription vmDescription = {
+	name, 	// Name of the microcontroller
+	{
+		{ 1, "id" },	// Do not touch it
+		{ 1, "source" }, // nor this one
+		{ argsSize, "args" },	// neither this one
+		{1, "leftSpeed"},
+		{1, "rightSpeed"},
+	// leds
+		{8, "leds"},
+	// prox
+	    {8, "prox"},
+		{8, "ambiant"},
+	// acc
+		{3, "acc"},
+	// camera
+		{1, "camLine"},
+		{60, "camR"},
+		{60, "camG"},
+		{60, "camB"},
+		
+		{ 0, NULL }	// null terminated
+	}
 };
-static AsebaNativeFunctionDescription* nativeFunctionsDescriptions[nativeFunctionsCount] =
+
+static uint16 vmBytecode[VM_BYTECODE_SIZE];
+
+static sint16 vmStack[VM_STACK_SIZE];
+
+static AsebaVMState vmState = {
+	0x1,
+	
+	VM_BYTECODE_SIZE,
+	vmBytecode,
+	
+	sizeof(ePuckVariables) / sizeof(sint16),
+	(sint16*)&ePuckVariables,
+
+	VM_STACK_SIZE,
+	vmStack
+};
+
+const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
+	return &vmDescription;
+}	
+
+
+
+
+static unsigned int events_flags = 0;
+enum Events
+{
+	EVENT_IR_SENSORS = 0,
+	EVENT_CAMERA,
+	EVENTS_COUNT
+};
+
+static const AsebaLocalEventDescription localEvents[] = { 
+	{"ir_sensors", "New IR sensors values available"},
+	{"camera", "New camera picture available"},
+	{ NULL, NULL }
+};
+
+const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+{
+	return localEvents;
+}
+
+static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 	&AsebaNativeDescription_vecdot,
-	&AsebaNativeDescription_vecstat
+	&AsebaNativeDescription_vecstat,
+	&AsebaNativeDescription_vecfill,
+	&AsebaNativeDescription_veccopy,
+	&AsebaNativeDescription_vecadd,
+	&AsebaNativeDescription_vecsub,
+	0	// null terminated
 };
 
+static AsebaNativeFunctionPointer nativeFunctions[] = {
+	AsebaNative_vecdot,
+	AsebaNative_vecstat,
+	AsebaNative_vecfill,
+	AsebaNative_veccopy,
+	AsebaNative_vecadd,
+	AsebaNative_vecsub,
+};
+
+void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+{
+	nativeFunctions[id](vm);
+}
+
+const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescription;
+}	
+
+void uartSendUInt8(uint8 value)
+{
+	e_send_uart1_char((char *)&value, 1);
+	while (e_uart1_sending());
+}
+
+void uartSendUInt16(uint16 value)
+{
+	e_send_uart1_char((char *)&value, 2);
+	while (e_uart1_sending());
+}
+
+void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+{
+	uartSendUInt16(length - 2);
+	uartSendUInt16(vmState.nodeId);
+	uint16 i;
+	for (i = 0; i < length; i++)
+		uartSendUInt8(*data++);
+}	
+
+uint8 uartGetUInt8()
+{
+	char c;
+	while (!e_ischar_uart1());
+	e_getchar_uart1(&c);
+	return c;
+}
+
+uint16 uartGetUInt16()
+{
+	uint16 value;
+	// little endian
+	value = uartGetUInt8();
+	value |= (uartGetUInt8() << 8);
+	return value;
+}
+
+uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+{
+	BODY_LED = 1;
+	uint16 ret = 0;
+	if (e_ischar_uart1())
+	{
+		uint16 len = uartGetUInt16() + 2;
+		*source = uartGetUInt16();
+	
+		uint16 i;
+		for (i = 0; i < len; i++)
+			*data++ = uartGetUInt8();
+		ret = len;
+	}
+	BODY_LED = 0;
+	return ret;
+}	
+
+
+extern int e_ambient_and_reflected_ir[8];
 void updateRobotVariables()
 {
 	unsigned i;
@@ -132,19 +285,24 @@ void updateRobotVariables()
 		e_set_speed_right(rightSpeed);
 	}
 	
-	// leds and prox
-	for (i = 0; i < 8; i++)
-	{
-		e_set_led(i, ePuckVariables.leds[i]);
-		ePuckVariables.ambiant[i] = e_get_ambient_light(i);
-		ePuckVariables.prox[i] =  e_get_calibrated_prox(i);
+	
+	if(e_ambient_and_reflected_ir[7] != 0xFFFF) {
+		SET_EVENT(EVENT_IR_SENSORS); 
+		// leds and prox
+		for (i = 0; i < 8; i++)
+		{
+			e_set_led(i, ePuckVariables.leds[i]);
+			ePuckVariables.ambiant[i] = e_get_ambient_light(i);
+			ePuckVariables.prox[i] =  e_get_calibrated_prox(i);
+		}
+		e_ambient_and_reflected_ir[7] = 0xFFFF;
 	}
 	
 	for(i = 0; i < 3; i++)
 		ePuckVariables.acc[i] = e_get_acc(i);
 
 	// camera
-	if(e_po3030k_is_img_ready())
+	if(e_po3030k_is_img_ready())	
 	{
 		for(i = 0; i < 60; i++)
 		{
@@ -152,7 +310,8 @@ void updateRobotVariables()
 			ePuckVariables.camG[i] = CAM_GREEN(cam_data[i]);
 			ePuckVariables.camB[i] = CAM_BLUE(cam_data[i]);
 		}
-		if(camline != ePuckVariables.camLine) {
+		if(camline != ePuckVariables.camLine)
+		{
 			camline = ePuckVariables.camLine;
 			e_po3030k_config_cam(camline,0,4,480,4,8,RGB_565_MODE);
 			e_po3030k_set_ref_exposure(160);
@@ -161,6 +320,7 @@ void updateRobotVariables()
 			e_po3030k_write_cam_registers();
 		}
 		e_po3030k_launch_capture((char *)cam_data);
+		SET_EVENT(EVENT_CAMERA);
 	}
 }
 
@@ -196,206 +356,34 @@ void initRobot()
 	}
 }
 
+void AsebaWriteBytecode(AsebaVMState *vm) {
+	// TODO 
+}
+void AsebaResetIntoBootloader(AsebaVMState *vm) {
+	asm __volatile__ ("reset");
+}
+
 void initAseba()
 {
 	// VM
 	int selector = SELECTOR0 | (SELECTOR1 << 1) | (SELECTOR2 << 2);
-	vmState.bytecodeSize = vmBytecodeSize;
-	vmState.bytecode = vmBytecode;
-	vmState.variablesSize = vmVariablesSize;
-	vmState.variables = (sint16 *)&ePuckVariables;
-	vmState.stackSize = vmStackSize;
-	vmState.stack = vmStack;
-	AsebaVMInit(&vmState, selector + 1);
+	vmState.nodeId = selector + 1;
+	AsebaVMInit(&vmState);
 	ePuckVariables.id = selector + 1;
 	ePuckVariables.camLine = 640/2-4;
+	name[6] = '0' + selector;
 	e_led_clear();
 	e_set_led(selector,1);
 }
-
-int uartIsChar()
-{
-	return e_ischar_uart1();
-}
-
-uint8 uartGetUInt8()
-{
-	char c;
-	while (!e_ischar_uart1());
-	e_getchar_uart1(&c);
-	return c;
-}
-
-uint16 uartGetUInt16()
-{
-	uint16 value;
-	// little endian
-	value = uartGetUInt8();
-	value |= (uartGetUInt8() << 8);
-	return value;
-}
-
-void uartSendUInt8(uint8 value)
-{
-	e_send_uart1_char((char *)&value, 1);
-	while (e_uart1_sending());
-}
-
-void uartSendUInt16(uint16 value)
-{
-	e_send_uart1_char((char *)&value, 2);
-	while (e_uart1_sending());
-}
-
-
-void uartSendString(const char *s)
-{
-	unsigned len = strlen(s);
-	uartSendUInt8(len);
-	e_send_uart1_char(s, len);
-	while (e_uart1_sending());
-}
-
-void uartSendNativeFunction(const AsebaNativeFunctionDescription* description)
-{
-	unsigned int i;
-	uartSendString(description->name);
-	uartSendString(description->doc);
-	uartSendUInt16(description->argumentCount);
-	for (i = 0; i < description->argumentCount; i++)
-	{
-		uartSendUInt16(description->arguments[i].size);
-		uartSendString(description->arguments[i].name);
-	}
-}
-
-
-////
-
-void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size)
-{
-	uartSendUInt16(size);
-	uartSendUInt16(vm->nodeId);
-	uartSendUInt16(id);
-	unsigned i;
-	for (i = 0; i < size; i++)
-		uartSendUInt8(((unsigned char*)data)[i]);
-}
-
-void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
-{
-	uint16 i;
-	uartSendUInt16(length*2+2);
-	uartSendUInt16(vm->nodeId);
-	uartSendUInt16(ASEBA_MESSAGE_VARIABLES);
-	uartSendUInt16(start);
-	for (i = start; i < start + length; i++)
-		uartSendUInt16(vmState.variables[i]);
-}
-
-void AsebaSendDescription(AsebaVMState *vm)
-{
-	char name[] = "e-puck 0";
-	unsigned int i;
-	unsigned nativeFunctionSizes = 0;
-
-	for (i = 0; i < nativeFunctionsCount; i++)
-		nativeFunctionSizes += AsebaNativeFunctionGetDescriptionSize(nativeFunctionsDescriptions[i]);
-
-	uartSendUInt16(126+nativeFunctionSizes);
-	uartSendUInt16(vm->nodeId);
-	uartSendUInt16(ASEBA_MESSAGE_DESCRIPTION);
-	
-	name[7] += vm->nodeId;
-	uartSendString(name);				// 9
-	
-	uartSendUInt16(vmBytecodeSize);		// 2
-	uartSendUInt16(vmStackSize);		// 2
-	uartSendUInt16(vmVariablesSize);	// 2
-	
-	uartSendUInt16(13);					// 2
-
-	uartSendUInt16(1);					// 2
-	uartSendString("id");				// 3
-	uartSendUInt16(1);					// 2
-	uartSendString("source");			// 7
-	uartSendUInt16(argsSize);			// 2
-	uartSendString("args");				// 5
-	uartSendUInt16(1);					// 2
-	uartSendString("leftSpeed");		// 10
-	uartSendUInt16(1);					// 2
-	uartSendString("rightSpeed");		// 11
-	uartSendUInt16(8);					// 2
-	uartSendString("leds");				// 5
-	uartSendUInt16(8);					// 2
-	uartSendString("prox");				// 5
-	uartSendUInt16(8);					// 2
-	uartSendString("ambiant");			// 8
-	uartSendUInt16(3);					// 2 		
-	uartSendString("acc");				// 4
-	uartSendUInt16(1);					// 2
-	uartSendString("camLine");			// 8		
-	uartSendUInt16(60);					// 2
-	uartSendString("camR");				// 5
-	uartSendUInt16(60);					// 2
-	uartSendString("camG");				// 5
-	uartSendUInt16(60);					// 2
-	uartSendString("camB");				// 5
-	
-	uartSendUInt16(nativeFunctionsCount);	// 2
-
-	for (i = 0; i < nativeFunctionsCount; i++)
-		 uartSendNativeFunction(nativeFunctionsDescriptions[i]);
-}
-
-void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
-{
-	nativeFunctions[id](vm);
-}
-
-
-void AsebaDebugHandleCommands()
-{
-	BODY_LED = 1;
-	if (uartIsChar())
-	{
-		uint16 len = uartGetUInt16();
-		uint16 source = uartGetUInt16();
-		uint16 type = uartGetUInt16();
-		static uint8 recvDataBuffer[ASEBA_MAX_PACKET_SIZE]; // Want on the heap, 512 is too much on the stack
-		unsigned i = 0;
-		
-		for (i = 0; i < len; i++)
-			recvDataBuffer[i] = uartGetUInt8();
-		
-		ePuckVariables.source = source;
-		if (type < 0x8000)
-		{
-			// user message
-			for (i = 0; (i < argsSize) && (i < len / 2); i++)
-				ePuckVariables.args[i] = ((uint16*)recvDataBuffer)[i];
-			AsebaVMSetupEvent(&vmState, type);
-		}
-		else
-		{
-			
-			// debug message
-			AsebaVMDebugMessage(&vmState, type, (uint16*)recvDataBuffer, len / 2);
-		}
-	}
-	BODY_LED = 0;
-}
-
 
 int main()
 {	
 	int i;
 	initRobot();
-	
 
 	do {
 		initAseba();
-	} while(!uartIsChar());
+	} while(!e_ischar_uart1());
 
 	for (i = 0; i < 14; i++)
 	{
@@ -405,13 +393,22 @@ int main()
 	e_acc_calibr();
 	while (1)
 	{
+		AsebaProcessIncomingEvents(&vmState);		
 		updateRobotVariables();
-		AsebaDebugHandleCommands();
 		AsebaVMRun(&vmState, 1000);
-		if (!AsebaVMIsExecutingThread(&vmState))
+		
+		if (AsebaMaskIsClear(vmState.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vmState.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 		{
-			ePuckVariables.source = vmState.nodeId;
-			AsebaVMSetupEvent(&vmState, ASEBA_EVENT_PERIODIC);
+			unsigned i;
+			// Find first bit from right (LSB) 
+			asm ("ff1r %[word], %[b]" : [b] "=r" (i) : [word] "r" (events_flags) : "cc");
+			if(i)
+			{
+				i--;
+				CLEAR_EVENT(i);
+				ePuckVariables.source = vmState.nodeId;
+				AsebaVMSetupEvent(&vmState, ASEBA_EVENT_LOCAL_EVENTS_START - i);
+			}
 		}
 	}
 	
