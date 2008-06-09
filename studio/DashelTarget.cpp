@@ -495,10 +495,13 @@ namespace Aseba
 		Q_ASSERT(nodes.find(id) != nodes.end());
 		Node& node = nodes[id];
 		
-		// copy description into array
-		node.description.localEvents[node.localEventsReceptionCounter++] = *description;
-		
-		emitNodeConnectedIfDescriptionComplete(id, node);
+		// copy description into array if array is empty
+		if (node.localEventsReceptionCounter < node.description.localEvents.size())
+		{
+			node.description.localEvents[node.localEventsReceptionCounter++] = *description;
+			
+			emitNodeConnectedIfDescriptionComplete(id, node);
+		}
 	}
 	
 	void DashelTarget::receivedNativeFunctionDescription(Message *message)
@@ -511,9 +514,12 @@ namespace Aseba
 		Node& node = nodes[id];
 		
 		// copy description into array
-		node.description.nativeFunctions[node.nativeFunctionReceptionCounter++] = *description;
-		
-		emitNodeConnectedIfDescriptionComplete(id, node);
+		if (node.nativeFunctionReceptionCounter < node.description.nativeFunctions.size())
+		{
+			node.description.nativeFunctions[node.nativeFunctionReceptionCounter++] = *description;
+			
+			emitNodeConnectedIfDescriptionComplete(id, node);
+		}
 	}
 	
 	bool DashelTarget::emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node)
