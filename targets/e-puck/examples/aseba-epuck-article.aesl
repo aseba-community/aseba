@@ -1,22 +1,28 @@
+<!DOCTYPE aesl-source>
+<network>
+    <event size="1" name="bad" />
+    <event size="0" name="start" />
+    <event size="0" name="stop" />
+    <node name="e-puck5" >var run
 var badness[3] = 0, 0, 0
 var threshold[3] = 13,8,9
 var wasBad = 0
 var i
 camLine = 32
-ontimer
+onevent ir_sensors
 for i in 0:2 do
-	if badness[i] > 0 then
-		badness[i] = badness[i] - 1
-	end
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
 end
 var isAcc = 0
 var min var max var m
 call vecstat(acc, min, max, m)
 when min &lt; -1000 do
-	isAcc = 1
+        isAcc = 1
 end
 when max > 1000 do
-	isAcc = 1
+        isAcc = 1
 end
 var mean[3] = 0, 0, 0
 var meanOfMean = 0
@@ -26,33 +32,383 @@ call vecstat(camB[0:59], min, max, mean[2])
 call vecstat(mean, min, max, meanOfMean)
 var isBad = 0
 for i in 0:2 do
-	if mean[i] > meanOfMean + threshold[i] then
-		if isAcc == 1 then
-			emit bad i	
-		end
-		if badness[i] > 0 then
-			isBad = 1
-		end
-	end
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
 end
 if run == 1 then
-	if wasBad == 1 then
-		if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
-			leftSpeed = -400
-			rightSpeed = 400
-		else
-			wasBad = 0
-		end
-	else
-		if isBad == 0 then
-			leftSpeed = 1000 - prox[1]*4 - prox[0]*2
-			rightSpeed = 1000 - prox[6]*4 - prox[7]*2
-		else
-			leftSpeed = -400
-			rightSpeed = 400
-			wasBad = 1
-		end
-	end
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
 end
 onevent bad
 badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+    <node name="e-puck1" >var run
+var badness[3] = 0, 0, 0
+var threshold[3] = 13,8,9
+var wasBad = 0
+var i
+camLine = 32
+onevent ir_sensors
+for i in 0:2 do
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
+end
+var isAcc = 0
+var min var max var m
+call vecstat(acc, min, max, m)
+when min &lt; -1000 do
+        isAcc = 1
+end
+when max > 1000 do
+        isAcc = 1
+end
+var mean[3] = 0, 0, 0
+var meanOfMean = 0
+call vecstat(camR[0:59], min, max, mean[0])
+call vecstat(camG[0:59], min, max, mean[1])
+call vecstat(camB[0:59], min, max, mean[2])
+call vecstat(mean, min, max, meanOfMean)
+var isBad = 0
+for i in 0:2 do
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
+end
+if run == 1 then
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
+end
+onevent bad
+badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+    <node name="e-puck4" >var run
+var badness[3] = 0, 0, 0
+var threshold[3] = 13,8,9
+var wasBad = 0
+var i
+camLine = 32
+onevent ir_sensors
+for i in 0:2 do
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
+end
+var isAcc = 0
+var min var max var m
+call vecstat(acc, min, max, m)
+when min &lt; -1000 do
+        isAcc = 1
+end
+when max > 1000 do
+        isAcc = 1
+end
+var mean[3] = 0, 0, 0
+var meanOfMean = 0
+call vecstat(camR[0:59], min, max, mean[0])
+call vecstat(camG[0:59], min, max, mean[1])
+call vecstat(camB[0:59], min, max, mean[2])
+call vecstat(mean, min, max, meanOfMean)
+var isBad = 0
+for i in 0:2 do
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
+end
+if run == 1 then
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
+end
+onevent bad
+badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+    <node name="e-puck0" >var run
+var badness[3] = 0, 0, 0
+var threshold[3] = 13,8,9
+var wasBad = 0
+var i
+camLine = 32
+onevent ir_sensors
+for i in 0:2 do
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
+end
+var isAcc = 0
+var min var max var m
+call vecstat(acc, min, max, m)
+when min &lt; -1000 do
+        isAcc = 1
+end
+when max > 1000 do
+        isAcc = 1
+end
+var mean[3] = 0, 0, 0
+var meanOfMean = 0
+call vecstat(camR[0:59], min, max, mean[0])
+call vecstat(camG[0:59], min, max, mean[1])
+call vecstat(camB[0:59], min, max, mean[2])
+call vecstat(mean, min, max, meanOfMean)
+var isBad = 0
+for i in 0:2 do
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
+end
+if run == 1 then
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
+end
+onevent bad
+badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+    <node name="e-puck2" >var run
+var badness[3] = 0, 0, 0
+var threshold[3] = 13,8,9
+var wasBad = 0
+var i
+camLine = 32
+onevent ir_sensors
+for i in 0:2 do
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
+end
+var isAcc = 0
+var min var max var m
+call vecstat(acc, min, max, m)
+when min &lt; -1000 do
+        isAcc = 1
+end
+when max > 1000 do
+        isAcc = 1
+end
+var mean[3] = 0, 0, 0
+var meanOfMean = 0
+call vecstat(camR[0:59], min, max, mean[0])
+call vecstat(camG[0:59], min, max, mean[1])
+call vecstat(camB[0:59], min, max, mean[2])
+call vecstat(mean, min, max, meanOfMean)
+var isBad = 0
+for i in 0:2 do
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
+end
+if run == 1 then
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
+end
+onevent bad
+badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+    <node name="e-puck3" >var run
+var badness[3] = 0, 0, 0
+var threshold[3] = 13,8,9
+var wasBad = 0
+var i
+camLine = 32
+onevent ir_sensors
+for i in 0:2 do
+        if badness[i] > 0 then
+                badness[i] = badness[i] - 1
+        end
+end
+var isAcc = 0
+var min var max var m
+call vecstat(acc, min, max, m)
+when min &lt; -1000 do
+        isAcc = 1
+end
+when max > 1000 do
+        isAcc = 1
+end
+var mean[3] = 0, 0, 0
+var meanOfMean = 0
+call vecstat(camR[0:59], min, max, mean[0])
+call vecstat(camG[0:59], min, max, mean[1])
+call vecstat(camB[0:59], min, max, mean[2])
+call vecstat(mean, min, max, meanOfMean)
+var isBad = 0
+for i in 0:2 do
+        if mean[i] > meanOfMean + threshold[i] then
+                if isAcc == 1 then
+                        emit bad i
+                end
+                if badness[i] > 0 then
+                        isBad = 1
+                end
+        end
+end
+if run == 1 then
+        if wasBad == 1 then
+                if prox[1] + prox[6] + prox[0] + prox[7] > 300 then
+                        leftSpeed = -400
+                        rightSpeed = 400
+                else
+                        wasBad = 0
+                end
+        else
+                if isBad == 0 then
+                        leftSpeed = 1000 - prox[1]*4 - prox[0]*2
+                        rightSpeed = 1000 - prox[6]*4 - prox[7]*2
+                else
+                        leftSpeed = -400
+                        rightSpeed = 400
+                        wasBad = 1
+                end
+        end
+end
+onevent bad
+badness[args[0]] = 5000
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+leftSpeed = 0
+rightSpeed = 0
+</node>
+</network>
