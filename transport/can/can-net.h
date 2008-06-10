@@ -102,6 +102,10 @@ uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 */
 uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
 
+/*! Wait until the send queue is empty
+*/
+void AsebaCanFlushQueue(void);
+
 // to be implemented by the glue 
 
 /*! Busy wait until the can buffer has room. At worst, can be an empty function */

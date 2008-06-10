@@ -237,6 +237,12 @@ void AsebaCanFrameSent()
 		AsebaCanSendQueueToPhysicalLayer();
 }
 
+void AsebaCanFlushQueue(void)
+{
+	while(asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos || !asebaCan.isFrameRoomFP())
+		AsebaIdle();
+}
+
 uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 {
 	int stopPos = -1;
