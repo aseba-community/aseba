@@ -198,8 +198,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_EVENT_EXECUTION_KILLED] = &Aseba::DashelTarget::receivedEventExecutionKilled;
 		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
 		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
-		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] =
-		&Aseba::DashelTarget::receivedBreakpointSetResult;
+		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] = &Aseba::DashelTarget::receivedBreakpointSetResult;
 		
 		DashelConnectionDialog targetSelector;
 		while (true)
@@ -443,7 +442,7 @@ namespace Aseba
 					deleteMessage = false;
 				}
 				else
-					qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 16).arg(message->source);
+					qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 6).arg(message->source);
 			}
 			else
 			{
@@ -577,11 +576,12 @@ namespace Aseba
 		NodeSpecificError *nse = polymorphic_downcast<NodeSpecificError *>(message);
 		
 		int line = getLineFromPC(nse->source, nse->pc);
-		if (line >= 0)
-		{
+		// The NodeSpecificError can be triggered even if the pc is not valid
+//		if (line >= 0)
+//		{
 			emit nodeSpecificError(nse->source, line, QString::fromUtf8(nse->message.c_str()));
 			emit executionModeChanged(nse->source, EXECUTION_STOP);
-		}
+//		}
 	}
 	
 	void DashelTarget::receivedExecutionStateChanged(Message *message)
