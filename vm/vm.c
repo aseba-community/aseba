@@ -443,7 +443,11 @@ void AsebaVMStep(AsebaVMState *vm)
 void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
 {
 	uint16 msgLen = strlen(message);
+#ifdef __GNUC__
 	uint8 buffer[msgLen+3];
+#else
+	uint8 * buffer = alloca(msgLen+3);
+#endif
 	
 	vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 	
