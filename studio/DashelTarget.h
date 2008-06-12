@@ -30,6 +30,8 @@
 #include <QString>
 #include <QDialog>
 #include <QQueue>
+#include <QTimer>
+#include <QThread>
 #include <map>
 #include <dashel/dashel.h>
 
@@ -78,7 +80,30 @@ namespace Aseba
 	class Message;
 	class UserMessage;
 	
-	class DashelTarget: public Target, public Dashel::Hub
+	class DashelInterface: public QThread, public Dashel::Hub
+	{
+		Q_OBJECT
+		
+	public:
+		Dashel::Stream* stream;
+		
+	public:
+		DashelInterface();
+		
+	signals:
+		void messageAvailable(Message *message);
+		void dashelDisconnection();
+	
+	protected:
+		// from QThread
+		virtual void run();
+		
+		// from Dashel::Hub
+		virtual void incomingData(Dashel::Stream *stream);
+		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+	};
+	
+	class DashelTarget: public Target
 	{
 		Q_OBJECT
 		
@@ -101,12 +126,12 @@ namespace Aseba
 		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
 		typedef std::map<unsigned, Node> NodesMap;
 		
+		DashelInterface dashelInterface;
+		
 		QQueue<UserMessage *> userEventsQueue;
 		MessagesHandlersMap messagesHandlersMap;
 		NodesMap nodes;
-		Dashel::Stream* stream;
-		int netTimer;
-		bool quitting;
+		QTimer userEventsTimer;
 		
 	public:
 		DashelTarget();
@@ -133,12 +158,12 @@ namespace Aseba
 		virtual void setBreakpoint(unsigned node, unsigned line);
 		virtual void clearBreakpoint(unsigned node, unsigned line);
 		virtual void clearBreakpoints(unsigned node);
-		
-	protected:
-		virtual void timerEvent(QTimerEvent *event);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-		
+	
+	protected slots:
+		void updateUserEvents();
+		void messageFromDashel(Message *message);
+		void disconnectionFromDashel();
+	
 	protected:
 		void receivedDescription(Message *message);
 		void receivedLocalEventDescription(Message *message);

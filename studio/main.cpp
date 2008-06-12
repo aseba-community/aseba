@@ -21,6 +21,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <signal.h>
 #include <QApplication>
 #include <QTextCodec>
 #include <QTranslator>
@@ -35,6 +36,10 @@
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	
+	// override dashel signal handling
+	signal(SIGTERM, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
 	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name());

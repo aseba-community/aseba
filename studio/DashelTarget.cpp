@@ -173,33 +173,9 @@ namespace Aseba
 		connectButton->setEnabled(serial->selectionModel()->hasSelection() || (!serialGroupBox->isChecked()));
 	}
 	
-	enum InNextState
-	{
-		NOT_IN_NEXT,
-		WAITING_INITAL_PC,
-		WAITING_LINE_CHANGE
-	};
-	
-	DashelTarget::Node::Node()
-	{
-		executionMode = EXECUTION_UNKNOWN;
-	}
-	
-	DashelTarget::DashelTarget() :
+	DashelInterface::DashelInterface() :
 		stream(0)
 	{
-		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION] = &Aseba::DashelTarget::receivedLocalEventDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION] = &Aseba::DashelTarget::receivedNativeFunctionDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
-		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
-		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
-		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
-		messagesHandlersMap[ASEBA_MESSAGE_EVENT_EXECUTION_KILLED] = &Aseba::DashelTarget::receivedEventExecutionKilled;
-		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
-		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
-		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] = &Aseba::DashelTarget::receivedBreakpointSetResult;
-		
 		DashelConnectionDialog targetSelector;
 		while (true)
 		{
@@ -214,41 +190,72 @@ namespace Aseba
 			}
 			catch (DashelException e)
 			{
-				
 				// exception, try again
 			}
 		}
+	}
+	
+	// In QThread main function, we just make our Dashel hub switch listen for incoming data
+	void DashelInterface::run()
+	{
+		Dashel::Hub::run();
+	}
+	
+	enum InNextState
+	{
+		NOT_IN_NEXT,
+		WAITING_INITAL_PC,
+		WAITING_LINE_CHANGE
+	};
+	
+	DashelTarget::Node::Node()
+	{
+		executionMode = EXECUTION_UNKNOWN;
+	}
+	
+	DashelTarget::DashelTarget()
+	{
+		userEventsTimer.setSingleShot(true);
+		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));
+		// we connect the events from the stream listening thread to slots living in our gui thread
+		connect(&dashelInterface, SIGNAL(messageAvailable(Message *)), SLOT(messageFromDashel(Message *)), Qt::QueuedConnection);
+		connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
+		
+		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION] = &Aseba::DashelTarget::receivedLocalEventDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION] = &Aseba::DashelTarget::receivedNativeFunctionDescription;
+		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
+		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
+		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
+		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
+		messagesHandlersMap[ASEBA_MESSAGE_EVENT_EXECUTION_KILLED] = &Aseba::DashelTarget::receivedEventExecutionKilled;
+		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
+		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
+		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] = &Aseba::DashelTarget::receivedBreakpointSetResult;
 		
 		// Send presence query
-		GetDescription().serialize(stream);
-		stream->flush();
-		netTimer = startTimer(20);
-		quitting = false;
+		GetDescription().serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
+		dashelInterface.start();
 	}
 	
 	DashelTarget::~DashelTarget()
 	{
-		quitting = true;
-		killTimer(netTimer);
-		disconnect();
-		#ifdef WIN32
-		Sleep(200);
-		#else
-		usleep(200000);
-		#endif
-		step(0);
+		dashelInterface.stop();
+		dashelInterface.wait();
+		DashelTarget::disconnect();
 	}
-		
+	
 	void DashelTarget::disconnect()
 	{
 		// detach all nodes
 		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			//DetachDebugger(node->first).serialize(stream);
-			BreakpointClearAll(node->first).serialize(stream);
-			Run(node->first).serialize(stream);
-			stream->flush();
+			//DetachDebugger(node->first).serialize(dashelInterface.stream);
+			BreakpointClearAll(node->first).serialize(dashelInterface.stream);
+			Run(node->first).serialize(dashelInterface.stream);
 		}
+		dashelInterface.stream->flush();
 	}
 	
 	const TargetDescription * const DashelTarget::getConstDescription(unsigned node) const
@@ -275,7 +282,7 @@ namespace Aseba
 			SetBytecode setBytecodeMessage(node, bytecodeStart);
 			setBytecodeMessage.bytecode.resize(bytecodePayloadSize);
 			copy(bytecode.begin()+bytecodeStart, bytecode.begin()+bytecodeStart+bytecodePayloadSize, setBytecodeMessage.bytecode.begin());
-			setBytecodeMessage.serialize(stream);
+			setBytecodeMessage.serialize(dashelInterface.stream);
 			
 			bytecodeStart += bytecodePayloadSize;
 			bytecodeCount -= bytecodePayloadSize;
@@ -285,28 +292,28 @@ namespace Aseba
 			SetBytecode setBytecodeMessage(node, bytecodeStart);
 			setBytecodeMessage.bytecode.resize(bytecodeCount);
 			copy(bytecode.begin()+bytecodeStart, bytecode.end(), setBytecodeMessage.bytecode.begin());
-			setBytecodeMessage.serialize(stream);
+			setBytecodeMessage.serialize(dashelInterface.stream);
 		}
 		
-		stream->flush();
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::writeBytecode(unsigned node)
 	{
-		WriteBytecode(node).serialize(stream);
-		stream->flush();
+		WriteBytecode(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
-		UserMessage(id, data).serialize(stream);
-		stream->flush();
+		UserMessage(id, data).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
-		SetVariables(node, start, data).serialize(stream);
-		stream->flush();
+		SetVariables(node, start, data).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
@@ -314,18 +321,18 @@ namespace Aseba
 		unsigned variablesPayloadSize = (ASEBA_MAX_PACKET_SIZE - 4) / 2;
 		while (length > variablesPayloadSize)
 		{
-			GetVariables(node, start, variablesPayloadSize).serialize(stream);
+			GetVariables(node, start, variablesPayloadSize).serialize(dashelInterface.stream);
 			start += variablesPayloadSize;
 			length -= variablesPayloadSize;
 		}
-		GetVariables(node, start, length).serialize(stream);
-		stream->flush();
+		GetVariables(node, start, length).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::reset(unsigned node)
 	{
-		Reset(node).serialize(stream);
-		stream->flush();
+		Reset(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::run(unsigned node)
@@ -334,15 +341,15 @@ namespace Aseba
 		assert(nodeIt != nodes.end());
 		
 		if (nodeIt->second.executionMode == EXECUTION_STEP_BY_STEP)
-			Step(node).serialize(stream);
-		Run(node).serialize(stream);
-		stream->flush();
+			Step(node).serialize(dashelInterface.stream);
+		Run(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::pause(unsigned node)
 	{
-		Pause(node).serialize(stream);
-		stream->flush();
+		Pause(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::next(unsigned node)
@@ -355,14 +362,14 @@ namespace Aseba
 		GetExecutionState getExecutionStateMessage;
 		getExecutionStateMessage.dest = node;
 		
-		getExecutionStateMessage.serialize(stream);
-		stream->flush();
+		getExecutionStateMessage.serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::stop(unsigned node)
 	{
-		Stop(node).serialize(stream);
-		stream->flush();
+		Stop(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
 	void DashelTarget::setBreakpoint(unsigned node, unsigned line)
@@ -374,8 +381,8 @@ namespace Aseba
 			breakpointSetMessage.pc = pc;
 			breakpointSetMessage.dest = node;
 			
-			breakpointSetMessage.serialize(stream);
-			stream->flush();
+			breakpointSetMessage.serialize(dashelInterface.stream);
+			dashelInterface.stream->flush();
 		}
 	}
 	
@@ -388,8 +395,8 @@ namespace Aseba
 			breakpointClearMessage.pc = pc;
 			breakpointClearMessage.dest = node;
 			
-			breakpointClearMessage.serialize(stream);
-			stream->flush();
+			breakpointClearMessage.serialize(dashelInterface.stream);
+			dashelInterface.stream->flush();
 		}
 	}
 	
@@ -398,15 +405,12 @@ namespace Aseba
 		BreakpointClearAll breakpointClearAllMessage;
 		breakpointClearAllMessage.dest = node;
 		
-		breakpointClearAllMessage.serialize(stream);
-		stream->flush();
+		breakpointClearAllMessage.serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
 	}
 	
-	void DashelTarget::timerEvent(QTimerEvent *event)
+	void DashelTarget::updateUserEvents()
 	{
-		Q_UNUSED(event);
-		step(0);
-		
 		// send only 20 latest user events
 		if (userEventsQueue.size() > 20)
 			emit userEventsDropped(userEventsQueue.size() - 20);
@@ -423,40 +427,50 @@ namespace Aseba
 		}
 	}
 	
-	void DashelTarget::incomingData(Stream *stream)
+	void DashelInterface::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
+		emit messageAvailable(message);
+	}
+	
+	void DashelTarget::messageFromDashel(Message *message)
+	{
 		bool deleteMessage = true;
 		//message->dump(std::cout);
 		//std::cout << std::endl;
 		
-		if (!quitting)
+		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
+		if (messageHandler == messagesHandlersMap.end())
 		{
-			MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
-			if (messageHandler == messagesHandlersMap.end())
+			UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+			if (userMessage)
 			{
-				UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
-				if (userMessage)
-				{
-					userEventsQueue.enqueue(userMessage);
-					deleteMessage = false;
-				}
-				else
-					qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 6).arg(message->source);
+				userEventsQueue.enqueue(userMessage);
+				if (!userEventsTimer.isActive())
+					userEventsTimer.start(50);
+				deleteMessage = false;
 			}
 			else
-			{
-				(this->*(messageHandler->second))(message);
-			}
+				qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 6).arg(message->source);
+		}
+		else
+		{
+			(this->*(messageHandler->second))(message);
 		}
 		
 		if (deleteMessage)
 			delete message;
 	}
 	
-	void DashelTarget::connectionClosed(Stream* stream, bool abnormal)
+	void DashelInterface::connectionClosed(Stream* stream, bool abnormal)
 	{
 		Q_UNUSED(stream);
+		Q_UNUSED(abnormal);
+		emit dashelDisconnection();
+	}
+	
+	void DashelTarget::disconnectionFromDashel()
+	{
 		QMessageBox::critical(0, tr("Connection closed"), tr("Warning, connection closed, save your work and quit Studio."));
 		// temporary disabling this dynamism as aseba is still in development
 		//emit networkDisconnected();
@@ -613,8 +627,8 @@ namespace Aseba
 						node.lineInNext = line;
 						node.steppingInNext = WAITING_LINE_CHANGE;
 						
-						Step(ess->source).serialize(stream);
-						stream->flush();
+						Step(ess->source).serialize(dashelInterface.stream);
+						dashelInterface.stream->flush();
 					}
 					else if (node.steppingInNext == WAITING_LINE_CHANGE)
 					{
@@ -627,8 +641,8 @@ namespace Aseba
 						}
 						else
 						{
-							Step(ess->source).serialize(stream);
-							stream->flush();
+							Step(ess->source).serialize(dashelInterface.stream);
+							dashelInterface.stream->flush();
 						}
 					}
 					else
