@@ -59,6 +59,7 @@ namespace Aseba
 			case TOKEN_STR_if: return "if keyword";
 			case TOKEN_STR_then: return "then keyword";
 			case TOKEN_STR_else: return "else keyword";
+			case TOKEN_STR_elseif: return "elseif keyword";
 			case TOKEN_STR_end: return "end keyword";
 			case TOKEN_STR_var: return "var keyword";
 			case TOKEN_STR_call: return "call keyword";
@@ -282,6 +283,8 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_then, pos));
 						else if (s == "else")
 							tokens.push_back(Token(Token::TOKEN_STR_else, pos));
+						else if (s == "elseif")
+							tokens.push_back(Token(Token::TOKEN_STR_elseif, pos));
 						else if (s == "end")
 							tokens.push_back(Token(Token::TOKEN_STR_end, pos));
 						else if (s == "var")

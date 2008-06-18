@@ -209,6 +209,7 @@ namespace Aseba
 				TOKEN_STR_if,
 				TOKEN_STR_then,
 				TOKEN_STR_else,
+				TOKEN_STR_elseif,
 				TOKEN_STR_end,
 				TOKEN_STR_var,
 				TOKEN_STR_call,

@@ -43,7 +43,7 @@ namespace Aseba
 		QStringList keywordPatterns;
 		keywordPatterns << "\\bemit\\b" << "\\bwhile\\b" << "\\bdo\\b"
 						<< "\\bfor\\b" << "\\bin\\b" << "\\bstep\\b"
-						<< "\\bif\\b" << "\\bthen\\b" << "\\belse\\b"
+						<< "\\bif\\b" << "\\bthen\\b" << "\\belse\\b" << "\\belseif\\b"
 						<< "\\bend\\b" << "\\bvar\\b" << "\\bcall\\b"
 						<< "\\bonevent\\b" << "\\bontimer\\b" << "\\bwhen\\b"
 						<< "\\band\\b" << "\\bor\\b" << "\\bnot\\b" ;

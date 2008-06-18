@@ -339,7 +339,7 @@ namespace Aseba
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
-		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_end };
+		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_elseif, Token::TOKEN_STR_end };
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
@@ -363,7 +363,7 @@ namespace Aseba
 		while (!IS_ONE_OF(elseEndTypes))
 			ifNode->children[1]->children.push_back(parseBlockStatement());
 		
-		// parse false condition (only for if)
+		/*// parse false condition (only for if)
 		if (!edgeSensitive && (tokens.front() == Token::TOKEN_STR_else))
 		{
 			tokens.pop_front();
@@ -371,6 +371,25 @@ namespace Aseba
 			ifNode->children.push_back(new BlockNode(tokens.front().pos));
 			while (tokens.front() != Token::TOKEN_STR_end)
 				ifNode->children[2]->children.push_back(parseBlockStatement());
+		}*/
+		
+		// parse false condition (only for if)
+		if (!edgeSensitive)
+		{
+			if (tokens.front() == Token::TOKEN_STR_else)
+			{
+				tokens.pop_front();
+				
+				ifNode->children.push_back(new BlockNode(tokens.front().pos));
+				while (tokens.front() != Token::TOKEN_STR_end)
+					ifNode->children[2]->children.push_back(parseBlockStatement());
+			}
+			// if elseif, queue new if directly after and return before parsing trailing end
+			if (tokens.front() == Token::TOKEN_STR_elseif)
+			{
+				ifNode->children.push_back(parseIfWhen(false));
+				return ifNode.release();
+			}
 		}
 		
 		// end keyword
