@@ -71,11 +71,14 @@ namespace Aseba
 	
 	QVariant TargetVariablesModel::data(const QModelIndex &index, int role) const
 	{
-		if (role != Qt::DisplayRole)
-			return QVariant();
+		
+		
 			
 		if (index.parent().isValid())
 		{
+			if (role != Qt::DisplayRole)
+				return QVariant();
+			
 			if (index.column() == 0)
 				return index.row();
 			else
@@ -84,9 +87,21 @@ namespace Aseba
 		else
 		{
 			if (index.column() == 0)
+			{
+				if (role != Qt::DisplayRole)
+					return QVariant();
+			
 				return variables.at(index.row()).name;
+			}
 			else
-				return QString("(%0)").arg(variables.at(index.row()).value.size());
+			{
+				if (role == Qt::DisplayRole)
+					return QString("(%0)").arg(variables.at(index.row()).value.size());
+				else if (role == Qt::ForegroundRole)
+					return QApplication::palette().color(QPalette::Disabled, QPalette::Text);
+				else
+					return QVariant();
+			}
 		}
 	}
 	
