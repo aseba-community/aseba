@@ -555,6 +555,7 @@ namespace Enki
 	
 	ChallengeViewer::ChallengeViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
 	{
+		savingVideo = false;
 		initTexturesResources();
 		
 		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
@@ -662,6 +663,22 @@ namespace Enki
 		}
 		
 		ViewerWidget::mouseMoveEvent(event);
+	}
+	
+	void ChallengeViewer::keyPressEvent ( QKeyEvent * event )
+	{
+		if (event->key() == Qt::Key_V)
+			savingVideo = true;
+		else
+			ViewerWidget::keyPressEvent(event);
+	}
+	
+	void ChallengeViewer::keyReleaseEvent ( QKeyEvent * event )
+	{
+		if (event->key() == Qt::Key_V)
+			savingVideo = false;
+		else
+			ViewerWidget::keyReleaseEvent (event);
 	}
 	
 	void ChallengeViewer::drawQuad2D(double x, double y, double w, double ar)
@@ -843,6 +860,11 @@ namespace Enki
 		glVertex3d(-20,-20,0);
 		glEnd();
 		glPopMatrix();
+		
+		// save image
+		static int imageCounter = 0;
+		if (savingVideo)
+			grabFrameBuffer().save(QString("frame%0.bmp").arg(imageCounter++), "BMP");
 	}
 }
 

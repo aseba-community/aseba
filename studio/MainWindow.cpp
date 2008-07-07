@@ -118,7 +118,7 @@ namespace Aseba
 		compiler.setTargetDescription(target->getConstDescription(id));
 		compiler.setCommonDefinitions(commonDefinitions);
 		vmFunctionsModel = new TargetFunctionsModel(target->getConstDescription(id), 0);
-		vmMemoryModel = new TargetMemoryModel();
+		vmMemoryModel = new TargetVariablesModel();
 		
 		// create gui
 		setupWidgets();
@@ -191,17 +191,15 @@ namespace Aseba
 		memoryTitleLayout->addWidget(new QLabel(tr("<b>Memory</b>")));
 		memoryTitleLayout->addWidget(refreshMemoryButton);
 		
-		vmMemoryView = new FixedWidthTableView;
-		vmMemoryView->setShowGrid(false);
-		vmMemoryView->verticalHeader()->hide();
-		vmMemoryView->horizontalHeader()->hide();
+		vmMemoryView = new QTreeView;
+		//vmMemoryView->setShowGrid(false);
+		//vmMemoryView->verticalHeader()->hide();
+		vmMemoryView->header()->hide();
 		vmMemoryView->setModel(vmMemoryModel);
-		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-		vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
-		vmMemoryView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
-		vmMemoryView->setSecondColumnLongestContent("-888888##");
-		vmMemoryView->resizeRowsToContents();
-		
+		//vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+		//vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
+		vmMemoryView->setItemDelegate(new SpinBoxDelegate(-32768, 32767, this));
+		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-888888##"));
 		
 		// functions
 		vmFunctionsView = new QTableView;
@@ -337,10 +335,9 @@ namespace Aseba
 	
 	void NodeTab::insertVariableName(const QModelIndex &index)
 	{
-		if ((index.column() == 0) && (index.row() < variablesNames.size()))
-		{
-			editor->insertPlainText(QString::fromUtf8(variablesNames[index.row()].c_str()));
-		}
+		// only top level names have to be inserted
+		if (!index.parent().isValid() && (index.column() == 0))
+			editor->insertPlainText(index.data().toString());
 	}
 	
 	void NodeTab::editorContentChanged()
@@ -363,10 +360,10 @@ namespace Aseba
 		
 		// compile
 		std::istringstream is(editor->toPlainText().toStdString());
-		bool result = compiler.compile(is, bytecode, variablesNames, allocatedVariablesCount, error);
+		bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
 		if (result)
 		{
-			vmMemoryModel->setVariablesNames(variablesNames);
+			vmMemoryModel->updateVariablesStructure(compiler.getVariablesMap());
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			loadButton->setEnabled(true);
@@ -866,6 +863,8 @@ namespace Aseba
 		
 		QTextStream out(&file);
 		
+		/*
+		TODO: unbroke this
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
@@ -890,7 +889,7 @@ namespace Aseba
 					out << ", " << tab->vmMemoryModel->variablesData[j];
 				}
 			}
-		}
+		}*/
 	}
 	
 	void MainWindow::resetAll()
@@ -1111,7 +1110,7 @@ namespace Aseba
 			std::ostringstream compilationMessages;
 			BytecodeVector bytecode;
 			Error error;
-			bool result = tab->compiler.compile(is, bytecode, tab->variablesNames, tab->allocatedVariablesCount, error, &compilationMessages);
+			bool result = tab->compiler.compile(is, bytecode, tab->allocatedVariablesCount, error, &compilationMessages);
 			
 			if (result)
 				compilationMessageBox->text->setText(

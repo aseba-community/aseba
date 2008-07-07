@@ -44,6 +44,7 @@ namespace Enki
 		Q_OBJECT
 		
 	protected:
+		bool savingVideo;
 		int ePuckCount;
 		QPushButton* addRobotButton;
 		QPushButton* delRobotButton;
@@ -64,6 +65,8 @@ namespace Enki
 	protected:
 		virtual void timerEvent(QTimerEvent * event);
 		virtual void mouseMoveEvent ( QMouseEvent * event );
+		virtual void keyPressEvent ( QKeyEvent * event );
+		virtual void keyReleaseEvent ( QKeyEvent * event );
 		
 		void drawQuad2D(double x, double y, double w, double ar);
 		

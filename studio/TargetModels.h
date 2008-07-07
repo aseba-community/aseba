@@ -25,7 +25,9 @@
 #define TARGET_MODELS_H
 
 #include <QAbstractTableModel>
+#include <QAbstractItemModel>
 #include <QVector>
+#include <QList>
 #include <QString>
 #include "../compiler/compiler.h"
 
@@ -37,29 +39,37 @@ namespace Aseba
 	
 	class TargetDescription;
 	
-	class TargetVariablesModel: public QAbstractTableModel
+	class TargetVariablesModel: public QAbstractItemModel
 	{
 		Q_OBJECT
 	
 	public:
-		TargetVariablesModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent = 0);
-		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+		QModelIndex parent(const QModelIndex &index) const;
 		
 		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
-		
+	
 	public slots:
-		void addVariable();
-		void delVariable(int index);
-		
+		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
+		void setVariablesData(unsigned start, const VariablesDataVector &data);
+	
+	signals:
+		void variableValueChanged(unsigned index, int value);
+	
 	private:
-		const TargetDescription *descriptionRead; //!< description for read access
-		TargetDescription *descriptionWrite; //!< description for write access
+		struct Variable
+		{
+			QString name;
+			unsigned pos;
+			VariablesDataVector value;
+		};
+		QList<Variable> variables;
 	};
 	
 	class TargetFunctionsModel: public QAbstractTableModel
@@ -89,7 +99,7 @@ namespace Aseba
 		TargetDescription *descriptionWrite; //!< description for write access
 	};
 	
-	class TargetMemoryModel: public QAbstractTableModel
+	/*class TargetMemoryModel: public QAbstractTableModel
 	{
 		Q_OBJECT
 	
@@ -116,7 +126,7 @@ namespace Aseba
 		friend class MainWindow;
 		QVector<QString> variablesNames;
 		VariablesDataVector variablesData;
-	};
+	};*/
 	
 	/*@}*/
 }; // Aseba

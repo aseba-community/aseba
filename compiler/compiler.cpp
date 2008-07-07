@@ -69,6 +69,7 @@ namespace Aseba
 	void Compiler::setTargetDescription(const TargetDescription *description)
 	{
 		targetDescription = description;
+		buildMaps();
 	}
 	
 	//! Set the common definitions, such as events or some constants
@@ -80,11 +81,11 @@ namespace Aseba
 	//! Compile a new condition
 	//! \param source stream to read the source code from
 	//! \param bytecode destination array for bytecode
-	//! \param error error is copied there on error
+	//! \param allocatedVariablesCount amount of allocated variables
+	//! \param errorDescription error is copied there on error
 	//! \param dump stream to send dump messages to
-	//! \param verbose if true, produce full dump
 	//! \return returns true on success 
-	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
+	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
 	{
 		assert(targetDescription);
 		
@@ -156,17 +157,7 @@ namespace Aseba
 			*dump << "\n\n";
 		}
 		
-		// fill variables names vector
-		variablesNames.resize(targetDescription->variablesSize, "");
-		fill(variablesNames.begin(), variablesNames.end(), "");
-		for (VariablesMap::const_iterator it = variablesMap.begin(); it != variablesMap.end(); ++it)
-		{
-			unsigned pos = it->second.first;
-			unsigned size = it->second.second;
-			assert(pos + size <= variablesNames.size());
-			for (unsigned i = pos; i < pos + size; i++)
-				variablesNames[i] = it->first;
-		}
+		// set the number of allocated variables
 		allocatedVariablesCount = freeVariableIndex;
 		
 		// code generation

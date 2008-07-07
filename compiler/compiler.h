@@ -251,13 +251,19 @@ namespace Aseba
 			std::string toString() const;
 			operator Type () const { return type; }
 		};
+		
+		//! Lookup table for variables name => (pos, size))
+		typedef std::map<std::string, std::pair<unsigned, unsigned> > VariablesMap;
+		//! Lookup table for functions (name => id in target description)
+		typedef std::map<std::string, unsigned> FunctionsMap;
 	
 	public:
 		Compiler();
 		void setTargetDescription(const TargetDescription *description);
 		const TargetDescription *getTargetDescription() const { return targetDescription;}
+		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
-		bool compile(std::istream& source, BytecodeVector& bytecode, VariablesNamesVector &variablesNames, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
+		bool compile(std::istream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
 	protected:
 		void internalCompilerError() const;
@@ -306,12 +312,6 @@ namespace Aseba
 		Node* parseFunctionCall();
 		
 		void parseReadVarArrayAccess(unsigned* addr, unsigned* size);
-	
-	protected:
-		//! Lookup table for variables name => (pos, size))
-		typedef std::map<std::string, std::pair<unsigned, unsigned> > VariablesMap;
-		//! Lookup table for functions (name => id in target description)
-		typedef std::map<std::string, unsigned> FunctionsMap;
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens

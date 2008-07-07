@@ -3,7 +3,7 @@
     <node name="e-puck" >leftSpeed = 100
 rightSpeed = 100
 
-ontimer
+onevent timer
 
 var maxBlueVal = 0
 var maxBluePos = 0

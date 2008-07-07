@@ -23,6 +23,7 @@ class QTabWidget;
 class QTextEdit;
 class QListWidget;
 class QListWidgetItem;
+class QTreeView;
 
 namespace Aseba
 {
@@ -137,8 +138,8 @@ namespace Aseba
 		QPushButton *nextButton;
 		QPushButton *refreshMemoryButton;
 		
-		TargetMemoryModel *vmMemoryModel;
-		FixedWidthTableView *vmMemoryView;
+		TargetVariablesModel *vmMemoryModel;
+		QTreeView *vmMemoryView;
 		
 		TargetFunctionsModel *vmFunctionsModel;
 		QTableView *vmFunctionsView;
