@@ -134,7 +134,6 @@ namespace Aseba
 	
 	NodeTab::~NodeTab()
 	{
-		compiler.setTargetDescription(0);
 		delete vmFunctionsModel;
 		delete vmMemoryModel;
 	}
