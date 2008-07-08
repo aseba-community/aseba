@@ -4,7 +4,10 @@ if (QT4_FOUND)
 	include(${QT_USE_FILE})
 	
 	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)
-	find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
+	find_library(QWT_LIBRARIES qwt /usr/lib /usr/local/lib)
+	if (NOT QWT_LIBRARIES)
+		find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
+	endif (NOT QWT_LIBRARIES)
 	
 	if (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
 	
@@ -28,7 +31,7 @@ if (QT4_FOUND)
 	
 	else (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
 	
-		message(FATAL_ERROR "Cannot find Qwt")
+		message("Cannot find Qwt")
 		
 	endif (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
 	
