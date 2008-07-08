@@ -42,7 +42,7 @@ namespace Aseba
 	class TargetVariablesModel: public QAbstractItemModel
 	{
 		Q_OBJECT
-	
+		
 	public:
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;

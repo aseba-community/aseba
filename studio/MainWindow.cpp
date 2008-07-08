@@ -193,7 +193,7 @@ namespace Aseba
 		vmMemoryView = new QTreeView;
 		//vmMemoryView->setShowGrid(false);
 		//vmMemoryView->verticalHeader()->hide();
-		vmMemoryView->header()->hide();
+		//vmMemoryView->header()->hide();
 		vmMemoryView->setModel(vmMemoryModel);
 		//vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		//vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);

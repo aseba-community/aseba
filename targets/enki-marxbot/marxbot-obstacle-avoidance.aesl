@@ -1,7 +1,9 @@
 <!DOCTYPE aesl-source>
 <network>
-    <event name="ObstacleDetected" />
-    <event name="FreeOfObstacle" />
+    <event size="2" name="ObstacleDetected" />
+    <event size="0" name="FreeOfObstacle" />
+    <constant value="5" name="tcrt1000_threshold" />
+    <constant value="4" name="tcnd5000_threshold" />
     <node name="left motor" >speed = 300
 
 onevent ObstacleDetected
@@ -26,14 +28,14 @@ var vectorX[24] = -254, -241, -212, -168, -113,  -50, 17, 82, 142, 192, 229, 250
 var vectorY[24] = -17, -82, -142, -192, -229, -250, -254, -241, -212, -168, -113, -50, 17, 82  , 142, 192, 229, 250, 254, 241, 212, 168, 113, 50
 var threshold = 80
 
-ontimer
+onevent timer
 
 var eventBuffer[2]
 
 var activation
-call vecdot(bumpers, vectorX, eventBuffer[0], 11)
-call vecdot(bumpers, vectorY, eventBuffer[1], 11)
-call vecdot(eventBuffer, eventBuffer, activation, 0)
+call vecdot(eventBuffer[0], bumpers, vectorX, 11)
+call vecdot(eventBuffer[1], bumpers, vectorY, 11)
+call vecdot(activation, eventBuffer, eventBuffer, 0)
 
 if activation > threshold then
 	emit ObstacleDetected eventBuffer

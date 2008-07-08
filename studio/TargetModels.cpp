@@ -71,9 +71,6 @@ namespace Aseba
 	
 	QVariant TargetVariablesModel::data(const QModelIndex &index, int role) const
 	{
-		
-		
-			
 		if (index.parent().isValid())
 		{
 			if (role != Qt::DisplayRole)
