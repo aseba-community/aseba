@@ -36,7 +36,7 @@ namespace Aseba
 	{
 		if (parent.isValid())
 		{
-			if (parent.parent().isValid())
+			if (parent.parent().isValid() || (variables.at(parent.row()).value.size() == 1))
 				return 0;
 			else
 				return variables.at(parent.row()).value.size();
@@ -93,9 +93,19 @@ namespace Aseba
 			else
 			{
 				if (role == Qt::DisplayRole)
-					return QString("(%0)").arg(variables.at(index.row()).value.size());
+				{
+					if (variables.at(index.row()).value.size() == 1)
+						return variables.at(index.row()).value[0];
+					else
+						return QString("(%0)").arg(variables.at(index.row()).value.size());
+				}
 				else if (role == Qt::ForegroundRole)
-					return QApplication::palette().color(QPalette::Disabled, QPalette::Text);
+				{
+					if (variables.at(index.row()).value.size() == 1)
+						return QVariant();
+					else
+						return QApplication::palette().color(QPalette::Disabled, QPalette::Text);
+				}
 				else
 					return QVariant();
 			}
@@ -115,9 +125,16 @@ namespace Aseba
 		if (!index.isValid())
 			return 0;
 		
-		if (index.parent().isValid() && (index.column() == 1))
-			return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-		else if (index.column() == 0)
+		if (index.column() == 1)
+		{
+			if (index.parent().isValid())
+				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+			else if (variables.at(index.row()).value.size() == 1)
+				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+			else
+				return 0;
+		}
+		else
 			return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	}
 	
@@ -134,6 +151,18 @@ namespace Aseba
 				
 				variables[index.parent().row()].value[index.row()] = variableValue;
 				emit variableValueChanged(variables[index.parent().row()].pos + index.row(), variableValue);
+				
+				return true;
+			}
+			else if (variables.at(index.row()).value.size() == 1)
+			{
+				int variableValue;
+				bool ok;
+				variableValue = value.toInt(&ok);
+				Q_ASSERT(ok);
+				
+				variables[index.row()].value[0] = variableValue;
+				emit variableValueChanged(variables[index.row()].pos, variableValue);
 				
 				return true;
 			}

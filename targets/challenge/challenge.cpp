@@ -383,7 +383,7 @@ namespace Enki
 					epuck->energy += dEnergy;
 					energy -= dEnergy;
 					if (energy < EPUCK_FEEDER_THRESHOLD_HIDE)
-						owner->color = EPUCK_FEEDER_COLOR_INACTIVE;
+						owner->setColor(EPUCK_FEEDER_COLOR_INACTIVE);
 				}
 			}
 		}
@@ -394,7 +394,7 @@ namespace Enki
 			if (alive)
 			{
 				if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy+dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
-					owner->color = EPUCK_FEEDER_COLOR_ACTIVE;
+					owner->setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 				energy += EPUCK_FEEDER_RECHARGE_RATE * dt;
 				if (energy > EPUCK_FEEDER_MAX_ENERGY)
 					energy = EPUCK_FEEDER_MAX_ENERGY;
@@ -403,8 +403,8 @@ namespace Enki
 				{
 					alive = false;
 					age = 0;
-					owner->color = EPUCK_FEEDER_COLOR_DEAD;
-					owner->r = EPUCK_FEEDER_RADIUS_DEAD;
+					owner->setColor(EPUCK_FEEDER_COLOR_DEAD);
+					owner->setCylindric(EPUCK_FEEDER_RADIUS_DEAD, owner->_height());
 				}
 			}
 			else
@@ -413,8 +413,8 @@ namespace Enki
 				{
 					alive = true;
 					age = 0;
-					owner->color = EPUCK_FEEDER_COLOR_ACTIVE;
-					owner->r = EPUCK_FEEDER_RADIUS;
+					owner->setColor(EPUCK_FEEDER_COLOR_ACTIVE);
+					owner->setCylindric(EPUCK_FEEDER_RADIUS, owner->_height());
 				}
 			}
 		}
@@ -433,6 +433,8 @@ namespace Enki
 			mass = -1;
 			addLocalInteraction(&feeding);
 			color = EPUCK_FEEDER_COLOR_ACTIVE;
+			
+			commitPhysicalParameters();
 		}
 	};
 	
@@ -495,7 +497,7 @@ namespace Enki
 			glCallList(lists[0]);
 			
 			// ring
-			glColor3d(0.6+object->color.components[0]-0.3*object->color.components[1]-0.3*object->color.components[2], 0.6+object->color.components[1]-0.3*object->color.components[0]-0.3*object->color.components[2], 0.6+object->color.components[2]-0.3*object->color.components[0]-0.3*object->color.components[1]);
+			glColor3d(0.6+object->_color().components[0]-0.3*object->_color().components[1]-0.3*object->_color().components[2], 0.6+object->_color().components[1]-0.3*object->_color().components[0]-0.3*object->_color().components[2], 0.6+object->_color().components[2]-0.3*object->_color().components[0]-0.3*object->_color().components[1]);
 			glCallList(lists[5]);
 			
 			// food
