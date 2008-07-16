@@ -604,9 +604,6 @@ namespace Aseba
 		ResetIntoBootloader(uint16 dest) : CmdMessage(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER, dest) { }
 		
 	protected:
-		virtual void serializeSpecific() { }
-		virtual void deserializeSpecific() { }
-		virtual void dumpSpecific(std::ostream &stream) { }
 		virtual operator const char * () const { return "reset into bootloader"; }
 	};
 	/*@}*/
