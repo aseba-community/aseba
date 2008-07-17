@@ -100,7 +100,7 @@ namespace Aseba
 		customGroupBox->setCheckable(true);
 		customGroupBox->setChecked(false);
 		QHBoxLayout* customLayout = new QHBoxLayout();
-		custom = new QLineEdit(ASEBA_DEFAULT_TARGET);
+		custom = new QLineEdit(QSettings("EPFL-LSRO-Mobots", "Aseba Studio").value("custom target", ASEBA_DEFAULT_TARGET).toString());
 		customLayout->addWidget(custom);
 		customGroupBox->setLayout(customLayout);
 		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
@@ -133,6 +133,7 @@ namespace Aseba
 		}
 		else if (customGroupBox->isChecked())
 		{
+			QSettings("EPFL-LSRO-Mobots", "Aseba Studio").setValue("custom target", custom->text());
 			return custom->text().toStdString();
 		}
 		else
