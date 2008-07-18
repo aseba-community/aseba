@@ -110,6 +110,9 @@ namespace Aseba
 		//! Save the bytecode currently on target
 		virtual void writeBytecode(unsigned node) = 0;
 		
+		//! Reboot (restart the whole microcontroller, not just reset the aseba VM)
+		virtual void reboot(unsigned node) = 0;
+		
 		//! Send an event to the aseba network.
 		virtual void sendEvent(unsigned id, const VariablesDataVector &data) = 0;
 		

@@ -143,6 +143,7 @@ namespace Aseba
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
 		virtual void writeBytecode(unsigned node);
+		virtual void reboot(unsigned node);
 		
 		virtual void sendEvent(unsigned id, const VariablesDataVector &data);
 		

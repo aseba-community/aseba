@@ -79,7 +79,7 @@ namespace Aseba
 			registerMessageType<GetVariables>(ASEBA_MESSAGE_GET_VARIABLES);
 			registerMessageType<SetVariables>(ASEBA_MESSAGE_SET_VARIABLES);
 			registerMessageType<WriteBytecode>(ASEBA_MESSAGE_WRITE_BYTECODE);
-			registerMessageType<ResetIntoBootloader>(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER);
+			registerMessageType<Reboot>(ASEBA_MESSAGE_REBOOT);
 		}
 		
 		//! Register a message type by storing a pointer to its constructor

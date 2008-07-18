@@ -305,6 +305,12 @@ namespace Aseba
 		dashelInterface.stream->flush();
 	}
 	
+	void DashelTarget::reboot(unsigned node)
+	{
+		Reboot(node).serialize(dashelInterface.stream);
+		dashelInterface.stream->flush();
+	}
+	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
 		UserMessage(id, data).serialize(dashelInterface.stream);

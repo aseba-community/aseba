@@ -90,12 +90,14 @@ namespace Aseba
 		void refreshMemoryClicked();
 		
 		void writeBytecode();
+		void reboot();
 		
 		void setVariableValue(unsigned, int);
 		void insertVariableName(const QModelIndex &);
 		
 		void editorContentChanged();
 		void recompile();
+		void markTargetUnsynced();
 		
 		void cursorMoved();
 		void goToError();
@@ -266,6 +268,8 @@ namespace Aseba
 		// tools
 		QMenu *writeBytecodeMenu;
 		QAction *writeAllBytecodesAct;
+		QMenu *rebootMenu;
+		// TODO: continue there
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;

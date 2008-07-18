@@ -735,7 +735,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		AsebaWriteBytecode(vm);
 		break;
 		
-		case ASEBA_MESSAGE_RESET_INTO_BOOTLOADER:
+		case ASEBA_MESSAGE_REBOOT:
 		AsebaResetIntoBootloader(vm);
 		break;
 		

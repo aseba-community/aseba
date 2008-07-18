@@ -326,6 +326,12 @@ namespace Aseba
 		}
 	}
 	
+	void NodeTab::reboot()
+	{
+		markTargetUnsynced();
+		target->reboot(id);
+	}
+	
 	void NodeTab::setVariableValue(unsigned index, int value)
 	{
 		VariablesDataVector data(1, value);
@@ -395,18 +401,25 @@ namespace Aseba
 		if (editor->debugging)
 		{
 			//target->stop(id);
-			// when code is changed, remove breakpoints from target but keep them locally as pending for next code load
+			markTargetUnsynced();
 			doRehighlight = true;
-			editor->debugging = false;
-			resetButton->setEnabled(false);
-			runInterruptButton->setEnabled(false);
-			nextButton->setEnabled(false);
-			target->clearBreakpoints(id);
-			switchEditorProperty("breakpoint", "breakpointPending");
+			
 		}
 		
 		if (doRehighlight)
 			rehighlight();
+	}
+	
+	//! When code is changed or target is rebooted, remove breakpoints from target but keep them locally as pending for next code load
+	void NodeTab::markTargetUnsynced()
+	{
+		editor->debugging = false;
+		resetButton->setEnabled(false);
+		runInterruptButton->setEnabled(false);
+		nextButton->setEnabled(false);
+		target->clearBreakpoints(id);
+		switchEditorProperty("breakpoint", "breakpointPending");
+		executionModeLabel->setText(tr("unknown"));
 	}
 	
 	void NodeTab::cursorMoved()
@@ -1571,6 +1584,7 @@ namespace Aseba
 	void MainWindow::regenerateToolsMenus()
 	{
 		writeBytecodeMenu->clear();
+		rebootMenu->clear();
 		
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -1580,6 +1594,8 @@ namespace Aseba
 			QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
 			
 			connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
+			
+			rebootMenu->addAction(tr("... %0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
 		}
 		
 		writeBytecodeMenu->addSeparator();
@@ -1692,6 +1708,8 @@ namespace Aseba
 		menuBar()->addMenu(toolMenu);
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
 		toolMenu->addMenu(writeBytecodeMenu);
+		rebootMenu = new QMenu(tr("Reboot..."));
+		toolMenu->addMenu(rebootMenu);
 		regenerateToolsMenus();
 		
 		// Help menu

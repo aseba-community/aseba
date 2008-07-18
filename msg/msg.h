@@ -596,15 +596,15 @@ namespace Aseba
 		virtual operator const char * () const { return "save bytecode"; }
 	};
 	
-	//! Reset a node into its bootloader, if present; otherwise do nothing
-	class ResetIntoBootloader : public CmdMessage
+	//! Reboot a node, useful to go into its bootloader, if present
+	class Reboot : public CmdMessage
 	{
 	public:
-		ResetIntoBootloader() : CmdMessage(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER, ASEBA_DEST_INVALID) { }
-		ResetIntoBootloader(uint16 dest) : CmdMessage(ASEBA_MESSAGE_RESET_INTO_BOOTLOADER, dest) { }
+		Reboot() : CmdMessage(ASEBA_MESSAGE_REBOOT, ASEBA_DEST_INVALID) { }
+		Reboot(uint16 dest) : CmdMessage(ASEBA_MESSAGE_REBOOT, dest) { }
 		
 	protected:
-		virtual operator const char * () const { return "reset into bootloader"; }
+		virtual operator const char * () const { return "reboot"; }
 	};
 	/*@}*/
 }
