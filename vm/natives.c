@@ -54,7 +54,7 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 {
-	"vecfill",
+	"vec.fill",
 	"fill vector with constant",
 	{
 		{ -1, "dest" },
@@ -83,7 +83,7 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 {
-	"veccopy",
+	"vec.copy",
 	"copy vector content",
 	{
 		{ -1, "dest" },
@@ -111,7 +111,7 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 {
-	"vecadd",
+	"vec.add",
 	"add two vectors",
 	{
 		{ -1, "dest" },
@@ -140,7 +140,7 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 {
-	"vecsub",
+	"vec.sub",
 	"substract two vectors",
 	{
 		{ -1, "dest" },
@@ -149,6 +149,73 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 		{ 0, 0 }
 	}
 };
+
+
+void AsebaNative_vecmin(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 src1 = vm->stack[1];
+	uint16 src2 = vm->stack[2];
+	
+	// variable size
+	uint16 length = vm->stack[3];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 v1 = vm->variables[src1++];
+		sint16 v2 = vm->variables[src2++];
+		sint16 res = v1 < v2 ? v1 : v2;
+		vm->variables[dest++] = res;
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
+{
+	"vec.min",
+	"element by element minimum",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
+
+void AsebaNative_vecmax(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = vm->stack[0];
+	uint16 src1 = vm->stack[1];
+	uint16 src2 = vm->stack[2];
+	
+	// variable size
+	uint16 length = vm->stack[3];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 v1 = vm->variables[src1++];
+		sint16 v2 = vm->variables[src2++];
+		sint16 res = v1 > v2 ? v1 : v2;
+		vm->variables[dest++] = res;
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
+{
+	"vec.max",
+	"element by element maximum",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
 
 
 void AsebaNative_vecdot(AsebaVMState *vm)
@@ -175,7 +242,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
-	"vecdot",
+	"vec.dot",
 	"scalar product between two vectors",
 	{
 		{ 1, "dest" },
@@ -224,7 +291,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
-	"vecstat",
+	"vec.stat",
 	"statistics on a vector",
 	{
 		{ -1, "src" },

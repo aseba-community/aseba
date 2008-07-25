@@ -101,6 +101,16 @@ void AsebaNative_vecsub(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsub */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
 
+/*! Function to take the element by element minimum */
+void AsebaNative_vecmin(AsebaVMState *vm);
+/*! Description of AsebaNative_vecmin */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmin;
+
+/*! Function to take the element by element maximum */
+void AsebaNative_vecmax(AsebaVMState *vm);
+/*! Description of AsebaNative_vecsmax */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmax;
+
 /*! Function to perform a dot product on a vector */
 void AsebaNative_vecdot(AsebaVMState *vm);
 /*! Description of AsebaNative_vecdot */
