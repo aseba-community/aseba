@@ -121,6 +121,16 @@ void AsebaNative_vecstat(AsebaVMState *vm);
 /*! Description of AsebaNative_vecstat */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecstat;
 
+/*! Function to perform dest = (a*b)/c in 32 bits */
+void AsebaNative_mathmuldiv(AsebaVMState *vm);
+/*! Description of AsebaNative_mathmuldiv */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv;
+
+/*! Function to perform atan2 */
+void AsebaNative_mathatan2(AsebaVMState *vm);
+/*! Description of AsebaNative_mathatan2 */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2;
+
 /*@}*/
 
 #ifdef __cplusplus

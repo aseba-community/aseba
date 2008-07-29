@@ -1,5 +1,5 @@
-aseba (0.9-svn105) UNRELEASED; urgency=low
+aseba (0.9-svn189) UNRELEASED; urgency=low
 
-  * Initial debian release.
+  * Current debian release.
 
  -- Stephane Magnenat <stephane@nospam.magnenat.net>  Mon, 14 Apr 2008 20:34:24 +0200
