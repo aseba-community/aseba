@@ -12,7 +12,8 @@ if (QT4_FOUND)
 		DashelTarget.cpp
 		CustomDelegate.cpp
 		main.cpp
-		Target.cpp)
+		Target.cpp
+		VariablesViewPlugin.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	

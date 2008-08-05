@@ -38,12 +38,15 @@ namespace Aseba
 	/*@{*/
 	
 	class TargetDescription;
+	class VariablesViewPlugin;
 	
 	class TargetVariablesModel: public QAbstractItemModel
 	{
 		Q_OBJECT
 		
 	public:
+		virtual ~TargetVariablesModel();
+		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
 		QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -54,15 +57,28 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
-	
+		
 	public slots:
 		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
 		void setVariablesData(unsigned start, const VariablesDataVector &data);
 	
 	signals:
+		//! Emitted on setData, when the user change the data, not when nodes have sent updated variables
 		void variableValueChanged(unsigned index, int value);
-	
+
 	private:
+		friend class VariablesViewPlugin;
+		// VariablesViewPlugin API 
+		
+		//! Unsubscribe the plugin from any variables it is listening to
+		void unsubscribeViewPlugin(VariablesViewPlugin* plugin);
+		//! Subscribe to a variable of interest, return true if variable exists, false otherwise
+		bool subscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name);
+		//! Unsubscribe to a variable of interest
+		void unsubscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name);
+		
+	private:
+		// variables
 		struct Variable
 		{
 			QString name;
@@ -70,6 +86,10 @@ namespace Aseba
 			VariablesDataVector value;
 		};
 		QList<Variable> variables;
+		
+		// VariablesViewPlugin API 
+		typedef QMap<VariablesViewPlugin*, QStringList> ViewPlugInToVariablesNameMap;
+		ViewPlugInToVariablesNameMap viewPluginsMap;
 	};
 	
 	class TargetFunctionsModel: public QAbstractTableModel
@@ -98,35 +118,6 @@ namespace Aseba
 		const TargetDescription *descriptionRead; //!< description for read access
 		TargetDescription *descriptionWrite; //!< description for write access
 	};
-	
-	/*class TargetMemoryModel: public QAbstractTableModel
-	{
-		Q_OBJECT
-	
-	public:
-		TargetMemoryModel(QObject *parent = 0);
-		
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
-		
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
-		
-		bool setData(const QModelIndex &index, const QVariant &value, int role);
-	
-	public slots:
-		void setVariablesNames(const VariablesNamesVector &names);
-		void setVariablesData(unsigned start, const VariablesDataVector &data);
-	
-	signals:
-		void variableValueChanged(unsigned index, int value);
-		
-	private:
-		friend class MainWindow;
-		QVector<QString> variablesNames;
-		VariablesDataVector variablesData;
-	};*/
 	
 	/*@}*/
 }; // Aseba

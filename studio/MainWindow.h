@@ -36,7 +36,6 @@ namespace Aseba
 	class NamedValuesVectorModel;
 	class AeslEditor;
 	class AeslHighlighter;
-	class CompilationLogDialog;
 	
 	class CompilationLogDialog: public QDialog
 	{

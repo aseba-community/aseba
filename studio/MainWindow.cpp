@@ -57,8 +57,8 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	 CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
-	 	QDialog(parent)
+	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
+		QDialog(parent)
 	{
 		QFont font;
 		font.setFamily("");

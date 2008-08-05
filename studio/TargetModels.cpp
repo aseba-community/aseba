@@ -22,6 +22,7 @@
 */
 
 #include "TargetModels.h"
+#include "VariablesViewPlugin.h"
 #include <QtDebug>
 #include <QtGui>
 
@@ -31,6 +32,15 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
+	
+	TargetVariablesModel::~TargetVariablesModel()
+	{
+		for (ViewPlugInToVariablesNameMap::iterator it = viewPluginsMap.begin(); it != viewPluginsMap.end(); ++it)
+		{
+			it.key()->invalidateVariableModel();
+			it.key()->deleteLater();
+		}
+	}
 	
 	int TargetVariablesModel::rowCount(const QModelIndex &parent) const
 	{
@@ -223,12 +233,45 @@ namespace Aseba
 			// if nothing to copy, continue
 			if (copyLen <= 0)
 				continue;
+			
 			// copy
 			copy(data.begin() + copyStart, data.begin() + copyStart + copyLen, var.value.begin() + varStart);
 			// and notify gui
 			QModelIndex parentIndex = index(i, 0);
 			emit dataChanged(index(varStart, 0, parentIndex), index(varStart + copyLen, 0, parentIndex));
+			
+			// and notify view plugins
+			for (ViewPlugInToVariablesNameMap::iterator it = viewPluginsMap.begin(); it != viewPluginsMap.end(); ++it)
+			{
+				QStringList &list = it.value();
+				for (int v = 0; v < list.size(); v++)
+				{
+					if (list[v] == var.name)
+						it.key()->variableValueUpdated(var.name, var.value);
+				}
+			}
 		}
+	}
+	
+	void TargetVariablesModel::unsubscribeViewPlugin(VariablesViewPlugin* plugin)
+	{
+		viewPluginsMap.remove(plugin);
+	}
+	
+	bool TargetVariablesModel::subscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name)
+	{
+		QStringList &list = viewPluginsMap[plugin];
+		list.push_back(name);
+		for (int i = 0; i < variables.size(); i++)
+			if (variables[i].name == name)
+				return true;
+		return false;
+	}
+	
+	void TargetVariablesModel::unsubscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name)
+	{
+		QStringList &list = viewPluginsMap[plugin];
+		list.removeAll(name);
 	}
 	
 	
@@ -363,121 +406,6 @@ namespace Aseba
 		
 		endRemoveRows();
 	}
-	
-	
-// 	TargetMemoryModel::TargetMemoryModel(QObject *parent) :
-// 		QAbstractTableModel(parent)
-// 	{
-// 		
-// 	}
-// 	
-// 	int TargetMemoryModel::rowCount(const QModelIndex & /* parent */) const
-// 	{
-// 		return variablesData.size();
-// 	}
-// 	
-// 	int TargetMemoryModel::columnCount(const QModelIndex & /* parent */) const
-// 	{
-// 		return 2;
-// 	}
-// 	
-// 	QVariant TargetMemoryModel::data(const QModelIndex &index, int role) const
-// 	{
-// 		Q_ASSERT(variablesNames.size() == variablesData.size());
-// 		if (!index.isValid() || role != Qt::DisplayRole)
-// 			return QVariant();
-// 		switch (index.column())
-// 		{
-// 			case 0: return variablesNames[index.row()];
-// 			case 1: return variablesData[index.row()];
-// 			default: return QVariant();
-// 		}
-// 	}
-// 	
-// 	QVariant TargetMemoryModel::headerData(int section, Qt::Orientation orientation, int role) const
-// 	{
-// 		Q_UNUSED(section)
-// 		Q_UNUSED(orientation)
-// 		Q_UNUSED(role)
-// 		return QVariant();
-// 	}
-// 	
-// 	Qt::ItemFlags TargetMemoryModel::flags(const QModelIndex & index) const
-// 	{
-// 		switch (index.column())
-// 		{
-// 			case 0: return 0;
-// 			case 1: return Qt::ItemIsEnabled | Qt::ItemIsEditable;
-// 			default: return 0;
-// 		}
-// 	}
-// 	
-// 	bool TargetMemoryModel::setData(const QModelIndex &index, const QVariant &value, int role)
-// 	{
-// 		if (index.isValid() && role == Qt::EditRole)
-// 		{
-// 			if (index.column() == 1)
-// 			{
-// 				int variableValue;
-// 				bool ok;
-// 				variableValue = value.toInt(&ok);
-// 				Q_ASSERT(ok);
-// 				
-// 				variablesData[index.row()] = variableValue;
-// 				emit variableValueChanged(index.row(), variableValue);
-// 				
-// 				return true;
-// 			}
-// 		}
-// 		return false;
-// 	}
-// 	
-// 	void TargetMemoryModel::setVariablesNames(const VariablesNamesVector &names)
-// 	{
-// 		variablesNames.resize(names.size());
-// 		
-// 		QString name;
-// 		unsigned counter = 0;
-// 		for (size_t i = 0; i < names.size(); i++)
-// 		{
-// 			QString newName = QString::fromUtf8(names[i].c_str());
-// 			bool singleVariable = false;
-// 			if (newName != name)
-// 			{
-// 				name = newName;
-// 				if ((i+1 < names.size()) && (QString::fromUtf8(names[i+1].c_str()) != newName))
-// 					singleVariable = true;
-// 				counter = 0;
-// 			}
-// 			else
-// 				counter++;
-// 			if (!name.isEmpty())
-// 			{
-// 				if (singleVariable)
-// 					variablesNames[i] = name;
-// 				else
-// 					variablesNames[i] = QString("%0[%1]").arg(name).arg(counter);
-// 			}
-// 			else
-// 			{
-// 				variablesNames[i] = "";
-// 			}
-// 		}
-// 		
-// 		variablesData.resize(variablesNames.size());
-// 		reset();
-// 	}
-// 	
-// 	void TargetMemoryModel::setVariablesData(unsigned start, const VariablesDataVector &data)
-// 	{
-// 		Q_ASSERT(start + data.size() <= variablesData.size());
-// 		
-// 		if (data.size() > 0)
-// 		{
-// 			copy(data.begin(), data.end(), variablesData.begin() + start);
-// 			emit dataChanged(index(start, 1), index(start + data.size() - 1, 1));
-// 		}
-// 	}
 	
 	/*@}*/
 }; // Aseba
