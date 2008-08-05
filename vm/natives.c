@@ -35,15 +35,30 @@
 
 // useful math functions used by below
 
-// table is 20 bins (one for each bit of value) of 8 values each
-static const sint16 aseba_atan_table[20*8+1] = { 651,732,813,894,974,1055,1136,1216,1297,1457,1616,1775,1933,2090,2246,2401,2555,2859,3159,3453,3742,4024,4301,4572,4836,5344,5826,6282,6711,7116,7497,7855,8192,8804,9346,9825,10250,10630,10969,11273,11547,12021,12415,12746,13028,13270,13481,13665,13828,14103,14325,14508,14661,14791,14903,15001,15086,15229,15344,15438,15516,15583,15640,15689,15732,15805,15862,15910,15949,15983,16011,16036,16058,16094,16123,16146,16166,16183,16197,16210,16221,16239,16253,16265,16275,16283,16290,16297,16302,16311,16318,16324,16329,16333,16337,16340,16343,16347,16351,16354,16356,16358,16360,16362,16363,16365,16367,16369,16370,16371,16372,16373,16373,16374,16375,16376,16377,16377,16378,16378,16378,16379,16379,16380,16380,16380,16381,16381,16381,16381,16381,16382,16382,16382,16382,16382,16382,16382,16382,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16383,16384 };
+// table is 20 bins (one for each bit of value) of 8 values each + one for infinity
+static const sint16 aseba_atan_table[20*8+1] = { 652, 735, 816, 896, 977, 1058, 1139, 1218, 1300, 1459, 1620, 1777, 1935, 2093, 2250, 2403, 2556, 2868, 3164, 3458, 3748, 4029, 4307, 4578, 4839, 5359, 5836, 6290, 6720, 7126, 7507, 7861, 8203, 8825, 9357, 9839, 10260, 10640, 10976, 11281, 11557, 12037, 12425, 12755, 13036, 13277, 13486, 13671, 13837, 14112, 14331, 14514, 14666, 14796, 14907, 15003, 15091, 15235, 15348, 15441, 15519, 15585, 15642, 15691, 15736, 15808, 15865, 15912, 15951, 15984, 16013, 16037, 16060, 16096, 16125, 16148, 16168, 16184, 16199, 16211, 16222, 16240, 16255, 16266, 16276, 16284, 16292, 16298, 16303, 16312, 16320, 16325, 16331, 16334, 16338, 16341, 16344, 16348, 16352, 16355, 16357, 16360, 16361, 16363, 16364, 16366, 16369, 16369, 16371, 16372, 16373, 16373, 16375, 16375, 16377, 16376, 16378, 16378, 16378, 16379, 16379, 16380, 16380, 16380, 16382, 16381, 16381, 16381, 16382, 16382, 16382, 16382, 16382, 16382, 16384, 16383, 16383, 16383, 16383, 16383, 16383, 16383, 16383, 16383, 16383, 16383, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384, 16384 };
+/* Generation code:
+for (int i = 0; i < 20; i++)
+{
+	double d = pow(2, (double)(i - 4));
+	double dd = d / 8;
+	for (int j = 0; j < 8; j++)
+	{
+		double v = atan(d + dd * j);
+		aseba_atan_table[i*8+j] = (int)(((32768.*v) /  (M_PI))+0.5);
+	}
+	aseba_atan_table[20*8] = 16384
+}
++ optimisation
+*/
+
 
 // atan2, do y/x and return an "aseba" angle that spans the whole 16 bits range
 sint16 aseba_atan2(sint16 y, sint16 x)
 {
 	if (y == 0)
 	{
-		if (x >= 0)	// we return 0 on devision by zero
+		if (x >= 0)	// we return 0 on division by zero
 			return 0;
 		else if (x < 0)
 			return -32768;
@@ -93,6 +108,63 @@ sint16 aseba_atan2(sint16 y, sint16 x)
 		return res;
 	else
 		return -res;
+}
+
+// 2 << 7 entries + 1, from 0 to 16384, being from 0 to PI
+static const sint16 aseba_sin_table[128+1] = {0, 403, 804, 1207, 1608, 2010, 2411, 2812, 3212, 3612, 4011, 4411, 4808, 5206, 5603, 5998, 6393, 6787, 7180, 7572, 7962, 8352, 8740, 9127, 9513, 9896, 10279, 10660, 11040, 11417, 11794, 12167, 12540, 12911, 13279, 13646, 14010, 14373, 14733, 15091, 15447, 15801, 16151, 16500, 16846, 17190, 17531, 17869, 18205, 18538, 18868, 19196, 19520, 19842, 20160, 20476, 20788, 21097, 21403, 21706, 22006, 22302, 22595, 22884, 23171, 23453, 23732, 24008, 24279, 24548, 24812, 25073, 25330, 25583, 25833, 26078, 26320, 26557, 26791, 27020, 27246, 27467, 27684, 27897, 28106, 28311, 28511, 28707, 28899, 29086, 29269, 29448, 29622, 29792, 29957, 30117, 30274, 30425, 30572, 30715, 30852, 30985, 31114, 31238, 31357, 31471, 31581, 31686, 31786, 31881, 31972, 32057, 32138, 32215, 32285, 32352, 32413, 32470, 32521, 32569, 32610, 32647, 32679, 32706, 32728, 32746, 32758, 32766, 32767, };
+/* Generation code:
+int i;
+for (i = 0; i <= 128; i++)
+{
+	sinTable[i] = (sint16)(32767. * sin( ((M_PI/2.)*(double)i)/128.) + 0.5);
+}
++ optimisation
+*/
+
+
+// do the sinus of an "aseba" angle that spans the whole 16 bits range, and return a 1.15 fixed point value
+sint16 aseba_sin(sint16 angle)
+{
+	sint16 index;
+	sint16 subIndex;
+	sint16 invert;
+	sint16 lookupAngle;
+	if (angle < 0)
+	{
+		if (angle < -16384)
+			lookupAngle = 32768 + angle;
+		else if (angle > -16384)
+			lookupAngle = -angle;
+		else
+			return -32767;
+		invert = 1;
+	}
+	else
+	{
+		if (angle > 16384)
+			lookupAngle = 32767 - angle + 1;
+		else if (angle < 16484)
+			lookupAngle = angle;
+		else
+			return 32767;
+		invert = 0;
+	}
+	
+	index = lookupAngle >> 7;
+	subIndex = lookupAngle & 0x7f;
+	
+	sint16 result = (sint16)(((sint32)aseba_sin_table[index] * (sint32)(128-subIndex) + (sint32)aseba_sin_table[index+1] * (sint32)(subIndex)) >> 7);
+	
+	if (invert)
+		return -result;
+	else
+		return result;
+}
+
+// do the cos of an "aseba" angle that spans the whole 16 bits range, and return a 1.15 fixed point value
+sint16 aseba_cos(sint16 angle)
+{
+	return aseba_sin(16384 + angle);
 }
 
 // standard natives functions
@@ -366,9 +438,9 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 
 void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
-	uint16 a = vm->variables[vm->stack[1]];
-	uint16 b = vm->variables[vm->stack[2]];
-	uint16 c = vm->variables[vm->stack[3]];
+	sint16 a = vm->variables[vm->stack[1]];
+	sint16 b = vm->variables[vm->stack[2]];
+	sint16 c = vm->variables[vm->stack[3]];
 	
 	vm->variables[vm->stack[0]] = (sint16)(((sint32)a * (sint32)b) / (sint32)c);
 }
@@ -388,8 +460,8 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 
 void AsebaNative_mathatan2(AsebaVMState *vm)
 {
-	uint16 y = vm->variables[vm->stack[1]];
-	uint16 x = vm->variables[vm->stack[2]];
+	sint16 y = vm->variables[vm->stack[1]];
+	sint16 x = vm->variables[vm->stack[2]];
 	
 	vm->variables[vm->stack[0]] = aseba_atan2(y, x);
 }
@@ -406,5 +478,68 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 	}
 };
 
+void AsebaNative_mathsin(AsebaVMState *vm)
+{
+	sint16 x = vm->variables[vm->stack[1]];
+	
+	vm->variables[vm->stack[0]] = aseba_sin(x);
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
+{
+	"math.sin",
+	"performs sin(x)",
+	{
+		{ 1, "dest" },
+		{ 1, "x" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_mathcos(AsebaVMState *vm)
+{
+	sint16 x = vm->variables[vm->stack[1]];
+	
+	vm->variables[vm->stack[0]] = aseba_cos(x);
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
+{
+	"math.cos",
+	"performs cos(x)",
+	{
+		{ 1, "dest" },
+		{ 1, "x" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_mathrot2(AsebaVMState *vm)
+{
+	sint16 x = vm->variables[vm->stack[1]];
+	sint16 y = vm->variables[vm->stack[1]+1];
+	sint16 a = vm->variables[vm->stack[2]];
+	
+	sint16 cos_a = aseba_cos(a);
+	sint16 sin_a = aseba_sin(a);
+	
+	sint16 xp = (sint16)(((sint32)cos_a * (sint32)x + (sint32)sin_a * (sint32)y) >> (sint32)15);
+	sint16 yp = (sint16)(((sint32)cos_a * (sint32)y - (sint32)sin_a * (sint32)x) >> (sint32)15);
+	
+	vm->variables[vm->stack[0]] = xp;
+	vm->variables[vm->stack[0+1]] = yp;
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
+{
+	"math.rot2",
+	"rotates v of a",
+	{
+		{ 2, "dest" },
+		{ 2, "v" },
+		{ 1, "a" },
+		{ 0, 0 }
+	}
+};
 
 /*@}*/

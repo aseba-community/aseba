@@ -24,7 +24,7 @@
 #include "AsebaMarxbot.h"
 #include "../../common/consts.h"
 #include "../../vm/natives.h"
-#include <../../transport/buffer/vm-buffer.h>
+#include "../../transport/buffer/vm-buffer.h"
 #include <set>
 #include <map>
 #include <cassert>

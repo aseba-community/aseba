@@ -243,7 +243,7 @@ namespace Aseba
 					s += c;
 					int nextC = source.peek();
 					int posIncrement = 0;
-					while ((nextC != EOF) && (std::isalnum(nextC) || (nextC == '_')))
+					while ((nextC != EOF) && (std::isalnum(nextC) || (nextC == '_') || (nextC == '.')))
 					{
 						s += nextC;
 						source.get();

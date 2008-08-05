@@ -131,6 +131,17 @@ void AsebaNative_mathatan2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathatan2 */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2;
 
+/*! Function to perform sin */
+void AsebaNative_mathsin(AsebaVMState *vm);
+/*! Description of AsebaNative_mathsin */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathsin;
+
+/*! Function to perform cos */
+void AsebaNative_mathcos(AsebaVMState *vm);
+/*! Description of AsebaNative_mathcos */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathcos;
+
+
 /*@}*/
 
 #ifdef __cplusplus
