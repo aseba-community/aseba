@@ -108,6 +108,14 @@ namespace Aseba
 		);
 	}
 	
+	//! Constructor
+	UnaryArithmeticNode::UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child) :
+		Node(sourcePos),
+		op(op)
+	{
+		children.push_back(child);
+	}
+	
 	//! Recursively apply de Morgan law as long as node are logic operations, and then invert comparisons
 	void BinaryArithmeticNode::deMorganNotRemoval()
 	{

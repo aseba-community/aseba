@@ -939,6 +939,7 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	switch (reason)
 	{
 		case ASEBA_ASSERT_UNKNOWN: std::cerr << "undefined"; break;
+		case ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR: std::cerr << "unknown unary operator"; break;
 		case ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR: std::cerr << "unknown binary operator"; break;
 		case ASEBA_ASSERT_UNKNOWN_BYTECODE: std::cerr << "unknown bytecode"; break;
 		case ASEBA_ASSERT_STACK_OVERFLOW: std::cerr << "stack overflow"; break;

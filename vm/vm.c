@@ -302,14 +302,27 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Unary Arithmetic
 		case ASEBA_BYTECODE_UNARY_ARITHMETIC:
 		{
+			sint16 value;
+			
 			// check sp
 			#ifdef ASEBA_ASSERT
 			if (vm->sp < 0)
 				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
-			// Only unary negation is supported for now
-			vm->stack[vm->sp] = -vm->stack[vm->sp];
+			// do operation
+			value = vm->stack[vm->sp];
+			switch (bytecode & ASEBA_UNARY_OPERATOR_MASK)
+			{
+				case ASEBA_UNARY_OP_SUB: value = -value; break;
+				case ASEBA_UNARY_OP_ABS: value = value >= 0 ? value : -value; break;
+				
+				default:
+				#ifdef ASEBA_ASSERT
+				AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR);
+				#endif
+			};
+			vm->stack[vm->sp] = value;
 			
 			// increment PC
 			vm->pc ++;

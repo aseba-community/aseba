@@ -239,6 +239,7 @@ namespace Aseba
 				TOKEN_OP_MULT,
 				TOKEN_OP_DIV,
 				TOKEN_OP_MOD,
+				TOKEN_OP_ABS
 				
 			} type; //!< type of this token
 			std::string sValue; //!< string version of the value

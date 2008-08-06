@@ -89,6 +89,7 @@ namespace Aseba
 			case TOKEN_OP_MULT: return "* (time)";
 			case TOKEN_OP_DIV: return "/ (divide)";
 			case TOKEN_OP_MOD: return "modulo";
+			case TOKEN_OP_ABS: return "abs";
 			default: return "unknown";
 		}
 	}
@@ -145,6 +146,7 @@ namespace Aseba
 				case '*': tokens.push_back(Token(Token::TOKEN_OP_MULT, pos)); break;
 				case '/': tokens.push_back(Token(Token::TOKEN_OP_DIV, pos)); break;
 				case '%': tokens.push_back(Token(Token::TOKEN_OP_MOD, pos)); break;
+				case '|': tokens.push_back(Token(Token::TOKEN_OP_ABS, pos)); break;
 				
 				// special case for comment
 				case '#':

@@ -237,7 +237,7 @@ namespace Aseba
 	void UnaryArithmeticNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		children[0]->emit(bytecodes);
-		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_UNARY_ARITHMETIC);
+		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_UNARY_ARITHMETIC) | op;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	

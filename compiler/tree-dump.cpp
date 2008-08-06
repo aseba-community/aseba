@@ -49,10 +49,21 @@ namespace Aseba
 			case ASEBA_OP_SMALLER_THAN: return "<";
 			case ASEBA_OP_SMALLER_EQUAL_THAN: return "<=";
 			
-			case ASEBA_OP_OR: return "or"; break;
-			case ASEBA_OP_AND: return "and"; break;
+			case ASEBA_OP_OR: return "or";
+			case ASEBA_OP_AND: return "and";
 			
 			default: return "? (binary operator)";
+		}
+	}
+	
+	std::string unaryOperatorToString(AsebaUnaryOperator op)
+	{
+		switch (op)
+		{
+			case ASEBA_UNARY_OP_SUB: return "unary -";
+			case ASEBA_UNARY_OP_ABS: return "abs";
+			
+			default: return "? (unary operator)";
 		}
 	}
 	
@@ -121,6 +132,13 @@ namespace Aseba
 	{
 		std::string s = "BinaryArithmetic: ";
 		s += binaryOperatorToString(op);
+		return s;
+	}
+	
+	std::string UnaryArithmeticNode::toString() const
+	{
+		std::string s = "UnaryArithmetic: ";
+		s += unaryOperatorToString(op);
 		return s;
 	}
 	

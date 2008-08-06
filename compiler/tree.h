@@ -40,6 +40,9 @@ namespace Aseba
 	//! Return the string corresponding to the binary operator
 	std::string binaryOperatorToString(AsebaBinaryOperator op);
 	
+	//! Return the string corresponding to the unary operator
+	std::string unaryOperatorToString(AsebaUnaryOperator op);
+	
 	//! An abstract node of syntax tree
 	struct Node
 	{
@@ -201,16 +204,19 @@ namespace Aseba
 		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 	};
 	
-	//! Node for unary arithmetic, only minus for now.
+	//! Node for unary arithmetic
 	//! children[0] is the expression to negate
 	struct UnaryArithmeticNode : Node
 	{
+		AsebaUnaryOperator op; //!< operator
+		
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
 		
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const { return "UnaryArithmetic: -"; }
+		virtual std::string toString() const;
 	};
 	
 	//! Node for pushing immediate value on stack.

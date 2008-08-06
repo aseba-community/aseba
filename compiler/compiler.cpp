@@ -304,7 +304,8 @@ namespace Aseba
 				break;
 				
 				case ASEBA_BYTECODE_UNARY_ARITHMETIC:
-				dump << "UNARY_ARITHMETIC -\n";
+				dump << "UNARY_ARITHMETIC ";
+				dump << unaryOperatorToString((AsebaUnaryOperator)(bytecode[pc] & ASEBA_UNARY_OPERATOR_MASK)) << "\n";
 				pc++;
 				break;
 				

@@ -91,6 +91,16 @@ typedef enum
 /*! Mask of available binary operators */
 #define ASEBA_BINARY_OPERATOR_MASK 0xf
 
+/*!  List of unary operators */
+typedef enum
+{
+	ASEBA_UNARY_OP_SUB = 0x0,
+	ASEBA_UNARY_OP_ABS,
+} AsebaUnaryOperator;
+
+/*! Mask of available unary operators */
+#define ASEBA_UNARY_OPERATOR_MASK 0xf
+
 /*! Bit inside if opcode that indicates it is a when condition */
 #define ASEBA_IF_IS_WHEN_BIT 4
 /*! Bit inside if opcode that indicates that the last evaluation was true */

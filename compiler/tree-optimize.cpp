@@ -311,13 +311,26 @@ namespace Aseba
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		if (immediateChild)
 		{
-			int value = -immediateChild->value;
+			int result;
 			SourcePos pos = sourcePos;
+			
+			switch (op)
+			{
+				case ASEBA_UNARY_OP_SUB: result = -immediateChild->value; break;
+				case ASEBA_UNARY_OP_ABS: 
+					if (immediateChild->value == -32768)
+						throw Error(sourcePos, "-32768 has no positive correspondance in 16 bits integers.");
+					else
+						result = abs(immediateChild->value);
+				break;
+				
+				default: assert(false);
+			}
 			
 			if (dump)
 				*dump << sourcePos.toString() << ": unary arithmetic expression simplified\n";
 			delete this;
-			return new ImmediateNode(pos, value);
+			return new ImmediateNode(pos, result);
 		}
 		else
 			return this;

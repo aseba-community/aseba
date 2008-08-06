@@ -793,7 +793,7 @@ namespace Aseba
 	//! Parse "unary_expression" grammar element.
 	Node *Compiler::parseUnaryExpression()
 	{
-		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_ABS, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
 		
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
@@ -816,9 +816,14 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				std::auto_ptr<Node> negation(new UnaryArithmeticNode(pos));
-				negation->children.push_back(parseUnaryExpression());
-				return negation.release();
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
+			}
+			
+			case Token::TOKEN_OP_ABS:
+			{
+				tokens.pop_front();
+				
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
 			}
 			
 			case Token::TOKEN_INT_LITERAL:
