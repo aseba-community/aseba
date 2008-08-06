@@ -38,7 +38,6 @@ namespace Aseba
 		for (ViewPlugInToVariablesNameMap::iterator it = viewPluginsMap.begin(); it != viewPluginsMap.end(); ++it)
 		{
 			it.key()->invalidateVariableModel();
-			it.key()->deleteLater();
 		}
 	}
 	

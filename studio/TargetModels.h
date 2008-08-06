@@ -68,6 +68,7 @@ namespace Aseba
 
 	private:
 		friend class VariablesViewPlugin;
+		friend class LinearCameraViewPlugin;
 		// VariablesViewPlugin API 
 		
 		//! Unsubscribe the plugin from any variables it is listening to

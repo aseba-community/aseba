@@ -28,6 +28,7 @@
 #include "NamedValuesVectorModel.h"
 #include "CustomDelegate.h"
 #include "AeslEditor.h"
+#include "VariablesViewPlugin.h"
 #include "../common/consts.h"
 #include <QtGui>
 #include <QtXml>
@@ -1226,6 +1227,17 @@ namespace Aseba
 		}
 	}
 	
+	void MainWindow::addPluginLinearCameraView()
+	{
+		if (nodes->currentWidget())
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->currentWidget());
+			// TODO: gray option when no tab is selected
+			QWidget* plugin = new LinearCameraViewPlugin(tab->vmMemoryModel);
+			connect(this, SIGNAL(MainWindowClosed()), plugin, SLOT(close()));
+		}
+	}
+	
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
@@ -1712,6 +1724,11 @@ namespace Aseba
 		toolMenu->addMenu(rebootMenu);
 		regenerateToolsMenus();
 		
+		// Plugins
+		QMenu *pluginMenu = new QMenu(tr("&Plug-ins"), this);
+		menuBar()->addMenu(pluginMenu);
+		pluginMenu->addAction(tr("&Linear Camera View"), this, SLOT(addPluginLinearCameraView()));
+		
 		// Help menu
 		QMenu *helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
@@ -1722,6 +1739,11 @@ namespace Aseba
 	void MainWindow::hideEvent(QHideEvent * event)
 	{
 		compilationMessageBox->hide();
+	}
+	
+	void MainWindow::closeEvent ( QCloseEvent * event )
+	{
+		emit MainWindowClosed();
 	}
 	
 	/*@}*/

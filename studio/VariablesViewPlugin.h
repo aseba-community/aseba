@@ -1,8 +1,10 @@
 #ifndef VARIABLE_VIEW_PLUGIN_H
 #define VARIABLE_VIEW_PLUGIN_H
 
-#include <QObject>
+#include <QWidget>
 #include "../compiler/compiler.h"
+
+class QLabel;
 
 namespace Aseba
 {
@@ -11,11 +13,9 @@ namespace Aseba
 	
 	class TargetVariablesModel;
 	
-	class VariablesViewPlugin:public QObject
+	class VariablesViewPlugin: public QWidget
 	{
-		Q_OBJECT
-		
-	private:
+	protected:
 		TargetVariablesModel *variables;
 		
 	public:
@@ -29,6 +29,18 @@ namespace Aseba
 		friend class TargetVariablesModel;
 		//! New values are available for a variable this plugin is interested in
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values) = 0;
+	};
+	
+	class LinearCameraViewPlugin: public VariablesViewPlugin
+	{
+	public:
+		LinearCameraViewPlugin(TargetVariablesModel* variables);
+		
+		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
+		
+	private:
+		QLabel *image;
+		VariablesDataVector red, green, blue;
 	};
 	
 	/*@}*/

@@ -164,6 +164,9 @@ namespace Aseba
 		MainWindow(QWidget *parent = 0);
 		~MainWindow();
 
+	signals:
+		void MainWindowClosed();
+		
 	private slots:
 		void about();
 		void newFile();
@@ -217,6 +220,7 @@ namespace Aseba
 	
 		void recompileAll();
 		void writeAllBytecodes();
+		void addPluginLinearCameraView();
 	
 	private:
 		// utility functions
@@ -233,6 +237,7 @@ namespace Aseba
 		void setupConnections();
 		void setupMenu();
 		void hideEvent(QHideEvent * event);
+		void closeEvent ( QCloseEvent * event );
 		
 		// tabs
 		QTabWidget* nodes;
