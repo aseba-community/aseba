@@ -751,6 +751,31 @@ namespace Aseba
 		stream << bytecode.size() << " words of bytecode of starting at " << start;
 	}
 	
+	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode)
+	{
+		unsigned bytecodePayloadSize = (ASEBA_MAX_PACKET_SIZE - 6) / 2;
+		unsigned bytecodeStart = 0;
+		unsigned bytecodeCount = bytecode.size();
+		
+		while (bytecodeCount > bytecodePayloadSize)
+		{
+			SetBytecode setBytecodeMessage(dest, bytecodeStart);
+			setBytecodeMessage.bytecode.resize(bytecodePayloadSize);
+			copy(bytecode.begin()+bytecodeStart, bytecode.begin()+bytecodeStart+bytecodePayloadSize, setBytecodeMessage.bytecode.begin());
+			setBytecodeMessage.serialize(stream);
+			
+			bytecodeStart += bytecodePayloadSize;
+			bytecodeCount -= bytecodePayloadSize;
+		}
+		
+		{
+			SetBytecode setBytecodeMessage(dest, bytecodeStart);
+			setBytecodeMessage.bytecode.resize(bytecodeCount);
+			copy(bytecode.begin()+bytecodeStart, bytecode.end(), setBytecodeMessage.bytecode.begin());
+			setBytecodeMessage.serialize(stream);
+		}
+	}
+	
 	//
 	
 	void BreakpointSet::serializeSpecific()

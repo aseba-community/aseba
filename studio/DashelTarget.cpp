@@ -293,27 +293,7 @@ namespace Aseba
 		
 		nodeIt->second.debugBytecode = bytecode;
 		
-		unsigned bytecodePayloadSize = (ASEBA_MAX_PACKET_SIZE - 6) / 2;
-		unsigned bytecodeStart = 0;
-		unsigned bytecodeCount = bytecode.size();
-		
-		while (bytecodeCount > bytecodePayloadSize)
-		{
-			SetBytecode setBytecodeMessage(node, bytecodeStart);
-			setBytecodeMessage.bytecode.resize(bytecodePayloadSize);
-			copy(bytecode.begin()+bytecodeStart, bytecode.begin()+bytecodeStart+bytecodePayloadSize, setBytecodeMessage.bytecode.begin());
-			setBytecodeMessage.serialize(dashelInterface.stream);
-			
-			bytecodeStart += bytecodePayloadSize;
-			bytecodeCount -= bytecodePayloadSize;
-		}
-		
-		{
-			SetBytecode setBytecodeMessage(node, bytecodeStart);
-			setBytecodeMessage.bytecode.resize(bytecodeCount);
-			copy(bytecode.begin()+bytecodeStart, bytecode.end(), setBytecodeMessage.bytecode.begin());
-			setBytecodeMessage.serialize(dashelInterface.stream);
-		}
+		sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
 		
 		dashelInterface.stream->flush();
 	}
