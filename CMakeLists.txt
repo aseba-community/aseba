@@ -78,6 +78,7 @@ add_library(aseba
 	compiler/errors.cpp
 	compiler/tree-optimize.cpp
 	msg/msg.cpp
+	msg/descriptions-manager.cpp
 )
 
 add_subdirectory(switch)

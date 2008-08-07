@@ -1,8 +1,4 @@
-VM
-- boolean operations
-
 Compiler/AESL
-- boolean operations
 - thread local variables
 - size typed event arguments
 

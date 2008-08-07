@@ -1,10 +1,10 @@
 /*
-	Aseba - an event-based middleware for distributed robot control
-	Copyright (C) 2006 - 2007:
+	Aseba - an event-based framework for distributed robot control
+	Copyright (C) 2006 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
-		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
-		Laboratory of Robotics Systems, EPFL, Lausanne
+		and other contributors, see authors.txt for details
+		Mobots group, Laboratory of Robotics Systems, EPFL, Lausanne
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -174,6 +174,7 @@ namespace Aseba
 		connectButton->setEnabled(serial->selectionModel()->hasSelection() || (!serialGroupBox->isChecked()));
 	}
 	
+	
 	DashelInterface::DashelInterface() :
 		stream(0)
 	{
@@ -201,6 +202,20 @@ namespace Aseba
 	{
 		Dashel::Hub::run();
 	}
+	
+	void DashelInterface::incomingData(Stream *stream)
+	{
+		Message *message = Message::receive(stream);
+		emit messageAvailable(message);
+	}
+	
+	void DashelInterface::connectionClosed(Stream* stream, bool abnormal)
+	{
+		Q_UNUSED(stream);
+		Q_UNUSED(abnormal);
+		emit dashelDisconnection();
+	}
+	
 	
 	enum InNextState
 	{
@@ -434,12 +449,6 @@ namespace Aseba
 		}
 	}
 	
-	void DashelInterface::incomingData(Stream *stream)
-	{
-		Message *message = Message::receive(stream);
-		emit messageAvailable(message);
-	}
-	
 	void DashelTarget::messageFromDashel(Message *message)
 	{
 		bool deleteMessage = true;
@@ -467,13 +476,6 @@ namespace Aseba
 		
 		if (deleteMessage)
 			delete message;
-	}
-	
-	void DashelInterface::connectionClosed(Stream* stream, bool abnormal)
-	{
-		Q_UNUSED(stream);
-		Q_UNUSED(abnormal);
-		emit dashelDisconnection();
 	}
 	
 	void DashelTarget::disconnectionFromDashel()

@@ -1,10 +1,10 @@
 /*
-	Aseba - an event-based middleware for distributed robot control
+	Aseba - an event-based framework for distributed robot control
 	Copyright (C) 2006 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
-		Valentin Longchamp <valentin dot longchamp at epfl dot ch>
-		Laboratory of Robotics Systems, EPFL, Lausanne
+		and other contributors, see authors.txt for details
+		Mobots group, Laboratory of Robotics Systems, EPFL, Lausanne
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
