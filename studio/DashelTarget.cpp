@@ -143,8 +143,6 @@ namespace Aseba
 		}
 	}
 	
-	
-
 	void DashelConnectionDialog::netGroupChecked()
 	{
 		netGroupBox->setChecked(true);
@@ -217,6 +215,12 @@ namespace Aseba
 	}
 	
 	
+	void SignalingDescriptionsManager::nodeDescriptionReceived(unsigned nodeId)
+	{
+		emit nodeDescriptionReceivedSignal(nodeId);
+	}
+	
+	
 	enum InNextState
 	{
 		NOT_IN_NEXT,
@@ -233,13 +237,16 @@ namespace Aseba
 	{
 		userEventsTimer.setSingleShot(true);
 		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));
+		
 		// we connect the events from the stream listening thread to slots living in our gui thread
 		connect(&dashelInterface, SIGNAL(messageAvailable(Message *)), SLOT(messageFromDashel(Message *)), Qt::QueuedConnection);
 		connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
 		
-		messagesHandlersMap[ASEBA_MESSAGE_DESCRIPTION] = &Aseba::DashelTarget::receivedDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION] = &Aseba::DashelTarget::receivedLocalEventDescription;
-		messagesHandlersMap[ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION] = &Aseba::DashelTarget::receivedNativeFunctionDescription;
+		// we also connect to the description manager to know when we have a new node available
+		connect(&descriptionManager, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
+		
+		void nodeDescriptionReceived();
+		
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
@@ -274,12 +281,9 @@ namespace Aseba
 		dashelInterface.stream->flush();
 	}
 	
-	const TargetDescription * const DashelTarget::getConstDescription(unsigned node) const
+	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(node);
-		assert(nodeIt != nodes.end());
-		
-		return &(nodeIt->second.description);
+		return descriptionManager.getDescription(node);
 	}
 	
 	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
@@ -455,6 +459,10 @@ namespace Aseba
 		//message->dump(std::cout);
 		//std::cout << std::endl;
 		
+		// let the description manager filter the message
+		descriptionManager.processMessage(message);
+		
+		// see if we have a registered handler for this message
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
 		if (messageHandler == messagesHandlersMap.end())
 		{
@@ -466,14 +474,15 @@ namespace Aseba
 					userEventsTimer.start(50);
 				deleteMessage = false;
 			}
-			else
-				qDebug() << QString("Unknown non user message of type 0x%0 received from %1").arg(message->type, 6).arg(message->source);
+			/*else
+				qDebug() << QString("Unhandeled non user message of type 0x%0 received from %1").arg(message->type, 6).arg(message->source);*/
 		}
 		else
 		{
 			(this->*(messageHandler->second))(message);
 		}
 		
+		// if required, garbage collect this message
 		if (deleteMessage)
 			delete message;
 	}
@@ -486,70 +495,14 @@ namespace Aseba
 		//nodes.clear();
 	}
 	
-	void DashelTarget::receivedDescription(Message *message)
+	void DashelTarget::nodeDescriptionReceived(unsigned nodeId)
 	{
-		Description *description = polymorphic_downcast<Description *>(message);
-		unsigned id = description->source;
+		Node& node = nodes[nodeId];
 		
-		// We can receive a description twice, for instance if there is another IDE connected
-		if (nodes.find(id) != nodes.end())
-			return;
-		
-		// create node
-		Node& node = nodes[id];
-		
-		// copy description into it
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
-		node.description = *description;
-		node.localEventsReceptionCounter = 0;
-		node.nativeFunctionReceptionCounter = 0;
 		
-		emitNodeConnectedIfDescriptionComplete(id, node);
-	}
-	
-	void DashelTarget::receivedLocalEventDescription(Message *message)
-	{
-		LocalEventDescription *description = polymorphic_downcast<LocalEventDescription *>(message);
-		unsigned id = description->source;
-		
-		// we must have received a description first
-		Q_ASSERT(nodes.find(id) != nodes.end());
-		Node& node = nodes[id];
-		
-		// copy description into array if array is empty
-		if (node.localEventsReceptionCounter < node.description.localEvents.size())
-		{
-			node.description.localEvents[node.localEventsReceptionCounter++] = *description;
-			
-			emitNodeConnectedIfDescriptionComplete(id, node);
-		}
-	}
-	
-	void DashelTarget::receivedNativeFunctionDescription(Message *message)
-	{
-		NativeFunctionDescription *description = polymorphic_downcast<NativeFunctionDescription *>(message);
-		unsigned id = description->source;
-		
-		// we must have received a description first
-		Q_ASSERT(nodes.find(id) != nodes.end());
-		Node& node = nodes[id];
-		
-		// copy description into array
-		if (node.nativeFunctionReceptionCounter < node.description.nativeFunctions.size())
-		{
-			node.description.nativeFunctions[node.nativeFunctionReceptionCounter++] = *description;
-			
-			emitNodeConnectedIfDescriptionComplete(id, node);
-		}
-	}
-	
-	bool DashelTarget::emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node)
-	{
-		// we will emit the connected signal only when we have received all local events and native functions
-		if ((node.localEventsReceptionCounter == node.description.localEvents.size()) &&
-			(node.nativeFunctionReceptionCounter == node.description.nativeFunctions.size()))
-			emit nodeConnected(id);
+		emit nodeConnected(nodeId);
 	}
 	
 	void DashelTarget::receivedVariables(Message *message)

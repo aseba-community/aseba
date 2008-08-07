@@ -55,8 +55,8 @@ namespace Aseba
 					return;
 				
 				// create node and copy description into it
-				it->second = NodeDescription(*static_cast<const TargetDescription*>(description));
-				checkIfNodeDescriptionComplete(it->first, it->second);
+				nodesDescriptions[description->source] = NodeDescription(*description);
+				checkIfNodeDescriptionComplete(description->source, nodesDescriptions[description->source]);
 			}
 		}
 		
@@ -128,7 +128,7 @@ namespace Aseba
 		return 0xFFFFFFFF;
 	}
 	
-	const TargetDescription * const DescriptionsManager::getConstDescription(unsigned nodeId, bool *ok) const
+	const TargetDescription * const DescriptionsManager::getDescription(unsigned nodeId, bool *ok) const
 	{
 		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
 		

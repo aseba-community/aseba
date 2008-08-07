@@ -26,6 +26,7 @@
 
 #include "Target.h"
 #include "../common/consts.h"
+#include "../msg/descriptions-manager.h"
 #include <QString>
 #include <QDialog>
 #include <QQueue>
@@ -102,6 +103,18 @@ namespace Aseba
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 	};
 	
+	//! Provides a signal/slot interface for the description manager
+	class SignalingDescriptionsManager: public QObject, public DescriptionsManager
+	{
+		Q_OBJECT
+	
+	signals:
+		void nodeDescriptionReceivedSignal(unsigned nodeId);
+	
+	protected:
+		virtual void nodeDescriptionReceived(unsigned nodeId);
+	};
+	
 	class DashelTarget: public Target
 	{
 		Q_OBJECT
@@ -111,10 +124,6 @@ namespace Aseba
 		{
 			Node();
 			
-			QString name; //!< name of node
-			TargetDescription description; //!< description of node
-			int localEventsReceptionCounter; //!< what is the status of the reception of local events
-			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
 			BytecodeVector debugBytecode; //!< bytecode with debug information
 			unsigned steppingInNext; //!< state of node when in next and stepping
 			unsigned lineInNext; //!< line of node to execute when in next and stepping
@@ -127,8 +136,10 @@ namespace Aseba
 		
 		DashelInterface dashelInterface;
 		
-		QQueue<UserMessage *> userEventsQueue;
 		MessagesHandlersMap messagesHandlersMap;
+		
+		QQueue<UserMessage *> userEventsQueue;
+		SignalingDescriptionsManager descriptionManager;
 		NodesMap nodes;
 		QTimer userEventsTimer;
 		
@@ -138,7 +149,7 @@ namespace Aseba
 		
 		virtual void disconnect();
 		
-		virtual const TargetDescription * const getConstDescription(unsigned node) const;
+		virtual const TargetDescription * const getDescription(unsigned node) const;
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
 		virtual void writeBytecode(unsigned node);
@@ -163,6 +174,7 @@ namespace Aseba
 		void updateUserEvents();
 		void messageFromDashel(Message *message);
 		void disconnectionFromDashel();
+		void nodeDescriptionReceived(unsigned node);
 	
 	protected:
 		void receivedDescription(Message *message);

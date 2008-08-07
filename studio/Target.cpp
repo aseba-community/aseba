@@ -32,7 +32,7 @@ namespace Aseba
 	
 	const QString Target::getName(unsigned node) const
 	{
-		return QString::fromUtf8(getConstDescription(node)->name.c_str());
+		return QString::fromUtf8(getDescription(node)->name.c_str());
 	}
 	
 	/*@}*/

@@ -116,9 +116,9 @@ namespace Aseba
 		allocatedVariablesCount = 0;
 		
 		// create models
-		compiler.setTargetDescription(target->getConstDescription(id));
+		compiler.setTargetDescription(target->getDescription(id));
 		compiler.setCommonDefinitions(commonDefinitions);
-		vmFunctionsModel = new TargetFunctionsModel(target->getConstDescription(id), 0);
+		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), 0);
 		vmMemoryModel = new TargetVariablesModel();
 		
 		// create gui
@@ -1306,7 +1306,7 @@ namespace Aseba
 	//! A node did an access out of array bounds exception.
 	void MainWindow::arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index)
 	{
-		addErrorEvent(node, line, tr("access out of memory (%2/%3)").arg(index).arg(target->getConstDescription(node)->variablesSize));
+		addErrorEvent(node, line, tr("access out of memory (%2/%3)").arg(index).arg(target->getDescription(node)->variablesSize));
 	}
 	
 	//! A node did a division by zero exception.

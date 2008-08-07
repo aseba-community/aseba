@@ -51,13 +51,16 @@ namespace Aseba
 		NodesDescriptionsMap nodesDescriptions; //!< all known nodes descriptions
 		
 	public:
+		//! Virtual destructor
+		virtual ~DescriptionsManager() {}
+		
 		//! Process a message and reconstruct descriptions if relevant
 		void processMessage(const Message* message);
 		
 		//! Return the id of the node corresponding to name and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
 		unsigned getNodeId(const std::string& name, bool *ok = 0) const;
 		//! Return the description of a node and set ok to true, if provided; if invalid, return 0 and set ok to false
-		const TargetDescription * const getConstDescription(unsigned nodeId, bool *ok = 0) const;
+		const TargetDescription * const getDescription(unsigned nodeId, bool *ok = 0) const;
 		//! Return the position of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
 		unsigned getVariablePos(unsigned nodeId, const std::string& name, bool *ok = 0) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
