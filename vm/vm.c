@@ -321,7 +321,8 @@ void AsebaVMStep(AsebaVMState *vm)
 				#ifdef ASEBA_ASSERT
 				AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR);
 				#endif
-			};
+				break;
+			}
 			vm->stack[vm->sp] = value;
 			
 			// increment PC
