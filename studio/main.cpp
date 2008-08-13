@@ -27,6 +27,8 @@
 #include <QTranslator>
 #include <QString>
 #include <QLocale>
+#include <iostream>
+#include <stdexcept>
 #include "MainWindow.h"
 
 /**
@@ -51,9 +53,17 @@ int main(int argc, char *argv[])
 	translator.load(QString(":/asebastudio_") + QLocale::system().name());
 	app.installTranslator(&translator);
 	
-	Aseba::MainWindow window;
-	window.show();
-	return app.exec();
+	try
+	{
+		Aseba::MainWindow window;
+		window.show();
+		return app.exec();
+	}
+	catch (std::runtime_error e)
+	{
+		std::cerr << "Program terminated with runtime error: " << e.what() << std::endl;
+		return -1;
+	}
 }
 
 

@@ -216,7 +216,7 @@ namespace Enki
 			}
 			catch (Dashel::DashelException e)
 			{
-				QMessageBox::critical(0, QApplication::tr("Aseba Challenge"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.sysMessage.c_str()));
+				QMessageBox::critical(0, QApplication::tr("Aseba Challenge"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
 				abort();
 			}
 			

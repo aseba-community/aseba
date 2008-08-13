@@ -30,6 +30,8 @@
 #include <cassert>
 #include <QInputDialog>
 #include <QtGui>
+#include <stdexcept>
+
 
 #include <DashelTarget.moc>
 
@@ -180,7 +182,9 @@ namespace Aseba
 		while (true)
 		{
 			if (targetSelector.exec() == QDialog::Rejected)
-				exit(0);
+			{
+				throw std::runtime_error("connection dialog closed");
+			}
 			
 			try
 			{
@@ -244,8 +248,6 @@ namespace Aseba
 		
 		// we also connect to the description manager to know when we have a new node available
 		connect(&descriptionManager, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
-		
-		void nodeDescriptionReceived();
 		
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
