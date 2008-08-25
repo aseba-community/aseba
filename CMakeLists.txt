@@ -93,5 +93,7 @@ add_subdirectory(targets/enki-marxbot)
 
 add_subdirectory(targets/challenge)
 
+add_subdirectory(targets/playground)
+
 add_subdirectory(eventlogger)
 
