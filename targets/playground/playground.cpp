@@ -102,25 +102,31 @@ Enki::PlaygroundViewer *playgroundViewer = 0;
 
 namespace Enki
 {
+	#define LEGO_RED						Enki::Color(0.77, 0.2, 0.15)
+	#define LEGO_GREEN						Enki::Color(0, 0.5, 0.17)
+	#define LEGO_BLUE						Enki::Color(0, 0.38 ,0.61)
+	#define LEGO_WHITE						Enki::Color(0.9, 0.9, 0.9)
+	
 	#define EPUCK_FEEDER_INITIAL_ENERGY		10
 	#define EPUCK_FEEDER_THRESHOLD_HIDE		2
 	#define EPUCK_FEEDER_THRESHOLD_SHOW		4
 	#define EPUCK_FEEDER_RADIUS				5
-	#define EPUCK_FEEDER_RADIUS_DEAD		6
 	#define EPUCK_FEEDER_RANGE				10
 	
-	#define EPUCK_FEEDER_COLOR_ACTIVE		Color::green
-	#define EPUCK_FEEDER_COLOR_INACTIVE		Color::gray
+	#define EPUCK_FEEDER_COLOR_ACTIVE		LEGO_GREEN
+	#define EPUCK_FEEDER_COLOR_INACTIVE		LEGO_WHITE
 	
 	#define EPUCK_FEEDER_D_ENERGY			4
 	#define EPUCK_FEEDER_RECHARGE_RATE		0.5
 	#define EPUCK_FEEDER_MAX_ENERGY			100
 	
-	#define EPUCK_FEEDER_LIFE_SPAN			60
-	#define EPUCK_FEEDER_DEATH_SPAN			10
+	#define EPUCK_FEEDER_HEIGHT				5
 	
 	#define EPUCK_INITIAL_ENERGY			10
 	#define EPUCK_ENERGY_CONSUMPTION_RATE	1
+	
+	#define ACTIVATION_OBJECT_COLOR			LEGO_RED
+	#define ACTIVATION_OBJECT_HEIGHT		6
 	
 	#define DEATH_ANIMATION_STEPS			30
 	
@@ -307,13 +313,177 @@ namespace Enki
 	public:
 		EPuckFeeder() : feeding(this)
 		{
-			height = 5;
+			height = EPUCK_FEEDER_HEIGHT;
 			mass = -1;
 			addLocalInteraction(&feeding);
 			color = EPUCK_FEEDER_COLOR_ACTIVE;
 			setupBoundingSurface(Polygone() << Point(-1.6, -1.6) <<  Point(1.6, -1.6) << Point(1.6, 1.6) << Point(-1.6, 1.6));
 			
 			commitPhysicalParameters();
+		}
+	};
+	
+	class Door: public PhysicalObject
+	{
+	public:
+		virtual void open() = 0;
+		virtual void close() = 0;
+	};
+	
+	class SlidingDoor : public Door
+	{
+	protected:
+		Point closedPos;
+		Point openedPos;
+		double moveDuration;
+		enum Mode
+		{
+			MODE_CLOSED,
+			MODE_OPENING,
+			MODE_OPENED,
+			MODE_CLOSING
+		} mode;
+		double moveTimeLeft;
+	
+	public:
+		SlidingDoor(const Point& closedPos, const Point& openedPos, const Point& size, double height, double moveDuration) :
+			closedPos(closedPos),
+			openedPos(openedPos),
+			moveDuration(moveDuration),
+			mode(MODE_CLOSED),
+			moveTimeLeft(0)
+		{
+			mass = -1;
+			setRectangular(size.x, size.y, height);
+			commitPhysicalParameters();
+		}
+		
+		virtual void step(double dt)
+		{
+			// cos interpolation between positions
+			double alpha;
+			switch (mode)
+			{
+				case MODE_CLOSED:
+				pos = closedPos;
+				break;
+				
+				case MODE_OPENING:
+				alpha = (cos((moveTimeLeft*M_PI)/moveDuration) + 1.) / 2.;
+				pos = openedPos * alpha + closedPos * (1 - alpha);
+				moveTimeLeft -= dt;
+				if (moveTimeLeft < 0)
+					mode = MODE_OPENED;
+				break;
+				
+				case MODE_OPENED:
+				pos = openedPos;
+				break;
+				
+				case MODE_CLOSING:
+				alpha = (cos((moveTimeLeft*M_PI)/moveDuration) + 1.) / 2.;
+				pos = closedPos * alpha + openedPos * (1 - alpha);
+				moveTimeLeft -= dt;
+				if (moveTimeLeft < 0)
+					mode = MODE_CLOSED;
+				break;
+				
+				default:
+				break;
+			}
+			PhysicalObject::step(dt);
+		}
+		
+		virtual void open(void)
+		{
+			if (mode == MODE_CLOSED)
+			{
+				moveTimeLeft = moveDuration;
+				mode = MODE_OPENING;
+			}
+			else if (mode == MODE_CLOSING)
+			{
+				moveTimeLeft = moveDuration - moveTimeLeft;
+				mode = MODE_OPENING;
+			}
+		}
+		
+		virtual void close(void)
+		{
+			if (mode == MODE_OPENED)
+			{
+				moveTimeLeft = moveDuration;
+				mode = MODE_CLOSING;
+			}
+			else if (mode == MODE_OPENING)
+			{
+				moveTimeLeft = moveDuration - moveTimeLeft;
+				mode = MODE_CLOSING;
+			}
+		}
+	};
+	
+	class AreaActivating : public LocalInteraction
+	{
+	public:
+		bool active;
+		Polygone activeArea;
+		
+	public:
+		AreaActivating(Robot *owner, const Polygone& activeArea) :
+			active(false),
+			activeArea(activeArea)
+		{
+			r = activeArea.getBoundingRadius();
+			this->owner = owner;
+		}
+		
+		virtual void init()
+		{
+			active = false;
+		}
+		
+		virtual void objectStep (double dt, PhysicalObject *po, World *w)
+		{
+			if (po != owner && dynamic_cast<Robot*>(po))
+				active |= activeArea.isPointInside(po->pos - owner->pos);
+		}
+	};
+	
+	class ActivationObject: public Robot
+	{
+	protected:
+		AreaActivating areaActivating;
+		bool wasActive;
+		Door* attachedDoor;
+	
+	public:
+		ActivationObject(const Point& pos, const Point& size, const Polygone& activeArea, Door* attachedDoor) :
+			areaActivating(this, activeArea),
+			wasActive(false),
+			attachedDoor(attachedDoor)
+		{
+			this->pos = pos;
+			mass = -1;
+			addLocalInteraction(&areaActivating);
+			color = ACTIVATION_OBJECT_COLOR;
+			setRectangular(size.x, size.y, ACTIVATION_OBJECT_HEIGHT);
+			commitPhysicalParameters();
+		}
+		
+		virtual void step(double dt)
+		{
+			Robot::step(dt);
+			
+			if (areaActivating.active != wasActive)
+			{
+				//std::cerr << "Door activity changed to " << areaActivating.active <<  "\n";
+				if (areaActivating.active)
+					attachedDoor->open();
+				else
+					attachedDoor->close();
+				wasActive = areaActivating.active;
+			}
 		}
 	};
 
@@ -850,12 +1020,72 @@ int main(int argc, char *argv[])
 	
 	// Create the world
 	Enki::World world(110.4, 110.4);
+	Enki::Color wallsColor(0.9, 0.9, 0.9);
+	world.setWallsColor(wallsColor);
 	
 	// Add feeders
 	Enki::EPuckFeeder* feeder = new Enki::EPuckFeeder;
 	feeder->pos.x = 16;
-	feeder->pos.y = 16;
+	feeder->pos.y = 110-16;
 	world.addObject(feeder);
+	
+	// Add walls
+	Enki::PhysicalObject* wall;
+	
+	wall = new Enki::PhysicalObject();
+	wall->setColor(wallsColor);
+	wall->pos = Enki::Point(32.8, 55.2);
+	wall->setRectangular(1.6, 46.4, 10);
+	wall->setMass(-1);
+	wall->commitPhysicalParameters();
+	world.addObject(wall);
+	
+	wall = new Enki::PhysicalObject();
+	wall->setColor(wallsColor);
+	wall->pos = Enki::Point(110.4-32.8, 55.2);
+	wall->setRectangular(1.6, 46.4, 10);
+	wall->setMass(-1);
+	wall->commitPhysicalParameters();
+	world.addObject(wall);
+	
+	wall = new Enki::PhysicalObject();
+	wall->setColor(wallsColor);
+	wall->pos = Enki::Point(55.2, 110.4-32);
+	wall->setRectangular(46.4, 1.6, 10);
+	wall->setMass(-1);
+	wall->commitPhysicalParameters();
+	world.addObject(wall);
+	
+	wall = new Enki::PhysicalObject();
+	wall->setColor(wallsColor);
+	wall->pos = Enki::Point(55.2, 49.6);
+	wall->setRectangular(24, 35.2, 10);
+	wall->setMass(-1);
+	wall->commitPhysicalParameters();
+	world.addObject(wall);
+	
+	// Add doors
+	Enki::SlidingDoor *door;
+	
+	// left blue door
+	door = new Enki::SlidingDoor(Enki::Point(38.4, 33.6), Enki::Point(48, 33.6), Enki::Point(9.6, 1.6), 9, 1);
+	door->setColor(LEGO_BLUE);
+	world.addObject(door);
+	
+	Enki::Polygone activationArea;
+	activationArea << Enki::Point(0, -4.8) << Enki::Point(4.8, -2.4) << Enki::Point(4.8, 2.4) << Enki::Point(0, 4.8);
+	world.addObject(new Enki::ActivationObject(Enki::Point(0, 55.2), Enki::Point(1.6, 3.2), activationArea, door));
+	activationArea.flipX();
+	world.addObject(new Enki::ActivationObject(Enki::Point(110.4, 55.2), Enki::Point(1.6, 3.2), activationArea, door));
+	
+	// right white door
+	door = new Enki::SlidingDoor(Enki::Point(110.4-38.4, 33.6), Enki::Point(110.4-48, 33.6), Enki::Point(9.6, 1.6), 9, 3);
+	door->setColor(LEGO_WHITE);
+	world.addObject(door);
+	
+	activationArea.clear();
+	activationArea << Enki::Point(1, -16.8) << Enki::Point(10.6, -16.8) << Enki::Point(10.6, 16.8) << Enki::Point(1, 16.8);
+	world.addObject(new Enki::ActivationObject(Enki::Point(66.2, 49.6), Enki::Point(1.6, 1.6), activationArea, door));
 	
 	// Add e-puck
 	int ePuckCount = 4;
@@ -864,12 +1094,15 @@ int main(int argc, char *argv[])
 		char buffer[9];
 		strncpy(buffer, "e-puck  ", sizeof(buffer));
 		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(i+1);
-		epuck->pos.x = Enki::random.getRange(90)+10;
-		epuck->pos.y = Enki::random.getRange(90)+10;
+		epuck->pos.x = i  + Enki::random.getRange(5)+5;
+		epuck->pos.y = Enki::random.getRange(10)+20;
 		buffer[7] = '0' + i;
 		epuck->name = buffer;
 		world.addObject(epuck);
+		if (i == 3)
+			epuck->pos = Enki::Point(66.2+5, 49.6);
 	}
+	
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);
