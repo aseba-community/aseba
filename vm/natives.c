@@ -77,11 +77,24 @@ sint16 aseba_atan2(sint16 y, sint16 x)
 		sint16 fb1 = 0;
 		
 		// find first bit at one
+#ifdef __C30__ 
+		// ASM optimisation for 16bits PIC
+		// Find first bit from left (MSB) on 32 bits word
+		asm ("ff1l %[word], %[b]" : [b] "=r" (fb1) : [word] "r" ((int) (value >> 16)) : "cc");
+		if(fb1) 
+			fb1 = fb1 + 16 - 1; // Bit 0 is "1", fbl = 0 mean no 1 found for ff1l
+		else {
+			asm ("ff1l %[word], %[b]" : [b] "=r" (fb1) : [word] "r" ((int) value) : "cc");
+			if(fb1)
+				fb1--; // See above
+		}
+			
+#else		
 		sint16 fb1_counter;
 		for (fb1_counter = 0; fb1_counter < 32; fb1_counter++)
 			if ((value >> (sint32)fb1_counter) != 0)
 				fb1 = fb1_counter;
-		
+#endif	
 		// we only keep 4 bits of precision below comma as atan(x) is like x near 0
 		sint16 index = fb1 - 12;
 		if (index < 0)
