@@ -54,6 +54,13 @@ namespace Aseba
 				if (it != nodesDescriptions.end())
 					return;
 				
+				// Call a user function when a node protocol version mismatches
+				if (description->protocolVersion != ASEBA_PROTOCOL_VERSION)
+				{
+					nodeProtocolVersionMismatch(description->name, description->protocolVersion);
+					return;
+				}
+				
 				// create node and copy description into it
 				nodesDescriptions[description->source] = NodeDescription(*description);
 				checkIfNodeDescriptionComplete(description->source, nodesDescriptions[description->source]);

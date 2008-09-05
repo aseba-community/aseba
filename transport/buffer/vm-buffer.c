@@ -102,7 +102,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 
 	buffer_add_string(vmDescription->name);
 	
-	buffer_add_uint16(1);
+	buffer_add_uint16(ASEBA_PROTOCOL_VERSION);
 
 	buffer_add_uint16(vm->bytecodeSize);
 	buffer_add_uint16(vm->stackSize);
