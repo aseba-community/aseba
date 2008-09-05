@@ -95,10 +95,8 @@ namespace Aseba
 	
 	class TargetFunctionsModel: public QAbstractTableModel
 	{
-		Q_OBJECT
-	
 	public:
-		TargetFunctionsModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent = 0);
+		TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent = 0);
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -107,17 +105,11 @@ namespace Aseba
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
-		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		//! Data have been by directly accessing the struct from the model index, so we have to emit dataChanged() from here anyway
 		void dataChangedExternally(const QModelIndex &index);
 		
-	public slots:
-		void addFunction();
-		void delFunction(int index);
-		
 	private:
 		const TargetDescription *descriptionRead; //!< description for read access
-		TargetDescription *descriptionWrite; //!< description for write access
 	};
 	
 	/*@}*/

@@ -274,10 +274,9 @@ namespace Aseba
 	}
 	
 	
-	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, TargetDescription *descriptionWrite, QObject *parent) :
+	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent) :
 		QAbstractTableModel(parent),
-		descriptionRead(descriptionRead),
-		descriptionWrite(descriptionWrite)
+		descriptionRead(descriptionRead)
 	{
 		Q_ASSERT(descriptionRead);
 	}
@@ -300,7 +299,8 @@ namespace Aseba
 		
 		if (role == Qt::DisplayRole)
 		{
-			return QString::fromUtf8(descriptionRead->nativeFunctions[index.row()].name.c_str());
+			const TargetDescription::NativeFunction& function = descriptionRead->nativeFunctions[index.row()];
+			return QString::fromUtf8(function.name.c_str());
 		}
 		else
 		{
@@ -336,74 +336,12 @@ namespace Aseba
 	
 	Qt::ItemFlags TargetFunctionsModel::flags(const QModelIndex & index) const
 	{
-		if (descriptionWrite)
-		{
-			if (index.column() == 0)
-				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-			else
-				return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-		}
-		else
-			return Qt::ItemIsEnabled;
-	}
-	
-	bool TargetFunctionsModel::setData(const QModelIndex &index, const QVariant &value, int role)
-	{
-		Q_ASSERT(descriptionWrite);
-		if (index.isValid() && role == Qt::EditRole)
-		{
-			// check for valid identifiers
-			if (index.column() == 0)
-			{
-				QString name = value.toString();
-				bool ok = !name.isEmpty();
-				if (ok && (name[0].isLetter() || name[0] == '_'))
-				{
-					for (int i = 1; i < name.size(); i++)
-						if (!(name[i].isLetterOrNumber() || name[i] == '_'))
-							return false;
-					
-					descriptionWrite->nativeFunctions[index.row()].name = name.toUtf8().data();
-					emit dataChanged(index, index);
-					return true;
-				}
-			}
-			else
-			{
-				// do nothing there, see setParameterData(...)
-			}
-			
-			return false;
-		}
-		return false;
+		return Qt::ItemIsEnabled;
 	}
 	
 	void TargetFunctionsModel::dataChangedExternally(const QModelIndex &index)
 	{
 		emit dataChanged(index, index);
-	}
-	
-	void TargetFunctionsModel::addFunction()
-	{
-		Q_ASSERT(descriptionWrite);
-		
-		unsigned position = descriptionWrite->nativeFunctions.size();
-		beginInsertRows(QModelIndex(), position, position);
-		
-		TargetDescription::NativeFunction newFunction;
-		newFunction.name = "unnamed";
-		descriptionWrite->nativeFunctions.insert(descriptionWrite->nativeFunctions.begin() + position, 1, newFunction);
-	
-		endInsertRows();
-	}
-	
-	void TargetFunctionsModel::delFunction(int index)
-	{
-		beginRemoveRows(QModelIndex(), index, index);
-		
-		descriptionWrite->nativeFunctions.erase(descriptionWrite->nativeFunctions.begin() + index);
-		
-		endRemoveRows();
 	}
 	
 	/*@}*/

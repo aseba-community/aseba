@@ -118,7 +118,7 @@ namespace Aseba
 		// create models
 		compiler.setTargetDescription(target->getDescription(id));
 		compiler.setCommonDefinitions(commonDefinitions);
-		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), 0);
+		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id));
 		vmMemoryModel = new TargetVariablesModel();
 		
 		// create gui
