@@ -205,7 +205,7 @@ namespace Aseba
 		
 		void userEventsDropped(unsigned amount);
 		void userEvent(unsigned id, const VariablesDataVector &data);
-		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
+		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned size, unsigned index);
 		void divisionByZero(unsigned node, unsigned line);
 		void eventExecutionKilled(unsigned node, unsigned line);
 		void nodeSpecificError(unsigned node, unsigned line, const QString& message);

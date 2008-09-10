@@ -363,7 +363,7 @@ namespace Aseba
 		if (immediateChild)
 		{
 			unsigned index = immediateChild->value;
-			if (index > arraySize)
+			if (index >= arraySize)
 			{
 				throw Error(sourcePos,
 					FormatableString("Out of bound static array access. Trying to read index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
@@ -393,7 +393,7 @@ namespace Aseba
 		if (immediateChild)
 		{
 			unsigned index = immediateChild->value;
-			if (index > arraySize)
+			if (index >= arraySize)
 			{
 				throw Error(sourcePos,
 					FormatableString("Out of bound static array access. Trying to write index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));

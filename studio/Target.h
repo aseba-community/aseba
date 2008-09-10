@@ -68,7 +68,7 @@ namespace Aseba
 		void userEventsDropped(unsigned amount);
 		
 		//! A node did an access out of array bounds exception.
-		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned index);
+		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned size, unsigned index);
 		//! A node did a division by zero exception.
 		void divisionByZero(unsigned node, unsigned line);
 		//! A new event was run and the current killed on a node

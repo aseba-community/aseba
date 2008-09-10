@@ -518,7 +518,7 @@ namespace Aseba
 		int line = getLineFromPC(aa->source, aa->pc);
 		if (line >= 0)
 		{
-			emit arrayAccessOutOfBounds(aa->source, line, aa->index);
+			emit arrayAccessOutOfBounds(aa->source, line, aa->size, aa->index);
 			emit executionModeChanged(aa->source, EXECUTION_STOP);
 		}
 	}

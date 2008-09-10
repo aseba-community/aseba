@@ -273,52 +273,28 @@ namespace Aseba
 	
 	void ArrayReadNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		unsigned short bytecode;
-		
-		// optimise when index is constant
+		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
-		if (immediateChild)
-		{
-			assert(immediateChild->value >= 0);
-			unsigned addr = immediateChild->value + arrayAddr;
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | addr;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		else
-		{
-			children[0]->emit(bytecodes);
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | arrayAddr;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_BINARY_ARITHMETIC) | ASEBA_OP_ADD;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD_INDIRECT);
+		assert(immediateChild == 0);
+		
+		children[0]->emit(bytecodes);
+		
+		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD_INDIRECT) | arrayAddr;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.currentBytecode->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
 	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		unsigned short bytecode;
-		
-		// optimise when index is constant
+		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
-		if (immediateChild)
-		{
-			assert(immediateChild->value >= 0);
-			unsigned addr = immediateChild->value + arrayAddr;
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | addr;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		else
-		{
-			children[0]->emit(bytecodes);
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | arrayAddr;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_BINARY_ARITHMETIC) | ASEBA_OP_ADD;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT);
+		assert(immediateChild == 0);
+		
+		children[0]->emit(bytecodes);
+		
+		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT) | arrayAddr;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.currentBytecode->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const

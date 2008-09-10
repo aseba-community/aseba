@@ -525,18 +525,20 @@ namespace Aseba
 	void ArrayAccessOutOfBounds::serializeSpecific()
 	{
 		add(pc);
+		add(size);
 		add(index);
 	}
 	
 	void ArrayAccessOutOfBounds::deserializeSpecific()
 	{
 		pc = get<uint16>();
+		size = get<uint16>();
 		index = get<uint16>();
 	}
 	
 	void ArrayAccessOutOfBounds::dumpSpecific(ostream &stream)
 	{
-		stream << "pc " << pc << ", index " << index;
+		stream << "pc " << pc << ", size " << size << ", index " << index ;
 	}
 	
 	//

@@ -228,6 +228,8 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Load Indirect
 		case ASEBA_BYTECODE_LOAD_INDIRECT:
 		{
+			uint16 arrayIndex;
+			uint16 arraySize;
 			uint16 variableIndex;
 			
 			// check sp
@@ -236,34 +238,36 @@ void AsebaVMStep(AsebaVMState *vm)
 				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
-			// get variable index
-			variableIndex =  vm->stack[vm->sp];
+			// get indexes
+			arrayIndex = bytecode & 0x0fff;
+			arraySize = vm->bytecode[vm->pc + 1];
+			variableIndex = vm->stack[vm->sp];
 			
 			// check variable index
-			#ifndef ASEBA_NO_ARRAY_CHECK
-			if (variableIndex >= vm->variablesSize)
+			if (variableIndex >= arraySize)
 			{
-				// TODO: really check array access bounds and not memory bounds
-				uint16 buffer[2];
+				uint16 buffer[3];
 				buffer[0] = vm->pc;
-				buffer[1] = variableIndex;
+				buffer[1] = arraySize;
+				buffer[2] = variableIndex;
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, sizeof(buffer));
 				break;
 			}
-			#endif
 			
 			// load variable
-			vm->stack[vm->sp] = vm->variables[variableIndex];
+			vm->stack[vm->sp] = vm->variables[arrayIndex + variableIndex];
 			
 			// increment PC
-			vm->pc ++;
+			vm->pc += 2;
 		}
 		break;
 		
 		// Bytecode: Store Indirect
 		case ASEBA_BYTECODE_STORE_INDIRECT:
 		{
+			uint16 arrayIndex;
+			uint16 arraySize;
 			uint16 variableIndex;
 			sint16 variableValue;
 			
@@ -273,13 +277,14 @@ void AsebaVMStep(AsebaVMState *vm)
 				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
-			// get variable value and index
-			variableValue =  vm->stack[vm->sp - 1];
-			variableIndex =  (uint16)vm->stack[vm->sp];
+			// get value and indexes
+			arrayIndex = bytecode & 0x0fff;
+			arraySize = vm->bytecode[vm->pc + 1];
+			variableValue = vm->stack[vm->sp - 1];
+			variableIndex = (uint16)vm->stack[vm->sp];
 			
 			// check variable index
-			#ifndef ASEBA_NO_ARRAY_CHECK
-			if (variableIndex >= vm->variablesSize)
+			if (variableIndex >= arraySize)
 			{
 				uint16 buffer[2];
 				buffer[0] = vm->pc;
@@ -288,10 +293,9 @@ void AsebaVMStep(AsebaVMState *vm)
 				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, sizeof(buffer));
 				break;
 			}
-			#endif
 			
 			// store variable and change sp
-			vm->variables[variableIndex] = variableValue;
+			vm->variables[arrayIndex + variableIndex] = variableValue;
 			vm->sp -= 2;
 			
 			// increment PC

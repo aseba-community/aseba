@@ -243,6 +243,7 @@ namespace Aseba
 	{
 	public:
 		uint16 pc;
+		uint16 size;
 		uint16 index;
 		
 	public:

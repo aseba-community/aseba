@@ -294,13 +294,13 @@ namespace Aseba
 				break;
 				
 				case ASEBA_BYTECODE_LOAD_INDIRECT:
-				dump << "LOAD_INDIRECT\n";
-				pc++;
+				dump << "LOAD_INDIRECT in array at " << (bytecode[pc] & 0x0fff) << " of size " << bytecode[pc+1] << "\n";
+				pc += 2;
 				break;
 				
 				case ASEBA_BYTECODE_STORE_INDIRECT:
-				dump << "STORE_INDIRECT\n";
-				pc++;
+				dump << "STORE_INDIRECT in array at " << (bytecode[pc] & 0x0fff) << " of size " << bytecode[pc+1] << "\n";
+				pc += 2;
 				break;
 				
 				case ASEBA_BYTECODE_UNARY_ARITHMETIC:

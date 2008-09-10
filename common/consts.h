@@ -30,7 +30,7 @@
 /*@{*/
 
 /*! version of aseba protocol */
-#define ASEBA_PROTOCOL_VERSION 1
+#define ASEBA_PROTOCOL_VERSION 2
 
 /*! default listen target for aseba */
 #define ASEBA_DEFAULT_LISTEN_TARGET "tcpin:33333"
