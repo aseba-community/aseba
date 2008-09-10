@@ -1,7 +1,8 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2006 - 2007:
+	Copyright (C) 2006 - 2008:
 		Stephane Magnenat <stephane at magnenat dot net>
+		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
 		Mobots group, Laboratory of Robotics Systems, EPFL, Lausanne
 	
@@ -39,6 +40,9 @@
 #include <e_ad_conv.h>
 #include <e_prox.h>
 #include <e_acc.h>
+#include <e_I2C_protocol.h>
+
+#include "libpic30.h"
 
 
 #include <string.h>
@@ -49,7 +53,8 @@
 #include "vm/natives.h"
 #include "transport/buffer/vm-buffer.h"
 
-#define vmBytecodeSize 1024
+#define LIS_GROUND_SENSORS
+
 #define vmVariablesSize (sizeof(struct EPuckVariables) / sizeof(sint16))
 #define vmStackSize 32
 #define argsSize 32
@@ -81,6 +86,8 @@ unsigned int __attribute((far)) cam_data[60];
 /* The number of opcode an aseba script can have */
 #define VM_BYTECODE_SIZE 1024
 #define VM_STACK_SIZE 32
+
+unsigned char _EEDATA(1) eeprom_bytecode[VM_BYTECODE_SIZE*2];
 
 struct EPuckVariables
 {
@@ -180,6 +187,35 @@ const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState 
 	return localEvents;
 }
 
+#ifdef LIS_GROUND_SENSORS 
+void EpuckNative_get_ground_values(AsebaVMState *vm)
+{
+	// where to 
+	uint16 dest = vm->stack[0];
+	uint16 i;
+	e_i2cp_enable();
+
+	for (i = 0; i < 3; i++)
+	{	
+		unsigned int temp;
+		temp = e_i2cp_read(0xC0,i*2) << 8;
+		temp |= e_i2cp_read(0xC0,i*2+1);
+		vm->variables[dest++] = temp;
+	}
+	e_i2cp_disable();
+}
+
+AsebaNativeFunctionDescription EpuckNativeDescription_get_ground_values =
+{
+	"get_ground_values",
+	"read the values of the ground sensors",
+	{
+		{ 3, "dest" },
+		{ 0, 0 }
+	}
+};
+#endif
+
 static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 	&AsebaNativeDescription_vecdot,
 	&AsebaNativeDescription_vecstat,
@@ -187,6 +223,15 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 	&AsebaNativeDescription_veccopy,
 	&AsebaNativeDescription_vecadd,
 	&AsebaNativeDescription_vecsub,
+	&AsebaNativeDescription_vecmin,
+	&AsebaNativeDescription_vecmax,
+	&AsebaNativeDescription_mathmuldiv,
+	&AsebaNativeDescription_mathatan2,
+	&AsebaNativeDescription_mathsin,
+	&AsebaNativeDescription_mathcos,
+#ifdef LIS_GROUND_SENSORS
+	&EpuckNativeDescription_get_ground_values,
+#endif
 	0	// null terminated
 };
 
@@ -197,6 +242,15 @@ static AsebaNativeFunctionPointer nativeFunctions[] = {
 	AsebaNative_veccopy,
 	AsebaNative_vecadd,
 	AsebaNative_vecsub,
+	AsebaNative_vecmin,
+	AsebaNative_vecmax,
+	AsebaNative_mathmuldiv,
+	AsebaNative_mathatan2,
+	AsebaNative_mathsin,
+	AsebaNative_mathcos,
+#ifdef LIS_GROUND_SENSORS
+	EpuckNative_get_ground_values,
+#endif
 };
 
 void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
@@ -356,8 +410,22 @@ void initRobot()
 	}
 }
 
+
 void AsebaWriteBytecode(AsebaVMState *vm) {
-	// TODO 
+	int i = 0;
+	_prog_addressT EE_addr;
+		
+	_init_prog_address(EE_addr, eeprom_bytecode); 
+	
+	for(i = 0; i < 2048; i+=_EE_ROW) {
+		_erase_eedata(EE_addr, _EE_ROW);
+		_wait_eedata();
+		
+		_write_eedata_row(EE_addr, (int *) (vm->bytecode + i/2));
+		_wait_eedata();
+		
+		EE_addr += _EE_ROW;
+	}
 }
 void AsebaResetIntoBootloader(AsebaVMState *vm) {
 	asm __volatile__ ("reset");
@@ -379,6 +447,8 @@ void initAseba()
 int main()
 {	
 	int i;
+	_prog_addressT EE_addr;
+	
 	initRobot();
 
 	do {
@@ -391,6 +461,19 @@ int main()
 	}
 	e_calibrate_ir();
 	e_acc_calibr();
+
+	// Load the bytecode
+	
+	_init_prog_address(EE_addr, eeprom_bytecode);
+	
+	for( i = 0; i< 2048; i += _EE_ROW) {
+		_memcpy_p2d16(vmState.bytecode + i/2, EE_addr, _EE_ROW);
+		EE_addr += _EE_ROW;
+	}
+	
+	// Init the vm
+	AsebaVMSetupEvent(&vmState, ASEBA_EVENT_INIT);	
+	
 	while (1)
 	{
 		AsebaProcessIncomingEvents(&vmState);		
