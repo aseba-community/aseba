@@ -131,7 +131,7 @@ static uint16 AsebaCanRecvQueueGetMinFreeFrames()
 	return asebaCan.recvQueueSize - AsebaCanRecvQueueGetMaxUsedFrames();
 }
 
-/*! Free frames associated with an id */
+/*! Readjust the fifo pointers */
 static void AsebaCanRecvQueueGarbageCollect()
 {
 	uint16 temp;
@@ -362,8 +362,10 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 	if (AsebaCanRecvQueueGetMinFreeFrames() <= 1)
 	{
 		// if packet is stop, free associated frames, otherwise this could lead to everlasting used frames
-		if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP)
+		if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP) {
 			AsebaCanRecvQueueFreeFrames(source);
+			AsebaCanRecvQueueGarbageCollect();
+		}
 		
 		// notify user
 		asebaCan.receivedPacketDroppedFP();
