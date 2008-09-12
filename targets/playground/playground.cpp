@@ -62,6 +62,15 @@ namespace Enki
 	class AsebaFeedableEPuck;
 }
 
+extern "C" void PlaygroundNative_energysend(AsebaVMState *vm);
+extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm);
+extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm);
+
+extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend;
+extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive;
+extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energyamount;
+
+
 static AsebaNativeFunctionPointer nativeFunctions[] =
 {
 	AsebaNative_vecfill,
@@ -76,6 +85,9 @@ static AsebaNativeFunctionPointer nativeFunctions[] =
 	AsebaNative_mathatan2,
 	AsebaNative_mathsin,
 	AsebaNative_mathcos,
+	PlaygroundNative_energysend,
+	PlaygroundNative_energyreceive,
+	PlaygroundNative_energyamount
 };
 
 static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
@@ -92,6 +104,9 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	&AsebaNativeDescription_mathatan2,
 	&AsebaNativeDescription_mathsin,
 	&AsebaNativeDescription_mathcos,
+	&PlaygroundNativeDescription_energysend,
+	&PlaygroundNativeDescription_energyreceive,
+	&PlaygroundNativeDescription_energyamount,
 	0
 };
 
@@ -446,7 +461,9 @@ namespace Enki
 		virtual void objectStep (double dt, PhysicalObject *po, World *w)
 		{
 			if (po != owner && dynamic_cast<Robot*>(po))
+			{
 				active |= activeArea.isPointInside(po->pos - owner->pos);
+			}
 		}
 	};
 	
@@ -487,8 +504,9 @@ namespace Enki
 		}
 	};
 
-	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0)
+	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0), energyPool(300)
 	{
+		font.setPixelSize(20);
 		try
 		{
 			Dashel::Hub::connect(QString("tcpin:port=%1").arg(ASEBA_DEFAULT_PORT).toStdString());
@@ -504,6 +522,25 @@ namespace Enki
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
 		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
+	}
+	
+	void PlaygroundViewer::sceneCompletedHook()
+	{
+		// create a map with names and scores
+		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
+		qglColor(Qt::black);
+		renderText(20, 30, QString("E. in pool: %0").arg(energyPool), font);
+		int i = 0;
+		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		{
+			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
+			if (epuck)
+			{
+				renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
+				renderText(20, 30 + 24 + i * 24, QString("%0  E. %1  Pt.  %2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score), font);
+				i++;
+			}
+		}
 	}
 	
 	void PlaygroundViewer::connectionCreated(Dashel::Stream *stream)
@@ -887,6 +924,48 @@ namespace Enki
 	}*/
 }
 
+// Implementation of native function
+
+extern "C" void PlaygroundNative_energysend(AsebaVMState *vm)
+{
+	// find related VM
+	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
+	{
+		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
+		if (epuck && (&(epuck->vm) == vm) && (epuck->energy > EPUCK_INITIAL_ENERGY))
+		{
+			uint16 amount = vm->variables[vm->stack[0]];
+			
+			unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
+			playgroundViewer->energyPool += toSend;
+			epuck->energy -= toSend;
+		}
+	}
+}
+
+extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
+{
+	// find related VM
+	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
+	{
+		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
+		if (epuck && (&(epuck->vm) == vm))
+		{
+			uint16 amount = vm->variables[vm->stack[0]];
+			
+			unsigned toReceive = std::min((unsigned)amount, (unsigned)playgroundViewer->energyPool);
+			playgroundViewer->energyPool -= toReceive;
+			epuck->energy += toReceive;
+		}
+	}
+}
+
+extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm)
+{
+	vm->variables[vm->stack[0]] = playgroundViewer->energyPool;
+}
+
+
 // Implementation of aseba glue code
 
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
@@ -1068,7 +1147,7 @@ int main(int argc, char *argv[])
 	Enki::SlidingDoor *door;
 	
 	// left blue door
-	door = new Enki::SlidingDoor(Enki::Point(38.4, 33.6), Enki::Point(48, 33.6), Enki::Point(9.6, 1.6), 9, 1);
+	door = new Enki::SlidingDoor(Enki::Point(38.4, 33.6), Enki::Point(48.2, 33.6), Enki::Point(9.7, 1.6), 9, 1);
 	door->setColor(LEGO_BLUE);
 	world.addObject(door);
 	
@@ -1100,7 +1179,9 @@ int main(int argc, char *argv[])
 		epuck->name = buffer;
 		world.addObject(epuck);
 		if (i == 3)
-			epuck->pos = Enki::Point(66.2+5, 49.6);
+			//epuck->pos = Enki::Point(66.2+5, 49.6);
+			//epuck->pos = Enki::Point(105, 55.2);
+			;
 	}
 	
 	

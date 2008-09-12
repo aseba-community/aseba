@@ -47,6 +47,8 @@ namespace Enki
 		Dashel::Stream* stream;
 		uint16 lastMessageSource;
 		std::valarray<uint8> lastMessageData;
+		QFont font;
+		unsigned energyPool;
 		
 	public:
 		PlaygroundViewer(World* world);
@@ -54,6 +56,7 @@ namespace Enki
 		
 	protected:
 		virtual void renderObjectsTypesHook();
+		virtual void sceneCompletedHook();
 		
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);

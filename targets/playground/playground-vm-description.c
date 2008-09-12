@@ -52,5 +52,33 @@ AsebaVMDescription vmDescription = {
 	}
 };
 
+AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend =
+{
+	"energy.send",
+	"send energy to pool",
+	{
+		{ 1, "amount" },
+		{ 0, 0 }
+	}
+};
 
+AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive =
+{
+	"energy.receive",
+	"receive energy from pool",
+	{
+		{ 1, "amount" },
+		{ 0, 0 }
+	}
+};
+
+AsebaNativeFunctionDescription PlaygroundNativeDescription_energyamount =
+{
+	"energy.amount",
+	"get the amount of energy available in pool",
+	{
+		{ 1, "amount" },
+		{ 0, 0 }
+	}
+};
 
