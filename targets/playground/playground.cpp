@@ -140,6 +140,10 @@ namespace Enki
 	#define EPUCK_INITIAL_ENERGY			10
 	#define EPUCK_ENERGY_CONSUMPTION_RATE	1
 	
+	#define SCORE_MODIFIER_COEFFICIENT		0.2
+	
+	#define INITIAL_POOL_ENERGY				10
+	
 	#define ACTIVATION_OBJECT_COLOR			LEGO_RED
 	#define ACTIVATION_OBJECT_HEIGHT		6
 	
@@ -152,6 +156,14 @@ namespace Enki
 	extern GLint GenFeederCharge3();
 	extern GLint GenFeederRing();
 	
+	class ScoreModifier: public GlobalInteraction
+	{
+	public:
+		ScoreModifier(Robot* owner) : GlobalInteraction(owner) {}
+		
+		virtual void step(double dt, World *w);
+	};
+	
 	class FeedableEPuck: public EPuck
 	{
 	public:
@@ -159,9 +171,18 @@ namespace Enki
 		double score;
 		QString name;
 		int diedAnimation;
+		ScoreModifier scoreModifier;
 	
 	public:
-		FeedableEPuck() : EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), energy(EPUCK_INITIAL_ENERGY), score(0), diedAnimation(-1) { }
+		FeedableEPuck() :
+			EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), 
+			energy(EPUCK_INITIAL_ENERGY),
+			score(0),
+			diedAnimation(-1),
+			scoreModifier(this)
+		{
+			addGlobalInteraction(&scoreModifier);
+		}
 		
 		void step(double dt)
 		{
@@ -179,6 +200,14 @@ namespace Enki
 				diedAnimation--;
 		}
 	};
+	
+	void ScoreModifier::step(double dt, World *w)
+	{
+		double x = owner->pos.x;
+		double y = owner->pos.y;
+		if ((x > 32) && (x < 110.4-32) && (y > 67.2) && (y < 110.4-32))
+			polymorphic_downcast<FeedableEPuck*>(owner)->score += dt * SCORE_MODIFIER_COEFFICIENT;
+	}
 	
 	class AsebaFeedableEPuck : public FeedableEPuck
 	{
@@ -504,9 +533,10 @@ namespace Enki
 		}
 	};
 
-	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0), energyPool(300)
+	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0), energyPool(INITIAL_POOL_ENERGY)
 	{
-		font.setPixelSize(20);
+		font.setPixelSize(16);
+		font.setLetterSpacing(QFont::PercentageSpacing, 130);
 		try
 		{
 			Dashel::Hub::connect(QString("tcpin:port=%1").arg(ASEBA_DEFAULT_PORT).toStdString());
@@ -529,18 +559,28 @@ namespace Enki
 		// create a map with names and scores
 		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
 		qglColor(Qt::black);
-		renderText(20, 30, QString("E. in pool: %0").arg(energyPool), font);
+		
+		
 		int i = 0;
+		QString scoreString("Id.: E./Score. - ");
+		int totalScore = 0;
 		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
 		{
 			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
 			if (epuck)
 			{
+				totalScore += (int)epuck->score;
+				if (i != 0)
+					scoreString += " - ";
+				scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
 				renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
-				renderText(20, 30 + 24 + i * 24, QString("%0  E. %1  Pt.  %2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score), font);
 				i++;
 			}
 		}
+		
+		renderText(16, 22, scoreString, font);
+		
+		renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 	}
 	
 	void PlaygroundViewer::connectionCreated(Dashel::Stream *stream)
@@ -609,6 +649,7 @@ namespace Enki
 		// do a simulator/gui step
 		ViewerWidget::timerEvent(event);
 	}
+	
 	/*
 	// Playground Viewer
 	
@@ -1173,8 +1214,8 @@ int main(int argc, char *argv[])
 		char buffer[9];
 		strncpy(buffer, "e-puck  ", sizeof(buffer));
 		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(i+1);
-		epuck->pos.x = i  + Enki::random.getRange(5)+5;
-		epuck->pos.y = Enki::random.getRange(10)+20;
+		epuck->pos.x = i  + Enki::random.getRange(5)+15;
+		epuck->pos.y = Enki::random.getRange(10)+30;
 		buffer[7] = '0' + i;
 		epuck->name = buffer;
 		world.addObject(epuck);
