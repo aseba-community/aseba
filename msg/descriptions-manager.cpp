@@ -29,6 +29,7 @@ using namespace std;
 namespace Aseba
 {
 	DescriptionsManager::NodeDescription::NodeDescription() :
+		namedVariablesReceptionCounter(0),
 		localEventsReceptionCounter(0),
 		nativeFunctionReceptionCounter(0)
 	{
@@ -36,6 +37,7 @@ namespace Aseba
 	
 	DescriptionsManager::NodeDescription::NodeDescription(const TargetDescription& targetDescription) :
 		TargetDescription(targetDescription),
+		namedVariablesReceptionCounter(0),
 		localEventsReceptionCounter(0),
 		nativeFunctionReceptionCounter(0)
 	{
@@ -64,6 +66,26 @@ namespace Aseba
 				// create node and copy description into it
 				nodesDescriptions[description->source] = NodeDescription(*description);
 				checkIfNodeDescriptionComplete(description->source, nodesDescriptions[description->source]);
+			}
+		}
+		
+		// if we have a named variabledescription
+		{
+			const NamedVariableDescription *description = dynamic_cast<const NamedVariableDescription *>(message);
+			if (description)
+			{
+				NodesDescriptionsMap::iterator it = nodesDescriptions.find(description->source);
+				
+				// we must have received a description first
+				if (it == nodesDescriptions.end())
+					return;
+				
+				// copy description into array if array is empty
+				if (it->second.namedVariablesReceptionCounter < it->second.namedVariables.size())
+				{
+					it->second.namedVariables[it->second.namedVariablesReceptionCounter++] = *description;
+					checkIfNodeDescriptionComplete(it->first, it->second);
+				}
 			}
 		}
 		
@@ -111,8 +133,10 @@ namespace Aseba
 	void DescriptionsManager::checkIfNodeDescriptionComplete(unsigned id, const NodeDescription& description)
 	{
 		// we will call the virtual function only when we have received all local events and native functions
-		if ((description.localEventsReceptionCounter == description.localEvents.size()) &&
-			(description.nativeFunctionReceptionCounter == description.nativeFunctions.size()))
+		if ((description.namedVariablesReceptionCounter == description.namedVariables.size()) &&
+			(description.localEventsReceptionCounter == description.localEvents.size()) &&
+			(description.nativeFunctionReceptionCounter == description.nativeFunctions.size())
+		)
 			nodeDescriptionReceived(id);
 	}
 	

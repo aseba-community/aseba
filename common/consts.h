@@ -30,7 +30,7 @@
 /*@{*/
 
 /*! version of aseba protocol */
-#define ASEBA_PROTOCOL_VERSION 2
+#define ASEBA_PROTOCOL_VERSION 3
 
 /*! default listen target for aseba */
 #define ASEBA_DEFAULT_LISTEN_TARGET "tcpin:33333"
@@ -143,6 +143,7 @@ typedef enum
 	
 	/* from a specific node */
 	ASEBA_MESSAGE_DESCRIPTION = 0x9000,
+	ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION,
 	ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION,
 	ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION,
 	ASEBA_MESSAGE_DISCONNECTED,

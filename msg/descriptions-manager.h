@@ -43,6 +43,7 @@ namespace Aseba
 			NodeDescription();
 			NodeDescription(const TargetDescription& targetDescription);
 			
+			int namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
 			int localEventsReceptionCounter; //!< what is the status of the reception of local events
 			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
 		};

@@ -46,6 +46,7 @@ namespace Aseba
 			registerMessageType<BootloaderAck>(ASEBA_MESSAGE_BOOTLOADER_ACK);
 			
 			registerMessageType<Description>(ASEBA_MESSAGE_DESCRIPTION);
+			registerMessageType<NamedVariableDescription>(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION);
 			registerMessageType<LocalEventDescription>(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION);
 			registerMessageType<NativeFunctionDescription>(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION);
 			registerMessageType<Disconnected>(ASEBA_MESSAGE_DISCONNECTED);
@@ -385,11 +386,7 @@ namespace Aseba
 		add(variablesSize);
 		
 		add(static_cast<uint16>(namedVariables.size()));
-		for (size_t i = 0; i < namedVariables.size(); i++)
-		{
-			add(namedVariables[i].size);
-			add(namedVariables[i].name);
-		}
+		// named variables are sent separately
 		
 		add(static_cast<uint16>(localEvents.size()));
 		// local events are sent separately
@@ -408,11 +405,7 @@ namespace Aseba
 		variablesSize = get<uint16>();
 		
 		namedVariables.resize(get<uint16>());
-		for (size_t i = 0; i < namedVariables.size(); i++)
-		{
-			namedVariables[i].size = get<uint16>();
-			namedVariables[i].name = get<string>();
-		}
+		// named variables are received separately
 		
 		localEvents.resize(get<uint16>());
 		// local events are received separately
@@ -425,14 +418,34 @@ namespace Aseba
 	{
 		stream << "Node " << name << " using protocol version " << protocolVersion << "\n";
 		stream << "bytecode: " << bytecodeSize << ", stack: " << stackSize << ", variables: " << variablesSize;
-		for (size_t i = 0; i < namedVariables.size(); i++)
-			stream << "\n\t" << namedVariables[i].name << " : " << namedVariables[i].size;
+		
+		stream << "\nnamed variables: " << namedVariables.size() << "\n";
+		// named variables are available separately
 		
 		stream << "\nlocal events: " << localEvents.size() << "\n";
 		// local events are available separately
 		
 		stream << "native functions: " << nativeFunctions.size();
 		// native functions are available separately
+	}
+	
+	//
+	
+	void NamedVariableDescription::serializeSpecific()
+	{
+		add(size);
+		add(name);
+	}
+	
+	void NamedVariableDescription::deserializeSpecific()
+	{
+		size = get<uint16>();
+		name = get<string>();
+	}
+	
+	void NamedVariableDescription::dumpSpecific(std::ostream &stream)
+	{
+		stream << name << " of size " << size;
 	}
 	
 	//

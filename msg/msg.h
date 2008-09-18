@@ -182,6 +182,19 @@ namespace Aseba
 		virtual operator const char * () const { return "description"; }
 	};
 	
+	//! Description of a named variable available on a node, the description of the node itself must have been sent first
+	class NamedVariableDescription : public Message, public TargetDescription::NamedVariable
+	{
+	public:
+		NamedVariableDescription() : Message(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::ostream &stream);
+		virtual operator const char * () const { return "named variable"; }
+	};
+	
 	//! Description of a local event available on a node, the description of the node itself must have been sent first
 	class LocalEventDescription : public Message, public TargetDescription::LocalEvent
 	{

@@ -92,6 +92,7 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 void AsebaSendDescription(AsebaVMState *vm)
 {
 	const AsebaVMDescription *vmDescription = AsebaGetVMDescription(vm);
+	const AsebaVariableDescription* namedVariables = vmDescription->variables;
 	const AsebaNativeFunctionDescription* const * nativeFunctionsDescription = AsebaGetNativeFunctionsDescriptions(vm);
 	const AsebaLocalEventDescription* localEvents = AsebaGetLocalEventsDescriptions(vm);
 	
@@ -109,15 +110,9 @@ void AsebaSendDescription(AsebaVMState *vm)
 	buffer_add_uint16(vm->variablesSize);
 
 	// compute the number of variables descriptions
-	for (i = 0; vmDescription->variables[i].size; i++)
+	for (i = 0; namedVariables[i].size; i++)
 		;
 	buffer_add_uint16(i);
-	// send variables description
-	for (i = 0; vmDescription->variables[i].size; i++)
-	{
-		buffer_add_uint16(vmDescription->variables[i].size);
-		buffer_add_string(vmDescription->variables[i].name);
-	}
 	
 	// compute the number of local event functions
 	for (i = 0; localEvents[i].name; i++)
@@ -131,6 +126,20 @@ void AsebaSendDescription(AsebaVMState *vm)
 	
 	// send buffer
 	AsebaSendBuffer(vm, buffer, buffer_pos);
+	
+	// send named variables description
+	for (i = 0; namedVariables[i].name; i++)
+	{
+		buffer_pos = 0;
+		
+		buffer_add_uint16(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION);
+		
+		buffer_add_uint16(namedVariables[i].size);
+		buffer_add_string(namedVariables[i].name);
+		
+		// send buffer
+		AsebaSendBuffer(vm, buffer, buffer_pos);
+	}
 	
 	// send local events description
 	for (i = 0; localEvents[i].name; i++)
