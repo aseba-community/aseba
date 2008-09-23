@@ -273,8 +273,8 @@ namespace Enki
 		void step(double dt)
 		{
 			// set physical variables
-			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
-			rightSpeed = toDoubleClamp(variables.speedR, 1, -13, 13);
+			leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
+			rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
 			color.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
 			color.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
 			color.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
