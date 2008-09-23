@@ -286,9 +286,10 @@ void AsebaVMStep(AsebaVMState *vm)
 			// check variable index
 			if (variableIndex >= arraySize)
 			{
-				uint16 buffer[2];
+				uint16 buffer[3];
 				buffer[0] = vm->pc;
-				buffer[1] = variableIndex;
+				buffer[1] = arraySize;
+				buffer[2] = variableIndex;
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, sizeof(buffer));
 				break;
@@ -299,7 +300,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			vm->sp -= 2;
 			
 			// increment PC
-			vm->pc ++;
+			vm->pc += 2;
 		}
 		break;
 		
