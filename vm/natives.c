@@ -540,7 +540,7 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	sint16 yp = (sint16)(((sint32)cos_a * (sint32)y - (sint32)sin_a * (sint32)x) >> (sint32)15);
 	
 	vm->variables[vm->stack[0]] = xp;
-	vm->variables[vm->stack[0+1]] = yp;
+	vm->variables[vm->stack[0]+1] = yp;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
