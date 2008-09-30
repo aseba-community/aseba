@@ -57,7 +57,7 @@ namespace Aseba
 		// literals
 		QTextCharFormat literalsFormat;
 		literalsFormat.setForeground(Qt::darkBlue);
-		rule.pattern = QRegExp("\\b-{0,1}[0-9]+\\b");
+		rule.pattern = QRegExp("\\b(-{0,1}\\d+|0x([0-9]|[a-f]|[A-F])+|0b[0-1]+)\\b");
 		rule.format = literalsFormat;
 		highlightingRules.append(rule);
 		
@@ -148,24 +148,17 @@ namespace Aseba
 			
 			if (pos + len < text.length())
 			{
-				if (text[pos + len].isDigit())
-				{
-					// find length of number
-					while (pos + len < text.length())
-						if (!text[pos + len].isDigit())
-							break;
-						else
-							len++;
-				}
-				else
-				{
-					// find length of word
-					while (pos + len < text.length())
-						if (!text[pos + len].isLetter() && (text[pos + len] != '_'))
-							break;
-						else
-							len++;
-				}
+				// find length of number or word
+				while (pos + len < text.length())
+					if (
+						(!text[pos + len].isDigit()) && 
+						(!text[pos + len].isLetter()) &&
+						(text[pos + len] != '_') && 
+						(text[pos + len] != '.')
+					)
+						break;
+					else
+						len++;
 			}
 			len = len > 0 ? len : 1;
 			setFormat(pos, len, Qt::red);

@@ -36,7 +36,14 @@ namespace Aseba
 		pos(pos)
 	{
 		if (type == TOKEN_INT_LITERAL)
-			iValue = atoi(value.c_str());
+		{
+			if ((value.length() > 1) && (value[1] == 'x'))
+				iValue = strtol(value.c_str() + 2, NULL, 16);
+			else if ((value.length() > 1) && (value[1] == 'b'))
+				iValue = strtol(value.c_str() + 2, NULL, 2);
+			else
+				iValue = atoi(value.c_str());
+		}
 		else
 			iValue = 0;
 		pos.column--; // column has already been incremented when token is created, so we remove one
@@ -256,10 +263,33 @@ namespace Aseba
 					// we now have a string, let's check what it is
 					if (std::isdigit(s[0]))
 					{
-						// check if we have a valid number
-						for (unsigned i = 1; i < s.size(); i++)
-							if (!std::isdigit(s[i]))
-								throw Error(pos, "error in number");
+						// check if hex or binary
+						if ((s.length() > 1) && (s[0] == '0') && (!std::isdigit(s[1])))
+						{
+							// check if we have a valid number
+							if (s[1] == 'x')
+							{
+								for (unsigned i = 2; i < s.size(); i++)
+									if (!std::isxdigit(s[i]))
+										throw Error(pos, "error in hexadecimal number");
+							}
+							else if (s[1] == 'b')
+							{
+								for (unsigned i = 2; i < s.size(); i++)
+									if ((s[i] != '0') && (s[i] != '1'))
+										throw Error(pos, "error in binary number");
+							}
+							else
+								throw Error(pos, "error in number, invalid base");
+							
+						}
+						else
+						{
+							// check if we have a valid number
+							for (unsigned i = 1; i < s.size(); i++)
+								if (!std::isdigit(s[i]))
+									throw Error(pos, "error in number");
+						}
 						tokens.push_back(Token(Token::TOKEN_INT_LITERAL, pos, s));
 					}
 					else
