@@ -154,13 +154,13 @@ namespace Aseba
 		virtual std::string toString() const;
 	};
 	
-	//! Node for "onevent" and "ontimer".
+	//! Node for "onevent" 
 	//! no children
-	struct ContextSwitcherNode : Node
+	struct EventDeclNode : Node
 	{
 		unsigned eventId; //!< the event id associated with this context
 		
-		ContextSwitcherNode(const SourcePos& sourcePos, unsigned eventId = 0);
+		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -168,6 +168,7 @@ namespace Aseba
 	};
 	
 	//! Node for "emit".
+	//! no children
 	struct EmitNode : Node
 	{
 		unsigned eventId; //!< id of event to emit
@@ -176,6 +177,32 @@ namespace Aseba
 		
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		
+		virtual Node* optimize(std::ostream* dump);
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::string toString() const;
+	};
+	
+	//! Node for "sub"
+	//! no children
+	struct SubDeclNode : Node
+	{
+		unsigned subroutineId; //!< the associated subroutine
+		
+		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
+		
+		virtual Node* optimize(std::ostream* dump);
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::string toString() const;
+	};
+	
+	//! Node for "callsub"
+	//! no children
+	struct CallSubNode : Node
+	{
+		unsigned subroutineId; //!< the subroutine to call
+		
+		CallSubNode(const SourcePos& sourcePos, unsigned subroutineId);
 		
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;

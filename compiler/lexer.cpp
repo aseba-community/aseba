@@ -70,6 +70,8 @@ namespace Aseba
 			case TOKEN_STR_end: return "end keyword";
 			case TOKEN_STR_var: return "var keyword";
 			case TOKEN_STR_call: return "call keyword";
+			case TOKEN_STR_sub: return "sub keyword";
+			case TOKEN_STR_callsub: return "callsub keyword";
 			case TOKEN_STR_onevent: return "onevent keyword";
 			case TOKEN_STRING_LITERAL: return "string";
 			case TOKEN_INT_LITERAL: return "integer";
@@ -323,6 +325,10 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_var, pos));
 						else if (s == "call")
 							tokens.push_back(Token(Token::TOKEN_STR_call, pos));
+						else if (s == "sub")
+							tokens.push_back(Token(Token::TOKEN_STR_sub, pos));
+						else if (s == "callsub")
+							tokens.push_back(Token(Token::TOKEN_STR_callsub, pos));
 						else if (s == "onevent")
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
 						else if (s == "or")

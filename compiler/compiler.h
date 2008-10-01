@@ -28,6 +28,7 @@
 #include <deque>
 #include <string>
 #include <map>
+#include <set>
 #include <utility>
 #include <istream>
 
@@ -108,10 +109,18 @@ namespace Aseba
 	//! Bytecode array in the form of a dequeue, for construction
 	typedef std::deque<BytecodeElement> BytecodeVector;
 	
-	//! Bytecode use for compilation previous to linking. Basically a map of events id to events bytecodes
-	struct PreLinkBytecode : public std::map<unsigned, BytecodeVector>
+	//! Bytecode use for compilation previous to linking
+	struct PreLinkBytecode
 	{
-		BytecodeVector *currentBytecode; //!< pointer to bytecode being constructed
+		//! Map of events id to event bytecode
+		typedef std::map<unsigned, BytecodeVector> EventsBytecode;
+		EventsBytecode events; //!< bytecode for events
+		
+		//! Map of routines id to routine bytecode
+		typedef std::map<unsigned, BytecodeVector> SubroutinesBytecode;
+		SubroutinesBytecode subroutines; //!< bytecode for routines
+		
+		BytecodeVector *current; //!< pointer to bytecode being constructed
 		
 		PreLinkBytecode();
 		void fixup();
@@ -213,6 +222,8 @@ namespace Aseba
 				TOKEN_STR_end,
 				TOKEN_STR_var,
 				TOKEN_STR_call,
+				TOKEN_STR_sub,
+				TOKEN_STR_callsub,
 				TOKEN_STR_onevent,
 				TOKEN_STRING_LITERAL,
 				TOKEN_INT_LITERAL,
@@ -257,6 +268,12 @@ namespace Aseba
 		typedef std::map<std::string, std::pair<unsigned, unsigned> > VariablesMap;
 		//! Lookup table for functions (name => id in target description)
 		typedef std::map<std::string, unsigned> FunctionsMap;
+		//! Lookup table for subroutines id => (name, address)
+		typedef std::vector<std::pair<std::string, unsigned> > SubroutineTable;
+		//! Reverse Lookup table for subroutines name => id
+		typedef std::map<std::string, unsigned> SubroutineReverseTable;
+		//! Lookup table to keep track of implemented events
+		typedef std::set<unsigned> ImplementedEvents;
 	
 	public:
 		Compiler();
@@ -275,6 +292,7 @@ namespace Aseba
 		unsigned expectUInt12Literal() const;
 		unsigned expectGlobalEventId() const;
 		unsigned expectAnyEventId() const;
+		std::string eventName(unsigned eventId) const;
 		template <int length>
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
@@ -282,7 +300,7 @@ namespace Aseba
 		void buildMaps();
 		void tokenize(std::istream& source);
 		void dumpTokens(std::ostream &dest) const;
-		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const;
+		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
 		void disassemble(BytecodeVector& bytecode, std::ostream& dump) const;
 		
 	protected:
@@ -299,6 +317,8 @@ namespace Aseba
 		Node* parseWhile();
 		Node* parseOnEvent();
 		Node* parseEmit();
+		Node* parseSubDecl();
+		Node* parseCallSub();
 		
 		BinaryArithmeticNode* parseOr();
 		BinaryArithmeticNode* parseAnd();
@@ -317,7 +337,10 @@ namespace Aseba
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
 		VariablesMap variablesMap; //!< variables lookup
+		ImplementedEvents implementedEvents; //!< list of implemented events
 		FunctionsMap functionsMap; //!< functions lookup
+		SubroutineTable subroutineTable; //!< subroutine lookup
+		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants

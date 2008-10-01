@@ -48,9 +48,25 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ContextSwitcherNode::ContextSwitcherNode(const SourcePos& sourcePos, unsigned eventId) :
+	EventDeclNode::EventDeclNode(const SourcePos& sourcePos, unsigned eventId) :
 		Node(sourcePos),
 		eventId(eventId)
+	{
+	
+	}
+	
+	//! Constructor
+	SubDeclNode::SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId) :
+		Node(sourcePos),
+		subroutineId(subroutineId)
+	{
+	
+	}
+	
+	//! Constructor
+	CallSubNode::CallSubNode(const SourcePos& sourcePos, unsigned subroutineId) :
+		Node(sourcePos),
+		subroutineId(subroutineId)
 	{
 	
 	}

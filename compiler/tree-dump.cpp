@@ -112,7 +112,7 @@ namespace Aseba
 		return s;
 	};
 	
-	std::string ContextSwitcherNode::toString() const
+	std::string EventDeclNode::toString() const
 	{
 		if (eventId == ASEBA_EVENT_INIT)
 			return "ContextSwitcher: to init";
@@ -126,6 +126,16 @@ namespace Aseba
 		if (arraySize)
 			s += FormatableString("addr %0 size %1 ").arg(arrayAddr).arg(arraySize);
 		return s;
+	}
+	
+	std::string SubDeclNode::toString() const
+	{
+		return FormatableString("Sub: %0").arg(subroutineId);
+	}
+	
+	std::string CallSubNode::toString() const
+	{
+		return FormatableString("CallSub: %0").arg(subroutineId);
 	}
 
 	std::string BinaryArithmeticNode::toString() const

@@ -143,6 +143,22 @@ namespace Aseba
 		return expectGlobalEventId();
 	}
 	
+	//! Return the name of an event given its identifier
+	std::string Compiler::eventName(unsigned eventId) const
+	{
+		// search for local
+		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
+			if (ASEBA_EVENT_LOCAL_EVENTS_START - i == eventId)
+				return targetDescription->localEvents[i].name;
+		
+		// then for global
+		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
+			if (commonDefinitions->events[i].value == eventId)
+				return commonDefinitions->events[eventId].name;
+		
+		return "unknown";
+	}
+	
 	//! Return true if next token is of the following types
 	template <int length>
 	bool Compiler::isOneOf(const Token::Type types[length]) const
@@ -204,6 +220,7 @@ namespace Aseba
 		{
 			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, "Variable definition is allowed only at the beginning of the program before any statement");
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
+			case Token::TOKEN_STR_sub: return parseSubDecl();
 			default: return parseBlockStatement();
 		}
 	}
@@ -217,9 +234,9 @@ namespace Aseba
 			case Token::TOKEN_STR_when: return parseIfWhen(true);
 			case Token::TOKEN_STR_for: return parseFor();
 			case Token::TOKEN_STR_while: return parseWhile();
-			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_emit: return parseEmit();
 			case Token::TOKEN_STR_call: return parseFunctionCall();
+			case Token::TOKEN_STR_callsub: return parseCallSub();
 			default: return parseAssignment();
 		}
 	}
@@ -559,9 +576,13 @@ namespace Aseba
 		tokens.pop_front();
 		
 		unsigned eventId = expectAnyEventId();
+		if (implementedEvents.find(eventId) != implementedEvents.end())
+			throw Error(tokens.front().pos, FormatableString("Event %0 is already implemented").arg(eventName(eventId)));
+		implementedEvents.insert(eventId);
+		
 		tokens.pop_front();
 		
-		return new ContextSwitcherNode(pos, eventId);
+		return new EventDeclNode(pos, eventId);
 	}
 	
 	//! Parse "event" grammar element
@@ -591,6 +612,46 @@ namespace Aseba
 		}
 		
 		return emitNode.release();
+	}
+	
+	//! Parse "sub" grammar element, declaration of subroutine
+	Node* Compiler::parseSubDecl()
+	{
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+		
+		expect(Token::TOKEN_STRING_LITERAL);
+		
+		const std::string& name = tokens.front().sValue;
+		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
+		if (it != subroutineReverseTable.end())
+			throw Error(tokens.front().pos, FormatableString("Subroutine %0 is already defined").arg(name));
+		
+		unsigned subroutineId = subroutineTable.size();
+		subroutineTable.push_back(std::make_pair(name, 0));
+		subroutineReverseTable[name] = subroutineId;
+		
+		tokens.pop_front();
+		
+		return new SubDeclNode(pos, subroutineId);
+	}
+	
+	//! Parse "subcall" grammar element, call of subroutine
+	Node* Compiler::parseCallSub()
+	{
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+		
+		expect(Token::TOKEN_STRING_LITERAL);
+		
+		const std::string& name = tokens.front().sValue;
+		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
+		if (it == subroutineReverseTable.end())
+			throw Error(tokens.front().pos, FormatableString("Subroutine %0 does not exists").arg(name));
+		
+		tokens.pop_front();
+		
+		return new CallSubNode(pos, it->second);
 	}
 	
 	//! Parse access to variable, arrray, or array subscript
@@ -902,9 +963,8 @@ namespace Aseba
 		tokens.pop_front();
 		
 		expect(Token::TOKEN_STRING_LITERAL);
-		std::string funcName = tokens.front().sValue;
-		tokens.pop_front();
 		
+		std::string funcName = tokens.front().sValue;
 		FunctionsMap::const_iterator funcIt = functionsMap.find(funcName);
 		
 		// check if function exists, get it and create node
@@ -912,6 +972,8 @@ namespace Aseba
 			throw Error(tokens.front().pos, FormatableString("Target does not provide function %0").arg(funcName));
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
 		std::auto_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
+		
+		tokens.pop_front();
 		
 		expect(Token::TOKEN_PAR_OPEN);
 		tokens.pop_front();

@@ -165,7 +165,7 @@ namespace Aseba
 		program->emit(preLinkBytecode);
 		delete program;
 		
-		// fix-up (add of missing STOP bytecodes at code generation)
+		// fix-up (add of missing STOP and RET bytecodes at code generation)
 		preLinkBytecode.fixup();
 		
 		// linking (flattening of complex structure into linear vector)
@@ -186,17 +186,17 @@ namespace Aseba
 	}
 	
 	//! Create the final bytecode for a microcontroller
-	bool Compiler::link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode) const
+	bool Compiler::link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode)
 	{
 		bytecode.clear();
 		
 		// event vector table size
-		unsigned addr = preLinkBytecode.size() * 2 + 1;
+		unsigned addr = preLinkBytecode.events.size() * 2 + 1;
 		bytecode.push_back(addr);
 		
 		// events
-		for (std::map<unsigned, BytecodeVector>::const_iterator it = preLinkBytecode.begin();
-			it != preLinkBytecode.end();
+		for (PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.begin();
+			it != preLinkBytecode.events.end();
 			++it
 		)
 		{
@@ -205,14 +205,57 @@ namespace Aseba
 			addr += it->second.size();			// next bytecode addr
 		}
 		
-		// bytecode
-		for (std::map<unsigned, BytecodeVector>::const_iterator it = preLinkBytecode.begin();
-			it != preLinkBytecode.end();
+		// evPreLinkBytecode::ents bytecode
+		for (PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.begin();
+			it != preLinkBytecode.events.end();
 			++it
 		)
-			std::copy(it->second.begin(),
-			it->second.end(),
-			std::back_inserter(bytecode));
+		{
+			std::copy(it->second.begin(), it->second.end(), std::back_inserter(bytecode));
+		}
+		
+		// subrountines bytecode
+		for (PreLinkBytecode::SubroutinesBytecode::const_iterator it = preLinkBytecode.subroutines.begin();
+			it != preLinkBytecode.subroutines.end();
+			++it
+		)
+		{
+			subroutineTable[it->first].second = bytecode.size();
+			std::copy(it->second.begin(), it->second.end(), std::back_inserter(bytecode));
+		}
+		
+		// resolve subroutines call addresses
+		for (size_t pc = 0; pc < bytecode.size();)
+		{
+			switch (bytecode[pc] >> 12)
+			{
+				case ASEBA_BYTECODE_SUB_CALL:
+				{
+					unsigned id = bytecode[pc] & 0x0fff;
+					assert(id < subroutineTable.size());
+					unsigned address = subroutineTable[id].second;
+					bytecode[pc].bytecode &= 0xf000;
+					bytecode[pc].bytecode |= address;
+					pc += 1;
+				}
+				break;
+				
+				case ASEBA_BYTECODE_LARGE_IMMEDIATE:
+				case ASEBA_BYTECODE_LOAD_INDIRECT:
+				case ASEBA_BYTECODE_STORE_INDIRECT:
+				case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
+					pc += 2;
+				break;
+				
+				case ASEBA_BYTECODE_EMIT:
+					pc += 3;
+				break;
+				
+				default:
+					pc += 1;
+				break;
+			}
+		}
 		
 		// check size
 		return bytecode.size() <= targetDescription->bytecodeSize;
@@ -221,8 +264,13 @@ namespace Aseba
 	//! Disassemble a microcontroller bytecode and dump it
 	void Compiler::disassemble(BytecodeVector& bytecode, std::ostream& dump) const
 	{
-		// address of threads
+		// address of threads and subroutines
 		std::map<unsigned, unsigned> eventAddr;
+		std::map<unsigned, unsigned> subroutinesAddr;
+		
+		// build subroutine map
+		for (size_t i = 0; i < subroutineTable.size(); ++i)
+			subroutinesAddr[subroutineTable[i].second] = i;
 		
 		// event table
 		unsigned eventVectSize = bytecode[0];
@@ -264,6 +312,12 @@ namespace Aseba
 					
 				dump << "\n";
 			}
+			
+			if (subroutinesAddr.find(pc) != subroutinesAddr.end())
+			{
+				dump << "sub " << subroutineTable[subroutinesAddr[pc]].first << ":\n";
+			}
+			
 			dump << "    ";
 			dump << pc << " (" << bytecode[pc].line << ") : ";
 			switch (bytecode[pc] >> 12)
@@ -347,6 +401,23 @@ namespace Aseba
 				pc++;
 				break;
 				
+				case ASEBA_BYTECODE_SUB_CALL:
+				{
+					unsigned address = (bytecode[pc] & 0x0fff);
+					std::string name("unknown");
+					for (size_t i = 0; i < subroutineTable.size(); i++)
+						if (subroutineTable[i].second == address)
+							name = subroutineTable[i].first;
+					dump << "SUB_CALL to " << name << " @ " << address << "\n";
+					pc++;
+				}
+				break;
+				
+				case ASEBA_BYTECODE_SUB_RET:
+				dump << "SUB_RET\n";
+				pc++;
+				break;
+				
 				default:
 				dump << "?\n";
 				pc++;
@@ -360,6 +431,11 @@ namespace Aseba
 	{
 		assert(targetDescription);
 		freeVariableIndex = 0;
+		
+		// erase tables
+		implementedEvents.clear();
+		subroutineTable.clear();
+		subroutineReverseTable.clear();
 		
 		// fill variables map
 		variablesMap.clear();

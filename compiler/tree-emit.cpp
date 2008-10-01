@@ -32,31 +32,41 @@ namespace Aseba
 	//! Add init event and point to currentBytecode it
 	PreLinkBytecode::PreLinkBytecode()
 	{
-		(*this)[ASEBA_EVENT_INIT] = BytecodeVector();
-		currentBytecode = &(*this)[ASEBA_EVENT_INIT];
+		events[ASEBA_EVENT_INIT] = BytecodeVector();
+		current = &events[ASEBA_EVENT_INIT];
 	};
 	
-	//! Fixup prelinked bytecodes by making sure each vector has at least a STOP token
+	//! Fixup prelinked bytecodes by making sure that each vector is closed correctly,
+	//! i.e. with a STOP for events and a RET for subroutines
 	void PreLinkBytecode::fixup()
 	{
-		// add terminal STOP
-		size_t currentBytecodeSize = currentBytecode->size();
-		if (currentBytecodeSize > 0)
-			currentBytecode->push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), (*currentBytecode)[currentBytecodeSize-1].line));
-		
-		// clear empty entries
-		for (std::map<unsigned, BytecodeVector>::iterator it = begin(); it != end();)
+		// clear empty events entries
+		for (EventsBytecode::iterator it = events.begin(); it != events.end();)
 		{
-			std::map<unsigned, BytecodeVector>::iterator curIt = it;
+			EventsBytecode::iterator curIt = it;
 			++it;
 			size_t bytecodeSize = curIt->second.size();
 			if (bytecodeSize == 0)
 			{
-				erase(curIt);
+				events.erase(curIt);
 			}
-			/*else if ((curIt->second[bytecodeSize-1].bytecode >> 12) != ASEBA_BYTECODE_STOP)
-				curIt->second.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), curIt->second[bytecodeSize-1].line));*/
 		}
+		
+		// add terminals
+		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
+		{
+			BytecodeVector& bytecode = it->second;
+			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode[bytecode.size()-1].line));
+		}
+		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
+		{
+			BytecodeVector& bytecode = it->second;
+			if (bytecode.size())
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode[bytecode.size()-1].line));
+			else
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), 0));
+		}
+		// TODO: fix location
 	}
 	
 	void BlockNode::emit(PreLinkBytecode& bytecodes) const
@@ -98,44 +108,44 @@ namespace Aseba
 		BytecodeVector bfb;
 		
 		// save real current bytecode
-		BytecodeVector* currentBytecode = bytecodes.currentBytecode;
+		BytecodeVector* currentBytecode = bytecodes.current;
 		
 		// generate code for left expression
-		bytecodes.currentBytecode = &ble;
+		bytecodes.current = &ble;
 		children[0]->emit(bytecodes);
 		// generate code for right expression
-		bytecodes.currentBytecode = &bre;
+		bytecodes.current = &bre;
 		children[1]->emit(bytecodes);
 		// generate code for true block
-		bytecodes.currentBytecode = &btb;
+		bytecodes.current = &btb;
 		children[2]->emit(bytecodes);
 		// generate code for false block
 		if (children.size() == 4)
 		{
-			bytecodes.currentBytecode = &bfb;
+			bytecodes.current = &bfb;
 			children[3]->emit(bytecodes);
 		}
 		
 		// restore real current bytecode
-		bytecodes.currentBytecode = currentBytecode;
+		bytecodes.current = currentBytecode;
 		
 		// fit everything together
-		std::copy(ble.begin(), ble.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(ble.begin(), ble.end(), std::back_inserter(*bytecodes.current));
 		
-		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.current));
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH);
 		bytecode |= op;
 		bytecode |= edgeSensitive ? (1 << ASEBA_IF_IS_WHEN_BIT) : 0;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		
 		if (children.size() == 4)
-			bytecodes.currentBytecode->push_back(BytecodeElement(2 + btb.size() + 1, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(2 + btb.size() + 1, sourcePos.row));
 		else
-			bytecodes.currentBytecode->push_back(BytecodeElement(2 + btb.size(), sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(2 + btb.size(), sourcePos.row));
 		
 		
-		std::copy(btb.begin(), btb.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(btb.begin(), btb.end(), std::back_inserter(*bytecodes.current));
 		
 		if (children.size() == 4)
 		{
@@ -145,9 +155,9 @@ namespace Aseba
 				jumpLine = (btb.end()-1)->line;
 			else
 				jumpLine = sourcePos.row;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode , jumpLine));
+			bytecodes.current->push_back(BytecodeElement(bytecode , jumpLine));
 			
-			std::copy(bfb.begin(), bfb.end(), std::back_inserter(*bytecodes.currentBytecode));
+			std::copy(bfb.begin(), bfb.end(), std::back_inserter(*bytecodes.current));
 		}
 	}
 	
@@ -176,54 +186,70 @@ namespace Aseba
 		BytecodeVector bb;
 		
 		// save real current bytecode
-		BytecodeVector* currentBytecode = bytecodes.currentBytecode;
+		BytecodeVector* currentBytecode = bytecodes.current;
 		
 		// generate code for left expression
-		bytecodes.currentBytecode = &ble;
+		bytecodes.current = &ble;
 		children[0]->emit(bytecodes);
 		// generate code for right expression
-		bytecodes.currentBytecode = &bre;
+		bytecodes.current = &bre;
 		children[1]->emit(bytecodes);
 		// generate code for block
-		bytecodes.currentBytecode = &bb;
+		bytecodes.current = &bb;
 		children[2]->emit(bytecodes);
 		
 		// restore real current bytecode
-		bytecodes.currentBytecode = currentBytecode;
+		bytecodes.current = currentBytecode;
 		
 		// fit everything together
-		std::copy(ble.begin(), ble.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(ble.begin(), ble.end(), std::back_inserter(*bytecodes.current));
 		
-		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(bre.begin(), bre.end(), std::back_inserter(*bytecodes.current));
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CONDITIONAL_BRANCH) | op;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(2 + bb.size() + 1, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(2 + bb.size() + 1, sourcePos.row));
 		
-		std::copy(bb.begin(), bb.end(), std::back_inserter(*bytecodes.currentBytecode));
+		std::copy(bb.begin(), bb.end(), std::back_inserter(*bytecodes.current));
 		
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP);
 		bytecode |= ((unsigned)(-(int)(ble.size() + bre.size() + bb.size() + 2))) & 0x0fff;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
-	void ContextSwitcherNode::emit(PreLinkBytecode& bytecodes) const
+	void EventDeclNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		// push stop
-		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STOP);
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		// change event bytecode
-		if (bytecodes.find(eventId) == bytecodes.end())
-			bytecodes[eventId] = BytecodeVector();
-		bytecodes.currentBytecode = &bytecodes[eventId];
+		// make sure that we do not have twice the same event
+		assert(bytecodes.events.find(eventId) == bytecodes.events.end());
+		
+		// create new bytecode for event
+		bytecodes.events[eventId] = BytecodeVector();
+		bytecodes.current = &bytecodes.events[eventId];
 	}
 	
 	void EmitNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_EMIT) | eventId;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(arrayAddr, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(arraySize, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(arrayAddr, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
+	}
+	
+	void SubDeclNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		// make sure that we do not have twice the same subroutine
+		assert(bytecodes.subroutines.find(subroutineId) == bytecodes.subroutines.end());
+		
+		// create new bytecode for subroutine
+		bytecodes.subroutines[subroutineId] = BytecodeVector();
+		bytecodes.current = &bytecodes.subroutines[subroutineId];
+	}
+	
+	void CallSubNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_CALL);
+		bytecode |= subroutineId;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	void BinaryArithmeticNode::emit(PreLinkBytecode& bytecodes) const
@@ -231,14 +257,14 @@ namespace Aseba
 		children[0]->emit(bytecodes);
 		children[1]->emit(bytecodes);
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_BINARY_ARITHMETIC) | op;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	void UnaryArithmeticNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		children[0]->emit(bytecodes);
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_UNARY_ARITHMETIC) | op;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	void ImmediateNode::emit(PreLinkBytecode& bytecodes) const
@@ -249,26 +275,26 @@ namespace Aseba
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
 			bytecode |= ((unsigned)value) & 0x0fff;
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		}
 		else
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LARGE_IMMEDIATE);
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-			bytecodes.currentBytecode->push_back(BytecodeElement(value, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(value, sourcePos.row));
 		}
 	}
 	
 	void LoadNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | varAddr;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	void StoreNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | varAddr;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	void ArrayReadNode::emit(PreLinkBytecode& bytecodes) const
@@ -280,8 +306,8 @@ namespace Aseba
 		children[0]->emit(bytecodes);
 		
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD_INDIRECT) | arrayAddr;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(arraySize, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
 	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
@@ -293,8 +319,8 @@ namespace Aseba
 		children[0]->emit(bytecodes);
 		
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT) | arrayAddr;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
-		bytecodes.currentBytecode->push_back(BytecodeElement(arraySize, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
@@ -309,12 +335,12 @@ namespace Aseba
 		for (unsigned i = 0; i < argumentsAddr.size(); i++)
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | argumentsAddr[i];
-			bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		}
 		
 		// generate call itself
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_NATIVE_CALL) | funcId;
-		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	/*@}*/

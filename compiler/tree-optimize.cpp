@@ -219,12 +219,22 @@ namespace Aseba
 		assert(false);
 	}
 	
-	Node* ContextSwitcherNode::optimize(std::ostream* dump)
+	Node* EventDeclNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
 	
 	Node* EmitNode::optimize(std::ostream* dump)
+	{
+		return this;
+	}
+	
+	Node* SubDeclNode::optimize(std::ostream* dump)
+	{
+		return this;
+	}
+	
+	Node* CallSubNode::optimize(std::ostream* dump)
 	{
 		return this;
 	}
