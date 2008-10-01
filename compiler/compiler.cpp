@@ -168,6 +168,8 @@ namespace Aseba
 		// fix-up (add of missing STOP and RET bytecodes at code generation)
 		preLinkBytecode.fixup(subroutineTable);
 		
+		// TODO: check recursive calls for stack overflow
+		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))
 		{
@@ -178,7 +180,7 @@ namespace Aseba
 		if (dump)
 		{
 			*dump << "Bytecode:" << std::endl;
-			disassemble(bytecode, *dump);
+			disassemble(bytecode, preLinkBytecode, *dump);
 			*dump << "\n\n";
 		}
 		
@@ -262,7 +264,7 @@ namespace Aseba
 	}
 	
 	//! Disassemble a microcontroller bytecode and dump it
-	void Compiler::disassemble(BytecodeVector& bytecode, std::ostream& dump) const
+	void Compiler::disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::ostream& dump) const
 	{
 		// address of threads and subroutines
 		std::map<unsigned, unsigned> eventAddr;
@@ -281,7 +283,7 @@ namespace Aseba
 			pc += 2;
 		}
 		unsigned eventCount = (eventVectSize - 1 ) / 2;
-		dump << "Disassembling " << eventCount << " segments:\n";
+		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments:\n";
 		
 		// bytecode
 		while (pc < bytecode.size())
@@ -298,7 +300,7 @@ namespace Aseba
 						if (eventId < commonDefinitions->events.size())
 							dump << "event " << commonDefinitions->events[eventId].name << ": ";
 						else
-							dump << "unknown global event " << eventId << ":  ";
+							dump << "unknown global event " << eventId << ": ";
 					}
 					else
 					{
@@ -306,16 +308,20 @@ namespace Aseba
 						if (index < targetDescription->localEvents.size())
 							dump << "event " << targetDescription->localEvents[index].name << ": ";
 						else
-							dump << "unknown local event " << index << ":  ";
+							dump << "unknown local event " << index << ": ";
 					}
 				}
-					
-				dump << "\n";
+				
+				PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.find(eventId);
+				assert(it != preLinkBytecode.events.end());
+				dump << " (max stack " << it->second.maxStackDepth << ")\n";
 			}
 			
 			if (subroutinesAddr.find(pc) != subroutinesAddr.end())
 			{
-				dump << "sub " << subroutineTable[subroutinesAddr[pc]].name << ":\n";
+				PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.subroutines.find(subroutinesAddr[pc]);
+				assert(it != preLinkBytecode.subroutines.end());
+				dump << "sub " << subroutineTable[subroutinesAddr[pc]].name << ": (max stack " << it->second.maxStackDepth << ")\n";
 			}
 			
 			dump << "    ";

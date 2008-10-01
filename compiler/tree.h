@@ -53,6 +53,8 @@ namespace Aseba
 		
 		//! Optimize this node, reture true if any optimization was successful
 		virtual Node* optimize(std::ostream* dump) = 0;
+		//! Return the stack depth requirement for this node and its children
+		virtual unsigned getStackDepth() const;
 		//! Generate bytecode
 		virtual void emit(PreLinkBytecode& bytecodes) const = 0;
 		
@@ -76,6 +78,16 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Block"; }
+	};
+	
+	//! Node for "program", i.e. a block node with some special behaviour later on
+	struct ProgramNode: BlockNode
+	{
+		//! Constructor
+		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
+		
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::string toString() const { return "ProgramBlock"; }
 	};
 	
 	//! Node for assignation.
@@ -121,6 +133,7 @@ namespace Aseba
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -150,6 +163,7 @@ namespace Aseba
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -222,6 +236,7 @@ namespace Aseba
 		void deMorganNotRemoval();
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 		
@@ -258,6 +273,7 @@ namespace Aseba
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -272,6 +288,7 @@ namespace Aseba
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};
@@ -330,6 +347,7 @@ namespace Aseba
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		
 		virtual Node* optimize(std::ostream* dump);
+		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
 	};

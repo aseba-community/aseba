@@ -68,11 +68,47 @@ namespace Aseba
 		}
 	}
 	
+	unsigned Node::getStackDepth() const
+	{
+		unsigned stackDepth = 0;
+		for (size_t i = 0; i < children.size(); i++)
+			stackDepth = std::max(stackDepth, children[i]->getStackDepth());
+		return stackDepth;
+	}
+	
+	
 	void BlockNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		for (size_t i = 0; i < children.size(); i++)
 			children[i]->emit(bytecodes);
 	}
+	
+	void ProgramNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		BlockNode::emit(bytecodes);
+		
+		// analyze blocks for stack depth
+		BytecodeVector* currentBytecode = &bytecodes.events[ASEBA_EVENT_INIT];
+		unsigned maxStackDepth = 0;
+		for (size_t i = 0; i < children.size(); i++)
+		{
+			EventDeclNode* eventDecl = dynamic_cast<EventDeclNode*>(children[i]);
+			SubDeclNode* subDecl = dynamic_cast<SubDeclNode*>(children[i]);
+			if (eventDecl || subDecl)
+			{
+				currentBytecode->maxStackDepth = maxStackDepth;
+				maxStackDepth = 0;
+				
+				if (eventDecl)
+					currentBytecode = &bytecodes.events[eventDecl->eventId];
+				else
+					currentBytecode = &bytecodes.subroutines[subDecl->subroutineId];
+			}
+			else
+				maxStackDepth = std::max(maxStackDepth, children[i]->getStackDepth());
+		}
+	}
+	
 	
 	void AssignmentNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -80,10 +116,12 @@ namespace Aseba
 		children[0]->emit(bytecodes);
 	}
 	
+	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		assert(false);
 	}
+	
 	
 	void FoldedIfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -160,10 +198,21 @@ namespace Aseba
 		}
 	}
 	
+	unsigned FoldedIfWhenNode::getStackDepth() const
+	{
+		unsigned stackDepth = children[0]->getStackDepth() + children[1]->getStackDepth();
+		stackDepth = std::max(stackDepth, children[2]->getStackDepth());
+		if (children.size() == 4)
+			stackDepth = std::max(stackDepth, children[3]->getStackDepth());
+		return stackDepth;
+	}
+	
+	
 	void WhileNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		assert(false);
 	}
+	
 	
 	void FoldedWhileNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -216,6 +265,14 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
+	unsigned FoldedWhileNode::getStackDepth() const
+	{
+		unsigned stackDepth = children[0]->getStackDepth() + children[1]->getStackDepth();
+		stackDepth = std::max(stackDepth, children[2]->getStackDepth());
+		return stackDepth;
+	}
+	
+	
 	void EventDeclNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// make sure that we do not have twice the same event
@@ -226,6 +283,7 @@ namespace Aseba
 		bytecodes.current = &bytecodes.events[eventId];
 	}
 	
+	
 	void EmitNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_EMIT) | eventId;
@@ -233,6 +291,7 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(arrayAddr, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
+	
 	
 	void SubDeclNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -244,12 +303,14 @@ namespace Aseba
 		bytecodes.current = &bytecodes.subroutines[subroutineId];
 	}
 	
+	
 	void CallSubNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_CALL);
 		bytecode |= subroutineId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
 	
 	void BinaryArithmeticNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -259,12 +320,19 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
+	unsigned BinaryArithmeticNode::getStackDepth() const
+	{
+		return children[0]->getStackDepth() + children[1]->getStackDepth();
+	}
+	
+	
 	void UnaryArithmeticNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		children[0]->emit(bytecodes);
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_UNARY_ARITHMETIC) | op;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
 	
 	void ImmediateNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -284,17 +352,30 @@ namespace Aseba
 		}
 	}
 	
+	unsigned ImmediateNode::getStackDepth() const
+	{
+		return 1;
+	}
+	
+	
 	void LoadNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | varAddr;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
+	unsigned LoadNode::getStackDepth() const
+	{
+		return 1;
+	}
+	
+	
 	void StoreNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | varAddr;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
 	
 	void ArrayReadNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -309,6 +390,7 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
+	
 	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// constant index should have been optimized out already
@@ -321,6 +403,7 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
+	
 	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -341,6 +424,17 @@ namespace Aseba
 		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_NATIVE_CALL) | funcId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
+	unsigned CallNode::getStackDepth() const
+	{
+		unsigned stackDepth = Node::getStackDepth();
+		
+		// get the stack depth for arguments
+		stackDepth = std::max(stackDepth, argumentsAddr.size());
+		
+		return stackDepth;
+	}
+	
 	
 	/*@}*/
 	

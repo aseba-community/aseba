@@ -107,7 +107,13 @@ namespace Aseba
 	};
 	
 	//! Bytecode array in the form of a dequeue, for construction
-	typedef std::deque<BytecodeElement> BytecodeVector;
+	struct BytecodeVector: std::deque<BytecodeElement>
+	{
+		//! Constructor
+		BytecodeVector() : maxStackDepth(0) { }
+		
+		unsigned maxStackDepth; //!< maximum depth of the stack used by all the computations of the bytecode
+	};
 	
 	// predeclaration
 	class PreLinkBytecode;
@@ -296,7 +302,7 @@ namespace Aseba
 		void tokenize(std::istream& source);
 		void dumpTokens(std::ostream &dest) const;
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
-		void disassemble(BytecodeVector& bytecode, std::ostream& dump) const;
+		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::ostream& dump) const;
 		
 	protected:
 		Node* parseProgram();

@@ -193,7 +193,7 @@ namespace Aseba
 	//! Parse "program" grammar element.
 	Node* Compiler::parseProgram()
 	{
-		std::auto_ptr<BlockNode> block(new BlockNode(tokens.front().pos));
+		std::auto_ptr<ProgramNode> block(new ProgramNode(tokens.front().pos));
 		// parse all vars declarations
 		while (tokens.front() == Token::TOKEN_STR_var)
 		{
