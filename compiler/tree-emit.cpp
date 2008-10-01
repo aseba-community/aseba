@@ -38,7 +38,7 @@ namespace Aseba
 	
 	//! Fixup prelinked bytecodes by making sure that each vector is closed correctly,
 	//! i.e. with a STOP for events and a RET for subroutines
-	void PreLinkBytecode::fixup()
+	void PreLinkBytecode::fixup(const Compiler::SubroutineTable &subroutineTable)
 	{
 		// clear empty events entries
 		for (EventsBytecode::iterator it = events.begin(); it != events.end();)
@@ -64,9 +64,8 @@ namespace Aseba
 			if (bytecode.size())
 				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode[bytecode.size()-1].line));
 			else
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), 0));
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[it->first].line));
 		}
-		// TODO: fix location
 	}
 	
 	void BlockNode::emit(PreLinkBytecode& bytecodes) const

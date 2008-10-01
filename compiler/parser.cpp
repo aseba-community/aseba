@@ -628,7 +628,7 @@ namespace Aseba
 			throw Error(tokens.front().pos, FormatableString("Subroutine %0 is already defined").arg(name));
 		
 		unsigned subroutineId = subroutineTable.size();
-		subroutineTable.push_back(std::make_pair(name, 0));
+		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
 		subroutineReverseTable[name] = subroutineId;
 		
 		tokens.pop_front();

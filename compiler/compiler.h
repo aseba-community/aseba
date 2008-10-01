@@ -109,22 +109,8 @@ namespace Aseba
 	//! Bytecode array in the form of a dequeue, for construction
 	typedef std::deque<BytecodeElement> BytecodeVector;
 	
-	//! Bytecode use for compilation previous to linking
-	struct PreLinkBytecode
-	{
-		//! Map of events id to event bytecode
-		typedef std::map<unsigned, BytecodeVector> EventsBytecode;
-		EventsBytecode events; //!< bytecode for events
-		
-		//! Map of routines id to routine bytecode
-		typedef std::map<unsigned, BytecodeVector> SubroutinesBytecode;
-		SubroutinesBytecode subroutines; //!< bytecode for routines
-		
-		BytecodeVector *current; //!< pointer to bytecode being constructed
-		
-		PreLinkBytecode();
-		void fixup();
-	};
+	// predeclaration
+	class PreLinkBytecode;
 	
 	//! Position in a source file or string. First is line, second is column
 	struct SourcePos
@@ -268,8 +254,17 @@ namespace Aseba
 		typedef std::map<std::string, std::pair<unsigned, unsigned> > VariablesMap;
 		//! Lookup table for functions (name => id in target description)
 		typedef std::map<std::string, unsigned> FunctionsMap;
-		//! Lookup table for subroutines id => (name, address)
-		typedef std::vector<std::pair<std::string, unsigned> > SubroutineTable;
+		//! Description of a subroutine
+		struct SubroutineDescriptor
+		{
+			std::string name;
+			unsigned address;
+			unsigned line;
+			
+			SubroutineDescriptor(const std::string& name, unsigned address, unsigned line) : name(name), address(address), line(line) {}
+		};
+		//! Lookup table for subroutines id => (name, address, line)
+		typedef std::vector<SubroutineDescriptor> SubroutineTable;
 		//! Reverse Lookup table for subroutines name => id
 		typedef std::map<std::string, unsigned> SubroutineReverseTable;
 		//! Lookup table to keep track of implemented events
@@ -345,6 +340,24 @@ namespace Aseba
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
 	}; // Compiler
+	
+	//! Bytecode use for compilation previous to linking
+	struct PreLinkBytecode
+	{
+		//! Map of events id to event bytecode
+		typedef std::map<unsigned, BytecodeVector> EventsBytecode;
+		EventsBytecode events; //!< bytecode for events
+		
+		//! Map of routines id to routine bytecode
+		typedef std::map<unsigned, BytecodeVector> SubroutinesBytecode;
+		SubroutinesBytecode subroutines; //!< bytecode for routines
+		
+		BytecodeVector *current; //!< pointer to bytecode being constructed
+		
+		PreLinkBytecode();
+		
+		void fixup(const Compiler::SubroutineTable &subroutineTable);
+	};
 	
 	/*@}*/
 	

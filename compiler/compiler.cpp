@@ -166,7 +166,7 @@ namespace Aseba
 		delete program;
 		
 		// fix-up (add of missing STOP and RET bytecodes at code generation)
-		preLinkBytecode.fixup();
+		preLinkBytecode.fixup(subroutineTable);
 		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))
@@ -220,7 +220,7 @@ namespace Aseba
 			++it
 		)
 		{
-			subroutineTable[it->first].second = bytecode.size();
+			subroutineTable[it->first].address = bytecode.size();
 			std::copy(it->second.begin(), it->second.end(), std::back_inserter(bytecode));
 		}
 		
@@ -233,7 +233,7 @@ namespace Aseba
 				{
 					unsigned id = bytecode[pc] & 0x0fff;
 					assert(id < subroutineTable.size());
-					unsigned address = subroutineTable[id].second;
+					unsigned address = subroutineTable[id].address;
 					bytecode[pc].bytecode &= 0xf000;
 					bytecode[pc].bytecode |= address;
 					pc += 1;
@@ -269,8 +269,8 @@ namespace Aseba
 		std::map<unsigned, unsigned> subroutinesAddr;
 		
 		// build subroutine map
-		for (size_t i = 0; i < subroutineTable.size(); ++i)
-			subroutinesAddr[subroutineTable[i].second] = i;
+		for (size_t id = 0; id < subroutineTable.size(); ++id)
+			subroutinesAddr[subroutineTable[id].address] = id;
 		
 		// event table
 		unsigned eventVectSize = bytecode[0];
@@ -315,7 +315,7 @@ namespace Aseba
 			
 			if (subroutinesAddr.find(pc) != subroutinesAddr.end())
 			{
-				dump << "sub " << subroutineTable[subroutinesAddr[pc]].first << ":\n";
+				dump << "sub " << subroutineTable[subroutinesAddr[pc]].name << ":\n";
 			}
 			
 			dump << "    ";
@@ -406,8 +406,8 @@ namespace Aseba
 					unsigned address = (bytecode[pc] & 0x0fff);
 					std::string name("unknown");
 					for (size_t i = 0; i < subroutineTable.size(); i++)
-						if (subroutineTable[i].second == address)
-							name = subroutineTable[i].first;
+						if (subroutineTable[i].address == address)
+							name = subroutineTable[i].name;
 					dump << "SUB_CALL to " << name << " @ " << address << "\n";
 					pc++;
 				}
