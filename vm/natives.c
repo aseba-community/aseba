@@ -201,7 +201,7 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 {
-	"vec.fill",
+	"math.fill",
 	"fill vector with constant",
 	{
 		{ -1, "dest" },
@@ -230,7 +230,7 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 {
-	"vec.copy",
+	"math.assign",
 	"copy vector content",
 	{
 		{ -1, "dest" },
@@ -258,7 +258,7 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 {
-	"vec.add",
+	"math.add",
 	"add two vectors",
 	{
 		{ -1, "dest" },
@@ -287,7 +287,7 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 {
-	"vec.sub",
+	"math.sub",
 	"substract two vectors",
 	{
 		{ -1, "dest" },
@@ -320,7 +320,7 @@ void AsebaNative_vecmin(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 {
-	"vec.min",
+	"math.min",
 	"element by element minimum",
 	{
 		{ -1, "dest" },
@@ -353,7 +353,7 @@ void AsebaNative_vecmax(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 {
-	"vec.max",
+	"math.max",
 	"element by element maximum",
 	{
 		{ -1, "dest" },
@@ -389,7 +389,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
-	"vec.dot",
+	"math.dot",
 	"scalar product between two vectors",
 	{
 		{ 1, "dest" },
@@ -438,7 +438,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
-	"vec.stat",
+	"math.stat",
 	"statistics on a vector",
 	{
 		{ -1, "src" },
@@ -451,78 +451,121 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 
 void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
-	sint16 a = vm->variables[vm->stack[1]];
-	sint16 b = vm->variables[vm->stack[2]];
-	sint16 c = vm->variables[vm->stack[3]];
+	// variable pos
+	uint16 destIndex = vm->stack[0];
+	sint16 aIndex = vm->stack[1];
+	sint16 bIndex = vm->stack[2];
+	sint16 cIndex = vm->stack[3];
 	
-	vm->variables[vm->stack[0]] = (sint16)(((sint32)a * (sint32)b) / (sint32)c);
+	// variable size
+	uint16 length = vm->stack[4];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint32 a = (sint32)vm->variables[aIndex++];
+		sint32 b = (sint32)vm->variables[bIndex++];
+		sint32 c = (sint32)vm->variables[cIndex++];
+		vm->variables[destIndex++] = (sint16)((a * b) / c);
+	}
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 {
 	"math.muldiv",
-	"performs dest = (a*b)/c in 32 bits",
+	"performs dest = (a*b)/c in 32 bits element by element",
 	{
-		{ 1, "dest" },
-		{ 1, "a" },
-		{ 1, "b" },
-		{ 1, "c" },
+		{ -1, "dest" },
+		{ -1, "a" },
+		{ -1, "b" },
+		{ -1, "c" },
 		{ 0, 0 }
 	}
 };
 
 void AsebaNative_mathatan2(AsebaVMState *vm)
 {
-	sint16 y = vm->variables[vm->stack[1]];
-	sint16 x = vm->variables[vm->stack[2]];
+	// variable pos
+	uint16 destIndex = vm->stack[0];
+	sint16 yIndex = vm->stack[1];
+	sint16 xIndex = vm->stack[2];
 	
-	vm->variables[vm->stack[0]] = aseba_atan2(y, x);
+	// variable size
+	uint16 length = vm->stack[3];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 y = vm->variables[yIndex++];
+		sint16 x = vm->variables[xIndex++];
+		vm->variables[destIndex++] = aseba_atan2(y, x);
+	}
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 {
 	"math.atan2",
-	"performs atan2(y,x)",
+	"performs atan2(y,x) element by element",
 	{
-		{ 1, "dest" },
-		{ 1, "y" },
-		{ 1, "x" },
+		{ -1, "dest" },
+		{ -1, "y" },
+		{ -1, "x" },
 		{ 0, 0 }
 	}
 };
 
 void AsebaNative_mathsin(AsebaVMState *vm)
 {
-	sint16 x = vm->variables[vm->stack[1]];
+	// variable pos
+	uint16 destIndex = vm->stack[0];
+	sint16 xIndex = vm->stack[1];
 	
-	vm->variables[vm->stack[0]] = aseba_sin(x);
+	// variable size
+	uint16 length = vm->stack[2];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 x = vm->variables[xIndex++];
+		vm->variables[destIndex++] = aseba_sin(x);
+	}
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 {
 	"math.sin",
-	"performs sin(x)",
+	"performs sin(x) element by element",
 	{
-		{ 1, "dest" },
-		{ 1, "x" },
+		{ -1, "dest" },
+		{ -1, "x" },
 		{ 0, 0 }
 	}
 };
 
 void AsebaNative_mathcos(AsebaVMState *vm)
 {
-	sint16 x = vm->variables[vm->stack[1]];
+	// variable pos
+	uint16 destIndex = vm->stack[0];
+	sint16 xIndex = vm->stack[1];
 	
-	vm->variables[vm->stack[0]] = aseba_cos(x);
+	// variable size
+	uint16 length = vm->stack[2];
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 x = vm->variables[xIndex++];
+		vm->variables[destIndex++] = aseba_cos(x);
+	}
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 {
 	"math.cos",
-	"performs cos(x)",
+	"performs cos(x) element by element",
 	{
-		{ 1, "dest" },
-		{ 1, "x" },
+		{ -1, "dest" },
+		{ -1, "x" },
 		{ 0, 0 }
 	}
 };
