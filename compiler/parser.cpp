@@ -178,12 +178,21 @@ namespace Aseba
 	Node* Compiler::parseProgram()
 	{
 		std::auto_ptr<BlockNode> block(new BlockNode(tokens.front().pos));
-		while (tokens.front() != Token::TOKEN_END_OF_STREAM)
+		// parse all vars declarations
+		while (tokens.front() == Token::TOKEN_STR_var)
 		{
-			// program may receive NULL pointers because non initialized variables produce no code
-			Node *child = parseStatement();
+			// we may receive NULL pointers because non initialized variables produce no code
+			Node *child = parseVarDef();
 			if (child)
 				block->children.push_back(child);
+		}
+		// parse the rest of the code
+		while (tokens.front() != Token::TOKEN_END_OF_STREAM)
+		{
+			// only var declaration are allowed to return NULL node, so we assert on node
+			Node *child = parseStatement();
+			assert(child);
+			block->children.push_back(child);
 		}
 		return block.release();
 	}
@@ -193,7 +202,7 @@ namespace Aseba
 	{
 		switch (tokens.front())
 		{
-			case Token::TOKEN_STR_var: return parseVarDef();
+			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, "Variable definition is allowed only at the beginning of the program before any statement");
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			default: return parseBlockStatement();
 		}
