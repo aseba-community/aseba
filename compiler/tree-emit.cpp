@@ -429,7 +429,7 @@ namespace Aseba
 	
 	unsigned CallNode::getStackDepth() const
 	{
-		unsigned stackDepth = Node::getStackDepth();
+		size_t stackDepth = Node::getStackDepth();
 		
 		// get the stack depth for arguments
 		stackDepth = std::max(stackDepth, argumentsAddr.size());
