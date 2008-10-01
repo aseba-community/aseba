@@ -342,7 +342,7 @@ namespace Aseba
 				}
 				break;
 				
-				case ASEBA_BYTECODE_CALL:
+				case ASEBA_BYTECODE_NATIVE_CALL:
 				dump << "CALL " << (bytecode[pc] & 0x0fff) << "\n";
 				pc++;
 				break;

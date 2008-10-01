@@ -440,7 +440,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		break;
 		
 		// Bytecode: Call
-		case ASEBA_BYTECODE_CALL:
+		case ASEBA_BYTECODE_NATIVE_CALL:
 		{
 			// call native function
 			AsebaNativeFunction(vm, bytecode & 0x0fff);
@@ -448,6 +448,27 @@ void AsebaVMStep(AsebaVMState *vm)
 			
 			// increment PC
 			vm->pc ++;
+		}
+		break;
+		
+		// Bytecode: Subroutine call
+		case ASEBA_BYTECODE_SUB_CALL:
+		{
+			uint16 dest = bytecode & 0x0fff;
+			
+			// store return value on stack
+			vm->stack[++vm->sp] = vm->pc + 1;
+			
+			// jump
+			vm->pc = dest;
+		}
+		break;
+		
+		// Bytecode: Subroutine return
+		case ASEBA_BYTECODE_SUB_RET:
+		{
+			// do return
+			vm->pc = vm->stack[vm->sp--];
 		}
 		break;
 		

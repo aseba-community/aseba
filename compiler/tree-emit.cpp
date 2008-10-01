@@ -313,7 +313,7 @@ namespace Aseba
 		}
 		
 		// generate call itself
-		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_CALL) | funcId;
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_NATIVE_CALL) | funcId;
 		bytecodes.currentBytecode->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
