@@ -68,6 +68,7 @@ namespace Aseba
 		}
 	}
 	
+	
 	unsigned Node::getStackDepth() const
 	{
 		unsigned stackDepth = 0;
@@ -107,6 +108,7 @@ namespace Aseba
 			else
 				maxStackDepth = std::max(maxStackDepth, children[i]->getStackDepth());
 		}
+		currentBytecode->maxStackDepth = maxStackDepth;
 	}
 	
 	

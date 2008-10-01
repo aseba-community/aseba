@@ -110,9 +110,10 @@ namespace Aseba
 	struct BytecodeVector: std::deque<BytecodeElement>
 	{
 		//! Constructor
-		BytecodeVector() : maxStackDepth(0) { }
+		BytecodeVector() : maxStackDepth(0), callDepth(0) { }
 		
 		unsigned maxStackDepth; //!< maximum depth of the stack used by all the computations of the bytecode
+		unsigned callDepth; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
 	};
 	
 	// predeclaration
@@ -301,6 +302,7 @@ namespace Aseba
 		void buildMaps();
 		void tokenize(std::istream& source);
 		void dumpTokens(std::ostream &dest) const;
+		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
 		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::ostream& dump) const;
 		

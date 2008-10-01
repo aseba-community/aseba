@@ -168,7 +168,12 @@ namespace Aseba
 		// fix-up (add of missing STOP and RET bytecodes at code generation)
 		preLinkBytecode.fixup(subroutineTable);
 		
-		// TODO: check recursive calls for stack overflow
+		// stack check
+		if (!verifyStackCalls(preLinkBytecode))
+		{
+			errorDescription = Error(SourcePos(), "Execution stack will overflow, check for any recursive subroutine call and cut long mathematical expressions.");
+			return false;
+		}
 		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))

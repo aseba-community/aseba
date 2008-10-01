@@ -77,6 +77,7 @@ add_library(aseba
 	compiler/lexer.cpp
 	compiler/errors.cpp
 	compiler/tree-optimize.cpp
+	compiler/analysis.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
 )
