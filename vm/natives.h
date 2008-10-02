@@ -145,6 +145,11 @@ void AsebaNative_mathcos(AsebaVMState *vm);
 /*! Description of AsebaNative_mathcos */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathcos;
 
+/*! Function to perform the rotation of a vector */
+void AsebaNative_mathrot2(AsebaVMState *vm);
+/*! Description of AsebaNative_mathrot2 */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
+
 
 /*@}*/
 
