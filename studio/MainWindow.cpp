@@ -707,7 +707,7 @@ namespace Aseba
 						"<ul><li>Aseba " \
 						ASEBA_SVN_REV \
 						"</li><li>Dashel "\
-						DASHEL_SVN_REV \
+						DASHEL_VERSION \
 						"</li></ul>" \
 						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a></p>" \
 						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>"));

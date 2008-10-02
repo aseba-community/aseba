@@ -66,9 +66,9 @@ extern "C" void PlaygroundNative_energysend(AsebaVMState *vm);
 extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm);
 extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm);
 
-extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend;
-extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive;
-extern AsebaNativeFunctionDescription PlaygroundNativeDescription_energyamount;
+extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend;
+extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive;
+extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energyamount;
 
 
 static AsebaNativeFunctionPointer nativeFunctions[] =
@@ -110,7 +110,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	0
 };
 
-extern AsebaVMDescription vmDescription;
+extern "C" AsebaVMDescription vmDescription;
 
 // this uglyness is necessary to glue with C code
 Enki::PlaygroundViewer *playgroundViewer = 0;
@@ -536,7 +536,9 @@ namespace Enki
 	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0), energyPool(INITIAL_POOL_ENERGY)
 	{
 		font.setPixelSize(16);
+		#if QT_VERSION > 0x040400
 		font.setLetterSpacing(QFont::PercentageSpacing, 130);
+		#endif
 		try
 		{
 			Dashel::Hub::connect(QString("tcpin:port=%1").arg(ASEBA_DEFAULT_PORT).toStdString());

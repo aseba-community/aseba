@@ -37,7 +37,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class TargetDescription;
+	struct TargetDescription;
 	class VariablesViewPlugin;
 	
 	class TargetVariablesModel: public QAbstractItemModel

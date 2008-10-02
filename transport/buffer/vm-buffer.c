@@ -56,7 +56,7 @@ static void buffer_add_uint16(uint16 value)
 static void buffer_add_string(const char* s)
 {
 	uint16 len = strlen(s);
-	buffer_add_uint8(len);
+	buffer_add_uint8((uint8)len);
 	while (*s)
 		buffer_add_uint8(*s++);
 }
@@ -158,11 +158,13 @@ void AsebaSendDescription(AsebaVMState *vm)
 	// send native functions description
 	for (i = 0; nativeFunctionsDescription[i]; i++)
 	{
+		uint16 j;
+
 		buffer_pos = 0;
 		
 		buffer_add_uint16(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION);
 		
-		uint16 j;
+		
 		buffer_add_string(nativeFunctionsDescription[i]->name);
 		buffer_add_string(nativeFunctionsDescription[i]->doc);
 		for (j = 0; nativeFunctionsDescription[i]->arguments[j].size; j++)

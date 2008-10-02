@@ -43,9 +43,9 @@ namespace Aseba
 			NodeDescription();
 			NodeDescription(const TargetDescription& targetDescription);
 			
-			int namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
-			int localEventsReceptionCounter; //!< what is the status of the reception of local events
-			int nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
+			unsigned namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
+			unsigned localEventsReceptionCounter; //!< what is the status of the reception of local events
+			unsigned nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
 		};
 		//! Map from nodes id to nodes descriptions
 		typedef std::map<unsigned, NodeDescription> NodesDescriptionsMap;

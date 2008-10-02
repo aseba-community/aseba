@@ -117,7 +117,7 @@ namespace Aseba
 	};
 	
 	// predeclaration
-	class PreLinkBytecode;
+	struct PreLinkBytecode;
 	
 	//! Position in a source file or string. First is line, second is column
 	struct SourcePos

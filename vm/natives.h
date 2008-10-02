@@ -31,6 +31,10 @@ extern "C" {
 #include "../common/types.h"
 #include "vm.h"
 
+#ifdef _MSC_VER
+#pragma warning( disable: 4200)	// disable 0 size arrays warning
+#endif
+
 /**
 	\file natives.h
 	Definition of standard natives functions for Aseba Virtual Machine

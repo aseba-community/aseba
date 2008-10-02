@@ -101,10 +101,10 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 	return asebaSocketMaps[vm]->lastMessageData.size();
 }
 
-extern AsebaVMDescription vmLeftMotorDescription;
-extern AsebaVMDescription vmRightMotorDescription;
-extern AsebaVMDescription vmProximitySensorsDescription;
-extern AsebaVMDescription vmDistanceSensorsDescription;
+extern "C" AsebaVMDescription vmLeftMotorDescription;
+extern "C" AsebaVMDescription vmRightMotorDescription;
+extern "C" AsebaVMDescription vmProximitySensorsDescription;
+extern "C" AsebaVMDescription vmDistanceSensorsDescription;
 
 extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {

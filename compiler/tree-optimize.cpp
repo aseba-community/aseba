@@ -161,6 +161,7 @@ namespace Aseba
 	Node* FoldedIfWhenNode::optimize(std::ostream* dump)
 	{
 		assert(false);
+		return 0;
 	}
 	
 	Node* WhileNode::optimize(std::ostream* dump)
@@ -217,6 +218,7 @@ namespace Aseba
 	Node* FoldedWhileNode::optimize(std::ostream* dump)
 	{
 		assert(false);
+		return 0;
 	}
 	
 	Node* EventDeclNode::optimize(std::ostream* dump)

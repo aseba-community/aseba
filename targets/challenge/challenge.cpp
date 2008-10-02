@@ -95,7 +95,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	0
 };
 
-extern AsebaVMDescription vmDescription;
+extern "C" AsebaVMDescription vmDescription;
 
 namespace Enki
 {
