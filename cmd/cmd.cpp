@@ -45,6 +45,7 @@ namespace Aseba
 		stream << "* whex : write hex file [dest] [file name]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
 		stream << "* reset: switch user/bootloader mode [dest]\n";
+		stream << "* sb: switch into bootloader mode [dest]\n";
 	}
 	
 	//! Show usage
@@ -252,10 +253,10 @@ namespace Aseba
 				pageData.dest = dest;
 				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
 				pageData.serialize(stream);
-				stream->flush();
 				dataWritten += sizeof(pageData.data);
 				cout << "." << std::flush;
 				
+/*
 				while (true)
 				{
 					Message *message = Message::receive(stream);
@@ -274,7 +275,30 @@ namespace Aseba
 					
 					delete message;
 				}
+*/
 			}
+			// Flush only here so we 3n14rg3 our bandwidth
+			stream->flush();
+			
+			while (true)
+			{
+				Message *message = Message::receive(stream);
+				
+				// handle ack
+				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+				if (ackMessage && (ackMessage->source == dest))
+				{
+					uint16 errorCode = ackMessage->errorCode;
+					delete message;
+					if(errorCode == BootloaderAck::SUCCESS)
+						break;
+					else
+						return false;
+				}
+				
+				delete message;
+			}
+			
 			cout << "done" << endl;
 			return true;
 		}
@@ -467,6 +491,7 @@ namespace Aseba
 			
 			// Wait ack from bootloader (mean we got out of it)
 			// Or bootloader description (mean we just entered it)
+			// WRONG; FIXME 
 			while (true)
 			{
 				Message *message = Message::receive(stream);
@@ -489,7 +514,21 @@ namespace Aseba
 				
 				delete message;
 			}
-		}	
+		} 
+		else if (strcmp(cmd, "sb") == 0)
+		{
+			uint16 dest;
+			
+			if(argc < 2)
+				errorMissingArgument(argv[0]);
+			argEaten = 1;
+			
+			dest = atoi(argv[1]);
+			
+			Reboot msg(dest);
+			msg.serialize(stream);
+			stream->flush();
+		}
 		else
 			errorUnknownCommand(cmd);
 		
