@@ -157,13 +157,12 @@ namespace Aseba
 		children[1]->emit(bytecodes);
 		// generate code for true block
 		bytecodes.current = &btb;
-		children[2]->emit(bytecodes);
+		if (children[2])
+			children[2]->emit(bytecodes);
 		// generate code for false block
-		if (children.size() == 4)
-		{
-			bytecodes.current = &bfb;
+		bytecodes.current = &bfb;
+		if ((children.size() == 4) && (children[3]))
 			children[3]->emit(bytecodes);
-		}
 		
 		// restore real current bytecode
 		bytecodes.current = currentBytecode;

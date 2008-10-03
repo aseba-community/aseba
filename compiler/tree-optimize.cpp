@@ -82,16 +82,33 @@ namespace Aseba
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		children[1] = children[1]->optimize(dump);
-		assert(children[1]);
 		
+		// optimise true block, which may be NULL afterwards
+		children[1] = children[1]->optimize(dump);
 		Node *trueBlock = children[1];
-		Node *falseBlock = 0;
+		
+		// optimise false block, which may be NULL afterwards
+		Node *falseBlock;
 		if (children.size() > 2)
 		{
 			children[2] = children[2]->optimize(dump);
-			assert(children[2]);
 			falseBlock = children[2];
+			if (children[2] == 0)
+				children.resize(2);
+		}
+		else
+			falseBlock = 0;
+		
+		// check if both block are NULL or do not contain any data, in this case return
+		if (
+			((trueBlock == 0) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) && 
+			((falseBlock == 0) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty()))
+		)
+		{
+			if (dump)
+				*dump << sourcePos.toString() << ": if test removed because it had no associated code\n";
+			delete this;
+			return NULL;
 		}
 		
 		// check for if on constants
@@ -101,38 +118,24 @@ namespace Aseba
 			if (constantExpression->value != 0)
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test removed because condition was always true\n";
+					*dump << sourcePos.toString() << ": if test simplified because condition was always true\n";
 				children[1] = 0;
 				delete this;
 				return trueBlock;
 			}
-			else if (falseBlock)
+			else
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test removed because condition was always false\n";
-				// false block
+					*dump << sourcePos.toString() << ": if test simplified because condition was always false\n";
 				children[2] = 0;
 				delete this;
 				return falseBlock;
 			}
-			else
-			{
-				// no false block
-				if (dump)
-					*dump << sourcePos.toString() << ": if removed because condition was always false and no code was associated\n";
-				delete this;
-				return NULL;
-			}
 		}
 		
-		// check remove
-		if (trueBlock->children.empty() && (!falseBlock || falseBlock->children.empty()))
-		{
-			if (dump)
-				*dump << sourcePos.toString() << ": if removed because it contained no statement\n";
-			delete this;
-			return NULL;
-		}
+		// create a dummy block for true if none exist
+		if (trueBlock == 0)
+			children[1] = new BlockNode(sourcePos);
 		
 		// fold operation inside if
 		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
@@ -168,8 +171,9 @@ namespace Aseba
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
+		
+		// block may be NULL
 		children[1] = children[1]->optimize(dump);
-		assert(children[1]);
 		
 		// check for loops on constants
 		ImmediateNode* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
@@ -189,7 +193,7 @@ namespace Aseba
 		}
 		
 		// check for loops with empty content
-		if (children[1]->children.empty())
+		if ((children[1] == 0) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
 		{
 			if (dump)
 				*dump << sourcePos.toString() << ": while removed because it contained no statement\n";
