@@ -893,7 +893,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, parseUnaryExpression());
 			}
 			
 			case Token::TOKEN_INT_LITERAL:
