@@ -110,6 +110,7 @@ namespace Aseba
 	struct IfWhenNode : Node
 	{
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
+		unsigned endLine; //!< line of end keyword
 		
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
@@ -128,6 +129,7 @@ namespace Aseba
 	{
 		AsebaBinaryOperator op; //!< operator
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
+		unsigned endLine; //!< line of end keyword
 		
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }

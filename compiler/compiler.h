@@ -110,10 +110,17 @@ namespace Aseba
 	struct BytecodeVector: std::deque<BytecodeElement>
 	{
 		//! Constructor
-		BytecodeVector() : maxStackDepth(0), callDepth(0) { }
+		BytecodeVector() : maxStackDepth(0), callDepth(0), lastLine(0) { }
 		
 		unsigned maxStackDepth; //!< maximum depth of the stack used by all the computations of the bytecode
 		unsigned callDepth; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
+		unsigned lastLine; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
+		
+		void push_back(const BytecodeElement& be)
+		{
+			std::deque<BytecodeElement>::push_back(be);
+			lastLine = be.line;
+		}
 	};
 	
 	// predeclaration

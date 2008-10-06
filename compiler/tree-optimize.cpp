@@ -140,8 +140,9 @@ namespace Aseba
 		// fold operation inside if
 		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
 		FoldedIfWhenNode *foldedNode = new FoldedIfWhenNode(sourcePos);
-		foldedNode->edgeSensitive = edgeSensitive;
 		foldedNode->op = operation->op;
+		foldedNode->edgeSensitive = edgeSensitive;
+		foldedNode->endLine = endLine;
 		foldedNode->children.push_back(operation->children[0]);
 		foldedNode->children.push_back(operation->children[1]);
 		operation->children.clear();

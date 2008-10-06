@@ -295,8 +295,9 @@ namespace Aseba
 			
 			for (unsigned i = 0; i < varSize; i++)
 			{
+				SourcePos assignPos = tokens.front().pos;
 				block->children.push_back(parseShiftExpression());
-				block->children.push_back(new StoreNode(tokens.front().pos, varAddr + i));
+				block->children.push_back(new StoreNode(assignPos, varAddr + i));
 				
 				if (i + 1 < varSize)
 				{
@@ -419,6 +420,7 @@ namespace Aseba
 		}
 		
 		// end keyword
+		ifNode->endLine = tokens.front().pos.row;
 		expect(Token::TOKEN_STR_end);
 		tokens.pop_front();
 		

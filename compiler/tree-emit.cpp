@@ -56,13 +56,13 @@ namespace Aseba
 		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
-			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode[bytecode.size()-1].line));
+			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
 		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
 			if (bytecode.size())
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode[bytecode.size()-1].line));
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
 			else
 				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[it->first].line));
 		}
@@ -196,6 +196,8 @@ namespace Aseba
 			
 			std::copy(bfb.begin(), bfb.end(), std::back_inserter(*bytecodes.current));
 		}
+		
+		bytecodes.current->lastLine = endLine;
 	}
 	
 	unsigned FoldedIfWhenNode::getStackDepth() const
