@@ -107,7 +107,7 @@ namespace Aseba
 	
 	std::string FoldedWhileNode::toString() const
 	{
-		std::string s = "While: ";
+		std::string s = "Folded While: ";
 		s += binaryOperatorToString(op);
 		return s;
 	};
