@@ -129,7 +129,7 @@ namespace Enki
 		//! Destructor, unregister VMs
 		virtual ~AsebaMarxbot();
 		//! In addition to DifferentialWheeled::step(), update aseba variables and initiate periodic events.
-		virtual void step(double dt);
+		virtual void controlStep(double dt);
 		
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);

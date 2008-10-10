@@ -141,9 +141,9 @@ namespace Enki
 	public:
 		FeedableEPuck() : EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), energy(EPUCK_INITIAL_ENERGY), score(0), diedAnimation(-1) { }
 		
-		void step(double dt)
+		virtual void controlStep(double dt)
 		{
-			EPuck::step(dt);
+			EPuck::controlStep(dt);
 			
 			energy -= dt * EPUCK_ENERGY_CONSUMPTION_RATE;
 			score += dt;
@@ -284,7 +284,7 @@ namespace Enki
 			return v;
 		}
 		
-		void step(double dt)
+		void controlStep(double dt)
 		{
 			// set physical variables
 			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
@@ -294,7 +294,7 @@ namespace Enki
 			color.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
 			
 			// do motion
-			FeedableEPuck::step(dt);
+			FeedableEPuck::controlStep(dt);
 			
 			// get physical variables
 			#ifdef SIMPLIFIED_EPUCK

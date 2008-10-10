@@ -184,9 +184,9 @@ namespace Enki
 			addGlobalInteraction(&scoreModifier);
 		}
 		
-		void step(double dt)
+		void controlStep(double dt)
 		{
-			EPuck::step(dt);
+			EPuck::controlStep(dt);
 			
 			energy -= dt * EPUCK_ENERGY_CONSUMPTION_RATE;
 			score += dt;
@@ -270,7 +270,7 @@ namespace Enki
 			return v;
 		}
 		
-		void step(double dt)
+		void controlStep(double dt)
 		{
 			// set physical variables
 			leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
@@ -280,7 +280,7 @@ namespace Enki
 			color.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
 			
 			// do motion
-			FeedableEPuck::step(dt);
+			FeedableEPuck::controlStep(dt);
 			
 			// get physical variables
 			variables.prox[0] = static_cast<sint16>(infraredSensor0.finalValue);
@@ -402,7 +402,7 @@ namespace Enki
 			commitPhysicalParameters();
 		}
 		
-		virtual void step(double dt)
+		virtual void controlStep(double dt)
 		{
 			// cos interpolation between positions
 			double alpha;
@@ -435,7 +435,7 @@ namespace Enki
 				default:
 				break;
 			}
-			PhysicalObject::step(dt);
+			PhysicalObject::controlStep(dt);
 		}
 		
 		virtual void open(void)
@@ -517,9 +517,9 @@ namespace Enki
 			commitPhysicalParameters();
 		}
 		
-		virtual void step(double dt)
+		virtual void controlStep(double dt)
 		{
-			Robot::step(dt);
+			Robot::controlStep(dt);
 			
 			if (areaActivating.active != wasActive)
 			{

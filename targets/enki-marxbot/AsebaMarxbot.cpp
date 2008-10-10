@@ -257,7 +257,7 @@ namespace Enki
 		asebaSocketMaps.erase(&distanceSensors.vm);
 	}
 	
-	void AsebaMarxbot::step(double dt)
+	void AsebaMarxbot::controlStep(double dt)
 	{
 		//stepCounter++;
 		//std::cerr << stepCounter << std::endl;
@@ -278,7 +278,7 @@ namespace Enki
 		rightSpeed = static_cast<double>(rightMotorVariables.speed) / 100;
 		
 		// do motion
-		DifferentialWheeled::step(dt);
+		DifferentialWheeled::controlStep(dt);
 		
 		// get physical variables
 		int odoLeft = static_cast<int>((leftOdometry * 16  * 134) / (2 * M_PI));

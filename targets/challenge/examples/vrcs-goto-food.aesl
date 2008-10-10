@@ -1,13 +1,17 @@
 <!DOCTYPE aesl-source>
 <network>
-    <node name="e-puck" >leftSpeed = 100
+    <node name="e-puck" >var maxBlueVal
+var maxBluePos
+var i
+
+leftSpeed = 100
 rightSpeed = 100
 
 onevent timer
+maxBlueVal = 0
+maxBluePos = 0
+i = 0
 
-var maxBlueVal = 0
-var maxBluePos = 0
-var i = 0
 while i &lt; 3 do
         if camB[i] > maxBlueVal then
                 maxBluePos = i
