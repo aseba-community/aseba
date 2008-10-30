@@ -118,12 +118,13 @@ typedef struct
 */
 void AsebaVMInit(AsebaVMState *vm);
 
-/*!	Return the starting address of an event, or 0 if the event is not handled */
+/*!	Return the starting address of an event, or 0 if the event is not handled. */
 uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event);
 
-/*! Setup VM to execute an thread.
-	If event is not handled, VM is not ready for run. */
-void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
+/*! Setup VM to execute an event.
+	If event is not handled, VM is not ready for run.
+	Return the starting address of the event, or 0 if the event is not handled. */
+uint16 AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
 
 /*! Run the VM depending on the current execution mode.
 	Either run or step, depending of the current mode.

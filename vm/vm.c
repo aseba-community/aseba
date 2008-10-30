@@ -67,23 +67,24 @@ uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event)
 }
 
 
-void AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
+uint16 AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 {
 	uint16 address = AsebaVMGetEventAddress(vm, event);
-	if (!address)
-		return;
-	
-	// if currently executing a thread, notify kill
-	if (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
-		AsebaSendMessage(vm, ASEBA_MESSAGE_EVENT_EXECUTION_KILLED, &(vm->pc), 2);
-	
-	vm->pc = address;
-	vm->sp = -1;
-	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
-	
-	// if we are in step by step, notify
-	if (AsebaMaskIsSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK))
-		AsebaVMSendExecutionStateChanged(vm);
+	if (address)
+	{
+		// if currently executing a thread, notify kill
+		if (AsebaMaskIsSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+			AsebaSendMessage(vm, ASEBA_MESSAGE_EVENT_EXECUTION_KILLED, &(vm->pc), 2);
+		
+		vm->pc = address;
+		vm->sp = -1;
+		AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK);
+		
+		// if we are in step by step, notify
+		if (AsebaMaskIsSet(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK))
+			AsebaVMSendExecutionStateChanged(vm);
+	}
+	return address;
 }
 
 static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16 valueTwo, uint16 op)
@@ -700,7 +701,9 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_RESET:
 		vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
-		AsebaVMSetupEvent(vm, ASEBA_EVENT_INIT);
+		// try to setup event, if it fails, return the execution state anyway
+		if (AsebaVMSetupEvent(vm, ASEBA_EVENT_INIT) == 0)
+			AsebaVMSendExecutionStateChanged(vm);
 		break;
 		
 		case ASEBA_MESSAGE_RUN:
