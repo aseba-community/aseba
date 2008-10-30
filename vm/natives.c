@@ -25,6 +25,8 @@
 #include "natives.h"
 #include <string.h>
 
+#include <assert.h>
+
 /**
 	\file vm.c
 	Implementation of standard natives functions for Aseba Virtual Machine
@@ -32,6 +34,16 @@
 
 /** \addtogroup vm */
 /*@{*/
+
+// support
+
+inline sint16 AsebaNativeGetArg(AsebaVMState *vm, uint16 argId, uint16 argsCount)
+{
+	sint16 base = vm->sp - argsCount + 1;
+	assert(argId < argsCount);
+	assert(base >= 0);
+	return vm->stack[base + argId];
+}
 
 // useful math functions used by below
 
@@ -191,11 +203,11 @@ sint16 aseba_cos(sint16 angle)
 void AsebaNative_vecfill(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 value = vm->stack[1];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 3);
+	uint16 value = AsebaNativeGetArg(vm, 1, 3);
 	
 	// variable size
-	uint16 length = vm->stack[2];
+	uint16 length = AsebaNativeGetArg(vm, 2, 3);
 	
 	uint16 i;
 	
@@ -220,11 +232,11 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 void AsebaNative_veccopy(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src = vm->stack[1];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 3);
+	uint16 src = AsebaNativeGetArg(vm, 1, 3);
 	
 	// variable size
-	uint16 length = vm->stack[2];
+	uint16 length = AsebaNativeGetArg(vm, 2, 3);
 	
 	uint16 i;
 	
@@ -236,7 +248,7 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 {
-	"math.assign",
+	"math.copy",
 	"copy vector content",
 	{
 		{ -1, "dest" },
@@ -248,12 +260,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 void AsebaNative_vecadd(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src1 = vm->stack[1];
-	uint16 src2 = vm->stack[2];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 4);
+	uint16 src1 = AsebaNativeGetArg(vm, 1, 4);
+	uint16 src2 = AsebaNativeGetArg(vm, 2, 4);
 	
 	// variable size
-	uint16 length = vm->stack[3];
+	uint16 length = AsebaNativeGetArg(vm, 3, 4);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -277,12 +289,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 void AsebaNative_vecsub(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src1 = vm->stack[1];
-	uint16 src2 = vm->stack[2];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 4);
+	uint16 src1 = AsebaNativeGetArg(vm, 1, 4);
+	uint16 src2 = AsebaNativeGetArg(vm, 2, 4);
 	
 	// variable size
-	uint16 length = vm->stack[3];
+	uint16 length = AsebaNativeGetArg(vm, 3, 4);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -307,12 +319,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 void AsebaNative_vecmin(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src1 = vm->stack[1];
-	uint16 src2 = vm->stack[2];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 4);
+	uint16 src1 = AsebaNativeGetArg(vm, 1, 4);
+	uint16 src2 = AsebaNativeGetArg(vm, 2, 4);
 	
 	// variable size
-	uint16 length = vm->stack[3];
+	uint16 length = AsebaNativeGetArg(vm, 3, 4);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -340,12 +352,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 void AsebaNative_vecmax(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src1 = vm->stack[1];
-	uint16 src2 = vm->stack[2];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 4);
+	uint16 src1 = AsebaNativeGetArg(vm, 1, 4);
+	uint16 src2 = AsebaNativeGetArg(vm, 2, 4);
 	
 	// variable size
-	uint16 length = vm->stack[3];
+	uint16 length = AsebaNativeGetArg(vm, 3, 4);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -374,13 +386,13 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 void AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = vm->stack[0];
-	uint16 src1 = vm->stack[1];
-	uint16 src2 = vm->stack[2];
-	sint32 shift = vm->variables[vm->stack[3]];
+	uint16 dest = AsebaNativeGetArg(vm, 0, 5);
+	uint16 src1 = AsebaNativeGetArg(vm, 1, 5);
+	uint16 src2 = AsebaNativeGetArg(vm, 2, 5);
+	sint32 shift = AsebaNativeGetArg(vm, 3, 5);
 	
 	// variable size
-	uint16 length = vm->stack[4];
+	uint16 length = AsebaNativeGetArg(vm, 4, 5);
 	
 	sint32 res = 0;
 	uint16 i;
@@ -410,13 +422,13 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 void AsebaNative_vecstat(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 src = vm->stack[0];
-	uint16 min = vm->stack[1];
-	uint16 max = vm->stack[2];
-	uint16 mean = vm->stack[3];
+	uint16 src = AsebaNativeGetArg(vm, 0, 5);
+	uint16 min = AsebaNativeGetArg(vm, 1, 5);
+	uint16 max = AsebaNativeGetArg(vm, 2, 5);
+	uint16 mean = AsebaNativeGetArg(vm, 3, 5);
 	
 	// variable size
-	uint16 length = vm->stack[4];
+	uint16 length = AsebaNativeGetArg(vm, 4, 5);
 	sint16 val;
 	sint32 acc;
 	uint16 i;
@@ -458,13 +470,13 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = vm->stack[0];
-	sint16 aIndex = vm->stack[1];
-	sint16 bIndex = vm->stack[2];
-	sint16 cIndex = vm->stack[3];
+	uint16 destIndex = AsebaNativeGetArg(vm, 0, 5);
+	sint16 aIndex = AsebaNativeGetArg(vm, 1, 5);
+	sint16 bIndex = AsebaNativeGetArg(vm, 2, 5);
+	sint16 cIndex = AsebaNativeGetArg(vm, 3, 5);
 	
 	// variable size
-	uint16 length = vm->stack[4];
+	uint16 length = AsebaNativeGetArg(vm, 4, 5);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -492,12 +504,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 void AsebaNative_mathatan2(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = vm->stack[0];
-	sint16 yIndex = vm->stack[1];
-	sint16 xIndex = vm->stack[2];
+	uint16 destIndex = AsebaNativeGetArg(vm, 0, 4);
+	sint16 yIndex = AsebaNativeGetArg(vm, 1, 4);
+	sint16 xIndex = AsebaNativeGetArg(vm, 2, 4);
 	
 	// variable size
-	uint16 length = vm->stack[3];
+	uint16 length = AsebaNativeGetArg(vm, 3, 4);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -523,11 +535,11 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 void AsebaNative_mathsin(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = vm->stack[0];
-	sint16 xIndex = vm->stack[1];
+	uint16 destIndex = AsebaNativeGetArg(vm, 0, 3);
+	sint16 xIndex = AsebaNativeGetArg(vm, 1, 3);
 	
 	// variable size
-	uint16 length = vm->stack[2];
+	uint16 length = AsebaNativeGetArg(vm, 2, 3);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -551,11 +563,11 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 void AsebaNative_mathcos(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = vm->stack[0];
-	sint16 xIndex = vm->stack[1];
+	uint16 destIndex = AsebaNativeGetArg(vm, 0, 3);
+	sint16 xIndex = AsebaNativeGetArg(vm, 1, 3);
 	
 	// variable size
-	uint16 length = vm->stack[2];
+	uint16 length = AsebaNativeGetArg(vm, 2, 3);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -578,9 +590,15 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 
 void AsebaNative_mathrot2(AsebaVMState *vm)
 {
-	sint16 x = vm->variables[vm->stack[1]];
-	sint16 y = vm->variables[vm->stack[1]+1];
-	sint16 a = vm->variables[vm->stack[2]];
+	// variable pos
+	uint16 vectOutIndex = AsebaNativeGetArg(vm, 0, 3);
+	uint16 vecInIndex = AsebaNativeGetArg(vm, 1, 3);
+	uint16 angleIndex = AsebaNativeGetArg(vm, 2, 3);
+	
+	// variables
+	sint16 x = vm->variables[vecInIndex];
+	sint16 y = vm->variables[vecInIndex+1];
+	sint16 a = vm->variables[angleIndex];
 	
 	sint16 cos_a = aseba_cos(a);
 	sint16 sin_a = aseba_sin(a);
@@ -588,8 +606,8 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	sint16 xp = (sint16)(((sint32)cos_a * (sint32)x + (sint32)sin_a * (sint32)y) >> (sint32)15);
 	sint16 yp = (sint16)(((sint32)cos_a * (sint32)y - (sint32)sin_a * (sint32)x) >> (sint32)15);
 	
-	vm->variables[vm->stack[0]] = xp;
-	vm->variables[vm->stack[0]+1] = yp;
+	vm->variables[vectOutIndex] = xp;
+	vm->variables[vectOutIndex+1] = yp;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =

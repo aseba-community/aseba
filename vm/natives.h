@@ -43,6 +43,7 @@ extern "C" {
 /** \addtogroup vm */
 /*@{*/
 
+// data structures
 
 /*! Description of a variable */
 typedef struct
@@ -82,6 +83,11 @@ typedef struct
 	const char* doc;	/*!< documentation of the function */
 	AsebaNativeFunctionArgumentDescription arguments[];	/*!< arguments, terminated by an element of size 0 */
 } AsebaNativeFunctionDescription;
+
+// support functions
+
+/*! Return an argument on the stack, including the value of template parameters */
+extern sint16 AsebaNativeGetArg(AsebaVMState *vm, uint16 argId, uint16 argsCount);
 
 // standard natives functions
 
