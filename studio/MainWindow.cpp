@@ -1144,6 +1144,7 @@ namespace Aseba
 	{
 		bool ok;
 		QString eventName = QInputDialog::getText(this, tr("Add a new event"), tr("Name:"), QLineEdit::Normal, "", &ok);
+		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
 		{
 			if (commonDefinitions.events.contains(eventName.toStdString()))
