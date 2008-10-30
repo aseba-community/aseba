@@ -87,7 +87,10 @@ typedef struct
 // support functions
 
 /*! Return an argument on the stack, including the value of template parameters */
-extern sint16 AsebaNativeGetArg(AsebaVMState *vm, uint16 argId, uint16 argsCount);
+static inline sint16 AsebaNativeGetArg(AsebaVMState *vm, uint16 argId)
+{
+	return vm->stack[vm->sp - argId];
+}
 
 // standard natives functions
 

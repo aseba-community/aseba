@@ -340,7 +340,7 @@ namespace Aseba
 	};
 	
 	//! Node for calling a native function
-	//! no children
+	//! may have children for pushing constants somewhere
 	struct CallNode : Node
 	{
 		unsigned funcId; //!< identifier of the function to be called

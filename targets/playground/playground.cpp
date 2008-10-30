@@ -977,7 +977,7 @@ extern "C" void PlaygroundNative_energysend(AsebaVMState *vm)
 		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
 		if (epuck && (&(epuck->vm) == vm) && (epuck->energy > EPUCK_INITIAL_ENERGY))
 		{
-			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0, 1)];
+			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0)];
 			
 			unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
 			playgroundViewer->energyPool += toSend;
@@ -994,7 +994,7 @@ extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
 		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
 		if (epuck && (&(epuck->vm) == vm))
 		{
-			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0, 1)];
+			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0)];
 			
 			unsigned toReceive = std::min((unsigned)amount, (unsigned)playgroundViewer->energyPool);
 			playgroundViewer->energyPool -= toReceive;
@@ -1005,7 +1005,7 @@ extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
 
 extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm)
 {
-	vm->variables[AsebaNativeGetArg(vm, 0, 1)] = playgroundViewer->energyPool;
+	vm->variables[AsebaNativeGetArg(vm, 0)] = playgroundViewer->energyPool;
 }
 
 

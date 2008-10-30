@@ -415,11 +415,13 @@ namespace Aseba
 		for (size_t i = 0; i < children.size(); i++)
 			children[i]->emit(bytecodes);
 		
-		// generate load for arguments
-		for (unsigned i = 0; i < argumentsAddr.size(); i++)
+		// generate load for arguments in reverse order
+		int i = (int)argumentsAddr.size() - 1;
+		while (i >= 0)
 		{
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | argumentsAddr[i];
 			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+			i--;
 		}
 		
 		// generate call itself
