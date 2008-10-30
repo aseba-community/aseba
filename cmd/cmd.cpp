@@ -44,8 +44,8 @@ namespace Aseba
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
 		stream << "* whex : write hex file [dest] [file name]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
-		stream << "* reset: switch user/bootloader mode [dest]\n";
-		stream << "* sb: switch into bootloader mode [dest]\n";
+		stream << "* eb: exit from bootloader, go back into user mode [dest]\n";
+		stream << "* sb: switch into bootloader: reboot node, then enter bootloader for a while [dest]\n";
 	}
 	
 	//! Show usage
@@ -475,7 +475,7 @@ namespace Aseba
 				errorHexFile(e.toString());
 			}
 		}
-		else if (strcmp(cmd, "reset") == 0)
+		else if (strcmp(cmd, "eb") == 0)
 		{
 			uint16 dest;
 			
@@ -504,17 +504,11 @@ namespace Aseba
 					cout << "Device is now in user-code" << endl;
 					delete message;
 					break;
-				} 
-				else if (bMessage && (message->source == dest))
-				{
-					cout << "Device is now in bootloader" << endl;
-					delete message;
-					break;
 				}
 				
 				delete message;
 			}
-		} 
+		}
 		else if (strcmp(cmd, "sb") == 0)
 		{
 			uint16 dest;
