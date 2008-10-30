@@ -30,17 +30,17 @@
 
 #include <p30f6014a.h>
 
-#include <e_epuck_ports.h>
-#include <e_init_port.h>
-#include <e_led.h>
-#include <e_motors.h>
-#include <e_agenda.h>
-#include <e_po3030k.h>
-#include <e_uart_char.h>
-#include <e_ad_conv.h>
-#include <e_prox.h>
-#include <e_acc.h>
-#include <e_I2C_protocol.h>
+#include "e-puck/library/motor_led/e_epuck_ports.h"
+#include "e-puck/library/motor_led/e_init_port.h"
+#include "e-puck/library/motor_led/e_led.h"
+#include "e-puck/library/motor_led/advance_one_timer/e_motors.h"
+#include "e-puck/library/motor_led/advance_one_timer/e_agenda.h"
+#include "e-puck/library/camera/fast_2_timer/e_po3030k.h"
+#include "e-puck/library/uart/e_uart_char.h"
+#include "e-puck/library/a_d/advance_ad_scan/e_ad_conv.h"
+#include "e-puck/library/a_d/advance_ad_scan/e_prox.h"
+#include "e-puck/library/a_d/advance_ad_scan/e_acc.h"
+#include "e-puck/library/I2C/e_I2C_protocol.h"
 
 #include "libpic30.h"
 
@@ -48,10 +48,10 @@
 #include <string.h>
 
 #define ASEBA_ASSERT
-#include "vm/vm.h"
-#include "common/consts.h"
-#include "vm/natives.h"
-#include "transport/buffer/vm-buffer.h"
+#include <vm/vm.h>
+#include <common/consts.h>
+#include <vm/natives.h>
+#include <transport/buffer/vm-buffer.h>
 
 #define LIS_GROUND_SENSORS
 
@@ -191,7 +191,7 @@ const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState 
 void EpuckNative_get_ground_values(AsebaVMState *vm)
 {
 	// where to 
-	uint16 dest = vm->stack[0];
+	uint16 dest = AsebaNativeGetArg(vm, 0);
 	uint16 i;
 	e_i2cp_enable();
 
@@ -345,7 +345,7 @@ void updateRobotVariables()
 		// leds and prox
 		for (i = 0; i < 8; i++)
 		{
-			e_set_led(i, ePuckVariables.leds[i]);
+			e_set_led(i, ePuckVariables.leds[i] ? 1 : 0);
 			ePuckVariables.ambiant[i] = e_get_ambient_light(i);
 			ePuckVariables.prox[i] =  e_get_calibrated_prox(i);
 		}
