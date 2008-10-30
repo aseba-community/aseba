@@ -68,6 +68,14 @@ namespace Aseba
 		rule.pattern = QRegExp("#[^\n]*");
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
+		
+		// todo/fixme
+		QTextCharFormat todoFormat;
+		todoFormat.setForeground(Qt::black);
+		todoFormat.setBackground(QColor(255, 192, 192));
+		rule.pattern = QRegExp("#.*(\\bTODO\\b|\\bFIXME\\b).*");
+		rule.format = todoFormat;
+		highlightingRules.append(rule);
 	}
 	
 	void AeslHighlighter::highlightBlock(const QString &text)
