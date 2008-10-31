@@ -67,7 +67,7 @@ typedef struct
 } AsebaLocalEventDescription;
 
 /*! Signature of a native function */
-typedef uint16 (*AsebaNativeFunctionPointer)(AsebaVMState *vm);
+typedef void (*AsebaNativeFunctionPointer)(AsebaVMState *vm);
 
 /*! Description of an argument of a native function */
 typedef struct
@@ -87,75 +87,75 @@ typedef struct
 // support functions
 
 /*! Return an argument on the stack, including the value of template parameters */
-static inline sint16 AsebaNativeGetArg(AsebaVMState *vm, uint16 argId)
+static inline sint16 AsebaNativePopArg(AsebaVMState *vm)
 {
-	return vm->stack[vm->sp - argId];
+	return vm->stack[vm->sp--];
 }
 
 // standard natives functions
 
 /*! Function to fill all the elements of a vector to a specific value*/
-uint16 AsebaNative_vecfill(AsebaVMState *vm);
+void AsebaNative_vecfill(AsebaVMState *vm);
 /*! Description of AsebaNative_vecfill */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecfill;
 
 /*! Function to copy a vector */
-uint16 AsebaNative_veccopy(AsebaVMState *vm);
+void AsebaNative_veccopy(AsebaVMState *vm);
 /*! Description of AsebaNative_veccopy */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
 
 /*! Function to add two vectors */
-uint16 AsebaNative_vecadd(AsebaVMState *vm);
+void AsebaNative_vecadd(AsebaVMState *vm);
 /*! Description of AsebaNative_vecadd */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecadd;
 
 /*! Function to substract two vectors */
-uint16 AsebaNative_vecsub(AsebaVMState *vm);
+void AsebaNative_vecsub(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsub */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
 
 /*! Function to take the element by element minimum */
-uint16 AsebaNative_vecmin(AsebaVMState *vm);
+void AsebaNative_vecmin(AsebaVMState *vm);
 /*! Description of AsebaNative_vecmin */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmin;
 
 /*! Function to take the element by element maximum */
-uint16 AsebaNative_vecmax(AsebaVMState *vm);
+void AsebaNative_vecmax(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsmax */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmax;
 
 /*! Function to perform a dot product on a vector */
-uint16 AsebaNative_vecdot(AsebaVMState *vm);
+void AsebaNative_vecdot(AsebaVMState *vm);
 /*! Description of AsebaNative_vecdot */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecdot;
 
 /*! Function to perform statistics on a vector */
-uint16 AsebaNative_vecstat(AsebaVMState *vm);
+void AsebaNative_vecstat(AsebaVMState *vm);
 /*! Description of AsebaNative_vecstat */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecstat;
 
 /*! Function to perform dest = (a*b)/c in 32 bits */
-uint16 AsebaNative_mathmuldiv(AsebaVMState *vm);
+void AsebaNative_mathmuldiv(AsebaVMState *vm);
 /*! Description of AsebaNative_mathmuldiv */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv;
 
 /*! Function to perform atan2 */
-uint16 AsebaNative_mathatan2(AsebaVMState *vm);
+void AsebaNative_mathatan2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathatan2 */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2;
 
 /*! Function to perform sin */
-uint16 AsebaNative_mathsin(AsebaVMState *vm);
+void AsebaNative_mathsin(AsebaVMState *vm);
 /*! Description of AsebaNative_mathsin */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathsin;
 
 /*! Function to perform cos */
-uint16 AsebaNative_mathcos(AsebaVMState *vm);
+void AsebaNative_mathcos(AsebaVMState *vm);
 /*! Description of AsebaNative_mathcos */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathcos;
 
 /*! Function to perform the rotation of a vector */
-uint16 AsebaNative_mathrot2(AsebaVMState *vm);
+void AsebaNative_mathrot2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathrot2 */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 

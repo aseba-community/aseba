@@ -190,14 +190,14 @@ sint16 aseba_cos(sint16 angle)
 
 // standard natives functions
 
-uint16 AsebaNative_vecfill(AsebaVMState *vm)
+void AsebaNative_vecfill(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 value = AsebaNativeGetArg(vm, 1);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 value = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 2);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	
@@ -205,8 +205,6 @@ uint16 AsebaNative_vecfill(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[value];
 	}
-	
-	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
@@ -221,14 +219,14 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 };
 
 
-uint16 AsebaNative_veccopy(AsebaVMState *vm)
+void AsebaNative_veccopy(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src = AsebaNativeGetArg(vm, 1);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 2);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	
@@ -236,8 +234,6 @@ uint16 AsebaNative_veccopy(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[src++];
 	}
-	
-	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
@@ -251,23 +247,21 @@ AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 	}
 };
 
-uint16 AsebaNative_vecadd(AsebaVMState *vm)
+void AsebaNative_vecadd(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src1 = AsebaNativeGetArg(vm, 1);
-	uint16 src2 = AsebaNativeGetArg(vm, 2);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 3);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
 	{
 		vm->variables[dest++] = vm->variables[src1++] + vm->variables[src2++];
 	}
-	
-	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
@@ -282,23 +276,21 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 	}
 };
 
-uint16 AsebaNative_vecsub(AsebaVMState *vm)
+void AsebaNative_vecsub(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src1 = AsebaNativeGetArg(vm, 1);
-	uint16 src2 = AsebaNativeGetArg(vm, 2);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 3);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
 	{
 		vm->variables[dest++] = vm->variables[src1++] - vm->variables[src2++];
 	}
-	
-	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
@@ -314,15 +306,15 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 };
 
 
-uint16 AsebaNative_vecmin(AsebaVMState *vm)
+void AsebaNative_vecmin(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src1 = AsebaNativeGetArg(vm, 1);
-	uint16 src2 = AsebaNativeGetArg(vm, 2);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 3);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -332,8 +324,6 @@ uint16 AsebaNative_vecmin(AsebaVMState *vm)
 		sint16 res = v1 < v2 ? v1 : v2;
 		vm->variables[dest++] = res;
 	}
-	
-	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
@@ -349,15 +339,15 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 };
 
 
-uint16 AsebaNative_vecmax(AsebaVMState *vm)
+void AsebaNative_vecmax(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src1 = AsebaNativeGetArg(vm, 1);
-	uint16 src2 = AsebaNativeGetArg(vm, 2);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 3);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -367,8 +357,6 @@ uint16 AsebaNative_vecmax(AsebaVMState *vm)
 		sint16 res = v1 > v2 ? v1 : v2;
 		vm->variables[dest++] = res;
 	}
-	
-	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
@@ -385,16 +373,16 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 
 
 
-uint16 AsebaNative_vecdot(AsebaVMState *vm)
+void AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 dest = AsebaNativeGetArg(vm, 0);
-	uint16 src1 = AsebaNativeGetArg(vm, 1);
-	uint16 src2 = AsebaNativeGetArg(vm, 2);
-	sint32 shift = AsebaNativeGetArg(vm, 3);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
+	sint32 shift = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 4);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	sint32 res = 0;
 	uint16 i;
@@ -405,8 +393,6 @@ uint16 AsebaNative_vecdot(AsebaVMState *vm)
 	}
 	res >>= shift;
 	vm->variables[dest] = (sint16)res;
-	
-	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
@@ -423,22 +409,22 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 };
 
 
-uint16 AsebaNative_vecstat(AsebaVMState *vm)
+void AsebaNative_vecstat(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 src = AsebaNativeGetArg(vm, 0);
-	uint16 min = AsebaNativeGetArg(vm, 1);
-	uint16 max = AsebaNativeGetArg(vm, 2);
-	uint16 mean = AsebaNativeGetArg(vm, 3);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 min = AsebaNativePopArg(vm);
+	uint16 max = AsebaNativePopArg(vm);
+	uint16 mean = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 4);
+	uint16 length = AsebaNativePopArg(vm);
 	sint16 val;
 	sint32 acc;
 	uint16 i;
 	
 	if (length)
-	{	
+	{
 		val = vm->variables[src++];
 		acc = val;
 		vm->variables[min] = val;
@@ -456,7 +442,6 @@ uint16 AsebaNative_vecstat(AsebaVMState *vm)
 		
 		vm->variables[mean] = (sint16)(acc / (sint32)length);
 	}
-	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
@@ -472,16 +457,16 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 	}
 };
 
-uint16 AsebaNative_mathmuldiv(AsebaVMState *vm)
+void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = AsebaNativeGetArg(vm, 0);
-	sint16 aIndex = AsebaNativeGetArg(vm, 1);
-	sint16 bIndex = AsebaNativeGetArg(vm, 2);
-	sint16 cIndex = AsebaNativeGetArg(vm, 3);
+	uint16 destIndex = AsebaNativePopArg(vm);
+	sint16 aIndex = AsebaNativePopArg(vm);
+	sint16 bIndex = AsebaNativePopArg(vm);
+	sint16 cIndex = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 4);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -491,8 +476,6 @@ uint16 AsebaNative_mathmuldiv(AsebaVMState *vm)
 		sint32 c = (sint32)vm->variables[cIndex++];
 		vm->variables[destIndex++] = (sint16)((a * b) / c);
 	}
-	
-	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
@@ -508,15 +491,15 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 	}
 };
 
-uint16 AsebaNative_mathatan2(AsebaVMState *vm)
+void AsebaNative_mathatan2(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = AsebaNativeGetArg(vm, 0);
-	sint16 yIndex = AsebaNativeGetArg(vm, 1);
-	sint16 xIndex = AsebaNativeGetArg(vm, 2);
+	uint16 destIndex = AsebaNativePopArg(vm);
+	sint16 yIndex = AsebaNativePopArg(vm);
+	sint16 xIndex = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 3);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -525,8 +508,6 @@ uint16 AsebaNative_mathatan2(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_atan2(y, x);
 	}
-	
-	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
@@ -541,14 +522,14 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 	}
 };
 
-uint16 AsebaNative_mathsin(AsebaVMState *vm)
+void AsebaNative_mathsin(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = AsebaNativeGetArg(vm, 0);
-	sint16 xIndex = AsebaNativeGetArg(vm, 1);
+	uint16 destIndex = AsebaNativePopArg(vm);
+	sint16 xIndex = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 2);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -556,8 +537,6 @@ uint16 AsebaNative_mathsin(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_sin(x);
 	}
-	
-	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
@@ -571,14 +550,14 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 	}
 };
 
-uint16 AsebaNative_mathcos(AsebaVMState *vm)
+void AsebaNative_mathcos(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 destIndex = AsebaNativeGetArg(vm, 0);
-	sint16 xIndex = AsebaNativeGetArg(vm, 1);
+	uint16 destIndex = AsebaNativePopArg(vm);
+	sint16 xIndex = AsebaNativePopArg(vm);
 	
 	// variable size
-	uint16 length = AsebaNativeGetArg(vm, 2);
+	uint16 length = AsebaNativePopArg(vm);
 	
 	uint16 i;
 	for (i = 0; i < length; i++)
@@ -586,8 +565,6 @@ uint16 AsebaNative_mathcos(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_cos(x);
 	}
-	
-	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
@@ -601,12 +578,12 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 	}
 };
 
-uint16 AsebaNative_mathrot2(AsebaVMState *vm)
+void AsebaNative_mathrot2(AsebaVMState *vm)
 {
 	// variable pos
-	uint16 vectOutIndex = AsebaNativeGetArg(vm, 0);
-	uint16 vecInIndex = AsebaNativeGetArg(vm, 1);
-	uint16 angleIndex = AsebaNativeGetArg(vm, 2);
+	uint16 vectOutIndex = AsebaNativePopArg(vm);
+	uint16 vecInIndex = AsebaNativePopArg(vm);
+	uint16 angleIndex = AsebaNativePopArg(vm);
 	
 	// variables
 	sint16 x = vm->variables[vecInIndex];
@@ -621,8 +598,6 @@ uint16 AsebaNative_mathrot2(AsebaVMState *vm)
 	
 	vm->variables[vectOutIndex] = xp;
 	vm->variables[vectOutIndex+1] = yp;
-	
-	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =

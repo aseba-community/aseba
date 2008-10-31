@@ -911,9 +911,9 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" uint16 AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	return nativeFunctions[id](vm);
+	nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaWriteBytecode(AsebaVMState *vm)

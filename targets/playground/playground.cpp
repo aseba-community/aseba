@@ -62,9 +62,9 @@ namespace Enki
 	class AsebaFeedableEPuck;
 }
 
-extern "C" uint16 PlaygroundNative_energysend(AsebaVMState *vm);
-extern "C" uint16 PlaygroundNative_energyreceive(AsebaVMState *vm);
-extern "C" uint16 PlaygroundNative_energyamount(AsebaVMState *vm);
+extern "C" void PlaygroundNative_energysend(AsebaVMState *vm);
+extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm);
+extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm);
 
 extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend;
 extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive;
@@ -969,46 +969,46 @@ namespace Enki
 
 // Implementation of native function
 
-extern "C" uint16 PlaygroundNative_energysend(AsebaVMState *vm)
+extern "C" void PlaygroundNative_energysend(AsebaVMState *vm)
 {
+	int index = AsebaNativePopArg(vm);
 	// find related VM
 	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
 	{
 		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
 		if (epuck && (&(epuck->vm) == vm) && (epuck->energy > EPUCK_INITIAL_ENERGY))
 		{
-			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0)];
+			uint16 amount = vm->variables[index];
 			
 			unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
 			playgroundViewer->energyPool += toSend;
 			epuck->energy -= toSend;
 		}
 	}
-	return 1;
 }
 
-extern "C" uint16 PlaygroundNative_energyreceive(AsebaVMState *vm)
+extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
 {
+	int index = AsebaNativePopArg(vm);
 	// find related VM
 	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
 	{
 		Enki::AsebaFeedableEPuck *epuck = dynamic_cast<Enki::AsebaFeedableEPuck*>(*objectIt);
 		if (epuck && (&(epuck->vm) == vm))
 		{
-			uint16 amount = vm->variables[AsebaNativeGetArg(vm, 0)];
+			uint16 amount = vm->variables[index];
 			
 			unsigned toReceive = std::min((unsigned)amount, (unsigned)playgroundViewer->energyPool);
 			playgroundViewer->energyPool -= toReceive;
 			epuck->energy += toReceive;
 		}
 	}
-	return 1;
 }
 
-extern "C" uint16 PlaygroundNative_energyamount(AsebaVMState *vm)
+extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm)
 {
-	vm->variables[AsebaNativeGetArg(vm, 0)] = playgroundViewer->energyPool;
-	return 1;
+	int index = AsebaNativePopArg(vm);
+	vm->variables[index] = playgroundViewer->energyPool;
 }
 
 
@@ -1082,9 +1082,9 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" uint16 AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	return nativeFunctions[id](vm);
+	nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
