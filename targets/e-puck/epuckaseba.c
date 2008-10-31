@@ -191,7 +191,7 @@ const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState 
 void EpuckNative_get_ground_values(AsebaVMState *vm)
 {
 	// where to 
-	uint16 dest = AsebaNativeGetArg(vm, 0);
+	uint16 dest = AsebaNativePopArg(vm);
 	uint16 i;
 	e_i2cp_enable();
 
