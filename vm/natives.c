@@ -190,7 +190,7 @@ sint16 aseba_cos(sint16 angle)
 
 // standard natives functions
 
-void AsebaNative_vecfill(AsebaVMState *vm)
+uint16 AsebaNative_vecfill(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -205,6 +205,8 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[value];
 	}
+	
+	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
@@ -219,7 +221,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 };
 
 
-void AsebaNative_veccopy(AsebaVMState *vm)
+uint16 AsebaNative_veccopy(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -234,6 +236,8 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[src++];
 	}
+	
+	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
@@ -247,7 +251,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 	}
 };
 
-void AsebaNative_vecadd(AsebaVMState *vm)
+uint16 AsebaNative_vecadd(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -262,6 +266,8 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[src1++] + vm->variables[src2++];
 	}
+	
+	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
@@ -276,7 +282,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 	}
 };
 
-void AsebaNative_vecsub(AsebaVMState *vm)
+uint16 AsebaNative_vecsub(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -291,6 +297,8 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 	{
 		vm->variables[dest++] = vm->variables[src1++] - vm->variables[src2++];
 	}
+	
+	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
@@ -306,7 +314,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 };
 
 
-void AsebaNative_vecmin(AsebaVMState *vm)
+uint16 AsebaNative_vecmin(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -324,6 +332,8 @@ void AsebaNative_vecmin(AsebaVMState *vm)
 		sint16 res = v1 < v2 ? v1 : v2;
 		vm->variables[dest++] = res;
 	}
+	
+	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
@@ -339,7 +349,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 };
 
 
-void AsebaNative_vecmax(AsebaVMState *vm)
+uint16 AsebaNative_vecmax(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -357,6 +367,8 @@ void AsebaNative_vecmax(AsebaVMState *vm)
 		sint16 res = v1 > v2 ? v1 : v2;
 		vm->variables[dest++] = res;
 	}
+	
+	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
@@ -373,7 +385,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 
 
 
-void AsebaNative_vecdot(AsebaVMState *vm)
+uint16 AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativeGetArg(vm, 0);
@@ -393,6 +405,8 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	}
 	res >>= shift;
 	vm->variables[dest] = (sint16)res;
+	
+	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
@@ -409,7 +423,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 };
 
 
-void AsebaNative_vecstat(AsebaVMState *vm)
+uint16 AsebaNative_vecstat(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 src = AsebaNativeGetArg(vm, 0);
@@ -442,6 +456,8 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 	}
 	
 	vm->variables[mean] = (sint16)(acc / (sint32)length);
+	
+	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
@@ -457,7 +473,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 	}
 };
 
-void AsebaNative_mathmuldiv(AsebaVMState *vm)
+uint16 AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 destIndex = AsebaNativeGetArg(vm, 0);
@@ -476,6 +492,8 @@ void AsebaNative_mathmuldiv(AsebaVMState *vm)
 		sint32 c = (sint32)vm->variables[cIndex++];
 		vm->variables[destIndex++] = (sint16)((a * b) / c);
 	}
+	
+	return 5;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
@@ -491,7 +509,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 	}
 };
 
-void AsebaNative_mathatan2(AsebaVMState *vm)
+uint16 AsebaNative_mathatan2(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 destIndex = AsebaNativeGetArg(vm, 0);
@@ -508,6 +526,8 @@ void AsebaNative_mathatan2(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_atan2(y, x);
 	}
+	
+	return 4;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
@@ -522,7 +542,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 	}
 };
 
-void AsebaNative_mathsin(AsebaVMState *vm)
+uint16 AsebaNative_mathsin(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 destIndex = AsebaNativeGetArg(vm, 0);
@@ -537,6 +557,8 @@ void AsebaNative_mathsin(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_sin(x);
 	}
+	
+	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
@@ -550,7 +572,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 	}
 };
 
-void AsebaNative_mathcos(AsebaVMState *vm)
+uint16 AsebaNative_mathcos(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 destIndex = AsebaNativeGetArg(vm, 0);
@@ -565,6 +587,8 @@ void AsebaNative_mathcos(AsebaVMState *vm)
 		sint16 x = vm->variables[xIndex++];
 		vm->variables[destIndex++] = aseba_cos(x);
 	}
+	
+	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
@@ -578,7 +602,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 	}
 };
 
-void AsebaNative_mathrot2(AsebaVMState *vm)
+uint16 AsebaNative_mathrot2(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 vectOutIndex = AsebaNativeGetArg(vm, 0);
@@ -598,6 +622,8 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	
 	vm->variables[vectOutIndex] = xp;
 	vm->variables[vectOutIndex+1] = yp;
+	
+	return 3;
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =

@@ -444,8 +444,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		case ASEBA_BYTECODE_NATIVE_CALL:
 		{
 			// call native function
-			AsebaNativeFunction(vm, bytecode & 0x0fff);
-			vm->sp = -1;
+			vm->sp -= AsebaNativeFunction(vm, bytecode & 0x0fff);
 			
 			// increment PC
 			vm->pc ++;

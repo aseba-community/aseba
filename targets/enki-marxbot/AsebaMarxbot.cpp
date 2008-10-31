@@ -132,9 +132,9 @@ extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(As
 	return localEvents;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" uint16 AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	nativeFunctions[id](vm);
+	return nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaWriteBytecode(AsebaVMState *vm)

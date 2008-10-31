@@ -155,7 +155,7 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length);
 void AsebaSendDescription(AsebaVMState *vm);
 
 /*! Called by AsebaStep to perform a native function call. */
-void AsebaNativeFunction(AsebaVMState *vm, uint16 id);
+uint16 AsebaNativeFunction(AsebaVMState *vm, uint16 id);
 
 /*! Called by AsebaVMDebugMessage when VM must write its bytecode to flash, write an empty function to leave feature unsupported */
 void AsebaWriteBytecode(AsebaVMState *vm);

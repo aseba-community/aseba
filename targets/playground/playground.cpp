@@ -62,9 +62,9 @@ namespace Enki
 	class AsebaFeedableEPuck;
 }
 
-extern "C" void PlaygroundNative_energysend(AsebaVMState *vm);
-extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm);
-extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm);
+extern "C" uint16 PlaygroundNative_energysend(AsebaVMState *vm);
+extern "C" uint16 PlaygroundNative_energyreceive(AsebaVMState *vm);
+extern "C" uint16 PlaygroundNative_energyamount(AsebaVMState *vm);
 
 extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend;
 extern "C" AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive;
@@ -969,7 +969,7 @@ namespace Enki
 
 // Implementation of native function
 
-extern "C" void PlaygroundNative_energysend(AsebaVMState *vm)
+extern "C" uint16 PlaygroundNative_energysend(AsebaVMState *vm)
 {
 	// find related VM
 	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
@@ -984,9 +984,10 @@ extern "C" void PlaygroundNative_energysend(AsebaVMState *vm)
 			epuck->energy -= toSend;
 		}
 	}
+	return 1;
 }
 
-extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
+extern "C" uint16 PlaygroundNative_energyreceive(AsebaVMState *vm)
 {
 	// find related VM
 	for (Enki::World::ObjectsIterator objectIt = playgroundViewer->getWorld()->objects.begin(); objectIt != playgroundViewer->getWorld()->objects.end(); ++objectIt)
@@ -1001,11 +1002,13 @@ extern "C" void PlaygroundNative_energyreceive(AsebaVMState *vm)
 			epuck->energy += toReceive;
 		}
 	}
+	return 1;
 }
 
-extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm)
+extern "C" uint16 PlaygroundNative_energyamount(AsebaVMState *vm)
 {
 	vm->variables[AsebaNativeGetArg(vm, 0)] = playgroundViewer->energyPool;
+	return 1;
 }
 
 
@@ -1079,9 +1082,9 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" uint16 AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	nativeFunctions[id](vm);
+	return nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
