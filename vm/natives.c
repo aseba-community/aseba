@@ -437,26 +437,25 @@ uint16 AsebaNative_vecstat(AsebaVMState *vm)
 	sint32 acc;
 	uint16 i;
 	
-	if (!length)
-		return;
-	
-	val = vm->variables[src++];
-	acc = val;
-	vm->variables[min] = val;
-	vm->variables[max] = val;
-	
-	for (i = 1; i < length; i++)
-	{
+	if (length)
+	{	
 		val = vm->variables[src++];
-		if (val < vm->variables[min])
-			vm->variables[min] = val;
-		if (val > vm->variables[max])
-			vm->variables[max] = val;
-		acc += (sint32)val;
+		acc = val;
+		vm->variables[min] = val;
+		vm->variables[max] = val;
+		
+		for (i = 1; i < length; i++)
+		{
+			val = vm->variables[src++];
+			if (val < vm->variables[min])
+				vm->variables[min] = val;
+			if (val > vm->variables[max])
+				vm->variables[max] = val;
+			acc += (sint32)val;
+		}
+		
+		vm->variables[mean] = (sint16)(acc / (sint32)length);
 	}
-	
-	vm->variables[mean] = (sint16)(acc / (sint32)length);
-	
 	return 5;
 }
 
