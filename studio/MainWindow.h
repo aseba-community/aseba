@@ -143,7 +143,7 @@ namespace Aseba
 		QTreeView *vmMemoryView;
 		
 		TargetFunctionsModel *vmFunctionsModel;
-		QTableView *vmFunctionsView;
+		QTreeView *vmFunctionsView;
 		
 		QListWidget* vmLocalEvents;
 		

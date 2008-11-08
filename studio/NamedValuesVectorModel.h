@@ -40,6 +40,7 @@ namespace Aseba
 		Q_OBJECT
 	
 	public:
+		NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
 		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -58,6 +59,7 @@ namespace Aseba
 		
 	private:
 		NamedValuesVector* namedValues;
+		QString tooltipText;
 	};
 	
 	/*@}*/

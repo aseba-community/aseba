@@ -123,9 +123,14 @@ namespace Aseba
 	
 	QVariant TargetVariablesModel::headerData(int section, Qt::Orientation orientation, int role) const
 	{
-		Q_UNUSED(section)
+		//Q_UNUSED(section)
 		Q_UNUSED(orientation)
 		Q_UNUSED(role)
+		if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+			if (section == 0)
+				return tr("variables");
+			else
+				return tr("values");
 		return QVariant();
 	}
 	
@@ -144,7 +149,7 @@ namespace Aseba
 				return 0;
 		}
 		else
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+			return Qt::ItemIsEnabled; //| Qt::ItemIsSelectable;
 	}
 	
 	bool TargetVariablesModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -274,21 +279,159 @@ namespace Aseba
 	}
 	
 	
+	
+	struct TargetFunctionsModel::TreeItem
+	{
+		TreeItem* parent;
+		QList<TreeItem*> children;
+		QString name;
+		QString toolTip;
+		
+		TreeItem() :
+			parent(0),
+			name("root")
+		{ }
+		
+		TreeItem(TreeItem* parent, const QString& name) :
+			parent(parent),
+			name(name)
+		{ }
+		
+		TreeItem(TreeItem* parent, const QString& name, const QString& toolTip) :
+			parent(parent),
+			name(name),
+			toolTip(toolTip)
+		{ }
+		
+		~TreeItem()
+		{
+			for (int i = 0; i < children.size(); i++)
+				delete children[i];
+		}
+		
+		TreeItem *getEntry(const QString& name)
+		{
+			for (int i = 0; i < children.size(); i++)
+				if (children[i]->name == name)
+					return children[i];
+			
+			children.push_back(new TreeItem(this, name));
+			return children.last();
+		}
+	};
+	
+	
+	
 	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent) :
 		QAbstractTableModel(parent),
+		root(0),
 		descriptionRead(descriptionRead)
 	{
 		Q_ASSERT(descriptionRead);
+		createTreeFromDescription();
 	}
 	
-	int TargetFunctionsModel::rowCount(const QModelIndex & /* parent */) const
+	TargetFunctionsModel::~TargetFunctionsModel()
 	{
-		return descriptionRead->nativeFunctions.size();
+		delete root;
+	}
+	
+	TargetFunctionsModel::TreeItem *TargetFunctionsModel::getItem(const QModelIndex &index) const
+	{
+		if (index.isValid())
+		{
+			TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+			if (item)
+				return item;
+		}
+		return root;
+	}
+	
+	QString TargetFunctionsModel::getToolTip(const TargetDescription::NativeFunction& function) const
+	{
+		// tooltip, display detailed information with pretty print of template parameters
+		QString text;
+		text += QString("<b>%0</b>(").arg(QString::fromUtf8(function.name.c_str()));
+		for (size_t i = 0; i < function.parameters.size(); i++)
+		{
+			text += QString("%0").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
+			if (function.parameters[i].size > 0)
+				text += QString("<%0>").arg(function.parameters[i].size);
+			else if (function.parameters[i].size < 0)
+				text += QString("<T%0>").arg(-function.parameters[i].size);
+			
+			if (i + 1 < function.parameters.size())
+				text += QString(", ");
+		}
+		
+		text += QString(")<br/>") + QString::fromUtf8(function.description.c_str());
+		
+		return text;
+	}
+	
+	int TargetFunctionsModel::rowCount(const QModelIndex & parent) const
+	{
+		return getItem(parent)->children.count();
 	}
 	
 	int TargetFunctionsModel::columnCount(const QModelIndex & /* parent */) const
 	{
 		return 1;
+	}
+	
+	void TargetFunctionsModel::createTreeFromDescription()
+	{
+		if (root)
+			delete root;
+		root = new TreeItem;
+		for (size_t i = 0; i < descriptionRead->nativeFunctions.size(); i++)
+		{
+			// get the name, split it, and managed hidden
+			QString name = QString::fromUtf8(descriptionRead->nativeFunctions[i].name.c_str());
+			QStringList splittedName = name.split(".", QString::SkipEmptyParts);
+			
+			// ignore functions with no name at all
+			if (splittedName.isEmpty())
+				continue;
+			
+			// get first, and iterate
+			TreeItem* entry = root->getEntry(splittedName[0]);
+			for (int j = 1; j < splittedName.size() - 1; ++j)
+			{
+				if (splittedName[j].isEmpty())
+					entry = entry->getEntry(tr("hidden"));
+				else
+					entry = entry->getEntry(splittedName[j]);
+			}
+			
+			// for last entry
+			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i])));
+		}
+	}
+	
+	QModelIndex TargetFunctionsModel::parent(const QModelIndex &index) const
+	{
+		if (!index.isValid())
+			return QModelIndex();
+	
+		TreeItem *childItem = getItem(index);
+		TreeItem *parentItem = childItem->parent;
+	
+		if (parentItem == root)
+			return QModelIndex();
+	
+		return createIndex(parentItem->children.size(), 0, parentItem);
+	}
+	
+	QModelIndex TargetFunctionsModel::index(int row, int column, const QModelIndex &parent) const
+	{
+		TreeItem *parentItem = getItem(parent);
+		TreeItem *childItem = parentItem->children.value(row);
+		
+		if (childItem)
+			return createIndex(row, column, childItem);
+		else
+			return QModelIndex();
 	}
 	
 	QVariant TargetFunctionsModel::data(const QModelIndex &index, int role) const
@@ -299,30 +442,11 @@ namespace Aseba
 		
 		if (role == Qt::DisplayRole)
 		{
-			const TargetDescription::NativeFunction& function = descriptionRead->nativeFunctions[index.row()];
-			return QString::fromUtf8(function.name.c_str());
+			return getItem(index)->name;
 		}
 		else
 		{
-			// tooltip, display detailed information with pretty print of template parameters
-			const TargetDescription::NativeFunction& function = descriptionRead->nativeFunctions[index.row()];
-			QString text;
-			text += QString("<b>%0</b>(").arg(QString::fromUtf8(function.name.c_str()));
-			for (size_t i = 0; i < function.parameters.size(); i++)
-			{
-				text += QString("%0").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
-				if (function.parameters[i].size > 0)
-					text += QString("<%0>").arg(function.parameters[i].size);
-				else if (function.parameters[i].size < 0)
-					text += QString("<T%0>").arg(-function.parameters[i].size);
-				
-				if (i + 1 < function.parameters.size())
-					text += QString(", ");
-			}
-			
-			text += QString(")<br/>") + QString::fromUtf8(function.description.c_str());
-			
-			return text;
+			return getItem(index)->toolTip;
 		}
 	}
 	

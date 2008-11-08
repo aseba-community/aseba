@@ -474,7 +474,16 @@ void AsebaNative_mathmuldiv(AsebaVMState *vm)
 		sint32 a = (sint32)vm->variables[aIndex++];
 		sint32 b = (sint32)vm->variables[bIndex++];
 		sint32 c = (sint32)vm->variables[cIndex++];
-		vm->variables[destIndex++] = (sint16)((a * b) / c);
+		if (c != 0)
+		{
+			vm->variables[destIndex++] = (sint16)((a * b) / c);
+		}
+		else
+		{
+			vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+			AsebaSendMessage(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &(vm->pc), sizeof(vm->pc));
+			return;
+		}
 	}
 }
 

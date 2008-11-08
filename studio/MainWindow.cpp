@@ -172,10 +172,7 @@ namespace Aseba
 		// panel
 		
 		// buttons
-		QHBoxLayout *executionTitleLayout = new QHBoxLayout;
-		executionTitleLayout->addWidget(new QLabel(tr("<b>Execution</b>")));
 		executionModeLabel = new QLabel(tr("unknown"));
-		executionTitleLayout->addWidget(executionModeLabel);
 		
 		loadButton = new QPushButton(QIcon(":/images/upload.png"), tr("Load"));
 		resetButton = new QPushButton(QIcon(":/images/reset.png"), tr("Reset"));
@@ -186,35 +183,38 @@ namespace Aseba
 		nextButton->setEnabled(false);
 		refreshMemoryButton = new QPushButton(QIcon(":/images/rescan.png"), tr("refresh"));
 		
-		// memory
-		QHBoxLayout *memoryTitleLayout = new QHBoxLayout;
-		memoryTitleLayout->addWidget(new QLabel(tr("<b>Memory</b>")));
-		memoryTitleLayout->addWidget(refreshMemoryButton);
+		QGridLayout* buttonsLayout = new QGridLayout;
+		buttonsLayout->addWidget(new QLabel(tr("<b>Execution</b>")), 0, 0);
+		buttonsLayout->addWidget(executionModeLabel, 0, 1);
+		buttonsLayout->addWidget(loadButton, 1, 0);
+		buttonsLayout->addWidget(runInterruptButton, 1, 1);
+		buttonsLayout->addWidget(resetButton, 2, 0);
+		buttonsLayout->addWidget(nextButton, 2, 1);
 		
+		// memory
 		vmMemoryView = new QTreeView;
-		//vmMemoryView->setShowGrid(false);
-		//vmMemoryView->verticalHeader()->hide();
-		//vmMemoryView->header()->hide();
 		vmMemoryView->setModel(vmMemoryModel);
-		//vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-		//vmMemoryView->setSelectionMode(QAbstractItemView::NoSelection);
+		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmMemoryView->setItemDelegate(new SpinBoxDelegate(-32768, 32767, this));
 		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-888888##"));
+		//vmMemoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		//vmMemoryView->setHeaderHidden(true);
+		
+		QGridLayout *memoryLayout = new QGridLayout;
+		memoryLayout->addWidget(new QLabel(tr("<b>Memory</b>")), 0, 0);
+		memoryLayout->addWidget(refreshMemoryButton, 0, 1);
+		memoryLayout->addWidget(vmMemoryView, 1, 0, 1, 2);
 		
 		// functions
-		vmFunctionsView = new QTableView;
+		vmFunctionsView = new QTreeView;
 		vmFunctionsView->setMinimumHeight(40);
-		vmFunctionsView->setShowGrid(false);
-		vmFunctionsView->verticalHeader()->hide();
-		vmFunctionsView->horizontalHeader()->hide();
 		vmFunctionsView->setMinimumSize(QSize(50,40));
 		vmFunctionsView->setModel(vmFunctionsModel);
 		vmFunctionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmFunctionsView->setSelectionMode(QAbstractItemView::NoSelection);	
 		vmFunctionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmFunctionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-		vmFunctionsView->resizeColumnsToContents();
-		vmFunctionsView->resizeRowsToContents();
+		vmFunctionsView->setHeaderHidden(true);
 		
 		// local events
 		vmLocalEvents = new QListWidget;
@@ -231,25 +231,27 @@ namespace Aseba
 		QToolBox* toolBox = new QToolBox;
 		toolBox->addItem(vmFunctionsView, tr("Native Functions"));
 		toolBox->addItem(vmLocalEvents, tr("Local Events"));
+		QVBoxLayout* toolBoxLayout = new QVBoxLayout;
+		toolBoxLayout->addWidget(toolBox);
+		QWidget* toolBoxWidget = new QWidget;
+		toolBoxWidget->setLayout(toolBoxLayout);
 		
 		// panel
-		QVBoxLayout *panelLayout = new QVBoxLayout;
-		panelLayout->addLayout(executionTitleLayout);
-		panelLayout->addWidget(loadButton);
-		panelLayout->addWidget(resetButton);
-		panelLayout->addWidget(runInterruptButton);
-		panelLayout->addWidget(nextButton);
-		panelLayout->addLayout(memoryTitleLayout);
-		panelLayout->addWidget(vmMemoryView, 3);
-		panelLayout->addWidget(toolBox, 1);
+		QSplitter *panelSplitter = new QSplitter(Qt::Vertical);
 		
-		/*QHBoxLayout *layout = new QLayout;
-		layout->addLayout(panelLayout, 1);
-		layout->addLayout(editorLayout, 4);
-		setLayout(layout);*/
-		QWidget *panelWidget = new QWidget;
-		panelWidget->setLayout(panelLayout);
-		addWidget(panelWidget);
+		QWidget* buttonsWidget = new QWidget;
+		buttonsWidget->setLayout(buttonsLayout);
+		panelSplitter->addWidget(buttonsWidget);
+		
+		QWidget* memoryWidget = new QWidget;
+		memoryWidget->setLayout(memoryLayout);
+		panelSplitter->addWidget(memoryWidget);
+		panelSplitter->setStretchFactor(1, 3);
+		
+		panelSplitter->addWidget(toolBoxWidget);
+		panelSplitter->setStretchFactor(2, 1);
+		
+		addWidget(panelSplitter);
 		QWidget *editorWidget = new QWidget;
 		editorWidget->setLayout(editorLayout);
 		addWidget(editorWidget);
@@ -268,7 +270,8 @@ namespace Aseba
 		
 		// memory
 		connect(vmMemoryModel, SIGNAL(variableValueChanged(unsigned, int)), SLOT(setVariableValue(unsigned, int)));
-		connect(vmMemoryView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(insertVariableName(const QModelIndex &)));
+		// temporary disabled for the sake of consistancy
+		//connect(vmMemoryView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(insertVariableName(const QModelIndex &)));
 		
 		// editor
 		connect(editor, SIGNAL(textChanged()), SLOT(editorContentChanged()));
@@ -678,7 +681,7 @@ namespace Aseba
 		target = new DashelTarget();
 		
 		// create models
-		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, this);
+		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
 		
 		// create gui
@@ -709,8 +712,9 @@ namespace Aseba
 						"</li><li>Dashel "\
 						DASHEL_VERSION \
 						"</li></ul>" \
-						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a></p>" \
-						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>"));
+						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a> and other contributors</p>" \
+						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>" \
+						"<p>Aseba is open-source under the GPL license version 3</p>"));
 	}
 	
 	void MainWindow::newFile()
@@ -1513,7 +1517,7 @@ namespace Aseba
 		eventsDockLayout->addWidget(clearLogger);
 		
 		splitter->addWidget(eventsDockWidget);
-		splitter->setSizes(QList<int>() << 600 << 150);
+		splitter->setSizes(QList<int>() << 580 << 140);
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);

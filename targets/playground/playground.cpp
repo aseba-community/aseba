@@ -42,6 +42,7 @@
 #include <iostream>
 #include <QtGui>
 #include <QtDebug>
+#include <QtXml>
 #include "playground.h"
 //#include <playground.moc>
 #include <string.h>
@@ -1143,8 +1144,221 @@ int main(int argc, char *argv[])
 	app.installTranslator(&translator);
 	*/
 	
+	// create document
+	QDomDocument domDocument("aseba-playground");
+	
+	// Get cmd line arguments
+	QString fileName;
+	bool ask = true;
+	if (argc > 1)
+	{
+		fileName = argv[1];
+		ask = false;
+	}
+	
+	// Try to load xml config file
+	do
+	{
+		if (ask)
+			fileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), "", app.tr("playground scenario (*.playground)"));
+		ask = true;
+		
+		if (fileName.isEmpty())
+		{
+			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog\n";
+			exit(1);
+		}
+		
+		QFile file(fileName);
+		if (file.open(QIODevice::ReadOnly))
+		{
+			QString errorStr;
+			int errorLine, errorColumn;
+			if (!domDocument.setContent(&file, false, &errorStr, &errorLine, &errorColumn))
+			{
+				QMessageBox::information(0, "Aseba Playground",
+										app.tr("Parse error at file %1, line %2, column %3:\n%4")
+										.arg(fileName)
+										.arg(errorLine)
+										.arg(errorColumn)
+										.arg(errorStr));
+			}
+			else
+				break;
+		}
+	}
+	while (true);
+	
+	// Scan for colors
+	typedef QMap<QString, Enki::Color> ColorsMap;
+	ColorsMap colorsMap;
+	QDomElement colorE = domDocument.documentElement().firstChildElement("color");
+	while (!colorE.isNull())
+	{
+		colorsMap[colorE.attribute("name")] = Enki::Color(
+			colorE.attribute("r").toDouble(),
+			colorE.attribute("g").toDouble(),
+			colorE.attribute("b").toDouble()
+		);
+		
+		colorE = colorE.nextSiblingElement ("color");
+	}
+	
+	// Scan for areas
+	typedef QMap<QString, Enki::Polygone> AreasMap;
+	AreasMap areasMap;
+	QDomElement areaE = domDocument.documentElement().firstChildElement("area");
+	while (!areaE.isNull())
+	{
+		Enki::Polygone p;
+		QDomElement pointE = areaE.firstChildElement("point");
+		while (!pointE.isNull())
+		{
+			p.push_back(Enki::Point(
+				pointE.attribute("x").toDouble(),
+				pointE.attribute("y").toDouble()
+			));
+			pointE = pointE.nextSiblingElement ("point");
+		}
+		areasMap[areaE.attribute("name")] = p;
+		areaE = areaE.nextSiblingElement ("area");
+	}
+	
 	// Create the world
-	Enki::World world(110.4, 110.4);
+	QDomElement worldE = domDocument.documentElement().firstChildElement("world");
+	Enki::World world(
+		worldE.attribute("w").toDouble(),
+		worldE.attribute("h").toDouble()
+	);
+	if (!colorsMap.contains(worldE.attribute("color")))
+		std::cerr << "Warning, world walls color " << worldE.attribute("color").toStdString() << " undefined\n";
+	else
+		world.setWallsColor(colorsMap[worldE.attribute("color")]);
+	
+	// Scan for walls
+	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");
+	while (!wallE.isNull())
+	{
+		Enki::PhysicalObject* wall = new Enki::PhysicalObject();
+		if (!colorsMap.contains(wallE.attribute("color")))
+			std::cerr << "Warning, color " << wallE.attribute("color").toStdString() << " undefined\n";
+		else
+			wall->setColor(colorsMap[wallE.attribute("color")]);
+		wall->pos.x = wallE.attribute("x").toDouble();
+		wall->pos.y = wallE.attribute("y").toDouble();
+		wall->setRectangular(
+			wallE.attribute("l1").toDouble(),
+			wallE.attribute("l2").toDouble(),
+			wallE.attribute("h").toDouble()
+		);
+		wall->setMass(-1);
+		wall->commitPhysicalParameters();
+		world.addObject(wall);
+		
+		wallE  = wallE.nextSiblingElement ("wall");
+	}
+	
+	// Scan for feeders
+	QDomElement feederE = domDocument.documentElement().firstChildElement("feeder");
+	while (!feederE.isNull())
+	{
+		Enki::EPuckFeeder* feeder = new Enki::EPuckFeeder;
+		feeder->pos.x = feederE.attribute("x").toDouble();
+		feeder->pos.y = feederE.attribute("y").toDouble();
+		world.addObject(feeder);
+	
+		feederE = feederE.nextSiblingElement ("feeder");
+	}
+	// TODO: if needed, custom color to feeder
+	
+	// Scan for doors
+	typedef QMap<QString, Enki::SlidingDoor*> DoorsMap;
+	DoorsMap doorsMap;
+	QDomElement doorE = domDocument.documentElement().firstChildElement("door");
+	while (!doorE.isNull())
+	{
+		Enki::SlidingDoor *door = new Enki::SlidingDoor(
+			Enki::Point(
+				doorE.attribute("closedX").toDouble(),
+				doorE.attribute("closedY").toDouble()
+			),
+			Enki::Point(
+				doorE.attribute("openedX").toDouble(),
+				doorE.attribute("openedY").toDouble()
+			),
+			Enki::Point(
+				doorE.attribute("l1").toDouble(),
+				doorE.attribute("l2").toDouble()
+			),
+			doorE.attribute("h").toDouble(),
+			doorE.attribute("moveDuration").toDouble()
+		);
+		if (!colorsMap.contains(doorE.attribute("color")))
+			std::cerr << "Warning, door color " << doorE.attribute("color").toStdString() << " undefined\n";
+		else
+			door->setColor(colorsMap[doorE.attribute("color")]);
+		doorsMap[doorE.attribute("name")] = door;
+		world.addObject(door);
+		
+		doorE = doorE.nextSiblingElement ("door");
+	}
+	
+	// Scan for activation, and link them with areas and doors
+	QDomElement activationE = domDocument.documentElement().firstChildElement("activation");
+	while (!activationE.isNull())
+	{
+		if (areasMap.find(activationE.attribute("area")) == areasMap.end())
+		{
+			std::cerr << "Warning, area " << activationE.attribute("area").toStdString() << " undefined\n";
+			activationE = activationE.nextSiblingElement ("activation");
+			continue;
+		}
+		
+		if (doorsMap.find(activationE.attribute("door")) == doorsMap.end())
+		{
+			std::cerr << "Warning, door " << activationE.attribute("door").toStdString() << " undefined\n";
+			activationE = activationE.nextSiblingElement ("activation");
+			continue;
+		}
+		
+		const Enki::Polygone& area = *areasMap.find(activationE.attribute("area"));
+		Enki::Door* door = *doorsMap.find(activationE.attribute("door"));
+		
+		Enki::ActivationObject* activation = new Enki::ActivationObject(
+			Enki::Point(
+				activationE.attribute("x").toDouble(),
+				activationE.attribute("y").toDouble()
+			),
+			Enki::Point(
+				activationE.attribute("l1").toDouble(),
+				activationE.attribute("l2").toDouble()
+			),
+			area,
+			door
+		);
+		
+		world.addObject(activation);
+		
+		activationE = activationE.nextSiblingElement ("activation");
+	}
+	
+	// Scan for e-puck
+	QDomElement ePuckE = domDocument.documentElement().firstChildElement("e-puck");
+	int ePuckCount = 0;
+	while (!ePuckE.isNull())
+	{
+		char buffer[9];
+		strncpy(buffer, "e-puck  ", sizeof(buffer));
+		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ePuckCount + 1);
+		buffer[7] = '0' + ePuckCount++;
+		epuck->pos.x = ePuckE.attribute("x").toDouble();
+		epuck->pos.y = ePuckE.attribute("y").toDouble();
+		epuck->name = buffer;
+		world.addObject(epuck);
+		ePuckE = ePuckE.nextSiblingElement ("e-puck");
+	}
+	
+	/*Enki::World world(110.4, 110.4);
 	Enki::Color wallsColor(0.9, 0.9, 0.9);
 	world.setWallsColor(wallsColor);
 	
@@ -1229,7 +1443,7 @@ int main(int argc, char *argv[])
 			//epuck->pos = Enki::Point(105, 55.2);
 			;
 	}
-	
+	*/
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);

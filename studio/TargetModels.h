@@ -96,10 +96,17 @@ namespace Aseba
 	class TargetFunctionsModel: public QAbstractTableModel
 	{
 	public:
+		struct TreeItem;
+		
+	public:
 		TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent = 0);
+		~TargetFunctionsModel();
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		
+		QModelIndex parent(const QModelIndex &index) const;
+		QModelIndex index(int row, int column, const QModelIndex &parent) const;
 		
 		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -109,6 +116,11 @@ namespace Aseba
 		void dataChangedExternally(const QModelIndex &index);
 		
 	private:
+		void createTreeFromDescription();
+		TreeItem *getItem(const QModelIndex &index) const;
+		QString getToolTip(const TargetDescription::NativeFunction& function) const;
+		
+		TreeItem* root; //!< root of functions description tree
 		const TargetDescription *descriptionRead; //!< description for read access
 	};
 	

@@ -32,6 +32,14 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
+	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent) :
+		QAbstractTableModel(parent),
+		namedValues(namedValues),
+		tooltipText(tooltipText)
+	{
+		Q_ASSERT(namedValues);
+	}
+	
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues)
@@ -53,12 +61,22 @@ namespace Aseba
 	
 	QVariant NamedValuesVectorModel::data(const QModelIndex &index, int role) const
 	{
-		if (!index.isValid() || role != Qt::DisplayRole)
+		if (!index.isValid())
 			return QVariant();
-		if (index.column() == 0)
-			return QString::fromStdString(namedValues->at(index.row()).name);
+		
+		if (role == Qt::DisplayRole)
+		{
+			if (index.column() == 0)
+				return QString::fromStdString(namedValues->at(index.row()).name);
+			else
+				return namedValues->at(index.row()).value;
+		}
+		else if (role == Qt::ToolTipRole && !tooltipText.isEmpty())
+		{
+			return tooltipText.arg(index.row());
+		}
 		else
-			return namedValues->at(index.row()).value;
+			return QVariant();
 	}
 	
 	QVariant NamedValuesVectorModel::headerData(int section, Qt::Orientation orientation, int role) const

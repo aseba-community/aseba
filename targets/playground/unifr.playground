@@ -1,0 +1,49 @@
+<!DOCTYPE aseba-playground>
+<aseba-playground>
+	<color name="wall" r="0.9" g="0.9" b="0.9" />
+	<color name="red" r="0.77" g="0.2" b="0.15" />
+	<color name="green" r="0" g="0." b="0.17" />
+	<color name="blue" r="0" g="0.38" b="0.61" />
+	
+	<world w="110.4" h="110.4" color="wall"/>
+	
+	<wall x="32.8" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
+	<wall x="77.6" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
+	<wall x="55.2" y="78.4" l1="46.4" l2="1.6" h="10" color="wall" />
+	<wall x="55.2" y="49.6" l1="24" l2="35.2" h="10" color="wall" />
+	
+	<feeder x="16" y="94"/>
+	
+	<area name="left">
+		<point x="0" y="-4.8" />
+		<point x="4.8" y="-2.4" />
+		<point x="4.8" y="2.4" />
+		<point x="0" y="4.8" />
+	</area>
+	
+	<area name="right">
+		<point x="0" y="-4.8" />
+		<point x="-4.8" y="-2.4" />
+		<point x="-4.8" y="2.4" />
+		<point x="0" y="4.8" />
+	</area>
+	
+	<area name="center">
+		<point x="1" y="-16.8" />
+		<point x="10.6" y="-16.8" />
+		<point x="10.6" y="16.8" />
+		<point x="1" y="16.8" />
+	</area>
+	
+	<door closedX="38.4" closedY="33.6" openedX="48.2" openedY="33.6" l1="9.7" l2="1.6" h="10" moveDuration = "1" name="entrance" color="blue"/>
+	<door closedX="72" closedY="33.6" openedX="62.4" openedY="33.6" l1="9.6" l2="1.6" h="9" moveDuration = "3" name="exit" color="wall"/>
+	
+	<activation x="0" y="55.2" l1="1.6" l2="3.2" area="left" door="entrance" />
+	<activation x="110.4" y="55.2" l1="1.6" l2="3.2" area="right" door="entrance" />
+	<activation x="66.2" y="49.6" l1="1.6" l2="1.6" area="center" door="exit" />
+	
+	<e-puck x="15" y="30"/>
+	<e-puck x="15" y="40"/>
+	<e-puck x="20" y="30"/>
+	<e-puck x="20" y="40"/>
+</aseba-playground>
