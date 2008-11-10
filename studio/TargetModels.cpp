@@ -286,21 +286,25 @@ namespace Aseba
 		QList<TreeItem*> children;
 		QString name;
 		QString toolTip;
+		bool enabled;
 		
 		TreeItem() :
 			parent(0),
-			name("root")
+			name("root"),
+			enabled(true)
 		{ }
 		
-		TreeItem(TreeItem* parent, const QString& name) :
-			parent(parent),
-			name(name)
-		{ }
-		
-		TreeItem(TreeItem* parent, const QString& name, const QString& toolTip) :
+		TreeItem(TreeItem* parent, const QString& name, bool enabled) :
 			parent(parent),
 			name(name),
-			toolTip(toolTip)
+			enabled(enabled)
+		{ }
+		
+		TreeItem(TreeItem* parent, const QString& name, const QString& toolTip, bool enabled) :
+			parent(parent),
+			name(name),
+			toolTip(toolTip),
+			enabled(enabled)
 		{ }
 		
 		~TreeItem()
@@ -309,13 +313,13 @@ namespace Aseba
 				delete children[i];
 		}
 		
-		TreeItem *getEntry(const QString& name)
+		TreeItem *getEntry(const QString& name, bool enabled = true)
 		{
 			for (int i = 0; i < children.size(); i++)
 				if (children[i]->name == name)
 					return children[i];
 			
-			children.push_back(new TreeItem(this, name));
+			children.push_back(new TreeItem(this, name, enabled));
 			return children.last();
 		}
 	};
@@ -394,18 +398,18 @@ namespace Aseba
 			if (splittedName.isEmpty())
 				continue;
 			
-			// get first, and iterate
-			TreeItem* entry = root->getEntry(splittedName[0]);
-			for (int j = 1; j < splittedName.size() - 1; ++j)
-			{
-				if (splittedName[j].isEmpty())
-					entry = entry->getEntry(tr("hidden"));
-				else
-					entry = entry->getEntry(splittedName[j]);
-			}
+			// get first, check whether hidden, and then iterate
+			TreeItem* entry = root;
+			Q_ASSERT(!splittedName[0].isEmpty());
+			if (splittedName[0][0] == '_')
+				entry = entry->getEntry(tr("hidden"), false);
+			// TODO: add global option
+			
+			for (int j = 0; j < splittedName.size() - 1; ++j)
+				entry = entry->getEntry(splittedName[j], entry->enabled);
 			
 			// for last entry
-			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i])));
+			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i]), entry->enabled));
 		}
 	}
 	
@@ -419,14 +423,18 @@ namespace Aseba
 	
 		if (parentItem == root)
 			return QModelIndex();
-	
-		return createIndex(parentItem->children.size(), 0, parentItem);
+		
+		if (parentItem->parent)
+			return createIndex(parentItem->parent->children.indexOf(const_cast<TreeItem*>(parentItem)), 0, parentItem);
+		else
+			return createIndex(0, 0, parentItem);
 	}
 	
 	QModelIndex TargetFunctionsModel::index(int row, int column, const QModelIndex &parent) const
 	{
 		TreeItem *parentItem = getItem(parent);
 		TreeItem *childItem = parentItem->children.value(row);
+		Q_ASSERT(childItem);
 		
 		if (childItem)
 			return createIndex(row, column, childItem);
@@ -460,7 +468,11 @@ namespace Aseba
 	
 	Qt::ItemFlags TargetFunctionsModel::flags(const QModelIndex & index) const
 	{
-		return Qt::ItemIsEnabled;
+		TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+		if (item)
+			return (item->enabled ? Qt::ItemIsEnabled : Qt::NoItemFlags);
+		else
+			return Qt::ItemIsEnabled;
 	}
 	
 	void TargetFunctionsModel::dataChangedExternally(const QModelIndex &index)
