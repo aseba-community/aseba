@@ -93,8 +93,10 @@ namespace Aseba
 		ViewPlugInToVariablesNameMap viewPluginsMap;
 	};
 	
-	class TargetFunctionsModel: public QAbstractTableModel
+	class TargetFunctionsModel: public QAbstractItemModel
 	{
+		Q_OBJECT
+		
 	public:
 		struct TreeItem;
 		
@@ -112,11 +114,10 @@ namespace Aseba
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
-		//! Data have been by directly accessing the struct from the model index, so we have to emit dataChanged() from here anyway
-		void dataChangedExternally(const QModelIndex &index);
+	public slots:
+		void recreateTreeFromDescription(bool showHidden);
 		
 	private:
-		void createTreeFromDescription();
 		TreeItem *getItem(const QModelIndex &index) const;
 		QString getToolTip(const TargetDescription::NativeFunction& function) const;
 		

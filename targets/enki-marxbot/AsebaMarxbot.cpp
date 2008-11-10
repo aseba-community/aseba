@@ -60,6 +60,7 @@ static AsebaNativeFunctionPointer nativeFunctions[] =
 	AsebaNative_mathatan2,
 	AsebaNative_mathsin,
 	AsebaNative_mathcos,
+	AsebaNative_mathrot2
 };
 
 static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
@@ -76,6 +77,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	&AsebaNativeDescription_mathatan2,
 	&AsebaNativeDescription_mathsin,
 	&AsebaNativeDescription_mathcos,
+	&AsebaNativeDescription_mathrot2,
 	0
 };
 

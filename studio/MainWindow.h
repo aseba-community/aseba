@@ -281,6 +281,7 @@ namespace Aseba
 		QAction *pasteAct;
 		QAction *undoAct;
 		QAction *redoAct;
+		QAction *showHiddenAct;
 		
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages

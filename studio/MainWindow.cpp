@@ -1087,6 +1087,8 @@ namespace Aseba
 			disconnect(undoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(undo()));
 			disconnect(redoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(redo()));
 			
+			disconnect(showHiddenAct, SIGNAL(toggled(bool)), previousActiveTab->vmFunctionsModel, SLOT(recreateTreeFromDescription(bool)));
+			
 			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
@@ -1101,6 +1103,8 @@ namespace Aseba
 		connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
 		connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
 		connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
+		
+		connect(showHiddenAct, SIGNAL(toggled(bool)), tab->vmFunctionsModel, SLOT(recreateTreeFromDescription(bool)));
 		
 		connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 		connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
@@ -1717,21 +1721,25 @@ namespace Aseba
 		debugMenu->addAction(runAllAct);
 		debugMenu->addAction(pauseAllAct);
 		
-		// Compilation menu
-		QMenu *compilationMenu = new QMenu(tr("&Compilation"), this);
-		menuBar()->addMenu(compilationMenu);
-		compilationMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show messages"),
-							this, SLOT(showCompilationMessages()),
-							QKeySequence(tr("Ctrl+M", "Compilation|Show messages")));
-		
 		// Tool menu
 		QMenu *toolMenu = new QMenu(tr("&Tools"), this);
 		menuBar()->addMenu(toolMenu);
+		toolMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"),
+							this, SLOT(showCompilationMessages()),
+							QKeySequence(tr("Ctrl+M", "Tools|Show last compilation messages")));
+		toolMenu->addSeparator();
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
 		toolMenu->addMenu(writeBytecodeMenu);
 		rebootMenu = new QMenu(tr("Reboot..."));
 		toolMenu->addMenu(rebootMenu);
 		regenerateToolsMenus();
+		
+		// Settings
+		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
+		menuBar()->addMenu(settingsMenu);
+		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
+		showHiddenAct->setCheckable(true);
+		settingsMenu->addAction(showHiddenAct);
 		
 		// Plugins
 		QMenu *pluginMenu = new QMenu(tr("&Plug-ins"), this);

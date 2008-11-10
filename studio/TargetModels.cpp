@@ -327,12 +327,12 @@ namespace Aseba
 	
 	
 	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent) :
-		QAbstractTableModel(parent),
+		QAbstractItemModel(parent),
 		root(0),
 		descriptionRead(descriptionRead)
 	{
 		Q_ASSERT(descriptionRead);
-		createTreeFromDescription();
+		recreateTreeFromDescription(false);
 	}
 	
 	TargetFunctionsModel::~TargetFunctionsModel()
@@ -383,11 +383,15 @@ namespace Aseba
 		return 1;
 	}
 	
-	void TargetFunctionsModel::createTreeFromDescription()
+	void TargetFunctionsModel::recreateTreeFromDescription(bool showHidden)
 	{
 		if (root)
 			delete root;
 		root = new TreeItem;
+		
+		if (showHidden)
+			root->getEntry(tr("hidden"), false);
+		
 		for (size_t i = 0; i < descriptionRead->nativeFunctions.size(); i++)
 		{
 			// get the name, split it, and managed hidden
@@ -402,8 +406,11 @@ namespace Aseba
 			TreeItem* entry = root;
 			Q_ASSERT(!splittedName[0].isEmpty());
 			if (splittedName[0][0] == '_')
+			{
+				if (!showHidden)
+					continue;
 				entry = entry->getEntry(tr("hidden"), false);
-			// TODO: add global option
+			}
 			
 			for (int j = 0; j < splittedName.size() - 1; ++j)
 				entry = entry->getEntry(splittedName[j], entry->enabled);
@@ -411,6 +418,8 @@ namespace Aseba
 			// for last entry
 			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i]), entry->enabled));
 		}
+		
+		reset();
 	}
 	
 	QModelIndex TargetFunctionsModel::parent(const QModelIndex &index) const
@@ -473,11 +482,6 @@ namespace Aseba
 			return (item->enabled ? Qt::ItemIsEnabled : Qt::NoItemFlags);
 		else
 			return Qt::ItemIsEnabled;
-	}
-	
-	void TargetFunctionsModel::dataChangedExternally(const QModelIndex &index)
-	{
-		emit dataChanged(index, index);
 	}
 	
 	/*@}*/

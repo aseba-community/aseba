@@ -86,6 +86,7 @@ static AsebaNativeFunctionPointer nativeFunctions[] =
 	AsebaNative_mathatan2,
 	AsebaNative_mathsin,
 	AsebaNative_mathcos,
+	AsebaNative_mathrot2,
 	PlaygroundNative_energysend,
 	PlaygroundNative_energyreceive,
 	PlaygroundNative_energyamount
@@ -105,6 +106,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	&AsebaNativeDescription_mathatan2,
 	&AsebaNativeDescription_mathsin,
 	&AsebaNativeDescription_mathcos,
+	&AsebaNativeDescription_mathrot2,
 	&PlaygroundNativeDescription_energysend,
 	&PlaygroundNativeDescription_energyreceive,
 	&PlaygroundNativeDescription_energyamount,
