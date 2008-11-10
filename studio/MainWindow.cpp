@@ -214,7 +214,11 @@ namespace Aseba
 		vmFunctionsView->setSelectionMode(QAbstractItemView::NoSelection);	
 		vmFunctionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmFunctionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+		#if QT_VERSION >= 0x040400
 		vmFunctionsView->setHeaderHidden(true);
+		#else
+		#warning "Some feature have been disabled because you are using Qt < 4.4.0"
+		#endif
 		
 		// local events
 		vmLocalEvents = new QListWidget;

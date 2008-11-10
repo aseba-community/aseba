@@ -537,8 +537,10 @@ namespace Enki
 	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), stream(0), energyPool(INITIAL_POOL_ENERGY)
 	{
 		font.setPixelSize(16);
-		#if QT_VERSION > 0x040400
+		#if QT_VERSION >= 0x040400
 		font.setLetterSpacing(QFont::PercentageSpacing, 130);
+		#else
+		#warning "Some feature have been disabled because you are using Qt < 4.4.0 !"
 		#endif
 		try
 		{
