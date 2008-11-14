@@ -391,7 +391,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	{
 		res += (sint32)vm->variables[src1++] * (sint32)vm->variables[src2++];
 	}
-	res >>= shift;
+	res >>= vm->variables[shift];
 	vm->variables[dest] = (sint16)res;
 }
 
