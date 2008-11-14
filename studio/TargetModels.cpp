@@ -479,7 +479,7 @@ namespace Aseba
 	{
 		TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 		if (item)
-			return (item->enabled ? Qt::ItemIsEnabled : 0);
+			return (item->enabled ? Qt::ItemIsEnabled : QFlags<Qt::ItemFlag>());
 		else
 			return Qt::ItemIsEnabled;
 	}
