@@ -541,7 +541,7 @@ namespace Enki
 		font.setPixelSize(16);
 		#if QT_VERSION >= 0x040400
 		font.setLetterSpacing(QFont::PercentageSpacing, 130);
-		#else
+		#elif (!defined(_MSC_VER))
 		#warning "Some feature have been disabled because you are using Qt < 4.4.0 !"
 		#endif
 		try

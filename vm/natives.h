@@ -33,6 +33,7 @@ extern "C" {
 
 #ifdef _MSC_VER
 #pragma warning( disable: 4200)	// disable 0 size arrays warning
+#define inline __inline			// msvc does not support the standart C99/C++ static inline construct
 #endif
 
 /**

@@ -216,7 +216,7 @@ namespace Aseba
 		vmFunctionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		#if QT_VERSION >= 0x040400
 		vmFunctionsView->setHeaderHidden(true);
-		#else
+		#elif (!defined(_MSC_VER))
 		#warning "Some feature have been disabled because you are using Qt < 4.4.0"
 		#endif
 		
