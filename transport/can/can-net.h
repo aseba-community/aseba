@@ -122,6 +122,9 @@ void AsebaCanFrameReceived(const CanFrame *frame);
 /*! Data layer should call this function when the CAN frame (max 8 bytes) was sent successfully */
 void AsebaCanFrameSent();
 
+/*! Return true if the recv buffer is empty, false otherwise */
+uint16 AsebaCanRecvBufferEmpty(void);
+
 /*@}*/
 
 #ifdef __cplusplus

@@ -230,6 +230,12 @@ uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 	return 1;
 }
 
+
+uint16 AsebaCanRecvBufferEmpty(void) 
+{
+	return asebaCan.recvQueueInsertPos == asebaCan.recvQueueConsumePos;
+}
+
 void AsebaCanFrameSent()
 {
 	// send everything we can if we are currently not sending
