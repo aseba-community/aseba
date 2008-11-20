@@ -22,6 +22,7 @@
 */
 
 #include "tree.h"
+#include <cstdlib>
 
 // Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
 template<typename Derived, typename Base>

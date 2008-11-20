@@ -23,6 +23,7 @@
 
 #include "tree.h"
 #include <cassert>
+#include <cstdlib>
 
 namespace Aseba
 {

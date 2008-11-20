@@ -30,6 +30,7 @@
 #include <vector>
 #include <iterator>
 #include <cassert>
+#include <cstring>
 
 namespace Aseba 
 {

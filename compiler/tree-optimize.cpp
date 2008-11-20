@@ -25,6 +25,7 @@
 #include "power-of-two.h"
 #include "../utils/FormatableString.h"
 #include <cassert>
+#include <cstdlib>
 
 // Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
 template<typename Derived, typename Base>
