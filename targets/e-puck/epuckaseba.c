@@ -87,6 +87,7 @@ unsigned int __attribute((far)) cam_data[60];
 #define VM_BYTECODE_SIZE 1024
 #define VM_STACK_SIZE 32
 
+int _EEDATA(1) bytecode_version;
 unsigned char _EEDATA(1) eeprom_bytecode[VM_BYTECODE_SIZE*2];
 
 struct EPuckVariables
@@ -415,16 +416,26 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 	int i = 0;
 	_prog_addressT EE_addr;
 		
+	_init_prog_address(EE_addr, bytecode_version);
+	_erase_eedata(EE_addr, 2);
+	_wait_eedata();
+	
+	i = ASEBA_PROTOCOL_VERSION;
+	_write_eedata_word(EE_addr, i);
+		
+	_wait_eedata();
+	
 	_init_prog_address(EE_addr, eeprom_bytecode); 
 	
-	for(i = 0; i < 2048; i+=_EE_ROW) {
-		_erase_eedata(EE_addr, _EE_ROW);
+	for(i = 0; i < 2048; i+=2) {
+		
+		_erase_eedata(EE_addr, 2);
 		_wait_eedata();
 		
-		_write_eedata_row(EE_addr, (int *) (vm->bytecode + i/2));
+		_write_eedata_word(EE_addr, vm->bytecode[i/2]);
 		_wait_eedata();
 		
-		EE_addr += _EE_ROW;
+		EE_addr += 2;
 	}
 }
 void AsebaResetIntoBootloader(AsebaVMState *vm) {
@@ -462,17 +473,24 @@ int main()
 	e_calibrate_ir();
 	e_acc_calibr();
 
-	// Load the bytecode
+	// Load the bytecode...
+	_init_prog_address(EE_addr, bytecode_version);
+	_memcpy_p2d16(&i, EE_addr, _EE_WORD);
 	
-	_init_prog_address(EE_addr, eeprom_bytecode);
-	
-	for( i = 0; i< 2048; i += _EE_ROW) {
-		_memcpy_p2d16(vmState.bytecode + i/2, EE_addr, _EE_ROW);
-		EE_addr += _EE_ROW;
+	// ...only load bytecode if version is the same as current one
+	if(i == ASEBA_PROTOCOL_VERSION)
+	{
+		_init_prog_address(EE_addr, eeprom_bytecode);
+		
+		for( i = 0; i< 2048; i += 2)
+		{
+			_memcpy_p2d16(vmState.bytecode + i/2 , EE_addr, 2);
+			EE_addr += 2;
+		}
+		
+		// Init the vm
+		AsebaVMSetupEvent(&vmState, ASEBA_EVENT_INIT);	
 	}
-	
-	// Init the vm
-	AsebaVMSetupEvent(&vmState, ASEBA_EVENT_INIT);	
 	
 	while (1)
 	{
