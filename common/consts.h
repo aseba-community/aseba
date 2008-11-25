@@ -29,7 +29,7 @@
 */
 /*@{*/
 
-/*! version of aseba protocol */
+/*! version of aseba protocol, including bytecodes types and constants */
 #define ASEBA_PROTOCOL_VERSION 3
 
 /*! default listen target for aseba */
