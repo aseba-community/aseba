@@ -48,36 +48,12 @@ static VmSocketMap asebaSocketMaps;
 
 static AsebaNativeFunctionPointer nativeFunctions[] =
 {
-	AsebaNative_vecfill,
-	AsebaNative_veccopy,
-	AsebaNative_vecadd,
-	AsebaNative_vecsub,
-	AsebaNative_vecmin,
-	AsebaNative_vecmax,
-	AsebaNative_vecdot,
-	AsebaNative_vecstat,
-	AsebaNative_mathmuldiv,
-	AsebaNative_mathatan2,
-	AsebaNative_mathsin,
-	AsebaNative_mathcos,
-	AsebaNative_mathrot2
+	ASEBA_NATIVES_STD_FUNCTIONS,
 };
 
 static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 {
-	&AsebaNativeDescription_vecfill,
-	&AsebaNativeDescription_veccopy,
-	&AsebaNativeDescription_vecadd,
-	&AsebaNativeDescription_vecsub,
-	&AsebaNativeDescription_vecmin,
-	&AsebaNativeDescription_vecmax,
-	&AsebaNativeDescription_vecdot,
-	&AsebaNativeDescription_vecstat,
-	&AsebaNativeDescription_mathmuldiv,
-	&AsebaNativeDescription_mathatan2,
-	&AsebaNativeDescription_mathsin,
-	&AsebaNativeDescription_mathcos,
-	&AsebaNativeDescription_mathrot2,
+	ASEBA_NATIVES_STD_DESCRIPTIONS,
 	0
 };
 

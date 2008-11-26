@@ -218,18 +218,7 @@ AsebaNativeFunctionDescription EpuckNativeDescription_get_ground_values =
 #endif
 
 static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
-	&AsebaNativeDescription_vecdot,
-	&AsebaNativeDescription_vecstat,
-	&AsebaNativeDescription_vecfill,
-	&AsebaNativeDescription_veccopy,
-	&AsebaNativeDescription_vecadd,
-	&AsebaNativeDescription_vecsub,
-	&AsebaNativeDescription_vecmin,
-	&AsebaNativeDescription_vecmax,
-	&AsebaNativeDescription_mathmuldiv,
-	&AsebaNativeDescription_mathatan2,
-	&AsebaNativeDescription_mathsin,
-	&AsebaNativeDescription_mathcos,
+	ASEBA_NATIVES_STD_FUNCTIONS,
 #ifdef LIS_GROUND_SENSORS
 	&EpuckNativeDescription_get_ground_values,
 #endif
@@ -237,18 +226,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 };
 
 static AsebaNativeFunctionPointer nativeFunctions[] = {
-	AsebaNative_vecdot,
-	AsebaNative_vecstat,
-	AsebaNative_vecfill,
-	AsebaNative_veccopy,
-	AsebaNative_vecadd,
-	AsebaNative_vecsub,
-	AsebaNative_vecmin,
-	AsebaNative_vecmax,
-	AsebaNative_mathmuldiv,
-	AsebaNative_mathatan2,
-	AsebaNative_mathsin,
-	AsebaNative_mathcos,
+	ASEBA_NATIVES_STD_DESCRIPTIONS,
 #ifdef LIS_GROUND_SENSORS
 	EpuckNative_get_ground_values,
 #endif
