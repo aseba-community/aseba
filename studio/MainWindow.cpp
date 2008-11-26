@@ -1240,6 +1240,16 @@ namespace Aseba
 		}
 	}
 	
+	void MainWindow::rebootAllNodes()
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			tab->reboot();
+		}
+	}
+	
 	void MainWindow::addPluginLinearCameraView()
 	{
 		if (nodes->currentWidget())
@@ -1620,12 +1630,14 @@ namespace Aseba
 			
 			connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
 			
-			rebootMenu->addAction(tr("... %0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
+			rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
 		}
 		
 		writeBytecodeMenu->addSeparator();
 		
 		writeAllBytecodesAct = writeBytecodeMenu->addAction(tr("...inside all nodes"), this, SLOT(writeAllBytecodes()));
+		
+		rebootMenu->addAction(tr("...all nodes"), this, SLOT(rebootAllNodes()));
 	}
 	
 	void MainWindow::setupMenu()

@@ -220,6 +220,7 @@ namespace Aseba
 	
 		void recompileAll();
 		void writeAllBytecodes();
+		void rebootAllNodes();
 		void addPluginLinearCameraView();
 	
 	private:
