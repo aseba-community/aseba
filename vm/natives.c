@@ -602,8 +602,8 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	sint16 cos_a = aseba_cos(a);
 	sint16 sin_a = aseba_sin(a);
 	
-	sint16 xp = (sint16)(((sint32)cos_a * (sint32)x + (sint32)sin_a * (sint32)y) >> (sint32)15);
-	sint16 yp = (sint16)(((sint32)cos_a * (sint32)y - (sint32)sin_a * (sint32)x) >> (sint32)15);
+	sint16 xp = (sint16)(((sint32)cos_a * (sint32)x - (sint32)sin_a * (sint32)y) >> (sint32)15);
+	sint16 yp = (sint16)(((sint32)cos_a * (sint32)y + (sint32)sin_a * (sint32)x) >> (sint32)15);
 	
 	vm->variables[vectOutIndex] = xp;
 	vm->variables[vectOutIndex+1] = yp;
