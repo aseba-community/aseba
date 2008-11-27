@@ -737,7 +737,7 @@ namespace Aseba
 	
 		if (fileName.isEmpty())
 			fileName = QFileDialog::getOpenFileName(this,
-				tr("Open Script"), "", "AESL scripts (*.aesl)");
+				tr("Open Script"), "", "Aseba scripts (*.aesl)");
 		
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))
@@ -819,7 +819,7 @@ namespace Aseba
 		
 		if (fileName.isEmpty())
 			fileName = QFileDialog::getSaveFileName(this,
-				tr("Save Script"), actualFileName, "AESL scripts (*.aesl)");
+				tr("Save Script"), actualFileName, "Aseba scripts (*.aesl)");
 		
 		if (fileName.isEmpty())
 			return;
@@ -1634,9 +1634,9 @@ namespace Aseba
 		}
 		
 		writeBytecodeMenu->addSeparator();
-		
 		writeAllBytecodesAct = writeBytecodeMenu->addAction(tr("...inside all nodes"), this, SLOT(writeAllBytecodes()));
 		
+		rebootMenu->addSeparator();
 		rebootMenu->addAction(tr("...all nodes"), this, SLOT(rebootAllNodes()));
 	}
 	
