@@ -136,7 +136,7 @@ namespace Aseba
 					// compute address
 					uint32 address = lowAddress;
 					address += baseAddress;
-					std::cout << "data record at address 0x" << std::hex << address << "\n";
+					//std::cout << "data record at address 0x" << std::hex << address << "\n";
 					
 					// is some place to add
 					bool found = false;
@@ -174,7 +174,7 @@ namespace Aseba
 				// end of file record
 				for (ChunkMap::iterator it = data.begin(); it != data.end(); ++it)
 				{
-					std::cout << "End of file found. Address " << it->first << " size " << it->second.size() << "\n";
+					//std::cout << "End of file found. Address " << it->first << " size " << it->second.size() << "\n";
 				}
 				return;
 				break;
@@ -191,7 +191,7 @@ namespace Aseba
 					computedCheckSum += highAddress >> 8;
 					baseAddress = highAddress;
 					baseAddress <<= 4;
-					std::cout << "Extended segment address record (?!): 0x" << std::hex << baseAddress << "\n";
+					//std::cout << "Extended segment address record (?!): 0x" << std::hex << baseAddress << "\n";
 					
 					// verify checksum
 					uint8 checkSum = getUint8(ifs);
@@ -213,7 +213,7 @@ namespace Aseba
 					computedCheckSum += highAddress >> 8;
 					baseAddress = highAddress;
 					baseAddress <<= 16;
-					std::cout << "Linear address record: 0x" << std::hex << baseAddress << "\n";
+					//std::cout << "Linear address record: 0x" << std::hex << baseAddress << "\n";
 					
 					// verify checksum
 					uint8 checkSum = getUint8(ifs);
