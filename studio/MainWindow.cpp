@@ -196,7 +196,8 @@ namespace Aseba
 		vmMemoryView->setModel(vmMemoryModel);
 		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmMemoryView->setItemDelegate(new SpinBoxDelegate(-32768, 32767, this));
-		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-888888##"));
+		vmMemoryView->setColumnWidth(0, 200-QFontMetrics(QFont()).width("-8888888##"));
+		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-8888888##"));
 		//vmMemoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//vmMemoryView->setHeaderHidden(true);
 		
@@ -246,6 +247,7 @@ namespace Aseba
 		QWidget* buttonsWidget = new QWidget;
 		buttonsWidget->setLayout(buttonsLayout);
 		panelSplitter->addWidget(buttonsWidget);
+		panelSplitter->setCollapsible(0, false);
 		
 		QWidget* memoryWidget = new QWidget;
 		memoryWidget->setLayout(memoryLayout);
@@ -259,8 +261,7 @@ namespace Aseba
 		QWidget *editorWidget = new QWidget;
 		editorWidget->setLayout(editorLayout);
 		addWidget(editorWidget);
-		setStretchFactor(0, 1);
-		setStretchFactor(1, 3);
+		setSizes(QList<int>() << 250 << 550);
 	}
 	
 	void NodeTab::setupConnections()
@@ -1467,20 +1468,11 @@ namespace Aseba
 		splitter->addWidget(nodes);
 		setCentralWidget(splitter);
 		
-		QWidget* eventsDockWidget = new QWidget;
-		QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
+		//QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
 		
-		eventsDockLayout->addWidget(new QLabel(tr("<b>Constants</b>")));
-		
-		QHBoxLayout* constantsAddRemoveLayout = new QHBoxLayout;;
-		constantsAddRemoveLayout->addStretch();
 		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
-		constantsAddRemoveLayout->addWidget(addConstantButton);
 		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		removeConstantButton->setEnabled(false);
-		constantsAddRemoveLayout->addWidget(removeConstantButton);
-		
-		eventsDockLayout->addLayout(constantsAddRemoveLayout);
 		
 		constantsView = new FixedWidthTableView;
 		constantsView->setShowGrid(false);
@@ -1495,9 +1487,29 @@ namespace Aseba
 		constantsView->setSecondColumnLongestContent("-888888##");
 		constantsView->resizeRowsToContents();
 		
-		eventsDockLayout->addWidget(constantsView, 1);
+		QGridLayout* constantsLayout = new QGridLayout;
+		constantsLayout->addWidget(new QLabel(tr("<b>Constants</b>")),0,0);
+		constantsLayout->setColumnStretch(0, 1);
+		constantsLayout->addWidget(addConstantButton,0,1);
+		constantsLayout->setColumnStretch(1, 0);
+		constantsLayout->addWidget(removeConstantButton,0,2);
+		constantsLayout->setColumnStretch(2, 0);
+		constantsLayout->addWidget(constantsView, 1, 0, 1, 3);
+		//setColumnStretch
 		
-		eventsDockLayout->addWidget(new QLabel(tr("<b>Events</b>")));
+		/*QHBoxLayout* constantsAddRemoveLayout = new QHBoxLayout;;
+		constantsAddRemoveLayout->addStretch();
+		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
+		constantsAddRemoveLayout->addWidget(addConstantButton);
+		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
+		removeConstantButton->setEnabled(false);
+		constantsAddRemoveLayout->addWidget(removeConstantButton);
+		
+		eventsDockLayout->addLayout(constantsAddRemoveLayout);
+		eventsDockLayout->addWidget(constantsView, 1);*/
+		
+		
+		/*eventsDockLayout->addWidget(new QLabel(tr("<b>Events</b>")));
 		
 		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;;
 		eventsAddRemoveLayout->addStretch();
@@ -1511,6 +1523,15 @@ namespace Aseba
 		eventsAddRemoveLayout->addWidget(sendEventButton);
 		
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
+				
+		eventsDockLayout->addWidget(eventsDescriptionsView, 1);*/
+		
+		
+		addEventNameButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
+		removeEventNameButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
+		removeEventNameButton->setEnabled(false);
+		sendEventButton = new QPushButton(QPixmap(QString(":/images/newmsg.png")), "");
+		sendEventButton->setEnabled(false);
 		
 		eventsDescriptionsView = new FixedWidthTableView;
 		eventsDescriptionsView->setShowGrid(false);
@@ -1525,17 +1546,51 @@ namespace Aseba
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
 		eventsDescriptionsView->resizeRowsToContents();
 		
-		eventsDockLayout->addWidget(eventsDescriptionsView, 1);
+		QGridLayout* eventsLayout = new QGridLayout;
+		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")),0,0);
+		eventsLayout->setColumnStretch(0, 1);
+		eventsLayout->addWidget(sendEventButton,0,1);
+		eventsLayout->setColumnStretch(1, 0);
+		eventsLayout->addWidget(addEventNameButton,0,2);
+		eventsLayout->setColumnStretch(2, 0);
+		eventsLayout->addWidget(removeEventNameButton,0,3);
+		eventsLayout->setColumnStretch(3, 0);
+		eventsLayout->addWidget(eventsDescriptionsView, 1, 0, 1, 4);
 		
-		logger = new QListWidget;
+		/*logger = new QListWidget;
 		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		eventsDockLayout->addWidget(logger, 3);
 		clearLogger = new QPushButton(tr("Clear"));
-		eventsDockLayout->addWidget(clearLogger);
+		eventsDockLayout->addWidget(clearLogger);*/
 		
-		splitter->addWidget(eventsDockWidget);
-		splitter->setSizes(QList<int>() << 580 << 140);
+		logger = new QListWidget;
+		logger->setMinimumSize(80,100);
+		logger->setSelectionMode(QAbstractItemView::NoSelection);
+		clearLogger = new QPushButton(tr("Clear"));
+		
+		QVBoxLayout* loggerLayout = new QVBoxLayout;
+		loggerLayout->addWidget(logger);
+		loggerLayout->addWidget(clearLogger);
+		
+		// panel
+		QSplitter* rightPanelSplitter = new QSplitter(Qt::Vertical);
+		
+		QWidget* constantsWidget = new QWidget;
+		constantsWidget->setLayout(constantsLayout);
+		rightPanelSplitter->addWidget(constantsWidget);
+		
+		QWidget* eventsWidget = new QWidget;
+		eventsWidget->setLayout(eventsLayout);
+		rightPanelSplitter->addWidget(eventsWidget);
+		
+		QWidget* loggerWidget = new QWidget;
+		loggerWidget->setLayout(loggerLayout);
+		rightPanelSplitter->addWidget(loggerWidget);
+		
+		// main window
+		splitter->addWidget(rightPanelSplitter);
+		splitter->setSizes(QList<int>() << 800 << 200);
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);

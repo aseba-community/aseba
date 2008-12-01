@@ -4,7 +4,6 @@ Studio
 - help menu
 	-> language
 	-> FAQ
-- put splitters in right menu
 - selective hide of events
 - move events
 - tree for variables
