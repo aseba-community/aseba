@@ -1,7 +1,21 @@
-Compiler/AESL
-- thread local variables
+* For version 1.0
+
+Studio
+- help menu
+	-> language
+	-> FAQ
+- put splitters in right menu
+- selective hide of events
+- move events
+- tree for variables
+
+* For a later version
+
+Core
+- enum capabilities
+
+Compiler
 - size typed event arguments
 
 Studio
-- thread local variables
 - size typed events

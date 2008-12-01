@@ -146,15 +146,14 @@ namespace Aseba
 	//! Return the name of an event given its identifier
 	std::string Compiler::eventName(unsigned eventId) const
 	{
-		// search for local
-		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
-			if (ASEBA_EVENT_LOCAL_EVENTS_START - i == eventId)
-				return targetDescription->localEvents[i].name;
+		// search for global
+		if (eventId < commonDefinitions->events.size())
+			return commonDefinitions->events[eventId].name;
 		
-		// then for global
-		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
-			if (commonDefinitions->events[i].value == eventId)
-				return commonDefinitions->events[eventId].name;
+		// then for local
+		int localId = ASEBA_EVENT_LOCAL_EVENTS_START - eventId;
+		if (localId >= 0 && localId < targetDescription->localEvents.size())
+			return targetDescription->localEvents[localId].name;
 		
 		return "unknown";
 	}
