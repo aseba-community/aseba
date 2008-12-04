@@ -1140,7 +1140,10 @@ int main(int argc, char *argv[])
 	do
 	{
 		if (ask)
-			fileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), "", app.tr("playground scenario (*.playground)"));
+		{
+			QString lastFileName = QSettings("EPFL-LSRO-Mobots", "Aseba Playground").value("last file").toString();
+			fileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
+		}
 		ask = true;
 		
 		if (fileName.isEmpty())
@@ -1164,7 +1167,10 @@ int main(int argc, char *argv[])
 										.arg(errorStr));
 			}
 			else
+			{
+				QSettings("EPFL-LSRO-Mobots", "Aseba Playground").setValue("last file", fileName);
 				break;
+			}
 		}
 	}
 	while (true);

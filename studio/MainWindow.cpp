@@ -710,16 +710,23 @@ namespace Aseba
 	
 	void MainWindow::about()
 	{
-		QMessageBox::about(this, tr("About Aseba Studio"),
-					tr(	"<p>Aseba pre-release</p>" \
+		QString revString(ASEBA_SVN_REV);
+		QStringList revStringList = revString.split(" ");
+		revStringList.pop_front();
+		
+		QString text = tr(	"<p>Aseba pre-release:</p>" \
 						"<ul><li>Aseba " \
-						ASEBA_SVN_REV \
-						"</li><li>Dashel "\
+						"SVN rev. %0 / protocol ver. %1" \
+						"</li><li>Dashel ver. "\
 						DASHEL_VERSION \
 						"</li></ul>" \
-						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a> and other contributors</p>" \
-						"<p><a href=\"http://mobots.epfl.ch\">Mobots group</a> - <a href=\"http://lsro.epfl.ch\">LSRO1</a> - <a href=\"http://www.epfl.ch\">EPFL</a></p>" \
-						"<p>Aseba is open-source under the GPL license version 3</p>"));
+						"<p>(c) 2006-2008 <a href=\"http://stephane.magnenat.net\">Stephane Magnenat</a> and other contributors.</p>" \
+						"<p><a href=\"http://mobots.epfl.ch\">http://mobots.epfl.ch/aseba.html</a></p>" \
+						"<p>Aseba is open-source licensed under the GPL version 3.</p>");
+		
+		text = text.arg(revStringList.front()).arg(ASEBA_PROTOCOL_VERSION);
+		
+		QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
 	
 	void MainWindow::newFile()
