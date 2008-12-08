@@ -105,8 +105,9 @@ namespace Aseba
 	
 	//////
 	
-	NodeTab::NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
+	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QSplitter(parent),
+		mainWindow(mainWindow),
 		id(id),
 		target(target)
 	{
@@ -374,7 +375,31 @@ namespace Aseba
 		
 		// compile
 		std::istringstream is(editor->toPlainText().toStdString());
-		bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
+		bool result;
+		if (mainWindow->nodes->currentWidget() == this)
+		{
+			std::ostringstream compilationMessages;
+			result = compiler.compile(is, bytecode, allocatedVariablesCount, error, &compilationMessages);
+			
+			mainWindow->compilationMessageBox->setWindowTitle(
+				tr("Aseba Studio: Output of last compilation for %0").arg(target->getName(id))
+			);
+			
+			if (result)
+				mainWindow->compilationMessageBox->text->setText(
+					tr("Compilation success.") + QString("\n\n") + 
+					QString::fromStdString(compilationMessages.str())
+				);
+			else
+				mainWindow->compilationMessageBox->text->setText(
+					QString::fromStdString(error.toString()) + ".\n\n" +
+					QString::fromStdString(compilationMessages.str())
+				);
+		}
+		else
+			result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
+		
+		// update state following result
 		if (result)
 		{
 			vmMemoryModel->updateVariablesStructure(compiler.getVariablesMap());
@@ -1127,37 +1152,17 @@ namespace Aseba
 		
 		previousActiveTab = tab;
 		
+		if (compilationMessageBox->isVisible())
+			tab->recompile();
+		
 		target->getVariables(tab->id, 0, tab->allocatedVariablesCount);
 	}
 	
-	void MainWindow::showCompilationMessages()
+	void MainWindow::showCompilationMessages(bool doShow)
 	{
+		compilationMessageBox->setVisible(doShow);
 		if (nodes->currentWidget())
-		{
-			compilationMessageBox->hide();
-			NodeTab *tab = polymorphic_downcast<NodeTab *>(nodes->currentWidget());
-			
-			
-			// recompile with verbose
-			std::istringstream is(tab->editor->toPlainText().toStdString());
-			std::ostringstream compilationMessages;
-			BytecodeVector bytecode;
-			Error error;
-			bool result = tab->compiler.compile(is, bytecode, tab->allocatedVariablesCount, error, &compilationMessages);
-			
-			if (result)
-				compilationMessageBox->text->setText(
-					tr("Compilation success.") + QString("\n\n") + 
-					QString::fromStdString(compilationMessages.str())
-				);
-			else
-				compilationMessageBox->text->setText(
-					QString::fromStdString(error.toString()) + ".\n\n" +
-					QString::fromStdString(compilationMessages.str())
-				);
-			
-			compilationMessageBox->show();
-		}
+			polymorphic_downcast<NodeTab *>(nodes->currentWidget())->recompile();
 	}
 	
 	void MainWindow::addEventNameClicked()
@@ -1272,7 +1277,7 @@ namespace Aseba
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
-		NodeTab* tab = new NodeTab(target, &commonDefinitions, node);
+		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -1798,9 +1803,13 @@ namespace Aseba
 		// Tool menu
 		QMenu *toolMenu = new QMenu(tr("&Tools"), this);
 		menuBar()->addMenu(toolMenu);
-		toolMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"),
+		/*toolMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"),
 							this, SLOT(showCompilationMessages()),
-							QKeySequence(tr("Ctrl+M", "Tools|Show last compilation messages")));
+							QKeySequence(tr("Ctrl+M", "Tools|Show last compilation messages")));*/
+		QAction* showCompilationMsg = new QAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"), this);
+		showCompilationMsg->setCheckable(true);
+		toolMenu->addAction(showCompilationMsg);
+		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
 		toolMenu->addSeparator();
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
 		toolMenu->addMenu(writeBytecodeMenu);

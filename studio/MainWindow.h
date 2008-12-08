@@ -60,12 +60,14 @@ namespace Aseba
 		virtual void resizeEvent ( QResizeEvent * event );
 	};
 	
+	class MainWindow;
+	
 	class NodeTab : public QSplitter
 	{
 		Q_OBJECT
 		
 	public:
-		NodeTab(Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
+		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned nodeId() const { return id; }
 		
@@ -126,6 +128,7 @@ namespace Aseba
 	
 	private:
 		friend class MainWindow;
+		MainWindow* mainWindow;
 		AeslEditor *editor;
 		AeslHighlighter *highlighter;
 		QLabel *cursorPosText;
@@ -189,7 +192,7 @@ namespace Aseba
 		void sendEvent();
 		void sendEventIf(const QModelIndex &);
 		void logEntryDoubleClicked(QListWidgetItem *);
-		void showCompilationMessages();
+		void showCompilationMessages(bool doShown);
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();
@@ -241,6 +244,7 @@ namespace Aseba
 		void closeEvent ( QCloseEvent * event );
 		
 		// tabs
+		friend class NodeTab;
 		QTabWidget* nodes;
 		NodeTab* previousActiveTab;
 		
