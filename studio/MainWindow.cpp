@@ -958,6 +958,21 @@ namespace Aseba
 		}*/
 	}
 	
+	void MainWindow::copyAll()
+	{
+		QString toCopy;
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			
+			toCopy += QString("# node %0\n").arg(target->getName(tab->nodeId()));
+			toCopy += tab->editor->toPlainText();
+			toCopy += "\n\n";
+		}
+		 QApplication::clipboard()->setText(toCopy);
+	}
+	
 	void MainWindow::resetAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -1780,9 +1795,12 @@ namespace Aseba
 		editMenu->addAction(copyAct);
 		editMenu->addAction(pasteAct);
 		editMenu->addSeparator();
+		editMenu->addAction(QIcon(":/images/editcopy.png"), tr("Copy &all"), this, SLOT(copyAll()));
+		editMenu->addSeparator();
 		editMenu->addAction(undoAct);
 		editMenu->addAction(redoAct);
 		editMenu->addSeparator();
+		
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));

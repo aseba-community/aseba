@@ -178,6 +178,7 @@ namespace Aseba
 		void save();
 		void saveFile(const QString &previousFileName = QString());
 		void exportMemoriesContent();
+		void copyAll();
 		
 		void loadAll();
 		void resetAll();

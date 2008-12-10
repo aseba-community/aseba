@@ -1,8 +1,0 @@
-all: vm/vm.c can/can.c
-	pic30-elf-gcc -c -DASEBA_ASSERT vm/vm.c -o vm.o
-	pic30-elf-gcc -c -DASEBA_ASSERT can/can.c -o can.o
-	ar rcs libasebaembedded.a vm.o can.o
-	rm vm.o can.o
-
-clean:
-	rm -f libasebaembedded.a
