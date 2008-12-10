@@ -872,6 +872,9 @@ namespace Aseba
 		QDomElement root = document.createElement("network");
 		document.appendChild(root);
 		
+		root.appendChild(document.createTextNode("\n\n\n"));
+		root.appendChild(document.createComment("list of global events"));
+		
 		// events
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)
 		{
@@ -880,6 +883,9 @@ namespace Aseba
 			element.setAttribute("size", QString::number(commonDefinitions.events[i].value));
 			root.appendChild(element);
 		}
+		
+		root.appendChild(document.createTextNode("\n\n\n"));
+		root.appendChild(document.createComment("list of constants"));
 		
 		// constants
 		for (size_t i = 0; i < commonDefinitions.constants.size(); i++)
@@ -895,16 +901,22 @@ namespace Aseba
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
+			const QString& nodeName(target->getName(tab->nodeId()));
+			
+			root.appendChild(document.createTextNode("\n\n\n"));
+			root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
 			
 			QDomElement element = document.createElement("node");
-			element.setAttribute("name", target->getName(tab->nodeId()));
+			element.setAttribute("name", nodeName);
 			QDomText text = document.createTextNode(tab->editor->toPlainText());
 			element.appendChild(text);
 			root.appendChild(element);
 		}
 		
+		root.appendChild(document.createTextNode("\n\n\n"));
+		
 		QTextStream out(&file);
-		document.save(out, 4);
+		document.save(out, 0);
 	}
 	
 	void MainWindow::exportMemoriesContent()
