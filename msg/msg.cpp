@@ -380,11 +380,11 @@ namespace Aseba
 	void Description::serializeSpecific()
 	{
 		add(name);
-		add(protocolVersion);
+		add(static_cast<uint16>(protocolVersion));
 		
-		add(bytecodeSize);
-		add(stackSize);
-		add(variablesSize);
+		add(static_cast<uint16>(bytecodeSize));
+		add(static_cast<uint16>(stackSize));
+		add(static_cast<uint16>(variablesSize));
 		
 		add(static_cast<uint16>(namedVariables.size()));
 		// named variables are sent separately
@@ -434,7 +434,7 @@ namespace Aseba
 	
 	void NamedVariableDescription::serializeSpecific()
 	{
-		add(size);
+		add(static_cast<sint16>(size));
 		add(name);
 	}
 	
@@ -478,7 +478,7 @@ namespace Aseba
 		add(static_cast<uint16>(parameters.size()));
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			add(parameters[j].size);
+			add(static_cast<sint16>(parameters[j].size));
 			add(parameters[j].name);
 		}
 	}

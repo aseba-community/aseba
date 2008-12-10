@@ -53,6 +53,11 @@ static void buffer_add_uint16(uint16 value)
 	buffer_add((unsigned char *) &value, 2);
 }
 
+static void buffer_add_sint16(sint16 value)
+{
+	buffer_add((unsigned char *) &value, 2);
+}
+
 static void buffer_add_string(const char* s)
 {
 	uint16 len = strlen(s);
@@ -172,7 +177,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 		buffer_add_uint16(j);
 		for (j = 0; nativeFunctionsDescription[i]->arguments[j].size; j++)
 		{
-			buffer_add_uint16(nativeFunctionsDescription[i]->arguments[j].size);
+			buffer_add_sint16(nativeFunctionsDescription[i]->arguments[j].size);
 			buffer_add_string(nativeFunctionsDescription[i]->arguments[j].name);
 		}
 		

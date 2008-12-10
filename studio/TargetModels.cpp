@@ -355,14 +355,16 @@ namespace Aseba
 	{
 		// tooltip, display detailed information with pretty print of template parameters
 		QString text;
-		text += QString("<b>%0</b>(").arg(QString::fromUtf8(function.name.c_str()));
+		text += QString("<b>%1</b>(").arg(QString::fromUtf8(function.name.c_str()));
 		for (size_t i = 0; i < function.parameters.size(); i++)
 		{
-			text += QString("%0").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
-			if (function.parameters[i].size > 0)
-				text += QString("<%0>").arg(function.parameters[i].size);
+			text += QString("%1").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
+			if (function.parameters[i].size > 1)
+				text += QString("[%1]").arg(function.parameters[i].size);
 			else if (function.parameters[i].size < 0)
-				text += QString("<T%0>").arg(-function.parameters[i].size);
+			{
+				text += QString("[&lt;T%1&gt;]").arg(-function.parameters[i].size);
+			}
 			
 			if (i + 1 < function.parameters.size())
 				text += QString(", ");
