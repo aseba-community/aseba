@@ -2,11 +2,14 @@
 
 Studio
 - help menu
+	-> discover studio
 	-> language
 	-> FAQ
 - selective hide of events
 - move events
 - tree for variables
+- ctrl-g for "goto line"
+- ctrl-f for "find"
 
 * For a later version
 
