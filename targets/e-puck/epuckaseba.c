@@ -218,7 +218,7 @@ AsebaNativeFunctionDescription EpuckNativeDescription_get_ground_values =
 #endif
 
 static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
-	ASEBA_NATIVES_STD_FUNCTIONS,
+	ASEBA_NATIVES_STD_DESCRIPTIONS,
 #ifdef LIS_GROUND_SENSORS
 	&EpuckNativeDescription_get_ground_values,
 #endif
@@ -226,7 +226,7 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 };
 
 static AsebaNativeFunctionPointer nativeFunctions[] = {
-	ASEBA_NATIVES_STD_DESCRIPTIONS,
+	ASEBA_NATIVES_STD_FUNCTIONS,
 #ifdef LIS_GROUND_SENSORS
 	EpuckNative_get_ground_values,
 #endif
