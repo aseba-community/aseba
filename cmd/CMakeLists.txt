@@ -3,4 +3,4 @@ add_executable(asebacmd
 	cmd.cpp
 )
 
-target_link_libraries(asebacmd aseba ${EXTRA_LIBS})
+target_link_libraries(asebacmd asebacore ${EXTRA_LIBS})

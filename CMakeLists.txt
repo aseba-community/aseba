@@ -59,12 +59,14 @@ endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 
 add_definitions(-DASEBA_ASSERT)
 
-add_library(aseba
-	vm/vm.c
-	vm/natives.c
-	transport/buffer/vm-buffer.c
+add_library(asebacore
 	utils/FormatableString.cpp
 	utils/utils.cpp
+	msg/msg.cpp
+	msg/descriptions-manager.cpp
+)
+
+add_library(asebacompiler
 	compiler/compiler.cpp
 	compiler/tree-dump.cpp
 	compiler/tree-emit.cpp
@@ -74,8 +76,12 @@ add_library(aseba
 	compiler/errors.cpp
 	compiler/tree-optimize.cpp
 	compiler/analysis.cpp
-	msg/msg.cpp
-	msg/descriptions-manager.cpp
+)
+
+add_library(asebavm
+	vm/vm.c
+	vm/natives.c
+	transport/buffer/vm-buffer.c
 )
 
 add_subdirectory(switch)

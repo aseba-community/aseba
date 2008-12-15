@@ -24,9 +24,9 @@ if (QT4_FOUND)
 		
 		# Only include the qtmain lib if we are on the windows platform
 		if (WIN32)
-			target_link_libraries(asebaeventlogger aseba ${QWT_LIBRARIES} ${QT_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS})
+			target_link_libraries(asebaeventlogger asebacore ${QWT_LIBRARIES} ${QT_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS})
 		else (WIN32)
-			target_link_libraries(asebaeventlogger aseba ${QWT_LIBRARIES} ${QT_LIBRARIES} ${EXTRA_LIBS})
+			target_link_libraries(asebaeventlogger asebacore ${QWT_LIBRARIES} ${QT_LIBRARIES} ${EXTRA_LIBS})
 		endif (WIN32)
 	
 	else (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
