@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+
 project(aseba)
 
 # Dashel
@@ -59,14 +61,14 @@ endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 
 add_definitions(-DASEBA_ASSERT)
 
-add_library(asebacore
+set (ASEBACORE_SRC
 	utils/FormatableString.cpp
 	utils/utils.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
 )
 
-add_library(asebacompiler
+set (ASEBACOMPILER_SRC
 	compiler/compiler.cpp
 	compiler/tree-dump.cpp
 	compiler/tree-emit.cpp
@@ -78,10 +80,51 @@ add_library(asebacompiler
 	compiler/analysis.cpp
 )
 
-add_library(asebavm
+set (ASEBAVM_SRC
 	vm/vm.c
 	vm/natives.c
 	transport/buffer/vm-buffer.c
+)
+
+if (SHARED_LIBS)
+	add_library(asebacore SHARED ${ASEBACORE_SRC})
+	add_library(asebacompiler SHARED ${ASEBACOMPILER_SRC})
+	add_library(asebavm SHARED ${ASEBAVM_SRC})
+
+	install(TARGETS asebacore LIBRARY DESTINATION lib)
+	install(TARGETS asebacompiler LIBRARY DESTINATION lib)
+	install(TARGETS asebavm LIBRARY DESTINATION lib)
+else(SHARED_LIBS)
+	add_library(asebacore ${ASEBACORE_SRC})
+	add_library(asebacompiler ${ASEBACOMPILER_SRC})
+	add_library(asebavm ${ASEBAVM_SRC})
+	
+	install(TARGETS asebacore ARCHIVE DESTINATION lib)
+	install(TARGETS asebacompiler ARCHIVE DESTINATION lib)
+	install(TARGETS asebavm ARCHIVE DESTINATION lib)
+endif(SHARED_LIBS)
+
+set (ASEBACORE_HDR_UTILS 
+	utils/utils.h
+	utils/FormatableString.h
+)
+set (ASEBACORE_HDR_MSG
+	msg/msg.h
+	msg/descriptions-manager.h
+)
+set (ASEBACORE_HDR_COMMON
+	common/consts.h
+	common/types.h
+)
+	
+install(FILES ${ASEBACORE_HDR_UTILS}
+	DESTINATION include/aseba/utils
+)
+install(FILES ${ASEBACORE_HDR_MSG}
+	DESTINATION include/aseba/msg
+)
+install(FILES ${ASEBACORE_HDR_COMMON}
+	DESTINATION include/aseba/common
 )
 
 add_subdirectory(switch)
@@ -90,13 +133,14 @@ add_subdirectory(cmd)
 
 add_subdirectory(dump)
 
-add_subdirectory(studio)
+if(NOT CMD_LINE)
+	add_subdirectory(studio)
 
-add_subdirectory(targets/enki-marxbot)
+	add_subdirectory(targets/enki-marxbot)
 
-add_subdirectory(targets/challenge)
+	add_subdirectory(targets/challenge)
 
-add_subdirectory(targets/playground)
+	add_subdirectory(targets/playground)
 
-add_subdirectory(eventlogger)
-
+	add_subdirectory(eventlogger)
+endif(NOT CMD_LINE)

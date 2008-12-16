@@ -3,3 +3,7 @@ add_executable(asebaswitch
 )
 
 target_link_libraries(asebaswitch asebacore ${EXTRA_LIBS})
+
+install(TARGETS asebaswitch RUNTIME
+	DESTINATION bin
+)
