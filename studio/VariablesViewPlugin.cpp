@@ -64,9 +64,25 @@ namespace Aseba
 		{
 			QPixmap pixmap(width, 1);
 			QPainter painter(&pixmap);
+			
+			// get min and max values for autoset
+			int min = std::numeric_limits<int>::max();
+			int max = std::numeric_limits<int>::min();
 			for (int i = 0; i < width; i++)
 			{
-				painter.fillRect(i, 0, 1, 1, QColor((red[i]*255)/100, (green[i]*255)/100, (blue[i]*255)/100));
+				min = std::min(min, (int)red[i]);
+				min = std::min(min, (int)green[i]);
+				min = std::min(min, (int)blue[i]);
+				max = std::max(max, (int)red[i]);
+				max = std::max(max, (int)green[i]);
+				max = std::max(max, (int)blue[i]);
+			}
+			for (int i = 0; i < width; i++)
+			{
+				int r = ((red[i] - min) * 255) / (max-min);
+				int g = ((green[i] - min) * 255) / (max-min);
+				int b = ((blue[i] - min) * 255) / (max-min);
+				painter.fillRect(i, 0, 1, 1, QColor(r, g, b));
 			}
 			image->setPixmap(pixmap);
 		}
