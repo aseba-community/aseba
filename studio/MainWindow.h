@@ -7,6 +7,7 @@
 #include <QItemSelection>
 #include <QTableView>
 #include <QSplitter>
+#include <QTextEdit>
 
 #include "CustomDelegate.h"
 
@@ -20,7 +21,6 @@ class QSpinBox;
 class QGroupBox;
 class QPushButton;
 class QTabWidget;
-class QTextEdit;
 class QListWidget;
 class QListWidgetItem;
 class QTreeView;
@@ -37,14 +37,12 @@ namespace Aseba
 	class AeslEditor;
 	class AeslHighlighter;
 	
-	class CompilationLogDialog: public QDialog
+	class CompilationLogDialog: public QTextEdit
 	{
 		Q_OBJECT
 		
 	public:
-		CompilationLogDialog(QWidget *parent);
-		
-		QTextEdit *text;
+		CompilationLogDialog(QWidget *parent = 0);
 	};
 	
 	class FixedWidthTableView : public QTableView
@@ -292,6 +290,7 @@ namespace Aseba
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		QString actualFileName; //!< name of opened file, "" if new
+		QTextEdit* helpViewer;
 		
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;

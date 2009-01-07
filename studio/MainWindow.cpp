@@ -59,7 +59,7 @@ namespace Aseba
 	/*@{*/
 	
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
-		QDialog(parent)
+		QTextEdit(parent)
 	{
 		QFont font;
 		font.setFamily("");
@@ -67,18 +67,11 @@ namespace Aseba
 		font.setFixedPitch(true);
 		font.setPointSize(10);
 		
-		text = new QTextEdit;
-		text->setFont(font);
-		text->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
-		text->setReadOnly(true);
+		setFont(font);
+		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+		setReadOnly(true);
 		
-		QVBoxLayout* layout = new QVBoxLayout(this);
-		layout->addWidget(text);
-		
-		//setStandardButtons(QMessageBox::Ok);
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
-		setModal(false);
-		setSizeGripEnabled(true);
 	}
 
 
@@ -386,12 +379,12 @@ namespace Aseba
 			);
 			
 			if (result)
-				mainWindow->compilationMessageBox->text->setText(
+				mainWindow->compilationMessageBox->setText(
 					tr("Compilation success.") + QString("\n\n") + 
 					QString::fromStdString(compilationMessages.str())
 				);
 			else
-				mainWindow->compilationMessageBox->text->setText(
+				mainWindow->compilationMessageBox->setText(
 					QString::fromStdString(error.toString()) + ".\n\n" +
 					QString::fromStdString(compilationMessages.str())
 				);
@@ -1633,7 +1626,18 @@ namespace Aseba
 		splitter->setSizes(QList<int>() << 800 << 200);
 		
 		// dialog box
-		compilationMessageBox = new CompilationLogDialog(this);
+		compilationMessageBox = new CompilationLogDialog();
+		
+		// help viewer
+		helpViewer = new QTextEdit();
+		helpViewer->setReadOnly(true);
+		helpViewer->setWindowTitle(tr("Aseba Studio Help: Language"));
+		QFile helpFile(":/doc/aseba-language.en.html");
+		if (helpFile.open(QIODevice::ReadOnly))
+			helpViewer->insertHtml(QString::fromUtf8(helpFile.readAll().constData ()));
+		else
+			helpViewer->setPlainText(tr("Cannot open help file."));
+		// % TODO: scroll to top, using cursor?
 	}
 	
 	void MainWindow::setupConnections()
@@ -1863,6 +1867,12 @@ namespace Aseba
 		// Help menu
 		QMenu *helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
+		/*QAction* showLanguageHelp = new QAction(QIcon(":/images/view_text.png"), tr("Aseba &language"), this);
+		showLanguageHelp->setCheckable(true);
+		helpMenu->addAction(showLanguageHelp);
+		connect(showLanguageHelp, SIGNAL(toggled(bool)), helpViewer, SLOT(setVisible(bool)));*/
+		helpMenu->addAction(tr("&Language"), helpViewer, SLOT(show()));
+		helpMenu->addSeparator();
 		helpMenu->addAction(tr("&About"), this, SLOT(about()));
 		helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
 	}
