@@ -777,6 +777,7 @@ namespace Aseba
 			return;
 		
 		eventsDescriptionsModel->clear();
+		constantsDefinitionsModel->clear();
 		
 		QDomDocument document("aesl-source");
 		QString errorMsg;
