@@ -816,6 +816,9 @@ namespace Aseba
 			// update recent files
 			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
+			
+			// set windows title
+			setWindowTitle(tr("%0 - Aseba Studio").arg(fileName.mid(fileName.lastIndexOf("/") + 1)));
 		}
 		else
 			QMessageBox::warning(this,
