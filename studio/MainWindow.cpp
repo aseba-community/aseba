@@ -849,12 +849,12 @@ namespace Aseba
 		openFile(entry->text());
 	}
 	
-	void MainWindow::save()
+	bool MainWindow::save()
 	{
-		saveFile(actualFileName);
+		return saveFile(actualFileName);
 	}
 	
-	void MainWindow::saveFile(const QString &previousFileName)
+	bool MainWindow::saveFile(const QString &previousFileName)
 	{
 		QString fileName = previousFileName;
 		
@@ -863,14 +863,14 @@ namespace Aseba
 				tr("Save Script"), actualFileName, "Aseba scripts (*.aesl)");
 		
 		if (fileName.isEmpty())
-			return;
+			return false;
 		
 		if (fileName.lastIndexOf(".") < 0)
 			fileName += ".aesl";
 		
 		QFile file(fileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
-			return;
+			return false;
 		
 		actualFileName = fileName;
 		updateRecentFiles(fileName);
@@ -928,6 +928,7 @@ namespace Aseba
 		
 		sourceModified = false;
 		updateWindowTitle();
+		return true;
 	}
 	
 	void MainWindow::exportMemoriesContent()
@@ -1907,18 +1908,58 @@ namespace Aseba
 	
 	void MainWindow::closeEvent ( QCloseEvent * event )
 	{
-		emit MainWindowClosed();
+		if (sourceModified)
+		{
+			QString docName(tr("Untitled"));
+			if (!actualFileName.isEmpty())
+				docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
+			
+			QMessageBox msgBox;
+			msgBox.setText(tr("The document \"%0\" has been modified.").arg(docName));
+			msgBox.setInformativeText(tr("Do you want to save your changes or discard them?"));
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			
+			int ret = msgBox.exec();
+			switch (ret)
+			{
+				case QMessageBox::Save:
+					// Save was clicked
+					if (save())
+						event->accept();
+					else
+						event->ignore();
+					break;
+				case QMessageBox::Discard:
+					// Don't Save was clicked
+					event->accept();
+					break;
+				case QMessageBox::Cancel:
+					// Cancel was clicked
+					event->ignore();
+					break;
+				default:
+					// should never be reached
+					assert(false);
+					break;
+			}
+		}
+		
+		if (event->isAccepted())
+			emit MainWindowClosed();
 	}
 	
 	void MainWindow::updateWindowTitle()
 	{
 		QString modifiedText;
 		if (sourceModified)
-			modifiedText = "[modified] ";
-		if (actualFileName.isEmpty())
-			setWindowTitle(tr("Untitled %0- Aseba Studio").arg(modifiedText));
-		else
-			setWindowTitle(tr("%0 %1- Aseba Studio").arg(actualFileName.mid(actualFileName.lastIndexOf("/") + 1)).arg(modifiedText));
+			modifiedText = tr("[modified] ");
+			
+		QString docName(tr("Untitled"));
+		if (!actualFileName.isEmpty())
+			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
+		
+		setWindowTitle(tr("%0 %1- Aseba Studio").arg(docName).arg(modifiedText));
 	}
 	
 	/*@}*/
