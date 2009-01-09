@@ -1794,7 +1794,7 @@ namespace Aseba
 							this, SLOT(exportMemoriesContent()));
 		fileMenu->addSeparator();
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
-							qApp, SLOT(quit()),
+							this, SLOT(close()),
 							QKeySequence(tr("Ctrl+Q", "File|Quit")));
 		
 		// Edit menu
