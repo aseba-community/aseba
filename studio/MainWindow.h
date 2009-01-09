@@ -150,6 +150,7 @@ namespace Aseba
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
+		bool firstCompilation; //!< true if first compilation after creation
 		
 		Compiler compiler; //!< Aesl compiler
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
@@ -223,6 +224,9 @@ namespace Aseba
 		void recompileAll();
 		void writeAllBytecodes();
 		void rebootAllNodes();
+		
+		void sourceChanged();
+		
 		void addPluginLinearCameraView();
 	
 	private:
@@ -241,6 +245,7 @@ namespace Aseba
 		void setupMenu();
 		void hideEvent(QHideEvent * event);
 		void closeEvent ( QCloseEvent * event );
+		void updateWindowTitle();
 		
 		// tabs
 		friend class NodeTab;
@@ -290,6 +295,7 @@ namespace Aseba
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		QString actualFileName; //!< name of opened file, "" if new
+		bool sourceModified; //!< true if source code has been modified since last save
 		QTextEdit* helpViewer;
 		
 		// compiler and source code related stuff

@@ -102,7 +102,8 @@ namespace Aseba
 		QSplitter(parent),
 		mainWindow(mainWindow),
 		id(id),
-		target(target)
+		target(target),
+		firstCompilation(true)
 	{
 		// setup some variables
 		rehighlighting = false;
@@ -123,7 +124,7 @@ namespace Aseba
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
 		// get the value of the variables
-		recompile();
+		//recompile();
 		refreshMemoryClicked();
 	}
 	
@@ -351,9 +352,17 @@ namespace Aseba
 	void NodeTab::editorContentChanged()
 	{
 		if (rehighlighting)
+		{
 			rehighlighting = false;
+		}
 		else
+		{
 			recompile();
+			if (!firstCompilation)
+				mainWindow->sourceChanged();
+			else
+				firstCompilation = false;
+		}
 	}
 	
 	void NodeTab::recompile()
@@ -698,7 +707,8 @@ namespace Aseba
 	
 	
 	MainWindow::MainWindow(QWidget *parent) :
-		QMainWindow(parent)
+		QMainWindow(parent),
+		sourceModified(false)
 	{
 		// create target
 		target = new DashelTarget();
@@ -713,7 +723,7 @@ namespace Aseba
 		setupConnections();
 		
 		// cosmetic fix-up
-		setWindowTitle(tr("Aseba Studio"));
+		updateWindowTitle();
 		resize(1000,700);
 	}
 	
@@ -769,15 +779,15 @@ namespace Aseba
 		if (!file.open(QFile::ReadOnly))
 			return;
 		
-		eventsDescriptionsModel->clear();
-		constantsDefinitionsModel->clear();
-		
 		QDomDocument document("aesl-source");
 		QString errorMsg;
 		int errorLine;
 		int errorColumn;
 		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
+			eventsDescriptionsModel->clear();
+			constantsDefinitionsModel->clear();
+		
 			int noNodeCount = 0;
 			actualFileName = fileName;
 			QDomNode domNode = document.documentElement().firstChild();
@@ -817,19 +827,20 @@ namespace Aseba
 			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
 			
-			// set windows title
-			setWindowTitle(tr("%0 - Aseba Studio").arg(fileName.mid(fileName.lastIndexOf("/") + 1)));
+			recompileAll();
+		
+			sourceModified = false;
+			updateWindowTitle();
 		}
 		else
+		{
 			QMessageBox::warning(this,
 				tr("Loading"),
 				tr("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)
 			);
+		}
+		
 		file.close();
-		
-		recompileAll();
-		
-		
 	}
 	
 	void MainWindow::openRecentFile()
@@ -914,6 +925,9 @@ namespace Aseba
 		
 		QTextStream out(&file);
 		document.save(out, 0);
+		
+		sourceModified = false;
+		updateWindowTitle();
 	}
 	
 	void MainWindow::exportMemoriesContent()
@@ -1285,6 +1299,12 @@ namespace Aseba
 			Q_ASSERT(tab);
 			tab->reboot();
 		}
+	}
+	
+	void MainWindow::sourceChanged()
+	{
+		sourceModified = true;
+		updateWindowTitle();
 	}
 	
 	void MainWindow::addPluginLinearCameraView()
@@ -1888,6 +1908,17 @@ namespace Aseba
 	void MainWindow::closeEvent ( QCloseEvent * event )
 	{
 		emit MainWindowClosed();
+	}
+	
+	void MainWindow::updateWindowTitle()
+	{
+		QString modifiedText;
+		if (sourceModified)
+			modifiedText = "[modified] ";
+		if (actualFileName.isEmpty())
+			setWindowTitle(tr("Untitled %0- Aseba Studio").arg(modifiedText));
+		else
+			setWindowTitle(tr("%0 %1- Aseba Studio").arg(actualFileName.mid(actualFileName.lastIndexOf("/") + 1)).arg(modifiedText));
 	}
 	
 	/*@}*/
