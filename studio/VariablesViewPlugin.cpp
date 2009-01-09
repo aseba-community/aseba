@@ -2,6 +2,8 @@
 #include "TargetModels.h"
 #include <QtGui>
 #include <QtDebug>
+#include <limits>
+
 
 //#include <VariablesViewPlugin.moc>
 

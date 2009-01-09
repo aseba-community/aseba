@@ -12,7 +12,6 @@ features
 - tree for variables
 - ctrl-g for "goto line"
 - ctrl-f for "find"
-- confirmation for save on quit
 
 bugs
 - if compilation dialog is closed, corresponding menu entry is not updated
