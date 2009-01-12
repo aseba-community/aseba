@@ -113,7 +113,8 @@ namespace Aseba
 	private:
 		void rehighlight();
 		void reSetBreakpoints();
-		
+		void updateHidden();
+
 		// editor properties code
 		bool setEditorProperty(const QString &property, const QVariant &value, unsigned line, bool removeOld = false);
 		bool clearEditorProperty(const QString &property, unsigned line);
@@ -151,6 +152,7 @@ namespace Aseba
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
 		bool firstCompilation; //!< true if first compilation after creation
+		bool showHidden;
 		
 		Compiler compiler; //!< Aesl compiler
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
@@ -178,6 +180,7 @@ namespace Aseba
 		bool saveFile(const QString &previousFileName = QString());
 		void exportMemoriesContent();
 		void copyAll();
+		void showHidden(bool show);
 		
 		void loadAll();
 		void resetAll();

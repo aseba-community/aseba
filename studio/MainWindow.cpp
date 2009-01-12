@@ -364,6 +364,19 @@ namespace Aseba
 				firstCompilation = false;
 		}
 	}
+
+	void NodeTab::updateHidden() 
+	{
+		// Quick hack to hide hidden variable in the treeview and not in vmMemoryModel
+		for(int i = 0; i < vmMemoryModel->rowCount(QModelIndex()); i++) 
+		{
+			QString name;
+			name = vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString();
+			if(name.at(0) == '_' || name.contains(QString("._")))
+				vmMemoryView->setRowHidden(i,QModelIndex(), !showHidden);
+		}
+
+	}
 	
 	void NodeTab::recompile()
 	{
@@ -405,6 +418,7 @@ namespace Aseba
 		if (result)
 		{
 			vmMemoryModel->updateVariablesStructure(compiler.getVariablesMap());
+			updateHidden();
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			loadButton->setEnabled(true);
@@ -1037,6 +1051,14 @@ namespace Aseba
 			target->stop(tab->nodeId());
 		}
 	}
+
+	void MainWindow::showHidden(bool show) 
+	{
+		NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->currentWidget());
+		tab->vmFunctionsModel->recreateTreeFromDescription(show);
+		tab->showHidden = show;
+		tab->updateHidden();
+	}
 	
 	void MainWindow::clearAllExecutionError()
 	{
@@ -1159,8 +1181,6 @@ namespace Aseba
 			disconnect(undoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(undo()));
 			disconnect(redoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(redo()));
 			
-			disconnect(showHiddenAct, SIGNAL(toggled(bool)), previousActiveTab->vmFunctionsModel, SLOT(recreateTreeFromDescription(bool)));
-			
 			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
@@ -1175,8 +1195,6 @@ namespace Aseba
 		connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
 		connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
 		connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
-		
-		connect(showHiddenAct, SIGNAL(toggled(bool)), tab->vmFunctionsModel, SLOT(recreateTreeFromDescription(bool)));
 		
 		connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 		connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
@@ -1675,6 +1693,7 @@ namespace Aseba
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
+		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 		
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
