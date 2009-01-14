@@ -41,8 +41,12 @@ namespace Aseba
 	//! This class calls Aseba::Message::dump() for each message
 	class Dump : public Hub
 	{
+	private:
+		bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
+	
 	public:
-		Dump(const string& target)
+		Dump(const string& target, bool rawTime) :
+			rawTime(rawTime)
 		{
 			cout << "Connected to " << connect(target)->getTargetName() << endl;
 		}
@@ -53,7 +57,7 @@ namespace Aseba
 		{
 			Message *message = Message::receive(stream);
 			
-			dumpTime(cout);
+			dumpTime(cout, rawTime);
 			if (message)
 				message->dump(cout);
 			else
@@ -78,13 +82,19 @@ namespace Aseba
 int main(int argc, char *argv[])
 {
 	const char *target = ASEBA_DEFAULT_TARGET;
+	bool rawTime = false;
 	
 	if (argc >= 2)
 		target = argv[1];
+	// TODO: fix this with a more generic command line handling, see switch
+	if ((argc >= 3) && (strcmp(argv[2], "--rawtime") == 0))
+	{
+		rawTime = true;
+	}
 	
 	try
 	{
-		Aseba::Dump dump(target);
+		Aseba::Dump dump(target, rawTime);
 		dump.run();
 	}
 	catch(Dashel::DashelException e)
