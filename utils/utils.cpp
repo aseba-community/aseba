@@ -27,6 +27,7 @@
 	#include <sys/time.h>
 #else // WIN32
 	#include <sys/types.h>
+	#include <sys/timeb.h>
 #endif // WIN32
 #include <time.h>
 #include <errno.h>
