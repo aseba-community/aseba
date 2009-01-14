@@ -33,7 +33,7 @@ namespace Aseba
 	*/
 	/*@{*/
 	
-	void dumpTime(std::ostream &stream);
+	void dumpTime(std::ostream &stream, bool raw = false);
 	
 	/*@}*/
 	

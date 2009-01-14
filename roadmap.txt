@@ -13,8 +13,9 @@ features
 - ctrl-g for "goto line"
 - ctrl-f for "find"
 
-bugs
+known bugs
 - if compilation dialog is closed, corresponding menu entry is not updated
+- desynchronisation between hidden status of variable and menu
 
 
 * For a later version

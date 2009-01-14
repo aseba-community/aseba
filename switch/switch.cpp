@@ -44,10 +44,11 @@ namespace Aseba
 	/*@{*/
 
 	//! Broadcast messages form any data stream to all others data streams including itself.
-	Switch::Switch(unsigned port, bool verbose, bool dump, bool forward) :
+	Switch::Switch(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
 		verbose(verbose),
 		dump(dump),
-		forward(forward)
+		forward(forward),
+		rawTime(rawTime)
 	{
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
@@ -58,7 +59,7 @@ namespace Aseba
 	{
 		if (verbose)
 		{
-			dumpTime(cout);
+			dumpTime(cout, rawTime);
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
 	}
@@ -79,6 +80,7 @@ namespace Aseba
 		
 		if (dump)
 		{
+			dumpTime(cout, rawTime);
 			std::cout << "Read " << std::dec << len + 4 << " on stream " << stream << " : ";
 			for(unsigned int i = 0; i < readbuff.size(); i++)
 				std::cout << std::hex << (unsigned)readbuff[i] << " ";
@@ -144,6 +146,8 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "-d, --dump      : makes the switch dump all data\n";
 	stream << "-l, --loop      : makes the switch transmit messages back to the send, not only forward them.\n";
 	stream << "-p port         : listens to incoming connection on this port\n";
+	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
+	stream << "-h, --help      : shows this help\n";
 	stream << "Additional targets are any valid Dashel targets." << std::endl;
 }
 
@@ -153,6 +157,7 @@ int main(int argc, char *argv[])
 	bool verbose = false;
 	bool dump = false;
 	bool forward = true;
+	bool rawTime = false;
 	std::vector<std::string> additionalTargets;
 	
 	int argCounter = 1;
@@ -178,6 +183,10 @@ int main(int argc, char *argv[])
 			arg = argv[++argCounter];
 			port = atoi(arg);
 		}
+		else if (strcmp(arg, "--rawtime") == 0)
+		{
+			rawTime = true;
+		}
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
@@ -192,7 +201,7 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::Switch aswitch(port, verbose, dump, forward);
+		Aseba::Switch aswitch(port, verbose, dump, forward, rawTime);
 		for (size_t i = 0; i < additionalTargets.size(); i++)
 			aswitch.connect(additionalTargets[i]);
 		/*

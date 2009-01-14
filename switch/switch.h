@@ -44,7 +44,7 @@ namespace Aseba
 				@param dump should we dump content of each message
 				@param forward should we only forward messages instead of transmit them back to the sender
 			*/
-			Switch(unsigned port, bool verbose, bool dump, bool forward);
+			Switch(unsigned port, bool verbose, bool dump, bool forward, bool rawTime);
 			
 			/*! Forwards the data received for a connections to the other ones.
 				If forward is false, transmit it back to the sender too.
@@ -64,6 +64,7 @@ namespace Aseba
 			bool verbose; //!< should we print a notification on each message
 			bool dump; //!< should we dump content of CAN messages
 			bool forward; //!< should we only forward messages instead of transmit them back to the sender
+			bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 	};
 	
 	/*@}*/

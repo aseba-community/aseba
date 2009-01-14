@@ -23,8 +23,10 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <sys/time.h>
 #include <time.h>
 #include <errno.h>
+#include <iomanip>
 #include "utils.h"
 
 namespace Aseba
@@ -33,14 +35,25 @@ namespace Aseba
 	/*@{*/
 	
 	//! Dump the current time to a stream
-	void dumpTime(std::ostream &stream)
+	void dumpTime(std::ostream &stream, bool raw)
 	{
 		stream << "[";
 		time_t t;
 		time(&t);
-		char *timeString = ctime(&t);
-		timeString[strlen(timeString) - 1] = 0;
-		stream << timeString;
+		if (raw)
+		{
+			stream << std::dec << t;
+			stream << ".";
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			stream << tv.tv_usec;
+		}
+		else
+		{
+			char *timeString = ctime(&t);
+			timeString[strlen(timeString) - 1] = 0;
+			stream << timeString;
+		}
 		stream << "] ";
 	}
 	
