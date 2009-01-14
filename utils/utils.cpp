@@ -23,7 +23,11 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <sys/time.h>
+#ifndef WIN32
+	#include <sys/time.h>
+#else // WIN32
+	#include <sys/types.h>
+#endif // WIN32
 #include <time.h>
 #include <errno.h>
 #include <iomanip>
@@ -38,18 +42,23 @@ namespace Aseba
 	void dumpTime(std::ostream &stream, bool raw)
 	{
 		stream << "[";
-		time_t t;
-		time(&t);
 		if (raw)
 		{
-			stream << std::dec << t;
-			stream << ".";
+			#ifndef WIN32
 			struct timeval tv;
 			gettimeofday(&tv, NULL);
-			stream << tv.tv_usec;
+			stream << std::dec << tv.tv_sec << "." << (tv.tv_usec / 1000);
+			#else // WIN32
+			struct __timeb64 tv;
+			_ftime64_s(&tv);
+			stream << std::dec << tv.time << "." << tv.millitm;
+			#endif // WIN32
+			
 		}
 		else
 		{
+			time_t t;
+			time(&t);
 			char *timeString = ctime(&t);
 			timeString[strlen(timeString) - 1] = 0;
 			stream << timeString;
