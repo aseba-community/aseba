@@ -54,7 +54,8 @@ namespace Aseba
 		
 		void connectionCreated(Stream *stream)
 		{
-			cout << "Connected to " << stream->getTargetName() << endl;
+			dumpTime(cout, rawTime);
+			cout << stream->getTargetName()  << " connection created." << endl;
 		}
 		
 		void incomingData(Stream *stream)
@@ -62,21 +63,21 @@ namespace Aseba
 			Message *message = Message::receive(stream);
 			
 			dumpTime(cout, rawTime);
+			cout << stream->getTargetName()  << " ";
 			if (message)
 				message->dump(cout);
 			else
 				cout << "unknown message received";
-			cout << std::endl;
+			cout << endl;
 		}
 		
 		void connectionClosed(Stream *stream, bool abnormal)
 		{
 			dumpTime(cerr);
-			cout << "Connection closed to " << stream->getTargetName();
+			cout << stream->getTargetName() << " connection closed";
 			if (abnormal)
 				cout << " : " << stream->getFailReason();
-			cout << endl;
-			stop();
+			cout << "." << endl;
 		}
 	};
 	
