@@ -45,13 +45,17 @@ namespace Aseba
 		bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 	
 	public:
-		Dump(const string& target, bool rawTime) :
+		Dump(bool rawTime) :
 			rawTime(rawTime)
 		{
-			cout << "Connected to " << connect(target)->getTargetName() << endl;
 		}
 	
 	protected:
+		
+		void connectionCreated(Stream *stream)
+		{
+			cout << "Connected to " << stream->getTargetName() << endl;
+		}
 		
 		void incomingData(Stream *stream)
 		{
@@ -79,22 +83,53 @@ namespace Aseba
 	/*@}*/
 }
 
+
+//! Show usage
+void dumpHelp(std::ostream &stream, const char *programName)
+{
+	stream << "Aseba dump, print the content of aseba messages, usage:\n";
+	stream << programName << " [options] [targets]*\n";
+	stream << "Options:\n";
+	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
+	stream << "-h, --help      : shows this help\n";
+	stream << "Targets are any valid Dashel targets." << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
-	const char *target = ASEBA_DEFAULT_TARGET;
 	bool rawTime = false;
+	std::vector<std::string> targets;
 	
-	if (argc >= 2)
-		target = argv[1];
-	// TODO: fix this with a more generic command line handling, see switch
-	if ((argc >= 3) && (strcmp(argv[2], "--rawtime") == 0))
+	int argCounter = 1;
+	
+	while (argCounter < argc)
 	{
-		rawTime = true;
+		const char *arg = argv[argCounter];
+		
+		if (strcmp(arg, "--rawtime") == 0)
+		{
+			rawTime = true;
+		}
+		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
+		{
+			dumpHelp(std::cout, argv[0]);
+			return 0;
+		}
+		else
+		{
+			targets.push_back(argv[argCounter]);
+		}
+		argCounter++;
 	}
+	
+	if (targets.empty())
+		targets.push_back(ASEBA_DEFAULT_TARGET);
 	
 	try
 	{
-		Aseba::Dump dump(target, rawTime);
+		Aseba::Dump dump(rawTime);
+		for (size_t i = 0; i < targets.size(); i++)
+			dump.connect(targets[i]);
 		dump.run();
 	}
 	catch(Dashel::DashelException e)
