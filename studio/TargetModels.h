@@ -29,6 +29,7 @@
 #include <QVector>
 #include <QList>
 #include <QString>
+#include <QRegExp>
 #include "../compiler/compiler.h"
 
 
@@ -123,6 +124,7 @@ namespace Aseba
 		
 		TreeItem* root; //!< root of functions description tree
 		const TargetDescription *descriptionRead; //!< description for read access
+		QRegExp regExp;
 	};
 	
 	/*@}*/

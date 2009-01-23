@@ -210,7 +210,7 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 {
 	"math.fill",
-	"fill vector with constant",
+	"fills dest with constant value",
 	{
 		{ -1, "dest" },
 		{ 1, "value" },
@@ -239,7 +239,7 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 {
 	"math.copy",
-	"copy vector content",
+	"copies src to dest element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "src" },
@@ -267,7 +267,7 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 {
 	"math.add",
-	"add two vectors",
+	"adds src1 and src2 to dest, element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "src1" },
@@ -275,6 +275,7 @@ AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 		{ 0, 0 }
 	}
 };
+
 
 void AsebaNative_vecsub(AsebaVMState *vm)
 {
@@ -296,7 +297,79 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 {
 	"math.sub",
-	"substract two vectors",
+	"substracts src2 from src1 to dest, element by element",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
+
+void AsebaNative_vecmul(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[src1++] * vm->variables[src2++];
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecmul =
+{
+	"math.mul",
+	"multiplies src1 and src2 to dest, element by element",
+	{
+		{ -1, "dest" },
+		{ -1, "src1" },
+		{ -1, "src2" },
+		{ 0, 0 }
+	}
+};
+
+
+void AsebaNative_vecdiv(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src1 = AsebaNativePopArg(vm);
+	uint16 src2 = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint32 dividend = (sint32)vm->variables[src1++];
+		sint32 divisor = (sint32)vm->variables[src2++];
+		
+		if (divisor != 0)
+		{
+			vm->variables[dest++] = dividend / divisor;
+		}
+		else
+		{
+			vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+			AsebaSendMessage(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &(vm->pc), sizeof(vm->pc));
+			return;
+		}
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv =
+{
+	"math.div",
+	"divides src1 by src2 to dest, element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "src1" },
@@ -329,7 +402,7 @@ void AsebaNative_vecmin(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 {
 	"math.min",
-	"element by element minimum",
+	"writes the minimum of src1 and src2 to dest, element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "src1" },
@@ -362,7 +435,7 @@ void AsebaNative_vecmax(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 {
 	"math.max",
-	"element by element maximum",
+	"writes the maximum of src1 and src2 to dest, element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "src1" },
@@ -398,7 +471,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
 	"math.dot",
-	"scalar product between two vectors",
+	"writes the dot product of src1 and src2 to dest, after a shift",
 	{
 		{ 1, "dest" },
 		{ -1, "src1" },
@@ -447,7 +520,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
 	"math.stat",
-	"statistics on a vector",
+	"performs statistics on src",
 	{
 		{ -1, "src" },
 		{ 1, "min" },
@@ -522,7 +595,7 @@ void AsebaNative_mathatan2(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 {
 	"math.atan2",
-	"performs atan2(y,x) element by element",
+	"performs dest = atan2(y,x) element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "y" },
@@ -551,7 +624,7 @@ void AsebaNative_mathsin(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 {
 	"math.sin",
-	"performs sin(x) element by element",
+	"performs dest = sin(x) element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "x" },
@@ -579,7 +652,7 @@ void AsebaNative_mathcos(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 {
 	"math.cos",
-	"performs cos(x) element by element",
+	"performs dest = cos(x) element by element",
 	{
 		{ -1, "dest" },
 		{ -1, "x" },
@@ -612,7 +685,7 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
 {
 	"math.rot2",
-	"rotates v of a",
+	"rotates v of angle a to dest",
 	{
 		{ 2, "dest" },
 		{ 2, "v" },

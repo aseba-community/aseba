@@ -329,7 +329,8 @@ namespace Aseba
 	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent) :
 		QAbstractItemModel(parent),
 		root(0),
-		descriptionRead(descriptionRead)
+		descriptionRead(descriptionRead),
+		regExp("\\b")
 	{
 		Q_ASSERT(descriptionRead);
 		recreateTreeFromDescription(false);
@@ -355,10 +356,14 @@ namespace Aseba
 	{
 		// tooltip, display detailed information with pretty print of template parameters
 		QString text;
+		QSet<QString> variablesNames;
+		
 		text += QString("<b>%1</b>(").arg(QString::fromUtf8(function.name.c_str()));
 		for (size_t i = 0; i < function.parameters.size(); i++)
 		{
-			text += QString("%1").arg(QString::fromUtf8(function.parameters[i].name.c_str()));
+			QString variableName(QString::fromUtf8(function.parameters[i].name.c_str()));
+			variablesNames.insert(variableName);
+			text += variableName;
 			if (function.parameters[i].size > 1)
 				text += QString("[%1]").arg(function.parameters[i].size);
 			else if (function.parameters[i].size < 0)
@@ -370,7 +375,13 @@ namespace Aseba
 				text += QString(", ");
 		}
 		
-		text += QString(")<br/>") + QString::fromUtf8(function.description.c_str());
+		QString description = QString::fromUtf8(function.description.c_str());
+		QStringList descriptionWords = description.split(regExp);
+		for (int i = 0; i < descriptionWords.size(); ++i)
+			if (variablesNames.contains(descriptionWords.at(i)))
+				descriptionWords[i] = QString("<tt>%1</tt>").arg(descriptionWords[i]);
+		
+		text += QString(")<br/>") + descriptionWords.join(" ");
 		
 		return text;
 	}

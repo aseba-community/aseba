@@ -115,6 +115,16 @@ void AsebaNative_vecsub(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsub */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
 
+/*! Function to multiply two vectors elements by elements */
+void AsebaNative_vecmul(AsebaVMState *vm);
+/*! Description of AsebaNative_vecadd */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmul;
+
+/*! Function to divide two vectors elements by elements  */
+void AsebaNative_vecdiv(AsebaVMState *vm);
+/*! Description of AsebaNative_vecsub */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv;
+
 /*! Function to take the element by element minimum */
 void AsebaNative_vecmin(AsebaVMState *vm);
 /*! Description of AsebaNative_vecmin */
@@ -166,6 +176,8 @@ extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 	AsebaNative_veccopy, \
 	AsebaNative_vecadd, \
 	AsebaNative_vecsub, \
+	AsebaNative_vecmul, \
+	AsebaNative_vecdiv, \
 	AsebaNative_vecmin, \
 	AsebaNative_vecmax, \
 	AsebaNative_vecdot, \
@@ -182,6 +194,8 @@ extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 	&AsebaNativeDescription_veccopy, \
 	&AsebaNativeDescription_vecadd, \
 	&AsebaNativeDescription_vecsub, \
+	&AsebaNativeDescription_vecmul, \
+	&AsebaNativeDescription_vecdiv, \
 	&AsebaNativeDescription_vecmin, \
 	&AsebaNativeDescription_vecmax, \
 	&AsebaNativeDescription_vecdot, \
