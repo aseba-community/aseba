@@ -803,6 +803,7 @@ namespace Aseba
 			constantsDefinitionsModel->clear();
 		
 			int noNodeCount = 0;
+			absentNodes.clear();
 			actualFileName = fileName;
 			QDomNode domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
@@ -816,7 +817,10 @@ namespace Aseba
 						if (tab)
 							tab->editor->setPlainText(element.firstChild().toText().data());
 						else
+						{
+							absentNodes.push_back(qMakePair(element.attribute("name"), element.firstChild().toText().data()));
 							noNodeCount++;
+						}
 					}
 					else if (element.tagName() == "event")
 					{
@@ -931,6 +935,22 @@ namespace Aseba
 			QDomElement element = document.createElement("node");
 			element.setAttribute("name", nodeName);
 			QDomText text = document.createTextNode(tab->editor->toPlainText());
+			element.appendChild(text);
+			root.appendChild(element);
+		}
+		
+		// additional source code for abscent nodes
+		for (int i = 0; i < absentNodes.size(); i++)
+		{
+			const QString& nodeName = absentNodes[i].first;
+			const QString& nodeContent = absentNodes[i].second;
+			
+			root.appendChild(document.createTextNode("\n\n\n"));
+			root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
+			
+			QDomElement element = document.createElement("node");
+			element.setAttribute("name", nodeName);
+			QDomText text = document.createTextNode(nodeContent);
 			element.appendChild(text);
 			root.appendChild(element);
 		}

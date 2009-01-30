@@ -250,10 +250,13 @@ namespace Aseba
 		void closeEvent ( QCloseEvent * event );
 		void updateWindowTitle();
 		
-		// tabs
+		// tabs and nodes
 		friend class NodeTab;
 		QTabWidget* nodes;
 		NodeTab* previousActiveTab;
+		typedef QPair<QString,QString> AbsentNode;
+		typedef QVector<AbsentNode> AbsentNodes;
+		AbsentNodes absentNodes;
 		
 		// events
 		QPushButton* addEventNameButton;
