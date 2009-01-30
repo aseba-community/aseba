@@ -47,8 +47,8 @@ namespace Aseba
 				iValue = atoi(value.c_str());
 				wasSigned = true;
 			}
-			if ((wasSigned == false) && (iValue < 0))
-				iValue += 65536;
+			if ((wasSigned == false) && (iValue > 32767))
+				iValue -= 65536;
 		}
 		else
 			iValue = 0;
