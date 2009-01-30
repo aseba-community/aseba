@@ -37,12 +37,18 @@ namespace Aseba
 	{
 		if (type == TOKEN_INT_LITERAL)
 		{
+			bool wasSigned = false;
 			if ((value.length() > 1) && (value[1] == 'x'))
 				iValue = strtol(value.c_str() + 2, NULL, 16);
 			else if ((value.length() > 1) && (value[1] == 'b'))
 				iValue = strtol(value.c_str() + 2, NULL, 2);
 			else
+			{
 				iValue = atoi(value.c_str());
+				wasSigned = true;
+			}
+			if ((wasSigned == false) && (iValue < 0))
+				iValue += 65536;
 		}
 		else
 			iValue = 0;
