@@ -1,6 +1,14 @@
 find_package(Qt4)
 
 if (QT4_FOUND AND ENKI_FOUND)
+	# SDL
+	find_package(SDL)
+	if (SDL_FOUND)
+		include_directories(${SDL_INCLUDE_DIR})
+		set(EXTRA_LIBS ${SDL_LIBRARY} ${EXTRA_LIBS})
+		add_definitions("-DUSE_SDL")
+	endif (SDL_FOUND)
+
 	find_package(OpenGL REQUIRED)
 	
 	include(${QT_USE_FILE})

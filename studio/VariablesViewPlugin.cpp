@@ -81,9 +81,12 @@ namespace Aseba
 			}
 			for (int i = 0; i < width; i++)
 			{
-				int r = ((red[i] - min) * 255) / (max-min);
-				int g = ((green[i] - min) * 255) / (max-min);
-				int b = ((blue[i] - min) * 255) / (max-min);
+				int range = max - min;
+				if (range == 0)
+					range = 1;
+				int r = ((red[i] - min) * 255) / range;
+				int g = ((green[i] - min) * 255) / range;
+				int b = ((blue[i] - min) * 255) / range;
 				painter.fillRect(i, 0, 1, 1, QColor(r, g, b));
 			}
 			image->setPixmap(pixmap);

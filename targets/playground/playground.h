@@ -34,9 +34,13 @@
 
 #include <viewer/Viewer.h>
 #include <dashel/dashel.h>
+#include <QVector>
 
 class QPushButton;
 class QCheckBox;
+#ifdef USE_SDL
+typedef struct _SDL_Joystick SDL_Joystick;
+#endif
 
 namespace Enki
 {
@@ -49,9 +53,13 @@ namespace Enki
 		std::valarray<uint8> lastMessageData;
 		QFont font;
 		unsigned energyPool;
+		#ifdef USE_SDL
+		QVector<SDL_Joystick *> joysticks;
+		#endif // USE_SDL
 		
 	public:
 		PlaygroundViewer(World* world);
+		virtual ~PlaygroundViewer();
 		World* getWorld() { return world; }
 		
 	protected:
@@ -64,43 +72,6 @@ namespace Enki
 		
 		virtual void timerEvent(QTimerEvent * event);
 	};
-	/*class PlaygroundViewer : public ViewerWidget
-	{
-		Q_OBJECT
-		
-	protected:
-		bool savingVideo;
-		int ePuckCount;
-		QPushButton* addRobotButton;
-		QPushButton* delRobotButton;
-		QCheckBox* autoCameraButtons;
-		QCheckBox* hideButtons;
-		
-		QFont titleFont;
-		QFont entryFont;
-		QFont labelFont;
-		
-	public:
-		PlaygroundViewer(World* world, int ePuckCount);
-	
-	protected slots:
-		void addNewRobot();	
-		void removeRobot();
-	
-	protected:
-		virtual void timerEvent(QTimerEvent * event);
-		virtual void mouseMoveEvent ( QMouseEvent * event );
-		virtual void keyPressEvent ( QKeyEvent * event );
-		virtual void keyReleaseEvent ( QKeyEvent * event );
-		
-		void drawQuad2D(double x, double y, double w, double ar);
-		
-		virtual void initializeGL();
-		
-		virtual void renderObjectsTypesHook();
-		virtual void displayObjectHook(PhysicalObject *object);
-		virtual void sceneCompletedHook();
-	};*/
 }
 
 #endif

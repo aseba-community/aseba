@@ -47,6 +47,10 @@
 //#include <playground.moc>
 #include <string.h>
 
+#ifdef USE_SDL
+#include <SDL/SDL.h>
+#endif
+
 //! Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
 template<typename Derived, typename Base>
 inline Derived polymorphic_downcast(Base base)
@@ -191,6 +195,7 @@ namespace Enki
 	class AsebaFeedableEPuck : public FeedableEPuck
 	{
 	public:
+		int joystick;
 		AsebaVMState vm;
 		std::valarray<unsigned short> bytecode;
 		std::valarray<signed short> stack;
@@ -213,7 +218,8 @@ namespace Enki
 		} variables;
 		
 	public:
-		AsebaFeedableEPuck(int id)
+		AsebaFeedableEPuck(int id) :
+			joystick(-1)
 		{
 			vm.nodeId = id;
 			
@@ -254,9 +260,24 @@ namespace Enki
 			// set physical variables
 			leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
 			rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
-			color.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
-			color.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
-			color.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			Color c;
+			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
+			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
+			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			setColor(c);
+			
+			// if this robot is controlled by a joystick, override the wheel speed commands
+			#ifdef USE_SDL
+			SDL_JoystickUpdate();
+			if (joystick >= 0 && joystick < playgroundViewer->joysticks.size())
+			{
+				const double SPEED_MAX = 13.;
+				double x = SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 0) / (32767. / SPEED_MAX);
+				double y = -SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 1) / (32767. / SPEED_MAX);
+				leftSpeed = y + x;
+				rightSpeed = y - x;
+			}
+			#endif // USE_SDL
 			
 			// do motion
 			FeedableEPuck::controlStep(dt);
@@ -336,13 +357,9 @@ namespace Enki
 	public:
 		EPuckFeeder() : feeding(this)
 		{
-			height = EPUCK_FEEDER_HEIGHT;
-			mass = -1;
+			setRectangular(3.2, 3.2, EPUCK_FEEDER_HEIGHT, -1);
 			addLocalInteraction(&feeding);
-			color = EPUCK_FEEDER_COLOR_ACTIVE;
-			setupBoundingSurface(Polygone() << Point(-1.6, -1.6) <<  Point(1.6, -1.6) << Point(1.6, 1.6) << Point(-1.6, 1.6));
-			
-			commitPhysicalParameters();
+			setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 		}
 	};
 	
@@ -376,9 +393,7 @@ namespace Enki
 			mode(MODE_CLOSED),
 			moveTimeLeft(0)
 		{
-			mass = -1;
-			setRectangular(size.x, size.y, height);
-			commitPhysicalParameters();
+			setRectangular(size.x, size.y, height, -1);
 		}
 		
 		virtual void controlStep(double dt)
@@ -489,11 +504,9 @@ namespace Enki
 			attachedDoor(attachedDoor)
 		{
 			this->pos = pos;
-			mass = -1;
+			setRectangular(size.x, size.y, ACTIVATION_OBJECT_HEIGHT, -1);
 			addLocalInteraction(&areaActivating);
-			color = ACTIVATION_OBJECT_COLOR;
-			setRectangular(size.x, size.y, ACTIVATION_OBJECT_HEIGHT);
-			commitPhysicalParameters();
+			setColor(ACTIVATION_OBJECT_COLOR);
 		}
 		
 		virtual void controlStep(double dt)
@@ -530,6 +543,41 @@ namespace Enki
 			abort();
 		}
 		playgroundViewer = this;
+		
+		#ifdef USE_SDL
+		if((SDL_Init(SDL_INIT_JOYSTICK)==-1))
+		{
+			std::cerr << "Error : Could not initialize SDL: " << SDL_GetError() << endl;
+			return;
+		}
+		
+		int joystickCount = SDL_NumJoysticks();
+		for (int i = 0; i < joystickCount; ++i)
+		{
+			SDL_Joystick* joystick = SDL_JoystickOpen(i);
+			if (!joystick)
+			{
+				std::cerr << "Error: Can't open joystick " << i << endl;
+				continue;
+			}
+			if (SDL_JoystickNumAxes(joystick) < 2)
+			{
+				std::cerr << "Error: not enough axis on joystick" << i<< endl;
+				SDL_JoystickClose(joystick);
+				continue;
+			}
+			joysticks.push_back(joystick);
+		}
+		#endif // USE_SDL
+	}
+	
+	PlaygroundViewer::~PlaygroundViewer()
+	{
+		#ifdef USE_SDL
+		for (int i = 0; i < joysticks.size(); ++i)
+			SDL_JoystickClose(joysticks[i]);
+		SDL_Quit();
+		#endif // USE_SDL
 	}
 	
 	void PlaygroundViewer::renderObjectsTypesHook()
@@ -632,320 +680,6 @@ namespace Enki
 		// do a simulator/gui step
 		ViewerWidget::timerEvent(event);
 	}
-	
-	/*
-	// Playground Viewer
-	
-	PlaygroundViewer::PlaygroundViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
-	{
-		savingVideo = false;
-		initTexturesResources();
-		
-		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
-		Q_ASSERT(res != -1);
-		//qDebug() << QFontDatabase::applicationFontFamilies(res);
-		
-		titleFont = QFont("SF Old Republic SC", 20);
-		entryFont = QFont("SF Old Republic SC", 23);
-		labelFont = QFont("SF Old Republic SC", 16);
-		
-		QVBoxLayout *vLayout = new QVBoxLayout;
-		QHBoxLayout *hLayout = new QHBoxLayout;
-		
-		hLayout->addStretch();
-		addRobotButton = new QPushButton(tr("Add a new robot"));
-		hLayout->addWidget(addRobotButton);
-		delRobotButton = new QPushButton(tr("Remove all robots"));
-		hLayout->addWidget(delRobotButton);
-		autoCameraButtons = new QCheckBox(tr("Auto camera"));
-		hLayout->addWidget(autoCameraButtons);
-		hideButtons = new QCheckBox(tr("Auto hide"));
-		hLayout->addWidget(hideButtons);
-		hLayout->addStretch();
-		vLayout->addLayout(hLayout);
-		vLayout->addStretch();
-		setLayout(vLayout);
-		
-		// TODO: setup transparent with style sheet
-		connect(addRobotButton, SIGNAL(clicked()), SLOT(addNewRobot()));
-		connect(delRobotButton, SIGNAL(clicked()), SLOT(removeRobot()));
-		
-		setMouseTracking(true);
-		setAttribute(Qt::WA_OpaquePaintEvent);
-		setAttribute(Qt::WA_NoSystemBackground);
-		resize(780, 560);
-	}
-	
-	void PlaygroundViewer::addNewRobot()
-	{
-		bool ok;
-		QString eventName = QInputDialog::getText(this, tr("Add a new robot"), tr("Robot name:"), QLineEdit::Normal, "", &ok);
-		if (ok && !eventName.isEmpty())
-		{
-			// TODO change ePuckCount to port
-			Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ePuckCount++);
-			epuck->pos.x = Enki::random.getRange(120)+10;
-			epuck->pos.y = Enki::random.getRange(120)+10;
-			epuck->name = eventName;
-			world->addObject(epuck);
-		}
-	}
-	
-	void PlaygroundViewer::removeRobot()
-	{
-		std::set<AsebaFeedableEPuck *> toFree;
-		// TODO: for now, remove all robots; later, show a gui box to choose which robot to remove
-		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
-		{
-			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
-			if (epuck)
-				toFree.insert(epuck);
-		}
-		
-		for (std::set<AsebaFeedableEPuck *>::iterator it = toFree.begin(); it != toFree.end(); ++it)
-		{
-			world->removeObject(*it);
-			delete *it;
-		}
-		ePuckCount = 0;
-	}
-
-	void PlaygroundViewer::timerEvent(QTimerEvent * event)
-	{
-		if (autoCameraButtons->isChecked())
-		{
-			altitude = 70;
-			yaw += 0.002;
-			pos = QPointF(-world->w/2 + 120*sin(yaw+M_PI/2), -world->h/2 + 120*cos(yaw+M_PI/2));
-			if (yaw > 2*M_PI)
-				yaw -= 2*M_PI;
-			pitch = M_PI/7	;
-		}
-		ViewerWidget::timerEvent(event);
-	}
-
-	void PlaygroundViewer::mouseMoveEvent ( QMouseEvent * event )
-	{
-		bool isInButtonArea = event->y() < addRobotButton->y() + addRobotButton->height() + 10;
-		if (hideButtons->isChecked())
-		{
-			if (isInButtonArea && !addRobotButton->isVisible())
-			{
-				addRobotButton->show();
-				delRobotButton->show();
-				autoCameraButtons->show();
-				hideButtons->show();
-			}
-			if (!isInButtonArea && addRobotButton->isVisible())
-			{
-				addRobotButton->hide();
-				delRobotButton->hide();
-				autoCameraButtons->hide();
-				hideButtons->hide();
-			}
-		}
-		
-		ViewerWidget::mouseMoveEvent(event);
-	}
-	
-	void PlaygroundViewer::keyPressEvent ( QKeyEvent * event )
-	{
-		if (event->key() == Qt::Key_V)
-			savingVideo = true;
-		else
-			ViewerWidget::keyPressEvent(event);
-	}
-	
-	void PlaygroundViewer::keyReleaseEvent ( QKeyEvent * event )
-	{
-		if (event->key() == Qt::Key_V)
-			savingVideo = false;
-		else
-			ViewerWidget::keyReleaseEvent (event);
-	}
-	
-	void PlaygroundViewer::drawQuad2D(double x, double y, double w, double ar)
-	{
-		double thisAr = (double)width() / (double)height();
-		double h = (w * thisAr) / ar;
-		glBegin(GL_QUADS);
-		glTexCoord2d(0, 1);
-		glVertex2d(x, y);
-		glTexCoord2d(1, 1);
-		glVertex2d(x+w, y);
-		glTexCoord2d(1, 0);
-		glVertex2d(x+w, y+h);
-		glTexCoord2d(0, 0);
-		glVertex2d(x, y+h);
-		glEnd();
-	}
-	
-	void PlaygroundViewer::initializeGL()
-	{
-		ViewerWidget::initializeGL();
-	}
-	
-	void PlaygroundViewer::renderObjectsTypesHook()
-	{
-		// render vrcs specific static types
-		managedObjects[&typeid(EPuckFeeder)] = new FeederModel(this);
-		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-	}
-	
-	void PlaygroundViewer::displayObjectHook(PhysicalObject *object)
-	{
-		FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
-		if ((epuck) && (epuck->diedAnimation >= 0))
-		{
-			ViewerUserData *userData = dynamic_cast<ViewerUserData *>(epuck->userData);
-			assert(userData);
-			
-			double dist = (double)(DEATH_ANIMATION_STEPS - epuck->diedAnimation);
-			double coeff =  (double)(epuck->diedAnimation) / DEATH_ANIMATION_STEPS;
-			glColor3d(0.2*coeff, 0.2*coeff, 0.2*coeff);
-			glTranslated(0, 0, 2. * dist);
-			userData->drawSpecial(object);
-		}
-	}
-	
-	void PlaygroundViewer::sceneCompletedHook()
-	{
-		// create a map with names and scores
-		qglColor(Qt::black);
-		QMultiMap<int, QStringList> scores;
-		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
-		{
-			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
-			if (epuck)
-			{
-				QStringList entry;
-				entry << epuck->name << QString::number(epuck->port) << QString::number((int)epuck->energy) << QString::number((int)epuck->score);
-				scores.insert((int)epuck->score, entry);
-				renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, labelFont);
-			}
-		}
-		
-		// build score texture
-		QImage scoreBoard(512, 256, QImage::Format_ARGB32);
-		scoreBoard.setDotsPerMeterX(2350);
-		scoreBoard.setDotsPerMeterY(2350);
-		QPainter painter(&scoreBoard);
-		//painter.fillRect(scoreBoard.rect(), QColor(224,224,255,196));
-		painter.fillRect(scoreBoard.rect(), QColor(224,255,224,196));
-		
-		// draw lines
-		painter.setBrush(Qt::NoBrush);
-		QPen pen(Qt::black);
-		pen.setWidth(2);
-		painter.setPen(pen);
-		painter.drawRect(scoreBoard.rect());
-		pen.setWidth(1);
-		painter.setPen(pen);
-		painter.drawLine(22, 34, 504, 34);
-		painter.drawLine(312, 12, 312, 247);
-		painter.drawLine(312, 240, 504, 240);
-		
-		// draw title
-		painter.setFont(titleFont);
-		painter.drawText(35, 28, "name");
-		painter.drawText(200, 28, "port");
-		painter.drawText(324, 28, "energy");
-		painter.drawText(430, 28, "points");
-		
-		// display entries
-		QMapIterator<int, QStringList> it(scores);
-		
-		it.toBack();
-		int pos = 61;
-		while (it.hasPrevious())
-		{
-			it.previous();
-			painter.drawText(200, pos, it.value().at(1));
-			pos += 24;
-		}
-		
-		it.toBack();
-		painter.setFont(entryFont);
-		pos = 61;
-		while (it.hasPrevious())
-		{
-			it.previous();
-			painter.drawText(35, pos, it.value().at(0));
-			painter.drawText(335, pos, it.value().at(2));
-			painter.drawText(445, pos, it.value().at(3));
-			pos += 24;
-		}
-		
-		glDisable(GL_LIGHTING);
-		glEnable(GL_TEXTURE_2D);
-		GLuint tex = bindTexture(scoreBoard, GL_TEXTURE_2D);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		glCullFace(GL_FRONT);
-		glColor4d(1, 1, 1, 0.75);
-		for (int i = 0; i < 4; i++)
-		{
-			glPushMatrix();
-			glTranslated(world->w/2, world->h/2, 50);
-			glRotated(90*i, 0, 0, 1);
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0);
-			glVertex3d(-20, -20, 0);
-			glTexCoord2d(1, 0);
-			glVertex3d(20, -20, 0);
-			glTexCoord2d(1, 1);
-			glVertex3d(20, -20, 20);
-			glTexCoord2d(0, 1);
-			glVertex3d(-20, -20, 20);
-			glEnd();
-			glPopMatrix();
-		}
-		
-		glCullFace(GL_BACK);
-		glColor3d(1, 1, 1);
-		for (int i = 0; i < 4; i++)
-		{
-			glPushMatrix();
-			glTranslated(world->w/2, world->h/2, 50);
-			glRotated(90*i, 0, 0, 1);
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0);
-			glVertex3d(-20, -20, 0);
-			glTexCoord2d(1, 0);
-			glVertex3d(20, -20, 0);
-			glTexCoord2d(1, 1);
-			glVertex3d(20, -20, 20);
-			glTexCoord2d(0, 1);
-			glVertex3d(-20, -20, 20);
-			glEnd();
-			glPopMatrix();
-		}
-		
-		deleteTexture(tex);
-		
-		glDisable(GL_TEXTURE_2D);
-		glColor4d(7./8.,7./8.,1,0.75);
-		glPushMatrix();
-		glTranslated(world->w/2, world->h/2, 50);
-		glBegin(GL_QUADS);
-		glVertex3d(-20,-20,20);
-		glVertex3d(20,-20,20);
-		glVertex3d(20,20,20);
-		glVertex3d(-20,20,20);
-		
-		glVertex3d(-20,20,0);
-		glVertex3d(20,20,0);
-		glVertex3d(20,-20,0);
-		glVertex3d(-20,-20,0);
-		glEnd();
-		glPopMatrix();
-		
-		// save image
-		static int imageCounter = 0;
-		if (savingVideo)
-			grabFrameBuffer().save(QString("frame%0.bmp").arg(imageCounter++), "BMP");
-	}*/
 }
 
 // Implementation of native function
@@ -1235,10 +969,9 @@ int main(int argc, char *argv[])
 		wall->setRectangular(
 			wallE.attribute("l1").toDouble(),
 			wallE.attribute("l2").toDouble(),
-			wallE.attribute("h").toDouble()
+			wallE.attribute("h").toDouble(),
+			-1
 		);
-		wall->setMass(-1);
-		wall->commitPhysicalParameters();
 		world.addObject(wall);
 		
 		wallE  = wallE.nextSiblingElement ("wall");
@@ -1339,97 +1072,12 @@ int main(int argc, char *argv[])
 		buffer[7] = '0' + ePuckCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
+		if (ePuckE.hasAttribute("joystick"))
+			epuck->joystick = ePuckE.attribute("joystick").toInt();
 		epuck->name = buffer;
 		world.addObject(epuck);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
-	
-	/*Enki::World world(110.4, 110.4);
-	Enki::Color wallsColor(0.9, 0.9, 0.9);
-	world.setWallsColor(wallsColor);
-	
-	// Add feeders
-	Enki::EPuckFeeder* feeder = new Enki::EPuckFeeder;
-	feeder->pos.x = 16;
-	feeder->pos.y = 110-16;
-	world.addObject(feeder);
-	
-	// Add walls
-	Enki::PhysicalObject* wall;
-	
-	wall = new Enki::PhysicalObject();
-	wall->setColor(wallsColor);
-	wall->pos = Enki::Point(32.8, 55.2);
-	wall->setRectangular(1.6, 46.4, 10);
-	wall->setMass(-1);
-	wall->commitPhysicalParameters();
-	world.addObject(wall);
-	
-	wall = new Enki::PhysicalObject();
-	wall->setColor(wallsColor);
-	wall->pos = Enki::Point(110.4-32.8, 55.2);
-	wall->setRectangular(1.6, 46.4, 10);
-	wall->setMass(-1);
-	wall->commitPhysicalParameters();
-	world.addObject(wall);
-	
-	wall = new Enki::PhysicalObject();
-	wall->setColor(wallsColor);
-	wall->pos = Enki::Point(55.2, 110.4-32);
-	wall->setRectangular(46.4, 1.6, 10);
-	wall->setMass(-1);
-	wall->commitPhysicalParameters();
-	world.addObject(wall);
-	
-	wall = new Enki::PhysicalObject();
-	wall->setColor(wallsColor);
-	wall->pos = Enki::Point(55.2, 49.6);
-	wall->setRectangular(24, 35.2, 10);
-	wall->setMass(-1);
-	wall->commitPhysicalParameters();
-	world.addObject(wall);
-	
-	// Add doors
-	Enki::SlidingDoor *door;
-	
-	// left blue door
-	door = new Enki::SlidingDoor(Enki::Point(38.4, 33.6), Enki::Point(48.2, 33.6), Enki::Point(9.7, 1.6), 9, 1);
-	door->setColor(LEGO_BLUE);
-	world.addObject(door);
-	
-	Enki::Polygone activationArea;
-	activationArea << Enki::Point(0, -4.8) << Enki::Point(4.8, -2.4) << Enki::Point(4.8, 2.4) << Enki::Point(0, 4.8);
-	world.addObject(new Enki::ActivationObject(Enki::Point(0, 55.2), Enki::Point(1.6, 3.2), activationArea, door));
-	activationArea.flipX();
-	world.addObject(new Enki::ActivationObject(Enki::Point(110.4, 55.2), Enki::Point(1.6, 3.2), activationArea, door));
-	
-	// right white door
-	door = new Enki::SlidingDoor(Enki::Point(110.4-38.4, 33.6), Enki::Point(110.4-48, 33.6), Enki::Point(9.6, 1.6), 9, 3);
-	door->setColor(LEGO_WHITE);
-	world.addObject(door);
-	
-	activationArea.clear();
-	activationArea << Enki::Point(1, -16.8) << Enki::Point(10.6, -16.8) << Enki::Point(10.6, 16.8) << Enki::Point(1, 16.8);
-	world.addObject(new Enki::ActivationObject(Enki::Point(66.2, 49.6), Enki::Point(1.6, 1.6), activationArea, door));
-	
-	// Add e-puck
-	int ePuckCount = 4;
-	for (int i = 0; i < ePuckCount; i++)
-	{
-		char buffer[9];
-		strncpy(buffer, "e-puck  ", sizeof(buffer));
-		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(i+1);
-		epuck->pos.x = i  + Enki::random.getRange(5)+15;
-		epuck->pos.y = Enki::random.getRange(10)+30;
-		buffer[7] = '0' + i;
-		epuck->name = buffer;
-		world.addObject(epuck);
-		if (i == 3)
-			//epuck->pos = Enki::Point(66.2+5, 49.6);
-			//epuck->pos = Enki::Point(105, 55.2);
-			;
-	}
-	*/
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);

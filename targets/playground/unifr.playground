@@ -35,14 +35,14 @@
 		<point x="1" y="16.8" />
 	</area>
 	
-	<door closedX="38.4" closedY="33.6" openedX="48.2" openedY="33.6" l1="9.7" l2="1.6" h="10" moveDuration = "1" name="entrance" color="blue"/>
+	<door closedX="38.4" closedY="33.6" openedX="48.2" openedY="33.6" l1="9.7" l2="1.6" h="9" moveDuration = "1" name="entrance" color="blue"/>
 	<door closedX="72" closedY="33.6" openedX="62.4" openedY="33.6" l1="9.6" l2="1.6" h="9" moveDuration = "3" name="exit" color="wall"/>
 	
 	<activation x="0" y="55.2" l1="1.6" l2="3.2" area="left" door="entrance" />
 	<activation x="110.4" y="55.2" l1="1.6" l2="3.2" area="right" door="entrance" />
 	<activation x="66.2" y="49.6" l1="1.6" l2="1.6" area="center" door="exit" />
 	
-	<e-puck x="15" y="30"/>
+	<e-puck x="15" y="30" joystick="0"/>
 	<e-puck x="15" y="40"/>
 	<e-puck x="20" y="30"/>
 	<e-puck x="20" y="40"/>

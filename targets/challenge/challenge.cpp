@@ -279,9 +279,11 @@ namespace Enki
 			// set physical variables
 			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
 			rightSpeed = toDoubleClamp(variables.speedR, 1, -13, 13);
-			color.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
-			color.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
-			color.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			Color c;
+			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
+			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
+			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			setColor(c);
 			
 			// do motion
 			FeedableEPuck::controlStep(dt);
@@ -394,7 +396,7 @@ namespace Enki
 					alive = false;
 					age = 0;
 					owner->setColor(EPUCK_FEEDER_COLOR_DEAD);
-					owner->setCylindric(EPUCK_FEEDER_RADIUS_DEAD, owner->_height());
+					owner->setCylindric(EPUCK_FEEDER_RADIUS_DEAD, owner->getHeight(), owner->getMass());
 				}
 			}
 			else
@@ -404,7 +406,7 @@ namespace Enki
 					alive = true;
 					age = 0;
 					owner->setColor(EPUCK_FEEDER_COLOR_ACTIVE);
-					owner->setCylindric(EPUCK_FEEDER_RADIUS, owner->_height());
+					owner->setCylindric(EPUCK_FEEDER_RADIUS, owner->getHeight(), owner->getMass());
 				}
 			}
 		}
@@ -418,13 +420,9 @@ namespace Enki
 	public:
 		EPuckFeeder(double age) : feeding(this, age)
 		{
-			r = EPUCK_FEEDER_RADIUS;
-			height = 5;
-			mass = -1;
+			setCylindric(EPUCK_FEEDER_RADIUS, 5, -1);
 			addLocalInteraction(&feeding);
-			color = EPUCK_FEEDER_COLOR_ACTIVE;
-			
-			commitPhysicalParameters();
+			setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 		}
 	};
 	
@@ -487,7 +485,7 @@ namespace Enki
 			glCallList(lists[0]);
 			
 			// ring
-			glColor3d(0.6+object->_color().components[0]-0.3*object->_color().components[1]-0.3*object->_color().components[2], 0.6+object->_color().components[1]-0.3*object->_color().components[0]-0.3*object->_color().components[2], 0.6+object->_color().components[2]-0.3*object->_color().components[0]-0.3*object->_color().components[1]);
+			glColor3d(0.6+object->getColor().components[0]-0.3*object->getColor().components[1]-0.3*object->getColor().components[2], 0.6+object->getColor().components[1]-0.3*object->getColor().components[0]-0.3*object->getColor().components[2], 0.6+object->getColor().components[2]-0.3*object->getColor().components[0]-0.3*object->getColor().components[1]);
 			glCallList(lists[5]);
 			
 			// food
@@ -1002,7 +1000,7 @@ int main(int argc, char *argv[])
 	Enki::ChallengeViewer viewer(&world, ePuckCount);
 	
 	// Show and run
-	viewer.setWindowTitle("Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowTitle("ASEBA Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.show();
 	
 	return app.exec();
