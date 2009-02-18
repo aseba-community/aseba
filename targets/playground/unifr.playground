@@ -42,7 +42,7 @@
 	<activation x="110.4" y="55.2" l1="1.6" l2="3.2" area="right" door="entrance" />
 	<activation x="66.2" y="49.6" l1="1.6" l2="1.6" area="center" door="exit" />
 	
-	<e-puck x="15" y="30" joystick="0"/>
+	<e-puck x="15" y="30"/>
 	<e-puck x="15" y="40"/>
 	<e-puck x="20" y="30"/>
 	<e-puck x="20" y="40"/>
