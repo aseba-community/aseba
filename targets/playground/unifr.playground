@@ -22,10 +22,10 @@
 	</area>
 	
 	<area name="right">
-		<point x="0" y="-4.8" />
-		<point x="-4.8" y="-2.4" />
-		<point x="-4.8" y="2.4" />
 		<point x="0" y="4.8" />
+		<point x="-4.8" y="2.4" />
+		<point x="-4.8" y="-2.4" />
+		<point x="0" y="-4.8" />
 	</area>
 	
 	<area name="center">
