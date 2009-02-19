@@ -36,7 +36,7 @@ namespace Aseba
 		ok &= variables->subscribeToVariableOfInterest(this, "camB");
 		if (!ok)
 		{
-			QMessageBox::warning(this, tr("Cannot initialize linear camera view plugin"), tr("One or more variable not found in camR, camG, or camB"));
+			QMessageBox::warning(this, tr("Cannot initialize linear camera view plugin"), tr("One or more variable not found in camR, camG, or camB."));
 			deleteLater();
 		}
 		else
