@@ -326,7 +326,7 @@ namespace Enki
 			this->owner = owner;
 		}
 		
-		void objectStep (double dt, PhysicalObject *po, World *w)
+		void objectStep(double dt, World *w, PhysicalObject *po)
 		{
 			FeedableEPuck *epuck = dynamic_cast<FeedableEPuck *>(po);
 			if (epuck && energy > 0)
@@ -339,7 +339,7 @@ namespace Enki
 			}
 		}
 		
-		void finalize(double dt)
+		void finalize(double dt, World *w)
 		{
 			if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy+dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
 				owner->setColor(EPUCK_FEEDER_COLOR_ACTIVE);
@@ -476,12 +476,12 @@ namespace Enki
 			this->owner = owner;
 		}
 		
-		virtual void init()
+		virtual void init(double dt, World *w)
 		{
 			active = false;
 		}
 		
-		virtual void objectStep (double dt, PhysicalObject *po, World *w)
+		virtual void objectStep (double dt, World *w, PhysicalObject *po)
 		{
 			if (po != owner && dynamic_cast<Robot*>(po))
 			{
@@ -946,14 +946,17 @@ int main(int argc, char *argv[])
 	
 	// Create the world
 	QDomElement worldE = domDocument.documentElement().firstChildElement("world");
-	Enki::World world(
-		worldE.attribute("w").toDouble(),
-		worldE.attribute("h").toDouble()
-	);
+	Enki::Color worldColor(Enki::Color::gray);
 	if (!colorsMap.contains(worldE.attribute("color")))
 		std::cerr << "Warning, world walls color " << worldE.attribute("color").toStdString() << " undefined\n";
 	else
-		world.setWallsColor(colorsMap[worldE.attribute("color")]);
+		worldColor = colorsMap[worldE.attribute("color")];
+	Enki::World world(
+		worldE.attribute("w").toDouble(),
+		worldE.attribute("h").toDouble(),
+		worldColor
+	);
+	
 	
 	// Scan for walls
 	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");

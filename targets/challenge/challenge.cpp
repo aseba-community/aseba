@@ -364,7 +364,7 @@ namespace Enki
 			alive = true;
 		}
 		
-		void objectStep (double dt, PhysicalObject *po, World *w)
+		void objectStep(double dt, World *w, PhysicalObject *po)
 		{
 			if (alive)
 			{
@@ -380,7 +380,7 @@ namespace Enki
 			}
 		}
 		
-		void finalize(double dt)
+		void finalize(double dt, World *w)
 		{
 			age += dt;
 			if (alive)
