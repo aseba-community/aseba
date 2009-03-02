@@ -178,67 +178,72 @@ namespace Aseba
 	{
 		// create menu
 		QMenu *menu = createStandardContextMenu();
-		QAction *breakpointAction;
-		menu->addSeparator();
-		
-		// check for breakpoint
-		QTextBlock block = cursorForPosition(e->pos()).block();
-		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
-		bool breakpointPresent = (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
-		
-		// add action
-		if (breakpointPresent)
-			breakpointAction = menu->addAction(tr("Clear breakpoint"));
-		else
-			breakpointAction = menu->addAction(tr("Set breakpoint"));
-		QAction *breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
-		
-		// execute menu
-		QAction* selectedAction = menu->exec(e->globalPos());
-		
-		// do actions
-		if (selectedAction == breakpointAction)
+		if (!isReadOnly())
 		{
-			// modify editor state
+			QAction *breakpointAction;
+			menu->addSeparator();
+			
+			// check for breakpoint
+			QTextBlock block = cursorForPosition(e->pos()).block();
+			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			bool breakpointPresent = (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
+			
+			// add action
 			if (breakpointPresent)
-			{
-				// clear breakpoint
-				uData->properties.remove("breakpointPending");
-				uData->properties.remove("breakpoint");
-				if (uData->properties.isEmpty())
-				{
-					// garbage collect UserData
-					block.setUserData(0);
-				}
-				emit breakpointCleared(cursorForPosition(e->pos()).blockNumber());
-			}
+				breakpointAction = menu->addAction(tr("Clear breakpoint"));
 			else
+				breakpointAction = menu->addAction(tr("Set breakpoint"));
+			QAction *breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
+			
+			// execute menu
+			QAction* selectedAction = menu->exec(e->globalPos());
+			
+			// do actions
+			if (selectedAction == breakpointAction)
 			{
-				// set breakpoint
-				if (!uData)
+				// modify editor state
+				if (breakpointPresent)
 				{
-					// create user data
-					uData = new AeslEditorUserData("breakpointPending");
-					block.setUserData(uData);
+					// clear breakpoint
+					uData->properties.remove("breakpointPending");
+					uData->properties.remove("breakpoint");
+					if (uData->properties.isEmpty())
+					{
+						// garbage collect UserData
+						block.setUserData(0);
+					}
+					emit breakpointCleared(cursorForPosition(e->pos()).blockNumber());
 				}
 				else
-					uData->properties.insert("breakpointPending", QVariant());
-				emit breakpointSet(cursorForPosition(e->pos()).blockNumber());
-			}
-		}
-		if (selectedAction == breakpointClearAllAction)
-		{
-			for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
-			{
-				AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
-				if (uData)
 				{
-					uData->properties.remove("breakpoint");
-					uData->properties.remove("breakpointPending");
+					// set breakpoint
+					if (!uData)
+					{
+						// create user data
+						uData = new AeslEditorUserData("breakpointPending");
+						block.setUserData(uData);
+					}
+					else
+						uData->properties.insert("breakpointPending", QVariant());
+					emit breakpointSet(cursorForPosition(e->pos()).blockNumber());
 				}
 			}
-			emit breakpointClearedAll();
+			if (selectedAction == breakpointClearAllAction)
+			{
+				for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
+				{
+					AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
+					if (uData)
+					{
+						uData->properties.remove("breakpoint");
+						uData->properties.remove("breakpointPending");
+					}
+				}
+				emit breakpointClearedAll();
+			}
 		}
+		else
+			menu->exec(e->globalPos());
 		delete menu;
 	}
 	

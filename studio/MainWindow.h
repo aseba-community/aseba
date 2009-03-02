@@ -60,7 +60,30 @@ namespace Aseba
 	
 	class MainWindow;
 	
-	class NodeTab : public QSplitter
+	class ScriptTab
+	{
+	public:
+		virtual ~ScriptTab() {}
+		
+	protected:
+		void createEditor();
+		
+		friend class MainWindow;
+		AeslEditor* editor;
+		AeslHighlighter *highlighter;
+	};
+	
+	class AbsentNodeTab : public QWidget, public ScriptTab
+	{
+		Q_OBJECT
+		
+	public:
+		AbsentNodeTab(const QString& name, const QString& sourceCode);
+	
+		const QString name;
+	};
+	
+	class NodeTab : public QSplitter, public ScriptTab
 	{
 		Q_OBJECT
 		
@@ -128,8 +151,6 @@ namespace Aseba
 	private:
 		friend class MainWindow;
 		MainWindow* mainWindow;
-		AeslEditor *editor;
-		AeslHighlighter *highlighter;
 		QLabel *cursorPosText;
 		QLabel *compilationResultImage;
 		QLabel *compilationResultText;
@@ -238,6 +259,7 @@ namespace Aseba
 		NodeTab* getTabFromId(unsigned node);
 		NodeTab* getTabFromName(const QString& name);
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
+		void clearAbsentNodesTabs();
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
@@ -253,10 +275,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		QTabWidget* nodes;
-		NodeTab* previousActiveTab;
-		typedef QPair<QString,QString> AbsentNode;
-		typedef QVector<AbsentNode> AbsentNodes;
-		AbsentNodes absentNodes;
+		ScriptTab* previousActiveTab;
 		
 		// events
 		QPushButton* addEventNameButton;
@@ -297,6 +316,7 @@ namespace Aseba
 		QAction *undoAct;
 		QAction *redoAct;
 		QAction *showHiddenAct;
+		QAction* showCompilationMsg;
 		
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages

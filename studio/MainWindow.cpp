@@ -96,6 +96,37 @@ namespace Aseba
 		setColumnWidth(1, col1Width);
 	}
 	
+	
+	//////
+	
+	void ScriptTab::createEditor()
+	{
+		// editor widget
+		QFont font;
+		font.setFamily("");
+		font.setStyleHint(QFont::TypeWriter);
+		font.setFixedPitch(true);
+		font.setPointSize(10);
+
+		editor = new AeslEditor;
+		editor->setFont(font);
+		editor->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+		highlighter = new AeslHighlighter(editor, editor->document());
+	}
+	
+	//////
+	
+	AbsentNodeTab::AbsentNodeTab(const QString& name, const QString& sourceCode) :
+		name(name)
+	{
+		createEditor();
+		editor->setReadOnly(true);
+		editor->setPlainText(sourceCode);
+		QVBoxLayout *layout = new QVBoxLayout;
+		layout->addWidget(editor);
+		setLayout(layout);
+	}
+	
 	//////
 	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
@@ -136,17 +167,7 @@ namespace Aseba
 	
 	void NodeTab::setupWidgets()
 	{
-		// editor widget
-		QFont font;
-		font.setFamily("");
-		font.setStyleHint(QFont::TypeWriter);
-		font.setFixedPitch(true);
-		font.setPointSize(10);
-
-		editor = new AeslEditor;
-		editor->setFont(font);
-		editor->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
-		highlighter = new AeslHighlighter(editor, editor->document());
+		createEditor();
 		
 		// editor related notification widgets
 		cursorPosText = new QLabel;
@@ -773,12 +794,16 @@ namespace Aseba
 	
 	void MainWindow::newFile()
 	{
+		clearAbsentNodesTabs();
+		// we must only have NodeTab* left.
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
 			tab->editor->clear();
 		}
+		// TODO: clear constants
+		// TODO: clear events
 	}
 	
 	void MainWindow::openFile(const QString &path)
@@ -802,8 +827,10 @@ namespace Aseba
 			eventsDescriptionsModel->clear();
 			constantsDefinitionsModel->clear();
 		
+			// TODO: clear constants
+			// TODO: clear events
 			int noNodeCount = 0;
-			absentNodes.clear();
+			clearAbsentNodesTabs();
 			actualFileName = fileName;
 			QDomNode domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
@@ -818,7 +845,7 @@ namespace Aseba
 							tab->editor->setPlainText(element.firstChild().toText().data());
 						else
 						{
-							absentNodes.push_back(qMakePair(element.attribute("name"), element.firstChild().toText().data()));
+							nodes->addTab(new AbsentNodeTab(element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
 							noNodeCount++;
 						}
 					}
@@ -925,25 +952,18 @@ namespace Aseba
 		// source code
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			const QString& nodeName(target->getName(tab->nodeId()));
+			const ScriptTab* tab = polymorphic_downcast<const ScriptTab*>(nodes->widget(i));
+			QString nodeName;
 			
-			root.appendChild(document.createTextNode("\n\n\n"));
-			root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
+			const NodeTab* nodeTab = dynamic_cast<const NodeTab*>(tab);
+			if (nodeTab)
+				nodeName = target->getName(nodeTab->nodeId());
 			
-			QDomElement element = document.createElement("node");
-			element.setAttribute("name", nodeName);
-			QDomText text = document.createTextNode(tab->editor->toPlainText());
-			element.appendChild(text);
-			root.appendChild(element);
-		}
-		
-		// additional source code for abscent nodes
-		for (int i = 0; i < absentNodes.size(); i++)
-		{
-			const QString& nodeName = absentNodes[i].first;
-			const QString& nodeContent = absentNodes[i].second;
+			const AbsentNodeTab* absentNodeTab = dynamic_cast<const AbsentNodeTab*>(tab);
+			if (absentNodeTab)
+				nodeName = absentNodeTab->name;
+			
+			const QString& nodeContent = tab->editor->toPlainText();
 			
 			root.appendChild(document.createTextNode("\n\n\n"));
 			root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
@@ -954,7 +974,6 @@ namespace Aseba
 			element.appendChild(text);
 			root.appendChild(element);
 		}
-		
 		root.appendChild(document.createTextNode("\n\n\n"));
 		
 		QTextStream out(&file);
@@ -1009,12 +1028,20 @@ namespace Aseba
 		QString toCopy;
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			toCopy += QString("# node %0\n").arg(target->getName(tab->nodeId()));
-			toCopy += tab->editor->toPlainText();
-			toCopy += "\n\n";
+			const NodeTab* nodeTab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (nodeTab)
+			{
+				toCopy += QString("# node %0\n").arg(target->getName(nodeTab->nodeId()));
+				toCopy += nodeTab->editor->toPlainText();
+				toCopy += "\n\n";
+			}
+			const AbsentNodeTab* absentNodeTab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (absentNodeTab)
+			{
+				toCopy += QString("# abscent node named %0\n").arg(absentNodeTab->name);
+				toCopy += absentNodeTab->editor->toPlainText();
+				toCopy += "\n\n";
+			}
 		}
 		 QApplication::clipboard()->setText(toCopy);
 	}
@@ -1023,9 +1050,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->resetClicked();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->resetClicked();
 		}
 	}
 	
@@ -1033,9 +1060,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->loadClicked();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->loadClicked();
 		}
 	}
 	
@@ -1043,10 +1070,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			target->run(tab->nodeId());
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				target->run(tab->nodeId());
 		}
 	}
 	
@@ -1054,10 +1080,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			target->pause(tab->nodeId());
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				target->pause(tab->nodeId());
 		}
 	}
 	
@@ -1065,29 +1090,30 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			target->stop(tab->nodeId());
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				target->stop(tab->nodeId());
 		}
 	}
 
 	void MainWindow::showHidden(bool show) 
 	{
-		NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->currentWidget());
-		tab->vmFunctionsModel->recreateTreeFromDescription(show);
-		tab->showHidden = show;
-		tab->updateHidden();
+		NodeTab* tab = dynamic_cast<NodeTab*>(nodes->currentWidget());
+		if (tab)
+		{
+			tab->vmFunctionsModel->recreateTreeFromDescription(show);
+			tab->showHidden = show;
+			tab->updateHidden();
+		}
 	}
 	
 	void MainWindow::clearAllExecutionError()
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			tab->clearExecutionErrors();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->clearExecutionErrors();
 		}
 	}
 	
@@ -1096,13 +1122,14 @@ namespace Aseba
 		bool ready = true;
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			if (!tab->loadButton->isEnabled())
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
 			{
-				ready = false;
-				break;
+				if (!tab->loadButton->isEnabled())
+				{
+					ready = false;
+					break;
+				}
 			}
 		}
 		
@@ -1208,35 +1235,50 @@ namespace Aseba
 		}
 		
 		// reconnect to new
-		NodeTab *tab = polymorphic_downcast<NodeTab *>(nodes->widget(index));
-		
-		connect(cutAct, SIGNAL(triggered()), tab->editor, SLOT(cut()));
-		connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
-		connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
-		connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
-		connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
-		
-		connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-		connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-		connect(tab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
-		connect(tab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
-		
-		// TODO: it would be nice to find a way to setup this correctly
-		cutAct->setEnabled(false);
-		copyAct->setEnabled(false);
-		undoAct->setEnabled(false);
-		redoAct->setEnabled(false);
-		
-		previousActiveTab = tab;
-		
-		if (compilationMessageBox->isVisible())
-			tab->recompile();
-		
-		target->getVariables(tab->id, 0, tab->allocatedVariablesCount);
+		if (index >= 0)
+		{
+			ScriptTab *tab = polymorphic_downcast<ScriptTab*>(nodes->widget(index));
+			
+			connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
+			connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+			
+			NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
+			if (nodeTab)
+			{
+				connect(cutAct, SIGNAL(triggered()), tab->editor, SLOT(cut()));
+				connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
+				connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
+				connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
+				
+				connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+				connect(tab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
+				connect(tab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+				
+				if (compilationMessageBox->isVisible())
+					nodeTab->recompile();
+				
+				target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
+				
+				showCompilationMsg->setEnabled(true);
+			}
+			else
+				showCompilationMsg->setEnabled(false);
+			
+			// TODO: it would be nice to find a way to setup this correctly
+			cutAct->setEnabled(false);
+			copyAct->setEnabled(false);
+			undoAct->setEnabled(false);
+			redoAct->setEnabled(false);
+			
+			previousActiveTab = tab;
+		}
+		else
+			previousActiveTab = 0;
 	}
 	
 	void MainWindow::showCompilationMessages(bool doShow)
 	{
+		// this slot shouldn't be callable when an unactive tab is show
 		compilationMessageBox->setVisible(doShow);
 		if (nodes->currentWidget())
 			polymorphic_downcast<NodeTab *>(nodes->currentWidget())->recompile();
@@ -1314,9 +1356,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->recompile();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->recompile();
 		}
 	}
 	
@@ -1324,9 +1366,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->writeBytecode();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->writeBytecode();
 		}
 	}
 	
@@ -1334,9 +1376,9 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->reboot();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->reboot();
 		}
 	}
 	
@@ -1350,10 +1392,13 @@ namespace Aseba
 	{
 		if (nodes->currentWidget())
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->currentWidget());
-			// TODO: gray option when no tab is selected
-			QWidget* plugin = new LinearCameraViewPlugin(tab->vmMemoryModel);
-			connect(this, SIGNAL(MainWindowClosed()), plugin, SLOT(close()));
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->currentWidget());
+			if (tab)
+			{
+				// TODO: gray option when no tab is selected or tab is not active
+				QWidget* plugin = new LinearCameraViewPlugin(tab->vmMemoryModel);
+				connect(this, SIGNAL(MainWindowClosed()), plugin, SLOT(close()));
+			}
 		}
 	}
 	
@@ -1518,11 +1563,12 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			if (tab->nodeId() == node)
-				return i;
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
+					return i;
+			}
 		}
 		return -1;
 	}
@@ -1531,11 +1577,12 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			if (tab->nodeId() == node)
-				return tab;
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
+					return tab;
+			}
 		}
 		return 0;
 	}
@@ -1544,13 +1591,35 @@ namespace Aseba
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			if (target->getName(tab->nodeId()) == name)
-				return tab;
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (target->getName(tab->nodeId()) == name)
+					return tab;
+			}
 		}
 		return 0;
+	}
+	
+	void MainWindow::clearAbsentNodesTabs()
+	{
+		bool changed = false;
+		do
+		{
+			changed = false;
+			for (int i = 0; i < nodes->count(); i++)
+			{
+				AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+				if (tab)
+				{
+					nodes->removeTab(i);
+					delete tab;
+					changed = true;
+					break;
+				}
+			}
+		}
+		while (changed);
 	}
 	
 	void MainWindow::setupWidgets()
@@ -1785,14 +1854,15 @@ namespace Aseba
 		
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
-			
-			connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
-			
-			rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+			{	
+				QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
+				
+				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
+				
+				rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
+			}
 		}
 		
 		writeBytecodeMenu->addSeparator();
@@ -1904,7 +1974,7 @@ namespace Aseba
 		/*toolMenu->addAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"),
 							this, SLOT(showCompilationMessages()),
 							QKeySequence(tr("Ctrl+M", "Tools|Show last compilation messages")));*/
-		QAction* showCompilationMsg = new QAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"), this);
+		showCompilationMsg = new QAction(QIcon(":/images/view_text.png"), tr("&Show last compilation messages"), this);
 		showCompilationMsg->setCheckable(true);
 		toolMenu->addAction(showCompilationMsg);
 		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
