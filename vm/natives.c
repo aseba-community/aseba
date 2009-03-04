@@ -27,6 +27,10 @@
 
 #include <assert.h>
 
+#ifdef __C30__
+#include <p33fxxxx.h>
+#endif
+
 /**
 	\file vm.c
 	Implementation of standard natives functions for Aseba Virtual Machine
@@ -452,20 +456,51 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	uint16 dest = AsebaNativePopArg(vm);
 	uint16 src1 = AsebaNativePopArg(vm);
 	uint16 src2 = AsebaNativePopArg(vm);
-	sint32 shift = AsebaNativePopArg(vm);
+	sint16 shift = vm->variables[AsebaNativePopArg(vm)];
 	
 	// variable size
 	uint16 length = AsebaNativePopArg(vm);
 	
-	sint32 res = 0;
-	uint16 i;
+	if(shift > 32) {
+		vm->variables[dest] = 0;
+		return;
+	}
+
+#ifdef __C30__
+	length--;
 	
+	CORCONbits.US = 0; // Signed mode
+	CORCON |= 0b11110001; // 40 bits mode, saturation enable, integer mode.
+	// Do NOT save the accumulator values, so do NOT USE THIS FUNCTION IN INTERRUPT ! 	
+	asm __volatile__ (
+	"clr A\r\n"							//	A = 0
+	"do %[loop_cnt], 1f	\r\n"		//	Iterate loop_cnt time the tree  following instructions
+	"mov [%[ptr1]++], w4 \r\n"		//	Load w4
+	"mov [%[ptr2]++], w5 \r\n"		// 	Load w5
+	"1: mac w4*w5, A \r\n"			//	A += w4 * w5
+	: /* No output */
+	: [loop_cnt] "r" (length), [ptr1] "r" (&vm->variables[src1]), [ptr2] "r" (&vm->variables[src2])
+	: "cc", "w4", "w5" );
+	
+	if(shift > 16) {
+		shift -= 16;
+		asm __volatile__ ("sftac	A, #16\r\n" : /* No output */ : /* No input */ : "cc");
+	}
+	
+	// Shift and get the output
+	asm __volatile__ ("sftac A, %[sft]\r\n" : /* No output */ : [sft] "r" (shift) : "cc");
+	
+	vm->variables[dest] = ACCAL; // Get the Accumulator low word
+#else
+	uint16 i;
+	sint32 res = 0;;
 	for (i = 0; i < length; i++)
 	{
 		res += (sint32)vm->variables[src1++] * (sint32)vm->variables[src2++];
 	}
-	res >>= vm->variables[shift];
+	res >>= shift;
 	vm->variables[dest] = (sint16)res;
+#endif
 }
 
 AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
