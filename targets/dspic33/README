@@ -1,0 +1,60 @@
+Here is how to integrate aseba with a dspic33 and a CAN bus.
+
+What's needed:
+	- Molole (https://gna.org/projects/molole)
+	- Aseba  (https://gna.org/projects/aseba)
+	- C30 compiler (or anything which is fully compatible with the GCC toolchain)
+	- Mplab (Optionally)
+
+
+What's needed in Molole:
+	CAN driver
+		-> DMA
+	Flash
+	GPIO
+
+
+What's needed in aseba
+	can-buffer.c
+	can-net.c
+	natives.c
+	vm.c
+	vm-buffer.c
+
+What are the files provided:
+	skel.c and skel.h
+		The generic "glue" layer for aseba and dspic
+		You can include thoses exact same files in all your project
+	
+	skel-user.c
+		Is included from skel.c, so don't compile it directly
+		Follow the comment inside to define Aseba's variable descriptions,
+		Aseba's event descriptions and natives function structures.
+
+	skel-user.h
+		Is included from skel.h, so don't include it yourself.
+		Follow the comment inside to define some CAN driver configuration,
+		communication buffers size, Aseba's stack and bytecode size, 
+		the C variables accessed from inside the VM (must be identical to
+		the ones declared in skel-user.c), the Event number (must be identical
+		to the ones declared in skel-user.h), and the settings which are stored
+		in flash.
+
+	main.c
+	 	Example file to show how to initialise and start the VM.
+
+
+How to make this damn things working ? 
+	In you "main()" do the following things:
+		- Init all your dspic peripherals (except CAN) 
+		- call init_aseba_and_can()
+		- load_settings_from_flash(), if it return 0, then the settings
+		  loaded inside the settings structure.
+	
+	When you are ready to give the dspic control to aseba call:
+		- run_aseba_main_loop()
+
+
+
+
+
