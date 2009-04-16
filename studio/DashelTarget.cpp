@@ -112,10 +112,10 @@ namespace Aseba
 		languageSelectionBox = new QComboBox;
 		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
 		languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
-		//qDebug() << "locale is " << QLocale::system().name();
+		qDebug() << "locale is " << QLocale::system().name();
 		for (int i = 0; i < languageSelectionBox->count(); ++i)
 		{
-			if (languageSelectionBox->itemData(i).toString() == QLocale::system().name())
+			if (QLocale::system().name().startsWith(languageSelectionBox->itemData(i).toString()))
 			{
 				languageSelectionBox->setCurrentIndex(i);
 				break;
