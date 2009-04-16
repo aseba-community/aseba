@@ -27,6 +27,7 @@
 #include <QTranslator>
 #include <QString>
 #include <QLocale>
+ #include <QLibraryInfo>
 #include <iostream>
 #include <stdexcept>
 #include "MainWindow.h"
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
 	signal(SIGINT, SIG_DFL);
 	
 	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + QLocale::system().name());
+	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 	
 	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
@@ -55,7 +56,10 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::MainWindow window;
+		QVector<QTranslator*> translators;
+		translators.push_back(&qtTranslator);
+		translators.push_back(&translator);
+		Aseba::MainWindow window(translators);
 		window.show();
 		return app.exec();
 	}

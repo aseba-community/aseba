@@ -40,6 +40,8 @@ class QGroupBox;
 class QLineEdit;
 class QSpinBox;
 class QListWidget;
+class QComboBox;
+class QTranslator;
 
 
 namespace Dashel
@@ -65,10 +67,12 @@ namespace Aseba
 		QListWidget* serial;
 		QGroupBox* customGroupBox;
 		QLineEdit* custom;
+		QComboBox* languageSelectionBox;
 		
 	public:
 		DashelConnectionDialog();
 		std::string getTarget();
+		QString getLocaleName();
 		
 	public slots:
 		void netGroupChecked();
@@ -88,7 +92,7 @@ namespace Aseba
 		Dashel::Stream* stream;
 		
 	public:
-		DashelInterface();
+		DashelInterface(QVector<QTranslator*> translators);
 		
 	signals:
 		void messageAvailable(Message *message);
@@ -145,7 +149,7 @@ namespace Aseba
 		QTimer userEventsTimer;
 		
 	public:
-		DashelTarget();
+		DashelTarget(QVector<QTranslator*> translators);
 		~DashelTarget();
 		
 		virtual void disconnect();

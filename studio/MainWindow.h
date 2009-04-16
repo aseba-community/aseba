@@ -24,6 +24,7 @@ class QTabWidget;
 class QListWidget;
 class QListWidgetItem;
 class QTreeView;
+class QTranslator;
 
 namespace Aseba
 {
@@ -186,7 +187,7 @@ namespace Aseba
 		Q_OBJECT
 	
 	public:
-		MainWindow(QWidget *parent = 0);
+		MainWindow(QVector<QTranslator*> translators, QWidget *parent = 0);
 		~MainWindow();
 
 	signals:

@@ -30,6 +30,7 @@
 #include <cassert>
 #include <QInputDialog>
 #include <QtGui>
+#include <QLibraryInfo>
 #include <stdexcept>
 
 
@@ -108,6 +109,20 @@ namespace Aseba
 		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
 		mainLayout->addWidget(customGroupBox);
 		
+		languageSelectionBox = new QComboBox;
+		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
+		languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
+		//qDebug() << "locale is " << QLocale::system().name();
+		for (int i = 0; i < languageSelectionBox->count(); ++i)
+		{
+			if (languageSelectionBox->itemData(i).toString() == QLocale::system().name())
+			{
+				languageSelectionBox->setCurrentIndex(i);
+				break;
+			}
+		}
+		mainLayout->addWidget(languageSelectionBox);
+		
 		QHBoxLayout* buttonLayout = new QHBoxLayout();
 		connectButton = new QPushButton(QIcon(":/images/ok.png"), tr("Connect"));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
@@ -145,6 +160,11 @@ namespace Aseba
 		}
 	}
 	
+	QString DashelConnectionDialog::getLocaleName()
+	{
+		return languageSelectionBox->itemData(languageSelectionBox->currentIndex()).toString();
+	}
+	
 	void DashelConnectionDialog::netGroupChecked()
 	{
 		netGroupBox->setChecked(true);
@@ -175,7 +195,7 @@ namespace Aseba
 	}
 	
 	
-	DashelInterface::DashelInterface() :
+	DashelInterface::DashelInterface(QVector<QTranslator*> translators) :
 		stream(0)
 	{
 		DashelConnectionDialog targetSelector;
@@ -190,6 +210,9 @@ namespace Aseba
 			{
 				//qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
 				stream = Hub::connect(targetSelector.getTarget());
+				assert(translators.size() == 2);
+				translators[0]->load(QString("qt_") + targetSelector.getLocaleName(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+				translators[1]->load(QString(":/asebastudio_") + targetSelector.getLocaleName());
 				break;
 			}
 			catch (DashelException e)
@@ -254,7 +277,8 @@ namespace Aseba
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
-	DashelTarget::DashelTarget()
+	DashelTarget::DashelTarget(QVector<QTranslator*> translators) :
+		dashelInterface(translators)
 	{
 		userEventsTimer.setSingleShot(true);
 		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));

@@ -741,12 +741,12 @@ namespace Aseba
 	}
 	
 	
-	MainWindow::MainWindow(QWidget *parent) :
+	MainWindow::MainWindow(QVector<QTranslator*> translators, QWidget *parent) :
 		QMainWindow(parent),
 		sourceModified(false)
 	{
 		// create target
-		target = new DashelTarget();
+		target = new DashelTarget(translators);
 		
 		// create models
 		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
