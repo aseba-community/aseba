@@ -359,7 +359,7 @@ void AsebaNative_vecdiv(AsebaVMState *vm)
 		
 		if (divisor != 0)
 		{
-			vm->variables[dest++] = dividend / divisor;
+			vm->variables[dest++] = (sint16)(dividend / divisor);
 		}
 		else
 		{
@@ -460,6 +460,8 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	
 	// variable size
 	uint16 length = AsebaNativePopArg(vm);
+	sint32 res = 0;
+	uint16 i;
 	
 	if(shift > 32) {
 		vm->variables[dest] = 0;
@@ -492,8 +494,6 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	
 	vm->variables[dest] = ACCAL; // Get the Accumulator low word
 #else
-	uint16 i;
-	sint32 res = 0;;
 	for (i = 0; i < length; i++)
 	{
 		res += (sint32)vm->variables[src1++] * (sint32)vm->variables[src2++];
