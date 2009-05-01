@@ -4,8 +4,8 @@
 var maxBluePos
 var i
 
-leftSpeed = 100
-rightSpeed = 100
+wheel_left_speed = 100
+wheel_right_speed = 100
 
 onevent timer
 maxBlueVal = 0
@@ -34,8 +34,8 @@ else
 end
 
 if maxBlueVal &lt;= 50 then
-        leftSpeed = -10
-        rightSpeed = -5
+        wheel_left_speed = -10
+        wheel_right_speed = -5
 end
 </node>
 </network>

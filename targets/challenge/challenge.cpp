@@ -85,7 +85,11 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	0
 };
 
-extern "C" AsebaVMDescription vmDescription;
+// changed by selection dialog
+static QString localName;
+
+extern "C" AsebaVMDescription vmDescription_en;
+extern "C" AsebaVMDescription vmDescription_fr;
 
 namespace Enki
 {
@@ -162,11 +166,15 @@ namespace Enki
 			sint16 colorR; // body red [0..100] %
 			sint16 colorG; // body green [0..100] %
 			sint16 colorB; // body blue [0..100] %
-			sint16 prox[8];	// 
+			sint16 prox_A[8];	// proximity sensors as variables, normal e-puck order
+			sint16 prox_B[8];	// proximity sensors as array, normal e-puck order
 			#ifdef SIMPLIFIED_EPUCK
-			sint16 camR[3]; // camera red (left, middle, right) [0..100] %
-			sint16 camG[3]; // camera green (left, middle, right) [0..100] %
-			sint16 camB[3]; // camera blue (left, middle, right) [0..100] %
+			sint16 camR_A[3]; // camera red as variables (left, middle, right) [0..100] %
+			sint16 camR_B[3]; // camera red as array (left, middle, right) [0..100] %
+			sint16 camG_A[3]; // camera green as variables (left, middle, right) [0..100] %
+			sint16 camG_B[3]; // camera green as array (left, middle, right) [0..100] %
+			sint16 camB_A[3]; // camera blue as variables (left, middle, right) [0..100] %
+			sint16 camB_B[3]; // camera blue as array (left, middle, right) [0..100] %
 			#else
 			sint16 camR[60]; // camera red (left, middle, right) [0..100] %
 			sint16 camG[60]; // camera green (left, middle, right) [0..100] %
@@ -290,14 +298,16 @@ namespace Enki
 			
 			// get physical variables
 			#ifdef SIMPLIFIED_EPUCK
-			variables.prox[0] = static_cast<sint16>(infraredSensor0.getDist());
-			variables.prox[1] = static_cast<sint16>(infraredSensor1.getDist());
-			variables.prox[2] = static_cast<sint16>(infraredSensor2.getDist());
-			variables.prox[3] = static_cast<sint16>(infraredSensor3.getDist());
-			variables.prox[4] = static_cast<sint16>(infraredSensor4.getDist());
-			variables.prox[5] = static_cast<sint16>(infraredSensor5.getDist());
-			variables.prox[6] = static_cast<sint16>(infraredSensor6.getDist());
-			variables.prox[7] = static_cast<sint16>(infraredSensor7.getDist());
+			variables.prox_A[0] = static_cast<sint16>(infraredSensor0.getDist());
+			variables.prox_A[1] = static_cast<sint16>(infraredSensor1.getDist());
+			variables.prox_A[2] = static_cast<sint16>(infraredSensor2.getDist());
+			variables.prox_A[3] = static_cast<sint16>(infraredSensor3.getDist());
+			variables.prox_A[4] = static_cast<sint16>(infraredSensor4.getDist());
+			variables.prox_A[5] = static_cast<sint16>(infraredSensor5.getDist());
+			variables.prox_A[6] = static_cast<sint16>(infraredSensor6.getDist());
+			variables.prox_A[7] = static_cast<sint16>(infraredSensor7.getDist());
+			for (size_t i = 0; i < 8; ++i)
+				variables.prox_B[i] = variables.prox_A[i];
 			#else
 			variables.prox[0] = static_cast<sint16>(infraredSensor0.finalValue);
 			variables.prox[1] = static_cast<sint16>(infraredSensor1.finalValue);
@@ -322,9 +332,9 @@ namespace Enki
 					sumG += camera.image[index].g();
 					sumB += camera.image[index].b();
 				}
-				variables.camR[i] = static_cast<sint16>(sumR * 100. / 20.);
-				variables.camG[i] = static_cast<sint16>(sumG * 100. / 20.);
-				variables.camB[i] = static_cast<sint16>(sumB * 100. / 20.);
+				variables.camR_A[i] = variables.camR_B[i] = static_cast<sint16>(sumR * 100. / 20.);
+				variables.camG_A[i] = variables.camG_B[i] = static_cast<sint16>(sumG * 100. / 20.);
+				variables.camB_A[i] = variables.camB_B[i] = static_cast<sint16>(sumB * 100. / 20.);
 			}
 			#else
 			for (size_t i = 0; i < 60; i++)
@@ -884,7 +894,10 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 
 extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
-	return &vmDescription;
+	if (localName == "fr")
+		return &vmDescription_fr;
+	else
+		return &vmDescription_en;
 }
 
 static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { NULL, NULL }};
@@ -944,6 +957,40 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	AsebaVMInit(vm);
 }
 
+class LanguageSelectionDialog : public QDialog
+{
+public:
+	QComboBox* languageSelectionBox;
+	
+	LanguageSelectionDialog()
+	{
+		QVBoxLayout* layout = new QVBoxLayout(this);
+		
+		QLabel* text = new QLabel(tr("Please choose your language"));
+		layout->addWidget(text);
+		
+		languageSelectionBox = new QComboBox(this);
+		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
+		languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
+		//qDebug() << "locale is " << QLocale::system().name();
+		for (int i = 0; i < languageSelectionBox->count(); ++i)
+		{
+			if (QLocale::system().name().startsWith(languageSelectionBox->itemData(i).toString()))
+			{
+				languageSelectionBox->setCurrentIndex(i);
+				break;
+			}
+		}
+		layout->addWidget(languageSelectionBox);
+		
+		QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
+		connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
+		layout->addWidget(okButton);
+		
+		setWindowTitle(tr("Language selection"));
+	}
+};
+
 
 int main(int argc, char *argv[])
 {
@@ -951,12 +998,24 @@ int main(int argc, char *argv[])
 	
 	// Translation support
 	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + QLocale::system().name());
+	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 	
+	qDebug() << QLocale::system().name();
 	QTranslator translator;
-	translator.load(QString(":/asebachallenge_") + QLocale::system().name());
+	qDebug() << translator.load(QString(":/asebachallenge_") + QLocale::system().name());
 	app.installTranslator(&translator);
+	
+	// choose the language
+	{
+		LanguageSelectionDialog languageSelectionDialog;
+		languageSelectionDialog.show();
+		languageSelectionDialog.exec();
+		
+		localName = languageSelectionDialog.languageSelectionBox->itemData(languageSelectionDialog.languageSelectionBox->currentIndex()).toString();
+		qtTranslator.load(QString("qt_") + localName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+		translator.load(QString(":/asebachallenge_") + localName);
+	}
 	
 	// Create the world
 	Enki::World world(140, 140);
