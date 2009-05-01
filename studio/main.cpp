@@ -44,11 +44,11 @@ int main(int argc, char *argv[])
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
 	
+	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
-	
-	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 	
 	QTranslator translator;
 	translator.load(QString(":/asebastudio_") + QLocale::system().name());

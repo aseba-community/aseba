@@ -804,6 +804,24 @@ namespace Aseba
 		return BinaryArithmeticNode::fromComparison(conditionPos, op, left.release(), right);
 	}
 	
+	/*
+	TODO: later if we want to add binary |, &, ~ but we need to get more operator space first
+	Node *Compiler::parseBinaryOrExpression()
+	{
+	
+	}
+	
+	Node *Compiler::parseBinaryXorExpression()
+	{
+	
+	}
+	
+	Node *Compiler::parseBinaryAndExpression()
+	{
+	
+	}
+	*/
+	
 	//! Parse "shift_expression" grammar element.
 	Node *Compiler::parseShiftExpression()
 	{

@@ -166,8 +166,12 @@ namespace Enki
 			sint16 colorR; // body red [0..100] %
 			sint16 colorG; // body green [0..100] %
 			sint16 colorB; // body blue [0..100] %
-			sint16 prox_A[8];	// proximity sensors as variables, normal e-puck order
-			sint16 prox_B[8];	// proximity sensors as array, normal e-puck order
+			#ifdef SIMPLIFIED_EPUCK
+			sint16 dist_A[8];	// proximity sensors in dist [cm] as variables, normal e-puck order
+			sint16 dist_B[8];	// proximity sensors in dist [cm] as array, normal e-puck order
+			#else
+			sint16 prox[8];		// proximity sensors, normal e-puck order
+			#endif
 			#ifdef SIMPLIFIED_EPUCK
 			sint16 camR_A[3]; // camera red as variables (left, middle, right) [0..100] %
 			sint16 camR_B[3]; // camera red as array (left, middle, right) [0..100] %
@@ -298,16 +302,16 @@ namespace Enki
 			
 			// get physical variables
 			#ifdef SIMPLIFIED_EPUCK
-			variables.prox_A[0] = static_cast<sint16>(infraredSensor0.getDist());
-			variables.prox_A[1] = static_cast<sint16>(infraredSensor1.getDist());
-			variables.prox_A[2] = static_cast<sint16>(infraredSensor2.getDist());
-			variables.prox_A[3] = static_cast<sint16>(infraredSensor3.getDist());
-			variables.prox_A[4] = static_cast<sint16>(infraredSensor4.getDist());
-			variables.prox_A[5] = static_cast<sint16>(infraredSensor5.getDist());
-			variables.prox_A[6] = static_cast<sint16>(infraredSensor6.getDist());
-			variables.prox_A[7] = static_cast<sint16>(infraredSensor7.getDist());
+			variables.dist_A[0] = static_cast<sint16>(infraredSensor0.getDist());
+			variables.dist_A[1] = static_cast<sint16>(infraredSensor1.getDist());
+			variables.dist_A[2] = static_cast<sint16>(infraredSensor2.getDist());
+			variables.dist_A[3] = static_cast<sint16>(infraredSensor3.getDist());
+			variables.dist_A[4] = static_cast<sint16>(infraredSensor4.getDist());
+			variables.dist_A[5] = static_cast<sint16>(infraredSensor5.getDist());
+			variables.dist_A[6] = static_cast<sint16>(infraredSensor6.getDist());
+			variables.dist_A[7] = static_cast<sint16>(infraredSensor7.getDist());
 			for (size_t i = 0; i < 8; ++i)
-				variables.prox_B[i] = variables.prox_A[i];
+				variables.dist_B[i] = variables.dist_A[i];
 			#else
 			variables.prox[0] = static_cast<sint16>(infraredSensor0.finalValue);
 			variables.prox[1] = static_cast<sint16>(infraredSensor1.finalValue);
@@ -957,9 +961,8 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	AsebaVMInit(vm);
 }
 
-class LanguageSelectionDialog : public QDialog
+struct LanguageSelectionDialog : public QDialog
 {
-public:
 	QComboBox* languageSelectionBox;
 	
 	LanguageSelectionDialog()
@@ -997,6 +1000,8 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	
 	// Translation support
+	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);

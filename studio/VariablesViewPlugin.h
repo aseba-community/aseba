@@ -16,10 +16,10 @@ namespace Aseba
 	class VariablesViewPlugin: public QWidget
 	{
 	protected:
-		TargetVariablesModel *variables;
+		TargetVariablesModel *variablesModel;
 		
 	public:
-		VariablesViewPlugin(TargetVariablesModel* variables);
+		VariablesViewPlugin(TargetVariablesModel* variablesModel);
 		
 		virtual ~VariablesViewPlugin();
 		
@@ -34,12 +34,19 @@ namespace Aseba
 	class LinearCameraViewPlugin: public VariablesViewPlugin
 	{
 	public:
-		LinearCameraViewPlugin(TargetVariablesModel* variables);
+		LinearCameraViewPlugin(TargetVariablesModel* variablesModel);
 		
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		
 	private:
+		enum ValuesRange
+		{
+			VALUES_RANGE_AUTO = 0,
+			VALUES_RANGE_8BITS,
+			VALUES_RANGE_PERCENT
+		} valuesRange;
 		QLabel *image;
+		QString redName, greenName, blueName;
 		VariablesDataVector red, green, blue;
 	};
 	

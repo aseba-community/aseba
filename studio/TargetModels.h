@@ -44,6 +44,15 @@ namespace Aseba
 	class TargetVariablesModel: public QAbstractItemModel
 	{
 		Q_OBJECT
+	
+	public:
+		// variables
+		struct Variable
+		{
+			QString name;
+			unsigned pos;
+			VariablesDataVector value;
+		};
 		
 	public:
 		virtual ~TargetVariablesModel();
@@ -58,6 +67,8 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		
+		const QList<Variable>& getVariables() { return variables; }
 		
 	public slots:
 		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
@@ -80,13 +91,7 @@ namespace Aseba
 		void unsubscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name);
 		
 	private:
-		// variables
-		struct Variable
-		{
-			QString name;
-			unsigned pos;
-			VariablesDataVector value;
-		};
+		
 		QList<Variable> variables;
 		
 		// VariablesViewPlugin API 
