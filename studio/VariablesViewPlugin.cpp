@@ -1,4 +1,5 @@
 #include "VariablesViewPlugin.h"
+#include <VariablesViewPlugin.moc>
 #include "TargetModels.h"
 #include <QtGui>
 #include <QtDebug>
@@ -27,54 +28,47 @@ namespace Aseba
 		variablesModel = 0;
 	}
 	
-	struct LinearCameraViewVariablesDialog : public QDialog
+	
+	LinearCameraViewVariablesDialog::LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel) :
+		redVariable(new QComboBox),
+		greenVariable(new QComboBox),
+		blueVariable(new QComboBox),
+		valuesRanges(new QComboBox)
 	{
-		QComboBox* redVariable;
-		QComboBox* greenVariable;
-		QComboBox* blueVariable;
-		QComboBox* valuesRanges;
+		QVBoxLayout* layout = new QVBoxLayout(this);
+	
+		layout->addWidget(new QLabel(tr("Please choose your variables")));
+		layout->addWidget(new QLabel(tr("red component")));
+		layout->addWidget(redVariable);
+		layout->addWidget(new QLabel(tr("green component")));
+		layout->addWidget(greenVariable);
+		layout->addWidget(new QLabel(tr("blue component")));
+		layout->addWidget(blueVariable);
+		layout->addWidget(new QLabel(tr("range of values")));
+		layout->addWidget(valuesRanges);
 		
-		LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel) :
-			redVariable(new QComboBox),
-			greenVariable(new QComboBox),
-			blueVariable(new QComboBox),
-			valuesRanges(new QComboBox)
+		QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
+		connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
+		layout->addWidget(okButton);
+		
+		valuesRanges->addItem(tr("auto range"));
+		valuesRanges->addItem(tr("8 bits range (0–255)"));
+		valuesRanges->addItem(tr("percent range (0–100)"));
+		
+		const QList<TargetVariablesModel::Variable>& variables(variablesModel->getVariables());
+		for (size_t i = 0; i < variables.size(); ++i)
 		{
-			QVBoxLayout* layout = new QVBoxLayout(this);
-		
-			layout->addWidget(new QLabel(tr("Please choose your variables")));
-			layout->addWidget(new QLabel(tr("red component")));
-			layout->addWidget(redVariable);
-			layout->addWidget(new QLabel(tr("green component")));
-			layout->addWidget(greenVariable);
-			layout->addWidget(new QLabel(tr("blue component")));
-			layout->addWidget(blueVariable);
-			layout->addWidget(new QLabel(tr("range of values")));
-			layout->addWidget(valuesRanges);
-			
-			QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
-			connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
-			layout->addWidget(okButton);
-			
-			valuesRanges->addItem(tr("auto range"));
-			valuesRanges->addItem(tr("8 bits range (0–255)"));
-			valuesRanges->addItem(tr("percent range (0–100)"));
-			
-			const QList<TargetVariablesModel::Variable>& variables(variablesModel->getVariables());
-			for (size_t i = 0; i < variables.size(); ++i)
-			{
-				redVariable->addItem(variables[i].name);
-				greenVariable->addItem(variables[i].name);
-				blueVariable->addItem(variables[i].name);
-			}
-			
-			redVariable->setEditText("camR");
-			greenVariable->setEditText("camG");
-			blueVariable->setEditText("camB");
-			
-			setWindowTitle(tr("Linear Camera View Plugin"));
+			redVariable->addItem(variables[i].name);
+			greenVariable->addItem(variables[i].name);
+			blueVariable->addItem(variables[i].name);
 		}
-	};
+		
+		redVariable->setEditText("camR");
+		greenVariable->setEditText("camG");
+		blueVariable->setEditText("camB");
+		
+		setWindowTitle(tr("Linear Camera View Plugin"));
+	}
 	
 	LinearCameraViewPlugin::LinearCameraViewPlugin(TargetVariablesModel* variablesModel) :
 		VariablesViewPlugin(variablesModel)

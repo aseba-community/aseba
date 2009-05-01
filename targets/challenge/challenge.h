@@ -33,9 +33,11 @@
 #define __CHALLENGE_H
 
 #include <viewer/Viewer.h>
+#include <QDialog>
 
 class QPushButton;
 class QCheckBox;
+class QComboBox;
 
 namespace Enki
 {
@@ -77,6 +79,16 @@ namespace Enki
 		virtual void sceneCompletedHook();
 	};
 }
+
+class LanguageSelectionDialog : public QDialog
+{
+	Q_OBJECT
+
+public:
+	QComboBox* languageSelectionBox;
+	
+	LanguageSelectionDialog();
+};
 
 #endif
 

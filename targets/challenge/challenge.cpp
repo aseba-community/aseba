@@ -961,38 +961,34 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	AsebaVMInit(vm);
 }
 
-struct LanguageSelectionDialog : public QDialog
+
+LanguageSelectionDialog::LanguageSelectionDialog()
 {
-	QComboBox* languageSelectionBox;
+	QVBoxLayout* layout = new QVBoxLayout(this);
 	
-	LanguageSelectionDialog()
+	QLabel* text = new QLabel(tr("Please choose your language"));
+	layout->addWidget(text);
+	
+	languageSelectionBox = new QComboBox(this);
+	languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
+	languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
+	//qDebug() << "locale is " << QLocale::system().name();
+	for (int i = 0; i < languageSelectionBox->count(); ++i)
 	{
-		QVBoxLayout* layout = new QVBoxLayout(this);
-		
-		QLabel* text = new QLabel(tr("Please choose your language"));
-		layout->addWidget(text);
-		
-		languageSelectionBox = new QComboBox(this);
-		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
-		languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
-		//qDebug() << "locale is " << QLocale::system().name();
-		for (int i = 0; i < languageSelectionBox->count(); ++i)
+		if (QLocale::system().name().startsWith(languageSelectionBox->itemData(i).toString()))
 		{
-			if (QLocale::system().name().startsWith(languageSelectionBox->itemData(i).toString()))
-			{
-				languageSelectionBox->setCurrentIndex(i);
-				break;
-			}
+			languageSelectionBox->setCurrentIndex(i);
+			break;
 		}
-		layout->addWidget(languageSelectionBox);
-		
-		QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
-		connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
-		layout->addWidget(okButton);
-		
-		setWindowTitle(tr("Language selection"));
 	}
-};
+	layout->addWidget(languageSelectionBox);
+	
+	QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
+	connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
+	layout->addWidget(okButton);
+	
+	setWindowTitle(tr("Language selection"));
+}
 
 
 int main(int argc, char *argv[])

@@ -2,9 +2,11 @@
 #define VARIABLE_VIEW_PLUGIN_H
 
 #include <QWidget>
+#include <QDialog>
 #include "../compiler/compiler.h"
 
 class QLabel;
+class QComboBox;
 
 namespace Aseba
 {
@@ -31,8 +33,24 @@ namespace Aseba
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values) = 0;
 	};
 	
+	class LinearCameraViewVariablesDialog : public QDialog
+	{
+		Q_OBJECT
+		
+	public:
+		QComboBox* redVariable;
+		QComboBox* greenVariable;
+		QComboBox* blueVariable;
+		QComboBox* valuesRanges;
+		
+		LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel);
+		virtual ~LinearCameraViewVariablesDialog() {}
+	};
+	
 	class LinearCameraViewPlugin: public VariablesViewPlugin
 	{
+		Q_OBJECT
+		
 	public:
 		LinearCameraViewPlugin(TargetVariablesModel* variablesModel);
 		
