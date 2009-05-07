@@ -55,6 +55,7 @@ namespace Aseba
 		};
 		
 	public:
+		TargetVariablesModel() { setSupportedDragActions(Qt::CopyAction); }
 		virtual ~TargetVariablesModel();
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -67,6 +68,9 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		
+		QStringList mimeTypes () const;
+		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
 		
 		const QList<Variable>& getVariables() { return variables; }
 		

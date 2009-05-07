@@ -56,7 +56,7 @@ namespace Aseba
 		valuesRanges->addItem(tr("percent range (0–100)"));
 		
 		const QList<TargetVariablesModel::Variable>& variables(variablesModel->getVariables());
-		for (size_t i = 0; i < variables.size(); ++i)
+		for (int i = 0; i < variables.size(); ++i)
 		{
 			redVariable->addItem(variables[i].name);
 			greenVariable->addItem(variables[i].name);

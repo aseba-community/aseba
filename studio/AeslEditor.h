@@ -78,7 +78,7 @@ namespace Aseba
 		void breakpointClearedAll();
 		
 	public:
-		AeslEditor() { debugging = false; }
+		AeslEditor();
 		virtual ~AeslEditor() { }
 		virtual void contextMenuEvent ( QContextMenuEvent * e );
 	
@@ -86,6 +86,8 @@ namespace Aseba
 		bool debugging;
 	
 	protected:
+		virtual void dragEnterEvent(QDragEnterEvent *event);
+		virtual void dropEvent(QDropEvent *event);
 		virtual void keyPressEvent(QKeyEvent * event);
 	};
 	

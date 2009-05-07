@@ -149,7 +149,12 @@ namespace Aseba
 				return 0;
 		}
 		else
-			return Qt::ItemIsEnabled; //| Qt::ItemIsSelectable;
+		{
+			if (index.parent().isValid())
+				return Qt::ItemIsEnabled;
+			else
+				return Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable;
+		}
 	}
 	
 	bool TargetVariablesModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -182,6 +187,30 @@ namespace Aseba
 			}
 		}
 		return false;
+	}
+	
+	QStringList TargetVariablesModel::mimeTypes () const
+	{
+		QStringList types;
+		types << "text/plain";
+		return types;
+	}
+	
+	QMimeData * TargetVariablesModel::mimeData ( const QModelIndexList & indexes ) const
+	{
+		QString texts;
+		foreach (QModelIndex index, indexes)
+		{
+			if (index.isValid())
+			{
+				QString text = data(index, Qt::DisplayRole).toString();
+				texts += text;
+			}
+		}
+		
+		QMimeData *mimeData = new QMimeData();
+		mimeData->setText(texts);
+		return mimeData;
 	}
 	
 	void TargetVariablesModel::updateVariablesStructure(const Compiler::VariablesMap *variablesMap)

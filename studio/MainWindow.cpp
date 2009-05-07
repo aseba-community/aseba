@@ -102,15 +102,7 @@ namespace Aseba
 	void ScriptTab::createEditor()
 	{
 		// editor widget
-		QFont font;
-		font.setFamily("");
-		font.setStyleHint(QFont::TypeWriter);
-		font.setFixedPitch(true);
-		font.setPointSize(10);
-
 		editor = new AeslEditor;
-		editor->setFont(font);
-		editor->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
 		highlighter = new AeslHighlighter(editor, editor->document());
 	}
 	
@@ -214,6 +206,10 @@ namespace Aseba
 		vmMemoryView->setItemDelegate(new SpinBoxDelegate(-32768, 32767, this));
 		vmMemoryView->setColumnWidth(0, 200-QFontMetrics(QFont()).width("-8888888##"));
 		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-8888888##"));
+		vmMemoryView->setSelectionMode(QAbstractItemView::SingleSelection);
+		vmMemoryView->setSelectionBehavior(QAbstractItemView::SelectItems);
+		vmMemoryView->setDragDropMode(QAbstractItemView::DragOnly);
+		vmMemoryView->setDragEnabled(true);
 		//vmMemoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//vmMemoryView->setHeaderHidden(true);
 		

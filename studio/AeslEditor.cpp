@@ -174,6 +174,35 @@ namespace Aseba
 		}
 	}
 	
+	AeslEditor::AeslEditor() :
+		debugging(false)
+	{
+		QFont font;
+		font.setFamily("");
+		font.setStyleHint(QFont::TypeWriter);
+		font.setFixedPitch(true);
+		font.setPointSize(10);
+		setFont(font);
+		setAcceptDrops(true);
+		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+	}
+	
+	void AeslEditor::dragEnterEvent(QDragEnterEvent *event)
+	{
+		//if (event->mimeData()->hasText())
+			event->acceptProposedAction();
+	}
+	
+	void AeslEditor::dropEvent(QDropEvent *event)
+	{
+		if (event->mimeData()->hasText())
+		{
+			insertPlainText(event->mimeData()->text());
+			event->acceptProposedAction();
+			setFocus(Qt::MouseFocusReason);
+		}
+	}
+	
 	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )
 	{
 		// create menu
