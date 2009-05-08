@@ -475,13 +475,13 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	CORCON |= 0b11110001; // 40 bits mode, saturation enable, integer mode.
 	// Do NOT save the accumulator values, so do NOT USE THIS FUNCTION IN INTERRUPT ! 	
 	asm __volatile__ (
-	"clr A\r\n"							//	A = 0
-	"do %[loop_cnt], 1f	\r\n"		//	Iterate loop_cnt time the tree  following instructions
-	"mov [%[ptr1]++], w4 \r\n"		//	Load w4
-	"mov [%[ptr2]++], w5 \r\n"		// 	Load w5
-	"1: mac w4*w5, A \r\n"			//	A += w4 * w5
+	"clr A\r\n"									//	A = 0
+	"mov [%[ptr1]++], w4 \r\n"					// Preload ptr
+	"do %[loop_cnt], 1f	\r\n"					//	Iterate loop_cnt time the two following instructions
+	"mov [%[ptr2]++], w5 \r\n"					// 	Load w5
+	"1: mac w4*w5, A, [%[ptr1]]+=2, w4 \r\n"	//	A += w4 * w5, prefetch ptr1 into w4
 	: /* No output */
-	: [loop_cnt] "r" (length), [ptr1] "r" (&vm->variables[src1]), [ptr2] "r" (&vm->variables[src2])
+	: [loop_cnt] "r" (length), [ptr1] "x" (&vm->variables[src1]), [ptr2] "r" (&vm->variables[src2])
 	: "cc", "w4", "w5" );
 	
 	if(shift > 16) {
