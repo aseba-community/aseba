@@ -1,4 +1,4 @@
-Le language d'Aseba
+Le langage d'Aseba
 Stéphane Magnenat
 
 %! Encoding: utf-8
@@ -8,7 +8,7 @@ Stéphane Magnenat
 %!postproc(tex): Aseba \\textsc{Aseba}
 %!postproc(tex): \t '    '
 
-Le language de programmation d'aseba permet de programmer le comportement des noeuds aseba.
+Le langage de programmation d'aseba permet de programmer le comportement des noeuds aseba.
 Syntaxiquement, ce langage ressemble à //matlab//: cette ressemblance permet aux développeurs ayant des connaissances préalables sur les langages de scripts de se sentir à l'aise et d'apprendre rapidement.
 Sémantiquement, c'est un langage de programmation impératif avec un seul type simple (nombres entiers signés sur 16 bits) et des tableaux.
 Cette simplicité permet aux développeurs sans connaissances préalables d'un système de type de programmer des comportement ; les nombres entiers étant le type de variable le plus naturel.
@@ -154,7 +154,7 @@ callsub toto
 
 = Fonctions natives =
 
-Nous avons conçu le language de script d'aseba simple afin de permettre une compréhension aisée par des développeurs novices et pour implémenter la machine virtuelle efficacement.
+Nous avons conçu le langage de script d'aseba simple afin de permettre une compréhension aisée par des développeurs novices et pour implémenter la machine virtuelle efficacement.
 Pour implémenter des calculs complexes ou lourds, nous fournissons des fonctions natives implémentées en code natif pour une exécution rapide.
 Par exemple, une fonction native est la solution de choix pour effectuer un calcul de produit scalaire.
 

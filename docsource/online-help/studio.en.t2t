@@ -1,0 +1,53 @@
+An overview of Studio
+Stéphane Magnenat
+
+%! Encoding: utf-8
+%!postproc(html): aseba '<span style="font-variant: small-caps;">aseba</span>'
+%!postproc(tex): aseba \\textsc{aseba}
+%!postproc(html): Aseba '<span style="font-variant: small-caps;">Aseba</span>'
+%!postproc(tex): Aseba \\textsc{Aseba}
+%!postproc(tex): \t '    '
+
+Aseba Studio is an integrated development environment within which we edit and debug the scripts of all nodes of an aseba network.
+
+[studio.png]
+
+Studio provides the following features:
+
+- ``Concurrent editing (1).``
+Within Studio, each node of an aseba network has its own tab with its script, memory content, execution status, and debugging commands.
+In addition, a toolbar provides general commands which affect all the nodes.
+This allows both an overall control of the network and a specific control of each node.
+
+- ``Powerful editor (2).``
+The script editor provides syntax highlighting, indentations of block, and dragging of variables' names from memory.
+It also shows the current position of execution in step by step mode and colors errors in red.
+
+- ``Instant compilation (3).``
+Studio recompiles the script while the developer is typing it.
+The result of compilation (success or a description of the error) is displayed below the editor.
+This permits the correction of errors as soon as they appear, which increases the quality of the code.
+
+- ``Data inspection (4).``
+Studio lists the variables available on each node with their values.
+We can update this list in a single click.
+This list provides a quick overview of the state of the node.
+
+- ``Debugger (5).``
+Studio integrates a debugger; for each node, it gives the current execution status.
+It supports continuous execution, step by step, and breakpoints.
+A right click inside the script editor allows to set or clear a breakpoint on a specific line.
+After a breakpoint or a step, the values of the variables are updated.
+
+- ``Constants definition (6).``
+We can define constants that are available on all the nodes.
+
+- ``Network-wide events (7).``
+We can specify the names of the events, and by double-clicking on a name, we can send the corresponding event.
+Below the list of events names, a log shows the recent events along with their time stamp and parameters.
+This allows the monitoring of the distributed behavior in the network.
+
+- ``Local events and native functions (8)``
+Studio shows the local events available on each node.
+It also lists its native functions.
+The tooltip of each function gives a short documentation.
