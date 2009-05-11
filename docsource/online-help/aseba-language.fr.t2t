@@ -2,11 +2,13 @@ Le langage d'Aseba
 Stéphane Magnenat
 
 %! Encoding: utf-8
-%!postproc(html): aseba '<span style="font-variant: small-caps;">aseba</span>'
+%!postproc(html): '(aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
 %!postproc(tex): aseba \\textsc{aseba}
-%!postproc(html): Aseba '<span style="font-variant: small-caps;">Aseba</span>'
+%!postproc(html): '(Aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
 %!postproc(tex): Aseba \\textsc{Aseba}
 %!postproc(tex): \t '    '
+
+Voir aussi: [Studio studio.fr.html]
 
 Le langage de programmation d'aseba permet de programmer le comportement des noeuds aseba.
 Syntaxiquement, ce langage ressemble à //matlab//: cette ressemblance permet aux développeurs ayant des connaissances préalables sur les langages de scripts de se sentir à l'aise et d'apprendre rapidement.

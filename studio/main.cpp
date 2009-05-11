@@ -40,11 +40,14 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	
+	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	
 	// override dashel signal handling
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
 	
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	
 	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));

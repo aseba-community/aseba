@@ -2,11 +2,13 @@ The Aseba Language
 Stéphane Magnenat
 
 %! Encoding: utf-8
-%!postproc(html): aseba '<span style="font-variant: small-caps;">aseba</span>'
+%!postproc(html): '(aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
 %!postproc(tex): aseba \\textsc{aseba}
-%!postproc(html): Aseba '<span style="font-variant: small-caps;">Aseba</span>'
+%!postproc(html): '(Aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
 %!postproc(tex): Aseba \\textsc{Aseba}
 %!postproc(tex): \t '    '
+
+See also: [Studio studio.en.html]
 
 The aseba programming language allows to implement distributed control inside aseba nodes.
 Syntactically, this language resembles //matlab//; this similarity allows developers with previous knowledge of some scripting language to feel quickly at ease with aseba and thus lowers the learning curve.

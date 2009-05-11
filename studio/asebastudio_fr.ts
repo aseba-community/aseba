@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="fr">
+<defaultcodec></defaultcodec>
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -546,7 +547,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="1902"/>
         <source>Export &amp;memories content...</source>
-        <translation>Exporter le contenu de la &amp;mémoire</translation>
+        <translation>Exporter le contenu de la &amp;mémoire...</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="1936"/>
@@ -596,7 +597,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="2007"/>
         <source>&amp;Language</source>
-        <translation>&amp;Language</translation>
+        <translation>&amp;Langage</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="2067"/>
@@ -626,7 +627,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="848"/>
         <source> (not available)</source>
-        <translation type="unfinished"></translation>
+        <translation>(pas disponible)</translation>
     </message>
 </context>
 <context>
@@ -767,7 +768,7 @@ event %0 : </source>
         <location filename="LocalVirtualMachine.cpp" line="48"/>
         <source>Assertion at 0x%0 (sp = %2):
 </source>
-        <translation>Assertion à 0x%0 (sp = %2):(new line)</translation>
+        <translation>Assertion à 0x%0 (sp = %2):</translation>
     </message>
     <message>
         <location filename="LocalVirtualMachine.cpp" line="51"/>

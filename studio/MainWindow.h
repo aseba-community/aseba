@@ -25,6 +25,7 @@ class QListWidget;
 class QListWidgetItem;
 class QTreeView;
 class QTranslator;
+class QTextBrowser;
 
 namespace Aseba
 {
@@ -253,6 +254,9 @@ namespace Aseba
 		void sourceChanged();
 		
 		void addPluginLinearCameraView();
+		
+		void showHelpLanguage();
+		void showHelpStudio();
 	
 	private:
 		// utility functions
@@ -323,7 +327,7 @@ namespace Aseba
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		QString actualFileName; //!< name of opened file, "" if new
 		bool sourceModified; //!< true if source code has been modified since last save
-		QTextEdit* helpViewer;
+		QTextBrowser* helpViewer;
 		
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;
