@@ -32,6 +32,7 @@
 	<file>images/reset.png</file>
 	<file>images/newmsg.png</file>
 	<file>images/network.png</file>
-	<file>doc/aseba-language.en.html</file>
+	<file>doc/aseba-language.en.xhtml</file>
+	<file>doc/aseba-language.fr.xhtml</file>
 </qresource>
 </RCC>

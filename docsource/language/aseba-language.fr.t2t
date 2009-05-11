@@ -1,0 +1,174 @@
+Le language d'Aseba
+Stéphane Magnenat
+
+%! Encoding: utf-8
+%!postproc(html): aseba '<span style="font-variant: small-caps;">aseba</span>'
+%!postproc(tex): aseba \\textsc{aseba}
+%!postproc(html): Aseba '<span style="font-variant: small-caps;">Aseba</span>'
+%!postproc(tex): Aseba \\textsc{Aseba}
+%!postproc(tex): \t '    '
+
+Le language de programmation d'aseba permet de programmer le comportement des noeuds aseba.
+Syntaxiquement, ce langage ressemble à //matlab//: cette ressemblance permet aux développeurs ayant des connaissances préalables sur les langages de scripts de se sentir à l'aise et d'apprendre rapidement.
+Sémantiquement, c'est un langage de programmation impératif avec un seul type simple (nombres entiers signés sur 16 bits) et des tableaux.
+Cette simplicité permet aux développeurs sans connaissances préalables d'un système de type de programmer des comportement ; les nombres entiers étant le type de variable le plus naturel.
+De plus, les nombres entiers sont particulièrement adaptés aux robots à microcontrolleurs.
+
+= Commentaires =
+
+Les commentaires commencent avec un //#// et finissent à la fin de la ligne.
+
+Exemple :
+```
+# ceci est un commentaire
+var b	# un autre commentaire
+```
+
+= Variables =
+
+Les variables font référence soit à des valeurs scalaires, soit à des tableaux de valeurs scalaires.
+Les valeurs sont comprises entre -32768 et 32767, ce qui correspond à la plage des nombres entiers signés sur 16 bits.
+Nous pouvons accéder aux éléments des tableaux avec l'opérateur parenthèse carrée ; l'index des tableaux com-
+mence à zéro.
+Vous devez déclarer toutes les variables que vous définissez au début du script aseba avant tout traitement.
+
+Exemple :
+```
+var a
+var c[10]
+var b = 0
+var d[3] = 2, 3, 4
+```
+
+= Événements =
+
+Aseba est une architecture //basée sur des événements//, c'est à dire que les événements déclenchent l'exécution du code de façon asynchrone.
+Les événements peuvent être externes, par exemple un événement défini par l'utilisateur venant d'un autre noeud aseba, ou internes, par exemple émis par un capteur qui possède un valeur nouvellement acquise.
+La réception d'un événement exécute, si défini, le bloc de code commençant par le mot clé ``onevent`` suivi du nom de l'événement.
+Le code au début du script est exécuté quand ce dernier est chargé ou au reset.
+Un script peut aussi envoyer des événements en utilisant le mot clé ``emit``, suivi par le nom de l'événement ainsi que du nom de la variable à envoyer, s'il y a lieu.
+Si une variable est fournie, la taille de l'événement doit correspondre à celle de l'argument à envoyer.
+Les événements permettent ainsi à un script de déclencher l'exécution de code sur un autre noued ou de communiquer avec un programme externe.
+
+Afin de permettre l'exécution du code lors de la réception d'un nouvel événement, le script ne doit pas bloquer et donc ne pas contenir de boucle infinie.
+Par exemple dans le contexte de la robotique, où un programme de contrôle de robot traditionnel travaillerait à l'intérieur d'une boucle infinie, un script aseba ferait simplement le travail lors d'un événement lié aux capteurs.
+
+Exemple :
+```
+var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+	emit valeurs_des_capteurs valeurs_des_capteurs_de_proximite
+end
+```
+
+= Expressions et assignations =
+
+Les expressions permettent les calculs mathématiques et sont écrites en syntaxe mathématique infixée commune.
+L'assignation utilise le mot clé ``=`` et affecte le résultat du calcul d'une expression à une variable scalaire ou à l'élément d'un tableau.
+Aseba fournit, par ordre de précédence, les opérateurs ``*``, ``/``, ``%`` (modulo); suivi par ``+`` et ``-``; suivi par ``<<`` (décalage à gauche) and ``>>`` (décalage à droite).
+Pour évaluer une expression dans un ordre différent, nous pouvons utiliser une paire de parenthèses afin de grouper une sous-expression.
+
+Exemple :
+```
+a = 1 + 1
+b = b + d[0]
+b = (a - 7) % 5
+c[a] = d[a]
+```
+
+= Conditions =
+
+Aseba fournit deux types de conditions : ``if`` et ``when``.
+Les opérateurs de comparaison sont ``==``, ``!=``, ``>``, ``>=``, ``<`` et``<=``.
+Les comparaisons peuvent être groupées en utilisant les opérateurs ``and``, ``or``, ``not`` et les parenthèses.
+
+Tant ``if`` que ``when`` exécutent un bloc de code différent selon qu'une condition est vraie ou fausse ; mais ``when`` exécute le
+bloc correspondant à vrai seulement si la dernière évaluation de la condition était fausse et que l'évaluation courante est vraie.
+Cette différentiation permet l'exécution de code seulement quand quelque chose change.
+
+Exemple :
+```
+if a - b > c[0] then
+	c[0] = a
+else
+	b = 0
+end
+when a > b do
+	leds[0] = 1
+end
+```
+Ici le bloc ``when`` s'exécute seulement quand ``a`` //devient// plus grand que ``b``.
+
+= Boucles =
+
+Deux constructions permettent la création de boucles : ``while`` et ``for``.
+Une boucle ``while`` exécute un bloc de code plusieurs fois tant qu'une condition est vraie.
+La condition est de même type que celle utilisée par ``if``.
+
+Exemple:
+```
+while i < 10 do
+	v = v + i * i
+	i = i + 1
+end
+```
+
+Une boucle ``for`` fait itérer une variable sur un intervalle d'entiers, avec en option une taille de pas.
+
+Exemple:
+```
+for i in 1:10 do
+	v = v + i * i
+end
+for i in 30:1 step -3 do
+	v = v - i * i
+end
+```
+
+= Sous-routines =
+
+Lorsque vous effectuez une même suite d'opérations à plusieurs endroits dans le code, il est bon de mettre le code commun une seule fois dans une sous-routine, puis d'appeler cette dernière depuis les divers endroits.
+Vous pouvez définir une sous-routine en utilisant le mot-clé ``sub`` suivi du nom de la sous-routine.
+Vous pouvez appeler la sous-routine en utilisant le mot-clé ``callsub`` suivi du nom de la sous-routine.
+Les sous-routines ne peuvent pas avoir d'arguments, ni être récursives, que ce soit directement ou indirectement.
+Les sous-routines peuvent accéder à toutes les variables.
+
+Exemple:
+```
+var v = 0
+
+sub toto
+v = 1
+
+onevent test
+callsub toto
+```
+
+= Fonctions natives =
+
+Nous avons conçu le language de script d'aseba simple afin de permettre une compréhension aisée par des développeurs novices et pour implémenter la machine virtuelle efficacement.
+Pour implémenter des calculs complexes ou lourds, nous fournissons des fonctions natives implémentées en code natif pour une exécution rapide.
+Par exemple, une fonction native est la solution de choix pour effectuer un calcul de produit scalaire.
+
+Les fonctions natives sont sûrs, dans le sens qu'elles spécifient et vérifient les tailles de leurs arguments, qui peuvent être des constantes, des variables ou des accès à des tableaux.
+Dans ces derniers, nous pouvons accéder à tout le tableau, à un élément discret ou à un sous-intervalle du tableau.
+Les fonctions natives prennent leurs arguments par référence et peuvent modifier leurs contenus, mais ne retournent aucune valeur. Les fonctions natives sont appellées par le mot-clé ``call``.
+
+Exemple:
+```
+var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)
+```

@@ -1019,7 +1019,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Create the world
-	Enki::World world(140, 140);
+	Enki::World world(140, 140, Enki::Color(0.9, 0.9, 0.9));
 	
 	// Add feeders
 	Enki::EPuckFeeder* feeders[4];

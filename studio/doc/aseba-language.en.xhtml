@@ -13,19 +13,60 @@
 <h2>Stéphane Magnenat</h2>
 </div>
 
+<p></p>
+<hr class="light" />
+<p></p>
+  <ul>
+  <li><a href="#toc1">Comments</a>
+  </li>
+  <li><a href="#toc2">Variables</a>
+  </li>
+  <li><a href="#toc3">Events</a>
+  </li>
+  <li><a href="#toc4">Expressions and Assignations</a>
+  </li>
+  <li><a href="#toc5">Conditionals</a>
+  </li>
+  <li><a href="#toc6">Loops</a>
+  </li>
+  <li><a href="#toc7">Subroutines</a>
+  </li>
+  <li><a href="#toc8">Natives Functions</a>
+  </li>
+  </ul>
+
+<p></p>
+<hr class="light" />
+<p></p>
 <p>
-The aseba programming language aims at supporting the distributed control facilities that aseba provides.
+The aseba programming language allows to implement distributed control inside aseba nodes.
 Syntactically, this language resembles <i>matlab</i>; this similarity allows developers with previous knowledge of some scripting language to feel quickly at ease with aseba and thus lowers the learning curve.
 Semantically, it is a simple imperative programming language with a single basic type (16 bit signed integers) and arrays.
 This simplicity allows developers to program behaviours with no prior knowledge of a type system, integers being the most natural type of variables and well suited for programming microcontroller-based mobile robots.
 </p>
+<a id="toc1" name="toc1"></a>
+<h1>Comments</h1>
+<p>
+Comments begin with a <i>#</i> and terminate at the end of the line.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  # this is a comment
+  var b	# another comment
+</pre>
+<p></p>
+<a id="toc2" name="toc2"></a>
 <h1>Variables</h1>
 <p>
 Variables refer either to single scalar values or to arrays of scalar values.
 The values are comprised between -32768 and 32767, which is the range of 16 bit signed integers.
 You can access arrays elements using the usual square parenthesis operator; arrays indexes begin at zero.
-You must declare all user-defined variables at the top of the aseba script before doing any processing.
-For instance:
+You must declare all user-defined variables at the beginning of the aseba script before doing any processing.
+</p>
+<p>
+Example:
 </p>
 <pre>
   var a
@@ -34,19 +75,22 @@ For instance:
   var d[3] = 2, 3, 4
 </pre>
 <p></p>
+<a id="toc3" name="toc3"></a>
 <h1>Events</h1>
 <p>
 Aseba is an <i>event-based</i> architecture, which means that events trigger code execution asynchronously.
 Events can be external, for instance a user-defined event coming from another aseba node, or internal, for instance emitted by a sensor which provides updated data.
 The reception of an event executes, if defined, the block of code that begins with the <code>onevent</code> keyword followed by the name of the event; the code at the top of the script is executed when the script is started or reset.
-The script can also send events by using the <code>emit</code> keyword, followed by the name of the variable to send, if any.
+The script can also send events by using the <code>emit</code> keyword, followed by the name of the event and the name of the variable to send, if any.
 If a variable is provided, the size of the event must match the size of the argument to emit.
 Events allow the script to trigger the execution of code on another node or to communicate with an external program.
 </p>
 <p>
 To allow the execution of related code upon new events, scripts must not block and thus not contain any infinite loop.
 For instance in the context of robotics, where a traditional robot control program would do some processing inside an infinite loop, an aseba script would just do the processing inside a sensor-related event.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   var run = 0
@@ -63,13 +107,16 @@ For instance:
   end
 </pre>
 <p></p>
+<a id="toc4" name="toc4"></a>
 <h1>Expressions and Assignations</h1>
 <p>
 Expressions allow mathematical computations and are written using the normal mathematical infix syntax.
 Assignations use the keyword <code>=</code> and set the result of the computation of an expression to a scalar variable or to an array element.
 Aseba provides, by order of precedence, the operators <code>*</code>, <code>/</code>, <code>%</code> (modulo); followed by <code>+</code> and <code>-</code>; followed by <code>&lt;&lt;</code> (left shift) and <code>&gt;&gt;</code> (right shift).
 To evaluate an expression in a different order, you can use a pair of parenthesis to group a sub-expression.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   a = 1 + 1
@@ -78,6 +125,7 @@ For instance:
   c[a] = d[a]
 </pre>
 <p></p>
+<a id="toc5" name="toc5"></a>
 <h1>Conditionals</h1>
 <p>
 Aseba provides two types of conditionals: <code>if</code> and <code>when</code>.
@@ -86,7 +134,9 @@ Comparison operators are <code>==</code>, <code>!=</code>, <code>&gt;</code>, <c
 <p>
 Both <code>if</code> and <code>when</code> execute a different block of code whether a condition is true or false; but <code>when</code> executes the block corresponding to true only if the last evaluation of the condition was false and the current is true.
 This allows the execution of code only when something changes.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   if a - b &gt; c[0] then
@@ -99,8 +149,9 @@ For instance:
   end
 </pre>
 <p>
-Here <code>when</code> evaluates to true only when <code>a</code> <i>becomes</i> bigger than <code>b</code>.
+Here <code>when</code> bloc executes only when <code>a</code> <i>becomes</i> bigger than <code>b</code>.
 </p>
+<a id="toc6" name="toc6"></a>
 <h1>Loops</h1>
 <p>
 Two constructs allow the creation of loops: <code>while</code> and <code>for</code>.
@@ -108,7 +159,9 @@ Two constructs allow the creation of loops: <code>while</code> and <code>for</co
 <p>
 A <code>while</code> loop repeatedly executes a block of code as long as the condition is true.
 The condition is of the same form as the one <code>if</code> uses.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   while i &lt; 10 do
@@ -119,7 +172,9 @@ For instance:
 <p></p>
 <p>
 A <code>for</code> loop allows a variable to iterate over a range of integers, with an optional step size.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   for i in 1:10 do
@@ -130,13 +185,17 @@ For instance:
   end
 </pre>
 <p></p>
+<a id="toc7" name="toc7"></a>
 <h1>Subroutines</h1>
 <p>
-When you perform the same operation at two or more different places in the code, you can write the common code only once in a subroutine and then call this subroutine.
-You define a subroutine using the <code>sub</code> keyword followed by the name of the subroutine and call the subroutine using the <code>callsub</code> keyword, also followed by the name of the subroutine.
+When you perform the same sequence of operations at two or more different places in the code, you can write the common code only once in a subroutine and then call this subroutine from different places.
+You define a subroutine using the <code>sub</code> keyword followed by the name of the subroutine.
+You call the subroutine using the <code>callsub</code> keyword, followed by the name of the subroutine.
 Subroutines cannot have arguments, nor be recursive, either directly or indirectly.
 Subroutines can access any variable.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   var v = 0
@@ -148,6 +207,7 @@ For instance:
   callsub toto
 </pre>
 <p></p>
+<a id="toc8" name="toc8"></a>
 <h1>Natives Functions</h1>
 <p>
 We designed aseba script to be simple to allow a quick understanding even by novice developers and to implement the virtual machine efficiently on a microcontroller.
@@ -159,7 +219,9 @@ Native functions are safe, as they specify and check the size of their arguments
 In the latter, you can access the whole array, a single element, or a sub-range of the array.
 Native functions take their arguments as reference and can modify their contents but do not return any value.
 You can use native functions through the <code>call</code> keyword.
-For instance:
+</p>
+<p>
+Example:
 </p>
 <pre>
   var a[3] = 1, 2, 3
@@ -170,17 +232,7 @@ For instance:
   call math.dot(d, a, c[0:2], 3)
   call math.dot(a[0], c[0:2], 3)
 </pre>
-<p></p>
-<h1>Comments</h1>
-<p>
-Comments begin with a <i>#</i> and terminate at the end of the line.
-For instance:
-</p>
-<pre>
-  # this is a comment
-  var b	# another comment
-</pre>
 
 <!-- xhtml code generated by txt2tags 2.3 (http://txt2tags.sf.net) -->
-<!-- cmdline: txt2tags -t xhtml -i docsource/language/aseba-language.en.t2t -o studio/doc/aseba-language.en.html -->
+<!-- cmdline: txt2tags -t xhtml -\-toc /home/nct/data/epfl-lsro/aseba/docsource/language/aseba-language.en.t2t -->
 </body></html>

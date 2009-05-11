@@ -90,6 +90,7 @@ namespace Aseba
 		
 	public:
 		Dashel::Stream* stream;
+		QString language;
 		
 	public:
 		DashelInterface(QVector<QTranslator*> translators);
@@ -151,6 +152,8 @@ namespace Aseba
 	public:
 		DashelTarget(QVector<QTranslator*> translators);
 		~DashelTarget();
+		
+		virtual QString getLanguage() const { return dashelInterface.language; }
 		
 		virtual void disconnect();
 		

@@ -5,7 +5,6 @@ Studio
 features
 - help menu
 	-> discover studio
-	-> language
 	-> FAQ
 - selective hide of events
 - move events

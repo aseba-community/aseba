@@ -211,8 +211,9 @@ namespace Aseba
 				//qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
 				stream = Hub::connect(targetSelector.getTarget());
 				assert(translators.size() == 2);
-				translators[0]->load(QString("qt_") + targetSelector.getLocaleName(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-				translators[1]->load(QString(":/asebastudio_") + targetSelector.getLocaleName());
+				language = targetSelector.getLocaleName();
+				translators[0]->load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+				translators[1]->load(QString(":/asebastudio_") + language);
 				break;
 			}
 			catch (DashelException e)
