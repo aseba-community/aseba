@@ -17,6 +17,8 @@ binary-arch:
 	install -d debian/tmp/DEBIAN
 	install -d debian/tmp/usr/bin
 	install -d debian/tmp/usr/share/doc/aseba
+	install -d debian/tmp/usr/share/doc/aseba/example-code
+	install -d debian/tmp/usr/share/doc/aseba/example-scenarios
 #	cp changelog debian/tmp/usr/share/doc/aseba/changelog
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
@@ -25,7 +27,10 @@ binary-arch:
 	cp ${ASEBA_BUILD_DIR}/dump/asebadump debian/tmp/usr/bin
 	cp ${ASEBA_BUILD_DIR}/cmd/asebacmd debian/tmp/usr/bin
 	cp ${ASEBA_BUILD_DIR}/targets/challenge/asebachallenge debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/targets/enki-marxbot/asebamarxbot debian/tmp/usr/bin
+	cp ${ASEBA_BUILD_DIR}/targets/playground/asebaplayground debian/tmp/usr/bin
+	cp targets/playground/unifr.playground debian/tmp/usr/share/doc/aseba/example-scenarios
+	cp targets/challenge/examples/challenge-goto-energy.aesl debian/tmp/usr/share/doc/aseba/example-code
+	cp debian/README.Debian debian/tmp/usr/share/doc/aseba/
 	dpkg-shlibdeps debian/tmp/usr/bin/*
 	dpkg-gencontrol -isp
 	chown -R root.root debian/tmp
