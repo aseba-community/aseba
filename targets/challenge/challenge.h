@@ -38,6 +38,7 @@
 class QPushButton;
 class QCheckBox;
 class QComboBox;
+class QTextBrowser;
 
 namespace Enki
 {
@@ -52,6 +53,8 @@ namespace Enki
 		QPushButton* delRobotButton;
 		QCheckBox* autoCameraButtons;
 		QCheckBox* hideButtons;
+		QPushButton* helpButton;
+		QTextBrowser* helpViewer;
 		
 		QFont titleFont;
 		QFont entryFont;
@@ -59,6 +62,9 @@ namespace Enki
 		
 	public:
 		ChallengeViewer(World* world, int ePuckCount);
+	
+	signals:
+		void windowClosed();
 	
 	protected slots:
 		void addNewRobot();	
@@ -69,6 +75,7 @@ namespace Enki
 		virtual void mouseMoveEvent ( QMouseEvent * event );
 		virtual void keyPressEvent ( QKeyEvent * event );
 		virtual void keyReleaseEvent ( QKeyEvent * event );
+		virtual void closeEvent ( QCloseEvent * event );
 		
 		void drawQuad2D(double x, double y, double w, double ar);
 		
