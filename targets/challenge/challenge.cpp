@@ -600,7 +600,8 @@ namespace Enki
 		helpViewer->moveCursor(QTextCursor::Start);
 		helpViewer->setWindowTitle(tr("Aseba Challenge Help"));
 		
-		// TODO: setup transparent with style sheet
+		// TODO: setup transparent with combination of reading of doc / stylesheet
+		
 		connect(addRobotButton, SIGNAL(clicked()), SLOT(addNewRobot()));
 		connect(delRobotButton, SIGNAL(clicked()), SLOT(removeRobot()));
 		connect(helpButton, SIGNAL(clicked()), helpViewer, SLOT(show()));
@@ -671,6 +672,7 @@ namespace Enki
 				delRobotButton->show();
 				autoCameraButtons->show();
 				hideButtons->show();
+				helpButton->show();
 			}
 			if (!isInButtonArea && addRobotButton->isVisible())
 			{
@@ -678,6 +680,7 @@ namespace Enki
 				delRobotButton->hide();
 				autoCameraButtons->hide();
 				hideButtons->hide();
+				helpButton->hide();
 			}
 		}
 		

@@ -195,12 +195,8 @@ namespace Aseba
 	
 	void AeslEditor::dropEvent(QDropEvent *event)
 	{
-		if (event->mimeData()->hasText())
-		{
-			insertPlainText(event->mimeData()->text());
-			event->acceptProposedAction();
-			setFocus(Qt::MouseFocusReason);
-		}
+		QTextEdit::dropEvent(event);
+		setFocus(Qt::MouseFocusReason);
 	}
 	
 	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )
