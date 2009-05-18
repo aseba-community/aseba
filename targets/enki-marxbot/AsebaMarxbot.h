@@ -51,12 +51,28 @@ namespace Enki
 	*/
 	class AsebaMarxbot : public Marxbot, public Dashel::Hub
 	{
-	private:
-		/*struct Event
+	public:
+		struct Event
 		{
 			unsigned short source;
 			std::valarray<unsigned char> data;
-		}*/
+			
+			Event(unsigned short source, const uint8* data, uint16 length) :
+				source(source),
+				data(length)
+			{
+				memcpy(&this->data[0], data, length);
+			}
+			
+			Event(Dashel::Stream* stream)
+			{
+				uint16 len;
+				stream->read(&len, 2);
+				stream->read(&source, 2);
+				data.resize(len+2);
+				stream->read(&data[0], data.size());
+			}
+		};
 		
 		struct Module
 		{
@@ -66,8 +82,11 @@ namespace Enki
 			std::valarray<unsigned short> bytecode;
 			std::valarray<signed short> stack;
 			//std::deque<Event> events;
+			
+			std::deque<Event> events;
 		};
 		
+	private:
 		struct BaseVariables
 		{
 			sint16 id;
@@ -114,13 +133,10 @@ namespace Enki
 		Module proximitySensors;
 		Module distanceSensors;
 		
-		std::vector<Module *> modules;
-		static int marxbotNumber;
-		
 	public:
 		// public because accessed from a glue function
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
+		std::vector<Module *> modules;
+		static int marxbotNumber;
 		
 	public:
 		

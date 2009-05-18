@@ -59,24 +59,51 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
-	Dashel::Stream* stream = asebaSocketMaps[vm]->stream;
+	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
+	Dashel::Stream* stream = marxBot.stream;
 	assert(stream);
 	
+	// send to stream
 	uint16 len = length - 2;
 	stream->write(&len, 2);
 	stream->write(&vm->nodeId, 2);
 	stream->write(data, length);
 	stream->flush();
+	
+	// push to other nodes
+	for (size_t i = 0; i < marxBot.modules.size(); ++i)
+	{
+		Enki::AsebaMarxbot::Module& module = *(marxBot.modules[i]);
+		if (&(module.vm) != vm) 
+		{
+			module.events.push_back(Enki::AsebaMarxbot::Event(vm->nodeId, data, length));
+			AsebaProcessIncomingEvents(&(module.vm));
+		}
+	}
 }
 
 extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
 {
-	if (asebaSocketMaps[vm]->lastMessageData.size())
+	// TODO: improve this, it is rather ugly
+	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
+	for (size_t i = 0; i < marxBot.modules.size(); ++i)
 	{
-		*source = asebaSocketMaps[vm]->lastMessageSource;
-		memcpy(data, &asebaSocketMaps[vm]->lastMessageData[0], asebaSocketMaps[vm]->lastMessageData.size());
+		Enki::AsebaMarxbot::Module& module = *(marxBot.modules[i]);
+		if (&(module.vm) == vm)
+		{
+			if (module.events.empty())
+				return 0;
+				
+			const Enki::AsebaMarxbot::Event& event = module.events.front();
+			*source = event.source;
+			size_t length = event.data.size();
+			length = std::min<size_t>(length, maxLength);
+			memcpy(data, &event.data[0], length);
+			module.events.pop_front();
+			return length;
+		}
 	}
-	return asebaSocketMaps[vm]->lastMessageData.size();
+	return 0;
 }
 
 extern "C" AsebaVMDescription vmLeftMotorDescription;
@@ -318,14 +345,15 @@ namespace Enki
 	
 	void AsebaMarxbot::incomingData(Stream *stream)
 	{
-		uint16 len;
-		stream->read(&len, 2);
-		stream->read(&lastMessageSource, 2);
-		lastMessageData.resize(len+2);
-		stream->read(&lastMessageData[0], lastMessageData.size());
+		Event event(stream);
 		
-		for (size_t i = 0; i < modules.size(); i++)
-			AsebaProcessIncomingEvents(&(modules[i]->vm));
+		// push to other nodes
+		for (size_t i = 0; i < modules.size(); ++i)
+		{
+			Module& module = *(modules[i]);
+			module.events.push_back(event);
+			AsebaProcessIncomingEvents(&(module.vm));
+		}
 	}
 	
 	void AsebaMarxbot::connectionClosed(Dashel::Stream *stream, bool abnormal)
