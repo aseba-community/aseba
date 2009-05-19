@@ -1,3 +1,26 @@
+/*
+	Aseba - an event-based framework for distributed robot control
+	Copyright (C) 2007--2009:
+		Stephane Magnenat <stephane at magnenat dot net>
+		(http://stephane.magnenat.net)
+		and other contributors, see authors.txt for details
+		Mobots group, Laboratory of Robotics Systems, EPFL, Lausanne
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	any other version as decided by the two original authors
+	Stephane Magnenat and Valentin Longchamp.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -8,6 +31,7 @@
 #include <QTableView>
 #include <QSplitter>
 #include <QTextEdit>
+#include <QMultiMap>
 
 #include "CustomDelegate.h"
 
@@ -38,6 +62,7 @@ namespace Aseba
 	class NamedValuesVectorModel;
 	class AeslEditor;
 	class AeslHighlighter;
+	class EventViewer;
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -217,6 +242,7 @@ namespace Aseba
 		void tabChanged(int);
 		void sendEvent();
 		void sendEventIf(const QModelIndex &);
+		void eventContextMenuRequested(const QPoint & pos);
 		void logEntryDoubleClicked(QListWidgetItem *);
 		void showCompilationMessages(bool doShown);
 		
@@ -264,7 +290,7 @@ namespace Aseba
 		NodeTab* getTabFromId(unsigned node);
 		NodeTab* getTabFromName(const QString& name);
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
-		void clearAbsentNodesTabs();
+		void clearDocumentSpecificTabs();
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
@@ -281,6 +307,15 @@ namespace Aseba
 		friend class NodeTab;
 		QTabWidget* nodes;
 		ScriptTab* previousActiveTab;
+		
+		#ifdef HAVE_QWT
+		
+		// events viewers. only one event per viewer
+		friend class EventViewer;
+		typedef QMultiMap<unsigned, EventViewer*> EventViewers;
+		EventViewers eventsViewers;
+		
+		#endif // HAVE_QWT
 		
 		// events
 		QPushButton* addEventNameButton;

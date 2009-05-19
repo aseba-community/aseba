@@ -21,48 +21,44 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAMED_VALUES_VECTOR_MODEL_H
-#define NAMED_VALUES_VECTOR_MODEL_H
+#ifndef EVENT_VIEWER_H
+#define EVENT_VIEWER_H
 
-#include <QAbstractTableModel>
-#include <QVector>
-#include <QString>
-#include "../compiler/compiler.h"
+#ifdef HAVE_QWT
 
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_legend.h>
+
+#include <QTime>
+
+#include "MainWindow.h"
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
-	class NamedValuesVectorModel: public QAbstractTableModel
+		
+	class EventViewer:  public QwtPlot
 	{
-		Q_OBJECT
+	protected:
+		unsigned eventId;
+		MainWindow::EventViewers* eventsViewers;
+		
+		std::vector<VariablesDataVector> values;
+		std::vector<double> timeStamps;
+		QTime startingTime;
 	
 	public:
-		NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers);
+		virtual ~EventViewer();
 		
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
-		
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
-		
-		bool setData(const QModelIndex &index, const QVariant &value, int role);
-		
-	public slots:
-		void addNamedValue(const NamedValue& namedValue);
-		void delNamedValue(int index);
-		void clear();
-		
-	private:
-		NamedValuesVector* namedValues;
-		QString tooltipText;
+		void addData(const VariablesDataVector& data);
 	};
 	
 	/*@}*/
 }; // Aseba
 
-#endif
+#endif // HAVE_QWT
+
+#endif // EVENT_VIEWER_H

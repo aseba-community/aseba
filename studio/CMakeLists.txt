@@ -3,6 +3,9 @@ find_package(Qt4)
 if (QT4_FOUND)
 	include(${QT_USE_FILE})
 	
+	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)
+	find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
+	
 	set(studio_SRCS
 		AeslEditor.cpp
 		MainWindow.cpp
@@ -13,7 +16,8 @@ if (QT4_FOUND)
 		CustomDelegate.cpp
 		main.cpp
 		Target.cpp
-		VariablesViewPlugin.cpp)
+		VariablesViewPlugin.cpp
+		EventViewer.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	
@@ -23,34 +27,19 @@ if (QT4_FOUND)
 	
 	add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles})
 	
+	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+		message(STATUS "Qwt found")
+		include_directories (${QWT_INCLUDE_DIR})
+		set(EXTRA_LIBS ${EXTRA_LIBS} ${QWT_LIBRARIES})
+		add_definitions(-DHAVE_QWT)
+	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+		message(STATUS "Qwt not found")
+	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+	
 	# Only include the qtmain lib if we are on the windows platform
 	if (WIN32)
 		target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTXML_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS})
 	else (WIN32)
 		target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS})
 	endif (WIN32)
-	
-	
-	
-# 	find_package(OpenGL REQUIRED)
-# 	
-# 	include(${QT_USE_FILE})
-	
-# 	set(viewer_lib_SRCS Viewer.cpp objects/EPuckBody.cpp objects/EPuckRest.cpp objects/EPuckRing.cpp objects/EPuckWheelLeft.cpp objects/EPuckWheelRight.cpp)
-# 	set(viewer_test_SRCS Studio.cpp)
-# 	
-# 	qt4_automoc(${viewer_lib_SRCS})
-# 	qt4_automoc(${viewer_test_SRCS})
-# 	
-# 	qt4_add_resources(viewer_lib_RCC_SRCS textures.qrc)
-# 	
-# 	include_directories (${enki_SOURCE_DIR} ${QT_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
-# 	
-# 	link_directories (${enki_BINARY_DIR})
-# 	
-# 	add_library (enkiviewer ${viewer_lib_SRCS} ${viewer_lib_RCC_SRCS})
-# 	add_executable(enkistudio ${viewer_test_SRCS})
-# 	
-# 	target_link_libraries(enkistudio enkiviewer enki ${QT_QTOPENGL_LIBRARIES} ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
-	
 endif (QT4_FOUND)

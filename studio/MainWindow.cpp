@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2006 - 2008:
+	Copyright (C) 2007--2009:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -29,6 +29,7 @@
 #include "CustomDelegate.h"
 #include "AeslEditor.h"
 #include "VariablesViewPlugin.h"
+#include "EventViewer.h"
 #include "../common/consts.h"
 #include <QtGui>
 #include <QtXml>
@@ -790,7 +791,7 @@ namespace Aseba
 	
 	void MainWindow::newFile()
 	{
-		clearAbsentNodesTabs();
+		clearDocumentSpecificTabs();
 		// we must only have NodeTab* left.
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -826,7 +827,7 @@ namespace Aseba
 			// TODO: clear constants
 			// TODO: clear events
 			int noNodeCount = 0;
-			clearAbsentNodesTabs();
+			clearDocumentSpecificTabs();
 			actualFileName = fileName;
 			QDomNode domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
@@ -1111,6 +1112,7 @@ namespace Aseba
 			if (tab)
 				tab->clearExecutionErrors();
 		}
+		logger->setStyleSheet("");
 	}
 	
 	void MainWindow::uploadReadynessChanged()
@@ -1191,6 +1193,27 @@ namespace Aseba
 			sendEvent();
 	}
 	
+	void MainWindow::eventContextMenuRequested(const QPoint & pos)
+	{
+		#ifdef HAVE_QWT
+		QModelIndex index(eventsDescriptionsView->indexAt(pos));
+		if (index.isValid() && (index.column() == 0))
+		{
+			QString eventName(eventsDescriptionsModel->data(index).toString());
+			QMenu menu;
+			menu.addAction(tr("Plot event %1").arg(eventName));
+			QAction* ret = menu.exec(eventsDescriptionsView->mapToGlobal(pos));
+			if (ret)
+			{
+				const unsigned eventId = index.row();
+				const unsigned eventVariablesCount = eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 1)).toUInt();
+				const QString tabTitle(tr("plot of %1").arg(eventName));
+				nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle);
+			}
+		}
+		#endif // HAVE_QWT
+	}
+	
 	void MainWindow::logEntryDoubleClicked(QListWidgetItem * item)
 	{
 		if (item->data(Qt::UserRole).type() == QVariant::Point)
@@ -1233,40 +1256,44 @@ namespace Aseba
 		// reconnect to new
 		if (index >= 0)
 		{
-			ScriptTab *tab = polymorphic_downcast<ScriptTab*>(nodes->widget(index));
-			
-			connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
-			connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-			
-			NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
-			if (nodeTab)
+			ScriptTab *tab = dynamic_cast<ScriptTab*>(nodes->widget(index));
+			if (tab)
 			{
-				connect(cutAct, SIGNAL(triggered()), tab->editor, SLOT(cut()));
-				connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
-				connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
-				connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
+				connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
+				connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 				
-				connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-				connect(tab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
-				connect(tab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+				NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
+				if (nodeTab)
+				{
+					connect(cutAct, SIGNAL(triggered()), tab->editor, SLOT(cut()));
+					connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
+					connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
+					connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
+					
+					connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+					connect(tab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
+					connect(tab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+					
+					if (compilationMessageBox->isVisible())
+						nodeTab->recompile();
+					
+					target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
+					
+					showCompilationMsg->setEnabled(true);
+				}
+				else
+					showCompilationMsg->setEnabled(false);
 				
-				if (compilationMessageBox->isVisible())
-					nodeTab->recompile();
+				// TODO: it would be nice to find a way to setup this correctly
+				cutAct->setEnabled(false);
+				copyAct->setEnabled(false);
+				undoAct->setEnabled(false);
+				redoAct->setEnabled(false);
 				
-				target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
-				
-				showCompilationMsg->setEnabled(true);
+				previousActiveTab = tab;
 			}
 			else
-				showCompilationMsg->setEnabled(false);
-			
-			// TODO: it would be nice to find a way to setup this correctly
-			cutAct->setEnabled(false);
-			copyAct->setEnabled(false);
-			undoAct->setEnabled(false);
-			redoAct->setEnabled(false);
-			
-			previousActiveTab = tab;
+				previousActiveTab = 0;
 		}
 		else
 			previousActiveTab = 0;
@@ -1473,6 +1500,15 @@ namespace Aseba
 			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 		logger->scrollToBottom();
+		
+		#ifdef HAVE_QWT
+		
+		// iterate over all viewer for this event
+		QList<EventViewer*> viewers = eventsViewers.values(id);
+		for (int i = 0; i < viewers.size(); ++i)
+			viewers.at(i)->addData(data);
+		
+		#endif // HAVE_QWT
 	}
 	
 	//! Some user events have been dropped, i.e. not sent to the gui
@@ -1485,6 +1521,7 @@ namespace Aseba
 			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 		logger->scrollToBottom();
+		logger->setStyleSheet(" QListView::item { background: rgb(255,128,128); }");
 	}
 	
 	//! A node did an access out of array bounds exception.
@@ -1621,7 +1658,7 @@ namespace Aseba
 		return 0;
 	}
 	
-	void MainWindow::clearAbsentNodesTabs()
+	void MainWindow::clearDocumentSpecificTabs()
 	{
 		bool changed = false;
 		do
@@ -1629,8 +1666,13 @@ namespace Aseba
 			changed = false;
 			for (int i = 0; i < nodes->count(); i++)
 			{
-				AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
-				if (tab)
+				QWidget* tab = nodes->widget(i);
+				
+				#ifdef HAVE_QWT
+				if (dynamic_cast<AbsentNodeTab*>(tab) || dynamic_cast<EventViewer*>(tab))
+				#else // HAVE_QWT
+				if (dynamic_cast<AbsentNodeTab*>(tab))
+				#endif // HAVE_QWT
 				{
 					nodes->removeTab(i);
 					delete tab;
@@ -1729,6 +1771,7 @@ namespace Aseba
 		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
 		eventsDescriptionsView->resizeRowsToContents();
+		eventsDescriptionsView->setContextMenuPolicy(Qt::CustomContextMenu);
 		
 		QGridLayout* eventsLayout = new QGridLayout;
 		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")),0,0);
@@ -1806,6 +1849,7 @@ namespace Aseba
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
+		connect(eventsDescriptionsView, SIGNAL(customContextMenuRequested ( const QPoint & )), SLOT(eventContextMenuRequested(const QPoint & )));
 		
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
