@@ -28,6 +28,8 @@
 
 #ifdef HAVE_QWT
 
+#include <qwt_data.h>
+
 namespace Aseba
 {
 	/** \addtogroup studio */
@@ -51,7 +53,6 @@ namespace Aseba
 	};
 	
 	EventViewer::EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers) :
-		QwtPlot(QwtText(QString(tr("Plot for event %1 (number %2)")).arg(eventName).arg(eventId))),
 		eventId(eventId),
 		eventsViewers(eventsViewers),
 		values(eventVariablesCount),
