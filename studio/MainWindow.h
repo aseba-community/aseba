@@ -32,6 +32,7 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <QMultiMap>
+#include <QTabWidget>
 
 #include "CustomDelegate.h"
 
@@ -44,7 +45,6 @@ class QLabel;
 class QSpinBox;
 class QGroupBox;
 class QPushButton;
-class QTabWidget;
 class QListWidget;
 class QListWidgetItem;
 class QTreeView;
@@ -63,6 +63,7 @@ namespace Aseba
 	class AeslEditor;
 	class AeslHighlighter;
 	class EventViewer;
+	class EditorsPlotsTabWidget;
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -83,6 +84,17 @@ namespace Aseba
 	
 	protected:
 		virtual void resizeEvent ( QResizeEvent * event );
+	};
+
+	class EditorsPlotsTabWidget: public QTabWidget
+	{
+		Q_OBJECT
+
+	public:
+		void addTab(QWidget* widget, const QString& label, bool closable = false);
+
+	public slots:
+		void removeAndDeleteTab(int index = -1);
 	};
 	
 	class MainWindow;
@@ -240,7 +252,6 @@ namespace Aseba
 		
 		void uploadReadynessChanged();
 		void tabChanged(int);
-		void removeTab();
 		void sendEvent();
 		void sendEventIf(const QModelIndex &);
 		void eventContextMenuRequested(const QPoint & pos);
@@ -279,6 +290,7 @@ namespace Aseba
 		void rebootAllNodes();
 		
 		void sourceChanged();
+		void updateWindowTitle();
 		
 		void addPluginLinearCameraView();
 		
@@ -292,6 +304,7 @@ namespace Aseba
 		NodeTab* getTabFromName(const QString& name);
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
 		void clearDocumentSpecificTabs();
+		bool askUserBeforeDiscarding();
 		
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
@@ -302,11 +315,10 @@ namespace Aseba
 		void setupMenu();
 		void hideEvent(QHideEvent * event);
 		void closeEvent ( QCloseEvent * event );
-		void updateWindowTitle();
 		
 		// tabs and nodes
 		friend class NodeTab;
-		QTabWidget* nodes;
+		EditorsPlotsTabWidget* nodes;
 		ScriptTab* previousActiveTab;
 		
 		#ifdef HAVE_QWT

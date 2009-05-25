@@ -278,10 +278,9 @@ namespace Aseba
 	
 	void UserMessage::dumpSpecific(ostream &stream)
 	{
-		stream << "user message of size " << data.size() << " : ";
-		stream << hex << setfill('0');
+		stream << dec << "user message of size " << data.size() << " : ";
 		for (size_t i = 0 ; i < data.size(); i++)
-			stream << setw(4) << (unsigned)data[i] << " ";
+			stream << setw(4) << data[i] << " ";
 		stream << dec << setfill(' ');
 	}
 	

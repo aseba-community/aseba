@@ -315,9 +315,9 @@ namespace Aseba
 		{
 			QString headingSpace("\n");
 			const QString &line = textCursor().block().text();
-			for (size_t i = 0; i < line.length(); i++)
+			for (size_t i = 0; i < (size_t)line.length(); i++)
 			{
-				const QChar c = line[(unsigned)i];
+				const QChar c = line[i];
 				if (c.isSpace())
 					headingSpace += c;
 				else

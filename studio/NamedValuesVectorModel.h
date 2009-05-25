@@ -51,6 +51,8 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		bool checkIfModified() { return wasModified; }
+		void clearWasModified() { wasModified = false; }
 		
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
@@ -60,6 +62,7 @@ namespace Aseba
 	private:
 		NamedValuesVector* namedValues;
 		QString tooltipText;
+		bool wasModified;
 	};
 	
 	/*@}*/

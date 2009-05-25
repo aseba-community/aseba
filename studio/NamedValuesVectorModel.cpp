@@ -35,7 +35,8 @@ namespace Aseba
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
-		tooltipText(tooltipText)
+		tooltipText(tooltipText),
+		wasModified(false)
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -104,6 +105,7 @@ namespace Aseba
 			{
 				namedValues->at(index.row()).value = value.toInt();
 				emit dataChanged(index, index);
+				wasModified = true;
 				return true;
 			}
 		}
@@ -119,6 +121,7 @@ namespace Aseba
 		beginInsertRows(QModelIndex(), position, position);
 		
 		namedValues->push_back(namedValue);
+		wasModified = true;
 		
 		endInsertRows();
 	}
@@ -131,6 +134,7 @@ namespace Aseba
 		beginRemoveRows(QModelIndex(), index, index);
 		
 		namedValues->erase(namedValues->begin() + index);
+		wasModified = true;
 		
 		endRemoveRows();
 	}
@@ -143,7 +147,10 @@ namespace Aseba
 			return;
 		
 		beginRemoveRows(QModelIndex(), 0, namedValues->size()-1);
+		
 		namedValues->clear();
+		wasModified = true;
+
 		endRemoveRows();
 	}
 	

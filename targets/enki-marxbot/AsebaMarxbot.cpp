@@ -94,11 +94,12 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 			if (module.events.empty())
 				return 0;
 				
-			const Enki::AsebaMarxbot::Event& event = module.events.front();
+			// I do not put const here to work around a bug in MSVC 2005 implementation of std::valarray
+			Enki::AsebaMarxbot::Event& event = module.events.front();
 			*source = event.source;
 			size_t length = event.data.size();
 			length = std::min<size_t>(length, maxLength);
-			memcpy(data, &event.data[0], length);
+			memcpy(data, &(event.data[0]), length);
 			module.events.pop_front();
 			return length;
 		}

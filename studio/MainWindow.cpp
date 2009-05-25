@@ -97,7 +97,45 @@ namespace Aseba
 		setColumnWidth(1, col1Width);
 	}
 	
+	//////
 	
+	void EditorsPlotsTabWidget::addTab(QWidget* widget, const QString& label, bool closable)
+	{
+		const int index = QTabWidget::addTab(widget, label);
+		#if QT_VERSION >= 0x040500
+		if (closable)
+		{
+			QPushButton* button = new QPushButton(QIcon(":/images/remove.png"), "");
+			button->setFlat(true);
+			connect(button, SIGNAL(clicked(bool)), this, SLOT(removeAndDeleteTab()));
+			tabBar()->setTabButton(index, QTabBar::RightSide, button);
+		}
+		#endif // QT_VERSION >= 0x040500
+	}
+
+	void EditorsPlotsTabWidget::removeAndDeleteTab(int index)
+	{
+		if (index < 0)
+		{
+			QWidget* button(polymorphic_downcast<QWidget*>(sender()));
+			for (int i = 0; i < count(); ++i)
+			{
+				if (tabBar()->tabButton(i, QTabBar::RightSide) == button)
+				{
+					index = i;
+					break;
+				}
+			}
+		}
+
+		if (index >= 0)
+		{
+			QWidget* w(widget(index));
+			QTabWidget::removeTab(index);
+			w->deleteLater();
+		}
+	}
+
 	//////
 	
 	void ScriptTab::createEditor()
@@ -736,7 +774,7 @@ namespace Aseba
 			block = block.next();
 		}
 	}
-	
+
 	
 	MainWindow::MainWindow(QVector<QTranslator*> translators, QWidget *parent) :
 		QMainWindow(parent),
@@ -791,20 +829,27 @@ namespace Aseba
 	
 	void MainWindow::newFile()
 	{
-		clearDocumentSpecificTabs();
-		// we must only have NodeTab* left.
-		for (int i = 0; i < nodes->count(); i++)
+		if (askUserBeforeDiscarding())
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			tab->editor->clear();
+			clearDocumentSpecificTabs();
+			// we must only have NodeTab* left.
+			for (int i = 0; i < nodes->count(); i++)
+			{
+				NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+				Q_ASSERT(tab);
+				tab->editor->clear();
+			}
+			constantsDefinitionsModel->clear();
+			eventsDescriptionsModel->clear();
 		}
-		// TODO: clear constants
-		// TODO: clear events
 	}
 	
 	void MainWindow::openFile(const QString &path)
 	{
+		// make sure we do not loose changes
+		if (askUserBeforeDiscarding() == false)
+			return;
+		
 		QString fileName = path;
 	
 		if (fileName.isEmpty())
@@ -872,6 +917,8 @@ namespace Aseba
 			recompileAll();
 		
 			sourceModified = false;
+			constantsDefinitionsModel->clearWasModified();
+			eventsDescriptionsModel->clearWasModified();
 			updateWindowTitle();
 		}
 		else
@@ -977,7 +1024,10 @@ namespace Aseba
 		document.save(out, 0);
 		
 		sourceModified = false;
+		constantsDefinitionsModel->clearWasModified();
+		eventsDescriptionsModel->clearWasModified();
 		updateWindowTitle();
+
 		return true;
 	}
 	
@@ -1208,12 +1258,7 @@ namespace Aseba
 				const unsigned eventId = index.row();
 				const unsigned eventVariablesCount = eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 1)).toUInt();
 				const QString tabTitle(tr("plot of %1").arg(eventName));
-				const int index = nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle);
-				#if QT_VERSION >= 0x040500
-				QPushButton* button = new QPushButton(QIcon(":/images/remove.png"), "");
-				connect(button, SIGNAL(clicked(bool)), SLOT(removeTab()));
-				nodes->tabBar()->setTabButton(index, QTabBar::RightSide, button);
-				#endif // QT_VERSION >= 0x040500
+				nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle, true);
 			}
 		}
 		#endif // HAVE_QWT
@@ -1304,13 +1349,6 @@ namespace Aseba
 			previousActiveTab = 0;
 	}
 	
-	void MainWindow::removeTab()
-	{
-		QWidget* widget(polymorphic_downcast<QWidget*>(sender()));
-		nodes->removeTab(nodes->indexOf(widget));
-		delete widget;
-	}
-	
 	void MainWindow::showCompilationMessages(bool doShow)
 	{
 		// this slot shouldn't be callable when an unactive tab is show
@@ -1334,6 +1372,7 @@ namespace Aseba
 			{
 				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdString(), 0));
 				recompileAll();
+				updateWindowTitle();
 			}
 		}
 	}
@@ -1345,6 +1384,7 @@ namespace Aseba
 		eventsDescriptionsModel->delNamedValue(currentRow.row());
 		
 		recompileAll();
+		updateWindowTitle();
 	}
 	
 	void MainWindow::eventsDescriptionsSelectionChanged()
@@ -1368,6 +1408,7 @@ namespace Aseba
 			{
 				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdString(), 0));
 				recompileAll();
+				updateWindowTitle();
 			}
 		}
 	}
@@ -1379,6 +1420,7 @@ namespace Aseba
 		constantsDefinitionsModel->delNamedValue(currentRow.row());
 		
 		recompileAll();
+		updateWindowTitle();
 	}
 	
 	void MainWindow::constantsSelectionChanged()
@@ -1476,10 +1518,8 @@ namespace Aseba
 	{
 		int index = getIndexFromId(node);
 		Q_ASSERT(index >= 0);
-		NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(index));
 		
-		nodes->removeTab(index);
-		delete tab;
+		nodes->removeAndDeleteTab(index);
 		
 		regenerateToolsMenus();
 	}
@@ -1493,7 +1533,7 @@ namespace Aseba
 			widgets[i] = nodes->widget(i);
 		nodes->clear();
 		for (size_t i = 0; i < widgets.size(); i++)
-			delete widgets[i];
+			widgets[i]->deleteLater();
 		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
 	}
 	
@@ -1686,8 +1726,7 @@ namespace Aseba
 				if (dynamic_cast<AbsentNodeTab*>(tab))
 				#endif // HAVE_QWT
 				{
-					nodes->removeTab(i);
-					delete tab;
+					nodes->removeAndDeleteTab(i);
 					changed = true;
 					break;
 				}
@@ -1699,7 +1738,7 @@ namespace Aseba
 	void MainWindow::setupWidgets()
 	{
 		previousActiveTab = 0;
-		nodes = new QTabWidget;
+		nodes = new EditorsPlotsTabWidget;
 		nodes->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
 		QSplitter *splitter = new QSplitter();
@@ -1861,8 +1900,9 @@ namespace Aseba
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
+		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
 		connect(eventsDescriptionsView, SIGNAL(customContextMenuRequested ( const QPoint & )), SLOT(eventContextMenuRequested(const QPoint & )));
-		
+
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
 		connect(clearLogger, SIGNAL(clicked()), SLOT(clearAllExecutionError()));
@@ -1872,6 +1912,7 @@ namespace Aseba
 		connect(removeConstantButton, SIGNAL(clicked()), SLOT(removeConstantClicked()));
 		connect(constantsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(constantsSelectionChanged()));
 		connect(constantsDefinitionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
+		connect(constantsDefinitionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
 		
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
@@ -2083,53 +2124,69 @@ namespace Aseba
 		compilationMessageBox->hide();
 	}
 	
+	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
+	/*!
+		\return true if it is ok to discard, false if operation must abort
+	*/
+	bool MainWindow::askUserBeforeDiscarding()
+	{
+		const bool anythingModified = sourceModified || constantsDefinitionsModel->checkIfModified() || eventsDescriptionsModel->checkIfModified();
+		if (anythingModified == false)
+			return true;
+
+		QString docName(tr("Untitled"));
+		if (!actualFileName.isEmpty())
+			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
+		
+		QMessageBox msgBox;
+		msgBox.setText(tr("The document \"%0\" has been modified.").arg(docName));
+		msgBox.setInformativeText(tr("Do you want to save your changes or discard them?"));
+		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+		msgBox.setDefaultButton(QMessageBox::Save);
+		
+		int ret = msgBox.exec();
+		switch (ret)
+		{
+			case QMessageBox::Save:
+				// Save was clicked
+				if (save())
+					return true;
+				else
+					return false;
+			case QMessageBox::Discard:
+				// Don't Save was clicked
+				return true;
+			case QMessageBox::Cancel:
+				// Cancel was clicked
+				return false;
+			default:
+				// should never be reached
+				assert(false);
+				break;
+		}
+
+		return false;
+	}
+
 	void MainWindow::closeEvent ( QCloseEvent * event )
 	{
-		if (sourceModified)
+		if (askUserBeforeDiscarding())
 		{
-			QString docName(tr("Untitled"));
-			if (!actualFileName.isEmpty())
-				docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
-			
-			QMessageBox msgBox;
-			msgBox.setText(tr("The document \"%0\" has been modified.").arg(docName));
-			msgBox.setInformativeText(tr("Do you want to save your changes or discard them?"));
-			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-			msgBox.setDefaultButton(QMessageBox::Save);
-			
-			int ret = msgBox.exec();
-			switch (ret)
-			{
-				case QMessageBox::Save:
-					// Save was clicked
-					if (save())
-						event->accept();
-					else
-						event->ignore();
-					break;
-				case QMessageBox::Discard:
-					// Don't Save was clicked
-					event->accept();
-					break;
-				case QMessageBox::Cancel:
-					// Cancel was clicked
-					event->ignore();
-					break;
-				default:
-					// should never be reached
-					assert(false);
-					break;
-			}
-		}
-		
-		if (event->isAccepted())
+			event->accept();
 			emit MainWindowClosed();
+		}
+		else
+		{
+			event->ignore();
+		}
 	}
 	
 	void MainWindow::updateWindowTitle()
 	{
+		const bool anythingModified = sourceModified || constantsDefinitionsModel->checkIfModified() || eventsDescriptionsModel->checkIfModified();
+		
 		QString modifiedText;
-		if (sourceModified)
+		if (anythingModified)
 			modifiedText = tr("[modified] ");
 			
 		QString docName(tr("Untitled"));

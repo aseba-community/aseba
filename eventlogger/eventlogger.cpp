@@ -6,6 +6,11 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+
+#ifdef _MSC_VER
+#define QWT_DLL
+#endif // _MSC_VER
+
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_legend.h>

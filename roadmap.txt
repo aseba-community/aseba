@@ -3,9 +3,6 @@
 Studio
 
 features
-- help menu
-	-> discover studio
-	-> FAQ
 - selective hide of events
 - move events
 - tree for variables
