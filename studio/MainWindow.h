@@ -240,6 +240,7 @@ namespace Aseba
 		
 		void uploadReadynessChanged();
 		void tabChanged(int);
+		void removeTab();
 		void sendEvent();
 		void sendEventIf(const QModelIndex &);
 		void eventContextMenuRequested(const QPoint & pos);

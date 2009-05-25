@@ -1208,7 +1208,12 @@ namespace Aseba
 				const unsigned eventId = index.row();
 				const unsigned eventVariablesCount = eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 1)).toUInt();
 				const QString tabTitle(tr("plot of %1").arg(eventName));
-				nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle);
+				const int index = nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle);
+				#if QT_VERSION >= 0x040500
+				QPushButton* button = new QPushButton(QIcon(":/images/remove.png"), "");
+				connect(button, SIGNAL(clicked(bool)), SLOT(removeTab()));
+				nodes->tabBar()->setTabButton(index, QTabBar::RightSide, button);
+				#endif // QT_VERSION >= 0x040500
 			}
 		}
 		#endif // HAVE_QWT
@@ -1297,6 +1302,13 @@ namespace Aseba
 		}
 		else
 			previousActiveTab = 0;
+	}
+	
+	void MainWindow::removeTab()
+	{
+		QWidget* widget(polymorphic_downcast<QWidget*>(sender()));
+		nodes->removeTab(nodes->indexOf(widget));
+		delete widget;
 	}
 	
 	void MainWindow::showCompilationMessages(bool doShow)
