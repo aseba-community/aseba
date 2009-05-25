@@ -115,6 +115,7 @@ namespace Aseba
 
 	void EditorsPlotsTabWidget::removeAndDeleteTab(int index)
 	{
+		#if QT_VERSION >= 0x040500
 		if (index < 0)
 		{
 			QWidget* button(polymorphic_downcast<QWidget*>(sender()));
@@ -127,6 +128,7 @@ namespace Aseba
 				}
 			}
 		}
+		#endif // QT_VERSION >= 0x040500
 
 		if (index >= 0)
 		{
