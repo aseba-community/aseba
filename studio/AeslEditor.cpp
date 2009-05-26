@@ -317,7 +317,7 @@ namespace Aseba
 			const QString &line = textCursor().block().text();
 			for (size_t i = 0; i < (size_t)line.length(); i++)
 			{
-				const QChar c = line[i];
+				const QChar c(line[(unsigned)i]);
 				if (c.isSpace())
 					headingSpace += c;
 				else
