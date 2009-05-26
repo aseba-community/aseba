@@ -13,9 +13,9 @@ Voir aussi: [Le langage d'Aseba aseba-language.fr.html]
 Aseba Studio est un environnement de développement intégré dans lequel nous éditons et debugons les scripts pour tous
 les noeuds d'un réseau aseba.
 
-[studio.png]
+= Fonctionnalités =
 
-Il fournit les fonctionnalités suivantes :
+[studio.png]
 
 - **Édition concurrente (1).**
 Chaque noeud possède son propre onglet avec son script, le contenu de sa mémoire, son statut d'exécution et ses commandes de debug.
@@ -54,3 +54,8 @@ Ceci permet d'inspecter le comportement distribué du réseau.
 Studio liste les événements locaux disponibles sur chaque noeud.
 Il liste aussi ses fonctions natives.
 La bulle d'aide de chaque fonction donne une brève documentation.
+
+
+= Astuces =
+
+- Vous pouvez glisser les noms des variables, des fonctions natives, des événements et des constantes et ainsi avoir moins de texte à taper.

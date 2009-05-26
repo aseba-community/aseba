@@ -12,9 +12,9 @@ See also: [The Aseba language aseba-language.en.html]
 
 Aseba Studio is an integrated development environment within which we edit and debug the scripts of all nodes of an aseba network.
 
-[studio.png]
+= Features =
 
-Studio provides the following features:
+[studio.png]
 
 - **Concurrent editing (1).**
 Within Studio, each node of an aseba network has its own tab with its script, memory content, execution status, and debugging commands.
@@ -53,3 +53,8 @@ This allows the monitoring of the distributed behavior in the network.
 Studio shows the local events available on each node.
 It also lists its native functions.
 The tooltip of each function gives a short documentation.
+
+
+= Tips =
+
+- You can drag the names of variables, native functions, events, and constants and thus save typing.
