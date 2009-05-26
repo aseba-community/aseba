@@ -43,7 +43,8 @@ namespace Aseba
 	
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
-		namedValues(namedValues)
+		namedValues(namedValues),
+		wasModified(false)
 	{
 		Q_ASSERT(namedValues);
 	}
