@@ -50,6 +50,9 @@ namespace Aseba
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
+		QStringList mimeTypes () const;
+		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
+		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }

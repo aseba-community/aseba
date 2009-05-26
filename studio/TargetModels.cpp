@@ -316,24 +316,28 @@ namespace Aseba
 		QString name;
 		QString toolTip;
 		bool enabled;
+		bool draggable;
 		
 		TreeItem() :
 			parent(0),
 			name("root"),
-			enabled(true)
+			enabled(true),
+			draggable(false)
 		{ }
 		
-		TreeItem(TreeItem* parent, const QString& name, bool enabled) :
+		TreeItem(TreeItem* parent, const QString& name, bool enabled, bool draggable) :
 			parent(parent),
 			name(name),
-			enabled(enabled)
+			enabled(enabled),
+			draggable(draggable)
 		{ }
 		
-		TreeItem(TreeItem* parent, const QString& name, const QString& toolTip, bool enabled) :
+		TreeItem(TreeItem* parent, const QString& name, const QString& toolTip, bool enabled, bool draggable) :
 			parent(parent),
 			name(name),
 			toolTip(toolTip),
-			enabled(enabled)
+			enabled(enabled),
+			draggable(draggable)
 		{ }
 		
 		~TreeItem()
@@ -348,7 +352,7 @@ namespace Aseba
 				if (children[i]->name == name)
 					return children[i];
 			
-			children.push_back(new TreeItem(this, name, enabled));
+			children.push_back(new TreeItem(this, name, enabled, draggable));
 			return children.last();
 		}
 	};
@@ -362,6 +366,7 @@ namespace Aseba
 		regExp("\\b")
 	{
 		Q_ASSERT(descriptionRead);
+		setSupportedDragActions(Qt::CopyAction);
 		recreateTreeFromDescription(false);
 	}
 	
@@ -458,7 +463,7 @@ namespace Aseba
 				entry = entry->getEntry(splittedName[j], entry->enabled);
 			
 			// for last entry
-			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i]), entry->enabled));
+			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i]), entry->enabled, true));
 		}
 		
 		reset();
@@ -521,10 +526,40 @@ namespace Aseba
 	{
 		TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 		if (item)
-			return (item->enabled ? Qt::ItemIsEnabled : QFlags<Qt::ItemFlag>());
+		{
+			QFlags<Qt::ItemFlag> flags;
+			flags |= item->enabled ? Qt::ItemIsEnabled : QFlags<Qt::ItemFlag>();
+			flags |= item->draggable ? Qt::ItemIsDragEnabled | Qt::ItemIsSelectable : QFlags<Qt::ItemFlag>();
+			return flags;
+		}
 		else
 			return Qt::ItemIsEnabled;
 	}
+	
+	QStringList TargetFunctionsModel::mimeTypes () const
+	{
+		QStringList types;
+		types << "text/plain";
+		return types;
+	}
+	
+	QMimeData * TargetFunctionsModel::mimeData ( const QModelIndexList & indexes ) const
+	{
+		QString texts;
+		foreach (QModelIndex index, indexes)
+		{
+			if (index.isValid())
+			{
+				QString text = data(index, Qt::DisplayRole).toString();
+				texts += text;
+			}
+		}
+		
+		QMimeData *mimeData = new QMimeData();
+		mimeData->setText(texts);
+		return mimeData;
+	}
+	
 	
 	/*@}*/
 }; // Aseba

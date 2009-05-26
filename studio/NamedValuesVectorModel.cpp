@@ -92,9 +92,33 @@ namespace Aseba
 	Qt::ItemFlags NamedValuesVectorModel::flags(const QModelIndex & index) const
 	{
 		if (index.column() == 0)
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 		else
 			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	}
+	
+	QStringList NamedValuesVectorModel::mimeTypes () const
+	{
+		QStringList types;
+		types << "text/plain";
+		return types;
+	}
+	
+	QMimeData * NamedValuesVectorModel::mimeData ( const QModelIndexList & indexes ) const
+	{
+		QString texts;
+		foreach (QModelIndex index, indexes)
+		{
+			if (index.isValid() && (index.column() == 0))
+			{
+				QString text = data(index, Qt::DisplayRole).toString();
+				texts += text;
+			}
+		}
+		
+		QMimeData *mimeData = new QMimeData();
+		mimeData->setText(texts);
+		return mimeData;
 	}
 	
 	bool NamedValuesVectorModel::setData(const QModelIndex &index, const QVariant &value, int role)

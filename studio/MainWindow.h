@@ -64,6 +64,7 @@ namespace Aseba
 	class AeslHighlighter;
 	class EventViewer;
 	class EditorsPlotsTabWidget;
+	class DraggableListWidget;
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -207,7 +208,7 @@ namespace Aseba
 		TargetFunctionsModel *vmFunctionsModel;
 		QTreeView *vmFunctionsView;
 		
-		QListWidget* vmLocalEvents;
+		DraggableListWidget* vmLocalEvents;
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success

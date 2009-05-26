@@ -75,6 +75,32 @@ namespace Aseba
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
 	}
 
+	//////
+	
+	class DraggableListWidget: public QListWidget
+	{
+		QStringList mimeTypes () const
+		{
+			QStringList types;
+			types << "text/plain";
+			return types;
+		}
+		
+		QMimeData * mimeData ( const QList<QListWidgetItem *> items ) const
+		{
+			QString texts;
+			foreach (QListWidgetItem *item, items)
+			{
+				texts += item->text();
+			}
+			
+			QMimeData *mimeData = new QMimeData();
+			mimeData->setText(texts);
+			return mimeData;
+		}
+	};
+	
+	//////
 
 	FixedWidthTableView::FixedWidthTableView()
 	{
@@ -265,7 +291,10 @@ namespace Aseba
 		vmFunctionsView->setMinimumSize(QSize(50,40));
 		vmFunctionsView->setModel(vmFunctionsModel);
 		vmFunctionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-		vmFunctionsView->setSelectionMode(QAbstractItemView::NoSelection);	
+		vmFunctionsView->setSelectionMode(QAbstractItemView::SingleSelection);
+		vmFunctionsView->setSelectionBehavior(QAbstractItemView::SelectItems);
+		vmFunctionsView->setDragDropMode(QAbstractItemView::DragOnly);
+		vmFunctionsView->setDragEnabled(true);
 		vmFunctionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		vmFunctionsView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		#if QT_VERSION >= 0x040400
@@ -275,9 +304,11 @@ namespace Aseba
 		#endif
 		
 		// local events
-		vmLocalEvents = new QListWidget;
+		vmLocalEvents = new DraggableListWidget;
 		vmLocalEvents->setMinimumHeight(40);
-		vmLocalEvents->setSelectionMode(QAbstractItemView::NoSelection);	
+		vmLocalEvents->setSelectionMode(QAbstractItemView::SingleSelection);
+		vmLocalEvents->setDragDropMode(QAbstractItemView::DragOnly);
+		vmLocalEvents->setDragEnabled(true);
 		for (size_t i = 0; i < compiler.getTargetDescription()->localEvents.size(); i++)
 		{
 			QListWidgetItem* item = new QListWidgetItem(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].name.c_str()));
@@ -870,9 +901,7 @@ namespace Aseba
 		{
 			eventsDescriptionsModel->clear();
 			constantsDefinitionsModel->clear();
-		
-			// TODO: clear constants
-			// TODO: clear events
+			
 			int noNodeCount = 0;
 			clearDocumentSpecificTabs();
 			actualFileName = fileName;
@@ -1761,6 +1790,8 @@ namespace Aseba
 		constantsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		constantsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+		constantsView->setDragDropMode(QAbstractItemView::DragOnly);
+		constantsView->setDragEnabled(true);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
 		constantsView->setSecondColumnLongestContent("-888888##");
@@ -1820,6 +1851,8 @@ namespace Aseba
 		eventsDescriptionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		eventsDescriptionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+		eventsDescriptionsView->setDragDropMode(QAbstractItemView::DragOnly);
+		eventsDescriptionsView->setDragEnabled(true);
 		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, (ASEBA_MAX_PACKET_SIZE-6)/2, this));
 		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
