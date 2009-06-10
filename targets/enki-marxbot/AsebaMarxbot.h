@@ -32,6 +32,7 @@
 #include "../../common/consts.h"
 #include <dashel/dashel.h>
 #include <deque>
+#include <string.h>
 
 /*!	\file AsebaMarxbot.h
 	\brief Header of the aseba-enabled marXbot robot

@@ -129,6 +129,8 @@ install(FILES ${ASEBACORE_HDR_COMMON}
 
 add_subdirectory(switch)
 
+add_subdirectory(medulla)
+
 add_subdirectory(cmd)
 
 add_subdirectory(dump)
