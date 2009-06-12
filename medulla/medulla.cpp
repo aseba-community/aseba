@@ -35,6 +35,10 @@
 #include "../common/consts.h"
 #include "../common/types.h"
 #include "../utils/utils.h"
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDBusMetaType>
+#include <QtDebug>
 
 namespace Aseba 
 {
@@ -44,6 +48,154 @@ namespace Aseba
 	/** \addtogroup medulla */
 	/*@{*/
 	
+	std::vector<sint16> toAsebaVector(const Values& values)
+	{
+		std::vector<sint16> data;
+		data.reserve(values.size());
+		for (int i = 0; i < values.size(); ++i)
+			data.push_back(values[i]);
+		return data;
+	}
+	
+	Values fromAsebaVector(const std::vector<sint16>& values)
+	{
+		Values data;
+		for (size_t i = 0; i < values.size(); ++i)
+			data.push_back(values[i]);
+		return data;
+	}
+	
+	
+	AsebaNetworkInterface::AsebaNetworkInterface(Hub* hub) :
+		QDBusAbstractAdaptor(hub),
+		hub(hub)
+	{
+		qDBusRegisterMetaType<Values>();
+		
+		QDBusConnection::sessionBus().registerObject("/", hub);
+		QDBusConnection::sessionBus().registerService("ch.epfl.mobots.Aseba");
+	}
+	
+	void AsebaNetworkInterface::processMessage(Message *message)
+	{
+		DescriptionsManager::processMessage(message);
+		
+		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+		if (userMessage)
+		{
+			// TODO: process using event filter
+		}
+		
+		Variables *variables = dynamic_cast<Variables *>(message);
+		if (variables)
+		{
+			const unsigned nodeId(variables->source);
+			const unsigned pos(variables->start);
+			for (RequestsList::iterator it = pendingReads.begin(); it != pendingReads.end(); ++it)
+			{
+				RequestData* request(*it);
+				if (request->nodeId == nodeId && request->pos == pos)
+				{
+					QDBusMessage &reply(request->reply);
+					Values values(fromAsebaVector(variables->variables));
+					QDBusArgument arg;
+					arg << values;
+					reply << arg.asVariant();
+					QDBusConnection::sessionBus().send(reply);
+					delete request;
+					pendingReads.erase(it);
+					break;
+				}
+			}
+		}
+		
+		delete message;
+	}
+	
+	QStringList AsebaNetworkInterface::GetNodesList() const
+	{
+		QStringList list;
+		for (NodesNamesMap::const_iterator it = nodesNames.begin(); it != nodesNames.end(); ++it)
+		{
+			list.push_back(it.key());
+		}
+		return list;
+	}
+	
+	QStringList AsebaNetworkInterface::GetVariablesList(const QString& node) const
+	{
+		NodesNamesMap::const_iterator it(nodesNames.find(node));
+		if (it != nodesNames.end())
+		{
+			const unsigned nodeId(it.value());
+			const NodesDescriptionsMap::const_iterator descIt(nodesDescriptions.find(nodeId));
+			const NodeDescription& description(descIt->second);
+			QStringList list;
+			for (size_t i = 0; i < description.namedVariables.size(); ++i)
+			{
+				list.push_back(QString::fromStdString(description.namedVariables[i].name));
+			}
+			return list;
+		}
+		else
+		{
+			return QStringList();
+		}
+	}
+	
+	void AsebaNetworkInterface::SetVariable(const QString& node, const QString& variable, const Values& data) const
+	{
+		// TODO: generate error if bad arguments
+		NodesNamesMap::const_iterator it(nodesNames.find(node));
+		if (it != nodesNames.end())
+		{
+			const unsigned nodeId(it.value());
+			bool ok;
+			const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
+			if (ok)
+			{
+				Message* message(new SetVariables(nodeId, pos, toAsebaVector(data)));
+				hub->sendMessage(message);
+				delete message;
+			}
+		}
+	}
+	
+	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage &message)
+	{
+		// TODO: generate error if bad arguments
+		NodesNamesMap::const_iterator it(nodesNames.find(node));
+		if (it != nodesNames.end())
+		{
+			const unsigned nodeId(it.value());
+			bool ok;
+			const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
+			if (ok)
+			{
+				RequestData *request = new RequestData;
+				request->nodeId = nodeId;
+				request->pos = pos;
+				message.setDelayedReply(true);
+				request->reply = message.createReply();
+				QDBusConnection::sessionBus().send(request->reply);
+				
+				pendingReads.push_back(request);
+			}
+		}
+		return Values();
+	}
+	
+	QDBusObjectPath AsebaNetworkInterface::CreateEventFilter()
+	{
+		// TODO
+		return QDBusObjectPath();
+	}
+	
+	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
+	{
+		nodesNames[QString::fromStdString(nodesDescriptions[nodeId].name)] = nodeId;
+	}
+	
 	//! Broadcast messages form any data stream to all others data streams including itself.
 	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
 		verbose(verbose),
@@ -51,6 +203,8 @@ namespace Aseba
 		forward(forward),
 		rawTime(rawTime)
 	{
+		AsebaNetworkInterface* network(new AsebaNetworkInterface(this));
+		QObject::connect(this, SIGNAL(messageAvailable(Message*)), network, SLOT(processMessage(Message*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
@@ -117,6 +271,8 @@ namespace Aseba
 			dumpTime(cout, rawTime);
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
+		GetDescription().serialize(stream);
+		stream->flush();
 	}
 	
 	void Hub::connectionClosed(Stream* stream, bool abnormal)
@@ -206,7 +362,7 @@ int main(int argc, char *argv[])
 	try
 	{
 		for (size_t i = 0; i < additionalTargets.size(); i++)
-			((Dashel::Hub)hub).connect(additionalTargets[i]);
+			((Dashel::Hub&)hub).connect(additionalTargets[i]);
 	}
 	catch(Dashel::DashelException e)
 	{

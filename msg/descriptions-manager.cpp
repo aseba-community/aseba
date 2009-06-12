@@ -140,6 +140,19 @@ namespace Aseba
 			nodeDescriptionReceived(id);
 	}
 	
+	std::string DescriptionsManager::getNodeName(unsigned nodeId) const
+	{
+		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
+		if (it != nodesDescriptions.end())
+		{
+			return it->second.name;
+		}
+		else
+		{
+			return "";
+		}
+	}
+	
 	unsigned DescriptionsManager::getNodeId(const std::string& name, bool *ok ) const
 	{
 		// search for the first node with a given name

@@ -26,7 +26,16 @@
 
 #include <dashel/dashel.h>
 #include <QThread>
+#include <QStringList>
+#include <QDBusObjectPath>
+#include <QDBusAbstractAdaptor>
+#include <QDBusMessage>
+#include <QMetaType>
+#include <QList>
 #include "../msg/msg.h"
+#include "../msg/descriptions-manager.h"
+
+typedef QList<qint16> Values;
 
 namespace Aseba
 {
@@ -35,6 +44,60 @@ namespace Aseba
 	*/
 	/*@{*/
 	
+	class Hub;
+	
+	//! DBus interface for aseba network
+	class AsebaNetworkInterface: public QDBusAbstractAdaptor, public DescriptionsManager
+	{
+		Q_OBJECT
+		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.AsebaNetwork")
+		
+		protected:
+			struct RequestData
+			{
+				unsigned nodeId;
+				unsigned pos;
+				QDBusMessage reply;
+			};
+			
+		public:
+			AsebaNetworkInterface(Hub* hub);
+		
+		private slots:
+			friend class Hub;
+			void processMessage(Message *message);
+		
+		public slots:
+			QStringList GetNodesList() const;
+			QStringList GetVariablesList(const QString& node) const;
+			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data) const;
+			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);
+			QDBusObjectPath CreateEventFilter();
+		
+		protected:
+			virtual void nodeDescriptionReceived(unsigned nodeId);
+			
+		protected:
+			Hub* hub;
+			typedef QMap<QString, unsigned> NodesNamesMap;
+			NodesNamesMap nodesNames;
+			typedef QList<RequestData*> RequestsList;
+			RequestsList pendingReads;
+	};
+	/*
+	//! DBus interface for an event filter
+	class EventFilterInterface: public QObject
+	{
+		Q_OBJECT
+		
+		public slots:
+			void ListenEvent(quint16 event)
+			void IgnoreEvent(quint16 event)
+		
+		signals:
+			void Event(uint quint16, const Values& data);
+	};
+	*/
 	/*!
 		Route Aseba messages on the TCP part of the network.
 	*/
@@ -69,17 +132,9 @@ namespace Aseba
 			bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 	};
 	
-	class AsebaDBusInterface: public QObject
-	{
-		Q_OBJECT
-	};
-	
-	class EventFilterInterface: public QObject
-	{
-		Q_OBJECT
-	};
-	
 	/*@}*/
 };
+
+Q_DECLARE_METATYPE(Values);
 
 #endif
