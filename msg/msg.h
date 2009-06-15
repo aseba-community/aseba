@@ -607,9 +607,6 @@ namespace Aseba
 		WriteBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, dest) { }
 		
 	protected:
-		virtual void serializeSpecific() { }
-		virtual void deserializeSpecific() { }
-		virtual void dumpSpecific(std::ostream &stream) { }
 		virtual operator const char * () const { return "save bytecode"; }
 	};
 	
