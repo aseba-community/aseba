@@ -33,6 +33,9 @@
 
 
 // Aseba include
+#include <vm/natives.h>
+#include <vm/vm.h>
+
 #include <common/types.h>
 
 #include <skel-user.h>

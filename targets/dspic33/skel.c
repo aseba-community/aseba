@@ -258,6 +258,8 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 	unsigned long count;
 	unsigned int i;
 	unsigned long temp_addr = aseba_flash_ptr;
+	unsigned int instr_count;
+	unsigned char * bcptr = (unsigned char *) vm->bytecode;
 	// take the first minimum value
 	for (i = 0; i < NUMBER_OF_CHUNK; i++, temp_addr += INSTRUCTIONS_PER_PAGE * 2 * PAGE_PER_CHUNK) {
 		count = flash_read_instr(temp_addr);
@@ -282,7 +284,40 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 	flash_write_buffer((unsigned char *) vm->bytecode, VM_BYTECODE_SIZE*2);
 	flash_complete_write();
 	
-	// TODO: CHECK DATA
+	
+	// Now, check the data
+	
+	if(min != flash_read_instr(min_addr)) {
+		AsebaVMEmitNodeSpecificError(vm, "Error: Unable to flash bytecode (1) !");
+		return;
+	}	
+	min_addr += 2;
+	instr_count = (VM_BYTECODE_SIZE*2) / 3;
+
+	for(i = 0; i < instr_count; i++) {
+		unsigned char data[3];
+		flash_read_chunk(min_addr, 3, data);
+
+		if(memcmp(data, bcptr, 3)) {
+			AsebaVMEmitNodeSpecificError(vm, "Error: Unable to flash bytecode (2) !");
+			return;
+		}
+		bcptr += 3;
+		min_addr += 2;
+	}
+	
+	i = (VM_BYTECODE_SIZE * 2) % 3;
+	
+	if(i != 0) {
+		unsigned char data[2];
+		flash_read_chunk(min_addr, i, data);
+		if(memcmp(data, bcptr, i)) {
+			AsebaVMEmitNodeSpecificError(vm, "Error: Unable to flash bytecode (3) !");
+			return;
+		}
+	}
+	
+	AsebaVMEmitNodeSpecificError(vm, "Flashing OK");
 	
 }
 

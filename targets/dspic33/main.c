@@ -27,7 +27,7 @@
 
 _FWDT(FWDTEN_OFF);              // Watchdog Timer disabled
 _FOSCSEL(FNOSC_FRCPLL); // override oscillator configuration bits
-_FOSC(POSCMD_NONE & OSCIOFNC_ON);
+_FOSC(POSCMD_NONE & OSCIOFNC_ON & FCKSM_CSECMD);
 // ICD communicates on PGC1/EMUC1 and disable JTAG
 _FICD(ICS_PGD1 & JTAGEN_OFF);
 
