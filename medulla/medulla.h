@@ -45,6 +45,29 @@ namespace Aseba
 	/*@{*/
 	
 	class Hub;
+	class AsebaNetworkInterface;
+	
+	//! DBus interface for an event filter
+	class EventFilterInterface: public QObject
+	{
+		Q_OBJECT
+		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.EventFilter")
+		
+		public:
+			EventFilterInterface(AsebaNetworkInterface* network) : network(network) { ListenEvent(0); }
+			void emitEvent(const quint16 id, const Values& data);
+			
+		public slots:
+			Q_SCRIPTABLE void ListenEvent(const quint16 event);
+			Q_SCRIPTABLE void IgnoreEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void Free();
+		
+		signals:
+			Q_SCRIPTABLE void Event(const quint16, const Values& );
+		
+		protected:
+			AsebaNetworkInterface* network;
+	};
 	
 	//! DBus interface for aseba network
 	class AsebaNetworkInterface: public QDBusAbstractAdaptor, public DescriptionsManager
@@ -66,11 +89,15 @@ namespace Aseba
 		private slots:
 			friend class Hub;
 			void processMessage(Message *message);
+			friend class EventFilterInterface;
+			void listenEvent(EventFilterInterface* filter, quint16 event);
+			void ignoreEvent(EventFilterInterface* filter, quint16 event);
+			void filterDestroyed(EventFilterInterface* filter);
 		
 		public slots:
 			QStringList GetNodesList() const;
 			QStringList GetVariablesList(const QString& node) const;
-			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data) const;
+			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
 			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);
 			QDBusObjectPath CreateEventFilter();
 		
@@ -83,21 +110,11 @@ namespace Aseba
 			NodesNamesMap nodesNames;
 			typedef QList<RequestData*> RequestsList;
 			RequestsList pendingReads;
+			typedef QMultiMap<quint16, EventFilterInterface*> EventsFiltersMap;
+			EventsFiltersMap eventsFilters;
+			unsigned eventsFiltersCounter;
 	};
-	/*
-	//! DBus interface for an event filter
-	class EventFilterInterface: public QObject
-	{
-		Q_OBJECT
-		
-		public slots:
-			void ListenEvent(quint16 event)
-			void IgnoreEvent(quint16 event)
-		
-		signals:
-			void Event(uint quint16, const Values& data);
-	};
-	*/
+	
 	/*!
 		Route Aseba messages on the TCP part of the network.
 	*/

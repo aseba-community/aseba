@@ -65,10 +65,31 @@ namespace Aseba
 		return data;
 	}
 	
+	void EventFilterInterface::emitEvent(const quint16 id, const Values& data)
+	{
+		emit Event(id, data);
+	}
+	
+	void EventFilterInterface::ListenEvent(const quint16 event)
+	{
+		network->listenEvent(this, event);
+	}
+	
+	void EventFilterInterface::IgnoreEvent(const quint16 event)
+	{
+		network->ignoreEvent(this, event);
+	}
+	
+	void EventFilterInterface::Free()
+	{
+		network->filterDestroyed(this);
+		deleteLater();
+	}
 	
 	AsebaNetworkInterface::AsebaNetworkInterface(Hub* hub) :
 		QDBusAbstractAdaptor(hub),
-		hub(hub)
+		hub(hub),
+		eventsFiltersCounter(0)
 	{
 		qDBusRegisterMetaType<Values>();
 		
@@ -83,7 +104,10 @@ namespace Aseba
 		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
 		if (userMessage)
 		{
-			// TODO: process using event filter
+			Values values(fromAsebaVector(userMessage->data));
+			QList<EventFilterInterface*> filters = eventsFilters.values(userMessage->type);
+			for (int i = 0; i < filters.size(); ++i)
+				filters.at(i)->emitEvent(userMessage->type, values);
 		}
 		
 		Variables *variables = dynamic_cast<Variables *>(message);
@@ -98,9 +122,7 @@ namespace Aseba
 				{
 					QDBusMessage &reply(request->reply);
 					Values values(fromAsebaVector(variables->variables));
-					QDBusArgument arg;
-					arg << values;
-					reply << arg.asVariant();
+					reply << QVariant::fromValue(values);
 					QDBusConnection::sessionBus().send(reply);
 					delete request;
 					pendingReads.erase(it);
@@ -110,6 +132,23 @@ namespace Aseba
 		}
 		
 		delete message;
+	}
+	
+	void AsebaNetworkInterface::listenEvent(EventFilterInterface* filter, quint16 event)
+	{
+		eventsFilters.insert(event, filter);
+	}
+	
+	void AsebaNetworkInterface::ignoreEvent(EventFilterInterface* filter, quint16 event)
+	{
+		eventsFilters.remove(event, filter);
+	}
+	
+	void AsebaNetworkInterface::filterDestroyed(EventFilterInterface* filter)
+	{
+		QList<quint16> events = eventsFilters.keys(filter);
+		for (int i = 0; i < events.size(); ++i)
+			eventsFilters.remove(events.at(i), filter);
 	}
 	
 	QStringList AsebaNetworkInterface::GetNodesList() const
@@ -143,52 +182,67 @@ namespace Aseba
 		}
 	}
 	
-	void AsebaNetworkInterface::SetVariable(const QString& node, const QString& variable, const Values& data) const
+	void AsebaNetworkInterface::SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const
 	{
-		// TODO: generate error if bad arguments
 		NodesNamesMap::const_iterator it(nodesNames.find(node));
-		if (it != nodesNames.end())
+		if (it == nodesNames.end())
 		{
-			const unsigned nodeId(it.value());
-			bool ok;
-			const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
-			if (ok)
-			{
-				Message* message(new SetVariables(nodeId, pos, toAsebaVector(data)));
-				hub->sendMessage(message);
-				delete message;
-			}
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			return;
 		}
+		
+		const unsigned nodeId(it.value());
+		bool ok;
+		const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
+		if (!ok)
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+			return;
+		}
+		
+		SetVariables msg(nodeId, pos, toAsebaVector(data));
+		hub->sendMessage(&msg);
 	}
 	
 	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage &message)
 	{
-		// TODO: generate error if bad arguments
 		NodesNamesMap::const_iterator it(nodesNames.find(node));
-		if (it != nodesNames.end())
+		if (it == nodesNames.end())
 		{
-			const unsigned nodeId(it.value());
-			bool ok;
-			const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
-			if (ok)
-			{
-				RequestData *request = new RequestData;
-				request->nodeId = nodeId;
-				request->pos = pos;
-				message.setDelayedReply(true);
-				request->reply = message.createReply();
-				QDBusConnection::sessionBus().send(request->reply);
-				
-				pendingReads.push_back(request);
-			}
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			return Values();
 		}
+		
+		const unsigned nodeId(it.value());
+		bool ok1, ok2;
+		const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok1));
+		const unsigned length(getVariableSize(nodeId, variable.toStdString(), &ok2));
+		if (!(ok1 && ok2))
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+			return Values();
+		}
+		
+		{
+			GetVariables msg(nodeId, pos, length);
+			hub->sendMessage(&msg);
+		}
+		
+		RequestData *request = new RequestData;
+		request->nodeId = nodeId;
+		request->pos = pos;
+		message.setDelayedReply(true);
+		request->reply = message.createReply();
+		
+		pendingReads.push_back(request);
 		return Values();
 	}
 	
 	QDBusObjectPath AsebaNetworkInterface::CreateEventFilter()
 	{
-		// TODO
-		return QDBusObjectPath();
+		QDBusObjectPath path(QString("/events_filters/%0").arg(eventsFiltersCounter++));
+		QDBusConnection::sessionBus().registerObject(path.path(), new EventFilterInterface(this), QDBusConnection::ExportScriptableContents);
+		return path;
 	}
 	
 	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
@@ -356,8 +410,6 @@ int main(int argc, char *argv[])
 	}
 	
 	Aseba::Hub hub(port, verbose, dump, forward, rawTime);
-	
-	// TODO: add d-bus
 	
 	try
 	{
