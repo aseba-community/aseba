@@ -1027,27 +1027,30 @@ namespace Aseba
 		// source code
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			const ScriptTab* tab = polymorphic_downcast<const ScriptTab*>(nodes->widget(i));
-			QString nodeName;
-			
-			const NodeTab* nodeTab = dynamic_cast<const NodeTab*>(tab);
-			if (nodeTab)
-				nodeName = target->getName(nodeTab->nodeId());
-			
-			const AbsentNodeTab* absentNodeTab = dynamic_cast<const AbsentNodeTab*>(tab);
-			if (absentNodeTab)
-				nodeName = absentNodeTab->name;
-			
-			const QString& nodeContent = tab->editor->toPlainText();
-			
-			root.appendChild(document.createTextNode("\n\n\n"));
-			root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
-			
-			QDomElement element = document.createElement("node");
-			element.setAttribute("name", nodeName);
-			QDomText text = document.createTextNode(nodeContent);
-			element.appendChild(text);
-			root.appendChild(element);
+			const ScriptTab* tab = dynamic_cast<const ScriptTab*>(nodes->widget(i));
+			if (tab)
+			{
+				QString nodeName;
+				
+				const NodeTab* nodeTab = dynamic_cast<const NodeTab*>(tab);
+				if (nodeTab)
+					nodeName = target->getName(nodeTab->nodeId());
+				
+				const AbsentNodeTab* absentNodeTab = dynamic_cast<const AbsentNodeTab*>(tab);
+				if (absentNodeTab)
+					nodeName = absentNodeTab->name;
+				
+				const QString& nodeContent = tab->editor->toPlainText();
+				
+				root.appendChild(document.createTextNode("\n\n\n"));
+				root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
+				
+				QDomElement element = document.createElement("node");
+				element.setAttribute("name", nodeName);
+				QDomText text = document.createTextNode(nodeContent);
+				element.appendChild(text);
+				root.appendChild(element);
+			}
 		}
 		root.appendChild(document.createTextNode("\n\n\n"));
 		
