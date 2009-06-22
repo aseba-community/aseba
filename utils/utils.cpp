@@ -45,15 +45,20 @@ namespace Aseba
 		stream << "[";
 		if (raw)
 		{
+			long ts, tms;
 			#ifndef WIN32
 			struct timeval tv;
 			gettimeofday(&tv, NULL);
-			stream << std::dec << tv.tv_sec << "." << (tv.tv_usec / 1000);
+			ts = tv.tv_sec;
+			tms = tv.tv_usec / 1000;
 			#else // WIN32
 			struct __timeb64 tv;
 			_ftime64_s(&tv);
-			stream << std::dec << tv.time << "." << tv.millitm;
+			ts = tv.time;
+			tms = tv.millitm;
 			#endif // WIN32
+			stream << std::dec << ts << "." << std::setfill('0') << std::setw(3) << tms;
+			stream << std::setw(0);
 			
 		}
 		else
