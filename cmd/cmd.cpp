@@ -499,13 +499,14 @@ namespace Aseba
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
-				BootloaderDescription * bMessage = dynamic_cast<BootloaderDescription *>(message);
 				if (ackMessage && (ackMessage->source == dest))
 				{
 					cout << "Device is now in user-code" << endl;
 					delete message;
 					break;
 				}
+				
+				//BootloaderDescription * bMessage = dynamic_cast<BootloaderDescription *>(message);
 				
 				delete message;
 			}

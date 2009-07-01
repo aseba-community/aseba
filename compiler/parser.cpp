@@ -152,7 +152,7 @@ namespace Aseba
 		
 		// then for local
 		int localId = ASEBA_EVENT_LOCAL_EVENTS_START - eventId;
-		if (localId >= 0 && localId < targetDescription->localEvents.size())
+		if ((localId >= 0) && (localId < (int)targetDescription->localEvents.size()))
 			return targetDescription->localEvents[localId].name;
 		
 		return "unknown";
@@ -366,7 +366,6 @@ namespace Aseba
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
 		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_elseif, Token::TOKEN_STR_end };
-		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
 		std::auto_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
 		
@@ -546,8 +545,6 @@ namespace Aseba
 	//! Parse "while" grammar element.
 	Node* Compiler::parseWhile()
 	{
-		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
-		
 		std::auto_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
 		
 		// eat "while"

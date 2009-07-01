@@ -187,12 +187,6 @@ namespace Aseba
 		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
 	}
 	
-	void AeslEditor::dragEnterEvent(QDragEnterEvent *event)
-	{
-		//if (event->mimeData()->hasText())
-			event->acceptProposedAction();
-	}
-	
 	void AeslEditor::dropEvent(QDropEvent *event)
 	{
 		QTextEdit::dropEvent(event);

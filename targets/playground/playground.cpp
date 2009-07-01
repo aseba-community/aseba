@@ -547,7 +547,7 @@ namespace Enki
 		#ifdef USE_SDL
 		if((SDL_Init(SDL_INIT_JOYSTICK)==-1))
 		{
-			std::cerr << "Error : Could not initialize SDL: " << SDL_GetError() << endl;
+			std::cerr << "Error : Could not initialize SDL: " << SDL_GetError() << std::endl;
 			return;
 		}
 		

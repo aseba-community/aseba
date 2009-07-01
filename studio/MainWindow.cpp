@@ -190,9 +190,9 @@ namespace Aseba
 	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QSplitter(parent),
-		mainWindow(mainWindow),
 		id(id),
 		target(target),
+		mainWindow(mainWindow),
 		firstCompilation(true)
 	{
 		// setup some variables
@@ -1586,6 +1586,7 @@ namespace Aseba
 			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 		logger->scrollToBottom();
+		Q_UNUSED(item);
 		
 		#ifdef HAVE_QWT
 		
@@ -1607,6 +1608,7 @@ namespace Aseba
 			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 		logger->scrollToBottom();
+		Q_UNUSED(item);
 		logger->setStyleSheet(" QListView::item { background: rgb(255,128,128); }");
 	}
 	

@@ -187,7 +187,7 @@ namespace Aseba
 		
 		if (children.size() == 4)
 		{
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP) | bfb.size() + 1;
+			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP) | (bfb.size() + 1);
 			unsigned short jumpLine;
 			if (btb.size())
 				jumpLine = (btb.end()-1)->line;

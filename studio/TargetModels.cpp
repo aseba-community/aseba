@@ -127,10 +127,12 @@ namespace Aseba
 		Q_UNUSED(orientation)
 		Q_UNUSED(role)
 		if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+		{
 			if (section == 0)
 				return tr("variables");
 			else
 				return tr("values");
+		}
 		return QVariant();
 	}
 	

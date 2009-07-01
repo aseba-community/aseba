@@ -154,7 +154,7 @@ namespace Aseba
 	void NamedValuesVectorModel::delNamedValue(int index)
 	{
 		Q_ASSERT(namedValues);
-		Q_ASSERT(index < namedValues->size());
+		Q_ASSERT(index < (int)namedValues->size());
 		
 		beginRemoveRows(QModelIndex(), index, index);
 		
