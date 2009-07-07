@@ -213,7 +213,7 @@ const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptio
 // Put everything in the same section, so we are 100% sure that the linker will put them contiguously.
 // Force the address, since the linker sometimes put it in the middle of the code 
 #define NUMBER_OF_CHUNK 26
-unsigned char  aseba_flash[PAGE_PER_CHUNK][INSTRUCTIONS_PER_PAGE * 2] __attribute__ ((space(prog), aligned(INSTRUCTIONS_PER_PAGE * 2), section(".aseba_bytecode"), address(0x15800 - 0x800 /* bootloader */ - 0x400 /* settings */ - NUMBER_OF_CHUNK*0x400)/*, noload*/));
+unsigned char  aseba_flash[PAGE_PER_CHUNK][INSTRUCTIONS_PER_PAGE * 2] __attribute__ ((space(prog), aligned(INSTRUCTIONS_PER_PAGE * 2), section(".aseba_bytecode"), address(0x15800 - 0x800 /* bootloader */ - 0x400 /* settings */ - NUMBER_OF_CHUNK*0x400L*PAGE_PER_CHUNK)/*, noload*/));
 unsigned char aseba_flash1[PAGE_PER_CHUNK][INSTRUCTIONS_PER_PAGE * 2] __attribute__ ((space(prog), aligned(INSTRUCTIONS_PER_PAGE * 2), section(".aseba_bytecode")/*, noload*/));
 unsigned char aseba_flash2[PAGE_PER_CHUNK][INSTRUCTIONS_PER_PAGE * 2] __attribute__ ((space(prog), aligned(INSTRUCTIONS_PER_PAGE * 2), section(".aseba_bytecode")/*, noload*/));
 unsigned char aseba_flash3[PAGE_PER_CHUNK][INSTRUCTIONS_PER_PAGE * 2] __attribute__ ((space(prog), aligned(INSTRUCTIONS_PER_PAGE * 2), section(".aseba_bytecode")/*, noload*/));
