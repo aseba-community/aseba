@@ -154,7 +154,7 @@ namespace Aseba
 		void writeBytecode();
 		void reboot();
 		
-		void setVariableValue(unsigned, int);
+		void setVariableValues(unsigned, const VariablesDataVector &);
 		void insertVariableName(const QModelIndex &);
 		
 		void editorContentChanged();
@@ -240,6 +240,7 @@ namespace Aseba
 		bool save();
 		bool saveFile(const QString &previousFileName = QString());
 		void exportMemoriesContent();
+		void importMemoriesContent();
 		void copyAll();
 		void showHidden(bool show);
 		

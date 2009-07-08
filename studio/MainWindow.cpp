@@ -358,9 +358,7 @@ namespace Aseba
 		connect(refreshMemoryButton, SIGNAL(clicked()), SLOT(refreshMemoryClicked()));
 		
 		// memory
-		connect(vmMemoryModel, SIGNAL(variableValueChanged(unsigned, int)), SLOT(setVariableValue(unsigned, int)));
-		// temporary disabled for the sake of consistancy
-		//connect(vmMemoryView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(insertVariableName(const QModelIndex &)));
+		connect(vmMemoryModel, SIGNAL(variableValuesChanged(unsigned, const VariablesDataVector &)), SLOT(setVariableValues(unsigned, const VariablesDataVector &)));
 		
 		// editor
 		connect(editor, SIGNAL(textChanged()), SLOT(editorContentChanged()));
@@ -425,10 +423,9 @@ namespace Aseba
 		target->reboot(id);
 	}
 	
-	void NodeTab::setVariableValue(unsigned index, int value)
+	void NodeTab::setVariableValues(unsigned index, const VariablesDataVector &values)
 	{
-		VariablesDataVector data(1, value);
-		target->setVariables(id, index, data);
+		target->setVariables(id, index, values);
 	}
 	
 	void NodeTab::insertVariableName(const QModelIndex &index)
@@ -1067,7 +1064,7 @@ namespace Aseba
 	
 	void MainWindow::exportMemoriesContent()
 	{
-		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), "", "All Files (*.*);;CSV files (*.csv);;Text files (*.txt)");
+		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memories content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
 		
 		QFile file(exportFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -1094,6 +1091,74 @@ namespace Aseba
 					out << "\n";
 				}
 			}
+		}
+	}
+	
+	void MainWindow::importMemoriesContent()
+	{
+		QString importFileName = QFileDialog::getOpenFileName(this, tr("Import memories content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		
+		QFile file(importFileName);
+		if (!file.open(QFile::ReadOnly))
+			return;
+		
+		QTextStream in(&file);
+		
+		QSet<QString> nodesNotFound;
+		QStringList variablesNotFound;
+		
+		while (!in.atEnd())
+		{
+			QString line(in.readLine());
+			int pointPos(line.indexOf('.'));
+			QString nodeName(line.left(pointPos));
+			NodeTab* tab(getTabFromName(nodeName));
+			if (tab)
+			{
+				int endVarNamePos(line.indexOf(' ', pointPos+1));
+				if (endVarNamePos != -1)
+				{
+					QString variableName(line.mid(pointPos+1, endVarNamePos-pointPos-1));
+					VariablesDataVector values;
+					int index(endVarNamePos);
+					while (index != -1)
+					{
+						int nextIndex(line.indexOf(' ', index+1));
+						QString value(line.mid(index+1, nextIndex - index - 1));
+						if (value.isEmpty())
+							break;
+						values.push_back(value.toShort());
+						index = nextIndex;
+					}
+					if (!tab->vmMemoryModel->setVariableValues(variableName, values))
+					{
+						variablesNotFound << tr("%0 on node %1").arg(variableName).arg(nodeName);
+					}
+				}
+			}
+			else
+				nodesNotFound.insert(nodeName);
+		}
+		
+		if (!nodesNotFound.isEmpty() || !variablesNotFound.isEmpty())
+		{
+			QString msg;
+			if (!nodesNotFound.isEmpty())
+			{
+				msg += tr("The following nodes are not present in the current network and their associated content was not imported:\n");
+				foreach (QString value, nodesNotFound)
+					msg += "• " + value + "\n";
+			}
+			if (!variablesNotFound.isEmpty())
+			{
+				msg += tr("The following variables are not present in the current network and their associated content was not imported:\n");
+				foreach (QString value, variablesNotFound)
+					msg += "• " + value + "\n";
+			}
+			QMessageBox::warning(this,
+				tr("Some content was not imported"),
+				msg
+			);
 		}
 	}
 	
@@ -2046,6 +2111,8 @@ namespace Aseba
 		fileMenu->addSeparator();*/
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Export &memories content..."),
 							this, SLOT(exportMemoriesContent()));
+		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Import memories content..."),
+							this, SLOT(importMemoriesContent()));
 		fileMenu->addSeparator();
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
 							this, SLOT(close()),

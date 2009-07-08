@@ -77,10 +77,11 @@ namespace Aseba
 	public slots:
 		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
 		void setVariablesData(unsigned start, const VariablesDataVector &data);
+		bool setVariableValues(const QString& name, const VariablesDataVector& values);
 	
 	signals:
 		//! Emitted on setData, when the user change the data, not when nodes have sent updated variables
-		void variableValueChanged(unsigned index, int value);
+		void variableValuesChanged(unsigned index, const VariablesDataVector &values);
 
 	private:
 		friend class VariablesViewPlugin;

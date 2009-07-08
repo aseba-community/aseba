@@ -171,7 +171,7 @@ namespace Aseba
 				Q_ASSERT(ok);
 				
 				variables[index.parent().row()].value[index.row()] = variableValue;
-				emit variableValueChanged(variables[index.parent().row()].pos + index.row(), variableValue);
+				emit variableValuesChanged(variables[index.parent().row()].pos + index.row(), VariablesDataVector(1, variableValue));
 				
 				return true;
 			}
@@ -183,7 +183,7 @@ namespace Aseba
 				Q_ASSERT(ok);
 				
 				variables[index.row()].value[0] = variableValue;
-				emit variableValueChanged(variables[index.row()].pos, variableValue);
+				emit variableValuesChanged(variables[index.row()].pos, VariablesDataVector(1, variableValue));
 				
 				return true;
 			}
@@ -271,7 +271,8 @@ namespace Aseba
 			
 			// copy
 			copy(data.begin() + copyStart, data.begin() + copyStart + copyLen, var.value.begin() + varStart);
-			// and notify gui
+			
+			// notify gui
 			QModelIndex parentIndex = index(i, 0);
 			emit dataChanged(index(varStart, 0, parentIndex), index(varStart + copyLen, 0, parentIndex));
 			
@@ -286,6 +287,21 @@ namespace Aseba
 				}
 			}
 		}
+	}
+	
+	bool TargetVariablesModel::setVariableValues(const QString& name, const VariablesDataVector& values)
+	{
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			Variable& variable(variables[i]);
+			if (variable.name == name)
+			{
+				setVariablesData(variable.pos, values);
+				emit variableValuesChanged(variable.pos, values);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	void TargetVariablesModel::unsubscribeViewPlugin(VariablesViewPlugin* plugin)
