@@ -1,10 +1,19 @@
 <!DOCTYPE aesl-source>
 <network>
-    <event size="2" name="ObstacleDetected" />
-    <event size="0" name="FreeOfObstacle" />
-    <constant value="5" name="tcrt1000_threshold" />
-    <constant value="4" name="tcnd5000_threshold" />
-    <node name="left motor" >speed = 300
+
+
+<!--list of global events-->
+<event size="2" name="ObstacleDetected" />
+<event size="0" name="FreeOfObstacle" />
+
+
+<!--list of constants-->
+<constant value="5" name="tcrt1000_threshold" />
+<constant value="4" name="tcnd5000_threshold" />
+
+
+<!--source code of node left motor-->
+<node name="left motor" >speed = 300
 
 onevent ObstacleDetected
 speed = 300 + (args[0] - args[1]) * 4
@@ -12,30 +21,36 @@ speed = 300 + (args[0] - args[1]) * 4
 onevent FreeOfObstacle
 speed = 300
 </node>
-    <node name="right motor" >speed = 300
+
+
+<!--source code of node right motor-->
+<node name="right motor" >speed = 300
 
 onevent ObstacleDetected
 speed = 300 + (args[0] + args[1]) * 4
 
 onevent FreeOfObstacle
 speed = 300</node>
-    <node name="proximity sensors" ># angles = pi/48:pi/12:(47*2*pi)/48
+
+
+<!--source code of node proximity sensors-->
+<node name="proximity sensors" ># angles = pi/48:pi/12:(47*2*pi)/48
 # vectorX = round(-cos(angles)*255)
 # vectorY = round(-sin(angles)*255)
 
 # vector field obstacle avoidance
 var vectorX[24] = -254, -241, -212, -168, -113,  -50, 17, 82, 142, 192, 229, 250, 254, 241, 212,  168, 113, 50, -17, -82, -142, -192, -229, -250
 var vectorY[24] = -17, -82, -142, -192, -229, -250, -254, -241, -212, -168, -113, -50, 17, 82  , 142, 192, 229, 250, 254, 241, 212, 168, 113, 50
-var threshold = 80
-
-onevent timer
-
+var threshold = 20
 var eventBuffer[2]
 
 var activation
-call vecdot(eventBuffer[0], bumpers, vectorX, 11)
-call vecdot(eventBuffer[1], bumpers, vectorY, 11)
-call vecdot(activation, eventBuffer, eventBuffer, 0)
+
+onevent timer
+
+call math.dot(eventBuffer[0], bumpers, vectorX, 11)
+call math.dot(eventBuffer[1], bumpers, vectorY, 11)
+call math.dot(activation, eventBuffer, eventBuffer, 0)
 
 if activation > threshold then
 	emit ObstacleDetected eventBuffer
@@ -44,5 +59,10 @@ when activation &lt;= threshold do
 	emit FreeOfObstacle
 end
 	</node>
-    <node name="distance sensors" ></node>
+
+
+<!--source code of node distance sensors-->
+<node name="distance sensors" ></node>
+
+
 </network>

@@ -295,10 +295,14 @@ namespace Aseba
 	protected:
 		void internalCompilerError() const;
 		void expect(const Token::Type& type) const;
-		int expectInt16Literal() const;
-		int expectConstant() const;
-		int expectInt16LiteralOrConstant() const;
 		unsigned expectUInt12Literal() const;
+		unsigned expectUInt16Literal() const;
+		unsigned expectPositiveInt16Literal() const;
+		int expectAbsoluteInt16Literal(bool negative) const;
+		unsigned expectPositiveConstant() const;
+		int expectConstant() const;
+		unsigned expectPositiveInt16LiteralOrConstant() const;
+		int expectInt16LiteralOrConstant();
 		unsigned expectGlobalEventId() const;
 		unsigned expectAnyEventId() const;
 		std::string eventName(unsigned eventId) const;

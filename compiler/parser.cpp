@@ -61,11 +61,50 @@ namespace Aseba
 				);
 	}
 	
-	//! Check if next token is a signed 16 bits int literal. If so, return it, if not, throw an exception
-	int Compiler::expectInt16Literal() const
+	//! Check if next token is an unsigned 12 bits integer literal. If so, return it, if not, throw an exception
+	unsigned Compiler::expectUInt12Literal() const
 	{
 		expect(Token::TOKEN_INT_LITERAL);
-		if ((tokens.front().iValue > 32767) || (tokens.front().iValue < -32768))
+		if (tokens.front().iValue < 0 || tokens.front().iValue > 4095)
+			throw Error(tokens.front().pos,
+				FormatableString("Integer value %0 out of [0;4095] range")
+					.arg(tokens.front().iValue)
+				);
+		return tokens.front().iValue;
+	}
+	
+	//! Check if next token is an unsigned 16 bits integer literal. If so, return it, if not, throw an exception
+	unsigned Compiler::expectUInt16Literal() const
+	{
+		expect(Token::TOKEN_INT_LITERAL);
+		if (tokens.front().iValue < 0 || tokens.front().iValue > 65535)
+			throw Error(tokens.front().pos,
+				FormatableString("Integer value %0 out of [0;65535] range")
+					.arg(tokens.front().iValue)
+				);
+		return tokens.front().iValue;
+	}
+	
+	//! Check if next token is the positive part of a 16 bits signed integer literal. If so, return it, if not, throw an exception
+	unsigned Compiler::expectPositiveInt16Literal() const
+	{
+		expect(Token::TOKEN_INT_LITERAL);
+		if (tokens.front().iValue < 0 || tokens.front().iValue > 32767)
+			throw Error(tokens.front().pos,
+				FormatableString("Integer value %0 out of [0;32767] range")
+					.arg(tokens.front().iValue)
+				);
+		return tokens.front().iValue;
+	}
+	
+	//! Check if next token is the absolute part of a 16 bits signed integer literal. If so, return it, if not, throw an exception
+	int Compiler::expectAbsoluteInt16Literal(bool negative) const
+	{
+		expect(Token::TOKEN_INT_LITERAL);
+		int limit(32767);
+		if (negative)
+			limit++;
+		if (tokens.front().iValue < 0 || tokens.front().iValue > limit)
 			throw Error(tokens.front().pos,
 				FormatableString("Integer value %0 out of [-32768;32767] range")
 					.arg(tokens.front().iValue)
@@ -73,38 +112,77 @@ namespace Aseba
 		return tokens.front().iValue;
 	}
 	
-	//! Check if next toxen is a valid constant
-	int Compiler::expectConstant() const
+	//! Check if next toxen is a valid positive part of a 16 bits signed integer constant
+	unsigned Compiler::expectPositiveConstant() const
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 		for (size_t i = 0; i < commonDefinitions->constants.size(); ++i)
+		{
 			if (commonDefinitions->constants[i].name == tokens.front().sValue)
-				return commonDefinitions->constants[i].value;
+			{
+				int value = commonDefinitions->constants[i].value;
+				if (value < 0 || value > 32767)
+					throw Error(tokens.front().pos,
+						FormatableString("Constant %0 has value %0, which is out of [0;32767] range")
+							.arg(tokens.front().sValue)
+							.arg(value)
+						);
+				return value;
+			}
+		}
 		
 		throw Error(tokens.front().pos, FormatableString("Constant %0 not defined").arg(tokens.front().sValue));
 		
 		return 0;
 	}
 	
-	//! Check and return either a signed 16 bits integer or the value of a valid constant
-	int Compiler::expectInt16LiteralOrConstant() const
+	//! Check if next toxen is a valid 16 bits signed integer constant
+	int Compiler::expectConstant() const
 	{
-		if (tokens.front() == Token::TOKEN_INT_LITERAL)
-			return expectInt16Literal();
-		else
-			return expectConstant();
+		expect(Token::TOKEN_STRING_LITERAL);
+		for (size_t i = 0; i < commonDefinitions->constants.size(); ++i)
+		{
+			if (commonDefinitions->constants[i].name == tokens.front().sValue)
+			{
+				int value = commonDefinitions->constants[i].value;
+				if (value < 32768 || value > 32767)
+					throw Error(tokens.front().pos,
+						FormatableString("Constant %0 has value %0, which is out of [-32768;32767] range")
+							.arg(tokens.front().sValue)
+							.arg(value)
+						);
+				return value;
+			}
+		}
+		
+		throw Error(tokens.front().pos, FormatableString("Constant %0 not defined").arg(tokens.front().sValue));
+		
+		return 0;
 	}
 	
-	//! Check if next token is an unsigned 12 bits int literal. If so, return it, if not, throw an exception
-	unsigned Compiler::expectUInt12Literal() const
+	//! Check and return either the positive part of a 16 bits signed integer or the value of a valid constant
+	unsigned Compiler::expectPositiveInt16LiteralOrConstant() const
 	{
-		expect(Token::TOKEN_INT_LITERAL);
-		if (tokens.front().iValue > 4095)
-			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [0;4095] range")
-					.arg(tokens.front().iValue)
-				);
-		return tokens.front().iValue;
+		if (tokens.front() == Token::TOKEN_INT_LITERAL)
+			return expectPositiveInt16Literal();
+		else
+			return expectPositiveConstant();
+	}
+	
+	//! Check and return either a 16 bits signed integer or the value of a valid constant
+	int Compiler::expectInt16LiteralOrConstant()
+	{
+		if (tokens.front() == Token::TOKEN_OP_NEG)
+		{
+			tokens.pop_front();
+			return -expectAbsoluteInt16Literal(true);
+		}
+		else if (tokens.front() == Token::TOKEN_INT_LITERAL)
+		{
+			return expectAbsoluteInt16Literal(false);
+		}
+		else
+			return expectConstant();
 	}
 	
 	//! Check if next token is a known global event identifier
@@ -263,10 +341,7 @@ namespace Aseba
 		{
 			tokens.pop_front();
 			
-			int value = expectInt16LiteralOrConstant();
-			if (value <= 0)
-				throw Error(tokens.front().pos, "Arrays must have a non-zero positive size");
-			varSize = (unsigned)value;
+			varSize = expectPositiveInt16LiteralOrConstant();
 			tokens.pop_front();
 			
 			expect(Token::TOKEN_BRACKET_CLOSE);
@@ -449,14 +524,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range start index
-		int rangeStartIndex;
-		if (tokens.front() == Token::TOKEN_OP_NEG)
-		{
-			tokens.pop_front();
-			rangeStartIndex = -expectInt16LiteralOrConstant();
-		}
-		else
-			rangeStartIndex = expectInt16LiteralOrConstant();
+		int rangeStartIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeStartIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
@@ -465,14 +533,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// range end index
-		int rangeEndIndex;
-		if (tokens.front() == Token::TOKEN_OP_NEG)
-		{
-			tokens.pop_front();
-			rangeEndIndex = -expectInt16LiteralOrConstant();
-		}
-		else
-			rangeEndIndex = expectInt16LiteralOrConstant();
+		int rangeEndIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeEndIndexPos = tokens.front().pos;
 		tokens.pop_front();
 		
@@ -481,13 +542,7 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_STR_step)
 		{
 			tokens.pop_front();
-			if (tokens.front() == Token::TOKEN_OP_NEG)
-			{
-				tokens.pop_front();
-				step = -expectInt16LiteralOrConstant();
-			}
-			else
-				step = expectInt16LiteralOrConstant();
+			step = expectInt16LiteralOrConstant();
 			if (step == 0)
 				throw Error(tokens.front().pos, "Null steps are not allowed in for loops");
 			tokens.pop_front();
@@ -673,9 +728,7 @@ namespace Aseba
 		{
 			tokens.pop_front();
 			
-			int value = expectInt16LiteralOrConstant();
-			if (value < 0)
-				throw Error(tokens.front().pos, "array index must be positive");
+			int value = expectPositiveInt16LiteralOrConstant();
 			unsigned startIndex = (unsigned)value;
 			unsigned len = 1;
 			
@@ -689,9 +742,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				value = expectInt16LiteralOrConstant();
-				if (value < 0)
-					throw Error(tokens.front().pos, "array index must be positive");
+				value = expectPositiveInt16LiteralOrConstant();
 				
 				// check if second index is within bounds
 				unsigned endIndex = (unsigned)value;
@@ -914,7 +965,7 @@ namespace Aseba
 			
 			case Token::TOKEN_INT_LITERAL:
 			{
-				int value = expectInt16Literal();
+				int value = expectUInt16Literal();
 				tokens.pop_front();
 				return new ImmediateNode(pos, value);
 			}
@@ -1014,7 +1065,7 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
-				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL, Token::TOKEN_OP_NEG };
 				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
@@ -1027,7 +1078,7 @@ namespace Aseba
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
 				
-				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (commonDefinitions->constants.contains(tokens.front().sValue)))
+				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (tokens.front() == Token::TOKEN_OP_NEG) || (commonDefinitions->constants.contains(tokens.front().sValue)))
 				{
 					int value = expectInt16LiteralOrConstant();
 					// we have inline integer, we need to store it and pass the address
