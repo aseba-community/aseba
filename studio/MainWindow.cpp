@@ -1075,33 +1075,26 @@ namespace Aseba
 		
 		QTextStream out(&file);
 		
-		/*
-		TODO: unbroke this
 		for (int i = 0; i < nodes->count(); i++)
 		{
-			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
-			Q_ASSERT(tab);
-			
-			std::string oldName;
-			bool first = true;
-			for (int j = 0; j < tab->variablesNames.size(); j++)
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
 			{
-				const std::string& name = tab->variablesNames[j];
-				if (!name.empty())
+				const QString nodeName(target->getName(tab->nodeId()));
+				const QList<TargetVariablesModel::Variable>& variables(tab->vmMemoryModel->getVariables());
+				
+				for (int j = 0; j < variables.size(); ++j)
 				{
-					if (name != oldName)
+					const TargetVariablesModel::Variable& variable(variables[j]);
+					out << nodeName << "." << variable.name << " ";
+					for (size_t k = 0; k < variable.value.size(); ++k)
 					{
-						if (first)
-							first = false;
-						else
-							out << "\n";
-						out << target->getName(tab->nodeId()) << "." << QString::fromUtf8(name.c_str());
-						oldName = name;
+						out << variable.value[k] << " ";
 					}
-					out << ", " << tab->vmMemoryModel->variablesData[j];
+					out << "\n";
 				}
 			}
-		}*/
+		}
 	}
 	
 	void MainWindow::copyAll()
