@@ -123,7 +123,7 @@ namespace Aseba
 				int value = commonDefinitions->constants[i].value;
 				if (value < 0 || value > 32767)
 					throw Error(tokens.front().pos,
-						FormatableString("Constant %0 has value %0, which is out of [0;32767] range")
+						FormatableString("Constant %0 has value %1, which is out of [0;32767] range")
 							.arg(tokens.front().sValue)
 							.arg(value)
 						);
@@ -147,7 +147,7 @@ namespace Aseba
 				int value = commonDefinitions->constants[i].value;
 				if (value < 32768 || value > 32767)
 					throw Error(tokens.front().pos,
-						FormatableString("Constant %0 has value %0, which is out of [-32768;32767] range")
+						FormatableString("Constant %0 has value %1, which is out of [-32768;32767] range")
 							.arg(tokens.front().sValue)
 							.arg(value)
 						);
@@ -853,21 +853,53 @@ namespace Aseba
 	}
 	
 	/*
-	TODO: later if we want to add binary |, &, ~ but we need to get more operator space first
+	TODO: later if we want to add binary |, ^, &, ~ but we need to get more operator space first
 	Node *Compiler::parseBinaryOrExpression()
 	{
-	
+		std::auto_ptr<BinaryArithmeticNode> node(parseBinaryXorExpression());
+		
+		while (tokens.front() == Token::TOKEN_OP_BINARY_OR)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseBinaryXorExpression();
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_OR, node.release(), subExpression));
+		}
+		
+		return node.release();
 	}
 	
 	Node *Compiler::parseBinaryXorExpression()
 	{
-	
+		std::auto_ptr<BinaryArithmeticNode> node(parseBinaryAndExpression());
+		
+		while (tokens.front() == Token::TOKEN_OP_BINARY_XOR)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseBinaryAndExpression();
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_XOR, node.release(), subExpression));
+		}
+		
+		return node.release();
 	}
 	
 	Node *Compiler::parseBinaryAndExpression()
 	{
-	
+		std::auto_ptr<BinaryArithmeticNode> node(parseShiftExpression());
+		
+		while (tokens.front() == Token::TOKEN_OP_BINARY_AND)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseShiftExpression();
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_AND, node.release(), subExpression));
+		}
+		
+		return node.release();
 	}
+	
+	// TODO: add as well BINARY_NOT
 	*/
 	
 	//! Parse "shift_expression" grammar element.
