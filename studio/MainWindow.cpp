@@ -193,7 +193,8 @@ namespace Aseba
 		id(id),
 		target(target),
 		mainWindow(mainWindow),
-		firstCompilation(true)
+		firstCompilation(true),
+		showHidden(mainWindow->showHiddenAct->isChecked())
 	{
 		// setup some variables
 		rehighlighting = false;
