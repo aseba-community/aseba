@@ -145,7 +145,7 @@ namespace Aseba
 			if (commonDefinitions->constants[i].name == tokens.front().sValue)
 			{
 				int value = commonDefinitions->constants[i].value;
-				if (value < 32768 || value > 32767)
+				if (value < -32768 || value > 32767)
 					throw Error(tokens.front().pos,
 						FormatableString("Constant %0 has value %1, which is out of [-32768;32767] range")
 							.arg(tokens.front().sValue)
