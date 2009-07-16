@@ -420,8 +420,18 @@ namespace Aseba
 		int i = (int)argumentsAddr.size() - 1;
 		while (i >= 0)
 		{
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE) | argumentsAddr[i];
-			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+			if ((abs(argumentsAddr[i]) >> 11) == 0)
+			{
+				bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
+				bytecode |= ((unsigned)argumentsAddr[i]) & 0x0fff;
+				bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+			}
+			else
+			{
+				bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LARGE_IMMEDIATE);
+				bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+				bytecodes.current->push_back(BytecodeElement(argumentsAddr[i], sourcePos.row));
+			}
 			i--;
 		}
 		
