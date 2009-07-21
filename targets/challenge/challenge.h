@@ -49,12 +49,17 @@ namespace Enki
 	protected:
 		bool savingVideo;
 		int ePuckCount;
+		QTextBrowser* helpViewer;
+		
+		#ifndef Q_WS_MAC
 		QPushButton* addRobotButton;
 		QPushButton* delRobotButton;
-		QCheckBox* autoCameraButtons;
+		QCheckBox* autoCamera;
 		QCheckBox* hideButtons;
 		QPushButton* helpButton;
-		QTextBrowser* helpViewer;
+		#else // Q_WS_MAC
+		QAction* autoCamera;
+		#endif // Q_WS_MAC
 		
 		QFont titleFont;
 		QFont entryFont;

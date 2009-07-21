@@ -562,33 +562,6 @@ namespace Enki
 		savingVideo = false;
 		initTexturesResources();
 		
-		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
-		Q_ASSERT(res != -1);
-		//qDebug() << QFontDatabase::applicationFontFamilies(res);
-		
-		titleFont = QFont("SF Old Republic SC", 20);
-		entryFont = QFont("SF Old Republic SC", 23);
-		labelFont = QFont("SF Old Republic SC", 16);
-		
-		QVBoxLayout *vLayout = new QVBoxLayout;
-		QHBoxLayout *hLayout = new QHBoxLayout;
-		
-		hLayout->addStretch();
-		addRobotButton = new QPushButton(tr("Add a new robot"));
-		hLayout->addWidget(addRobotButton);
-		delRobotButton = new QPushButton(tr("Remove all robots"));
-		hLayout->addWidget(delRobotButton);
-		autoCameraButtons = new QCheckBox(tr("Auto camera"));
-		hLayout->addWidget(autoCameraButtons);
-		hideButtons = new QCheckBox(tr("Auto hide"));
-		hLayout->addWidget(hideButtons);
-		helpButton = new QPushButton(tr("Help"));
-		hLayout->addWidget(helpButton);
-		hLayout->addStretch();
-		vLayout->addLayout(hLayout);
-		vLayout->addStretch();
-		setLayout(vLayout);
-		
 		helpViewer = new QTextBrowser();
 		helpViewer->setReadOnly(true);
 		helpViewer->resize(600, 500);
@@ -600,12 +573,55 @@ namespace Enki
 		helpViewer->moveCursor(QTextCursor::Start);
 		helpViewer->setWindowTitle(tr("Aseba Challenge Help"));
 		
+		#ifndef Q_WS_MAC
+		
+		QVBoxLayout *vLayout = new QVBoxLayout;
+		QHBoxLayout *hLayout = new QHBoxLayout;
+		
+		hLayout->addStretch();
+		addRobotButton = new QPushButton(tr("Add a new robot"));
+		hLayout->addWidget(addRobotButton);
+		delRobotButton = new QPushButton(tr("Remove all robots"));
+		hLayout->addWidget(delRobotButton);
+		autoCamera = new QCheckBox(tr("Auto camera"));
+		hLayout->addWidget(autoCamera);
+		hideButtons = new QCheckBox(tr("Auto hide"));
+		hLayout->addWidget(hideButtons);
+		helpButton = new QPushButton(tr("Help"));
+		hLayout->addWidget(helpButton);
+		hLayout->addStretch();
+		vLayout->addLayout(hLayout);
+		vLayout->addStretch();
+		setLayout(vLayout);
+		
 		// TODO: setup transparent with combination of reading of doc / stylesheet
 		
 		connect(addRobotButton, SIGNAL(clicked()), SLOT(addNewRobot()));
 		connect(delRobotButton, SIGNAL(clicked()), SLOT(removeRobot()));
 		connect(helpButton, SIGNAL(clicked()), helpViewer, SLOT(show()));
+		
+		#else // Q_WS_MAC
+		
+		QMenuBar *menuBar = new QMenuBar(0);
+		menuBar->addAction(tr("Add a new robot"), this, SLOT(addNewRobot()));
+		menuBar->addAction(tr("Remove all robots"), this, SLOT(removeRobot()));
+		menuBar->addSeparator();
+		autoCamera = new QAction(tr("Auto camera"));
+		autoCamera->setCheckable(true);
+		menuBar->addAction(autoCamera);
+		menuBar->addSeparator();
+		menuBar->addAction(tr("Help"), helpViewer, SLOT(show()));
+		
+		#endif // Q_WS_MAC
+		
 		connect(this, SIGNAL(windowClosed()), helpViewer, SLOT(close()));
+		
+		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
+		Q_ASSERT(res != -1);
+		//qDebug() << QFontDatabase::applicationFontFamilies(res);
+		titleFont = QFont("SF Old Republic SC", 20);
+		entryFont = QFont("SF Old Republic SC", 23);
+		labelFont = QFont("SF Old Republic SC", 16);
 		
 		setMouseTracking(true);
 		setAttribute(Qt::WA_OpaquePaintEvent);
@@ -649,7 +665,7 @@ namespace Enki
 
 	void ChallengeViewer::timerEvent(QTimerEvent * event)
 	{
-		if (autoCameraButtons->isChecked())
+		if (autoCamera->isChecked())
 		{
 			altitude = 70;
 			yaw += 0.002;
@@ -663,6 +679,8 @@ namespace Enki
 
 	void ChallengeViewer::mouseMoveEvent ( QMouseEvent * event )
 	{
+		#ifndef Q_WS_MAC
+		
 		bool isInButtonArea = event->y() < addRobotButton->y() + addRobotButton->height() + 10;
 		if (hideButtons->isChecked())
 		{
@@ -670,7 +688,7 @@ namespace Enki
 			{
 				addRobotButton->show();
 				delRobotButton->show();
-				autoCameraButtons->show();
+				autoCamera->show();
 				hideButtons->show();
 				helpButton->show();
 			}
@@ -678,11 +696,13 @@ namespace Enki
 			{
 				addRobotButton->hide();
 				delRobotButton->hide();
-				autoCameraButtons->hide();
+				autoCamera->hide();
 				hideButtons->hide();
 				helpButton->hide();
 			}
 		}
+		
+		#endif // Q_WS_MAC
 		
 		ViewerWidget::mouseMoveEvent(event);
 	}
