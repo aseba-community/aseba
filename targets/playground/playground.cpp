@@ -557,12 +557,12 @@ namespace Enki
 			SDL_Joystick* joystick = SDL_JoystickOpen(i);
 			if (!joystick)
 			{
-				std::cerr << "Error: Can't open joystick " << i << endl;
+				std::cerr << "Error: Can't open joystick " << i << std::endl;
 				continue;
 			}
 			if (SDL_JoystickNumAxes(joystick) < 2)
 			{
-				std::cerr << "Error: not enough axis on joystick" << i<< endl;
+				std::cerr << "Error: not enough axis on joystick" << i<< std::endl;
 				SDL_JoystickClose(joystick);
 				continue;
 			}

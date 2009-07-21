@@ -370,7 +370,7 @@ namespace Aseba
 			for (unsigned i = 0; i < varSize; i++)
 			{
 				SourcePos assignPos = tokens.front().pos;
-				block->children.push_back(parseShiftExpression());
+				block->children.push_back(parseBinaryOrExpression());
 				block->children.push_back(new StoreNode(assignPos, varAddr + i));
 				
 				if (i + 1 < varSize)
@@ -413,7 +413,7 @@ namespace Aseba
 			
 			std::auto_ptr<Node> array(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
 		
-			array->children.push_back(parseShiftExpression());
+			array->children.push_back(parseBinaryOrExpression());
 
 			expect(Token::TOKEN_BRACKET_CLOSE);
 			tokens.pop_front();
@@ -431,7 +431,7 @@ namespace Aseba
 		expect(Token::TOKEN_ASSIGN);
 		tokens.pop_front();
 		
-		assignement->children.push_back(parseShiftExpression());
+		assignement->children.push_back(parseBinaryOrExpression());
 		
 		return assignement.release();
 	}
@@ -840,67 +840,65 @@ namespace Aseba
 	{
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
-		std::auto_ptr<Node> left(parseShiftExpression());
+		std::auto_ptr<Node> left(parseBinaryOrExpression());
 		
 		EXPECT_ONE_OF(conditionTypes);
 		SourcePos conditionPos = tokens.front().pos;
 		Compiler::Token::Type op = tokens.front();
 		tokens.pop_front();
 		
-		Node* right(parseShiftExpression());
+		Node* right(parseBinaryOrExpression());
 		
 		return BinaryArithmeticNode::fromComparison(conditionPos, op, left.release(), right);
 	}
 	
-	/*
-	TODO: later if we want to add binary |, ^, &, ~ but we need to get more operator space first
+	//! Parse "binary or" grammar element.
 	Node *Compiler::parseBinaryOrExpression()
 	{
-		std::auto_ptr<BinaryArithmeticNode> node(parseBinaryXorExpression());
+		std::auto_ptr<Node> node(parseBinaryXorExpression());
 		
-		while (tokens.front() == Token::TOKEN_OP_BINARY_OR)
+		while (tokens.front() == Token::TOKEN_OP_BIT_OR)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
 			Node *subExpression = parseBinaryXorExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_OR, node.release(), subExpression));
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_OR, node.release(), subExpression));
 		}
 		
 		return node.release();
 	}
 	
+	//! Parse "binary xor" grammar element.
 	Node *Compiler::parseBinaryXorExpression()
 	{
-		std::auto_ptr<BinaryArithmeticNode> node(parseBinaryAndExpression());
+		std::auto_ptr<Node> node(parseBinaryAndExpression());
 		
-		while (tokens.front() == Token::TOKEN_OP_BINARY_XOR)
+		while (tokens.front() == Token::TOKEN_OP_BIT_XOR)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
 			Node *subExpression = parseBinaryAndExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_XOR, node.release(), subExpression));
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_XOR, node.release(), subExpression));
 		}
 		
 		return node.release();
 	}
 	
+	//! Parse "binary and" grammar element.
 	Node *Compiler::parseBinaryAndExpression()
 	{
-		std::auto_ptr<BinaryArithmeticNode> node(parseShiftExpression());
+		std::auto_ptr<Node> node(parseShiftExpression());
 		
-		while (tokens.front() == Token::TOKEN_OP_BINARY_AND)
+		while (tokens.front() == Token::TOKEN_OP_BIT_AND)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
 			Node *subExpression = parseShiftExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BINARY_AND, node.release(), subExpression));
+			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_AND, node.release(), subExpression));
 		}
 		
 		return node.release();
 	}
-	
-	// TODO: add as well BINARY_NOT
-	*/
 	
 	//! Parse "shift_expression" grammar element.
 	Node *Compiler::parseShiftExpression()
@@ -962,7 +960,7 @@ namespace Aseba
 	//! Parse "unary_expression" grammar element.
 	Node *Compiler::parseUnaryExpression()
 	{
-		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_ABS, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_BIT_NOT, Token::TOKEN_STR_abs, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
 		
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
@@ -973,7 +971,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				std::auto_ptr<Node> expression(parseShiftExpression());
+				std::auto_ptr<Node> expression(parseBinaryOrExpression());
 				
 				expect(Token::TOKEN_PAR_CLOSE);
 				tokens.pop_front();
@@ -988,11 +986,26 @@ namespace Aseba
 				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
 			}
 			
-			case Token::TOKEN_OP_ABS:
+			case Token::TOKEN_OP_BIT_NOT:
 			{
 				tokens.pop_front();
 				
-				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, parseUnaryExpression());
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, parseUnaryExpression());
+			};
+			
+			case Token::TOKEN_STR_abs:
+			{
+				tokens.pop_front();
+				
+				expect(Token::TOKEN_PAR_OPEN);
+				tokens.pop_front();
+				
+				std::auto_ptr<Node> expression(parseBinaryOrExpression());
+				
+				expect(Token::TOKEN_PAR_CLOSE);
+				tokens.pop_front();
+				
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, expression.release());
 			}
 			
 			case Token::TOKEN_INT_LITERAL:
@@ -1034,7 +1047,7 @@ namespace Aseba
 						
 						std::auto_ptr<Node> array(new ArrayReadNode(pos, varAddr, varSize, varName));
 					
-						array->children.push_back(parseShiftExpression());
+						array->children.push_back(parseBinaryOrExpression());
 	
 						expect(Token::TOKEN_BRACKET_CLOSE);
 						tokens.pop_front();

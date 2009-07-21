@@ -30,7 +30,7 @@
 /*@{*/
 
 /*! version of aseba protocol, including bytecodes types and constants */
-#define ASEBA_PROTOCOL_VERSION 3
+#define ASEBA_PROTOCOL_VERSION 4
 
 /*! default listen target for aseba */
 #define ASEBA_DEFAULT_LISTEN_TARGET "tcpin:33333"
@@ -76,6 +76,10 @@ typedef enum
 	ASEBA_OP_MULT,
 	ASEBA_OP_DIV,
 	ASEBA_OP_MOD,
+	// binary arithmetic
+	ASEBA_OP_BIT_OR,
+	ASEBA_OP_BIT_XOR,
+	ASEBA_OP_BIT_AND,
 	// comparison
 	ASEBA_OP_EQUAL,
 	ASEBA_OP_NOT_EQUAL,
@@ -90,22 +94,23 @@ typedef enum
 } AsebaBinaryOperator;
 
 /*! Mask of available binary operators */
-#define ASEBA_BINARY_OPERATOR_MASK 0xf
+#define ASEBA_BINARY_OPERATOR_MASK 0xff
 
 /*!  List of unary operators */
 typedef enum
 {
 	ASEBA_UNARY_OP_SUB = 0x0,
 	ASEBA_UNARY_OP_ABS,
+	ASEBA_UNARY_OP_BIT_NOT
 } AsebaUnaryOperator;
 
 /*! Mask of available unary operators */
-#define ASEBA_UNARY_OPERATOR_MASK 0xf
+#define ASEBA_UNARY_OPERATOR_MASK 0xff
 
 /*! Bit inside if opcode that indicates it is a when condition */
-#define ASEBA_IF_IS_WHEN_BIT 4
+#define ASEBA_IF_IS_WHEN_BIT 8
 /*! Bit inside if opcode that indicates that the last evaluation was true */
-#define ASEBA_IF_WAS_TRUE_BIT 5
+#define ASEBA_IF_WAS_TRUE_BIT 9
 
 /*! List of masks for flags in AsebaVMState */
 typedef enum

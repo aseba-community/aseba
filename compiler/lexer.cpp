@@ -79,6 +79,7 @@ namespace Aseba
 			case TOKEN_STR_sub: return "sub keyword";
 			case TOKEN_STR_callsub: return "callsub keyword";
 			case TOKEN_STR_onevent: return "onevent keyword";
+			case TOKEN_STR_abs: return "abs keyword";
 			case TOKEN_STRING_LITERAL: return "string";
 			case TOKEN_INT_LITERAL: return "integer";
 			case TOKEN_PAR_OPEN: return "( (open parenthesis)";
@@ -91,6 +92,10 @@ namespace Aseba
 			case TOKEN_OP_OR: return "or";
 			case TOKEN_OP_AND: return "and";
 			case TOKEN_OP_NOT: return "not";
+			case TOKEN_OP_BIT_OR: return "binary or";
+			case TOKEN_OP_BIT_XOR: return "binary xor";
+			case TOKEN_OP_BIT_AND: return "binary and";
+			case TOKEN_OP_BIT_NOT: return "binary not";
 			case TOKEN_OP_EQUAL: return "== (equal to)";
 			case TOKEN_OP_NOT_EQUAL: return "!= (not equal to)";
 			case TOKEN_OP_BIGGER: return "> (bigger than)";
@@ -104,7 +109,6 @@ namespace Aseba
 			case TOKEN_OP_MULT: return "* (time)";
 			case TOKEN_OP_DIV: return "/ (divide)";
 			case TOKEN_OP_MOD: return "modulo";
-			case TOKEN_OP_ABS: return "abs";
 			default: return "unknown";
 		}
 	}
@@ -161,7 +165,10 @@ namespace Aseba
 				case '*': tokens.push_back(Token(Token::TOKEN_OP_MULT, pos)); break;
 				case '/': tokens.push_back(Token(Token::TOKEN_OP_DIV, pos)); break;
 				case '%': tokens.push_back(Token(Token::TOKEN_OP_MOD, pos)); break;
-				case '|': tokens.push_back(Token(Token::TOKEN_OP_ABS, pos)); break;
+				case '|': tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos)); break;
+				case '^': tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos)); break;
+				case '&': tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos)); break;
+				case '~': tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos)); break;
 				
 				// special case for comment
 				case '#':
@@ -337,6 +344,8 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_callsub, pos));
 						else if (s == "onevent")
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
+						else if (s == "abs")
+							tokens.push_back(Token(Token::TOKEN_STR_abs, pos));
 						else if (s == "or")
 							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
 						else if (s == "and")

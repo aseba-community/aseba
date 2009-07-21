@@ -225,6 +225,7 @@ namespace Aseba
 				TOKEN_STR_sub,
 				TOKEN_STR_callsub,
 				TOKEN_STR_onevent,
+				TOKEN_STR_abs,
 				TOKEN_STRING_LITERAL,
 				TOKEN_INT_LITERAL,
 				TOKEN_PAR_OPEN,
@@ -237,6 +238,10 @@ namespace Aseba
 				TOKEN_OP_OR,
 				TOKEN_OP_AND,
 				TOKEN_OP_NOT,
+				TOKEN_OP_BIT_OR,
+				TOKEN_OP_BIT_XOR,
+				TOKEN_OP_BIT_AND,
+				TOKEN_OP_BIT_NOT,
 				TOKEN_OP_EQUAL,
 				TOKEN_OP_NOT_EQUAL,
 				TOKEN_OP_BIGGER,
@@ -249,8 +254,7 @@ namespace Aseba
 				TOKEN_OP_NEG,
 				TOKEN_OP_MULT,
 				TOKEN_OP_DIV,
-				TOKEN_OP_MOD,
-				TOKEN_OP_ABS
+				TOKEN_OP_MOD
 				
 			} type; //!< type of this token
 			std::string sValue; //!< string version of the value
@@ -339,6 +343,10 @@ namespace Aseba
 		BinaryArithmeticNode* parseNot();
 		
 		BinaryArithmeticNode* parseCondition();
+		
+		Node *parseBinaryOrExpression();
+		Node *parseBinaryXorExpression();
+		Node *parseBinaryAndExpression();
 		
 		Node* parseShiftExpression();
 		Node* parseAddExpression();

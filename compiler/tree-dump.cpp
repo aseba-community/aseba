@@ -42,6 +42,10 @@ namespace Aseba
 			case ASEBA_OP_DIV: return "/";
 			case ASEBA_OP_MOD: return "modulo";
 			
+			case ASEBA_OP_BIT_OR: return "binary or";
+			case ASEBA_OP_BIT_XOR: return "binary xor";
+			case ASEBA_OP_BIT_AND: return "binary and";
+			
 			case ASEBA_OP_EQUAL: return "==";
 			case ASEBA_OP_NOT_EQUAL: return "!=";
 			case ASEBA_OP_BIGGER_THAN: return ">";
@@ -62,6 +66,7 @@ namespace Aseba
 		{
 			case ASEBA_UNARY_OP_SUB: return "unary -";
 			case ASEBA_UNARY_OP_ABS: return "abs";
+			case ASEBA_UNARY_OP_BIT_NOT: return "binary not";
 			
 			default: return "? (unary operator)";
 		}

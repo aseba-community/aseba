@@ -73,7 +73,7 @@ namespace Enki
 		void windowClosed();
 	
 	protected slots:
-		void addNewRobot();	
+		void addNewRobot();
 		void removeRobot();
 	
 	protected:

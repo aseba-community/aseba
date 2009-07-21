@@ -110,6 +110,10 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 			}
 		case ASEBA_OP_MOD: return valueOne % valueTwo;
 		
+		case ASEBA_OP_BIT_OR: return valueOne | valueTwo;
+		case ASEBA_OP_BIT_XOR: return valueOne ^ valueTwo;
+		case ASEBA_OP_BIT_AND: return valueOne & valueTwo;
+		
 		case ASEBA_OP_EQUAL: return valueOne == valueTwo;
 		case ASEBA_OP_NOT_EQUAL: return valueOne != valueTwo;
 		case ASEBA_OP_BIGGER_THAN: return valueOne > valueTwo;
@@ -123,6 +127,22 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 		default:
 		#ifdef ASEBA_ASSERT
 		AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR);
+		#endif
+		return 0;
+	}
+}
+
+static sint16 AsebaVMDoUnaryOperation(AsebaVMState *vm, sint16 value, uint16 op)
+{
+	switch (op)
+	{
+		case ASEBA_UNARY_OP_SUB: return -value;
+		case ASEBA_UNARY_OP_ABS: return value >= 0 ? value : -value;
+		case ASEBA_UNARY_OP_BIT_NOT: return ~value;
+		
+		default:
+		#ifdef ASEBA_ASSERT
+		AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR);
 		#endif
 		return 0;
 	}
@@ -308,7 +328,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Unary Arithmetic
 		case ASEBA_BYTECODE_UNARY_ARITHMETIC:
 		{
-			sint16 value;
+			sint16 value, opResult;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -316,20 +336,14 @@ void AsebaVMStep(AsebaVMState *vm)
 				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
-			// do operation
+			// get operand
 			value = vm->stack[vm->sp];
-			switch (bytecode & ASEBA_UNARY_OPERATOR_MASK)
-			{
-				case ASEBA_UNARY_OP_SUB: value = -value; break;
-				case ASEBA_UNARY_OP_ABS: value = value >= 0 ? value : -value; break;
-				
-				default:
-				#ifdef ASEBA_ASSERT
-				AsebaAssert(vm, ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR);
-				#endif
-				break;
-			}
-			vm->stack[vm->sp] = value;
+			
+			// do operation
+			opResult = AsebaVMDoUnaryOperation(vm, value, bytecode & ASEBA_UNARY_OPERATOR_MASK);
+			
+			// write result
+			vm->stack[vm->sp] = opResult;
 			
 			// increment PC
 			vm->pc ++;
