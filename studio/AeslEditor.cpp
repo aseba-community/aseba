@@ -181,7 +181,7 @@ namespace Aseba
 		font.setFamily("");
 		font.setStyleHint(QFont::TypeWriter);
 		font.setFixedPitch(true);
-		font.setPointSize(10);
+		//font.setPointSize(10);
 		setFont(font);
 		setAcceptDrops(true);
 		setTabStopWidth( QFontMetrics(font).width(' ') * 4);

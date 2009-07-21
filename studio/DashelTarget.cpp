@@ -240,6 +240,8 @@ namespace Aseba
 		Q_UNUSED(stream);
 		Q_UNUSED(abnormal);
 		emit dashelDisconnection();
+		Q_ASSERT(stream == this->stream);
+		this->stream = 0;
 	}
 	
 	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(const std::string &nodeName, uint16 protocolVersion)
@@ -315,14 +317,17 @@ namespace Aseba
 	
 	void DashelTarget::disconnect()
 	{
-		// detach all nodes
-		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		if (dashelInterface.stream)
 		{
-			//DetachDebugger(node->first).serialize(dashelInterface.stream);
-			BreakpointClearAll(node->first).serialize(dashelInterface.stream);
-			Run(node->first).serialize(dashelInterface.stream);
+			// detach all nodes
+			for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+			{
+				//DetachDebugger(node->first).serialize(dashelInterface.stream);
+				BreakpointClearAll(node->first).serialize(dashelInterface.stream);
+				Run(node->first).serialize(dashelInterface.stream);
+			}
+			dashelInterface.stream->flush();
 		}
-		dashelInterface.stream->flush();
 	}
 	
 	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
