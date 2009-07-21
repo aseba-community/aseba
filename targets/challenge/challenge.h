@@ -57,6 +57,7 @@ namespace Enki
 		QCheckBox* autoCamera;
 		QCheckBox* hideButtons;
 		QPushButton* helpButton;
+		QFrame* menuFrame;
 		#else // Q_WS_MAC
 		QAction* autoCamera;
 		#endif // Q_WS_MAC

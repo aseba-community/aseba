@@ -579,22 +579,28 @@ namespace Enki
 		QHBoxLayout *hLayout = new QHBoxLayout;
 		
 		hLayout->addStretch();
+		
+		menuFrame = new QFrame();
+		menuFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
+		// construction of menu frame
+		QHBoxLayout *frameLayout = new QHBoxLayout;
 		addRobotButton = new QPushButton(tr("Add a new robot"));
-		hLayout->addWidget(addRobotButton);
+		frameLayout->addWidget(addRobotButton);
 		delRobotButton = new QPushButton(tr("Remove all robots"));
-		hLayout->addWidget(delRobotButton);
+		frameLayout->addWidget(delRobotButton);
 		autoCamera = new QCheckBox(tr("Auto camera"));
-		hLayout->addWidget(autoCamera);
+		frameLayout->addWidget(autoCamera);
 		hideButtons = new QCheckBox(tr("Auto hide"));
-		hLayout->addWidget(hideButtons);
+		frameLayout->addWidget(hideButtons);
 		helpButton = new QPushButton(tr("Help"));
-		hLayout->addWidget(helpButton);
+		frameLayout->addWidget(helpButton);
+		menuFrame->setLayout(frameLayout);
+		// construction of the screen layout
+		hLayout->addWidget(menuFrame);
 		hLayout->addStretch();
 		vLayout->addLayout(hLayout);
 		vLayout->addStretch();
 		setLayout(vLayout);
-		
-		// TODO: setup transparent with combination of reading of doc / stylesheet
 		
 		connect(addRobotButton, SIGNAL(clicked()), SLOT(addNewRobot()));
 		connect(delRobotButton, SIGNAL(clicked()), SLOT(removeRobot()));
@@ -626,6 +632,7 @@ namespace Enki
 		setMouseTracking(true);
 		setAttribute(Qt::WA_OpaquePaintEvent);
 		setAttribute(Qt::WA_NoSystemBackground);
+		setAutoFillBackground(false);
 		resize(780, 560);
 	}
 	
@@ -686,19 +693,11 @@ namespace Enki
 		{
 			if (isInButtonArea && !addRobotButton->isVisible())
 			{
-				addRobotButton->show();
-				delRobotButton->show();
-				autoCamera->show();
-				hideButtons->show();
-				helpButton->show();
+				menuFrame->show();
 			}
 			if (!isInButtonArea && addRobotButton->isVisible())
 			{
-				addRobotButton->hide();
-				delRobotButton->hide();
-				autoCamera->hide();
-				hideButtons->hide();
-				helpButton->hide();
+				menuFrame->hide();
 			}
 		}
 		
