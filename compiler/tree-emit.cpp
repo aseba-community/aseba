@@ -122,7 +122,7 @@ namespace Aseba
 	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		assert(false);
+		abort();
 	}
 	
 	
@@ -213,7 +213,7 @@ namespace Aseba
 	
 	void WhileNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		assert(false);
+		abort();
 	}
 	
 	

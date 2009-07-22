@@ -769,9 +769,9 @@ namespace Aseba
 	}
 	
 	//! Parse "or" grammar element.
-	BinaryArithmeticNode* Compiler::parseOr()
+	Node* Compiler::parseOr()
 	{
-		std::auto_ptr<BinaryArithmeticNode> node(parseAnd());
+		std::auto_ptr<Node> node(parseAnd());
 		
 		while (tokens.front() == Token::TOKEN_OP_OR)
 		{
@@ -785,9 +785,9 @@ namespace Aseba
 	}
 	
 	//! Parse "and" grammar element.
-	BinaryArithmeticNode* Compiler::parseAnd()
+	Node* Compiler::parseAnd()
 	{
-		std::auto_ptr<BinaryArithmeticNode> node(parseNot());
+		std::auto_ptr<Node> node(parseNot());
 		
 		while (tokens.front() == Token::TOKEN_OP_AND)
 		{
@@ -801,8 +801,10 @@ namespace Aseba
 	}
 	
 	//! Parse "not" grammar element.
-	BinaryArithmeticNode* Compiler::parseNot()
+	Node* Compiler::parseNot()
 	{
+		SourcePos pos = tokens.front().pos;
+		
 		// eat all trailing not
 		bool odd = false;
 		while (tokens.front() == Token::TOKEN_OP_NOT)
@@ -811,7 +813,13 @@ namespace Aseba
 			tokens.pop_front();
 		}
 		
-		std::auto_ptr<BinaryArithmeticNode> expression;
+		if (odd)
+			return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_NOT, parseCondition());
+		else
+			return parseCondition();
+		/*
+		
+		std::auto_ptr<BinaryArithmeticNode> expression(parseCondition());
 		
 		// recurse on parenthesis
 		if (tokens.front() == Token::TOKEN_PAR_OPEN)
@@ -827,29 +835,31 @@ namespace Aseba
 		{
 			expression.reset(parseCondition());
 		}
-		
 		// apply de Morgan to remove the not
 		if (odd)
 			expression->deMorganNotRemoval();
 		
 		return expression.release();
+		*/
 	}
 	
 	//! Parse "condition" grammar element.
-	BinaryArithmeticNode* Compiler::parseCondition()
+	Node* Compiler::parseCondition()
 	{
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
-		std::auto_ptr<Node> left(parseBinaryOrExpression());
+		std::auto_ptr<Node> node(parseBinaryOrExpression());
 		
-		EXPECT_ONE_OF(conditionTypes);
-		SourcePos conditionPos = tokens.front().pos;
-		Compiler::Token::Type op = tokens.front();
-		tokens.pop_front();
+		while (IS_ONE_OF(conditionTypes))
+		{
+			Token::Type op = tokens.front();
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+			Node *subExpression = parseBinaryOrExpression();
+			node.reset(BinaryArithmeticNode::fromComparison(pos, op, node.release(), subExpression));
+		}
 		
-		Node* right(parseBinaryOrExpression());
-		
-		return BinaryArithmeticNode::fromComparison(conditionPos, op, left.release(), right);
+		return node.release();
 	}
 	
 	//! Parse "binary or" grammar element.
@@ -971,7 +981,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				std::auto_ptr<Node> expression(parseBinaryOrExpression());
+				std::auto_ptr<Node> expression(parseOr());
 				
 				expect(Token::TOKEN_PAR_CLOSE);
 				tokens.pop_front();
@@ -997,15 +1007,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				expect(Token::TOKEN_PAR_OPEN);
-				tokens.pop_front();
-				
-				std::auto_ptr<Node> expression(parseBinaryOrExpression());
-				
-				expect(Token::TOKEN_PAR_CLOSE);
-				tokens.pop_front();
-				
-				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, expression.release());
+				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, parseUnaryExpression());
 			}
 			
 			case Token::TOKEN_INT_LITERAL:

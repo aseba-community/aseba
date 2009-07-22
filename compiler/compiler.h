@@ -338,11 +338,11 @@ namespace Aseba
 		Node* parseSubDecl();
 		Node* parseCallSub();
 		
-		BinaryArithmeticNode* parseOr();
-		BinaryArithmeticNode* parseAnd();
-		BinaryArithmeticNode* parseNot();
+		Node* parseOr();
+		Node* parseAnd();
+		Node* parseNot();
 		
-		BinaryArithmeticNode* parseCondition();
+		Node* parseCondition();
 		
 		Node *parseBinaryOrExpression();
 		Node *parseBinaryXorExpression();

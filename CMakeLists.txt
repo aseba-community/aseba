@@ -70,14 +70,15 @@ set (ASEBACORE_SRC
 
 set (ASEBACOMPILER_SRC
 	compiler/compiler.cpp
-	compiler/tree-dump.cpp
-	compiler/tree-emit.cpp
-	compiler/parser.cpp
-	compiler/tree-build.cpp
-	compiler/lexer.cpp
 	compiler/errors.cpp
-	compiler/tree-optimize.cpp
+	compiler/lexer.cpp
+	compiler/parser.cpp
 	compiler/analysis.cpp
+	compiler/tree-build.cpp
+	compiler/tree-dump.cpp
+	compiler/tree-typecheck.cpp
+	compiler/tree-optimize.cpp
+	compiler/tree-emit.cpp
 )
 
 set (ASEBAVM_SRC

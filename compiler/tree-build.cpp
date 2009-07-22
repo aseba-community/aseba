@@ -133,33 +133,6 @@ namespace Aseba
 		children.push_back(child);
 	}
 	
-	//! Recursively apply de Morgan law as long as node are logic operations, and then invert comparisons
-	void BinaryArithmeticNode::deMorganNotRemoval()
-	{
-		switch (op)
-		{
-			// comparison: invert
-			case ASEBA_OP_EQUAL: op = ASEBA_OP_NOT_EQUAL; break;
-			case ASEBA_OP_NOT_EQUAL: op = ASEBA_OP_EQUAL; break;
-			case ASEBA_OP_BIGGER_THAN: op = ASEBA_OP_SMALLER_EQUAL_THAN; break;
-			case ASEBA_OP_BIGGER_EQUAL_THAN: op = ASEBA_OP_SMALLER_THAN; break;
-			case ASEBA_OP_SMALLER_THAN: op = ASEBA_OP_BIGGER_EQUAL_THAN; break;
-			case ASEBA_OP_SMALLER_EQUAL_THAN: op = ASEBA_OP_BIGGER_THAN; break;
-			// logic: invert and call recursively
-			case ASEBA_OP_OR:
-				op = ASEBA_OP_AND;
-				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
-				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
-			break;
-			case ASEBA_OP_AND:
-				op = ASEBA_OP_OR;
-				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
-				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
-			break;
-			default: abort();
-		};
-	}
-	
 	//! Constructor
 	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName) :
 		Node(sourcePos),

@@ -46,12 +46,22 @@ namespace Aseba
 	//! An abstract node of syntax tree
 	struct Node
 	{
+		//! A type a node can return
+		enum ReturnType
+		{
+			TYPE_UNIT = 0,
+			TYPE_BOOL,
+			TYPE_INT
+		};
+		
 		//! Constructor
 		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
 		
 		virtual ~Node();
 		
-		//! Optimize this node, reture true if any optimization was successful
+		//! Typecheck this node, throw an exception if there is any type violation
+		virtual ReturnType typeCheck() const;
+		//! Optimize this node, return the optimized node
 		virtual Node* optimize(std::ostream* dump) = 0;
 		//! Return the stack depth requirement for this node and its children
 		virtual unsigned getStackDepth() const;
@@ -62,6 +72,11 @@ namespace Aseba
 		virtual std::string toString() const = 0;
 		//! Dump this node and the rest of the tree
 		virtual void dump(std::ostream& dest, unsigned& indent) const;
+		
+		//! Return the name of a type
+		std::string typeName(const Node::ReturnType& type) const;
+		//! Check for a specific type, throw an exception otherwise
+		void expectType(const Node::ReturnType& expected, const Node::ReturnType& type) const;
 		
 		//! Vector for children of a node
 		typedef std::vector<Node *> NodesVector;
@@ -237,6 +252,7 @@ namespace Aseba
 		
 		void deMorganNotRemoval();
 		
+		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::ostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -258,6 +274,7 @@ namespace Aseba
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
 		
+		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -274,6 +291,7 @@ namespace Aseba
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		
+		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -289,6 +307,7 @@ namespace Aseba
 		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
+		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -319,6 +338,7 @@ namespace Aseba
 		
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
 		
+		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -348,6 +368,7 @@ namespace Aseba
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;

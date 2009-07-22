@@ -131,10 +131,29 @@ namespace Aseba
 		
 		if (dump)
 		{
-			*dump << "Syntax tree before optimisation:\n" << std::endl;
+			*dump << "Syntax tree before optimisation:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
-			*dump << "Optimizations:\n" << std::endl;
+			*dump << "Type checking:\n";
+		}
+		
+		// typecheck
+		try
+		{
+			program->typeCheck();
+		}
+		catch(Error error)
+		{
+			delete program;
+			errorDescription = error;
+			return false;
+		}
+		
+		if (dump)
+		{
+			*dump << "correct.\n";
+			*dump << "\n\n";
+			*dump << "Optimizations:\n";
 		}
 		
 		// optimization
@@ -152,7 +171,7 @@ namespace Aseba
 		if (dump)
 		{
 			*dump << "\n\n";
-			*dump << "Syntax tree after optimization:" << std::endl;
+			*dump << "Syntax tree after optimization:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
 		}
@@ -184,7 +203,7 @@ namespace Aseba
 		
 		if (dump)
 		{
-			*dump << "Bytecode:" << std::endl;
+			*dump << "Bytecode:\n";
 			disassemble(bytecode, preLinkBytecode, *dump);
 			*dump << "\n\n";
 		}
@@ -387,10 +406,12 @@ namespace Aseba
 				
 				case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
 				dump << "CONDITIONAL_BRANCH ";
-				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & ASEBA_BINARY_OPERATOR_MASK)) << " ";
+				dump << binaryOperatorToString((AsebaBinaryOperator)(bytecode[pc] & ASEBA_BINARY_OPERATOR_MASK));
 				if (bytecode[pc] & (1 << ASEBA_IF_IS_WHEN_BIT))
-					dump << "(edge) ";
-				dump << ((signed short)bytecode[pc+1]) << "\n";
+					dump << " (edge), ";
+				else
+					dump << ", ";
+				dump << "skip " << ((signed short)bytecode[pc+1]) << " if false" << "\n";
 				pc += 2;
 				break;
 				

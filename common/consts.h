@@ -89,8 +89,7 @@ typedef enum
 	ASEBA_OP_SMALLER_EQUAL_THAN,
 	// logic
 	ASEBA_OP_OR,
-	ASEBA_OP_AND,
-	ASEBA_OP_NOT	// < not used for the VM, only for parsing, reduced by compiler using de Morgan and comparison inversion
+	ASEBA_OP_AND
 } AsebaBinaryOperator;
 
 /*! Mask of available binary operators */
@@ -101,7 +100,8 @@ typedef enum
 {
 	ASEBA_UNARY_OP_SUB = 0x0,
 	ASEBA_UNARY_OP_ABS,
-	ASEBA_UNARY_OP_BIT_NOT
+	ASEBA_UNARY_OP_BIT_NOT,
+	ASEBA_UNARY_OP_NOT	// < not used for the VM, only for parsing, reduced by compiler using de Morgan and comparison inversion
 } AsebaUnaryOperator;
 
 /*! Mask of available unary operators */

@@ -67,6 +67,7 @@ namespace Aseba
 			case ASEBA_UNARY_OP_SUB: return "unary -";
 			case ASEBA_UNARY_OP_ABS: return "abs";
 			case ASEBA_UNARY_OP_BIT_NOT: return "binary not";
+			case ASEBA_UNARY_OP_NOT: return "not";
 			
 			default: return "? (unary operator)";
 		}

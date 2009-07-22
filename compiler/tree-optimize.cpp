@@ -165,7 +165,7 @@ namespace Aseba
 	
 	Node* FoldedIfWhenNode::optimize(std::ostream* dump)
 	{
-		assert(false);
+		abort();
 		return 0;
 	}
 	
@@ -223,7 +223,7 @@ namespace Aseba
 	
 	Node* FoldedWhileNode::optimize(std::ostream* dump)
 	{
-		assert(false);
+		abort();
 		return 0;
 	}
 	
@@ -289,7 +289,7 @@ namespace Aseba
 				case ASEBA_OP_OR: result = valueOne || valueTwo; break;
 				case ASEBA_OP_AND: result = valueOne && valueTwo; break;
 				
-				default: assert(false);
+				default: abort();
 			}
 			
 			if (dump)
@@ -320,6 +320,33 @@ namespace Aseba
 		return this;
 	}
 	
+	//! Recursively apply de Morgan law as long as nodes are logic operations, and then invert comparisons
+	void BinaryArithmeticNode::deMorganNotRemoval()
+	{
+		switch (op)
+		{
+			// comparison: invert
+			case ASEBA_OP_EQUAL: op = ASEBA_OP_NOT_EQUAL; break;
+			case ASEBA_OP_NOT_EQUAL: op = ASEBA_OP_EQUAL; break;
+			case ASEBA_OP_BIGGER_THAN: op = ASEBA_OP_SMALLER_EQUAL_THAN; break;
+			case ASEBA_OP_BIGGER_EQUAL_THAN: op = ASEBA_OP_SMALLER_THAN; break;
+			case ASEBA_OP_SMALLER_THAN: op = ASEBA_OP_BIGGER_EQUAL_THAN; break;
+			case ASEBA_OP_SMALLER_EQUAL_THAN: op = ASEBA_OP_BIGGER_THAN; break;
+			// logic: invert and call recursively
+			case ASEBA_OP_OR:
+				op = ASEBA_OP_AND;
+				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
+				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
+			break;
+			case ASEBA_OP_AND:
+				op = ASEBA_OP_OR;
+				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
+				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
+			break;
+			default: abort();
+		};
+	}
+	
 	Node* UnaryArithmeticNode::optimize(std::ostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
@@ -342,13 +369,24 @@ namespace Aseba
 						result = abs(immediateChild->value);
 				break;
 				
-				default: assert(false);
+				default: abort();
 			}
 			
 			if (dump)
 				*dump << sourcePos.toString() << ": unary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
+		}
+		else if (op == ASEBA_UNARY_OP_NOT)
+		{
+			// de Morgan removal of not
+			if (dump)
+				*dump << sourcePos.toString() << ": not removed using de Morgan\n";
+			BinaryArithmeticNode* child(polymorphic_downcast<BinaryArithmeticNode*>(children[0]));
+			child->deMorganNotRemoval();
+			children.clear();
+			delete this;
+			return child;
 		}
 		else
 			return this;
