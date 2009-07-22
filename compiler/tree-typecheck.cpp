@@ -37,7 +37,7 @@ namespace Aseba
 			case TYPE_UNIT: return "unit"; 
 			case TYPE_BOOL: return "bool";
 			case TYPE_INT: return "integer";
-			default: abort();
+			default: abort(); return "unknown";
 		}
 	}
 	
@@ -92,6 +92,7 @@ namespace Aseba
 				
 			default:
 				abort();
+				return TYPE_UNIT;
 		}
 	}
 	
@@ -111,6 +112,7 @@ namespace Aseba
 			
 			default:
 				abort();
+				return TYPE_UNIT;
 		}
 	}
 	
