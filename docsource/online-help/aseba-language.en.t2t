@@ -72,7 +72,9 @@ end
 
 Expressions allow mathematical computations and are written using the normal mathematical infix syntax.
 Assignations use the keyword ``=`` and set the result of the computation of an expression to a scalar variable or to an array element.
-Aseba provides, by order of precedence, the operators ``*``, ``/``, ``%`` (modulo); followed by ``+`` and ``-``; followed by ``<<`` (left shift) and ``>>`` (right shift).
+Aseba provides, by order of precedence, the binary operators ``*``, ``/``, ``%`` (modulo); followed by ``+`` and ``-``; followed by ``<<`` (left shift) and ``>>`` (right shift); followed by ``|`` (binary or); followed by ``^`` (binary exclusive or); followed by ``&`` (binary and).
+The binary operators and left associative.
+Aseba also provides the unary operators ``-``, ``~`` (binary not), and ``abs`` (absolute value).
 To evaluate an expression in a different order, you can use a pair of parenthesis to group a sub-expression.
 
 Example:
@@ -86,7 +88,8 @@ c[a] = d[a]
 = Conditionals =
 
 Aseba provides two types of conditionals: ``if`` and ``when``.
-Comparison operators are ``==``, ``!=``, ``>``, ``>=``, ``<``, and ``<=``; comparisons can be grouped by using the ``and``, ``or``, and ``not`` operators, and by using parenthesis.
+Comparison operators are ``==``, ``!=``, ``>``, ``>=``, ``<``, and ``<=``; you can compare arbitrary expressions.
+You can group comparisons using the ``and``, ``or``, and ``not`` operators, and by using parenthesis.
 
 Both ``if`` and ``when`` execute a different block of code whether a condition is true or false; but ``when`` executes the block corresponding to true only if the last evaluation of the condition was false and the current is true.
 This allows the execution of code only when something changes.

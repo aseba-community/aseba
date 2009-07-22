@@ -75,7 +75,9 @@ end
 
 Les expressions permettent les calculs mathématiques et sont écrites en syntaxe mathématique infixée commune.
 L'assignation utilise le mot clé ``=`` et affecte le résultat du calcul d'une expression à une variable scalaire ou à l'élément d'un tableau.
-Aseba fournit, par ordre de précédence, les opérateurs ``*``, ``/``, ``%`` (modulo); suivi par ``+`` et ``-``; suivi par ``<<`` (décalage à gauche) and ``>>`` (décalage à droite).
+Aseba fournit, par ordre de précédence, les opérateurs binaires ``*``, ``/``, ``%`` (modulo); suivi par ``+`` et ``-``; suivi par ``<<`` (décalage à gauche) and ``>>`` (décalage à droite); suivi par ``|`` (ou binaire); suivi par ``^`` (ou exclusif binaire); suivi par ``&`` (et binaire).
+Les opérateurs binaires sont associatifs à gauche.
+Aseba fournit également les opérateurs unaires ``-``, ``~`` (non binaire), et ``abs`` (valeur absolue).
 Pour évaluer une expression dans un ordre différent, nous pouvons utiliser une paire de parenthèses afin de grouper une sous-expression.
 
 Exemple :
@@ -89,7 +91,7 @@ c[a] = d[a]
 = Conditions =
 
 Aseba fournit deux types de conditions : ``if`` et ``when``.
-Les opérateurs de comparaison sont ``==``, ``!=``, ``>``, ``>=``, ``<`` et``<=``.
+Les opérateurs de comparaison sont ``==``, ``!=``, ``>``, ``>=``, ``<`` et``<=``; vous pouvez comparer des expressions quelconques.
 Les comparaisons peuvent être groupées en utilisant les opérateurs ``and``, ``or``, ``not`` et les parenthèses.
 
 Tant ``if`` que ``when`` exécutent un bloc de code différent selon qu'une condition est vraie ou fausse ; mais ``when`` exécute le
