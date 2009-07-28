@@ -791,6 +791,31 @@ namespace Aseba
 		}
 	}
 	
+	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode)
+	{
+		unsigned bytecodePayloadSize = (ASEBA_MAX_PACKET_SIZE - 6) / 2;
+		unsigned bytecodeStart = 0;
+		unsigned bytecodeCount = bytecode.size();
+		
+		while (bytecodeCount > bytecodePayloadSize)
+		{
+			SetBytecode* setBytecodeMessage = new SetBytecode(dest, bytecodeStart);
+			setBytecodeMessage->bytecode.resize(bytecodePayloadSize);
+			copy(bytecode.begin()+bytecodeStart, bytecode.begin()+bytecodeStart+bytecodePayloadSize, setBytecodeMessage->bytecode.begin());
+			messagesVector.push_back(setBytecodeMessage);
+			
+			bytecodeStart += bytecodePayloadSize;
+			bytecodeCount -= bytecodePayloadSize;
+		}
+		
+		{
+			SetBytecode* setBytecodeMessage = new SetBytecode(dest, bytecodeStart);
+			setBytecodeMessage->bytecode.resize(bytecodeCount);
+			copy(bytecode.begin()+bytecodeStart, bytecode.end(), setBytecodeMessage->bytecode.begin());
+			messagesVector.push_back(setBytecodeMessage);
+		}
+	}
+	
 	//
 	
 	void BreakpointSet::serializeSpecific()

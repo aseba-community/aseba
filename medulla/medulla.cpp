@@ -38,6 +38,7 @@
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusMetaType>
+#include <QtXml>
 #include <QtDebug>
 
 namespace Aseba 
@@ -65,9 +66,9 @@ namespace Aseba
 		return data;
 	}
 	
-	void EventFilterInterface::emitEvent(const quint16 id, const Values& data)
+	void EventFilterInterface::emitEvent(const quint16 id, const QString& name, const Values& data)
 	{
-		emit Event(id, data);
+		emit Event(id, name, data);
 	}
 	
 	void EventFilterInterface::ListenEvent(const quint16 event)
@@ -75,9 +76,27 @@ namespace Aseba
 		network->listenEvent(this, event);
 	}
 	
+	void EventFilterInterface::ListenEventName(const QString& name, const QDBusMessage &message)
+	{
+		size_t event;
+		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
+			network->listenEvent(this, event);
+		else
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+	}
+	
 	void EventFilterInterface::IgnoreEvent(const quint16 event)
 	{
 		network->ignoreEvent(this, event);
+	}
+	
+	void EventFilterInterface::IgnoreEventName(const QString& name, const QDBusMessage &message)
+	{
+		size_t event;
+		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
+			network->ignoreEvent(this, event);
+		else
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 	
 	void EventFilterInterface::Free()
@@ -106,8 +125,13 @@ namespace Aseba
 		{
 			Values values(fromAsebaVector(userMessage->data));
 			QList<EventFilterInterface*> filters = eventsFilters.values(userMessage->type);
+			QString name;
+			if (userMessage->type < commonDefinitions.events.size())
+				name = QString::fromStdString(commonDefinitions.events[userMessage->type].name);
+			else
+				name = "?";
 			for (int i = 0; i < filters.size(); ++i)
-				filters.at(i)->emitEvent(userMessage->type, values);
+				filters.at(i)->emitEvent(userMessage->type, name, values);
 		}
 		
 		Variables *variables = dynamic_cast<Variables *>(message);
@@ -149,6 +173,93 @@ namespace Aseba
 		QList<quint16> events = eventsFilters.keys(filter);
 		for (int i = 0; i < events.size(); ++i)
 			eventsFilters.remove(events.at(i), filter);
+	}
+	
+	void AsebaNetworkInterface::LoadScripts(const QString& fileName, const QDBusMessage &message)
+	{
+		QFile file(fileName);
+		if (!file.open(QFile::ReadOnly))
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("file %0 does not exists").arg(fileName)));
+			return;
+		}
+		
+		QDomDocument document("aesl-source");
+		QString errorMsg;
+		int errorLine;
+		int errorColumn;
+		if (!document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)));
+			return;
+		}
+		
+		commonDefinitions.events.clear();
+		commonDefinitions.constants.clear();
+		
+		int noNodeCount = 0;
+		QDomNode domNode = document.documentElement().firstChild();
+		
+		// FIXME: this code depends on event and contants being before any code
+		while (!domNode.isNull())
+		{
+			if (domNode.isElement())
+			{
+				QDomElement element = domNode.toElement();
+				if (element.tagName() == "node")
+				{
+					bool ok;
+					unsigned nodeId(getNodeId(element.attribute("name").toStdString(), &ok));
+					if (ok)
+					{
+						std::istringstream is(element.firstChild().toText().data().toStdString());
+						Error error;
+						BytecodeVector bytecode;
+						unsigned allocatedVariablesCount;
+						
+						Compiler compiler;
+						compiler.setTargetDescription(getDescription(nodeId));
+						compiler.setCommonDefinitions(&commonDefinitions);
+						bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
+						
+						if (result)
+						{
+							typedef std::vector<Message*> MessageVector;
+							MessageVector messages;
+							sendBytecode(messages, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+							for (MessageVector::const_iterator it = messages.begin(); it != messages.end(); ++it)
+							{
+								hub->sendMessage(*it);
+								delete *it;
+							}
+						}
+						else
+						{
+							QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString::fromStdString(error.toString())));
+						}
+						// FIXME: if we want to use user-defined variables in get/set, use:
+						// compiler.getVariablesMap
+					}
+					else
+						noNodeCount++;
+				}
+				else if (element.tagName() == "event")
+				{
+					commonDefinitions.events.push_back(NamedValue(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
+				}
+				else if (element.tagName() == "constant")
+				{
+					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdString(), element.attribute("value").toUInt()));
+				}
+			}
+			domNode = domNode.nextSibling();
+		}
+		
+		// check if there was some matching problem
+		if (noNodeCount)
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount)));
+		}
 	}
 	
 	QStringList AsebaNetworkInterface::GetNodesList() const

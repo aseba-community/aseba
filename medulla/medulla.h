@@ -55,15 +55,17 @@ namespace Aseba
 		
 		public:
 			EventFilterInterface(AsebaNetworkInterface* network) : network(network) { ListenEvent(0); }
-			void emitEvent(const quint16 id, const Values& data);
+			void emitEvent(const quint16 id, const QString& name, const Values& data);
 			
 		public slots:
-			Q_SCRIPTABLE void ListenEvent(const quint16 event);
-			Q_SCRIPTABLE void IgnoreEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void ListenEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void ListenEventName(const QString& name, const QDBusMessage &message);
+			Q_SCRIPTABLE Q_NOREPLY void IgnoreEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void IgnoreEventName(const QString& name, const QDBusMessage &message);
 			Q_SCRIPTABLE Q_NOREPLY void Free();
 		
 		signals:
-			Q_SCRIPTABLE void Event(const quint16, const Values& );
+			Q_SCRIPTABLE void Event(const quint16, const QString& name, const Values& );
 		
 		protected:
 			AsebaNetworkInterface* network;
@@ -95,6 +97,7 @@ namespace Aseba
 			void filterDestroyed(EventFilterInterface* filter);
 		
 		public slots:
+			Q_NOREPLY void LoadScripts(const QString& fileName, const QDBusMessage &message);
 			QStringList GetNodesList() const;
 			QStringList GetVariablesList(const QString& node) const;
 			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
@@ -106,6 +109,7 @@ namespace Aseba
 			
 		protected:
 			Hub* hub;
+			CommonDefinitions commonDefinitions;
 			typedef QMap<QString, unsigned> NodesNamesMap;
 			NodesNamesMap nodesNames;
 			typedef QList<RequestData*> RequestsList;

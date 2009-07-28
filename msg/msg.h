@@ -450,6 +450,8 @@ namespace Aseba
 	
 	//! Call the SetBytecode multiple time in order to send all the bytecode 
 	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode);
+	//! Call the SetBytecode multiple time in order to send all the bytecode 
+	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode);
 	
 	//! Reset a node
 	class Reset : public CmdMessage

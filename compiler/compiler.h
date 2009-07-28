@@ -174,7 +174,7 @@ namespace Aseba
 	//! Generic vector of name - value pairs
 	struct NamedValuesVector: public std::vector<NamedValue>
 	{
-		bool contains(const std::string& s) const;
+		bool contains(const std::string& s, size_t* position = 0) const;
 	};
 	
 	//! Vector of events descriptions

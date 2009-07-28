@@ -217,7 +217,6 @@ namespace Aseba
 		
 		Compiler compiler; //!< Aesl compiler
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
-		VariablesNamesVector variablesNames; //!< names of variables resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables
 	};
 	

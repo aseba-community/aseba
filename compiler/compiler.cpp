@@ -50,11 +50,17 @@ namespace Aseba
 			return "";
 	}
 	
-	bool NamedValuesVector::contains(const std::string& s) const
+	bool NamedValuesVector::contains(const std::string& s, size_t* position) const
 	{
 		for (size_t i = 0; i < size(); i++)
+		{
 			if ((*this)[i].name == s)
+			{
+				if (position)
+					*position = i;
 				return true;
+			}
+		}
 		return false;
 	}
 	
