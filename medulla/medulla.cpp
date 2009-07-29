@@ -349,6 +349,21 @@ namespace Aseba
 		return Values();
 	}
 	
+	void AsebaNetworkInterface::SendEvent(const quint16 event, const Values& data) const
+	{
+		UserMessage msg(event, toAsebaVector(data));
+		hub->sendMessage(&msg);
+	}
+	
+	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message) const
+	{
+		size_t event;
+		if (commonDefinitions.events.contains(name.toStdString(), &event))
+			SendEvent(event, data);
+		else
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+	}
+	
 	QDBusObjectPath AsebaNetworkInterface::CreateEventFilter()
 	{
 		QDBusObjectPath path(QString("/events_filters/%0").arg(eventsFiltersCounter++));
