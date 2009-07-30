@@ -258,7 +258,7 @@ namespace Aseba
 		// check if there was some matching problem
 		if (noNodeCount)
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount)));
+			std::cerr << QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount).toStdString() << std::endl;
 		}
 	}
 	
