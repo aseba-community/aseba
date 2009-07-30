@@ -102,8 +102,8 @@ namespace Aseba
 			QStringList GetVariablesList(const QString& node) const;
 			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
 			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);
-			Q_NOREPLY void SendEvent(const quint16 event, const Values& data) const;
-			Q_NOREPLY void SendEventName(const QString& name, const Values& data, const QDBusMessage &message) const;
+			Q_NOREPLY void SendEvent(const quint16 event, const Values& data);
+			Q_NOREPLY void SendEventName(const QString& name, const Values& data, const QDBusMessage &message);
 			QDBusObjectPath CreateEventFilter();
 		
 		protected:

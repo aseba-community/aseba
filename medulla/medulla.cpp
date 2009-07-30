@@ -349,13 +349,19 @@ namespace Aseba
 		return Values();
 	}
 	
-	void AsebaNetworkInterface::SendEvent(const quint16 event, const Values& data) const
+	void AsebaNetworkInterface::SendEvent(const quint16 event, const Values& data)
 	{
-		UserMessage msg(event, toAsebaVector(data));
-		hub->sendMessage(&msg);
+		// create message
+		UserMessage* message(new UserMessage(event, toAsebaVector(data)));
+		
+		// send on TCP
+		hub->sendMessage(message);
+		
+		// send on DBus, the receiver can delete it
+		processMessage(message);
 	}
 	
-	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message) const
+	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message)
 	{
 		size_t event;
 		if (commonDefinitions.events.contains(name.toStdString(), &event))
@@ -392,6 +398,14 @@ namespace Aseba
 	
 	void Hub::sendMessage(Message *message, Stream* sourceStream)
 	{
+		// dump if requested
+		if (dump)
+		{
+			dumpTime(cout, rawTime);
+			message->dump(cout);
+			cout << std::endl;
+		}
+		
 		// write on all connected streams
 		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
@@ -421,6 +435,7 @@ namespace Aseba
 	
 	void Hub::incomingData(Stream *stream)
 	{
+		// receive message
 		Message *message;
 		try
 		{
@@ -432,15 +447,10 @@ namespace Aseba
 			std::cerr << "error while reading message" << std::endl;
 		}
 		
-		if (dump)
-		{
-			dumpTime(cout, rawTime);
-			message->dump(cout);
-		}
-		
+		// send on TCP
 		sendMessage(message);
 		
-		// the receiver can delete it
+		// send on DBus, the receiver can delete it
 		emit messageAvailable(message);
 	}
 	
