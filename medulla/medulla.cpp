@@ -232,10 +232,12 @@ namespace Aseba
 								hub->sendMessage(*it);
 								delete *it;
 							}
+							Run msg(nodeId);
+							hub->sendMessage(&msg);
 						}
 						else
 						{
-							QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString::fromStdString(error.toString())));
+							QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
 						}
 						// FIXME: if we want to use user-defined variables in get/set, use:
 						// compiler.getVariablesMap

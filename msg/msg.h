@@ -59,6 +59,7 @@ namespace Aseba
 		void serialize(Dashel::Stream* stream);
 		static Message *receive(Dashel::Stream* stream);
 		void dump(std::ostream &stream);
+		void dumpBuffer(std::ostream &stream);
 		
 	protected:
 		virtual void serializeSpecific() = 0;

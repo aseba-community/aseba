@@ -182,8 +182,8 @@ namespace Aseba
 		if (message->readPos != message->rawData.size())
 		{
 			cerr << "Message::receive() : fatal error: message not fully read.\n";
-			cerr << "type: " << type << ", readPos: " << message->readPos << ", rawData size: " << message->rawData.size();
-			cerr << endl;
+			cerr << "type: " << type << ", readPos: " << message->readPos << ", rawData size: " << message->rawData.size() << endl;
+			message->dumpBuffer(cerr);
 			abort();
 		}
 		
@@ -196,6 +196,13 @@ namespace Aseba
 		stream << dec << noshowbase << *this << " from ";
 		stream << source << " : ";
 		dumpSpecific(stream);
+	}
+	
+	void Message::dumpBuffer(std::ostream &stream)
+	{
+		for (size_t i = 0; i < rawData.size(); ++i)
+			stream << (unsigned)(rawData[i]) << " (" << rawData[i] << "), ";
+		stream << endl;
 	}
 	
 	template<typename T>
@@ -215,6 +222,7 @@ namespace Aseba
 			cerr << "Message::add<string>() : fatal error, string length exceeds 255 characters.\n";
 			cerr << "string size: " << val.length();
 			cerr << endl;
+			dumpBuffer(cerr);
 			abort();
 		}
 		
@@ -231,6 +239,7 @@ namespace Aseba
 			cerr << "Message<" << typeid(T).name() << ">::get() : fatal error: attempt to overread.\n";
 			cerr << "type: " << type << ", readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
 			cerr << endl;
+			dumpBuffer(cerr);
 			abort();
 		}
 		
