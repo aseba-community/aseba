@@ -101,10 +101,10 @@ namespace Aseba
 		}
 		
 		//! Print the list of registered messages types to stream
-		void dumpKnownMessagesTypes(ostream &stream)
+		void dumpKnownMessagesTypes(ostream &stream) const
 		{
 			stream << hex << showbase;
-			for (map<uint16, CreatorFunc>::iterator it = messagesTypes.begin(); it != messagesTypes.end(); ++it)
+			for (map<uint16, CreatorFunc>::const_iterator it = messagesTypes.begin(); it != messagesTypes.end(); ++it)
 				stream << "\t" << setw(4) << it->first << "\n";
 			stream << dec << noshowbase;
 		}
@@ -190,7 +190,7 @@ namespace Aseba
 		return message;
 	}
 	
-	void Message::dump(ostream &stream)
+	void Message::dump(ostream &stream) const
 	{
 		stream << hex << showbase << setw(4) << type << " ";
 		stream << dec << noshowbase << *this << " from ";
@@ -198,7 +198,7 @@ namespace Aseba
 		dumpSpecific(stream);
 	}
 	
-	void Message::dumpBuffer(std::ostream &stream)
+	void Message::dumpBuffer(std::ostream &stream) const
 	{
 		for (size_t i = 0; i < rawData.size(); ++i)
 			stream << (unsigned)(rawData[i]) << " (" << rawData[i] << "), ";
@@ -285,7 +285,7 @@ namespace Aseba
 			data[i] = get<sint16>();
 	}
 	
-	void UserMessage::dumpSpecific(ostream &stream)
+	void UserMessage::dumpSpecific(ostream &stream) const
 	{
 		stream << dec << "user message of size " << data.size() << " : ";
 		for (size_t i = 0 ; i < data.size(); i++)
@@ -309,7 +309,7 @@ namespace Aseba
 		pagesCount = get<uint16>();
 	}
 	
-	void BootloaderDescription::dumpSpecific(ostream &stream)
+	void BootloaderDescription::dumpSpecific(ostream &stream) const
 	{
 		stream << pagesCount << " pages of size " << pageSize << " starting at page " << pagesStart;
 	}
@@ -329,7 +329,7 @@ namespace Aseba
 			data[i] = get<uint8>();
 	}
 	
-	void BootloaderDataRead::dumpSpecific(ostream &stream)
+	void BootloaderDataRead::dumpSpecific(ostream &stream) const
 	{
 		stream << hex << setfill('0');
 		for (size_t i = 0 ; i < sizeof(data); i++)
@@ -353,7 +353,7 @@ namespace Aseba
 			errorAddress = get<uint16>();
 	}
 	
-	void BootloaderAck::dumpSpecific(ostream &stream)
+	void BootloaderAck::dumpSpecific(ostream &stream) const
 	{
 		switch (errorCode)
 		{
@@ -378,7 +378,7 @@ namespace Aseba
 		version = get<uint16>();
 	}
 	
-	void GetDescription::dumpSpecific(std::ostream &stream)
+	void GetDescription::dumpSpecific(std::ostream &stream) const
 	{
 		stream << "protocol version " << version;
 	}
@@ -423,7 +423,7 @@ namespace Aseba
 		// native functions are received separately
 	}
 	
-	void Description::dumpSpecific(ostream &stream)
+	void Description::dumpSpecific(ostream &stream) const
 	{
 		stream << "Node " << name << " using protocol version " << protocolVersion << "\n";
 		stream << "bytecode: " << bytecodeSize << ", stack: " << stackSize << ", variables: " << variablesSize;
@@ -452,7 +452,7 @@ namespace Aseba
 		name = get<string>();
 	}
 	
-	void NamedVariableDescription::dumpSpecific(std::ostream &stream)
+	void NamedVariableDescription::dumpSpecific(std::ostream &stream) const
 	{
 		stream << name << " of size " << size;
 	}
@@ -471,7 +471,7 @@ namespace Aseba
 		description = get<string>();
 	}
 	
-	void LocalEventDescription::dumpSpecific(std::ostream &stream)
+	void LocalEventDescription::dumpSpecific(std::ostream &stream) const
 	{
 		stream << name << " : " << description;
 	}
@@ -504,7 +504,7 @@ namespace Aseba
 		}
 	}
 	
-	void NativeFunctionDescription::dumpSpecific(std::ostream &stream)
+	void NativeFunctionDescription::dumpSpecific(std::ostream &stream) const
 	{
 		stream << name << " (";
 		for (size_t j = 0; j < parameters.size(); j++)
@@ -534,7 +534,7 @@ namespace Aseba
 			variables[i] = get<sint16>();
 	}
 	
-	void Variables::dumpSpecific(ostream &stream)
+	void Variables::dumpSpecific(ostream &stream) const
 	{
 		stream << "start " << start << ", variables vector of size " << variables.size();
 		/*for (size_t i = 0; i < variables.size(); i++)
@@ -558,7 +558,7 @@ namespace Aseba
 		index = get<uint16>();
 	}
 	
-	void ArrayAccessOutOfBounds::dumpSpecific(ostream &stream)
+	void ArrayAccessOutOfBounds::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc << ", size " << size << ", index " << index ;
 	}
@@ -575,7 +575,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void DivisionByZero::dumpSpecific(ostream &stream)
+	void DivisionByZero::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc;
 	}
@@ -592,7 +592,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void EventExecutionKilled::dumpSpecific(ostream &stream)
+	void EventExecutionKilled::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc;
 	}
@@ -611,7 +611,7 @@ namespace Aseba
 		message = get<std::string>();
 	}
 	
-	void NodeSpecificError::dumpSpecific(ostream &stream)
+	void NodeSpecificError::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc << " " << message;
 	}
@@ -630,7 +630,7 @@ namespace Aseba
 		flags = get<uint16>();
 	}
 	
-	void ExecutionStateChanged::dumpSpecific(ostream &stream)
+	void ExecutionStateChanged::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc << ", flags ";
 		stream << hex << showbase << setw(4) << flags;
@@ -651,7 +651,7 @@ namespace Aseba
 		success = get<uint16>();
 	}
 	
-	void BreakpointSetResult::dumpSpecific(ostream &stream)
+	void BreakpointSetResult::dumpSpecific(ostream &stream) const
 	{
 		stream << "pc " << pc << ", success " << success;
 	}
@@ -668,7 +668,7 @@ namespace Aseba
 		dest = get<uint16>();
 	}
 	
-	void CmdMessage::dumpSpecific(ostream &stream)
+	void CmdMessage::dumpSpecific(ostream &stream) const
 	{
 		stream << "dest " << dest << " ";
 	}
@@ -689,7 +689,7 @@ namespace Aseba
 		pageNumber = get<uint16>();
 	}
 	
-	void BootloaderReadPage::dumpSpecific(ostream &stream)
+	void BootloaderReadPage::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -712,7 +712,7 @@ namespace Aseba
 		pageNumber = get<uint16>();
 	}
 	
-	void BootloaderWritePage::dumpSpecific(ostream &stream)
+	void BootloaderWritePage::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -737,7 +737,7 @@ namespace Aseba
 			data[i] = get<uint8>();
 	}
 	
-	void BootloaderPageDataWrite::dumpSpecific(ostream &stream)
+	void BootloaderPageDataWrite::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -768,7 +768,7 @@ namespace Aseba
 			bytecode[i] = get<uint16>();
 	}
 	
-	void SetBytecode::dumpSpecific(ostream &stream)
+	void SetBytecode::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -841,7 +841,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void BreakpointSet::dumpSpecific(ostream &stream)
+	void BreakpointSet::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -864,7 +864,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void BreakpointClear::dumpSpecific(ostream &stream)
+	void BreakpointClear::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -896,7 +896,7 @@ namespace Aseba
 		length = get<uint16>();
 	}
 	
-	void GetVariables::dumpSpecific(ostream &stream)
+	void GetVariables::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -931,7 +931,7 @@ namespace Aseba
 			variables[i] = get<sint16>();
 	}
 	
-	void SetVariables::dumpSpecific(ostream &stream)
+	void SetVariables::dumpSpecific(ostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		

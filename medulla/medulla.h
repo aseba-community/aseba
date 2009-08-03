@@ -90,8 +90,9 @@ namespace Aseba
 		
 		private slots:
 			friend class Hub;
-			void processMessage(Message *message);
+			void processMessage(Message *message, Dashel::Stream* sourceStream);
 			friend class EventFilterInterface;
+			void sendEventOnDBus(const quint16 event, const Values& data);
 			void listenEvent(EventFilterInterface* filter, quint16 event);
 			void ignoreEvent(EventFilterInterface* filter, quint16 event);
 			void filterDestroyed(EventFilterInterface* filter);
@@ -123,31 +124,44 @@ namespace Aseba
 	
 	/*!
 		Route Aseba messages on the TCP part of the network.
+		
+		This thread only *receives* messages.
+		All dispatch, including forwarding, is done in the main thread called by
+		the AsebaNetworkInterface class.
 	*/
 	class Hub: public QThread, public Dashel::Hub
 	{
 		Q_OBJECT
 		
 		public:
-			/*! Creates the hub, listen to TCP on port.
+			/*! Creates the hub, listen to TCP on port, and creates a DBus interace.
 				@param verbose should we print a notification on each message
 				@param dump should we dump content of each message
 				@param forward should we only forward messages instead of transmit them back to the sender
+				@param rawTime should the time be printed as integer
 			*/
 			Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime);
 			
-		signals:
-			void messageAvailable(Message *message);
-			
-		public slots:
+			/*! Sends a message to Dashel peers.
+				Does not delete the message, should be called by the main thread.
+				@param message aseba message to send
+				@param sourceStream originate of the message, if from Dashel.
+			*/
 			void sendMessage(Message *message, Dashel::Stream* sourceStream = 0);
+			/*! Sends a message to Dashel peers.
+				Convenience overload
+			*/
+			void sendMessage(Message& message, Dashel::Stream* sourceStream = 0);
+			
+		signals:
+			void messageAvailable(Message *message, Dashel::Stream* sourceStream);
 			
 		private:
 			virtual void run();
 			virtual void connectionCreated(Dashel::Stream *stream);
 			virtual void incomingData(Dashel::Stream *stream);
 			virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-		
+			
 		private:
 			bool verbose; //!< should we print a notification on each message
 			bool dump; //!< should we dump content of CAN messages

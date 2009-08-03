@@ -58,13 +58,13 @@ namespace Aseba
 		
 		void serialize(Dashel::Stream* stream);
 		static Message *receive(Dashel::Stream* stream);
-		void dump(std::ostream &stream);
-		void dumpBuffer(std::ostream &stream);
+		void dump(std::ostream &stream) const;
+		void dumpBuffer(std::ostream &stream) const;
 		
 	protected:
 		virtual void serializeSpecific() = 0;
 		virtual void deserializeSpecific() = 0;
-		virtual void dumpSpecific(std::ostream &stream) = 0;
+		virtual void dumpSpecific(std::ostream &stream) const = 0;
 		virtual operator const char * () const { return "message super class"; }
 	
 	protected:
@@ -90,7 +90,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "user message"; }
 	};
 	
@@ -108,7 +108,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader description"; }
 	};
 	
@@ -124,7 +124,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader page data read"; }
 	};
 	
@@ -150,7 +150,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader ack"; }
 	};
 	
@@ -166,7 +166,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &);
+		virtual void dumpSpecific(std::ostream &) const;
 		virtual operator const char * () const { return "presence"; }
 	};
 	
@@ -179,7 +179,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "description"; }
 	};
 	
@@ -192,7 +192,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "named variable"; }
 	};
 	
@@ -205,7 +205,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "local event"; }
 	};
 	
@@ -218,7 +218,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "native function description"; }
 	};
 	
@@ -231,7 +231,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific() {}
 		virtual void deserializeSpecific() {}
-		virtual void dumpSpecific(std::ostream &) {}
+		virtual void dumpSpecific(std::ostream &) const {}
 		virtual operator const char * () const { return "disconnected"; }
 	};
 	
@@ -248,7 +248,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "variables"; }
 	};
 	
@@ -266,7 +266,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "array access out of bounds"; }
 	};
 	
@@ -282,7 +282,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "division by zero"; }
 	};
 	
@@ -298,7 +298,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "event execution killed"; }
 	};
 	
@@ -315,7 +315,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &);
+		virtual void dumpSpecific(std::ostream &) const;
 		virtual operator const char * () const { return "node specific error"; }
 	};
 	
@@ -332,7 +332,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "execution state"; }
 	};
 	
@@ -349,7 +349,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "breakpoint set result"; }
 	};
 	
@@ -365,7 +365,7 @@ namespace Aseba
 	protected:	
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "command message super class"; }
 	};
 	
@@ -393,7 +393,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader read page"; }
 	};
 	
@@ -410,7 +410,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader write page"; }
 	};
 	
@@ -427,7 +427,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "bootloader page data write"; }
 	};
 	
@@ -445,7 +445,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "set bytecode"; }
 	};
 	
@@ -533,7 +533,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "breakpoint set"; }
 	};
 	
@@ -550,7 +550,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "breakpoint clear"; }
 	};
 	
@@ -579,7 +579,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "get variables"; }
 	};
 	
@@ -598,7 +598,7 @@ namespace Aseba
 	protected:
 		virtual void serializeSpecific();
 		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::ostream &stream);
+		virtual void dumpSpecific(std::ostream &stream) const;
 		virtual operator const char * () const { return "set variables"; }
 	};
 	

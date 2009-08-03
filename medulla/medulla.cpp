@@ -116,24 +116,22 @@ namespace Aseba
 		QDBusConnection::sessionBus().registerService("ch.epfl.mobots.Aseba");
 	}
 	
-	void AsebaNetworkInterface::processMessage(Message *message)
+	void AsebaNetworkInterface::processMessage(Message *message, Dashel::Stream* sourceStream)
 	{
+		// send messages to Dashel peers
+		hub->sendMessage(message, sourceStream);
+		
+		// scan this message for nodes descriptions
 		DescriptionsManager::processMessage(message);
 		
+		// if user message, send to D-Bus as well
 		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
 		if (userMessage)
 		{
-			Values values(fromAsebaVector(userMessage->data));
-			QList<EventFilterInterface*> filters = eventsFilters.values(userMessage->type);
-			QString name;
-			if (userMessage->type < commonDefinitions.events.size())
-				name = QString::fromStdString(commonDefinitions.events[userMessage->type].name);
-			else
-				name = "?";
-			for (int i = 0; i < filters.size(); ++i)
-				filters.at(i)->emitEvent(userMessage->type, name, values);
+			sendEventOnDBus(userMessage->type, fromAsebaVector(userMessage->data));
 		}
 		
+		// if variables, check for pending answers
 		Variables *variables = dynamic_cast<Variables *>(message);
 		if (variables)
 		{
@@ -156,6 +154,18 @@ namespace Aseba
 		}
 		
 		delete message;
+	}
+	
+	void AsebaNetworkInterface::sendEventOnDBus(const quint16 event, const Values& data)
+	{
+		QList<EventFilterInterface*> filters = eventsFilters.values(event);
+		QString name;
+		if (event < commonDefinitions.events.size())
+			name = QString::fromStdString(commonDefinitions.events[event].name);
+		else
+			name = "?";
+		for (int i = 0; i < filters.size(); ++i)
+			filters.at(i)->emitEvent(event, name, data);
 	}
 	
 	void AsebaNetworkInterface::listenEvent(EventFilterInterface* filter, quint16 event)
@@ -233,7 +243,7 @@ namespace Aseba
 								delete *it;
 							}
 							Run msg(nodeId);
-							hub->sendMessage(&msg);
+							hub->sendMessage(msg);
 						}
 						else
 						{
@@ -314,7 +324,7 @@ namespace Aseba
 		}
 		
 		SetVariables msg(nodeId, pos, toAsebaVector(data));
-		hub->sendMessage(&msg);
+		hub->sendMessage(msg);
 	}
 	
 	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage &message)
@@ -338,7 +348,7 @@ namespace Aseba
 		
 		{
 			GetVariables msg(nodeId, pos, length);
-			hub->sendMessage(&msg);
+			hub->sendMessage(msg);
 		}
 		
 		RequestData *request = new RequestData;
@@ -353,14 +363,12 @@ namespace Aseba
 	
 	void AsebaNetworkInterface::SendEvent(const quint16 event, const Values& data)
 	{
-		// create message
-		UserMessage* message(new UserMessage(event, toAsebaVector(data)));
+		// send event to DBus listeners
+		sendEventOnDBus(event, data);
 		
 		// send on TCP
-		hub->sendMessage(message);
-		
-		// send on DBus, the receiver can delete it
-		processMessage(message);
+		UserMessage msg(event, toAsebaVector(data));
+		hub->sendMessage(msg);
 	}
 	
 	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message)
@@ -384,7 +392,6 @@ namespace Aseba
 		nodesNames[QString::fromStdString(nodesDescriptions[nodeId].name)] = nodeId;
 	}
 	
-	//! Broadcast messages form any data stream to all others data streams including itself.
 	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
 		verbose(verbose),
 		dump(dump),
@@ -392,7 +399,7 @@ namespace Aseba
 		rawTime(rawTime)
 	{
 		AsebaNetworkInterface* network(new AsebaNetworkInterface(this));
-		QObject::connect(this, SIGNAL(messageAvailable(Message*)), network, SLOT(processMessage(Message*)));
+		QObject::connect(this, SIGNAL(messageAvailable(Message*, Stream*)), network, SLOT(processMessage(Message*, Stream*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
@@ -429,6 +436,11 @@ namespace Aseba
 		}
 	}
 	
+	void Hub::sendMessage(Message& message, Dashel::Stream* sourceStream)
+	{
+		sendMessage(&message, sourceStream);
+	}
+	
 	// In QThread main function, we just make our Dashel hub switch listen for incoming data
 	void Hub::run()
 	{
@@ -449,11 +461,8 @@ namespace Aseba
 			std::cerr << "error while reading message" << std::endl;
 		}
 		
-		// send on TCP
-		sendMessage(message);
-		
 		// send on DBus, the receiver can delete it
-		emit messageAvailable(message);
+		emit messageAvailable(message, stream);
 	}
 	
 	void Hub::connectionCreated(Stream *stream)
@@ -463,8 +472,8 @@ namespace Aseba
 			dumpTime(cout, rawTime);
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
-		GetDescription().serialize(stream);
-		stream->flush();
+		
+		emit messageAvailable(new GetDescription(), 0);
 	}
 	
 	void Hub::connectionClosed(Stream* stream, bool abnormal)
@@ -559,6 +568,8 @@ int main(int argc, char *argv[])
 		std::cerr << e.what() << std::endl;
 	}
 	
+	//TODO: fix multi-threading
+	//hub.moveToThread(&hub);
 	hub.start();
 	
 	return app.exec();
