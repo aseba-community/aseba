@@ -399,7 +399,7 @@ namespace Aseba
 		rawTime(rawTime)
 	{
 		AsebaNetworkInterface* network(new AsebaNetworkInterface(this));
-		QObject::connect(this, SIGNAL(messageAvailable(Message*, Stream*)), network, SLOT(processMessage(Message*, Stream*)));
+		QObject::connect(this, SIGNAL(messageAvailable(Message*, Dashel::Stream*)), network, SLOT(processMessage(Message*, Dashel::Stream*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
