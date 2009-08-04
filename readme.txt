@@ -13,7 +13,7 @@ platforms:
 Aseba depends on the following libraries:
 	- Dashel (http://home.gna.org/dashel/)
 	- Boost
-	- Qt (http://www.qtsoftware.com/products/, for IDE)
+	- Qt4 (http://www.qtsoftware.com/products/, for IDE)
 	- Qwt (http://qwt.sourceforge.net/, optional, for graphs)
 	- Enki (http://home.gna.org/enki/, optional, for simulators)
 
