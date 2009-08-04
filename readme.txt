@@ -21,7 +21,7 @@ If you are on Unix and lazy, and just want to compile Aseba without any
 additional thinking, try the following commands in Aseba sources directory:
 	cmake . && make
 If this does not work, probably because you have to specify the path of some libraries,
-read the aforementioned web page.
+read the CMake documentation page.
 
 If you still have some problem to compile Aseba after reading the relevant
 documentation, feel free to post your question on our development mailing
