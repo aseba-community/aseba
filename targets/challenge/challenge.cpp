@@ -609,14 +609,15 @@ namespace Enki
 		#else // Q_WS_MAC
 		
 		QMenuBar *menuBar = new QMenuBar(0);
-		menuBar->addAction(tr("Add a new robot"), this, SLOT(addNewRobot()));
-		menuBar->addAction(tr("Remove all robots"), this, SLOT(removeRobot()));
-		menuBar->addSeparator();
-		autoCamera = new QAction(tr("Auto camera"));
+		QMenu *menu = menuBar->addMenu(tr("Simulator control"));
+		menu->addAction(tr("Add a new robot"), this, SLOT(addNewRobot()));
+		menu->addAction(tr("Remove all robots"), this, SLOT(removeRobot()));
+		menu->addSeparator();
+		autoCamera = new QAction(tr("Auto camera"), 0);
 		autoCamera->setCheckable(true);
-		menuBar->addAction(autoCamera);
-		menuBar->addSeparator();
-		menuBar->addAction(tr("Help"), helpViewer, SLOT(show()));
+		menu->addAction(autoCamera);
+		menu->addSeparator();
+		menu->addAction(tr("Help"), helpViewer, SLOT(show()));
 		
 		#endif // Q_WS_MAC
 		
