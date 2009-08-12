@@ -440,14 +440,15 @@ int main()
 	
 	initRobot();
 
-	do {
+//	do {
 		initAseba();
-	} while(!e_ischar_uart1());
-
+//	} while(!e_ischar_uart1());
+/*
 	for (i = 0; i < 14; i++)
 	{
 		uartGetUInt8();
 	}
+*/
 	e_calibrate_ir();
 	e_acc_calibr();
 
