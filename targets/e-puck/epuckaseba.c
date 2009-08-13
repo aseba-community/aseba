@@ -35,7 +35,7 @@
 #include "e-puck/library/motor_led/e_led.h"
 #include "e-puck/library/motor_led/advance_one_timer/e_motors.h"
 #include "e-puck/library/motor_led/advance_one_timer/e_agenda.h"
-#include "e-puck/library/camera/fast_2_timer/e_po3030k.h"
+#include "e-puck/library/camera/fast_2_timer/e_poxxxx.h"
 #include "e-puck/library/uart/e_uart_char.h"
 #include "e-puck/library/a_d/advance_ad_scan/e_ad_conv.h"
 #include "e-puck/library/a_d/advance_ad_scan/e_prox.h"
@@ -114,7 +114,7 @@ struct EPuckVariables
 	sint16 camG[60];
 	sint16 camB[60];
 	// free space
-	sint16 freeSpace[256];
+	sint16 freeSpace[128];
 } __attribute__ ((far)) ePuckVariables;
 
 char name[] = "e-puck0";
@@ -335,7 +335,7 @@ void updateRobotVariables()
 		ePuckVariables.acc[i] = e_get_acc(i);
 
 	// camera
-	if(e_po3030k_is_img_ready())	
+	if(e_poxxxx_is_img_ready())	
 	{
 		for(i = 0; i < 60; i++)
 		{
@@ -346,13 +346,13 @@ void updateRobotVariables()
 		if(camline != ePuckVariables.camLine)
 		{
 			camline = ePuckVariables.camLine;
-			e_po3030k_config_cam(camline,0,4,480,4,8,RGB_565_MODE);
-			e_po3030k_set_ref_exposure(160);
-			e_po3030k_set_ww(0);
-			e_po3030k_set_mirror(1,1);
-			e_po3030k_write_cam_registers();
+			e_poxxxx_config_cam(camline,0,4,480,4,8,RGB_565_MODE);
+		//	e_po3030k_set_ref_exposure(160);
+		//	e_po3030k_set_ww(0);
+			e_poxxxx_set_mirror(1,1);
+			e_poxxxx_write_cam_registers();
 		}
-		e_po3030k_launch_capture((char *)cam_data);
+		e_poxxxx_launch_capture((char *)cam_data);
 		SET_EVENT(EVENT_CAMERA);
 	}
 }
@@ -373,13 +373,13 @@ void initRobot()
 	e_init_motors();
 	e_init_uart1();
 	e_init_ad_scan(0);
-	e_po3030k_init_cam();
-	e_po3030k_config_cam(640/2-4,0,4,480,4,8,RGB_565_MODE);
-	e_po3030k_set_ref_exposure(160);
-	e_po3030k_set_ww(0);
-	e_po3030k_set_mirror(1,1);
-	e_po3030k_write_cam_registers();
-	e_po3030k_launch_capture((char *)cam_data);
+	e_poxxxx_init_cam();
+	e_poxxxx_config_cam(640/2-4,0,4,480,4,8,RGB_565_MODE);
+//	e_po3030k_set_ref_exposure(160);
+//	e_po3030k_set_ww(0);
+	e_poxxxx_set_mirror(1,1);
+	e_poxxxx_write_cam_registers();
+	e_poxxxx_launch_capture((char *)cam_data);
 
 	// reset if power on (some problem for few robots)
 	if (RCONbits.POR)
