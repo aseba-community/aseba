@@ -170,6 +170,11 @@ void AsebaNative_mathrot2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathrot2 */
 extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 
+/*! Function to perform sqrt */
+void AsebaNative_mathsqrt(AsebaVMState *vm);
+/*! Description of AsebaNative_mathsqrt */
+extern AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
+
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
 	AsebaNative_vecfill, \
@@ -186,7 +191,8 @@ extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 	AsebaNative_mathatan2, \
 	AsebaNative_mathsin, \
 	AsebaNative_mathcos, \
-	AsebaNative_mathrot2
+	AsebaNative_mathrot2, \
+	AsebaNative_mathsqrt
 
 /*! snippet to include descriptions of standard native functions */
 #define ASEBA_NATIVES_STD_DESCRIPTIONS \
@@ -204,7 +210,8 @@ extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 	&AsebaNativeDescription_mathatan2, \
 	&AsebaNativeDescription_mathsin, \
 	&AsebaNativeDescription_mathcos, \
-	&AsebaNativeDescription_mathrot2
+	&AsebaNativeDescription_mathrot2, \
+	&AsebaNativeDescription_mathsqrt
 
 /*@}*/
 

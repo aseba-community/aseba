@@ -198,6 +198,33 @@ sint16 aseba_cos(sint16 angle)
 	return aseba_sin(16384 + angle);
 }
 
+// Do integer square root ( From Wikipedia )
+sint16 aseba_sqrt(sint16 num)
+{
+	sint16 op = num;
+	sint16 res = 0;
+	sint16 one = 1 << 14;
+	
+	while(one > op)
+		one >>= 2;
+		
+	while(one != 0) 
+	{
+		if (op >= res + one) 
+		{
+			op -= res + one;
+			res = (res >> 1) + one;
+		}
+		else
+		{	
+			res >>= 1;
+		}
+		one >>= 2;
+	}
+	return res;
+}
+		
+
 // standard natives functions
 
 void AsebaNative_vecfill(AsebaVMState *vm)
@@ -731,6 +758,34 @@ AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
 		{ 2, "dest" },
 		{ 2, "v" },
 		{ 1, "a" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_mathsqrt(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 destIndex = AsebaNativePopArg(vm);
+	sint16 xIndex = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 x = vm->variables[xIndex++];
+		vm->variables[destIndex++] = aseba_sqrt(x);
+	}
+}
+
+AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt =
+{
+	"math.sqrt",
+	"performs dest = sqrt(x) element by element",
+	{
+		{ -1, "dest" },
+		{ -1, "x" },
 		{ 0, 0 }
 	}
 };
