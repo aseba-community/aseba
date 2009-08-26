@@ -206,6 +206,7 @@ namespace Aseba
 		
 		commonDefinitions.events.clear();
 		commonDefinitions.constants.clear();
+		userDefinedVariablesMap.clear();
 		
 		int noNodeCount = 0;
 		QDomNode domNode = document.documentElement().firstChild();
@@ -249,8 +250,8 @@ namespace Aseba
 						{
 							QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
 						}
-						// FIXME: if we want to use user-defined variables in get/set, use:
-						// compiler.getVariablesMap
+						// retrieve user-defined variables for use in get/set
+						userDefinedVariablesMap[element.attribute("name")] = *compiler.getVariablesMap();
 					}
 					else
 						noNodeCount++;
@@ -289,6 +290,7 @@ namespace Aseba
 		NodesNamesMap::const_iterator it(nodesNames.find(node));
 		if (it != nodesNames.end())
 		{
+			// node defined variables
 			const unsigned nodeId(it.value());
 			const NodesDescriptionsMap::const_iterator descIt(nodesDescriptions.find(nodeId));
 			const NodeDescription& description(descIt->second);
@@ -297,6 +299,18 @@ namespace Aseba
 			{
 				list.push_back(QString::fromStdString(description.namedVariables[i].name));
 			}
+			
+			// user defined variables
+			const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
+			if (userVarMapIt != userDefinedVariablesMap.end())
+			{
+				const Compiler::VariablesMap& variablesMap(*userVarMapIt);
+				for (Compiler::VariablesMap::const_iterator jt = variablesMap.begin(); jt != variablesMap.end(); ++jt)
+				{
+					list.push_back(QString::fromStdString(jt->first));
+				}
+			}
+			
 			return list;
 		}
 		else
@@ -307,20 +321,39 @@ namespace Aseba
 	
 	void AsebaNetworkInterface::SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const
 	{
-		NodesNamesMap::const_iterator it(nodesNames.find(node));
-		if (it == nodesNames.end())
+		// make sure the node exists
+		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
+		if (nodeIt == nodesNames.end())
 		{
 			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return;
 		}
+		const unsigned nodeId(nodeIt.value());
 		
-		const unsigned nodeId(it.value());
-		bool ok;
-		const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok));
-		if (!ok)
+		unsigned pos(unsigned(-1));
+		
+		// check whether variable is user-defined
+		const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
+		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
-			return;
+			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
+			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdString()));
+			if (userVarIt != userVarMap.end())
+			{
+				pos = userVarIt->second.first;
+			}
+		}
+		
+		// if variable is not user-defined, check whether it is provided by this node
+		if (pos == unsigned(-1))
+		{
+			bool ok;
+			pos = getVariablePos(nodeId, variable.toStdString(), &ok);
+			if (!ok)
+			{
+				QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				return;
+			}
 		}
 		
 		SetVariables msg(nodeId, pos, toAsebaVector(data));
@@ -329,28 +362,51 @@ namespace Aseba
 	
 	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage &message)
 	{
-		NodesNamesMap::const_iterator it(nodesNames.find(node));
-		if (it == nodesNames.end())
+		// make sure the node exists
+		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
+		if (nodeIt == nodesNames.end())
 		{
 			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return Values();
 		}
+		const unsigned nodeId(nodeIt.value());
 		
-		const unsigned nodeId(it.value());
-		bool ok1, ok2;
-		const unsigned pos(getVariablePos(nodeId, variable.toStdString(), &ok1));
-		const unsigned length(getVariableSize(nodeId, variable.toStdString(), &ok2));
-		if (!(ok1 && ok2))
+		unsigned pos(unsigned(-1));
+		unsigned length(unsigned(-1));
+		
+		// check whether variable is user-defined
+		const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
+		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
-			return Values();
+			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
+			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdString()));
+			if (userVarIt != userVarMap.end())
+			{
+				pos = userVarIt->second.first;
+				length = userVarIt->second.second;
+			}
 		}
 		
+		// if variable is not user-defined, check whether it is provided by this node
+		if (pos == unsigned(-1))
+		{
+			bool ok1, ok2;
+			pos = getVariablePos(nodeId, variable.toStdString(), &ok1);
+			length = getVariableSize(nodeId, variable.toStdString(), &ok2);
+			if (!(ok1 && ok2))
+			{
+				QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				return Values();
+			}
+		}
+		
+		// send request to aseba network
 		{
 			GetVariables msg(nodeId, pos, length);
 			hub->sendMessage(msg);
 		}
 		
+		// build bookkeeping for async reply
 		RequestData *request = new RequestData;
 		request->nodeId = nodeId;
 		request->pos = pos;

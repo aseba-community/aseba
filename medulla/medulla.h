@@ -115,6 +115,8 @@ namespace Aseba
 			CommonDefinitions commonDefinitions;
 			typedef QMap<QString, unsigned> NodesNamesMap;
 			NodesNamesMap nodesNames;
+			typedef QMap<QString, Compiler::VariablesMap> UserDefinedVariablesMap;
+			UserDefinedVariablesMap userDefinedVariablesMap;
 			typedef QList<RequestData*> RequestsList;
 			RequestsList pendingReads;
 			typedef QMultiMap<quint16, EventFilterInterface*> EventsFiltersMap;
