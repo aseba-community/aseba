@@ -94,6 +94,7 @@ namespace Aseba
 	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
 	{
 		assert(targetDescription);
+		dump = &std::cerr;
 		
 		Node *program;
 		unsigned indent = 0;

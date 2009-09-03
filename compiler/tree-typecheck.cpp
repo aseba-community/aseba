@@ -56,6 +56,22 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
+	Node::ReturnType IfWhenNode::typeCheck() const
+	{
+		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
+			throw Error(children[0]->sourcePos, FormatableString("Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
+		return TYPE_UNIT;
+	}
+	
+	Node::ReturnType WhileNode::typeCheck() const
+	{
+		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
+			throw Error(children[0]->sourcePos, FormatableString("Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
+		return TYPE_UNIT;
+	}
+	
 	Node::ReturnType BinaryArithmeticNode::typeCheck() const
 	{
 		switch (op)

@@ -70,6 +70,8 @@ namespace Aseba
 		
 		//! Return a string representation of this node
 		virtual std::string toString() const = 0;
+		//! Return a string representation of the name of this node
+		virtual std::string toNodeName() const = 0;
 		//! Dump this node and the rest of the tree
 		virtual void dump(std::ostream& dest, unsigned& indent) const;
 		
@@ -93,6 +95,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Block"; }
+		virtual std::string toNodeName() const { return "block"; }
 	};
 	
 	//! Node for "program", i.e. a block node with some special behaviour later on
@@ -103,6 +106,7 @@ namespace Aseba
 		
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "ProgramBlock"; }
+		virtual std::string toNodeName() const { return "program block"; }
 	};
 	
 	//! Node for assignation.
@@ -116,6 +120,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Assign"; }
+		virtual std::string toNodeName() const { return "assignment"; }
 	};
 	
 	//! Node for "if" and "when".
@@ -130,9 +135,11 @@ namespace Aseba
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
+		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "if/when"; }
 	};
 	
 	//! Node for "if" and "when" with operator folded inside.
@@ -153,6 +160,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "folded if/when"; }
 	};
 	
 	//! Node for "while".
@@ -163,9 +171,11 @@ namespace Aseba
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
+		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "while"; }
 	};
 	
 	//! Node for "while" with operator folded inside.
@@ -183,6 +193,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "folded while"; }
 	};
 	
 	//! Node for "onevent" 
@@ -196,6 +207,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "event declaration"; }
 	};
 	
 	//! Node for "emit".
@@ -212,6 +224,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "emit"; }
 	};
 	
 	//! Node for "sub"
@@ -225,6 +238,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "subroutine declaration"; }
 	};
 	
 	//! Node for "callsub"
@@ -238,6 +252,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "subroutine call"; }
 	};
 	
 	//! Node for binary arithmetic.
@@ -257,6 +272,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "binary function"; }
 		
 		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
@@ -278,6 +294,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "unary function"; }
 	};
 	
 	//! Node for pushing immediate value on stack.
@@ -296,6 +313,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "constant"; }
 	};
 	
 	//! Node for loading a variable on stack.
@@ -312,6 +330,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "variable access (read)"; }
 	};
 	
 	//! Node for storing a variable from stack.
@@ -326,6 +345,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "variable access (write)"; }
 	};
 	
 	//! Node for reading from an array.
@@ -342,6 +362,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "array access (read)"; }
 	};
 	
 	//! Node for writing to an array. Value to store is supposed to be on the stack already
@@ -357,6 +378,7 @@ namespace Aseba
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "array access (write)"; }
 	};
 	
 	//! Node for calling a native function
@@ -373,6 +395,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
+		virtual std::string toNodeName() const { return "native function call"; }
 	};
 	
 	/*@}*/
