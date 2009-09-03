@@ -34,51 +34,30 @@ namespace Aseba
 	using namespace std;
 	
 	/**
-	\defgroup dump Message dumper
+	\defgroup rec Message recorder
 	*/
 	/*@{*/
 	
-	//! A simple message dumper.
-	//! This class calls Aseba::Message::dump() for each message
-	class Dump : public Hub
+	//! A message recorder.
+	//! This class saves user messages
+	class Recorder : public Hub
 	{
-	private:
-		bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
-	
-	public:
-		Dump(bool rawTime) :
-			rawTime(rawTime)
-		{
-		}
-	
 	protected:
-		
-		void connectionCreated(Stream *stream)
-		{
-			dumpTime(cout, rawTime);
-			cout << stream->getTargetName()  << " connection created." << endl;
-		}
 		
 		void incomingData(Stream *stream)
 		{
 			Message *message = Message::receive(stream);
-			
-			dumpTime(cout, rawTime);
-			cout << stream->getTargetName()  << " ";
-			if (message)
-				message->dump(cout);
-			else
-				cout << "unknown message received";
-			cout << endl;
-		}
-		
-		void connectionClosed(Stream *stream, bool abnormal)
-		{
-			dumpTime(cout);
-			cout << stream->getTargetName() << " connection closed";
-			if (abnormal)
-				cout << " : " << stream->getFailReason();
-			cout << "." << endl;
+			UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+			if (userMessage)
+			{
+				dumpTime(cout, true);
+				cout << userMessage->source << " ";
+				cout << userMessage->type << " ";
+				cout << userMessage->data.size() << " ";
+				for (UserMessage::DataVector::const_iterator it = userMessage->data.begin(); it != userMessage->data.end(); ++it)
+					cout << *it << " ";
+				cout << endl;
+			}
 		}
 	};
 	
@@ -89,17 +68,15 @@ namespace Aseba
 //! Show usage
 void dumpHelp(std::ostream &stream, const char *programName)
 {
-	stream << "Aseba dump, print the content of aseba messages, usage:\n";
+	stream << "Aseba rec, record the user messages to stdout for later replay, usage:\n";
 	stream << programName << " [options] [targets]*\n";
 	stream << "Options:\n";
-	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
 	stream << "-h, --help      : shows this help\n";
 	stream << "Targets are any valid Dashel targets." << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
-	bool rawTime = false;
 	std::vector<std::string> targets;
 	
 	int argCounter = 1;
@@ -108,11 +85,7 @@ int main(int argc, char *argv[])
 	{
 		const char *arg = argv[argCounter];
 		
-		if (strcmp(arg, "--rawtime") == 0)
-		{
-			rawTime = true;
-		}
-		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
+		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
 			return 0;
@@ -129,10 +102,10 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::Dump dump(rawTime);
+		Aseba::Recorder recorder;
 		for (size_t i = 0; i < targets.size(); i++)
-			dump.connect(targets[i]);
-		dump.run();
+			recorder.connect(targets[i]);
+		recorder.run();
 	}
 	catch(Dashel::DashelException e)
 	{

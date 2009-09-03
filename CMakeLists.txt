@@ -136,6 +136,8 @@ add_subdirectory(cmd)
 
 add_subdirectory(dump)
 
+add_subdirectory(replay)
+
 if(NOT CMD_LINE)
 	add_subdirectory(studio)
 

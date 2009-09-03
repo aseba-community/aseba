@@ -25,6 +25,7 @@
 #define ASEBA_UTILS_H
 
 #include <iostream>
+#include <string>
 
 namespace Aseba
 {
@@ -33,6 +34,46 @@ namespace Aseba
 	*/
 	/*@{*/
 	
+	//! Time or durations, in milliseconds
+	struct UnifiedTime
+	{
+		//! storage for time
+		typedef long long unsigned Value;
+		//! time
+		Value value;
+		
+		//! Constructor, set time to current time
+		UnifiedTime();
+		//! Constructor, from a specific number of ms
+		UnifiedTime(Value ms);
+		//! Constructor, from a specific number of seconds and ms
+		UnifiedTime(Value seconds, Value milliseconds);
+		
+		//! Add times
+		void operator +=(const UnifiedTime &that) { value += that.value; }
+		//! Substract times
+		void operator -=(const UnifiedTime &that) { value -= that.value; }
+		//! Add times
+		UnifiedTime operator +(const UnifiedTime &that) const { return UnifiedTime(value + that.value); }
+		//! Substract times
+		UnifiedTime operator -(const UnifiedTime &that) const { return UnifiedTime(value - that.value); }
+		//! Time comparison
+		bool operator <(const UnifiedTime &that) const { return value < that.value; }
+		
+		//! Sleep for this amount of time
+		void sleep() const;
+		
+		//! Create a human readable string with this time
+		std::string toHumanReadableStringFromEpoch() const;
+		
+		//! Return the raw time string representing this time
+		std::string toRawTimeString() const;
+		
+		//! Return the time from the raw time string
+		static UnifiedTime fromRawTimeString(const std::string& rawTimeString);
+	};
+	
+	//! Dump the current time to a stream
 	void dumpTime(std::ostream &stream, bool raw = false);
 	
 	/*@}*/

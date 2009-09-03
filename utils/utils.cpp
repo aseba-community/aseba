@@ -32,6 +32,9 @@
 #include <time.h>
 #include <errno.h>
 #include <iomanip>
+#include <ostream>
+#include <sstream>
+#include <cassert>
 #include "utils.h"
 
 namespace Aseba
@@ -39,37 +42,81 @@ namespace Aseba
 	/** \addtogroup utils */
 	/*@{*/
 	
-	//! Dump the current time to a stream
+	UnifiedTime::UnifiedTime()
+	{
+		#ifndef WIN32
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		value = (Value(tv.tv_sec) * 1000) + Value(tv.tv_usec) / 1000;
+		#else // WIN32
+		struct __timeb64 tv;
+		_ftime64_s(&tv);
+		value = Value(tv.time) + Value(tv.millitm);
+		#endif // WIN32
+	}
+	
+	UnifiedTime::UnifiedTime(Value ms) :
+		value(ms)
+	{
+	}
+	
+	UnifiedTime::UnifiedTime(Value seconds, Value milliseconds) :
+		value(seconds * 1000 + milliseconds)
+	{
+	}
+	
+	void UnifiedTime::sleep() const
+	{
+		#ifndef WIN32
+		struct timespec ts;
+		ts.tv_sec = (value / 1000);
+		ts.tv_nsec = ((value % 1000) * 1000000);
+		nanosleep(&ts, 0);
+		#else // WIN32
+		assert(value < (1 << 32));
+		Sleep(value);
+		#endif // WIN32
+	}
+	
+	std::string UnifiedTime::toHumanReadableStringFromEpoch() const
+	{
+		std::ostringstream oss;
+		Value seconds(value / 1000);
+		Value milliseconds(value % 1000);
+		time_t t(seconds);
+		char *timeString = ctime(&t);
+		timeString[strlen(timeString) - 1] = 0;
+		oss << "[";
+		oss << timeString << " ";
+		oss << std::setfill('0') << std::setw(3) << milliseconds;
+		oss << "]";
+		return oss.str();
+	}
+	
+	std::string UnifiedTime::toRawTimeString() const
+	{
+		std::ostringstream oss;
+		Value seconds(value / 1000);
+		Value milliseconds(value % 1000);
+		oss << std::dec << seconds << "." << std::setfill('0') << std::setw(3) << milliseconds;
+		return oss.str();
+	}
+	
+	UnifiedTime UnifiedTime::fromRawTimeString(const std::string& rawTimeString)
+	{
+		size_t dotPos(rawTimeString.find('.'));
+		assert(dotPos != std::string::npos);
+		return UnifiedTime(atoll(rawTimeString.substr(0, dotPos).c_str()), atoll(rawTimeString.substr(dotPos + 1, std::string::npos).c_str()));
+	}
+	
+	
 	void dumpTime(std::ostream &stream, bool raw)
 	{
-		stream << "[";
 		if (raw)
-		{
-			long ts, tms;
-			#ifndef WIN32
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			ts = tv.tv_sec;
-			tms = tv.tv_usec / 1000;
-			#else // WIN32
-			struct __timeb64 tv;
-			_ftime64_s(&tv);
-			ts = tv.time;
-			tms = tv.millitm;
-			#endif // WIN32
-			stream << std::dec << ts << "." << std::setfill('0') << std::setw(3) << tms;
-			stream << std::setw(0);
-			
-		}
+			stream << UnifiedTime().toRawTimeString();
 		else
-		{
-			time_t t;
-			time(&t);
-			char *timeString = ctime(&t);
-			timeString[strlen(timeString) - 1] = 0;
-			stream << timeString;
-		}
-		stream << "] ";
+			stream << UnifiedTime().toHumanReadableStringFromEpoch();
+		stream << " ";
 	}
 	
 	/*@}*/
