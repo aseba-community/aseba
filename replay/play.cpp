@@ -48,15 +48,17 @@ namespace Aseba
 		typedef deque<string> StringList;
 		
 		bool respectTimings;
+		int speedFactor;
 		Stream* in;
 		string line;
 		UnifiedTime lastTimeStamp;
 		UnifiedTime lastEventTime;
 	
 	public:
-		Player(const char* inputFile, bool respectTimings) :
+		Player(const char* inputFile, bool respectTimings, int speedFactor) :
 			respectTimings(respectTimings),
-			lastTimeStamp(0)
+			lastTimeStamp(0),
+			speedFactor(speedFactor)
 		{
 			if (inputFile)
 				in = connect("file:" + string(inputFile) + ";mode=read");
@@ -119,7 +121,9 @@ namespace Aseba
 				const UnifiedTime deltaTimeStamp(timeStamp - lastTimeStamp);
 				if (lostTime < deltaTimeStamp)
 				{
-					(deltaTimeStamp - lostTime).sleep();
+					UnifiedTime waitTime(deltaTimeStamp - lostTime);
+					waitTime /= speedFactor;
+					waitTime.sleep();
 				}
 			}
 			
@@ -176,6 +180,8 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "Aseba play, play recorded user messages from a file or stdin, usage:\n";
 	stream << programName << " [options] [targets]*\n";
 	stream << "Options:\n";
+	stream << "--fast          : replay messages twice the speed of real time\n";
+	stream << "--faster        : replay messages four times the speed of real time\n";
 	stream << "--fastest       : replay messages as fast as possible\n";
 	stream << "-f INPUT_FILE   : open INPUT_FILE instead of stdin\n";
 	stream << "-h, --help      : shows this help\n";
@@ -185,6 +191,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 int main(int argc, char *argv[])
 {
 	bool respectTimings = true;
+	int speedFactor = 1;
 	std::vector<std::string> targets;
 	const char* inputFile = 0;
 	
@@ -197,6 +204,14 @@ int main(int argc, char *argv[])
 		if (strcmp(arg, "--fastest") == 0)
 		{
 			respectTimings = false;
+		}
+		else if (strcmp(arg, "--fast") == 0)
+		{
+			speedFactor = 2;
+		}
+		else if (strcmp(arg, "--faster") == 0)
+		{
+			speedFactor = 4;
 		}
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
@@ -226,7 +241,7 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::Player player(inputFile, respectTimings);
+		Aseba::Player player(inputFile, respectTimings, speedFactor);
 		for (size_t i = 0; i < targets.size(); i++)
 			player.connect(targets[i]);
 		player.run();

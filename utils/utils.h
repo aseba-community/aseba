@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <string>
+#include <cassert>
 
 namespace Aseba
 {
@@ -53,10 +54,18 @@ namespace Aseba
 		void operator +=(const UnifiedTime &that) { value += that.value; }
 		//! Substract times
 		void operator -=(const UnifiedTime &that) { value -= that.value; }
+		//! Divide time by an amount
+		void operator /=(const long long unsigned factor) {  assert(factor); value /= factor; }
+		//! Multiply time by an amount
+		void operator *=(const long long unsigned factor) { value *= factor; }
 		//! Add times
 		UnifiedTime operator +(const UnifiedTime &that) const { return UnifiedTime(value + that.value); }
 		//! Substract times
 		UnifiedTime operator -(const UnifiedTime &that) const { return UnifiedTime(value - that.value); }
+		//! Divide time by an amount
+		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return UnifiedTime(value / factor); }
+		//! Multiply time by an amount
+		UnifiedTime operator *(const long long unsigned factor) const { return UnifiedTime(value * factor); }
 		//! Time comparison
 		bool operator <(const UnifiedTime &that) const { return value < that.value; }
 		
