@@ -1,0 +1,14 @@
+#ifndef _HARDWARE_H_
+#define _HARDWARE_H_
+
+#include <gpio/gpio.h>
+
+#define U_UART UART_1
+#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD,2)
+#define UART_CTS GPIO_MAKE_ID(GPIO_PORTD,9)
+#define UART_RTS GPIO_MAKE_ID(GPIO_PORTF,6)
+#define LED0 GPIO_MAKE_ID(GPIO_PORTD, 0)
+#define LED1 GPIO_MAKE_ID(GPIO_PORTD, 1)
+
+#endif
+

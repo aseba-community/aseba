@@ -1,0 +1,214 @@
+[Header]
+MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
+Version=1.0
+[File000]
+Location=Z:\svn_robot\trunk\translator\dspics\main.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File001]
+Location=Z:\svn_robot\trunk\translator\dspics\can.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File002]
+Location=Z:\svn_robot\trunk\translator\dspics\clock.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File003]
+Location=Z:\svn_robot\trunk\translator\dspics\dma.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File004]
+Location=Z:\svn_robot\trunk\translator\dspics\error.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File005]
+Location=Z:\svn_robot\trunk\translator\dspics\gpio.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File006]
+Location=Z:\svn_robot\trunk\translator\dspics\timer.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File007]
+Location=Z:\svn_robot\trunk\translator\dspics\trap.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -fomit-frame-pointer
+TraceCmdString=
+DebugOptions=
+[File008]
+Location=Z:\svn_robot\trunk\translator\dspics\can-net.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File009]
+Location=Z:\svn_robot\trunk\translator\dspics\can-buffer.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File010]
+Location=Z:\svn_robot\trunk\translator\dspics\ei.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File011]
+Location=Z:\svn_robot\trunk\translator\dspics\uart-software-fc.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File012]
+Location=Z:\svn_robot\trunk\translator\dspics\adc.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File013]
+Location=Z:\svn_robot\trunk\translator\dspics\morse.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -O3
+TraceCmdString=
+DebugOptions=
+[File014]
+Location=Z:\svn_robot\trunk\translator\dspics\translateur.cof
+Folder=Output
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
+TraceCmdString=
+DebugOptions=
+[File015]
+Location=Z:\svn_robot\trunk\translator\dspics\translateur.hex
+Folder=Output
+DeviceName=dsPIC33FJ256GP506
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)|Z:\molole||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|main.c|Z:\molole\can\can.c|Z:\molole\clock\clock.c|Z:\molole\dma\dma.c|Z:\molole\error\error.c|Z:\molole\gpio\gpio.c|Z:\molole\timer\timer.c|Z:\marxbotmot2\trap.c|Z:\aseba\trunk\transport\can\can-net.c|Z:\aseba\trunk\transport\can\can-buffer.c|Z:\molole\ei\ei.c|Z:\molole\uart\uart-software-fc.c|Z:\molole\adc\adc.c|morse.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
+TraceCmdString=
+DebugOptions=
+[TOOL_LOC_STAMPS]
+tool_loc{069BD372-6CA0-40D4-BF2F-5DC806D05083}=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+tool_loc{433C3D55-811D-409D-A6BF-159CF9355B42}=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
