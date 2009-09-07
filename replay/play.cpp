@@ -57,8 +57,8 @@ namespace Aseba
 	public:
 		Player(const char* inputFile, bool respectTimings, int speedFactor) :
 			respectTimings(respectTimings),
-			lastTimeStamp(0),
-			speedFactor(speedFactor)
+			speedFactor(speedFactor),
+			lastTimeStamp(0)
 		{
 			if (inputFile)
 				in = connect("file:" + string(inputFile) + ";mode=read");
