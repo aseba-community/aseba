@@ -117,6 +117,9 @@ set (ASEBACORE_HDR_COMMON
 	common/consts.h
 	common/types.h
 )
+set (ASEBACORE_HDR_COMPILER
+	compiler/compiler.h
+)
 	
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/utils
@@ -126,6 +129,9 @@ install(FILES ${ASEBACORE_HDR_MSG}
 )
 install(FILES ${ASEBACORE_HDR_COMMON}
 	DESTINATION include/aseba/common
+)
+install(FILES ${ASEBACORE_HDR_COMPILER}
+	DESTINATION include/aseba/compiler
 )
 
 add_subdirectory(switch)
