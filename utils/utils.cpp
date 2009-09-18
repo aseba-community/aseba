@@ -28,6 +28,8 @@
 #else // WIN32
 	#include <sys/types.h>
 	#include <sys/timeb.h>
+	#include <windows.h>
+	#define atoll _atoi64
 #endif // WIN32
 #include <time.h>
 #include <errno.h>
@@ -74,7 +76,7 @@ namespace Aseba
 		nanosleep(&ts, 0);
 		#else // WIN32
 		assert(value < (1 << 32));
-		Sleep(value);
+		Sleep((DWORD)value);
 		#endif // WIN32
 	}
 	
