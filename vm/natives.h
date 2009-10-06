@@ -98,82 +98,82 @@ static inline sint16 AsebaNativePopArg(AsebaVMState *vm)
 /*! Function to fill all the elements of a vector to a specific value*/
 void AsebaNative_vecfill(AsebaVMState *vm);
 /*! Description of AsebaNative_vecfill */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecfill;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecfill;
 
 /*! Function to copy a vector */
 void AsebaNative_veccopy(AsebaVMState *vm);
 /*! Description of AsebaNative_veccopy */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
 
 /*! Function to add two vectors */
 void AsebaNative_vecadd(AsebaVMState *vm);
 /*! Description of AsebaNative_vecadd */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecadd;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecadd;
 
 /*! Function to substract two vectors */
 void AsebaNative_vecsub(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsub */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecsub;
 
 /*! Function to multiply two vectors elements by elements */
 void AsebaNative_vecmul(AsebaVMState *vm);
 /*! Description of AsebaNative_vecadd */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmul;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecmul;
 
 /*! Function to divide two vectors elements by elements  */
 void AsebaNative_vecdiv(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsub */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv;
 
 /*! Function to take the element by element minimum */
 void AsebaNative_vecmin(AsebaVMState *vm);
 /*! Description of AsebaNative_vecmin */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmin;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecmin;
 
 /*! Function to take the element by element maximum */
 void AsebaNative_vecmax(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsmax */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecmax;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecmax;
 
 /*! Function to perform a dot product on a vector */
 void AsebaNative_vecdot(AsebaVMState *vm);
 /*! Description of AsebaNative_vecdot */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecdot;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecdot;
 
 /*! Function to perform statistics on a vector */
 void AsebaNative_vecstat(AsebaVMState *vm);
 /*! Description of AsebaNative_vecstat */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_vecstat;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecstat;
 
 /*! Function to perform dest = (a*b)/c in 32 bits */
 void AsebaNative_mathmuldiv(AsebaVMState *vm);
 /*! Description of AsebaNative_mathmuldiv */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv;
 
 /*! Function to perform atan2 */
 void AsebaNative_mathatan2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathatan2 */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2;
 
 /*! Function to perform sin */
 void AsebaNative_mathsin(AsebaVMState *vm);
 /*! Description of AsebaNative_mathsin */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathsin;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathsin;
 
 /*! Function to perform cos */
 void AsebaNative_mathcos(AsebaVMState *vm);
 /*! Description of AsebaNative_mathcos */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathcos;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathcos;
 
 /*! Function to perform the rotation of a vector */
 void AsebaNative_mathrot2(AsebaVMState *vm);
 /*! Description of AsebaNative_mathrot2 */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2;
 
 /*! Function to perform sqrt */
 void AsebaNative_mathsqrt(AsebaVMState *vm);
 /*! Description of AsebaNative_mathsqrt */
-extern AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
 
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \

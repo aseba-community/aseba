@@ -244,7 +244,7 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 {
 	"math.fill",
 	"fills dest with constant value",
@@ -273,7 +273,7 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
+const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
 {
 	"math.copy",
 	"copies src to dest element by element",
@@ -301,7 +301,7 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecadd =
 {
 	"math.add",
 	"adds src1 and src2 to dest, element by element",
@@ -331,7 +331,7 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecsub =
 {
 	"math.sub",
 	"substracts src2 from src1 to dest, element by element",
@@ -361,7 +361,7 @@ void AsebaNative_vecmul(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecmul =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecmul =
 {
 	"math.mul",
 	"multiplies src1 and src2 to dest, element by element",
@@ -403,7 +403,7 @@ void AsebaNative_vecdiv(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecdiv =
 {
 	"math.div",
 	"divides src1 by src2 to dest, element by element",
@@ -436,7 +436,7 @@ void AsebaNative_vecmin(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecmin =
 {
 	"math.min",
 	"writes the minimum of src1 and src2 to dest, element by element",
@@ -469,7 +469,7 @@ void AsebaNative_vecmax(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 {
 	"math.max",
 	"writes the maximum of src1 and src2 to dest, element by element",
@@ -536,7 +536,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 #endif
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecdot =
 {
 	"math.dot",
 	"writes the dot product of src1 and src2 to dest, after a shift",
@@ -585,7 +585,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 {
 	"math.stat",
 	"performs statistics on src",
@@ -628,7 +628,7 @@ void AsebaNative_mathmuldiv(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathmuldiv =
 {
 	"math.muldiv",
 	"performs dest = (a*b)/c in 32 bits element by element",
@@ -660,7 +660,7 @@ void AsebaNative_mathatan2(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathatan2 =
 {
 	"math.atan2",
 	"performs dest = atan2(y,x) element by element",
@@ -689,7 +689,7 @@ void AsebaNative_mathsin(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathsin =
 {
 	"math.sin",
 	"performs dest = sin(x) element by element",
@@ -717,7 +717,7 @@ void AsebaNative_mathcos(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathcos =
 {
 	"math.cos",
 	"performs dest = cos(x) element by element",
@@ -750,7 +750,7 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	vm->variables[vectOutIndex+1] = yp;
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathrot2 =
 {
 	"math.rot2",
 	"rotates v of angle a to dest",
@@ -779,7 +779,7 @@ void AsebaNative_mathsqrt(AsebaVMState *vm)
 	}
 }
 
-AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt =
+const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt =
 {
 	"math.sqrt",
 	"performs dest = sqrt(x) element by element",
