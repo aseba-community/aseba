@@ -29,6 +29,20 @@
 #include <QtGui>
 #include <QtDebug>
 
+namespace Enki
+{
+	class MarxbotViewer: public ViewerWidget
+	{
+	public:
+		MarxbotViewer(World* world) : ViewerWidget(world) {}
+		
+		void renderObjectsTypesHook()
+		{
+			managedObjectsAliases[&typeid(AsebaMarxbot)] = &typeid(Marxbot);
+		}
+	};
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +52,7 @@ int main(int argc, char *argv[])
 	Enki::World world(200, 200);
 	
 	// Create viewer
-	Enki::ViewerWidget viewer(&world);
+	Enki::MarxbotViewer viewer(&world);
 	
 	// Create a Khepera and position it
 	Enki::AsebaMarxbot *marXbot = new Enki::AsebaMarxbot();
