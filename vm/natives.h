@@ -95,15 +95,20 @@ static inline sint16 AsebaNativePopArg(AsebaVMState *vm)
 
 // standard natives functions
 
+/*! Function to copy a vector */
+void AsebaNative_veccopy(AsebaVMState *vm);
+/*! Description of AsebaNative_veccopy */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
+
 /*! Function to fill all the elements of a vector to a specific value*/
 void AsebaNative_vecfill(AsebaVMState *vm);
 /*! Description of AsebaNative_vecfill */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecfill;
 
-/*! Function to copy a vector */
-void AsebaNative_veccopy(AsebaVMState *vm);
-/*! Description of AsebaNative_veccopy */
-extern const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy;
+/*! Function to add a scalar to each element of a vector */
+void AsebaNative_vecaddscalar(AsebaVMState *vm);
+/*! Description of AsebaNative_vecaddscalar */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecaddscalar;
 
 /*! Function to add two vectors */
 void AsebaNative_vecadd(AsebaVMState *vm);
@@ -175,10 +180,16 @@ void AsebaNative_mathsqrt(AsebaVMState *vm);
 /*! Description of AsebaNative_mathsqrt */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
 
+/*! Function to get the middle index of the largest sequence of non-zero elements */
+void AsebaNative_vecnonzerosequence(AsebaVMState *vm);
+/*! Description of AsebaNative_vecnonzerosequence */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzerosequence;
+
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
-	AsebaNative_vecfill, \
 	AsebaNative_veccopy, \
+	AsebaNative_vecfill, \
+	AsebaNative_vecaddscalar, \
 	AsebaNative_vecadd, \
 	AsebaNative_vecsub, \
 	AsebaNative_vecmul, \
@@ -192,12 +203,14 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
 	AsebaNative_mathsin, \
 	AsebaNative_mathcos, \
 	AsebaNative_mathrot2, \
-	AsebaNative_mathsqrt
+	AsebaNative_mathsqrt, \
+	AsebaNative_vecnonzerosequence
 
 /*! snippet to include descriptions of standard native functions */
 #define ASEBA_NATIVES_STD_DESCRIPTIONS \
-	&AsebaNativeDescription_vecfill, \
 	&AsebaNativeDescription_veccopy, \
+	&AsebaNativeDescription_vecfill, \
+	&AsebaNativeDescription_vecaddscalar, \
 	&AsebaNativeDescription_vecadd, \
 	&AsebaNativeDescription_vecsub, \
 	&AsebaNativeDescription_vecmul, \
@@ -211,7 +224,8 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt;
 	&AsebaNativeDescription_mathsin, \
 	&AsebaNativeDescription_mathcos, \
 	&AsebaNativeDescription_mathrot2, \
-	&AsebaNativeDescription_mathsqrt
+	&AsebaNativeDescription_mathsqrt, \
+	&AsebaNativeDescription_vecnonzerosequence
 
 /*@}*/
 

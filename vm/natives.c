@@ -227,6 +227,35 @@ sint16 aseba_sqrt(sint16 num)
 
 // standard natives functions
 
+void AsebaNative_veccopy(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[dest++] = vm->variables[src++];
+	}
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
+{
+	"math.copy",
+	"copies src to dest element by element",
+	{
+		{ -1, "dest" },
+		{ -1, "src" },
+		{ 0, 0 }
+	}
+};
+
+
 void AsebaNative_vecfill(AsebaVMState *vm)
 {
 	// variable pos
@@ -256,33 +285,36 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecfill =
 };
 
 
-void AsebaNative_veccopy(AsebaVMState *vm)
+void AsebaNative_vecaddscalar(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 dest = AsebaNativePopArg(vm);
 	uint16 src = AsebaNativePopArg(vm);
+	uint16 scalar = AsebaNativePopArg(vm);
 	
 	// variable size
 	uint16 length = AsebaNativePopArg(vm);
 	
+	const sint16 scalarValue = vm->variables[scalar];
 	uint16 i;
-	
 	for (i = 0; i < length; i++)
 	{
-		vm->variables[dest++] = vm->variables[src++];
+		vm->variables[dest++] = vm->variables[src++] + scalarValue;
 	}
 }
 
-const AsebaNativeFunctionDescription AsebaNativeDescription_veccopy =
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecaddscalar =
 {
-	"math.copy",
-	"copies src to dest element by element",
+	"math.addscalar",
+	"add scalar to each element of src and store result to dest",
 	{
 		{ -1, "dest" },
 		{ -1, "src" },
+		{ 1, "scalar" },
 		{ 0, 0 }
 	}
 };
+
 
 void AsebaNative_vecadd(AsebaVMState *vm)
 {
@@ -786,6 +818,204 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_mathsqrt =
 	{
 		{ -1, "dest" },
 		{ -1, "x" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = AsebaNativePopArg(vm); // output value index
+	uint16 src = AsebaNativePopArg(vm); // input vector index
+	uint16 length = AsebaNativePopArg(vm); // length threshold index
+	
+	// variable size
+	uint16 inputLength = AsebaNativePopArg(vm);
+	sint16 minLength = vm->variables[length]; // length threshold 
+	
+	// work variables
+	uint16 nzFirstZero;
+	sint16 index;
+	sint16 seqIndex;
+	sint16 bestSeqLength;
+	sint16 bestSeqIndex;
+	sint16 seqLength;
+	
+	// search for a zero, then non-zero
+	uint16 nzFirstIndex = 0;
+	while (vm->variables[src + nzFirstIndex] != 0)
+	{
+		++nzFirstIndex;
+		if (nzFirstIndex > inputLength)
+		{
+			vm->variables[dest] = 0;
+			return;
+		}
+	}
+	nzFirstZero = nzFirstIndex;
+	while (vm->variables[src + nzFirstIndex] == 0)
+	{
+		++nzFirstIndex;
+		if (nzFirstIndex > inputLength)
+		{
+			if (nzFirstZero == 0)
+			{
+				vm->variables[dest] = -1;
+			}
+			else
+			{
+				uint16 seqLength = nzFirstZero - 1;
+				if (seqLength < minLength)
+					vm->variables[dest] = -1;
+				else
+					vm->variables[dest] = (nzFirstZero - 1) / 2;
+			}
+			return;
+		}
+	}
+	
+	index = 0;
+	bestSeqLength = 0;
+	bestSeqIndex = 0;
+	
+	while (1)
+	{
+		// scan non-zero sequence
+		seqIndex = index;
+		while (vm->variables[src + (nzFirstIndex + index) % inputLength] != 0)
+		{
+			++index;
+			if (index >= inputLength)
+				break;
+		}
+		// check size
+		seqLength = index - seqIndex;
+		if (seqLength > bestSeqLength)
+		{
+			bestSeqLength = seqLength;
+			bestSeqIndex = (index + seqIndex) / 2;
+		}
+		if (index >= inputLength)
+			break;
+		
+		// scan zero sequence
+		while (vm->variables[src + (nzFirstIndex + index) % inputLength] == 0)
+		{
+			++index;
+			if (index >= inputLength)
+				goto doubleBreak;
+		}
+	}
+	
+doubleBreak:
+	if (bestSeqLength < minLength)
+	{
+		vm->variables[dest] = -1;
+	}
+	else
+	{
+		vm->variables[dest] = (nzFirstIndex + bestSeqIndex) % inputLength;
+	}
+	
+	/*
+	
+	uint16 i;
+	uint16 maxWidth = 0;
+	uint16 width;
+	uint16 rightEnd;
+	uint16 j;
+	uint16 searchFlag;
+
+	sint16 v = vm->variables[src];
+	
+	i = src;
+	if (v>0)
+	{
+		maxWidth = 1;
+		rightEnd = src;
+		i = src+inputLenght-1; // last element
+		searchFlag = 1;
+		while (searchFlag)
+		{
+			if (i>src)
+			{
+				if (vm->variables[i--]>0)
+					maxWidth++;
+				else searchFlag = 0;    
+			}
+			else searchFlag = 0;    
+		}
+		j = i;
+		i = src+1;
+		searchFlag = 1;
+		while (searchFlag)
+		{
+			if (i<=j)
+			{
+				if(vm->variables[i++]>0
+				{
+					maxWidth++;                             
+					rightEnd = i-1;                         
+				}
+				else
+					searchFlag = 0;
+			}
+			else
+				searchFlag = 0;    
+		}
+	}
+	//i++;  
+	width = 0;
+	while (i<src+inputLenght)
+	{
+		if (vm->variables[i]>0)
+		{
+			width++;
+		}
+		else
+		{
+			if (width>0)
+			{
+				if (width>maxWidth)
+				{
+					maxWidth = width;
+					rightEnd = i-1;
+				}
+				width = 0;
+			}
+		}
+		i++;
+	}
+	
+	if (width>0)
+	{
+		if (width>maxWidth)
+		{
+			maxWidth = width;
+			rightEnd = i-1;
+		}
+	}
+	
+	if (maxWidth>threshold)
+	{
+		sint16 middleValue = rightEnd-src-maxWidth/2;
+		vm->variables[dest] = (middleValue > -1 ? middleValue : (middleValue+inputLenght)); // map to 0:inputLenght-1
+	}
+	else
+	{
+		vm->variables[dest] = -1;
+	}*/
+}
+
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzerosequence =
+{
+	"math.nzseq",
+	"write to dest the middle index of the largest sequence of non-zero elements from src, -1 if not found or if smaller than minLength",
+	{
+		{ 1, "dest" },
+		{ -1, "src" },
+		{ 1, "minLength" },
 		{ 0, 0 }
 	}
 };
