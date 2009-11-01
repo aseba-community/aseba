@@ -310,6 +310,8 @@ namespace Aseba
 			}
 			else if (op == ASEBA_OP_DIV)
 			{
+				if (immediateRightChild->value == 0)
+					throw Error(sourcePos, "Division by zero.");
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
