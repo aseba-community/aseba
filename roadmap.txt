@@ -12,12 +12,10 @@ features
 known bugs
 - if compilation dialog is closed, corresponding menu entry is not updated
 - desynchronisation between hidden status of variable and menu
+- enki marxbot crashes if studio disconnects (no check for dashel exception: asebamarxbot: targets/enki-marxbot/AsebaMarxbot.cpp:64: void AsebaSendBuffer(AsebaVMState*, const uint8*, uint16): Assertion `stream' failed.)
 
 
 * For a later version
-
-Core
-- enum capabilities
 
 Compiler
 - size typed event arguments
