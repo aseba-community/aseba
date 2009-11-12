@@ -65,7 +65,13 @@ namespace Aseba
 			Q_SCRIPTABLE Q_NOREPLY void Free();
 		
 		signals:
-			Q_SCRIPTABLE void Event(const quint16, const QString& name, const Values& );
+			Q_SCRIPTABLE void Event(const quint16, const QString& name, const Values& values);
+			Q_SCRIPTABLE void Test0(const quint16);
+			Q_SCRIPTABLE void Test1(const QString& );
+			Q_SCRIPTABLE void Test2(const Values& );
+			Q_SCRIPTABLE void Test0_1(const quint16, const QString& );
+			Q_SCRIPTABLE void Test0_2(const quint16, const Values& );
+			Q_SCRIPTABLE void Test1_2(const QString&, const Values& );
 		
 		protected:
 			AsebaNetworkInterface* network;

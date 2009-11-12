@@ -305,15 +305,16 @@ namespace Aseba
 			subroutinesAddr[subroutineTable[id].address] = id;
 		
 		// event table
-		unsigned eventVectSize = bytecode[0];
+		const unsigned eventVectSize = bytecode[0];
 		unsigned pc = 1;
 		while (pc < eventVectSize)
 		{
 			eventAddr[bytecode[pc + 1]] = bytecode[pc];
 			pc += 2;
 		}
-		unsigned eventCount = (eventVectSize - 1 ) / 2;
-		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments:\n";
+		const unsigned eventCount = (eventVectSize - 1 ) / 2;
+		const float fillPrecentage = float(bytecode.size() * 100.f) / float(targetDescription->bytecodeSize);
+		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments (" << bytecode.size() << " words on " << targetDescription->bytecodeSize << ", " << fillPrecentage << "% filled):\n";
 		
 		// bytecode
 		while (pc < bytecode.size())
