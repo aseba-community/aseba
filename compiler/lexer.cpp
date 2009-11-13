@@ -26,6 +26,7 @@
 #include <sstream>
 #include <ostream>
 #include <cctype>
+#include <cstdio>
 
 namespace Aseba
 {
