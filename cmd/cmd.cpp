@@ -47,6 +47,7 @@ namespace Aseba
 		stream << "* rhex : read hex file [source] [file name]\n";
 		stream << "* eb: exit from bootloader, go back into user mode [dest]\n";
 		stream << "* sb: switch into bootloader: reboot node, then enter bootloader for a while [dest]\n";
+		stream << "* sleep: put the vm to sleep [dest]\n";
 	}
 	
 	//! Show usage
@@ -141,20 +142,7 @@ namespace Aseba
 			dest(dest)
 		{
 			// Wait until the bootloader answers
-			while (true)
-			{
-				Message *message = Message::receive(stream);
-				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
-				if (bDescMessage && (bDescMessage->source == dest))
-				{
-					pageSize = bDescMessage->pageSize;
-					pagesStart = bDescMessage->pagesStart;
-					pagesCount = bDescMessage->pagesCount;
-					delete message;
-					break;
-				}
-				delete message;
-			}
+
 		}
 		
 		//! Return the size of a page
@@ -255,7 +243,7 @@ namespace Aseba
 				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
 				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
-				cout << "." << std::flush;
+//				cout << "." << std::flush;
 				
 /*
 				while (true)
@@ -311,6 +299,21 @@ namespace Aseba
 			HexFile hexFile;
 			hexFile.read(fileName);
 			
+			while (true)
+			{
+				Message *message = Message::receive(stream);
+				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
+				if (bDescMessage && (bDescMessage->source == dest))
+				{
+					pageSize = bDescMessage->pageSize;
+					pagesStart = bDescMessage->pagesStart;
+					pagesCount = bDescMessage->pagesCount;
+					delete message;
+					break;
+				}
+				delete message;
+			}
+			
 			// Build a map of pages out of the map of addresses
 			typedef map<uint32, vector<uint8> > PageMap;
 			PageMap pageMap;
@@ -334,7 +337,7 @@ namespace Aseba
 					// if page does not exists, create it
 					if (pageMap.find(pageIndex) == pageMap.end())
 					{
-						std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+					//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
 						pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
 					}
 					// copy data
@@ -525,7 +528,19 @@ namespace Aseba
 			msg.serialize(stream);
 			stream->flush();
 		}
-		else
+		else if (strcmp(cmd, "sleep") == 0)
+		{
+			uint16 dest;
+			if(argc < 2)
+				errorMissingArgument(argv[0]);
+			argEaten = 1;
+
+			dest = atoi(argv[1]);
+
+			Sleep msg(dest);
+			msg.serialize(stream);
+			stream->flush();
+		} else 
 			errorUnknownCommand(cmd);
 		
 		return argEaten;
