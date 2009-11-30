@@ -324,10 +324,12 @@ uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source)
 	return pos;
 }
 
+#define MAX_DROPPING_SOURCE 20
+static uint16 dropping[MAX_DROPPING_SOURCE];
+
 void AsebaCanFrameReceived(const CanFrame *frame)
 {
-	#define MAX_DROPPING_SOURCE 20
-	static uint16 dropping[MAX_DROPPING_SOURCE];
+	
 	uint16 source = CANID_TO_ID(frame->id);
 	
 	// check whether this packet should be filtered or not
@@ -387,6 +389,18 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 			temp = 0;
 		asebaCan.recvQueueInsertPos = temp;
 	}
+}
+
+void AsebaCanRecvFreeQueue(void)
+{
+	int i;
+	for(i = 0; i < asebaCan.recvQueueSize; i++)
+		asebaCan.recvQueue[i].used = 0;
+	asebaCan.recvQueueInsertPos = 0;
+	asebaCan.recvQueueConsumePos = 0;
+	
+	for(i = 0; i < MAX_DROPPING_SOURCE; i++) 
+		dropping[i] = 0;
 }
 
 /*@}*/

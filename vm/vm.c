@@ -797,6 +797,10 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		AsebaResetIntoBootloader(vm);
 		break;
 		
+		case ASEBA_MESSAGE_SUSPEND_TO_RAM:
+		AsebaPutVmToSleep(vm);
+		break;
+		
 		default:
 		break;
 	}

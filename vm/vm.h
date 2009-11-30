@@ -163,6 +163,9 @@ void AsebaWriteBytecode(AsebaVMState *vm);
 /*! Called by AsebaVMDebugMessage when VM must restart the node and enter to the bootloader, write an empty function to leave feature unsupported */
 void AsebaResetIntoBootloader(AsebaVMState *vm);
 
+/*! Called by AsebaVMDebugMessage when VM must put to node in deep sleep. Write an empty function to leave feature unsupported */
+void AsebaPutVmToSleep(AsebaVMState *vm);
+
 // Function optionally implemented
 
 #ifdef ASEBA_ASSERT

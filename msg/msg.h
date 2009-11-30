@@ -624,6 +624,19 @@ namespace Aseba
 		virtual operator const char * () const { return "reboot"; }
 	};
 	
+	//! Put the node in sleep mode. After receiving this event, the node might go into sleep depending on its 
+	//! internal state. If it goes to sleep, the node will not receive events any 
+	//! more, until it is waken up by an implementation-specific action.
+	class Sleep : public CmdMessage
+	{
+	public:
+		Sleep() : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, ASEBA_DEST_INVALID) { }
+		Sleep(uint16 dest) : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, dest) { }
+	
+	protected:
+		virtual operator const char * () const { return "sleep"; }
+	};
+	
 	/*@}*/
 }
 

@@ -57,6 +57,10 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	0
 };
 
+extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
+{
+}
+
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];

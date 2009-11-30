@@ -168,6 +168,9 @@ void AsebaIdle(void) {
 	Idle();
 }
 
+void AsebaPutVmToSleep(AsebaVMState *vm) {
+}
+
 void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
 	nativeFunctions[id](vm);

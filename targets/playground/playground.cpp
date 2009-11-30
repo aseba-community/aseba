@@ -729,6 +729,10 @@ extern "C" void PlaygroundNative_energyamount(AsebaVMState *vm)
 
 // Implementation of aseba glue code
 
+extern "C" void AsebaPutVmToSleep(AsebaVMState *vm) 
+{
+}
+
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
 	Dashel::Stream* stream = playgroundViewer->stream;

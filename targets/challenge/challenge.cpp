@@ -918,6 +918,10 @@ namespace Enki
 
 // Implementation of aseba glue code
 
+extern "C" void AsebaPutVmToSleep(AsebaVMState *vm) 
+{
+}
+
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;

@@ -106,6 +106,10 @@ uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
 */
 void AsebaCanFlushQueue(void);
 
+/*! Free everything in the Rx queue. Warning, this is a low-level function which should 
+	only be called if the underlaying CAN driver is disabled. */
+void AsebaCanRecvFreeQueue(void);
+
 // to be implemented by the glue 
 
 /*! Busy wait until the can buffer has room. At worst, can be an empty function */
