@@ -35,7 +35,6 @@
 #include "../common/consts.h"
 #include "../common/types.h"
 #include "../utils/utils.h"
-#include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QtXml>
@@ -82,7 +81,7 @@ namespace Aseba
 		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
 			network->listenEvent(this, event);
 		else
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 	
 	void EventFilterInterface::IgnoreEvent(const quint16 event)
@@ -96,7 +95,7 @@ namespace Aseba
 		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
 			network->ignoreEvent(this, event);
 		else
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 	
 	void EventFilterInterface::Free()
@@ -105,15 +104,17 @@ namespace Aseba
 		deleteLater();
 	}
 	
-	AsebaNetworkInterface::AsebaNetworkInterface(Hub* hub) :
+	AsebaNetworkInterface::AsebaNetworkInterface(Hub* hub, bool systemBus) :
 		QDBusAbstractAdaptor(hub),
 		hub(hub),
+		systemBus(systemBus),
 		eventsFiltersCounter(0)
 	{
 		qDBusRegisterMetaType<Values>();
 		
-		QDBusConnection::sessionBus().registerObject("/", hub);
-		QDBusConnection::sessionBus().registerService("ch.epfl.mobots.Aseba");
+		//FIXME: here no error handling is done, with system bus these calls can fail	
+		DBusConnectionBus().registerObject("/", hub);
+		DBusConnectionBus().registerService("ch.epfl.mobots.Aseba");
 	}
 	
 	void AsebaNetworkInterface::processMessage(Message *message, Dashel::Stream* sourceStream)
@@ -145,7 +146,7 @@ namespace Aseba
 					QDBusMessage &reply(request->reply);
 					Values values(fromAsebaVector(variables->variables));
 					reply << QVariant::fromValue(values);
-					QDBusConnection::sessionBus().send(reply);
+					DBusConnectionBus().send(reply);
 					delete request;
 					pendingReads.erase(it);
 					break;
@@ -190,7 +191,7 @@ namespace Aseba
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("file %0 does not exists").arg(fileName)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("file %0 does not exists").arg(fileName)));
 			return;
 		}
 		
@@ -200,7 +201,7 @@ namespace Aseba
 		int errorColumn;
 		if (!document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Other, QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::Other, QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)));
 			return;
 		}
 		
@@ -248,7 +249,7 @@ namespace Aseba
 						}
 						else
 						{
-							QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
+							DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
 						}
 						// retrieve user-defined variables for use in get/set
 						userDefinedVariablesMap[element.attribute("name")] = *compiler.getVariablesMap();
@@ -325,7 +326,7 @@ namespace Aseba
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return;
 		}
 		const unsigned nodeId(nodeIt.value());
@@ -351,7 +352,7 @@ namespace Aseba
 			pos = getVariablePos(nodeId, variable.toStdString(), &ok);
 			if (!ok)
 			{
-				QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
 				return;
 			}
 		}
@@ -366,7 +367,7 @@ namespace Aseba
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return Values();
 		}
 		const unsigned nodeId(nodeIt.value());
@@ -395,7 +396,7 @@ namespace Aseba
 			length = getVariableSize(nodeId, variable.toStdString(), &ok2);
 			if (!(ok1 && ok2))
 			{
-				QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
 				return Values();
 			}
 		}
@@ -433,13 +434,13 @@ namespace Aseba
 		if (commonDefinitions.events.contains(name.toStdString(), &event))
 			SendEvent(event, data);
 		else
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 	
 	QDBusObjectPath AsebaNetworkInterface::CreateEventFilter()
 	{
 		QDBusObjectPath path(QString("/events_filters/%0").arg(eventsFiltersCounter++));
-		QDBusConnection::sessionBus().registerObject(path.path(), new EventFilterInterface(this), QDBusConnection::ExportScriptableContents);
+		DBusConnectionBus().registerObject(path.path(), new EventFilterInterface(this), QDBusConnection::ExportScriptableContents);
 		return path;
 	}
 	
@@ -447,14 +448,22 @@ namespace Aseba
 	{
 		nodesNames[QString::fromStdString(nodesDescriptions[nodeId].name)] = nodeId;
 	}
+
+	inline QDBusConnection AsebaNetworkInterface::DBusConnectionBus() const
+	{
+		if (systemBus)
+			return QDBusConnection::systemBus();
+		else
+			return QDBusConnection::sessionBus();
+	}
 	
-	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
+	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime, bool systemBus) :
 		verbose(verbose),
 		dump(dump),
 		forward(forward),
 		rawTime(rawTime)
 	{
-		AsebaNetworkInterface* network(new AsebaNetworkInterface(this));
+		AsebaNetworkInterface* network(new AsebaNetworkInterface(this, systemBus));
 		QObject::connect(this, SIGNAL(messageAvailable(Message*, Dashel::Stream*)), network, SLOT(processMessage(Message*, Dashel::Stream*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
@@ -558,6 +567,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "-l, --loop      : makes the switch transmit messages back to the send, not only forward them.\n";
 	stream << "-p port         : listens to incoming connection on this port\n";
 	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
+	stream << "--system        : connects medulla to the system d-bus bus\n";	
 	stream << "-h, --help      : shows this help\n";
 	stream << "Additional targets are any valid Dashel targets." << std::endl;
 }
@@ -571,6 +581,7 @@ int main(int argc, char *argv[])
 	bool dump = false;
 	bool forward = true;
 	bool rawTime = false;
+	bool systemBus = false;
 	std::vector<std::string> additionalTargets;
 	
 	int argCounter = 1;
@@ -600,6 +611,10 @@ int main(int argc, char *argv[])
 		{
 			rawTime = true;
 		}
+		else if (strcmp(arg, "--system") == 0)
+		{
+			systemBus = true;
+		}
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
@@ -612,7 +627,7 @@ int main(int argc, char *argv[])
 		argCounter++;
 	}
 	
-	Aseba::Hub hub(port, verbose, dump, forward, rawTime);
+	Aseba::Hub hub(port, verbose, dump, forward, rawTime, systemBus);
 	
 	try
 	{

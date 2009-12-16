@@ -29,6 +29,7 @@
 #include <QStringList>
 #include <QDBusObjectPath>
 #include <QDBusAbstractAdaptor>
+#include <QDBusConnection>
 #include <QDBusMessage>
 #include <QMetaType>
 #include <QList>
@@ -92,7 +93,7 @@ namespace Aseba
 			};
 			
 		public:
-			AsebaNetworkInterface(Hub* hub);
+			AsebaNetworkInterface(Hub* hub, bool systemBus);
 		
 		private slots:
 			friend class Hub;
@@ -115,6 +116,7 @@ namespace Aseba
 		
 		protected:
 			virtual void nodeDescriptionReceived(unsigned nodeId);
+			QDBusConnection DBusConnectionBus() const;
 			
 		protected:
 			Hub* hub;
@@ -128,6 +130,7 @@ namespace Aseba
 			typedef QMultiMap<quint16, EventFilterInterface*> EventsFiltersMap;
 			EventsFiltersMap eventsFilters;
 			unsigned eventsFiltersCounter;
+			bool systemBus;
 	};
 	
 	/*!
@@ -148,7 +151,7 @@ namespace Aseba
 				@param forward should we only forward messages instead of transmit them back to the sender
 				@param rawTime should the time be printed as integer
 			*/
-			Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime);
+			Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime, bool systemBus);
 			
 			/*! Sends a message to Dashel peers.
 				Does not delete the message, should be called by the main thread.
