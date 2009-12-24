@@ -53,7 +53,7 @@ namespace Aseba
 		#else // WIN32
 		struct __timeb64 tv;
 		_ftime64_s(&tv);
-		value = Value(tv.time) + Value(tv.millitm);
+		value = Value(tv.time) * 1000 + Value(tv.millitm);
 		#endif // WIN32
 	}
 	
