@@ -113,7 +113,6 @@ namespace Aseba
 				tokenizedLine.pop_front();
 			}
 			
-			
 			// if required, sleep
 			if ((respectTimings) && (lastTimeStamp.value != 0))
 			{
@@ -153,9 +152,9 @@ namespace Aseba
 		
 		void incomingData(Stream *stream)
 		{
+			char c(stream->read<char>());
 			if (stream == in)
 			{
-				char c(in->read<char>());
 				if (c == '\n')
 					sendLine();
 				else

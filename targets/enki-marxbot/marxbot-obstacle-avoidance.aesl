@@ -8,8 +8,6 @@
 
 
 <!--list of constants-->
-<constant value="5" name="tcrt1000_threshold" />
-<constant value="4" name="tcnd5000_threshold" />
 
 
 <!--source code of node left motor-->
