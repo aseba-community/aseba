@@ -86,6 +86,7 @@ namespace Aseba
 	public:
 		UserMessage() : Message(ASEBA_MESSAGE_INVALID) { }
 		UserMessage(uint16 type, const DataVector& data = DataVector()) : Message(type), data(data) { }
+		UserMessage(uint16 type, const sint16* data, const size_t length);
 		
 	protected:
 		virtual void serializeSpecific();

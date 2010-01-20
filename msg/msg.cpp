@@ -264,6 +264,13 @@ namespace Aseba
 	}
 	
 	//
+
+	UserMessage::UserMessage(uint16 type, const sint16* data, const size_t length):
+		Message(type)
+	{
+		this->data.resize(length);
+		copy(data, data+length, this->data.begin());
+	}
 	
 	void UserMessage::serializeSpecific()
 	{
