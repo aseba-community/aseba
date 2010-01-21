@@ -807,12 +807,12 @@ namespace Aseba
 	}
 
 	
-	MainWindow::MainWindow(QVector<QTranslator*> translators, QWidget *parent) :
+	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, QWidget *parent) :
 		QMainWindow(parent),
 		sourceModified(false)
 	{
 		// create target
-		target = new DashelTarget(translators);
+		target = new DashelTarget(translators, commandLineTarget);
 		
 		// create models
 		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);

@@ -195,10 +195,30 @@ namespace Aseba
 	}
 	
 	
-	DashelInterface::DashelInterface(QVector<QTranslator*> translators) :
+	DashelInterface::DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget) :
 		stream(0)
 	{
+		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
+		if (!commandLineTarget.isEmpty())
+		{
+			bool failed = false;
+			try
+			{
+				stream = Hub::connect(commandLineTarget.toStdString());
+			}
+			catch (DashelException e)
+			{
+				// exception, try again
+				failed = true;
+			}
+			
+			if (failed)
+				QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
+			else
+				return;
+		}
+		// show connection dialog
 		while (true)
 		{
 			if (targetSelector.exec() == QDialog::Rejected)
@@ -280,8 +300,8 @@ namespace Aseba
 		executionMode = EXECUTION_UNKNOWN;
 	}
 	
-	DashelTarget::DashelTarget(QVector<QTranslator*> translators) :
-		dashelInterface(translators)
+	DashelTarget::DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget) :
+		dashelInterface(translators, commandLineTarget)
 	{
 		userEventsTimer.setSingleShot(true);
 		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));

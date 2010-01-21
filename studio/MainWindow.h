@@ -225,7 +225,7 @@ namespace Aseba
 		Q_OBJECT
 	
 	public:
-		MainWindow(QVector<QTranslator*> translators, QWidget *parent = 0);
+		MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, QWidget *parent = 0);
 		~MainWindow();
 
 	signals:

@@ -93,7 +93,7 @@ namespace Aseba
 		QString language;
 		
 	public:
-		DashelInterface(QVector<QTranslator*> translators);
+		DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget);
 		
 	signals:
 		void messageAvailable(Message *message);
@@ -150,7 +150,7 @@ namespace Aseba
 		QTimer userEventsTimer;
 		
 	public:
-		DashelTarget(QVector<QTranslator*> translators);
+		DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget);
 		~DashelTarget();
 		
 		virtual QString getLanguage() const { return dashelInterface.language; }

@@ -47,7 +47,15 @@ int main(int argc, char *argv[])
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
 	
-	
+	QString commandLineTarget;
+	for (int i = 1; i < argc; ++i)
+	{
+		if (argv[i][0] != '-')
+		{
+			commandLineTarget = argv[i];
+			break;
+		}
+	}
 	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
@@ -62,7 +70,7 @@ int main(int argc, char *argv[])
 		QVector<QTranslator*> translators;
 		translators.push_back(&qtTranslator);
 		translators.push_back(&translator);
-		Aseba::MainWindow window(translators);
+		Aseba::MainWindow window(translators, commandLineTarget);
 		window.show();
 		return app.exec();
 	}
