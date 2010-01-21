@@ -60,6 +60,8 @@ namespace Aseba
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
+		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
 		netGroupBox = new QGroupBox(tr("Network (TCP)"));
@@ -67,12 +69,12 @@ namespace Aseba
 		QGridLayout* netLayout = new QGridLayout;
 		netLayout->addWidget(new QLabel(tr("Host")), 0, 0);
 		netLayout->addWidget(new QLabel(tr("Port")), 0, 1);
-		host = new QLineEdit(ASEBA_DEFAULT_HOST);
+		host = new QLineEdit(settings.value("tcp host", ASEBA_DEFAULT_HOST).toString());
 		netLayout->addWidget(host, 1, 0);
 		port = new QSpinBox();
 		port->setMinimum(0);
 		port->setMaximum(65535);
-		port->setValue(ASEBA_DEFAULT_PORT);
+		port->setValue(settings.value("tcp port", ASEBA_DEFAULT_PORT).toInt());
 		netLayout->addWidget(port, 1, 1);
 		netGroupBox->setLayout(netLayout);
 		connect(netGroupBox, SIGNAL(clicked()), SLOT(netGroupChecked()));
@@ -103,7 +105,7 @@ namespace Aseba
 		customGroupBox->setCheckable(true);
 		customGroupBox->setChecked(false);
 		QHBoxLayout* customLayout = new QHBoxLayout();
-		custom = new QLineEdit(QSettings("EPFL-LSRO-Mobots", "Aseba Studio").value("custom target", ASEBA_DEFAULT_TARGET).toString());
+		custom = new QLineEdit(settings.value("custom target", ASEBA_DEFAULT_TARGET).toString());
 		customLayout->addWidget(custom);
 		customGroupBox->setLayout(customLayout);
 		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
@@ -137,8 +139,11 @@ namespace Aseba
 	
 	std::string DashelConnectionDialog::getTarget()
 	{
+		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
 		if (netGroupBox->isChecked())
 		{
+			settings.setValue("tcp host", host->text());
+			settings.setValue("tcp port", port->value());
 			std::ostringstream oss;
 			oss << "tcp:host=" << host->text().toStdString() << ";port=" << port->value();
 			return oss.str();
@@ -150,7 +155,7 @@ namespace Aseba
 		}
 		else if (customGroupBox->isChecked())
 		{
-			QSettings("EPFL-LSRO-Mobots", "Aseba Studio").setValue("custom target", custom->text());
+			settings.setValue("custom target", custom->text());
 			return custom->text().toStdString();
 		}
 		else
