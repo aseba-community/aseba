@@ -254,13 +254,14 @@ namespace Aseba
 	{
 		if (!isOneOf<length>(types))
 		{
-			std::string errorMessage("Expecting one of");
+			std::string errorMessage("Expecting one of ");
 			for (size_t i = 0; i < length; i++)
 			{
-				errorMessage += " ";
 				errorMessage += Token(types[i]).typeName();
+				if (i + 1 < length)
+					errorMessage += ", ";
 			}
-			errorMessage += ", found ";
+			errorMessage += "; but found ";
 			errorMessage += tokens.front().typeName();
 			errorMessage += " instead";
 			throw Error(tokens.front().pos, errorMessage);
