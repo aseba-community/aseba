@@ -538,6 +538,7 @@ namespace Aseba
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
 		
+		usleep(200000);
 		emit messageAvailable(new GetDescription(), 0);
 	}
 	
