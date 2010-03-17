@@ -129,8 +129,8 @@ namespace Aseba
 			RequestsList pendingReads;
 			typedef QMultiMap<quint16, EventFilterInterface*> EventsFiltersMap;
 			EventsFiltersMap eventsFilters;
-			unsigned eventsFiltersCounter;
 			bool systemBus;
+			unsigned eventsFiltersCounter;
 	};
 	
 	/*!
