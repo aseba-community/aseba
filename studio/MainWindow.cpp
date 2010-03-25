@@ -830,6 +830,11 @@ namespace Aseba
 	
 	MainWindow::~MainWindow()
 	{
+		for (EventViewers::iterator it = eventsViewers.begin(); it != eventsViewers.end(); ++it)
+		{
+			it.value()->detachFromMain();
+		}
+		
 		delete target;
 	}
 	
@@ -872,6 +877,7 @@ namespace Aseba
 			}
 			constantsDefinitionsModel->clear();
 			eventsDescriptionsModel->clear();
+			actualFileName.clear();
 		}
 	}
 	
@@ -1238,12 +1244,15 @@ namespace Aseba
 
 	void MainWindow::showHidden(bool show) 
 	{
-		NodeTab* tab = dynamic_cast<NodeTab*>(nodes->currentWidget());
-		if (tab)
+		for (int i = 0; i < nodes->count(); i++)
 		{
-			tab->vmFunctionsModel->recreateTreeFromDescription(show);
-			tab->showHidden = show;
-			tab->updateHidden();
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				tab->vmFunctionsModel->recreateTreeFromDescription(show);
+				tab->showHidden = show;
+				tab->updateHidden();
+			}
 		}
 	}
 	

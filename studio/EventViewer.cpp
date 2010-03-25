@@ -79,7 +79,8 @@ namespace Aseba
 	
 	EventViewer::~EventViewer()
 	{
-		eventsViewers->remove(eventId, this);
+		if (eventsViewers)
+			eventsViewers->remove(eventId, this);
 	}
 	
 	void EventViewer::addData(const VariablesDataVector& data)

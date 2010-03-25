@@ -57,6 +57,7 @@ namespace Aseba
 		EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers);
 		virtual ~EventViewer();
 		
+		void detachFromMain() { eventsViewers=0; }
 		void addData(const VariablesDataVector& data);
 	};
 	

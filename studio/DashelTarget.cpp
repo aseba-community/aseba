@@ -504,6 +504,7 @@ namespace Aseba
 		{
 			emit userEvent(userEventsQueue.head()->type, userEventsQueue.head()->data);
 			userEventsQueue.dequeue();
+			// FIXME: leak there, should delete, but userEventsQueue.head()->data passed as reference
 		}
 	}
 	
