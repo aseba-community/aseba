@@ -458,6 +458,9 @@ namespace Aseba
 	}
 	
 	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime, bool systemBus) :
+		#ifdef DASHEL_VERSION_INT
+		Dashel::Hub(verbose || dump),
+		#endif // DASHEL_VERSION_INT
 		verbose(verbose),
 		dump(dump),
 		forward(forward),

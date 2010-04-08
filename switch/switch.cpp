@@ -45,6 +45,9 @@ namespace Aseba
 
 	//! Broadcast messages form any data stream to all others data streams including itself.
 	Switch::Switch(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
+		#ifdef DASHEL_VERSION_INT
+		Dashel::Hub(verbose || dump),
+		#endif // DASHEL_VERSION_INT
 		verbose(verbose),
 		dump(dump),
 		forward(forward),
