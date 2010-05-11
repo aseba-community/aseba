@@ -1,4 +1,14 @@
 #!/bin/sh
+ROBOT_FILE=/sys/module/kernel/parameters/mx31moboard_baseboard
+MARXBOT=2
+HANDBOT=3
+
+ROBOT=$(cat $ROBOT_FILE)
+
+if [ "$ROBOT" -ne "$MARXBOT" ] && [ "$ROBOT" -ne "$HANDBOT" ]; then
+        echo "This board does not have an aseba bus, leaving"
+        exit 1
+fi
 
 case "$1" in
         start)
