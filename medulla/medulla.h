@@ -107,6 +107,7 @@ namespace Aseba
 		public slots:
 			Q_NOREPLY void LoadScripts(const QString& fileName, const QDBusMessage &message);
 			QStringList GetNodesList() const;
+			qint16 GetNodeId(const QString& node, const QDBusMessage &message) const;
 			QStringList GetVariablesList(const QString& node) const;
 			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
 			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);

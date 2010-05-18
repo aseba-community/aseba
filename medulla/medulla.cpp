@@ -285,7 +285,18 @@ namespace Aseba
 		}
 		return list;
 	}
-	
+
+	qint16 AsebaNetworkInterface::GetNodeId(const QString& node, const QDBusMessage &message) const
+	{
+		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
+		if (nodeIt == nodesNames.end())
+		{
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			return 0;
+		}
+		return nodeIt.value();	
+	}
+
 	QStringList AsebaNetworkInterface::GetVariablesList(const QString& node) const
 	{
 		NodesNamesMap::const_iterator it(nodesNames.find(node));
