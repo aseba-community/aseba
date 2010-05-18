@@ -146,7 +146,6 @@ namespace Aseba
 						if (address == it->first + chunkSize)
 						{
 							// copy new
-							it->second.reserve(chunkSize + recordData.size());
 							std::copy(recordData.begin(), recordData.end(), std::back_inserter(it->second));
 							found = true;
 							//std::cout << "tail fusable chunk found\n";
