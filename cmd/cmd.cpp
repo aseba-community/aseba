@@ -43,7 +43,7 @@ namespace Aseba
 		stream << "* presence : broadcast presence message\n";
 		stream << "* usermsg: user message [type] [length in 16 bit words]\n";
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
-		stream << "* whex : write hex file [dest] [file name]\n";
+		stream << "* whex : write hex file [dest] [file name] [reset]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
 		stream << "* eb: exit from bootloader, go back into user mode [dest]\n";
 		stream << "* sb: switch into bootloader: reboot node, then enter bootloader for a while [dest]\n";
@@ -293,12 +293,19 @@ namespace Aseba
 		}
 		
 		//! Write an hex file
-		void writeHex(const string &fileName)
+		void writeHex(const string &fileName, bool reset)
 		{
 			// Load hex file
 			HexFile hexFile;
 			hexFile.read(fileName);
 			
+			if (reset) 
+			{
+				Reboot msg(dest);
+				msg.serialize(stream);
+				stream->flush();
+			}
+				
 			while (true)
 			{
 				Message *message = Message::receive(stream);
@@ -357,6 +364,13 @@ namespace Aseba
 				if ((pageIndex >= pagesStart) && (pageIndex < pagesStart + pagesCount))
 					if (!writePage(pageIndex, &it->second[0]))
 						errorWritePage(pageIndex);
+			}
+
+			if (reset) 
+			{
+				BootloaderReset msg(dest);
+				msg.serialize(stream);
+				stream->flush();
 			}
 		}
 		
@@ -445,16 +459,23 @@ namespace Aseba
 		}
 		else if (strcmp(cmd, "whex") == 0)
 		{
+			bool reset = 0;
 			// first arg is dest, second is file name
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
 			
+			if (argc > 3 && !strcmp(argv[3], "reset")) 
+			{
+				reset = 1;
+				argEaten = 3;
+			}
+
 			// try to write hex file
 			try
 			{
 				BootloaderInterface bootloader(stream, atoi(argv[1]));
-				bootloader.writeHex(argv[2]);
+				bootloader.writeHex(argv[2], reset);
 			}
 			catch (HexFile::Error &e)
 			{
