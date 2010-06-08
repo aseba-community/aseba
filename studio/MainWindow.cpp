@@ -928,7 +928,9 @@ namespace Aseba
 					}
 					else if (element.tagName() == "event")
 					{
-						eventsDescriptionsModel->addNamedValue(NamedValue(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
+						const QString eventName(element.attribute("name"));
+						const unsigned eventSize(element.attribute("size").toUInt());
+						eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdString(), std::min(unsigned(ASEBA_MAX_EVENT_ARG_SIZE), eventSize)));
 					}
 					else if (element.tagName() == "constant")
 					{

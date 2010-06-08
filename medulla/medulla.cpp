@@ -213,6 +213,7 @@ namespace Aseba
 		QDomNode domNode = document.documentElement().firstChild();
 		
 		// FIXME: this code depends on event and contants being before any code
+		bool wasError = false;
 		while (!domNode.isNull())
 		{
 			if (domNode.isElement())
@@ -250,6 +251,8 @@ namespace Aseba
 						else
 						{
 							DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
+							wasError = true;
+							break;
 						}
 						// retrieve user-defined variables for use in get/set
 						userDefinedVariablesMap[element.attribute("name")] = *compiler.getVariablesMap();
@@ -259,7 +262,18 @@ namespace Aseba
 				}
 				else if (element.tagName() == "event")
 				{
-					commonDefinitions.events.push_back(NamedValue(element.attribute("name").toStdString(), element.attribute("size").toUInt()));
+					const QString eventName(element.attribute("name"));
+					const unsigned eventSize(element.attribute("size").toUInt());
+					if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
+					{
+						DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString("Event %1 has a length %2 larger than maximum %3").arg(eventName).arg(eventSize).arg(ASEBA_MAX_EVENT_ARG_SIZE)));
+						wasError = true;
+						break;
+					}
+					else
+					{
+						commonDefinitions.events.push_back(NamedValue(eventName.toStdString(), eventSize));
+					}
 				}
 				else if (element.tagName() == "constant")
 				{
@@ -267,6 +281,15 @@ namespace Aseba
 				}
 			}
 			domNode = domNode.nextSibling();
+		}
+		
+		// check if there was an error
+		if (wasError)
+		{
+			std::cerr << QString("There was an error while loading script %1").arg(fileName).toStdString() << std::endl;
+			commonDefinitions.events.clear();
+			commonDefinitions.constants.clear();
+			userDefinedVariablesMap.clear();
 		}
 		
 		// check if there was some matching problem

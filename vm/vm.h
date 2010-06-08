@@ -183,6 +183,7 @@ typedef enum
 	ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS,
 	ASEBA_ASSERT_STEP_OUT_OF_RUN,
 	ASEBA_ASSERT_BREAKPOINT_OUT_OF_BYTECODE_BOUNDS,
+	ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG,
 } AsebaAssertReason;
 
 /*! If ASEBA_ASSERT is defined, this function is called when an error arise */

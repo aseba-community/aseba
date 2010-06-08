@@ -447,6 +447,11 @@ void AsebaVMStep(AsebaVMState *vm)
 			// emit event
 			uint16 start = vm->bytecode[vm->pc + 1];
 			uint16 length = vm->bytecode[vm->pc + 2] * 2;
+			
+			#ifdef ASEBA_ASSERT
+			if (length > ASEBA_MAX_PACKET_SIZE - 6)
+				AsebaAssert(vm, ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG);
+			#endif
 			AsebaSendMessage(vm, bytecode & 0x0fff, vm->variables + start, length);
 			
 			// increment PC

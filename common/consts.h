@@ -197,6 +197,9 @@ typedef enum
 	ASEBA_MAX_PACKET_SIZE = 512+6	/*!< maximum size an aseba packet is allowed to be (in byte), including all its aseba headers, but not the source and the length */
 } AsebaLimits;
 
+/*! Maximum number of word in a aseba user message */
+#define ASEBA_MAX_EVENT_ARG_SIZE ((ASEBA_MAX_PACKET_SIZE-6)/2)
+
 /*@}*/
 
 #endif
