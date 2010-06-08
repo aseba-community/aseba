@@ -166,7 +166,14 @@ namespace Aseba
 			void sendMessage(Message& message, Dashel::Stream* sourceStream = 0);
 			
 		signals:
+			void firstConnectionCreated();
 			void messageAvailable(Message *message, Dashel::Stream* sourceStream);
+		
+		protected slots:
+			//! If no description has been previously requested, requests one in 200 ms
+			void firstConnectionAvailable();
+			//! Timer has elapsed, request a description
+			void requestDescription();
 			
 		private:
 			virtual void run();

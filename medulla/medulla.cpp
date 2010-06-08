@@ -491,6 +491,8 @@ namespace Aseba
 			return QDBusConnection::sessionBus();
 	}
 	
+	// the following methods run in the main thread (event loop)
+	
 	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime, bool systemBus) :
 		#ifdef DASHEL_VERSION_INT
 		Dashel::Hub(verbose || dump),
@@ -500,8 +502,10 @@ namespace Aseba
 		forward(forward),
 		rawTime(rawTime)
 	{
+		// TODO: work in progress to remove ugly delay
 		AsebaNetworkInterface* network(new AsebaNetworkInterface(this, systemBus));
 		QObject::connect(this, SIGNAL(messageAvailable(Message*, Dashel::Stream*)), network, SLOT(processMessage(Message*, Dashel::Stream*)));
+		QObject::connect(this, SIGNAL(firstConnectionCreated()), SLOT(firstConnectionAvailable()));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
@@ -543,11 +547,25 @@ namespace Aseba
 		sendMessage(&message, sourceStream);
 	}
 	
+	void Hub::firstConnectionAvailable()
+	{
+		QTimer::singleShot(200, this, SLOT(requestDescription()));
+	}
+	
+	void Hub::requestDescription()
+	{
+		emit messageAvailable(new GetDescription(), 0);
+	}
+	
+	// the following methods run in the blocking reception thread
+	
 	// In QThread main function, we just make our Dashel hub switch listen for incoming data
 	void Hub::run()
 	{
 		Dashel::Hub::run();
 	}
+	
+	// the following method run in the blocking reception thread
 	
 	void Hub::incomingData(Stream *stream)
 	{
@@ -575,8 +593,10 @@ namespace Aseba
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
 		}
 		
-		usleep(200000);
-		emit messageAvailable(new GetDescription(), 0);
+		if (dataStreams.size() == 1)
+		{
+			emit firstConnectionCreated();
+		}
 	}
 	
 	void Hub::connectionClosed(Stream* stream, bool abnormal)
@@ -677,8 +697,6 @@ int main(int argc, char *argv[])
 		std::cerr << e.what() << std::endl;
 	}
 	
-	//TODO: fix multi-threading
-	//hub.moveToThread(&hub);
 	hub.start();
 	
 	return app.exec();
