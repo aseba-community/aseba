@@ -57,6 +57,7 @@ void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 		case ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS: message += QObject::tr("out of bytecode bounds"); break;
 		case ASEBA_ASSERT_STEP_OUT_OF_RUN: message += QObject::tr("step called while not thread running"); break;
 		case ASEBA_ASSERT_BREAKPOINT_OUT_OF_BYTECODE_BOUNDS: message += QObject::tr("a breakpoint has been set out of bytecode bounds"); break;
+		case ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG: message += QObject::tr("tried to emit a buffer too long"); break;
 		default: message = QObject::tr("unknown assert define, your code seems broken"); break;
 	}
 	
