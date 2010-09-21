@@ -1,0 +1,19 @@
+ASEBA on Smartrob
+=================
+
+To use ASEBA on the Smartrob with your robot you need:
+- Smartrob development board
+- CAN <-> USB translator (uses USB serial protocol)
+- ASEBA compiled on your computer
+
+To start programming your Smartrob with Studio, proceed as follows:
+1. Plug the translator to the Smartrob
+2. Plug the Smartrob to the power supply
+3. Plug the USB cable to your computer
+4. Launch asebaswitch on your computer:
+	For instance, on Linux if the translator is connected to the first USB serial, launch:
+		asebaswitch -v "ser:device=/dev/ttyUSB0;fc=hard;baud=921600"
+	To have debug info on the switch, add -d:
+		asebaswitch -v -d "ser:device=/dev/ttyUSB0;fc=hard;baud=921600"
+5. Launch asebastudio, if no other ASEBA software than the switch is running on your computer,
+   you can use the default target to connect to your Smartrob
