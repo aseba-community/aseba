@@ -40,6 +40,10 @@
 #include <QtXml>
 #include <QtDebug>
 
+#if DASHEL_VERSION_INT < 10003
+#	error "You need at least Dashel version 1.0.3 to compile Medulla"
+#endif // DAHSEL_VERSION_INT
+
 namespace Aseba 
 {
 	using namespace std;
@@ -521,6 +525,9 @@ namespace Aseba
 			cout << std::endl;
 		}
 		
+		// Called from the dbus thread, not the Hub thread, need to lock	
+		lock();
+
 		// write on all connected streams
 		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
@@ -540,6 +547,8 @@ namespace Aseba
 				std::cerr << "error while writing message" << std::endl;
 			}
 		}
+
+		unlock();
 	}
 	
 	void Hub::sendMessage(Message& message, Dashel::Stream* sourceStream)
