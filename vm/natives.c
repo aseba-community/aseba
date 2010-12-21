@@ -535,7 +535,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 		return;
 	}
 
-#if DSP_AVAILABLE
+#ifdef DSP_AVAILABLE
 	length--;
 	
 	CORCONbits.US = 0; // Signed mode
@@ -564,6 +564,11 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	asm __volatile__ ("sftac A, %[sft]\r\n" : /* No output */ : [sft] "r" (shift) : "cc");
 	
 	vm->variables[dest] = ACCAL; // Get the Accumulator low word
+#elif defined(__C30__)
+	for (i= 0; i < length; i++)
+		res += __builtin_mulss(vm->variables[src1++], vm->variables[src2++]);
+	res >>= shift;
+	vm->variables[dest] = (sint16) res;
 #else
 	for (i = 0; i < length; i++)
 	{
