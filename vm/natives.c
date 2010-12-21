@@ -29,8 +29,10 @@
 
 #if defined(__dsPIC30F__)
 #include <p30fxxxx.h>
+#define DSP_AVAILABLE
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
+#define DSP_AVAILABLE
 #elif defined(__PIC24H__)
 #include <p24Hxxxx.h>
 #endif 
@@ -533,7 +535,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 		return;
 	}
 
-#ifdef __C30__
+#if DSP_AVAILABLE
 	length--;
 	
 	CORCONbits.US = 0; // Signed mode
