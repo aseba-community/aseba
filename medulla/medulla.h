@@ -147,6 +147,7 @@ namespace Aseba
 		
 		public:
 			/*! Creates the hub, listen to TCP on port, and creates a DBus interace.
+				@param port port on which to listen for incoming connections
 				@param verbose should we print a notification on each message
 				@param dump should we dump content of each message
 				@param forward should we only forward messages instead of transmit them back to the sender

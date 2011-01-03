@@ -18,6 +18,7 @@ if (QT4_FOUND)
 		DashelTarget.cpp
 		CustomDelegate.cpp
 		main.cpp
+		FindDialog.cpp
 		Target.cpp
 		VariablesViewPlugin.cpp
 		EventViewer.cpp)

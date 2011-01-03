@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
 
-#build: clean
-#	mkdir debian/build
-#	cd debian/build && cmake -D CMAKE_BUILD_TYPE=relwithdebuginfo ../..
-#	cd debian/build && $(MAKE)
+build: clean
+	mkdir debian/build
+	cd debian/build && cmake -D CMAKE_BUILD_TYPE=relwithdebuginfo -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..
+	cd debian/build && make
 
 clean:
 	rm -rf debian/files debian/substvars debian/tmp debian/build
@@ -22,17 +22,18 @@ binary-arch:
 #	cp changelog debian/tmp/usr/share/doc/aseba/changelog
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
-	cp ${ASEBA_BUILD_DIR}/studio/asebastudio debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/switch/asebaswitch debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/dump/asebadump debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/cmd/asebacmd debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/targets/challenge/asebachallenge debian/tmp/usr/bin
-	cp ${ASEBA_BUILD_DIR}/targets/playground/asebaplayground debian/tmp/usr/bin
+	cp debian/build/studio/asebastudio debian/tmp/usr/bin
+	cp debian/build/switch/asebaswitch debian/tmp/usr/bin
+	cp debian/build/dump/asebadump debian/tmp/usr/bin
+	cp debian/build/cmd/asebacmd debian/tmp/usr/bin
+	cp debian/build/targets/challenge/asebachallenge debian/tmp/usr/bin
+	cp debian/build/targets/playground/asebaplayground debian/tmp/usr/bin
 	cp targets/playground/unifr.playground debian/tmp/usr/share/doc/aseba/example-scenarios
 	cp targets/challenge/examples/challenge-goto-energy.aesl debian/tmp/usr/share/doc/aseba/example-code
+	strip --strip-unneeded -R .note -R .comment  debian/build/*.a
+	cd debian/build && make install
 	cp debian/README.Debian debian/tmp/usr/share/doc/aseba/
 	dpkg-shlibdeps debian/tmp/usr/bin/*
-	dpkg-gencontrol -isp
 	chown -R root.root debian/tmp
 	chmod -R o-s,go=u,go-ws debian/tmp
 	dpkg-gencontrol

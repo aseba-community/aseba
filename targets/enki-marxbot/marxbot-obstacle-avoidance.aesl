@@ -3,36 +3,64 @@
 
 
 <!--list of global events-->
-<event size="2" name="ObstacleDetected" />
-<event size="0" name="FreeOfObstacle" />
+<event size="2" name="ObstacleDetected"/>
+<event size="0" name="FreeOfObstacle"/>
+<event size="0" name="Start"/>
+<event size="0" name="Stop"/>
 
 
 <!--list of constants-->
 
 
 <!--source code of node left motor-->
-<node name="left motor" >speed = 300
+<node name="left motor">var isRunning = 1
+speed = 300
+
+onevent Start
+isRunning = 1
+speed = 300
+
+onevent Stop
+isRunning = 0
+speed = 0
 
 onevent ObstacleDetected
-speed = 300 + (args[0] + args[1]) * 4
+if isRunning == 1 then
+	speed = 300 + (args[0] + args[1]) * 4
+end
 
 onevent FreeOfObstacle
-speed = 300
+if isRunning == 1 then
+	speed = 300
+end
 </node>
 
 
 <!--source code of node right motor-->
-<node name="right motor" >speed = 300
+<node name="right motor">var isRunning = 1
+speed = 300
+
+onevent Start
+isRunning = 1
+speed = 300
+
+onevent Stop
+isRunning = 0
+speed = 0
 
 onevent ObstacleDetected
-speed = 300 + (args[0] - args[1]) * 4
+if isRunning == 1 then
+	speed = 300 + (args[0] - args[1]) * 4
+end
 
 onevent FreeOfObstacle
-speed = 300</node>
+if isRunning == 1 then
+	speed = 300
+end</node>
 
 
 <!--source code of node proximity sensors-->
-<node name="proximity sensors" ># angles = pi/48:pi/12:(47*2*pi)/48
+<node name="proximity sensors"># angles = pi/48:pi/12:(47*2*pi)/48
 # vectorX = round(-cos(angles)*255)
 # vectorY = round(-sin(angles)*255)
 
@@ -60,7 +88,7 @@ end
 
 
 <!--source code of node distance sensors-->
-<node name="distance sensors" ></node>
+<node name="distance sensors"></node>
 
 
 </network>

@@ -17,3 +17,6 @@ Copyright (C) 2006 - 2009:
 	Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
 	EPFL, Lausanne (http://www.epfl.ch)
+	
+	Autonomous Systems Lab (http://www.asl.ethz.ch)
+	ETHZ, Zurich (http://www.ethz.ch)

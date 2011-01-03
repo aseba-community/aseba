@@ -65,6 +65,7 @@ namespace Aseba
 	class EventViewer;
 	class EditorsPlotsTabWidget;
 	class DraggableListWidget;
+	class FindDialog;
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -314,7 +315,6 @@ namespace Aseba
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
-		void hideEvent(QHideEvent * event);
 		void closeEvent ( QCloseEvent * event );
 		
 		// tabs and nodes
@@ -369,11 +369,13 @@ namespace Aseba
 		QAction *pasteAct;
 		QAction *undoAct;
 		QAction *redoAct;
+		QAction *findAct;
 		QAction *showHiddenAct;
 		QAction* showCompilationMsg;
 		
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
+		FindDialog* findDialog; //!< find dialog
 		QString actualFileName; //!< name of opened file, "" if new
 		bool sourceModified; //!< true if source code has been modified since last save
 		QTextBrowser* helpViewer;

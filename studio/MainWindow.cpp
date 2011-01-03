@@ -30,6 +30,7 @@
 #include "AeslEditor.h"
 #include "VariablesViewPlugin.h"
 #include "EventViewer.h"
+#include "FindDialog.h"
 #include "../common/consts.h"
 #include <QtGui>
 #include <QtXml>
@@ -854,7 +855,7 @@ namespace Aseba
 						"</li><li>Dashel ver. "\
 						DASHEL_VERSION \
 						"</li></ul>" \
-						"<p>(c) 2006-2009 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
+						"<p>(c) 2006-2010 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
 						"<p><a href=\"http://mobots.epfl.ch\">http://mobots.epfl.ch/aseba.html</a></p>" \
 						"<p>Aseba is open-source licensed under the GPL version 3.</p>");
 		
@@ -1405,6 +1406,9 @@ namespace Aseba
 			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
 			disconnect(previousActiveTab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+			
+			findDialog->hide();
+			findDialog->editor = 0;
 		}
 		
 		// reconnect to new
@@ -1445,6 +1449,8 @@ namespace Aseba
 				redoAct->setEnabled(false);
 				
 				previousActiveTab = tab;
+				
+				findDialog->editor = tab->editor;
 			}
 			else
 				previousActiveTab = 0;
@@ -1982,6 +1988,9 @@ namespace Aseba
 		
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog();
+		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(close()));
+		findDialog = new FindDialog(this);
+		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
 		
 		// help viewer
 		helpViewer = new QTextBrowser();
@@ -2151,6 +2160,10 @@ namespace Aseba
 		undoAct->setEnabled(false);
 		redoAct->setEnabled(false);
 		
+		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find"), this);
+		findAct->setShortcut(tr("Ctrl+F", "Edit|Find"));
+		connect(findAct, SIGNAL(triggered()), findDialog, SLOT(show()));
+		
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
 		editMenu->addAction(cutAct);
@@ -2162,6 +2175,7 @@ namespace Aseba
 		editMenu->addAction(undoAct);
 		editMenu->addAction(redoAct);
 		editMenu->addSeparator();
+		editMenu->addAction(findAct);
 		
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
@@ -2230,12 +2244,6 @@ namespace Aseba
 		helpMenu->addAction(tr("&About"), this, SLOT(about()));
 		helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
 	}
-	
-	void MainWindow::hideEvent(QHideEvent * event)
-	{
-		compilationMessageBox->hide();
-	}
-	
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!
 		\return true if it is ok to discard, false if operation must abort
