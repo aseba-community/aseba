@@ -40,4 +40,7 @@ if (QT4_FOUND)
 	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 	
 	target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+
+	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+
 endif (QT4_FOUND)
