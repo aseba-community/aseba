@@ -2275,6 +2275,7 @@ namespace Aseba
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
 		
 		QMessageBox msgBox;
+		msgBox.setWindowTitle(tr("Aseba Studio - Confirmation Dialog"));
 		msgBox.setText(tr("The document \"%0\" has been modified.").arg(docName));
 		msgBox.setInformativeText(tr("Do you want to save your changes or discard them?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
