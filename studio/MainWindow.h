@@ -242,6 +242,8 @@ namespace Aseba
 		void exportMemoriesContent();
 		void importMemoriesContent();
 		void copyAll();
+		void findTriggered();
+		void replaceTriggered();
 		void showHidden(bool show);
 		
 		void loadAll();
@@ -370,6 +372,7 @@ namespace Aseba
 		QAction *undoAct;
 		QAction *redoAct;
 		QAction *findAct;
+		QAction *replaceAct;
 		QAction *showHiddenAct;
 		QAction* showCompilationMsg;
 		

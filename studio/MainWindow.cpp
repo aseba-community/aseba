@@ -1195,6 +1195,18 @@ namespace Aseba
 		 QApplication::clipboard()->setText(toCopy);
 	}
 	
+	void MainWindow::findTriggered()
+	{
+		findDialog->replaceGroupBox->setChecked(false);
+		findDialog->show();
+	}
+	
+	void MainWindow::replaceTriggered()
+	{
+		findDialog->replaceGroupBox->setChecked(true);
+		findDialog->show();
+	}
+	
 	void MainWindow::resetAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2160,9 +2172,13 @@ namespace Aseba
 		undoAct->setEnabled(false);
 		redoAct->setEnabled(false);
 		
-		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find"), this);
+		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find..."), this);
 		findAct->setShortcut(tr("Ctrl+F", "Edit|Find"));
-		connect(findAct, SIGNAL(triggered()), findDialog, SLOT(show()));
+		connect(findAct, SIGNAL(triggered()), SLOT(findTriggered()));
+		
+		replaceAct = new QAction(QIcon(":/images/edit.png"), tr("&Replace..."), this);
+		replaceAct->setShortcut(tr("Ctrl+R", "Edit|Replace"));
+		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
 		
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
@@ -2176,7 +2192,7 @@ namespace Aseba
 		editMenu->addAction(redoAct);
 		editMenu->addSeparator();
 		editMenu->addAction(findAct);
-		
+		editMenu->addAction(replaceAct);
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
@@ -2226,23 +2242,23 @@ namespace Aseba
 		// Settings
 		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
 		menuBar()->addMenu(settingsMenu);
-		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
+		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
 		showHiddenAct->setCheckable(true);
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Plugins
 		QMenu *pluginMenu = new QMenu(tr("&Plug-ins"), this);
 		menuBar()->addMenu(pluginMenu);
-		pluginMenu->addAction(tr("&Linear Camera View"), this, SLOT(addPluginLinearCameraView()));
+		pluginMenu->addAction(tr("&Linear Camera View..."), this, SLOT(addPluginLinearCameraView()));
 		
 		// Help menu
 		QMenu *helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
-		helpMenu->addAction(tr("&Language"), this, SLOT(showHelpLanguage()));
-		helpMenu->addAction(tr("&Studio"), this, SLOT(showHelpStudio()));
+		helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
+		helpMenu->addAction(tr("&Studio..."), this, SLOT(showHelpStudio()));
 		helpMenu->addSeparator();
-		helpMenu->addAction(tr("&About"), this, SLOT(about()));
-		helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
+		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
+		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
 	}
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!

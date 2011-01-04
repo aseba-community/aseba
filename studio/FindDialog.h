@@ -34,6 +34,7 @@ class QLineEdit;
 class QPushButton;
 class QCheckBox;
 class QTextEdit;
+class QGroupBox;
 
 namespace Aseba
 {
@@ -47,15 +48,21 @@ namespace Aseba
 		void findNext();
 		void findPrevious();
 		void findFromTop();
+		void replaceFindNext();
+		void replaceFindPrevious();
+		void replaceAll();
 		
 	protected:
-		void find(const QTextCursor pos, const QTextDocument::FindFlag dir);
+		bool find(const QTextCursor pos, const QTextDocument::FindFlag dir);
+		void replace();
 		
 	public:
 		QTextEdit* editor;
+		QGroupBox* replaceGroupBox;
 	
 	protected:
-		QLineEdit *lineEdit;
+		QLineEdit *findLineEdit;
+		QLineEdit *replaceLineEdit;
 		
 		// options
 		QCheckBox *caseCheckBox;
@@ -66,6 +73,10 @@ namespace Aseba
 		QPushButton *findNextButton;
 		QPushButton *findPreviousButton;
 		QPushButton *findFromTopButton;
+		QPushButton *replaceFindNextButton;
+		QPushButton *replaceFindPreviousButton;
+		QPushButton *replaceAllButton;
+		//QPushButton *findFromTopButton;
 		
 		// warning lineEdit
 		QLabel *warningText;
