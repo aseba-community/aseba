@@ -7,7 +7,6 @@ features
 - move events
 - tree for variables
 - ctrl-g for "goto line"
-- ctrl-f for "find"
 
 known bugs
 - if compilation dialog is closed, corresponding menu entry is not updated

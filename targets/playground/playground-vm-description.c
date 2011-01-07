@@ -1,32 +1,28 @@
 /*
 	Playground - An active arena to learn multi-robots programming
-	Copyright (C) 1999 - 2008:
+	Copyright (C) 1999--2008:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 	3D models
 	Copyright (C) 2008:
 		Basilio Noris
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2006 - 2008:
+	Copyright (C) 2007--2010:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
-		Mobots group (http://mobots.epfl.ch)
-		Laboratory of Robotics Systems (http://lsro.epfl.ch)
-		EPFL, Lausanne (http://www.epfl.ch)
+		and other contributors, see authors.txt for details
 	
 	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	any other version as decided by the two original authors
-	Stephane Magnenat and Valentin Longchamp.
+	it under the terms of the GNU Lesser General Public License as published
+	by the Free Software Foundation, version 3 of the License.
 	
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+	GNU Lesser General Public License for more details.
 	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "../../vm/natives.h"

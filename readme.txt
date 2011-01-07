@@ -1,9 +1,9 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2009:
+Copyright (C) 2007--2010:
 	Stephane Magnenat <stephane at magnenat dot net>
 	(http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
-	Mobots group, Laboratory of Robotics Systems, EPFL, Lausanne
+
 
 To compile Aseba, you need CMake 2.6 or later (http://www.cmake.org/).
 The CMake website provides documentation on how to use CMake on the different
