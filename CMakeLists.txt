@@ -136,7 +136,9 @@ install(FILES ${ASEBACORE_HDR_COMPILER}
 
 add_subdirectory(switch)
 
-add_subdirectory(medulla)
+if (UNIX)
+	add_subdirectory(medulla)
+endif (UNIX)
 
 add_subdirectory(cmd)
 
