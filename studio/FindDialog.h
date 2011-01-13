@@ -39,7 +39,7 @@ namespace Aseba
 		 Q_OBJECT
 	public:
 		FindDialog(QWidget *parent = 0, QTextEdit* editor = 0);
-	
+		
 	protected slots:
 		void findNext();
 		void findPrevious();

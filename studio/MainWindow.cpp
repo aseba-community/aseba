@@ -852,9 +852,9 @@ namespace Aseba
 						"</li><li>Dashel ver. "\
 						DASHEL_VERSION \
 						"</li></ul>" \
-						"<p>(c) 2006-2010 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
+						"<p>(c) 2006-2011 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
 						"<p><a href=\"http://mobots.epfl.ch\">http://mobots.epfl.ch/aseba.html</a></p>" \
-						"<p>Aseba is open-source licensed under the GPL version 3.</p>");
+						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
 		text = text.arg(revStringList.front()).arg(ASEBA_PROTOCOL_VERSION);
 		
@@ -1204,6 +1204,22 @@ namespace Aseba
 		findDialog->show();
 	}
 	
+	void MainWindow::goToLine()
+	{
+		assert(currentScriptTab);
+		QTextEdit* editor(currentScriptTab->editor);
+		const QTextDocument* document(editor->document());
+		QTextCursor cursor(editor->textCursor());
+		bool ok;
+		const int curLine = cursor.blockNumber() + 1;
+		const int minLine = 1;
+		const int maxLine = document->lineCount();
+		const int line = QInputDialog::getInt(
+			this, tr("Go To Line"), tr("Line:"), curLine, minLine, maxLine, 1, &ok);
+		if (ok)
+			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
+	}
+	
 	void MainWindow::resetAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -1403,21 +1419,25 @@ namespace Aseba
 	void MainWindow::tabChanged(int index)
 	{
 		// remove old connections, if any
-		if (previousActiveTab)
+		if (currentScriptTab)
 		{
-			disconnect(cutAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(cut()));
-			disconnect(copyAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(copy()));
-			disconnect(pasteAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(paste()));
-			disconnect(undoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(undo()));
-			disconnect(redoAct, SIGNAL(triggered()), previousActiveTab->editor, SLOT(redo()));
+			disconnect(cutAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(cut()));
+			disconnect(copyAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(copy()));
+			disconnect(pasteAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(paste()));
+			disconnect(undoAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(undo()));
+			disconnect(redoAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(redo()));
 			
-			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-			disconnect(previousActiveTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-			disconnect(previousActiveTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
-			disconnect(previousActiveTab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+			disconnect(currentScriptTab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+			disconnect(currentScriptTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+			disconnect(currentScriptTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
+			disconnect(currentScriptTab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
 			
+			pasteAct->setEnabled(false);
 			findDialog->hide();
 			findDialog->editor = 0;
+			findAct->setEnabled(false);
+			replaceAct->setEnabled(false);
+			goToLineAct->setEnabled(false);
 		}
 		
 		// reconnect to new
@@ -1428,6 +1448,10 @@ namespace Aseba
 			{
 				connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
 				connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+				
+				findDialog->editor = tab->editor;
+				findAct->setEnabled(true);
+				goToLineAct->setEnabled(true);
 				
 				NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
 				if (nodeTab)
@@ -1447,9 +1471,16 @@ namespace Aseba
 					target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
 					
 					showCompilationMsg->setEnabled(true);
+					findDialog->replaceGroupBox->setEnabled(true);
+					// paste and replace are only available when the editor is in read/write mode
+					pasteAct->setEnabled(true);
+					replaceAct->setEnabled(true);
 				}
 				else
+				{
 					showCompilationMsg->setEnabled(false);
+					findDialog->replaceGroupBox->setEnabled(false);
+				}
 				
 				// TODO: it would be nice to find a way to setup this correctly
 				cutAct->setEnabled(false);
@@ -1457,15 +1488,13 @@ namespace Aseba
 				undoAct->setEnabled(false);
 				redoAct->setEnabled(false);
 				
-				previousActiveTab = tab;
-				
-				findDialog->editor = tab->editor;
+				currentScriptTab = tab;
 			}
 			else
-				previousActiveTab = 0;
+				currentScriptTab = 0;
 		}
 		else
-			previousActiveTab = 0;
+			currentScriptTab = 0;
 	}
 	
 	void MainWindow::showCompilationMessages(bool doShow)
@@ -1858,7 +1887,7 @@ namespace Aseba
 	
 	void MainWindow::setupWidgets()
 	{
-		previousActiveTab = 0;
+		currentScriptTab = 0;
 		nodes = new EditorsPlotsTabWidget;
 		nodes->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -2151,31 +2180,38 @@ namespace Aseba
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
 		cutAct->setShortcut(tr("Ctrl+X", "Edit|Cut"));
+		cutAct->setEnabled(false);
 		
 		copyAct = new QAction(QIcon(":/images/editcopy.png"), tr("&Copy"), this);
 		copyAct->setShortcut(tr("Ctrl+C", "Edit|Copy"));
+		copyAct->setEnabled(false);
 		
 		pasteAct = new QAction(QIcon(":/images/editpaste.png"), tr("&Paste"), this);
 		pasteAct->setShortcut(tr("Ctrl+V", "Edit|Paste"));
+		pasteAct->setEnabled(false);
 		
 		undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
 		undoAct->setShortcut(tr("Ctrl+Z", "Edit|Undo"));
+		undoAct->setEnabled(false);
 		
 		redoAct = new QAction(QIcon(":/images/redo.png"), tr("Re&do"), this);
 		redoAct->setShortcut(tr("Ctrl+Shift+Z", "Edit|Redo"));
-		
-		cutAct->setEnabled(false);
-		copyAct->setEnabled(false);
-		undoAct->setEnabled(false);
 		redoAct->setEnabled(false);
 		
 		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find..."), this);
 		findAct->setShortcut(tr("Ctrl+F", "Edit|Find"));
 		connect(findAct, SIGNAL(triggered()), SLOT(findTriggered()));
+		findAct->setEnabled(false);
 		
 		replaceAct = new QAction(QIcon(":/images/edit.png"), tr("&Replace..."), this);
 		replaceAct->setShortcut(tr("Ctrl+R", "Edit|Replace"));
 		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
+		replaceAct->setEnabled(false);
+		
+		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
+		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
+		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
+		goToLineAct->setEnabled(false);
 		
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
@@ -2190,6 +2226,8 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(findAct);
 		editMenu->addAction(replaceAct);
+		editMenu->addSeparator();
+		editMenu->addAction(goToLineAct);
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));

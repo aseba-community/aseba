@@ -241,6 +241,7 @@ namespace Aseba
 		void copyAll();
 		void findTriggered();
 		void replaceTriggered();
+		void goToLine();
 		void showHidden(bool show);
 		
 		void loadAll();
@@ -319,7 +320,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		EditorsPlotsTabWidget* nodes;
-		ScriptTab* previousActiveTab;
+		ScriptTab* currentScriptTab;
 		
 		#ifdef HAVE_QWT
 		
@@ -370,6 +371,7 @@ namespace Aseba
 		QAction *redoAct;
 		QAction *findAct;
 		QAction *replaceAct;
+		QAction *goToLineAct;
 		QAction *showHiddenAct;
 		QAction* showCompilationMsg;
 		

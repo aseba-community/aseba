@@ -6,7 +6,6 @@ features
 - selective hide of events
 - move events
 - tree for variables
-- ctrl-g for "goto line"
 
 known bugs
 - if compilation dialog is closed, corresponding menu entry is not updated
