@@ -42,6 +42,17 @@ namespace Aseba
 	
 	void DescriptionsManager::processMessage(const Message* message)
 	{
+		// if we have a disconnection message
+		{
+			const Disconnected *disconnected = dynamic_cast<const Disconnected *>(message);
+			if (disconnected)
+			{
+				NodesDescriptionsMap::iterator it = nodesDescriptions.find(disconnected->source);
+				if (it != nodesDescriptions.end())
+					nodesDescriptions.erase(it);
+			}
+		}
+		
 		// if we have an initial description
 		{
 			const Description *description = dynamic_cast<const Description *>(message);
