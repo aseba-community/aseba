@@ -193,6 +193,7 @@ namespace Aseba
 		void receivedNodeSpecificError(Message *message);
 		void receivedExecutionStateChanged(Message *message);
 		void receivedBreakpointSetResult(Message *message);
+		void receivedBootloaderAck(Message *message);
 		
 	protected:
 		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);

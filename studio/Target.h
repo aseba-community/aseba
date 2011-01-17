@@ -86,6 +86,9 @@ namespace Aseba
 		//! The result of a set breakpoint call
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
 		
+		//! We received an ack from the bootloader
+		void bootloaderAck(unsigned errorCode, unsigned errorAddress);
+		
 	public:
 		//! Virtual destructor.
 		virtual ~Target() { }
