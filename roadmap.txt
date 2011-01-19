@@ -5,11 +5,13 @@ Studio
 features
 - selective hide of events
 - move events
-- tree for variables
 
 known bugs
-- if compilation dialog is closed, corresponding menu entry is not updated
+
+* high priority
 - desynchronisation between hidden status of variable and menu
+
+* low priority
 - enki marxbot crashes if studio disconnects (no check for dashel exception: asebamarxbot: targets/enki-marxbot/AsebaMarxbot.cpp:64: void AsebaSendBuffer(AsebaVMState*, const uint8*, uint16): Assertion `stream' failed.)
 
 
@@ -19,4 +21,5 @@ Compiler
 - size typed event arguments
 
 Studio
+- tree for variables
 - size typed events

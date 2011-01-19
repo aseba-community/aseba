@@ -70,6 +70,10 @@ namespace Aseba
 		
 	public:
 		CompilationLogDialog(QWidget *parent = 0);
+	signals:
+		void hidden();
+	protected:
+		virtual void hideEvent ( QHideEvent * event );
 	};
 	
 	class FixedWidthTableView : public QTableView
@@ -259,6 +263,7 @@ namespace Aseba
 		void eventContextMenuRequested(const QPoint & pos);
 		void logEntryDoubleClicked(QListWidgetItem *);
 		void showCompilationMessages(bool doShown);
+		void compilationMessagesWasHidden();
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();

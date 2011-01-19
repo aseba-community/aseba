@@ -54,7 +54,7 @@ namespace Aseba
 {
 	#define ASEBA_SVN_REV "$Revision$"
 	
-	/** \addtogroup studio */
+// 	/** \addtogroup studio */
 	/*@{*/
 	
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
@@ -71,6 +71,12 @@ namespace Aseba
 		setReadOnly(true);
 		
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
+	}
+	
+	void CompilationLogDialog::hideEvent( QHideEvent * event )
+	{
+		if (!isVisible())
+			emit hidden();
 	}
 
 	//////
@@ -1505,6 +1511,11 @@ namespace Aseba
 			polymorphic_downcast<NodeTab *>(nodes->currentWidget())->recompile();
 	}
 	
+	void MainWindow::compilationMessagesWasHidden()
+	{
+		showCompilationMsg->setChecked(false);
+	}
+	
 	void MainWindow::addEventNameClicked()
 	{
 		bool ok;
@@ -2267,6 +2278,7 @@ namespace Aseba
 		showCompilationMsg->setCheckable(true);
 		toolMenu->addAction(showCompilationMsg);
 		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
+		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
 		toolMenu->addSeparator();
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
 		toolMenu->addMenu(writeBytecodeMenu);
