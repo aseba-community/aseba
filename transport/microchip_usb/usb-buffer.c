@@ -196,8 +196,6 @@ void AsebaUsbInit(unsigned char * sendQueue, size_t sendQueueSize, unsigned char
 	
 	AsebaUsb.rx.buffer = recvQueue;
 	AsebaUsb.rx.size = recvQueueSize;
-	
-	usb_uart_init();
 }
 
 int AsebaUsbRecvBufferEmpty(void) {
@@ -213,4 +211,8 @@ int AsebaUsbRecvBufferEmpty(void) {
 			return 0;
 	}
 	return 1;
+}
+
+int AsebaUsbTxBusy(void) {
+	return tx_busy;
 }

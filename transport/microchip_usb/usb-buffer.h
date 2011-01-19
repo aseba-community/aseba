@@ -57,5 +57,6 @@ uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* s
  *************/
 void AsebaUsbInit(unsigned char * sendQueue, size_t sendQueueSize, unsigned char * recvQueue, size_t recvQueueSize);
 int AsebaUsbRecvBufferEmpty(void);
+int AsebaUsbTxBusy(void);
 
 #endif
