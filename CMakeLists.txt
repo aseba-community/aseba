@@ -64,6 +64,7 @@ add_definitions(-DASEBA_ASSERT)
 set (ASEBACORE_SRC
 	utils/FormatableString.cpp
 	utils/utils.cpp
+	utils/HexFile.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
 )

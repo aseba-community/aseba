@@ -32,6 +32,8 @@
 #include <map>
 #include <dashel/dashel.h>
 
+#include "MainWindow.h"
+
 class QPushButton;
 class QGroupBox;
 class QLineEdit;
@@ -147,6 +149,7 @@ namespace Aseba
 		QTimer userEventsTimer;
 		
 	public:
+		friend class InvasivePlugin;
 		DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget);
 		~DashelTarget();
 		

@@ -1,5 +1,4 @@
 add_executable(asebacmd
-	HexFile.cpp
 	cmd.cpp
 )
 

@@ -31,6 +31,8 @@
 #include <QMultiMap>
 #include <QTabWidget>
 
+#include <dashel/dashel.h>
+
 #include "CustomDelegate.h"
 
 #include "../compiler/compiler.h"
@@ -63,6 +65,16 @@ namespace Aseba
 	class EditorsPlotsTabWidget;
 	class DraggableListWidget;
 	class FindDialog;
+	class ThymioBootloaderDialog;
+	class MainWindow;
+
+	struct InvasivePlugin
+	{
+		MainWindow* mainWindow;
+		InvasivePlugin(MainWindow* mainWindow);
+		Dashel::Stream* getDashelStream();
+		Target * getTarget();
+	};
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -99,9 +111,7 @@ namespace Aseba
 	public slots:
 		void removeAndDeleteTab(int index = -1);
 	};
-	
-	class MainWindow;
-	
+		
 	class ScriptTab
 	{
 	public:
@@ -300,6 +310,8 @@ namespace Aseba
 		void updateWindowTitle();
 		
 		void addPluginLinearCameraView();
+
+		void ThymioFlash();
 		
 		void showHelpLanguage();
 		void showHelpStudio();
@@ -391,6 +403,10 @@ namespace Aseba
 		CommonDefinitions commonDefinitions;
 		Compiler compiler; //!< Aesl compiler
 		Target *target;
+
+		friend class InvasivePlugin;
+		// misc.
+		ThymioBootloaderDialog * thymiobootloader;
 	};
 	
 	/*@}*/

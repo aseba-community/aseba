@@ -38,6 +38,8 @@
 
 #include <MainWindow.moc>
 
+#include "ThymioBootloader.h"
+
 using std::copy;
 
 // Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
@@ -56,6 +58,20 @@ namespace Aseba
 	
 // 	/** \addtogroup studio */
 	/*@{*/
+
+	InvasivePlugin::InvasivePlugin(MainWindow* mainWindow) : mainWindow(mainWindow) {};
+
+	Dashel::Stream* InvasivePlugin::getDashelStream()
+	{
+		DashelTarget* target = 
+			polymorphic_downcast<DashelTarget*>(mainWindow->target);
+		return target->dashelInterface.stream;
+	}
+
+	Target* InvasivePlugin::getTarget()
+	{
+		return mainWindow->target;
+	}
 	
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
 		QTextEdit(parent)
@@ -817,6 +833,8 @@ namespace Aseba
 	{
 		// create target
 		target = new DashelTarget(translators, commandLineTarget);
+
+		thymiobootloader = new ThymioBootloaderDialog(this);
 		
 		// create models
 		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
@@ -839,6 +857,8 @@ namespace Aseba
 			it.value()->detachFromMain();
 		}
 		
+		delete thymiobootloader;
+
 		delete target;
 	}
 	
@@ -1637,6 +1657,13 @@ namespace Aseba
 			}
 		}
 	}
+
+	void MainWindow::ThymioFlash()
+	{
+		NodeTab * tab;
+		if(nodes->currentWidget() && (tab = dynamic_cast<NodeTab*>(nodes->currentWidget())))
+			thymiobootloader->Flash(tab);
+	}
 	
 	void MainWindow::showHelpLanguage()
 	{
@@ -2297,6 +2324,7 @@ namespace Aseba
 		QMenu *pluginMenu = new QMenu(tr("&Plug-ins"), this);
 		menuBar()->addMenu(pluginMenu);
 		pluginMenu->addAction(tr("&Linear Camera View..."), this, SLOT(addPluginLinearCameraView()));
+		pluginMenu->addAction(tr("&Thymio Bootloader..."), this, SLOT(ThymioFlash()));
 		
 		// Help menu
 		QMenu *helpMenu = new QMenu(tr("&Help"), this);

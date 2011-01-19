@@ -21,7 +21,7 @@
 #include "../msg/msg.h"
 #include "../utils/utils.h"
 #include <dashel/dashel.h>
-#include "HexFile.h"
+#include "../utils/HexFile.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -40,11 +40,13 @@ namespace Aseba
 		stream << "* presence : broadcast presence message\n";
 		stream << "* usermsg: user message [type] [length in 16 bit words]\n";
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
+		stream << "* rdpageusb : bootloader read page usb [dest] [page number]\n";
 		stream << "* whex : write hex file [dest] [file name] [reset]\n";
 		stream << "* rhex : read hex file [source] [file name]\n";
 		stream << "* eb: exit from bootloader, go back into user mode [dest]\n";
 		stream << "* sb: switch into bootloader: reboot node, then enter bootloader for a while [dest]\n";
 		stream << "* sleep: put the vm to sleep [dest]\n";
+		stream << "* wusb : write hex file to [dest] [file name] [reset]\n";
 	}
 	
 	//! Show usage
@@ -113,6 +115,12 @@ namespace Aseba
 	{
 		cerr << "Error while writing page " << pageIndex << endl;
 		exit(11);
+	}
+	
+	//! Warn about an error but do not quit
+	void errorWritePageNonFatal(unsigned pageIndex)
+	{
+		cerr << "Error while writing page " << pageIndex << ", continuing ..." << endl;
 	}
 	
 	//! Produce an error message and quit
@@ -198,6 +206,17 @@ namespace Aseba
 				delete message;
 			}
 			
+			return true;
+		}
+		
+		bool readPageUsb(unsigned pageNumber, uint8 * data) {
+			BootloaderReadPage message;
+			message.dest = dest;
+			message.pageNumber = pageNumber;
+			message.serialize(stream);
+			stream->flush();
+			
+			stream->read(data, 2048);
 			return true;
 		}
 		
@@ -371,6 +390,134 @@ namespace Aseba
 			}
 		}
 		
+		bool writePageUsb(int pageNumber, const uint8 *data)
+		{
+			// send command
+			BootloaderWritePage writePage;
+			writePage.dest = dest;
+			writePage.pageNumber = pageNumber;
+			writePage.serialize(stream);
+			
+			cout << "Writing page " << pageNumber << endl;
+			cout << "First data: " << hex << (int) data[0] << "," << hex << (int) data[1] << "," << hex << (int) data[2] << endl;
+			
+			stream->write(data,pageSize);
+			stream->flush();
+			
+			while (true)
+			{
+				cout << "Waiting ack ..." << endl;
+				Message *message = Message::receive(stream);
+				// handle ack
+				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+				if (ackMessage && (ackMessage->source == dest))
+				{
+					uint16 errorCode = ackMessage->errorCode;
+					delete message;
+					if(errorCode == BootloaderAck::SUCCESS) {
+						cout << "Success" << endl;
+						break;
+					} else {
+						cout << "Fail" << endl;
+						return false;
+					}
+				}
+				
+				delete message;
+			}
+			
+			return true;
+		}
+		
+		void writeHexUsb(const string &fileName, bool reset) {
+			HexFile hexFile;
+			hexFile.read(fileName);
+			
+			if (reset) 
+			{
+				Reboot msg(dest);
+				msg.serialize(stream);
+				stream->flush();
+			}
+				
+/*			while (true)
+			{
+				Message *message = Message::receive(stream);
+				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
+				if (bDescMessage && (bDescMessage->source == dest))
+				{
+					pageSize = bDescMessage->pageSize;
+					pagesStart = bDescMessage->pagesStart;
+					pagesCount = bDescMessage->pagesCount;
+					delete message;
+					break;
+				}
+				delete message;
+			}
+*/			
+			pageSize = 2048;
+			// Build a map of pages out of the map of addresses
+			typedef map<uint32, vector<uint8> > PageMap;
+			PageMap pageMap;
+			for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
+			{
+				// get page number
+				unsigned chunkAddress = it->first;
+				// index inside data chunk
+				unsigned chunkDataIndex = 0;
+				// size of chunk in bytes
+				unsigned chunkSize = it->second.size();
+				
+				// copy data from chunk to page
+				do
+				{
+					// get page number
+					unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
+					// get address inside page
+					unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
+				
+					// if page does not exists, create it
+					if (pageMap.find(pageIndex) == pageMap.end())
+					{
+					//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+						pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
+					}
+					// copy data
+					unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
+					copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
+					
+					// increment chunk data pointer
+					chunkDataIndex += amountToCopy;
+				}
+				while (chunkDataIndex < chunkSize);
+			}
+			
+			// Write pages
+			for (PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it ++)
+			{
+				unsigned pageIndex = it->first;
+				if (pageIndex != 0)
+					if (!writePageUsb(pageIndex, &it->second[0]))
+						errorWritePageNonFatal(pageIndex);
+			}
+			// Now look for the index 0 page
+			for (PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it ++)
+			{
+				unsigned pageIndex = it->first;
+				if (pageIndex == 0)
+					if (!writePageUsb(pageIndex, &it->second[0]))
+						errorWritePageNonFatal(pageIndex);
+			}
+
+			if (reset) 
+			{
+				BootloaderReset msg(dest);
+				msg.serialize(stream);
+				stream->flush();
+			}
+			
+		}
+		
 		//! Read an hex file
 		void readHex(const string &fileName)
 		{
@@ -454,6 +601,25 @@ namespace Aseba
 			else
 				errorReadPage(atoi(argv[2]));
 		}
+		else if(strcmp(cmd, "rdpageusb") == 0)
+		{
+			if (argc < 3)
+				errorMissingArgument(argv[0]);
+			argEaten = 2;
+			
+			BootloaderInterface bootloader(stream, atoi(argv[1]));
+			vector <uint8> data(2048);
+			cout << "Page: " << atoi(argv[2]) << endl;
+			if(bootloader.readPageUsb(atoi(argv[2]), &data[0])) {
+				ofstream file("page.bin");
+				if(file.good())
+					copy(data.begin(),data.end(),ostream_iterator<uint8>(file));
+				else
+					errorOpenFile("page.bin");
+			}
+			else
+				errorReadPage(atoi(argv[2]));
+		}
 		else if (strcmp(cmd, "whex") == 0)
 		{
 			bool reset = 0;
@@ -473,6 +639,27 @@ namespace Aseba
 			{
 				BootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.writeHex(argv[2], reset);
+			}
+			catch (HexFile::Error &e)
+			{
+				errorHexFile(e.toString());
+			}
+		}
+		else if (strcmp(cmd,"wusb") == 0)
+		{
+			bool reset = 0;
+			if (argc < 3)
+				errorMissingArgument(argv[0]);
+			argEaten = 2;
+			if(argc > 3 && !strcmp(argv[3], "reset"))
+			{
+				reset = 1;
+				argEaten = 3;
+			}
+			try
+			{
+				BootloaderInterface bootloader(stream, atoi(argv[1]));
+				bootloader.writeHexUsb(argv[2], reset);
 			}
 			catch (HexFile::Error &e)
 			{

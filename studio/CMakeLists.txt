@@ -21,7 +21,8 @@ if (QT4_FOUND)
 		FindDialog.cpp
 		Target.cpp
 		VariablesViewPlugin.cpp
-		EventViewer.cpp)
+		EventViewer.cpp
+		ThymioBootloader.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	
