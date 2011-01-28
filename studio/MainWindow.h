@@ -31,14 +31,14 @@
 #include <QMultiMap>
 #include <QTabWidget>
 
-#include <dashel/dashel.h>
-
 #include "CustomDelegate.h"
 
 #include "../compiler/compiler.h"
 #include <fstream>
 #include <sstream>
 #include "Target.h"
+#include "TargetModels.h"
+#include "Plugin.h"
 
 class QLabel;
 class QSpinBox;
@@ -49,6 +49,7 @@ class QListWidgetItem;
 class QTreeView;
 class QTranslator;
 class QTextBrowser;
+class QToolBox;
 
 namespace Aseba
 {
@@ -65,16 +66,7 @@ namespace Aseba
 	class EditorsPlotsTabWidget;
 	class DraggableListWidget;
 	class FindDialog;
-	class ThymioBootloaderDialog;
 	class MainWindow;
-
-	struct InvasivePlugin
-	{
-		MainWindow* mainWindow;
-		InvasivePlugin(MainWindow* mainWindow);
-		Dashel::Stream* getDashelStream();
-		Target * getTarget();
-	};
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -135,7 +127,7 @@ namespace Aseba
 		const QString name;
 	};
 	
-	class NodeTab : public QSplitter, public ScriptTab
+	class NodeTab : public QSplitter, public ScriptTab, public VariableListener
 	{
 		Q_OBJECT
 		
@@ -150,6 +142,7 @@ namespace Aseba
 		void uploadReadynessChanged(bool);
 	
 	protected:
+		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void setupWidgets();
 		void setupConnections();
 	
@@ -184,6 +177,8 @@ namespace Aseba
 		void executionModeChanged(Target::ExecutionMode mode);
 		
 		void breakpointSetResult(unsigned line, bool success);
+		
+		void closePlugins();
 	
 	private:
 		void rehighlight();
@@ -198,6 +193,8 @@ namespace Aseba
 		
 	protected:
 		unsigned id;
+		unsigned productId;
+		friend class InvasivePlugin;
 		Target *target;
 	
 	private:
@@ -221,6 +218,9 @@ namespace Aseba
 		QTreeView *vmFunctionsView;
 		
 		DraggableListWidget* vmLocalEvents;
+		
+		QToolBox* toolBox;
+		NodeToolInterfaces tools;
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
@@ -308,11 +308,7 @@ namespace Aseba
 		
 		void sourceChanged();
 		void updateWindowTitle();
-		
-		void addPluginLinearCameraView();
 
-		void ThymioFlash();
-		
 		void showHelpLanguage();
 		void showHelpStudio();
 	
@@ -403,10 +399,6 @@ namespace Aseba
 		CommonDefinitions commonDefinitions;
 		Compiler compiler; //!< Aesl compiler
 		Target *target;
-
-		friend class InvasivePlugin;
-		// misc.
-		ThymioBootloaderDialog * thymiobootloader;
 	};
 	
 	/*@}*/

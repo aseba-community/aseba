@@ -36,11 +36,34 @@ namespace Aseba
 	/*@{*/
 	
 	struct TargetDescription;
-	class VariablesViewPlugin;
+	class TargetVariablesModel;
+	
+	//! Classes that want to listen to variable changes should inherit from this class
+	class VariableListener
+	{
+	protected:
+		TargetVariablesModel *variablesModel;
+		
+	public:
+		VariableListener(TargetVariablesModel* variablesModel);
+		virtual ~VariableListener();
+		
+		bool subscribeToVariableOfInterest(const QString& name);
+		void unsubscribeToVariableOfInterest(const QString& name);
+		void unsubscribeToVariablesOfInterest();
+		void invalidateVariableModel();
+		
+	protected:
+		friend class TargetVariablesModel;
+		//! New values are available for a variable this plugin is interested in
+		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values) = 0;
+	};
 	
 	class TargetVariablesModel: public QAbstractItemModel
 	{
 		Q_OBJECT
+		
+		// FIXME: uses map for fast variable access
 	
 	public:
 		// variables
@@ -69,7 +92,10 @@ namespace Aseba
 		QStringList mimeTypes () const;
 		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
 		
-		const QList<Variable>& getVariables() { return variables; }
+		const QList<Variable>& getVariables() const { return variables; }
+		unsigned getVariablePos(const QString& name) const;
+		unsigned getVariableSize(const QString& name) const;
+		
 		
 	public slots:
 		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
@@ -81,24 +107,24 @@ namespace Aseba
 		void variableValuesChanged(unsigned index, const VariablesDataVector &values);
 
 	private:
-		friend class VariablesViewPlugin;
-		friend class LinearCameraViewPlugin;
-		// VariablesViewPlugin API 
+		friend class VariableListener;
+		// VariableListener API 
 		
 		//! Unsubscribe the plugin from any variables it is listening to
-		void unsubscribeViewPlugin(VariablesViewPlugin* plugin);
+		void unsubscribeViewPlugin(VariableListener* plugin);
 		//! Subscribe to a variable of interest, return true if variable exists, false otherwise
-		bool subscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name);
+		bool subscribeToVariableOfInterest(VariableListener* plugin, const QString& name);
 		//! Unsubscribe to a variable of interest
-		void unsubscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name);
+		void unsubscribeToVariableOfInterest(VariableListener* plugin, const QString& name);
+		//! Unsubscribe to all variables of interest for a given plugin
+		void unsubscribeToVariablesOfInterest(VariableListener* plugin);
 		
 	private:
-		
 		QList<Variable> variables;
 		
 		// VariablesViewPlugin API 
-		typedef QMap<VariablesViewPlugin*, QStringList> ViewPlugInToVariablesNameMap;
-		ViewPlugInToVariablesNameMap viewPluginsMap;
+		typedef QMap<VariableListener*, QStringList> VariableListenersNameMap;
+		VariableListenersNameMap variableListenersMap;
 	};
 	
 	class TargetFunctionsModel: public QAbstractItemModel

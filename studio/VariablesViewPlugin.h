@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QDialog>
+#include "TargetModels.h"
+#include "Plugin.h"
 #include "../compiler/compiler.h"
 
 class QLabel;
@@ -14,24 +16,6 @@ namespace Aseba
 	/*@{*/
 	
 	class TargetVariablesModel;
-	
-	class VariablesViewPlugin: public QWidget
-	{
-	protected:
-		TargetVariablesModel *variablesModel;
-		
-	public:
-		VariablesViewPlugin(TargetVariablesModel* variablesModel);
-		
-		virtual ~VariablesViewPlugin();
-		
-		void invalidateVariableModel();
-		
-	protected:
-		friend class TargetVariablesModel;
-		//! New values are available for a variable this plugin is interested in
-		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values) = 0;
-	};
 	
 	class LinearCameraViewVariablesDialog : public QDialog
 	{
@@ -47,13 +31,27 @@ namespace Aseba
 		virtual ~LinearCameraViewVariablesDialog() {}
 	};
 	
-	class LinearCameraViewPlugin: public VariablesViewPlugin
+	class LinearCameraViewPlugin: public QWidget, public NodeToolInterface, public InvasivePlugin, public VariableListener
 	{
 		Q_OBJECT
 		
 	public:
-		LinearCameraViewPlugin(TargetVariablesModel* variablesModel);
+		LinearCameraViewPlugin(NodeTab* nodeTab);
 		
+		virtual QWidget* createMenuEntry();
+		virtual void closeAsSoonAsPossible();
+	
+	signals:
+		void dialogBoxResult(bool ok);
+		
+	private slots:
+		void setEnabled(bool enabled);
+		
+	private:
+		void enablePlugin();
+		void disablePlugin();
+		
+		virtual void timerEvent ( QTimerEvent * event );
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		
 	private:
@@ -65,7 +63,10 @@ namespace Aseba
 		} valuesRange;
 		QLabel *image;
 		QString redName, greenName, blueName;
+		unsigned redPos, greenPos, bluePos;
+		unsigned redSize, greenSize, blueSize;
 		VariablesDataVector red, green, blue;
+		unsigned componentsReceived;
 	};
 	
 	/*@}*/

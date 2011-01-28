@@ -15,53 +15,56 @@
 
 #include <dashel/dashel.h>
 
-#include "MainWindow.h"
-#include "DashelTarget.h"
+#include "../Plugin.h"
+#include "../DashelTarget.h"
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class ThymioBootloaderDialog : public QDialog, public InvasivePlugin
+	class ThymioBootloaderDialog : public QDialog, public InvasivePlugin, public NodeToolInterface
 	{
 		Q_OBJECT
 
 	private:
 		QVBoxLayout	*verticalLayout;
-		QHBoxLayout 	*fileLayout;
-		QHBoxLayout 	*flashLayout;
-		QSpacerItem 	*spacer;
+		QHBoxLayout *fileLayout;
+		QHBoxLayout *flashLayout;
+		QSpacerItem *spacer;
 		QLineEdit 	*lineEdit;
-		QPushButton 	*fileButton;
-		QPushButton 	*quitButton;
-		QPushButton 	*flashButton;
-		QProgressBar 	*progressBar;
+		QPushButton *fileButton;
+		QPushButton *quitButton;
+		QPushButton *flashButton;
+		QProgressBar *progressBar;
 		
 		typedef std::map<uint32, std::vector<uint8> > PageMap;
-		PageMap 	pageMap;
+		PageMap pageMap;
 		PageMap::iterator currentPage;
 
-		unsigned 	id;
+		unsigned nodeId;
 		Dashel::Stream 	*stream;
 
-		void writePage(unsigned page, unsigned char * data);
-		void flashDone(void);
-
 	public:
-		ThymioBootloaderDialog(MainWindow * mainWindow);
+		ThymioBootloaderDialog(NodeTab* nodeTab);
 		~ThymioBootloaderDialog();
 		
-		void Flash(class NodeTab * t);
+		virtual QWidget* createMenuEntry();
+		virtual void closeAsSoonAsPossible();
 		
 	private slots:
-		void Ack(unsigned error_code, unsigned address);
+		void showFlashDialog();
+		
 		void openFile(void);
 		void doFlash(void);
 		void doClose(void);
-		void vmDisconnect(unsigned);
+		
+		void ackReceived(unsigned error_code, unsigned address);
+		void vmDisconnected(unsigned);
 
-	protected:	
+	private:
+		void writePage(unsigned page, unsigned char * data);
+		void flashDone(void);
 		void closeEvent(QCloseEvent * event);
 	};
 	/*@}*/

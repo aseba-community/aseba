@@ -1,6 +1,7 @@
 #include "VariablesViewPlugin.h"
 #include <VariablesViewPlugin.moc>
 #include "TargetModels.h"
+#include "Target.h"
 #include <QtGui>
 #include <QtDebug>
 #include <limits>
@@ -11,24 +12,6 @@
 
 namespace Aseba
 {
-	VariablesViewPlugin::VariablesViewPlugin(TargetVariablesModel* variablesModel) :
-		variablesModel(variablesModel)
-	{
-		
-	}
-	
-	VariablesViewPlugin::~VariablesViewPlugin()
-	{
-		if (variablesModel)
-			variablesModel->unsubscribeViewPlugin(this);
-	}
-	
-	void VariablesViewPlugin::invalidateVariableModel()
-	{
-		variablesModel = 0;
-	}
-	
-	
 	LinearCameraViewVariablesDialog::LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel) :
 		redVariable(new QComboBox),
 		greenVariable(new QComboBox),
@@ -63,68 +46,133 @@ namespace Aseba
 			blueVariable->addItem(variables[i].name);
 		}
 		
-		redVariable->setEditText("camR");
-		greenVariable->setEditText("camG");
-		blueVariable->setEditText("camB");
+		redVariable->setEditText("cam_red");
+		greenVariable->setEditText("cam_green");
+		blueVariable->setEditText("cam_blue");
 		
 		setWindowTitle(tr("Linear Camera View Plugin"));
 	}
 	
-	LinearCameraViewPlugin::LinearCameraViewPlugin(TargetVariablesModel* variablesModel) :
-		VariablesViewPlugin(variablesModel)
+	LinearCameraViewPlugin::LinearCameraViewPlugin(NodeTab* nodeTab) :
+		InvasivePlugin(nodeTab),
+		VariableListener(getVariablesModel()),
+		componentsReceived(0)
 	{
+		QVBoxLayout *layout = new QVBoxLayout(this);
+		image = new QLabel;
+		image->setScaledContents(true);
+		layout->addWidget(image);
+		setWindowTitle(tr("Linear Camera View Plugin"));
+		resize(200, 40);
+	}
+
+
+	QWidget* LinearCameraViewPlugin::createMenuEntry()
+	{
+		QCheckBox *checkbox = new QCheckBox(tr("linear camera viewer"));
+		connect(checkbox, SIGNAL(clicked(bool)), SLOT(setEnabled(bool)));
+		connect(this, SIGNAL(dialogBoxResult(bool)), checkbox, SLOT(setChecked(bool)));
+		return checkbox;
+	}
+	
+	void LinearCameraViewPlugin::closeAsSoonAsPossible()
+	{
+		close();
+	}
+	
+	void LinearCameraViewPlugin::setEnabled(bool enabled)
+	{
+		if (enabled)
+			enablePlugin();
+		else
+			disablePlugin();
+	}
+	
+	void LinearCameraViewPlugin::enablePlugin()
+	{
+		// unsubscribe to existing variables, if any
+		unsubscribeToVariablesOfInterest();
+		
 		{
 			LinearCameraViewVariablesDialog linearCameraViewVariablesDialog(variablesModel);
-			if (linearCameraViewVariablesDialog.exec() == QDialog::Accepted)
+			if (linearCameraViewVariablesDialog.exec() != QDialog::Accepted)
 			{
-				redName = linearCameraViewVariablesDialog.redVariable->currentText();
-				greenName = linearCameraViewVariablesDialog.greenVariable->currentText();
-				blueName = linearCameraViewVariablesDialog.blueVariable->currentText();
-				valuesRange = (ValuesRange)linearCameraViewVariablesDialog.valuesRanges->currentIndex();
-			}
-			else
-			{
-				deleteLater();
+				emit dialogBoxResult(false);
 				return;
 			}
+			
+			redName = linearCameraViewVariablesDialog.redVariable->currentText();
+			greenName = linearCameraViewVariablesDialog.greenVariable->currentText();
+			blueName = linearCameraViewVariablesDialog.blueVariable->currentText();
+			valuesRange = (ValuesRange)linearCameraViewVariablesDialog.valuesRanges->currentIndex();
 		}
 		
 		bool ok = true;
-		ok &= variablesModel->subscribeToVariableOfInterest(this, redName);
-		ok &= variablesModel->subscribeToVariableOfInterest(this, greenName);
-		ok &= variablesModel->subscribeToVariableOfInterest(this, blueName);
+		ok &= subscribeToVariableOfInterest(redName);
+		ok &= subscribeToVariableOfInterest(greenName);
+		ok &= subscribeToVariableOfInterest(blueName);
 		
 		if (!ok)
 		{
 			QMessageBox::warning(this, tr("Cannot initialize linear camera view plugin"), tr("One or more variable not found in %1, %2, or %3.").arg(redName).arg(greenName).arg(blueName));
-			deleteLater();
+			unsubscribeToVariablesOfInterest();
+			emit dialogBoxResult(false);
+			return;
 		}
-		else
-		{
-			QVBoxLayout *layout = new QVBoxLayout(this);
-			image = new QLabel;
-			image->resize(200, 40);
-			image->setScaledContents(true);
-			layout->addWidget(image);
-			setAttribute(Qt::WA_DeleteOnClose);
-			setWindowTitle(tr("Linear Camera View Plugin"));
-			show();
-		}
+		
+		redPos = getVariablesModel()->getVariablePos(redName);
+		greenPos = getVariablesModel()->getVariablePos(greenName);
+		bluePos = getVariablesModel()->getVariablePos(blueName);
+		redSize = getVariablesModel()->getVariableSize(redName);
+		greenSize = getVariablesModel()->getVariableSize(greenName);
+		blueSize = getVariablesModel()->getVariableSize(blueName);
+		
+		getTarget()->getVariables(getNodeId(), redPos, redSize);
+		getTarget()->getVariables(getNodeId(), greenPos, greenSize);
+		getTarget()->getVariables(getNodeId(), bluePos, blueSize);
+		
+		// TODO: let the user choose the refresh rate
+		startTimer(100);
+		
+		show();
+	}
+	
+	void LinearCameraViewPlugin::disablePlugin()
+	{
+		// unsubscribe to existing variables, if any
+		unsubscribeToVariablesOfInterest();
+		hide();
+	}
+	
+	void LinearCameraViewPlugin::timerEvent ( QTimerEvent * event )
+	{
+		getTarget()->getVariables(getNodeId(), redPos, redSize);
+		getTarget()->getVariables(getNodeId(), greenPos, greenSize);
+		getTarget()->getVariables(getNodeId(), bluePos, blueSize);
 	}
 	
 	void LinearCameraViewPlugin::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
 		if (name == redName)
-			red = values;
-		if (name == greenName)
-			green = values;
-		if (name == blueName)
-			blue = values;
-		
-		int width = qMin(red.size(), qMin(green.size(), blue.size()));
-		
-		if (width)
 		{
+			red = values;
+			componentsReceived |= 1 << 0;
+		}
+		if (name == greenName)
+		{
+			green = values;
+			componentsReceived |= 1 << 1;
+		}
+		if (name == blueName)
+		{
+			blue = values;
+			componentsReceived |= 1 << 2;
+		}
+		
+		const int width = qMin(red.size(), qMin(green.size(), blue.size()));
+		if ((componentsReceived == 0x7) && width)
+		{
+			componentsReceived = 0;
 			QPixmap pixmap(width, 1);
 			QPainter painter(&pixmap);
 			

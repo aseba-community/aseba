@@ -22,7 +22,8 @@ if (QT4_FOUND)
 		Target.cpp
 		VariablesViewPlugin.cpp
 		EventViewer.cpp
-		ThymioBootloader.cpp)
+		Plugin.cpp
+		plugins/ThymioBootloader.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	

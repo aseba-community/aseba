@@ -30,9 +30,42 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
+	VariableListener::VariableListener(TargetVariablesModel* variablesModel) :
+		variablesModel(variablesModel)
+	{
+		
+	}
+	
+	VariableListener::~VariableListener()
+	{
+		if (variablesModel)
+			variablesModel->unsubscribeViewPlugin(this);
+	}
+	
+	bool VariableListener::subscribeToVariableOfInterest(const QString& name)
+	{
+		variablesModel->subscribeToVariableOfInterest(this, name);
+	}
+	
+	void VariableListener::unsubscribeToVariableOfInterest(const QString& name)
+	{
+		variablesModel->unsubscribeToVariableOfInterest(this, name);
+	}
+	
+	void VariableListener::unsubscribeToVariablesOfInterest()
+	{
+		variablesModel->unsubscribeToVariablesOfInterest(this);
+	}
+	
+	void VariableListener::invalidateVariableModel()
+	{
+		variablesModel = 0;
+	}
+	
+	
 	TargetVariablesModel::~TargetVariablesModel()
 	{
-		for (ViewPlugInToVariablesNameMap::iterator it = viewPluginsMap.begin(); it != viewPluginsMap.end(); ++it)
+		for (VariableListenersNameMap::iterator it = variableListenersMap.begin(); it != variableListenersMap.end(); ++it)
 		{
 			it.key()->invalidateVariableModel();
 		}
@@ -212,6 +245,28 @@ namespace Aseba
 		return mimeData;
 	}
 	
+	unsigned TargetVariablesModel::getVariablePos(const QString& name) const
+	{
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			const Variable& variable(variables[i]);
+			if (variable.name == name)
+				return variable.pos;
+		}
+		return 0;
+	}
+	
+	unsigned TargetVariablesModel::getVariableSize(const QString& name) const
+	{
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			const Variable& variable(variables[i]);
+			if (variable.name == name)
+				return variable.value.size();
+		}
+		return 0;
+	}
+	
 	void TargetVariablesModel::updateVariablesStructure(const Compiler::VariablesMap *variablesMap)
 	{
 		// TODO: make this function more intelligent: keep track of unchanged variables
@@ -274,7 +329,7 @@ namespace Aseba
 			emit dataChanged(index(varStart, 0, parentIndex), index(varStart + copyLen, 0, parentIndex));
 			
 			// and notify view plugins
-			for (ViewPlugInToVariablesNameMap::iterator it = viewPluginsMap.begin(); it != viewPluginsMap.end(); ++it)
+			for (VariableListenersNameMap::iterator it = variableListenersMap.begin(); it != variableListenersMap.end(); ++it)
 			{
 				QStringList &list = it.value();
 				for (int v = 0; v < list.size(); v++)
@@ -293,7 +348,7 @@ namespace Aseba
 			Variable& variable(variables[i]);
 			if (variable.name == name)
 			{
-				setVariablesData(variable.pos, values);
+// 				setVariablesData(variable.pos, values);
 				emit variableValuesChanged(variable.pos, values);
 				return true;
 			}
@@ -301,14 +356,14 @@ namespace Aseba
 		return false;
 	}
 	
-	void TargetVariablesModel::unsubscribeViewPlugin(VariablesViewPlugin* plugin)
+	void TargetVariablesModel::unsubscribeViewPlugin(VariableListener* listener)
 	{
-		viewPluginsMap.remove(plugin);
+		variableListenersMap.remove(listener);
 	}
 	
-	bool TargetVariablesModel::subscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name)
+	bool TargetVariablesModel::subscribeToVariableOfInterest(VariableListener* listener, const QString& name)
 	{
-		QStringList &list = viewPluginsMap[plugin];
+		QStringList &list = variableListenersMap[listener];
 		list.push_back(name);
 		for (int i = 0; i < variables.size(); i++)
 			if (variables[i].name == name)
@@ -316,13 +371,17 @@ namespace Aseba
 		return false;
 	}
 	
-	void TargetVariablesModel::unsubscribeToVariableOfInterest(VariablesViewPlugin* plugin, const QString& name)
+	void TargetVariablesModel::unsubscribeToVariableOfInterest(VariableListener* listener, const QString& name)
 	{
-		QStringList &list = viewPluginsMap[plugin];
+		QStringList &list = variableListenersMap[listener];
 		list.removeAll(name);
 	}
 	
-	
+	void TargetVariablesModel::unsubscribeToVariablesOfInterest(VariableListener* plugin)
+	{
+		if (variableListenersMap.contains(plugin))
+			variableListenersMap.remove(plugin);
+	}
 	
 	struct TargetFunctionsModel::TreeItem
 	{

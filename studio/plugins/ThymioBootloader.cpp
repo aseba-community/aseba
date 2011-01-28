@@ -2,8 +2,9 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QDebug>
+#include <QPushButton>
 
-#include "../utils/HexFile.h"
+#include "../../utils/HexFile.h"
 
 #include "ThymioBootloader.h"
 
@@ -13,7 +14,9 @@ using namespace std;
 
 namespace Aseba
 {
-	ThymioBootloaderDialog::ThymioBootloaderDialog(MainWindow * mainWindow) : InvasivePlugin(mainWindow)
+	ThymioBootloaderDialog::ThymioBootloaderDialog(NodeTab* nodeTab):
+		InvasivePlugin(nodeTab),
+		nodeId(getNodeId())
 	{
 		// Create the gui ...
 		setWindowTitle("Thymio Bootloader");
@@ -53,10 +56,47 @@ namespace Aseba
 		connect(flashButton, SIGNAL(clicked()), this, SLOT(doFlash()));
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(doClose()));
 	}
-
-	void ThymioBootloaderDialog::doClose(void) 
+	
+	ThymioBootloaderDialog::~ThymioBootloaderDialog()
 	{
-		done(0);
+	}
+	
+	QWidget* ThymioBootloaderDialog::createMenuEntry()
+	{
+		QPushButton *flashButton = new QPushButton(tr("Flash firmware"));
+		connect(flashButton, SIGNAL(clicked()), SLOT(showFlashDialog()));
+		return flashButton;
+	}
+	
+	void ThymioBootloaderDialog::closeAsSoonAsPossible()
+	{
+		// FIXME: is it correct, what to do if someone requsted a close
+		// of the main window while we are flashing?
+		close();
+	}
+	
+	void ThymioBootloaderDialog::showFlashDialog()
+	{
+		progressBar->setValue(0);
+		fileButton->setEnabled(true);
+		flashButton->setEnabled(true);
+		lineEdit->setEnabled(true);
+
+		stream = getDashelStream();
+
+		connect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		connect(getTarget(), SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
+
+		exec();
+
+		disconnect(getTarget(), SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
+		disconnect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));	
+	}
+	
+	void ThymioBootloaderDialog::openFile(void)
+	{
+		QString name = QFileDialog::getOpenFileName(this, "Select hex file", QString(),"Hex files (*.hex)");
+		lineEdit->setText(name);
 	}
 
 	void ThymioBootloaderDialog::doFlash(void) 
@@ -108,76 +148,18 @@ namespace Aseba
 		progressBar->setValue(0);
 		
 		// Ask the pic to switch into bootloader
-		Reboot msg(id);
+		Reboot msg(nodeId);
 		msg.serialize(stream);
 		stream->flush();
 		// now, wait until the disconnect event is sent.
 	}
-
-	void ThymioBootloaderDialog::vmDisconnect(unsigned node)
+	
+	void ThymioBootloaderDialog::doClose(void) 
 	{
-		qDebug() << "Bootloader entered " << node;
-		if(node != id)
-			abort();
-
-		currentPage = pageMap.begin();
-		if(currentPage == pageMap.end()) {
-			flashDone();
-			return;
-		}
-		while(currentPage->first == 0 && currentPage != pageMap.end())
-			currentPage++;
-		if(currentPage == pageMap.end())
-			currentPage = pageMap.find(0);
-		writePage(currentPage->first, &currentPage->second[0]);
+		done(0);
 	}
 
-	void ThymioBootloaderDialog::openFile(void)
-	{
-		QString name = QFileDialog::getOpenFileName(this, "Select hex file", QString(),"Hex files (*.hex)");
-		lineEdit->setText(name);
-	}
-
-	ThymioBootloaderDialog::~ThymioBootloaderDialog()
-	{
-	}
-
-	void ThymioBootloaderDialog::writePage(unsigned page, unsigned char * data)
-	{
-		qDebug() << "Write page: " << page;
-		BootloaderWritePage writePage;
-		writePage.dest = id;
-		writePage.pageNumber = page;
-		writePage.serialize(stream);
-		
-		stream->write(data,2048);
-
-		stream->flush();
-
-	}
-
-	void ThymioBootloaderDialog::flashDone(void)
-	{
-		pageMap.clear();
-		// Send exit bootloader, send presence
-		
-		qDebug() << "Flash done, switch back to VM";
-
-		BootloaderReset msg(id);
-		msg.serialize(stream);
-		stream->flush();
-
-	//	QTest::qSleep(10); // Fixme HACK
-
-		GetDescription message;
-		message.serialize(stream);
-		stream->flush();
-		
-		// Don't allow to immediatly reflash, we want studio to redisplay a new tab ! 
-		quitButton->setEnabled(true);
-	}
-
-	void ThymioBootloaderDialog::Ack(unsigned error_code, unsigned address) 
+	void ThymioBootloaderDialog::ackReceived(unsigned error_code, unsigned address) 
 	{
 		qDebug() << "Got ack: " << error_code;
 		if(error_code != 0)
@@ -202,6 +184,58 @@ namespace Aseba
 		}
 		writePage(currentPage->first, &currentPage->second[0]);
 	}
+	
+	void ThymioBootloaderDialog::vmDisconnected(unsigned node)
+	{
+		qDebug() << "Bootloader entered " << node;
+		if(node != nodeId)
+			abort();
+
+		currentPage = pageMap.begin();
+		if(currentPage == pageMap.end()) {
+			flashDone();
+			return;
+		}
+		while(currentPage->first == 0 && currentPage != pageMap.end())
+			currentPage++;
+		if(currentPage == pageMap.end())
+			currentPage = pageMap.find(0);
+		writePage(currentPage->first, &currentPage->second[0]);
+	}
+	
+	void ThymioBootloaderDialog::writePage(unsigned page, unsigned char * data)
+	{
+		qDebug() << "Write page: " << page;
+		BootloaderWritePage writePage;
+		writePage.dest = nodeId;
+		writePage.pageNumber = page;
+		writePage.serialize(stream);
+		
+		stream->write(data,2048);
+
+		stream->flush();
+	}
+
+	void ThymioBootloaderDialog::flashDone(void)
+	{
+		pageMap.clear();
+		// Send exit bootloader, send presence
+		
+		qDebug() << "Flash done, switch back to VM";
+
+		BootloaderReset msg(nodeId);
+		msg.serialize(stream);
+		stream->flush();
+
+	//	QTest::qSleep(10); // Fixme HACK
+
+		GetDescription message;
+		message.serialize(stream);
+		stream->flush();
+		
+		// Don't allow to immediatly reflash, we want studio to redisplay a new tab ! 
+		quitButton->setEnabled(true);
+	}
 
 	void ThymioBootloaderDialog::closeEvent(QCloseEvent *event)
 	{ 
@@ -210,25 +244,4 @@ namespace Aseba
 		else
 			event->ignore();
 	}
-
-
-	void ThymioBootloaderDialog::Flash(NodeTab * t)
-	{
-		progressBar->setValue(0);
-		fileButton->setEnabled(true);
-		flashButton->setEnabled(true);
-		lineEdit->setEnabled(true);
-
-		stream = getDashelStream();
-		id = t->nodeId();
-
-		connect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(Ack(uint,uint)));
-		connect(getTarget(), SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnect(unsigned)));
-
-		exec();
-
-		disconnect(getTarget(), SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnect(unsigned)));
-		disconnect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(Ack(uint,uint)));	
-	}
-	
 };
