@@ -1,7 +1,6 @@
 #include "VariablesViewPlugin.h"
 #include <VariablesViewPlugin.moc>
-#include "TargetModels.h"
-#include "Target.h"
+#include "../Target.h"
 #include <QtGui>
 #include <QtDebug>
 #include <limits>

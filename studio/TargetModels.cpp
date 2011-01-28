@@ -19,7 +19,6 @@
 */
 
 #include "TargetModels.h"
-#include "VariablesViewPlugin.h"
 #include <QtDebug>
 #include <QtGui>
 

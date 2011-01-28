@@ -25,7 +25,6 @@
 #include "NamedValuesVectorModel.h"
 #include "CustomDelegate.h"
 #include "AeslEditor.h"
-#include "VariablesViewPlugin.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "../common/consts.h"

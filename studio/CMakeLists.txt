@@ -20,9 +20,9 @@ if (QT4_FOUND)
 		main.cpp
 		FindDialog.cpp
 		Target.cpp
-		VariablesViewPlugin.cpp
 		EventViewer.cpp
 		Plugin.cpp
+		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp)
 	
 	qt4_automoc(${studio_SRCS})

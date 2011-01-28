@@ -3,9 +3,9 @@
 
 #include <QWidget>
 #include <QDialog>
-#include "TargetModels.h"
-#include "Plugin.h"
-#include "../compiler/compiler.h"
+#include "../Plugin.h"
+#include "../TargetModels.h"
+#include "../../compiler/compiler.h"
 
 class QLabel;
 class QComboBox;

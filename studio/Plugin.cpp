@@ -26,7 +26,7 @@
 
 // plugins
 
-#include "VariablesViewPlugin.h"
+#include "plugins/VariablesViewPlugin.h"
 #include "plugins/ThymioBootloader.h"
 
 namespace Aseba
