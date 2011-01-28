@@ -29,15 +29,6 @@
 #define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 #define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 
-// Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
-template<typename Derived, typename Base>
-static inline Derived polymorphic_downcast(Base base)
-{
-	Derived derived = dynamic_cast<Derived>(base);
-	if (!derived)
-		abort();
-	return derived;
-}
 
 namespace Aseba
 {

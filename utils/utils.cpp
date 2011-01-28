@@ -48,13 +48,13 @@ namespace Aseba
 		value = (Value(tv.tv_sec) * 1000) + Value(tv.tv_usec) / 1000;
 		#else // WIN32
 		FILETIME        ft;
-        	LARGE_INTEGER   li;
-        	__int64         t;
-        	GetSystemTimeAsFileTime(&ft);
-        	li.LowPart = ft.dwLowDateTime;
-        	li.HighPart = ft.dwHighDateTime;
-        	t = li.QuadPart;                        // In 100-nanosecond intervals
-	        value = t / 10000l;                      // In milliseconds
+		LARGE_INTEGER   li;
+		__int64         t;
+		GetSystemTimeAsFileTime(&ft);
+		li.LowPart = ft.dwLowDateTime;
+		li.HighPart = ft.dwHighDateTime;
+		t = li.QuadPart;                        // In 100-nanosecond intervals
+		value = t / 10000l;                      // In milliseconds
 		#endif // WIN32
 	}
 	

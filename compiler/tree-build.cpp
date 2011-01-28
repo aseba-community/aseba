@@ -21,16 +21,6 @@
 #include "tree.h"
 #include <cstdlib>
 
-// Asserts a dynamic cast.	Similar to the one in boost/cast.hpp
-template<typename Derived, typename Base>
-static inline Derived polymorphic_downcast(Base base)
-{
-	Derived derived = dynamic_cast<Derived>(base);
-	if (!derived)
-		abort();
-	return derived;
-}
-
 namespace Aseba
 {
 	/** \addtogroup compiler */

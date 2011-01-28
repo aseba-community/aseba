@@ -26,12 +26,14 @@
 */
 
 #include "../../vm/natives.h"
+#include "../../common/productids.h"
 
 #define SIMPLIFIED_EPUCK
 
 AsebaVMDescription vmDescription_en = {
 	"e-puck",
 	{
+		{ 1, ASEBA_PID_VAR_NAME },
 		{ 1, "wheel_left_speed" },
 		{ 1, "wheel_right_speed" },
 		{ 1, "color_red" },
@@ -82,6 +84,7 @@ AsebaVMDescription vmDescription_en = {
 AsebaVMDescription vmDescription_fr = {
 	"e-puck",
 	{
+		{ 1, ASEBA_PID_VAR_NAME },
 		{ 1, "roues_vitesse_gauche" },
 		{ 1, "roues_vitesse_droite" },
 		{ 1, "couleur_rouge" },

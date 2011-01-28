@@ -29,10 +29,11 @@
 #define ASEBA_ASSERT
 #endif
 
-#include <../../vm/vm.h>
+#include "../../vm/vm.h"
 #include "../../vm/natives.h"
-#include <../../common/consts.h>
-#include <../../transport/buffer/vm-buffer.h>
+#include "../../common/productids.h"
+#include "../../common/consts.h"
+#include "../../transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
@@ -157,6 +158,7 @@ namespace Enki
 		std::valarray<signed short> stack;
 		struct Variables
 		{
+			sint16 productId; // product id
 			sint16 speedL; // left motor speed
 			sint16 speedR; // right motor speed
 			sint16 colorR; // body red [0..100] %
@@ -220,6 +222,7 @@ namespace Enki
 			
 			AsebaVMInit(&vm);
 			
+			variables.productId = ASEBA_PID_CHALLENGE;
 			variables.colorG = 100;
 		}
 		

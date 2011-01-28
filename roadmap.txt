@@ -8,6 +8,8 @@ features
 
 known bugs
 
+* track memory leak
+
 * high priority
 - desynchronisation between hidden status of variable and menu
 
