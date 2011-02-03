@@ -75,12 +75,12 @@ namespace Aseba
 		typedef CreatorMap::const_iterator ConstIt;
 		typedef std::pair<ConstIt, ConstIt> ConstItPair;
 		ConstItPair range(creators.equal_range(pid));
-		if (range.first == range.second)
+		/*if (range.first == range.second)
 		{
 			std::cerr << "No tool registered for product id " << pid << ". Known ones are:\n";
 			dump(std::cerr);
 			throw std::runtime_error("Trying to instanciate unknown element from NodeToolRegistrar");
-		}
+		}*/
 		NodeToolInterfaces interfaces;
 		for (ConstIt it(range.first); it != range.second; ++it)
 		{
