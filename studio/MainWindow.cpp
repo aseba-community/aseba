@@ -223,7 +223,11 @@ namespace Aseba
 	NodeTab::~NodeTab()
 	{
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
-			delete (*it);
+		{
+			NodeToolInterface* tool(*it);
+			if (!tool->surviveTabDestruction())
+				delete (*it);
+		}
 		delete vmFunctionsModel;
 		delete vmMemoryModel;
 	}

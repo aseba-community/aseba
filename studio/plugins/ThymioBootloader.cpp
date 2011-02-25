@@ -16,7 +16,9 @@ namespace Aseba
 {
 	ThymioBootloaderDialog::ThymioBootloaderDialog(NodeTab* nodeTab):
 		InvasivePlugin(nodeTab),
-		nodeId(getNodeId())
+		nodeId(getNodeId()),
+		target(getTarget()),
+		stream(getDashelStream())
 	{
 		// Create the gui ...
 		setWindowTitle("Thymio Bootloader");
@@ -75,6 +77,11 @@ namespace Aseba
 		close();
 	}
 	
+	bool ThymioBootloaderDialog::surviveTabDestruction() const 
+	{
+		return true;
+	}
+	
 	void ThymioBootloaderDialog::showFlashDialog()
 	{
 		progressBar->setValue(0);
@@ -82,15 +89,16 @@ namespace Aseba
 		flashButton->setEnabled(true);
 		lineEdit->setEnabled(true);
 
-		stream = getDashelStream();
-
-		connect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
-		connect(getTarget(), SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
+		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
 
 		exec();
 
-		disconnect(getTarget(), SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
-		disconnect(getTarget(), SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));	
+		disconnect(target, SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
+		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		
+		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
+		deleteLater();
 	}
 	
 	void ThymioBootloaderDialog::openFile(void)

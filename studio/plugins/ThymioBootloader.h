@@ -42,7 +42,9 @@ namespace Aseba
 		PageMap pageMap;
 		PageMap::iterator currentPage;
 
+		// we must cache this because during the flashing process, the tab is not there any more
 		unsigned nodeId;
+		Target * target;
 		Dashel::Stream 	*stream;
 
 	public:
@@ -51,6 +53,7 @@ namespace Aseba
 		
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
+		virtual bool surviveTabDestruction() const;
 		
 	private slots:
 		void showFlashDialog();

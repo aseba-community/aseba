@@ -62,6 +62,9 @@ namespace Aseba
 	public:
 		virtual QWidget* createMenuEntry() = 0;
 		virtual void closeAsSoonAsPossible() = 0;
+		//! wether this tool should survive tab destruction, useful for flashers for instance
+		virtual bool surviveTabDestruction() const { return false; }
+		
 	};
 	typedef std::vector<NodeToolInterface*> NodeToolInterfaces;
 	
