@@ -54,6 +54,21 @@ namespace Aseba
 			QTextCharFormat format;
 		};
 		QVector<HighlightingRule> highlightingRules;
+		struct CommentBlockRule
+		{
+			QRegExp begin;
+			QRegExp end;
+			QTextCharFormat format;
+		};
+		// For multi-lines comments
+		CommentBlockRule commentBlockRules;
+		enum BlockState
+		{
+			STATE_DEFAULT=-1,       // Qt default
+			NO_COMMENT=0,           // Normal block
+			COMMENT,                // Block with multilines comments
+		};
+
 		AeslEditor *editor;
 	};
 	

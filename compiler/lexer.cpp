@@ -171,22 +171,61 @@ namespace Aseba
 				// special case for comment
 				case '#':
 				{
-					while ((c != '\n') && (c != '\r') && (c != EOF))
+					// check if it's a comment block #* ... *#
+					if (source.peek() == '*')
 					{
-						if (c == '\t')
-							pos.column += tabSize;
-						else
-							pos.column++;
+						// comment block
+						// record position of the begining
+						SourcePos begin(pos);
+						// move forward by 2 characters then search for the end
+						int step = 2;
+						while ((step > 0) || (c != '*') || (source.peek() != '#'))
+						{
+							if (step)
+								step--;
+
+							if (c == '\t')
+								pos.column += tabSize;
+							else if (c == '\n')
+							{
+								pos.row++;
+								pos.column = 0;
+							}
+							else
+								pos.column++;
+							c = source.get();
+							pos.character++;
+							if (c == EOF)
+							{
+								// EOF -> unbalanced block
+								throw Error(begin, "Unbalanced comment block.");
+							}
+						}
+						// fetch the #
 						c = source.get();
+						pos.column++;
 						pos.character++;
 					}
-					if (c == '\n')
+					else
 					{
-						pos.row++;
-						pos.column = 0;
+						// simple comment
+						while ((c != '\n') && (c != '\r') && (c != EOF))
+						{
+							if (c == '\t')
+								pos.column += tabSize;
+							else
+								pos.column++;
+							c = source.get();
+							pos.character++;
+						}
+						if (c == '\n')
+						{
+							pos.row++;
+							pos.column = 0;
+						}
+						else if (c == '\r')
+							pos.column = 0;
 					}
-					else if (c == '\r')
-						pos.column = 0;
 				}
 				break;
 				

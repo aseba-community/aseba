@@ -24,6 +24,16 @@ Example:
 # this is a comment
 var b	# another comment
 ```
+Comments spanning over several lines are also possible. They begin with //#*// and end with //*#//.
+
+Example:
+```
+#*
+this is a comment spanning
+several lines
+*#
+var b	# a simple comment
+```
 
 = Variables =
 

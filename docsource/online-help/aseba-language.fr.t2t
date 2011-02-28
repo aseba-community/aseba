@@ -25,6 +25,16 @@ Exemple :
 # ceci est un commentaire
 var b	# un autre commentaire
 ```
+Les commentaires sur plusieurs lignes sont également possibles. Ils commencent par //#*// et finissent par //*#//.
+
+Exemple :
+```
+#*
+ceci est un commentaire
+sur plusieurs lignes
+*#
+var b	# commentaire simple
+```
 
 = Variables =
 

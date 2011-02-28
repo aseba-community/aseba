@@ -59,13 +59,27 @@ namespace Aseba
 		rule.format = literalsFormat;
 		highlightingRules.append(rule);
 		
-		// comments
+		// comments #
 		QTextCharFormat commentFormat;
 		commentFormat.setForeground(Qt::gray);
-		rule.pattern = QRegExp("#[^\n]*");
+		rule.pattern = QRegExp("[^\\*]{1}#(?!\\*).*");   // '#' without '*' right after or before
+		rule.format = commentFormat;
+		highlightingRules.append(rule);
+
+		rule.pattern = QRegExp("^#(?!\\*).*");           // '#' without '*' right after + beginning of line
+		rule.format = commentFormat;
+		highlightingRules.append(rule);
+
+		// comments #* ... *#
+		rule.pattern = QRegExp("#\\*.*\\*#");
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
 		
+		// multilines block of comments #* ... [\n]* ... *#
+		commentBlockRules.begin = QRegExp("#\\*(?!.*\\*#)");    // '#*' with no corresponding '*#'
+		commentBlockRules.end = QRegExp(".*\\*#");
+		commentBlockRules.format = commentFormat;
+
 		// todo/fixme
 		QTextCharFormat todoFormat;
 		todoFormat.setForeground(Qt::black);
@@ -146,20 +160,59 @@ namespace Aseba
 			}
 		}
 		
+
+		// Prepare the format for multilines comment block
+		int index;
+		QTextCharFormat format = commentBlockRules.format;
+
+		// Comply with the breakpoint formatting
+		if (isBreakpointPending)
+			format.setBackground(breakpointPendingColor);
+
+		// Search for a multilines comment block
+		setCurrentBlockState(NO_COMMENT);                // No comment
+		if (previousBlockState() != COMMENT)
+		{
+			// Search for a beginning
+			if ((index = text.indexOf(commentBlockRules.begin)) != -1)
+			{
+				// Found one
+				setFormat(index, text.length() - index, format);
+				setCurrentBlockState(COMMENT);
+			}
+		}
+		else
+		{
+			// Search for an end
+			if ((index = text.indexOf(commentBlockRules.end)) != -1)
+			{
+				// Found one
+				int length = commentBlockRules.end.matchedLength();
+				setFormat(0, length, format);
+				setCurrentBlockState(NO_COMMENT);
+			}
+			else
+			{
+				// Still inside a block
+				setFormat(0, text.length(), format);
+				setCurrentBlockState(COMMENT);
+			}
+		}
+
 		// error word in red
 		if (uData && uData->properties.contains("errorPos"))
 		{
 			int pos = uData->properties["errorPos"].toInt();
 			int len = 0;
-			
+
 			if (pos + len < text.length())
 			{
 				// find length of number or word
 				while (pos + len < text.length())
 					if (
-						(!text[pos + len].isDigit()) && 
+						(!text[pos + len].isDigit()) &&
 						(!text[pos + len].isLetter()) &&
-						(text[pos + len] != '_') && 
+						(text[pos + len] != '_') &&
 						(text[pos + len] != '.')
 					)
 						break;
