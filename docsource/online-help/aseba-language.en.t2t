@@ -108,9 +108,12 @@ Example:
 ```
 if a - b > c[0] then
 	c[0] = a
+elseif a > 0 then
+       b = a
 else
 	b = 0
 end
+
 when a > b do
 	leds[0] = 1
 end
