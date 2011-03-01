@@ -121,7 +121,7 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8 *data, uint16 length) {
 	int flags;
 	// Here we must loop until we can send the data.
 	// BUT if the usb connection is not available, we drop the packet
-	if(USBGetDeviceState() != CONFIGURED_STATE || USBIsDeviceSuspended())
+	if(!usb_uart_serial_port_open())
 		return;
 	
 	// Sanity check, should never be true
@@ -148,7 +148,7 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8 *data, uint16 length) {
 	
 		
 		// Usb can be disconnected while sending ...
-		if(USBGetDeviceState() != CONFIGURED_STATE || USBIsDeviceSuspended()) {
+		if(!usb_uart_serial_port_open()) {
 			// FIXME: Empty the fifo ? 
 			USBUnmaskInterrupts(flags);
 			break;
@@ -183,7 +183,7 @@ uint16 AsebaGetBuffer(AsebaVMState *vm, uint8 * data, uint16 maxLength, uint16* 
 			ret = len;
 		}
 	}
-	if(USBGetDeviceState() == CONFIGURED_STATE && !USBIsDeviceSuspended())
+	if(usb_uart_serial_port_open())
 		USBCDCKickRx();
 
 	USBUnmaskInterrupts(flags);
