@@ -317,23 +317,6 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"constant"; }
 	};
 	
-	//! Node for loading a variable on stack.
-	//! no children
-	struct LoadNode : Node
-	{
-		unsigned varAddr; //!< address of variable to load from
-		
-		//! Constructor
-		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		
-		virtual ReturnType typeCheck() const { return TYPE_INT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"variable access (read)"; }
-	};
-	
 	//! Node for storing a variable from stack.
 	//! no children
 	struct StoreNode : Node
@@ -350,6 +333,24 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"variable access (write)"; }
 	};
 	
+	//! Node for loading a variable on stack.
+	//! no children
+	struct LoadNode : Node
+	{
+		unsigned varAddr; //!< address of variable to load from
+
+		//! Constructor
+		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
+		LoadNode(const StoreNode* store) : Node(store->sourcePos), varAddr(store->varAddr) {}
+
+		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual Node* optimize(std::wostream* dump);
+		virtual unsigned getStackDepth() const;
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"variable access (read)"; }
+	};
+
 	//! Node for reading from an array.
 	//! children[0] is the index in the array
 	struct ArrayReadNode : Node

@@ -255,6 +255,8 @@ namespace Aseba
 				TOKEN_OP_NEG,
 				TOKEN_OP_MULT,
 				TOKEN_OP_DIV,
+				TOKEN_OP_ADD_EQUAL,
+				TOKEN_OP_NEG_EQUAL,
 				TOKEN_OP_MOD
 				
 			} type; //!< type of this token
@@ -342,6 +344,7 @@ namespace Aseba
 		
 		Node* parseVarDef();
 		Node* parseAssignment();
+		Node* parseCompoundAssignment(Node* l_value);
 		Node* parseIfWhen(bool edgeSensitive);
 		Node* parseFor();
 		Node* parseWhile();
