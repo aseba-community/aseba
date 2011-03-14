@@ -394,12 +394,45 @@ namespace Aseba
 
 		assignment->children.push_back(l_value);
 		
-		expect(Token::TOKEN_ASSIGN);
-		tokens.pop_front();
-		
-		assignment->children.push_back(parseBinaryOrExpression());
+		// parse rvalue
+		if (tokens.front() == Token::TOKEN_ASSIGN)
+		{
+			tokens.pop_front();
+			assignment->children.push_back(parseBinaryOrExpression());
+		}
+		else if (
+			(tokens.front() == Token::TOKEN_OP_ADD_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_NEG_EQUAL)
+			)
+		{
+			assignment->children.push_back(parseCompoundAssignment(l_value));
+		}
+		else
+			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
 		
 		return assignment.release();
+	}
+
+	// parse +=, -=,... assignments
+	// assignments a += b are expanded to a = a + b
+	Node* Compiler::parseCompoundAssignment(Node* l_value)
+	{
+		Token::Type op = tokens.front();
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+
+		// convert the l_value from a StoreNode to a LoadNode
+		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// get the r_value
+		std::auto_ptr<Node> node(parseBinaryOrExpression());
+
+		// translate the compound assignment to a regular operator (+, -, ...)
+		if ((op == Token::TOKEN_OP_ADD_EQUAL) || (op == Token::TOKEN_OP_NEG_EQUAL))
+		{
+			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_ADD - Token::TOKEN_OP_ADD_EQUAL));
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, op, load.release(), node.release()));
+		}
+		return node.release();
 	}
 
 	
