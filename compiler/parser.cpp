@@ -837,18 +837,20 @@ namespace Aseba
 	{
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
-		std::auto_ptr<Node> node(parseBinaryOrExpression());
+		std::auto_ptr<Node> leftExprNode(parseBinaryOrExpression());
 		
-		while (IS_ONE_OF(conditionTypes))
+		if (!IS_ONE_OF(conditionTypes))
+		{
+			throw Error(tokens.front().pos, "Expecting a condition");
+		}
+		else
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseBinaryOrExpression();
-			node.reset(BinaryArithmeticNode::fromComparison(pos, op, node.release(), subExpression));
+			Node *rightExprNode = parseBinaryOrExpression();
+			return BinaryArithmeticNode::fromComparison(pos, op, leftExprNode.release(), rightExprNode);
 		}
-		
-		return node.release();
 	}
 	
 	//! Parse "binary or" grammar element.
