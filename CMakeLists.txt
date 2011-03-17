@@ -85,6 +85,9 @@ set (ASEBACOMPILER_SRC
 set (ASEBAVM_SRC
 	vm/vm.c
 	vm/natives.c
+)
+
+set (ASEBAVMBUFFER_SRC
 	transport/buffer/vm-buffer.c
 )
 
@@ -92,18 +95,22 @@ if (SHARED_LIBS)
 	add_library(asebacore SHARED ${ASEBACORE_SRC})
 	add_library(asebacompiler SHARED ${ASEBACOMPILER_SRC})
 	add_library(asebavm SHARED ${ASEBAVM_SRC})
+	add_library(asebavmbuffer SHARED ${ASEBAVMBUFFER_SRC})
 
 	install(TARGETS asebacore LIBRARY DESTINATION lib)
 	install(TARGETS asebacompiler LIBRARY DESTINATION lib)
 	install(TARGETS asebavm LIBRARY DESTINATION lib)
+	install(TARGETS asebavmbuffer LIBRARY DESTINATION lib)
 else(SHARED_LIBS)
 	add_library(asebacore ${ASEBACORE_SRC})
 	add_library(asebacompiler ${ASEBACOMPILER_SRC})
 	add_library(asebavm ${ASEBAVM_SRC})
+	add_library(asebavmbuffer ${ASEBAVMBUFFER_SRC})
 	
 	install(TARGETS asebacore ARCHIVE DESTINATION lib)
 	install(TARGETS asebacompiler ARCHIVE DESTINATION lib)
 	install(TARGETS asebavm ARCHIVE DESTINATION lib)
+	install(TARGETS asebavmbuffer ARCHIVE DESTINATION lib)
 endif(SHARED_LIBS)
 
 set (ASEBACORE_HDR_UTILS 

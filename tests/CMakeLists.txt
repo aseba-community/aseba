@@ -9,6 +9,17 @@ install(TARGETS asebatestcompile RUNTIME
 	LIBRARY DESTINATION lib
 )
 
+add_executable(asebatestcompilerun
+	asebatestcompilerun.cpp
+)
+
+target_link_libraries(asebatestcompilerun asebacompiler asebavm asebacore ${EXTRA_LIBS})
+
+install(TARGETS asebatestcompilerun RUNTIME
+	DESTINATION bin
+	LIBRARY DESTINATION lib
+)
+
 # the following tests should succeed
 add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatestcompile ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
 

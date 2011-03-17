@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 				usage(argc, argv);
 				exit(EXIT_FAILURE);
 		}
-        }
+	}
 
 	std::string filename;
 	

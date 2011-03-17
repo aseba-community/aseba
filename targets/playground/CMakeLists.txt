@@ -26,9 +26,9 @@ if (QT4_FOUND AND ENKI_FOUND)
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_RCC_SRCS})
 	
 	if (WIN32)
-		target_link_libraries(asebaplayground asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTXML_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+		target_link_libraries(asebaplayground asebavmbuffer asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTXML_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 	else (WIN32)
-		target_link_libraries(asebaplayground asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+		target_link_libraries(asebaplayground asebavmbuffer asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 		install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif (WIN32)
 
