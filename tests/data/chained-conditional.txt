@@ -1,0 +1,7 @@
+# The compiler should fail on chained conditions
+
+var i
+
+if i < 0 < 1 then
+	i = 2
+end

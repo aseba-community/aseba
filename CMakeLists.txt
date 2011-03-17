@@ -147,6 +147,9 @@ add_subdirectory(dump)
 
 add_subdirectory(replay)
 
+enable_testing()
+add_subdirectory(tests)
+
 if(NOT CMD_LINE)
 	add_subdirectory(studio)
 
@@ -158,3 +161,4 @@ if(NOT CMD_LINE)
 
 	add_subdirectory(eventlogger)
 endif(NOT CMD_LINE)
+

@@ -1,0 +1,7 @@
+# Implicit conditions should fail
+
+var i
+
+if i then
+	i = 0
+end
