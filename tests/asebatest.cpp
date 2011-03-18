@@ -17,11 +17,12 @@ using namespace Aseba;
 // helper function
 void dump_source(std::string filename);
 
-static const char short_options [] = "fsd";
+static const char short_options [] = "fsdm:";
 static const struct option long_options[] = { 
 	{ "fail",	no_argument,		NULL,		'f'},
 	{ "source",	no_argument,		NULL,		's'},
 	{ "dump",	no_argument,		NULL,		'd'},
+	{ "memcmp", required_argument,	NULL,		'm'},
 	{ 0, 0, 0, 0 } 
 };
 
@@ -29,14 +30,32 @@ static void usage (int argc, char** argv)
 {
 	std::cerr 	<< "Usage: " << argv[0] << " [options] source" << std::endl << std::endl
 			<< "Options:" << std::endl
-			<< "    -f | --fail    Return EXIT_SUCCESS if compilation fail" << std::endl
-			<< "    -s | --source  Dump the source code" << std::endl
-			<< "    -d | --dump    Dump the result (tokens, tree, bytecode)" << std::endl;
+			<< "    -f | --fail         Return EXIT_SUCCESS if compilation fail" << std::endl
+			<< "    -s | --source       Dump the source code" << std::endl
+			<< "    -d | --dump         Dump the result (tokens, tree, bytecode)" << std::endl
+			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl;
 }
+
+static bool executionError(false);
 
 extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, void *data, uint16 size)
 {
-	std::cerr << "AsebaSendMessage of type " << type << ", size " << size << std::endl;
+	switch (type)
+	{
+		case ASEBA_MESSAGE_DIVISION_BY_ZERO:
+		std::cerr << "Division by zero" << std::endl;
+		executionError = true;
+		break;
+		
+		case ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS:
+		std::cerr << "Array access out of bounds" << std::endl;
+		executionError = true;
+		break;
+		
+		default:
+		std::cerr << "AsebaSendMessage of type " << type << ", size " << size << std::endl;
+		break;
+	}
 }
 
 extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
@@ -71,20 +90,9 @@ extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
 	std::cerr << "AsebaResetIntoBootloader" << std::endl;
 }
 
-static bool wasAssert(false);
-
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 {
-	std::cerr << "\nFatal error: ";
-	switch (vm->nodeId)
-	{
-		case 1: std::cerr << "left motor module"; break;
-		case 2:	std::cerr << "right motor module"; break;
-		case 3: std::cerr << "proximity sensors module"; break;
-		case 4: std::cerr << "distance sensors module"; break;
-		default: std::cerr << "unknown module"; break;
-	}
-	std::cerr << " has produced exception: ";
+	std::cerr << "\nFatal error, internal VM exception: ";
 	switch (reason)
 	{
 		case ASEBA_ASSERT_UNKNOWN: std::cerr << "undefined"; break;
@@ -102,7 +110,7 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	}
 	std::cerr << ".\npc = " << vm->pc << ", sp = " << vm->sp;
 	std::cerr << "\nResetting VM" << std::endl;
-	wasAssert = true;
+	executionError = true;
 	AsebaVMInit(vm);
 }
 
@@ -115,9 +123,6 @@ struct AsebaNode
 	
 	struct Variables
 	{
-		sint16 id;
-		sint16 source;
-		sint16 args[32];
 		sint16 user[256];
 	} variables;
 
@@ -138,8 +143,6 @@ struct AsebaNode
 		
 		AsebaVMInit(&vm);
 		
-		variables.id = 0;
-		
 		// fill description accordingly
 		d.name = "testvm";
 		d.protocolVersion = ASEBA_PROTOCOL_VERSION;
@@ -148,9 +151,9 @@ struct AsebaNode
 		d.variablesSize = vm.variablesSize;
 		d.stackSize = vm.stackSize;
 		
-		d.namedVariables.push_back(TargetDescription::NamedVariable("id", 1));
+		/*d.namedVariables.push_back(TargetDescription::NamedVariable("id", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("source", 1));
-		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));
+		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));*/
 	}
 	
 	const TargetDescription* getTargetDescription() const
@@ -179,11 +182,41 @@ struct AsebaNode
 	}
 };
 
+void checkForError(const std::string& module, bool shouldFail, bool wasError, const std::string& errorMessage = "")
+{
+	if (wasError)
+	{
+		// errors
+		std::cerr << "An error in " << module << " occured";
+		if (!errorMessage.empty())
+			std::cerr << ":" << std::endl << errorMessage;
+		std::cerr << std::endl;
+		if (shouldFail)
+		{
+			// this was expected
+			std::cerr << "Failure was expected" << std::endl;
+			exit(EXIT_SUCCESS);
+		}
+		else
+		{
+			// oops
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		// no errors
+		std::cerr << module << " was successful" << std::endl;
+	}
+}
+
 int main(int argc, char** argv)
 {
 	bool should_fail = false;
 	bool source = false;
 	bool dump = false;
+	bool memCmp = false;
+	std::string memCmpFileName;
 
 	// parse the arguments
 	for(;;)
@@ -208,6 +241,10 @@ int main(int argc, char** argv)
 				break;
 			case 'd':
 				dump = true;
+				break;
+			case 'm':
+				memCmp = true;
+				memCmpFileName = optarg;
 				break;
 			default:
 				usage(argc, argv);
@@ -261,39 +298,7 @@ int main(int argc, char** argv)
 
 	ifs.close();
 	
-	// check for errors
-	if (outError.message != "not defined")
-	{
-		// errors
-		std::cerr << "An error occured:" << std::endl;
-		std::cerr << outError.message << std::endl;
-		if (should_fail)
-		{
-			// this was expected
-			std::cerr << "Failure was expected" << std::endl;
-			exit(EXIT_SUCCESS);
-		}
-		else
-		{
-			// oops
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		// no errors
-		std::cerr << "Compilation successful" << std::endl;
-		if (should_fail)
-		{
-			// it should have failed...
-			std::cerr << "... and this was NOT expected!" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		else
-		{
-			// ok, cool, we can continue
-		}
-	}
+	checkForError("Compilation", should_fail, (outError.message != "not defined"), outError.message);
 	
 	// run
 	if (!node.loadBytecode(bytecode))
@@ -302,8 +307,48 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 	node.run();
-	if (wasAssert)
-		return EXIT_FAILURE;
+	
+	checkForError("Execution", should_fail, executionError);
+	
+	if (memCmp)
+	{
+		ifs.open(memCmpFileName.data(), std::ifstream::in);
+		if (!ifs.is_open())
+		{
+			std::cerr << "Error opening mem dump file " << memCmpFileName << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		size_t i = 0;
+		while (!ifs.eof())
+		{
+			int v;
+			ifs >> v;
+			if (ifs.eof())
+				break;
+			if (i >= node.vm.variablesSize)
+				break;
+			if (node.vm.variables[i] != v)
+			{
+				std::cerr << "VM variable value at pos " << i << " after execution differs from dump; expected: " << v << ", found: " << node.vm.variables[i] << std::endl;
+				if (should_fail)
+				{
+					std::cerr << "Failure was expected" << std::endl;
+					exit(EXIT_SUCCESS);
+				}
+				else
+					exit(EXIT_FAILURE);
+			}
+			++i;
+		}
+		ifs.close();
+	}
+	
+	
+	if (should_fail)
+	{
+		std::cerr << "All tests passed successfully, but failure was expected" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	
 	return EXIT_SUCCESS;
 }

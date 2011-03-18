@@ -1,30 +1,23 @@
-add_executable(asebatestcompile
-	asebatestcompile.cpp
+add_executable(asebatest
+	asebatest.cpp
 )
 
-target_link_libraries(asebatestcompile asebacompiler asebacore ${EXTRA_LIBS})
+target_link_libraries(asebatest asebacompiler asebavm asebacore ${EXTRA_LIBS})
 
-install(TARGETS asebatestcompile RUNTIME
-	DESTINATION bin
-	LIBRARY DESTINATION lib
-)
-
-add_executable(asebatestcompilerun
-	asebatestcompilerun.cpp
-)
-
-target_link_libraries(asebatestcompilerun asebacompiler asebavm asebacore ${EXTRA_LIBS})
-
-install(TARGETS asebatestcompilerun RUNTIME
+install(TARGETS asebatest RUNTIME
 	DESTINATION bin
 	LIBRARY DESTINATION lib
 )
 
 # the following tests should succeed
-add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatestcompile ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
-
+add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest -m ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
 
 # the following tests should fail
-add_test(chained-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatestcompile --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/chained-conditional.txt)
-add_test(implicit-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatestcompile --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/implicit-conditional.txt)
-
+add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)
+add_test(division-by-zero-static ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-static.txt)
+add_test(chained-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/chained-conditional.txt)
+add_test(implicit-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/implicit-conditional.txt)
+add_test(array-access-out-of-bounds-dyn-over ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-dyn-over.txt)
+add_test(array-access-out-of-bounds-dyn-under ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-dyn-under.txt)
+add_test(array-access-out-of-bounds-static-over ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-static-over.txt)
+add_test(array-access-out-of-bounds-static-under ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-static-under.txt)
