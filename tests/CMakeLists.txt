@@ -10,7 +10,7 @@ install(TARGETS asebatest RUNTIME
 )
 
 # the following tests should succeed
-add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest -d --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
+add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
 add_test(multiple-logic-op ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/multiple-logic-op.txt)
 
 # the following tests should fail

@@ -8,7 +8,7 @@ if a <= b or a < b and c > d or d == 4 then
 	e = 1
 end
 
-if (a <= b) or a < b and (c > d) or d == 4 then
+if ((a <= b) or a < b) and ((c > d) or d == 4) then
 	e = 2
 end
 
@@ -17,9 +17,9 @@ if ((a <= b) or a < b and (c > d)) or d == 4 then
 end
 
 if (((a <= b) or a < b and (c > d)) or d == 4) then
-	e = 3
+	e = 4
 end
 
 if (a+3) < b then
-	e = 4
+	e = 5
 end
