@@ -298,7 +298,7 @@ int main(int argc, char** argv)
 
 	ifs.close();
 	
-	checkForError("Compilation", should_fail, (outError.message != "not defined"), outError.message);
+	checkForError("Compilation", should_fail, (outError.message != "not defined"), outError.toString());
 	
 	// run
 	if (!node.loadBytecode(bytecode))

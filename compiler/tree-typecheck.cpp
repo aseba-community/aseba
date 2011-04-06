@@ -53,8 +53,19 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
+	Node::ReturnType AssignmentNode::typeCheck() const
+	{
+		expectType(TYPE_UNIT, children[0]->typeCheck());
+		expectType(TYPE_INT, children[1]->typeCheck());
+		return TYPE_UNIT;
+	}
+	
 	Node::ReturnType IfWhenNode::typeCheck() const
 	{
+		expectType(TYPE_BOOL, children[0]->typeCheck());
+		expectType(TYPE_UNIT, children[1]->typeCheck());
+		if (children.size() > 2)
+			expectType(TYPE_UNIT, children[2]->typeCheck());
 		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
 			throw Error(children[0]->sourcePos, FormatableString("Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
@@ -63,6 +74,8 @@ namespace Aseba
 	
 	Node::ReturnType WhileNode::typeCheck() const
 	{
+		expectType(TYPE_BOOL, children[0]->typeCheck());
+		expectType(TYPE_UNIT, children[1]->typeCheck());
 		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
 			throw Error(children[0]->sourcePos, FormatableString("Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));

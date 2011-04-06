@@ -1,0 +1,18 @@
+var a = 1
+var b = 2
+var c = 3
+var d = 4
+var e = 0
+var prox.horizontal[5] = 0,0,0,0,0
+var detect = 0
+if a == b or a < b and c > d or d == 4 then
+	e = 1
+end
+
+if (a+3) < b then
+	e = 2
+end
+
+if prox.horizontal[0]<detect or prox.horizontal[1]>detect or prox.horizontal[2]>detect or prox.horizontal[3]>detect or prox.horizontal[4]>detect then
+	e = 2
+end

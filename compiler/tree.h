@@ -114,6 +114,7 @@ namespace Aseba
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
+		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const { return "Assign"; }
@@ -201,6 +202,7 @@ namespace Aseba
 		
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -218,6 +220,7 @@ namespace Aseba
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -232,6 +235,7 @@ namespace Aseba
 		
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -339,6 +343,7 @@ namespace Aseba
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
@@ -372,6 +377,7 @@ namespace Aseba
 		
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
 		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::ostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::string toString() const;
