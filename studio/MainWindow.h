@@ -30,6 +30,7 @@
 #include <QTextEdit>
 #include <QMultiMap>
 #include <QTabWidget>
+#include <QCloseEvent>
 
 #include "CustomDelegate.h"
 
@@ -329,6 +330,8 @@ namespace Aseba
 		void setupConnections();
 		void setupMenu();
 		void closeEvent ( QCloseEvent * event );
+		bool readSettings();
+		void writeSettings();
 		
 		// tabs and nodes
 		friend class NodeTab;

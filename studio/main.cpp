@@ -20,11 +20,12 @@
 
 #include <signal.h>
 #include <QApplication>
+#include <QCoreApplication>
 #include <QTextCodec>
 #include <QTranslator>
 #include <QString>
 #include <QLocale>
- #include <QLibraryInfo>
+#include <QLibraryInfo>
 #include <iostream>
 #include <stdexcept>
 #include "MainWindow.h"
@@ -36,7 +37,11 @@
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	
+	// Information used by QSettings with default constructor
+	QCoreApplication::setOrganizationName("EPFL-LSRO-Mobots");
+	QCoreApplication::setOrganizationDomain("mobots.epfl.ch");
+	QCoreApplication::setApplicationName("Aseba Studio");
+
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	

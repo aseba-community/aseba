@@ -48,7 +48,7 @@ namespace Aseba
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
-		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QSettings settings;
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
@@ -127,7 +127,7 @@ namespace Aseba
 	
 	std::string DashelConnectionDialog::getTarget()
 	{
-		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QSettings settings;
 		if (netGroupBox->isChecked())
 		{
 			settings.setValue("tcp host", host->text());

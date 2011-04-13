@@ -860,7 +860,8 @@ namespace Aseba
 		
 		// cosmetic fix-up
 		updateWindowTitle();
-		resize(1000,700);
+		if (readSettings() == false)
+			resize(1000,700);
 	}
 	
 	MainWindow::~MainWindow()
@@ -876,7 +877,7 @@ namespace Aseba
 	#ifndef SVN_REV
 	#define SVN_REV "unknown, please configure your build system to set SVN_REV correctly"
 	#endif
-	
+
 	void MainWindow::about()
 	{
 		QString revString(ASEBA_SVN_REV);
@@ -2124,7 +2125,7 @@ namespace Aseba
 	{
 		openRecentMenu->clear();
 		
-		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QSettings settings;
 		QStringList recentFiles = settings.value("recent files").toStringList();
 		
 		for (int i = 0; i < recentFiles.size(); i++)
@@ -2133,7 +2134,7 @@ namespace Aseba
 	
 	void MainWindow::updateRecentFiles(const QString& fileName)
 	{
-		QSettings settings("EPFL-LSRO-Mobots", "Aseba Studio");
+		QSettings settings;
 		QStringList recentFiles = settings.value("recent files").toStringList();
 		if (recentFiles.contains(fileName))
 			recentFiles.removeAt(recentFiles.indexOf(fileName));
@@ -2368,6 +2369,7 @@ namespace Aseba
 	{
 		if (askUserBeforeDiscarding())
 		{
+			writeSettings();
 			event->accept();
 			emit MainWindowClosed();
 		}
@@ -2375,6 +2377,23 @@ namespace Aseba
 		{
 			event->ignore();
 		}
+	}
+
+	bool MainWindow::readSettings()
+	{
+		bool result;
+
+		QSettings settings;
+		result = restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+		restoreState(settings.value("MainWindow/windowState").toByteArray());
+		return result;
+	}
+
+	void MainWindow::writeSettings()
+	{
+		QSettings settings;
+		settings.setValue("MainWindow/geometry", saveGeometry());
+		settings.setValue("MainWindow/windowState", saveState());
 	}
 	
 	void MainWindow::updateWindowTitle()
