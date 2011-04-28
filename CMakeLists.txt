@@ -19,7 +19,7 @@ include_directories(${DASHEL_INCLUDE_DIR})
 set(EXTRA_LIBS ${DASHEL_LIBRARY})
 
 if (WIN32)
-	set(EXTRA_LIBS ${EXTRA_LIBS} winspool ws2_32)
+	set(EXTRA_LIBS ${EXTRA_LIBS} winspool ws2_32 setupapi)
 else (WIN32)
 	if (APPLE)
 		find_library(COREFOUNDATION_LIBRARY CoreFoundation)
