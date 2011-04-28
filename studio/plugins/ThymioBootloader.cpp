@@ -57,6 +57,8 @@ namespace Aseba
 		connect(fileButton, SIGNAL(clicked()),this,SLOT(openFile()));
 		connect(flashButton, SIGNAL(clicked()), this, SLOT(doFlash()));
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(doClose()));
+
+		delete_myself = 0;
 	}
 	
 	ThymioBootloaderDialog::~ThymioBootloaderDialog()
@@ -98,7 +100,8 @@ namespace Aseba
 		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
 		
 		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
-		deleteLater();
+		if(delete_myself)
+			deleteLater();
 	}
 	
 	void ThymioBootloaderDialog::openFile(void)
@@ -195,6 +198,8 @@ namespace Aseba
 	
 	void ThymioBootloaderDialog::vmDisconnected(unsigned node)
 	{
+		delete_myself = 1;
+
 		qDebug() << "Bootloader entered " << node;
 		if(node != nodeId)
 			abort();

@@ -47,6 +47,8 @@ namespace Aseba
 		Target * target;
 		Dashel::Stream 	*stream;
 
+		int delete_myself;
+
 	public:
 		ThymioBootloaderDialog(NodeTab* nodeTab);
 		~ThymioBootloaderDialog();
