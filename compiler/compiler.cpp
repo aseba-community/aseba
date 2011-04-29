@@ -88,7 +88,7 @@ namespace Aseba
 	//! \param errorDescription error is copied there on error
 	//! \param dump stream to send dump messages to
 	//! \return returns true on success 
-	bool Compiler::compile(std::istream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
+	bool Compiler::compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
 	{
 		assert(targetDescription);
 		assert(commonDefinitions);

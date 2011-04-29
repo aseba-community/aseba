@@ -127,7 +127,7 @@ namespace Aseba
 	
 	//! Parse source and build tokens vector
 	//! \param source source code
-	void Compiler::tokenize(std::istream& source)
+	void Compiler::tokenize(std::wistream& source)
 	{
 		tokens.clear();
 		SourcePos pos(0, 0, 0);

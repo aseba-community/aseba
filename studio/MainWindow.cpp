@@ -505,7 +505,7 @@ namespace Aseba
 		bool doRehighlight = clearEditorProperty("errorPos");
 		
 		// compile
-		std::istringstream is(editor->toPlainText().toStdString());
+		std::wistringstream is(editor->toPlainText().toStdWString());
 		bool result;
 		if (mainWindow->nodes->currentWidget() == this)
 		{

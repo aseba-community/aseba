@@ -226,7 +226,7 @@ namespace Aseba
 					unsigned nodeId(getNodeId(element.attribute("name").toStdString(), &ok));
 					if (ok)
 					{
-						std::istringstream is(element.firstChild().toText().data().toStdString());
+						std::wistringstream is(element.firstChild().toText().data().toStdWString());
 						Error error;
 						BytecodeVector bytecode;
 						unsigned allocatedVariablesCount;
