@@ -21,7 +21,7 @@ namespace Aseba
 		stream(getDashelStream())
 	{
 		// Create the gui ...
-		setWindowTitle("Thymio Bootloader");
+		setWindowTitle(tr("Thymio Firmware Updater"));
 		resize(544,182);
 
 		verticalLayout = new QVBoxLayout(this);
@@ -29,7 +29,7 @@ namespace Aseba
 		lineEdit = new QLineEdit(this);
 		fileLayout->addWidget(lineEdit);
 		
-		fileButton = new QPushButton("File ...", this);
+		fileButton = new QPushButton(tr("File..."), this);
 		fileLayout->addWidget(fileButton);
 
 		verticalLayout->addLayout(fileLayout);
@@ -46,10 +46,10 @@ namespace Aseba
 
 		flashLayout->addItem(spacer);
 
-		flashButton = new QPushButton("Update", this);
+		flashButton = new QPushButton(tr("Update"), this);
 		flashLayout->addWidget(flashButton);
 
-		quitButton = new QPushButton("Quit", this);
+		quitButton = new QPushButton(tr("Quit"), this);
 		flashLayout->addWidget(quitButton);
 
 		verticalLayout->addItem(flashLayout);
@@ -67,7 +67,7 @@ namespace Aseba
 	
 	QWidget* ThymioBootloaderDialog::createMenuEntry()
 	{
-		QPushButton *flashButton = new QPushButton(tr("Flash firmware"));
+		QPushButton *flashButton = new QPushButton(tr("Update firmware"));
 		connect(flashButton, SIGNAL(clicked()), SLOT(showFlashDialog()));
 		return flashButton;
 	}
@@ -106,7 +106,7 @@ namespace Aseba
 	
 	void ThymioBootloaderDialog::openFile(void)
 	{
-		QString name = QFileDialog::getOpenFileName(this, "Select hex file", QString(),"Hex files (*.hex)");
+		QString name = QFileDialog::getOpenFileName(this, tr("Select hex file"), QString(), tr("Hex files (*.hex)"));
 		lineEdit->setText(name);
 	}
 
@@ -117,7 +117,7 @@ namespace Aseba
 			hex.read(lineEdit->text().toStdString());
 		}
 		catch(HexFile::Error& e) {
-			QMessageBox::critical(this,"Error", "Unable to read Hex file");
+			QMessageBox::critical(this, tr("Update Error"), tr("Unable to read Hex file"));
 			return;
 		}
 		quitButton->setEnabled(false);
