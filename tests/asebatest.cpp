@@ -7,7 +7,6 @@ using namespace Aseba;
 // C++
 #include <string>
 #include <iostream>
-#include <locale>
 #include <fstream>
 #include <valarray>
 
@@ -271,9 +270,8 @@ int main(int argc, char** argv)
 		dump_source(filename);
 
 	// open file
-	std::wfstream ifs;
-	ifs.open( filename.data(), std::ios::in);
-	ifs.imbue(std::locale("en_US.UTF-8"));		// use UTF-8 encoding
+	std::fstream ifs;
+	ifs.open( filename.data(), std::ifstream::in);
 	if (!ifs.is_open())
 	{
 		std::cerr << "Error opening source file " << filename << std::endl;
