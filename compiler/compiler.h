@@ -291,7 +291,7 @@ namespace Aseba
 		const TargetDescription *getTargetDescription() const { return targetDescription;}
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
-		bool compile(std::istream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
+		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
 		
 	protected:
 		void internalCompilerError() const;
@@ -312,7 +312,7 @@ namespace Aseba
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
 		void buildMaps();
-		void tokenize(std::istream& source);
+		void tokenize(std::wistream& source);
 		void dumpTokens(std::ostream &dest) const;
 		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);

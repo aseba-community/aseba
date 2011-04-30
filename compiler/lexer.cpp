@@ -127,7 +127,7 @@ namespace Aseba
 	
 	//! Parse source and build tokens vector
 	//! \param source source code
-	void Compiler::tokenize(std::istream& source)
+	void Compiler::tokenize(std::wistream& source)
 	{
 		tokens.clear();
 		SourcePos pos(0, 0, 0);
@@ -138,7 +138,7 @@ namespace Aseba
 		{
 			int c = source.get();
 			
-			if (c == EOF)
+			if (source.eof())
 				break;
 			
 			pos.column++;
@@ -195,7 +195,7 @@ namespace Aseba
 								pos.column++;
 							c = source.get();
 							pos.character++;
-							if (c == EOF)
+							if (source.eof())
 							{
 								// EOF -> unbalanced block
 								throw Error(begin, "Unbalanced comment block.");
@@ -209,7 +209,7 @@ namespace Aseba
 					else
 					{
 						// simple comment
-						while ((c != '\n') && (c != '\r') && (c != EOF))
+						while ((c != '\n') && (c != '\r') && (!source.eof()))
 						{
 							if (c == '\t')
 								pos.column += tabSize;
@@ -304,7 +304,7 @@ namespace Aseba
 					s += c;
 					int nextC = source.peek();
 					int posIncrement = 0;
-					while ((nextC != EOF) && (std::isalnum(nextC) || (nextC == '_') || (nextC == '.')))
+					while ((source.good()) && (std::isalnum(nextC) || (nextC == '_') || (nextC == '.')))
 					{
 						s += nextC;
 						source.get();
