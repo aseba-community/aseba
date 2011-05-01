@@ -136,7 +136,7 @@ namespace Aseba
 		// tokenize text source
 		while (source.good())
 		{
-			int c = source.get();
+			wchar_t c = source.get();
 			
 			if (source.eof())
 				break;
@@ -302,7 +302,7 @@ namespace Aseba
 					// get a string
 					std::string s;
 					s += c;
-					int nextC = source.peek();
+					wchar_t nextC = source.peek();
 					int posIncrement = 0;
 					while ((source.good()) && (std::isalnum(nextC) || (nextC == '_') || (nextC == '.')))
 					{
