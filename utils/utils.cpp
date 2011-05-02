@@ -124,7 +124,7 @@ namespace Aseba
 	
 	std::string WStringToUTF8(const std::wstring& s)
 	{
-		std::wcerr << "converting to utf " << s << std::endl;
+		//std::wcerr << "converting to utf " << s << std::endl;
 		mbstate_t state;
 		memset (&state, '\0', sizeof (state));
 		const wchar_t* src = s.c_str();
@@ -134,24 +134,24 @@ namespace Aseba
 		memset (&state, '\0', sizeof (state));
 		src = s.c_str();
 		wcsrtombs(&os[0], &src, count, &state);
-		std::cerr << "result " << os << std::endl;
+		//std::cerr << "result " << os << std::endl;
 		return os;
 	}
 	
 	std::wstring UTF8ToWString(const std::string& s)
 	{
-		std::cerr << "converting from utf " << s << std::endl;
+		//std::cerr << "converting from utf " << s << std::endl;
 		mbstate_t state;
 		memset (&state, '\0', sizeof (state));
 		const char* src = s.c_str();
 		const size_t count = mbsrtowcs(0, &src, 0, &state);
-		std::cerr << "will need " << count << std::endl;
+		//std::cerr << "will need " << count << std::endl;
 		std::wstring os;
 		os.resize(count);
 		memset (&state, '\0', sizeof (state));
 		src = s.c_str();
 		mbsrtowcs(&os[0], &src, count, &state);
-		std::wcerr << "result " << os << std::endl;
+		//std::wcerr << "result " << os << std::endl;
 		return os;
 	}
 	
