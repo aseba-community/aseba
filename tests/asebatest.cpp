@@ -2,6 +2,7 @@
 #include "../compiler/compiler.h"
 #include "../vm/vm.h"
 #include "../common/consts.h"
+#include "../utils/utils.h"
 using namespace Aseba;
 
 // C++
@@ -9,6 +10,7 @@ using namespace Aseba;
 #include <iostream>
 #include <locale>
 #include <fstream>
+#include <sstream>
 #include <valarray>
 
 // C
@@ -16,7 +18,8 @@ using namespace Aseba;
 #include <stdlib.h>		// exit()
 
 // helper function
-void dump_source(std::string filename);
+std::wstring read_source(const std::string& filename);
+void dump_source(const std::wstring& source);
 
 static const char short_options [] = "fsdm:";
 static const struct option long_options[] = { 
@@ -265,20 +268,16 @@ int main(int argc, char** argv)
 		usage(argc, argv);
 		exit(EXIT_FAILURE);
 	}
-
+	
+	// read source
+	const std::wstring wSource = read_source(filename);
+	
 	// dump source
 	if (source)
-		dump_source(filename);
-
-	// open file
-	std::wfstream ifs;
-	ifs.open( filename.data(), std::ios::in);
-	//ifs.imbue(std::locale("en_US.UTF-8"));		// use UTF-8 encoding
-	if (!ifs.is_open())
-	{
-		std::cerr << "Error opening source file " << filename << std::endl;
-		exit(EXIT_FAILURE);
-	}
+		dump_source(wSource);
+	
+	// parse source
+	std::wistringstream ifs(wSource);
 
 	Compiler compiler;
 
@@ -298,7 +297,7 @@ int main(int argc, char** argv)
 	else
 		compiler.compile(ifs, bytecode, varCount, outError, NULL);
 
-	ifs.close();
+	//ifs.close();
 	
 	checkForError("Compilation", should_fail, (outError.message != L"not defined"), outError.toWString());
 	
@@ -314,6 +313,7 @@ int main(int argc, char** argv)
 	
 	if (memCmp)
 	{
+		std::ifstream ifs;
 		ifs.open(memCmpFileName.data(), std::ifstream::in);
 		if (!ifs.is_open())
 		{
@@ -355,30 +355,50 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-// dump program source
-void dump_source(std::string filename)
+// read source code to a string
+std::wstring read_source(const std::string& filename)
 {
-	std::fstream ifs;
-	ifs.open( filename.data() , std::ifstream::in );
+	std::ifstream ifs;
+	ifs.open( filename.c_str() ,std::ifstream::binary);
 	if (!ifs.is_open())
 	{
 		std::cerr << "Error opening source file " << filename << std::endl;
 		exit(EXIT_FAILURE);
 	}
-		
-	char c;
+	
+	ifs.seekg (0, std::ios::end);
+	std::streampos length = ifs.tellg();
+	ifs.seekg (0, std::ios::beg);
+	
+	std::string utf8Source;
+	utf8Source.resize(length);
+	ifs.read(&utf8Source[0], length);
+	ifs.close();
+	
+	const std::wstring s = UTF8ToWString(utf8Source);
+	
+	std::cerr << "len utf8 " << utf8Source.length() << " len final " << s.length() << std::endl;
+	
+	return s;
+}
+
+// dump program source
+void dump_source(const std::wstring& source)
+{
+	std::wistringstream is(source);
+	wchar_t c;
 	std::cout << "Program:" << std::endl;
 	int line = 1;
 	bool header = true;
-	while (ifs)
+	while (is)
 	{
 		if (header)
 		{
 			std::cout << line << "  ";
 			header = false;
 		}
-		ifs.get(c);
-		std::cout << c;
+		c = is.get();
+		std::wcout << c;
 		if (c == '\n')
 		{
 			header = true;
@@ -386,7 +406,5 @@ void dump_source(std::string filename)
 		}
 	}
 	std::cout << std::endl;
-
-	ifs.close();
 }
 
