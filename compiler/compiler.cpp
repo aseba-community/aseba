@@ -21,6 +21,7 @@
 #include "compiler.h"
 #include "../common/consts.h"
 #include "tree.h"
+#include "../utils/FormatableString.h"
 #include <cassert>
 #include <cstdlib>
 #include <sstream>
@@ -28,6 +29,7 @@
 #include <fstream>
 #include <iomanip>
 #include <memory>
+#include <limits>
 
 namespace Aseba
 {
@@ -461,6 +463,50 @@ namespace Aseba
 				break;
 			}
 		}
+	}
+	
+	// from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
+	// FIXME: improve this
+	template <class T> unsigned int edit_distance(const T& s1, const T& s2)
+	{
+		const size_t len1 = s1.size(), len2 = s2.size();
+		std::vector<std::vector<unsigned int> > d(len1 + 1, std::vector<unsigned int>(len2 + 1));
+
+		d[0][0] = 0;
+		for(unsigned int i = 1; i <= len1; ++i) d[i][0] = i;
+		for(unsigned int i = 1; i <= len2; ++i) d[0][i] = i;
+
+		for(unsigned int i = 1; i <= len1; ++i)
+			for(unsigned int j = 1; j <= len2; ++j)
+				d[i][j] = std::min( std::min(d[i - 1][j] + 1,d[i][j - 1] + 1),
+					d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1) );
+		return d[len1][len2];
+	}
+	
+	//! Find for a variable of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos)
+	{
+		VariablesMap::const_iterator varIt = variablesMap.find(varName);
+		if (varIt == variablesMap.end())
+		{
+			std::wstring bestName;
+			unsigned bestDist(std::numeric_limits<unsigned>::max());
+			for (VariablesMap::const_iterator varJt(variablesMap.begin()); varJt != variablesMap.end(); ++varJt)
+			{
+				const std::wstring thatName(varJt->first);
+				const unsigned d(edit_distance<std::wstring>(varName, thatName));
+				if (d < bestDist && d < 3)
+				{
+					bestDist = d;
+					bestName = thatName;
+				}
+			}
+			if (bestDist != std::numeric_limits<unsigned>::max())
+				throw Error(varPos, WFormatableString(L"%0 is not a defined variable, do you mean %1 ?").arg(varName).arg(bestName));
+			else
+				throw Error(varPos, WFormatableString(L"%0 is not a defined variable").arg(varName));
+		}
+		return varIt;
 	}
 	
 	//! Build variables and functions maps

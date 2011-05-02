@@ -382,11 +382,7 @@ namespace Aseba
 		
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
-		VariablesMap::const_iterator varIt = variablesMap.find(varName);
-		
-		// check if variable exists
-		if (varIt == variablesMap.end())
-			throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
+		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 		
 		unsigned varAddr = varIt->second.first;
 		unsigned varSize = varIt->second.second;
@@ -500,11 +496,7 @@ namespace Aseba
 		expect(Token::TOKEN_STRING_LITERAL);
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
-		VariablesMap::const_iterator varIt = variablesMap.find(varName);
-		
-		// check if variable exists
-		if (varIt == variablesMap.end())
-			throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
+		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 		unsigned varAddr = varIt->second.first;
 		tokens.pop_front();
 		
@@ -704,9 +696,7 @@ namespace Aseba
 		// we have a variable access, check if variable exists
 		SourcePos varPos = tokens.front().pos;
 		std::wstring varName = tokens.front().sValue;
-		VariablesMap::const_iterator varIt = variablesMap.find(varName);
-		if (varIt == variablesMap.end())
-			throw Error(varPos, WFormatableString(L"%0 is not a defined variable").arg(varName));
+		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 		
 		// store variable address
 		*addr = varIt->second.first;
@@ -1032,11 +1022,7 @@ namespace Aseba
 				{
 					std::wstring varName = tokens.front().sValue;
 					SourcePos varPos = tokens.front().pos;
-					VariablesMap::const_iterator varIt = variablesMap.find(varName);
-					
-					// check if variable exists
-					if (varIt == variablesMap.end())
-						throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
+					VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 					
 					unsigned varAddr = varIt->second.first;
 					unsigned varSize = varIt->second.second;
