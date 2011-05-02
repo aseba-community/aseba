@@ -1,5 +1,7 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2010:
+	http://aseba.wikidot.com
+
+Copyright (C) 2007--2011:
 	Stephane Magnenat <stephane at magnenat dot net>
 	(http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
@@ -16,6 +18,9 @@ Aseba depends on the following libraries:
 	- Qt4 (http://www.qtsoftware.com/products/, for IDE)
 	- Qwt (http://qwt.sourceforge.net/, optional, for graphs)
 	- Enki (http://home.gna.org/enki/, optional, for simulators)
+
+And optionally, to enumerate serial ports properly on linux:
+	- libudev (http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/)
 
 If you are on Unix and lazy, and just want to compile Aseba without any
 additional thinking, try the following commands in Aseba sources directory:

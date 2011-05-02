@@ -891,7 +891,7 @@ namespace Aseba
 						DASHEL_VERSION \
 						"</li></ul>" \
 						"<p>(c) 2006-2011 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
-						"<p><a href=\"http://mobots.epfl.ch\">http://mobots.epfl.ch/aseba.html</a></p>" \
+						"<p><a href=\"http://aseba.wikidot.com\">http://aseba.wikidot.com</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
 		text = text.arg(revStringList.front()).arg(ASEBA_PROTOCOL_VERSION);
