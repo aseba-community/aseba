@@ -79,7 +79,7 @@ namespace Aseba
 	void EventFilterInterface::ListenEventName(const QString& name, const QDBusMessage &message)
 	{
 		size_t event;
-		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
+		if (network->commonDefinitions.events.contains(name.toStdWString(), &event))
 			network->listenEvent(this, event);
 		else
 			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
@@ -93,7 +93,7 @@ namespace Aseba
 	void EventFilterInterface::IgnoreEventName(const QString& name, const QDBusMessage &message)
 	{
 		size_t event;
-		if (network->commonDefinitions.events.contains(name.toStdString(), &event))
+		if (network->commonDefinitions.events.contains(name.toStdWString(), &event))
 			network->ignoreEvent(this, event);
 		else
 			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
@@ -163,7 +163,7 @@ namespace Aseba
 		QList<EventFilterInterface*> filters = eventsFilters.values(event);
 		QString name;
 		if (event < commonDefinitions.events.size())
-			name = QString::fromStdString(commonDefinitions.events[event].name);
+			name = QString::fromStdWString(commonDefinitions.events[event].name);
 		else
 			name = "?";
 		for (int i = 0; i < filters.size(); ++i)
@@ -223,7 +223,7 @@ namespace Aseba
 				if (element.tagName() == "node")
 				{
 					bool ok;
-					unsigned nodeId(getNodeId(element.attribute("name").toStdString(), &ok));
+					unsigned nodeId(getNodeId(element.attribute("name").toStdWString(), &ok));
 					if (ok)
 					{
 						std::wistringstream is(element.firstChild().toText().data().toStdWString());
@@ -251,7 +251,7 @@ namespace Aseba
 						}
 						else
 						{
-							DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdString(error.toString())));
+							DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdWString(error.toWString())));
 							wasError = true;
 							break;
 						}
@@ -273,12 +273,12 @@ namespace Aseba
 					}
 					else
 					{
-						commonDefinitions.events.push_back(NamedValue(eventName.toStdString(), eventSize));
+						commonDefinitions.events.push_back(NamedValue(eventName.toStdWString(), eventSize));
 					}
 				}
 				else if (element.tagName() == "constant")
 				{
-					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdString(), element.attribute("value").toUInt()));
+					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toUInt()));
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -287,7 +287,7 @@ namespace Aseba
 		// check if there was an error
 		if (wasError)
 		{
-			std::cerr << QString("There was an error while loading script %1").arg(fileName).toStdString() << std::endl;
+			std::wcerr << QString("There was an error while loading script %1").arg(fileName).toStdWString() << std::endl;
 			commonDefinitions.events.clear();
 			commonDefinitions.constants.clear();
 			userDefinedVariablesMap.clear();
@@ -296,7 +296,7 @@ namespace Aseba
 		// check if there was some matching problem
 		if (noNodeCount)
 		{
-			std::cerr << QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount).toStdString() << std::endl;
+			std::wcerr << QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount).toStdWString() << std::endl;
 		}
 	}
 	
@@ -333,7 +333,7 @@ namespace Aseba
 			QStringList list;
 			for (size_t i = 0; i < description.namedVariables.size(); ++i)
 			{
-				list.push_back(QString::fromStdString(description.namedVariables[i].name));
+				list.push_back(QString::fromStdWString(description.namedVariables[i].name));
 			}
 			
 			// user defined variables
@@ -343,7 +343,7 @@ namespace Aseba
 				const Compiler::VariablesMap& variablesMap(*userVarMapIt);
 				for (Compiler::VariablesMap::const_iterator jt = variablesMap.begin(); jt != variablesMap.end(); ++jt)
 				{
-					list.push_back(QString::fromStdString(jt->first));
+					list.push_back(QString::fromStdWString(jt->first));
 				}
 			}
 			
@@ -373,7 +373,7 @@ namespace Aseba
 		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
 			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
-			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdString()));
+			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
 			if (userVarIt != userVarMap.end())
 			{
 				pos = userVarIt->second.first;
@@ -384,7 +384,7 @@ namespace Aseba
 		if (pos == unsigned(-1))
 		{
 			bool ok;
-			pos = getVariablePos(nodeId, variable.toStdString(), &ok);
+			pos = getVariablePos(nodeId, variable.toStdWString(), &ok);
 			if (!ok)
 			{
 				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
@@ -415,7 +415,7 @@ namespace Aseba
 		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
 			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
-			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdString()));
+			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
 			if (userVarIt != userVarMap.end())
 			{
 				pos = userVarIt->second.first;
@@ -427,8 +427,8 @@ namespace Aseba
 		if (pos == unsigned(-1))
 		{
 			bool ok1, ok2;
-			pos = getVariablePos(nodeId, variable.toStdString(), &ok1);
-			length = getVariableSize(nodeId, variable.toStdString(), &ok2);
+			pos = getVariablePos(nodeId, variable.toStdWString(), &ok1);
+			length = getVariableSize(nodeId, variable.toStdWString(), &ok2);
 			if (!(ok1 && ok2))
 			{
 				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
@@ -466,7 +466,7 @@ namespace Aseba
 	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message)
 	{
 		size_t event;
-		if (commonDefinitions.events.contains(name.toStdString(), &event))
+		if (commonDefinitions.events.contains(name.toStdWString(), &event))
 			SendEvent(event, data);
 		else
 			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
@@ -481,7 +481,7 @@ namespace Aseba
 	
 	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
 	{
-		nodesNames[QString::fromStdString(nodesDescriptions[nodeId].name)] = nodeId;
+		nodesNames[QString::fromStdWString(nodesDescriptions[nodeId].name)] = nodeId;
 	}
 
 	inline QDBusConnection AsebaNetworkInterface::DBusConnectionBus() const
@@ -518,7 +518,7 @@ namespace Aseba
 		if (dump)
 		{
 			dumpTime(cout, rawTime);
-			message->dump(cout);
+			message->dump(wcout);
 			cout << std::endl;
 		}
 		

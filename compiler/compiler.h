@@ -48,36 +48,36 @@ namespace Aseba
 		//! Description of target VM named variable
 		struct NamedVariable
 		{
-			NamedVariable(const std::string &name, unsigned size) : size(size), name(name) {}
+			NamedVariable(const std::wstring &name, unsigned size) : size(size), name(name) {}
 			NamedVariable() {}
 			
 			unsigned size; //!< size of variable in words
-			std::string name; //!< name of the variable
+			std::wstring name; //!< name of the variable
 		};
 		
 		//! Description of local event;
 		struct LocalEvent
 		{
-			std::string name; //!< name of the event
-			std::string description; //!< description (some short documentation) of the event
+			std::wstring name; //!< name of the event
+			std::wstring description; //!< description (some short documentation) of the event
 		};
 		
 		//! Typed parameter of native functions
 		struct NativeFunctionParameter
 		{
 			int size; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
-			std::string name; //!< name of the parameter
+			std::wstring name; //!< name of the parameter
 		};
 		
 		//! Description of target VM native function
 		struct NativeFunction
 		{
-			std::string name; //!< name of the function
-			std::string description; //!< description (some short documentation) of the function
+			std::wstring name; //!< name of the function
+			std::wstring description; //!< description (some short documentation) of the function
 			std::vector<NativeFunctionParameter> parameters; //!< for each argument of the function, its size in words or, if negative, its template ID
 		};
 		
-		std::string name; //!< node name
+		std::wstring name; //!< node name
 		unsigned protocolVersion; //!< version of the aseba protocol
 		
 		unsigned bytecodeSize; //!< total amount of bytecode space
@@ -133,32 +133,32 @@ namespace Aseba
 		
 		SourcePos(unsigned character, unsigned row, unsigned column) : character(character - 1), row(row), column(column - 1) { valid = true; }
 		SourcePos() { valid = false; }
-		std::string toString() const;
+		std::wstring toWString() const;
 	};
 	
 	//! Compilation error
 	struct Error
 	{
 		SourcePos pos; //!< position of error in source string
-		std::string message; //!< message
+		std::wstring message; //!< message
 		//! Create an error at pos
-		Error(const SourcePos& pos, const std::string& message) : pos(pos), message(message) { }
+		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
 		//! Create an empty error
-		Error() { message = "not defined"; }
+		Error() { message = L"not defined"; }
 		//! Return a string describing the error
-		std::string toString() const;
+		std::wstring toWString() const;
 	};
 	
 	//! Vector of names of variables
-	typedef std::vector<std::string> VariablesNamesVector;
+	typedef std::vector<std::wstring> VariablesNamesVector;
 	
 	//! A name - value pair
 	struct NamedValue
 	{
 		//! Create a filled pair
-		NamedValue(const std::string& name, int value) : name(name), value(value) {}
+		NamedValue(const std::wstring& name, int value) : name(name), value(value) {}
 		
-		std::string name; //!< name part of the pair
+		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
 	};
 	
@@ -171,7 +171,7 @@ namespace Aseba
 	//! Generic vector of name - value pairs
 	struct NamedValuesVector: public std::vector<NamedValue>
 	{
-		bool contains(const std::string& s, size_t* position = 0) const;
+		bool contains(const std::wstring& s, size_t* position = 0) const;
 	};
 	
 	//! Vector of events descriptions
@@ -254,34 +254,34 @@ namespace Aseba
 				TOKEN_OP_MOD
 				
 			} type; //!< type of this token
-			std::string sValue; //!< string version of the value
+			std::wstring sValue; //!< string version of the value
 			int iValue; //!< int version of the value, 0 if not applicable
 			SourcePos pos;//!< position of token in source code
 			
 			Token() : type(TOKEN_END_OF_STREAM), iValue(0) {}
-			Token(Type type, SourcePos pos = SourcePos(), const std::string& value = "");
-			const char* typeName() const;
-			std::string toString() const;
+			Token(Type type, SourcePos pos = SourcePos(), const std::wstring& value = L"");
+			const wchar_t* typeName() const;
+			std::wstring toWString() const;
 			operator Type () const { return type; }
 		};
 		
 		//! Lookup table for variables name => (pos, size))
-		typedef std::map<std::string, std::pair<unsigned, unsigned> > VariablesMap;
+		typedef std::map<std::wstring, std::pair<unsigned, unsigned> > VariablesMap;
 		//! Lookup table for functions (name => id in target description)
-		typedef std::map<std::string, unsigned> FunctionsMap;
+		typedef std::map<std::wstring, unsigned> FunctionsMap;
 		//! Description of a subroutine
 		struct SubroutineDescriptor
 		{
-			std::string name;
+			std::wstring name;
 			unsigned address;
 			unsigned line;
 			
-			SubroutineDescriptor(const std::string& name, unsigned address, unsigned line) : name(name), address(address), line(line) {}
+			SubroutineDescriptor(const std::wstring& name, unsigned address, unsigned line) : name(name), address(address), line(line) {}
 		};
 		//! Lookup table for subroutines id => (name, address, line)
 		typedef std::vector<SubroutineDescriptor> SubroutineTable;
 		//! Reverse Lookup table for subroutines name => id
-		typedef std::map<std::string, unsigned> SubroutineReverseTable;
+		typedef std::map<std::wstring, unsigned> SubroutineReverseTable;
 		//! Lookup table to keep track of implemented events
 		typedef std::set<unsigned> ImplementedEvents;
 	
@@ -291,7 +291,7 @@ namespace Aseba
 		const TargetDescription *getTargetDescription() const { return targetDescription;}
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
-		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump = 0);
+		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
 		
 	protected:
 		void internalCompilerError() const;
@@ -306,17 +306,17 @@ namespace Aseba
 		int expectInt16LiteralOrConstant();
 		unsigned expectGlobalEventId() const;
 		unsigned expectAnyEventId() const;
-		std::string eventName(unsigned eventId) const;
+		std::wstring eventName(unsigned eventId) const;
 		template <int length>
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
 		void buildMaps();
 		void tokenize(std::wistream& source);
-		void dumpTokens(std::ostream &dest) const;
+		void dumpTokens(std::wostream &dest) const;
 		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
-		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::ostream& dump) const;
+		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::wostream& dump) const;
 		
 	protected:
 		Node* parseProgram();

@@ -148,7 +148,7 @@ namespace Aseba
 			nodeDescriptionReceived(id);
 	}
 	
-	std::string DescriptionsManager::getNodeName(unsigned nodeId) const
+	std::wstring DescriptionsManager::getNodeName(unsigned nodeId) const
 	{
 		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
 		if (it != nodesDescriptions.end())
@@ -157,11 +157,11 @@ namespace Aseba
 		}
 		else
 		{
-			return "";
+			return L"";
 		}
 	}
 	
-	unsigned DescriptionsManager::getNodeId(const std::string& name, bool *ok ) const
+	unsigned DescriptionsManager::getNodeId(const std::wstring& name, bool *ok ) const
 	{
 		// search for the first node with a given name
 		for (NodesDescriptionsMap::const_iterator it = nodesDescriptions.begin(); it != nodesDescriptions.end(); ++it)
@@ -197,7 +197,7 @@ namespace Aseba
 		return &(it->second);
 	}
 	
-	unsigned DescriptionsManager::getVariablePos(unsigned nodeId, const std::string& name, bool *ok) const
+	unsigned DescriptionsManager::getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
 		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
 		
@@ -223,7 +223,7 @@ namespace Aseba
 		return 0xFFFFFFFF;
 	}
 	
-	unsigned DescriptionsManager::getVariableSize(unsigned nodeId, const std::string& name, bool *ok) const
+	unsigned DescriptionsManager::getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
 		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
 		

@@ -599,7 +599,7 @@ namespace Aseba
 		// The NodeSpecificError can be triggered even if the pc is not valid
 //		if (line >= 0)
 //		{
-			emit nodeSpecificError(nse->source, line, QString::fromUtf8(nse->message.c_str()));
+			emit nodeSpecificError(nse->source, line, QString::fromStdWString(nse->message));
 			emit executionModeChanged(nse->source, EXECUTION_STOP);
 //		}
 	}

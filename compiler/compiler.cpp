@@ -35,19 +35,19 @@ namespace Aseba
 	/*@{*/
 
 	//! Return the string version of this position
-	std::string SourcePos::toString() const
+	std::wstring SourcePos::toWString() const
 	{
 		if (valid)
 		{
-			std::ostringstream oss;
-			oss << row + 1 << ":" << column;
+			std::wostringstream oss;
+			oss << row + 1 << ':' << column;
 			return oss.str();
 		}
 		else
-			return "";
+			return L"";
 	}
 	
-	bool NamedValuesVector::contains(const std::string& s, size_t* position) const
+	bool NamedValuesVector::contains(const std::wstring& s, size_t* position) const
 	{
 		for (size_t i = 0; i < size(); i++)
 		{
@@ -88,7 +88,7 @@ namespace Aseba
 	//! \param errorDescription error is copied there on error
 	//! \param dump stream to send dump messages to
 	//! \return returns true on success 
-	bool Compiler::compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::ostream* dump)
+	bool Compiler::compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump)
 	{
 		assert(targetDescription);
 		assert(commonDefinitions);
@@ -100,7 +100,7 @@ namespace Aseba
 		buildMaps();
 		if (freeVariableIndex > targetDescription->variablesSize)
 		{
-			errorDescription = Error(SourcePos(), "Broken target description: not enough room for internal variables");
+			errorDescription = Error(SourcePos(), L"Broken target description: not enough room for internal variables");
 			return false;
 		}
 		
@@ -194,14 +194,14 @@ namespace Aseba
 		// stack check
 		if (!verifyStackCalls(preLinkBytecode))
 		{
-			errorDescription = Error(SourcePos(), "Execution stack will overflow, check for any recursive subroutine call and cut long mathematical expressions.");
+			errorDescription = Error(SourcePos(), L"Execution stack will overflow, check for any recursive subroutine call and cut long mathematical expressions.");
 			return false;
 		}
 		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))
 		{
-			errorDescription = Error(SourcePos(), "Script too big for target bytecode size.");
+			errorDescription = Error(SourcePos(), L"Script too big for target bytecode size.");
 			return false;
 		}
 		
@@ -292,7 +292,7 @@ namespace Aseba
 	}
 	
 	//! Disassemble a microcontroller bytecode and dump it
-	void Compiler::disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::ostream& dump) const
+	void Compiler::disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::wostream& dump) const
 	{
 		// address of threads and subroutines
 		std::map<unsigned, unsigned> eventAddr;
@@ -441,7 +441,7 @@ namespace Aseba
 				case ASEBA_BYTECODE_SUB_CALL:
 				{
 					unsigned address = (bytecode[pc] & 0x0fff);
-					std::string name("unknown");
+					std::wstring name(L"unknown");
 					for (size_t i = 0; i < subroutineTable.size(); i++)
 						if (subroutineTable[i].address == address)
 							name = subroutineTable[i].name;

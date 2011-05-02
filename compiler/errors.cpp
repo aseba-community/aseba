@@ -27,9 +27,9 @@ namespace Aseba
 	/*@{*/
 	
 	//! Return the string version of this error
-	std::string Error::toString() const
+	std::wstring Error::toWString() const
 	{
-		std::ostringstream oss;
+		std::wostringstream oss;
 		if (pos.valid)
 			oss << "Error at Line: " << pos.row + 1 << " Col: " << pos.column + 1 << " : " << message;
 		else

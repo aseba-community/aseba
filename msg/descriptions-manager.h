@@ -56,15 +56,15 @@ namespace Aseba
 		void processMessage(const Message* message);
 		
 		//! Return the name corresponding to a node identifier; if invalid, return the empty string
-		std::string getNodeName(unsigned nodeId) const;
+		std::wstring getNodeName(unsigned nodeId) const;
 		//! Return the id of the node corresponding to name and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getNodeId(const std::string& name, bool *ok = 0) const;
+		unsigned getNodeId(const std::wstring& name, bool *ok = 0) const;
 		//! Return the description of a node and set ok to true, if provided; if invalid, return 0 and set ok to false
 		const TargetDescription * const getDescription(unsigned nodeId, bool *ok = 0) const;
 		//! Return the position of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariablePos(unsigned nodeId, const std::string& name, bool *ok = 0) const;
+		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariableSize(unsigned nodeId, const std::string& name, bool *ok = 0) const;
+		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
 		// TODO: reverse lookup?
 		// TODO: move bytecode sender manager here, rename class?
 		
@@ -73,7 +73,7 @@ namespace Aseba
 		void checkIfNodeDescriptionComplete(unsigned id, const NodeDescription& description);
 		
 		//! Virtual function that is called when a version mismatches
-		virtual void nodeProtocolVersionMismatch(const std::string &nodeName, uint16 protocolVersion) { }
+		virtual void nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion) { }
 		
 		//! Virtual function that is called when a node description has been fully received
 		virtual void nodeDescriptionReceived(unsigned nodeId) { }

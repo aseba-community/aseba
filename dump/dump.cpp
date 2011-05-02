@@ -63,7 +63,7 @@ namespace Aseba
 			dumpTime(cout, rawTime);
 			cout << stream->getTargetName()  << " ";
 			if (message)
-				message->dump(cout);
+				message->dump(wcout);
 			else
 				cout << "unknown message received";
 			cout << endl;

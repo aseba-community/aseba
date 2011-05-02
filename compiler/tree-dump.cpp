@@ -27,164 +27,164 @@ namespace Aseba
 	/** \addtogroup compiler */
 	/*@{*/
 	
-	std::string binaryOperatorToString(AsebaBinaryOperator op)
+	std::wstring binaryOperatorToString(AsebaBinaryOperator op)
 	{
 		switch (op)
 		{
-			case ASEBA_OP_SHIFT_LEFT: return "<<";
-			case ASEBA_OP_SHIFT_RIGHT: return ">>";
-			case ASEBA_OP_ADD: return "+";
-			case ASEBA_OP_SUB: return "-";
-			case ASEBA_OP_MULT: return "*";
-			case ASEBA_OP_DIV: return "/";
-			case ASEBA_OP_MOD: return "modulo";
+			case ASEBA_OP_SHIFT_LEFT: return L"<<";
+			case ASEBA_OP_SHIFT_RIGHT: return L">>";
+			case ASEBA_OP_ADD: return L"+";
+			case ASEBA_OP_SUB: return L"-";
+			case ASEBA_OP_MULT: return L"*";
+			case ASEBA_OP_DIV: return L"/";
+			case ASEBA_OP_MOD: return L"modulo";
 			
-			case ASEBA_OP_BIT_OR: return "binary or";
-			case ASEBA_OP_BIT_XOR: return "binary xor";
-			case ASEBA_OP_BIT_AND: return "binary and";
+			case ASEBA_OP_BIT_OR: return L"binary or";
+			case ASEBA_OP_BIT_XOR: return L"binary xor";
+			case ASEBA_OP_BIT_AND: return L"binary and";
 			
-			case ASEBA_OP_EQUAL: return "==";
-			case ASEBA_OP_NOT_EQUAL: return "!=";
-			case ASEBA_OP_BIGGER_THAN: return ">";
-			case ASEBA_OP_BIGGER_EQUAL_THAN: return ">=";
-			case ASEBA_OP_SMALLER_THAN: return "<";
-			case ASEBA_OP_SMALLER_EQUAL_THAN: return "<=";
+			case ASEBA_OP_EQUAL: return L"==";
+			case ASEBA_OP_NOT_EQUAL: return L"!=";
+			case ASEBA_OP_BIGGER_THAN: return L">";
+			case ASEBA_OP_BIGGER_EQUAL_THAN: return L">=";
+			case ASEBA_OP_SMALLER_THAN: return L"<";
+			case ASEBA_OP_SMALLER_EQUAL_THAN: return L"<=";
 			
-			case ASEBA_OP_OR: return "or";
-			case ASEBA_OP_AND: return "and";
+			case ASEBA_OP_OR: return L"or";
+			case ASEBA_OP_AND: return L"and";
 			
-			default: return "? (binary operator)";
+			default: return L"? (binary operator)";
 		}
 	}
 	
-	std::string unaryOperatorToString(AsebaUnaryOperator op)
+	std::wstring unaryOperatorToString(AsebaUnaryOperator op)
 	{
 		switch (op)
 		{
-			case ASEBA_UNARY_OP_SUB: return "unary -";
-			case ASEBA_UNARY_OP_ABS: return "abs";
-			case ASEBA_UNARY_OP_BIT_NOT: return "binary not";
-			case ASEBA_UNARY_OP_NOT: return "not";
+			case ASEBA_UNARY_OP_SUB: return L"unary -";
+			case ASEBA_UNARY_OP_ABS: return L"abs";
+			case ASEBA_UNARY_OP_BIT_NOT: return L"binary not";
+			case ASEBA_UNARY_OP_NOT: return L"not";
 			
-			default: return "? (unary operator)";
+			default: return L"? (unary operator)";
 		}
 	}
 	
-	void Node::dump(std::ostream& dest, unsigned& indent) const
+	void Node::dump(std::wostream& dest, unsigned& indent) const
 	{
 		for (unsigned i = 0; i < indent; i++)
-			dest << "    ";
-		dest << toString() << "\n";
+			dest << L"    ";
+		dest << toWString() << L"\n";
 		indent++;
 		for (size_t i = 0; i < children.size(); i++)
 			children[i]->dump(dest, indent);
 		indent--;
 	}
 	
-	std::string IfWhenNode::toString() const
+	std::wstring IfWhenNode::toWString() const
 	{
-		std::string s;
+		std::wstring s;
 		if (edgeSensitive)
-			s += "When: ";
+			s += L"When: ";
 		else
-			s += "If: ";
+			s += L"If: ";
 		return s;
 	}
 	
-	std::string FoldedIfWhenNode::toString() const
+	std::wstring FoldedIfWhenNode::toWString() const
 	{
-		std::string s;
+		std::wstring s;
 		if (edgeSensitive)
-			s += "Folded When: ";
+			s += L"Folded When: ";
 		else
-			s += "Folded If: ";
+			s += L"Folded If: ";
 		s += binaryOperatorToString(op);
 		return s;
 	}
 	
-	std::string WhileNode::toString() const
+	std::wstring WhileNode::toWString() const
 	{
-		std::string s = "While: ";
+		std::wstring s = L"While: ";
 		return s;
 	};
 	
-	std::string FoldedWhileNode::toString() const
+	std::wstring FoldedWhileNode::toWString() const
 	{
-		std::string s = "Folded While: ";
+		std::wstring s = L"Folded While: ";
 		s += binaryOperatorToString(op);
 		return s;
 	};
 	
-	std::string EventDeclNode::toString() const
+	std::wstring EventDeclNode::toWString() const
 	{
 		if (eventId == ASEBA_EVENT_INIT)
-			return "ContextSwitcher: to init";
+			return L"ContextSwitcher: to init";
 		else
-			return FormatableString("ContextSwitcher: to event %0").arg(eventId);
+			return WFormatableString(L"ContextSwitcher: to event %0").arg(eventId);
 	}
 	
-	std::string EmitNode::toString() const
+	std::wstring EmitNode::toWString() const
 	{
-		std::string s = FormatableString("Emit: %0 ").arg(eventId);
+		std::wstring s = WFormatableString(L"Emit: %0 ").arg(eventId);
 		if (arraySize)
-			s += FormatableString("addr %0 size %1 ").arg(arrayAddr).arg(arraySize);
+			s += WFormatableString(L"addr %0 size %1 ").arg(arrayAddr).arg(arraySize);
 		return s;
 	}
 	
-	std::string SubDeclNode::toString() const
+	std::wstring SubDeclNode::toWString() const
 	{
-		return FormatableString("Sub: %0").arg(subroutineId);
+		return WFormatableString(L"Sub: %0").arg(subroutineId);
 	}
 	
-	std::string CallSubNode::toString() const
+	std::wstring CallSubNode::toWString() const
 	{
-		return FormatableString("CallSub: %0").arg(subroutineId);
+		return WFormatableString(L"CallSub: %0").arg(subroutineId);
 	}
 
-	std::string BinaryArithmeticNode::toString() const
+	std::wstring BinaryArithmeticNode::toWString() const
 	{
-		std::string s = "BinaryArithmetic: ";
+		std::wstring s = L"BinaryArithmetic: ";
 		s += binaryOperatorToString(op);
 		return s;
 	}
 	
-	std::string UnaryArithmeticNode::toString() const
+	std::wstring UnaryArithmeticNode::toWString() const
 	{
-		std::string s = "UnaryArithmetic: ";
+		std::wstring s = L"UnaryArithmetic: ";
 		s += unaryOperatorToString(op);
 		return s;
 	}
 	
-	std::string ImmediateNode::toString() const
+	std::wstring ImmediateNode::toWString() const
 	{
-		return FormatableString("Immediate: %0").arg(value);
+		return WFormatableString(L"Immediate: %0").arg(value);
 	}
 
-	std::string LoadNode::toString() const
+	std::wstring LoadNode::toWString() const
 	{
-		return FormatableString("Load: addr %0").arg(varAddr);
+		return WFormatableString(L"Load: addr %0").arg(varAddr);
 	}
 
-	std::string StoreNode::toString() const
+	std::wstring StoreNode::toWString() const
 	{
-		return FormatableString("Store: addr %0").arg(varAddr);
+		return WFormatableString(L"Store: addr %0").arg(varAddr);
 	}
 
-	std::string ArrayReadNode::toString() const
+	std::wstring ArrayReadNode::toWString() const
 	{
-		return FormatableString("ArrayRead: addr %0 size %1").arg(arrayAddr).arg(arraySize);
+		return WFormatableString(L"ArrayRead: addr %0 size %1").arg(arrayAddr).arg(arraySize);
 	}
 	
-	std::string ArrayWriteNode::toString() const
+	std::wstring ArrayWriteNode::toWString() const
 	{
-		return FormatableString("ArrayWrite: addr %0 size %1").arg(arrayAddr).arg(arraySize);
+		return WFormatableString(L"ArrayWrite: addr %0 size %1").arg(arrayAddr).arg(arraySize);
 	}
 	
-	std::string CallNode::toString() const
+	std::wstring CallNode::toWString() const
 	{
-		std::string s = FormatableString("Call: id %0").arg(funcId);
+		std::wstring s = WFormatableString(L"Call: id %0").arg(funcId);
 		for (unsigned i = 0; i < argumentsAddr.size(); i++)
-			s += FormatableString(", arg %0 is addr %1").arg(i).arg(argumentsAddr[i]);
+			s += WFormatableString(L", arg %0 is addr %1").arg(i).arg(argumentsAddr[i]);
 		return s;
 	}
 	

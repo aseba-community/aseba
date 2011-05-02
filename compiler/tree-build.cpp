@@ -121,7 +121,7 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName) :
+	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
@@ -131,7 +131,7 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName) :
+	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),

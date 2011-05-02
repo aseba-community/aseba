@@ -35,7 +35,7 @@ namespace Aseba
 	//! There is a bug in the compiler, ask for a bug report
 	void Compiler::internalCompilerError() const
 	{
-		throw Error(tokens.front().pos, "Internal compiler error, please report a bug containing the source which triggered this error");
+		throw Error(tokens.front().pos, L"Internal compiler error, please report a bug containing the source which triggered this error");
 	}
 	
 	//! Check if next token is of type, produce an exception otherwise
@@ -43,7 +43,7 @@ namespace Aseba
 	{
 		if (tokens.front() != type)
 			throw Error(tokens.front().pos,
-				FormatableString("Expecting %0, found %1 instead")
+				WFormatableString(L"Expecting %0, found %1 instead")
 					.arg(Token(type).typeName())
 					.arg(tokens.front().typeName())
 				);
@@ -55,7 +55,7 @@ namespace Aseba
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 4095)
 			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [0;4095] range")
+				WFormatableString(L"Integer value %0 out of [0;4095] range")
 					.arg(tokens.front().iValue)
 				);
 		return tokens.front().iValue;
@@ -67,7 +67,7 @@ namespace Aseba
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 65535)
 			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [0;65535] range")
+				WFormatableString(L"Integer value %0 out of [0;65535] range")
 					.arg(tokens.front().iValue)
 				);
 		return tokens.front().iValue;
@@ -79,7 +79,7 @@ namespace Aseba
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 32767)
 			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [0;32767] range")
+				WFormatableString(L"Integer value %0 out of [0;32767] range")
 					.arg(tokens.front().iValue)
 				);
 		return tokens.front().iValue;
@@ -94,7 +94,7 @@ namespace Aseba
 			limit++;
 		if (tokens.front().iValue < 0 || tokens.front().iValue > limit)
 			throw Error(tokens.front().pos,
-				FormatableString("Integer value %0 out of [-32768;32767] range")
+				WFormatableString(L"Integer value %0 out of [-32768;32767] range")
 					.arg(tokens.front().iValue)
 				);
 		return tokens.front().iValue;
@@ -111,7 +111,7 @@ namespace Aseba
 				int value = commonDefinitions->constants[i].value;
 				if (value < 0 || value > 32767)
 					throw Error(tokens.front().pos,
-						FormatableString("Constant %0 has value %1, which is out of [0;32767] range")
+						WFormatableString(L"Constant %0 has value %1, which is out of [0;32767] range")
 							.arg(tokens.front().sValue)
 							.arg(value)
 						);
@@ -119,7 +119,7 @@ namespace Aseba
 			}
 		}
 		
-		throw Error(tokens.front().pos, FormatableString("Constant %0 not defined").arg(tokens.front().sValue));
+		throw Error(tokens.front().pos, WFormatableString(L"Constant %0 not defined").arg(tokens.front().sValue));
 		
 		return 0;
 	}
@@ -135,7 +135,7 @@ namespace Aseba
 				int value = commonDefinitions->constants[i].value;
 				if (value < -32768 || value > 32767)
 					throw Error(tokens.front().pos,
-						FormatableString("Constant %0 has value %1, which is out of [-32768;32767] range")
+						WFormatableString(L"Constant %0 has value %1, which is out of [-32768;32767] range")
 							.arg(tokens.front().sValue)
 							.arg(value)
 						);
@@ -143,7 +143,7 @@ namespace Aseba
 			}
 		}
 		
-		throw Error(tokens.front().pos, FormatableString("Constant %0 not defined").arg(tokens.front().sValue));
+		throw Error(tokens.front().pos, WFormatableString(L"Constant %0 not defined").arg(tokens.front().sValue));
 		
 		return 0;
 	}
@@ -180,14 +180,14 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const std::string & eventName = tokens.front().sValue;
+		const std::wstring & eventName = tokens.front().sValue;
 		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
 			if (commonDefinitions->events[i].name == eventName)
 			{
 				return i;
 			}
 		
-		throw Error(tokens.front().pos, FormatableString("%0 is not a known event").arg(eventName));
+		throw Error(tokens.front().pos, WFormatableString(L"%0 is not a known event").arg(eventName));
 	}
 	
 	//! Check if next token is a known local or global event identifier
@@ -198,7 +198,7 @@ namespace Aseba
 		expect(Token::TOKEN_STRING_LITERAL);
 		
 		// try first local
-		const std::string & eventName = tokens.front().sValue;
+		const std::wstring & eventName = tokens.front().sValue;
 		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
 			if (targetDescription->localEvents[i].name == eventName)
 			{
@@ -210,7 +210,7 @@ namespace Aseba
 	}
 	
 	//! Return the name of an event given its identifier
-	std::string Compiler::eventName(unsigned eventId) const
+	std::wstring Compiler::eventName(unsigned eventId) const
 	{
 		// search for global
 		if (eventId < commonDefinitions->events.size())
@@ -221,7 +221,7 @@ namespace Aseba
 		if ((localId >= 0) && (localId < (int)targetDescription->localEvents.size()))
 			return targetDescription->localEvents[localId].name;
 		
-		return "unknown";
+		return L"unknown";
 	}
 	
 	//! Return true if next token is of the following types
@@ -242,16 +242,16 @@ namespace Aseba
 	{
 		if (!isOneOf<length>(types))
 		{
-			std::string errorMessage("Expecting one of ");
+			std::wstring errorMessage(L"Expecting one of ");
 			for (size_t i = 0; i < length; i++)
 			{
 				errorMessage += Token(types[i]).typeName();
 				if (i + 1 < length)
-					errorMessage += ", ";
+					errorMessage += L", ";
 			}
-			errorMessage += "; but found ";
+			errorMessage += L"; but found ";
 			errorMessage += tokens.front().typeName();
-			errorMessage += " instead";
+			errorMessage += L" instead";
 			throw Error(tokens.front().pos, errorMessage);
 		}
 	}
@@ -284,7 +284,7 @@ namespace Aseba
 	{
 		switch (tokens.front())
 		{
-			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, "Variable definition is allowed only at the beginning of the program before any statement");
+			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, L"Variable definition is allowed only at the beginning of the program before any statement");
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_sub: return parseSubDecl();
 			default: return parseBlockStatement();
@@ -315,10 +315,10 @@ namespace Aseba
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
 			throw Error(tokens.front().pos,
-				FormatableString("Expecting identifier, found %0").arg(tokens.front().toString()));
+				WFormatableString(L"Expecting identifier, found %0").arg(tokens.front().toWString()));
 		
 		// save variable
-		std::string varName = tokens.front().sValue;
+		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
 		unsigned varSize = 1;
 		unsigned varAddr = freeVariableIndex;
@@ -339,7 +339,7 @@ namespace Aseba
 		
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
-			throw Error(varPos, FormatableString("Variable %0 is already defined").arg(varName));
+			throw Error(varPos, WFormatableString(L"Variable %0 is already defined").arg(varName));
 		
 		// save variable
 		variablesMap[varName] = std::make_pair(varAddr, varSize);
@@ -347,7 +347,7 @@ namespace Aseba
 		
 		// check space
 		if (freeVariableIndex > targetDescription->variablesSize)
-			throw Error(varPos, "No more free variable space");
+			throw Error(varPos, L"No more free variable space");
 		
 		// optional assignation
 		if (tokens.front() == Token::TOKEN_ASSIGN)
@@ -380,13 +380,13 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		std::string varName = tokens.front().sValue;
+		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
 		VariablesMap::const_iterator varIt = variablesMap.find(varName);
 		
 		// check if variable exists
 		if (varIt == variablesMap.end())
-			throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
+			throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
 		
 		unsigned varAddr = varIt->second.first;
 		unsigned varSize = varIt->second.second;
@@ -412,7 +412,7 @@ namespace Aseba
 		else
 		{
 			if (varSize != 1)
-				throw Error(varPos, FormatableString("Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
+				throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
 			
 			assignement->children.push_back(new StoreNode(tokens.front().pos, varAddr));
 		}
@@ -498,13 +498,13 @@ namespace Aseba
 		
 		// variable
 		expect(Token::TOKEN_STRING_LITERAL);
-		std::string varName = tokens.front().sValue;
+		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
 		VariablesMap::const_iterator varIt = variablesMap.find(varName);
 		
 		// check if variable exists
 		if (varIt == variablesMap.end())
-			throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
+			throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
 		unsigned varAddr = varIt->second.first;
 		tokens.pop_front();
 		
@@ -533,7 +533,7 @@ namespace Aseba
 			tokens.pop_front();
 			step = expectInt16LiteralOrConstant();
 			if (step == 0)
-				throw Error(tokens.front().pos, "Null steps are not allowed in for loops");
+				throw Error(tokens.front().pos, L"Null steps are not allowed in for loops");
 			tokens.pop_front();
 		}
 		
@@ -541,12 +541,12 @@ namespace Aseba
 		if (step > 0)
 		{
 			if (rangeStartIndex > rangeEndIndex)
-				throw Error(rangeStartIndexPos, "Start index must be lower than end index in increasing loops");
+				throw Error(rangeStartIndexPos, L"Start index must be lower than end index in increasing loops");
 		}
 		else
 		{
 			if (rangeStartIndex < rangeEndIndex)
-				throw Error(rangeStartIndexPos, "Start index must be higher than end index in decreasing loops");
+				throw Error(rangeStartIndexPos, L"Start index must be higher than end index in decreasing loops");
 		}
 		
 		// do keyword
@@ -619,7 +619,7 @@ namespace Aseba
 		
 		unsigned eventId = expectAnyEventId();
 		if (implementedEvents.find(eventId) != implementedEvents.end())
-			throw Error(tokens.front().pos, FormatableString("Event %0 is already implemented").arg(eventName(eventId)));
+			throw Error(tokens.front().pos, WFormatableString(L"Event %0 is already implemented").arg(eventName(eventId)));
 		implementedEvents.insert(eventId);
 		
 		tokens.pop_front();
@@ -645,7 +645,7 @@ namespace Aseba
 		{
 			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);
 			if (emitNode->arraySize != eventSize)
-				throw Error(pos, FormatableString("Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
+				throw Error(pos, WFormatableString(L"Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
 		}
 		else
 		{
@@ -664,10 +664,10 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const std::string& name = tokens.front().sValue;
+		const std::wstring& name = tokens.front().sValue;
 		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it != subroutineReverseTable.end())
-			throw Error(tokens.front().pos, FormatableString("Subroutine %0 is already defined").arg(name));
+			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 is already defined").arg(name));
 		
 		unsigned subroutineId = subroutineTable.size();
 		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
@@ -686,10 +686,10 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const std::string& name = tokens.front().sValue;
+		const std::wstring& name = tokens.front().sValue;
 		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it == subroutineReverseTable.end())
-			throw Error(tokens.front().pos, FormatableString("Subroutine %0 does not exists").arg(name));
+			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 does not exists").arg(name));
 		
 		tokens.pop_front();
 		
@@ -703,10 +703,10 @@ namespace Aseba
 		
 		// we have a variable access, check if variable exists
 		SourcePos varPos = tokens.front().pos;
-		std::string varName = tokens.front().sValue;
+		std::wstring varName = tokens.front().sValue;
 		VariablesMap::const_iterator varIt = variablesMap.find(varName);
 		if (varIt == variablesMap.end())
-			throw Error(varPos, FormatableString("%0 is not a defined variable").arg(varName));
+			throw Error(varPos, WFormatableString(L"%0 is not a defined variable").arg(varName));
 		
 		// store variable address
 		*addr = varIt->second.first;
@@ -723,7 +723,7 @@ namespace Aseba
 			
 			// check if first index is within bounds
 			if (startIndex >= varIt->second.second)
-				throw Error(tokens.front().pos, FormatableString("access of array %0 out of bounds").arg(varName));
+				throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
 			tokens.pop_front();
 			
 			// do we have array subscript?
@@ -736,9 +736,9 @@ namespace Aseba
 				// check if second index is within bounds
 				unsigned endIndex = (unsigned)value;
 				if (endIndex >= varIt->second.second)
-					throw Error(tokens.front().pos, FormatableString("access of array %0 out of bounds").arg(varName));
+					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
 				if (endIndex < startIndex)
-					throw Error(tokens.front().pos, FormatableString("end of range index must be lower or equal to start of range index"));
+					throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
 				tokens.pop_front();
 				
 				len = endIndex - startIndex + 1;
@@ -1020,7 +1020,7 @@ namespace Aseba
 			
 			case Token::TOKEN_STRING_LITERAL:
 			{
-				std::string varName = tokens.front().sValue;
+				std::wstring varName = tokens.front().sValue;
 				// if too slow, switch to a map
 				if (commonDefinitions->constants.contains(varName))
 				{
@@ -1030,13 +1030,13 @@ namespace Aseba
 				}
 				else
 				{
-					std::string varName = tokens.front().sValue;
+					std::wstring varName = tokens.front().sValue;
 					SourcePos varPos = tokens.front().pos;
 					VariablesMap::const_iterator varIt = variablesMap.find(varName);
 					
 					// check if variable exists
 					if (varIt == variablesMap.end())
-						throw Error(varPos, FormatableString("Variable %0 is not defined").arg(varName));
+						throw Error(varPos, WFormatableString(L"Variable %0 is not defined").arg(varName));
 					
 					unsigned varAddr = varIt->second.first;
 					unsigned varSize = varIt->second.second;
@@ -1060,7 +1060,7 @@ namespace Aseba
 					else
 					{
 						if (varSize != 1)
-							throw Error(varPos, FormatableString("Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
+							throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
 						
 						return new LoadNode(pos, varAddr);
 					}
@@ -1079,12 +1079,12 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		std::string funcName = tokens.front().sValue;
+		std::wstring funcName = tokens.front().sValue;
 		FunctionsMap::const_iterator funcIt = functionsMap.find(funcName);
 		
 		// check if function exists, get it and create node
 		if (funcIt == functionsMap.end())
-			throw Error(tokens.front().pos, FormatableString("Target does not provide function %0").arg(funcName));
+			throw Error(tokens.front().pos, WFormatableString(L"Target does not provide function %0").arg(funcName));
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
 		std::auto_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
 		
@@ -1096,7 +1096,7 @@ namespace Aseba
 		if (function.parameters.size() == 0)
 		{
 			if (tokens.front() != Token::TOKEN_PAR_CLOSE)
-				throw Error(tokens.front().pos, FormatableString("Function %0 requires no argument, some are used").arg(funcName));
+				throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires no argument, some are used").arg(funcName));
 			tokens.pop_front();
 		}
 		else
@@ -1117,7 +1117,7 @@ namespace Aseba
 				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-					throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
+					throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
 				else
 					EXPECT_ONE_OF(argTypes);
 				
@@ -1132,7 +1132,7 @@ namespace Aseba
 					// we have inline integer, we need to store it and pass the address
 					// we store it at the end of the variable space, we test if there is no overflow
 					if (localConstsAddr <= freeVariableIndex)
-						throw Error(varPos, "No more free variable space for constant");
+						throw Error(varPos, L"No more free variable space for constant");
 					varAddr = --localConstsAddr;
 					varSize = 1;
 					callNode->children.push_back(new ImmediateNode(varPos, value));
@@ -1148,7 +1148,7 @@ namespace Aseba
 				if (function.parameters[i].size > 0)
 				{
 					if (varSize != (unsigned)function.parameters[i].size)
-						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is of size %3, function definition demands size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, function definition demands size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size));
 				}
 				else if (function.parameters[i].size < 0)
 				{
@@ -1160,7 +1160,7 @@ namespace Aseba
 					}
 					else if ((unsigned)templateParameters[templateIndex] != varSize)
 					{
-						throw Error(varPos, FormatableString("Argument %0 (%1) of function %2 is of size %3, while a previous instance of the template parameter was of size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, while a previous instance of the template parameter was of size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
 					}
 				}
 				else
@@ -1176,14 +1176,14 @@ namespace Aseba
 				if (i + 1 == function.parameters.size())
 				{
 					if (tokens.front() == Token::TOKEN_COMMA)
-						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.parameters.size()));
+						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.parameters.size()));
 					else
 						expect(Token::TOKEN_PAR_CLOSE);
 				}
 				else
 				{
 					if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-						throw Error(tokens.front().pos, FormatableString("Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i + 1));
+						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i + 1));
 					else
 						expect(Token::TOKEN_COMMA);
 				}

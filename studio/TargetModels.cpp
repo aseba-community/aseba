@@ -274,7 +274,7 @@ namespace Aseba
 		{
 			// create new variable
 			Variable var;
-			var.name = QString::fromUtf8(it->first.c_str());
+			var.name = QString::fromStdWString(it->first);
 			var.pos = it->second.first;
 			var.value.resize(it->second.second);
 			
@@ -465,10 +465,10 @@ namespace Aseba
 		QString text;
 		QSet<QString> variablesNames;
 		
-		text += QString("<b>%1</b>(").arg(QString::fromUtf8(function.name.c_str()));
+		text += QString("<b>%1</b>(").arg(QString::fromStdWString(function.name));
 		for (size_t i = 0; i < function.parameters.size(); i++)
 		{
-			QString variableName(QString::fromUtf8(function.parameters[i].name.c_str()));
+			QString variableName(QString::fromStdWString(function.parameters[i].name));
 			variablesNames.insert(variableName);
 			text += variableName;
 			if (function.parameters[i].size > 1)
@@ -482,7 +482,7 @@ namespace Aseba
 				text += QString(", ");
 		}
 		
-		QString description = QString::fromUtf8(function.description.c_str());
+		QString description = QString::fromStdWString(function.description);
 		QStringList descriptionWords = description.split(regExp);
 		for (int i = 0; i < descriptionWords.size(); ++i)
 			if (variablesNames.contains(descriptionWords.at(i)))
@@ -515,7 +515,7 @@ namespace Aseba
 		for (size_t i = 0; i < descriptionRead->nativeFunctions.size(); i++)
 		{
 			// get the name, split it, and managed hidden
-			QString name = QString::fromUtf8(descriptionRead->nativeFunctions[i].name.c_str());
+			QString name = QString::fromStdWString(descriptionRead->nativeFunctions[i].name);
 			QStringList splittedName = name.split(".", QString::SkipEmptyParts);
 			
 			// ignore functions with no name at all

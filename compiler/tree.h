@@ -35,10 +35,10 @@ namespace Aseba
 	/*@{*/
 
 	//! Return the string corresponding to the binary operator
-	std::string binaryOperatorToString(AsebaBinaryOperator op);
+	std::wstring binaryOperatorToString(AsebaBinaryOperator op);
 	
 	//! Return the string corresponding to the unary operator
-	std::string unaryOperatorToString(AsebaUnaryOperator op);
+	std::wstring unaryOperatorToString(AsebaUnaryOperator op);
 	
 	//! An abstract node of syntax tree
 	struct Node
@@ -59,21 +59,21 @@ namespace Aseba
 		//! Typecheck this node, throw an exception if there is any type violation
 		virtual ReturnType typeCheck() const;
 		//! Optimize this node, return the optimized node
-		virtual Node* optimize(std::ostream* dump) = 0;
+		virtual Node* optimize(std::wostream* dump) = 0;
 		//! Return the stack depth requirement for this node and its children
 		virtual unsigned getStackDepth() const;
 		//! Generate bytecode
 		virtual void emit(PreLinkBytecode& bytecodes) const = 0;
 		
 		//! Return a string representation of this node
-		virtual std::string toString() const = 0;
+		virtual std::wstring toWString() const = 0;
 		//! Return a string representation of the name of this node
-		virtual std::string toNodeName() const = 0;
+		virtual std::wstring toNodeName() const = 0;
 		//! Dump this node and the rest of the tree
-		virtual void dump(std::ostream& dest, unsigned& indent) const;
+		virtual void dump(std::wostream& dest, unsigned& indent) const;
 		
 		//! Return the name of a type
-		std::string typeName(const Node::ReturnType& type) const;
+		std::wstring typeName(const Node::ReturnType& type) const;
 		//! Check for a specific type, throw an exception otherwise
 		void expectType(const Node::ReturnType& expected, const Node::ReturnType& type) const;
 		
@@ -83,27 +83,27 @@ namespace Aseba
 		SourcePos sourcePos; //!< position is source
 	};
 	
-	//! Node for "block", i.e. a vector of statements
+	//! Node for L"block", i.e. a vector of statements
 	struct BlockNode : Node
 	{
 		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const { return "Block"; }
-		virtual std::string toNodeName() const { return "block"; }
+		virtual std::wstring toWString() const { return L"Block"; }
+		virtual std::wstring toNodeName() const { return L"block"; }
 	};
 	
-	//! Node for "program", i.e. a block node with some special behaviour later on
+	//! Node for L"program", i.e. a block node with some special behaviour later on
 	struct ProgramNode: BlockNode
 	{
 		//! Constructor
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
 		
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const { return "ProgramBlock"; }
-		virtual std::string toNodeName() const { return "program block"; }
+		virtual std::wstring toWString() const { return L"ProgramBlock"; }
+		virtual std::wstring toNodeName() const { return L"program block"; }
 	};
 	
 	//! Node for assignation.
@@ -115,13 +115,13 @@ namespace Aseba
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const { return "Assign"; }
-		virtual std::string toNodeName() const { return "assignment"; }
+		virtual std::wstring toWString() const { return L"Assign"; }
+		virtual std::wstring toNodeName() const { return L"assignment"; }
 	};
 	
-	//! Node for "if" and "when".
+	//! Node for L"if" and L"when".
 	//! children[0] is expression
 	//! children[1] is true block
 	//! children[2] is false block
@@ -134,13 +134,13 @@ namespace Aseba
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "if/when"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"if/when"; }
 	};
 	
-	//! Node for "if" and "when" with operator folded inside.
+	//! Node for L"if" and L"when" with operator folded inside.
 	//! children[0] is left part of expression
 	//! children[1] is right part of expression
 	//! children[2] is true block
@@ -154,14 +154,14 @@ namespace Aseba
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "folded if/when"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"folded if/when"; }
 	};
 	
-	//! Node for "while".
+	//! Node for L"while".
 	//! children[0] is expression
 	//! children[1] is block
 	struct WhileNode : Node
@@ -170,13 +170,13 @@ namespace Aseba
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "while"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"while"; }
 	};
 	
-	//! Node for "while" with operator folded inside.
+	//! Node for L"while" with operator folded inside.
 	//! children[0] is left part of expression
 	//! children[1] is right part of expression
 	//! children[2] is block
@@ -187,14 +187,14 @@ namespace Aseba
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "folded while"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"folded while"; }
 	};
 	
-	//! Node for "onevent" 
+	//! Node for L"onevent" 
 	//! no children
 	struct EventDeclNode : Node
 	{
@@ -203,13 +203,13 @@ namespace Aseba
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "event declaration"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"event declaration"; }
 	};
 	
-	//! Node for "emit".
+	//! Node for L"emit".
 	//! no children
 	struct EmitNode : Node
 	{
@@ -221,13 +221,13 @@ namespace Aseba
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "emit"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"emit"; }
 	};
 	
-	//! Node for "sub"
+	//! Node for L"sub"
 	//! no children
 	struct SubDeclNode : Node
 	{
@@ -236,13 +236,13 @@ namespace Aseba
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "subroutine declaration"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"subroutine declaration"; }
 	};
 	
-	//! Node for "callsub"
+	//! Node for L"callsub"
 	//! no children
 	struct CallSubNode : Node
 	{
@@ -250,10 +250,10 @@ namespace Aseba
 		
 		CallSubNode(const SourcePos& sourcePos, unsigned subroutineId);
 		
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "subroutine call"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"subroutine call"; }
 	};
 	
 	//! Node for binary arithmetic.
@@ -269,11 +269,11 @@ namespace Aseba
 		void deMorganNotRemoval();
 		
 		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "binary function"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"binary function"; }
 		
 		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
@@ -292,10 +292,10 @@ namespace Aseba
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
 		
 		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "unary function"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"unary function"; }
 	};
 	
 	//! Node for pushing immediate value on stack.
@@ -310,11 +310,11 @@ namespace Aseba
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "constant"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"constant"; }
 	};
 	
 	//! Node for loading a variable on stack.
@@ -327,11 +327,11 @@ namespace Aseba
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "variable access (read)"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"variable access (read)"; }
 	};
 	
 	//! Node for storing a variable from stack.
@@ -344,10 +344,10 @@ namespace Aseba
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "variable access (write)"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"variable access (write)"; }
 	};
 	
 	//! Node for reading from an array.
@@ -356,15 +356,15 @@ namespace Aseba
 	{
 		unsigned arrayAddr; //!< address of the first element of the array
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
-		std::string arrayName; //!< name of the array (for debug)
+		std::wstring arrayName; //!< name of the array (for debug)
 		
-		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
+		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
 		
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "array access (read)"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"array access (read)"; }
 	};
 	
 	//! Node for writing to an array. Value to store is supposed to be on the stack already
@@ -373,15 +373,15 @@ namespace Aseba
 	{
 		unsigned arrayAddr; //!< address of the first element of the array
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
-		std::string arrayName; //!< name of the array (for debug)
+		std::wstring arrayName; //!< name of the array (for debug)
 		
-		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::string &arrayName);
+		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "array access (write)"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"array access (write)"; }
 	};
 	
 	//! Node for calling a native function
@@ -394,11 +394,11 @@ namespace Aseba
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::ostream* dump);
+		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::string toString() const;
-		virtual std::string toNodeName() const { return "native function call"; }
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"native function call"; }
 	};
 	
 	/*@}*/

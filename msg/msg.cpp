@@ -99,7 +99,7 @@ namespace Aseba
 		}
 		
 		//! Print the list of registered messages types to stream
-		void dumpKnownMessagesTypes(ostream &stream) const
+		void dumpKnownMessagesTypes(wostream &stream) const
 		{
 			stream << hex << showbase;
 			for (map<uint16, CreatorFunc>::const_iterator it = messagesTypes.begin(); it != messagesTypes.end(); ++it)
@@ -181,14 +181,14 @@ namespace Aseba
 		{
 			cerr << "Message::receive() : fatal error: message not fully read.\n";
 			cerr << "type: " << type << ", readPos: " << message->readPos << ", rawData size: " << message->rawData.size() << endl;
-			message->dumpBuffer(cerr);
+			message->dumpBuffer(wcerr);
 			abort();
 		}
 		
 		return message;
 	}
 	
-	void Message::dump(ostream &stream) const
+	void Message::dump(wostream &stream) const
 	{
 		stream << hex << showbase << setw(4) << type << " ";
 		stream << dec << noshowbase << *this << " from ";
@@ -196,7 +196,7 @@ namespace Aseba
 		dumpSpecific(stream);
 	}
 	
-	void Message::dumpBuffer(std::ostream &stream) const
+	void Message::dumpBuffer(std::wostream &stream) const
 	{
 		for (size_t i = 0; i < rawData.size(); ++i)
 			stream << (unsigned)(rawData[i]) << " (" << rawData[i] << "), ";
@@ -220,7 +220,7 @@ namespace Aseba
 			cerr << "Message::add<string>() : fatal error, string length exceeds 255 characters.\n";
 			cerr << "string size: " << val.length();
 			cerr << endl;
-			dumpBuffer(cerr);
+			dumpBuffer(wcerr);
 			abort();
 		}
 		
@@ -237,7 +237,7 @@ namespace Aseba
 			cerr << "Message<" << typeid(T).name() << ">::get() : fatal error: attempt to overread.\n";
 			cerr << "type: " << type << ", readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
 			cerr << endl;
-			dumpBuffer(cerr);
+			dumpBuffer(wcerr);
 			abort();
 		}
 		
@@ -290,12 +290,12 @@ namespace Aseba
 			data[i] = get<sint16>();
 	}
 	
-	void UserMessage::dumpSpecific(ostream &stream) const
+	void UserMessage::dumpSpecific(wostream &stream) const
 	{
 		stream << dec << "user message of size " << data.size() << " : ";
 		for (size_t i = 0 ; i < data.size(); i++)
 			stream << setw(4) << data[i] << " ";
-		stream << dec << setfill(' ');
+		stream << dec << setfill(wchar_t(' '));
 	}
 	
 	//
@@ -314,7 +314,7 @@ namespace Aseba
 		pagesCount = get<uint16>();
 	}
 	
-	void BootloaderDescription::dumpSpecific(ostream &stream) const
+	void BootloaderDescription::dumpSpecific(wostream &stream) const
 	{
 		stream << pagesCount << " pages of size " << pageSize << " starting at page " << pagesStart;
 	}
@@ -334,12 +334,12 @@ namespace Aseba
 			data[i] = get<uint8>();
 	}
 	
-	void BootloaderDataRead::dumpSpecific(ostream &stream) const
+	void BootloaderDataRead::dumpSpecific(wostream &stream) const
 	{
-		stream << hex << setfill('0');
+		stream << hex << setfill(wchar_t('0'));
 		for (size_t i = 0 ; i < sizeof(data); i++)
 			stream << setw(2) << (unsigned)data[i] << " ";
-		stream << dec << setfill(' ');
+		stream << dec << setfill(wchar_t(' '));
 	}
 	
 	//
@@ -358,7 +358,7 @@ namespace Aseba
 			errorAddress = get<uint16>();
 	}
 	
-	void BootloaderAck::dumpSpecific(ostream &stream) const
+	void BootloaderAck::dumpSpecific(wostream &stream) const
 	{
 		switch (errorCode)
 		{
@@ -383,7 +383,7 @@ namespace Aseba
 		version = get<uint16>();
 	}
 	
-	void GetDescription::dumpSpecific(std::ostream &stream) const
+	void GetDescription::dumpSpecific(std::wostream  &stream) const
 	{
 		stream << "protocol version " << version;
 	}
@@ -392,7 +392,7 @@ namespace Aseba
 	
 	void Description::serializeSpecific()
 	{
-		add(name);
+		add(WStringToUTF8(name));
 		add(static_cast<uint16>(protocolVersion));
 		
 		add(static_cast<uint16>(bytecodeSize));
@@ -411,7 +411,7 @@ namespace Aseba
 	
 	void Description::deserializeSpecific()
 	{
-		name = get<string>();
+		name = UTF8ToWString(get<string>());
 		protocolVersion = get<uint16>();
 		
 		bytecodeSize = get<uint16>();
@@ -428,7 +428,7 @@ namespace Aseba
 		// native functions are received separately
 	}
 	
-	void Description::dumpSpecific(ostream &stream) const
+	void Description::dumpSpecific(wostream &stream) const
 	{
 		stream << "Node " << name << " using protocol version " << protocolVersion << "\n";
 		stream << "bytecode: " << bytecodeSize << ", stack: " << stackSize << ", variables: " << variablesSize;
@@ -448,16 +448,16 @@ namespace Aseba
 	void NamedVariableDescription::serializeSpecific()
 	{
 		add(static_cast<sint16>(size));
-		add(name);
+		add(WStringToUTF8(name));
 	}
 	
 	void NamedVariableDescription::deserializeSpecific()
 	{
 		size = get<uint16>();
-		name = get<string>();
+		name = UTF8ToWString(get<string>());
 	}
 	
-	void NamedVariableDescription::dumpSpecific(std::ostream &stream) const
+	void NamedVariableDescription::dumpSpecific(std::wostream  &stream) const
 	{
 		stream << name << " of size " << size;
 	}
@@ -466,17 +466,17 @@ namespace Aseba
 	
 	void LocalEventDescription::serializeSpecific()
 	{
-		add(name);
-		add(description);
+		add(WStringToUTF8(name));
+		add(WStringToUTF8(description));
 	}
 	
 	void LocalEventDescription::deserializeSpecific()
 	{
-		name = get<string>();
-		description = get<string>();
+		name = UTF8ToWString(get<string>());
+		description = UTF8ToWString(get<string>());
 	}
 	
-	void LocalEventDescription::dumpSpecific(std::ostream &stream) const
+	void LocalEventDescription::dumpSpecific(std::wostream  &stream) const
 	{
 		stream << name << " : " << description;
 	}
@@ -485,31 +485,31 @@ namespace Aseba
 	
 	void NativeFunctionDescription::serializeSpecific()
 	{
-		add(name);
-		add(description);
+		add(WStringToUTF8(name));
+		add(WStringToUTF8(description));
 		
 		add(static_cast<uint16>(parameters.size()));
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
 			add(static_cast<sint16>(parameters[j].size));
-			add(parameters[j].name);
+			add(WStringToUTF8(parameters[j].name));
 		}
 	}
 	
 	void NativeFunctionDescription::deserializeSpecific()
 	{
-		name = get<string>();
-		description = get<string>();
+		name = UTF8ToWString(get<string>());
+		description = UTF8ToWString(get<string>());
 		
 		parameters.resize(get<uint16>());
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
 			parameters[j].size = get<sint16>();
-			parameters[j].name = get<string>();
+			parameters[j].name = UTF8ToWString(get<string>());
 		}
 	}
 	
-	void NativeFunctionDescription::dumpSpecific(std::ostream &stream) const
+	void NativeFunctionDescription::dumpSpecific(std::wostream  &stream) const
 	{
 		stream << name << " (";
 		for (size_t j = 0; j < parameters.size(); j++)
@@ -539,7 +539,7 @@ namespace Aseba
 			variables[i] = get<sint16>();
 	}
 	
-	void Variables::dumpSpecific(ostream &stream) const
+	void Variables::dumpSpecific(wostream &stream) const
 	{
 		stream << "start " << start << ", variables vector of size " << variables.size();
 		/*for (size_t i = 0; i < variables.size(); i++)
@@ -563,7 +563,7 @@ namespace Aseba
 		index = get<uint16>();
 	}
 	
-	void ArrayAccessOutOfBounds::dumpSpecific(ostream &stream) const
+	void ArrayAccessOutOfBounds::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc << ", size " << size << ", index " << index ;
 	}
@@ -580,7 +580,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void DivisionByZero::dumpSpecific(ostream &stream) const
+	void DivisionByZero::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc;
 	}
@@ -597,7 +597,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void EventExecutionKilled::dumpSpecific(ostream &stream) const
+	void EventExecutionKilled::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc;
 	}
@@ -607,16 +607,16 @@ namespace Aseba
 	void NodeSpecificError::serializeSpecific()
 	{
 		add(pc);
-		add(message);
+		add(WStringToUTF8(message));
 	}
 	
 	void NodeSpecificError::deserializeSpecific()
 	{
 		pc = get<uint16>();
-		message = get<std::string>();
+		message = UTF8ToWString(get<std::string>());
 	}
 	
-	void NodeSpecificError::dumpSpecific(ostream &stream) const
+	void NodeSpecificError::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc << " " << message;
 	}
@@ -635,7 +635,7 @@ namespace Aseba
 		flags = get<uint16>();
 	}
 	
-	void ExecutionStateChanged::dumpSpecific(ostream &stream) const
+	void ExecutionStateChanged::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc << ", flags ";
 		stream << hex << showbase << setw(4) << flags;
@@ -656,7 +656,7 @@ namespace Aseba
 		success = get<uint16>();
 	}
 	
-	void BreakpointSetResult::dumpSpecific(ostream &stream) const
+	void BreakpointSetResult::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc << ", success " << success;
 	}
@@ -673,7 +673,7 @@ namespace Aseba
 		dest = get<uint16>();
 	}
 	
-	void CmdMessage::dumpSpecific(ostream &stream) const
+	void CmdMessage::dumpSpecific(wostream &stream) const
 	{
 		stream << "dest " << dest << " ";
 	}
@@ -694,7 +694,7 @@ namespace Aseba
 		pageNumber = get<uint16>();
 	}
 	
-	void BootloaderReadPage::dumpSpecific(ostream &stream) const
+	void BootloaderReadPage::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -717,7 +717,7 @@ namespace Aseba
 		pageNumber = get<uint16>();
 	}
 	
-	void BootloaderWritePage::dumpSpecific(ostream &stream) const
+	void BootloaderWritePage::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -742,14 +742,14 @@ namespace Aseba
 			data[i] = get<uint8>();
 	}
 	
-	void BootloaderPageDataWrite::dumpSpecific(ostream &stream) const
+	void BootloaderPageDataWrite::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
-		stream << hex << setfill('0');
+		stream << hex << setfill(wchar_t('0'));
 		for (size_t i = 0 ; i < sizeof(data); i++)
 			stream << setw(2) << (unsigned)data[i] << " ";
-		stream << dec << setfill(' ');
+		stream << dec << setfill(wchar_t(' '));
 	}
 	
 	//
@@ -773,7 +773,7 @@ namespace Aseba
 			bytecode[i] = get<uint16>();
 	}
 	
-	void SetBytecode::dumpSpecific(ostream &stream) const
+	void SetBytecode::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -846,7 +846,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void BreakpointSet::dumpSpecific(ostream &stream) const
+	void BreakpointSet::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -869,7 +869,7 @@ namespace Aseba
 		pc = get<uint16>();
 	}
 	
-	void BreakpointClear::dumpSpecific(ostream &stream) const
+	void BreakpointClear::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -901,7 +901,7 @@ namespace Aseba
 		length = get<uint16>();
 	}
 	
-	void GetVariables::dumpSpecific(ostream &stream) const
+	void GetVariables::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		
@@ -936,7 +936,7 @@ namespace Aseba
 			variables[i] = get<sint16>();
 	}
 	
-	void SetVariables::dumpSpecific(ostream &stream) const
+	void SetVariables::dumpSpecific(wostream &stream) const
 	{
 		CmdMessage::dumpSpecific(stream);
 		

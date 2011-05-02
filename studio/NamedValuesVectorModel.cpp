@@ -66,7 +66,7 @@ namespace Aseba
 		if (role == Qt::DisplayRole)
 		{
 			if (index.column() == 0)
-				return QString::fromStdString(namedValues->at(index.row()).name);
+				return QString::fromStdWString(namedValues->at(index.row()).name);
 			else
 				return namedValues->at(index.row()).value;
 		}

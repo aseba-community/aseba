@@ -32,24 +32,26 @@ namespace Aseba
 	/** \addtogroup utils */
 	/*@{*/
 	
-	void FormatableString::proceedReplace(const std::string &replacement)
+	template<typename charT>
+	void BasicFormatableString<charT>::proceedReplace(const S &replacement)
 	{
-		std::ostringstream search;
+		typename std::basic_ostringstream<charT> search;
 		search << "%" << this->argLevel;
-		std::string::size_type pos = this->find(search.str(), 0);
-		assert(pos != std::string::npos);
+		typename S::size_type pos = this->find(search.str(), 0);
+		assert(pos != S::npos);
 		this->replace(pos, search.str().length(), replacement);
 		++argLevel;
 	}
 	
-	FormatableString &FormatableString::arg(int value, int fieldWidth, int base, char fillChar)
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(int value, int fieldWidth, int base, charT fillChar)
 	{
-		std::ostringstream oss;
+		typename std::basic_ostringstream<charT> oss;
 		oss << std::setbase(base);
 		oss.width(fieldWidth);
 		oss.fill(fillChar);
 		
-		// transform value into std::string
+		// transform value into S
 		oss << value;
 	
 		proceedReplace(oss.str());
@@ -58,14 +60,15 @@ namespace Aseba
 		return *this;
 	}
 	
-	FormatableString &FormatableString::arg(unsigned value, int fieldWidth, int base, char fillChar)
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(unsigned value, int fieldWidth, int base, charT fillChar)
 	{
-		std::ostringstream oss;
+		typename std::basic_ostringstream<charT> oss;
 		oss << std::setbase(base);
 		oss.width(fieldWidth);
 		oss.fill(fillChar);
 		
-		// transform value into std::string
+		// transform value into S
 		oss << value;
 	
 		proceedReplace(oss.str());
@@ -74,15 +77,16 @@ namespace Aseba
 		return *this;
 	}
 	
-	FormatableString &FormatableString::arg(float value, int fieldWidth, int precision, char fillChar)
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(float value, int fieldWidth, int precision, charT fillChar)
 	{
-		std::ostringstream oss;
+		typename std::basic_ostringstream<charT> oss;
 		oss.precision(precision);
 		oss.width(fieldWidth);
 		oss.fill(fillChar);
 	
 		oss.setf(oss.fixed, oss.floatfield);
-		// transform value into std::string
+		// transform value into S
 		oss << value;
 	
 		proceedReplace(oss.str());
@@ -91,12 +95,16 @@ namespace Aseba
 		return *this;
 	}
 	
-	FormatableString &FormatableString::operator=(const std::string& str)
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::operator=(const S& str)
 	{
 		this->assign(str);
 		this->argLevel = 0;
 		return (*this);
 	}
+	
+	template class BasicFormatableString<char>;
+	template class BasicFormatableString<wchar_t>;
 	
 	/*@}*/
 }

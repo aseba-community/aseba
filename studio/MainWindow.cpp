@@ -341,8 +341,8 @@ namespace Aseba
 		vmLocalEvents->setDragEnabled(true);
 		for (size_t i = 0; i < compiler.getTargetDescription()->localEvents.size(); i++)
 		{
-			QListWidgetItem* item = new QListWidgetItem(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].name.c_str()));
-			item->setToolTip(QString::fromUtf8(compiler.getTargetDescription()->localEvents[i].description.c_str()));
+			QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(compiler.getTargetDescription()->localEvents[i].name));
+			item->setToolTip(QString::fromStdWString(compiler.getTargetDescription()->localEvents[i].description));
 			vmLocalEvents->addItem(item);
 		}
 		
@@ -509,7 +509,7 @@ namespace Aseba
 		bool result;
 		if (mainWindow->nodes->currentWidget() == this)
 		{
-			std::ostringstream compilationMessages;
+			std::wostringstream compilationMessages;
 			result = compiler.compile(is, bytecode, allocatedVariablesCount, error, &compilationMessages);
 			
 			mainWindow->compilationMessageBox->setWindowTitle(
@@ -519,12 +519,12 @@ namespace Aseba
 			if (result)
 				mainWindow->compilationMessageBox->setText(
 					tr("Compilation success.") + QString("\n\n") + 
-					QString::fromStdString(compilationMessages.str())
+					QString::fromStdWString(compilationMessages.str())
 				);
 			else
 				mainWindow->compilationMessageBox->setText(
-					QString::fromStdString(error.toString()) + ".\n\n" +
-					QString::fromStdString(compilationMessages.str())
+					QString::fromStdWString(error.toWString()) + ".\n\n" +
+					QString::fromStdWString(compilationMessages.str())
 				);
 		}
 		else
@@ -544,7 +544,7 @@ namespace Aseba
 		}
 		else
 		{
-			compilationResultText->setText(QString::fromStdString(error.toString()));
+			compilationResultText->setText(QString::fromStdWString(error.toWString()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
 			loadButton->setEnabled(false);
 			emit uploadReadynessChanged(false);
@@ -966,11 +966,11 @@ namespace Aseba
 					{
 						const QString eventName(element.attribute("name"));
 						const unsigned eventSize(element.attribute("size").toUInt());
-						eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdString(), std::min(unsigned(ASEBA_MAX_EVENT_ARG_SIZE), eventSize)));
+						eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), std::min(unsigned(ASEBA_MAX_EVENT_ARG_SIZE), eventSize)));
 					}
 					else if (element.tagName() == "constant")
 					{
-						constantsDefinitionsModel->addNamedValue(NamedValue(element.attribute("name").toStdString(), element.attribute("value").toInt()));
+						constantsDefinitionsModel->addNamedValue(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
 					}
 				}
 				domNode = domNode.nextSibling();
@@ -1049,7 +1049,7 @@ namespace Aseba
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)
 		{
 			QDomElement element = document.createElement("event");
-			element.setAttribute("name", QString::fromStdString(commonDefinitions.events[i].name));
+			element.setAttribute("name", QString::fromStdWString(commonDefinitions.events[i].name));
 			element.setAttribute("size", QString::number(commonDefinitions.events[i].value));
 			root.appendChild(element);
 		}
@@ -1061,7 +1061,7 @@ namespace Aseba
 		for (size_t i = 0; i < commonDefinitions.constants.size(); i++)
 		{
 			QDomElement element = document.createElement("constant");
-			element.setAttribute("name", QString::fromStdString(commonDefinitions.constants[i].name));
+			element.setAttribute("name", QString::fromStdWString(commonDefinitions.constants[i].name));
 			element.setAttribute("value", QString::number(commonDefinitions.constants[i].value));
 			root.appendChild(element);
 		}
@@ -1359,7 +1359,7 @@ namespace Aseba
 		Q_ASSERT(currentRow.isValid());
 		
 		unsigned eventId = currentRow.row();
-		QString eventName = QString::fromStdString(commonDefinitions.events[eventId].name);
+		QString eventName = QString::fromStdWString(commonDefinitions.events[eventId].name);
 		int argsCount = commonDefinitions.events[eventId].value;
 		VariablesDataVector data(argsCount);
 		
@@ -1555,13 +1555,13 @@ namespace Aseba
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
 		{
-			if (commonDefinitions.events.contains(eventName.toStdString()))
+			if (commonDefinitions.events.contains(eventName.toStdWString()))
 			{
 				QMessageBox::warning(this, tr("Event already exists"), tr("Event %0 already exists.").arg(eventName));
 			}
 			else
 			{
-				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdString(), 0));
+				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), 0));
 				recompileAll();
 				updateWindowTitle();
 			}
@@ -1591,13 +1591,13 @@ namespace Aseba
 		QString constantName = QInputDialog::getText(this, tr("Add a new constant"), tr("Name:"), QLineEdit::Normal, "", &ok);
 		if (ok && !constantName.isEmpty())
 		{
-			if (commonDefinitions.constants.contains(constantName.toStdString()))
+			if (commonDefinitions.constants.contains(constantName.toStdWString()))
 			{
 				QMessageBox::warning(this, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(constantName));
 			}
 			else
 			{
-				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdString(), 0));
+				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdWString(), 0));
 				recompileAll();
 				updateWindowTitle();
 			}
@@ -1719,7 +1719,7 @@ namespace Aseba
 	{
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
 		if (id < commonDefinitions.events.size())
-			text += QString("\n%0 : ").arg(QString::fromStdString(commonDefinitions.events[id].name));
+			text += QString("\n%0 : ").arg(QString::fromStdWString(commonDefinitions.events[id].name));
 		else
 			text += tr("\nevent %0 : ").arg(id);
 		for (size_t i = 0; i < data.size(); i++)

@@ -35,8 +35,11 @@ namespace Aseba
 	* FormatableString fs("Hello %0");
 	* cout << fs.arg("World");
 	*/
-	class FormatableString : public std::string
+	template<typename charT>
+	class BasicFormatableString : public std::basic_string<charT>
 	{
+		typedef std::basic_string<charT> S;
+		
 		private:
 			/*!
 			* Next argument to be replaced.
@@ -46,19 +49,18 @@ namespace Aseba
 			/*!
 			* Replace the next argument by replacement.
 			*/
-			void proceedReplace(const std::string &replacement);
+			void proceedReplace(const S &replacement);
 			
 		public:
 			
-			FormatableString() : std::string(), argLevel(0) { }
+			BasicFormatableString() : S(), argLevel(0) { }
 			/*!
 			* Creates a new FormatableString with format string set to s.
 			* \param s A string with indicators for argument substitution.
 			* Each indicator is the % symbol followed by a number. The number
 			* is the index of the corresponding argument (starting at %0).
 			*/
-			FormatableString(const std::string &s)
-		: std::string(s), argLevel(0) { }
+			BasicFormatableString(const S &s) : S(s), argLevel(0) { }
 			
 			/*!
 			* Replace the next arg by an int value.
@@ -68,7 +70,7 @@ namespace Aseba
 			* \param fillChar Character used to pad the number to reach fieldWidth
 			* \see arg(const T& value)
 			*/
-			FormatableString &arg(int value, int fieldWidth = 0, int base = 10, char fillChar = ' ');
+			BasicFormatableString &arg(int value, int fieldWidth = 0, int base = 10, charT fillChar = ' ');
 			
 			/*!
 			* Replace the next arg by an int value.
@@ -78,7 +80,7 @@ namespace Aseba
 			* \param fillChar Character used to pad the number to reach fieldWidth
 			* \see arg(const T& value)
 			*/
-			FormatableString &arg(unsigned value, int fieldWidth = 0, int base = 10, char fillChar = ' ');
+			BasicFormatableString &arg(unsigned value, int fieldWidth = 0, int base = 10, charT fillChar = ' ');
 			
 			/*!
 			* Replace the next arg by a float value.
@@ -88,17 +90,17 @@ namespace Aseba
 			* \param fillChar Character used to pad the number to reach fieldWidth.
 			* \see arg(const T& value)
 			*/
-			FormatableString &arg(float value, int fieldWidth = 0, int precision = 6, char fillChar = ' ');
+			BasicFormatableString &arg(float value, int fieldWidth = 0, int precision = 6, charT fillChar = ' ');
 			
 			/*!
 			* Replace the next arg by a value that can be passed to an ostringstream.
 			* The first call to arg replace %0, the second %1, and so on.
 			* \param value Value used to replace the current argument.
 			*/
-			template <typename T> FormatableString &arg(const T& value)
+			template <typename T> BasicFormatableString &arg(const T& value)
 			{
-				// transform value into std::string
-				std::ostringstream oss;
+				// transform value into S
+				std::basic_ostringstream<charT> oss;
 				oss << value;
 			
 				proceedReplace(oss.str());
@@ -112,8 +114,11 @@ namespace Aseba
 			* counter.
 			* \param str New format string.
 			*/
-			FormatableString& operator=(const std::string& str) ;
+			BasicFormatableString& operator=(const S& str) ;
 	};
+	
+	typedef BasicFormatableString<char> FormatableString;
+	typedef BasicFormatableString<wchar_t> WFormatableString;
 	
 	/*@}*/
 }

@@ -31,7 +31,7 @@ namespace Aseba
 	/** \addtogroup compiler */
 	/*@{*/
 	
-	Node* BlockNode::optimize(std::ostream* dump)
+	Node* BlockNode::optimize(std::wostream* dump)
 	{
 		for (NodesVector::iterator it = children.begin(); it != children.end();)
 		{
@@ -59,7 +59,7 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* AssignmentNode::optimize(std::ostream* dump)
+	Node* AssignmentNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -68,7 +68,7 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* IfWhenNode::optimize(std::ostream* dump)
+	Node* IfWhenNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -96,7 +96,7 @@ namespace Aseba
 		)
 		{
 			if (dump)
-				*dump << sourcePos.toString() << ": if test removed because it had no associated code\n";
+				*dump << sourcePos.toWString() << L": if test removed because it had no associated code\n";
 			delete this;
 			return NULL;
 		}
@@ -108,7 +108,7 @@ namespace Aseba
 			if (constantExpression->value != 0)
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test simplified because condition was always true\n";
+					*dump << sourcePos.toWString() << L": if test simplified because condition was always true\n";
 				children[1] = 0;
 				delete this;
 				return trueBlock;
@@ -116,7 +116,7 @@ namespace Aseba
 			else
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": if test simplified because condition was always false\n";
+					*dump << sourcePos.toWString() << L": if test simplified because condition was always false\n";
 				children[2] = 0;
 				delete this;
 				return falseBlock;
@@ -145,20 +145,20 @@ namespace Aseba
 		}
 		
 		if (dump)
-			*dump << sourcePos.toString() << ": if condition folded inside node\n";
+			*dump << sourcePos.toWString() << L": if condition folded inside node\n";
 		
 		delete this;
 		
 		return foldedNode;
 	}
 	
-	Node* FoldedIfWhenNode::optimize(std::ostream* dump)
+	Node* FoldedIfWhenNode::optimize(std::wostream* dump)
 	{
 		abort();
 		return 0;
 	}
 	
-	Node* WhileNode::optimize(std::ostream* dump)
+	Node* WhileNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -172,12 +172,12 @@ namespace Aseba
 		{
 			if (constantExpression->value != 0)
 			{
-				throw Error(sourcePos, "Infinite loops not allowed");
+				throw Error(sourcePos, L"Infinite loops not allowed");
 			}
 			else
 			{
 				if (dump)
-					*dump << sourcePos.toString() << ": while removed because condition is always false\n";
+					*dump << sourcePos.toWString() << L": while removed because condition is always false\n";
 				delete this;
 				return NULL;
 			}
@@ -187,7 +187,7 @@ namespace Aseba
 		if ((children[1] == 0) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
 		{
 			if (dump)
-				*dump << sourcePos.toString() << ": while removed because it contained no statement\n";
+				*dump << sourcePos.toWString() << L": while removed because it contained no statement\n";
 			delete this;
 			return NULL;
 		}
@@ -203,40 +203,40 @@ namespace Aseba
 		children[1] = 0;
 		
 		if (dump)
-			*dump << sourcePos.toString() << ": while condition folded inside node\n";
+			*dump << sourcePos.toWString() << L": while condition folded inside node\n";
 		
 		delete this;
 		
 		return foldedNode;
 	}
 	
-	Node* FoldedWhileNode::optimize(std::ostream* dump)
+	Node* FoldedWhileNode::optimize(std::wostream* dump)
 	{
 		abort();
 		return 0;
 	}
 	
-	Node* EventDeclNode::optimize(std::ostream* dump)
+	Node* EventDeclNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* EmitNode::optimize(std::ostream* dump)
+	Node* EmitNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* SubDeclNode::optimize(std::ostream* dump)
+	Node* SubDeclNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* CallSubNode::optimize(std::ostream* dump)
+	Node* CallSubNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* BinaryArithmeticNode::optimize(std::ostream* dump)
+	Node* BinaryArithmeticNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -262,7 +262,7 @@ namespace Aseba
 				case ASEBA_OP_MULT: result = valueOne * valueTwo; break;
 				case ASEBA_OP_DIV: 
 					if (valueTwo == 0)
-						throw Error(sourcePos, "Division by zero.");
+						throw Error(sourcePos, L"Division by zero.");
 					else
 						result = valueOne / valueTwo;
 				break;
@@ -282,7 +282,7 @@ namespace Aseba
 			}
 			
 			if (dump)
-				*dump << sourcePos.toString() << ": binary arithmetic expression simplified\n";
+				*dump << sourcePos.toWString() << L": binary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
@@ -295,16 +295,16 @@ namespace Aseba
 				op = ASEBA_OP_SHIFT_LEFT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
-					*dump << sourcePos.toString() << ": multiplication transformed to left shift\n";
+					*dump << sourcePos.toWString() << L": multiplication transformed to left shift\n";
 			}
 			else if (op == ASEBA_OP_DIV)
 			{
 				if (immediateRightChild->value == 0)
-					throw Error(sourcePos, "Division by zero.");
+					throw Error(sourcePos, L"Division by zero.");
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
-					*dump << sourcePos.toString() << ": division transformed to right shift\n";
+					*dump << sourcePos.toWString() << L": division transformed to right shift\n";
 			}
 		}
 		
@@ -338,7 +338,7 @@ namespace Aseba
 		};
 	}
 	
-	Node* UnaryArithmeticNode::optimize(std::ostream* dump)
+	Node* UnaryArithmeticNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
@@ -355,7 +355,7 @@ namespace Aseba
 				case ASEBA_UNARY_OP_SUB: result = -immediateChild->value; break;
 				case ASEBA_UNARY_OP_ABS: 
 					if (immediateChild->value == -32768)
-						throw Error(sourcePos, "-32768 has no positive correspondance in 16 bits integers.");
+						throw Error(sourcePos, L"-32768 has no positive correspondance in 16 bits integers.");
 					else
 						result = abs(immediateChild->value);
 				break;
@@ -364,7 +364,7 @@ namespace Aseba
 			}
 			
 			if (dump)
-				*dump << sourcePos.toString() << ": unary arithmetic expression simplified\n";
+				*dump << sourcePos.toWString() << L": unary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
@@ -372,7 +372,7 @@ namespace Aseba
 		{
 			// de Morgan removal of not
 			if (dump)
-				*dump << sourcePos.toString() << ": not removed using de Morgan\n";
+				*dump << sourcePos.toWString() << L": not removed using de Morgan\n";
 			BinaryArithmeticNode* child(polymorphic_downcast<BinaryArithmeticNode*>(children[0]));
 			child->deMorganNotRemoval();
 			children.clear();
@@ -383,22 +383,22 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* ImmediateNode::optimize(std::ostream* dump)
+	Node* ImmediateNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* LoadNode::optimize(std::ostream* dump)
+	Node* LoadNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* StoreNode::optimize(std::ostream* dump)
+	Node* StoreNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
 	
-	Node* ArrayReadNode::optimize(std::ostream* dump)
+	Node* ArrayReadNode::optimize(std::wostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
@@ -413,14 +413,14 @@ namespace Aseba
 			if (index >= arraySize)
 			{
 				throw Error(sourcePos,
-					FormatableString("Out of bound static array access. Trying to read index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
+					WFormatableString(L"Out of bound static array access. Trying to read index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
 			}
 			
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
 			
 			if (dump)
-				*dump << sourcePos.toString() << ": array access transformed to single variable access\n";
+				*dump << sourcePos.toWString() << L": array access transformed to single variable access\n";
 			delete this;
 			return new LoadNode(pos, varAddr);
 		}
@@ -428,7 +428,7 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* ArrayWriteNode::optimize(std::ostream* dump)
+	Node* ArrayWriteNode::optimize(std::wostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
@@ -443,14 +443,14 @@ namespace Aseba
 			if (index >= arraySize)
 			{
 				throw Error(sourcePos,
-					FormatableString("Out of bound static array access. Trying to write index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
+					WFormatableString(L"Out of bound static array access. Trying to write index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
 			}
 			
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
 			
 			if (dump)
-				*dump << sourcePos.toString() << ": array access transformed to single variable access\n";
+				*dump << sourcePos.toWString() << L": array access transformed to single variable access\n";
 			delete this;
 			return new StoreNode(pos, varAddr);
 		}
@@ -458,7 +458,7 @@ namespace Aseba
 			return this;
 	}
 	
-	Node* CallNode::optimize(std::ostream* dump)
+	Node* CallNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}

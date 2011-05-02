@@ -93,6 +93,12 @@ namespace Aseba
 	//! Dump the current time to a stream
 	void dumpTime(std::ostream &stream, bool raw = false);
 	
+	//! Transform a wstring into an UTF8 string, this function is thread-safe
+	std::string WStringToUTF8(const std::wstring& s);
+	
+	//! Transform a UTF8 string into a wstring, this function is thread-safe
+	std::wstring UTF8ToWString(const std::string& s);
+	
 	/*@}*/
 	
 };

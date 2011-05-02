@@ -28,7 +28,7 @@
 namespace Aseba
 {
 	//! Construct a new token of given type and value
-	Compiler::Token::Token(Type type, SourcePos pos, const std::string& value) :
+	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) :
 		type(type),
 		sValue(value),
 		pos(pos)
@@ -37,12 +37,12 @@ namespace Aseba
 		{
 			bool wasSigned = false;
 			if ((value.length() > 1) && (value[1] == 'x'))
-				iValue = strtol(value.c_str() + 2, NULL, 16);
+				iValue = wcstol(value.c_str() + 2, NULL, 16);
 			else if ((value.length() > 1) && (value[1] == 'b'))
-				iValue = strtol(value.c_str() + 2, NULL, 2);
+				iValue = wcstol(value.c_str() + 2, NULL, 2);
 			else
 			{
-				iValue = atoi(value.c_str());
+				iValue = wcstol(value.c_str(), NULL, 10);
 				wasSigned = true;
 			}
 			if ((wasSigned == false) && (iValue > 32767))
@@ -55,72 +55,72 @@ namespace Aseba
 	}
 	
 	//! Return the name of the type of this token
-	const char* Compiler::Token::typeName() const
+	const wchar_t* Compiler::Token::typeName() const
 	{
 		switch (type)
 		{
-			case TOKEN_END_OF_STREAM: return "end of stream";
-			case TOKEN_STR_when: return "when keyword";
-			case TOKEN_STR_emit: return "emit keyword";
-			case TOKEN_STR_for: return "for keyword";
-			case TOKEN_STR_in: return "in keyword";
-			case TOKEN_STR_step: return "step keyword";
-			case TOKEN_STR_while: return "while keyword";
-			case TOKEN_STR_do: return "do keyword";
-			case TOKEN_STR_if: return "if keyword";
-			case TOKEN_STR_then: return "then keyword";
-			case TOKEN_STR_else: return "else keyword";
-			case TOKEN_STR_elseif: return "elseif keyword";
-			case TOKEN_STR_end: return "end keyword";
-			case TOKEN_STR_var: return "var keyword";
-			case TOKEN_STR_call: return "call keyword";
-			case TOKEN_STR_sub: return "sub keyword";
-			case TOKEN_STR_callsub: return "callsub keyword";
-			case TOKEN_STR_onevent: return "onevent keyword";
-			case TOKEN_STR_abs: return "abs keyword";
-			case TOKEN_STRING_LITERAL: return "string";
-			case TOKEN_INT_LITERAL: return "integer";
-			case TOKEN_PAR_OPEN: return "( (open parenthesis)";
-			case TOKEN_PAR_CLOSE: return ") (close parenthesis)";
-			case TOKEN_BRACKET_OPEN: return "[ (open bracket)";
-			case TOKEN_BRACKET_CLOSE: return "] (close bracket)";
-			case TOKEN_COLON: return ": (colon)";
-			case TOKEN_COMMA: return ", (comma)";
-			case TOKEN_ASSIGN: return "= (assignation)";
-			case TOKEN_OP_OR: return "or";
-			case TOKEN_OP_AND: return "and";
-			case TOKEN_OP_NOT: return "not";
-			case TOKEN_OP_BIT_OR: return "binary or";
-			case TOKEN_OP_BIT_XOR: return "binary xor";
-			case TOKEN_OP_BIT_AND: return "binary and";
-			case TOKEN_OP_BIT_NOT: return "binary not";
-			case TOKEN_OP_EQUAL: return "== (equal to)";
-			case TOKEN_OP_NOT_EQUAL: return "!= (not equal to)";
-			case TOKEN_OP_BIGGER: return "> (bigger than)";
-			case TOKEN_OP_BIGGER_EQUAL: return ">= (bigger or equal than)";
-			case TOKEN_OP_SMALLER: return "< (smaller than)";
-			case TOKEN_OP_SMALLER_EQUAL: return "<= (smaller or equal than)";
-			case TOKEN_OP_SHIFT_LEFT: return "<< (shift left)";
-			case TOKEN_OP_SHIFT_RIGHT: return ">> (shift right)";
-			case TOKEN_OP_ADD: return "+ (plus)";
-			case TOKEN_OP_NEG: return "- (minus)";
-			case TOKEN_OP_MULT: return "* (time)";
-			case TOKEN_OP_DIV: return "/ (divide)";
-			case TOKEN_OP_MOD: return "modulo";
-			default: return "unknown";
+			case TOKEN_END_OF_STREAM: return L"end of stream";
+			case TOKEN_STR_when: return L"when keyword";
+			case TOKEN_STR_emit: return L"emit keyword";
+			case TOKEN_STR_for: return L"for keyword";
+			case TOKEN_STR_in: return L"in keyword";
+			case TOKEN_STR_step: return L"step keyword";
+			case TOKEN_STR_while: return L"while keyword";
+			case TOKEN_STR_do: return L"do keyword";
+			case TOKEN_STR_if: return L"if keyword";
+			case TOKEN_STR_then: return L"then keyword";
+			case TOKEN_STR_else: return L"else keyword";
+			case TOKEN_STR_elseif: return L"elseif keyword";
+			case TOKEN_STR_end: return L"end keyword";
+			case TOKEN_STR_var: return L"var keyword";
+			case TOKEN_STR_call: return L"call keyword";
+			case TOKEN_STR_sub: return L"sub keyword";
+			case TOKEN_STR_callsub: return L"callsub keyword";
+			case TOKEN_STR_onevent: return L"onevent keyword";
+			case TOKEN_STR_abs: return L"abs keyword";
+			case TOKEN_STRING_LITERAL: return L"string";
+			case TOKEN_INT_LITERAL: return L"integer";
+			case TOKEN_PAR_OPEN: return L"( (open parenthesis)";
+			case TOKEN_PAR_CLOSE: return L") (close parenthesis)";
+			case TOKEN_BRACKET_OPEN: return L"[ (open bracket)";
+			case TOKEN_BRACKET_CLOSE: return L"] (close bracket)";
+			case TOKEN_COLON: return L": (colon)";
+			case TOKEN_COMMA: return L", (comma)";
+			case TOKEN_ASSIGN: return L"= (assignation)";
+			case TOKEN_OP_OR: return L"or";
+			case TOKEN_OP_AND: return L"and";
+			case TOKEN_OP_NOT: return L"not";
+			case TOKEN_OP_BIT_OR: return L"binary or";
+			case TOKEN_OP_BIT_XOR: return L"binary xor";
+			case TOKEN_OP_BIT_AND: return L"binary and";
+			case TOKEN_OP_BIT_NOT: return L"binary not";
+			case TOKEN_OP_EQUAL: return L"== (equal to)";
+			case TOKEN_OP_NOT_EQUAL: return L"!= (not equal to)";
+			case TOKEN_OP_BIGGER: return L"> (bigger than)";
+			case TOKEN_OP_BIGGER_EQUAL: return L">= (bigger or equal than)";
+			case TOKEN_OP_SMALLER: return L"< (smaller than)";
+			case TOKEN_OP_SMALLER_EQUAL: return L"<= (smaller or equal than)";
+			case TOKEN_OP_SHIFT_LEFT: return L"<< (shift left)";
+			case TOKEN_OP_SHIFT_RIGHT: return L">> (shift right)";
+			case TOKEN_OP_ADD: return L"+ (plus)";
+			case TOKEN_OP_NEG: return L"- (minus)";
+			case TOKEN_OP_MULT: return L"* (time)";
+			case TOKEN_OP_DIV: return L"/ (divide)";
+			case TOKEN_OP_MOD: return L"modulo";
+			default: return L"unknown";
 		}
 	}
 	
 	//! Return a string representation of the token
-	std::string Compiler::Token::toString() const
+	std::wstring Compiler::Token::toWString() const
 	{
-		std::ostringstream oss;
-		oss << "Line: " << pos.row + 1 << " Col: " << pos.column + 1 << " : ";
+		std::wostringstream oss;
+		oss << L"Line: " << pos.row + 1 << L" Col: " << pos.column + 1 << L" : ";
 		oss << typeName();
 		if (type == TOKEN_INT_LITERAL)
-			oss << " : " << iValue;
+			oss << L" : " << iValue;
 		if (type == TOKEN_STRING_LITERAL)
-			oss << " : " << sValue;
+			oss << L" : " << sValue;
 		return oss.str();
 	}
 	
@@ -198,7 +198,7 @@ namespace Aseba
 							if (source.eof())
 							{
 								// EOF -> unbalanced block
-								throw Error(begin, "Unbalanced comment block.");
+								throw Error(begin, L"Unbalanced comment block.");
 							}
 						}
 						// fetch the #
@@ -239,7 +239,7 @@ namespace Aseba
 						pos.character++;
 					}
 					else
-						throw Error(pos, "syntax error");
+						throw Error(pos, L"syntax error");
 				break;
 				
 				case '=':
@@ -296,15 +296,15 @@ namespace Aseba
 				default:
 				{
 					// check first character
-					if (!std::isalnum(c) && (c != '_'))
-						throw Error(pos, "identifiers must begin with _ and an alphanumeric character");
+					if (!iswalnum(c) && (c != '_'))
+						throw Error(pos, L"identifiers must begin with _ and an alphanumeric character");
 					
 					// get a string
-					std::string s;
+					std::wstring s;
 					s += c;
 					wchar_t nextC = source.peek();
 					int posIncrement = 0;
-					while ((source.good()) && (std::isalnum(nextC) || (nextC == '_') || (nextC == '.')))
+					while ((source.good()) && (iswalnum(nextC) || (nextC == '_') || (nextC == '.')))
 					{
 						s += nextC;
 						source.get();
@@ -323,16 +323,16 @@ namespace Aseba
 							{
 								for (unsigned i = 2; i < s.size(); i++)
 									if (!std::isxdigit(s[i]))
-										throw Error(pos, "error in hexadecimal number");
+										throw Error(pos, L"error in hexadecimal number");
 							}
 							else if (s[1] == 'b')
 							{
 								for (unsigned i = 2; i < s.size(); i++)
 									if ((s[i] != '0') && (s[i] != '1'))
-										throw Error(pos, "error in binary number");
+										throw Error(pos, L"error in binary number");
 							}
 							else
-								throw Error(pos, "error in number, invalid base");
+								throw Error(pos, L"error in number, invalid base");
 							
 						}
 						else
@@ -340,54 +340,54 @@ namespace Aseba
 							// check if we have a valid number
 							for (unsigned i = 1; i < s.size(); i++)
 								if (!std::isdigit(s[i]))
-									throw Error(pos, "error in number");
+									throw Error(pos, L"error in number");
 						}
 						tokens.push_back(Token(Token::TOKEN_INT_LITERAL, pos, s));
 					}
 					else
 					{
 						// check if it is a known keyword
-						if (s == "when")
+						if (s == L"when")
 							tokens.push_back(Token(Token::TOKEN_STR_when, pos));
-						else if (s == "emit")
+						else if (s == L"emit")
 							tokens.push_back(Token(Token::TOKEN_STR_emit, pos));
-						else if (s == "for")
+						else if (s == L"for")
 							tokens.push_back(Token(Token::TOKEN_STR_for, pos));
-						else if (s == "in")
+						else if (s == L"in")
 							tokens.push_back(Token(Token::TOKEN_STR_in, pos));
-						else if (s == "step")
+						else if (s == L"step")
 							tokens.push_back(Token(Token::TOKEN_STR_step, pos));
-						else if (s == "while")
+						else if (s == L"while")
 							tokens.push_back(Token(Token::TOKEN_STR_while, pos));
-						else if (s == "do")
+						else if (s == L"do")
 							tokens.push_back(Token(Token::TOKEN_STR_do, pos));
-						else if (s == "if")
+						else if (s == L"if")
 							tokens.push_back(Token(Token::TOKEN_STR_if, pos));
-						else if (s == "then")
+						else if (s == L"then")
 							tokens.push_back(Token(Token::TOKEN_STR_then, pos));
-						else if (s == "else")
+						else if (s == L"else")
 							tokens.push_back(Token(Token::TOKEN_STR_else, pos));
-						else if (s == "elseif")
+						else if (s == L"elseif")
 							tokens.push_back(Token(Token::TOKEN_STR_elseif, pos));
-						else if (s == "end")
+						else if (s == L"end")
 							tokens.push_back(Token(Token::TOKEN_STR_end, pos));
-						else if (s == "var")
+						else if (s == L"var")
 							tokens.push_back(Token(Token::TOKEN_STR_var, pos));
-						else if (s == "call")
+						else if (s == L"call")
 							tokens.push_back(Token(Token::TOKEN_STR_call, pos));
-						else if (s == "sub")
+						else if (s == L"sub")
 							tokens.push_back(Token(Token::TOKEN_STR_sub, pos));
-						else if (s == "callsub")
+						else if (s == L"callsub")
 							tokens.push_back(Token(Token::TOKEN_STR_callsub, pos));
-						else if (s == "onevent")
+						else if (s == L"onevent")
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
-						else if (s == "abs")
+						else if (s == L"abs")
 							tokens.push_back(Token(Token::TOKEN_STR_abs, pos));
-						else if (s == "or")
+						else if (s == L"or")
 							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
-						else if (s == "and")
+						else if (s == L"and")
 							tokens.push_back(Token(Token::TOKEN_OP_AND, pos));
-						else if (s == "not")
+						else if (s == L"not")
 							tokens.push_back(Token(Token::TOKEN_OP_NOT, pos));
 						else
 							tokens.push_back(Token(Token::TOKEN_STRING_LITERAL, pos, s));
@@ -404,9 +404,9 @@ namespace Aseba
 	}
 	
 	//! Debug print of tokens
-	void Compiler::dumpTokens(std::ostream &dest) const
+	void Compiler::dumpTokens(std::wostream &dest) const
 	{
 		for (unsigned i = 0; i < tokens.size(); i++)
-			dest << tokens[i].toString() << std::endl;
+			dest << tokens[i].toWString() << std::endl;
 	}
 }; // Aseba

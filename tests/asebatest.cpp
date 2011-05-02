@@ -145,7 +145,7 @@ struct AsebaNode
 		AsebaVMInit(&vm);
 		
 		// fill description accordingly
-		d.name = "testvm";
+		d.name = L"testvm";
 		d.protocolVersion = ASEBA_PROTOCOL_VERSION;
 		
 		d.bytecodeSize = vm.bytecodeSize;
@@ -183,14 +183,14 @@ struct AsebaNode
 	}
 };
 
-void checkForError(const std::string& module, bool shouldFail, bool wasError, const std::string& errorMessage = "")
+void checkForError(const std::string& module, bool shouldFail, bool wasError, const std::wstring& errorMessage = L"")
 {
 	if (wasError)
 	{
 		// errors
 		std::cerr << "An error in " << module << " occured";
 		if (!errorMessage.empty())
-			std::cerr << ":" << std::endl << errorMessage;
+			std::wcerr << ':' << std::endl << errorMessage;
 		std::cerr << std::endl;
 		if (shouldFail)
 		{
@@ -294,13 +294,13 @@ int main(int argc, char** argv)
 	compiler.setTargetDescription(node.getTargetDescription());
 	compiler.setCommonDefinitions(&definitions);
 	if (dump)
-		compiler.compile(ifs, bytecode, varCount, outError, &(std::cout));
+		compiler.compile(ifs, bytecode, varCount, outError, &(std::wcout));
 	else
 		compiler.compile(ifs, bytecode, varCount, outError, NULL);
 
 	ifs.close();
 	
-	checkForError("Compilation", should_fail, (outError.message != "not defined"), outError.toString());
+	checkForError("Compilation", should_fail, (outError.message != L"not defined"), outError.toWString());
 	
 	// run
 	if (!node.loadBytecode(bytecode))
