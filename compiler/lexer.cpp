@@ -19,6 +19,7 @@
 */
 
 #include "compiler.h"
+#include "../utils/FormatableString.h"
 #include <cstdlib>
 #include <sstream>
 #include <ostream>
@@ -297,7 +298,7 @@ namespace Aseba
 				{
 					// check first character
 					if (!iswalnum(c) && (c != '_'))
-						throw Error(pos, L"identifiers must begin with _ and an alphanumeric character");
+						throw Error(pos, WFormatableString(L"identifiers must begin with _ and an alphanumeric character, found unicode character 0x%0 instead").arg((unsigned)c, 0, 16));
 					
 					// get a string
 					std::wstring s;

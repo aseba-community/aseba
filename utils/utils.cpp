@@ -126,64 +126,98 @@ namespace Aseba
 	
 	std::string WStringToUTF8(const std::wstring& s)
 	{
-		//std::wcerr << "converting to utf " << s << std::endl;
-		mbstate_t state;
-		memset (&state, '\0', sizeof (state));
-		const wchar_t* src = s.c_str();
-		const size_t count = wcsrtombs(0, &src, 0, &state);
-		//if (count == std::numeric_limits<size_t>::max())
-		//	return "Invalid input string";
 		std::string os;
-		os.resize(count);
-		memset (&state, '\0', sizeof (state));
-		src = s.c_str();
-		wcsrtombs(&os[0], &src, count, &state);
-		//std::cerr << "result " << os << std::endl;
+		for (size_t i = 0; i < s.length(); ++i)
+		{
+			const wchar_t c(s[i]);
+			if (c < 0x80)
+			{
+				os += static_cast<uint8_t>(c);
+			}
+			else if (c < 0x800)
+			{
+				os += static_cast<uint8_t>(((c>>6)&0x1F)|0xC0);
+				os += static_cast<uint8_t>((c&0x3F)|0x80);
+			}
+			else if (c < 0xd800)
+			{
+				os += static_cast<uint8_t>(((c>>12)&0x0F)|0xE0);
+				os += static_cast<uint8_t>(((c>>6)&0x3F)|0x80);
+				os += static_cast<uint8_t>((c&0x3F)|0x80);
+			}
+			else
+			{
+				os += '?';
+			}
+		}
+		// TODO: add >UTF16 support
 		return os;
 	}
 	
-	#define BOM8A 0xEF
-	#define BOM8B 0xBB
-	#define BOM8C 0xBF
+	/*
 	
-	// code from http://www.cplusplus.com/forum/general/7142/
-	// TODO: if it works, keep it and add (c)
+	This code is heavily inspired by http://www.cplusplus.com/forum/general/7142/
+	released under the following license:
 	
+	* Copyright (c) 2009, Helios (helios.vmg@gmail.com)
+	* All rights reserved.
+	*
+	* Redistribution and use in source and binary forms, with or without
+	* modification, are permitted provided that the following conditions are met:
+	*     * Redistributions of source code must retain the above copyright notice,
+	*       this list of conditions and the following disclaimer.
+	*     * Redistributions in binary form must reproduce the above copyright
+	*       notice, this list of conditions and the following disclaimer in the
+	*       documentation and/or other materials provided with the distribution.
+	*
+	* THIS SOFTWARE IS PROVIDED BY HELIOS "AS IS" AND ANY EXPRESS OR IMPLIED
+	* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+	* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+	* EVENT SHALL HELIOS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+	* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+	* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+	* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+	* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+	* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+	* OF THE POSSIBILITY OF SUCH DAMAGE.
+	*/
+
 	std::wstring UTF8ToWString(const std::string& s)
 	{
 		std::wstring res;
-		const char * string(s.c_str());
-		
-		long b=0, c=0;
-		if ((uint8_t)string[0]==BOM8A && (uint8_t)string[1]==BOM8B && (uint8_t)string[2]==BOM8C)
-			string+=3;
-		for (const char *a=string;*a;a++)
-			if (((uint8_t)*a)<128 || (*a&192)==192)
-				c++;
-		res.resize(c);
-		for (uint8_t *a=(uint8_t*)string;*a;a++)
+		for (size_t i = 0; i < s.length(); ++i)
 		{
+			const char *a = &s[i];
 			if (!(*a&128))
+			{
 				//Byte represents an ASCII character. Direct copy will do.
-				res[b]=*a;
+				res += *a;
+			}
 			else if ((*a&192)==128)
+			{
 				//Byte is the middle of an encoded character. Ignore.
 				continue;
+			}
 			else if ((*a&224)==192)
+			{
 				//Byte represents the start of an encoded character in the range
 				//U+0080 to U+07FF
-				res[b]=((*a&31)<<6)|a[1]&63;
+				res += ((*a&31)<<6)|a[1]&63;
+			}
 			else if ((*a&240)==224)
+			{
 				//Byte represents the start of an encoded character in the range
 				//U+07FF to U+FFFF
-				res[b]=((*a&15)<<12)|((a[1]&63)<<6)|a[2]&63;
-			else if ((*a&248)==240){
+				res += ((*a&15)<<12)|((a[1]&63)<<6)|a[2]&63;
+			}
+			else if ((*a&248)==240)
+			{
 				//Byte represents the start of an encoded character beyond the
 				//U+FFFF limit of 16-bit integers
-				res[b]='?';
+				res += '?';
 			}
-			b++;
 		}
+		// TODO: add >UTF16 support
 		return res;
 	}
 	
