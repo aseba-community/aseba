@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(aseba)
 
-# svn revision
+# version management
 if (USER_VERSION)
-	message("User version given: " USER_VERSION)
+	message("-- User version given: " ${USER_VERSION})
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"${USER_VERSION}\"\n")
 else (USER_VERSION)
 	find_package(Subversion)
@@ -23,7 +23,7 @@ else (USER_VERSION)
 		add_custom_target(versionheader ALL DEPENDS ${CMAKE_BINARY_DIR}/version.h)
 		set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
 	else (SUBVERSION_FOUND AND HAS_SVN_REP)
-		message("Not a svn repository and no user version given, version is unknown.")
+		message("-- Not a svn repository and no user version given, version is unknown.")
 		file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"unknown\"\n")
 	endif (SUBVERSION_FOUND AND HAS_SVN_REP)
 endif (USER_VERSION)
