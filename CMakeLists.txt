@@ -4,7 +4,10 @@ project(aseba)
 
 # svn revision
 find_package(Subversion)
-if (SUBVERSION_FOUND)
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
+	set(HAS_SVN_REP 1)
+endif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
+if (SUBVERSION_FOUND AND HAS_SVN_REP)
 	# extract working copy information for SOURCE_DIR into MY_XXX variables
 	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
 	# write a file with the SVNVERSION define
@@ -14,9 +17,9 @@ if (SUBVERSION_FOUND)
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different version.h.txt version.h)
 	add_custom_target(versionheader ALL DEPENDS ${CMAKE_BINARY_DIR}/version.h)
 	set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
-else (SUBVERSION_FOUND)
+else (SUBVERSION_FOUND AND HAS_SVN_REP)
 	file(WRITE ${CMAKE_BINARY_DIR}/version.txt "#define ASEBA_VERSION \"unknown\n")
-endif (SUBVERSION_FOUND)
+endif (SUBVERSION_FOUND AND HAS_SVN_REP)
 
 # Dashel
 # TODO: make Dashel.cmake to perform this
