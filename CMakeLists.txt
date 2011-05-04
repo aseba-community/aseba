@@ -2,6 +2,22 @@ cmake_minimum_required(VERSION 2.6)
 
 project(aseba)
 
+# svn revision
+find_package(Subversion)
+if (SUBVERSION_FOUND)
+	# extract working copy information for SOURCE_DIR into MY_XXX variables
+	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
+	# write a file with the SVNVERSION define
+	file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_VERSION \"svn-${ASEBA_WC_REVISION}\"\n")
+	# copy the file to the final header only if the version changes
+	# reduces needless rebuilds
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different version.h.txt version.h)
+	add_custom_target(versionheader ALL DEPENDS ${CMAKE_BINARY_DIR}/version.h)
+	set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
+else (SUBVERSION_FOUND)
+	file(WRITE ${CMAKE_BINARY_DIR}/version.txt "#define ASEBA_VERSION \"unknown\n")
+endif (SUBVERSION_FOUND)
+
 # Dashel
 # TODO: make Dashel.cmake to perform this
 

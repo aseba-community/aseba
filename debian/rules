@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
 
+DEBVERS := $(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*//')
+
 build: clean
 	mkdir debian/build
 	cd debian/build && cmake -D CMAKE_BUILD_TYPE=relwithdebuginfo -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..

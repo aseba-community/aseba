@@ -29,9 +29,10 @@ if (QT4_FOUND)
 	
 	qt4_add_resources(resfiles asebastudio.qrc)
 	
-	include_directories (${CMAKE_BINARY_DIR}/studio)
+	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	
-	add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles})
+	add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	add_dependencies(asebastudio versionheader)
 	
 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt found")
@@ -41,7 +42,7 @@ if (QT4_FOUND)
 	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt not found")
 	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
-	
+
 	target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
 	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)

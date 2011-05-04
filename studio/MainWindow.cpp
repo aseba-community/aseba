@@ -38,14 +38,13 @@
 #include <QTabWidget>
 
 #include <MainWindow.moc>
+#include <version.h>
 
 using std::copy;
 
 
 namespace Aseba
 {
-	#define ASEBA_SVN_REV "$Revision$"
-	
 // 	/** \addtogroup studio */
 	/*@{*/
 
@@ -874,19 +873,15 @@ namespace Aseba
 		delete target;
 	}
 	
-	#ifndef SVN_REV
-	#define SVN_REV "unknown, please configure your build system to set SVN_REV correctly"
-	#endif
-
 	void MainWindow::about()
 	{
-		QString revString(ASEBA_SVN_REV);
-		QStringList revStringList = revString.split(" ");
-		revStringList.pop_front();
+		#ifndef ASEBA_VERSION
+		#define ASEBA_VERSION "unknown, please configure your build system to set ASEBAVERSION correctly"
+		#endif // ASEBA_VERSION
 		
 		QString text = tr(	"<p>Aseba pre-release:</p>" \
 						"<ul><li>Aseba " \
-						"SVN rev. %0 / protocol ver. %1" \
+						"ver. %0 / protocol ver. %1" \
 						"</li><li>Dashel ver. "\
 						DASHEL_VERSION \
 						"</li></ul>" \
@@ -894,7 +889,7 @@ namespace Aseba
 						"<p><a href=\"http://aseba.wikidot.com\">http://aseba.wikidot.com</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
-		text = text.arg(revStringList.front()).arg(ASEBA_PROTOCOL_VERSION);
+		text = text.arg(ASEBA_VERSION).arg(ASEBA_PROTOCOL_VERSION);
 		
 		QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
