@@ -8,6 +8,7 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
 	set(HAS_SVN_REP 1)
 endif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
 if (SUBVERSION_FOUND AND HAS_SVN_REP)
+	set(HAS_DYN_VERSION)
 	# extract working copy information for SOURCE_DIR into MY_XXX variables
 	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
 	# write a file with the SVNVERSION define
@@ -18,7 +19,7 @@ if (SUBVERSION_FOUND AND HAS_SVN_REP)
 	add_custom_target(versionheader ALL DEPENDS ${CMAKE_BINARY_DIR}/version.h)
 	set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
 else (SUBVERSION_FOUND AND HAS_SVN_REP)
-	file(WRITE ${CMAKE_BINARY_DIR}/version.txt "#define ASEBA_VERSION \"unknown\n")
+	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"unknown\n")
 endif (SUBVERSION_FOUND AND HAS_SVN_REP)
 
 # Dashel
