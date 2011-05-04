@@ -875,10 +875,6 @@ namespace Aseba
 	
 	void MainWindow::about()
 	{
-		#ifndef ASEBA_VERSION
-		#define ASEBA_VERSION "unknown, please configure your build system to set ASEBAVERSION correctly"
-		#endif // ASEBA_VERSION
-		
 		QString text = tr(	"<p>Aseba pre-release:</p>" \
 						"<ul><li>Aseba " \
 						"ver. %0 / protocol ver. %1" \
