@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Aseba Studio
+GenericName=Integrated Development Environment
+GenericName[fr]=Environnement de développement intégré
+Exec=asebastudio
+TryExec=asebastudio
+Categories=Education;Science
+Icon=asebastudio.png

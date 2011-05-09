@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Aseba Playground
+GenericName=Aseba e-puck robot simulator for solo play
+GenericName[fr]=Simulateur de robot Aseba e-puck pour jeu solo
+Exec=asebaplayground
+TryExec=asebaplayground
+Categories=Education;Science;Aseba
+Icon=asebaplayground.png
