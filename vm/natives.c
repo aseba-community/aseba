@@ -940,4 +940,43 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzerosequence =
 	}
 };
 
+static uint16 rnd_state;
+
+void AsebaSetRandomSeed(uint16 seed)
+{
+	rnd_state = seed;
+}
+
+uint16 AsebaGetRandom()
+{
+	rnd_state = 25173 * rnd_state + 13849;
+	return rnd_state;
+}
+
+void AsebaNative_rand(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 destIndex = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		vm->variables[destIndex++] = (sint16)AsebaGetRandom();
+	}
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_rand =
+{
+	"math.rand",
+	"fill array with random values",
+	{
+		{ -1, "dest" },
+		{ 0, 0 }
+	}
+};
+
+
 /*@}*/

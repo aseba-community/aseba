@@ -182,6 +182,15 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm);
 /*! Description of AsebaNative_vecnonzerosequence */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzerosequence;
 
+/*! Functon to set the seed of random generator */
+void AsebaSetRandomSeed(uint16 seed);
+/*! Functon to get a random number */
+uint16 AsebaGetRandom();
+/*! Function to get a 16-bit signed random number */
+void AsebaNative_rand(AsebaVMState *vm);
+/*! Description of AsebaNative_rand */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
+
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
 	AsebaNative_veccopy, \
@@ -201,7 +210,8 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzeroseq
 	AsebaNative_mathcos, \
 	AsebaNative_mathrot2, \
 	AsebaNative_mathsqrt, \
-	AsebaNative_vecnonzerosequence
+	AsebaNative_vecnonzerosequence, \
+	AsebaNative_rand
 
 /*! snippet to include descriptions of standard native functions */
 #define ASEBA_NATIVES_STD_DESCRIPTIONS \
@@ -222,7 +232,8 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzeroseq
 	&AsebaNativeDescription_mathcos, \
 	&AsebaNativeDescription_mathrot2, \
 	&AsebaNativeDescription_mathsqrt, \
-	&AsebaNativeDescription_vecnonzerosequence
+	&AsebaNativeDescription_vecnonzerosequence, \
+	&AsebaNativeDescription_rand
 
 /*@}*/
 
