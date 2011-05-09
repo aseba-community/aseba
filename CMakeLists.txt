@@ -8,9 +8,20 @@ if (USER_VERSION)
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"${USER_VERSION}\"\n")
 else (USER_VERSION)
 	find_package(Subversion)
+	
+	if (SUBVERSION_FOUND)
+		message("-- Subversion executable found")
+	else (SUBVERSION_FOUND)
+		message("-- Subversion executable NOT found")
+	endif (SUBVERSION_FOUND)
+	
 	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
+		message("-- SVN repository found")
 		set(HAS_SVN_REP 1)
+	else (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
+		message("-- SVN repository NOT found")
 	endif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
+	
 	if (SUBVERSION_FOUND AND HAS_SVN_REP)
 		set(HAS_DYN_VERSION)
 		# extract working copy information for SOURCE_DIR into MY_XXX variables
