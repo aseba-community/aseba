@@ -32,8 +32,6 @@
 #include <map>
 #include <dashel/dashel.h>
 
-#include "MainWindow.h"
-
 class QPushButton;
 class QGroupBox;
 class QLineEdit;
