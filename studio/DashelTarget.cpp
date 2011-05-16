@@ -49,11 +49,13 @@ namespace Aseba
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
 		QSettings settings;
+		const unsigned sectionEnabled(settings.value("connection dialog enabled group", 0).toUInt());
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
 		netGroupBox = new QGroupBox(tr("Network (TCP)"));
 		netGroupBox->setCheckable(true);
+		netGroupBox->setChecked(sectionEnabled == 0);
 		QGridLayout* netLayout = new QGridLayout;
 		netLayout->addWidget(new QLabel(tr("Host")), 0, 0);
 		netLayout->addWidget(new QLabel(tr("Port")), 0, 1);
@@ -70,17 +72,19 @@ namespace Aseba
 		
 		serialGroupBox = new QGroupBox(tr("Serial"));
 		serialGroupBox->setCheckable(true);
-		serialGroupBox->setChecked(false);
+		serialGroupBox->setChecked(sectionEnabled == 1);
 		QHBoxLayout* serialLayout = new QHBoxLayout();
 		serial = new QListWidget();
 		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		PortsMap ports = SerialPortEnumerator::getPorts();
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
-			QListWidgetItem* item = new QListWidgetItem(QString(it->second.second.c_str()));
+			const QString text(it->second.second.c_str());
+			QListWidgetItem* item = new QListWidgetItem(text);
 			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
 			serial->addItem(item);
-		//
+			if (settings.value("serial name") == text)
+				serial->setCurrentItem(item);
 		}
 		serial->setSelectionMode(QAbstractItemView::SingleSelection);
 		serialLayout->addWidget(serial);
@@ -91,7 +95,7 @@ namespace Aseba
 		
 		customGroupBox = new QGroupBox(tr("Custom"));
 		customGroupBox->setCheckable(true);
-		customGroupBox->setChecked(false);
+		customGroupBox->setChecked(sectionEnabled == 2);
 		QHBoxLayout* customLayout = new QHBoxLayout();
 		custom = new QLineEdit(settings.value("custom target", ASEBA_DEFAULT_TARGET).toString());
 		customLayout->addWidget(custom);
@@ -130,6 +134,7 @@ namespace Aseba
 		QSettings settings;
 		if (netGroupBox->isChecked())
 		{
+			settings.setValue("connection dialog enabled group", 0);
 			settings.setValue("tcp host", host->text());
 			settings.setValue("tcp port", port->value());
 			std::ostringstream oss;
@@ -138,11 +143,15 @@ namespace Aseba
 		}
 		else if (serialGroupBox->isChecked())
 		{
+			const QModelIndex item(serial->selectionModel()->selectedRows().first());
+			settings.setValue("connection dialog enabled group", 1);
+			settings.setValue("serial name", item.data());
 			QString target("ser:device=%0");
-			return target.arg(serial->selectionModel()->selectedRows().first().data(Qt::UserRole).toString()).toStdString();
+			return target.arg(item.data(Qt::UserRole).toString()).toStdString();
 		}
 		else if (customGroupBox->isChecked())
 		{
+			settings.setValue("connection dialog enabled group", 2);
 			settings.setValue("custom target", custom->text());
 			return custom->text().toStdString();
 		}
