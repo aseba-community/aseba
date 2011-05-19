@@ -27,6 +27,8 @@
 #include <dashel/dashel.h>
 
 using namespace std;
+#define bswap16(v) ({uint16 _v = v; _v = (_v >> 8) | (_v << 8);})
+#define bswap32(v) __builtin_bswap32(v)
 
 namespace Aseba
 {
@@ -147,10 +149,20 @@ namespace Aseba
 			cerr << endl;
 			abort();
 		}
-		
+#ifdef __BIG_ENDIAN__
+		uint16 t;
+
+		len = bswap16(len);
+		stream->write(&len,2);
+		t = bswap16(source);
+		stream->write(&t,2);
+		t = bswap16(type);
+		stream->write(&t,2);
+#else
 		stream->write(&len, 2);
 		stream->write(&source, 2);
 		stream->write(&type, 2);
+#endif
 		if(rawData.size())
 			stream->write(&rawData[0], rawData.size());
 	}
@@ -162,6 +174,11 @@ namespace Aseba
 		stream->read(&len, 2);
 		stream->read(&source, 2);
 		stream->read(&type, 2);
+#ifdef __BIG_ENDIAN__
+		len = bswap16(len);
+		source = bswap16(source);
+		type = bswap16(type);
+#endif
 		
 		// create message
 		Message *message = messageTypesInitializer.createMessage(type);
@@ -208,7 +225,27 @@ namespace Aseba
 	{
 		size_t pos = rawData.size();
 		rawData.reserve(pos + sizeof(T));
+		
+#ifdef __BIG_ENDIAN__
+		uint16 v16;
+		uint32 v32;
+		const uint8 *ptr;
+		if(sizeof(T) == 1) {
+			ptr = reinterpret_cast<const uint8 *>(&val);
+		} else if(sizeof(T) == 2) {
+			v16 = bswap16(*reinterpret_cast<const uint16*>(&val));
+			ptr = reinterpret_cast<const uint8 *>(&v16);
+		} else if(sizeof(T) == 4) {
+			v32 = bswap32(*reinterpret_cast<const uint32*>(&val));
+			ptr = reinterpret_cast<const uint8 *>(&v32);
+		} else { 
+			cerr << "Unable to bswap\n" << endl;
+			ptr = reinterpret_cast<const uint8 *>(&val);
+		}
+#else
 		const uint8 *ptr = reinterpret_cast<const uint8 *>(&val);
+#endif
+
 		copy(ptr, ptr + sizeof(T), back_inserter(rawData));
 	}
 	
@@ -246,6 +283,15 @@ namespace Aseba
 		T val;
 		uint8 *ptr = reinterpret_cast<uint8 *>(&val);
 		copy(rawData.begin() + pos, rawData.begin() + pos + sizeof(T), ptr);
+#ifdef __BIG_ENDIAN__
+		if(sizeof(T) == 2)
+			val = bswap16(val);
+		else if(sizeof(T) == 4)
+			val = bswap32(val);
+		else if(sizeof(T) != 1) {
+			cerr << "Unable to bswap\n" << endl;
+		}
+ #endif			
 		return val;
 	}
 	
