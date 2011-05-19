@@ -296,7 +296,8 @@ namespace Aseba
 			}
 			else if (dropSourceWidget == nodeTab->vmMemoryView)
 			{
-				bool isInVarDef(true);
+				// we do not want to define variables, as they are already defined
+				/*bool isInVarDef(true);
 				bool isInComment(false);
 				QTextBlock block(cursor.block().previous());
 				
@@ -350,7 +351,8 @@ namespace Aseba
 				}
 				// inserting variable
 				if (isInVarDef)
-					prefix = "var ";
+					prefix = "var ";*/
+				midfix = " ";
 			}
 			else if (dropSourceWidget == nodeTab->vmLocalEvents)
 			{
