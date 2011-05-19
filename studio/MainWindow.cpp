@@ -23,7 +23,6 @@
 #include "DashelTarget.h"
 #include "TargetModels.h"
 #include "NamedValuesVectorModel.h"
-#include "CustomDelegate.h"
 #include "AeslEditor.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
@@ -68,54 +67,6 @@ namespace Aseba
 	{
 		if (!isVisible())
 			emit hidden();
-	}
-
-	//////
-	
-	class DraggableListWidget: public QListWidget
-	{
-		QStringList mimeTypes () const
-		{
-			QStringList types;
-			types << "text/plain";
-			return types;
-		}
-		
-		QMimeData * mimeData ( const QList<QListWidgetItem *> items ) const
-		{
-			QString texts;
-			foreach (QListWidgetItem *item, items)
-			{
-				texts += item->text();
-			}
-			
-			QMimeData *mimeData = new QMimeData();
-			mimeData->setText(texts);
-			return mimeData;
-		}
-	};
-	
-	//////
-
-	FixedWidthTableView::FixedWidthTableView()
-	{
-		col1Width = 50;
-		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	}
-	
-	void FixedWidthTableView::setSecondColumnLongestContent(const QString& content)
-	{
-		Q_ASSERT(model ()->columnCount() == 2);
-		QFontMetrics fm(font());
-		col1Width = fm.width(content);
-	}
-	
-	void FixedWidthTableView::resizeEvent ( QResizeEvent * event )
-	{
-		Q_ASSERT(model ()->columnCount() == 2);
-		int col0Width = event->size().width() - col1Width;
-		setColumnWidth(0, col0Width);
-		setColumnWidth(1, col1Width);
 	}
 	
 	//////
@@ -164,7 +115,7 @@ namespace Aseba
 	void ScriptTab::createEditor()
 	{
 		// editor widget
-		editor = new AeslEditor;
+		editor = new AeslEditor(this);
 		highlighter = new AeslHighlighter(editor, editor->document());
 	}
 	
@@ -2263,6 +2214,7 @@ namespace Aseba
 		
 		// Debug toolbar
 		QToolBar* globalToolBar = addToolBar(tr("Debug"));
+		globalToolBar->setObjectName("debug toolbar");
 		globalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 		globalToolBar->addAction(loadAllAct);
 		globalToolBar->addAction(resetAllAct);

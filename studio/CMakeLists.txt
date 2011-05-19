@@ -17,6 +17,7 @@ if (QT4_FOUND)
 		ClickableLabel.cpp
 		DashelTarget.cpp
 		CustomDelegate.cpp
+		CustomWidgets.cpp
 		main.cpp
 		FindDialog.cpp
 		Target.cpp

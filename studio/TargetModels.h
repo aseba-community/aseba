@@ -155,6 +155,7 @@ namespace Aseba
 		void recreateTreeFromDescription(bool showHidden);
 		
 	private:
+		friend class AeslEditor;
 		TreeItem *getItem(const QModelIndex &index) const;
 		QString getToolTip(const TargetDescription::NativeFunction& function) const;
 		

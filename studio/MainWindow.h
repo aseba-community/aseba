@@ -33,6 +33,7 @@
 #include <QCloseEvent>
 
 #include "CustomDelegate.h"
+#include "CustomWidgets.h"
 
 #include "../compiler/compiler.h"
 #include <fstream>
@@ -79,19 +80,6 @@ namespace Aseba
 		void hidden();
 	protected:
 		virtual void hideEvent ( QHideEvent * event );
-	};
-	
-	class FixedWidthTableView : public QTableView
-	{
-	protected:
-		int col1Width;
-		
-	public:
-		FixedWidthTableView();
-		void setSecondColumnLongestContent(const QString& content);
-	
-	protected:
-		virtual void resizeEvent ( QResizeEvent * event );
 	};
 
 	class EditorsPlotsTabWidget: public QTabWidget
@@ -200,6 +188,8 @@ namespace Aseba
 	
 	private:
 		friend class MainWindow;
+		friend class AeslEditor;
+		
 		MainWindow* mainWindow;
 		QLabel *cursorPosText;
 		QLabel *compilationResultImage;
@@ -335,6 +325,7 @@ namespace Aseba
 		
 		// tabs and nodes
 		friend class NodeTab;
+		friend class AeslEditor;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
 		

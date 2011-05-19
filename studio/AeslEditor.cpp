@@ -19,6 +19,8 @@
 */
 
 #include "AeslEditor.h"
+#include "MainWindow.h"
+#include "CustomWidgets.h"
 #include <QtGui>
 
 #include <AeslEditor.moc>
@@ -224,8 +226,10 @@ namespace Aseba
 		}
 	}
 	
-	AeslEditor::AeslEditor() :
-		debugging(false)
+	AeslEditor::AeslEditor(const ScriptTab* tab) :
+		tab(tab),
+		debugging(false),
+		dropSourceWidget(0)
 	{
 		QFont font;
 		font.setFamily("");
@@ -234,13 +238,145 @@ namespace Aseba
 		//font.setPointSize(10);
 		setFont(font);
 		setAcceptDrops(true);
+		setAcceptRichText(false);
 		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
 	}
 	
 	void AeslEditor::dropEvent(QDropEvent *event)
 	{
+		dropSourceWidget = event->source();
 		QTextEdit::dropEvent(event);
+		dropSourceWidget = 0;
 		setFocus(Qt::MouseFocusReason);
+	}
+	
+	void AeslEditor::insertFromMimeData ( const QMimeData * source )
+	{
+		QTextCursor cursor(this->textCursor());
+		
+		// check whether we are at the beginning of a line
+		bool startOfLine(cursor.atBlockStart());
+		const int posInBlock(cursor.position() - cursor.positionInBlock());
+		if (!startOfLine && posInBlock)
+		{
+			const QString startText(cursor.block().text().left(posInBlock));
+			startOfLine = !startText.contains(QRegExp("\\S"));
+		}
+		
+		// if beginning of a line and source widget is known, add some helper text
+		if (dropSourceWidget && startOfLine)
+		{
+			const NodeTab* nodeTab(dynamic_cast<const NodeTab*>(tab));
+			QString prefix(""); // before the text
+			QString midfix(""); // between the text and the cursor
+			QString postfix(""); // after the curser
+			if (dropSourceWidget == nodeTab->vmFunctionsView)
+			{
+				// inserting function
+				prefix = "call ";
+				midfix = "(";
+				// fill call from doc
+				const TargetDescription *desc = nodeTab->vmFunctionsModel->descriptionRead;
+				const std::wstring funcName = source->text().toStdWString();
+				for (size_t i = 0; i < desc->nativeFunctions.size(); i++)
+				{
+					const TargetDescription::NativeFunction native(desc->nativeFunctions[i]);
+					if (native.name == funcName)
+					{
+						for (size_t j = 0; j < native.parameters.size(); ++j)
+						{
+							postfix += QString::fromStdWString(native.parameters[j].name);
+							if (j + 1 < native.parameters.size())
+								postfix += ", ";
+						}
+						break;
+					}
+				}
+				postfix += ")\n";
+			}
+			else if (dropSourceWidget == nodeTab->vmMemoryView)
+			{
+				bool isInVarDef(true);
+				bool isInComment(false);
+				QTextBlock block(cursor.block().previous());
+				
+				QRegExp emptyRE("^\\s*$");
+				QRegExp varDefRE("^\\s*var\\s");
+				QRegExp slCommentRE("^\\s*#");
+				QRegExp mlCommentSLRE("^\\s*#\\*.*\\*#\\s*$");
+				QRegExp mlCommentStartRE("#\\*");
+				QRegExp mlCommentEndEOLRE("\\*#\\s*$");
+				QRegExp mlCommentEndRE("\\*#");
+				
+				while (block.isValid())
+				{
+					const QString& text(block.text());
+					const bool inSlMlComment(text.contains(mlCommentSLRE));
+					
+					if (!inSlMlComment && text.contains(mlCommentStartRE))
+					{
+						if (isInComment)
+						{
+							isInComment = false;
+						}
+						else
+						{
+							// we saw a start-of-comment while not seen comment entering, meaning that we have been copy/pasted inside the comment
+							isInVarDef = false;
+							break;
+						}
+					}
+					
+					if (!isInComment)
+					{
+						if (!inSlMlComment && text.contains(mlCommentEndRE))
+						{
+							isInComment = true;
+						}
+						
+						if (
+							!text.contains(emptyRE) &&
+							!text.contains(varDefRE) &&
+							!text.contains(slCommentRE) &&
+							!text.contains(mlCommentEndEOLRE)
+						)
+						{
+							isInVarDef = false;
+							break;
+						}
+					}
+					
+					block = block.previous();
+				}
+				// inserting variable
+				if (isInVarDef)
+					prefix = "var ";
+			}
+			else if (dropSourceWidget == nodeTab->vmLocalEvents)
+			{
+				// inserting local event
+				prefix = "onevent ";
+				midfix = "\n";
+			}
+			else if (dropSourceWidget == nodeTab->mainWindow->eventsDescriptionsView)
+			{
+				// inserting global event
+				prefix = "onevent ";
+				midfix = "\n";
+			}
+			
+			cursor.beginEditBlock();
+			cursor.insertText(prefix + source->text() + midfix);
+			const int pos = cursor.position();
+			cursor.insertText(postfix);
+			cursor.setPosition(pos);
+			cursor.endEditBlock();
+
+			this->setTextCursor(cursor);
+		}
+		else
+			cursor.insertText(source->text());
+		
 	}
 	
 	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )

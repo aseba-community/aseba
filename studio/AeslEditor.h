@@ -80,6 +80,8 @@ namespace Aseba
 		virtual ~AeslEditorUserData() { }
 	};
 	
+	class ScriptTab;
+	
 	class AeslEditor : public QTextEdit
 	{
 		Q_OBJECT
@@ -90,15 +92,18 @@ namespace Aseba
 		void breakpointClearedAll();
 		
 	public:
-		AeslEditor();
+		AeslEditor(const ScriptTab* tab);
 		virtual ~AeslEditor() { }
 		virtual void contextMenuEvent ( QContextMenuEvent * e );
 	
 	public:
+		const ScriptTab* tab;
 		bool debugging;
+		QWidget *dropSourceWidget;
 	
 	protected:
 		virtual void dropEvent(QDropEvent *event);
+		virtual void insertFromMimeData ( const QMimeData * source );
 		virtual void keyPressEvent(QKeyEvent * event);
 	};
 	
