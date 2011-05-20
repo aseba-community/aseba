@@ -64,10 +64,13 @@ namespace Enki
 			
 			Event(Dashel::Stream* stream)
 			{
+				uint16 temp;
 				uint16 len;
-				stream->read(&len, 2);
-				stream->read(&source, 2);
-				data.resize(len+2);
+				stream->read(&temp, 2);
+				len = bswap16(temp);
+				stream->read(&temp, 2);
+				source = bswap16(temp);
+				data.resize(len + 2);
 				stream->read(&data[0], data.size());
 			}
 		};

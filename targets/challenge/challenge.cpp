@@ -931,7 +931,6 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	assert(stream);
 	
 	uint16 temp;
-	
 	temp = bswap16(length - 2);
 	stream->write(&temp, 2);
 	temp = bswap16(vm->nodeId);

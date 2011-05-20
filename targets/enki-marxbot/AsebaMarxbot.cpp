@@ -65,9 +65,11 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	assert(stream);
 	
 	// send to stream
-	uint16 len = length - 2;
-	stream->write(&len, 2);
-	stream->write(&vm->nodeId, 2);
+	uint16 temp;
+	temp = bswap16(length - 2);
+	stream->write(&temp, 2);
+	temp = bswap16(vm->nodeId);
+	stream->write(&temp, 2);
 	stream->write(data, length);
 	stream->flush();
 	
