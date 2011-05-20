@@ -99,7 +99,7 @@ namespace Aseba
 			((a>>56)&0x00000000000000ffLL);
 	}
 	
-	#if __BIG_ENDIAN__
+	#ifdef __BIG_ENDIAN__
 	
 	template<typename T>
 	T swapEndianCopy(const T& v) { return ByteSwapper::swap<T>(v); }
