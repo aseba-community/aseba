@@ -249,13 +249,17 @@ namespace Enki
 		
 		void incomingData(Dashel::Stream *stream)
 		{
+			uint16 temp;
 			uint16 len;
-			stream->read(&len, 2);
-			stream->read(&lastMessageSource, 2);
+			
+			stream->read(&temp, 2);
+			len = bswap16(temp);
+			stream->read(&temp, 2);
+			lastMessageSource = bswap16(temp);
 			lastMessageData.resize(len+2);
 			stream->read(&lastMessageData[0], lastMessageData.size());
 			
-			if (*((uint16*)&lastMessageData[0]) >= 0xA000)
+			if (bswap16(*(uint16*)&lastMessageData[0]) >= 0xA000)
 				AsebaProcessIncomingEvents(&vm);
 			else
 				qDebug() << this << " : Non debug event dropped.";
@@ -926,9 +930,12 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
 	assert(stream);
 	
-	uint16 len = length - 2;
-	stream->write(&len, 2);
-	stream->write(&vm->nodeId, 2);
+	uint16 temp;
+	
+	temp = bswap16(length - 2);
+	stream->write(&temp, 2);
+	temp = bswap16(vm->nodeId);
+	stream->write(&temp, 2);
 	stream->write(data, length);
 	stream->flush();
 }

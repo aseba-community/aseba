@@ -38,6 +38,9 @@ extern "C" {
 	The layer does not uses acknowledgment, instead it trusts the
 	CAN checksum mechanism to ensure that other nodes on the CAN bus
 	received the data correctly.
+	
+	This transport layer only works on little-endian systems for now,
+	as it does not perform endian correction.
 */
 /*@{*/
 

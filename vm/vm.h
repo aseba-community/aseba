@@ -143,7 +143,15 @@ uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* dat
 
 /*! Called by AsebaStep if there is a message (not an user event) to send.
 	size is given in number of bytes. */
-void AsebaSendMessage(AsebaVMState *vm, uint16 id, void *data, uint16 size);
+void AsebaSendMessage(AsebaVMState *vm, uint16 id, const void *data, uint16 size);
+
+#ifdef __BIG_ENDIAN__
+/*! Called by AsebaStep if there is a message (not an user event) to send.
+	count is given in number of words. */
+void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count);
+#else
+	#define AsebaSendMessageWords(vm,type,data,size) AsebaSendMessage(vm,type,data,(size*2))
+#endif
 
 /*! Called by AsebaVMDebugMessage when some variables must be sent efficiently */
 void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length);

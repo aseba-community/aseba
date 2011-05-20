@@ -31,14 +31,7 @@
 #include "../common/types.h"
 #include "../utils/utils.h"
 #include "../msg/msg.h"
-
-#define bswap16(v) ({uint16 _v = v; _v = (_v << 8) | (_v >> 8);})
-
-#ifdef __BIG_ENDIAN__
-#define atohs(v) bswap16(v)
-#else
-#define atohs(v) (v)
-#endif
+#include "../msg/endian.h"
 
 namespace Aseba 
 {
@@ -77,11 +70,11 @@ namespace Aseba
 		// max packet length is 65533
 		// packet source and packet type is not counted in len,
 		// thus read buffer is of size len + 4
-		uint16 len;
+		uint16 netLen;
 		
 		// read the transfer size
-		stream->read(&len, 2);
-		len = atohs(len);
+		stream->read(&netLen, 2);
+		const uint16 len(swapEndianCopy(netLen));
 		
 		// allocate the read buffer and do socket read
 		std::valarray<uint8> readbuff((uint8)0, len + 4);
@@ -106,9 +99,7 @@ namespace Aseba
 			
 			try
 			{
-				len = atohs(len);
-				
-				destStream->write(&len, 2);
+				destStream->write(&netLen, 2);
 				destStream->write(&readbuff[0], len + 4);
 				destStream->flush();
 			}
@@ -191,6 +182,11 @@ int main(int argc, char *argv[])
 		}
 		else if (strcmp(arg, "-p") == 0)
 		{
+			if (argCounter + 1 >= argc)
+			{
+				std::cerr << "port value needed" << std::endl;
+				return 1;
+			}
 			arg = argv[++argCounter];
 			port = atoi(arg);
 		}

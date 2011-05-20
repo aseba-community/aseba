@@ -423,6 +423,18 @@ namespace Aseba
 		}
 		else
 		{
+			QTextCursor cursor(editor->textCursor());
+			if (cursor.atBlockEnd() && !cursor.block().next().isValid())
+			{
+				// language completion
+// 				const QString line(cursor.block().text());
+// 				if (
+//				cursor.beginEditBlock();
+//				cursor.insertText(" ");
+//				const int pos = cursor.position();
+//				TODO
+				
+			}
 			recompile();
 			if (!firstCompilation)
 				mainWindow->sourceChanged();

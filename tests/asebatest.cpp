@@ -42,7 +42,7 @@ static void usage (int argc, char** argv)
 
 static bool executionError(false);
 
-extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, void *data, uint16 size)
+extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, const void *data, uint16 size)
 {
 	switch (type)
 	{
@@ -61,6 +61,13 @@ extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, void *data, uint
 		break;
 	}
 }
+
+#ifdef __BIG_ENDIAN__
+extern "C" void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count)
+{
+	AsebaSendMessage(vm, type, data, count*2);
+}
+#endif
 
 extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {

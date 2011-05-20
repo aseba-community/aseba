@@ -20,13 +20,14 @@
 
 #include "vm-buffer.h"
 #include "../../common/consts.h"
+#include "../../common/types.h"
 #include <string.h>
 #include <assert.h>
 
 static unsigned char buffer[ASEBA_MAX_PACKET_SIZE];
 static unsigned buffer_pos;
 
-static void buffer_add(const uint8* data, uint16 len)
+static void buffer_add(const uint8* data, const uint16 len)
 {
 	uint16 i = 0;
 	while (i < len)
@@ -41,19 +42,21 @@ static void buffer_add(const uint8* data, uint16 len)
 	}
 }
 
-static void buffer_add_uint8(uint8 value)
+static void buffer_add_uint8(const uint8 value)
 {
 	buffer_add(&value, 1);
 }
 
-static void buffer_add_uint16(uint16 value)
+static void buffer_add_uint16(const uint16 value)
 {
-	buffer_add((unsigned char *) &value, 2);
+	const uint16 temp = bswap16(value);
+	buffer_add((const unsigned char *) &temp, 2);
 }
 
-static void buffer_add_sint16(sint16 value)
+static void buffer_add_sint16(const sint16 value)
 {
-	buffer_add((unsigned char *) &value, 2);
+	const uint16 temp = bswap16(value);
+	buffer_add((const unsigned char *) &temp, 2);
 }
 
 static void buffer_add_string(const char* s)
@@ -66,18 +69,31 @@ static void buffer_add_string(const char* s)
 
 /* implementation of vm hooks */
 
-void AsebaSendMessage(AsebaVMState *vm, uint16 type, void *data, uint16 size)
+void AsebaSendMessage(AsebaVMState *vm, uint16 type, const void *data, uint16 size)
 {
 	uint16 i;
 
 	buffer_pos = 0;
 	buffer_add_uint16(type);
 	for (i = 0; i < size; i++)
-		buffer_add_uint8(((unsigned char*)data)[i]);
+		buffer_add_uint8(((const unsigned char*)data)[i]);
 
 	AsebaSendBuffer(vm, buffer, buffer_pos);
 }
 
+#ifdef __BIG_ENDIAN__
+void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count)
+{
+	uint16 i;
+	
+	buffer_pos = 0;
+	buffer_add_uint16(type);
+	for (i = 0; i < count; i++)
+		buffer_add_uint16(data[i]);
+	
+	AsebaSendBuffer(vm, buffer, buffer_pos);
+}
+#endif
 
 void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {
@@ -193,7 +209,7 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 
 	if (amount > 0)
 	{
-		uint16 type = ((uint16*)buffer)[0];
+		uint16 type = bswap16(((uint16*)buffer)[0]);
 		uint16* payload = (uint16*)(buffer+2);
 		uint16 payloadSize = (amount-2)/2;
 		if (type < 0x8000)
@@ -208,7 +224,7 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 				uint16 i;
 				vm->variables[argPos++] = source;
 				for (i = 0; (i < argsSize) && (i < payloadSize); i++)
-					vm->variables[argPos + i] = payload[i];
+					vm->variables[argPos + i] = bswap16(payload[i]);
 				AsebaVMSetupEvent(vm, type);
 			}
 		}
