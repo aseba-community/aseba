@@ -424,16 +424,50 @@ namespace Aseba
 		else
 		{
 			QTextCursor cursor(editor->textCursor());
-			if (cursor.atBlockEnd() && !cursor.block().next().isValid())
+			if (cursor.atBlockEnd())// && !cursor.block().next().isValid())
 			{
 				// language completion
-// 				const QString line(cursor.block().text());
-// 				if (
-//				cursor.beginEditBlock();
-//				cursor.insertText(" ");
-//				const int pos = cursor.position();
-//				TODO
+				const QString& line(cursor.block().text());
+				const QString keyword(line.trimmed());
 				
+				QString prefix;
+				QString postfix;
+				if (keyword == "if")
+				{
+					const QString headSpace = line.left(line.indexOf("if"));
+					prefix = " ";
+					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "when")
+				{
+					const QString headSpace = line.left(line.indexOf("when"));
+					prefix = " ";
+					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "for")
+				{
+					const QString headSpace = line.left(line.indexOf("for"));
+					prefix = " ";
+					postfix = "i in 0:0 do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "while")
+				{
+					const QString headSpace = line.left(line.indexOf("while"));
+					prefix = " ";
+					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				
+				if (!prefix.isNull() || !postfix.isNull())
+				{
+					cursor.beginEditBlock();
+					cursor.insertText(prefix);
+					const int pos = cursor.position();
+					cursor.insertText(postfix);
+					cursor.setPosition(pos);
+					cursor.endEditBlock();
+					editor->setTextCursor(cursor);
+				}
+				//TODO
 			}
 			recompile();
 			if (!firstCompilation)

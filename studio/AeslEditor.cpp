@@ -296,62 +296,6 @@ namespace Aseba
 			}
 			else if (dropSourceWidget == nodeTab->vmMemoryView)
 			{
-				// we do not want to define variables, as they are already defined
-				/*bool isInVarDef(true);
-				bool isInComment(false);
-				QTextBlock block(cursor.block().previous());
-				
-				QRegExp emptyRE("^\\s*$");
-				QRegExp varDefRE("^\\s*var\\s");
-				QRegExp slCommentRE("^\\s*#");
-				QRegExp mlCommentSLRE("^\\s*#\\*.*\\*#\\s*$");
-				QRegExp mlCommentStartRE("#\\*");
-				QRegExp mlCommentEndEOLRE("\\*#\\s*$");
-				QRegExp mlCommentEndRE("\\*#");
-				
-				while (block.isValid())
-				{
-					const QString& text(block.text());
-					const bool inSlMlComment(text.contains(mlCommentSLRE));
-					
-					if (!inSlMlComment && text.contains(mlCommentStartRE))
-					{
-						if (isInComment)
-						{
-							isInComment = false;
-						}
-						else
-						{
-							// we saw a start-of-comment while not seen comment entering, meaning that we have been copy/pasted inside the comment
-							isInVarDef = false;
-							break;
-						}
-					}
-					
-					if (!isInComment)
-					{
-						if (!inSlMlComment && text.contains(mlCommentEndRE))
-						{
-							isInComment = true;
-						}
-						
-						if (
-							!text.contains(emptyRE) &&
-							!text.contains(varDefRE) &&
-							!text.contains(slCommentRE) &&
-							!text.contains(mlCommentEndEOLRE)
-						)
-						{
-							isInVarDef = false;
-							break;
-						}
-					}
-					
-					block = block.previous();
-				}
-				// inserting variable
-				if (isInVarDef)
-					prefix = "var ";*/
 				midfix = " ";
 			}
 			else if (dropSourceWidget == nodeTab->vmLocalEvents)
