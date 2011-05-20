@@ -150,7 +150,7 @@ void AsebaSendMessage(AsebaVMState *vm, uint16 id, const void *data, uint16 size
 	count is given in number of words. */
 void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count);
 #else
-	#define AsebaSendMessageWords(vm,type,data,size) AsebaSendMessage(vm,type,data,(size*2))
+	#define AsebaSendMessageWords(vm,type,data,size) AsebaSendMessage(vm,type,data,(size)*2)
 #endif
 
 /*! Called by AsebaVMDebugMessage when some variables must be sent efficiently */
