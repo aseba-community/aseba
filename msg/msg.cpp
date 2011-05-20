@@ -28,7 +28,6 @@
 
 using namespace std;
 #define bswap16(v) ({uint16 _v = v; _v = (_v >> 8) | (_v << 8);})
-#define bswap32(v) __builtin_bswap32(v)
 
 namespace Aseba
 {
@@ -235,9 +234,6 @@ namespace Aseba
 		} else if(sizeof(T) == 2) {
 			v16 = bswap16(*reinterpret_cast<const uint16*>(&val));
 			ptr = reinterpret_cast<const uint8 *>(&v16);
-		} else if(sizeof(T) == 4) {
-			v32 = bswap32(*reinterpret_cast<const uint32*>(&val));
-			ptr = reinterpret_cast<const uint8 *>(&v32);
 		} else { 
 			cerr << "Unable to bswap\n" << endl;
 			ptr = reinterpret_cast<const uint8 *>(&val);
@@ -286,8 +282,6 @@ namespace Aseba
 #ifdef __BIG_ENDIAN__
 		if(sizeof(T) == 2)
 			val = bswap16(val);
-		else if(sizeof(T) == 4)
-			val = bswap32(val);
 		else if(sizeof(T) != 1) {
 			cerr << "Unable to bswap\n" << endl;
 		}
