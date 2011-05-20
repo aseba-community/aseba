@@ -627,12 +627,15 @@ namespace Enki
 	
 	void PlaygroundViewer::incomingData(Dashel::Stream *stream)
 	{
+		uint16 temp;
 		uint16 len;
 		uint16 incomingMessageSource;
 		std::valarray<uint8> incomingMessageData;
 		
-		stream->read(&len, 2);
-		stream->read(&incomingMessageSource, 2);
+		stream->read(&temp, 2);
+		len = bswap16(temp);
+		stream->read(&temp, 2);
+		incomingMessageSource = bswap16(temp);
 		incomingMessageData.resize(len+2);
 		stream->read(&incomingMessageData[0], incomingMessageData.size());
 		
@@ -736,10 +739,13 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	{
 		try
 		{
+			uint16 temp;
+			
 			// this may happen if target has disconnected
-			uint16 len = length - 2;
-			stream->write(&len, 2);
-			stream->write(&vm->nodeId, 2);
+			temp = bswap16(length - 2);
+			stream->write(&temp, 2);
+			temp = bswap16(vm->nodeId);
+			stream->write(&temp, 2);
 			stream->write(data, length);
 			stream->flush();
 		}
