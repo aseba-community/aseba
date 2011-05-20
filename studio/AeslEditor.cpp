@@ -256,7 +256,7 @@ namespace Aseba
 		
 		// check whether we are at the beginning of a line
 		bool startOfLine(cursor.atBlockStart());
-		const int posInBlock(cursor.position() - cursor.positionInBlock());
+		const int posInBlock(cursor.position() - cursor.block().position());
 		if (!startOfLine && posInBlock)
 		{
 			const QString startText(cursor.block().text().left(posInBlock));
