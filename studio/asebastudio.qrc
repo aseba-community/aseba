@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
 	<file>asebastudio_fr.qm</file>
+	<file>asebastudio_de.qm</file>
 	<file>images/ok.png</file>
 	<file>images/no.png</file>
 	<file>images/filenew.png</file>
