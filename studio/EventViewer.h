@@ -27,27 +27,37 @@
 #define QWT_DLL
 #endif // _MSC_VER
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_legend.h>
-
+#include <deque>
 #include <QTime>
 
 #include "MainWindow.h"
+#include "../common/types.h"
+
+class QwtPlot;
+class QDoubleSpinBox;
+class QPushButton;
+class QCheckBox;
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
 		
-	class EventViewer:  public QwtPlot
+	class EventViewer:  public QWidget
 	{
+		Q_OBJECT
+		
 	protected:
 		unsigned eventId;
 		MainWindow::EventViewers* eventsViewers;
+		bool isCapturing;
+		QwtPlot* plot;
+		QPushButton *pauseRunButton;
+		QCheckBox *timeWindowCheckBox;
+		QDoubleSpinBox *timeWindowLength;
 		
-		std::vector<VariablesDataVector> values;
-		std::vector<double> timeStamps;
+		std::vector<std::deque<sint16> > values;
+		std::deque<double> timeStamps;
 		QTime startingTime;
 	
 	public:
@@ -56,6 +66,10 @@ namespace Aseba
 		
 		void detachFromMain() { eventsViewers=0; }
 		void addData(const VariablesDataVector& data);
+		
+	protected slots:
+		void pauseRunCapture();
+		void clearPlot();
 	};
 	
 	/*@}*/

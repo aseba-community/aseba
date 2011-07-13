@@ -1,5 +1,5 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2010:
+Copyright (C) 2007--2011:
 	
 	Stephane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
@@ -13,6 +13,9 @@ Copyright (C) 2007--2010:
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
 	(inputs on challenge, graphics design on challenge)
+
+	Sandra Moser [2]
+	(German translation)
 	
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
@@ -21,5 +24,5 @@ Copyright (C) 2007--2010:
 	[2] Autonomous Systems Lab (http://www.asl.ethz.ch)
 	ETHZ, Zurich (http://www.ethz.ch)
 	(as from September 2010)
-	
+
 The icons used in studio are from http://www.everaldo.com/crystal/

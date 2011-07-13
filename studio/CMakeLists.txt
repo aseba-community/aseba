@@ -9,6 +9,15 @@ if (QT4_FOUND)
 	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)
 	find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
 	
+	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+		message(STATUS "Qwt found")
+		include_directories (${QWT_INCLUDE_DIR})
+		set(EXTRA_LIBS ${EXTRA_LIBS} ${QWT_LIBRARIES})
+		add_definitions(-DHAVE_QWT)
+	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+		message(STATUS "Qwt not found")
+	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+	
 	set(studio_SRCS
 		AeslEditor.cpp
 		MainWindow.cpp
@@ -36,15 +45,6 @@ if (QT4_FOUND)
 	if (HAS_DYN_VERSION)
 		add_dependencies(asebastudio versionheader)
 	endif (HAS_DYN_VERSION)
-	
-	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
-		message(STATUS "Qwt found")
-		include_directories (${QWT_INCLUDE_DIR})
-		set(EXTRA_LIBS ${EXTRA_LIBS} ${QWT_LIBRARIES})
-		add_definitions(-DHAVE_QWT)
-	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
-		message(STATUS "Qwt not found")
-	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 
 	target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 

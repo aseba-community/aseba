@@ -18,14 +18,23 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "EventViewer.h"
-#include "../common/types.h"
-#include <vector>
-#include <QtDebug>
-
 #ifdef HAVE_QWT
 
+#include "EventViewer.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QDoubleSpinBox>
+#include <QtDebug>
+
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_legend.h>
+
 #include <qwt_data.h>
+
+#include <EventViewer.moc>
 
 namespace Aseba
 {
@@ -35,11 +44,11 @@ namespace Aseba
 	class EventDataWrapper : public QwtData
 	{
 	private:
-		std::vector<double>& _x;
-		std::vector<sint16>& _y;
+		std::deque<double>& _x;
+		std::deque<sint16>& _y;
 		
 	public:
-		EventDataWrapper(std::vector<double>& _x, std::vector<sint16>& _y) :
+		EventDataWrapper(std::deque<double>& _x, std::deque<sint16>& _y) :
 			_x(_x),
 			_y(_y)
 		{ }
@@ -55,34 +64,79 @@ namespace Aseba
 		values(eventVariablesCount),
 		startingTime(QTime::currentTime())
 	{
-		setCanvasBackground(Qt::white);
-		setAxisTitle(xBottom, tr("Time (seconds)"));
-		setAxisTitle(yLeft, tr("Values"));
+		// create plot
+		plot = new QwtPlot;
+		plot->setCanvasBackground(Qt::white);
+		plot->setAxisTitle(plot->xBottom, tr("Time (seconds)"));
+		plot->setAxisTitle(plot->yLeft, tr("Values"));
 		
 		QwtLegend *legend = new QwtLegend;
 		//legend->setItemMode(QwtLegend::CheckableItem);
-		insertLegend(legend, QwtPlot::BottomLegend);
+		plot->insertLegend(legend, QwtPlot::BottomLegend);
 		
 		for (size_t i = 0; i < values.size(); i++)
 		{
 			QwtPlotCurve *curve = new QwtPlotCurve(QString("%0").arg(i));
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
-			curve->attach(this);
+			curve->attach(plot);
 			curve->setPen(QColor::fromHsv((i * 360) / values.size(), 255, 100));
 		}
 		
+		QVBoxLayout *layout = new QVBoxLayout(this);
+		layout->addWidget(plot);
+		
+		// add control
+		QHBoxLayout *controlLayout = new QHBoxLayout;
+		
+		pauseRunButton = new QPushButton(QPixmap(QString(":/images/pause.png")), "");
+		connect(pauseRunButton, SIGNAL(clicked()), SLOT(pauseRunCapture()));
+		controlLayout->addWidget(pauseRunButton);
+		
+		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), "");
+		connect(clearButton, SIGNAL(clicked()), SLOT(clearPlot()));
+		controlLayout->addWidget(clearButton);
+		
+		timeWindowCheckBox = new QCheckBox(tr("time window:"));
+		controlLayout->addWidget(timeWindowCheckBox);
+		
+		timeWindowLength = new QDoubleSpinBox;
+		timeWindowLength->setSuffix("s");
+		connect(timeWindowCheckBox, SIGNAL(toggled(bool)), timeWindowLength, SLOT(setEnabled(bool))); 
+		timeWindowLength->setValue(10);
+		timeWindowLength->setEnabled(false);
+		controlLayout->addWidget(timeWindowLength);
+		controlLayout->addStretch();
+		layout->addLayout(controlLayout);
+		
+		// receive events
 		eventsViewers->insert(eventId, this);
+		isCapturing = true;
 	}
 	
 	EventViewer::~EventViewer()
 	{
-		if (eventsViewers)
+		if (eventsViewers && isCapturing)
 			eventsViewers->remove(eventId, this);
 	}
 	
 	void EventViewer::addData(const VariablesDataVector& data)
 	{
-		double elapsedTime = (double)startingTime.msecsTo(QTime::currentTime()) / 1000.;
+		const double elapsedTime = (double)startingTime.msecsTo(QTime::currentTime()) / 1000.;
+		if (timeWindowCheckBox->isChecked())
+		{
+			// remove old data
+			while (
+				(!timeStamps.empty()) &&
+				(elapsedTime - timeStamps[0] > timeWindowLength->value())
+			)
+			{
+				timeStamps.pop_front();
+				for (size_t i = 0; i < values.size(); i++)
+					values[i].pop_front();
+			}
+		}
+			
+			
 		timeStamps.push_back(elapsedTime);
 		for (size_t i = 0; i < values.size(); i++)
 		{
@@ -95,7 +149,33 @@ namespace Aseba
 				values[i].push_back(0);
 			}
 		}
-		replot();
+		plot->replot();
+	}
+	
+	void EventViewer::pauseRunCapture()
+	{
+		if (isCapturing)
+		{
+			if (eventsViewers)
+				eventsViewers->remove(eventId, this);
+			isCapturing = false;
+			pauseRunButton->setIcon(QPixmap(QString(":/images/play.png")));
+		}
+		else
+		{
+			if (eventsViewers)
+				eventsViewers->insert(eventId, this);
+			isCapturing = true;
+			pauseRunButton->setIcon(QPixmap(QString(":/images/pause.png")));
+		}
+	}
+	
+	void EventViewer::clearPlot()
+	{
+		for (size_t i = 0; i < values.size(); i++)
+			values[i].clear();
+		timeStamps.clear();
+		plot->replot();
 	}
 	
 	/*@}*/
