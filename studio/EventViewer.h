@@ -70,6 +70,7 @@ namespace Aseba
 	protected slots:
 		void pauseRunCapture();
 		void clearPlot();
+		void saveToFile();
 	};
 	
 	/*@}*/

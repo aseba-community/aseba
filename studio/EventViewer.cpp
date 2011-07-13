@@ -26,6 +26,9 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QDoubleSpinBox>
+#include <QFile>
+#include <QFileDialog>
+#include <QSettings>
 #include <QtDebug>
 
 #include <qwt_plot.h>
@@ -106,6 +109,11 @@ namespace Aseba
 		timeWindowLength->setEnabled(false);
 		controlLayout->addWidget(timeWindowLength);
 		controlLayout->addStretch();
+		
+		QPushButton *saveToFileButton = new QPushButton(QPixmap(QString(":/images/filesaveas.png")), tr("Save &As..."));
+		connect(saveToFileButton, SIGNAL(clicked()), SLOT(saveToFile()));
+		controlLayout->addWidget(saveToFileButton);
+		
 		layout->addLayout(controlLayout);
 		
 		// receive events
@@ -176,6 +184,32 @@ namespace Aseba
 			values[i].clear();
 		timeStamps.clear();
 		plot->replot();
+	}
+	
+	void EventViewer::saveToFile()
+	{
+		QSettings settings;
+		QString lastFileName(settings.value("EventViewer/exportFileName", "").toString());
+		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		
+		QFile file(fileName);
+		if (!file.open(QFile::WriteOnly | QFile::Truncate))
+			return;
+		
+		settings.setValue("EventViewer/exportFileName", fileName);
+		
+		QTextStream out(&file);
+		for (size_t i = 0; i < timeStamps.size(); ++i)
+		{
+			out << timeStamps[i] << " ";
+			for (size_t j = 0; j < values.size(); ++j)
+			{
+				out << values[j][i];
+				if (j + 1 < values.size())
+					out << " ";
+			}
+			out << "\n";
+		}
 	}
 	
 	/*@}*/
