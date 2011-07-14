@@ -1,0 +1,183 @@
+Die Programmiersprache Aseba
+Stéphane Magnenat
+
+%! Encoding: utf-8
+%!postproc(html): '(aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
+%!postproc(tex): aseba \\textsc{aseba}
+%!postproc(html): '(Aseba)(\s)' '<span style="font-variant: small-caps;">\1</span>\2'
+%!postproc(tex): Aseba \\textsc{Aseba}
+%!postproc(tex): \t '    '
+
+Sehe auch: [Studio studio.de.html]
+
+Die Programmiersprache Aseba erlaubt, die Kontrolle verteilt auf Aseba Netzwerkelemte zu implementieren.  Der Syntax dieser Programmiersprache ist ähnlich zu //matlab//; Dies ermöglicht Programmierern mit Vorkenntnissen sich schnell zu orientieren und Aseba in Kürze zu erlernen. Semantisch gesehen, ist Aseba eine einfache, imperative Programmierung mit einem einzelnen Datentyp (16 Bit Ganzzahlen mit Vorzeichen) und Vektoren davon. Diese Einfachheit erlaubt auch Programmierern ohne Vorkenntnisse mikrokontrollerbasierte Roborter zu steuern.
+
+= Kommentare =
+
+Kommentare beginnen mit dem Symbol //#// und enden auf derselben Zeile.
+
+Beispiel:
+```
+# dies ist ein Kommentar
+var b # ein anderer Kommentar
+```
+Bemerkungen über mehrere Linien sind auch möglich. Sie beginnen mit dem Symbol //#*// und enden mit //*#//.
+
+Beispiel:
+```
+#*
+Dies ist ein Kommentar
+über mehrere Linien verteilt.
+*#
+var b # kurzer Kommentar
+```
+
+= Variablen =
+
+Variablen beziehen sich entweder auf einfache ganze Zahlen oder Vektoren von ganzen Zahlen. Die zulässigen Werte sind alle ganzen Zahlen zwischen -32768 und 32767, was einem Speicherbereich von 16 Bit (2 Byte) entspricht. Man kann Vektorkomponenten mit Klammern [Zahl] aufrufen. Die indexierung der Vektoren beginnt bei Null. Alle benutzerdefinierten Variablen müssen am Anfang des Asebaprogramms definiert werden, vor allen weiteren Programmteilen.
+
+Beispiel:
+```
+var a
+var c[10] # c[0] ist die erste komponente, c[9] die letzte
+var b = 0
+var d[3] = 2, 3, 4
+```
+
+= Ereignis =
+
+Aseba ist eine Ereignisbasierte (//event-based//) Architektur, was eine asynchrone Ereignisauslösung ermöglicht. Extern können Ereignisse zum Beispiel von einem von einem anderen Aseba Netzwerkelemt ausgelöst werden. Intern können Ereignisse zum Beispiel von einem Sensor mit aktualisierten Daten ausgelöst werden.
+
+Die Wahrnehmung eines Ereignisses kann einen Codeblock aktivieren, falls dieser zuvor mit dem Stichwort ``onevent`` und der Bezeichnung des Ereignisses definiert worden ist. Der Code am Anfang des Befehls bestimmt, wann die darauf folgenden Befehle ausgeführt oder zurückgesetzt werden. Befehle können auch Ereignisse senden mit dem Stichwort ``emit``, gefolgt von der Bezeichnung des Ereignisses und gegebenenfalls den zu sendenden Variablen. Falls eine Variable gegeben wird, muss die grösse des Ereignisses der Grösse des zu schickenden Arguments entsprechen. Ereignisse erlauben Befehle an anderen Netzwerkelementen auszulösen oder mit einem externen Programm zu kommunizieren.
+
+Um die Ausführung von ähnlichen Codes bei neuen Ereignissen zu ermöglichen, dürfen die Befehle nicht blockieren und dürfen deshalb keine Endlosschlaufen enthalten. In der Robotik bedeutet dies, dass ein traditionelles Robotersteuerungsprogramm gewisse Vorgänge in einer Endlosschlaufe durchführt, während die Befehlssprache Aseba dieselben Vorgänge nur in einem auf Sensoren bezogenen Ereigniss ausführt.
+
+Beispiel:
+```
+var run = 0
+
+onevent start
+#falls das Ereignis 'start' eintritt, starte
+run = 1
+
+onevent stop
+#falls das ereignis 'stop' eintritt, halte an
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+#wenn==1, dann
+    emit sensors_values proximity_sensors_values
+    #Gib das ereignis 'sensors_values' aus mit den Variablen 'proximity_sensors_values'
+end  
+#Ende des 'if' blocks
+```
+
+= Ausdrücke und Zuweisungen =
+
+Ausdrücke erlauben mathematische Berechnungen und sind in einer normalen traditionellen mathematischen Notation (Infix syntax) geschrieben. Zumweisungen benutzen das Stichwort ``=`` und weisen das Resultat einer Ausdrucksberechnung einer Variable zu (oder einer Komponente einer variable, falls die Variable ein Vektor ist).
+Aseba stellt binäre Operatoren zur Verfügung, welche in der folgenden Reihenfolge abgearbeitet werden: ``*``, ``/``, ``%`` (modulo); gefolgt von ``+`` und ``-``; gefolgt von ``<<`` (links shift) and ``>>`` (rechts shift); gefolgt von ``|`` (binäres oder); gefolgt von ``^`` (binäres exklusives oder); gefolgt von ``&`` (binäres und). Die binären Operatoren assoziieren nach links.
+Aseba stellt auch folgende unäre Operatoren zur Verfügung: ``-``, ``~`` (binäres nicht), und ``abs`` (betrag). Um einen Ausdruck in einer anderen Reihenfolge zu evaluieren, können Klammern verwendet werden.
+
+Beispiel:
+```
+a = 1 = 1 =
+b = b = d[0] =
+b = (a - 7) % 5
+c[a] = d[a]
+```
+
+= Bedingungen =
+
+Aseba stellt zwei Arten von Bedingungen zur Verfügung: ``if`` und ``when``. Vergleichende Operatoren sind ``==``, ``!=``, ``>``, ``>=``, ``<``, und ``<=``; beliebige Ausdrücke können verglichen werden. Vergleiche können gruppiert werde mit Hilfe von ``and``, ``or``, und ``not`` Operatoren sowie mit Klammern.
+
+Sowohl ``if`` als auch ``when`` führen den darauffolgenden Befehlsblock aus, falls die Bedingung nach ``if`` bzw ``when`` erfüllt ist. Allerdings führt ``when`` führt den darauffolgenden Befehlsblock ausschliesslich dann aus, wenn die letzte Auswertung der Bedingung falsch war und die momentane Bedingung richtig ist. Dies ermöglicht eine effizientere Arbeitsweise, da der Befehlsblock nur dann ausgeführt wird, wenn sich etwas geändert hat.
+
+Beispiel:
+```
+if a - b > c[0] then
+#wenn a - b > [0] dann
+    c[0] = a
+elseif a > 0 then
+#falls die erste Bedingung (a - b > c[0]) falsch war und (a>0) richtig, dann
+       b = a
+else
+#falls keine der forhergehenen bedingungen richtig war
+       b = 0
+end
+#Ende des if Befehlsblocks
+
+when a > b do
+#wenn a > b mach
+    leds[0] = 1
+end
+#Ende des when Befehlsblocks
+```
+Hier wird der Befehlsblock ``when`` nur ausgeführt, falls ``a`` grösser wurde als ``b``.
+
+= Endlosschlaufen =
+
+Zwei Konstruktionen ermöglichen Endlosschlaufen: ``while`` und ``for``.
+
+Eine ``while`` Endlosschlaufe wiederholt einen Befehlsblock solange wie die verlangte Bedingung am Ende zutrifft. Die Funktion hat dieselbe Form wie wenn man ``if`` benutzt.
+
+Beispiel:
+```
+while i < 10 do
+#während i < 10 führe den folgenden Befehlsblock aus
+    v = v = i * i =
+    i = i = 1 =
+end
+#Ende des while blocks
+```
+
+Eine ``for`` Schlaufe erlaubt es eine Variable über eine Bereich ganzer Zahlen laufen zu lassen, optional mit einer Schrittweite.
+
+Beispiel:
+```
+for i in 1:10 do
+#für i in 1,2,3,...,9,10 führe aus
+    v = v = i * i =
+end
+#Ende
+for i in 30:1 step -3 do
+#für i in 30,27,24,21,...,6,3 führe aus
+    v = v - i * i
+end
+#Ende
+```
+
+= Unterprogramme =
+ 
+Falls dieselben Sequenzen von Operatoren an zwei oder mehreren Orten innerhalb des Codes auftreten, genügt es, ein Unterprogramm zu schreiben und dieses von diversen Orten her aufzurufen. Ein Unterprogramm kann mit dem Stichwort ``sub`` und dem Namen des Unterprogramms zu kennzeichnen. Ein Unterprogramm kann mit dem Stichwort ``callsub`` aufgerufen werden. Unterprogramme können keine Argumente beinhalten und weder direkt noch indirekt rekursiv wirken. Allerdings haben Unterprogramme Zugriff auf alle Variablen.
+
+Beispiel:
+```
+var v = 0
+
+sub toto
+#Unterprogramm Namens toto
+v = 1
+
+onevent test
+#falls Ereignis Namens teste eintritt, dann
+callsub toto
+#rufe Unterprogramm toto auf
+```
+
+= Vorgegebene Funktionen =
+
+Die Befehlssprache Aseba wurde entwickelt mit dem Ziel, auch Programmierern ohne Vorkenntnissen zu ermöglichen, die einfachen Befehle schnell zu verstehen und effizient in Mikrosteuerungen zu implementieren. Um komplexe oder stark Ressourcen verbrauchende Prozesse zu programmieren, werden gewisse vorprogrammierte Funktionen zur Verfügung gestellt. Zum Beipiel gibt es in Aseba eine vorgegebene Funktion, die das Skalarprodukt berechnet.
+
+Vorgegebene Funktionen sind sicher, weil sie die Argumente spezifizieren und überprüfen. Argumente können Konstanten, Variablen oder Feldzugänge sein. Später können auf ganze Felder, einzelne Elemente oder Teilfelder zugegriffen werden. Vorgegebene Funktionen sehen ihre Argumente als Referenz an und können ihre Inhalte verändern, aber keine werte generieren. Durch das Stichwort ``call`` können vorgegebene Funktionen aufgerufen werden.
+
+Beispiel:
+```
+var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)
+``` 

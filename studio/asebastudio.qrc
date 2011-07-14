@@ -39,8 +39,10 @@
 	<file>images/plot.png</file>
 	<file>doc/aseba-language.en.html</file>
 	<file>doc/aseba-language.fr.html</file>
+	<file>doc/aseba-language.de.html</file>
 	<file>doc/studio.en.html</file>
 	<file>doc/studio.fr.html</file>
+	<file>doc/studio.de.html</file>
 	<file>doc/studio.png</file>
 </qresource>
 </RCC>
