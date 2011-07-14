@@ -1066,11 +1066,8 @@ namespace Aseba
 		expect(Token::TOKEN_STRING_LITERAL);
 		
 		std::wstring funcName = tokens.front().sValue;
-		FunctionsMap::const_iterator funcIt = functionsMap.find(funcName);
+		FunctionsMap::const_iterator funcIt(findFunction(funcName, pos));
 		
-		// check if function exists, get it and create node
-		if (funcIt == functionsMap.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Target does not provide function %0").arg(funcName));
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
 		std::auto_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
 		

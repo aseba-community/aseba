@@ -311,7 +311,10 @@ namespace Aseba
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
-		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& varPos);
+		template <typename MapType>
+		typename MapType::const_iterator findInMap(MapType& table, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg);
+		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos);
+		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos);
 		void buildMaps();
 		void tokenize(std::wistream& source);
 		void dumpTokens(std::wostream &dest) const;

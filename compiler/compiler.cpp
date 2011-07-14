@@ -498,31 +498,44 @@ namespace Aseba
 		return d[matSize-1];
 	}
 	
-	//! Find for a variable of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos)
+	//! Helper function to find for something in one of the map, using edit-distance to check for candidates if not found
+	template <typename MapType>
+	typename MapType::const_iterator findInTable(MapType& map, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg)
 	{
-		VariablesMap::const_iterator varIt = variablesMap.find(varName);
-		if (varIt == variablesMap.end())
+		typename MapType::const_iterator it(map.find(name));
+		if (it == map.end())
 		{
+			const unsigned maxDist(3);
 			std::wstring bestName;
 			unsigned bestDist(std::numeric_limits<unsigned>::max());
-			for (VariablesMap::const_iterator varJt(variablesMap.begin()); varJt != variablesMap.end(); ++varJt)
+			for (typename MapType::const_iterator jt(map.begin()); jt != map.end(); ++jt)
 			{
-				const std::wstring thatName(varJt->first);
-				const unsigned maxDist(3);
-				const unsigned d(editDistance<std::wstring>(varName, thatName, maxDist));
+				const std::wstring thatName(jt->first);
+				const unsigned d(editDistance<std::wstring>(name, thatName, maxDist));
 				if (d < bestDist && d < maxDist)
 				{
 					bestDist = d;
 					bestName = thatName;
 				}
 			}
-			if (bestDist != std::numeric_limits<unsigned>::max())
-				throw Error(varPos, WFormatableString(L"%0 is not a defined variable, do you mean %1 ?").arg(varName).arg(bestName));
+			if (bestDist < maxDist)
+				throw Error(pos, WFormatableString(misspelledMsg).arg(name).arg(bestName));
 			else
-				throw Error(varPos, WFormatableString(L"%0 is not a defined variable").arg(varName));
+				throw Error(pos, WFormatableString(notFoundMsg).arg(name));
 		}
-		return varIt;
+		return it;
+	}
+	
+	//! Find for a variable of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos)
+	{
+		return findInTable<VariablesMap>(variablesMap, varName, varPos, L"%0 is not a defined variable", L"%0 is not a defined variable, do you mean %1 ?");
+	}
+	
+	//! Find for a function of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos)
+	{
+		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, L"Target does not provide function %0",L"Target does not provide function %0, do you mean %1 ?");
 	}
 	
 	//! Build variables and functions maps
