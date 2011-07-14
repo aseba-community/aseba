@@ -1448,15 +1448,8 @@ namespace Aseba
 			NodeTab* tab = getTabFromId(node);
 			Q_ASSERT(tab);
 			nodes->setCurrentWidget(tab);
-			QTextBlock block = tab->editor->document()->begin();
-			for (int i = 0; i < line; i++)
-			{
-				if (block == tab->editor->document()->end())
-					return;
-				block = block.next();
-			}
-			
-			tab->editor->textCursor().setPosition(block.position(), QTextCursor::MoveAnchor);
+			tab->editor->setTextCursor(QTextCursor(tab->editor->document()->findBlockByLineNumber(line)));
+			tab->editor->setFocus();
 		}
 	}
 	
