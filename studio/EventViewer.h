@@ -37,6 +37,7 @@ class QwtPlot;
 class QDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
+class QLabel;
 
 namespace Aseba
 {
@@ -52,6 +53,7 @@ namespace Aseba
 		MainWindow::EventViewers* eventsViewers;
 		bool isCapturing;
 		QwtPlot* plot;
+		QLabel *status;
 		QPushButton *pauseRunButton;
 		QCheckBox *timeWindowCheckBox;
 		QDoubleSpinBox *timeWindowLength;

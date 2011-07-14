@@ -91,11 +91,14 @@ namespace Aseba
 		// add control
 		QHBoxLayout *controlLayout = new QHBoxLayout;
 		
-		pauseRunButton = new QPushButton(QPixmap(QString(":/images/pause.png")), "");
+		status = new QLabel(tr("Recording..."));
+		controlLayout->addWidget(status);
+		
+		pauseRunButton = new QPushButton(QPixmap(QString(":/images/pause.png")), tr("Pause"));
 		connect(pauseRunButton, SIGNAL(clicked()), SLOT(pauseRunCapture()));
 		controlLayout->addWidget(pauseRunButton);
 		
-		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), "");
+		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), tr("Clear"));
 		connect(clearButton, SIGNAL(clicked()), SLOT(clearPlot()));
 		controlLayout->addWidget(clearButton);
 		
@@ -167,14 +170,18 @@ namespace Aseba
 			if (eventsViewers)
 				eventsViewers->remove(eventId, this);
 			isCapturing = false;
-			pauseRunButton->setIcon(QPixmap(QString(":/images/play.png")));
+			status->setText(tr("Paused..."));
+			pauseRunButton->setIcon(QPixmap(QString(":/images/mix_record.png")));
+			pauseRunButton->setText(tr("Record"));
 		}
 		else
 		{
 			if (eventsViewers)
 				eventsViewers->insert(eventId, this);
 			isCapturing = true;
+			status->setText(tr("Recording..."));
 			pauseRunButton->setIcon(QPixmap(QString(":/images/pause.png")));
+			pauseRunButton->setText(tr("Pause"));
 		}
 	}
 	
