@@ -261,7 +261,9 @@ namespace Aseba
 		void tabChanged(int);
 		void sendEvent();
 		void sendEventIf(const QModelIndex &);
+		void plotEvent();
 		void eventContextMenuRequested(const QPoint & pos);
+		void plotEvent(const unsigned eventId);
 		void logEntryDoubleClicked(QListWidgetItem *);
 		void showCompilationMessages(bool doShown);
 		void compilationMessagesWasHidden();
@@ -342,6 +344,9 @@ namespace Aseba
 		QPushButton* addEventNameButton;
 		QPushButton* removeEventNameButton;
 		QPushButton* sendEventButton;
+		#ifdef HAVE_QWT
+		QPushButton* plotEventButton;
+		#endif // HAVE_QWT
 		QListWidget* logger;
 		QPushButton* clearLogger;
 		FixedWidthTableView* eventsDescriptionsView;

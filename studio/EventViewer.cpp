@@ -94,15 +94,15 @@ namespace Aseba
 		status = new QLabel(tr("Recording..."));
 		controlLayout->addWidget(status);
 		
-		pauseRunButton = new QPushButton(QPixmap(QString(":/images/pause.png")), tr("Pause"));
+		pauseRunButton = new QPushButton(QPixmap(QString(":/images/pause.png")), tr("&Pause"));
 		connect(pauseRunButton, SIGNAL(clicked()), SLOT(pauseRunCapture()));
 		controlLayout->addWidget(pauseRunButton);
 		
-		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), tr("Clear"));
+		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), tr("&Clear"));
 		connect(clearButton, SIGNAL(clicked()), SLOT(clearPlot()));
 		controlLayout->addWidget(clearButton);
 		
-		timeWindowCheckBox = new QCheckBox(tr("time window:"));
+		timeWindowCheckBox = new QCheckBox(tr("time &window:"));
 		controlLayout->addWidget(timeWindowCheckBox);
 		
 		timeWindowLength = new QDoubleSpinBox;
@@ -172,7 +172,7 @@ namespace Aseba
 			isCapturing = false;
 			status->setText(tr("Paused..."));
 			pauseRunButton->setIcon(QPixmap(QString(":/images/mix_record.png")));
-			pauseRunButton->setText(tr("Record"));
+			pauseRunButton->setText(tr("&Record"));
 		}
 		else
 		{
@@ -181,7 +181,7 @@ namespace Aseba
 			isCapturing = true;
 			status->setText(tr("Recording..."));
 			pauseRunButton->setIcon(QPixmap(QString(":/images/pause.png")));
-			pauseRunButton->setText(tr("Pause"));
+			pauseRunButton->setText(tr("&Pause"));
 		}
 	}
 	

@@ -1346,9 +1346,9 @@ namespace Aseba
 		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
 		
-		unsigned eventId = currentRow.row();
-		QString eventName = QString::fromStdWString(commonDefinitions.events[eventId].name);
-		int argsCount = commonDefinitions.events[eventId].value;
+		const unsigned eventId = currentRow.row();
+		const QString eventName = QString::fromStdWString(commonDefinitions.events[eventId].name);
+		const int argsCount = commonDefinitions.events[eventId].value;
 		VariablesDataVector data(argsCount);
 		
 		if (argsCount > 0)
@@ -1399,24 +1399,42 @@ namespace Aseba
 			sendEvent();
 	}
 	
+	void MainWindow::plotEvent()
+	{
+		#ifdef HAVE_QWT
+		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
+		Q_ASSERT(currentRow.isValid());
+		const unsigned eventId = currentRow.row();
+		plotEvent(eventId);
+		#endif // HAVE_QWT
+	}
+	
 	void MainWindow::eventContextMenuRequested(const QPoint & pos)
 	{
 		#ifdef HAVE_QWT
-		QModelIndex index(eventsDescriptionsView->indexAt(pos));
+		const QModelIndex index(eventsDescriptionsView->indexAt(pos));
 		if (index.isValid() && (index.column() == 0))
 		{
-			QString eventName(eventsDescriptionsModel->data(index).toString());
+			const QString eventName(eventsDescriptionsModel->data(index).toString());
 			QMenu menu;
 			menu.addAction(tr("Plot event %1").arg(eventName));
-			QAction* ret = menu.exec(eventsDescriptionsView->mapToGlobal(pos));
+			const QAction* ret = menu.exec(eventsDescriptionsView->mapToGlobal(pos));
 			if (ret)
 			{
 				const unsigned eventId = index.row();
-				const unsigned eventVariablesCount = eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 1)).toUInt();
-				const QString tabTitle(tr("plot of %1").arg(eventName));
-				nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle, true);
+				plotEvent(eventId);
 			}
 		}
+		#endif // HAVE_QWT
+	}
+	
+	void MainWindow::plotEvent(const unsigned eventId)
+	{
+		#ifdef HAVE_QWT
+		const unsigned eventVariablesCount(eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 1)).toUInt());
+		const QString eventName(eventsDescriptionsModel->data(eventsDescriptionsModel->index(eventId, 0)).toString());
+		const QString tabTitle(tr("plot of %1").arg(eventName));
+		nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle, true);
 		#endif // HAVE_QWT
 	}
 	
@@ -1571,6 +1589,9 @@ namespace Aseba
 		bool isSelected = eventsDescriptionsView->selectionModel()->currentIndex().isValid();
 		removeEventNameButton->setEnabled(isSelected);
 		sendEventButton->setEnabled(isSelected);
+		#ifdef HAVE_QWT
+		plotEventButton->setEnabled(isSelected);
+		#endif // HAVE_QWT
 	}
 	
 	void MainWindow::addConstantClicked()
@@ -1978,6 +1999,10 @@ namespace Aseba
 		removeEventNameButton->setEnabled(false);
 		sendEventButton = new QPushButton(QPixmap(QString(":/images/newmsg.png")), "");
 		sendEventButton->setEnabled(false);
+		#ifdef HAVE_QWT
+		plotEventButton = new QPushButton(QPixmap(QString(":/images/plot.png")), "");
+		plotEventButton->setEnabled(false);
+		#endif // HAVE_QWT
 		
 		eventsDescriptionsView = new FixedWidthTableView;
 		eventsDescriptionsView->setShowGrid(false);
@@ -1996,15 +2021,18 @@ namespace Aseba
 		eventsDescriptionsView->setContextMenuPolicy(Qt::CustomContextMenu);
 		
 		QGridLayout* eventsLayout = new QGridLayout;
-		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")),0,0);
-		eventsLayout->setColumnStretch(0, 1);
-		eventsLayout->addWidget(sendEventButton,0,1);
-		eventsLayout->setColumnStretch(1, 0);
-		eventsLayout->addWidget(addEventNameButton,0,2);
-		eventsLayout->setColumnStretch(2, 0);
-		eventsLayout->addWidget(removeEventNameButton,0,3);
-		eventsLayout->setColumnStretch(3, 0);
-		eventsLayout->addWidget(eventsDescriptionsView, 1, 0, 1, 4);
+		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")),0,0,1,4);
+		eventsLayout->addWidget(addEventNameButton,1,0);
+		//eventsLayout->setColumnStretch(2, 0);
+		eventsLayout->addWidget(removeEventNameButton,1,1);
+		//eventsLayout->setColumnStretch(3, 0);
+		//eventsLayout->setColumnStretch(0, 1);
+		eventsLayout->addWidget(sendEventButton,1,2);
+		//eventsLayout->setColumnStretch(1, 0);
+		#ifdef HAVE_QWT
+		eventsLayout->addWidget(plotEventButton,1,3);
+		#endif // HAVE_QWT
+		eventsLayout->addWidget(eventsDescriptionsView, 2, 0, 1, 4);
 		
 		/*logger = new QListWidget;
 		logger->setMinimumSize(80,100);
@@ -2071,6 +2099,9 @@ namespace Aseba
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
 		connect(sendEventButton, SIGNAL(clicked()), SLOT(sendEvent()));
+		#ifdef HAVE_QWT
+		connect(plotEventButton, SIGNAL(clicked()), SLOT(plotEvent()));
+		#endif // HAVE_QWT
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
