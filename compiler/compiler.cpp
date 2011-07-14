@@ -466,21 +466,36 @@ namespace Aseba
 	}
 	
 	// from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
-	// FIXME: improve this
-	template <class T> unsigned int edit_distance(const T& s1, const T& s2)
+	template <class T> unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)
 	{
-		const size_t len1 = s1.size(), len2 = s2.size();
-		std::vector<std::vector<unsigned int> > d(len1 + 1, std::vector<unsigned int>(len2 + 1));
+		const size_t len1 = s1.size() + 1, len2 = s2.size() + 1;
+		const size_t matSize(len1*len2);
+		unsigned *d(reinterpret_cast<unsigned*>(alloca(matSize*sizeof(unsigned))));
 
-		d[0][0] = 0;
-		for(unsigned int i = 1; i <= len1; ++i) d[i][0] = i;
-		for(unsigned int i = 1; i <= len2; ++i) d[0][i] = i;
+		d[0] = 0;
+		for(unsigned i = 1; i < len1; ++i)
+			d[i*len2+0] = i;
+		for(unsigned i = 1; i < len2; ++i)
+			d[i] = i;
 
-		for(unsigned int i = 1; i <= len1; ++i)
-			for(unsigned int j = 1; j <= len2; ++j)
-				d[i][j] = std::min( std::min(d[i - 1][j] + 1,d[i][j - 1] + 1),
-					d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1) );
-		return d[len1][len2];
+		for(unsigned i = 1; i < len1; ++i)
+		{
+			bool wasBelowMax(false);
+			for(unsigned j = 1; j < len2; ++j)
+			{
+				const unsigned cost = std::min(std::min(
+					d[(i - 1)*len2+j] + 1,
+					d[i*len2+(j - 1)] + 1),
+					d[(i - 1)*len2+(j - 1)] + (s1[i - 1] == s2[j - 1] ? 0 : 1)
+				);
+				if (cost < maxDist)
+					wasBelowMax = true;
+				d[i*len2+j] = cost;
+			}
+			if (!wasBelowMax)
+				return maxDist;
+		}
+		return d[matSize-1];
 	}
 	
 	//! Find for a variable of a given name, and if found, return an iterator; if not, return an exception
@@ -494,8 +509,9 @@ namespace Aseba
 			for (VariablesMap::const_iterator varJt(variablesMap.begin()); varJt != variablesMap.end(); ++varJt)
 			{
 				const std::wstring thatName(varJt->first);
-				const unsigned d(edit_distance<std::wstring>(varName, thatName));
-				if (d < bestDist && d < 3)
+				const unsigned maxDist(3);
+				const unsigned d(editDistance<std::wstring>(varName, thatName, maxDist));
+				if (d < bestDist && d < maxDist)
 				{
 					bestDist = d;
 					bestName = thatName;
