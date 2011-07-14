@@ -284,6 +284,8 @@ namespace Aseba
 		typedef std::map<std::wstring, unsigned> SubroutineReverseTable;
 		//! Lookup table to keep track of implemented events
 		typedef std::set<unsigned> ImplementedEvents;
+		//! Lookup table for constant name => value
+		typedef std::map<std::wstring, int> ConstantsMap;
 	
 	public:
 		Compiler();
@@ -311,10 +313,10 @@ namespace Aseba
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
-		template <typename MapType>
-		typename MapType::const_iterator findInMap(MapType& table, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg);
-		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos);
-		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos);
+		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
+		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
+		ConstantsMap::const_iterator findConstant(const std::wstring& name, const SourcePos& pos) const;
+		bool constantExists(const std::wstring& name) const;
 		void buildMaps();
 		void tokenize(std::wistream& source);
 		void dumpTokens(std::wostream &dest) const;
@@ -362,6 +364,7 @@ namespace Aseba
 		VariablesMap variablesMap; //!< variables lookup
 		ImplementedEvents implementedEvents; //!< list of implemented events
 		FunctionsMap functionsMap; //!< functions lookup
+		ConstantsMap constantsMap; //!< constants map
 		SubroutineTable subroutineTable; //!< subroutine lookup
 		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable

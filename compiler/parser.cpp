@@ -104,48 +104,36 @@ namespace Aseba
 	unsigned Compiler::expectPositiveConstant() const
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
-		for (size_t i = 0; i < commonDefinitions->constants.size(); ++i)
-		{
-			if (commonDefinitions->constants[i].name == tokens.front().sValue)
-			{
-				int value = commonDefinitions->constants[i].value;
-				if (value < 0 || value > 32767)
-					throw Error(tokens.front().pos,
-						WFormatableString(L"Constant %0 has value %1, which is out of [0;32767] range")
-							.arg(tokens.front().sValue)
-							.arg(value)
-						);
-				return value;
-			}
-		}
+		const std::wstring name = tokens.front().sValue;
+		const SourcePos pos = tokens.front().pos;
+		const ConstantsMap::const_iterator constIt(findConstant(name, pos));
 		
-		throw Error(tokens.front().pos, WFormatableString(L"Constant %0 not defined").arg(tokens.front().sValue));
-		
-		return 0;
+		const int value = constIt->second;
+		if (value < 0 || value > 32767)
+			throw Error(tokens.front().pos,
+				WFormatableString(L"Constant %0 has value %1, which is out of [0;32767] range")
+					.arg(tokens.front().sValue)
+					.arg(value)
+				);
+		return value;
 	}
 	
 	//! Check if next toxen is a valid 16 bits signed integer constant
 	int Compiler::expectConstant() const
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
-		for (size_t i = 0; i < commonDefinitions->constants.size(); ++i)
-		{
-			if (commonDefinitions->constants[i].name == tokens.front().sValue)
-			{
-				int value = commonDefinitions->constants[i].value;
-				if (value < -32768 || value > 32767)
-					throw Error(tokens.front().pos,
-						WFormatableString(L"Constant %0 has value %1, which is out of [-32768;32767] range")
-							.arg(tokens.front().sValue)
-							.arg(value)
-						);
-				return value;
-			}
-		}
+		const std::wstring name = tokens.front().sValue;
+		const SourcePos pos = tokens.front().pos;
+		const ConstantsMap::const_iterator constIt(findConstant(name, pos));
 		
-		throw Error(tokens.front().pos, WFormatableString(L"Constant %0 not defined").arg(tokens.front().sValue));
-		
-		return 0;
+		const int value = constIt->second;
+		if (value < -32768 || value > 32767)
+			throw Error(tokens.front().pos,
+				WFormatableString(L"Constant %0 has value %1, which is out of [-32768;32767] range")
+					.arg(tokens.front().sValue)
+					.arg(value)
+				);
+		return value;
 	}
 	
 	//! Check and return either the positive part of a 16 bits signed integer or the value of a valid constant
@@ -1011,8 +999,7 @@ namespace Aseba
 			case Token::TOKEN_STRING_LITERAL:
 			{
 				std::wstring varName = tokens.front().sValue;
-				// if too slow, switch to a map
-				if (commonDefinitions->constants.contains(varName))
+				if (constantExists(varName))
 				{
 					int value = expectConstant();
 					tokens.pop_front();
@@ -1020,7 +1007,6 @@ namespace Aseba
 				}
 				else
 				{
-					std::wstring varName = tokens.front().sValue;
 					SourcePos varPos = tokens.front().pos;
 					VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 					
@@ -1109,7 +1095,7 @@ namespace Aseba
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
 				
-				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (tokens.front() == Token::TOKEN_OP_NEG) || (commonDefinitions->constants.contains(tokens.front().sValue)))
+				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (tokens.front() == Token::TOKEN_OP_NEG) || (constantExists(tokens.front().sValue)))
 				{
 					int value = expectInt16LiteralOrConstant();
 					// we have inline integer, we need to store it and pass the address

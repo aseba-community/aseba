@@ -74,7 +74,6 @@ namespace Aseba
 	void Compiler::setTargetDescription(const TargetDescription *description)
 	{
 		targetDescription = description;
-		buildMaps();
 	}
 	
 	//! Set the common definitions, such as events or some constants
@@ -500,7 +499,7 @@ namespace Aseba
 	
 	//! Helper function to find for something in one of the map, using edit-distance to check for candidates if not found
 	template <typename MapType>
-	typename MapType::const_iterator findInTable(MapType& map, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg)
+	typename MapType::const_iterator findInTable(const MapType& map, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg)
 	{
 		typename MapType::const_iterator it(map.find(name));
 		if (it == map.end())
@@ -526,16 +525,28 @@ namespace Aseba
 		return it;
 	}
 	
-	//! Find for a variable of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos)
+	//! Look for a variable of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
 	{
 		return findInTable<VariablesMap>(variablesMap, varName, varPos, L"%0 is not a defined variable", L"%0 is not a defined variable, do you mean %1 ?");
 	}
 	
-	//! Find for a function of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos)
+	//! Look for a function of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
 	{
 		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, L"Target does not provide function %0",L"Target does not provide function %0, do you mean %1 ?");
+	}
+	
+	//! Look for a constant of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::ConstantsMap::const_iterator Compiler::findConstant(const std::wstring& name, const SourcePos& pos) const
+	{
+		return findInTable<ConstantsMap>(constantsMap, name, pos, L"Constant %0 not defined", L"Constant %0 not defined, do you mean %1 ?");
+	}
+	
+	//! Return true if a constant of a given name exists
+	bool Compiler::constantExists(const std::wstring& name) const 
+	{
+		return constantsMap.find(name) != constantsMap.end();
 	}
 	
 	//! Build variables and functions maps
@@ -563,6 +574,14 @@ namespace Aseba
 		for (unsigned i = 0; i < targetDescription->nativeFunctions.size(); i++)
 		{
 			functionsMap[targetDescription->nativeFunctions[i].name] = i;
+		}
+		
+		// fill contants maps
+		constantsMap.clear();
+		for (unsigned i = 0; i < commonDefinitions->constants.size(); i++)
+		{
+			const NamedValue &constant(commonDefinitions->constants[i]);
+			constantsMap[constant.name] = constant.value;
 		}
 	}
 	
