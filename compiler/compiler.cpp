@@ -528,25 +528,31 @@ namespace Aseba
 	//! Look for a variable of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
 	{
-		return findInTable<VariablesMap>(variablesMap, varName, varPos, L"%0 is not a defined variable", L"%0 is not a defined variable, do you mean %1 ?");
+		return findInTable<VariablesMap>(variablesMap, varName, varPos, L"%0 is not a defined variable", L"%0 is not a defined variable, do you mean %1?");
 	}
 	
 	//! Look for a function of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
 	{
-		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, L"Target does not provide function %0",L"Target does not provide function %0, do you mean %1 ?");
+		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, L"Target does not provide function %0",L"Target does not provide function %0, do you mean %1?");
 	}
 	
 	//! Look for a constant of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::ConstantsMap::const_iterator Compiler::findConstant(const std::wstring& name, const SourcePos& pos) const
 	{
-		return findInTable<ConstantsMap>(constantsMap, name, pos, L"Constant %0 not defined", L"Constant %0 not defined, do you mean %1 ?");
+		return findInTable<ConstantsMap>(constantsMap, name, pos, L"Constant %0 not defined", L"Constant %0 not defined, do you mean %1?");
 	}
 	
 	//! Return true if a constant of a given name exists
 	bool Compiler::constantExists(const std::wstring& name) const 
 	{
 		return constantsMap.find(name) != constantsMap.end();
+	}
+	
+	//! Look for a subroutine of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::SubroutineReverseTable::const_iterator Compiler::findSubroutine(const std::wstring& name, const SourcePos& pos) const
+	{
+		return findInTable<SubroutineReverseTable>(subroutineReverseTable, name, pos, L"Subroutine %0 does not exists", L"Subroutine %0 does not exists, do you mean %1?");
 	}
 	
 	//! Build variables and functions maps

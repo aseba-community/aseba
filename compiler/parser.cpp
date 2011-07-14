@@ -639,17 +639,17 @@ namespace Aseba
 	//! Parse "sub" grammar element, declaration of subroutine
 	Node* Compiler::parseSubDecl()
 	{
-		SourcePos pos = tokens.front().pos;
+		const SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
 		const std::wstring& name = tokens.front().sValue;
-		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
+		const SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it != subroutineReverseTable.end())
 			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 is already defined").arg(name));
 		
-		unsigned subroutineId = subroutineTable.size();
+		const unsigned subroutineId = subroutineTable.size();
 		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
 		subroutineReverseTable[name] = subroutineId;
 		
@@ -661,15 +661,13 @@ namespace Aseba
 	//! Parse "subcall" grammar element, call of subroutine
 	Node* Compiler::parseCallSub()
 	{
-		SourcePos pos = tokens.front().pos;
+		const SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
 		const std::wstring& name = tokens.front().sValue;
-		SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
-		if (it == subroutineReverseTable.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 does not exists").arg(name));
+		const SubroutineReverseTable::const_iterator it(findSubroutine(name, pos));
 		
 		tokens.pop_front();
 		

@@ -316,6 +316,7 @@ namespace Aseba
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
 		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
 		ConstantsMap::const_iterator findConstant(const std::wstring& name, const SourcePos& pos) const;
+		SubroutineReverseTable::const_iterator findSubroutine(const std::wstring& name, const SourcePos& pos) const;
 		bool constantExists(const std::wstring& name) const;
 		void buildMaps();
 		void tokenize(std::wistream& source);
