@@ -413,7 +413,12 @@ namespace Aseba
 				if (event->modifiers() & Qt::ControlModifier)
 				{
 					cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-					if (cursor.selectedText() == "\t")
+					if ((cursor.selectedText() == "\t") ||
+						(	(cursor.selectedText() == " ") &&
+							(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
+							(cursor.selectedText() == "    ")
+						)
+					)
 						cursor.removeSelectedText();
 				}
 				else
@@ -426,7 +431,12 @@ namespace Aseba
 			if (event->modifiers() & Qt::ControlModifier)
 			{
 				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-				if (cursor.selectedText() == "\t")
+				if ((cursor.selectedText() == "\t") ||
+					(	(cursor.selectedText() == " ") &&
+						(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
+						(cursor.selectedText() == "    ")
+					)
+				)
 					cursor.removeSelectedText();
 			}
 			else
@@ -435,9 +445,8 @@ namespace Aseba
 			cursor.endEditBlock();
 			return;
 		}
-		
 		// handle indentation and new line
-		if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+		else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
 		{
 			QString headingSpace("\n");
 			const QString &line = textCursor().block().text();
