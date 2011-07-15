@@ -549,6 +549,27 @@ namespace Aseba
 		return constantsMap.find(name) != constantsMap.end();
 	}
 	
+	//! Look for a global event of a given name, and if found, return an iterator; if not, return an exception
+	Compiler::EventsMap::const_iterator Compiler::findGlobalEvent(const std::wstring& name, const SourcePos& pos) const
+	{
+		try
+		{
+			return findInTable<EventsMap>(globalEventsMap, name, pos, L"%0 is not a known event", L"%0 is not a known event, do you mean %1?");
+		}
+		catch (Error e)
+		{
+			if (allEventsMap.find(name) != allEventsMap.end())
+				throw Error(pos, WFormatableString(L"%0 is a local event that you cannot emit").arg(name));
+			else
+				throw e;
+		}
+	}
+	
+	Compiler::EventsMap::const_iterator Compiler::findAnyEvent(const std::wstring& name, const SourcePos& pos) const
+	{
+		return findInTable<EventsMap>(allEventsMap, name, pos, L"%0 is not a known event", L"%0 is not a known event, do you mean %1?");
+	}
+	
 	//! Look for a subroutine of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::SubroutineReverseTable::const_iterator Compiler::findSubroutine(const std::wstring& name, const SourcePos& pos) const
 	{
@@ -588,6 +609,20 @@ namespace Aseba
 		{
 			const NamedValue &constant(commonDefinitions->constants[i]);
 			constantsMap[constant.name] = constant.value;
+		}
+		
+		// fill global events map
+		globalEventsMap.clear();
+		for (unsigned i = 0; i < commonDefinitions->events.size(); i++)
+		{
+			globalEventsMap[commonDefinitions->events[i].name] = i;
+		}
+		
+		// fill global all events map
+		allEventsMap = globalEventsMap;
+		for (unsigned i = 0; i < targetDescription->localEvents.size(); ++i)
+		{
+			allEventsMap[targetDescription->localEvents[i].name] = ASEBA_EVENT_LOCAL_EVENTS_START - i;
 		}
 	}
 	

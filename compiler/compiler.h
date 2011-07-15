@@ -286,6 +286,8 @@ namespace Aseba
 		typedef std::set<unsigned> ImplementedEvents;
 		//! Lookup table for constant name => value
 		typedef std::map<std::wstring, int> ConstantsMap;
+		//! Lookup table for event name => id
+		typedef std::map<std::wstring, unsigned> EventsMap;
 	
 	public:
 		Compiler();
@@ -316,6 +318,8 @@ namespace Aseba
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
 		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
 		ConstantsMap::const_iterator findConstant(const std::wstring& name, const SourcePos& pos) const;
+		EventsMap::const_iterator findGlobalEvent(const std::wstring& name, const SourcePos& pos) const;
+		EventsMap::const_iterator findAnyEvent(const std::wstring& name, const SourcePos& pos) const;
 		SubroutineReverseTable::const_iterator findSubroutine(const std::wstring& name, const SourcePos& pos) const;
 		bool constantExists(const std::wstring& name) const;
 		void buildMaps();
@@ -366,6 +370,8 @@ namespace Aseba
 		ImplementedEvents implementedEvents; //!< list of implemented events
 		FunctionsMap functionsMap; //!< functions lookup
 		ConstantsMap constantsMap; //!< constants map
+		EventsMap globalEventsMap; //!< global-events map
+		EventsMap allEventsMap; //!< all-events map
 		SubroutineTable subroutineTable; //!< subroutine lookup
 		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable

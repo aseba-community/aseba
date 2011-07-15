@@ -168,14 +168,11 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const std::wstring & eventName = tokens.front().sValue;
-		for (size_t i = 0; i < commonDefinitions->events.size(); ++i)
-			if (commonDefinitions->events[i].name == eventName)
-			{
-				return i;
-			}
+		const std::wstring & name = tokens.front().sValue;
+		const SourcePos pos = tokens.front().pos;
+		const EventsMap::const_iterator eventIt(findGlobalEvent(name, pos));
 		
-		throw Error(tokens.front().pos, WFormatableString(L"%0 is not a known event").arg(eventName));
+		return eventIt->second;
 	}
 	
 	//! Check if next token is a known local or global event identifier
@@ -185,16 +182,11 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		// try first local
-		const std::wstring & eventName = tokens.front().sValue;
-		for (size_t i = 0; i < targetDescription->localEvents.size(); ++i)
-			if (targetDescription->localEvents[i].name == eventName)
-			{
-				return ASEBA_EVENT_LOCAL_EVENTS_START - i;
-			}
-			
-		// then global
-		return expectGlobalEventId();
+		const std::wstring & name = tokens.front().sValue;
+		const SourcePos pos = tokens.front().pos;
+		const EventsMap::const_iterator eventIt(findAnyEvent(name, pos));
+		
+		return eventIt->second;
 	}
 	
 	//! Return the name of an event given its identifier
@@ -597,7 +589,7 @@ namespace Aseba
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		
-		unsigned eventId = expectAnyEventId();
+		const unsigned eventId = expectAnyEventId();
 		if (implementedEvents.find(eventId) != implementedEvents.end())
 			throw Error(tokens.front().pos, WFormatableString(L"Event %0 is already implemented").arg(eventName(eventId)));
 		implementedEvents.insert(eventId);
