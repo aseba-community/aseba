@@ -25,6 +25,9 @@
 #include <dashel/dashel.h>
 #include <stdexcept>
 #include <iostream>
+#include <set>
+
+class QMenu;
 
 namespace Dashel
 {

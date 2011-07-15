@@ -26,6 +26,7 @@
 */
 
 #include "../../vm/natives.h"
+#include "../../common/productids.h"
 
 
 AsebaVMDescription vmDescription = {
@@ -34,6 +35,7 @@ AsebaVMDescription vmDescription = {
 		{ 1, "id" },	// Do not touch it
 		{ 1, "source" }, // nor this one
 		{ 32, "args" },	// neither this one
+		{ 1, ASEBA_PID_VAR_NAME },
 		{ 1, "leftSpeed" },
 		{ 1, "rightSpeed" },
 		{ 1, "colorR" },

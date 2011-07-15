@@ -18,6 +18,9 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QMenu>
+#include <QtDebug>
+
 #include "Plugin.h"
 #include "DashelTarget.h"
 #include "MainWindow.h"

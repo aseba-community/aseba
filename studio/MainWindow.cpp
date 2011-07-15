@@ -138,7 +138,7 @@ namespace Aseba
 		QSplitter(parent),
 		VariableListener(0),
 		id(id),
-		productId(ASEBA_PID_UNDEFINED),
+		pid(ASEBA_PID_UNDEFINED),
 		target(target),
 		mainWindow(mainWindow),
 		firstCompilation(true),
@@ -156,7 +156,6 @@ namespace Aseba
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
-		target->getVariables(id, vmMemoryModel->getVariablePos(ASEBA_PID_VAR_NAME), 1);
 		
 		// create gui
 		setupWidgets();
@@ -166,7 +165,7 @@ namespace Aseba
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
 		// get the value of the variables
-		//recompile();
+		recompile();
 		refreshMemoryClicked();
 	}
 	
@@ -186,10 +185,10 @@ namespace Aseba
 	{
 		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1) && (tools.empty()))
 		{
-			productId = values[0];
-			qDebug() << "received product id " << productId;
+			pid = values[0];
+			//qDebug() << "received product id " << pid;
 			
-			tools = nodeToolRegistrer.create(productId, this);
+			tools = nodeToolRegistrer.create(pid, this);
 			if (tools.empty())
 				return;
 			
@@ -199,6 +198,8 @@ namespace Aseba
 				layout->addWidget((*it)->createMenuEntry());
 			widget->setLayout(layout);
 			toolBox->addItem(widget, tr("Tools"));
+			
+			mainWindow->regenerateHelpMenu();
 			
 			connect(mainWindow, SIGNAL(MainWindowClosed()), SLOT(closePlugins()));
 		}
@@ -872,9 +873,10 @@ namespace Aseba
 	
 	void MainWindow::about()
 	{
-		QString text = tr(	"<p>Aseba pre-release:</p>" \
-						"<ul><li>Aseba " \
-						"ver. %0 / protocol ver. %1" \
+		QString text = tr("<p>Aseba version informations:</p>" \
+						"<ul><li>Aseba ver. "\
+						ASEBA_VERSION \
+						"<br/>(build ver. %0 / protocol ver. %1)" \
 						"</li><li>Dashel ver. "\
 						DASHEL_VERSION \
 						"</li></ul>" \
@@ -882,7 +884,7 @@ namespace Aseba
 						"<p><a href=\"http://aseba.wikidot.com\">http://aseba.wikidot.com</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
-		text = text.arg(ASEBA_VERSION).arg(ASEBA_PROTOCOL_VERSION);
+		text = text.arg(ASEBA_BUILD_VERSION).arg(ASEBA_PROTOCOL_VERSION);
 		
 		QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
@@ -1705,6 +1707,7 @@ namespace Aseba
 		nodes->removeAndDeleteTab(index);
 		
 		regenerateToolsMenus();
+		regenerateHelpMenu();
 	}
 	
 	//! The network connection has been cut: all nodes have disconnected.
@@ -2191,6 +2194,52 @@ namespace Aseba
 		globalToolBar->setVisible(activeVMCount > 1);
 	}
 	
+	void MainWindow::regenerateHelpMenu()
+	{
+		helpMenu->clear();
+		
+		helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
+		helpMenu->addAction(tr("&Studio..."), this, SLOT(showHelpStudio()));
+		helpMenu->addSeparator();
+		
+		typedef std::set<int> ProductIds;
+		ProductIds productIds;
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				productIds.insert(tab->productId());
+		}
+		for (ProductIds::const_iterator it(productIds.begin()); it != productIds.end(); ++it)
+		{
+			switch (*it)
+			{
+				case ASEBA_PID_THYMIO2:
+				helpMenu->addAction(tr("Thymio programming tutorial..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:thymiotutoriel")));
+				helpMenu->addAction(tr("Thymio programming interface..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:thymioapi")));
+				break;
+				
+				case ASEBA_PID_CHALLENGE:
+				helpMenu->addAction(tr("Challenge tutorial..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:gettingstarted")));
+				break;
+				
+				default:
+				break;
+			}
+		}
+		helpMenu->addSeparator();
+		
+		helpMenu->addAction(tr("Web site Aseba..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:start")));
+		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
+		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
+	}
+	
+	void MainWindow::openToUrlFromAction() const
+	{
+		const QAction *action(reinterpret_cast<QAction *>(sender()));
+		QDesktopServices::openUrl(action->data().toUrl());
+	}
+	
 	void MainWindow::setupMenu()
 	{
 		// File menu
@@ -2324,7 +2373,6 @@ namespace Aseba
 		toolMenu->addMenu(writeBytecodeMenu);
 		rebootMenu = new QMenu(tr("Reboot..."));
 		toolMenu->addMenu(rebootMenu);
-		regenerateToolsMenus();
 		
 		// Settings
 		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
@@ -2334,13 +2382,16 @@ namespace Aseba
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Help menu
-		QMenu *helpMenu = new QMenu(tr("&Help"), this);
+		helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
-		helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
+		/*helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
 		helpMenu->addAction(tr("&Studio..."), this, SLOT(showHelpStudio()));
 		helpMenu->addSeparator();
 		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
-		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
+		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));*/
+		
+		// add dynamic stuff
+		regenerateToolsMenus();
 	}
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!

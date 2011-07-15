@@ -29,10 +29,11 @@
 #define ASEBA_ASSERT
 #endif
 
-#include <../../vm/vm.h>
+#include "../../vm/vm.h"
 #include "../../vm/natives.h"
-#include <../../common/consts.h>
-#include <../../transport/buffer/vm-buffer.h>
+#include "../../common/consts.h"
+#include "../../transport/buffer/vm-buffer.h"
+#include "../../common/productids.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
 #include <iostream>
@@ -200,6 +201,7 @@ namespace Enki
 			sint16 id;
 			sint16 source;
 			sint16 args[32];
+			sint16 productId; 
 			sint16 speedL; // left motor speed
 			sint16 speedR; // right motor speed
 			sint16 colorR; // body red [0..100] %
@@ -233,6 +235,7 @@ namespace Enki
 			AsebaVMInit(&vm);
 			
 			variables.id = id;
+			variables.productId = ASEBA_PID_PLAYGROUND;
 		}
 		
 		virtual ~AsebaFeedableEPuck()

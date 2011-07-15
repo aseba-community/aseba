@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 project(aseba)
 
 # version management
-if (USER_VERSION)
-	message("-- User version given: " ${USER_VERSION})
-	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"${USER_VERSION}\"\n")
-else (USER_VERSION)
+if (USER_BUILD_VERSION)
+	message("-- User version given: " ${USER_BUILD_VERSION})
+	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_BUILD_VERSION \"${USER_BUILD_VERSION}\"\n")
+else (USER_BUILD_VERSION)
 	find_package(Subversion)
 	
 	if (Subversion_FOUND)
@@ -27,7 +27,7 @@ else (USER_VERSION)
 		# extract working copy information for SOURCE_DIR into MY_XXX variables
 		Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
 		# write a file with the SVNVERSION define
-		file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_VERSION \"svn-${ASEBA_WC_REVISION}\"\n")
+		file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_BUILD_VERSION \"svn-${ASEBA_WC_REVISION}\"\n")
 		# copy the file to the final header only if the version changes
 		# reduces needless rebuilds
 		execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different version.h.txt version.h)
@@ -35,9 +35,9 @@ else (USER_VERSION)
 		set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
 	else (Subversion_FOUND AND HAS_SVN_REP)
 		message("-- (svn executable not found OR not a svn repository) and no user version given, version is unknown.")
-		file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_VERSION \"unknown\"\n")
+		file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_BUILD_VERSION \"unknown\"\n")
 	endif (Subversion_FOUND AND HAS_SVN_REP)
-endif (USER_VERSION)
+endif (USER_BUILD_VERSION)
 
 # Dashel
 # TODO: make Dashel.cmake to perform this

@@ -124,6 +124,7 @@ namespace Aseba
 		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned nodeId() const { return id; }
+		unsigned productId() const  { return pid; }
 		
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
 	
@@ -181,8 +182,8 @@ namespace Aseba
 		void switchEditorProperty(const QString &oldProperty, const QString &newProperty);
 		
 	protected:
-		unsigned id;
-		unsigned productId;
+		unsigned id; //!< node identifier
+		unsigned pid; //!< node product identifier
 		friend class InvasivePlugin;
 		Target *target;
 	
@@ -304,6 +305,8 @@ namespace Aseba
 
 		void showHelpLanguage();
 		void showHelpStudio();
+		
+		void openToUrlFromAction() const;
 	
 	private:
 		// utility functions
@@ -318,6 +321,7 @@ namespace Aseba
 		void regenerateOpenRecentMenu();
 		void updateRecentFiles(const QString& fileName);
 		void regenerateToolsMenus();
+		void regenerateHelpMenu();
 		void setupWidgets();
 		void setupConnections();
 		void setupMenu();
@@ -374,7 +378,7 @@ namespace Aseba
 		QMenu *writeBytecodeMenu;
 		QAction *writeAllBytecodesAct;
 		QMenu *rebootMenu;
-		// TODO: continue there
+		QMenu *helpMenu;
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;
