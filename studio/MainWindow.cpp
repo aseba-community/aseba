@@ -874,17 +874,20 @@ namespace Aseba
 	void MainWindow::about()
 	{
 		QString text = tr("<p>Aseba version informations:</p>" \
-						"<ul><li>Aseba ver. "\
-						ASEBA_VERSION \
-						"<br/>(build ver. %0 / protocol ver. %1)" \
-						"</li><li>Dashel ver. "\
-						DASHEL_VERSION \
+						"<ul><li>Aseba ver. %0"\
+						"<br/>(build ver. %1/protocol ver. %2)" \
+						"</li><li>Dashel ver. %3"\
 						"</li></ul>" \
 						"<p>(c) 2006-2011 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
-						"<p><a href=\"http://aseba.wikidot.com\">http://aseba.wikidot.com</a></p>" \
+						"<p><a href=\"%5\">%5</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
-		text = text.arg(ASEBA_BUILD_VERSION).arg(ASEBA_PROTOCOL_VERSION);
+		text = text.
+			arg(ASEBA_VERSION).
+			arg(ASEBA_BUILD_VERSION).
+			arg(ASEBA_PROTOCOL_VERSION).
+			arg(DASHEL_VERSION).
+			arg(tr("http://aseba.wikidot.com/en:start"));
 		
 		QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
