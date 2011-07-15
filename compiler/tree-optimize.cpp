@@ -287,6 +287,36 @@ namespace Aseba
 			return new ImmediateNode(pos, result);
 		}
 		
+		// multiplications by 1 or addition of 0
+		// TODO: make more generic the concept of neutral element
+		if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV || op == ASEBA_OP_ADD || op == ASEBA_OP_SUB)
+		{
+			Node **survivor(0);
+			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
+			{
+				if (immediateRightChild && (immediateRightChild->value == 1))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == 1))
+					survivor = &children[1];
+			}
+			else
+			{
+				if (immediateRightChild && (immediateRightChild->value == 0))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == 0))
+					survivor = &children[1];
+			}
+			if (survivor)
+			{
+				if (dump)
+					*dump << sourcePos.toWString() << L": operation with neutral element removed\n";
+				Node *returNode = *survivor;
+				*survivor = 0;
+				delete this;
+				return returNode;
+			}
+		}
+		
 		// POT mult/div to shift conversion
 		if (immediateRightChild && isPOT(immediateRightChild->value))
 		{
