@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2010:
+	Copyright (C) 2007--2011:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -68,7 +68,7 @@ namespace Aseba
 		return false;
 	}
 	
-	// from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
+	//! Compute the edit distance between two vector-style containers, inspired from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
 	template <class T> unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)
 	{
 		const size_t len1 = s1.size() + 1, len2 = s2.size() + 1;
