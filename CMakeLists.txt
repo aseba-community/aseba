@@ -125,6 +125,7 @@ set (ASEBACORE_SRC
 set (ASEBACOMPILER_SRC
 	compiler/compiler.cpp
 	compiler/errors.cpp
+	compiler/identifier-lookup.cpp
 	compiler/lexer.cpp
 	compiler/parser.cpp
 	compiler/analysis.cpp
