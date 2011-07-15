@@ -2166,16 +2166,19 @@ namespace Aseba
 		writeBytecodeMenu->clear();
 		rebootMenu->clear();
 		
+		unsigned activeVMCount(0);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab)
-			{	
+			{
 				QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
 				
 				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
 				
 				rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
+				
+				++activeVMCount;
 			}
 		}
 		
@@ -2184,6 +2187,8 @@ namespace Aseba
 		
 		rebootMenu->addSeparator();
 		rebootMenu->addAction(tr("...all nodes"), this, SLOT(rebootAllNodes()));
+		
+		globalToolBar->setVisible(activeVMCount > 1);
 	}
 	
 	void MainWindow::setupMenu()
@@ -2287,7 +2292,7 @@ namespace Aseba
 		pauseAllAct->setShortcut(tr("F10", "Debug|Pause all"));
 		
 		// Debug toolbar
-		QToolBar* globalToolBar = addToolBar(tr("Debug"));
+		globalToolBar = addToolBar(tr("Debug"));
 		globalToolBar->setObjectName("debug toolbar");
 		globalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 		globalToolBar->addAction(loadAllAct);

@@ -365,6 +365,7 @@ namespace Aseba
 		QAction* resetAllAct;
 		QAction* runAllAct;
 		QAction* pauseAllAct;
+		QToolBar* globalToolBar;
 		
 		// open recent actions
 		QMenu *openRecentMenu;
