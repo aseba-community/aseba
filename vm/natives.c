@@ -86,28 +86,53 @@ sint16 aseba_atan2(sint16 y, sint16 x)
 		}
 		else
 		{
-			sint32 value = (((sint32)ay << 16)/(sint32)(ax));
-			sint16 fb1 = 0;
+#ifdef __C30__
+			unsigned int q2, rem1;
+			unsigned long q1;
+			q1 = __builtin_divmodud(ay, ax, &rem1);
+			q2 = __builtin_divud(((unsigned long) rem1) << 16, ax);
+			sint32 value = (q1 << 16) | q2;
+			
+			sint16 fb1;
 			
 			// find first bit at one
-	#ifdef __C30__ 
 			// ASM optimisation for 16bits PIC
 			// Find first bit from left (MSB) on 32 bits word
 			asm ("ff1l %[word], %[b]" : [b] "=r" (fb1) : [word] "r" ((int) (value >> 16)) : "cc");
 			if(fb1) 
-				fb1 = fb1 + 16 - 1; // Bit 0 is "1", fbl = 0 mean no 1 found for ff1l
+				fb1 = 17 - fb1 + 16 - 1; // Bit 0 is "16", fbl = 0 mean no 1 found for ff1l
 			else {
 				asm ("ff1l %[word], %[b]" : [b] "=r" (fb1) : [word] "r" ((int) value) : "cc");
 				if(fb1)
-					fb1--; // See above
+					fb1 = 17 - fb1 - 1; // see above
 			}
+			{
+				// we only keep 4 bits of precision below comma as atan(x) is like x near 0
+				sint16 index = fb1 - 12;
+				if (index < 0)
+				{
+					// value is smaller than 2e-4
+					res = (value*aseba_atan_table[0]) >> 12;
+				}
+				else
+				{
+					sint32 subprecision_rest = value - (1L << fb1);
+					sint16 to_shift = fb1 - 8; // fb1 >= 12 otherwise index would have been < 0
+					sint16 subprecision_index = (sint16)(subprecision_rest >> to_shift);
+					sint16 bin = subprecision_index >> 5;
+					sint16 delta = subprecision_index & 0x1f;
+					res = __builtin_divsd(__builtin_mulss(aseba_atan_table[index*8 + bin], 32 - delta) + __builtin_mulss(aseba_atan_table[index*8 + bin + 1], delta),32);
+				}
 				
-	#else		
+#else		
+			sint32 value = (((sint32)ay << 16)/(sint32)(ax));
+			sint16 fb1 = 0;
+			
 			sint16 fb1_counter;
 			for (fb1_counter = 0; fb1_counter < 32; fb1_counter++)
 				if ((value >> (sint32)fb1_counter) != 0)
 					fb1 = fb1_counter;
-	#endif	
+						
 			{
 				// we only keep 4 bits of precision below comma as atan(x) is like x near 0
 				sint16 index = fb1 - 12;
@@ -118,14 +143,14 @@ sint16 aseba_atan2(sint16 y, sint16 x)
 				}
 				else
 				{
-					sint32 subprecision_rest = value - (1 << (sint32)fb1);
+					sint32 subprecision_rest = value - (((sint32) 1) << fb1);
 					sint16 to_shift = fb1 - 8; // fb1 >= 12 otherwise index would have been < 0
-					sint16 subprecision_index = (sint16)(subprecision_rest >> (sint32)to_shift);
+					sint16 subprecision_index = (sint16)(subprecision_rest >> to_shift);
 					sint16 bin = subprecision_index >> 5;
 					sint16 delta = subprecision_index & 0x1f;
 					res = (sint16)(((sint32)aseba_atan_table[index*8 + bin] * (sint32)(32 - delta) + (sint32)aseba_atan_table[index*8 + bin + 1] * (sint32)delta) >> 5);
 				}
-				
+#endif
 				// do pi - value if x negative
 				if (x < 0)
 					res = 32768 - res;
