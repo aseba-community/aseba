@@ -30,6 +30,7 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
+#include <malloc.h>
 
 namespace Aseba
 {
