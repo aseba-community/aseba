@@ -69,21 +69,44 @@ namespace Aseba
 	{
 		// max packet length is 65533
 		// packet source and packet type is not counted in len,
-		// thus read buffer is of size len + 4
+		// thus amount of data to read is of size: 
+		// len + 2 (for source id) + 2 (for msg type)
 		uint16 netLen;
 		
 		// read the transfer size
 		stream->read(&netLen, 2);
 		const uint16 len(swapEndianCopy(netLen));
 		
+		// read the source id
+		uint16 netSourceId;
+		stream->read(&netSourceId, 2);
+		uint16 sourceId(swapEndianCopy(netSourceId));
+		uint16 oldSourceId(sourceId);
+		
+		// check whether it is remapped
+		const IdRemapTable::const_iterator remapIt(idRemapTable.find(stream));
+		if (remapIt != idRemapTable.end())
+		{
+			sourceId = remapIt->second;
+			netSourceId = swapEndianCopy(sourceId);
+		}
+		
+		// read the type
+		uint16 netType;
+		stream->read(&netType, 2);
+		const uint16 type(swapEndianCopy(netType));
+		
 		// allocate the read buffer and do socket read
-		std::valarray<uint8> readbuff((uint8)0, len + 4);
-		stream->read(&readbuff[0], len + 4);
+		std::valarray<uint8> readbuff((uint8)0, len);
+		stream->read(&readbuff[0], len);
 		
 		if (dump)
 		{
 			dumpTime(cout, rawTime);
-			std::cout << "Read " << std::dec << len + 4 << " on stream " << stream << " : ";
+			std::cout << "From " << sourceId;
+			if (oldSourceId != sourceId)
+				std::cout << " (remapped from " << oldSourceId << ")";
+			std::cout << ", type " << std::hex << type << ", reading " << std::dec << len << " content bytes on stream " << stream << " : ";
 			for(unsigned int i = 0; i < readbuff.size(); i++)
 				std::cout << std::hex << (unsigned)readbuff[i] << " ";
 			std::cout << std::endl;
@@ -100,7 +123,9 @@ namespace Aseba
 			try
 			{
 				destStream->write(&netLen, 2);
-				destStream->write(&readbuff[0], len + 4);
+				destStream->write(&netSourceId, 2);
+				destStream->write(&netType, 2);
+				destStream->write(&readbuff[0], len);
 				destStream->flush();
 			}
 			catch (DashelException e)
@@ -133,6 +158,11 @@ namespace Aseba
 			uMsg.serialize(*it);
 			(*it)->flush();
 		}
+	}
+	
+	void Switch::remapId(Dashel::Stream* stream, const unsigned id)
+	{
+		idRemapTable[stream] = id;
 	}
 	
 	/*@}*/
@@ -210,7 +240,18 @@ int main(int argc, char *argv[])
 	{
 		Aseba::Switch aswitch(port, verbose, dump, forward, rawTime);
 		for (size_t i = 0; i < additionalTargets.size(); i++)
-			aswitch.connect(additionalTargets[i]);
+		{
+			const std::string& target(additionalTargets[i]);
+			Dashel::Stream* stream = aswitch.connect(target);
+			
+			// see whether we have to remap the id of this stream
+			Dashel::ParameterSet remapIdDecoder;
+			remapIdDecoder.add("remap=-1");
+			remapIdDecoder.add(target.c_str());
+			const int remappedId(remapIdDecoder.get<int>("remap"));
+			if (remappedId >= 0)
+				aswitch.remapId(stream, unsigned(remappedId));
+		}
 		/*
 		Uncomment this and comment aswitch.run() to flood all pears with dummy user messages
 		while (1)

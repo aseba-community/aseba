@@ -22,6 +22,7 @@
 #define ASEBA_SWITCH
 
 #include <dashel/dashel.h>
+#include <map>
 
 namespace Aseba
 {
@@ -52,6 +53,12 @@ namespace Aseba
 			/*!	Send a dummy user message to all connected pears. */
 			void broadcastDummyUserMessage();
 			
+			/*! Remap the node identifier for messages coming on a stream
+				@param stream the stream from which node id will be remapped
+				@param id the new node id to use
+			*/
+			void remapId(Dashel::Stream* stream, const unsigned id);
+			
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
 			virtual void incomingData(Dashel::Stream *stream);
@@ -62,6 +69,10 @@ namespace Aseba
 			bool dump; //!< should we dump content of CAN messages
 			bool forward; //!< should we only forward messages instead of transmit them back to the sender
 			bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
+			
+			//! A table allowing to remap the aseba node id of streams
+			typedef std::map<Dashel::Stream*, unsigned> IdRemapTable;
+			IdRemapTable idRemapTable; //!< table for remapping id
 	};
 	
 	/*@}*/
