@@ -23,6 +23,7 @@
 
 #include <dashel/dashel.h>
 #include <map>
+#include "../common/types.h"
 
 namespace Aseba
 {
@@ -55,9 +56,10 @@ namespace Aseba
 			
 			/*! Remap the node identifier for messages coming on a stream
 				@param stream the stream from which node id will be remapped
-				@param id the new node id to use
+				@param localId the new local node id to use
+				@param targetId the target node id to remap
 			*/
-			void remapId(Dashel::Stream* stream, const unsigned id);
+			void remapId(Dashel::Stream* stream, const uint16 localId, const uint16 targetId);
 			
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
@@ -70,8 +72,10 @@ namespace Aseba
 			bool forward; //!< should we only forward messages instead of transmit them back to the sender
 			bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 			
+			//! A pair of id: local, target
+			typedef std::pair<uint16, uint16> IdPair;
 			//! A table allowing to remap the aseba node id of streams
-			typedef std::map<Dashel::Stream*, unsigned> IdRemapTable;
+			typedef std::map<Dashel::Stream*, IdPair> IdRemapTable;
 			IdRemapTable idRemapTable; //!< table for remapping id
 	};
 	
