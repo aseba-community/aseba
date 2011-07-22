@@ -2226,6 +2226,10 @@ namespace Aseba
 				helpMenu->addAction(tr("Challenge tutorial..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:gettingstarted")));
 				break;
 				
+				case ASEBA_PID_MARXBOT:
+				helpMenu->addAction(tr("MarXbot user manual..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf")));
+				break;
+				
 				default:
 				break;
 			}
