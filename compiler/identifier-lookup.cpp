@@ -30,7 +30,9 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
-#include <malloc.h>
+#ifndef __APPLE__
+	#include <malloc.h>
+#endif
 
 namespace Aseba
 {
