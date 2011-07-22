@@ -863,10 +863,12 @@ namespace Aseba
 	
 	MainWindow::~MainWindow()
 	{
+		#ifdef HAVE_QWT
 		for (EventViewers::iterator it = eventsViewers.begin(); it != eventsViewers.end(); ++it)
 		{
 			it.value()->detachFromMain();
 		}
+		#endif // HAVE_QWT
 		
 		delete target;
 	}
