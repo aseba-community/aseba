@@ -2398,6 +2398,9 @@ namespace Aseba
 		helpMenu->addSeparator();
 		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
 		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));*/
+
+		// Generate a basic help menu, for robots without any productID (as current marXbots)
+		regenerateHelpMenu();
 		
 		// add dynamic stuff
 		regenerateToolsMenus();
