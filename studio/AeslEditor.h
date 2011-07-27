@@ -23,6 +23,7 @@
 
 #include <QSyntaxHighlighter>
 
+#include <QWidget>
 #include <QHash>
 #include <QTextCharFormat>
 #include <QTextBlockUserData>
@@ -78,6 +79,28 @@ namespace Aseba
 		
 		AeslEditorUserData(const QString &property, const QVariant &value = QVariant()) { properties.insert(property, value); }
 		virtual ~AeslEditorUserData() { }
+	};
+
+	class AeslEditorSidebar : public QWidget
+	{
+		Q_OBJECT
+
+	public:
+		AeslEditorSidebar(AeslEditor* editor);
+		virtual QSize sizeHint() const;
+
+	public slots:
+		void scroll(int verticalScroll);
+		void showLineNumbers(bool state);
+
+	protected:
+		virtual void paintEvent(QPaintEvent *event);
+		int idealLineNumberWidth() const;
+
+	protected:
+		AeslEditor* editor;
+		QSize currentSizeHint;
+		int verticalScroll;
 	};
 	
 	class ScriptTab;

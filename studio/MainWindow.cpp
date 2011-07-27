@@ -116,6 +116,7 @@ namespace Aseba
 	{
 		// editor widget
 		editor = new AeslEditor(this);
+		sidebar = new AeslEditorSidebar(editor);
 		highlighter = new AeslHighlighter(editor, editor->document());
 	}
 	
@@ -221,8 +222,11 @@ namespace Aseba
 		compilationResultLayout->addWidget(compilationResultImage);
 		
 		// editor area
+		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
+		editorAreaLayout->addWidget(sidebar);
+		editorAreaLayout->addWidget(editor);
 		QVBoxLayout *editorLayout = new QVBoxLayout;
-		editorLayout->addWidget(editor);
+		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
 		
 		// panel
@@ -1235,6 +1239,17 @@ namespace Aseba
 	{
 		findDialog->replaceGroupBox->setChecked(true);
 		findDialog->show();
+	}
+
+	void MainWindow::showLineNumbersChanged(bool state)
+	{
+		assert(currentScriptTab);
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+			Q_ASSERT(tab);
+			tab->sidebar->showLineNumbers(state);
+		}
 	}
 	
 	void MainWindow::goToLine()
@@ -2316,6 +2331,12 @@ namespace Aseba
 		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
 		replaceAct->setEnabled(false);
 		
+		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
+		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
+		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
+		showLineNumbers->setCheckable(true);
+		showLineNumbers->setChecked(true);
+
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
 		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
@@ -2335,6 +2356,7 @@ namespace Aseba
 		editMenu->addAction(findAct);
 		editMenu->addAction(replaceAct);
 		editMenu->addSeparator();
+		editMenu->addAction(showLineNumbers);
 		editMenu->addAction(goToLineAct);
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);

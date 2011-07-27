@@ -225,7 +225,94 @@ namespace Aseba
 			setFormat(pos, len, Qt::red);
 		}
 	}
-	
+
+	AeslEditorSidebar::AeslEditorSidebar(AeslEditor* editor) :
+		QWidget(editor),
+		editor(editor),
+		currentSizeHint(0,0),
+		verticalScroll(0)
+	{
+		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+		connect(editor->verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(scroll(int)));
+		connect(editor, SIGNAL(textChanged()), SLOT(update()));
+	}
+
+	void AeslEditorSidebar::scroll(int dy)
+	{
+		verticalScroll = dy;
+		update();		// repaint
+	}
+
+	void AeslEditorSidebar::showLineNumbers(bool state)
+	{
+		setVisible(state);
+	}
+
+	QSize AeslEditorSidebar::sizeHint() const
+	{
+		return QSize(idealLineNumberWidth(), 0);
+	}
+
+	void AeslEditorSidebar::paintEvent(QPaintEvent *event)
+	{
+		QSize newSizeHint = sizeHint();
+
+		if (currentSizeHint != newSizeHint)
+		{
+			// geometry has changed, recompute the layout based on sizeHint()
+			updateGeometry();
+			currentSizeHint = newSizeHint;
+		}
+
+		// begin painting
+		QPainter painter(this);
+
+		// get the editor's painting area
+		QRect editorRect = editor->contentsRect();
+
+		// enable clipping to match the vertical painting area of the editor
+		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip );
+		painter.setClipping(true);
+
+		// fill the background
+		painter.fillRect(event->rect(), QColor(210, 210, 210));
+
+		// get the first text block
+		QTextBlock block = editor->document()->firstBlock();
+		
+		painter.setPen(Qt::darkGray);
+		// iterate over all text blocks
+		// FIXME: do clever painting
+		while(block.isValid())
+		{
+			if (block.isVisible())
+			{
+				QString number = QString::number(block.blockNumber() + 1);
+				// paint the line number
+				int y = block.layout()->position().y() + editorRect.top() - verticalScroll;
+				painter.drawText(0, y, width(), fontMetrics().height(), Qt::AlignRight, number);
+			}
+
+			block = block.next();
+		}
+	}
+
+	int AeslEditorSidebar::idealLineNumberWidth() const
+	{
+		// This is based on the Qt code editor example
+		// http://doc.qt.nokia.com/latest/widgets-codeeditor.html
+		int digits = 1;
+		int linenumber = editor->document()->blockCount();
+		while (linenumber >= 10) {
+			linenumber /= 10;
+			digits++;
+		}
+
+		int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+
+		return space;
+	}
+
 	AeslEditor::AeslEditor(const ScriptTab* tab) :
 		tab(tab),
 		debugging(false),
@@ -397,7 +484,7 @@ namespace Aseba
 			menu->exec(e->globalPos());
 		delete menu;
 	}
-	
+
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
 		// handle tab and control tab

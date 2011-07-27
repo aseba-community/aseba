@@ -63,6 +63,7 @@ namespace Aseba
 	class TargetMemoryModel;
 	class NamedValuesVectorModel;
 	class AeslEditor;
+	class AeslEditorSidebar;
 	class AeslHighlighter;
 	class EventViewer;
 	class EditorsPlotsTabWidget;
@@ -103,6 +104,7 @@ namespace Aseba
 		
 		friend class MainWindow;
 		AeslEditor* editor;
+		AeslEditorSidebar* sidebar;
 		AeslHighlighter *highlighter;
 	};
 	
@@ -247,6 +249,7 @@ namespace Aseba
 		void copyAll();
 		void findTriggered();
 		void replaceTriggered();
+		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
 		
@@ -388,6 +391,7 @@ namespace Aseba
 		QAction *redoAct;
 		QAction *findAct;
 		QAction *replaceAct;
+		QAction *showLineNumbers;
 		QAction *goToLineAct;
 		QAction *showHiddenAct;
 		QAction* showCompilationMsg;
