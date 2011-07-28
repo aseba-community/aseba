@@ -243,14 +243,9 @@ namespace Aseba
 		update();		// repaint
 	}
 
-	void AeslEditorSidebar::showLineNumbers(bool state)
-	{
-		setVisible(state);
-	}
-
 	QSize AeslEditorSidebar::sizeHint() const
 	{
-		return QSize(idealLineNumberWidth(), 0);
+		return QSize(idealWidth(), 0);
 	}
 
 	void AeslEditorSidebar::paintEvent(QPaintEvent *event)
@@ -263,9 +258,51 @@ namespace Aseba
 			updateGeometry();
 			currentSizeHint = newSizeHint;
 		}
+	}
+
+	int AeslEditorSidebar::posToLineNumber(int y)
+	{
+
+		// iterate over all text blocks
+		QTextBlock block = editor->document()->firstBlock();
+		int offset = editor->contentsRect().top();		// top margin
+
+		while (block.isValid())
+		{
+			QRectF bounds = block.layout()->boundingRect();
+			bounds.translate(0, offset + block.layout()->position().y());
+			if (y > bounds.top() && y < bounds.bottom())
+			{
+				// this is it
+				return block.blockNumber();
+			}
+
+			block = block.next();
+		}
+
+		// not found
+		return -1;
+	}
+
+	AeslLineNumberSidebar::AeslLineNumberSidebar(AeslEditor *editor) :
+		AeslEditorSidebar(editor)
+	{
+	}
+
+	void AeslLineNumberSidebar::showLineNumbers(bool state)
+	{
+		setVisible(state);
+	}
+
+	void AeslLineNumberSidebar::paintEvent(QPaintEvent *event)
+	{
+		AeslEditorSidebar::paintEvent(event);
 
 		// begin painting
 		QPainter painter(this);
+
+		// fill the background
+		painter.fillRect(event->rect(), QColor(210, 210, 210));
 
 		// get the editor's painting area
 		QRect editorRect = editor->contentsRect();
@@ -274,12 +311,14 @@ namespace Aseba
 		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip );
 		painter.setClipping(true);
 
-		// fill the background
-		painter.fillRect(event->rect(), QColor(210, 210, 210));
+		// define the painting area for linenumbers (top / bottom are identic to the editor))
+		QRect region = editorRect;
+		region.setLeft(0);
+		region.setRight(idealWidth());
 
 		// get the first text block
 		QTextBlock block = editor->document()->firstBlock();
-		
+
 		painter.setPen(Qt::darkGray);
 		// iterate over all text blocks
 		// FIXME: do clever painting
@@ -289,7 +328,7 @@ namespace Aseba
 			{
 				QString number = QString::number(block.blockNumber() + 1);
 				// paint the line number
-				int y = block.layout()->position().y() + editorRect.top() - verticalScroll;
+				int y = block.layout()->position().y() + region.top() - verticalScroll;
 				painter.drawText(0, y, width(), fontMetrics().height(), Qt::AlignRight, number);
 			}
 
@@ -297,7 +336,7 @@ namespace Aseba
 		}
 	}
 
-	int AeslEditorSidebar::idealLineNumberWidth() const
+	int AeslLineNumberSidebar::idealWidth() const
 	{
 		// This is based on the Qt code editor example
 		// http://doc.qt.nokia.com/latest/widgets-codeeditor.html
@@ -311,6 +350,71 @@ namespace Aseba
 		int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 
 		return space;
+	}
+
+	AeslBreakpointSidebar::AeslBreakpointSidebar(AeslEditor *editor) :
+		AeslEditorSidebar(editor)
+	{
+	}
+
+	void AeslBreakpointSidebar::paintEvent(QPaintEvent *event)
+	{
+		AeslEditorSidebar::paintEvent(event);
+
+		// begin painting
+		QPainter painter(this);
+
+		// fill the background
+		painter.fillRect(event->rect(), QColor(210, 210, 210));
+
+		// get the editor's painting area
+		QRect editorRect = editor->contentsRect();
+
+		// enable clipping to match the vertical painting area of the editor
+		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip );
+		painter.setClipping(true);
+
+		// define the painting area for breakpoints (top / bottom are identic to the editor)
+		QRect region = editorRect;
+		region.setLeft(0);
+		region.setRight(idealWidth());
+
+		// get the first text block
+		QTextBlock block = editor->document()->firstBlock();
+
+		painter.setPen(Qt::red);
+		painter.setBrush(Qt::red);
+		// iterate over all text blocks
+		// FIXME: do clever painting
+		while(block.isValid())
+		{
+			if (block.isVisible())
+			{
+				// get the block data and check for a breakpoint
+				if (editor->isBreakpoint(block))
+				{
+					// paint the breakpoint
+					int y = block.layout()->position().y() + region.top() - verticalScroll;
+					// FIXME: Hughly breakpoing design...
+					painter.drawRect(2, y + 2, 16, 16);
+				}
+
+			}
+
+			block = block.next();
+		}
+	}
+
+	void AeslBreakpointSidebar::mousePressEvent(QMouseEvent *event)
+	{
+		// click in the breakpoint column
+		int line = posToLineNumber(event->pos().y());
+		editor->toggleBreakpoint(editor->document()->findBlockByNumber(line));
+	}
+
+	int AeslBreakpointSidebar::idealWidth() const
+	{
+		return 20;
 	}
 
 	AeslEditor::AeslEditor(const ScriptTab* tab) :
@@ -423,8 +527,8 @@ namespace Aseba
 			
 			// check for breakpoint
 			QTextBlock block = cursorForPosition(e->pos()).block();
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
-			bool breakpointPresent = (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
+			//AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			bool breakpointPresent = isBreakpoint(block);
 			
 			// add action
 			if (breakpointPresent)
@@ -443,46 +547,77 @@ namespace Aseba
 				if (breakpointPresent)
 				{
 					// clear breakpoint
-					uData->properties.remove("breakpointPending");
-					uData->properties.remove("breakpoint");
-					if (uData->properties.isEmpty())
-					{
-						// garbage collect UserData
-						block.setUserData(0);
-					}
-					emit breakpointCleared(cursorForPosition(e->pos()).blockNumber());
+					clearBreakpoint(block);
 				}
 				else
 				{
 					// set breakpoint
-					if (!uData)
-					{
-						// create user data
-						uData = new AeslEditorUserData("breakpointPending");
-						block.setUserData(uData);
-					}
-					else
-						uData->properties.insert("breakpointPending", QVariant());
-					emit breakpointSet(cursorForPosition(e->pos()).blockNumber());
+					setBreakpoint(block);
 				}
 			}
 			if (selectedAction == breakpointClearAllAction)
 			{
-				for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
-				{
-					AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
-					if (uData)
-					{
-						uData->properties.remove("breakpoint");
-						uData->properties.remove("breakpointPending");
-					}
-				}
-				emit breakpointClearedAll();
+				clearAllBreakpoints();
 			}
 		}
 		else
 			menu->exec(e->globalPos());
 		delete menu;
+	}
+
+	bool AeslEditor::isBreakpoint(QTextBlock block)
+	{
+		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
+	}
+
+	void AeslEditor::toggleBreakpoint(QTextBlock block)
+	{
+		if (isBreakpoint(block))
+			clearBreakpoint(block);
+		else
+			setBreakpoint(block);
+	}
+
+	void AeslEditor::setBreakpoint(QTextBlock block)
+	{
+		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		if (!uData)
+		{
+			// create user data
+			uData = new AeslEditorUserData("breakpointPending");
+			block.setUserData(uData);
+		}
+		else
+			uData->properties.insert("breakpointPending", QVariant());
+		emit breakpointSet(block.blockNumber());
+	}
+
+	void AeslEditor::clearBreakpoint(QTextBlock block)
+	{
+		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		uData->properties.remove("breakpointPending");
+		uData->properties.remove("breakpoint");
+		if (uData->properties.isEmpty())
+		{
+			// garbage collect UserData
+			block.setUserData(0);
+		}
+		emit breakpointCleared(block.blockNumber());
+	}
+
+	void AeslEditor::clearAllBreakpoints()
+	{
+		for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
+		{
+			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
+			if (uData)
+			{
+				uData->properties.remove("breakpoint");
+				uData->properties.remove("breakpointPending");
+			}
+		}
+		emit breakpointClearedAll();
 	}
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)

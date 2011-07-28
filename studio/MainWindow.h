@@ -63,7 +63,8 @@ namespace Aseba
 	class TargetMemoryModel;
 	class NamedValuesVectorModel;
 	class AeslEditor;
-	class AeslEditorSidebar;
+	class AeslLineNumberSidebar;
+	class AeslBreakpointSidebar;
 	class AeslHighlighter;
 	class EventViewer;
 	class EditorsPlotsTabWidget;
@@ -104,7 +105,8 @@ namespace Aseba
 		
 		friend class MainWindow;
 		AeslEditor* editor;
-		AeslEditorSidebar* sidebar;
+		AeslLineNumberSidebar* linenumbers;
+		AeslBreakpointSidebar* breakpoints;
 		AeslHighlighter *highlighter;
 	};
 	

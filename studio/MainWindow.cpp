@@ -116,7 +116,8 @@ namespace Aseba
 	{
 		// editor widget
 		editor = new AeslEditor(this);
-		sidebar = new AeslEditorSidebar(editor);
+		breakpoints = new AeslBreakpointSidebar(editor);
+		linenumbers = new AeslLineNumberSidebar(editor);
 		highlighter = new AeslHighlighter(editor, editor->document());
 	}
 	
@@ -223,7 +224,9 @@ namespace Aseba
 		
 		// editor area
 		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
-		editorAreaLayout->addWidget(sidebar);
+		editorAreaLayout->setSpacing(0);
+		editorAreaLayout->addWidget(breakpoints);
+		editorAreaLayout->addWidget(linenumbers);
 		editorAreaLayout->addWidget(editor);
 		QVBoxLayout *editorLayout = new QVBoxLayout;
 		editorLayout->addLayout(editorAreaLayout);
@@ -1248,7 +1251,7 @@ namespace Aseba
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
-			tab->sidebar->showLineNumbers(state);
+			tab->linenumbers->showLineNumbers(state);
 		}
 	}
 	

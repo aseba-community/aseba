@@ -90,17 +90,47 @@ namespace Aseba
 		virtual QSize sizeHint() const;
 
 	public slots:
-		void scroll(int verticalScroll);
-		void showLineNumbers(bool state);
+		virtual void scroll(int verticalScroll);
 
 	protected:
 		virtual void paintEvent(QPaintEvent *event);
-		int idealLineNumberWidth() const;
+		virtual void mousePressEvent(QMouseEvent *event) {QWidget::mousePressEvent(event);}
+
+		virtual int idealWidth() const = 0;
+		int posToLineNumber(int y);
 
 	protected:
 		AeslEditor* editor;
 		QSize currentSizeHint;
 		int verticalScroll;
+	};
+
+	class AeslLineNumberSidebar : public AeslEditorSidebar
+	{
+		Q_OBJECT
+
+	public:
+		AeslLineNumberSidebar(AeslEditor* editor);
+
+	public slots:
+		void showLineNumbers(bool state);
+
+	protected:
+		virtual void paintEvent(QPaintEvent *event);
+		virtual int idealWidth() const;
+	};
+
+	class AeslBreakpointSidebar : public AeslEditorSidebar
+	{
+		Q_OBJECT
+
+	public:
+		AeslBreakpointSidebar(AeslEditor* editor);
+
+	protected:
+		virtual void paintEvent(QPaintEvent *event);
+		virtual void mousePressEvent(QMouseEvent *event);
+		virtual int idealWidth() const;
 	};
 	
 	class ScriptTab;
@@ -118,6 +148,12 @@ namespace Aseba
 		AeslEditor(const ScriptTab* tab);
 		virtual ~AeslEditor() { }
 		virtual void contextMenuEvent ( QContextMenuEvent * e );
+
+		bool isBreakpoint(QTextBlock block);
+		void toggleBreakpoint(QTextBlock block);
+		void setBreakpoint(QTextBlock block);
+		void clearBreakpoint(QTextBlock block);
+		void clearAllBreakpoints();
 	
 	public:
 		const ScriptTab* tab;
