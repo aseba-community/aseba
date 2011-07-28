@@ -2040,6 +2040,8 @@ namespace Aseba
 		
 		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
 		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
+		addConstantButton->setToolTip(tr("Add a new constant"));
+		removeConstantButton->setToolTip(tr("Remove this constant"));
 		removeConstantButton->setEnabled(false);
 		
 		constantsView = new FixedWidthTableView;
@@ -2102,11 +2104,17 @@ namespace Aseba
 		removeEventNameButton->setEnabled(false);
 		sendEventButton = new QPushButton(QPixmap(QString(":/images/newmsg.png")), "");
 		sendEventButton->setEnabled(false);
+
+		addEventNameButton->setToolTip(tr("Add a new event"));
+		removeEventNameButton->setToolTip(tr("Remove this event"));
+		sendEventButton->setToolTip(tr("Send this event"));
+
 		#ifdef HAVE_QWT
 		plotEventButton = new QPushButton(QPixmap(QString(":/images/plot.png")), "");
 		plotEventButton->setEnabled(false);
+		plotEventButton->setToolTip(tr("Plot this event"));
 		#endif // HAVE_QWT
-		
+
 		eventsDescriptionsView = new FixedWidthTableView;
 		eventsDescriptionsView->setShowGrid(false);
 		eventsDescriptionsView->verticalHeader()->hide();
