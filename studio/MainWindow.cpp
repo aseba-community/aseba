@@ -1270,6 +1270,18 @@ namespace Aseba
 		if (ok)
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
 	}
+
+	void MainWindow::toggleBreakpoint()
+	{
+		assert(currentScriptTab);
+		currentScriptTab->editor->toggleBreakpoint();
+	}
+
+	void MainWindow::clearAllBreakpoints()
+	{
+		assert(currentScriptTab);
+		currentScriptTab->editor->clearAllBreakpoints();
+	}
 	
 	void MainWindow::resetAll()
 	{
@@ -2384,8 +2396,19 @@ namespace Aseba
 		globalToolBar->addAction(pauseAllAct);
 		
 		// Debug menu
+		toggleBreakpointAct = new QAction(tr("Toggle breakpoint"), this);
+		toggleBreakpointAct->setShortcut(tr("Ctrl+B", "Debug|Toggle breakpoint"));
+		connect(toggleBreakpointAct, SIGNAL(triggered()), SLOT(toggleBreakpoint()));
+
+		clearAllBreakpointsAct = new QAction(tr("Clear all breakpoints"), this);
+		//clearAllBreakpointsAct->setShortcut();
+		connect(clearAllBreakpointsAct, SIGNAL(triggered()), SLOT(clearAllBreakpoints()));
+
 		QMenu *debugMenu = new QMenu(tr("&Debug"), this);
 		menuBar()->addMenu(debugMenu);
+		debugMenu->addAction(toggleBreakpointAct);
+		debugMenu->addAction(clearAllBreakpointsAct);
+		debugMenu->addSeparator();
 		debugMenu->addAction(loadAllAct);
 		debugMenu->addAction(resetAllAct);
 		debugMenu->addAction(runAllAct);

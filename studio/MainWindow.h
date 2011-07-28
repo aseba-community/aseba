@@ -254,6 +254,9 @@ namespace Aseba
 		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
+
+		void toggleBreakpoint();
+		void clearAllBreakpoints();
 		
 		void loadAll();
 		void resetAll();
@@ -395,6 +398,8 @@ namespace Aseba
 		QAction *replaceAct;
 		QAction *showLineNumbers;
 		QAction *goToLineAct;
+		QAction *toggleBreakpointAct;
+		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;
 		QAction* showCompilationMsg;
 		

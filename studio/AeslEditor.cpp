@@ -565,10 +565,20 @@ namespace Aseba
 		delete menu;
 	}
 
+	bool AeslEditor::isBreakpoint()
+	{
+		return isBreakpoint(textCursor().block());
+	}
+
 	bool AeslEditor::isBreakpoint(QTextBlock block)
 	{
 		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
 		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
+	}
+
+	void AeslEditor::toggleBreakpoint()
+	{
+		toggleBreakpoint(textCursor().block());
 	}
 
 	void AeslEditor::toggleBreakpoint(QTextBlock block)
@@ -577,6 +587,11 @@ namespace Aseba
 			clearBreakpoint(block);
 		else
 			setBreakpoint(block);
+	}
+
+	void AeslEditor::setBreakpoint()
+	{
+		setBreakpoint(textCursor().block());
 	}
 
 	void AeslEditor::setBreakpoint(QTextBlock block)
@@ -591,6 +606,11 @@ namespace Aseba
 		else
 			uData->properties.insert("breakpointPending", QVariant());
 		emit breakpointSet(block.blockNumber());
+	}
+
+	void AeslEditor::clearBreakpoint()
+	{
+		clearBreakpoint(textCursor().block());
 	}
 
 	void AeslEditor::clearBreakpoint(QTextBlock block)

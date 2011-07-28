@@ -149,9 +149,13 @@ namespace Aseba
 		virtual ~AeslEditor() { }
 		virtual void contextMenuEvent ( QContextMenuEvent * e );
 
+		bool isBreakpoint();			// apply to the current line
 		bool isBreakpoint(QTextBlock block);
+		void toggleBreakpoint();		// apply to the current line
 		void toggleBreakpoint(QTextBlock block);
+		void setBreakpoint();			// apply to the current line
 		void setBreakpoint(QTextBlock block);
+		void clearBreakpoint();			// apply to the current line
 		void clearBreakpoint(QTextBlock block);
 		void clearAllBreakpoints();
 	
