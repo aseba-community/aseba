@@ -845,7 +845,65 @@ namespace Aseba
 		}
 	}
 
-	
+	NewNamedValueDialog::NewNamedValueDialog(QString *name, int *value) :
+		name(name),
+		value(value)
+	{
+		// create the widgets
+		label1 = new QLabel(tr("Name", "Name of the named value (can be a constant, event,...)"));
+		line1 = new QLineEdit(*name);
+		label2 = new QLabel(tr("Default description", "When no description is given for the named value"));
+		line2 = new QLineEdit(QString::number(*value));
+		line2->setValidator(new QIntValidator());
+		QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+		// create the layout
+		QVBoxLayout* mainLayout = new QVBoxLayout();
+		mainLayout->addWidget(label1);
+		mainLayout->addWidget(line1);
+		mainLayout->addWidget(label2);
+		mainLayout->addWidget(line2);
+		mainLayout->addWidget(buttonBox);
+		setLayout(mainLayout);
+
+		// set modal
+		setModal(true);
+
+		// connections
+		connect(buttonBox, SIGNAL(accepted()), this, SLOT(okSlot()));
+		connect(buttonBox, SIGNAL(rejected()), this, SLOT(cancelSlot()));
+	}
+
+	bool NewNamedValueDialog::getNamedValue(QString *name, int *value, QString title, QString valueName, QString valueDescription)
+	{
+		NewNamedValueDialog dialog(name, value);
+		dialog.setWindowTitle(title);
+		dialog.label1->setText(valueName);
+		dialog.label2->setText(valueDescription);
+		dialog.resize(500, 0);		// make it wide enough
+
+		int ret = dialog.exec();
+
+		if (ret)
+			return true;
+		else
+			return false;
+	}
+
+	void NewNamedValueDialog::okSlot()
+	{
+		*name = line1->text();
+		*value = line2->text().toInt();
+		accept();
+	}
+
+	void NewNamedValueDialog::cancelSlot()
+	{
+		*name = "";
+		*value = -1;
+		reject();
+	}
+
 	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, QWidget *parent) :
 		QMainWindow(parent),
 		sourceModified(false)
@@ -1587,7 +1645,12 @@ namespace Aseba
 	void MainWindow::addEventNameClicked()
 	{
 		bool ok;
-		QString eventName = QInputDialog::getText(this, tr("Add a new event"), tr("Name:"), QLineEdit::Normal, "", &ok);
+		QString eventName;
+		int eventNbArgs = 0;
+
+		// prompt the user for the named value
+		ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
+
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
 		{
@@ -1597,7 +1660,7 @@ namespace Aseba
 			}
 			else
 			{
-				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), 0));
+				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), eventNbArgs));
 				recompileAll();
 				updateWindowTitle();
 			}
@@ -1627,7 +1690,12 @@ namespace Aseba
 	void MainWindow::addConstantClicked()
 	{
 		bool ok;
-		QString constantName = QInputDialog::getText(this, tr("Add a new constant"), tr("Name:"), QLineEdit::Normal, "", &ok);
+		QString constantName;
+		int constantValue = 0;
+
+		// prompt the user for the named value
+		ok = NewNamedValueDialog::getNamedValue(&constantName, &constantValue, tr("Add a new constant"), tr("Name:"), tr("Value", "Value assigned to the constant"));
+
 		if (ok && !constantName.isEmpty())
 		{
 			if (commonDefinitions.constants.contains(constantName.toStdWString()))
@@ -1636,7 +1704,7 @@ namespace Aseba
 			}
 			else
 			{
-				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdWString(), 0));
+				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdWString(), constantValue));
 				recompileAll();
 				updateWindowTitle();
 			}

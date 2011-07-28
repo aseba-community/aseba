@@ -227,7 +227,29 @@ namespace Aseba
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables
 	};
-	
+
+	class NewNamedValueDialog : public QDialog
+	{
+		Q_OBJECT
+
+	public:
+		NewNamedValueDialog(QString* name, int* value);
+		static bool getNamedValue(QString* name, int* value, QString title, QString valueName, QString valueDescription);
+
+	protected slots:
+		void okSlot();
+		void cancelSlot();
+
+	protected:
+		QLabel* label1;
+		QLineEdit* line1;
+		QLabel* label2;
+		QLineEdit* line2;
+
+		QString* name;
+		int* value;
+	};
+
 	class MainWindow : public QMainWindow
 	{
 		Q_OBJECT
