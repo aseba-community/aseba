@@ -270,7 +270,7 @@ namespace Aseba
 		while (block.isValid())
 		{
 			QRectF bounds = block.layout()->boundingRect();
-			bounds.translate(0, offset + block.layout()->position().y());
+			bounds.translate(0, offset + block.layout()->position().y() - verticalScroll);
 			if (y > bounds.top() && y < bounds.bottom())
 			{
 				// this is it
