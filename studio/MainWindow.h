@@ -273,6 +273,8 @@ namespace Aseba
 		void copyAll();
 		void findTriggered();
 		void replaceTriggered();
+		void commentTriggered();
+		void uncommentTriggered();
 		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
@@ -418,6 +420,8 @@ namespace Aseba
 		QAction *redoAct;
 		QAction *findAct;
 		QAction *replaceAct;
+		QAction *commentAct;
+		QAction *uncommentAct;
 		QAction *showLineNumbers;
 		QAction *goToLineAct;
 		QAction *toggleBreakpointAct;

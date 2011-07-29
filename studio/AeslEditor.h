@@ -158,6 +158,12 @@ namespace Aseba
 		void clearBreakpoint();			// apply to the current line
 		void clearBreakpoint(QTextBlock block);
 		void clearAllBreakpoints();
+
+		enum CommentOperation {
+			CommentSelection,
+			UncommentSelection
+		};
+		void commentAndUncommentSelection(CommentOperation commentOperation);
 	
 	public:
 		const ScriptTab* tab;

@@ -1302,6 +1302,18 @@ namespace Aseba
 		findDialog->show();
 	}
 
+	void MainWindow::commentTriggered()
+	{
+		assert(currentScriptTab);
+		currentScriptTab->editor->commentAndUncommentSelection(AeslEditor::CommentSelection);
+	}
+
+	void MainWindow::uncommentTriggered()
+	{
+		assert(currentScriptTab);
+		currentScriptTab->editor->commentAndUncommentSelection(AeslEditor::UncommentSelection);
+	}
+
 	void MainWindow::showLineNumbersChanged(bool state)
 	{
 		assert(currentScriptTab);
@@ -2421,7 +2433,15 @@ namespace Aseba
 		replaceAct->setShortcut(tr("Ctrl+R", "Edit|Replace"));
 		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
 		replaceAct->setEnabled(false);
-		
+
+		commentAct = new QAction(tr("Comment the selection"), this);
+		commentAct->setShortcut(tr("Ctrl+D", "Edit|Comment the selection"));
+		connect(commentAct, SIGNAL(triggered()), SLOT(commentTriggered()));
+
+		uncommentAct = new QAction(tr("Unomment the selection"), this);
+		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Unomment the selection"));
+		connect(uncommentAct, SIGNAL(triggered()), SLOT(uncommentTriggered()));
+
 		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
 		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
 		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
@@ -2446,6 +2466,9 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(findAct);
 		editMenu->addAction(replaceAct);
+		editMenu->addSeparator();
+		editMenu->addAction(commentAct);
+		editMenu->addAction(uncommentAct);
 		editMenu->addSeparator();
 		editMenu->addAction(showLineNumbers);
 		editMenu->addAction(goToLineAct);

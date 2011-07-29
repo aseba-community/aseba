@@ -640,6 +640,60 @@ namespace Aseba
 		emit breakpointClearedAll();
 	}
 
+	void AeslEditor::commentAndUncommentSelection(CommentOperation commentOperation)
+	{
+		QTextCursor cursor = textCursor();
+		bool moveFailed = false;
+
+		// get the last line of the selection
+		int lineEnd = document()->findBlock(cursor.selectionEnd()).blockNumber();
+
+		// if the end of the selection is at the begining of a line,
+		// this last line should not be taken into account
+		if (cursor.hasSelection() && (cursor.positionInBlock() == 0))
+			lineEnd--;
+
+		// start at the begining of the selection
+		cursor.setPosition(cursor.anchor());
+		cursor.movePosition(QTextCursor::StartOfBlock);
+		QTextCursor cursorRestore = cursor;
+
+		while (cursor.block().blockNumber() <= lineEnd)
+		{
+			// prepare for insertion / deletion
+			setTextCursor(cursor);
+
+			if (commentOperation == CommentSelection)
+			{
+				// insert #
+				cursor.insertText("#");
+			}
+			else if (commentOperation == UncommentSelection)
+			{
+				// delete #
+				if (cursor.block().text().at(0) == QChar('#'))
+					cursor.deleteChar();
+			}
+
+			// move to the next line
+			if (!cursor.movePosition(QTextCursor::NextBlock))
+			{
+				// end of the document
+				moveFailed = true;
+				break;
+			}
+		}
+
+		// select the changed lines
+		cursorRestore.movePosition(QTextCursor::StartOfBlock);
+		if (!moveFailed)
+			cursor.movePosition(QTextCursor::StartOfBlock);
+		else
+			cursor.movePosition(QTextCursor::EndOfBlock);
+		cursorRestore.setPosition(cursor.position(), QTextCursor::KeepAnchor);
+		setTextCursor(cursorRestore);
+	}
+
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
 		// handle tab and control tab
