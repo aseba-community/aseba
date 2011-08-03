@@ -105,36 +105,35 @@ namespace Aseba
 		QColor breakpointColor(255, 211, 178);
 		QColor activeColor(220, 220, 255);
 		QColor errorColor(240, 100, 100);
-		
+
+		// use the QTextEdit::ExtraSelection class to highlight the background
+		// of special lines (breakpoints, active line,...)
+		QList<QTextEdit::ExtraSelection> extraSelections;
+		if (currentBlock().blockNumber() != 0)
+			// past the first line, we recall the previous "selections"
+			extraSelections = editor->extraSelections();
+
+		// prepare the current "selection"
+		QTextEdit::ExtraSelection selection;
+		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+		selection.cursor = QTextCursor(currentBlock());
+
 		if (isBreakpointPending)
-		{
-			QTextCharFormat format;
-			format.setBackground(breakpointPendingColor);
-			setFormat(0, text.length(), format);
-		}
+			selection.format.setBackground(breakpointPendingColor);
 		if (isBreakpoint)
-		{
-			QTextCharFormat format;
-			//format.setBackground(QColor(255, 231, 185));
-			format.setBackground(breakpointColor);
-			setFormat(0, text.length(), format);
-		}
+			selection.format.setBackground(breakpointColor);
 		if (editor->debugging)
 		{
 			if (isActive)
-			{
-				QTextCharFormat format;
-				format.setBackground(activeColor);
-				setFormat(0, text.length(), format);
-			}
+				selection.format.setBackground(activeColor);
 			if (isExecutionError)
-			{
-				QTextCharFormat format;
-				format.setBackground(errorColor);
-				setFormat(0, text.length(), format);
-			}
+				selection.format.setBackground(errorColor);
 		}
 		
+		// we are done
+		extraSelections.append(selection);
+		editor->setExtraSelections(extraSelections);
+
 		// syntax highlight
 		foreach (HighlightingRule rule, highlightingRules)
 		{
@@ -144,19 +143,6 @@ namespace Aseba
 			{
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
-				
-				if (isBreakpointPending)
-					format.setBackground(breakpointPendingColor);
-				if (isBreakpoint)
-					format.setBackground(breakpointColor);
-				if (editor->debugging)
-				{
-					if (isActive)
-						format.setBackground(activeColor);
-					if (isExecutionError)
-						format.setBackground(errorColor);
-				}
-				
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
 			}
