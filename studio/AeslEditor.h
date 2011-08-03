@@ -151,6 +151,7 @@ namespace Aseba
 
 		bool isBreakpoint();			// apply to the current line
 		bool isBreakpoint(QTextBlock block);
+		bool isBreakpoint(int line);
 		void toggleBreakpoint();		// apply to the current line
 		void toggleBreakpoint(QTextBlock block);
 		void setBreakpoint();			// apply to the current line

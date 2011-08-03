@@ -89,10 +89,16 @@ namespace Aseba
 		Q_OBJECT
 
 	public:
+		EditorsPlotsTabWidget() { connect(this, SIGNAL(currentChanged(int)), SLOT(resetHighlight(int))); }
 		void addTab(QWidget* widget, const QString& label, bool closable = false);
+		void highlightTab(int index, QColor color = Qt::red);
+		void setExecutionMode(int index, Target::ExecutionMode state);
 
 	public slots:
 		void removeAndDeleteTab(int index = -1);
+
+	protected slots:
+		void resetHighlight(int index);
 	};
 		
 	class ScriptTab
@@ -220,6 +226,8 @@ namespace Aseba
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success
+		int currentPC; //!< current program counter
+		Target::ExecutionMode previousMode;
 		bool firstCompilation; //!< true if first compilation after creation
 		bool showHidden;
 		

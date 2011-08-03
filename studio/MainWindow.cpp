@@ -85,6 +85,31 @@ namespace Aseba
 		#endif // QT_VERSION >= 0x040500
 	}
 
+	void EditorsPlotsTabWidget::highlightTab(int index, QColor color)
+	{
+		tabBar()->setTabTextColor(index, color);
+	}
+
+	void EditorsPlotsTabWidget::setExecutionMode(int index, Target::ExecutionMode state)
+	{
+		if (state == Target::EXECUTION_UNKNOWN)
+		{
+			setTabIcon(index, QIcon());
+		}
+		else if (state == Target::EXECUTION_RUN)
+		{
+			setTabIcon(index, QIcon(":/images/play.png"));
+		}
+		else if (state == Target::EXECUTION_STEP_BY_STEP)
+		{
+			setTabIcon(index, QIcon(":/images/pause.png"));
+		}
+		else if (state == Target::EXECUTION_STOP)
+		{
+			setTabIcon(index, QIcon(":/images/stop.png"));
+		}
+	}
+
 	void EditorsPlotsTabWidget::removeAndDeleteTab(int index)
 	{
 		#if QT_VERSION >= 0x040500
@@ -108,6 +133,11 @@ namespace Aseba
 			QTabWidget::removeTab(index);
 			w->deleteLater();
 		}
+	}
+
+	void EditorsPlotsTabWidget::resetHighlight(int index)
+	{
+		tabBar()->setTabTextColor(index, Qt::black);
 	}
 
 	//////
@@ -143,6 +173,8 @@ namespace Aseba
 		pid(ASEBA_PID_UNDEFINED),
 		target(target),
 		mainWindow(mainWindow),
+		currentPC(0),
+		previousMode(Target::EXECUTION_UNKNOWN),
 		firstCompilation(true),
 		showHidden(mainWindow->showHiddenAct->isChecked())
 	{
@@ -643,6 +675,7 @@ namespace Aseba
 	void NodeTab::executionPosChanged(unsigned line)
 	{
 		// change active state
+		currentPC = line;
 		if (setEditorProperty("active", QVariant(), line, true))
 			rehighlight();
 	}
@@ -656,6 +689,24 @@ namespace Aseba
 		resetButton->setEnabled(true);
 		runInterruptButton->setEnabled(true);
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
+
+		// Filter spurious messages, to detect a stop at a breakpoint
+		if (previousMode != mode)
+		{
+			previousMode = mode;
+			if ((mode == Target::EXECUTION_STEP_BY_STEP) && editor->isBreakpoint(currentPC))
+			{
+				// we are at a breakpoint
+				if (mainWindow->currentScriptTab != this)
+				{
+					// not the current tab -> hidden tab -> highlight me in red
+					mainWindow->nodes->highlightTab(mainWindow->getIndexFromId(id), Qt::red);
+				}
+				// go to this line
+				editor->setTextCursor(QTextCursor(editor->document()->findBlockByLineNumber(currentPC)));
+				editor->ensureCursorVisible();
+			}
+		}
 		
 		if (mode == Target::EXECUTION_RUN)
 		{
@@ -665,7 +716,7 @@ namespace Aseba
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
 			
 			nextButton->setEnabled(false);
-			
+
 			if (clearEditorProperty("active"))
 				rehighlight();
 		}
@@ -690,6 +741,9 @@ namespace Aseba
 			if (clearEditorProperty("active"))
 				rehighlight();
 		}
+
+		// set the tab icon to show the current execution mode
+		mainWindow->nodes->setExecutionMode(mainWindow->getIndexFromId(id), mode);
 	}
 	
 	void NodeTab::breakpointSetResult(unsigned line, bool success)

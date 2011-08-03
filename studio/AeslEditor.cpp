@@ -576,6 +576,12 @@ namespace Aseba
 		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
 	}
 
+	bool AeslEditor::isBreakpoint(int line)
+	{
+		QTextBlock block = document()->findBlockByNumber(line);
+		return isBreakpoint(block);
+	}
+
 	void AeslEditor::toggleBreakpoint()
 	{
 		toggleBreakpoint(textCursor().block());
