@@ -264,7 +264,7 @@ namespace Aseba
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
-		
+
 		// create gui
 		setupWidgets();
 		setupConnections();
@@ -277,7 +277,7 @@ namespace Aseba
 		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
 		processCompilationResult(result);
 	}
-	
+
 	NodeTab::~NodeTab()
 	{
 		compilationFuture.waitForFinished();
@@ -555,6 +555,7 @@ namespace Aseba
 		connect(editor, SIGNAL(breakpointSet(unsigned)), SLOT(setBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointCleared(unsigned)), SLOT(clearBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointClearedAll()), SLOT(breakpointClearedAll()));
+		connect(editor, SIGNAL(refreshModelRequest(LocalContext)), SLOT(refreshCompleterModel(LocalContext)));
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
@@ -1114,6 +1115,17 @@ namespace Aseba
 			rehighlight();
 	}
 	
+	void NodeTab::refreshCompleterModel(LocalContext context)
+	{
+//		qDebug() << "New context: " << context;
+		if ((context == GeneralContext) || (context == UnknownContext))
+			editor->setCompleterModel(vmMemoryModel);
+		else if (context == FunctionContext)
+			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
+		else if (context == EventContext)
+			editor->setCompleterModel(0);		// not yet implemented
+	}
+
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view

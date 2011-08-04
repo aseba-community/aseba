@@ -35,7 +35,9 @@
 #include <QFutureWatcher>
 #include <QToolButton>
 #include <QToolBar>
+#include <QCompleter>
 
+#include "AeslEditor.h"
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
 
@@ -128,7 +130,7 @@ namespace Aseba
 		
 	protected:
 		void createEditor();
-		
+
 		friend class MainWindow;
 		AeslEditor* editor;
 		AeslLineNumberSidebar* linenumbers;
@@ -184,6 +186,7 @@ namespace Aseba
 	
 	public slots:
 		void clearExecutionErrors();
+		void refreshCompleterModel(LocalContext context);
 	
 	protected slots:
 		void resetClicked();
@@ -295,6 +298,8 @@ namespace Aseba
 		QTreeView *vmFunctionsView;
 		
 		DraggableListWidget* vmLocalEvents;
+
+		QCompleter *completer;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
