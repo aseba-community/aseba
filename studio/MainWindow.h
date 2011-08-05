@@ -89,7 +89,8 @@ namespace Aseba
 		Q_OBJECT
 
 	public:
-		EditorsPlotsTabWidget() { connect(this, SIGNAL(currentChanged(int)), SLOT(resetHighlight(int))); }
+		EditorsPlotsTabWidget();
+		virtual ~EditorsPlotsTabWidget();
 		void addTab(QWidget* widget, const QString& label, bool closable = false);
 		void highlightTab(int index, QColor color = Qt::red);
 		void setExecutionMode(int index, Target::ExecutionMode state);
@@ -98,7 +99,16 @@ namespace Aseba
 		void removeAndDeleteTab(int index = -1);
 
 	protected slots:
-		void resetHighlight(int index);
+		void vmMemoryResized(int, int, int);		// for vmMemoryView QTreeView child widget
+		void tabChanged(int index);
+
+	protected:
+		virtual void resetHighlight(int index);
+		virtual void vmMemoryViewResize(NodeTab* tab);
+		virtual void readSettings();
+		virtual void writeSettings();
+
+		int vmMemorySize[2];
 	};
 		
 	class ScriptTab
@@ -200,7 +210,8 @@ namespace Aseba
 	private:
 		friend class MainWindow;
 		friend class AeslEditor;
-		
+		friend class EditorsPlotsTabWidget;
+
 		MainWindow* mainWindow;
 		QLabel *cursorPosText;
 		QLabel *compilationResultImage;

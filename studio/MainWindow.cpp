@@ -70,6 +70,20 @@ namespace Aseba
 	}
 	
 	//////
+
+	EditorsPlotsTabWidget::EditorsPlotsTabWidget()
+	{
+		vmMemorySize[0] = -1;	// not yet initialized
+		vmMemorySize[1] = -1;	// not yet initialized
+		readSettings();		// read user's preferences
+		connect(this, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
+	}
+
+	EditorsPlotsTabWidget::~EditorsPlotsTabWidget()
+	{
+		// store user's preferences
+		writeSettings();
+	}
 	
 	void EditorsPlotsTabWidget::addTab(QWidget* widget, const QString& label, bool closable)
 	{
@@ -83,6 +97,14 @@ namespace Aseba
 			tabBar()->setTabButton(index, QTabBar::RightSide, button);
 		}
 		#endif // QT_VERSION >= 0x040500
+
+		// manage the sections size for the vmMemoryView child widget
+		NodeTab* tab = polymorphic_downcast<NodeTab*>(widget);
+		if (tab)
+		{
+			vmMemoryViewResize(tab);
+			connect(tab->vmMemoryView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(vmMemoryResized(int,int,int)));
+		}
 	}
 
 	void EditorsPlotsTabWidget::highlightTab(int index, QColor color)
@@ -135,9 +157,49 @@ namespace Aseba
 		}
 	}
 
+	void EditorsPlotsTabWidget::vmMemoryResized(int col, int oldSize, int newSize)
+	{
+		// keep track of the current value, to apply it on the other tabs
+		vmMemorySize[col] = newSize;
+	}
+
+	void EditorsPlotsTabWidget::tabChanged(int index)
+	{
+		// resize the vmMemoryView, to match the user choice
+		NodeTab* tab = polymorphic_downcast<NodeTab*>(currentWidget());
+		vmMemoryViewResize(tab);
+		// reset the tab highlight
+		resetHighlight(index);
+	}
+
 	void EditorsPlotsTabWidget::resetHighlight(int index)
 	{
 		tabBar()->setTabTextColor(index, Qt::black);
+	}
+
+	void EditorsPlotsTabWidget::vmMemoryViewResize(NodeTab *tab)
+	{
+		if (!tab)
+			return;
+
+		// resize the vmMemoryView QTreeView, according to the global value
+		for (int i = 0; i < 2; i++)
+			if (vmMemorySize[i] != -1)
+				tab->vmMemoryView->header()->resizeSection(i, vmMemorySize[i]);
+	}
+
+	void EditorsPlotsTabWidget::readSettings()
+	{
+		QSettings settings;
+		vmMemorySize[0] = settings.value("vmMemoryView/col0", -1).toInt();
+		vmMemorySize[1] = settings.value("vmMemoryView/col1", -1).toInt();
+	}
+
+	void EditorsPlotsTabWidget::writeSettings()
+	{
+		QSettings settings;
+		settings.setValue("vmMemoryView/col0", vmMemorySize[0]);
+		settings.setValue("vmMemoryView/col1", vmMemorySize[1]);
 	}
 
 	//////
