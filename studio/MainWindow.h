@@ -252,8 +252,8 @@ namespace Aseba
 		Q_OBJECT
 
 	public:
-		NewNamedValueDialog(QString* name, int* value);
-		static bool getNamedValue(QString* name, int* value, QString title, QString valueName, QString valueDescription);
+		NewNamedValueDialog(QString* name, int* value, int min, int max);
+		static bool getNamedValue(QString* name, int* value, int min, int max, QString title, QString valueName, QString valueDescription);
 
 	protected slots:
 		void okSlot();
@@ -263,7 +263,7 @@ namespace Aseba
 		QLabel* label1;
 		QLineEdit* line1;
 		QLabel* label2;
-		QLineEdit* line2;
+		QSpinBox* line2;
 
 		QString* name;
 		int* value;

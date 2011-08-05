@@ -961,7 +961,7 @@ namespace Aseba
 		}
 	}
 
-	NewNamedValueDialog::NewNamedValueDialog(QString *name, int *value) :
+	NewNamedValueDialog::NewNamedValueDialog(QString *name, int *value, int min, int max) :
 		name(name),
 		value(value)
 	{
@@ -969,8 +969,10 @@ namespace Aseba
 		label1 = new QLabel(tr("Name", "Name of the named value (can be a constant, event,...)"));
 		line1 = new QLineEdit(*name);
 		label2 = new QLabel(tr("Default description", "When no description is given for the named value"));
-		line2 = new QLineEdit(QString::number(*value));
-		line2->setValidator(new QIntValidator());
+		line2 = new QSpinBox();
+		line2->setRange(min, max);
+		line2->setValue(*value);
+		QLabel* lineHelp = new QLabel(QString("(%1 ... %2)").arg(min).arg(max));
 		QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
 		// create the layout
@@ -979,6 +981,7 @@ namespace Aseba
 		mainLayout->addWidget(line1);
 		mainLayout->addWidget(label2);
 		mainLayout->addWidget(line2);
+		mainLayout->addWidget(lineHelp);
 		mainLayout->addWidget(buttonBox);
 		setLayout(mainLayout);
 
@@ -990,9 +993,9 @@ namespace Aseba
 		connect(buttonBox, SIGNAL(rejected()), this, SLOT(cancelSlot()));
 	}
 
-	bool NewNamedValueDialog::getNamedValue(QString *name, int *value, QString title, QString valueName, QString valueDescription)
+	bool NewNamedValueDialog::getNamedValue(QString *name, int *value, int min, int max, QString title, QString valueName, QString valueDescription)
 	{
-		NewNamedValueDialog dialog(name, value);
+		NewNamedValueDialog dialog(name, value, min, max);
 		dialog.setWindowTitle(title);
 		dialog.label1->setText(valueName);
 		dialog.label2->setText(valueDescription);
@@ -1009,7 +1012,7 @@ namespace Aseba
 	void NewNamedValueDialog::okSlot()
 	{
 		*name = line1->text();
-		*value = line2->text().toInt();
+		*value = line2->value();
 		accept();
 	}
 
@@ -1777,7 +1780,7 @@ namespace Aseba
 		int eventNbArgs = 0;
 
 		// prompt the user for the named value
-		ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
+		ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, 32767, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
 
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
@@ -1822,7 +1825,7 @@ namespace Aseba
 		int constantValue = 0;
 
 		// prompt the user for the named value
-		ok = NewNamedValueDialog::getNamedValue(&constantName, &constantValue, tr("Add a new constant"), tr("Name:"), tr("Value", "Value assigned to the constant"));
+		ok = NewNamedValueDialog::getNamedValue(&constantName, &constantValue, -32768, 32767, tr("Add a new constant"), tr("Name:"), tr("Value", "Value assigned to the constant"));
 
 		if (ok && !constantName.isEmpty())
 		{
