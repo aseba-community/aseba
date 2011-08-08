@@ -339,8 +339,13 @@ namespace Aseba
 	}
 
 	AeslBreakpointSidebar::AeslBreakpointSidebar(AeslEditor *editor) :
-		AeslEditorSidebar(editor)
+		AeslEditorSidebar(editor),
+		borderSize(1)
 	{
+		// define the breakpoint geometry, according to the font metrics
+		QFontMetrics metrics = fontMetrics();
+		int lineSpacing = metrics.lineSpacing();
+		breakpoint = QRect(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
 	}
 
 	void AeslBreakpointSidebar::paintEvent(QPaintEvent *event)
@@ -382,7 +387,7 @@ namespace Aseba
 					// paint the breakpoint
 					int y = block.layout()->position().y() + region.top() - verticalScroll;
 					// FIXME: Hughly breakpoing design...
-					painter.drawRect(2, y + 2, 16, 16);
+					painter.drawRect(breakpoint.translated(0, y));
 				}
 
 			}
@@ -400,7 +405,7 @@ namespace Aseba
 
 	int AeslBreakpointSidebar::idealWidth() const
 	{
-		return 20;
+		return breakpoint.width() + 2*borderSize;
 	}
 
 	AeslEditor::AeslEditor(const ScriptTab* tab) :

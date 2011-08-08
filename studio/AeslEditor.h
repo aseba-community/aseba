@@ -131,6 +131,10 @@ namespace Aseba
 		virtual void paintEvent(QPaintEvent *event);
 		virtual void mousePressEvent(QMouseEvent *event);
 		virtual int idealWidth() const;
+
+	protected:
+		const int borderSize;
+		QRect breakpoint;
 	};
 	
 	class ScriptTab;
