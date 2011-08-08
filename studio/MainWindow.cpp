@@ -684,6 +684,7 @@ namespace Aseba
 		target->clearBreakpoints(id);
 		switchEditorProperty("breakpoint", "breakpointPending");
 		executionModeLabel->setText(tr("unknown"));
+		mainWindow->nodes->setExecutionMode(mainWindow->getIndexFromId(id), Target::EXECUTION_UNKNOWN);
 	}
 	
 	void NodeTab::cursorMoved()
