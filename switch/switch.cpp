@@ -237,8 +237,12 @@ int main(int argc, char *argv[])
 			remapIdDecoder.add(target.c_str());
 			const int remappedLocalId(remapIdDecoder.get<int>("remapLocal"));
 			const int remappedTargetId(remapIdDecoder.get<int>("remapTarget"));
-			if (remappedLocalId >= 0)
+			if (target.find("remapLocal=") != std::string::npos)
+			{
 				aswitch.remapId(stream, uint16(remappedLocalId), uint16(remappedTargetId));
+				if (verbose)
+					std::cout << "Remapping local " << remappedLocalId << " with remote " << remappedTargetId << std::endl;
+			}
 		}
 		/*
 		Uncomment this and comment aswitch.run() to flood all pears with dummy user messages
