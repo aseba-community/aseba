@@ -118,6 +118,10 @@ namespace Aseba
 			std::deque<BytecodeElement>::push_back(be);
 			lastLine = be.line;
 		}
+		
+		//! A map of event addresses to identifiers
+		typedef std::map<unsigned, unsigned> EventAddressesToIdsMap;
+		EventAddressesToIdsMap getEventAddressesToIds() const;
 	};
 	
 	// predeclaration

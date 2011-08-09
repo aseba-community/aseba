@@ -364,10 +364,12 @@ namespace Aseba
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
 		
+		// fill debug bytecode and build address map
 		nodeIt->second.debugBytecode = bytecode;
+		nodeIt->second.eventAddressToId = bytecode.getEventAddressesToIds();
 		
+		// send bytecode
 		sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
-		
 		dashelInterface.stream->flush();
 	}
 	
@@ -648,7 +650,10 @@ namespace Aseba
 					}
 					else if (node.steppingInNext == WAITING_LINE_CHANGE)
 					{
-						if (line != static_cast<int>(node.lineInNext))
+						if (
+							(node.eventAddressToId.find(ess->pc) != node.eventAddressToId.end()) ||
+							(line != static_cast<int>(node.lineInNext))
+						)
 						{
 							node.steppingInNext = NOT_IN_NEXT;
 							emit executionPosChanged(ess->source, line);

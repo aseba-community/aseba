@@ -265,11 +265,25 @@ namespace Aseba
 		return bytecode.size() <= targetDescription->bytecodeSize;
 	}
 	
+	//! Get the map of event addresses to identifiers
+	BytecodeVector::EventAddressesToIdsMap BytecodeVector::getEventAddressesToIds() const
+	{
+		EventAddressesToIdsMap eventAddr;
+		const unsigned eventVectSize = (*this)[0];
+		unsigned pc = 1;
+		while (pc < eventVectSize)
+		{
+			eventAddr[(*this)[pc + 1]] = (*this)[pc];
+			pc += 2;
+		}
+		return eventAddr;
+	}
+	
 	//! Disassemble a microcontroller bytecode and dump it
 	void Compiler::disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::wostream& dump) const
 	{
 		// address of threads and subroutines
-		std::map<unsigned, unsigned> eventAddr;
+		const BytecodeVector::EventAddressesToIdsMap eventAddr(bytecode.getEventAddressesToIds());
 		std::map<unsigned, unsigned> subroutinesAddr;
 		
 		// build subroutine map
@@ -277,23 +291,17 @@ namespace Aseba
 			subroutinesAddr[subroutineTable[id].address] = id;
 		
 		// event table
-		const unsigned eventVectSize = bytecode[0];
-		unsigned pc = 1;
-		while (pc < eventVectSize)
-		{
-			eventAddr[bytecode[pc + 1]] = bytecode[pc];
-			pc += 2;
-		}
-		const unsigned eventCount = (eventVectSize - 1 ) / 2;
+		const unsigned eventCount = eventAddr.size();
 		const float fillPrecentage = float(bytecode.size() * 100.f) / float(targetDescription->bytecodeSize);
 		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments (" << bytecode.size() << " words on " << targetDescription->bytecodeSize << ", " << fillPrecentage << "% filled):\n";
 		
 		// bytecode
+		unsigned pc = eventCount*2 + 1;
 		while (pc < bytecode.size())
 		{
 			if (eventAddr.find(pc) != eventAddr.end())
 			{
-				unsigned eventId = eventAddr[pc];
+				const unsigned eventId = eventAddr.at(pc);
 				if (eventId == ASEBA_EVENT_INIT)
 					dump << "init:       ";
 				else

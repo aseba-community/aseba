@@ -128,6 +128,7 @@ namespace Aseba
 			Node();
 			
 			BytecodeVector debugBytecode; //!< bytecode with debug information
+			BytecodeVector::EventAddressesToIdsMap eventAddressToId; //!< map event start addresses to event identifiers
 			unsigned steppingInNext; //!< state of node when in next and stepping
 			unsigned lineInNext; //!< line of node to execute when in next and stepping
 			ExecutionMode executionMode; //!< last known execution mode if this node
