@@ -510,7 +510,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="2404"/>
         <source>http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf</source>
-        <translation></translation>
+        <translation>http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="2442"/>
