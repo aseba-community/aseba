@@ -643,15 +643,17 @@ namespace Aseba
 		bool moveFailed = false;
 
 		// get the last line of the selection
-		int lineEnd = document()->findBlock(cursor.selectionEnd()).blockNumber();
+		QTextBlock endBlock = document()->findBlock(cursor.selectionEnd());
+		int lineEnd = endBlock.blockNumber();
+		int positionInEndBlock = cursor.selectionEnd() - endBlock.position();
 
 		// if the end of the selection is at the begining of a line,
 		// this last line should not be taken into account
-		if (cursor.hasSelection() && (cursor.positionInBlock() == 0))
+		if (cursor.hasSelection() && (positionInEndBlock == 0))
 			lineEnd--;
 
 		// start at the begining of the selection
-		cursor.setPosition(cursor.anchor());
+		cursor.setPosition(cursor.selectionStart());
 		cursor.movePosition(QTextCursor::StartOfBlock);
 		QTextCursor cursorRestore = cursor;
 
