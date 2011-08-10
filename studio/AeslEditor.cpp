@@ -652,6 +652,9 @@ namespace Aseba
 		if (cursor.hasSelection() && (positionInEndBlock == 0))
 			lineEnd--;
 
+		// begin of editing block
+		cursor.beginEditBlock();
+
 		// start at the begining of the selection
 		cursor.setPosition(cursor.selectionStart());
 		cursor.movePosition(QTextCursor::StartOfBlock);
@@ -691,6 +694,9 @@ namespace Aseba
 			cursor.movePosition(QTextCursor::EndOfBlock);
 		cursorRestore.setPosition(cursor.position(), QTextCursor::KeepAnchor);
 		setTextCursor(cursorRestore);
+
+		// end of editing block
+		cursor.endEditBlock();
 	}
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
