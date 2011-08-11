@@ -99,7 +99,7 @@ namespace Aseba
 		#endif // QT_VERSION >= 0x040500
 
 		// manage the sections size for the vmMemoryView child widget
-		NodeTab* tab = polymorphic_downcast<NodeTab*>(widget);
+		NodeTab* tab = dynamic_cast<NodeTab*>(widget);
 		if (tab)
 		{
 			vmMemoryViewResize(tab);
@@ -166,7 +166,10 @@ namespace Aseba
 	void EditorsPlotsTabWidget::tabChanged(int index)
 	{
 		// resize the vmMemoryView, to match the user choice
-		NodeTab* tab = polymorphic_downcast<NodeTab*>(currentWidget());
+		NodeTab* tab = dynamic_cast<NodeTab*>(currentWidget());
+		if (!tab)
+			return;
+
 		vmMemoryViewResize(tab);
 		// reset the tab highlight
 		resetHighlight(index);
