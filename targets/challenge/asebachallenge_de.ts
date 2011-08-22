@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr">
+<TS version="2.0" language="de_DE">
 <context>
     <name>Enki::ChallengeViewer</name>
     <message>
         <location filename="challenge.cpp" line="577"/>
         <source>Aseba Challenge Help</source>
-        <translation>Aide d&apos;Aseba Challenge</translation>
+        <translation>Aseba Challenge Hilfe</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="590"/>
         <location filename="challenge.cpp" line="616"/>
         <location filename="challenge.cpp" line="646"/>
         <source>Add a new robot</source>
-        <translation>Ajouter un robot</translation>
+        <translation>Eines Roboters hinzufügen</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="592"/>
         <location filename="challenge.cpp" line="617"/>
         <source>Remove all robots</source>
-        <translation>Enlever tous les robots</translation>
+        <translation>Alle Roboter entferner</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="594"/>
         <location filename="challenge.cpp" line="619"/>
         <source>Auto camera</source>
-        <translation>Caméra auto</translation>
+        <translation>Automatische Kamera</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="596"/>
         <source>Auto hide</source>
-        <translation>Cacher auto</translation>
+        <translation>Autohide</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="598"/>
         <location filename="challenge.cpp" line="623"/>
         <source>Help</source>
-        <translation>Aide</translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="615"/>
         <source>Simulator control</source>
-        <translation>Contrôle du simulateur</translation>
+        <translation>Simulatorkontroll</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="646"/>
         <source>Robot name:</source>
-        <translation>Nom du robot:</translation>
+        <translation>Name des Roboters:</translation>
     </message>
 </context>
 <context>
@@ -54,7 +54,7 @@
     <message>
         <location filename="challenge.cpp" line="1023"/>
         <source>Please choose your language</source>
-        <translation>Veuillez choisir votre langue</translation>
+        <translation>Bitte wählen Sie Ihre Sprache</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="1040"/>
@@ -64,7 +64,7 @@
     <message>
         <location filename="challenge.cpp" line="1044"/>
         <source>Language selection</source>
-        <translation>Séléction de la langue</translation>
+        <translation>Sprachauswahl</translation>
     </message>
 </context>
 <context>
@@ -77,7 +77,7 @@
     <message>
         <location filename="challenge.cpp" line="219"/>
         <source>Cannot create listening port %0: %1</source>
-        <translation>Ne peut pas créer le port d&apos;écoute %0 : %1</translation>
+        <translation>Abhörport %0 kann nicht erstellt werden: %1</translation>
     </message>
 </context>
 </TS>

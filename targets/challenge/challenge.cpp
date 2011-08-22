@@ -1026,6 +1026,7 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 	languageSelectionBox = new QComboBox(this);
 	languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
 	languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
+	languageSelectionBox->addItem(QString::fromUtf8("German"), "de");
 	//qDebug() << "locale is " << QLocale::system().name();
 	for (int i = 0; i < languageSelectionBox->count(); ++i)
 	{
