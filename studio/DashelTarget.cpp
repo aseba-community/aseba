@@ -48,8 +48,13 @@ namespace Aseba
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
+		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
+		const PortsMap ports = SerialPortEnumerator::getPorts();
+		
 		QSettings settings;
-		const unsigned sectionEnabled(settings.value("connection dialog enabled group", 0).toUInt());
+		unsigned sectionEnabled(settings.value("connection dialog enabled group", 0).toUInt());
+		if ((sectionEnabled == 1) && (ports.size() == 0))
+			sectionEnabled = 0;
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
@@ -75,8 +80,6 @@ namespace Aseba
 		serialGroupBox->setChecked(sectionEnabled == 1);
 		QHBoxLayout* serialLayout = new QHBoxLayout();
 		serial = new QListWidget();
-		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
-		PortsMap ports = SerialPortEnumerator::getPorts();
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
 			const QString text(it->second.second.c_str());
@@ -144,7 +147,9 @@ namespace Aseba
 		}
 		else if (serialGroupBox->isChecked())
 		{
-			const QModelIndex item(serial->selectionModel()->selectedRows().first());
+			const QItemSelectionModel* model(serial->selectionModel());
+			assert(model && !model->selectedRows().isEmpty());
+			const QModelIndex item(model->selectedRows().first());
 			settings.setValue("connection dialog enabled group", 1);
 			settings.setValue("serial name", item.data());
 			QString target("ser:device=%0");
