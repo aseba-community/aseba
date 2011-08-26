@@ -22,6 +22,8 @@ binary-arch:
 	install -d debian/tmp/usr/share/doc/aseba
 	install -d debian/tmp/usr/share/doc/aseba/example-code
 	install -d debian/tmp/usr/share/doc/aseba/example-scenarios
+	install -d debian/tmp/usr/share/applications
+	install -d debian/tmp/usr/share/icons
 #	cp changelog debian/tmp/usr/share/doc/aseba/changelog
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
