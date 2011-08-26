@@ -1,8 +1,8 @@
-aseba (1.0) natty; urgency=low
+aseba (1.0.0) natty; urgency=low
 
-  * Upstream 1.0
+  * Upstream 1.0.0
 
- -- Stéphane Magnenat <stephane@nospam.magnenat.net>  Thu, 25 Aug 2011 09:58:52 +0200
+ -- Stéphane Magnenat <stephane@nospam.magnenat.net>  Fri, 26 Aug 2011 09:48:20 +0200
 
 aseba (0.9-svn476) natty; urgency=low
 
