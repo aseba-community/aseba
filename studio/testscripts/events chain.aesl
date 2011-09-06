@@ -1,21 +1,25 @@
 <!DOCTYPE aesl-source>
 <network>
-    <node name="left motor" >var a = 0
+    <event name="e1" />
+    <event name="e2" />
+    <event name="e3" />
+    <event name="start" />
+    <event name="stop" />
+    <node name="left motor" >var isRunning = 0
 
 ontimer
+if isRunning == 1 then
+	emit e1
+end
 
-emit 1
+onevent start
+isRunning = 1
 
-onevent 4
-
-a = a + 1</node>
-    <node name="right motor" >onevent 1
-
-emit 2</node>
-    <node name="proximity sensors" >onevent 2
-
-emit 3</node>
-    <node name="distance sensors" >onevent 3
-
-emit 4</node>
+onevent stop
+isRunning = 0</node>
+    <node name="right motor" >onevent e1
+emit e2</node>
+    <node name="proximity sensors" >onevent e2
+emit e3</node>
+    <node name="distance sensors" ></node>
 </network>

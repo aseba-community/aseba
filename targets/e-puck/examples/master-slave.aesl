@@ -1,0 +1,26 @@
+<!DOCTYPE aesl-source>
+<network>
+    <event name="start" />
+    <event name="stop" />
+    <event name="setspeed" />
+    <node name="e-puck" >var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+ontimer
+leftSpeed = 1000 - prox[1] / 4
+rightSpeed = 1000 - prox[6] / 4
+var msg[2] = leftSpeed, rightSpeed
+emit setspeed msg
+</node>
+    <node name="e-puck" >leftSpeed = 0
+rightSpeed = 0
+
+onevent setspeed
+leftSpeed = args[0]
+rightSpeed = args[1]</node>
+</network>

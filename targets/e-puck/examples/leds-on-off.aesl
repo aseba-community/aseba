@@ -1,0 +1,35 @@
+<!DOCTYPE aesl-source>
+<network>
+    <event name="start" />
+    <event name="stop" />
+    <node name="e-puck 1" >var i 
+
+onevent start
+i = 0
+while i &lt; 8 do
+	leds[i] = 1
+	i = i + 1
+end
+
+onevent stop
+i = 0
+while i &lt; 8 do
+	leds[i] = 0
+	i = i + 1
+end</node>
+    <node name="e-puck 2" >var i 
+
+onevent start
+i = 0
+while i &lt; 8 do
+	leds[i] = 1
+	i = i + 1
+end
+
+onevent stop
+i = 0
+while i &lt; 8 do
+	leds[i] = 0
+	i = i + 1
+end</node>
+</network>
