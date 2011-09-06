@@ -109,8 +109,8 @@ Beispiel:
 </P>
 
 <PRE>
-  a = 1 = 1 =
-  b = b = d[0] =
+  a = 1 + 1
+  b = b + d[0]
   b = (a - 7) % 5
   c[a] = d[a]
 </PRE>
@@ -166,8 +166,8 @@ Beispiel:
 <PRE>
   while i &lt; 10 do
   #während i &lt; 10 führe den folgenden Befehlsblock aus
-      v = v = i * i =
-      i = i = 1 =
+      v = v + i * i
+      i = i + 1
   end
   #Ende des while blocks
 </PRE>
@@ -182,7 +182,7 @@ Beispiel:
 <PRE>
   for i in 1:10 do
   #für i in 1,2,3,...,9,10 führe aus
-      v = v = i * i =
+      v = v + i * i
   end
   #Ende
   for i in 30:1 step -3 do
