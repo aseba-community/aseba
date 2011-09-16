@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "../common/consts.h"
 #include "../msg/msg.h"
 #include "../utils/utils.h"
 #include <dashel/dashel.h>
@@ -69,7 +70,17 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << programName << " [options] [targets]*\n";
 	stream << "Options:\n";
 	stream << "-h, --help      : shows this help\n";
+	stream << "-V, --version   : shows the version number\n";
 	stream << "Targets are any valid Dashel targets." << std::endl;
+	stream << "Report bugs to: aseba-dev@gna.org" << std::endl;
+}
+
+//! Show version
+void dumpVersion(std::ostream &stream)
+{
+	stream << "Aseba rec " << ASEBA_VERSION << std::endl;
+	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
+	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
 int main(int argc, char *argv[])
@@ -85,6 +96,11 @@ int main(int argc, char *argv[])
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
+			return 0;
+		}
+		else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
+		{
+			dumpVersion(std::cout);
 			return 0;
 		}
 		else
