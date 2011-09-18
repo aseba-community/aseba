@@ -257,6 +257,8 @@ namespace Aseba
 				TOKEN_OP_DIV,
 				TOKEN_OP_ADD_EQUAL,
 				TOKEN_OP_NEG_EQUAL,
+				TOKEN_OP_MULT_EQUAL,
+				TOKEN_OP_DIV_EQUAL,
 				TOKEN_OP_MOD
 				
 			} type; //!< type of this token
