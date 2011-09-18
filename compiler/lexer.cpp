@@ -237,6 +237,13 @@ namespace Aseba
 						pos.column++;
 						pos.character++;
 					}
+					else if (source.peek() == '+')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_PLUS_PLUS, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
 					else
 						tokens.push_back(Token(Token::TOKEN_OP_ADD, pos)); 
 				break;
@@ -245,6 +252,13 @@ namespace Aseba
 					if (source.peek() == '=')
 					{
 						tokens.push_back(Token(Token::TOKEN_OP_NEG_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else if (source.peek() == '-')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MINUS_MINUS, pos));
 						source.get();
 						pos.column++;
 						pos.character++;

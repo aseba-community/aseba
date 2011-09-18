@@ -409,6 +409,10 @@ namespace Aseba
 		{
 			assignment->children.push_back(parseCompoundAssignment(l_value));
 		}
+		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
+		{
+			assignment->children.push_back(parseIncrementAssignment(l_value));
+		}
 		else
 			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
 		
@@ -442,6 +446,29 @@ namespace Aseba
 		return node.release();
 	}
 
+	// parse ++ and -- operators
+	// assignments a++ are expanded to a = a + 1
+	Node* Compiler::parseIncrementAssignment(Node* l_value)
+	{
+		Token::Type op = tokens.front();
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+
+		// convert the l_value from a StoreNode to a LoadNode
+		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// create the immediate node
+		std::auto_ptr<Node> node(new ImmediateNode(pos, 1));
+
+		if (op == Token::TOKEN_OP_PLUS_PLUS)
+		{
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_ADD, load.release(), node.release()));
+		}
+		else if (op == Token::TOKEN_OP_MINUS_MINUS)
+		{
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_NEG, load.release(), node.release()));
+		}
+		return node.release();
+	}
 	
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
