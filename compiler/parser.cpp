@@ -369,36 +369,37 @@ namespace Aseba
 		
 		tokens.pop_front();
 		
-		std::auto_ptr<AssignmentNode> assignement(new AssignmentNode(varPos));
-		
+		Node* l_value;
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
+
+		// parse the left value
 		// check if it is an array access
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
 			tokens.pop_front();
 			
-			std::auto_ptr<Node> array(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
-		
-			array->children.push_back(parseBinaryOrExpression());
+			l_value = new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName);
+			l_value->children.push_back(parseBinaryOrExpression());
 
 			expect(Token::TOKEN_BRACKET_CLOSE);
 			tokens.pop_front();
-		
-			assignement->children.push_back(array.release());
 		}
 		else
 		{
 			if (varSize != 1)
 				throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
 			
-			assignement->children.push_back(new StoreNode(tokens.front().pos, varAddr));
+			l_value = new StoreNode(tokens.front().pos, varAddr);
 		}
+
+		assignment->children.push_back(l_value);
 		
 		expect(Token::TOKEN_ASSIGN);
 		tokens.pop_front();
 		
-		assignement->children.push_back(parseBinaryOrExpression());
+		assignment->children.push_back(parseBinaryOrExpression());
 		
-		return assignement.release();
+		return assignment.release();
 	}
 
 	
