@@ -255,6 +255,8 @@ namespace Aseba
 				TOKEN_OP_NEG,
 				TOKEN_OP_ADD_EQUAL,
 				TOKEN_OP_NEG_EQUAL,
+				TOKEN_OP_PLUS_PLUS,
+				TOKEN_OP_MINUS_MINUS,
 				TOKEN_OP_MULT,
 				TOKEN_OP_DIV,
 				TOKEN_OP_MOD,
@@ -348,6 +350,7 @@ namespace Aseba
 		Node* parseVarDef();
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);
+		Node* parseIncrementAssignment(Node* l_value);
 		Node* parseIfWhen(bool edgeSensitive);
 		Node* parseFor();
 		Node* parseWhile();

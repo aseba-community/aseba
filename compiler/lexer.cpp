@@ -107,6 +107,8 @@ namespace Aseba
 			case TOKEN_OP_NEG: return L"- (minus)";
 			case TOKEN_OP_ADD_EQUAL: return L"+= (plus equal)";
 			case TOKEN_OP_NEG_EQUAL: return L"-= (minus equal)";
+			case TOKEN_OP_PLUS_PLUS: return L"++ (plus) plus";
+			case TOKEN_OP_MINUS_MINUS: return L"-- (minus minus)";
 			case TOKEN_OP_MULT: return L"* (time)";
 			case TOKEN_OP_DIV: return L"/ (divide)";
 			case TOKEN_OP_MOD: return L"modulo";
@@ -239,6 +241,13 @@ namespace Aseba
 						pos.column++;
 						pos.character++;
 					}
+					else if (source.peek() == '+')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_PLUS_PLUS, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
 					else
 						tokens.push_back(Token(Token::TOKEN_OP_ADD, pos)); 
 				break;
@@ -247,6 +256,13 @@ namespace Aseba
 					if (source.peek() == '=')
 					{
 						tokens.push_back(Token(Token::TOKEN_OP_NEG_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else if (source.peek() == '-')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MINUS_MINUS, pos));
 						source.get();
 						pos.column++;
 						pos.character++;
