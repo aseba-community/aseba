@@ -26,7 +26,8 @@ static const struct option long_options[] = {
 	{ "fail",	no_argument,		NULL,		'f'},
 	{ "source",	no_argument,		NULL,		's'},
 	{ "dump",	no_argument,		NULL,		'd'},
-	{ "memcmp", required_argument,	NULL,		'm'},
+	{ "memdump",	no_argument,		NULL,		'u'},
+	{ "memcmp", 	required_argument,	NULL,		'm'},
 	{ 0, 0, 0, 0 } 
 };
 
@@ -36,7 +37,8 @@ static void usage (int argc, char** argv)
 			<< "Options:" << std::endl
 			<< "    -f | --fail         Return EXIT_SUCCESS if compilation fail" << std::endl
 			<< "    -s | --source       Dump the source code" << std::endl
-			<< "    -d | --dump         Dump the result (tokens, tree, bytecode)" << std::endl
+			<< "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
+			<< "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
 			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl;
 }
 
@@ -226,6 +228,7 @@ int main(int argc, char** argv)
 	bool should_fail = false;
 	bool source = false;
 	bool dump = false;
+	bool memDump = false;
 	bool memCmp = false;
 	std::string memCmpFileName;
 
@@ -252,6 +255,9 @@ int main(int argc, char** argv)
 				break;
 			case 'd':
 				dump = true;
+				break;
+			case 'u':
+				memDump = true;
 				break;
 			case 'm':
 				memCmp = true;
@@ -317,6 +323,15 @@ int main(int argc, char** argv)
 	node.run();
 	
 	checkForError("Execution", should_fail, executionError);
+
+	if (memDump)
+	{
+		std::wcout << L"Memory dump:" << std::endl;
+		for (int i = 0; i < node.vm.variablesSize; i++)
+		{
+			std::wcout << node.vm.variables[i] << std::endl;
+		}
+	}
 	
 	if (memCmp)
 	{
