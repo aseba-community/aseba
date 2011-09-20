@@ -633,7 +633,17 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
 	stream << "--system        : connects medulla to the system d-bus bus\n";	
 	stream << "-h, --help      : shows this help\n";
+	stream << "-V, --version   : shows the version number\n";
 	stream << "Additional targets are any valid Dashel targets." << std::endl;
+	stream << "Report bugs to: aseba-dev@gna.org" << std::endl;
+}
+
+//! Show version
+void dumpVersion(std::ostream &stream)
+{
+	stream << "Aseba medulla " << ASEBA_VERSION << std::endl;
+	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
+	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
 int main(int argc, char *argv[])
@@ -682,6 +692,11 @@ int main(int argc, char *argv[])
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
+			return 0;
+		}
+		else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
+		{
+			dumpVersion(std::cout);
 			return 0;
 		}
 		else

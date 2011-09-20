@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "../common/consts.h"
 #include "../msg/msg.h"
 #include "../utils/utils.h"
 #include <dashel/dashel.h>
@@ -56,8 +57,21 @@ namespace Aseba
 		stream << programName << " [-t target] [cmd destId (args)] ... [cmd destId (args)]\n";
 		stream << "where cmd is one af the following:\n";
 		dumpCommandList(stream);
+		stream << std::endl;
+		stream << "Other options:\n";
+		stream << "    -h, --help      : shows this help\n";
+		stream << "    -V, --version   : shows the version number\n";
+		stream << "Report bugs to: aseba-dev@gna.org" << std::endl;
 	}
 	
+	//! Show version
+	void dumpVersion(std::ostream &stream)
+	{
+		stream << "Aseba cmd " << ASEBA_VERSION << std::endl;
+		stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
+		stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
+	}
+
 	//! Produce an error message and dump help and quit
 	void errorMissingArgument(const char *programName)
 	{
@@ -770,6 +784,11 @@ int main(int argc, char *argv[])
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			Aseba::dumpHelp(std::cout, argv[0]);
+			return 0;
+		}
+		else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
+		{
+			Aseba::dumpVersion(std::cout);
 			return 0;
 		}
 		else
