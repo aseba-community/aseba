@@ -369,38 +369,106 @@ namespace Aseba
 		
 		tokens.pop_front();
 		
-		std::auto_ptr<AssignmentNode> assignement(new AssignmentNode(varPos));
-		
+		Node* l_value;
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
+
+		// parse the left value
 		// check if it is an array access
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
 			tokens.pop_front();
 			
-			std::auto_ptr<Node> array(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
-		
-			array->children.push_back(parseBinaryOrExpression());
+			l_value = new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName);
+			l_value->children.push_back(parseBinaryOrExpression());
 
 			expect(Token::TOKEN_BRACKET_CLOSE);
 			tokens.pop_front();
-		
-			assignement->children.push_back(array.release());
 		}
 		else
 		{
 			if (varSize != 1)
 				throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
 			
-			assignement->children.push_back(new StoreNode(tokens.front().pos, varAddr));
+			l_value = new StoreNode(tokens.front().pos, varAddr);
 		}
+
+		assignment->children.push_back(l_value);
 		
-		expect(Token::TOKEN_ASSIGN);
-		tokens.pop_front();
+		// parse rvalue
+		if (tokens.front() == Token::TOKEN_ASSIGN)
+		{
+			tokens.pop_front();
+			assignment->children.push_back(parseBinaryOrExpression());
+		}
+		else if (
+			(tokens.front() == Token::TOKEN_OP_ADD_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_NEG_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_MULT_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_DIV_EQUAL)
+			)
+		{
+			assignment->children.push_back(parseCompoundAssignment(l_value));
+		}
+		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
+		{
+			assignment->children.push_back(parseIncrementAssignment(l_value));
+		}
+		else
+			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
 		
-		assignement->children.push_back(parseBinaryOrExpression());
-		
-		return assignement.release();
+		return assignment.release();
 	}
 
+	// parse +=, -=,... assignments
+	// assignments a += b are expanded to a = a + b
+	Node* Compiler::parseCompoundAssignment(Node* l_value)
+	{
+		Token::Type op = tokens.front();
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+
+		// convert the l_value from a StoreNode to a LoadNode
+		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// get the r_value
+		std::auto_ptr<Node> node(parseBinaryOrExpression());
+
+		// translate the compound assignment to a regular operator (+, -, ...)
+		if ((op == Token::TOKEN_OP_ADD_EQUAL) || (op == Token::TOKEN_OP_NEG_EQUAL))
+		{
+			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_ADD - Token::TOKEN_OP_ADD_EQUAL));
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, op, load.release(), node.release()));
+		}
+		else if ((op == Token::TOKEN_OP_MULT_EQUAL) || (op == Token::TOKEN_OP_DIV_EQUAL))
+		{
+			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_MULT - Token::TOKEN_OP_MULT_EQUAL));
+			node.reset(BinaryArithmeticNode::fromMultExpression(pos, op, load.release(), node.release()));
+		}
+		return node.release();
+	}
+
+	// parse ++ and -- operators
+	// assignments a++ are expanded to a = a + 1
+	Node* Compiler::parseIncrementAssignment(Node* l_value)
+	{
+		Token::Type op = tokens.front();
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+
+		// convert the l_value from a StoreNode to a LoadNode
+		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// create the immediate node
+		std::auto_ptr<Node> node(new ImmediateNode(pos, 1));
+
+		if (op == Token::TOKEN_OP_PLUS_PLUS)
+		{
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_ADD, load.release(), node.release()));
+		}
+		else if (op == Token::TOKEN_OP_MINUS_MINUS)
+		{
+			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_NEG, load.release(), node.release()));
+		}
+		return node.release();
+	}
 	
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)

@@ -107,6 +107,8 @@ namespace Aseba
 			case TOKEN_OP_NEG: return L"- (minus)";
 			case TOKEN_OP_MULT: return L"* (time)";
 			case TOKEN_OP_DIV: return L"/ (divide)";
+			case TOKEN_OP_ADD_EQUAL: return L"+= (plus equal)";
+			case TOKEN_OP_NEG_EQUAL: return L"-= (minus equal)";
 			case TOKEN_OP_MOD: return L"modulo";
 			default: return L"unknown";
 		}
@@ -159,10 +161,6 @@ namespace Aseba
 				case ']': tokens.push_back(Token(Token::TOKEN_BRACKET_CLOSE, pos)); break;
 				case ':': tokens.push_back(Token(Token::TOKEN_COLON, pos)); break;
 				case ',': tokens.push_back(Token(Token::TOKEN_COMMA, pos)); break;
-				case '+': tokens.push_back(Token(Token::TOKEN_OP_ADD, pos)); break;
-				case '-': tokens.push_back(Token(Token::TOKEN_OP_NEG, pos)); break;
-				case '*': tokens.push_back(Token(Token::TOKEN_OP_MULT, pos)); break;
-				case '/': tokens.push_back(Token(Token::TOKEN_OP_DIV, pos)); break;
 				case '%': tokens.push_back(Token(Token::TOKEN_OP_MOD, pos)); break;
 				case '|': tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos)); break;
 				case '^': tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos)); break;
@@ -231,6 +229,68 @@ namespace Aseba
 				break;
 				
 				// cases that require one character look-ahead
+				case '+':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_ADD_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else if (source.peek() == '+')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_PLUS_PLUS, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_ADD, pos)); 
+				break;
+
+				case '-':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_NEG_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else if (source.peek() == '-')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MINUS_MINUS, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_NEG, pos));
+				break;
+
+				case '*':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MULT_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_MULT, pos));
+				break;
+
+				case '/':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_DIV_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_DIV, pos));
+				break;
+
 				case '!':
 					if (source.peek() == '=')
 					{
