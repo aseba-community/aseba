@@ -389,6 +389,7 @@ namespace Aseba
 					else
 						result = abs(immediateChild->value);
 				break;
+				case ASEBA_UNARY_OP_BIT_NOT: result = ~immediateChild->value; break;
 				
 				default: abort();
 			}
@@ -400,14 +401,19 @@ namespace Aseba
 		}
 		else if (op == ASEBA_UNARY_OP_NOT)
 		{
-			// de Morgan removal of not
-			if (dump)
-				*dump << sourcePos.toWString() << L": not removed using de Morgan\n";
-			BinaryArithmeticNode* child(polymorphic_downcast<BinaryArithmeticNode*>(children[0]));
-			child->deMorganNotRemoval();
-			children.clear();
-			delete this;
-			return child;
+			BinaryArithmeticNode* binaryNodeChild(dynamic_cast<BinaryArithmeticNode*>(children[0]));
+			if (binaryNodeChild)
+			{
+				// de Morgan removal of not
+				if (dump)
+					*dump << sourcePos.toWString() << L": not removed using de Morgan\n";
+				binaryNodeChild->deMorganNotRemoval();
+				children.clear();
+				delete this;
+				return binaryNodeChild;
+			}
+			else
+				return this;
 		}
 		else
 			return this;
