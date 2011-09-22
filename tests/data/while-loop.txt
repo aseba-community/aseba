@@ -1,0 +1,7 @@
+var i = 0
+var j = 0
+
+while i < 10 do
+	j = j + i
+	i = i + 1
+end
