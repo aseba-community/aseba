@@ -341,6 +341,8 @@ namespace Aseba
 		bool constantExists(const std::wstring& name) const;
 		void buildMaps();
 		void tokenize(std::wistream& source);
+		wchar_t getNextCharacter(std::wistream& source, SourcePos& pos);
+		bool testNextCharacter(std::wistream& source, SourcePos& pos, wchar_t test, Token::Type tokenIfTrue);
 		void dumpTokens(std::wostream &dest) const;
 		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);

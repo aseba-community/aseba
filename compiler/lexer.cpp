@@ -207,9 +207,7 @@ namespace Aseba
 							}
 						}
 						// fetch the #
-						c = source.get();
-						pos.column++;
-						pos.character++;
+						getNextCharacter(source, pos);
 					}
 					else
 					{
@@ -236,204 +234,107 @@ namespace Aseba
 				
 				// cases that require one character look-ahead
 				case '+':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_ADD_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else if (source.peek() == '+')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_PLUS_PLUS, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_ADD, pos)); 
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_ADD_EQUAL))
+						break;
+					if (testNextCharacter(source, pos, '+', Token::TOKEN_OP_PLUS_PLUS))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_ADD, pos));
+					break;
 
 				case '-':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_NEG_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else if (source.peek() == '-')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_MINUS_MINUS, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_NEG, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_NEG_EQUAL))
+						break;
+					if (testNextCharacter(source, pos, '-', Token::TOKEN_OP_MINUS_MINUS))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_NEG, pos));
+					break;
 
 				case '*':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_MULT_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_MULT, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_MULT_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_MULT, pos));
+					break;
 
 				case '/':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_DIV_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_DIV, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_DIV_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_DIV, pos));
+					break;
 
 				case '%':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_MOD_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_MOD, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_MOD_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_MOD, pos));
+					break;
 
 				case '|':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_OR_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_OR_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos));
+					break;
 
 				case '^':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_XOR_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos));
+					break;
 
 				case '&':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_AND_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_AND_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos));
+					break;
 
 				case '~':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_NOT_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos));
+					break;
 
 				case '!':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_NOT_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						throw Error(pos, L"syntax error");
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_NOT_EQUAL))
+						break;
+					throw Error(pos, L"syntax error");
+					break;
 				
 				case '=':
-					if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_ASSIGN, pos));
-				break;
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_ASSIGN, pos));
+					break;
 				
+				// cases that require two characters look-ahead
 				case '<':
 					if (source.peek() == '<')
 					{
-						source.get();
-						pos.column++;
-						pos.character++;
-						if (source.peek() == '=')
-						{
-							source.get();
-							pos.column++;
-							pos.character++;
-							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT_EQUAL, pos));
-						}
-						else
-							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT, pos));
+						// <<
+						getNextCharacter(source, pos);
+						if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SHIFT_LEFT_EQUAL))
+							break;
+						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT, pos));
+						break;
 					}
-					else if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_SMALLER_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_SMALLER, pos));
-				break;
+					// <
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SMALLER_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_SMALLER, pos));
+					break;
 				
 				case '>':
 					if (source.peek() == '>')
 					{
-						source.get();
-						pos.column++;
-						pos.character++;
-						if (source.peek() == '=')
-						{
-							source.get();
-							pos.column++;
-							pos.character++;
-							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT_EQUAL, pos));
-						}
-						else
-							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
+						// >>
+						getNextCharacter(source, pos);
+						if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SHIFT_RIGHT_EQUAL))
+							break;
+						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
+						break;
 					}
-					else if (source.peek() == '=')
-					{
-						tokens.push_back(Token(Token::TOKEN_OP_BIGGER_EQUAL, pos));
-						source.get();
-						pos.column++;
-						pos.character++;
-					}
-					else
-						tokens.push_back(Token(Token::TOKEN_OP_BIGGER, pos));
-				break;
+					// >
+					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIGGER_EQUAL))
+						break;
+					tokens.push_back(Token(Token::TOKEN_OP_BIGGER, pos));
+					break;
 				
 				// cases that require to look for a while
 				default:
@@ -544,6 +445,24 @@ namespace Aseba
 		} // while (source.good())
 		
 		tokens.push_back(Token(Token::TOKEN_END_OF_STREAM, pos));
+	}
+
+	wchar_t Compiler::getNextCharacter(std::wistream &source, SourcePos &pos)
+	{
+		pos.column++;
+		pos.character++;
+		return source.get();
+	}
+
+	bool Compiler::testNextCharacter(std::wistream &source, SourcePos &pos, wchar_t test, Token::Type tokenIfTrue)
+	{
+		if (source.peek() == test)
+		{
+			tokens.push_back(Token(tokenIfTrue, pos));
+			getNextCharacter(source, pos);
+			return true;
+		}
+		return false;
 	}
 	
 	//! Debug print of tokens
