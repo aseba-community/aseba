@@ -257,8 +257,11 @@ namespace Aseba
 				TOKEN_OP_NEG_EQUAL,
 				TOKEN_OP_MULT,
 				TOKEN_OP_DIV,
-				TOKEN_OP_MOD
-				
+				TOKEN_OP_MOD,
+				TOKEN_OP_MULT_EQUAL,
+				TOKEN_OP_DIV_EQUAL,
+				TOKEN_OP_MOD_EQUAL
+
 			} type; //!< type of this token
 			std::wstring sValue; //!< string version of the value
 			int iValue; //!< int version of the value, 0 if not applicable

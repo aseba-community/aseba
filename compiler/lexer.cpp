@@ -110,6 +110,9 @@ namespace Aseba
 			case TOKEN_OP_MULT: return L"* (time)";
 			case TOKEN_OP_DIV: return L"/ (divide)";
 			case TOKEN_OP_MOD: return L"modulo";
+			case TOKEN_OP_MULT_EQUAL: return L"*= (time equal)";
+			case TOKEN_OP_DIV_EQUAL: return L"/= (divide equal)";
+			case TOKEN_OP_MOD_EQUAL: return L"modulo equal";
 			default: return L"unknown";
 		}
 	}
@@ -161,9 +164,6 @@ namespace Aseba
 				case ']': tokens.push_back(Token(Token::TOKEN_BRACKET_CLOSE, pos)); break;
 				case ':': tokens.push_back(Token(Token::TOKEN_COLON, pos)); break;
 				case ',': tokens.push_back(Token(Token::TOKEN_COMMA, pos)); break;
-				case '*': tokens.push_back(Token(Token::TOKEN_OP_MULT, pos)); break;
-				case '/': tokens.push_back(Token(Token::TOKEN_OP_DIV, pos)); break;
-				case '%': tokens.push_back(Token(Token::TOKEN_OP_MOD, pos)); break;
 				case '|': tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos)); break;
 				case '^': tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos)); break;
 				case '&': tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos)); break;
@@ -253,6 +253,42 @@ namespace Aseba
 					}
 					else
 						tokens.push_back(Token(Token::TOKEN_OP_NEG, pos));
+				break;
+
+				case '*':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MULT_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_MULT, pos));
+				break;
+
+				case '/':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_DIV_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_DIV, pos));
+				break;
+
+				case '%':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_MOD_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_MOD, pos));
 				break;
 
 				case '!':
