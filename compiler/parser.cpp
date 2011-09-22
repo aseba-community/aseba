@@ -400,27 +400,10 @@ namespace Aseba
 			tokens.pop_front();
 			assignment->children.push_back(parseBinaryOrExpression());
 		}
-		else if (
-			(tokens.front() == Token::TOKEN_OP_ADD_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_NEG_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_MULT_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_DIV_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_MOD_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_BIT_OR_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_BIT_AND_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_BIT_NOT_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_SHIFT_LEFT_EQUAL) || (tokens.front() == Token::TOKEN_OP_SHIFT_RIGHT_EQUAL)
-			)
-		{
-			assignment->children.push_back(parseCompoundAssignment(l_value));
-		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
-		{
 			assignment->children.push_back(parseIncrementAssignment(l_value));
-		}
 		else
-			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
+			assignment->children.push_back(parseCompoundAssignment(l_value));
 		
 		return assignment.release();
 	}
@@ -430,6 +413,7 @@ namespace Aseba
 	Node* Compiler::parseCompoundAssignment(Node* l_value)
 	{
 		Token::Type op = tokens.front();
+		const wchar_t* typeName = tokens.front().typeName();
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 
@@ -464,6 +448,9 @@ namespace Aseba
 			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_SHIFT_LEFT- Token::TOKEN_OP_SHIFT_LEFT_EQUAL));
 			node.reset(BinaryArithmeticNode::fromShiftExpression(pos, op, load.release(), node.release()));
 		}
+		else
+			throw Error(pos, WFormatableString(L"Expecting assignement, found %0 instead").arg(typeName));
+
 		return node.release();
 	}
 

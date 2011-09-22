@@ -253,22 +253,22 @@ namespace Aseba
 				TOKEN_OP_BIGGER_EQUAL,
 				TOKEN_OP_SMALLER,
 				TOKEN_OP_SMALLER_EQUAL,
-				TOKEN_OP_SHIFT_LEFT,
-				TOKEN_OP_SHIFT_RIGHT,
-				TOKEN_OP_SHIFT_LEFT_EQUAL,
-				TOKEN_OP_SHIFT_RIGHT_EQUAL,
-				TOKEN_OP_ADD,
-				TOKEN_OP_NEG,
-				TOKEN_OP_ADD_EQUAL,
-				TOKEN_OP_NEG_EQUAL,
+				TOKEN_OP_SHIFT_LEFT,		// group of 4 tokens, don't split or mess up
+				TOKEN_OP_SHIFT_RIGHT,		//
+				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
+				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
+				TOKEN_OP_ADD,			// group of 4 tokens, don't split or mess up
+				TOKEN_OP_NEG,			//
+				TOKEN_OP_ADD_EQUAL,		//
+				TOKEN_OP_NEG_EQUAL,		//
 				TOKEN_OP_PLUS_PLUS,
 				TOKEN_OP_MINUS_MINUS,
-				TOKEN_OP_MULT,
-				TOKEN_OP_DIV,
-				TOKEN_OP_MOD,
-				TOKEN_OP_MULT_EQUAL,
-				TOKEN_OP_DIV_EQUAL,
-				TOKEN_OP_MOD_EQUAL
+				TOKEN_OP_MULT,			// group of 6 tokens, don't split or mess up
+				TOKEN_OP_DIV,			//
+				TOKEN_OP_MOD,			//
+				TOKEN_OP_MULT_EQUAL,		//
+				TOKEN_OP_DIV_EQUAL,		//
+				TOKEN_OP_MOD_EQUAL		//
 
 			} type; //!< type of this token
 			std::wstring sValue; //!< string version of the value
