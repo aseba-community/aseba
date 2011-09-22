@@ -30,3 +30,7 @@ add_test(array-access-out-of-bounds-dyn-under ${EXECUTABLE_OUTPUT_PATH}/asebates
 add_test(array-access-out-of-bounds-static-over ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-static-over.txt)
 add_test(array-access-out-of-bounds-static-under ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-access-out-of-bounds-static-under.txt)
 add_test(assigning-bool ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/assigning-bool.txt)
+add_test(inconsistent-input1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input1.txt)
+add_test(inconsistent-input2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input2.txt)
+add_test(inconsistent-input3 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input3.txt)
+add_test(inconsistent-input4 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input4.txt)

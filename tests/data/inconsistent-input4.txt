@@ -1,0 +1,6 @@
+# Recursive sub call -> stack overflow
+var v = 0
+
+sub toto
+v = 1
+callsub toto
