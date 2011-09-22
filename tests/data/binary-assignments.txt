@@ -1,0 +1,9 @@
+var i = 6
+var j = 6
+var k = 6
+var l = 1
+
+i &= 2
+j |= 1
+k ^= 2
+l ~= l
