@@ -11,6 +11,7 @@ install(TARGETS asebatest RUNTIME
 
 # the following tests should succeed
 add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
+add_test(advanced-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt)
 add_test(compound-assignment ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/compound-assignments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/compound-assignments.txt)
 add_test(binary-assignment ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-assignments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-assignments.txt)
 add_test(shift-assignment ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/shift-assignments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/shift-assignments.txt)
