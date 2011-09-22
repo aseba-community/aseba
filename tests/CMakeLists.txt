@@ -21,6 +21,7 @@ add_test(for-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_S
 add_test(while-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop.txt)
 add_test(when-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/when-conditional.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/when-conditional.txt)
 add_test(comments ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/comments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/comments.txt)
+add_test(subroutine ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/subroutine.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)

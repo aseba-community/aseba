@@ -1,0 +1,7 @@
+# the sub call is not tested, as it would imply the use of an event,
+# which is for now impossible
+
+var v = 0
+
+sub toto
+	v = 1
