@@ -3,6 +3,7 @@ var b = 2
 var c = 3
 var d = 4
 var e = 0
+var f = 3
 
 if a <= b or a < b and c > d or d == 4 then
 	e = 1
@@ -22,4 +23,8 @@ end
 
 if (a+3) < b then
 	e = 5
+end
+
+if  (f > 2) and not (f > 4) then
+	f = 1
 end

@@ -1,0 +1,6 @@
+var i
+var j = 0
+
+for i in 30:1 step -3 do
+	j = j + i
+end
