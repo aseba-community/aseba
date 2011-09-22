@@ -107,6 +107,8 @@ namespace Aseba
 			case TOKEN_OP_SMALLER_EQUAL: return L"<= (smaller or equal than)";
 			case TOKEN_OP_SHIFT_LEFT: return L"<< (shift left)";
 			case TOKEN_OP_SHIFT_RIGHT: return L">> (shift right)";
+			case TOKEN_OP_SHIFT_LEFT_EQUAL: return L"<<= (shift left equal)";
+			case TOKEN_OP_SHIFT_RIGHT_EQUAL: return L">>= (shift right equal)";
 			case TOKEN_OP_ADD: return L"+ (plus)";
 			case TOKEN_OP_NEG: return L"- (minus)";
 			case TOKEN_OP_ADD_EQUAL: return L"+= (plus equal)";
@@ -382,10 +384,18 @@ namespace Aseba
 				case '<':
 					if (source.peek() == '<')
 					{
-						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT, pos));
 						source.get();
 						pos.column++;
 						pos.character++;
+						if (source.peek() == '=')
+						{
+							source.get();
+							pos.column++;
+							pos.character++;
+							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT_EQUAL, pos));
+						}
+						else
+							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT, pos));
 					}
 					else if (source.peek() == '=')
 					{
@@ -401,10 +411,18 @@ namespace Aseba
 				case '>':
 					if (source.peek() == '>')
 					{
-						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
 						source.get();
 						pos.column++;
 						pos.character++;
+						if (source.peek() == '=')
+						{
+							source.get();
+							pos.column++;
+							pos.character++;
+							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT_EQUAL, pos));
+						}
+						else
+							tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
 					}
 					else if (source.peek() == '=')
 					{

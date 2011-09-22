@@ -409,7 +409,8 @@ namespace Aseba
 			(tokens.front() == Token::TOKEN_OP_BIT_OR_EQUAL) ||
 			(tokens.front() == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
 			(tokens.front() == Token::TOKEN_OP_BIT_AND_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_BIT_NOT_EQUAL)
+			(tokens.front() == Token::TOKEN_OP_BIT_NOT_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_SHIFT_LEFT_EQUAL) || (tokens.front() == Token::TOKEN_OP_SHIFT_RIGHT_EQUAL)
 			)
 		{
 			assignment->children.push_back(parseCompoundAssignment(l_value));
@@ -457,6 +458,11 @@ namespace Aseba
 		else if (op == Token::TOKEN_OP_BIT_NOT_EQUAL)
 		{
 			node.reset(new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, node.release()));
+		}
+		else if ((op == Token::TOKEN_OP_SHIFT_LEFT_EQUAL) || (op == Token::TOKEN_OP_SHIFT_RIGHT_EQUAL))
+		{
+			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_SHIFT_LEFT- Token::TOKEN_OP_SHIFT_LEFT_EQUAL));
+			node.reset(BinaryArithmeticNode::fromShiftExpression(pos, op, load.release(), node.release()));
 		}
 		return node.release();
 	}
