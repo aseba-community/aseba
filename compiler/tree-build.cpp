@@ -111,6 +111,17 @@ namespace Aseba
 			right
 		);
 	}
+
+	//! Create a binary arithmetic node for or/xor/and operation op
+	BinaryArithmeticNode *BinaryArithmeticNode::fromBinaryExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right)
+	{
+		return new BinaryArithmeticNode(
+			sourcePos,
+			static_cast<AsebaBinaryOperator>((op - Compiler::Token::TOKEN_OP_BIT_OR) + ASEBA_OP_BIT_OR),
+			left,
+			right
+		);
+	}
 	
 	//! Constructor
 	UnaryArithmeticNode::UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child) :

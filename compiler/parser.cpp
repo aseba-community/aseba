@@ -405,7 +405,11 @@ namespace Aseba
 			(tokens.front() == Token::TOKEN_OP_NEG_EQUAL) ||
 			(tokens.front() == Token::TOKEN_OP_MULT_EQUAL) ||
 			(tokens.front() == Token::TOKEN_OP_DIV_EQUAL) ||
-			(tokens.front() == Token::TOKEN_OP_MOD_EQUAL)
+			(tokens.front() == Token::TOKEN_OP_MOD_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_BIT_OR_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_BIT_AND_EQUAL) ||
+			(tokens.front() == Token::TOKEN_OP_BIT_NOT_EQUAL)
 			)
 		{
 			assignment->children.push_back(parseCompoundAssignment(l_value));
@@ -443,6 +447,16 @@ namespace Aseba
 		{
 			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_MULT - Token::TOKEN_OP_MULT_EQUAL));
 			node.reset(BinaryArithmeticNode::fromMultExpression(pos, op, load.release(), node.release()));
+		}
+		else if ((op == Token::TOKEN_OP_BIT_OR_EQUAL) || (op == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
+			 (op == Token::TOKEN_OP_BIT_AND_EQUAL))
+		{
+			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_BIT_OR - Token::TOKEN_OP_BIT_OR_EQUAL));
+			node.reset(BinaryArithmeticNode::fromBinaryExpression(pos, op, load.release(), node.release()));
+		}
+		else if (op == Token::TOKEN_OP_BIT_NOT_EQUAL)
+		{
+			node.reset(new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, node.release()));
 		}
 		return node.release();
 	}

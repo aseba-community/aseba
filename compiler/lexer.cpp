@@ -95,6 +95,10 @@ namespace Aseba
 			case TOKEN_OP_BIT_XOR: return L"binary xor";
 			case TOKEN_OP_BIT_AND: return L"binary and";
 			case TOKEN_OP_BIT_NOT: return L"binary not";
+			case TOKEN_OP_BIT_OR_EQUAL: return L"binary or equal";
+			case TOKEN_OP_BIT_XOR_EQUAL: return L"binary xor equal";
+			case TOKEN_OP_BIT_AND_EQUAL: return L"binary and equal";
+			case TOKEN_OP_BIT_NOT_EQUAL: return L"binary not equal";
 			case TOKEN_OP_EQUAL: return L"== (equal to)";
 			case TOKEN_OP_NOT_EQUAL: return L"!= (not equal to)";
 			case TOKEN_OP_BIGGER: return L"> (bigger than)";
@@ -166,10 +170,6 @@ namespace Aseba
 				case ']': tokens.push_back(Token(Token::TOKEN_BRACKET_CLOSE, pos)); break;
 				case ':': tokens.push_back(Token(Token::TOKEN_COLON, pos)); break;
 				case ',': tokens.push_back(Token(Token::TOKEN_COMMA, pos)); break;
-				case '|': tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos)); break;
-				case '^': tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos)); break;
-				case '&': tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos)); break;
-				case '~': tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos)); break;
 				
 				// special case for comment
 				case '#':
@@ -305,6 +305,54 @@ namespace Aseba
 					}
 					else
 						tokens.push_back(Token(Token::TOKEN_OP_MOD, pos));
+				break;
+
+				case '|':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_OR_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos));
+				break;
+
+				case '^':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos));
+				break;
+
+				case '&':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_AND_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos));
+				break;
+
+				case '~':
+					if (source.peek() == '=')
+					{
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT_EQUAL, pos));
+						source.get();
+						pos.column++;
+						pos.character++;
+					}
+					else
+						tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos));
 				break;
 
 				case '!':

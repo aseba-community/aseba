@@ -279,6 +279,7 @@ namespace Aseba
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromAddExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
+		static BinaryArithmeticNode *fromBinaryExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 	};
 	
 	//! Node for unary arithmetic
