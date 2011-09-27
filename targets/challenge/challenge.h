@@ -30,6 +30,7 @@
 
 #include <viewer/Viewer.h>
 #include <QDialog>
+#include <QWidget>
 
 class QPushButton;
 class QCheckBox;
@@ -45,18 +46,8 @@ namespace Enki
 	protected:
 		bool savingVideo;
 		int ePuckCount;
-		QTextBrowser* helpViewer;
-		
-		#ifndef Q_WS_MAC
-		QPushButton* addRobotButton;
-		QPushButton* delRobotButton;
-		QCheckBox* autoCamera;
-		QCheckBox* hideButtons;
-		QPushButton* helpButton;
-		QFrame* menuFrame;
-		#else // Q_WS_MAC
-		QAction* autoCamera;
-		#endif // Q_WS_MAC
+
+		bool autoCamera;
 		
 		QFont titleFont;
 		QFont entryFont;
@@ -65,19 +56,16 @@ namespace Enki
 	public:
 		ChallengeViewer(World* world, int ePuckCount);
 	
-	signals:
-		void windowClosed();
-	
-	protected slots:
+	public slots:
 		void addNewRobot();
 		void removeRobot();
+		void autoCameraStateChanged(int state);
 	
 	protected:
 		virtual void timerEvent(QTimerEvent * event);
 		virtual void mouseMoveEvent ( QMouseEvent * event );
 		virtual void keyPressEvent ( QKeyEvent * event );
 		virtual void keyReleaseEvent ( QKeyEvent * event );
-		virtual void closeEvent ( QCloseEvent * event );
 		
 		void drawQuad2D(double x, double y, double w, double ar);
 		
@@ -86,6 +74,39 @@ namespace Enki
 		virtual void renderObjectsTypesHook();
 		virtual void displayObjectHook(PhysicalObject *object);
 		virtual void sceneCompletedHook();
+	};
+
+	class ChallengeApplication : public QWidget
+	{
+		Q_OBJECT
+
+	protected:
+		ChallengeViewer viewer;
+
+		QTextBrowser* helpViewer;
+
+		#ifndef Q_WS_MAC
+		QPushButton* addRobotButton;
+		QPushButton* delRobotButton;
+		QCheckBox* autoCamera;
+		QCheckBox* hideButtons;
+		QPushButton* helpButton;
+		QFrame* menuFrame;
+		/*
+		#else // Q_WS_MAC
+		QAction* autoCamera;
+		*/
+		#endif // Q_WS_MAC
+
+	public:
+		ChallengeApplication(World* world, int ePuckCount);
+
+	signals:
+		void windowClosed();
+
+	protected:
+		virtual void closeEvent ( QCloseEvent * event );
+
 	};
 }
 
