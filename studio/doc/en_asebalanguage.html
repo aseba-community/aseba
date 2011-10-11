@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <title>
+      The Aseba language
+    </title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <div id="toc" class="floatright"></div>
+    <p>
+      This help is also available within Aseba Studio in the <tt>Help-&gt;Language</tt> menu.
+    </p>
+    <p>
+      The Aseba programming language allows to implement distributed control inside Aseba nodes. Syntactically, this language resembles <em>matlab</em>; this similarity allows developers with previous knowledge of some scripting language to feel quickly at ease with Aseba and thus lowers the learning curve. Semantically, it is a simple imperative programming language with a single basic type (16 bit signed integers) and arrays. This simplicity allows developers to program behaviours with no prior knowledge of a type system, integers being the most natural type of variables and well suited to programming microcontroller-based mobile robots.
+    </p>
+    <h1 id="toc0">
+      <span>Comments</span>
+    </h1>
+    <p>
+      Comments begin with a <em>#</em> and terminate at the end of the line.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code># this is a comment
+var b    # another comment</code>
+</pre>
+    </div><br />
+    Comments spanning several lines are also possible. They begin with <em>#*</em> and end with <em>*#</em>.
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>#*
+this is a comment spanning
+several lines
+*#
+var b    # a simple comment</code>
+</pre>
+    </div>
+    <h1 id="toc1">
+      <span>Variables</span>
+    </h1>
+    <p>
+      Variables refer either to single scalar values or to arrays of scalar values. The values are comprised between -32768 and 32767, which is the range of 16 bit signed integers. You can access array elements using the usual square parenthesis operator; array indexes begin at zero. You must declare all user-defined variables at the beginning of the Aseba script before doing any processing.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a
+var c[10]
+var b = 0
+var d[3] = 2, 3, 4</code>
+</pre>
+    </div>
+    <h1 id="toc2">
+      <span>Events</span>
+    </h1>
+    <p>
+      Aseba is an <em>event-based</em> architecture, which means that events trigger code execution asynchronously.<br />
+      Events can be external, for instance a user-defined event coming from another Aseba node, or internal, for instance emitted by a sensor which provides updated data. The reception of an event executes, if defined, the block of code that begins with the <tt>onevent</tt> keyword followed by the name of the event; the code at the top of the script is executed when the script is started or reset. The script can also send events by using the <tt>emit</tt> keyword, followed by the name of the event and the name of the variable to send, if any. If a variable is provided, the size of the event must match the size of the argument to be emitted. Events allow the script to trigger the execution of code on another node or to communicate with an external program.
+    </p>
+    <p>
+      To allow the execution of related code upon new events, scripts must not block and thus must not contain any infinite loop. For instance in the context of robotics, where a traditional robot control program would do some processing inside an infinite loop, an aseba script would just do the processing inside a sensor-related event.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+    emit sensors_values proximity_sensors_values
+end</code>
+</pre>
+    </div>
+    <h1 id="toc3">
+      <span>Expressions and Assignations</span>
+    </h1>
+    <p>
+      Expressions allow mathematical computations and are written using the normal mathematical infix syntax.<br />
+      Assignations use the keyword <tt>=</tt> and set the result of the computation of an expression into a scalar variable or an array element. Aseba provides, by order of precedence, the binary operators <tt>*</tt>, <tt>/</tt>, <tt>%</tt> (modulo); followed by <tt>+</tt> and <tt>-</tt>; followed by <tt>«</tt> (left shift) and <tt>»</tt> (right shift); followed by <tt>|</tt> (binary or); followed by <tt>^</tt> (binary exclusive or); followed by <tt>&amp;</tt> (binary and). The binary operators are left associative.<br />
+      Aseba also provides the unary operators <tt>-</tt>, <tt>~</tt> (binary not), and <tt>abs</tt> (absolute value). To evaluate an expression in a different order, you can use a pair of parentheses to group a sub-expression.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>a = 1 + 1
+b = b + d[0]
+b = (a - 7) % 5
+c[a] = d[a]</code>
+</pre>
+    </div>
+    <h1 id="toc4">
+      <span>Conditionals</span>
+    </h1>
+    <p>
+      Aseba provides two types of conditionals: <tt>if</tt> and <tt>when</tt>. Comparison operators are <tt>==</tt>, <tt>!=</tt>, <tt>&gt;</tt>, <tt>&gt;=</tt>, <tt>&lt;</tt>, and <tt>&lt;=</tt>; you can compare arbitrary expressions. You can group comparisons using the <tt>and</tt>, <tt>or</tt>, and <tt>not</tt> operators, and by using parentheses.
+    </p>
+    <p>
+      Both <tt>if</tt> and <tt>when</tt> execute a different block of code according to whether a condition is true or false; but <tt>when</tt> executes the block corresponding to true only if the last evaluation of the condition was false and the current one is true. This allows the execution of code only when something changes.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>if a - b &gt; c[0] then
+    c[0] = a
+elseif a &gt; 0 then
+       b = a
+else
+    b = 0
+end
+
+when a &gt; b do
+    leds[0] = 1
+end</code>
+</pre>
+    </div><br />
+    Here the <tt>when</tt> block executes only when <tt>a</tt> <em>becomes</em> bigger than <tt>b</tt>.
+    <h1 id="toc5">
+      <span>Loops</span>
+    </h1>
+    <p>
+      Two constructs allow the creation of loops: <tt>while</tt> and <tt>for</tt>.
+    </p>
+    <p>
+      A <tt>while</tt> loop repeatedly executes a block of code as long as the condition is true. The condition is of the same form as the one <tt>if</tt> uses.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>while i &lt; 10 do
+    v = v + i * i
+    i = i + 1
+end</code>
+</pre>
+    </div>
+    <p>
+      A <tt>for</tt> loop allows a variable to iterate over a range of integers, with an optional step size.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>for i in 1:10 do
+    v = v + i * i
+end
+for i in 30:1 step -3 do
+    v = v - i * i
+end</code>
+</pre>
+    </div>
+    <h1 id="toc6">
+      <span>Subroutines</span>
+    </h1>
+    <p>
+      When you want to perform the same sequence of operations at two or more different places in the code, you can write common code just once in a subroutine and then call this subroutine from different places. You define a subroutine using the <tt>sub</tt> keyword followed by the name of the subroutine. You call the subroutine using the <tt>callsub</tt> keyword, followed by the name of the subroutine. Subroutines must be defined before they are called. Subroutines cannot have arguments, nor be recursive, either directly or indirectly. Subroutines can access any variable.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+v = 1
+
+onevent test
+callsub toto</code>
+</pre>
+    </div>
+    <h1 id="toc7">
+      <span>Native Functions</span>
+    </h1>
+    <p>
+      We designed Aseba script to be simple so as to allow a quick understanding even by novice developers and to implement the virtual machine efficiently on a micro-controller. To perform complex or resource consuming processing, we provide native functions that are implemented in native code for efficiency. For instance, a native function is the natural way to implement a scalar product.
+    </p>
+    <p>
+      Native functions are safe, as they specify and check the size of their arguments, which can be constants, variables, or array accesses. In the latter, you can access the whole array, a single element, or a sub-range of the array. Native functions take their arguments by reference and can modify their contents but do not return any value. You can use native functions through the <tt>call</tt> keyword.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)</code>
+</pre>
+    </div>
+    <div style="position:absolute; top: 5px; left: -190px; margin: 0px; text-align:left; z-index:1000"></div>
+  </body>
+</html>

@@ -23,10 +23,12 @@ import os
 import os.path
 import sys
 from shutil import rmtree
+from shutil import copytree
 from shutil import copy
 
 # Custom lib
 from wikidot.fetch import fetchwikidot
+import qrc
 
 #language_map = [('fr','http://aseba.wikidot.com/fr:asebausermanual')]
 language_map = [
@@ -35,10 +37,19 @@ language_map = [
                 ('de','http://aseba.wikidot.com/de:asebausermanual')
                 ]
 OUTPUT_DIR = 'doc'
+QRC_FILE = './doc.qrc'
+STUDIO_PATH = '../studio/'
+
 # Clean
 rmtree(OUTPUT_DIR, True)
 os.mkdir(OUTPUT_DIR)
+try:
+    os.remove(QRC_FILE)
+except OSError:
+    # File doesn't exist
+    pass
 
+# Fetch the wiki, for all languages
 for x in language_map:
     print >> sys.stderr, "\n*** Getting doc for language ", x[0], " ***"
     output = OUTPUT_DIR + '_' + x[0]
@@ -50,3 +61,19 @@ for x in language_map:
     for y in listing:
         copy(os.path.join(output, y), os.path.join(OUTPUT_DIR, y))
 
+# Generate the Qt resource file
+qrc.generate(OUTPUT_DIR, QRC_FILE)
+
+# Clean Aseba Studio files
+studio_output_dir = os.path.join(STUDIO_PATH, OUTPUT_DIR)
+studio_doc_qrc = os.path.join(STUDIO_PATH, QRC_FILE)
+rmtree(studio_output_dir)
+try:
+    os.remove(studio_doc_qrc)
+except OSError:
+    # File doesn't exist
+    pass
+
+# Copy new files
+copytree(OUTPUT_DIR, studio_output_dir)
+copy(QRC_FILE, studio_doc_qrc)

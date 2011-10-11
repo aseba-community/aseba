@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <title>
+      Getting started with Aseba
+    </title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <p>
+      This page teaches you how to get started with Aseba if you do not have any physical robot. If you have a Thymio II, there exists a <a href="http://aseba.wikidot.com/en:thymioprogram">specific page</a>.
+    </p>
+    <table style="margin:0; padding:0">
+      <tr>
+        <td style="margin:0; padding:0">
+          <div id="toc"></div>
+        </td>
+      </tr>
+    </table>
+    <h1 id="toc0">
+      <span>To start, launch <em>challenge</em></span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="asebachallenge.png" width="390px" alt="asebachallenge.png" class="image" />
+    </div>
+    <p>
+      Aseba <em>challenge</em> (right image) is a simulated world where Aseba-controlled robots compete for food. You can use it as a playground to explore writing Aseba scripts or as an educational game to learn and teach programming.
+    </p>
+    <p>
+      To get started, you have to launch Aseba <em>challenge</em>. If Aseba is not yet installed, please follow the <a href="http://aseba.wikidot.com/en:downloadinstall">installation instructions</a>. Once <em>challenge</em> is started, you have to click on “Add a new robot”, and to choose a name for it. If you are a group, you have to add one robot for each player. You can remove all the robots by clicking “Remove all robots”. You can hide the buttons by checking “Auto hide”: the buttons will only show up when the mouse pointer is around them. You can have the camera move automatically by checking “Auto camera”. If you are moving the camera manually, the controls are the following:
+    </p>
+    <ul>
+      <li>ctrl + left mouse button: rotate view
+      </li>
+      <li>ctrl + shift + left mouse button: displace view on x/y
+      </li>
+      <li>ctrl + shift + right mouse button: displace view on z
+      </li>
+    </ul>
+    <div class="image-container floatright">
+      <img src="studio-connect-en.png" width="146px" alt="studio-connect-en.png" class="image" />
+    </div>
+    <p>
+      <em>Challenge</em> shows the score of each robot on translucid boards hanging over the arena. The goal is to stay alive by collecting energy. As long as a robot is alive, its points increase; when it dies, they are halved. Four blue sources provide energy to nearby robots. When a source is depleted, it becomes red and does not provide energy any more. From time to time, a source will sink into the ground and robots will no longer see it until it reappears.
+    </p>
+    <p>
+      Once Aseba <em>challenge</em> is running, you have to start Aseba <em>studio</em> to program your robot. For each robot, you have to run one instance of studio, which can run on any computer. At startup, <em>studio</em> proposes you to connect to an Aseba target (right image). If you have launched <em>challenge</em> on your computer and added a robot, the default option will connect to this robot. If <em>challenge</em> is running on another computer, or if there are several robots in the arena, please specify the computer in <em>host</em> and the robot in <em>port</em>. The translucent screen over the arena in <em>challenge</em> shows the ports corresponding to the different robots
+    </p>
+    <h1 id="toc1">
+      <span>Your first robot controller</span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="studio-challenge-en.png" width="390px" alt="studio-challenge-en.png" class="image" />
+    </div>
+    <p>
+      Once <em>studio</em> is running (right image), you can edit the robot's program in the centre area. The latter is a program editor which checks and compiles your program in real time, telling you whether the program's syntax is correct or not. You can learn more about <em>studio</em> in the menu <tt>Help-&gt;Studio</tt>. The menu <tt><a href="en_asebalanguage.html">Help-&gt;Language</a></tt> provides a detailed documentation of the Aseba programming language.
+    </p>
+    <p>
+      To program a robot, you first have to understand how it works. A robot interacts with the world in a loop: it perceives the state of the world through its sensors, takes some decisions with its onboard computer, and performs actions with its actuators; these actions change the state of the world, and the robot perceives this new state when it reads its sensors again.
+    </p>
+    <p>
+      In <em>challenge</em>, you program a simulated <a href="http://aseba.wikidot.com/en:e-puck">e-puck</a> robot. This robot has 8 proximity sensors around its body and a simple camera of 3 pixels pointing forward, with an aperture angle of 20° per pixel. You can read these values and also choose the speed of the wheels:<br />
+      <img src="epuck-sensors-wiki-en.png" alt="epuck-sensors-wiki-en.png" class="image" /><br />
+    </p>
+    <div style="text-align: right;">
+      <p>
+        <a href="epuck-sensors-wiki-en.svg">original svg file</a>, <a href="epuck-top-grayscale.png">background e-puck top</a>
+      </p>
+    </div>
+    <p>
+      Now, let us write your first robot controller. In the text editor in the middle of the <em>studio</em> window, write the following lines:
+    </p>
+    <div class="code">
+      <pre>
+<code>wheel_left_speed = 5
+wheel_right_speed = -5</code>
+</pre>
+    </div><br />
+    Click “Load” and then “Run”. You should see your robot turning on the spot. This code just sets the speed of the wheels when the robot starts and then does nothing. To have a better behaviour, we should allow the robot to perceive its environment, for instance any obstacles; and make decisions, for instance to avoid the obstacles.
+    <p>
+      To interact with the world continuously, the robot must execute a script periodically. This is achieved with the <tt>onevent timer</tt> keywords. For instance, using a front proximity sensor, we can set the speed of the wheels with respect to the distance to the object in front of the robot:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = dist[0] - 6
+wheel_right_speed = dist[0] - 6</code>
+</pre>
+    </div><br />
+    Click “Load” and then “Run”. As the proximity sensors return a distance between 0 to 12&nbsp;cm (if the object is farther than 12&nbsp;cm, they nevertheless return 12), the speed of the robot will be -6&nbsp;cm/s when the object is close, 0&nbsp;cm/s when the object is 6&nbsp;cm away, and 6&nbsp;cm/s when the object is far away. The robot will thus tend to stay 6&nbsp;cm away from any object in front.
+    <h1 id="toc2">
+      <span>A more elaborate robot controller</span>
+    </h1>
+    <p>
+      Keeping a safe distance to an object in front is good, but right now the robot cannot move elsewhere. To have the robot wander around, we have to understand how it moves.
+    </p>
+    <p>
+      The simulated <em>e-puck</em> robot in <em>challenge</em> is an example of a differential wheeled robot; this type of robot changes its direction by setting different speeds for its right and left wheels. If each wheel has the same speed, the robot goes forward; otherwise it turns; if the speeds are in the opposite direction, the robot turns on the spot. Industrial caterpillar vehicles use the same movement modality.
+    </p>
+    <p>
+      Let us write a small code that makes the robot avoid obstacles and go straight ahead otherwise:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = prox[1] - 6
+wheel_right_speed = prox[6] - 6</code>
+</pre>
+    </div><br />
+    This controller looks at the front, left and right proximity sensors. As long there is no obstacle, both <tt>prox[1]</tt> and <tt>prox[6]</tt> report 12 and thus the robot goes forward at speed 6. But when there is an obstacle at one side, the value of the corresponding sensor goes down. For instance, if there is an obstacle on the left, <tt>prox[6]</tt> (which looks to the left) could be 10 but <tt>prox[1]</tt> (which looks to the right) will stay at 12; and thus, <tt>wheel_left_speed</tt> would still be 6 but <tt>wheel_right_speed</tt> would be 4, causing the robot to turn to the right and thus avoid the obstacle on its left.
+    <h1 id="toc3">
+      <span>Taking decisions</span>
+    </h1>
+    <p>
+      The controllers we have seen so far link the values of the sensors to the speed of the wheels through mathematical expressions, but do not make “if, then” choices. Yet this is sometimes desirable; for instance if we want the robot either to go straight or to turn on the spot, but not perform curved trajectories, we can write:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+var dists = prox[6] + prox[7] + prox[0] + prox[1]
+if dists &lt; 48 then
+    wheel_left_speed = 5
+    wheel_right_speed = -5
+else
+    wheel_left_speed = 5
+    wheel_right_speed = 5
+end</code>
+</pre>
+    </div><br />
+    This controller sums the distances of all front proximity sensors, and if this sum is below 48&nbsp;cm, which means that at least one of the sensor sees an obstacle, the robot turns on the spot. Otherwise, it goes straight ahead.<br />
+    The scripting language provides other interesting constructs, such as the <tt>while</tt> loop, which executes a block of code repeatedly as long as a condition is true, or the <tt>for</tt> loop, which executes a block of code a certain number of times and changes the value of a variable each time. The menu <tt><a href="en_asebalanguage.html">Help -&gt; Language</a></tt> gives access to a page which lists all available constructs together with examples; feel free to have a look.
+    <h1 id="toc4">
+      <span>Your turn</span>
+    </h1>
+    <p>
+      Play for a while with obstacle avoidance in order to get a good understanding of the sensors, actuators and dynamics of the robot. Feel free to explore, the robot is in a simulator and does not risk being harmed.
+    </p>
+    <p>
+      Once you feel confident, try to make the robot direct itself to the food sources when they are blue (0, 0, 100) (in R, G, B), and avoid them when they are red (100, 0, 0). The colour of the background is gray (50, 50, 50). Try to play with your friends and to get the best robot controller. You can change the colour of your robot (by changing variables <tt>color_red</tt>, <tt>color_green</tt> and <tt>color_blue</tt>), and thus feign being a food source. If the others trick your robot like this, check the energy variable; if it is not increasing while seeing blue, you are being tricked.
+    </p>
+    <p>
+      The goal of <em>challenge</em> is to learn robotics, programming, and Aseba while having fun.
+    </p>
+    <h1 id="toc5">
+      <span>What to read next?</span>
+    </h1>
+    <p>
+      You might be interested to read:
+    </p>
+    <ul>
+      <li>
+        <a href="en_asebastudio.html">Documentation about Aseba's integrated development environment</a>
+      </li>
+      <li>
+        <a href="en_asebalanguage.html">Description of the Aseba language</a>
+      </li>
+    </ul>
+    <div style="position:absolute; top: 5px; left: -190px; margin: 0px; text-align:left; z-index:1000"></div>
+  </body>
+</html>
