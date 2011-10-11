@@ -82,6 +82,10 @@ static inline void fifo_peek(unsigned char * d, struct fifo * f,size_t size) {
 	}
 }	
 
+static inline void fifo_reset(struct fifo * f) {
+	f->insert = f->consume = 0;
+}
+
 /* USB interrupt part */
 // They can be called from the main, but with usb interrupt disabled, so it's OK
 static int tx_busy;
@@ -149,7 +153,7 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8 *data, uint16 length) {
 		
 		// Usb can be disconnected while sending ...
 		if(!usb_uart_serial_port_open()) {
-			// FIXME: Empty the fifo ? 
+			fifo_reset(&AsebaUsb.tx);
 			USBUnmaskInterrupts(flags);
 			break;
 		}		
@@ -185,6 +189,8 @@ uint16 AsebaGetBuffer(AsebaVMState *vm, uint8 * data, uint16 maxLength, uint16* 
 	}
 	if(usb_uart_serial_port_open())
 		USBCDCKickRx();
+	else	
+		fifo_reset(&AsebaUsb.rx);
 
 	USBUnmaskInterrupts(flags);
 	return ret;
