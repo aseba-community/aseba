@@ -32,6 +32,7 @@ if (QT4_FOUND)
 		Target.cpp
 		EventViewer.cpp
 		Plugin.cpp
+		HelpViewer.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp)
 	
