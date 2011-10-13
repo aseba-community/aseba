@@ -38,6 +38,7 @@ language_map = [
                 ]
 OUTPUT_DIR = 'doc'
 QRC_FILE = './doc.qrc'
+CSS_FILE = './css/aseba.css'
 STUDIO_PATH = '../studio/'
 
 # Clean
@@ -61,10 +62,14 @@ for x in language_map:
     for y in listing:
         copy(os.path.join(output, y), os.path.join(OUTPUT_DIR, y))
 
-# Generate the Qt resource file
+# Add the CSS to output directory
+copy(CSS_FILE, OUTPUT_DIR)
+
+# Generate the Qt resource files
 qrc.generate(OUTPUT_DIR, QRC_FILE)
 
 # Clean Aseba Studio files
+print >> sys.stderr, "\nCleaning Aseba Studio directory..."
 studio_output_dir = os.path.join(STUDIO_PATH, OUTPUT_DIR)
 studio_doc_qrc = os.path.join(STUDIO_PATH, QRC_FILE)
 rmtree(studio_output_dir)
@@ -75,5 +80,8 @@ except OSError:
     pass
 
 # Copy new files
+print >> sys.stderr, "\nCopying new files to Aseba Studio..."
 copytree(OUTPUT_DIR, studio_output_dir)
-copy(QRC_FILE, studio_doc_qrc)
+copy(QRC_FILE, STUDIO_PATH)
+
+print >> sys.stderr, "Finished!!! :-)"

@@ -27,6 +27,6 @@
 	<file>doc/studio-connect-fr.png</file>
 	<file>doc/studio-overlay-en.png</file>
 	<file>doc/studio-overlay-fr.png</file>
-
+	<file>doc/aseba.css</file>
 </qresource>
 </RCC>

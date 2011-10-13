@@ -2325,6 +2325,9 @@ namespace Aseba
 		helpViewer = new QTextBrowser();
 		helpViewer->setReadOnly(true);
 		helpViewer->resize(600, 500);
+		QFile file(":/doc/aseba.css");
+		file.open(QIODevice::ReadOnly | QIODevice::Text);
+		helpViewer->document()->addResource(QTextDocument::StyleSheetResource, QUrl( "aseba.css" ), QVariant(file.readAll()) );
 		connect(this, SIGNAL(MainWindowClosed()), helpViewer, SLOT(close()));
 	}
 	
