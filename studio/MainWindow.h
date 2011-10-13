@@ -354,6 +354,7 @@ namespace Aseba
 		void sourceChanged();
 		void updateWindowTitle();
 
+		void showUserManual();
 		void showHelpLanguage();
 		void showHelpStudio();
 		
