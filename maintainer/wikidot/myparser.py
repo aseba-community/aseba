@@ -46,6 +46,8 @@ class MyParser(HTMLParser):
         # Format back attributes
         attributes = ""
         for attr in attrs:
+            if ~isinstance(attr[1], str):
+                attr = (attr[0], str(attr[1]))
             attributes += (attr[0] + "=\"" + attr[1] + "\" ")
         return "<{} {}>".format(tag, attributes)
 

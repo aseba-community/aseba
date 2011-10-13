@@ -33,8 +33,9 @@ header = \
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-<title>${title}</title>
+<link rel='stylesheet' type='text/css' href='aseba.css' />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>${title}</title>
 </head >
 
 <body>
@@ -119,9 +120,16 @@ class WikidotParser(MyParser):
                 for index, attr in enumerate(attrs):
                     if attr[0] == 'src':
                         self.links.add(attr[1])
-                        break
+                    elif attr[0] == 'width':
+                        # Fix the width=xx attribute
+                        # Wikidot gives width="600px", instead of width=600
+                        pos = attr[1].find('px')
+                        if pos >= 0:
+                            attrs[index] = (attr[0], attr[1][0:pos])
+
             # Add the tag to output
             MyParser.handle_starttag(self, tag, attrs)
+        # Handle breadcrumbs
         elif (self.state[-1] == "breadcrumbs") and (tag == 'a'):
             # Check for a valid link to the main doc page
             for attr in attrs:
