@@ -71,6 +71,7 @@ namespace Aseba
 		connect(viewer, SIGNAL(forwardAvailable(bool)), this, SLOT(forwardAvailable(bool)));
 
 		resize(800, 500);
+		setWindowTitle(tr("Aseba Studio Help"));
 	}
 
 	void HelpViewer::setLanguage(QString lang)
