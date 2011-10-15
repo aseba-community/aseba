@@ -20,33 +20,55 @@
 
 #include "HelpViewer.h"
 
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFile>
 #include <QIODevice>
 #include <QUrl>
 #include <QVariant>
 
+#include <HelpViewer.moc>
+
 namespace Aseba
 {
-	HelpViewer::HelpViewer()
+	HelpViewer::HelpViewer(QWidget* parent):
+		QWidget(parent)
 	{
+		// navigation buttons
+		previous = new QPushButton(tr("Previous"));
+		previous->setEnabled(false);
+		next = new QPushButton(tr("Next"));
+		next->setEnabled(false);
+		home = new QPushButton(tr("Home"));
+		QHBoxLayout* buttonLayout = new QHBoxLayout();
+		buttonLayout->addWidget(previous);
+		buttonLayout->addWidget(home);
+		buttonLayout->addWidget(next);
+		buttonLayout->addStretch();
+
 		// QTextBrower
 		viewer = new QTextBrowser();
 		viewer->setReadOnly(true);
-
-		// main layout
-		QVBoxLayout* mainLayout = new QVBoxLayout();
-		mainLayout->addWidget(viewer);
-
-		setLayout(mainLayout);
-
 		// set the stylesheet
 		QFile file(":/doc/aseba.css");
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
 		viewer->document()->addResource(QTextDocument::StyleSheetResource, QUrl( "aseba.css" ), QVariant(file.readAll()) );
-
 		// set default language
 		setLanguage("en");
+
+		// main layout
+		QVBoxLayout* mainLayout = new QVBoxLayout();
+		mainLayout->addLayout(buttonLayout);
+		mainLayout->addWidget(viewer);
+
+		setLayout(mainLayout);
+
+		// connect
+		connect(previous, SIGNAL(clicked()), this, SLOT(previousClicked()));
+		connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
+		connect(home, SIGNAL(clicked()), this, SLOT(homeClicked()));
+		connect(viewer, SIGNAL(backwardAvailable(bool)), this, SLOT(backwardAvailable(bool)));
+		connect(viewer, SIGNAL(forwardAvailable(bool)), this, SLOT(forwardAvailable(bool)));
 
 		resize(800, 500);
 	}
@@ -77,6 +99,31 @@ namespace Aseba
 		viewer->moveCursor(QTextCursor::Start);
 		viewer->setWindowTitle(tr("Aseba Studio Help"));
 		this->show();
+	}
+
+	void HelpViewer::previousClicked()
+	{
+		viewer->backward();
+	}
+
+	void HelpViewer::backwardAvailable(bool state)
+	{
+		previous->setEnabled(state);
+	}
+
+	void HelpViewer::nextClicked()
+	{
+		viewer->forward();
+	}
+
+	void HelpViewer::forwardAvailable(bool state)
+	{
+		next->setEnabled(state);
+	}
+
+	void HelpViewer::homeClicked()
+	{
+		showHelp(HelpViewer::USERMANUAL);
 	}
 }
 

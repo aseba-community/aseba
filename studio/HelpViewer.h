@@ -23,30 +23,40 @@
 
 #include <QWidget>
 #include <QString>
+#include <QPushButton>
 #include <QTextBrowser>
 
 namespace Aseba
 {
 	class HelpViewer: public QWidget
 	{
-		public:
-			enum helpType {
-				USERMANUAL,
-				STUDIO,
-				LANGUAGE
-			};
+		Q_OBJECT
 
-		public:
-			HelpViewer();
-			virtual ~HelpViewer() {};
+	public:
+		HelpViewer(QWidget* parent = 0);
 
-			void setLanguage(QString lang);
-			void showHelp(helpType type);
+		enum helpType {
+			USERMANUAL,
+			STUDIO,
+			LANGUAGE
+		};
 
+		void setLanguage(QString lang);
+		void showHelp(helpType type);
 
-		protected:
-			QTextBrowser* viewer;
-			QString language;
+	protected:
+		QTextBrowser* viewer;
+		QPushButton* previous;
+		QPushButton* next;
+		QPushButton* home;
+		QString language;
+
+	protected slots:
+		void previousClicked();
+		void backwardAvailable(bool state);
+		void nextClicked();
+		void forwardAvailable(bool state);
+		void homeClicked();
 	};
 }
 
