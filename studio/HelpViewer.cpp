@@ -26,6 +26,7 @@
 #include <QIODevice>
 #include <QUrl>
 #include <QVariant>
+#include <QSettings>
 
 #include <HelpViewer.moc>
 
@@ -70,8 +71,16 @@ namespace Aseba
 		connect(viewer, SIGNAL(backwardAvailable(bool)), this, SLOT(backwardAvailable(bool)));
 		connect(viewer, SIGNAL(forwardAvailable(bool)), this, SLOT(forwardAvailable(bool)));
 
-		resize(800, 500);
+		// restore window state, if available
+		if (readSettings() == false)
+			resize(800, 500);
+
 		setWindowTitle(tr("Aseba Studio Help"));
+	}
+
+	HelpViewer::~HelpViewer()
+	{
+		writeSettings();
 	}
 
 	void HelpViewer::setLanguage(QString lang)
@@ -101,6 +110,24 @@ namespace Aseba
 		viewer->setWindowTitle(tr("Aseba Studio Help"));
 		this->show();
 	}
+
+	bool HelpViewer::readSettings()
+	{
+		bool result;
+
+		QSettings settings;
+		result = restoreGeometry(settings.value("HelpViewer/geometry").toByteArray());
+		move(settings.value("HelpViewer/position").toPoint());
+		return result;
+	}
+
+	void HelpViewer::writeSettings()
+	{
+		QSettings settings;
+		settings.setValue("HelpViewer/geometry", saveGeometry());
+		settings.setValue("HelpViewer/position", pos());
+	}
+
 
 	void HelpViewer::previousClicked()
 	{

@@ -34,6 +34,7 @@ namespace Aseba
 
 	public:
 		HelpViewer(QWidget* parent = 0);
+		~HelpViewer();
 
 		enum helpType {
 			USERMANUAL,
@@ -45,6 +46,9 @@ namespace Aseba
 		void showHelp(helpType type);
 
 	protected:
+		bool readSettings();
+		void writeSettings();
+
 		QTextBrowser* viewer;
 		QPushButton* previous;
 		QPushButton* next;
