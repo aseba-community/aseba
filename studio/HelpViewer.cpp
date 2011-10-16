@@ -43,7 +43,7 @@ namespace Aseba
 	HelpViewer::HelpViewer(QWidget* parent):
 		QWidget(parent)
 	{
-		helpEngine = new QHelpEngine("aseba-doc-en.qhc", this);
+		helpEngine = new QHelpEngine("aseba-doc.qhc", this);
 		helpEngine->setupData();
 
 		// navigation buttons
