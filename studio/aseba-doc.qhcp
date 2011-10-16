@@ -12,18 +12,18 @@
 
 		<enableDocumentationManager>false</enableDocumentationManager>
 		<enableAddressBar>true</enableAddressBar>
-		<enableFilterFunctionality>false</enableFilterFunctionality>
+		<enableFilterFunctionality>true</enableFilterFunctionality>
 	</assistant>
 
 	<docFiles>
 		<generate>
 			<file>
-				<input>aseba-doc-en.qhp</input>
-				<output>aseba-doc-en.qch</output>
+				<input>aseba-doc.qhp</input>
+				<output>aseba-doc.qch</output>
 			</file>
 		</generate>
 		<register>
-			<file>aseba-doc-en.qch</file>
+			<file>aseba-doc.qch</file>
 		</register>
 	</docFiles>
 </QHelpCollectionProject>

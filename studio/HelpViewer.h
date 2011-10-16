@@ -45,7 +45,9 @@ namespace Aseba
 			LANGUAGE
 		};
 
-		void setLanguage(QString lang);
+		static QString DEFAULT_LANGUAGE;
+
+		void setLanguage(QString lang = DEFAULT_LANGUAGE);
 		void showHelp(helpType type);
 
 	protected:

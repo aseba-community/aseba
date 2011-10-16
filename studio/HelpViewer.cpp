@@ -30,6 +30,7 @@
 #include <QVariant>
 #include <QSettings>
 #include <QDesktopServices>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -37,6 +38,8 @@
 
 namespace Aseba
 {
+	QString HelpViewer::DEFAULT_LANGUAGE = "en";
+
 	HelpViewer::HelpViewer(QWidget* parent):
 		QWidget(parent)
 	{
@@ -59,7 +62,7 @@ namespace Aseba
 		viewer = new HelpBrowser(helpEngine);
 
 		// set default language
-		setLanguage("en");
+		setLanguage();
 
 		// help layout
 		QSplitter *helpSplitter = new QSplitter(Qt::Horizontal);
@@ -97,7 +100,21 @@ namespace Aseba
 
 	void HelpViewer::setLanguage(QString lang)
 	{
-		this->language = lang;
+		// check if the language is part of the existing filters
+		if (helpEngine->customFilters().contains(lang))
+		{
+			helpEngine->setCurrentFilter(lang);
+			this->language = lang;
+		}
+		else
+		{
+			// rollback to default language
+			QMessageBox::warning(this, "Help not found", "The help filter for the langauge \"" +
+					     lang + "\" has not been found. Falling back to the default language (" +
+					     DEFAULT_LANGUAGE + "). This is probably a bug, please report it.");
+			helpEngine->setCurrentFilter(DEFAULT_LANGUAGE);
+			this->language = DEFAULT_LANGUAGE;
+		}
 	}
 
 	void HelpViewer::showHelp(helpType type)
