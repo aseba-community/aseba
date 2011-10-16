@@ -6,6 +6,7 @@ if (QT4_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
 	set(QT_USE_QTMAIN ON)
+	set(QT_USE_QTHELP ON)
 	include(${QT_USE_FILE})
 	
 	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)

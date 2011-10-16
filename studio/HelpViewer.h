@@ -21,6 +21,7 @@
 #ifndef HELP_VIEWER_H
 #define HELP_VIEWER_H
 
+#include <QtHelp/QHelpEngine>
 #include <QWidget>
 #include <QString>
 #include <QPushButton>
@@ -28,6 +29,8 @@
 
 namespace Aseba
 {
+	class HelpBrowser;
+
 	class HelpViewer: public QWidget
 	{
 		Q_OBJECT
@@ -49,7 +52,8 @@ namespace Aseba
 		bool readSettings();
 		void writeSettings();
 
-		QTextBrowser* viewer;
+		QHelpEngine *helpEngine;
+		HelpBrowser* viewer;
 		QPushButton* previous;
 		QPushButton* next;
 		QPushButton* home;
@@ -61,6 +65,17 @@ namespace Aseba
 		void nextClicked();
 		void forwardAvailable(bool state);
 		void homeClicked();
+	};
+
+	class HelpBrowser: public QTextBrowser
+	{
+	public:
+		HelpBrowser(QHelpEngine* helpEngine, QWidget* parent = 0);
+		virtual void setSource(const QUrl& url);
+		virtual QVariant loadResource(int type, const QUrl& url);
+
+	protected:
+		QHelpEngine* helpEngine;
 	};
 }
 
