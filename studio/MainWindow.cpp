@@ -2419,7 +2419,7 @@ namespace Aseba
 	{
 		helpMenu->clear();
 		
-		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()));
+		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()), QKeySequence(tr("F1", "Help|User Manual")));
 		helpMenu->addSeparator();
 		
 		typedef std::set<int> ProductIds;
