@@ -356,8 +356,6 @@ namespace Aseba
 		void updateWindowTitle();
 
 		void showUserManual();
-		void showHelpLanguage();
-		void showHelpStudio();
 		
 		void openToUrlFromAction() const;
 	
@@ -455,7 +453,6 @@ namespace Aseba
 		FindDialog* findDialog; //!< find dialog
 		QString actualFileName; //!< name of opened file, "" if new
 		bool sourceModified; //!< true if source code has been modified since last save
-		//QTextBrowser* helpViewer;
 		HelpViewer helpViewer;
 		
 		// compiler and source code related stuff

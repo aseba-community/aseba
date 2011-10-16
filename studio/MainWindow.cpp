@@ -1903,16 +1903,6 @@ namespace Aseba
 		helpViewer.showHelp(HelpViewer::USERMANUAL);
 	}
 	
-	void MainWindow::showHelpLanguage()
-	{
-		helpViewer.showHelp(HelpViewer::LANGUAGE);
-	}
-	
-	void MainWindow::showHelpStudio()
-	{
-		helpViewer.showHelp(HelpViewer::STUDIO);
-	}
-	
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
@@ -2430,8 +2420,6 @@ namespace Aseba
 		helpMenu->clear();
 		
 		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()));
-		helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
-		helpMenu->addAction(tr("&Studio..."), this, SLOT(showHelpStudio()));
 		helpMenu->addSeparator();
 		
 		typedef std::set<int> ProductIds;

@@ -54,7 +54,7 @@ if (QT4_FOUND)
 	
 	qt4_automoc(${studio_SRCS})
 	
-	qt4_add_resources(resfiles asebastudio.qrc doc.qrc)
+	qt4_add_resources(resfiles asebastudio.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	
