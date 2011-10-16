@@ -1,5 +1,7 @@
 find_package(Qt4)
 
+set(DOC_NAME aseba-doc)
+
 if (QT4_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
@@ -17,6 +19,19 @@ if (QT4_FOUND)
 	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt not found")
 	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+
+	# generates the documentation
+	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+		message("-- qcollectiongenerator executable found")
+		# all the process should be done in ${CMAKE_CURRENT_SOURCE_DIR}, then the binary files are moved to ${CMAKE_CURRENT_BINARY_DIR}
+		add_custom_command(
+			OUTPUT ${DOC_NAME}-en.qhc ${DOC_NAME}-en.qch
+			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qhc
+			COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qch ${CMAKE_CURRENT_BINARY_DIR}
+			COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qhc ${CMAKE_CURRENT_BINARY_DIR}
+			MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}-en.qhp)
+		add_custom_target(documentation DEPENDS ${DOC_NAME}-en.qhc ${DOC_NAME}-en.qch)
+	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
 	set(studio_SRCS
 		AeslEditor.cpp
@@ -46,6 +61,9 @@ if (QT4_FOUND)
 	if (HAS_DYN_VERSION)
 		add_dependencies(asebastudio versionheader)
 	endif (HAS_DYN_VERSION)
+	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+		add_dependencies(asebastudio documentation)
+	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
 	target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
