@@ -190,7 +190,9 @@ class WikidotParser(MyParser):
 
         Depending on the current state, the charref is queued for output,
         or not."""
-        if self.state[-1] == "body":
+        if self.state[-1] == "title":
+            self.page_title += ("&#" + name + ";")
+        elif self.state[-1] == "body":
             MyParser.handle_charref(self, name)
 
     def handle_entityref(self, name):
@@ -198,7 +200,9 @@ class WikidotParser(MyParser):
 
         Depending on the current state, the entityref is queued for output,
         or not."""
-        if self.state[-1] == "body":
+        if self.state[-1] == "title":
+            self.page_title += ("&" + name + ";")
+        elif self.state[-1] == "body":
             MyParser.handle_entityref(self, name)
 
     def handle_decl(self, decl):
