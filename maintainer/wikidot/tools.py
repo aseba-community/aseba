@@ -21,25 +21,14 @@ import os
 import os.path
 import sys
 import urllib2
-import urlparse
 import mimetypes
 import subprocess
 
 # Custom lib
 import wikidot.debug
+import wikidot.structure
+from wikidot.urltoname import urltoname
 from wikidot.parser import WikidotParser
-
-
-def urltoname(page):
-    o = urlparse.urlparse(page)
-    name = os.path.basename(o.path)
-    # Convert ':' to '_'
-    name = name.replace(':', '_')
-    # Fix missing extension
-    if os.path.splitext(name)[1] == '':
-        name += '.html'
-    return name
-
 
 def fetchurl(page, offline_name, breadcrumbs = ''):
     """Given a wikidot URL, fetch it, convert it and store it locally.
@@ -68,10 +57,20 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
             # Convert the wikidot page and check the breakcrumbs
             print >> sys.stderr, "Parsing..."
             parser = WikidotParser()
-            parser.set_breadcrumbs(breadcrumbs)
             parser.feed(response.read())
-            if (breadcrumbs == '') or (parser.is_breadcrumbs_valid()):
+            # Test if the breadcrumbs links to the main page
+            breadcrumbs_valid = False
+            page_breadcrumbs = parser.get_breadcrumbs()
+            if (breadcrumbs == ''):
+                # Ok, no main page given
+                breadcrumbs_valid = True
+            elif (len(page_breadcrumbs) > 0) and (breadcrumbs in page_breadcrumbs[0]):
+                # Ok
+                breadcrumbs_valid = True
+
+            if breadcrumbs_valid == True:
                 # Ok, page valid
+                wikidot.structure.insert(parser.get_title(), page, page_breadcrumbs)
                 data = parser.get_doc()
                 links = parser.get_links()
             else:

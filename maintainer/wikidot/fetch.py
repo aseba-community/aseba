@@ -27,7 +27,7 @@ import urlparse
 from wikidot.tools import fetchurl
 from wikidot.fixurl import fixurls
 from wikidot.tools import tidy
-from wikidot.tools import urltoname
+from wikidot.urltoname import urltoname
 
 def fetchwikidot(starturl, outputdir):
     # Create the output directory, if needed

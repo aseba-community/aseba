@@ -24,7 +24,7 @@ import urlparse
 
 # Custom lib
 from wikidot.myparser import MyParser
-from wikidot.tools import urltoname
+from wikidot.urltoname import urltoname
 
 
 class FixURL(MyParser):

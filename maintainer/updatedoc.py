@@ -28,7 +28,8 @@ from shutil import copy
 
 # Custom lib
 from wikidot.fetch import fetchwikidot
-import qrc
+import wikidot.structure
+import qthelp
 
 #language_map = [('fr','http://aseba.wikidot.com/fr:asebausermanual')]
 language_map = [
@@ -37,7 +38,7 @@ language_map = [
                 ('de','http://aseba.wikidot.com/de:asebausermanual')
                 ]
 OUTPUT_DIR = 'doc'
-QRC_FILE = './doc.qrc'
+QHP_FILE = './aseba-doc.qhp'
 CSS_FILE = './css/aseba.css'
 STUDIO_PATH = '../studio/'
 
@@ -45,16 +46,26 @@ STUDIO_PATH = '../studio/'
 rmtree(OUTPUT_DIR, True)
 os.mkdir(OUTPUT_DIR)
 try:
-    os.remove(QRC_FILE)
+    os.remove(QHP_FILE)
 except OSError:
     # File doesn't exist
     pass
 
 # Fetch the wiki, for all languages
+output_directories = list()
+available_languages = list()
 for x in language_map:
-    print >> sys.stderr, "\n*** Getting doc for language ", x[0], " ***"
-    output = OUTPUT_DIR + '_' + x[0]
+    lang = x[0]
+    available_languages.append(lang)
+    print >> sys.stderr, "\n*** Getting doc for language ", lang, " ***"
+    # Get + clean the output directory for the current language
+    output = OUTPUT_DIR + '_' + lang
+    output_directories.append(output)
     rmtree(output, True)
+    # Prepare the tree before fetching this language
+    wikidot.structure.add_language(lang)
+    wikidot.structure.set_current_language(lang)
+    # Fetch!
     fetchwikidot(x[1], output)
     # Copy from output to OUTPUT_DIR
     # copytree not possible, as OUTPUT_DIR already exists
@@ -65,16 +76,16 @@ for x in language_map:
 # Add the CSS to output directory
 copy(CSS_FILE, OUTPUT_DIR)
 
-# Generate the Qt resource files
-qrc.generate(OUTPUT_DIR, QRC_FILE)
+# Generate the Qt Help files
+qthelp.generate(output_directories, OUTPUT_DIR, available_languages, QHP_FILE)
 
 # Clean Aseba Studio files
 print >> sys.stderr, "\nCleaning Aseba Studio directory..."
 studio_output_dir = os.path.join(STUDIO_PATH, OUTPUT_DIR)
-studio_doc_qrc = os.path.join(STUDIO_PATH, QRC_FILE)
+studio_doc_qhp = os.path.join(STUDIO_PATH, QHP_FILE)
 rmtree(studio_output_dir)
 try:
-    os.remove(studio_doc_qrc)
+    os.remove(studio_doc_qhp)
 except OSError:
     # File doesn't exist
     pass
@@ -82,6 +93,6 @@ except OSError:
 # Copy new files
 print >> sys.stderr, "\nCopying new files to Aseba Studio..."
 copytree(OUTPUT_DIR, studio_output_dir)
-copy(QRC_FILE, STUDIO_PATH)
+copy(QHP_FILE, STUDIO_PATH)
 
 print >> sys.stderr, "Finished!!! :-)"

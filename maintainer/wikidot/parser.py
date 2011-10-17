@@ -67,8 +67,7 @@ class WikidotParser(MyParser):
             ('style','position:absolute', 'useless')]
         self.page_title = ""
         self.links = set()
-        self.breadcrumbs = ""
-        self.valid_breadcrumbs = False
+        self.breadcrumbs = list()
 
     # Public interface
     def get_doc(self):
@@ -84,13 +83,11 @@ class WikidotParser(MyParser):
         """Retrieve the links embedded in the page (including images)"""
         return self.links
 
-    def set_breadcrumbs(self, breadcrumbs):
-        """Set the top page reference (breadcrumbs)"""
-        self.breadcrumbs = breadcrumbs
+    def get_title(self):
+        return self.page_title
 
-    def is_breadcrumbs_valid(self):
-        """Compare the page's breakcrumbs with the reference breadcrumbs"""
-        return self.valid_breadcrumbs
+    def get_breadcrumbs(self):
+        return self.breadcrumbs
 
     # Inherited functions
     def handle_starttag(self, tag, attrs):
@@ -131,10 +128,10 @@ class WikidotParser(MyParser):
             MyParser.handle_starttag(self, tag, attrs)
         # Handle breadcrumbs
         elif (self.state[-1] == "breadcrumbs") and (tag == 'a'):
-            # Check for a valid link to the main doc page
+            # Register the breadcrumbs
             for attr in attrs:
-                if (attr[0] == 'href') and (self.breadcrumbs in attr[1]):
-                    self.valid_breadcrumbs = True
+                if (attr[0] == 'href'):
+                    self.breadcrumbs.append(attr[1])
                     break
 
         # Update the state machine
@@ -184,7 +181,7 @@ class WikidotParser(MyParser):
         Depending on the current state, the data is queued for output,
         or not."""
         if self.state[-1] == "title":
-            self.page_title += data
+            self.page_title += data.strip()
         elif self.state[-1] == "body":
             MyParser.handle_data(self, data)
 
