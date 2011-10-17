@@ -2564,7 +2564,7 @@ namespace Aseba
 		commentAct->setShortcut(tr("Ctrl+D", "Edit|Comment the selection"));
 		connect(commentAct, SIGNAL(triggered()), SLOT(commentTriggered()));
 
-		uncommentAct = new QAction(tr("Unomment the selection"), this);
+		uncommentAct = new QAction(tr("Uncomment the selection"), this);
 		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Unomment the selection"));
 		connect(uncommentAct, SIGNAL(triggered()), SLOT(uncommentTriggered()));
 
