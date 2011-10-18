@@ -41,6 +41,7 @@ header = \
 
 <body>
 <h1 class="title">${title}</h1>
+${toc}
 """
 
 footer = \
@@ -66,17 +67,23 @@ class WikidotParser(MyParser):
             ('id', 'breadcrumbs', 'breadcrumbs'),
             ('id', 'page-content', 'body'),
             ('id', 'toc', 'toc'),
+            ('id', 'toc-action-bar', 'useless'),
             ('style','position:absolute', 'useless')]
         self.page_title = ""
+        self.toc = ""
         self.links = OrderedSet()
         self.breadcrumbs = list()
 
     # Public interface
     def get_doc(self):
         """Retrieve the parsed and cleaned document"""
+        # format the TOC
+        if self.toc != "":
+            self.toc = """<table id="toc-table"><tr><td>""" + self.toc
+            self.toc += "</td></tr></table>"
         # Add header
         header_template = Template(header)
-        self.out_doc = header_template.substitute(title=self.page_title) + self.out_doc
+        self.out_doc = header_template.substitute(title=self.page_title, toc=self.toc) + self.out_doc
         # Add footer
         self.out_doc += footer
         return self.out_doc
@@ -128,6 +135,8 @@ class WikidotParser(MyParser):
 
             # Add the tag to output
             MyParser.handle_starttag(self, tag, attrs)
+        elif (self.state[-1] == "toc"):
+            self.toc += MyParser.format_start_tag(self, tag, attrs)
         # Handle breadcrumbs
         elif (self.state[-1] == "breadcrumbs") and (tag == 'a'):
             # Register the breadcrumbs
@@ -176,6 +185,8 @@ class WikidotParser(MyParser):
         if self.state[-1] == "body":
             # Add the tag to output
             MyParser.handle_endtag(self, tag)
+        elif (self.state[-1] == "toc"):
+            self.toc += MyParser.format_end_tag(self, tag)
 
     def handle_data(self, data):
         """Overridden - Called when some data is parsed
@@ -186,6 +197,8 @@ class WikidotParser(MyParser):
             self.page_title += data.strip()
         elif self.state[-1] == "body":
             MyParser.handle_data(self, data)
+        elif (self.state[-1] == "toc"):
+            self.toc += data
 
     def handle_charref(self, name):
         """Overridden - Called when a charref (&#xyz) is parsed
@@ -196,6 +209,8 @@ class WikidotParser(MyParser):
             self.page_title += ("&#" + name + ";")
         elif self.state[-1] == "body":
             MyParser.handle_charref(self, name)
+        elif (self.state[-1] == "toc"):
+            self.toc += ("&#" + name + ";")
 
     def handle_entityref(self, name):
         """Overridden - Called when an entityref (&xyz) tag is parsed
@@ -206,6 +221,8 @@ class WikidotParser(MyParser):
             self.page_title += ("&" + name + ";")
         elif self.state[-1] == "body":
             MyParser.handle_entityref(self, name)
+        elif (self.state[-1] == "toc"):
+            self.toc += ("&" + name + ";")
 
     def handle_decl(self, decl):
         """Overridden - Called when a SGML declaration (<!) is parsed

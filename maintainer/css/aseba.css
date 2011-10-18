@@ -91,11 +91,14 @@ a:hover{
 	padding: 0;
 }
 
+#toc-table{
+	margin: 20px;
+}
+
 #toc{
 	margin: 1em auto 1em 0;
 	padding: 0em 0.5em;
-	border: 1px dashed gray;
-	background-color: #F7F7F7;
+	background-color: #E0E0E0;
 	display: table;
 	
 }
