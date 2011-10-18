@@ -59,6 +59,7 @@ class WikidotParser(MyParser):
         self.div_level = 0
         self.div_bookmark = [-1]    # List managed as a stack
         self.state = ["none"]       # List managed as a stack
+        self.current_state = "none" # Point to the top of the stack
         # map for div tag attribute -> state
         # (attribute name, attribute property, state)
         self.div_state_map = \
@@ -66,8 +67,8 @@ class WikidotParser(MyParser):
             ('id', 'page-title', 'title'),
             ('id', 'breadcrumbs', 'breadcrumbs'),
             ('id', 'page-content', 'body'),
-            ('id', 'toc', 'toc'),
             ('id', 'toc-action-bar', 'useless'),
+            ('id', 'toc', 'toc'),
             ('style','position:absolute', 'useless')]
         self.page_title = ""
         self.toc = ""
@@ -109,43 +110,109 @@ class WikidotParser(MyParser):
 
         Depending on the current state, the start tag is queued for output,
         or not."""
+        # Debug
         if wikidot.debug.ENABLE_DEBUG == True:
             print >> sys.stderr, "<{}> {}".format(tag, attrs)
 
-        # Output here: reference tag will NOT appear in the output
-        # BUG: tag still appear if part of nested tags
-        if self.state[-1] == "body":
-            # Special case 1: links
-            if tag == 'a':
-                for index, attr in enumerate(attrs):
-                    if attr[0] == 'href':
-                        self.links.add(attr[1])
-                        break
-            # Special case 2: images
-            elif tag == 'img':
-                for index, attr in enumerate(attrs):
-                    if attr[0] == 'src':
-                        self.links.add(attr[1])
-                    elif attr[0] == 'width':
-                        # Fix the width=xx attribute
-                        # Wikidot gives width="600px", instead of width=600
-                        pos = attr[1].find('px')
-                        if pos >= 0:
-                            attrs[index] = (attr[0], attr[1][0:pos])
+        # Update the state machine
+        state_changed = self.__update_state_machine_start__(tag, attrs)
 
+        if (state_changed == True) and (self.current_state == "body"):
+            # We have just entered the body, don't output this <div> tag
+            return
+        if self.current_state == "body":
+            # Handle special tags
+            self.__handle_body_tag__(tag, attrs)
             # Add the tag to output
             MyParser.handle_starttag(self, tag, attrs)
-        elif (self.state[-1] == "toc"):
+        elif self.current_state == "toc":
+            # Handle the content of the TOC
             self.toc += MyParser.format_start_tag(self, tag, attrs)
-        # Handle breadcrumbs
-        elif (self.state[-1] == "breadcrumbs") and (tag == 'a'):
+        elif (self.current_state == "breadcrumbs") and (tag == 'a'):
             # Register the breadcrumbs
             for attr in attrs:
                 if (attr[0] == 'href'):
                     self.breadcrumbs.append(attr[1])
                     break
 
+    def handle_endtag(self, tag):
+        """Overridden - Called when an end tag is parsed
+
+        The state machine is updated when a </div> tag is encountered.
+        Depending on the current state, the end tag is queued for output,
+        or not."""
+        if self.current_state == "toc":
+            # Add the tag to the TOC
+            self.toc += MyParser.format_end_tag(self, tag)
+
         # Update the state machine
+        state_changed = self.__update_state_machine_end__(tag)
+        if state_changed == True:
+            return
+
+        if self.current_state == "body":
+            # Add the tag to output
+            MyParser.handle_endtag(self, tag)
+
+    def handle_data(self, data):
+        """Overridden - Called when some data is parsed
+
+        Depending on the current state, the data is queued for output,
+        or not."""
+        if self.current_state == "title":
+            # Register the title
+            self.page_title += data.strip()
+        elif self.current_state == "body":
+            # Add data to the output
+            MyParser.handle_data(self, data)
+        elif self.current_state == "toc":
+            # Add data to the TOC
+            self.toc += data
+
+    def handle_charref(self, name):
+        """Overridden - Called when a charref (&#xyz) is parsed
+
+        Depending on the current state, the charref is queued for output,
+        or not."""
+        if self.current_state == "title":
+            # Add charref to the title
+            self.page_title += ("&#" + name + ";")
+        elif self.current_state == "body":
+            # Add charref to the output
+            MyParser.handle_charref(self, name)
+        elif self.current_state == "toc":
+            # Add charref to the TOC
+            self.toc += ("&#" + name + ";")
+
+    def handle_entityref(self, name):
+        """Overridden - Called when an entityref (&xyz) tag is parsed
+
+        Depending on the current state, the entityref is queued for output,
+        or not."""
+        if self.current_state == "title":
+            # Add the entityref to the title
+            self.page_title += ("&" + name + ";")
+        elif self.current_state == "body":
+            # Add the entityref to the output
+            MyParser.handle_entityref(self, name)
+        elif self.current_state == "toc":
+            # Add the entityref to the TOC
+            self.toc += ("&" + name + ";")
+
+    def handle_decl(self, decl):
+        """Overridden - Called when a SGML declaration (<!) is parsed
+
+        Depending on the current state, the declaration is queued for output,
+        or not."""
+        if self.current_state == "body":
+            # Add the SGML declaration to the output
+            MyParser.handle_decl(self, decl)
+
+    # Private functions
+    def __update_state_machine_start__(self, tag, attrs):
+        """Update the state machine."""
+        state_changed = False
+
         if tag == 'div':
             if wikidot.debug.ENABLE_DEBUG == True:
                 print >> sys.stderr, self.state, self.div_bookmark
@@ -156,22 +223,18 @@ class WikidotParser(MyParser):
                         # Match !
                         self.state.append(div_attr[2])
                         self.div_bookmark.append(self.div_level)
+                        state_changed = True
                         break
             # Increment div level
             self.div_level += 1
 
-        # Output here: reference tag will appear in the output
-        # None
+        # Update the current state
+        self.current_state = self.__get_current_state__()
+        return state_changed
 
-    def handle_endtag(self, tag):
-        """Overridden - Called when an end tag is parsed
+    def __update_state_machine_end__(self, tag):
+        state_changed = False
 
-        The state machine is updated when a </div> tag is encountered.
-        Depending on the current state, the end tag is queued for output,
-        or not."""
-        # Output here: reference tag will appear in the output
-
-        # Update the state machine
         if tag == 'div':
             if wikidot.debug.ENABLE_DEBUG == True:
                 print >> sys.stderr, self.state, self.div_bookmark
@@ -180,55 +243,33 @@ class WikidotParser(MyParser):
                 # Matching closing </div> tag -> pop the state
                 self.state.pop()
                 self.div_bookmark.pop()
+                state_changed = True
 
-        # Output here: reference tag will NOT appear in the output
-        if self.state[-1] == "body":
-            # Add the tag to output
-            MyParser.handle_endtag(self, tag)
-        elif (self.state[-1] == "toc"):
-            self.toc += MyParser.format_end_tag(self, tag)
+        # Update the current state
+        self.current_state = self.__get_current_state__()
+        return state_changed
 
-    def handle_data(self, data):
-        """Overridden - Called when some data is parsed
+    def __get_current_state__(self):
+        return self.state[-1]
 
-        Depending on the current state, the data is queued for output,
-        or not."""
-        if self.state[-1] == "title":
-            self.page_title += data.strip()
-        elif self.state[-1] == "body":
-            MyParser.handle_data(self, data)
-        elif (self.state[-1] == "toc"):
-            self.toc += data
-
-    def handle_charref(self, name):
-        """Overridden - Called when a charref (&#xyz) is parsed
-
-        Depending on the current state, the charref is queued for output,
-        or not."""
-        if self.state[-1] == "title":
-            self.page_title += ("&#" + name + ";")
-        elif self.state[-1] == "body":
-            MyParser.handle_charref(self, name)
-        elif (self.state[-1] == "toc"):
-            self.toc += ("&#" + name + ";")
-
-    def handle_entityref(self, name):
-        """Overridden - Called when an entityref (&xyz) tag is parsed
-
-        Depending on the current state, the entityref is queued for output,
-        or not."""
-        if self.state[-1] == "title":
-            self.page_title += ("&" + name + ";")
-        elif self.state[-1] == "body":
-            MyParser.handle_entityref(self, name)
-        elif (self.state[-1] == "toc"):
-            self.toc += ("&" + name + ";")
-
-    def handle_decl(self, decl):
-        """Overridden - Called when a SGML declaration (<!) is parsed
-
-        Depending on the current state, the declaration is queued for output,
-        or not."""
-        if self.state[-1] == "body":
-            MyParser.handle_decl(self, decl)
+    def __handle_body_tag__(self, tag, attrs):
+        # Special case 1: links
+        if tag == 'a':
+            for index, attr in enumerate(attrs):
+                if attr[0] == 'href':
+                    # Register the link
+                    self.links.add(attr[1])
+                    break
+        # Special case 2: images
+        elif tag == 'img':
+            for index, attr in enumerate(attrs):
+                if attr[0] == 'src':
+                    # Register the link
+                    self.links.add(attr[1])
+                elif attr[0] == 'width':
+                    # Fix the width=xx attribute
+                    # Wikidot gives width="600px", instead of width=600
+                    pos = attr[1].find('px')
+                    if pos >= 0:
+                        attrs[index] = (attr[0], attr[1][0:pos])
 
