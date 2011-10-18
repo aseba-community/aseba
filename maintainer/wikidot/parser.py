@@ -40,6 +40,7 @@ header = \
 </head >
 
 <body>
+<h1 class="title">${title}</h1>
 """
 
 footer = \

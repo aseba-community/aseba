@@ -67,14 +67,14 @@ for x in language_map:
     wikidot.structure.set_current_language(lang)
     # Fetch!
     fetchwikidot(x[1], output)
+    # Add the CSS to output directory
+    copy(CSS_FILE, output)
     # Copy from output to OUTPUT_DIR
     # copytree not possible, as OUTPUT_DIR already exists
     listing = os.listdir(output)
     for y in listing:
         copy(os.path.join(output, y), os.path.join(OUTPUT_DIR, y))
 
-# Add the CSS to output directory
-copy(CSS_FILE, OUTPUT_DIR)
 
 # Generate the Qt Help files
 qthelp.generate(output_directories, OUTPUT_DIR, available_languages, QHP_FILE)
