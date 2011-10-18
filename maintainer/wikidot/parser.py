@@ -23,6 +23,7 @@ from string import Template
 
 # Local module
 import wikidot.debug
+from wikidot.orderedset import OrderedSet
 
 header = \
 """
@@ -66,7 +67,7 @@ class WikidotParser(MyParser):
             ('id', 'toc', 'toc'),
             ('style','position:absolute', 'useless')]
         self.page_title = ""
-        self.links = set()
+        self.links = OrderedSet()
         self.breadcrumbs = list()
 
     # Public interface

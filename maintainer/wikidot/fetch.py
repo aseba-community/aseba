@@ -28,6 +28,7 @@ from wikidot.tools import fetchurl
 from wikidot.fixurl import fixurls
 from wikidot.tools import tidy
 from wikidot.urltoname import urltoname
+from wikidot.orderedset import OrderedSet
 
 def fetchwikidot(starturl, outputdir):
     # Create the output directory, if needed
@@ -42,13 +43,13 @@ def fetchwikidot(starturl, outputdir):
     newlinks = fetchurl(starturl, output)
 
     # Create a set with fetched links (avoid loops...)
-    links = set(starturl)
+    links = OrderedSet(starturl)
 
     # Iterate on the links, and recursively download / convert
     fetchlinks = newlinks
     breadcrumbs = os.path.basename(urlparse.urlparse(starturl).path)
     while len(fetchlinks) > 0:
-        newlinks = set()
+        newlinks = OrderedSet()
         for url in fetchlinks:
             url = urlparse.urljoin(starturl, url)
             output = os.path.join(outputdir, urltoname(url))
