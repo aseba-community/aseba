@@ -19,6 +19,7 @@ h1{
 h1.title{
 	font-size: 200%;
 	text-decoration: underline;
+	margin-bottom: 20px;
 }
 h2{
 	font-weight: normal;
@@ -128,12 +129,13 @@ pre{
 	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
 }
 
-.code { 
-	border: 1px dashed #DDD;
-	background-color: #F7F7F7;
+.code {
+	border-style:solid;	/* No effect in QTextBrowser :-( */
+	border-width: 1px;	/* No effect in QTextBrowser :-( */
+	background-color: #D0D0D0;
 	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
-	padding: 0 1em;
-	margin: 0.4em 0;
+	padding: 0 1em;		/* No effect in QTextBrowser :-( */
+	margin: 20px;
 	overflow: auto;
 }
 
