@@ -80,7 +80,7 @@ class WikidotParser(MyParser):
         """Retrieve the parsed and cleaned document"""
         # format the TOC
         if self.toc != "":
-            self.toc = """<table id="toc-table"><tr><td>""" + self.toc
+            self.toc = """<table id="toc-table" summary="TOC"><tr><td>""" + self.toc
             self.toc += "</td></tr></table>"
         # Add header
         header_template = Template(header)
