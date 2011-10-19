@@ -68,10 +68,25 @@ class FixURL(MyParser):
         else:
             return False
 
+    def __is_link_toc__(self, link):
+        """Private - Tell if the link is part of the Table of Content.
+
+        Output:
+            True if the link is of the form #tocXYZ
+            False otherwise"""
+        if link.find('#toc') == 0:
+            return True
+        else:
+            return False
+
     def __fix_link__(self, link):
         """Private - Take a link and convert it,
         either as a local link, either as a link pointing
         to the remote host."""
+        if self.__is_link_toc__(link) == True:
+            # don't touch it!
+            return link
+
         if self.__is_link_local__(link) == True:
             # Convert link
             new_link = urltoname(link)
