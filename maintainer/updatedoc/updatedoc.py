@@ -40,7 +40,7 @@ language_map = [
 OUTPUT_DIR = 'doc'
 QHP_FILE = './aseba-doc.qhp'
 CSS_FILE = './css/aseba.css'
-STUDIO_PATH = '../studio/'
+STUDIO_PATH = '../../studio/'
 
 # Clean
 rmtree(OUTPUT_DIR, True)
