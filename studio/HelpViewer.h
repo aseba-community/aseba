@@ -60,6 +60,7 @@ namespace Aseba
 		QPushButton* next;
 		QPushButton* home;
 		QString language;
+		bool helpFound;
 
 	protected slots:
 		void previousClicked();

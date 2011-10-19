@@ -21,6 +21,8 @@
 #include "HelpViewer.h"
 
 #include <QtHelp/QHelpContentWidget>
+#include <QCoreApplication>
+#include <QDir>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSplitter>
@@ -36,6 +38,18 @@
 
 #include <HelpViewer.moc>
 
+
+// define the name of the help file
+#ifndef HELP_FILE
+	#define HELP_FILE	"aseba-doc.qhc"
+#endif
+
+// define a user path to the help file (try after the application binary path)
+#ifndef HELP_USR_PATH
+	#define HELP_USR_PATH	"/usr/share/doc/aseba/"
+#endif
+
+
 namespace Aseba
 {
 	QString HelpViewer::DEFAULT_LANGUAGE = "en";
@@ -43,7 +57,34 @@ namespace Aseba
 	HelpViewer::HelpViewer(QWidget* parent):
 		QWidget(parent)
 	{
-		helpEngine = new QHelpEngine("aseba-doc.qhc", this);
+		QString helpFile;
+
+		// search for the help file
+		QDir helpPath = QDir(QCoreApplication::applicationDirPath());
+		QDir helpUsrPath = QDir(HELP_USR_PATH);
+		if (helpPath.exists(HELP_FILE))
+		{
+			// use the application binary directory
+			helpFound = true;
+			helpFile = helpPath.absoluteFilePath(HELP_FILE);
+		}
+		else if (helpUsrPath.exists(HELP_FILE))
+		{
+			// use the user-given path
+			helpFound = true;
+			helpFile = helpUsrPath.absoluteFilePath(HELP_FILE);
+		}
+		else
+		{
+			// not found!
+			helpFound = false;
+			helpFile = "";
+			QMessageBox::warning(this, "Help file not found", "The help file " + QString(HELP_FILE) +
+					     " has not been found. It should be located in the same directory as " +
+					     "the binary of Aseba Studio. Please check your installation, or report a bug.");
+		}
+
+		helpEngine = new QHelpEngine(helpFile, this);
 		helpEngine->setupData();
 
 		// navigation buttons
@@ -100,6 +141,9 @@ namespace Aseba
 
 	void HelpViewer::setLanguage(QString lang)
 	{
+		if (!helpFound)
+			return;
+
 		// check if the language is part of the existing filters
 		if (helpEngine->customFilters().contains(lang))
 		{
@@ -109,7 +153,7 @@ namespace Aseba
 		else
 		{
 			// rollback to default language
-			QMessageBox::warning(this, "Help not found", "The help filter for the langauge \"" +
+			QMessageBox::warning(this, "Help filter not found", "The help filter for the langauge \"" +
 					     lang + "\" has not been found. Falling back to the default language (" +
 					     DEFAULT_LANGUAGE + "). This is probably a bug, please report it.");
 			helpEngine->setCurrentFilter(DEFAULT_LANGUAGE);
@@ -119,6 +163,12 @@ namespace Aseba
 
 	void HelpViewer::showHelp(helpType type)
 	{
+		if (!helpFound)
+		{
+			this->show();	// show anyway, but will be blank
+			return;
+		}
+
 		QString filename = "qthelp:///doc/doc/" + this->language + "_";
 		switch (type)
 		{
