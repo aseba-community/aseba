@@ -79,9 +79,10 @@ namespace Aseba
 			// not found!
 			helpFound = false;
 			helpFile = "";
-			QMessageBox::warning(this, "Help file not found", "The help file " + QString(HELP_FILE) +
-					     " has not been found. It should be located in the same directory as " +
-					     "the binary of Aseba Studio. Please check your installation, or report a bug.");
+			QString message = tr("The help file %0 has not been found. " \
+					     "It should be located in the same directory as the binary of Aseba Studio. " \
+					     "Please check your installation, or report a bug.").arg(HELP_FILE);
+			QMessageBox::warning(this, tr("Help file not found"), message);
 		}
 
 		helpEngine = new QHelpEngine(helpFile, this);
@@ -153,9 +154,10 @@ namespace Aseba
 		else
 		{
 			// rollback to default language
-			QMessageBox::warning(this, "Help filter not found", "The help filter for the langauge \"" +
-					     lang + "\" has not been found. Falling back to the default language (" +
-					     DEFAULT_LANGUAGE + "). This is probably a bug, please report it.");
+			QString message = tr("The help filter for the langauge \"%0\" has not been found. " \
+					     "Falling back to the default language (%1). " \
+					     "This is probably a bug, please report it.").arg(lang).arg(DEFAULT_LANGUAGE);
+			QMessageBox::warning(this, tr("Help filter not found"), message);
 			helpEngine->setCurrentFilter(DEFAULT_LANGUAGE);
 			this->language = DEFAULT_LANGUAGE;
 		}
