@@ -1,0 +1,184 @@
+
+/* general font settings */
+body
+{
+	font-family: verdana,arial,helvetica,sans-serif;
+	font-size: 0.82em;
+}
+
+/* HEADINGS */
+
+h1,h2,h3,h4,h5,h6{
+	font-family: "Trebuchet MS", Trebuchet, Verdana, Arial, Helvetica;
+}
+
+h1{
+	font-size: 180%;
+	font-weight: normal;
+}
+h1.title{
+	font-size: 200%;
+	text-decoration: underline;
+	margin-bottom: 20px;
+}
+h2{
+	font-weight: normal;
+	font-size: 150%;
+}
+h3{
+	font-weight: bold;
+	font-size: 130%;
+}
+h4{
+	font-weight: bold;
+	font-size: 120%;
+}
+h5 {
+	font-weight: bold;
+	font-size: 100%;
+}
+h6 {
+	font-weight: bold;
+	font-size: 90%;
+}
+
+img{
+	border-width: 0px;
+}
+
+td {
+	text-align: left;
+}
+
+a{
+	color: #00A;
+}
+a:hover{
+	background-color: #EEE;
+}
+
+/*
+* 		LAYOUT 
+*/
+
+#container-wrap-wrap {
+	position: relative;
+}
+
+#page-content{
+	
+}
+
+#container {
+	margin: 0;
+	padding: 0;
+}
+
+/* header */
+
+#header {
+	position: relative;
+	z-index: 30;
+	height: 7em;
+}
+
+#header h1{
+	margin: 0;
+	padding: 0;
+}
+#header h2{
+	margin: 0;
+	padding: 0;
+}
+
+#toc-table{
+	margin: 20px;
+}
+
+#toc{
+	margin: 1em auto 1em 0;
+	padding: 0em 0.5em;
+	background-color: #E0E0E0;
+	display: table;
+	
+}
+
+#toc .title {
+	font-weight: bold;
+	margin: 0.2em 0  ;
+	padding: 0 2em;
+	text-align: center;
+}
+
+#toc-list{
+	margin: 0.5em 0;
+}
+#toc.floatright{
+	float: right;
+	margin: 1em;
+}
+#toc.floatleft{
+	float: left;
+	margin: 1em;
+}
+
+tt{
+	font-family: 'Andale Mono', 'Courier New', Courier, monospace; 
+	font-size: 98%;
+}
+
+
+pre{
+	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
+}
+
+.code {
+	border-style:solid;	/* No effect in QTextBrowser :-( */
+	border-width: 1px;	/* No effect in QTextBrowser :-( */
+	background-color: #D0D0D0;
+	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
+	padding: 0 1em;		/* No effect in QTextBrowser :-( */
+	margin: 20px;
+	overflow: auto;
+}
+
+code {
+	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
+}
+
+.math-equation{
+	text-align: center;
+	padding: 0.5em 0;
+	height: 1%; /* for IE to blink ;-) */
+    display: none;
+}
+.equation-number{
+	float: right;
+	margin-top: 1em;
+	font-size: 110%;
+}
+.math-inline {
+    display: none;
+}
+
+.math-inline span.merror {
+    color: red !important;
+}
+
+a.inline-math-error {
+    padding: 0 0.5em;
+    font-weight: bold;
+}
+
+a.math-equation-error {
+    padding: 0 2em;
+    font-weight: bold;
+}
+
+div.wiki-note{
+	width: auto;
+	margin: 0.5em 5em;
+	border: 1px solid #999;
+	text-align: center;
+}
+

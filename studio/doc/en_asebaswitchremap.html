@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Remap Identifiers using asebaswitch
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Remap Identifiers using asebaswitch
+    </h1>
+    <p>
+      Aseba provides <em>asebaswitch</em>, a command-line utility that can connect several targets. The syntax is the following:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch [options] [additional targets]*</code>
+</pre>
+    </div><br />
+    For detailed informations, please type:
+    <div class="code">
+      <pre>
+<code>asebaswitch --help</code>
+</pre>
+    </div><br />
+    Note that additional targets must follow the <a href="http://download.gna.org/dashel/1.0.3/doc/">Dashel naming convention</a>.
+    <h1 id="toc0">
+      <span>Advanced use</span>
+    </h1>
+    <p>
+      Aseba demands that every node in a network has a different identifier, because Aseba uses the latter to route data. However, some targets, such as the <a href="http://aseba.wikidot.com/en:thymio">Thymio</a>, have an identifier hard-coded in their firmware. Fortunately, asebaswitch provides an <em>identifier remapping</em> mechanism, that allows to remap the identifier of a target.
+    </p>
+    <p>
+      This mechanism allows, for example, to have two Thymios on the same Aseba network. Under Linux, this translates into this command line:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch -d "ser:device=/dev/ttyACM0;remapLocal=1" "ser:device=/dev/ttyACM1;remapLocal=2"</code>
+</pre>
+    </div>
+    <p>
+      The remapping mechanism adds two options to the target-description string:
+    </p>
+    <ul>
+      <li>
+        <tt>remapLocal</tt>, the identifier under which the target node should appear locally,
+      </li>
+      <li>
+        <tt>remapTarget</tt> (default: <tt>1</tt>), the identifer of the target node to remap.
+      </li>
+    </ul>
+    <p>
+      Currently, this mechanism allows to remap only one node per target. We might generalize this depending on the needs.
+    </p>
+  </body>
+</html>

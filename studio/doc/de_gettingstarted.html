@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Übung macht den Meister
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Übung macht den Meister
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc">
+            <div class="title">
+              Table of Contents
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Simulationsspiel Challenge</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Eine simple Robotersteuerung</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Eine kompliziertere Robotersteuerung</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc3">Entscheidungen treffen</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc4">Die Herausforderung</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Weiterführende Webseiten:</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Hier werden die ersten Programmierschritte mit Aseba erklärt, die man auch ohne Roboter ausprobieren kann. Falls Sie bereits den Roboter Thymio II besitzen, gibt es eine spezifisch für Thymio II geschriebene <a href="http://aseba.wikidot.com/de:thymioprogram">Bedienungsanleitung</a>.
+    </p>
+    <table style="margin:0; padding:0">
+      <tr>
+        <td style="margin:0; padding:0"></td>
+      </tr>
+    </table>
+    <h1 id="toc0">
+      <span>Simulationsspiel <em>Challenge</em></span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="asebachallenge.png" width="390" alt="asebachallenge.png" class="image" />
+    </div>
+    <p>
+      <br />
+      Aseba <em>Challenge</em> (rechtes Bild) ist eine simulierte Welt in welcher mit Aseba programmierte Roboter um Energie kämpfen. Diese simulierte Welt ist als Trainingspiel aufgebaut und gut für den Programmierunterricht geeignet.
+    </p>
+    <p>
+      Zu Beginn muss Aseba <em>Challenge</em> in Betrieb genommen werden. Falls Sie Aseba noch nicht installiert haben, folgen Sie bitte der <a href="http://aseba.wikidot.com/de:downloadinstall">Installationsanleitung</a>. Sobald <em>Challenge</em> gestartet wurde, drücken Sie “Neuen Roboter hinzufügen”. Dann wählen Sie einen Namen für Ihren Roboter. Dabei braucht jeder Spieler in einer Gruppe einen eigenen Roboter. Sämtliche Roboter können mit einem Klick auf “Alle Roboter entfernen” gelöscht werden. Die Tasten können durch “Automatisches Verstecken” vorübergehend unsichtbar gemacht werden. Die Tasten erscheinen erst wieder, wenn der Mauspfeil in dessen Nähe ist. Die Kameraführung kann automatisch erfolgen durch einen Klick auf “Automatische Kamera” oder manuell mit folgenden Befehlen gesteuert werden:
+    </p>
+    <ul>
+      <li>ctrl + linke Maustaste: rotierende Ansicht
+      </li>
+      <li>ctrl + shift + linke Maustaste: Zweidimensionale Ortung auf einer X/Y-Achse
+      </li>
+      <li>ctrl + shift + rechte Maustaste: Ortung auf der Z-Achse
+      </li>
+    </ul>
+    <div class="image-container floatright">
+      <img src="studio-connect-en.png" width="146" alt="studio-connect-en.png" class="image" />
+    </div>
+    <p>
+      Das Ziel des Spiels <em>Challenge</em> besteht darin, durch das Sammeln von Energie am Leben zu bleiben. Die Punkte der einzelnen Roboter werden an einer lichtdurchlässigen Anzeigetafel über dem Spielfeld angezeigt. Die Punkte vermehren sich solange ein Roboter am Leben bleibt, sobald der Roboter stirbt, werden die Punkte durch zwei geteilt. Vier blaue Energiequellen versorgen die Roboter mit Energie. Von Zeit zu Zeit verschwinden die Energiequellen in den Boden und werden auf diese Weise unsichtbar für die Roboter. Wenn eine Energiequelle vollständig augebraucht ist, verfärbt sich die Energiequelle rot und gibt keine Energie mehr an Roboter ab.
+    </p>
+    <p>
+      Sobald Aseba <em>Challenge</em> gestartet wurde, sollten Sie Aseba <em>studio</em> ebenfalls starten, um Ihren Roboter zu programmieren. Für jeden einzelnen Roboter muss eine Sequenz auf Studio auf irgendeinem Computer laufen. Zu Beginn, fordert Aseba <em>studio</em> Sie auf, mit einem Aseba Ziel zu verbinden (Bild rechts). Falls Sie Aseba <em>Challenge</em> öffnen, während noch ein Roboter mit Ihrem Computer verbunden ist, wird der Computer automatisch eine Verbindung mit dem Roboter herstellen. Falls Sie <em>Challenge</em> von einem Computer ohne angeschlossenem Roboter öffnen oder sich mehrere Roboer in der Nähe befinden, registrieren Sie sich bitte unter <em>Gast</em> und wählen Ihren Roboter unter <em>port</em>. Das lichtdurchlässige Fenster über der Arena in <em>Challenge</em> zeigt die verschiedenen Verbindungen zu den Robotern an.
+    </p>
+    <h1 id="toc1">
+      <span>Eine simple Robotersteuerung</span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="studio-challenge-en.png" width="390" alt="studio-challenge-en.png" class="image" />
+    </div>
+    <p>
+      Sobald <em>studio</em> läuft (Bild rechts), können Sie Ihre erste Programme in das mittlere Eingabefeld schreiben. Diese Eingaben werden automatisch in Echtzeit überprüft und Fehler im Syntax werden sofort mitgeteilt. Weitere Informationen dazu erhalten Sie unter <em>studio</em>, welches Sie im Menu <tt>Hilfe-&gt;Studio</tt> finden. Zusätzlich finden Sie im Menu <tt><a href="de_asebalanguage.html">Hilfe-&gt;Sprache</a></tt> eine detaillierte Dokumentation der Programmiersprache Aseba.
+    </p>
+    <p>
+      Um einen Roboter zu programmieren, müssen Sie zuerst verstehen, wie er funktioniert. Ein Roboter interagiert mit der Umgebung in einem Kreislauf: Durch Sensoren nimmt der Roboter die Umgebung wahr und reagiert mit einigen vorinstallierten Programmen, welche verschiedene Aktivitäten auslösen können. Dadurch wird die Umgebung verändert und der Roboter nimmt die Veränderung der Umwelt mit seinen Sensoren wahr.
+    </p>
+    <p>
+      In <em>Challenge</em> können Sie einen simulierten <a href="http://aseba.wikidot.com/de:e-puck">E-puck</a>-Roboter programmieren. Dieser Roboter hat 8 Distanzsenoren und einer nach vorne gerichteten, einfache Kamera mit 3 Pixels mit einem Öffnungswinkel von je 20° pro Pixel. Diese Werte können von Ihnen abgelesen werden und die Geschwindigkeit der Räder gesteuert werden.<br />
+      <img src="epuck-sensors-wiki-en.png" alt="epuck-sensors-wiki-en.png" class="image" /><br />
+    </p>
+    <div style="text-align: right;">
+      <p>
+        <a href="epuck-sensors-wiki-en.svg">original svg file</a>, <a href="epuck-top-grayscale.png">background e-puck top</a>
+      </p>
+    </div>
+    <p>
+      Jetzt wissen Sie genug, um die erste Robotersteuerung zu programmieren. Schreiben Sie in das Textfeld in der Mitte des <em>studio</em>-Fensters folgendes:
+    </p>
+    <div class="code">
+      <pre>
+<code>wheel_left_speed = 5
+#Rad_links_Geschwindigkeit = 5
+wheel_right_speed = -5
+#Rad_rechts_Geschwindigkeit = -5</code>
+</pre>
+    </div><br />
+    Klicken Sie auf “Laden” und dann auf “Start”. Nun sollten Sie sehen, wie sich Ihr Roboter um einen imaginären Punkt dreht. Dieser Kode definiert nur beim Start die Geschwindigkeit der Räder des Roboters und danach löst dieser Kode nichts mehr aus. Um ein interessanters Verhalten des Roboters zu sehen, sollte man dem Roboter erlauben, seine Umgebung wahrzunehmen. Zum Beispiel könnte man programmieren, dass der Roboter Hindernisse wahrnimmt und diesen selbstständig ausweichen kann.<br />
+    Um selbstständig mit der Umwelt zu interagieren, braucht der Roboter periodische Befehle. Dies kann mit dem Befehl <tt>onevent timer</tt> (wenn dieses Ereignis eintritt, dann…) erreicht werden. Eine andere Möglichkeit besteht darin, den Distanzsensor so zu benützen, dass man die Geschwindigkeit der Räder auf Hindernisse abstimmen kann:
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = dist[0] - 6
+wheel_right_speed = dist[0] - 6</code>
+</pre>
+    </div><br />
+    Klicken Sie auf “Laden” und dann auf “Start”. Der Distanzsensor kann Werte zwischen 0 und 12cm annehmen. Distanzen von mehr als 12cm werden trotzdem mit einer 12 angezeigt. Der Roboter wird mit dem oben geschriebenen Programm eine Geschwindigkeit von -6&nbsp;cm/s annehmen, wenn das Hindernis nahe ist, und 0&nbsp;cm/s, wenn das Objekt weniger als 6cm vom Roboter entfernt ist. Aus diesem Grund wird der Roboter jeweils 6&nbsp;cm vor einem Hindernis zum Stillstand kommen. Falls das Hindernis weit entfernt ist, wird der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s unterwegs sein.
+    <h1 id="toc2">
+      <span>Eine kompliziertere Robotersteuerung</span>
+    </h1>
+    <p>
+      Einen sicheren Abstand vor Hindernissen zu bewahren ist gut, aber mit diesem Programm wird der Roboter nicht mehr weiterfahren. Um einen Roboter frei herumfahren zu lassen, müssen Sie verstehen, auf welche Art und Weise er sich bewegt.
+    </p>
+    <p>
+      Der simulierte <em>E-puck</em> Roboter in <em>Challenge</em> kann sich dank verschiedener Geschwindigkeiten auf seinen Rädern freier bewegen. Wenn beide Räder die gleiche Geschwindigkeit aufweisen, fährt der Roboter geradeaus, ansonsten wendet der Roboter. Wenn die Räder mit genau entgegengesetzte Geschwindigkeiten fahren, dreht sich der Roboter um sich selbst an einem Punkt. Industriell gefertigte Raupenantriebe funktionieren nach demselben Prinzip.
+    </p>
+    <p>
+      Schreiben Sie jetzt einen einfachen Kode, der es dem Roboter erlaubt, Hindernisse zu umfahren und sich sonst geradeaus fortzubewegen:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = prox[1] - 6
+wheel_right_speed = prox[6] - 6</code>
+</pre>
+    </div><br />
+    Diese Steuerung liest die vorderen linken und rechten Distanzsensoren. Wenn kein Hindernis in der Nähe ist, senden die Distanzsensoren <tt>prox[1]</tt> und <tt>prox[6]</tt> den Wert 12. Darauf fährt der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s geradeaus. Falls nun aber ein Hindernis auftaucht, reduziert sich der von den Sensoren gemeldete Wert. Wenn zum Beispiel ein Hindernis auf der linken Seite auftaucht, wird der Distanzsensor <tt>prox[6]</tt>, welcher nach links blickt, einen Wert von z.B. 10 senden, währen der Distanzsensor <tt>prox[1]</tt>, welcher nach rechts blickt, immer noch einen Wert von 12 zurückmeldet. Daher wird sich bei<tt>wheel_right_speed</tt> die Geschwindigkeit auf 4&nbsp;cm/s reduzieren, während die Geschwindigkeit von <tt>wheel_left_speed</tt> konstant bei 6&nbsp;cm/s bleibt. Diese Anpassung der Geschwindigkeit veranlasst den Roboter, eine Drehung nach rechts zu fahren und auf diese Weise das Hindernis zu umfahren.
+    <h1 id="toc3">
+      <span>Entscheidungen treffen</span>
+    </h1>
+    <p>
+      Die bisher erläuterten Steuerungen verknüpfen durch mathematische Ausdrücke die Werte der Sensoren mit der Geschwindigkeit der Räder. Bislang wurden noch keine “wenn…, dann…” Entscheidungen getroffen. In gewissen Situation wäre dies aber wünschenswert, zum Beispiel, wenn der Roboter entweder geradeaus oder im Kreis fahren sollte. In diesem Fall können Sie programmieren:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+var dists = prox[6] + prox[7] + prox[0] + prox[1]
+if dists &lt; 48 then
+    wheel_left_speed = 5
+    wheel_right_speed = -5
+else
+    wheel_left_speed = 5
+    wheel_right_speed = 5
+end</code>
+</pre>
+    </div><br />
+    Diese Steuerung zählt die Werte aller Distanzsensoren zusammen. Falls die Summe weniger als 48 ergibt, bedeutet dies, dass zumindest einer der Distanzsensoren ein Hindernis entdeckt haben muss. Falls die Summe also 48 beträgt, fährt der Roboter geradeaus weiter, ansonsten beginnt der Roboter sich um einen Punkt zu drehen.
+    <p>
+      Eine Programmiersprache enthält aber auch andere interessante Möglichkeiten, wie zum Beispiel eine <tt>while</tt> Schleife, die ermöglicht, denselben Kodeblock mehrmals durchzuführen, bis die Anfangsbedingung nicht mehr zutrifft. Eine weitere Möglichkeit bietet die <tt>for</tt> Schleife, wobei die Werte jedes Mal erneuert werden. Im Menu <tt><a href="de_asebalanguage.html">Hilfe -&gt; Sprache</a></tt> findet sich eine Liste mit allen möglichen Befehlen und dazugehörigen Beispielen.
+    </p>
+    <h1 id="toc4">
+      <span>Die Herausforderung</span>
+    </h1>
+    <p>
+      Spielen Sie zur Übung ein wenig mit dem Ausweichen von Hindernissen, um ein gutes Verständnis für die Sensoren zu erhalten. Experimentieren Sie mit allem Möglichen, denn der Roboter in <em>Challenge</em> ist nur ein Simulator und kann nicht kaputt gehen.
+    </p>
+    <p>
+      Sobald Sie sich sicher beim Programmieren fühlen, versuchen Sie, den Roboter so zu programmieren, dass er automatisch auf die blauen Energiequellen (0, 0, 100) (in R, G, B), zusteuert und automatisch rote Energiequellen vermeidet (100, 0, 0), während die Farbe des Hintergrundes konstant grau (50, 50, 50) bleibt.
+    </p>
+    <p>
+      Versuchen Sie Ihre Freunde mit der besten Roboterprogrammierung zu übertreffen. Die Farbe Ihres Roboters können Sie durch die Variablen <tt>color_red</tt>, <tt>color_green</tt> und <tt>color_blue</tt> verändern und so Energiequellen imitieren. Falls Ihre Mitspieler versuchen, Sie auf diese Weise hinters Licht zu führen, können Sie anhand einer Überprüfung der Energievariablen herausfinden, ob es sich um echte oder simulierte Energiequellen handelt. Wenn der Roboter blau sieht, seine Variablen sich aber nicht erhöhen, wurden Sie ausgetrickst.
+    </p>
+    <p>
+      Das Ziel vom Trainingsspiel Aseba <em>Challenge</em> besteht darin, auf spielerische Weise das Programmieren von Robotern zu erlernen.
+    </p>
+    <h1 id="toc5">
+      <span>Weiterführende Webseiten:</span>
+    </h1>
+    <ul>
+      <li>
+        <a href="de_asebastudio.html">Dokumentation von Aseba Studio</a>
+      </li>
+      <li>
+        <a href="de_asebalanguage.html">Programmiersprache Aseba</a>
+      </li>
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+        <namespace>aseba.main</namespace>
+        <virtualFolder>doc</virtualFolder>
+
+        <customFilter name="en">
+                <filterAttribute>lang-en</filterAttribute>
+        </customFilter>
+        <customFilter name="fr">
+                <filterAttribute>lang-fr</filterAttribute>
+        </customFilter>
+        <customFilter name="de">
+                <filterAttribute>lang-de</filterAttribute>
+        </customFilter>
+
+
+
+        <filterSection>
+                <filterAttribute>lang-en</filterAttribute>
+                <toc>
+                        <section title="Aseba user manual" ref = "doc/en_asebausermanual.html">
+                                <section title="Getting started with Aseba" ref="doc/en_gettingstarted.html"></section>
+                                <section title="Aseba Studio" ref="doc/en_asebastudio.html"></section>
+                                <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
+                                <section title="Remap Identifiers using asebaswitch" ref="doc/en_asebaswitchremap.html"></section>
+
+                        </section>
+
+                </toc>
+
+                <files>
+                        <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/en_asebalanguage.html</file>
+                        <file>doc/en_asebastudio.html</file>
+                        <file>doc/en_asebaswitchremap.html</file>
+                        <file>doc/en_asebausermanual.html</file>
+                        <file>doc/en_gettingstarted.html</file>
+                        <file>doc/epuck-sensors-wiki-en.png</file>
+                        <file>doc/epuck-sensors-wiki-en.svg</file>
+                        <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/studio-challenge-en.png</file>
+                        <file>doc/studio-connect-en.png</file>
+                        <file>doc/studio-overlay-en.png</file>
+
+                </files>
+        </filterSection>
+
+        <filterSection>
+                <filterAttribute>lang-fr</filterAttribute>
+                <toc>
+                        <section title="Mode d&#039;emploi d&#039;Aseba" ref = "doc/fr_asebausermanual.html">
+                                <section title="Démarrer avec Aseba" ref="doc/fr_gettingstarted.html"></section>
+                                <section title="Aseba Studio" ref="doc/fr_asebastudio.html"></section>
+                                <section title="Le langage d&#039;Aseba" ref="doc/fr_asebalanguage.html"></section>
+                                <section title="Remapper les identificateurs avec asebaswitch" ref="doc/fr_asebaswitchremap.html"></section>
+
+                        </section>
+
+                </toc>
+
+                <files>
+                        <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/epuck-sensors-wiki-fr.png</file>
+                        <file>doc/epuck-sensors-wiki-fr.svg</file>
+                        <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/fr_asebalanguage.html</file>
+                        <file>doc/fr_asebastudio.html</file>
+                        <file>doc/fr_asebaswitchremap.html</file>
+                        <file>doc/fr_asebausermanual.html</file>
+                        <file>doc/fr_gettingstarted.html</file>
+                        <file>doc/studio-challenge-fr.png</file>
+                        <file>doc/studio-connect-fr.png</file>
+                        <file>doc/studio-overlay-fr.png</file>
+
+                </files>
+        </filterSection>
+
+        <filterSection>
+                <filterAttribute>lang-de</filterAttribute>
+                <toc>
+                        <section title="Bedienungsanleitung zu Aseba" ref = "doc/de_asebausermanual.html">
+                                <section title="Übung macht den Meister" ref="doc/de_gettingstarted.html"></section>
+                                <section title="Aseba Studio" ref="doc/de_asebastudio.html"></section>
+                                <section title="Programmiersprache Aseba" ref="doc/de_asebalanguage.html"></section>
+
+                        </section>
+
+                </toc>
+
+                <files>
+                        <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/de_asebalanguage.html</file>
+                        <file>doc/de_asebastudio.html</file>
+                        <file>doc/de_asebausermanual.html</file>
+                        <file>doc/de_gettingstarted.html</file>
+                        <file>doc/epuck-sensors-wiki-en.png</file>
+                        <file>doc/epuck-sensors-wiki-en.svg</file>
+                        <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/studio-challenge-en.png</file>
+                        <file>doc/studio-connect-en.png</file>
+                        <file>doc/studio-overlay-en.png</file>
+
+                </files>
+        </filterSection>
+
+
+</QtHelpProject>

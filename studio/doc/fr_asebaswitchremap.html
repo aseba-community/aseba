@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Remapper les identificateurs avec asebaswitch
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Remapper les identificateurs avec asebaswitch
+    </h1>
+    <p>
+      Aseba fournit <em>asebaswitch</em>, un outils en ligne de commande qui permet de connecter ensemble plusieurs cibles. La syntaxe est la suivante :
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch [options] [cibles additionnelles]*</code>
+</pre>
+    </div><br />
+    Pour plus d'informations, veuillez taper :
+    <div class="code">
+      <pre>
+<code>asebaswitch --help</code>
+</pre>
+    </div><br />
+    Notez que les cibles additionnelles doivent suivre la <a href="http://download.gna.org/dashel/1.0.3/doc/">convention de nommage de Dashel</a>.
+    <h1 id="toc0">
+      <span>Usage avancé</span>
+    </h1>
+    <p>
+      Aseba exige que chaque nœud d'un réseau ait un identificateur différent, parce qu'aseba utilise ces derniers pour router les données. Néanmoins, certaines cibles, telle que le <a href="http://aseba.wikidot.com/fr:thymio">Thymio</a>, ont un identificateur codé en dur dans leur firmware. Heureusement, asebaswitch fournit un mécanisme de <em>remapping d'identificateur</em> qui permet de remapper l'identificateur d'une cible.
+    </p>
+    <p>
+      Ce mécanisme permet, par exemple, d'avoir deux Thymios sur le même réseau. Sous Linux, cela ce traduit dans la ligne de commande suivante :
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch -d "ser:device=/dev/ttyACM0;remapLocal=1" "ser:device=/dev/ttyACM1;remapLocal=2"</code>
+</pre>
+    </div>
+    <p>
+      Le mécanisme de remapping ajoute deux options à la chaîne de description de cible :
+    </p>
+    <ul>
+      <li>
+        <tt>remapLocal</tt>, l'identificateur sous lequel le nœud cible va apparaître localement,
+      </li>
+      <li>
+        <tt>remapTarget</tt> (défault: <tt>1</tt>), l'identificateur du nœud cible à remapper.
+      </li>
+    </ul>
+    <p>
+      Actuellement, ce mécanisme ne permet de remapper qu'un seul nœud par cible. Il se peut que nous le généralisions, suivant les besoins.
+    </p>
+    <hr />
+  </body>
+</html>

@@ -9,7 +9,7 @@ Copyright (C) 2007--2011:
 	(inputs and coding on embedded integration)
 
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	(Windows maintainer, additional coding)
+	(Windows maintainer, help system, additional coding)
 
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
 	(Apple maintainer)
