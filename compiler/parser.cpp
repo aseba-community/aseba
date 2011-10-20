@@ -360,6 +360,10 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 		
+		const Token::Type compoundAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
+							   Token::TOKEN_OP_MULT_EQUAL, Token::TOKEN_OP_DIV_EQUAL, Token::TOKEN_OP_MOD_EQUAL,
+							   Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL, Token::TOKEN_OP_BIT_NOT_EQUAL,
+							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
 		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
@@ -402,8 +406,10 @@ namespace Aseba
 		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
 			assignment->children.push_back(parseIncrementAssignment(l_value));
-		else
+		else if (IS_ONE_OF(compoundAssignment))
 			assignment->children.push_back(parseCompoundAssignment(l_value));
+		else
+			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
 		
 		return assignment.release();
 	}
@@ -417,8 +423,20 @@ namespace Aseba
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 
-		// convert the l_value from a StoreNode to a LoadNode
-		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// convert the l_value from a StoreNode / ArrayWriteNode to a LoadNode / ArrayReadNode respectively
+		std::auto_ptr<Node> load;
+		StoreNode* store = dynamic_cast<StoreNode*>(l_value);
+		ArrayWriteNode* read = dynamic_cast<ArrayWriteNode*>(l_value);
+		if (store)
+			// scalar
+			load.reset(new LoadNode(store));
+		else if (read)
+			// array
+			load.reset(new ArrayReadNode(read));
+		else
+			// oops
+			throw Error(pos, WFormatableString(L"Unexpected error: missing scalar or array assignment"));
+
 		// get the r_value
 		std::auto_ptr<Node> node(parseBinaryOrExpression());
 
