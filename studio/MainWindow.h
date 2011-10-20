@@ -41,6 +41,7 @@
 #include "Target.h"
 #include "TargetModels.h"
 #include "Plugin.h"
+#include "HelpViewer.h"
 
 class QLabel;
 class QSpinBox;
@@ -50,7 +51,7 @@ class QListWidget;
 class QListWidgetItem;
 class QTreeView;
 class QTranslator;
-class QTextBrowser;
+//class QTextBrowser;
 class QToolBox;
 
 namespace Aseba
@@ -354,8 +355,7 @@ namespace Aseba
 		void sourceChanged();
 		void updateWindowTitle();
 
-		void showHelpLanguage();
-		void showHelpStudio();
+		void showUserManual();
 		
 		void openToUrlFromAction() const;
 	
@@ -453,7 +453,7 @@ namespace Aseba
 		FindDialog* findDialog; //!< find dialog
 		QString actualFileName; //!< name of opened file, "" if new
 		bool sourceModified; //!< true if source code has been modified since last save
-		QTextBrowser* helpViewer;
+		HelpViewer helpViewer;
 		
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;

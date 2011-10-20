@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Programmiersprache Aseba
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Programmiersprache Aseba
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Inhaltsverzeichnis
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Kommentare</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Variablen</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Ereignis</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc3">Ausdrücke und Zuweisungen</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc4">Bedingungen</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Endlosschlaufen</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc6">Unterprogramme</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc7">Vorgegebene Funktionen</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Diese Hilfe finden Sie auch innerhalb des Aseba Studios im Menu <tt>Hilfe -&gt; Sprache</tt>.
+    </p>
+    <p>
+      Die Programmiersprache Aseba erlaubt, die Kontrolle verteilt auf Aseba Netzwerkelemente zu implementieren. Der Syntax dieser Programmiersprache ist ähnlich zu <em>matlab</em>; Dies ermöglicht Programmierern mit Vorkenntnissen sich schnell zu orientieren und Aseba in Kürze zu erlernen. Semantisch gesehen, ist Aseba eine einfache, imperative Programmierung mit einem einzelnen Datentyp (16 Bit Ganzzahlen mit Vorzeichen) und Vektoren davon. Diese Einfachheit erlaubt auch Programmierern ohne Vorkenntnisse mikrokontrollerbasierte Roborter zu steuern.
+    </p>
+    <h1 id="toc0">
+      <span>Kommentare</span>
+    </h1>
+    <p>
+      Kommentare beginnen mit dem Symbol <em>#</em> und enden auf derselben Zeile.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code># dies ist ein Kommentar
+var b    # ein anderer Kommentar</code>
+</pre>
+    </div><br />
+    Bemerkungen über mehrere Linien sind auch möglich. Sie beginnen mit dem Symbol <em>#*</em> und enden mit <em>*#</em>.
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>#*
+Dies ist ein Kommentar
+über mehrere Linien verteilt.
+*#
+var b    # kurzer Kommentar</code>
+</pre>
+    </div>
+    <h1 id="toc1">
+      <span>Variablen</span>
+    </h1>
+    <p>
+      Variablen beziehen sich entweder auf einfache ganze Zahlen oder Vektoren von ganzen Zahlen. Die zulässigen Werte sind alle ganzen Zahlen zwischen -32768 und 32767, was einem Speicherbereich von 16 Bit (2 Byte) entspricht. Man kann Vektorkomponenten mit Klammern [Zahl] aufrufen. Die indexierung der Vektoren beginnt bei Null. Alle benutzerdefinierten Variablen müssen am Anfang des Asebaprogramms definiert werden, vor allen weiteren Programmteilen.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a
+var c[10] # c[0] ist die erste Komponente, c[9] die letzte
+var b = 0
+var d[3] = 2, 3, 4</code>
+</pre>
+    </div>
+    <h1 id="toc2">
+      <span>Ereignis</span>
+    </h1>
+    <p>
+      Aseba ist eine Ereignisbasierte (<em>event-based</em>) Architektur, was eine asynchrone Ereignisauslösung ermöglicht. Extern können Ereignisse zum Beispiel von einem anderen Aseba Netzwerkelement ausgelöst werden. Intern können Ereignisse zum Beispiel von einem Sensor mit aktualisierten Daten ausgelöst werden.
+    </p>
+    <p>
+      Die Wahrnehmung eines Ereignisses kann einen Codeblock aktivieren, falls dieser zuvor mit dem Stichwort <tt>onevent</tt> und der Bezeichnung des Ereignisses definiert worden ist. Der Code am Anfang des Befehls bestimmt, wann die darauf folgenden Befehle ausgeführt oder zurückgesetzt werden. Befehle können auch Ereignisse senden mit dem Stichwort <tt>emit</tt>, gefolgt von der Bezeichnung des Ereignisses und gegebenenfalls den zu sendenden Variablen. Falls eine Variable gegeben wird, muss die Grösse des Ereignisses der Grösse des zu schickenden Arguments entsprechen. Ereignisse erlauben Befehle an anderen Netzwerkelementen auszulösen oder mit einem externen Programm zu kommunizieren.
+    </p>
+    <p>
+      Um die Ausführung von ähnlichen Codes bei neuen Ereignissen zu ermöglichen, dürfen die Befehle nicht blockieren und dürfen deshalb keine Endlosschlaufen enthalten. In der Robotik bedeutet dies, dass ein traditionelles Robotersteuerungsprogramm gewisse Vorgänge in einer Endlosschlaufe durchführt, während die Befehlssprache Aseba dieselben Vorgänge nur in einem auf Sensoren bezogenen Ereigniss ausführt.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+#falls das Ereignis 'start' eintritt, starte
+run = 1
+
+onevent stop
+#falls das Ereignis 'stop' eintritt, halte an
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+#wenn==1, dann
+    emit sensors_values proximity_sensors_values
+    #Gib das Ereignis 'sensors_values' aus mit den Variablen 'proximity_sensors_values'
+end  
+#Ende des 'if' blocks</code>
+</pre>
+    </div>
+    <h1 id="toc3">
+      <span>Ausdrücke und Zuweisungen</span>
+    </h1>
+    <p>
+      Ausdrücke erlauben mathematische Berechnungen und sind in einer normalen traditionellen mathematischen Notation (Infix syntax) geschrieben. Zumweisungen benutzen das Stichwort <tt>=</tt> und weisen das Resultat einer Ausdrucksberechnung einer Variable zu (oder einer Komponente einer Variable, falls die Variable ein Vektor ist).<br />
+      Aseba stellt binäre Operatoren zur Verfügung, welche in der folgenden Reihenfolge abgearbeitet werden: <tt>*</tt>, <tt>/</tt>, <tt>%</tt> (modulo); gefolgt von <tt>+</tt> und <tt>-</tt>; gefolgt von <tt>«</tt> (links shift) and <tt>»</tt> (rechts shift); gefolgt von <tt>|</tt> (binäres oder); gefolgt von <tt>^</tt> (binäres exklusives oder); gefolgt von <tt>&amp;</tt> (binäres und). Die binären Operatoren assoziieren nach links.<br />
+      Aseba stellt auch folgende unäre Operatoren zur Verfügung: <tt>-</tt>, <tt>~</tt> (binäres nicht), und <tt>abs</tt> (betrag). Um einen Ausdruck in einer anderen Reihenfolge zu evaluieren, können Klammern verwendet werden.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>a = 1 + 1
+b = b + d[0]
+b = (a - 7) % 5
+c[a] = d[a]</code>
+</pre>
+    </div>
+    <h1 id="toc4">
+      <span>Bedingungen</span>
+    </h1>
+    <p>
+      Aseba stellt zwei Arten von Bedingungen zur Verfügung: <tt>if</tt> und <tt>when</tt>. Vergleichende Operatoren sind <tt>==</tt>, <tt>!=</tt>, <tt>&gt;</tt>, <tt>&gt;=</tt>, <tt>&lt;</tt>, und <tt>&lt;=</tt>; beliebige Ausdrücke können verglichen werden. Vergleiche können gruppiert werde mit Hilfe von <tt>and</tt>, <tt>or</tt>, und <tt>not</tt> Operatoren sowie mit Klammern.
+    </p>
+    <p>
+      Sowohl <tt>if</tt> als auch <tt>when</tt> führen den darauffolgenden Befehlsblock aus, falls die Bedingung nach <tt>if</tt> bzw <tt>when</tt> erfüllt ist. Allerdings führt <tt>when</tt> den darauffolgenden Befehlsblock ausschliesslich dann aus, wenn die letzte Auswertung der Bedingung falsch war und die momentane Bedingung richtig ist. Dies ermöglicht eine effizientere Arbeitsweise, da der Befehlsblock nur dann ausgeführt wird, wenn sich etwas geändert hat.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>if a - b &gt; c[0] then
+#wenn a - b &gt; [0] dann
+    c[0] = a
+elseif a &gt; 0 then
+#falls die erste Bedingung (a - b &gt; c[0]) falsch war und (a&gt;0) richtig, dann
+       b = a
+else
+#falls keine der vorhergehenden Bedingungen richtig war
+       b = 0
+end
+#Ende des if Befehlsblocks 
+
+when a &gt; b do
+#wenn a &gt; b mach
+    leds[0] = 1
+end
+#Ende des when Befehlsblocks</code>
+</pre>
+    </div><br />
+    Hier wird der Befehlsblock <tt>when</tt> nur ausgeführt, falls <tt>a</tt> grösser als <tt>b</tt> ist.
+    <h1 id="toc5">
+      <span>Endlosschlaufen</span>
+    </h1>
+    <p>
+      Zwei Konstruktionen ermöglichen Endlosschlaufen: <tt>while</tt> und <tt>for</tt>.
+    </p>
+    <p>
+      Eine <tt>while</tt> Endlosschlaufe wiederholt einen Befehlsblock solange wie die verlangte Bedingung am Ende zutrifft. Die Funktion hat dieselbe Form wie wenn man <tt>if</tt> benutzt.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>while i &lt; 10 do
+#während i &lt; 10 führe den folgenden Befehlsblock aus
+    v = v + i * i
+    i = i + 1
+end
+#Ende des while Blocks</code>
+</pre>
+    </div>
+    <p>
+      Eine <tt>for</tt> Schlaufe erlaubt es eine Variable über eine Bereich ganzer Zahlen laufen zu lassen, optional mit einer Schrittweite.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>for i in 1:10 do
+#für i in 1,2,3,...,9,10 führe aus
+    v = v + i * i
+end
+#Ende
+for i in 30:1 step -3 do
+#für i in 30,27,24,21,...,6,3 führe aus
+    v = v - i * i
+end
+#Ende</code>
+</pre>
+    </div>
+    <h1 id="toc6">
+      <span>Unterprogramme</span>
+    </h1>
+    <p>
+      Falls dieselben Sequenzen von Operatoren an zwei oder mehreren Orten innerhalb des Codes auftreten, genügt es, ein Unterprogramm zu schreiben und dieses von diversen Orten her aufzurufen. Ein Unterprogramm kann mit dem Stichwort <tt>sub</tt> und dem Namen des Unterprogramms definiert werden. Ein Unterprogramm kann mit dem Stichwort <tt>callsub</tt> aufgerufen werden. Unterprogramme können keine Argumente beinhalten und weder direkt noch indirekt rekursiv wirken. Allerdings haben Unterprogramme Zugriff auf alle Variablen.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+#Unterprogramm Namens toto
+v = 1
+
+onevent test
+#falls Ereignis Namens teste eintritt, dann
+callsub toto
+#rufe Unterprogramm toto auf</code>
+</pre>
+    </div>
+    <h1 id="toc7">
+      <span>Vorgegebene Funktionen</span>
+    </h1>
+    <p>
+      Die Befehlssprache Aseba wurde entwickelt mit dem Ziel, auch Programmierern ohne Vorkenntnissen zu ermöglichen, die einfachen Befehle schnell zu verstehen und effizient in Mikrosteuerungen zu implementieren. Um komplexe oder stark Ressourcen verbrauchende Prozesse zu programmieren, werden gewisse vorprogrammierte Funktionen zur Verfügung gestellt. Zum Beipiel gibt es in Aseba eine vorgegebene Funktion, die das Skalarprodukt berechnet.
+    </p>
+    <p>
+      Vorgegebene Funktionen sind sicher, weil sie die Argumente spezifizieren und überprüfen. Argumente können Konstanten, Variablen oder Feldzugänge sein. Später können auf ganze Felder, einzelne Elemente oder Teilfelder zugegriffen werden. Vorgegebene Funktionen sehen ihre Argumente als Referenz an und können ihre Inhalte verändern, aber keine Werte generieren. Durch das Stichwort <tt>call</tt> können vorgegebene Funktionen aufgerufen werden.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)</code>
+</pre>
+    </div>
+  </body>
+</html>

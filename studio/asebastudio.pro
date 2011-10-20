@@ -17,6 +17,23 @@ PRE_TARGETDEPS = ../compiler/libaeslc.a ../vm/build-local/libasebavm.a
 # HEADERS += RemoteBluetoothTarget.h LocalVirtualMachine.h
 # SOURCES += RemoteBluetoothTarget.cpp LocalVirtualMachine.cpp 
 
-HEADERS += ClickableLabel.h MainWindow.h AeslEditor.h Target.h TcpTarget.h TargetModels.h CustomDelegate.h FunctionParametersDialog.h ../compiler/compiler.h ../vm/vm.h
-SOURCES += ClickableLabel.cpp MainWindow.cpp AeslEditor.cpp Target.cpp TcpTarget.cpp TargetModels.cpp CustomDelegate.cpp FunctionParametersDialog.cpp main.cpp
+HEADERS += ClickableLabel.h MainWindow.h AeslEditor.h Target.h TcpTarget.h TargetModels.h CustomDelegate.h FunctionParametersDialog.h ../compiler/compiler.h ../vm/vm.h \
+    NamedValuesVectorModel.h \
+    LocalVirtualMachine.h \
+    HelpViewer.h \
+    FindDialog.h \
+    EventViewer.h \
+    DashelTarget.h \
+    CustomWidgets.h \
+    Plugin.h
+SOURCES += ClickableLabel.cpp MainWindow.cpp AeslEditor.cpp Target.cpp TcpTarget.cpp TargetModels.cpp CustomDelegate.cpp FunctionParametersDialog.cpp main.cpp \
+TRANSLATIONS = asebastudio_fr.ts \
+    NamedValuesVectorModel.cpp \
+    LocalVirtualMachine.cpp \
+    HelpViewer.cpp \
+    FindDialog.cpp \
+    EventViewer.cpp \
+    DashelTarget.cpp \
+    CustomWidgets.cpp \
+    Plugin.cpp
 TRANSLATIONS = asebastudio_fr.ts
