@@ -9,6 +9,9 @@ install(TARGETS asebatest RUNTIME
 	LIBRARY DESTINATION lib
 )
 
+# set the number of test loops for the fuzzy test
+set(fuzzy_loop "500")
+
 # the following tests should succeed
 add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
 add_test(advanced-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt)
@@ -74,4 +77,22 @@ add_test(simulate-inconsistent-input1 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.p
 add_test(simulate-inconsistent-input2 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input2.txt)
 add_test(simulate-inconsistent-input3 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input3.txt)
 add_test(simulate-inconsistent-input4 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/inconsistent-input4.txt)
+
+# use zzuf to fuzzy the input script deterministically
+# compiler should not crash
+add_test(fuzzy-basic-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt ${fuzzy_loop})
+add_test(fuzzy-advanced-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt ${fuzzy_loop})
+add_test(fuzzy-binary-op ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-op.txt ${fuzzy_loop})
+add_test(fuzzy-shift-op ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/shift-op.txt ${fuzzy_loop})
+add_test(fuzzy-compound-assignment ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/compound-assignments.txt ${fuzzy_loop})
+add_test(fuzzy-binary-assignment ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-assignments.txt ${fuzzy_loop})
+add_test(fuzzy-shift-assignment ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/shift-assignments.txt ${fuzzy_loop})
+add_test(fuzzy-multiple-logic-op ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/multiple-logic-op.txt ${fuzzy_loop})
+add_test(fuzzy-unicode ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/unicode.txt ${fuzzy_loop})
+add_test(fuzzy-optimisation-binary-not ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-binary-not.txt ${fuzzy_loop})
+add_test(fuzzy-for-loop ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.txt ${fuzzy_loop})
+add_test(fuzzy-while-loop ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop.txt ${fuzzy_loop})
+add_test(fuzzy-when-conditional ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/when-conditional.txt ${fuzzy_loop})
+add_test(fuzzy-comments ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/comments.txt ${fuzzy_loop})
+add_test(fuzzy-subroutine ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/subroutine.txt ${fuzzy_loop})
 
