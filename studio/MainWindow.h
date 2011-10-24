@@ -53,6 +53,7 @@ class QTreeView;
 class QTranslator;
 //class QTextBrowser;
 class QToolBox;
+class QCheckBox;
 
 namespace Aseba
 {
@@ -153,6 +154,7 @@ namespace Aseba
 		void uploadReadynessChanged(bool);
 	
 	protected:
+		virtual void timerEvent ( QTimerEvent * event );
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void setupWidgets();
 		void setupConnections();
@@ -166,6 +168,7 @@ namespace Aseba
 		void runInterruptClicked();
 		void nextClicked();
 		void refreshMemoryClicked();
+		void autoRefreshMemoryClicked(int state);
 		
 		void writeBytecode();
 		void reboot();
@@ -224,6 +227,7 @@ namespace Aseba
 		QPushButton *runInterruptButton;
 		QPushButton *nextButton;
 		QPushButton *refreshMemoryButton;
+		QCheckBox *autoRefreshMemoryCheck;
 		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
@@ -235,6 +239,8 @@ namespace Aseba
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
+		
+		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
 		int errorPos; //!< position of last error, -1 if compilation was success

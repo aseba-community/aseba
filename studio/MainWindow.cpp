@@ -280,6 +280,51 @@ namespace Aseba
 		delete vmMemoryModel;
 	}
 	
+	void NodeTab::timerEvent ( QTimerEvent * event )
+	{
+		// only fetch what is visible
+		const QList<TargetVariablesModel::Variable> variables(variablesModel->getVariables());
+		assert(variables.size() == variablesModel->rowCount());
+		
+		unsigned currentReqCount(0);
+		unsigned currentReqPos(0);
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			const TargetVariablesModel::Variable& var(variables[i]);
+			if  (((var.value.size() == 1) ||
+				 (vmMemoryView->isExpanded(variablesModel->index(i, 0)))
+				 ) &&
+				 (!vmMemoryView->isRowHidden(i, QModelIndex()))
+				)
+			{
+				if (currentReqCount == 0)
+				{
+					// new request
+					currentReqPos = var.pos;
+					currentReqCount = var.value.size();
+				}
+				else if (currentReqPos + currentReqCount == var.pos)
+				{
+					// continuous, append
+					currentReqCount += var.value.size();
+				}
+				else
+				{
+					// flush and reset
+					target->getVariables(id, currentReqPos, currentReqCount);
+					// new request
+					currentReqPos = var.pos;
+					currentReqCount = var.value.size();
+				}
+			}
+		}
+		if (currentReqCount != 0)
+		{
+			// flush request
+			target->getVariables(id, currentReqPos, currentReqCount);
+		}
+	}
+	
 	void NodeTab::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
 		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1) && (tools.empty()))
@@ -342,6 +387,7 @@ namespace Aseba
 		nextButton = new QPushButton(QIcon(":/images/step.png"), tr("Next"));
 		nextButton->setEnabled(false);
 		refreshMemoryButton = new QPushButton(QIcon(":/images/rescan.png"), tr("refresh"));
+		autoRefreshMemoryCheck = new QCheckBox(tr("auto"));
 		
 		QGridLayout* buttonsLayout = new QGridLayout;
 		buttonsLayout->addWidget(new QLabel(tr("<b>Execution</b>")), 0, 0);
@@ -365,10 +411,14 @@ namespace Aseba
 		//vmMemoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//vmMemoryView->setHeaderHidden(true);
 		
-		QGridLayout *memoryLayout = new QGridLayout;
-		memoryLayout->addWidget(new QLabel(tr("<b>Memory</b>")), 0, 0);
-		memoryLayout->addWidget(refreshMemoryButton, 0, 1);
-		memoryLayout->addWidget(vmMemoryView, 1, 0, 1, 2);
+		QVBoxLayout *memoryLayout = new QVBoxLayout;
+		QHBoxLayout *memorySubLayout = new QHBoxLayout;
+		memorySubLayout->addWidget(new QLabel(tr("<b>Memory</b>")));
+		memorySubLayout->addStretch();
+		memorySubLayout->addWidget(autoRefreshMemoryCheck);
+		memorySubLayout->addWidget(refreshMemoryButton);
+		memoryLayout->addLayout(memorySubLayout);
+		memoryLayout->addWidget(vmMemoryView);
 		
 		// functions
 		vmFunctionsView = new QTreeView;
@@ -441,6 +491,7 @@ namespace Aseba
 		connect(runInterruptButton, SIGNAL(clicked()), SLOT(runInterruptClicked()));
 		connect(nextButton, SIGNAL(clicked()), SLOT(nextClicked()));
 		connect(refreshMemoryButton, SIGNAL(clicked()), SLOT(refreshMemoryClicked()));
+		connect(autoRefreshMemoryCheck, SIGNAL(stateChanged(int)), SLOT(autoRefreshMemoryClicked(int)));
 		
 		// memory
 		connect(vmMemoryModel, SIGNAL(variableValuesChanged(unsigned, const VariablesDataVector &)), SLOT(setVariableValues(unsigned, const VariablesDataVector &)));
@@ -490,7 +541,23 @@ namespace Aseba
 	
 	void NodeTab::refreshMemoryClicked()
 	{
+		// as we explicitely clicked, refresh all variables
 		target->getVariables(id, 0, allocatedVariablesCount);
+	}
+	
+	void NodeTab::autoRefreshMemoryClicked(int state)
+	{
+		if (state == Qt::Checked)
+		{
+			refreshMemoryButton->setEnabled(false);
+			refreshTimer = startTimer(200); // 5 Hz
+		}
+		else
+		{
+			refreshMemoryButton->setEnabled(true);
+			killTimer(refreshTimer);
+			refreshMemoryClicked();
+		}
 	}
 	
 	void NodeTab::writeBytecode()
