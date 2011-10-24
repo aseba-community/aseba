@@ -505,6 +505,10 @@ namespace Aseba
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
+		
+		// following default settings
+		if (mainWindow->autoMemoryRefresh)
+			autoRefreshMemoryCheck->setChecked(true);
 	}
 	
 	void NodeTab::resetClicked()
@@ -1094,8 +1098,9 @@ namespace Aseba
 		reject();
 	}
 
-	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, QWidget *parent) :
+	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent) :
 		QMainWindow(parent),
+		autoMemoryRefresh(autoRefresh),
 		sourceModified(false)
 	{
 		// create target

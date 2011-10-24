@@ -26,9 +26,22 @@
 #include <QString>
 #include <QLocale>
 #include <QLibraryInfo>
+#include <QDebug>
 #include <iostream>
 #include <stdexcept>
 #include "MainWindow.h"
+
+using namespace std;
+
+void usage(const char *execName)
+{
+	cout << "Usage: " << execName << " (OPTIONS|TARGET)* " << endl;
+	cout << "  where" << endl;
+	cout << "OPTION is one of:" << endl;
+	cout << " -h      this help" << endl;
+	cout << " -ar     auto memory refresh enabled by default" << endl;
+	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
+}
 
 /**
 	\defgroup studio Integrated Development Editor
@@ -36,7 +49,9 @@
 
 int main(int argc, char *argv[])
 {
+	bool autoRefresh(false);
 	QApplication app(argc, argv);
+	
 	// Information used by QSettings with default constructor
 	QCoreApplication::setOrganizationName("EPFL-LSRO-Mobots");
 	QCoreApplication::setOrganizationDomain("mobots.epfl.ch");
@@ -57,6 +72,19 @@ int main(int argc, char *argv[])
 			commandLineTarget = argv[i];
 			break;
 		}
+		else if (argv[i][1] != 0)
+		{
+			QString cmd(&(argv[i][1]));
+			if (cmd == "h")
+			{
+				usage(argv[0]);
+				return 0;
+			}
+			else if (cmd == "ar")
+			{
+				autoRefresh = true;
+			}
+		}
 	}
 	
 	QTranslator qtTranslator;
@@ -72,7 +100,7 @@ int main(int argc, char *argv[])
 		QVector<QTranslator*> translators;
 		translators.push_back(&qtTranslator);
 		translators.push_back(&translator);
-		Aseba::MainWindow window(translators, commandLineTarget);
+		Aseba::MainWindow window(translators, commandLineTarget, autoRefresh);
 		window.show();
 		return app.exec();
 	}

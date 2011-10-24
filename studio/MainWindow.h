@@ -281,7 +281,7 @@ namespace Aseba
 		Q_OBJECT
 	
 	public:
-		MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, QWidget *parent = 0);
+		MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent = 0);
 		~MainWindow();
 
 	signals:
@@ -459,6 +459,7 @@ namespace Aseba
 		FindDialog* findDialog; //!< find dialog
 		QString actualFileName; //!< name of opened file, "" if new
 		bool sourceModified; //!< true if source code has been modified since last save
+		bool autoMemoryRefresh; //! < true if auto memory refresh is on by default
 		HelpViewer helpViewer;
 		
 		// compiler and source code related stuff
