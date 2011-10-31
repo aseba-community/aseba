@@ -30,6 +30,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "MainWindow.h"
+#include "HelpViewer.h"
 
 using namespace std;
 
@@ -40,6 +41,7 @@ void usage(const char *execName)
 	cout << "OPTION is one of:" << endl;
 	cout << " -h      this help" << endl;
 	cout << " -ar     auto memory refresh enabled by default" << endl;
+	cout << " -doc    show documentation instead of studio" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
 }
 
@@ -50,6 +52,7 @@ void usage(const char *execName)
 int main(int argc, char *argv[])
 {
 	bool autoRefresh(false);
+	bool showDoc(false);
 	QApplication app(argc, argv);
 	
 	// Information used by QSettings with default constructor
@@ -84,6 +87,10 @@ int main(int argc, char *argv[])
 			{
 				autoRefresh = true;
 			}
+			else if (cmd == "doc")
+			{
+				showDoc = true;
+			}
 		}
 	}
 	
@@ -95,19 +102,31 @@ int main(int argc, char *argv[])
 	translator.load(QString(":/asebastudio_") + QLocale::system().name());
 	app.installTranslator(&translator);
 	
-	try
+	if (showDoc)
 	{
-		QVector<QTranslator*> translators;
-		translators.push_back(&qtTranslator);
-		translators.push_back(&translator);
-		Aseba::MainWindow window(translators, commandLineTarget, autoRefresh);
-		window.show();
+		// directly show doc browser
+		Aseba::HelpViewer helpViewer;
+		helpViewer.setLanguage(QLocale::system().name());
+		helpViewer.show();
 		return app.exec();
 	}
-	catch (std::runtime_error e)
+	else
 	{
-		std::cerr << "Program terminated with runtime error: " << e.what() << std::endl;
-		return -1;
+		// start normal aseba studio
+		try
+		{
+			QVector<QTranslator*> translators;
+			translators.push_back(&qtTranslator);
+			translators.push_back(&translator);
+			Aseba::MainWindow window(translators, commandLineTarget, autoRefresh);
+			window.show();
+			return app.exec();
+		}
+		catch (std::runtime_error e)
+		{
+			std::cerr << "Program terminated with runtime error: " << e.what() << std::endl;
+			return -1;
+		}
 	}
 }
 

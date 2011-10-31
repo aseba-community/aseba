@@ -52,7 +52,7 @@
 
 namespace Aseba
 {
-	QString HelpViewer::DEFAULT_LANGUAGE = "en";
+	const QString HelpViewer::DEFAULT_LANGUAGE = "en";
 
 	HelpViewer::HelpViewer(QWidget* parent):
 		QWidget(parent)
@@ -140,18 +140,13 @@ namespace Aseba
 		writeSettings();
 	}
 
-	void HelpViewer::setLanguage(QString lang)
+	void HelpViewer::setLanguage(const QString& lang)
 	{
 		if (!helpFound)
 			return;
 
 		// check if the language is part of the existing filters
-		if (helpEngine->customFilters().contains(lang))
-		{
-			helpEngine->setCurrentFilter(lang);
-			this->language = lang;
-		}
-		else
+		if (selectLanguage(lang) == false)
 		{
 			// rollback to default language
 			QString message = tr("The help filter for the langauge \"%0\" has not been found. " \
@@ -161,6 +156,22 @@ namespace Aseba
 			helpEngine->setCurrentFilter(DEFAULT_LANGUAGE);
 			this->language = DEFAULT_LANGUAGE;
 		}
+	}
+	
+	bool HelpViewer::selectLanguage(const QString& reqLang)
+	{
+		const QStringList& langList(helpEngine->customFilters());
+		for (QStringList::const_iterator it = langList.constBegin(); it != langList.constEnd(); ++it)
+		{
+			const QString& availableLang(*it);
+			if (reqLang.startsWith(availableLang))
+			{
+				helpEngine->setCurrentFilter(availableLang);
+				this->language = availableLang;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void HelpViewer::showHelp(helpType type)

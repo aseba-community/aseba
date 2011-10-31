@@ -45,12 +45,13 @@ namespace Aseba
 			LANGUAGE
 		};
 
-		static QString DEFAULT_LANGUAGE;
+		static const QString DEFAULT_LANGUAGE;
 
-		void setLanguage(QString lang = DEFAULT_LANGUAGE);
+		void setLanguage(const QString& lang = DEFAULT_LANGUAGE);
 		void showHelp(helpType type);
 
 	protected:
+		bool selectLanguage(const QString& reqLang);
 		bool readSettings();
 		void writeSettings();
 
