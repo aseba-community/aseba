@@ -25,6 +25,7 @@
 #include <string>
 #include <cassert>
 #include <cstdlib>
+#include "../common/types.h"
 
 namespace Aseba
 {
@@ -98,6 +99,12 @@ namespace Aseba
 	
 	//! Transform a UTF8 string into a wstring, this function is thread-safe
 	std::wstring UTF8ToWString(const std::string& s);
+	
+	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a wstring
+	uint16 crcXModem(const uint16 oldCrc, const std::wstring& s);
+	
+	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a uint16 value
+	uint16 crcXModem(const uint16 oldCrc, const uint16 v);
 	
 	/*@}*/
 	
