@@ -2,6 +2,18 @@ find_package(Qt4)
 
 set(DOC_NAME aseba-doc)
 
+# file(TO_NATIVE_PATH ...) is broken with MSYS generator 
+# (http://www.kwwidgets.org/Bug/bug_view_advanced_page.php?bug_id=5939)
+# This is a replacement...
+# From : http://www.cmake.org/pipermail/cmake/2006-July/010180.html
+MACRO(MAKE_WINDOWS_PATH pathname)
+  # An extra \\ escape is necessary to get a \ through CMake's processing.
+  STRING(REPLACE "/" "\\" ${pathname} "${${pathname}}")
+  # Enclose with UNESCAPED quotes.  This means we need to escape our
+  # quotes once here, i.e. with \"
+  SET(${pathname} \"${${pathname}}\")
+ENDMACRO(MAKE_WINDOWS_PATH)
+
 if (QT4_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
@@ -25,13 +37,29 @@ if (QT4_FOUND)
 	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message("-- qcollectiongenerator executable found")
 		# all the process should be done in ${CMAKE_CURRENT_SOURCE_DIR}, then the binary files are moved to ${CMAKE_CURRENT_BINARY_DIR}
-		add_custom_command(
-			OUTPUT ${DOC_NAME}.qhc ${DOC_NAME}.qch
-			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc
-			COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch ${CMAKE_CURRENT_BINARY_DIR}
-			COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc ${CMAKE_CURRENT_BINARY_DIR}
-			MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
-		add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
+		set(SOURCE_QCH "${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch")
+		set(SOURCE_QHC "${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc")
+		set(DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+		if (WIN32)
+			MAKE_WINDOWS_PATH(SOURCE_QCH)
+			MAKE_WINDOWS_PATH(SOURCE_QHC)
+			MAKE_WINDOWS_PATH(DEST_DIR)
+			add_custom_command(
+				OUTPUT ${DOC_NAME}.qhc ${DOC_NAME}.qch
+				COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc
+				COMMAND move "${SOURCE_QCH}" "${DEST_DIR}"
+				COMMAND move "${SOURCE_QHC}" "${DEST_DIR}"
+				MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+			add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
+		else (WIN32)
+			add_custom_command(
+				OUTPUT ${DOC_NAME}.qhc ${DOC_NAME}.qch
+				COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc
+				COMMAND mv "${SOURCE_QCH}" "${DEST_DIR}"
+				COMMAND mv "${SOURCE_QHC}" "${DEST_DIR}"
+				MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+			add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
+		endif (WIN32)
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
 	set(studio_SRCS
