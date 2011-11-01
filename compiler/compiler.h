@@ -29,6 +29,8 @@
 #include <utility>
 #include <istream>
 
+#include "../common/types.h"
+
 namespace Aseba
 {
 	/**
@@ -89,6 +91,7 @@ namespace Aseba
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
 		TargetDescription() { variablesSize = bytecodeSize = stackSize = 0; }
+		uint16 crc() const;
 	};
 	
 	//! A bytecode element 

@@ -172,6 +172,7 @@ namespace Aseba
 		
 		void writeBytecode();
 		void reboot();
+		void saveBytecode();
 		
 		void setVariableValues(unsigned, const VariablesDataVector &);
 		void insertVariableName(const QModelIndex &);
@@ -435,6 +436,7 @@ namespace Aseba
 		QMenu *writeBytecodeMenu;
 		QAction *writeAllBytecodesAct;
 		QMenu *rebootMenu;
+		QMenu *saveBytecodeMenu;
 		QMenu *helpMenu;
 		
 		// Menu action that need dynamic reconnection

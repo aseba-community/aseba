@@ -266,6 +266,17 @@ namespace Aseba
 		return 0;
 	}
 	
+	VariablesDataVector TargetVariablesModel::getVariableValue(const QString& name) const
+	{
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			const Variable& variable(variables[i]);
+			if (variable.name == name)
+				return variable.value;
+		}
+		return VariablesDataVector();
+	}
+	
 	void TargetVariablesModel::updateVariablesStructure(const Compiler::VariablesMap *variablesMap)
 	{
 		// TODO: make this function more intelligent: keep track of unchanged variables

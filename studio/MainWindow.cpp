@@ -579,6 +579,61 @@ namespace Aseba
 		target->reboot(id);
 	}
 	
+	static void write16(QIODevice& dev, const uint16 v)
+	{
+		dev.write((const char*)&v, 2);
+	}
+	
+	static void write16(QIODevice& dev, const VariablesDataVector& data, const char *varName)
+	{
+		if (data.empty())
+		{
+			std::cerr << "Warning, cannot find " << varName << " required to save bytecode, using 0" << std::endl;
+			write16(dev, 0);
+		}
+		else
+			dev.write((const char *)&data[0], 2);
+	}
+	
+	static uint16 crcXModem(const uint16 oldCrc, const QString& s)
+	{
+		return crcXModem(oldCrc, s.toStdWString());
+	}
+
+	void NodeTab::saveBytecode()
+	{
+		const QString& nodeName(target->getName(id));
+		QString bytecodeFileName = QFileDialog::getSaveFileName(this, tr("Save the binary code of %0").arg(nodeName), "", "Aseba Binary Object (*.abo);;All Files (*)");
+		
+		QFile file(bytecodeFileName);
+		if (!file.open(QFile::WriteOnly | QFile::Truncate))
+			return;
+		
+		// See AS001 at https://aseba.wikidot.com/asebaspecifications
+		
+		// header
+		const char* magic = "ABO";
+		file.write(magic, 4);
+		write16(file, 0); // binary format version
+		write16(file, ASEBA_PROTOCOL_VERSION);
+		write16(file, vmMemoryModel->getVariableValue("_productId"), "product identifier (_productId)");
+		write16(file, vmMemoryModel->getVariableValue("_fwversion"), "firmware version (_fwversion)");
+		write16(file, id);
+		write16(file, crcXModem(0, nodeName));
+		write16(file, target->getDescription(id)->crc());
+		
+		// bytecode
+		write16(file, bytecode.size());
+		uint16 crc(0);
+		for (size_t i = 0; i < bytecode.size(); ++i)
+		{
+			const uint16 bc(bytecode[i]);
+			write16(file, bc);
+			crc = crcXModem(crc, bc);
+		}
+		write16(file, crc);
+	}
+	
 	void NodeTab::setVariableValues(unsigned index, const VariablesDataVector &values)
 	{
 		target->setVariables(id, index, values);
@@ -2461,6 +2516,7 @@ namespace Aseba
 	{
 		writeBytecodeMenu->clear();
 		rebootMenu->clear();
+		saveBytecodeMenu->clear();
 		
 		unsigned activeVMCount(0);
 		for (int i = 0; i < nodes->count(); i++)
@@ -2469,10 +2525,12 @@ namespace Aseba
 			if (tab)
 			{
 				QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
-				
 				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
 				
 				rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
+				
+				act = saveBytecodeMenu->addAction(tr("...of %0").arg(target->getName(tab->nodeId())),tab, SLOT(saveBytecode()));
+				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
 				
 				++activeVMCount;
 			}
@@ -2701,6 +2759,8 @@ namespace Aseba
 		toolMenu->addMenu(writeBytecodeMenu);
 		rebootMenu = new QMenu(tr("Reboot..."));
 		toolMenu->addMenu(rebootMenu);
+		saveBytecodeMenu = new QMenu(tr("Save the binary code..."));
+		toolMenu->addMenu(saveBytecodeMenu);
 		
 		// Settings
 		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);

@@ -19,8 +19,9 @@
 */
 
 #include "compiler.h"
-#include "../common/consts.h"
 #include "tree.h"
+#include "../common/consts.h"
+#include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include <cassert>
 #include <cstdlib>
@@ -35,6 +36,34 @@ namespace Aseba
 {
 	/** \addtogroup compiler */
 	/*@{*/
+	
+	//! Compute the XModem CRC of the description, as defined in AS001 at https://aseba.wikidot.com/asebaspecifications
+	uint16 TargetDescription::crc() const
+	{
+		uint16 crc(0);
+		crc = crcXModem(crc, bytecodeSize);
+		crc = crcXModem(crc, variablesSize);
+		crc = crcXModem(crc, stackSize);
+		for (size_t i = 0; i < namedVariables.size(); ++i)
+		{
+			crc = crcXModem(crc, namedVariables[i].size);
+			crc = crcXModem(crc, namedVariables[i].name);
+		}
+		for (size_t i = 0; i < localEvents.size(); ++i)
+		{
+			crc = crcXModem(crc, localEvents[i].name);
+		}
+		for (size_t i = 0; i < nativeFunctions.size(); ++i)
+		{
+			crc = crcXModem(crc, nativeFunctions[i].name);
+			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); ++j)
+			{
+				crc = crcXModem(crc, nativeFunctions[i].parameters[j].size);
+				crc = crcXModem(crc, nativeFunctions[i].parameters[j].name);
+			}
+		}
+		return crc;
+	}
 	
 	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
 	Compiler::Compiler()

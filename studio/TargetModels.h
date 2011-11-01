@@ -95,7 +95,7 @@ namespace Aseba
 		const QList<Variable>& getVariables() const { return variables; }
 		unsigned getVariablePos(const QString& name) const;
 		unsigned getVariableSize(const QString& name) const;
-		
+		VariablesDataVector getVariableValue(const QString& name) const;
 		
 	public slots:
 		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
