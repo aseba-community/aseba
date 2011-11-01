@@ -2426,7 +2426,11 @@ namespace Aseba
 		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
 		
 		// help viewer
-		helpViewer.setLanguage(target->getLanguage().left(2));
+		QString lang = target->getLanguage().left(2);
+		if (lang != "")
+			helpViewer.setLanguage();
+		else
+			helpViewer.setLanguage(QLocale::system().name());
 		connect(this, SIGNAL(MainWindowClosed()), &helpViewer, SLOT(close()));
 	}
 	
