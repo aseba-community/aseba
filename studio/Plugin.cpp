@@ -61,6 +61,16 @@ namespace Aseba
 		return nodeTab->vmMemoryModel;
 	}
 	
+	void InvasivePlugin::blockWrite()
+	{
+		nodeTab->target->blockWrite();
+	}
+	
+	void InvasivePlugin::unblockWrite()
+	{
+		nodeTab->target->unblockWrite();
+	}
+	
 	//! Create an instance of C, passing node to its constructor
 	template<typename C>
 	NodeToolInterface* createInstance(NodeTab* node)

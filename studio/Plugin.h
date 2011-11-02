@@ -55,6 +55,8 @@ namespace Aseba
 		Target * getTarget();
 		unsigned getNodeId();
 		TargetVariablesModel * getVariablesModel();
+		void blockWrite();
+		void unblockWrite();
 	};
 	
 	//! A tool that is specific to a node

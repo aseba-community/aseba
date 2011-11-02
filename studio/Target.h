@@ -154,6 +154,15 @@ namespace Aseba
 		
 		//! Remove all breakpoints in a node
 		virtual void clearBreakpoints(unsigned node) = 0;
+	
+	protected:
+		friend class InvasivePlugin;
+		
+		//! Block all write operations, used by invasive plugins when they do something hacky with the underlying data stream
+		virtual void blockWrite() = 0;
+		
+		//! Unblock write operatinos, used by invasive plugins when they do something hacky with the underlying data stream
+		virtual void unblockWrite() = 0;
 	};
 	
 	/*@}*/

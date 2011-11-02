@@ -146,6 +146,7 @@ namespace Aseba
 		SignalingDescriptionsManager descriptionManager;
 		NodesMap nodes;
 		QTimer userEventsTimer;
+		bool writeBlocked; //!< true if write is being blocked by invasive plugins, false if write is allowed
 		
 	public:
 		friend class InvasivePlugin;
@@ -176,6 +177,10 @@ namespace Aseba
 		virtual void setBreakpoint(unsigned node, unsigned line);
 		virtual void clearBreakpoint(unsigned node, unsigned line);
 		virtual void clearBreakpoints(unsigned node);
+	
+	protected:
+		virtual void blockWrite();
+		virtual void unblockWrite();
 	
 	protected slots:
 		void updateUserEvents();
