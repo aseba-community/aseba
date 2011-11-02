@@ -91,6 +91,7 @@ namespace Aseba
 		flashButton->setEnabled(true);
 		lineEdit->setEnabled(true);
 
+		blockWrite();
 		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
 		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
 
@@ -98,6 +99,7 @@ namespace Aseba
 
 		disconnect(target, SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
 		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		unblockWrite();
 		
 		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
 		if(delete_myself)
