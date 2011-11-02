@@ -2428,7 +2428,7 @@ namespace Aseba
 		// help viewer
 		QString lang = target->getLanguage().left(2);
 		if (lang != "")
-			helpViewer.setLanguage();
+			helpViewer.setLanguage(lang);
 		else
 			helpViewer.setLanguage(QLocale::system().name());
 		connect(this, SIGNAL(MainWindowClosed()), &helpViewer, SLOT(close()));
