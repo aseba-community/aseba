@@ -156,7 +156,7 @@ namespace Aseba
 		virtual void clearBreakpoints(unsigned node) = 0;
 	
 	protected:
-		friend class InvasivePlugin;
+		friend class ThymioBootloaderDialog;
 		
 		//! Block all write operations, used by invasive plugins when they do something hacky with the underlying data stream
 		virtual void blockWrite() = 0;

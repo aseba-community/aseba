@@ -91,15 +91,16 @@ namespace Aseba
 		flashButton->setEnabled(true);
 		lineEdit->setEnabled(true);
 
-		blockWrite();
+		target->blockWrite();
 		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
 		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
 
 		exec();
+		// Note that now nodeTab is not valid anymore
 
 		disconnect(target, SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
 		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
-		unblockWrite();
+		target->unblockWrite();
 		
 		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
 		if(delete_myself)
@@ -241,9 +242,15 @@ namespace Aseba
 		BootloaderReset msg(nodeId);
 		msg.serialize(stream);
 		stream->flush();
-
-	//	QTest::qSleep(10); // Fixme HACK
-
+		
+		// send GetDescription 100 ms later
+		startTimer(100);
+	}
+	
+	void ThymioBootloaderDialog::timerEvent(QTimerEvent *event)
+	{
+		killTimer(event->timerId());
+		
 		GetDescription message;
 		message.serialize(stream);
 		stream->flush();
