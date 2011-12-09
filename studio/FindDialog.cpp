@@ -107,6 +107,11 @@ namespace Aseba
 		connect(replaceAllButton, SIGNAL(clicked()), SLOT(replaceAll()));
 	}
 	
+	void FindDialog::setFindText(const QString& text)
+	{
+		findLineEdit->setText(text);
+	}
+	
 	void FindDialog::findNext()
 	{
 		find(editor->textCursor(), QTextDocument::FindFlag(0));

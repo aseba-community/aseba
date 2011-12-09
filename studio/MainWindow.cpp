@@ -1542,6 +1542,9 @@ namespace Aseba
 	
 	void MainWindow::findTriggered()
 	{
+		ScriptTab* tab = dynamic_cast<ScriptTab*>(nodes->currentWidget());
+		if (tab && tab->editor->textCursor().hasSelection())
+			findDialog->setFindText(tab->editor->textCursor().selectedText());
 		findDialog->replaceGroupBox->setChecked(false);
 		findDialog->show();
 	}
