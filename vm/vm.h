@@ -171,6 +171,13 @@ void AsebaResetIntoBootloader(AsebaVMState *vm);
 /*! Called by AsebaVMDebugMessage when VM must put to node in deep sleep. Write an empty function to leave feature unsupported */
 void AsebaPutVmToSleep(AsebaVMState *vm);
 
+/*! Called by AsebaVMDebugMessage when VM is going to be run */
+void __attribute__((weak)) AsebaVMRunCB(AsebaVMState *vm);
+
+/*! Called by AsebaVMEmitNodeSpecificError to be notified when VM hit an execution error
+	Is also called for wrong array access or division by 0 with message == NULL */
+void __attribute__((weak)) AsebaVMErrorCB(AsebaVMState *vm, const char* message);
+
 // Function optionally implemented
 
 #ifdef ASEBA_ASSERT
