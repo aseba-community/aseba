@@ -62,7 +62,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="128"/>
         <source>Cancel</source>
-        <translation>Löschen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="133"/>
