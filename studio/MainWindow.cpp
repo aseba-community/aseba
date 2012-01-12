@@ -1419,7 +1419,7 @@ namespace Aseba
 	
 	void MainWindow::exportMemoriesContent()
 	{
-		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memories content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
 		
 		QFile file(exportFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -1451,7 +1451,7 @@ namespace Aseba
 	
 	void MainWindow::importMemoriesContent()
 	{
-		QString importFileName = QFileDialog::getOpenFileName(this, tr("Import memories content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		QString importFileName = QFileDialog::getOpenFileName(this, tr("Import memory content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
 		
 		QFile file(importFileName);
 		if (!file.open(QFile::ReadOnly))
@@ -2676,7 +2676,7 @@ namespace Aseba
 		connect(commentAct, SIGNAL(triggered()), SLOT(commentTriggered()));
 
 		uncommentAct = new QAction(tr("Uncomment the selection"), this);
-		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Unomment the selection"));
+		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Uncomment the selection"));
 		connect(uncommentAct, SIGNAL(triggered()), SLOT(uncommentTriggered()));
 
 		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
