@@ -70,6 +70,7 @@ namespace Aseba
 	private:
 		void writePage(unsigned page, unsigned char * data);
 		void flashDone(void);
+		void timerEvent(QTimerEvent *event);
 		void closeEvent(QCloseEvent * event);
 	};
 	/*@}*/
