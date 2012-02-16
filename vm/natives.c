@@ -539,7 +539,6 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 };
 
 
-
 void AsebaNative_vecdot(AsebaVMState *vm)
 {
 	// variable pos
@@ -663,6 +662,53 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecstat =
 		{ 0, 0 }
 	}
 };
+
+
+void AsebaNative_vecargbounds(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 argmin = AsebaNativePopArg(vm);
+	uint16 argmax = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	sint16 min = 32767;
+	sint16 max = -32768;
+	sint16 val;
+	uint16 i;
+	
+	if (length)
+	{
+		for (i = 0; i < length; i++)
+		{
+			val = vm->variables[src++];
+			if (val < min)
+			{
+				min = val;
+				vm->variables[argmin] = i;
+			}
+			if (val > max)
+			{
+				max = val;
+				vm->variables[argmax] = i;
+			}
+		}
+	}
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecargbounds =
+{
+	"math.argbounds",
+	"get the indices (argmin, argmax) of the (minimum, maximum) values of src",
+	{
+		{ -1, "src" },
+		{ 1, "argmin" },
+		{ 1, "argmax" },
+		{ 0, 0 }
+	}
+};
+
 
 void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {

@@ -147,6 +147,11 @@ void AsebaNative_vecstat(AsebaVMState *vm);
 /*! Description of AsebaNative_vecstat */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecstat;
 
+/*! Function to get indices of the bounds of a vector */
+void AsebaNative_vecargbounds(AsebaVMState *vm);
+/*! Description of AsebaNative_vecargbounds */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecargbounds;
+
 /*! Function to perform dest = (a*b)/c in 32 bits */
 void AsebaNative_mathmuldiv(AsebaVMState *vm);
 /*! Description of AsebaNative_mathmuldiv */
@@ -204,6 +209,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	AsebaNative_vecmax, \
 	AsebaNative_vecdot, \
 	AsebaNative_vecstat, \
+	AsebaNative_vecargbounds, \
 	AsebaNative_mathmuldiv, \
 	AsebaNative_mathatan2, \
 	AsebaNative_mathsin, \
@@ -226,6 +232,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	&AsebaNativeDescription_vecmax, \
 	&AsebaNativeDescription_vecdot, \
 	&AsebaNativeDescription_vecstat, \
+	&AsebaNativeDescription_vecargbounds, \
 	&AsebaNativeDescription_mathmuldiv, \
 	&AsebaNativeDescription_mathatan2, \
 	&AsebaNativeDescription_mathsin, \
