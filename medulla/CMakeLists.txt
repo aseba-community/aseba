@@ -1,4 +1,6 @@
-find_package(Qt4 COMPONENTS QtCore QtDBus QtXml REQUIRED )
+if (NOT WIN32)
+	find_package(Qt4 COMPONENTS QtCore QtDBus QtXml REQUIRED )
+endif (NOT WIN32)
 
 if (QT4_FOUND AND QT_QTDBUS_FOUND)
 	set(QT_USE_QTDBUS ON)
