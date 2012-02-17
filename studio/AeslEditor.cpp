@@ -21,6 +21,7 @@
 #include "AeslEditor.h"
 #include "MainWindow.h"
 #include "CustomWidgets.h"
+#include "../utils/utils.h"
 #include <QtGui>
 
 #include <AeslEditor.moc>
@@ -93,7 +94,7 @@ namespace Aseba
 	
 	void AeslHighlighter::highlightBlock(const QString &text)
 	{
-		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(currentBlockUserData());
+		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(currentBlockUserData());
 		
 		// current line background blue
 		bool isActive = uData && uData->properties.contains("active");
@@ -106,6 +107,8 @@ namespace Aseba
 		QColor activeColor(220, 220, 255);
 		QColor errorColor(240, 100, 100);
 
+		/*
+		This code was disabled by Steph because it caused memory trash (see Valgrind output)
 		// use the QTextEdit::ExtraSelection class to highlight the background
 		// of special lines (breakpoints, active line,...)
 		QList<QTextEdit::ExtraSelection> extraSelections;
@@ -133,7 +136,28 @@ namespace Aseba
 		// we are done
 		extraSelections.append(selection);
 		editor->setExtraSelections(extraSelections);
-
+		
+		*/
+		
+		QColor specialBackground("white");
+		if (isBreakpointPending)
+			specialBackground = breakpointPendingColor;
+		if (isBreakpoint)
+			specialBackground = breakpointColor;
+		if (editor->debugging)
+		{
+			if (isActive)
+				specialBackground = activeColor;
+			if (isExecutionError)
+				specialBackground = errorColor;
+		}
+		if (specialBackground != "white")
+		{
+			QTextCharFormat format;
+			format.setBackground(specialBackground);
+			setFormat(0, text.length(), format);
+		}
+		
 		// syntax highlight
 		foreach (HighlightingRule rule, highlightingRules)
 		{
@@ -143,12 +167,15 @@ namespace Aseba
 			{
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
+				
+				if (specialBackground != "white")
+					format.setBackground(specialBackground);
+				
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
 			}
 		}
 		
-
 		// Prepare the format for multilines comment block
 		int index;
 		QTextCharFormat format = commentBlockRules.format;
@@ -518,7 +545,7 @@ namespace Aseba
 			
 			// check for breakpoint
 			QTextBlock block = cursorForPosition(e->pos()).block();
-			//AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			//AeslEditorUserData *uData = polymorphic_downcast<AeslEditorUserData *>(block.userData());
 			bool breakpointPresent = isBreakpoint(block);
 			
 			// add action
@@ -563,7 +590,7 @@ namespace Aseba
 
 	bool AeslEditor::isBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
 	}
 
@@ -593,7 +620,7 @@ namespace Aseba
 
 	void AeslEditor::setBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 		if (!uData)
 		{
 			// create user data
@@ -612,7 +639,7 @@ namespace Aseba
 
 	void AeslEditor::clearBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 		uData->properties.remove("breakpointPending");
 		uData->properties.remove("breakpoint");
 		if (uData->properties.isEmpty())
@@ -627,7 +654,7 @@ namespace Aseba
 	{
 		for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
 		{
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(it.userData());
+			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(it.userData());
 			if (uData)
 			{
 				uData->properties.remove("breakpoint");

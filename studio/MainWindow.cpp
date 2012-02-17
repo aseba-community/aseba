@@ -783,7 +783,7 @@ namespace Aseba
 				QTextBlock textBlock = editor->document()->findBlock(errorPos);
 				int posInBlock = errorPos - textBlock.position();
 				if (textBlock.userData())
-					static_cast<AeslEditorUserData *>(textBlock.userData())->properties["errorPos"] = posInBlock;
+					polymorphic_downcast<AeslEditorUserData *>(textBlock.userData())->properties["errorPos"] = posInBlock;
 				else
 					textBlock.setUserData(new AeslEditorUserData("errorPos", posInBlock));
 				doRehighlight = true;
@@ -965,7 +965,7 @@ namespace Aseba
 		unsigned lineCounter = 0;
 		while (block != editor->document()->end())
 		{
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 			if (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending")))
 				target->setBreakpoint(id, lineCounter);
 			block = block.next();
@@ -981,7 +981,7 @@ namespace Aseba
 		unsigned lineCounter = 0;
 		while (block != editor->document()->end())
 		{
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 			if (lineCounter == line)
 			{
 				// set propety
@@ -1032,7 +1032,7 @@ namespace Aseba
 		{
 			if (lineCounter == line)
 			{
-				AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+				AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 				if (uData && uData->properties.contains(property))
 				{
 					uData->properties.remove(property);
@@ -1059,7 +1059,7 @@ namespace Aseba
 		QTextBlock block = editor->document()->begin();
 		while (block != editor->document()->end())
 		{
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 			if (uData && uData->properties.contains(property))
 			{
 				uData->properties.remove(property);
@@ -1081,7 +1081,7 @@ namespace Aseba
 		QTextBlock block = editor->document()->begin();
 		while (block != editor->document()->end())
 		{
-			AeslEditorUserData *uData = static_cast<AeslEditorUserData *>(block.userData());
+			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
 			if (uData && uData->properties.contains(oldProperty))
 			{
 				uData->properties.remove(oldProperty);
@@ -1295,7 +1295,7 @@ namespace Aseba
 			
 			// update recent files
 			updateRecentFiles(fileName);
-			regenerateOpenRecentMenu();
+			regenerateOpenRecentMenu(fileName);
 			
 			recompileAll();
 		
@@ -2495,15 +2495,31 @@ namespace Aseba
 		connect(target, SIGNAL(breakpointSetResult(unsigned, unsigned, bool)), SLOT(breakpointSetResult(unsigned, unsigned, bool)));
 	}
 	
-	void MainWindow::regenerateOpenRecentMenu()
+	void MainWindow::regenerateOpenRecentMenu(const QString& keepName)
 	{
-		openRecentMenu->clear();
+		// Note: we cannot use openRecentMenu->clear() because removing an action being processed might result in a segfault
+		// Therefore we have this ugly and complicated code :-(
+		typedef QList<QAction *> ActionList;
+		ActionList oldActions(openRecentMenu->actions());
+		for (ActionList::iterator it(oldActions.begin()); it != oldActions.end(); ++it)
+		{
+			QAction *act(*it);
+			if (act->text() != keepName)
+			{
+				openRecentMenu->removeAction(act);
+				act->deleteLater();
+			}
+		}
 		
+		// Add all other actions excepted the one we are processing
 		QSettings settings;
 		QStringList recentFiles = settings.value("recent files").toStringList();
-		
 		for (int i = 0; i < recentFiles.size(); i++)
-			openRecentMenu->addAction(recentFiles.at(i), this, SLOT(openRecentFile()));
+		{
+			const QString& fileName(recentFiles.at(i));
+			if (fileName != keepName)
+				openRecentMenu->addAction(fileName, this, SLOT(openRecentFile()));
+		}
 	}
 	
 	void MainWindow::updateRecentFiles(const QString& fileName)

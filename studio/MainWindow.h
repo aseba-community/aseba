@@ -376,7 +376,7 @@ namespace Aseba
 		bool askUserBeforeDiscarding();
 		
 		// gui initialisation code
-		void regenerateOpenRecentMenu();
+		void regenerateOpenRecentMenu(const QString& keepName = "");
 		void updateRecentFiles(const QString& fileName);
 		void regenerateToolsMenus();
 		void regenerateHelpMenu();
