@@ -1295,7 +1295,7 @@ namespace Aseba
 			
 			// update recent files
 			updateRecentFiles(fileName);
-			regenerateOpenRecentMenu(fileName);
+			regenerateOpenRecentMenu();
 			
 			recompileAll();
 		
@@ -2495,21 +2495,9 @@ namespace Aseba
 		connect(target, SIGNAL(breakpointSetResult(unsigned, unsigned, bool)), SLOT(breakpointSetResult(unsigned, unsigned, bool)));
 	}
 	
-	void MainWindow::regenerateOpenRecentMenu(const QString& keepName)
+	void MainWindow::regenerateOpenRecentMenu()
 	{
-		// Note: we cannot use openRecentMenu->clear() because removing an action being processed might result in a segfault
-		// Therefore we have this ugly and complicated code :-(
-		typedef QList<QAction *> ActionList;
-		ActionList oldActions(openRecentMenu->actions());
-		for (ActionList::iterator it(oldActions.begin()); it != oldActions.end(); ++it)
-		{
-			QAction *act(*it);
-			if (act->text() != keepName)
-			{
-				openRecentMenu->removeAction(act);
-				act->deleteLater();
-			}
-		}
+		openRecentMenu->clear();
 		
 		// Add all other actions excepted the one we are processing
 		QSettings settings;
@@ -2517,8 +2505,7 @@ namespace Aseba
 		for (int i = 0; i < recentFiles.size(); i++)
 		{
 			const QString& fileName(recentFiles.at(i));
-			if (fileName != keepName)
-				openRecentMenu->addAction(fileName, this, SLOT(openRecentFile()));
+			openRecentMenu->addAction(fileName, this, SLOT(openRecentFile()));
 		}
 	}
 	
