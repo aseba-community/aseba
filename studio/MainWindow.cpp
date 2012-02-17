@@ -725,7 +725,7 @@ namespace Aseba
 			QString name(vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString());
 			bool hidden(false);
 			if (
-				(showHidden && (name.at(0) == '_' || name.contains(QString("._")))) ||
+				(!showHidden && (name.at(0) == '_' || name.contains(QString("._")))) ||
 				(!filterString.isEmpty() && !name.contains(filterString))
 			)
 				hidden = true;
