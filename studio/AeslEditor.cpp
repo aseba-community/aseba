@@ -505,7 +505,14 @@ namespace Aseba
 			}
 			else if (dropSourceWidget == nodeTab->vmMemoryView)
 			{
-				midfix = " ";
+				const std::wstring varName = source->text().toStdWString();
+				if (nodeTab->vmMemoryModel->getVariableSize(QString::fromStdWString(varName)) > 1)
+				{
+					midfix = "[";
+					postfix = "] ";
+				}
+				else
+					midfix = " ";
 			}
 			else if (dropSourceWidget == nodeTab->vmLocalEvents)
 			{

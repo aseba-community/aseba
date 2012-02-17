@@ -182,7 +182,7 @@ namespace Aseba
 		else
 		{
 			if (index.parent().isValid())
-				return Qt::ItemIsEnabled;
+				return Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable;
 			else
 				return Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable;
 		}
@@ -234,8 +234,14 @@ namespace Aseba
 		{
 			if (index.isValid())
 			{
-				QString text = data(index, Qt::DisplayRole).toString();
-				texts += text;
+				const QString text = data(index, Qt::DisplayRole).toString();
+				if (index.parent().isValid())
+				{
+					const QString varName = data(index.parent(), Qt::DisplayRole).toString();
+					texts += varName + "[" + text + "]";
+				}
+				else
+					texts += text;
 			}
 		}
 		
