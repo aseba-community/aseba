@@ -194,12 +194,13 @@ namespace Aseba
 		void breakpointSetResult(unsigned line, bool success);
 		
 		void closePlugins();
+		
+		void updateHidden();
 	
 	private:
 		void rehighlight();
 		void reSetBreakpoints();
-		void updateHidden();
-
+		
 		// editor properties code
 		bool setEditorProperty(const QString &property, const QVariant &value, unsigned line, bool removeOld = false);
 		bool clearEditorProperty(const QString &property, unsigned line);
@@ -232,6 +233,7 @@ namespace Aseba
 		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
+		QLineEdit *vmMemoryFilter;
 		
 		TargetFunctionsModel *vmFunctionsModel;
 		QTreeView *vmFunctionsView;

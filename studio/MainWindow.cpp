@@ -419,6 +419,13 @@ namespace Aseba
 		memorySubLayout->addWidget(refreshMemoryButton);
 		memoryLayout->addLayout(memorySubLayout);
 		memoryLayout->addWidget(vmMemoryView);
+		memorySubLayout = new QHBoxLayout;
+		QLabel* filterLabel(new QLabel(tr("F&ilter:")));
+		memorySubLayout->addWidget(filterLabel);
+		vmMemoryFilter= new QLineEdit;
+		filterLabel->setBuddy(vmMemoryFilter);
+		memorySubLayout->addWidget(vmMemoryFilter);
+		memoryLayout->addLayout(memorySubLayout);
 		
 		// functions
 		vmFunctionsView = new QTreeView;
@@ -495,6 +502,7 @@ namespace Aseba
 		
 		// memory
 		connect(vmMemoryModel, SIGNAL(variableValuesChanged(unsigned, const VariablesDataVector &)), SLOT(setVariableValues(unsigned, const VariablesDataVector &)));
+		connect(vmMemoryFilter, SIGNAL(textChanged(const QString &)), SLOT(updateHidden()));
 		
 		// editor
 		connect(editor, SIGNAL(textChanged()), SLOT(editorContentChanged()));
@@ -710,13 +718,18 @@ namespace Aseba
 
 	void NodeTab::updateHidden() 
 	{
+		const QString& filterString(vmMemoryFilter->text());
 		// Quick hack to hide hidden variable in the treeview and not in vmMemoryModel
 		for(int i = 0; i < vmMemoryModel->rowCount(QModelIndex()); i++) 
 		{
-			QString name;
-			name = vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString();
-			if(name.at(0) == '_' || name.contains(QString("._")))
-				vmMemoryView->setRowHidden(i,QModelIndex(), !showHidden);
+			QString name(vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString());
+			bool hidden(false);
+			if (
+				(showHidden && (name.at(0) == '_' || name.contains(QString("._")))) ||
+				(!filterString.isEmpty() && !name.contains(filterString))
+			)
+				hidden = true;
+			vmMemoryView->setRowHidden(i,QModelIndex(), hidden);
 		}
 
 	}
