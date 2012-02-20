@@ -39,7 +39,7 @@ def get_structure(lang):
     """Return the tree corresponding to a specific language"""
     return __structure__[lang]
 
-def insert(title, url, breadcrumbs):
+def insert(title, url, breadcrumbs = set()):
     """Insert a page into the current tree
 
     Set the current language using the 'set_current_language()' function."""
