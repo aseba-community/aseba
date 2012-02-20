@@ -285,8 +285,56 @@ namespace Aseba
 	
 	void TargetVariablesModel::updateVariablesStructure(const Compiler::VariablesMap *variablesMap)
 	{
-		// TODO: make this function more intelligent: keep track of unchanged variables
-		variables.clear();
+		// Build a new list of variables
+		QList<Variable> newVariables;
+		for (Compiler::VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
+		{
+			// create new variable
+			Variable var;
+			var.name = QString::fromStdWString(it->first);
+			var.pos = it->second.first;
+			var.value.resize(it->second.second);
+			
+			// find its right place in the array
+			int i;
+			for (i = 0; i < newVariables.size(); ++i)
+			{
+				if (var.pos < newVariables[i].pos)
+					break;
+			}
+			newVariables.insert(i, var);
+		}
+		
+		// compute the difference
+		int i(0);
+		int count(std::min(variables.length(), newVariables.length()));
+		while (
+			i < count && 
+			variables[i].name == newVariables[i].name && 
+			variables[i].pos == newVariables[i].pos &&
+			variables[i].value.size() == newVariables[i].value.size()
+		)
+			++i;
+		
+		// update starting from the first change point
+		//qDebug() << "change from " << i << " to " << variables.length();
+		if (i != variables.length())
+		{
+			beginRemoveRows(QModelIndex(), i, variables.length()-1);
+			int removeCount(variables.length() - i);
+			for (int j = 0; j < removeCount; ++j)
+				variables.removeLast();
+			endRemoveRows();
+		}
+		
+		//qDebug() << "size: " << variables.length();
+		
+		beginInsertRows(QModelIndex(), i, newVariables.length()-1);
+		for (int j = i; j < newVariables.length(); ++j)
+			variables.append(newVariables[j]);
+		endInsertRows();
+
+		/*variables.clear();
 		for (Compiler::VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
 		{
 			// create new variable
@@ -305,7 +353,7 @@ namespace Aseba
 			variables.insert(i, var);
 		}
 		
-		reset();
+		reset();*/
 	}
 	
 	void TargetVariablesModel::setVariablesData(unsigned start, const VariablesDataVector &data)
