@@ -46,6 +46,10 @@ img{
 	border-width: 0px;
 }
 
+img.inline-math{
+	vertical-align: middle;
+}
+
 td {
 	text-align: left;
 }

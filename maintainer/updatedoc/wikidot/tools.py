@@ -29,6 +29,21 @@ import wikidot.debug
 import wikidot.structure
 from wikidot.urltoname import urltoname
 from wikidot.parser import WikidotParser
+import wikidot.tex2png
+
+def __fix_breadcrumbs__(breadcrumbs, toplevel):
+    # check if toplevel is part of the breadcrumbs,
+    # and rebase the basecrumb on this level
+    if toplevel == '':
+        return breadcrumbs
+    output = list()
+    output_enable = False
+    for bc in breadcrumbs:
+        if output_enable:
+            output.append(bc)
+        if toplevel in bc:
+            output_enable = True
+    return output
 
 def fetchurl(page, offline_name, breadcrumbs = ''):
     """Given a wikidot URL, fetch it, convert it and store it locally.
@@ -50,6 +65,9 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
     except urllib2.URLError, e:
         print >> sys.stderr, e.reason
     else:
+        retval = dict()
+        retval['links'] = set()
+        retval['breadcrumbs'] = list()
         # Check MIME type
         mime = mimetypes.guess_type(page)[0]
         if (mime == None) or ('html' in mime):
@@ -59,41 +77,34 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
             parser = WikidotParser()
             parser.feed(response.read())
             # Test if the breadcrumbs links to the main page
-            breadcrumbs_valid = False
             page_breadcrumbs = parser.get_breadcrumbs()
-            if (breadcrumbs == ''):
-                # Ok, no main page given
-                breadcrumbs_valid = True
-            elif (len(page_breadcrumbs) > 0) and (breadcrumbs in page_breadcrumbs[0]):
-                # Ok
-                breadcrumbs_valid = True
-
-            if breadcrumbs_valid == True:
+            page_breadcrumbs = __fix_breadcrumbs__(page_breadcrumbs, breadcrumbs)
+            retval['breadcrumbs'].extend(page_breadcrumbs)
+            if (breadcrumbs == '') or (len(page_breadcrumbs) > 0):
                 # Ok, page valid
-                wikidot.structure.insert(parser.get_title(), page, page_breadcrumbs)
+                wikidot.structure.insert(parser.get_title(), page, page_breadcrumbs if breadcrumbs != '' else set())
                 data = parser.get_doc()
-                links = parser.get_links()
+                retval['links'] = parser.get_links()
             else:
                 # Page is not linked to the main page
                 print >> sys.stderr, "*** Page is not part of the documentation. Page skipped."
-                return set()
+                return retval
         elif ('image' in mime):
             # Image
             data = response.read()
-            links = set()
         else:
             # Type is not supported
             if wikidot.debug.ENABLE_DEBUG == True:
                 print >> sys.stderr, "*** This is not a supported type of file. File skipped."
-            return set()
+            return retval
         # Save
         print >> sys.stderr, "Saving the result to {}...".format(offline_name)
         f = open(offline_name, 'w')
         f.write(data)
         f.close()
         if wikidot.debug.ENABLE_DEBUG == True:
-            print >> sys.stderr, "***DEBUG: links: ", links
-        return links
+            print >> sys.stderr, "***DEBUG: links: ", reval['links']
+        return retval
 
 def tidy(directory):
     html_files = [x for x in os.listdir(directory) if '.html' in x]
@@ -102,3 +113,20 @@ def tidy(directory):
         filename = os.path.join(directory, x)
         print >> sys.stderr, "Processing ", filename
         retcode = subprocess.call(["tidy","-config", "wikidot/tidy.config", "-q", "-o", filename, filename])
+
+def fix_latex(directory):
+    """Given a directory, convert LaTeX code to PNG images for every HTML file.
+
+    Inputs:
+        directory:      Source directory
+
+    Output:
+        No output."""
+
+    html_files = [x for x in os.listdir(directory) if '.html' in x]
+    print >> sys.stderr, "\nConverting LaTeX equations embedded in HTML files..."
+    for x in html_files:
+        filename = os.path.join(directory, x)
+        print >> sys.stderr, "Processing ", filename
+        wikidot.tex2png.from_html(filename, os.path.splitext(filename)[0])
+

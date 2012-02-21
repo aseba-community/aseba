@@ -27,6 +27,7 @@ import urlparse
 from wikidot.tools import fetchurl
 from wikidot.fixurl import fixurls
 from wikidot.tools import tidy
+from wikidot.tools import fix_latex
 from wikidot.urltoname import urltoname
 from wikidot.orderedset import OrderedSet
 
@@ -40,14 +41,20 @@ def fetchwikidot(starturl, outputdir):
 
     # Fetch root page
     output = os.path.join(outputdir, urltoname(starturl))
-    newlinks = fetchurl(starturl, output)
+    retval = fetchurl(starturl, output)
+    newlinks = retval['links']
+    breadcrumbs = retval['breadcrumbs']
+    # get the last element of the list
+    if len(breadcrumbs) > 0:
+        breadcrumbs = breadcrumbs[len(breadcrumbs)-1]
+    else:
+        breadcrumbs = ''
 
     # Create a set with fetched links (avoid loops...)
     links = OrderedSet(starturl)
 
     # Iterate on the links, and recursively download / convert
     fetchlinks = newlinks
-    breadcrumbs = os.path.basename(urlparse.urlparse(starturl).path)
     while len(fetchlinks) > 0:
         newlinks = OrderedSet()
         for url in fetchlinks:
@@ -56,7 +63,8 @@ def fetchwikidot(starturl, outputdir):
             print >> sys.stderr, "\nProcessing ", url
             # Link on the same server?
             if (urlparse.urlparse(url).netloc == urlparse.urlparse(starturl).netloc):
-                newlinks.update(fetchurl(url, output, breadcrumbs))
+                retval = fetchurl(url, output, breadcrumbs)
+                newlinks.update(retval['links'])
             else:
                 print >> sys.stderr, "*** {} is not on the same server. Link skipped.".format(url)
         # Update sets of links
@@ -68,6 +76,9 @@ def fetchwikidot(starturl, outputdir):
 
     # Clean HTML code
     tidy(outputdir)
+
+    # Convert equations to PNG
+    fix_latex(outputdir)
 
     # We are done
     print >> sys.stderr, "\nDone!"
