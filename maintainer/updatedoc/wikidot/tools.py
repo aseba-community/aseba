@@ -29,6 +29,7 @@ import wikidot.debug
 import wikidot.structure
 from wikidot.urltoname import urltoname
 from wikidot.parser import WikidotParser
+import wikidot.tex2png
 
 def __fix_breadcrumbs__(breadcrumbs, toplevel):
     # check if toplevel is part of the breadcrumbs,
@@ -112,3 +113,20 @@ def tidy(directory):
         filename = os.path.join(directory, x)
         print >> sys.stderr, "Processing ", filename
         retcode = subprocess.call(["tidy","-config", "wikidot/tidy.config", "-q", "-o", filename, filename])
+
+def fix_latex(directory):
+    """Given a directory, convert LaTeX code to PNG images for every HTML file.
+
+    Inputs:
+        directory:      Source directory
+
+    Output:
+        No output."""
+
+    html_files = [x for x in os.listdir(directory) if '.html' in x]
+    print >> sys.stderr, "\nConverting LaTeX equations embedded in HTML files..."
+    for x in html_files:
+        filename = os.path.join(directory, x)
+        print >> sys.stderr, "Processing ", filename
+        wikidot.tex2png.from_html(filename, os.path.splitext(filename)[0])
+

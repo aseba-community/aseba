@@ -27,6 +27,7 @@ import urlparse
 from wikidot.tools import fetchurl
 from wikidot.fixurl import fixurls
 from wikidot.tools import tidy
+from wikidot.tools import fix_latex
 from wikidot.urltoname import urltoname
 from wikidot.orderedset import OrderedSet
 
@@ -75,6 +76,9 @@ def fetchwikidot(starturl, outputdir):
 
     # Clean HTML code
     tidy(outputdir)
+
+    # Convert equations to PNG
+    fix_latex(outputdir)
 
     # We are done
     print >> sys.stderr, "\nDone!"
