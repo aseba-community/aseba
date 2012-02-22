@@ -329,10 +329,13 @@ namespace Aseba
 		
 		//qDebug() << "size: " << variables.length();
 		
-		beginInsertRows(QModelIndex(), i, newVariables.length()-1);
-		for (int j = i; j < newVariables.length(); ++j)
-			variables.append(newVariables[j]);
-		endInsertRows();
+		if (i != newVariables.length())
+		{
+			beginInsertRows(QModelIndex(), i, newVariables.length()-1);
+			for (int j = i; j < newVariables.length(); ++j)
+				variables.append(newVariables[j]);
+			endInsertRows();
+		}
 
 		/*variables.clear();
 		for (Compiler::VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
