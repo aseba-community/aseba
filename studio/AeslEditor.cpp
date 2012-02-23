@@ -107,8 +107,8 @@ namespace Aseba
 		QColor activeColor(220, 220, 255);
 		QColor errorColor(240, 100, 100);
 
-		/*
-		This code was disabled by Steph because it caused memory trash (see Valgrind output)
+		
+		//This code seemed to have caused trash at a point but we cannot reproduce them now
 		// use the QTextEdit::ExtraSelection class to highlight the background
 		// of special lines (breakpoints, active line,...)
 		QList<QTextEdit::ExtraSelection> extraSelections;
@@ -137,7 +137,9 @@ namespace Aseba
 		extraSelections.append(selection);
 		editor->setExtraSelections(extraSelections);
 		
-		*/
+		/*
+		
+		// This is backup code in case the ExtraSelection creates trashes
 		
 		QColor specialBackground("white");
 		if (isBreakpointPending)
@@ -157,6 +159,7 @@ namespace Aseba
 			format.setBackground(specialBackground);
 			setFormat(0, text.length(), format);
 		}
+		*/
 		
 		// syntax highlight
 		foreach (HighlightingRule rule, highlightingRules)
@@ -168,8 +171,10 @@ namespace Aseba
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
 				
+				/*
+				// This is backup code in case the ExtraSelection creates trashes
 				if (specialBackground != "white")
-					format.setBackground(specialBackground);
+					format.setBackground(specialBackground);*/
 				
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
