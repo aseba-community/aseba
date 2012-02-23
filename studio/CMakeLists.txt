@@ -20,6 +20,11 @@ if (QT4_FOUND)
 	set(QT_USE_QTMAIN ON)
 	set(QT_USE_QTHELP ON)
 	include(${QT_USE_FILE})
+
+	# add a console for debug messages under Windows
+	if (WIN32)
+		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-Wl,-subsystem,console ${CMAKE_EXE_LINKER_FLAGS}")
+	endif (WIN32)
 	
 	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)
 	find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
