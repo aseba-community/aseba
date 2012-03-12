@@ -9,10 +9,22 @@ install(TARGETS asebatest RUNTIME
 	LIBRARY DESTINATION lib
 )
 
+add_executable(aseba-test-natives-count
+	aseba-test-natives-count.cpp
+)
+
+target_link_libraries(aseba-test-natives-count asebavm)
+
+install(TARGETS aseba-test-natives-count RUNTIME
+	DESTINATION bin
+	LIBRARY DESTINATION lib
+)
+
 # set the number of test loops for the fuzzy test
 set(fuzzy_loop "500")
 
 # the following tests should succeed
+add_test(natives-count ${EXECUTABLE_OUTPUT_PATH}/aseba-test-natives-count)
 add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)
 add_test(advanced-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt)
 add_test(binary-op ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-op.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-op.txt)

@@ -196,6 +196,7 @@ void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 
+/*! Embedded targets must know the size of ASEBA_NATIVES_STD_FUNCTIONS without having to compute them by hand, please update this when adding a new function */
 #define ASEBA_NATIVES_STD_COUNT 20
 
 /*! snippet to include standard native functions */
