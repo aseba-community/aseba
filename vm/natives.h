@@ -196,6 +196,8 @@ void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 
+#define ASEBA_NATIVES_STD_COUNT 20
+
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
 	AsebaNative_veccopy, \
