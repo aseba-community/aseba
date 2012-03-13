@@ -272,7 +272,7 @@ void AsebaVMStep(AsebaVMState *vm)
 				buffer[1] = arraySize;
 				buffer[2] = variableIndex;
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
-				AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, 3);
+				AsebaSendMessageWords(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, 3);
 				break;
 			}
 			
