@@ -186,6 +186,13 @@ namespace Aseba
 		// set the number of allocated variables
 		allocatedVariablesCount = freeVariableIndex;
 		
+		if (dump)
+		{
+			const float fillPercentage = float(allocatedVariablesCount * 100.f) / float(targetDescription->variablesSize);
+			*dump << "Using " << allocatedVariablesCount << " on " << targetDescription->variablesSize << " (" << fillPercentage << " %) words of variable space\n";
+			*dump << "\n\n";
+		}
+		
 		// code generation
 		PreLinkBytecode preLinkBytecode;
 		program->emit(preLinkBytecode);
@@ -321,8 +328,8 @@ namespace Aseba
 		
 		// event table
 		const unsigned eventCount = eventAddr.size();
-		const float fillPrecentage = float(bytecode.size() * 100.f) / float(targetDescription->bytecodeSize);
-		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments (" << bytecode.size() << " words on " << targetDescription->bytecodeSize << ", " << fillPrecentage << "% filled):\n";
+		const float fillPercentage = float(bytecode.size() * 100.f) / float(targetDescription->bytecodeSize);
+		dump << "Disassembling " << eventCount + subroutineTable.size() << " segments (" << bytecode.size() << " words on " << targetDescription->bytecodeSize << ", " << fillPercentage << "% filled):\n";
 		
 		// bytecode
 		unsigned pc = eventCount*2 + 1;
