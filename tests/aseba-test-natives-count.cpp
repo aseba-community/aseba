@@ -1,5 +1,10 @@
 #include "../vm/natives.h"
 
+// this prevents a link problem when compiling in debug
+void AsebaSendMessage(AsebaVMState *vm, uint16 id, const void *data, uint16 size)
+{
+}
+
 int main(int argc, char*argv[])
 {
 	AsebaNativeFunctionPointer defaultNatives[] ={ ASEBA_NATIVES_STD_FUNCTIONS };
