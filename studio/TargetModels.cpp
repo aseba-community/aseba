@@ -174,7 +174,7 @@ namespace Aseba
 		{
 			if (index.parent().isValid())
 				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-			else if (variables.at(index.row()).value.size() == 1)
+			else if ((index.row() < variables.length()) && (variables.at(index.row()).value.size() == 1))
 				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
 			else
 				return 0;
