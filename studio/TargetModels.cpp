@@ -90,13 +90,16 @@ namespace Aseba
 	
 	QModelIndex TargetVariablesModel::index(int row, int column, const QModelIndex &parent) const
 	{
-		//if (!hasIndex(row, column, parent))
-		//	return QModelIndex();
-		
 		if (parent.isValid())
 			return createIndex(row, column, parent.row());
 		else
-			return createIndex(row, column, -1);
+		{
+			// top-level indices shall not point outside the variable array
+			if (row < 0 || row >= variables.length())
+				return QModelIndex();
+			else
+				return createIndex(row, column, -1);
+		}
 	}
 	
 	QModelIndex TargetVariablesModel::parent(const QModelIndex &index) const
@@ -174,7 +177,7 @@ namespace Aseba
 		{
 			if (index.parent().isValid())
 				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-			else if ((index.row() < variables.length()) && (variables.at(index.row()).value.size() == 1))
+			else if (variables.at(index.row()).value.size() == 1)
 				return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
 			else
 				return 0;
