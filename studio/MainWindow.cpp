@@ -768,7 +768,7 @@ namespace Aseba
 		if (compilationFuture.isRunning())
 			compilationDirty = true;
 		else
-		{	
+		{
 			bool dump(mainWindow->nodes->currentWidget() == this);
 			compilationFuture = QtConcurrent::run(compilationThread, *target->getDescription(id), *commonDefinitions, editor->toPlainText(), dump);
 			compilationWatcher.setFuture(compilationFuture);
@@ -788,6 +788,7 @@ namespace Aseba
 		if (compilationDirty)
 		{
 			recompile();
+			delete result;
 			return;
 		}
 		
