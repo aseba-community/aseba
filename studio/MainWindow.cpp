@@ -787,8 +787,8 @@ namespace Aseba
 		// as long as result is dirty, continue compilation
 		if (compilationDirty)
 		{
-			recompile();
 			delete result;
+			recompile();
 			return;
 		}
 		
