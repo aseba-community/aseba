@@ -35,6 +35,7 @@
 #include <iostream>
 #include <cassert>
 #include <QTabWidget>
+#include <QtConcurrentRun>
 
 #include <MainWindow.moc>
 #include <version.h>
@@ -237,11 +238,13 @@ namespace Aseba
 		id(id),
 		pid(ASEBA_PID_UNDEFINED),
 		target(target),
+		commonDefinitions(commonDefinitions),
 		mainWindow(mainWindow),
 		currentPC(0),
 		previousMode(Target::EXECUTION_UNKNOWN),
 		firstCompilation(true),
-		showHidden(mainWindow->showHiddenAct->isChecked())
+		showHidden(mainWindow->showHiddenAct->isChecked()),
+		compilationDirty(false)
 	{
 		// setup some variables
 		rehighlighting = false;
@@ -249,8 +252,6 @@ namespace Aseba
 		allocatedVariablesCount = 0;
 		
 		// create models
-		compiler.setTargetDescription(target->getDescription(id));
-		compiler.setCommonDefinitions(commonDefinitions);
 		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id));
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
@@ -270,6 +271,7 @@ namespace Aseba
 	
 	NodeTab::~NodeTab()
 	{
+		compilationFuture.waitForFinished();
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 		{
 			NodeToolInterface* tool(*it);
@@ -451,10 +453,10 @@ namespace Aseba
 		vmLocalEvents->setSelectionMode(QAbstractItemView::SingleSelection);
 		vmLocalEvents->setDragDropMode(QAbstractItemView::DragOnly);
 		vmLocalEvents->setDragEnabled(true);
-		for (size_t i = 0; i < compiler.getTargetDescription()->localEvents.size(); i++)
+		for (size_t i = 0; i < target->getDescription(id)->localEvents.size(); i++)
 		{
-			QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(compiler.getTargetDescription()->localEvents[i].name));
-			item->setToolTip(QString::fromStdWString(compiler.getTargetDescription()->localEvents[i].description));
+			QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(target->getDescription(id)->localEvents[i].name));
+			item->setToolTip(QString::fromStdWString(target->getDescription(id)->localEvents[i].description));
 			vmLocalEvents->addItem(item);
 		}
 		
@@ -492,6 +494,9 @@ namespace Aseba
 	
 	void NodeTab::setupConnections()
 	{
+		// compiler
+		connect(&compilationWatcher, SIGNAL(finished()), SLOT(compilationCompleted()));
+		
 		// execution
 		connect(loadButton, SIGNAL(clicked()), SLOT(loadClicked()));
 		connect(resetButton, SIGNAL(clicked()), SLOT(resetClicked()));
@@ -734,46 +739,88 @@ namespace Aseba
 
 	}
 	
+	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump)
+	{
+		NodeTab::CompilationResult* result(new NodeTab::CompilationResult(dump));
+		
+		Compiler compiler;
+		compiler.setTargetDescription(&targetDescription);
+		compiler.setCommonDefinitions(&commonDefinitions);
+		
+		std::wistringstream is(source.toStdWString());
+		
+		if (dump)
+			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error, &result->compilationMessages);
+		else
+			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
+		
+		if (result->success)
+		{
+			result->variablesMap = *compiler.getVariablesMap();
+		}
+		
+		return result;
+	}
+	
 	void NodeTab::recompile()
 	{
-		// output bytecode
-		Error error;
+		// compile
+		if (compilationFuture.isRunning())
+			compilationDirty = true;
+		else
+		{	
+			bool dump(mainWindow->nodes->currentWidget() == this);
+			compilationFuture = QtConcurrent::run(compilationThread, *target->getDescription(id), *commonDefinitions, editor->toPlainText(), dump);
+			compilationWatcher.setFuture(compilationFuture);
+			compilationDirty = false;
+			
+			// show progress icon
+			compilationResultImage->setPixmap(QPixmap(QString(":/images/busy.png")));
+		}
+	}
+	
+	void NodeTab::compilationCompleted()
+	{
+		CompilationResult* result(compilationFuture.result());
+		assert(result);
+		
+		// as long as result is dirty, continue compilation
+		if (compilationDirty)
+		{
+			recompile();
+			return;
+		}
 		
 		// clear old user data
 		// doRehighlight is required to prevent infinite recursion because there is not slot
 		// to differentiate user changes from highlight changes in documents
 		bool doRehighlight = clearEditorProperty("errorPos");
 		
-		// compile
-		std::wistringstream is(editor->toPlainText().toStdWString());
-		bool result;
-		if (mainWindow->nodes->currentWidget() == this)
+		if (result->dump)
 		{
-			std::wostringstream compilationMessages;
-			result = compiler.compile(is, bytecode, allocatedVariablesCount, error, &compilationMessages);
-			
 			mainWindow->compilationMessageBox->setWindowTitle(
 				tr("Aseba Studio: Output of last compilation for %0").arg(target->getName(id))
 			);
 			
-			if (result)
+			if (result->success)
 				mainWindow->compilationMessageBox->setText(
 					tr("Compilation success.") + QString("\n\n") + 
-					QString::fromStdWString(compilationMessages.str())
+					QString::fromStdWString(result->compilationMessages.str())
 				);
 			else
 				mainWindow->compilationMessageBox->setText(
-					QString::fromStdWString(error.toWString()) + ".\n\n" +
-					QString::fromStdWString(compilationMessages.str())
+					QString::fromStdWString(result->error.toWString()) + ".\n\n" +
+					QString::fromStdWString(result->compilationMessages.str())
 				);
 		}
-		else
-			result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
 		
 		// update state following result
-		if (result)
+		if (result->success)
 		{
-			vmMemoryModel->updateVariablesStructure(compiler.getVariablesMap());
+			bytecode = result->bytecode;
+			allocatedVariablesCount = result->allocatedVariablesCount;
+			vmMemoryModel->updateVariablesStructure(&result->variablesMap);
+			
 			updateHidden();
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
@@ -784,15 +831,15 @@ namespace Aseba
 		}
 		else
 		{
-			compilationResultText->setText(QString::fromStdWString(error.toWString()));
+			compilationResultText->setText(QString::fromStdWString(result->error.toWString()));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
 			loadButton->setEnabled(false);
 			emit uploadReadynessChanged(false);
 			
 			// we have an error, set the correct user data
-			if (error.pos.valid)
+			if (result->error.pos.valid)
 			{
-				errorPos = error.pos.character;
+				errorPos = result->error.pos.character;
 				QTextBlock textBlock = editor->document()->findBlock(errorPos);
 				int posInBlock = errorPos - textBlock.position();
 				if (textBlock.userData())
@@ -802,6 +849,9 @@ namespace Aseba
 				doRehighlight = true;
 			}
 		}
+		
+		// we have finished with the results
+		delete result;
 		
 		// clear bearkpoints of target if currently in debugging mode
 		if (editor->debugging)

@@ -31,6 +31,8 @@
 #include <QMultiMap>
 #include <QTabWidget>
 #include <QCloseEvent>
+#include <QFuture>
+#include <QFutureWatcher>
 
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
@@ -141,6 +143,21 @@ namespace Aseba
 	class NodeTab : public QSplitter, public ScriptTab, public VariableListener
 	{
 		Q_OBJECT
+	
+	public:
+		struct CompilationResult
+		{
+			bool dump;
+			bool success;
+			BytecodeVector bytecode;
+			unsigned allocatedVariablesCount;
+			Compiler::VariablesMap variablesMap;
+			Error error;
+			std::wostringstream compilationMessages;
+			
+			CompilationResult(bool dump):dump(dump) {}
+		};
+		
 		
 	public:
 		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
@@ -196,8 +213,10 @@ namespace Aseba
 		void closePlugins();
 		
 		void updateHidden();
+		
+		void compilationCompleted();
 	
-	private:
+	protected:
 		void rehighlight();
 		void reSetBreakpoints();
 		
@@ -208,15 +227,15 @@ namespace Aseba
 		void switchEditorProperty(const QString &oldProperty, const QString &newProperty);
 		
 	protected:
-		unsigned id; //!< node identifier
-		unsigned pid; //!< node product identifier
-		friend class InvasivePlugin;
-		Target *target;
-	
-	private:
 		friend class MainWindow;
 		friend class AeslEditor;
 		friend class EditorsPlotsTabWidget;
+		
+		unsigned id; //!< node identifier
+		unsigned pid; //!< node product identifier
+		friend class InvasivePlugin;
+		Target *target; //!< pointer to target
+		const CommonDefinitions *commonDefinitions; //!< pointer to common definitions
 
 		MainWindow* mainWindow;
 		QLabel *cursorPosText;
@@ -252,7 +271,10 @@ namespace Aseba
 		bool firstCompilation; //!< true if first compilation after creation
 		bool showHidden;
 		
-		Compiler compiler; //!< Aesl compiler
+		QFuture<CompilationResult*> compilationFuture;
+		QFutureWatcher<CompilationResult*> compilationWatcher;
+		bool compilationDirty;
+		
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables
 	};
@@ -468,7 +490,6 @@ namespace Aseba
 		
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;
-		Compiler compiler; //!< Aesl compiler
 		Target *target;
 	};
 	

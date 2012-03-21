@@ -19,6 +19,7 @@ if (QT4_FOUND)
 	set(QT_USE_QTNETWORK ON)
 	set(QT_USE_QTMAIN ON)
 	set(QT_USE_QTHELP ON)
+	set(QT_USE_QTCONCURRENT ON)
 	include(${QT_USE_FILE})
 
 	# add a console for debug messages under Windows
