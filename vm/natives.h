@@ -152,6 +152,11 @@ void AsebaNative_vecargbounds(AsebaVMState *vm);
 /*! Description of AsebaNative_vecargbounds */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecargbounds;
 
+/*! Function to sort a vector */
+void AsebaNative_vecsort(AsebaVMState *vm);
+/*! Description of AsebaNative_vecsort */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecsort;
+
 /*! Function to perform dest = (a*b)/c in 32 bits */
 void AsebaNative_mathmuldiv(AsebaVMState *vm);
 /*! Description of AsebaNative_mathmuldiv */
@@ -197,7 +202,7 @@ void AsebaNative_rand(AsebaVMState *vm);
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 
 /*! Embedded targets must know the size of ASEBA_NATIVES_STD_FUNCTIONS without having to compute them by hand, please update this when adding a new function */
-#define ASEBA_NATIVES_STD_COUNT 20
+#define ASEBA_NATIVES_STD_COUNT 21
 
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
@@ -213,6 +218,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	AsebaNative_vecdot, \
 	AsebaNative_vecstat, \
 	AsebaNative_vecargbounds, \
+	AsebaNative_vecsort, \
 	AsebaNative_mathmuldiv, \
 	AsebaNative_mathatan2, \
 	AsebaNative_mathsin, \
@@ -236,6 +242,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	&AsebaNativeDescription_vecdot, \
 	&AsebaNativeDescription_vecstat, \
 	&AsebaNativeDescription_vecargbounds, \
+	&AsebaNativeDescription_vecsort, \
 	&AsebaNativeDescription_mathmuldiv, \
 	&AsebaNativeDescription_mathatan2, \
 	&AsebaNativeDescription_mathsin, \

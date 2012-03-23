@@ -223,7 +223,7 @@ sint16 aseba_cos(sint16 angle)
 	return aseba_sin(16384 + angle);
 }
 
-// Do integer square root ( From Wikipedia )
+// Do integer square root ( from Wikipedia )
 sint16 aseba_sqrt(sint16 num)
 {
 	sint16 op = num;
@@ -247,6 +247,35 @@ sint16 aseba_sqrt(sint16 num)
 		one >>= 2;
 	}
 	return res;
+}
+
+// comb sort ( from Wikipedia )
+void aseba_comb_sort(sint16* input, uint16 size)
+{
+	uint16 gap = size;
+	uint16 swapped = 0;
+	uint16 i;
+
+	while ((gap > 1) || swapped)
+	{
+		if (gap > 1)
+		{
+			gap = (uint16)(((uint32)gap * 4) / 5);
+		}
+
+		swapped = 0;
+
+		for (i = 0; gap + i < size; i++)
+		{
+			if (input[i] - input[i + gap] > 0)
+			{
+				sint16 swap = input[i];
+				input[i] = input[i + gap];
+				input[i + gap] = swap;
+				swapped = 1;
+			}
+		}
+	}
 }
 
 
@@ -710,13 +739,35 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecargbounds =
 };
 
 
+void AsebaNative_vecsort(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 src = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	aseba_comb_sort(&vm->variables[src], length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecsort =
+{
+	"math.sort",
+	"sort array in place",
+	{
+		{ -1, "array" },
+		{ 0, 0 }
+	}
+};
+
+
 void AsebaNative_mathmuldiv(AsebaVMState *vm)
 {
 	// variable pos
 	uint16 destIndex = AsebaNativePopArg(vm);
-	sint16 aIndex = AsebaNativePopArg(vm);
-	sint16 bIndex = AsebaNativePopArg(vm);
-	sint16 cIndex = AsebaNativePopArg(vm);
+	uint16 aIndex = AsebaNativePopArg(vm);
+	uint16 bIndex = AsebaNativePopArg(vm);
+	uint16 cIndex = AsebaNativePopArg(vm);
 	
 	// variable size
 	uint16 length = AsebaNativePopArg(vm);
