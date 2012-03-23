@@ -793,7 +793,7 @@ namespace Aseba
 		}
 		
 		// clear old user data
-		// doRehighlight is required to prevent infinite recursion because there is not slot
+		// doRehighlight is required to prevent infinite recursion because there are no slot
 		// to differentiate user changes from highlight changes in documents
 		bool doRehighlight = clearEditorProperty("errorPos");
 		

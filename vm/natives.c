@@ -241,14 +241,14 @@ sint16 aseba_sqrt(sint16 num)
 			res = (res >> 1) + one;
 		}
 		else
-		{	
+		{
 			res >>= 1;
 		}
 		one >>= 2;
 	}
 	return res;
 }
-		
+
 
 // standard natives functions
 
