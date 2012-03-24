@@ -77,9 +77,9 @@ namespace Aseba
 		
 		serialGroupBox = new QGroupBox(tr("Serial"));
 		serialGroupBox->setCheckable(true);
-		serialGroupBox->setChecked(sectionEnabled == 1);
 		QHBoxLayout* serialLayout = new QHBoxLayout();
 		serial = new QListWidget();
+		bool serialPortSet(false);
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
 			const QString text(it->second.second.c_str());
@@ -87,8 +87,14 @@ namespace Aseba
 			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
 			serial->addItem(item);
 			if (settings.value("serial name") == text)
+			{
 				serial->setCurrentItem(item);
+				serialPortSet = true;
+			}
 		}
+		if (sectionEnabled == 1 && !serialPortSet)
+			sectionEnabled = 2;
+		serialGroupBox->setChecked(sectionEnabled == 1);
 		serial->setSelectionMode(QAbstractItemView::SingleSelection);
 		serialLayout->addWidget(serial);
 		connect(serial, SIGNAL(itemSelectionChanged()), SLOT(setupOkStateFromListSelection()));
