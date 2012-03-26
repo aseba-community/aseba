@@ -260,7 +260,11 @@ void aseba_comb_sort(sint16* input, uint16 size)
 	{
 		if (gap > 1)
 		{
+#ifdef __C30__
+			gap = __builtin_divud(__builtin_muluu(gap,4),5);
+#else
 			gap = (uint16)(((uint32)gap * 4) / 5);
+#endif
 		}
 
 		swapped = 0;
