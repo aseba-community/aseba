@@ -236,19 +236,19 @@ namespace Aseba
 		
 		uint8 checkSum = 0;
 		
-		stream << ":02000002";
+		stream << ":02000004";
 		checkSum += 0x02;
 		checkSum += 0x00;
 		checkSum += 0x00;
-		checkSum += 0x02;
-		
-		stream << std::setw(2);
-		stream << (addr16 & 0xFF);
-		checkSum += (addr16 & 0xFF);
+		checkSum += 0x04;
 		
 		stream << std::setw(2);
 		stream << (addr16 >> 8);
 		checkSum += (addr16 >> 8);
+		
+		stream << std::setw(2);
+		stream << (addr16 & 0xFF);
+		checkSum += (addr16 & 0xFF);
 		
 		checkSum = (~checkSum) + 1;
 		stream << std::setw(2);
@@ -271,12 +271,12 @@ namespace Aseba
 		checkSum += count8;
 		
 		stream << std::setw(2);
-		stream << (addr16 & 0xFF);
-		checkSum += (addr16 & 0xFF);
-		
-		stream << std::setw(2);
 		stream << (addr16 >> 8);
 		checkSum += (addr16 >> 8);
+		
+		stream << std::setw(2);
+		stream << (addr16 & 0xFF);
+		checkSum += (addr16 & 0xFF);
 		
 		stream << "00";
 		checkSum += 0x00;
@@ -294,16 +294,75 @@ namespace Aseba
 		
 		stream << "\n";
 	}
+
+	void HexFile::strip(unsigned pageSize)
+	{
+		// Build a page map.
+		typedef std::map<uint32, std::vector<uint8> > PageMap;
+		PageMap pageMap;
+		for (ChunkMap::iterator it = data.begin(); it != data.end(); it ++)
+		{
+			// get page number
+			unsigned chunkAddress = it->first;
+			// index inside data chunk
+			unsigned chunkDataIndex = 0;
+			// size of chunk in bytes
+			unsigned chunkSize = it->second.size();
+
+			// copy data from chunk to page
+			do
+			{
+				// get page number
+				unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
+				// get address inside page
+				unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
+
+				// if page does not exists, create it
+				if (pageMap.find(pageIndex) == pageMap.end())
+				{
+				//      std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+					pageMap[pageIndex] = std::vector<uint8>(pageSize, (uint8)0xFF); // New page is created uninitialized
+				}
+				// copy data
+				unsigned amountToCopy = std::min(pageSize - byteIndex, chunkSize - chunkDataIndex);
+				copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
+
+				// increment chunk data pointer
+				chunkDataIndex += amountToCopy;
+			}
+			while (chunkDataIndex < chunkSize);
+		}
+		
+		// Now, for each page, drop it if empty
+		data.clear();
+		
+		for(PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it++)
+		{
+			int isempty = 1;
+			int i;
+			for(i = 0; i < pageSize; i+=4)
+				if(it->second[i] != 0xff || it->second[i+1] != 0xff || it->second[i+2] != 0xff) {
+					isempty = 0;
+					break;
+				}
+			if(!isempty)
+				data[it->first * pageSize] = it->second;
+		}
+
+
+	}
 	
 	void HexFile::write(const std::string &fileName) const
 	{
+		int first = 1;
+		unsigned highAddress = 0;
 		std::ofstream ofs(fileName.c_str());
 		
 		if (ofs.bad())
 			throw FileOpeningError(fileName);
 		
 		// set format
-		ofs.flags(std::ios::hex);
+		ofs.flags(std::ios::hex | std::ios::uppercase);
 		ofs.fill('0');
 		
 		// for each chunk
@@ -312,20 +371,19 @@ namespace Aseba
 			// split address
 			unsigned address = it->first;
 			unsigned amount = it->second.size();
-			unsigned highAddress = address >> 16;
 			
-			writeExtendedLinearAddressRecord(ofs, highAddress);
 			for (unsigned count = 0; count < amount;)
 			{
 				// check if we have changed 64 K boundary, if so, write new high address
 				unsigned newHighAddress = (address + count) >> 16;
-				if (newHighAddress != highAddress)
+				if (newHighAddress != highAddress || first)
 					writeExtendedLinearAddressRecord(ofs, newHighAddress);
+				first = 0;
 				highAddress = newHighAddress;
 				
 				// write data
-				unsigned rowCount = std::min(amount - count, (unsigned)32);
-				unsigned lowAddress = address & 0xFFFF;
+				unsigned rowCount = std::min(amount - count, (unsigned)16);
+				unsigned lowAddress = (address + count) & 0xFFFF;
 				std::valarray<uint8> buffer(rowCount);
 				std::copy(it->second.begin() + count, it->second.begin() + count + rowCount, &buffer[0]);
 				writeData(ofs, lowAddress, rowCount , &buffer[0]);
