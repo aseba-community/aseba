@@ -294,6 +294,63 @@ namespace Aseba
 		
 		stream << "\n";
 	}
+
+	void HexFile::strip(unsigned pageSize)
+	{
+		// Build a page map.
+		typedef std::map<uint32, std::vector<uint8> > PageMap;
+		PageMap pageMap;
+		for (ChunkMap::iterator it = data.begin(); it != data.end(); it ++)
+		{
+			// get page number
+			unsigned chunkAddress = it->first;
+			// index inside data chunk
+			unsigned chunkDataIndex = 0;
+			// size of chunk in bytes
+			unsigned chunkSize = it->second.size();
+
+			// copy data from chunk to page
+			do
+			{
+				// get page number
+				unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
+				// get address inside page
+				unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
+
+				// if page does not exists, create it
+				if (pageMap.find(pageIndex) == pageMap.end())
+				{
+				//      std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+					pageMap[pageIndex] = std::vector<uint8>(pageSize, (uint8)0xFF); // New page is created uninitialized
+				}
+				// copy data
+				unsigned amountToCopy = std::min(pageSize - byteIndex, chunkSize - chunkDataIndex);
+				copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
+
+				// increment chunk data pointer
+				chunkDataIndex += amountToCopy;
+			}
+			while (chunkDataIndex < chunkSize);
+		}
+		
+		// Now, for each page, drop it if empty
+		data.clear();
+		
+		for(PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it++)
+		{
+			int isempty = 1;
+			int i;
+			for(i = 0; i < pageSize; i+=4)
+				if(it->second[i] != 0xff || it->second[i+1] != 0xff || it->second[i+2] != 0xff) {
+					isempty = 0;
+					break;
+				}
+			if(!isempty)
+				data[it->first * pageSize] = it->second;
+		}
+
+
+	}
 	
 	void HexFile::write(const std::string &fileName) const
 	{

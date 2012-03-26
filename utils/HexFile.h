@@ -92,6 +92,7 @@ namespace Aseba
 	public:
 		void read(const std::string &fileName);
 		void write(const std::string &fileName) const;
+		void strip(unsigned pageSize);
 	
 	protected:
 		unsigned getUint4(std::istream &stream);
