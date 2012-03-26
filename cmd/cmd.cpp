@@ -554,6 +554,7 @@ namespace Aseba
 			}
 			
 			// Write hex file
+			hexFile.strip(pageSize);
 			hexFile.write(fileName);
 		}
 	
