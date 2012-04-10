@@ -66,8 +66,16 @@ namespace Aseba
 		expectType(TYPE_UNIT, children[1]->typeCheck());
 		if (children.size() > 2)
 			expectType(TYPE_UNIT, children[2]->typeCheck());
-		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
-		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
+		
+		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
+		bool ok(false);
+		if (binaryOp && binaryOp->op >= ASEBA_OP_EQUAL && binaryOp->op <= ASEBA_OP_AND)
+			ok = true;
+		if (unaryOp && unaryOp->op == ASEBA_UNARY_OP_NOT)
+			ok = true;
+		
+		if (!ok)
 			throw Error(children[0]->sourcePos, WFormatableString(L"Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
 		return TYPE_UNIT;
 	}
@@ -76,8 +84,16 @@ namespace Aseba
 	{
 		expectType(TYPE_BOOL, children[0]->typeCheck());
 		expectType(TYPE_UNIT, children[1]->typeCheck());
-		BinaryArithmeticNode* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
-		if ((operation == 0) || (operation->op < ASEBA_OP_EQUAL))
+		
+		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
+		bool ok(false);
+		if (binaryOp && binaryOp->op >= ASEBA_OP_EQUAL && binaryOp->op <= ASEBA_OP_AND)
+			ok = true;
+		if (unaryOp && unaryOp->op == ASEBA_UNARY_OP_NOT)
+			ok = true;
+		
+		if (!ok)
 			throw Error(children[0]->sourcePos, WFormatableString(L"Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
 		return TYPE_UNIT;
 	}
