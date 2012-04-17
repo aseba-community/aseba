@@ -81,7 +81,9 @@ namespace Aseba
 		}
 		else if (role == Qt::DecorationRole && index.column() == 2)
 		{
-			return namedValues->at(index.row()).flag ? QIcon(QPixmap(QString(":/images/eye.png"))) : QIcon(QPixmap(QString(":/images/eyeclose.png")));
+			return namedValues->at(index.row()).flag ? 
+				QPixmap(QString(":/images/eye.png")) :
+				QPixmap(QString(":/images/eyeclose.png"));
 		}
 		else
 		return QVariant();
@@ -148,11 +150,10 @@ namespace Aseba
 
 	bool NamedValuesVectorModel::isVisible(const unsigned id)
 	{
-		Q_ASSERT(id < namedValues.size());
-
+		Q_ASSERT(id < namedValues->size());
 		if( namedValues->at(id).flag )
 			return true;
-
+		
 		return false;
 	}
 	
@@ -186,7 +187,7 @@ namespace Aseba
     void NamedValuesVectorModel::toggle(const QModelIndex &index)
 	{
 		Q_ASSERT(namedValues);
-		Q_ASSERT(index < (int)namedValues->size());
+		Q_ASSERT(index.row() < (int)namedValues->size());
 
 		namedValues->at(index.row()).flag = !namedValues->at(index.row()).flag;
 		emit dataChanged(index, index);

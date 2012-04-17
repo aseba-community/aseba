@@ -11,6 +11,12 @@ Copyright (C) 2007--2011:
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
 	(Windows maintainer, help system, additional coding)
 
+	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
+	(additional coding)
+
+	Sandra Moser [2]
+	(German translation)
+
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
 	(Apple maintainer)
 	
@@ -19,9 +25,6 @@ Copyright (C) 2007--2011:
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
 	(inputs on challenge, graphics design on challenge)
-
-	Sandra Moser [2]
-	(German translation)
 	
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
