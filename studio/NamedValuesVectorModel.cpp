@@ -55,7 +55,10 @@ namespace Aseba
 	int NamedValuesVectorModel::columnCount(const QModelIndex & parent) const
 	{
 		Q_UNUSED(parent)
-		return 2;
+		if(tooltipText.isEmpty())
+			return 2;
+		else
+			return 3;
 	}
 	
 	QVariant NamedValuesVectorModel::data(const QModelIndex &index, int role) const
@@ -67,15 +70,21 @@ namespace Aseba
 		{
 			if (index.column() == 0)
 				return QString::fromStdWString(namedValues->at(index.row()).name);
-			else
+			else if (index.column() == 1)
 				return namedValues->at(index.row()).value;
+			else
+				return QVariant();
 		}
 		else if (role == Qt::ToolTipRole && !tooltipText.isEmpty())
 		{
 			return tooltipText.arg(index.row());
 		}
+		else if (role == Qt::DecorationRole && index.column() == 2)
+		{
+			return namedValues->at(index.row()).flag ? QIcon(QPixmap(QString(":/images/eye.png"))) : QIcon(QPixmap(QString(":/images/eyeclose.png")));
+		}
 		else
-			return QVariant();
+		return QVariant();
 	}
 	
 	QVariant NamedValuesVectorModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -90,8 +99,11 @@ namespace Aseba
 	{
 		if (index.column() == 0)
 			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+		else if (index.column() == 1)
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;		
 		else
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
 	}
 	
 	QStringList NamedValuesVectorModel::mimeTypes () const
@@ -133,6 +145,16 @@ namespace Aseba
 		}
 		return false;
 	}
+
+	bool NamedValuesVectorModel::isVisible(const unsigned id)
+	{
+		Q_ASSERT(id < namedValues.size());
+
+		if( namedValues->at(id).flag )
+			return true;
+
+		return false;
+	}
 	
 	void NamedValuesVectorModel::addNamedValue(const NamedValue& namedValue)
 	{
@@ -159,6 +181,16 @@ namespace Aseba
 		wasModified = true;
 		
 		endRemoveRows();
+	}
+	
+    void NamedValuesVectorModel::toggle(const QModelIndex &index)
+	{
+		Q_ASSERT(namedValues);
+		Q_ASSERT(index < (int)namedValues->size());
+
+		namedValues->at(index.row()).flag = !namedValues->at(index.row()).flag;
+		emit dataChanged(index, index);
+		wasModified = true;
 	}
 	
 	void NamedValuesVectorModel::clear()
