@@ -33,7 +33,8 @@ namespace Aseba
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
 		tooltipText(tooltipText),
-		wasModified(false)
+		wasModified(false),
+		viewEvent()
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -41,7 +42,8 @@ namespace Aseba
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
-		wasModified(false)
+		wasModified(false),
+		viewEvent()
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -81,7 +83,7 @@ namespace Aseba
 		}
 		else if (role == Qt::DecorationRole && index.column() == 2)
 		{
-			return namedValues->at(index.row()).flag ? 
+			return viewEvent[index.row()] ? 
 				QPixmap(QString(":/images/eye.png")) :
 				QPixmap(QString(":/images/eyeclose.png"));
 		}
@@ -150,10 +152,7 @@ namespace Aseba
 
 	bool NamedValuesVectorModel::isVisible(const unsigned id)
 	{
-		if(id >= namedValues->size())
-			return true;
-		
-		if( (*namedValues)[id].flag )
+		if (id >= viewEvent.size() || viewEvent[id])
 			return true;
 		
 		return false;
@@ -168,6 +167,7 @@ namespace Aseba
 		beginInsertRows(QModelIndex(), position, position);
 		
 		namedValues->push_back(namedValue);
+		viewEvent.push_back(true);
 		wasModified = true;
 		
 		endInsertRows();
@@ -181,6 +181,7 @@ namespace Aseba
 		beginRemoveRows(QModelIndex(), index, index);
 		
 		namedValues->erase(namedValues->begin() + index);
+		viewEvent.erase(viewEvent.begin() + index);
 		wasModified = true;
 		
 		endRemoveRows();
@@ -191,7 +192,7 @@ namespace Aseba
 		Q_ASSERT(namedValues);
 		Q_ASSERT(index.row() < (int)namedValues->size());
 
-		namedValues->at(index.row()).flag = !namedValues->at(index.row()).flag;
+		viewEvent[index.row()] = !viewEvent[index.row()];
 		emit dataChanged(index, index);
 		wasModified = true;
 	}

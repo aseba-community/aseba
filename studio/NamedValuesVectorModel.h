@@ -65,6 +65,7 @@ namespace Aseba
 		NamedValuesVector* namedValues;
 		QString tooltipText;
 		bool wasModified;
+		std::vector<bool> viewEvent;
 	};
 	
 	/*@}*/

@@ -163,11 +163,10 @@ namespace Aseba
 	struct NamedValue
 	{
 		//! Create a filled pair
-		NamedValue(const std::wstring& name, int value, bool flag=true) : name(name), value(value), flag(flag) {}
+		NamedValue(const std::wstring& name, int value) : name(name), value(value) {}
 		
 		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
-		bool flag; //!< flag for view/hide
 	};
 	
 	//! An event description is a name - value pair
