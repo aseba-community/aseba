@@ -53,10 +53,12 @@ namespace Aseba
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
+		bool isVisible(const unsigned id);
 		
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
 		void delNamedValue(int index);
+		void toggle(const QModelIndex &index);
 		void clear();
 		
 	private:
