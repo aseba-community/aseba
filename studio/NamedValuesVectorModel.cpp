@@ -150,8 +150,10 @@ namespace Aseba
 
 	bool NamedValuesVectorModel::isVisible(const unsigned id)
 	{
-		Q_ASSERT(id < namedValues->size());
-		if( namedValues->at(id).flag )
+		if(id >= namedValues->size())
+			return true;
+		
+		if( (*namedValues)[id].flag )
 			return true;
 		
 		return false;
