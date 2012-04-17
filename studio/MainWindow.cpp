@@ -1823,6 +1823,12 @@ namespace Aseba
 			sendEvent();
 	}
 	
+	void MainWindow::toggleEventVisibleButton(const QModelIndex &index)
+	{
+		if (index.column() == 2)
+			eventsDescriptionsModel->toggle(index);
+	}
+		
 	void MainWindow::plotEvent()
 	{
 		#ifdef HAVE_QWT
@@ -2135,19 +2141,22 @@ namespace Aseba
 	//! A user event has arrived from the network.
 	void MainWindow::userEvent(unsigned id, const VariablesDataVector &data)
 	{
-		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
-		if (id < commonDefinitions.events.size())
-			text += QString("\n%0 : ").arg(QString::fromStdWString(commonDefinitions.events[id].name));
-		else
-			text += tr("\nevent %0 : ").arg(id);
-		for (size_t i = 0; i < data.size(); i++)
-			text += QString("%0 ").arg(data[i]);
-		
-		if (logger->count() > 50)
-			delete logger->takeItem(0);
-		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
-		logger->scrollToBottom();
-		Q_UNUSED(item);
+		if (eventsDescriptionsModel->isVisible(id) ) 
+		{
+			QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
+			if (id < commonDefinitions.events.size())
+				text += QString("\n%0 : ").arg(QString::fromStdWString(commonDefinitions.events[id].name));
+			else
+				text += tr("\nevent %0 : ").arg(id);
+			for (size_t i = 0; i < data.size(); i++)
+				text += QString("%0 ").arg(data[i]);
+			
+			if (logger->count() > 50)
+				delete logger->takeItem(0);
+			QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
+			logger->scrollToBottom();
+			Q_UNUSED(item);
+		}
 		
 		#ifdef HAVE_QWT
 		
@@ -2523,6 +2532,7 @@ namespace Aseba
 		#endif // HAVE_QWT
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
+		connect(eventsDescriptionsView, SIGNAL(clicked(const QModelIndex &)), SLOT(toggleEventVisibleButton(const QModelIndex &)) );
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
 		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
 		connect(eventsDescriptionsView, SIGNAL(customContextMenuRequested ( const QPoint & )), SLOT(eventContextMenuRequested(const QPoint & )));
