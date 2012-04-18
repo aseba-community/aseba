@@ -596,7 +596,7 @@ namespace Aseba
 			// get first, check whether hidden, and then iterate
 			TreeItem* entry = root;
 			Q_ASSERT(!splittedName[0].isEmpty());
-			if (splittedName[0][0] == '_')
+			if (name.at(0) == '_' || name.contains(QString("._")))
 			{
 				if (!showHidden)
 					continue;
