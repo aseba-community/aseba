@@ -161,7 +161,7 @@ namespace Aseba
 		if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
 		{
 			if (section == 0)
-				return tr("variables");
+				return tr("names");
 			else
 				return tr("values");
 		}

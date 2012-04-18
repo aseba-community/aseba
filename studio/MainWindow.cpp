@@ -415,7 +415,7 @@ namespace Aseba
 		
 		QVBoxLayout *memoryLayout = new QVBoxLayout;
 		QHBoxLayout *memorySubLayout = new QHBoxLayout;
-		memorySubLayout->addWidget(new QLabel(tr("<b>Memory</b>")));
+		memorySubLayout->addWidget(new QLabel(tr("<b>Variables</b>")));
 		memorySubLayout->addStretch();
 		memorySubLayout->addWidget(autoRefreshMemoryCheck);
 		memorySubLayout->addWidget(refreshMemoryButton);
@@ -2447,7 +2447,7 @@ namespace Aseba
 		eventsDescriptionsView->setContextMenuPolicy(Qt::CustomContextMenu);
 		
 		QGridLayout* eventsLayout = new QGridLayout;
-		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")),0,0,1,4);
+		eventsLayout->addWidget(new QLabel(tr("<b>Global Events</b>")),0,0,1,4);
 		eventsLayout->addWidget(addEventNameButton,1,0);
 		//eventsLayout->setColumnStretch(2, 0);
 		eventsLayout->addWidget(removeEventNameButton,1,1);
