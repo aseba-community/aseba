@@ -833,7 +833,7 @@ namespace Aseba
 		else
 		{
 			compilationResultText->setText(QString::fromStdWString(result->error.toWString()));
-			compilationResultImage->setPixmap(QPixmap(QString(":/images/no.png")));
+			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
 			loadButton->setEnabled(false);
 			emit uploadReadynessChanged(false);
 			
