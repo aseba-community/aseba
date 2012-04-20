@@ -222,7 +222,7 @@ namespace Aseba
 	//! Node for L"emit".
 	//! no children
 	struct EmitNode : Node
-	{
+	{		
 		unsigned eventId; //!< id of event to emit
 		unsigned arrayAddr; //!< address of the first element of the array to send
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument

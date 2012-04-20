@@ -40,6 +40,8 @@
 #include <MainWindow.moc>
 #include <version.h>
 
+#include <iostream>
+
 using std::copy;
 
 
@@ -246,7 +248,8 @@ namespace Aseba
 		previousMode(Target::EXECUTION_UNKNOWN),
 		firstCompilation(true),
 		showHidden(mainWindow->showHiddenAct->isChecked()),
-		compilationDirty(false)
+		compilationDirty(false),
+		isSynchronized(true)
 	{
 		// setup some variables
 		rehighlighting = false;
@@ -544,6 +547,9 @@ namespace Aseba
 			reSetBreakpoints();
 			rehighlight();
 		}
+		
+		isSynchronized = true;
+		mainWindow->resetStatusText();
 	}
 	
 	void NodeTab::runInterruptClicked()
@@ -757,10 +763,8 @@ namespace Aseba
 		else
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
 		
-		if (result->success)
-		{
+		if (result->success)	
 			result->variablesMap = *compiler.getVariablesMap();
-		}
 		
 		return result;
 	}
@@ -817,11 +821,12 @@ namespace Aseba
 					tr("Compilation success.") + QString("\n\n") + 
 					QString::fromStdWString(result->compilationMessages.str())
 				);
-			else
+			else 	
 				mainWindow->compilationMessageBox->setText(
 					QString::fromStdWString(result->error.toWString()) + ".\n\n" +
 					QString::fromStdWString(result->compilationMessages.str())
 				);
+				
 		}
 		
 		// update state following result
@@ -1691,13 +1696,15 @@ namespace Aseba
 	}
 	
 	void MainWindow::loadAll()
-	{
+	{	
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab)
 				tab->loadClicked();
 		}
+
+		statusText->setText("");
 	}
 	
 	void MainWindow::runAll()
@@ -2021,9 +2028,17 @@ namespace Aseba
 		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
 		eventsDescriptionsModel->delNamedValue(currentRow.row());
+
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->isSynchronized = false; // Jiwon
+		}
 		
+		statusText->setText(tr("Desynchronised! Please reload."));
 		recompileAll();
-		updateWindowTitle();
+		updateWindowTitle();		
 	}
 	
 	void MainWindow::eventsDescriptionsSelectionChanged()
@@ -2034,6 +2049,20 @@ namespace Aseba
 		#ifdef HAVE_QWT
 		plotEventButton->setEnabled(isSelected);
 		#endif // HAVE_QWT
+	}
+	
+	void MainWindow::resetStatusText()
+	{
+		bool flag = true;
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				flag = (flag && tab->isSynchronized);
+		}
+		
+		if (flag)
+			statusText->setText("");
 	}
 	
 	void MainWindow::addConstantClicked()
@@ -2154,14 +2183,16 @@ namespace Aseba
 	
 	//! A user event has arrived from the network.
 	void MainWindow::userEvent(unsigned id, const VariablesDataVector &data)
-	{
-		if (eventsDescriptionsModel->isVisible(id) ) 
-		{
+	{	
+		if (eventsDescriptionsModel->isVisible(id)) 
+		{	
 			QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
+
 			if (id < commonDefinitions.events.size())
-				text += QString("\n%0 : ").arg(QString::fromStdWString(commonDefinitions.events[id].name));
+					text += QString("\n%0 : ").arg(QString::fromStdWString(commonDefinitions.events[id].name));
 			else
 				text += tr("\nevent %0 : ").arg(id);
+
 			for (size_t i = 0; i < data.size(); i++)
 				text += QString("%0 ").arg(data[i]);
 			
@@ -2485,8 +2516,10 @@ namespace Aseba
 		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		clearLogger = new QPushButton(tr("Clear"));
+		statusText = new QLabel(""); // Jiwon
 		
 		QVBoxLayout* loggerLayout = new QVBoxLayout;
+		loggerLayout->addWidget(statusText); // Jiwon
 		loggerLayout->addWidget(logger);
 		loggerLayout->addWidget(clearLogger);
 		

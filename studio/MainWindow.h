@@ -263,6 +263,8 @@ namespace Aseba
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
 		
+		bool isSynchronized;
+		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
@@ -358,6 +360,8 @@ namespace Aseba
 		void removeEventNameClicked();
 		void eventsDescriptionsSelectionChanged();
 		
+		void resetStatusText(); // Jiwon
+		
 		void addConstantClicked();
 		void removeConstantClicked();
 		void constantsSelectionChanged();
@@ -438,6 +442,7 @@ namespace Aseba
 		#endif // HAVE_QWT
 		QListWidget* logger;
 		QPushButton* clearLogger;
+		QLabel* statusText; // Jiwon
 		FixedWidthTableView* eventsDescriptionsView;
 		
 		// constants
