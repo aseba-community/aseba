@@ -66,6 +66,8 @@ if (QT4_FOUND)
 				MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
 			add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
 		endif (WIN32)
+	else (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+		message(FATAL_ERROR "-- qcollectiongenerator executable not found (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
 	set(studio_SRCS
