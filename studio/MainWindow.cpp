@@ -690,7 +690,7 @@ namespace Aseba
 					const QString headSpace = line.left(line.indexOf("if"));
 					prefix = " ";
 					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
-				}
+				}			
 				else if (keyword == "when")
 				{
 					const QString headSpace = line.left(line.indexOf("when"));
@@ -714,6 +714,30 @@ namespace Aseba
 				{
 					cursor.beginEditBlock();
 					cursor.insertText(prefix);
+					const int pos = cursor.position();
+					cursor.insertText(postfix);
+					cursor.setPosition(pos);
+					cursor.endEditBlock();
+					editor->setTextCursor(cursor);
+				}
+				
+				if (keyword == "elseif") // Jiwon
+				{
+					const QString tab = QString("\t");
+					QString headSpace = line.left(line.indexOf("elseif"));
+
+					if( headSpace.size() - tab.size() > 0 ) 
+						headSpace = headSpace.left(headSpace.size() - tab.size());
+					else
+						headSpace.clear();
+					
+					postfix = " then\n" + headSpace + "\t";
+
+					cursor.select(QTextCursor::BlockUnderCursor);
+					cursor.removeSelectedText();
+					
+					cursor.beginEditBlock();
+					cursor.insertText("\n" + headSpace + "elseif ");
 					const int pos = cursor.position();
 					cursor.insertText(postfix);
 					cursor.setPosition(pos);
@@ -1704,7 +1728,7 @@ namespace Aseba
 				tab->loadClicked();
 		}
 
-		statusText->setText("");
+		statusText->clear();
 	}
 	
 	void MainWindow::runAll()
@@ -2036,6 +2060,7 @@ namespace Aseba
 				tab->isSynchronized = false; // Jiwon
 		}
 		
+		statusText->setPixmap(QPixmap(":/images/warning.png"));
 		statusText->setText(tr("Desynchronised! Please reload."));
 		recompileAll();
 		updateWindowTitle();		
@@ -2062,7 +2087,7 @@ namespace Aseba
 		}
 		
 		if (flag)
-			statusText->setText("");
+			statusText->clear();
 	}
 	
 	void MainWindow::addConstantClicked()
