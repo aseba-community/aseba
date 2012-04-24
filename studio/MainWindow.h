@@ -197,6 +197,18 @@ namespace Aseba
 		void editorContentChanged();
 		void recompile();
 		void markTargetUnsynced();
+	
+		// keywords
+		void varButtonClicked();
+		void ifButtonClicked();
+		void elseifButtonClicked();
+		void elseButtonClicked();
+		void oneventButtonClicked();
+		void whileButtonClicked();
+		void forButtonClicked();
+		void subroutineButtonClicked();
+		void callsubButtonClicked();
+		void showKeywords(bool show);
 		
 		void cursorMoved();
 		void goToError();
@@ -250,6 +262,19 @@ namespace Aseba
 		QPushButton *nextButton;
 		QPushButton *refreshMemoryButton;
 		QCheckBox *autoRefreshMemoryCheck;
+		
+				
+		// keywords // Jiwon
+		QPushButton *varButton;
+		QPushButton *ifButton;
+		QPushButton *elseifButton;
+		QPushButton *elseButton;
+		QPushButton *oneventButton;
+		QPushButton *whileButton;
+		QPushButton *forButton;
+		QPushButton *subroutineButton;
+		QPushButton *callsubButton;
+		QGroupBox *keywordsBox;
 		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
@@ -332,6 +357,7 @@ namespace Aseba
 		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
+		void showKeywords(bool show); // Jiwon
 
 		void toggleBreakpoint();
 		void clearAllBreakpoints();
@@ -489,6 +515,7 @@ namespace Aseba
 		QAction *toggleBreakpointAct;
 		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;
+		QAction *showKeywordsAct; // Jiwon
 		QAction* showCompilationMsg;
 		
 		// gui helper stuff

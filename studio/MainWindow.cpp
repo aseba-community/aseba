@@ -378,7 +378,32 @@ namespace Aseba
 		editorAreaLayout->addWidget(breakpoints);
 		editorAreaLayout->addWidget(linenumbers);
 		editorAreaLayout->addWidget(editor);
+		
+		// keywords
+		varButton = new QPushButton("var");
+		ifButton = new QPushButton("if");
+		elseifButton = new QPushButton("elseif");
+		elseButton = new QPushButton("else");
+		oneventButton = new QPushButton("onevent");
+		whileButton = new QPushButton("while");
+		forButton = new QPushButton("for");
+		subroutineButton = new QPushButton("sub");
+		callsubButton = new QPushButton("callsub");
+		keywordsBox = new QGroupBox(tr("Keywords"));
+		QHBoxLayout *keywordsLayout = new QHBoxLayout;
+		keywordsLayout->addWidget(varButton);
+		keywordsLayout->addWidget(ifButton);
+		keywordsLayout->addWidget(elseifButton);
+		keywordsLayout->addWidget(elseButton);
+		keywordsLayout->addWidget(oneventButton);
+		keywordsLayout->addWidget(whileButton);
+		keywordsLayout->addWidget(forButton);
+		keywordsLayout->addWidget(subroutineButton);
+		keywordsLayout->addWidget(callsubButton);
+		keywordsBox->setLayout(keywordsLayout);
+		
 		QVBoxLayout *editorLayout = new QVBoxLayout;
+		editorLayout->addWidget(keywordsBox); // Jiwon
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
 		
@@ -524,6 +549,17 @@ namespace Aseba
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
+						
+		// keywords
+		connect(varButton, SIGNAL(clicked()), SLOT(varButtonClicked()));
+		connect(ifButton, SIGNAL(clicked()), SLOT(ifButtonClicked()));
+		connect(elseifButton, SIGNAL(clicked()), SLOT(elseifButtonClicked()));
+		connect(elseButton, SIGNAL(clicked()), SLOT(elseButtonClicked()));
+		connect(oneventButton, SIGNAL(clicked()), SLOT(oneventButtonClicked()));
+		connect(whileButton, SIGNAL(clicked()), SLOT(whileButtonClicked()));
+		connect(forButton, SIGNAL(clicked()), SLOT(forButtonClicked()));
+		connect(subroutineButton, SIGNAL(clicked()), SLOT(subroutineButtonClicked()));
+		connect(callsubButton, SIGNAL(clicked()), SLOT(callsubButtonClicked()));		
 		
 		// following default settings
 		if (mainWindow->autoMemoryRefresh)
@@ -690,7 +726,7 @@ namespace Aseba
 					const QString headSpace = line.left(line.indexOf("if"));
 					prefix = " ";
 					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
-				}			
+				}
 				else if (keyword == "when")
 				{
 					const QString headSpace = line.left(line.indexOf("when"));
@@ -752,6 +788,104 @@ namespace Aseba
 			else
 				firstCompilation = false;
 		}
+	}
+
+	
+	void NodeTab::varButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+		
+		cursor.beginEditBlock();
+		cursor.insertText("var ");
+		cursor.endEditBlock();
+	}
+	
+	void NodeTab::ifButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("if");
+		cursor.endEditBlock();
+		editorContentChanged();
+	}
+	
+	void NodeTab::elseifButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("elseif");
+		cursor.endEditBlock();
+		editorContentChanged();
+	}
+	
+	void NodeTab::elseButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("else\n\t");
+		const int pos = cursor.position();
+		cursor.insertText("\n");
+		cursor.setPosition(pos);
+		cursor.endEditBlock();
+		editor->setTextCursor(cursor);
+	}
+
+	void NodeTab::oneventButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("onevent ");
+		cursor.endEditBlock();
+	}
+	
+	void NodeTab::whileButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+		
+		cursor.beginEditBlock();
+		cursor.insertText("while");
+		cursor.endEditBlock();
+		editorContentChanged();
+	}
+	
+	void NodeTab::forButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+		
+		cursor.beginEditBlock();
+		cursor.insertText("for");
+		cursor.endEditBlock();
+		editorContentChanged();
+	}
+	
+	void NodeTab::subroutineButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("sub ");
+		cursor.endEditBlock();
+	}	
+
+	void NodeTab::callsubButtonClicked()
+	{
+		QTextCursor cursor(editor->textCursor());
+
+		cursor.beginEditBlock();
+		cursor.insertText("callsub ");
+		cursor.endEditBlock();
+	}	
+
+	void NodeTab::showKeywords(bool show)
+	{
+		if(show)
+			keywordsBox->show();
+		else
+			keywordsBox->hide();
 	}
 
 	void NodeTab::updateHidden() 
@@ -1727,8 +1861,6 @@ namespace Aseba
 			if (tab)
 				tab->loadClicked();
 		}
-
-		statusText->clear();
 	}
 	
 	void MainWindow::runAll()
@@ -1774,7 +1906,17 @@ namespace Aseba
 			}
 		}
 	}
-	
+
+	void MainWindow::showKeywords(bool show) // Jiwon
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->showKeywords(show);
+		}
+	}
+
 	void MainWindow::clearAllExecutionError()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2060,8 +2202,8 @@ namespace Aseba
 				tab->isSynchronized = false; // Jiwon
 		}
 		
-		statusText->setPixmap(QPixmap(":/images/warning.png"));
 		statusText->setText(tr("Desynchronised! Please reload."));
+		statusText->show();
 		recompileAll();
 		updateWindowTitle();		
 	}
@@ -2078,16 +2220,31 @@ namespace Aseba
 	
 	void MainWindow::resetStatusText()
 	{
-		bool flag = true;
-		for (int i = 0; i < nodes->count(); i++)
+		bool flag;
+		int i;
+		
+		for (i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (tab)
+			if (tab) 
+			{
+				flag = tab->isSynchronized;
+				break;
+			}
+		}
+
+		for (; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab) 
 				flag = (flag && tab->isSynchronized);
 		}
 		
-		if (flag)
+		if (flag) 
+		{
 			statusText->clear();
+			statusText->hide();
+		}
 	}
 	
 	void MainWindow::addConstantClicked()
@@ -2420,9 +2577,7 @@ namespace Aseba
 		QSplitter *splitter = new QSplitter();
 		splitter->addWidget(nodes);
 		setCentralWidget(splitter);
-		
-		//QVBoxLayout* eventsDockLayout = new QVBoxLayout(eventsDockWidget);
-		
+
 		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
 		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		addConstantButton->setToolTip(tr("Add a new constant"));
@@ -2542,6 +2697,7 @@ namespace Aseba
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		clearLogger = new QPushButton(tr("Clear"));
 		statusText = new QLabel(""); // Jiwon
+		statusText->hide();
 		
 		QVBoxLayout* loggerLayout = new QVBoxLayout;
 		loggerLayout->addWidget(statusText); // Jiwon
@@ -2595,6 +2751,7 @@ namespace Aseba
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
+		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
 		
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
@@ -2620,7 +2777,7 @@ namespace Aseba
 		connect(constantsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(constantsSelectionChanged()));
 		connect(constantsDefinitionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
 		connect(constantsDefinitionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
-		
+
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target, SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
@@ -2963,6 +3120,13 @@ namespace Aseba
 		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
 		showHiddenAct->setCheckable(true);
 		settingsMenu->addAction(showHiddenAct);
+		
+		// Jiwon
+		showKeywordsAct = new QAction(tr("Show &keywords..."), this);
+		showKeywordsAct->setCheckable(true);
+		showKeywordsAct->setChecked(true);
+		settingsMenu->addAction(showKeywordsAct);
+		
 		
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
