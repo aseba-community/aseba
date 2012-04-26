@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Concepts
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Concepts
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Table des matières
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Nœud</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Événement</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Cette page présente les concepts importants pour comprendre Aseba.
+    </p>
+    <h1 id="toc0">
+      <span>Nœud</span>
+    </h1>
+    <p>
+      Dans Aseba, il peut y avoir plusieurs robots ou un robot avec plusieurs <a href="http://fr.wikipedia.org/wiki/Processeur">processors</a> fonctionnant dans le même réseau. Ce réseau peut être logiciel (<a href="http://fr.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a>), matériel (<a href="http://fr.wikipedia.org/wiki/Controller_area_network">CAN</a>), ou une combinaison des deux. Chaque processeur d'un réseau Aseba, appelé nœud, fait tourner une petite <a href="http://fr.wikipedia.org/wiki/Machine_virtuelle">machine virtuelle</a>. Chaque nœud possède son propre onglet dans <a href="fr_asebastudio.html">Aseba Studio</a>, ce qui vous permet de le programmer indépendamment des autres nœuds. Les nœuds communiquent ensemble à travers des événements.
+    </p>
+    <h1 id="toc1">
+      <span>Événement</span>
+    </h1>
+    <p>
+      Aseba est une architecture <a href="http://fr.wikipedia.org/wiki/Programmation_%C3%A9v%C3%A9nementielle">basée sur des événements</a>, c'est à dire que des événements déclenchent l'exécution du code de façon asynchrone. Les événements ont un identificateur et transportent optionnellement des données. Les nœuds s'échangent des événements à l'intérieur d'un réseau Aseba. De plus, les événements peuvent être internes à un nœud, par exemple émis par un capteur qui possède un valeur nouvellement acquise. La réception d'un événement exécute, si défini, le bloc de code correspondant. Un script peut aussi <a href="fr_asebalanguage.html">envoyer des événements</a>, ce qui lui permet de déclencher l'exécution de code sur un autre nœud ou de communiquer avec un programme externe. Afin de permettre l'exécution du code lors de la réception d'un nouvel événement, aucun script ne doit bloquer et donc les scripts ne doivent pas contenir de boucle infinie. Par exemple dans le contexte de la robotique, où un programme de contrôle de robot traditionnel travaillerait à l'intérieur d'une boucle infinie, un script Aseba ferait simplement le travail lors d'un événement lié aux capteurs.
+    </p>
+    <hr />
+  </body>
+</html>

@@ -51,15 +51,16 @@
       </tr>
     </table>
     <p>
-      Diese Hilfe finden Sie auch innerhalb des Aseba Studios im Menu <tt>Hilfe -&gt; Sprache</tt>.
+      Diese Hilfe finden Sie auch innerhalb des Aseba Studios im Menu <tt>Hilfe -&gt; Sprache</tt>. Technische Ausdrücke sind mit der entsprechenden Erklärung auf Wikipedia verlinkt.
     </p>
     <p>
-      Die Programmiersprache Aseba erlaubt, die Kontrolle verteilt auf Aseba Netzwerkelemente zu implementieren. Der Syntax dieser Programmiersprache ist ähnlich zu <em>matlab</em>; Dies ermöglicht Programmierern mit Vorkenntnissen sich schnell zu orientieren und Aseba in Kürze zu erlernen. Semantisch gesehen, ist Aseba eine einfache, imperative Programmierung mit einem einzelnen Datentyp (16 Bit Ganzzahlen mit Vorzeichen) und Vektoren davon. Diese Einfachheit erlaubt auch Programmierern ohne Vorkenntnisse mikrokontrollerbasierte Roborter zu steuern.
+      Die Syntax der Programmiersprache Aseba gleicht derjenigen von <a href="http://de.wikipedia.org/wiki/Matlab">Matlab</a> (verbreitete wissenschaftliche Programmiersprache). Dies ermöglicht Programmierern mit Vorkenntnissen sich schnell zu orientieren und Aseba in Kürze zu erlernen. Semantisch gesehen, ist Aseba eine einfache, <a href="http://de.wikipedia.org/wiki/Imperative_Programmierung">imperative Programmierung</a> mit einem einzelnen <a href="http://de.wikipedia.org/wiki/Datentyp">Datentyp</a> (16 <a href="http://de.wikipedia.org/wiki/Bit">Bit</a> <a href="http://de.wikipedia.org/wiki/Integer_Datentyp">Ganzzahlen</a> mit Vorzeichen) und Vektoren davon. Diese Einfachheit erlaubt auch Programmierern ohne Vorkenntnisse <a href="http://de.wikipedia.org/wiki/Mikrocontroller">Mikrokontroller</a>-basierte Roboter zu steuern.
     </p>
     <h1 id="toc0">
       <span>Kommentare</span>
     </h1>
     <p>
+      Kommentare erlauben, in den Programmtext Information einzufügen, die vom <a href="http://de.wikipedia.org/wiki/Compiler">Compiler</a> ignoriert wird. Dies ist sehr nützlich um Informationen in <a href="http://de.wikipedia.org/wiki/Nat%C3%BCrliche_Sprache">natürlicher Sprache</a> einzufügen oder zwischenzeitlich Code-Teile auszuschalten.<br />
       Kommentare beginnen mit dem Symbol <em>#</em> und enden auf derselben Zeile.
     </p>
     <p>
@@ -88,7 +89,7 @@ var b    # kurzer Kommentar</code>
       <span>Variablen</span>
     </h1>
     <p>
-      Variablen beziehen sich entweder auf einfache ganze Zahlen oder Vektoren von ganzen Zahlen. Die zulässigen Werte sind alle ganzen Zahlen zwischen -32768 und 32767, was einem Speicherbereich von 16 Bit (2 Byte) entspricht. Man kann Vektorkomponenten mit Klammern [Zahl] aufrufen. Die indexierung der Vektoren beginnt bei Null. Alle benutzerdefinierten Variablen müssen am Anfang des Asebaprogramms definiert werden, vor allen weiteren Programmteilen.
+      Variablen beziehen sich entweder auf einfache ganze Zahlen oder Vektoren von ganzen Zahlen. Die zulässigen Werte sind alle ganzen Zahlen zwischen -32768 und 32767, was einem Speicherbereich von 16 Bit (2 Byte) entspricht. Man kann Vektorkomponenten mit <a href="http://de.wikipedia.org/wiki/Klammer_%28Zeichen%29#Klammern_in_Programmiersprachen">eckigen Klammern</a> [Zahl] aufrufen. Die Indexierung der Vektoren beginnt bei Null. Alle benutzerdefinierten Variablen müssen am Anfang des Asebaprogramms definiert werden, vor allen weiteren Programmteilen.
     </p>
     <p>
       Beispiel:
@@ -105,7 +106,7 @@ var d[3] = 2, 3, 4</code>
       <span>Ereignis</span>
     </h1>
     <p>
-      Aseba ist eine Ereignisbasierte (<em>event-based</em>) Architektur, was eine asynchrone Ereignisauslösung ermöglicht. Extern können Ereignisse zum Beispiel von einem anderen Aseba Netzwerkelement ausgelöst werden. Intern können Ereignisse zum Beispiel von einem Sensor mit aktualisierten Daten ausgelöst werden.
+      Aseba besitzt eine ereignisbasierte (<em>event-based</em>) Architektur, was eine asynchrone Ereignisauslösung ermöglicht. Extern können Ereignisse zum Beispiel von einem anderen Aseba-Netzwerkelement ausgelöst werden. Intern können Ereignisse zum Beispiel von einem Sensor mit aktualisierten Daten ausgelöst werden.
     </p>
     <p>
       Die Wahrnehmung eines Ereignisses kann einen Codeblock aktivieren, falls dieser zuvor mit dem Stichwort <tt>onevent</tt> und der Bezeichnung des Ereignisses definiert worden ist. Der Code am Anfang des Befehls bestimmt, wann die darauf folgenden Befehle ausgeführt oder zurückgesetzt werden. Befehle können auch Ereignisse senden mit dem Stichwort <tt>emit</tt>, gefolgt von der Bezeichnung des Ereignisses und gegebenenfalls den zu sendenden Variablen. Falls eine Variable gegeben wird, muss die Grösse des Ereignisses der Grösse des zu schickenden Arguments entsprechen. Ereignisse erlauben Befehle an anderen Netzwerkelementen auszulösen oder mit einem externen Programm zu kommunizieren.
@@ -141,10 +142,302 @@ end
       <span>Ausdrücke und Zuweisungen</span>
     </h1>
     <p>
-      Ausdrücke erlauben mathematische Berechnungen und sind in einer normalen traditionellen mathematischen Notation (Infix syntax) geschrieben. Zumweisungen benutzen das Stichwort <tt>=</tt> und weisen das Resultat einer Ausdrucksberechnung einer Variable zu (oder einer Komponente einer Variable, falls die Variable ein Vektor ist).<br />
-      Aseba stellt binäre Operatoren zur Verfügung, welche in der folgenden Reihenfolge abgearbeitet werden: <tt>*</tt>, <tt>/</tt>, <tt>%</tt> (modulo); gefolgt von <tt>+</tt> und <tt>-</tt>; gefolgt von <tt>«</tt> (links shift) and <tt>»</tt> (rechts shift); gefolgt von <tt>|</tt> (binäres oder); gefolgt von <tt>^</tt> (binäres exklusives oder); gefolgt von <tt>&amp;</tt> (binäres und). Die binären Operatoren assoziieren nach links.<br />
-      Aseba stellt auch folgende unäre Operatoren zur Verfügung: <tt>-</tt>, <tt>~</tt> (binäres nicht), und <tt>abs</tt> (betrag). Um einen Ausdruck in einer anderen Reihenfolge zu evaluieren, können Klammern verwendet werden.
+      Ausdrücke erlauben mathematische Berechnungen und sind in einer normalen traditionellen mathematischen Notation (Infix syntax) geschrieben. Zuweisungen benutzen <tt>=</tt> und weisen das Resultat einer Ausdrucksberechnung einer Variable zu (oder einer Komponente einer Variable, falls die Variable ein Vektor ist). In Aseba gibt es verschiedene Operatoren, welche in der Tabelle unten mit ihrer Priorität aufgeführt sind. Um einen Ausdruck in einer anderen Reihenfolge zu evaluieren, können Klammern benutzt werden.
     </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th>
+          Priorität
+        </th>
+        <th>
+          Operator
+        </th>
+        <th>
+          Beschreibung
+        </th>
+        <th>
+          Assoziativität
+        </th>
+        <th>
+          Stelligkeit
+        </th>
+      </tr>
+      <tr>
+        <td>
+          1
+        </td>
+        <td>
+          ()
+        </td>
+        <td>
+          Gruppieren eines Unter-Ausdrucks
+        </td>
+        <td></td>
+        <td>
+          unär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          2
+        </td>
+        <td>
+          * /
+        </td>
+        <td>
+          Multiplikation, Division
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %
+        </td>
+        <td>
+          Modulo
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          3
+        </td>
+        <td>
+          + -
+        </td>
+        <td>
+          Addition, Subtraktion
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          4
+        </td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt; &gt;&gt;</span>
+        </td>
+        <td>
+          Left shift, right shift
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          5
+        </td>
+        <td>
+          |
+        </td>
+        <td>
+          binäres oder (or)
+        </td>
+        <td>
+          links assoziativ
+        </td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          6
+        </td>
+        <td>
+          ^
+        </td>
+        <td>
+          binäres, exklusives oder (xor)
+        </td>
+        <td>
+          links assoziativ
+        </td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          7
+        </td>
+        <td>
+          &amp;
+        </td>
+        <td>
+          binäres und
+        </td>
+        <td>
+          links assoziativ
+        </td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          8
+        </td>
+        <td>
+          -
+        </td>
+        <td>
+          unäres minus
+        </td>
+        <td></td>
+        <td>
+          unär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          9
+        </td>
+        <td>
+          ~
+        </td>
+        <td>
+          binäres nicht
+        </td>
+        <td></td>
+        <td>
+          unär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          10
+        </td>
+        <td>
+          abs
+        </td>
+        <td>
+          absoluter Wert
+        </td>
+        <td></td>
+        <td>
+          unär
+        </td>
+      </tr>
+      <tr>
+        <td>
+          11
+        </td>
+        <td>
+          =
+        </td>
+        <td>
+          Zuweisung
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          |= ^= &amp;=
+        </td>
+        <td>
+          Zuweisung durch binäres oder, xor, und
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          ~=
+        </td>
+        <td>
+          Zuweisung durch binäres nicht
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          *= /=
+        </td>
+        <td>
+          Zuweisung durch Produkt und Quotient
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %=
+        </td>
+        <td>
+          Zuweisung durch modulo
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          += -=
+        </td>
+        <td>
+          Zuweisung durch Summe und Differenz
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt;= &gt;&gt;=</span>
+        </td>
+        <td>
+          Zuweisung durch left / right shift
+        </td>
+        <td></td>
+        <td>
+          binär
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          ++ <span style="white-space: pre-wrap;">--</span>
+        </td>
+        <td>
+          unäres increment und decrement
+        </td>
+        <td></td>
+        <td>
+          unär
+        </td>
+      </tr>
+    </table>
     <p>
       Beispiel:
     </p>

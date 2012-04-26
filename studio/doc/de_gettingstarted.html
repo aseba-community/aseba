@@ -63,7 +63,7 @@
       Aseba <em>Challenge</em> (rechtes Bild) ist eine simulierte Welt in welcher mit Aseba programmierte Roboter um Energie kämpfen. Diese simulierte Welt ist als Trainingspiel aufgebaut und gut für den Programmierunterricht geeignet.
     </p>
     <p>
-      Zu Beginn muss Aseba <em>Challenge</em> in Betrieb genommen werden. Falls Sie Aseba noch nicht installiert haben, folgen Sie bitte der <a href="http://aseba.wikidot.com/de:downloadinstall">Installationsanleitung</a>. Sobald <em>Challenge</em> gestartet wurde, drücken Sie “Neuen Roboter hinzufügen”. Dann wählen Sie einen Namen für Ihren Roboter. Dabei braucht jeder Spieler in einer Gruppe einen eigenen Roboter. Sämtliche Roboter können mit einem Klick auf “Alle Roboter entfernen” gelöscht werden. Die Tasten können durch “Automatisches Verstecken” vorübergehend unsichtbar gemacht werden. Die Tasten erscheinen erst wieder, wenn der Mauspfeil in dessen Nähe ist. Die Kameraführung kann automatisch erfolgen durch einen Klick auf “Automatische Kamera” oder manuell mit folgenden Befehlen gesteuert werden:
+      Zuerst muss Aseba <em>Challenge</em> in Betrieb genommen werden. Falls Sie Aseba noch nicht installiert haben, folgen Sie bitte der <a href="http://aseba.wikidot.com/de:downloadinstall">Installationsanleitung</a>. Sobald <em>Challenge</em> gestartet wurde, drücken Sie “Neuen Roboter hinzufügen”. Dann wählen Sie einen Namen für Ihren Roboter. Dabei braucht jeder Spieler in einer Gruppe einen eigenen Roboter. Sämtliche Roboter können mit einem Klick auf “Alle Roboter entfernen” gelöscht werden. Die Tasten können durch “Automatisches Verstecken” vorübergehend unsichtbar gemacht werden. Die Tasten erscheinen erst wieder, wenn der Mauspfeil in dessen Nähe ist. Die Kameraführung kann automatisch erfolgen durch einen Klick auf “Automatische Kamera” oder manuell mit folgenden Befehlen gesteuert werden:
     </p>
     <ul>
       <li>ctrl + linke Maustaste: rotierende Ansicht
@@ -114,7 +114,7 @@ wheel_right_speed = -5
 #Rad_rechts_Geschwindigkeit = -5</code>
 </pre>
     </div><br />
-    Klicken Sie auf “Laden” und dann auf “Start”. Nun sollten Sie sehen, wie sich Ihr Roboter um einen imaginären Punkt dreht. Dieser Kode definiert nur beim Start die Geschwindigkeit der Räder des Roboters und danach löst dieser Kode nichts mehr aus. Um ein interessanters Verhalten des Roboters zu sehen, sollte man dem Roboter erlauben, seine Umgebung wahrzunehmen. Zum Beispiel könnte man programmieren, dass der Roboter Hindernisse wahrnimmt und diesen selbstständig ausweichen kann.<br />
+    Klicken Sie auf “Laden” und dann auf “Start”. Nun sollten Sie sehen, wie sich Ihr Roboter um einen imaginären Punkt dreht. Dieser Kode definiert nur beim Start die Geschwindigkeit der Räder des Roboters und danach löst dieser Kode nichts mehr aus. Um ein interessanteres Verhalten des Roboters zu sehen, sollte man dem Roboter erlauben, seine Umgebung wahrzunehmen. Zum Beispiel könnte man programmieren, dass der Roboter Hindernisse wahrnimmt und diesen selbstständig ausweichen kann.<br />
     Um selbstständig mit der Umwelt zu interagieren, braucht der Roboter periodische Befehle. Dies kann mit dem Befehl <tt>onevent timer</tt> (wenn dieses Ereignis eintritt, dann…) erreicht werden. Eine andere Möglichkeit besteht darin, den Distanzsensor so zu benützen, dass man die Geschwindigkeit der Räder auf Hindernisse abstimmen kann:
     <div class="code">
       <pre>
@@ -123,7 +123,7 @@ wheel_left_speed = dist[0] - 6
 wheel_right_speed = dist[0] - 6</code>
 </pre>
     </div><br />
-    Klicken Sie auf “Laden” und dann auf “Start”. Der Distanzsensor kann Werte zwischen 0 und 12cm annehmen. Distanzen von mehr als 12cm werden trotzdem mit einer 12 angezeigt. Der Roboter wird mit dem oben geschriebenen Programm eine Geschwindigkeit von -6&nbsp;cm/s annehmen, wenn das Hindernis nahe ist, und 0&nbsp;cm/s, wenn das Objekt weniger als 6cm vom Roboter entfernt ist. Aus diesem Grund wird der Roboter jeweils 6&nbsp;cm vor einem Hindernis zum Stillstand kommen. Falls das Hindernis weit entfernt ist, wird der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s unterwegs sein.
+    Klicken Sie auf “Laden” und dann auf “Start”. Der Distanzsensor kann Werte zwischen 0 und 12cm annehmen. Distanzen von mehr als 12cm werden trotzdem mit einer 12 angezeigt. Der Roboter wird mit dem oben geschriebenen Programm eine Geschwindigkeit von -6&nbsp;cm/s annehmen, wenn das Hindernis nahe ist, und 0&nbsp;cm/s, wenn das Objekt etwa 6cm vom Roboter entfernt ist. Aus diesem Grund wird der Roboter jeweils 6&nbsp;cm vor einem Hindernis zum Stillstand kommen. Falls das Hindernis weit entfernt ist, wird der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s unterwegs sein.
     <h1 id="toc2">
       <span>Eine kompliziertere Robotersteuerung</span>
     </h1>
@@ -139,11 +139,11 @@ wheel_right_speed = dist[0] - 6</code>
     <div class="code">
       <pre>
 <code>onevent timer
-wheel_left_speed = prox[1] - 6
-wheel_right_speed = prox[6] - 6</code>
+wheel_left_speed = dist[1] - 6
+wheel_right_speed = dist[6] - 6</code>
 </pre>
     </div><br />
-    Diese Steuerung liest die vorderen linken und rechten Distanzsensoren. Wenn kein Hindernis in der Nähe ist, senden die Distanzsensoren <tt>prox[1]</tt> und <tt>prox[6]</tt> den Wert 12. Darauf fährt der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s geradeaus. Falls nun aber ein Hindernis auftaucht, reduziert sich der von den Sensoren gemeldete Wert. Wenn zum Beispiel ein Hindernis auf der linken Seite auftaucht, wird der Distanzsensor <tt>prox[6]</tt>, welcher nach links blickt, einen Wert von z.B. 10 senden, währen der Distanzsensor <tt>prox[1]</tt>, welcher nach rechts blickt, immer noch einen Wert von 12 zurückmeldet. Daher wird sich bei<tt>wheel_right_speed</tt> die Geschwindigkeit auf 4&nbsp;cm/s reduzieren, während die Geschwindigkeit von <tt>wheel_left_speed</tt> konstant bei 6&nbsp;cm/s bleibt. Diese Anpassung der Geschwindigkeit veranlasst den Roboter, eine Drehung nach rechts zu fahren und auf diese Weise das Hindernis zu umfahren.
+    Diese Steuerung liest die vorderen linken und rechten Distanzsensoren. Wenn kein Hindernis in der Nähe ist, senden die Distanzsensoren <tt>dist[1]</tt> und <tt>dist[6]</tt> den Wert 12. Darauf fährt der Roboter mit einer Geschwindigkeit von 6&nbsp;cm/s geradeaus. Falls nun aber ein Hindernis auftaucht, reduziert sich der von den Sensoren gemeldete Wert. Wenn zum Beispiel ein Hindernis auf der linken Seite auftaucht, wird der Distanzsensor <tt>dist[6]</tt>, welcher nach links blickt, einen Wert von z.B. 10 senden, währen der Distanzsensor <tt>dist[1]</tt>, welcher nach rechts blickt, immer noch einen Wert von 12 zurückmeldet. Daher wird sich bei<tt>wheel_right_speed</tt> die Geschwindigkeit auf 4&nbsp;cm/s reduzieren, während die Geschwindigkeit von <tt>wheel_left_speed</tt> konstant bei 6&nbsp;cm/s bleibt. Diese Anpassung der Geschwindigkeit veranlasst den Roboter, eine Drehung nach rechts zu fahren und auf diese Weise das Hindernis zu umfahren.
     <h1 id="toc3">
       <span>Entscheidungen treffen</span>
     </h1>
@@ -153,7 +153,7 @@ wheel_right_speed = prox[6] - 6</code>
     <div class="code">
       <pre>
 <code>onevent timer
-var dists = prox[6] + prox[7] + prox[0] + prox[1]
+var dists = dist[6] + dist[7] + dist[0] + dist[1]
 if dists &lt; 48 then
     wheel_left_speed = 5
     wheel_right_speed = -5

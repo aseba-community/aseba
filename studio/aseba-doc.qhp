@@ -18,12 +18,14 @@
         <filterSection>
                 <filterAttribute>lang-en</filterAttribute>
                 <toc>
-                        <section title="Aseba user manual" ref = "doc/en_asebausermanual.html">
+                        <section title="User manual" ref = "doc/en_asebausermanual.html">
                                 <section title="Getting started with Aseba" ref="doc/en_gettingstarted.html"></section>
+                                <section title="Concepts" ref="doc/en_asebaconcepts.html"></section>
                                 <section title="Aseba Studio" ref="doc/en_asebastudio.html"></section>
                                 <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
                                 <section title="Native functions standard library" ref="doc/en_asebastdnative.html"></section>
                                 <section title="Remap Identifiers using asebaswitch" ref="doc/en_asebaswitchremap.html"></section>
+                                <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
 
                         </section>
 
@@ -32,6 +34,7 @@
                 <files>
                         <file>doc/aseba.css</file>
                         <file>doc/asebachallenge.png</file>
+                        <file>doc/en_asebaconcepts.html</file>
                         <file>doc/en_asebalanguage.html</file>
                         <file>doc/en_asebastdnative-eq0.png</file>
                         <file>doc/en_asebastdnative-eq1.png</file>
@@ -83,12 +86,14 @@
         <filterSection>
                 <filterAttribute>lang-fr</filterAttribute>
                 <toc>
-                        <section title="Mode d&#039;emploi d&#039;Aseba" ref = "doc/fr_asebausermanual.html">
+                        <section title="Mode d&#039;emploi" ref = "doc/fr_asebausermanual.html">
                                 <section title="Démarrer avec Aseba" ref="doc/fr_gettingstarted.html"></section>
+                                <section title="Concepts" ref="doc/fr_asebaconcepts.html"></section>
                                 <section title="Aseba Studio" ref="doc/fr_asebastudio.html"></section>
                                 <section title="Le langage d&#039;Aseba" ref="doc/fr_asebalanguage.html"></section>
                                 <section title="Bibliothèque standard de fonctions natives" ref="doc/fr_asebastdnative.html"></section>
                                 <section title="Remapper les identificateurs avec asebaswitch" ref="doc/fr_asebaswitchremap.html"></section>
+                                <section title="Le langage d&#039;Aseba" ref="doc/fr_asebalanguage.html"></section>
 
                         </section>
 
@@ -100,6 +105,7 @@
                         <file>doc/epuck-sensors-wiki-fr.png</file>
                         <file>doc/epuck-sensors-wiki-fr.svg</file>
                         <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/fr_asebaconcepts.html</file>
                         <file>doc/fr_asebalanguage.html</file>
                         <file>doc/fr_asebastdnative.html</file>
                         <file>doc/fr_asebastudio.html</file>
@@ -116,7 +122,7 @@
         <filterSection>
                 <filterAttribute>lang-de</filterAttribute>
                 <toc>
-                        <section title="Bedienungsanleitung zu Aseba" ref = "doc/de_asebausermanual.html">
+                        <section title="Bedienungsanleitung" ref = "doc/de_asebausermanual.html">
                                 <section title="Übung macht den Meister" ref="doc/de_gettingstarted.html"></section>
                                 <section title="Aseba Studio" ref="doc/de_asebastudio.html"></section>
                                 <section title="Programmiersprache Aseba" ref="doc/de_asebalanguage.html"></section>

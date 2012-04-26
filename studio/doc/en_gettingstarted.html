@@ -122,15 +122,15 @@ wheel_left_speed = dist[0] - 6
 wheel_right_speed = dist[0] - 6</code>
 </pre>
     </div><br />
-    Click “Load” and then “Run”. As the proximity sensors return a distance between 0 to 12&nbsp;cm (if the object is farther than 12&nbsp;cm, they nevertheless return 12), the speed of the robot will be -6&nbsp;cm/s when the object is close, 0&nbsp;cm/s when the object is 6&nbsp;cm away, and 6&nbsp;cm/s when the object is far away. The robot will thus tend to stay 6&nbsp;cm away from any object in front.
+    Click “Load” and then “Run”. As the proximity sensors return a distance between 0 to 12&nbsp;cm (if the object is farther than 12&nbsp;cm, they nevertheless return 12), the speed of the robot will be -6&nbsp;cm/s when the object is close, 0&nbsp;cm/s when the object is 6&nbsp;cm away, and 6&nbsp;cm/s when the object is far away. The robot will thus tend to stay 6&nbsp;cm away from any object in front of it.
     <h1 id="toc2">
       <span>A more elaborate robot controller</span>
     </h1>
     <p>
-      Keeping a safe distance to an object in front is good, but right now the robot cannot move elsewhere. To have the robot wander around, we have to understand how it moves.
+      Keeping a safe distance to an object in front is good, but right now the robot cannot move elsewhere. To have the robot wander around, we need to understand how it moves.
     </p>
     <p>
-      The simulated <em>e-puck</em> robot in <em>challenge</em> is an example of a differential wheeled robot; this type of robot changes its direction by setting different speeds for its right and left wheels. If each wheel has the same speed, the robot goes forward; otherwise it turns; if the speeds are in the opposite direction, the robot turns on the spot. Industrial caterpillar vehicles use the same movement modality.
+      The simulated <em>e-puck</em> robot in <em>challenge</em> is an example of a differential wheeled robot; this type of robot changes its direction by setting different speeds for its right and left wheels. If each wheel has the same speed, the robot goes forward; otherwise it turns; if the speeds are in opposite directions, the robot turns on the spot. Industrial caterpillar vehicles use the same movement modality.
     </p>
     <p>
       Let us write a small code that makes the robot avoid obstacles and go straight ahead otherwise:
@@ -138,11 +138,11 @@ wheel_right_speed = dist[0] - 6</code>
     <div class="code">
       <pre>
 <code>onevent timer
-wheel_left_speed = prox[1] - 6
-wheel_right_speed = prox[6] - 6</code>
+wheel_left_speed = dist[1] - 6
+wheel_right_speed = dist[6] - 6</code>
 </pre>
     </div><br />
-    This controller looks at the front, left and right proximity sensors. As long there is no obstacle, both <tt>prox[1]</tt> and <tt>prox[6]</tt> report 12 and thus the robot goes forward at speed 6. But when there is an obstacle at one side, the value of the corresponding sensor goes down. For instance, if there is an obstacle on the left, <tt>prox[6]</tt> (which looks to the left) could be 10 but <tt>prox[1]</tt> (which looks to the right) will stay at 12; and thus, <tt>wheel_left_speed</tt> would still be 6 but <tt>wheel_right_speed</tt> would be 4, causing the robot to turn to the right and thus avoid the obstacle on its left.
+    This controller looks at the front left and front right proximity sensors. As long there is no obstacle, both <tt>dist[1]</tt> and <tt>dist[6]</tt> report 12 and thus the robot goes forward at speed 6. But when there is an obstacle at one side, the value of the corresponding sensor goes down. For instance, if there is an obstacle on the left, <tt>dist[6]</tt> (which looks to the left) could be 10 but <tt>dist[1]</tt> (which looks to the right) will stay at 12; and thus <tt>wheel_left_speed</tt> would still be 6 but <tt>wheel_right_speed</tt> would be 4, causing the robot to turn to the right and thus avoid the obstacle on its left.
     <h1 id="toc3">
       <span>Taking decisions</span>
     </h1>
@@ -152,7 +152,7 @@ wheel_right_speed = prox[6] - 6</code>
     <div class="code">
       <pre>
 <code>onevent timer
-var dists = prox[6] + prox[7] + prox[0] + prox[1]
+var dists = dist[6] + dist[7] + dist[0] + dist[1]
 if dists &lt; 48 then
     wheel_left_speed = 5
     wheel_right_speed = -5
@@ -162,7 +162,7 @@ else
 end</code>
 </pre>
     </div><br />
-    This controller sums the distances of all front proximity sensors, and if this sum is below 48&nbsp;cm, which means that at least one of the sensor sees an obstacle, the robot turns on the spot. Otherwise, it goes straight ahead.<br />
+    This controller sums the distances of the 4 front proximity sensors, and if this sum is below 48&nbsp;cm, which means that at least one of the sensor sees an obstacle, the robot turns on the spot. Otherwise, it goes straight ahead.<br />
     The scripting language provides other interesting constructs, such as the <tt>while</tt> loop, which executes a block of code repeatedly as long as a condition is true, or the <tt>for</tt> loop, which executes a block of code a certain number of times and changes the value of a variable each time. The menu <tt><a href="en_asebalanguage.html">Help -&gt; Language</a></tt> gives access to a page which lists all available constructs together with examples; feel free to have a look.
     <h1 id="toc4">
       <span>Your turn</span>
@@ -171,7 +171,7 @@ end</code>
       Play for a while with obstacle avoidance in order to get a good understanding of the sensors, actuators and dynamics of the robot. Feel free to explore, the robot is in a simulator and does not risk being harmed.
     </p>
     <p>
-      Once you feel confident, try to make the robot direct itself to the food sources when they are blue (0, 0, 100) (in R, G, B), and avoid them when they are red (100, 0, 0). The colour of the background is gray (50, 50, 50). Try to play with your friends and to get the best robot controller. You can change the colour of your robot (by changing variables <tt>color_red</tt>, <tt>color_green</tt> and <tt>color_blue</tt>), and thus feign being a food source. If the others trick your robot like this, check the energy variable; if it is not increasing while seeing blue, you are being tricked.
+      Once you feel confident, try to make the robot direct itself to the food sources when they are blue (0, 0, 100) (in R, G, B), and avoid them when they are red (100, 0, 0). The colour of the background is gray (50, 50, 50). Try to play with your friends and to get the best robot controller. You can change the colour of your robot (by changing variables <tt>color_red</tt>, <tt>color_green</tt> and <tt>color_blue</tt>), and thus pretend to be a food source. If the others trick your robot like this, check the energy variable; if it is not increasing while seeing blue, you are being tricked.
     </p>
     <p>
       The goal of <em>challenge</em> is to learn robotics, programming, and Aseba while having fun.
