@@ -193,7 +193,6 @@ namespace Aseba
 		Q_ASSERT(index.row() < (int)namedValues->size());
 
 		viewEvent[index.row()] = !viewEvent[index.row()];
-		emit dataChanged(index, index);
 		wasModified = true;
 	}
 	
