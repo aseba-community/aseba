@@ -1979,12 +1979,11 @@ namespace Aseba
 	
 	void MainWindow::addEventNameClicked()
 	{
-		bool ok;
 		QString eventName;
 		int eventNbArgs = 0;
 
 		// prompt the user for the named value
-		ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, 32767, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
+		const bool ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, 32767, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
 
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
@@ -1992,6 +1991,10 @@ namespace Aseba
 			if (commonDefinitions.events.contains(eventName.toStdWString()))
 			{
 				QMessageBox::warning(this, tr("Event already exists"), tr("Event %0 already exists.").arg(eventName));
+			}
+			else if (!QRegExp("(\\w)(\\w|\\.)+").exactMatch(eventName) || eventName[0].isDigit())
+			{
+				QMessageBox::warning(this, tr("Invalid event name"), tr("Event %0 has an invalid name. Valid names start with an alphabetical character or an \"_\", and continue with any number of alphanumeric characters, \"_\" and \".\"").arg(eventName));
 			}
 			else
 			{
