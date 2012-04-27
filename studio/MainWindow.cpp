@@ -249,7 +249,8 @@ namespace Aseba
 		firstCompilation(true),
 		showHidden(mainWindow->showHiddenAct->isChecked()),
 		compilationDirty(false),
-		isSynchronized(true)
+		isSynchronized(true),
+		autoComplete(true)
 	{
 		// setup some variables
 		rehighlighting = false;
@@ -706,6 +707,8 @@ namespace Aseba
 	
 	void NodeTab::editorContentChanged()
 	{
+		if( !autoComplete ) return;
+		
 		if (rehighlighting)
 		{
 			rehighlighting = false;
@@ -886,6 +889,11 @@ namespace Aseba
 			keywordsBox->show();
 		else
 			keywordsBox->hide();
+	}
+
+	void NodeTab::setAutocomplete(bool flag)
+	{
+		autoComplete = flag;
 	}
 
 	void NodeTab::updateHidden() 
@@ -1519,6 +1527,14 @@ namespace Aseba
 					{
 						constantsDefinitionsModel->addNamedValue(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
 					}
+					else if (element.tagName() == "keywords") // Jiwon
+					{
+						if( element.attribute("flag") == "true" )
+							showKeywordsAct->setChecked(true);
+						else
+							showKeywordsAct->setChecked(false);
+					}
+						
 				}
 				domNode = domNode.nextSibling();
 			}
@@ -1590,7 +1606,7 @@ namespace Aseba
 		document.appendChild(root);
 		
 		root.appendChild(document.createTextNode("\n\n\n"));
-		root.appendChild(document.createComment("list of global events"));
+		root.appendChild(document.createComment("list of global events"));		
 		
 		// events
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)
@@ -1612,6 +1628,17 @@ namespace Aseba
 			element.setAttribute("value", QString::number(commonDefinitions.constants[i].value));
 			root.appendChild(element);
 		}
+		
+		// keywords Jiwon
+		root.appendChild(document.createTextNode("\n\n\n"));
+		root.appendChild(document.createComment("show keywords state"));
+		
+		QDomElement keywords = document.createElement("keywords"); 
+		if( showKeywordsAct->isChecked() ) 
+			keywords.setAttribute("flag", "true");
+		else
+			keywords.setAttribute("flag", "false");
+		root.appendChild(keywords);
 		
 		// source code
 		for (int i = 0; i < nodes->count(); i++)
@@ -1914,6 +1941,16 @@ namespace Aseba
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab)
 				tab->showKeywords(show);
+		}
+	}
+
+	void MainWindow::setAutocomplete(bool flag) // Jiwon
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->setAutocomplete(flag);
 		}
 	}
 
@@ -2752,6 +2789,7 @@ namespace Aseba
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
+		connect(autocompleteAct, SIGNAL(toggled(bool)), SLOT(setAutocomplete(bool)));
 		
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
@@ -3126,7 +3164,11 @@ namespace Aseba
 		showKeywordsAct->setCheckable(true);
 		showKeywordsAct->setChecked(true);
 		settingsMenu->addAction(showKeywordsAct);
-		
+
+		autocompleteAct = new QAction(tr("Set &autocomplete..."), this);
+		autocompleteAct->setCheckable(true);
+		autocompleteAct->setChecked(true);
+		settingsMenu->addAction(autocompleteAct);
 		
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
