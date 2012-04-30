@@ -616,7 +616,6 @@ namespace Aseba
 	void DashelTarget::receivedVariables(Message *message)
 	{
 		Variables *variables = polymorphic_downcast<Variables *>(message);
-		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 	

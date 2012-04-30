@@ -232,6 +232,8 @@ namespace Aseba
 	
 	//////
 	
+	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
+	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QSplitter(parent),
 		VariableListener(0),
@@ -265,8 +267,9 @@ namespace Aseba
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
 		// get the value of the variables
-		recompile();
-		refreshMemoryClicked();
+		// compile in this thread the first time
+		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
+		processCompilationResult(result);
 	}
 	
 	NodeTab::~NodeTab()
@@ -792,6 +795,12 @@ namespace Aseba
 			return;
 		}
 		
+		// process results
+		processCompilationResult(result);
+	}
+	
+	void NodeTab::processCompilationResult(CompilationResult* result)
+	{
 		// clear old user data
 		// doRehighlight is required to prevent infinite recursion because there are no slot
 		// to differentiate user changes from highlight changes in documents
@@ -907,6 +916,7 @@ namespace Aseba
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view
+		qDebug() << "received variables 2";
 		vmMemoryModel->setVariablesData(start, variables);
 	}
 	
@@ -1259,7 +1269,7 @@ namespace Aseba
 						"<br/>(build ver. %1/protocol ver. %2)" \
 						"</li><li>Dashel ver. %3"\
 						"</li></ul>" \
-						"<p>(c) 2006-2011 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
+						"<p>(c) 2006-2012 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
 						"<p><a href=\"%5\">%5</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
@@ -1935,6 +1945,7 @@ namespace Aseba
 					if (compilationMessageBox->isVisible())
 						nodeTab->recompile();
 					
+					// because this is a new tab, get content of variables
 					target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
 					
 					showCompilationMsg->setEnabled(true);

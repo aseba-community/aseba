@@ -217,6 +217,7 @@ namespace Aseba
 		void compilationCompleted();
 	
 	protected:
+		void processCompilationResult(CompilationResult* result);
 		void rehighlight();
 		void reSetBreakpoints();
 		
