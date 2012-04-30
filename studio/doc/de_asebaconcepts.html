@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Konzepte
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Konzepte
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Table of Contents
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Knoten</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Ereignisse</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Nachstehende Konzepte sind hilfreich, um Aseba besser zu verstehen.
+    </p>
+    <h1 id="toc0">
+      <span>Knoten</span>
+    </h1>
+    <p>
+      In Aseba können mehrere Roboter oder ein einzelner Roboter mit mehreren <a href="http://de.wikipedia.org/wiki/Hauptprozessor">Prozessoren</a> in demselben Netzwerk laufen. Dieses Netzwerk kann in Software (<a href="http://de.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a>), Hardware (<a href="http://de.wikipedia.org/wiki/Controller_Area_Network">CAN</a>), oder durch einen Mix aus Software und Hardware aufgebaut sein. Jeder Prozessor im Netzwerk stellt einen sogenannten "Knoten" dar; auf jedem solchen Knoten läuft eine kleine <a href="http://de.wikipedia.org/wiki/Virtuelle_Maschine">virtuelle Maschine</a>. Jeder Knoten hat seinen eigenen Tab in <a href="de_asebastudio.html">Aseba Studio</a>, welcher es erlaubt, die verschiedenen Knoten unabhängig voneinander zu programmieren. Interaktionen zwischen den einzelnen Knoten bleiben aber durch Ereignisse möglich.
+    </p>
+    <h1 id="toc1">
+      <span>Ereignisse</span>
+    </h1>
+    <p>
+      Aseba ist eine <a href="http://de.wikipedia.org/wiki/Ereignis_%28Programmierung%29">ereignisgesteuerte Architektur</a>. Das bedeutet, dass Programme durch Ereignisse ausgelöst werden und unregelmässig (asynchron) ablaufen. Ereignisse haben einen Bezeichner (Identifier) und optionale Nutzdaten. Aseba-Knoten können zwei Arten von Ereignisse austauschen. Ereignisse, die Aseba-Knoten innerhalb eines Aseba-Netzwerkes austauschen, heissen "globale" Ereignisse. "Lokale" Ereignisse hingegen sind intern und werden im Innern eines einzelnen Knotens ausgetauscht. Ein Beispiel für ein lokales Ereignis ist ein Ereignis, das von einem Sensor ausgelöst wird, wenn neue Daten bereit stehen. Ist der Programmcode zum Empfangen von einem Ereignis einmal definiert, wird der entsprechende Block im Programmcode ausgeführt, sobald das Ereignis empfangen wurde. Programmcode kann auch <a href="de_asebalanguage.html">Ereignisse erzeugen</a>, welche dann ihrerseits zur Ausführung von Code auf anderen Knoten führen oder die Kommunikation mit einem externen Programm ermöglichen. Damit der Programmcode auch ausgeführt wird, sobald neue Ereignisse empfangen wurden, dürfen Skripte nicht blockieren und müssen daher frei von Endlosschleifen sein. Mit Bezug zu Anwendungen in der Robotik, wo herkömmliche Steuerungsprogramme von Robotern Prozesse in Endlosschleifen abarbeiten, führt ein Aseba-Skript dieselben Prozessschritte auf Grund von einem Sensor-basierten Ereignis aus.
+    </p>
+  </body>
+</html>
