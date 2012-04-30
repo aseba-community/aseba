@@ -102,9 +102,8 @@ a:hover{
 #toc{
 	margin: 1em auto 1em 0;
 	padding: 0em 0.5em;
-	background-color: #E0E0E0;
 	display: table;
-	
+	background-color: #F0F0F0;
 }
 
 #toc .title {
@@ -139,7 +138,7 @@ pre{
 .code {
 	border-style:solid;	/* No effect in QTextBrowser :-( */
 	border-width: 1px;	/* No effect in QTextBrowser :-( */
-	background-color: #D0D0D0;
+	background-color: #E8E8FF;
 	font-family: 'Andale Mono', 'Courier New', Courier, monospace;
 	padding: 0 1em;		/* No effect in QTextBrowser :-( */
 	margin: 20px;
