@@ -21,13 +21,13 @@
         <tt>math.copy(A,B)</tt>
       </dt>
       <dd>
-        Copy the vector <img src="en_asebastdnative-eq0.png"> in the vector <img src="en_asebastdnative-eq1.png">, element by element: <img src="en_asebastdnative-eq2.png">.
+        Copy the array <img src="en_asebastdnative-eq0.png"> in the array <img src="en_asebastdnative-eq1.png">, element by element: <img src="en_asebastdnative-eq2.png">.
       </dd>
       <dt>
         <tt>math.fill(A,c)</tt>
       </dt>
       <dd>
-        Fill each element of the vector <img src="en_asebastdnative-eq1.png"> by the constant <img src="en_asebastdnative-eq3.png">: <img src="en_asebastdnative-eq4.png">.
+        Fill each element of the array <img src="en_asebastdnative-eq1.png"> by the constant <img src="en_asebastdnative-eq3.png">: <img src="en_asebastdnative-eq4.png">.
       </dd>
       <dt>
         <tt>math.addscalar(A, B, c)</tt>
@@ -39,55 +39,61 @@
         <tt>math.add(A, B, C)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq6.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size.
+        Compute <img src="en_asebastdnative-eq6.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size.
       </dd>
       <dt>
         <tt>math.sub(A, B, C)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq8.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size.
+        Compute <img src="en_asebastdnative-eq8.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size.
       </dd>
       <dt>
         <tt>math.mul(A, B, C)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq9.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size. <em>Note that this is not a dot product.</em>
+        Compute <img src="en_asebastdnative-eq9.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size. <em>Note that this is not a dot product.</em>
       </dd>
       <dt>
         <tt>math.div(A, B, C)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq10.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size. <em>An exception will be trigged if a division by zero occurs.</em>
+        Compute <img src="en_asebastdnative-eq10.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size. <em>An exception will be trigged if a division by zero occurs.</em>
       </dd>
       <dt>
         <tt>math.min(A, B, C)</tt>
       </dt>
       <dd>
-        Write the minimum of each element of <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> in <img src="en_asebastdnative-eq1.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size: <img src="en_asebastdnative-eq11.png">.
+        Write the minimum of each element of <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> in <img src="en_asebastdnative-eq1.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size: <img src="en_asebastdnative-eq11.png">.
       </dd>
       <dt>
         <tt>math.max(A, B, C)</tt>
       </dt>
       <dd>
-        Write the maximum of each element of <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> in <img src="en_asebastdnative-eq1.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three vectors of the same size: <img src="en_asebastdnative-eq12.png">.
+        Write the maximum of each element of <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> in <img src="en_asebastdnative-eq1.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size: <img src="en_asebastdnative-eq12.png">.
       </dd>
       <dt>
         <tt>math.dot(r, A, B, n)</tt>
       </dt>
       <dd>
-        Compute the dot product between two vectors of the same size <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png">: <img src="en_asebastdnative-eq13.png">
+        Compute the dot product between two arrays of the same size <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png">: <img src="en_asebastdnative-eq13.png">
       </dd>
       <dt>
         <tt>math.stat(V, min, max, mean)</tt>
       </dt>
       <dd>
-        Compute the maximum, the mean and the minimum values of vector <img src="en_asebastdnative-eq14.png">.
+        Compute the maximum, the mean and the minimum values of array <img src="en_asebastdnative-eq14.png">.
       </dd>
       <dt>
         <tt>math.argbounds(A, argmin, argmax)</tt>
       </dt>
       <dd>
         Get the indices <em>argmin</em> and <em>argmax</em> corresponding to the minimum respectively maximum values of <img src="en_asebastdnative-eq1.png">.
+      </dd>
+      <dt>
+        <tt>math.sort(A)</tt>
+      </dt>
+      <dd>
+        Sort array <img src="en_asebastdnative-eq1.png"> in place.
       </dd>
       <dt>
         <tt>math.muldiv(A, B, C, D)</tt>
@@ -99,31 +105,31 @@
         <tt>math.atan2(A, Y, X)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq16.png"> using the signs of <img src="en_asebastdnative-eq17.png"> and <img src="en_asebastdnative-eq18.png"> to determine the quadrant of the output, where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq19.png"> and <img src="en_asebastdnative-eq20.png"> are three vectors of the same size. <em>Note that <img src="en_asebastdnative-eq21.png"> and <img src="en_asebastdnative-eq22.png"> will produce <img src="en_asebastdnative-eq23.png">.</em>.
+        Compute <img src="en_asebastdnative-eq16.png"> using the signs of <img src="en_asebastdnative-eq17.png"> and <img src="en_asebastdnative-eq18.png"> to determine the quadrant of the output, where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq19.png"> and <img src="en_asebastdnative-eq20.png"> are three arrays of the same size. <em>Note that <img src="en_asebastdnative-eq21.png"> and <img src="en_asebastdnative-eq22.png"> will produce <img src="en_asebastdnative-eq23.png">.</em>.
       </dd>
       <dt>
         <tt>math.sin(A, B)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq24.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two vectors of the same size.
+        Compute <img src="en_asebastdnative-eq24.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two arrays of the same size.
       </dd>
       <dt>
         <tt>math.cos(A, B)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq25.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two vectors of the same size.
+        Compute <img src="en_asebastdnative-eq25.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two arrays of the same size.
       </dd>
       <dt>
         <tt>math.rot2(A, B, angle)</tt>
       </dt>
       <dd>
-        Rotate the vector <img src="en_asebastdnative-eq0.png"> by <em>angle</em>, write result to <img src="en_asebastdnative-eq1.png">. <em>Note that <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> must both be vectors of size 2.</em>
+        Rotate the array <img src="en_asebastdnative-eq0.png"> by <em>angle</em>, write result to <img src="en_asebastdnative-eq1.png">. <em>Note that <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> must both be arrays of size 2.</em>
       </dd>
       <dt>
         <tt>math.sqrt(A, B)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq26.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two vectors of the same size.
+        Compute <img src="en_asebastdnative-eq26.png"> where <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> are two arrays of the same size.
       </dd>
       <dt>
         <tt>math.nzseq(a, B, m)</tt>
