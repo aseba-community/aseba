@@ -1,7 +1,7 @@
 Aseba - an event-based framework for distributed robot control
 	http://aseba.wikidot.com
 
-Copyright (C) 2007--2011:
+Copyright (C) 2007--2012:
 	Stephane Magnenat <stephane at magnenat dot net>
 	(http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
@@ -25,7 +25,7 @@ And optionally, to enumerate serial ports properly on linux:
 
 On Linux, the first four libraries are packages available in your distribution. For instance, on Ubuntu, you can install them, along cmake and the compiler, with:
 
-sudo apt-get install libboost-dev libqt4-dev libqwt5-qt4-dev libudev-dev cmake g++
+sudo apt-get install libboost-dev libqt4-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev cmake g++ subversion git
 
 Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba and tell it where it can find Dashel and Enki. Then you can compile Aseba. The following script does this for you:
 
