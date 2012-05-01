@@ -25,7 +25,6 @@
                                 <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
                                 <section title="Native functions standard library" ref="doc/en_asebastdnative.html"></section>
                                 <section title="Remap Identifiers using asebaswitch" ref="doc/en_asebaswitchremap.html"></section>
-                                <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
 
                         </section>
 
@@ -93,7 +92,6 @@
                                 <section title="Le langage d&#039;Aseba" ref="doc/fr_asebalanguage.html"></section>
                                 <section title="Bibliothèque standard de fonctions natives" ref="doc/fr_asebastdnative.html"></section>
                                 <section title="Remapper les identificateurs avec asebaswitch" ref="doc/fr_asebaswitchremap.html"></section>
-                                <section title="Le langage d&#039;Aseba" ref="doc/fr_asebalanguage.html"></section>
 
                         </section>
 
@@ -160,7 +158,6 @@
                                 <section title="Aseba Studio" ref="doc/de_asebastudio.html"></section>
                                 <section title="Programmiersprache Aseba" ref="doc/de_asebalanguage.html"></section>
                                 <section title="Asebastdnative" ref="doc/de_asebastdnative.html"></section>
-                                <section title="Programmiersprache Aseba" ref="doc/de_asebalanguage.html"></section>
 
                         </section>
 
