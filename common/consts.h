@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2011:
+	Copyright (C) 2007--2012:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -27,10 +27,10 @@
 /*@{*/
 
 /*! version of Aseba as string */
-#define ASEBA_VERSION "1.0.90"
+#define ASEBA_VERSION "1.1.0"
 
 /*! version of Aseba as an int */
-#define ASEBA_VERSION_INT 10090
+#define ASEBA_VERSION_INT 10100
 
 /*! version of aseba protocol, including bytecodes types and constants */
 #define ASEBA_PROTOCOL_VERSION 4

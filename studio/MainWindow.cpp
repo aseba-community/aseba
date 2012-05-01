@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2011:
+	Copyright (C) 2007--2012:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -2003,7 +2003,7 @@ namespace Aseba
 			{
 				QMessageBox::warning(this, tr("Event already exists"), tr("Event %0 already exists.").arg(eventName));
 			}
-			else if (!QRegExp("(\\w)(\\w|\\.)+").exactMatch(eventName) || eventName[0].isDigit())
+			else if (!QRegExp("\\w(\\w|\\.)*").exactMatch(eventName) || eventName[0].isDigit())
 			{
 				QMessageBox::warning(this, tr("Invalid event name"), tr("Event %0 has an invalid name. Valid names start with an alphabetical character or an \"_\", and continue with any number of alphanumeric characters, \"_\" and \".\"").arg(eventName));
 			}
