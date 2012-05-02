@@ -117,7 +117,8 @@ namespace Aseba
 			{
 				if (dump)
 					*dump << sourcePos.toWString() << L": if test simplified because condition was always false\n";
-				children[2] = 0;
+				if (children.size() > 2)
+					children[2] = 0;
 				delete this;
 				return falseBlock;
 			}
