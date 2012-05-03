@@ -1,0 +1,2 @@
+var buff[2]
+buff[0]++
