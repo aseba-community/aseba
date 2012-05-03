@@ -23,6 +23,7 @@
 
 #include "compiler.h"
 #include "../common/consts.h"
+#include "../utils/FormatableString.h"
 #include <vector>
 #include <string>
 #include <ostream>
@@ -399,7 +400,15 @@ namespace Aseba
 		ArrayReadNode(const ArrayWriteNode* write) :
 			Node(write->sourcePos), arrayAddr(write->arrayAddr), arraySize(write->arraySize), arrayName(write->arrayName)
 		{
-			children.push_back((write->children[0])->clone());
+			ImmediateNode* index;
+			// accept only immediates for array index
+			// TODO fix this? should handle the case:
+			// array[i++]+=2, which will expand to array[i++] = array[i++] + 2
+			// which is not what the user meant
+			if (write->children.size() > 0 && (index = dynamic_cast<ImmediateNode*> (write->children[0])) != 0)
+				children.push_back(index->clone());
+			else
+				throw Error(sourcePos, WFormatableString(L"Such operation is not permitted with non-immediate index"));
 		}
 		virtual ArrayReadNode* clone() const {return(new ArrayReadNode(*this));}
 
