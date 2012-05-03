@@ -478,10 +478,25 @@ namespace Aseba
 	{
 		Token::Type op = tokens.front();
 		SourcePos pos = tokens.front().pos;
+		StoreNode* store;
+		ArrayWriteNode* array;
+		std::auto_ptr<Node> load;
 		tokens.pop_front();
 
-		// convert the l_value from a StoreNode to a LoadNode
-		std::auto_ptr<LoadNode> load(new LoadNode( dynamic_cast<StoreNode*>(l_value)));
+		// l_value is StoreNode?
+		if ((store = dynamic_cast<StoreNode*>(l_value)) != 0)
+		{
+			load.reset(new LoadNode(store));
+		}
+		// ArrayWriteNode?
+		else if ((array = dynamic_cast<ArrayWriteNode*>(l_value)) != 0)
+		{
+			load.reset(new ArrayReadNode(array));
+		}
+		else
+			// invalid left value
+			throw Error(pos, WFormatableString(L"Expecting a left value."));
+
 		// create the immediate node
 		std::auto_ptr<Node> node(new ImmediateNode(pos, 1));
 
