@@ -88,7 +88,8 @@ if (QT4_FOUND)
 		HelpViewer.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp
-		plugins/ThymioVisualProgramming.cpp)
+		plugins/ThymioVisualProgramming.cpp
+		plugins/ThymioButtons.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	
