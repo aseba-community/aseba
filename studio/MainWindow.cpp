@@ -2512,6 +2512,7 @@ namespace Aseba
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog();
 		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(close()));
+		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(deleteLater()));
 		findDialog = new FindDialog(this);
 		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
 		
@@ -2643,13 +2644,31 @@ namespace Aseba
 		globalToolBar->setVisible(activeVMCount > 1);
 	}
 	
-	void MainWindow::regenerateHelpMenu()
+	void MainWindow::generateHelpMenu()
 	{
-		helpMenu->clear();
-		
 		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()), QKeySequence(tr("F1", "Help|User Manual")));
 		helpMenu->addSeparator();
 		
+		helpMenuTargetSpecificSeparator = helpMenu->addSeparator();
+		helpMenu->addAction(tr("Web site Aseba..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:start")));
+		helpMenu->addAction(tr("Report bug..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://github.com/aseba-community/aseba/issues/new")));
+		
+		helpMenu->addSeparator();
+		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
+		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
+	}
+	
+	void MainWindow::regenerateHelpMenu()
+	{
+		// remove old target-specific actions
+		while (!targetSpecificHelp.isEmpty())
+		{
+			QAction *action(targetSpecificHelp.takeFirst());
+			helpMenu->removeAction(action);
+			delete action;
+		}
+		
+		// add back target-specific actions
 		typedef std::set<int> ProductIds;
 		ProductIds productIds;
 		for (int i = 0; i < nodes->count(); i++)
@@ -2660,33 +2679,42 @@ namespace Aseba
 		}
 		for (ProductIds::const_iterator it(productIds.begin()); it != productIds.end(); ++it)
 		{
+			QAction *action;
 			switch (*it)
 			{
 				case ASEBA_PID_THYMIO2:
-				helpMenu->addAction(tr("Thymio programming tutorial..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:thymiotutoriel")));
-				helpMenu->addAction(tr("Thymio programming interface..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:thymioapi")));
+				action = new QAction(tr("Thymio programming tutorial..."), helpMenu);
+				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
+				action->setData(QUrl(tr("http://aseba.wikidot.com/en:thymiotutoriel")));
+				targetSpecificHelp.append(action);
+				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
+				action = new QAction(tr("Thymio programming interface..."), helpMenu);
+				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
+				action->setData(QUrl(tr("http://aseba.wikidot.com/en:thymioapi")));
+				targetSpecificHelp.append(action);
+				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
 				
 				case ASEBA_PID_CHALLENGE:
-				helpMenu->addAction(tr("Challenge tutorial..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:gettingstarted")));
+				action = new QAction(tr("Challenge tutorial..."), helpMenu);
+				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
+				action->setData(QUrl(tr("http://aseba.wikidot.com/en:gettingstarted")));
+				targetSpecificHelp.append(action);
+				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
 				
 				case ASEBA_PID_MARXBOT:
-				helpMenu->addAction(tr("MarXbot user manual..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf")));
+				action = new QAction(tr("MarXbot user manual..."), helpMenu);
+				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
+				action->setData(QUrl(tr("http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf")));
+				targetSpecificHelp.append(action);
+				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
 				
 				default:
 				break;
 			}
 		}
-		
-		helpMenu->addSeparator();
-		helpMenu->addAction(tr("Web site Aseba..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:start")));
-		helpMenu->addAction(tr("Report bug..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://github.com/aseba-community/aseba/issues/new")));
-		
-		helpMenu->addSeparator();
-		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
-		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
 	}
 	
 	void MainWindow::openToUrlFromAction() const
@@ -2707,7 +2735,7 @@ namespace Aseba
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Open..."), 
 							this, SLOT(openFile()),
 							QKeySequence(tr("Ctrl+O", "File|Open")));
-		openRecentMenu = new QMenu(tr("Open &Recent"));
+		openRecentMenu = new QMenu(tr("Open &Recent"), fileMenu);
 		regenerateOpenRecentMenu();
 		fileMenu->addMenu(openRecentMenu)->setIcon(QIcon(":/images/fileopen.png"));
 		
@@ -2853,11 +2881,11 @@ namespace Aseba
 		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
 		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
 		toolMenu->addSeparator();
-		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."));
+		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."), toolMenu);
 		toolMenu->addMenu(writeBytecodeMenu);
-		rebootMenu = new QMenu(tr("Reboot..."));
+		rebootMenu = new QMenu(tr("Reboot..."), toolMenu);
 		toolMenu->addMenu(rebootMenu);
-		saveBytecodeMenu = new QMenu(tr("Save the binary code..."));
+		saveBytecodeMenu = new QMenu(tr("Save the binary code..."), toolMenu);
 		toolMenu->addMenu(saveBytecodeMenu);
 		
 		// Settings
@@ -2870,13 +2898,7 @@ namespace Aseba
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
-		/*helpMenu->addAction(tr("&Language..."), this, SLOT(showHelpLanguage()));
-		helpMenu->addAction(tr("&Studio..."), this, SLOT(showHelpStudio()));
-		helpMenu->addSeparator();
-		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
-		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));*/
-
-		// Generate a basic help menu, for robots without any productID (as current marXbots)
+		generateHelpMenu();
 		regenerateHelpMenu();
 		
 		// add dynamic stuff

@@ -405,6 +405,7 @@ namespace Aseba
 		void regenerateOpenRecentMenu();
 		void updateRecentFiles(const QString& fileName);
 		void regenerateToolsMenus();
+		void generateHelpMenu();
 		void regenerateHelpMenu();
 		void setupWidgets();
 		void setupConnections();
@@ -464,6 +465,9 @@ namespace Aseba
 		QMenu *rebootMenu;
 		QMenu *saveBytecodeMenu;
 		QMenu *helpMenu;
+		typedef QList<QAction*> ActionList;
+		QAction* helpMenuTargetSpecificSeparator;
+		ActionList targetSpecificHelp;
 		
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;
