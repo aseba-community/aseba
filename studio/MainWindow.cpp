@@ -2654,7 +2654,11 @@ namespace Aseba
 		helpMenu->addAction(tr("Report bug..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://github.com/aseba-community/aseba/issues/new")));
 		
 		helpMenu->addSeparator();
+		#ifdef Q_WS_MAC
+		helpMenu->addAction("about", this, SLOT(about()));
+		#else // Q_WS_MAC
 		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
+		#endif // Q_WS_MAC
 		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
 	}
 	
@@ -2755,9 +2759,15 @@ namespace Aseba
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Import memories content..."),
 							this, SLOT(importMemoriesContent()));
 		fileMenu->addSeparator();
+		#ifdef Q_WS_MAC
+		fileMenu->addAction(QIcon(":/images/exit.png"), "quit",
+							this, SLOT(close()),
+							QKeySequence(tr("Ctrl+Q", "File|Quit")));
+		#else // Q_WS_MAC
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
 							this, SLOT(close()),
 							QKeySequence(tr("Ctrl+Q", "File|Quit")));
+		#endif // Q_WS_MAC
 		
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
