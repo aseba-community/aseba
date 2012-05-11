@@ -2653,13 +2653,14 @@ namespace Aseba
 		helpMenu->addAction(tr("Web site Aseba..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:start")));
 		helpMenu->addAction(tr("Report bug..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://github.com/aseba-community/aseba/issues/new")));
 		
-		helpMenu->addSeparator();
 		#ifdef Q_WS_MAC
 		helpMenu->addAction("about", this, SLOT(about()));
+		helpMenu->addAction("About &Qt...", qApp, SLOT(aboutQt()));
 		#else // Q_WS_MAC
+		helpMenu->addSeparator();
 		helpMenu->addAction(tr("&About..."), this, SLOT(about()));
-		#endif // Q_WS_MAC
 		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
+		#endif // Q_WS_MAC
 	}
 	
 	void MainWindow::regenerateHelpMenu()
