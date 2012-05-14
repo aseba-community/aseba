@@ -109,6 +109,9 @@ namespace Aseba
 		
 		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioBootloaderDialog>);
 		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
+
+		// for development -- delete me when done (jiwon)
+		reg(ASEBA_PID_UNDEFINED, &createInstance<ThymioVisualProgramming>);
 	}
 	
 	/*@}*/
