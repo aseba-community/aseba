@@ -375,7 +375,7 @@ namespace Aseba
 	
 	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -391,7 +391,7 @@ namespace Aseba
 	
 	void DashelTarget::writeBytecode(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		WriteBytecode(node).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -399,7 +399,7 @@ namespace Aseba
 	
 	void DashelTarget::reboot(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		Reboot(node).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -407,7 +407,7 @@ namespace Aseba
 	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		UserMessage(id, data).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -415,7 +415,7 @@ namespace Aseba
 	
 	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		SetVariables(node, start, data).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -423,7 +423,7 @@ namespace Aseba
 	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		unsigned variablesPayloadSize = (ASEBA_MAX_PACKET_SIZE - 4) / 2;
 		while (length > variablesPayloadSize)
@@ -438,7 +438,7 @@ namespace Aseba
 	
 	void DashelTarget::reset(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		Reset(node).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -446,7 +446,7 @@ namespace Aseba
 	
 	void DashelTarget::run(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -459,7 +459,7 @@ namespace Aseba
 	
 	void DashelTarget::pause(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		Pause(node).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -467,7 +467,7 @@ namespace Aseba
 	
 	void DashelTarget::next(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		NodesMap::iterator nodeIt = nodes.find(node);
 		assert(nodeIt != nodes.end());
@@ -483,7 +483,7 @@ namespace Aseba
 	
 	void DashelTarget::stop(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		Stop(node).serialize(dashelInterface.stream);
 		dashelInterface.stream->flush();
@@ -491,7 +491,7 @@ namespace Aseba
 	
 	void DashelTarget::setBreakpoint(unsigned node, unsigned line)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -507,7 +507,7 @@ namespace Aseba
 	
 	void DashelTarget::clearBreakpoint(unsigned node, unsigned line)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		int pc = getPCFromLine(node, line);
 		if (pc >= 0)
@@ -523,7 +523,7 @@ namespace Aseba
 	
 	void DashelTarget::clearBreakpoints(unsigned node)
 	{
-		if (writeBlocked) return;
+		if (writeBlocked || !dashelInterface.stream) return;
 		
 		BreakpointClearAll breakpointClearAllMessage;
 		breakpointClearAllMessage.dest = node;
@@ -675,6 +675,7 @@ namespace Aseba
 		int line = getLineFromPC(ess->source, ess->pc);
 		
 		assert(writeBlocked == false);
+		assert(dashelInterface.stream);
 		
 		Target::ExecutionMode mode;
 		if (ess->flags & ASEBA_VM_STEP_BY_STEP_MASK)
