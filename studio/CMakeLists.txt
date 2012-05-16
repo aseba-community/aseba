@@ -86,6 +86,7 @@ if (QT4_FOUND)
 		EventViewer.cpp
 		Plugin.cpp
 		HelpViewer.cpp
+		ConfigDialog.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp

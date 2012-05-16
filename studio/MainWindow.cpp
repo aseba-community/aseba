@@ -1861,6 +1861,12 @@ namespace Aseba
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
 	}
 
+	void MainWindow::showSettings()
+	{
+		configDialog.setModal(true);
+		configDialog.show();
+	}
+
 	void MainWindow::toggleBreakpoint()
 	{
 		assert(currentScriptTab);
@@ -3074,7 +3080,7 @@ namespace Aseba
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
 		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
 		goToLineAct->setEnabled(false);
-		
+
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
 		editMenu->addAction(cutAct);
@@ -3094,6 +3100,8 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(showLineNumbers);
 		editMenu->addAction(goToLineAct);
+		editMenu->addSeparator();
+		editMenu->addAction(tr("Settings"), this, SLOT(showSettings()));
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
