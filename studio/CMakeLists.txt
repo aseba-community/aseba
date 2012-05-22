@@ -89,6 +89,7 @@ if (QT4_FOUND)
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp
 		plugins/ThymioVisualProgramming.cpp
+		plugins/ThymioScene.cpp
 		plugins/ThymioButtons.cpp
 		plugins/ThymioEventButtons.cpp
 		plugins/ThymioActionButtons.cpp)
