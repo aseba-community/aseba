@@ -41,15 +41,7 @@
 	<file>images/busy.png</file>
 	<file>images/eye.png</file>
 	<file>images/eyeclose.png</file>
-	<file>images/thymiobuttons.svg</file>
-	<file>images/thymioprox.svg</file>
-	<file>images/thymiobody.svg</file>
-	<file>images/thymioproxground.svg</file>
 	<file>images/thymioclap.svg</file>
 	<file>images/thymiotap.svg</file>
-	<file>images/thymiocolor.svg</file>
-	<file>images/thymiospeaker.svg</file>
-	<file>images/thymiocircleon.svg</file>
-	<file>images/thymiomove.svg</file>
 </qresource>
 </RCC>
