@@ -17,6 +17,9 @@ Copyright (C) 2007--2011:
 	Sandra Moser [2]
 	(German translation)
 
+	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
+	(Spanish translation)
+
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
 	(Apple maintainer)
 	
@@ -25,6 +28,7 @@ Copyright (C) 2007--2011:
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
 	(inputs on challenge, graphics design on challenge)
+
 	
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
@@ -33,6 +37,7 @@ Copyright (C) 2007--2011:
 	[2] Autonomous Systems Lab (http://www.asl.ethz.ch)
 	ETHZ, Zurich (http://www.ethz.ch)
 	(as from September 2010)
+
 
 The user manual is fetched from the Wiki at http://aseba.wikidot.com,
 see there for the list of contributors. The license is
