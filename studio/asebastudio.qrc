@@ -43,5 +43,11 @@
 	<file>images/eyeclose.png</file>
 	<file>images/thymioclap.svg</file>
 	<file>images/thymiotap.svg</file>
+	<file>images/play.svgz</file>
+	<file>images/save.svgz</file>
+	<file>images/saveas.svgz</file>
+	<file>images/filenew.svgz</file>
+	<file>images/fileopen.svgz</file>
+	<file>images/exit.svgz</file>
 </qresource>
 </RCC>

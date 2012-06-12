@@ -54,6 +54,8 @@ namespace Aseba
 		Dashel::Stream* getDashelStream();
 		Target * getTarget();
 		unsigned getNodeId();
+		void displayCode(QList<QString> code);
+		void loadNrun();
 		TargetVariablesModel * getVariablesModel();
 	};
 	

@@ -381,30 +381,30 @@ namespace Aseba
 		editorAreaLayout->addWidget(editor);
 		
 		// keywords
-		varButton = new QPushButton("var");
-		ifButton = new QPushButton("if");
-		elseifButton = new QPushButton("elseif");
-		elseButton = new QPushButton("else");
-		oneventButton = new QPushButton("onevent");
-		whileButton = new QPushButton("while");
-		forButton = new QPushButton("for");
-		subroutineButton = new QPushButton("sub");
-		callsubButton = new QPushButton("callsub");
-		keywordsBox = new QGroupBox(tr("Keywords"));
-		QHBoxLayout *keywordsLayout = new QHBoxLayout;
-		keywordsLayout->addWidget(varButton);
-		keywordsLayout->addWidget(ifButton);
-		keywordsLayout->addWidget(elseifButton);
-		keywordsLayout->addWidget(elseButton);
-		keywordsLayout->addWidget(oneventButton);
-		keywordsLayout->addWidget(whileButton);
-		keywordsLayout->addWidget(forButton);
-		keywordsLayout->addWidget(subroutineButton);
-		keywordsLayout->addWidget(callsubButton);
-		keywordsBox->setLayout(keywordsLayout);
+		keywordsToolbar = new QToolBar();
+		varButton = new QToolButton(); varButton->setText("var");
+		ifButton = new QToolButton(); ifButton->setText("if");
+		elseifButton = new QToolButton(); elseifButton->setText("elseif");
+		elseButton = new QToolButton(); elseButton->setText("else");
+		oneventButton = new QToolButton(); oneventButton->setText("onevent");
+		whileButton = new QToolButton(); whileButton->setText("while");
+		forButton = new QToolButton(); forButton->setText("for");
+		subroutineButton = new QToolButton(); subroutineButton->setText("sub");
+		callsubButton = new QToolButton(); callsubButton->setText("callsub");
+		keywordsToolbar->addWidget(new QLabel(tr("<b>Keywords <\b>")));
+		keywordsToolbar->addSeparator();
+		keywordsToolbar->addWidget(varButton);
+		keywordsToolbar->addWidget(ifButton);
+		keywordsToolbar->addWidget(elseifButton);
+		keywordsToolbar->addWidget(elseButton);
+		keywordsToolbar->addWidget(oneventButton);
+		keywordsToolbar->addWidget(whileButton);
+		keywordsToolbar->addWidget(forButton);
+		keywordsToolbar->addWidget(subroutineButton);
+		keywordsToolbar->addWidget(callsubButton);
 		
 		QVBoxLayout *editorLayout = new QVBoxLayout;
-		editorLayout->addWidget(keywordsBox); // Jiwon
+		editorLayout->addWidget(keywordsToolbar); // Jiwon
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
 		
@@ -883,12 +883,21 @@ namespace Aseba
 		cursor.endEditBlock();
 	}	
 
+	void NodeTab::displayCode(QList<QString> code)
+	{
+		editor->clear();
+		
+		editor->textCursor();
+		for(int i=0; i<code.size(); i++)
+			editor->insertPlainText(code[i]);
+	}
+
 	void NodeTab::showKeywords(bool show)
 	{
 		if(show)
-			keywordsBox->show();
+			keywordsToolbar->show();
 		else
-			keywordsBox->hide();
+			keywordsToolbar->hide();
 	}
 
 	void NodeTab::setAutocomplete(bool flag)

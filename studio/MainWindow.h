@@ -33,6 +33,8 @@
 #include <QCloseEvent>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QToolButton>
+#include <QToolBar>
 
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
@@ -40,6 +42,8 @@
 #include "../compiler/compiler.h"
 #include <fstream>
 #include <sstream>
+#include <vector>
+#include <string>
 #include "Target.h"
 #include "TargetModels.h"
 #include "Plugin.h"
@@ -166,7 +170,7 @@ namespace Aseba
 		unsigned productId() const  { return pid; }
 		
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
-	
+		
 	signals:
 		void uploadReadynessChanged(bool);
 	
@@ -211,6 +215,8 @@ namespace Aseba
 		void showKeywords(bool show);
 		
 		void setAutocomplete(bool flag);
+		
+		void displayCode(QList<QString> code);
 		
 		void cursorMoved();
 		void goToError();
@@ -267,16 +273,16 @@ namespace Aseba
 		
 				
 		// keywords // Jiwon
-		QPushButton *varButton;
-		QPushButton *ifButton;
-		QPushButton *elseifButton;
-		QPushButton *elseButton;
-		QPushButton *oneventButton;
-		QPushButton *whileButton;
-		QPushButton *forButton;
-		QPushButton *subroutineButton;
-		QPushButton *callsubButton;
-		QGroupBox *keywordsBox;
+		QToolButton *varButton;
+		QToolButton *ifButton;
+		QToolButton *elseifButton;
+		QToolButton *elseButton;
+		QToolButton *oneventButton;
+		QToolButton *whileButton;
+		QToolButton *forButton;
+		QToolButton *subroutineButton;
+		QToolButton *callsubButton;
+		QToolBar *keywordsToolbar;
 		
 		bool autoComplete;
 		
