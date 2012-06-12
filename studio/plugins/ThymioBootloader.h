@@ -72,6 +72,9 @@ namespace Aseba
 		void flashDone(void);
 		void timerEvent(QTimerEvent *event);
 		void closeEvent(QCloseEvent * event);
+
+	private:
+		void handleDashelException(Dashel::DashelException e);
 	};
 	/*@}*/
 }; // Aseba

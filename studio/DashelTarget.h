@@ -206,6 +206,9 @@ namespace Aseba
 		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
 		int getPCFromLine(unsigned node, unsigned line);
 		int getLineFromPC(unsigned node, unsigned pc);
+
+	protected:
+		void handleDashelException(Dashel::DashelException e);
 	};
 	
 	/*@}*/

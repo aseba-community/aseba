@@ -163,9 +163,16 @@ namespace Aseba
 		
 		// Ask the pic to switch into bootloader
 		Reboot msg(nodeId);
-		msg.serialize(stream);
-		stream->flush();
-		// now, wait until the disconnect event is sent.
+		try
+		{
+			msg.serialize(stream);
+			stream->flush();
+			// now, wait until the disconnect event is sent.
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 	}
 	
 	void ThymioBootloaderDialog::doClose(void) 
@@ -225,11 +232,17 @@ namespace Aseba
 		BootloaderWritePage writePage;
 		writePage.dest = nodeId;
 		writePage.pageNumber = page;
-		writePage.serialize(stream);
-		
-		stream->write(data,2048);
 
-		stream->flush();
+		try
+		{
+			writePage.serialize(stream);
+			stream->write(data,2048);
+			stream->flush();
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 	}
 
 	void ThymioBootloaderDialog::flashDone(void)
@@ -240,8 +253,15 @@ namespace Aseba
 		qDebug() << "Flash done, switch back to VM";
 
 		BootloaderReset msg(nodeId);
-		msg.serialize(stream);
-		stream->flush();
+		try
+		{
+			msg.serialize(stream);
+			stream->flush();
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 		
 		// send GetDescription 100 ms later
 		startTimer(100);
@@ -252,8 +272,15 @@ namespace Aseba
 		killTimer(event->timerId());
 		
 		GetDescription message;
-		message.serialize(stream);
-		stream->flush();
+		try
+		{
+			message.serialize(stream);
+			stream->flush();
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 		
 		// Don't allow to immediatly reflash, we want studio to redisplay a new tab ! 
 		quitButton->setEnabled(true);
@@ -265,5 +292,18 @@ namespace Aseba
 			event->accept();
 		else
 			event->ignore();
+	}
+
+	void ThymioBootloaderDialog::handleDashelException(Dashel::DashelException e)
+	{
+		switch(e.source)
+		{
+		default:
+			// oops... we are doomed
+			// non-modal message box
+			QMessageBox* message = new QMessageBox(QMessageBox::Critical, tr("Dashel Unexpected Error"), tr("A communication error happened during the flashing process:") + " (" + QString::number(e.source) + ") " + e.what(), QMessageBox::NoButton, this);
+			message->setWindowModality(Qt::NonModal);
+			message->show();
+		}
 	}
 };
