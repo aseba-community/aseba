@@ -170,6 +170,8 @@ add_subdirectory(dump)
 
 add_subdirectory(replay)
 
+add_subdirectory(exec)
+
 add_subdirectory(targets/dummy)
 
 enable_testing()
