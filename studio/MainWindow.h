@@ -534,7 +534,6 @@ namespace Aseba
 		bool sourceModified; //!< true if source code has been modified since last save
 		bool autoMemoryRefresh; //! < true if auto memory refresh is on by default
 		HelpViewer helpViewer;
-		ConfigDialog configDialog;
 		
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;

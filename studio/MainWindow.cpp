@@ -1413,6 +1413,9 @@ namespace Aseba
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
 		
+		// create config dialog + read settings on-disk
+		ConfigDialog::init(this);
+
 		// create gui
 		setupWidgets();
 		setupMenu();
@@ -1863,8 +1866,7 @@ namespace Aseba
 
 	void MainWindow::showSettings()
 	{
-		configDialog.setModal(true);
-		configDialog.show();
+		ConfigDialog::showConfig();
 	}
 
 	void MainWindow::toggleBreakpoint()

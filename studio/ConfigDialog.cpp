@@ -57,6 +57,30 @@ namespace Aseba
 
 
 	/*** ConfigDialog ***/
+	void ConfigDialog::init(QWidget* parent)
+	{
+		if (!me)
+			me = new ConfigDialog(parent);
+	}
+
+	void ConfigDialog::bye()
+	{
+		if (me)
+		{
+			delete me;
+			me = NULL;
+		}
+	}
+
+	void ConfigDialog::showConfig()
+	{
+		me->setModal(true);
+		me->show();
+
+	}
+
+	ConfigDialog* ConfigDialog::me = NULL;
+
 	ConfigDialog::ConfigDialog(QWidget* parent):
 		QDialog(parent)
 	{

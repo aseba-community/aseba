@@ -34,12 +34,19 @@ namespace Aseba
 		Q_OBJECT
 
 	public:
+		// instantiate / kill the singleton
+		static void init(QWidget* parent = 0);
+		static void bye(void);
+
+		static void showConfig();
+
+	protected:
 		ConfigDialog(QWidget* parent = 0);
 		~ConfigDialog();
 
-		void showConfig();
-
 	protected:
+		static ConfigDialog* me;	// pointer to the singleton
+
 		QPushButton* okButton;
 		QPushButton* cancelButton;
 		QListWidget* topicList;
