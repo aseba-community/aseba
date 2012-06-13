@@ -28,6 +28,9 @@
 
 namespace Aseba
 {
+	class GeneralPage;
+	class EditorPage;
+
 	// ConfigDialog
 	class ConfigDialog: public QDialog
 	{
@@ -40,6 +43,9 @@ namespace Aseba
 
 		static void showConfig();
 
+		// access to properties
+		static bool getAutoCompletion(void);
+
 	protected:
 		ConfigDialog(QWidget* parent = 0);
 		~ConfigDialog();
@@ -51,6 +57,10 @@ namespace Aseba
 		QPushButton* cancelButton;
 		QListWidget* topicList;
 		QStackedWidget* configStack;
+
+		// individual pages
+		GeneralPage* generalpage;
+		EditorPage* editorpage;
 
 		bool readSettings();
 		void writeSettings();
@@ -69,6 +79,8 @@ namespace Aseba
 		ConfigPage(QString title = QString(), QWidget* parent = 0);
 		~ConfigPage(){}
 
+		friend class ConfigDialog;
+
 	protected:
 		QVBoxLayout* mainLayout;
 	};
@@ -81,6 +93,8 @@ namespace Aseba
 	public:
 		GeneralPage(QWidget* parent = 0);
 		~GeneralPage(){}
+
+		friend class ConfigDialog;
 	};
 
 	// EditorPage
@@ -91,6 +105,8 @@ namespace Aseba
 	public:
 		EditorPage(QWidget* parent = 0);
 		~EditorPage(){}
+
+		friend class ConfigDialog;
 
 	protected:
 		QCheckBox* autocompletion;

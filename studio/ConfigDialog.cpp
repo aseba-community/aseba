@@ -89,11 +89,12 @@ namespace Aseba
 		topicList->addItem("General");
 		topicList->addItem("Editor");
 
+		// create pages
 		configStack = new QStackedWidget();
-		ConfigPage* page1 = new GeneralPage();
-		configStack->addWidget(page1);
-		ConfigPage* page2 = new EditorPage();
-		configStack->addWidget(page2);
+		generalpage = new GeneralPage();
+		configStack->addWidget(generalpage);
+		editorpage = new EditorPage();
+		configStack->addWidget(editorpage);
 
 		connect(topicList, SIGNAL(currentRowChanged(int)), configStack, SLOT(setCurrentIndex(int)));
 		topicList->setCurrentRow(0);
@@ -124,6 +125,14 @@ namespace Aseba
 	ConfigDialog::~ConfigDialog()
 	{
 		writeSettings();
+	}
+
+	bool ConfigDialog::getAutoCompletion()
+	{
+		if (me)
+			return (me->editorpage->autocompletion->checkState() == Qt::Unchecked ? false : true);
+		else
+			return false;
 	}
 
 	void ConfigDialog::accept()

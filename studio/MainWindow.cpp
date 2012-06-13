@@ -715,7 +715,7 @@ namespace Aseba
 		else
 		{
 			QTextCursor cursor(editor->textCursor());
-			if (cursor.atBlockEnd())// && !cursor.block().next().isValid())
+			if (cursor.atBlockEnd() && ConfigDialog::getAutoCompletion())// && !cursor.block().next().isValid())
 			{
 				// language completion
 				const QString& line(cursor.block().text());
