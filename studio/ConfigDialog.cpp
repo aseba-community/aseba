@@ -45,6 +45,20 @@ namespace Aseba
 		mainLayout->addStretch();
 	}
 
+	void GeneralPage::readSettings()
+	{
+		QSettings settings;
+		settings.beginGroup("general-config");
+		settings.endGroup();
+	}
+
+	void GeneralPage::writeSettings()
+	{
+		QSettings settings;
+		settings.beginGroup("general-config");
+		settings.endGroup();
+	}
+
 
 	/*** EditorPage ***/
 	EditorPage::EditorPage(QWidget *parent):
@@ -53,6 +67,22 @@ namespace Aseba
 		autocompletion = new QCheckBox(tr("Enable autocompletion"));
 		mainLayout->addWidget(autocompletion);
 		mainLayout->addStretch();
+	}
+
+	void EditorPage::readSettings()
+	{
+		QSettings settings;
+		settings.beginGroup("editor-config");
+		autocompletion->setCheckState(settings.value("autocompletion", true).toBool() == true ? Qt::Checked : Qt::Unchecked);
+		settings.endGroup();
+	}
+
+	void EditorPage::writeSettings()
+	{
+		QSettings settings;
+		settings.beginGroup("editor-config");
+		settings.setValue("autocompletion", autocompletion->checkState() == Qt::Checked);
+		settings.endGroup();
 	}
 
 
@@ -120,6 +150,8 @@ namespace Aseba
 		mainLayout->addLayout(buttonLayout);
 
 		setLayout(mainLayout);
+
+		readSettings();
 	}
 
 	ConfigDialog::~ConfigDialog()
@@ -145,21 +177,24 @@ namespace Aseba
 		QDialog::reject();
 	}
 
-	bool ConfigDialog::readSettings()
+	void ConfigDialog::readSettings()
 	{
-		bool result = false;
-
-		QSettings settings;
-		//result = restoreGeometry(settings.value("HelpViewer/geometry").toByteArray());
-		//move(settings.value("HelpViewer/position").toPoint());
-		return result;
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->readSettings();
+		}
 	}
 
 	void ConfigDialog::writeSettings()
 	{
-		QSettings settings;
-		//settings.setValue("HelpViewer/geometry", saveGeometry());
-		//settings.setValue("HelpViewer/position", pos());
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->writeSettings();
+		}
 	}
 
 }

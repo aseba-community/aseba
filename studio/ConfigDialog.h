@@ -62,7 +62,7 @@ namespace Aseba
 		GeneralPage* generalpage;
 		EditorPage* editorpage;
 
-		bool readSettings();
+		void readSettings();
 		void writeSettings();
 
 	public slots:
@@ -82,6 +82,10 @@ namespace Aseba
 		friend class ConfigDialog;
 
 	protected:
+		virtual void readSettings() = 0;
+		virtual void writeSettings() = 0;
+
+	protected:
 		QVBoxLayout* mainLayout;
 	};
 
@@ -95,6 +99,10 @@ namespace Aseba
 		~GeneralPage(){}
 
 		friend class ConfigDialog;
+
+	protected:
+		virtual void readSettings();
+		virtual void writeSettings();
 	};
 
 	// EditorPage
@@ -107,6 +115,10 @@ namespace Aseba
 		~EditorPage(){}
 
 		friend class ConfigDialog;
+
+	protected:
+		virtual void readSettings();
+		virtual void writeSettings();
 
 	protected:
 		QCheckBox* autocompletion;
