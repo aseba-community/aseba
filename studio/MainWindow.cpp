@@ -249,8 +249,7 @@ namespace Aseba
 		firstCompilation(true),
 		showHidden(mainWindow->showHiddenAct->isChecked()),
 		compilationDirty(false),
-		isSynchronized(true),
-		autoComplete(true)
+		isSynchronized(true)
 	{
 		// setup some variables
 		rehighlighting = false;
@@ -707,8 +706,6 @@ namespace Aseba
 	
 	void NodeTab::editorContentChanged()
 	{
-		if( !autoComplete ) return;
-		
 		if (rehighlighting)
 		{
 			rehighlighting = false;
@@ -898,11 +895,6 @@ namespace Aseba
 			keywordsToolbar->show();
 		else
 			keywordsToolbar->hide();
-	}
-
-	void NodeTab::setAutocomplete(bool flag)
-	{
-		autoComplete = flag;
 	}
 
 	void NodeTab::updateHidden() 
@@ -1953,16 +1945,6 @@ namespace Aseba
 		}
 	}
 
-	void MainWindow::setAutocomplete(bool flag) // Jiwon
-	{
-		for (int i = 0; i < nodes->count(); i++)
-		{
-			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (tab)
-				tab->setAutocomplete(flag);
-		}
-	}
-
 	void MainWindow::clearAllExecutionError()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2798,8 +2780,7 @@ namespace Aseba
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
-		connect(autocompleteAct, SIGNAL(toggled(bool)), SLOT(setAutocomplete(bool)));
-		
+
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
 		connect(removeEventNameButton, SIGNAL(clicked()), SLOT(removeEventNameClicked()));
@@ -3173,11 +3154,6 @@ namespace Aseba
 		showKeywordsAct->setCheckable(true);
 		showKeywordsAct->setChecked(true);
 		settingsMenu->addAction(showKeywordsAct);
-
-		autocompleteAct = new QAction(tr("Set &autocomplete..."), this);
-		autocompleteAct->setCheckable(true);
-		autocompleteAct->setChecked(true);
-		settingsMenu->addAction(autocompleteAct);
 		
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);

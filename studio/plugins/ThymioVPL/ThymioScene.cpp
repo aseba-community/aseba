@@ -103,6 +103,8 @@ namespace Aseba
 			setFocusItem(0);
 		}
 
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));
+
 		sceneModified = true;
 		return button;
 	}
@@ -170,18 +172,23 @@ namespace Aseba
 			setFocusItem(0);
 		}
 		
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));		
+		
 		sceneModified = true;		
 		return button;
 	}
 
 	bool ThymioScene::isEmpty()
 	{
-		if( buttonSets.size() > 1 ||
-			buttonSets.last()->actionExists() ||
-			buttonSets.last()->eventExists() )
-			return false;
+		if( buttonSets.isEmpty() )
+			return true;
+			
+		if( buttonSets.size() == 1 &&
+			buttonSets[0]->actionExists() &&
+			buttonSets[0]->eventExists() )
+			return true;
 
-		return true;
+		return false;
 	}
 
 	void ThymioScene::reset()
@@ -193,6 +200,8 @@ namespace Aseba
 		button->setScale(scaleFactor);
 		button->setPos(20, 20);
 		buttonSets.push_back(button);
+	
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));
 	
 		addItem(button);
 		thymioCompiler.AddButtonSet(button->getIRButtonSet());
@@ -263,6 +272,8 @@ namespace Aseba
 	
 		sceneModified = true;
 		
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));
+		
 		buttonUpdateDetected();
 	}
 	
@@ -289,6 +300,8 @@ namespace Aseba
 		prevNewActionButton = false;
 	
 		sceneModified = true;
+		
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));		
 	}
 
 	void ThymioScene::rearrangeButtons(int row)
@@ -302,11 +315,35 @@ namespace Aseba
 		scaleFactor = scale*0.5;
 		for( ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr )
 			(*itr)->setScale(scaleFactor);
+			
+		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));			
 	}	
 	
 	QString ThymioScene::getErrorMessage() 
 	{ 
-		return QString::fromStdWString(thymioCompiler.getErrorMessage());
+		switch(thymioCompiler.getErrorCode()) {
+		case THYMIO_MISSING_EVENT:
+			return tr("Missing event button");
+			break;
+		case THYMIO_MISSING_ACTION:
+			return tr("Missing action button");
+			break;
+		case THYMIO_EVENT_NOT_SET:
+			return tr("Event button is not set.");
+			break;
+		case THYMIO_EVENT_MULTISET:
+			return tr("Redeclaration of event button.");
+			break;
+		case THYMIO_INVALID_CODE:
+			return tr("Unknown button type.");
+			break;
+		case THYMIO_NO_ERROR:
+			return tr("Compilation success.");
+		default:
+			break;
+		}
+		
+		return "";
 	}	
 	
 	QList<QString> ThymioScene::getCode()

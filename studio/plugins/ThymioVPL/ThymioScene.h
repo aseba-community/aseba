@@ -25,12 +25,13 @@ namespace Aseba
 		bool isModified() { return sceneModified; }
 		void setModified(bool mod) { sceneModified=mod; }
 		void setScale(qreal scale);
+		int getNumberOfButtonSets() { return buttonSets.size(); }
 		
 		QString getErrorMessage();
 		QList<QString> getCode();
 		
 		bool isSuccessful() { return  thymioCompiler.isSuccessful(); }
-				
+		
 		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
 		
 		ButtonSetItr buttonsBegin() { return buttonSets.begin(); }

@@ -214,8 +214,6 @@ namespace Aseba
 		void callsubButtonClicked();
 		void showKeywords(bool show);
 		
-		void setAutocomplete(bool flag);
-		
 		void displayCode(QList<QString> code);
 		
 		void cursorMoved();
@@ -283,8 +281,6 @@ namespace Aseba
 		QToolButton *subroutineButton;
 		QToolButton *callsubButton;
 		QToolBar *keywordsToolbar;
-		
-		bool autoComplete;
 		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
@@ -367,8 +363,7 @@ namespace Aseba
 		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
-		void showKeywords(bool show); // Jiwon
-		void setAutocomplete(bool show); // Jiwon
+		void showKeywords(bool show);
 
 		void toggleBreakpoint();
 		void clearAllBreakpoints();
@@ -526,8 +521,7 @@ namespace Aseba
 		QAction *toggleBreakpointAct;
 		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;
-		QAction *showKeywordsAct; // Jiwon
-		QAction *autocompleteAct; // Jiwon
+		QAction *showKeywordsAct; 
 		QAction* showCompilationMsg;
 		
 		// gui helper stuff

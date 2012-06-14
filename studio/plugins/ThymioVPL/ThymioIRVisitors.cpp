@@ -89,50 +89,86 @@ namespace Aseba
 
 		errorCode = THYMIO_NO_ERROR;
 		
-		multimap<wstring, ThymioIRButton*> *currentHash;		
+		multimap<wstring, ThymioIRButton*> *currentHash;
+		multimap<wstring, ThymioIRButton*> tempHash;
 		switch( activeActionName )
 		{
 		case THYMIO_MOVE_IR:
 			currentHash = &moveHash;
+			tempHash = moveHash;
 			break;
 		case THYMIO_COLOR_IR:
 			currentHash = &colorHash;
+			tempHash = colorHash;
 			break;
 		case THYMIO_CIRCLE_IR:
-			currentHash = &circleHash;	
+			currentHash = &circleHash;
+			tempHash = circleHash;
 			break;
 		case THYMIO_SOUND_IR:
-			currentHash = &soundHash;			
+			currentHash = &soundHash;
+			tempHash = soundHash;
 			break;
 		default:
 			return;
 			break;
 		}
 
-		for(int i=0; i<button->size(); i++)
-		{		
-			pair< multimap<wstring, ThymioIRButton*>::iterator,
-				  multimap<wstring, ThymioIRButton*>::iterator > ret;
-			multimap<wstring, ThymioIRButton*>::iterator itr;
+		currentHash->clear();
+	
+		for(multimap<wstring, ThymioIRButton*>::iterator itr = tempHash.begin();
+			itr != tempHash.end(); ++itr)
+		{
+			if( itr->second != button )
+				currentHash->insert(*itr);
+		}
 
-			wstring buttonname = button->getBasename();
-			buttonname += toWstring(i);
-			
-			ret = currentHash->equal_range(buttonname);
+		wstring buttonname = button->getBasename();
+		for(int i=0; i<button->size(); i++)
+		{	
 			if( button->isClicked(i) )
-			{				
-				for( itr = ret.first; itr != ret.second; ++itr )				
-					if( (*itr).second != button )
-						errorCode = THYMIO_EVENT_MULTISET;
-				currentHash->insert( pair<wstring, ThymioIRButton*>(buttonname, button) );
-			}
-			else
-			{				
-				for( itr = ret.first; itr != ret.second; ++itr )
-					if( (*itr).second == button )
-						currentHash->erase(itr);
+			{
+				buttonname += L"_";
+				buttonname += toWstring(i);	
 			}
 		}
+
+		pair< multimap<wstring, ThymioIRButton*>::iterator,
+			  multimap<wstring, ThymioIRButton*>::iterator > ret;
+		ret = currentHash->equal_range(buttonname);		
+
+		for(multimap<wstring, ThymioIRButton*>::iterator itr = ret.first; 
+			itr != ret.second; ++itr )				
+			if( itr->second != button )
+				errorCode = THYMIO_EVENT_MULTISET;
+				
+		currentHash->insert( pair<wstring, ThymioIRButton*>(buttonname, button) );
+		tempHash.clear();
+
+//		for(int i=0; i<button->size(); i++)
+//		{		
+//			pair< multimap<wstring, ThymioIRButton*>::iterator,
+//				  multimap<wstring, ThymioIRButton*>::iterator > ret;
+//			multimap<wstring, ThymioIRButton*>::iterator itr;
+//
+//			wstring buttonname = button->getBasename();
+//			buttonname += toWstring(i);
+//			
+//			ret = currentHash->equal_range(buttonname);
+//			if( button->isClicked(i) )
+//			{				
+//				for( itr = ret.first; itr != ret.second; ++itr )				
+//					if( (*itr).second != button )
+//						errorCode = THYMIO_EVENT_MULTISET;
+//				currentHash->insert( pair<wstring, ThymioIRButton*>(buttonname, button) );
+//			}
+//			else
+//			{				
+//				for( itr = ret.first; itr != ret.second; ++itr )
+//					if( (*itr).second == button )
+//						currentHash->erase(itr);
+//			}
+//		}
 
 	}
 
@@ -248,7 +284,8 @@ namespace Aseba
 				{
 					if(button->isClicked(i))
 					{
-						text += (flag ? L" or " : L"");						
+						text += (flag ? L" and " : L"");						
+//						text += (flag ? L" or " : L"");	
 						text += L"button.";
 						text += directions[i];
 						text += L" == 1";
@@ -264,7 +301,8 @@ namespace Aseba
 				{
 					if(button->isClicked(i))
 					{
-						text += (flag ? L" or " : L"");
+						text += (flag ? L" and " : L"");
+//						text += (flag ? L" or " : L"");
 						text += L"prox.horizontal[";
 						text += toWstring(i);
 						text += L"] > 500";
@@ -280,7 +318,8 @@ namespace Aseba
 				{
 					if(button->isClicked(i))
 					{
-						text += (flag ? L" or " : L"");
+						text += (flag ? L" and " : L"");
+//						text += (flag ? L" or " : L"");
 						text += L"prox.ground.reflected[";
 						text += toWstring(i);
 						text += L"] < 150";

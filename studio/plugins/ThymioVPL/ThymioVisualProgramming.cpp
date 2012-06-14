@@ -141,7 +141,7 @@ namespace Aseba
 		view = new QGraphicsView(scene);
 		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);		
 		view->setRenderHint(QPainter::Antialiasing);
-		view->setSceneRect(QRectF(0, 0, 540, 500));
+		scene->setSceneRect(QRectF(0, 0, 540, 600));
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		view->setMinimumWidth(290);
@@ -673,7 +673,6 @@ namespace Aseba
 
 		iconSize = QSize(128*scale, 128*scale);
 		scene->setScale(scale);
-		view->setSceneRect(QRectF(0, 0, 500*scale+40, 50000));
 
 		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
