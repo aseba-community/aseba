@@ -27,7 +27,7 @@ namespace Aseba
 	
 	int ThymioIRButton::size() 
 	{ 
-		buttons.size(); 
+		return buttons.size(); 
 	}
 
 	void ThymioIRButton::setBasename(wstring n)
@@ -54,10 +54,12 @@ namespace Aseba
 	{ 
 		if( name > 2 )
 			return true; 
-		
-		for(int i=0; i<size(); ++i) 
-			if( buttons[i] == true ) 
-				return true; 
+
+		for(int i=0; i<size(); ++i)
+		{
+			if( buttons[i] == true )
+				return true;
+		}
 		
 		return false; 
 	}
@@ -75,13 +77,11 @@ namespace Aseba
 		
 	void ThymioIRButtonSet::addEventButton(ThymioIRButton *event) 
 	{ 
-		std::cout << "event button " << event << " added\n";
 		eventButton = event; 
 	}
 	
 	void ThymioIRButtonSet::addActionButton(ThymioIRButton *action) 
 	{ 
-		std::cout << "action button " << action << " added\n";
 		actionButton = action; 
 	}
 		

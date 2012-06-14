@@ -167,10 +167,10 @@ namespace Aseba
 	// Syntax Checker //
 	void ThymioIRSyntaxChecker::visit(ThymioIRButton *button)
 	{
-		errorCode = THYMIO_NO_ERROR;
-		
 		if( !button->isValid() )
 			errorCode = THYMIO_EVENT_NOT_SET;
+		else
+			errorCode = THYMIO_NO_ERROR;
 	}
 	
 	void ThymioIRSyntaxChecker::visit(ThymioIRButtonSet *buttonSet)

@@ -31,7 +31,7 @@
 
 #include "plugins/VariablesViewPlugin.h"
 #include "plugins/ThymioBootloader.h"
-//#include "plugins/ThymioVisualProgramming.h"
+#include "plugins/ThymioVPL/ThymioVisualProgramming.h"
 
 namespace Aseba
 {	
@@ -119,10 +119,7 @@ namespace Aseba
 		reg(ASEBA_PID_SMARTROB, &createInstance<LinearCameraViewPlugin>);
 		
 		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioBootloaderDialog>);
-//		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
-
-		// for development -- delete me when done (jiwon)
-//		reg(ASEBA_PID_UNDEFINED, &createInstance<ThymioVisualProgramming>);
+		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
 	}
 	
 	/*@}*/

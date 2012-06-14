@@ -10,7 +10,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 
-#include "../../utils/HexFile.h"
+//#include "../../utils/HexFile.h"
 
 #include "ThymioVisualProgramming.h"
 #include "ThymioVisualProgramming.moc"
@@ -40,32 +40,33 @@ namespace Aseba
 		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);		
 		mainLayout->addWidget(toolBar);
 
-		QToolButton *newButton = new QToolButton();
+		newButton = new QToolButton();
+		openButton = new QToolButton();
+		saveButton = new QToolButton();
+		saveAsButton = new QToolButton();
+		runButton = new QToolButton();				
+		colorComboButton = new QComboBox();			
+		quitButton = new QToolButton();
+
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
 		
-		QToolButton *openButton = new QToolButton();
 		openButton->setIcon(QIcon(":/images/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));		
 		
-		QToolButton *saveButton = new QToolButton();
 		saveButton->setIcon(QIcon(":/images/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 
-		QToolButton *saveAsButton = new QToolButton();
 		saveAsButton->setIcon(QIcon(":/images/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 
-		runButton = new QToolButton();
 		runButton->setIcon(QIcon(":/images/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
-		
-		colorComboButton = new QComboBox();		
+	
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
 		colorComboButton->setIconSize(QSize(64,32));
 
-		QToolButton *quitButton = new QToolButton();
 		quitButton->setIcon(QIcon(":/images/exit.svgz"));
 		quitButton->setToolTip(tr("Quit"));
 			
@@ -88,46 +89,30 @@ namespace Aseba
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
-		QHBoxLayout *horizontalLayout = new QHBoxLayout();
+		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
 		
 		// events
-		QVBoxLayout *eventsLayout = new QVBoxLayout();
+		eventsLayout = new QVBoxLayout();
 
 		tapSvg = new QSvgRenderer(QString(":/images/thymiotap.svg"));
 		clapSvg = new QSvgRenderer(QString(":/images/thymioclap.svg"));
-		
-		ThymioButtonsEvent *buttonEvent = new ThymioButtonsEvent();
-		ThymioProxEvent *proxEvent = new ThymioProxEvent();
-		ThymioProxGroundEvent *groundEvent = new ThymioProxGroundEvent();
-		ThymioTapEvent *tapEvent = new ThymioTapEvent();
-		ThymioClapEvent *clapEvent = new ThymioClapEvent();
-		
-		tapEvent->setSharedRenderer(tapSvg);
-		clapEvent->setSharedRenderer(clapSvg);
-		
-		ThymioPushButton *buttonsButton = new	ThymioPushButton();
-		buttonsButton->setThymioButton(buttonEvent);
+
+		ThymioPushButton *buttonsButton = new ThymioPushButton("button");
+		ThymioPushButton *proxButton = new ThymioPushButton("prox");
+		ThymioPushButton *proxGroundButton = new ThymioPushButton("proxground");		
+		ThymioPushButton *tapButton = new ThymioPushButton("tap", tapSvg);
+		ThymioPushButton *clapButton = new ThymioPushButton("clap", clapSvg);
+
 		eventButtons.push_back(buttonsButton);
-
-		ThymioPushButton *proxButton = new ThymioPushButton();
-		proxButton->setThymioButton(proxEvent);
 		eventButtons.push_back(proxButton);
-
-		ThymioPushButton *proxGroundButton = new ThymioPushButton();
-		proxGroundButton->setThymioButton(groundEvent);
-		eventButtons.push_back(proxGroundButton);
-		
-		ThymioPushButton *tapButton = new ThymioPushButton();
-		tapButton->setThymioButton(tapEvent);
+		eventButtons.push_back(proxGroundButton);		
 		eventButtons.push_back(tapButton);
-		
-		ThymioPushButton *clapButton = new ThymioPushButton();
-		clapButton->setThymioButton(clapEvent);
 		eventButtons.push_back(clapButton);
 		
-		eventsLayout->addWidget(new QLabel(tr("<b>Events</b>")));
+		eventsLabel = new QLabel(tr("<b>Events</b>"));
 		eventsLayout->setAlignment(Qt::AlignTop);
+		eventsLayout->addWidget(eventsLabel);
 		eventsLayout->addWidget(buttonsButton);
 		eventsLayout->addWidget(proxButton);
 		eventsLayout->addWidget(proxGroundButton);
@@ -136,63 +121,53 @@ namespace Aseba
 		
 		horizontalLayout->addLayout(eventsLayout);
 		
-		// scene
-		QVBoxLayout *sceneLayout = new QVBoxLayout();
+		sceneLayout = new QVBoxLayout();
 
+		// compilation
+		compilationResultImage = new QLabel();
+		compilationResult = new QLabel(tr("Compilation success."));
+				
+		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
+		compilationResult->setWordWrap(true);
+		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+
+		compilationResultLayout = new QHBoxLayout;
+		compilationResultLayout->addWidget(compilationResultImage);  
+		compilationResultLayout->addWidget(compilationResult,10000);
+		sceneLayout->addLayout(compilationResultLayout);
+
+		// scene		
 		scene = new ThymioScene(this);
-//		scene->setSceneRect(QRectF(0, 0, 540, 10000));
-//		scene->setBackgroundBrush(Qt::Dense7Pattern);
 		view = new QGraphicsView(scene);
 		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);		
 		view->setRenderHint(QPainter::Antialiasing);
-		view->setSceneRect(QRectF(0, 0, 540, 10000));
+		view->setSceneRect(QRectF(0, 0, 540, 500));
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		view->setMinimumWidth(290);
 		view->centerOn(250,0);
 		sceneLayout->addWidget(view);
-   
-		// compilation
-		compilationResultImage = new QLabel();
-		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-		compilationResult = new QLabel(tr("Compilation success."));
-		compilationResult->setWordWrap(true);
-		compilationResult->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-		QHBoxLayout *compilationResultLayout = new QHBoxLayout;
-		compilationResultLayout->addWidget(compilationResult,10000);
-		compilationResultLayout->addWidget(compilationResultImage);  
-		sceneLayout->addLayout(compilationResultLayout);
 
 		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
 
 		horizontalLayout->addLayout(sceneLayout);
      
 		// actions
-		QVBoxLayout *actionsLayout = new QVBoxLayout();
+		actionsLayout = new QVBoxLayout();
 
-		ThymioMoveAction *moveAction = new ThymioMoveAction();
-		ThymioColorAction *colorAction = new ThymioColorAction();
-		ThymioCircleAction *circleAction = new ThymioCircleAction();
-		ThymioSoundAction *soundAction = new ThymioSoundAction();
-
-		ThymioPushButton *moveButton = new ThymioPushButton();
-		moveButton->setThymioButton(moveAction);
+		ThymioPushButton *moveButton = new ThymioPushButton("move");
+		ThymioPushButton *colorButton = new ThymioPushButton("color");
+		ThymioPushButton *circleButton = new ThymioPushButton("circle");
+		ThymioPushButton *soundButton = new ThymioPushButton("sound");
+		actionsLabel = new QLabel(tr("<b>Actions</b>"));
+								
 		actionButtons.push_back(moveButton);
-		
-		ThymioPushButton *colorButton = new ThymioPushButton();
-		colorButton->setThymioButton(colorAction);
 		actionButtons.push_back(colorButton);
-		
-		ThymioPushButton *circleButton = new ThymioPushButton();
-		circleButton->setThymioButton(circleAction);
 		actionButtons.push_back(circleButton);
-		
-		ThymioPushButton *soundButton = new ThymioPushButton();
-		soundButton->setThymioButton(soundAction);
 		actionButtons.push_back(soundButton);
 
 		actionsLayout->setAlignment(Qt::AlignTop);
-		actionsLayout->addWidget(new QLabel(tr("<b>Actions</b>")));
+		actionsLayout->addWidget(actionsLabel);
 		actionsLayout->addWidget(moveButton);
 		actionsLayout->addWidget(colorButton);
 		actionsLayout->addWidget(circleButton);
@@ -215,8 +190,33 @@ namespace Aseba
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
+		delete(mainLayout);
+		delete(horizontalLayout);
+		delete(eventsLayout);
+		delete(sceneLayout);
+		delete(compilationResultLayout);
+		delete(actionsLayout);
+		
+		for(int i=0; i<eventButtons.size(); ++i)
+			delete(eventButtons[i]);
+			
+		for(int i=0; i<actionButtons.size(); ++i)
+			delete(actionButtons[i]);
+			
 		eventButtons.clear();
 		actionButtons.clear();
+
+		delete(eventsLabel);
+		delete(actionsLabel);
+
+		delete(toolBar);
+		delete(newButton);
+		delete(openButton);
+		delete(saveButton);
+		delete(saveAsButton);		
+		delete(runButton);
+		delete(colorComboButton);
+		delete(quitButton);
 
 		eventColors.clear();
 		actionColors.clear();
@@ -224,8 +224,8 @@ namespace Aseba
 		delete(compilationResult);
 		delete(compilationResultImage);
 
-		delete(view);
 		delete(scene);
+		delete(view);
 
 		delete(tapSvg);
 		delete(clapSvg);		
@@ -271,8 +271,6 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
-		// FIXME: is it correct, what to do if someone requsted a close
-		// of the main window while we are flashing?
 		close();
 	}
 	
@@ -474,8 +472,6 @@ namespace Aseba
 		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
 			scene->clear();
-			
-			qDebug() << "clear done\n";
 
 			QDomNode domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
@@ -483,19 +479,16 @@ namespace Aseba
 				if (domNode.isElement())
 				{
 					QDomElement element = domNode.toElement();
-					if (element.tagName() == "setting") {
-						qDebug() << "reading setting";
+					if (element.tagName() == "setting") 
+					{
 						QDomElement childElement = element.firstChildElement("colorscheme");
 						colorComboButton->setCurrentIndex(childElement.attribute("value").toInt());	
-						qDebug() << " -- set color " << childElement.attribute("value");
 					}
 					else if(element.tagName() == "button-element")
 					{
-						qDebug() << "\nreading button element";
 						QDomElement eventElement = element.firstChildElement("event");
 						if( !eventElement.isNull() )
 						{
-							qDebug() << " -- event exists";
 							QString buttonName = eventElement.attribute("name");
 							ThymioButton *button;
 							
@@ -521,31 +514,24 @@ namespace Aseba
 								                     tr("Error in XML source file: %0 unknown event type").arg(buttonName));
 								return false;
 							}
-							
-							qDebug() << "    - button name: " << buttonName;
-							
+
 							for(int i=0; i<button->getNumButtons(); ++i)
 								if( eventElement.attribute(QString("button%0").arg(i)) == "true" )
 									button->setClicked(i, true);
 								else
 									button->setClicked(i, false);
-							
-							qDebug() << "    - adding to the scene";
-									
+	
 							scene->addEvent(button);
-							qDebug() << "    - done adding event";
 						}
 						else 
 						{
-							qDebug() << " -- event does not exist";
 							scene->addEvent(0);
-							qDebug() << "    - done adding event";
 						}
 						
 						QDomElement actionElement = element.firstChildElement("action");
 						if( !actionElement.isNull() )
 						{
-							qDebug() << " -- action exists";
+							// qDebug() << " -- action exists";
 							QString buttonName = actionElement.attribute("name");
 							ThymioButton *button;
 							
@@ -564,24 +550,16 @@ namespace Aseba
 								return false;
 							}								
 							
-							qDebug() << "    - button name: " << buttonName;
-							
 							for(int i=0; i<button->getNumButtons(); ++i)
 								if( actionElement.attribute(QString("button%0").arg(i)) == "true" )
 									button->setClicked(i, true);
 								else
 									button->setClicked(i, false);
-
-							qDebug() << "    - adding to the scene";
-
 							scene->addAction(button);
-							qDebug() << "    - done adding action";
 						}
 						else
 						{
-							qDebug() << " -- action does not exist";
 							scene->addAction(0);
-							qDebug() << "    - done adding action";
 						}						
 
 					}			
@@ -692,14 +670,10 @@ namespace Aseba
 		double scaleV = 1 + (double)deltaSize.width()/(windowWidth-100);
 		double scale = (scaleH < scaleV ? (scaleH > 1.95 ? 1.95 : scaleH) :
  										  (scaleV > 1.95 ? 1.95 : scaleV) );
-		
-		qDebug() << "\n\n::::VPL::::\n\tevent size: " << event->size();// << "deltaSize: " << deltaSize;
-		qDebug() << " -- scaleH: " << scaleH;
-		qDebug() << " -- scaleV: " << scaleV;
-				
+
 		iconSize = QSize(128*scale, 128*scale);
 		scene->setScale(scale);
-		view->setSceneRect(QRectF(0, 0, 500*scale+40, 5000));
+		view->setSceneRect(QRectF(0, 0, 500*scale+40, 50000));
 
 		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)

@@ -23,8 +23,8 @@
 #include "ThymioButtons.h"
 #include "ThymioScene.h"
 
-#include "../Plugin.h"
-#include "../DashelTarget.h"
+#include "../../Plugin.h"
+#include "../../DashelTarget.h"
 
 namespace Aseba
 {
@@ -66,24 +66,37 @@ namespace Aseba
 		void recompileButtonSet();
 		
 	protected:
-		QVBoxLayout *mainLayout;
-
 		QGraphicsView *view;
 		ThymioScene *scene;
 
 		// Event & Action buttons
 		QList<ThymioPushButton *> eventButtons;
 		QList<ThymioPushButton *> actionButtons;
+		QLabel *eventsLabel;
+		QLabel *actionsLabel;
 
 		QList<QColor> eventColors;
 		QList<QColor> actionColors;
-		QComboBox *colorComboButton;
-		QToolBar *toolBar;
 	
 		QLabel *compilationResult;
 		QLabel *compilationResultImage;
 
+		QToolBar *toolBar;
+		QToolButton *newButton;
+		QToolButton *openButton;
+		QToolButton *saveButton;
+		QToolButton *saveAsButton;		
 		QToolButton *runButton;
+		QComboBox *colorComboButton;
+		QToolButton *quitButton;
+
+		QVBoxLayout *mainLayout;
+		QHBoxLayout *horizontalLayout;
+		QVBoxLayout *eventsLayout;
+		QVBoxLayout *sceneLayout;
+		QHBoxLayout *compilationResultLayout;
+		QVBoxLayout *actionsLayout;
+
 
 		QSvgRenderer *tapSvg;
 		QSvgRenderer *clapSvg;

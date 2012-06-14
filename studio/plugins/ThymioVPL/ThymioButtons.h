@@ -161,6 +161,7 @@ namespace Aseba
 		};
 			
 		ThymioButtonSet(int row, QGraphicsItem *parent=0);
+		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);		
 		QRectF boundingRect() const { return QRectF(0, 0, 1000, 400); }
 
@@ -181,7 +182,7 @@ namespace Aseba
 		ThymioIRButtonSet *getIRButtonSet() { return &buttonSetIR; }
 		
 	signals:
-		void buttonUpdated(int);
+		void buttonUpdated();
 	
 	public slots:
 		void stateChanged();
@@ -213,13 +214,13 @@ namespace Aseba
 		Q_OBJECT
 				
 	public:
-		ThymioPushButton(QWidget *parent=0);
-		void setThymioButton(ThymioButton *button);
-		void changeButtonColor(QColor color) { thymioButton->setButtonColor(color); setIcon(thymioButton->image()); }
-	
+		ThymioPushButton(QString name, QSvgRenderer *renderer=0, QWidget *parent=0);
+		~ThymioPushButton();
+			
+		void changeButtonColor(QColor color);
+		
 	protected:
 		virtual void mouseMoveEvent( QMouseEvent *event );
-//		virtual void resizeEvent( QResizeEvent *event );
 
 	private:
 		ThymioButton *thymioButton;

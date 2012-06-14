@@ -115,7 +115,7 @@ namespace Aseba
 		return codeGenerator.endCode(); 
 	}	
 			
-	void ThymioCompiler::compile(int row)
+	void ThymioCompiler::compile()
 	{
 		errorType = THYMIO_NO_TYPE_ERROR;
 		typeChecker.reset();
@@ -123,7 +123,7 @@ namespace Aseba
 		std::vector<ThymioIRButtonSet*>::iterator itr = buttonSet.begin();
 		for( itr = buttonSet.begin(); itr != buttonSet.end(); ++itr )
 		{
-			(*itr)->accept(&syntaxChecker);
+			(*itr)->accept(&syntaxChecker);			
 			if( !syntaxChecker.isSuccessful() ) 
 			{
 				errorType = THYMIO_SYNTAX_ERROR;
@@ -136,6 +136,7 @@ namespace Aseba
 				errorType = THYMIO_TYPE_ERROR;
 				break;
 			}
+					
 		}
 	}
 

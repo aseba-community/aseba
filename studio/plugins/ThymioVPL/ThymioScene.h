@@ -13,6 +13,7 @@ namespace Aseba
 		
 	public:
 		ThymioScene(QObject *parent = 0);
+		~ThymioScene();
 		
 		QGraphicsItem *addAction(ThymioButton *item);
 		QGraphicsItem *addEvent(ThymioButton *item);
@@ -39,7 +40,7 @@ namespace Aseba
 		void stateChanged();
 		
 	private slots:
-		void buttonUpdateDetected(int);
+		void buttonUpdateDetected();
 		
 	protected:
 		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);

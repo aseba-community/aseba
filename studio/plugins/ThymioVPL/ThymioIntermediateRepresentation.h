@@ -171,7 +171,7 @@ namespace Aseba
 		ThymioCompiler();
 		~ThymioCompiler();
 		
-		void compile(int row);
+		void compile();
 		void generateCode();
 
 		void AddButtonSet(ThymioIRButtonSet *set);
