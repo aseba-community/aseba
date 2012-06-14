@@ -1,0 +1,63 @@
+<!DOCTYPE avpl-source>
+<buttons>
+
+<setting>
+<colorscheme value="1"/>
+</setting>
+
+<button-element>
+<event button0="false" button1="true" button2="false" button3="false" button4="false" button5="false" name="prox" button6="false"/>
+<action button0="false" button1="true" button2="false" button3="false" button4="true" button5="false" name="color" button6="true" button7="false" button8="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="true" button3="false" button4="false" button5="false" name="prox" button6="false"/>
+<action button0="true" button1="false" button2="false" button3="false" button4="false" button5="true" name="color" button6="true" button7="false" button8="false"/>
+</button-element>
+
+<button-element>
+<event button0="true" button1="false" button2="false" button3="false" button4="false" button5="false" name="prox" button6="false"/>
+<action button0="false" button1="false" button2="true" button3="true" button4="false" button5="false" name="color" button6="true" button7="false" button8="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="false" button3="false" button4="true" button5="false" name="prox" button6="false"/>
+<action button0="true" button1="false" button2="false" button3="true" button4="false" button5="false" name="color" button6="false" button7="false" button8="true"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="false" button3="false" button4="false" button5="true" name="prox" button6="true"/>
+<action button0="false" button1="false" button2="false" button3="false" button4="false" button5="false" name="circle" button6="false" button7="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="false" button3="false" button4="true" name="button"/>
+<action button0="false" button1="false" button2="true" button3="false" button4="false" button5="false" name="move" button6="false" button7="true" button8="false" button9="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="false" button3="true" button4="false" button5="false" name="prox" button6="false"/>
+<action button0="true" button1="false" button2="false" button3="false" button4="true" button5="false" name="color" button6="false" button7="true" button8="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="false" button3="false" button4="false" button5="true" name="prox" button6="true"/>
+<action button0="true" button1="false" button2="false" button3="true" button4="false" button5="false" name="color" button6="true" button7="false" button8="false"/>
+</button-element>
+
+<button-element>
+<event button0="true" button1="false" button2="false" button3="false" button4="false" name="button"/>
+<action button0="false" button1="true" button2="false" button3="false" button4="false" button5="false" name="move" button6="true" button7="false" button8="false" button9="false"/>
+</button-element>
+
+<button-element>
+<event button0="false" button1="false" button2="true" button3="false" button4="false" name="button"/>
+<action button0="false" button1="false" button2="false" button3="true" button4="false" button5="false" name="move" button6="false" button7="false" button8="true" button9="false"/>
+</button-element>
+
+<button-element>
+<event name="tap"/>
+<action button0="true" button1="false" button2="false" name="sound"/>
+</button-element>
+
+</buttons>

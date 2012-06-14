@@ -120,7 +120,7 @@ namespace Aseba
 		errorType = THYMIO_NO_TYPE_ERROR;
 		typeChecker.reset();
 
-		std::vector<ThymioIRButtonSet*>::iterator itr = buttonSet.begin();
+		vector<ThymioIRButtonSet*>::iterator itr = buttonSet.begin();
 		for( itr = buttonSet.begin(); itr != buttonSet.end(); ++itr )
 		{
 			(*itr)->accept(&syntaxChecker);			

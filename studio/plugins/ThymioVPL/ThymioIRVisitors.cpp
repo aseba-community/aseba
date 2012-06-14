@@ -144,44 +144,20 @@ namespace Aseba
 				
 		currentHash->insert( pair<wstring, ThymioIRButton*>(buttonname, button) );
 		tempHash.clear();
-
-//		for(int i=0; i<button->size(); i++)
-//		{		
-//			pair< multimap<wstring, ThymioIRButton*>::iterator,
-//				  multimap<wstring, ThymioIRButton*>::iterator > ret;
-//			multimap<wstring, ThymioIRButton*>::iterator itr;
-//
-//			wstring buttonname = button->getBasename();
-//			buttonname += toWstring(i);
-//			
-//			ret = currentHash->equal_range(buttonname);
-//			if( button->isClicked(i) )
-//			{				
-//				for( itr = ret.first; itr != ret.second; ++itr )				
-//					if( (*itr).second != button )
-//						errorCode = THYMIO_EVENT_MULTISET;
-//				currentHash->insert( pair<wstring, ThymioIRButton*>(buttonname, button) );
-//			}
-//			else
-//			{				
-//				for( itr = ret.first; itr != ret.second; ++itr )
-//					if( (*itr).second == button )
-//						currentHash->erase(itr);
-//			}
-//		}
-
 	}
 
 	void ThymioIRTypeChecker::visit(ThymioIRButtonSet *buttonSet)
 	{
 		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() ) return;
+				
+		errorCode = THYMIO_NO_ERROR;
 
 		ThymioIRButtonName eventName = buttonSet->getEventButton()->getName();
 		ThymioIRButtonName actionName = buttonSet->getActionButton()->getName();
-		
+
 		if( eventName == THYMIO_TAP_IR ) 
 		{
-			if( tapSeenActions.find(actionName) != tapSeenActions.end() )
+			if( tapSeenActions.find(actionName) != tapSeenActions.end() ) 
 				errorCode = THYMIO_EVENT_MULTISET;
 			else
 				tapSeenActions.insert(actionName);
@@ -198,6 +174,7 @@ namespace Aseba
 			activeActionName = actionName;
 			visit(buttonSet->getEventButton());	
 		}
+		
 	}
 
 	// Syntax Checker //
