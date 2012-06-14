@@ -316,7 +316,7 @@ namespace Aseba
 		{
 			QByteArray rendererData;
 			QDataStream rendererStream(&rendererData, QIODevice::WriteOnly);
-			int location  = (int)(renderer());
+			quint64 location  = (quint64)(renderer());
 			rendererStream << location;
 			mime->setData("thymiorenderer", rendererData);
 		}
@@ -666,7 +666,7 @@ namespace Aseba
 					button = new ThymioTapEvent();
 					QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 					QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
-					int location;
+					quint64 location;
 					rendererStream >> location;
 					QSvgRenderer *tapSvg;
 					tapSvg = (QSvgRenderer*)location;
@@ -677,7 +677,7 @@ namespace Aseba
 					button = new ThymioClapEvent();
 					QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 					QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
-					int location;
+					quint64 location;
 					rendererStream >> location;
 					QSvgRenderer *clapSvg;
 					clapSvg = (QSvgRenderer*)location;
@@ -825,7 +825,7 @@ namespace Aseba
 		{
 			QByteArray rendererData;
 			QDataStream rendererStream(&rendererData, QIODevice::WriteOnly);
-			int location  = (int)( thymioButton->renderer());
+			quint64 location  = (quint64)(thymioButton->renderer());
 			rendererStream << location;
 			mime->setData("thymiorenderer", rendererData);
 		}	

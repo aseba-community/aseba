@@ -431,11 +431,11 @@ namespace Aseba
 			else if ( buttonName == "proxground" )
 				button = new ThymioProxGroundEvent();
 			else if ( buttonName == "tap" )
-			{					
+			{
 				button = new ThymioTapEvent();
 				QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 				QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
-				int location;
+				quint64 location;
 				rendererStream >> location;
 				QSvgRenderer *tapSvg;
 				tapSvg = (QSvgRenderer*)location;
@@ -446,7 +446,7 @@ namespace Aseba
 				button = new ThymioClapEvent();
 				QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 				QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
-				int location;
+				quint64 location;
 				rendererStream >> location;
 				QSvgRenderer *clapSvg;
 				clapSvg = (QSvgRenderer*)location;
