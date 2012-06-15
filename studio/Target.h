@@ -157,7 +157,8 @@ namespace Aseba
 	
 	protected:
 		friend class ThymioBootloaderDialog;
-		
+		friend class ThymioVisualProgramming;
+				
 		//! Block all write operations, used by invasive plugins when they do something hacky with the underlying data stream
 		virtual void blockWrite() = 0;
 		

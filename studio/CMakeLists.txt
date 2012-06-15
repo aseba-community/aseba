@@ -20,6 +20,7 @@ if (QT4_FOUND)
 	set(QT_USE_QTMAIN ON)
 	set(QT_USE_QTHELP ON)
 	set(QT_USE_QTCONCURRENT ON)
+	set(QT_USE_QTSVG ON)
 	include(${QT_USE_FILE})
 
 	# add a console for debug messages under Windows
@@ -86,7 +87,15 @@ if (QT4_FOUND)
 		Plugin.cpp
 		HelpViewer.cpp
 		plugins/VariablesViewPlugin.cpp
-		plugins/ThymioBootloader.cpp)
+		plugins/ThymioBootloader.cpp
+		plugins/ThymioVPL/ThymioVisualProgramming.cpp
+		plugins/ThymioVPL/ThymioScene.cpp
+		plugins/ThymioVPL/ThymioButtons.cpp
+		plugins/ThymioVPL/ThymioEventButtons.cpp
+		plugins/ThymioVPL/ThymioActionButtons.cpp
+		plugins/ThymioVPL/ThymioIRButtons.cpp
+		plugins/ThymioVPL/ThymioIRVisitors.cpp
+		plugins/ThymioVPL/ThymioCompiler.cpp)
 	
 	qt4_automoc(${studio_SRCS})
 	

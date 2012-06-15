@@ -33,6 +33,8 @@
 #include <QCloseEvent>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QToolButton>
+#include <QToolBar>
 
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
@@ -40,6 +42,8 @@
 #include "../compiler/compiler.h"
 #include <fstream>
 #include <sstream>
+#include <vector>
+#include <string>
 #include "Target.h"
 #include "TargetModels.h"
 #include "Plugin.h"
@@ -166,7 +170,7 @@ namespace Aseba
 		unsigned productId() const  { return pid; }
 		
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
-	
+		
 	signals:
 		void uploadReadynessChanged(bool);
 	
@@ -197,6 +201,20 @@ namespace Aseba
 		void editorContentChanged();
 		void recompile();
 		void markTargetUnsynced();
+	
+		// keywords
+		void varButtonClicked();
+		void ifButtonClicked();
+		void elseifButtonClicked();
+		void elseButtonClicked();
+		void oneventButtonClicked();
+		void whileButtonClicked();
+		void forButtonClicked();
+		void subroutineButtonClicked();
+		void callsubButtonClicked();
+		void showKeywords(bool show);
+		
+		void displayCode(QList<QString> code);
 		
 		void cursorMoved();
 		void goToError();
@@ -251,6 +269,19 @@ namespace Aseba
 		QPushButton *refreshMemoryButton;
 		QCheckBox *autoRefreshMemoryCheck;
 		
+				
+		// keywords // Jiwon
+		QToolButton *varButton;
+		QToolButton *ifButton;
+		QToolButton *elseifButton;
+		QToolButton *elseButton;
+		QToolButton *oneventButton;
+		QToolButton *whileButton;
+		QToolButton *forButton;
+		QToolButton *subroutineButton;
+		QToolButton *callsubButton;
+		QToolBar *keywordsToolbar;
+		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
 		QLineEdit *vmMemoryFilter;
@@ -262,6 +293,8 @@ namespace Aseba
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
+		
+		bool isSynchronized;
 		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
@@ -330,6 +363,7 @@ namespace Aseba
 		void showLineNumbersChanged(bool state);
 		void goToLine();
 		void showHidden(bool show);
+		void showKeywords(bool show);
 
 		void toggleBreakpoint();
 		void clearAllBreakpoints();
@@ -357,6 +391,8 @@ namespace Aseba
 		void addEventNameClicked();
 		void removeEventNameClicked();
 		void eventsDescriptionsSelectionChanged();
+		
+		void resetStatusText(); // Jiwon
 		
 		void addConstantClicked();
 		void removeConstantClicked();
@@ -438,6 +474,7 @@ namespace Aseba
 		#endif // HAVE_QWT
 		QListWidget* logger;
 		QPushButton* clearLogger;
+		QLabel* statusText; // Jiwon
 		FixedWidthTableView* eventsDescriptionsView;
 		
 		// constants
@@ -484,6 +521,7 @@ namespace Aseba
 		QAction *toggleBreakpointAct;
 		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;
+		QAction *showKeywordsAct; 
 		QAction* showCompilationMsg;
 		
 		// gui helper stuff

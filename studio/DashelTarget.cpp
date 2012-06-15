@@ -935,7 +935,7 @@ namespace Aseba
 			// managed internally in Dashel::Hub, so don't care about
 			break;
 		default:
-			QMessageBox::critical(NULL, tr("Dashel Unexpected Error"), tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
+			QMessageBox::critical(NULL, tr("Unexpected Dashel Error"), tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
 			break;
 		}
 	}

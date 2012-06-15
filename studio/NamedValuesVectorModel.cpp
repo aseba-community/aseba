@@ -102,11 +102,11 @@ namespace Aseba
 	Qt::ItemFlags NamedValuesVectorModel::flags(const QModelIndex & index) const
 	{
 		if (index.column() == 0)
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 		else if (index.column() == 1)
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;		
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled;
 		else
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
 
 	}
 	

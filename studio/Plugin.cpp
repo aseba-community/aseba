@@ -31,6 +31,7 @@
 
 #include "plugins/VariablesViewPlugin.h"
 #include "plugins/ThymioBootloader.h"
+#include "plugins/ThymioVPL/ThymioVisualProgramming.h"
 
 namespace Aseba
 {	
@@ -54,6 +55,17 @@ namespace Aseba
 	unsigned InvasivePlugin::getNodeId()
 	{
 		return nodeTab->id;
+	}
+	
+	void InvasivePlugin::displayCode(QList<QString> code)
+	{
+		nodeTab->displayCode(code);
+	}
+	
+	void InvasivePlugin::loadNrun()
+	{
+		nodeTab->loadClicked();
+		nodeTab->target->run(nodeTab->id);
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()
@@ -107,6 +119,7 @@ namespace Aseba
 		reg(ASEBA_PID_SMARTROB, &createInstance<LinearCameraViewPlugin>);
 		
 		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioBootloaderDialog>);
+		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
 	}
 	
 	/*@}*/
