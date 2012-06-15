@@ -402,8 +402,15 @@ namespace Aseba
 		nodeIt->second.eventAddressToId = bytecode.getEventAddressesToIds();
 		
 		// send bytecode
-		sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
-		dashelInterface.stream->flush();
+		try
+		{
+			sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+			dashelInterface.stream->flush();
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 	}
 	
 	void DashelTarget::writeBytecode(unsigned node)
