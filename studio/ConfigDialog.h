@@ -46,7 +46,12 @@ namespace Aseba
 		static void showConfig();
 
 		// access to properties
-		static bool getAutoCompletion(void);
+		// startup properties
+		static const bool getStartupShowHidden(void);
+		static const bool getStartupShowLineNumbers(void);
+		static const bool getStartupShowKeywordToolbar(void);
+		// autocompletion behaviour
+		static const bool getAutoCompletion(void);
 
 	protected:
 		ConfigDialog(QWidget* parent = 0);
@@ -118,6 +123,11 @@ namespace Aseba
 	protected:
 		virtual void readSettings();
 		virtual void writeSettings();
+
+	protected:
+		QCheckBox* startupShowHidden;
+		QCheckBox* startupShowLineNumbers;
+		QCheckBox* startupShowKeyword;
 	};
 
 	// EditorPage
@@ -136,7 +146,7 @@ namespace Aseba
 		virtual void writeSettings();
 
 	protected:
-		QCheckBox* autocompletion;
+		QCheckBox* autoKeyword;
 	};
 }
 

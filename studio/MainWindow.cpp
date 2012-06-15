@@ -2370,6 +2370,8 @@ namespace Aseba
 	void MainWindow::nodeConnected(unsigned node)
 	{
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
+		tab->showKeywords(showKeywordsAct->isChecked());
+		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -3076,7 +3078,7 @@ namespace Aseba
 		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
 		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
 		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(true);
+		showLineNumbers->setChecked(ConfigDialog::getStartupShowLineNumbers());
 
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
@@ -3169,12 +3171,14 @@ namespace Aseba
 		menuBar()->addMenu(settingsMenu);
 		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
 		showHiddenAct->setCheckable(true);
+		showHiddenAct->setChecked(ConfigDialog::getStartupShowHidden());
+		showHidden(ConfigDialog::getStartupShowHidden());
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Jiwon
 		showKeywordsAct = new QAction(tr("Show &keywords..."), this);
 		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(true);
+		showKeywordsAct->setChecked(ConfigDialog::getStartupShowKeywordToolbar());
 		settingsMenu->addAction(showKeywordsAct);
 		
 		// Help menu

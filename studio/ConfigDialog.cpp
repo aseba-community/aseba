@@ -28,6 +28,8 @@
 #define BOOL_TO_CHECKED(value)	(value == true ? Qt::Checked : Qt::Unchecked)
 #define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
 
+#define TITLE_SPACING		10
+#define HORIZONTAL_STRUT	700
 
 namespace Aseba
 {
@@ -36,9 +38,16 @@ namespace Aseba
 		QWidget(parent)
 	{
 		QLabel* myTitle = new QLabel(title);
+		// bold & align center
+		myTitle->setAlignment(Qt::AlignCenter);
+		QFont current = myTitle->font();
+		current.setBold(true);
+		myTitle->setFont(current);
 
 		mainLayout = new QVBoxLayout();
 		mainLayout->addWidget(myTitle);
+		mainLayout->addSpacing(TITLE_SPACING);
+		mainLayout->addStrut(HORIZONTAL_STRUT);
 		setLayout(mainLayout);
 	}
 
@@ -113,6 +122,20 @@ namespace Aseba
 	GeneralPage::GeneralPage(QWidget *parent):
 		ConfigPage(tr("General Setup"), parent)
 	{
+		QGroupBox* gb1 = new QGroupBox(tr("On startup"));
+		QVBoxLayout* gb1layout = new QVBoxLayout();
+		gb1->setLayout(gb1layout);
+		mainLayout->addWidget(gb1);
+		// Show hidden variables & functions
+		startupShowHidden = newCheckbox(tr("Show hidden variables"), "showhidden", false);
+		gb1layout->addWidget(startupShowHidden);
+		// Show line numbers
+		startupShowLineNumbers = newCheckbox(tr("Show line numbers"), "showlinenumbers", true);
+		gb1layout->addWidget(startupShowLineNumbers);
+		// Show the keyword toolbar
+		startupShowKeyword = newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true);
+		gb1layout->addWidget(startupShowKeyword);
+
 		mainLayout->addStretch();
 	}
 
@@ -137,8 +160,15 @@ namespace Aseba
 	EditorPage::EditorPage(QWidget *parent):
 		ConfigPage(tr("Editor Setup"), parent)
 	{
-		autocompletion = newCheckbox(tr("Enable autocompletion"), "autocompletion");
-		mainLayout->addWidget(autocompletion);
+		//
+		QGroupBox* gb1 = new QGroupBox(tr("Autocompletion"));
+		QVBoxLayout* gb1layout = new QVBoxLayout();
+		gb1->setLayout(gb1layout);
+		mainLayout->addWidget(gb1);
+		//
+		autoKeyword = newCheckbox(tr("Keywords"), "autoKeyword", true);
+		gb1layout->addWidget(autoKeyword);
+
 		mainLayout->addStretch();
 	}
 
@@ -232,10 +262,34 @@ namespace Aseba
 		writeSettings();
 	}
 
-	bool ConfigDialog::getAutoCompletion()
+	const bool ConfigDialog::getStartupShowHidden()
 	{
 		if (me)
-			return me->editorpage->checkboxCache["autocompletion"].value;
+			return me->generalpage->checkboxCache["showhidden"].value;
+		else
+			return false;
+	}
+
+	const bool ConfigDialog::getStartupShowLineNumbers()
+	{
+		if (me)
+			return me->generalpage->checkboxCache["showlinenumbers"].value;
+		else
+			return false;
+	}
+
+	const bool ConfigDialog::getStartupShowKeywordToolbar()
+	{
+		if (me)
+			return me->generalpage->checkboxCache["keywordToolbar"].value;
+		else
+			return false;
+	}
+
+	const bool ConfigDialog::getAutoCompletion()
+	{
+		if (me)
+			return me->editorpage->checkboxCache["autoKeyword"].value;
 		else
 			return false;
 	}
