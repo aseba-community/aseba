@@ -25,6 +25,8 @@
 #include <QString>
 #include <QtGui>
 
+#include <map>
+
 
 namespace Aseba
 {
@@ -82,10 +84,23 @@ namespace Aseba
 		friend class ConfigDialog;
 
 	protected:
-		virtual void readSettings() = 0;
-		virtual void writeSettings() = 0;
+		virtual void readSettings();
+		virtual void writeSettings();
+
+		virtual void flushCache();
+		virtual void discardChanges();
+
+		QCheckBox* newCheckbox(QString label, QString ID, bool checked = false);
 
 	protected:
+		template <class T> struct WidgetCache {
+			WidgetCache(): widget(NULL){}
+			WidgetCache(QWidget* widget, T value):widget(widget),value(value){}
+			QWidget* widget;
+			T value;
+		};
+		std::map<QString, WidgetCache<bool> > checkboxCache;
+
 		QVBoxLayout* mainLayout;
 	};
 

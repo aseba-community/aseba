@@ -24,6 +24,11 @@
 
 #include <ConfigDialog.moc>
 
+
+#define BOOL_TO_CHECKED(value)	(value == true ? Qt::Checked : Qt::Unchecked)
+#define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
+
+
 namespace Aseba
 {
 	/*** ConfigPage ***/
@@ -35,6 +40,72 @@ namespace Aseba
 		mainLayout = new QVBoxLayout();
 		mainLayout->addWidget(myTitle);
 		setLayout(mainLayout);
+	}
+
+	QCheckBox* ConfigPage::newCheckbox(QString label, QString ID, bool checked)
+	{
+		QCheckBox* widget = new QCheckBox(label);
+		widget->setCheckState(BOOL_TO_CHECKED(checked));
+		WidgetCache<bool> cache(widget, checked);
+		checkboxCache.insert(std::pair<QString, WidgetCache<bool> >(ID, cache));
+		return widget;
+	}
+
+	void ConfigPage::readSettings()
+	{
+		// update cache and widgets from disk
+		QSettings settings;
+		// iterate on checkboxes
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		{
+			QString name = it->first;
+			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
+			Q_ASSERT(checkbox);
+			if (settings.contains(name))
+			{
+				bool value = settings.value(name, false).toBool();
+				checkbox->setCheckState(BOOL_TO_CHECKED(value));	// update widget
+				(it->second).value = value;				// update cache
+			}
+		}
+	}
+
+	void ConfigPage::writeSettings()
+	{
+		// write the cache on disk
+		QSettings settings;
+		// iterate on checkboxes
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		{
+			QString name = it->first;
+			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
+			Q_ASSERT(checkbox);
+			settings.setValue(name, (it->second).value);
+		}
+	}
+
+	void ConfigPage::flushCache()
+	{
+		// sync the cache with the widgets' state
+		// iterate on checkboxes
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		{
+			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
+			Q_ASSERT(checkbox);
+			(it->second).value = CHECKED_TO_BOOL(checkbox->checkState());
+		}
+	}
+
+	void ConfigPage::discardChanges()
+	{
+		// reload values from the cache
+		// iterate on checkboxes
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		{
+			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
+			Q_ASSERT(checkbox);
+			checkbox->setCheckState(BOOL_TO_CHECKED((it->second).value));
+		}
 	}
 
 
@@ -49,6 +120,7 @@ namespace Aseba
 	{
 		QSettings settings;
 		settings.beginGroup("general-config");
+		ConfigPage::readSettings();
 		settings.endGroup();
 	}
 
@@ -56,6 +128,7 @@ namespace Aseba
 	{
 		QSettings settings;
 		settings.beginGroup("general-config");
+		ConfigPage::writeSettings();
 		settings.endGroup();
 	}
 
@@ -64,7 +137,7 @@ namespace Aseba
 	EditorPage::EditorPage(QWidget *parent):
 		ConfigPage(tr("Editor Setup"), parent)
 	{
-		autocompletion = new QCheckBox(tr("Enable autocompletion"));
+		autocompletion = newCheckbox(tr("Enable autocompletion"), "autocompletion");
 		mainLayout->addWidget(autocompletion);
 		mainLayout->addStretch();
 	}
@@ -73,7 +146,7 @@ namespace Aseba
 	{
 		QSettings settings;
 		settings.beginGroup("editor-config");
-		autocompletion->setCheckState(settings.value("autocompletion", true).toBool() == true ? Qt::Checked : Qt::Unchecked);
+		ConfigPage::readSettings();
 		settings.endGroup();
 	}
 
@@ -81,7 +154,7 @@ namespace Aseba
 	{
 		QSettings settings;
 		settings.beginGroup("editor-config");
-		settings.setValue("autocompletion", autocompletion->checkState() == Qt::Checked);
+		ConfigPage::writeSettings();
 		settings.endGroup();
 	}
 
@@ -162,18 +235,32 @@ namespace Aseba
 	bool ConfigDialog::getAutoCompletion()
 	{
 		if (me)
-			return (me->editorpage->autocompletion->checkState() == Qt::Unchecked ? false : true);
+			return me->editorpage->checkboxCache["autocompletion"].value;
 		else
 			return false;
 	}
 
 	void ConfigDialog::accept()
 	{
+		// update the cache with new values
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->flushCache();
+		}
 		QDialog::accept();
 	}
 
 	void ConfigDialog::reject()
 	{
+		// reload values from the cache
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->discardChanges();
+		}
 		QDialog::reject();
 	}
 
