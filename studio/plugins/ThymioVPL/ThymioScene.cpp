@@ -238,15 +238,7 @@ namespace Aseba
 		if( buttonSets.isEmpty() ) 
 		{
 			ThymioButtonSet *button = createNewButtonSet();
-			button->setPos(20,20);
-//			ThymioButtonSet *button = new ThymioButtonSet(0);
-//			button->setColorScheme(eventButtonColor, actionButtonColor);
-//			button->setScale(scaleFactor);
-//			button->setPos(20, 20);
-//			buttonSets.push_back(button);
-//		
-//			addItem(button);
-//			connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));			
+			button->setPos(20,20);		
 		}
 
 		prevNewEventButton = false;
@@ -285,6 +277,8 @@ namespace Aseba
 		sceneModified = true;
 		
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));		
+
+		buttonUpdateDetected();
 	}
 
 	void ThymioScene::rearrangeButtons(int row)
@@ -390,6 +384,8 @@ namespace Aseba
 			lastFocus = currentRow;
 	
 			sceneModified = true;
+			
+			buttonUpdateDetected();
 		}
 		else if( event->mimeData()->hasFormat("thymiobutton") && 
 				((event->scenePos().y()-20)/(buttonSetHeight*scaleFactor)) >= buttonSets.size() )
