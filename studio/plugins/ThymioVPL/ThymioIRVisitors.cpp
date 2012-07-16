@@ -323,15 +323,15 @@ namespace Aseba
 			case THYMIO_MOVE_IR:
 				text += L"motor.left.target = ";
 				text += ( button->isClicked(0) ? L"500\n" : 
-						  button->isClicked(1) ? L"250\n" :
+						  button->isClicked(1) ? L"200\n" :
 						  button->isClicked(2) ? L"0\n" : 
-						  button->isClicked(3) ? L"-250\n" : L"-500\n" );
+						  button->isClicked(3) ? L"-200\n" : L"-500\n" );
 				text += (inIfBlock ? L"\t\t" : L"\t");
 				text += L"motor.right.target = ";
 				text += ( button->isClicked(5) ? L"500\n" : 
-						  button->isClicked(6) ? L"250\n" :
+						  button->isClicked(6) ? L"200\n" :
 						  button->isClicked(7) ? L"0\n" : 
-						  button->isClicked(8) ? L"-250\n" : L"-500\n" );
+						  button->isClicked(8) ? L"-200\n" : L"-500\n" );
 				break;
 			case THYMIO_COLOR_IR:
 				text += L"call leds.top(";
@@ -398,7 +398,7 @@ namespace Aseba
 				generatedCode.push_back(L"onevent tap\n");
 				break;
 			case THYMIO_CLAP_IR:
-				generatedCode.insert(generatedCode.begin(),L"mic.threshold = 200\n");
+				generatedCode.insert(generatedCode.begin(),L"mic.threshold = 250\n");
 				generatedCode.push_back(L"onevent mic\n");
 				block += 1;
 				for(map<ThymioIRButtonName, int>::iterator itr = editor.begin();

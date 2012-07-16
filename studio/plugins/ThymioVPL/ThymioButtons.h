@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QDebug>
 
 #include "ThymioIntermediateRepresentation.h"
 
@@ -180,6 +181,8 @@ namespace Aseba
 		void setScale(qreal factor);
 		
 		ThymioIRButtonSet *getIRButtonSet() { return &buttonSetIR; }
+
+		void setErrorStatus(bool flag) { errorFlag = flag; }
 		
 	signals:
 		void buttonUpdated();
@@ -196,6 +199,7 @@ namespace Aseba
 		
 		bool highlightEventButton;
 		bool highlightActionButton;
+		bool errorFlag;
 		
 		QColor eventButtonColor;
 		QColor actionButtonColor;
@@ -221,6 +225,8 @@ namespace Aseba
 		
 	protected:
 		virtual void mouseMoveEvent( QMouseEvent *event );
+		virtual void dragEnterEvent( QDragEnterEvent *event );
+		virtual void dropEvent( QDropEvent *event );
 
 	private:
 		ThymioButton *thymioButton;

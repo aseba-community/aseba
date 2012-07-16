@@ -327,10 +327,11 @@ namespace Aseba
 		drag->setPixmap(img.scaled(256*scaleFactor, 256*scaleFactor));
 		drag->setHotSpot(QPoint(256*scaleFactor, 256*scaleFactor));
 
-		if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
+		if (drag->exec(Qt::MoveAction | Qt::CopyAction , Qt::CopyAction) == Qt::MoveAction)
 			parentID = -1;
 		
 		setCursor(Qt::OpenHandCursor);
+		parentItem()->update();
 	}
 
 	// Button Set
@@ -385,7 +386,7 @@ namespace Aseba
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-			
+		
 		qreal alpha = hasFocus() ? 255 : 150;
 		
 		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
@@ -407,6 +408,7 @@ namespace Aseba
 		actionButton(0),
 		highlightEventButton(false),
 		highlightActionButton(false),
+		errorFlag(false),
 		eventButtonColor(QColor(0,191,255)),
 		actionButtonColor(QColor(218,112,214)),
 		buttonSetIR()	
@@ -434,7 +436,7 @@ namespace Aseba
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
      		
-		qreal alpha = (hasFocus() ? 150 : 50);
+		qreal alpha = (errorFlag ? 255 : hasFocus() ? 150 : 50);
 
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(255, 196, 180, alpha));		
@@ -449,6 +451,10 @@ namespace Aseba
 		pts[2] = QPointF(446, 168);
 		painter->drawPolygon(pts, 3);
 
+		painter->setPen(errorFlag ? Qt::black : Qt::gray);		
+		painter->setFont(QFont("Arial", 30));
+		painter->drawText(QRect(800, 20, 180, 40), Qt::AlignRight, QString("%0").arg(getRow()));
+
 		if( eventButton && eventButton->getParentID() < 0 ) 
 		{
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
@@ -459,7 +465,7 @@ namespace Aseba
 			buttonSetIR.addEventButton(0);
 			emit buttonUpdated();
 		}
-		if( actionButton && actionButton->getParentID() < 0 ) 
+		if( actionButton && actionButton->getParentID() < 0 )
 		{
 			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(actionButton);
@@ -472,7 +478,7 @@ namespace Aseba
 		
 		if( eventButton == 0 )
 		{
-			if( !highlightEventButton || !hasFocus() ) eventButtonColor.setAlpha(50);
+			if( !highlightEventButton /* || !hasFocus() */ ) eventButtonColor.setAlpha(50);
 			painter->setPen(QPen(eventButtonColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));				
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
@@ -481,13 +487,15 @@ namespace Aseba
 
 		if( actionButton == 0 )
 		{
-			if( !highlightActionButton || !hasFocus() ) actionButtonColor.setAlpha(50);	
+			if( !highlightActionButton /* || !hasFocus() */ ) actionButtonColor.setAlpha(50);	
 			painter->setPen(QPen(actionButtonColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(505, 45, 246, 246, 5, 5);
 			actionButtonColor.setAlpha(255);	
 		}
 
+		highlightEventButton = false;
+		highlightActionButton = false;
 	}
 
 	void ThymioButtonSet::setColorScheme(QColor eventColor, QColor actionColor)
@@ -618,14 +626,6 @@ namespace Aseba
 		if ( event->mimeData()->hasFormat("thymiobutton") || 
 			 event->mimeData()->hasFormat("thymiobuttonset") )
 		{
-			if( event->mimeData()->hasFormat("thymiotype") )
-			{
-				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
-					highlightEventButton = false;
-				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
-					highlightActionButton = false;
-			}
-
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			update();					
@@ -636,8 +636,10 @@ namespace Aseba
 
 	void ThymioButtonSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
+		qDebug() << "ThymioButtonSet -- drop event";
+
 		scene()->setFocusItem(0);
-					
+
 		if ( event->mimeData()->hasFormat("thymiobutton") )
 		{	
 			QByteArray buttonData = event->mimeData()->data("thymiobutton");
@@ -692,6 +694,8 @@ namespace Aseba
 				else if ( buttonName == "sound" )			
 					button = new ThymioSoundAction();
 				
+				qDebug() << "  == TBS -- drop event : created " << buttonName << " button.";
+				
 				if( button ) 
 					for( int i=0; i<numButtons; ++i ) 
 					{
@@ -703,6 +707,8 @@ namespace Aseba
 				event->setDropAction(Qt::MoveAction);
 				event->accept();
 				
+				qDebug() << "  == TBS -- drop event : accepted the button.";
+				
 				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
 				{
 					addEventButton(button);
@@ -713,12 +719,16 @@ namespace Aseba
 					addActionButton(button);
 					highlightActionButton = false;
 				}
+
+				qDebug() << "  == TBS -- drop event : added the button.";
 			}
 			
 			update();
 		}
 		else
 			event->ignore();
+
+		qDebug() << "  == TBS -- drop event : done";
 	}
 
 	void ThymioButtonSet::mousePressEvent( QGraphicsSceneMouseEvent * event )
@@ -790,6 +800,8 @@ namespace Aseba
 		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		setIconSize(QSize(128,128));
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+		
+		setAcceptDrops(true);
 	}
 	
 	ThymioPushButton::~ThymioPushButton()
@@ -837,6 +849,28 @@ namespace Aseba
 		drag->setHotSpot(QPoint(iconSize().width(), iconSize().height()));
 
 		drag->exec();
+	}
+
+
+	void ThymioPushButton::dragEnterEvent( QDragEnterEvent *event )
+	{
+		if( event->mimeData()->hasFormat("thymiotype") &&
+			event->mimeData()->data("thymiotype") == thymioButton->getType().toLatin1() )
+			event->accept();
+		else
+			event->ignore();
+	}
+
+	void ThymioPushButton::dropEvent( QDropEvent *event )
+	{
+		if( event->mimeData()->hasFormat("thymiotype") &&
+			event->mimeData()->data("thymiotype") == thymioButton->getType().toLatin1() )
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+		else
+			event->ignore();
 	}
 
 };

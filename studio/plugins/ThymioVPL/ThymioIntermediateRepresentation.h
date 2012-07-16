@@ -174,14 +174,16 @@ namespace Aseba
 		void compile();
 		void generateCode();
 
-		void AddButtonSet(ThymioIRButtonSet *set);
-		void InsertButtonSet(int row, ThymioIRButtonSet *set);
-		void RemoveButtonSet(int row);
-		void ReplaceButtonSet(int row, ThymioIRButtonSet *set);
+		void addButtonSet(ThymioIRButtonSet *set);
+		void insertButtonSet(int row, ThymioIRButtonSet *set);
+		void removeButtonSet(int row);
+		void replaceButtonSet(int row, ThymioIRButtonSet *set);
+		void swap(int row1, int row2);
 
 		ThymioIRErrorCode getErrorCode();
 		std::wstring getErrorMessage();
 		bool isSuccessful();
+		int getErrorLine();
 		
 		vector<wstring>::const_iterator beginCode();
 		vector<wstring>::const_iterator endCode(); 
@@ -195,6 +197,8 @@ namespace Aseba
 		ThymioIRCodeGenerator codeGenerator;
 		
 		ThymioIRErrorType errorType;
+
+		int errorLine;
 	};
 
 }; // Aseba

@@ -19,31 +19,59 @@ namespace Aseba
 		clear();
 	}
 
-	void ThymioCompiler::AddButtonSet(ThymioIRButtonSet *set)
+	void ThymioCompiler::addButtonSet(ThymioIRButtonSet *set)
 	{	
-		buttonSet.push_back(set);		
+		cout << "Thymio Compiler -- add button set: " << buttonSet.size() << flush;
+		
+		buttonSet.push_back(set);
+		
+		cout << "  ..\n" << flush;	
 	}
 
-	void ThymioCompiler::InsertButtonSet(int row, ThymioIRButtonSet *set)
+	void ThymioCompiler::insertButtonSet(int row, ThymioIRButtonSet *set)
 	{
+		cout << "Thymio Compiler -- insert button set: " << row << ", " << buttonSet.size() << flush;
+		
 		if(row < buttonSet.size())	
 			buttonSet.insert(buttonSet.begin()+row, set);
 		else
 			buttonSet.push_back(set);
+
+		cout << "  ..\n" << flush;	
 	}
 	
-	void ThymioCompiler::RemoveButtonSet(int row)
+	// crash here!!!
+	void ThymioCompiler::removeButtonSet(int row)
 	{
+		cout << "Thymio Compiler -- remove button set: " << row << ", " << buttonSet.size() << flush;
+
 		assert(row < buttonSet.size());
 		buttonSet.erase(buttonSet.begin()+row);
+
+		cout << "  ..\n" << flush;	
 	}
 	
-	void ThymioCompiler::ReplaceButtonSet(int row, ThymioIRButtonSet *set)
+	void ThymioCompiler::replaceButtonSet(int row, ThymioIRButtonSet *set)
 	{
+		cout << "Thymio Compiler -- replace button set: " << row << ", " << buttonSet.size() << flush;
+
 		if(row < buttonSet.size())
 			buttonSet[row] = set;
 		else
 			buttonSet.push_back(set);
+
+		cout << "  ..\n" << flush;	
+	}
+	
+	void ThymioCompiler::swap(int row1, int row2)
+	{
+		cout << "Thymio Compiler -- swap button set: " << row1 << ", " << row2 << ", " << buttonSet.size() << flush;
+		
+		ThymioIRButtonSet *set = buttonSet[row1];
+		buttonSet[row1] = buttonSet[row2];
+		buttonSet[row2] = set;
+
+		cout << "  ..\n" << flush;	
 	}
 	
 	void ThymioCompiler::clear()
@@ -104,6 +132,11 @@ namespace Aseba
 	{
 		return ( errorType == THYMIO_NO_TYPE_ERROR ? true : false );
 	}
+
+	int ThymioCompiler::getErrorLine()
+	{
+		return ( errorType == THYMIO_NO_TYPE_ERROR ? -1 : errorLine );
+	}
 	
 	vector<wstring>::const_iterator ThymioCompiler::beginCode() 
 	{ 
@@ -118,11 +151,14 @@ namespace Aseba
 	void ThymioCompiler::compile()
 	{
 		errorType = THYMIO_NO_TYPE_ERROR;
+		errorLine = -1;
 		typeChecker.reset();
 
 		vector<ThymioIRButtonSet*>::iterator itr = buttonSet.begin();
 		for( itr = buttonSet.begin(); itr != buttonSet.end(); ++itr )
 		{
+			errorLine++;
+			
 			(*itr)->accept(&syntaxChecker);			
 			if( !syntaxChecker.isSuccessful() ) 
 			{

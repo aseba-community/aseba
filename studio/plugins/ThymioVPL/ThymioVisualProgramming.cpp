@@ -45,7 +45,7 @@ namespace Aseba
 		saveButton = new QToolButton();
 		saveAsButton = new QToolButton();
 		runButton = new QToolButton();				
-		colorComboButton = new QComboBox();			
+		colorComboButton = new QComboBox();
 		quitButton = new QToolButton();
 
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));

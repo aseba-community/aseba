@@ -92,7 +92,7 @@ namespace Aseba
 	
 	ThymioIRButton *ThymioIRButtonSet::getActionButton() 
 	{ 
-		return actionButton; 
+		return actionButton;
 	}
 
 	bool ThymioIRButtonSet::hasEventButton() 
