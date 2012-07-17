@@ -235,5 +235,51 @@ namespace Aseba
 		return pixmap;
 	}	
 
+	// Reset Action
+	void ThymioResetAction::Reset::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
+	{		
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+		
+		painter->setPen(QPen(Qt::black, 20.0, Qt::SolidLine, Qt::RoundCap));
+		painter->setBrush(Qt::black);
+
+		painter->drawArc(50, 50, 156, 156, 4320, -2240);
+		painter->drawArc(50, 50, 156, 156, 1440, -2240);
+		
+		painter->setPen(QPen(Qt::black, 3.0, Qt::SolidLine, Qt::RoundCap));
+		QPointF points[3];
+		points[0] = QPointF(123, 186);
+		points[1] = QPointF(123, 226);
+		points[2] = QPointF(153, 206);
+		painter->drawPolygon(points, 3);		
+
+		points[0] = QPointF(133, 30);
+		points[1] = QPointF(133, 70);
+		points[2] = QPointF(103, 50);
+		painter->drawPolygon(points, 3);
+	}	
+	
+	ThymioResetAction::ThymioResetAction(QGraphicsItem *parent) : 
+		ThymioButton(false, 1.0, true, parent)
+	{
+		setData(0, "action");		
+		setData(1, "reset");
+		
+		logo = new Reset(this);
+	}
+
+	QPixmap ThymioResetAction::image(bool on)
+	{
+		QPixmap pixmap = ThymioButton::image(on);
+		QPainter painter(&pixmap);
+
+		painter.translate(logo->pos());
+		logo->paint(&painter, 0, 0);
+		painter.resetTransform();
+		
+		return pixmap;
+	}	
+
 };
 

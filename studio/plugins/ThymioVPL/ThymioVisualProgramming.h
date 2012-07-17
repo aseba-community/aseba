@@ -54,6 +54,7 @@ namespace Aseba
 		void addColorAction();
 		void addCircleAction();	
 		void addSoundAction();
+		void addResetAction();
 		
 		void newFile();
 		void openFile();

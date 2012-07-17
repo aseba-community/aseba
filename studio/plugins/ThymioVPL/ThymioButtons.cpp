@@ -199,6 +199,8 @@ namespace Aseba
 				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR);
 			else if( name == "sound" )
 				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR);
+			else if( name == "reset" )
+				buttonIR = new ThymioIRButton(num, THYMIO_RESET_IR);
 
 			buttonIR->setBasename(name.toStdWString());
 		}
@@ -621,6 +623,29 @@ namespace Aseba
 			event->ignore();
 	}	
 
+	void ThymioButtonSet::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
+	{
+		if ( event->mimeData()->hasFormat("thymiobutton") || 
+			 event->mimeData()->hasFormat("thymiobuttonset") )
+		{
+			if( event->mimeData()->hasFormat("thymiotype") )
+			{
+				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
+					highlightEventButton = true;
+				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
+					highlightActionButton = true;
+			}
+			
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+			update();
+					
+			scene()->setFocusItem(this);
+		}
+		else
+			event->ignore();
+	}	
+	
 	void ThymioButtonSet::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		if ( event->mimeData()->hasFormat("thymiobutton") || 
@@ -693,6 +718,8 @@ namespace Aseba
 					button = new ThymioCircleAction();
 				else if ( buttonName == "sound" )			
 					button = new ThymioSoundAction();
+				else if ( buttonName == "reset" )
+					button = new ThymioResetAction();
 				
 				qDebug() << "  == TBS -- drop event : created " << buttonName << " button.";
 				
@@ -788,8 +815,10 @@ namespace Aseba
 			thymioButton = new ThymioColorAction();
 		else if( name == "circle" )
 			thymioButton = new ThymioCircleAction();
-		else // name == "sound"
+		else if( name == "sound" )
 			thymioButton = new ThymioSoundAction();
+		else if( name == "reset" )
+			thymioButton = new ThymioResetAction();
 
 		if( renderer )
 			thymioButton->setSharedRenderer(renderer);		

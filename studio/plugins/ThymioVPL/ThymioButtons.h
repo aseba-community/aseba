@@ -209,6 +209,7 @@ namespace Aseba
 		virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
 
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 	};
@@ -304,11 +305,29 @@ namespace Aseba
 		};
 	
 		ThymioSoundAction(QGraphicsItem *parent=0);
-		
 		virtual QPixmap image(bool on=true);
 		
 	protected:
 		Speaker *speaker;
+	};
+
+	// Reset Action
+	class ThymioResetAction : public ThymioButton
+	{		
+	public:
+		class Reset : public QGraphicsItem
+		{
+		public:
+			Reset(QGraphicsItem *parent=0) : QGraphicsItem(parent) {}
+			virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
+		};
+	
+		ThymioResetAction(QGraphicsItem *parent=0);
+		virtual QPixmap image(bool on=true);
+
+	protected:
+		Reset *logo;
 	};
 	
 	/*@}*/

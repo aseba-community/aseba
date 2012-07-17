@@ -49,19 +49,16 @@ namespace Aseba
 	{ 
 		return (name < 5 ? true : false); 
 	}
-
-	bool ThymioIRButton::isValid() 
-	{ 
-		if( name > 2 )
-			return true; 
-
+	
+	bool ThymioIRButton::isSet()
+	{
 		for(int i=0; i<size(); ++i)
 		{
 			if( buttons[i] == true )
 				return true;
-		}
-		
-		return false; 
+		}		
+	
+		return false;
 	}
 
 	void ThymioIRButton::accept(ThymioIRVisitor *visitor) 

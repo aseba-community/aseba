@@ -159,19 +159,22 @@ namespace Aseba
 		ThymioPushButton *colorButton = new ThymioPushButton("color");
 		ThymioPushButton *circleButton = new ThymioPushButton("circle");
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
+		ThymioPushButton *resetButton = new ThymioPushButton("reset");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 								
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
 		actionButtons.push_back(soundButton);
-
+		actionButtons.push_back(resetButton);
+		
 		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
 		actionsLayout->addWidget(moveButton);
 		actionsLayout->addWidget(colorButton);
 		actionsLayout->addWidget(circleButton);
 		actionsLayout->addWidget(soundButton);
+		actionsLayout->addWidget(resetButton);
 
 		horizontalLayout->addLayout(actionsLayout);
 		
@@ -186,6 +189,7 @@ namespace Aseba
 		connect(colorButton, SIGNAL(clicked()), this, SLOT(addColorAction()));	
 		connect(circleButton, SIGNAL(clicked()), this, SLOT(addCircleAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
+		connect(resetButton, SIGNAL(clicked()), this, SLOT(addResetAction()));
 	}	
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
@@ -661,7 +665,14 @@ namespace Aseba
 		scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
-	
+
+	void ThymioVisualProgramming::addResetAction()
+	{
+		ThymioResetAction *button = new ThymioResetAction();
+		scene->setFocus();
+		view->centerOn(scene->addAction(button));
+	}
+		
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		QSize iconSize;

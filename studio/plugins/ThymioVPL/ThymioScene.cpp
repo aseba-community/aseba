@@ -321,9 +321,6 @@ namespace Aseba
 		case THYMIO_MISSING_ACTION:
 			return tr("Line %0: Missing action button").arg(thymioCompiler.getErrorLine());
 			break;
-		case THYMIO_EVENT_NOT_SET:
-			return tr("Line %0: Event button is not set.").arg(thymioCompiler.getErrorLine());
-			break;
 		case THYMIO_EVENT_MULTISET:
 			return tr("Line %0: Redeclaration of event button.").arg(thymioCompiler.getErrorLine());
 			break;
@@ -467,6 +464,8 @@ namespace Aseba
 				button = new ThymioCircleAction();
 			else if ( buttonName == "sound" )			
 				button = new ThymioSoundAction();
+			else if ( buttonName == "reset" )
+				button = new ThymioResetAction();
 							
 			event->setDropAction(Qt::MoveAction);
 			event->accept();

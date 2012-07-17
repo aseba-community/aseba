@@ -21,7 +21,8 @@ namespace Aseba
 		THYMIO_MOVE_IR,
 		THYMIO_COLOR_IR,
 		THYMIO_CIRCLE_IR,
-		THYMIO_SOUND_IR
+		THYMIO_SOUND_IR,
+		THYMIO_RESET_IR
 	};
 	
 	enum ThymioIRErrorCode
@@ -29,7 +30,6 @@ namespace Aseba
 		THYMIO_NO_ERROR = 0,
 		THYMIO_MISSING_EVENT,
 		THYMIO_MISSING_ACTION,
-		THYMIO_EVENT_NOT_SET,
 		THYMIO_EVENT_MULTISET,
 		THYMIO_INVALID_CODE
 	};
@@ -59,7 +59,7 @@ namespace Aseba
 		wstring getBasename();
 		
 		bool isEventButton();
-		bool isValid();
+		bool isSet();
 
 		void accept(ThymioIRVisitor *visitor);
 
@@ -126,6 +126,7 @@ namespace Aseba
 		multimap<wstring, ThymioIRButton*> colorHash;
 		multimap<wstring, ThymioIRButton*> circleHash;
 		multimap<wstring, ThymioIRButton*> soundHash;
+		multimap<wstring, ThymioIRButton*> resetHash;
 
 		set<ThymioIRButtonName> tapSeenActions;
 		set<ThymioIRButtonName> clapSeenActions;
@@ -163,6 +164,7 @@ namespace Aseba
 		vector<wstring> directions;
 		int currentBlock;
 		bool inIfBlock;
+		wstring::iterator insertLoc;
 	};
 
 	class ThymioCompiler 
