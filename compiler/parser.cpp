@@ -319,10 +319,16 @@ namespace Aseba
 		{
 			tokens.pop_front();
 			
-			varSize = expectPositiveInt16LiteralOrConstant();
-			tokens.pop_front();
-			
-			expect(Token::TOKEN_BRACKET_CLOSE);
+			if (tokens.front() == Token::TOKEN_BRACKET_CLOSE)
+			{
+				varSize = 0;
+			}
+			else
+			{
+				varSize = expectPositiveInt16LiteralOrConstant();
+				tokens.pop_front();
+				expect(Token::TOKEN_BRACKET_CLOSE);
+			}
 			tokens.pop_front();
 		}
 		
@@ -346,30 +352,48 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
-			
-			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
-			if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-			{
-				std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(false));
-				// TODO: check size
-				for (size_t i = 0; i < arrayCtr->children.size(); ++i)
-				{
-					assign->children.push_back(new StoreNode(varPos, varAddr + i));
-					assign->children.push_back(arrayCtr->children[i]);
-					arrayCtr->children[i] = 0;
-				}
-			}
-			else
-			{
-				// TODO: check size
-				assign->children.push_back(new StoreNode(varPos, varAddr));
-				assign->children.push_back(parseBinaryOrExpression());
-			}
-			
-			return assign.release();
+			return parseArrayAssignment(varName, varPos, varAddr, varSize);
 		}
 		else
+		{
+			if (varSize == 0)
+				throw Error(varPos, WFormatableString(L"Array %0 has undefined size").arg(varName));
 			return NULL;
+		}
+	}
+	
+	//! Parse the right part of the assignment, taking the left (resulting  array) as parameter, and return the complete assignment node
+	AssignmentNode *Compiler::parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned varSize)
+	{
+		std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+		{
+			std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(false));
+			if (varSize)
+			{
+				if (arrayCtr->children.size() != varSize)
+					throw Error(varPos, WFormatableString(L"Variable %0 has been declared of size %1 while literal argument is of size %2").arg(varName).arg(varSize).arg(arrayCtr->children.size()));
+			}
+			else
+				varSize = arrayCtr->children.size();
+			for (size_t i = 0; i < arrayCtr->children.size(); ++i)
+			{
+				assign->children.push_back(new StoreNode(varPos, varAddr + i));
+				assign->children.push_back(arrayCtr->children[i]);
+				arrayCtr->children[i] = 0;
+			}
+		}
+		else
+		{
+			if (varSize == 0)
+				throw Error(varPos, WFormatableString(L"Scalar literal cannot be assigned to array %0").arg(varName));
+			else if (varSize != 1)
+				throw Error(varPos, WFormatableString(L"Variable %0 has been declared of size %1 but scalar literal given").arg(varName).arg(varSize));
+			assign->children.push_back(new StoreNode(varPos, varAddr));
+			assign->children.push_back(parseBinaryOrExpression());
+		}
+		
+		return assign.release();
 	}
 	
 	//! Parse "[ .... ]" grammar element
@@ -377,10 +401,9 @@ namespace Aseba
 	{
 		const Token::Type acceptableTypes[] = { Token::TOKEN_BRACKET_CLOSE, Token::TOKEN_COMMA };
 		
-		
 		expect(Token::TOKEN_BRACKET_OPEN);
 		
-		std::auto_ptr<ArrayConstructorNode> arrayCtor(new ArrayConstructorNode(tokens.front().pos)));
+		std::auto_ptr<ArrayConstructorNode> arrayCtor(new ArrayConstructorNode(tokens.front().pos));
 		
 		// TODO: assign memory
 		arrayCtor->addr = -1;
@@ -389,12 +412,13 @@ namespace Aseba
 		{
 			tokens.pop_front();
 			
-			arrayCtor->children->push_back(parseBinaryOrExpression());
+			arrayCtor->children.push_back(parseBinaryOrExpression());
 			
 			EXPECT_ONE_OF(acceptableTypes);
 		}
+		tokens.pop_front();
 		
-		return arrayCtor;
+		return arrayCtor.release();
 	}
 	
 	//! Parse "assignment" grammar element
@@ -415,35 +439,37 @@ namespace Aseba
 		
 		tokens.pop_front();
 		
-		Node* l_value;
+		if (tokens.front() != Token::TOKEN_BRACKET_OPEN)
+		{
+			// assignment between arrays or scalars
+			expect(Token::TOKEN_ASSIGN);
+			tokens.pop_front();
+			return parseArrayAssignment(varName, varPos, varAddr, varSize);
+		}
+		tokens.pop_front();
+		
 		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
-
+		
 		// parse the left value
 		// check if it is an array access
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-		{
-			tokens.pop_front();
-			
-			l_value = new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName);
-			l_value->children.push_back(parseBinaryOrExpression());
+		std::auto_ptr<Node> l_value_auto(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
+		l_value_auto->children.push_back(parseBinaryOrExpression());
 
-			expect(Token::TOKEN_BRACKET_CLOSE);
-			tokens.pop_front();
-		}
-		else
-		{
-			if (varSize != 1)
-				throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
-			
-			l_value = new StoreNode(tokens.front().pos, varAddr);
-		}
-
+		expect(Token::TOKEN_BRACKET_CLOSE);
+		tokens.pop_front();
+		
+		Node* l_value(l_value_auto.release());
 		assignment->children.push_back(l_value);
 		
 		// parse rvalue
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
+			
+			//if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+			//	return parseArrayAssignment(varName, varPos, varAddr, varSize);
+			
+			//tokens.pop_front();
 			assignment->children.push_back(parseBinaryOrExpression());
 		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
@@ -455,7 +481,7 @@ namespace Aseba
 		
 		return assignment.release();
 	}
-
+	
 	// parse +=, -=,... assignments
 	// assignments a += b are expanded to a = a + b
 	Node* Compiler::parseCompoundAssignment(Node* l_value)

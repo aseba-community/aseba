@@ -117,8 +117,12 @@ namespace Aseba
 	
 	void AssignmentNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		children[1]->emit(bytecodes);
-		children[0]->emit(bytecodes);
+		assert(children.size() % 2 == 0);
+		for (size_t i = 0; i < children.size(); i += 2)
+		{
+			children[i+1]->emit(bytecodes);
+			children[i+0]->emit(bytecodes);
+		}
 	}
 	
 	
