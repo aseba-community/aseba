@@ -229,8 +229,19 @@ namespace Aseba
 	{
 		// list of topics
 		topicList = new QListWidget();
-		topicList->addItem("General");
-		topicList->addItem("Editor");
+		topicList->setViewMode(QListView::IconMode);
+		topicList->setIconSize(QSize(64, 64));
+		topicList->setMovement(QListView::Static);
+		topicList->setMaximumWidth(128);
+		topicList->setGridSize(QSize(100, 100));
+		topicList->setMinimumHeight(300);
+		// add topics
+		QListWidgetItem* general = new QListWidgetItem(QIcon(":/images/exec.png"), tr("General"));
+		general->setTextAlignment(Qt::AlignHCenter);
+		topicList->addItem(general);
+		QListWidgetItem* editor = new QListWidgetItem(QIcon(":/images/kedit.png"), tr("Editor"));
+		editor->setTextAlignment(Qt::AlignHCenter);
+		topicList->addItem(editor);
 
 		// create pages
 		configStack = new QStackedWidget();
