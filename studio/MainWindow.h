@@ -48,6 +48,7 @@
 #include "TargetModels.h"
 #include "Plugin.h"
 #include "HelpViewer.h"
+#include "ConfigDialog.h"
 
 class QLabel;
 class QSpinBox;
@@ -363,6 +364,7 @@ namespace Aseba
 		void uncommentTriggered();
 		void showLineNumbersChanged(bool state);
 		void goToLine();
+		void showSettings();
 		void showHidden(bool show);
 		void showKeywords(bool show);
 

@@ -715,7 +715,7 @@ namespace Aseba
 		else
 		{
 			QTextCursor cursor(editor->textCursor());
-			if (cursor.atBlockEnd())// && !cursor.block().next().isValid())
+			if (cursor.atBlockEnd() && ConfigDialog::getAutoCompletion())// && !cursor.block().next().isValid())
 			{
 				// language completion
 				const QString& line(cursor.block().text());
@@ -1413,6 +1413,9 @@ namespace Aseba
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
 		
+		// create config dialog + read settings on-disk
+		ConfigDialog::init(this);
+
 		// create gui
 		setupWidgets();
 		setupMenu();
@@ -1859,6 +1862,11 @@ namespace Aseba
 			this, tr("Go To Line"), tr("Line:"), curLine, minLine, maxLine, 1, &ok);
 		if (ok)
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
+	}
+
+	void MainWindow::showSettings()
+	{
+		ConfigDialog::showConfig();
 	}
 
 	void MainWindow::toggleBreakpoint()
@@ -2362,6 +2370,8 @@ namespace Aseba
 	void MainWindow::nodeConnected(unsigned node)
 	{
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
+		tab->showKeywords(showKeywordsAct->isChecked());
+		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -3068,13 +3078,13 @@ namespace Aseba
 		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
 		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
 		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(true);
+		showLineNumbers->setChecked(ConfigDialog::getStartupShowLineNumbers());
 
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
 		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
 		goToLineAct->setEnabled(false);
-		
+
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
 		editMenu->addAction(cutAct);
@@ -3094,6 +3104,8 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(showLineNumbers);
 		editMenu->addAction(goToLineAct);
+		editMenu->addSeparator();
+		editMenu->addAction(tr("Settings"), this, SLOT(showSettings()));
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
@@ -3159,12 +3171,14 @@ namespace Aseba
 		menuBar()->addMenu(settingsMenu);
 		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
 		showHiddenAct->setCheckable(true);
+		showHiddenAct->setChecked(ConfigDialog::getStartupShowHidden());
+		showHidden(ConfigDialog::getStartupShowHidden());
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Jiwon
 		showKeywordsAct = new QAction(tr("Show &keywords..."), this);
 		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(true);
+		showKeywordsAct->setChecked(ConfigDialog::getStartupShowKeywordToolbar());
 		settingsMenu->addAction(showKeywordsAct);
 		
 		// Help menu
