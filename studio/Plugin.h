@@ -56,6 +56,7 @@ namespace Aseba
 		unsigned getNodeId();
 		void displayCode(QList<QString> code);
 		void loadNrun();
+		void stop();
 		TargetVariablesModel * getVariablesModel();
 	};
 	

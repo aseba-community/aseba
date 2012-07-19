@@ -464,8 +464,8 @@ namespace Aseba
 				button = new ThymioCircleAction();
 			else if ( buttonName == "sound" )			
 				button = new ThymioSoundAction();
-			else if ( buttonName == "reset" )
-				button = new ThymioResetAction();
+//			else if ( buttonName == "reset" )
+//				button = new ThymioResetAction();
 							
 			event->setDropAction(Qt::MoveAction);
 			event->accept();

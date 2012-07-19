@@ -44,7 +44,8 @@ namespace Aseba
 		openButton = new QToolButton();
 		saveButton = new QToolButton();
 		saveAsButton = new QToolButton();
-		runButton = new QToolButton();				
+		runButton = new QToolButton();
+		stopButton = new QToolButton();	
 		colorComboButton = new QComboBox();
 		quitButton = new QToolButton();
 
@@ -62,6 +63,9 @@ namespace Aseba
 
 		runButton->setIcon(QIcon(":/images/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
+
+		stopButton->setIcon(QIcon(":/images/stop1.png"));
+		stopButton->setToolTip(tr("Stop"));
 	
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
@@ -76,6 +80,7 @@ namespace Aseba
 		toolBar->addWidget(saveAsButton);
 		toolBar->addSeparator();
 		toolBar->addWidget(runButton);
+		toolBar->addWidget(stopButton);
 		toolBar->addSeparator();
 		toolBar->addWidget(colorComboButton);
 		toolBar->addSeparator();
@@ -88,7 +93,9 @@ namespace Aseba
 		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
+		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 
+		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
 		
@@ -159,14 +166,14 @@ namespace Aseba
 		ThymioPushButton *colorButton = new ThymioPushButton("color");
 		ThymioPushButton *circleButton = new ThymioPushButton("circle");
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
-		ThymioPushButton *resetButton = new ThymioPushButton("reset");
+//		ThymioPushButton *resetButton = new ThymioPushButton("reset");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 								
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
 		actionButtons.push_back(soundButton);
-		actionButtons.push_back(resetButton);
+//		actionButtons.push_back(resetButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
@@ -174,7 +181,7 @@ namespace Aseba
 		actionsLayout->addWidget(colorButton);
 		actionsLayout->addWidget(circleButton);
 		actionsLayout->addWidget(soundButton);
-		actionsLayout->addWidget(resetButton);
+//		actionsLayout->addWidget(resetButton);
 
 		horizontalLayout->addLayout(actionsLayout);
 		
@@ -189,48 +196,48 @@ namespace Aseba
 		connect(colorButton, SIGNAL(clicked()), this, SLOT(addColorAction()));	
 		connect(circleButton, SIGNAL(clicked()), this, SLOT(addCircleAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
-		connect(resetButton, SIGNAL(clicked()), this, SLOT(addResetAction()));
+//		connect(resetButton, SIGNAL(clicked()), this, SLOT(addResetAction()));
 	}	
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
-		delete(mainLayout);
-		delete(horizontalLayout);
-		delete(eventsLayout);
-		delete(sceneLayout);
-		delete(compilationResultLayout);
-		delete(actionsLayout);
-		
-		for(int i=0; i<eventButtons.size(); ++i)
-			delete(eventButtons[i]);
-			
-		for(int i=0; i<actionButtons.size(); ++i)
-			delete(actionButtons[i]);
-			
-		eventButtons.clear();
-		actionButtons.clear();
-
-		delete(eventsLabel);
-		delete(actionsLabel);
-
-		delete(toolBar);
-		delete(newButton);
-		delete(openButton);
-		delete(saveButton);
-		delete(saveAsButton);		
-		delete(runButton);
-		delete(colorComboButton);
-		delete(quitButton);
-
-		eventColors.clear();
-		actionColors.clear();
-		
-		delete(compilationResult);
-		delete(compilationResultImage);
-
-		delete(scene);
-		delete(view);
-
+//		delete(mainLayout);
+//		delete(horizontalLayout);
+//		delete(eventsLayout);
+//		delete(sceneLayout);
+//		delete(compilationResultLayout);
+//		delete(actionsLayout);
+//		
+//		for(int i=0; i<eventButtons.size(); ++i)
+//			delete(eventButtons[i]);
+//			
+//		for(int i=0; i<actionButtons.size(); ++i)
+//			delete(actionButtons[i]);
+//			
+//		eventButtons.clear();
+//		actionButtons.clear();
+//
+//		delete(eventsLabel);
+//		delete(actionsLabel);
+//
+//		delete(toolBar);
+//		delete(newButton);
+//		delete(openButton);
+//		delete(saveButton);
+//		delete(saveAsButton);		
+//		delete(runButton);
+//		delete(colorComboButton);
+//		delete(quitButton);
+//
+//		eventColors.clear();
+//		actionColors.clear();
+//		
+//		delete(compilationResult);
+//		delete(compilationResultImage);
+//
+//		delete(scene);
+//		delete(view);
+//
 		delete(tapSvg);
 		delete(clapSvg);		
 	}
@@ -278,10 +285,10 @@ namespace Aseba
 		close();
 	}
 	
-	bool ThymioVisualProgramming::surviveTabDestruction() const 
-	{
-		return true;
-	}
+//	bool ThymioVisualProgramming::surviveTabDestruction() const 
+//	{
+//		return true;
+//	}
 
 	void ThymioVisualProgramming::showFlashDialog()
 	{		
@@ -364,6 +371,11 @@ namespace Aseba
 			loadNrun();
 	}
 
+	void ThymioVisualProgramming::stop()
+	{
+		InvasivePlugin::stop();
+	}
+	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if ( scene->isEmpty() || warningDialog() )
@@ -666,12 +678,12 @@ namespace Aseba
 		view->centerOn(scene->addAction(button));
 	}
 
-	void ThymioVisualProgramming::addResetAction()
-	{
-		ThymioResetAction *button = new ThymioResetAction();
-		scene->setFocus();
-		view->centerOn(scene->addAction(button));
-	}
+//	void ThymioVisualProgramming::addResetAction()
+//	{
+//		ThymioResetAction *button = new ThymioResetAction();
+//		scene->setFocus();
+//		view->centerOn(scene->addAction(button));
+//	}
 		
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{

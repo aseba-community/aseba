@@ -22,11 +22,11 @@ namespace Aseba
 		
 				if( i==0 ) 
 				{
-					button = new ThymioClickableButton(QRectF(-25,-10,50,20), THYMIO_RECTANGULAR_BUTTON, this);
-					button->setClicked(true);
+					button = new ThymioClickableButton(QRectF(-25,-10,50,20), THYMIO_RECTANGULAR_BUTTON, 2, this);
+					button->setClicked(1);
 				}
 				else
-					button = new ThymioClickableButton(QRectF(-25,-10-num*7.5,50,20+num*15), THYMIO_TRIANGULAR_BUTTON, this);
+					button = new ThymioClickableButton(QRectF(-25,-10-num*7.5,50,20+num*15), THYMIO_TRIANGULAR_BUTTON, 2, this);
 							
 				button->setButtonColor(QColor(num<2 ? 255:0, num>0? 255:0, 0));
 
@@ -66,7 +66,7 @@ namespace Aseba
 		for(int k=0; k<2; ++k)
 		{
 			for(int i=0; i<5; i++)
-				if( thymioButtons.at(k*5+i)->isClicked() )
+				if( thymioButtons.at(k*5+i)->isClicked() > 0 )
 				{
 					pt[k] = (i-2);
 					break;
@@ -88,7 +88,7 @@ namespace Aseba
 		{			
 			for(int i=0; i<3; ++i) 
 			{
-				ThymioClickableButton *button = new ThymioClickableButton(QRectF(0,0,40,40), THYMIO_CIRCULAR_BUTTON, this);
+				ThymioClickableButton *button = new ThymioClickableButton(QRectF(0,0,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 
 				button->setData(0, k);   // color
 				button->setData(1, i); 	 // value
@@ -106,7 +106,7 @@ namespace Aseba
 				thymioButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 			}
-			thymioButtons.back()->setClicked(true);
+			thymioButtons.back()->setClicked(1);
 			
 			for(int i=k*3; i<k*3+3; i++)
 			{
@@ -130,18 +130,18 @@ namespace Aseba
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);		
 
 		for(int i=0; i<3; ++i)
-			if( thymioButtons.at(i)->isClicked() ) {
-				thymioBody->bodyColor.setRed(127.5*i);
+			if( thymioButtons.at(i)->isClicked() > 0 ) {
+				thymioBody->bodyColor.setRed(80*i+85);
 				break;
 			}
 		for(int i=3; i<6; ++i)
-			if( thymioButtons.at(i)->isClicked() ) {
-				thymioBody->bodyColor.setGreen(127.5*(i-3));
+			if( thymioButtons.at(i)->isClicked() > 0 ) {
+				thymioBody->bodyColor.setGreen(80*(i-3)+85);
 				break;
 			}
 		for(int i=6; i<9; ++i)
-			if( thymioButtons.at(i)->isClicked() ) {
-				thymioBody->bodyColor.setBlue(127.5*(i-6));
+			if( thymioButtons.at(i)->isClicked() > 0) {
+				thymioBody->bodyColor.setBlue(80*(i-6)+85);
 				break;
 			}	
 	}
@@ -155,7 +155,7 @@ namespace Aseba
 		
 		for(uint i=0; i<8; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25,-15,50,30), THYMIO_RECTANGULAR_BUTTON, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25,-15,50,30), THYMIO_RECTANGULAR_BUTTON, 5, this);
 
 			qreal offset = (qreal)i;			
 			button->setRotation(45*offset);
@@ -209,7 +209,7 @@ namespace Aseba
 			thymioButtons.push_back(button);
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
-		thymioButtons.at(0)->setClicked(true);
+		thymioButtons.at(0)->setClicked(1);
 		
 		for(int i=0; i<3; i++)
 		{
@@ -236,50 +236,50 @@ namespace Aseba
 	}	
 
 	// Reset Action
-	void ThymioResetAction::Reset::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
-	{		
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-		
-		painter->setPen(QPen(Qt::black, 20.0, Qt::SolidLine, Qt::RoundCap));
-		painter->setBrush(Qt::black);
-
-		painter->drawArc(50, 50, 156, 156, 4320, -2240);
-		painter->drawArc(50, 50, 156, 156, 1440, -2240);
-		
-		painter->setPen(QPen(Qt::black, 3.0, Qt::SolidLine, Qt::RoundCap));
-		QPointF points[3];
-		points[0] = QPointF(123, 186);
-		points[1] = QPointF(123, 226);
-		points[2] = QPointF(153, 206);
-		painter->drawPolygon(points, 3);		
-
-		points[0] = QPointF(133, 30);
-		points[1] = QPointF(133, 70);
-		points[2] = QPointF(103, 50);
-		painter->drawPolygon(points, 3);
-	}	
-	
-	ThymioResetAction::ThymioResetAction(QGraphicsItem *parent) : 
-		ThymioButton(false, 1.0, true, parent)
-	{
-		setData(0, "action");		
-		setData(1, "reset");
-		
-		logo = new Reset(this);
-	}
-
-	QPixmap ThymioResetAction::image(bool on)
-	{
-		QPixmap pixmap = ThymioButton::image(on);
-		QPainter painter(&pixmap);
-
-		painter.translate(logo->pos());
-		logo->paint(&painter, 0, 0);
-		painter.resetTransform();
-		
-		return pixmap;
-	}	
+//	void ThymioResetAction::Reset::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
+//	{		
+//		Q_UNUSED(option);
+//		Q_UNUSED(widget);
+//		
+//		painter->setPen(QPen(Qt::black, 20.0, Qt::SolidLine, Qt::RoundCap));
+//		painter->setBrush(Qt::black);
+//
+//		painter->drawArc(50, 50, 156, 156, 4320, -2240);
+//		painter->drawArc(50, 50, 156, 156, 1440, -2240);
+//		
+//		painter->setPen(QPen(Qt::black, 3.0, Qt::SolidLine, Qt::RoundCap));
+//		QPointF points[3];
+//		points[0] = QPointF(123, 186);
+//		points[1] = QPointF(123, 226);
+//		points[2] = QPointF(153, 206);
+//		painter->drawPolygon(points, 3);		
+//
+//		points[0] = QPointF(133, 30);
+//		points[1] = QPointF(133, 70);
+//		points[2] = QPointF(103, 50);
+//		painter->drawPolygon(points, 3);
+//	}	
+//	
+//	ThymioResetAction::ThymioResetAction(QGraphicsItem *parent) : 
+//		ThymioButton(false, 1.0, true, parent)
+//	{
+//		setData(0, "action");		
+//		setData(1, "reset");
+//		
+//		logo = new Reset(this);
+//	}
+//
+//	QPixmap ThymioResetAction::image(bool on)
+//	{
+//		QPixmap pixmap = ThymioButton::image(on);
+//		QPainter painter(&pixmap);
+//
+//		painter.translate(logo->pos());
+//		logo->paint(&painter, 0, 0);
+//		painter.resetTransform();
+//		
+//		return pixmap;
+//	}	
 
 };
 

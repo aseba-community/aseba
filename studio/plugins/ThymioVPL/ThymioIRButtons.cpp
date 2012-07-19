@@ -3,8 +3,9 @@
 namespace Aseba
 {
 
-	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n) : 
-		name(n)
+	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n, int states) : 
+		name(n),
+		numStates(states)
 	{ 
 		buttons.resize(size, false); 
 	}
@@ -14,15 +15,20 @@ namespace Aseba
 		buttons.clear();
 	}	
 
-	void ThymioIRButton::setClicked(int i, bool status) 
+	void ThymioIRButton::setClicked(int i, int status) 
 	{ 
 		if( i<size() ) buttons[i] = status; 
 	}
 	
-	bool ThymioIRButton::isClicked(int i) 
+	int ThymioIRButton::isClicked(int i) 
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
+	}
+	
+	int ThymioIRButton::getNumStates()
+	{
+		return numStates;
 	}
 	
 	int ThymioIRButton::size() 
@@ -54,7 +60,7 @@ namespace Aseba
 	{
 		for(int i=0; i<size(); ++i)
 		{
-			if( buttons[i] == true )
+			if( buttons[i] > 0 )
 				return true;
 		}		
 	

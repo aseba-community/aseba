@@ -13,13 +13,14 @@
 namespace Aseba
 {
 	// Clickable button
-	ThymioClickableButton::ThymioClickableButton ( QRectF rect, ThymioButtonType type, QGraphicsItem *parent ) :
+	ThymioClickableButton::ThymioClickableButton ( QRectF rect, ThymioButtonType type,  int nstates, QGraphicsItem *parent ) :
 		QGraphicsObject(parent),
 		buttonType(type),
 		boundingRectangle(rect),
 		buttonColor(Qt::gray),
 		buttonClicked(false),
-		toggleState(true)
+		toggleState(true),
+		numStates(nstates)
 	{		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -32,10 +33,10 @@ namespace Aseba
 		painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 		
 		// filled
-		if ( buttonClicked )
-			painter->setBrush(buttonColor);
-		else
-			painter->setBrush(Qt::white);
+		double step = (double)(buttonClicked)/(double)(numStates-1);
+		painter->setBrush(QColor(buttonColor.red()*step + 255*(1-step), 
+								 buttonColor.green()*step + 255*(1-step), 
+								 buttonColor.blue()*step + 255*(1-step)));
 
 		if ( buttonType == THYMIO_CIRCULAR_BUTTON )
 			painter->drawEllipse(boundingRectangle);
@@ -57,7 +58,8 @@ namespace Aseba
 		if( event->button() == Qt::LeftButton ) 
 		{
 			if( toggleState ) {
-				buttonClicked = !buttonClicked;
+				if( ++buttonClicked == numStates )
+					buttonClicked = 0;
 				update();
 			}
 			else 
@@ -65,7 +67,7 @@ namespace Aseba
 				buttonClicked = true;
 				for( QList<ThymioClickableButton*>::iterator itr = siblings.begin();
 					 itr != siblings.end(); ++itr )				
-					(*itr)->setClicked(false);
+					(*itr)->setClicked(0);
 				parentItem()->update();
 			}
 			emit stateChanged();
@@ -74,7 +76,7 @@ namespace Aseba
 		
 	// Face Button
 	ThymioFaceButton::ThymioFaceButton ( QRectF rect, ThymioSmileType type, QGraphicsItem *parent ) :
-		ThymioClickableButton( rect, THYMIO_CIRCULAR_BUTTON, parent )
+		ThymioClickableButton( rect, THYMIO_CIRCULAR_BUTTON, 2, parent )
 	{
 		qreal x = boundingRectangle.x();
 		qreal y = boundingRectangle.y();
@@ -168,7 +170,7 @@ namespace Aseba
 			delete(buttonIR);
 	}
 
-	void ThymioButton::setClicked(int i, bool status)
+	void ThymioButton::setClicked(int i, int status)
 	{
 		if( i < thymioButtons.size()  )
 			thymioButtons.at(i)->setClicked(status);
@@ -182,25 +184,25 @@ namespace Aseba
 			QString name = getName();
 
 			if( name == "button" )
-				buttonIR = new ThymioIRButton(num, THYMIO_BUTTONS_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_BUTTONS_IR, 2);
 			else if( name == "prox" )
-				buttonIR = new ThymioIRButton(num, THYMIO_PROX_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_PROX_IR, 3);
 			else if( name == "proxground" )
-				buttonIR = new ThymioIRButton(num, THYMIO_PROX_GROUND_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_PROX_GROUND_IR, 3);
 			else if( name == "tap" )
-				buttonIR = new ThymioIRButton(num, THYMIO_TAP_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_TAP_IR, 0);
 			else if( name == "clap" )
-				buttonIR = new ThymioIRButton(num, THYMIO_CLAP_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_CLAP_IR, 0);
 			else if( name == "move" )
-				buttonIR = new ThymioIRButton(num, THYMIO_MOVE_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_MOVE_IR, 2);
 			else if( name == "color" )
-				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR, 2);
 			else if( name == "circle" )
-				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR, 5);
 			else if( name == "sound" )
-				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR);
-			else if( name == "reset" )
-				buttonIR = new ThymioIRButton(num, THYMIO_RESET_IR);
+				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR, 2);
+//			else if( name == "reset" )
+//				buttonIR = new ThymioIRButton(num, THYMIO_RESET_IR);
 
 			buttonIR->setBasename(name.toStdWString());
 		}
@@ -223,7 +225,7 @@ namespace Aseba
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-				
+		
 		painter->setPen(QColor(147, 134, 115));
 		painter->setBrush(buttonColor); // filling
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);		
@@ -238,12 +240,12 @@ namespace Aseba
 		QPainter painter(&pixmap);
 		painter.setRenderHint(QPainter::Antialiasing);
 
-		bool state[getNumButtons()];
+		int state[getNumButtons()];
 		if(on)
 			for(int i=0; i<getNumButtons(); ++i)
 			{
 				state[i] = thymioButtons.at(i)->isClicked();
-				thymioButtons.at(i)->setClicked(true);
+				thymioButtons.at(i)->setClicked(thymioButtons.at(i)->getNumStates()-1);
 			}
 
 		if(thymioBody != 0) 
@@ -281,7 +283,7 @@ namespace Aseba
 
 		for(QList<ThymioClickableButton*>::iterator itr = thymioButtons.begin();
 			itr != thymioButtons.end(); ++itr)
-			if( (*itr)->isClicked() )
+			if( (*itr)->isClicked() > 0 )
 				return true;
 				
 		return false;
@@ -718,15 +720,15 @@ namespace Aseba
 					button = new ThymioCircleAction();
 				else if ( buttonName == "sound" )			
 					button = new ThymioSoundAction();
-				else if ( buttonName == "reset" )
-					button = new ThymioResetAction();
+//				else if ( buttonName == "reset" )
+//					button = new ThymioResetAction();
 				
 				qDebug() << "  == TBS -- drop event : created " << buttonName << " button.";
 				
 				if( button ) 
 					for( int i=0; i<numButtons; ++i ) 
 					{
-						bool status;
+						int status;
 						dataStream >> status;					
 						button->setClicked(i, status);
 					}
@@ -817,8 +819,8 @@ namespace Aseba
 			thymioButton = new ThymioCircleAction();
 		else if( name == "sound" )
 			thymioButton = new ThymioSoundAction();
-		else if( name == "reset" )
-			thymioButton = new ThymioResetAction();
+//		else if( name == "reset" )
+//			thymioButton = new ThymioResetAction();
 
 		if( renderer )
 			thymioButton->setSharedRenderer(renderer);		

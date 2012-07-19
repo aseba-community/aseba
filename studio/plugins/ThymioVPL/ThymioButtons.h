@@ -35,12 +35,14 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		ThymioClickableButton ( QRectF rect, ThymioButtonType type, QGraphicsItem *parent=0 );
+		ThymioClickableButton ( QRectF rect, ThymioButtonType type, int nstates = 2, QGraphicsItem *parent=0 );
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 
-		bool isClicked() { return buttonClicked; }
-		void setClicked(bool clicked) { buttonClicked = clicked; }
+		int isClicked() { return buttonClicked; }
+		void setClicked(int clicked) { buttonClicked = clicked; }
 		void setToggleState(bool state) { toggleState = state; }
+		void setNumStates(int num) { numStates = num > 2 ? num : 2; }
+		int getNumStates() { return numStates; }
 
 		QRectF boundingRect() const { return boundingRectangle; }
 		void setButtonColor(QColor color) { buttonColor = color; }
@@ -52,8 +54,9 @@ namespace Aseba
 	
 	protected:
 		ThymioButtonType buttonType;
-		bool buttonClicked;
+		int buttonClicked;
 		bool toggleState;
+		int numStates;
 		
 		QRectF boundingRectangle;		
 		QColor buttonColor;
@@ -103,8 +106,8 @@ namespace Aseba
 
 		void setButtonColor(QColor color) { buttonColor = color; update(); }
 		QColor getButtonColor() { return buttonColor; }
-		void setClicked(int i, bool status);
-		bool isClicked(int i) { if( i<thymioButtons.size() ) return thymioButtons.at(i)->isClicked(); return false; }
+		void setClicked(int i, int status);
+		int isClicked(int i) { if( i<thymioButtons.size() ) return thymioButtons.at(i)->isClicked(); return -1; }
 
 		void setParentID(int id) { parentID = id; }
 		int getParentID() { return parentID; }
@@ -312,24 +315,24 @@ namespace Aseba
 	};
 
 	// Reset Action
-	class ThymioResetAction : public ThymioButton
-	{		
-	public:
-		class Reset : public QGraphicsItem
-		{
-		public:
-			Reset(QGraphicsItem *parent=0) : QGraphicsItem(parent) {}
-			virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
-		};
-	
-		ThymioResetAction(QGraphicsItem *parent=0);
-		virtual QPixmap image(bool on=true);
-
-	protected:
-		Reset *logo;
-	};
-	
+//	class ThymioResetAction : public ThymioButton
+//	{		
+//	public:
+//		class Reset : public QGraphicsItem
+//		{
+//		public:
+//			Reset(QGraphicsItem *parent=0) : QGraphicsItem(parent) {}
+//			virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+//			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
+//		};
+//	
+//		ThymioResetAction(QGraphicsItem *parent=0);
+//		virtual QPixmap image(bool on=true);
+//
+//	protected:
+//		Reset *logo;
+//	};
+//	
 	/*@}*/
 }; // Aseba
 

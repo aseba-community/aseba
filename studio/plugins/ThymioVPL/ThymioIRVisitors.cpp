@@ -73,7 +73,7 @@ namespace Aseba
 		colorHash.clear();
 		circleHash.clear();
 		soundHash.clear();
-		resetHash.clear();
+//		resetHash.clear();
 		
 		tapSeenActions.clear();
 		clapSeenActions.clear();
@@ -107,10 +107,10 @@ namespace Aseba
 			currentHash = &soundHash;
 			tempHash = soundHash;
 			break;
-		case THYMIO_RESET_IR:
-			currentHash = &resetHash;
-			tempHash = resetHash;
-			break;
+//		case THYMIO_RESET_IR:
+//			currentHash = &resetHash;
+//			tempHash = resetHash;
+//			break;
 		default:
 			return;
 			break;
@@ -128,10 +128,12 @@ namespace Aseba
 		wstring buttonname = button->getBasename();
 		for(int i=0; i<button->size(); i++)
 		{	
-			if( button->isClicked(i) )
+			if( button->isClicked(i) > 0 )
 			{
 				buttonname += L"_";
-				buttonname += toWstring(i);	
+				buttonname += toWstring(i);
+				buttonname += L"_";
+				buttonname += toWstring(button->isClicked(i));
 			}
 		}
 
@@ -218,7 +220,7 @@ namespace Aseba
 		directions.push_back(L"left");
 		directions.push_back(L"backward");
 		directions.push_back(L"right");
-		directions.push_back(L"center");		
+		directions.push_back(L"center");
 	}
 	
 	ThymioIRCodeGenerator::~ThymioIRCodeGenerator()
@@ -263,7 +265,7 @@ namespace Aseba
 					text = L"\tif ";
 					for(int i=0; i<5; ++i)
 					{
-						if(button->isClicked(i))
+						if(button->isClicked(i) > 0)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"button.";
@@ -293,7 +295,15 @@ namespace Aseba
 					text = L"\tif ";
 					for(int i=0; i<button->size(); ++i)
 					{
-						if(button->isClicked(i))
+						if(button->isClicked(i) == 1)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.horizontal[";
+							text += toWstring(i);
+							text += L"] < 400";
+							flag = true;
+						} 
+						else if(button->isClicked(i) == 2)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.horizontal[";
@@ -323,7 +333,7 @@ namespace Aseba
 					text = L"\tif ";
 					for(int i=0; i<button->size(); ++i)
 					{
-						if(button->isClicked(i))
+						if(button->isClicked(i) == 1)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.ground.reflected[";
@@ -331,6 +341,14 @@ namespace Aseba
 							text += L"] < 150";
 							flag = true;
 						}
+						else if(button->isClicked(i) == 2)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.ground.reflected[";
+							text += toWstring(i);
+							text += L"] > 300";
+							flag = true;
+						}						
 					}
 					text += L" then\n";
 					inIfBlock = true;
@@ -367,27 +385,30 @@ namespace Aseba
 			{
 			case THYMIO_MOVE_IR:
 				text += L"motor.left.target = ";
-				text += ( button->isClicked(0) ? L"500\n" : 
-						  button->isClicked(1) ? L"200\n" :
-						  button->isClicked(2) ? L"0\n" : 
-						  button->isClicked(3) ? L"-200\n" : L"-500\n" );
+				text += ( button->isClicked(0) > 0 ? L"500\n" : 
+						  button->isClicked(1) > 0 ? L"200\n" :
+						  button->isClicked(2) > 0 ? L"0\n" : 
+						  button->isClicked(3) > 0 ? L"-200\n" : L"-500\n" );
 				text += (inIfBlock ? L"\t\t" : L"\t");
 				text += L"motor.right.target = ";
-				text += ( button->isClicked(5) ? L"500\n" : 
-						  button->isClicked(6) ? L"200\n" :
-						  button->isClicked(7) ? L"0\n" : 
-						  button->isClicked(8) ? L"-200\n" : L"-500\n" );
+				text += ( button->isClicked(5) > 0 ? L"500\n" : 
+						  button->isClicked(6) > 0 ? L"200\n" :
+						  button->isClicked(7) > 0 ? L"0\n" : 
+						  button->isClicked(8) > 0 ? L"-200\n" : L"-500\n" );
 				break;
 			case THYMIO_COLOR_IR:
 				text += L"call leds.top(";
-				text += (button->isClicked(0) ? L"0," : button->isClicked(1) ? L"16," : L"32,");
-				text += (button->isClicked(3) ? L"0," : button->isClicked(4) ? L"16," : L"32,");
-				text += (button->isClicked(6) ? L"0)\n" : button->isClicked(7) ? L"16)\n" : L"32)\n");				
+				text += (button->isClicked(0) > 0 ? L"0," : button->isClicked(1) > 0 ? L"16," : L"32,");
+				text += (button->isClicked(3) > 0 ? L"0," : button->isClicked(4) > 0 ? L"16," : L"32,");
+				text += (button->isClicked(6) > 0 ? L"0)\n" : button->isClicked(7) > 0 ? L"16)\n" : L"32)\n");				
 				break;
 			case THYMIO_CIRCLE_IR:
 				text += L"call leds.circle(";
 				for(int i=0; i < button->size(); ++i)
-					text += (button->isClicked(i)? L"32," : L"0,");
+				{
+					text += toWstring((32*button->isClicked(i))/(button->getNumStates()-1)); 
+					text += L",";//(button->isClicked(i)? L"32," : L"0,");
+				}
 				text.replace(text.length()-1, 2,L")\n");
 				break;
 			case THYMIO_SOUND_IR:
@@ -398,23 +419,23 @@ namespace Aseba
 				else
 					text += L"call sound.system(4)\n"; // scared
 				break;
-			case THYMIO_RESET_IR:
-				text += L"motor.left.target = 0\n";
-				if( inIfBlock )
-				{
-					text += L"\t\tmotor.right.target = 0\n";
-					text += L"\t\tcall leds.top(0,0,0)\n";
-					text += L"\t\tcall leds.circle(0,0,0,0,0,0,0,0)\n";
-					text += L"\t\tcall sound.system(-1)\n";
-				}
-				else
-				{
-					text += L"\tmotor.right.target = 0\n";
-					text += L"\tcall leds.top(0,0,0)\n";
-					text += L"\tcall leds.circle(0,0,0,0,0,0,0,0)\n";
-					text += L"\tcall sound.system(-1)\n";
-				}
-				break;
+//			case THYMIO_RESET_IR:
+//				text += L"motor.left.target = 0\n";
+//				if( inIfBlock )
+//				{
+//					text += L"\t\tmotor.right.target = 0\n";
+//					text += L"\t\tcall leds.top(0,0,0)\n";
+//					text += L"\t\tcall leds.circle(0,0,0,0,0,0,0,0)\n";
+//					text += L"\t\tcall sound.system(-1)\n";
+//				}
+//				else
+//				{
+//					text += L"\tmotor.right.target = 0\n";
+//					text += L"\tcall leds.top(0,0,0)\n";
+//					text += L"\tcall leds.circle(0,0,0,0,0,0,0,0)\n";
+//					text += L"\tcall sound.system(-1)\n";
+//				}
+//				break;
 			default:
 				errorCode = THYMIO_INVALID_CODE;
 				break;
@@ -432,6 +453,9 @@ namespace Aseba
 		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() ) return;
 		
 		errorCode = THYMIO_NO_ERROR;
+		
+//		if( generatedCode.empty() )
+//			generatedCode.push_back(L"onevent vplthymioreset\n\tmotor.right.target = 0\n\tcall leds.top(0,0,0)\n\tcall leds.circle(0,0,0,0,0,0,0,0)\n\tcall sound.system(-1)\n");
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		int block = editor[name];
