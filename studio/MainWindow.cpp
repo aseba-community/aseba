@@ -64,6 +64,8 @@ namespace Aseba
 		setReadOnly(true);
 		
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
+		
+		resize(600, 560);
 	}
 	
 	void CompilationLogDialog::hideEvent( QHideEvent * event )

@@ -437,6 +437,21 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"native function call"; }
 	};
 	
+	//! Node for returning from an event or subroutine
+	//! has no children, just a jump of 0 offset that will be resolved at link time
+	struct ReturnNode : Node
+	{
+		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		virtual ReturnNode* clone() const {return(new ReturnNode(*this));}
+		
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual Node* optimize(std::wostream* dump) { return this; }
+		virtual unsigned getStackDepth() const { return 0; }
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::wstring toWString() const { return L"Return"; }
+		virtual std::wstring toNodeName() const { return L"return"; } 
+	};
+	
 	/*@}*/
 	
 }; // Aseba

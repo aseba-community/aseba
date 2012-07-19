@@ -54,13 +54,18 @@ namespace Aseba
 		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
-			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
+			if (bytecode.getTypeOfLast() != ASEBA_BYTECODE_STOP)
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
 		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
 			if (bytecode.size())
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
+			{
+				bytecode.changeStopToRetSub();
+				if (bytecode.getTypeOfLast() != ASEBA_BYTECODE_SUB_RET)
+					bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
+			}
 			else
 				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[it->first].line));
 		}
@@ -447,6 +452,11 @@ namespace Aseba
 		return stackDepth;
 	}
 	
+	void ReturnNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		const unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STOP);
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+	}
 	
 	/*@}*/
 	

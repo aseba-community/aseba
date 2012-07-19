@@ -101,6 +101,7 @@ namespace Aseba
 		BytecodeElement(unsigned short bytecode) : bytecode(bytecode), line(0) { }
 		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) { }
 		operator unsigned short () const { return bytecode; }
+		unsigned getWordSize() const;
 		
 		unsigned short bytecode; //! bytecode itself
 		unsigned short line; //!< line in source code
@@ -121,6 +122,9 @@ namespace Aseba
 			std::deque<BytecodeElement>::push_back(be);
 			lastLine = be.line;
 		}
+		
+		void changeStopToRetSub();
+		unsigned short getTypeOfLast() const;
 		
 		//! A map of event addresses to identifiers
 		typedef std::map<unsigned, unsigned> EventAddressesToIdsMap;
@@ -230,6 +234,7 @@ namespace Aseba
 				TOKEN_STR_callsub,
 				TOKEN_STR_onevent,
 				TOKEN_STR_abs,
+				TOKEN_STR_return,
 				TOKEN_STRING_LITERAL,
 				TOKEN_INT_LITERAL,
 				TOKEN_PAR_OPEN,
@@ -358,6 +363,7 @@ namespace Aseba
 		
 		Node* parseBlockStatement();
 		
+		Node* parseReturn();
 		Node* parseVarDef();
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);

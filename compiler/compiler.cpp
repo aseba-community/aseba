@@ -65,6 +65,25 @@ namespace Aseba
 		return crc;
 	}
 	
+	//! Return the number of words this element takes in memory
+	unsigned BytecodeElement::getWordSize() const
+	{
+		switch (bytecode >> 12)
+		{
+			case ASEBA_BYTECODE_LARGE_IMMEDIATE:
+			case ASEBA_BYTECODE_LOAD_INDIRECT:
+			case ASEBA_BYTECODE_STORE_INDIRECT:
+			case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
+			return 2;
+			
+			case ASEBA_BYTECODE_EMIT:
+			return 3;
+			
+			default:
+			return 1;
+		}
+	}
+	
 	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
 	Compiler::Compiler()
 	{
@@ -267,38 +286,46 @@ namespace Aseba
 		// resolve subroutines call addresses
 		for (size_t pc = 0; pc < bytecode.size();)
 		{
-			switch (bytecode[pc] >> 12)
+			BytecodeElement &element(bytecode[pc]);
+			if (element.bytecode >> 12 == ASEBA_BYTECODE_SUB_CALL)
 			{
-				case ASEBA_BYTECODE_SUB_CALL:
-				{
-					unsigned id = bytecode[pc] & 0x0fff;
-					assert(id < subroutineTable.size());
-					unsigned address = subroutineTable[id].address;
-					bytecode[pc].bytecode &= 0xf000;
-					bytecode[pc].bytecode |= address;
-					pc += 1;
-				}
-				break;
-				
-				case ASEBA_BYTECODE_LARGE_IMMEDIATE:
-				case ASEBA_BYTECODE_LOAD_INDIRECT:
-				case ASEBA_BYTECODE_STORE_INDIRECT:
-				case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
-					pc += 2;
-				break;
-				
-				case ASEBA_BYTECODE_EMIT:
-					pc += 3;
-				break;
-				
-				default:
-					pc += 1;
-				break;
+				const unsigned id = element.bytecode & 0x0fff;
+				assert(id < subroutineTable.size());
+				const unsigned address = subroutineTable[id].address;
+				element.bytecode &= 0xf000;
+				element.bytecode |= address;
 			}
+			pc += element.getWordSize();
 		}
 		
 		// check size
 		return bytecode.size() <= targetDescription->bytecodeSize;
+	}
+	
+	//! Change "stop" bytecode to "return from subroutine"
+	void BytecodeVector::changeStopToRetSub()
+	{
+		const unsigned bytecodeEndPos(size());
+		for (unsigned pc = 0; pc < bytecodeEndPos;)
+		{
+			BytecodeElement &element((*this)[pc]);
+			if ((element.bytecode >> 12) == ASEBA_BYTECODE_STOP)
+				element.bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET);
+			pc += element.getWordSize();
+		}
+	}
+	
+	//! Return the type of last bytecode element
+	unsigned short BytecodeVector::getTypeOfLast() const
+	{
+		unsigned short type(16); // invalid type
+		for (size_t pc = 0; pc < size();)
+		{
+			const BytecodeElement &element((*this)[pc]);
+			type = element.bytecode >> 12;
+			pc += element.getWordSize();
+		}
+		return type;
 	}
 	
 	//! Get the map of event addresses to identifiers

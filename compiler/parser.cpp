@@ -283,8 +283,17 @@ namespace Aseba
 			case Token::TOKEN_STR_emit: return parseEmit();
 			case Token::TOKEN_STR_call: return parseFunctionCall();
 			case Token::TOKEN_STR_callsub: return parseCallSub();
+			case Token::TOKEN_STR_return: return parseReturn();
 			default: return parseAssignment();
 		}
+	}
+	
+	//! Parse "return statement" grammar element.
+	Node* Compiler::parseReturn()
+	{
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+		return new ReturnNode(pos);
 	}
 	
 	//! Parse "var def" grammar element.

@@ -79,6 +79,7 @@ namespace Aseba
 			case TOKEN_STR_callsub: return L"callsub keyword";
 			case TOKEN_STR_onevent: return L"onevent keyword";
 			case TOKEN_STR_abs: return L"abs keyword";
+			case TOKEN_STR_return: return L"return keyword";
 			case TOKEN_STRING_LITERAL: return L"string";
 			case TOKEN_INT_LITERAL: return L"integer";
 			case TOKEN_PAR_OPEN: return L"( (open parenthesis)";
@@ -427,6 +428,8 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
 						else if (s == L"abs")
 							tokens.push_back(Token(Token::TOKEN_STR_abs, pos));
+						else if (s == L"return")
+							tokens.push_back(Token(Token::TOKEN_STR_return, pos));
 						else if (s == L"or")
 							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
 						else if (s == L"and")
