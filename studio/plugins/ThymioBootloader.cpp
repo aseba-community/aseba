@@ -81,7 +81,7 @@ namespace Aseba
 	
 	bool ThymioBootloaderDialog::surviveTabDestruction() const 
 	{
-		return true;
+		return delete_myself;
 	}
 	
 	void ThymioBootloaderDialog::showFlashDialog()
