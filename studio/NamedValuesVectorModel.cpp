@@ -197,21 +197,27 @@ namespace Aseba
 
 	QVariant MaskableNamedValuesVectorModel::data(const QModelIndex &index, int role) const
 	{
+		if (index.column() != 2)
+			return NamedValuesVectorModel::data(index, role);
+
 		if (role == Qt::DisplayRole)
 		{
-			if (index.column() == 2)
-				return QVariant();
-			else
-				return NamedValuesVectorModel::data(index, role);
+			return QVariant();
 		}
-		else if (role == Qt::DecorationRole && index.column() == 2)
+		else if (role == Qt::DecorationRole)
 		{
 			return viewEvent[index.row()] ?
 				QPixmap(QString(":/images/eye.png")) :
 				QPixmap(QString(":/images/eyeclose.png"));
 		}
+		else if (role == Qt::ToolTipRole)
+		{
+			return viewEvent[index.row()] ?
+				tr("Hide") :
+				tr("View");
+		}
 		else
-			return NamedValuesVectorModel::data(index, role);
+			return QVariant();
 	}
 
 	Qt::ItemFlags MaskableNamedValuesVectorModel::flags(const QModelIndex & index) const
