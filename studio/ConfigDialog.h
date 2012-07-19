@@ -27,6 +27,8 @@
 
 #include <map>
 
+#define CONFIG_PROPERTY_CHECKBOX_DECLARE(name) \
+	static const bool name(void);
 
 namespace Aseba
 {
@@ -47,11 +49,11 @@ namespace Aseba
 
 		// access to properties
 		// startup properties
-		static const bool getStartupShowHidden(void);
-		static const bool getStartupShowLineNumbers(void);
-		static const bool getStartupShowKeywordToolbar(void);
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowHidden)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowLineNumbers)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowKeywordToolbar)
 		// autocompletion behaviour
-		static const bool getAutoCompletion(void);
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(getAutoCompletion)
 
 	protected:
 		ConfigDialog(QWidget* parent = 0);
@@ -123,11 +125,6 @@ namespace Aseba
 	protected:
 		virtual void readSettings();
 		virtual void writeSettings();
-
-	protected:
-		QCheckBox* startupShowHidden;
-		QCheckBox* startupShowLineNumbers;
-		QCheckBox* startupShowKeyword;
 	};
 
 	// EditorPage
@@ -144,9 +141,6 @@ namespace Aseba
 	protected:
 		virtual void readSettings();
 		virtual void writeSettings();
-
-	protected:
-		QCheckBox* autoKeyword;
 	};
 }
 

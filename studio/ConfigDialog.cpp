@@ -28,11 +28,25 @@
 #define BOOL_TO_CHECKED(value)	(value == true ? Qt::Checked : Qt::Unchecked)
 #define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
 
+#define CONFIG_PROPERTY_CHECKBOX_HANDLER(name, page, keyword) \
+	const bool ConfigDialog::name() { \
+		if (me) \
+			return me->page->checkboxCache[#keyword].value; \
+		else \
+			return false; \
+	}
+
+
 #define TITLE_SPACING		10
 #define HORIZONTAL_STRUT	700
 
 namespace Aseba
 {
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowLineNumbers,	generalpage,	showlinenumbers		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowHidden,		generalpage,	showhidden		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowKeywordToolbar,	generalpage,	keywordToolbar		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(getAutoCompletion,		editorpage,	autoKeyword		)
+
 	/*** ConfigPage ***/
 	ConfigPage::ConfigPage(QString title, QWidget *parent):
 		QWidget(parent)
@@ -127,14 +141,11 @@ namespace Aseba
 		gb1->setLayout(gb1layout);
 		mainLayout->addWidget(gb1);
 		// Show hidden variables & functions
-		startupShowHidden = newCheckbox(tr("Show hidden variables"), "showhidden", false);
-		gb1layout->addWidget(startupShowHidden);
+		gb1layout->addWidget(newCheckbox(tr("Show hidden variables"), "showhidden", false));
 		// Show line numbers
-		startupShowLineNumbers = newCheckbox(tr("Show line numbers"), "showlinenumbers", true);
-		gb1layout->addWidget(startupShowLineNumbers);
+		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 		// Show the keyword toolbar
-		startupShowKeyword = newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true);
-		gb1layout->addWidget(startupShowKeyword);
+		gb1layout->addWidget(newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true));
 
 		mainLayout->addStretch();
 	}
@@ -166,8 +177,7 @@ namespace Aseba
 		gb1->setLayout(gb1layout);
 		mainLayout->addWidget(gb1);
 		//
-		autoKeyword = newCheckbox(tr("Keywords"), "autoKeyword", true);
-		gb1layout->addWidget(autoKeyword);
+		gb1layout->addWidget(newCheckbox(tr("Keywords"), "autoKeyword", true));
 
 		mainLayout->addStretch();
 	}
@@ -260,38 +270,6 @@ namespace Aseba
 	ConfigDialog::~ConfigDialog()
 	{
 		writeSettings();
-	}
-
-	const bool ConfigDialog::getStartupShowHidden()
-	{
-		if (me)
-			return me->generalpage->checkboxCache["showhidden"].value;
-		else
-			return false;
-	}
-
-	const bool ConfigDialog::getStartupShowLineNumbers()
-	{
-		if (me)
-			return me->generalpage->checkboxCache["showlinenumbers"].value;
-		else
-			return false;
-	}
-
-	const bool ConfigDialog::getStartupShowKeywordToolbar()
-	{
-		if (me)
-			return me->generalpage->checkboxCache["keywordToolbar"].value;
-		else
-			return false;
-	}
-
-	const bool ConfigDialog::getAutoCompletion()
-	{
-		if (me)
-			return me->editorpage->checkboxCache["autoKeyword"].value;
-		else
-			return false;
 	}
 
 	void ConfigDialog::accept()
