@@ -58,7 +58,9 @@ namespace Aseba
 			thymioCompiler.AddButtonSet(button->getIRButtonSet());				
 		}
 		else if( prevNewEventButton )
+		{
 			button = buttonSets.last();
+		}
 		else 
 		{
 			if( lastFocus >= 0 )
@@ -128,7 +130,9 @@ namespace Aseba
 			thymioCompiler.AddButtonSet(button->getIRButtonSet());				
 		}
 		else if( prevNewActionButton )
+		{
 			button = buttonSets.last();
+		}
 		else 
 		{
 			if( lastFocus >= 0 )
@@ -140,7 +144,7 @@ namespace Aseba
 						button = buttonSets.at(i);
 						break;
 					}
-								
+			
 			if( !button )
 			{
 				if(!buttonSets.isEmpty() && !(buttonSets.last()->eventExists()) )
@@ -465,7 +469,7 @@ namespace Aseba
 			event->accept();
 			
 			lastFocus = -1;
-			prevNewActionButton = false;			
+			prevNewActionButton = false;
 			prevNewEventButton = false;
 			newRow = true;
 			
