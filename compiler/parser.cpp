@@ -329,6 +329,10 @@ namespace Aseba
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
 			throw Error(varPos, WFormatableString(L"Variable %0 is already defined").arg(varName));
+
+		// check if variable conflicts with a constant
+		if(commonDefinitions->constants.contains(varName))
+			throw Error(varPos, WFormatableString(L"Variable %0 has the same name as a constant").arg(varName));
 		
 		// save variable
 		variablesMap[varName] = std::make_pair(varAddr, varSize);
