@@ -81,7 +81,7 @@ namespace Aseba
 	}
 	
 	void ThymioIRButtonSet::addActionButton(ThymioIRButton *action) 
-	{ 
+	{
 		actionButton = action; 
 	}
 		

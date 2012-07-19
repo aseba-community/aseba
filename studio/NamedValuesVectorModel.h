@@ -53,18 +53,41 @@ namespace Aseba
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
-		bool isVisible(const unsigned id);
 		
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
 		void delNamedValue(int index);
-		void toggle(const QModelIndex &index);
 		void clear();
 		
-	private:
+	protected:
 		NamedValuesVector* namedValues;
-		QString tooltipText;
 		bool wasModified;
+
+	private:
+		QString tooltipText;
+	};
+
+	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel
+	{
+		Q_OBJECT
+
+	public:
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+
+		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		Qt::ItemFlags flags(const QModelIndex & index) const;
+
+		bool isVisible(const unsigned id);
+
+	public slots:
+		void addNamedValue(const NamedValue& namedValue);
+		void delNamedValue(int index);
+		void toggle(const QModelIndex &index);
+
+	private:
 		std::vector<bool> viewEvent;
 	};
 	

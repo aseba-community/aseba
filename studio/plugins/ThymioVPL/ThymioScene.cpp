@@ -45,18 +45,7 @@ namespace Aseba
 		prevNewActionButton = false;
 		
 		if( newRow )
-		{
-			button = new ThymioButtonSet(buttonSets.size());
-			button->setColorScheme(eventButtonColor, actionButtonColor);
-			button->setScale(scaleFactor);
-			buttonSets.push_back(button);
-		
-			addItem(button);
-			prevNewEventButton = true;
-			
-			connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-			thymioCompiler.AddButtonSet(button->getIRButtonSet());				
-		}
+			button = createNewButtonSet();
 		else if( prevNewEventButton )
 		{
 			button = buttonSets.last();
@@ -79,20 +68,10 @@ namespace Aseba
 					button = buttonSets.last();
 				else
 				{
-					button = new ThymioButtonSet(buttonSets.size());
-					button->setColorScheme(eventButtonColor, actionButtonColor);
-					button->setScale(scaleFactor);					
-					buttonSets.push_back(button);
-				
-					addItem(button);
+					button = createNewButtonSet();
 					prevNewActionButton = true;
-					
-					connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-					thymioCompiler.AddButtonSet(button->getIRButtonSet());						
 				}
-			}
-
-				
+			}				
 		}
 		
 		if( item ) button->addActionButton(item);
@@ -117,18 +96,7 @@ namespace Aseba
 		prevNewEventButton = false;
 
 		if( newRow )
-		{
-			button = new ThymioButtonSet(buttonSets.size());
-			button->setColorScheme(eventButtonColor, actionButtonColor);
-			button->setScale(scaleFactor);
-			buttonSets.push_back(button);
-		
-			addItem(button);
-			prevNewEventButton = true;
-			
-			connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-			thymioCompiler.AddButtonSet(button->getIRButtonSet());				
-		}
+			button = createNewButtonSet();		
 		else if( prevNewActionButton )
 		{
 			button = buttonSets.last();
@@ -151,17 +119,22 @@ namespace Aseba
 					button = buttonSets.last();
 				else
 				{
-					button = new ThymioButtonSet(buttonSets.size());
-					button->setColorScheme(eventButtonColor, actionButtonColor);
-					button->setScale(scaleFactor);
-					buttonSets.push_back(button);
-				
-					addItem(button);
+					button = createNewButtonSet();
 					prevNewEventButton = true;
-					
-					connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-					thymioCompiler.AddButtonSet(button->getIRButtonSet());								
 				}
+		
+//				{
+//					button = new ThymioButtonSet(buttonSets.size());
+//					button->setColorScheme(eventButtonColor, actionButtonColor);
+//					button->setScale(scaleFactor);
+//					buttonSets.push_back(button);
+//				
+//					addItem(button);
+//					prevNewEventButton = true;
+//					
+//					connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
+//					thymioCompiler.AddButtonSet(button->getIRButtonSet());								
+//				}
 			}
 
 		}
@@ -182,6 +155,21 @@ namespace Aseba
 		return button;
 	}
 
+	ThymioButtonSet *ThymioScene::createNewButtonSet()
+	{
+		ThymioButtonSet *button = new ThymioButtonSet(buttonSets.size());
+		button->setColorScheme(eventButtonColor, actionButtonColor);
+		button->setScale(scaleFactor);
+		buttonSets.push_back(button);
+	
+		addItem(button);
+
+		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
+		thymioCompiler.AddButtonSet(button->getIRButtonSet());
+
+		return button;		
+	}
+
 	bool ThymioScene::isEmpty()
 	{
 		if( buttonSets.isEmpty() )
@@ -199,17 +187,11 @@ namespace Aseba
 	{
 		clear();
 
-		ThymioButtonSet *button = new ThymioButtonSet(0);
-		button->setColorScheme(eventButtonColor, actionButtonColor);		
-		button->setScale(scaleFactor);
+		ThymioButtonSet *button = createNewButtonSet();
 		button->setPos(20, 20);
-		buttonSets.push_back(button);
-	
+		thymioCompiler.AddButtonSet(button->getIRButtonSet());		
+
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));
-	
-		addItem(button);
-		thymioCompiler.AddButtonSet(button->getIRButtonSet());
-		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 	}
 	
 	void ThymioScene::clear()
@@ -245,7 +227,6 @@ namespace Aseba
 
 	void ThymioScene::removeButton(int row)
 	{
-		
 		Q_ASSERT( row < buttonSets.size() );
 			
 		ThymioButtonSet *button = buttonSets[row];
@@ -260,14 +241,8 @@ namespace Aseba
 
 		if( buttonSets.isEmpty() ) 
 		{
-			ThymioButtonSet *button = new ThymioButtonSet(0);
-			button->setColorScheme(eventButtonColor, actionButtonColor);
-			button->setScale(scaleFactor);
-			button->setPos(20, 20);
-			buttonSets.push_back(button);
-		
-			addItem(button);
-			connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));			
+			ThymioButtonSet *button = createNewButtonSet();
+			button->setPos(20,20);		
 		}
 
 		prevNewEventButton = false;
@@ -306,6 +281,8 @@ namespace Aseba
 		sceneModified = true;
 		
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));		
+
+		buttonUpdateDetected();
 	}
 
 	void ThymioScene::rearrangeButtons(int row)
@@ -411,6 +388,8 @@ namespace Aseba
 			lastFocus = currentRow;
 	
 			sceneModified = true;
+			
+			buttonUpdateDetected();
 		}
 		else if( event->mimeData()->hasFormat("thymiobutton") && 
 				((event->scenePos().y()-20)/(buttonSetHeight*scaleFactor)) >= buttonSets.size() )

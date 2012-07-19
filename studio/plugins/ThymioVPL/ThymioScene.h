@@ -50,11 +50,13 @@ namespace Aseba
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+	private:
 		void removeButton(int row);
 		void insertButton(int row);
 		void rearrangeButtons(int row=0);
 		
-	private:
+		ThymioButtonSet *createNewButtonSet();
+
 		bool prevNewEventButton;
 		bool prevNewActionButton;
 		int lastFocus;

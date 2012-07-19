@@ -69,6 +69,7 @@ namespace Aseba
 	class TargetVariablesModel;
 	class TargetFunctionsModel;
 	class TargetMemoryModel;
+	class MaskableNamedValuesVectorModel;
 	class NamedValuesVectorModel;
 	class AeslEditor;
 	class AeslLineNumberSidebar;
@@ -483,7 +484,7 @@ namespace Aseba
 		FixedWidthTableView* constantsView;
 		
 		// models
-		NamedValuesVectorModel* eventsDescriptionsModel;
+		MaskableNamedValuesVectorModel* eventsDescriptionsModel;
 		NamedValuesVectorModel* constantsDefinitionsModel;
 		
 		// global buttons
