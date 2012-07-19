@@ -53,9 +53,7 @@ namespace Aseba
 		};
 		
 		//! Constructor
-		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
-		virtual Node* clone() const = 0;
-		
+		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }		
 		virtual ~Node();
 		
 		//! Typecheck this node, throw an exception if there is any type violation
@@ -90,7 +88,6 @@ namespace Aseba
 	{
 		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual BlockNode* clone() const {return(new BlockNode(*this));}
 		
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -103,7 +100,6 @@ namespace Aseba
 	{
 		//! Constructor
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
-		virtual ProgramNode* clone() const {return(new ProgramNode(*this));}
 
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const { return L"ProgramBlock"; }
@@ -117,7 +113,6 @@ namespace Aseba
 	{
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual AssignmentNode* clone() const {return(new AssignmentNode(*this));}
 
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -137,7 +132,6 @@ namespace Aseba
 		
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual IfWhenNode* clone() const {return(new IfWhenNode(*this));}
 
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -159,7 +153,6 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedIfWhenNode* clone() const {return(new FoldedIfWhenNode(*this));}
 
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
@@ -175,7 +168,6 @@ namespace Aseba
 	{
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual WhileNode* clone() const {return(new WhileNode(*this));}
 
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -194,7 +186,6 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedWhileNode* clone() const {return(new FoldedWhileNode(*this));}
 
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
@@ -210,7 +201,6 @@ namespace Aseba
 		unsigned eventId; //!< the event id associated with this context
 		
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
-		virtual EventDeclNode* clone() const {return(new EventDeclNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -229,7 +219,6 @@ namespace Aseba
 		
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual EmitNode* clone() const {return(new EmitNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -245,7 +234,6 @@ namespace Aseba
 		unsigned subroutineId; //!< the associated subroutine
 		
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual SubDeclNode* clone() const {return(new SubDeclNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -261,7 +249,6 @@ namespace Aseba
 		unsigned subroutineId; //!< the subroutine to call
 		
 		CallSubNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual CallSubNode* clone() const {return(new CallSubNode(*this));}
 
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -278,7 +265,6 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual BinaryArithmeticNode* clone() const {return(new BinaryArithmeticNode(*this));}
 
 		void deMorganNotRemoval();
 		
@@ -305,7 +291,6 @@ namespace Aseba
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
-		virtual UnaryArithmeticNode* clone() const {return(new UnaryArithmeticNode(*this));}
 
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -324,7 +309,6 @@ namespace Aseba
 		
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
-		virtual ImmediateNode* clone() const {return(new ImmediateNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -342,7 +326,6 @@ namespace Aseba
 		
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual StoreNode* clone() const {return(new StoreNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -360,7 +343,6 @@ namespace Aseba
 		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		LoadNode(const StoreNode* store) : Node(store->sourcePos), varAddr(store->varAddr) {}
-		virtual LoadNode* clone() const {return(new LoadNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -379,7 +361,6 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayWriteNode* clone() const {return(new ArrayWriteNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -406,11 +387,10 @@ namespace Aseba
 			// array[i++]+=2, which will expand to array[i++] = array[i++] + 2
 			// which is not what the user meant
 			if (write->children.size() > 0 && (index = dynamic_cast<ImmediateNode*> (write->children[0])) != 0)
-				children.push_back(index->clone());
+				children.push_back(new ImmediateNode(*index));
 			else
 				throw Error(sourcePos, WFormatableString(L"Such operation is not permitted with non-immediate index"));
 		}
-		virtual ArrayReadNode* clone() const {return(new ArrayReadNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -427,7 +407,6 @@ namespace Aseba
 		std::vector<unsigned> argumentsAddr; //!< address of all arguments
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
-		virtual CallNode* clone() const {return(new CallNode(*this));}
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -442,7 +421,6 @@ namespace Aseba
 	struct ReturnNode : Node
 	{
 		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
-		virtual ReturnNode* clone() const {return(new ReturnNode(*this));}
 		
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump) { return this; }
