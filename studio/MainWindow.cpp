@@ -1408,7 +1408,7 @@ namespace Aseba
 		target = new DashelTarget(translators, commandLineTarget);
 
 		// create models
-		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
+		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
 		
 		// create gui

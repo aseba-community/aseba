@@ -33,8 +33,7 @@ namespace Aseba
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
 		tooltipText(tooltipText),
-		wasModified(false),
-		viewEvent()
+		wasModified(false)
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -42,8 +41,7 @@ namespace Aseba
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
-		wasModified(false),
-		viewEvent()
+		wasModified(false)
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -57,10 +55,7 @@ namespace Aseba
 	int NamedValuesVectorModel::columnCount(const QModelIndex & parent) const
 	{
 		Q_UNUSED(parent)
-		if(tooltipText.isEmpty())
-			return 2;
-		else
-			return 3;
+		return 2;
 	}
 	
 	QVariant NamedValuesVectorModel::data(const QModelIndex &index, int role) const
@@ -72,23 +67,15 @@ namespace Aseba
 		{
 			if (index.column() == 0)
 				return QString::fromStdWString(namedValues->at(index.row()).name);
-			else if (index.column() == 1)
-				return namedValues->at(index.row()).value;
 			else
-				return QVariant();
+				return namedValues->at(index.row()).value;
 		}
 		else if (role == Qt::ToolTipRole && !tooltipText.isEmpty())
 		{
 			return tooltipText.arg(index.row());
 		}
-		else if (role == Qt::DecorationRole && index.column() == 2)
-		{
-			return viewEvent[index.row()] ? 
-				QPixmap(QString(":/images/eye.png")) :
-				QPixmap(QString(":/images/eyeclose.png"));
-		}
 		else
-		return QVariant();
+			return QVariant();
 	}
 	
 	QVariant NamedValuesVectorModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -103,11 +90,8 @@ namespace Aseba
 	{
 		if (index.column() == 0)
 			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
-		else if (index.column() == 1)
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled;
 		else
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
-
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled;
 	}
 	
 	QStringList NamedValuesVectorModel::mimeTypes () const
@@ -150,14 +134,6 @@ namespace Aseba
 		return false;
 	}
 
-	bool NamedValuesVectorModel::isVisible(const unsigned id)
-	{
-		if (id >= viewEvent.size() || viewEvent[id])
-			return true;
-		
-		return false;
-	}
-	
 	void NamedValuesVectorModel::addNamedValue(const NamedValue& namedValue)
 	{
 		Q_ASSERT(namedValues);
@@ -167,7 +143,6 @@ namespace Aseba
 		beginInsertRows(QModelIndex(), position, position);
 		
 		namedValues->push_back(namedValue);
-		viewEvent.push_back(true);
 		wasModified = true;
 		
 		endInsertRows();
@@ -181,19 +156,9 @@ namespace Aseba
 		beginRemoveRows(QModelIndex(), index, index);
 		
 		namedValues->erase(namedValues->begin() + index);
-		viewEvent.erase(viewEvent.begin() + index);
 		wasModified = true;
 		
 		endRemoveRows();
-	}
-	
-    void NamedValuesVectorModel::toggle(const QModelIndex &index)
-	{
-		Q_ASSERT(namedValues);
-		Q_ASSERT(index.row() < (int)namedValues->size());
-
-		viewEvent[index.row()] = !viewEvent[index.row()];
-		wasModified = true;
 	}
 	
 	void NamedValuesVectorModel::clear()
@@ -210,6 +175,82 @@ namespace Aseba
 
 		endRemoveRows();
 	}
-	
+
+	// ****************************************************************************** //
+
+	MaskableNamedValuesVectorModel::MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent) :
+		NamedValuesVectorModel(namedValues, tooltipText, parent),
+		viewEvent()
+	{
+	}
+
+	MaskableNamedValuesVectorModel::MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
+		NamedValuesVectorModel(namedValues, parent),
+		viewEvent()
+	{
+	}
+
+	int MaskableNamedValuesVectorModel::columnCount(const QModelIndex & parent) const
+	{
+		return 3;
+	}
+
+	QVariant MaskableNamedValuesVectorModel::data(const QModelIndex &index, int role) const
+	{
+		if (role == Qt::DisplayRole)
+		{
+			if (index.column() == 2)
+				return QVariant();
+			else
+				return NamedValuesVectorModel::data(index, role);
+		}
+		else if (role == Qt::DecorationRole && index.column() == 2)
+		{
+			return viewEvent[index.row()] ?
+				QPixmap(QString(":/images/eye.png")) :
+				QPixmap(QString(":/images/eyeclose.png"));
+		}
+		else
+			return NamedValuesVectorModel::data(index, role);
+	}
+
+	Qt::ItemFlags MaskableNamedValuesVectorModel::flags(const QModelIndex & index) const
+	{
+		if (index.column() == 2)
+			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
+		else
+			return NamedValuesVectorModel::flags(index);
+
+	}
+
+	bool MaskableNamedValuesVectorModel::isVisible(const unsigned id)
+	{
+		if (id >= viewEvent.size() || viewEvent[id])
+			return true;
+
+		return false;
+	}
+
+	void MaskableNamedValuesVectorModel::addNamedValue(const NamedValue& namedValue)
+	{
+		NamedValuesVectorModel::addNamedValue(namedValue);
+		viewEvent.push_back(true);
+	}
+
+	void MaskableNamedValuesVectorModel::delNamedValue(int index)
+	{
+		viewEvent.erase(viewEvent.begin() + index);
+		NamedValuesVectorModel::delNamedValue(index);
+	}
+
+	void MaskableNamedValuesVectorModel::toggle(const QModelIndex &index)
+	{
+		Q_ASSERT(namedValues);
+		Q_ASSERT(index.row() < (int)namedValues->size());
+
+		viewEvent[index.row()] = !viewEvent[index.row()];
+		wasModified = true;
+	}
+
 	/*@}*/
 }; // Aseba
