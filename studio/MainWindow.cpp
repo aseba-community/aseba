@@ -351,7 +351,8 @@ namespace Aseba
 			for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 				layout->addWidget((*it)->createMenuEntry());
 			widget->setLayout(layout);
-			toolBox->addItem(widget, tr("Tools"));
+			int index = toolBox->addItem(widget, tr("Local Tools"));
+			toolBox->setCurrentIndex(index);
 			
 			mainWindow->regenerateHelpMenu();
 			
