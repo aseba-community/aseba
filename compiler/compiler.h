@@ -43,6 +43,7 @@ namespace Aseba
 	struct ProgramNode;
 	struct StatementNode;
 	struct BinaryArithmeticNode;
+	struct ArrayConstructorNode;
 	
 	//! Description of target VM
 	struct TargetDescription
@@ -365,6 +366,7 @@ namespace Aseba
 		
 		Node* parseReturn();
 		Node* parseVarDef();
+		ArrayConstructorNode* parseArrayConstructor(bool assignMemory);
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);
 		Node* parseIncrementAssignment(Node* l_value);

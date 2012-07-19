@@ -122,6 +122,17 @@ namespace Aseba
 	}
 	
 	
+	void ArrayConstructorNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		for (size_t i = 0; i < children.size(); i++)
+		{
+			children[i]->emit(bytecodes);
+			unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | (addr+i);
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		}
+	}
+	
+	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		abort();

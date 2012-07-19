@@ -68,6 +68,17 @@ namespace Aseba
 		return this;
 	}
 	
+	Node* ArrayConstructorNode::optimize(std::wostream* dump)
+	{
+		for (NodesVector::iterator it = children.begin(); it != children.end(); ++it)
+		{
+			Node *optimizedChild = (*it)->optimize(dump);
+			assert(optimizedChild);
+			*it = optimizedChild;
+		}
+		return this;
+	}
+	
 	Node* IfWhenNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);

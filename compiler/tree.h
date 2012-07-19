@@ -121,6 +121,22 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"assignment"; }
 	};
 	
+	//! Node for assembling values into an array
+	//! children[x] is the x-th value to be assembled
+	struct ArrayConstructorNode : Node
+	{
+		unsigned addr; //!< address of destination array
+		
+		//! Constructor
+		ArrayConstructorNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		
+		virtual ReturnType typeCheck() const;
+		virtual Node* optimize(std::wostream* dump);
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"array constructor"; }
+	};
+	
 	//! Node for L"if" and L"when".
 	//! children[0] is expression
 	//! children[1] is true block
@@ -212,7 +228,7 @@ namespace Aseba
 	//! Node for L"emit".
 	//! no children
 	struct EmitNode : Node
-	{		
+	{
 		unsigned eventId; //!< id of event to emit
 		unsigned arrayAddr; //!< address of the first element of the array to send
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument

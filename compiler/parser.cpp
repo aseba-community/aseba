@@ -345,27 +345,56 @@ namespace Aseba
 		// optional assignation
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
-			std::auto_ptr<BlockNode> block(new BlockNode(tokens.front().pos));
-			
 			tokens.pop_front();
 			
-			for (unsigned i = 0; i < varSize; i++)
+			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
+			if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 			{
-				SourcePos assignPos = tokens.front().pos;
-				block->children.push_back(parseBinaryOrExpression());
-				block->children.push_back(new StoreNode(assignPos, varAddr + i));
-				
-				if (i + 1 < varSize)
+				std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(false));
+				// TODO: check size
+				for (size_t i = 0; i < arrayCtr->children.size(); ++i)
 				{
-					expect(Token::TOKEN_COMMA);
-					tokens.pop_front();
+					assign->children.push_back(new StoreNode(varPos, varAddr + i));
+					assign->children.push_back(arrayCtr->children[i]);
+					arrayCtr->children[i] = 0;
 				}
 			}
+			else
+			{
+				// TODO: check size
+				assign->children.push_back(new StoreNode(varPos, varAddr));
+				assign->children.push_back(parseBinaryOrExpression());
+			}
 			
-			return block.release();
+			return assign.release();
 		}
 		else
 			return NULL;
+	}
+	
+	//! Parse "[ .... ]" grammar element
+	ArrayConstructorNode* Compiler::parseArrayConstructor(bool assignMemory)
+	{
+		const Token::Type acceptableTypes[] = { Token::TOKEN_BRACKET_CLOSE, Token::TOKEN_COMMA };
+		
+		
+		expect(Token::TOKEN_BRACKET_OPEN);
+		
+		std::auto_ptr<ArrayConstructorNode> arrayCtor(new ArrayConstructorNode(tokens.front().pos)));
+		
+		// TODO: assign memory
+		arrayCtor->addr = -1;
+		
+		while (tokens.front() != Token::TOKEN_BRACKET_CLOSE)
+		{
+			tokens.pop_front();
+			
+			arrayCtor->children->push_back(parseBinaryOrExpression());
+			
+			EXPECT_ONE_OF(acceptableTypes);
+		}
+		
+		return arrayCtor;
 	}
 	
 	//! Parse "assignment" grammar element

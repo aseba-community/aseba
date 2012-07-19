@@ -81,6 +81,11 @@ namespace Aseba
 		indent--;
 	}
 	
+	std::wstring ArrayConstructorNode::toWString() const
+	{
+		return WFormatableString(L"Array Constructor: addr %0").arg(addr);
+	}
+	
 	std::wstring IfWhenNode::toWString() const
 	{
 		std::wstring s;

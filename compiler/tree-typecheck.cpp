@@ -60,6 +60,15 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
+	Node::ReturnType ArrayConstructorNode::typeCheck() const
+	{
+		for (NodesVector::const_iterator it = children.begin(); it != children.end(); ++it)
+		{
+			expectType(TYPE_INT, (*it)->typeCheck());
+		}
+		return TYPE_UNIT; // FIXME: check if we should not use an array type
+	}
+	
 	Node::ReturnType IfWhenNode::typeCheck() const
 	{
 		expectType(TYPE_BOOL, children[0]->typeCheck());
