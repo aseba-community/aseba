@@ -53,6 +53,7 @@ namespace Aseba
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
+		void setEditable(bool editable);
 		
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
@@ -65,6 +66,7 @@ namespace Aseba
 
 	private:
 		QString tooltipText;
+		bool editable;
 	};
 
 	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel

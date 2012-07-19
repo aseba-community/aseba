@@ -33,7 +33,8 @@ namespace Aseba
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
 		tooltipText(tooltipText),
-		wasModified(false)
+		wasModified(false),
+		editable(false)
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -41,7 +42,8 @@ namespace Aseba
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
-		wasModified(false)
+		wasModified(false),
+		editable(false)
 	{
 		Q_ASSERT(namedValues);
 	}
@@ -89,7 +91,12 @@ namespace Aseba
 	Qt::ItemFlags NamedValuesVectorModel::flags(const QModelIndex & index) const
 	{
 		if (index.column() == 0)
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+		{
+			if (editable)
+				return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+			else
+				return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+		}
 		else
 			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled;
 	}
@@ -123,6 +130,13 @@ namespace Aseba
 		Q_ASSERT(namedValues);
 		if (index.isValid() && role == Qt::EditRole)
 		{
+			if (index.column() == 0)
+			{
+				namedValues->at(index.row()).name = value.toString().toStdWString();
+				emit dataChanged(index, index);
+				wasModified = true;
+				return true;
+			}
 			if (index.column() == 1)
 			{
 				namedValues->at(index.row()).value = value.toInt();
@@ -132,6 +146,11 @@ namespace Aseba
 			}
 		}
 		return false;
+	}
+
+	void NamedValuesVectorModel::setEditable(bool editable)
+	{
+		this->editable = editable;
 	}
 
 	void NamedValuesVectorModel::addNamedValue(const NamedValue& namedValue)

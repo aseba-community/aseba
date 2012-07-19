@@ -1413,6 +1413,7 @@ namespace Aseba
 		// create models
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel->setEditable(true);
 		
 		// create config dialog + read settings on-disk
 		ConfigDialog::init(this);
