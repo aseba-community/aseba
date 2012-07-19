@@ -2371,8 +2371,18 @@ namespace Aseba
 	//! A node has disconnected from the network.
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
-		int index = getIndexFromId(node);
+		const int index = getIndexFromId(node);
 		Q_ASSERT(index >= 0);
+		const NodeTab* tab = getTabFromId(node);
+		const QString& tabName = nodes->tabText(index);
+		
+		nodes->addTab(
+			new AbsentNodeTab(
+				tabName,
+				tab->editor->document()->toPlainText()
+			),
+			tabName
+		);
 		
 		nodes->removeAndDeleteTab(index);
 		
