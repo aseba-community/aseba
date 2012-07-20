@@ -235,6 +235,23 @@ namespace Aseba
 			throw Error(tokens.front().pos, errorMessage);
 		}
 	}
+
+	void Compiler::freeTemporaryMemory()
+	{
+		endVariableIndex = 0;
+	}
+
+	void Compiler::allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr)
+	{
+		// allocate space at the end of the variables' memory
+		unsigned endOfMemory = targetDescription->variablesSize - endVariableIndex;
+		varAddr = endOfMemory - size;
+		endVariableIndex += size;
+
+		// free space check
+		if (freeVariableIndex + endVariableIndex > targetDescription->variablesSize)
+			throw Error(varPos, WFormatableString(L"Not enough free space to allocate this tempory variable"));
+	}
 	
 	//! Parse "program" grammar element.
 	Node* Compiler::parseProgram()
@@ -262,6 +279,9 @@ namespace Aseba
 	//! Parse "statement" grammar element.
 	Node* Compiler::parseStatement()
 	{
+		// reset temporary variables
+		freeTemporaryMemory();
+
 		switch (tokens.front())
 		{
 			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, L"Variable definition is allowed only at the beginning of the program before any statement");
@@ -374,7 +394,7 @@ namespace Aseba
 		std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
-			std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(false));
+			std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(varPos, false));
 			if (varSize)
 			{
 				if (arrayCtr->children.size() != varSize)
@@ -403,7 +423,7 @@ namespace Aseba
 	}
 	
 	//! Parse "[ .... ]" grammar element
-	ArrayConstructorNode* Compiler::parseArrayConstructor(bool assignMemory)
+	ArrayConstructorNode* Compiler::parseArrayConstructor(const SourcePos& varPos, bool assignMemory)
 	{
 		const Token::Type acceptableTypes[] = { Token::TOKEN_BRACKET_CLOSE, Token::TOKEN_COMMA };
 		
@@ -411,19 +431,23 @@ namespace Aseba
 		
 		std::auto_ptr<ArrayConstructorNode> arrayCtor(new ArrayConstructorNode(tokens.front().pos));
 		
-		// TODO: assign memory
-		arrayCtor->addr = -1;
-		
+		arrayCtor->addr = -1;	// not yet allocated
+
 		while (tokens.front() != Token::TOKEN_BRACKET_CLOSE)
 		{
 			tokens.pop_front();
 			
 			arrayCtor->children.push_back(parseBinaryOrExpression());
+			arrayCtor->size++;
 			
 			EXPECT_ONE_OF(acceptableTypes);
 		}
 		tokens.pop_front();
-		
+
+		// allocate memory at the end of the variable space
+		if (assignMemory)
+			allocateTemporaryMemory(varPos, arrayCtor->size, arrayCtor->addr);
+
 		return arrayCtor.release();
 	}
 	
@@ -798,9 +822,15 @@ namespace Aseba
 		unsigned eventSize = commonDefinitions->events[emitNode->eventId].value;
 		if (eventSize > 0)
 		{
-			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);
+			std::auto_ptr<Node> preNode(parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize));
 			if (emitNode->arraySize != eventSize)
 				throw Error(pos, WFormatableString(L"Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
+
+			// need to execute a node before the emit (e.g. allocate memory)?
+			if (preNode.get())
+			{
+				emitNode->children.push_back(preNode.release());
+			}
 		}
 		else
 		{
@@ -850,62 +880,77 @@ namespace Aseba
 	}
 	
 	//! Parse access to variable, arrray, or array subscript
-	void Compiler::parseReadVarArrayAccess(unsigned* addr, unsigned* size)
+	Node* Compiler::parseReadVarArrayAccess(unsigned* addr, unsigned* size)
 	{
-		expect(Token::TOKEN_STRING_LITERAL);
-		
-		// we have a variable access, check if variable exists
+		const Token::Type acceptableTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_BRACKET_OPEN, Token::TOKEN_END_OF_STREAM };
+		EXPECT_ONE_OF(acceptableTypes);
+
 		SourcePos varPos = tokens.front().pos;
-		std::wstring varName = tokens.front().sValue;
-		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
-		
-		// store variable address
-		*addr = varIt->second.first;
-		
-		// check if it is a const array access
-		tokens.pop_front();
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+
+		if (tokens.front() == Token::TOKEN_STRING_LITERAL)
 		{
+			// we have a variable access, check if variable exists
+			std::wstring varName = tokens.front().sValue;
+			VariablesMap::const_iterator varIt(findVariable(varName, varPos));
+
+			// store variable address
+			*addr = varIt->second.first;
+
+			// check if it is a const array access
 			tokens.pop_front();
-			
-			int value = expectPositiveInt16LiteralOrConstant();
-			unsigned startIndex = (unsigned)value;
-			unsigned len = 1;
-			
-			// check if first index is within bounds
-			if (startIndex >= varIt->second.second)
-				throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-			tokens.pop_front();
-			
-			// do we have array subscript?
-			if (tokens.front() == Token::TOKEN_COLON)
+			if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 			{
 				tokens.pop_front();
-				
-				value = expectPositiveInt16LiteralOrConstant();
-				
-				// check if second index is within bounds
-				unsigned endIndex = (unsigned)value;
-				if (endIndex >= varIt->second.second)
+
+				int value = expectPositiveInt16LiteralOrConstant();
+				unsigned startIndex = (unsigned)value;
+				unsigned len = 1;
+
+				// check if first index is within bounds
+				if (startIndex >= varIt->second.second)
 					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-				if (endIndex < startIndex)
-					throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
 				tokens.pop_front();
-				
-				len = endIndex - startIndex + 1;
+
+				// do we have array subscript?
+				if (tokens.front() == Token::TOKEN_COLON)
+				{
+					tokens.pop_front();
+
+					value = expectPositiveInt16LiteralOrConstant();
+
+					// check if second index is within bounds
+					unsigned endIndex = (unsigned)value;
+					if (endIndex >= varIt->second.second)
+						throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
+					if (endIndex < startIndex)
+						throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
+					tokens.pop_front();
+
+					len = endIndex - startIndex + 1;
+				}
+
+				expect(Token::TOKEN_BRACKET_CLOSE);
+				tokens.pop_front();
+
+				*addr += startIndex;
+				*size = len;
 			}
-			
-			expect(Token::TOKEN_BRACKET_CLOSE);
-			tokens.pop_front();
-			
-			*addr += startIndex;
-			*size = len;
+			else
+			{
+				// full array
+				*size = varIt->second.second;
+			}
 		}
-		else
+		else if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
-			// full array
-			*size = varIt->second.second;
+			// tuple?
+			std::auto_ptr<ArrayConstructorNode> arrayCtr(parseArrayConstructor(varPos, true));
+			*addr = arrayCtr->addr;
+			*size = arrayCtr->size;
+			return arrayCtr.release();
 		}
+
+		return NULL;
 	}
 	
 	//! Parse "or" grammar element.
@@ -1243,9 +1288,6 @@ namespace Aseba
 		}
 		else
 		{
-			// we store constants for this call at the end of memory
-			unsigned localConstsAddr = targetDescription->variablesSize;
-			
 			// count the number of template parameters and build array
 			int minTemplateId = 0;
 			for (unsigned i = 0; i < function.parameters.size(); i++)
@@ -1271,12 +1313,9 @@ namespace Aseba
 				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (tokens.front() == Token::TOKEN_OP_NEG) || (constantExists(tokens.front().sValue)))
 				{
 					int value = expectInt16LiteralOrConstant();
-					// we have inline integer, we need to store it and pass the address
-					// we store it at the end of the variable space, we test if there is no overflow
-					if (localConstsAddr <= freeVariableIndex)
-						throw Error(varPos, L"No more free variable space for constant");
-					varAddr = --localConstsAddr;
+					// we have inline integer, we need to create temporary variables
 					varSize = 1;
+					allocateTemporaryMemory(varPos, varSize, varAddr);
 					callNode->children.push_back(new ImmediateNode(varPos, value));
 					callNode->children.push_back(new StoreNode(varPos, varAddr));
 					tokens.pop_front();

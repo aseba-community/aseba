@@ -128,6 +128,7 @@ namespace Aseba
 	
 	void ArrayConstructorNode::emit(PreLinkBytecode& bytecodes) const
 	{
+		assert(addr != -1);
 		for (size_t i = 0; i < children.size(); i++)
 		{
 			children[i]->emit(bytecodes);
@@ -306,6 +307,10 @@ namespace Aseba
 	
 	void EmitNode::emit(PreLinkBytecode& bytecodes) const
 	{
+		// emit code for children. They might contain code to store constants somewhere
+		for (size_t i = 0; i < children.size(); i++)
+			children[i]->emit(bytecodes);
+
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_EMIT) | eventId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arrayAddr, sourcePos.row));

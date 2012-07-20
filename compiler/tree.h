@@ -126,9 +126,10 @@ namespace Aseba
 	struct ArrayConstructorNode : Node
 	{
 		unsigned addr; //!< address of destination array
+		unsigned size; //!< size of destination array
 		
 		//! Constructor
-		ArrayConstructorNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		ArrayConstructorNode(const SourcePos& sourcePos) : Node(sourcePos),addr(0),size(0) {}
 		
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -226,7 +227,7 @@ namespace Aseba
 	};
 	
 	//! Node for L"emit".
-	//! no children
+	//! may have children for pushing constants somewhere
 	struct EmitNode : Node
 	{
 		unsigned eventId; //!< id of event to emit

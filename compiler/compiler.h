@@ -342,6 +342,10 @@ namespace Aseba
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
+
+		void freeTemporaryMemory();
+		void allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr);
+
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
 		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
 		ConstantsMap::const_iterator findConstant(const std::wstring& name, const SourcePos& pos) const;
@@ -368,7 +372,7 @@ namespace Aseba
 		Node* parseReturn();
 		Node* parseVarDef();
 		AssignmentNode* parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize);
-		ArrayConstructorNode* parseArrayConstructor(bool assignMemory);
+		ArrayConstructorNode* parseArrayConstructor(const SourcePos& varPos, bool assignMemory);
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);
 		Node* parseIncrementAssignment(Node* l_value);
@@ -396,7 +400,7 @@ namespace Aseba
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
 		
-		void parseReadVarArrayAccess(unsigned* addr, unsigned* size);
+		Node* parseReadVarArrayAccess(unsigned* addr, unsigned* size);
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
@@ -409,6 +413,7 @@ namespace Aseba
 		SubroutineTable subroutineTable; //!< subroutine lookup
 		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable
+		unsigned endVariableIndex; //!< (endMemory - endVariableIndex) is pointing to the first free variable at the end
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
 	}; // Compiler
