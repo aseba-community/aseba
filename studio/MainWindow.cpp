@@ -374,6 +374,10 @@ namespace Aseba
 		compilationResultLayout->addWidget(cursorPosText);
 		compilationResultLayout->addWidget(compilationResultText, 1000);
 		compilationResultLayout->addWidget(compilationResultImage);
+
+		// memory usage notification area
+		memoryUsageText = new QLabel();
+		memoryUsageText->setAlignment(Qt::AlignLeft);
 		
 		// editor area
 		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
@@ -409,6 +413,7 @@ namespace Aseba
 		editorLayout->addWidget(keywordsToolbar); // Jiwon
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
+		editorLayout->addWidget(memoryUsageText);
 		
 		// panel
 		
@@ -997,6 +1002,18 @@ namespace Aseba
 					QString::fromStdWString(result->compilationMessages.str())
 				);
 				
+		}
+
+		// show memory usage
+		if (result->success)
+		{
+			unsigned variableCount = result->allocatedVariablesCount;
+			unsigned variableTotal = (*target->getDescription(id)).variablesSize;
+			unsigned bytecodeCount = result->bytecode.size();
+			unsigned bytecodeTotal = (*target->getDescription(id)).bytecodeSize;
+			QString variableText = QString("variables: %1 on %2 (%3\%)").arg(variableCount).arg(variableTotal).arg((double)variableCount*100./variableTotal, 0, 'f', 1);
+			QString bytecodeText = QString("bytecode: %1 on %2 (%3\%)").arg(bytecodeCount).arg(bytecodeTotal).arg((double)bytecodeCount*100./bytecodeTotal, 0, 'f', 1);
+			memoryUsageText->setText(QString("[Memory usage]    " + variableText + QString("    ") + bytecodeText));
 		}
 		
 		// update state following result

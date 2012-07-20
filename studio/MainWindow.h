@@ -262,6 +262,7 @@ namespace Aseba
 		QLabel *cursorPosText;
 		QLabel *compilationResultImage;
 		QLabel *compilationResultText;
+		QLabel *memoryUsageText;
 		
 		QLabel *executionModeLabel;
 		QPushButton *loadButton;
