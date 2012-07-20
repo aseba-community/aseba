@@ -371,7 +371,7 @@ namespace Aseba
 		
 		Node* parseReturn();
 		Node* parseVarDef();
-		AssignmentNode* parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize);
+		AssignmentNode* parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize, bool strict = true);
 		ArrayConstructorNode* parseArrayConstructor(const SourcePos& varPos, bool assignMemory);
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);

@@ -366,7 +366,7 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
-			temp = parseArrayAssignment(varName, varPos, varAddr, varSize);
+			temp = parseArrayAssignment(varName, varPos, varAddr, varSize, false);
 		}
 		else
 		{
@@ -389,7 +389,8 @@ namespace Aseba
 	}
 	
 	//! Parse the right part of the assignment, taking the left (resulting  array) as parameter, and return the complete assignment node
-	AssignmentNode *Compiler::parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize)
+	//! strict requires brackets to define tuples, set it to false for compatibility mode
+	AssignmentNode *Compiler::parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize, bool strict)
 	{
 		std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
@@ -414,9 +415,36 @@ namespace Aseba
 			if (varSize == 0)
 				throw Error(varPos, WFormatableString(L"Scalar literal cannot be assigned to array %0").arg(varName));
 			else if (varSize != 1)
-				throw Error(varPos, WFormatableString(L"Variable %0 has been declared of size %1 but scalar literal given").arg(varName).arg(varSize));
-			assign->children.push_back(new StoreNode(varPos, varAddr));
-			assign->children.push_back(parseBinaryOrExpression());
+			{
+				if (strict)
+					throw Error(varPos, WFormatableString(L"Variable %0 has been declared of size %1 but scalar literal given").arg(varName).arg(varSize));
+				else
+				{
+					// compatibility mode for old style variable definitions
+					// var foo[3] = 1,2,3
+					const Token::Type expectTypes[] = { Token::TOKEN_END_OF_STREAM, Token::TOKEN_COMMA };
+					for (unsigned int i = 0;; i++)
+					{
+						std::auto_ptr<Node> immediate(parseBinaryOrExpression());
+						assign->children.push_back(new StoreNode(varPos, varAddr+i));
+						assign->children.push_back(immediate.release());
+						EXPECT_ONE_OF(expectTypes);
+						if (tokens.front() == Token::TOKEN_COMMA)
+							tokens.pop_front();
+						else if (tokens.front() == Token::TOKEN_END_OF_STREAM)
+						{
+							if (i >= varSize)
+								throw Error(tokens.front().pos, WFormatableString(L"Variable %0 has been declared of size %1 while literal argument is of size %2").arg(varName).arg(varSize).arg(i+1));
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				assign->children.push_back(new StoreNode(varPos, varAddr));
+				assign->children.push_back(parseBinaryOrExpression());
+			}
 		}
 		
 		return assign.release();
