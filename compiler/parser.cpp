@@ -340,30 +340,36 @@ namespace Aseba
 		if(commonDefinitions->constants.contains(varName))
 			throw Error(varPos, WFormatableString(L"Variable %0 has the same name as a constant").arg(varName));
 		
-		// save variable
-		variablesMap[varName] = std::make_pair(varAddr, varSize);
-		freeVariableIndex += varSize;
-		
-		// check space
-		if (freeVariableIndex > targetDescription->variablesSize)
-			throw Error(varPos, L"No more free variable space");
-		
+		Node* temp = NULL;
+
 		// optional assignation
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
-			return parseArrayAssignment(varName, varPos, varAddr, varSize);
+			temp = parseArrayAssignment(varName, varPos, varAddr, varSize);
 		}
 		else
 		{
 			if (varSize == 0)
 				throw Error(varPos, WFormatableString(L"Array %0 has undefined size").arg(varName));
-			return NULL;
 		}
+
+		// save variable
+		variablesMap[varName] = std::make_pair(varAddr, varSize);
+		freeVariableIndex += varSize;
+
+		// check space
+		if (freeVariableIndex > targetDescription->variablesSize)
+			throw Error(varPos, L"No more free variable space");
+
+		if (temp)
+			return temp;
+		else
+			return NULL;
 	}
 	
 	//! Parse the right part of the assignment, taking the left (resulting  array) as parameter, and return the complete assignment node
-	AssignmentNode *Compiler::parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned varSize)
+	AssignmentNode *Compiler::parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize)
 	{
 		std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
