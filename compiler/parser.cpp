@@ -1297,7 +1297,7 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
-				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL, Token::TOKEN_OP_NEG };
+				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL, Token::TOKEN_OP_NEG, Token::TOKEN_BRACKET_OPEN };
 				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
@@ -1322,7 +1322,10 @@ namespace Aseba
 				}
 				else
 				{
-					parseReadVarArrayAccess(&varAddr, &varSize);
+					std::auto_ptr<Node> arrayNode(parseReadVarArrayAccess(&varAddr, &varSize));
+					// need to execute a node before the call (e.g. allocate memory)?
+					if (arrayNode.get())
+						callNode->children.push_back(arrayNode.release());
 				}
 				
 				// check if variable size is correct
