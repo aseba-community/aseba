@@ -3195,6 +3195,7 @@ namespace Aseba
 		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
 		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
 		showMemoryUsageAct->setCheckable(true);
+		showMemoryUsageAct->setChecked(ConfigDialog::getStartupShowMemoryUsage());
 		toolMenu->addAction(showMemoryUsageAct);
 		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 		toolMenu->addSeparator();

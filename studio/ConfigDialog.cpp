@@ -45,6 +45,7 @@ namespace Aseba
 	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowLineNumbers,	generalpage,	showlinenumbers		)
 	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowHidden,		generalpage,	showhidden		)
 	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowKeywordToolbar,	generalpage,	keywordToolbar		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowMemoryUsage,	generalpage,	memoryusage		)
 	CONFIG_PROPERTY_CHECKBOX_HANDLER(getAutoCompletion,		editorpage,	autoKeyword		)
 
 	/*** ConfigPage ***/
@@ -146,6 +147,8 @@ namespace Aseba
 		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 		// Show the keyword toolbar
 		gb1layout->addWidget(newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true));
+		// Show the memory usage gauge
+		gb1layout->addWidget(newCheckbox(tr("Show memory usage"), "memoryusage", false));
 
 		mainLayout->addStretch();
 	}

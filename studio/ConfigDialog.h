@@ -52,6 +52,7 @@ namespace Aseba
 		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowHidden)
 		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowLineNumbers)
 		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowKeywordToolbar)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowMemoryUsage)
 		// autocompletion behaviour
 		CONFIG_PROPERTY_CHECKBOX_DECLARE(getAutoCompletion)
 
