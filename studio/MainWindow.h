@@ -215,6 +215,8 @@ namespace Aseba
 		void subroutineButtonClicked();
 		void callsubButtonClicked();
 		void showKeywords(bool show);
+
+		void showMemoryUsage(bool show);
 		
 		void displayCode(QList<QString> code);
 		
@@ -391,6 +393,7 @@ namespace Aseba
 		void logEntryDoubleClicked(QListWidgetItem *);
 		void showCompilationMessages(bool doShown);
 		void compilationMessagesWasHidden();
+		void showMemoryUsage(bool show);
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();
@@ -527,6 +530,7 @@ namespace Aseba
 		QAction *showHiddenAct;
 		QAction *showKeywordsAct; 
 		QAction* showCompilationMsg;
+		QAction* showMemoryUsageAct;
 		
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages

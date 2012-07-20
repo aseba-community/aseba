@@ -905,6 +905,11 @@ namespace Aseba
 			keywordsToolbar->hide();
 	}
 
+	void NodeTab::showMemoryUsage(bool show)
+	{
+		memoryUsageText->setVisible(show);
+	}
+
 	void NodeTab::updateHidden() 
 	{
 		const QString& filterString(vmMemoryFilter->text());
@@ -2217,6 +2222,16 @@ namespace Aseba
 	{
 		showCompilationMsg->setChecked(false);
 	}
+
+	void MainWindow::showMemoryUsage(bool show)
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->showMemoryUsage(show);
+		}
+	}
 	
 	void MainWindow::addEventNameClicked()
 	{
@@ -2391,6 +2406,7 @@ namespace Aseba
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
 		tab->showKeywords(showKeywordsAct->isChecked());
 		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
+		tab->showMemoryUsage(showMemoryUsageAct->isChecked());
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -3177,6 +3193,10 @@ namespace Aseba
 		toolMenu->addAction(showCompilationMsg);
 		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
 		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
+		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
+		showMemoryUsageAct->setCheckable(true);
+		toolMenu->addAction(showMemoryUsageAct);
+		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 		toolMenu->addSeparator();
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."), toolMenu);
 		toolMenu->addMenu(writeBytecodeMenu);
