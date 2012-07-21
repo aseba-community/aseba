@@ -69,6 +69,9 @@ namespace Aseba
 		//! Typed parameter of native functions
 		struct NativeFunctionParameter
 		{
+			NativeFunctionParameter(const std::wstring &name, int size) : size(size), name(name) {}
+			NativeFunctionParameter() {}
+
 			int size; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
 			std::wstring name; //!< name of the parameter
 		};
@@ -76,6 +79,9 @@ namespace Aseba
 		//! Description of target VM native function
 		struct NativeFunction
 		{
+			NativeFunction(const std::wstring &name, const std::wstring &description) : name(name), description(description) {}
+			NativeFunction() {}
+
 			std::wstring name; //!< name of the function
 			std::wstring description; //!< description (some short documentation) of the function
 			std::vector<NativeFunctionParameter> parameters; //!< for each argument of the function, its size in words or, if negative, its template ID

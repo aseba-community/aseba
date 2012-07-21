@@ -1,0 +1,8 @@
+var i[3]
+var j[3]
+var k[3]
+var bar[5]
+
+call math.add(i, j, k)
+call math.add(i, [1,2,3], [4,5,6])
+call math.add(i, [1,2,3], bar[1:3])
