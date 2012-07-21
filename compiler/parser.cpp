@@ -497,27 +497,35 @@ namespace Aseba
 		
 		tokens.pop_front();
 		
-		if (tokens.front() != Token::TOKEN_BRACKET_OPEN)
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
+		std::auto_ptr<Node> l_value_auto;
+
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
-			// assignment between arrays or scalars
+			tokens.pop_front();
+
+			// parse the left value
+			// check if it is an array access
+			l_value_auto.reset(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
+			l_value_auto->children.push_back(parseBinaryOrExpression());
+
+			expect(Token::TOKEN_BRACKET_CLOSE);
+			tokens.pop_front();
+		}
+		else if (varSize == 1)
+		{
+			l_value_auto.reset(new StoreNode(tokens.front().pos, varAddr));
+		}
+		else
+		{
+			// assignment between arrays
 			expect(Token::TOKEN_ASSIGN);
 			tokens.pop_front();
 			return parseArrayAssignment(varName, varPos, varAddr, varSize);
 		}
-		tokens.pop_front();
-		
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
-		
-		// parse the left value
-		// check if it is an array access
-		std::auto_ptr<Node> l_value_auto(new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName));
-		l_value_auto->children.push_back(parseBinaryOrExpression());
 
-		expect(Token::TOKEN_BRACKET_CLOSE);
-		tokens.pop_front();
-		
-		Node* l_value(l_value_auto.release());
-		assignment->children.push_back(l_value);
+		Node* l_value(l_value_auto.get());
+		assignment->children.push_back(l_value_auto.release());
 		
 		// parse rvalue
 		if (tokens.front() == Token::TOKEN_ASSIGN)
