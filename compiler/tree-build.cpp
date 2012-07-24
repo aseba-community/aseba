@@ -20,6 +20,8 @@
 
 #include "tree.h"
 #include <cstdlib>
+#include <iostream>
+
 
 namespace Aseba
 {
@@ -34,7 +36,16 @@ namespace Aseba
 			if (children[i])
 				delete children[i];
 	}
-	
+
+	Node* Node::deepCopy()
+	{
+		Node* newCopy = shallowCopy();
+		for (size_t i = 0; i < children.size(); i++)
+			if (children[i])
+				newCopy->children[i] = children[i]->deepCopy();
+		return newCopy;
+	}
+
 	//! Constructor
 	EventDeclNode::EventDeclNode(const SourcePos& sourcePos, unsigned eventId) :
 		Node(sourcePos),
@@ -149,6 +160,17 @@ namespace Aseba
 		arrayName(arrayName)
 	{
 	
+	}
+
+	//! Constructor
+	MemoryVectorNode::MemoryVectorNode(const SourcePos &sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+		VectorNode(sourcePos),
+		arrayAddr(arrayAddr),
+		arraySize(arraySize),
+		arrayName(arrayName),
+		write(false)
+	{
+
 	}
 	
 	//! Constructor

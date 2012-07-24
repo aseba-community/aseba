@@ -94,6 +94,7 @@ set (ASEBACOMPILER_SRC
 	compiler/parser.cpp
 	compiler/analysis.cpp
 	compiler/tree-build.cpp
+	compiler/tree-expand.cpp
 	compiler/tree-dump.cpp
 	compiler/tree-typecheck.cpp
 	compiler/tree-optimize.cpp

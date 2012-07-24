@@ -60,7 +60,7 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
-	Node::ReturnType ArrayConstructorNode::typeCheck() const
+	Node::ReturnType StaticVectorNode::typeCheck() const
 	{
 		for (NodesVector::const_iterator it = children.begin(); it != children.end(); ++it)
 		{

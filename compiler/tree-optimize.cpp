@@ -68,7 +68,7 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* ArrayConstructorNode::optimize(std::wostream* dump)
+	Node* StaticVectorNode::optimize(std::wostream* dump)
 	{
 		for (NodesVector::iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -504,6 +504,11 @@ namespace Aseba
 		}
 		else
 			return this;
+	}
+
+	Node* MemoryVectorNode::optimize(std::wostream *dump)
+	{
+		return this;
 	}
 	
 	Node* CallNode::optimize(std::wostream* dump)

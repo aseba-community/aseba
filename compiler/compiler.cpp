@@ -157,12 +157,31 @@ namespace Aseba
 		
 		if (dump)
 		{
+			*dump << "Syntax tree before 2nd pass:\n";
+			program->dump(*dump, indent);
+			*dump << "\n\n";
+			*dump << "2nd pass:\n";
+		}
+		
+		// expand the syntax tree to Aseba-like syntax
+		try
+		{
+			program = program->treeExpand(dump);
+		}
+		catch (Error error)
+		{
+			errorDescription = error;
+			return false;
+		}
+
+		if (dump)
+		{
 			*dump << "Syntax tree before optimisation:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
 			*dump << "Type checking:\n";
 		}
-		
+
 		// typecheck
 		try
 		{

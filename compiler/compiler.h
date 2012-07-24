@@ -44,7 +44,8 @@ namespace Aseba
 	struct StatementNode;
 	struct BinaryArithmeticNode;
 	struct AssignmentNode;
-	struct ArrayConstructorNode;
+	struct StaticVectorNode;
+	struct MemoryVectorNode;
 	
 	//! Description of target VM
 	struct TargetDescription
@@ -351,6 +352,7 @@ namespace Aseba
 
 		void freeTemporaryMemory();
 		void allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr);
+		AssignmentNode* allocateTemporaryVariable(const SourcePos varPos, Node* rValue);
 
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
 		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
@@ -377,8 +379,10 @@ namespace Aseba
 		
 		Node* parseReturn();
 		Node* parseVarDef();
-		AssignmentNode* parseArrayAssignment(const std::wstring& varName, const SourcePos& varPos, unsigned varAddr, unsigned& varSize, bool strict = true);
-		ArrayConstructorNode* parseArrayConstructor(const SourcePos& varPos, bool assignMemory);
+		AssignmentNode* parseVarDefInit(MemoryVectorNode* lValue);
+		//Node* parseVectorAccess(bool assignMemory = false, bool strict = true);
+		StaticVectorNode* parseArrayConstructor();
+		//MemoryVectorNode* parseVariableAccess(void);
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);
 		Node* parseIncrementAssignment(Node* l_value);
@@ -405,8 +409,11 @@ namespace Aseba
 		Node* parseMultExpression();
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
+
+		Node* parseConstantAndVariable();
+		MemoryVectorNode* parseVariable();
 		
-		Node* parseReadVarArrayAccess(unsigned* addr, unsigned* size);
+		//void getVectorAccessType(const Node* const node, unsigned& arrayAddr, unsigned& arraySize);
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens

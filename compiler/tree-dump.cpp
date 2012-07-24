@@ -80,10 +80,23 @@ namespace Aseba
 			children[i]->dump(dest, indent);
 		indent--;
 	}
-	
-	std::wstring ArrayConstructorNode::toWString() const
+
+	void StaticVectorNode::dump(std::wostream& dest, unsigned& indent) const
 	{
-		return WFormatableString(L"Array Constructor: addr %0").arg(addr);
+		Node::dump(dest, indent);
+		indent++;
+		for (unsigned int i = 0; i < getMemorySize(); i++)
+		{
+			for (unsigned j = 0; j < indent; j++)
+				dest << L"    ";
+			dest << WFormatableString(L"[%0] -> %1\n").arg(i).arg(getValue(i));
+		}
+		indent--;
+	}
+	
+	std::wstring StaticVectorNode::toWString() const
+	{
+		return WFormatableString(L"Static Vector: size %0").arg(getMemorySize());
 	}
 	
 	std::wstring IfWhenNode::toWString() const
@@ -183,6 +196,11 @@ namespace Aseba
 	std::wstring ArrayWriteNode::toWString() const
 	{
 		return WFormatableString(L"ArrayWrite: addr %0 size %1").arg(arrayAddr).arg(arraySize);
+	}
+
+	std::wstring MemoryVectorNode::toWString() const
+	{
+		return WFormatableString(L"Memory Vector Access: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
 	}
 	
 	std::wstring CallNode::toWString() const

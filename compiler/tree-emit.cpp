@@ -126,15 +126,17 @@ namespace Aseba
 	}
 	
 	
-	void ArrayConstructorNode::emit(PreLinkBytecode& bytecodes) const
+	void StaticVectorNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		assert(addr != -1);
+		abort();
+		/*
 		for (size_t i = 0; i < children.size(); i++)
 		{
 			children[i]->emit(bytecodes);
-			unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | (addr+i);
+			unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | (arrayAddr+i);
 			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		}
+		*/
 	}
 	
 	
@@ -427,6 +429,13 @@ namespace Aseba
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT) | arrayAddr;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
+	}
+
+
+	void MemoryVectorNode::emit(PreLinkBytecode &bytecodes) const
+	{
+		// oups
+		throw Error();
 	}
 	
 	
