@@ -104,16 +104,35 @@ namespace Aseba
 	{
 		assert(index < getMemorySize());
 
-		if (write == true)
+		StaticVectorNode* accessIndex = NULL;
+		if (children.size() > 0)
+			accessIndex = dynamic_cast<StaticVectorNode*>(children[0]);
+
+		if (accessIndex || children.size() == 0)
 		{
-			return new StoreNode(sourcePos, getMemoryAddr() + index);
+			// immediate index / full array access
+			if (write == true)
+				return new StoreNode(sourcePos, getMemoryAddr() + index);
+			else
+				return new LoadNode(sourcePos, getMemoryAddr() + index);
 		}
 		else
 		{
-			return new LoadNode(sourcePos, getMemoryAddr() + index);
-		}
+			// indirect access
+			std::auto_ptr<Node> array;
+			if (write == true)
+			{
+				array.reset(new ArrayWriteNode(sourcePos, arrayAddr, arraySize, arrayName));
+			}
+			else
+			{
+				array.reset(new ArrayReadNode(sourcePos, arrayAddr, arraySize, arrayName));
+			}
 
-		return this;
+			array->children.push_back(children[0]->treeExpand(dump, index));
+			children[0] = 0;
+			return array.release();
+		}
 	}
 
 
