@@ -1196,12 +1196,12 @@ namespace Aseba
 			// immediate index?
 			if (StaticVectorNode* index = dynamic_cast<StaticVectorNode*>(vector->children[0]))
 			{
-				/*
-				// check if first index is within bounds
-				if (startIndex >= varIt->second.second)
-					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-					*/
 				unsigned start = index->getLonelyImmediate();
+
+				// check if first index is within bounds
+				if (start >= vector->arraySize)
+					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
+
 
 				// do we have array subscript?
 				if (tokens.front() == Token::TOKEN_COLON)
@@ -1211,16 +1211,11 @@ namespace Aseba
 					unsigned endIndex = expectPositiveInt16LiteralOrConstant();
 
 					// check if second index is within bounds
-					/*
-					unsigned endIndex = (unsigned)value;
-					if (endIndex >= varIt->second.second)
+					if (endIndex >= vector->arraySize)
 						throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-					if (endIndex < startIndex)
+					if (endIndex < start)
 						throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
-						*/
 
-					//len = endIndex - start + 1;
-					//vector->children.push_back(new StaticVectorNode(tokens.front().pos, endIndex));
 					index->addValue(endIndex);
 					tokens.pop_front();
 				}
