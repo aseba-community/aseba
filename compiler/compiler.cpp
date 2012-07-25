@@ -157,16 +157,16 @@ namespace Aseba
 		
 		if (dump)
 		{
-			*dump << "Syntax tree before 2nd pass:\n";
+			*dump << "Vectorial syntax tree:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
-			*dump << "2nd pass:\n";
+			*dump << "Expanding the vectorial tree:\n";
 		}
 		
 		// expand the syntax tree to Aseba-like syntax
 		try
 		{
-			program = program->treeExpand(dump);
+			program = program->expandToAsebaTree(dump);
 		}
 		catch (Error error)
 		{
@@ -176,7 +176,7 @@ namespace Aseba
 
 		if (dump)
 		{
-			*dump << "Syntax tree before optimisation:\n";
+			*dump << "Expanded syntax tree before optimisation:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
 			*dump << "Type checking:\n";

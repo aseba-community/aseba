@@ -194,6 +194,7 @@ namespace Aseba
 	
 	}
 
+	//! Constructor
 	ArithmeticAssignmentNode::ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right) :
 		AbstractTreeNode(sourcePos),
 		op(op)
@@ -212,6 +213,7 @@ namespace Aseba
 		return operatorMap[token - Compiler::Token::TOKEN_OP_ADD_EQUAL];
 	}
 
+	//! Constructor
 	UnaryArithmeticAssignmentNode::UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory) :
 		AbstractTreeNode(sourcePos)
 	{

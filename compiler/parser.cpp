@@ -260,7 +260,7 @@ namespace Aseba
 		static unsigned uid = 0;
 
 		// allocate the temporary variable
-		const unsigned size = rValue->getMemorySize();
+		const unsigned size = rValue->getVectorSize();
 		unsigned addr = Node::E_NOVAL;
 		allocateTemporaryMemory(varPos, size, addr);
 
@@ -385,7 +385,7 @@ namespace Aseba
 		if (temp.get())
 		{
 			// valid
-			varSize = me->getMemorySize();
+			varSize = me->getVectorSize();
 			me.release();
 		}
 
@@ -415,17 +415,17 @@ namespace Aseba
 			tokens.pop_front();
 
 			// try old style initialization 1,2,3
-			std::auto_ptr<Node> rValue(parseArrayConstructor(true));
+			std::auto_ptr<Node> rValue(parseImmediateVector(true));
 			if (rValue.get() == NULL)
 			{
 				// no -> other type of initialization
 				rValue.reset(parseBinaryOrExpression());
 			}
 
-			if (lValue->getMemorySize() == Node::E_NOVAL)
+			if (lValue->getVectorSize() == Node::E_NOVAL)
 			{
 				// infere the variable's size based on the initilization
-				lValue->arraySize = rValue->getMemorySize();
+				lValue->arraySize = rValue->getVectorSize();
 			}
 
 			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(pos));
@@ -448,9 +448,10 @@ namespace Aseba
 							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL,
 							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
 
+		// parse left value
 		std::auto_ptr<Node> lValue(parseBinaryOrExpression());
 		
-		// parse rvalue
+		// parse right value
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(tokens.front().pos));
@@ -619,7 +620,7 @@ namespace Aseba
 		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
 		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(rangeStartIndexPos));
 		assignment->children.push_back(variable.release());
-		assignment->children.push_back(new StaticVectorNode(rangeStartIndexPos, rangeStartIndex));
+		assignment->children.push_back(new ImmediateVectorNode(rangeStartIndexPos, rangeStartIndex));
 		blockNode->children.push_back(assignment.release());
 		
 		// create while and condition
@@ -631,7 +632,7 @@ namespace Aseba
 			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
 			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		comparisonNode->children.push_back(new StaticVectorNode(rangeEndIndexPos, rangeEndIndex));
+		comparisonNode->children.push_back(new ImmediateVectorNode(rangeEndIndexPos, rangeEndIndex));
 		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
@@ -643,7 +644,7 @@ namespace Aseba
 		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
 		whileNode->children[1]->children.push_back(assignmentNode);
 		assignmentNode->children.push_back(variableRef->deepCopy());
-		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new StaticVectorNode(varPos, step)));
+		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new ImmediateVectorNode(varPos, step)));
 		
 		tokens.pop_front();
 		
@@ -716,8 +717,8 @@ namespace Aseba
 			}
 
 			//allocateTemporaryVariable(pos)
-			emitNode->arrayAddr = preNode->getMemoryAddr();
-			emitNode->arraySize = preNode->getMemorySize();
+			emitNode->arrayAddr = preNode->getVectorAddr();
+			emitNode->arraySize = preNode->getVectorSize();
 			emitNode->children.push_back(preNode.release());
 
 			if (emitNode->arraySize != eventSize)
@@ -1005,7 +1006,7 @@ namespace Aseba
 
 			case Token::TOKEN_BRACKET_OPEN:
 			{
-				return parseArrayConstructor();
+				return parseImmediateVector();
 			}
 			
 			case Token::TOKEN_OP_NEG:
@@ -1032,7 +1033,7 @@ namespace Aseba
 			case Token::TOKEN_INT_LITERAL:
 			{
 				// immediate
-				std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(pos, expectUInt16Literal()));
+				std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(pos, expectUInt16Literal()));
 				tokens.pop_front();
 				return arrayCtor.release();
 			}
@@ -1047,7 +1048,7 @@ namespace Aseba
 	}
 
 	//! Parse "[ .... ]" grammar element
-	StaticVectorNode* Compiler::parseArrayConstructor(bool compatibility)
+	ImmediateVectorNode* Compiler::parseImmediateVector(bool compatibility)
 	{
 		if (!compatibility)
 		{
@@ -1065,7 +1066,7 @@ namespace Aseba
 		}
 
 		SourcePos varPos = tokens.front().pos;
-		std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(varPos));
+		std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(varPos));
 
 		do
 		{
@@ -1094,7 +1095,7 @@ namespace Aseba
 		std::wstring varName = tokens.front().sValue;
 		if (constantExists(varName))
 		{
-			std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(tokens.front().pos));
+			std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(tokens.front().pos));
 			arrayCtor->addValue(expectConstant());
 			tokens.pop_front();
 			return arrayCtor.release();
@@ -1128,10 +1129,8 @@ namespace Aseba
 			std::auto_ptr<Node> startIndex(parseBinaryOrExpression());
 			vector->children.push_back(startIndex.release());
 
-			unsigned len = 1;
-
 			// immediate index?
-			if (StaticVectorNode* index = dynamic_cast<StaticVectorNode*>(vector->children[0]))
+			if (ImmediateVectorNode* index = dynamic_cast<ImmediateVectorNode*>(vector->children[0]))
 			{
 				unsigned start = index->getLonelyImmediate();
 
@@ -1194,8 +1193,6 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
-				//const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL, Token::TOKEN_OP_NEG, Token::TOKEN_BRACKET_OPEN };
-				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
 					throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
@@ -1207,13 +1204,13 @@ namespace Aseba
 
 				std::auto_ptr<Node> preNode(parseBinaryOrExpression());
 				// get the address and size
-				varAddr = preNode->getMemoryAddr();
-				varSize = preNode->getMemorySize();
+				varAddr = preNode->getVectorAddr();
+				varSize = preNode->getVectorSize();
 
 				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
 				{
 					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
-					varAddr = preNode->getMemoryAddr();
+					varAddr = preNode->getVectorAddr();
 					callNode->children.push_back(preNode.release());
 				}
 				

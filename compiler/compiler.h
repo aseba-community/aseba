@@ -44,7 +44,7 @@ namespace Aseba
 	struct StatementNode;
 	struct BinaryArithmeticNode;
 	struct AssignmentNode;
-	struct StaticVectorNode;
+	struct ImmediateVectorNode;
 	struct MemoryVectorNode;
 	
 	//! Description of target VM
@@ -276,7 +276,7 @@ namespace Aseba
 				TOKEN_OP_BIT_AND,		//
 				TOKEN_OP_BIT_NOT,		//
 
-				TOKEN_OP_ADD_EQUAL,		// group of 13 tokens, don't split or mess up
+				TOKEN_OP_ADD_EQUAL,		// group of 12 tokens, don't split or mess up
 				TOKEN_OP_NEG_EQUAL,		//
 				TOKEN_OP_MULT_EQUAL,		//
 				TOKEN_OP_DIV_EQUAL,		//
@@ -286,7 +286,6 @@ namespace Aseba
 				TOKEN_OP_BIT_OR_EQUAL,		//
 				TOKEN_OP_BIT_XOR_EQUAL,		//
 				TOKEN_OP_BIT_AND_EQUAL,		//
-				TOKEN_OP_BIT_NOT_EQUAL,		//
 
 				TOKEN_OP_PLUS_PLUS,
 				TOKEN_OP_MINUS_MINUS
@@ -384,9 +383,6 @@ namespace Aseba
 		Node* parseReturn();
 		Node* parseVarDef();
 		AssignmentNode* parseVarDefInit(MemoryVectorNode* lValue);
-		//Node* parseVectorAccess(bool assignMemory = false, bool strict = true);
-		StaticVectorNode* parseArrayConstructor(bool compatibility = false);
-		//MemoryVectorNode* parseVariableAccess(void);
 		Node* parseAssignment();
 		Node* parseIfWhen(bool edgeSensitive);
 		Node* parseFor();
@@ -412,10 +408,9 @@ namespace Aseba
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
 
+		ImmediateVectorNode* parseImmediateVector(bool compatibility = false);
 		Node* parseConstantAndVariable();
 		MemoryVectorNode* parseVariable();
-		
-		//void getVectorAccessType(const Node* const node, unsigned& arrayAddr, unsigned& arraySize);
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
