@@ -50,7 +50,7 @@ namespace Aseba
 
 		// consistency check
 		if (lSize != rSize)
-			throw Error(sourcePos, WFormatableString(L"Inconsistent size! Left size: %0, right size: %1").arg(lSize).arg(rSize));
+			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
 
 		MemoryVectorNode* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
 		assert(leftVector);
@@ -74,13 +74,6 @@ namespace Aseba
 
 	Node* BinaryArithmeticNode::treeExpand(std::wostream *dump, unsigned int index)
 	{
-		unsigned lSize = children[0]->getMemorySize();
-		unsigned rSize = children[1]->getMemorySize();
-
-		// consistency check
-		if (lSize != rSize)
-			throw Error(sourcePos, WFormatableString(L"Inconsistent size! Left size: %0, right size: %1").arg(lSize).arg(rSize));
-
 		std::auto_ptr<Node> left(children[0]->treeExpand(dump, index));
 		std::auto_ptr<Node> right(children[1]->treeExpand(dump, index));
 		return new BinaryArithmeticNode(sourcePos, op, left.release(), right.release());
@@ -111,10 +104,15 @@ namespace Aseba
 		if (accessIndex || children.size() == 0)
 		{
 			// immediate index / full array access
+			unsigned pointer = getMemoryAddr() + index;
+			// check if index is within bounds
+			if (pointer >= arrayAddr + arraySize)
+				throw Error(sourcePos, WFormatableString(L"Access of array %0 out of bounds").arg(arrayName));
+
 			if (write == true)
-				return new StoreNode(sourcePos, getMemoryAddr() + index);
+				return new StoreNode(sourcePos, pointer);
 			else
-				return new LoadNode(sourcePos, getMemoryAddr() + index);
+				return new LoadNode(sourcePos, pointer);
 		}
 		else
 		{
@@ -147,7 +145,7 @@ namespace Aseba
 			if (size == E_NOVAL)
 				size = new_size;
 			else if (size != new_size)
-				throw Error(sourcePos, L"Size mismatch between vectors");
+				throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(size).arg(new_size));
 		}
 
 		return size;
@@ -173,7 +171,7 @@ namespace Aseba
 
 	int StaticVectorNode::getLonelyImmediate() const
 	{
-		assert(getMemorySize() == 1);
+		assert(getMemorySize() >= 1);
 		return values[0];
 	}
 
@@ -215,15 +213,21 @@ namespace Aseba
 			StaticVectorNode* index = dynamic_cast<StaticVectorNode*>(children[0]);
 			if (index)
 			{
+				unsigned numberOfIndex = index->getMemorySize();
 				// immediate indexes
-				if (index->getMemorySize() == 1)
+				if (numberOfIndex == 1)
+				{
 					// 1 index is given -> 1 dimension
 					return 1;
-				else
+				}
+				else if (numberOfIndex == 2)
 				{
 					// 2 indexes are given -> compute the span
 					return index->getValue(1) - index->getValue(0) + 1;
 				}
+				else
+					// whaaaaat? Are you trying foo[[1,2,3]]?
+					throw Error(sourcePos, L"Illegal operation");
 			}
 			else
 				// 1 index, random access

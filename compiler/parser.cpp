@@ -411,6 +411,7 @@ namespace Aseba
 	{
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
+			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
 
 			// try old style initialization 1,2,3
@@ -427,11 +428,13 @@ namespace Aseba
 				lValue->arraySize = rValue->getMemorySize();
 			}
 
-			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
+			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(pos));
 			assign->children.push_back(lValue);
 			assign->children.push_back(rValue.release());
 			return assign.release();
 		}
+
+		return NULL;
 	}
 	
 
@@ -1206,11 +1209,6 @@ namespace Aseba
 			{
 				unsigned start = index->getLonelyImmediate();
 
-				// check if first index is within bounds
-				if (start >= vector->arraySize)
-					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-
-
 				// do we have array subscript?
 				if (tokens.front() == Token::TOKEN_COLON)
 				{
@@ -1219,8 +1217,6 @@ namespace Aseba
 					unsigned endIndex = expectPositiveInt16LiteralOrConstant();
 
 					// check if second index is within bounds
-					if (endIndex >= vector->arraySize)
-						throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
 					if (endIndex < start)
 						throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
 

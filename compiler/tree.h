@@ -84,7 +84,7 @@ namespace Aseba
 
 		enum
 		{
-			E_NOVAL = UINT_MAX
+			E_NOVAL = 0
 		};
 		virtual unsigned getMemoryAddr() const;
 		virtual unsigned getMemorySize() const;
