@@ -134,6 +134,49 @@ namespace Aseba
 	}
 
 
+	Node* ArithmeticAssignmentNode::treeExpand(std::wostream* dump, unsigned int index)
+	{
+		assert(children.size() == 2);
+
+		Node* leftVector = children[0];
+		Node* rightVector = children[1];
+
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
+		std::auto_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector->deepCopy(), rightVector->deepCopy()));
+		assignment->children.push_back(leftVector->deepCopy());
+		assignment->children.push_back(binary.release());
+
+		std::auto_ptr<Node> finalBlock(assignment->treeExpand(dump, index));
+
+		assignment.release();
+		delete this;
+
+		return finalBlock.release();
+	}
+
+
+	Node* UnaryArithmeticAssignmentNode::treeExpand(std::wostream* dump, unsigned int index)
+	{
+		assert(children.size() == 1);
+
+		Node* memoryVector = children[0];
+
+		// create a vector of 1's
+		std::auto_ptr<StaticVectorNode> constant(new StaticVectorNode(sourcePos));
+		for (unsigned int i = 0; i < memoryVector->getMemorySize(); i++)
+			constant->addValue(1);
+
+		// expand to "vector op= 1"
+		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector->deepCopy(), constant.release()));
+		std::auto_ptr<Node> finalBlock(assignment->treeExpand(dump, index));
+
+		assignment.release();
+		delete this;
+
+		return finalBlock.release();
+	}
+
+
 	unsigned Node::getMemorySize() const
 	{
 		unsigned size = E_NOVAL;
@@ -160,14 +203,6 @@ namespace Aseba
 			return E_NOVAL;
 	}
 
-
-	void Node::releaseChildren()
-	{
-		for (NodesVector::iterator it = children.begin(); it != children.end(); ++it)
-		{
-			*(it) = 0;
-		}
-	}
 
 	int StaticVectorNode::getLonelyImmediate() const
 	{

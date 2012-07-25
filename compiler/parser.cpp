@@ -443,9 +443,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const Token::Type compoundAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
+		static const Token::Type compoundBinaryAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
 							   Token::TOKEN_OP_MULT_EQUAL, Token::TOKEN_OP_DIV_EQUAL, Token::TOKEN_OP_MOD_EQUAL,
-							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL, Token::TOKEN_OP_BIT_NOT_EQUAL,
+							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL,
 							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
 
 		std::auto_ptr<Node> lValue(parseBinaryOrExpression());
@@ -460,115 +460,41 @@ namespace Aseba
 			assignment->children.push_back(parseBinaryOrExpression());
 			return assignment.release();
 		}
-		/*
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
-			assignment->children.push_back(parseIncrementAssignment(l_value));
-		else if (IS_ONE_OF(compoundAssignment))
-			assignment->children.push_back(parseCompoundAssignment(l_value));
-			*/
+		{
+			SourcePos pos = tokens.front().pos;
+			Compiler::Token op = tokens.front();
+			tokens.pop_front();
+
+			std::auto_ptr<UnaryArithmeticAssignmentNode> assignment(
+						new UnaryArithmeticAssignmentNode(
+							pos,
+							op,
+							lValue.release()));
+
+			return assignment.release();
+		}
+		else if (IS_ONE_OF(compoundBinaryAssignment))
+		{
+			SourcePos pos = tokens.front().pos;
+			Compiler::Token op = tokens.front();
+			tokens.pop_front();
+
+			std::auto_ptr<ArithmeticAssignmentNode> assignment(
+						ArithmeticAssignmentNode::fromArithmeticAssignmentToken(
+							pos,
+							op,
+							lValue.release(),
+							parseBinaryOrExpression()));
+
+			return assignment.release();
+		}
 		else
 			throw Error(tokens.front().pos, WFormatableString(L"Expecting assignement, found %0 instead").arg(tokens.front().toWString()));
 		
 		return NULL;
 	}
-	
-	// parse +=, -=,... assignments
-	// assignments a += b are expanded to a = a + b
-	Node* Compiler::parseCompoundAssignment(Node* l_value)
-	{
-		Token::Type op = tokens.front();
-		const wchar_t* typeName = tokens.front().typeName();
-		SourcePos pos = tokens.front().pos;
-		tokens.pop_front();
 
-		// convert the l_value from a StoreNode / ArrayWriteNode to a LoadNode / ArrayReadNode respectively
-		std::auto_ptr<Node> load;
-		StoreNode* store = dynamic_cast<StoreNode*>(l_value);
-		ArrayWriteNode* read = dynamic_cast<ArrayWriteNode*>(l_value);
-		if (store)
-			// scalar
-			load.reset(new LoadNode(store));
-		else if (read)
-			// array
-			load.reset(new ArrayReadNode(read));
-		else
-			// oops
-			throw Error(pos, WFormatableString(L"Unexpected error: missing scalar or array assignment"));
-
-		// get the r_value
-		std::auto_ptr<Node> node(parseBinaryOrExpression());
-
-		// translate the compound assignment to a regular operator (+, -, ...)
-		if ((op == Token::TOKEN_OP_ADD_EQUAL) || (op == Token::TOKEN_OP_NEG_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_ADD - Token::TOKEN_OP_ADD_EQUAL));
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, op, load.release(), node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_MULT_EQUAL) || (op == Token::TOKEN_OP_DIV_EQUAL) || (op == Token::TOKEN_OP_MOD_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_MULT - Token::TOKEN_OP_MULT_EQUAL));
-			node.reset(BinaryArithmeticNode::fromMultExpression(pos, op, load.release(), node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_BIT_OR_EQUAL) || (op == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
-			 (op == Token::TOKEN_OP_BIT_AND_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_BIT_OR - Token::TOKEN_OP_BIT_OR_EQUAL));
-			node.reset(BinaryArithmeticNode::fromBinaryExpression(pos, op, load.release(), node.release()));
-		}
-		else if (op == Token::TOKEN_OP_BIT_NOT_EQUAL)
-		{
-			node.reset(new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_SHIFT_LEFT_EQUAL) || (op == Token::TOKEN_OP_SHIFT_RIGHT_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_SHIFT_LEFT- Token::TOKEN_OP_SHIFT_LEFT_EQUAL));
-			node.reset(BinaryArithmeticNode::fromShiftExpression(pos, op, load.release(), node.release()));
-		}
-		else
-			throw Error(pos, WFormatableString(L"Expecting assignement, found %0 instead").arg(typeName));
-
-		return node.release();
-	}
-
-	// parse ++ and -- operators
-	// assignments a++ are expanded to a = a + 1
-	Node* Compiler::parseIncrementAssignment(Node* l_value)
-	{
-		Token::Type op = tokens.front();
-		SourcePos pos = tokens.front().pos;
-		StoreNode* store;
-		ArrayWriteNode* array;
-		std::auto_ptr<Node> load;
-		tokens.pop_front();
-
-		// l_value is StoreNode?
-		if ((store = dynamic_cast<StoreNode*>(l_value)) != 0)
-		{
-			load.reset(new LoadNode(store));
-		}
-		// ArrayWriteNode?
-		else if ((array = dynamic_cast<ArrayWriteNode*>(l_value)) != 0)
-		{
-			load.reset(new ArrayReadNode(array));
-		}
-		else
-			// invalid left value
-			throw Error(pos, WFormatableString(L"Expecting a left value."));
-
-		// create the immediate node
-		std::auto_ptr<Node> node(new ImmediateNode(pos, 1));
-
-		if (op == Token::TOKEN_OP_PLUS_PLUS)
-		{
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_ADD, load.release(), node.release()));
-		}
-		else if (op == Token::TOKEN_OP_MINUS_MINUS)
-		{
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_NEG, load.release(), node.release()));
-		}
-		return node.release();
-	}
-	
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{

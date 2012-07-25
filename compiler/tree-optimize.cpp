@@ -68,17 +68,6 @@ namespace Aseba
 		return this;
 	}
 	
-	Node* StaticVectorNode::optimize(std::wostream* dump)
-	{
-		for (NodesVector::iterator it = children.begin(); it != children.end(); ++it)
-		{
-			Node *optimizedChild = (*it)->optimize(dump);
-			assert(optimizedChild);
-			*it = optimizedChild;
-		}
-		return this;
-	}
-	
 	Node* IfWhenNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
@@ -504,11 +493,6 @@ namespace Aseba
 		}
 		else
 			return this;
-	}
-
-	Node* MemoryVectorNode::optimize(std::wostream *dump)
-	{
-		return this;
 	}
 	
 	Node* CallNode::optimize(std::wostream* dump)

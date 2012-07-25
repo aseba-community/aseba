@@ -88,7 +88,6 @@ namespace Aseba
 		};
 		virtual unsigned getMemoryAddr() const;
 		virtual unsigned getMemorySize() const;
-		virtual void releaseChildren();
 
 		//! Vector for children of a node
 		typedef std::vector<Node *> NodesVector;
@@ -475,32 +474,30 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"return"; } 
 	};
 
-	struct VectorNode : Node
+	struct AbstractTreeNode : Node
 	{
-		VectorNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		//! Constructor
+		AbstractTreeNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump) = 0;
-		virtual void emit(PreLinkBytecode& bytecodes) const = 0;
-		virtual std::wstring toWString() const = 0;
-		virtual std::wstring toNodeName() const = 0;
+		// Following operations should not be performed on abstraction nodes
+		virtual ReturnType typeCheck() const { abort(); }
+		virtual Node* optimize(std::wostream* dump) { abort(); }
+		virtual unsigned getStackDepth() const { abort(); }
+		virtual void emit(PreLinkBytecode& bytecodes) const { abort(); }
 	};
 
 	//! Node for assembling values into an array
 	//! values[x] is the x-th value to be assembled
-	struct StaticVectorNode : VectorNode
+	struct StaticVectorNode : AbstractTreeNode
 	{
 		std::vector<int> values;
 
 		//! Constructor
-		StaticVectorNode(const SourcePos& sourcePos) : VectorNode(sourcePos) {}
-		StaticVectorNode(const SourcePos& sourcePos, int value) : VectorNode(sourcePos) { values.push_back(value); }
+		StaticVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
+		StaticVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { values.push_back(value); }
 		virtual StaticVectorNode* shallowCopy() { return new StaticVectorNode(*this); }
 
 		virtual Node* treeExpand(std::wostream* dump, unsigned int index = 0);
-		virtual ReturnType typeCheck() const;
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"array constructor"; }
 		virtual void dump(std::wostream& dest, unsigned& indent) const;
@@ -516,7 +513,7 @@ namespace Aseba
 	//! This is an abstraction, and should be replaced by the correct operation(s) at a later stage
 	//! children[0] is optional index, like 'i' in foo[i]
 	//! If children[0] is a StaticVector of two elements (int), it will be foo[x:y]
-	struct MemoryVectorNode : VectorNode
+	struct MemoryVectorNode : AbstractTreeNode
 	{
 		unsigned arrayAddr; //!< address of the first element of the array
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
@@ -527,14 +524,44 @@ namespace Aseba
 		virtual MemoryVectorNode* shallowCopy() { return new MemoryVectorNode(*this); }
 
 		virtual Node* treeExpand(std::wostream* dump, unsigned int index = 0);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"vector access"; }
 		virtual unsigned getMemoryAddr() const;
 		virtual unsigned getMemorySize() const;
 
 		virtual void setWrite(bool write) { this->write = write; }
+	};
+
+	struct ArithmeticAssignmentNode : AbstractTreeNode
+	{
+		AsebaBinaryOperator op; //!< operator
+
+		//! Constructor
+		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
+		virtual ArithmeticAssignmentNode* shallowCopy() { return new ArithmeticAssignmentNode(*this); }
+
+		virtual Node* treeExpand(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const { return L"Arithmetic Assign"; }
+		virtual std::wstring toNodeName() const { return L"arithmetic assignment"; }
+
+		static ArithmeticAssignmentNode* fromArithmeticAssignmentToken(const SourcePos& sourcePos, Compiler::Token::Type token, Node *left, Node *right);
+
+	protected:
+		const static AsebaBinaryOperator operatorMap[];
+		static AsebaBinaryOperator getBinaryOperator(Compiler::Token::Type token);
+	};
+
+	struct UnaryArithmeticAssignmentNode : AbstractTreeNode
+	{
+		AsebaBinaryOperator arithmeticOp; //!< operator
+
+		//! Constructor
+		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory);
+		virtual UnaryArithmeticAssignmentNode* shallowCopy() { return new UnaryArithmeticAssignmentNode(*this); }
+
+		virtual Node* treeExpand(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const { return L"Unary Arithmetic Assign"; }
+		virtual std::wstring toNodeName() const { return L"unary arithmetic assignment"; }
 	};
 
 	/*@}*/

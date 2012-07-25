@@ -256,36 +256,40 @@ namespace Aseba
 				TOKEN_OP_OR,
 				TOKEN_OP_AND,
 				TOKEN_OP_NOT,
-				TOKEN_OP_BIT_OR,
-				TOKEN_OP_BIT_XOR,
-				TOKEN_OP_BIT_AND,
-				TOKEN_OP_BIT_OR_EQUAL,
-				TOKEN_OP_BIT_XOR_EQUAL,
-				TOKEN_OP_BIT_AND_EQUAL,
-				TOKEN_OP_BIT_NOT,
-				TOKEN_OP_BIT_NOT_EQUAL,
-				TOKEN_OP_EQUAL,
-				TOKEN_OP_NOT_EQUAL,
-				TOKEN_OP_BIGGER,
-				TOKEN_OP_BIGGER_EQUAL,
-				TOKEN_OP_SMALLER,
-				TOKEN_OP_SMALLER_EQUAL,
-				TOKEN_OP_SHIFT_LEFT,		// group of 4 tokens, don't split or mess up
-				TOKEN_OP_SHIFT_RIGHT,		//
-				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
-				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
-				TOKEN_OP_ADD,			// group of 4 tokens, don't split or mess up
+
+				TOKEN_OP_EQUAL,			// group of tokens, don't split or mess up
+				TOKEN_OP_NOT_EQUAL,		//
+				TOKEN_OP_BIGGER,		//
+				TOKEN_OP_BIGGER_EQUAL,		//
+				TOKEN_OP_SMALLER,		//
+				TOKEN_OP_SMALLER_EQUAL,		//
+
+				TOKEN_OP_ADD,			// group of 2 tokens, don't split or mess up
 				TOKEN_OP_NEG,			//
-				TOKEN_OP_ADD_EQUAL,		//
-				TOKEN_OP_NEG_EQUAL,		//
-				TOKEN_OP_PLUS_PLUS,
-				TOKEN_OP_MINUS_MINUS,
-				TOKEN_OP_MULT,			// group of 6 tokens, don't split or mess up
+				TOKEN_OP_MULT,			// group of 3 tokens, don't split or mess up
 				TOKEN_OP_DIV,			//
 				TOKEN_OP_MOD,			//
+				TOKEN_OP_SHIFT_LEFT,		// group of 2 tokens, don't split or mess up
+				TOKEN_OP_SHIFT_RIGHT,		//
+				TOKEN_OP_BIT_OR,		// group of 4 tokens, don't split or mess up
+				TOKEN_OP_BIT_XOR,		//
+				TOKEN_OP_BIT_AND,		//
+				TOKEN_OP_BIT_NOT,		//
+
+				TOKEN_OP_ADD_EQUAL,		// group of 13 tokens, don't split or mess up
+				TOKEN_OP_NEG_EQUAL,		//
 				TOKEN_OP_MULT_EQUAL,		//
 				TOKEN_OP_DIV_EQUAL,		//
-				TOKEN_OP_MOD_EQUAL		//
+				TOKEN_OP_MOD_EQUAL,		//
+				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
+				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
+				TOKEN_OP_BIT_OR_EQUAL,		//
+				TOKEN_OP_BIT_XOR_EQUAL,		//
+				TOKEN_OP_BIT_AND_EQUAL,		//
+				TOKEN_OP_BIT_NOT_EQUAL,		//
+
+				TOKEN_OP_PLUS_PLUS,
+				TOKEN_OP_MINUS_MINUS
 
 			} type; //!< type of this token
 			std::wstring sValue; //!< string version of the value
@@ -384,8 +388,6 @@ namespace Aseba
 		StaticVectorNode* parseArrayConstructor(bool compatibility = false);
 		//MemoryVectorNode* parseVariableAccess(void);
 		Node* parseAssignment();
-		Node* parseCompoundAssignment(Node* l_value);
-		Node* parseIncrementAssignment(Node* l_value);
 		Node* parseIfWhen(bool edgeSensitive);
 		Node* parseFor();
 		Node* parseWhile();

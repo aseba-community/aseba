@@ -124,21 +124,7 @@ namespace Aseba
 			children[i+0]->emit(bytecodes);
 		}
 	}
-	
-	
-	void StaticVectorNode::emit(PreLinkBytecode& bytecodes) const
-	{
-		abort();
-		/*
-		for (size_t i = 0; i < children.size(); i++)
-		{
-			children[i]->emit(bytecodes);
-			unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | (arrayAddr+i);
-			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		*/
-	}
-	
+
 	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -430,14 +416,6 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
-
-
-	void MemoryVectorNode::emit(PreLinkBytecode &bytecodes) const
-	{
-		// oups
-		throw Error();
-	}
-	
 	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
 	{
