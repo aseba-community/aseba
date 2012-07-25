@@ -381,7 +381,7 @@ namespace Aseba
 		Node* parseVarDef();
 		AssignmentNode* parseVarDefInit(MemoryVectorNode* lValue);
 		//Node* parseVectorAccess(bool assignMemory = false, bool strict = true);
-		StaticVectorNode* parseArrayConstructor();
+		StaticVectorNode* parseArrayConstructor(bool compatibility = false);
 		//MemoryVectorNode* parseVariableAccess(void);
 		Node* parseAssignment();
 		Node* parseCompoundAssignment(Node* l_value);

@@ -412,15 +412,19 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
-			std::auto_ptr<Node> rValue(parseBinaryOrExpression());
+
+			// try old style initialization 1,2,3
+			std::auto_ptr<Node> rValue(parseArrayConstructor(true));
+			if (rValue.get() == NULL)
+			{
+				// no -> other type of initialization
+				rValue.reset(parseBinaryOrExpression());
+			}
 
 			if (lValue->getMemorySize() == Node::E_NOVAL)
 			{
 				// infere the variable's size based on the initilization
-				//unsigned arrayAddr;
-				//getVectorAccessType(rValue.get(), arrayAddr, lValue->arraySize);
 				lValue->arraySize = rValue->getMemorySize();
-				//lValue->accessSize = lValue->arraySize;
 			}
 
 			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(tokens.front().pos));
@@ -1098,22 +1102,9 @@ namespace Aseba
 			
 			case Token::TOKEN_INT_LITERAL:
 			{
-				// immediate or old-style 1,2,3 initialization
-				std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(pos));
-
-				for (unsigned int i = 0;; i++)
-				{
-					int value = expectUInt16Literal();
-					tokens.pop_front();
-					arrayCtor->addValue(value);
-					/*
-					if (tokens.front() == Token::TOKEN_COMMA && STRICT == false)
-						tokens.pop_front();
-					else
-					*/
-						break;
-				}
-
+				// immediate
+				std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(pos, expectUInt16Literal()));
+				tokens.pop_front();
 				return arrayCtor.release();
 			}
 			
@@ -1127,26 +1118,43 @@ namespace Aseba
 	}
 
 	//! Parse "[ .... ]" grammar element
-	StaticVectorNode* Compiler::parseArrayConstructor()
+	StaticVectorNode* Compiler::parseArrayConstructor(bool compatibility)
 	{
-		const Token::Type acceptableTypes[] = { Token::TOKEN_BRACKET_CLOSE, Token::TOKEN_COMMA };
-
-		expect(Token::TOKEN_BRACKET_OPEN);
+		if (!compatibility)
+		{
+			expect(Token::TOKEN_BRACKET_OPEN);
+			tokens.pop_front();
+		}
+		else
+		{
+			// check if 2nd token is a comma
+			if ( !(tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA) )
+			{
+				// no
+				return NULL;
+			}
+		}
 
 		SourcePos varPos = tokens.front().pos;
 		std::auto_ptr<StaticVectorNode> arrayCtor(new StaticVectorNode(varPos));
 
-		while (tokens.front() != Token::TOKEN_BRACKET_CLOSE)
+		do
 		{
-			tokens.pop_front();
-
 			arrayCtor->addValue(expectInt16LiteralOrConstant());
 			tokens.pop_front();
-			//arrayCtor->arraySize++;
 
-			EXPECT_ONE_OF(acceptableTypes);
+			if (tokens.front() != Token::TOKEN_COMMA)
+				break;
+			else
+				tokens.pop_front();
 		}
-		tokens.pop_front();
+		while (1);
+
+		if (!compatibility)
+		{
+			expect(Token::TOKEN_BRACKET_CLOSE);
+			tokens.pop_front();
+		}
 
 		return arrayCtor.release();
 	}
