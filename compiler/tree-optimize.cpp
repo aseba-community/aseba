@@ -224,6 +224,13 @@ namespace Aseba
 	
 	Node* EmitNode::optimize(std::wostream* dump)
 	{
+		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		{
+			// generic optimization and removal
+			*it = (*it)->optimize(dump);
+			++it;
+		}
+
 		return this;
 	}
 	
@@ -497,6 +504,13 @@ namespace Aseba
 	
 	Node* CallNode::optimize(std::wostream* dump)
 	{
+		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		{
+			// generic optimization and removal
+			*it = (*it)->optimize(dump);
+			++it;
+		}
+
 		return this;
 	}
 	
