@@ -61,6 +61,8 @@ namespace Aseba
 		//! Return a deep copy of the object (children are also copied)
 		virtual Node* deepCopy();
 		
+		//! Check the consistency in vectors' size
+		virtual void checkVectorSize() const;
 		//! Second pass to expand "abstract" nodes into more concrete ones
 		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
@@ -131,6 +133,7 @@ namespace Aseba
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		virtual AssignmentNode* shallowCopy() { return new AssignmentNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index);
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -152,6 +155,7 @@ namespace Aseba
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		virtual IfWhenNode* shallowCopy() { return new IfWhenNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -174,6 +178,7 @@ namespace Aseba
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		virtual FoldedIfWhenNode* shallowCopy() { return new FoldedIfWhenNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -190,6 +195,7 @@ namespace Aseba
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		virtual WhileNode* shallowCopy() { return new WhileNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -209,6 +215,7 @@ namespace Aseba
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		virtual FoldedWhileNode* shallowCopy() { return new FoldedWhileNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -547,6 +554,7 @@ namespace Aseba
 		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
 		virtual ArithmeticAssignmentNode* shallowCopy() { return new ArithmeticAssignmentNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"arithmetic assignment"; }

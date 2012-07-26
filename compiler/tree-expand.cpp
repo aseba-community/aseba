@@ -44,20 +44,13 @@ namespace Aseba
 	{
 		assert(children.size() == 2);
 
-		unsigned lSize = children[0]->getVectorSize();
-		unsigned rSize = children[1]->getVectorSize();
-
-		// consistency check
-		if (lSize != rSize)
-			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
-
 		MemoryVectorNode* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
 		assert(leftVector);
 		leftVector->setWrite(true);
 		Node* rightVector = children[1];
 
 		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos));
-		for (unsigned int i = 0; i < lSize; i++)
+		for (unsigned int i = 0; i < leftVector->getVectorSize(); i++)
 		{
 			// expand to left[i] = right[i]
 			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
@@ -174,6 +167,101 @@ namespace Aseba
 		delete this;
 
 		return finalBlock.release();
+	}
+
+
+	void Node::checkVectorSize() const
+	{
+		// recursively walk the tree and expand children
+		for (NodesVector::const_iterator it = children.begin(); it != children.end();)
+		{
+			(*it)->checkVectorSize();
+			++it;
+		}
+	}
+
+
+	void AssignmentNode::checkVectorSize() const
+	{
+		assert(children.size() == 2);
+
+		// will recursively check the whole tree belonging to "="
+		unsigned lSize = children[0]->getVectorSize();
+		unsigned rSize = children[1]->getVectorSize();
+
+		// top-level check
+		if (lSize != rSize)
+			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
+	}
+
+	void ArithmeticAssignmentNode::checkVectorSize() const
+	{
+		assert(children.size() == 2);
+
+		// will recursively check the whole tree belonging to "="
+		unsigned lSize = children[0]->getVectorSize();
+		unsigned rSize = children[1]->getVectorSize();
+
+		// top-level check
+		if (lSize != rSize)
+			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
+	}
+
+
+	void IfWhenNode::checkVectorSize() const
+	{
+		assert(children.size() > 0);
+
+		unsigned conditionSize = children[0]->getVectorSize();
+		if (conditionSize != 1)
+			throw Error(sourcePos, L"Condition of the if cannot be a vector");
+		// check true block
+		if (children.size() > 1 && children[1])
+			children[1]->checkVectorSize();
+		// check false block
+		if (children.size() > 2 && children[2])
+			children[2]->checkVectorSize();
+	}
+
+	void FoldedIfWhenNode::checkVectorSize() const
+	{
+		assert(children.size() > 1);
+
+		unsigned conditionLeftSize = children[0]->getVectorSize();
+		unsigned conditionRightSize = children[1]->getVectorSize();
+		if (conditionLeftSize != 1 || conditionRightSize != 1)
+			throw Error(sourcePos, L"Condition of the if cannot be a vector");
+		// check true block
+		if (children.size() > 2 && children[2])
+			children[2]->checkVectorSize();
+		// check false block
+		if (children.size() > 3 && children[3])
+			children[3]->checkVectorSize();
+	}
+
+	void WhileNode::checkVectorSize() const
+	{
+		assert(children.size() > 0);
+
+		unsigned conditionSize = children[0]->getVectorSize();
+		if (conditionSize != 1)
+			throw Error(sourcePos, L"Condition of the while cannot be a vector");
+		// check inner block
+		if (children.size() > 1 && children[1])
+			children[1]->checkVectorSize();
+	}
+
+	void FoldedWhileNode::checkVectorSize() const
+	{
+		assert(children.size() > 1);
+
+		unsigned conditionLeftSize = children[0]->getVectorSize();
+		unsigned conditionRightSize = children[1]->getVectorSize();
+		if (conditionLeftSize != 1 || conditionRightSize != 1)
+			throw Error(sourcePos, L"Condition of the while cannot be a vector");
+		// check inner block
+		if (children.size() > 2 && children[2])
+			children[2]->checkVectorSize();
 	}
 
 
