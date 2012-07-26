@@ -1,0 +1,11 @@
+# Test simple arithmetics on vectors
+
+var i[2] = [0,1]
+var j[2] = [1,0]
+var k[2]
+
+k = i + j	# [1,1]
+k = [30,60] * k	# [30,60]
+k = k / [3,3]	# [10,20]
+k = k - [1,10]	# [9,10]
+k = k % [5,3]	# [4,1]

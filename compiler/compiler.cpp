@@ -157,12 +157,50 @@ namespace Aseba
 		
 		if (dump)
 		{
-			*dump << "Syntax tree before optimisation:\n";
+			*dump << "Vectorial syntax tree:\n";
+			program->dump(*dump, indent);
+			*dump << "\n\n";
+			*dump << "Checking the vectors' size:\n";
+		}
+		
+		// check vectors' size
+		try
+		{
+			program->checkVectorSize();
+		}
+		catch(Error error)
+		{
+			delete program;
+			errorDescription = error;
+			return false;
+		}
+
+		if (dump)
+		{
+			*dump << "Ok\n";
+			*dump << "\n\n";
+			*dump << "Expanding the syntax tree...\n";
+		}
+
+		// expand the syntax tree to Aseba-like syntax
+		try
+		{
+			program = program->expandToAsebaTree(dump);
+		}
+		catch (Error error)
+		{
+			errorDescription = error;
+			return false;
+		}
+
+		if (dump)
+		{
+			*dump << "Expanded syntax tree before optimisation:\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
 			*dump << "Type checking:\n";
 		}
-		
+
 		// typecheck
 		try
 		{

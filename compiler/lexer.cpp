@@ -99,7 +99,6 @@ namespace Aseba
 			case TOKEN_OP_BIT_OR_EQUAL: return L"binary or equal";
 			case TOKEN_OP_BIT_XOR_EQUAL: return L"binary xor equal";
 			case TOKEN_OP_BIT_AND_EQUAL: return L"binary and equal";
-			case TOKEN_OP_BIT_NOT_EQUAL: return L"binary not equal";
 			case TOKEN_OP_EQUAL: return L"== (equal to)";
 			case TOKEN_OP_NOT_EQUAL: return L"!= (not equal to)";
 			case TOKEN_OP_BIGGER: return L"> (bigger than)";
@@ -287,8 +286,6 @@ namespace Aseba
 					break;
 
 				case '~':
-					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_NOT_EQUAL))
-						break;
 					tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos));
 					break;
 
