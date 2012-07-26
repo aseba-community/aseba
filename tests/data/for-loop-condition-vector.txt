@@ -1,0 +1,7 @@
+var i[2]
+var j = 0
+
+# should fail (vectorial condition not supported)
+for i in [30,10]:[1,1] step [-3,-1] do
+	j = j + i
+end

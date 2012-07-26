@@ -1,0 +1,6 @@
+var i[2] = [2,2]
+
+# should fail, as vectorial conditions are not supported
+if i > 1 then
+	i = [0,0]
+end
