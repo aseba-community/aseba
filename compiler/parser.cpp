@@ -347,28 +347,13 @@ namespace Aseba
 		// save variable
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
-		unsigned varSize = 1;
+		unsigned varSize = Node::E_NOVAL;
 		unsigned varAddr = freeVariableIndex;
 		
 		tokens.pop_front();
 		
 		// optional array
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-		{
-			tokens.pop_front();
-			
-			if (tokens.front() == Token::TOKEN_BRACKET_CLOSE)
-			{
-				varSize = Node::E_NOVAL;
-			}
-			else
-			{
-				varSize = expectPositiveInt16LiteralOrConstant();
-				tokens.pop_front();
-				expect(Token::TOKEN_BRACKET_CLOSE);
-			}
-			tokens.pop_front();
-		}
+		varSize = parseVariableDefSize();
 		
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
@@ -1155,6 +1140,77 @@ namespace Aseba
 		}
 
 		return vector.release();
+	}
+
+	unsigned Compiler::parseVariableDefSize()
+	{
+		int result = 0;
+
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+
+			if (tokens.front() == Token::TOKEN_BRACKET_CLOSE)
+			{
+				result = Node::E_NOVAL;
+			}
+			else
+			{
+				// create a temporary "var = expr" tree
+				// used to access the facility offered by the AssignmentNode (size check,...)
+				std::auto_ptr<Node> tempTree1(new AssignmentNode(pos));
+				tempTree1->children.push_back(new MemoryVectorNode(pos, 0, 1, L"fake"));
+				tempTree1->children.push_back(parseBinaryOrExpression());
+
+				//unsigned indent = 0;
+				//std::cerr << "Tree before expanding" << std::endl;
+				//tempTree1->dump(std::wcerr, indent);
+
+				std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
+
+				//std::cerr << "Tree after expanding" << std::endl;
+				//tempTree2->dump(std::wcerr, indent);
+
+				tempTree1.release();	// tree already deleted by expandToAsebaTree()
+				tempTree2->optimize(NULL);
+
+				//std::cerr << "Tree after optimization" << std::endl;
+				//tempTree2->dump(std::wcerr, indent);
+				//std::cerr << std::endl;
+
+				// valid optimization?
+				if ( !tempTree2.get() || tempTree2->children.size() == 0 )
+					throw Error(pos, L"Array size: not a valid expression");
+				AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
+				if ( !assignment || assignment->children.size() != 2 )
+					throw Error(pos, L"Array size: not a valid expression");
+
+				// resolve to an ImmediateNode?
+				ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
+				if (immediate)
+					result = immediate->value;
+				else
+					throw Error(pos, L"Array size: not a valid constant expression");
+
+				// delete the tree
+				tempTree2.reset();
+
+				if (result < 0)
+					// what??
+					throw Error(pos, WFormatableString(L"Array size: result is negative (%0)").arg(result));
+				else if (result == 0)
+					throw Error(pos, L"Array size: result is null");
+
+				expect(Token::TOKEN_BRACKET_CLOSE);
+			}
+			tokens.pop_front();
+		}
+		else
+			// not an array
+			result = 1;
+
+		return result;
 	}
 	
 	//! Parse "function_call" grammar element.

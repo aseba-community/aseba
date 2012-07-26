@@ -411,6 +411,7 @@ namespace Aseba
 		ImmediateVectorNode* parseImmediateVector(bool compatibility = false);
 		Node* parseConstantAndVariable();
 		MemoryVectorNode* parseVariable();
+		unsigned parseVariableDefSize();
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
