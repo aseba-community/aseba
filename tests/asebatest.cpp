@@ -1,8 +1,10 @@
 // Aseba
 #include "../compiler/compiler.h"
 #include "../vm/vm.h"
+#include "../vm/natives.h"
 #include "../common/consts.h"
 #include "../utils/utils.h"
+#include "../utils/FormatableString.h"
 using namespace Aseba;
 
 // C++
@@ -86,11 +88,25 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 	std::cerr << "AsebaPutVmToSleep" << std::endl;
 }
 
+static AsebaNativeFunctionPointer nativeFunctions[] =
+{
+	ASEBA_NATIVES_STD_FUNCTIONS,
+};
+
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
+{
+	ASEBA_NATIVES_STD_DESCRIPTIONS,
+	0
+};
+
+extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescriptions;
+}
+
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	//nativeFunctions[id](vm);
-	std::cerr << "AsebaNativeFunction" << std::endl;
-	// TODO: add native functions
+	nativeFunctions[id](vm);
 }
 
 extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
@@ -167,6 +183,12 @@ struct AsebaNode
 		/*d.namedVariables.push_back(TargetDescription::NamedVariable("id", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("source", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));*/
+ 
+		TargetDescription::NativeFunction native(L"math.add", L"copy vectors");
+		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"dst", -1));
+		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"src1", -1));
+		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"src2", -1));
+		d.nativeFunctions.push_back(native);
 	}
 	
 	const TargetDescription* getTargetDescription() const
@@ -297,6 +319,8 @@ int main(int argc, char** argv)
 	// fake target description
 	AsebaNode node;
 	CommonDefinitions definitions;
+	definitions.events.push_back(NamedValue(L"event1", 0));
+	definitions.events.push_back(NamedValue(L"event2", 3));
 
 	BytecodeVector bytecode;
 	unsigned int varCount;

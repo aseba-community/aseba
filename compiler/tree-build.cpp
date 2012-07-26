@@ -20,12 +20,27 @@
 
 #include "tree.h"
 #include <cstdlib>
+#include <iostream>
+
 
 namespace Aseba
 {
 	/** \addtogroup compiler */
 	/*@{*/
-	
+
+	const AsebaBinaryOperator ArithmeticAssignmentNode::operatorMap[] = {
+		ASEBA_OP_ADD,			// TOKEN_OP_ADD_EQUAL
+		ASEBA_OP_SUB,			// TOKEN_OP_NEG_EQUAL
+		ASEBA_OP_MULT,			// TOKEN_OP_MULT_EQUAL
+		ASEBA_OP_DIV,			// TOKEN_OP_DIV_EQUAL
+		ASEBA_OP_MOD,			// TOKEN_OP_MOD_EQUAL
+		ASEBA_OP_SHIFT_LEFT,		// TOKEN_OP_SHIFT_LEFT_EQUAL
+		ASEBA_OP_SHIFT_RIGHT,		// TOKEN_OP_SHIFT_RIGHT_EQUAL
+		ASEBA_OP_BIT_OR,		// TOKEN_OP_BIT_OR_EQUAL
+		ASEBA_OP_BIT_XOR,		// TOKEN_OP_BIT_XOR_EQUAL
+		ASEBA_OP_BIT_AND		// TOKEN_OP_BIT_AND_EQUAL
+	};
+
 	//! Destructor, delete all children.
 	Node::~Node()
 	{
@@ -34,7 +49,16 @@ namespace Aseba
 			if (children[i])
 				delete children[i];
 	}
-	
+
+	Node* Node::deepCopy()
+	{
+		Node* newCopy = shallowCopy();
+		for (size_t i = 0; i < children.size(); i++)
+			if (children[i])
+				newCopy->children[i] = children[i]->deepCopy();
+		return newCopy;
+	}
+
 	//! Constructor
 	EventDeclNode::EventDeclNode(const SourcePos& sourcePos, unsigned eventId) :
 		Node(sourcePos),
@@ -150,6 +174,17 @@ namespace Aseba
 	{
 	
 	}
+
+	//! Constructor
+	MemoryVectorNode::MemoryVectorNode(const SourcePos &sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+		AbstractTreeNode(sourcePos),
+		arrayAddr(arrayAddr),
+		arraySize(arraySize),
+		arrayName(arrayName),
+		write(false)
+	{
+
+	}
 	
 	//! Constructor
 	CallNode::CallNode(const SourcePos& sourcePos, unsigned funcId) :
@@ -157,6 +192,47 @@ namespace Aseba
 		funcId(funcId)
 	{
 	
+	}
+
+	//! Constructor
+	ArithmeticAssignmentNode::ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right) :
+		AbstractTreeNode(sourcePos),
+		op(op)
+	{
+		children.push_back(left);
+		children.push_back(right);
+	}
+
+	ArithmeticAssignmentNode* ArithmeticAssignmentNode::fromArithmeticAssignmentToken(const SourcePos& sourcePos, Compiler::Token::Type token, Node *left, Node *right)
+	{
+		return new ArithmeticAssignmentNode(sourcePos, getBinaryOperator(token), left, right);
+	}
+
+	AsebaBinaryOperator ArithmeticAssignmentNode::getBinaryOperator(Compiler::Token::Type token)
+	{
+		return operatorMap[token - Compiler::Token::TOKEN_OP_ADD_EQUAL];
+	}
+
+	//! Constructor
+	UnaryArithmeticAssignmentNode::UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory) :
+		AbstractTreeNode(sourcePos)
+	{
+		switch (token)
+		{
+		case Compiler::Token::TOKEN_OP_PLUS_PLUS:
+			arithmeticOp = ASEBA_OP_ADD;
+			break;
+
+		case Compiler::Token::TOKEN_OP_MINUS_MINUS:
+			arithmeticOp = ASEBA_OP_SUB;
+			break;
+
+		default:
+			throw Error(sourcePos, L"Unexpected token when building UnaryArithmeticAssignmentNode");
+			break;
+		}
+
+		children.push_back(memory);
 	}
 	
 	/*@}*/

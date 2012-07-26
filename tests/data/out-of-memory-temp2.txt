@@ -1,0 +1,6 @@
+# allocate 251
+var foo1[3]
+var foo2[251]
+
+# require 6 more of temp space -> too much
+call math.add(foo1, [1,2,3], [1,2,3])
