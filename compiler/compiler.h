@@ -412,6 +412,8 @@ namespace Aseba
 		Node* parseConstantAndVariable();
 		MemoryVectorNode* parseVariable();
 		unsigned parseVariableDefSize();
+		Node* tryParsingConstantExpression(SourcePos pos, int& constantResult);
+		int expectConstantExpression(SourcePos pos, Node* tree);
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens

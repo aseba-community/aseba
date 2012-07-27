@@ -1109,30 +1109,43 @@ namespace Aseba
 		tokens.pop_front();
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
+			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
 
-			std::auto_ptr<Node> startIndex(parseBinaryOrExpression());
-			vector->children.push_back(startIndex.release());
+			int start;
+			std::auto_ptr<Node> startIndex(tryParsingConstantExpression(pos, start));
 
-			// immediate index?
-			if (ImmediateVectorNode* index = dynamic_cast<ImmediateVectorNode*>(vector->children[0]))
+			if (startIndex.get() == NULL)
 			{
-				unsigned start = index->getLonelyImmediate();
+				// constant index
+				std::auto_ptr<ImmediateVectorNode> index(new ImmediateVectorNode(pos));
+				index->addValue(start);
 
 				// do we have array subscript?
 				if (tokens.front() == Token::TOKEN_COLON)
 				{
+					pos = tokens.front().pos;
 					tokens.pop_front();
 
-					unsigned endIndex = expectPositiveInt16LiteralOrConstant();
+					int end;
+					std::auto_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
+
+					if (endIndex.get() != NULL)
+						throw Error(pos, L"Expecting a constant expression as a second index");
 
 					// check if second index is within bounds
-					if (endIndex < start)
+					if (end < start)
 						throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
 
-					index->addValue(endIndex);
-					tokens.pop_front();
+					index->addValue(end);
 				}
+
+				vector->children.push_back(index.release());
+			}
+			else
+			{
+				// general expression as index
+				vector->children.push_back(startIndex.release());
 			}
 
 			expect(Token::TOKEN_BRACKET_CLOSE);
@@ -1157,44 +1170,7 @@ namespace Aseba
 			}
 			else
 			{
-				// create a temporary "var = expr" tree
-				// used to access the facility offered by the AssignmentNode (size check,...)
-				std::auto_ptr<Node> tempTree1(new AssignmentNode(pos));
-				tempTree1->children.push_back(new MemoryVectorNode(pos, 0, 1, L"fake"));
-				tempTree1->children.push_back(parseBinaryOrExpression());
-
-				//unsigned indent = 0;
-				//std::cerr << "Tree before expanding" << std::endl;
-				//tempTree1->dump(std::wcerr, indent);
-
-				std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
-
-				//std::cerr << "Tree after expanding" << std::endl;
-				//tempTree2->dump(std::wcerr, indent);
-
-				tempTree1.release();	// tree already deleted by expandToAsebaTree()
-				tempTree2->optimize(NULL);
-
-				//std::cerr << "Tree after optimization" << std::endl;
-				//tempTree2->dump(std::wcerr, indent);
-				//std::cerr << std::endl;
-
-				// valid optimization?
-				if ( !tempTree2.get() || tempTree2->children.size() == 0 )
-					throw Error(pos, L"Array size: not a valid expression");
-				AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
-				if ( !assignment || assignment->children.size() != 2 )
-					throw Error(pos, L"Array size: not a valid expression");
-
-				// resolve to an ImmediateNode?
-				ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
-				if (immediate)
-					result = immediate->value;
-				else
-					throw Error(pos, L"Array size: not a valid constant expression");
-
-				// delete the tree
-				tempTree2.reset();
+				result = expectConstantExpression(pos, parseBinaryOrExpression());
 
 				if (result < 0)
 					// what??
@@ -1209,6 +1185,77 @@ namespace Aseba
 		else
 			// not an array
 			result = 1;
+
+		return result;
+	}
+
+	//! Use parseBinaryOrExpression() and try to reduce the result into an integer
+	//! If successful, return NULL and the integer in constantResult
+	//! If unsuccessful, return the parsed tree (constantResult useless in this case)
+	Node* Compiler::tryParsingConstantExpression(SourcePos pos, int& constantResult)
+	{
+		std::auto_ptr<Node> tree(parseBinaryOrExpression());
+
+		try
+		{
+			constantResult = expectConstantExpression(pos, tree->deepCopy());
+			tree.reset();
+			return NULL;
+		}
+		catch (Error error)
+		{
+			// oops, tree cannot be resolved to a constant, return it
+			return tree.release();
+		}
+	}
+
+	//! This is a generalization of expectPositiveInt16LiteralOrConstant()
+	//! Try to reduce the expression into a single figure, if not raise an exception
+	//! The tree pointed by "tree" is deleted during execution, not safe to use it after
+	int Compiler::expectConstantExpression(SourcePos pos, Node* tree)
+	{
+		int result = 0;
+
+		// create a temporary "var = expr" tree
+		// used to access the facility offered by the AssignmentNode (size check,...)
+		std::auto_ptr<Node> tempTree1(new AssignmentNode(pos));
+		tempTree1->children.push_back(new MemoryVectorNode(pos, 0, 1, L"fake"));
+		tempTree1->children.push_back(tree);
+
+		//tempTree1->children.push_back(parseBinaryOrExpression());
+
+		//unsigned indent = 0;
+		//std::cerr << "Tree before expanding" << std::endl;
+		//tempTree1->dump(std::wcerr, indent);
+
+		std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
+
+		//std::cerr << "Tree after expanding" << std::endl;
+		//tempTree2->dump(std::wcerr, indent);
+
+		tempTree1.release();	// tree already deleted by expandToAsebaTree()
+		tempTree2->optimize(NULL);
+
+		//std::cerr << "Tree after optimization" << std::endl;
+		//tempTree2->dump(std::wcerr, indent);
+		//std::cerr << std::endl;
+
+		// valid optimization?
+		if ( !tempTree2.get() || tempTree2->children.size() == 0 )
+			throw Error(pos, L"Not a valid constant expression");
+		AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
+		if ( !assignment || assignment->children.size() != 2 )
+			throw Error(pos, L"Not a valid constant expression");
+
+		// resolve to an ImmediateNode?
+		ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
+		if (immediate)
+			result = immediate->value;
+		else
+			throw Error(pos, L"Not a valid constant expression");
+
+		// delete the tree
+		tempTree2.reset();
 
 		return result;
 	}
