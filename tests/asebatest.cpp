@@ -321,6 +321,7 @@ int main(int argc, char** argv)
 	CommonDefinitions definitions;
 	definitions.events.push_back(NamedValue(L"event1", 0));
 	definitions.events.push_back(NamedValue(L"event2", 3));
+	definitions.constants.push_back(NamedValue(L"FOO", 2));
 
 	BytecodeVector bytecode;
 	unsigned int varCount;

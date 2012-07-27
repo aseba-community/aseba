@@ -1,0 +1,4 @@
+var i[1+1] = [1,2]
+# constant FOO equals 2
+var j[2*2-FOO] = [3,4]
+var k[FOO*FOO-1] = [5,6,7]
