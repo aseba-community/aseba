@@ -26,6 +26,7 @@
 #include "AeslEditor.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
+#include "CompilerTranslator.h"
 #include "../common/consts.h"
 #include "../common/productids.h"
 #include "../utils/utils.h"
@@ -935,6 +936,7 @@ namespace Aseba
 		Compiler compiler;
 		compiler.setTargetDescription(&targetDescription);
 		compiler.setCommonDefinitions(&commonDefinitions);
+		compiler.setTranslateCallback(CompilerTranslator::translate);
 		
 		std::wistringstream is(source.toStdWString());
 		
