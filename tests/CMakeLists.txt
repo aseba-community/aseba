@@ -49,6 +49,7 @@ add_test(subroutine ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_D
 add_test(array-post-increment ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-post-increment.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-post-increment.txt)
 add_test(vardef ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef.txt)
 add_test(vardef-compat ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-compat.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-compat.txt)
+add_test(vardef-constant-size ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-constant-size.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-constant-size.txt)
 add_test(assignments ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/assignments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/assignments.txt)
 add_test(events ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/events.txt)
 add_test(native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/native-function.txt)
@@ -78,12 +79,14 @@ add_test(vardef-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT
 add_test(vardef-fail2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-fail2.txt)
 add_test(vardef-fail3 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-fail3.txt)
 add_test(vardef-compat-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-compat-fail1.txt)
+add_test(vardef-not-constant-size ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-not-constant-size.txt)
 add_test(out-of-memory1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/out-of-memory1.txt)
 add_test(out-of-memory2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/out-of-memory2.txt)
 add_test(out-of-memory-temp1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/out-of-memory-temp1.txt)
 add_test(out-of-memory-temp2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/out-of-memory-temp2.txt)
 add_test(if-condition-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/if-condition-vector.txt)
 add_test(for-loop-condition-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-condition-vector.txt)
+add_test(constant-namespace-collision ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constant-namespace-collision.txt)
 
 
 # stress test the compiler, by simulating user's input
