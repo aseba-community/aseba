@@ -18,19 +18,19 @@ namespace Aseba
 		QGraphicsItem *addAction(ThymioButton *item);
 		QGraphicsItem *addEvent(ThymioButton *item);
 
-		bool isEmpty();
+		bool isEmpty() const;
 		void reset();
 		void clear();
 		void setColorScheme(QColor eventColor, QColor actionColor);
-		bool isModified() { return sceneModified; }
+		bool isModified() const { return sceneModified; }
 		void setModified(bool mod) { sceneModified=mod; }
 		void setScale(qreal scale);
-		int getNumberOfButtonSets() { return buttonSets.size(); }
+		int getNumberOfButtonSets() const { return buttonSets.size(); }
 		
-		QString getErrorMessage();
-		QList<QString> getCode();
+		QString getErrorMessage() const;
+		QList<QString> getCode() const;
 		
-		bool isSuccessful() { return  thymioCompiler.isSuccessful(); }
+		bool isSuccessful() const { return  thymioCompiler.isSuccessful(); }
 		
 		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
 		

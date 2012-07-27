@@ -397,7 +397,7 @@ namespace Aseba
 		forButton = new QToolButton(); forButton->setText("for");
 		subroutineButton = new QToolButton(); subroutineButton->setText("sub");
 		callsubButton = new QToolButton(); callsubButton->setText("callsub");
-		keywordsToolbar->addWidget(new QLabel(tr("<b>Keywords <\b>")));
+		keywordsToolbar->addWidget(new QLabel(tr("<b>Keywords</b>")));
 		keywordsToolbar->addSeparator();
 		keywordsToolbar->addWidget(varButton);
 		keywordsToolbar->addWidget(ifButton);
@@ -1012,13 +1012,15 @@ namespace Aseba
 		// show memory usage
 		if (result->success)
 		{
-			unsigned variableCount = result->allocatedVariablesCount;
-			unsigned variableTotal = (*target->getDescription(id)).variablesSize;
-			unsigned bytecodeCount = result->bytecode.size();
-			unsigned bytecodeTotal = (*target->getDescription(id)).bytecodeSize;
-			QString variableText = QString("variables: %1 on %2 (%3\%)").arg(variableCount).arg(variableTotal).arg((double)variableCount*100./variableTotal, 0, 'f', 1);
-			QString bytecodeText = QString("bytecode: %1 on %2 (%3\%)").arg(bytecodeCount).arg(bytecodeTotal).arg((double)bytecodeCount*100./bytecodeTotal, 0, 'f', 1);
-			memoryUsageText->setText(QString("[Memory usage]    " + variableText + QString("    ") + bytecodeText));
+			const unsigned variableCount = result->allocatedVariablesCount;
+			const unsigned variableTotal = (*target->getDescription(id)).variablesSize;
+			const unsigned bytecodeCount = result->bytecode.size();
+			const unsigned bytecodeTotal = (*target->getDescription(id)).bytecodeSize;
+			assert(variableCount);
+			assert(bytecodeCount);
+			const QString variableText = tr("variables: %1 on %2 (%3\%)").arg(variableCount).arg(variableTotal).arg((double)variableCount*100./variableTotal, 0, 'f', 1);
+			const QString bytecodeText = tr("bytecode: %1 on %2 (%3\%)").arg(bytecodeCount).arg(bytecodeTotal).arg((double)bytecodeCount*100./bytecodeTotal, 0, 'f', 1);
+			memoryUsageText->setText(trUtf8("<b>Memory usage</b> : %1, %2").arg(variableText).arg(bytecodeText));
 		}
 		
 		// update state following result
@@ -3140,7 +3142,7 @@ namespace Aseba
 		editMenu->addAction(showLineNumbers);
 		editMenu->addAction(goToLineAct);
 		editMenu->addSeparator();
-		editMenu->addAction(tr("Settings"), this, SLOT(showSettings()));
+		editMenu->addAction(tr("&Settings"), this, SLOT(showSettings()));
 		
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
@@ -3209,14 +3211,14 @@ namespace Aseba
 		// Settings
 		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
 		menuBar()->addMenu(settingsMenu);
-		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
+		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
 		showHiddenAct->setCheckable(true);
 		showHiddenAct->setChecked(ConfigDialog::getStartupShowHidden());
 		showHidden(ConfigDialog::getStartupShowHidden());
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Jiwon
-		showKeywordsAct = new QAction(tr("Show &keywords..."), this);
+		showKeywordsAct = new QAction(tr("Show &keywords"), this);
 		showKeywordsAct->setCheckable(true);
 		showKeywordsAct->setChecked(ConfigDialog::getStartupShowKeywordToolbar());
 		settingsMenu->addAction(showKeywordsAct);

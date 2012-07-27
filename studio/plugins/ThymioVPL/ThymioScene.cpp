@@ -170,7 +170,7 @@ namespace Aseba
 		return button;		
 	}
 
-	bool ThymioScene::isEmpty()
+	bool ThymioScene::isEmpty() const
 	{
 		if( buttonSets.isEmpty() )
 			return true;
@@ -300,34 +300,26 @@ namespace Aseba
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));			
 	}	
 	
-	QString ThymioScene::getErrorMessage() 
+	QString ThymioScene::getErrorMessage() const
 	{ 
-		switch(thymioCompiler.getErrorCode()) {
-		case THYMIO_MISSING_EVENT:
-			return tr("Missing event button");
-			break;
-		case THYMIO_MISSING_ACTION:
-			return tr("Missing action button");
-			break;
-		case THYMIO_EVENT_NOT_SET:
-			return tr("Event button is not set.");
-			break;
-		case THYMIO_EVENT_MULTISET:
-			return tr("Redeclaration of event button.");
-			break;
-		case THYMIO_INVALID_CODE:
-			return tr("Unknown button type.");
-			break;
-		case THYMIO_NO_ERROR:
-			return tr("Compilation success.");
-		default:
-			break;
+		switch(thymioCompiler.getErrorCode())
+		{
+			case THYMIO_MISSING_EVENT:
+				return tr("Missing event");
+			case THYMIO_MISSING_ACTION:
+				return tr("Missing action");
+			case THYMIO_EVENT_MULTISET:
+				return tr("Redeclaration of event");
+			case THYMIO_INVALID_CODE:
+				return tr("Unknown event/action type");
+			case THYMIO_NO_ERROR:
+				return tr("Compilation success");
+			default:
+				return tr("Unknown VPL error");
 		}
-		
-		return "";
 	}	
 	
-	QList<QString> ThymioScene::getCode()
+	QList<QString> ThymioScene::getCode() const
 	{
 		QList<QString> out;
 		

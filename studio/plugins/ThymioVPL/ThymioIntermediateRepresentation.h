@@ -51,15 +51,15 @@ namespace Aseba
 		~ThymioIRButton();
 
 		void setClicked(int i, bool status);
-		bool isClicked(int i);
-		int size();
+		bool isClicked(int i) const;
+		int size() const;
 
-		ThymioIRButtonName getName();
+		ThymioIRButtonName getName() const;
 		void setBasename(wstring n);
-		wstring getBasename();
+		wstring getBasename() const;
 		
-		bool isEventButton();
-		bool isValid();
+		bool isEventButton() const;
+		bool isValid() const;
 
 		void accept(ThymioIRVisitor *visitor);
 
@@ -71,7 +71,7 @@ namespace Aseba
 	
 	class ThymioIRButtonSet
 	{
-	public:			
+	public:
 		ThymioIRButtonSet(ThymioIRButton *event=0, ThymioIRButton *action=0);
 		
 		void addEventButton(ThymioIRButton *event);
@@ -80,8 +80,8 @@ namespace Aseba
 		ThymioIRButton *getEventButton();
 		ThymioIRButton *getActionButton();
 		
-		bool hasEventButton();
-		bool hasActionButton();
+		bool hasEventButton() const;
+		bool hasActionButton() const;
 	
 		void accept(ThymioIRVisitor *visitor);
 	
@@ -98,9 +98,9 @@ namespace Aseba
 		virtual void visit(ThymioIRButton *button);
 		virtual void visit(ThymioIRButtonSet *buttonSet);
 
-		ThymioIRErrorCode getErrorCode();
-		bool isSuccessful();
-		std::wstring getErrorMessage();		
+		ThymioIRErrorCode getErrorCode() const;
+		bool isSuccessful() const;
+		std::wstring getErrorMessage() const;
 		
 	protected:
 		ThymioIRErrorCode errorCode;
@@ -152,8 +152,8 @@ namespace Aseba
 		virtual void visit(ThymioIRButton *button);
 		virtual void visit(ThymioIRButtonSet *buttonSet);
 
-		vector<wstring>::const_iterator beginCode() { return generatedCode.begin(); }
-		vector<wstring>::const_iterator endCode() { return generatedCode.end(); }
+		vector<wstring>::const_iterator beginCode() const { return generatedCode.begin(); }
+		vector<wstring>::const_iterator endCode() const { return generatedCode.end(); }
 		void reset();
 		void clear();
 		
@@ -179,12 +179,12 @@ namespace Aseba
 		void RemoveButtonSet(int row);
 		void ReplaceButtonSet(int row, ThymioIRButtonSet *set);
 
-		ThymioIRErrorCode getErrorCode();
-		std::wstring getErrorMessage();
-		bool isSuccessful();
+		ThymioIRErrorCode getErrorCode() const;
+		std::wstring getErrorMessage() const;
+		bool isSuccessful() const;
 		
-		vector<wstring>::const_iterator beginCode();
-		vector<wstring>::const_iterator endCode(); 
+		vector<wstring>::const_iterator beginCode() const;
+		vector<wstring>::const_iterator endCode() const; 
 
 		void clear();
 

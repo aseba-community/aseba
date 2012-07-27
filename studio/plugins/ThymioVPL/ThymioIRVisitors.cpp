@@ -14,34 +14,31 @@ namespace Aseba
 		errorCode = THYMIO_NO_ERROR;
 	}
 
-	ThymioIRErrorCode ThymioIRVisitor::getErrorCode()
+	ThymioIRErrorCode ThymioIRVisitor::getErrorCode() const
 	{
 		return errorCode;
 	}
 	
-	bool ThymioIRVisitor::isSuccessful()
+	bool ThymioIRVisitor::isSuccessful() const
 	{
 		return ( errorCode == THYMIO_NO_ERROR ? true : false );
 	}
 
-	wstring ThymioIRVisitor::getErrorMessage()
+	wstring ThymioIRVisitor::getErrorMessage() const
 	{
-		switch(errorCode) {
+		// FIXME: this duplicates code in scene, check and remove or unify
+		switch(errorCode)
+		{
 		case THYMIO_MISSING_EVENT:
-			return L"Missing event button";
-			break;
+			return L"Missing event";
 		case THYMIO_MISSING_ACTION:
-			return L"Missing action button";
-			break;
+			return L"Missing action";
 		case THYMIO_EVENT_NOT_SET:
-			return L"Event button is not set.";
-			break;
+			return L"Event is not set.";
 		case THYMIO_EVENT_MULTISET:
-			return L"Redeclaration of event button.";
-			break;
+			return L"Redeclaration of event.";
 		case THYMIO_INVALID_CODE:
-			return L"Unknown button type.";
-			break;
+			return L"Unknown event/action type.";
 		case THYMIO_NO_ERROR:
 			return L"Compilation success.";
 		default:

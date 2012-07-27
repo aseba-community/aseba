@@ -277,6 +277,7 @@ namespace Aseba
 		mainLayout->addLayout(buttonLayout);
 
 		setLayout(mainLayout);
+		setWindowTitle(tr("Aseba Studio - Settings"));
 
 		readSettings();
 	}

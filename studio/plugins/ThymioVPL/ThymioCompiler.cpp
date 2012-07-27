@@ -1,6 +1,8 @@
 #include <assert.h>
 
+#include <QObject>
 #include "ThymioIntermediateRepresentation.h"
+
 
 namespace Aseba
 {
@@ -21,7 +23,7 @@ namespace Aseba
 
 	void ThymioCompiler::AddButtonSet(ThymioIRButtonSet *set)
 	{	
-		buttonSet.push_back(set);		
+		buttonSet.push_back(set);
 	}
 
 	void ThymioCompiler::InsertButtonSet(int row, ThymioIRButtonSet *set)
@@ -56,7 +58,7 @@ namespace Aseba
 		errorType = THYMIO_NO_TYPE_ERROR;
 	}
 	
-	ThymioIRErrorCode ThymioCompiler::getErrorCode()
+	ThymioIRErrorCode ThymioCompiler::getErrorCode() const
 	{
 		switch(errorType)
 		{
@@ -77,7 +79,7 @@ namespace Aseba
 		return THYMIO_NO_ERROR;
 	}
 	
-	wstring ThymioCompiler::getErrorMessage()
+	wstring ThymioCompiler::getErrorMessage() const
 	{
 		switch(errorType)
 		{
@@ -91,26 +93,26 @@ namespace Aseba
 			return codeGenerator.getErrorMessage();
 			break;
 		case THYMIO_NO_TYPE_ERROR:
-			return L"Compilation success.";
+			return QObject::tr("Compilation success.").toStdWString();
 			break;
 		default:
-			break;			
+			break;
 		}
 		
-		return L"";		
+		return L"";
 	}
 	
-	bool ThymioCompiler::isSuccessful()
+	bool ThymioCompiler::isSuccessful() const
 	{
 		return ( errorType == THYMIO_NO_TYPE_ERROR ? true : false );
 	}
 	
-	vector<wstring>::const_iterator ThymioCompiler::beginCode() 
+	vector<wstring>::const_iterator ThymioCompiler::beginCode() const
 	{ 
-		return codeGenerator.beginCode(); 
+		return codeGenerator.beginCode();
 	}
 	
-	vector<wstring>::const_iterator ThymioCompiler::endCode() 
+	vector<wstring>::const_iterator ThymioCompiler::endCode() const
 	{ 
 		return codeGenerator.endCode(); 
 	}	

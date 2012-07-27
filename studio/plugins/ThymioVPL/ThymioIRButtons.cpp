@@ -19,13 +19,13 @@ namespace Aseba
 		if( i<size() ) buttons[i] = status; 
 	}
 	
-	bool ThymioIRButton::isClicked(int i) 
+	bool ThymioIRButton::isClicked(int i) const
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
 	}
 	
-	int ThymioIRButton::size() 
+	int ThymioIRButton::size() const
 	{ 
 		return buttons.size(); 
 	}
@@ -35,22 +35,22 @@ namespace Aseba
 		basename = n;
 	}
 
-	ThymioIRButtonName ThymioIRButton::getName()
+	ThymioIRButtonName ThymioIRButton::getName() const
 	{ 
 		return name; 
 	}
 	
-	wstring ThymioIRButton::getBasename()
+	wstring ThymioIRButton::getBasename() const
 	{
 		return basename;
 	}
 	
-	bool ThymioIRButton::isEventButton()
+	bool ThymioIRButton::isEventButton() const
 	{ 
 		return (name < 5 ? true : false); 
 	}
 
-	bool ThymioIRButton::isValid() 
+	bool ThymioIRButton::isValid() const
 	{ 
 		if( name > 2 )
 			return true; 
@@ -95,12 +95,12 @@ namespace Aseba
 		return actionButton; 
 	}
 
-	bool ThymioIRButtonSet::hasEventButton() 
+	bool ThymioIRButtonSet::hasEventButton() const
 	{ 
 		return (eventButton == 0 ? false : true); 
 	}
 	
-	bool ThymioIRButtonSet::hasActionButton() 
+	bool ThymioIRButtonSet::hasActionButton() const
 	{ 
 		return (actionButton == 0 ? false : true); 
 	}
