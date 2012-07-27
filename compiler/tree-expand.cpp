@@ -103,7 +103,7 @@ namespace Aseba
 			unsigned pointer = getVectorAddr() + index;
 			// check if index is within bounds
 			if (pointer >= arrayAddr + arraySize)
-				throw Error(sourcePos, WFormatableString(L"Access of array %0 out of bounds").arg(arrayName));
+				throw Error(sourcePos, WFormatableString(L"Access of array %0 out of bounds: accessing index %1 while array is of size %2").arg(arrayName).arg(index).arg(arraySize));
 
 			if (write == true)
 				return new StoreNode(sourcePos, pointer);
