@@ -5,9 +5,11 @@ namespace Aseba
 
 	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n, int states) : 
 		name(n),
-		numStates(states)
-	{ 
-		buttons.resize(size, false); 
+		numStates(states),
+		buttons(size),
+		memory(-1)
+	{
+		cout << "thymio ir button -- size, buttons.size: " << size << ", " << buttons.size() << endl; 
 	}
 
 	ThymioIRButton::~ThymioIRButton() 
@@ -17,7 +19,10 @@ namespace Aseba
 
 	void ThymioIRButton::setClicked(int i, int status) 
 	{ 
-		if( i<size() ) buttons[i] = status; 
+		cout << "in set clicked .. " << i << ", " << buttons.size() << flush;
+		if( i<size() ) 
+			buttons[i] = status; 
+		cout << " .. done\n" << flush;
 	}
 	
 	int ThymioIRButton::isClicked(int i) 
@@ -34,6 +39,16 @@ namespace Aseba
 	int ThymioIRButton::size() 
 	{ 
 		return buttons.size(); 
+	}
+
+	void ThymioIRButton::setMemoryState(int s)
+	{
+		memory = s;
+	}
+
+	int ThymioIRButton::getMemoryState()
+	{
+		return memory;
 	}
 
 	void ThymioIRButton::setBasename(wstring n)

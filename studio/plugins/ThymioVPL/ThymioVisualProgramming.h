@@ -54,7 +54,7 @@ namespace Aseba
 		void addColorAction();
 		void addCircleAction();	
 		void addSoundAction();
-//		void addResetAction();
+		void addMemoryAction();
 		
 		void newFile();
 		void openFile();
@@ -63,6 +63,7 @@ namespace Aseba
 		void setColorScheme(int index);
 		void run();	
 		void stop();
+		void advancedMode();
 		void closeFile();
 		
 		void recompileButtonSet();
@@ -90,6 +91,7 @@ namespace Aseba
 		QToolButton *saveAsButton;		
 		QToolButton *runButton;
 		QToolButton *stopButton;
+		QToolButton *advancedButton;
 		QComboBox *colorComboButton;
 		QToolButton *quitButton;
 

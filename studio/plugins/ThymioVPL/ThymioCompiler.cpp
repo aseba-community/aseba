@@ -105,28 +105,28 @@ namespace Aseba
 		return THYMIO_NO_ERROR;
 	}
 	
-	wstring ThymioCompiler::getErrorMessage()
-	{
-		switch(errorType)
-		{
-		case THYMIO_SYNTAX_ERROR:
-			return syntaxChecker.getErrorMessage();
-			break;
-		case THYMIO_TYPE_ERROR:
-			return typeChecker.getErrorMessage();
-			break;
-		case THYMIO_CODE_ERROR:
-			return codeGenerator.getErrorMessage();
-			break;
-		case THYMIO_NO_TYPE_ERROR:
-			return L"Compilation success.";
-			break;
-		default:
-			break;			
-		}
-		
-		return L"";		
-	}
+//	wstring ThymioCompiler::getErrorMessage()
+//	{
+//		switch(errorType)
+//		{
+//		case THYMIO_SYNTAX_ERROR:
+//			return syntaxChecker.getErrorMessage();
+//			break;
+//		case THYMIO_TYPE_ERROR:
+//			return typeChecker.getErrorMessage();
+//			break;
+//		case THYMIO_CODE_ERROR:
+//			return codeGenerator.getErrorMessage();
+//			break;
+//		case THYMIO_NO_TYPE_ERROR:
+//			return L"Compilation success.";
+//			break;
+//		default:
+//			break;			
+//		}
+//		
+//		return L"";		
+//	}
 	
 	bool ThymioCompiler::isSuccessful()
 	{

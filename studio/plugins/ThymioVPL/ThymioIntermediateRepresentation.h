@@ -21,8 +21,8 @@ namespace Aseba
 		THYMIO_MOVE_IR,
 		THYMIO_COLOR_IR,
 		THYMIO_CIRCLE_IR,
-		THYMIO_SOUND_IR
-//		THYMIO_RESET_IR
+		THYMIO_SOUND_IR,
+		THYMIO_MEMORY_IR
 	};
 	
 	enum ThymioIRErrorCode
@@ -54,6 +54,8 @@ namespace Aseba
 		int isClicked(int i);
 		int getNumStates();
 		int size();
+		void setMemoryState(int s);
+		int getMemoryState();
 
 		ThymioIRButtonName getName();
 		void setBasename(wstring n);
@@ -66,6 +68,7 @@ namespace Aseba
 
 	private:
 		vector<int> buttons;
+		int memory;
 		int numStates;
 		ThymioIRButtonName name;
 		wstring basename;
@@ -102,7 +105,7 @@ namespace Aseba
 
 		ThymioIRErrorCode getErrorCode();
 		bool isSuccessful();
-		std::wstring getErrorMessage();		
+//		std::wstring getErrorMessage();		
 		
 	protected:
 		ThymioIRErrorCode errorCode;
@@ -128,7 +131,7 @@ namespace Aseba
 		multimap<wstring, ThymioIRButton*> colorHash;
 		multimap<wstring, ThymioIRButton*> circleHash;
 		multimap<wstring, ThymioIRButton*> soundHash;
-//		multimap<wstring, ThymioIRButton*> resetHash;
+		multimap<wstring, ThymioIRButton*> memoryHash;
 
 		set<ThymioIRButtonName> tapSeenActions;
 		set<ThymioIRButtonName> clapSeenActions;
@@ -185,7 +188,7 @@ namespace Aseba
 		void swap(int row1, int row2);
 
 		ThymioIRErrorCode getErrorCode();
-		std::wstring getErrorMessage();
+//		std::wstring getErrorMessage();
 		bool isSuccessful();
 		int getErrorLine();
 		

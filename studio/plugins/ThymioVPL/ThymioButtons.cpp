@@ -145,12 +145,13 @@ namespace Aseba
 		}
 	}
 
-	ThymioButton::ThymioButton(bool eventButton, qreal scale, bool up, QGraphicsItem *parent) : 
+	ThymioButton::ThymioButton(bool eventButton, qreal scale, bool up, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsSvgItem(parent),
 		buttonColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
 		parentID(-1),
 		scaleFactor(0.5),
-		buttonIR()
+		buttonIR(),
+		trans(advanced ? 64 : 0)
 	{
 		thymioBody = new ThymioBody(this);
 		thymioBody->setUp(up);
@@ -162,6 +163,20 @@ namespace Aseba
 
 		setCursor(Qt::OpenHandCursor);
 		setAcceptedMouseButtons(Qt::LeftButton);
+		
+		if( advanced )
+		{
+			for(uint i=0; i<4; i++)
+			{
+				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
+
+				button->setPos(288, i*60 + 40);
+				button->setButtonColor(Qt::gray);
+
+				memoryButtons.push_back(button);
+				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			}
+		}
 	}
 
 	ThymioButton::~ThymioButton() 
@@ -172,8 +187,9 @@ namespace Aseba
 
 	void ThymioButton::setClicked(int i, int status)
 	{
+		qDebug() << "in thymio button set clicked";
 		if( i < thymioButtons.size()  )
-			thymioButtons.at(i)->setClicked(status);
+			thymioButtons.at(i)->setClicked(status);			
 	}
 	
 	ThymioIRButton *ThymioButton::getIRButton()
@@ -182,6 +198,8 @@ namespace Aseba
 		if( buttonIR == 0 )
 		{
 			QString name = getName();
+
+			qDebug() << "getIRButton num: " << num;
 
 			if( name == "button" )
 				buttonIR = new ThymioIRButton(num, THYMIO_BUTTONS_IR, 2);
@@ -194,29 +212,46 @@ namespace Aseba
 			else if( name == "clap" )
 				buttonIR = new ThymioIRButton(num, THYMIO_CLAP_IR, 0);
 			else if( name == "move" )
-				buttonIR = new ThymioIRButton(num, THYMIO_MOVE_IR, 2);
+				buttonIR = new ThymioIRButton(num, THYMIO_MOVE_IR, 0);
 			else if( name == "color" )
-				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR, 2);
+				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR, 0);
 			else if( name == "circle" )
 				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR, 5);
 			else if( name == "sound" )
 				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR, 2);
-//			else if( name == "reset" )
-//				buttonIR = new ThymioIRButton(num, THYMIO_RESET_IR);
+			else if( name == "memory" )
+				buttonIR = new ThymioIRButton(num, THYMIO_MEMORY_IR);
 
 			buttonIR->setBasename(name.toStdWString());
 		}
 
 		for(int i=0; i<num; ++i)
 			buttonIR->setClicked(i, isClicked(i));
-			
+
+		if( !memoryButtons.empty() )
+		{
+			int val=0;
+			for(int i=0; i<memoryButtons.size(); ++i)
+				val += (memoryButtons[i]->isClicked()*(0x01<<i));
+			buttonIR->setMemoryState(val);
+		}
+		
 		return buttonIR;
 	}
 
 	void ThymioButton::updateIRButton()
-	{
+	{ 
 		for(int i=0; i<getNumButtons(); ++i) 
 			buttonIR->setClicked(i, isClicked(i));
+
+		if( !memoryButtons.empty() )
+		{
+			int val=0;
+			for(int i=0; i<memoryButtons.size(); ++i)
+				val += (memoryButtons[i]->isClicked()*(0x01<<i));
+			buttonIR->setMemoryState(val);
+		} else
+			buttonIR->setMemoryState(-1);		
 		
 		emit stateChanged();
 	}
@@ -235,10 +270,12 @@ namespace Aseba
 	
 	QPixmap ThymioButton::image(bool on)
 	{
-		QPixmap pixmap(256, 256);
-		pixmap.fill(buttonColor);
+		QPixmap pixmap(256+trans, 256);
+		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
 		painter.setRenderHint(QPainter::Antialiasing);
+		painter.setBrush(buttonColor);
+		painter.drawRoundedRect(0,0,256,256,5,5);
 
 		int state[getNumButtons()];
 		if(on)
@@ -266,12 +303,20 @@ namespace Aseba
 			painter.resetTransform();
 		}
 
+		for(QList<ThymioClickableButton*>::iterator itr = memoryButtons.begin();
+			itr != memoryButtons.end(); ++itr)
+		{			
+			painter.translate((*itr)->pos());
+			(*itr)->paint(&painter, 0, 0);
+			painter.resetTransform();
+		}
+
 		if(on)
 			for(int i=0; i<getNumButtons(); ++i)
 				thymioButtons.at(i)->setClicked(state[i]);
 				
 		if( renderer() ) 
-			renderer()->render(&painter); 
+			renderer()->render(&painter, QRectF(0,0,256,256)); 
 
 		return pixmap;
 	}
@@ -288,7 +333,36 @@ namespace Aseba
 				
 		return false;
 	}
-		
+
+	void ThymioButton::setAdvanced(bool advanced)
+	{
+		if( advanced && memoryButtons.empty() )
+		{
+			for(int i=0; i<4; i++)
+			{
+				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
+
+				button->setPos(288, i*60 + 40);
+				button->setButtonColor(Qt::gray);
+
+				memoryButtons.push_back(button);
+				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			}
+		}
+		trans = advanced ? 64 : 0;		
+		updateIRButton();		
+		//		else if( !advanced && !memoryButtons.empty() )
+//		{
+//			for(int i=0; i<memoryButtons.size(); i++)
+//			{
+//				disconnect(memoryButtons[i], SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+//				memoryButtons[i]->setParentItem(0);
+//				delete(memoryButtons[i]);
+//			}
+//			memoryButtons.clear();
+//		}
+	}
+
 	void ThymioButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
 		setCursor(Qt::ClosedHandCursor);
@@ -308,9 +382,8 @@ namespace Aseba
 		QDataStream dataStream(&buttonData, QIODevice::WriteOnly);
 		dataStream << parentID << getName() << getNumButtons();
 		
-		for(QList<ThymioClickableButton*>::iterator itr=thymioButtons.begin();
-			itr!=thymioButtons.end(); ++itr)
-			dataStream << (*itr)->isClicked();			
+		for(int i=0; i<getNumButtons(); i++)
+			dataStream << isClicked(i);	
 
 		QMimeData *mime = new QMimeData;
 		mime->setData("thymiobutton", buttonData);
@@ -325,11 +398,11 @@ namespace Aseba
 			mime->setData("thymiorenderer", rendererData);
 		}
 		
-		QDrag *drag = new QDrag(event->widget());		
+		QDrag *drag = new QDrag(event->widget());
 		QPixmap img = image(false);		
 		drag->setMimeData(mime);
-		drag->setPixmap(img.scaled(256*scaleFactor, 256*scaleFactor));
-		drag->setHotSpot(QPoint(256*scaleFactor, 256*scaleFactor));
+		drag->setPixmap(img.scaled((256+trans)*scaleFactor, 256*scaleFactor));
+		drag->setHotSpot(QPoint((256+trans)*scaleFactor, 256*scaleFactor));
 
 		if (drag->exec(Qt::MoveAction | Qt::CopyAction , Qt::CopyAction) == Qt::MoveAction)
 			parentID = -1;
@@ -406,7 +479,7 @@ namespace Aseba
 		painter->drawLine(0,-16,0,16);
 	}
 
-	ThymioButtonSet::ThymioButtonSet(int row, QGraphicsItem *parent) : 
+	ThymioButtonSet::ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		eventButton(0),
 		actionButton(0),
@@ -415,16 +488,18 @@ namespace Aseba
 		errorFlag(false),
 		eventButtonColor(QColor(0,191,255)),
 		actionButtonColor(QColor(218,112,214)),
-		buttonSetIR()	
+		buttonSetIR(),
+		advancedMode(advanced),
+		trans(advanced ? 64 : 0)
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
 		
 		deleteButton = new ThymioRemoveButton(this);
-		deleteButton->setPos(896, 168);
-		
 		addButton = new ThymioAddButton(this);
-		addButton->setPos(500, 368);
+		
+		deleteButton->setPos(896+trans, 168);
+		addButton->setPos(500+trans, 368);
 		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -444,20 +519,20 @@ namespace Aseba
 
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(255, 196, 180, alpha));		
-		painter->drawRoundedRect(0, 0, 1000, 336, 5, 5);
+		painter->drawRoundedRect(0, 0, 1000+trans, 336, 5, 5);
 
 		painter->setBrush(QColor(167, 151, 128, alpha));
-		painter->drawRect(340, 143, 55, 55);
+		painter->drawRect(340 + trans, 143, 55, 55);
 
 		QPointF pts[3];
-		pts[0] = QPointF(394.5, 118);
-		pts[1] = QPointF(394.5, 218);
-		pts[2] = QPointF(446, 168);
+		pts[0] = QPointF(394.5+trans, 118);
+		pts[1] = QPointF(394.5+trans, 218);
+		pts[2] = QPointF(446+trans, 168);
 		painter->drawPolygon(pts, 3);
 
-		painter->setPen(errorFlag ? Qt::black : Qt::gray);		
+		painter->setPen(errorFlag ? Qt::black : Qt::gray);
 		painter->setFont(QFont("Arial", 30));
-		painter->drawText(QRect(800, 20, 180, 40), Qt::AlignRight, QString("%0").arg(getRow()));
+		painter->drawText(QRect(800+trans, 20, 180, 40), Qt::AlignRight, QString("%0").arg(getRow()));
 
 		if( eventButton && eventButton->getParentID() < 0 ) 
 		{
@@ -494,7 +569,7 @@ namespace Aseba
 			if( !highlightActionButton /* || !hasFocus() */ ) actionButtonColor.setAlpha(50);	
 			painter->setPen(QPen(actionButtonColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
-			painter->drawRoundedRect(505, 45, 246, 246, 5, 5);
+			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
 			actionButtonColor.setAlpha(255);	
 		}
 
@@ -551,7 +626,7 @@ namespace Aseba
 		}
 		
 		action->setButtonColor(actionButtonColor);
-		action->setPos(500, 40);
+		action->setPos(500+trans, 40);
 		action->setScaleFactor(scale());
 		action->setEnabled(true);
 		action->setParentItem(this);
@@ -574,6 +649,22 @@ namespace Aseba
 		if( actionButton )
 			actionButton->setScaleFactor(factor);
 	}
+	
+	void ThymioButtonSet::setAdvanced(bool advanced)
+	{
+		advancedMode = advanced;
+		if( eventButton )
+			eventButton->setAdvanced(advanced);
+					
+		trans = advanced ? 64 : 0;
+		deleteButton->setPos(896+trans, 168);
+		addButton->setPos(500+trans/2, 368);
+		
+		if( actionButton )
+			actionButton->setPos(500+trans, 40);
+				
+		update();
+	}
 
 	void ThymioButtonSet::stateChanged()
 	{
@@ -582,7 +673,7 @@ namespace Aseba
 	
 	QPixmap ThymioButtonSet::image()
 	{
-		QPixmap pixmap(1000, 336);
+		QPixmap pixmap(advancedMode? 1064 : 1000, 336);
 		pixmap.fill();
 		QPainter painter(&pixmap);
 		painter.setRenderHint(QPainter::Antialiasing);	
@@ -685,14 +776,14 @@ namespace Aseba
 				bool eventButtonFlag = true;
 
 				if ( buttonName == "button" )
-					button = new ThymioButtonsEvent();
+					button = new ThymioButtonsEvent(0,advancedMode);
 				else if ( buttonName == "prox" )
-					button = new ThymioProxEvent();
+					button = new ThymioProxEvent(0,advancedMode);
 				else if ( buttonName == "proxground" )
-					button = new ThymioProxGroundEvent();
+					button = new ThymioProxGroundEvent(0,advancedMode);
 				else if ( buttonName == "tap" )
 				{					
-					button = new ThymioTapEvent();
+					button = new ThymioTapEvent(0,advancedMode);
 					QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 					QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
 					quint64 location;
@@ -703,7 +794,7 @@ namespace Aseba
 				}
 				else if ( buttonName == "clap" )
 				{
-					button = new ThymioClapEvent();
+					button = new ThymioClapEvent(0,advancedMode);
 					QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 					QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
 					quint64 location;
@@ -720,35 +811,37 @@ namespace Aseba
 					button = new ThymioCircleAction();
 				else if ( buttonName == "sound" )			
 					button = new ThymioSoundAction();
-//				else if ( buttonName == "reset" )
-//					button = new ThymioResetAction();
-				
-				qDebug() << "  == TBS -- drop event : created " << buttonName << " button.";
-				
+				else if( buttonName == "memory" )
+					button = new ThymioMemoryAction();
+							
+				qDebug() << "  == TBS -- drop event : created " << buttonName << " button, # " << numButtons;
+
 				if( button ) 
+				{
+					event->setDropAction(Qt::MoveAction);
+					event->accept();
+					
+					qDebug() << "  == TBS -- drop event : accepted the button.";
+					
+					if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
+					{
+						addEventButton(button);
+						highlightEventButton = false;
+					}
+					else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
+					{
+						addActionButton(button);
+						highlightActionButton = false;
+					}
+					
 					for( int i=0; i<numButtons; ++i ) 
 					{
 						int status;
-						dataStream >> status;					
+						dataStream >> status;	
 						button->setClicked(i, status);
 					}
 
-				event->setDropAction(Qt::MoveAction);
-				event->accept();
-				
-				qDebug() << "  == TBS -- drop event : accepted the button.";
-				
-				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
-				{
-					addEventButton(button);
-					highlightEventButton = false;
 				}
-				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
-				{
-					addActionButton(button);
-					highlightActionButton = false;
-				}
-
 				qDebug() << "  == TBS -- drop event : added the button.";
 			}
 			
@@ -782,8 +875,8 @@ namespace Aseba
 		QDrag *drag = new QDrag(event->widget());		
 		QPixmap img = image();
 		drag->setMimeData(mime);
-		drag->setPixmap(img.scaled(1000*scale(),336*scale()));
-		drag->setHotSpot(QPoint(500*scale(), 168*scale()));
+		drag->setPixmap(img.scaled((1000+trans)*scale(),336*scale()));
+		drag->setHotSpot(QPoint((500+trans*0.5)*scale(), 168*scale()));
 
 		drag->exec(Qt::MoveAction);
 		setCursor(Qt::OpenHandCursor);
@@ -819,16 +912,17 @@ namespace Aseba
 			thymioButton = new ThymioCircleAction();
 		else if( name == "sound" )
 			thymioButton = new ThymioSoundAction();
-//		else if( name == "reset" )
-//			thymioButton = new ThymioResetAction();
+		else if( name == "memory" )
+			thymioButton = new ThymioMemoryAction();
 
 		if( renderer )
 			thymioButton->setSharedRenderer(renderer);		
+
+		setIcon(thymioButton->image()); 
+		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		
 		setMinimumSize(64,64);
 		setMaximumSize(256,256);
-		setIcon(thymioButton->image()); 
-		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		setIconSize(QSize(128,128));
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		

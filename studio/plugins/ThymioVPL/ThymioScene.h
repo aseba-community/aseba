@@ -25,6 +25,8 @@ namespace Aseba
 		bool isModified() { return sceneModified; }
 		void setModified(bool mod) { sceneModified=mod; }
 		void setScale(qreal scale);
+		void setAdvanced(bool advanced);
+		bool getAdvanced() { return advancedMode; }
 		int getNumberOfButtonSets() { return buttonSets.size(); }
 		
 		QString getErrorMessage();
@@ -70,6 +72,7 @@ namespace Aseba
 		double scaleFactor;
 		bool newRow;
 		qreal buttonSetHeight;
+		bool advancedMode;
 	};
 };
 

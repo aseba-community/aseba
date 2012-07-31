@@ -50,5 +50,6 @@
 	<file>images/fileopen.svgz</file>
 	<file>images/exit.svgz</file>
 	<file>images/stop1.png</file>
+	<file>images/run.png</file>
 </qresource>
 </RCC>

@@ -21,9 +21,10 @@ namespace Aseba
 		sceneModified(false),
 		scaleFactor(0.5),
 		thymioCompiler(),
-		newRow(false)
+		newRow(false),
+		advancedMode(false)
 	{
-		ThymioButtonSet *button = new ThymioButtonSet(0);
+		ThymioButtonSet *button = new ThymioButtonSet(0, advancedMode);
 		button->setScale(scaleFactor);
 		button->setPos(20, 20);
 		buttonSets.push_back(button);
@@ -153,7 +154,7 @@ namespace Aseba
 	{
 		qDebug() << "ThymioScene -- create new button set " << buttonSets.size();
 		
-		ThymioButtonSet *button = new ThymioButtonSet(buttonSets.size());
+		ThymioButtonSet *button = new ThymioButtonSet(buttonSets.size(), advancedMode);
 		button->setColorScheme(eventButtonColor, actionButtonColor);
 		button->setScale(scaleFactor);
 		buttonSets.push_back(button);
@@ -184,7 +185,9 @@ namespace Aseba
 	void ThymioScene::reset()
 	{
 		qDebug() << "ThymioScene -- reset " << buttonSets.size();
-		
+
+		setAdvanced(false); // must be before clear();
+				
 		clear();
 
 		ThymioButtonSet *button = createNewButtonSet();
@@ -230,6 +233,15 @@ namespace Aseba
 		sceneModified = true;
 	}
 
+	void ThymioScene::setAdvanced(bool advanced)
+	{
+		advancedMode = advanced;
+		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
+			(*itr)->setAdvanced(advanced);
+		
+		buttonUpdateDetected();
+	}
+
 	void ThymioScene::removeButton(int row)
 	{
 		qDebug() << "ThymioScene -- remove button " << row << ", " << buttonSets.size();
@@ -270,7 +282,7 @@ namespace Aseba
 		qDebug() << "ThymioScene -- insert button " << row << ", " << buttonSets.size();		
 		Q_ASSERT( row <= buttonSets.size() );
 
-		ThymioButtonSet *button = new ThymioButtonSet(row);
+		ThymioButtonSet *button = new ThymioButtonSet(row, advancedMode);
 		button->setColorScheme(eventButtonColor, actionButtonColor);
 		button->setScale(scaleFactor);
 		buttonSets.insert(row, button);
@@ -429,14 +441,14 @@ namespace Aseba
 			bool eventButtonFlag = true;
 
 			if ( buttonName == "button" )
-				button = new ThymioButtonsEvent();
+				button = new ThymioButtonsEvent(0, advancedMode);
 			else if ( buttonName == "prox" )
-				button = new ThymioProxEvent();
+				button = new ThymioProxEvent(0, advancedMode);
 			else if ( buttonName == "proxground" )
-				button = new ThymioProxGroundEvent();
+				button = new ThymioProxGroundEvent(0, advancedMode);
 			else if ( buttonName == "tap" )
 			{
-				button = new ThymioTapEvent();
+				button = new ThymioTapEvent(0, advancedMode);
 				QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 				QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
 				quint64 location;
@@ -447,7 +459,7 @@ namespace Aseba
 			}
 			else if ( buttonName == "clap" )
 			{
-				button = new ThymioClapEvent();
+				button = new ThymioClapEvent(0, advancedMode);
 				QByteArray rendererData = event->mimeData()->data("thymiorenderer");
 				QDataStream rendererStream(&rendererData, QIODevice::ReadOnly);
 				quint64 location;
@@ -464,22 +476,31 @@ namespace Aseba
 				button = new ThymioCircleAction();
 			else if ( buttonName == "sound" )			
 				button = new ThymioSoundAction();
-//			else if ( buttonName == "reset" )
-//				button = new ThymioResetAction();
-							
-			event->setDropAction(Qt::MoveAction);
-			event->accept();
-			
-			lastFocus = -1;
-			prevNewActionButton = false;			
-			prevNewEventButton = false;
-			newRow = true;
-			
-			if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
-				addEvent(button);
-			else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
-				addAction(button);
+			else if ( buttonName == "memory" )
+				button = new ThymioMemoryAction();
+
+			if( button ) 
+			{			
+				event->setDropAction(Qt::MoveAction);
+				event->accept();
 				
+				lastFocus = -1;
+				prevNewActionButton = false;
+				prevNewEventButton = false;
+				newRow = true;
+				
+				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
+					addEvent(button);
+				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
+					addAction(button);
+
+				for( int i=0; i<numButtons; ++i ) 
+				{
+					int status;
+					dataStream >> status;	
+					button->setClicked(i, status);
+				}
+			}
 			qDebug() << "  == done";
 		}
 		else

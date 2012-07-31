@@ -47,7 +47,8 @@ namespace Aseba
 		runButton = new QToolButton();
 		stopButton = new QToolButton();	
 		colorComboButton = new QComboBox();
-		quitButton = new QToolButton();
+		advancedButton = new QToolButton();
+		quitButton = new QToolButton();		
 
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
@@ -71,6 +72,9 @@ namespace Aseba
 		setColors(colorComboButton);
 		colorComboButton->setIconSize(QSize(64,32));
 
+		advancedButton->setIcon(QIcon(":/images/run.png"));
+		advancedButton->setToolTip(tr("Advanced mode"));
+
 		quitButton->setIcon(QIcon(":/images/exit.svgz"));
 		quitButton->setToolTip(tr("Quit"));
 			
@@ -84,6 +88,8 @@ namespace Aseba
 		toolBar->addSeparator();
 		toolBar->addWidget(colorComboButton);
 		toolBar->addSeparator();
+		toolBar->addWidget(advancedButton);
+		toolBar->addSeparator();
 		toolBar->addWidget(quitButton);
 		
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
@@ -94,7 +100,7 @@ namespace Aseba
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-
+		connect(advancedButton, SIGNAL(clicked()), this, SLOT(advancedMode()));
 		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
@@ -166,14 +172,14 @@ namespace Aseba
 		ThymioPushButton *colorButton = new ThymioPushButton("color");
 		ThymioPushButton *circleButton = new ThymioPushButton("circle");
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
-//		ThymioPushButton *resetButton = new ThymioPushButton("reset");
+		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 								
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
 		actionButtons.push_back(soundButton);
-//		actionButtons.push_back(resetButton);
+		actionButtons.push_back(memoryButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
@@ -181,7 +187,9 @@ namespace Aseba
 		actionsLayout->addWidget(colorButton);
 		actionsLayout->addWidget(circleButton);
 		actionsLayout->addWidget(soundButton);
-//		actionsLayout->addWidget(resetButton);
+		actionsLayout->addWidget(memoryButton);
+		
+		memoryButton->hide(); // memory
 
 		horizontalLayout->addLayout(actionsLayout);
 		
@@ -196,7 +204,7 @@ namespace Aseba
 		connect(colorButton, SIGNAL(clicked()), this, SLOT(addColorAction()));	
 		connect(circleButton, SIGNAL(clicked()), this, SLOT(addCircleAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
-//		connect(resetButton, SIGNAL(clicked()), this, SLOT(addResetAction()));
+		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
 	}	
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
@@ -282,7 +290,10 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
-		close();
+		advancedButton->setEnabled(true);
+		actionButtons.last()->hide(); // memory button
+		scene->reset();
+		close();		
 	}
 	
 //	bool ThymioVisualProgramming::surviveTabDestruction() const 
@@ -348,6 +359,8 @@ namespace Aseba
 		if( scene->isEmpty() || warningDialog() ) 
 		{
 			scene->reset();
+			advancedButton->setEnabled(true);
+			actionButtons.last()->hide(); // memory button
 			close();
 		}
 	}
@@ -376,11 +389,20 @@ namespace Aseba
 		InvasivePlugin::stop();
 	}
 	
+	void ThymioVisualProgramming::advancedMode()
+	{
+		advancedButton->setEnabled(false);
+		actionButtons.last()->show(); // memory button
+		scene->setAdvanced(true);
+	}
+	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if ( scene->isEmpty() || warningDialog() )
 		{
 			scene->reset();
+			advancedButton->setEnabled(true);
+			actionButtons.last()->hide(); // memory button
 			close();
 		}
 		else
@@ -615,28 +637,28 @@ namespace Aseba
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ThymioButtonsEvent *button = new ThymioButtonsEvent();
+		ThymioButtonsEvent *button = new ThymioButtonsEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ThymioProxEvent *button = new ThymioProxEvent();
+		ThymioProxEvent *button = new ThymioProxEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ThymioProxGroundEvent *button = new ThymioProxGroundEvent();
+		ThymioProxGroundEvent *button = new ThymioProxGroundEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		ThymioTapEvent *button = new ThymioTapEvent();
+		ThymioTapEvent *button = new ThymioTapEvent(0, scene->getAdvanced());
 		button->setSharedRenderer(tapSvg);
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
@@ -644,7 +666,7 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ThymioClapEvent *button = new ThymioClapEvent();
+		ThymioClapEvent *button = new ThymioClapEvent(0, scene->getAdvanced());
 		button->setSharedRenderer(clapSvg);
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
@@ -678,12 +700,12 @@ namespace Aseba
 		view->centerOn(scene->addAction(button));
 	}
 
-//	void ThymioVisualProgramming::addResetAction()
-//	{
-//		ThymioResetAction *button = new ThymioResetAction();
-//		scene->setFocus();
-//		view->centerOn(scene->addAction(button));
-//	}
+	void ThymioVisualProgramming::addMemoryAction()
+	{
+		ThymioMemoryAction *button = new ThymioMemoryAction();
+		scene->setFocus();
+		view->centerOn(scene->addAction(button));
+	}
 		
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{

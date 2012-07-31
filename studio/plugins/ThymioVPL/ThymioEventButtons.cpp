@@ -7,8 +7,8 @@
 namespace Aseba
 {
 	// Buttons Event
-	ThymioButtonsEvent::ThymioButtonsEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, true, parent)
+	ThymioButtonsEvent::ThymioButtonsEvent(QGraphicsItem *parent, bool advanced) : 
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{	
 		setData(0, "event");
 		setData(1, "button");
@@ -37,8 +37,8 @@ namespace Aseba
 	}
 			
 	// Prox Event
-	ThymioProxEvent::ThymioProxEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, true, parent)
+	ThymioProxEvent::ThymioProxEvent(QGraphicsItem *parent, bool advanced) : 
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "prox");
@@ -73,8 +73,8 @@ namespace Aseba
 	}
 	
 	// Prox Ground Event
-	ThymioProxGroundEvent::ThymioProxGroundEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, false, parent)
+	ThymioProxGroundEvent::ThymioProxGroundEvent( QGraphicsItem *parent, bool advanced ) : 
+		ThymioButton(true, 1.0, false, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "proxground");
@@ -84,7 +84,7 @@ namespace Aseba
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 
 			button->setPos(QPointF(98 + i*60, 40));
-			button->setButtonColor(Qt::green);
+			button->setButtonColor(Qt::red);
 			
 			thymioButtons.push_back(button);
 			
@@ -93,8 +93,8 @@ namespace Aseba
 	}	
 			
 	// Tap Event
-	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent ) :
-		ThymioButton(true, 1.0, true, parent)
+	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent, bool advanced ) :
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "tap");
@@ -105,8 +105,8 @@ namespace Aseba
 	
 	
 	// Clap Event
-	ThymioClapEvent::ThymioClapEvent( QGraphicsItem *parent ) :
-		ThymioButton(true, 1.0, true, parent)
+	ThymioClapEvent::ThymioClapEvent( QGraphicsItem *parent, bool advanced ) :
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{		
 		setData(0, "event");		
 		setData(1, "clap");
