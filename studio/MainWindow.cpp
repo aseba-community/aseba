@@ -1872,6 +1872,7 @@ namespace Aseba
 			Q_ASSERT(tab);
 			tab->linenumbers->showLineNumbers(state);
 		}
+		ConfigDialog::setShowLineNumbers(state);
 	}
 	
 	void MainWindow::goToLine()
@@ -1969,6 +1970,7 @@ namespace Aseba
 				tab->updateHidden();
 			}
 		}
+		ConfigDialog::setShowHidden(show);
 	}
 
 	void MainWindow::showKeywords(bool show) // Jiwon
@@ -1979,6 +1981,7 @@ namespace Aseba
 			if (tab)
 				tab->showKeywords(show);
 		}
+		ConfigDialog::setShowKeywordToolbar(show);
 	}
 
 	void MainWindow::clearAllExecutionError()
@@ -2233,6 +2236,7 @@ namespace Aseba
 			if (tab)
 				tab->showMemoryUsage(show);
 		}
+		ConfigDialog::setShowMemoryUsage(show);
 	}
 	
 	void MainWindow::addEventNameClicked()
@@ -3115,7 +3119,7 @@ namespace Aseba
 		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
 		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
 		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(ConfigDialog::getStartupShowLineNumbers());
+		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
@@ -3197,7 +3201,7 @@ namespace Aseba
 		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
 		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
 		showMemoryUsageAct->setCheckable(true);
-		showMemoryUsageAct->setChecked(ConfigDialog::getStartupShowMemoryUsage());
+		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
 		toolMenu->addAction(showMemoryUsageAct);
 		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 		toolMenu->addSeparator();
@@ -3213,14 +3217,14 @@ namespace Aseba
 		menuBar()->addMenu(settingsMenu);
 		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
 		showHiddenAct->setCheckable(true);
-		showHiddenAct->setChecked(ConfigDialog::getStartupShowHidden());
-		showHidden(ConfigDialog::getStartupShowHidden());
+		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
+		showHidden(ConfigDialog::getShowHidden());
 		settingsMenu->addAction(showHiddenAct);
 		
 		// Jiwon
 		showKeywordsAct = new QAction(tr("Show &keywords"), this);
 		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(ConfigDialog::getStartupShowKeywordToolbar());
+		showKeywordsAct->setChecked(ConfigDialog::getShowKeywordToolbar());
 		settingsMenu->addAction(showKeywordsAct);
 		
 		// Help menu

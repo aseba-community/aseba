@@ -29,11 +29,16 @@
 #define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
 
 #define CONFIG_PROPERTY_CHECKBOX_HANDLER(name, page, keyword) \
-	const bool ConfigDialog::name() { \
+	const bool ConfigDialog::get##name() { \
 		if (me) \
 			return me->page->checkboxCache[#keyword].value; \
 		else \
 			return false; \
+	} \
+	\
+	void ConfigDialog::set##name(bool value) { \
+		if (me) \
+			me->page->checkboxCache[#keyword].value = value; \
 	}
 
 
@@ -42,11 +47,11 @@
 
 namespace Aseba
 {
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowLineNumbers,	generalpage,	showlinenumbers		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowHidden,		generalpage,	showhidden		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowKeywordToolbar,	generalpage,	keywordToolbar		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowMemoryUsage,	generalpage,	memoryusage		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getAutoCompletion,		editorpage,	autoKeyword		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers,	generalpage,	showlinenumbers		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden,		generalpage,	showhidden		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar,	generalpage,	keywordToolbar		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage,	generalpage,	memoryusage		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(AutoCompletion,		editorpage,	autoKeyword		)
 
 	/*** ConfigPage ***/
 	ConfigPage::ConfigPage(QString title, QWidget *parent):
@@ -137,7 +142,7 @@ namespace Aseba
 	GeneralPage::GeneralPage(QWidget *parent):
 		ConfigPage(tr("General Setup"), parent)
 	{
-		QGroupBox* gb1 = new QGroupBox(tr("On startup"));
+		QGroupBox* gb1 = new QGroupBox(tr("Layout"));
 		QVBoxLayout* gb1layout = new QVBoxLayout();
 		gb1->setLayout(gb1layout);
 		mainLayout->addWidget(gb1);
@@ -221,6 +226,7 @@ namespace Aseba
 	void ConfigDialog::showConfig()
 	{
 		me->setModal(true);
+		me->reject();	// hack to reload values from cache
 		me->show();
 
 	}

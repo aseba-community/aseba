@@ -28,7 +28,9 @@
 #include <map>
 
 #define CONFIG_PROPERTY_CHECKBOX_DECLARE(name) \
-	static const bool name(void);
+public: \
+	static const bool get##name(void); \
+	static void set##name(bool);
 
 namespace Aseba
 {
@@ -48,13 +50,13 @@ namespace Aseba
 		static void showConfig();
 
 		// access to properties
-		// startup properties
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowHidden)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowLineNumbers)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowKeywordToolbar)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowMemoryUsage)
+		// layout properties
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowHidden)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowLineNumbers)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowKeywordToolbar)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowMemoryUsage)
 		// autocompletion behaviour
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getAutoCompletion)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(AutoCompletion)
 
 	protected:
 		ConfigDialog(QWidget* parent = 0);
