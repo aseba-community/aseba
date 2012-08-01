@@ -24,13 +24,22 @@ import os.path
 import sys
 from string import Template
 import re
+import subprocess
 
 INPUT_DIRECTORY = '.'
 INPUT_FILE = 'errors.cpp'
+
 OUTPUT_CODE_FILE = 'errors_code.h'
 OUTPUT_CODE_DIRECTORY = INPUT_DIRECTORY
+
 OUTPUT_QT_FILE = 'CompilerTranslator.cpp'
 OUTPUT_QT_DIRECTORY = '../studio'
+
+OUTPUT_TRANSLATION_DIRECTORY = '../studio'
+translation_files = list()
+translation_files.append(['french', 'fr', 'compiler_fr.ts'])
+translation_files.append(['german', 'de', 'compiler_de.ts'])
+translation_files.append(['spanish', 'es', 'compiler_es.ts'])
 
 comment_regexp = re.compile(r'\A\s*// (.*)')
 error_regexp = re.compile(r'error_map\[(.*?)\]\s*=\s*L"(.*?)";')
@@ -171,3 +180,19 @@ except:
 fh.write(result)
 fh.close()
 print "Done!"
+
+# update translation files
+for translation in translation_files:
+    translation_name = translation[0]
+    translation_code = translation[1]
+    translation_file = translation[2]
+    answer = raw_input("Do you want to update " + translation_name + " [" + translation_code + "] translation file (" + translation_file + ")? [y/n] ")
+    if answer == 'y' or answer == 'Y':
+        print "Updating " + translation_file + "..."
+        file1 = os.path.join(OUTPUT_QT_DIRECTORY, OUTPUT_QT_FILE)
+        file2 = os.path.join(OUTPUT_TRANSLATION_DIRECTORY, translation_file)
+        cmd = "lupdate-qt4 " + file1 + " -ts " + file2
+        print "> " + cmd
+        subprocess.call(cmd, shell=True)
+    else:
+        print "Skipping..."
