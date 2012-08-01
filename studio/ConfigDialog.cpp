@@ -146,14 +146,14 @@ namespace Aseba
 		QVBoxLayout* gb1layout = new QVBoxLayout();
 		gb1->setLayout(gb1layout);
 		mainLayout->addWidget(gb1);
-		// Show hidden variables & functions
-		gb1layout->addWidget(newCheckbox(tr("Show hidden variables"), "showhidden", false));
-		// Show line numbers
-		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 		// Show the keyword toolbar
 		gb1layout->addWidget(newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true));
 		// Show the memory usage gauge
 		gb1layout->addWidget(newCheckbox(tr("Show memory usage"), "memoryusage", false));
+		// Show hidden variables & functions
+		gb1layout->addWidget(newCheckbox(tr("Show hidden variables"), "showhidden", false));
+		// Show line numbers
+		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 
 		mainLayout->addStretch();
 	}
