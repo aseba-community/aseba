@@ -83,31 +83,31 @@ namespace Aseba
 				break;
 
 			case ERROR_UNBALANCED_COMMENT_BLOCK:
-				msg = tr("Unbalanced comment block.");
+				msg = tr("Unbalanced comment block");
 				break;
 
 			case ERROR_SYNTAX:
-				msg = tr("syntax error");
+				msg = tr("Syntax error");
 				break;
 
 			case ERROR_INVALID_IDENTIFIER:
-				msg = tr("identifiers must begin with _ or an alphanumeric character, found unicode character 0x%0 instead");
+				msg = tr("Identifiers must begin with _ or an alphanumeric character, found unicode character 0x%0 instead");
 				break;
 
 			case ERROR_INVALID_HEXA_NUMBER:
-				msg = tr("error in hexadecimal number");
+				msg = tr("Error in hexadecimal number");
 				break;
 
 			case ERROR_INVALID_BINARY_NUMBER:
-				msg = tr("error in binary number");
+				msg = tr("Error in binary number");
 				break;
 
 			case ERROR_NUMBER_INVALID_BASE:
-				msg = tr("error in number, invalid base");
+				msg = tr("Error in number, invalid base");
 				break;
 
 			case ERROR_IN_NUMBER:
-				msg = tr("error in number");
+				msg = tr("Error in number");
 				break;
 
 			case ERROR_INTERNAL:
@@ -207,7 +207,7 @@ namespace Aseba
 				break;
 
 			case ERROR_INDEX_WRONG_END:
-				msg = tr("end of range index must be lower or equal to start of range index");
+				msg = tr("End of range index must be lower or equal to start of range index");
 				break;
 
 			case ERROR_SIZE_IS_NEGATIVE:
@@ -271,11 +271,11 @@ namespace Aseba
 				break;
 
 			case ERROR_DIVISION_BY_ZERO:
-				msg = tr("Division by zero.");
+				msg = tr("Division by zero");
 				break;
 
 			case ERROR_ABS_NOT_POSSIBLE:
-				msg = tr("-32768 has no positive correspondance in 16 bits integers.");
+				msg = tr("-32768 has no positive correspondance in 16 bits integers");
 				break;
 
 			case ERROR_ARRAY_OUT_OF_BOUND_READ:
@@ -507,7 +507,7 @@ namespace Aseba
 				break;
 
 			case ERROR_TOKEN_OP_PLUS_PLUS:
-				msg = tr("++ (plus) plus");
+				msg = tr("++ (plus plus)");
 				break;
 
 			case ERROR_TOKEN_OP_MINUS_MINUS:

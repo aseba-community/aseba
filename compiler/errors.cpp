@@ -51,13 +51,13 @@ namespace Aseba
 		// lexer.cpp
 		error_map[ERROR_LINE] =					L"Line: ";
 		error_map[ERROR_COL] =					L" Col: ";
-		error_map[ERROR_UNBALANCED_COMMENT_BLOCK] =		L"Unbalanced comment block.";
-		error_map[ERROR_SYNTAX] =				L"syntax error";
-		error_map[ERROR_INVALID_IDENTIFIER] =			L"identifiers must begin with _ or an alphanumeric character, found unicode character 0x%0 instead";
-		error_map[ERROR_INVALID_HEXA_NUMBER] =			L"error in hexadecimal number";
-		error_map[ERROR_INVALID_BINARY_NUMBER] =		L"error in binary number";
-		error_map[ERROR_NUMBER_INVALID_BASE] =			L"error in number, invalid base";
-		error_map[ERROR_IN_NUMBER] =				L"error in number";
+		error_map[ERROR_UNBALANCED_COMMENT_BLOCK] =		L"Unbalanced comment block";
+		error_map[ERROR_SYNTAX] =				L"Syntax error";
+		error_map[ERROR_INVALID_IDENTIFIER] =			L"Identifiers must begin with _ or an alphanumeric character, found unicode character 0x%0 instead";
+		error_map[ERROR_INVALID_HEXA_NUMBER] =			L"Error in hexadecimal number";
+		error_map[ERROR_INVALID_BINARY_NUMBER] =		L"Error in binary number";
+		error_map[ERROR_NUMBER_INVALID_BASE] =			L"Error in number, invalid base";
+		error_map[ERROR_IN_NUMBER] =				L"Error in number";
 		// parser.cpp
 		error_map[ERROR_INTERNAL] =				L"Internal compiler error, please report a bug containing the source which triggered this error";
 		error_map[ERROR_EXPECTING] =				L"Expecting %0, found %1 instead";
@@ -83,7 +83,7 @@ namespace Aseba
 		error_map[ERROR_EVENT_WRONG_ARG_SIZE] =			L"Event %0 needs an array of size %1, but one of size %2 is passed";
 		error_map[ERROR_SUBROUTINE_ALREADY_DEF] =		L"Subroutine %0 is already defined";
 		error_map[ERROR_INDEX_EXPECTING_CONSTANT] =		L"Expecting a constant expression as a second index";
-		error_map[ERROR_INDEX_WRONG_END] =			L"end of range index must be lower or equal to start of range index";
+		error_map[ERROR_INDEX_WRONG_END] =			L"End of range index must be lower or equal to start of range index";
 		error_map[ERROR_SIZE_IS_NEGATIVE] =			L"Array size: result is negative (%0)";
 		error_map[ERROR_SIZE_IS_NULL] =				L"Array size: result is null";
 		error_map[ERROR_NOT_CONST_EXPR] =			L"Not a valid constant expression";
@@ -102,8 +102,8 @@ namespace Aseba
 		error_map[ERROR_ARRAY_ILLEGAL_ACCESS] =			L"MemoryVectorNode::getVectorSize: illegal operation";
 		// tree-optimize.cpp
 		error_map[ERROR_INFINITE_LOOP] =			L"Infinite loops not allowed";
-		error_map[ERROR_DIVISION_BY_ZERO] =			L"Division by zero.";
-		error_map[ERROR_ABS_NOT_POSSIBLE] =			L"-32768 has no positive correspondance in 16 bits integers.";
+		error_map[ERROR_DIVISION_BY_ZERO] =			L"Division by zero";
+		error_map[ERROR_ABS_NOT_POSSIBLE] =			L"-32768 has no positive correspondance in 16 bits integers";
 		error_map[ERROR_ARRAY_OUT_OF_BOUND_READ] =		L"Out of bound static array access. Trying to read index %0 of array %1 of size %2";
 		error_map[ERROR_ARRAY_OUT_OF_BOUND_WRITE] =		L"Out of bound static array access. Trying to write index %0 of array %1 of size %2";
 		// tree-typecheck.cpp
@@ -164,7 +164,7 @@ namespace Aseba
 		error_map[ERROR_TOKEN_OP_NEG] =				L"- (minus)";
 		error_map[ERROR_TOKEN_OP_ADD_EQUAL] =			L"+= (plus equal)";
 		error_map[ERROR_TOKEN_OP_NEG_EQUAL] =			L"-= (minus equal)";
-		error_map[ERROR_TOKEN_OP_PLUS_PLUS] =			L"++ (plus) plus";
+		error_map[ERROR_TOKEN_OP_PLUS_PLUS] =			L"++ (plus plus)";
 		error_map[ERROR_TOKEN_OP_MINUS_MINUS] =			L"-- (minus minus)";
 		error_map[ERROR_TOKEN_OP_MULT] =			L"* (time)";
 		error_map[ERROR_TOKEN_OP_DIV] =				L"/ (divide)";
