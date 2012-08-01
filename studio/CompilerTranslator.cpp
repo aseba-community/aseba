@@ -294,6 +294,254 @@ namespace Aseba
 				msg = tr("Expecting a condition, found a %0 instead");
 				break;
 
+			case ERROR_TOKEN_END_OF_STREAM:
+				msg = tr("end of stream");
+				break;
+
+			case ERROR_TOKEN_STR_when:
+				msg = tr("when keyword");
+				break;
+
+			case ERROR_TOKEN_STR_emit:
+				msg = tr("emit keyword");
+				break;
+
+			case ERROR_TOKEN_STR_for:
+				msg = tr("for keyword");
+				break;
+
+			case ERROR_TOKEN_STR_in:
+				msg = tr("in keyword");
+				break;
+
+			case ERROR_TOKEN_STR_step:
+				msg = tr("step keyword");
+				break;
+
+			case ERROR_TOKEN_STR_while:
+				msg = tr("while keyword");
+				break;
+
+			case ERROR_TOKEN_STR_do:
+				msg = tr("do keyword");
+				break;
+
+			case ERROR_TOKEN_STR_if:
+				msg = tr("if keyword");
+				break;
+
+			case ERROR_TOKEN_STR_then:
+				msg = tr("then keyword");
+				break;
+
+			case ERROR_TOKEN_STR_else:
+				msg = tr("else keyword");
+				break;
+
+			case ERROR_TOKEN_STR_elseif:
+				msg = tr("elseif keyword");
+				break;
+
+			case ERROR_TOKEN_STR_end:
+				msg = tr("end keyword");
+				break;
+
+			case ERROR_TOKEN_STR_var:
+				msg = tr("var keyword");
+				break;
+
+			case ERROR_TOKEN_STR_call:
+				msg = tr("call keyword");
+				break;
+
+			case ERROR_TOKEN_STR_sub:
+				msg = tr("sub keyword");
+				break;
+
+			case ERROR_TOKEN_STR_callsub:
+				msg = tr("callsub keyword");
+				break;
+
+			case ERROR_TOKEN_STR_onevent:
+				msg = tr("onevent keyword");
+				break;
+
+			case ERROR_TOKEN_STR_abs:
+				msg = tr("abs keyword");
+				break;
+
+			case ERROR_TOKEN_STR_return:
+				msg = tr("return keyword");
+				break;
+
+			case ERROR_TOKEN_STRING_LITERAL:
+				msg = tr("string");
+				break;
+
+			case ERROR_TOKEN_INT_LITERAL:
+				msg = tr("integer");
+				break;
+
+			case ERROR_TOKEN_PAR_OPEN:
+				msg = tr("( (open parenthesis)");
+				break;
+
+			case ERROR_TOKEN_PAR_CLOSE:
+				msg = tr(") (close parenthesis)");
+				break;
+
+			case ERROR_TOKEN_BRACKET_OPEN:
+				msg = tr("[ (open bracket)");
+				break;
+
+			case ERROR_TOKEN_BRACKET_CLOSE:
+				msg = tr("] (close bracket)");
+				break;
+
+			case ERROR_TOKEN_COLON:
+				msg = tr(": (colon)");
+				break;
+
+			case ERROR_TOKEN_COMMA:
+				msg = tr(", (comma)");
+				break;
+
+			case ERROR_TOKEN_ASSIGN:
+				msg = tr("= (assignation)");
+				break;
+
+			case ERROR_TOKEN_OP_OR:
+				msg = tr("or");
+				break;
+
+			case ERROR_TOKEN_OP_AND:
+				msg = tr("and");
+				break;
+
+			case ERROR_TOKEN_OP_NOT:
+				msg = tr("not");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_OR:
+				msg = tr("binary or");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_XOR:
+				msg = tr("binary xor");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_AND:
+				msg = tr("binary and");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_NOT:
+				msg = tr("binary not");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_OR_EQUAL:
+				msg = tr("binary or equal");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_XOR_EQUAL:
+				msg = tr("binary xor equal");
+				break;
+
+			case ERROR_TOKEN_OP_BIT_AND_EQUAL:
+				msg = tr("binary and equal");
+				break;
+
+			case ERROR_TOKEN_OP_EQUAL:
+				msg = tr("== (equal to)");
+				break;
+
+			case ERROR_TOKEN_OP_NOT_EQUAL:
+				msg = tr("!= (not equal to)");
+				break;
+
+			case ERROR_TOKEN_OP_BIGGER:
+				msg = tr("> (bigger than)");
+				break;
+
+			case ERROR_TOKEN_OP_BIGGER_EQUAL:
+				msg = tr(">= (bigger or equal than)");
+				break;
+
+			case ERROR_TOKEN_OP_SMALLER:
+				msg = tr("< (smaller than)");
+				break;
+
+			case ERROR_TOKEN_OP_SMALLER_EQUAL:
+				msg = tr("<= (smaller or equal than)");
+				break;
+
+			case ERROR_TOKEN_OP_SHIFT_LEFT:
+				msg = tr("<< (shift left)");
+				break;
+
+			case ERROR_TOKEN_OP_SHIFT_RIGHT:
+				msg = tr(">> (shift right)");
+				break;
+
+			case ERROR_TOKEN_OP_SHIFT_LEFT_EQUAL:
+				msg = tr("<<= (shift left equal)");
+				break;
+
+			case ERROR_TOKEN_OP_SHIFT_RIGHT_EQUAL:
+				msg = tr(">>= (shift right equal)");
+				break;
+
+			case ERROR_TOKEN_OP_ADD:
+				msg = tr("+ (plus)");
+				break;
+
+			case ERROR_TOKEN_OP_NEG:
+				msg = tr("- (minus)");
+				break;
+
+			case ERROR_TOKEN_OP_ADD_EQUAL:
+				msg = tr("+= (plus equal)");
+				break;
+
+			case ERROR_TOKEN_OP_NEG_EQUAL:
+				msg = tr("-= (minus equal)");
+				break;
+
+			case ERROR_TOKEN_OP_PLUS_PLUS:
+				msg = tr("++ (plus) plus");
+				break;
+
+			case ERROR_TOKEN_OP_MINUS_MINUS:
+				msg = tr("-- (minus minus)");
+				break;
+
+			case ERROR_TOKEN_OP_MULT:
+				msg = tr("* (time)");
+				break;
+
+			case ERROR_TOKEN_OP_DIV:
+				msg = tr("/ (divide)");
+				break;
+
+			case ERROR_TOKEN_OP_MOD:
+				msg = tr("modulo");
+				break;
+
+			case ERROR_TOKEN_OP_MULT_EQUAL:
+				msg = tr("*= (time equal)");
+				break;
+
+			case ERROR_TOKEN_OP_DIV_EQUAL:
+				msg = tr("/= (divide equal)");
+				break;
+
+			case ERROR_TOKEN_OP_MOD_EQUAL:
+				msg = tr("modulo equal");
+				break;
+
+			case ERROR_TOKEN_UNKNOWN:
+				msg = tr("unknown");
+				break;
+
 			default:
 				msg = tr("Unknown error");
 		}

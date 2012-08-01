@@ -109,6 +109,70 @@ namespace Aseba
 		// tree-typecheck.cpp
 		error_map[ERROR_EXPECTING_TYPE] =			L"Expecting %0 type, found %1 type instead";
 		error_map[ERROR_EXPECTING_CONDITION] =			L"Expecting a condition, found a %0 instead";
+
+		// lexer.cpp Token::typeName()
+		error_map[ERROR_TOKEN_END_OF_STREAM] =			L"end of stream";
+		error_map[ERROR_TOKEN_STR_when] =			L"when keyword";
+		error_map[ERROR_TOKEN_STR_emit] =			L"emit keyword";
+		error_map[ERROR_TOKEN_STR_for] =			L"for keyword";
+		error_map[ERROR_TOKEN_STR_in] =				L"in keyword";
+		error_map[ERROR_TOKEN_STR_step] =			L"step keyword";
+		error_map[ERROR_TOKEN_STR_while] =			L"while keyword";
+		error_map[ERROR_TOKEN_STR_do] =				L"do keyword";
+		error_map[ERROR_TOKEN_STR_if] =				L"if keyword";
+		error_map[ERROR_TOKEN_STR_then] =			L"then keyword";
+		error_map[ERROR_TOKEN_STR_else] =			L"else keyword";
+		error_map[ERROR_TOKEN_STR_elseif] =			L"elseif keyword";
+		error_map[ERROR_TOKEN_STR_end] =			L"end keyword";
+		error_map[ERROR_TOKEN_STR_var] =			L"var keyword";
+		error_map[ERROR_TOKEN_STR_call] =			L"call keyword";
+		error_map[ERROR_TOKEN_STR_sub] =			L"sub keyword";
+		error_map[ERROR_TOKEN_STR_callsub] =			L"callsub keyword";
+		error_map[ERROR_TOKEN_STR_onevent] =			L"onevent keyword";
+		error_map[ERROR_TOKEN_STR_abs] =			L"abs keyword";
+		error_map[ERROR_TOKEN_STR_return] =			L"return keyword";
+		error_map[ERROR_TOKEN_STRING_LITERAL] =			L"string";
+		error_map[ERROR_TOKEN_INT_LITERAL] =			L"integer";
+		error_map[ERROR_TOKEN_PAR_OPEN] =			L"( (open parenthesis)";
+		error_map[ERROR_TOKEN_PAR_CLOSE] =			L") (close parenthesis)";
+		error_map[ERROR_TOKEN_BRACKET_OPEN] =			L"[ (open bracket)";
+		error_map[ERROR_TOKEN_BRACKET_CLOSE] =			L"] (close bracket)";
+		error_map[ERROR_TOKEN_COLON] =				L": (colon)";
+		error_map[ERROR_TOKEN_COMMA] =				L", (comma)";
+		error_map[ERROR_TOKEN_ASSIGN] =				L"= (assignation)";
+		error_map[ERROR_TOKEN_OP_OR] =				L"or";
+		error_map[ERROR_TOKEN_OP_AND] =				L"and";
+		error_map[ERROR_TOKEN_OP_NOT] =				L"not";
+		error_map[ERROR_TOKEN_OP_BIT_OR] =			L"binary or";
+		error_map[ERROR_TOKEN_OP_BIT_XOR] =			L"binary xor";
+		error_map[ERROR_TOKEN_OP_BIT_AND] =			L"binary and";
+		error_map[ERROR_TOKEN_OP_BIT_NOT] =			L"binary not";
+		error_map[ERROR_TOKEN_OP_BIT_OR_EQUAL] =		L"binary or equal";
+		error_map[ERROR_TOKEN_OP_BIT_XOR_EQUAL] =		L"binary xor equal";
+		error_map[ERROR_TOKEN_OP_BIT_AND_EQUAL] =		L"binary and equal";
+		error_map[ERROR_TOKEN_OP_EQUAL] =			L"== (equal to)";
+		error_map[ERROR_TOKEN_OP_NOT_EQUAL] =			L"!= (not equal to)";
+		error_map[ERROR_TOKEN_OP_BIGGER] =			L"> (bigger than)";
+		error_map[ERROR_TOKEN_OP_BIGGER_EQUAL] =		L">= (bigger or equal than)";
+		error_map[ERROR_TOKEN_OP_SMALLER] =			L"< (smaller than)";
+		error_map[ERROR_TOKEN_OP_SMALLER_EQUAL] =		L"<= (smaller or equal than)";
+		error_map[ERROR_TOKEN_OP_SHIFT_LEFT] =			L"<< (shift left)";
+		error_map[ERROR_TOKEN_OP_SHIFT_RIGHT] =			L">> (shift right)";
+		error_map[ERROR_TOKEN_OP_SHIFT_LEFT_EQUAL] =		L"<<= (shift left equal)";
+		error_map[ERROR_TOKEN_OP_SHIFT_RIGHT_EQUAL] =		L">>= (shift right equal)";
+		error_map[ERROR_TOKEN_OP_ADD] =				L"+ (plus)";
+		error_map[ERROR_TOKEN_OP_NEG] =				L"- (minus)";
+		error_map[ERROR_TOKEN_OP_ADD_EQUAL] =			L"+= (plus equal)";
+		error_map[ERROR_TOKEN_OP_NEG_EQUAL] =			L"-= (minus equal)";
+		error_map[ERROR_TOKEN_OP_PLUS_PLUS] =			L"++ (plus) plus";
+		error_map[ERROR_TOKEN_OP_MINUS_MINUS] =			L"-- (minus minus)";
+		error_map[ERROR_TOKEN_OP_MULT] =			L"* (time)";
+		error_map[ERROR_TOKEN_OP_DIV] =				L"/ (divide)";
+		error_map[ERROR_TOKEN_OP_MOD] =				L"modulo";
+		error_map[ERROR_TOKEN_OP_MULT_EQUAL] =			L"*= (time equal)";
+		error_map[ERROR_TOKEN_OP_DIV_EQUAL] =			L"/= (divide equal)";
+		error_map[ERROR_TOKEN_OP_MOD_EQUAL] =			L"modulo equal";
+		error_map[ERROR_TOKEN_UNKNOWN] =			L"unknown";
 	}
 
 	const std::wstring ErrorMessages::defaultCallback(ErrorCode error)
