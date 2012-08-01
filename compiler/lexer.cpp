@@ -129,7 +129,7 @@ namespace Aseba
 	std::wstring Compiler::Token::toWString() const
 	{
 		std::wostringstream oss;
-		oss << L"Line: " << pos.row + 1 << L" Col: " << pos.column + 1 << L" : ";
+		oss << translate(ERROR_LINE) << pos.row + 1 << translate(ERROR_COL) << pos.column + 1 << L" : ";
 		oss << typeName();
 		if (type == TOKEN_INT_LITERAL)
 			oss << L" : " << iValue;
@@ -203,7 +203,7 @@ namespace Aseba
 							if (source.eof())
 							{
 								// EOF -> unbalanced block
-								throw Error(begin, L"Unbalanced comment block.");
+								throw TranslatableError(begin, ERROR_UNBALANCED_COMMENT_BLOCK);
 							}
 						}
 						// fetch the #
@@ -292,7 +292,7 @@ namespace Aseba
 				case '!':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_NOT_EQUAL))
 						break;
-					throw Error(pos, L"syntax error");
+					throw TranslatableError(pos, ERROR_SYNTAX);
 					break;
 				
 				case '=':
@@ -339,7 +339,7 @@ namespace Aseba
 				{
 					// check first character
 					if (!iswalnum(c) && (c != '_'))
-						throw Error(pos, WFormatableString(L"identifiers must begin with _ or an alphanumeric character, found unicode character 0x%0 instead").arg((unsigned)c, 0, 16));
+						throw TranslatableError(pos, ERROR_INVALID_IDENTIFIER).arg((unsigned)c, 0, 16);
 					
 					// get a string
 					std::wstring s;
@@ -365,16 +365,16 @@ namespace Aseba
 							{
 								for (unsigned i = 2; i < s.size(); i++)
 									if (!std::isxdigit(s[i]))
-										throw Error(pos, L"error in hexadecimal number");
+										throw TranslatableError(pos, ERROR_INVALID_HEXA_NUMBER);
 							}
 							else if (s[1] == 'b')
 							{
 								for (unsigned i = 2; i < s.size(); i++)
 									if ((s[i] != '0') && (s[i] != '1'))
-										throw Error(pos, L"error in binary number");
+										throw TranslatableError(pos, ERROR_INVALID_BINARY_NUMBER);
 							}
 							else
-								throw Error(pos, L"error in number, invalid base");
+								throw TranslatableError(pos, ERROR_NUMBER_INVALID_BASE);
 							
 						}
 						else
@@ -382,7 +382,7 @@ namespace Aseba
 							// check if we have a valid number
 							for (unsigned i = 1; i < s.size(); i++)
 								if (!std::isdigit(s[i]))
-									throw Error(pos, L"error in number");
+									throw TranslatableError(pos, ERROR_IN_NUMBER);
 						}
 						tokens.push_back(Token(Token::TOKEN_INT_LITERAL, pos, s));
 					}

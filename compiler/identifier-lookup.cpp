@@ -106,7 +106,7 @@ namespace Aseba
 	
 	//! Helper function to find for something in one of the map, using edit-distance to check for candidates if not found
 	template <typename MapType>
-	typename MapType::const_iterator findInTable(const MapType& map, const std::wstring& name, const SourcePos& pos, const std::wstring& notFoundMsg, const std::wstring& misspelledMsg)
+	typename MapType::const_iterator findInTable(const MapType& map, const std::wstring& name, const SourcePos& pos, const ErrorCode notFoundError, const ErrorCode misspelledError)
 	{
 		typename MapType::const_iterator it(map.find(name));
 		if (it == map.end())
@@ -125,9 +125,9 @@ namespace Aseba
 				}
 			}
 			if (bestDist < maxDist)
-				throw Error(pos, WFormatableString(misspelledMsg).arg(name).arg(bestName));
+				throw TranslatableError(pos, misspelledError).arg(name).arg(bestName);
 			else
-				throw Error(pos, WFormatableString(notFoundMsg).arg(name));
+				throw TranslatableError(pos, notFoundError).arg(name);
 		}
 		return it;
 	}
@@ -135,19 +135,19 @@ namespace Aseba
 	//! Look for a variable of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
 	{
-		return findInTable<VariablesMap>(variablesMap, varName, varPos, L"%0 is not a defined variable", L"%0 is not a defined variable, do you mean %1?");
+		return findInTable<VariablesMap>(variablesMap, varName, varPos, ERROR_VARIABLE_NOT_DEFINED, ERROR_VARIABLE_NOT_DEFINED_GUESS);
 	}
 	
 	//! Look for a function of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
 	{
-		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, L"Target does not provide function %0",L"Target does not provide function %0, do you mean %1?");
+		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, ERROR_FUNCTION_NOT_DEFINED, ERROR_FUNCTION_NOT_DEFINED_GUESS);
 	}
 	
 	//! Look for a constant of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::ConstantsMap::const_iterator Compiler::findConstant(const std::wstring& name, const SourcePos& pos) const
 	{
-		return findInTable<ConstantsMap>(constantsMap, name, pos, L"Constant %0 not defined", L"Constant %0 not defined, do you mean %1?");
+		return findInTable<ConstantsMap>(constantsMap, name, pos, ERROR_CONSTANT_NOT_DEFINED, ERROR_CONSTANT_NOT_DEFINED_GUESS);
 	}
 	
 	//! Return true if a constant of a given name exists
@@ -161,12 +161,12 @@ namespace Aseba
 	{
 		try
 		{
-			return findInTable<EventsMap>(globalEventsMap, name, pos, L"%0 is not a known event", L"%0 is not a known event, do you mean %1?");
+			return findInTable<EventsMap>(globalEventsMap, name, pos, ERROR_EVENT_NOT_DEFINED, ERROR_EVENT_NOT_DEFINED_GUESS);
 		}
-		catch (Error e)
+		catch (TranslatableError e)
 		{
 			if (allEventsMap.find(name) != allEventsMap.end())
-				throw Error(pos, WFormatableString(L"%0 is a local event that you cannot emit").arg(name));
+				throw TranslatableError(pos, ERROR_EMIT_LOCAL_EVENT).arg(name);
 			else
 				throw e;
 		}
@@ -174,13 +174,13 @@ namespace Aseba
 	
 	Compiler::EventsMap::const_iterator Compiler::findAnyEvent(const std::wstring& name, const SourcePos& pos) const
 	{
-		return findInTable<EventsMap>(allEventsMap, name, pos, L"%0 is not a known event", L"%0 is not a known event, do you mean %1?");
+		return findInTable<EventsMap>(allEventsMap, name, pos, ERROR_EVENT_NOT_DEFINED, ERROR_EVENT_NOT_DEFINED_GUESS);
 	}
 	
 	//! Look for a subroutine of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::SubroutineReverseTable::const_iterator Compiler::findSubroutine(const std::wstring& name, const SourcePos& pos) const
 	{
-		return findInTable<SubroutineReverseTable>(subroutineReverseTable, name, pos, L"Subroutine %0 does not exists", L"Subroutine %0 does not exists, do you mean %1?");
+		return findInTable<SubroutineReverseTable>(subroutineReverseTable, name, pos, ERROR_SUBROUTINE_NOT_DEFINED, ERROR_SUBROUTINE_NOT_DEFINED_GUESS);
 	}
 	
 	//! Build variables and functions maps

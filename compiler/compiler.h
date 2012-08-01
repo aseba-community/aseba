@@ -365,6 +365,7 @@ namespace Aseba
 		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
+		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		
 	protected:
 		void internalCompilerError() const;

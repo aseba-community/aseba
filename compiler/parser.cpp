@@ -37,18 +37,17 @@ namespace Aseba
 	//! There is a bug in the compiler, ask for a bug report
 	void Compiler::internalCompilerError() const
 	{
-		throw Error(tokens.front().pos, L"Internal compiler error, please report a bug containing the source which triggered this error");
+		throw TranslatableError(tokens.front().pos, ERROR_INTERNAL);
 	}
 	
 	//! Check if next token is of type, produce an exception otherwise
 	void Compiler::expect(const Token::Type& type) const
 	{
 		if (tokens.front() != type)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Expecting %0, found %1 instead")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING)
 					.arg(Token(type).typeName())
-					.arg(tokens.front().typeName())
-				);
+					.arg(tokens.front().typeName());
 	}
 	
 	//! Check if next token is an unsigned 12 bits integer literal. If so, return it, if not, throw an exception
@@ -56,10 +55,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 4095)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;4095] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_UINT12_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -68,10 +66,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 65535)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;65535] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_UINT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -80,10 +77,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;32767] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_PINT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -95,10 +91,9 @@ namespace Aseba
 		if (negative)
 			limit++;
 		if (tokens.front().iValue < 0 || tokens.front().iValue > limit)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [-32768;32767] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_INT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -112,11 +107,10 @@ namespace Aseba
 		
 		const int value = constIt->second;
 		if (value < 0 || value > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Constant %0 has value %1, which is out of [0;32767] range")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_PCONSTANT_OUT_OF_RANGE)
 					.arg(tokens.front().sValue)
-					.arg(value)
-				);
+					.arg(value);
 		return value;
 	}
 	
@@ -130,11 +124,10 @@ namespace Aseba
 		
 		const int value = constIt->second;
 		if (value < -32768 || value > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Constant %0 has value %1, which is out of [-32768;32767] range")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_CONSTANT_OUT_OF_RANGE)
 					.arg(tokens.front().sValue)
-					.arg(value)
-				);
+					.arg(value);
 		return value;
 	}
 	
@@ -224,17 +217,15 @@ namespace Aseba
 	{
 		if (!isOneOf<length>(types))
 		{
-			std::wstring errorMessage(L"Expecting one of ");
+			std::wstring expectedTypes;
 			for (size_t i = 0; i < length; i++)
 			{
-				errorMessage += Token(types[i]).typeName();
+				expectedTypes += Token(types[i]).typeName();
 				if (i + 1 < length)
-					errorMessage += L", ";
+					expectedTypes += L", ";
 			}
-			errorMessage += L"; but found ";
-			errorMessage += tokens.front().typeName();
-			errorMessage += L" instead";
-			throw Error(tokens.front().pos, errorMessage);
+
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ONE_OF).arg(expectedTypes).arg(tokens.front().typeName());
 		}
 	}
 
@@ -252,7 +243,7 @@ namespace Aseba
 
 		// free space check
 		if (freeVariableIndex + endVariableIndex > targetDescription->variablesSize)
-			throw Error(varPos, WFormatableString(L"Not enough free space to allocate this tempory variable"));
+			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_TEMP_SPACE);
 	}
 
 	AssignmentNode* Compiler::allocateTemporaryVariable(const SourcePos varPos, Node* rValue)
@@ -302,7 +293,7 @@ namespace Aseba
 
 		switch (tokens.front())
 		{
-			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, L"Variable definition is allowed only at the beginning of the program before any statement");
+			case Token::TOKEN_STR_var: throw TranslatableError(tokens.front().pos, ERROR_MISPLACED_VARDEF);
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_sub: return parseSubDecl();
 			default: return parseBlockStatement();
@@ -341,8 +332,8 @@ namespace Aseba
 		
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Expecting identifier, found %0").arg(tokens.front().toWString()));
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
 		
 		// save variable
 		std::wstring varName = tokens.front().sValue;
@@ -357,11 +348,11 @@ namespace Aseba
 		
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
-			throw Error(varPos, WFormatableString(L"Variable %0 is already defined").arg(varName));
+			throw TranslatableError(varPos, ERROR_VAR_ALREADY_DEFINED).arg(varName);
 
 		// check if variable conflicts with a constant
 		if(commonDefinitions->constants.contains(varName))
-			throw Error(varPos, WFormatableString(L"Variable %0 has the same name as a constant").arg(varName));
+			throw TranslatableError(varPos, ERROR_VAR_CONST_COLLISION).arg(varName);
 		
 		// optional assignation
 		std::auto_ptr<MemoryVectorNode> me(new MemoryVectorNode(varPos, varAddr, varSize, varName));
@@ -376,7 +367,7 @@ namespace Aseba
 
 		// sanity check for array
 		if (varSize == 0)
-			throw Error(varPos, WFormatableString(L"Array %0 has undefined size").arg(varName));
+			throw TranslatableError(varPos, ERROR_UNDEFINED_SIZE).arg(varName);
 
 		// save variable
 		variablesMap[varName] = std::make_pair(varAddr, varSize);
@@ -384,7 +375,7 @@ namespace Aseba
 
 		// check space
 		if (freeVariableIndex > targetDescription->variablesSize)
-			throw Error(varPos, L"No more free variable space");
+			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_SPACE);
 
 		if (temp.get())
 			return temp.release();
@@ -476,7 +467,7 @@ namespace Aseba
 			return assignment.release();
 		}
 		else
-			throw Error(tokens.front().pos, WFormatableString(L"Expecting assignement, found %0 instead").arg(tokens.front().toWString()));
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		
 		return NULL;
 	}
@@ -581,7 +572,7 @@ namespace Aseba
 			tokens.pop_front();
 			step = expectInt16LiteralOrConstant();
 			if (step == 0)
-				throw Error(tokens.front().pos, L"Null steps are not allowed in for loops");
+				throw TranslatableError(tokens.front().pos, ERROR_FOR_NULL_STEPS);
 			tokens.pop_front();
 		}
 		
@@ -589,12 +580,12 @@ namespace Aseba
 		if (step > 0)
 		{
 			if (rangeStartIndex > rangeEndIndex)
-				throw Error(rangeStartIndexPos, L"Start index must be lower than end index in increasing loops");
+				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_HIGHER_THAN_END);
 		}
 		else
 		{
 			if (rangeStartIndex < rangeEndIndex)
-				throw Error(rangeStartIndexPos, L"Start index must be higher than end index in decreasing loops");
+				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_LOWER_THAN_END);
 		}
 		
 		// do keyword
@@ -669,7 +660,7 @@ namespace Aseba
 		
 		const unsigned eventId = expectAnyEventId();
 		if (implementedEvents.find(eventId) != implementedEvents.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Event %0 is already implemented").arg(eventName(eventId)));
+			throw TranslatableError(tokens.front().pos, ERROR_EVENT_ALREADY_IMPL).arg(eventName(eventId));
 		implementedEvents.insert(eventId);
 		
 		tokens.pop_front();
@@ -707,7 +698,7 @@ namespace Aseba
 			emitNode->children.push_back(preNode.release());
 
 			if (emitNode->arraySize != eventSize)
-				throw Error(pos, WFormatableString(L"Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
+				throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
 		}
 		else
 		{
@@ -729,7 +720,7 @@ namespace Aseba
 		const std::wstring& name = tokens.front().sValue;
 		const SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it != subroutineReverseTable.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 is already defined").arg(name));
+			throw TranslatableError(tokens.front().pos, ERROR_SUBROUTINE_ALREADY_DEF).arg(name);
 		
 		const unsigned subroutineId = subroutineTable.size();
 		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
@@ -1131,11 +1122,11 @@ namespace Aseba
 					std::auto_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
 
 					if (endIndex.get() != NULL)
-						throw Error(pos, L"Expecting a constant expression as a second index");
+						throw TranslatableError(pos, ERROR_INDEX_EXPECTING_CONSTANT);
 
 					// check if second index is within bounds
 					if (end < start)
-						throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
+						throw TranslatableError(tokens.front().pos, ERROR_INDEX_WRONG_END);
 
 					index->addValue(end);
 				}
@@ -1174,9 +1165,9 @@ namespace Aseba
 
 				if (result < 0)
 					// what??
-					throw Error(pos, WFormatableString(L"Array size: result is negative (%0)").arg(result));
+					throw TranslatableError(pos, ERROR_SIZE_IS_NEGATIVE).arg(result);
 				else if (result == 0)
-					throw Error(pos, L"Array size: result is null");
+					throw TranslatableError(pos, ERROR_SIZE_IS_NULL);
 
 				expect(Token::TOKEN_BRACKET_CLOSE);
 			}
@@ -1202,7 +1193,7 @@ namespace Aseba
 			tree.reset();
 			return NULL;
 		}
-		catch (Error error)
+		catch (TranslatableError error)
 		{
 			// oops, tree cannot be resolved to a constant, return it
 			return tree.release();
@@ -1242,17 +1233,17 @@ namespace Aseba
 
 		// valid optimization?
 		if ( !tempTree2.get() || tempTree2->children.size() == 0 )
-			throw Error(pos, L"Not a valid constant expression");
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 		AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
 		if ( !assignment || assignment->children.size() != 2 )
-			throw Error(pos, L"Not a valid constant expression");
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 
 		// resolve to an ImmediateNode?
 		ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
 		if (immediate)
 			result = immediate->value;
 		else
-			throw Error(pos, L"Not a valid constant expression");
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 
 		// delete the tree
 		tempTree2.reset();
@@ -1282,7 +1273,7 @@ namespace Aseba
 		if (function.parameters.size() == 0)
 		{
 			if (tokens.front() != Token::TOKEN_PAR_CLOSE)
-				throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires no argument, some are used").arg(funcName));
+				throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_HAS_NO_ARG).arg(funcName);
 			tokens.pop_front();
 		}
 		else
@@ -1298,7 +1289,7 @@ namespace Aseba
 			{
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-					throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
+					throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i);
 				
 				// we need to fill those two variables
 				unsigned varAddr;
@@ -1321,7 +1312,7 @@ namespace Aseba
 				if (function.parameters[i].size > 0)
 				{
 					if (varSize != (unsigned)function.parameters[i].size)
-						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, function definition demands size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size);
 				}
 				else if (function.parameters[i].size < 0)
 				{
@@ -1333,7 +1324,7 @@ namespace Aseba
 					}
 					else if ((unsigned)templateParameters[templateIndex] != varSize)
 					{
-						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, while a previous instance of the template parameter was of size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE_TEMPLATE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]);
 					}
 				}
 				else
@@ -1349,14 +1340,14 @@ namespace Aseba
 				if (i + 1 == function.parameters.size())
 				{
 					if (tokens.front() == Token::TOKEN_COMMA)
-						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.parameters.size()));
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_TOO_MANY_ARG).arg(funcName).arg((unsigned int)function.parameters.size());
 					else
 						expect(Token::TOKEN_PAR_CLOSE);
 				}
 				else
 				{
 					if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i + 1));
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i + 1);
 					else
 						expect(Token::TOKEN_COMMA);
 				}

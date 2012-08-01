@@ -124,7 +124,7 @@ namespace Aseba
 		buildMaps();
 		if (freeVariableIndex > targetDescription->variablesSize)
 		{
-			errorDescription = Error(SourcePos(), L"Broken target description: not enough room for internal variables");
+			errorDescription = TranslatableError(SourcePos(), ERROR_BROKEN_TARGET).toError();
 			return false;
 		}
 		
@@ -263,14 +263,14 @@ namespace Aseba
 		// stack check
 		if (!verifyStackCalls(preLinkBytecode))
 		{
-			errorDescription = Error(SourcePos(), L"Execution stack will overflow, check for any recursive subroutine call and cut long mathematical expressions.");
+			errorDescription = TranslatableError(SourcePos(), ERROR_STACK_OVERFLOW).toError();
 			return false;
 		}
 		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))
 		{
-			errorDescription = Error(SourcePos(), L"Script too big for target bytecode size.");
+			errorDescription = TranslatableError(SourcePos(), ERROR_SCRIPT_TOO_BIG).toError();
 			return false;
 		}
 		
