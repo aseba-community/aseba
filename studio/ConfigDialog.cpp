@@ -77,6 +77,8 @@ namespace Aseba
 		widget->setCheckState(BOOL_TO_CHECKED(checked));
 		WidgetCache<bool> cache(widget, checked);
 		checkboxCache.insert(std::pair<QString, WidgetCache<bool> >(ID, cache));
+		connect(widget, SIGNAL(released()), ConfigDialog::getInstance(), SLOT(flushCache()));
+		connect(widget, SIGNAL(released()), ConfigDialog::getInstance(), SIGNAL(settingsChanged()));
 		return widget;
 	}
 
@@ -211,7 +213,10 @@ namespace Aseba
 	void ConfigDialog::init(QWidget* parent)
 	{
 		if (!me)
+		{
 			me = new ConfigDialog(parent);
+			me->setupWidgets();
+		}
 	}
 
 	void ConfigDialog::bye()
@@ -235,6 +240,15 @@ namespace Aseba
 
 	ConfigDialog::ConfigDialog(QWidget* parent):
 		QDialog(parent)
+	{
+	}
+
+	ConfigDialog::~ConfigDialog()
+	{
+		writeSettings();
+	}
+
+	void ConfigDialog::setupWidgets()
 	{
 		// list of topics
 		topicList = new QListWidget();
@@ -288,20 +302,10 @@ namespace Aseba
 		readSettings();
 	}
 
-	ConfigDialog::~ConfigDialog()
-	{
-		writeSettings();
-	}
-
 	void ConfigDialog::accept()
 	{
 		// update the cache with new values
-		for (int i = 0; i < configStack->count(); i++)
-		{
-			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
-			if (config)
-				config->flushCache();
-		}
+		flushCache();
 		QDialog::accept();
 	}
 
@@ -315,6 +319,17 @@ namespace Aseba
 				config->discardChanges();
 		}
 		QDialog::reject();
+	}
+
+	void ConfigDialog::flushCache()
+	{
+		// update the cache with new values
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->flushCache();
+		}
 	}
 
 	void ConfigDialog::readSettings()

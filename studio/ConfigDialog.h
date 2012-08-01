@@ -46,6 +46,7 @@ namespace Aseba
 		// instantiate / kill the singleton
 		static void init(QWidget* parent = 0);
 		static void bye(void);
+		static const ConfigDialog* getInstance() { return me; }
 
 		static void showConfig();
 
@@ -58,9 +59,13 @@ namespace Aseba
 		// autocompletion behaviour
 		CONFIG_PROPERTY_CHECKBOX_DECLARE(AutoCompletion)
 
+	signals:
+		void settingsChanged();
+
 	protected:
 		ConfigDialog(QWidget* parent = 0);
 		~ConfigDialog();
+		void setupWidgets();
 
 	protected:
 		static ConfigDialog* me;	// pointer to the singleton
@@ -80,6 +85,9 @@ namespace Aseba
 	public slots:
 		virtual void accept();
 		virtual void reject();
+
+	protected slots:
+		void flushCache();
 	};
 
 	// ConfigPage

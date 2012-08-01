@@ -434,6 +434,9 @@ namespace Aseba
 		void showUserManual();
 		
 		void openToUrlFromAction() const;
+
+	public slots:
+		void applySettings();
 	
 	private:
 		// utility functions

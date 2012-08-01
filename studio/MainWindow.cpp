@@ -1865,7 +1865,6 @@ namespace Aseba
 
 	void MainWindow::showLineNumbersChanged(bool state)
 	{
-		assert(currentScriptTab);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
@@ -2835,6 +2834,7 @@ namespace Aseba
 		// general connections
 		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
 		connect(logger, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(logEntryDoubleClicked(QListWidgetItem *)));
+		connect(ConfigDialog::getInstance(), SIGNAL(settingsChanged()), SLOT(applySettings()));
 		
 		// global actions
 		connect(loadAllAct, SIGNAL(triggered()), SLOT(loadAll()));
@@ -3133,25 +3133,20 @@ namespace Aseba
 		// View menu
 		showKeywordsAct = new QAction(tr("Show &keywords"), this);
 		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(ConfigDialog::getShowKeywordToolbar());
 		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
 
 		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
 		showMemoryUsageAct->setCheckable(true);
-		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
 		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 
 		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
 		showHiddenAct->setCheckable(true);
-		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
-		showHidden(ConfigDialog::getShowHidden());
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 
 		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
 		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
 		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
-		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
+		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
 
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
@@ -3237,6 +3232,9 @@ namespace Aseba
 		
 		// add dynamic stuff
 		regenerateToolsMenus();
+
+		// Load the state from the settings (thus from hard drive)
+		applySettings();
 	}
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!
@@ -3327,6 +3325,14 @@ namespace Aseba
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
 		
 		setWindowTitle(tr("%0 %1- Aseba Studio").arg(docName).arg(modifiedText));
+	}
+
+	void MainWindow::applySettings()
+	{
+		showKeywordsAct->setChecked(ConfigDialog::getShowKeywordToolbar());
+		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
+		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
+		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 	}
 	
 	/*@}*/
