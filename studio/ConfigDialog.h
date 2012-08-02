@@ -28,7 +28,9 @@
 #include <map>
 
 #define CONFIG_PROPERTY_CHECKBOX_DECLARE(name) \
-	static const bool name(void);
+public: \
+	static const bool get##name(void); \
+	static void set##name(bool);
 
 namespace Aseba
 {
@@ -44,21 +46,26 @@ namespace Aseba
 		// instantiate / kill the singleton
 		static void init(QWidget* parent = 0);
 		static void bye(void);
+		static const ConfigDialog* getInstance() { return me; }
 
 		static void showConfig();
 
 		// access to properties
-		// startup properties
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowHidden)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowLineNumbers)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowKeywordToolbar)
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getStartupShowMemoryUsage)
+		// layout properties
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowHidden)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowLineNumbers)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowKeywordToolbar)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(ShowMemoryUsage)
 		// autocompletion behaviour
-		CONFIG_PROPERTY_CHECKBOX_DECLARE(getAutoCompletion)
+		CONFIG_PROPERTY_CHECKBOX_DECLARE(AutoCompletion)
+
+	signals:
+		void settingsChanged();
 
 	protected:
 		ConfigDialog(QWidget* parent = 0);
 		~ConfigDialog();
+		void setupWidgets();
 
 	protected:
 		static ConfigDialog* me;	// pointer to the singleton
@@ -76,8 +83,13 @@ namespace Aseba
 		void writeSettings();
 
 	public slots:
+		virtual void saveState();
+		virtual void reloadFromCache();
 		virtual void accept();
 		virtual void reject();
+
+	protected slots:
+		void flushCache();
 	};
 
 	// ConfigPage
@@ -95,8 +107,10 @@ namespace Aseba
 		virtual void readSettings();
 		virtual void writeSettings();
 
+		virtual void saveState();
 		virtual void flushCache();
 		virtual void discardChanges();
+		virtual void reloadFromCache();
 
 		QCheckBox* newCheckbox(QString label, QString ID, bool checked = false);
 
@@ -108,6 +122,7 @@ namespace Aseba
 			T value;
 		};
 		std::map<QString, WidgetCache<bool> > checkboxCache;
+		std::map<QString, WidgetCache<bool> > checkboxCacheSave;	// used to save the state prior to changes
 
 		QVBoxLayout* mainLayout;
 	};

@@ -29,11 +29,16 @@
 #define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
 
 #define CONFIG_PROPERTY_CHECKBOX_HANDLER(name, page, keyword) \
-	const bool ConfigDialog::name() { \
+	const bool ConfigDialog::get##name() { \
 		if (me) \
 			return me->page->checkboxCache[#keyword].value; \
 		else \
 			return false; \
+	} \
+	\
+	void ConfigDialog::set##name(bool value) { \
+		if (me && !me->isVisible()) \
+			me->page->checkboxCache[#keyword].value = value; \
 	}
 
 
@@ -42,11 +47,11 @@
 
 namespace Aseba
 {
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowLineNumbers,	generalpage,	showlinenumbers		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowHidden,		generalpage,	showhidden		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowKeywordToolbar,	generalpage,	keywordToolbar		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getStartupShowMemoryUsage,	generalpage,	memoryusage		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(getAutoCompletion,		editorpage,	autoKeyword		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers,		generalpage,	showlinenumbers		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden,			generalpage,	showhidden		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar,		generalpage,	keywordToolbar		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage,		generalpage,	memoryusage		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(AutoCompletion,		editorpage,	autoKeyword		)
 
 	/*** ConfigPage ***/
 	ConfigPage::ConfigPage(QString title, QWidget *parent):
@@ -72,6 +77,8 @@ namespace Aseba
 		widget->setCheckState(BOOL_TO_CHECKED(checked));
 		WidgetCache<bool> cache(widget, checked);
 		checkboxCache.insert(std::pair<QString, WidgetCache<bool> >(ID, cache));
+		connect(widget, SIGNAL(released()), ConfigDialog::getInstance(), SLOT(flushCache()));
+		connect(widget, SIGNAL(released()), ConfigDialog::getInstance(), SIGNAL(settingsChanged()));
 		return widget;
 	}
 
@@ -108,6 +115,12 @@ namespace Aseba
 		}
 	}
 
+	void ConfigPage::saveState()
+	{
+		// create a temporary cache
+		checkboxCacheSave = checkboxCache;
+	}
+
 	void ConfigPage::flushCache()
 	{
 		// sync the cache with the widgets' state
@@ -122,8 +135,15 @@ namespace Aseba
 
 	void ConfigPage::discardChanges()
 	{
-		// reload values from the cache
-		// iterate on checkboxes
+		// reload values from the temporary cache
+		checkboxCache = checkboxCacheSave;
+		// update widgets accordingly
+		reloadFromCache();
+	}
+
+	void ConfigPage::reloadFromCache()
+	{
+		// update widgets based on the cache
 		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
 		{
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
@@ -137,18 +157,18 @@ namespace Aseba
 	GeneralPage::GeneralPage(QWidget *parent):
 		ConfigPage(tr("General Setup"), parent)
 	{
-		QGroupBox* gb1 = new QGroupBox(tr("On startup"));
+		QGroupBox* gb1 = new QGroupBox(tr("Layout"));
 		QVBoxLayout* gb1layout = new QVBoxLayout();
 		gb1->setLayout(gb1layout);
 		mainLayout->addWidget(gb1);
-		// Show hidden variables & functions
-		gb1layout->addWidget(newCheckbox(tr("Show hidden variables"), "showhidden", false));
-		// Show line numbers
-		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 		// Show the keyword toolbar
 		gb1layout->addWidget(newCheckbox(tr("Show keyword toolbar"), "keywordToolbar", true));
 		// Show the memory usage gauge
 		gb1layout->addWidget(newCheckbox(tr("Show memory usage"), "memoryusage", false));
+		// Show hidden variables & functions
+		gb1layout->addWidget(newCheckbox(tr("Show hidden variables"), "showhidden", false));
+		// Show line numbers
+		gb1layout->addWidget(newCheckbox(tr("Show line numbers"), "showlinenumbers", true));
 
 		mainLayout->addStretch();
 	}
@@ -206,7 +226,10 @@ namespace Aseba
 	void ConfigDialog::init(QWidget* parent)
 	{
 		if (!me)
+		{
 			me = new ConfigDialog(parent);
+			me->setupWidgets();
+		}
 	}
 
 	void ConfigDialog::bye()
@@ -221,6 +244,8 @@ namespace Aseba
 	void ConfigDialog::showConfig()
 	{
 		me->setModal(true);
+		me->reloadFromCache();
+		me->saveState();
 		me->show();
 
 	}
@@ -229,6 +254,15 @@ namespace Aseba
 
 	ConfigDialog::ConfigDialog(QWidget* parent):
 		QDialog(parent)
+	{
+	}
+
+	ConfigDialog::~ConfigDialog()
+	{
+		writeSettings();
+	}
+
+	void ConfigDialog::setupWidgets()
 	{
 		// list of topics
 		topicList = new QListWidget();
@@ -282,12 +316,50 @@ namespace Aseba
 		readSettings();
 	}
 
-	ConfigDialog::~ConfigDialog()
+	void ConfigDialog::saveState()
 	{
-		writeSettings();
+		// save the state of pages, prior to editing
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->saveState();
+		}
+	}
+
+	void ConfigDialog::reloadFromCache()
+	{
+		// reload values from the cache
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->reloadFromCache();
+		}
 	}
 
 	void ConfigDialog::accept()
+	{
+		// update the cache with new values
+		flushCache();
+		QDialog::accept();
+	}
+
+	void ConfigDialog::reject()
+	{
+		// discard the cache and reload widgets with old values
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->discardChanges();
+		}
+		// GUI should adopt changes
+		emit settingsChanged();
+		QDialog::reject();
+	}
+
+	void ConfigDialog::flushCache()
 	{
 		// update the cache with new values
 		for (int i = 0; i < configStack->count(); i++)
@@ -296,19 +368,6 @@ namespace Aseba
 			if (config)
 				config->flushCache();
 		}
-		QDialog::accept();
-	}
-
-	void ConfigDialog::reject()
-	{
-		// reload values from the cache
-		for (int i = 0; i < configStack->count(); i++)
-		{
-			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
-			if (config)
-				config->discardChanges();
-		}
-		QDialog::reject();
 	}
 
 	void ConfigDialog::readSettings()

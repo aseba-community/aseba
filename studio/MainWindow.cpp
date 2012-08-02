@@ -1865,13 +1865,13 @@ namespace Aseba
 
 	void MainWindow::showLineNumbersChanged(bool state)
 	{
-		assert(currentScriptTab);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
 			tab->linenumbers->showLineNumbers(state);
 		}
+		ConfigDialog::setShowLineNumbers(state);
 	}
 	
 	void MainWindow::goToLine()
@@ -1969,6 +1969,7 @@ namespace Aseba
 				tab->updateHidden();
 			}
 		}
+		ConfigDialog::setShowHidden(show);
 	}
 
 	void MainWindow::showKeywords(bool show) // Jiwon
@@ -1979,6 +1980,7 @@ namespace Aseba
 			if (tab)
 				tab->showKeywords(show);
 		}
+		ConfigDialog::setShowKeywordToolbar(show);
 	}
 
 	void MainWindow::clearAllExecutionError()
@@ -2233,6 +2235,7 @@ namespace Aseba
 			if (tab)
 				tab->showMemoryUsage(show);
 		}
+		ConfigDialog::setShowMemoryUsage(show);
 	}
 	
 	void MainWindow::addEventNameClicked()
@@ -2831,14 +2834,13 @@ namespace Aseba
 		// general connections
 		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
 		connect(logger, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(logEntryDoubleClicked(QListWidgetItem *)));
+		connect(ConfigDialog::getInstance(), SIGNAL(settingsChanged()), SLOT(applySettings()));
 		
 		// global actions
 		connect(loadAllAct, SIGNAL(triggered()), SLOT(loadAll()));
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
-		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
-		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
 
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
@@ -3111,17 +3113,6 @@ namespace Aseba
 		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Uncomment the selection"));
 		connect(uncommentAct, SIGNAL(triggered()), SLOT(uncommentTriggered()));
 
-		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
-		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
-		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
-		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(ConfigDialog::getStartupShowLineNumbers());
-
-		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
-		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
-		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
-		goToLineAct->setEnabled(false);
-
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
 		editMenu->addAction(cutAct);
@@ -3138,12 +3129,42 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(commentAct);
 		editMenu->addAction(uncommentAct);
-		editMenu->addSeparator();
-		editMenu->addAction(showLineNumbers);
-		editMenu->addAction(goToLineAct);
-		editMenu->addSeparator();
-		editMenu->addAction(tr("&Settings"), this, SLOT(showSettings()));
 		
+		// View menu
+		showKeywordsAct = new QAction(tr("Show &keywords"), this);
+		showKeywordsAct->setCheckable(true);
+		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
+
+		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
+		showMemoryUsageAct->setCheckable(true);
+		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
+
+		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
+		showHiddenAct->setCheckable(true);
+		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
+
+		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
+		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
+		showLineNumbers->setCheckable(true);
+		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
+
+		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
+		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
+		goToLineAct->setEnabled(false);
+		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
+
+		QMenu *viewMenu = new QMenu(tr("&View"), this);
+		viewMenu->addAction(showKeywordsAct);
+		viewMenu->addAction(showMemoryUsageAct);
+		viewMenu->addAction(showHiddenAct);
+		viewMenu->addSeparator();
+		viewMenu->addAction(showLineNumbers);
+		viewMenu->addAction(goToLineAct);
+		viewMenu->addSeparator();
+		viewMenu->addAction(tr("&Settings"), this, SLOT(showSettings()));
+		menuBar()->addMenu(viewMenu);
+
+		// Debug actions
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
 		
@@ -3155,7 +3176,7 @@ namespace Aseba
 		
 		pauseAllAct = new QAction(QIcon(":/images/pause.png"), tr("&Pause all"), this);
 		pauseAllAct->setShortcut(tr("F10", "Debug|Pause all"));
-		
+
 		// Debug toolbar
 		globalToolBar = addToolBar(tr("Debug"));
 		globalToolBar->setObjectName("debug toolbar");
@@ -3195,11 +3216,6 @@ namespace Aseba
 		toolMenu->addAction(showCompilationMsg);
 		connect(showCompilationMsg, SIGNAL(toggled(bool)), SLOT(showCompilationMessages(bool)));
 		connect(compilationMessageBox, SIGNAL(hidden()), SLOT(compilationMessagesWasHidden()));
-		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
-		showMemoryUsageAct->setCheckable(true);
-		showMemoryUsageAct->setChecked(ConfigDialog::getStartupShowMemoryUsage());
-		toolMenu->addAction(showMemoryUsageAct);
-		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 		toolMenu->addSeparator();
 		writeBytecodeMenu = new QMenu(tr("Write the program(s)..."), toolMenu);
 		toolMenu->addMenu(writeBytecodeMenu);
@@ -3207,21 +3223,6 @@ namespace Aseba
 		toolMenu->addMenu(rebootMenu);
 		saveBytecodeMenu = new QMenu(tr("Save the binary code..."), toolMenu);
 		toolMenu->addMenu(saveBytecodeMenu);
-		
-		// Settings
-		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
-		menuBar()->addMenu(settingsMenu);
-		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
-		showHiddenAct->setCheckable(true);
-		showHiddenAct->setChecked(ConfigDialog::getStartupShowHidden());
-		showHidden(ConfigDialog::getStartupShowHidden());
-		settingsMenu->addAction(showHiddenAct);
-		
-		// Jiwon
-		showKeywordsAct = new QAction(tr("Show &keywords"), this);
-		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(ConfigDialog::getStartupShowKeywordToolbar());
-		settingsMenu->addAction(showKeywordsAct);
 		
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
@@ -3231,6 +3232,9 @@ namespace Aseba
 		
 		// add dynamic stuff
 		regenerateToolsMenus();
+
+		// Load the state from the settings (thus from hard drive)
+		applySettings();
 	}
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!
@@ -3321,6 +3325,14 @@ namespace Aseba
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
 		
 		setWindowTitle(tr("%0 %1- Aseba Studio").arg(docName).arg(modifiedText));
+	}
+
+	void MainWindow::applySettings()
+	{
+		showKeywordsAct->setChecked(ConfigDialog::getShowKeywordToolbar());
+		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
+		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
+		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 	}
 	
 	/*@}*/
