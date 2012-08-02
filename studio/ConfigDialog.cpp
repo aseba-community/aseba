@@ -37,7 +37,7 @@
 	} \
 	\
 	void ConfigDialog::set##name(bool value) { \
-		if (me) \
+		if (me && !me->isVisible()) \
 			me->page->checkboxCache[#keyword].value = value; \
 	}
 
@@ -47,10 +47,10 @@
 
 namespace Aseba
 {
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers,	generalpage,	showlinenumbers		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden,		generalpage,	showhidden		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar,	generalpage,	keywordToolbar		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage,	generalpage,	memoryusage		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers,		generalpage,	showlinenumbers		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden,			generalpage,	showhidden		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar,		generalpage,	keywordToolbar		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage,		generalpage,	memoryusage		)
 	CONFIG_PROPERTY_CHECKBOX_HANDLER(AutoCompletion,		editorpage,	autoKeyword		)
 
 	/*** ConfigPage ***/
@@ -115,6 +115,12 @@ namespace Aseba
 		}
 	}
 
+	void ConfigPage::saveState()
+	{
+		// create a temporary cache
+		checkboxCacheSave = checkboxCache;
+	}
+
 	void ConfigPage::flushCache()
 	{
 		// sync the cache with the widgets' state
@@ -129,8 +135,15 @@ namespace Aseba
 
 	void ConfigPage::discardChanges()
 	{
-		// reload values from the cache
-		// iterate on checkboxes
+		// reload values from the temporary cache
+		checkboxCache = checkboxCacheSave;
+		// update widgets accordingly
+		reloadFromCache();
+	}
+
+	void ConfigPage::reloadFromCache()
+	{
+		// update widgets based on the cache
 		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
 		{
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
@@ -231,7 +244,8 @@ namespace Aseba
 	void ConfigDialog::showConfig()
 	{
 		me->setModal(true);
-		me->reject();	// hack to reload values from cache
+		me->reloadFromCache();
+		me->saveState();
 		me->show();
 
 	}
@@ -302,6 +316,28 @@ namespace Aseba
 		readSettings();
 	}
 
+	void ConfigDialog::saveState()
+	{
+		// save the state of pages, prior to editing
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->saveState();
+		}
+	}
+
+	void ConfigDialog::reloadFromCache()
+	{
+		// reload values from the cache
+		for (int i = 0; i < configStack->count(); i++)
+		{
+			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
+			if (config)
+				config->reloadFromCache();
+		}
+	}
+
 	void ConfigDialog::accept()
 	{
 		// update the cache with new values
@@ -311,13 +347,15 @@ namespace Aseba
 
 	void ConfigDialog::reject()
 	{
-		// reload values from the cache
+		// discard the cache and reload widgets with old values
 		for (int i = 0; i < configStack->count(); i++)
 		{
 			ConfigPage* config = dynamic_cast<ConfigPage*>(configStack->widget(i));
 			if (config)
 				config->discardChanges();
 		}
+		// GUI should adopt changes
+		emit settingsChanged();
 		QDialog::reject();
 	}
 

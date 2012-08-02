@@ -83,6 +83,8 @@ namespace Aseba
 		void writeSettings();
 
 	public slots:
+		virtual void saveState();
+		virtual void reloadFromCache();
 		virtual void accept();
 		virtual void reject();
 
@@ -105,8 +107,10 @@ namespace Aseba
 		virtual void readSettings();
 		virtual void writeSettings();
 
+		virtual void saveState();
 		virtual void flushCache();
 		virtual void discardChanges();
+		virtual void reloadFromCache();
 
 		QCheckBox* newCheckbox(QString label, QString ID, bool checked = false);
 
@@ -118,6 +122,7 @@ namespace Aseba
 			T value;
 		};
 		std::map<QString, WidgetCache<bool> > checkboxCache;
+		std::map<QString, WidgetCache<bool> > checkboxCacheSave;	// used to save the state prior to changes
 
 		QVBoxLayout* mainLayout;
 	};
