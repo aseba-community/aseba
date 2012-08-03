@@ -29,7 +29,9 @@
 #include <utility>
 #include <istream>
 
+#include "errors_code.h"
 #include "../common/types.h"
+#include "../utils/FormatableString.h"
 
 namespace Aseba
 {
@@ -156,6 +158,18 @@ namespace Aseba
 		std::wstring toWString() const;
 	};
 	
+	//! Return error messages based on error ID (needed to translate messages for other applications)
+	class ErrorMessages
+	{
+		public:
+			ErrorMessages();
+
+			//! Type of the callback
+			typedef const std::wstring (*ErrorCallback)(ErrorCode error);
+			//! Default callback
+			static const std::wstring defaultCallback(ErrorCode error);
+	};
+
 	//! Compilation error
 	struct Error
 	{
@@ -165,10 +179,27 @@ namespace Aseba
 		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
 		//! Create an empty error
 		Error() { message = L"not defined"; }
+
 		//! Return a string describing the error
 		std::wstring toWString() const;
 	};
-	
+
+	struct TranslatableError : public Error
+	{
+		TranslatableError() : Error() {}
+		TranslatableError(const SourcePos& pos, ErrorCode error);
+		TranslatableError &arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError &arg(unsigned value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError &arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
+		TranslatableError &arg(const std::wstring& value);
+
+		Error toError(void);
+		static void setTranslateCB(ErrorMessages::ErrorCallback newCB);
+
+		static ErrorMessages::ErrorCallback translateCB;
+		WFormatableString message;
+	};
+
 	//! Vector of names of variables
 	typedef std::vector<std::wstring> VariablesNamesVector;
 	
@@ -333,6 +364,8 @@ namespace Aseba
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
+		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
+		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		
 	protected:
 		void internalCompilerError() const;
@@ -429,6 +462,8 @@ namespace Aseba
 		unsigned endVariableIndex; //!< (endMemory - endVariableIndex) is pointing to the first free variable at the end
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
+
+		ErrorMessages translator;
 	}; // Compiler
 	
 	//! Bytecode use for compilation previous to linking

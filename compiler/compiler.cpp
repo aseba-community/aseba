@@ -20,6 +20,7 @@
 
 #include "compiler.h"
 #include "tree.h"
+#include "errors_code.h"
 #include "../common/consts.h"
 #include "../utils/utils.h"
 #include "../utils/FormatableString.h"
@@ -89,6 +90,7 @@ namespace Aseba
 	{
 		targetDescription = 0;
 		commonDefinitions = 0;
+		TranslatableError::setTranslateCB(ErrorMessages::defaultCallback);
 	}
 	
 	//! Set the description of the target as returned by the microcontroller. You must call this function before any call to compile().
@@ -122,7 +124,7 @@ namespace Aseba
 		buildMaps();
 		if (freeVariableIndex > targetDescription->variablesSize)
 		{
-			errorDescription = Error(SourcePos(), L"Broken target description: not enough room for internal variables");
+			errorDescription = TranslatableError(SourcePos(), ERROR_BROKEN_TARGET).toError();
 			return false;
 		}
 		
@@ -131,9 +133,9 @@ namespace Aseba
 		{
 			tokenize(source);
 		}
-		catch (Error error)
+		catch (TranslatableError error)
 		{
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 		
@@ -149,9 +151,9 @@ namespace Aseba
 		{
 			program = parseProgram();
 		}
-		catch (Error error)
+		catch (TranslatableError error)
 		{
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 		
@@ -168,10 +170,10 @@ namespace Aseba
 		{
 			program->checkVectorSize();
 		}
-		catch(Error error)
+		catch(TranslatableError error)
 		{
 			delete program;
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 
@@ -187,9 +189,9 @@ namespace Aseba
 		{
 			program = program->expandToAsebaTree(dump);
 		}
-		catch (Error error)
+		catch (TranslatableError error)
 		{
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 
@@ -206,10 +208,10 @@ namespace Aseba
 		{
 			program->typeCheck();
 		}
-		catch(Error error)
+		catch(TranslatableError error)
 		{
 			delete program;
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 		
@@ -225,10 +227,10 @@ namespace Aseba
 		{
 			program = program->optimize(dump);
 		}
-		catch (Error error)
+		catch (TranslatableError error)
 		{
 			delete program;
-			errorDescription = error;
+			errorDescription = error.toError();
 			return false;
 		}
 		
@@ -261,14 +263,14 @@ namespace Aseba
 		// stack check
 		if (!verifyStackCalls(preLinkBytecode))
 		{
-			errorDescription = Error(SourcePos(), L"Execution stack will overflow, check for any recursive subroutine call and cut long mathematical expressions.");
+			errorDescription = TranslatableError(SourcePos(), ERROR_STACK_OVERFLOW).toError();
 			return false;
 		}
 		
 		// linking (flattening of complex structure into linear vector)
 		if (!link(preLinkBytecode, bytecode))
 		{
-			errorDescription = Error(SourcePos(), L"Script too big for target bytecode size.");
+			errorDescription = TranslatableError(SourcePos(), ERROR_SCRIPT_TOO_BIG).toError();
 			return false;
 		}
 		

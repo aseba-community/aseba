@@ -103,7 +103,7 @@ namespace Aseba
 			unsigned pointer = getVectorAddr() + index;
 			// check if index is within bounds
 			if (pointer >= arrayAddr + arraySize)
-				throw Error(sourcePos, WFormatableString(L"Access of array %0 out of bounds: accessing index %1 while array is of size %2").arg(arrayName).arg(index).arg(arraySize));
+				throw TranslatableError(sourcePos, ERROR_ARRAY_OUT_OF_BOUND).arg(arrayName).arg(index).arg(arraySize);
 
 			if (write == true)
 				return new StoreNode(sourcePos, pointer);
@@ -191,7 +191,7 @@ namespace Aseba
 
 		// top-level check
 		if (lSize != rSize)
-			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
+			throw TranslatableError(sourcePos, ERROR_ARRAY_SIZE_MISMATCH).arg(lSize).arg(rSize);
 	}
 
 	void ArithmeticAssignmentNode::checkVectorSize() const
@@ -204,7 +204,7 @@ namespace Aseba
 
 		// top-level check
 		if (lSize != rSize)
-			throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(lSize).arg(rSize));
+			throw TranslatableError(sourcePos, ERROR_ARRAY_SIZE_MISMATCH).arg(lSize).arg(rSize);
 	}
 
 
@@ -214,7 +214,7 @@ namespace Aseba
 
 		unsigned conditionSize = children[0]->getVectorSize();
 		if (conditionSize != 1)
-			throw Error(sourcePos, L"Condition of the if cannot be a vector");
+			throw TranslatableError(sourcePos, ERROR_IF_VECTOR_CONDITION);
 		// check true block
 		if (children.size() > 1 && children[1])
 			children[1]->checkVectorSize();
@@ -230,7 +230,7 @@ namespace Aseba
 		unsigned conditionLeftSize = children[0]->getVectorSize();
 		unsigned conditionRightSize = children[1]->getVectorSize();
 		if (conditionLeftSize != 1 || conditionRightSize != 1)
-			throw Error(sourcePos, L"Condition of the if cannot be a vector");
+			throw TranslatableError(sourcePos, ERROR_IF_VECTOR_CONDITION);
 		// check true block
 		if (children.size() > 2 && children[2])
 			children[2]->checkVectorSize();
@@ -245,7 +245,7 @@ namespace Aseba
 
 		unsigned conditionSize = children[0]->getVectorSize();
 		if (conditionSize != 1)
-			throw Error(sourcePos, L"Condition of the while cannot be a vector");
+			throw TranslatableError(sourcePos, ERROR_WHILE_VECTOR_CONDITION);
 		// check inner block
 		if (children.size() > 1 && children[1])
 			children[1]->checkVectorSize();
@@ -258,7 +258,7 @@ namespace Aseba
 		unsigned conditionLeftSize = children[0]->getVectorSize();
 		unsigned conditionRightSize = children[1]->getVectorSize();
 		if (conditionLeftSize != 1 || conditionRightSize != 1)
-			throw Error(sourcePos, L"Condition of the while cannot be a vector");
+			throw TranslatableError(sourcePos, ERROR_WHILE_VECTOR_CONDITION);
 		// check inner block
 		if (children.size() > 2 && children[2])
 			children[2]->checkVectorSize();
@@ -287,7 +287,7 @@ namespace Aseba
 			if (size == E_NOVAL)
 				size = new_size;
 			else if (size != new_size)
-				throw Error(sourcePos, WFormatableString(L"Size error! Size of array1 = %0 ; size of array2 = %1").arg(size).arg(new_size));
+				throw TranslatableError(sourcePos, ERROR_ARRAY_SIZE_MISMATCH).arg(size).arg(new_size);
 		}
 
 		return size;
@@ -344,7 +344,7 @@ namespace Aseba
 				}
 				else
 					// whaaaaat? Are you trying foo[[1,2,3]]?
-					throw Error(sourcePos, L"MemoryVectorNode::getVectorSize: illegal operation");
+					throw TranslatableError(sourcePos, ERROR_ARRAY_ILLEGAL_ACCESS);
 			}
 			else
 				// random access foo[expr]

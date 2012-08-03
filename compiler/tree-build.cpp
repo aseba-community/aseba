@@ -228,7 +228,7 @@ namespace Aseba
 			break;
 
 		default:
-			throw Error(sourcePos, L"Unexpected token when building UnaryArithmeticAssignmentNode");
+			throw TranslatableError(sourcePos, ERROR_UNARY_ARITH_BUILD_UNEXPECTED);
 			break;
 		}
 
