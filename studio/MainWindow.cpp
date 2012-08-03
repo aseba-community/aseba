@@ -1438,6 +1438,7 @@ namespace Aseba
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
 		
 		// create config dialog + read settings on-disk
@@ -2689,8 +2690,9 @@ namespace Aseba
 		constantsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		constantsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-		constantsView->setDragDropMode(QAbstractItemView::DragOnly);
+		constantsView->setDragDropMode(QAbstractItemView::InternalMove);
 		constantsView->setDragEnabled(true);
+		constantsView->setDropIndicatorShown(true);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
 		constantsView->setSecondColumnLongestContent("-888888##");
