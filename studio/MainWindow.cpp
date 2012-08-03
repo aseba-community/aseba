@@ -1436,7 +1436,9 @@ namespace Aseba
 
 		// create models
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
+		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
 		
 		// create config dialog + read settings on-disk
@@ -2260,8 +2262,6 @@ namespace Aseba
 			else
 			{
 				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), eventNbArgs));
-				recompileAll();
-				updateWindowTitle();
 			}
 		}
 	}
@@ -2278,11 +2278,22 @@ namespace Aseba
 			if (tab)
 				tab->isSynchronized = false; // Jiwon
 		}
-		
-		statusText->setText(tr("Desynchronised! Please reload."));
-		statusText->show();
+	}
+
+	void MainWindow::eventsUpdated(bool indexChanged)
+	{
+		if (indexChanged)
+		{
+			statusText->setText(tr("Desynchronised! Please reload."));
+			statusText->show();
+		}
 		recompileAll();
-		updateWindowTitle();		
+		updateWindowTitle();
+	}
+
+	void MainWindow::eventsUpdatedDirty()
+	{
+		eventsUpdated(true);
 	}
 	
 	void MainWindow::eventsDescriptionsSelectionChanged()
@@ -2682,8 +2693,9 @@ namespace Aseba
 		constantsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		constantsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-		constantsView->setDragDropMode(QAbstractItemView::DragOnly);
+		constantsView->setDragDropMode(QAbstractItemView::InternalMove);
 		constantsView->setDragEnabled(true);
+		constantsView->setDropIndicatorShown(true);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
 		constantsView->setSecondColumnLongestContent("-888888##");
@@ -2753,8 +2765,9 @@ namespace Aseba
 		eventsDescriptionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		eventsDescriptionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-		eventsDescriptionsView->setDragDropMode(QAbstractItemView::DragOnly);
+		eventsDescriptionsView->setDragDropMode(QAbstractItemView::InternalMove);
 		eventsDescriptionsView->setDragEnabled(true);
+		eventsDescriptionsView->setDropIndicatorShown(true);
 		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, (ASEBA_MAX_PACKET_SIZE-6)/2, this));
 		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
@@ -2852,8 +2865,9 @@ namespace Aseba
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsView, SIGNAL(clicked(const QModelIndex &)), SLOT(toggleEventVisibleButton(const QModelIndex &)) );
-		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
-		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
+		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(eventsUpdated()));
+		connect(eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(eventsUpdated()));
+		connect(eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(eventsUpdatedDirty()));
 		connect(eventsDescriptionsView, SIGNAL(customContextMenuRequested ( const QPoint & )), SLOT(eventContextMenuRequested(const QPoint & )));
 
 		// logger

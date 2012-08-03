@@ -90,26 +90,35 @@ namespace Aseba
 	
 	Qt::ItemFlags NamedValuesVectorModel::flags(const QModelIndex & index) const
 	{
+		if (!index.isValid())
+			return Qt::ItemIsDropEnabled;
+
+		Qt::ItemFlags commonFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 		if (index.column() == 0)
 		{
 			if (editable)
-				return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+				return commonFlags | Qt::ItemIsEditable;
 			else
-				return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+				return commonFlags;
 		}
 		else
-			return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled;
+			return commonFlags | Qt::ItemIsEditable;
 	}
-	
+
 	QStringList NamedValuesVectorModel::mimeTypes () const
 	{
 		QStringList types;
 		types << "text/plain";
+		if (privateMimeType != "")
+			types << privateMimeType;
 		return types;
 	}
 	
 	QMimeData * NamedValuesVectorModel::mimeData ( const QModelIndexList & indexes ) const
 	{
+		QMimeData *mimeData = new QMimeData();
+
+		// "text/plain"
 		QString texts;
 		foreach (QModelIndex index, indexes)
 		{
@@ -119,10 +128,64 @@ namespace Aseba
 				texts += text;
 			}
 		}
-		
-		QMimeData *mimeData = new QMimeData();
 		mimeData->setText(texts);
+
+		if (privateMimeType == "")
+			return mimeData;
+
+		// privateMimeType
+		QByteArray itemData;
+		QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+		foreach (QModelIndex itemIndex, indexes)
+		{
+			if (!itemIndex.isValid())
+				continue;
+			QString name = data(index(itemIndex.row(), 0), Qt::DisplayRole).toString();
+			int nbArgs = data(index(itemIndex.row(), 1), Qt::DisplayRole).toInt();
+			dataStream << name << nbArgs;
+		}
+		mimeData->setData(privateMimeType, itemData);
+
 		return mimeData;
+	}
+
+	bool NamedValuesVectorModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+	{
+		if (action == Qt::IgnoreAction)
+			return true;
+
+		if (!data->hasFormat(privateMimeType))
+			return false;
+
+		// decode mime data
+		QByteArray itemData = data->data(privateMimeType);
+		QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+		QString name;
+		int value;
+		dataStream >> name >> value;
+
+		// search for this element
+		int oldIndex = 0;
+		for (NamedValuesVector::iterator it = namedValues->begin(); it != namedValues->end(); it++, oldIndex++)
+			if ((*it).name == name.toStdWString() && (*it).value == value)
+			{
+				// found! move it
+				moveRow(oldIndex, row);
+				return true;
+			}
+
+		// element not found
+		return false;
+	}
+
+	Qt::DropActions NamedValuesVectorModel::supportedDragActions()
+	{
+		return Qt::CopyAction | Qt::MoveAction;
+	}
+
+	Qt::DropActions NamedValuesVectorModel::supportedDropActions() const
+	{
+		return Qt::CopyAction | Qt::MoveAction;
 	}
 	
 	bool NamedValuesVectorModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -153,18 +216,28 @@ namespace Aseba
 		this->editable = editable;
 	}
 
-	void NamedValuesVectorModel::addNamedValue(const NamedValue& namedValue)
+	void NamedValuesVectorModel::addNamedValue(const NamedValue &namedValue, int index)
 	{
 		Q_ASSERT(namedValues);
-		
-		unsigned position = namedValues->size();
-		
-		beginInsertRows(QModelIndex(), position, position);
-		
-		namedValues->push_back(namedValue);
+		Q_ASSERT(index < (int)namedValues->size());
+
+		if (index < 0)
+		{
+			// insert at the end
+			beginInsertRows(QModelIndex(), namedValues->size(), namedValues->size());
+			namedValues->push_back(namedValue);
+			endInsertRows();
+		}
+		else
+		{
+			beginInsertRows(QModelIndex(), index, index);
+			NamedValuesVector::iterator it = namedValues->begin() + index;
+			namedValues->insert(it, namedValue);
+			endInsertRows();
+		}
+
 		wasModified = true;
-		
-		endInsertRows();
+		emit publicRowsInserted();
 	}
 	
 	void NamedValuesVectorModel::delNamedValue(int index)
@@ -178,8 +251,28 @@ namespace Aseba
 		wasModified = true;
 		
 		endRemoveRows();
+		emit publicRowsRemoved();
 	}
 	
+	bool NamedValuesVectorModel::moveRow(int oldRow, int& newRow)
+	{
+		if (oldRow == newRow || namedValues->size() <= 1)
+			return false;
+
+		// get values
+		NamedValue value = namedValues->at(oldRow);
+
+		delNamedValue(oldRow);
+
+		// update index for the new model
+		if (newRow > oldRow && newRow > 0)
+			newRow--;
+
+		addNamedValue(value, newRow);
+
+		return true;
+	}
+
 	void NamedValuesVectorModel::clear()
 	{
 		Q_ASSERT(namedValues);
@@ -266,6 +359,24 @@ namespace Aseba
 	{
 		viewEvent.erase(viewEvent.begin() + index);
 		NamedValuesVectorModel::delNamedValue(index);
+	}
+
+	bool MaskableNamedValuesVectorModel::moveRow(int oldRow, int& newRow)
+	{
+		if (!NamedValuesVectorModel::moveRow(oldRow, newRow))
+			return false;
+
+		// get value
+		bool value = viewEvent.at(oldRow);
+
+		viewEvent.erase(viewEvent.begin() + oldRow);
+
+		if (newRow < 0)
+			viewEvent.push_back(value);
+		else
+			viewEvent.insert(viewEvent.begin() + newRow, value);
+
+		return true;
 	}
 
 	void MaskableNamedValuesVectorModel::toggle(const QModelIndex &index)

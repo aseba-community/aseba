@@ -21,6 +21,7 @@
 #include "CustomWidgets.h"
 #include <QMimeData>
 #include <QResizeEvent>
+#include <QPainter>
 
 namespace Aseba
 {
@@ -79,6 +80,95 @@ namespace Aseba
 			setColumnWidth(1, col1Width);
 			setColumnWidth(2, 22);
 		}
+	}
+
+	void FixedWidthTableView::startDrag(Qt::DropActions supportedActions)
+	{
+		QModelIndex item = currentIndex();
+		QModelIndexList list;
+		list.append(item);
+
+		QMimeData* mimeData = model()->mimeData(list);
+
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		QPixmap pixmap = getDragPixmap(mimeData->text());
+		drag->setPixmap(pixmap);
+		QPoint hotpoint(pixmap.width()+10, pixmap.height()/2);
+		drag->setHotSpot(hotpoint);
+
+		if (drag->exec(Qt::CopyAction|Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
+		{
+			// item moved
+		}
+		else
+		{
+			// item copied
+		}
+	}
+
+	void FixedWidthTableView::dragEnterEvent(QDragEnterEvent *event)
+	{
+		if (modelMatchMimeFormat(event->mimeData()->formats()))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+		else
+			event->ignore();
+	}
+
+	void FixedWidthTableView::dragMoveEvent(QDragMoveEvent *event)
+	{
+		event->accept();
+	}
+
+	void FixedWidthTableView::dropEvent(QDropEvent *event)
+	{
+		int row = rowAt(event->pos().y());
+		int col = columnAt(event->pos().x());
+
+		if (model()->dropMimeData(event->mimeData(), event->dropAction(), row, col, QModelIndex()))
+		{
+			event->accept();
+		}
+		else
+			event->ignore();
+	}
+
+	QPixmap FixedWidthTableView::getDragPixmap(QString text)
+	{
+		// From the "Fridge Magnets" example
+		QFontMetrics metric(font());
+		QSize size = metric.size(Qt::TextSingleLine, text);
+
+		QImage image(size.width() + 12, size.height() + 12, QImage::Format_ARGB32_Premultiplied);
+		image.fill(qRgba(0, 0, 0, 0));
+
+		QFont font;
+		font.setStyleStrategy(QFont::ForceOutline);
+
+		QPainter painter;
+		painter.begin(&image);
+		painter.setRenderHint(QPainter::Antialiasing);
+
+		painter.setFont(font);
+		painter.setBrush(Qt::black);
+		painter.drawText(QRect(QPoint(6, 6), size), Qt::AlignCenter, text);
+		painter.end();
+
+		return QPixmap::fromImage(image);
+	}
+
+	bool FixedWidthTableView::modelMatchMimeFormat(QStringList candidates)
+	{
+		QStringList acceptedMime = model()->mimeTypes();
+		for (QStringList::ConstIterator it = acceptedMime.constBegin(); it != acceptedMime.constEnd(); it++)
+		{
+			if (candidates.contains(*it))
+				return true;
+		}
+		return false;
 	}
 	
 	/*@}*/
