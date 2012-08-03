@@ -397,6 +397,8 @@ namespace Aseba
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();
+		void eventsUpdated(bool indexChanged = false);
+		void eventsUpdatedDirty();
 		void eventsDescriptionsSelectionChanged();
 		
 		void resetStatusText(); // Jiwon

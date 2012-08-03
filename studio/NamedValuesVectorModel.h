@@ -48,21 +48,32 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		QStringList mimeTypes () const;
+		void setExtraMimeType(QString mime) { privateMimeType = mime; }
 		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
+		bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+		Qt::DropActions supportedDragActions();
+		Qt::DropActions supportedDropActions() const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
 		void setEditable(bool editable);
 		
+		virtual bool moveRow(int oldRow, int& newRow);
+
 	public slots:
-		void addNamedValue(const NamedValue& namedValue);
+		void addNamedValue(const NamedValue& namedValue, int index = -1);
 		void delNamedValue(int index);
 		void clear();
+
+	signals:
+		void publicRowsInserted();
+		void publicRowsRemoved();
 		
 	protected:
 		NamedValuesVector* namedValues;
 		bool wasModified;
+		QString privateMimeType;
 
 	private:
 		QString tooltipText;
@@ -83,6 +94,8 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 
 		bool isVisible(const unsigned id);
+
+		virtual bool moveRow(int oldRow, int& newRow);
 
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
