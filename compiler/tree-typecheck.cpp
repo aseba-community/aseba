@@ -41,7 +41,7 @@ namespace Aseba
 	void Node::expectType(const Node::ReturnType& expected, const Node::ReturnType& type) const
 	{
 		if (type != expected)
-			throw Error(sourcePos, WFormatableString(L"Expecting %0 type, found %1 type instead").arg(typeName(expected)).arg(typeName(type)));
+			throw TranslatableError(sourcePos, ERROR_EXPECTING_TYPE).arg(typeName(expected)).arg(typeName(type));
 	};
 	
 	Node::ReturnType Node::typeCheck() const
@@ -76,7 +76,7 @@ namespace Aseba
 			ok = true;
 		
 		if (!ok)
-			throw Error(children[0]->sourcePos, WFormatableString(L"Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
+			throw TranslatableError(children[0]->sourcePos, ERROR_EXPECTING_CONDITION).arg(children[0]->toNodeName());
 		return TYPE_UNIT;
 	}
 	
@@ -94,7 +94,7 @@ namespace Aseba
 			ok = true;
 		
 		if (!ok)
-			throw Error(children[0]->sourcePos, WFormatableString(L"Expecting a condition, found a %0 instead").arg(children[0]->toNodeName()));
+			throw TranslatableError(children[0]->sourcePos, ERROR_EXPECTING_CONDITION).arg(children[0]->toNodeName());
 		return TYPE_UNIT;
 	}
 	
