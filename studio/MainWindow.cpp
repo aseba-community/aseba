@@ -224,7 +224,8 @@ namespace Aseba
 	
 	//////
 	
-	AbsentNodeTab::AbsentNodeTab(const QString& name, const QString& sourceCode) :
+	AbsentNodeTab::AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode) :
+		ScriptTab(id),
 		name(name)
 	{
 		createEditor();
@@ -241,8 +242,8 @@ namespace Aseba
 	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QSplitter(parent),
+		ScriptTab(id),
 		VariableListener(0),
-		id(id),
 		pid(ASEBA_PID_UNDEFINED),
 		target(target),
 		commonDefinitions(commonDefinitions),
@@ -1549,7 +1550,7 @@ namespace Aseba
 							tab->editor->setPlainText(element.firstChild().toText().data());
 						else
 						{
-							nodes->addTab(new AbsentNodeTab(element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
+							nodes->addTab(new AbsentNodeTab(0, element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
 							noNodeCount++;
 						}
 					}
@@ -2421,10 +2422,22 @@ namespace Aseba
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
+		// create a new tab for the node
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
 		tab->showKeywords(showKeywordsAct->isChecked());
 		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
 		tab->showMemoryUsage(showMemoryUsageAct->isChecked());
+		
+		// check if there is an absent node tab with this id and name, and copy data
+		const int absentIndex(getAbsentIndexFromId(node));
+		const AbsentNodeTab* absentTab(getAbsentTabFromId(node));
+		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
+		{
+			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
+			nodes->removeAndDeleteTab(absentIndex);
+		}
+		
+		// connect and show new tab
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -2441,6 +2454,7 @@ namespace Aseba
 		
 		nodes->addTab(
 			new AbsentNodeTab(
+				node,
 				tabName,
 				tab->editor->document()->toPlainText()
 			),
@@ -2604,7 +2618,7 @@ namespace Aseba
 		tab->breakpointSetResult(line, success);
 	}
 	
-	int MainWindow::getIndexFromId(unsigned node)
+	int MainWindow::getIndexFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2618,7 +2632,7 @@ namespace Aseba
 		return -1;
 	}
 	
-	NodeTab* MainWindow::getTabFromId(unsigned node)
+	NodeTab* MainWindow::getTabFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2632,7 +2646,7 @@ namespace Aseba
 		return 0;
 	}
 	
-	NodeTab* MainWindow::getTabFromName(const QString& name)
+	NodeTab* MainWindow::getTabFromName(const QString& name) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2640,6 +2654,34 @@ namespace Aseba
 			if (tab)
 			{
 				if (target->getName(tab->nodeId()) == name)
+					return tab;
+			}
+		}
+		return 0;
+	}
+	
+	int MainWindow::getAbsentIndexFromId(unsigned node) const
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
+					return i;
+			}
+		}
+		return -1;
+	}
+	
+	AbsentNodeTab* MainWindow::getAbsentTabFromId(unsigned node) const
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
 					return tab;
 			}
 		}
