@@ -926,10 +926,14 @@ namespace Aseba
 	void AeslEditor::insertCompletion(const QString& completion)
 	{
 		QTextCursor tc = textCursor();
-		int extra = completion.length() - completer->completionPrefix().length();
+		// move at the end of the word (make sure to be on it)
 		tc.movePosition(QTextCursor::Left);
 		tc.movePosition(QTextCursor::EndOfWord);
-		tc.insertText(completion.right(extra));
+		// move the cursor left, by the number of completer's prefix characters
+		tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, completer->completionPrefix().length());
+		tc.removeSelectedText();
+		// insert completion
+		tc.insertText(completion);
 		setTextCursor(tc);
 	}
 
