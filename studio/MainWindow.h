@@ -41,6 +41,7 @@
 #include "AeslEditor.h"
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
+#include "ModelAggregator.h"
 
 #include "../compiler/compiler.h"
 #include <fstream>
@@ -305,6 +306,7 @@ namespace Aseba
 		QAbstractItemModel* eventAggregator;
 		QAbstractItemModel* variableAggregator;
 		QSortFilterProxyModel* sortingProxy;
+		TreeChainsawFilter* functionsFlatModel;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;

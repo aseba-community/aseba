@@ -288,6 +288,10 @@ namespace Aseba
 		sortingProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
 		sortingProxy->setSortRole(Qt::DisplayRole);
 
+		// create the chainsaw filter for native functions
+		functionsFlatModel = new TreeChainsawFilter(this);
+		functionsFlatModel->setSourceModel(vmFunctionsModel);
+
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -1154,7 +1158,11 @@ namespace Aseba
 		else if (context == VarDefContext)
 			editor->setCompleterModel(0);		// disable auto-completion in this case
 		else if (context == FunctionContext)
-			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
+		{
+			sortingProxy->setSourceModel(functionsFlatModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// native functions
+		}
 		else if (context == EventContext)
 		{
 			sortingProxy->setSourceModel(eventAggregator);
