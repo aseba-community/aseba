@@ -51,7 +51,9 @@ namespace Aseba
 		if( newRow )
 			button = createNewButtonSet();
 		else if( prevNewEventButton )
+		{
 			button = buttonSets.last();
+		}
 		else 
 		{
 			if( lastFocus >= 0 )
@@ -105,7 +107,9 @@ namespace Aseba
 		if( newRow )
 			button = createNewButtonSet();		
 		else if( prevNewActionButton )
+		{
 			button = buttonSets.last();
+		}
 		else 
 		{
 			if( lastFocus >= 0 )
@@ -117,7 +121,7 @@ namespace Aseba
 						button = buttonSets.at(i);
 						break;
 					}
-								
+			
 			if( !button )
 			{
 				if(!buttonSets.isEmpty() && !(buttonSets.last()->eventExists()) )
@@ -169,7 +173,7 @@ namespace Aseba
 		return button;		
 	}
 
-	bool ThymioScene::isEmpty()
+	bool ThymioScene::isEmpty() const
 	{
 		if( buttonSets.isEmpty() )
 			return true;
@@ -324,31 +328,30 @@ namespace Aseba
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));			
 	}	
 	
-	QString ThymioScene::getErrorMessage() 
+	QString ThymioScene::getErrorMessage() const
 	{ 
 		switch(thymioCompiler.getErrorCode()) {
 		case THYMIO_MISSING_EVENT:
-			return tr("Line %0: Missing event button").arg(thymioCompiler.getErrorLine());
+			return tr("Line %0: Missing event").arg(thymioCompiler.getErrorLine());
 			break;
 		case THYMIO_MISSING_ACTION:
-			return tr("Line %0: Missing action button").arg(thymioCompiler.getErrorLine());
+			return tr("Line %0: Missing action").arg(thymioCompiler.getErrorLine());
 			break;
 		case THYMIO_EVENT_MULTISET:
-			return tr("Line %0: Redeclaration of event button.").arg(thymioCompiler.getErrorLine());
+			return tr("Line %0: Redeclaration of event").arg(thymioCompiler.getErrorLine());
 			break;
 		case THYMIO_INVALID_CODE:
-			return tr("Line %0: Unknown button type.").arg(thymioCompiler.getErrorLine());
+			return tr("Line %0: Unknown event/action type").arg(thymioCompiler.getErrorLine());
 			break;
 		case THYMIO_NO_ERROR:
-			return tr("Compilation success.");
+			return tr("Compilation success");
 		default:
+			return tr("Unknown VPL error");
 			break;
 		}
-		
-		return "";
 	}	
 	
-	QList<QString> ThymioScene::getCode()
+	QList<QString> ThymioScene::getCode() const
 	{
 		QList<QString> out;
 		

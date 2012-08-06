@@ -26,6 +26,7 @@
 #include "AeslEditor.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
+#include "CompilerTranslator.h"
 #include "../common/consts.h"
 #include "../common/productids.h"
 #include "../utils/utils.h"
@@ -64,6 +65,8 @@ namespace Aseba
 		setReadOnly(true);
 		
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
+		
+		resize(600, 560);
 	}
 	
 	void CompilationLogDialog::hideEvent( QHideEvent * event )
@@ -349,7 +352,8 @@ namespace Aseba
 			for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 				layout->addWidget((*it)->createMenuEntry());
 			widget->setLayout(layout);
-			toolBox->addItem(widget, tr("Tools"));
+			int index = toolBox->addItem(widget, tr("Local Tools"));
+			toolBox->setCurrentIndex(index);
 			
 			mainWindow->regenerateHelpMenu();
 			
@@ -371,6 +375,10 @@ namespace Aseba
 		compilationResultLayout->addWidget(cursorPosText);
 		compilationResultLayout->addWidget(compilationResultText, 1000);
 		compilationResultLayout->addWidget(compilationResultImage);
+
+		// memory usage notification area
+		memoryUsageText = new QLabel();
+		memoryUsageText->setAlignment(Qt::AlignLeft);
 		
 		// editor area
 		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
@@ -390,7 +398,7 @@ namespace Aseba
 		forButton = new QToolButton(); forButton->setText("for");
 		subroutineButton = new QToolButton(); subroutineButton->setText("sub");
 		callsubButton = new QToolButton(); callsubButton->setText("callsub");
-		keywordsToolbar->addWidget(new QLabel(tr("<b>Keywords <\b>")));
+		keywordsToolbar->addWidget(new QLabel(tr("<b>Keywords</b>")));
 		keywordsToolbar->addSeparator();
 		keywordsToolbar->addWidget(varButton);
 		keywordsToolbar->addWidget(ifButton);
@@ -406,6 +414,7 @@ namespace Aseba
 		editorLayout->addWidget(keywordsToolbar); // Jiwon
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
+		editorLayout->addWidget(memoryUsageText);
 		
 		// panel
 		
@@ -713,7 +722,7 @@ namespace Aseba
 		else
 		{
 			QTextCursor cursor(editor->textCursor());
-			if (cursor.atBlockEnd())// && !cursor.block().next().isValid())
+			if (cursor.atBlockEnd() && ConfigDialog::getAutoCompletion())// && !cursor.block().next().isValid())
 			{
 				// language completion
 				const QString& line(cursor.block().text());
@@ -897,6 +906,11 @@ namespace Aseba
 			keywordsToolbar->hide();
 	}
 
+	void NodeTab::showMemoryUsage(bool show)
+	{
+		memoryUsageText->setVisible(show);
+	}
+
 	void NodeTab::updateHidden() 
 	{
 		const QString& filterString(vmMemoryFilter->text());
@@ -922,6 +936,7 @@ namespace Aseba
 		Compiler compiler;
 		compiler.setTargetDescription(&targetDescription);
 		compiler.setCommonDefinitions(&commonDefinitions);
+		compiler.setTranslateCallback(CompilerTranslator::translate);
 		
 		std::wistringstream is(source.toStdWString());
 		
@@ -994,6 +1009,20 @@ namespace Aseba
 					QString::fromStdWString(result->compilationMessages.str())
 				);
 				
+		}
+
+		// show memory usage
+		if (result->success)
+		{
+			const unsigned variableCount = result->allocatedVariablesCount;
+			const unsigned variableTotal = (*target->getDescription(id)).variablesSize;
+			const unsigned bytecodeCount = result->bytecode.size();
+			const unsigned bytecodeTotal = (*target->getDescription(id)).bytecodeSize;
+			assert(variableCount);
+			assert(bytecodeCount);
+			const QString variableText = tr("variables: %1 on %2 (%3\%)").arg(variableCount).arg(variableTotal).arg((double)variableCount*100./variableTotal, 0, 'f', 1);
+			const QString bytecodeText = tr("bytecode: %1 on %2 (%3\%)").arg(bytecodeCount).arg(bytecodeTotal).arg((double)bytecodeCount*100./bytecodeTotal, 0, 'f', 1);
+			memoryUsageText->setText(trUtf8("<b>Memory usage</b> : %1, %2").arg(variableText).arg(bytecodeText));
 		}
 		
 		// update state following result
@@ -1408,9 +1437,15 @@ namespace Aseba
 		target = new DashelTarget(translators, commandLineTarget);
 
 		// create models
-		eventsDescriptionsModel = new NamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
+		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
+		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
 		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
+		constantsDefinitionsModel->setEditable(true);
 		
+		// create config dialog + read settings on-disk
+		ConfigDialog::init(this);
+
 		// create gui
 		setupWidgets();
 		setupMenu();
@@ -1834,13 +1869,13 @@ namespace Aseba
 
 	void MainWindow::showLineNumbersChanged(bool state)
 	{
-		assert(currentScriptTab);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
 			Q_ASSERT(tab);
 			tab->linenumbers->showLineNumbers(state);
 		}
+		ConfigDialog::setShowLineNumbers(state);
 	}
 	
 	void MainWindow::goToLine()
@@ -1857,6 +1892,11 @@ namespace Aseba
 			this, tr("Go To Line"), tr("Line:"), curLine, minLine, maxLine, 1, &ok);
 		if (ok)
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
+	}
+
+	void MainWindow::showSettings()
+	{
+		ConfigDialog::showConfig();
 	}
 
 	void MainWindow::toggleBreakpoint()
@@ -1933,6 +1973,7 @@ namespace Aseba
 				tab->updateHidden();
 			}
 		}
+		ConfigDialog::setShowHidden(show);
 	}
 
 	void MainWindow::showKeywords(bool show) // Jiwon
@@ -1943,6 +1984,7 @@ namespace Aseba
 			if (tab)
 				tab->showKeywords(show);
 		}
+		ConfigDialog::setShowKeywordToolbar(show);
 	}
 
 	void MainWindow::clearAllExecutionError()
@@ -2188,6 +2230,17 @@ namespace Aseba
 	{
 		showCompilationMsg->setChecked(false);
 	}
+
+	void MainWindow::showMemoryUsage(bool show)
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				tab->showMemoryUsage(show);
+		}
+		ConfigDialog::setShowMemoryUsage(show);
+	}
 	
 	void MainWindow::addEventNameClicked()
 	{
@@ -2211,8 +2264,6 @@ namespace Aseba
 			else
 			{
 				eventsDescriptionsModel->addNamedValue(NamedValue(eventName.toStdWString(), eventNbArgs));
-				recompileAll();
-				updateWindowTitle();
 			}
 		}
 	}
@@ -2229,11 +2280,22 @@ namespace Aseba
 			if (tab)
 				tab->isSynchronized = false; // Jiwon
 		}
-		
-		statusText->setText(tr("Desynchronised! Please reload."));
-		statusText->show();
+	}
+
+	void MainWindow::eventsUpdated(bool indexChanged)
+	{
+		if (indexChanged)
+		{
+			statusText->setText(tr("Desynchronised! Please reload."));
+			statusText->show();
+		}
 		recompileAll();
-		updateWindowTitle();		
+		updateWindowTitle();
+	}
+
+	void MainWindow::eventsUpdatedDirty()
+	{
+		eventsUpdated(true);
 	}
 	
 	void MainWindow::eventsDescriptionsSelectionChanged()
@@ -2360,6 +2422,9 @@ namespace Aseba
 	void MainWindow::nodeConnected(unsigned node)
 	{
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
+		tab->showKeywords(showKeywordsAct->isChecked());
+		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
+		tab->showMemoryUsage(showMemoryUsageAct->isChecked());
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -2369,8 +2434,18 @@ namespace Aseba
 	//! A node has disconnected from the network.
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
-		int index = getIndexFromId(node);
+		const int index = getIndexFromId(node);
 		Q_ASSERT(index >= 0);
+		const NodeTab* tab = getTabFromId(node);
+		const QString& tabName = nodes->tabText(index);
+		
+		nodes->addTab(
+			new AbsentNodeTab(
+				tabName,
+				tab->editor->document()->toPlainText()
+			),
+			tabName
+		);
 		
 		nodes->removeAndDeleteTab(index);
 		
@@ -2620,8 +2695,9 @@ namespace Aseba
 		constantsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		constantsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		constantsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-		constantsView->setDragDropMode(QAbstractItemView::DragOnly);
+		constantsView->setDragDropMode(QAbstractItemView::InternalMove);
 		constantsView->setDragEnabled(true);
+		constantsView->setDropIndicatorShown(true);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
 		constantsView->setSecondColumnLongestContent("-888888##");
@@ -2691,8 +2767,9 @@ namespace Aseba
 		eventsDescriptionsView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		eventsDescriptionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 		eventsDescriptionsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-		eventsDescriptionsView->setDragDropMode(QAbstractItemView::DragOnly);
+		eventsDescriptionsView->setDragDropMode(QAbstractItemView::InternalMove);
 		eventsDescriptionsView->setDragEnabled(true);
+		eventsDescriptionsView->setDropIndicatorShown(true);
 		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, (ASEBA_MAX_PACKET_SIZE-6)/2, this));
 		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
@@ -2772,14 +2849,13 @@ namespace Aseba
 		// general connections
 		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
 		connect(logger, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(logEntryDoubleClicked(QListWidgetItem *)));
+		connect(ConfigDialog::getInstance(), SIGNAL(settingsChanged()), SLOT(applySettings()));
 		
 		// global actions
 		connect(loadAllAct, SIGNAL(triggered()), SLOT(loadAll()));
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
 		connect(runAllAct, SIGNAL(triggered()), SLOT(runAll()));
 		connect(pauseAllAct, SIGNAL(triggered()), SLOT(pauseAll()));
-		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
-		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
 
 		// events
 		connect(addEventNameButton, SIGNAL(clicked()), SLOT(addEventNameClicked()));
@@ -2791,8 +2867,9 @@ namespace Aseba
 		connect(eventsDescriptionsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(eventsDescriptionsSelectionChanged()));
 		connect(eventsDescriptionsView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(sendEventIf(const QModelIndex &)));
 		connect(eventsDescriptionsView, SIGNAL(clicked(const QModelIndex &)), SLOT(toggleEventVisibleButton(const QModelIndex &)) );
-		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(recompileAll()));
-		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(updateWindowTitle()));
+		connect(eventsDescriptionsModel, SIGNAL(dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT(eventsUpdated()));
+		connect(eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(eventsUpdated()));
+		connect(eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(eventsUpdatedDirty()));
 		connect(eventsDescriptionsView, SIGNAL(customContextMenuRequested ( const QPoint & )), SLOT(eventContextMenuRequested(const QPoint & )));
 
 		// logger
@@ -3052,17 +3129,6 @@ namespace Aseba
 		uncommentAct->setShortcut(tr("Shift+Ctrl+D", "Edit|Uncomment the selection"));
 		connect(uncommentAct, SIGNAL(triggered()), SLOT(uncommentTriggered()));
 
-		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
-		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
-		connect(showLineNumbers, SIGNAL(triggered(bool)), SLOT(showLineNumbersChanged(bool)));
-		showLineNumbers->setCheckable(true);
-		showLineNumbers->setChecked(true);
-
-		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
-		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
-		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
-		goToLineAct->setEnabled(false);
-		
 		QMenu *editMenu = new QMenu(tr("&Edit"), this);
 		menuBar()->addMenu(editMenu);
 		editMenu->addAction(cutAct);
@@ -3079,10 +3145,42 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(commentAct);
 		editMenu->addAction(uncommentAct);
-		editMenu->addSeparator();
-		editMenu->addAction(showLineNumbers);
-		editMenu->addAction(goToLineAct);
 		
+		// View menu
+		showKeywordsAct = new QAction(tr("Show &keywords"), this);
+		showKeywordsAct->setCheckable(true);
+		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
+
+		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
+		showMemoryUsageAct->setCheckable(true);
+		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
+
+		showHiddenAct = new QAction(tr("S&how hidden variables and functions"), this);
+		showHiddenAct->setCheckable(true);
+		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
+
+		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
+		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
+		showLineNumbers->setCheckable(true);
+		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
+
+		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
+		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
+		goToLineAct->setEnabled(false);
+		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
+
+		QMenu *viewMenu = new QMenu(tr("&View"), this);
+		viewMenu->addAction(showKeywordsAct);
+		viewMenu->addAction(showMemoryUsageAct);
+		viewMenu->addAction(showHiddenAct);
+		viewMenu->addSeparator();
+		viewMenu->addAction(showLineNumbers);
+		viewMenu->addAction(goToLineAct);
+		viewMenu->addSeparator();
+		viewMenu->addAction(tr("&Settings"), this, SLOT(showSettings()));
+		menuBar()->addMenu(viewMenu);
+
+		// Debug actions
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
 		
@@ -3094,7 +3192,7 @@ namespace Aseba
 		
 		pauseAllAct = new QAction(QIcon(":/images/pause.png"), tr("&Pause all"), this);
 		pauseAllAct->setShortcut(tr("F10", "Debug|Pause all"));
-		
+
 		// Debug toolbar
 		globalToolBar = addToolBar(tr("Debug"));
 		globalToolBar->setObjectName("debug toolbar");
@@ -3142,19 +3240,6 @@ namespace Aseba
 		saveBytecodeMenu = new QMenu(tr("Save the binary code..."), toolMenu);
 		toolMenu->addMenu(saveBytecodeMenu);
 		
-		// Settings
-		QMenu *settingsMenu = new QMenu(tr("&Settings"), this);
-		menuBar()->addMenu(settingsMenu);
-		showHiddenAct = new QAction(tr("S&how hidden variables and functions..."), this);
-		showHiddenAct->setCheckable(true);
-		settingsMenu->addAction(showHiddenAct);
-		
-		// Jiwon
-		showKeywordsAct = new QAction(tr("Show &keywords..."), this);
-		showKeywordsAct->setCheckable(true);
-		showKeywordsAct->setChecked(true);
-		settingsMenu->addAction(showKeywordsAct);
-		
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
@@ -3163,6 +3248,9 @@ namespace Aseba
 		
 		// add dynamic stuff
 		regenerateToolsMenus();
+
+		// Load the state from the settings (thus from hard drive)
+		applySettings();
 	}
 	//! Ask the user to save or discard or ignore the operation that would destroy the unmodified data.
 	/*!
@@ -3253,6 +3341,14 @@ namespace Aseba
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
 		
 		setWindowTitle(tr("%0 %1- Aseba Studio").arg(docName).arg(modifiedText));
+	}
+
+	void MainWindow::applySettings()
+	{
+		showKeywordsAct->setChecked(ConfigDialog::getShowKeywordToolbar());
+		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
+		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
+		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 	}
 	
 	/*@}*/

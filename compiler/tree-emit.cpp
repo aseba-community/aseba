@@ -54,13 +54,18 @@ namespace Aseba
 		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
-			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
+			if (bytecode.getTypeOfLast() != ASEBA_BYTECODE_STOP)
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
 		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
 			if (bytecode.size())
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
+			{
+				bytecode.changeStopToRetSub();
+				if (bytecode.getTypeOfLast() != ASEBA_BYTECODE_SUB_RET)
+					bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
+			}
 			else
 				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[it->first].line));
 		}
@@ -112,10 +117,14 @@ namespace Aseba
 	
 	void AssignmentNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		children[1]->emit(bytecodes);
-		children[0]->emit(bytecodes);
+		assert(children.size() % 2 == 0);
+		for (size_t i = 0; i < children.size(); i += 2)
+		{
+			children[i+1]->emit(bytecodes);
+			children[i+0]->emit(bytecodes);
+		}
 	}
-	
+
 	
 	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
 	{
@@ -286,6 +295,10 @@ namespace Aseba
 	
 	void EmitNode::emit(PreLinkBytecode& bytecodes) const
 	{
+		// emit code for children. They might contain code to store constants somewhere
+		for (size_t i = 0; i < children.size(); i++)
+			children[i]->emit(bytecodes);
+
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_EMIT) | eventId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arrayAddr, sourcePos.row));
@@ -404,7 +417,6 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
 	}
 	
-	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		unsigned short bytecode;
@@ -447,6 +459,11 @@ namespace Aseba
 		return stackDepth;
 	}
 	
+	void ReturnNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		const unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STOP);
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+	}
 	
 	/*@}*/
 	

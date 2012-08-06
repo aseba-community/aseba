@@ -25,18 +25,20 @@ namespace Aseba
 		cout << " .. done\n" << flush;
 	}
 	
-	int ThymioIRButton::isClicked(int i) 
+	int ThymioIRButton::isClicked(int i) const
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
+
+		return -1;
 	}
 	
-	int ThymioIRButton::getNumStates()
+	int ThymioIRButton::getNumStates() const
 	{
 		return numStates;
 	}
 	
-	int ThymioIRButton::size() 
+	int ThymioIRButton::size() const
 	{ 
 		return buttons.size(); 
 	}
@@ -46,7 +48,7 @@ namespace Aseba
 		memory = s;
 	}
 
-	int ThymioIRButton::getMemoryState()
+	int ThymioIRButton::getMemoryState() const
 	{
 		return memory;
 	}
@@ -56,22 +58,22 @@ namespace Aseba
 		basename = n;
 	}
 
-	ThymioIRButtonName ThymioIRButton::getName()
+	ThymioIRButtonName ThymioIRButton::getName() const
 	{ 
 		return name; 
 	}
 	
-	wstring ThymioIRButton::getBasename()
+	wstring ThymioIRButton::getBasename() const
 	{
 		return basename;
 	}
 	
-	bool ThymioIRButton::isEventButton()
+	bool ThymioIRButton::isEventButton() const
 	{ 
 		return (name < 5 ? true : false); 
 	}
 	
-	bool ThymioIRButton::isSet()
+	bool ThymioIRButton::isSet() const
 	{
 		for(int i=0; i<size(); ++i)
 		{
@@ -113,12 +115,12 @@ namespace Aseba
 		return actionButton;
 	}
 
-	bool ThymioIRButtonSet::hasEventButton() 
+	bool ThymioIRButtonSet::hasEventButton() const
 	{ 
 		return (eventButton == 0 ? false : true); 
 	}
 	
-	bool ThymioIRButtonSet::hasActionButton() 
+	bool ThymioIRButtonSet::hasActionButton() const
 	{ 
 		return (actionButton == 0 ? false : true); 
 	}

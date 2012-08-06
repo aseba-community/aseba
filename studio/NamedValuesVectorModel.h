@@ -48,23 +48,61 @@ namespace Aseba
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 		QStringList mimeTypes () const;
+		void setExtraMimeType(QString mime) { privateMimeType = mime; }
 		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
+		bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+		Qt::DropActions supportedDragActions();
+		Qt::DropActions supportedDropActions() const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
-		bool isVisible(const unsigned id);
+		void setEditable(bool editable);
 		
+		virtual bool moveRow(int oldRow, int& newRow);
+
+	public slots:
+		void addNamedValue(const NamedValue& namedValue, int index = -1);
+		void delNamedValue(int index);
+		void clear();
+
+	signals:
+		void publicRowsInserted();
+		void publicRowsRemoved();
+		
+	protected:
+		NamedValuesVector* namedValues;
+		bool wasModified;
+		QString privateMimeType;
+
+	private:
+		QString tooltipText;
+		bool editable;
+	};
+
+	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel
+	{
+		Q_OBJECT
+
+	public:
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+
+		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		Qt::ItemFlags flags(const QModelIndex & index) const;
+
+		bool isVisible(const unsigned id);
+
+		virtual bool moveRow(int oldRow, int& newRow);
+
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
 		void delNamedValue(int index);
 		void toggle(const QModelIndex &index);
-		void clear();
-		
+
 	private:
-		NamedValuesVector* namedValues;
-		QString tooltipText;
-		bool wasModified;
 		std::vector<bool> viewEvent;
 	};
 	

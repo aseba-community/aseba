@@ -80,6 +80,19 @@ namespace Aseba
 			children[i]->dump(dest, indent);
 		indent--;
 	}
+
+	void ImmediateVectorNode::dump(std::wostream& dest, unsigned& indent) const
+	{
+		Node::dump(dest, indent);
+		indent++;
+		for (unsigned int i = 0; i < getVectorSize(); i++)
+		{
+			for (unsigned j = 0; j < indent; j++)
+				dest << L"    ";
+			dest << WFormatableString(L"[%0] -> %1\n").arg(i).arg(getValue(i));
+		}
+		indent--;
+	}
 	
 	std::wstring IfWhenNode::toWString() const
 	{
@@ -179,7 +192,7 @@ namespace Aseba
 	{
 		return WFormatableString(L"ArrayWrite: addr %0 size %1").arg(arrayAddr).arg(arraySize);
 	}
-	
+
 	std::wstring CallNode::toWString() const
 	{
 		std::wstring s = WFormatableString(L"Call: id %0").arg(funcId);
@@ -188,6 +201,35 @@ namespace Aseba
 		return s;
 	}
 	
+	std::wstring ImmediateVectorNode::toWString() const
+	{
+		return WFormatableString(L"Static Vector: size %0").arg(getVectorSize());
+	}
+
+	std::wstring MemoryVectorNode::toWString() const
+	{
+		return WFormatableString(L"Memory Vector Access: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
+	}
+
+	std::wstring ArithmeticAssignmentNode::toWString() const
+	{
+		std::wstring s = L"BinaryArithmeticAssign: ";
+		s += binaryOperatorToString(op);
+		return s;
+	}
+
+	std::wstring UnaryArithmeticAssignmentNode::toWString() const
+	{
+		 std::wstring s = L"UnaryArithmeticAssign: ";
+		 if (arithmeticOp == ASEBA_OP_ADD)
+			 s += L"++";
+		 else if (arithmeticOp == ASEBA_OP_SUB)
+			 s += L"--";
+		 else
+			 s += L"unknown";
+		 return s;
+	}
+
 	/*@}*/
 	
 }; // Aseba

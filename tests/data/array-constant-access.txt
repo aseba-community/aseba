@@ -1,0 +1,4 @@
+# FOO equals 2
+var foo[FOO+1] = [0,1,2]
+
+foo[FOO-2:FOO/2] = [10,11]	# foo[0,1]

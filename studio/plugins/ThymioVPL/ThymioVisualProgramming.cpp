@@ -37,7 +37,7 @@ namespace Aseba
 		toolBar->setMinimumWidth(300);
 		toolBar->setMaximumHeight(64);
 		toolBar->setIconSize(QSize(32,32));
-		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);		
+		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		mainLayout->addWidget(toolBar);
 
 		newButton = new QToolButton();

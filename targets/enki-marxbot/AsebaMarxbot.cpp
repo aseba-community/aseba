@@ -62,7 +62,8 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 {
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
 	Dashel::Stream* stream = marxBot.stream;
-	assert(stream);
+	if (!stream)
+		return;
 	
 	// send to stream
 	uint16 temp;

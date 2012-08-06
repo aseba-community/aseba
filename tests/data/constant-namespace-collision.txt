@@ -1,0 +1,3 @@
+# detect a collision with the constant FOO
+# (defined in asebatest.cpp)
+var FOO

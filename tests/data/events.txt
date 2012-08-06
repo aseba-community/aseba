@@ -1,0 +1,16 @@
+var i = 0
+var foo[5]
+
+# check only successful compilation
+# won't work in reallity
+emit event1
+emit event2 [1,2,3]
+emit event2 [1,2,3]+[4,5,6]
+emit event2 foo[1:3]
+emit event2 [1,2,3]*foo[1:3]
+
+onevent event1
+	i = 1
+
+onevent event2
+	i = 2

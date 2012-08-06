@@ -51,18 +51,18 @@ namespace Aseba
 		~ThymioIRButton();
 
 		void setClicked(int i, int status);
-		int isClicked(int i);
-		int getNumStates();
-		int size();
+		int isClicked(int i) const;
+		int getNumStates() const;
+		int size() const;
 		void setMemoryState(int s);
-		int getMemoryState();
+		int getMemoryState() const;
 
-		ThymioIRButtonName getName();
+		ThymioIRButtonName getName() const;
 		void setBasename(wstring n);
-		wstring getBasename();
-		
-		bool isEventButton();
-		bool isSet();
+		wstring getBasename() const;
+
+		bool isEventButton() const;
+		bool isSet() const;
 
 		void accept(ThymioIRVisitor *visitor);
 
@@ -76,7 +76,7 @@ namespace Aseba
 	
 	class ThymioIRButtonSet
 	{
-	public:			
+	public:
 		ThymioIRButtonSet(ThymioIRButton *event=0, ThymioIRButton *action=0);
 		
 		void addEventButton(ThymioIRButton *event);
@@ -85,8 +85,8 @@ namespace Aseba
 		ThymioIRButton *getEventButton();
 		ThymioIRButton *getActionButton();
 		
-		bool hasEventButton();
-		bool hasActionButton();
+		bool hasEventButton() const;
+		bool hasActionButton() const;
 	
 		void accept(ThymioIRVisitor *visitor);
 	
@@ -103,10 +103,9 @@ namespace Aseba
 		virtual void visit(ThymioIRButton *button);
 		virtual void visit(ThymioIRButtonSet *buttonSet);
 
-		ThymioIRErrorCode getErrorCode();
-		bool isSuccessful();
-//		std::wstring getErrorMessage();		
-		
+		ThymioIRErrorCode getErrorCode() const;
+		bool isSuccessful() const;
+
 	protected:
 		ThymioIRErrorCode errorCode;
 		wstring toWstring(int val);
@@ -158,8 +157,8 @@ namespace Aseba
 		virtual void visit(ThymioIRButton *button);
 		virtual void visit(ThymioIRButtonSet *buttonSet);
 
-		vector<wstring>::const_iterator beginCode() { return generatedCode.begin(); }
-		vector<wstring>::const_iterator endCode() { return generatedCode.end(); }
+		vector<wstring>::const_iterator beginCode() const { return generatedCode.begin(); }
+		vector<wstring>::const_iterator endCode() const { return generatedCode.end(); }
 		void reset();
 		void clear();
 		
@@ -187,13 +186,12 @@ namespace Aseba
 		void replaceButtonSet(int row, ThymioIRButtonSet *set);
 		void swap(int row1, int row2);
 
-		ThymioIRErrorCode getErrorCode();
-//		std::wstring getErrorMessage();
-		bool isSuccessful();
-		int getErrorLine();
-		
-		vector<wstring>::const_iterator beginCode();
-		vector<wstring>::const_iterator endCode(); 
+		ThymioIRErrorCode getErrorCode() const;
+		bool isSuccessful() const;
+		int getErrorLine() const;
+
+		vector<wstring>::const_iterator beginCode() const;
+		vector<wstring>::const_iterator endCode() const; 
 
 		void clear();
 

@@ -25,28 +25,29 @@
 #include <valarray>
 #include <iostream>
 #include <cassert>
+#include <typeinfo>
 
 #define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 #define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 
+#define STRICT		false
 
 namespace Aseba
 {
 	//! There is a bug in the compiler, ask for a bug report
 	void Compiler::internalCompilerError() const
 	{
-		throw Error(tokens.front().pos, L"Internal compiler error, please report a bug containing the source which triggered this error");
+		throw TranslatableError(tokens.front().pos, ERROR_INTERNAL);
 	}
 	
 	//! Check if next token is of type, produce an exception otherwise
 	void Compiler::expect(const Token::Type& type) const
 	{
 		if (tokens.front() != type)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Expecting %0, found %1 instead")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING)
 					.arg(Token(type).typeName())
-					.arg(tokens.front().typeName())
-				);
+					.arg(tokens.front().typeName());
 	}
 	
 	//! Check if next token is an unsigned 12 bits integer literal. If so, return it, if not, throw an exception
@@ -54,10 +55,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 4095)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;4095] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_UINT12_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -66,10 +66,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 65535)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;65535] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_UINT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -78,10 +77,9 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [0;32767] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_PINT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -93,10 +91,9 @@ namespace Aseba
 		if (negative)
 			limit++;
 		if (tokens.front().iValue < 0 || tokens.front().iValue > limit)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Integer value %0 out of [-32768;32767] range")
-					.arg(tokens.front().iValue)
-				);
+			throw TranslatableError(tokens.front().pos,
+				ERROR_INT16_OUT_OF_RANGE)
+					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 	
@@ -110,11 +107,10 @@ namespace Aseba
 		
 		const int value = constIt->second;
 		if (value < 0 || value > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Constant %0 has value %1, which is out of [0;32767] range")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_PCONSTANT_OUT_OF_RANGE)
 					.arg(tokens.front().sValue)
-					.arg(value)
-				);
+					.arg(value);
 		return value;
 	}
 	
@@ -128,11 +124,10 @@ namespace Aseba
 		
 		const int value = constIt->second;
 		if (value < -32768 || value > 32767)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Constant %0 has value %1, which is out of [-32768;32767] range")
+			throw TranslatableError(tokens.front().pos,
+				ERROR_CONSTANT_OUT_OF_RANGE)
 					.arg(tokens.front().sValue)
-					.arg(value)
-				);
+					.arg(value);
 		return value;
 	}
 	
@@ -222,18 +217,49 @@ namespace Aseba
 	{
 		if (!isOneOf<length>(types))
 		{
-			std::wstring errorMessage(L"Expecting one of ");
+			std::wstring expectedTypes;
 			for (size_t i = 0; i < length; i++)
 			{
-				errorMessage += Token(types[i]).typeName();
+				expectedTypes += Token(types[i]).typeName();
 				if (i + 1 < length)
-					errorMessage += L", ";
+					expectedTypes += L", ";
 			}
-			errorMessage += L"; but found ";
-			errorMessage += tokens.front().typeName();
-			errorMessage += L" instead";
-			throw Error(tokens.front().pos, errorMessage);
+
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ONE_OF).arg(expectedTypes).arg(tokens.front().typeName());
 		}
+	}
+
+	void Compiler::freeTemporaryMemory()
+	{
+		endVariableIndex = 0;
+	}
+
+	void Compiler::allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr)
+	{
+		// allocate space at the end of the variables' memory
+		unsigned endOfMemory = targetDescription->variablesSize - endVariableIndex;
+		varAddr = endOfMemory - size;
+		endVariableIndex += size;
+
+		// free space check
+		if (freeVariableIndex + endVariableIndex > targetDescription->variablesSize)
+			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_TEMP_SPACE);
+	}
+
+	AssignmentNode* Compiler::allocateTemporaryVariable(const SourcePos varPos, Node* rValue)
+	{
+		static unsigned uid = 0;
+
+		// allocate the temporary variable
+		const unsigned size = rValue->getVectorSize();
+		unsigned addr = Node::E_NOVAL;
+		allocateTemporaryMemory(varPos, size, addr);
+
+		// create assignment
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
+		assignment->children.push_back(new MemoryVectorNode(varPos, addr, size, WFormatableString(L"temp%0").arg(uid++)));
+		assignment->children.push_back(rValue);
+		return assignment.release();
 	}
 	
 	//! Parse "program" grammar element.
@@ -262,9 +288,12 @@ namespace Aseba
 	//! Parse "statement" grammar element.
 	Node* Compiler::parseStatement()
 	{
+		// reset temporary variables
+		freeTemporaryMemory();
+
 		switch (tokens.front())
 		{
-			case Token::TOKEN_STR_var: throw Error(tokens.front().pos, L"Variable definition is allowed only at the beginning of the program before any statement");
+			case Token::TOKEN_STR_var: throw TranslatableError(tokens.front().pos, ERROR_MISPLACED_VARDEF);
 			case Token::TOKEN_STR_onevent: return parseOnEvent();
 			case Token::TOKEN_STR_sub: return parseSubDecl();
 			default: return parseBlockStatement();
@@ -283,8 +312,17 @@ namespace Aseba
 			case Token::TOKEN_STR_emit: return parseEmit();
 			case Token::TOKEN_STR_call: return parseFunctionCall();
 			case Token::TOKEN_STR_callsub: return parseCallSub();
+			case Token::TOKEN_STR_return: return parseReturn();
 			default: return parseAssignment();
 		}
+	}
+	
+	//! Parse "return statement" grammar element.
+	Node* Compiler::parseReturn()
+	{
+		SourcePos pos = tokens.front().pos;
+		tokens.pop_front();
+		return new ReturnNode(pos);
 	}
 	
 	//! Parse "var def" grammar element.
@@ -294,223 +332,146 @@ namespace Aseba
 		
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
-			throw Error(tokens.front().pos,
-				WFormatableString(L"Expecting identifier, found %0").arg(tokens.front().toWString()));
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
 		
 		// save variable
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
-		unsigned varSize = 1;
+		unsigned varSize = Node::E_NOVAL;
 		unsigned varAddr = freeVariableIndex;
 		
 		tokens.pop_front();
 		
 		// optional array
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-		{
-			tokens.pop_front();
-			
-			varSize = expectPositiveInt16LiteralOrConstant();
-			tokens.pop_front();
-			
-			expect(Token::TOKEN_BRACKET_CLOSE);
-			tokens.pop_front();
-		}
+		varSize = parseVariableDefSize();
 		
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
-			throw Error(varPos, WFormatableString(L"Variable %0 is already defined").arg(varName));
+			throw TranslatableError(varPos, ERROR_VAR_ALREADY_DEFINED).arg(varName);
+
+		// check if variable conflicts with a constant
+		if(commonDefinitions->constants.contains(varName))
+			throw TranslatableError(varPos, ERROR_VAR_CONST_COLLISION).arg(varName);
 		
+		// optional assignation
+		std::auto_ptr<MemoryVectorNode> me(new MemoryVectorNode(varPos, varAddr, varSize, varName));
+		std::auto_ptr<Node> temp;
+		temp.reset(parseVarDefInit(me.get()));
+		if (temp.get())
+		{
+			// valid
+			varSize = me->getVectorSize();
+			me.release();
+		}
+
+		// sanity check for array
+		if (varSize == 0)
+			throw TranslatableError(varPos, ERROR_UNDEFINED_SIZE).arg(varName);
+
 		// save variable
 		variablesMap[varName] = std::make_pair(varAddr, varSize);
 		freeVariableIndex += varSize;
-		
+
 		// check space
 		if (freeVariableIndex > targetDescription->variablesSize)
-			throw Error(varPos, L"No more free variable space");
-		
-		// optional assignation
-		if (tokens.front() == Token::TOKEN_ASSIGN)
-		{
-			std::auto_ptr<BlockNode> block(new BlockNode(tokens.front().pos));
-			
-			tokens.pop_front();
-			
-			for (unsigned i = 0; i < varSize; i++)
-			{
-				SourcePos assignPos = tokens.front().pos;
-				block->children.push_back(parseBinaryOrExpression());
-				block->children.push_back(new StoreNode(assignPos, varAddr + i));
-				
-				if (i + 1 < varSize)
-				{
-					expect(Token::TOKEN_COMMA);
-					tokens.pop_front();
-				}
-			}
-			
-			return block.release();
-		}
+			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_SPACE);
+
+		if (temp.get())
+			return temp.release();
 		else
 			return NULL;
 	}
+
+	AssignmentNode *Compiler::parseVarDefInit(MemoryVectorNode* lValue)
+	{
+		if (tokens.front() == Token::TOKEN_ASSIGN)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+
+			// try old style initialization 1,2,3
+			std::auto_ptr<Node> rValue(parseImmediateVector(true));
+			if (rValue.get() == NULL)
+			{
+				// no -> other type of initialization
+				rValue.reset(parseBinaryOrExpression());
+			}
+
+			if (lValue->getVectorSize() == Node::E_NOVAL)
+			{
+				// infere the variable's size based on the initilization
+				lValue->arraySize = rValue->getVectorSize();
+			}
+
+			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(pos));
+			assign->children.push_back(lValue);
+			assign->children.push_back(rValue.release());
+			return assign.release();
+		}
+
+		return NULL;
+	}
 	
+
 	//! Parse "assignment" grammar element
 	Node* Compiler::parseAssignment()
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const Token::Type compoundAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
+		static const Token::Type compoundBinaryAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
 							   Token::TOKEN_OP_MULT_EQUAL, Token::TOKEN_OP_DIV_EQUAL, Token::TOKEN_OP_MOD_EQUAL,
-							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL, Token::TOKEN_OP_BIT_NOT_EQUAL,
+							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL,
 							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
-		std::wstring varName = tokens.front().sValue;
-		SourcePos varPos = tokens.front().pos;
-		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
-		
-		unsigned varAddr = varIt->second.first;
-		unsigned varSize = varIt->second.second;
-		
-		tokens.pop_front();
-		
-		Node* l_value;
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
 
-		// parse the left value
-		// check if it is an array access
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-		{
-			tokens.pop_front();
-			
-			l_value = new ArrayWriteNode(tokens.front().pos, varAddr, varSize, varName);
-			l_value->children.push_back(parseBinaryOrExpression());
-
-			expect(Token::TOKEN_BRACKET_CLOSE);
-			tokens.pop_front();
-		}
-		else
-		{
-			if (varSize != 1)
-				throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
-			
-			l_value = new StoreNode(tokens.front().pos, varAddr);
-		}
-
-		assignment->children.push_back(l_value);
+		// parse left value
+		std::auto_ptr<Node> lValue(parseBinaryOrExpression());
 		
-		// parse rvalue
+		// parse right value
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
+			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(tokens.front().pos));
 			tokens.pop_front();
+			
+			assignment->children.push_back(lValue.release());
 			assignment->children.push_back(parseBinaryOrExpression());
+			return assignment.release();
 		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
-			assignment->children.push_back(parseIncrementAssignment(l_value));
-		else if (IS_ONE_OF(compoundAssignment))
-			assignment->children.push_back(parseCompoundAssignment(l_value));
+		{
+			SourcePos pos = tokens.front().pos;
+			Compiler::Token op = tokens.front();
+			tokens.pop_front();
+
+			std::auto_ptr<UnaryArithmeticAssignmentNode> assignment(
+						new UnaryArithmeticAssignmentNode(
+							pos,
+							op,
+							lValue.release()));
+
+			return assignment.release();
+		}
+		else if (IS_ONE_OF(compoundBinaryAssignment))
+		{
+			SourcePos pos = tokens.front().pos;
+			Compiler::Token op = tokens.front();
+			tokens.pop_front();
+
+			std::auto_ptr<ArithmeticAssignmentNode> assignment(
+						ArithmeticAssignmentNode::fromArithmeticAssignmentToken(
+							pos,
+							op,
+							lValue.release(),
+							parseBinaryOrExpression()));
+
+			return assignment.release();
+		}
 		else
-			throw Error(varPos, WFormatableString(L"Expecting assignement, found %0 instead").arg(varName));
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		
-		return assignment.release();
+		return NULL;
 	}
 
-	// parse +=, -=,... assignments
-	// assignments a += b are expanded to a = a + b
-	Node* Compiler::parseCompoundAssignment(Node* l_value)
-	{
-		Token::Type op = tokens.front();
-		const wchar_t* typeName = tokens.front().typeName();
-		SourcePos pos = tokens.front().pos;
-		tokens.pop_front();
-
-		// convert the l_value from a StoreNode / ArrayWriteNode to a LoadNode / ArrayReadNode respectively
-		std::auto_ptr<Node> load;
-		StoreNode* store = dynamic_cast<StoreNode*>(l_value);
-		ArrayWriteNode* read = dynamic_cast<ArrayWriteNode*>(l_value);
-		if (store)
-			// scalar
-			load.reset(new LoadNode(store));
-		else if (read)
-			// array
-			load.reset(new ArrayReadNode(read));
-		else
-			// oops
-			throw Error(pos, WFormatableString(L"Unexpected error: missing scalar or array assignment"));
-
-		// get the r_value
-		std::auto_ptr<Node> node(parseBinaryOrExpression());
-
-		// translate the compound assignment to a regular operator (+, -, ...)
-		if ((op == Token::TOKEN_OP_ADD_EQUAL) || (op == Token::TOKEN_OP_NEG_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_ADD - Token::TOKEN_OP_ADD_EQUAL));
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, op, load.release(), node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_MULT_EQUAL) || (op == Token::TOKEN_OP_DIV_EQUAL) || (op == Token::TOKEN_OP_MOD_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_MULT - Token::TOKEN_OP_MULT_EQUAL));
-			node.reset(BinaryArithmeticNode::fromMultExpression(pos, op, load.release(), node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_BIT_OR_EQUAL) || (op == Token::TOKEN_OP_BIT_XOR_EQUAL) ||
-			 (op == Token::TOKEN_OP_BIT_AND_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_BIT_OR - Token::TOKEN_OP_BIT_OR_EQUAL));
-			node.reset(BinaryArithmeticNode::fromBinaryExpression(pos, op, load.release(), node.release()));
-		}
-		else if (op == Token::TOKEN_OP_BIT_NOT_EQUAL)
-		{
-			node.reset(new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, node.release()));
-		}
-		else if ((op == Token::TOKEN_OP_SHIFT_LEFT_EQUAL) || (op == Token::TOKEN_OP_SHIFT_RIGHT_EQUAL))
-		{
-			op = static_cast<Token::Type>(op + (Token::TOKEN_OP_SHIFT_LEFT- Token::TOKEN_OP_SHIFT_LEFT_EQUAL));
-			node.reset(BinaryArithmeticNode::fromShiftExpression(pos, op, load.release(), node.release()));
-		}
-		else
-			throw Error(pos, WFormatableString(L"Expecting assignement, found %0 instead").arg(typeName));
-
-		return node.release();
-	}
-
-	// parse ++ and -- operators
-	// assignments a++ are expanded to a = a + 1
-	Node* Compiler::parseIncrementAssignment(Node* l_value)
-	{
-		Token::Type op = tokens.front();
-		SourcePos pos = tokens.front().pos;
-		StoreNode* store;
-		ArrayWriteNode* array;
-		std::auto_ptr<Node> load;
-		tokens.pop_front();
-
-		// l_value is StoreNode?
-		if ((store = dynamic_cast<StoreNode*>(l_value)) != 0)
-		{
-			load.reset(new LoadNode(store));
-		}
-		// ArrayWriteNode?
-		else if ((array = dynamic_cast<ArrayWriteNode*>(l_value)) != 0)
-		{
-			load.reset(new ArrayReadNode(array));
-		}
-		else
-			// invalid left value
-			throw Error(pos, WFormatableString(L"Expecting a left value."));
-
-		// create the immediate node
-		std::auto_ptr<Node> node(new ImmediateNode(pos, 1));
-
-		if (op == Token::TOKEN_OP_PLUS_PLUS)
-		{
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_ADD, load.release(), node.release()));
-		}
-		else if (op == Token::TOKEN_OP_MINUS_MINUS)
-		{
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, Token::TOKEN_OP_NEG, load.release(), node.release()));
-		}
-		return node.release();
-	}
-	
 	//! Parse "if" grammar element.
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
@@ -582,12 +543,9 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// variable
-		expect(Token::TOKEN_STRING_LITERAL);
-		std::wstring varName = tokens.front().sValue;
-		SourcePos varPos = tokens.front().pos;
-		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
-		unsigned varAddr = varIt->second.first;
-		tokens.pop_front();
+		std::auto_ptr<MemoryVectorNode> variable(parseVariable());
+		MemoryVectorNode* variableRef = variable.get();		// used to create copies
+		SourcePos varPos = variable->sourcePos;
 		
 		// in keyword
 		expect(Token::TOKEN_STR_in);
@@ -614,7 +572,7 @@ namespace Aseba
 			tokens.pop_front();
 			step = expectInt16LiteralOrConstant();
 			if (step == 0)
-				throw Error(tokens.front().pos, L"Null steps are not allowed in for loops");
+				throw TranslatableError(tokens.front().pos, ERROR_FOR_NULL_STEPS);
 			tokens.pop_front();
 		}
 		
@@ -622,12 +580,12 @@ namespace Aseba
 		if (step > 0)
 		{
 			if (rangeStartIndex > rangeEndIndex)
-				throw Error(rangeStartIndexPos, L"Start index must be lower than end index in increasing loops");
+				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_HIGHER_THAN_END);
 		}
 		else
 		{
 			if (rangeStartIndex < rangeEndIndex)
-				throw Error(rangeStartIndexPos, L"Start index must be higher than end index in decreasing loops");
+				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_LOWER_THAN_END);
 		}
 		
 		// do keyword
@@ -636,19 +594,21 @@ namespace Aseba
 		
 		// create enclosing block and initial variable state
 		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
-		blockNode->children.push_back(new ImmediateNode(rangeStartIndexPos, rangeStartIndex));
-		blockNode->children.push_back(new StoreNode(varPos, varAddr));
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(rangeStartIndexPos));
+		assignment->children.push_back(variable.release());
+		assignment->children.push_back(new ImmediateVectorNode(rangeStartIndexPos, rangeStartIndex));
+		blockNode->children.push_back(assignment.release());
 		
 		// create while and condition
 		WhileNode* whileNode = new WhileNode(whilePos);
 		blockNode->children.push_back(whileNode);
 		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
-		comparisonNode->children.push_back(new LoadNode(varPos, varAddr));
+		comparisonNode->children.push_back(variableRef->deepCopy());
 		if (rangeStartIndex <= rangeEndIndex)
 			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
 			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		comparisonNode->children.push_back(new ImmediateNode(rangeEndIndexPos, rangeEndIndex));
+		comparisonNode->children.push_back(new ImmediateVectorNode(rangeEndIndexPos, rangeEndIndex));
 		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
@@ -659,8 +619,8 @@ namespace Aseba
 		// increment variable
 		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
 		whileNode->children[1]->children.push_back(assignmentNode);
-		assignmentNode->children.push_back(new StoreNode(varPos, varAddr));
-		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, new LoadNode(varPos, varAddr), new ImmediateNode(varPos, step)));
+		assignmentNode->children.push_back(variableRef->deepCopy());
+		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new ImmediateVectorNode(varPos, step)));
 		
 		tokens.pop_front();
 		
@@ -700,7 +660,7 @@ namespace Aseba
 		
 		const unsigned eventId = expectAnyEventId();
 		if (implementedEvents.find(eventId) != implementedEvents.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Event %0 is already implemented").arg(eventName(eventId)));
+			throw TranslatableError(tokens.front().pos, ERROR_EVENT_ALREADY_IMPL).arg(eventName(eventId));
 		implementedEvents.insert(eventId);
 		
 		tokens.pop_front();
@@ -724,9 +684,21 @@ namespace Aseba
 		unsigned eventSize = commonDefinitions->events[emitNode->eventId].value;
 		if (eventSize > 0)
 		{
-			parseReadVarArrayAccess(&emitNode->arrayAddr, &emitNode->arraySize);
+			std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+
+			// allocate memory?
+			if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
+			{
+				preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
+			}
+
+			//allocateTemporaryVariable(pos)
+			emitNode->arrayAddr = preNode->getVectorAddr();
+			emitNode->arraySize = preNode->getVectorSize();
+			emitNode->children.push_back(preNode.release());
+
 			if (emitNode->arraySize != eventSize)
-				throw Error(pos, WFormatableString(L"Event %0 needs an array of size %1, but one of size %2 is passed").arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize));
+				throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
 		}
 		else
 		{
@@ -748,7 +720,7 @@ namespace Aseba
 		const std::wstring& name = tokens.front().sValue;
 		const SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it != subroutineReverseTable.end())
-			throw Error(tokens.front().pos, WFormatableString(L"Subroutine %0 is already defined").arg(name));
+			throw TranslatableError(tokens.front().pos, ERROR_SUBROUTINE_ALREADY_DEF).arg(name);
 		
 		const unsigned subroutineId = subroutineTable.size();
 		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
@@ -773,65 +745,6 @@ namespace Aseba
 		tokens.pop_front();
 		
 		return new CallSubNode(pos, it->second);
-	}
-	
-	//! Parse access to variable, arrray, or array subscript
-	void Compiler::parseReadVarArrayAccess(unsigned* addr, unsigned* size)
-	{
-		expect(Token::TOKEN_STRING_LITERAL);
-		
-		// we have a variable access, check if variable exists
-		SourcePos varPos = tokens.front().pos;
-		std::wstring varName = tokens.front().sValue;
-		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
-		
-		// store variable address
-		*addr = varIt->second.first;
-		
-		// check if it is a const array access
-		tokens.pop_front();
-		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-		{
-			tokens.pop_front();
-			
-			int value = expectPositiveInt16LiteralOrConstant();
-			unsigned startIndex = (unsigned)value;
-			unsigned len = 1;
-			
-			// check if first index is within bounds
-			if (startIndex >= varIt->second.second)
-				throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-			tokens.pop_front();
-			
-			// do we have array subscript?
-			if (tokens.front() == Token::TOKEN_COLON)
-			{
-				tokens.pop_front();
-				
-				value = expectPositiveInt16LiteralOrConstant();
-				
-				// check if second index is within bounds
-				unsigned endIndex = (unsigned)value;
-				if (endIndex >= varIt->second.second)
-					throw Error(tokens.front().pos, WFormatableString(L"access of array %0 out of bounds").arg(varName));
-				if (endIndex < startIndex)
-					throw Error(tokens.front().pos, WFormatableString(L"end of range index must be lower or equal to start of range index"));
-				tokens.pop_front();
-				
-				len = endIndex - startIndex + 1;
-			}
-			
-			expect(Token::TOKEN_BRACKET_CLOSE);
-			tokens.pop_front();
-			
-			*addr += startIndex;
-			*size = len;
-		}
-		else
-		{
-			// full array
-			*size = varIt->second.second;
-		}
 	}
 	
 	//! Parse "or" grammar element.
@@ -1048,7 +961,7 @@ namespace Aseba
 	//! Parse "unary_expression" grammar element.
 	Node *Compiler::parseUnaryExpression()
 	{
-		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_BIT_NOT, Token::TOKEN_STR_abs, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_BRACKET_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_BIT_NOT, Token::TOKEN_STR_abs, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
 		
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
@@ -1065,6 +978,11 @@ namespace Aseba
 				tokens.pop_front();
 				
 				return expression.release();
+			}
+
+			case Token::TOKEN_BRACKET_OPEN:
+			{
+				return parseImmediateVector();
 			}
 			
 			case Token::TOKEN_OP_NEG:
@@ -1090,56 +1008,247 @@ namespace Aseba
 			
 			case Token::TOKEN_INT_LITERAL:
 			{
-				int value = expectUInt16Literal();
+				// immediate
+				std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(pos, expectUInt16Literal()));
 				tokens.pop_front();
-				return new ImmediateNode(pos, value);
+				return arrayCtor.release();
 			}
 			
 			case Token::TOKEN_STRING_LITERAL:
 			{
-				std::wstring varName = tokens.front().sValue;
-				if (constantExists(varName))
-				{
-					int value = expectConstant();
-					tokens.pop_front();
-					return new ImmediateNode(pos, value);
-				}
-				else
-				{
-					SourcePos varPos = tokens.front().pos;
-					VariablesMap::const_iterator varIt(findVariable(varName, varPos));
-					
-					unsigned varAddr = varIt->second.first;
-					unsigned varSize = varIt->second.second;
-					
-					tokens.pop_front();
-					
-					// check if it is an array access
-					if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
-					{
-						tokens.pop_front();
-						
-						std::auto_ptr<Node> array(new ArrayReadNode(pos, varAddr, varSize, varName));
-					
-						array->children.push_back(parseBinaryOrExpression());
-	
-						expect(Token::TOKEN_BRACKET_CLOSE);
-						tokens.pop_front();
-					
-						return array.release();
-					}
-					else
-					{
-						if (varSize != 1)
-							throw Error(varPos, WFormatableString(L"Accessing variable %0 as a scalar, but is an array of size %1 instead").arg(varName).arg(varSize));
-						
-						return new LoadNode(pos, varAddr);
-					}
-				}
+				return parseConstantAndVariable();
 			}
 			
 			default: internalCompilerError(); return NULL;
 		}
+	}
+
+	//! Parse "[ .... ]" grammar element
+	ImmediateVectorNode* Compiler::parseImmediateVector(bool compatibility)
+	{
+		if (!compatibility)
+		{
+			expect(Token::TOKEN_BRACKET_OPEN);
+			tokens.pop_front();
+		}
+		else
+		{
+			// check if 2nd token is a comma
+			if ( !(tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA) )
+			{
+				// no
+				return NULL;
+			}
+		}
+
+		SourcePos varPos = tokens.front().pos;
+		std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(varPos));
+
+		do
+		{
+			arrayCtor->addValue(expectInt16LiteralOrConstant());
+			tokens.pop_front();
+
+			if (tokens.front() != Token::TOKEN_COMMA)
+				break;
+			else
+				tokens.pop_front();
+		}
+		while (1);
+
+		if (!compatibility)
+		{
+			expect(Token::TOKEN_BRACKET_CLOSE);
+			tokens.pop_front();
+		}
+
+		return arrayCtor.release();
+	}
+
+	Node* Compiler::parseConstantAndVariable()
+	{
+		expect(Token::TOKEN_STRING_LITERAL);
+		std::wstring varName = tokens.front().sValue;
+		if (constantExists(varName))
+		{
+			std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(tokens.front().pos));
+			arrayCtor->addValue(expectConstant());
+			tokens.pop_front();
+			return arrayCtor.release();
+		}
+		else
+		{
+			return parseVariable();
+		}
+	}
+
+	MemoryVectorNode* Compiler::parseVariable()
+	{
+		expect(Token::TOKEN_STRING_LITERAL);
+		std::wstring varName = tokens.front().sValue;
+		SourcePos varPos = tokens.front().pos;
+		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
+
+		std::auto_ptr<MemoryVectorNode> vector(
+					new MemoryVectorNode(
+						varPos,
+						varIt->second.first,
+						varIt->second.second,
+						varName));
+
+		// check if it is a const array access
+		tokens.pop_front();
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+
+			int start;
+			std::auto_ptr<Node> startIndex(tryParsingConstantExpression(pos, start));
+
+			if (startIndex.get() == NULL)
+			{
+				// constant index
+				std::auto_ptr<ImmediateVectorNode> index(new ImmediateVectorNode(pos));
+				index->addValue(start);
+
+				// do we have array subscript?
+				if (tokens.front() == Token::TOKEN_COLON)
+				{
+					pos = tokens.front().pos;
+					tokens.pop_front();
+
+					int end;
+					std::auto_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
+
+					if (endIndex.get() != NULL)
+						throw TranslatableError(pos, ERROR_INDEX_EXPECTING_CONSTANT);
+
+					// check if second index is within bounds
+					if (end < start)
+						throw TranslatableError(tokens.front().pos, ERROR_INDEX_WRONG_END);
+
+					index->addValue(end);
+				}
+
+				vector->children.push_back(index.release());
+			}
+			else
+			{
+				// general expression as index
+				vector->children.push_back(startIndex.release());
+			}
+
+			expect(Token::TOKEN_BRACKET_CLOSE);
+			tokens.pop_front();
+		}
+
+		return vector.release();
+	}
+
+	unsigned Compiler::parseVariableDefSize()
+	{
+		int result = 0;
+
+		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+		{
+			SourcePos pos = tokens.front().pos;
+			tokens.pop_front();
+
+			if (tokens.front() == Token::TOKEN_BRACKET_CLOSE)
+			{
+				result = Node::E_NOVAL;
+			}
+			else
+			{
+				result = expectConstantExpression(pos, parseBinaryOrExpression());
+
+				if (result < 0)
+					// what??
+					throw TranslatableError(pos, ERROR_SIZE_IS_NEGATIVE).arg(result);
+				else if (result == 0)
+					throw TranslatableError(pos, ERROR_SIZE_IS_NULL);
+
+				expect(Token::TOKEN_BRACKET_CLOSE);
+			}
+			tokens.pop_front();
+		}
+		else
+			// not an array
+			result = 1;
+
+		return result;
+	}
+
+	//! Use parseBinaryOrExpression() and try to reduce the result into an integer
+	//! If successful, return NULL and the integer in constantResult
+	//! If unsuccessful, return the parsed tree (constantResult useless in this case)
+	Node* Compiler::tryParsingConstantExpression(SourcePos pos, int& constantResult)
+	{
+		std::auto_ptr<Node> tree(parseBinaryOrExpression());
+
+		try
+		{
+			constantResult = expectConstantExpression(pos, tree->deepCopy());
+			tree.reset();
+			return NULL;
+		}
+		catch (TranslatableError error)
+		{
+			// oops, tree cannot be resolved to a constant, return it
+			return tree.release();
+		}
+	}
+
+	//! This is a generalization of expectPositiveInt16LiteralOrConstant()
+	//! Try to reduce the expression into a single figure, if not raise an exception
+	//! The tree pointed by "tree" is deleted during execution, not safe to use it after
+	int Compiler::expectConstantExpression(SourcePos pos, Node* tree)
+	{
+		int result = 0;
+
+		// create a temporary "var = expr" tree
+		// used to access the facility offered by the AssignmentNode (size check,...)
+		std::auto_ptr<Node> tempTree1(new AssignmentNode(pos));
+		tempTree1->children.push_back(new MemoryVectorNode(pos, 0, 1, L"fake"));
+		tempTree1->children.push_back(tree);
+
+		//tempTree1->children.push_back(parseBinaryOrExpression());
+
+		//unsigned indent = 0;
+		//std::cerr << "Tree before expanding" << std::endl;
+		//tempTree1->dump(std::wcerr, indent);
+
+		std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
+
+		//std::cerr << "Tree after expanding" << std::endl;
+		//tempTree2->dump(std::wcerr, indent);
+
+		tempTree1.release();	// tree already deleted by expandToAsebaTree()
+		tempTree2->optimize(NULL);
+
+		//std::cerr << "Tree after optimization" << std::endl;
+		//tempTree2->dump(std::wcerr, indent);
+		//std::cerr << std::endl;
+
+		// valid optimization?
+		if ( !tempTree2.get() || tempTree2->children.size() == 0 )
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
+		AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
+		if ( !assignment || assignment->children.size() != 2 )
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
+
+		// resolve to an ImmediateNode?
+		ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
+		if (immediate)
+			result = immediate->value;
+		else
+			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
+
+		// delete the tree
+		tempTree2.reset();
+
+		return result;
 	}
 	
 	//! Parse "function_call" grammar element.
@@ -1164,14 +1273,11 @@ namespace Aseba
 		if (function.parameters.size() == 0)
 		{
 			if (tokens.front() != Token::TOKEN_PAR_CLOSE)
-				throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires no argument, some are used").arg(funcName));
+				throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_HAS_NO_ARG).arg(funcName);
 			tokens.pop_front();
 		}
 		else
 		{
-			// we store constants for this call at the end of memory
-			unsigned localConstsAddr = targetDescription->variablesSize;
-			
 			// count the number of template parameters and build array
 			int minTemplateId = 0;
 			for (unsigned i = 0; i < function.parameters.size(); i++)
@@ -1181,42 +1287,32 @@ namespace Aseba
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
-				const Token::Type argTypes[] = { Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL, Token::TOKEN_OP_NEG };
-				
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-					throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i));
-				else
-					EXPECT_ONE_OF(argTypes);
+					throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i);
 				
 				// we need to fill those two variables
 				unsigned varAddr;
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
-				
-				if ((tokens.front() == Token::TOKEN_INT_LITERAL) || (tokens.front() == Token::TOKEN_OP_NEG) || (constantExists(tokens.front().sValue)))
+
+				std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+				// get the address and size
+				varAddr = preNode->getVectorAddr();
+				varSize = preNode->getVectorSize();
+
+				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
 				{
-					int value = expectInt16LiteralOrConstant();
-					// we have inline integer, we need to store it and pass the address
-					// we store it at the end of the variable space, we test if there is no overflow
-					if (localConstsAddr <= freeVariableIndex)
-						throw Error(varPos, L"No more free variable space for constant");
-					varAddr = --localConstsAddr;
-					varSize = 1;
-					callNode->children.push_back(new ImmediateNode(varPos, value));
-					callNode->children.push_back(new StoreNode(varPos, varAddr));
-					tokens.pop_front();
-				}
-				else
-				{
-					parseReadVarArrayAccess(&varAddr, &varSize);
+					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
+					varAddr = preNode->getVectorAddr();
+					callNode->children.push_back(preNode.release());
 				}
 				
 				// check if variable size is correct
 				if (function.parameters[i].size > 0)
 				{
 					if (varSize != (unsigned)function.parameters[i].size)
-						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, function definition demands size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size));
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size);
 				}
 				else if (function.parameters[i].size < 0)
 				{
@@ -1228,7 +1324,7 @@ namespace Aseba
 					}
 					else if ((unsigned)templateParameters[templateIndex] != varSize)
 					{
-						throw Error(varPos, WFormatableString(L"Argument %0 (%1) of function %2 is of size %3, while a previous instance of the template parameter was of size %4").arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]));
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE_TEMPLATE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]);
 					}
 				}
 				else
@@ -1244,14 +1340,14 @@ namespace Aseba
 				if (i + 1 == function.parameters.size())
 				{
 					if (tokens.front() == Token::TOKEN_COMMA)
-						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, more are used").arg(funcName).arg(function.parameters.size()));
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_TOO_MANY_ARG).arg(funcName).arg((unsigned int)function.parameters.size());
 					else
 						expect(Token::TOKEN_PAR_CLOSE);
 				}
 				else
 				{
 					if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-						throw Error(tokens.front().pos, WFormatableString(L"Function %0 requires %1 arguments, only %2 are provided").arg(funcName).arg(function.parameters.size()).arg(i + 1));
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i + 1);
 					else
 						expect(Token::TOKEN_COMMA);
 				}

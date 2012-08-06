@@ -173,7 +173,7 @@ namespace Aseba
 		{
 			if (constantExpression->value != 0)
 			{
-				throw Error(sourcePos, L"Infinite loops not allowed");
+				throw TranslatableError(sourcePos, ERROR_INFINITE_LOOP);
 			}
 			else
 			{
@@ -224,6 +224,13 @@ namespace Aseba
 	
 	Node* EmitNode::optimize(std::wostream* dump)
 	{
+		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		{
+			// generic optimization and removal
+			*it = (*it)->optimize(dump);
+			++it;
+		}
+
 		return this;
 	}
 	
@@ -263,7 +270,7 @@ namespace Aseba
 				case ASEBA_OP_MULT: result = valueOne * valueTwo; break;
 				case ASEBA_OP_DIV: 
 					if (valueTwo == 0)
-						throw Error(sourcePos, L"Division by zero.");
+						throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 					else
 						result = valueOne / valueTwo;
 				break;
@@ -331,7 +338,7 @@ namespace Aseba
 			else if (op == ASEBA_OP_DIV)
 			{
 				if (immediateRightChild->value == 0)
-					throw Error(sourcePos, L"Division by zero.");
+					throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
@@ -386,7 +393,7 @@ namespace Aseba
 				case ASEBA_UNARY_OP_SUB: result = -immediateChild->value; break;
 				case ASEBA_UNARY_OP_ABS: 
 					if (immediateChild->value == -32768)
-						throw Error(sourcePos, L"-32768 has no positive correspondance in 16 bits integers.");
+						throw TranslatableError(sourcePos, ERROR_ABS_NOT_POSSIBLE);
 					else
 						result = abs(immediateChild->value);
 				break;
@@ -449,8 +456,8 @@ namespace Aseba
 			unsigned index = immediateChild->value;
 			if (index >= arraySize)
 			{
-				throw Error(sourcePos,
-					WFormatableString(L"Out of bound static array access. Trying to read index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
+				throw TranslatableError(sourcePos,
+					ERROR_ARRAY_OUT_OF_BOUND_READ).arg(index).arg(arrayName).arg(arraySize);
 			}
 			
 			unsigned varAddr = arrayAddr + index;
@@ -479,8 +486,8 @@ namespace Aseba
 			unsigned index = immediateChild->value;
 			if (index >= arraySize)
 			{
-				throw Error(sourcePos,
-					WFormatableString(L"Out of bound static array access. Trying to write index %0 of array %1 of size %2").arg(index).arg(arrayName).arg(arraySize));
+				throw TranslatableError(sourcePos,
+					ERROR_ARRAY_OUT_OF_BOUND_WRITE).arg(index).arg(arrayName).arg(arraySize);
 			}
 			
 			unsigned varAddr = arrayAddr + index;
@@ -497,6 +504,13 @@ namespace Aseba
 	
 	Node* CallNode::optimize(std::wostream* dump)
 	{
+		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		{
+			// generic optimization and removal
+			*it = (*it)->optimize(dump);
+			++it;
+		}
+
 		return this;
 	}
 	

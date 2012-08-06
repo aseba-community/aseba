@@ -29,7 +29,9 @@
 #include <utility>
 #include <istream>
 
+#include "errors_code.h"
 #include "../common/types.h"
+#include "../utils/FormatableString.h"
 
 namespace Aseba
 {
@@ -43,6 +45,9 @@ namespace Aseba
 	struct ProgramNode;
 	struct StatementNode;
 	struct BinaryArithmeticNode;
+	struct AssignmentNode;
+	struct ImmediateVectorNode;
+	struct MemoryVectorNode;
 	
 	//! Description of target VM
 	struct TargetDescription
@@ -67,6 +72,9 @@ namespace Aseba
 		//! Typed parameter of native functions
 		struct NativeFunctionParameter
 		{
+			NativeFunctionParameter(const std::wstring &name, int size) : size(size), name(name) {}
+			NativeFunctionParameter() {}
+
 			int size; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
 			std::wstring name; //!< name of the parameter
 		};
@@ -74,6 +82,9 @@ namespace Aseba
 		//! Description of target VM native function
 		struct NativeFunction
 		{
+			NativeFunction(const std::wstring &name, const std::wstring &description) : name(name), description(description) {}
+			NativeFunction() {}
+
 			std::wstring name; //!< name of the function
 			std::wstring description; //!< description (some short documentation) of the function
 			std::vector<NativeFunctionParameter> parameters; //!< for each argument of the function, its size in words or, if negative, its template ID
@@ -101,6 +112,7 @@ namespace Aseba
 		BytecodeElement(unsigned short bytecode) : bytecode(bytecode), line(0) { }
 		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) { }
 		operator unsigned short () const { return bytecode; }
+		unsigned getWordSize() const;
 		
 		unsigned short bytecode; //! bytecode itself
 		unsigned short line; //!< line in source code
@@ -121,6 +133,9 @@ namespace Aseba
 			std::deque<BytecodeElement>::push_back(be);
 			lastLine = be.line;
 		}
+		
+		void changeStopToRetSub();
+		unsigned short getTypeOfLast() const;
 		
 		//! A map of event addresses to identifiers
 		typedef std::map<unsigned, unsigned> EventAddressesToIdsMap;
@@ -143,6 +158,18 @@ namespace Aseba
 		std::wstring toWString() const;
 	};
 	
+	//! Return error messages based on error ID (needed to translate messages for other applications)
+	class ErrorMessages
+	{
+		public:
+			ErrorMessages();
+
+			//! Type of the callback
+			typedef const std::wstring (*ErrorCallback)(ErrorCode error);
+			//! Default callback
+			static const std::wstring defaultCallback(ErrorCode error);
+	};
+
 	//! Compilation error
 	struct Error
 	{
@@ -152,10 +179,27 @@ namespace Aseba
 		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
 		//! Create an empty error
 		Error() { message = L"not defined"; }
+
 		//! Return a string describing the error
 		std::wstring toWString() const;
 	};
-	
+
+	struct TranslatableError : public Error
+	{
+		TranslatableError() : Error() {}
+		TranslatableError(const SourcePos& pos, ErrorCode error);
+		TranslatableError &arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError &arg(unsigned value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError &arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
+		TranslatableError &arg(const std::wstring& value);
+
+		Error toError(void);
+		static void setTranslateCB(ErrorMessages::ErrorCallback newCB);
+
+		static ErrorMessages::ErrorCallback translateCB;
+		WFormatableString message;
+	};
+
 	//! Vector of names of variables
 	typedef std::vector<std::wstring> VariablesNamesVector;
 	
@@ -230,6 +274,7 @@ namespace Aseba
 				TOKEN_STR_callsub,
 				TOKEN_STR_onevent,
 				TOKEN_STR_abs,
+				TOKEN_STR_return,
 				TOKEN_STRING_LITERAL,
 				TOKEN_INT_LITERAL,
 				TOKEN_PAR_OPEN,
@@ -242,36 +287,39 @@ namespace Aseba
 				TOKEN_OP_OR,
 				TOKEN_OP_AND,
 				TOKEN_OP_NOT,
-				TOKEN_OP_BIT_OR,
-				TOKEN_OP_BIT_XOR,
-				TOKEN_OP_BIT_AND,
-				TOKEN_OP_BIT_OR_EQUAL,
-				TOKEN_OP_BIT_XOR_EQUAL,
-				TOKEN_OP_BIT_AND_EQUAL,
-				TOKEN_OP_BIT_NOT,
-				TOKEN_OP_BIT_NOT_EQUAL,
-				TOKEN_OP_EQUAL,
-				TOKEN_OP_NOT_EQUAL,
-				TOKEN_OP_BIGGER,
-				TOKEN_OP_BIGGER_EQUAL,
-				TOKEN_OP_SMALLER,
-				TOKEN_OP_SMALLER_EQUAL,
-				TOKEN_OP_SHIFT_LEFT,		// group of 4 tokens, don't split or mess up
-				TOKEN_OP_SHIFT_RIGHT,		//
-				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
-				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
-				TOKEN_OP_ADD,			// group of 4 tokens, don't split or mess up
+
+				TOKEN_OP_EQUAL,			// group of tokens, don't split or mess up
+				TOKEN_OP_NOT_EQUAL,		//
+				TOKEN_OP_BIGGER,		//
+				TOKEN_OP_BIGGER_EQUAL,		//
+				TOKEN_OP_SMALLER,		//
+				TOKEN_OP_SMALLER_EQUAL,		//
+
+				TOKEN_OP_ADD,			// group of 2 tokens, don't split or mess up
 				TOKEN_OP_NEG,			//
-				TOKEN_OP_ADD_EQUAL,		//
-				TOKEN_OP_NEG_EQUAL,		//
-				TOKEN_OP_PLUS_PLUS,
-				TOKEN_OP_MINUS_MINUS,
-				TOKEN_OP_MULT,			// group of 6 tokens, don't split or mess up
+				TOKEN_OP_MULT,			// group of 3 tokens, don't split or mess up
 				TOKEN_OP_DIV,			//
 				TOKEN_OP_MOD,			//
+				TOKEN_OP_SHIFT_LEFT,		// group of 2 tokens, don't split or mess up
+				TOKEN_OP_SHIFT_RIGHT,		//
+				TOKEN_OP_BIT_OR,		// group of 4 tokens, don't split or mess up
+				TOKEN_OP_BIT_XOR,		//
+				TOKEN_OP_BIT_AND,		//
+				TOKEN_OP_BIT_NOT,		//
+
+				TOKEN_OP_ADD_EQUAL,		// group of 12 tokens, don't split or mess up
+				TOKEN_OP_NEG_EQUAL,		//
 				TOKEN_OP_MULT_EQUAL,		//
 				TOKEN_OP_DIV_EQUAL,		//
-				TOKEN_OP_MOD_EQUAL		//
+				TOKEN_OP_MOD_EQUAL,		//
+				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
+				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
+				TOKEN_OP_BIT_OR_EQUAL,		//
+				TOKEN_OP_BIT_XOR_EQUAL,		//
+				TOKEN_OP_BIT_AND_EQUAL,		//
+
+				TOKEN_OP_PLUS_PLUS,
+				TOKEN_OP_MINUS_MINUS
 
 			} type; //!< type of this token
 			std::wstring sValue; //!< string version of the value
@@ -316,6 +364,8 @@ namespace Aseba
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
+		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
+		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		
 	protected:
 		void internalCompilerError() const;
@@ -335,6 +385,11 @@ namespace Aseba
 		bool isOneOf(const Token::Type types[length]) const;
 		template <int length>
 		void expectOneOf(const Token::Type types[length]) const;
+
+		void freeTemporaryMemory();
+		void allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr);
+		AssignmentNode* allocateTemporaryVariable(const SourcePos varPos, Node* rValue);
+
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;
 		FunctionsMap::const_iterator findFunction(const std::wstring& name, const SourcePos& pos) const;
 		ConstantsMap::const_iterator findConstant(const std::wstring& name, const SourcePos& pos) const;
@@ -358,10 +413,10 @@ namespace Aseba
 		
 		Node* parseBlockStatement();
 		
+		Node* parseReturn();
 		Node* parseVarDef();
+		AssignmentNode* parseVarDefInit(MemoryVectorNode* lValue);
 		Node* parseAssignment();
-		Node* parseCompoundAssignment(Node* l_value);
-		Node* parseIncrementAssignment(Node* l_value);
 		Node* parseIfWhen(bool edgeSensitive);
 		Node* parseFor();
 		Node* parseWhile();
@@ -385,8 +440,13 @@ namespace Aseba
 		Node* parseMultExpression();
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
-		
-		void parseReadVarArrayAccess(unsigned* addr, unsigned* size);
+
+		ImmediateVectorNode* parseImmediateVector(bool compatibility = false);
+		Node* parseConstantAndVariable();
+		MemoryVectorNode* parseVariable();
+		unsigned parseVariableDefSize();
+		Node* tryParsingConstantExpression(SourcePos pos, int& constantResult);
+		int expectConstantExpression(SourcePos pos, Node* tree);
 	
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
@@ -399,8 +459,11 @@ namespace Aseba
 		SubroutineTable subroutineTable; //!< subroutine lookup
 		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable
+		unsigned endVariableIndex; //!< (endMemory - endVariableIndex) is pointing to the first free variable at the end
 		const TargetDescription *targetDescription; //!< description of the target VM
 		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
+
+		ErrorMessages translator;
 	}; // Compiler
 	
 	//! Bytecode use for compilation previous to linking

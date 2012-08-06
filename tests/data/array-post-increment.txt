@@ -1,2 +1,7 @@
 var buff[2]
+var i = 0
+
+buff = [0,1]
 buff[0]++
+buff++
+buff[i+1]++

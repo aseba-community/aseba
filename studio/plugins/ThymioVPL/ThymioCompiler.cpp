@@ -1,6 +1,8 @@
 #include <assert.h>
 
+#include <QObject>
 #include "ThymioIntermediateRepresentation.h"
+
 
 namespace Aseba
 {
@@ -84,7 +86,7 @@ namespace Aseba
 		errorType = THYMIO_NO_TYPE_ERROR;
 	}
 	
-	ThymioIRErrorCode ThymioCompiler::getErrorCode()
+	ThymioIRErrorCode ThymioCompiler::getErrorCode() const
 	{
 		switch(errorType)
 		{
@@ -105,45 +107,22 @@ namespace Aseba
 		return THYMIO_NO_ERROR;
 	}
 	
-//	wstring ThymioCompiler::getErrorMessage()
-//	{
-//		switch(errorType)
-//		{
-//		case THYMIO_SYNTAX_ERROR:
-//			return syntaxChecker.getErrorMessage();
-//			break;
-//		case THYMIO_TYPE_ERROR:
-//			return typeChecker.getErrorMessage();
-//			break;
-//		case THYMIO_CODE_ERROR:
-//			return codeGenerator.getErrorMessage();
-//			break;
-//		case THYMIO_NO_TYPE_ERROR:
-//			return L"Compilation success.";
-//			break;
-//		default:
-//			break;			
-//		}
-//		
-//		return L"";		
-//	}
-	
-	bool ThymioCompiler::isSuccessful()
+	bool ThymioCompiler::isSuccessful() const
 	{
 		return ( errorType == THYMIO_NO_TYPE_ERROR ? true : false );
 	}
 
-	int ThymioCompiler::getErrorLine()
+	int ThymioCompiler::getErrorLine() const
 	{
 		return ( errorType == THYMIO_NO_TYPE_ERROR ? -1 : errorLine );
 	}
 	
-	vector<wstring>::const_iterator ThymioCompiler::beginCode() 
+	vector<wstring>::const_iterator ThymioCompiler::beginCode() const
 	{ 
-		return codeGenerator.beginCode(); 
+		return codeGenerator.beginCode();
 	}
 	
-	vector<wstring>::const_iterator ThymioCompiler::endCode() 
+	vector<wstring>::const_iterator ThymioCompiler::endCode() const
 	{ 
 		return codeGenerator.endCode(); 
 	}	

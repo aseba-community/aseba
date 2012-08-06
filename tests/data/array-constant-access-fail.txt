@@ -1,0 +1,6 @@
+# FOO equals 2
+var i = 1
+var foo[FOO+1] = [0,1,2]
+
+# not allowed
+foo[FOO-2:i] = [10,11]

@@ -14,39 +14,15 @@ namespace Aseba
 		errorCode = THYMIO_NO_ERROR;
 	}
 
-	ThymioIRErrorCode ThymioIRVisitor::getErrorCode()
+	ThymioIRErrorCode ThymioIRVisitor::getErrorCode() const
 	{
 		return errorCode;
 	}
 	
-	bool ThymioIRVisitor::isSuccessful()
+	bool ThymioIRVisitor::isSuccessful() const
 	{
 		return ( errorCode == THYMIO_NO_ERROR ? true : false );
 	}
-
-//	wstring ThymioIRVisitor::getErrorMessage()
-//	{
-//		switch(errorCode) {
-//		case THYMIO_MISSING_EVENT:
-//			return L"Missing event button";
-//			break;
-//		case THYMIO_MISSING_ACTION:
-//			return L"Missing action button";
-//			break;
-//		case THYMIO_EVENT_MULTISET:
-//			return L"Redeclaration of event button.";
-//			break;
-//		case THYMIO_INVALID_CODE:
-//			return L"Unknown button type.";
-//			break;
-//		case THYMIO_NO_ERROR:
-//			return L"Compilation success.";
-//		default:
-//			break;
-//		}
-//		
-//		return L"";
-//	}
 
 	wstring ThymioIRVisitor::toWstring(int val)
 	{

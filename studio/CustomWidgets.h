@@ -47,6 +47,14 @@ namespace Aseba
 	
 	protected:
 		virtual void resizeEvent ( QResizeEvent * event );
+
+		void startDrag(Qt::DropActions supportedActions);
+		void dragEnterEvent(QDragEnterEvent *event);
+		void dragMoveEvent(QDragMoveEvent *event);
+		void dropEvent(QDropEvent *event);
+
+		QPixmap getDragPixmap(QString text);
+		bool modelMatchMimeFormat(QStringList candidates);
 	};
 	
 	/*@}*/

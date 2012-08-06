@@ -48,6 +48,7 @@
 #include "TargetModels.h"
 #include "Plugin.h"
 #include "HelpViewer.h"
+#include "ConfigDialog.h"
 
 class QLabel;
 class QSpinBox;
@@ -69,6 +70,7 @@ namespace Aseba
 	class TargetVariablesModel;
 	class TargetFunctionsModel;
 	class TargetMemoryModel;
+	class MaskableNamedValuesVectorModel;
 	class NamedValuesVectorModel;
 	class AeslEditor;
 	class AeslLineNumberSidebar;
@@ -213,6 +215,8 @@ namespace Aseba
 		void subroutineButtonClicked();
 		void callsubButtonClicked();
 		void showKeywords(bool show);
+
+		void showMemoryUsage(bool show);
 		
 		void displayCode(QList<QString> code);
 		
@@ -260,6 +264,7 @@ namespace Aseba
 		QLabel *cursorPosText;
 		QLabel *compilationResultImage;
 		QLabel *compilationResultText;
+		QLabel *memoryUsageText;
 		
 		QLabel *executionModeLabel;
 		QPushButton *loadButton;
@@ -362,6 +367,7 @@ namespace Aseba
 		void uncommentTriggered();
 		void showLineNumbersChanged(bool state);
 		void goToLine();
+		void showSettings();
 		void showHidden(bool show);
 		void showKeywords(bool show);
 
@@ -387,9 +393,12 @@ namespace Aseba
 		void logEntryDoubleClicked(QListWidgetItem *);
 		void showCompilationMessages(bool doShown);
 		void compilationMessagesWasHidden();
+		void showMemoryUsage(bool show);
 		
 		void addEventNameClicked();
 		void removeEventNameClicked();
+		void eventsUpdated(bool indexChanged = false);
+		void eventsUpdatedDirty();
 		void eventsDescriptionsSelectionChanged();
 		
 		void resetStatusText(); // Jiwon
@@ -427,6 +436,9 @@ namespace Aseba
 		void showUserManual();
 		
 		void openToUrlFromAction() const;
+
+	public slots:
+		void applySettings();
 	
 	private:
 		// utility functions
@@ -483,7 +495,7 @@ namespace Aseba
 		FixedWidthTableView* constantsView;
 		
 		// models
-		NamedValuesVectorModel* eventsDescriptionsModel;
+		MaskableNamedValuesVectorModel* eventsDescriptionsModel;
 		NamedValuesVectorModel* constantsDefinitionsModel;
 		
 		// global buttons
@@ -523,6 +535,7 @@ namespace Aseba
 		QAction *showHiddenAct;
 		QAction *showKeywordsAct; 
 		QAction* showCompilationMsg;
+		QAction* showMemoryUsageAct;
 		
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages

@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 #include <ostream>
+#include <climits>
 
 
 
@@ -53,11 +54,17 @@ namespace Aseba
 		};
 		
 		//! Constructor
-		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
-		virtual Node* clone() const = 0;
-		
+		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }		
 		virtual ~Node();
+		//! Return a shallow copy of the object (children point to the same objects)
+		virtual Node* shallowCopy() = 0;
+		//! Return a deep copy of the object (children are also copied)
+		virtual Node* deepCopy();
 		
+		//! Check the consistency in vectors' size
+		virtual void checkVectorSize() const;
+		//! Second pass to expand "abstract" nodes into more concrete ones
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
 		virtual ReturnType typeCheck() const;
 		//! Optimize this node, return the optimized node
@@ -73,12 +80,19 @@ namespace Aseba
 		virtual std::wstring toNodeName() const = 0;
 		//! Dump this node and the rest of the tree
 		virtual void dump(std::wostream& dest, unsigned& indent) const;
-		
+
 		//! Return the name of a type
 		std::wstring typeName(const Node::ReturnType& type) const;
 		//! Check for a specific type, throw an exception otherwise
 		void expectType(const Node::ReturnType& expected, const Node::ReturnType& type) const;
-		
+
+		enum MemoryErrorCode
+		{
+			E_NOVAL = 0
+		};
+		virtual unsigned getVectorAddr() const;
+		virtual unsigned getVectorSize() const;
+
 		//! Vector for children of a node
 		typedef std::vector<Node *> NodesVector;
 		NodesVector children; //!< children of this node
@@ -90,8 +104,8 @@ namespace Aseba
 	{
 		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual BlockNode* clone() const {return(new BlockNode(*this));}
-		
+		virtual BlockNode* shallowCopy() { return new BlockNode(*this); }
+
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const { return L"Block"; }
@@ -103,7 +117,7 @@ namespace Aseba
 	{
 		//! Constructor
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
-		virtual ProgramNode* clone() const {return(new ProgramNode(*this));}
+		virtual ProgramNode* shallowCopy() { return new ProgramNode(*this); }
 
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const { return L"ProgramBlock"; }
@@ -117,8 +131,10 @@ namespace Aseba
 	{
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual AssignmentNode* clone() const {return(new AssignmentNode(*this));}
+		virtual AssignmentNode* shallowCopy() { return new AssignmentNode(*this); }
 
+		virtual void checkVectorSize() const;
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index);
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -137,8 +153,9 @@ namespace Aseba
 		
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual IfWhenNode* clone() const {return(new IfWhenNode(*this));}
+		virtual IfWhenNode* shallowCopy() { return new IfWhenNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -159,8 +176,9 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedIfWhenNode* clone() const {return(new FoldedIfWhenNode(*this));}
+		virtual FoldedIfWhenNode* shallowCopy() { return new FoldedIfWhenNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -175,8 +193,9 @@ namespace Aseba
 	{
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual WhileNode* clone() const {return(new WhileNode(*this));}
+		virtual WhileNode* shallowCopy() { return new WhileNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -194,8 +213,9 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedWhileNode* clone() const {return(new FoldedWhileNode(*this));}
+		virtual FoldedWhileNode* shallowCopy() { return new FoldedWhileNode(*this); }
 
+		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -210,7 +230,7 @@ namespace Aseba
 		unsigned eventId; //!< the event id associated with this context
 		
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
-		virtual EventDeclNode* clone() const {return(new EventDeclNode(*this));}
+		virtual EventDeclNode* shallowCopy() { return new EventDeclNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -220,16 +240,16 @@ namespace Aseba
 	};
 	
 	//! Node for L"emit".
-	//! no children
+	//! may have children for pushing constants somewhere
 	struct EmitNode : Node
-	{		
+	{
 		unsigned eventId; //!< id of event to emit
 		unsigned arrayAddr; //!< address of the first element of the array to send
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument
 		
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual EmitNode* clone() const {return(new EmitNode(*this));}
+		virtual EmitNode* shallowCopy() { return new EmitNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -245,7 +265,7 @@ namespace Aseba
 		unsigned subroutineId; //!< the associated subroutine
 		
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual SubDeclNode* clone() const {return(new SubDeclNode(*this));}
+		virtual SubDeclNode* shallowCopy() { return new SubDeclNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -261,7 +281,7 @@ namespace Aseba
 		unsigned subroutineId; //!< the subroutine to call
 		
 		CallSubNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual CallSubNode* clone() const {return(new CallSubNode(*this));}
+		virtual CallSubNode* shallowCopy() { return new CallSubNode(*this); }
 
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -278,10 +298,11 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual BinaryArithmeticNode* clone() const {return(new BinaryArithmeticNode(*this));}
+		virtual BinaryArithmeticNode* shallowCopy() { return new BinaryArithmeticNode(*this); }
 
 		void deMorganNotRemoval();
 		
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
@@ -305,8 +326,9 @@ namespace Aseba
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
-		virtual UnaryArithmeticNode* clone() const {return(new UnaryArithmeticNode(*this));}
+		virtual UnaryArithmeticNode* shallowCopy() { return new UnaryArithmeticNode(*this); }
 
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -324,7 +346,7 @@ namespace Aseba
 		
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
-		virtual ImmediateNode* clone() const {return(new ImmediateNode(*this));}
+		virtual ImmediateNode* shallowCopy() { return new ImmediateNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -332,6 +354,8 @@ namespace Aseba
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"constant"; }
+
+		virtual unsigned getVectorSize() const { return 1; }
 	};
 	
 	//! Node for storing a variable from stack.
@@ -342,13 +366,16 @@ namespace Aseba
 		
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual StoreNode* clone() const {return(new StoreNode(*this));}
+		virtual StoreNode* shallowCopy() { return new StoreNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"variable access (write)"; }
+
+		virtual unsigned getVectorAddr() const { return varAddr; }
+		virtual unsigned getVectorSize() const { return 1; }
 	};
 	
 	//! Node for loading a variable on stack.
@@ -359,8 +386,7 @@ namespace Aseba
 
 		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		LoadNode(const StoreNode* store) : Node(store->sourcePos), varAddr(store->varAddr) {}
-		virtual LoadNode* clone() const {return(new LoadNode(*this));}
+		virtual LoadNode* shallowCopy() { return new LoadNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -368,6 +394,9 @@ namespace Aseba
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"variable access (read)"; }
+
+		virtual unsigned getVectorAddr() const { return varAddr; }
+		virtual unsigned getVectorSize() const { return 1; }
 	};
 
 	//! Node for writing to an array. Value to store is supposed to be on the stack already
@@ -379,13 +408,16 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayWriteNode* clone() const {return(new ArrayWriteNode(*this));}
+		virtual ArrayWriteNode* shallowCopy() { return new ArrayWriteNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"array access (write)"; }
+
+		virtual unsigned getVectorAddr() const { return arrayAddr; }
+		virtual unsigned getVectorSize() const { return 1; }
 	};
 	
 	//! Node for reading from an array.
@@ -397,26 +429,16 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		ArrayReadNode(const ArrayWriteNode* write) :
-			Node(write->sourcePos), arrayAddr(write->arrayAddr), arraySize(write->arraySize), arrayName(write->arrayName)
-		{
-			ImmediateNode* index;
-			// accept only immediates for array index
-			// TODO fix this? should handle the case:
-			// array[i++]+=2, which will expand to array[i++] = array[i++] + 2
-			// which is not what the user meant
-			if (write->children.size() > 0 && (index = dynamic_cast<ImmediateNode*> (write->children[0])) != 0)
-				children.push_back(index->clone());
-			else
-				throw Error(sourcePos, WFormatableString(L"Such operation is not permitted with non-immediate index"));
-		}
-		virtual ArrayReadNode* clone() const {return(new ArrayReadNode(*this));}
+		virtual ArrayReadNode* shallowCopy() { return new ArrayReadNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"array access (read)"; }
+
+		virtual unsigned getVectorAddr() const { return arrayAddr; }
+		virtual unsigned getVectorSize() const { return 1; }
 	};
 
 	//! Node for calling a native function
@@ -427,7 +449,7 @@ namespace Aseba
 		std::vector<unsigned> argumentsAddr; //!< address of all arguments
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
-		virtual CallNode* clone() const {return(new CallNode(*this));}
+		virtual CallNode* shallowCopy() { return new CallNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -437,6 +459,129 @@ namespace Aseba
 		virtual std::wstring toNodeName() const { return L"native function call"; }
 	};
 	
+	//! Node for returning from an event or subroutine
+	//! has no children, just a jump of 0 offset that will be resolved at link time
+	struct ReturnNode : Node
+	{
+		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		virtual ReturnNode* shallowCopy() { return new ReturnNode(*this); }
+
+		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual Node* optimize(std::wostream* dump) { return this; }
+		virtual unsigned getStackDepth() const { return 0; }
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::wstring toWString() const { return L"Return"; }
+		virtual std::wstring toNodeName() const { return L"return"; } 
+	};
+
+	/*** Nodes for abstract operations (e.g. vectors) ***/
+
+	//! Virtual class for abstraction nodes
+	//! abort() if you try to typeCheck(), optimize() or emit()
+	//! to force correct expansion into regular Aseba nodes
+	struct AbstractTreeNode : Node
+	{
+		//! Constructor
+		AbstractTreeNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+
+		// Following operations should not be performed on abstraction nodes
+		virtual ReturnType typeCheck() const { abort(); }
+		virtual Node* optimize(std::wostream* dump) { abort(); }
+		virtual unsigned getStackDepth() const { abort(); }
+		virtual void emit(PreLinkBytecode& bytecodes) const { abort(); }
+	};
+
+	//! Node for assembling values into an array
+	//! values[x] is the x-th value to be assembled
+	struct ImmediateVectorNode : AbstractTreeNode
+	{
+		std::vector<int> values;
+
+		//! Constructor
+		ImmediateVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
+		ImmediateVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { values.push_back(value); }
+		virtual ImmediateVectorNode* shallowCopy() { return new ImmediateVectorNode(*this); }
+
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"array of constants"; }
+		virtual void dump(std::wostream& dest, unsigned& indent) const;
+
+		virtual unsigned getVectorSize() const { return values.size(); }
+
+		virtual int getLonelyImmediate() const;
+		virtual int getValue(unsigned index) const;
+		virtual void addValue(int value) { values.push_back(value); }
+	};
+
+	//! Node for accessing a memory as a vector, in read or write operations
+	//! If write == true, will expand to StoreNode or ArrayWriteNode
+	//! If write == false, will expand to LoadNode or ArrayReadNode
+	//! children[0] is an optional index
+	//! If children[0] is a StaticVector of one elements (int), it will be foo[x]
+	//! If children[0] is a StaticVector of two elements (int), it will be foo[x:y]
+	//! If children[0] is another type of node, it will be foo[whatever]
+	//! If children[0] doesn't exist, access to the full array is considered
+	struct MemoryVectorNode : AbstractTreeNode
+	{
+		unsigned arrayAddr; //!< address of the first element of the array
+		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
+		std::wstring arrayName; //!< name of the array (for debug)
+		bool write; //!< expand to a node for storing or loading data?
+
+		MemoryVectorNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
+		virtual MemoryVectorNode* shallowCopy() { return new MemoryVectorNode(*this); }
+
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"vector access"; }
+
+		virtual unsigned getVectorAddr() const;
+		virtual unsigned getVectorSize() const;
+
+		virtual void setWrite(bool write) { this->write = write; }
+	};
+
+	//! Node for operations like "vector (op)= something"
+	//! Will expand to "vector = vector (op) something"
+	//! children[0] is a MemoryVectorNode
+	//! children[1] is whatever Node for the right operand
+	struct ArithmeticAssignmentNode : AbstractTreeNode
+	{
+		AsebaBinaryOperator op; //!< operator
+
+		//! Constructor
+		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
+		virtual ArithmeticAssignmentNode* shallowCopy() { return new ArithmeticAssignmentNode(*this); }
+
+		virtual void checkVectorSize() const;
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"arithmetic assignment"; }
+
+		static ArithmeticAssignmentNode* fromArithmeticAssignmentToken(const SourcePos& sourcePos, Compiler::Token::Type token, Node *left, Node *right);
+
+	protected:
+		const static AsebaBinaryOperator operatorMap[];
+		static AsebaBinaryOperator getBinaryOperator(Compiler::Token::Type token);
+	};
+
+	//! Node for operations like "vector(op)", may be ++ or --
+	//! Will expand to "vector (op)= [1,...,1]"
+	//! children[0] is a MemoryVectorNode
+	struct UnaryArithmeticAssignmentNode : AbstractTreeNode
+	{
+		AsebaBinaryOperator arithmeticOp; //!< operator
+
+		//! Constructor
+		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory);
+		virtual UnaryArithmeticAssignmentNode* shallowCopy() { return new UnaryArithmeticAssignmentNode(*this); }
+
+		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"unary arithmetic assignment"; }
+	};
+
 	/*@}*/
 	
 }; // Aseba
