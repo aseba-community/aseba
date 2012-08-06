@@ -282,6 +282,12 @@ namespace Aseba
 		aggregator->addModel(mainWindow->constantsDefinitionsModel);
 		variableAggregator = aggregator;
 
+		// create the sorting proxy
+		sortingProxy = new QSortFilterProxyModel(this);
+		sortingProxy->setDynamicSortFilter(true);
+		sortingProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+		sortingProxy->setSortRole(Qt::DisplayRole);
+
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -1131,18 +1137,41 @@ namespace Aseba
 	void NodeTab::refreshCompleterModel(LocalContext context)
 	{
 //		qDebug() << "New context: " << context;
+		disconnect(mainWindow->eventsDescriptionsModel, 0, sortingProxy, 0);
+
 		if ((context == GeneralContext) || (context == UnknownContext))
-			editor->setCompleterModel(variableAggregator);	// both variables and constants
+		{
+			sortingProxy->setSourceModel(variableAggregator);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// both variables and constants
+		}
 		else if (context == LeftValueContext)
-			editor->setCompleterModel(vmMemoryModel);	// only variables
+		{
+			sortingProxy->setSourceModel(vmMemoryModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// only variables
+		}
 		else if (context == VarDefContext)
 			editor->setCompleterModel(0);		// disable auto-completion in this case
 		else if (context == FunctionContext)
 			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
 		else if (context == EventContext)
-			editor->setCompleterModel(eventAggregator);	// both local and global events
+		{
+			sortingProxy->setSourceModel(eventAggregator);
+			sortingProxy->sort(0);
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(sortCompleterModel()));
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(sortCompleterModel()));
+			editor->setCompleterModel(sortingProxy);	// both local and global events
+		}
 	}
-
+/*
+	void NodeTab::sortCompleterModel()
+	{
+		sortingProxy->sort(0);
+		editor->setCompleterModel(0);
+		editor->setCompleterModel(sortingProxy);
+	}
+*/
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view

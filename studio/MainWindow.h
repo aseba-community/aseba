@@ -36,6 +36,7 @@
 #include <QToolButton>
 #include <QToolBar>
 #include <QCompleter>
+#include <QSortFilterProxyModel>
 
 #include "AeslEditor.h"
 #include "CustomDelegate.h"
@@ -187,6 +188,7 @@ namespace Aseba
 	public slots:
 		void clearExecutionErrors();
 		void refreshCompleterModel(LocalContext context);
+		//void sortCompleterModel();
 	
 	protected slots:
 		void resetClicked();
@@ -302,6 +304,7 @@ namespace Aseba
 		QCompleter *completer;
 		QAbstractItemModel* eventAggregator;
 		QAbstractItemModel* variableAggregator;
+		QSortFilterProxyModel* sortingProxy;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
