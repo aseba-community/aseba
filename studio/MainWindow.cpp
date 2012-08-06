@@ -1123,7 +1123,8 @@ namespace Aseba
 		else if (context == FunctionContext)
 			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
 		else if (context == EventContext)
-			editor->setCompleterModel(0);		// not yet implemented
+			// local events only
+			editor->setCompleterModel(vmLocalEvents->model());
 	}
 
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
