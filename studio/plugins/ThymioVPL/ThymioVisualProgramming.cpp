@@ -209,43 +209,6 @@ namespace Aseba
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
-//		delete(mainLayout);
-//		delete(horizontalLayout);
-//		delete(eventsLayout);
-//		delete(sceneLayout);
-//		delete(compilationResultLayout);
-//		delete(actionsLayout);
-//		
-//		for(int i=0; i<eventButtons.size(); ++i)
-//			delete(eventButtons[i]);
-//			
-//		for(int i=0; i<actionButtons.size(); ++i)
-//			delete(actionButtons[i]);
-//			
-//		eventButtons.clear();
-//		actionButtons.clear();
-//
-//		delete(eventsLabel);
-//		delete(actionsLabel);
-//
-//		delete(toolBar);
-//		delete(newButton);
-//		delete(openButton);
-//		delete(saveButton);
-//		delete(saveAsButton);		
-//		delete(runButton);
-//		delete(colorComboButton);
-//		delete(quitButton);
-//
-//		eventColors.clear();
-//		actionColors.clear();
-//		
-//		delete(compilationResult);
-//		delete(compilationResultImage);
-//
-//		delete(scene);
-//		delete(view);
-//
 		delete(tapSvg);
 		delete(clapSvg);		
 	}
@@ -290,9 +253,12 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
+		qDebug() << "ThmioVisualProgramming: in close as soon as possible";
+
 		advancedButton->setEnabled(true);
-		actionButtons.last()->hide(); // memory button
-		scene->reset();
+		actionButtons.last()->hide(); // state button
+		scene->clear();
+//		scene->reset();
 		close();		
 	}
 	
@@ -356,11 +322,13 @@ namespace Aseba
 
 	void ThymioVisualProgramming::closeFile()
 	{
+		qDebug() << "ThmioVisualProgramming: in close file";
 		if( scene->isEmpty() || warningDialog() ) 
 		{
-			scene->reset();
 			advancedButton->setEnabled(true);
-			actionButtons.last()->hide(); // memory button
+			actionButtons.last()->hide(); // state button
+			scene->clear();
+//			scene->reset();
 			close();
 		}
 	}
@@ -392,17 +360,19 @@ namespace Aseba
 	void ThymioVisualProgramming::advancedMode()
 	{
 		advancedButton->setEnabled(false);
-		actionButtons.last()->show(); // memory button
+		actionButtons.last()->show(); // state button
 		scene->setAdvanced(true);
 	}
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
+		qDebug() << "ThmioVisualProgramming: in close event";
 		if ( scene->isEmpty() || warningDialog() )
 		{
-			scene->reset();
 			advancedButton->setEnabled(true);
-			actionButtons.last()->hide(); // memory button
+			actionButtons.last()->hide(); // state button
+			scene->clear();
+//			scene->reset();
 			close();
 		}
 		else
@@ -453,6 +423,10 @@ namespace Aseba
 		buttons.appendChild(document.createTextNode("\n\n"));		
 		
 		buttons.appendChild(setting);
+		QDomElement mode = document.createElement("mode");
+		mode.setAttribute("advanced", scene->getAdvanced() ? "true" : "false");
+		setting.appendChild(mode);	
+		
 		QDomElement colorScheme = document.createElement("colorscheme");
 		colorScheme.setAttribute("value", QString::number(colorComboButton->currentIndex()));
 		setting.appendChild(colorScheme);
@@ -521,6 +495,10 @@ namespace Aseba
 					{
 						QDomElement childElement = element.firstChildElement("colorscheme");
 						colorComboButton->setCurrentIndex(childElement.attribute("value").toInt());	
+						
+						QDomElement childElement2 = element.firstChildElement("mode");
+						if( childElement2.attribute("advanced") == "true" )
+							advancedMode();
 					}
 					else if(element.tagName() == "button-element")
 					{
@@ -531,19 +509,19 @@ namespace Aseba
 							ThymioButton *button;
 							
 							if ( buttonName == "button" )
-								button = new ThymioButtonsEvent();
+								button = new ThymioButtonsEvent(0,scene->getAdvanced());
 							else if ( buttonName == "prox" )
-								button = new ThymioProxEvent();
+								button = new ThymioProxEvent(0,scene->getAdvanced());
 							else if ( buttonName == "proxground" )
-								button = new ThymioProxGroundEvent();
+								button = new ThymioProxGroundEvent(0,scene->getAdvanced());
 							else if ( buttonName == "tap" )
 							{					
-								button = new ThymioTapEvent();
+								button = new ThymioTapEvent(0,scene->getAdvanced());
 								button->setSharedRenderer(tapSvg);
 							}
 							else if ( buttonName == "clap" )
 							{
-								button = new ThymioClapEvent();
+								button = new ThymioClapEvent(0,scene->getAdvanced());
 								button->setSharedRenderer(clapSvg);
 							}
 							else

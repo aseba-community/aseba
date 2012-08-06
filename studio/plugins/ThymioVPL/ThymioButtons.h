@@ -104,7 +104,7 @@ namespace Aseba
 		~ThymioButton();
 
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return memoryButtons.empty() ? QRectF(0, 0, 256, 256) : QRectF(0,0,320, 256); }
+		QRectF boundingRect() const { return QRectF(0, 0, 256+trans, 256); }
 
 		void setButtonColor(QColor color) { buttonColor = color; update(); }
 		QColor getButtonColor() { return buttonColor; }
@@ -133,7 +133,7 @@ namespace Aseba
 		
 	protected:
 		QList<ThymioClickableButton*> thymioButtons;
-		QList<ThymioClickableButton*> memoryButtons;
+		QList<ThymioClickableButton*> stateButtons;
 		ThymioBody *thymioBody;
 		ThymioIRButton *buttonIR;
 		QColor buttonColor;

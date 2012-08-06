@@ -173,7 +173,7 @@ namespace Aseba
 				button->setPos(288, i*60 + 40);
 				button->setButtonColor(Qt::gray);
 
-				memoryButtons.push_back(button);
+				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 			}
 		}
@@ -228,11 +228,11 @@ namespace Aseba
 		for(int i=0; i<num; ++i)
 			buttonIR->setClicked(i, isClicked(i));
 
-		if( !memoryButtons.empty() )
+		if( !stateButtons.empty() )
 		{
 			int val=0;
-			for(int i=0; i<memoryButtons.size(); ++i)
-				val += (memoryButtons[i]->isClicked()*(0x01<<i));
+			for(int i=0; i<stateButtons.size(); ++i)
+				val += (stateButtons[i]->isClicked()*(0x01<<i));
 			buttonIR->setMemoryState(val);
 		}
 		
@@ -244,11 +244,11 @@ namespace Aseba
 		for(int i=0; i<getNumButtons(); ++i) 
 			buttonIR->setClicked(i, isClicked(i));
 
-		if( !memoryButtons.empty() )
+		if( !stateButtons.empty() )
 		{
 			int val=0;
-			for(int i=0; i<memoryButtons.size(); ++i)
-				val += (memoryButtons[i]->isClicked()*(0x01<<i));
+			for(int i=0; i<stateButtons.size(); ++i)
+				val += (stateButtons[i]->isClicked()*(0x01<<i));
 			buttonIR->setMemoryState(val);
 		} else
 			buttonIR->setMemoryState(-1);		
@@ -303,8 +303,8 @@ namespace Aseba
 			painter.resetTransform();
 		}
 
-		for(QList<ThymioClickableButton*>::iterator itr = memoryButtons.begin();
-			itr != memoryButtons.end(); ++itr)
+		for(QList<ThymioClickableButton*>::iterator itr = stateButtons.begin();
+			itr != stateButtons.end(); ++itr)
 		{			
 			painter.translate((*itr)->pos());
 			(*itr)->paint(&painter, 0, 0);
@@ -336,7 +336,7 @@ namespace Aseba
 
 	void ThymioButton::setAdvanced(bool advanced)
 	{
-		if( advanced && memoryButtons.empty() )
+		if( advanced && stateButtons.empty() )
 		{
 			for(int i=0; i<4; i++)
 			{
@@ -345,21 +345,21 @@ namespace Aseba
 				button->setPos(288, i*60 + 40);
 				button->setButtonColor(Qt::gray);
 
-				memoryButtons.push_back(button);
+				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 			}
 		}
 		trans = advanced ? 64 : 0;		
 		updateIRButton();		
-		//		else if( !advanced && !memoryButtons.empty() )
+		//		else if( !advanced && !stateButtons.empty() )
 //		{
-//			for(int i=0; i<memoryButtons.size(); i++)
+//			for(int i=0; i<stateButtons.size(); i++)
 //			{
-//				disconnect(memoryButtons[i], SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-//				memoryButtons[i]->setParentItem(0);
-//				delete(memoryButtons[i]);
+//				disconnect(stateButtons[i], SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+//				stateButtons[i]->setParentItem(0);
+//				delete(stateButtons[i]);
 //			}
-//			memoryButtons.clear();
+//			stateButtons.clear();
 //		}
 	}
 
