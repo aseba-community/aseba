@@ -61,7 +61,7 @@ public:
 	AsebaNode()
 	{
 		// setup variables
-		vm.nodeId = ASEBA_PID_UNDEFINED;
+		vm.nodeId = 1;
 		
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];

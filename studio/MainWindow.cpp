@@ -2474,14 +2474,18 @@ namespace Aseba
 	//! The network connection has been cut: all nodes have disconnected.
 	void MainWindow::networkDisconnected()
 	{
-		disconnect(nodes, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-		std::vector<QWidget *> widgets(nodes->count());
+		// collect all node ids to disconnect
+		std::vector<unsigned> toDisconnect;
 		for (int i = 0; i < nodes->count(); i++)
-			widgets[i] = nodes->widget(i);
-		nodes->clear();
-		for (size_t i = 0; i < widgets.size(); i++)
-			widgets[i]->deleteLater();
-		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				toDisconnect.push_back(tab->nodeId());
+		}
+		
+		// disconnect all node ids
+		for (size_t i = 0; i < toDisconnect.size(); i++)
+			nodeDisconnected(toDisconnect[i]);
 	}
 	
 	//! A user event has arrived from the network.
@@ -2645,6 +2649,7 @@ namespace Aseba
 		}
 	}
 	
+	//! Get the tab widget index of a corresponding node id
 	int MainWindow::getIndexFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2659,6 +2664,7 @@ namespace Aseba
 		return -1;
 	}
 	
+	//! Get the tab widget pointer of a corresponding node id
 	NodeTab* MainWindow::getTabFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2673,6 +2679,7 @@ namespace Aseba
 		return 0;
 	}
 	
+	//! Get the tab widget pointer of a corresponding node name
 	NodeTab* MainWindow::getTabFromName(const QString& name) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2687,6 +2694,7 @@ namespace Aseba
 		return 0;
 	}
 	
+	//! Get the absent tab widget index of a corresponding node id
 	int MainWindow::getAbsentIndexFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2701,6 +2709,7 @@ namespace Aseba
 		return -1;
 	}
 	
+	//! Get the absent tab widget pointer of a corresponding node id
 	AbsentNodeTab* MainWindow::getAbsentTabFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)

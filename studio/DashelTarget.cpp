@@ -211,6 +211,7 @@ namespace Aseba
 	
 	
 	DashelInterface::DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget) :
+		isRunning(true),
 		stream(0)
 	{
 		// try to connect to cammand line target, if any
@@ -220,7 +221,9 @@ namespace Aseba
 			bool failed = false;
 			try
 			{
-				stream = Hub::connect(commandLineTarget.toStdString());
+				const std::string& testTarget(commandLineTarget.toStdString());
+				stream = Hub::connect(testTarget);
+				lastConnectedTarget = testTarget;
 			}
 			catch (DashelException e)
 			{
@@ -244,7 +247,9 @@ namespace Aseba
 			try
 			{
 				//qDebug() << "Connecting to " << targetSelector.getTarget().c_str();
-				stream = Hub::connect(targetSelector.getTarget());
+				const std::string& testTarget(targetSelector.getTarget());
+				stream = Hub::connect(testTarget);
+				lastConnectedTarget = testTarget;
 				assert(translators.size() == 3);
 				language = targetSelector.getLocaleName();
 				translators[0]->load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
@@ -259,10 +264,35 @@ namespace Aseba
 		}
 	}
 	
+	bool DashelInterface::attemptToReconnect()
+	{
+		assert(stream == 0);
+		try
+		{
+			// we have to stop hub because otherwise it will be forever in poll()
+			stream = Hub::connect(lastConnectedTarget);
+			Dashel::Hub::stop();
+			if (stream)
+				return true;
+		}
+		catch (DashelException e)
+		{
+		}
+		return false;
+	}
+	
+	
+	void DashelInterface::stop()
+	{
+		isRunning = false;
+		Dashel::Hub::stop();
+	}
+	
 	// In QThread main function, we just make our Dashel hub switch listen for incoming data
 	void DashelInterface::run()
 	{
-		Dashel::Hub::run();
+		while (isRunning)
+			Dashel::Hub::run();
 	}
 	
 	void DashelInterface::incomingData(Stream *stream)
@@ -374,7 +404,6 @@ namespace Aseba
 			{
 				handleDashelException(e);
 			}
-
 		}
 	}
 	
@@ -722,10 +751,31 @@ namespace Aseba
 	
 	void DashelTarget::disconnectionFromDashel()
 	{
-		QMessageBox::critical(0, tr("Connection closed"), tr("Warning, connection closed, save your work and quit Studio."));
-		// temporary disabling this dynamism as aseba is still in development
-		//emit networkDisconnected();
-		//nodes.clear();
+		emit networkDisconnected();
+		nodes.clear();
+		descriptionManager.reset();
+		
+		// prepare a dialog box giving the possibility to reconnect
+		QMessageBox msgBox;
+		msgBox.setWindowTitle(tr("Aseba Studio - Connection closed"));
+		msgBox.setText(tr("Warning, connection closed: try to reconnect or save your work and quit Studio."));
+		msgBox.setStandardButtons(QMessageBox::Close);
+		QPushButton* retryButton(new QPushButton(tr("Try to reconnect")));
+		msgBox.addButton(retryButton, QMessageBox::AcceptRole);
+		msgBox.setEscapeButton(QMessageBox::Close);
+		msgBox.setDefaultButton(retryButton);
+		msgBox.setIcon(QMessageBox::Warning);
+		
+		// show dialog box until reconnection is successful or the user closes it
+		while (true)
+		{
+			msgBox.exec();
+			if (msgBox.clickedButton() != retryButton)
+				break;
+			
+			if (dashelInterface.attemptToReconnect())
+				return;
+		}
 	}
 	
 	void DashelTarget::nodeDescriptionReceived(unsigned nodeId)
