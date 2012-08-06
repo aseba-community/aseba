@@ -301,6 +301,7 @@ namespace Aseba
 
 		QCompleter *completer;
 		QAbstractItemModel* eventAggregator;
+		QAbstractItemModel* variableAggregator;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;

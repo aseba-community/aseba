@@ -271,10 +271,16 @@ namespace Aseba
 		setupConnections();
 
 		// create aggregated models
+		// local and global events
 		ModelAggregator* aggregator = new ModelAggregator(this);
 		aggregator->addModel(vmLocalEvents->model());
 		aggregator->addModel(mainWindow->eventsDescriptionsModel);
 		eventAggregator = aggregator;
+		// variables and constants
+		aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmMemoryModel);
+		aggregator->addModel(mainWindow->constantsDefinitionsModel);
+		variableAggregator = aggregator;
 
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -1126,7 +1132,7 @@ namespace Aseba
 	{
 //		qDebug() << "New context: " << context;
 		if ((context == GeneralContext) || (context == UnknownContext))
-			editor->setCompleterModel(vmMemoryModel);
+			editor->setCompleterModel(variableAggregator);
 		else if (context == FunctionContext)
 			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
 		else if (context == EventContext)
