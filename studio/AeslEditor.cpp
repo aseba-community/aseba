@@ -445,7 +445,10 @@ namespace Aseba
 		debugging(false),
 		dropSourceWidget(0),
 		completer(0),
-		previousContext(UnknownContext)
+		vardefRegexp("^var .*"),
+		leftValueRegexp("^\\w+\\s*=.*"),
+		previousContext(UnknownContext),
+		editingLeftValue(false)
 	{
 		QFont font;
 		font.setFamily("");
@@ -866,11 +869,16 @@ namespace Aseba
 		// this function spy the events to detect the local context
 		LocalContext currentContext = UnknownContext;
 		QString previous = previousWord();
+		QString line = currentLine();
 
 		if (previous == "call")
 			currentContext = FunctionContext;
 		else if (previous == "onevent" || previous == "emit")
 			currentContext = EventContext;
+		else if (vardefRegexp.indexIn(line) != -1)
+			currentContext = VarDefContext;
+		else if (leftValueRegexp.indexIn(line) == -1)
+			currentContext = LeftValueContext;
 		else
 			currentContext = GeneralContext;
 
@@ -949,6 +957,14 @@ namespace Aseba
 		tc.movePosition(QTextCursor::WordLeft);
 		tc.movePosition(QTextCursor::PreviousWord);
 		tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+		return tc.selectedText();
+	}
+
+	QString AeslEditor::currentLine() const
+	{
+		// return everything between the start and the cursor
+		QTextCursor tc = textCursor();
+		tc.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
 		return tc.selectedText();
 	}
 

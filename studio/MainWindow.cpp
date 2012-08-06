@@ -1132,12 +1132,15 @@ namespace Aseba
 	{
 //		qDebug() << "New context: " << context;
 		if ((context == GeneralContext) || (context == UnknownContext))
-			editor->setCompleterModel(variableAggregator);
+			editor->setCompleterModel(variableAggregator);	// both variables and constants
+		else if (context == LeftValueContext)
+			editor->setCompleterModel(vmMemoryModel);	// only variables
+		else if (context == VarDefContext)
+			editor->setCompleterModel(0);		// disable auto-completion in this case
 		else if (context == FunctionContext)
 			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
 		else if (context == EventContext)
-			// local events only
-			editor->setCompleterModel(eventAggregator);
+			editor->setCompleterModel(eventAggregator);	// both local and global events
 	}
 
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)

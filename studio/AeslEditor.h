@@ -29,6 +29,7 @@
 #include <QTextBlockUserData>
 #include <QTextEdit>
 #include <QCompleter>
+#include <QRegExp>
 
 class QTextDocument;
 
@@ -142,6 +143,8 @@ namespace Aseba
 	
 	enum LocalContext {
 		UnknownContext,
+		VarDefContext,
+		LeftValueContext,
 		FunctionContext,
 		EventContext,
 		GeneralContext
@@ -203,10 +206,14 @@ namespace Aseba
 
 		QString textUnderCursor() const;
 		QString previousWord() const;
+		QString currentLine() const;
 
 	protected:
 		QCompleter *completer;
+		const QRegExp vardefRegexp;
+		const QRegExp leftValueRegexp;
 		LocalContext previousContext;
+		bool editingLeftValue;
 	};
 	
 	/*@}*/
