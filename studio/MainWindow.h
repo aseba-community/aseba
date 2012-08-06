@@ -35,9 +35,13 @@
 #include <QFutureWatcher>
 #include <QToolButton>
 #include <QToolBar>
+#include <QCompleter>
+#include <QSortFilterProxyModel>
 
+#include "AeslEditor.h"
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
+#include "ModelAggregator.h"
 
 #include "../compiler/compiler.h"
 #include <fstream>
@@ -188,6 +192,8 @@ namespace Aseba
 	
 	public slots:
 		void clearExecutionErrors();
+		void refreshCompleterModel(LocalContext context);
+		//void sortCompleterModel();
 	
 	protected slots:
 		void resetClicked();
@@ -298,6 +304,12 @@ namespace Aseba
 		QTreeView *vmFunctionsView;
 		
 		DraggableListWidget* vmLocalEvents;
+
+		QCompleter *completer;
+		QAbstractItemModel* eventAggregator;
+		QAbstractItemModel* variableAggregator;
+		QSortFilterProxyModel* sortingProxy;
+		TreeChainsawFilter* functionsFlatModel;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;

@@ -27,6 +27,7 @@
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "CompilerTranslator.h"
+#include "ModelAggregator.h"
 #include "../common/consts.h"
 #include "../common/productids.h"
 #include "../utils/utils.h"
@@ -265,11 +266,33 @@ namespace Aseba
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
-		
+
 		// create gui
 		setupWidgets();
 		setupConnections();
-		
+
+		// create aggregated models
+		// local and global events
+		ModelAggregator* aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmLocalEvents->model());
+		aggregator->addModel(mainWindow->eventsDescriptionsModel);
+		eventAggregator = aggregator;
+		// variables and constants
+		aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmMemoryModel);
+		aggregator->addModel(mainWindow->constantsDefinitionsModel);
+		variableAggregator = aggregator;
+
+		// create the sorting proxy
+		sortingProxy = new QSortFilterProxyModel(this);
+		sortingProxy->setDynamicSortFilter(true);
+		sortingProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+		sortingProxy->setSortRole(Qt::DisplayRole);
+
+		// create the chainsaw filter for native functions
+		functionsFlatModel = new TreeChainsawFilter(this);
+		functionsFlatModel->setSourceModel(vmFunctionsModel);
+
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -278,7 +301,7 @@ namespace Aseba
 		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
 		processCompilationResult(result);
 	}
-	
+
 	NodeTab::~NodeTab()
 	{
 		compilationFuture.waitForFinished();
@@ -556,6 +579,7 @@ namespace Aseba
 		connect(editor, SIGNAL(breakpointSet(unsigned)), SLOT(setBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointCleared(unsigned)), SLOT(clearBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointClearedAll()), SLOT(breakpointClearedAll()));
+		connect(editor, SIGNAL(refreshModelRequest(LocalContext)), SLOT(refreshCompleterModel(LocalContext)));
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
@@ -1115,6 +1139,48 @@ namespace Aseba
 			rehighlight();
 	}
 	
+	void NodeTab::refreshCompleterModel(LocalContext context)
+	{
+//		qDebug() << "New context: " << context;
+		disconnect(mainWindow->eventsDescriptionsModel, 0, sortingProxy, 0);
+
+		if ((context == GeneralContext) || (context == UnknownContext))
+		{
+			sortingProxy->setSourceModel(variableAggregator);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// both variables and constants
+		}
+		else if (context == LeftValueContext)
+		{
+			sortingProxy->setSourceModel(vmMemoryModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// only variables
+		}
+		else if (context == VarDefContext)
+			editor->setCompleterModel(0);		// disable auto-completion in this case
+		else if (context == FunctionContext)
+		{
+			sortingProxy->setSourceModel(functionsFlatModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// native functions
+		}
+		else if (context == EventContext)
+		{
+			sortingProxy->setSourceModel(eventAggregator);
+			sortingProxy->sort(0);
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(sortCompleterModel()));
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(sortCompleterModel()));
+			editor->setCompleterModel(sortingProxy);	// both local and global events
+		}
+	}
+/*
+	void NodeTab::sortCompleterModel()
+	{
+		sortingProxy->sort(0);
+		editor->setCompleterModel(0);
+		editor->setCompleterModel(sortingProxy);
+	}
+*/
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view
