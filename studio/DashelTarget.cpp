@@ -341,15 +341,7 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BOOTLOADER_ACK] = &Aseba::DashelTarget::receivedBootloaderAck;
 		
 		// Send presence query
-		try
-		{
-			GetDescription().serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
-		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		broadcastGetDescription();
 
 		dashelInterface.start();
 	}
@@ -389,6 +381,21 @@ namespace Aseba
 	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
 	{
 		return descriptionManager.getDescription(node);
+	}
+	
+	void DashelTarget::broadcastGetDescription()
+	{
+		if (writeBlocked || !dashelInterface.stream) return;
+		
+		try
+		{
+			GetDescription().serialize(dashelInterface.stream);
+			dashelInterface.stream->flush();
+		}
+		catch(Dashel::DashelException e)
+		{
+			handleDashelException(e);
+		}
 	}
 	
 	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)

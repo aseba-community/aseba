@@ -1431,6 +1431,7 @@ namespace Aseba
 
 	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent) :
 		QMainWindow(parent),
+		getDescriptionTimer(0),
 		autoMemoryRefresh(autoRefresh),
 		sourceModified(false)
 	{
@@ -2465,6 +2466,9 @@ namespace Aseba
 		
 		regenerateToolsMenus();
 		regenerateHelpMenu();
+		
+		if (!getDescriptionTimer)
+			getDescriptionTimer = startTimer(2000);
 	}
 	
 	//! The network connection has been cut: all nodes have disconnected.
@@ -2616,6 +2620,29 @@ namespace Aseba
 		Q_ASSERT(tab);
 		
 		tab->breakpointSetResult(line, success);
+	}
+	
+	//! If any node was disconnected, send get description
+	void MainWindow::timerEvent ( QTimerEvent * event )
+	{
+		bool doSend(false);
+		
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+				doSend = doSend || (tab->id != 0);
+		}
+		
+		if (doSend)
+		{
+			target->broadcastGetDescription();
+		}
+		else
+		{
+			killTimer(getDescriptionTimer);
+			getDescriptionTimer = 0;
+		}
 	}
 	
 	int MainWindow::getIndexFromId(unsigned node) const

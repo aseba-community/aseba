@@ -444,6 +444,8 @@ namespace Aseba
 		void applySettings();
 	
 	private:
+		virtual void timerEvent ( QTimerEvent * event );
+		
 		// utility functions
 		int getIndexFromId(unsigned node) const;
 		NodeTab* getTabFromId(unsigned node) const;
@@ -472,6 +474,7 @@ namespace Aseba
 		friend class AeslEditor;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
+		int getDescriptionTimer;
 		
 		#ifdef HAVE_QWT
 		
