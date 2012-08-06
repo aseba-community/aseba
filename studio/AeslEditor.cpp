@@ -889,7 +889,7 @@ namespace Aseba
 //		qDebug() << "Completion prefix: " << completionPrefix;
 
 		// don't show the popup if the word is too short, or if we detect an "end of word" character
-		if (event->text().isEmpty()|| completionPrefix.length() < 3 || eow.contains(event->text().right(1))) {
+		if (event->text().isEmpty()|| completionPrefix.length() < 1 || eow.contains(event->text().right(1))) {
 			completer->popup()->hide();
 			return;
 		}

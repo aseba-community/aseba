@@ -300,6 +300,7 @@ namespace Aseba
 		DraggableListWidget* vmLocalEvents;
 
 		QCompleter *completer;
+		QAbstractItemModel* eventAggregator;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;

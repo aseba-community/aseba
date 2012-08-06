@@ -27,6 +27,7 @@
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "CompilerTranslator.h"
+#include "ModelAggregator.h"
 #include "../common/consts.h"
 #include "../common/productids.h"
 #include "../utils/utils.h"
@@ -268,7 +269,13 @@ namespace Aseba
 		// create gui
 		setupWidgets();
 		setupConnections();
-		
+
+		// create aggregated models
+		ModelAggregator* aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmLocalEvents->model());
+		aggregator->addModel(mainWindow->eventsDescriptionsModel);
+		eventAggregator = aggregator;
+
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -1124,7 +1131,7 @@ namespace Aseba
 			editor->setCompleterModel(0);		// not yet implemented (not working in fact)
 		else if (context == EventContext)
 			// local events only
-			editor->setCompleterModel(vmLocalEvents->model());
+			editor->setCompleterModel(eventAggregator);
 	}
 
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)

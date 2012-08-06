@@ -88,6 +88,7 @@ if (QT4_FOUND)
 		HelpViewer.cpp
 		ConfigDialog.cpp
 		CompilerTranslator.cpp
+		ModelAggregator.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioBootloader.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
