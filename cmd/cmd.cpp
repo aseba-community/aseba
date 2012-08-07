@@ -39,7 +39,7 @@ namespace Aseba
 	void dumpCommandList(ostream &stream)
 	{
 		stream << "* presence : broadcast presence message\n";
-		stream << "* usermsg: user message [type] [length in 16 bit words]\n";
+		stream << "* usermsg: user message [type] [word0] ... [wordN]\n";
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
 		stream << "* rdpageusb : bootloader read page usb [dest] [page number]\n";
 		stream << "* whex : write hex file [dest] [file name] [reset]\n";
@@ -581,15 +581,15 @@ namespace Aseba
 		else if (strcmp(cmd, "usermsg") == 0)
 		{
 			// first arg is type, second is length
-			if (argc < 3)
+			if (argc < 2)
 				errorMissingArgument(argv[0]);
-			argEaten = 2;
+			argEaten = argc;
 			uint16 type = atoi(argv[1]);
-			uint16 length = atoi(argv[2]);
+			uint16 length = argc-2;
 			
 			UserMessage::DataVector data(length);
 			for (size_t i = 0; i < length; i++)
-				data[i] = i;
+				data[i] = atoi(argv[i+2]);
 			
 			UserMessage message(type, data);
 			message.serialize(stream);
