@@ -39,7 +39,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	InvasivePlugin::InvasivePlugin(NodeTab* nodeTab) : nodeTab(nodeTab) {};
+	InvasivePlugin::InvasivePlugin(NodeTab* nodeTab) : nodeTab(nodeTab) { mainWindow = nodeTab->mainWindow; };
 
 	Dashel::Stream* InvasivePlugin::getDashelStream()
 	{
@@ -76,6 +76,24 @@ namespace Aseba
 		nodeTab->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
 		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
 		nodeTab->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
+	}
+	
+	QString InvasivePlugin::saveFile(bool as)
+	{
+		if( as )
+			mainWindow->saveFile();
+		else
+			mainWindow->save();
+	
+		return mainWindow->actualFileName;
+	}
+	
+	void InvasivePlugin::openFile(QString name)
+	{ 
+		mainWindow->sourceModified = false;
+		mainWindow->constantsDefinitionsModel->clearWasModified();
+		mainWindow->eventsDescriptionsModel->clearWasModified();
+		mainWindow->openFile(name);
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()

@@ -44,7 +44,7 @@ namespace Aseba
 		void setClicked(int clicked) { buttonClicked = clicked; }
 		void setToggleState(bool state) { toggleState = state; }
 		void setNumStates(int num) { numStates = num > 2 ? num : 2; }
-		int getNumStates() { return numStates; }
+		int getNumStates() const { return numStates; }
 
 		QRectF boundingRect() const { return boundingRectangle; }
 		void setButtonColor(QColor color) { buttonColor = color; }
@@ -107,17 +107,19 @@ namespace Aseba
 		QRectF boundingRect() const { return QRectF(0, 0, 256+trans, 256); }
 
 		void setButtonColor(QColor color) { buttonColor = color; update(); }
-		QColor getButtonColor() { return buttonColor; }
+		QColor getButtonColor() const { return buttonColor; }
 		virtual void setClicked(int i, int status);
 		virtual int isClicked(int i) { if( i<thymioButtons.size() ) return thymioButtons.at(i)->isClicked(); return -1; }
 
 		void setParentID(int id) { parentID = id; }
-		int getParentID() { return parentID; }
-		QString getType() { return data(0).toString(); }
-		QString getName() { return data(1).toString(); }
+		int getParentID() const { return parentID; }
+		QString getType() const { return data(0).toString(); }
+		QString getName() const { return data(1).toString(); }
 		virtual int getNumButtons() { return thymioButtons.size(); }
 		void setScaleFactor(qreal factor) { scaleFactor = factor; } 
 		void setAdvanced(bool advanced);
+		int getState() const;
+		void setState(int val);
 		
 		virtual QPixmap image(bool on=true);
 	

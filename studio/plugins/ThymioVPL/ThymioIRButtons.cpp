@@ -9,7 +9,7 @@ namespace Aseba
 		buttons(size),
 		memory(-1)
 	{
-		cout << "thymio ir button -- size, buttons.size: " << size << ", " << buttons.size() << endl; 
+		//cout << "thymio ir button -- size, buttons.size: " << size << ", " << buttons.size() << endl; 
 	}
 
 	ThymioIRButton::~ThymioIRButton() 
@@ -19,10 +19,10 @@ namespace Aseba
 
 	void ThymioIRButton::setClicked(int i, int status) 
 	{ 
-		cout << "in set clicked .. " << i << ", " << buttons.size() << flush;
+		//cout << "in set clicked .. " << i << ", " << buttons.size() << flush;
 		if( i<size() ) 
 			buttons[i] = status; 
-		cout << " .. done\n" << flush;
+		//cout << " .. done\n" << flush;
 	}
 	
 	int ThymioIRButton::isClicked(int i) const

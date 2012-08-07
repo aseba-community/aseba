@@ -465,6 +465,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		friend class AeslEditor;
+		friend class InvasivePlugin;		
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
 		

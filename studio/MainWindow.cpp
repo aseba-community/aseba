@@ -1563,7 +1563,7 @@ namespace Aseba
 					{
 						constantsDefinitionsModel->addNamedValue(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
 					}
-					else if (element.tagName() == "keywords") // Jiwon
+					else if (element.tagName() == "keywords")
 					{
 						if( element.attribute("flag") == "true" )
 							showKeywordsAct->setChecked(true);
@@ -1665,7 +1665,7 @@ namespace Aseba
 			root.appendChild(element);
 		}
 		
-		// keywords Jiwon
+		// keywords
 		root.appendChild(document.createTextNode("\n\n\n"));
 		root.appendChild(document.createComment("show keywords state"));
 		

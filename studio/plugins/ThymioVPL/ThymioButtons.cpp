@@ -187,7 +187,7 @@ namespace Aseba
 
 	void ThymioButton::setClicked(int i, int status)
 	{
-		qDebug() << "in thymio button set clicked";
+		//qDebug() << "in thymio button set clicked";
 		if( i < thymioButtons.size()  )
 			thymioButtons.at(i)->setClicked(status);			
 	}
@@ -199,7 +199,7 @@ namespace Aseba
 		{
 			QString name = getName();
 
-			qDebug() << "getIRButton num: " << num;
+			//qDebug() << "getIRButton num: " << num;
 
 			if( name == "button" )
 				buttonIR = new ThymioIRButton(num, THYMIO_BUTTONS_IR, 2);
@@ -244,14 +244,7 @@ namespace Aseba
 		for(int i=0; i<getNumButtons(); ++i) 
 			buttonIR->setClicked(i, isClicked(i));
 
-		if( !stateButtons.empty() )
-		{
-			int val=0;
-			for(int i=0; i<stateButtons.size(); ++i)
-				val += (stateButtons[i]->isClicked()*(0x01<<i));
-			buttonIR->setMemoryState(val);
-		} else
-			buttonIR->setMemoryState(-1);		
+		buttonIR->setMemoryState(getState());		
 		
 		emit stateChanged();
 	}
@@ -336,6 +329,8 @@ namespace Aseba
 
 	void ThymioButton::setAdvanced(bool advanced)
 	{
+		trans = advanced ? 64 : 0;	
+		
 		if( advanced && stateButtons.empty() )
 		{
 			for(int i=0; i<4; i++)
@@ -348,19 +343,53 @@ namespace Aseba
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 			}
+			updateIRButton();
+		}	
+		else if( !advanced && !stateButtons.empty() )
+		{
+			for(int i=0; i<stateButtons.size(); i++)
+			{
+				disconnect(stateButtons[i], SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+				stateButtons[i]->setParentItem(0);
+				delete(stateButtons[i]);
+			}
+			stateButtons.clear();
 		}
-		trans = advanced ? 64 : 0;		
-		updateIRButton();		
-		//		else if( !advanced && !stateButtons.empty() )
-//		{
-//			for(int i=0; i<stateButtons.size(); i++)
-//			{
-//				disconnect(stateButtons[i], SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-//				stateButtons[i]->setParentItem(0);
-//				delete(stateButtons[i]);
-//			}
-//			stateButtons.clear();
-//		}
+	}
+
+	int ThymioButton::getState() const
+	{
+		if( stateButtons.empty() )
+			return -1;
+
+		int val=0;
+		for(int i=0; i<stateButtons.size(); ++i)
+			val += (stateButtons[i]->isClicked()*(0x01<<i));
+
+		return val;
+	}
+	
+	void ThymioButton::setState(int val)
+	{		
+		if( val >= 0 )
+		{
+			if( stateButtons.empty() )	
+			{
+				for(int i=0; i<4; ++i)
+				{
+					ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
+
+					button->setPos(288, i*60 + 40);
+					button->setButtonColor(Qt::gray);
+
+					stateButtons.push_back(button);
+					connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+				}
+			}
+			
+			for(int i=0; i<4; ++i)
+				stateButtons.at(i)->setClicked(val&(0x01<<i)? 1 : 0);			
+		}
 	}
 
 	void ThymioButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
@@ -754,7 +783,7 @@ namespace Aseba
 
 	void ThymioButtonSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		qDebug() << "ThymioButtonSet -- drop event";
+		//qDebug() << "ThymioButtonSet -- drop event";
 
 		scene()->setFocusItem(0);
 
@@ -814,14 +843,14 @@ namespace Aseba
 				else if( buttonName == "memory" )
 					button = new ThymioMemoryAction();
 							
-				qDebug() << "  == TBS -- drop event : created " << buttonName << " button, # " << numButtons;
+				//qDebug() << "  == TBS -- drop event : created " << buttonName << " button, # " << numButtons;
 
 				if( button ) 
 				{
 					event->setDropAction(Qt::MoveAction);
 					event->accept();
 					
-					qDebug() << "  == TBS -- drop event : accepted the button.";
+					//qDebug() << "  == TBS -- drop event : accepted the button.";
 					
 					if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
 					{
@@ -842,7 +871,7 @@ namespace Aseba
 					}
 
 				}
-				qDebug() << "  == TBS -- drop event : added the button.";
+				//qDebug() << "  == TBS -- drop event : added the button.";
 			}
 			
 			update();
@@ -850,7 +879,7 @@ namespace Aseba
 		else
 			event->ignore();
 
-		qDebug() << "  == TBS -- drop event : done";
+		//qDebug() << "  == TBS -- drop event : done";
 	}
 
 	void ThymioButtonSet::mousePressEvent( QGraphicsSceneMouseEvent * event )
