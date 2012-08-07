@@ -749,6 +749,30 @@ namespace Aseba
 			delete message;
 	}
 	
+	struct ReconnectionDialog: public QMessageBox
+	{
+		ReconnectionDialog(DashelInterface& dashelInterface):
+			dashelInterface(dashelInterface)
+		{
+			setWindowTitle(tr("Aseba Studio - Connection closed"));
+			setText(tr("Warning, connection closed: I am trying to reconnect."));
+			setStandardButtons(QMessageBox::Cancel);
+			setEscapeButton(QMessageBox::Cancel);
+			setIcon(QMessageBox::Warning);
+			
+			startTimer(1000);
+		}
+	
+	protected:
+		virtual void timerEvent ( QTimerEvent * event )
+		{
+			if (dashelInterface.attemptToReconnect())
+				accept();
+		}
+		
+		DashelInterface& dashelInterface;
+	};
+	
 	void DashelTarget::disconnectionFromDashel()
 	{
 		emit networkDisconnected();
@@ -756,26 +780,8 @@ namespace Aseba
 		descriptionManager.reset();
 		
 		// prepare a dialog box giving the possibility to reconnect
-		QMessageBox msgBox;
-		msgBox.setWindowTitle(tr("Aseba Studio - Connection closed"));
-		msgBox.setText(tr("Warning, connection closed: try to reconnect or save your work and quit Studio."));
-		msgBox.setStandardButtons(QMessageBox::Close);
-		QPushButton* retryButton(new QPushButton(tr("Try to reconnect")));
-		msgBox.addButton(retryButton, QMessageBox::AcceptRole);
-		msgBox.setEscapeButton(QMessageBox::Close);
-		msgBox.setDefaultButton(retryButton);
-		msgBox.setIcon(QMessageBox::Warning);
-		
-		// show dialog box until reconnection is successful or the user closes it
-		while (true)
-		{
-			msgBox.exec();
-			if (msgBox.clickedButton() != retryButton)
-				break;
-			
-			if (dashelInterface.attemptToReconnect())
-				return;
-		}
+		ReconnectionDialog reconnectionDialog(dashelInterface);
+		reconnectionDialog.exec();
 	}
 	
 	void DashelTarget::nodeDescriptionReceived(unsigned nodeId)
