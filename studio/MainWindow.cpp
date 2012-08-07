@@ -1262,6 +1262,11 @@ namespace Aseba
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
 			
 			nextButton->setEnabled(true);
+
+			// go to this line and next line is visible
+			editor->setTextCursor(QTextCursor(editor->document()->findBlockByLineNumber(currentPC+1)));
+			editor->ensureCursorVisible();
+			editor->setTextCursor(QTextCursor(editor->document()->findBlockByLineNumber(currentPC)));
 		}
 		else if (mode == Target::EXECUTION_STOP)
 		{
