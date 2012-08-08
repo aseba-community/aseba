@@ -66,23 +66,30 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 		return;
 	
 	// send to stream
-	uint16 temp;
-	temp = bswap16(length - 2);
-	stream->write(&temp, 2);
-	temp = bswap16(vm->nodeId);
-	stream->write(&temp, 2);
-	stream->write(data, length);
-	stream->flush();
-	
-	// push to other nodes
-	for (size_t i = 0; i < marxBot.modules.size(); ++i)
+	try
 	{
-		Enki::AsebaMarxbot::Module& module = *(marxBot.modules[i]);
-		if (&(module.vm) != vm) 
+		uint16 temp;
+		temp = bswap16(length - 2);
+		stream->write(&temp, 2);
+		temp = bswap16(vm->nodeId);
+		stream->write(&temp, 2);
+		stream->write(data, length);
+		stream->flush();
+
+		// push to other nodes
+		for (size_t i = 0; i < marxBot.modules.size(); ++i)
 		{
-			module.events.push_back(Enki::AsebaMarxbot::Event(vm->nodeId, data, length));
-			AsebaProcessIncomingEvents(&(module.vm));
+			Enki::AsebaMarxbot::Module& module = *(marxBot.modules[i]);
+			if (&(module.vm) != vm) 
+			{
+				module.events.push_back(Enki::AsebaMarxbot::Event(vm->nodeId, data, length));
+				AsebaProcessIncomingEvents(&(module.vm));
+			}
 		}
+	}
+	catch (Dashel::DashelException e)
+	{
+		std::cerr << "Cannot write to socket: " << stream->getFailReason() << std::endl;
 	}
 }
 

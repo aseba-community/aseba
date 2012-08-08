@@ -930,14 +930,21 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 {
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
 	assert(stream);
-	
-	uint16 temp;
-	temp = bswap16(length - 2);
-	stream->write(&temp, 2);
-	temp = bswap16(vm->nodeId);
-	stream->write(&temp, 2);
-	stream->write(data, length);
-	stream->flush();
+
+	try
+	{
+		uint16 temp;
+		temp = bswap16(length - 2);
+		stream->write(&temp, 2);
+		temp = bswap16(vm->nodeId);
+		stream->write(&temp, 2);
+		stream->write(data, length);
+		stream->flush();
+	}
+	catch (Dashel::DashelException e)
+	{
+		std::cerr << "Cannot write to socket: " << stream->getFailReason() << std::endl;
+	}
 }
 
 extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
