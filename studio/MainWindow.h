@@ -314,8 +314,6 @@ namespace Aseba
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
 		
-		bool isSynchronized;
-		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
 		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
@@ -328,6 +326,7 @@ namespace Aseba
 		QFuture<CompilationResult*> compilationFuture;
 		QFutureWatcher<CompilationResult*> compilationWatcher;
 		bool compilationDirty;
+		bool isSynchronized;
 		
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables

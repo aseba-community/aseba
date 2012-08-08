@@ -1503,8 +1503,8 @@ namespace Aseba
 	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent) :
 		QMainWindow(parent),
 		getDescriptionTimer(0),
-		autoMemoryRefresh(autoRefresh),
-		sourceModified(false)
+		sourceModified(false),
+		autoMemoryRefresh(autoRefresh)
 	{
 		// create target
 		target = new DashelTarget(translators, commandLineTarget);

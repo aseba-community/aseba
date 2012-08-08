@@ -84,7 +84,7 @@ namespace Aseba
 		class ThymioBody : public QGraphicsItem
 		{
 		public:
-			ThymioBody(QGraphicsItem *parent=0) : QGraphicsItem(parent), up(true), bodyColor(Qt::white) { }
+			ThymioBody(QGraphicsItem *parent=0) : QGraphicsItem(parent), bodyColor(Qt::white), up(true) { }
 			virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
 			void setUp(bool u) { up = u; }

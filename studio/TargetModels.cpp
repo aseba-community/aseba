@@ -43,7 +43,7 @@ namespace Aseba
 	
 	bool VariableListener::subscribeToVariableOfInterest(const QString& name)
 	{
-		variablesModel->subscribeToVariableOfInterest(this, name);
+		return variablesModel->subscribeToVariableOfInterest(this, name);
 	}
 	
 	void VariableListener::unsubscribeToVariableOfInterest(const QString& name)

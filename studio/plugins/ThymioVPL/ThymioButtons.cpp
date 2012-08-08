@@ -16,10 +16,10 @@ namespace Aseba
 	ThymioClickableButton::ThymioClickableButton ( QRectF rect, ThymioButtonType type, QGraphicsItem *parent ) :
 		QGraphicsObject(parent),
 		buttonType(type),
-		boundingRectangle(rect),
-		buttonColor(Qt::gray),
 		buttonClicked(false),
-		toggleState(true)
+		toggleState(true),
+		boundingRectangle(rect),
+		buttonColor(Qt::gray)
 	{		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -145,10 +145,10 @@ namespace Aseba
 
 	ThymioButton::ThymioButton(bool eventButton, qreal scale, bool up, QGraphicsItem *parent) : 
 		QGraphicsSvgItem(parent),
+		buttonIR(),
 		buttonColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
 		parentID(-1),
-		scaleFactor(0.5),
-		buttonIR()
+		scaleFactor(0.5)
 	{
 		thymioBody = new ThymioBody(this);
 		thymioBody->setUp(up);
@@ -405,11 +405,11 @@ namespace Aseba
 		QGraphicsObject(parent),
 		eventButton(0),
 		actionButton(0),
+		buttonSetIR(),
 		highlightEventButton(false),
 		highlightActionButton(false),
 		eventButtonColor(QColor(0,191,255)),
-		actionButtonColor(QColor(218,112,214)),
-		buttonSetIR()	
+		actionButtonColor(QColor(218,112,214))
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
@@ -653,7 +653,6 @@ namespace Aseba
 				dataStream >> buttonName >> numButtons;
 				
 				ThymioButton *button = 0;
-				bool eventButtonFlag = true;
 
 				if ( buttonName == "button" )
 					button = new ThymioButtonsEvent();

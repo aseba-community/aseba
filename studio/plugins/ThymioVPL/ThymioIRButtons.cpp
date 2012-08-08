@@ -23,6 +23,7 @@ namespace Aseba
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
+		return false;
 	}
 	
 	int ThymioIRButton::size() const

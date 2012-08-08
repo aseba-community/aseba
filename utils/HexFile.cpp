@@ -339,7 +339,7 @@ namespace Aseba
 		for(PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it++)
 		{
 			int isempty = 1;
-			int i;
+			unsigned int i;
 			for(i = 0; i < pageSize; i+=4)
 				if(it->second[i] != 0xff || it->second[i+1] != 0xff || it->second[i+2] != 0xff) {
 					isempty = 0;
