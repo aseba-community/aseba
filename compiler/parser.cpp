@@ -596,7 +596,7 @@ namespace Aseba
 		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
 		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(rangeStartIndexPos));
 		assignment->children.push_back(variable.release());
-		assignment->children.push_back(new ImmediateVectorNode(rangeStartIndexPos, rangeStartIndex));
+		assignment->children.push_back(new TupleVectorNode(rangeStartIndexPos, rangeStartIndex));
 		blockNode->children.push_back(assignment.release());
 		
 		// create while and condition
@@ -608,7 +608,7 @@ namespace Aseba
 			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
 			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		comparisonNode->children.push_back(new ImmediateVectorNode(rangeEndIndexPos, rangeEndIndex));
+		comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
 		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
@@ -620,7 +620,7 @@ namespace Aseba
 		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
 		whileNode->children[1]->children.push_back(assignmentNode);
 		assignmentNode->children.push_back(variableRef->deepCopy());
-		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new ImmediateVectorNode(varPos, step)));
+		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
 		
 		tokens.pop_front();
 		
@@ -1009,7 +1009,7 @@ namespace Aseba
 			case Token::TOKEN_INT_LITERAL:
 			{
 				// immediate
-				std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(pos, expectUInt16Literal()));
+				std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(pos, expectUInt16Literal()));
 				tokens.pop_front();
 				return arrayCtor.release();
 			}
@@ -1024,7 +1024,7 @@ namespace Aseba
 	}
 
 	//! Parse "[ .... ]" grammar element
-	ImmediateVectorNode* Compiler::parseImmediateVector(bool compatibility)
+	TupleVectorNode* Compiler::parseImmediateVector(bool compatibility)
 	{
 		if (!compatibility)
 		{
@@ -1042,11 +1042,11 @@ namespace Aseba
 		}
 
 		SourcePos varPos = tokens.front().pos;
-		std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(varPos));
+		std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(varPos));
 
 		do
 		{
-			arrayCtor->addValue(expectInt16LiteralOrConstant());
+			arrayCtor->addImmediateValue(expectInt16LiteralOrConstant());
 			tokens.pop_front();
 
 			if (tokens.front() != Token::TOKEN_COMMA)
@@ -1071,8 +1071,8 @@ namespace Aseba
 		std::wstring varName = tokens.front().sValue;
 		if (constantExists(varName))
 		{
-			std::auto_ptr<ImmediateVectorNode> arrayCtor(new ImmediateVectorNode(tokens.front().pos));
-			arrayCtor->addValue(expectConstant());
+			std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(tokens.front().pos));
+			arrayCtor->addImmediateValue(expectConstant());
 			tokens.pop_front();
 			return arrayCtor.release();
 		}
@@ -1109,8 +1109,8 @@ namespace Aseba
 			if (startIndex.get() == NULL)
 			{
 				// constant index
-				std::auto_ptr<ImmediateVectorNode> index(new ImmediateVectorNode(pos));
-				index->addValue(start);
+				std::auto_ptr<TupleVectorNode> index(new TupleVectorNode(pos));
+				index->addImmediateValue(start);
 
 				// do we have array subscript?
 				if (tokens.front() == Token::TOKEN_COLON)
@@ -1128,7 +1128,7 @@ namespace Aseba
 					if (end < start)
 						throw TranslatableError(tokens.front().pos, ERROR_INDEX_WRONG_END);
 
-					index->addValue(end);
+					index->addImmediateValue(end);
 				}
 
 				vector->children.push_back(index.release());

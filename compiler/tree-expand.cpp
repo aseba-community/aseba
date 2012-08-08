@@ -83,9 +83,9 @@ namespace Aseba
 
 
 	//! expand to vector[index]
-	Node* ImmediateVectorNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
+	Node* TupleVectorNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
 	{
-		return new ImmediateNode(sourcePos, getValue(index));
+		return new ImmediateNode(sourcePos, getImmediateValue(index));
 	}
 
 
@@ -94,9 +94,9 @@ namespace Aseba
 		assert(index < getVectorSize());
 
 		// get the optional index given in the Aseba code
-		ImmediateVectorNode* accessIndex = NULL;
+		TupleVectorNode* accessIndex = NULL;
 		if (children.size() > 0)
-			accessIndex = dynamic_cast<ImmediateVectorNode*>(children[0]);
+			accessIndex = dynamic_cast<TupleVectorNode*>(children[0]);
 
 		if (accessIndex || children.size() == 0)
 		{
@@ -156,9 +156,9 @@ namespace Aseba
 		Node* memoryVector = children[0];
 
 		// create a vector of 1's
-		std::auto_ptr<ImmediateVectorNode> constant(new ImmediateVectorNode(sourcePos));
+		std::auto_ptr<TupleVectorNode> constant(new TupleVectorNode(sourcePos));
 		for (unsigned int i = 0; i < memoryVector->getVectorSize(); i++)
-			constant->addValue(1);
+			constant->addImmediateValue(1);
 
 		// expand to "vector (op)= 1"
 		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector->deepCopy(), constant.release()));
@@ -295,6 +295,16 @@ namespace Aseba
 	}
 
 
+	unsigned TupleVectorNode::getVectorSize() const
+	{
+		unsigned size = 0;
+		NodesVector::const_iterator it;
+		for (it = children.begin(); it != children.end(); it++)
+			size += (*it)->getVectorSize();
+		return size;
+	}
+
+
 	//! return the compile-time base address of the memory range, taking
 	//! into account an immediate index foo[n] or foo[n:m]
 	//! return E_NOVAL if foo[expr]
@@ -307,10 +317,10 @@ namespace Aseba
 		// index(es) given?
 		if (children.size() == 1)
 		{
-			ImmediateVectorNode* index = dynamic_cast<ImmediateVectorNode*>(children[0]);
+			TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
 			if (index)
 			{
-				shift = index->getValue(0);
+				shift = index->getImmediateValue(0);
 			}
 			else
 				// not know at compile time
@@ -328,7 +338,7 @@ namespace Aseba
 
 		if (children.size() == 1)
 		{
-			ImmediateVectorNode* index = dynamic_cast<ImmediateVectorNode*>(children[0]);
+			TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
 			if (index)
 			{
 				unsigned numberOfIndex = index->getVectorSize();
@@ -341,7 +351,7 @@ namespace Aseba
 				else if (numberOfIndex == 2)
 				{
 					// foo[n:m] -> compute the span
-					return index->getValue(1) - index->getValue(0) + 1;
+					return index->getImmediateValue(1) - index->getImmediateValue(0) + 1;
 				}
 				else
 					// whaaaaat? Are you trying foo[[1,2,3]]?
@@ -356,18 +366,25 @@ namespace Aseba
 			return arraySize;
 	}
 
-	//! return the very-first element of the vector
-	int ImmediateVectorNode::getLonelyImmediate() const
+	bool TupleVectorNode::isImmediateVector() const
 	{
-		assert(getVectorSize() >= 1);
-		return values[0];
+		NodesVector::const_iterator it;
+		for (it = children.begin(); it != children.end(); it++)
+		{
+			ImmediateNode* node = dynamic_cast<ImmediateNode*>(*it);
+			if (!node)
+				return false;
+		}
+		return true;
 	}
 
 	//! return the n-th vector's element
-	int ImmediateVectorNode::getValue(unsigned index) const
+	int TupleVectorNode::getImmediateValue(unsigned index) const
 	{
 		assert(index < getVectorSize());
-		return values[index];
+		assert(isImmediateVector());
+		ImmediateNode* node = dynamic_cast<ImmediateNode*>(children[index]);
+		assert(node);
+		return node->value;
 	}
-
 }

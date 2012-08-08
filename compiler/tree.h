@@ -492,26 +492,24 @@ namespace Aseba
 	};
 
 	//! Node for assembling values into an array
-	//! values[x] is the x-th value to be assembled
-	struct ImmediateVectorNode : AbstractTreeNode
+	//! children[x] is the x-th Node to be assembled
+	struct TupleVectorNode : AbstractTreeNode
 	{
-		std::vector<int> values;
-
 		//! Constructor
-		ImmediateVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
-		ImmediateVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { values.push_back(value); }
-		virtual ImmediateVectorNode* shallowCopy() { return new ImmediateVectorNode(*this); }
+		TupleVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
+		TupleVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { children.push_back(new ImmediateNode(sourcePos, value)); }
+		virtual TupleVectorNode* shallowCopy() { return new TupleVectorNode(*this); }
 
 		virtual Node* expandToAsebaTree(std::wostream* dump, unsigned int index = 0);
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"array of constants"; }
 		virtual void dump(std::wostream& dest, unsigned& indent) const;
 
-		virtual unsigned getVectorSize() const { return values.size(); }
+		virtual unsigned getVectorSize() const;
 
-		virtual int getLonelyImmediate() const;
-		virtual int getValue(unsigned index) const;
-		virtual void addValue(int value) { values.push_back(value); }
+		virtual bool isImmediateVector() const;
+		virtual int getImmediateValue(unsigned index) const;
+		virtual void addImmediateValue(int value) { children.push_back(new ImmediateNode(sourcePos, value)); }
 	};
 
 	//! Node for accessing a memory as a vector, in read or write operations
