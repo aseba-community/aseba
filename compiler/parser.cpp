@@ -391,7 +391,7 @@ namespace Aseba
 			tokens.pop_front();
 
 			// try old style initialization 1,2,3
-			std::auto_ptr<Node> rValue(parseImmediateVector(true));
+			std::auto_ptr<Node> rValue(parseTupleVector(true));
 			if (rValue.get() == NULL)
 			{
 				// no -> other type of initialization
@@ -982,7 +982,7 @@ namespace Aseba
 
 			case Token::TOKEN_BRACKET_OPEN:
 			{
-				return parseImmediateVector();
+				return parseTupleVector();
 			}
 			
 			case Token::TOKEN_OP_NEG:
@@ -1024,7 +1024,7 @@ namespace Aseba
 	}
 
 	//! Parse "[ .... ]" grammar element
-	TupleVectorNode* Compiler::parseImmediateVector(bool compatibility)
+	TupleVectorNode* Compiler::parseTupleVector(bool compatibility)
 	{
 		if (!compatibility)
 		{
@@ -1046,8 +1046,16 @@ namespace Aseba
 
 		do
 		{
-			arrayCtor->addImmediateValue(expectInt16LiteralOrConstant());
-			tokens.pop_front();
+			if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
+			{
+				// nested tuples
+				arrayCtor->children.push_back(parseTupleVector());
+			}
+			else
+			{
+				arrayCtor->addImmediateValue(expectInt16LiteralOrConstant());
+				tokens.pop_front();
+			}
 
 			if (tokens.front() != Token::TOKEN_COMMA)
 				break;

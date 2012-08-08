@@ -28,7 +28,7 @@
 #include <string>
 #include <ostream>
 #include <climits>
-
+#include <cassert>
 
 
 namespace Aseba
@@ -348,6 +348,7 @@ namespace Aseba
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		virtual ImmediateNode* shallowCopy() { return new ImmediateNode(*this); }
 
+		virtual Node* expandToAsebaTree(std::wostream *dump, unsigned int index = 0) { assert(index == 0); return shallowCopy(); }
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;

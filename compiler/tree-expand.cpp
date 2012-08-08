@@ -85,7 +85,19 @@ namespace Aseba
 	//! expand to vector[index]
 	Node* TupleVectorNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
 	{
-		return new ImmediateNode(sourcePos, getImmediateValue(index));
+		size_t total = 0;
+		size_t prevTotal = 0;
+		for (size_t i = 0; i < children.size(); i++)
+		{
+			prevTotal = total;
+			total += children[i]->getVectorSize();
+			if (index < total)
+			{
+				return children[i]->expandToAsebaTree(dump, index-prevTotal);
+			}
+		}
+		assert(0);
+		return 0;
 	}
 
 

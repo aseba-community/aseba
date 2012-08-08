@@ -441,7 +441,7 @@ namespace Aseba
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
 
-		TupleVectorNode* parseImmediateVector(bool compatibility = false);
+		TupleVectorNode* parseTupleVector(bool compatibility = false);
 		Node* parseConstantAndVariable();
 		MemoryVectorNode* parseVariable();
 		unsigned parseVariableDefSize();
