@@ -20,6 +20,7 @@
 
 #include "descriptions-manager.h"
 #include "msg.h"
+#include <iostream>
 
 using namespace std;
 
@@ -137,7 +138,7 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	void DescriptionsManager::checkIfNodeDescriptionComplete(unsigned id, const NodeDescription& description)
 	{
 		// we will call the virtual function only when we have received all local events and native functions
@@ -145,7 +146,9 @@ namespace Aseba
 			(description.localEventsReceptionCounter == description.localEvents.size()) &&
 			(description.nativeFunctionReceptionCounter == description.nativeFunctions.size())
 		)
+		{
 			nodeDescriptionReceived(id);
+		}
 	}
 	
 	std::wstring DescriptionsManager::getNodeName(unsigned nodeId) const
@@ -245,5 +248,10 @@ namespace Aseba
 		if (ok)
 			*ok = false;
 		return 0xFFFFFFFF;
+	}
+	
+	void DescriptionsManager::reset()
+	{
+		nodesDescriptions.clear();
 	}
 }

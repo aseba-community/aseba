@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 project(aseba)
 include(ParseVersion.cmake)
 
+add_definitions(-Wall)
+
 # Dashel
 # TODO: make Dashel.cmake to perform this
 

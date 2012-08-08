@@ -328,7 +328,7 @@ namespace Aseba
 			
 			Token() : type(TOKEN_END_OF_STREAM), iValue(0) {}
 			Token(Type type, SourcePos pos = SourcePos(), const std::wstring& value = L"");
-			const wchar_t* typeName() const;
+			const std::wstring typeName() const;
 			std::wstring toWString() const;
 			operator Type () const { return type; }
 		};

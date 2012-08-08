@@ -17,7 +17,7 @@ if (QT4_FOUND AND ENKI_FOUND)
 	
 	set(playground_SRCS playground.cpp playground-vm-description.c)
 	
-	qt4_automoc(${playground_SRCS})
+	#qt4_automoc(${playground_SRCS})
 	
 	#qt4_add_resources(playground_RCC_SRCS playground-textures.qrc)
 	

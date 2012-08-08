@@ -13,9 +13,10 @@ namespace Aseba
 
 	ThymioScene::ThymioScene(QObject *parent) : 
 		QGraphicsScene(parent),
-		prevNewActionButton(false),
 		prevNewEventButton(false),
+		prevNewActionButton(false),
 		lastFocus(-1),
+		thymioCompiler(),
 		eventButtonColor(QColor(0,191,255)),
 		actionButtonColor(QColor(218,112,214)),
 		sceneModified(false),
@@ -435,7 +436,6 @@ namespace Aseba
 			dataStream >> buttonName >> numButtons;
 			
 			ThymioButton *button = 0;
-			bool eventButtonFlag = true;
 
 			if ( buttonName == "button" )
 				button = new ThymioButtonsEvent(0, advancedMode);

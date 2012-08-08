@@ -28,6 +28,8 @@
 #include <QTextCharFormat>
 #include <QTextBlockUserData>
 #include <QTextEdit>
+#include <QCompleter>
+#include <QRegExp>
 
 class QTextDocument;
 
@@ -139,6 +141,15 @@ namespace Aseba
 	
 	class ScriptTab;
 	
+	enum LocalContext {
+		UnknownContext,
+		VarDefContext,
+		LeftValueContext,
+		FunctionContext,
+		EventContext,
+		GeneralContext
+	};
+
 	class AeslEditor : public QTextEdit
 	{
 		Q_OBJECT
@@ -147,6 +158,8 @@ namespace Aseba
 		void breakpointSet(unsigned line);
 		void breakpointCleared(unsigned line);
 		void breakpointClearedAll();
+
+		void refreshModelRequest(LocalContext context);
 		
 	public:
 		AeslEditor(const ScriptTab* tab);
@@ -164,6 +177,8 @@ namespace Aseba
 		void clearBreakpoint(QTextBlock block);
 		void clearAllBreakpoints();
 
+		void setCompleterModel(QAbstractItemModel* model);
+
 		enum CommentOperation {
 			CommentSelection,
 			UncommentSelection
@@ -175,10 +190,30 @@ namespace Aseba
 		bool debugging;
 		QWidget *dropSourceWidget;
 	
+	protected slots:
+		void insertCompletion(const QString &completion);
+
 	protected:
 		virtual void dropEvent(QDropEvent *event);
 		virtual void insertFromMimeData ( const QMimeData * source );
 		virtual void keyPressEvent(QKeyEvent * event);
+
+		virtual bool handleCompleter(QKeyEvent * event);
+		virtual bool handleTab(QKeyEvent * event);
+		virtual bool handleNewLine(QKeyEvent * event);
+		virtual void detectLocalContextChange(QKeyEvent * event);
+		virtual void doCompletion(QKeyEvent * event);
+
+		QString textUnderCursor() const;
+		QString previousWord() const;
+		QString currentLine() const;
+
+	protected:
+		QCompleter *completer;
+		const QRegExp vardefRegexp;
+		const QRegExp leftValueRegexp;
+		LocalContext previousContext;
+		bool editingLeftValue;
 	};
 	
 	/*@}*/

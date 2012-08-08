@@ -65,6 +65,9 @@ namespace Aseba
 		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
 		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
+		//! Reset all descriptions, for instance when a network was disconnected and is reconnected
+		void reset();
+		
 		// TODO: reverse lookup?
 		// TODO: move bytecode sender manager here, rename class?
 		

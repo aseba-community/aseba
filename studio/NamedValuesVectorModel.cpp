@@ -32,8 +32,8 @@ namespace Aseba
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
-		tooltipText(tooltipText),
 		wasModified(false),
+		tooltipText(tooltipText),
 		editable(false)
 	{
 		Q_ASSERT(namedValues);

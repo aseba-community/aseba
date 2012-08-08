@@ -86,11 +86,17 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
+		bool isRunning;
 		Dashel::Stream* stream;
+		std::string lastConnectedTarget;
 		QString language;
 		
 	public:
 		DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget);
+		bool attemptToReconnect();
+		
+		// from Dashel::Hub
+		virtual void stop();
 		
 	signals:
 		void messageAvailable(Message *message);
@@ -158,6 +164,8 @@ namespace Aseba
 		virtual void disconnect();
 		
 		virtual const TargetDescription * const getDescription(unsigned node) const;
+		
+		virtual void broadcastGetDescription();
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
 		virtual void writeBytecode(unsigned node);

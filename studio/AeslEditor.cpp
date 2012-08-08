@@ -65,7 +65,7 @@ namespace Aseba
 		// comments #
 		QTextCharFormat commentFormat;
 		commentFormat.setForeground(Qt::gray);
-		rule.pattern = QRegExp("[^\\*]{1}#(?!\\*).*");   // '#' without '*' right after or before
+		rule.pattern = QRegExp("(?!\\*)#(?!\\*).*");   // '#' without '*' right after or before
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
 
@@ -443,7 +443,12 @@ namespace Aseba
 	AeslEditor::AeslEditor(const ScriptTab* tab) :
 		tab(tab),
 		debugging(false),
-		dropSourceWidget(0)
+		dropSourceWidget(0),
+		completer(0),
+		vardefRegexp("^var .*"),
+		leftValueRegexp("^\\w+\\s*=.*"),
+		previousContext(UnknownContext),
+		editingLeftValue(false)
 	{
 		QFont font;
 		font.setFamily("");
@@ -454,6 +459,15 @@ namespace Aseba
 		setAcceptDrops(true);
 		setAcceptRichText(false);
 		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+
+		// create completer
+		completer = new QCompleter(this);
+		//completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+		completer->setCaseSensitivity(Qt::CaseInsensitive);
+		completer->setWrapAround(false);
+		completer->setWidget(this);
+		completer->setCompletionMode(QCompleter::PopupCompletion);
+		QObject::connect(completer, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
 	}
 	
 	void AeslEditor::dropEvent(QDropEvent *event)
@@ -740,33 +754,53 @@ namespace Aseba
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
-		// handle tab and control tab
-		if ((event->key() == Qt::Key_Tab) && textCursor().hasSelection())
-		{
-			QTextCursor cursor(document()->findBlock(textCursor().selectionStart()));
-			
-			cursor.beginEditBlock();
-			
-			while (cursor.position() < textCursor().selectionEnd())
-			{
-				cursor.movePosition(QTextCursor::StartOfLine);
-				if (event->modifiers() & Qt::ControlModifier)
-				{
-					cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-					if ((cursor.selectedText() == "\t") ||
-						(	(cursor.selectedText() == " ") &&
-							(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
-							(cursor.selectedText() == "    ")
-						)
-					)
-						cursor.removeSelectedText();
-				}
-				else
-					cursor.insertText("\t");
-				cursor.movePosition(QTextCursor::Down);
-				cursor.movePosition(QTextCursor::EndOfLine);
+		if (handleCompleter(event))
+			return;
+		if (handleTab(event))
+			return;
+		if (handleNewLine(event))
+			return;
+
+		// default handler
+		QTextEdit::keyPressEvent(event);
+		detectLocalContextChange(event);
+		doCompletion(event);
+	}
+
+	bool AeslEditor::handleCompleter(QKeyEvent *event)
+	{
+		// if the popup is visible, forward special keys to the completer
+		if (completer && completer->popup()->isVisible()) {
+			switch (event->key()) {
+				case Qt::Key_Enter:
+				case Qt::Key_Return:
+				case Qt::Key_Escape:
+				case Qt::Key_Tab:
+				case Qt::Key_Backtab:
+					event->ignore();
+					return true;	// let the completer do default behavior
+				default:
+					break;
 			}
-			
+		}
+
+		// not the case, go on with other handlers
+		return false;
+	}
+
+	bool AeslEditor::handleTab(QKeyEvent *event)
+	{
+		// handle tab and control tab
+		if (!(event->key() == Qt::Key_Tab) || !(textCursor().hasSelection()))
+			// I won't handle this event
+			return false;
+
+		QTextCursor cursor(document()->findBlock(textCursor().selectionStart()));
+
+		cursor.beginEditBlock();
+
+		while (cursor.position() < textCursor().selectionEnd())
+		{
 			cursor.movePosition(QTextCursor::StartOfLine);
 			if (event->modifiers() & Qt::ControlModifier)
 			{
@@ -781,30 +815,169 @@ namespace Aseba
 			}
 			else
 				cursor.insertText("\t");
-				
-			cursor.endEditBlock();
-			return;
+			cursor.movePosition(QTextCursor::Down);
+			cursor.movePosition(QTextCursor::EndOfLine);
 		}
-		// handle indentation and new line
-		else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+
+		cursor.movePosition(QTextCursor::StartOfLine);
+		if (event->modifiers() & Qt::ControlModifier)
 		{
-			QString headingSpace("\n");
-			const QString &line = textCursor().block().text();
-			for (size_t i = 0; i < (size_t)line.length(); i++)
-			{
-				const QChar c(line[(unsigned)i]);
-				if (c.isSpace())
-					headingSpace += c;
-				else
-					break;
-					
-			}
-			insertPlainText(headingSpace);
+			cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+			if ((cursor.selectedText() == "\t") ||
+				(	(cursor.selectedText() == " ") &&
+					(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
+					(cursor.selectedText() == "    ")
+				)
+			)
+				cursor.removeSelectedText();
 		}
 		else
-			QTextEdit::keyPressEvent(event);
-		
+			cursor.insertText("\t");
+
+		cursor.endEditBlock();
+
+		// successfully handeled
+		return true;
 	}
+
+	bool AeslEditor::handleNewLine(QKeyEvent *event)
+	{
+		// handle indentation and new line
+		if (!(event->key() == Qt::Key_Return ) && !(event->key() == Qt::Key_Enter))
+			// I won't handle this event
+			return false;
+
+		QString headingSpace("\n");
+		const QString &line = textCursor().block().text();
+		for (size_t i = 0; i < (size_t)line.length(); i++)
+		{
+			const QChar c(line[(unsigned)i]);
+			if (c.isSpace())
+				headingSpace += c;
+			else
+				break;
+
+		}
+		insertPlainText(headingSpace);
+
+		// successfully handeled
+		return true;
+	}
+
+	void AeslEditor::detectLocalContextChange(QKeyEvent *event)
+	{
+		// this function spy the events to detect the local context
+		LocalContext currentContext = UnknownContext;
+		QString previous = previousWord();
+		QString line = currentLine();
+
+		if (previous == "call")
+			currentContext = FunctionContext;
+		else if (previous == "onevent" || previous == "emit")
+			currentContext = EventContext;
+		else if (vardefRegexp.indexIn(line) != -1)
+			currentContext = VarDefContext;
+		else if (leftValueRegexp.indexIn(line) == -1)
+			currentContext = LeftValueContext;
+		else
+			currentContext = GeneralContext;
+
+		if (currentContext != previousContext)
+		{
+			// local context has changed
+			previousContext = currentContext;
+			emit refreshModelRequest(currentContext);
+		}
+	}
+
+	void AeslEditor::doCompletion(QKeyEvent *event)
+	{
+		static QString eow("~!@#$%^&*()+{}|:\"<>?,/;'[]\\-=");		// end of word
+		QString completionPrefix = textUnderCursor();
+//		qDebug() << "Completion prefix: " << completionPrefix;
+
+		// don't show the popup if the word is too short, or if we detect an "end of word" character
+		if (event->text().isEmpty()|| completionPrefix.length() < 1 || eow.contains(event->text().right(1))) {
+			completer->popup()->hide();
+			return;
+		}
+
+		// update the completion prefix
+		if (completionPrefix != completer->completionPrefix()) {
+			completer->setCompletionPrefix(completionPrefix);
+			completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+		}
+
+//		qDebug() << completer->completionCount();
+		// if we match the only completion available, close the popup.
+		if (completer->completionCount() == 1)
+			if (completer->currentCompletion() == completionPrefix)
+			{
+				completer->popup()->hide();
+				return;
+			}
+
+		// show the popup
+		QRect cr = cursorRect();
+		cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
+		completer->complete(cr);
+	}
+
+	void AeslEditor::insertCompletion(const QString& completion)
+	{
+		QTextCursor tc = textCursor();
+		// move at the end of the word (make sure to be on it)
+		tc.movePosition(QTextCursor::Left);
+		tc.movePosition(QTextCursor::EndOfWord);
+		// move the cursor left, by the number of completer's prefix characters
+		tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, completer->completionPrefix().length());
+		tc.removeSelectedText();
+		// insert completion
+		tc.insertText(completion);
+		setTextCursor(tc);
+	}
+
+	QString AeslEditor::textUnderCursor() const
+	{
+		QTextCursor tc = textCursor();
+		// found the end
+		tc.movePosition(QTextCursor::EndOfWord);
+		int endPosition = tc.position();
+		// found the begining, including possible "." in the word
+		tc.movePosition(QTextCursor::StartOfWord);
+		while( (document()->characterAt(tc.position() - 1)) == QChar('.') )
+		{
+			tc.movePosition(QTextCursor::Left);
+			tc.movePosition(QTextCursor::WordLeft);
+		}
+		// select
+		tc.setPosition(endPosition, QTextCursor::KeepAnchor);
+		return tc.selectedText();
+	}
+
+	QString AeslEditor::previousWord() const
+	{
+		QTextCursor tc = textCursor();
+		tc.movePosition(QTextCursor::WordLeft);
+		tc.movePosition(QTextCursor::PreviousWord);
+		tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+		return tc.selectedText();
+	}
+
+	QString AeslEditor::currentLine() const
+	{
+		// return everything between the start and the cursor
+		QTextCursor tc = textCursor();
+		tc.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+		return tc.selectedText();
+	}
+
+	void AeslEditor::setCompleterModel(QAbstractItemModel *model)
+	{
+		completer->setModel(model);
+		completer->setCompletionRole(Qt::DisplayRole);
+	}
+
 	
 	/*@}*/
 }; // Aseba

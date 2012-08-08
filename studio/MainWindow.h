@@ -35,9 +35,13 @@
 #include <QFutureWatcher>
 #include <QToolButton>
 #include <QToolBar>
+#include <QCompleter>
+#include <QSortFilterProxyModel>
 
+#include "AeslEditor.h"
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
+#include "ModelAggregator.h"
 
 #include "../compiler/compiler.h"
 #include <fstream>
@@ -124,10 +128,15 @@ namespace Aseba
 	class ScriptTab
 	{
 	public:
+		ScriptTab(const unsigned id):id(id) {}
 		virtual ~ScriptTab() {}
+		
+		unsigned nodeId() const { return id; }
 		
 	protected:
 		void createEditor();
+		
+		unsigned id; //!< node identifier
 		
 		friend class MainWindow;
 		AeslEditor* editor;
@@ -141,7 +150,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		AbsentNodeTab(const QString& name, const QString& sourceCode);
+		AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode);
 	
 		const QString name;
 	};
@@ -168,7 +177,6 @@ namespace Aseba
 	public:
 		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
 		~NodeTab();
-		unsigned nodeId() const { return id; }
 		unsigned productId() const  { return pid; }
 		
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
@@ -184,6 +192,8 @@ namespace Aseba
 	
 	public slots:
 		void clearExecutionErrors();
+		void refreshCompleterModel(LocalContext context);
+		//void sortCompleterModel();
 	
 	protected slots:
 		void resetClicked();
@@ -254,7 +264,6 @@ namespace Aseba
 		friend class AeslEditor;
 		friend class EditorsPlotsTabWidget;
 		
-		unsigned id; //!< node identifier
 		unsigned pid; //!< node product identifier
 		friend class InvasivePlugin;
 		Target *target; //!< pointer to target
@@ -295,11 +304,15 @@ namespace Aseba
 		QTreeView *vmFunctionsView;
 		
 		DraggableListWidget* vmLocalEvents;
+
+		QCompleter *completer;
+		QAbstractItemModel* eventAggregator;
+		QAbstractItemModel* variableAggregator;
+		QSortFilterProxyModel* sortingProxy;
+		TreeChainsawFilter* functionsFlatModel;
 		
 		QToolBox* toolBox;
 		NodeToolInterfaces tools;
-		
-		bool isSynchronized;
 		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
@@ -313,6 +326,7 @@ namespace Aseba
 		QFuture<CompilationResult*> compilationFuture;
 		QFutureWatcher<CompilationResult*> compilationWatcher;
 		bool compilationDirty;
+		bool isSynchronized;
 		
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables
@@ -441,10 +455,14 @@ namespace Aseba
 		void applySettings();
 	
 	private:
+		virtual void timerEvent ( QTimerEvent * event );
+		
 		// utility functions
-		int getIndexFromId(unsigned node);
-		NodeTab* getTabFromId(unsigned node);
-		NodeTab* getTabFromName(const QString& name);
+		int getIndexFromId(unsigned node) const;
+		NodeTab* getTabFromId(unsigned node) const;
+		NodeTab* getTabFromName(const QString& name) const;
+		int getAbsentIndexFromId(unsigned node) const;
+		AbsentNodeTab* getAbsentTabFromId(unsigned node) const;
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
 		void clearDocumentSpecificTabs();
 		bool askUserBeforeDiscarding();
@@ -468,6 +486,7 @@ namespace Aseba
 		friend class InvasivePlugin;		
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
+		int getDescriptionTimer;
 		
 		#ifdef HAVE_QWT
 		

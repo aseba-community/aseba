@@ -27,6 +27,7 @@
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "CompilerTranslator.h"
+#include "ModelAggregator.h"
 #include "../common/consts.h"
 #include "../common/productids.h"
 #include "../utils/utils.h"
@@ -224,7 +225,8 @@ namespace Aseba
 	
 	//////
 	
-	AbsentNodeTab::AbsentNodeTab(const QString& name, const QString& sourceCode) :
+	AbsentNodeTab::AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode) :
+		ScriptTab(id),
 		name(name)
 	{
 		createEditor();
@@ -241,8 +243,8 @@ namespace Aseba
 	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
 		QSplitter(parent),
+		ScriptTab(id),
 		VariableListener(0),
-		id(id),
 		pid(ASEBA_PID_UNDEFINED),
 		target(target),
 		commonDefinitions(commonDefinitions),
@@ -264,11 +266,33 @@ namespace Aseba
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
-		
+
 		// create gui
 		setupWidgets();
 		setupConnections();
-		
+
+		// create aggregated models
+		// local and global events
+		ModelAggregator* aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmLocalEvents->model());
+		aggregator->addModel(mainWindow->eventsDescriptionsModel);
+		eventAggregator = aggregator;
+		// variables and constants
+		aggregator = new ModelAggregator(this);
+		aggregator->addModel(vmMemoryModel);
+		aggregator->addModel(mainWindow->constantsDefinitionsModel);
+		variableAggregator = aggregator;
+
+		// create the sorting proxy
+		sortingProxy = new QSortFilterProxyModel(this);
+		sortingProxy->setDynamicSortFilter(true);
+		sortingProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+		sortingProxy->setSortRole(Qt::DisplayRole);
+
+		// create the chainsaw filter for native functions
+		functionsFlatModel = new TreeChainsawFilter(this);
+		functionsFlatModel->setSourceModel(vmFunctionsModel);
+
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		
@@ -277,7 +301,7 @@ namespace Aseba
 		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
 		processCompilationResult(result);
 	}
-	
+
 	NodeTab::~NodeTab()
 	{
 		compilationFuture.waitForFinished();
@@ -555,6 +579,7 @@ namespace Aseba
 		connect(editor, SIGNAL(breakpointSet(unsigned)), SLOT(setBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointCleared(unsigned)), SLOT(clearBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointClearedAll()), SLOT(breakpointClearedAll()));
+		connect(editor, SIGNAL(refreshModelRequest(LocalContext)), SLOT(refreshCompleterModel(LocalContext)));
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
@@ -1114,6 +1139,48 @@ namespace Aseba
 			rehighlight();
 	}
 	
+	void NodeTab::refreshCompleterModel(LocalContext context)
+	{
+//		qDebug() << "New context: " << context;
+		disconnect(mainWindow->eventsDescriptionsModel, 0, sortingProxy, 0);
+
+		if ((context == GeneralContext) || (context == UnknownContext))
+		{
+			sortingProxy->setSourceModel(variableAggregator);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// both variables and constants
+		}
+		else if (context == LeftValueContext)
+		{
+			sortingProxy->setSourceModel(vmMemoryModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// only variables
+		}
+		else if (context == VarDefContext)
+			editor->setCompleterModel(0);		// disable auto-completion in this case
+		else if (context == FunctionContext)
+		{
+			sortingProxy->setSourceModel(functionsFlatModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// native functions
+		}
+		else if (context == EventContext)
+		{
+			sortingProxy->setSourceModel(eventAggregator);
+			sortingProxy->sort(0);
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(sortCompleterModel()));
+			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(sortCompleterModel()));
+			editor->setCompleterModel(sortingProxy);	// both local and global events
+		}
+	}
+/*
+	void NodeTab::sortCompleterModel()
+	{
+		sortingProxy->sort(0);
+		editor->setCompleterModel(0);
+		editor->setCompleterModel(sortingProxy);
+	}
+*/
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view
@@ -1195,6 +1262,11 @@ namespace Aseba
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
 			
 			nextButton->setEnabled(true);
+
+			// go to this line and next line is visible
+			editor->setTextCursor(QTextCursor(editor->document()->findBlockByLineNumber(currentPC+1)));
+			editor->ensureCursorVisible();
+			editor->setTextCursor(QTextCursor(editor->document()->findBlockByLineNumber(currentPC)));
 		}
 		else if (mode == Target::EXECUTION_STOP)
 		{
@@ -1430,8 +1502,9 @@ namespace Aseba
 
 	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent) :
 		QMainWindow(parent),
-		autoMemoryRefresh(autoRefresh),
-		sourceModified(false)
+		getDescriptionTimer(0),
+		sourceModified(false),
+		autoMemoryRefresh(autoRefresh)
 	{
 		// create target
 		target = new DashelTarget(translators, commandLineTarget);
@@ -1549,7 +1622,7 @@ namespace Aseba
 							tab->editor->setPlainText(element.firstChild().toText().data());
 						else
 						{
-							nodes->addTab(new AbsentNodeTab(element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
+							nodes->addTab(new AbsentNodeTab(0, element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
 							noNodeCount++;
 						}
 					}
@@ -2421,10 +2494,22 @@ namespace Aseba
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
+		// create a new tab for the node
 		NodeTab* tab = new NodeTab(this, target, &commonDefinitions, node);
 		tab->showKeywords(showKeywordsAct->isChecked());
 		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
 		tab->showMemoryUsage(showMemoryUsageAct->isChecked());
+		
+		// check if there is an absent node tab with this id and name, and copy data
+		const int absentIndex(getAbsentIndexFromId(node));
+		const AbsentNodeTab* absentTab(getAbsentTabFromId(node));
+		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
+		{
+			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
+			nodes->removeAndDeleteTab(absentIndex);
+		}
+		
+		// connect and show new tab
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
 		
@@ -2441,6 +2526,7 @@ namespace Aseba
 		
 		nodes->addTab(
 			new AbsentNodeTab(
+				node,
 				tabName,
 				tab->editor->document()->toPlainText()
 			),
@@ -2451,19 +2537,26 @@ namespace Aseba
 		
 		regenerateToolsMenus();
 		regenerateHelpMenu();
+		
+		if (!getDescriptionTimer)
+			getDescriptionTimer = startTimer(2000);
 	}
 	
 	//! The network connection has been cut: all nodes have disconnected.
 	void MainWindow::networkDisconnected()
 	{
-		disconnect(nodes, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-		std::vector<QWidget *> widgets(nodes->count());
+		// collect all node ids to disconnect
+		std::vector<unsigned> toDisconnect;
 		for (int i = 0; i < nodes->count(); i++)
-			widgets[i] = nodes->widget(i);
-		nodes->clear();
-		for (size_t i = 0; i < widgets.size(); i++)
-			widgets[i]->deleteLater();
-		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
+		{
+			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (tab)
+				toDisconnect.push_back(tab->nodeId());
+		}
+		
+		// disconnect all node ids
+		for (size_t i = 0; i < toDisconnect.size(); i++)
+			nodeDisconnected(toDisconnect[i]);
 	}
 	
 	//! A user event has arrived from the network.
@@ -2604,7 +2697,31 @@ namespace Aseba
 		tab->breakpointSetResult(line, success);
 	}
 	
-	int MainWindow::getIndexFromId(unsigned node)
+	//! If any node was disconnected, send get description
+	void MainWindow::timerEvent ( QTimerEvent * event )
+	{
+		bool doSend(false);
+		
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+				doSend = doSend || (tab->id != 0);
+		}
+		
+		if (doSend)
+		{
+			target->broadcastGetDescription();
+		}
+		else
+		{
+			killTimer(getDescriptionTimer);
+			getDescriptionTimer = 0;
+		}
+	}
+	
+	//! Get the tab widget index of a corresponding node id
+	int MainWindow::getIndexFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2618,7 +2735,8 @@ namespace Aseba
 		return -1;
 	}
 	
-	NodeTab* MainWindow::getTabFromId(unsigned node)
+	//! Get the tab widget pointer of a corresponding node id
+	NodeTab* MainWindow::getTabFromId(unsigned node) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2632,7 +2750,8 @@ namespace Aseba
 		return 0;
 	}
 	
-	NodeTab* MainWindow::getTabFromName(const QString& name)
+	//! Get the tab widget pointer of a corresponding node name
+	NodeTab* MainWindow::getTabFromName(const QString& name) const
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2640,6 +2759,36 @@ namespace Aseba
 			if (tab)
 			{
 				if (target->getName(tab->nodeId()) == name)
+					return tab;
+			}
+		}
+		return 0;
+	}
+	
+	//! Get the absent tab widget index of a corresponding node id
+	int MainWindow::getAbsentIndexFromId(unsigned node) const
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
+					return i;
+			}
+		}
+		return -1;
+	}
+	
+	//! Get the absent tab widget pointer of a corresponding node id
+	AbsentNodeTab* MainWindow::getAbsentTabFromId(unsigned node) const
+	{
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
+			if (tab)
+			{
+				if (tab->nodeId() == node)
 					return tab;
 			}
 		}
