@@ -456,7 +456,7 @@ namespace Aseba
 
 	bool Compiler::testNextCharacter(std::wistream &source, SourcePos &pos, wchar_t test, Token::Type tokenIfTrue)
 	{
-		if (source.peek() == test)
+		if (source.peek() == int(test))
 		{
 			tokens.push_back(Token(tokenIfTrue, pos));
 			getNextCharacter(source, pos);

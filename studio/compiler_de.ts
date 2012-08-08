@@ -298,379 +298,385 @@
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="250"/>
-        <source>Access of array %0 out of bounds: accessing index %1 while array is of size %2</source>
+        <source>Expecting an assignment to a variable, found %0 instead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="254"/>
-        <source>Size error! Size of array1 = %0 ; size of array2 = %1</source>
+        <source>Access of array %0 out of bounds: accessing index %1 while array is of size %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="258"/>
-        <source>Condition of the if cannot be a vector</source>
+        <source>Size error! Size of array1 = %0 ; size of array2 = %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="262"/>
-        <source>Condition of the while cannot be a vector</source>
+        <source>Condition of the if cannot be a vector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="266"/>
-        <source>MemoryVectorNode::getVectorSize: illegal operation</source>
+        <source>Condition of the while cannot be a vector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="270"/>
-        <source>Infinite loops not allowed</source>
+        <source>MemoryVectorNode::getVectorSize: illegal operation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="CompilerTranslator.cpp" line="274"/>
+        <source>Infinite loops not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CompilerTranslator.cpp" line="278"/>
         <source>Division by zero</source>
         <oldsource>Division by zero.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="278"/>
+        <location filename="CompilerTranslator.cpp" line="282"/>
         <source>-32768 has no positive correspondance in 16 bits integers</source>
         <oldsource>-32768 has no positive correspondance in 16 bits integers.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="282"/>
+        <location filename="CompilerTranslator.cpp" line="286"/>
         <source>Out of bound static array access. Trying to read index %0 of array %1 of size %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="286"/>
+        <location filename="CompilerTranslator.cpp" line="290"/>
         <source>Out of bound static array access. Trying to write index %0 of array %1 of size %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="290"/>
+        <location filename="CompilerTranslator.cpp" line="294"/>
         <source>Expecting %0 type, found %1 type instead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="294"/>
+        <location filename="CompilerTranslator.cpp" line="298"/>
         <source>Expecting a condition, found a %0 instead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="298"/>
+        <location filename="CompilerTranslator.cpp" line="302"/>
         <source>end of stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="302"/>
+        <location filename="CompilerTranslator.cpp" line="306"/>
         <source>when keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="306"/>
+        <location filename="CompilerTranslator.cpp" line="310"/>
         <source>emit keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="310"/>
+        <location filename="CompilerTranslator.cpp" line="314"/>
         <source>for keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="314"/>
+        <location filename="CompilerTranslator.cpp" line="318"/>
         <source>in keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="318"/>
+        <location filename="CompilerTranslator.cpp" line="322"/>
         <source>step keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="322"/>
+        <location filename="CompilerTranslator.cpp" line="326"/>
         <source>while keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="326"/>
+        <location filename="CompilerTranslator.cpp" line="330"/>
         <source>do keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="330"/>
+        <location filename="CompilerTranslator.cpp" line="334"/>
         <source>if keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="334"/>
+        <location filename="CompilerTranslator.cpp" line="338"/>
         <source>then keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="338"/>
+        <location filename="CompilerTranslator.cpp" line="342"/>
         <source>else keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="342"/>
+        <location filename="CompilerTranslator.cpp" line="346"/>
         <source>elseif keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="346"/>
+        <location filename="CompilerTranslator.cpp" line="350"/>
         <source>end keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="350"/>
+        <location filename="CompilerTranslator.cpp" line="354"/>
         <source>var keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="354"/>
+        <location filename="CompilerTranslator.cpp" line="358"/>
         <source>call keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="358"/>
+        <location filename="CompilerTranslator.cpp" line="362"/>
         <source>sub keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="362"/>
+        <location filename="CompilerTranslator.cpp" line="366"/>
         <source>callsub keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="366"/>
+        <location filename="CompilerTranslator.cpp" line="370"/>
         <source>onevent keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="370"/>
+        <location filename="CompilerTranslator.cpp" line="374"/>
         <source>abs keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="374"/>
+        <location filename="CompilerTranslator.cpp" line="378"/>
         <source>return keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="378"/>
+        <location filename="CompilerTranslator.cpp" line="382"/>
         <source>string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="382"/>
+        <location filename="CompilerTranslator.cpp" line="386"/>
         <source>integer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="386"/>
+        <location filename="CompilerTranslator.cpp" line="390"/>
         <source>( (open parenthesis)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="390"/>
+        <location filename="CompilerTranslator.cpp" line="394"/>
         <source>) (close parenthesis)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="394"/>
+        <location filename="CompilerTranslator.cpp" line="398"/>
         <source>[ (open bracket)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="398"/>
+        <location filename="CompilerTranslator.cpp" line="402"/>
         <source>] (close bracket)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="402"/>
+        <location filename="CompilerTranslator.cpp" line="406"/>
         <source>: (colon)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="406"/>
+        <location filename="CompilerTranslator.cpp" line="410"/>
         <source>, (comma)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="410"/>
+        <location filename="CompilerTranslator.cpp" line="414"/>
         <source>= (assignation)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="414"/>
+        <location filename="CompilerTranslator.cpp" line="418"/>
         <source>or</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="418"/>
+        <location filename="CompilerTranslator.cpp" line="422"/>
         <source>and</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="422"/>
+        <location filename="CompilerTranslator.cpp" line="426"/>
         <source>not</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="426"/>
+        <location filename="CompilerTranslator.cpp" line="430"/>
         <source>binary or</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="430"/>
+        <location filename="CompilerTranslator.cpp" line="434"/>
         <source>binary xor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="434"/>
+        <location filename="CompilerTranslator.cpp" line="438"/>
         <source>binary and</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="438"/>
+        <location filename="CompilerTranslator.cpp" line="442"/>
         <source>binary not</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="442"/>
+        <location filename="CompilerTranslator.cpp" line="446"/>
         <source>binary or equal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="446"/>
+        <location filename="CompilerTranslator.cpp" line="450"/>
         <source>binary xor equal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="450"/>
+        <location filename="CompilerTranslator.cpp" line="454"/>
         <source>binary and equal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="454"/>
+        <location filename="CompilerTranslator.cpp" line="458"/>
         <source>== (equal to)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="458"/>
+        <location filename="CompilerTranslator.cpp" line="462"/>
         <source>!= (not equal to)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="462"/>
+        <location filename="CompilerTranslator.cpp" line="466"/>
         <source>&gt; (bigger than)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="466"/>
+        <location filename="CompilerTranslator.cpp" line="470"/>
         <source>&gt;= (bigger or equal than)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="470"/>
+        <location filename="CompilerTranslator.cpp" line="474"/>
         <source>&lt; (smaller than)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="474"/>
+        <location filename="CompilerTranslator.cpp" line="478"/>
         <source>&lt;= (smaller or equal than)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="478"/>
+        <location filename="CompilerTranslator.cpp" line="482"/>
         <source>&lt;&lt; (shift left)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="482"/>
+        <location filename="CompilerTranslator.cpp" line="486"/>
         <source>&gt;&gt; (shift right)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="486"/>
+        <location filename="CompilerTranslator.cpp" line="490"/>
         <source>&lt;&lt;= (shift left equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="490"/>
+        <location filename="CompilerTranslator.cpp" line="494"/>
         <source>&gt;&gt;= (shift right equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="494"/>
+        <location filename="CompilerTranslator.cpp" line="498"/>
         <source>+ (plus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="498"/>
+        <location filename="CompilerTranslator.cpp" line="502"/>
         <source>- (minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="502"/>
+        <location filename="CompilerTranslator.cpp" line="506"/>
         <source>+= (plus equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="506"/>
+        <location filename="CompilerTranslator.cpp" line="510"/>
         <source>-= (minus equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="510"/>
+        <location filename="CompilerTranslator.cpp" line="514"/>
         <source>++ (plus plus)</source>
         <oldsource>++ (plus) plus</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="514"/>
+        <location filename="CompilerTranslator.cpp" line="518"/>
         <source>-- (minus minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="518"/>
+        <location filename="CompilerTranslator.cpp" line="522"/>
         <source>* (time)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="522"/>
+        <location filename="CompilerTranslator.cpp" line="526"/>
         <source>/ (divide)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="526"/>
+        <location filename="CompilerTranslator.cpp" line="530"/>
         <source>modulo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="530"/>
+        <location filename="CompilerTranslator.cpp" line="534"/>
         <source>*= (time equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="534"/>
+        <location filename="CompilerTranslator.cpp" line="538"/>
         <source>/= (divide equal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="538"/>
+        <location filename="CompilerTranslator.cpp" line="542"/>
         <source>modulo equal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="542"/>
+        <location filename="CompilerTranslator.cpp" line="546"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="CompilerTranslator.cpp" line="546"/>
+        <location filename="CompilerTranslator.cpp" line="550"/>
+        <location filename="CompilerTranslator.cpp" line="554"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

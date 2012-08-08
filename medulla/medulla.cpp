@@ -576,7 +576,7 @@ namespace Aseba
 	void Hub::incomingData(Stream *stream)
 	{
 		// receive message
-		Message *message;
+		Message *message(0);
 		try
 		{
 			message = Message::receive(stream);

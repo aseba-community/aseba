@@ -779,7 +779,7 @@ namespace Aseba
 		nodes.clear();
 		descriptionManager.reset();
 		
-		// prepare a dialog box giving the possibility to reconnect
+		// show a dialog box that is trying to reconnect
 		ReconnectionDialog reconnectionDialog(dashelInterface);
 		reconnectionDialog.exec();
 	}

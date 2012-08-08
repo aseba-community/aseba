@@ -45,7 +45,8 @@ namespace Aseba
 		assert(children.size() == 2);
 
 		MemoryVectorNode* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
-		assert(leftVector);
+		if (!leftVector)
+			throw TranslatableError(sourcePos, ERROR_INCORRECT_LEFT_VALUE).arg(children[0]->toNodeName());
 		leftVector->setWrite(true);
 		Node* rightVector = children[1];
 

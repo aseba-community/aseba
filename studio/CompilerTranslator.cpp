@@ -246,6 +246,10 @@ namespace Aseba
 				msg = tr("Unexpected token when building UnaryArithmeticAssignmentNode");
 				break;
 
+			case ERROR_INCORRECT_LEFT_VALUE:
+				msg = tr("Expecting an assignment to a variable, found %0 instead");
+				break;
+
 			case ERROR_ARRAY_OUT_OF_BOUND:
 				msg = tr("Access of array %0 out of bounds: accessing index %1 while array is of size %2");
 				break;
@@ -540,6 +544,10 @@ namespace Aseba
 
 			case ERROR_TOKEN_UNKNOWN:
 				msg = tr("unknown");
+				break;
+
+			case ERROR_UNKNOWN_ERROR:
+				msg = tr("Unknown error");
 				break;
 
 			default:
