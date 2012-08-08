@@ -134,28 +134,25 @@ namespace Enki
 	};
 	GLint GenFeederCharge1()
 	{
-		int i;
-		int j;
-		
 		GLint lid=glGenLists(1);
 		glNewList(lid, GL_COMPILE);
 		
 			glBegin (GL_TRIANGLES);
-			for(i=0;i<sizeof(face_indicies)/sizeof(face_indicies[0]);i++)
+			for(size_t i=0;i<sizeof(face_indicies)/sizeof(face_indicies[0]);i++)
 			{
-			for(j=0;j<3;j++)
+				for(size_t j=0;j<3;j++)
 				{
-				int vi=face_indicies[i][j];
-				int ni=face_indicies[i][j+3];//Normal index
-				int ti=face_indicies[i][j+6];//Texture index
-				/*glNormal3f (normals[ni][0],normals[ni][1],normals[ni][2]);
-				glTexCoord2f(textures[ti][0],textures[ti][1]);
-				glVertex3f (vertices[vi][0],vertices[vi][1],vertices[vi][2]);*/
-				
-				// rotate 90 deg around z
-				glNormal3f (normals[ni][1],-normals[ni][0],normals[ni][2]);
-				glTexCoord2f(textures[ti][0],textures[ti][1]);
-				glVertex3f (100.f*vertices[vi][1],-100.f*vertices[vi][0],100.f*vertices[vi][2]);
+					int vi=face_indicies[i][j];
+					int ni=face_indicies[i][j+3];//Normal index
+					int ti=face_indicies[i][j+6];//Texture index
+					/*glNormal3f (normals[ni][0],normals[ni][1],normals[ni][2]);
+					glTexCoord2f(textures[ti][0],textures[ti][1]);
+					glVertex3f (vertices[vi][0],vertices[vi][1],vertices[vi][2]);*/
+					
+					// rotate 90 deg around z
+					glNormal3f (normals[ni][1],-normals[ni][0],normals[ni][2]);
+					glTexCoord2f(textures[ti][0],textures[ti][1]);
+					glVertex3f (100.f*vertices[vi][1],-100.f*vertices[vi][0],100.f*vertices[vi][2]);
 				}
 			}
 			glEnd ();

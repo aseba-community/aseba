@@ -111,6 +111,7 @@ namespace Aseba
 			QString name = it->first;
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
 			Q_ASSERT(checkbox);
+			Q_UNUSED(checkbox);
 			settings.setValue(name, (it->second).value);
 		}
 	}

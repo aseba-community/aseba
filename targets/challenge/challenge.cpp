@@ -628,6 +628,7 @@ namespace Enki
 		
 		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
 		Q_ASSERT(res != -1);
+		Q_UNUSED(res);
 		//qDebug() << QFontDatabase::applicationFontFamilies(res);
 		titleFont = QFont("SF Old Republic SC", 20);
 		entryFont = QFont("SF Old Republic SC", 23);

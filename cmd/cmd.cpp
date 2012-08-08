@@ -158,14 +158,17 @@ namespace Aseba
 		//! Create an interface to bootloader with id dest using a socket
 		BootloaderInterface(Stream* stream, int dest) :
 			stream(stream),
-			dest(dest)
+			dest(dest),
+			pageSize(0),
+			pagesStart(0),
+			pagesCount(0)
 		{
 			// Wait until the bootloader answers
 
 		}
 		
 		//! Return the size of a page
-		int getPageSize() { return pageSize; }
+		int getPageSize() const { return pageSize; }
 		
 		//! Read a page
 		bool readPage(unsigned pageNumber, uint8* data)

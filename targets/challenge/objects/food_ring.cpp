@@ -119,16 +119,13 @@ namespace Enki
 
 	GLint GenFeederRing()
 	{
-		int i;
-		int j;
-		
 		GLint lid=glGenLists(1);
 		glNewList(lid, GL_COMPILE);
 		
 		glBegin (GL_TRIANGLES);
-		for(i=0;i<sizeof(face_indicies)/sizeof(face_indicies[0]);i++)
+		for(size_t i=0;i<sizeof(face_indicies)/sizeof(face_indicies[0]);i++)
 		{
-			for(j=0;j<3;j++)
+			for(size_t j=0;j<3;j++)
 			{
 				int vi=face_indicies[i][j];
 				int ni=face_indicies[i][j+3];//Normal index
