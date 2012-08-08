@@ -51,9 +51,12 @@ add_test(array-constant-access ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CM
 add_test(vardef ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef.txt)
 add_test(vardef-compat ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-compat.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-compat.txt)
 add_test(vardef-constant-size ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-constant-size.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/vardef-constant-size.txt)
+add_test(general-tuple ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple.txt)
 add_test(assignments ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/assignments.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/assignments.txt)
 add_test(events ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/events.txt)
+add_test(general-tuple-events ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-events.txt)
 add_test(native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/native-function.txt)
+add_test(general-tuple-native-function.txt ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
 
 
 # the following tests should fail

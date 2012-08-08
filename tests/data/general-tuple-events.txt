@@ -1,0 +1,7 @@
+var i = 0
+var j = 1
+var k[] = [2,3,4]
+
+emit event2 [i,j,5]
+emit event2 [k[1:2],3*4]
+

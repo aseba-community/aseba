@@ -1,0 +1,7 @@
+var i[3]
+var j = 0
+var k = 1
+var l[] = [2,3,4,5]
+
+call math.add(i, [1,2,3], [j,k*l[2],l[0]])
+
