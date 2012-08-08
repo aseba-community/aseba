@@ -124,12 +124,24 @@ namespace Aseba
 		}
 		else
 		{
+			QString name = variables.at(index.row()).name;
+			// hidden variable
+			if (name.left(1) == "_")
+			{
+				if (role == Qt::ForegroundRole)
+					return QApplication::palette().color(QPalette::Disabled, QPalette::Text);
+				else if (role == Qt::FontRole)
+				{
+					QFont font;
+					font.setItalic(true);
+					return font;
+				}
+			}
 			if (index.column() == 0)
 			{
-				if (role != Qt::DisplayRole)
-					return QVariant();
-			
-				return variables.at(index.row()).name;
+				if (role == Qt::DisplayRole)
+					return name;
+				return QVariant();
 			}
 			else
 			{
