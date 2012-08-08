@@ -1053,8 +1053,7 @@ namespace Aseba
 			}
 			else
 			{
-				arrayCtor->addImmediateValue(expectInt16LiteralOrConstant());
-				tokens.pop_front();
+				arrayCtor->children.push_back(parseBinaryOrExpression());
 			}
 
 			if (tokens.front() != Token::TOKEN_COMMA)
