@@ -95,6 +95,7 @@ namespace Aseba
 		// tree-build.cpp
 		error_map[ERROR_UNARY_ARITH_BUILD_UNEXPECTED] =		L"Unexpected token when building UnaryArithmeticAssignmentNode";
 		// tree-expand.cpp
+		error_map[ERROR_INCORRECT_LEFT_VALUE] =			L"Expecting an assignment to a variable, found %0 instead";
 		error_map[ERROR_ARRAY_OUT_OF_BOUND] =			L"Access of array %0 out of bounds: accessing index %1 while array is of size %2";
 		error_map[ERROR_ARRAY_SIZE_MISMATCH] =			L"Size error! Size of array1 = %0 ; size of array2 = %1";
 		error_map[ERROR_IF_VECTOR_CONDITION] =			L"Condition of the if cannot be a vector";
