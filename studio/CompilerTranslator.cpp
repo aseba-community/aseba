@@ -546,6 +546,10 @@ namespace Aseba
 				msg = tr("unknown");
 				break;
 
+			case ERROR_UNKNOWN_ERROR:
+				msg = tr("Unknown error");
+				break;
+
 			default:
 				msg = tr("Unknown error");
 		}

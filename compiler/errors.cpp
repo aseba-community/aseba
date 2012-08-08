@@ -174,12 +174,14 @@ namespace Aseba
 		error_map[ERROR_TOKEN_OP_DIV_EQUAL] =			L"/= (divide equal)";
 		error_map[ERROR_TOKEN_OP_MOD_EQUAL] =			L"modulo equal";
 		error_map[ERROR_TOKEN_UNKNOWN] =			L"unknown";
+
+		error_map[ERROR_UNKNOWN_ERROR] =			L"Unknown error";
 	}
 
 	const std::wstring ErrorMessages::defaultCallback(ErrorCode error)
 	{
 		if (error >= ERROR_END)
-			return L"Boulet";
+			return std::wstring(error_map[ERROR_UNKNOWN_ERROR]);
 		else
 			return std::wstring(error_map[error]);
 	}
