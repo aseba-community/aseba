@@ -134,57 +134,30 @@ namespace Aseba
 				
 		errorCode = THYMIO_NO_ERROR;
 
-		ThymioIRButtonName eventName = buttonSet->getEventButton()->getName();
 		ThymioIRButtonName actionName = buttonSet->getActionButton()->getName();
 
-//		if( (eventName == THYMIO_PROX_IR || eventName == THYMIO_PROX_GROUND_IR) &&
-//			!(buttonSet->getEventButton()->isSet()) )
-//		{
-			multimap<wstring, ThymioIRButton*> *currentHash;
-			switch( actionName )
-			{
-			case THYMIO_MOVE_IR:
-				currentHash = &moveHash;
-				break;
-			case THYMIO_COLOR_IR:
-				currentHash = &colorHash;
-				break;
-			case THYMIO_CIRCLE_IR:
-				currentHash = &circleHash;
-				break;
-			case THYMIO_SOUND_IR:
-				currentHash = &soundHash;
-				break;
-			default:
-				return;
-				break;
-			}
-			
-//			if( currentHash->find(L"prox_empty") != currentHash->end() )
-//				errorCode = THYMIO_EVENT_MULTISET;
-//			else
-//				currentHash->insert(pair<wstring, ThymioIRButton*>(L"prox_empty",buttonSet->getActionButton()));
-//		}
-//		else if( eventName == THYMIO_TAP_IR ) 
-//		{
-//			if( tapSeenActions.find(actionName) != tapSeenActions.end() ) 
-//				errorCode = THYMIO_EVENT_MULTISET;
-//			else
-//				tapSeenActions.insert(actionName);
-//		}
-//		else if( eventName == THYMIO_CLAP_IR )
-//		{
-//			if( clapSeenActions.find(actionName) != clapSeenActions.end() )
-//				errorCode = THYMIO_EVENT_MULTISET;
-//			else
-//				clapSeenActions.insert(actionName);
-//		}
-//		else
-//		{
-			activeActionName = actionName;
-			visit(buttonSet->getEventButton());	
-//		}
+		multimap<wstring, ThymioIRButton*> *currentHash;
+		switch( actionName )
+		{
+		case THYMIO_MOVE_IR:
+			currentHash = &moveHash;
+			break;
+		case THYMIO_COLOR_IR:
+			currentHash = &colorHash;
+			break;
+		case THYMIO_CIRCLE_IR:
+			currentHash = &circleHash;
+			break;
+		case THYMIO_SOUND_IR:
+			currentHash = &soundHash;
+			break;
+		default:
+			return;
+			break;
+		}
 		
+		activeActionName = actionName;
+		visit(buttonSet->getEventButton());			
 	}
 
 	// Syntax Checker //

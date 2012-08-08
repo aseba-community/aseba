@@ -4,10 +4,10 @@ namespace Aseba
 {
 
 	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n, int states) : 
-		name(n),
-		numStates(states),
 		buttons(size),
-		memory(-1)
+		memory(-1),
+		numStates(states),
+		name(n)
 	{
 		//cout << "thymio ir button -- size, buttons.size: " << size << ", " << buttons.size() << endl; 
 	}

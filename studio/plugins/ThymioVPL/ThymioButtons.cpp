@@ -18,7 +18,7 @@ namespace Aseba
 		buttonType(type),
 		buttonClicked(false),
 		toggleState(true),
-		numStates(nstates)
+		numStates(nstates),
 		boundingRectangle(rect),
 		buttonColor(Qt::gray)
 	{		
@@ -151,7 +151,6 @@ namespace Aseba
 		buttonColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
 		parentID(-1),
 		scaleFactor(0.5),
-		buttonIR(),
 		trans(advanced ? 64 : 0)
 	{
 		thymioBody = new ThymioBody(this);
@@ -185,6 +184,11 @@ namespace Aseba
 		if( buttonIR != 0 ) 
 			delete(buttonIR);
 	}
+
+	void ThymioButton::setScaleFactor(qreal factor) 
+	{ 
+		scaleFactor = factor; 
+	} 
 
 	void ThymioButton::setClicked(int i, int status)
 	{
@@ -514,18 +518,13 @@ namespace Aseba
 		eventButton(0),
 		actionButton(0),
 		buttonSetIR(),
+		eventButtonColor(QColor(0,191,255)),
+		actionButtonColor(QColor(218,112,214)),
 		highlightEventButton(false),
 		highlightActionButton(false),
 		errorFlag(false),
-		eventButtonColor(QColor(0,191,255)),
-<<<<<<< HEAD
-		actionButtonColor(QColor(218,112,214)),
-		buttonSetIR(),
 		advancedMode(advanced),
 		trans(advanced ? 64 : 0)
-=======
-		actionButtonColor(QColor(218,112,214))
->>>>>>> 104259352927c9877fd8bd03c54396d70dc45422
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);

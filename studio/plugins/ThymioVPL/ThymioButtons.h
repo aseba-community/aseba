@@ -116,7 +116,7 @@ namespace Aseba
 		QString getType() const { return data(0).toString(); }
 		QString getName() const { return data(1).toString(); }
 		virtual int getNumButtons() { return thymioButtons.size(); }
-		void setScaleFactor(qreal factor) { scaleFactor = factor; } 
+		void setScaleFactor(qreal factor);
 		void setAdvanced(bool advanced);
 		int getState() const;
 		void setState(int val);
@@ -208,14 +208,14 @@ namespace Aseba
 		ThymioAddButton *addButton;
 		ThymioIRButtonSet buttonSetIR;
 		
+		QColor eventButtonColor;
+		QColor actionButtonColor;
+		
 		bool highlightEventButton;
 		bool highlightActionButton;
 		bool errorFlag;
 		bool advancedMode;
 		qreal trans;
-		
-		QColor eventButtonColor;
-		QColor actionButtonColor;
 		
 		virtual void mousePressEvent ( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );

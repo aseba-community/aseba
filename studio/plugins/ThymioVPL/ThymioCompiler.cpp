@@ -34,7 +34,7 @@ namespace Aseba
 	{
 		//cout << "Thymio Compiler -- insert button set: " << row << ", " << buttonSet.size() << flush;
 		
-		if(row < buttonSet.size())	
+		if(row < (int)buttonSet.size())	
 			buttonSet.insert(buttonSet.begin()+row, set);
 		else
 			buttonSet.push_back(set);
@@ -47,7 +47,7 @@ namespace Aseba
 	{
 		//cout << "Thymio Compiler -- remove button set: " << row << ", " << buttonSet.size() << flush;
 
-		assert(row < buttonSet.size());
+		assert(row < (int)buttonSet.size());
 		buttonSet.erase(buttonSet.begin()+row);
 
 		//cout << "  ..\n" << flush;	
@@ -57,7 +57,7 @@ namespace Aseba
 	{
 		//cout << "Thymio Compiler -- replace button set: " << row << ", " << buttonSet.size() << flush;
 
-		if(row < buttonSet.size())
+		if(row < (int)buttonSet.size())
 			buttonSet[row] = set;
 		else
 			buttonSet.push_back(set);

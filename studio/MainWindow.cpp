@@ -38,7 +38,7 @@
 #include <cassert>
 #include <QTabWidget>
 #include <QtConcurrentRun>
-
+ 
 #include <MainWindow.moc>
 #include <version.h>
 
@@ -435,7 +435,7 @@ namespace Aseba
 		keywordsToolbar->addWidget(callsubButton);
 		
 		QVBoxLayout *editorLayout = new QVBoxLayout;
-		editorLayout->addWidget(keywordsToolbar); // Jiwon
+		editorLayout->addWidget(keywordsToolbar);
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
 		editorLayout->addWidget(memoryUsageText);
@@ -585,15 +585,38 @@ namespace Aseba
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
 						
 		// keywords
-		connect(varButton, SIGNAL(clicked()), SLOT(varButtonClicked()));
-		connect(ifButton, SIGNAL(clicked()), SLOT(ifButtonClicked()));
-		connect(elseifButton, SIGNAL(clicked()), SLOT(elseifButtonClicked()));
-		connect(elseButton, SIGNAL(clicked()), SLOT(elseButtonClicked()));
-		connect(oneventButton, SIGNAL(clicked()), SLOT(oneventButtonClicked()));
-		connect(whileButton, SIGNAL(clicked()), SLOT(whileButtonClicked()));
-		connect(forButton, SIGNAL(clicked()), SLOT(forButtonClicked()));
-		connect(subroutineButton, SIGNAL(clicked()), SLOT(subroutineButtonClicked()));
-		connect(callsubButton, SIGNAL(clicked()), SLOT(callsubButtonClicked()));		
+		signalMapper = new QSignalMapper(this);
+		signalMapper->setMapping(varButton, QString("var "));
+		signalMapper->setMapping(ifButton, QString("if"));
+		signalMapper->setMapping(elseifButton, QString("elseif"));
+		signalMapper->setMapping(elseButton, QString("else\n\t"));
+		signalMapper->setMapping(oneventButton, QString("onevent "));
+		signalMapper->setMapping(whileButton, QString("while"));
+		signalMapper->setMapping(forButton, QString("for"));
+		signalMapper->setMapping(subroutineButton, QString("sub "));
+		signalMapper->setMapping(callsubButton, QString("callsub "));
+				
+		connect(varButton, SIGNAL(clicked()), signalMapper, SLOT(map()));
+		connect(ifButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(elseifButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(elseButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(oneventButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(whileButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(forButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(subroutineButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+		connect(callsubButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
+
+		connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(keywordClicked(QString)));
+		
+//		connect(varButton, SIGNAL(clicked()), SLOT(varButtonClicked()));
+//		connect(ifButton, SIGNAL(clicked()), SLOT(ifButtonClicked()));
+//		connect(elseifButton, SIGNAL(clicked()), SLOT(elseifButtonClicked()));
+//		connect(elseButton, SIGNAL(clicked()), SLOT(elseButtonClicked()));
+//		connect(oneventButton, SIGNAL(clicked()), SLOT(oneventButtonClicked()));
+//		connect(whileButton, SIGNAL(clicked()), SLOT(whileButtonClicked()));
+//		connect(forButton, SIGNAL(clicked()), SLOT(forButtonClicked()));
+//		connect(subroutineButton, SIGNAL(clicked()), SLOT(subroutineButtonClicked()));
+//		connect(callsubButton, SIGNAL(clicked()), SLOT(callsubButtonClicked()));		
 		
 		// following default settings
 		if (mainWindow->autoMemoryRefresh)
@@ -791,7 +814,7 @@ namespace Aseba
 					editor->setTextCursor(cursor);
 				}
 				
-				if (keyword == "elseif") // Jiwon
+				if (keyword == "elseif")
 				{
 					const QString tab = QString("\t");
 					QString headSpace = line.left(line.indexOf("elseif"));
@@ -824,95 +847,104 @@ namespace Aseba
 		}
 	}
 
-	
-	void NodeTab::varButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-		
-		cursor.beginEditBlock();
-		cursor.insertText("var ");
-		cursor.endEditBlock();
-	}
-	
-	void NodeTab::ifButtonClicked()
+	void NodeTab::keywordClicked(QString keyword)
 	{
 		QTextCursor cursor(editor->textCursor());
 
 		cursor.beginEditBlock();
-		cursor.insertText("if");
+		cursor.insertText(keyword);
 		cursor.endEditBlock();
 		editorContentChanged();
 	}
 	
-	void NodeTab::elseifButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-
-		cursor.beginEditBlock();
-		cursor.insertText("elseif");
-		cursor.endEditBlock();
-		editorContentChanged();
-	}
-	
-	void NodeTab::elseButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-
-		cursor.beginEditBlock();
-		cursor.insertText("else\n\t");
-		const int pos = cursor.position();
-		cursor.insertText("\n");
-		cursor.setPosition(pos);
-		cursor.endEditBlock();
-		editor->setTextCursor(cursor);
-	}
-
-	void NodeTab::oneventButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-
-		cursor.beginEditBlock();
-		cursor.insertText("onevent ");
-		cursor.endEditBlock();
-	}
-	
-	void NodeTab::whileButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-		
-		cursor.beginEditBlock();
-		cursor.insertText("while");
-		cursor.endEditBlock();
-		editorContentChanged();
-	}
-	
-	void NodeTab::forButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-		
-		cursor.beginEditBlock();
-		cursor.insertText("for");
-		cursor.endEditBlock();
-		editorContentChanged();
-	}
-	
-	void NodeTab::subroutineButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-
-		cursor.beginEditBlock();
-		cursor.insertText("sub ");
-		cursor.endEditBlock();
-	}	
-
-	void NodeTab::callsubButtonClicked()
-	{
-		QTextCursor cursor(editor->textCursor());
-
-		cursor.beginEditBlock();
-		cursor.insertText("callsub ");
-		cursor.endEditBlock();
-	}	
+//	void NodeTab::varButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//		
+//		cursor.beginEditBlock();
+//		cursor.insertText("var ");
+//		cursor.endEditBlock();
+//	}
+//	
+//	void NodeTab::ifButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("if");
+//		cursor.endEditBlock();
+//		editorContentChanged();
+//	}
+//	
+//	void NodeTab::elseifButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("elseif");
+//		cursor.endEditBlock();
+//		editorContentChanged();
+//	}
+//	
+//	void NodeTab::elseButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("else\n\t");
+//		const int pos = cursor.position();
+//		cursor.insertText("\n");
+//		cursor.setPosition(pos);
+//		cursor.endEditBlock();
+//		editor->setTextCursor(cursor);
+//	}
+//
+//	void NodeTab::oneventButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("onevent ");
+//		cursor.endEditBlock();
+//	}
+//	
+//	void NodeTab::whileButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//		
+//		cursor.beginEditBlock();
+//		cursor.insertText("while");
+//		cursor.endEditBlock();
+//		editorContentChanged();
+//	}
+//	
+//	void NodeTab::forButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//		
+//		cursor.beginEditBlock();
+//		cursor.insertText("for");
+//		cursor.endEditBlock();
+//		editorContentChanged();
+//	}
+//	
+//	void NodeTab::subroutineButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("sub ");
+//		cursor.endEditBlock();
+//	}	
+//
+//	void NodeTab::callsubButtonClicked()
+//	{
+//		QTextCursor cursor(editor->textCursor());
+//
+//		cursor.beginEditBlock();
+//		cursor.insertText("callsub ");
+//		cursor.endEditBlock();
+//	}	
 
 	void NodeTab::displayCode(QList<QString> code)
 	{
@@ -2049,7 +2081,7 @@ namespace Aseba
 		ConfigDialog::setShowHidden(show);
 	}
 
-	void MainWindow::showKeywords(bool show) // Jiwon
+	void MainWindow::showKeywords(bool show)
 	{
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -2351,7 +2383,7 @@ namespace Aseba
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab)
-				tab->isSynchronized = false; // Jiwon
+				tab->isSynchronized = false;
 		}
 	}
 
@@ -2383,24 +2415,19 @@ namespace Aseba
 	
 	void MainWindow::resetStatusText()
 	{
-		bool flag;
-		int i;
+		bool flag = true;
 		
-		for (i = 0; i < nodes->count(); i++)
+		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab) 
 			{
-				flag = tab->isSynchronized;
-				break;
+				if( !tab->isSynchronized )
+				{
+					flag = false;
+					break;
+				}
 			}
-		}
-
-		for (; i < nodes->count(); i++)
-		{
-			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (tab) 
-				flag = (flag && tab->isSynchronized);
 		}
 		
 		if (flag) 
@@ -2950,11 +2977,11 @@ namespace Aseba
 		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		clearLogger = new QPushButton(tr("Clear"));
-		statusText = new QLabel(""); // Jiwon
+		statusText = new QLabel("");
 		statusText->hide();
 		
 		QVBoxLayout* loggerLayout = new QVBoxLayout;
-		loggerLayout->addWidget(statusText); // Jiwon
+		loggerLayout->addWidget(statusText);
 		loggerLayout->addWidget(logger);
 		loggerLayout->addWidget(clearLogger);
 		

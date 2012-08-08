@@ -21,7 +21,6 @@ namespace Aseba
 		actionButtonColor(QColor(218,112,214)),
 		sceneModified(false),
 		scaleFactor(0.5),
-		thymioCompiler(),
 		newRow(false),
 		advancedMode(false)
 	{
