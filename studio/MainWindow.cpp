@@ -608,16 +608,6 @@ namespace Aseba
 
 		connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(keywordClicked(QString)));
 		
-//		connect(varButton, SIGNAL(clicked()), SLOT(varButtonClicked()));
-//		connect(ifButton, SIGNAL(clicked()), SLOT(ifButtonClicked()));
-//		connect(elseifButton, SIGNAL(clicked()), SLOT(elseifButtonClicked()));
-//		connect(elseButton, SIGNAL(clicked()), SLOT(elseButtonClicked()));
-//		connect(oneventButton, SIGNAL(clicked()), SLOT(oneventButtonClicked()));
-//		connect(whileButton, SIGNAL(clicked()), SLOT(whileButtonClicked()));
-//		connect(forButton, SIGNAL(clicked()), SLOT(forButtonClicked()));
-//		connect(subroutineButton, SIGNAL(clicked()), SLOT(subroutineButtonClicked()));
-//		connect(callsubButton, SIGNAL(clicked()), SLOT(callsubButtonClicked()));		
-		
 		// following default settings
 		if (mainWindow->autoMemoryRefresh)
 			autoRefreshMemoryCheck->setChecked(true);
@@ -856,95 +846,6 @@ namespace Aseba
 		cursor.endEditBlock();
 		editorContentChanged();
 	}
-	
-//	void NodeTab::varButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//		
-//		cursor.beginEditBlock();
-//		cursor.insertText("var ");
-//		cursor.endEditBlock();
-//	}
-//	
-//	void NodeTab::ifButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("if");
-//		cursor.endEditBlock();
-//		editorContentChanged();
-//	}
-//	
-//	void NodeTab::elseifButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("elseif");
-//		cursor.endEditBlock();
-//		editorContentChanged();
-//	}
-//	
-//	void NodeTab::elseButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("else\n\t");
-//		const int pos = cursor.position();
-//		cursor.insertText("\n");
-//		cursor.setPosition(pos);
-//		cursor.endEditBlock();
-//		editor->setTextCursor(cursor);
-//	}
-//
-//	void NodeTab::oneventButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("onevent ");
-//		cursor.endEditBlock();
-//	}
-//	
-//	void NodeTab::whileButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//		
-//		cursor.beginEditBlock();
-//		cursor.insertText("while");
-//		cursor.endEditBlock();
-//		editorContentChanged();
-//	}
-//	
-//	void NodeTab::forButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//		
-//		cursor.beginEditBlock();
-//		cursor.insertText("for");
-//		cursor.endEditBlock();
-//		editorContentChanged();
-//	}
-//	
-//	void NodeTab::subroutineButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("sub ");
-//		cursor.endEditBlock();
-//	}	
-//
-//	void NodeTab::callsubButtonClicked()
-//	{
-//		QTextCursor cursor(editor->textCursor());
-//
-//		cursor.beginEditBlock();
-//		cursor.insertText("callsub ");
-//		cursor.endEditBlock();
-//	}	
 
 	void NodeTab::displayCode(QList<QString> code)
 	{
