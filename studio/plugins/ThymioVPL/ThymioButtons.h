@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <QSlider>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsItemAnimation>
+#include <QTimeLine>
 
 #include "ThymioIntermediateRepresentation.h"
 
@@ -286,20 +288,7 @@ namespace Aseba
 	class ThymioMoveAction : public ThymioButton
 	{
 		Q_OBJECT
-				
-		class MoveArrow : public QGraphicsItem
-		{
-		private:
-			double lwheel;
-			double rwheel;
-
-		public:
-			MoveArrow(QGraphicsItem *parent=0) : QGraphicsItem(parent), lwheel(0), rwheel(0) {}
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-64,-64, 128, 128); }
-			void setWheels(double l, double r) { lwheel = l; rwheel = r; }
-		};
-		
+						
 	public:
 		ThymioMoveAction(QGraphicsItem *parent=0);
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
@@ -312,9 +301,10 @@ namespace Aseba
 		void valueChangeDetected();
 				
 	private:
-		MoveArrow *moveArrow;
 		QList<QGraphicsProxyWidget *> widgets;
 		QList<QSlider *> sliders;
+		QGraphicsItemAnimation *animation;
+		QTimeLine *timer;
 	};
 	
 	// Color Action

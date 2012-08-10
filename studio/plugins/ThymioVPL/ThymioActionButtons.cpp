@@ -1,144 +1,19 @@
 #include <QPainter>
-
 #include <QGraphicsSceneMouseEvent>
 
 #include "ThymioButtons.h"
 
+
 namespace Aseba
 {
 	// Move Action
-	void ThymioMoveAction::MoveArrow::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
-	{		
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-
-//		double span = (-lwheel+rwheel)*2.88;
-//		double width = abs(lwheel-rwheel) < 500 ? abs(lwheel-rwheel)*0.1 : 50; 
-//		double height = (abs(lwheel)+abs(rwheel)) < 500 ? (abs(lwheel)+abs(rwheel))*0.1 : 50;
-//		double w2 = width*0.5;
-//		double h2 = height*0.5;
-//		QPointF trans;
-//
-//		painter->setPen(QPen(Qt::black, 10.0, Qt::SolidLine, Qt::SquareCap));
-//		painter->setBrush(Qt::black);
-//
-//		if( lwheel >= rwheel) 
-//		{
-////			double span2 = -(lwheel-rwheel)*0.003141593;
-//			if( lwheel > 0 )
-//			{
-//				painter->drawArc(-w2, -h2, width, height, 2880, span-1440);		
-////				trans = QPointF(w2*cos(span2 + 1.5707965), h2*sin(span2 + 1.5707965) - h2);
-//			}
-//			else
-//			{
-//				painter->drawArc(-w2, -h2, width, height, 2880, -span+1440);		
-////				trans = QPointF(w2*cos(span2 + 1.5707965), h2*sin(span2 + 1.5707965) + h2);
-//			}
-//		}
-//		else
-//		{
-////			double span2 = (lwheel+rwheel)*0.003141593;
-//			if( rwheel > 0 )
-//			{
-//				painter->drawArc(-w2, -h2, width, height, 0, span+1440);
-////				trans = QPointF(w2*cos(span2 + 1.5707965), h2*sin(span2 + 1.5707965) + h2 );
-//			}
-//			else
-//			{
-//				painter->drawArc(-w2, -h2, width, height, 0, -span-1440);
-////				trans = QPointF(w2*cos(span2 + 1.5707965), h2*sin(span2 + 1.5707965) - h2 );
-//			}
-//		
-////			span = (lwheel+rwheel)*0.003141593;
-//
-//		}
-//
-//		double span2 = (lwheel-rwheel)*0.003141593;
-//		trans = QPointF(w2*cos(span2 - 1.5707965), h2*sin(span2 + 1.5707965) );
-//			
-//		painter->setPen(QPen(Qt::red, 1.0, Qt::SolidLine, Qt::SquareCap));
-//		painter->setBrush(Qt::red);
-//		painter->drawEllipse(trans, 5, 5);
-		
-//		if( (lwheel + rwheel) >= 0 )
-//		{
-//			span = -(lwheel+rwheel+1000)*0.0015707965; //0.003141593;
-//			trans = QPointF(w2*cos(span + 1.5707965), h2*sin(span + 1.5707965) );
-//			qDebug() << "l>= r -- trans: " << trans;		
-//		}
-//		else
-//		{
-//			span = -(lwheel+rwheel+1000)*0.0015707965; //0.003141593;
-//			trans = QPointF(w2*cos(span - 4.7123895), h2*sin(span - 4.7123895) );
-//			qDebug() << "l<r -- trans: " << trans;
-//		}
-//							
-//		if( height != 0 )
-//		{
-//			painter->setPen(QPen(Qt::black, 1.0, Qt::SolidLine, Qt::SquareCap));		
-//			QPointF points[3];
-//			span = (lwheel+rwheel-1000)*0.0015707965;//0.003141593;
-//			double cosA = cos(span);
-//			double sinA = sin(span);
-////			points[0] = QPointF(-10*sinA,10*cosA);
-////			points[1] = QPointF(-10*cosA+5*sinA, (-10*sinA-5*cosA));
-////			points[2] = QPointF(10*cosA+5*sinA, (10*sinA-5*cosA));
-//			points[0] = QPointF(10*sinA,-10*cosA) + trans;
-//			points[1] = QPointF(-10*cosA-5*sinA, (-10*sinA+5*cosA)) + trans;
-//			points[2] = QPointF(10*cosA-5*sinA, (10*sinA+5*cosA)) + trans;
-//
-//			painter->drawPolygon(points, 3);
-//		}
-	}	
-	
 	ThymioMoveAction::ThymioMoveAction( QGraphicsItem *parent ) :
-		ThymioButton(false, 0.4, false, false, parent)
+		ThymioButton(false, 0.2, false, false, parent)
 	{
 		setData(0, "action");
-		setData(1, "move");	
-		
-//		for(int w=0; w<2; ++w) 
-//		{
-//			for(int i=-2; i<3; ++i) 
-//			{
-//				ThymioClickableButton *button;
-//				int num = qAbs(i);
-//		
-//				if( i==0 ) 
-//				{
-//					button = new ThymioClickableButton(QRectF(-25,-10,50,20), THYMIO_RECTANGULAR_BUTTON, 2, this);
-//					button->setClicked(1);
-//				}
-//				else
-//					button = new ThymioClickableButton(QRectF(-25,-10-num*7.5,50,20+num*15), THYMIO_TRIANGULAR_BUTTON, 2, this);
-//							
-//				button->setButtonColor(QColor(num<2 ? 255:0, num>0? 255:0, 0));
-//
-//				button->setPos(30+w*196, 128+i*(num*10+30));
-//				button->setRotation(i<0 ? 0 : 180);
-//
-//				button->setData(0, w);
-//				button->setData(1, i+2);
-//				
-//				button->setToggleState(false);
-//					
-//				thymioButtons.push_back(button);
-//				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-//			}
-//			
-//			for(int i=w*5; i<w*5+5; i++)
-//			{
-//				for(int j=w*5; j<w*5+5; j++) 
-//				{
-//					if( i!=j )
-//						thymioButtons.at(i)->addSibling(thymioButtons.at(j));
-//				}
-//			}
-//		}
+		setData(1, "move");
 
-		QTransform trans;
-		trans.scale(2.0,2.3);
+		QTransform transMatrix(2.0,0.0,0.0,0.0,2.3,0.0,0.0,0.0,1.0);
 				
 		for(int i=0; i<2; i++)
 		{
@@ -149,12 +24,12 @@ namespace Aseba
 						      "QSlider::handle:vertical { "
 						      "background: #FFFFFF; "
 						      "border: 2px solid #000000; height: 10px; width: 20px; margin: 0px 0; }");
-			s->setTickInterval(10);
+			s->setTickInterval(50);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
 			w->setPos(10+i*200, 15);
-			w->setTransform(trans);
+			w->setTransform(transMatrix);
 			
 			sliders.push_back(s);
 			widgets.push_back(w);
@@ -163,7 +38,13 @@ namespace Aseba
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButton()));
 		}		
 
-		moveArrow = new MoveArrow(this);
+		timer = new QTimeLine(2000);
+		timer->setFrameRange(0, 100);
+		timer->setCurveShape(QTimeLine::LinearCurve);
+		animation = new QGraphicsItemAnimation(this);
+		animation->setItem(thymioBody);
+		animation->setTimeLine(timer);				
+		thymioBody->setTransformOriginPoint(0,-14);//(pt[1]+pt[0]) == 0 ? 0 : (abs(pt[1])-abs(pt[0]))/(abs(pt[1])+abs(pt[0]))*22.2,-25);
 	}
 
 	void ThymioMoveAction::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -177,13 +58,45 @@ namespace Aseba
 	
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
-			pt[i] = sliders[i]->value();	
+			pt[i] = (sliders[i]->value())*0.06; // [-30,30]
 
-		thymioBody->setPos(128, -(pt[0]+pt[1])*0.06 + 128);
-		thymioBody->setRotation((pt[0]-pt[1])*0.18);
+		float rate = abs(pt[0])+abs(pt[1]);
+		timer->stop();
+		timer->setLoopCount(1);//+(int)(rate*0.005));
 
-		moveArrow->setWheels(pt[0], pt[1]);		
-		moveArrow->setPos(thymioBody->pos());
+#if 0
+		double angle=0;
+		double fspeed=(pt[0]+pt[1])*0.5; // (lspeed + rspeed)/2
+		double aspeed=atan((pt[1]-pt[0])/47.6); // (rspeed - lspeed)/dist
+		QPointF pos(0.0, 0.0);
+		
+		for (int i = 0; i < 200; ++i)
+		{
+			qreal step = i/200.0;
+			animation->setPosAt(step, pos+QPointF(128,128));
+			animation->setRotationAt(step, angle*180/3.14);
+						
+			pos += QPointF(fspeed*cos(angle+aspeed/200.0*0.5), fspeed*sin(angle+aspeed/200.0*0.5));
+			angle += aspeed/200.0;
+		}
+#else			
+
+		double angle=0;
+		double center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));		
+		
+		for (int i = 0; i < 200; ++i)
+		{
+			qreal step = i/200.0;
+			
+			angle = (pt[0]-pt[1]-0.04)*3*step;
+			animation->setPosAt(step, QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128));	
+			animation->setRotationAt(step, angle);
+		}
+
+
+#endif
+
+		timer->start();
 	}
 
 	QPixmap ThymioMoveAction::image(bool on)
@@ -193,8 +106,8 @@ namespace Aseba
 		QPainter painter(&pixmap);
 		painter.setRenderHint(QPainter::Antialiasing);
 
-		painter.translate(thymioBody->pos());
-		painter.scale(thymioBody->scale(),thymioBody->scale());
+		painter.translate(QPointF(128,128));
+		painter.scale(0.4,0.4);
 		painter.rotate(thymioBody->rotation());
 		thymioBody->paint(&painter, 0, 0);
 		painter.resetTransform();
@@ -206,11 +119,7 @@ namespace Aseba
 			sliders[i]->render(&painter);
 			painter.resetTransform();
 		}
-	
-		painter.translate(moveArrow->pos());
-		moveArrow->paint(&painter, 0, 0);
-		painter.resetTransform();
-	
+
 		return pixmap;
 	}
 
@@ -239,23 +148,26 @@ namespace Aseba
 		setData(0, "action");
 		setData(1, "color");
 
-		QTransform trans;
-		trans.scale(1.0,2.0);
+		QTransform transMatrix(1.0,0.0,0.0,0.0,2.0,0.0,0.0,0.0,1.0);
+		QString sliderColor("FF0000");
 		
 		for(int i=0; i<3; i++)
 		{
+			if( i == 1 ) sliderColor="00FF00";
+			else if( i == 2 ) sliderColor="0000FF";
+
 			QSlider *s = new QSlider(Qt::Horizontal);
 			s->setRange(0,32);
 			s->setStyleSheet(QString("QSlider::groove:horizontal { height: 14px; border: 2px solid #000000; "
 							  "background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #000000, stop:1 #%0); }"
 						      "QSlider::handle:horizontal { "
 						      "background: #FFFFFF; "
-						      "border: 5px solid #000000; width: 18px; margin: -2px 0; }").arg(i==0?"FF0000":i==1?"00FF00":"0000FF"));
+						      "border: 5px solid #000000; width: 18px; margin: -2px 0; }").arg(sliderColor));
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
 			w->setPos(27, 70+i*60);
-			w->setTransform(trans);
+			w->setTransform(transMatrix);
 			
 			sliders.push_back(s);
 			widgets.push_back(w);
@@ -273,23 +185,7 @@ namespace Aseba
 		
 		painter->setPen(QColor(147, 134, 115));
 		painter->setBrush(buttonColor); // filling
-		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);		
-
-//		for(int i=0; i<3; ++i)
-//			if( thymioButtons.at(i)->isClicked() > 0 ) {
-//				thymioBody->bodyColor.setRed(80*i+85);
-//				break;
-//			}
-//		for(int i=3; i<6; ++i)
-//			if( thymioButtons.at(i)->isClicked() > 0 ) {
-//				thymioBody->bodyColor.setGreen(80*(i-3)+85);
-//				break;
-//			}
-//		for(int i=6; i<9; ++i)
-//			if( thymioButtons.at(i)->isClicked() > 0) {
-//				thymioBody->bodyColor.setBlue(80*(i-6)+85);
-//				break;
-//			}
+		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 
 		thymioBody->bodyColor = QColor(sliders[0]->value()*5.46875+80, 
 									   sliders[1]->value()*5.46875+80, 
@@ -445,52 +341,6 @@ namespace Aseba
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
 	}	
-
-	// Reset Action
-//	void ThymioResetAction::Reset::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
-//	{		
-//		Q_UNUSED(option);
-//		Q_UNUSED(widget);
-//		
-//		painter->setPen(QPen(Qt::black, 20.0, Qt::SolidLine, Qt::RoundCap));
-//		painter->setBrush(Qt::black);
-//
-//		painter->drawArc(50, 50, 156, 156, 4320, -2240);
-//		painter->drawArc(50, 50, 156, 156, 1440, -2240);
-//		
-//		painter->setPen(QPen(Qt::black, 3.0, Qt::SolidLine, Qt::RoundCap));
-//		QPointF points[3];
-//		points[0] = QPointF(123, 186);
-//		points[1] = QPointF(123, 226);
-//		points[2] = QPointF(153, 206);
-//		painter->drawPolygon(points, 3);		
-//
-//		points[0] = QPointF(133, 30);
-//		points[1] = QPointF(133, 70);
-//		points[2] = QPointF(103, 50);
-//		painter->drawPolygon(points, 3);
-//	}	
-//	
-//	ThymioResetAction::ThymioResetAction(QGraphicsItem *parent) : 
-//		ThymioButton(false, 1.0, true, parent)
-//	{
-//		setData(0, "action");		
-//		setData(1, "reset");
-//		
-//		logo = new Reset(this);
-//	}
-//
-//	QPixmap ThymioResetAction::image(bool on)
-//	{
-//		QPixmap pixmap = ThymioButton::image(on);
-//		QPainter painter(&pixmap);
-//
-//		painter.translate(logo->pos());
-//		logo->paint(&painter, 0, 0);
-//		painter.resetTransform();
-//		
-//		return pixmap;
-//	}	
 
 };
 

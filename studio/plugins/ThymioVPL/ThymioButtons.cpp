@@ -64,7 +64,7 @@ namespace Aseba
 			}
 			else 
 			{
-				buttonClicked = true;
+				buttonClicked = 1;
 				for( QList<ThymioClickableButton*>::iterator itr = siblings.begin();
 					 itr != siblings.end(); ++itr )				
 					(*itr)->setClicked(0);
@@ -246,12 +246,15 @@ namespace Aseba
 
 	void ThymioButton::updateIRButton()
 	{ 
-		for(int i=0; i<getNumButtons(); ++i) 
-			buttonIR->setClicked(i, isClicked(i));
+		if( buttonIR ) 
+		{
+			for(int i=0; i<getNumButtons(); ++i) 
+				buttonIR->setClicked(i, isClicked(i));
 
-		buttonIR->setMemoryState(getState());		
+			buttonIR->setMemoryState(getState());		
 		
-		emit stateChanged();
+			emit stateChanged();
+		}
 	}
 	
 	void ThymioButton::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -375,26 +378,17 @@ namespace Aseba
 	}
 	
 	void ThymioButton::setState(int val)
-	{		
+	{	
 		if( val >= 0 )
 		{
-			if( stateButtons.empty() )	
-			{
-				for(int i=0; i<4; ++i)
-				{
-					ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
-
-					button->setPos(288, i*60 + 40);
-					button->setButtonColor(Qt::gray);
-
-					stateButtons.push_back(button);
-					connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-				}
-			}
+			setAdvanced(true);
 			
 			for(int i=0; i<4; ++i)
 				stateButtons.at(i)->setClicked(val&(0x01<<i)? 1 : 0);			
 		}
+		else
+			setAdvanced(false);
+		
 	}
 
 	void ThymioButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )

@@ -439,10 +439,10 @@ namespace Aseba
 					QDomElement eventElement = document.createElement("event");
 					eventElement.setAttribute("name", button->getName() );
 					for(int i=0; i<button->getNumButtons(); ++i)
-						eventElement.setAttribute( QString("button%0").arg(i), button->isClicked(i) ? "true" : "false");
-					element.appendChild(eventElement);
-					
+						eventElement.setAttribute( QString("button%0").arg(i), button->isClicked(i));					
 					eventElement.setAttribute("state", button->getState());
+
+					element.appendChild(eventElement);
 				}
 				
 				if( (*itr)->actionExists() ) 
@@ -452,9 +452,8 @@ namespace Aseba
 					QDomElement actionElement = document.createElement("action");
 					actionElement.setAttribute("name", button->getName() );
 					for(int i=0; i<button->getNumButtons(); ++i)					
-						actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i) ? "true" : "false");
-					for(int i=0; i<button->getNumButtons(); ++i)					
-						actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i) ? "true" : "false");
+						actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i));
+
 					element.appendChild(actionElement);
 				}
 				
@@ -498,6 +497,13 @@ namespace Aseba
 						QDomElement childElement2 = element.firstChildElement("mode");
 						if( childElement2.attribute("advanced") == "true" )
 							advancedMode();
+						else
+						{
+							advancedButton->setEnabled(true);
+							actionButtons.last()->hide(); // state button
+							scene->setAdvanced(false);					
+						}
+							
 					}
 					else if(element.tagName() == "vpl-button-element")
 					{
@@ -531,11 +537,8 @@ namespace Aseba
 							}
 
 							for(int i=0; i<button->getNumButtons(); ++i)
-								if( eventElement.attribute(QString("button%0").arg(i)) == "true" )
-									button->setClicked(i, true);
-								else
-									button->setClicked(i, false);
-									
+								button->setClicked(i,eventElement.attribute(QString("button%0").arg(i)).toInt());
+
 							button->setState(eventElement.attribute("state").toInt());
 	
 							scene->addEvent(button);
@@ -557,7 +560,7 @@ namespace Aseba
 								button = new ThymioColorAction();
 							else if ( buttonName == "circle" )
 								button = new ThymioCircleAction();
-							else if ( buttonName == "sound" )			
+							else if ( buttonName == "sound" )
 								button = new ThymioSoundAction();
 							else if ( buttonName == "memory" )			
 								button = new ThymioMemoryAction();
@@ -566,13 +569,12 @@ namespace Aseba
 								QMessageBox::warning(this,tr("Loading"),
 								                     tr("Error in XML source file: %0 unknown event type").arg(buttonName));
 								return false;
-							}								
-							
+							}							
+
 							for(int i=0; i<button->getNumButtons(); ++i)
-								if( actionElement.attribute(QString("button%0").arg(i)) == "true" )
-									button->setClicked(i, true);
-								else
-									button->setClicked(i, false);
+								button->setClicked(i,actionElement.attribute(QString("button%0").arg(i)).toInt());
+			
+							
 							scene->addAction(button);
 						}
 						else
