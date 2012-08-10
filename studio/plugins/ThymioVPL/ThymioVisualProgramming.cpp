@@ -1,6 +1,5 @@
 #include <QCloseEvent>
 #include <QMessageBox>
-#include <QDebug>
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
@@ -9,6 +8,8 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QDomElement>
+#include <QDesktopWidget>
+#include <QApplication>
 
 //#include "../../utils/HexFile.h"
 
@@ -27,6 +28,7 @@ namespace Aseba
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
+
 		resize(windowWidth, windowHeight);
 		setMinimumSize(QSize(480,448));
 		
@@ -45,8 +47,10 @@ namespace Aseba
 		saveButton = new QToolButton();
 		saveAsButton = new QToolButton();
 		runButton = new QToolButton();
+		stopButton = new QToolButton();	
 		colorComboButton = new QComboBox();
-		quitButton = new QToolButton();
+		advancedButton = new QToolButton();
+		quitButton = new QToolButton();		
 
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
@@ -62,10 +66,16 @@ namespace Aseba
 
 		runButton->setIcon(QIcon(":/images/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
+
+		stopButton->setIcon(QIcon(":/images/stop1.png"));
+		stopButton->setToolTip(tr("Stop"));
 	
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
 		colorComboButton->setIconSize(QSize(64,32));
+
+		advancedButton->setIcon(QIcon(":/images/run.png"));
+		advancedButton->setToolTip(tr("Advanced mode"));
 
 		quitButton->setIcon(QIcon(":/images/exit.svgz"));
 		quitButton->setToolTip(tr("Quit"));
@@ -76,8 +86,11 @@ namespace Aseba
 		toolBar->addWidget(saveAsButton);
 		toolBar->addSeparator();
 		toolBar->addWidget(runButton);
+		toolBar->addWidget(stopButton);
 		toolBar->addSeparator();
 		toolBar->addWidget(colorComboButton);
+		toolBar->addSeparator();
+		toolBar->addWidget(advancedButton);
 		toolBar->addSeparator();
 		toolBar->addWidget(quitButton);
 		
@@ -88,7 +101,9 @@ namespace Aseba
 		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
-
+		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
+		connect(advancedButton, SIGNAL(clicked()), this, SLOT(advancedMode()));
+		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
 		
@@ -159,19 +174,24 @@ namespace Aseba
 		ThymioPushButton *colorButton = new ThymioPushButton("color");
 		ThymioPushButton *circleButton = new ThymioPushButton("circle");
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
+		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 								
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
 		actionButtons.push_back(soundButton);
-
+		actionButtons.push_back(memoryButton);
+		
 		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
 		actionsLayout->addWidget(moveButton);
 		actionsLayout->addWidget(colorButton);
 		actionsLayout->addWidget(circleButton);
 		actionsLayout->addWidget(soundButton);
+		actionsLayout->addWidget(memoryButton);
+		
+		memoryButton->hide(); // memory
 
 		horizontalLayout->addLayout(actionsLayout);
 		
@@ -186,47 +206,17 @@ namespace Aseba
 		connect(colorButton, SIGNAL(clicked()), this, SLOT(addColorAction()));	
 		connect(circleButton, SIGNAL(clicked()), this, SLOT(addCircleAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
+		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
+		
+		QRect clientRect =  QApplication::desktop()->availableGeometry();
+
+		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )		
+			resize(clientRect.width()-100, clientRect.height()-100);	
+		
 	}	
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
-		delete(mainLayout);
-		delete(horizontalLayout);
-		delete(eventsLayout);
-		delete(sceneLayout);
-		delete(compilationResultLayout);
-		delete(actionsLayout);
-		
-		for(int i=0; i<eventButtons.size(); ++i)
-			delete(eventButtons[i]);
-			
-		for(int i=0; i<actionButtons.size(); ++i)
-			delete(actionButtons[i]);
-			
-		eventButtons.clear();
-		actionButtons.clear();
-
-		delete(eventsLabel);
-		delete(actionsLabel);
-
-		delete(toolBar);
-		delete(newButton);
-		delete(openButton);
-		delete(saveButton);
-		delete(saveAsButton);		
-		delete(runButton);
-		delete(colorComboButton);
-		delete(quitButton);
-
-		eventColors.clear();
-		actionColors.clear();
-		
-		delete(compilationResult);
-		delete(compilationResultImage);
-
-		delete(scene);
-		delete(view);
-
 		delete(tapSvg);
 		delete(clapSvg);		
 	}
@@ -271,13 +261,17 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
-		close();
+		advancedButton->setEnabled(true);
+		actionButtons.last()->hide(); // state button
+//		scene->clear();
+		scene->reset();
+		close();		
 	}
 	
-	bool ThymioVisualProgramming::surviveTabDestruction() const 
-	{
-		return true;
-	}
+//	bool ThymioVisualProgramming::surviveTabDestruction() const 
+//	{
+//		return true;
+//	}
 
 	void ThymioVisualProgramming::showFlashDialog()
 	{		
@@ -297,45 +291,31 @@ namespace Aseba
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
-			scene->reset();
+			scene->clear();
 			thymioFilename = QFileDialog::getOpenFileName(this, tr("Open Visual Programming Language"),
-							                          thymioFilename, "Aseba Visual Programming Language (*.avpl)");
-			loadFile(thymioFilename);
+							                          thymioFilename, "Aseba scripts (*.aesl)");
+			InvasivePlugin::openFile(thymioFilename);
+			loadFile(thymioFilename);			
 		}
 	}
 	
 	bool ThymioVisualProgramming::save()
 	{
-		if( thymioFilename.isEmpty() )
-			thymioFilename = QFileDialog::getSaveFileName(this, tr("Save Visual Programming Language"), 
-										thymioFilename, "Aseba Visual Programming Language (*.avpl)");
-										
-		if (thymioFilename.isEmpty())
-			return false;
-		
-		if (thymioFilename.lastIndexOf(".") < 0)
-			thymioFilename += ".avpl";
-				
-		return saveFile(thymioFilename);
+		return saveFile(InvasivePlugin::saveFile(false));
 	}
 	
 	bool ThymioVisualProgramming::saveAs()
 	{
-		thymioFilename = QFileDialog::getSaveFileName(this, tr("Save Visual Programming Language"), 
-									thymioFilename, "Aseba Visual Programming Language (*.avpl)");
-		if (thymioFilename.isEmpty())
-			return false;
-		
-		if (thymioFilename.lastIndexOf(".") < 0)
-			thymioFilename += ".avpl";
-			
-		return saveFile(thymioFilename);
+		return saveFile(InvasivePlugin::saveFile(true));
 	}
 
 	void ThymioVisualProgramming::closeFile()
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
+			advancedButton->setEnabled(true);
+			actionButtons.last()->hide(); // state button
+//			scene->clear();
 			scene->reset();
 			close();
 		}
@@ -360,10 +340,25 @@ namespace Aseba
 			loadNrun();
 	}
 
+	void ThymioVisualProgramming::stop()
+	{
+		InvasivePlugin::stop();
+	}
+	
+	void ThymioVisualProgramming::advancedMode()
+	{
+		advancedButton->setEnabled(false);
+		actionButtons.last()->show(); // state button
+		scene->setAdvanced(true);
+	}
+	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if ( scene->isEmpty() || warningDialog() )
 		{
+			advancedButton->setEnabled(true);
+			actionButtons.last()->hide(); // state button
+//			scene->clear();
 			scene->reset();
 			close();
 		}
@@ -404,53 +399,68 @@ namespace Aseba
 	bool ThymioVisualProgramming::saveFile(QString filename)
 	{	
 		QFile file(filename);
-		if (!file.open(QFile::WriteOnly | QFile::Truncate))
+		if (!file.open(QFile::ReadOnly))
 			return false;
+
+		QDomDocument document("aesl-source");
+		QString errorMsg;
+		int errorLine;
+		int errorColumn;
+		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
+		{
+			file.close();
+			if(!file.open(QFile::WriteOnly))
+				return false;
 		
-		// initiate DOM tree
-		QDomDocument document("avpl-source");
-		QDomElement buttons = document.createElement("buttons");
-		QDomElement setting = document.createElement("setting");
-		document.appendChild(buttons);
-		buttons.appendChild(document.createTextNode("\n\n"));		
-		
-		buttons.appendChild(setting);
-		QDomElement colorScheme = document.createElement("colorscheme");
-		colorScheme.setAttribute("value", QString::number(colorComboButton->currentIndex()));
-		setting.appendChild(colorScheme);
-		buttons.appendChild(document.createTextNode("\n\n"));		
-		
-		for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
-			  itr != scene->buttonsEnd(); ++itr )
-		{			
-			QDomElement element = document.createElement("button-element");			
+			QDomElement vplroot = document.documentElement();
+
+			QDomElement setting = document.createElement("vpl-setting");
+			vplroot.appendChild(document.createTextNode("\n\n"));
+			vplroot.appendChild(setting);
+						
+			QDomElement mode = document.createElement("mode");
+			mode.setAttribute("advanced", scene->getAdvanced() ? "true" : "false");
+			setting.appendChild(mode);	
 			
-			if( (*itr)->eventExists() ) 
-			{
-				ThymioButton *button = (*itr)->getEventButton();
+			QDomElement colorScheme = document.createElement("colorscheme");
+			colorScheme.setAttribute("value", QString::number(colorComboButton->currentIndex()));
+			setting.appendChild(colorScheme);
+			vplroot.appendChild(document.createTextNode("\n\n"));		
+			
+			for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
+				  itr != scene->buttonsEnd(); ++itr )
+			{			
+				QDomElement element = document.createElement("vpl-button-element");			
 				
-				QDomElement eventElement = document.createElement("event");
-				eventElement.setAttribute("name", button->getName() );
-				for(int i=0; i<button->getNumButtons(); ++i)
-					eventElement.setAttribute( QString("button%0").arg(i), button->isClicked(i) ? "true" : "false");
-				element.appendChild(eventElement);
-			}
-			
-			if( (*itr)->actionExists() ) 
-			{
-				ThymioButton *button = (*itr)->getActionButton();
+				if( (*itr)->eventExists() ) 
+				{
+					ThymioButton *button = (*itr)->getEventButton();
+					
+					QDomElement eventElement = document.createElement("event");
+					eventElement.setAttribute("name", button->getName() );
+					for(int i=0; i<button->getNumButtons(); ++i)
+						eventElement.setAttribute( QString("button%0").arg(i), button->isClicked(i));					
+					eventElement.setAttribute("state", button->getState());
+
+					element.appendChild(eventElement);
+				}
 				
-				QDomElement actionElement = document.createElement("action");
-				actionElement.setAttribute("name", button->getName() );
-				for(int i=0; i<button->getNumButtons(); ++i)					
-					actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i) ? "true" : "false");
-				element.appendChild(actionElement);
+				if( (*itr)->actionExists() ) 
+				{
+					ThymioButton *button = (*itr)->getActionButton();
+					
+					QDomElement actionElement = document.createElement("action");
+					actionElement.setAttribute("name", button->getName() );
+					for(int i=0; i<button->getNumButtons(); ++i)					
+						actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i));
+
+					element.appendChild(actionElement);
+				}
+				
+				vplroot.appendChild(element);
+				vplroot.appendChild(document.createTextNode("\n\n"));		
 			}
-			
-			buttons.appendChild(element);
-			buttons.appendChild(document.createTextNode("\n\n"));		
 		}
-		
 		QTextStream out(&file);
 		document.save(out, 0);
 
@@ -465,7 +475,7 @@ namespace Aseba
 		if (!file.open(QFile::ReadOnly | QFile::Truncate))
 			return false;
 
-		QDomDocument document("avpl-source");
+		QDomDocument document("aesl-source");
 		QString errorMsg;
 		int errorLine;
 		int errorColumn;
@@ -479,12 +489,23 @@ namespace Aseba
 				if (domNode.isElement())
 				{
 					QDomElement element = domNode.toElement();
-					if (element.tagName() == "setting") 
+					if (element.tagName() == "vpl-setting") 
 					{
 						QDomElement childElement = element.firstChildElement("colorscheme");
 						colorComboButton->setCurrentIndex(childElement.attribute("value").toInt());	
+						
+						QDomElement childElement2 = element.firstChildElement("mode");
+						if( childElement2.attribute("advanced") == "true" )
+							advancedMode();
+						else
+						{
+							advancedButton->setEnabled(true);
+							actionButtons.last()->hide(); // state button
+							scene->setAdvanced(false);					
+						}
+							
 					}
-					else if(element.tagName() == "button-element")
+					else if(element.tagName() == "vpl-button-element")
 					{
 						QDomElement eventElement = element.firstChildElement("event");
 						if( !eventElement.isNull() )
@@ -493,19 +514,19 @@ namespace Aseba
 							ThymioButton *button;
 							
 							if ( buttonName == "button" )
-								button = new ThymioButtonsEvent();
+								button = new ThymioButtonsEvent(0,scene->getAdvanced());
 							else if ( buttonName == "prox" )
-								button = new ThymioProxEvent();
+								button = new ThymioProxEvent(0,scene->getAdvanced());
 							else if ( buttonName == "proxground" )
-								button = new ThymioProxGroundEvent();
+								button = new ThymioProxGroundEvent(0,scene->getAdvanced());
 							else if ( buttonName == "tap" )
 							{					
-								button = new ThymioTapEvent();
+								button = new ThymioTapEvent(0,scene->getAdvanced());
 								button->setSharedRenderer(tapSvg);
 							}
 							else if ( buttonName == "clap" )
 							{
-								button = new ThymioClapEvent();
+								button = new ThymioClapEvent(0,scene->getAdvanced());
 								button->setSharedRenderer(clapSvg);
 							}
 							else
@@ -516,10 +537,9 @@ namespace Aseba
 							}
 
 							for(int i=0; i<button->getNumButtons(); ++i)
-								if( eventElement.attribute(QString("button%0").arg(i)) == "true" )
-									button->setClicked(i, true);
-								else
-									button->setClicked(i, false);
+								button->setClicked(i,eventElement.attribute(QString("button%0").arg(i)).toInt());
+
+							button->setState(eventElement.attribute("state").toInt());
 	
 							scene->addEvent(button);
 						}
@@ -531,7 +551,6 @@ namespace Aseba
 						QDomElement actionElement = element.firstChildElement("action");
 						if( !actionElement.isNull() )
 						{
-							// qDebug() << " -- action exists";
 							QString buttonName = actionElement.attribute("name");
 							ThymioButton *button;
 							
@@ -541,20 +560,21 @@ namespace Aseba
 								button = new ThymioColorAction();
 							else if ( buttonName == "circle" )
 								button = new ThymioCircleAction();
-							else if ( buttonName == "sound" )			
+							else if ( buttonName == "sound" )
 								button = new ThymioSoundAction();
+							else if ( buttonName == "memory" )			
+								button = new ThymioMemoryAction();
 							else
 							{
 								QMessageBox::warning(this,tr("Loading"),
 								                     tr("Error in XML source file: %0 unknown event type").arg(buttonName));
 								return false;
-							}								
-							
+							}							
+
 							for(int i=0; i<button->getNumButtons(); ++i)
-								if( actionElement.attribute(QString("button%0").arg(i)) == "true" )
-									button->setClicked(i, true);
-								else
-									button->setClicked(i, false);
+								button->setClicked(i,actionElement.attribute(QString("button%0").arg(i)).toInt());
+			
+							
 							scene->addAction(button);
 						}
 						else
@@ -599,28 +619,28 @@ namespace Aseba
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ThymioButtonsEvent *button = new ThymioButtonsEvent();
+		ThymioButtonsEvent *button = new ThymioButtonsEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ThymioProxEvent *button = new ThymioProxEvent();
+		ThymioProxEvent *button = new ThymioProxEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ThymioProxGroundEvent *button = new ThymioProxGroundEvent();
+		ThymioProxGroundEvent *button = new ThymioProxGroundEvent(0, scene->getAdvanced());
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		ThymioTapEvent *button = new ThymioTapEvent();
+		ThymioTapEvent *button = new ThymioTapEvent(0, scene->getAdvanced());
 		button->setSharedRenderer(tapSvg);
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
@@ -628,7 +648,7 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ThymioClapEvent *button = new ThymioClapEvent();
+		ThymioClapEvent *button = new ThymioClapEvent(0, scene->getAdvanced());
 		button->setSharedRenderer(clapSvg);
 		scene->setFocus();
 		view->centerOn(scene->addEvent(button));
@@ -661,7 +681,14 @@ namespace Aseba
 		scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
-	
+
+	void ThymioVisualProgramming::addMemoryAction()
+	{
+		ThymioMemoryAction *button = new ThymioMemoryAction();
+		scene->setFocus();
+		view->centerOn(scene->addAction(button));
+	}
+		
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		QSize iconSize;

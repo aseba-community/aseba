@@ -40,7 +40,7 @@ namespace Aseba
 		
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
-		virtual bool surviveTabDestruction() const;
+		//virtual bool surviveTabDestruction() const;
 	
 	private slots:
 		void showFlashDialog();
@@ -54,6 +54,7 @@ namespace Aseba
 		void addColorAction();
 		void addCircleAction();	
 		void addSoundAction();
+		void addMemoryAction();
 		
 		void newFile();
 		void openFile();
@@ -61,6 +62,8 @@ namespace Aseba
 		bool saveAs();
 		void setColorScheme(int index);
 		void run();	
+		void stop();
+		void advancedMode();
 		void closeFile();
 		
 		void recompileButtonSet();
@@ -87,6 +90,8 @@ namespace Aseba
 		QToolButton *saveButton;
 		QToolButton *saveAsButton;		
 		QToolButton *runButton;
+		QToolButton *stopButton;
+		QToolButton *advancedButton;
 		QComboBox *colorComboButton;
 		QToolButton *quitButton;
 

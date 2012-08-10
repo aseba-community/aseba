@@ -3,10 +3,13 @@
 namespace Aseba
 {
 
-	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n) : 
+	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n, int states) : 
+		buttons(size),
+		memory(-1),
+		numStates(states),
 		name(n)
-	{ 
-		buttons.resize(size, false); 
+	{
+		//cout << "thymio ir button -- size, buttons.size: " << size << ", " << buttons.size() << endl; 
 	}
 
 	ThymioIRButton::~ThymioIRButton() 
@@ -14,21 +17,40 @@ namespace Aseba
 		buttons.clear();
 	}	
 
-	void ThymioIRButton::setClicked(int i, bool status) 
+	void ThymioIRButton::setClicked(int i, int status) 
 	{ 
-		if( i<size() ) buttons[i] = status; 
+		//cout << "in set clicked .. " << i << ", " << buttons.size() << flush;
+		if( i<size() ) 
+			buttons[i] = status; 
+		//cout << " .. done\n" << flush;
 	}
 	
-	bool ThymioIRButton::isClicked(int i) const
+	int ThymioIRButton::isClicked(int i) const
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
-		return false;
+
+		return -1;
+	}
+	
+	int ThymioIRButton::getNumStates() const
+	{
+		return numStates;
 	}
 	
 	int ThymioIRButton::size() const
 	{ 
 		return buttons.size(); 
+	}
+
+	void ThymioIRButton::setMemoryState(int s)
+	{
+		memory = s;
+	}
+
+	int ThymioIRButton::getMemoryState() const
+	{
+		return memory;
 	}
 
 	void ThymioIRButton::setBasename(wstring n)
@@ -50,19 +72,16 @@ namespace Aseba
 	{ 
 		return (name < 5 ? true : false); 
 	}
-
-	bool ThymioIRButton::isValid() const
-	{ 
-		if( name > 2 )
-			return true; 
-
+	
+	bool ThymioIRButton::isSet() const
+	{
 		for(int i=0; i<size(); ++i)
 		{
-			if( buttons[i] == true )
+			if( buttons[i] > 0 )
 				return true;
-		}
-		
-		return false; 
+		}		
+	
+		return false;
 	}
 
 	void ThymioIRButton::accept(ThymioIRVisitor *visitor) 
@@ -93,7 +112,7 @@ namespace Aseba
 	
 	ThymioIRButton *ThymioIRButtonSet::getActionButton() 
 	{ 
-		return actionButton; 
+		return actionButton;
 	}
 
 	bool ThymioIRButtonSet::hasEventButton() const
