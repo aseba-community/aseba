@@ -46,7 +46,7 @@ namespace Aseba
 	struct StatementNode;
 	struct BinaryArithmeticNode;
 	struct AssignmentNode;
-	struct ImmediateVectorNode;
+	struct TupleVectorNode;
 	struct MemoryVectorNode;
 	
 	//! Description of target VM
@@ -441,7 +441,7 @@ namespace Aseba
 		Node* parseUnaryExpression();
 		Node* parseFunctionCall();
 
-		ImmediateVectorNode* parseImmediateVector(bool compatibility = false);
+		TupleVectorNode* parseTupleVector(bool compatibility = false);
 		Node* parseConstantAndVariable();
 		MemoryVectorNode* parseVariable();
 		unsigned parseVariableDefSize();

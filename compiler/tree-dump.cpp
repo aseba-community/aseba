@@ -81,15 +81,20 @@ namespace Aseba
 		indent--;
 	}
 
-	void ImmediateVectorNode::dump(std::wostream& dest, unsigned& indent) const
+	void TupleVectorNode::dump(std::wostream& dest, unsigned& indent) const
 	{
-		Node::dump(dest, indent);
+		for (unsigned i = 0; i < indent; i++)
+			dest << L"    ";
+		dest << toWString() << L"\n";
 		indent++;
-		for (unsigned int i = 0; i < getVectorSize(); i++)
+		for (size_t i = 0; i < children.size(); i++)
 		{
 			for (unsigned j = 0; j < indent; j++)
 				dest << L"    ";
-			dest << WFormatableString(L"[%0] -> %1\n").arg(i).arg(getValue(i));
+			dest << WFormatableString(L"[%0]:\n").arg(i);
+			indent++;
+			children[i]->dump(dest, indent);
+			indent--;
 		}
 		indent--;
 	}
@@ -201,9 +206,9 @@ namespace Aseba
 		return s;
 	}
 	
-	std::wstring ImmediateVectorNode::toWString() const
+	std::wstring TupleVectorNode::toWString() const
 	{
-		return WFormatableString(L"Static Vector: size %0").arg(getVectorSize());
+		return WFormatableString(L"Tuple Vector: size %0").arg(getVectorSize());
 	}
 
 	std::wstring MemoryVectorNode::toWString() const

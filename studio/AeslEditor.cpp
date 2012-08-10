@@ -23,6 +23,7 @@
 #include "CustomWidgets.h"
 #include "../utils/utils.h"
 #include <QtGui>
+#include <QtGlobal>
 
 #include <AeslEditor.moc>
 
@@ -459,6 +460,16 @@ namespace Aseba
 		setAcceptDrops(true);
 		setAcceptRichText(false);
 		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+
+#ifdef Q_WS_WIN
+		// Fix selection color on Windows when the find dialog is active
+		// See issue 93: https://github.com/aseba-community/aseba/issues/93
+		// Code from: http://stackoverflow.com/questions/9880441/qt-how-to-display-selected-text-in-an-inactive-window
+		QPalette p = palette();
+		p.setColor(QPalette::Inactive, QPalette::Highlight, p.color(QPalette::Active, QPalette::Highlight));
+		p.setColor(QPalette::Inactive, QPalette::HighlightedText, p.color(QPalette::Active, QPalette::HighlightedText));
+		setPalette(p);
+#endif // Q_WS_WIN
 
 		// create completer
 		completer = new QCompleter(this);
