@@ -21,7 +21,8 @@ namespace Aseba
 		THYMIO_MOVE_IR,
 		THYMIO_COLOR_IR,
 		THYMIO_CIRCLE_IR,
-		THYMIO_SOUND_IR
+		THYMIO_SOUND_IR,
+		THYMIO_MEMORY_IR
 	};
 	
 	enum ThymioIRErrorCode
@@ -29,7 +30,6 @@ namespace Aseba
 		THYMIO_NO_ERROR = 0,
 		THYMIO_MISSING_EVENT,
 		THYMIO_MISSING_ACTION,
-		THYMIO_EVENT_NOT_SET,
 		THYMIO_EVENT_MULTISET,
 		THYMIO_INVALID_CODE
 	};
@@ -47,24 +47,29 @@ namespace Aseba
 	class ThymioIRButton 
 	{
 	public:
-		ThymioIRButton(int size=0, ThymioIRButtonName n=THYMIO_BUTTONS_IR);
+		ThymioIRButton(int size=0, ThymioIRButtonName n=THYMIO_BUTTONS_IR, int states=2);
 		~ThymioIRButton();
 
-		void setClicked(int i, bool status);
-		bool isClicked(int i) const;
+		void setClicked(int i, int status);
+		int isClicked(int i) const;
+		int getNumStates() const;
 		int size() const;
+		void setMemoryState(int s);
+		int getMemoryState() const;
 
 		ThymioIRButtonName getName() const;
 		void setBasename(wstring n);
 		wstring getBasename() const;
-		
+
 		bool isEventButton() const;
-		bool isValid() const;
+		bool isSet() const;
 
 		void accept(ThymioIRVisitor *visitor);
 
 	private:
-		vector<bool> buttons;
+		vector<int> buttons;
+		int memory;
+		int numStates;
 		ThymioIRButtonName name;
 		wstring basename;
 	};
@@ -100,8 +105,7 @@ namespace Aseba
 
 		ThymioIRErrorCode getErrorCode() const;
 		bool isSuccessful() const;
-		std::wstring getErrorMessage() const;
-		
+
 	protected:
 		ThymioIRErrorCode errorCode;
 		wstring toWstring(int val);
@@ -126,6 +130,7 @@ namespace Aseba
 		multimap<wstring, ThymioIRButton*> colorHash;
 		multimap<wstring, ThymioIRButton*> circleHash;
 		multimap<wstring, ThymioIRButton*> soundHash;
+		multimap<wstring, ThymioIRButton*> memoryHash;
 
 		set<ThymioIRButtonName> tapSeenActions;
 		set<ThymioIRButtonName> clapSeenActions;
@@ -163,6 +168,7 @@ namespace Aseba
 		vector<wstring> directions;
 		int currentBlock;
 		bool inIfBlock;
+		wstring::iterator insertLoc;
 	};
 
 	class ThymioCompiler 
@@ -174,15 +180,16 @@ namespace Aseba
 		void compile();
 		void generateCode();
 
-		void AddButtonSet(ThymioIRButtonSet *set);
-		void InsertButtonSet(int row, ThymioIRButtonSet *set);
-		void RemoveButtonSet(int row);
-		void ReplaceButtonSet(int row, ThymioIRButtonSet *set);
+		void addButtonSet(ThymioIRButtonSet *set);
+		void insertButtonSet(int row, ThymioIRButtonSet *set);
+		void removeButtonSet(int row);
+		void replaceButtonSet(int row, ThymioIRButtonSet *set);
+		void swap(int row1, int row2);
 
 		ThymioIRErrorCode getErrorCode() const;
-		std::wstring getErrorMessage() const;
 		bool isSuccessful() const;
-		
+		int getErrorLine() const;
+
 		vector<wstring>::const_iterator beginCode() const;
 		vector<wstring>::const_iterator endCode() const; 
 
@@ -195,6 +202,8 @@ namespace Aseba
 		ThymioIRCodeGenerator codeGenerator;
 		
 		ThymioIRErrorType errorType;
+
+		int errorLine;
 	};
 
 }; // Aseba

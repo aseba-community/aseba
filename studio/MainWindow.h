@@ -37,6 +37,7 @@
 #include <QToolBar>
 #include <QCompleter>
 #include <QSortFilterProxyModel>
+#include <QSignalMapper>
 
 #include "AeslEditor.h"
 #include "CustomDelegate.h"
@@ -215,15 +216,16 @@ namespace Aseba
 		void markTargetUnsynced();
 	
 		// keywords
-		void varButtonClicked();
-		void ifButtonClicked();
-		void elseifButtonClicked();
-		void elseButtonClicked();
-		void oneventButtonClicked();
-		void whileButtonClicked();
-		void forButtonClicked();
-		void subroutineButtonClicked();
-		void callsubButtonClicked();
+		void keywordClicked(QString);		
+//		void varButtonClicked();
+//		void ifButtonClicked();
+//		void elseifButtonClicked();
+//		void elseButtonClicked();
+//		void oneventButtonClicked();
+//		void whileButtonClicked();
+//		void forButtonClicked();
+//		void subroutineButtonClicked();
+//		void callsubButtonClicked();
 		void showKeywords(bool show);
 
 		void showMemoryUsage(bool show);
@@ -295,6 +297,7 @@ namespace Aseba
 		QToolButton *subroutineButton;
 		QToolButton *callsubButton;
 		QToolBar *keywordsToolbar;
+		QSignalMapper *signalMapper;
 		
 		TargetVariablesModel *vmMemoryModel;
 		QTreeView *vmMemoryView;
@@ -483,6 +486,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		friend class AeslEditor;
+		friend class InvasivePlugin;		
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
 		int getDescriptionTimer;

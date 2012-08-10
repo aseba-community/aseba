@@ -24,30 +24,6 @@ namespace Aseba
 		return ( errorCode == THYMIO_NO_ERROR ? true : false );
 	}
 
-	wstring ThymioIRVisitor::getErrorMessage() const
-	{
-		// FIXME: this duplicates code in scene, check and remove or unify
-		switch(errorCode)
-		{
-		case THYMIO_MISSING_EVENT:
-			return L"Missing event";
-		case THYMIO_MISSING_ACTION:
-			return L"Missing action";
-		case THYMIO_EVENT_NOT_SET:
-			return L"Event is not set.";
-		case THYMIO_EVENT_MULTISET:
-			return L"Redeclaration of event.";
-		case THYMIO_INVALID_CODE:
-			return L"Unknown event/action type.";
-		case THYMIO_NO_ERROR:
-			return L"Compilation success.";
-		default:
-			break;
-		}
-		
-		return L"";
-	}
-
 	wstring ThymioIRVisitor::toWstring(int val)
 	{
 		wstringstream streamVal;
@@ -73,6 +49,7 @@ namespace Aseba
 		colorHash.clear();
 		circleHash.clear();
 		soundHash.clear();
+		memoryHash.clear();
 		
 		tapSeenActions.clear();
 		clapSeenActions.clear();
@@ -106,6 +83,10 @@ namespace Aseba
 			currentHash = &soundHash;
 			tempHash = soundHash;
 			break;
+		case THYMIO_MEMORY_IR:
+			currentHash = &memoryHash;
+			tempHash = memoryHash;
+			break;
 		default:
 			return;
 			break;
@@ -123,10 +104,14 @@ namespace Aseba
 		wstring buttonname = button->getBasename();
 		for(int i=0; i<button->size(); i++)
 		{	
-			if( button->isClicked(i) )
+			if( button->isClicked(i) > 0 )
 			{
 				buttonname += L"_";
-				buttonname += toWstring(i);	
+				buttonname += toWstring(i);
+				buttonname += L"_";
+				buttonname += toWstring(button->isClicked(i));
+				buttonname += L"_";
+				buttonname += toWstring(button->getMemoryState());
 			}
 		}
 
@@ -149,38 +134,36 @@ namespace Aseba
 				
 		errorCode = THYMIO_NO_ERROR;
 
-		ThymioIRButtonName eventName = buttonSet->getEventButton()->getName();
 		ThymioIRButtonName actionName = buttonSet->getActionButton()->getName();
 
-		if( eventName == THYMIO_TAP_IR ) 
+		multimap<wstring, ThymioIRButton*> *currentHash;
+		switch( actionName )
 		{
-			if( tapSeenActions.find(actionName) != tapSeenActions.end() ) 
-				errorCode = THYMIO_EVENT_MULTISET;
-			else
-				tapSeenActions.insert(actionName);
-		}
-		else if( eventName == THYMIO_CLAP_IR )
-		{
-			if( clapSeenActions.find(actionName) != clapSeenActions.end() )
-				errorCode = THYMIO_EVENT_MULTISET;
-			else
-				clapSeenActions.insert(actionName);
-		}
-		else
-		{
-			activeActionName = actionName;
-			visit(buttonSet->getEventButton());	
+		case THYMIO_MOVE_IR:
+			currentHash = &moveHash;
+			break;
+		case THYMIO_COLOR_IR:
+			currentHash = &colorHash;
+			break;
+		case THYMIO_CIRCLE_IR:
+			currentHash = &circleHash;
+			break;
+		case THYMIO_SOUND_IR:
+			currentHash = &soundHash;
+			break;
+		default:
+			return;
+			break;
 		}
 		
+		activeActionName = actionName;
+		visit(buttonSet->getEventButton());			
 	}
 
 	// Syntax Checker //
 	void ThymioIRSyntaxChecker::visit(ThymioIRButton *button)
 	{
-		if( !button->isValid() )
-			errorCode = THYMIO_EVENT_NOT_SET;
-		else
-			errorCode = THYMIO_NO_ERROR;
+		errorCode = THYMIO_NO_ERROR;
 	}
 	
 	void ThymioIRSyntaxChecker::visit(ThymioIRButtonSet *buttonSet)
@@ -203,7 +186,8 @@ namespace Aseba
 		ThymioIRVisitor(),
 		generatedCode(),
 		currentBlock(0),
-		inIfBlock(false)
+		inIfBlock(false),
+		insertLoc(0)
 	{
 		editor[THYMIO_BUTTONS_IR] = -1;	
 		editor[THYMIO_PROX_IR] = -1;
@@ -215,7 +199,7 @@ namespace Aseba
 		directions.push_back(L"left");
 		directions.push_back(L"backward");
 		directions.push_back(L"right");
-		directions.push_back(L"center");		
+		directions.push_back(L"center");
 	}
 	
 	ThymioIRCodeGenerator::~ThymioIRCodeGenerator()
@@ -247,99 +231,153 @@ namespace Aseba
 		if( button == 0 ) return;
 		
 		wstring text;
+
 		if( button->isEventButton() )
 		{
+			insertLoc = generatedCode[currentBlock].end();
 			bool flag=false;
-			switch( button->getName() )
+			if( button->isSet() )
 			{
-			case THYMIO_BUTTONS_IR:
 				text = L"\tif ";
-				for(int i=0; i<5; ++i)
+				switch( button->getName() )
 				{
-					if(button->isClicked(i))
+				case THYMIO_BUTTONS_IR:
+					for(int i=0; i<5; ++i)
 					{
-						text += (flag ? L" and " : L"");						
-//						text += (flag ? L" or " : L"");	
-						text += L"button.";
-						text += directions[i];
-						text += L" == 1";
-						flag = true;
+						if(button->isClicked(i) > 0)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"button.";
+							text += directions[i];
+							text += L" == 1";
+							flag = true;
+						}
 					}
+					if( button->getMemoryState() >= 0 )
+					{
+						text += L" and state == ";
+						text += toWstring(button->getMemoryState());
+					}
+					break;
+				case THYMIO_PROX_IR:
+					for(int i=0; i<button->size(); ++i)
+					{
+						if(button->isClicked(i) == 1)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.horizontal[";
+							text += toWstring(i);
+							text += L"] < 400";
+							flag = true;
+						} 
+						else if(button->isClicked(i) == 2)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.horizontal[";
+							text += toWstring(i);
+							text += L"] > 500";
+							flag = true;
+						} 
+					}
+					if( button->getMemoryState() >= 0 )
+					{
+						text += L" and state == ";
+						text += toWstring(button->getMemoryState());
+					}					
+					break;		
+				case THYMIO_PROX_GROUND_IR:
+					for(int i=0; i<button->size(); ++i)
+					{
+						if(button->isClicked(i) == 1)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.ground.reflected[";
+							text += toWstring(i);
+							text += L"] < 150";
+							flag = true;
+						}
+						else if(button->isClicked(i) == 2)
+						{
+							text += (flag ? L" and " : L"");
+							text += L"prox.ground.reflected[";
+							text += toWstring(i);
+							text += L"] > 300";
+							flag = true;
+						}						
+					}
+					if( button->getMemoryState() >= 0 )
+					{
+						text += L" and state == ";
+						text += toWstring(button->getMemoryState());
+					}						
+					break;			
+				case THYMIO_TAP_IR:
+				case THYMIO_CLAP_IR:
+				default:
+					errorCode = THYMIO_INVALID_CODE;
+					break;			
 				}
+
 				text += L" then\n";
 				inIfBlock = true;
-				break;
-			case THYMIO_PROX_IR:
-				text = L"\tif ";
-				for(int i=0; i<button->size(); ++i)
+					
+				generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
+				insertLoc = generatedCode[currentBlock].end();	
+			}
+			else 
+			{
+				if( button->getMemoryState() >= 0 )
 				{
-					if(button->isClicked(i))
-					{
-						text += (flag ? L" and " : L"");
-//						text += (flag ? L" or " : L"");
-						text += L"prox.horizontal[";
-						text += toWstring(i);
-						text += L"] > 500";
-						flag = true;
-					}
+					text += L"\tif state == ";
+					text += toWstring(button->getMemoryState());
+					text += L" then\n";
+					inIfBlock = true;
+					
+					generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
+					insertLoc = generatedCode[currentBlock].end();
 				}
-				text += L" then\n";
-				inIfBlock = true;
-				break;		
-			case THYMIO_PROX_GROUND_IR:
-				text = L"\tif ";
-				for(int i=0; i<button->size(); ++i)
+				else
 				{
-					if(button->isClicked(i))
-					{
-						text += (flag ? L" and " : L"");
-//						text += (flag ? L" or " : L"");
-						text += L"prox.ground.reflected[";
-						text += toWstring(i);
-						text += L"] < 150";
-						flag = true;
-					}
+					inIfBlock = false;
+					
+					size_t found =  generatedCode[currentBlock].find(L"if");
+					if( found == wstring::npos )
+						insertLoc = generatedCode[currentBlock].end();
+					else
+						insertLoc = generatedCode[currentBlock].begin() + found - 1;
 				}
-				text += L" then\n";
-				inIfBlock = true;
-				break;			
-			case THYMIO_TAP_IR:
-			case THYMIO_CLAP_IR:
-				inIfBlock = false;
-				break;
-			default:
-				errorCode = THYMIO_INVALID_CODE;
-				break;			
 			}
 		}
 		else
 		{
 			text = (inIfBlock ? L"\t\t" : L"\t");
+			int val=0;
 			switch( button->getName() )
 			{
 			case THYMIO_MOVE_IR:
 				text += L"motor.left.target = ";
-				text += ( button->isClicked(0) ? L"500\n" : 
-						  button->isClicked(1) ? L"250\n" :
-						  button->isClicked(2) ? L"0\n" : 
-						  button->isClicked(3) ? L"-250\n" : L"-500\n" );
-				text += (inIfBlock ? L"\t\t" : L"\t");
+				text += toWstring(button->isClicked(0));
+				text += (inIfBlock ? L"\n\t\t" : L"\n\t");
 				text += L"motor.right.target = ";
-				text += ( button->isClicked(5) ? L"500\n" : 
-						  button->isClicked(6) ? L"250\n" :
-						  button->isClicked(7) ? L"0\n" : 
-						  button->isClicked(8) ? L"-250\n" : L"-500\n" );
+				text += toWstring(button->isClicked(1));
+				text += L"\n";				
 				break;
 			case THYMIO_COLOR_IR:
 				text += L"call leds.top(";
-				text += (button->isClicked(0) ? L"0," : button->isClicked(1) ? L"16," : L"32,");
-				text += (button->isClicked(3) ? L"0," : button->isClicked(4) ? L"16," : L"32,");
-				text += (button->isClicked(6) ? L"0)\n" : button->isClicked(7) ? L"16)\n" : L"32)\n");				
+				text += toWstring(button->isClicked(0));
+				text += L",";
+				text += toWstring(button->isClicked(1));
+				text += L",";								
+				text += toWstring(button->isClicked(2));
+				text += L")\n";
 				break;
 			case THYMIO_CIRCLE_IR:
 				text += L"call leds.circle(";
 				for(int i=0; i < button->size(); ++i)
-					text += (button->isClicked(i)? L"32," : L"0,");
+				{
+					text += toWstring((32*button->isClicked(i))/(button->getNumStates()-1)); 
+					text += L",";
+				}
 				text.replace(text.length()-1, 2,L")\n");
 				break;
 			case THYMIO_SOUND_IR:
@@ -350,15 +388,23 @@ namespace Aseba
 				else
 					text += L"call sound.system(4)\n"; // scared
 				break;
+			case THYMIO_MEMORY_IR:
+				text += L"state = ";
+				for(int i=0; i<button->size(); ++i)
+					val += (button->isClicked(i)*(0x01<<i));
+				text += toWstring(val);
+				text += L"\n";
+				break;
 			default:
 				errorCode = THYMIO_INVALID_CODE;
 				break;
 			}
 			text += (inIfBlock ? L"\tend\n" : L"");
 			inIfBlock = false;
+		
+			generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
 		}
 	
-		generatedCode[currentBlock].insert(generatedCode[currentBlock].end(), text.begin(), text.end());	
 	}
 
 	void ThymioIRCodeGenerator::visit(ThymioIRButtonSet *buttonSet)
@@ -367,9 +413,12 @@ namespace Aseba
 		
 		errorCode = THYMIO_NO_ERROR;
 		
+		if( generatedCode.empty() && buttonSet->getEventButton()->getMemoryState() >= 0 )
+			generatedCode.push_back(L"var state = 0\n");
+		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		int block = editor[name];
-		
+
 		if( block < 0 )
 		{
 			block = generatedCode.size();
@@ -395,14 +444,19 @@ namespace Aseba
 				generatedCode.push_back(L"onevent tap\n");
 				break;
 			case THYMIO_CLAP_IR:
-				generatedCode.insert(generatedCode.begin(),L"mic.threshold = 200\n");
+				if( generatedCode.empty() || generatedCode[0].find(L"var state = 0\n") == wstring::npos )
+				{
+					generatedCode.insert(generatedCode.begin(),L"mic.threshold = 250\n");
+					for(map<ThymioIRButtonName, int>::iterator itr = editor.begin();
+						itr != editor.end(); ++itr)
+						if( itr->second >= 0 )
+							itr->second += 1;				
+					block += 1;
+				}
+				else
+					generatedCode[0].append(L"mic.threshold = 250\n");
 				generatedCode.push_back(L"onevent mic\n");
-				block += 1;
-				for(map<ThymioIRButtonName, int>::iterator itr = editor.begin();
-					itr != editor.end(); ++itr)
-					if( itr->second >= 0 )
-						itr->second += 1;
-				break;
+				break;	
 			default:
 				errorCode = THYMIO_INVALID_CODE;
 				return;
@@ -412,7 +466,7 @@ namespace Aseba
 			editor[name] = block;
 		}
 		currentBlock = block;
-
+				
 		visit(buttonSet->getEventButton());
 		visit(buttonSet->getActionButton());
 	}

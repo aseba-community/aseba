@@ -52,7 +52,7 @@
 	<file>images/filenew.svgz</file>
 	<file>images/fileopen.svgz</file>
 	<file>images/exit.svgz</file>
-	<file>images/exec.png</file>
-	<file>images/kedit.png</file>
+	<file>images/stop1.png</file>
+	<file>images/run.png</file>
 </qresource>
 </RCC>

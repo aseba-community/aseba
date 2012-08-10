@@ -42,11 +42,13 @@ namespace Aseba
 	class NodeTab;
 	class Target;
 	class TargetVariablesModel;
+	class MainWindow;
 	
 	//! To access private members of MainWindow and its children, a plugin must inherit from this class
 	struct InvasivePlugin
 	{
 		NodeTab* nodeTab;
+		MainWindow *mainWindow;
 		
 		InvasivePlugin(NodeTab* nodeTab);
 		virtual ~InvasivePlugin() {}
@@ -56,7 +58,10 @@ namespace Aseba
 		unsigned getNodeId();
 		void displayCode(QList<QString> code);
 		void loadNrun();
+		void stop();
 		TargetVariablesModel * getVariablesModel();
+		QString saveFile(bool as=false);
+		void openFile(QString name);
 	};
 	
 	//! A tool that is specific to a node

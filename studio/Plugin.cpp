@@ -26,6 +26,7 @@
 #include "MainWindow.h"
 #include "../utils/utils.h"
 #include "../common/productids.h"
+#include "NamedValuesVectorModel.h"
 
 // plugins
 
@@ -38,7 +39,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	InvasivePlugin::InvasivePlugin(NodeTab* nodeTab) : nodeTab(nodeTab) {};
+	InvasivePlugin::InvasivePlugin(NodeTab* nodeTab) : nodeTab(nodeTab) { mainWindow = nodeTab->mainWindow; };
 
 	Dashel::Stream* InvasivePlugin::getDashelStream()
 	{
@@ -66,6 +67,33 @@ namespace Aseba
 	{
 		nodeTab->loadClicked();
 		nodeTab->target->run(nodeTab->id);
+	}
+
+	void InvasivePlugin::stop()
+	{
+		nodeTab->target->stop(nodeTab->id);
+		const unsigned leftSpeedVarPos = getVariablesModel()->getVariablePos("motor.left.target");
+		nodeTab->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
+		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
+		nodeTab->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
+	}
+	
+	QString InvasivePlugin::saveFile(bool as)
+	{
+		if( as )
+			mainWindow->saveFile();
+		else
+			mainWindow->save();
+	
+		return mainWindow->actualFileName;
+	}
+	
+	void InvasivePlugin::openFile(QString name)
+	{ 
+		mainWindow->sourceModified = false;
+		mainWindow->constantsDefinitionsModel->clearWasModified();
+		mainWindow->eventsDescriptionsModel->clearWasModified();
+		mainWindow->openFile(name);
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()

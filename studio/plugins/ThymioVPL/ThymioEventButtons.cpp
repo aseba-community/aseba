@@ -7,8 +7,8 @@
 namespace Aseba
 {
 	// Buttons Event
-	ThymioButtonsEvent::ThymioButtonsEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, true, parent)
+	ThymioButtonsEvent::ThymioButtonsEvent(QGraphicsItem *parent, bool advanced) : 
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{	
 		setData(0, "event");
 		setData(1, "button");
@@ -16,7 +16,7 @@ namespace Aseba
 		// top, left, bottom, right		
 		for(int i=0; i<4; i++) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON, 2, this);
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
@@ -29,7 +29,7 @@ namespace Aseba
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
 
-		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, this);
+		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, 2, this);
 		button->setPos(QPointF(128, 128));
 		button->setButtonColor(Qt::green);
 		thymioButtons.push_back(button);
@@ -37,15 +37,15 @@ namespace Aseba
 	}
 			
 	// Prox Event
-	ThymioProxEvent::ThymioProxEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, true, parent)
+	ThymioProxEvent::ThymioProxEvent(QGraphicsItem *parent, bool advanced) : 
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "prox");
 		
 		for(int i=0; i<5; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this);	
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 			
 			qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
@@ -60,7 +60,7 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this);	
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 
 			button->setPos(QPointF(64 + i*128, 234));
 			button->setButtonColor(Qt::red);
@@ -73,18 +73,18 @@ namespace Aseba
 	}
 	
 	// Prox Ground Event
-	ThymioProxGroundEvent::ThymioProxGroundEvent(QGraphicsItem *parent) : 
-		ThymioButton(true, 1.0, false, parent)
+	ThymioProxGroundEvent::ThymioProxGroundEvent( QGraphicsItem *parent, bool advanced ) : 
+		ThymioButton(true, 1.0, false, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "proxground");
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this);	
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 
 			button->setPos(QPointF(98 + i*60, 40));
-			button->setButtonColor(Qt::green);
+			button->setButtonColor(Qt::red);
 			
 			thymioButtons.push_back(button);
 			
@@ -93,8 +93,8 @@ namespace Aseba
 	}	
 			
 	// Tap Event
-	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent ) :
-		ThymioButton(true, 1.0, true, parent)
+	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent, bool advanced ) :
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "tap");
@@ -105,8 +105,8 @@ namespace Aseba
 	
 	
 	// Clap Event
-	ThymioClapEvent::ThymioClapEvent( QGraphicsItem *parent ) :
-		ThymioButton(true, 1.0, true, parent)
+	ThymioClapEvent::ThymioClapEvent( QGraphicsItem *parent, bool advanced ) :
+		ThymioButton(true, 1.0, true, advanced, parent)
 	{		
 		setData(0, "event");		
 		setData(1, "clap");
