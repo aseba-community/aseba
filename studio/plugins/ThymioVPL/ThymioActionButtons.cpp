@@ -24,7 +24,7 @@ namespace Aseba
 						      "QSlider::handle:vertical { "
 						      "background: #FFFFFF; "
 						      "border: 2px solid #000000; height: 10px; width: 20px; margin: 0px 0; }");
-			s->setTickInterval(50);
+			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
@@ -47,6 +47,11 @@ namespace Aseba
 		thymioBody->setTransformOriginPoint(0,-14);//(pt[1]+pt[0]) == 0 ? 0 : (abs(pt[1])-abs(pt[0]))/(abs(pt[1])+abs(pt[0]))*22.2,-25);
 	}
 
+	ThymioMoveAction::~ThymioMoveAction()
+	{
+		delete(timer);
+	}
+
 	void ThymioMoveAction::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
@@ -59,8 +64,7 @@ namespace Aseba
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
 			pt[i] = (sliders[i]->value())*0.06; // [-30,30]
-
-		float rate = abs(pt[0])+abs(pt[1]);
+		
 		timer->stop();
 		timer->setLoopCount(1);//+(int)(rate*0.005));
 
@@ -92,8 +96,6 @@ namespace Aseba
 			animation->setPosAt(step, QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128));	
 			animation->setRotationAt(step, angle);
 		}
-
-
 #endif
 
 		timer->start();
@@ -163,11 +165,13 @@ namespace Aseba
 						      "QSlider::handle:horizontal { "
 						      "background: #FFFFFF; "
 						      "border: 5px solid #000000; width: 18px; margin: -2px 0; }").arg(sliderColor));
+			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
 			w->setPos(27, 70+i*60);
 			w->setTransform(transMatrix);
+			
 			
 			sliders.push_back(s);
 			widgets.push_back(w);

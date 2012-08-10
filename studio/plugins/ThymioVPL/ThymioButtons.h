@@ -291,6 +291,7 @@ namespace Aseba
 						
 	public:
 		ThymioMoveAction(QGraphicsItem *parent=0);
+		virtual ~ThymioMoveAction();
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		virtual QPixmap image(bool on=true);
 		virtual void setClicked(int i, int status);
