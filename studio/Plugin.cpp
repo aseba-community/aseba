@@ -72,10 +72,6 @@ namespace Aseba
 	void InvasivePlugin::stop()
 	{
 		nodeTab->target->stop(nodeTab->id);
-		const unsigned leftSpeedVarPos = getVariablesModel()->getVariablePos("motor.left.target");
-		nodeTab->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
-		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
-		nodeTab->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
 	
 	QString InvasivePlugin::saveFile(bool as)
@@ -99,6 +95,11 @@ namespace Aseba
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()
 	{
 		return nodeTab->vmMemoryModel;
+	}
+	
+	void InvasivePlugin::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		nodeTab->setVariableValues(addr, data);
 	}
 	
 	//! Create an instance of C, passing node to its constructor

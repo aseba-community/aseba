@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <set>
+#include "../compiler/compiler.h"
 
 class QMenu;
 
@@ -60,6 +61,7 @@ namespace Aseba
 		void loadNrun();
 		void stop();
 		TargetVariablesModel * getVariablesModel();
+		void setVariableValues(unsigned, const VariablesDataVector &);
 		QString saveFile(bool as=false);
 		void openFile(QString name);
 	};

@@ -15,6 +15,7 @@
 
 #include "ThymioVisualProgramming.h"
 #include "ThymioVisualProgramming.moc"
+#include "../../TargetModels.h"
 
 using namespace std;
 
@@ -343,6 +344,10 @@ namespace Aseba
 	void ThymioVisualProgramming::stop()
 	{
 		InvasivePlugin::stop();
+		const unsigned leftSpeedVarPos = getVariablesModel()->getVariablePos("motor.left.target");
+		setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
+		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
+		setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
 	
 	void ThymioVisualProgramming::advancedMode()
