@@ -101,7 +101,7 @@ namespace Aseba
 				currentHash->insert(*itr);
 		}
 
-		wstring buttonname = button->getBasename();
+		wstring buttonname = button->getBasename() + L"_" + toWstring(button->getMemoryState());;
 		for(int i=0; i<button->size(); i++)
 		{	
 			if( button->isClicked(i) > 0 )
@@ -110,8 +110,6 @@ namespace Aseba
 				buttonname += toWstring(i);
 				buttonname += L"_";
 				buttonname += toWstring(button->isClicked(i));
-				buttonname += L"_";
-				buttonname += toWstring(button->getMemoryState());
 			}
 		}
 

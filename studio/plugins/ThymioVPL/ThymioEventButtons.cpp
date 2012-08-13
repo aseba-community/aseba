@@ -51,6 +51,7 @@ namespace Aseba
 			button->setRotation(-20*offset);
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
 						   175 - 150*qCos(0.34906585*offset) );
+			button->setBeginButtonColor(QColor(100,255,100));
 			button->setButtonColor(Qt::red);
 
 			thymioButtons.push_back(button);
@@ -63,6 +64,7 @@ namespace Aseba
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 
 			button->setPos(QPointF(64 + i*128, 234));
+			button->setBeginButtonColor(QColor(100,255,100));
 			button->setButtonColor(Qt::red);
 			
 			thymioButtons.push_back(button);
@@ -84,6 +86,7 @@ namespace Aseba
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);	
 
 			button->setPos(QPointF(98 + i*60, 40));
+			button->setBeginButtonColor(QColor(100,255,100));
 			button->setButtonColor(Qt::red);
 			
 			thymioButtons.push_back(button);

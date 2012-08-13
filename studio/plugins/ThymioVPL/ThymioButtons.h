@@ -50,6 +50,7 @@ namespace Aseba
 
 		QRectF boundingRect() const { return boundingRectangle; }
 		void setButtonColor(QColor color) { buttonColor = color; }
+		void setBeginButtonColor(QColor color) { buttonBeginColor = color; }
 
 		void addSibling(ThymioClickableButton *s) { siblings.push_back(s); }
 	
@@ -64,6 +65,7 @@ namespace Aseba
 		
 		QRectF boundingRectangle;		
 		QColor buttonColor;
+		QColor buttonBeginColor;
 
 		QList<ThymioClickableButton*> siblings;
 

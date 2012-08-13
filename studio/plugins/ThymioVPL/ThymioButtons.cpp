@@ -20,7 +20,8 @@ namespace Aseba
 		toggleState(true),
 		numStates(nstates),
 		boundingRectangle(rect),
-		buttonColor(Qt::gray)
+		buttonColor(Qt::gray),
+		buttonBeginColor(Qt::white)
 	{		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -33,10 +34,15 @@ namespace Aseba
 		painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 		
 		// filled
-		double step = (double)(buttonClicked)/(double)(numStates-1);
-		painter->setBrush(QColor(buttonColor.red()*step + 255*(1-step), 
-								 buttonColor.green()*step + 255*(1-step), 
-								 buttonColor.blue()*step + 255*(1-step)));
+		if( buttonClicked == 0 )
+			painter->setBrush(Qt::white);
+		else
+		{
+			double step = (numStates <= 2 ? 1 : (double)(buttonClicked-1)/(double)(numStates-2));
+			painter->setBrush(QColor(buttonColor.red()*step + buttonBeginColor.red()*(1-step),
+									 buttonColor.green()*step + buttonBeginColor.green()*(1-step),
+									 buttonColor.blue()*step + buttonBeginColor.blue()*(1-step))); 
+		}
 
 		if ( buttonType == THYMIO_CIRCULAR_BUTTON )
 			painter->drawEllipse(boundingRectangle);
@@ -171,7 +177,7 @@ namespace Aseba
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 
 				button->setPos(288, i*60 + 40);
-				button->setButtonColor(Qt::gray);
+				button->setButtonColor(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
@@ -346,7 +352,7 @@ namespace Aseba
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 
 				button->setPos(288, i*60 + 40);
-				button->setButtonColor(Qt::gray);
+				button->setButtonColor(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
@@ -704,8 +710,6 @@ namespace Aseba
 		if( actionButton )
 			actionButton->setPos(500+trans, 40);
 		
-		
-				
 		update();
 	}
 
