@@ -26,7 +26,7 @@ namespace Aseba
 	{
 		ThymioButtonSet *button = new ThymioButtonSet(0, advancedMode);
 		button->setScale(scaleFactor);
-		button->setPos(20, 20);
+		button->setPos(15, 20); //advancedMode = false
 		buttonSets.push_back(button);
 		thymioCompiler.addButtonSet(button->getIRButtonSet());		
 		
@@ -185,7 +185,7 @@ namespace Aseba
 		clear();
 
 		ThymioButtonSet *button = createNewButtonSet();
-		button->setPos(20, 20);
+		button->setPos(15, 20); //advancedMode = false
 		
 		setSceneRect(QRectF(0, 0, 1000*scaleFactor+40, (buttonSets.size()+2)*400*scaleFactor));
 
@@ -259,7 +259,7 @@ namespace Aseba
 		if( buttonSets.isEmpty() ) 
 		{
 			ThymioButtonSet *button = createNewButtonSet();
-			button->setPos(20,20);		
+			button->setPos(advancedMode?5:15,20);		
 		}
 
 		prevNewEventButton = false;

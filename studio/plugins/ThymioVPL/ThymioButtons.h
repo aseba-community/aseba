@@ -218,6 +218,7 @@ namespace Aseba
 		bool errorFlag;
 		bool advancedMode;
 		qreal trans;
+		qreal xpos;
 		
 		virtual void mousePressEvent ( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );

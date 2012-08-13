@@ -518,7 +518,8 @@ namespace Aseba
 		highlightActionButton(false),
 		errorFlag(false),
 		advancedMode(advanced),
-		trans(advanced ? 64 : 0)
+		trans(advanced ? 64 : 0),
+		xpos(advanced ? 5 : 15)
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
@@ -535,7 +536,7 @@ namespace Aseba
 		setCursor(Qt::OpenHandCursor);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
-		setPos(20, row*400*scale()+20);
+		setPos(xpos, row*400*scale()+20);
 	}
 
 	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -585,7 +586,7 @@ namespace Aseba
 		
 		if( eventButton == 0 )
 		{
-			if( !highlightEventButton /* || !hasFocus() */ ) eventButtonColor.setAlpha(50);
+			if( !highlightEventButton ) eventButtonColor.setAlpha(50);
 			painter->setPen(QPen(eventButtonColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));				
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
@@ -594,7 +595,7 @@ namespace Aseba
 
 		if( actionButton == 0 )
 		{
-			if( !highlightActionButton /* || !hasFocus() */ ) actionButtonColor.setAlpha(50);	
+			if( !highlightActionButton ) actionButtonColor.setAlpha(50);	
 			painter->setPen(QPen(actionButtonColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
@@ -619,7 +620,7 @@ namespace Aseba
 		setData(1,row); 
 		if( eventButton ) eventButton->setParentID(row);
 		if( actionButton ) actionButton->setParentID(row);
-		setPos(20, row*400*scale()+20);	
+		setPos(xpos, row*400*scale()+20);	
 	}
 
 	void ThymioButtonSet::addEventButton(ThymioButton *event) 
@@ -669,7 +670,7 @@ namespace Aseba
 	void ThymioButtonSet::setScale(qreal factor)
 	{ 
 		QGraphicsItem::setScale(factor); 
-		setPos(20, getRow()*400*scale()+20);
+		setPos(xpos, getRow()*400*scale()+20);
 		
 		if( eventButton ) 
 			eventButton->setScaleFactor(factor);
@@ -683,13 +684,27 @@ namespace Aseba
 		advancedMode = advanced;
 		if( eventButton )
 			eventButton->setAdvanced(advanced);
-					
-		trans = advanced ? 64 : 0;
+		
+		if( advanced ) 
+		{			
+			trans = 64;
+			xpos = 5;
+		} 
+		else
+		{
+			trans = 0;
+			xpos = 15;
+		}
+
+		setPos(xpos, getRow()*400*scale()+20);		
+		
 		deleteButton->setPos(896+trans, 168);
 		addButton->setPos(500+trans/2, 368);
 		
 		if( actionButton )
 			actionButton->setPos(500+trans, 40);
+		
+		
 				
 		update();
 	}
