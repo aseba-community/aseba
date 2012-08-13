@@ -773,6 +773,7 @@ namespace Aseba
 					const QString headSpace = line.left(line.indexOf("if"));
 					prefix = " ";
 					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
+					//to have also elseif: postfix = " then\n" + headSpace + "\t\n" + headSpace + "else\n" + headSpace + "\t\n" + "end";
 				}
 				else if (keyword == "when")
 				{
@@ -792,7 +793,23 @@ namespace Aseba
 					prefix = " ";
 					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
 				}
-				
+				else if (keyword == "elseif")
+				{
+					const QString tab = QString("\t");
+					QString headSpace = line.left(line.indexOf("elseif"));
+					
+					if( headSpace.size() - tab.size() > 0 ) 
+						headSpace = headSpace.left(headSpace.size() - tab.size());
+					else
+						headSpace.clear();
+					
+					prefix = "\n" + headSpace + "elseif ";
+					postfix = " then\n" + headSpace + "\t";
+					
+					cursor.select(QTextCursor::BlockUnderCursor);
+					cursor.removeSelectedText();
+				}
+
 				if (!prefix.isNull() || !postfix.isNull())
 				{
 					cursor.beginEditBlock();
@@ -803,31 +820,6 @@ namespace Aseba
 					cursor.endEditBlock();
 					editor->setTextCursor(cursor);
 				}
-				
-				if (keyword == "elseif")
-				{
-					const QString tab = QString("\t");
-					QString headSpace = line.left(line.indexOf("elseif"));
-
-					if( headSpace.size() - tab.size() > 0 ) 
-						headSpace = headSpace.left(headSpace.size() - tab.size());
-					else
-						headSpace.clear();
-					
-					postfix = " then\n" + headSpace + "\t";
-
-					cursor.select(QTextCursor::BlockUnderCursor);
-					cursor.removeSelectedText();
-					
-					cursor.beginEditBlock();
-					cursor.insertText("\n" + headSpace + "elseif ");
-					const int pos = cursor.position();
-					cursor.insertText(postfix);
-					cursor.setPosition(pos);
-					cursor.endEditBlock();
-					editor->setTextCursor(cursor);
-				}
-				//TODO
 			}
 			recompile();
 			if (!firstCompilation)
