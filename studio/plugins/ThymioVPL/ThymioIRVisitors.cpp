@@ -65,6 +65,7 @@ namespace Aseba
 		
 		multimap<wstring, ThymioIRButton*> *currentHash;
 		multimap<wstring, ThymioIRButton*> tempHash;
+		
 		switch( activeActionName )
 		{
 		case THYMIO_MOVE_IR:
@@ -132,29 +133,8 @@ namespace Aseba
 				
 		errorCode = THYMIO_NO_ERROR;
 
-		ThymioIRButtonName actionName = buttonSet->getActionButton()->getName();
+		activeActionName = buttonSet->getActionButton()->getName();
 
-		multimap<wstring, ThymioIRButton*> *currentHash;
-		switch( actionName )
-		{
-		case THYMIO_MOVE_IR:
-			currentHash = &moveHash;
-			break;
-		case THYMIO_COLOR_IR:
-			currentHash = &colorHash;
-			break;
-		case THYMIO_CIRCLE_IR:
-			currentHash = &circleHash;
-			break;
-		case THYMIO_SOUND_IR:
-			currentHash = &soundHash;
-			break;
-		default:
-			return;
-			break;
-		}
-		
-		activeActionName = actionName;
 		visit(buttonSet->getEventButton());			
 	}
 
@@ -411,8 +391,13 @@ namespace Aseba
 		
 		errorCode = THYMIO_NO_ERROR;
 		
-		if( generatedCode.empty() && buttonSet->getEventButton()->getMemoryState() >= 0 )
-			generatedCode.push_back(L"var state = 0\n");
+		if( generatedCode.empty() )
+		{
+			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
+				generatedCode.push_back(L"var state = 0\n\nif _fwversion[0] >= 4 then\n\tcall _system.settings.write(0,4)\nend\n\n");
+			else
+				generatedCode.push_back(L"if _fwversion[0] >= 4 then\n\tcall _system.settings.write(0,4)\nend\n");
+		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		int block = editor[name];
