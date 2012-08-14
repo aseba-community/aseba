@@ -773,9 +773,10 @@ namespace Aseba
 			return;
 
 		// default handler
+		QKeyEvent eventCopy(*event);
 		QTextEdit::keyPressEvent(event);
-		detectLocalContextChange(event);
-		doCompletion(event);
+		detectLocalContextChange(&eventCopy);
+		doCompletion(&eventCopy);
 	}
 
 	bool AeslEditor::handleCompleter(QKeyEvent *event)
