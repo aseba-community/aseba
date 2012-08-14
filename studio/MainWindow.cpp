@@ -765,68 +765,77 @@ namespace Aseba
 			{
 				// language completion
 				const QString& line(cursor.block().text());
-				const QString keyword(line.trimmed());
+				QString keyword(line);
 				
-				QString prefix;
-				QString postfix;
-				if (keyword == "if")
+				// make sure the string does not have any trailing space
+				int nonWhitespace(0);
+				while ((nonWhitespace < keyword.size()) && ((keyword.at(nonWhitespace) == ' ') || (keyword.at(nonWhitespace) == '\t')))
+					++nonWhitespace;
+				keyword.remove(0,nonWhitespace);
+				
+				if (!keyword.trimmed().isEmpty())
 				{
-					const QString headSpace = line.left(line.indexOf("if"));
-					prefix = " ";
-					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
-				}
-				else if (keyword == "when")
-				{
-					const QString headSpace = line.left(line.indexOf("when"));
-					prefix = " ";
-					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
-				}
-				else if (keyword == "for")
-				{
-					const QString headSpace = line.left(line.indexOf("for"));
-					prefix = " ";
-					postfix = "i in 0:0 do\n" + headSpace + "\t\n" + headSpace + "end";
-				}
-				else if (keyword == "while")
-				{
-					const QString headSpace = line.left(line.indexOf("while"));
-					prefix = " ";
-					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
-				}
-				else if ((keyword == "else") && cursor.block().next().isValid())
-				{
-					const QString tab = QString("\t");
-					QString headSpace = line.left(line.indexOf("else"));
-					
-					if( headSpace.size() >= tab.size())
+					QString prefix;
+					QString postfix;
+					if (keyword == "if")
 					{
-						headSpace = headSpace.left(headSpace.size() - tab.size());
-						if (cursor.block().next().text() == headSpace + "end")
+						const QString headSpace = line.left(line.indexOf("if"));
+						prefix = " ";
+						postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
+					}
+					else if (keyword == "when")
+					{
+						const QString headSpace = line.left(line.indexOf("when"));
+						prefix = " ";
+						postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+					}
+					else if (keyword == "for")
+					{
+						const QString headSpace = line.left(line.indexOf("for"));
+						prefix = " ";
+						postfix = "i in 0:0 do\n" + headSpace + "\t\n" + headSpace + "end";
+					}
+					else if (keyword == "while")
+					{
+						const QString headSpace = line.left(line.indexOf("while"));
+						prefix = " ";
+						postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+					}
+					else if ((keyword == "else") && cursor.block().next().isValid())
+					{
+						const QString tab = QString("\t");
+						QString headSpace = line.left(line.indexOf("else"));
+						
+						if( headSpace.size() >= tab.size())
 						{
-							prefix = "\n" + headSpace + "else";
-							postfix = "\n" + headSpace + "\t";
-							
-							cursor.select(QTextCursor::BlockUnderCursor);
-							cursor.removeSelectedText();
+							headSpace = headSpace.left(headSpace.size() - tab.size());
+							if (cursor.block().next().text() == headSpace + "end")
+							{
+								prefix = "\n" + headSpace + "else";
+								postfix = "\n" + headSpace + "\t";
+								
+								cursor.select(QTextCursor::BlockUnderCursor);
+								cursor.removeSelectedText();
+							}
 						}
 					}
-				}
-				else if (keyword == "elseif")
-				{
-					const QString headSpace = line.left(line.indexOf("elseif"));
-					prefix = " ";
-					postfix = " then";
-				}
+					else if (keyword == "elseif")
+					{
+						const QString headSpace = line.left(line.indexOf("elseif"));
+						prefix = " ";
+						postfix = " then";
+					}
 
-				if (!prefix.isNull() || !postfix.isNull())
-				{
-					cursor.beginEditBlock();
-					cursor.insertText(prefix);
-					const int pos = cursor.position();
-					cursor.insertText(postfix);
-					cursor.setPosition(pos);
-					cursor.endEditBlock();
-					editor->setTextCursor(cursor);
+					if (!prefix.isNull() || !postfix.isNull())
+					{
+						cursor.beginEditBlock();
+						cursor.insertText(prefix);
+						const int pos = cursor.position();
+						cursor.insertText(postfix);
+						cursor.setPosition(pos);
+						cursor.endEditBlock();
+						editor->setTextCursor(cursor);
+					}
 				}
 			}
 			recompile();
