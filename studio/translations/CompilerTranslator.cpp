@@ -1,6 +1,6 @@
 
 #include "CompilerTranslator.h"
-#include "../compiler/errors_code.h"
+#include "../../compiler/errors_code.h"
 
 #include <CompilerTranslator.moc>
 
