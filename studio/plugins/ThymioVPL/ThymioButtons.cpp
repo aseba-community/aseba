@@ -20,7 +20,8 @@ namespace Aseba
 		toggleState(true),
 		numStates(nstates),
 		boundingRectangle(rect),
-		buttonColor(Qt::gray)
+		buttonColor(Qt::gray),
+		buttonBeginColor(Qt::white)
 	{		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -33,10 +34,15 @@ namespace Aseba
 		painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 		
 		// filled
-		double step = (double)(buttonClicked)/(double)(numStates-1);
-		painter->setBrush(QColor(buttonColor.red()*step + 255*(1-step), 
-								 buttonColor.green()*step + 255*(1-step), 
-								 buttonColor.blue()*step + 255*(1-step)));
+		if( buttonClicked == 0 )
+			painter->setBrush(Qt::white);
+		else
+		{
+			double step = (numStates <= 2 ? 1 : (double)(buttonClicked-1)/(double)(numStates-2));
+			painter->setBrush(QColor(buttonColor.red()*step + buttonBeginColor.red()*(1-step),
+									 buttonColor.green()*step + buttonBeginColor.green()*(1-step),
+									 buttonColor.blue()*step + buttonBeginColor.blue()*(1-step))); 
+		}
 
 		if ( buttonType == THYMIO_CIRCULAR_BUTTON )
 			painter->drawEllipse(boundingRectangle);
@@ -168,10 +174,13 @@ namespace Aseba
 		{
 			for(uint i=0; i<4; i++)
 			{
+//				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-15,-25,30,50), THYMIO_CIRCULAR_BUTTON, 2, this);//THYMIO_RECTANGULAR_BUTTON , 2, this);
+//				button->setPos(320 + (2-i)*(i%2)*35, 128 + (i-1)*((i+1)%2)*45);
+//				button->setRotation(90*(i+1));				
+				
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
-
-				button->setPos(288, i*60 + 40);
-				button->setButtonColor(Qt::gray);
+				button->setPos(295, i*60 + 40);
+				button->setButtonColor(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
@@ -343,10 +352,13 @@ namespace Aseba
 		{
 			for(int i=0; i<4; i++)
 			{
+//				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-10,-15,20,30), THYMIO_RECTANGULAR_BUTTON , 2, this);
+//				button->setPos(128 + (2-i)*(i%2)*35, 128 + (i-1)*((i+1)%2)*35);
+//				button->setRotation(90*(i+1));
+				
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
-
-				button->setPos(288, i*60 + 40);
-				button->setButtonColor(Qt::gray);
+				button->setPos(295, i*60 + 40);
+				button->setButtonColor(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
@@ -469,8 +481,7 @@ namespace Aseba
 		QRadialGradient radialGrad(QPointF(0, 0), 80);
 		radialGrad.setColorAt(0, Qt::red);
 		radialGrad.setColorAt(1, Qt::darkRed);		
-		
-		//painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
+
 		painter->setPen(Qt::black);
 		painter->setBrush(radialGrad);
 		painter->drawRect(-40,-20,80,40);
@@ -518,7 +529,8 @@ namespace Aseba
 		highlightActionButton(false),
 		errorFlag(false),
 		advancedMode(advanced),
-		trans(advanced ? 64 : 0)
+		trans(advanced ? 64 : 0),
+		xpos(advanced ? 5 : 15)
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
@@ -535,7 +547,7 @@ namespace Aseba
 		setCursor(Qt::OpenHandCursor);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
-		setPos(20, row*400*scale()+20);
+		setPos(xpos, row*400*scale()+20);
 	}
 
 	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -585,7 +597,7 @@ namespace Aseba
 		
 		if( eventButton == 0 )
 		{
-			if( !highlightEventButton /* || !hasFocus() */ ) eventButtonColor.setAlpha(50);
+			if( !highlightEventButton ) eventButtonColor.setAlpha(50);
 			painter->setPen(QPen(eventButtonColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));				
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
@@ -594,7 +606,7 @@ namespace Aseba
 
 		if( actionButton == 0 )
 		{
-			if( !highlightActionButton /* || !hasFocus() */ ) actionButtonColor.setAlpha(50);	
+			if( !highlightActionButton ) actionButtonColor.setAlpha(50);	
 			painter->setPen(QPen(actionButtonColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
@@ -619,7 +631,7 @@ namespace Aseba
 		setData(1,row); 
 		if( eventButton ) eventButton->setParentID(row);
 		if( actionButton ) actionButton->setParentID(row);
-		setPos(20, row*400*scale()+20);	
+		setPos(xpos, row*400*scale()+20);	
 	}
 
 	void ThymioButtonSet::addEventButton(ThymioButton *event) 
@@ -669,7 +681,7 @@ namespace Aseba
 	void ThymioButtonSet::setScale(qreal factor)
 	{ 
 		QGraphicsItem::setScale(factor); 
-		setPos(20, getRow()*400*scale()+20);
+		setPos(xpos, getRow()*400*scale()+20);
 		
 		if( eventButton ) 
 			eventButton->setScaleFactor(factor);
@@ -683,14 +695,26 @@ namespace Aseba
 		advancedMode = advanced;
 		if( eventButton )
 			eventButton->setAdvanced(advanced);
-					
-		trans = advanced ? 64 : 0;
+		
+		if( advanced ) 
+		{			
+			trans = 64;
+			xpos = 5;
+		} 
+		else
+		{
+			trans = 0;
+			xpos = 15;
+		}
+
+		setPos(xpos, getRow()*400*scale()+20);		
+		
 		deleteButton->setPos(896+trans, 168);
 		addButton->setPos(500+trans/2, 368);
 		
 		if( actionButton )
 			actionButton->setPos(500+trans, 40);
-				
+		
 		update();
 	}
 

@@ -160,7 +160,7 @@ namespace Aseba
 		scene->setSceneRect(QRectF(0, 0, 540, 600));
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		view->setMinimumWidth(290);
+		view->setMinimumWidth(300);
 		view->centerOn(250,0);
 		sceneLayout->addWidget(view);
 
@@ -267,11 +267,6 @@ namespace Aseba
 		scene->reset();
 		close();		
 	}
-	
-//	bool ThymioVisualProgramming::surviveTabDestruction() const 
-//	{
-//		return true;
-//	}
 
 	void ThymioVisualProgramming::showFlashDialog()
 	{		
