@@ -394,9 +394,8 @@ namespace Aseba
 		if( generatedCode.empty() )
 		{
 			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
-				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");
-			generatedCode.push_back(L"call sound.system(2)\ncall sound.system(3)\ncall sound.system(-1)\n");
-			generatedCode.push_back(L"call leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
+				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");			
+			generatedCode.push_back(L"call sound.system(-1)\ncall leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
 		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
