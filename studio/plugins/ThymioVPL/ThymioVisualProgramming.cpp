@@ -116,7 +116,7 @@ namespace Aseba
 
 		ThymioPushButton *buttonsButton = new ThymioPushButton("button");
 		ThymioPushButton *proxButton = new ThymioPushButton("prox");
-		ThymioPushButton *proxGroundButton = new ThymioPushButton("proxground");		
+		ThymioPushButton *proxGroundButton = new ThymioPushButton("proxground");
 		ThymioPushButton *tapButton = new ThymioPushButton("tap", tapSvg);
 		ThymioPushButton *clapButton = new ThymioPushButton("clap", clapSvg);
 
@@ -196,7 +196,7 @@ namespace Aseba
 
 		horizontalLayout->addLayout(actionsLayout);
 		
-		// make connections		
+		// make connections
 		connect(buttonsButton, SIGNAL(clicked()),this,SLOT(addButtonsEvent()));
 		connect(proxButton, SIGNAL(clicked()), this, SLOT(addProxEvent()));
 		connect(proxGroundButton, SIGNAL(clicked()), this, SLOT(addProxGroundEvent()));
@@ -212,14 +212,13 @@ namespace Aseba
 		QRect clientRect =  QApplication::desktop()->availableGeometry();
 
 		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )		
-			resize(clientRect.width()-100, clientRect.height()-100);	
-		
-	}	
+			resize(clientRect.width()-100, clientRect.height()-100);
+	}
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
 		delete(tapSvg);
-		delete(clapSvg);		
+		delete(clapSvg);
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *button)
