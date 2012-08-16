@@ -394,9 +394,9 @@ namespace Aseba
 		if( generatedCode.empty() )
 		{
 			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
-				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n\ncall sound.system(2)\ncall sound.system(3)\ncall sound.system(-1)\n");
-			else
-				generatedCode.push_back(L"call sound.system(2)\ncall sound.system(3)\ncall sound.system(-1)\n");
+				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");
+			generatedCode.push_back(L"call sound.system(2)\ncall sound.system(3)\ncall sound.system(-1)\n");
+			generatedCode.push_back(L"call leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
 		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
@@ -405,38 +405,33 @@ namespace Aseba
 		if( block < 0 )
 		{
 			block = generatedCode.size();
+			bool mflag = (buttonSet->getEventButton()->getMemoryState() >= 0 ? true : false);
 			
 			switch(name) 
 			{
 			case THYMIO_BUTTONS_IR:
 				generatedCode.push_back(L"onevent buttons\n");
-				if(buttonSet->getEventButton()->getMemoryState() >= 0)
-					generatedCode.push_back(L"\tstate = new_state\n\tcall leds.buttons(((state>>0) & 1)*32,((state>>1) & 1)*32,((state>>2) & 1)*32,((state>>3) & 1)*32)\n");
 				break;
 			case THYMIO_PROX_IR:
 				if( editor[THYMIO_PROX_GROUND_IR] < 0 )
-				{
 					generatedCode.push_back(L"onevent prox\n");
-					if(buttonSet->getEventButton()->getMemoryState() >= 0)
-						generatedCode.push_back(L"\tstate = new_state\n\tcall leds.buttons(((state>>0) & 1)*32,((state>>1) & 1)*32,((state>>2) & 1)*32,((state>>3) & 1)*32)\n");
-				}
 				else
+				{
 					block = editor[THYMIO_PROX_GROUND_IR];
+					mflag = false;
+				}
 				break;
 			case THYMIO_PROX_GROUND_IR:
 				if( editor[THYMIO_PROX_IR] < 0 )
-				{
 					generatedCode.push_back(L"onevent prox\n");
-					if(buttonSet->getEventButton()->getMemoryState() >= 0)
-						generatedCode.push_back(L"\tstate = new_state\n\tcall leds.buttons(((state>>0) & 1)*32,((state>>1) & 1)*32,((state>>2) & 1)*32,((state>>3) & 1)*32)\n");
-				}
 				else
+				{
 					block = editor[THYMIO_PROX_IR];
+					mflag = false;
+				}
 				break;
 			case THYMIO_TAP_IR:
-				generatedCode.push_back(L"onevent tap\n");
-				if(buttonSet->getEventButton()->getMemoryState() >= 0)
-					generatedCode.push_back(L"\tstate = new_state\n\tcall leds.buttons(((state>>0) & 1)*32,((state>>1) & 1)*32,((state>>2) & 1)*32,((state>>3) & 1)*32)\n");				
+				generatedCode.push_back(L"onevent tap\n");			
 				break;
 			case THYMIO_CLAP_IR:
 				if( generatedCode.empty() || generatedCode[0].find(L"var new_state = 0\n") == wstring::npos )
@@ -451,14 +446,15 @@ namespace Aseba
 				else
 					generatedCode[0].append(L"\nmic.threshold = 250\n");
 				generatedCode.push_back(L"onevent mic\n");
-				if(buttonSet->getEventButton()->getMemoryState() >= 0)
-					generatedCode.push_back(L"\tstate = new_state\n\tcall leds.buttons(((state>>0) & 1)*32,((state>>1) & 1)*32,((state>>2) & 1)*32,((state>>3) & 1)*32)");				
 				break;	
 			default:
 				errorCode = THYMIO_INVALID_CODE;
 				return;
 				break;
 			}
+
+			if(mflag)
+				generatedCode.push_back(L"\tstate = new_state\n\tcall leds.temperature(((state>>0) & 1)*10+((state>>1) & 1)*22,((state>>2) & 1)*10+((state>>3) & 1)*22)\n");
 
 			editor[name] = block;
 		}

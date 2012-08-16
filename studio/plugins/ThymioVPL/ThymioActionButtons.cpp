@@ -318,6 +318,9 @@ namespace Aseba
 		
 		for(uint i=0; i<4; i++)
 		{
+			//ThymioClickableButton *button = new ThymioClickableButton(QRectF(-15,-30,30,60), THYMIO_CIRCULAR_BUTTON, 2, this);//THYMIO_RECTANGULAR_BUTTON , 2, this);
+			//button->setPos(128 + (2-i)*(i%2)*60, 138 + (i-1)*((i+1)%2)*60); 
+			//button->setRotation(90*(i+1));
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 
 			button->setPos(128, i*60 + 40);
