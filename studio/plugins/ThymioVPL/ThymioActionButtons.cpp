@@ -66,24 +66,7 @@ namespace Aseba
 			pt[i] = (sliders[i]->value())*0.06; // [-30,30]
 		
 		timer->stop();
-		timer->setLoopCount(1);//+(int)(rate*0.005));
-
-#if 0
-		double angle=0;
-		double fspeed=(pt[0]+pt[1])*0.5; // (lspeed + rspeed)/2
-		double aspeed=atan((pt[1]-pt[0])/47.6); // (rspeed - lspeed)/dist
-		QPointF pos(0.0, 0.0);
-		
-		for (int i = 0; i < 200; ++i)
-		{
-			qreal step = i/200.0;
-			animation->setPosAt(step, pos+QPointF(128,128));
-			animation->setRotationAt(step, angle*180/3.14);
-						
-			pos += QPointF(fspeed*cos(angle+aspeed/200.0*0.5), fspeed*sin(angle+aspeed/200.0*0.5));
-			angle += aspeed/200.0;
-		}
-#else			
+		timer->setLoopCount(1);
 
 		double angle=0;
 		double center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));		
@@ -96,8 +79,6 @@ namespace Aseba
 			animation->setPosAt(step, QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128));	
 			animation->setRotationAt(step, angle);
 		}
-#endif
-
 		timer->start();
 	}
 
@@ -254,6 +235,7 @@ namespace Aseba
 			button->setPos(128 - 90*qCos(0.785398163*offset+1.57079633), 
 						   128 - 90*qSin(0.785398163*offset+1.57079633));
 
+			button->setBeginButtonColor(QColor(255, 222, 214.8));
 			button->setButtonColor(QColor(255, 90, 54));
 
 			thymioButtons.push_back(button);
@@ -336,10 +318,13 @@ namespace Aseba
 		
 		for(uint i=0; i<4; i++)
 		{
+			//ThymioClickableButton *button = new ThymioClickableButton(QRectF(-15,-30,30,60), THYMIO_CIRCULAR_BUTTON, 2, this);//THYMIO_RECTANGULAR_BUTTON , 2, this);
+			//button->setPos(128 + (2-i)*(i%2)*60, 138 + (i-1)*((i+1)%2)*60); 
+			//button->setRotation(90*(i+1));
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 
 			button->setPos(128, i*60 + 40);
-			button->setButtonColor(Qt::gray);
+			button->setButtonColor(QColor(255,200,0));
 
 			thymioButtons.push_back(button);
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));

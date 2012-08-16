@@ -65,6 +65,7 @@ namespace Aseba
 		
 		multimap<wstring, ThymioIRButton*> *currentHash;
 		multimap<wstring, ThymioIRButton*> tempHash;
+		
 		switch( activeActionName )
 		{
 		case THYMIO_MOVE_IR:
@@ -101,7 +102,7 @@ namespace Aseba
 				currentHash->insert(*itr);
 		}
 
-		wstring buttonname = button->getBasename();
+		wstring buttonname = button->getBasename() + L"_" + toWstring(button->getMemoryState());;
 		for(int i=0; i<button->size(); i++)
 		{	
 			if( button->isClicked(i) > 0 )
@@ -110,8 +111,6 @@ namespace Aseba
 				buttonname += toWstring(i);
 				buttonname += L"_";
 				buttonname += toWstring(button->isClicked(i));
-				buttonname += L"_";
-				buttonname += toWstring(button->getMemoryState());
 			}
 		}
 
@@ -134,29 +133,8 @@ namespace Aseba
 				
 		errorCode = THYMIO_NO_ERROR;
 
-		ThymioIRButtonName actionName = buttonSet->getActionButton()->getName();
+		activeActionName = buttonSet->getActionButton()->getName();
 
-		multimap<wstring, ThymioIRButton*> *currentHash;
-		switch( actionName )
-		{
-		case THYMIO_MOVE_IR:
-			currentHash = &moveHash;
-			break;
-		case THYMIO_COLOR_IR:
-			currentHash = &colorHash;
-			break;
-		case THYMIO_CIRCLE_IR:
-			currentHash = &circleHash;
-			break;
-		case THYMIO_SOUND_IR:
-			currentHash = &soundHash;
-			break;
-		default:
-			return;
-			break;
-		}
-		
-		activeActionName = actionName;
 		visit(buttonSet->getEventButton());			
 	}
 
@@ -389,7 +367,7 @@ namespace Aseba
 					text += L"call sound.system(4)\n"; // scared
 				break;
 			case THYMIO_MEMORY_IR:
-				text += L"state = ";
+				text += L"new_state = ";
 				for(int i=0; i<button->size(); ++i)
 					val += (button->isClicked(i)*(0x01<<i));
 				text += toWstring(val);
@@ -413,8 +391,13 @@ namespace Aseba
 		
 		errorCode = THYMIO_NO_ERROR;
 		
-		if( generatedCode.empty() && buttonSet->getEventButton()->getMemoryState() >= 0 )
-			generatedCode.push_back(L"var state = 0\n");
+		if( generatedCode.empty() )
+		{
+			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
+				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");
+			generatedCode.push_back(L"call sound.system(2)\ncall sound.system(3)\ncall sound.system(-1)\n");
+			generatedCode.push_back(L"call leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
+		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		int block = editor[name];
@@ -422,6 +405,7 @@ namespace Aseba
 		if( block < 0 )
 		{
 			block = generatedCode.size();
+			bool mflag = (buttonSet->getEventButton()->getMemoryState() >= 0 ? true : false);
 			
 			switch(name) 
 			{
@@ -432,19 +416,25 @@ namespace Aseba
 				if( editor[THYMIO_PROX_GROUND_IR] < 0 )
 					generatedCode.push_back(L"onevent prox\n");
 				else
+				{
 					block = editor[THYMIO_PROX_GROUND_IR];
+					mflag = false;
+				}
 				break;
 			case THYMIO_PROX_GROUND_IR:
 				if( editor[THYMIO_PROX_IR] < 0 )
 					generatedCode.push_back(L"onevent prox\n");
 				else
+				{
 					block = editor[THYMIO_PROX_IR];
+					mflag = false;
+				}
 				break;
 			case THYMIO_TAP_IR:
-				generatedCode.push_back(L"onevent tap\n");
+				generatedCode.push_back(L"onevent tap\n");			
 				break;
 			case THYMIO_CLAP_IR:
-				if( generatedCode.empty() || generatedCode[0].find(L"var state = 0\n") == wstring::npos )
+				if( generatedCode.empty() || generatedCode[0].find(L"var new_state = 0\n") == wstring::npos )
 				{
 					generatedCode.insert(generatedCode.begin(),L"mic.threshold = 250\n");
 					for(map<ThymioIRButtonName, int>::iterator itr = editor.begin();
@@ -454,7 +444,7 @@ namespace Aseba
 					block += 1;
 				}
 				else
-					generatedCode[0].append(L"mic.threshold = 250\n");
+					generatedCode[0].append(L"\nmic.threshold = 250\n");
 				generatedCode.push_back(L"onevent mic\n");
 				break;	
 			default:
@@ -462,6 +452,9 @@ namespace Aseba
 				return;
 				break;
 			}
+
+			if(mflag)
+				generatedCode.push_back(L"\tstate = new_state\n\tcall leds.temperature(((state>>0) & 1)*10+((state>>1) & 1)*22,((state>>2) & 1)*10+((state>>3) & 1)*22)\n");
 
 			editor[name] = block;
 		}
