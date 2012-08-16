@@ -26,16 +26,16 @@ from string import Template
 import re
 import subprocess
 
-INPUT_DIRECTORY = '.'
+INPUT_DIRECTORY = '../../compiler'
 INPUT_FILE = 'errors.cpp'
 
 OUTPUT_CODE_FILE = 'errors_code.h'
 OUTPUT_CODE_DIRECTORY = INPUT_DIRECTORY
 
 OUTPUT_QT_FILE = 'CompilerTranslator.cpp'
-OUTPUT_QT_DIRECTORY = '../studio'
+OUTPUT_QT_DIRECTORY = '../../studio/translations'
 
-OUTPUT_TRANSLATION_DIRECTORY = '../studio'
+OUTPUT_TRANSLATION_DIRECTORY = '../../studio'
 translation_files = list()
 translation_files.append(['french', 'fr', 'compiler_fr.ts'])
 translation_files.append(['german', 'de', 'compiler_de.ts'])
@@ -75,7 +75,7 @@ output_code_file_template = Template(output_code_file)
 output_qt_file = \
 """
 #include "CompilerTranslator.h"
-#include "../compiler/errors_code.h"
+#include "../../compiler/errors_code.h"
 
 #include <CompilerTranslator.moc>
 
