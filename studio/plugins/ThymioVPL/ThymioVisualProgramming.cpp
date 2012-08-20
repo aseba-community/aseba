@@ -31,15 +31,13 @@ namespace Aseba
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 
 		resize(windowWidth, windowHeight);
-		setMinimumSize(QSize(480,448));
+		setMinimumSize(QSize(450,400));
 		
 		mainLayout = new QVBoxLayout(this);
 		
 		toolBar = new QToolBar();
-		toolBar->setMinimumHeight(32);
-		toolBar->setMinimumWidth(300);
 		toolBar->setMaximumHeight(64);
-		toolBar->setIconSize(QSize(32,32));
+		toolBar->setIconSize(QSize(24,24));
 		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		mainLayout->addWidget(toolBar);
 
@@ -73,7 +71,7 @@ namespace Aseba
 	
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
-		colorComboButton->setIconSize(QSize(64,32));
+		//colorComboButton->setIconSize(QSize(64,32));
 
 		advancedButton->setIcon(QIcon(":/images/run.png"));
 		advancedButton->setToolTip(tr("Advanced mode"));
@@ -157,11 +155,10 @@ namespace Aseba
 		view = new QGraphicsView(scene);
 		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);		
 		view->setRenderHint(QPainter::Antialiasing);
-		scene->setSceneRect(QRectF(0, 0, 540, 600));
+//		scene->setSceneRect(QRectF(0, 0, 540, 600));
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		view->setMinimumWidth(300);
-		view->centerOn(250,0);
+		view->centerOn(200,0);
 		sceneLayout->addWidget(view);
 
 		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
@@ -692,27 +689,21 @@ namespace Aseba
 	{
 		QSize iconSize;
 		QSize deltaSize = (event->size() - QSize(windowWidth, windowHeight));
-		double scaleH = 1 + (double)deltaSize.height()/(windowHeight-100);
-		double scaleV = 1 + (double)deltaSize.width()/(windowWidth-100);
+		double scaleH = 1 + 1.2*(double)deltaSize.height()/windowHeight;
+		double scaleV = 1 + 1.2*(double)deltaSize.width()/windowWidth;
 		double scale = (scaleH < scaleV ? (scaleH > 1.95 ? 1.95 : scaleH) :
  										  (scaleV > 1.95 ? 1.95 : scaleV) );
 
 		iconSize = QSize(128*scale, 128*scale);
 		scene->setScale(scale);
-
+		
 		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
-		{
 			(*itr)->setIconSize(iconSize);
-			(*itr)->resize(iconSize+QSize(4,4));
-		}
 
 		for(QList<ThymioPushButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
-		{
 			(*itr)->setIconSize(iconSize);
-			(*itr)->resize(iconSize+QSize(4,4));
-		}
 	}
 
 };

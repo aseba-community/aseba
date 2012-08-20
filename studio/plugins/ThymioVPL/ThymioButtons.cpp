@@ -212,7 +212,6 @@ namespace Aseba
 		if( buttonIR == 0 )
 		{
 			QString name = getName();
-
 			//qDebug() << "getIRButton num: " << num;
 
 			if( name == "button" )
@@ -230,7 +229,7 @@ namespace Aseba
 			else if( name == "color" )
 				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR, 0);
 			else if( name == "circle" )
-				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR, 5);
+				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR, 3);
 			else if( name == "sound" )
 				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR, 2);
 			else if( name == "memory" )
@@ -530,7 +529,7 @@ namespace Aseba
 		errorFlag(false),
 		advancedMode(advanced),
 		trans(advanced ? 64 : 0),
-		xpos(advanced ? 5 : 15)
+		xpos(advanced ? 5*scale() : 15*scale())
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
@@ -539,7 +538,7 @@ namespace Aseba
 		addButton = new ThymioAddButton(this);
 		
 		deleteButton->setPos(896+trans, 168);
-		addButton->setPos(500+trans, 368);
+		addButton->setPos(500+trans/2, 368);
 		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
@@ -547,7 +546,7 @@ namespace Aseba
 		setCursor(Qt::OpenHandCursor);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
-		setPos(xpos, row*400*scale()+20);
+		setPos(xpos, (row*400+20)*scale());
 	}
 
 	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -631,7 +630,7 @@ namespace Aseba
 		setData(1,row); 
 		if( eventButton ) eventButton->setParentID(row);
 		if( actionButton ) actionButton->setParentID(row);
-		setPos(xpos, row*400*scale()+20);	
+		setPos(xpos, (row*400+20)*scale());	
 	}
 
 	void ThymioButtonSet::addEventButton(ThymioButton *event) 
@@ -681,7 +680,8 @@ namespace Aseba
 	void ThymioButtonSet::setScale(qreal factor)
 	{ 
 		QGraphicsItem::setScale(factor); 
-		setPos(xpos, getRow()*400*scale()+20);
+		xpos = (advancedMode ? 5*scale() : 15*scale());
+		setPos(xpos, (getRow()*400+20)*scale());
 		
 		if( eventButton ) 
 			eventButton->setScaleFactor(factor);
@@ -699,15 +699,15 @@ namespace Aseba
 		if( advanced ) 
 		{			
 			trans = 64;
-			xpos = 5;
+			xpos = 5*scale();
 		} 
 		else
 		{
 			trans = 0;
-			xpos = 15;
+			xpos = 15*scale();
 		}
 
-		setPos(xpos, getRow()*400*scale()+20);		
+		setPos(xpos, (getRow()*400+20)*scale());		
 		
 		deleteButton->setPos(896+trans, 168);
 		addButton->setPos(500+trans/2, 368);
@@ -972,7 +972,6 @@ namespace Aseba
 		setIcon(thymioButton->image()); 
 		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		
-		setMinimumSize(64,64);
 		setMaximumSize(256,256);
 		setIconSize(QSize(128,128));
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
