@@ -3,16 +3,16 @@ Copyright (C) 2007--2011:
 	
 	Stephane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
-	(original idea, framework architecture, main coding)
+	(original idea, framework architecture, core coder)
+	
+	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
+	(core coder, Windows maintainer)
 	
 	Philippe Retornaz <philippe dot retornaz at epfl dot ch> [1]
-	(inputs and coding on embedded integration)
-
-	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	(Windows maintainer, help system, additional coding)
+	(coder, embedded integration)
 
 	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
-	(additional coding)
+	(coder, VPL)
 
 	Sandra Moser [2]
 	(German translation)
