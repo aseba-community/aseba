@@ -718,8 +718,6 @@ namespace Aseba
 		//message->dump(std::cout);
 		//std::cout << std::endl;
 		
-		qDebug() << "msg from dashel";
-		
 		// let the description manager filter the message
 		descriptionManager.processMessage(message);
 		
