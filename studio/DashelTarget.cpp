@@ -369,9 +369,6 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] = &Aseba::DashelTarget::receivedBreakpointSetResult;
 		messagesHandlersMap[ASEBA_MESSAGE_BOOTLOADER_ACK] = &Aseba::DashelTarget::receivedBootloaderAck;
-		
-		// Send presence query
-		broadcastGetDescription();
 
 		dashelInterface.start();
 	}
@@ -720,6 +717,8 @@ namespace Aseba
 		bool deleteMessage = true;
 		//message->dump(std::cout);
 		//std::cout << std::endl;
+		
+		qDebug() << "msg from dashel";
 		
 		// let the description manager filter the message
 		descriptionManager.processMessage(message);
