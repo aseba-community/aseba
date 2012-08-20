@@ -228,14 +228,14 @@ namespace Aseba
 		
 		for(uint i=0; i<8; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25,-15,50,30), THYMIO_RECTANGULAR_BUTTON, 5, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25,-15,50,30), THYMIO_RECTANGULAR_BUTTON, 3, this);
 
 			qreal offset = (qreal)i;			
 			button->setRotation(45*offset);
 			button->setPos(128 - 90*qCos(0.785398163*offset+1.57079633), 
 						   128 - 90*qSin(0.785398163*offset+1.57079633));
 
-			button->setBeginButtonColor(QColor(255, 222, 214.8));
+			button->setBeginButtonColor(QColor(255, 172, 155));
 			button->setButtonColor(QColor(255, 90, 54));
 
 			thymioButtons.push_back(button);
