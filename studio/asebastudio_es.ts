@@ -32,27 +32,27 @@
     <message>
         <location filename="ConfigDialog.cpp" line="277"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>General</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="280"/>
         <source>Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editor</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="295"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="296"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="315"/>
         <source>Aseba Studio - Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio - Configuraciones</translation>
     </message>
 </context>
 <context>
@@ -124,12 +124,13 @@
     <message>
         <location filename="DashelTarget.cpp" line="1002"/>
         <source>Unexpected Dashel Error</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Is there any translation for Dashel?</translatorcomment>
+        <translation>Error Dashel inesperado</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="1002"/>
         <source>A communication error happened:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error de comunicación:</translation>
     </message>
 </context>
 <context>
@@ -137,17 +138,17 @@
     <message>
         <location filename="ConfigDialog.cpp" line="196"/>
         <source>Editor Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración del editor</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="199"/>
         <source>Autocompletion</source>
-        <translation type="unfinished"></translation>
+        <translation>Autocompletar</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="204"/>
         <source>Keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>Comandos</translation>
     </message>
 </context>
 <context>
@@ -299,32 +300,32 @@ Occurrences</source>
     <message>
         <location filename="ConfigDialog.cpp" line="159"/>
         <source>General Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración General</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="170"/>
         <source>Show hidden variables</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar variables ocultas</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="172"/>
         <source>Show line numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Enumerar líneas</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="166"/>
         <source>Show keyword toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar barra de comandos</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="161"/>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Disposición</translation>
     </message>
     <message>
         <location filename="ConfigDialog.cpp" line="168"/>
         <source>Show memory usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar uso de memoria</translation>
     </message>
 </context>
 <context>
@@ -627,7 +628,7 @@ Occurrences</source>
     <message>
         <location filename="MainWindow.cpp" line="2304"/>
         <source>Desynchronised! Please reload.</source>
-        <translation type="unfinished"></translation>
+        <translation>Desincronizado!Recargar por favor.</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="2357"/>
@@ -1109,7 +1110,7 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="3240"/>
         <source>Show memory usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar uso de memoria</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3322"/>
@@ -1136,7 +1137,7 @@ evento %0 : </translation>
         <location filename="MainWindow.cpp" line="3236"/>
         <source>Show &amp;keywords</source>
         <oldsource>Show &amp;keywords...</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar c&amp;omandos</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3330"/>
@@ -1180,12 +1181,12 @@ evento %0 : </translation>
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="328"/>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocultar</translation>
     </message>
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="329"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar</translation>
     </message>
 </context>
 <context>
@@ -1212,13 +1213,13 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="379"/>
         <source>Local Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Herramientas locales</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="425"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
         <oldsource>&lt;b&gt;Keywords &lt;<byte value="x8"/>&gt;</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Comandos&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="446"/>
@@ -1262,12 +1263,12 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="459"/>
         <source>&lt;b&gt;Execution&lt;/b&gt;</source>
-        <translation>Ejecución</translation>
+        <translation>&lt;b&gt;Ejecución&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="482"/>
         <source>&lt;b&gt;Variables&lt;/b&gt;</source>
-        <translation>Variables</translation>
+        <translation>&lt;b&gt;Variables&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="489"/>
@@ -1303,17 +1304,17 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="990"/>
         <source>variables: %1 on %2 (%3%)</source>
-        <translation type="unfinished"></translation>
+        <translation>variables: %1 en %2 (%3%)</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="991"/>
         <source>bytecode: %1 on %2 (%3%)</source>
-        <translation type="unfinished"></translation>
+        <translation>bytecode: %1 en %2 (%3%)</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="992"/>
         <source>&lt;b&gt;Memory usage&lt;/b&gt; : %1, %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Uso de memoria&lt;/b&gt; : %1, %2</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="1189"/>
@@ -1341,12 +1342,12 @@ evento %0 : </translation>
     <message>
         <location filename="DashelTarget.cpp" line="757"/>
         <source>Aseba Studio - Connection closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio - Conexión cerrada</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="758"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Atención, conexión cerrada: intentando conectarse nuevamente.</translation>
     </message>
 </context>
 <context>
@@ -1421,12 +1422,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="304"/>
         <source>Dashel Unexpected Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de Dashel inesperado</translation>
     </message>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="304"/>
         <source>A communication error happened during the flashing process:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error de comunicación durante el proceso de memoria flash:</translation>
     </message>
 </context>
 <context>
@@ -1434,22 +1435,22 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="329"/>
         <source>Line %0: Missing event</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea %0: Evento faltante</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="332"/>
         <source>Line %0: Missing action</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea %0: Acción faltante</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="335"/>
         <source>Line %0: Redeclaration of event</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea %0: Evento redeclarado</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="338"/>
         <source>Line %0: Unknown event/action type</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea %0: Tipo de evento/acción desconocido</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="341"/>
@@ -1460,7 +1461,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioScene.cpp" line="343"/>
         <source>Unknown VPL error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error VPL desconocido</translation>
     </message>
 </context>
 <context>
@@ -1468,47 +1469,47 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="31"/>
         <source>Thymio Visual Programming Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Lenguaje gráfico de programación para Thymio</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="57"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="60"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="63"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="66"/>
         <source>Save as</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar como</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="69"/>
         <source>Load &amp; Run</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar y ejecutar</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="72"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Detener</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="74"/>
         <source>Color scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>Esquema de colores</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="79"/>
         <source>Advanced mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo Avanzado</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="82"/>
@@ -1518,7 +1519,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="129"/>
         <source>&lt;b&gt;Events&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Eventos&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="144"/>
@@ -1528,32 +1529,32 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="179"/>
         <source>&lt;b&gt;Actions&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Acciones&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="258"/>
         <source>Launch VPL</source>
-        <translation type="unfinished"></translation>
+        <translation>Lanzar VPL</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="296"/>
         <source>Open Visual Programming Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir Lenguaje Gráfico de Programación</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="380"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Atención</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="381"/>
         <source>The document has been modified.</source>
-        <translation type="unfinished"></translation>
+        <translation>El documento ha sido modificdo.</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="382"/>
         <source>Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Desea conservar los cambios?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="539"/>
@@ -1566,7 +1567,7 @@ evento %0 : </translation>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="540"/>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="575"/>
         <source>Error in XML source file: %0 unknown event type</source>
-        <translation type="unfinished"></translation>
+        <translation>Error en archivo fuente XML: %0, tipo de evento desconocido</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="602"/>

@@ -1470,6 +1470,9 @@ namespace Aseba
 		updateWindowTitle();
 		if (readSettings() == false)
 			resize(1000,700);
+		
+		// when everything is ready, get description
+		target->broadcastGetDescription();
 	}
 	
 	MainWindow::~MainWindow()
