@@ -59,11 +59,11 @@ namespace Enki
 	public slots:
 		void addNewRobot();
 		void removeRobot();
-		void autoCameraStateChanged(int state);
+		void autoCameraStateChanged(bool state);
 	
 	protected:
 		virtual void timerEvent(QTimerEvent * event);
-		virtual void mouseMoveEvent ( QMouseEvent * event );
+		//virtual void mouseMoveEvent ( QMouseEvent * event );
 		virtual void keyPressEvent ( QKeyEvent * event );
 		virtual void keyReleaseEvent ( QKeyEvent * event );
 		
@@ -85,28 +85,17 @@ namespace Enki
 
 		QTextBrowser* helpViewer;
 
-		#ifndef Q_WS_MAC
-		QPushButton* addRobotButton;
-		QPushButton* delRobotButton;
-		QCheckBox* autoCamera;
-		QCheckBox* hideButtons;
-		QPushButton* helpButton;
-		QFrame* menuFrame;
-		/*
-		#else // Q_WS_MAC
-		QAction* autoCamera;
-		*/
-		#endif // Q_WS_MAC
-
 	public:
 		ChallengeApplication(World* world, int ePuckCount);
+		
+	public slots:
+		void fullScreenStateChanged(bool fullScreen);
 
 	signals:
 		void windowClosed();
 
 	protected:
 		virtual void closeEvent ( QCloseEvent * event );
-
 	};
 }
 

@@ -2,49 +2,76 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
 <context>
-    <name>Enki::ChallengeViewer</name>
+    <name>Enki::ChallengeApplication</name>
     <message>
-        <location filename="challenge.cpp" line="577"/>
+        <location filename="challenge.cpp" line="875"/>
         <source>Aseba Challenge Help</source>
         <translation>Aseba Challenge Hilfe</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="590"/>
-        <location filename="challenge.cpp" line="616"/>
-        <location filename="challenge.cpp" line="646"/>
+        <location filename="challenge.cpp" line="890"/>
         <source>Add a new robot</source>
         <translation>Eines Roboters hinzufügen</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="592"/>
-        <location filename="challenge.cpp" line="617"/>
+        <location filename="challenge.cpp" line="892"/>
         <source>Remove all robots</source>
         <translation>Alle Roboter entferner</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="594"/>
-        <location filename="challenge.cpp" line="619"/>
+        <location filename="challenge.cpp" line="894"/>
         <source>Auto camera</source>
         <translation>Automatische Kamera</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="596"/>
-        <source>Auto hide</source>
-        <translation>Autohide</translation>
+        <location filename="challenge.cpp" line="896"/>
+        <source>Full screen</source>
+        <translation>Vollbild</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="598"/>
-        <location filename="challenge.cpp" line="623"/>
+        <location filename="challenge.cpp" line="900"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="615"/>
-        <source>Simulator control</source>
-        <translation>Simulatorkontroll</translation>
+        <location filename="challenge.cpp" line="902"/>
+        <source>Quit</source>
+        <translation>Verlassen</translation>
+    </message>
+</context>
+<context>
+    <name>Enki::ChallengeViewer</name>
+    <message>
+        <source>Aseba Challenge Help</source>
+        <translation type="obsolete">Aseba Challenge Hilfe</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="646"/>
+        <location filename="challenge.cpp" line="587"/>
+        <source>Add a new robot</source>
+        <translation>Eines Roboters hinzufügen</translation>
+    </message>
+    <message>
+        <source>Remove all robots</source>
+        <translation type="obsolete">Alle Roboter entferner</translation>
+    </message>
+    <message>
+        <source>Auto camera</source>
+        <translation type="obsolete">Automatische Kamera</translation>
+    </message>
+    <message>
+        <source>Auto hide</source>
+        <translation type="obsolete">Autohide</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="obsolete">Hilfe</translation>
+    </message>
+    <message>
+        <source>Simulator control</source>
+        <translation type="obsolete">Simulatorkontroll</translation>
+    </message>
+    <message>
+        <location filename="challenge.cpp" line="587"/>
         <source>Robot name:</source>
         <translation>Name des Roboters:</translation>
     </message>
@@ -52,17 +79,17 @@
 <context>
     <name>LanguageSelectionDialog</name>
     <message>
-        <location filename="challenge.cpp" line="1023"/>
+        <location filename="challenge.cpp" line="1069"/>
         <source>Please choose your language</source>
         <translation>Bitte wählen Sie Ihre Sprache</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="1040"/>
+        <location filename="challenge.cpp" line="1088"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="challenge.cpp" line="1044"/>
+        <location filename="challenge.cpp" line="1092"/>
         <source>Language selection</source>
         <translation>Sprachauswahl</translation>
     </message>

@@ -615,14 +615,11 @@ namespace Enki
 		ePuckCount = 0;
 	}
 
-	void ChallengeViewer::autoCameraStateChanged(int state)
+	void ChallengeViewer::autoCameraStateChanged(bool state)
 	{
-		if (state == Qt::Unchecked)
-			autoCamera = false;
-		else if (state == Qt::Checked)
-			autoCamera = true;
+		autoCamera = state;
 	}
-
+	
 	void ChallengeViewer::timerEvent(QTimerEvent * event)
 	{
 		if (autoCamera)
@@ -636,11 +633,11 @@ namespace Enki
 		}
 		ViewerWidget::timerEvent(event);
 	}
-
+/*
 	void ChallengeViewer::mouseMoveEvent ( QMouseEvent * event )
 	{
 		#ifndef Q_WS_MAC
-/*
+
 		bool isInButtonArea = event->y() < addRobotButton->y() + addRobotButton->height() + 10;
 		if (hideButtons->isChecked())
 		{
@@ -653,12 +650,12 @@ namespace Enki
 				menuFrame->hide();
 			}
 		}
-*/
+
 		#endif // Q_WS_MAC
 		
 		ViewerWidget::mouseMoveEvent(event);
 	}
-	
+*/
 	void ChallengeViewer::keyPressEvent ( QKeyEvent * event )
 	{
 		if (event->key() == Qt::Key_V)
@@ -865,6 +862,7 @@ namespace Enki
 	ChallengeApplication::ChallengeApplication(World* world, int ePuckCount) :
 		viewer(world, ePuckCount)
 	{
+		// help viewer
 		helpViewer = new QTextBrowser();
 		helpViewer->setReadOnly(true);
 		helpViewer->resize(600, 500);
@@ -878,34 +876,36 @@ namespace Enki
 
 		connect(this, SIGNAL(windowClosed()), helpViewer, SLOT(close()));
 
-
-		#ifndef Q_WS_MAC
-
+		// main windows layout
 		QVBoxLayout *vLayout = new QVBoxLayout;
 		QHBoxLayout *hLayout = new QHBoxLayout;
 
 		hLayout->addStretch();
 
-		menuFrame = new QFrame();
-		menuFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
 		// construction of menu frame
+		QFrame* menuFrame = new QFrame();
+		//menuFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
+		menuFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
 		QHBoxLayout *frameLayout = new QHBoxLayout;
-		addRobotButton = new QPushButton(tr("Add a new robot"));
+		QPushButton* addRobotButton = new QPushButton(tr("Add a new robot"));
 		frameLayout->addWidget(addRobotButton);
-		delRobotButton = new QPushButton(tr("Remove all robots"));
+		QPushButton* delRobotButton = new QPushButton(tr("Remove all robots"));
 		frameLayout->addWidget(delRobotButton);
-		autoCamera = new QCheckBox(tr("Auto camera"));
+		QCheckBox* autoCamera = new QCheckBox(tr("Auto camera"));
 		frameLayout->addWidget(autoCamera);
+		QCheckBox* fullScreen = new QCheckBox(tr("Full screen"));
+		frameLayout->addWidget(fullScreen);
 		//hideButtons = new QCheckBox(tr("Auto hide"));
 		//frameLayout->addWidget(hideButtons);
-		helpButton = new QPushButton(tr("Help"));
+		QPushButton* helpButton = new QPushButton(tr("Help"));
 		frameLayout->addWidget(helpButton);
+		QPushButton* quitButton = new QPushButton(tr("Quit"));
+		frameLayout->addWidget(quitButton);
 		menuFrame->setLayout(frameLayout);
 
 //		menuFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		viewer.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 		resize(780, 560);
-
 
 		// construction of the screen layout
 		hLayout->addWidget(menuFrame);
@@ -913,14 +913,16 @@ namespace Enki
 
 		vLayout->addLayout(hLayout);
 		vLayout->addWidget(&viewer);
+		vLayout->setContentsMargins(0,4,0,0);
 		setLayout(vLayout);
-
 
 		connect(addRobotButton, SIGNAL(clicked()), &viewer, SLOT(addNewRobot()));
 		connect(delRobotButton, SIGNAL(clicked()), &viewer, SLOT(removeRobot()));
-		connect(autoCamera, SIGNAL(stateChanged(int)), &viewer, SLOT(autoCameraStateChanged(int)));
+		connect(autoCamera, SIGNAL(toggled(bool)), &viewer, SLOT(autoCameraStateChanged(bool)));
+		connect(fullScreen, SIGNAL(toggled(bool)), SLOT(fullScreenStateChanged(bool)));
 		connect(helpButton, SIGNAL(clicked()), helpViewer, SLOT(show()));
-
+		connect(quitButton, SIGNAL(clicked()), SLOT(close()));
+		
 		autoCamera->setCheckState(Qt::Checked);
 
 		/*
@@ -936,10 +938,18 @@ namespace Enki
 		menu->addAction(autoCamera);
 		menu->addSeparator();
 		menu->addAction(tr("Help"), helpViewer, SLOT(show()));
-		*/
+		
 		#endif // Q_WS_MAC
+		*/
 	}
-
+	
+	void ChallengeApplication::fullScreenStateChanged(bool fullScreen)
+	{
+		if (fullScreen)
+			showFullScreen();
+		else
+			showNormal();
+	}
 
 	void ChallengeApplication::closeEvent ( QCloseEvent * event )
 	{
@@ -1063,6 +1073,7 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 	languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
 	languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
 	languageSelectionBox->addItem(QString::fromUtf8("German"), "de");
+	languageSelectionBox->addItem(QString::fromUtf8("Español"), "es");
 	//qDebug() << "locale is " << QLocale::system().name();
 	for (int i = 0; i < languageSelectionBox->count(); ++i)
 	{
@@ -1093,9 +1104,9 @@ int main(int argc, char *argv[])
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 	
-	qDebug() << QLocale::system().name();
+	//qDebug() << QLocale::system().name();
 	QTranslator translator;
-	qDebug() << translator.load(QString(":/asebachallenge_") + QLocale::system().name());
+	translator.load(QString(":/asebachallenge_") + QLocale::system().name());
 	app.installTranslator(&translator);
 	
 	// choose the language
@@ -1148,7 +1159,6 @@ int main(int argc, char *argv[])
 	}
 	
 	// Create viewer
-	//Enki::ChallengeViewer viewer(&world, ePuckCount);
 	Enki::ChallengeApplication viewer(&world, ePuckCount);
 	
 	// Show and run
