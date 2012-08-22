@@ -1312,7 +1312,8 @@ namespace Aseba
 				varAddr = preNode->getVectorAddr();
 				varSize = preNode->getVectorSize();
 
-				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
+				MemoryVectorNode* memoryPreNode(dynamic_cast<MemoryVectorNode*>(preNode.get()));
+				if (memoryPreNode == 0 || !memoryPreNode->isAddressStatic())
 				{
 					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
 					varAddr = preNode->getVectorAddr();

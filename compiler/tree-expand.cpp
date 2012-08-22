@@ -137,8 +137,7 @@ namespace Aseba
 			return array.release();
 		}
 	}
-
-
+	
 	Node* ArithmeticAssignmentNode::expandToAsebaTree(std::wostream* dump, unsigned int index)
 	{
 		assert(children.size() == 2);
@@ -324,7 +323,7 @@ namespace Aseba
 	{
 		assert(children.size() <= 1);
 
-		unsigned shift = 0;
+		int shift = 0;
 
 		// index(es) given?
 		if (children.size() == 1)
@@ -339,6 +338,8 @@ namespace Aseba
 				return E_NOVAL;
 		}
 
+		if (shift < 0 || shift >= int(arraySize))
+			throw TranslatableError(sourcePos, ERROR_ARRAY_OUT_OF_BOUND).arg(arrayName).arg(shift).arg(arraySize);
 		return arrayAddr + shift;
 	}
 
@@ -362,8 +363,12 @@ namespace Aseba
 				}
 				else if (numberOfIndex == 2)
 				{
+					const int im0(index->getImmediateValue(0));
+					const int im1(index->getImmediateValue(1));
+					if (im1 < 0 || im1 >= int(arraySize))
+						throw TranslatableError(sourcePos, ERROR_ARRAY_OUT_OF_BOUND).arg(arrayName).arg(im1).arg(arraySize);
 					// foo[n:m] -> compute the span
-					return index->getImmediateValue(1) - index->getImmediateValue(0) + 1;
+					return im1 - im0 + 1;
 				}
 				else
 					// whaaaaat? Are you trying foo[[1,2,3]]?
@@ -376,6 +381,17 @@ namespace Aseba
 		else
 			// full array access
 			return arraySize;
+	}
+	
+	//! return whether this node accesses a static address
+	bool MemoryVectorNode::isAddressStatic() const
+	{
+		if (children.empty())
+			return true;
+		TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
+		if (index && index->children.size() <= 2 && index->isImmediateVector())
+			return true;
+		return false;
 	}
 
 	bool TupleVectorNode::isImmediateVector() const

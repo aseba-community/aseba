@@ -537,6 +537,7 @@ namespace Aseba
 
 		virtual unsigned getVectorAddr() const;
 		virtual unsigned getVectorSize() const;
+		bool isAddressStatic() const;
 
 		virtual void setWrite(bool write) { this->write = write; }
 	};
