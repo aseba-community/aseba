@@ -1034,7 +1034,11 @@ namespace Aseba
 		else
 		{
 			// check if 2nd token is a comma
-			if ( !(tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA) )
+			if ( !(
+				(tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA) ||
+				(tokens.size() >= 3 && tokens[0] == Token::TOKEN_OP_NEG && tokens[2] == Token::TOKEN_COMMA)
+				)
+			)
 			{
 				// no
 				return NULL;
