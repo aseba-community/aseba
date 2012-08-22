@@ -56,7 +56,8 @@ add_test(assignments ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURREN
 add_test(events ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/events.txt)
 add_test(general-tuple-events ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-events.txt)
 add_test(native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/native-function.txt)
-add_test(general-tuple-native-function.txt ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
+add_test(general-tuple-native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
+add_test(var-def-compat-issue135 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/var-def-compat-issue135.txt)
 
 
 # the following tests should fail
