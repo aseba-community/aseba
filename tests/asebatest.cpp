@@ -183,12 +183,35 @@ struct AsebaNode
 		/*d.namedVariables.push_back(TargetDescription::NamedVariable("id", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("source", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));*/
- 
-		TargetDescription::NativeFunction native(L"math.add", L"copy vectors");
-		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"dst", -1));
-		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"src1", -1));
-		native.parameters.push_back(TargetDescription::NativeFunctionParameter(L"src2", -1));
-		d.nativeFunctions.push_back(native);
+		
+		const AsebaNativeFunctionDescription** nativeDescs(nativeFunctionsDescriptions);
+		while (*nativeDescs)
+		{
+			const AsebaNativeFunctionDescription* nativeDesc(*nativeDescs);
+			std::string name(nativeDesc->name);
+			std::string doc(nativeDesc->doc);
+			
+			TargetDescription::NativeFunction native(
+				std::wstring(name.begin(), name.end()),
+				std::wstring(doc.begin(), doc.end())
+			);
+			
+			const AsebaNativeFunctionArgumentDescription* params(nativeDesc->arguments);
+			while (params->size)
+			{
+				AsebaNativeFunctionArgumentDescription param(*params);
+				name = param.name;
+				int size = param.size;
+				native.parameters.push_back(
+					TargetDescription::NativeFunctionParameter(std::wstring(name.begin(), name.end()), size)
+				);
+				++params;
+			}
+			
+			d.nativeFunctions.push_back(native);
+			
+			++nativeDescs;
+		}
 	}
 	
 	const TargetDescription* getTargetDescription() const
