@@ -317,6 +317,9 @@ namespace Aseba
 	
 	void NodeTab::timerEvent ( QTimerEvent * event )
 	{
+		if (mainWindow->nodes->currentWidget() != this)
+			return;
+			
 		// only fetch what is visible
 		const QList<TargetVariablesModel::Variable> variables(variablesModel->getVariables());
 		assert(variables.size() == variablesModel->rowCount());
