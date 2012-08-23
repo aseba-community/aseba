@@ -687,7 +687,7 @@ namespace Aseba
 			std::auto_ptr<Node> preNode(parseBinaryOrExpression());
 
 			// allocate memory?
-			if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
+			if (!dynamic_cast<MemoryVectorNode*>(preNode.get()) || preNode->getVectorAddr() == Node::E_NOVAL)
 			{
 				preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
 			}
@@ -1159,7 +1159,7 @@ namespace Aseba
 
 	unsigned Compiler::parseVariableDefSize()
 	{
-		int result = 0;
+		unsigned result = 0;
 
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
@@ -1312,8 +1312,8 @@ namespace Aseba
 				varAddr = preNode->getVectorAddr();
 				varSize = preNode->getVectorSize();
 
-				MemoryVectorNode* memoryPreNode(dynamic_cast<MemoryVectorNode*>(preNode.get()));
-				if (memoryPreNode == 0 || !memoryPreNode->isAddressStatic())
+				// allocate memory?
+				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()) || varAddr == Node::E_NOVAL)
 				{
 					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
 					varAddr = preNode->getVectorAddr();

@@ -88,7 +88,7 @@ namespace Aseba
 
 		enum MemoryErrorCode
 		{
-			E_NOVAL = 0
+			E_NOVAL = UINT_MAX
 		};
 		virtual unsigned getVectorAddr() const;
 		virtual unsigned getVectorSize() const;
