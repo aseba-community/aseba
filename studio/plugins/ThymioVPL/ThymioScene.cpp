@@ -179,23 +179,17 @@ namespace Aseba
 	}
 
 	void ThymioScene::reset()
-	{
-		//qDebug() << "ThymioScene -- reset " << buttonSets.size();		
-				
+	{	
 		clear();
 
 		ThymioButtonSet *button = createNewButtonSet();
 		button->setPos(15*scaleFactor, 20*scaleFactor); //advancedMode = false
 		
 		setSceneRect(QRectF(0, 0, 1030*scaleFactor, (buttonSets.size()+2)*400*scaleFactor));
-
-		//qDebug() << "  == TS -- reset : done";
 	}
 	
 	void ThymioScene::clear()
 	{
-		//qDebug() << "ThymioScene -- clear " << buttonSets.size();
-
 		advancedMode = false;
 		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
 			(*itr)->setAdvanced(false);	
@@ -213,9 +207,7 @@ namespace Aseba
 		
 		lastFocus = -1;
 		prevNewActionButton = false;
-		prevNewEventButton = false;
-
-		//qDebug() << "  == TS -- clear : done";		
+		prevNewEventButton = false;	
 	}
 	
 	void ThymioScene::setColorScheme(QColor eventColor, QColor actionColor)
@@ -242,8 +234,6 @@ namespace Aseba
 
 	void ThymioScene::removeButton(int row)
 	{
-		//qDebug() << "ThymioScene -- remove button " << row << ", " << buttonSets.size();
-		
 		Q_ASSERT( row < buttonSets.size() );
 			
 		ThymioButtonSet *button = buttonSets[row];
@@ -271,8 +261,6 @@ namespace Aseba
 		setSceneRect(QRectF(0, 0, 1030*scaleFactor, (buttonSets.size()+2)*400*scaleFactor));
 		
 		buttonUpdateDetected();
-		
-		//qDebug() << "  == TS -- remove button : done";
 	}
 	
 	void ThymioScene::insertButton(int row) 
