@@ -36,7 +36,7 @@ namespace Aseba
 		mainLayout = new QVBoxLayout(this);
 		
 		toolBar = new QToolBar();
-		toolBar->setMaximumHeight(64);
+		toolBar->setMaximumHeight(36);
 		toolBar->setIconSize(QSize(24,24));
 		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		mainLayout->addWidget(toolBar);
@@ -274,8 +274,10 @@ namespace Aseba
 	{
 		if( !scene->isEmpty() && warningDialog() ) 
 		{
+			bool advanced = scene->getAdvanced();
 			scene->reset();
 			thymioFilename.clear();
+			scene->setAdvanced(advanced);		
 		}
 	}
 
