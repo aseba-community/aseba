@@ -976,6 +976,8 @@ namespace Aseba
 		setIconSize(QSize(128,128));
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		
+		setStyleSheet("QPushButton {border: none;}");
+		
 		setAcceptDrops(true);
 	}
 	
