@@ -25,25 +25,55 @@
                 <a href="#toc0">Comments</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc1">Variables</a>
+                <a href="#toc1">Scalars</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc2">Notation</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc2">Events</a>
+                <a href="#toc3">Variables</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc4">Reserved keywords</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc5">Constants</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc6">Arrays</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc7">Array constructors</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc3">Expressions and Assignations</a>
+                <a href="#toc8">Expressions and assignations</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc9">Usage</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc4">Conditionals</a>
+                <a href="#toc10">Flow control</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc11">Conditionals</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc12">Loops</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc5">Loops</a>
+                <a href="#toc13">Blocks</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc14">Subroutines</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc15">Events</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc16">Return Statement</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc6">Subroutines</a>
-              </div>
-              <div style="margin-left: 1em;">
-                <a href="#toc7">Native Functions</a>
+                <a href="#toc17">Native functions</a>
               </div>
             </div>
           </div>
@@ -51,16 +81,16 @@
       </tr>
     </table>
     <p>
-      This help is also available within Aseba Studio in the <tt>Help-&gt;Language</tt> menu. When using technical words, these are linked to the corresponding Wikipedia article. You might also want to read the <a href="en_asebaconcepts.html">concepts</a> page first.
+      This help is also available within Aseba Studio in the <tt>Help-&gt;Language</tt> menu. When using technical words, these are linked to the corresponding Wikipedia article. You might also want to read the <a href="en_asebaconcepts.html">concepts</a> page first. The page presents the language as it is from version 1.2 of Aseba, for earlier versions, please read <a href="en_asebalanguage-1-1.html">this page</a>.
     </p>
     <p>
-      The Aseba language resembles <a href="http://en.wikipedia.org/wiki/Matlab">Matlab</a> (a common scientific programming language); this similarity allows developers with previous knowledge of some scripting language to feel quickly at ease with Aseba and thus lowers the learning curve. Semantically, it is a simple <a href="http://en.wikipedia.org/wiki/Imperative_programming">imperative programming language</a> with a single basic <a href="http://en.wikipedia.org/wiki/Data_type">type</a> (16 bit <a href="http://en.wikipedia.org/wiki/Signed_number_representations">signed</a> <a href="http://en.wikipedia.org/wiki/Integer_%28computer_science%29">integers</a>) and <a href="http://en.wikipedia.org/wiki/Array_data_type">arrays</a>. This simplicity allows developers to program behaviours with no prior knowledge of a <a href="http://en.wikipedia.org/wiki/Type_system">type system</a>, integers being the most natural type of variables and well suited to programming <a href="http://en.wikipedia.org/wiki/Microcontroller">microcontroller</a>-based mobile robots.
+      The Aseba language resembles <a href="http://en.wikipedia.org/wiki/Matlab">Matlab</a> (a common scientific programming language); this similarity allows developers with previous knowledge of some scripting language to feel quickly at ease with Aseba and thus lowers the learning curve. Semantically, it is a simple <a href="http://en.wikipedia.org/wiki/Imperative_programming">imperative programming language</a> with a single basic <a href="http://en.wikipedia.org/wiki/Data_type">data type</a> (16 bit <a href="http://en.wikipedia.org/wiki/Signed_number_representations">signed</a> <a href="http://en.wikipedia.org/wiki/Integer_%28computer_science%29">integers</a>) and <a href="http://en.wikipedia.org/wiki/Array_data_type">arrays</a>. This simplicity allows developers to program behaviours with no prior knowledge of a <a href="http://en.wikipedia.org/wiki/Type_system">type system</a>, integers being the most natural type of variables and well suited to programming <a href="http://en.wikipedia.org/wiki/Microcontroller">microcontroller</a>-based mobile robots.
     </p>
     <h1 id="toc0">
       <span>Comments</span>
     </h1>
     <p>
-      Comments allow to add information that is ignored by the <a href="http://en.wikipedia.org/wiki/Compiler">compiler</a>. Comments are very useful to annotate your code with human-readable notes or to temporary disable some code. Comments begin with a <em>#</em> and terminate at the end of the line.
+      Comments allow information to be added which is ignored by the <a href="http://en.wikipedia.org/wiki/Compiler">compiler</a>. Comments are very useful to annotate the code with human-readable notes or to temporarily disable some code. Comments begin with a <em>#</em> and terminate at the end of the line.
     </p>
     <p>
       Example:
@@ -68,7 +98,7 @@
     <div class="code">
       <pre>
 <code># this is a comment
-var b    # another comment</code>
+var b # another comment</code>
 </pre>
     </div><br />
     Comments spanning several lines are also possible. They begin with <em>#*</em> and end with <em>*#</em>.
@@ -81,14 +111,63 @@ var b    # another comment</code>
 this is a comment spanning
 several lines
 *#
-var b    # a simple comment</code>
+var b # a simple comment</code>
 </pre>
     </div>
     <h1 id="toc1">
+      <span>Scalars</span>
+    </h1>
+    <p>
+      <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">Scalar values</a> are used in Aseba to represent numbers. They can be used in any expressions, like the initialisation of a variable, a mathematical expression or in a logical condition.
+    </p>
+    <h2 id="toc2">
+      <span>Notation</span>
+    </h2>
+    <p>
+      Scalars can be given using several <a href="http://en.wikipedia.org/wiki/Radix">radices</a>. The most natural way is the <a href="http://en.wikipedia.org/wiki/Decimal">decimal system</a>, using digits from 0 to 9. Negative numbers are declared using a <tt>-</tt> (minus) sign in front of the number.
+    </p>
+    <div class="code">
+      <pre>
+<code>i = 42
+i = 31415
+i = -7</code>
+</pre>
+    </div>
+    <p>
+      Both <a href="http://en.wikipedia.org/wiki/Binary_numeral_system">binary</a> and <a href="http://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a> numbers can also be used. Binary numbers are prefixed by <tt>0b</tt>, whereas hexadecimal numbers are prefixed by <tt>0x</tt>.
+    </p>
+    <div class="code">
+      <pre>
+<code># binary notation
+i = 0b110         # i = 6
+i = 0b11111111    # i = 255
+
+# hexadecimal notation
+i = 0x10    # i = 16
+i = 0xff    # i = 255</code>
+</pre>
+    </div>
+    <h1 id="toc3">
       <span>Variables</span>
     </h1>
     <p>
-      Variables refer either to single <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">scalar</a> values or to arrays of scalar values. The values are comprised between -32768 and 32767, which is the range of 16 bit signed integers. You can access array elements using the usual <a href="http://en.wikipedia.org/wiki/Bracket#Uses_of_.22.5B.22_and_.22.5D.22">square parenthesis operator</a>; array indexes begin at zero. You must declare all user-defined variables at the beginning of the Aseba script before doing any processing.
+      Variables refer either to single <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">scalar</a> values or to arrays of scalar values. The values are comprised between -32768 and 32767, which is the range of 16 bit signed integers. You must declare all user-defined variables, using the keyword <tt>var</tt>, at the beginning of the Aseba script before doing any processing.
+    </p>
+    <p>
+      The name of a variable is defined by these rules:
+    </p>
+    <ul>
+      <li>The name can only contain upper or lower case alphabetic characters, '_' or '.'
+      </li>
+      <li>The name must start with a valid alphabetic character or '_'
+      </li>
+      <li>The name is case sensitive: a variable named "foo" is different from one named "Foo"
+      </li>
+      <li>The name cannot be identical with one of Aseba's keywords (see <a href="http://aseba.wikidot.com/en:asebausermanual#restricted-keywords">reserved keywords</a>)
+      </li>
+    </ul>
+    <p>
+      Variables may be initialised in the declaration, using the assignation symbol and combined with any valid mathematical expression. A variable without any prior initialisation may have a random value, it should never be assumed to be zero.
     </p>
     <p>
       Example:
@@ -96,45 +175,180 @@ var b    # a simple comment</code>
     <div class="code">
       <pre>
 <code>var a
-var c[10]
 var b = 0
-var d[3] = 2, 3, 4</code>
+var c = 2*a + b        # warning: 'a' is not initialised</code>
 </pre>
     </div>
-    <h1 id="toc2">
-      <span>Events</span>
-    </h1>
+    <h2 id="toc4">
+      <span>Reserved keywords</span>
+    </h2>
     <p>
-      Aseba is an <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-based architecture</a>, which means that events trigger code execution asynchronously.<br />
-      Events can be external, for instance a user-defined event coming from another Aseba node, or internal, for instance emitted by a sensor which provides updated data. The reception of an event executes, if defined, the block of code that begins with the <tt>onevent</tt> keyword followed by the name of the event; the code at the top of the script is executed when the script is started or reset. The script can also send events by using the <tt>emit</tt> keyword, followed by the name of the event and the name of the variable to send, if any. If a variable is provided, the size of the event must match the size of the <a href="http://en.wikipedia.org/wiki/Argument_%28computer_science%29">argument</a> to be emitted. Events allow the script to trigger the execution of code on another node or to communicate with an external program.
+      <a name="restricted-keywords" id="restricted-keywords"></a>
     </p>
     <p>
-      To allow the execution of related code upon new events, scripts must not block and thus must not contain any infinite loop. For instance in the context of robotics, where a traditional robot control program would do some processing inside an infinite loop, an Aseba script would just do the processing inside a sensor-related event.
+      The following keywords cannot be used as a valid name for variables, as they are already used by the Aseba language.
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th colspan="4">
+          Keywords
+        </th>
+      </tr>
+      <tr>
+        <td>
+          abs
+        </td>
+        <td>
+          call
+        </td>
+        <td>
+          callsub
+        </td>
+        <td>
+          do
+        </td>
+      </tr>
+      <tr>
+        <td>
+          else
+        </td>
+        <td>
+          elseif
+        </td>
+        <td>
+          emit
+        </td>
+        <td>
+          end
+        </td>
+      </tr>
+      <tr>
+        <td>
+          for
+        </td>
+        <td>
+          if
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          onevent
+        </td>
+      </tr>
+      <tr>
+        <td>
+          return
+        </td>
+        <td>
+          step
+        </td>
+        <td>
+          sub
+        </td>
+        <td>
+          then
+        </td>
+      </tr>
+      <tr>
+        <td>
+          var
+        </td>
+        <td>
+          when
+        </td>
+        <td>
+          while
+        </td>
+        <td></td>
+      </tr>
+    </table>
+    <h2 id="toc5">
+      <span>Constants</span>
+    </h2>
+    <p>
+      <a href="http://en.wikipedia.org/wiki/Constant_%28programming%29">Constants</a> can be defined in Aseba Studio, using the "Constants" panel, but they cannot be defined directly in the code. A constant represents a numeric value, which can be used wherever a number can be used. But unlike a variable, a constant cannot be modified during execution. Constants are useful when you want to easily change the behaviour between different executions, such as while adapting a threshold value, with a scope spanning several Aseba nodes. A constant cannot have the same name as a variable, otherwise an error is raised.
+    </p>
+    <div class="code">
+      <pre>
+<code># assuming a constant named THRESHOLD
+var i = 600
+
+if i &gt; THRESHOLD then
+    i = THRESHOLD - 1
+end</code>
+</pre>
+    </div>
+    <h2 id="toc6">
+      <span>Arrays</span>
+    </h2>
+    <p>
+      Arrays represent a contiguous area in memory, addressed as a single logical entity. The size of an array is fixed and must be specified in the declaration. Arrays can be declared using the usual <a href="http://en.wikipedia.org/wiki/Bracket#Uses_of_.22.5B.22_and_.22.5D.22">square bracket operator</a> <tt>[]</tt>. The number between the square brackets specifies the number of elements to be assigned to the array, thereafter referred to as its size. It can be any constant expression, including mathematical operations using scalars and constants. An optional assignation can be made using the array constructor (see below). If this is done, the size of the array need not be specified.
     </p>
     <p>
       Example:
     </p>
     <div class="code">
       <pre>
-<code>var run = 0
-
-onevent start
-run = 1
-
-onevent stop
-run = 0
-
-onevent ir_sensors
-if run == 1 then
-    emit sensors_values proximity_sensors_values
-end</code>
+<code>var a[10]                   # array of 10 elements
+var b[3] = [2, 3, 4]        # initialisation
+var c[] = [3, 1, 4, 1, 5]   # implicit size of 5 elements
+var d[3*FOO-1]              # size declared using a constant expression (FOO declared as a constant)</code>
 </pre>
     </div>
-    <h1 id="toc3">
-      <span>Expressions and Assignations</span>
+    <p>
+      Arrays can be accessed in several ways:
+    </p>
+    <ul>
+      <li>A single element is accessed by using the square bracket operator with a single value. Array indexes begin at zero. Any expression can be used as index, including mathematical expressions involving other variables.
+      </li>
+      <li>A range of elements can be accessed by using the square bracket operator with two constant expressions separated by a colon ':'.
+      </li>
+      <li>If the square brackets are omitted, the entire array is accessed.
+      </li>
+    </ul>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var foo[5] = [1,2,3,4,5]
+var i = 1
+var a
+var b[3]
+var c[5]
+var d[5]
+
+a = foo[0]       # copy first element from 'foo' to 'a'
+a = foo[2*i-2]       # same
+b = foo[1:3]       # take 2nd, 3rd and 4th elements of 'foo', copy to 'b'
+b = foo[1:2*2-1]   # same
+c = foo           # copy 5 elements from array 'foo' to array 'c'
+d = c * foo       # multiply arrays 'foo' and 'c' element by element, copy result to 'd'</code>
+</pre>
+    </div>
+    <h2 id="toc7">
+      <span>Array constructors</span>
+    </h2>
+    <p>
+      Array constructors are a way to build arrays from variables, other arrays, scalars, or even complex expressions. They are useful in several cases, for example when initialising another array, or as operands in expressions, functions and events. An array constructor is made by using square brackets enclosing several expressions separated by a <tt>,</tt> (comma). The size of an array constructor is the sum of the sizes of the individual elements, and it must match the size of the array in which the result is stored.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[5] = [1,2,3,4,5]    # array constructor to initialise an array
+var b[3] = [a[1:2],0]    # results in array b initialised to [2,3,0]
+a = a + [1,1,1,1,1]    # add 1 to each element of array a
+a = [b[1]+2,a[0:3]]    # results in [5,2,3,4,5]</code>
+</pre>
+    </div>
+    <h1 id="toc8">
+      <span>Expressions and assignations</span>
     </h1>
     <p>
-      Expressions allow mathematical computations and are written using the normal mathematical infix syntax. Assignations use the keyword <tt>=</tt> and set the result of the computation of an expression into a scalar variable or an array element. Aseba provides several operators. Please refer to the table below for a brief description, as well as for the precedence of each operator. To evaluate an expression in a different order, you can use a pair of parentheses to group a sub-expression.
+      Expressions allow mathematical computations and are written using the normal mathematical <a href="http://http://en.wikipedia.org/wiki/Infix_notation">infix</a> syntax. Assignations use the keyword <tt>=</tt> and set the result of the computation of an expression into a scalar variable, an array element or a whole array, depending on the size of the operands. Aseba provides several operators. Please refer to the table below for a brief description, as well as for the precedence of each operator. To evaluate an expression in a different order, pairs of parentheses can be used to group sub-expressions.
     </p>
     <table class="wiki-content-table">
       <tr>
@@ -354,19 +568,6 @@ end</code>
       <tr>
         <td></td>
         <td>
-          ~=
-        </td>
-        <td>
-          Assignment by binary not
-        </td>
-        <td></td>
-        <td>
-          binary
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
           *= /=
         </td>
         <td>
@@ -447,14 +648,34 @@ a++
 
 b = b + d[0]
 b = (a - 7) % 5
-c[a] = d[a]</code>
+c[a] = d[a]
+c[0:1] = d[2:3] * [3,2]</code>
 </pre>
     </div>
-    <h1 id="toc4">
-      <span>Conditionals</span>
-    </h1>
+    <h2 id="toc9">
+      <span>Usage</span>
+    </h2>
     <p>
-      Aseba provides two types of <a href="http://en.wikipedia.org/wiki/Conditional_%28programming%29">conditionals</a>: <tt>if</tt> and <tt>when</tt>. These consist of a test of conditions and blocks of code. The test consists in comparisons, optionally grouped using the <tt>and</tt> (<a href="http://en.wikipedia.org/wiki/Logical_conjunction">logical conjunction</a>), <tt>or</tt> (<a href="http://en.wikipedia.org/wiki/Logical_disjunction">logical disjunction</a>), and <tt>not</tt> (<a href="http://en.wikipedia.org/wiki/Logical_negation">logical negation</a>) operators, and parentheses.<br />
+      Mathematical expressions are a general tool. As such, they can be used in a great variety of situations. Just to mention a few:
+    </p>
+    <ul>
+      <li>On the right side of an assignation
+      </li>
+      <li>As an index when accessing elements of arrays
+      </li>
+      <li>Inside function calls
+      </li>
+      <li>As argument when emitting an event
+      </li>
+    </ul>
+    <h1 id="toc10">
+      <span>Flow control</span>
+    </h1>
+    <h2 id="toc11">
+      <span>Conditionals</span>
+    </h2>
+    <p>
+      Aseba provides two types of <a href="http://en.wikipedia.org/wiki/Conditional_%28programming%29">conditionals</a>: <tt>if</tt> and <tt>when</tt>. These consist of a test of conditions and blocks of code. The test consists of comparisons, optionally grouped using the <tt>and</tt> (<a href="http://en.wikipedia.org/wiki/Logical_conjunction">logical conjunction</a>), <tt>or</tt> (<a href="http://en.wikipedia.org/wiki/Logical_disjunction">logical disjunction</a>), and <tt>not</tt> (<a href="http://en.wikipedia.org/wiki/Logical_negation">logical negation</a>) operators, and parentheses.<br />
       A comparison consists of an <a href="http://en.wikipedia.org/wiki/Relational_operator">operator</a> and two <a href="http://en.wikipedia.org/wiki/Operand">operands</a>, and can either be true or false. The operands can be arbitrary expressions. The following table lists the comparison operators.
     </p>
     <table class="wiki-content-table">
@@ -543,9 +764,9 @@ end</code>
 </pre>
     </div><br />
     Here the <tt>when</tt> block executes only when <tt>a</tt> <em>becomes</em> larger than <tt>b</tt>.
-    <h1 id="toc5">
+    <h2 id="toc12">
       <span>Loops</span>
-    </h1>
+    </h2>
     <p>
       Two constructs allow the creation of loops: <tt><a href="http://en.wikipedia.org/wiki/While_loop">while</a></tt> and <tt><a href="http://en.wikipedia.org/wiki/For_loop">for</a></tt>.
     </p>
@@ -579,9 +800,12 @@ for i in 30:1 step -3 do
 end</code>
 </pre>
     </div>
-    <h1 id="toc6">
-      <span>Subroutines</span>
+    <h1 id="toc13">
+      <span>Blocks</span>
     </h1>
+    <h2 id="toc14">
+      <span>Subroutines</span>
+    </h2>
     <p>
       When you want to perform the same sequence of operations at two or more different places in the code, you can write common code just once in a subroutine and then call this subroutine from different places. You define a subroutine using the <tt>sub</tt> keyword followed by the name of the subroutine. You call the subroutine using the <tt>callsub</tt> keyword, followed by the name of the subroutine. Subroutines must be defined before they are called. Subroutines cannot have arguments, nor be <a href="http://en.wikipedia.org/wiki/Recursion_%28computer_science%29">recursive</a>, either directly or indirectly. Subroutines can access any variable.
     </p>
@@ -599,14 +823,68 @@ onevent test
 callsub toto</code>
 </pre>
     </div>
-    <h1 id="toc7">
-      <span>Native Functions</span>
-    </h1>
+    <h2 id="toc15">
+      <span>Events</span>
+    </h2>
     <p>
-      We designed Aseba script to be simple so as to allow a quick understanding even by novice developers and to implement the virtual machine efficiently on a micro-controller. To perform complex or resource consuming processing, we provide native functions that are implemented in native code for efficiency. For instance, a native function is the natural way to implement a scalar product.
+      Aseba is an <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-based architecture</a>, which means that events trigger code execution asynchronously.<br />
+      Events can be external, for instance a user-defined event coming from another Aseba node, or internal, for instance emitted by a sensor that provides updated data. The reception of an event executes, if defined, the block of code that begins with the <tt>onevent</tt> keyword followed by the name of the event; the code at the top of the script is executed when the script is started or reset. The script can also send events by using the <tt>emit</tt> keyword, followed by the name of the event and the name of the variable to send, if any. If a variable is provided, the size of the event must match the size of the <a href="http://en.wikipedia.org/wiki/Argument_%28computer_science%29">argument</a> to be emitted. Instead of a variable, array constructors and mathematical expressions can also be used in more complex situations. Events allow the script to trigger the execution of code on another node or to communicate with an external program.
     </p>
     <p>
-      Native functions are safe, as they specify and check the size of their arguments, which can be constants, variables, or array accesses. In the latter, you can access the whole array, a single element, or a sub-range of the array. Native functions take their arguments by <a href="http://en.wikipedia.org/wiki/Call_by_reference#Call_by_reference">reference</a> and can modify their contents but do not return any value. You can use native functions through the <tt>call</tt> keyword.
+      To allow the execution of related code upon new events, scripts must not block and thus must not contain any infinite loop. For instance in the context of robotics, where a traditional robot control program would do some processing inside an infinite loop, an Aseba script would just do the processing inside a sensor-related event.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+    emit sensors_values proximity_sensors_values
+end</code>
+</pre>
+    </div>
+    <h2 id="toc16">
+      <span>Return Statement</span>
+    </h2>
+    <p>
+      It is possible to early return from subroutines and stop the execution of events with the <tt>return</tt> statement.
+    </p>
+    <p>
+      Example:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+if v == 0 then
+    return
+end
+v = 1
+
+onevent test
+callsub toto
+return
+v = 2</code>
+</pre>
+    </div>
+    <h1 id="toc17">
+      <span>Native functions</span>
+    </h1>
+    <p>
+      We designed Aseba script to be simple in order to allow a quick understanding even by novice developers and to implement the virtual machine efficiently on a micro-controller. To perform complex or resource-intensive processing, we provide native functions that are implemented in native code for efficiency. For instance, a native function is the natural way to implement a scalar product.
+    </p>
+    <p>
+      Native functions are safe, as they specify and check the size of their arguments, which can be constants, variables, array accesses, array constructors and expressions. In the case of an array, you can access the whole array, a single element, or a sub-range of the array. Native functions take their arguments by <a href="http://en.wikipedia.org/wiki/Call_by_reference#Call_by_reference">reference</a> and can modify their contents but do not return any value. You can use native functions through the <tt>call</tt> keyword.
     </p>
     <p>
       Example:
