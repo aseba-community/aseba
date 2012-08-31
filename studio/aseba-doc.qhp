@@ -12,6 +12,9 @@
         <customFilter name="de">
                 <filterAttribute>lang-de</filterAttribute>
         </customFilter>
+        <customFilter name="es">
+                <filterAttribute>lang-es</filterAttribute>
+        </customFilter>
 
 
 
@@ -217,6 +220,69 @@
                         <file>doc/epuck-sensors-wiki-en.png</file>
                         <file>doc/epuck-sensors-wiki-en.svg</file>
                         <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/studio-challenge-en.png</file>
+                        <file>doc/studio-connect-en.png</file>
+                        <file>doc/studio-overlay-en.png</file>
+
+                </files>
+        </filterSection>
+
+        <filterSection>
+                <filterAttribute>lang-es</filterAttribute>
+                <toc>
+                        <section title="Manual del usuario: ASEBA" ref = "doc/es_asebausermanual.html">
+                                <section title="Primeros pasos con ASEBA" ref="doc/es_gettingstarted.html"></section>
+                                <section title="ASEBA Studio" ref="doc/es_asebastudio.html"></section>
+                                <section title="El lenguaje de ASEBA" ref="doc/es_asebalanguage.html"></section>
+                                <section title="Librería estándar de funciones nativas" ref="doc/es_asebastdnative.html"></section>
+
+                        </section>
+
+                </toc>
+
+                <files>
+                        <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/epuck-sensors-wiki-en.png</file>
+                        <file>doc/epuck-sensors-wiki-en.svg</file>
+                        <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/es_asebalanguage.html</file>
+                        <file>doc/es_asebastdnative-eq0.png</file>
+                        <file>doc/es_asebastdnative-eq1.png</file>
+                        <file>doc/es_asebastdnative-eq10.png</file>
+                        <file>doc/es_asebastdnative-eq11.png</file>
+                        <file>doc/es_asebastdnative-eq12.png</file>
+                        <file>doc/es_asebastdnative-eq13.png</file>
+                        <file>doc/es_asebastdnative-eq14.png</file>
+                        <file>doc/es_asebastdnative-eq15.png</file>
+                        <file>doc/es_asebastdnative-eq16.png</file>
+                        <file>doc/es_asebastdnative-eq17.png</file>
+                        <file>doc/es_asebastdnative-eq18.png</file>
+                        <file>doc/es_asebastdnative-eq19.png</file>
+                        <file>doc/es_asebastdnative-eq2.png</file>
+                        <file>doc/es_asebastdnative-eq20.png</file>
+                        <file>doc/es_asebastdnative-eq21.png</file>
+                        <file>doc/es_asebastdnative-eq22.png</file>
+                        <file>doc/es_asebastdnative-eq23.png</file>
+                        <file>doc/es_asebastdnative-eq24.png</file>
+                        <file>doc/es_asebastdnative-eq25.png</file>
+                        <file>doc/es_asebastdnative-eq26.png</file>
+                        <file>doc/es_asebastdnative-eq27.png</file>
+                        <file>doc/es_asebastdnative-eq28.png</file>
+                        <file>doc/es_asebastdnative-eq29.png</file>
+                        <file>doc/es_asebastdnative-eq3.png</file>
+                        <file>doc/es_asebastdnative-eq30.png</file>
+                        <file>doc/es_asebastdnative-eq31.png</file>
+                        <file>doc/es_asebastdnative-eq4.png</file>
+                        <file>doc/es_asebastdnative-eq5.png</file>
+                        <file>doc/es_asebastdnative-eq6.png</file>
+                        <file>doc/es_asebastdnative-eq7.png</file>
+                        <file>doc/es_asebastdnative-eq8.png</file>
+                        <file>doc/es_asebastdnative-eq9.png</file>
+                        <file>doc/es_asebastdnative.html</file>
+                        <file>doc/es_asebastudio.html</file>
+                        <file>doc/es_asebausermanual.html</file>
+                        <file>doc/es_gettingstarted.html</file>
                         <file>doc/studio-challenge-en.png</file>
                         <file>doc/studio-connect-en.png</file>
                         <file>doc/studio-overlay-en.png</file>

@@ -1,0 +1,650 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      El lenguaje de ASEBA
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      El lenguaje de ASEBA
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Contenido
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Comentarios</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Las variables</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Los eventos</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc3">Expresiones y asignaciones</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc4">Condicionales</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Ciclos (bucles)</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc6">Subrutinas</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc7">Funciones nativas</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Este documento también se encuentra disponible en el menú <tt>Help-&gt;Language</tt> de ASEBA. Te sugerimos revisar primero, los conceptos básicos definidos <a href="https://aseba.wikidot.com/es:asebaconcepts">aquí</a>, así como algunos términos técnicos que encuentras en esta página y que están directamente vinculados con el correspondiente artículo en Wikipedia.
+    </p>
+    <p>
+      El lenguaje de programación ASEBA permite implementar control distribuido entre nodos ASEBA.
+    </p>
+    <p>
+      Sintácticamente hablando, ASEBA se asemeja a <em><a href="http://www.mathworks.com/products/matlab/">MatLab</a></em> u <em><a href="http://www.gnu.org/software/octave/">Octave</a></em>; esta similitud le permite a los desarrolladores que tengan conocimientos previos en esos lenguajes, sentirse más cómodos con Aseba y reducir la curva de aprendizaje.
+    </p>
+    <p>
+      Semánticamente hablando, este es un <a href="http://es.wikipedia.org/wiki/Programaci%C3%B3n_imperativa">lenguaje de programación imperativo</a> con un solo <a href="http://es.wikipedia.org/wiki/Tipo_de_dato">tipo</a> de valores (<a href="http://es.wikipedia.org/wiki/Entero_%28tipo_de_dato%29">enteros</a> de 16 bits <a href="http://es.wikipedia.org/wiki/Representaci%C3%B3n_de_n%C3%BAmeros_con_signo">con signo</a>) y <a href="http://es.wikipedia.org/wiki/Vector_%28inform%C3%A1tica%29">vectores</a>. Esta simplicidad le permite a los desarrolladores programar comportamientos sin tener conocimientos previos en otros <a href="http://es.wikipedia.org/wiki/Sistema_de_tipos">sistemas de tipos</a> (como el hexadecimal). Los enteros nos resultan muy naturales, cómodos y adecuados para programar robots móviles basados en <a href="http://es.wikipedia.org/wiki/Microcontrolador">microcontroladores</a>.
+    </p>
+    <h1 id="toc0">
+      <span>Comentarios</span>
+    </h1>
+    <p>
+      Los comentarios te permiten incluir en tus programas, información que el <a href="http://es.wikipedia.org/wiki/Compilador">compilador</a> no considera. Los comentarios se utilizan con frecuencia para incluir notas aclaratorias que puedan ser interpretadas por humanos, o también para deshabilitar temporalmente algunas líneas del código.
+    </p>
+    <p>
+      Puedes usar dos tipo de comentarios:
+    </p>
+    <ul>
+      <li>Los comentarios de una sola línea: comienzan con <strong><em>#</em></strong> y terminan al final de la línea.
+      </li>
+    </ul>
+    <ul>
+      <li>Los comentarios de más de una línea: comienzan con <strong><em>#*</em></strong> y terminan con <strong><em>*#</em></strong>.
+      </li>
+    </ul>
+    <p>
+      Ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code># este es un comentario de una sola línea.
+# este es otro comentario.
+#*
+Este es un
+comentario con
+más de una línea.*#</code>
+</pre>
+    </div>
+    <h1 id="toc1">
+      <span>Las variables</span>
+    </h1>
+    <p>
+      Las variables son espacios de memoria que pueden contener un <a href="http://es.wikipedia.org/wiki/Escalar_%28inform%C3%A1tica%29">escalar</a> (entero de 16 bits con signo) o un vector de escalares. Un entero de 16 bits con signo puede tomar valores entre -32768 y 32767. Puedes acceder a los elementos de un vector usando <a href="http://es.wikipedia.org/wiki/Par%C3%A9ntesis#En_inform.C3.A1tica_2">corchetes</a>; los índices de los vectores comienzan con cero; es decir, la primera posición de un vector es la posición cero. Al principio de tú código Aseba y antes de cualquier proceso, debes declarar todas las variables que vas a usar. Este es un ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a
+var c[10]
+var b = 0
+var d[3] = 2, 3, 4</code>
+</pre>
+    </div>
+    <h1 id="toc2">
+      <span>Los eventos</span>
+    </h1>
+    <p>
+      La arquitectura de Aseba se <a href="http://es.wikipedia.org/wiki/Programaci%C3%B3n_dirigida_por_eventos">basa en eventos</a>. Esto quiere decir que los eventos pueden hacer que el código se ejecute asincrónicamente.
+    </p>
+    <p>
+      Los eventos pueden ser:
+    </p>
+    <ul>
+      <li>
+        <strong><em>externos</em></strong>, como por ejemplo los eventos definidos por el usuario que provienen de otro nodo Aseba; ó
+      </li>
+      <li>
+        <strong><em>internos</em></strong>, como aquellos generados por un sensor.
+      </li>
+    </ul>
+    <p>
+      La realización de un evento ejecuta el bloque de código que se encuentra después de la instrucción <tt>onevent</tt> seguido por el nombre del evento; el código que se encuentra antes de esa instrucción solo se ejecuta una vez al comienzo o cada vez que hay un reset. El script también puede generar un evento usando la instrucción <tt>emit</tt>, seguida por el nombre del evento y el nombre de la variable a enviar, si es el caso. Si se suministra el nombre de una variable, el tamaño del evento debe coincidir con el tamaño del <a href="http://es.wikipedia.org/wiki/Argumento_%28inform%C3%A1tica%29">argumento</a> que se emite. Los eventos le permite a los scripts, ejecutar códigos en otros nodos o comunicarse con un programa externo.
+    </p>
+    <p>
+      Para permitir que los códigos relacionados con otros eventos puedan ser ejecutados, los scripts no se pueden bloquear ni tener ciclos infinitos. En el contexto de la robótica, los programas tradicionales para controlar los robots realizaban procesos dentro de ciclos infinitos; un script de Aseba realiza los procesos dentro de eventos relacionados con los sensores.
+    </p>
+    <p>
+      Este es un ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+    emit sensors_values proximity_sensors_values
+end</code>
+</pre>
+    </div>
+    <h1 id="toc3">
+      <span>Expresiones y asignaciones</span>
+    </h1>
+    <p>
+      Las <em>expresiones</em> permiten ejecutar operaciones matemáticas utilizando la convencional <a href="http://es.wikipedia.org/wiki/Notaci%C3%B3n_de_infijo">notación de infijo</a> convencional.
+    </p>
+    <p>
+      Las <em>asignaciones</em> se usan para vincular el resultado de un cómputo o de una expresión a una variable escalar o a un elemento de un vector. Para asignar un valor a una variable se utiliza el operador <tt>=</tt>.
+    </p>
+    <p>
+      ASEBA dispone de los siguientes operadores:
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th>
+          <a href="http://es.wikipedia.org/wiki/Orden_de_evaluaci%C3%B3n">Precedencia</a>
+        </th>
+        <th>
+          <a href="http://en.wikipedia.org/wiki/Operator_%28programming%29">Operador</a>
+        </th>
+        <th>
+          Descripción
+        </th>
+        <th>
+          <a href="http://es.wikipedia.org/wiki/Asociatividad_%28%C3%A1lgebra%29">Asociatividad</a>
+        </th>
+        <th>
+          <a href="http://es.wikipedia.org/wiki/Aridad">Aridad</a>
+        </th>
+      </tr>
+      <tr>
+        <td>
+          1
+        </td>
+        <td>
+          ()
+        </td>
+        <td>
+          Agrupar subexpresiones
+        </td>
+        <td></td>
+        <td>
+          unario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          2
+        </td>
+        <td>
+          * /
+        </td>
+        <td>
+          Multiplicación, división
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Modulo_operation">Módulo</a>
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          3
+        </td>
+        <td>
+          + -
+        </td>
+        <td>
+          Suma, resta
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          4
+        </td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt; &gt;&gt;</span>
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Operador_a_nivel_de_bits#Desplazamiento_aritm.C3.A9tico">desplazamiento a izquierda, desplazamiento a derecha</a>
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          5
+        </td>
+        <td>
+          |
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Operador_a_nivel_de_bits#OR">ó binario (or)</a>
+        </td>
+        <td>
+          asociativo a izquierda
+        </td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          6
+        </td>
+        <td>
+          ^
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Operador_a_nivel_de_bits#XOR">ó exclusivo (xor)</a>
+        </td>
+        <td>
+          asociativo a izquierda
+        </td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          7
+        </td>
+        <td>
+          &amp;
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Operador_a_nivel_de_bits#AND">y binario (and)</a>
+        </td>
+        <td>
+          asociativo a izquierda
+        </td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          8
+        </td>
+        <td>
+          -
+        </td>
+        <td>
+          menos unario
+        </td>
+        <td></td>
+        <td>
+          unario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          9
+        </td>
+        <td>
+          ~
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Operador_a_nivel_de_bits#NOT">no binario (not)</a>
+        </td>
+        <td></td>
+        <td>
+          unario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          10
+        </td>
+        <td>
+          abs
+        </td>
+        <td>
+          <a href="http://es.wikipedia.org/wiki/Valor_absoluto">Valor absoluto</a>
+        </td>
+        <td></td>
+        <td>
+          unario
+        </td>
+      </tr>
+      <tr>
+        <td>
+          11
+        </td>
+        <td>
+          =
+        </td>
+        <td>
+          Asignación
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          |= ^= &amp;=
+        </td>
+        <td>
+          Asignación or, xor, and
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          ~=
+        </td>
+        <td>
+          Asignación not
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          *= /=
+        </td>
+        <td>
+          Asignación producto y cociente
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %=
+        </td>
+        <td>
+          Asignación módulo
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          += -=
+        </td>
+        <td>
+          Asignación suma y resta
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt;= &gt;&gt;=</span>
+        </td>
+        <td>
+          Asignación desplazamiento derecha / izquierda
+        </td>
+        <td></td>
+        <td>
+          binario
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          ++ <span style="white-space: pre-wrap;">--</span>
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Increment_and_decrement_operators">Incremento y decremento unario</a>
+        </td>
+        <td></td>
+        <td>
+          unario
+        </td>
+      </tr>
+    </table>
+    <p>
+      Las <em>asignaciones</em> con operadores binarios funcionan aplicando el operador a una variable y almacenando el resultado en ella misma. Por ejemplo, <tt>A *= 2</tt> es lo mismo que <tt>A = A * 2</tt>. Estos operadores buscan hacer el código más legible.
+    </p>
+    <p>
+      Ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>a = 1 + 1
+# Resultado: a = 2
+a *= 3
+# Resultado: a = 6
+a++
+# Resultado: a = 7
+
+b = b + d[0]
+b = (a - 7) % 5
+c[a] = d[a]</code>
+</pre>
+    </div>
+    <h1 id="toc4">
+      <span>Condicionales</span>
+    </h1>
+    <p>
+      ASEBA incluye dos tipos de <a href="http://es.wikipedia.org/wiki/Sentencia_condicional">condicionales</a>: <tt>if</tt> y <tt>when</tt>. Ambos constan de la evaluación de una condición (sentencia) y de un bloque de código. La evaluación es normalmente una comparación utilizando los operadores <tt>and</tt> (<a href="http://es.wikipedia.org/wiki/Conjunci%C3%B3n_l%C3%B3gica">conjunción lógica</a>), <tt>or</tt> (<a href="http://es.wikipedia.org/wiki/Disyunci%C3%B3n_l%C3%B3gica">disyunción lógica</a>), y <tt>not</tt> (<a href="http://es.wikipedia.org/wiki/Negaci%C3%B3n_l%C3%B3gica">negación lógica</a>), y paréntesis.
+    </p>
+    <p>
+      Una comparación consta de un <a href="http://en.wikipedia.org/wiki/Relational_operator">operador</a> y dos <a href="http://es.wikipedia.org/wiki/Operando">operandos</a>; el resultado puede ser <em>verdadero</em> o <em>falso</em>. Los operandos pueden ser expresiones arbitrarias.
+    </p>
+    <p>
+      La siguiente es una lista con los operadores de comparación:
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th>
+          <a href="http://en.wikipedia.org/wiki/Relational_operator">Operador</a>
+        </th>
+        <th>
+          Valor de verdad
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <tt>==</tt>
+        </td>
+        <td>
+          verdadero si los operandos son iguales
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>!=</tt>
+        </td>
+        <td>
+          verdadero si los operandos son diferentes
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&gt;</tt>
+        </td>
+        <td>
+          verdadero si el primer operando es estrictamente mayor que el segundo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&gt;=</tt>
+        </td>
+        <td>
+          verdadero si el primer operando es mayor o igual que el segundo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&lt;</tt>
+        </td>
+        <td>
+          verdadero si el primer operando es estrictamente menor que el segundo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&lt;=</tt>
+        </td>
+        <td>
+          verdadero si el primer operando es menor o igual que el segundo
+        </td>
+      </tr>
+    </table>
+    <p>
+      Las estructuras condicionales <tt>if</tt> y <tt>when</tt> ejecutan un bloque de código específico si se cumple o no una determinada condición (verdadero/falso):
+    </p>
+    <ul>
+      <li>
+        <strong><tt>if</tt></strong> ejecuta un primer bloque de código si se cumple la condición (<tt>verdadero</tt>). un segundo bloque de código puede ser ejecutado en caso de no cumplirse la condición (<tt>falso</tt>); basta con incluir la instrucción <tt>else</tt>. Además, otras condiciones pueden ser tenidas en cuenta utilizando la instrucción <tt>elseif</tt>.
+      </li>
+      <li>
+        <strong><tt>when</tt></strong> solo ejecuta las instrucciones correspondientes cuando ocurre un cambio en el estado de la condición. Es decir, el conjunto de instrucciones asociadas al cumplimiento de la condición (verdadero) so lo se ejecuta si la última vez que se evaluó fue <tt>falso</tt>.
+      </li>
+    </ul>
+    <p>
+      Ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>if a - b &gt; c[0] then
+    c[0] = a
+elseif a &gt; 0 then
+    b = a
+else
+    b = 0
+end
+
+if a &lt; 2 and a &gt; 2 then
+    b = 1
+else
+    b = 0
+end
+
+when a &gt; b do
+    leds[0] = 1
+end</code>
+</pre>
+    </div>
+    <p>
+      En el código anterior, la instrucción correspondiente al <tt>when</tt> se ejecuta solo cuando <tt>a</tt> <em>se vuelve</em> mayor que <tt>b</tt>.
+    </p>
+    <h1 id="toc5">
+      <span>Ciclos (bucles)</span>
+    </h1>
+    <p>
+      Dos estructuras permiten crear ciclos iterativos: <strong><tt>while</tt></strong> y <strong><tt>for</tt></strong>.
+    </p>
+    <p>
+      Un ciclo <tt>while</tt> ejecuta una conjunto de instrucciones, repetidamente, siempre y cuando se cumpla una determinada condición.Las condiciones se pueden construir de igual manera que para los condicionales <tt>if</tt> y <tt>when</tt>. El siguiente ejemplo, ejecuta las instrucciones asociadas al ciclo <tt>while</tt> mientras que el valor que tome <em>i</em> sea menor que 10.
+    </p>
+    <div class="code">
+      <pre>
+<code>while i &lt; 10 do
+    v = v + i * i
+    i = i + 1
+end</code>
+</pre>
+    </div>
+    <p>
+      Un ciclo <tt>for</tt> le permite a una variable tomar diferentes valores enteros dentro de un rango establecido y con un incremento determinado. En el primer ciclo <tt>for</tt> del siguiente ejemplo, la variable <em>i</em> toma valores desde 1 hasta 10 incrementándose en 1 para cada iteració; es decir, para la primera iteración <em>i=1</em>, para la segunda <em>i=2</em> y así sucesivamente, hasta la última iteración en donde <em>i=10</em>. En el segundo ciclo, la variable toma el valor de 30 para la primera iteración y va disminuyendo de 3&nbsp;en 3 hasta llegar a 1; es decir, <em>i=27</em> para la segunda iteración, <em>i=24</em> para la tercera y así sucesivamente.
+    </p>
+    <div class="code">
+      <pre>
+<code>for i in 1:10 do
+    v = v + i * i
+end
+for i in 30:1 step -3 do
+    v = v - i * i
+end</code>
+</pre>
+    </div>
+    <h1 id="toc6">
+      <span>Subrutinas</span>
+    </h1>
+    <p>
+      Cuando quieres utilizar una secuencia de instrucciones en dos o más lugares de tu código, puedes escribir una <strong>subrutina</strong> con la secuencia de instrucciones y luego llamarla donde la la necesites. Para definir una subrutina debes usar la instrucción <strong><tt>sub</tt></strong> seguida por el nombre de la subrutina. Para llamarla, utilizas la instrucción <tt>callsub</tt>, seguida por el nombre de la subrutina. Debes escribir las subrutinas antes de llamarlas. Las subrutinas tienen acceso a todas la variables, pero no pueden tener argumentos, ni pueden ser <a href="http://es.wikipedia.org/wiki/Recursi%C3%B3n_%28ciencias_de_computaci%C3%B3n%29">recursivas</a> (llamarse a si mismas), directa o indirectamente. Este es un ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+v = 1
+
+onevent test
+callsub toto</code>
+</pre>
+    </div>
+    <h1 id="toc7">
+      <span>Funciones nativas</span>
+    </h1>
+    <p>
+      Aseba está concebido para ser tan simple que permite un rápido aprendizaje por parte de los desarrolladores (incluso novatos) y la implementación de la máquina virtual en un micro-controlador de manera eficiente. Las <em>funciones nativas</em> se encargan de los procesos complejos o que requieren de muchos recursos. Ellas están escritas en lenguaje de máquina para mejorar la eficiencia. Además son seguras. Ellas especifican y verifican el tamaño de sus argumentos, los cuales pueden ser constantes, variables o elementos de vectores. Para el último caso, puedes extraer todos los elementos de un vector, un solo elemento o una porción. Las funciones nativas asignan sus argumentos por <a href="http://es.wikipedia.org/wiki/Iteraci%C3%B3n">referencia</a> y pueden modificar sus contenidos pero no devuelven ningún valor. Puedes usar funciones nativas usando la instrucción <tt>call</tt>. Por ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)</code>
+</pre>
+    </div>
+  </body>
+</html>

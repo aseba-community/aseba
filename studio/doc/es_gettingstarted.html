@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Primeros pasos con ASEBA
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Primeros pasos con ASEBA
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc">
+            <div class="title">
+              Contenido
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Comienza con un reto. ASEBA challenge</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Tu primer controlador</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Un controlador más elaborado</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc3">Tomando decisiones</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc4">Es tu turno</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Qué más puedo leer ahora?</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Esta página te enseña a utilizar ASEBA sin disponer de un robot físico. Si tienes un Thymio II, te invitamos a visitar su página <a href="http://aseba.wikidot.com/es:thymioprogram">aquí</a>.
+    </p>
+    <table style="margin:0; padding:0">
+      <tr>
+        <td style="margin:0; padding:0"></td>
+      </tr>
+    </table>
+    <h1 id="toc0">
+      <span>Comienza con un reto. ASEBA <em>challenge</em></span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="asebachallenge.png" width="390" alt="asebachallenge.png" class="image" />
+    </div>
+    <p>
+      ASEBA <em>challenge</em> (imagen derecha) es un escenario simulado en el que robots controlados con Aseba compiten por energía (food). Puedes utilizarlo como un lugar para explorar tus códigos o como un juego educativo para el aprendizaje y la enseñanza de programación.
+    </p>
+    <p>
+      Para comenzar, ejecuta ASEBA <em>challenge</em>. Si aún no has instalado ASEBA, sigue las <a href="http://aseba.wikidot.com/es:downloadinstall">instrucciones de instalación</a>. Una vez iniciado, has clic en ''Add a new robot'' para crear un nuevo robot, y luego asígnale un nombre. Si son varios jugadores, debes crear un robot para cada uno. Puedes suprimir todos los robots haciendo clic en “Remove all robots”. Puedes esconder los botones marcando la opción “Auto hide”: los botones solo se muestran cuando el puntero del mouse pasa cerca a ellos. Puedes tener una cámara automática, marcando la opción “Auto camera”: la posición de la cámara cambia automáticamente. Si prefieres mover la cámara manualmente, los controles son los siguientes:
+    </p>
+    <ul>
+      <li>ctrl + botón izquierdo del mouse: rotar vista.
+      </li>
+      <li>ctrl + shift + botón izquierdo del mouse: desplazar la vista en x/y.
+      </li>
+      <li>ctrl + shift + botón derecho del mouse: desplazar la vista en z.
+      </li>
+    </ul>
+    <div class="image-container floatright">
+      <img src="studio-connect-en.png" width="146" alt="studio-connect-en.png" class="image" />
+    </div>
+    <p>
+      <em>Challenge</em> indica la puntuación de cada robot en unos paneles translúcidos, suspendidos sobre la arena (terreno de juego). El objetivos es mantener el robot con vida, recolectando energía. Mientras el robot sobreviva, su marcador aumenta; si muere, se reducen a la mitad. Cuatro fuentes azules suministran energía a los robots que se acerquen a ellas. Cuando una fuente se agota, se vuelve roja y no suministra más energía. De vez en cuando, las fuentes se esconden, y los robots no pueden verlas sino hasta que reaparecen.
+    </p>
+    <p>
+      Cuando ASEBA <em>challenge</em> se esté ejecutando, puedes ejecutar ASEBA <em>studio</em> para programar tu robot. Debes ejecutar una instancia de <em>studio</em> desde cualquier PC, para controlar cada robot en la arena. Al inicio, <em>studio</em> te propone conectarte a un objetivo ASEBA (imagen de la derecha). Si has lanzado <em>challenge</em> en tu PC y has adicionado un robot, la opción por defecto será conectarte a ese robot. Si <em>challenge</em> se está ejecutando en otro PC, o si hay varios robots en la misma arena, debes especificar el PC en <em>host</em> y el robot en <em>port</em>. Los paneles translucidos indican el puerto (<em>port</em>) que corresponde a cada robot.
+    </p>
+    <h1 id="toc1">
+      <span>Tu primer controlador</span>
+    </h1>
+    <div class="image-container floatright">
+      <img src="studio-challenge-en.png" width="390" alt="studio-challenge-en.png" class="image" />
+    </div>
+    <p>
+      Si <em>studio</em> se está ejecutando (imagen derecha), podras utilizar la parte central de la ventana para editar el programa del robot. Se trata de un editor que revisa y compila tu código en tiempo real, indicándote si la sintaxis es correcta o no.Puedes consultar más detalles sobre <em>studio</em> en el menú <tt>Help-&gt;Studio</tt>. El menú <tt><a href="es_asebalanguage.html">Help-&gt;Language</a></tt> te ofrece información detallada del lenguaje de programación ASEBA.
+    </p>
+    <p>
+      Para programar un robot, primero debes entender cómo funciona. Un robot interactúa con el mundo en el siguiente ciclo: percibe el estado del mundo por medio de sensores, toma algunas decisiones con su computador incorporado, y ejecuta acciones a través de actuadores. Este ciclo se repite constantemente.
+    </p>
+    <p>
+      En <em>challenge</em> tu programas un robot <a href="http://aseba.wikidot.com/es:e-puck">e-puck</a>. Este robot tiene 8 sensores de proximidad alrededor de su cuerpo y una cámara de 3 pixeles (20°/pixel) dirigida hacia adelante. Puedes leer cada pixel y además controlar la velocidad de las ruedas.<br />
+      <img src="epuck-sensors-wiki-en.png" alt="epuck-sensors-wiki-en.png" class="image" /><br />
+    </p>
+    <div style="text-align: right;">
+      <p>
+        <a href="epuck-sensors-wiki-en.svg">archivo svg original</a>, <a href="epuck-top-grayscale.png">fondo, parte superior del e-puck</a>
+      </p>
+    </div>
+    <p>
+      Ahora escribe tu primer controlador de robot. Digita las siguientes líneas en el editor:
+    </p>
+    <div class="code">
+      <pre>
+<code>wheel_left_speed = 5
+wheel_right_speed = -5</code>
+</pre>
+    </div>
+    <p>
+      Click en “Load” y luego en “Run”. Debes ver a tu robot dando vueltas en un mismo sitio. Este código solo define la velocidad de las ruedas cuando el robot inicia. Para mejorar su comportamiento, permítele al robot percibir su entorno para tomar decisiones. Por ejemplo para evadir obstáculos.
+    </p>
+    <p>
+      Para ejecutar el programa constantemente, puedes usar la función <tt>onevent timer</tt>. Por ejemplo, usando el sensor de proximidad frontal, podemos definir la velocidad de las ruedas con respecto a la distancia al objeto.
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = dist[0] - 6
+wheel_right_speed = dist[0] - 6</code>
+</pre>
+    </div><br />
+    Click en “Load” y luego en “Run”. Como el sensor de proximidad entrega una distancia entre 0 y 12&nbsp;cm, la velocidd de las ruedas será -6&nbsp;cm/s s hay un objeto demasiado cerca, 0&nbsp;cm/s si el objeto está a 6&nbsp;cm, y 6&nbsp;cm/s si no hay obstáculos a la vista. De este modo, el robot tiende a mantenerse a una distancia de 6&nbsp;cm de un obstáculo.
+    <h1 id="toc2">
+      <span>Un controlador más elaborado</span>
+    </h1>
+    <p>
+      Mantener una distancia prudente a un objeto cercano es bueno, pero por ahora, el robot no puede moverse a ninguna otra parte. Para hacer que el robot se pasee por ahí, debes entender cómo se desplaza.
+    </p>
+    <p>
+      El <em>e-puck</em> simulado en <em>challenge</em> es un ejemplo de un robot con ruedas diferenciales; para cambiar la dirección se definen velocidades diferentes en sus ruedas derecha e izquierda. Si ambas ruedas tienen la misma velocidad, el robot se desplaza hacia adelante (o atrás). Si las velocidades de las ruedas son en sentidos opuestos, el robot comenzará a girar alrededor del mismo punto. Los vehículos industriales con orugas (caterpillar) utilizan el mismo principio.
+    </p>
+    <p>
+      El siguiente código hace que el robot evite obstáculos y se mueva hacia a delante:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+wheel_left_speed = dist[1] - 6
+wheel_right_speed = dist[6] - 6</code>
+</pre>
+    </div><br />
+    este controlador monitorea los sensores de proximidad frontales: derecho e izquierdo. Mientras no se detecten obstáculos, <tt>dist[1]</tt> y <tt>dist[6]</tt> equivalen a 12 y entonces el robot se desplaza hacia adelante a una velocidad de 6&nbsp;cm/s. Pero si se detecta un obstáculo a uno de los lados, el valor del respectivo sensor disminuirá. Por ejemplo, si se detecta un obstáculo a la izquierda, <tt>dist[6]</tt> (que mira hacia la izquierda) puede tomar el valor de 10, pero <tt>dist[1]</tt> (que mira hacia la derecha) se mantendrá en 12. Entonces, la velocidad de la rueda derecha <tt>wheel_right_speed</tt> se disminuirá a 4 haciendo que el robot gire hacia la derecha para evadir el obstáculo.
+    <h1 id="toc3">
+      <span>Tomando decisiones</span>
+    </h1>
+    <p>
+      Los controladores que hemos visto hasta ahora, vinculan los valores de los sensores a la velocidad de las ruedas por medio de expresiones matemáticas, pero no se toman decisiones de tipo ''si…entonces…''. En algunos casos, resulta conveniente tomar decisiones; por ejemplo, si queremos que el robot se mueva hacia adelante o gire en el mismo punto si realizar trayectorias curvas. Mira este ejemplo:
+    </p>
+    <div class="code">
+      <pre>
+<code>onevent timer
+var dists = dist[6] + dist[7] + dist[0] + dist[1]
+if dists &lt; 48 then
+    wheel_left_speed = 5
+    wheel_right_speed = -5
+else
+    wheel_left_speed = 5
+    wheel_right_speed = 5
+end</code>
+</pre>
+    </div><br />
+    Este controlador suma las distancias de los 4 sensores frontales, y si el total es menor que 48, lo que indica que por lo menos uno de los sensores detectó un obstáculo, entonces el robot gira sobre si mismo. De lo contrario, se desplaza hacia adelante.
+    <p>
+      El lenguaje de programación ofrece otras estructuras interesantes, como el ciclo <tt>while</tt>, que ejecuta un bloque de código iterativamente, siempre y cuando se cumpla una determinada condición. Otra estructura es el ciclo <tt>for</tt>, que ejecuta un bloque de código un determinado número de veces y actualiza cada vez, el valor de una variable (contador). El menú <tt><a href="es_asebalanguage.html">Help -&gt; Language</a></tt> te lleva a una lista de todas las estructuras disponibles, acompañadas de ejemplos.
+    </p>
+    <h1 id="toc4">
+      <span>Es tu turno</span>
+    </h1>
+    <p>
+      Juega un momento con el evasor de obstáculos para que entiendas mejor el funcionamiento de los sensores, los actuadores y la dinámica del robot. Explora tranquilamente otras posibilidades: se trata de un simulador y no hay ningún riesgo de que sufrir daños.
+    </p>
+    <p>
+      Si ya cogiste confianza, trata de hacer que tu robot se dirija a las fuentes de energía cuando estén azules (0,100,100&nbsp;en RGB) y las evite cuando estén rojas. Ten en cuenta que el color del fondo es gris (50,50,50). Reta a tus amigos y has el mejor controlador para tu robot!. Puedes cambiar el color del robot modificando las variables <tt>color_red</tt>, <tt>color_green</tt> y <tt>color_blue</tt>, así podrás fingir ser una fuente de energía. Para saber si alguien engaña a tu robot, revisa la variable de energía; si no aumenta mientras observas obstáculo azul, quiere decir que te están engañando!.
+    </p>
+    <p>
+      <em>Challenge</em> está diseñado para que tu aprendas robótica, programación y ASEBA, al mismo tiempo que te diviertes.
+    </p>
+    <h1 id="toc5">
+      <span>Qué más puedo leer ahora?</span>
+    </h1>
+    <p>
+      Con seguridad te interesará consultar:
+    </p>
+    <ul>
+      <li>
+        <a href="es_asebastudio.html">Documentación del entorno integrado de ASEBA</a>.
+      </li>
+      <li>
+        <a href="es_asebalanguage.html">Descripción del lenguaje ASEBA</a>.
+      </li>
+    </ul>
+  </body>
+</html>

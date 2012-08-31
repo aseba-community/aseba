@@ -35,7 +35,8 @@ import qthelp
 language_map = [
                 ('en','http://aseba.wikidot.com/en:asebausermanual'),
                 ('fr','http://aseba.wikidot.com/fr:asebausermanual'),
-                ('de','http://aseba.wikidot.com/de:asebausermanual')
+                ('de','http://aseba.wikidot.com/de:asebausermanual'),
+                ('es','http://aseba.wikidot.com/es:asebausermanual')
                 ]
 OUTPUT_DIR = 'doc'
 QHP_FILE = './aseba-doc.qhp'
