@@ -162,6 +162,8 @@ namespace Aseba
 	//! Create tool list with one of a given name
 	void NodeToolRegistrar::update(const QString& name, NodeTab* node, NodeToolInterfaces& tools) const
 	{
+		if (tools.containsNamed(name))
+			return;
 		typedef NamedCreatorMap::const_iterator ConstIt;
 		ConstIt it(namedCreators.find(name));
 		if (it == namedCreators.end())

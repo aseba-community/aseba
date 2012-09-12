@@ -261,14 +261,15 @@ namespace Aseba
 		actionButtons.last()->hide(); // state button
 //		scene->clear();
 		scene->reset();
-		close();		
+		close();
 	}
 
 	void ThymioVisualProgramming::showFlashDialog()
 	{
 		exec();
+		//recompileButtonSet();
 	}
-		
+	
 	void ThymioVisualProgramming::newFile()
 	{
 		if( !scene->isEmpty() && warningDialog() ) 
@@ -549,7 +550,7 @@ namespace Aseba
 					{
 						advancedButton->setEnabled(true);
 						actionButtons.last()->hide(); // state button
-						scene->setAdvanced(false);					
+						scene->setAdvanced(false);
 					}
 						
 				}
@@ -610,14 +611,14 @@ namespace Aseba
 							button = new ThymioCircleAction();
 						else if ( buttonName == "sound" )
 							button = new ThymioSoundAction();
-						else if ( buttonName == "memory" )			
+						else if ( buttonName == "memory" )
 							button = new ThymioMemoryAction();
 						else
 						{
 							QMessageBox::warning(this,tr("Loading"),
 												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
 							return;
-						}							
+						}
 
 						for(int i=0; i<button->getNumButtons(); ++i)
 							button->setClicked(i,actionElement.attribute(QString("button%0").arg(i)).toInt());
@@ -628,15 +629,13 @@ namespace Aseba
 					else
 					{
 						scene->addAction(0);
-					}						
-
-				}			
-					
+					}
+				}
 			}
 			domNode = domNode.nextSibling();
 		}
 		
-		scene->setModified(false);		
+		scene->setModified(false);
 	}
 	
 	bool ThymioVisualProgramming::loadFile(QString filename)

@@ -644,7 +644,10 @@ namespace Aseba
 		int oldCount = toolListLayout->count();
 		QLayoutItem *child;
 		while ((child = toolListLayout->takeAt(0)) != 0)
+		{
+			child->widget()->deleteLater();
 			delete child;
+		}
 		
 		// generate menu entries
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
