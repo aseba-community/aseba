@@ -1615,24 +1615,33 @@ namespace Aseba
 						{
 							QDomDocument pluginDataDocument("tool-plugin-data");
 							pluginDataDocument.appendChild(pluginDataDocument.importNode(toolPlugin.firstChildElement(), true));
-							qDebug() << "reconstructed plugin document" << pluginDataDocument.toString();
 							NodeToolInterface::SavedContent savedContent(toolPlugin.nodeName(), pluginDataDocument);
 							savedPlugins.push_back(savedContent);
 							toolPlugin = toolPlugin.nextSiblingElement();
 						}
 						
+						// get text
+						QString text;
+						for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
+						{
+							QDomText t = n.toText();
+							if (!t.isNull())
+								text += t.data();
+						}
+						
+						// reconstruct nodes
 						NodeTab* tab = getTabFromName(element.attribute("name"));
 						if (tab)
 						{
-							tab->editor->setPlainText(element.firstChild().toText().data());
 							tab->restorePlugins(savedPlugins);
+							tab->editor->setPlainText(text);
 						}
 						else
 						{
 							nodes->addTab(
 								new AbsentNodeTab(
 									0, 
-									element.attribute("name"), element.firstChild().toText().data(),
+									element.attribute("name"), text,
 									savedPlugins
 								),
 								element.attribute("name") + tr(" (not available)")
