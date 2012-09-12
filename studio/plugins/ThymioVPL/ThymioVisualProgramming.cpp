@@ -636,6 +636,8 @@ namespace Aseba
 		}
 		
 		scene->setModified(false);
+		if (!scene->isEmpty())
+			QTimer::singleShot(0, this, SLOT(exec()));
 	}
 	
 	bool ThymioVisualProgramming::loadFile(QString filename)
