@@ -1607,13 +1607,25 @@ namespace Aseba
 					QDomElement element = domNode.toElement();
 					if (element.tagName() == "node")
 					{
-						// TODO: load plugins xml data
+						// load plugins xml data
 						ScriptTab::SavedPlugins savedPlugins;
+						QDomElement toolsPlugins(element.firstChildElement("toolsPlugins"));
+						QDomElement toolPlugin(toolsPlugins.firstChildElement());
+						while (!toolPlugin.isNull())
+						{
+							QDomDocument pluginDataDocument("tool-plugin-data");
+							pluginDataDocument.appendChild(pluginDataDocument.importNode(toolPlugin.firstChildElement(), true));
+							qDebug() << "reconstructed plugin document" << pluginDataDocument.toString();
+							NodeToolInterface::SavedContent savedContent(toolPlugin.nodeName(), pluginDataDocument);
+							savedPlugins.push_back(savedContent);
+							toolPlugin = toolPlugin.nextSiblingElement();
+						}
+						
 						NodeTab* tab = getTabFromName(element.attribute("name"));
 						if (tab)
 						{
 							tab->editor->setPlainText(element.firstChild().toText().data());
-							// TODO: reload plugins
+							tab->restorePlugins(savedPlugins);
 						}
 						else
 						{

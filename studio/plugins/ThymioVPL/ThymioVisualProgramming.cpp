@@ -396,7 +396,7 @@ namespace Aseba
 
 	QDomDocument ThymioVisualProgramming::saveToDom() const 
 	{ 
-		QDomDocument document("aesl-source");
+		QDomDocument document("tool-plugin-data");
 		
 		QDomElement vplroot = document.createElement("vplroot");
 		document.appendChild(vplroot);
