@@ -397,15 +397,16 @@ namespace Aseba
 	{ 
 		QDomDocument document("aesl-source");
 		
-		QDomElement vplroot = document.documentElement();
+		QDomElement vplroot = document.createElement("vplroot");
+		document.appendChild(vplroot);
 
 		QDomElement setting = document.createElement("vpl-setting");
 		vplroot.appendChild(document.createTextNode("\n\n"));
 		vplroot.appendChild(setting);
-					
+		
 		QDomElement mode = document.createElement("mode");
 		mode.setAttribute("advanced", scene->getAdvanced() ? "true" : "false");
-		setting.appendChild(mode);	
+		setting.appendChild(mode);
 		
 		QDomElement colorScheme = document.createElement("colorscheme");
 		colorScheme.setAttribute("value", QString::number(colorComboButton->currentIndex()));
@@ -414,7 +415,7 @@ namespace Aseba
 		
 		for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
 			  itr != scene->buttonsEnd(); ++itr )
-		{			
+		{
 			QDomElement element = document.createElement("vpl-button-element");			
 			
 			if( (*itr)->eventExists() ) 
@@ -443,12 +444,13 @@ namespace Aseba
 			}
 			
 			vplroot.appendChild(element);
-			vplroot.appendChild(document.createTextNode("\n\n"));		
+			vplroot.appendChild(document.createTextNode("\n\n"));
 		}
 		
 
 		scene->setModified(false);
 
+		qDebug() << "ThymioVisualProgramming::saveToDom" << document.toString();
 		return document;
 	}
 	

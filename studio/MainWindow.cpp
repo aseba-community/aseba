@@ -1780,8 +1780,7 @@ namespace Aseba
 					for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
 					{
 						const NodeToolInterface::SavedContent content(*it);
-						QDomElement plugin(document.createElement("toolPlugin"));
-						plugin.setAttribute("name", content.first);
+						QDomElement plugin(document.createElement(content.first));
 						plugin.appendChild(document.importNode(content.second.documentElement(), true));
 						plugins.appendChild(plugin);
 					}
