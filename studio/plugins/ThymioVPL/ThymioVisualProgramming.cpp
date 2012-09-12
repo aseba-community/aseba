@@ -217,6 +217,11 @@ namespace Aseba
 		delete(clapSvg);
 	}
 	
+	QString ThymioVisualProgramming::getPluginName()
+	{
+		return "avpl";
+	}
+	
 	void ThymioVisualProgramming::setColors(QComboBox *button)
 	{
 		eventColors.push_back(QColor(0,191,255)); actionColors.push_back(QColor(218,112,214));
@@ -265,7 +270,7 @@ namespace Aseba
 	}
 
 	void ThymioVisualProgramming::showFlashDialog()
-	{		
+	{
 		exec();
 	}
 		

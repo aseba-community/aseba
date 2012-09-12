@@ -225,9 +225,10 @@ namespace Aseba
 	
 	//////
 	
-	AbsentNodeTab::AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode) :
+	AbsentNodeTab::AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode, const SavedPlugins& savedPlugins) :
 		ScriptTab(id),
-		name(name)
+		name(name),
+		savedPlugins(savedPlugins)
 	{
 		createEditor();
 		editor->setReadOnly(true);
@@ -365,26 +366,13 @@ namespace Aseba
 	
 	void NodeTab::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
-		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1) && (tools.empty()))
+		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
 		{
 			pid = values[0];
-			//qDebug() << "received product id " << pid;
-			
-			tools = nodeToolRegistrer.create(pid, this);
-			if (tools.empty())
-				return;
-			
-			QWidget* widget(new QWidget);
-			QVBoxLayout* layout(new QVBoxLayout);
-			for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
-				layout->addWidget((*it)->createMenuEntry());
-			widget->setLayout(layout);
-			int index = toolBox->addItem(widget, tr("Local Tools"));
-			toolBox->setCurrentIndex(index);
+			nodeToolRegistrer.update(pid, this, tools);
+			updateToolList();
 			
 			mainWindow->regenerateHelpMenu();
-			
-			connect(mainWindow, SIGNAL(MainWindowClosed()), SLOT(closePlugins()));
 		}
 	}
 	
@@ -531,6 +519,10 @@ namespace Aseba
 		toolBox = new QToolBox;
 		toolBox->addItem(vmFunctionsView, tr("Native Functions"));
 		toolBox->addItem(vmLocalEvents, tr("Local Events"));
+		QWidget* toolListWidget(new QWidget);
+		toolListLayout = new QVBoxLayout;
+		toolListWidget->setLayout(toolListLayout);
+		toolListIndex = toolBox->addItem(toolListWidget, tr("Local Tools"));
 		QVBoxLayout* toolBoxLayout = new QVBoxLayout;
 		toolBoxLayout->addWidget(toolBox);
 		QWidget* toolBoxWidget = new QWidget;
@@ -586,7 +578,10 @@ namespace Aseba
 		
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
-						
+		
+		// tools plugins
+		connect(mainWindow, SIGNAL(MainWindowClosed()), SLOT(closePlugins()));
+		
 		// keywords
 		signalMapper = new QSignalMapper(this);
 		signalMapper->setMapping(varButton, QString("var "));
@@ -615,6 +610,50 @@ namespace Aseba
 		if (mainWindow->autoMemoryRefresh)
 			autoRefreshMemoryCheck->setChecked(true);
 	}
+	
+	ScriptTab::SavedPlugins NodeTab::savePlugins() const
+	{
+		SavedPlugins savedPlugins;
+		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
+		{
+			const SavedContent savedContent((*it)->getSaved());
+			if (!savedContent.first.isEmpty() && !savedContent.second.isNull())
+				savedPlugins.push_back(savedContent);
+		}
+		return savedPlugins;
+	}
+	
+	void NodeTab::restorePlugins(const SavedPlugins& savedPlugins)
+	{
+		// first recreate plugins
+		for (SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+		{
+			nodeToolRegistrer.update(it->first, this, tools);
+		}
+		// then reload data
+		for (SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+		{
+			NodeToolInterface* interface(tools.getNamed(it->first));
+			interface->loadFromDom(it->second);
+		}
+	}
+	
+	void NodeTab::updateToolList()
+	{
+		// delete menu entries
+		int oldCount = toolListLayout->count();
+		QLayoutItem *child;
+		while ((child = toolListLayout->takeAt(0)) != 0)
+			delete child;
+		
+		// generate menu entries
+		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
+			toolListLayout->addWidget((*it)->createMenuEntry());
+		
+		// if elements were added, ensure that this tab is visible
+		if (toolListLayout->count() != oldCount)
+			toolBox->setCurrentIndex(toolListIndex);
+	}	
 	
 	void NodeTab::resetClicked()
 	{
@@ -1565,12 +1604,24 @@ namespace Aseba
 					QDomElement element = domNode.toElement();
 					if (element.tagName() == "node")
 					{
+						// TODO: load plugins xml data
+						ScriptTab::SavedPlugins savedPlugins;
 						NodeTab* tab = getTabFromName(element.attribute("name"));
 						if (tab)
+						{
 							tab->editor->setPlainText(element.firstChild().toText().data());
+							// TODO: reload plugins
+						}
 						else
 						{
-							nodes->addTab(new AbsentNodeTab(0, element.attribute("name"), element.firstChild().toText().data()), element.attribute("name") + tr(" (not available)"));
+							nodes->addTab(
+								new AbsentNodeTab(
+									0, 
+									element.attribute("name"), element.firstChild().toText().data(),
+									savedPlugins
+								),
+								element.attribute("name") + tr(" (not available)")
+							);
 							noNodeCount++;
 						}
 					}
@@ -1716,12 +1767,26 @@ namespace Aseba
 				const QString& nodeContent = tab->editor->toPlainText();
 				
 				root.appendChild(document.createTextNode("\n\n\n"));
-				root.appendChild(document.createComment(QString("source code of node %0").arg(nodeName)));
+				root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
 				
 				QDomElement element = document.createElement("node");
 				element.setAttribute("name", nodeName);
 				QDomText text = document.createTextNode(nodeContent);
 				element.appendChild(text);
+				ScriptTab::SavedPlugins savedPlugins(tab->savePlugins());
+				if (!savedPlugins.isEmpty())
+				{
+					QDomElement plugins = document.createElement("toolsPlugins");
+					for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+					{
+						const NodeToolInterface::SavedContent content(*it);
+						QDomElement plugin(document.createElement("toolPlugin"));
+						plugin.setAttribute("name", content.first);
+						plugin.appendChild(document.importNode(content.second.documentElement(), true));
+						plugins.appendChild(plugin);
+					}
+					element.appendChild(plugins);
+				}
 				root.appendChild(element);
 			}
 		}
@@ -2449,6 +2514,8 @@ namespace Aseba
 		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
 		{
 			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
+			tab->restorePlugins(absentTab->savePlugins());
+			tab->updateToolList();
 			nodes->removeAndDeleteTab(absentIndex);
 		}
 		
@@ -2471,7 +2538,8 @@ namespace Aseba
 			new AbsentNodeTab(
 				node,
 				tabName,
-				tab->editor->document()->toPlainText()
+				tab->editor->document()->toPlainText(),
+				tab->savePlugins()
 			),
 			tabName
 		);

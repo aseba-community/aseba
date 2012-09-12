@@ -42,8 +42,12 @@ namespace Aseba
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
 
-		virtual void loadFrom(const QDomDocument& document);
-		virtual QDomDocument saveTo() const;
+		virtual void loadFromDom(const QDomDocument& content) {};
+		virtual QDomDocument saveToDom() const { return QDomDocument(); } 
+		//virtual bool surviveTabDestruction() const;
+		
+		static QString getPluginName();
+>>>>>>> Changed tool plugins infrastructure to support saving and restorting to/from absent node tab.
 	
 	private slots:
 		void showFlashDialog();
