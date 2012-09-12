@@ -6,7 +6,6 @@
 #include <QSizePolicy>
 #include <QFileDialog>
 #include <QFile>
-#include <QDomDocument>
 #include <QDomElement>
 #include <QDesktopWidget>
 #include <QApplication>
@@ -393,6 +392,65 @@ namespace Aseba
 
 		return false;
 	}
+
+	QDomDocument ThymioVisualProgramming::saveTo() const 
+	{ 
+		QDomDocument document("aesl-source");
+		
+		QDomElement vplroot = document.documentElement();
+
+		QDomElement setting = document.createElement("vpl-setting");
+		vplroot.appendChild(document.createTextNode("\n\n"));
+		vplroot.appendChild(setting);
+					
+		QDomElement mode = document.createElement("mode");
+		mode.setAttribute("advanced", scene->getAdvanced() ? "true" : "false");
+		setting.appendChild(mode);	
+		
+		QDomElement colorScheme = document.createElement("colorscheme");
+		colorScheme.setAttribute("value", QString::number(colorComboButton->currentIndex()));
+		setting.appendChild(colorScheme);
+		vplroot.appendChild(document.createTextNode("\n\n"));		
+		
+		for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
+			  itr != scene->buttonsEnd(); ++itr )
+		{			
+			QDomElement element = document.createElement("vpl-button-element");			
+			
+			if( (*itr)->eventExists() ) 
+			{
+				ThymioButton *button = (*itr)->getEventButton();
+				
+				QDomElement eventElement = document.createElement("event");
+				eventElement.setAttribute("name", button->getName() );
+				for(int i=0; i<button->getNumButtons(); ++i)
+					eventElement.setAttribute( QString("button%0").arg(i), button->isClicked(i));					
+				eventElement.setAttribute("state", button->getState());
+
+				element.appendChild(eventElement);
+			}
+			
+			if( (*itr)->actionExists() ) 
+			{
+				ThymioButton *button = (*itr)->getActionButton();
+				
+				QDomElement actionElement = document.createElement("action");
+				actionElement.setAttribute("name", button->getName() );
+				for(int i=0; i<button->getNumButtons(); ++i)					
+					actionElement.setAttribute(QString("button%0").arg(i), button->isClicked(i));
+
+				element.appendChild(actionElement);
+			}
+			
+			vplroot.appendChild(element);
+			vplroot.appendChild(document.createTextNode("\n\n"));		
+		}
+		
+
+		scene->setModified(false);
+
+		return document;
+	}
 	
 	bool ThymioVisualProgramming::saveFile(QString filename)
 	{	
@@ -465,6 +523,118 @@ namespace Aseba
 		scene->setModified(false);
 		
 		return true;
+	}
+	
+	void ThymioVisualProgramming::loadFrom(const QDomDocument& document) 
+	{
+		scene->clear();
+
+		QDomNode domNode = document.documentElement().firstChild();
+		while (!domNode.isNull())
+		{
+			if (domNode.isElement())
+			{
+				QDomElement element = domNode.toElement();
+				if (element.tagName() == "vpl-setting") 
+				{
+					QDomElement childElement = element.firstChildElement("colorscheme");
+					colorComboButton->setCurrentIndex(childElement.attribute("value").toInt());	
+					
+					QDomElement childElement2 = element.firstChildElement("mode");
+					if( childElement2.attribute("advanced") == "true" )
+						advancedMode();
+					else
+					{
+						advancedButton->setEnabled(true);
+						actionButtons.last()->hide(); // state button
+						scene->setAdvanced(false);					
+					}
+						
+				}
+				else if(element.tagName() == "vpl-button-element")
+				{
+					QDomElement eventElement = element.firstChildElement("event");
+					if( !eventElement.isNull() )
+					{
+						QString buttonName = eventElement.attribute("name");
+						ThymioButton *button;
+						
+						if ( buttonName == "button" )
+							button = new ThymioButtonsEvent(0,scene->getAdvanced());
+						else if ( buttonName == "prox" )
+							button = new ThymioProxEvent(0,scene->getAdvanced());
+						else if ( buttonName == "proxground" )
+							button = new ThymioProxGroundEvent(0,scene->getAdvanced());
+						else if ( buttonName == "tap" )
+						{					
+							button = new ThymioTapEvent(0,scene->getAdvanced());
+							button->setSharedRenderer(tapSvg);
+						}
+						else if ( buttonName == "clap" )
+						{
+							button = new ThymioClapEvent(0,scene->getAdvanced());
+							button->setSharedRenderer(clapSvg);
+						}
+						else
+						{
+							QMessageBox::warning(this,tr("Loading"),
+												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
+							return;
+						}
+
+						for(int i=0; i<button->getNumButtons(); ++i)
+							button->setClicked(i,eventElement.attribute(QString("button%0").arg(i)).toInt());
+
+						button->setState(eventElement.attribute("state").toInt());
+
+						scene->addEvent(button);
+					}
+					else 
+					{
+						scene->addEvent(0);
+					}
+					
+					QDomElement actionElement = element.firstChildElement("action");
+					if( !actionElement.isNull() )
+					{
+						QString buttonName = actionElement.attribute("name");
+						ThymioButton *button;
+						
+						if ( buttonName == "move" )
+							button = new ThymioMoveAction();
+						else if ( buttonName == "color" )
+							button = new ThymioColorAction();
+						else if ( buttonName == "circle" )
+							button = new ThymioCircleAction();
+						else if ( buttonName == "sound" )
+							button = new ThymioSoundAction();
+						else if ( buttonName == "memory" )			
+							button = new ThymioMemoryAction();
+						else
+						{
+							QMessageBox::warning(this,tr("Loading"),
+												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
+							return;
+						}							
+
+						for(int i=0; i<button->getNumButtons(); ++i)
+							button->setClicked(i,actionElement.attribute(QString("button%0").arg(i)).toInt());
+		
+						
+						scene->addAction(button);
+					}
+					else
+					{
+						scene->addAction(0);
+					}						
+
+				}			
+					
+			}
+			domNode = domNode.nextSibling();
+		}
+		
+		scene->setModified(false);		
 	}
 	
 	bool ThymioVisualProgramming::loadFile(QString filename)

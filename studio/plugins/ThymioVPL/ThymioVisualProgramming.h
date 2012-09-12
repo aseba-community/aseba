@@ -19,6 +19,7 @@
 #include <map>
 #include <vector>
 #include <iterator>
+#include <QDomDocument>
 
 #include "ThymioButtons.h"
 #include "ThymioScene.h"
@@ -40,7 +41,9 @@ namespace Aseba
 		
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
-		//virtual bool surviveTabDestruction() const;
+
+		virtual void loadFrom(const QDomDocument& document);
+		virtual QDomDocument saveTo() const;
 	
 	private slots:
 		void showFlashDialog();
