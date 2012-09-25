@@ -17,6 +17,7 @@ namespace Aseba
 		
 		QGraphicsItem *addAction(ThymioButton *item);
 		QGraphicsItem *addEvent(ThymioButton *item);
+		void addButtonSet(ThymioButton *event, ThymioButton *action);
 
 		bool isEmpty() const;
 		void reset();

@@ -74,22 +74,25 @@ namespace Aseba
 		nodeTab->target->stop(nodeTab->id);
 	}
 	
-	QString InvasivePlugin::saveFile(bool as)
+	bool InvasivePlugin::saveFile(bool as)
 	{
 		if( as )
-			mainWindow->saveFile();
-		else
-			mainWindow->save();
-	
-		return mainWindow->actualFileName;
+			return mainWindow->saveFile();
+		
+		return mainWindow->save();
 	}
 	
-	void InvasivePlugin::openFile(QString name)
-	{ 
-		mainWindow->sourceModified = false;
-		mainWindow->constantsDefinitionsModel->clearWasModified();
-		mainWindow->eventsDescriptionsModel->clearWasModified();
-		mainWindow->openFile(name);
+//	void InvasivePlugin::openFile(QString name)
+//	{ 
+//		mainWindow->sourceModified = false;
+//		mainWindow->constantsDefinitionsModel->clearWasModified();
+//		mainWindow->eventsDescriptionsModel->clearWasModified();
+//		mainWindow->openFile();
+//	}
+
+	void InvasivePlugin::openFile()
+	{
+		mainWindow->openFile();
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()

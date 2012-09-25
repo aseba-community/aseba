@@ -23,57 +23,36 @@ namespace Aseba
 
 	void ThymioCompiler::addButtonSet(ThymioIRButtonSet *set)
 	{	
-		//cout << "Thymio Compiler -- add button set: " << buttonSet.size() << flush;
-		
 		buttonSet.push_back(set);
-		
-		//cout << "  ..\n" << flush;	
 	}
 
 	void ThymioCompiler::insertButtonSet(int row, ThymioIRButtonSet *set)
 	{
-		//cout << "Thymio Compiler -- insert button set: " << row << ", " << buttonSet.size() << flush;
-		
 		if(row < (int)buttonSet.size())	
 			buttonSet.insert(buttonSet.begin()+row, set);
 		else
 			buttonSet.push_back(set);
-
-		//cout << "  ..\n" << flush;	
 	}
 	
-	// crash here!!!
 	void ThymioCompiler::removeButtonSet(int row)
 	{
-		//cout << "Thymio Compiler -- remove button set: " << row << ", " << buttonSet.size() << flush;
-
 		assert(row < (int)buttonSet.size());
 		buttonSet.erase(buttonSet.begin()+row);
-
-		//cout << "  ..\n" << flush;	
 	}
 	
 	void ThymioCompiler::replaceButtonSet(int row, ThymioIRButtonSet *set)
 	{
-		//cout << "Thymio Compiler -- replace button set: " << row << ", " << buttonSet.size() << flush;
-
 		if(row < (int)buttonSet.size())
 			buttonSet[row] = set;
 		else
-			buttonSet.push_back(set);
-
-		//cout << "  ..\n" << flush;	
+			buttonSet.push_back(set);	
 	}
 	
 	void ThymioCompiler::swap(int row1, int row2)
 	{
-		//cout << "Thymio Compiler -- swap button set: " << row1 << ", " << row2 << ", " << buttonSet.size() << flush;
-		
 		ThymioIRButtonSet *set = buttonSet[row1];
 		buttonSet[row1] = buttonSet[row2];
-		buttonSet[row2] = set;
-
-		//cout << "  ..\n" << flush;	
+		buttonSet[row2] = set;	
 	}
 	
 	void ThymioCompiler::clear()

@@ -64,8 +64,8 @@ namespace Aseba
 		void stop();
 		TargetVariablesModel * getVariablesModel();
 		void setVariableValues(unsigned, const VariablesDataVector &);
-		QString saveFile(bool as=false);
-		void openFile(QString name);
+		bool saveFile(bool as=false);
+		void openFile();
 	};
 	
 	//! A tool that is specific to a node
