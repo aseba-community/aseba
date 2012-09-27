@@ -17,6 +17,7 @@ namespace Aseba
 		
 		QGraphicsItem *addAction(ThymioButton *item);
 		QGraphicsItem *addEvent(ThymioButton *item);
+		void addButtonSet(ThymioButton *event, ThymioButton *action);
 
 		bool isEmpty() const;
 		void reset();
@@ -33,6 +34,7 @@ namespace Aseba
 		QList<QString> getCode() const;
 		
 		bool isSuccessful() const { return  thymioCompiler.isSuccessful(); }
+		int getFocusItemId() const;
 		
 		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
 		
