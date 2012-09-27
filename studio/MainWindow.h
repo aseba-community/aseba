@@ -240,7 +240,7 @@ namespace Aseba
 
 		void showMemoryUsage(bool show);
 		
-		void displayCode(QList<QString> code);
+		void displayCode(QList<QString> code, int line);
 		
 		void cursorMoved();
 		void goToError();

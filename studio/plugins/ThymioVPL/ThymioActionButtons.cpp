@@ -44,7 +44,7 @@ namespace Aseba
 		animation = new QGraphicsItemAnimation(this);
 		animation->setItem(thymioBody);
 		animation->setTimeLine(timer);				
-		thymioBody->setTransformOriginPoint(0,-14);//(pt[1]+pt[0]) == 0 ? 0 : (abs(pt[1])-abs(pt[0]))/(abs(pt[1])+abs(pt[0]))*22.2,-25);
+		thymioBody->setTransformOriginPoint(0,-14);
 	}
 
 	ThymioMoveAction::~ThymioMoveAction()

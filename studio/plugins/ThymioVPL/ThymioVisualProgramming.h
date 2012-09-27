@@ -47,7 +47,7 @@ namespace Aseba
 		//virtual bool surviveTabDestruction() const;
 		
 	private slots:
-		void showFlashDialog();
+		void showVPL();
 		void addButtonsEvent();
 		void addProxEvent();
 		void addProxGroundEvent();
@@ -124,8 +124,8 @@ namespace Aseba
 		bool warningDialog();
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
-		bool saveFile(QString filename);		
-		bool loadFile(QString filename);
+//		bool saveFile(QString filename);		
+//		bool loadFile(QString filename);
 		
 		virtual void resizeEvent( QResizeEvent *event );
 	};

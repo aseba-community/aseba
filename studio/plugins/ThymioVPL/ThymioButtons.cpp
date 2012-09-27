@@ -740,8 +740,8 @@ namespace Aseba
 		
 	void ThymioButtonSet::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobutton") || 
-			 event->mimeData()->hasFormat("thymiobuttonset") )
+		if ( event->mimeData()->hasFormat("thymiobuttonset") || 
+			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
 			{
@@ -750,7 +750,7 @@ namespace Aseba
 				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
 					highlightActionButton = true;
 			}
-			
+
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			update();
@@ -759,12 +759,12 @@ namespace Aseba
 		}
 		else
 			event->ignore();
-	}	
+	}
 
 	void ThymioButtonSet::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobutton") || 
-			 event->mimeData()->hasFormat("thymiobuttonset") )
+		if ( event->mimeData()->hasFormat("thymiobuttonset") ||
+			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
 			{
@@ -800,7 +800,7 @@ namespace Aseba
 	void ThymioButtonSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		scene()->setFocusItem(0);
-
+	
 		if ( event->mimeData()->hasFormat("thymiobutton") )
 		{	
 			QByteArray buttonData = event->mimeData()->data("thymiobutton");
@@ -878,17 +878,13 @@ namespace Aseba
 						dataStream >> status;	
 						button->setClicked(i, status);
 					}
-
 				}
-
 			}
 			
 			update();
 		}
 		else
 			event->ignore();
-
-		//qDebug() << "  == TBS -- drop event : done";
 	}
 
 	void ThymioButtonSet::mousePressEvent( QGraphicsSceneMouseEvent * event )
@@ -913,7 +909,7 @@ namespace Aseba
 		QDrag *drag = new QDrag(event->widget());		
 		QPixmap img = image();
 		drag->setMimeData(mime);
-		drag->setPixmap(img.scaled((1000+trans)*scale(),336*scale()));
+		drag->setPixmap(img.scaled((1000+trans)*scale(), 336*scale()));
 		drag->setHotSpot(QPoint((500+trans*0.5)*scale(), 168*scale()));
 
 		drag->exec(Qt::MoveAction);
@@ -923,7 +919,7 @@ namespace Aseba
 	void ThymioButtonSet::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 	{
 		setCursor(Qt::OpenHandCursor);
-		QGraphicsItem::mouseReleaseEvent(event);		
+		QGraphicsItem::mouseReleaseEvent(event);
 	}
 
 	// Thymio Push Button
