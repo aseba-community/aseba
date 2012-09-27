@@ -148,6 +148,7 @@ set (ASEBACORE_HDR_COMMON
 )
 set (ASEBACORE_HDR_COMPILER
 	compiler/compiler.h
+	compiler/errors_code.h
 )
 	
 install(FILES ${ASEBACORE_HDR_UTILS}
