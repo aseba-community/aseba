@@ -34,6 +34,7 @@ namespace Aseba
 		QList<QString> getCode() const;
 		
 		bool isSuccessful() const { return  thymioCompiler.isSuccessful(); }
+		int getFocusItemId() const;
 		
 		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
 		

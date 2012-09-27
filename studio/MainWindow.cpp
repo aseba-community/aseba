@@ -901,13 +901,31 @@ namespace Aseba
 		editorContentChanged();
 	}
 
-	void NodeTab::displayCode(QList<QString> code)
+	void NodeTab::displayCode(QList<QString> code, int line)
 	{
 		editor->clear();
+		QTextCharFormat format;
+		QTextCursor cursor(editor->textCursor());
+		int pos=0;
 		
-		editor->textCursor();
 		for(int i=0; i<code.size(); i++)
-			editor->insertPlainText(code[i]);
+		{
+			if( i == line )
+			{
+				format.setBackground(QBrush(QColor(255,255,200)));
+				cursor.insertText(code[i], format);
+				pos = cursor.position();
+			} 
+			else
+			{
+				format.setBackground(QBrush(Qt::white));
+				cursor.insertText(code[i], format);			
+			}
+		}
+		
+		cursor.setPosition(pos);
+		editor->setTextCursor(cursor);
+		editor->ensureCursorVisible();		
 	}
 
 	void NodeTab::showKeywords(bool show)

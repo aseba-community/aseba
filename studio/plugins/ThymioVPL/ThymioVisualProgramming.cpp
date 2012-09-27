@@ -534,7 +534,7 @@ namespace Aseba
 		if( scene->isSuccessful() ) 
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			displayCode(scene->getCode());
+			displayCode(scene->getCode(), scene->getFocusItemId());
 			runButton->setEnabled(true);
 		}
 		else

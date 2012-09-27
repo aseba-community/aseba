@@ -59,7 +59,7 @@ namespace Aseba
 		Dashel::Stream* getDashelStream();
 		Target * getTarget();
 		unsigned getNodeId();
-		void displayCode(QList<QString> code);
+		void displayCode(QList<QString> code, int line);
 		void loadNrun();
 		void stop();
 		TargetVariablesModel * getVariablesModel();

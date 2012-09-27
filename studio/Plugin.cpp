@@ -58,9 +58,9 @@ namespace Aseba
 		return nodeTab->id;
 	}
 	
-	void InvasivePlugin::displayCode(QList<QString> code)
+	void InvasivePlugin::displayCode(QList<QString> code, int line)
 	{
-		nodeTab->displayCode(code);
+		nodeTab->displayCode(code, line);
 	}
 	
 	void InvasivePlugin::loadNrun()

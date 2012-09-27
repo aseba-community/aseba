@@ -55,6 +55,11 @@ namespace Aseba
 		buttonSet[row2] = set;	
 	}
 	
+	int ThymioCompiler::buttonToCode(int id) const
+	{
+		return codeGenerator.buttonToCode(id);
+	}
+	
 	void ThymioCompiler::clear()
 	{
 		buttonSet.clear();

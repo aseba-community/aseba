@@ -34,6 +34,7 @@ namespace Aseba
 		
 		addItem(button);
 		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
+		connect(this, SIGNAL(selectionChanged()), this, SIGNAL(stateChanged()));
 	}
 	
 	ThymioScene::~ThymioScene()
@@ -339,9 +340,24 @@ namespace Aseba
 		
 		for(std::vector<std::wstring>::const_iterator itr = thymioCompiler.beginCode();
 			itr != thymioCompiler.endCode(); ++itr)
-			out.push_back(QString::fromStdWString(*itr) + "\n");
+			out.push_back(QString::fromStdWString(*itr));
 	
 		return out;
+	}
+
+	int ThymioScene::getFocusItemId() const 
+	{ 
+		QGraphicsItem *item = focusItem();
+		
+		while( item != 0 )
+		{
+			if( item->data(0).toString() == "buttonset" )
+				return thymioCompiler.buttonToCode(item->data(1).toInt());
+			else
+				item = item->parentItem();			
+		}
+
+		return -1;
 	}
 	
 	void ThymioScene::buttonUpdateDetected()
