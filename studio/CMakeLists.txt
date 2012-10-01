@@ -98,7 +98,8 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioActionButtons.cpp
 		plugins/ThymioVPL/ThymioIRButtons.cpp
 		plugins/ThymioVPL/ThymioIRVisitors.cpp
-		plugins/ThymioVPL/ThymioCompiler.cpp)
+		plugins/ThymioVPL/ThymioCompiler.cpp
+		${SOCKETCAN_PLUGIN})
 	
 	qt4_automoc(${studio_SRCS})
 	
