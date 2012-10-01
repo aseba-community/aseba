@@ -40,6 +40,8 @@ else (WIN32)
 		mark_as_advanced(IOKIT_LIBRARY)
 		set(EXTRA_LIBS ${EXTRA_LIBS} ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY} ${EXTRA_LIBS})
 	else (APPLE)
+		set (SOCKETCAN_PLUGIN ../transport/dashel_plugin/socketcan.cpp)
+		
                 if (UDEV_FOUND)
                         include_directories(${UDEV_INCLUDE_DIR})
 			set(EXTRA_LIBS ${EXTRA_LIBS} ${UDEV_LIBS} ${EXTRA_LIBS})
