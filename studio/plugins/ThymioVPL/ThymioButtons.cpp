@@ -173,11 +173,7 @@ namespace Aseba
 		if( advanced )
 		{
 			for(uint i=0; i<4; i++)
-			{
-//				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-15,-25,30,50), THYMIO_CIRCULAR_BUTTON, 2, this);//THYMIO_RECTANGULAR_BUTTON , 2, this);
-//				button->setPos(320 + (2-i)*(i%2)*35, 128 + (i-1)*((i+1)%2)*45);
-//				button->setRotation(90*(i+1));				
-				
+			{	
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 				button->setPos(295, i*60 + 40);
 				button->setButtonColor(QColor(255,200,0));
@@ -201,9 +197,10 @@ namespace Aseba
 
 	void ThymioButton::setClicked(int i, int status)
 	{
-		//qDebug() << "in thymio button set clicked";
 		if( i < thymioButtons.size()  )
 			thymioButtons.at(i)->setClicked(status);			
+
+		updateIRButton();
 	}
 	
 	ThymioIRButton *ThymioButton::getIRButton()
@@ -350,11 +347,7 @@ namespace Aseba
 		if( advanced && stateButtons.empty() )
 		{
 			for(int i=0; i<4; i++)
-			{
-//				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-10,-15,20,30), THYMIO_RECTANGULAR_BUTTON , 2, this);
-//				button->setPos(128 + (2-i)*(i%2)*35, 128 + (i-1)*((i+1)%2)*35);
-//				button->setRotation(90*(i+1));
-				
+			{		
 				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
 				button->setPos(295, i*60 + 40);
 				button->setButtonColor(QColor(255,200,0));
@@ -663,7 +656,7 @@ namespace Aseba
 			scene()->removeItem( actionButton );
 			delete(actionButton);
 		}
-		
+			
 		action->setButtonColor(actionButtonColor);
 		action->setPos(500+trans, 40);
 		action->setScaleFactor(scale());
@@ -747,8 +740,8 @@ namespace Aseba
 		
 	void ThymioButtonSet::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobutton") || 
-			 event->mimeData()->hasFormat("thymiobuttonset") )
+		if ( event->mimeData()->hasFormat("thymiobuttonset") || 
+			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
 			{
@@ -757,7 +750,7 @@ namespace Aseba
 				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
 					highlightActionButton = true;
 			}
-			
+
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			update();
@@ -766,12 +759,12 @@ namespace Aseba
 		}
 		else
 			event->ignore();
-	}	
+	}
 
 	void ThymioButtonSet::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobutton") || 
-			 event->mimeData()->hasFormat("thymiobuttonset") )
+		if ( event->mimeData()->hasFormat("thymiobuttonset") ||
+			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
 			{
@@ -806,10 +799,8 @@ namespace Aseba
 
 	void ThymioButtonSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		//qDebug() << "ThymioButtonSet -- drop event";
-
 		scene()->setFocusItem(0);
-
+	
 		if ( event->mimeData()->hasFormat("thymiobutton") )
 		{	
 			QByteArray buttonData = event->mimeData()->data("thymiobutton");
@@ -864,15 +855,11 @@ namespace Aseba
 					button = new ThymioSoundAction();
 				else if( buttonName == "memory" )
 					button = new ThymioMemoryAction();
-							
-				//qDebug() << "  == TBS -- drop event : created " << buttonName << " button, # " << numButtons;
 
 				if( button ) 
 				{
 					event->setDropAction(Qt::MoveAction);
 					event->accept();
-					
-					//qDebug() << "  == TBS -- drop event : accepted the button.";
 					
 					if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
 					{
@@ -891,17 +878,13 @@ namespace Aseba
 						dataStream >> status;	
 						button->setClicked(i, status);
 					}
-
 				}
-				//qDebug() << "  == TBS -- drop event : added the button.";
 			}
 			
 			update();
 		}
 		else
 			event->ignore();
-
-		//qDebug() << "  == TBS -- drop event : done";
 	}
 
 	void ThymioButtonSet::mousePressEvent( QGraphicsSceneMouseEvent * event )
@@ -926,7 +909,7 @@ namespace Aseba
 		QDrag *drag = new QDrag(event->widget());		
 		QPixmap img = image();
 		drag->setMimeData(mime);
-		drag->setPixmap(img.scaled((1000+trans)*scale(),336*scale()));
+		drag->setPixmap(img.scaled((1000+trans)*scale(), 336*scale()));
 		drag->setHotSpot(QPoint((500+trans*0.5)*scale(), 168*scale()));
 
 		drag->exec(Qt::MoveAction);
@@ -936,7 +919,7 @@ namespace Aseba
 	void ThymioButtonSet::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 	{
 		setCursor(Qt::OpenHandCursor);
-		QGraphicsItem::mouseReleaseEvent(event);		
+		QGraphicsItem::mouseReleaseEvent(event);
 	}
 
 	// Thymio Push Button

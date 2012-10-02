@@ -165,13 +165,9 @@ namespace Aseba
 		generatedCode(),
 		currentBlock(0),
 		inIfBlock(false),
-		insertLoc(0)
+		buttonToCodeMap()
 	{
-		editor[THYMIO_BUTTONS_IR] = -1;	
-		editor[THYMIO_PROX_IR] = -1;
-		editor[THYMIO_PROX_GROUND_IR] = -1;
-		editor[THYMIO_TAP_IR] = -1;
-		editor[THYMIO_CLAP_IR] = -1;
+		reset();
 		
 		directions.push_back(L"forward");
 		directions.push_back(L"left");
@@ -195,14 +191,22 @@ namespace Aseba
 	
 	void ThymioIRCodeGenerator::reset() 
 	{
-		editor[THYMIO_BUTTONS_IR] = -1;	
-		editor[THYMIO_PROX_IR] = -1;
-		editor[THYMIO_PROX_GROUND_IR] = -1;
-		editor[THYMIO_TAP_IR] = -1;
-		editor[THYMIO_CLAP_IR] = -1;
+		editor[THYMIO_BUTTONS_IR] = make_pair(-1,0);
+		editor[THYMIO_PROX_IR] = make_pair(-1,0);
+		editor[THYMIO_TAP_IR] = make_pair(-1,0);
+		editor[THYMIO_CLAP_IR] = make_pair(-1,0);
 		generatedCode.clear();
 		inIfBlock = false;
+		buttonToCodeMap.clear();
 	}	
+
+	int ThymioIRCodeGenerator::buttonToCode(int id) const
+	{
+		if( errorCode != THYMIO_NO_ERROR )
+			return -1;
+
+		return (id < (int)buttonToCodeMap.size() ? buttonToCodeMap[id] : -1);
+	}
 
 	void ThymioIRCodeGenerator::visit(ThymioIRButton *button)
 	{
@@ -212,7 +216,6 @@ namespace Aseba
 
 		if( button->isEventButton() )
 		{
-			insertLoc = generatedCode[currentBlock].end();
 			bool flag=false;
 			if( button->isSet() )
 			{
@@ -299,8 +302,7 @@ namespace Aseba
 				text += L" then\n";
 				inIfBlock = true;
 					
-				generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
-				insertLoc = generatedCode[currentBlock].end();	
+				generatedCode[currentBlock] = text;
 			}
 			else 
 			{
@@ -309,21 +311,12 @@ namespace Aseba
 					text += L"\tif state == ";
 					text += toWstring(button->getMemoryState());
 					text += L" then\n";
-					inIfBlock = true;
 					
-					generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
-					insertLoc = generatedCode[currentBlock].end();
+					generatedCode[currentBlock] = text;
+					inIfBlock = true;
 				}
 				else
-				{
 					inIfBlock = false;
-					
-					size_t found =  generatedCode[currentBlock].find(L"if");
-					if( found == wstring::npos )
-						insertLoc = generatedCode[currentBlock].end();
-					else
-						insertLoc = generatedCode[currentBlock].begin() + found - 1;
-				}
 			}
 		}
 		else
@@ -380,14 +373,18 @@ namespace Aseba
 			text += (inIfBlock ? L"\tend\n" : L"");
 			inIfBlock = false;
 		
-			generatedCode[currentBlock].insert(insertLoc, text.begin(), text.end());
+			generatedCode[currentBlock].append(text);
 		}
 	
 	}
 
 	void ThymioIRCodeGenerator::visit(ThymioIRButtonSet *buttonSet)
 	{
-		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() ) return;
+		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() ) 
+		{
+			buttonToCodeMap.push_back(-1);
+			return;
+		}
 		
 		errorCode = THYMIO_NO_ERROR;
 		
@@ -399,52 +396,51 @@ namespace Aseba
 		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
-		int block = editor[name];
-
+		if( name == THYMIO_PROX_GROUND_IR )
+			name = THYMIO_PROX_IR;
+		
+		int block = editor[name].first;
+		int size = editor[name].second;
+		bool mflag = (buttonSet->getEventButton()->getMemoryState() >= 0 ? true : false);
+			
 		if( block < 0 )
 		{
 			block = generatedCode.size();
-			bool mflag = (buttonSet->getEventButton()->getMemoryState() >= 0 ? true : false);
 			
 			switch(name) 
 			{
 			case THYMIO_BUTTONS_IR:
-				generatedCode.push_back(L"onevent buttons\n");
+				generatedCode.push_back(L"\nonevent buttons\n");
+				size++;
 				break;
 			case THYMIO_PROX_IR:
-				if( editor[THYMIO_PROX_GROUND_IR] < 0 )
-					generatedCode.push_back(L"onevent prox\n");
-				else
-				{
-					block = editor[THYMIO_PROX_GROUND_IR];
-					mflag = false;
-				}
-				break;
-			case THYMIO_PROX_GROUND_IR:
-				if( editor[THYMIO_PROX_IR] < 0 )
-					generatedCode.push_back(L"onevent prox\n");
-				else
-				{
-					block = editor[THYMIO_PROX_IR];
-					mflag = false;
-				}
+				generatedCode.push_back(L"\nonevent prox\n");
+				size++;
 				break;
 			case THYMIO_TAP_IR:
-				generatedCode.push_back(L"onevent tap\n");			
+				generatedCode.push_back(L"\nonevent tap\n");
+				size++;
 				break;
 			case THYMIO_CLAP_IR:
 				if( generatedCode.empty() || generatedCode[0].find(L"var new_state = 0\n") == wstring::npos )
 				{
 					generatedCode.insert(generatedCode.begin(),L"mic.threshold = 250\n");
-					for(map<ThymioIRButtonName, int>::iterator itr = editor.begin();
+					for(map<ThymioIRButtonName, pair<int, int> >::iterator itr = editor.begin();
 						itr != editor.end(); ++itr)
-						if( itr->second >= 0 )
-							itr->second += 1;				
-					block += 1;
+						if( (itr->second).first >= 0 )
+							(itr->second).first++;
+
+					for(int i=0; i<(int)buttonToCodeMap.size(); i++)
+						if( buttonToCodeMap[i]>=0 ) 
+							buttonToCodeMap[i]++;
+
+					block += 1;				
 				}
 				else
 					generatedCode[0].append(L"\nmic.threshold = 250\n");
-				generatedCode.push_back(L"onevent mic\n");
+
+				generatedCode.push_back(L"\nonevent mic\n");
+				size++;
 				break;	
 			default:
 				errorCode = THYMIO_INVALID_CODE;
@@ -453,12 +449,43 @@ namespace Aseba
 			}
 
 			if(mflag)
-				generatedCode.push_back(L"\tstate = new_state\n\tcall leds.temperature(((state>>0) & 1)*10+((state>>1) & 1)*22,((state>>2) & 1)*10+((state>>3) & 1)*22)\n");
+			{
+				generatedCode.push_back(L"\n\tstate = new_state\n\tcall leds.temperature(((state>>0) & 1)*10+((state>>1) & 1)*22,((state>>2) & 1)*10+((state>>3) & 1)*22)\n");
+				editor[name] = make_pair(block, size+1);
+			}
+			else
+				editor[name] = make_pair(block, size);
 
-			editor[name] = block;
+			currentBlock = block + size;
+			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
+			buttonToCodeMap.push_back(currentBlock);
 		}
-		currentBlock = block;
+		else
+		{
+			currentBlock = (mflag ? block + size : block + size + 1);
+			editor[name].second++;
+			for(map<ThymioIRButtonName, pair<int, int> >::iterator itr = editor.begin(); itr != editor.end(); ++itr)
+				if( (itr->second).first > block )
+					(itr->second).first++;
+
+			if( !mflag && !buttonSet->getEventButton()->isSet() )
+			{
+				// find where "if" block starts for the current event
+				for(unsigned int i=0; i<buttonToCodeMap.size(); i++)
+					if( buttonToCodeMap[i] >= block && buttonToCodeMap[i] < currentBlock &&
+						generatedCode[buttonToCodeMap[i]].find(L"if ") != wstring::npos )				
+						currentBlock = buttonToCodeMap[i];
+			}
+			
+			for( unsigned int i=0; i<buttonToCodeMap.size(); i++)
+				if(buttonToCodeMap[i] >= currentBlock)
+					buttonToCodeMap[i]++;
 				
+			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
+			buttonToCodeMap.push_back(currentBlock);
+		}
+
+		
 		visit(buttonSet->getEventButton());
 		visit(buttonSet->getActionButton());
 	}

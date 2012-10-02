@@ -58,9 +58,9 @@ namespace Aseba
 		return nodeTab->id;
 	}
 	
-	void InvasivePlugin::displayCode(QList<QString> code)
+	void InvasivePlugin::displayCode(QList<QString> code, int line)
 	{
-		nodeTab->displayCode(code);
+		nodeTab->displayCode(code, line);
 	}
 	
 	void InvasivePlugin::loadNrun()
@@ -74,22 +74,25 @@ namespace Aseba
 		nodeTab->target->stop(nodeTab->id);
 	}
 	
-	QString InvasivePlugin::saveFile(bool as)
+	bool InvasivePlugin::saveFile(bool as)
 	{
 		if( as )
-			mainWindow->saveFile();
-		else
-			mainWindow->save();
-	
-		return mainWindow->actualFileName;
+			return mainWindow->saveFile();
+		
+		return mainWindow->save();
 	}
 	
-	void InvasivePlugin::openFile(QString name)
-	{ 
-		mainWindow->sourceModified = false;
-		mainWindow->constantsDefinitionsModel->clearWasModified();
-		mainWindow->eventsDescriptionsModel->clearWasModified();
-		mainWindow->openFile(name);
+//	void InvasivePlugin::openFile(QString name)
+//	{ 
+//		mainWindow->sourceModified = false;
+//		mainWindow->constantsDefinitionsModel->clearWasModified();
+//		mainWindow->eventsDescriptionsModel->clearWasModified();
+//		mainWindow->openFile();
+//	}
+
+	void InvasivePlugin::openFile()
+	{
+		mainWindow->openFile();
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()
@@ -109,46 +112,84 @@ namespace Aseba
 		return new C(node);
 	}
 	
-	void NodeToolRegistrar::reg(const ProductId pid, const CreatorFunc func)
+	//! Returns whether there is a tool named name in the list
+	bool NodeToolInterfaces::containsNamed(const QString& name) const
 	{
-		creators.insert(std::pair<ProductId, CreatorFunc>(pid, func));
+		for (const_iterator it(begin()); it != end(); ++it)
+			if ((*it)->name == name)
+				return true;
+		return false;
 	}
 	
-	NodeToolInterfaces NodeToolRegistrar::create(const ProductId pid, NodeTab* node)
+	//! Returns a tool of a given name
+	NodeToolInterface* NodeToolInterfaces::getNamed(const QString& name) const
 	{
-		typedef CreatorMap::const_iterator ConstIt;
-		typedef std::pair<ConstIt, ConstIt> ConstItPair;
-		ConstItPair range(creators.equal_range(pid));
-		/*if (range.first == range.second)
+		for (const_iterator it(begin()); it != end(); ++it)
+			if ((*it)->name == name)
+				return *it;
+		return 0;
+	}
+	
+	//! Register a class with a name/a list of PIDs by storing a pointer to its constructor
+	void NodeToolRegistrar::reg(const QString& name, const ProductIds& pid, const CreatorFunc func)
+	{
+		for (ProductIds::const_iterator it(pid.begin()); it != pid.end(); ++it)
+			reg(name, *it, func);
+	}
+	
+	//! Register a class with a name/a pid by storing a pointer to its constructor
+	void NodeToolRegistrar::reg(const QString& name, const ProductId pid, const CreatorFunc func)
+	{
+		pidCreators.insert(pid, CreatorFuncNamePair(func, name));
+		namedCreators[name] = func;
+	}
+	
+	//! Update tool list with onse for given pid
+	void NodeToolRegistrar::update(const ProductId pid, NodeTab* node, NodeToolInterfaces& tools) const
+	{
+		typedef PidCreatorMap::const_iterator ConstIt;
+		ConstIt it(pidCreators.find(pid));
+		while (it != pidCreators.end() && it.key() == pid)
 		{
-			std::cerr << "No tool registered for product id " << pid << ". Known ones are:\n";
-			dump(std::cerr);
-			throw std::runtime_error("Trying to instanciate unknown element from NodeToolRegistrar");
-		}*/
-		NodeToolInterfaces interfaces;
-		for (ConstIt it(range.first); it != range.second; ++it)
-		{
-			CreatorFunc creatorFunc(it->second);
-			interfaces.push_back(creatorFunc(node));
+			const QString& name(it.value().second);
+			if (!tools.containsNamed(name))
+			{
+				const CreatorFunc& creatorFunc(it.value().first);
+				tools.push_back(creatorFunc(node));
+				tools.back()->name = name;
+			}
+			++it;
 		}
-		return interfaces;
 	}
 	
+	//! Create tool list with one of a given name
+	void NodeToolRegistrar::update(const QString& name, NodeTab* node, NodeToolInterfaces& tools) const
+	{
+		if (tools.containsNamed(name))
+			return;
+		typedef NamedCreatorMap::const_iterator ConstIt;
+		ConstIt it(namedCreators.find(name));
+		if (it == namedCreators.end())
+			return;
+		const CreatorFunc& creatorFunc(it.value());
+		tools.push_back(creatorFunc(node));
+		tools.back()->name = name;
+	}
+	
+	//! Print the list of registered classes to stream
 	void NodeToolRegistrar::dump(std::ostream &stream)
 	{
-		for (CreatorMap::const_iterator it = creators.begin(); it != creators.end(); ++it)
+		for (PidCreatorMap::const_iterator it = pidCreators.begin(); it != pidCreators.end(); ++it)
 			stream << "- " << it->first << "\n";
 	}
 	
 	NodeToolRegistrer::NodeToolRegistrer()
 	{
-		reg(ASEBA_PID_CHALLENGE, &createInstance<LinearCameraViewPlugin>);
-		reg(ASEBA_PID_PLAYGROUND, &createInstance<LinearCameraViewPlugin>);
-		reg(ASEBA_PID_EPUCK, &createInstance<LinearCameraViewPlugin>);
-		reg(ASEBA_PID_SMARTROB, &createInstance<LinearCameraViewPlugin>);
-		
-		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioBootloaderDialog>);
-		reg(ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
+		ProductIds linearCameraPids;
+		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
+		reg("LinearCameraViewPlugin", linearCameraPids, &createInstance<LinearCameraViewPlugin>);
+		reg("ThymioBootloaderDialog", ASEBA_PID_THYMIO2, &createInstance<ThymioBootloaderDialog>);
+		reg("ThymioVisualProgramming", ASEBA_PID_THYMIO2, &createInstance<ThymioVisualProgramming>);
 	}
 	
 	/*@}*/

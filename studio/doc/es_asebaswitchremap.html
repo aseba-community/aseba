@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Conexión entre varios objetivos
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Conexión entre varios objetivos
+    </h1>
+    <p>
+      ASEBA ofrece una utilidad de linea de comandos llamada <em>asebaswitch</em>, que puede conectar diferentes objetivos. La sintaxis es:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch [opciones] [objetivos adicionales]*</code>
+</pre>
+    </div><br />
+    Para obtener más detalles, digita:
+    <div class="code">
+      <pre>
+<code>asebaswitch --help</code>
+</pre>
+    </div>
+    <p>
+      Los objetivos adicionales deben seguir la <a href="http://download.gna.org/dashel/1.0.3/doc/">nomenclatura Dashel</a>.
+    </p>
+    <h1 id="toc0">
+      <span>Uso avanzado</span>
+    </h1>
+    <p>
+      ASEBA requiere que cada nodo de una red tenga un identificador diferente. Sin embargo, algunos objetivos como <a href="http://aseba.wikidot.com/es:thymio">Thymio</a>, tienen un identificador incorporado el el firmware. Afortunadamente, asebaswitch dispone de un mecanismo para <em>remapear los identificadores</em>, que permite cambiar el identificador de un objetivo.
+    </p>
+    <p>
+      Tal mecanismo permite, por ejemplo, incluir dos o más Thymios en la misma red ASEBA.
+    </p>
+    <p>
+      En Linux, esto se traduce en la siguiente linea de comandos:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch -d "ser:device=/dev/ttyACM0;remapLocal=1" "ser:device=/dev/ttyACM1;remapLocal=2"</code>
+</pre>
+    </div>
+    <p>
+      El mecanismo de remapeo tiene dos opciones más en la cadena de caracteres que describen el objetivo:
+    </p>
+    <ul>
+      <li>
+        <tt>remapLocal</tt>. El identificador local con el que debe aparecer el nodo objetivo.
+      </li>
+      <li>
+        <tt>remapTarget</tt> (default: <tt>1</tt>). El identificador del nodo objetivo a remapear.
+      </li>
+    </ul>
+    <p>
+      Actualmente, este mecanismo permite remapear solo un nodo por objetivo. Esto se puede generalizar, dependiendo de las necesidades.
+    </p>
+  </body>
+</html>

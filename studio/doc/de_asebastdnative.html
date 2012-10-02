@@ -6,15 +6,151 @@
     <link rel="stylesheet" type="text/css" href="aseba.css" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>
-      Asebastdnative
+      Vorgegebene Funktionen Standard-Bibliothek
     </title>
   </head>
   <body>
     <h1 class="title">
-      Asebastdnative
+      Vorgegebene Funktionen Standard-Bibliothek
     </h1>
     <p>
-      <span style="color: purple">Diese Seite existiert noch nicht auf Deutsch, Sie können helfen bei überschreiben Seite <a href="http://aseba.wikidot.com/en:asebastdnative">asebastdnative</a>.</span>
+      Aseba bringt eine Standard-Bibliothek mit, die von Haus aus bereits viele Funktionen enthält. Die meisten Geräte liefern diese Standard-Bibliothek mit.<sup class="footnoteref"><a id="footnoteref-1" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-1')" name="footnoteref-1">1</a></sup> Falls die Firmware Ihres Gerätes schon etwas älter ist, unterstützt sie möglicherweise noch nicht neu hinzugekommene Funktionen. Seit Aseba 1.1 sind folgende Funktionen verfügbar:
     </p>
+    <dl>
+      <dt>
+        <tt>math.copy(A,B)</tt>
+      </dt>
+      <dd>
+        Kopiert eines nach dem anderen jedes Element des Vektors <img src="de_asebastdnative-eq0.png"> in den Vektor <img src="de_asebastdnative-eq1.png">: <img src="de_asebastdnative-eq2.png">.
+      </dd>
+      <dt>
+        <tt>math.fill(A,c)</tt>
+      </dt>
+      <dd>
+        Schreibt die Konstante <img src="de_asebastdnative-eq3.png"> in jedes Element des Vektors <img src="de_asebastdnative-eq1.png">: <img src="de_asebastdnative-eq4.png">.
+      </dd>
+      <dt>
+        <tt>math.addscalar(A, B, c)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq5.png">, wobei <img src="de_asebastdnative-eq3.png"> ein Skalar ist.
+      </dd>
+      <dt>
+        <tt>math.add(A, B, C)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq6.png">, wobei<img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> drei gleichgrosse Vektoren sind.
+      </dd>
+      <dt>
+        <tt>math.sub(A, B, C)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq8.png">, wobei <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> drei gleichgrosse Vektoren sind.
+      </dd>
+      <dt>
+        <tt>math.mul(A, B, C)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq9.png">, wobei <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> gleichgrosse Vektoren sind. <em>Beachte: Dies ist kein Skalarprodukt!</em>
+      </dd>
+      <dt>
+        <tt>math.div(A, B, C)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq10.png">, wobei <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> drei gleichgrosse Vektoren sind. <em>Eine Division durch Null führt zu einer Ausnahmesituation.</em>
+      </dd>
+      <dt>
+        <tt>math.min(A, B, C)</tt>
+      </dt>
+      <dd>
+        Speichere für jedes Element das Minimum der Vektoren <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> in <img src="de_asebastdnative-eq1.png">, wobei <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> drei Vektoren gleicher Grösse sind: <img src="de_asebastdnative-eq11.png">.
+      </dd>
+      <dt>
+        <tt>math.max(A, B, C)</tt>
+      </dt>
+      <dd>
+        Speichere für jedes Element das Maximum der Vektoren <img src="de_asebastdnative-eq0.png"> und <img src="de_asebastdnative-eq7.png"> in <img src="de_asebastdnative-eq1.png">, wobei <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq0.png"> and <img src="de_asebastdnative-eq7.png"> drei Vektoren gleicher Grösse sind: <img src="de_asebastdnative-eq12.png">.
+      </dd>
+      <dt>
+        <tt>math.dot(r, A, B, n)</tt>
+      </dt>
+      <dd>
+        Berechne das Skalarprodukt zweier gleichgrosser Vektoren <img src="de_asebastdnative-eq1.png"> und <img src="de_asebastdnative-eq0.png">: <img src="de_asebastdnative-eq13.png">
+      </dd>
+      <dt>
+        <tt>math.stat(V, min, max, mean)</tt>
+      </dt>
+      <dd>
+        Berechne das Maximum, den Mittelwert und das Minimum des Vektors <img src="de_asebastdnative-eq14.png">.
+      </dd>
+      <dt>
+        <tt>math.argbounds(A, argmin, argmax)</tt>
+      </dt>
+      <dd>
+        Bestimme die Indizes <em>argmin</em> und <em>argmax</em>, die dem kleinsten und dem grössten Wert aus <img src="de_asebastdnative-eq1.png"> entsprechen.
+      </dd>
+      <dt>
+        <tt>math.sort(A)</tt>
+      </dt>
+      <dd>
+        Sortiere den Vektor <img src="de_asebastdnative-eq1.png"> in situ.
+      </dd>
+      <dt>
+        <tt>math.muldiv(A, B, C, D)</tt>
+      </dt>
+      <dd>
+        Berechne die Multiplikations-Division mit 32-bit-Genauigkeit. <img src="de_asebastdnative-eq15.png">. <em>Eine Division durch Null führt zu einer Ausnahmesituation.</em>
+      </dd>
+      <dt>
+        <tt>math.atan2(A, Y, X)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq16.png">, wobei die Zeichen von <img src="de_asebastdnative-eq17.png"> und <img src="de_asebastdnative-eq18.png"> den Ausgabe-Quandranten festlegen. <img src="de_asebastdnative-eq1.png">, <img src="de_asebastdnative-eq19.png"> und <img src="de_asebastdnative-eq20.png"> müssen Vektoren gleicher Grösse sein. <em>Beachte, dass <img src="de_asebastdnative-eq21.png"> und <img src="de_asebastdnative-eq22.png"> zu dem Ergebnis <img src="de_asebastdnative-eq23.png"> führen.</em>.
+      </dd>
+      <dt>
+        <tt>math.sin(A, B)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq24.png">, wobei <img src="de_asebastdnative-eq1.png"> und <img src="de_asebastdnative-eq0.png"> zwei Vektoren gleicher Grösse sind.
+      </dd>
+      <dt>
+        <tt>math.cos(A, B)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq25.png">, wobei <img src="de_asebastdnative-eq1.png"> und <img src="de_asebastdnative-eq0.png"> zwei Vektoren gleicher Grösse sind.
+      </dd>
+      <dt>
+        <tt>math.rot2(A, B, Winkel)</tt>
+      </dt>
+      <dd>
+        Rotiere den Vektor <img src="de_asebastdnative-eq0.png"> um <em>Winkel</em> und speichere das Ergebnis in <img src="de_asebastdnative-eq1.png">. <em>Beachte: <img src="de_asebastdnative-eq1.png"> und <img src="de_asebastdnative-eq0.png"> müssen beide genau 2 Elemente enthalten.</em>
+      </dd>
+      <dt>
+        <tt>math.sqrt(A, B)</tt>
+      </dt>
+      <dd>
+        Berechne <img src="de_asebastdnative-eq26.png">, wobei <img src="de_asebastdnative-eq1.png"> und <img src="de_asebastdnative-eq0.png"> zwei Vektoren gleicher Grösse sind.
+      </dd>
+      <dt>
+        <tt>math.nzseq(a, B, m)</tt>
+      </dt>
+      <dd>
+        Speichere in <img src="de_asebastdnative-eq27.png"> den mittleren Index der längsten Aufeinanderfolge von Zahlen in <img src="de_asebastdnative-eq0.png">, die nicht Null sind oder <img src="de_asebastdnative-eq28.png"> falls es keine solche gibt oder dessen Länge kleiner als <img src="de_asebastdnative-eq29.png"> ist.
+      </dd>
+      <dt>
+        <tt>math.rand(v)</tt>
+      </dt>
+      <dd>
+        Bestimme einen zufälligen Wert <img src="de_asebastdnative-eq30.png"> aus dem zwischen <img src="de_asebastdnative-eq31.png"> und <img src="de_asebastdnative-eq32.png">.
+      </dd>
+    </dl>
+    <div class="footnotes-footer">
+      <div class="title">
+        Footnotes
+      </div>
+      <div class="footnote-footer" id="footnote-1">
+        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-1')">1</a>. Geräte mit besonders wenig Flash-Speicher bieten unter Umständen nur eine Teilmenge oder gar keine dieser Funktionen an.
+      </div>
+    </div>
   </body>
 </html>

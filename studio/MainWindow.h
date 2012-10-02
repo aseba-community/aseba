@@ -129,10 +129,14 @@ namespace Aseba
 	class ScriptTab
 	{
 	public:
+		typedef NodeToolInterface::SavedContent SavedContent;
+		typedef QList<SavedContent> SavedPlugins;
+		
 		ScriptTab(const unsigned id):id(id) {}
 		virtual ~ScriptTab() {}
 		
 		unsigned nodeId() const { return id; }
+		virtual SavedPlugins savePlugins() const = 0;
 		
 	protected:
 		void createEditor();
@@ -151,9 +155,12 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode);
+		AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode, const SavedPlugins& savedPlugins);
+		
+		virtual SavedPlugins savePlugins() const { return savedPlugins; }
 	
 		const QString name;
+		SavedPlugins savedPlugins;
 	};
 	
 	class NodeTab : public QSplitter, public ScriptTab, public VariableListener
@@ -190,6 +197,9 @@ namespace Aseba
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void setupWidgets();
 		void setupConnections();
+		virtual SavedPlugins savePlugins() const;
+		void restorePlugins(const SavedPlugins& savedPlugins);
+		void updateToolList();
 	
 	public slots:
 		void clearExecutionErrors();
@@ -230,7 +240,7 @@ namespace Aseba
 
 		void showMemoryUsage(bool show);
 		
-		void displayCode(QList<QString> code);
+		void displayCode(QList<QString> code, int line);
 		
 		void cursorMoved();
 		void goToError();
@@ -315,6 +325,8 @@ namespace Aseba
 		TreeChainsawFilter* functionsFlatModel;
 		
 		QToolBox* toolBox;
+		QVBoxLayout* toolListLayout;
+		int toolListIndex;
 		NodeToolInterfaces tools;
 		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active

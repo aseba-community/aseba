@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Conceptos básicos
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Conceptos básicos
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Contenido
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Nodo</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Evento</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Esta página define algunos conceptos que debes entender antes de aprender ASEBA.
+    </p>
+    <h1 id="toc0">
+      <span>Nodo</span>
+    </h1>
+    <p>
+      En ASEBA puede haber uno o varios robots, cada uno con uno o más <a href="http://es.wikipedia.org/wiki/Unidad_central_de_procesamiento">procesadores</a> interactuando en la misma red. La red puede ser de software (<a href="http://es.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a>), hardware (<a href="http://en.wikipedia.org/wiki/Controller_area_network">CAN</a>), o una mezcla entre ambas. cada procesador de la red, ejecuta una pequeña <a href="http://es.wikipedia.org/wiki/M%C3%A1quina_virtual">máquina virtual</a> llamada <em>nodo</em>. En <a href="es_asebastudio.html">Aseba Studio</a>, cada nodo puede ser programado independientemente (a través de su respectiva pestaña), pero también puede interactuar por medio de eventos.
+    </p>
+    <h1 id="toc1">
+      <span>Evento</span>
+    </h1>
+    <p>
+      ASEBA es una <a href="http://es.wikipedia.org/wiki/Programaci%C3%B3n_dirigida_por_eventos">arquitectura de programación dirigida por eventos</a>, lo que significa que un evento desencadena la ejecución de un bloque de código de manera no sincrónica. Los eventos se etiquetan con un identificador, pero también pueden contener información (datos). Los nodos ASEBA pueden intercambiar eventos que pueden ser de dos tipos:
+    </p>
+    <ul>
+      <li>
+        <strong>eventos globales</strong>, que son los eventos que los nodos ASEBA intercambian dentro de una red ASEBA; y
+      </li>
+      <li>
+        <strong>eventos locales</strong>, que son los eventos al interior de cada nodo. Un ejemplo de evento local es aquel generado por la actualización de datos provenientes de un sensor.
+      </li>
+    </ul>
+    <p>
+      La realización de un evento ejecuta, si se definió, el bloque de código correspondiente. También se pueden <a href="es_asebalanguage.html">generar eventos</a> desde el código, lo que permite ejecutar código en otro nodo o comunicarse con un programa externo. Para permitir la ejecución de un determinado código cuando se genera un evento, las instrucciones no se deben bloquear ni contener ciclos infinitos. En el contexto de la robótica, los tradicionales programas de control ejecutan procesos dentro de un ciclo infinito; en ASEBA, los procesos se ejecutan al interior de eventos vinculados a sensores.
+    </p>
+  </body>
+</html>

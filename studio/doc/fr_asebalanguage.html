@@ -25,25 +25,55 @@
                 <a href="#toc0">Commentaires</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc1">Variables</a>
+                <a href="#toc1">Scalaires</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc2">Notation</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc2">Événements</a>
+                <a href="#toc3">Variables</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc4">Mot clés réservés</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc5">Constantes</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc6">Tableaux</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc7">Constructeur de tableau</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc3">Expressions et assignations</a>
+                <a href="#toc8">Expressions et assignations</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc9">Utilisation</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc4">Conditions</a>
+                <a href="#toc10">Contrôle de flux</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc11">Conditions</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc12">Boucles</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc5">Boucles</a>
+                <a href="#toc13">Blocs</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc14">Sous-routines</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc15">Événements</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc16">Instruction return</a>
               </div>
               <div style="margin-left: 1em;">
-                <a href="#toc6">Sous-routines</a>
-              </div>
-              <div style="margin-left: 1em;">
-                <a href="#toc7">Fonctions natives</a>
+                <a href="#toc17">Fonctions natives</a>
               </div>
             </div>
           </div>
@@ -51,7 +81,7 @@
       </tr>
     </table>
     <p>
-      Cet aide est aussi disponible dans Aseba Studio dans le menu <tt>Aide -&gt; Langage</tt>. Lorsque nous utilisons des mots techniques, nous les lions vers l'article Wikipedia correspondant. De plus, la page <a href="fr_asebaconcepts.html">concepts</a> explique quelques concepts importants liés à Aseba.
+      Cet aide est aussi disponible dans Aseba Studio dans le menu <tt>Aide -&gt; Langage</tt>. Lorsque nous utilisons des mots techniques, nous les lions vers l'article Wikipedia correspondant. De plus, la page <a href="fr_asebaconcepts.html">concepts</a> explique quelques concepts importants liés à Aseba. Cette page présente le langage de la version 1.2 d'Aseba, pour des versions précédentes, veuillez lire <a href="fr_asebalanguage-1-1.html">cette page</a>.
     </p>
     <p>
       Le langage de programmation d'Aseba permet de programmer le comportement des nœuds Aseba. Syntaxiquement, ce langage ressemble à <a href="http://fr.wikipedia.org/wiki/Matlab">Matlab</a> (un langage de programmation scientifique commun) : cette ressemblance permet aux développeurs ayant des connaissances préalables sur les langages de scripts de se sentir à l'aise et d'apprendre rapidement. Sémantiquement, c'est un <a href="http://fr.wikipedia.org/wiki/Programmation_imp%C3%A9rative">langage de programmation impératif</a> avec un seul <a href="http://fr.wikipedia.org/wiki/Type_%28informatique%29">type simple</a> (<a href="http://fr.wikipedia.org/wiki/Entier_%28informatique%29">nombres entiers</a> <a href="http://fr.wikipedia.org/wiki/Compl%C3%A9ment_%C3%A0_deux">signés</a> sur 16 bits) et des <a href="http://fr.wikipedia.org/wiki/Tableau_%28structure_de_donn%C3%A9es%29">tableaux</a>. Cette simplicité permet aux développeurs sans connaissances préalables d'un système de type de programmer des comportement ; les nombres entiers étant le type de variable le plus naturel. De plus, les nombres entiers sont particulièrement adaptés aux robots à <a href="http://fr.wikipedia.org/wiki/Microcontr%C3%B4leur">micro-contrôleurs</a>.
@@ -85,10 +115,59 @@ var b    # commentaire simple</code>
 </pre>
     </div>
     <h1 id="toc1">
+      <span>Scalaires</span>
+    </h1>
+    <p>
+      Les valeurs <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">scalaires</a> sont utilisées dans Aseba pour représenter des nombres. Elles peuvent être utilisées dans n'importe quelle expression, telle que l'initialisation d'une variable, dans une expression mathématique, ou dans une condition logique.
+    </p>
+    <h2 id="toc2">
+      <span>Notation</span>
+    </h2>
+    <p>
+      Les scalaires peuvent être écrit en utilisant plusieurs bases différentes. La façon la plus naturelle correspond au système décimal, en utilisant les chiffres de 0 à 9. Les nombres négatifs sont déclarés en utilisant un signe <tt>-</tt> (moins) devant le nombre.
+    </p>
+    <div class="code">
+      <pre>
+<code>i = 42
+i = 31415
+i = -7</code>
+</pre>
+    </div>
+    <p>
+      Les nombres <a href="http://fr.wikipedia.org/wiki/Syst%C3%A8me_binaire">binaires</a> et <a href="http://fr.wikipedia.org/wiki/Syst%C3%A8me_hexad%C3%A9cimal">hexadécimales</a> peuvent également être utilisés. Les nombres binaires sont préfixés par <tt>0b</tt>, alors que les nombres hexadécimales sont préfixés par <tt>0x</tt>.
+    </p>
+    <div class="code">
+      <pre>
+<code># notation binaire
+i = 0b110         # i = 6
+i = 0b11111111    # i = 255
+
+# notation hexadécimale
+i = 0x10    # i = 16
+i = 0xff    # i = 255</code>
+</pre>
+    </div>
+    <h1 id="toc3">
       <span>Variables</span>
     </h1>
     <p>
-      Les variables font référence soit à des valeurs <a href="http://fr.wikipedia.org/wiki/Scalaire#Informatique">scalaires</a>, soit à des tableaux de valeurs scalaires. Les valeurs sont comprises entre -32768 et 32767, ce qui correspond à la plage des nombres entiers signés sur 16 bits. Nous pouvons accéder aux éléments des tableaux avec l'opérateur <a href="http://fr.wikipedia.org/wiki/Crochet_%28typographie%29#Informatique">crochet</a> ; l'index des tableaux commence à zéro. Vous devez déclarer toutes les variables que vous définissez au début du script Aseba avant tout traitement.
+      Les variables font référence soit à des valeurs <a href="http://fr.wikipedia.org/wiki/Scalaire#Informatique">scalaires</a>, soit à des tableaux de valeurs scalaires. Les valeurs sont comprises entre -32768 et 32767, ce qui correspond à la plage des nombres entiers signés sur 16 bits. Les variables utilisateurs doivent être déclarées au début du script Aseba, en utilisant le mot clé <tt>var</tt>, avant tout autre opération.
+    </p>
+    <p>
+      Le nom d'une variable doit suivre un certain nombre de règles :
+    </p>
+    <ul>
+      <li>Le nom fait la différence entre majuscules et minuscules : une variable appelée "foo" est différente d'une autre appelée "Foo"
+      </li>
+      <li>Le nom doit commencer par un caractère alphabétique valide, ou '_'
+      </li>
+      <li>Le nom ne peut contenir que des caractères alphabétiques, '_' ou '.'
+      </li>
+      <li>Le nom ne peut pas être identique à un des mots clés d'Aseba (voir <a href="http://aseba.wikidot.com/fr:asebausermanual#restricted-keywords">mots clés réservés</a>)
+      </li>
+    </ul>
+    <p>
+      Les variables peuvent être initialisées durant la déclaration, en utilisant le symbole d'assignation combiné à n'importe quelle expression mathématique. Une variable qui n'a pas été initialisée au préalable aura une valeur aléatoire, rien ne garantit qu'elle sera égale à zéro.
     </p>
     <p>
       Exemple :
@@ -96,44 +175,180 @@ var b    # commentaire simple</code>
     <div class="code">
       <pre>
 <code>var a
-var c[10]
 var b = 0
-var d[3] = 2, 3, 4</code>
+var c = 2*a + b # attention: 'a' n'est pas initialisée</code>
 </pre>
     </div>
-    <h1 id="toc2">
-      <span>Événements</span>
-    </h1>
+    <h2 id="toc4">
+      <span>Mot clés réservés</span>
+    </h2>
     <p>
-      Les événements peuvent être externes, par exemple un événement défini par l'utilisateur venant d'un autre nœud Aseba, ou internes, par exemple émis par un capteur qui possède un valeur nouvellement acquise. La réception d'un événement exécute, si défini, le bloc de code commençant par le mot clé <tt>onevent</tt> suivi du nom de l'événement. Le code au début du script est exécuté quand ce dernier est chargé ou au <em>reset</em>. Un script peut aussi envoyer des événements en utilisant le mot clé <tt>emit</tt>, suivi par le nom de l'événement ainsi que du nom de la variable à envoyer, s'il y a lieu. Si une variable est fournie, la taille de l'événement doit correspondre à celle de l'<a href="http://fr.wikipedia.org/wiki/Param%C3%A8tre">argument</a> à envoyer. Les événements permettent ainsi à un script de déclencher l'exécution de code sur un autre nœud ou de communiquer avec un programme externe.
+      <a name="restricted-keywords" id="restricted-keywords"></a>
     </p>
     <p>
-      Afin de permettre l'exécution du code lors de la réception d'un nouvel événement, le script ne doit pas bloquer et donc ne pas contenir de boucle infinie. Par exemple dans le contexte de la robotique, où un programme de contrôle de robot traditionnel travaillerait à l'intérieur d'une boucle infinie, un script Aseba ferait simplement le travail lors d'un événement lié aux capteurs.
+      Les mots clés suivants ne peuvent pas être utilisés pour nommer des variables, car ils sont déjà utilisés par la langage Aseba.
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th colspan="4">
+          Mots clés
+        </th>
+      </tr>
+      <tr>
+        <td>
+          abs
+        </td>
+        <td>
+          call
+        </td>
+        <td>
+          callsub
+        </td>
+        <td>
+          do
+        </td>
+      </tr>
+      <tr>
+        <td>
+          else
+        </td>
+        <td>
+          elseif
+        </td>
+        <td>
+          emit
+        </td>
+        <td>
+          end
+        </td>
+      </tr>
+      <tr>
+        <td>
+          for
+        </td>
+        <td>
+          if
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          onevent
+        </td>
+      </tr>
+      <tr>
+        <td>
+          return
+        </td>
+        <td>
+          step
+        </td>
+        <td>
+          sub
+        </td>
+        <td>
+          then
+        </td>
+      </tr>
+      <tr>
+        <td>
+          var
+        </td>
+        <td>
+          when
+        </td>
+        <td>
+          while
+        </td>
+        <td></td>
+      </tr>
+    </table>
+    <h2 id="toc5">
+      <span>Constantes</span>
+    </h2>
+    <p>
+      Des constantes peuvent être définies dans Aseba Studio, en utilisant le panneau "Constantes", car elles ne peuvent pas être définies directement dans le code. Tout comme une variable normale, une constante contient une valeur numérique, qui peut être utilisée plusieurs fois dans le programme. Mais contrairement aux variables, une constante ne peut pas être modifiée durant l'exécution. Les constantes sont utiles quand on veut facilement changer le comportement d'un programme d'une exécution à l'autre, comme le changement d'une valeur de seuil. Une constante a une portée couvrant l'ensemble des noeuds Aseba. Une constante ne peut pas avoir le même nom qu'une variable, une erreur est produite dans le cas contraire. Les constantes se comportent exactement comme des valeurs numériques.
+    </p>
+    <div class="code">
+      <pre>
+<code># en supposant une constante appelée SEUIL
+var i = 600
+
+if i &gt; SEUIL then
+    i = SEUIL - 1
+end</code>
+</pre>
+    </div>
+    <h2 id="toc6">
+      <span>Tableaux</span>
+    </h2>
+    <p>
+      Un tableau représente une zone contiguë de mémoire, manipulée comme une seule entité logique. La taille d'une tableau est fixe, et elle doit être définie au moment de la déclaration. On peut déclarer des tableaux en utilisant l'opérateur <a href="http://fr.wikipedia.org/wiki/Crochet_%28typographie%29#Informatique">crochet</a> habituel <tt>[]</tt>. Le nombre entre les crochets déclare le nombre d'éléments attribués au tableau, c'est-à-dire la taille du tableau. Il peut s'agir de n'importe quelle expression constante, incluant des opérations mathématiques portants sur des scalaires et des constantes. Une initialisation optionnelle peut avoir lieu, en utilisant le constructeur de tableau (voir ci-dessous). Dans le cas où une initialisation est effectuée, la taille du tableau peut être omise.
+    </p>
+    <p>
+      Exemple:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[10]                   # tableau de 10 éléments
+var b[3] = [2, 3, 4]        # initialisation
+var c[] = [3, 1, 4, 1, 5]   # taille implicite de 5 éléments
+var d[3*FOO-1]              # taille déclarée en utilisant une expression constante (FOO déclarée en tant que constante)</code>
+</pre>
+    </div>
+    <p>
+      Les tableaux peuvent être accédés selon plusieurs syntaxes :
+    </p>
+    <ul>
+      <li>On accède à un seul élément en utilisant l'opérateur crochet encadrant une seule valeur. Les indexes d'un tableau commencent à zéro. N'importe quelle expression peut être utilisée comme index, incluant des expressions mathématiques impliquant d'autres variables.
+      </li>
+      <li>Une plage de valeurs peut être accédée en utilisant l'opérateur crochet encadrant deux expressions constantes séparées par deux-points ':'.
+      </li>
+      <li>En l'absence de l'opérateur crochet, le tableau est accédé dans son ensemble.
+      </li>
+    </ul>
+    <p>
+      Exemple :
+    </p>
+    <div class="code">
+      <pre>
+<code>var foo[5] = [1,2,3,4,5]
+var i = 1
+var a
+var b[3]
+var c[5]
+var d[5]
+
+a = foo[0]        # copie le 1er élément depuis 'foo' vers 'a'
+a = foo[2*i-2]    # identique
+b = foo[1:3]      # prends le 2ème, 3ème et 4ème éléments de 'foo', copie vers 'b'
+b = foo[1:2*2-1]  # identique
+c = foo           # copie les 5 éléments de 'foo' vers 'c'
+d = c * foo       # multiplie élément par élément les tableaux 'c' et 'foo', copie vers 'd'</code>
+</pre>
+    </div>
+    <h2 id="toc7">
+      <span>Constructeur de tableau</span>
+    </h2>
+    <p>
+      Un constructeur de tableau permet de construire un tableau à partir de variables, d'autres tableaux, de scalaires, ou même n'importe quelle expression. Ils sont utiles dans plusieurs cas, par exemple lors de l'initialisation d'un autre tableau, ou comme opérande dans des expressions, fonctions ou événements. Un constructeur de tableau est déclaré en utilisant des crochets entourant plusieurs expressions séparées par une <tt>,</tt> (virgule). La taille d'un constructeur de tableau est la somme de la taille des éléments le constituant, et elle doit correspondre à la taille du tableau servant à stocker le résultat.
     </p>
     <p>
       Exemple :
     </p>
     <div class="code">
       <pre>
-<code>var run = 0
-
-onevent start
-run = 1
-
-onevent stop
-run = 0
-
-onevent ir_sensors
-if run == 1 then
-    emit valeurs_des_capteurs valeurs_des_capteurs_de_proximite
-end</code>
+<code>var a[5] = [1,2,3,4,5]    # constructeur de tableau pour initialiser un tableau
+var b[3] = [a[1:2],0]    # contenu du tableau 'b' : [2,3,0]
+a = a + [1,1,1,1,1]    # ajoute 1 à chaque élément du tableau 'a'
+a = [b[1]+2,a[0:3]]    # le résultat est [3,2,3,4,5]</code>
 </pre>
     </div>
-    <h1 id="toc3">
+    <h1 id="toc8">
       <span>Expressions et assignations</span>
     </h1>
     <p>
-      Les expressions permettent les calculs mathématiques et sont écrites en syntaxe mathématique infixée commune. L'assignation utilise le mot clé <tt>=</tt> et affecte le résultat du calcul d'une expression à une variable scalaire ou à l'élément d'un tableau. Aseba fournit plusieurs opérateurs. Le tableau ci-dessous fournit une brève description, ainsi que la préséance de chaque opérateur. Pour évaluer une expression dans un ordre différent, nous pouvons utiliser une paire de parenthèses afin de grouper une sous-expression.
+      Les expressions permettent les calculs mathématiques et sont écrites en syntaxe mathématique infixée commune. L'assignation utilise le mot clé <tt>=</tt> et affecte le résultat du calcul d'une expression à une variable scalaire, à l'élément d'un tableau, ou dans tout ou partie d'un tableau. Aseba fournit plusieurs opérateurs. Le tableau ci-dessous fournit une brève description, ainsi que la préséance de chaque opérateur. Pour évaluer une expression dans un ordre différent, nous pouvons utiliser une paire de parenthèses afin de grouper une sous-expression.
     </p>
     <table class="wiki-content-table">
       <tr>
@@ -353,19 +568,6 @@ end</code>
       <tr>
         <td></td>
         <td>
-          ~=
-        </td>
-        <td>
-          Assignation avec un NON binaire
-        </td>
-        <td></td>
-        <td>
-          Binaire
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
           *= /=
         </td>
         <td>
@@ -438,22 +640,42 @@ end</code>
     <div class="code">
       <pre>
 <code>a = 1 + 1
-# Result: a = 2
+# Résultat : a = 2
 a *= 3
-# Result: a = 6
+# Résultat : a = 6
 a++
-# Result: a = 7
+# Résultat : a = 7
 
 b = b + d[0]
 b = (a - 7) % 5
-c[a] = d[a]</code>
+c[a] = d[a]
+c[0:1] = d[2:3] * [3,2]</code>
 </pre>
     </div>
-    <h1 id="toc4">
-      <span>Conditions</span>
-    </h1>
+    <h2 id="toc9">
+      <span>Utilisation</span>
+    </h2>
     <p>
-      Aseba fournit deux types de conditions : <tt>if</tt> et <tt>when</tt>. Elles consistent en un test de conditions et des blocs de code. Le test consiste en des comparaisons éventuellement groupées en utilisant les opérateurs <tt>and</tt> (<a href="http://fr.wikipedia.org/wiki/Conjonction_logique">conjonction logique</a>), <tt>or</tt> (<a href="http://fr.wikipedia.org/wiki/Disjonction_logique">disjonction logique</a>), <tt>not</tt> (<a href="http://fr.wikipedia.org/wiki/N%C3%A9gation_logique">négation logique</a>) et les parenthèses. Une comparaison consiste en un <a href="http://fr.wikipedia.org/wiki/Op%C3%A9rateur_%28math%C3%A9matiques%29">opérateur</a> et deux <a href="http://fr.wikipedia.org/wiki/Op%C3%A9rande">opérandes</a>, et peut être soit vrai soit fausse. L’opérande peut être une expression quelconque. La table suivante liste les opérateurs de comparaison.
+      Les expressions mathématiques sont un outil qui peut être appliqué dans une grande variété de situations. Voici quelques utilisations :
+    </p>
+    <ul>
+      <li>Du côté droit d'une affectation
+      </li>
+      <li>Comme index lors de l'accès à un tableau
+      </li>
+      <li>A l'intérieur d'appels de fonctions
+      </li>
+      <li>Comme argument lors de l'émission d'un évènement
+      </li>
+    </ul>
+    <h1 id="toc10">
+      <span>Contrôle de flux</span>
+    </h1>
+    <h2 id="toc11">
+      <span>Conditions</span>
+    </h2>
+    <p>
+      Aseba fournit deux types de conditions : <tt>if</tt> et <tt>when</tt>. Elles consistent en un test de conditions et des blocs de code. Le test consiste en des comparaisons éventuellement groupées en utilisant les opérateurs <tt>and</tt> (<a href="http://fr.wikipedia.org/wiki/Conjonction_logique">conjonction logique</a>), <tt>or</tt> (<a href="http://fr.wikipedia.org/wiki/Disjonction_logique">disjonction logique</a>), <tt>not</tt> (<a href="http://fr.wikipedia.org/wiki/N%C3%A9gation_logique">négation logique</a>) et les parenthèses. Une comparaison consiste en un <a href="http://fr.wikipedia.org/wiki/Op%C3%A9rateur_%28math%C3%A9matiques%29">opérateur</a> et deux <a href="http://fr.wikipedia.org/wiki/Op%C3%A9rande">opérandes</a>, et peut être soit vraie soit fausse. L’opérande peut être une expression quelconque. La table suivante liste les opérateurs de comparaison.
     </p>
     <table class="wiki-content-table">
       <tr>
@@ -461,7 +683,7 @@ c[a] = d[a]</code>
           Opérateur
         </th>
         <th>
-          Value de vérité
+          Valeur de vérité
         </th>
       </tr>
       <tr>
@@ -541,11 +763,14 @@ end</code>
 </pre>
     </div><br />
     Ici le bloc <tt>when</tt> s'exécute seulement quand <tt>a</tt> <em>devient</em> plus grand que <tt>b</tt>.
-    <h1 id="toc5">
+    <h2 id="toc12">
       <span>Boucles</span>
-    </h1>
+    </h2>
     <p>
-      Deux constructions permettent la création de boucles : <tt><a href="http://fr.wikipedia.org/wiki/Structure_de_contr%C3%B4le#Boucle_tant_que">while</a></tt> et <tt><a href="http://fr.wikipedia.org/wiki/Structure_de_contr%C3%B4le#Compteurs">for</a></tt>. Une boucle <tt>while</tt> exécute un bloc de code plusieurs fois tant qu'une condition est vraie. La condition est de même type que celle utilisée par <tt>if</tt>.
+      Deux constructions permettent la création de boucles : <tt><a href="http://fr.wikipedia.org/wiki/Structure_de_contr%C3%B4le#Boucle_tant_que">while</a></tt> et <tt><a href="http://fr.wikipedia.org/wiki/Structure_de_contr%C3%B4le#Compteurs">for</a></tt>.
+    </p>
+    <p>
+      Une boucle <tt>while</tt> exécute un bloc de code plusieurs fois tant qu'une condition est vraie. La condition est de même type que celle utilisée par <tt>if</tt>.
     </p>
     <p>
       Exemple:
@@ -574,11 +799,14 @@ for i in 30:1 step -3 do
 end</code>
 </pre>
     </div>
-    <h1 id="toc6">
-      <span>Sous-routines</span>
+    <h1 id="toc13">
+      <span>Blocs</span>
     </h1>
+    <h2 id="toc14">
+      <span>Sous-routines</span>
+    </h2>
     <p>
-      Lorsque vous effectuez une même suite d'opérations à plusieurs endroits dans le code, il est bon de mettre le code commun une seule fois dans une sous-routine, puis d'appeler cette dernière depuis les divers endroits. Vous pouvez définir une sous-routine en utilisant le mot-clé <tt>sub</tt> suivi du nom de la sous-routine. Vous pouvez appeler la sous-routine en utilisant le mot-clé <tt>callsub</tt> suivi du nom de la sous-routine. Les sous-routines ne peuvent pas avoir d'arguments, ni être <a href="http://fr.wikipedia.org/wiki/Algorithme_r%C3%A9cursif">récursives</a>, que ce soit directement ou indirectement. Les sous-routines peuvent accéder à toutes les variables.
+      Lorsque vous effectuez une même suite d'opérations à plusieurs endroits dans le code, il est bon de mettre le code commun une seule fois dans une sous-routine, puis d'appeler cette dernière depuis les divers endroits. Vous pouvez définir une sous-routine en utilisant le mot-clé <tt>sub</tt> suivi du nom de la sous-routine. Vous pouvez appeler la sous-routine en utilisant le mot-clé <tt>callsub</tt> suivi du nom de la sous-routine. Les sous-routines doivent être définies avant leur utilisation. Les sous-routines ne peuvent pas avoir d'arguments, ni être <a href="http://fr.wikipedia.org/wiki/Algorithme_r%C3%A9cursif">récursives</a>, que ce soit directement ou indirectement. Les sous-routines peuvent accéder à toutes les variables.
     </p>
     <p>
       Exemple:
@@ -594,14 +822,67 @@ onevent test
 callsub toto</code>
 </pre>
     </div>
-    <h1 id="toc7">
+    <h2 id="toc15">
+      <span>Événements</span>
+    </h2>
+    <p>
+      Aseba a une architecture par <a href="http://fr.wikipedia.org/wiki/Programmation_%C3%A9v%C3%A9nementielle">programmation événementielle</a>, ce qui signifie que des événements peuvent déclencher l'exécution de code de façon asynchrone. Les événements peuvent être externes, par exemple un événement défini par l'utilisateur venant d'un autre nœud Aseba, ou internes, par exemple émis par un capteur qui possède un valeur nouvellement acquise. La réception d'un événement exécute, si défini, le bloc de code commençant par le mot clé <tt>onevent</tt> suivi du nom de l'événement. Le code au début du script est exécuté quand ce dernier est chargé ou au <em>reset</em>. Un script peut aussi envoyer des événements en utilisant le mot clé <tt>emit</tt>, suivi par le nom de l'événement ainsi que du nom de la variable à envoyer, s'il y a lieu. Si une variable est fournie, la taille de l'événement doit correspondre à celle de l'<a href="http://fr.wikipedia.org/wiki/Param%C3%A8tre">argument</a> à envoyer. En lieu et place d'une variable, des constructeurs de tableau et des expressions mathématiques peuvent aussi être utilisées pour les situations plus complexes. Les événements permettent ainsi à un script de déclencher l'exécution de code sur un autre nœud ou de communiquer avec un programme externe.
+    </p>
+    <p>
+      Afin de permettre l'exécution du code lors de la réception d'un nouvel événement, le script ne doit pas bloquer et donc ne pas contenir de boucle infinie. Par exemple dans le contexte de la robotique, où un programme de contrôle de robot traditionnel travaillerait à l'intérieur d'une boucle infinie, un script Aseba ferait simplement le travail lors d'un événement lié aux capteurs.
+    </p>
+    <p>
+      Exemple :
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+    emit valeurs_des_capteurs valeurs_des_capteurs_de_proximite
+end</code>
+</pre>
+    </div>
+    <h2 id="toc16">
+      <span>Instruction return</span>
+    </h2>
+    <p>
+      Il est possible de sortir prématurément d'une sous-routine et de stopper l'exécution d'un événement en utilisant le mot clé <tt>return</tt>.
+    </p>
+    <p>
+      Exemple :
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+if v == 0 then
+    return
+end
+v = 1
+
+onevent test
+callsub toto
+return
+v = 2</code>
+</pre>
+    </div>
+    <h1 id="toc17">
       <span>Fonctions natives</span>
     </h1>
     <p>
       Nous avons conçu le langage de script d'Aseba simple afin de permettre une compréhension aisée par des développeurs novices et pour implémenter la machine virtuelle efficacement. Pour implémenter des calculs complexes ou lourds, nous fournissons des fonctions natives implémentées en code natif pour une exécution rapide. Par exemple, une fonction native est la solution de choix pour effectuer un calcul de produit scalaire.
     </p>
     <p>
-      Les fonctions natives sont sûrs, dans le sens qu'elles spécifient et vérifient les tailles de leurs arguments, qui peuvent être des constantes, des variables ou des accès à des tableaux. Dans ces derniers, nous pouvons accéder à tout le tableau, à un élément discret ou à un sous-intervalle du tableau. Les fonctions natives prennent leurs arguments par <a href="http://fr.wikipedia.org/wiki/R%C3%A9f%C3%A9rence_%28informatique%29">référence</a> et peuvent modifier leurs contenus, mais ne retournent aucune valeur. Les fonctions natives sont appelées par le mot-clé <tt>call</tt>.
+      Les fonctions natives sont sûrs, dans le sens qu'elles spécifient et vérifient les tailles de leurs arguments, qui peuvent être des constantes, des variables, des accès à des tableaux, des constructeurs de tableau et des expressions. Dans le cas d'un tableau, nous pouvons accéder à tout le tableau, à un élément discret ou à un sous-intervalle du tableau. Les fonctions natives prennent leurs arguments par <a href="http://fr.wikipedia.org/wiki/R%C3%A9f%C3%A9rence_%28informatique%29">référence</a> et peuvent modifier leurs contenus, mais ne retournent aucune valeur. Les fonctions natives sont appelées par le mot-clé <tt>call</tt>.
     </p>
     <p>
       Exemple:

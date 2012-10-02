@@ -17,6 +17,7 @@
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import pickle
 
 from wikidot.urltoname import urltoname
 from wikidot.tree import WikiNode
@@ -57,4 +58,16 @@ def insert(title, url, breadcrumbs = set()):
 #        __structure__[__lang__].dump()
     else:
         print >> sys.stderr, "*** Error in wikidot.structure.insert: set the language beforehand"
+
+def serialize(f):
+    pickler = pickle.Pickler(f)
+    pickler.dump(__lang__)
+    pickler.dump(__structure__)
+
+def unserialize(f):
+    global __lang__
+    global __structure__
+    pickler = pickle.Unpickler(f)
+    __lang__ = pickler.load()
+    __structure__ = pickler.load()
 

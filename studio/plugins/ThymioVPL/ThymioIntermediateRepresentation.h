@@ -162,13 +162,16 @@ namespace Aseba
 		void reset();
 		void clear();
 		
+		int buttonToCode(int id) const;
+		
 	private:
-		map<ThymioIRButtonName, int> editor;
+		map<ThymioIRButtonName, pair<int, int> > editor;
+
 		vector<wstring> generatedCode;
 		vector<wstring> directions;
 		int currentBlock;
 		bool inIfBlock;
-		wstring::iterator insertLoc;
+		vector<int> buttonToCodeMap;
 	};
 
 	class ThymioCompiler 
@@ -185,6 +188,7 @@ namespace Aseba
 		void removeButtonSet(int row);
 		void replaceButtonSet(int row, ThymioIRButtonSet *set);
 		void swap(int row1, int row2);
+		int buttonToCode(int id) const;
 
 		ThymioIRErrorCode getErrorCode() const;
 		bool isSuccessful() const;

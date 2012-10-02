@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Geräte-Kennungen mit asebaswitch neu zuordnen
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Geräte-Kennungen mit asebaswitch neu zuordnen
+    </h1>
+    <p>
+      Mit Aseba wird auch <em>asebaswitch</em> mitgeliefert, ein Kommando-Zeilen-Programm, das mehrere Geräte miteinander verbinden kann. Die Syntax ist:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch [Optionen] [weitere Geräte]*</code>
+</pre>
+    </div><br />
+    Falls du mehr wissen möchtest, gib folgenden Befehl ein:
+    <div class="code">
+      <pre>
+<code>asebaswitch --help</code>
+</pre>
+    </div><br />
+    Beachte, dass alle weiteren Geräte der <a href="http://download.gna.org/dashel/1.0.3/doc/">Dashel-Namenskonvention</a> folgen müssen.
+    <h1 id="toc0">
+      <span>Weitergehende Benutzung</span>
+    </h1>
+    <p>
+      Damit Aseba Daten optimal durch das Netzwerk senden kann, muss jeder Netzwerk-Knoten eine unterschiedliche Kennung haben. Problematisch sind hierfür bestimmte Geräte, wie zum Beispiel der <a href="http://aseba.wikidot.com/de:thymio">Thymio</a>, die eine fest einprogrammierte Kennung beinhalten. Um auch solche Knoten zu unterstützen, bietet asebaswitch eine <em>Kennungs-Zuordnung</em> an, mit der einem Gerät eine neue Kennung zugeordnet wird.
+    </p>
+    <p>
+      Somit ist es also auch möglich, mehrere Thymios im gleichen Aseba-Netzwerk zusammenzuschalten. Unter Linux geht das mit folgendem Befehl:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch -d "ser:device=/dev/ttyACM0;remapLocal=1" "ser:device=/dev/ttyACM1;remapLocal=2"</code>
+</pre>
+    </div>
+    <p>
+      Der Zuordnungs-Mechanismus erwartet zwei weitere Optionen für die Zeichenkette, die das Gerät beschreibt:
+    </p>
+    <ul>
+      <li>
+        <tt>remapLocal</tt>, die neue <em>lokale</em> Kennung für den Netzwerkknoten.
+      </li>
+      <li>
+        <tt>remapTarget</tt> (standardmässig: <tt>1</tt>), die bisherige Kennung des Knotens, der neu zugeordnet werden soll.
+      </li>
+    </ul>
+    <p>
+      Momentan unterstützt dieser Mechanismus nur die Umbenennung eines Knotens pro Gerät. Je nach Bedarf wird dies aber noch erweitert.
+    </p>
+  </body>
+</html>

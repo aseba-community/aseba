@@ -1,3 +1,9 @@
+aseba (1.2.0) precise; urgency=low
+
+  * Upstream 1.2.0
+
+ -- Stéphane Magnenat <stephane@nospam.magnenat.net>  Thu, 06 Sep 2012 09:24:45 +0200
+
 aseba (1.1.0) natty; urgency=low
 
   * Upstream 1.1.0
