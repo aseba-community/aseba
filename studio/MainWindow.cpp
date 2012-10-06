@@ -1558,6 +1558,7 @@ namespace Aseba
 						"<ul><li>Aseba ver. %0"\
 						"<br/>(build ver. %1/protocol ver. %2)" \
 						"</li><li>Dashel ver. %3"\
+						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
 						"<p>(c) 2006-2012 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
 						"<p><a href=\"%5\">%5</a></p>" \
@@ -1568,6 +1569,7 @@ namespace Aseba
 			arg(ASEBA_BUILD_VERSION).
 			arg(ASEBA_PROTOCOL_VERSION).
 			arg(DASHEL_VERSION).
+			arg(QString::fromStdString(Dashel::streamTypeRegistry.list())).
 			arg(tr("http://aseba.wikidot.com/en:start"));
 		
 		QMessageBox::about(this, tr("About Aseba Studio"), text);

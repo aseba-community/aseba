@@ -21,8 +21,9 @@
 #include "../common/consts.h"
 #include "../msg/msg.h"
 #include "../utils/utils.h"
-#include <dashel/dashel.h>
 #include "../utils/HexFile.h"
+#include <dashel/dashel.h>
+#include "../transport/dashel_plugins/dashel-plugins.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -772,6 +773,8 @@ namespace Aseba
 
 int main(int argc, char *argv[])
 {
+	Dashel::initPlugins();
+	
 	const char *target = ASEBA_DEFAULT_TARGET;
 	int argCounter = 1;
 	

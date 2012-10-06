@@ -31,6 +31,7 @@
 #include <stdexcept>
 #include "MainWindow.h"
 #include "HelpViewer.h"
+#include "../transport/dashel_plugins/dashel-plugins.h"
 
 using namespace std;
 
@@ -54,6 +55,7 @@ int main(int argc, char *argv[])
 	bool autoRefresh(false);
 	bool showDoc(false);
 	QApplication app(argc, argv);
+	Dashel::initPlugins();
 	
 	// Information used by QSettings with default constructor
 	QCoreApplication::setOrganizationName("EPFL-LSRO-Mobots");

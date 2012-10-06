@@ -32,6 +32,7 @@
 #include "../common/consts.h"
 #include "../common/types.h"
 #include "../utils/utils.h"
+#include "../transport/dashel_plugins/dashel-plugins.h"
 #include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QtXml>
@@ -649,6 +650,7 @@ void dumpVersion(std::ostream &stream)
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
+	Dashel::initPlugins();
 	
 	unsigned port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;

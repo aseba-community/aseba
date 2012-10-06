@@ -27,6 +27,7 @@
 #include <vector>
 #include <iterator>
 #include "switch.h"
+#include "../transport/dashel_plugins/dashel-plugins.h"
 #include "../common/consts.h"
 #include "../utils/utils.h"
 #include "../msg/msg.h"
@@ -182,6 +183,7 @@ void dumpVersion(std::ostream &stream)
  
 int main(int argc, char *argv[])
 {
+	Dashel::initPlugins();
 	unsigned port = ASEBA_DEFAULT_PORT;
 	bool verbose = false;
 	bool dump = false;

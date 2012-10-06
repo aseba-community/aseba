@@ -403,11 +403,10 @@ class CanStream: public SelectableStream
 
 };
 
-static __attribute__((init_priority(65535))) class _foobar {
-public:
-  _foobar() {
-	Dashel::streamTypeRegistry.reg("can", &createInstance<CanStream>);
-  }
-
-} myctor;
-
+namespace Dashel
+{
+	void initPlugins()
+	{
+		Dashel::streamTypeRegistry.reg("can", &createInstance<CanStream>);
+	}
+}

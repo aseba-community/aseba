@@ -22,6 +22,7 @@
 #include "../msg/msg.h"
 #include "../utils/utils.h"
 #include <dashel/dashel.h>
+#include "../transport/dashel_plugins/dashel-plugins.h"
 #include <time.h>
 #include <iostream>
 #include <cstring>
@@ -197,6 +198,7 @@ void dumpVersion(std::ostream &stream)
 
 int main(int argc, char *argv[])
 {
+	Dashel::initPlugins();
 	bool respectTimings = true;
 	int speedFactor = 1;
 	std::vector<std::string> targets;

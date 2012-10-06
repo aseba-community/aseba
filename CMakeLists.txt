@@ -31,18 +31,18 @@ if (UDEV_INCLUDE_DIR AND UDEV_LIBS)
 endif (UDEV_INCLUDE_DIR AND UDEV_LIBS)
 
 if (WIN32)
+	set(DASHEL_PLUGINS transport/dashel_plugins/none.cpp)
 	set(EXTRA_LIBS ${EXTRA_LIBS} winspool ws2_32 setupapi)
 else (WIN32)
 	if (APPLE)
+		set(DASHEL_PLUGINS transport/dashel_plugins/none.cpp)
 		find_library(COREFOUNDATION_LIBRARY CoreFoundation)
 		find_library(IOKIT_LIBRARY IOKit)
 		mark_as_advanced(COREFOUNDATION_LIBRARY)
 		mark_as_advanced(IOKIT_LIBRARY)
 		set(EXTRA_LIBS ${EXTRA_LIBS} ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY} ${EXTRA_LIBS})
 	else (APPLE)
-		# Note that because of static initializers, this cannot be linked as a library,
-		# hence all aseba tools must link to this file directly
-		set (SOCKETCAN_PLUGIN ../transport/dashel_plugin/socketcan.cpp)
+		set(DASHEL_PLUGINS transport/dashel_plugins/socketcan.cpp)
 		if (UDEV_FOUND)
 			include_directories(${UDEV_INCLUDE_DIR})
 			set(EXTRA_LIBS ${EXTRA_LIBS} ${UDEV_LIBS} ${EXTRA_LIBS})
@@ -89,6 +89,7 @@ set (ASEBACORE_SRC
 	utils/HexFile.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
+	${DASHEL_PLUGINS}
 )
 
 set (ASEBACOMPILER_SRC
@@ -153,6 +154,10 @@ set (ASEBACORE_HDR_COMPILER
 	compiler/compiler.h
 	compiler/errors_code.h
 )
+
+set(ASEBACORE_HDR_DASHEL_PLUGINS
+	transport/dashel_plugins/dashel-plugins.h
+)
 	
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/utils
@@ -165,6 +170,9 @@ install(FILES ${ASEBACORE_HDR_COMMON}
 )
 install(FILES ${ASEBACORE_HDR_COMPILER}
 	DESTINATION include/aseba/compiler
+)
+install(FILES ${ASEBACORE_HDR_DASHEL_PLUGINS}
+	DESTINATION include/aseba/transport/dashel_plugins
 )
 
 add_subdirectory(switch)

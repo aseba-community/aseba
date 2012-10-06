@@ -10,7 +10,6 @@ if (QT4_FOUND AND QT_QTDBUS_FOUND)
 	
 	set(medulla_SRCS
 		medulla.cpp
-		${SOCKETCAN_PLUGIN}
 	)
 	
 	qt4_automoc(${medulla_SRCS})
