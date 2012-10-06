@@ -141,10 +141,10 @@ namespace Aseba
 		serializeSpecific();
 		uint16 len = static_cast<uint16>(rawData.size());
 		
-		if (len + 2 > ASEBA_MAX_PACKET_SIZE)
+		if (len+2 > ASEBA_MAX_INNER_PACKET_SIZE)
 		{
 			cerr << "Message::serialize() : fatal error: message size exceed maximum packet size.\n";
-			cerr << "message payload size: " << len + 2 << ", maximum packet size: " << ASEBA_MAX_PACKET_SIZE << ", message type: " << hex << showbase << type << dec << noshowbase;
+			cerr << "message payload size: " << len+2 << ", maximum packet size: " << ASEBA_MAX_INNER_PACKET_SIZE << ", message type: " << hex << showbase << type << dec << noshowbase;
 			cerr << endl;
 			abort();
 		}
@@ -793,7 +793,7 @@ namespace Aseba
 	
 	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode)
 	{
-		unsigned bytecodePayloadSize = (ASEBA_MAX_PACKET_SIZE - 6) / 2;
+		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT;
 		unsigned bytecodeStart = 0;
 		unsigned bytecodeCount = bytecode.size();
 		
@@ -818,7 +818,7 @@ namespace Aseba
 	
 	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode)
 	{
-		unsigned bytecodePayloadSize = (ASEBA_MAX_PACKET_SIZE - 6) / 2;
+		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT;
 		unsigned bytecodeStart = 0;
 		unsigned bytecodeCount = bytecode.size();
 		

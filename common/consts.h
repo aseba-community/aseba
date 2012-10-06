@@ -197,11 +197,20 @@ typedef enum
 /*! Limits for static buffers allocation */
 typedef enum
 {
-	ASEBA_MAX_PACKET_SIZE = 512+6	/*!< maximum size an aseba packet is allowed to be (in byte), including all its aseba headers, but not the source and the length */
+	ASEBA_MAX_EVENT_ARG_COUNT = 256,	/*!< Maximum number of arguments in an event (in word) */
 } AsebaLimits;
 
-/*! Maximum number of word in a aseba user message */
-#define ASEBA_MAX_EVENT_ARG_SIZE ((ASEBA_MAX_PACKET_SIZE-6)/2)
+/*! Maximum size of arguments in a user-defined event (in bytes) */
+#define ASEBA_MAX_EVENT_ARG_SIZE (ASEBA_MAX_EVENT_ARG_COUNT*2)
+
+/*! Maximum size of an event (in bytes), including its type, but not the source and the length */
+#define ASEBA_MAX_INNER_PACKET_SIZE (ASEBA_MAX_EVENT_ARG_SIZE+2)
+
+/*! Maximum size of an event (in bytes), including its type plus the source and the length */
+#define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE+4) 
+
+/*! *DEPRECATED*, please use one of the more explicit defines above */
+#define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_OUTER_PACKET_SIZE
 
 /*@}*/
 

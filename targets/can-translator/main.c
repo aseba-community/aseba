@@ -54,10 +54,10 @@ static  __attribute((far)) CanFrame sendQueue[SEND_QUEUE_SIZE];
 static  __attribute((far)) CanFrame recvQueue[RECV_QUEUE_SIZE];
 
 /* buffers for uart */
-static __attribute((far)) __attribute((aligned(2))) unsigned char uartSendBuffer[ASEBA_MAX_PACKET_SIZE+4];
+static __attribute((far)) __attribute((aligned(2))) unsigned char uartSendBuffer[ASEBA_MAX_OUTER_PACKET_SIZE];
 static unsigned uartSendPos;
 static unsigned uartSendSize;
-static __attribute((far))  __attribute((aligned(2))) unsigned char uartRecvBuffer[ASEBA_MAX_PACKET_SIZE+4];
+static __attribute((far))  __attribute((aligned(2))) unsigned char uartRecvBuffer[ASEBA_MAX_OUTER_PACKET_SIZE];
 static unsigned uartRecvPos;
 
 
@@ -101,7 +101,7 @@ static void can_rx_cb(const can_frame* frame)
 		
 	if(uartSendPos == uartSendSize) 
 	{
-		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_PACKET_SIZE, &source);
+		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 		if (amount > 0)
 		{
 			((uint16 *)uartSendBuffer)[0] = (uint16)amount - 2;
@@ -167,7 +167,7 @@ static bool uart_tx_cb(int __attribute((unused)) uart_id, unsigned char* data, v
 		// ...and if there is a new message on CAN, read it
 		uint16 source;
 			
-		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_PACKET_SIZE, &source);
+		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 		if (amount > 0)
 		{
 			((uint16 *)uartSendBuffer)[0] = (uint16)amount - 2;

@@ -77,9 +77,9 @@ class CanStream: public SelectableStream
 #define TO_CANID(type,id) (((type) << 8) | (id))
 
 	protected:
-		unsigned char tx_buffer[ASEBA_MAX_PACKET_SIZE];
+		unsigned char tx_buffer[ASEBA_MAX_OUTER_PACKET_SIZE];
 		int tx_len;
-		unsigned char rx_buffer[ASEBA_MAX_PACKET_SIZE];
+		unsigned char rx_buffer[ASEBA_MAX_OUTER_PACKET_SIZE];
 		unsigned int rx_len;
 		unsigned int rx_p;
 

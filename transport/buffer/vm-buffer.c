@@ -24,7 +24,7 @@
 #include <string.h>
 #include <assert.h>
 
-static unsigned char buffer[ASEBA_MAX_PACKET_SIZE];
+static unsigned char buffer[ASEBA_MAX_INNER_PACKET_SIZE];
 static unsigned buffer_pos;
 
 static void buffer_add(const uint8* data, const uint16 len)
@@ -33,9 +33,9 @@ static void buffer_add(const uint8* data, const uint16 len)
 	while (i < len)
 	{
 		/* uncomment this to check for buffer overflow in sent packets
-		if (buffer_pos >= ASEBA_MAX_PACKET_SIZE)
+		if (buffer_pos >= ASEBA_MAX_INNER_PACKET_SIZE)
 		{
-			printf("buffer pos %d max size %d\n", buffer_pos, ASEBA_MAX_PACKET_SIZE);
+			printf("buffer pos %d max size %d\n", buffer_pos, ASEBA_MAX_INNER_PACKET_SIZE);
 			abort();
 		}*/
 		buffer[buffer_pos++] = data[i++];
@@ -205,7 +205,7 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 	uint16 source;
 	const AsebaVMDescription *desc = AsebaGetVMDescription(vm);
 	
-	uint16 amount = AsebaGetBuffer(vm, buffer, ASEBA_MAX_PACKET_SIZE, &source);
+	uint16 amount = AsebaGetBuffer(vm, buffer, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 
 	if (amount > 0)
 	{

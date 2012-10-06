@@ -2975,7 +2975,7 @@ namespace Aseba
 		eventsDescriptionsView->setDragDropMode(QAbstractItemView::InternalMove);
 		eventsDescriptionsView->setDragEnabled(true);
 		eventsDescriptionsView->setDropIndicatorShown(true);
-		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, (ASEBA_MAX_PACKET_SIZE-6)/2, this));
+		eventsDescriptionsView->setItemDelegateForColumn(1, new SpinBoxDelegate(0, ASEBA_MAX_EVENT_ARG_COUNT, this));
 		eventsDescriptionsView->setMinimumHeight(100);
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
 		eventsDescriptionsView->resizeRowsToContents();
