@@ -43,13 +43,15 @@ namespace Aseba
 	const QString HelpViewer::DEFAULT_LANGUAGE = "en";
 
 	HelpViewer::HelpViewer(QWidget* parent):
-		QWidget(parent)
+		QWidget(parent),
+		tmpHelpSubDir(QString("aseba-studio-%1").arg(QCoreApplication::applicationPid())),
+		tmpHelpFileNameHC(QDir::temp().filePath(tmpHelpSubDir + "/aseba-doc.qhc")),
+		tmpHelpFileNameCH(QDir::temp().filePath(tmpHelpSubDir + "/aseba-doc.qch"))
 	{
 		// expanding help files into tmp
- 		const QString tmpHelpFileNameHC(QDir::temp().filePath("aseba-doc.qhc"));
+		QDir::temp().mkdir(tmpHelpSubDir);
  		QFile(":aseba-doc.qhc").copy(tmpHelpFileNameHC);
-		const QString tmpHelpFileNameCH(QDir::temp().filePath("aseba-doc.qch"));
- 		QFile(":aseba-doc.qch").copy(tmpHelpFileNameCH);
+		QFile(":aseba-doc.qch").copy(tmpHelpFileNameCH);
 		
 		// open files from tmp
 		helpEngine = new QHelpEngine(tmpHelpFileNameHC, this);
@@ -116,10 +118,9 @@ namespace Aseba
 	{
 		writeSettings();
 		// remove help files from tmp
-		const QString tmpHelpFileNameHC(QDir::temp().filePath("aseba-doc.qhc"));
- 		QFile(tmpHelpFileNameHC).remove();
-		const QString tmpHelpFileNameCH(QDir::temp().filePath("aseba-doc.qch"));
- 		QFile(tmpHelpFileNameCH).remove();
+		QFile(tmpHelpFileNameHC).remove();
+		QFile(tmpHelpFileNameCH).remove();
+		QDir::temp().rmdir(tmpHelpSubDir);
 	}
 
 	void HelpViewer::setLanguage(const QString& lang)
