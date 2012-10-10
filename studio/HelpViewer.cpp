@@ -38,18 +38,6 @@
 
 #include <HelpViewer.moc>
 
-
-// define the name of the help file
-#ifndef HELP_FILE
-	#define HELP_FILE	"aseba-doc.qhc"
-#endif
-
-// define a user path to the help file (try after the application binary path)
-#ifndef HELP_USR_PATH
-	#define HELP_USR_PATH	"/usr/share/doc/aseba/"
-#endif
-
-
 namespace Aseba
 {
 	const QString HelpViewer::DEFAULT_LANGUAGE = "en";
@@ -57,36 +45,25 @@ namespace Aseba
 	HelpViewer::HelpViewer(QWidget* parent):
 		QWidget(parent)
 	{
-		QString helpFile;
-
-		// search for the help file
-		QDir helpPath = QDir(QCoreApplication::applicationDirPath());
-		QDir helpUsrPath = QDir(HELP_USR_PATH);
-		if (helpPath.exists(HELP_FILE))
+		// expanding help files into tmp
+ 		const QString tmpHelpFileNameHC(QDir::temp().filePath("aseba-doc.qhc"));
+ 		QFile(":aseba-doc.qhc").copy(tmpHelpFileNameHC);
+		const QString tmpHelpFileNameCH(QDir::temp().filePath("aseba-doc.qch"));
+ 		QFile(":aseba-doc.qch").copy(tmpHelpFileNameCH);
+		
+		// open files from tmp
+		helpEngine = new QHelpEngine(tmpHelpFileNameHC, this);
+		if (helpEngine->setupData() == false)
 		{
-			// use the application binary directory
-			helpFound = true;
-			helpFile = helpPath.absoluteFilePath(HELP_FILE);
-		}
-		else if (helpUsrPath.exists(HELP_FILE))
-		{
-			// use the user-given path
-			helpFound = true;
-			helpFile = helpUsrPath.absoluteFilePath(HELP_FILE);
-		}
-		else
-		{
-			// not found!
 			helpFound = false;
-			helpFile = "";
-			QString message = tr("The help file %0 has not been found. " \
-					     "It should be located in the same directory as the binary of Aseba Studio. " \
-					     "Please check your installation, or report a bug.").arg(HELP_FILE);
+			QString message = tr("The help file %0 was not loaded successfully. " \
+				"The error was: %1." \
+				"The help file should be available in the temporary directory of your system. " \
+				"Please check your installation, or report a bug.").arg(tmpHelpFileNameHC).arg(helpEngine->error());
 			QMessageBox::warning(this, tr("Help file not found"), message);
 		}
-
-		helpEngine = new QHelpEngine(helpFile, this);
-		helpEngine->setupData();
+		else
+			helpFound = true;
 
 		// navigation buttons
 		previous = new QPushButton(tr("Previous"));
@@ -138,6 +115,11 @@ namespace Aseba
 	HelpViewer::~HelpViewer()
 	{
 		writeSettings();
+		// remove help files from tmp
+		const QString tmpHelpFileNameHC(QDir::temp().filePath("aseba-doc.qhc"));
+ 		QFile(tmpHelpFileNameHC).remove();
+		const QString tmpHelpFileNameCH(QDir::temp().filePath("aseba-doc.qch"));
+ 		QFile(tmpHelpFileNameCH).remove();
 	}
 
 	void HelpViewer::setLanguage(const QString& lang)

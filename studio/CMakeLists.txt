@@ -43,30 +43,11 @@ if (QT4_FOUND)
 	# generates the documentation
 	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message("-- qcollectiongenerator executable found")
-		# all the process should be done in ${CMAKE_CURRENT_SOURCE_DIR}, then the binary files are moved to ${CMAKE_CURRENT_BINARY_DIR}
-		set(SOURCE_QCH "${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch")
-		set(SOURCE_QHC "${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc")
-		set(DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-		if (WIN32)
-			MAKE_WINDOWS_PATH(SOURCE_QCH)
-			MAKE_WINDOWS_PATH(SOURCE_QHC)
-			MAKE_WINDOWS_PATH(DEST_DIR)
-			add_custom_command(
-				OUTPUT ${DOC_NAME}.qhc ${DOC_NAME}.qch
-				COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc
-				COMMAND move "${SOURCE_QCH}" "${DEST_DIR}"
-				COMMAND move "${SOURCE_QHC}" "${DEST_DIR}"
-				MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
-			add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
-		else (WIN32)
-			add_custom_command(
-				OUTPUT ${DOC_NAME}.qhc ${DOC_NAME}.qch
-				COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp -o ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc
-				COMMAND mv "${SOURCE_QCH}" "${DEST_DIR}"
-				COMMAND mv "${SOURCE_QHC}" "${DEST_DIR}"
-				MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
-			add_custom_target(documentation DEPENDS ${DOC_NAME}.qhc ${DOC_NAME}.qch)
-		endif (WIN32)
+		add_custom_command(
+			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch
+			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${DOC_NAME}.qhcp -o ${DOC_NAME}.qhc
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
 	else (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message(FATAL_ERROR "-- qcollectiongenerator executable not found (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
