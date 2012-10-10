@@ -62,6 +62,9 @@ namespace Aseba
 		QPushButton* home;
 		QString language;
 		bool helpFound;
+		const QString tmpHelpSubDir;
+		const QString tmpHelpFileNameHC;
+		const QString tmpHelpFileNameCH;
 
 	protected slots:
 		void previousClicked();
