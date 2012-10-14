@@ -234,11 +234,6 @@ namespace Aseba
 							flag = true;
 						}
 					}
-					if( button->getMemoryState() >= 0 )
-					{
-						text += L" and state == ";
-						text += toWstring(button->getMemoryState());
-					}
 					break;
 				case THYMIO_PROX_IR:
 					for(int i=0; i<button->size(); ++i)
@@ -260,12 +255,7 @@ namespace Aseba
 							flag = true;
 						} 
 					}
-					if( button->getMemoryState() >= 0 )
-					{
-						text += L" and state == ";
-						text += toWstring(button->getMemoryState());
-					}					
-					break;		
+					break;
 				case THYMIO_PROX_GROUND_IR:
 					for(int i=0; i<button->size(); ++i)
 					{
@@ -284,31 +274,36 @@ namespace Aseba
 							text += toWstring(i);
 							text += L"] > 300";
 							flag = true;
-						}						
+						}
 					}
-					if( button->getMemoryState() >= 0 )
-					{
-						text += L" and state == ";
-						text += toWstring(button->getMemoryState());
-					}						
-					break;			
+					break;
 				case THYMIO_TAP_IR:
 				case THYMIO_CLAP_IR:
 				default:
 					errorCode = THYMIO_INVALID_CODE;
-					break;			
+					break;
 				}
-
+				
+				if( button->getMemoryState() > 0 )
+				{
+					text += L" and (state & ";
+					text += toWstring(button->getMemoryState());
+					text += L") == ";
+					text += toWstring(button->getMemoryState());
+				}
+				
 				text += L" then\n";
 				inIfBlock = true;
-					
+				
 				generatedCode[currentBlock] = text;
 			}
 			else 
 			{
-				if( button->getMemoryState() >= 0 )
+				if( button->getMemoryState() > 0 )
 				{
-					text += L"\tif state == ";
+					text += L"\tif (state & ";
+					text += toWstring(button->getMemoryState());
+					text += L") == ";
 					text += toWstring(button->getMemoryState());
 					text += L" then\n";
 					
@@ -391,7 +386,7 @@ namespace Aseba
 		if( generatedCode.empty() )
 		{
 			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
-				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");			
+				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");
 			generatedCode.push_back(L"call sound.system(-1)\ncall leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
 		}
 		
