@@ -370,11 +370,15 @@ namespace Aseba
 	{
 		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
 		{
-			pid = values[0];
-			nodeToolRegistrer.update(pid, this, tools);
-			updateToolList();
-			
-			mainWindow->regenerateHelpMenu();
+			// only regenerate if pid has changed
+			if (values[0] != int(pid))
+			{
+				pid = values[0];
+				nodeToolRegistrer.update(pid, this, tools);
+				updateToolList();
+				
+				mainWindow->regenerateHelpMenu();
+			}
 		}
 	}
 	
@@ -1193,7 +1197,6 @@ namespace Aseba
 	void NodeTab::variablesMemoryChanged(unsigned start, const VariablesDataVector &variables)
 	{
 		// update memory view
-		qDebug() << "received variables 2";
 		vmMemoryModel->setVariablesData(start, variables);
 	}
 	
