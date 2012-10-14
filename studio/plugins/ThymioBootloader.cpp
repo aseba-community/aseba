@@ -91,16 +91,8 @@ namespace Aseba
 		flashButton->setEnabled(true);
 		lineEdit->setEnabled(true);
 
-		target->blockWrite();
-		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
-		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
-
 		exec();
 		// Note that now nodeTab is not valid anymore
-
-		disconnect(target, SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
-		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
-		target->unblockWrite();
 		
 		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
 		if(deleteMyself)
@@ -131,6 +123,11 @@ namespace Aseba
 		flashButton->setEnabled(false);
 		fileButton->setEnabled(false);
 		lineEdit->setEnabled(false);
+		
+		// make target ready for flashing
+		target->blockWrite();
+		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
 
 		// Now we have a valid hex file ...
 		pageMap.clear();
@@ -267,6 +264,11 @@ namespace Aseba
 			handleDashelException(e);
 		}
 		
+		// make target behave normally again
+		disconnect(target, SIGNAL(nodeDisconnected(uint)),this, SLOT(vmDisconnected(unsigned)));
+		disconnect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
+		target->unblockWrite();
+		
 		// send GetDescription 100 ms later
 		startTimer(100);
 	}
@@ -286,8 +288,10 @@ namespace Aseba
 			handleDashelException(e);
 		}
 		
+		// automatically close
+		done(0);
 		// Don't allow to immediatly reflash, we want studio to redisplay a new tab ! 
-		quitButton->setEnabled(true);
+		//quitButton->setEnabled(true);
 	}
 
 	void ThymioBootloaderDialog::closeEvent(QCloseEvent *event)
