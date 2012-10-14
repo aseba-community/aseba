@@ -47,7 +47,7 @@ namespace Aseba
 		Target * target;
 		Dashel::Stream 	*stream;
 
-		int delete_myself;
+		bool deleteMyself;
 
 	public:
 		ThymioBootloaderDialog(NodeTab* nodeTab);
