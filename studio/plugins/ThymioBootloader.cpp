@@ -58,7 +58,7 @@ namespace Aseba
 		connect(flashButton, SIGNAL(clicked()), this, SLOT(doFlash()));
 		connect(quitButton, SIGNAL(clicked()), this, SLOT(doClose()));
 
-		delete_myself = 0;
+		deleteMyself = false;
 	}
 	
 	ThymioBootloaderDialog::~ThymioBootloaderDialog()
@@ -81,7 +81,7 @@ namespace Aseba
 	
 	bool ThymioBootloaderDialog::surviveTabDestruction() const 
 	{
-		return delete_myself;
+		return deleteMyself;
 	}
 	
 	void ThymioBootloaderDialog::showFlashDialog()
@@ -103,7 +103,7 @@ namespace Aseba
 		target->unblockWrite();
 		
 		// we must delete ourself, because the tab is not there any more to do bookkeeping for us
-		if(delete_myself)
+		if(deleteMyself)
 			deleteLater();
 	}
 	
@@ -115,7 +115,11 @@ namespace Aseba
 
 	void ThymioBootloaderDialog::doFlash(void) 
 	{
-		HexFile	hex;
+		const int warnRet = QMessageBox::warning(this, tr("Pre-update warning"), tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.<p><b>Do not unplug the robot during the update!</b></p>Are you sure you want to proceed?"), QMessageBox::No|QMessageBox::Yes, QMessageBox::No);
+		if (warnRet != QMessageBox::Yes)
+			return;
+		
+		HexFile hex;
 		try {
 			hex.read(lineEdit->text().toStdString());
 		}
@@ -208,7 +212,7 @@ namespace Aseba
 	
 	void ThymioBootloaderDialog::vmDisconnected(unsigned node)
 	{
-		delete_myself = 1;
+		deleteMyself = true;
 
 		qDebug() << "Bootloader entered " << node;
 		if(node != nodeId)
@@ -301,7 +305,7 @@ namespace Aseba
 		default:
 			// oops... we are doomed
 			// non-modal message box
-			QMessageBox* message = new QMessageBox(QMessageBox::Critical, tr("Dashel Unexpected Error"), tr("A communication error happened during the flashing process:") + " (" + QString::number(e.source) + ") " + e.what(), QMessageBox::NoButton, this);
+			QMessageBox* message = new QMessageBox(QMessageBox::Critical, tr("Dashel Unexpected Error"), tr("A communication error happened during the update process:") + " (" + QString::number(e.source) + ") " + e.what(), QMessageBox::NoButton, this);
 			message->setWindowModality(Qt::NonModal);
 			message->show();
 		}

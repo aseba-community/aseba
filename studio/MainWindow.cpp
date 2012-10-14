@@ -305,6 +305,8 @@ namespace Aseba
 
 	NodeTab::~NodeTab()
 	{
+		// Note: this might memory leak, depending on when the signal/slots get disconnected
+		// but this is a rare case and can be safely ignored
 		compilationFuture.waitForFinished();
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 		{
@@ -1959,7 +1961,7 @@ namespace Aseba
 			const AbsentNodeTab* absentNodeTab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
 			if (absentNodeTab)
 			{
-				toCopy += QString("# abscent node named %0\n").arg(absentNodeTab->name);
+				toCopy += QString("# absent node named %0\n").arg(absentNodeTab->name);
 				toCopy += absentNodeTab->editor->toPlainText();
 				toCopy += "\n\n";
 			}
