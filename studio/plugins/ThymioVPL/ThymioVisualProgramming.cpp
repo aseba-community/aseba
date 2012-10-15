@@ -125,6 +125,7 @@ namespace Aseba
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
 		eventsLayout->setAlignment(Qt::AlignTop);
+		eventsLayout->setSpacing(10);
 		eventsLayout->addWidget(eventsLabel);
 		eventsLayout->addWidget(buttonsButton);
 		eventsLayout->addWidget(proxButton);
@@ -180,6 +181,7 @@ namespace Aseba
 		actionButtons.push_back(memoryButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
+		actionsLayout->setSpacing(10);
 		actionsLayout->addWidget(actionsLabel);
 		actionsLayout->addWidget(moveButton);
 		actionsLayout->addWidget(colorButton);
