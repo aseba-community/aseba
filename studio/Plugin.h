@@ -66,6 +66,7 @@ namespace Aseba
 		void setVariableValues(unsigned, const VariablesDataVector &);
 		bool saveFile(bool as=false);
 		void openFile();
+		bool newFile();
 	};
 	
 	//! A tool that is specific to a node
@@ -76,7 +77,7 @@ namespace Aseba
 		
 		virtual ~NodeToolInterface() {}
 		
-		virtual void loadFromDom(const QDomDocument& content) {};
+		virtual void loadFromDom(const QDomDocument& content, bool fromFile) {};
 		virtual QDomDocument saveToDom() const { return QDomDocument(); } 
 		SavedContent getSaved() const { return SavedContent(name, saveToDom()); }
 		

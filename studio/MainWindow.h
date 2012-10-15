@@ -198,7 +198,7 @@ namespace Aseba
 		void setupWidgets();
 		void setupConnections();
 		virtual SavedPlugins savePlugins() const;
-		void restorePlugins(const SavedPlugins& savedPlugins);
+		void restorePlugins(const SavedPlugins& savedPlugins, bool fromFile);
 		void updateToolList();
 	
 	public slots:
@@ -382,7 +382,7 @@ namespace Aseba
 		
 	private slots:
 		void about();
-		void newFile();
+		bool newFile();
 		void openFile(const QString &path = QString());
 		void openRecentFile();
 		bool save();

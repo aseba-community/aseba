@@ -81,18 +81,15 @@ namespace Aseba
 		
 		return mainWindow->save();
 	}
-	
-//	void InvasivePlugin::openFile(QString name)
-//	{ 
-//		mainWindow->sourceModified = false;
-//		mainWindow->constantsDefinitionsModel->clearWasModified();
-//		mainWindow->eventsDescriptionsModel->clearWasModified();
-//		mainWindow->openFile();
-//	}
 
 	void InvasivePlugin::openFile()
 	{
 		mainWindow->openFile();
+	}
+	
+	bool InvasivePlugin::newFile()
+	{
+		return mainWindow->newFile();
 	}
 	
 	TargetVariablesModel * InvasivePlugin::getVariablesModel()

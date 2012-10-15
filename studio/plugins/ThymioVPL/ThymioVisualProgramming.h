@@ -42,7 +42,7 @@ namespace Aseba
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
 
-		virtual void loadFromDom(const QDomDocument& content);
+		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
 		//virtual bool surviveTabDestruction() const;
 		
