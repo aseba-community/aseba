@@ -629,7 +629,7 @@ namespace Aseba
 		return savedPlugins;
 	}
 	
-	void NodeTab::restorePlugins(const SavedPlugins& savedPlugins)
+	void NodeTab::restorePlugins(const SavedPlugins& savedPlugins, bool fromFile)
 	{
 		// first recreate plugins
 		for (SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
@@ -640,7 +640,7 @@ namespace Aseba
 		for (SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
 		{
 			NodeToolInterface* interface(tools.getNamed(it->first));
-			interface->loadFromDom(it->second);
+			interface->loadFromDom(it->second, fromFile);
 		}
 	}
 	
@@ -1580,7 +1580,7 @@ namespace Aseba
 		QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
 	
-	void MainWindow::newFile()
+	bool MainWindow::newFile()
 	{
 		if (askUserBeforeDiscarding())
 		{
@@ -1595,7 +1595,9 @@ namespace Aseba
 			constantsDefinitionsModel->clear();
 			eventsDescriptionsModel->clear();
 			actualFileName.clear();
+			return true;
 		}
+		return false;
 	}
 	
 	void MainWindow::openFile(const QString &path)
@@ -1660,7 +1662,7 @@ namespace Aseba
 						NodeTab* tab = getTabFromName(element.attribute("name"));
 						if (tab)
 						{
-							tab->restorePlugins(savedPlugins);
+							tab->restorePlugins(savedPlugins, true);
 							tab->editor->setPlainText(text);
 						}
 						else
@@ -2564,7 +2566,7 @@ namespace Aseba
 		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
 		{
 			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
-			tab->restorePlugins(absentTab->savePlugins());
+			tab->restorePlugins(absentTab->savePlugins(), false);
 			tab->updateToolList();
 			nodes->removeAndDeleteTab(absentIndex);
 		}

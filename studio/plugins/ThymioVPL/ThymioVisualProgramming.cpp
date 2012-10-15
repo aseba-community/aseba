@@ -267,7 +267,8 @@ namespace Aseba
 
 	void ThymioVisualProgramming::showVPL()
 	{
-		exec();
+		if (InvasivePlugin::newFile())
+			exec();
 	}
 	
 	void ThymioVisualProgramming::newFile()
@@ -356,7 +357,7 @@ namespace Aseba
 		else
 			event->ignore();
 	}
-		
+	
 	bool ThymioVisualProgramming::warningDialog()
 	{
 		if(!scene->isModified())
@@ -364,7 +365,7 @@ namespace Aseba
 		
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Warning"));
-		msgBox.setText(tr("The document has been modified."));
+		msgBox.setText(tr("The VPL document has been modified."));
 		msgBox.setInformativeText(tr("Do you want to save the changes?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
@@ -432,7 +433,7 @@ namespace Aseba
 		return document;
 	}
 
-	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document) 
+	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
 		scene->clear();
 
@@ -454,7 +455,7 @@ namespace Aseba
 						scene->setAdvanced(false);
 					}
 					
-					colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());						
+					colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());
 				}
 				else if(element.tagName() == "buttonset")
 				{
@@ -493,7 +494,7 @@ namespace Aseba
 
 						eventButton->setState(element.attribute("state").toInt());
 					}
-										
+					
 					if( !(buttonName = element.attribute("action-name")).isEmpty() )
 					{
 						if ( buttonName == "move" )
@@ -523,7 +524,7 @@ namespace Aseba
 			domNode = domNode.nextSibling();
 		}
 		
-		scene->setModified(false);
+		scene->setModified(!fromFile);
 		
 		if (!scene->isEmpty())
 			QTimer::singleShot(0, this, SLOT(exec()));
