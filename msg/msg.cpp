@@ -793,7 +793,7 @@ namespace Aseba
 	
 	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode)
 	{
-		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
+		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-2;
 		unsigned bytecodeStart = 0;
 		unsigned bytecodeCount = bytecode.size();
 		
@@ -818,7 +818,7 @@ namespace Aseba
 	
 	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode)
 	{
-		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
+		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-2;
 		unsigned bytecodeStart = 0;
 		unsigned bytecodeCount = bytecode.size();
 		
