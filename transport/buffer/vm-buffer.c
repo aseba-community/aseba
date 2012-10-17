@@ -24,7 +24,16 @@
 #include <string.h>
 #include <assert.h>
 
-static unsigned char buffer[ASEBA_MAX_INNER_PACKET_SIZE];
+/*
+	Normally, the size should be ASEBA_MAX_INNER_PACKET_SIZE.
+	However, because of inconsistencies in previous sizes, old
+	Studios send larger packets, up to ASEBA_MAX_OUTER_PACKET_SIZE.
+	For the sake of compatibility, we will keep larger buffers for
+	a while.
+*/
+#define ASEBA_MAX_INNER_PACKET_SIZE_COMPAT ASEBA_MAX_OUTER_PACKET_SIZE
+
+static unsigned char buffer[ASEBA_MAX_INNER_PACKET_SIZE_COMPAT];
 static unsigned buffer_pos;
 
 static void buffer_add(const uint8* data, const uint16 len)
@@ -205,7 +214,7 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 	uint16 source;
 	const AsebaVMDescription *desc = AsebaGetVMDescription(vm);
 	
-	uint16 amount = AsebaGetBuffer(vm, buffer, ASEBA_MAX_INNER_PACKET_SIZE, &source);
+	uint16 amount = AsebaGetBuffer(vm, buffer, ASEBA_MAX_INNER_PACKET_SIZE_COMPAT, &source);
 
 	if (amount > 0)
 	{
