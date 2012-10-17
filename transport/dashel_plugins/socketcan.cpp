@@ -26,6 +26,8 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
+#include <unistd.h>
+
 #include <string>
 #include <iostream>
 
