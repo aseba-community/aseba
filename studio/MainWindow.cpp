@@ -759,7 +759,7 @@ namespace Aseba
 	void NodeTab::saveBytecode()
 	{
 		const QString& nodeName(target->getName(id));
-		QString bytecodeFileName = QFileDialog::getSaveFileName(this, tr("Save the binary code of %0").arg(nodeName), "", "Aseba Binary Object (*.abo);;All Files (*)");
+		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), "", "Aseba Binary Object (*.abo);;All Files (*)");
 		
 		QFile file(bytecodeFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
