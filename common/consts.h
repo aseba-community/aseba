@@ -197,7 +197,7 @@ typedef enum
 /*! Limits for static buffers allocation */
 typedef enum
 {
-	ASEBA_MAX_EVENT_ARG_COUNT = 256,	/*!< Maximum number of arguments in an event (in word) */
+	ASEBA_MAX_EVENT_ARG_COUNT = 258,	/*!< Maximum number of arguments in an event (in word) */
 } AsebaLimits;
 
 /*! Maximum size of arguments in a user-defined event (in bytes) */
@@ -210,7 +210,7 @@ typedef enum
 #define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE+4) 
 
 /*! *DEPRECATED*, please use one of the more explicit defines above */
-#define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_OUTER_PACKET_SIZE
+#define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE
 
 /*@}*/
 

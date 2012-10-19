@@ -511,7 +511,7 @@ namespace Aseba
 	{
 		if (writeBlocked || !dashelInterface.stream) return;
 		
-		const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT;
+		const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
 
 		try
 		{
