@@ -28,7 +28,7 @@ namespace Aseba
 		button->setScale(scaleFactor);
 		button->setPos(15*scaleFactor, 20*scaleFactor); //advancedMode = false
 		buttonSets.push_back(button);
-		thymioCompiler.addButtonSet(button->getIRButtonSet());		
+		thymioCompiler.addButtonSet(button->getIRButtonSet());
 		
 		buttonSetHeight = button->boundingRect().height();
 		
