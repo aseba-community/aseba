@@ -389,7 +389,16 @@ namespace Aseba
 	}
 
 	QDomDocument ThymioVisualProgramming::saveToDom() const 
-	{ 
+	{
+		// if VPL is in its virign state, do not return a valid document
+		// to prevent erasing of text-base code
+		if (scene->getNumberOfButtonSets() == 0)
+			return QDomDocument();
+		if ((scene->getNumberOfButtonSets() == 1) &&
+			(!(*scene->buttonsBegin())->eventExists()) &&
+			(!(*scene->buttonsBegin())->actionExists()))
+			return QDomDocument();
+		
 		QDomDocument document("tool-plugin-data");
 		
 		QDomElement vplroot = document.createElement("vplroot");
@@ -399,12 +408,12 @@ namespace Aseba
 		settings.setAttribute("advanced-mode", scene->getAdvanced() ? "true" : "false");
 		settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
 		vplroot.appendChild(settings);
-		vplroot.appendChild(document.createTextNode("\n\n"));		
+		vplroot.appendChild(document.createTextNode("\n\n"));
 		
 		for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
 			  itr != scene->buttonsEnd(); ++itr )
 		{
-			QDomElement element = document.createElement("buttonset");			
+			QDomElement element = document.createElement("buttonset");
 			
 			if( (*itr)->eventExists() ) 
 			{
