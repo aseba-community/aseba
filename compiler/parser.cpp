@@ -366,7 +366,7 @@ namespace Aseba
 		}
 
 		// sanity check for array
-		if (varSize == 0)
+		if (varSize == 0 || varSize == Node::E_NOVAL)
 			throw TranslatableError(varPos, ERROR_UNDEFINED_SIZE).arg(varName);
 
 		// save variable
