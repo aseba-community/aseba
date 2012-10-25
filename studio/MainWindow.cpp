@@ -983,7 +983,7 @@ namespace Aseba
 		else
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
 		
-		if (result->success)	
+		if (result->success)
 			result->variablesMap = *compiler.getVariablesMap();
 		
 		return result;
