@@ -34,6 +34,8 @@
 #include <cassert>
 #include <cstring>
 
+extern AsebaVMDescription nodeDescription;
+
 class AsebaNode: public Dashel::Hub
 {
 private:
@@ -48,6 +50,7 @@ private:
 		sint16 productId;
 		sint16 user[1024];
 	} variables;
+	char mutableName[12];
 	
 public:
 	// public because accessed from a glue function
@@ -73,9 +76,17 @@ public:
 		
 		vm.variables = reinterpret_cast<sint16 *>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(sint16);
+	}
+	
+	void listen(int basePort, int deltaPort)
+	{
+		const int port(basePort + deltaPort);
+		vm.nodeId = 1 + deltaPort;
+		strncpy(mutableName, "dummynode-0", 12);
+		mutableName[10] = '0' + deltaPort;
+		nodeDescription.name = mutableName;
 		
 		// connect network
-		int port = ASEBA_DEFAULT_PORT;
 		try
 		{
 			std::ostringstream oss;
@@ -258,6 +269,18 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 
 int main(int argc, char* argv[])
 {
+	const int basePort = ASEBA_DEFAULT_PORT;
+	int deltaPort = 0;
+	if (argc > 1)
+	{
+		deltaPort = atoi(argv[1]);
+		if (deltaPort < 0 || deltaPort >= 9)
+		{
+			std::cerr << "Usage: " << argv[0] << " [delta port, from 0 to 9]" << std::endl;
+			return 1;
+		}
+	}
+	node.listen(basePort, deltaPort);
 	while (node.step(10))
 	{
 		node.applicationStep();

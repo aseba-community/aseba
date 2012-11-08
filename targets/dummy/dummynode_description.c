@@ -22,7 +22,7 @@
 #include "../../common/productids.h"
 
 AsebaVMDescription nodeDescription = {
-	"dummynode",
+	"",
 	{
 		{ 1, "id" },
 		{ 1, "source" },
