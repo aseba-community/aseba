@@ -166,8 +166,10 @@ namespace Aseba
 		Reboot msg(nodeId);
 		try
 		{
+			qDebug() << getTimeThreadSafe() << "Reboot send start";
 			msg.serialize(stream);
 			stream->flush();
+			qDebug() << getTimeThreadSafe() << "Reboot send done";
 			// now, wait until the disconnect event is sent.
 		}
 		catch(Dashel::DashelException e)
@@ -183,7 +185,7 @@ namespace Aseba
 
 	void ThymioBootloaderDialog::ackReceived(unsigned error_code, unsigned address) 
 	{
-		qDebug() << "Got ack: " << error_code;
+		qDebug() << getTimeThreadSafe() << "Act received, error code:" << error_code;
 		if(error_code != 0)
 		{
 			// Fixme should not ignore errors...

@@ -26,6 +26,7 @@
 #include <ostream>
 #include <sstream>
 #include <cassert>
+#include <QElapsedTimer>
 #include <QInputDialog>
 #include <QtGui>
 #include <QLibraryInfo>
@@ -45,6 +46,15 @@ namespace Aseba
 
 	/** \addtogroup studio */
 	/*@{*/
+	
+	QElapsedTimer globalTimer;
+	QMutex globalTimerLock;
+	
+	qint64 getTimeThreadSafe()
+	{
+		QMutexLocker locker(&globalTimerLock);
+		return globalTimer.elapsed();
+	}
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
@@ -298,6 +308,7 @@ namespace Aseba
 	void DashelInterface::incomingData(Stream *stream)
 	{
 		Message *message = Message::receive(stream);
+		qDebug() << getTimeThreadSafe() << "Dashel incoming data:" << message;
 		emit messageAvailable(message);
 	}
 	
@@ -350,6 +361,8 @@ namespace Aseba
 		dashelInterface(translators, commandLineTarget),
 		writeBlocked(false)
 	{
+		globalTimer.start();
+		
 		userEventsTimer.setSingleShot(true);
 		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));
 		
@@ -714,6 +727,7 @@ namespace Aseba
 	
 	void DashelTarget::messageFromDashel(Message *message)
 	{
+		qDebug() << getTimeThreadSafe() << "Message arrive in main thread:" << message;
 		bool deleteMessage = true;
 		//message->dump(std::cout);
 		//std::cout << std::endl;

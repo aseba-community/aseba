@@ -40,7 +40,6 @@ class QListWidget;
 class QComboBox;
 class QTranslator;
 
-
 namespace Dashel
 {
 	class Stream;
@@ -50,6 +49,8 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
+	
+	qint64 getTimeThreadSafe();
 	
 	class DashelConnectionDialog : public QDialog
 	{
