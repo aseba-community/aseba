@@ -185,7 +185,7 @@ namespace Aseba
 
 	void ThymioBootloaderDialog::ackReceived(unsigned error_code, unsigned address) 
 	{
-		qDebug() << getTimeThreadSafe() << "Act received, error code:" << error_code;
+		qDebug() << getTimeThreadSafe() << "Act received, start of function, error code:" << error_code;
 		if(error_code != 0)
 		{
 			// Fixme should not ignore errors...
@@ -207,6 +207,7 @@ namespace Aseba
 			}
 		}
 		writePage(currentPage->first, &currentPage->second[0]);
+		qDebug() << getTimeThreadSafe() << "Act received, end of function";
 	}
 	
 	void ThymioBootloaderDialog::vmDisconnected(unsigned node)
