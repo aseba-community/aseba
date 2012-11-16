@@ -213,6 +213,7 @@ namespace Aseba
 	
 	void ThymioBootloaderDialog::vmDisconnected(unsigned node)
 	{
+		qDebug() << getTimeThreadSafe() << "vmDisconnected, start";
 		deleteMyself = true;
 
 		qDebug() << "Bootloader entered " << node;
@@ -229,6 +230,7 @@ namespace Aseba
 		if(currentPage == pageMap.end())
 			currentPage = pageMap.find(0);
 		writePage(currentPage->first, &currentPage->second[0]);
+		qDebug() << getTimeThreadSafe() << "vmDisconnected, end";
 	}
 	
 	void ThymioBootloaderDialog::writePage(unsigned page, unsigned char * data)
