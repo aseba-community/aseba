@@ -191,6 +191,7 @@ namespace Aseba
 			// Fixme should not ignore errors...
 		}
 		progressBar->setValue(progressBar->value()+1);
+		qDebug() << getTimeThreadSafe() << "Act received, progress bar updated";
 		if(currentPage->first == 0) {
 			// End of flash operation
 			flashDone();
