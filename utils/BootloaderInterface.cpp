@@ -39,8 +39,7 @@ namespace Aseba
 		pagesStart(0),
 		pagesCount(0)
 	{
-		// Wait until the bootloader answers
-
+		
 	}
 	
 	bool BootloaderInterface::readPage(unsigned pageNumber, uint8* data)
@@ -61,14 +60,13 @@ namespace Aseba
 		// get data
 		while (true)
 		{
-			Message *message = Message::receive(stream);
+			auto_ptr<Message> message(Message::receive(stream));
 			
 			// handle ack
-			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == dest))
 			{
 				uint16 errorCode = ackMessage->errorCode;
-				delete message;
 				if (errorCode == BootloaderAck::SUCCESS)
 				{
 					if (dataRead < pageSize)
@@ -80,7 +78,7 @@ namespace Aseba
 			}
 			
 			// handle data
-			BootloaderDataRead *dataMessage = dynamic_cast<BootloaderDataRead *>(message);
+			BootloaderDataRead *dataMessage = dynamic_cast<BootloaderDataRead *>(message.get());
 			if (dataMessage && (dataMessage->source == dest))
 			{
 				if (dataRead >= pageSize)
@@ -90,8 +88,6 @@ namespace Aseba
 				dataRead += sizeof(dataMessage->data);
 				cout << "Page read so far (" << dataRead << "/" << pageSize << ") bytes.\n";
 			}
-			
-			delete message;
 		}
 		
 		return true;
@@ -159,21 +155,18 @@ namespace Aseba
 				/*
 				while (true)
 				{
-					Message *message = Message::receive(stream);
+					auto_ptr<Message> message(Message::receive(stream));
 					
 					// handle ack
 					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
 					if (ackMessage && (ackMessage->source == dest))
 					{
 						uint16 errorCode = ackMessage->errorCode;
-						delete message;
 						if(errorCode == BootloaderAck::SUCCESS)
 							break;
 						else
 							return false;
 					}
-					
-					delete message;
 				}
 				*/
 			}
