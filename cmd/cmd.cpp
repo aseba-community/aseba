@@ -23,12 +23,14 @@
 #include "../utils/utils.h"
 #include <dashel/dashel.h>
 #include "../utils/HexFile.h"
+#include "../utils/FormatableString.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <iterator>
 #include <cassert>
 #include <cstring>
+#include <memory>
 
 namespace Aseba 
 {
@@ -104,13 +106,6 @@ namespace Aseba
 	}
 	
 	//! Produce an error message and quit
-	void errorWriteFile(const char *fileName)
-	{
-		cerr << "Error, can't write file " << fileName << endl;
-		exit(8);
-	}
-	
-	//! Produce an error message and quit
 	void errorServerDisconnected()
 	{
 		cerr << "Server closed connection before command was completely sent." << endl;
@@ -125,147 +120,194 @@ namespace Aseba
 	}
 	
 	//! Produce an error message and quit
-	void errorWritePage(unsigned pageIndex)
+	void errorBootloader(const string& message)
 	{
-		cerr << "Error while writing page " << pageIndex << endl;
-		exit(11);
-	}
-	
-	//! Warn about an error but do not quit
-	void errorWritePageNonFatal(unsigned pageIndex)
-	{
-		cerr << "Error while writing page " << pageIndex << ", continuing ..." << endl;
-	}
-	
-	//! Produce an error message and quit
-	void errorReadPage(unsigned pageIndex)
-	{
-		cerr << "Error while reading page " << pageIndex << endl;
-		exit(12);
-	}
-	
-	//! Produce an error message and quit
-	void errorReadPage(unsigned pageIndex, unsigned pagesStart, unsigned pagesCount)
-	{
-		cerr << "Error, page index " << pageIndex << " out of page range [ " << 	pagesStart << " : " << pagesStart + pagesCount << " ]" << endl;
-		exit(13);
+		cerr << "Error while interfacing with bootloader: " << message << endl;
+		exit(9);
 	}
 	
 	//! Manage interactions with an aseba-compatible bootloader
+	/**
+		There are two versions of the bootloader: the complete and the simple.
+		The complete version works on any Aseba network including over switches
+		as it transmits all data using the Aseba message protocol.
+		The simple version requires direct access to the device to be flashed,
+		because it breaks the Aseba message protocol for page transmission.
+	*/
 	class BootloaderInterface
 	{
 	public:
-		//! Create an interface to bootloader with id dest using a socket
-		BootloaderInterface(Stream* stream, int dest) :
-			stream(stream),
-			dest(dest),
-			pageSize(0),
-			pagesStart(0),
-			pagesCount(0)
+		//! An error in link with the bootloader
+		struct Error:public std::runtime_error
 		{
-			// Wait until the bootloader answers
-
-		}
+			Error(const string& what): std::runtime_error(what) {}
+		};
+		
+	public:
+		// main interface
+		
+		//! Create an interface to bootloader with id dest using a socket
+		BootloaderInterface(Stream* stream, int dest);
 		
 		//! Return the size of a page
 		int getPageSize() const { return pageSize; }
 		
 		//! Read a page
-		bool readPage(unsigned pageNumber, uint8* data)
+		bool readPage(unsigned pageNumber, uint8* data);
+		
+		//! Read a page, simplified protocol
+		bool readPageSimple(unsigned pageNumber, uint8 * data);
+		
+		//! Write a page, if simple is true, use simplified protocol, otherwise use complete protocol
+		bool writePage(int pageNumber, const uint8 *data, bool simple);
+		
+		//! Write an hex file
+		void writeHex(const string &fileName, bool reset, bool simple);
+		
+		//! Read an hex file and write it to fileName
+		void readHex(const string &fileName);
+		
+	protected:
+		// reporting function
+		
+		// progress
+		virtual void writePageStart(int pageNumber, const uint8* data, bool simple) {}
+		virtual void writePageWaitAck() {}
+		virtual void writePageSuccess() {}
+		virtual void writePageFailure() {}
+		
+		virtual void writeHexStart(const string &fileName, bool reset, bool simple) {}
+		virtual void writeHexEnteringBootloader() {}
+		virtual void writeHexGotDescription() {}
+		virtual void writeHexWritten() {}
+		virtual void writeHexExitingBootloader() {}
+		
+		// non-fatal errors
+		
+		//! Warn about an error but do not quit
+		virtual void errorWritePageNonFatal(unsigned pageIndex) {}
+		
+	protected:
+		// member variables
+		Stream* stream;
+		int dest;
+		unsigned pageSize;
+		unsigned pagesStart;
+		unsigned pagesCount;
+	};
+	
+	BootloaderInterface::BootloaderInterface(Stream* stream, int dest) :
+		stream(stream),
+		dest(dest),
+		pageSize(0),
+		pagesStart(0),
+		pagesCount(0)
+	{
+		// Wait until the bootloader answers
+
+	}
+	
+	bool BootloaderInterface::readPage(unsigned pageNumber, uint8* data)
+	{
+		if ((pageNumber < pagesStart) || (pageNumber >= pagesStart + pagesCount))
 		{
-			if ((pageNumber < pagesStart) || (pageNumber >= pagesStart + pagesCount))
-			{
-				errorReadPage(pageNumber, pagesStart, pagesCount);
-				return false;
-			}
+			throw Error(FormatableString("Error, page index %0 out of page range [%1:%2]").arg(pageNumber).arg(pagesStart).arg(pagesStart+pagesCount));
+		}
+		
+		// send command
+		BootloaderReadPage message;
+		message.dest = dest;
+		message.pageNumber = pageNumber;
+		message.serialize(stream);
+		stream->flush();
+		unsigned dataRead = 0;
+		
+		// get data
+		while (true)
+		{
+			Message *message = Message::receive(stream);
 			
-			// send command
-			BootloaderReadPage message;
-			message.dest = dest;
-			message.pageNumber = pageNumber;
-			message.serialize(stream);
-			stream->flush();
-			unsigned dataRead = 0;
-			
-			// get data
-			while (true)
+			// handle ack
+			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+			if (ackMessage && (ackMessage->source == dest))
 			{
-				Message *message = Message::receive(stream);
-				
-				// handle ack
-				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
-				if (ackMessage && (ackMessage->source == dest))
-				{
-					uint16 errorCode = ackMessage->errorCode;
-					delete message;
-					if (errorCode == BootloaderAck::SUCCESS)
-					{
-						if (dataRead < pageSize)
-							cerr << "Warning, got acknowledgement but page not fully read (" << dataRead << "/" << pageSize << ") bytes.\n";
-						return true;
-					}
-					else
-						return false;
-				}
-				
-				// handle data
-				BootloaderDataRead *dataMessage = dynamic_cast<BootloaderDataRead *>(message);
-				if (dataMessage && (dataMessage->source == dest))
-				{
-					if (dataRead >= pageSize)
-						cerr << "Warning, reading oversized page (" << dataRead << "/" << pageSize << ") bytes.\n";
-					copy(dataMessage->data, dataMessage->data + sizeof(dataMessage->data), data);
-					data += sizeof(dataMessage->data);
-					dataRead += sizeof(dataMessage->data);
-					cout << "Page read so far (" << dataRead << "/" << pageSize << ") bytes.\n";
-				}
-				
+				uint16 errorCode = ackMessage->errorCode;
 				delete message;
+				if (errorCode == BootloaderAck::SUCCESS)
+				{
+					if (dataRead < pageSize)
+						cerr << "Warning, got acknowledgement but page not fully read (" << dataRead << "/" << pageSize << ") bytes.\n";
+					return true;
+				}
+				else
+					return false;
 			}
 			
-			return true;
-		}
-		
-		bool readPageUsb(unsigned pageNumber, uint8 * data) {
-			BootloaderReadPage message;
-			message.dest = dest;
-			message.pageNumber = pageNumber;
-			message.serialize(stream);
-			stream->flush();
+			// handle data
+			BootloaderDataRead *dataMessage = dynamic_cast<BootloaderDataRead *>(message);
+			if (dataMessage && (dataMessage->source == dest))
+			{
+				if (dataRead >= pageSize)
+					cerr << "Warning, reading oversized page (" << dataRead << "/" << pageSize << ") bytes.\n";
+				copy(dataMessage->data, dataMessage->data + sizeof(dataMessage->data), data);
+				data += sizeof(dataMessage->data);
+				dataRead += sizeof(dataMessage->data);
+				cout << "Page read so far (" << dataRead << "/" << pageSize << ") bytes.\n";
+			}
 			
-			stream->read(data, 2048);
-			return true;
+			delete message;
 		}
 		
-		//! Write a page
-		bool writePage(int pageNumber, const uint8 *data)
+		return true;
+	}
+	
+	bool BootloaderInterface::readPageSimple(unsigned pageNumber, uint8 * data)
+	{
+		BootloaderReadPage message;
+		message.dest = dest;
+		message.pageNumber = pageNumber;
+		message.serialize(stream);
+		stream->flush();
+		
+		stream->read(data, 2048);
+		return true;
+	}
+	
+	bool BootloaderInterface::writePage(int pageNumber, const uint8 *data, bool simple)
+	{
+		writePageStart(pageNumber, data, simple);
+		
+		// send command
+		BootloaderWritePage writePage;
+		writePage.dest = dest;
+		writePage.pageNumber = pageNumber;
+		writePage.serialize(stream);
+		
+		if (simple)
 		{
-			// send command
-			BootloaderWritePage writePage;
-			writePage.dest = dest;
-			writePage.pageNumber = pageNumber;
-			writePage.serialize(stream);
+			// just write the complete page at ounce
+			stream->write(data,pageSize);
+		}
+		else
+		{
+			// flush command
 			stream->flush();
 			
-			cout << "Writing page " << pageNumber << endl;
 			// wait ACK
 			while (true)
 			{
-				Message *message = Message::receive(stream);
+				auto_ptr<Message> message(Message::receive(stream));
 				
 				// handle ack
-				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 				if (ackMessage && (ackMessage->source == dest))
 				{
 					uint16 errorCode = ackMessage->errorCode;
-					delete message;
 					if(errorCode == BootloaderAck::SUCCESS)
 						break;
 					else
 						return false;
 				}
-				
-				delete message;
 			}
 			
 			// write data
@@ -276,9 +318,9 @@ namespace Aseba
 				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
 				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
-//				cout << "." << std::flush;
+				//cout << "." << std::flush;
 				
-/*
+				/*
 				while (true)
 				{
 					Message *message = Message::receive(stream);
@@ -297,224 +339,134 @@ namespace Aseba
 					
 					delete message;
 				}
-*/
+				*/
 			}
-			// Flush only here so we 3n14rg3 our bandwidth
+			
+		}
+		
+		// flush only here to save bandwidth
+		stream->flush();
+		
+		while (true)
+		{
+			writePageWaitAck();
+			auto_ptr<Message> message(Message::receive(stream));
+			
+			// handle ack
+			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
+			if (ackMessage && (ackMessage->source == dest))
+			{
+				uint16 errorCode = ackMessage->errorCode;
+				if(errorCode == BootloaderAck::SUCCESS)
+				{
+					writePageSuccess();
+					return true;
+				}
+				else
+				{
+					writePageFailure();
+					return false;
+				}
+			}
+		}
+		
+		// should not happen
+		return true;
+	}
+	
+	void BootloaderInterface::writeHex(const string &fileName, bool reset, bool simple)
+	{
+		// Load hex file
+		HexFile hexFile;
+		hexFile.read(fileName);
+		
+		writeHexStart(fileName, reset, simple);
+		
+		if (reset) 
+		{
+			Reboot msg(dest);
+			msg.serialize(stream);
 			stream->flush();
 			
-			while (true)
-			{
-				Message *message = Message::receive(stream);
-				
-				// handle ack
-				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
-				if (ackMessage && (ackMessage->source == dest))
-				{
-					uint16 errorCode = ackMessage->errorCode;
-					delete message;
-					if(errorCode == BootloaderAck::SUCCESS)
-						break;
-					else
-						return false;
-				}
-				
-				delete message;
-			}
-			
-			cout << "done" << endl;
-			return true;
+			writeHexEnteringBootloader();
 		}
-		
-		//! Write an hex file
-		void writeHex(const string &fileName, bool reset)
+	
+		// Get page layout
+		if (simple)
 		{
-			// Load hex file
-			HexFile hexFile;
-			hexFile.read(fileName);
-			
-			if (reset) 
-			{
-				Reboot msg(dest);
-				msg.serialize(stream);
-				stream->flush();
-			}
-				
+			// wait for disconnected message
 			while (true)
 			{
-				Message *message = Message::receive(stream);
-				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
-				if (bDescMessage && (bDescMessage->source == dest))
-				{
-					pageSize = bDescMessage->pageSize;
-					pagesStart = bDescMessage->pagesStart;
-					pagesCount = bDescMessage->pagesCount;
-					delete message;
+				auto_ptr<Message> message(Message::receive(stream));
+				Disconnected* disconnectedMessage(dynamic_cast<Disconnected*>(message.get()));
+				if (disconnectedMessage)
 					break;
-				}
-				delete message;
 			}
-			
-			// Build a map of pages out of the map of addresses
-			typedef map<uint32, vector<uint8> > PageMap;
-			PageMap pageMap;
-			for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
-			{
-				// get page number
-				unsigned chunkAddress = it->first;
-				// index inside data chunk
-				unsigned chunkDataIndex = 0;
-				// size of chunk in bytes
-				unsigned chunkSize = it->second.size();
-				
-				// copy data from chunk to page
-				do
-				{
-					// get page number
-					unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
-					// get address inside page
-					unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
-				
-					// if page does not exists, create it
-					if (pageMap.find(pageIndex) == pageMap.end())
-					{
-					//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
-						pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
-					}
-					// copy data
-					unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
-					copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
-					
-					// increment chunk data pointer
-					chunkDataIndex += amountToCopy;
-				}
-				while (chunkDataIndex < chunkSize);
-			}
-			
-			// Write pages
-			for (PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it ++)
-			{
-				unsigned pageIndex = it->first;
-				if ((pageIndex >= pagesStart) && (pageIndex < pagesStart + pagesCount))
-					if (!writePage(pageIndex, &it->second[0]))
-						errorWritePage(pageIndex);
-			}
-
-			if (reset) 
-			{
-				BootloaderReset msg(dest);
-				msg.serialize(stream);
-				stream->flush();
-			}
-		}
-		
-		bool writePageUsb(int pageNumber, const uint8 *data)
-		{
-			// send command
-			BootloaderWritePage writePage;
-			writePage.dest = dest;
-			writePage.pageNumber = pageNumber;
-			writePage.serialize(stream);
-			
-			cout << "Writing page " << pageNumber << endl;
-			cout << "First data: " << hex << (int) data[0] << "," << hex << (int) data[1] << "," << hex << (int) data[2] << endl;
-			
-			stream->write(data,pageSize);
-			stream->flush();
-			
-			while (true)
-			{
-				cout << "Waiting ack ..." << endl;
-				Message *message = Message::receive(stream);
-				// handle ack
-				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
-				if (ackMessage && (ackMessage->source == dest))
-				{
-					uint16 errorCode = ackMessage->errorCode;
-					delete message;
-					if(errorCode == BootloaderAck::SUCCESS) {
-						cout << "Success" << endl;
-						break;
-					} else {
-						cout << "Fail" << endl;
-						return false;
-					}
-				}
-				
-				delete message;
-			}
-			
-			return true;
-		}
-		
-		void writeHexUsb(const string &fileName, bool reset) {
-			HexFile hexFile;
-			hexFile.read(fileName);
-			
-			if (reset) 
-			{
-				Reboot msg(dest);
-				msg.serialize(stream);
-				stream->flush();
-			}
-				
-/*			while (true)
-			{
-				Message *message = Message::receive(stream);
-				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message);
-				if (bDescMessage && (bDescMessage->source == dest))
-				{
-					pageSize = bDescMessage->pageSize;
-					pagesStart = bDescMessage->pagesStart;
-					pagesCount = bDescMessage->pagesCount;
-					delete message;
-					break;
-				}
-				delete message;
-			}
-*/			
 			pageSize = 2048;
-			// Build a map of pages out of the map of addresses
-			typedef map<uint32, vector<uint8> > PageMap;
-			PageMap pageMap;
-			for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
+		}
+		else
+		{
+			// get bootloader description
+			while (true)
+			{
+				auto_ptr<Message> message(Message::receive(stream));
+				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message.get());
+				if (bDescMessage && (bDescMessage->source == dest))
+				{
+					pageSize = bDescMessage->pageSize;
+					pagesStart = bDescMessage->pagesStart;
+					pagesCount = bDescMessage->pagesCount;
+					break;
+				}
+			}
+		}
+		
+		writeHexGotDescription();
+		
+		// Build a map of pages out of the map of addresses
+		typedef map<uint32, vector<uint8> > PageMap;
+		PageMap pageMap;
+		for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
+		{
+			// get page number
+			unsigned chunkAddress = it->first;
+			// index inside data chunk
+			unsigned chunkDataIndex = 0;
+			// size of chunk in bytes
+			unsigned chunkSize = it->second.size();
+			
+			// copy data from chunk to page
+			do
 			{
 				// get page number
-				unsigned chunkAddress = it->first;
-				// index inside data chunk
-				unsigned chunkDataIndex = 0;
-				// size of chunk in bytes
-				unsigned chunkSize = it->second.size();
-				
-				// copy data from chunk to page
-				do
-				{
-					// get page number
-					unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
-					// get address inside page
-					unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
-				
-					// if page does not exists, create it
-					if (pageMap.find(pageIndex) == pageMap.end())
-					{
-					//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
-						pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
-					}
-					// copy data
-					unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
-					copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
-					
-					// increment chunk data pointer
-					chunkDataIndex += amountToCopy;
-				}
-				while (chunkDataIndex < chunkSize);
-			}
+				unsigned pageIndex = (chunkAddress + chunkDataIndex) / pageSize;
+				// get address inside page
+				unsigned byteIndex = (chunkAddress + chunkDataIndex) % pageSize;
 			
+				// if page does not exists, create it
+				if (pageMap.find(pageIndex) == pageMap.end())
+				{
+				//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
+					pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
+				}
+				// copy data
+				unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
+				copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
+				
+				// increment chunk data pointer
+				chunkDataIndex += amountToCopy;
+			}
+			while (chunkDataIndex < chunkSize);
+		}
+		
+		if (simple)
+		{
 			// Write pages
 			for (PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it ++)
 			{
 				unsigned pageIndex = it->first;
 				if (pageIndex != 0)
-					if (!writePageUsb(pageIndex, &it->second[0]))
+					if (!writePage(pageIndex, &it->second[0], true))
 						errorWritePageNonFatal(pageIndex);
 			}
 			// Now look for the index 0 page
@@ -522,51 +474,120 @@ namespace Aseba
 			{
 				unsigned pageIndex = it->first;
 				if (pageIndex == 0)
-					if (!writePageUsb(pageIndex, &it->second[0]))
+					if (!writePage(pageIndex, &it->second[0], true))
 						errorWritePageNonFatal(pageIndex);
 			}
-
-			if (reset) 
+		}
+		else
+		{
+			// Write pages
+			for (PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it ++)
 			{
-				BootloaderReset msg(dest);
-				msg.serialize(stream);
-				stream->flush();
+				unsigned pageIndex = it->first;
+				if ((pageIndex >= pagesStart) && (pageIndex < pagesStart + pagesCount))
+					if (!writePage(pageIndex, &it->second[0], false))
+						throw Error(FormatableString("Error while writing page %0").arg(pageIndex));
 			}
-			
 		}
 		
-		//! Read an hex file
-		void readHex(const string &fileName)
+		writeHexWritten();
+
+		if (reset) 
 		{
-			HexFile hexFile;
+			BootloaderReset msg(dest);
+			msg.serialize(stream);
+			stream->flush();
 			
-			// Create memory
-			unsigned address = pagesStart * pageSize;
-			hexFile.data[address] = vector<uint8>();
-			hexFile.data[address].reserve(pagesCount * pageSize);
-			
-			// Read pages
-			for (unsigned page = pagesStart; page < pagesCount; page++)
-			{
-				vector<uint8> buffer((uint8)0, pageSize);
-				
-				if (!readPage(page, &buffer[0]))
-					errorReadPage(page);
-				
-				copy(&buffer[0], &buffer[pageSize], back_inserter(hexFile.data[address]));
-			}
-			
-			// Write hex file
-			hexFile.strip(pageSize);
-			hexFile.write(fileName);
+			writeHexExitingBootloader();
 		}
+	}
+	
+	void BootloaderInterface::readHex(const string &fileName)
+	{
+		HexFile hexFile;
+		
+		// Create memory
+		unsigned address = pagesStart * pageSize;
+		hexFile.data[address] = vector<uint8>();
+		hexFile.data[address].reserve(pagesCount * pageSize);
+		
+		// Read pages
+		for (unsigned page = pagesStart; page < pagesCount; page++)
+		{
+			vector<uint8> buffer((uint8)0, pageSize);
+			
+			if (!readPage(page, &buffer[0]))
+				throw Error(FormatableString("Error, cannot read page %0").arg(page));
+			
+			copy(&buffer[0], &buffer[pageSize], back_inserter(hexFile.data[address]));
+		}
+		
+		// Write hex file
+		hexFile.strip(pageSize);
+		hexFile.write(fileName);
+	}
+	
+	class CmdBootloaderInterface:public BootloaderInterface
+	{
+	public:
+		CmdBootloaderInterface(Stream* stream, int dest):
+			BootloaderInterface(stream, dest)
+		{}
 	
 	protected:
-		Stream* stream;
-		int dest;
-		unsigned pageSize;
-		unsigned pagesStart;
-		unsigned pagesCount;
+		// reporting function
+		virtual void writePageStart(int pageNumber, const uint8* data, bool simple)
+		{
+			cout << "Writing page " << pageNumber << "... ";
+			cout.flush();
+			//cout << "First data: " << hex << (int) data[0] << "," << hex << (int) data[1] << "," << hex << (int) data[2] << endl;
+		}
+		
+		virtual void writePageWaitAck()
+		{
+			cout << "Waiting ack ... ";
+			cout.flush();
+		}
+		
+		virtual void writePageSuccess()
+		{
+			cout << "Success" << endl;
+		}
+		
+		virtual void writePageFailure()
+		{
+			cout << "Failure" << endl;
+		}
+		
+		virtual void writeHexStart(const string &fileName, bool reset, bool simple)
+		{
+			cout << "Flashing " << fileName << endl;
+		}
+		
+		virtual void writeHexEnteringBootloader()
+		{
+			cout << "Entering bootloader" << endl;
+		}
+		
+		virtual void writeHexGotDescription()
+		{
+			cout << "In bootloader" << endl;
+		}
+		
+		virtual void writeHexWritten()
+		{
+			cout << "Write completed" << endl;
+		}
+		
+		virtual void writeHexExitingBootloader()
+		{
+			cout << "Exiting bootloader" << endl;
+		}
+		
+		virtual void errorWritePageNonFatal(unsigned pageIndex)
+		{
+			cerr << "Error while writing page " << pageIndex << ", continuing ..." << endl;
+		}
 	};
 	
 	//! Process a command, return the number of arguments eaten (not counting the command itself)
@@ -605,7 +626,7 @@ namespace Aseba
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
 			
-			BootloaderInterface bootloader(stream, atoi(argv[1]));
+			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 			
 			vector<uint8> data(bootloader.getPageSize());
 			if (bootloader.readPage(atoi(argv[2]), &data[0]))
@@ -625,10 +646,10 @@ namespace Aseba
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
 			
-			BootloaderInterface bootloader(stream, atoi(argv[1]));
+			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 			vector <uint8> data(2048);
 			cout << "Page: " << atoi(argv[2]) << endl;
-			if(bootloader.readPageUsb(atoi(argv[2]), &data[0])) {
+			if(bootloader.readPageSimple(atoi(argv[2]), &data[0])) {
 				ofstream file("page.bin");
 				if(file.good())
 					copy(data.begin(),data.end(),ostream_iterator<uint8>(file));
@@ -655,8 +676,8 @@ namespace Aseba
 			// try to write hex file
 			try
 			{
-				BootloaderInterface bootloader(stream, atoi(argv[1]));
-				bootloader.writeHex(argv[2], reset);
+				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
+				bootloader.writeHex(argv[2], reset, false);
 			}
 			catch (HexFile::Error &e)
 			{
@@ -676,8 +697,8 @@ namespace Aseba
 			}
 			try
 			{
-				BootloaderInterface bootloader(stream, atoi(argv[1]));
-				bootloader.writeHexUsb(argv[2], reset);
+				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
+				bootloader.writeHex(argv[2], reset, true);
 			}
 			catch (HexFile::Error &e)
 			{
@@ -694,7 +715,7 @@ namespace Aseba
 			// try to read hex file
 			try
 			{
-				BootloaderInterface bootloader(stream, atoi(argv[1]));
+				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.readHex(argv[2]);
 			}
 			catch (HexFile::Error &e)
@@ -775,6 +796,12 @@ int main(int argc, char *argv[])
 	const char *target = ASEBA_DEFAULT_TARGET;
 	int argCounter = 1;
 	
+	if (argc == 1)
+	{
+		Aseba::dumpHelp(std::cout, argv[0]);
+		return 0;
+	}
+	
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
@@ -810,6 +837,10 @@ int main(int argc, char *argv[])
 			catch (Dashel::DashelException e)
 			{
 				Aseba::errorServerDisconnected();
+			}
+			catch (Aseba::BootloaderInterface::Error e)
+			{
+				Aseba::errorBootloader(e.what());
 			}
 		}
 		argCounter++;

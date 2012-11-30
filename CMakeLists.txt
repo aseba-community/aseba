@@ -191,5 +191,7 @@ if(NOT CMD_LINE)
 	add_subdirectory(targets/playground)
 
 	add_subdirectory(eventlogger)
+	
+	add_subdirectory(thymioflasher)
 endif(NOT CMD_LINE)
 
