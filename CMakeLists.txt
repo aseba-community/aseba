@@ -84,6 +84,7 @@ set (ASEBACORE_SRC
 	utils/FormatableString.cpp
 	utils/utils.cpp
 	utils/HexFile.cpp
+	utils/BootloaderInterface.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
 )
