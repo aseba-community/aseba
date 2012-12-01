@@ -33,6 +33,8 @@ namespace Dashel
 
 namespace Aseba 
 {
+	// TODO: change API to use HexFile instead of file names
+	
 	//! Manage interactions with an aseba-compatible bootloader
 	/**
 		There are two versions of the bootloader: the complete and the simple.

@@ -2,6 +2,8 @@
 #define THYMIO_FLASHER_H
 
 #include <QWidget>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <dashel/dashel.h>
 #include "../utils/BootloaderInterface.h"
 
@@ -18,24 +20,46 @@ namespace Aseba
 	/** \addtogroup thymioflasher */
 	/*@{*/
 	
-	class QtBootloaderInterface:public BootloaderInterface
+	class QtBootloaderInterface:public QObject, public BootloaderInterface
 	{
+		Q_OBJECT
+		
 	public:
-		QtBootloaderInterface(Dashel::Stream* stream, int dest, QProgressBar* progressBar);
+		QtBootloaderInterface(Dashel::Stream* stream, int dest);
 		
 	protected:
 		virtual void writeHexGotDescription(unsigned pagesCount);
-		virtual void writePageStart(int pageNumber, const uint8* data, bool simple);
+		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple);
 		virtual void errorWritePageNonFatal(unsigned pageNumber);
-		
+	
 	protected:
-		QProgressBar* progressBar;
+		unsigned pagesCount;
+		unsigned pagesDoneCount;
+		
+	signals:
+		void flashProgress(int percentage);
 	};
 	
 	class ThymioFlasherDialog : public QWidget
 	{
 		Q_OBJECT
-
+		
+	private:
+		struct FlashResult
+		{
+			enum Status
+			{
+				SUCCESS = 0,
+				WARNING,
+				FAILURE
+			} status;
+			QString title;
+			QString text;
+			
+			FlashResult():status(SUCCESS) {}
+			FlashResult(Status status, const QString& title, const QString& text):status(status), title(title), text(text) {}
+		};
+		
 	private:
 		QVBoxLayout* mainLayout;
 		QListWidget* serial;
@@ -44,12 +68,19 @@ namespace Aseba
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
 		QLineEdit* lineEdit;
+		QPushButton* fileButton;
 		QProgressBar* progressBar;
-		QPushButton *flashButton;
+		QPushButton* flashButton;
+		QPushButton* quitButton;
+		QFuture<FlashResult> flashFuture;
+		QFutureWatcher<FlashResult> flashFutureWatcher;
 
 	public:
 		ThymioFlasherDialog();
 		~ThymioFlasherDialog();
+		
+	private:
+		FlashResult flashThread(const std::string& target, const std::string& hexFileName) const;
 	
 	private slots:
 		void serialGroupChecked();
@@ -57,6 +88,8 @@ namespace Aseba
 		void setupFlashButtonState();
 		void openFile(void);
 		void doFlash(void);
+		void flashProgress(int percentage);
+		void flashFinished();
 	};
 	
 	/*@}*/

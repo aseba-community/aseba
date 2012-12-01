@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
+#include <QtConcurrentRun>
 #include <memory>
 
 #include "../common/consts.h"
@@ -25,20 +26,22 @@ namespace Aseba
 	using namespace std;
 	
 	
-	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest, QProgressBar* progressBar):
+	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest):
 		BootloaderInterface(stream, dest),
-		progressBar(progressBar)
+		pagesCount(0),
+		pagesDoneCount(0)
 	{}
 	
 	void QtBootloaderInterface::writeHexGotDescription(unsigned pagesCount)
 	{
-		progressBar->setMaximum(pagesCount);
-		progressBar->setValue(0);
+		this->pagesCount = pagesCount;
+		this->pagesDoneCount = 0;
 	}
 	
-	void QtBootloaderInterface::writePageStart(int pageNumber, const uint8* data, bool simple)
+	void QtBootloaderInterface::writePageStart(unsigned pageNumber, const uint8* data, bool simple)
 	{
-		progressBar->setValue(progressBar->value()+1);
+		pagesDoneCount += 1;
+		emit flashProgress((100*pagesDoneCount)/pagesCount);
 	}
 	
 	void QtBootloaderInterface::errorWritePageNonFatal(unsigned pageNumber)
@@ -107,7 +110,7 @@ namespace Aseba
 		QGroupBox* fileGroupBox = new QGroupBox(tr("Firmware file"));
 		QHBoxLayout *fileLayout = new QHBoxLayout();
 		lineEdit = new QLineEdit(this);
-		QPushButton *fileButton = new QPushButton(tr("Select..."), this);
+		fileButton = new QPushButton(tr("Select..."), this);
 		fileLayout->addWidget(fileButton);
 		fileLayout->addWidget(lineEdit);
 		fileGroupBox->setLayout(fileLayout);
@@ -116,6 +119,7 @@ namespace Aseba
 		// progress bar
 		progressBar = new QProgressBar(this);
 		progressBar->setValue(0);
+		progressBar->setRange(0, 100);
 		mainLayout->addWidget(progressBar);
 
 		// flash and quit buttons
@@ -123,20 +127,22 @@ namespace Aseba
 		flashButton = new QPushButton(tr("Update"), this);
 		flashButton->setEnabled(false);
 		flashLayout->addWidget(flashButton);
-		QPushButton *quitButton = new QPushButton(tr("Quit"), this);
+		quitButton = new QPushButton(tr("Quit"), this);
 		flashLayout->addWidget(quitButton);
 		mainLayout->addItem(flashLayout);
 
 		// connections
-		connect(fileButton, SIGNAL(clicked()),this,SLOT(openFile()));
-		connect(flashButton, SIGNAL(clicked()), this, SLOT(doFlash()));
-		connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
+		connect(fileButton, SIGNAL(clicked()), SLOT(openFile()));
+		connect(flashButton, SIGNAL(clicked()), SLOT(doFlash()));
+		connect(quitButton, SIGNAL(clicked()), SLOT(close()));
+		connect(&flashFutureWatcher, SIGNAL(finished()), SLOT(flashFinished()));
 		
 		show();
 	}
 	
 	ThymioFlasherDialog::~ThymioFlasherDialog()
 	{
+		flashFuture.waitForFinished();
 	}
 	
 	void ThymioFlasherDialog::serialGroupChecked()
@@ -166,7 +172,6 @@ namespace Aseba
 		QString name = QFileDialog::getOpenFileName(this, tr("Select hex file"), QString(), tr("Hex files (*.hex)"));
 		lineEdit->setText(name);
 		setupFlashButtonState();
-		// TODO: load hex file
 	}
 
 	void ThymioFlasherDialog::doFlash(void) 
@@ -176,48 +181,88 @@ namespace Aseba
 		if (warnRet != QMessageBox::Yes)
 			return;
 		
+		// get target from GUI
+		string target;
+		if (serialGroupBox->isChecked())
+		{
+			const QItemSelectionModel* model(serial->selectionModel());
+			Q_ASSERT(model && !model->selectedRows().isEmpty());
+			const QModelIndex item(model->selectedRows().first());
+			target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toLocal8Bit().constData();
+		}
+		else
+			target = lineEdit->text().toLocal8Bit().constData();
+		
+		// disable buttons while flashing
+		quitButton->setEnabled(false);
+		flashButton->setEnabled(false);
+		fileButton->setEnabled(false);
+		lineEdit->setEnabled(false);
+	
+		// start flash thread
+		Q_ASSERT(!flashFuture.isRunning());
+		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, lineEdit->text().toLocal8Bit().constData());
+		flashFutureWatcher.setFuture(flashFuture);
+	}
+	
+	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& target, const std::string& hexFileName) const
+	{
 		// open stream
 		Dashel::Hub hub;
 		Dashel::Stream* stream(0);
-		string target;
 		try
 		{
-			if (serialGroupBox->isChecked())
-			{
-				const QItemSelectionModel* model(serial->selectionModel());
-				Q_ASSERT(model && !model->selectedRows().isEmpty());
-				const QModelIndex item(model->selectedRows().first());
-				target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toStdString();
-			}
-			else
-				target = lineEdit->text().toStdString();
 			stream = hub.connect(target);
 		}
 		catch (Dashel::DashelException& e)
 		{
-			QMessageBox::warning(this, tr("Cannot connect to target"), tr("Cannot connect to target: %1").arg(e.what()));
-			return;
+			return FlashResult(FlashResult::WARNING, tr("Cannot connect to target"), tr("Cannot connect to target: %1").arg(e.what()));
 		}
 		
 		// do flash
 		try
 		{
-			QtBootloaderInterface bootloaderInterface(stream, 1, progressBar);
-			bootloaderInterface.writeHex(lineEdit->text().toStdString(), true, true);
-			// TODO: fix potential bug with UTF8 file names
+			QtBootloaderInterface bootloaderInterface(stream, 1);
+			connect(&bootloaderInterface, SIGNAL(flashProgress(int)), this, SLOT(flashProgress(int)), Qt::QueuedConnection);
+			bootloaderInterface.writeHex(hexFileName, true, true);
 		}
 		catch (HexFile::Error& e)
 		{
-			QMessageBox::warning(this, tr("Update Error"), tr("Unable to read Hex file, update aborted"));
+			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file, update aborted"));
 		}
 		catch (BootloaderInterface::Error& e)
 		{
-			QMessageBox::critical(this, tr("Update Error"), tr("A bootloader error happened during the update process: %1").arg(e.what()));
-			close();
+			return FlashResult(FlashResult::FAILURE, tr("Update Error"), tr("A bootloader error happened during the update process: %1").arg(e.what()));
 		}
 		catch (Dashel::DashelException& e)
 		{
-			QMessageBox::critical(this, tr("Update Error"), tr("A communication error happened during the update process: %1").arg(e.what()));
+			return FlashResult(FlashResult::FAILURE, tr("Update Error"), tr("A communication error happened during the update process: %1").arg(e.what()));
+		}
+		return FlashResult();
+	}
+	
+	void ThymioFlasherDialog::flashProgress(int percentage)
+	{
+		progressBar->setValue(percentage);
+	}
+	
+	void ThymioFlasherDialog::flashFinished()
+	{
+		// re-enable buttons
+		quitButton->setEnabled(true);
+		flashButton->setEnabled(true);
+		fileButton->setEnabled(true);
+		lineEdit->setEnabled(true);
+		
+		// handle flash result
+		const FlashResult& result(flashFutureWatcher.result());
+		if (result.status == FlashResult::WARNING) 
+		{
+			QMessageBox::warning(this, result.title, result.text);
+		}
+		else if (result.status == FlashResult::FAILURE)
+		{
+			QMessageBox::critical(this, result.title, result.text);
 			close();
 		}
 	}
@@ -227,6 +272,8 @@ namespace Aseba
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	
+	// TODO: add translations
 	Aseba::ThymioFlasherDialog flasher;
 	return app.exec();
 }
