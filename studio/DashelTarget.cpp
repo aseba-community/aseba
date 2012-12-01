@@ -149,7 +149,7 @@ namespace Aseba
 			settings.setValue("tcp host", host->text());
 			settings.setValue("tcp port", port->value());
 			std::ostringstream oss;
-			oss << "tcp:host=" << host->text().toStdString() << ";port=" << port->value();
+			oss << "tcp:host=" << host->text().toLocal8Bit().constData() << ";port=" << port->value();
 			return oss.str();
 		}
 		else if (serialGroupBox->isChecked())
@@ -160,13 +160,13 @@ namespace Aseba
 			settings.setValue("connection dialog enabled group", 1);
 			settings.setValue("serial name", item.data());
 			QString target("ser:device=%0");
-			return target.arg(item.data(Qt::UserRole).toString()).toStdString();
+			return target.arg(item.data(Qt::UserRole).toString()).toLocal8Bit().constData();
 		}
 		else if (customGroupBox->isChecked())
 		{
 			settings.setValue("connection dialog enabled group", 2);
 			settings.setValue("custom target", custom->text());
-			return custom->text().toStdString();
+			return custom->text().toLocal8Bit().constData();
 		}
 		else
 		{
