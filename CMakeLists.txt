@@ -87,6 +87,7 @@ set (ASEBACORE_SRC
 	utils/FormatableString.cpp
 	utils/utils.cpp
 	utils/HexFile.cpp
+	utils/BootloaderInterface.cpp
 	msg/msg.cpp
 	msg/descriptions-manager.cpp
 	${DASHEL_PLUGINS}
@@ -202,5 +203,7 @@ if(NOT CMD_LINE)
 	add_subdirectory(targets/playground)
 
 	add_subdirectory(eventlogger)
+	
+	add_subdirectory(thymioflasher)
 endif(NOT CMD_LINE)
 
