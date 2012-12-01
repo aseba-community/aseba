@@ -105,7 +105,7 @@ namespace Aseba
 		return true;
 	}
 	
-	bool BootloaderInterface::writePage(int pageNumber, const uint8 *data, bool simple)
+	bool BootloaderInterface::writePage(unsigned pageNumber, const uint8 *data, bool simple)
 	{
 		writePageStart(pageNumber, data, simple);
 		
@@ -250,8 +250,6 @@ namespace Aseba
 			}
 		}
 		
-		writeHexGotDescription();
-		
 		// Build a map of pages out of the map of addresses
 		typedef map<uint32, vector<uint8> > PageMap;
 		PageMap pageMap;
@@ -287,6 +285,8 @@ namespace Aseba
 			}
 			while (chunkDataIndex < chunkSize);
 		}
+		
+		writeHexGotDescription(pageMap.size());
 		
 		if (simple)
 		{

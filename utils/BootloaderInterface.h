@@ -66,7 +66,7 @@ namespace Aseba
 		bool readPageSimple(unsigned pageNumber, uint8 * data);
 		
 		//! Write a page, if simple is true, use simplified protocol, otherwise use complete protocol
-		bool writePage(int pageNumber, const uint8 *data, bool simple);
+		bool writePage(unsigned pageNumber, const uint8 *data, bool simple);
 		
 		//! Write an hex file
 		void writeHex(const std::string &fileName, bool reset, bool simple);
@@ -78,21 +78,21 @@ namespace Aseba
 		// reporting function
 		
 		// progress
-		virtual void writePageStart(int pageNumber, const uint8* data, bool simple) {}
+		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple) {}
 		virtual void writePageWaitAck() {}
 		virtual void writePageSuccess() {}
 		virtual void writePageFailure() {}
 		
 		virtual void writeHexStart(const std::string &fileName, bool reset, bool simple) {}
 		virtual void writeHexEnteringBootloader() {}
-		virtual void writeHexGotDescription() {}
+		virtual void writeHexGotDescription(unsigned pagesCount) {}
 		virtual void writeHexWritten() {}
 		virtual void writeHexExitingBootloader() {}
 		
 		// non-fatal errors
 		
 		//! Warn about an error but do not quit
-		virtual void errorWritePageNonFatal(unsigned pageIndex) {}
+		virtual void errorWritePageNonFatal(unsigned pageNumber) {}
 		
 	protected:
 		// member variables

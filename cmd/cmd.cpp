@@ -137,7 +137,7 @@ namespace Aseba
 	
 	protected:
 		// reporting function
-		virtual void writePageStart(int pageNumber, const uint8* data, bool simple)
+		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple)
 		{
 			cout << "Writing page " << pageNumber << "... ";
 			cout.flush();
@@ -170,9 +170,9 @@ namespace Aseba
 			cout << "Entering bootloader" << endl;
 		}
 		
-		virtual void writeHexGotDescription()
+		virtual void writeHexGotDescription(unsigned pagesCount)
 		{
-			cout << "In bootloader" << endl;
+			cout << "In bootloader, about to write " << pagesCount << " pages" << endl;
 		}
 		
 		virtual void writeHexWritten()
@@ -185,9 +185,9 @@ namespace Aseba
 			cout << "Exiting bootloader" << endl;
 		}
 		
-		virtual void errorWritePageNonFatal(unsigned pageIndex)
+		virtual void errorWritePageNonFatal(unsigned pageNumber)
 		{
-			cerr << "Error while writing page " << pageIndex << ", continuing ..." << endl;
+			cerr << "Warning, error while writing page " << pageNumber << ", continuing ..." << endl;
 		}
 	};
 	

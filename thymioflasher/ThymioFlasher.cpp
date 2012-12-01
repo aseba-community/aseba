@@ -11,8 +11,10 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
+#include <memory>
 
 #include "../common/consts.h"
+#include "../utils/HexFile.h"
 
 #include "ThymioFlasher.h"
 #include "ThymioFlasher.moc"
@@ -21,6 +23,29 @@ namespace Aseba
 {
 	using namespace Dashel;
 	using namespace std;
+	
+	
+	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest, QProgressBar* progressBar):
+		BootloaderInterface(stream, dest),
+		progressBar(progressBar)
+	{}
+	
+	void QtBootloaderInterface::writeHexGotDescription(unsigned pagesCount)
+	{
+		progressBar->setMaximum(pagesCount);
+		progressBar->setValue(0);
+	}
+	
+	void QtBootloaderInterface::writePageStart(int pageNumber, const uint8* data, bool simple)
+	{
+		progressBar->setValue(progressBar->value()+1);
+	}
+	
+	void QtBootloaderInterface::errorWritePageNonFatal(unsigned pageNumber)
+	{
+		qDebug() << "Warning, error while writing page" << pageNumber << "continuing ...";
+	}
+
 	
 	ThymioFlasherDialog::ThymioFlasherDialog()
 	{
@@ -112,7 +137,6 @@ namespace Aseba
 	
 	ThymioFlasherDialog::~ThymioFlasherDialog()
 	{
-		// TODO: wait for future
 	}
 	
 	void ThymioFlasherDialog::serialGroupChecked()
@@ -152,86 +176,51 @@ namespace Aseba
 		if (warnRet != QMessageBox::Yes)
 			return;
 		
-		// open 
-		
-		/*HexFile hex;
-		try {
-			hex.read(lineEdit->text().toStdString());
-		}
-		catch(HexFile::Error& e) {
-			QMessageBox::critical(this, tr("Update Error"), tr("Unable to read Hex file"));
-			return;
-		}
-		quitButton->setEnabled(false);
-		flashButton->setEnabled(false);
-		fileButton->setEnabled(false);
-		lineEdit->setEnabled(false);
-		
-		// make target ready for flashing
-		target->blockWrite();
-		connect(target, SIGNAL(bootloaderAck(uint,uint)), this, SLOT(ackReceived(uint,uint)));
-		connect(target, SIGNAL(nodeDisconnected(uint)), this, SLOT(vmDisconnected(unsigned)));
-
-		// Now we have a valid hex file ...
-		pageMap.clear();
-
-		for (HexFile::ChunkMap::iterator it = hex.data.begin(); it != hex.data.end(); it ++)
-		{
-			// get page number
-			unsigned chunkAddress = it->first;
-			// index inside data chunk
-			unsigned chunkDataIndex = 0;
-			// size of chunk in bytes
-			unsigned chunkSize = it->second.size();
-			// copy data from chunk to page
-			do
-			{
-				// get page number
-				unsigned pageIndex = (chunkAddress + chunkDataIndex) / 2048;
-				// get address inside page
-				unsigned byteIndex = (chunkAddress + chunkDataIndex) % 2048;
-				// if page does not exists, create it
-				if (pageMap.find(pageIndex) == pageMap.end())
-					pageMap[pageIndex] = vector<uint8>(2048, (uint8)0);
-				// copy data
-				unsigned amountToCopy = min(2048 - byteIndex, chunkSize - chunkDataIndex);
-				copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
-				// increment chunk data pointer
-				chunkDataIndex += amountToCopy;
-			}
-			while(chunkDataIndex < chunkSize);
-		}
-
-		progressBar->setMaximum(pageMap.size());
-		progressBar->setValue(0);
-		
-		// Ask the pic to switch into bootloader
-		Reboot msg(nodeId);
+		// open stream
+		Dashel::Hub hub;
+		Dashel::Stream* stream(0);
+		string target;
 		try
 		{
-			msg.serialize(stream);
-			stream->flush();
-			// now, wait until the disconnect event is sent.
+			if (serialGroupBox->isChecked())
+			{
+				const QItemSelectionModel* model(serial->selectionModel());
+				Q_ASSERT(model && !model->selectedRows().isEmpty());
+				const QModelIndex item(model->selectedRows().first());
+				target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toStdString();
+			}
+			else
+				target = lineEdit->text().toStdString();
+			stream = hub.connect(target);
 		}
-		catch(Dashel::DashelException e)
+		catch (Dashel::DashelException& e)
 		{
-			handleDashelException(e);
-		}*/
+			QMessageBox::warning(this, tr("Cannot connect to target"), tr("Cannot connect to target: %1").arg(e.what()));
+			return;
+		}
+		
+		// do flash
+		try
+		{
+			QtBootloaderInterface bootloaderInterface(stream, 1, progressBar);
+			bootloaderInterface.writeHex(lineEdit->text().toStdString(), true, true);
+			// TODO: fix potential bug with UTF8 file names
+		}
+		catch (HexFile::Error& e)
+		{
+			QMessageBox::warning(this, tr("Update Error"), tr("Unable to read Hex file, update aborted"));
+		}
+		catch (BootloaderInterface::Error& e)
+		{
+			QMessageBox::critical(this, tr("Update Error"), tr("A bootloader error happened during the update process: %1").arg(e.what()));
+			close();
+		}
+		catch (Dashel::DashelException& e)
+		{
+			QMessageBox::critical(this, tr("Update Error"), tr("A communication error happened during the update process: %1").arg(e.what()));
+			close();
+		}
 	}
-	
-	/*
-	void ThymioFlasherDialog::handleDashelException(Dashel::DashelException e)
-	{
-		switch(e.source)
-		{
-		default:
-			// oops... we are doomed
-			// non-modal message box
-			QMessageBox* message = new QMessageBox(QMessageBox::Critical, tr("Dashel Unexpected Error"), tr("A communication error happened during the update process:") + " (" + QString::number(e.source) + ") " + e.what(), QMessageBox::NoButton, this);
-			message->setWindowModality(Qt::NonModal);
-			message->show();
-		}
-	}*/
 };
 
 

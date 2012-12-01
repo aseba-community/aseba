@@ -2,9 +2,8 @@
 #define THYMIO_FLASHER_H
 
 #include <QWidget>
-
 #include <dashel/dashel.h>
-
+#include "../utils/BootloaderInterface.h"
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -18,6 +17,20 @@ namespace Aseba
 {
 	/** \addtogroup thymioflasher */
 	/*@{*/
+	
+	class QtBootloaderInterface:public BootloaderInterface
+	{
+	public:
+		QtBootloaderInterface(Dashel::Stream* stream, int dest, QProgressBar* progressBar);
+		
+	protected:
+		virtual void writeHexGotDescription(unsigned pagesCount);
+		virtual void writePageStart(int pageNumber, const uint8* data, bool simple);
+		virtual void errorWritePageNonFatal(unsigned pageNumber);
+		
+	protected:
+		QProgressBar* progressBar;
+	};
 	
 	class ThymioFlasherDialog : public QWidget
 	{
@@ -37,7 +50,7 @@ namespace Aseba
 	public:
 		ThymioFlasherDialog();
 		~ThymioFlasherDialog();
-		
+	
 	private slots:
 		void serialGroupChecked();
 		void customGroupChecked();
@@ -45,6 +58,7 @@ namespace Aseba
 		void openFile(void);
 		void doFlash(void);
 	};
+	
 	/*@}*/
 }; // Aseba
 
