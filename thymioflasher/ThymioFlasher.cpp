@@ -228,7 +228,7 @@ namespace Aseba
 		}
 		catch (HexFile::Error& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file, update aborted"));
+			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
 		}
 		catch (BootloaderInterface::Error& e)
 		{
