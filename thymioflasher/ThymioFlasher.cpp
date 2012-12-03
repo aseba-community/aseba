@@ -206,7 +206,7 @@ namespace Aseba
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& target, const std::string& hexFileName) const
+	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string target, const std::string hexFileName) const
 	{
 		// open stream
 		Dashel::Hub hub;
