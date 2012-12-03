@@ -80,7 +80,7 @@ namespace Aseba
 		~ThymioFlasherDialog();
 		
 	private:
-		FlashResult flashThread(const std::string target, const std::string hexFileName) const;
+		FlashResult flashThread(std::string target, std::string hexFileName) const;
 	
 	private slots:
 		void serialGroupChecked();
