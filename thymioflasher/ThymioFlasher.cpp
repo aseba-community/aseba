@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
+#include <QTextCodec>
 #include <QtConcurrentRun>
 #include <memory>
 
@@ -272,6 +273,8 @@ namespace Aseba
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	// TODO: add translations
 	Aseba::ThymioFlasherDialog flasher;
