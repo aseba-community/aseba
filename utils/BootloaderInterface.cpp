@@ -26,6 +26,7 @@
 #include "FormatableString.h"
 #include <dashel/dashel.h>
 #include <memory>
+#include <unistd.h>
 
 namespace Aseba 
 {
@@ -223,6 +224,9 @@ namespace Aseba
 		// Get page layout
 		if (simple)
 		{
+			/* 
+			This would be cleaner for non-broken robot, but would not work for recovery.
+			Waiting works for robots in any states
 			// wait for disconnected message
 			while (true)
 			{
@@ -230,7 +234,9 @@ namespace Aseba
 				Disconnected* disconnectedMessage(dynamic_cast<Disconnected*>(message.get()));
 				if (disconnectedMessage)
 					break;
-			}
+			}*/
+			// give 10 ms to the robot the time to reset
+			usleep(10000);
 			pageSize = 2048;
 		}
 		else
