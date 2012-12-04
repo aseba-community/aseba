@@ -223,6 +223,14 @@ namespace Aseba
 		// Get page layout
 		if (simple)
 		{
+			// wait for disconnected message
+			while (true)
+			{
+				auto_ptr<Message> message(Message::receive(stream));
+				Disconnected* disconnectedMessage(dynamic_cast<Disconnected*>(message.get()));
+				if (disconnectedMessage)
+					break;
+			}
 			pageSize = 2048;
 		}
 		else

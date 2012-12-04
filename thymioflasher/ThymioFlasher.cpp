@@ -14,6 +14,7 @@
 #include <QTextCodec>
 #include <QtConcurrentRun>
 #include <memory>
+#include <iostream>
 
 #include "../common/consts.h"
 #include "../utils/HexFile.h"
@@ -202,11 +203,12 @@ namespace Aseba
 	
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
-		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, lineEdit->text().toLocal8Bit().constData());
+		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
+		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(std::string target, std::string hexFileName) const
+	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& target, const std::string& hexFileName) const
 	{
 		// open stream
 		Dashel::Hub hub;
