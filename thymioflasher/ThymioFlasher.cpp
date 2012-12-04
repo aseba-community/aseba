@@ -11,8 +11,10 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
+#include <QTextCodec>
 #include <QtConcurrentRun>
 #include <memory>
+#include <iostream>
 
 #include "../common/consts.h"
 #include "../utils/HexFile.h"
@@ -201,7 +203,8 @@ namespace Aseba
 	
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
-		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, lineEdit->text().toLocal8Bit().constData());
+		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
+		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
@@ -228,7 +231,7 @@ namespace Aseba
 		}
 		catch (HexFile::Error& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file, update aborted"));
+			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
 		}
 		catch (BootloaderInterface::Error& e)
 		{
@@ -272,6 +275,8 @@ namespace Aseba
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	// TODO: add translations
 	Aseba::ThymioFlasherDialog flasher;

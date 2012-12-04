@@ -172,6 +172,7 @@ namespace Aseba
 				{
 					//std::cout << "End of file found. Address " << it->first << " size " << it->second.size() << "\n";
 				}
+				ifs.close();
 				return;
 				break;
 				
