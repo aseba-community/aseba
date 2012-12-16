@@ -1659,7 +1659,7 @@ namespace Aseba
 						}
 						
 						// reconstruct nodes
-						NodeTab* tab = getTabFromName(element.attribute("name"));
+						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt());
 						if (tab)
 						{
 							tab->restorePlugins(savedPlugins, true);
@@ -1824,6 +1824,7 @@ namespace Aseba
 				
 				QDomElement element = document.createElement("node");
 				element.setAttribute("name", nodeName);
+				element.setAttribute("nodeId", tab->nodeId());
 				QDomText text = document.createTextNode(nodeContent);
 				element.appendChild(text);
 				ScriptTab::SavedPlugins savedPlugins(tab->savePlugins());
@@ -2813,19 +2814,26 @@ namespace Aseba
 		return 0;
 	}
 	
-	//! Get the tab widget pointer of a corresponding node name
-	NodeTab* MainWindow::getTabFromName(const QString& name) const
+	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise
+	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId) const
 	{
+		NodeTab* bestFound(0);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
 			if (tab)
 			{
-				if (target->getName(tab->nodeId()) == name)
-					return tab;
+				const unsigned id(tab->nodeId());
+				if (target->getName(id) == name)
+				{
+					if (id == preferedId)
+						return tab;
+					else if (!bestFound)
+						bestFound = tab;
+				}
 			}
 		}
-		return 0;
+		return bestFound;
 	}
 	
 	//! Get the absent tab widget index of a corresponding node id

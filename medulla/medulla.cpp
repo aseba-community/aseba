@@ -224,7 +224,7 @@ namespace Aseba
 				if (element.tagName() == "node")
 				{
 					bool ok;
-					unsigned nodeId(getNodeId(element.attribute("name").toStdWString(), &ok));
+					const unsigned nodeId(getNodeId(element.attribute("name").toStdWString(), element.attribute("nodeId", 0).toUInt(), &ok));
 					if (ok)
 					{
 						std::wistringstream is(element.firstChild().toText().data().toStdWString());

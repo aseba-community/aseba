@@ -164,18 +164,30 @@ namespace Aseba
 		}
 	}
 	
-	unsigned DescriptionsManager::getNodeId(const std::wstring& name, bool *ok ) const
+	unsigned DescriptionsManager::getNodeId(const std::wstring& name, unsigned preferedId, bool *ok) const
 	{
 		// search for the first node with a given name
+		bool found(false);
+		unsigned foundId(0);
 		for (NodesDescriptionsMap::const_iterator it = nodesDescriptions.begin(); it != nodesDescriptions.end(); ++it)
 		{
 			if (it->second.name == name)
 			{
 				if (ok)
 					*ok = true;
-				return it->first;
+				
+				if (it->first == preferedId)
+					return it->first;
+				else if (!found)
+					foundId = it->first;
+				
+				found = true;
 			}
 		}
+		
+		// node found, but with another id than prefered
+		if (found)
+			return foundId;
 		
 		// node not found
 		if (ok)
