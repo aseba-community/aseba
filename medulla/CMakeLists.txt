@@ -1,5 +1,6 @@
 if (NOT WIN32)
-	find_package(Qt4 COMPONENTS QtCore QtDBus QtXml REQUIRED )
+	find_package(Qt4 COMPONENTS QtCore QtXml REQUIRED )
+	find_package(Qt4 COMPONENTS QtCore QtDBus QtXml )
 endif (NOT WIN32)
 
 if (QT4_FOUND AND QT_QTDBUS_FOUND)
