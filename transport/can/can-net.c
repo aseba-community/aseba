@@ -402,7 +402,7 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 	{
 		uint16 temp;
 		// store and increment pos
-		asebaCan.recvQueue[asebaCan.recvQueueInsertPos] = *frame;
+		memcpy(&asebaCan.recvQueue[asebaCan.recvQueueInsertPos], frame, sizeof(*frame));
 		asebaCan.recvQueue[asebaCan.recvQueueInsertPos].used = 1;
 		temp = asebaCan.recvQueueInsertPos + 1;
 		if (temp >= asebaCan.recvQueueSize)
