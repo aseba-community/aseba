@@ -12,6 +12,8 @@
 #include <QListWidget>
 #include <QApplication>
 #include <QTextCodec>
+#include <QTranslator>
+#include <QLibraryInfo>
 #include <QtConcurrentRun>
 #include <memory>
 #include <iostream>
@@ -278,7 +280,19 @@ int main(int argc, char *argv[])
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
-	// TODO: add translations
+	const QString& systemLocale(QLocale::system().name());
+	const QString language(systemLocale.left(systemLocale.indexOf("_")));
+	//qDebug() << systemLocale;
+	//qDebug() << language;
+	
+	QTranslator qtTranslator;
+	QTranslator translator;
+	app.installTranslator(&qtTranslator);
+	app.installTranslator(&translator);
+	qtTranslator.load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	translator.load(QString(":/thymioflasher_") + language);
+	
 	Aseba::ThymioFlasherDialog flasher;
+	
 	return app.exec();
 }

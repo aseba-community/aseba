@@ -15,7 +15,7 @@ if (QT4_FOUND)
 	
 	qt4_automoc(${thymioflasher_SRCS})
 	
-	#qt4_add_resources(resfiles asebastudio.qrc)
+	qt4_add_resources(resfiles thymioflasher.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	
