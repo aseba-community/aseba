@@ -7,11 +7,12 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QLineEdit>
-#include <QSettings>
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
 #include <QTextCodec>
+#include <QTranslator>
+#include <QLibraryInfo>
 #include <QtConcurrentRun>
 #include <memory>
 #include <iostream>
@@ -27,6 +28,7 @@ namespace Aseba
 	using namespace Dashel;
 	using namespace std;
 	
+	typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 	
 	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest):
 		BootloaderInterface(stream, dest),
@@ -54,10 +56,7 @@ namespace Aseba
 	
 	ThymioFlasherDialog::ThymioFlasherDialog()
 	{
-		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		const PortsMap ports = SerialPortEnumerator::getPorts();
-		
-		QSettings settings;
 		
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Firmware Updater"));
@@ -65,16 +64,11 @@ namespace Aseba
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
-		// make sure the port list is enabled only if serial ports are found
-		unsigned sectionEnabled(ports.empty() ? 1 : 0);
-		
 		// serial port
-		serialGroupBox = new QGroupBox(tr("Serial connection"));
-		serialGroupBox->setCheckable(true);
+		serialGroupBox = new QGroupBox(tr("Connection"));
 		QHBoxLayout* serialLayout = new QHBoxLayout();
 
 		serial = new QListWidget();
-		bool serialPortSet(false);
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
 			const QString text(it->second.second.c_str());
@@ -82,37 +76,21 @@ namespace Aseba
 			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
 			serial->addItem(item);
 			if (it->second.second.compare(0,9,"Thymio-II") == 0)
-			{
 				serial->setCurrentItem(item);
-				serialPortSet = true;
-			}
 		}
-		if (sectionEnabled == 0 && !serialPortSet)
-			sectionEnabled = 1;
-		serialGroupBox->setChecked(sectionEnabled == 0);
+		
 		serial->setSelectionMode(QAbstractItemView::SingleSelection);
 		serialLayout->addWidget(serial);
 		connect(serial, SIGNAL(itemSelectionChanged()), SLOT(setupFlashButtonState()));
 		serialGroupBox->setLayout(serialLayout);
-		connect(serialGroupBox, SIGNAL(clicked()), SLOT(serialGroupChecked()));
 		mainLayout->addWidget(serialGroupBox);
-		
-		// custom target
-		customGroupBox = new QGroupBox(tr("Custom connection"));
-		customGroupBox->setCheckable(true);
-		customGroupBox->setChecked(sectionEnabled == 1);
-		QHBoxLayout* customLayout = new QHBoxLayout();
-		QLineEdit* custom = new QLineEdit(settings.value("custom target", ASEBA_DEFAULT_TARGET).toString());
-		customLayout->addWidget(custom);
-		customGroupBox->setLayout(customLayout);
-		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
-		mainLayout->addWidget(customGroupBox);
 		
 		// file selector
 		QGroupBox* fileGroupBox = new QGroupBox(tr("Firmware file"));
 		QHBoxLayout *fileLayout = new QHBoxLayout();
 		lineEdit = new QLineEdit(this);
 		fileButton = new QPushButton(tr("Select..."), this);
+		fileButton->setIcon(QIcon(":/images/fileopen.svgz"));
 		fileLayout->addWidget(fileButton);
 		fileLayout->addWidget(lineEdit);
 		fileGroupBox->setLayout(fileLayout);
@@ -145,20 +123,6 @@ namespace Aseba
 	ThymioFlasherDialog::~ThymioFlasherDialog()
 	{
 		flashFuture.waitForFinished();
-	}
-	
-	void ThymioFlasherDialog::serialGroupChecked()
-	{
-		serialGroupBox->setChecked(true);
-		customGroupBox->setChecked(false);
-		setupFlashButtonState();
-	}
-	
-	void ThymioFlasherDialog::customGroupChecked()
-	{
-		serialGroupBox->setChecked(false);
-		customGroupBox->setChecked(true);
-		setupFlashButtonState();
 	}
 	
 	void ThymioFlasherDialog::setupFlashButtonState()
@@ -278,7 +242,32 @@ int main(int argc, char *argv[])
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
-	// TODO: add translations
+	const QString& systemLocale(QLocale::system().name());
+	const QString language(systemLocale.left(systemLocale.indexOf("_")));
+	//qDebug() << systemLocale;
+	//qDebug() << language;
+	
+	QTranslator qtTranslator;
+	QTranslator translator;
+	app.installTranslator(&qtTranslator);
+	app.installTranslator(&translator);
+	qtTranslator.load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	translator.load(QString(":/thymioflasher_") + language);
+	
+	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
+	bool thymioFound(false);
+	for (Aseba::PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
+	{
+		if (it->second.second.compare(0,9,"Thymio-II") == 0)
+			thymioFound = true;
+	}
+	if (!thymioFound)
+	{
+		QMessageBox::critical(0, QApplication::tr("Thymio II not found"), QApplication::tr("<p><b>Cannot find Thymio II!</b></p><p>Plug Thymio II or use the command-line updater.</p>"));
+		return 1;
+	}
+	
 	Aseba::ThymioFlasherDialog flasher;
+	
 	return app.exec();
 }
