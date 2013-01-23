@@ -64,7 +64,6 @@ namespace Aseba
 		QVBoxLayout* mainLayout;
 		QListWidget* serial;
 		QGroupBox* serialGroupBox;
-		QGroupBox* customGroupBox;
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
 		QLineEdit* lineEdit;
@@ -83,8 +82,6 @@ namespace Aseba
 		FlashResult flashThread(const std::string& target, const std::string& hexFileName) const;
 	
 	private slots:
-		void serialGroupChecked();
-		void customGroupChecked();
 		void setupFlashButtonState();
 		void openFile(void);
 		void doFlash(void);
