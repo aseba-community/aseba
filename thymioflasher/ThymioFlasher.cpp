@@ -148,16 +148,11 @@ namespace Aseba
 			return;
 		
 		// get target from GUI
-		string target;
-		if (serialGroupBox->isChecked())
-		{
-			const QItemSelectionModel* model(serial->selectionModel());
-			Q_ASSERT(model && !model->selectedRows().isEmpty());
-			const QModelIndex item(model->selectedRows().first());
-			target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toLocal8Bit().constData();
-		}
-		else
-			target = lineEdit->text().toLocal8Bit().constData();
+		const QItemSelectionModel* model(serial->selectionModel());
+		Q_ASSERT(model && !model->selectedRows().isEmpty());
+		const QModelIndex item(model->selectedRows().first());
+		const string target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toLocal8Bit().constData();
+	
 		
 		// disable buttons while flashing
 		quitButton->setEnabled(false);
