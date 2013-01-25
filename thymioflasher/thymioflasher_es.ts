@@ -11,12 +11,12 @@
     <message>
         <location filename="ThymioFlasher.cpp" line="68"/>
         <source>Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Conexión</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="89"/>
         <source>Firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de firmware</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="92"/>
@@ -46,12 +46,12 @@
     <message>
         <location filename="ThymioFlasher.cpp" line="146"/>
         <source>Pre-update warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Alerta previa a la actualización</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="146"/>
         <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the update!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Está a punto de actualizar el firmware de Thymio II. Asegúrese de que el robot esté completamente cargado y que el cable USB esté bien conectado. &lt;p&gt;&lt;b&gt;No desconecte el robot durante la actualización!&lt;/b&gt;&lt;/p&gt;¿Desea continuar?</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="186"/>
@@ -78,12 +78,12 @@
     <message>
         <location filename="ThymioFlasher.cpp" line="202"/>
         <source>A bootloader error happened during the update process: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error de aranque durante el proceso de actualización: %1</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="206"/>
         <source>A communication error happened during the update process: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error de comunicación durante el proceso de actualización: %1</translation>
     </message>
 </context>
 <context>
@@ -91,12 +91,12 @@
     <message>
         <location filename="ThymioFlasher.cpp" line="266"/>
         <source>Thymio II not found</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encontró ningún Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="266"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug Thymio II or use the command-line updater.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;No se encontró ningún Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte un Thymio II o use la linea de comandos.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>
