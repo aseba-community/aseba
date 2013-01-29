@@ -5,8 +5,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QProgressBar>
-#include <QPushButton>
 #include <QLineEdit>
+#include <QLabel>
 #include <QGroupBox>
 #include <QListWidget>
 #include <QApplication>
@@ -54,36 +54,21 @@ namespace Aseba
 	}
 
 	
-	ThymioFlasherDialog::ThymioFlasherDialog()
+	ThymioFlasherDialog::ThymioFlasherDialog(const std::string& target):
+		target(target)
 	{
-		const PortsMap ports = SerialPortEnumerator::getPorts();
-		
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Firmware Updater"));
-		resize(600,500);
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
-		// serial port
-		serialGroupBox = new QGroupBox(tr("Connection"));
-		QHBoxLayout* serialLayout = new QHBoxLayout();
-
-		serial = new QListWidget();
-		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
-		{
-			const QString text(it->second.second.c_str());
-			QListWidgetItem* item = new QListWidgetItem(text);
-			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
-			serial->addItem(item);
-			if (it->second.second.compare(0,9,"Thymio-II") == 0)
-				serial->setCurrentItem(item);
-		}
-		
-		serial->setSelectionMode(QAbstractItemView::SingleSelection);
-		serialLayout->addWidget(serial);
-		connect(serial, SIGNAL(itemSelectionChanged()), SLOT(setupFlashButtonState()));
-		serialGroupBox->setLayout(serialLayout);
-		mainLayout->addWidget(serialGroupBox);
+		QHBoxLayout *imageLayout = new QHBoxLayout();
+		QLabel* image = new QLabel(this);
+		image->setPixmap(QPixmap(":/images/thymioflasher.png"));
+		imageLayout->addStretch();
+		imageLayout->addWidget(image);
+		imageLayout->addStretch();
+		mainLayout->addLayout(imageLayout);
 		
 		// file selector
 		QGroupBox* fileGroupBox = new QGroupBox(tr("Firmware file"));
@@ -128,7 +113,6 @@ namespace Aseba
 	void ThymioFlasherDialog::setupFlashButtonState()
 	{
 		flashButton->setEnabled(
-			(serial->selectionModel()->hasSelection() || (!serialGroupBox->isChecked())) &&
 			!lineEdit->text().isEmpty()
 		);
 	}
@@ -147,13 +131,6 @@ namespace Aseba
 		if (warnRet != QMessageBox::Yes)
 			return;
 		
-		// get target from GUI
-		const QItemSelectionModel* model(serial->selectionModel());
-		Q_ASSERT(model && !model->selectedRows().isEmpty());
-		const QModelIndex item(model->selectedRows().first());
-		const string target = QString("ser:device=%0").arg(item.data(Qt::UserRole).toString()).toLocal8Bit().constData();
-	
-		
 		// disable buttons while flashing
 		quitButton->setEnabled(false);
 		flashButton->setEnabled(false);
@@ -167,14 +144,14 @@ namespace Aseba
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& target, const std::string& hexFileName) const
+	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
 	{
 		// open stream
 		Dashel::Hub hub;
 		Dashel::Stream* stream(0);
 		try
 		{
-			stream = hub.connect(target);
+			stream = hub.connect(_target);
 		}
 		catch (Dashel::DashelException& e)
 		{
@@ -250,19 +227,32 @@ int main(int argc, char *argv[])
 	translator.load(QString(":/thymioflasher_") + language);
 	
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
+	std::string target("ser:device=");
 	bool thymioFound(false);
+	bool thymiosFound(false);
 	for (Aseba::PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 	{
 		if (it->second.second.compare(0,9,"Thymio-II") == 0)
+		{
+			if (thymioFound)
+				thymiosFound = true;
 			thymioFound = true;
+			target += it->second.first;
+			//std::cout << target << std::endl;
+		}
 	}
 	if (!thymioFound)
 	{
 		QMessageBox::critical(0, QApplication::tr("Thymio II not found"), QApplication::tr("<p><b>Cannot find Thymio II!</b></p><p>Plug Thymio II or use the command-line updater.</p>"));
 		return 1;
 	}
+	if (thymiosFound)
+	{
+		QMessageBox::critical(0, QApplication::tr("Multiple Thymio II found"), QApplication::tr("<p><b>More than one Thymio II found!</b></p><p>Plug a single Thymio II or use the command-line updater.</p>"));
+		return 2;
+	}
 	
-	Aseba::ThymioFlasherDialog flasher;
+	Aseba::ThymioFlasherDialog flasher(target);
 	
 	return app.exec();
 }

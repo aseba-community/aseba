@@ -103,7 +103,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="235"/>
         <source>Connection to command line target failed</source>
-        <translation>Falló la conexión con  línea de comandos del objetivo</translation>
+        <translation>Falló la conexión con el objetivo por línea de comandos</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="235"/>
@@ -203,7 +203,7 @@
     <message>
         <location filename="EventViewer.cpp" line="200"/>
         <source>Save plot data to file</source>
-        <translation>Guardar datos graficados</translation>
+        <translation>Guardar los datos graficados</translation>
     </message>
 </context>
 <context>
@@ -337,7 +337,7 @@ Occurrences</source>
     <message>
         <location filename="HelpViewer.cpp" line="61"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>El archivo de ayuda %0 no se cargó con éxito. El error es: %1.El archivo de ayuda puede encontrarse en el directorio temporal del sistema. Revise por favor su instalación o reporte este error.</translation>
     </message>
     <message>
         <location filename="HelpViewer.cpp" line="65"/>
@@ -626,7 +626,6 @@ Occurrences</source>
     <message>
         <location filename="MainWindow.cpp" line="2396"/>
         <source>Event %0 has an invalid name. Valid names start with an alphabetical character or an &quot;_&quot;, and continue with any number of alphanumeric characters, &quot;_&quot; and &quot;.&quot;</source>
-        <translatorcomment>carácter con acento de acuerdo a la Real Academia de la lengua española</translatorcomment>
         <translation>El evento %0 tiene un nombre invalido. Los nombres válidos comienzan con un carácter alfanumérico o con &quot;_&quot;, seguido por cualquier carácter alfanumérico , &quot;_&quot; y &quot;.&quot;</translation>
     </message>
     <message>
@@ -644,6 +643,7 @@ Occurrences</source>
         <location filename="MainWindow.cpp" line="2476"/>
         <source>Value</source>
         <comment>Value assigned to the constant</comment>
+        <translatorcomment>Valor asignado a la constante</translatorcomment>
         <translation>Valor</translation>
     </message>
     <message>
@@ -980,7 +980,7 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="3336"/>
         <source>Uncomment the selection</source>
-        <translation>Eliminar marca de comentario de selección</translation>
+        <translation>Eliminar marca de comentario de la selección</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3337"/>
@@ -1199,6 +1199,7 @@ evento %0 : </translation>
         <location filename="MainWindow.cpp" line="1456"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
+        <translatorcomment>Nombre del valor etiquetado (puede ser constante, evento,...)</translatorcomment>
         <translation>Nombre</translation>
     </message>
     <message>
@@ -1416,12 +1417,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="110"/>
         <source>Pre-update warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Alerta previa a la actualización</translation>
     </message>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="110"/>
         <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the update!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Está a punto de actualizar el firmware de Thymio II. Asegúrese de que el robot esté completamente cargado y que el cable USB esté bien conectado. &lt;p&gt;&lt;b&gt;No desconecte el robot durante la actualización!&lt;/b&gt;&lt;/p&gt;¿Desea continuar?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="119"/>
@@ -1441,7 +1442,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="312"/>
         <source>A communication error happened during the update process:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error de comunicación durante el proceso de actualización:</translation>
     </message>
     <message>
         <source>A communication error happened during the flashing process:</source>
