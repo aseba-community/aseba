@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Aseba Challenge
-GenericName=Aseba e-puck robot simulator for network play
-GenericName[fr]=Simulateur de robot Aseba e-puck pour jeu réseau
+GenericName=Aseba robot simulator for network play
+GenericName[fr]=Simulateur de robot Aseba pour jeu réseau
 Exec=asebachallenge
 TryExec=asebachallenge
 Categories=Education;Science;Aseba

@@ -1,10 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Thymio Flasher
-GenericName=Thymio Firmware Updater
-GenericName[fr]=Mise à jour du firmware du Thymio
-GenericName[de]=Thymio Firmware Updater
-GenericName[es]=Actualizador del firmware para Thymio
+Name=Thymio Firmware Updater
+Name[fr]=Mise à jour du firmware du Thymio
+Name[de]=Thymio Firmware Updater
+Name[es]=Actualizador del firmware para Thymio
 Exec=thymioflasher
 TryExec=thymioflasher
 Categories=Education;Science
