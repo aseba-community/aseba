@@ -61,9 +61,8 @@ namespace Aseba
 		};
 		
 	private:
+		std::string target;
 		QVBoxLayout* mainLayout;
-		QListWidget* serial;
-		QGroupBox* serialGroupBox;
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
 		QLineEdit* lineEdit;
@@ -75,11 +74,11 @@ namespace Aseba
 		QFutureWatcher<FlashResult> flashFutureWatcher;
 
 	public:
-		ThymioFlasherDialog();
+		ThymioFlasherDialog(const std::string& target);
 		~ThymioFlasherDialog();
 		
 	private:
-		FlashResult flashThread(const std::string& target, const std::string& hexFileName) const;
+		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
 	
 	private slots:
 		void setupFlashButtonState();

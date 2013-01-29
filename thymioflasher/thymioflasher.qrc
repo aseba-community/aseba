@@ -4,5 +4,6 @@
 	<file>thymioflasher_de.qm</file>
 	<file>thymioflasher_es.qm</file>
 	<file>images/fileopen.svgz</file>
+	<file>images/thymioflasher.png</file>
 </qresource>
 </RCC>
