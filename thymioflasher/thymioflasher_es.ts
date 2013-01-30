@@ -100,12 +100,12 @@
     <message>
         <location filename="ThymioFlasher.cpp" line="251"/>
         <source>Multiple Thymio II found</source>
-        <translation type="unfinished"></translation>
+        <translation>Se encontraron múltiples Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioFlasher.cpp" line="251"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Thymio II found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio II or use the command-line updater.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Se encuentró más de un Thymio II !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte solo un Thymio II o utilice el actualizador de la línea de comandos.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>
