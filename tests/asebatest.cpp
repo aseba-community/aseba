@@ -276,7 +276,9 @@ int main(int argc, char** argv)
 	bool memDump = false;
 	bool memCmp = false;
 	std::string memCmpFileName;
-
+	
+	std::locale::global(std::locale(""));
+	
 	// parse the arguments
 	for(;;)
 	{
@@ -429,7 +431,7 @@ int main(int argc, char** argv)
 std::wstring read_source(const std::string& filename)
 {
 	std::ifstream ifs;
-	ifs.open( filename.c_str() ,std::ifstream::binary);
+	ifs.open( filename.c_str(),std::ifstream::binary);
 	if (!ifs.is_open())
 	{
 		std::cerr << "Error opening source file " << filename << std::endl;
@@ -446,14 +448,13 @@ std::wstring read_source(const std::string& filename)
 	ifs.close();
 	
 	/*for (size_t i = 0; i < utf8Source.length(); ++i)
-		std::cerr << "source char " << i << " is 0x" << std::hex << (unsigned)(unsigned char)utf8Source[i] << std::endl;
+		std::cerr << "source char " << i << " is 0x" << std::hex << (unsigned)(unsigned char)utf8Source[i] << " (" << char(utf8Source[i]) << ")" << std::endl;
 	*/
 	const std::wstring s = UTF8ToWString(utf8Source);
-	/*
-	std::cerr << "len utf8 " << utf8Source.length() << " len final " << s.length() << std::endl;
 	
+	/*std::cerr << "len utf8 " << utf8Source.length() << " len final " << s.length() << std::endl;
 	for (size_t i = 0; i < s.length(); ++i)
-		std::cerr << "dest char " << i << " is 0x" << std::hex << (unsigned)s[i] << std::endl;
+		std::wcerr << "dest char " << i << " is 0x" << std::hex << (unsigned)s[i] << " (" << s[i] << ")"<< std::endl;
 	*/
 	return s;
 }
