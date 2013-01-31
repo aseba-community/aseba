@@ -5,7 +5,7 @@ VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*/
 
 build: clean
 	mkdir debian/build
-	cd debian/build && cmake -D USER_BUILD_VERSION=${DEBVERS} -D CMAKE_BUILD_TYPE=relwithdebuginfo -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..
+	cd debian/build && cmake -D USER_BUILD_VERSION=${DEBVERS} -D CMAKE_BUILD_TYPE=RelWithDebInfo -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..
 	cd debian/build && make
 
 clean:
@@ -28,6 +28,7 @@ binary-arch:
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
 	cp debian/build/studio/asebastudio debian/tmp/usr/bin
+	cp debian/build/thymioflasher/thymioflasher debian/tmp/usr/bin
 	cp debian/build/switch/asebaswitch debian/tmp/usr/bin
 	cp debian/build/dump/asebadump debian/tmp/usr/bin
 	cp debian/build/cmd/asebacmd debian/tmp/usr/bin

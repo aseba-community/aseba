@@ -214,6 +214,12 @@ namespace Aseba
 		isRunning(true),
 		stream(0)
 	{
+		// first use local name
+		const QString& systemLocale(QLocale::system().name());
+		translators[0]->load(QString("qt_") + systemLocale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+		translators[1]->load(QString(":/asebastudio_") + systemLocale);
+		translators[2]->load(QString(":/compiler_") + systemLocale);
+		
 		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
 		if (!commandLineTarget.isEmpty())
