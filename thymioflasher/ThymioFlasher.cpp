@@ -214,17 +214,12 @@ int main(int argc, char *argv[])
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
-	const QString& systemLocale(QLocale::system().name());
-	const QString language(systemLocale.left(systemLocale.indexOf("_")));
-	//qDebug() << systemLocale;
-	//qDebug() << language;
-	
 	QTranslator qtTranslator;
 	QTranslator translator;
 	app.installTranslator(&qtTranslator);
 	app.installTranslator(&translator);
-	qtTranslator.load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	translator.load(QString(":/thymioflasher_") + language);
+	qtTranslator.load(QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	translator.load(QString(":/thymioflasher_") + QLocale::system().name());
 	
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
 	std::string target("ser:device=");
