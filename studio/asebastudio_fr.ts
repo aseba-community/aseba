@@ -101,12 +101,12 @@
 <context>
     <name>Aseba::DashelInterface</name>
     <message>
-        <location filename="DashelTarget.cpp" line="235"/>
+        <location filename="DashelTarget.cpp" line="241"/>
         <source>Connection to command line target failed</source>
         <translation>Échec de connection à la destination passée en ligne de commande</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="235"/>
+        <location filename="DashelTarget.cpp" line="241"/>
         <source>Cannot connect to target %0</source>
         <translation>Ne peut pas se connecter à la destination %0</translation>
     </message>
@@ -122,12 +122,12 @@
         <translation type="obsolete">Attention, la connection a été perdue, enregistrez votre travail et quittez Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="999"/>
+        <location filename="DashelTarget.cpp" line="1005"/>
         <source>Unexpected Dashel Error</source>
         <translation>Erreure Dashel inattendue</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="999"/>
+        <location filename="DashelTarget.cpp" line="1005"/>
         <source>A communication error happened:</source>
         <translation>Une erreure de communication est survenue:</translation>
     </message>
@@ -1435,12 +1435,12 @@ event %0 : </source>
 <context>
     <name>Aseba::ReconnectionDialog</name>
     <message>
-        <location filename="DashelTarget.cpp" line="754"/>
+        <location filename="DashelTarget.cpp" line="760"/>
         <source>Aseba Studio - Connection closed</source>
         <translation>Aseba Studio - Connection terminée</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="755"/>
+        <location filename="DashelTarget.cpp" line="761"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
         <translation>Attention, la connection a été terminée : J&apos;essaye de reconnecter.</translation>
     </message>
@@ -1724,18 +1724,18 @@ event %0 : </source>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="DashelTarget.cpp" line="318"/>
-        <location filename="DashelTarget.cpp" line="325"/>
+        <location filename="DashelTarget.cpp" line="324"/>
+        <location filename="DashelTarget.cpp" line="331"/>
         <source>Protocol version mismatch</source>
         <translation>Les version des protocoles ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="319"/>
+        <location filename="DashelTarget.cpp" line="325"/>
         <source>Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.</source>
         <translation>Aseba Studio utilise un protocole plus ancien (%1) que le noeud %0 (%2), veuillez mettre à jour Aseba Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="326"/>
+        <location filename="DashelTarget.cpp" line="332"/>
         <source>Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.</source>
         <translation>Le noeud %0 utilise un protocole plus ancien (%2) que Aseba Studio (%1), veuillez mettre à jour le microprogramme du noeud.</translation>
     </message>
