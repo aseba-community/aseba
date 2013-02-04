@@ -11,7 +11,7 @@
     <message>
         <location filename="AeslEditor.cpp" line="592"/>
         <source>Set breakpoint</source>
-        <translation>Establecer una interrupción</translation>
+        <translation>Fijar interrupción</translation>
     </message>
     <message>
         <location filename="AeslEditor.cpp" line="593"/>
@@ -178,7 +178,7 @@
     <message>
         <location filename="EventViewer.cpp" line="101"/>
         <source>&amp;Clear</source>
-        <translation>&amp;Quitar</translation>
+        <translation>&amp;Limpiar gráfica</translation>
     </message>
     <message>
         <location filename="EventViewer.cpp" line="105"/>
@@ -203,7 +203,7 @@
     <message>
         <location filename="EventViewer.cpp" line="200"/>
         <source>Save plot data to file</source>
-        <translation>Guardar los datos graficados</translation>
+        <translation>Guardar datos graficados</translation>
     </message>
 </context>
 <context>
@@ -716,7 +716,7 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="3011"/>
         <source>Clear</source>
-        <translation>Quitar</translation>
+        <translation>Limpiar</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3154"/>
