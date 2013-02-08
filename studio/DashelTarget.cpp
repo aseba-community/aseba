@@ -713,8 +713,8 @@ namespace Aseba
 		while (!userEventsQueue.isEmpty())
 		{
 			emit userEvent(userEventsQueue.head()->type, userEventsQueue.head()->data);
+			delete userEventsQueue.head();
 			userEventsQueue.dequeue();
-			// FIXME: leak there, should delete, but userEventsQueue.head()->data passed as reference
 		}
 	}
 	

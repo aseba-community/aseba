@@ -60,7 +60,7 @@ namespace Aseba
 		void networkDisconnected();
 		
 		//! A user event has arrived from the network.
-		void userEvent(unsigned id, const VariablesDataVector &data);
+		void userEvent(unsigned id, const VariablesDataVector data);
 		//! Some user events have been dropped, i.e. not sent to the gui
 		void userEventsDropped(unsigned amount);
 		
