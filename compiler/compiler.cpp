@@ -117,7 +117,6 @@ namespace Aseba
 		assert(targetDescription);
 		assert(commonDefinitions);
 		
-		Node *program;
 		unsigned indent = 0;
 		
 		// we need to build maps at each compilation in case previous ones produced errors and messed maps up
@@ -147,9 +146,10 @@ namespace Aseba
 		}
 		
 		// parsing
+		std::auto_ptr<Node> program;
 		try
 		{
-			program = parseProgram();
+			program.reset(parseProgram());
 		}
 		catch (TranslatableError error)
 		{
@@ -172,7 +172,6 @@ namespace Aseba
 		}
 		catch(TranslatableError error)
 		{
-			delete program;
 			errorDescription = error.toError();
 			return false;
 		}
@@ -187,7 +186,9 @@ namespace Aseba
 		// expand the syntax tree to Aseba-like syntax
 		try
 		{
-			program = program->expandToAsebaTree(dump);
+			Node* expandedProgram(program->expandToAsebaTree(dump));
+			program.release();
+			program.reset(expandedProgram);
 		}
 		catch (TranslatableError error)
 		{
@@ -210,7 +211,6 @@ namespace Aseba
 		}
 		catch(TranslatableError error)
 		{
-			delete program;
 			errorDescription = error.toError();
 			return false;
 		}
@@ -225,11 +225,12 @@ namespace Aseba
 		// optimization
 		try
 		{
-			program = program->optimize(dump);
+			Node* optimizedProgram(program->optimize(dump));
+			program.release();
+			program.reset(optimizedProgram);
 		}
 		catch (TranslatableError error)
 		{
-			delete program;
 			errorDescription = error.toError();
 			return false;
 		}
@@ -255,7 +256,6 @@ namespace Aseba
 		// code generation
 		PreLinkBytecode preLinkBytecode;
 		program->emit(preLinkBytecode);
-		delete program;
 		
 		// fix-up (add of missing STOP and RET bytecodes at code generation)
 		preLinkBytecode.fixup(subroutineTable);

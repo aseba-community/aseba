@@ -15,18 +15,41 @@
 #include <qwt_plot_curve.h>
 #include <qwt_legend.h>
 
+#if QWT_VERSION >= 0x060000
+	#include <qwt_series_data.h>
+#else
+	#include <qwt_data.h>
+#endif
+
 using namespace Dashel;
 using namespace Aseba;
 using namespace std;
 
+#if QWT_VERSION >= 0x060000
+class EventDataWrapper : public QwtSeriesData<QPointF>
+{
+private:
+	std::vector<double>& _x;
+	std::vector<sint16>& _y;
+	
+public:
+	EventDataWrapper(std::vector<double>& _x, std::vector<sint16>& _y) :
+		_x(_x),
+		_y(_y)
+	{ }
+	virtual QRectF boundingRect () const { return qwtBoundingRect(*this); }
+	virtual QPointF sample (size_t i) const { return QPointF(_x[i], double(_y[i])); }
+	virtual size_t size () const { return _x.size(); }
+};
+#else
 class EventDataWrapper : public QwtData
 {
 private:
-	vector<double>& _x;
-	vector<sint16>& _y;
+	std::vector<double>& _x;
+	std::vector<sint16>& _y;
 	
 public:
-	EventDataWrapper(vector<double>& _x, vector<sint16>& _y) :
+	EventDataWrapper(std::vector<double>& _x, std::vector<sint16>& _y) :
 		_x(_x),
 		_y(_y)
 	{ }
@@ -35,6 +58,7 @@ public:
 	virtual double x (size_t i) const { return _x[i]; }
 	virtual double y (size_t i) const { return (double)_y[i]; }
 };
+#endif
 
 class EventLogger : public Hub, public QwtPlot
 {
@@ -68,7 +92,11 @@ public:
 		for (size_t i = 0; i < values.size(); i++)
 		{
 			QwtPlotCurve *curve = new QwtPlotCurve(QString("%0").arg(i));
+			#if QWT_VERSION >= 0x060000
+			curve->setData(new EventDataWrapper(timeStamps, values[i]));
+			#else
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
+			#endif
 			curve->attach(this);
 			curve->setPen(QColor::fromHsv((i * 360) / values.size(), 255, 100));
 		}

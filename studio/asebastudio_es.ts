@@ -11,7 +11,7 @@
     <message>
         <location filename="AeslEditor.cpp" line="592"/>
         <source>Set breakpoint</source>
-        <translation>Establecer una interrupción</translation>
+        <translation>Fijar interrupción</translation>
     </message>
     <message>
         <location filename="AeslEditor.cpp" line="593"/>
@@ -101,12 +101,12 @@
 <context>
     <name>Aseba::DashelInterface</name>
     <message>
-        <location filename="DashelTarget.cpp" line="235"/>
+        <location filename="DashelTarget.cpp" line="241"/>
         <source>Connection to command line target failed</source>
         <translation>Falló la conexión con el objetivo por línea de comandos</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="235"/>
+        <location filename="DashelTarget.cpp" line="241"/>
         <source>Cannot connect to target %0</source>
         <translation>No se pudo conectar al objetivo %0</translation>
     </message>
@@ -122,13 +122,13 @@
         <translation type="obsolete">Atención, conexión cerrada, guarde su trabajo y salga de Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="999"/>
+        <location filename="DashelTarget.cpp" line="1005"/>
         <source>Unexpected Dashel Error</source>
         <translatorcomment>Is there any translation for Dashel?</translatorcomment>
         <translation>Error Dashel inesperado</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="999"/>
+        <location filename="DashelTarget.cpp" line="1005"/>
         <source>A communication error happened:</source>
         <translation>Ocurrió un error de comunicación:</translation>
     </message>
@@ -178,7 +178,7 @@
     <message>
         <location filename="EventViewer.cpp" line="101"/>
         <source>&amp;Clear</source>
-        <translation>&amp;Quitar</translation>
+        <translation>&amp;Limpiar gráfica</translation>
     </message>
     <message>
         <location filename="EventViewer.cpp" line="105"/>
@@ -203,7 +203,7 @@
     <message>
         <location filename="EventViewer.cpp" line="200"/>
         <source>Save plot data to file</source>
-        <translation>Guardar los datos graficados</translation>
+        <translation>Guardar datos graficados</translation>
     </message>
 </context>
 <context>
@@ -716,7 +716,7 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="3011"/>
         <source>Clear</source>
-        <translation>Quitar</translation>
+        <translation>Limpiar</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3154"/>
@@ -1345,12 +1345,12 @@ evento %0 : </translation>
 <context>
     <name>Aseba::ReconnectionDialog</name>
     <message>
-        <location filename="DashelTarget.cpp" line="754"/>
+        <location filename="DashelTarget.cpp" line="760"/>
         <source>Aseba Studio - Connection closed</source>
         <translation>Aseba Studio - Conexión cerrada</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="755"/>
+        <location filename="DashelTarget.cpp" line="761"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
         <translation>Atención, conexión cerrada: intentando conectarse nuevamente.</translation>
     </message>
@@ -1598,18 +1598,18 @@ evento %0 : </translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="DashelTarget.cpp" line="318"/>
-        <location filename="DashelTarget.cpp" line="325"/>
+        <location filename="DashelTarget.cpp" line="324"/>
+        <location filename="DashelTarget.cpp" line="331"/>
         <source>Protocol version mismatch</source>
         <translation>Incompatibilidad en versiones de protocolo</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="319"/>
+        <location filename="DashelTarget.cpp" line="325"/>
         <source>Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.</source>
         <translation>Aseba Studio utiliza un protocolo anterior(%1) al utilizado por el nodo %0 (%2). Por favor actualice Aseba Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="326"/>
+        <location filename="DashelTarget.cpp" line="332"/>
         <source>Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.</source>
         <translation>El nodo %0 utiliza un protocolo anterior(%2) al utilizado por Aseba Studio (%1). Por favor actualice el firmware del nodo.</translation>
     </message>

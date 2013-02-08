@@ -40,6 +40,7 @@ translation_files = list()
 translation_files.append(['french', 'fr', 'compiler_fr.ts'])
 translation_files.append(['german', 'de', 'compiler_de.ts'])
 translation_files.append(['spanish', 'es', 'compiler_es.ts'])
+translation_files.append(['italian', 'it', 'compiler_it.ts'])
 
 comment_regexp = re.compile(r'\A\s*// (.*)')
 error_regexp = re.compile(r'error_map\[(.*?)\]\s*=\s*L"(.*?)";')

@@ -713,8 +713,8 @@ namespace Aseba
 		while (!userEventsQueue.isEmpty())
 		{
 			emit userEvent(userEventsQueue.head()->type, userEventsQueue.head()->data);
+			delete userEventsQueue.head();
 			userEventsQueue.dequeue();
-			// FIXME: leak there, should delete, but userEventsQueue.head()->data passed as reference
 		}
 	}
 	
@@ -998,8 +998,12 @@ namespace Aseba
 	{
 		switch(e.source)
 		{
+		case Dashel::DashelException::ConnectionLost:
 		case Dashel::DashelException::IOError:
-			// managed internally in Dashel::Hub, so don't care about
+			// "normal" disconnections, managed internally in Dashel::Hub, so don't care about
+			break;
+		case Dashel::DashelException::ConnectionFailed:
+			// should not happen here, but can because of typos in Dashel, catch it for now
 			break;
 		default:
 			QMessageBox::critical(NULL, tr("Unexpected Dashel Error"), tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());

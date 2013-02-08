@@ -1592,9 +1592,13 @@ namespace Aseba
 				Q_ASSERT(tab);
 				tab->editor->clear();
 			}
-			constantsDefinitionsModel->clear();
-			eventsDescriptionsModel->clear();
 			actualFileName.clear();
+			sourceModified = false;
+			constantsDefinitionsModel->clear();
+			constantsDefinitionsModel->clearWasModified();
+			eventsDescriptionsModel->clear();
+			eventsDescriptionsModel->clearWasModified();
+			updateWindowTitle();
 			return true;
 		}
 		return false;
