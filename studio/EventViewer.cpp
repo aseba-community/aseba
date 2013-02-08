@@ -108,7 +108,7 @@ namespace Aseba
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
 			#endif
 			curve->attach(plot);
-			curve->setPen(QColor::fromHsv((i * 360) / values.size(), 255, 100));
+			curve->setPen(QPen(QColor::fromHsv((i * 360) / values.size(), 255, 100), 2));
 		}
 		
 		QVBoxLayout *layout = new QVBoxLayout(this);
