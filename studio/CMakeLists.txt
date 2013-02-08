@@ -28,8 +28,8 @@ if (QT4_FOUND)
 		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-Wl,-subsystem,console ${CMAKE_EXE_LINKER_FLAGS}")
 	endif (WIN32)
 	
-	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4)
-	find_library(QWT_LIBRARIES qwt-qt4 /usr/lib /usr/local/lib)
+	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
+	find_library(QWT_LIBRARIES qwt-qt4)
 	
 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt found")

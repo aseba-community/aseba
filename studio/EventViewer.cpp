@@ -35,7 +35,11 @@
 #include <qwt_plot_curve.h>
 #include <qwt_legend.h>
 
-#include <qwt_data.h>
+#if QWT_VERSION >= 0x060000
+	#include <qwt_series_data.h>
+#else
+	#include <qwt_data.h>
+#endif
 
 #include <EventViewer.moc>
 
@@ -44,6 +48,23 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
+	#if QWT_VERSION >= 0x060000
+	class EventDataWrapper : public QwtSeriesData<QPointF>
+	{
+	private:
+		std::deque<double>& _x;
+		std::deque<sint16>& _y;
+		
+	public:
+		EventDataWrapper(std::deque<double>& _x, std::deque<sint16>& _y) :
+			_x(_x),
+			_y(_y)
+		{ }
+		virtual QRectF boundingRect () const { return qwtBoundingRect(*this); }
+		virtual QPointF sample (size_t i) const { return QPointF(_x[i], double(_y[i])); }
+		virtual size_t size () const { return _x.size(); }
+	};
+	#else
 	class EventDataWrapper : public QwtData
 	{
 	private:
@@ -60,6 +81,7 @@ namespace Aseba
 		virtual double x (size_t i) const { return _x[i]; }
 		virtual double y (size_t i) const { return (double)_y[i]; }
 	};
+	#endif
 	
 	EventViewer::EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers) :
 		eventId(eventId),
@@ -80,7 +102,11 @@ namespace Aseba
 		for (size_t i = 0; i < values.size(); i++)
 		{
 			QwtPlotCurve *curve = new QwtPlotCurve(QString("%0").arg(i));
+			#if QWT_VERSION >= 0x060000
+			curve->setData(new EventDataWrapper(timeStamps, values[i]));
+			#else
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
+			#endif
 			curve->attach(plot);
 			curve->setPen(QColor::fromHsv((i * 360) / values.size(), 255, 100));
 		}
