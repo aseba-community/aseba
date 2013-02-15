@@ -1715,8 +1715,7 @@ namespace Aseba
 			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
 			
-			recompileAll();
-		
+			// set source as unmodified
 			sourceModified = false;
 			constantsDefinitionsModel->clearWasModified();
 			eventsDescriptionsModel->clearWasModified();
