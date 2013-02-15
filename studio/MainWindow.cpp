@@ -1711,9 +1711,7 @@ namespace Aseba
 			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
 			
-			// TODO: try to disable this because the setPlainText should trigger textChanged
-			recompileAll();
-		
+			// set source as unmodified
 			sourceModified = false;
 			constantsDefinitionsModel->clearWasModified();
 			eventsDescriptionsModel->clearWasModified();
