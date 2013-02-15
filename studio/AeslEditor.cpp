@@ -139,9 +139,7 @@ namespace Aseba
 		editor->setExtraSelections(extraSelections);
 		*/
 		
-		
 		// This is backup code in case the ExtraSelection creates trashes
-		
 		QColor specialBackground("white");
 		if (isBreakpointPending)
 			specialBackground = breakpointPendingColor;
@@ -172,10 +170,9 @@ namespace Aseba
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
 				
-				/*
 				// This is backup code in case the ExtraSelection creates trashes
 				if (specialBackground != "white")
-					format.setBackground(specialBackground);*/
+					format.setBackground(specialBackground);
 				
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
