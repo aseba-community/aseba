@@ -822,7 +822,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3268"/>
         <source>&amp;Open...</source>
-        <translation>&amp;O Apertura...</translation>
+        <translation>&amp;Apertura...</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3270"/>
@@ -849,7 +849,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3278"/>
         <source>Save &amp;As...</source>
-        <translation>&amp;A Salva come...</translation>
+        <translation>Salva &amp;come...</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3286"/>
@@ -898,7 +898,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3310"/>
         <source>&amp;Paste</source>
-        <translation>&amp;P incolla</translation>
+        <translation>&amp;Incolla</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3311"/>
@@ -931,7 +931,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3322"/>
         <source>&amp;Find...</source>
-        <translation>&amp;F Trova...</translation>
+        <translation>&amp;Trova...</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3323"/>
@@ -942,7 +942,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3327"/>
         <source>&amp;Replace...</source>
-        <translation>&amp;R sostituisci...</translation>
+        <translation>&amp;Sostituisci...</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3328"/>
@@ -1065,7 +1065,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3401"/>
         <source>&amp;Pause all</source>
-        <translation>Metti in &amp;Pausa tutto</translation>
+        <translation>Metti in &amp;pausa tutto</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3402"/>
@@ -1102,7 +1102,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3433"/>
         <source>&amp;Tools</source>
-        <translation>s&amp;Trumenti</translation>
+        <translation>s&amp;trumenti</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3438"/>
@@ -1127,7 +1127,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3452"/>
         <source>&amp;Help</source>
-        <translation>&amp;H Aiuto</translation>
+        <translation>&amp;Aiuto</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3473"/>
@@ -1263,7 +1263,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="531"/>
         <source>Local Tools</source>
-        <translation>Strumenti llllllllli</translation>
+        <translation>Strumenti locali</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="762"/>
