@@ -1,7 +1,11 @@
-Aseba - an event-based framework for distributed robot control
-http://aseba.wikidot.com
+=====
+Aseba
+=====
 
-Copyright (C) 2007--2013:
+Aseba is a set of tools which allow beginners to program robots easily and efficiently.
+For more information, see: http://aseba.wikidot.com
+
+	Copyright (C) 2007--2013:
 	Stephane Magnenat <stephane at magnenat dot net>
 	(http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
@@ -48,7 +52,7 @@ Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba 
 	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -DDASHEL_INCLUDE_DIR=../dashel -DDASHEL_LIBRARY=../build-dashel/libdashel.a -DENKI_INCLUDE_DIR=../enki -DENKI_LIBRARY=../build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=../build-enki/viewer/libenkiviewer.a
 	make
 
-Once this script has run, you can find the executables in build-aseba/, in their respective sub-directories. 
+Once this script has run, you can find the executables in `build-aseba/`, in their respective sub-directories. 
 
 If you have some problem to compile Aseba after reading the relevant
 documentation, feel free to post your question on our development mailing
@@ -56,4 +60,4 @@ list. You can subscribe to the latter at http://gna.org/mail/?group=aseba
 
 Enjoy Aseba!
 
-	The developers
+The developers
