@@ -20,6 +20,9 @@ Copyright (C) 2007--2011:
 	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
 	(Spanish translation)
 
+	Ezio Somá <ezio dot soma at gmail dot com>
+	(Italian translation)
+
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
 	(Apple maintainer)
 	
