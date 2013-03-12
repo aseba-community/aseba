@@ -256,31 +256,6 @@ namespace Enki
 		
 		void controlStep(double dt)
 		{
-			// set physical variables
-			leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
-			rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
-			Color c;
-			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
-			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
-			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
-			setColor(c);
-			
-			// if this robot is controlled by a joystick, override the wheel speed commands
-			#ifdef USE_SDL
-			SDL_JoystickUpdate();
-			if (joystick >= 0 && joystick < playgroundViewer->joysticks.size())
-			{
-				const double SPEED_MAX = 13.;
-				double x = SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 0) / (32767. / SPEED_MAX);
-				double y = -SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 1) / (32767. / SPEED_MAX);
-				leftSpeed = y + x;
-				rightSpeed = y - x;
-			}
-			#endif // USE_SDL
-			
-			// do motion
-			FeedableEPuck::controlStep(dt);
-			
 			// get physical variables
 			variables.prox[0] = static_cast<sint16>(infraredSensor0.finalValue);
 			variables.prox[1] = static_cast<sint16>(infraredSensor1.finalValue);
@@ -310,6 +285,31 @@ namespace Enki
 				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-1);
 				AsebaVMRun(&vm, 1000);
 			}
+			
+			// set physical variables
+			leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
+			rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
+			Color c;
+			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
+			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
+			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			setColor(c);
+			
+			// if this robot is controlled by a joystick, override the wheel speed commands
+			#ifdef USE_SDL
+			SDL_JoystickUpdate();
+			if (joystick >= 0 && joystick < playgroundViewer->joysticks.size())
+			{
+				const double SPEED_MAX = 13.;
+				double x = SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 0) / (32767. / SPEED_MAX);
+				double y = -SDL_JoystickGetAxis(playgroundViewer->joysticks[joystick], 1) / (32767. / SPEED_MAX);
+				leftSpeed = y + x;
+				rightSpeed = y - x;
+			}
+			#endif // USE_SDL
+			
+			// set motion
+			FeedableEPuck::controlStep(dt);
 		}
 	};
 	
