@@ -95,6 +95,10 @@
                                 <section title="Aseba Studio" ref="doc/en_asebastudio.html"></section>
                                 <section title="The Aseba language" ref="doc/en_asebalanguage.html"></section>
                                 <section title="Native functions standard library" ref="doc/en_asebastdnative.html"></section>
+                        <section title="Aseba Playground" ref = "doc/en_asebaplayground.html">
+                                <section title="Playground Barcelona" ref="doc/en_playground-barcelona.html"></section>
+
+                        </section>
                                 <section title="Remap Identifiers using asebaswitch" ref="doc/en_asebaswitchremap.html"></section>
 
                         </section>
@@ -107,6 +111,7 @@
                         <file>doc/en_asebaconcepts.html</file>
                         <file>doc/en_asebalanguage-1-1.html</file>
                         <file>doc/en_asebalanguage.html</file>
+                        <file>doc/en_asebaplayground.html</file>
                         <file>doc/en_asebastdnative-eq0.png</file>
                         <file>doc/en_asebastdnative-eq1.png</file>
                         <file>doc/en_asebastdnative-eq10.png</file>
@@ -144,9 +149,11 @@
                         <file>doc/en_asebaswitchremap.html</file>
                         <file>doc/en_asebausermanual.html</file>
                         <file>doc/en_gettingstarted.html</file>
+                        <file>doc/en_playground-barcelona.html</file>
                         <file>doc/epuck-sensors-wiki-en.png</file>
                         <file>doc/epuck-sensors-wiki-en.svg</file>
                         <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/playground-barcelona.png</file>
                         <file>doc/studio-challenge-en.png</file>
                         <file>doc/studio-connect-en.png</file>
                         <file>doc/studio-overlay-en.png</file>
@@ -232,6 +239,10 @@
                                 <section title="ASEBA Studio" ref="doc/es_asebastudio.html"></section>
                                 <section title="Lenguaje Aseba" ref="doc/es_asebalanguage.html"></section>
                                 <section title="Librería estándar de funciones nativas" ref="doc/es_asebastdnative.html"></section>
+                        <section title="El Aseba Playground" ref = "doc/es_asebaplayground.html">
+                                <section title="Playground Barcelona (Pabellón Alemán)" ref="doc/es_playground-barcelona.html"></section>
+
+                        </section>
                                 <section title="Conexión entre varios objetivos" ref="doc/es_asebaswitchremap.html"></section>
 
                         </section>
@@ -240,10 +251,13 @@
 
                 <files>
                         <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/epuck-sensors-wiki-en.png</file>
                         <file>doc/epuck-sensors-wiki-en.svg</file>
                         <file>doc/epuck-top-grayscale.png</file>
                         <file>doc/es_asebaconcepts.html</file>
                         <file>doc/es_asebalanguage.html</file>
+                        <file>doc/es_asebaplayground.html</file>
                         <file>doc/es_asebastdnative-eq0.png</file>
                         <file>doc/es_asebastdnative-eq1.png</file>
                         <file>doc/es_asebastdnative-eq10.png</file>
@@ -281,6 +295,11 @@
                         <file>doc/es_asebaswitchremap.html</file>
                         <file>doc/es_asebausermanual.html</file>
                         <file>doc/es_gettingstarted.html</file>
+                        <file>doc/es_playground-barcelona.html</file>
+                        <file>doc/playground-barcelona.png</file>
+                        <file>doc/studio-challenge-en.png</file>
+                        <file>doc/studio-connect-en.png</file>
+                        <file>doc/studio-overlay-en.png</file>
 
                 </files>
         </filterSection>

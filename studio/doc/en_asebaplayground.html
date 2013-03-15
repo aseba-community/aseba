@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Aseba Playground
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Aseba Playground
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Table of Contents
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Events</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc1">Local Events</a>
+              </div>
+              <div style="margin-left: 3em;">
+                <a href="#toc2">Proximity sensors</a>
+              </div>
+              <div style="margin-left: 3em;">
+                <a href="#toc3">Camera</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc4">Emit</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Internal Variables</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc6">id</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc7">source</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc8">args</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc9">leftSpeed, rightSpeed</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc10">colorR, colorG, colorB</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc11">prox</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc12">camR, camG, camB</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc13">energy</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc14">Create your own environment</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      This document contains additional information on how to program robots in Playground, a multi-robot simulator bundled with Aseba.
+    </p>
+    <h1 id="toc0">
+      <span>Events</span>
+    </h1>
+    <h2 id="toc1">
+      <span>Local Events</span>
+    </h2>
+    <h3 id="toc2">
+      <span>Proximity sensors</span>
+    </h3>
+    <p>
+      The code following the instruction <tt>onevent ir_sensors</tt> will be executed at regular intervals, just after the distance to obstacles (<tt>prox</tt>) has been updated.
+    </p>
+    <h3 id="toc3">
+      <span>Camera</span>
+    </h3>
+    <p>
+      The code following the instruction <tt>onevent camera</tt> will be executed at regular intervals, just after the linear camera pixels <tt>camR</tt>, <tt>camG</tt>, <tt>camB</tt> have been updated.
+    </p>
+    <h2 id="toc4">
+      <span>Emit</span>
+    </h2>
+    <p>
+      <tt>emit <em>name</em> [<em>arguments</em>]</tt>
+    </p>
+    <p>
+      <tt>emit</tt> specifies that a given robot should send an event of type <em>name</em> to all other robots. The event may contain up to 32 <em>arguments</em>. Note that you cannot choose to which robot the event will be sent, since just like a radio signal, it is broadcast to all robots (see the example below in [args] for how you can address individual robots). Note also that the name of the event and the number of arguments have to be declared in the <em>Global Events</em> pane of Aseba Studio.
+    </p>
+    <h1 id="toc5">
+      <span>Internal Variables</span>
+    </h1>
+    <h2 id="toc6">
+      <span>id</span>
+    </h2>
+    <p>
+      An identifier whose value is unique for every robot.
+    </p>
+    <h2 id="toc7">
+      <span>source</span>
+    </h2>
+    <p>
+      The id of the robot from which the most recent event was received.
+    </p>
+    <h2 id="toc8">
+      <span>args</span>
+    </h2>
+    <p>
+      The arguments of the most recent event received on this robot.
+    </p>
+    <p>
+      <strong>Example:</strong> This example shows how events can target individual robots even if the signal was broadcast to all robots. The idea is to use a vector in which each position is allocated to a specific robot: when receiving the event a robot will read only a specific part of this vector.
+    </p>
+    <p>
+      The robot 1 sends a move-ahead event to robot 2, waits, then sends a move-ahead event to robot 3 and a stop to robot 2, waits, and finally sends a general stop message.
+    </p>
+    <p>
+      Code for robot 1:
+    </p>
+    <div class="code">
+      <pre>
+<code># variables
+var counter = 0
+
+onevent ir_sensors
+
+if counter == 10 then
+    emit move [1,0]
+end
+
+if counter == 100 then 
+    emit move [0,1]
+end
+
+counter += 1</code>
+</pre>
+    </div>
+    <p>
+      Code for robot 2:
+    </p>
+    <div class="code">
+      <pre>
+<code># events
+onevent move
+    if args[0] == 1 then
+        leftSpeed = 400
+        rightSpeed = 400
+    else
+        leftSpeed = 0
+        rightSpeed = 0        
+    end
+
+onevent stop
+    leftSpeed = 0
+    rightSpeed = 0</code>
+</pre>
+    </div>
+    <p>
+      Code for robot 3:
+    </p>
+    <div class="code">
+      <pre>
+<code># events
+onevent move
+    if args[1] == 1 then
+        leftSpeed = 400
+        rightSpeed = 400
+    else
+        leftSpeed = 0
+        rightSpeed = 0        
+    end
+
+onevent stop
+    leftSpeed = 0
+    rightSpeed = 0</code>
+</pre>
+    </div>
+    <h2 id="toc9">
+      <span>leftSpeed, rightSpeed</span>
+    </h2>
+    <p>
+      Wheel speed. Choose 400 for slow motion.
+    </p>
+    <h2 id="toc10">
+      <span>colorR, colorG, colorB</span>
+    </h2>
+    <p>
+      The red, green and blue components of the robot's colour.
+    </p>
+    <h2 id="toc11">
+      <span>prox</span>
+    </h2>
+    <p>
+      The distance to obstacles perceived by the sensors. Note that noise produces fluctuations in the measurements. See schema <a href="en_gettingstarted.html">here</a>.
+    </p>
+    <h2 id="toc12">
+      <span>camR, camG, camB</span>
+    </h2>
+    <p>
+      <em>Array of length 60.</em> The red, green and blue components of values returned by the robot's camera.
+    </p>
+    <h2 id="toc13">
+      <span>energy</span>
+    </h2>
+    <p>
+      <em>Integer: [0&nbsp;9].</em> The robot's energy level.
+    </p>
+    <h1 id="toc14">
+      <span>Create your own environment</span>
+    </h1>
+    <p>
+      Playground allows specific simulation environments to be defined. For instance, the following code creates a box containing four robots:
+    </p>
+    <div class="code">
+      <pre>
+<code>&lt;!DOCTYPE aseba-playground&gt;
+&lt;aseba-playground&gt;
+    &lt;color name="wall" r="0.9" g="0.9" b="0.9" /&gt;
+    &lt;color name="red" r="0.77" g="0.2" b="0.15" /&gt;
+    &lt;color name="green" r="0" g="0." b="0.17" /&gt;
+    &lt;color name="blue" r="0" g="0.38" b="0.61" /&gt;
+
+    &lt;world w="110.4" h="110.4" color="wall"/&gt;
+
+    &lt;e-puck x="40" y="40"/&gt;
+    &lt;e-puck x="40" y="60"/&gt;
+    &lt;e-puck x="60" y="40"/&gt;
+    &lt;e-puck x="60" y="60"/&gt;
+&lt;/aseba-playground&gt;</code>
+</pre>
+    </div>
+    <p>
+      <strong>Example:</strong> Get <a href="en_playground-barcelona.html">here</a> a model of the German Pavilion, 1929, designed by Mies van der Rohe.
+    </p>
+  </body>
+</html>

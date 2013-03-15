@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Playground Barcelona (Pabellón Alemán)
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Playground Barcelona (Pabellón Alemán)
+    </h1>
+    <p>
+      Modelo del <a href="http://es.wikipedia.org/wiki/Pabell%C3%B3n_alem%C3%A1n_(Barcelona)">Pabellón Alemán</a>, Barcelona, 1929, por Mies van der Rohe.
+    </p>
+    <div class="image-container alignleft">
+      <img src="playground-barcelona.png" alt="playground-barcelona.png" class="image" />
+    </div>
+    <div class="code">
+      <pre>
+<code>&lt;!DOCTYPE aseba-playground&gt;
+&lt;!-- plan of the German Pavillion, Barcelona, 1929, by Mies van der Rohe --&gt;
+&lt;!-- see http://en.wikipedia.org/wiki/Barcelona_Pavilion --&gt;
+&lt;!-- created 2012.09.26 by Vlad Atanasiu atanasiu@alum.mit.edu --&gt;
+
+&lt;aseba-playground&gt;
+
+    &lt;!-- colors definitions --&gt;
+    &lt;color name="wall" r="0.9" g="0.9" b="0.9"/&gt;
+    &lt;color name="water" r="0.2" g="0.6" b="1"/&gt;
+
+    &lt;!-- playground topology --&gt;
+    &lt;world w="600" h="276" color="wall"/&gt;
+
+    &lt;wall x="359" y="240" l1="481" l2="74" h="11" color="wall"/&gt;
+    &lt;wall x="506" y="24" l1="189" l2="51" h="11" color="wall"/&gt;
+    &lt;wall x="192" y="180" l1="224" l2="5" h="11" color="wall"/&gt;
+    &lt;wall x="402" y="162" l1="113" l2="5" h="11" color="wall"/&gt;
+    &lt;wall x="361" y="125" l1="10" l2="68" h="11" color="wall"/&gt;
+    &lt;wall x="338" y="89" l1="99" l2="5" h="11" color="wall"/&gt;
+    &lt;wall x="455" y="133" l1="62" l2="5" h="11" color="wall"/&gt;
+    &lt;wall x="513" y="125" l1="5" l2="87" h="11" color="wall"/&gt;
+
+    &lt;wall x="127" y="66" l1="228" l2="107" h="0.01" color="water"/&gt;
+    &lt;wall x="562" y="124" l1="43" l2="123" h="0.01" color="water"/&gt;
+
+    &lt;!-- robots initial positions --&gt;
+    &lt;e-puck x="373" y="25"/&gt;
+    &lt;e-puck x="50" y="140"/&gt;
+    &lt;e-puck x="445" y="110"/&gt;
+
+&lt;/aseba-playground&gt;</code>
+</pre>
+    </div>
+  </body>
+</html>
