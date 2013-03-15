@@ -67,10 +67,10 @@
                 <a href="#toc14">Unterprogramme</a>
               </div>
               <div style="margin-left: 2em;">
-                <a href="#toc15">Ereignisse</a>
+                <a href="#toc15">Unterprogramme</a>
               </div>
               <div style="margin-left: 2em;">
-                <a href="#toc16">Unterprogramme</a>
+                <a href="#toc16">Ereignisse</a>
               </div>
               <div style="margin-left: 1em;">
                 <a href="#toc17">Vorgegebene Funktionen</a>
@@ -81,7 +81,7 @@
       </tr>
     </table>
     <p>
-      Diese Hilfe finden Sie auch innerhalb des Aseba Studios im Menu <tt>Hilfe -&gt; Sprache</tt>. Technische Ausdrücke sind mit der entsprechenden Erklärung auf Wikipedia verlinkt. Die Seite stellt die Sprache ab der Version 1.2 des Aseba, die für frühere Versionen, lesen Sie bitte <a href="de_asebalanguage-1-1.html">diese Seite</a>.
+      Diese Hilfe finden Sie auch innerhalb des Aseba Studios im Menu <tt>Hilfe -&gt; Sprache</tt>. Technische Ausdrücke sind mit der entsprechenden Erklärung auf Wikipedia verlinkt. Die Seite stellt die Sprache ab der Version 1.2 von Aseba dar, für frühere Versionen lesen Sie bitte <a href="de_asebalanguage-1-1.html">diese Seite</a>.
     </p>
     <p>
       Die Syntax der Programmiersprache Aseba gleicht derjenigen von <a href="http://de.wikipedia.org/wiki/Matlab">Matlab</a> (verbreitete wissenschaftliche Programmiersprache). Dies ermöglicht Programmierern mit Vorkenntnissen sich schnell zu orientieren und Aseba in Kürze zu erlernen. Semantisch gesehen, ist Aseba eine einfache, <a href="http://de.wikipedia.org/wiki/Imperative_Programmierung">imperative Programmierung</a> mit einem einzelnen <a href="http://de.wikipedia.org/wiki/Datentyp">Datentyp</a> (16 <a href="http://de.wikipedia.org/wiki/Bit">Bit</a> <a href="http://de.wikipedia.org/wiki/Integer_(Datentyp)">Ganzzahlen</a> mit Vorzeichen) und Vektoren davon. Diese Einfachheit erlaubt auch Programmierern ohne Vorkenntnisse <a href="http://de.wikipedia.org/wiki/Mikrocontroller">Mikrokontroller</a>-basierte Roboter zu steuern.
@@ -846,6 +846,29 @@ callsub toto</code>
 </pre>
     </div>
     <h2 id="toc15">
+      <span>Unterprogramme</span>
+    </h2>
+    <p>
+      Falls dieselben Sequenzen von Operatoren an zwei oder mehreren Orten innerhalb des Codes auftreten, genügt es, ein Unterprogramm zu schreiben und dieses von diversen Orten her aufzurufen. Ein Unterprogramm kann mit dem Stichwort <tt>sub</tt> und dem Namen des Unterprogramms definiert werden. Ein Unterprogramm kann mit dem Stichwort <tt>callsub</tt> aufgerufen werden. Unterprogramme können keine Argumente beinhalten und weder direkt noch indirekt <a href="http://de.wikipedia.org/wiki/Rekursiv">rekursiv</a> wirken. Allerdings haben Unterprogramme Zugriff auf alle Variablen.
+    </p>
+    <p>
+      Beispiel:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+#Unterprogramm Namens toto
+v = 1
+
+onevent test
+#falls Ereignis Namens test eintritt, dann
+callsub toto
+#rufe Unterprogramm toto auf</code>
+</pre>
+    </div>
+    <h2 id="toc16">
       <span>Ereignisse</span>
     </h2>
     <p>
@@ -879,29 +902,6 @@ if run == 1 then
     #Gib das Ereignis 'sensors_values' aus mit den Variablen 'proximity_sensors_values'
 end  
 #Ende des 'if' blocks</code>
-</pre>
-    </div>
-    <h2 id="toc16">
-      <span>Unterprogramme</span>
-    </h2>
-    <p>
-      Falls dieselben Sequenzen von Operatoren an zwei oder mehreren Orten innerhalb des Codes auftreten, genügt es, ein Unterprogramm zu schreiben und dieses von diversen Orten her aufzurufen. Ein Unterprogramm kann mit dem Stichwort <tt>sub</tt> und dem Namen des Unterprogramms definiert werden. Ein Unterprogramm kann mit dem Stichwort <tt>callsub</tt> aufgerufen werden. Unterprogramme können keine Argumente beinhalten und weder direkt noch indirekt <a href="http://de.wikipedia.org/wiki/Rekursiv">rekursiv</a> wirken. Allerdings haben Unterprogramme Zugriff auf alle Variablen.
-    </p>
-    <p>
-      Beispiel:
-    </p>
-    <div class="code">
-      <pre>
-<code>var v = 0
-
-sub toto
-#Unterprogramm Namens toto
-v = 1
-
-onevent test
-#falls Ereignis Namens teste eintritt, dann
-callsub toto
-#rufe Unterprogramm toto auf</code>
 </pre>
     </div>
     <h1 id="toc17">

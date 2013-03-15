@@ -14,7 +14,7 @@
       Native functions standard library
     </h1>
     <p>
-      Aseba provides a standard library of native functions. Targets should normally<sup class="footnoteref"><a id="footnoteref-1" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-1')" name="footnoteref-1">1</a></sup> provide this library. If your target's firmware holds an old version of Aseba, not all functions might be available. In Aseba version 1.1, the following functions are available:
+      Aseba provides a standard library of native functions. Targets should normally<sup class="footnoteref"><a id="footnoteref-1" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-1')" name="footnoteref-1">1</a></sup> provide this library. If your target's firmware holds an old version of Aseba, not all functions might be available. In Aseba version 1.1, the following functions are available<sup class="footnoteref"><a id="footnoteref-2" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-2')" name="footnoteref-2">2</a></sup>:
     </p>
     <dl>
       <dt>
@@ -27,7 +27,7 @@
         <tt>math.fill(A,c)</tt>
       </dt>
       <dd>
-        Fill each element of the array <img src="en_asebastdnative-eq1.png"> by the constant <img src="en_asebastdnative-eq3.png">: <img src="en_asebastdnative-eq4.png">.
+        Fill each element of the array <img src="en_asebastdnative-eq1.png"> with the constant <img src="en_asebastdnative-eq3.png">: <img src="en_asebastdnative-eq4.png">.
       </dd>
       <dt>
         <tt>math.addscalar(A, B, c)</tt>
@@ -57,7 +57,7 @@
         <tt>math.div(A, B, C)</tt>
       </dt>
       <dd>
-        Compute <img src="en_asebastdnative-eq10.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size. <em>An exception will be trigged if a division by zero occurs.</em>
+        Compute <img src="en_asebastdnative-eq10.png"> where <img src="en_asebastdnative-eq1.png">, <img src="en_asebastdnative-eq0.png"> and <img src="en_asebastdnative-eq7.png"> are three arrays of the same size. <em>An exception will be triggered if a division by zero occurs.</em>
       </dd>
       <dt>
         <tt>math.min(A, B, C)</tt>
@@ -81,25 +81,25 @@
         <tt>math.stat(V, min, max, mean)</tt>
       </dt>
       <dd>
-        Compute the maximum, the mean and the minimum values of array <img src="en_asebastdnative-eq14.png">.
+        Compute the minimum, the maximum and the mean values of array <img src="en_asebastdnative-eq14.png">.
       </dd>
       <dt>
         <tt>math.argbounds(A, argmin, argmax)</tt>
       </dt>
       <dd>
-        Get the indices <em>argmin</em> and <em>argmax</em> corresponding to the minimum respectively maximum values of <img src="en_asebastdnative-eq1.png">.
+        Get the indices <em>argmin</em> and <em>argmax</em> corresponding to the minimum respectively maximum values of array <img src="en_asebastdnative-eq1.png">.
       </dd>
       <dt>
         <tt>math.sort(A)</tt>
       </dt>
       <dd>
-        Sort array <img src="en_asebastdnative-eq1.png"> in place.
+        Sort the array <img src="en_asebastdnative-eq1.png"> in place.
       </dd>
       <dt>
         <tt>math.muldiv(A, B, C, D)</tt>
       </dt>
       <dd>
-        Compute multiplication-division using internal 32\,bit precision: <img src="en_asebastdnative-eq15.png">. <em>An exception will be trigged if a division by zero occurs.</em>
+        Compute multiplication-division using internal 32\,bit precision: <img src="en_asebastdnative-eq15.png">. <em>An exception will be triggered if a division by zero occurs.</em>
       </dd>
       <dt>
         <tt>math.atan2(A, Y, X)</tt>
@@ -123,7 +123,7 @@
         <tt>math.rot2(A, B, angle)</tt>
       </dt>
       <dd>
-        Rotate the array <img src="en_asebastdnative-eq0.png"> by <em>angle</em>, write result to <img src="en_asebastdnative-eq1.png">. <em>Note that <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> must both be arrays of size 2.</em>
+        Rotate the array <img src="en_asebastdnative-eq0.png"> by <em>angle</em>, write the result to <img src="en_asebastdnative-eq1.png">. <em>Note that <img src="en_asebastdnative-eq1.png"> and <img src="en_asebastdnative-eq0.png"> must both be arrays of size 2.</em>
       </dd>
       <dt>
         <tt>math.sqrt(A, B)</tt>
@@ -149,7 +149,10 @@
         Footnotes
       </div>
       <div class="footnote-footer" id="footnote-1">
-        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-1')">1</a>. Targets with an exceptionally low amount of flash might omit some or all functions.
+        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-1')">1</a>. Targets with an exceptionally low amount of flash memory might omit some or all functions.
+      </div>
+      <div class="footnote-footer" id="footnote-2">
+        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-2')">2</a>. The trigonometric functions apply the angles [-pi,pi[ to -32768,32767.
       </div>
     </div>
   </body>
