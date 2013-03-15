@@ -22,6 +22,7 @@
 import sys
 import os.path
 import urlparse
+import re
 
 # Custom lib
 from wikidot.tools import fetchurl
@@ -30,6 +31,21 @@ from wikidot.tools import tidy
 from wikidot.tools import fix_latex
 from wikidot.urltoname import urltoname
 from wikidot.orderedset import OrderedSet
+
+ALTERNATE_SERVERS = {
+        'wikidot': set(['wikidot', 'wdfiles']),
+        }
+
+# TODO: somewhat ugly hack...
+def _get_alternate_server(url):
+    for base_server, servers in ALTERNATE_SERVERS.iteritems():
+        for server in servers:
+            if server in url:
+                #print "Replacing ", server, " with ", base_server, "..."
+                return re.sub(server, base_server, url)
+    # no match
+    return url
+
 
 def fetchwikidot(starturl, outputdir):
     # Create the output directory, if needed
@@ -61,8 +77,10 @@ def fetchwikidot(starturl, outputdir):
             url = urlparse.urljoin(starturl, url)
             output = os.path.join(outputdir, urltoname(url))
             print >> sys.stderr, "\nProcessing ", url
-            # Link on the same server?
-            if (urlparse.urlparse(url).netloc == urlparse.urlparse(starturl).netloc):
+            # Link on the same server? If no match, search the list of alternative servers
+            start_server = urlparse.urlparse(starturl).netloc
+            link_server = urlparse.urlparse(url).netloc
+            if (link_server == start_server or _get_alternate_server(link_server) == _get_alternate_server(start_server)):
                 retval = fetchurl(url, output, breadcrumbs)
                 newlinks.update(retval['links'])
             else:
