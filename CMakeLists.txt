@@ -205,5 +205,7 @@ if(NOT CMD_LINE)
 	add_subdirectory(eventlogger)
 	
 	add_subdirectory(thymioflasher)
+
+	add_subdirectory(examples)
 endif(NOT CMD_LINE)
 
