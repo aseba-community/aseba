@@ -12,6 +12,9 @@
         <customFilter name="de">
                 <filterAttribute>lang-de</filterAttribute>
         </customFilter>
+        <customFilter name="it">
+                <filterAttribute>lang-it</filterAttribute>
+        </customFilter>
         <customFilter name="es">
                 <filterAttribute>lang-es</filterAttribute>
         </customFilter>
@@ -223,6 +226,73 @@
                         <file>doc/epuck-sensors-wiki-en.png</file>
                         <file>doc/epuck-sensors-wiki-en.svg</file>
                         <file>doc/epuck-top-grayscale.png</file>
+                        <file>doc/studio-challenge-en.png</file>
+                        <file>doc/studio-connect-en.png</file>
+                        <file>doc/studio-overlay-en.png</file>
+
+                </files>
+        </filterSection>
+
+        <filterSection>
+                <filterAttribute>lang-it</filterAttribute>
+                <toc>
+                        <section title="Manuale d&#039;uso" ref = "doc/it_asebausermanual.html">
+                                <section title="Iniziare ad usare Aseba" ref="doc/it_gettingstarted.html"></section>
+                                <section title="Concetti base" ref="doc/it_asebaconcepts.html"></section>
+                                <section title="Aseba Studio" ref="doc/it_asebastudio.html"></section>
+                                <section title="Linguaggio Aseba" ref="doc/it_asebalanguage.html"></section>
+                                <section title="Librerie standard delle funzioni native" ref="doc/it_asebastdnative.html"></section>
+                                <section title="Aseba Playground" ref="doc/it_asebaplayground.html"></section>
+                                <section title="Rimappare gli Identificatori usando asebaswitch" ref="doc/it_asebaswitchremap.html"></section>
+
+                        </section>
+
+                </toc>
+
+                <files>
+                        <file>doc/aseba.css</file>
+                        <file>doc/asebachallenge.png</file>
+                        <file>doc/epuck-sensors-wiki-en.png</file>
+                        <file>doc/it_asebaconcepts.html</file>
+                        <file>doc/it_asebalanguage.html</file>
+                        <file>doc/it_asebaplayground.html</file>
+                        <file>doc/it_asebastdnative-eq0.png</file>
+                        <file>doc/it_asebastdnative-eq1.png</file>
+                        <file>doc/it_asebastdnative-eq10.png</file>
+                        <file>doc/it_asebastdnative-eq11.png</file>
+                        <file>doc/it_asebastdnative-eq12.png</file>
+                        <file>doc/it_asebastdnative-eq13.png</file>
+                        <file>doc/it_asebastdnative-eq14.png</file>
+                        <file>doc/it_asebastdnative-eq15.png</file>
+                        <file>doc/it_asebastdnative-eq16.png</file>
+                        <file>doc/it_asebastdnative-eq17.png</file>
+                        <file>doc/it_asebastdnative-eq18.png</file>
+                        <file>doc/it_asebastdnative-eq19.png</file>
+                        <file>doc/it_asebastdnative-eq2.png</file>
+                        <file>doc/it_asebastdnative-eq20.png</file>
+                        <file>doc/it_asebastdnative-eq21.png</file>
+                        <file>doc/it_asebastdnative-eq22.png</file>
+                        <file>doc/it_asebastdnative-eq23.png</file>
+                        <file>doc/it_asebastdnative-eq24.png</file>
+                        <file>doc/it_asebastdnative-eq25.png</file>
+                        <file>doc/it_asebastdnative-eq26.png</file>
+                        <file>doc/it_asebastdnative-eq27.png</file>
+                        <file>doc/it_asebastdnative-eq28.png</file>
+                        <file>doc/it_asebastdnative-eq29.png</file>
+                        <file>doc/it_asebastdnative-eq3.png</file>
+                        <file>doc/it_asebastdnative-eq30.png</file>
+                        <file>doc/it_asebastdnative-eq31.png</file>
+                        <file>doc/it_asebastdnative-eq4.png</file>
+                        <file>doc/it_asebastdnative-eq5.png</file>
+                        <file>doc/it_asebastdnative-eq6.png</file>
+                        <file>doc/it_asebastdnative-eq7.png</file>
+                        <file>doc/it_asebastdnative-eq8.png</file>
+                        <file>doc/it_asebastdnative-eq9.png</file>
+                        <file>doc/it_asebastdnative.html</file>
+                        <file>doc/it_asebastudio.html</file>
+                        <file>doc/it_asebaswitchremap.html</file>
+                        <file>doc/it_asebausermanual.html</file>
+                        <file>doc/it_gettingstarted.html</file>
                         <file>doc/studio-challenge-en.png</file>
                         <file>doc/studio-connect-en.png</file>
                         <file>doc/studio-overlay-en.png</file>
