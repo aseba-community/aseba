@@ -1,0 +1,937 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Linguaggio Aseba
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Linguaggio Aseba
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Contenuti
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Commenti</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Scalari</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc2">Notazione</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc3">Variabili</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc4">Parole chiave riservate</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc5">Costanti</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc6">Array</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc7">Costruttori di Array</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc8">Espressioni e assegnazioni</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc9">Uso</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc10">Controllo di flusso</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc11">Condizioni</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc12">Loop</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc13">Blocchi</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc14">Subroutine</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc15">Eventi</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc16">Direttiva Return</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc17">Funzioni native</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc18">Cosa leggere ora?</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Questa documentazione è anche disponibile in Aseba Studio nell'item di menu <tt>Help-&gt;Language</tt>. Quando si utilizzano parole tecniche, queste sono collegate ai corrispondenti articoli di Wikipedia, in Italiano dove disponibili, oppure in Inglese. Si consiglia di leggere prima la pagina relativa ai <a href="it_asebaconcepts.html">concetti di base</a> di Aseba. Questa documentazione presenta il linguaggio com'è a partire dalla versione 1.2 di Aseba. Per versioni più vecchie leggere <a href="http://aseba.wikidot.com/en:asebalanguage-1-1">questa pagina</a>.
+    </p>
+    <p>
+      Il linguaggio di Aseba assomiglia a quello di <a href="http://it.wikipedia.org/wiki/Matlab">Matlab</a> (un linguaggio comune di programmazione scientifica); questa somiglianza consente agli sviluppatori con una conoscenza precedente di qualche linguaggio di scripting di trovarsi velocemente a proprio agio con Aseba e quindi abbassare la curva di apprendimento. Semanticamente, è un semplice <a href="http://it.wikipedia.org/wiki/Programmazione_imperativa">linguaggio di programmazione imperativo</a> con un singolo <a href="http://http://it.wikipedia.org/wiki/Tipo_di_dato">tipo di dato</a> (<a href="http://it.wikipedia.org/wiki/Numero_intero_%28informatica%29">intero</a> a 16 bit <a href="http://it.wikipedia.org/wiki/Rappresentazione_dei_numeri_relativi">con segno</a> ) e <a href="http://it.wikipedia.org/wiki/Array">arrays</a>. Questa semplicità consente agli sviluppatori di programmare comportamenti senza una precedente conoscenza di un <a href="http://it.wikipedia.org/wiki/Sistema_dei_tipi">sistema dei tipi</a>, essendo gli interi il più naturale tipo di variabile e molto indicato per programmare robot basati su <a href="http://it.wikipedia.org/wiki/Microcontroller">microcontrollori</a>.
+    </p>
+    <h1 id="toc0">
+      <span>Commenti</span>
+    </h1>
+    <p>
+      I commenti consento di aggiungere nel codice delle informazioni testuali che vengono ignorate dal <a href="http://it.wikipedia.org/wiki/Compiler">compilatore</a>. I commenti sono molto utili per annotare il codice con informazioni comprensibili dall'essere umano o per disabilitare temporaneamente dei pezzi di codice.I commenti iniziano con <em>#</em> e termiano alla fine della linea.
+    </p>
+    <p>
+      Esempio
+    </p>
+    <div class="code">
+      <pre>
+<code># Questo è un commento
+var b # un altro commento</code>
+</pre>
+    </div><br />
+    Sono anche possibili commenti su più linee. Essi iniziano con <em>#*</em> e terminano con <em>*#</em>.
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>#*
+Questo è un commento
+su più linee
+*#
+var b # semplice commento</code>
+</pre>
+    </div>
+    <h1 id="toc1">
+      <span>Scalari</span>
+    </h1>
+    <p>
+      I <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">valori scalari</a> sono utilizzati in Aseba per rappresentare in umeri. Essi possono essere utilizzati in qualsiasi espressione, come l'inizializzazione di variabili, espressioni matematiche o condizioni logiche.
+    </p>
+    <h2 id="toc2">
+      <span>Notazione</span>
+    </h2>
+    <p>
+      Gli scalari possono essere rappresentati utilizzando varie <a href="http://it.wikipedia.org/wiki/Base_%28aritmetica%29">basi</a>. Il modo più naturale è il <a href="http://it.wikipedia.org/wiki/Sistema_numerico_decimale">sistema numerico decimale</a>, usando cifre da 0 a 9. I numeri negativi sono dichiarati utilizzando il segno meno <tt>-</tt> di fronte al numero.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>i = 42
+i = 31415
+i = -7</code>
+</pre>
+    </div>
+    <p>
+      Possono essere anche utilizzati numeri <a href="http://it.wikipedia.org/wiki/Sistema_numerico_binario">binari</a> e <a href="http://it.wikipedia.org/wiki/Sistema_numerico_esadecimale">esadecimali</a>. I numeri binari sono prefissati da <tt>0b</tt>, mentre i numeri esadecimali sono prefissati da <tt>0x</tt>.
+    </p>
+    <p>
+      Esempio
+    </p>
+    <div class="code">
+      <pre>
+<code># notazione binaria
+i = 0b110         # i = 6
+i = 0b11111111    # i = 255
+
+# notazione esadecimale
+i = 0x10    # i = 16
+i = 0xff    # i = 255</code>
+</pre>
+    </div>
+    <h1 id="toc3">
+      <span>Variabili</span>
+    </h1>
+    <p>
+      Le variabili si riferiscono sia singoli valori <a href="http://en.wikipedia.org/wiki/Scalar_%28computing%29">scalari</a> o array di valori scalari. I valori sono compresi tra -32768 e 32767, che è l'intervallo di validità per gli interi a 16 bit con segno. E' necessario dichiarare tutte le variabili definite dall'utente, utilizzando la parola chiave <tt>var</tt> all'inizio di uno script Aseba, prima di fare qualsiasi elaborazione.
+    </p>
+    <p>
+      Il nome delle variabili è definito secondo queste semplici regole:
+    </p>
+    <ul>
+      <li>Il nome può solo contenere caratteri alfabetici maiuscoli o minuscoli ed i caratteri '_' o '.'
+      </li>
+      <li>Il nome deve iniziare con un carattere alfabetico valido, oppure con '_'
+      </li>
+      <li>Il nome è sensibile alle maiuscole o minuscole: una variabile con nome "foo" è differente da un'altra chiamata "Foo"
+      </li>
+      <li>Il nome non può coincidere con una parola chiave Aseba (vedere l'elenco delle <a href="http://aseba.wikidot.com/it:asebausermanual#restricted-keywords">parole chiave</a> riservate)
+      </li>
+    </ul>
+    <p>
+      Le Variabili possono essere inizializzate nella dichiarazioni, utilizzando il simbolo di assegnazione in combinazione con qualsiasi espressione matematica valida.<br />
+      Una variabile non precedentemente inizializzata può contenere qualsiasi valore. Non si deve mai assumere che una variabile non inizializzata abbia valore zero.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a
+var b = 0
+var c = 2*a + b        # attenzione: 'a' non viene inizializzata</code>
+</pre>
+    </div>
+    <h2 id="toc4">
+      <span>Parole chiave riservate</span>
+    </h2>
+    <p>
+      <a name="restricted-keywords" id="restricted-keywords"></a>
+    </p>
+    <p>
+      Le seguenti parole chiave non possono essere utilizzate come nomi validi per variabili, perchè sono già utilizzate dal linguaggio Aseba.
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th colspan="4">
+          Parole chiave
+        </th>
+      </tr>
+      <tr>
+        <td>
+          abs
+        </td>
+        <td>
+          call
+        </td>
+        <td>
+          callsub
+        </td>
+        <td>
+          do
+        </td>
+      </tr>
+      <tr>
+        <td>
+          else
+        </td>
+        <td>
+          elseif
+        </td>
+        <td>
+          emit
+        </td>
+        <td>
+          end
+        </td>
+      </tr>
+      <tr>
+        <td>
+          for
+        </td>
+        <td>
+          if
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          onevent
+        </td>
+      </tr>
+      <tr>
+        <td>
+          return
+        </td>
+        <td>
+          step
+        </td>
+        <td>
+          sub
+        </td>
+        <td>
+          then
+        </td>
+      </tr>
+      <tr>
+        <td>
+          var
+        </td>
+        <td>
+          when
+        </td>
+        <td>
+          while
+        </td>
+        <td></td>
+      </tr>
+    </table>
+    <h2 id="toc5">
+      <span>Costanti</span>
+    </h2>
+    <p>
+      In Aseba Studio si possono definire delle <a href="http://it.wikipedia.org/wiki/Costante_%28informatica%29">costanti</a> utilizzando il pannello "Constants" ma non possono essere definite direttamente nel codice. Una costante rappresenta un valore numerico che può essere utilizzato in tutti i punti del codice dove si può utilizzare un numero.<br />
+      Diversamente da una variabile, una costante non può essere modificata durante l'esecuzione. Le costanti sono utili quando si vuole facilmente cambiare il comportamento tra differenti esecuzioni, come ad esempio quando si vuole adattare un valore di soglia condiviso da diversi nodi Aseba. Una costante non può avere lo stesso nome di una variabile, altrimenti viene rilevato un errore dal compilatore.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code># assumiamo l'esistenza di una costante di nome THRESHOLD
+var i = 600
+
+if i &gt; THRESHOLD then
+    i = THRESHOLD - 1
+end</code>
+</pre>
+    </div>
+    <h2 id="toc6">
+      <span>Array</span>
+    </h2>
+    <p>
+      Gli Array rappresentano aree contigue di memoria, indirizzate da una singola unità logica. La dimensione di un array è fissa e deve essere specificata nella dichiarazione. Gli array possono essere dichiarati usando le solite <a href="http://en.wikipedia.org/wiki/Bracket#Uses_of_.22.5B.22_and_.22.5D.22">parentesi quadre</a> <tt>[]</tt>. Il numero tra parentesi quadre specifica il numero di elementi che devono essere assegnati all'array e che ne rappresenta la dimensione. Può essere una espressione costante, comprese operazioni matematiche tra scalari e costanti. Utilizzando il costruttore dell'array (vedi sotto) è possibile definire una assegnazione opzionale dei valori dell'array. Se si fa in questo modo, non è necessario definire la dimensione dell'array.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[10]                   # array di 10 elementi
+var b[3] = [2, 3, 4]        # inizializzazione
+var c[] = [3, 1, 4, 1, 5]   # dimensione implicita di 5 elementi
+var d[3*FOO-1]              # dimensione definita utilizzando una espressione costante (FOO è dichiarata come costante)</code>
+</pre>
+    </div>
+    <p>
+      Gli arrays possono essere acceduti in vari modi:
+    </p>
+    <ul>
+      <li>Un singolo elemento è acceduto utilizzando le parentesi quadre con un singolo valore. L'indice di un array parte da zero e arriva fino alla dimensione meno uno. Qualsiasi espressione può essere utilizzata come indice comprese espressioni matematiche che includono altre variabili.
+      </li>
+      <li>un sottoinsieme di elmenti può essere acceduto specificando le parentesi quadre e due espressioni cstanti separate da due punti ':'.
+      </li>
+      <li>Se le parentesi quadre sono omesse, l'intero array è acceduto.
+      </li>
+    </ul>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var foo[5] = [1,2,3,4,5]
+var i = 1
+var a
+var b[3]
+var c[5]
+var d[5]
+
+a = foo[0]       # copia il primo elemento di  'foo' in 'a'
+a = foo[2*i-2]       # idem
+b = foo[1:3]       # prendi il secondo, terzo e quarto elemento  di 'foo' e copiali in 'b'
+b = foo[1:2*2-1]   # idem
+c = foo           # copia i 5 elementi dall'array 'foo' nell'array 'c'
+d = c * foo       # moltiplica gli elementi degli arrays 'foo' e 'c' elemento per  elemento e copia il risultato in 'd'</code>
+</pre>
+    </div>
+    <h2 id="toc7">
+      <span>Costruttori di Array</span>
+    </h2>
+    <p>
+      I costruttori di array sono un modo per costruire array partendo da variabili, altri array, scalari, o anche espressioni complesse. Sono utili in molti casi, per esempio quando si inizializzano altri array, o come operandi in espressioni, funzioni ed eventi. Un costruttore di un array è fatto utilizzando le parentesi quadre che racchiudono diverse espressioni separate da <tt>,</tt> (virgola). la dimensione di un costruttore di un array è pari alla somma delle dimensioni dei singoli elementi, e deve coincidere con la dimensione dell'array in cui il risultato è memorizzato.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[5] = [1,2,3,4,5]    # costruttore per inizializzare un array
+var b[3] = [a[1:2],0]    # l'array b viene inizializzato a [2,3,0]
+a = a + [1,1,1,1,1]    # aggiungi 1 a ciascun elemento dell'array a
+a = [b[1]+2,a[0:3]]    # l'array a conterrà [5,2,3,4,5]</code>
+</pre>
+    </div>
+    <h1 id="toc8">
+      <span>Espressioni e assegnazioni</span>
+    </h1>
+    <p>
+      Le espressioni consentono di effettuare calcoli matematici e sono scritte usando la normale notazione matematica <a href="http://it.wikipedia.org/wiki/Notazione_infissa">infissa</a>. Le assegnazioni utilizzano la parola chiave <tt>=</tt> e assegnano il risultato del calcolo di una espressione ad una variabilie scalare, un elemento di un array o un intero array, a seconda della dimensione dell'operando. Aseba fornisce vari operatori. Fare riferimento alla tabella seguente per una breve descrizione e per conoscere la precedenza di ciascun operatore. Per eseguire le espressioni in un ordine diverso da quello stabilito dalla precedenza degli operatori si possono usare le parentesi.
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th>
+          <a href="http://it.wikipedia.org/wiki/Ordine_delle_operazioni">Precedenza</a>
+        </th>
+        <th>
+          <a href="http://it.wikipedia.org/wiki/Operatore_%28informatica%29">Operatore</a>
+        </th>
+        <th>
+          Descrizione
+        </th>
+        <th>
+          <a href="http://it.wikipedia.org/wiki/Associativit%C3%A0">Associatività</a>
+        </th>
+        <th>
+          <a href="http://it.wikipedia.org/wiki/Ariet%C3%A0">Numero argomenti</a>
+        </th>
+      </tr>
+      <tr>
+        <td>
+          1
+        </td>
+        <td>
+          ()
+        </td>
+        <td>
+          raggruppa in sottoespressioni
+        </td>
+        <td></td>
+        <td>
+          unaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          2
+        </td>
+        <td>
+          * /
+        </td>
+        <td>
+          moltiplicazione e divisione
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %
+        </td>
+        <td>
+          <a href="http://it.wikipedia.org/wiki/Operazione_modulo">Modulo</a>
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          3
+        </td>
+        <td>
+          + -
+        </td>
+        <td>
+          Addizione, sottrazione
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          4
+        </td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt; &gt;&gt;</span>
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift">scorrimento a destra, scorrimento a sinistra</a>
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          5
+        </td>
+        <td>
+          |
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Bitwise_operation#OR">Or binaria</a>
+        </td>
+        <td>
+          associativa a sinistra
+        </td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          6
+        </td>
+        <td>
+          ^
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Bitwise_operation#XOR">or esclusiva binaria (xor)</a>
+        </td>
+        <td>
+          associativa a sinistra
+        </td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          7
+        </td>
+        <td>
+          &amp;
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Bitwise_operation#AND">AND binaria</a>
+        </td>
+        <td>
+          associativa a sinstra
+        </td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          8
+        </td>
+        <td>
+          -
+        </td>
+        <td>
+          meno unario
+        </td>
+        <td></td>
+        <td>
+          unaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          9
+        </td>
+        <td>
+          ~
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Bitwise_operation#NOT">NOT binario</a>
+        </td>
+        <td></td>
+        <td>
+          unaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          10
+        </td>
+        <td>
+          abs
+        </td>
+        <td>
+          <a href="http://it.wikipedia.org/wiki/Valore_assoluto">valore assoluto</a>
+        </td>
+        <td></td>
+        <td>
+          unaria
+        </td>
+      </tr>
+      <tr>
+        <td>
+          11
+        </td>
+        <td>
+          =
+        </td>
+        <td>
+          Assegnazione
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          |= ^= &amp;=
+        </td>
+        <td>
+          Assegnazione con or, xor, and
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          *= /=
+        </td>
+        <td>
+          Assegnazione con prodotto e quoziente
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          %=
+        </td>
+        <td>
+          Assegnazione con modulo
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          += -=
+        </td>
+        <td>
+          Assegnazione con somma e differenza
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span style="white-space: pre-wrap;">&lt;&lt;= &gt;&gt;=</span>
+        </td>
+        <td>
+          Assegnazione by left / right shift
+        </td>
+        <td></td>
+        <td>
+          binaria
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          ++ <span style="white-space: pre-wrap;">--</span>
+        </td>
+        <td>
+          <a href="http://en.wikipedia.org/wiki/Increment_and_decrement_operators">incremento e decremento</a>
+        </td>
+        <td></td>
+        <td>
+          unaria
+        </td>
+      </tr>
+    </table>
+    <p>
+      La versione con <em>assegnazione</em> dell'operatore binario funziona applicando l'operatore ad una variabile e memorizzando il risultato nella variabile stessa. Per esempio <tt>A *= 2</tt> è equivalente a scrivere <tt>A = A * 2</tt>. Queste forme abbreviate hanno lo scopo di rendere il codice più leggibile.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>a = 1 + 1
+# Risultato: a = 2
+a *= 3
+# Risultato: a = 6
+a++
+# Risultato: a = 7
+
+b = b + d[0]
+b = (a - 7) % 5
+c[a] = d[a]
+c[0:1] = d[2:3] * [3,2]</code>
+</pre>
+    </div>
+    <h2 id="toc9">
+      <span>Uso</span>
+    </h2>
+    <p>
+      Le espressioni matematiche sono strumenti di tipo generale. Come tali possono essere usate in una grande varietà di situazioni. Eccone alcune:
+    </p>
+    <ul>
+      <li>Sulla parte destra di una assegnazione
+      </li>
+      <li>Come indice quando si accede ad un elemento di un array
+      </li>
+      <li>All'interno di chiamate di funzioni
+      </li>
+      <li>Come argomenti quando si emette un evento
+      </li>
+    </ul>
+    <h1 id="toc10">
+      <span>Controllo di flusso</span>
+    </h1>
+    <h2 id="toc11">
+      <span>Condizioni</span>
+    </h2>
+    <p>
+      Aseba fornisce due tipi di <a href="http://en.wikipedia.org/wiki/Conditional_%28programming%29">condizionali</a>: <tt>if</tt> e <tt>when</tt>. Questi consistono nella verifica di una condizione e in un blocco di codice. Il test consiste in un confronti opzionalmente raggruppati usando <tt>and</tt> (<a href="http://it.wikipedia.org/wiki/Algebra_di_Boole#AND">congiunzione logica</a>), <tt>or</tt> (<a href="http://it.wikipedia.org/wiki/Algebra_di_Boole#OR">disgiunzione logica</a>), e <tt>not</tt> (<a href="http://it.wikipedia.org/wiki/Algebra_di_Boole#NOT">negazione logica</a>) operatori e parentesi.<br />
+      Un confronto è fatto da un <a href="http://en.wikipedia.org/wiki/Relational_operator">operatore</a> e due <a href="http://en.wikipedia.org/wiki/Operand">operandi</a>, e può essere vero o falso. Gli operandi possono essere espressioni arbitrarie. La seguente tabella elenca gli operatori di confronto.
+    </p>
+    <table class="wiki-content-table">
+      <tr>
+        <th>
+          <a href="http://en.wikipedia.org/wiki/Relational_operator">Operatore</a>
+        </th>
+        <th>
+          Funzione di verità
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <tt>==</tt>
+        </td>
+        <td>
+          vero se i due operandi sono uguali
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>!=</tt>
+        </td>
+        <td>
+          vero se i due operandi sono differenti
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&gt;</tt>
+        </td>
+        <td>
+          vero se il priomo operando è strettamente maggiore del secondo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&gt;=</tt>
+        </td>
+        <td>
+          vero se il primo operando è maggiore o uguale al secondo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&lt;</tt>
+        </td>
+        <td>
+          vero se il primo operando è strettamente minore del secondo
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <tt>&lt;=</tt>
+        </td>
+        <td>
+          vero se il primo operando è minore o uguale al secondo
+        </td>
+      </tr>
+    </table>
+    <p>
+      Sia <tt>if</tt> che <tt>when</tt> eseguono differenti blocchi di codice a seconda se la condizione è vera o falsa; ma <tt>when</tt> esegue il blocco corrispondente a vero solo se l'ultima valutazione del codice era falsa e quella corrente è vera. Questo consente l'esecuzione del codice solo quando qualcosa cambia. Il condizionale <tt>if</tt> esegue un primo blocco di codice se la condizione è vera. Si può aggiungere un secondo blocco di codice da eseguire quando la condizione è falsa tramite la parola chiave <tt>else</tt>. E' possibile concatenare ulterioni condizionali <tt>if</tt> usando la parola chiave <tt>elseif</tt>.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>if a - b &gt; c[0] then
+    c[0] = a
+elseif a &gt; 0 then
+    b = a
+else
+    b = 0
+end
+
+if a &lt; 2 and a &gt; 2 then
+    b = 1
+else
+    b = 0
+end
+
+when a &gt; b do
+    leds[0] = 1
+end</code>
+</pre>
+    </div><br />
+    Il blocco <tt>when</tt> viene eseguito solo quando <tt>a</tt> <em>diventa</em> maggiore di <tt>b</tt>.
+    <h2 id="toc12">
+      <span>Loop</span>
+    </h2>
+    <p>
+      Due costrutti consentono la creazione di iterazioni ad anello (loop) <tt><a href="http://it.wikipedia.org/wiki/While_loop">while</a></tt> e <tt><a href="http://it.wikipedia.org/wiki/For_loop">for</a></tt>.
+    </p>
+    <p>
+      Una iterazione ad anello con <tt>while</tt> esegue ripetutamente un blocco di codice fintanto che la condizione specificata sia vera. La condizione è della stessa forma di quella usata da <tt>if</tt>.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>while i &lt; 10 do
+    v = v + i * i
+    i = i + 1
+end</code>
+</pre>
+    </div>
+    <p>
+      Una iterazione ad anello con <tt>for</tt> consente ad una variabile <a href="http://en.wikipedia.org/wiki/Iterate">di iterare</a> su un intervallo di interi, con una dimensione del passo di incremento specificabile. Il passo di incremento può anche essere negativo. In questo caso la variabile si decrementa della quantità specificata andando dal valore maggiore al valore minore indicato dopo la parola chiave <tt>in</tt>.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>for i in 1:10 do
+    v = v + i * i
+end
+# ad ogni iterazione la variabile i viene incrementata di 1 e si andrà da 1 a 10
+for i in 30:1 step -3 do
+    v = v - i * i
+end
+# ad ogni iterazione la variabile i viene decrementata di 3 e si andrà da 30 a 1</code>
+</pre>
+    </div>
+    <h1 id="toc13">
+      <span>Blocchi</span>
+    </h1>
+    <h2 id="toc14">
+      <span>Subroutine</span>
+    </h2>
+    <p>
+      Quando volete eseguire la stessa sequenza di codice in due o tre posti nel programma, è possibile scrivere il codice in comune in un sottoprogramma e quindi richiamare questo sottoprogramma da posti diversi. E' possibile definire un sottoprogramma usando la parola chiave <tt>sub</tt> seguita dal nome del sottoprogramma. Potete chiamare il sottoprogramma usando la parola chiave <tt>callsub</tt>, seguita dal nome del sottoprogramma. I sottoprogrammi devono essere definiti prima di essere chiamati. I sottoprogrammi non possono avere argomenti né essere recursivi <a href="http://en.wikipedia.org/wiki/Recursion_%28computer_science%29">recursive</a>, cioè non possono richiamare se stessi né direttamente, nè indirettamente .<br />
+      I sottoprogrammi possono accedere a qualsiasi variabile (in Aseba tutte le variabili sono globali).
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+v = 1
+
+onevent test
+callsub toto</code>
+</pre>
+    </div>
+    <h2 id="toc15">
+      <span>Eventi</span>
+    </h2>
+    <p>
+      Aseba ha una <a href="http://it.wikipedia.org/wiki/Programmazione_a_eventi">architettura basata su eventi</a>, cioè gli eventi possono scatenare l'esecuzione di codice in maniera asincrona.
+    </p>
+    <p>
+      Gli eventi possono essere esterni, per esempio eventi definiti dall'utente in arrivo da altrun altro nodo Aseba, o interni, per esempio emessi da un sensore che fornisca un dato aggiornato.<br />
+      Il ricevimento di una notifica di un evento fa eseguire, se definito, il blocco di codice che inizia con la parola chiave <tt>onevent</tt> seguita dal nome dell'evento.Il codice in cima al programma è eseguito quando il programma è avviato o riavviato.<br />
+      Il programma può anche emettere un evento utilizzando la parola chiave <tt>emit</tt>, seguita dal nome dell'evento e dagli argomenti dell'evento stesso (se previsti). Se viene fornita una variabile questa deve avere una dimensione corrispondente a quella specificata negli <a href="http://it.wikipedia.org/wiki/Parametro_%28programmazione%29">argomenti</a> dell'evento che deve essere emesso. Invece di una variabile, in situazioni più complesse è anche possibile utilizzare come argomenti di un evento costruttori di array ed espressioni matematiche. Gli eventi consentono al programma di causare l'esecuzione di codice su un altro nodo o di comunicare con un programma esterno.
+    </p>
+    <p>
+      Per consentire l'esecuzione del codice relativo ad un nuovo evento gli script non devono bloccarsi e non devono contenere iterazioni ad anello infinite. Per esempio nel contesto della robotica spesso si ricorre ad una iterazione ad anello infinita all'interno della quale vengono eseguite tutte le elaborazioni legate ai valori dei sensori. Nel linguaggio Aseba invece il codice viene eseguito se specificato per un dato evento. Se l'evento si realizza allora verrà richiamato il sottoprogramma relativo.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var run = 0
+
+onevent start
+run = 1
+
+onevent stop
+run = 0
+
+onevent ir_sensors
+if run == 1 then
+    emit sensors_values proximity_sensors_values
+end</code>
+</pre>
+    </div>
+    <h2 id="toc16">
+      <span>Direttiva Return</span>
+    </h2>
+    <p>
+      E' possibile uscire da una subroutine e sospendere l'esecuzione di uno script attivato da un evento con la direttiva <tt>return</tt>.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var v = 0
+
+sub toto
+if v == 0 then
+    return
+end
+v = 1
+
+onevent test
+callsub toto
+return
+v = 2</code>
+</pre>
+    </div>
+    <h1 id="toc17">
+      <span>Funzioni native</span>
+    </h1>
+    <p>
+      Il linguaggio di script Aseba è stato progettato per essere semplice e consentire una rapida comprensione anche per sviluppatori inesperti e per realizzare la macchina virtuale efficientemente su un micro-controller. Per eseguire calcoli complessi o che fanno uso intenso di risorse, forniamo funzioni native realizzate in codice nativo per maggior efficienza.<br />
+      Per esempio una funzione nativa è il modo naturale di realizzare un prodotto scalare.
+    </p>
+    <p>
+      Le funzioni native sono sicure poiché specificano e verificano la dimensione dei loro argomenti, che possono essere costanti, variabili, celle di array, costruttori di array ed espressioni. Nel caso di array, potete accedere all'intero array, un singolo elemento, o un sotto-insieme dell'array. Le funzioni native accettano i loro argomenti per <a href="http://en.wikipedia.org/wiki/Call_by_reference#Call_by_reference">reference</a> e possono modificare il loro contenuto, ma non restituiscono alcun valore. Si possono richiamare le funzioni native per mezzo della parola chiave <tt>call</tt>.
+    </p>
+    <p>
+      Esempio:
+    </p>
+    <div class="code">
+      <pre>
+<code>var a[3] = 1, 2, 3
+var b[3] = 2, 3, 4
+var c[5] = 5, 10, 15
+var d
+call math.dot(d, a, b, 3)
+call math.dot(d, a, c[0:2], 3)
+call math.dot(a[0], c[0:2], 3)</code>
+</pre>
+    </div>
+    <h1 id="toc18">
+      <span>Cosa leggere ora?</span>
+    </h1>
+    <p>
+      Potreste essere interessati a leggere:
+    </p>
+    <ul>
+      <li>
+        <a href="it_asebastdnative.html">Descrizione della libreria standard delle funzioni native</a>
+      </li>
+    </ul>
+  </body>
+</html>
