@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# This program show how to interface with Aseba (medulla) using D-Bus.
+# To use it, you must first run asebamedulla on your computer to connect
+# to an Aseba network.
+
 import dbus
 import dbus.mainloop.glib
 import gobject
