@@ -27,6 +27,9 @@
               <div style="margin-left: 1em;">
                 <a href="#toc1">Event</a>
               </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">What to read next?</a>
+              </div>
             </div>
           </div>
         </td>
@@ -47,5 +50,22 @@
     <p>
       Aseba is an <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-based architecture</a>, which means that events trigger code execution asynchronously. Events have an identifier and optional payload data. Aseba nodes can exchange events, and these can be of two types. The events that Aseba nodes exchange within an Aseba network are called global events. The events that are internal to a node are called local events. An example of a local event is the one emitted by a sensor that provides updated data. If the code for receiving an event is defined, then the corresponding block of code is executed when the event is received. Code can also <a href="en_asebalanguage.html">emit events</a>, which can trigger the execution of code on another node or enable communication with an external program. To start the execution of related code upon receiving new events, scripts must not block and thus must not contain any infinite loops. For instance, in the context of robotics, where a traditional robot control program would do some processing inside an infinite loop, an Aseba script would just do the processing inside a sensor-related event.
     </p>
+    <h1 id="toc2">
+      <span>What to read next?</span>
+    </h1>
+    <p>
+      You might be interested to read:
+    </p>
+    <ul>
+      <li>
+        <a href="en_asebastudio.html">Documentation of the integrated development environment</a>
+      </li>
+      <li>
+        <a href="en_asebalanguage.html">Description of the Aseba language</a>
+      </li>
+      <li>
+        <a href="en_asebastdnative.html">Description of the native functions standard library</a>
+      </li>
+    </ul>
   </body>
 </html>

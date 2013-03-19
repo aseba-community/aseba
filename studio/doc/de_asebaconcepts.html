@@ -18,7 +18,7 @@
         <td>
           <div id="toc" class="floatright">
             <div class="title">
-              Table of Contents
+              Inhaltsverzeichnis
             </div>
             <div id="toc-list">
               <div style="margin-left: 1em;">
@@ -45,7 +45,7 @@
       <span>Ereignisse</span>
     </h1>
     <p>
-      Aseba ist eine <a href="http://de.wikipedia.org/wiki/Ereignis_%28Programmierung%29">ereignisgesteuerte Architektur</a>. Das bedeutet, dass Programme durch Ereignisse ausgelöst werden und unregelmässig (asynchron) ablaufen. Ereignisse haben einen Bezeichner (Identifier) und optionale Nutzdaten. Aseba-Knoten können zwei Arten von Ereignisse austauschen. Ereignisse, die Aseba-Knoten innerhalb eines Aseba-Netzwerkes austauschen, heissen "globale" Ereignisse. "Lokale" Ereignisse hingegen sind intern und werden im Innern eines einzelnen Knotens ausgetauscht. Ein Beispiel für ein lokales Ereignis ist ein Ereignis, das von einem Sensor ausgelöst wird, wenn neue Daten bereit stehen. Ist der Programmcode zum Empfangen von einem Ereignis einmal definiert, wird der entsprechende Block im Programmcode ausgeführt, sobald das Ereignis empfangen wurde. Programmcode kann auch <a href="de_asebalanguage.html">Ereignisse erzeugen</a>, welche dann ihrerseits zur Ausführung von Code auf anderen Knoten führen oder die Kommunikation mit einem externen Programm ermöglichen. Damit der Programmcode auch ausgeführt wird, sobald neue Ereignisse empfangen wurden, dürfen Skripte nicht blockieren und müssen daher frei von Endlosschleifen sein. Mit Bezug zu Anwendungen in der Robotik, wo herkömmliche Steuerungsprogramme von Robotern Prozesse in Endlosschleifen abarbeiten, führt ein Aseba-Skript dieselben Prozessschritte auf Grund von einem Sensor-basierten Ereignis aus.
+      Aseba ist eine <a href="http://de.wikipedia.org/wiki/Ereignis_%28Programmierung%29">ereignisgesteuerte Architektur</a>. Das bedeutet, dass Programme durch Ereignisse ausgelöst werden und unregelmässig (asynchron) ablaufen. Ereignisse haben einen Bezeichner (Identifier) und optionale Nutzdaten. Es gibt 2 Arten von Ereignissen: Ereignisse, die Aseba-Knoten innerhalb eines Aseba-Netzwerkes austauschen, heissen "globale" Ereignisse. "Lokale" Ereignisse hingegen sind intern und werden im Innern eines einzelnen Knotens ausgetauscht. Ein Beispiel für ein lokales Ereignis ist ein Ereignis, das von einem Sensor ausgelöst wird, wenn neue Daten bereit stehen. Ist der Programmcode zum Empfangen von einem Ereignis einmal definiert, wird der entsprechende Block im Programmcode ausgeführt, sobald das Ereignis empfangen wurde. Programmcode kann auch mit dem Befehl "emit" <a href="de_asebalanguage.html">Ereignisse erzeugen</a>, welche dann ihrerseits zur Ausführung von Code auf anderen Knoten führen oder die Kommunikation mit einem externen Programm ermöglichen. Damit der Programmcode auch ausgeführt wird, sobald neue Ereignisse empfangen wurden, dürfen Skripte nicht blockieren und müssen daher frei von Endlosschleifen sein. Mit Bezug zu Anwendungen in der Robotik, wo herkömmliche Steuerungsprogramme von Robotern Prozesse in Endlosschleifen abarbeiten, führt ein Aseba-Skript dieselben Prozessschritte auf Grund von einem Sensor-basierten Ereignis aus.
     </p>
   </body>
 </html>

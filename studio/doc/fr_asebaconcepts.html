@@ -27,6 +27,9 @@
               <div style="margin-left: 1em;">
                 <a href="#toc1">Événement</a>
               </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Que lire ensuite ?</a>
+              </div>
             </div>
           </div>
         </td>
@@ -47,6 +50,23 @@
     <p>
       Aseba est une architecture <a href="http://fr.wikipedia.org/wiki/Programmation_%C3%A9v%C3%A9nementielle">basée sur des événements</a>, c'est à dire que des événements déclenchent l'exécution du code de façon asynchrone. Les événements ont un identificateur et transportent optionnellement des données. Les nœuds s'échangent des événements à l'intérieur d'un réseau Aseba. De plus, les événements peuvent être internes à un nœud, par exemple émis par un capteur qui possède un valeur nouvellement acquise. La réception d'un événement exécute, si défini, le bloc de code correspondant. Un script peut aussi <a href="fr_asebalanguage.html">envoyer des événements</a>, ce qui lui permet de déclencher l'exécution de code sur un autre nœud ou de communiquer avec un programme externe. Afin de permettre l'exécution du code lors de la réception d'un nouvel événement, aucun script ne doit bloquer et donc les scripts ne doivent pas contenir de boucle infinie. Par exemple dans le contexte de la robotique, où un programme de contrôle de robot traditionnel travaillerait à l'intérieur d'une boucle infinie, un script Aseba ferait simplement le travail lors d'un événement lié aux capteurs.
     </p>
+    <h1 id="toc2">
+      <span>Que lire ensuite ?</span>
+    </h1>
+    <p>
+      Les pages suivantes peuvent vous intéresser :
+    </p>
+    <ul>
+      <li>
+        <a href="fr_asebastudio.html">Documentation de Studio, l'environnement de développement intégré</a>
+      </li>
+      <li>
+        <a href="fr_asebalanguage.html">Description du langage de programmation d'Aseba</a>
+      </li>
+      <li>
+        <a href="fr_asebastdnative.html">Description de la bibliothèque standard de fonctions natives</a>
+      </li>
+    </ul>
     <hr />
   </body>
 </html>

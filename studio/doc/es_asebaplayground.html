@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      El Aseba Playground
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      El Aseba Playground
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Contenido
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Eventos</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc1">Eventos Locales</a>
+              </div>
+              <div style="margin-left: 3em;">
+                <a href="#toc2">Proximity sensors</a>
+              </div>
+              <div style="margin-left: 3em;">
+                <a href="#toc3">Camera</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc4">Emit</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc5">Variables Internas</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc6">id</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc7">source</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc8">args</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc9">leftSpeed, rightSpeed</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc10">colorR, colorG, colorB</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc11">prox</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc12">camR, camG, camB</a>
+              </div>
+              <div style="margin-left: 2em;">
+                <a href="#toc13">energy</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc14">Crea tu propio entorno</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Este material proporciona información adicional sobre como programar robots para Aseba Playground, un simulador multi-robot incluido en Aseba.
+    </p>
+    <h1 id="toc0">
+      <span>Eventos</span>
+    </h1>
+    <h2 id="toc1">
+      <span>Eventos Locales</span>
+    </h2>
+    <h3 id="toc2">
+      <span>Proximity sensors</span>
+    </h3>
+    <p>
+      El código que se encuentra luego de la instrucción <tt>onevent ir_sensors</tt> será ejecutado periódicamente, inmediatamente después de actualizar la variable (<tt>prox</tt>) - distancia hasta obstáculos.
+    </p>
+    <h3 id="toc3">
+      <span>Camera</span>
+    </h3>
+    <p>
+      El código que se encuentra luego de la instrucción <tt>onevent camera</tt> será ejecutado periódicamente, inmediatamente después de actualizar las variables <tt>camR</tt>, <tt>camG</tt>, <tt>camB</tt> - pixeles de la cámara lineal.
+    </p>
+    <h2 id="toc4">
+      <span>Emit</span>
+    </h2>
+    <p>
+      <tt>emit <em>nombre</em> [<em>argumentos</em>]</tt>
+    </p>
+    <p>
+      <tt>emit</tt> sirve para que un determinado robot emita un evento tipo (<em>nombre</em>) a los demás. El evento puede incluir hasta 32 <em>argumentos</em>. El evento no puede ser dirigido a un robot en particular - Este se transmite a todos los robots como si fuese una emisora radial (el siguiente ejemplo en [args] te muestra cómo dirigirse a un robot en especial). Es importante además, que el nombre del evento y el número de argumentos estén declarados en el panel de <em>Eventos Globales</em> de Aseba Studio.
+    </p>
+    <h1 id="toc5">
+      <span>Variables Internas</span>
+    </h1>
+    <h2 id="toc6">
+      <span>id</span>
+    </h2>
+    <p>
+      Es el identificador propio de cada robot.
+    </p>
+    <h2 id="toc7">
+      <span>source</span>
+    </h2>
+    <p>
+      Es la {id} del robot del cual se recibió el evento más reciente.
+    </p>
+    <h2 id="toc8">
+      <span>args</span>
+    </h2>
+    <p>
+      Los argumentos del evento más reciente recibido en este robot.
+    </p>
+    <p>
+      <strong>Ejemplo:</strong> Este ejemplo muestra como los eventos pueden dirigirse a un robot en especial, incluso si fueron transmitidas a todos. La idea es crear un vector en el que cada posición/casilla se destina a cada robot - al recibir el evento, el robot consultará únicamente su propia casilla.
+    </p>
+    <p>
+      El robot 1 envía el evento {avanzar} al robot 2, {espera}, luego envía el evento {avanzar} al robot 3 y {detenerse} al robot 2, {espera} y finalmente envía el evento {detenerse} a todos.
+    </p>
+    <p>
+      Código para el robot 1:
+    </p>
+    <div class="code">
+      <pre>
+<code># variables
+var counter = 0
+
+onevent ir_sensors
+
+if counter == 10 then
+    emit avanzar [1,0]
+end
+
+if counter == 100 then 
+    emit avanzar [0,1]
+end
+
+counter += 1</code>
+</pre>
+    </div>
+    <p>
+      Código para el robot 2:
+    </p>
+    <div class="code">
+      <pre>
+<code># eventos
+onevent avanzar
+    if args[0] == 1 then
+        leftSpeed = 400
+        rightSpeed = 400
+    else
+        leftSpeed = 0
+        rightSpeed = 0        
+    end
+
+onevent detenerse
+    leftSpeed = 0
+    rightSpeed = 0</code>
+</pre>
+    </div>
+    <p>
+      Código para el robot 3:
+    </p>
+    <div class="code">
+      <pre>
+<code># eventos
+onevent avanzar
+    if args[1] == 1 then
+        leftSpeed = 400
+        rightSpeed = 400
+    else
+        leftSpeed = 0
+        rightSpeed = 0        
+    end
+
+onevent detenerse
+    leftSpeed = 0
+    rightSpeed = 0</code>
+</pre>
+    </div>
+    <h2 id="toc9">
+      <span>leftSpeed, rightSpeed</span>
+    </h2>
+    <p>
+      Velocidad de las ruedas. Use 400 para avanzar lentamente.
+    </p>
+    <h2 id="toc10">
+      <span>colorR, colorG, colorB</span>
+    </h2>
+    <p>
+      Son los componentes rojo, verde y azul del color del cuerpo del robot.
+    </p>
+    <h2 id="toc11">
+      <span>prox</span>
+    </h2>
+    <p>
+      La distancia a un obstáculo percibida por los sensores de proximidad. Las mediciones pueden fluctuar debido al ruido/interferencias. Consultar el esquema <a href="es_gettingstarted.html">aquí</a>.
+    </p>
+    <h2 id="toc12">
+      <span>camR, camG, camB</span>
+    </h2>
+    <p>
+      <em>Arreglo de 60 elementos</em>. Los componentes rojo, verde y azul entregados por la cámara del robot.
+    </p>
+    <h2 id="toc13">
+      <span>energy</span>
+    </h2>
+    <p>
+      <em>Número entero: [0&nbsp;9]</em>. El nivel de energía del robot.
+    </p>
+    <h1 id="toc14">
+      <span>Crea tu propio entorno</span>
+    </h1>
+    <p>
+      Playground te permite definir escenarios personalizados. Por ejemplo, el siguiente código crea una caja con cuatro robots en ella:
+    </p>
+    <div class="code">
+      <pre>
+<code>&lt;!DOCTYPE aseba-playground&gt;
+&lt;aseba-playground&gt;
+    &lt;color name="wall" r="0.9" g="0.9" b="0.9" /&gt;
+    &lt;color name="red" r="0.77" g="0.2" b="0.15" /&gt;
+    &lt;color name="green" r="0" g="0." b="0.17" /&gt;
+    &lt;color name="blue" r="0" g="0.38" b="0.61" /&gt;
+
+    &lt;world w="110.4" h="110.4" color="wall"/&gt;
+
+    &lt;e-puck x="40" y="40"/&gt;
+    &lt;e-puck x="40" y="60"/&gt;
+    &lt;e-puck x="60" y="40"/&gt;
+    &lt;e-puck x="60" y="60"/&gt;
+&lt;/aseba-playground&gt;</code>
+</pre>
+    </div>
+    <p>
+      <strong>Ejemplo:</strong> Encuentra <a href="es_playground-barcelona.html">aquí</a> un modelo del <a href="http://es.wikipedia.org/wiki/Pabell%C3%B3n_alem%C3%A1n_(Barcelona)">Pabellón Alemán</a>, Barcelon 1929, diseñado por Mies van der Rohe.
+    </p>
+  </body>
+</html>

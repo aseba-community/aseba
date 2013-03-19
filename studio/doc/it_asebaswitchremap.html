@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Rimappare gli Identificatori usando asebaswitch
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Rimappare gli Identificatori usando asebaswitch
+    </h1>
+    <p>
+      Aseba fornisce <em>asebaswitch</em>, una utilità a livello di riga di comando che consente di connetere varie piattaforme a microcontrollore (targe). La sintassi è la seguente:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch [opzioni] [target aggiuntivi]*</code>
+</pre>
+    </div><br />
+    per ottenre informazioni di dettaglio sul comando digitare:
+    <div class="code">
+      <pre>
+<code>asebaswitch --help</code>
+</pre>
+    </div><br />
+    Notare che i target aggiuntivi devono seguire la <a href="http://download.gna.org/dashel/1.0.3/doc/">naming convention Dashel</a>.
+    <h1 id="toc0">
+      <span>Uso avanzato</span>
+    </h1>
+    <p>
+      Aseba richiede che ciascun nodo nella rete abbia un identificatore univoco, perche Aseba lo utilizza per indirizzare i dati. Tuttavia alcuni target come <a href="http://aseba.wikidot.com/it:thymio">Thymio</a>, hanno un identificatore preconfigurato nel firmware. Fortunatamente asebaswitch fornisce un meccanismo di <em>rimappatura degli identificatori</em>, che consente di rimappare l'identificatore di un target attarverso il nome del dispositivo associato dal sistema operativo al target.
+    </p>
+    <p>
+      Questo meccanismo consente, per esempio, di avere due Thymio sulla stessa rete Aseba. Sotto Linux, questo si traduce nel seguente comando:
+    </p>
+    <div class="code">
+      <pre>
+<code>asebaswitch -d "ser:device=/dev/ttyACM0;remapLocal=1" "ser:device=/dev/ttyACM1;remapLocal=2"</code>
+</pre>
+    </div>
+    <p>
+      Il meccanismo di remapping aggiunge due opzioni alla stringa di descrizione del target:
+    </p>
+    <ul>
+      <li>
+        <tt>remapLocal</tt>, l'identificatore associato al target localmente,
+      </li>
+      <li>
+        <tt>remapTarget</tt> (default: <tt>1</tt>), l'identificatore del nodo target da rimappare.
+      </li>
+    </ul>
+    <p>
+      Attualmente questo meccanismo consente di rimappare solo un nodo per target.<br />
+      E' possibile modificare e generalizzare questo comportamento sulla base della effettiva necessità.
+    </p>
+  </body>
+</html>
