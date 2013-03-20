@@ -106,6 +106,7 @@ namespace Aseba
 		connect(viewer, SIGNAL(backwardAvailable(bool)), this, SLOT(backwardAvailable(bool)));
 		connect(viewer, SIGNAL(forwardAvailable(bool)), this, SLOT(forwardAvailable(bool)));
 		connect(helpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)), viewer, SLOT(setSource(const QUrl&)));
+		connect(viewer, SIGNAL(sourceChanged(const QUrl&)), this, SLOT(sourceChanged(const QUrl&)));
 
 		// restore window state, if available
 		if (readSettings() == false)
@@ -227,6 +228,13 @@ namespace Aseba
 	void HelpViewer::homeClicked()
 	{
 		showHelp(HelpViewer::USERMANUAL);
+	}
+
+	void HelpViewer::sourceChanged(const QUrl& src)
+	{
+		QModelIndex item = helpEngine->contentWidget()->indexOf(src);
+		if (item.isValid())
+			helpEngine->contentWidget()->setCurrentIndex(item);
 	}
 
 

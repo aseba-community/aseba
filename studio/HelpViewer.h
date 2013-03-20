@@ -26,6 +26,7 @@
 #include <QString>
 #include <QPushButton>
 #include <QTextBrowser>
+#include <QModelIndex>
 
 namespace Aseba
 {
@@ -72,6 +73,7 @@ namespace Aseba
 		void nextClicked();
 		void forwardAvailable(bool state);
 		void homeClicked();
+		void sourceChanged(const QUrl& src);
 	};
 
 	class HelpBrowser: public QTextBrowser
