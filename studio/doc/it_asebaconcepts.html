@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Concetti base
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Concetti base
+    </h1>
+    <table id="toc-table" summary="TOC">
+      <tr>
+        <td>
+          <div id="toc" class="floatright">
+            <div class="title">
+              Contenuti
+            </div>
+            <div id="toc-list">
+              <div style="margin-left: 1em;">
+                <a href="#toc0">Nodi</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc1">Eventi</a>
+              </div>
+              <div style="margin-left: 1em;">
+                <a href="#toc2">Cosa leggere ora?</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Questa pagina presenta concetti importanti da comprendere quando si legge la documentazione di Aseba.
+    </p>
+    <h1 id="toc0">
+      <span>Nodi</span>
+    </h1>
+    <p>
+      In Aseba, ci possono essere diversi robot o robot con <a href="http://it.wikipedia.org/wiki/CPU">unità centrali di processamento</a> multiple in esecuzione sulla stessa rete.<br />
+      Questa rete può essere software (<a href="http://it.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a>), hardware (<a href="http://it.wikipedia.org/wiki/Controller_area_network">CAN</a>), o un misto di entrambe. Ciascun processore nella rete esegue una piccola <a href="http://it.wikipedia.org/wiki/Virtual_machine">macchina virtuale</a> ed è chiamato <em>nodo</em>. Ciascun nodo ha il suo proprio tab in <a href="it_asebastudio.html">Aseba Studio</a>, consentendo di programmare indipendentemente ciascun nodo, ma con possibili interazioni attraverso gli eventi.
+    </p>
+    <h1 id="toc1">
+      <span>Eventi</span>
+    </h1>
+    <p>
+      Aseba è un ambiente di <a href="http://it.wikipedia.org/wiki/Programmazione_a_eventi">programmazione ad eventi</a>, il che significa che gli eventi scatenano l'esecuzione del codice ad essi associato in maniera totalmente asincrona. Gli eventi hanno un identificatore e un "carico utile" opzionale (informazioni associate all'evento che possono essewre lette dal codice). I nodi Aseba nodes possono scambiare eventi e questi possono essere di due tipi.
+    </p>
+    <ul>
+      <li>Gli eventi che i nodi Aseba scambiano nella rete Aseba sono chiamati <strong>eventi globali</strong>.
+      </li>
+      <li>Gli eventi che sono interni ad un nodo sono chiamati <strong>eventi locali</strong>. Un esempio di eventi locali sono quelli emessi da un sensore che fornisce un aggiornamento sui dati.
+      </li>
+    </ul>
+    <p>
+      Se è stato definito del codice in grado di gestire un evento, questo viene esguito quando il corrispondente evento viene riconosciuto.<br />
+      Il codice può anche <a href="it_asebalanguage.html">emettere eventi</a>, che possono scatenare l'esecuzione di codice di un altro nodo o abilitare la comunicazione verso un programma esterno. Per avviare l'esecuzione del codice relativo quando viene emesso un evento, gli script non devono essere bloccanti e quindi non devono contenere loop infiniti.Per esempio nel contesto della robotica là dove tradizionalmente il programma di controllo avrebbe eseguito un qualche processamento all'interno di un loop infinito, uno script Aseba esegue il processamento all'interno del codice legato a un evento generato da un sensore.
+    </p>
+    <h1 id="toc2">
+      <span>Cosa leggere ora?</span>
+    </h1>
+    <p>
+      Potreste essere interessati a leggere:
+    </p>
+    <ul>
+      <li>
+        <a href="it_asebastudio.html">Documentazione sull'ambiente integrato di sviluppo Aseba Studio</a>
+      </li>
+      <li>
+        <a href="it_asebalanguage.html">Descrizione del linguaggio Aseba</a>
+      </li>
+      <li>
+        <a href="it_asebastdnative.html">Descrizione della libreria standard delle funzioni native</a>
+      </li>
+    </ul>
+  </body>
+</html>

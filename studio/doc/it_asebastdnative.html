@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+    <link rel="stylesheet" type="text/css" href="aseba.css" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>
+      Librerie standard delle funzioni native
+    </title>
+  </head>
+  <body>
+    <h1 class="title">
+      Librerie standard delle funzioni native
+    </h1>
+    <p>
+      Aseba fornisce una libreria standard delle funzioni native. Le piattaforme a microcontrollore utilizzate dovrebbero normalmente<sup class="footnoteref"><a id="footnoteref-1" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-1')" name="footnoteref-1">1</a></sup> fornire questa libreria. Se il vostro firmware contiene una vecchia versione della macchina virtuale Aseba, non tutte le funzioni possono essere disponibili. Nelle versioni 1.1 e successive di Aseba sono disponibili le seguenti funzioni<sup class="footnoteref"><a id="footnoteref-2" href="javascript:;" class="footnoteref" onclick="WIKIDOT.page.utils.scrollToReference('footnote-2')" name="footnoteref-2">2</a></sup>:
+    </p>
+    <dl>
+      <dt>
+        <tt>math.copy(A,B)</tt>
+      </dt>
+      <dd>
+        Copia l'array <img src="it_asebastdnative-eq0.png"> nell'array <img src="it_asebastdnative-eq1.png">, elemento per elemento: <img src="it_asebastdnative-eq2.png">.
+      </dd>
+      <dt>
+        <tt>math.fill(A,c)</tt>
+      </dt>
+      <dd>
+        Assegna a ciascun elemento dell'array <img src="it_asebastdnative-eq1.png"> la costante <img src="it_asebastdnative-eq3.png">: <img src="it_asebastdnative-eq4.png">.
+      </dd>
+      <dt>
+        <tt>math.addscalar(A, B, c)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq5.png"> dove <img src="it_asebastdnative-eq3.png"> è uno scalare.
+      </dd>
+      <dt>
+        <tt>math.add(A, B, C)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq6.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre arrays della stessa dimensione.
+      </dd>
+      <dt>
+        <tt>math.sub(A, B, C)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq8.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre arrays della stessa dimensione.
+      </dd>
+      <dt>
+        <tt>math.mul(A, B, C)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq9.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre array della stessa dimensione. <em>Notare che questo non è un <a href="http://it.wikipedia.org/wiki/Prodotto_scalare">prodotto scalare</a></em>
+      </dd>
+      <dt>
+        <tt>math.div(A, B, C)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq10.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre array della stessa dimensione. <em>Viene sollevata una eccezione nel caso in cui uno degli elementi di C contenga zero.</em>
+      </dd>
+      <dt>
+        <tt>math.min(A, B, C)</tt>
+      </dt>
+      <dd>
+        Secrive il minimo valore di ciascun elemento di <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> in <img src="it_asebastdnative-eq1.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre array della stessa dimensione: <img src="it_asebastdnative-eq11.png">.
+      </dd>
+      <dt>
+        <tt>math.max(A, B, C)</tt>
+      </dt>
+      <dd>
+        Scrive il massimo di ciascun elemento di <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> in <img src="it_asebastdnative-eq1.png"> dove <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq0.png"> e <img src="it_asebastdnative-eq7.png"> sono tre array della stessa dimensione: <img src="it_asebastdnative-eq12.png">.
+      </dd>
+      <dt>
+        <tt>math.dot(r, A, B, n)</tt>
+      </dt>
+      <dd>
+        Calcola il <a href="http://it.wikipedia.org/wiki/Prodotto_scalare">prodotto scalare</a> tra due arrays della stessa dimensione <img src="it_asebastdnative-eq1.png"> and <img src="it_asebastdnative-eq0.png">: <img src="it_asebastdnative-eq13.png">
+      </dd>
+      <dt>
+        <tt>math.stat(V, min, max, mean)</tt>
+      </dt>
+      <dd>
+        Calcola il minimo, il massimo e il valore medio dell'array <img src="it_asebastdnative-eq14.png">.
+      </dd>
+      <dt>
+        <tt>math.argbounds(A, argmin, argmax)</tt>
+      </dt>
+      <dd>
+        Scrive in <em>argmin</em> e <em>argmax</em> l'indice corrispondente rispettivamente al valore minimo e massimo degli elementi dell'array <img src="it_asebastdnative-eq1.png">.
+      </dd>
+      <dt>
+        <tt>math.sort(A)</tt>
+      </dt>
+      <dd>
+        Ordina l'array <img src="it_asebastdnative-eq1.png">.
+      </dd>
+      <dt>
+        <tt>math.muldiv(A, B, C, D)</tt>
+      </dt>
+      <dd>
+        Calcola una moltiplicazione-divisione usando una precisione interna di 32\,bit : <img src="it_asebastdnative-eq15.png">. <em>Viene sollevata una eccezione in caso di divisione per zero.</em>
+      </dd>
+      <dt>
+        <tt>math.atan2(A, Y, X)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq16.png"> utilizzando i segni di<img src="it_asebastdnative-eq17.png"> e <img src="it_asebastdnative-eq18.png"> per determinare il quadrante di uscita. <img src="it_asebastdnative-eq1.png">, <img src="it_asebastdnative-eq19.png"> e <img src="it_asebastdnative-eq20.png"> sono tre array della stessa dimensione. <em>Notare che <img src="it_asebastdnative-eq21.png"> e <img src="it_asebastdnative-eq22.png"> produrranno <img src="it_asebastdnative-eq23.png"></em>.
+      </dd>
+      <dt>
+        <tt>math.sin(A, B)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq24.png"> dove <img src="it_asebastdnative-eq1.png"> e <img src="it_asebastdnative-eq0.png"> sono due array della stessa diensione.
+      </dd>
+      <dt>
+        <tt>math.cos(A, B)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq25.png"> dove <img src="it_asebastdnative-eq1.png"> e <img src="it_asebastdnative-eq0.png"> sono due array della stessa dimensione.
+      </dd>
+      <dt>
+        <tt>math.rot2(A, B, angle)</tt>
+      </dt>
+      <dd>
+        Ruota l'array <img src="it_asebastdnative-eq0.png"> di <em>angle</em>, e scrive il risultato in <img src="it_asebastdnative-eq1.png">. <em>Notare che <img src="it_asebastdnative-eq1.png"> e <img src="it_asebastdnative-eq0.png"> devono essere entrambi di dimensione 2.</em>
+      </dd>
+      <dt>
+        <tt>math.sqrt(A, B)</tt>
+      </dt>
+      <dd>
+        Calcola <img src="it_asebastdnative-eq26.png"> dove <img src="it_asebastdnative-eq1.png"> e <img src="it_asebastdnative-eq0.png"> sono due array della stessa dimensione.
+      </dd>
+      <dt>
+        <tt>math.nzseq(a, B, m)</tt>
+      </dt>
+      <dd>
+        scrive in <img src="it_asebastdnative-eq27.png"> l'indice medio della più lunga sequenza di elementi non nulli di <img src="it_asebastdnative-eq0.png">, <img src="it_asebastdnative-eq28.png"> se non trovato o se la sequenza è di lunghezza minore di <img src="it_asebastdnative-eq29.png"> elementi.
+      </dd>
+      <dt>
+        <tt>math.rand(v)</tt>
+      </dt>
+      <dd>
+        Restituisce un valore casuale <img src="it_asebastdnative-eq30.png"> nell'intervallo <img src="it_asebastdnative-eq31.png">.
+      </dd>
+    </dl>
+    <div class="footnotes-footer">
+      <div class="title">
+        Footnotes
+      </div>
+      <div class="footnote-footer" id="footnote-1">
+        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-1')">1</a>. In alcuni casi con poca memoria a disposizione alcune o tutte le funzioni possono essere omesse dalla virtual machine Aseba
+      </div>
+      <div class="footnote-footer" id="footnote-2">
+        <a href="javascript:;" onclick="WIKIDOT.page.utils.scrollToReference('footnoteref-2')">2</a>. Le funzioni trigoniometriche mappano l'intervallo angolare [-pi,pi[ sull'intervallo degli interi -32768,32767.
+      </div>
+    </div>
+  </body>
+</html>

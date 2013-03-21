@@ -16,7 +16,7 @@
     <table id="toc-table" summary="TOC">
       <tr>
         <td>
-          <div id="toc">
+          <div id="toc" class="floatright">
             <div class="title">
               Table of Contents
             </div>
@@ -47,22 +47,21 @@
     <p>
       This page teaches you how to get started with Aseba if you do not have any physical robot. If you have a Thymio II, there exists a <a href="http://aseba.wikidot.com/en:thymioprogram">specific page</a>.
     </p>
-    <table style="margin:0; padding:0">
-      <tr>
-        <td style="margin:0; padding:0"></td>
-      </tr>
-    </table>
     <h1 id="toc0">
       <span>To start, launch <em>challenge</em></span>
     </h1>
-    <div class="image-container floatright">
-      <img src="asebachallenge.png" width="390" alt="asebachallenge.png" class="image" />
-    </div>
     <p>
       Aseba <em>challenge</em> (right image) is a simulated world where Aseba-controlled robots compete for food. You can use it as a playground to explore writing Aseba scripts or as an educational game to learn and teach programming.
     </p>
     <p>
-      To get started, you have to launch Aseba <em>challenge</em>. If Aseba is not yet installed, please follow the <a href="http://aseba.wikidot.com/en:downloadinstall">installation instructions</a>. Once <em>challenge</em> is started, you have to click on “Add a new robot”, and to choose a name for it. If you are a group, you have to add one robot for each player. You can remove all the robots by clicking “Remove all robots”. You can hide the buttons by checking “Auto hide”: the buttons will only show up when the mouse pointer is around them. You can have the camera move automatically by checking “Auto camera”. If you are moving the camera manually, the controls are the following:
+      To get started, you have to launch Aseba <em>challenge</em>. If Aseba is not yet installed, please follow the <a href="http://aseba.wikidot.com/en:downloadinstall">installation instructions</a>. Once <em>challenge</em> is started, you have to click on “Add a new robot”, and to choose a name for it.
+    </p>
+    <div class="image-container floatright">
+      <img src="asebachallenge.png" width="390" alt="asebachallenge.png" class="image" />
+    </div>
+    <p>
+      If you are a group, you have to add one robot for each player. You can remove all the robots by clicking “Remove all robots”. You can hide the buttons by checking “Auto hide”: the buttons will only show up when the mouse pointer is around them.<br />
+      You can have the camera move automatically by checking “Auto camera”. If you are moving the camera manually, the controls are the following:
     </p>
     <ul>
       <li>ctrl + left mouse button: rotate view
@@ -72,11 +71,14 @@
       <li>ctrl + shift + right mouse button: displace view on z
       </li>
     </ul>
+    <p>
+      <em>Challenge</em> shows the score of each robot on translucid boards hanging over the arena. The goal is to stay alive by collecting energy.
+    </p>
     <div class="image-container floatright">
       <img src="studio-connect-en.png" width="146" alt="studio-connect-en.png" class="image" />
     </div>
     <p>
-      <em>Challenge</em> shows the score of each robot on translucid boards hanging over the arena. The goal is to stay alive by collecting energy. As long as a robot is alive, its points increase; when it dies, they are halved. Four blue sources provide energy to nearby robots. When a source is depleted, it becomes red and does not provide energy any more. From time to time, a source will sink into the ground and robots will no longer see it until it reappears.
+      As long as a robot is alive, its points increase; when it dies, they are halved. Four blue sources provide energy to nearby robots. When a source is depleted, it becomes red and does not provide energy any more. From time to time, a source will sink into the ground and robots will no longer see it until it reappears.
     </p>
     <p>
       Once Aseba <em>challenge</em> is running, you have to start Aseba <em>studio</em> to program your robot. For each robot, you have to run one instance of studio, which can run on any computer. At startup, <em>studio</em> proposes you to connect to an Aseba target (right image). If you have launched <em>challenge</em> on your computer and added a robot, the default option will connect to this robot. If <em>challenge</em> is running on another computer, or if there are several robots in the arena, please specify the computer in <em>host</em> and the robot in <em>port</em>. The translucent screen over the arena in <em>challenge</em> shows the ports corresponding to the different robots
@@ -184,10 +186,16 @@ end</code>
     </p>
     <ul>
       <li>
-        <a href="en_asebastudio.html">Documentation about Aseba's integrated development environment</a>
+        <a href="en_asebaconcepts.html">A description of basic concepts used in Aseba</a>
+      </li>
+      <li>
+        <a href="en_asebastudio.html">Documentation of the integrated development environment</a>
       </li>
       <li>
         <a href="en_asebalanguage.html">Description of the Aseba language</a>
+      </li>
+      <li>
+        <a href="en_asebastdnative.html">Description of the native functions standard library</a>
       </li>
     </ul>
   </body>

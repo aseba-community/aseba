@@ -291,18 +291,6 @@ namespace Enki
 		
 		void controlStep(double dt)
 		{
-			// set physical variables
-			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
-			rightSpeed = toDoubleClamp(variables.speedR, 1, -13, 13);
-			Color c;
-			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
-			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
-			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
-			setColor(c);
-			
-			// do motion
-			FeedableEPuck::controlStep(dt);
-			
 			// get physical variables
 			#ifdef SIMPLIFIED_EPUCK
 			variables.dist_A[0] = static_cast<sint16>(infraredSensor0.getDist());
@@ -363,6 +351,18 @@ namespace Enki
 			// reschedule a periodic event if we are not in step by step
 			if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
+		
+			// set physical variables
+			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
+			rightSpeed = toDoubleClamp(variables.speedR, 1, -13, 13);
+			Color c;
+			c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
+			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
+			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
+			setColor(c);
+			
+			// set motion
+			FeedableEPuck::controlStep(dt);
 		}
 	};
 	
