@@ -52,18 +52,23 @@ if (QT4_FOUND)
 		message(FATAL_ERROR "-- qcollectiongenerator executable not found (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
+	set(qttarget_SRCS
+		Target.cpp
+		DashelTarget.cpp
+	)
+	qt4_automoc(${qttarget_SRCS})
+	add_library(asebaqttarget ${qttarget_SRCS})
+	
 	set(studio_SRCS
 		AeslEditor.cpp
 		MainWindow.cpp
 		TargetModels.cpp
 		NamedValuesVectorModel.cpp
 		ClickableLabel.cpp
-		DashelTarget.cpp
 		CustomDelegate.cpp
 		CustomWidgets.cpp
 		main.cpp
 		FindDialog.cpp
-		Target.cpp
 		EventViewer.cpp
 		Plugin.cpp
 		HelpViewer.cpp
@@ -81,7 +86,6 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioIRVisitors.cpp
 		plugins/ThymioVPL/ThymioCompiler.cpp
 	)
-	
 	qt4_automoc(${studio_SRCS})
 	
 	qt4_add_resources(resfiles asebastudio.qrc)
@@ -96,7 +100,7 @@ if (QT4_FOUND)
 		add_dependencies(asebastudio documentation)
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
-	target_link_libraries(asebastudio asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+	target_link_libraries(asebastudio asebaqttarget asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
 	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 

@@ -53,7 +53,7 @@ namespace Aseba
 		void addProxGroundEvent();
 		void addTapEvent();
 		void addClapEvent();
-				
+		
 		void addMoveAction();
 		void addColorAction();
 		void addCircleAction();	
@@ -106,7 +106,6 @@ namespace Aseba
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
 
-
 		QSvgRenderer *tapSvg;
 		QSvgRenderer *clapSvg;
 		
@@ -115,17 +114,10 @@ namespace Aseba
 		int windowWidth;
 		int windowHeight;
 		
-		// we must cache this because during the flashing process, the tab is not there any more
-		unsigned nodeId;
-//		Target * target;
-//		Dashel::Stream 	*stream;
-		
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		bool warningDialog();
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
-//		bool saveFile(QString filename);		
-//		bool loadFile(QString filename);
 		
 		virtual void resizeEvent( QResizeEvent *event );
 	};
