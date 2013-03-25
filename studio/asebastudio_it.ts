@@ -953,7 +953,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3332"/>
         <source>Comment the selection</source>
-        <translation>Commentare questa selezione</translation>
+        <translation>Commentare la selezione</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3333"/>
@@ -964,7 +964,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3336"/>
         <source>Uncomment the selection</source>
-        <translation>Scommentare la soluzione</translation>
+        <translation>Scommentare la selezione</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3337"/>
@@ -1279,12 +1279,12 @@ event %0 : </source>
         <location filename="MainWindow.cpp" line="1039"/>
         <location filename="MainWindow.cpp" line="1072"/>
         <source>Compilation success.</source>
-        <translation>Complazione avvenuta con successo.</translation>
+        <translation>Compilazione avvenuta con successo.</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="1059"/>
         <source>variables: %1 on %2 (%3%)</source>
-        <translation>variabli: %1 su %2 (%3%)</translation>
+        <translation>variabili: %1 su %2 (%3%)</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="1060"/>
@@ -1294,7 +1294,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="1061"/>
         <source>&lt;b&gt;Memory usage&lt;/b&gt; : %1, %2</source>
-        <translation>&lt;b&gt;Utizzo della memoria&lt;/b&gt; : %1, %2</translation>
+        <translation>&lt;b&gt;Utilizzo della memoria&lt;/b&gt; : %1, %2</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="1257"/>
@@ -1513,7 +1513,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="142"/>
         <source>Compilation success.</source>
-        <translation>Complazione avvenuta con successo.</translation>
+        <translation>Compilazione avvenuta con successo.</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="175"/>
