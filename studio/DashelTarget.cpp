@@ -118,6 +118,7 @@ namespace Aseba
 		languageSelectionBox->addItem(QString::fromUtf8("Deutsch"), "de");
 		languageSelectionBox->addItem(QString::fromUtf8("Español"), "es");
 		languageSelectionBox->addItem(QString::fromUtf8("Italiano"), "it");
+		/* insert translation here (DO NOT REMOVE -> for automated script) */
 		//qDebug() << "locale is " << QLocale::system().name();
 		for (int i = 0; i < languageSelectionBox->count(); ++i)
 		{

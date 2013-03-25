@@ -37,6 +37,7 @@ complete_language_map = {
                 'de':'http://aseba.wikidot.com/de:asebausermanual',
                 'es':'http://aseba.wikidot.com/es:asebausermanual',
                 'it':'http://aseba.wikidot.com/it:asebausermanual'
+                # insert translation here (DO NOT REMOVE -> used by automated script)
                 }                       # used for updating help index
 language_map = complete_language_map.copy()    # used for fetching
 OUTPUT_DIR = 'doc'

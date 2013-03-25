@@ -4,10 +4,12 @@
 	<file>asebastudio_de.qm</file>
 	<file>asebastudio_es.qm</file>
 	<file>asebastudio_it.qm</file>
+	<!-- insert translation here (DO NOT REMOVE) -->
 	<file>compiler_fr.qm</file>
 	<file>compiler_de.qm</file>
 	<file>compiler_es.qm</file>
 	<file>compiler_it.qm</file>
+	<!-- insert compiler translation here (DO NOT REMOVE) -->
 	<file>aseba-doc.qhc</file>
 	<file>aseba-doc.qch</file>
 	<file>images/ok.png</file>

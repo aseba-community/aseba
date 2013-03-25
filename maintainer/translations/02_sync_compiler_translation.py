@@ -26,21 +26,7 @@ from string import Template
 import re
 import subprocess
 
-INPUT_DIRECTORY = '../../compiler'
-INPUT_FILE = 'errors.cpp'
-
-OUTPUT_CODE_FILE = 'errors_code.h'
-OUTPUT_CODE_DIRECTORY = INPUT_DIRECTORY
-
-OUTPUT_QT_FILE = 'CompilerTranslator.cpp'
-OUTPUT_QT_DIRECTORY = '../../studio/translations'
-
-OUTPUT_TRANSLATION_DIRECTORY = '../../studio'
-translation_files = list()
-translation_files.append(['french', 'fr', 'compiler_fr.ts'])
-translation_files.append(['german', 'de', 'compiler_de.ts'])
-translation_files.append(['spanish', 'es', 'compiler_es.ts'])
-translation_files.append(['italian', 'it', 'compiler_it.ts'])
+from path import *
 
 comment_regexp = re.compile(r'\A\s*// (.*)')
 error_regexp = re.compile(r'error_map\[(.*?)\]\s*=\s*L"(.*?)";')
@@ -113,12 +99,11 @@ output_qt_element = \
 output_qt_element_template = Template(output_qt_element)
 
 # process input file
-filename = os.path.join(INPUT_DIRECTORY, INPUT_FILE)
-print "Reading " + filename
+print "Reading " + errors_cpp
 try:
-    fh = file(filename)
+    fh = file(errors_cpp)
 except:
-    print >> sys.stderr, "Invalid file " + filename
+    print >> sys.stderr, "Invalid file " + errors_cpp
     exit(1)
 
 case_vector = ""
@@ -157,12 +142,11 @@ print "Found " + str(count) + " string(s)"
 
 # writing errors_code.h
 result = output_code_file_template.substitute(start_comment=start_comment, id_0=id_0, id_others=id_others)
-filename = os.path.join(OUTPUT_CODE_DIRECTORY, OUTPUT_CODE_FILE)
-print "Writing to " + filename
+print "Writing to " + errors_code_h
 try:
-    fh = file(filename, 'w')
+    fh = file(errors_code_h, 'w')
 except:
-    print >> sys.stderr, "Invalid file " + filename
+    print >> sys.stderr, "Invalid file " + errors_code_h
     exit(1)
 
 fh.write(result)
@@ -170,30 +154,14 @@ fh.close()
 
 # writing the qt file
 result = output_qt_file_template.substitute(elements=case_vector)
-filename = os.path.join(OUTPUT_QT_DIRECTORY, OUTPUT_QT_FILE)
-print "Writing to " + filename
+print "Writing to " + compiler_ts_cpp
 try:
-    fh = file(filename, 'w')
+    fh = file(compiler_ts_cpp, 'w')
 except:
-    print >> sys.stderr, "Invalid file " + filename
+    print >> sys.stderr, "Invalid file " + compiler_ts_cpp
     exit(1)
 
 fh.write(result)
 fh.close()
 print "Done!"
 
-# update translation files
-for translation in translation_files:
-    translation_name = translation[0]
-    translation_code = translation[1]
-    translation_file = translation[2]
-    answer = raw_input("Do you want to update " + translation_name + " [" + translation_code + "] translation file (" + translation_file + ")? [y/n] ")
-    if answer == 'y' or answer == 'Y':
-        print "Updating " + translation_file + "..."
-        file1 = os.path.join(OUTPUT_QT_DIRECTORY, OUTPUT_QT_FILE)
-        file2 = os.path.join(OUTPUT_TRANSLATION_DIRECTORY, translation_file)
-        cmd = "lupdate-qt4 " + file1 + " -ts " + file2
-        print "> " + cmd
-        subprocess.call(cmd, shell=True)
-    else:
-        print "Skipping..."
