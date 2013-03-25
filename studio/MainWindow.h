@@ -52,6 +52,7 @@
 #include "Target.h"
 #include "TargetModels.h"
 #include "Plugin.h"
+#include "PluginRegistry.h"
 #include "HelpViewer.h"
 #include "ConfigDialog.h"
 
@@ -85,7 +86,28 @@ namespace Aseba
 	class EditorsPlotsTabWidget;
 	class DraggableListWidget;
 	class FindDialog;
+	class NodeTab;
 	class MainWindow;
+	
+	//! To access private members of MainWindow and its children, a plugin must inherit from this class
+	struct StudioInterface: DevelopmentEnvironmentInterface
+	{
+		NodeTab* nodeTab;
+		MainWindow *mainWindow;
+		
+		StudioInterface(NodeTab* nodeTab);
+		
+		Target * getTarget();
+		unsigned getNodeId();
+		void displayCode(const QList<QString>& code, int line);
+		void loadNrun();
+		void stop();
+		TargetVariablesModel * getVariablesModel();
+		void setVariableValues(unsigned, const VariablesDataVector &);
+		bool saveFile(bool as=false);
+		void openFile();
+		bool newFile();
+	};
 	
 	class CompilationLogDialog: public QTextEdit
 	{
@@ -226,7 +248,7 @@ namespace Aseba
 		void markTargetUnsynced();
 	
 		// keywords
-		void keywordClicked(QString);		
+		void keywordClicked(QString);
 //		void varButtonClicked();
 //		void ifButtonClicked();
 //		void elseifButtonClicked();
@@ -240,7 +262,7 @@ namespace Aseba
 
 		void showMemoryUsage(bool show);
 		
-		void displayCode(QList<QString> code, int line);
+		void displayCode(const QList<QString>& code, int line);
 		
 		void cursorMoved();
 		void goToError();
@@ -277,7 +299,7 @@ namespace Aseba
 		friend class EditorsPlotsTabWidget;
 		
 		unsigned pid; //!< node product identifier
-		friend class InvasivePlugin;
+		friend class StudioInterface;
 		Target *target; //!< pointer to target
 		const CommonDefinitions *commonDefinitions; //!< pointer to common definitions
 
@@ -498,7 +520,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		friend class AeslEditor;
-		friend class InvasivePlugin;		
+		friend class StudioInterface;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
 		int getDescriptionTimer;

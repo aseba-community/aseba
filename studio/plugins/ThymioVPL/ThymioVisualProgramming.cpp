@@ -21,8 +21,8 @@ using namespace std;
 namespace Aseba
 {		
 	// Visual Programming
-	ThymioVisualProgramming::ThymioVisualProgramming(NodeTab* nodeTab):
-		InvasivePlugin(nodeTab),
+	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de):
+		de(_de),
 		windowWidth(900),
 		windowHeight(800)
 	{
@@ -45,16 +45,16 @@ namespace Aseba
 		saveButton = new QToolButton();
 		saveAsButton = new QToolButton();
 		runButton = new QToolButton();
-		stopButton = new QToolButton();	
+		stopButton = new QToolButton();
 		colorComboButton = new QComboBox();
 		advancedButton = new QToolButton();
-		quitButton = new QToolButton();		
+		quitButton = new QToolButton();
 
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
 		
 		openButton->setIcon(QIcon(":/images/fileopen.svgz"));
-		openButton->setToolTip(tr("Open"));		
+		openButton->setToolTip(tr("Open"));
 		
 		saveButton->setIcon(QIcon(":/images/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
@@ -267,7 +267,7 @@ namespace Aseba
 
 	void ThymioVisualProgramming::showVPL()
 	{
-		if (InvasivePlugin::newFile())
+		if (de->newFile())
 			exec();
 	}
 	
@@ -285,17 +285,17 @@ namespace Aseba
 	void ThymioVisualProgramming::openFile()
 	{
 		if( scene->isEmpty() || warningDialog() ) 
-			InvasivePlugin::openFile();
+			de->openFile();
 	}
 	
 	bool ThymioVisualProgramming::save()
 	{
-		return InvasivePlugin::saveFile(false);
+		return de->saveFile(false);
 	}
 	
 	bool ThymioVisualProgramming::saveAs()
 	{
-		return InvasivePlugin::saveFile(true);
+		return de->saveFile(true);
 	}
 
 	void ThymioVisualProgramming::closeFile()
@@ -325,16 +325,16 @@ namespace Aseba
 	void ThymioVisualProgramming::run()
 	{
 		if(runButton->isEnabled())
-			loadNrun();
+			de->loadNrun();
 	}
 
 	void ThymioVisualProgramming::stop()
 	{
-		InvasivePlugin::stop();
-		const unsigned leftSpeedVarPos = getVariablesModel()->getVariablePos("motor.left.target");
-		setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
-		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
-		setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
+		de->stop();
+		const unsigned leftSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.left.target");
+		de->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
+		const unsigned rightSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.right.target");
+		de->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
 	
 	void ThymioVisualProgramming::advancedMode()
@@ -546,7 +546,7 @@ namespace Aseba
 		if( scene->isSuccessful() ) 
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			displayCode(scene->getCode(), scene->getFocusItemId());
+			de->displayCode(scene->getCode(), scene->getFocusItemId());
 			runButton->setEnabled(true);
 		}
 		else

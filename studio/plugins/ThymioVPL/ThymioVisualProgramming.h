@@ -14,8 +14,6 @@
 #include <QToolBar>
 #include <QToolButton>
 
-#include <dashel/dashel.h>
-
 #include <map>
 #include <vector>
 #include <iterator>
@@ -31,12 +29,12 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	class ThymioVisualProgramming : public QDialog, public InvasivePlugin, public NodeToolInterface
+	class ThymioVisualProgramming : public QDialog, public NodeToolInterface
 	{
 		Q_OBJECT
 		
 	public:
-		ThymioVisualProgramming(NodeTab* nodeTab);
+		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de);
 		~ThymioVisualProgramming();
 		
 		virtual QWidget* createMenuEntry();
@@ -44,7 +42,6 @@ namespace Aseba
 
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
-		//virtual bool surviveTabDestruction() const;
 		
 	private slots:
 		void showVPL();
@@ -73,6 +70,7 @@ namespace Aseba
 		void recompileButtonSet();
 		
 	protected:
+		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		ThymioScene *scene;
 

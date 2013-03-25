@@ -52,31 +52,20 @@ if (QT4_FOUND)
 		message(FATAL_ERROR "-- qcollectiongenerator executable not found (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
-	set(qttarget_SRCS
+	# code common to the use of Aseba under Qt
+	set(qt_common_SRCS
 		Target.cpp
 		DashelTarget.cpp
-	)
-	qt4_automoc(${qttarget_SRCS})
-	add_library(asebaqttarget ${qttarget_SRCS})
-	
-	set(studio_SRCS
-		AeslEditor.cpp
-		MainWindow.cpp
 		TargetModels.cpp
-		NamedValuesVectorModel.cpp
-		ClickableLabel.cpp
-		CustomDelegate.cpp
-		CustomWidgets.cpp
-		main.cpp
-		FindDialog.cpp
-		EventViewer.cpp
+		AeslEditor.cpp
+	)
+	qt4_automoc(${qt_common_SRCS})
+	add_library(asebaqtcommon ${qt_common_SRCS})
+	
+	# plugins
+	set(qt_plugins_SRCS
 		Plugin.cpp
-		HelpViewer.cpp
-		ConfigDialog.cpp
-		ModelAggregator.cpp
-		translations/CompilerTranslator.cpp
 		plugins/VariablesViewPlugin.cpp
-		plugins/ThymioBootloader.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
 		plugins/ThymioVPL/ThymioScene.cpp
 		plugins/ThymioVPL/ThymioButtons.cpp
@@ -85,6 +74,25 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioIRButtons.cpp
 		plugins/ThymioVPL/ThymioIRVisitors.cpp
 		plugins/ThymioVPL/ThymioCompiler.cpp
+	)
+	qt4_automoc(${qt_plugins_SRCS})
+	add_library(asebaqtplugins ${qt_plugins_SRCS})
+	
+	# studio for desktop use
+	set(studio_SRCS
+		PluginRegistry.cpp
+		MainWindow.cpp
+		NamedValuesVectorModel.cpp
+		ClickableLabel.cpp
+		CustomDelegate.cpp
+		CustomWidgets.cpp
+		main.cpp
+		FindDialog.cpp
+		EventViewer.cpp
+		HelpViewer.cpp
+		ConfigDialog.cpp
+		ModelAggregator.cpp
+		translations/CompilerTranslator.cpp
 	)
 	qt4_automoc(${studio_SRCS})
 	
@@ -100,7 +108,7 @@ if (QT4_FOUND)
 		add_dependencies(asebastudio documentation)
 	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
-	target_link_libraries(asebastudio asebaqttarget asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+	target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
 	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 

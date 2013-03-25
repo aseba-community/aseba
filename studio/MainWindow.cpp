@@ -49,8 +49,70 @@ using std::copy;
 
 namespace Aseba
 {
-// 	/** \addtogroup studio */
+ 	/** \addtogroup studio */
 	/*@{*/
+	
+	StudioInterface::StudioInterface(NodeTab* nodeTab):
+		nodeTab(nodeTab)
+	{
+		mainWindow = nodeTab->mainWindow;
+	};
+
+	Target* StudioInterface::getTarget()
+	{
+		return nodeTab->target;
+	}
+	
+	unsigned StudioInterface::getNodeId()
+	{
+		return nodeTab->id;
+	}
+	
+	void StudioInterface::displayCode(const QList<QString>& code, int line)
+	{
+		nodeTab->displayCode(code, line);
+	}
+	
+	void StudioInterface::loadNrun()
+	{
+		nodeTab->loadClicked();
+		nodeTab->target->run(nodeTab->id);
+	}
+
+	void StudioInterface::stop()
+	{
+		nodeTab->target->stop(nodeTab->id);
+	}
+	
+	bool StudioInterface::saveFile(bool as)
+	{
+		if( as )
+			return mainWindow->saveFile();
+		
+		return mainWindow->save();
+	}
+
+	void StudioInterface::openFile()
+	{
+		mainWindow->openFile();
+	}
+	
+	bool StudioInterface::newFile()
+	{
+		return mainWindow->newFile();
+	}
+	
+	TargetVariablesModel * StudioInterface::getVariablesModel()
+	{
+		return nodeTab->vmMemoryModel;
+	}
+	
+	void StudioInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		nodeTab->setVariableValues(addr, data);
+	}
+	
+	//////
 
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
 		QTextEdit(parent)
@@ -311,8 +373,7 @@ namespace Aseba
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 		{
 			NodeToolInterface* tool(*it);
-			if (!tool->surviveTabDestruction())
-				delete (*it);
+			delete tool;
 		}
 		delete vmFunctionsModel;
 		delete vmMemoryModel;
@@ -907,7 +968,7 @@ namespace Aseba
 		editorContentChanged();
 	}
 
-	void NodeTab::displayCode(QList<QString> code, int line)
+	void NodeTab::displayCode(const QList<QString>& code, int line)
 	{
 		editor->clear();
 		QTextCharFormat format;
@@ -925,13 +986,13 @@ namespace Aseba
 			else
 			{
 				format.setBackground(QBrush(Qt::white));
-				cursor.insertText(code[i], format);			
+				cursor.insertText(code[i], format);
 			}
 		}
 		
 		cursor.setPosition(pos);
 		editor->setTextCursor(cursor);
-		editor->ensureCursorVisible();		
+		editor->ensureCursorVisible();
 	}
 
 	void NodeTab::showKeywords(bool show)
