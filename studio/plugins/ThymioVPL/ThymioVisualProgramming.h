@@ -29,12 +29,12 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	class ThymioVisualProgramming : public QDialog, public NodeToolInterface
+	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
 		
 	public:
-		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de);
+		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
 		~ThymioVisualProgramming();
 		
 		virtual QWidget* createMenuEntry();
@@ -42,9 +42,12 @@ namespace Aseba
 
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
+	
+	public slots:
+		bool closeFile();
 		
 	private slots:
-		void showVPL();
+		void showVPLModal();
 		void addButtonsEvent();
 		void addProxEvent();
 		void addProxGroundEvent();
@@ -53,7 +56,7 @@ namespace Aseba
 		
 		void addMoveAction();
 		void addColorAction();
-		void addCircleAction();	
+		void addCircleAction();
 		void addSoundAction();
 		void addMemoryAction();
 		
@@ -62,11 +65,9 @@ namespace Aseba
 		bool save();
 		bool saveAs();
 		void setColorScheme(int index);
-		void run();	
+		void run();
 		void stop();
 		void advancedMode();
-		void closeFile();
-		
 		void recompileButtonSet();
 		
 	protected:
@@ -90,7 +91,7 @@ namespace Aseba
 		QToolButton *newButton;
 		QToolButton *openButton;
 		QToolButton *saveButton;
-		QToolButton *saveAsButton;		
+		QToolButton *saveAsButton;
 		QToolButton *runButton;
 		QToolButton *stopButton;
 		QToolButton *advancedButton;

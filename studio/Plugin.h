@@ -42,19 +42,31 @@ namespace Aseba
 	
 	// TODO: constify DevelopmentEnvironmentInterface
 	
-	//! To access private members of the development environment (MainWindow and its children), a plugin must use the method of a subclass of this class
+	//! To access private members of the development environment (MainWindow and its children), a plugin must use the method of a subclass of this class.
+	//! This class interfaces to a specific node
 	struct DevelopmentEnvironmentInterface
 	{
+		//! Virtual destructor
 		virtual ~DevelopmentEnvironmentInterface() {}
+		//! Return the target Aseba network
 		virtual Target * getTarget() = 0;
+		//! Return the node ID of the node this plugin talks to
 		virtual unsigned getNodeId() = 0;
-		virtual void displayCode(const QList<QString>& code, int line) = 0;
-		virtual void loadNrun() = 0;
+		//! Set the code of the editor from a sequence of elements (each can be multiple sloc) and highlight one of these elements
+		virtual void displayCode(const QList<QString>& code, int elementToHighlight) = 0;
+		//! Load code and runs it on the node
+		virtual void loadAndRun() = 0;
+		//! Stop execution of the node
 		virtual void stop() = 0;
+		//! Return the variables model of the node
 		virtual TargetVariablesModel * getVariablesModel() = 0;
-		virtual void setVariableValues(unsigned, const VariablesDataVector &) = 0;
+		//! Set variables on the node
+		virtual void setVariableValues(unsigned addr, const VariablesDataVector &data) = 0;
+		//! Request the DE to save the current file
 		virtual bool saveFile(bool as=false) = 0;
+		//! Request the DE to open an existing file
 		virtual void openFile() = 0;
+		//! Request the DE to create a new empty file
 		virtual bool newFile() = 0;
 	};
 	

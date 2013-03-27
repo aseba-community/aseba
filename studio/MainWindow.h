@@ -39,7 +39,7 @@
 #include <QSortFilterProxyModel>
 #include <QSignalMapper>
 
-#include "AeslEditor.h"
+#include "StudioAeslEditor.h"
 #include "CustomDelegate.h"
 #include "CustomWidgets.h"
 #include "ModelAggregator.h"
@@ -78,7 +78,7 @@ namespace Aseba
 	class TargetMemoryModel;
 	class MaskableNamedValuesVectorModel;
 	class NamedValuesVectorModel;
-	class AeslEditor;
+	class StudioAeslEditor;
 	class AeslLineNumberSidebar;
 	class AeslBreakpointSidebar;
 	class AeslHighlighter;
@@ -99,8 +99,8 @@ namespace Aseba
 		
 		Target * getTarget();
 		unsigned getNodeId();
-		void displayCode(const QList<QString>& code, int line);
-		void loadNrun();
+		void displayCode(const QList<QString>& code, int elementToHighlight);
+		void loadAndRun();
 		void stop();
 		TargetVariablesModel * getVariablesModel();
 		void setVariableValues(unsigned, const VariablesDataVector &);
@@ -166,7 +166,7 @@ namespace Aseba
 		unsigned id; //!< node identifier
 		
 		friend class MainWindow;
-		AeslEditor* editor;
+		StudioAeslEditor* editor;
 		AeslLineNumberSidebar* linenumbers;
 		AeslBreakpointSidebar* breakpoints;
 		AeslHighlighter *highlighter;
@@ -249,20 +249,9 @@ namespace Aseba
 	
 		// keywords
 		void keywordClicked(QString);
-//		void varButtonClicked();
-//		void ifButtonClicked();
-//		void elseifButtonClicked();
-//		void elseButtonClicked();
-//		void oneventButtonClicked();
-//		void whileButtonClicked();
-//		void forButtonClicked();
-//		void subroutineButtonClicked();
-//		void callsubButtonClicked();
 		void showKeywords(bool show);
 
 		void showMemoryUsage(bool show);
-		
-		void displayCode(const QList<QString>& code, int line);
 		
 		void cursorMoved();
 		void goToError();
@@ -295,7 +284,7 @@ namespace Aseba
 		
 	protected:
 		friend class MainWindow;
-		friend class AeslEditor;
+		friend class StudioAeslEditor;
 		friend class EditorsPlotsTabWidget;
 		
 		unsigned pid; //!< node product identifier
@@ -519,7 +508,7 @@ namespace Aseba
 		
 		// tabs and nodes
 		friend class NodeTab;
-		friend class AeslEditor;
+		friend class StudioAeslEditor;
 		friend class StudioInterface;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;

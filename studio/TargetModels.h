@@ -156,6 +156,7 @@ namespace Aseba
 		
 	private:
 		friend class AeslEditor;
+		friend class StudioAeslEditor;
 		TreeItem *getItem(const QModelIndex &index) const;
 		QString getToolTip(const TargetDescription::NativeFunction& function) const;
 		

@@ -23,7 +23,7 @@
 #include "DashelTarget.h"
 #include "TargetModels.h"
 #include "NamedValuesVectorModel.h"
-#include "AeslEditor.h"
+#include "StudioAeslEditor.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "ModelAggregator.h"
@@ -68,12 +68,12 @@ namespace Aseba
 		return nodeTab->id;
 	}
 	
-	void StudioInterface::displayCode(const QList<QString>& code, int line)
+	void StudioInterface::displayCode(const QList<QString>& code, int elementToHighlight)
 	{
-		nodeTab->displayCode(code, line);
+		nodeTab->editor->replaceAndHighlightCode(code, elementToHighlight);
 	}
 	
-	void StudioInterface::loadNrun()
+	void StudioInterface::loadAndRun()
 	{
 		nodeTab->loadClicked();
 		nodeTab->target->run(nodeTab->id);
@@ -279,7 +279,7 @@ namespace Aseba
 	void ScriptTab::createEditor()
 	{
 		// editor widget
-		editor = new AeslEditor(this);
+		editor = new StudioAeslEditor(this);
 		breakpoints = new AeslBreakpointSidebar(editor);
 		linenumbers = new AeslLineNumberSidebar(editor);
 		highlighter = new AeslHighlighter(editor, editor->document());
@@ -966,33 +966,6 @@ namespace Aseba
 		cursor.insertText(keyword);
 		cursor.endEditBlock();
 		editorContentChanged();
-	}
-
-	void NodeTab::displayCode(const QList<QString>& code, int line)
-	{
-		editor->clear();
-		QTextCharFormat format;
-		QTextCursor cursor(editor->textCursor());
-		int pos=0;
-		
-		for(int i=0; i<code.size(); i++)
-		{
-			if( i == line )
-			{
-				format.setBackground(QBrush(QColor(255,255,200)));
-				cursor.insertText(code[i], format);
-				pos = cursor.position();
-			} 
-			else
-			{
-				format.setBackground(QBrush(Qt::white));
-				cursor.insertText(code[i], format);
-			}
-		}
-		
-		cursor.setPosition(pos);
-		editor->setTextCursor(cursor);
-		editor->ensureCursorVisible();
 	}
 
 	void NodeTab::showKeywords(bool show)
@@ -1760,7 +1733,6 @@ namespace Aseba
 						else
 							showKeywordsAct->setChecked(false);
 					}
-						
 				}
 				domNode = domNode.nextSibling();
 			}
@@ -1831,7 +1803,7 @@ namespace Aseba
 		document.appendChild(root);
 		
 		root.appendChild(document.createTextNode("\n\n\n"));
-		root.appendChild(document.createComment("list of global events"));		
+		root.appendChild(document.createComment("list of global events"));
 		
 		// events
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)

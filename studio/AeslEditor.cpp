@@ -19,7 +19,6 @@
 */
 
 #include "AeslEditor.h"
-#include "MainWindow.h"
 #include "CustomWidgets.h"
 #include "../utils/utils.h"
 #include <QtGui>
@@ -437,10 +436,8 @@ namespace Aseba
 		return breakpoint.width() + 2*borderSize;
 	}
 
-	AeslEditor::AeslEditor(const ScriptTab* tab) :
-		tab(tab),
+	AeslEditor::AeslEditor() :
 		debugging(false),
-		dropSourceWidget(0),
 		completer(0),
 		vardefRegexp("^var .*"),
 		leftValueRegexp("^\\w+\\s*=.*"),
@@ -475,96 +472,6 @@ namespace Aseba
 		completer->setWidget(this);
 		completer->setCompletionMode(QCompleter::PopupCompletion);
 		QObject::connect(completer, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
-	}
-	
-	void AeslEditor::dropEvent(QDropEvent *event)
-	{
-		dropSourceWidget = event->source();
-		QTextEdit::dropEvent(event);
-		dropSourceWidget = 0;
-		setFocus(Qt::MouseFocusReason);
-	}
-	
-	void AeslEditor::insertFromMimeData ( const QMimeData * source )
-	{
-		QTextCursor cursor(this->textCursor());
-		
-		// check whether we are at the beginning of a line
-		bool startOfLine(cursor.atBlockStart());
-		const int posInBlock(cursor.position() - cursor.block().position());
-		if (!startOfLine && posInBlock)
-		{
-			const QString startText(cursor.block().text().left(posInBlock));
-			startOfLine = !startText.contains(QRegExp("\\S"));
-		}
-		
-		// if beginning of a line and source widget is known, add some helper text
-		if (dropSourceWidget && startOfLine)
-		{
-			const NodeTab* nodeTab(dynamic_cast<const NodeTab*>(tab));
-			QString prefix(""); // before the text
-			QString midfix(""); // between the text and the cursor
-			QString postfix(""); // after the curser
-			if (dropSourceWidget == nodeTab->vmFunctionsView)
-			{
-				// inserting function
-				prefix = "call ";
-				midfix = "(";
-				// fill call from doc
-				const TargetDescription *desc = nodeTab->vmFunctionsModel->descriptionRead;
-				const std::wstring funcName = source->text().toStdWString();
-				for (size_t i = 0; i < desc->nativeFunctions.size(); i++)
-				{
-					const TargetDescription::NativeFunction native(desc->nativeFunctions[i]);
-					if (native.name == funcName)
-					{
-						for (size_t j = 0; j < native.parameters.size(); ++j)
-						{
-							postfix += QString::fromStdWString(native.parameters[j].name);
-							if (j + 1 < native.parameters.size())
-								postfix += ", ";
-						}
-						break;
-					}
-				}
-				postfix += ")\n";
-			}
-			else if (dropSourceWidget == nodeTab->vmMemoryView)
-			{
-				const std::wstring varName = source->text().toStdWString();
-				if (nodeTab->vmMemoryModel->getVariableSize(QString::fromStdWString(varName)) > 1)
-				{
-					midfix = "[";
-					postfix = "] ";
-				}
-				else
-					midfix = " ";
-			}
-			else if (dropSourceWidget == nodeTab->vmLocalEvents)
-			{
-				// inserting local event
-				prefix = "onevent ";
-				midfix = "\n";
-			}
-			else if (dropSourceWidget == nodeTab->mainWindow->eventsDescriptionsView)
-			{
-				// inserting global event
-				prefix = "onevent ";
-				midfix = "\n";
-			}
-			
-			cursor.beginEditBlock();
-			cursor.insertText(prefix + source->text() + midfix);
-			const int pos = cursor.position();
-			cursor.insertText(postfix);
-			cursor.setPosition(pos);
-			cursor.endEditBlock();
-
-			this->setTextCursor(cursor);
-		}
-		else
-			cursor.insertText(source->text());
-		
 	}
 	
 	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )
@@ -757,6 +664,37 @@ namespace Aseba
 
 		// end of editing block
 		cursor.endEditBlock();
+	}
+	
+	//! Replace current code using a sequence of elements (each can be multiple sloc) and highlight one of these elements
+	void AeslEditor::replaceAndHighlightCode(const QList<QString>& code, int elementToHighlight)
+	{
+		QTextCharFormat format;
+		QTextCursor cursor(textCursor());
+		cursor.beginEditBlock();
+		cursor.select(QTextCursor::Document);
+		cursor.removeSelectedText();
+		int pos=0;
+		
+		for (int i=0; i<code.size(); i++)
+		{
+			if (i == elementToHighlight)
+			{
+				format.setBackground(QBrush(QColor(255,255,200)));
+				cursor.insertText(code[i], format);
+				pos = cursor.position();
+			} 
+			else
+			{
+				format.setBackground(QBrush(Qt::white));
+				cursor.insertText(code[i], format);
+			}
+		}
+		
+		cursor.setPosition(pos);
+		cursor.endEditBlock();
+		setTextCursor(cursor);
+		ensureCursorVisible();
 	}
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)

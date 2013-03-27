@@ -10,8 +10,6 @@
 #include <QDesktopWidget>
 #include <QApplication>
 
-//#include "../../utils/HexFile.h"
-
 #include "ThymioVisualProgramming.h"
 #include "ThymioVisualProgramming.moc"
 #include "../../TargetModels.h"
@@ -19,9 +17,9 @@
 using namespace std;
 
 namespace Aseba
-{		
+{
 	// Visual Programming
-	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de):
+	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
 		windowWidth(900),
 		windowHeight(800)
@@ -41,63 +39,65 @@ namespace Aseba
 		mainLayout->addWidget(toolBar);
 
 		newButton = new QToolButton();
-		openButton = new QToolButton();
-		saveButton = new QToolButton();
-		saveAsButton = new QToolButton();
-		runButton = new QToolButton();
-		stopButton = new QToolButton();
-		colorComboButton = new QComboBox();
-		advancedButton = new QToolButton();
-		quitButton = new QToolButton();
-
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
+		toolBar->addWidget(newButton);
 		
+		openButton = new QToolButton();
 		openButton->setIcon(QIcon(":/images/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
+		toolBar->addWidget(openButton);
 		
+		saveButton = new QToolButton();
 		saveButton->setIcon(QIcon(":/images/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
-
+		toolBar->addWidget(saveButton);
+		
+		saveAsButton = new QToolButton();
 		saveAsButton->setIcon(QIcon(":/images/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
+		toolBar->addWidget(saveAsButton);
+		toolBar->addSeparator();
 
+		runButton = new QToolButton();
 		runButton->setIcon(QIcon(":/images/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
+		toolBar->addWidget(runButton);
 
+		stopButton = new QToolButton();
 		stopButton->setIcon(QIcon(":/images/stop1.png"));
 		stopButton->setToolTip(tr("Stop"));
+		toolBar->addWidget(stopButton);
+		toolBar->addSeparator();
 	
+		colorComboButton = new QComboBox();
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
 		//colorComboButton->setIconSize(QSize(64,32));
-
-		advancedButton->setIcon(QIcon(":/images/run.png"));
-		advancedButton->setToolTip(tr("Advanced mode"));
-
-		quitButton->setIcon(QIcon(":/images/exit.svgz"));
-		quitButton->setToolTip(tr("Quit"));
-			
-		toolBar->addWidget(newButton);
-		toolBar->addWidget(openButton);
-		toolBar->addWidget(saveButton);
-		toolBar->addWidget(saveAsButton);
-		toolBar->addSeparator();
-		toolBar->addWidget(runButton);
-		toolBar->addWidget(stopButton);
-		toolBar->addSeparator();
 		toolBar->addWidget(colorComboButton);
 		toolBar->addSeparator();
+
+		advancedButton = new QToolButton();
+		advancedButton->setIcon(QIcon(":/images/run.png"));
+		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
 		toolBar->addSeparator();
-		toolBar->addWidget(quitButton);
+
+		if (showCloseButton)
+		{
+			quitButton = new QToolButton();
+			quitButton->setIcon(QIcon(":/images/exit.svgz"));
+			quitButton->setToolTip(tr("Quit"));
+			toolBar->addWidget(quitButton);
+			connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
+		}
 		
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(save()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
 		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
-		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
+		
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(advancedMode()));
@@ -210,6 +210,8 @@ namespace Aseba
 
 		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )		
 			resize(clientRect.width()-100, clientRect.height()-100);
+		
+		setWindowModality(Qt::ApplicationModal);
 	}
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
@@ -246,13 +248,13 @@ namespace Aseba
 		painter.setBrush(color2);
 		painter.drawRoundedRect(66,0,54,54,4,4);
 		
-		return pixmap;		
+		return pixmap;
 	}
 	
 	QWidget* ThymioVisualProgramming::createMenuEntry()
 	{
 		QPushButton *vplButton = new QPushButton(tr("Launch VPL"));
-		connect(vplButton, SIGNAL(clicked()), SLOT(showVPL()));
+		connect(vplButton, SIGNAL(clicked()), SLOT(showVPLModal()));
 		return vplButton;
 	}
 	
@@ -265,10 +267,10 @@ namespace Aseba
 		close();
 	}
 
-	void ThymioVisualProgramming::showVPL()
+	void ThymioVisualProgramming::showVPLModal()
 	{
 		if (de->newFile())
-			exec();
+			show();
 	}
 	
 	void ThymioVisualProgramming::newFile()
@@ -278,7 +280,7 @@ namespace Aseba
 			bool advanced = scene->getAdvanced();
 			scene->reset();
 			thymioFilename.clear();
-			scene->setAdvanced(advanced);		
+			scene->setAdvanced(advanced);
 		}
 	}
 
@@ -298,7 +300,7 @@ namespace Aseba
 		return de->saveFile(true);
 	}
 
-	void ThymioVisualProgramming::closeFile()
+	bool ThymioVisualProgramming::closeFile()
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
@@ -306,7 +308,10 @@ namespace Aseba
 			actionButtons.last()->hide(); // state button
 			scene->reset();
 			close();
+			return true;
 		}
+		else
+			return false;
 	}
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
@@ -325,7 +330,7 @@ namespace Aseba
 	void ThymioVisualProgramming::run()
 	{
 		if(runButton->isEnabled())
-			de->loadNrun();
+			de->loadAndRun();
 	}
 
 	void ThymioVisualProgramming::stop()
@@ -346,15 +351,7 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
-		if ( scene->isEmpty() || warningDialog() )
-		{
-			advancedButton->setEnabled(true);
-			actionButtons.last()->hide(); // state button
-//			scene->clear();
-			scene->reset();
-			close();
-		}
-		else
+		if (!closeFile())
 			event->ignore();
 	}
 	
@@ -536,7 +533,7 @@ namespace Aseba
 		scene->setModified(!fromFile);
 		
 		if (!scene->isEmpty())
-			QTimer::singleShot(0, this, SLOT(exec()));
+			show();
 	}
 
 	void ThymioVisualProgramming::recompileButtonSet()

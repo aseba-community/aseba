@@ -57,7 +57,9 @@ if (QT4_FOUND)
 		Target.cpp
 		DashelTarget.cpp
 		TargetModels.cpp
+		CustomWidgets.cpp
 		AeslEditor.cpp
+		translations/CompilerTranslator.cpp
 	)
 	qt4_automoc(${qt_common_SRCS})
 	add_library(asebaqtcommon ${qt_common_SRCS})
@@ -80,19 +82,18 @@ if (QT4_FOUND)
 	
 	# studio for desktop use
 	set(studio_SRCS
+		StudioAeslEditor.cpp
 		PluginRegistry.cpp
 		MainWindow.cpp
 		NamedValuesVectorModel.cpp
 		ClickableLabel.cpp
 		CustomDelegate.cpp
-		CustomWidgets.cpp
 		main.cpp
 		FindDialog.cpp
 		EventViewer.cpp
 		HelpViewer.cpp
 		ConfigDialog.cpp
 		ModelAggregator.cpp
-		translations/CompilerTranslator.cpp
 	)
 	qt4_automoc(${studio_SRCS})
 	
@@ -111,5 +112,22 @@ if (QT4_FOUND)
 	target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
 	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+	
+	# Thymio VPL standalone
+	set(thymiovpl_SRCS
+		ThymioVPLStandalone.cpp
+		thymiovpl.cpp
+	)
+	qt4_automoc(${thymiovpl_SRCS})
+	
+	# TODO: 
+	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	if (HAS_DYN_VERSION)
+		add_dependencies(thymiovpl versionheader)
+	endif (HAS_DYN_VERSION)
+	
+	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+
+	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 endif (QT4_FOUND)
