@@ -29,6 +29,7 @@
 #include <QFileDialog>
 
 #include <ThymioVPLStandalone.moc>
+#include <version.h>
 
 namespace Aseba
 {
@@ -128,6 +129,14 @@ namespace Aseba
 		
 		layout = new QVBoxLayout;
 		layout->addWidget(editor, 1);
+		const QString text = tr("Aseba ver. %0 (build %1/protocol %2); Dashel ver. %3 (%4)").
+			arg(ASEBA_VERSION).
+			arg(ASEBA_BUILD_VERSION).
+			arg(ASEBA_PROTOCOL_VERSION).
+			arg(DASHEL_VERSION).
+			arg(QString::fromStdString(Dashel::streamTypeRegistry.list()));
+		
+		layout->addWidget(new QLabel(text));
 		setLayout(layout);
 	}
 	
@@ -184,7 +193,7 @@ namespace Aseba
 		if (as || fileName.isEmpty())
 		{
 			fileName = QFileDialog::getSaveFileName(this,
-				QObject::tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
+				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
 		}
 		
 		if (fileName.isEmpty())
