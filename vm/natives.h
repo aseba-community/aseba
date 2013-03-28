@@ -202,7 +202,7 @@ void AsebaNative_rand(AsebaVMState *vm);
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 
 /*! Embedded targets must know the size of ASEBA_NATIVES_STD_FUNCTIONS without having to compute them by hand, please update this when adding a new function */
-#define ASEBA_NATIVES_STD_COUNT 21
+#define ASEBA_NATIVES_STD_COUNT 20
 
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
@@ -225,7 +225,6 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	AsebaNative_mathcos, \
 	AsebaNative_mathrot2, \
 	AsebaNative_mathsqrt, \
-	AsebaNative_vecnonzerosequence, \
 	AsebaNative_rand
 
 /*! snippet to include descriptions of standard native functions */
@@ -249,7 +248,6 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	&AsebaNativeDescription_mathcos, \
 	&AsebaNativeDescription_mathrot2, \
 	&AsebaNativeDescription_mathsqrt, \
-	&AsebaNativeDescription_vecnonzerosequence, \
 	&AsebaNativeDescription_rand
 
 /*@}*/
