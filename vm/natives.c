@@ -733,7 +733,7 @@ void AsebaNative_vecargbounds(AsebaVMState *vm)
 const AsebaNativeFunctionDescription AsebaNativeDescription_vecargbounds =
 {
 	"math.argbounds",
-	"get the indices (argmin, argmax) of the (minimum, maximum) values of src",
+	"get the indices (argmin, argmax) of the limit values of src",
 	{
 		{ -1, "src" },
 		{ 1, "argmin" },
