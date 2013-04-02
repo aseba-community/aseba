@@ -49,4 +49,5 @@ studio_qrc = os.path.join(studio_path, "asebastudio.qrc")
 sync_compiler_py = os.path.join(my_path, "sync_compiler_translation.py")
 updatedoc = os.path.join(updatedoc_path, "updatedoc.py")
 challenge_cpp = os.path.join(challenge_path, "challenge.cpp")
+challenge_qrc = os.path.join(challenge_path, "challenge-textures.qrc")
 

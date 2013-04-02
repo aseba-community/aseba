@@ -35,6 +35,7 @@ studio_qrc_tag = re.compile(r"<!-- insert translation here")
 studio_qrc_compiler_tag = re.compile(r"<!-- insert compiler translation here")
 sync_compiler_py_tag = re.compile(r"# insert translation here")
 updatedoc_tag = sync_compiler_py_tag
+challenge_qrc_tag = studio_qrc_tag
 
 
 def insert_before_tag(input_file, output_file, tag_re, inserted_text):
@@ -129,6 +130,15 @@ insert_before_tag(challenge_cpp, tmp_file, cpp_tag, """\tlanguageSelectionBox->a
 os.remove(challenge_cpp)
 shutil.move(tmp_file, challenge_cpp)
 translation_tools.do_git_add(challenge_cpp)
+print "Done\n"
+
+# We have to update challenge-textures.qrc
+print "Updating challenge-textures.qrc..."
+tmp_file = "challenge-textures.qrc.tmp"
+insert_before_tag(challenge_qrc, tmp_file, challenge_qrc_tag, """\t<file>asebachallenge_{}.qm</file>\n""".format(code))
+os.remove(challenge_qrc)
+shutil.move(tmp_file, challenge_qrc)
+translation_tools.do_git_add(challenge_qrc)
 print "Done\n"
 
 # Update updatedoc.py, if asked by the user
