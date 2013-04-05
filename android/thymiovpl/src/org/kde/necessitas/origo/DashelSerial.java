@@ -24,6 +24,8 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbConstants;
 import android.content.Context;
 import android.content.Intent;
 
@@ -32,12 +34,41 @@ import org.kde.necessitas.origo.QtActivity;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import java.util.concurrent.CountDownLatch;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.app.PendingIntent;
+
 public class DashelSerial {
     private UsbDevice device;
+    private int epin = -1;
+    private int epout = -1;
     private UsbManager manager;
     private UsbDeviceConnection connection;
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private CountDownLatch latch = new CountDownLatch(1);
 
-    public DashelSerial() {
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                // We don't need synchronization, as the other thread is waiting on us.
+                device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                latch.countDown();
+            }
+        }
+    };
+
+    void RequestPermission() throws InterruptedException  {
+        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(QtActivity.getQtActivityInstance(), 0, new Intent(ACTION_USB_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        QtActivity.getQtActivityInstance().registerReceiver(mUsbReceiver, filter);
+        manager.requestPermission(device, mPermissionIntent);
+        latch.await();
+    }
+
+    public DashelSerial() throws InterruptedException {
         manager = (UsbManager) QtActivity.getQtActivityInstance().getSystemService(Context.USB_SERVICE);
         device = (UsbDevice)  QtActivity.getQtActivityInstance().getIntent().getParcelableExtra(UsbManager.EXTRA_DEVICE);
         if(device == null) {
@@ -46,8 +77,7 @@ public class DashelSerial {
             while(deviceIterator.hasNext()){
                 device = deviceIterator.next();
                 if(device.getVendorId() == 0x0617 || device.getProductId() == 0x000a) {
-
-                    // TODO: We should ask for the permission here as we discovered the device ourself.
+                    RequestPermission();
                     break;
                 }
             }
@@ -69,14 +99,47 @@ public class DashelSerial {
         }
 
         int i;
-        // TODO Claim only interface 0 & cdc-acm one.
+        // Claim interface 0 (control)
+        UsbInterface intf = device.getInterface(0);
+        connection.claimInterface(intf, true);
+
+        // Look for the cdc-acm data interface
         for(i = 0; i < device.getInterfaceCount(); i++) {
-            UsbInterface intf = device.getInterface(i);
-            connection.claimInterface(intf, true);
+            intf = device.getInterface(i);
+            if(intf.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
+                // Claim it, and look for Bulk IN and Bulk OUT endpoints
+                connection.claimInterface(intf, true);
+                int j;
+                for(j = 0; j < intf.getEndpointCount() && (epin == -1 || epout == -1); j++) {
+                    UsbEndpoint ep = intf.getEndpoint(j);
+                    if(ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
+                        if(epin == -1 && ep.getDirection() == UsbConstants.USB_DIR_IN)
+                            epin = ep.getAddress();
+                        if(epout == -1 && ep.getDirection() == UsbConstants.USB_DIR_OUT)
+                            epout = ep.getAddress();
+                    }
+                }
+                break;
+            }
+        }
+
+        if(epin == -1 || epout == -1) {
+            Log.i("DashelJ", "Unable to get data endpoints");
+            return -1;
         }
 
         Log.i("DashelJ", "Device successfully opened");
         return connection.getFileDescriptor();
+    }
+
+    int GetEpIn()
+    {
+        return epin;
+    }
+
+    int GetEpOut()
+    {
+        return epout;
     }
 
     boolean CloseDevice()

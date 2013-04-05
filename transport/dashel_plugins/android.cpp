@@ -37,6 +37,8 @@ static jclass s_DashelSerialClassID;
 static jmethodID s_DashelSerialConstructorMethodID;
 static jmethodID s_DashelSerialOpenDeviceMethodID;
 static jmethodID s_DashelSerialCloseDeviceMethodID;
+static jmethodID s_DashelSerialGetEpInMethodID;
+static jmethodID s_DashelSerialGetEpOutMethodID;
 
 using namespace Dashel;
 using namespace std;
@@ -60,7 +62,7 @@ void AndroidStream::schedule_read() {
     urb_is_in_flight = 1;
     memset(&rx_urb, 0, sizeof(rx_urb));
     rx_urb.type = USBDEVFS_URB_TYPE_BULK;
-    rx_urb.endpoint = 0x82;
+    rx_urb.endpoint = epin;
     rx_urb.buffer = rx_data;
     rx_urb.buffer_length = sizeof(rx_data);
     if(ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0)
@@ -95,6 +97,9 @@ AndroidStream::AndroidStream(const string &targetName) :
         throw  DashelException(DashelException::ConnectionFailed, 0, "Unable to grab fd");
     }
 
+    epin = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpInMethodID);
+    epout = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpOutMethodID);
+
     // software-open the port
     set_ctrl_line(1);
 
@@ -114,7 +119,7 @@ AndroidStream::~AndroidStream()
 void AndroidStream::write(const void *data, const size_t size)
 {
     struct usbdevfs_bulktransfer bulk;
-    bulk.ep = 0x2;
+    bulk.ep = epout;
     bulk.len = size;
     bulk.timeout = 1000;
     bulk.data = (void *) data;
@@ -226,6 +231,16 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void * /*reserved*/)
 
     s_DashelSerialCloseDeviceMethodID = env->GetMethodID(s_DashelSerialClassID, "CloseDevice", "()Z");
     if(! s_DashelSerialCloseDeviceMethodID) {
+        return -1;
+    }
+
+    s_DashelSerialGetEpInMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpIn", "()I");
+    if(! s_DashelSerialGetEpInMethodID) {
+        return -1;
+    }
+
+    s_DashelSerialGetEpOutMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpOut", "()I");
+    if(! s_DashelSerialGetEpOutMethodID) {
         return -1;
     }
 
