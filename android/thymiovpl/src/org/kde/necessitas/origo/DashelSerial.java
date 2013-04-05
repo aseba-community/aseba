@@ -32,12 +32,39 @@ import org.kde.necessitas.origo.QtActivity;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import java.util.concurrent.CountDownLatch;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.app.PendingIntent;
+
 public class DashelSerial {
     private UsbDevice device;
     private UsbManager manager;
     private UsbDeviceConnection connection;
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private CountDownLatch latch = new CountDownLatch(1);
 
-    public DashelSerial() {
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                // We don't need synchronization, as the other thread is waiting on us.
+                device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                latch.countDown();
+            }
+        }
+    };
+
+    void RequestPermission() throws InterruptedException  {
+        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(QtActivity.getQtActivityInstance(), 0, new Intent(ACTION_USB_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        QtActivity.getQtActivityInstance().registerReceiver(mUsbReceiver, filter);
+        manager.requestPermission(device, mPermissionIntent);
+        latch.await();
+    }
+
+    public DashelSerial() throws InterruptedException {
         manager = (UsbManager) QtActivity.getQtActivityInstance().getSystemService(Context.USB_SERVICE);
         device = (UsbDevice)  QtActivity.getQtActivityInstance().getIntent().getParcelableExtra(UsbManager.EXTRA_DEVICE);
         if(device == null) {
@@ -46,8 +73,7 @@ public class DashelSerial {
             while(deviceIterator.hasNext()){
                 device = deviceIterator.next();
                 if(device.getVendorId() == 0x0617 || device.getProductId() == 0x000a) {
-
-                    // TODO: We should ask for the permission here as we discovered the device ourself.
+                    RequestPermission();
                     break;
                 }
             }
