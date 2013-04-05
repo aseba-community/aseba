@@ -34,6 +34,8 @@ private:
     struct usbdevfs_urb rx_urb; // Used only for reception
     unsigned char rx_data[512];
     bool urb_is_in_flight;
+    int epin;
+    int epout;
 };
 
 #endif // ANDROID_H

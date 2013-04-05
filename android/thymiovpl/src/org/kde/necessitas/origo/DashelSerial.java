@@ -24,6 +24,8 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbConstants;
 import android.content.Context;
 import android.content.Intent;
 
@@ -40,6 +42,8 @@ import android.app.PendingIntent;
 
 public class DashelSerial {
     private UsbDevice device;
+    private int epin = -1;
+    private int epout = -1;
     private UsbManager manager;
     private UsbDeviceConnection connection;
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -95,14 +99,47 @@ public class DashelSerial {
         }
 
         int i;
-        // TODO Claim only interface 0 & cdc-acm one.
+        // Claim interface 0 (control)
+        UsbInterface intf = device.getInterface(0);
+        connection.claimInterface(intf, true);
+
+        // Look for the cdc-acm data interface
         for(i = 0; i < device.getInterfaceCount(); i++) {
-            UsbInterface intf = device.getInterface(i);
-            connection.claimInterface(intf, true);
+            intf = device.getInterface(i);
+            if(intf.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
+                // Claim it, and look for Bulk IN and Bulk OUT endpoints
+                connection.claimInterface(intf, true);
+                int j;
+                for(j = 0; j < intf.getEndpointCount() && (epin == -1 || epout == -1); j++) {
+                    UsbEndpoint ep = intf.getEndpoint(j);
+                    if(ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
+                        if(epin == -1 && ep.getDirection() == UsbConstants.USB_DIR_IN)
+                            epin = ep.getAddress();
+                        if(epout == -1 && ep.getDirection() == UsbConstants.USB_DIR_OUT)
+                            epout = ep.getAddress();
+                    }
+                }
+                break;
+            }
+        }
+
+        if(epin == -1 || epout == -1) {
+            Log.i("DashelJ", "Unable to get data endpoints");
+            return -1;
         }
 
         Log.i("DashelJ", "Device successfully opened");
         return connection.getFileDescriptor();
+    }
+
+    int GetEpIn()
+    {
+        return epin;
+    }
+
+    int GetEpOut()
+    {
+        return epout;
     }
 
     boolean CloseDevice()
