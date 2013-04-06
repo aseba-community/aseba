@@ -42,7 +42,13 @@ endif (Subversion_FOUND AND HAS_SVN_REP)
 ##########
 # detect git
 ##########
-find_package(Git)
+find_package(Git QUIET)
+if (NOT GIT_FOUND)
+  find_program(GIT_EXECUTABLE git NO_CMAKE_FIND_ROOT_PATH)
+  if (GIT_EXECUTABLE)
+    set(GIT_FOUND TRUE)
+  endif (GIT_EXECUTABLE)
+endif (NOT GIT_FOUND)
 
 if (GIT_FOUND)
 	message("-- Git executable found")

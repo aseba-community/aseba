@@ -21,56 +21,49 @@
 
 . ubash
 
-fs_abspath thymiovpl THYMIOVPLSOURCES
-
-script_init "Build Thymio VPL for Android"
+script_init "Build Thymio VPL and dependencies for Android"
+script_setopt "--ndk-root" "PATH" ANDROIDNDKROOT "/opt/android/ndk" \
+  "path to the Android NDK root directory"
 script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
-script_setopt "--sources|-s" "PATH" THYMIOVPLSOURCES $THYMIOVPLSOURCES \
-  "path to the Thymio VPL sources"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 17 \
   "level of the Android API"
-script_setopt "--build-dir|-b" "PATH" THYMIOVPLBUILD "build" \
-  "path to the Thymio VPL build root"
-script_setopt "--debug" "" ANTBUILDDEBUG false \
-  "build debug target instead of release"
-script_setopt "--install" "" THYMIOVPLINSTALL false \
+script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
+  "path to the Necessitas root directory"
+script_setopt "--dashel-sources" "PATH" DASHELSOURCES ../../dashel \
+  "path to the DaSHEL sources"
+script_setopt "--aseba-sources" "PATH" ASEBASOURCES ../ \
+  "path to the ASEBA sources"
+script_setopt "--thymiovpl-sources" "PATH" THYMIOVPLSOURCES thymiovpl \
+  "path to the Thymio VPL sources"
+script_setopt "--build-root|-b" "PATH" BUILDROOT "build" \
+  "path to the build root directory"
+script_setopt "--debug" "" BUILDDEBUG false \
+  "build debug targets instead of release"
+script_setopt "--install" "" ALLINSTALL false \
   "install package to Android device"
-script_setopt "--clean" "" THYMIOVPLCLEAN false "remove build directory"
+script_setopt "--clean" "" ALLCLEAN false "remove build directories"
 
 script_checkopts $*
 
-[ -d "$THYMIOVPLBUILD/thymiovpl" ] || \
-  execute "mkdir -p $THYMIOVPLBUILD/thymiovpl"
-
-fs_abspath $ANDROIDSDKROOT ANDROIDSDKROOT
-fs_abspath $THYMIOVPLSOURCES THYMIOVPLSOURCES
-fs_abspath $THYMIOVPLBUILD THYMIOVPLBUILD
-
-if true ANTBUILDDEBUG; then
-  ANTBUILDTARGET=debug
-  THYMIOVPLPKG=thymiovpl-debug-unaligned.apk
-else
-  ANTBUILDTARGET=release
-  THYMIOVPLPKG=thymiovpl-release-unsigned.apk
-fi
-
-cd $THYMIOVPLSOURCES && \
-  export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
-  export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
-  export THYMIO_VPL_BUILD=$THYMIOVPLBUILD/thymiovpl && \
-  ant $ANTBUILDTARGET && \
-  ANTBUILDSUCCESS=true
-
-if true ANTBUILDSUCCESS; then
-  if true THYMIOVPLINSTALL; then
-    $ANDROIDSDKROOT/platform-tools/adb -d install -r \
-      $THYMIOVPLBUILD/thymiovpl/$THYMIOVPLPKG
+if false ALLCLEAN; then
+  COMMONARGS="--build-root $BUILDROOT"
+  COMMONARGS="$COMMONARGS --api-level $ANDROIDAPILEVEL"
+  if true BUILDDEBUG; then
+    COMMONARGS="$COMMONARGS --debug"
   fi
-fi
+  if true ALLINSTALL; then
+    THYMIOVPLARGS="--install"
+  fi
 
-if true THYMIOVPLCLEAN; then
-  execute "rm -rf $THYMIOVPLBUILD/thymiovpl"
+  ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT && \
+  ./mkaseba.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --necessitas-root \
+    $NECESSITASROOT && \
+  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT
+else
+  ./mkdashel.sh --clean && \
+  ./mkaseba.sh --clean && \
+  ./mkthymiovpl.sh --clean
 fi
 
 log_clean

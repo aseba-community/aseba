@@ -21,56 +21,117 @@
 
 . ubash
 
-fs_abspath thymiovpl THYMIOVPLSOURCES
-
-script_init "Build Thymio VPL for Android"
+script_init "Debug Thymio VPL on Android"
+script_setopt "--ndk-root" "PATH" ANDROIDNDKROOT "/opt/android/ndk" \
+  "path to the Android NDK root directory"
 script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
-script_setopt "--sources|-s" "PATH" THYMIOVPLSOURCES $THYMIOVPLSOURCES \
-  "path to the Thymio VPL sources"
-script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 17 \
-  "level of the Android API"
-script_setopt "--build-dir|-b" "PATH" THYMIOVPLBUILD "build" \
-  "path to the Thymio VPL build root"
-script_setopt "--debug" "" ANTBUILDDEBUG false \
-  "build debug target instead of release"
-script_setopt "--install" "" THYMIOVPLINSTALL false \
-  "install package to Android device"
-script_setopt "--clean" "" THYMIOVPLCLEAN false "remove build directory"
+script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
+  "path to the Necessitas root directory"
+script_setopt "--build-root|-b" "PATH" BUILDROOT "build" \
+  "path to the build root directory"
+script_setopt "--debug-port|-p" "PORT" DEBUGPORT 5039 \
+  "network port used for debugging"
 
 script_checkopts $*
 
-[ -d "$THYMIOVPLBUILD/thymiovpl" ] || \
-  execute "mkdir -p $THYMIOVPLBUILD/thymiovpl"
-
+fs_abspath $ANDROIDNDKROOT ANDROIDNDKROOT
 fs_abspath $ANDROIDSDKROOT ANDROIDSDKROOT
-fs_abspath $THYMIOVPLSOURCES THYMIOVPLSOURCES
-fs_abspath $THYMIOVPLBUILD THYMIOVPLBUILD
+fs_abspath $BUILDROOT BUILDROOT
 
-if true ANTBUILDDEBUG; then
-  ANTBUILDTARGET=debug
-  THYMIOVPLPKG=thymiovpl-debug-unaligned.apk
-else
-  ANTBUILDTARGET=release
-  THYMIOVPLPKG=thymiovpl-release-unsigned.apk
-fi
+AWKSCRIPTS=$ANDROIDNDKROOT/build/awk
+MANIFEST=$BUILDROOT/thymiovpl/AndroidManifest.xml
+ADB=$ANDROIDSDKROOT/platform-tools/adb
 
-cd $THYMIOVPLSOURCES && \
-  export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
-  export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
-  export THYMIO_VPL_BUILD=$THYMIOVPLBUILD/thymiovpl && \
-  ant $ANTBUILDTARGET && \
-  ANTBUILDSUCCESS=true
+adb_var_shell()
+{
+  local CMDOUT RET OUTPUT VARNAME REDIRECTSTDERR
+  REDIRECTSTDERR=$1
+  VARNAME=$2
+  shift; shift;
 
-if true ANTBUILDSUCCESS; then
-  if true THYMIOVPLINSTALL; then
-    $ANDROIDSDKROOT/platform-tools/adb -d install -r \
-      $THYMIOVPLBUILD/thymiovpl/$THYMIOVPLPKG
+  CMDOUT=`mktemp /tmp/ndk-gdb-cmdout-XXXXXX`
+
+  if [ "$REDIRECTSTDERR" != 0 ]; then
+    $ADB shell "$@" ";" echo \$? | sed -e 's![[:cntrl:]]!!g' > $CMDOUT 2>&1
+  else
+    $ADB shell "$@" ";" echo \$? | sed -e 's![[:cntrl:]]!!g' > $CMDOUT
   fi
+
+  RET=`sed -e '$!d' $CMDOUT`
+  OUT=`sed -e '$d' $CMDOUT`
+  rm -f $CMDOUT
+
+  eval $VARNAME=\"\$OUT\"
+  return $RET
+}
+
+PACKAGENAME=`awk -f $AWKSCRIPTS/extract-package-name.awk $MANIFEST`
+LAUNCHABLENAME=`awk -f $AWKSCRIPTS/extract-launchable.awk $MANIFEST | sed 2q`
+DASHELOUTPATH=`grep "LIBRARY_OUTPUT_PATH:" $BUILDROOT/dashel/CMakeCache.txt | \
+  sed s/"LIBRARY_OUTPUT_PATH:PATH=\(.*\)"/"\1"/`
+ASEBAOUTPATH=`grep "LIBRARY_OUTPUT_PATH:" $BUILDROOT/aseba/CMakeCache.txt | \
+  sed s/"LIBRARY_OUTPUT_PATH:PATH=\(.*\)"/"\1"/`
+QTLIBRARYDIR=`grep "QT_LIBRARY_DIR:" $BUILDROOT/aseba/CMakeCache.txt | \
+  sed s/"QT_LIBRARY_DIR:PATH=\(.*\)"/"\1"/`
+DEBUGOUTPATH=$BUILDROOT/thymiovpl/debug
+
+if `awk -f $AWKSCRIPTS/extract-debuggable.awk $MANIFEST` != "true"; then
+  message_exit "Package is not debuggable"
 fi
 
-if true THYMIOVPLCLEAN; then
-  execute "rm -rf $THYMIOVPLBUILD/thymiovpl"
+adb_var_shell 1 DEVICEGDBSERVER ls /data/data/${PACKAGENAME}/lib/gdbserver
+if [ $? != 0 ]; then
+  message_exit "Application installed on device is not debuggable"
 fi
+
+adb_var_shell 1 DATADIR run-as $PACKAGENAME /system/bin/sh -c pwd
+if [ $? != 0 -o -z "$DATADIR" ]; then
+  message_exit "Could not determine the application's data directory"
+fi
+
+$ADB shell am start -n $PACKAGENAME/$LAUNCHABLENAME
+if [ $? != 0 ]; then
+  message_exit "Could not launch the application"
+fi
+$ADB shell sleep 2
+
+PID=`$ADB shell ps | awk -f $AWKSCRIPTS/extract-pid.awk -v PACKAGE="$PACKAGENAME"`
+if [ $? != 0 -o "$PID" = "0" ]; then
+  message_exit "Could not determine the application's PID"
+fi
+
+GDBPID=`$ADB shell ps | awk -f $AWKSCRIPTS/extract-pid.awk -v \
+  PACKAGE="lib/gdbserver"`
+if [ "$GDBPID" != "0" ]; then
+  message_warn "Debugging session already active on device"
+  $ADB shell run-as $PACKAGENAME kill -9 $GDBPID
+fi
+
+DEBUGSOCKET=debug-socket
+$ADB shell run-as $PACKAGENAME lib/gdbserver +$DEBUGSOCKET --attach $PID &
+if [ $? != 0 ]; then
+  message_exit "Failed to launch the debugging server on the device"
+fi
+
+$ADB forward tcp:$DEBUGPORT localfilesystem:$DATADIR/$DEBUGSOCKET
+if [ $? != 0 ]; then
+  message_exit "Failed to setup network redirection to debugging server"
+fi
+
+$ADB pull /system/bin/app_process $DEBUGOUTPATH/app_process
+$ADB pull /system/bin/linker $DEBUGOUTPATH/linker
+$ADB pull /system/lib/libc.so $DEBUGOUTPATH/libc.so
+$ADB pull /system/lib/libstdc++.so $DEBUGOUTPATH/libstdc++.so
+
+GDBSETUP=$DEBUGOUTPATH/gdb.setup
+echo -n > $GDBSETUP
+echo -n "set solib-search-path $DEBUGOUTPATH:$DASHELOUTPATH:" >> $GDBSETUP
+echo ":$ASEBAOUTPATH:$QTLIBRARYDIR" >> $GDBSETUP
+echo "file $DEBUGOUTPATH/app_process" >> $GDBSETUP
+echo "target remote :$DEBUGPORT" >> $GDBSETUP
+
+GDBCLIENT=$DEBUGOUTPATH/gdbclient
+$GDBCLIENT -x $GDBSETUP
 
 log_clean

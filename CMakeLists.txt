@@ -1,3 +1,5 @@
+# kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
+# vim: ts=4:sw=4:noexpandtab
 cmake_minimum_required(VERSION 2.6)
 
 project(aseba)
@@ -8,15 +10,9 @@ add_definitions(-Wall)
 # Dashel
 # TODO: make Dashel.cmake to perform this
 
-find_path(DASHEL_INCLUDE_DIR dashel.h
-	/usr/include/dashel
-	/usr/local/include/dashel
-)
+find_path(DASHEL_INCLUDE_DIR dashel/dashel.h CMAKE_FIND_ROOT_PATH_BOTH)
 
-find_library(DASHEL_LIBRARY dashel
-	/usr/lib
-	/usr/local/lib
-)
+find_library(DASHEL_LIBRARY dashel CMAKE_FIND_ROOT_PATH_BOTH)
 
 include_directories(${DASHEL_INCLUDE_DIR})
 set(EXTRA_LIBS ${DASHEL_LIBRARY})
@@ -42,7 +38,11 @@ else (WIN32)
 		mark_as_advanced(IOKIT_LIBRARY)
 		set(EXTRA_LIBS ${EXTRA_LIBS} ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY} ${EXTRA_LIBS})
 	else (APPLE)
-		set(DASHEL_PLUGINS transport/dashel_plugins/socketcan.cpp)
+		if (ANDROID)
+			set(DASHEL_PLUGINS transport/dashel_plugins/none.cpp)
+		else (ANDROID)
+			set(DASHEL_PLUGINS transport/dashel_plugins/socketcan.cpp)
+		endif (ANDROID)
 		if (UDEV_FOUND)
 			include_directories(${UDEV_INCLUDE_DIR})
 			set(EXTRA_LIBS ${EXTRA_LIBS} ${UDEV_LIBS} ${EXTRA_LIBS})
@@ -59,20 +59,11 @@ endif (WIN32)
 
 # Enki
 
-find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h
-	/usr/include/enki
-	/usr/local/include/enki
-)
+find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
 
-find_library(ENKI_LIBRARY enki
-	/usr/lib
-	/usr/local/lib
-)
+find_library(ENKI_LIBRARY enki)
 
-find_library(ENKI_VIEWER_LIBRARY enkiviewer
-	/usr/lib
-	/usr/local/lib
-)
+find_library(ENKI_VIEWER_LIBRARY enkiviewer)
 
 
 if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
@@ -122,7 +113,7 @@ if (SHARED_LIBS)
 	add_library(asebacompiler SHARED ${ASEBACOMPILER_SRC})
 	add_library(asebavm SHARED ${ASEBAVM_SRC})
 	add_library(asebavmbuffer SHARED ${ASEBAVMBUFFER_SRC})
-
+	
 	install(TARGETS asebacore LIBRARY DESTINATION lib)
 	install(TARGETS asebacompiler LIBRARY DESTINATION lib)
 	install(TARGETS asebavm LIBRARY DESTINATION lib)

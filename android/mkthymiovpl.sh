@@ -21,56 +21,55 @@
 
 . ubash
 
-fs_abspath thymiovpl THYMIOVPLSOURCES
-
 script_init "Build Thymio VPL for Android"
 script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
-script_setopt "--sources|-s" "PATH" THYMIOVPLSOURCES $THYMIOVPLSOURCES \
-  "path to the Thymio VPL sources"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 17 \
   "level of the Android API"
-script_setopt "--build-dir|-b" "PATH" THYMIOVPLBUILD "build" \
-  "path to the Thymio VPL build root"
-script_setopt "--debug" "" ANTBUILDDEBUG false \
-  "build debug target instead of release"
+script_setopt "--sources" "PATH" THYMIOVPLSOURCES thymiovpl \
+  "path to the Thymio VPL sources"
+script_setopt "--build-root|-b" "PATH" BUILDROOT "build" \
+  "path to the build root directory"
+script_setopt "--debug" "" BUILDDEBUG false \
+  "build debug targets instead of release"
 script_setopt "--install" "" THYMIOVPLINSTALL false \
   "install package to Android device"
 script_setopt "--clean" "" THYMIOVPLCLEAN false "remove build directory"
 
 script_checkopts $*
 
-[ -d "$THYMIOVPLBUILD/thymiovpl" ] || \
-  execute "mkdir -p $THYMIOVPLBUILD/thymiovpl"
+[ -d "$BUILDROOT/thymiovpl" ] || execute "mkdir -p $BUILDROOT/thymiovpl"
 
-fs_abspath $ANDROIDSDKROOT ANDROIDSDKROOT
-fs_abspath $THYMIOVPLSOURCES THYMIOVPLSOURCES
-fs_abspath $THYMIOVPLBUILD THYMIOVPLBUILD
+fs_abspath $BUILDROOT BUILDROOT
 
-if true ANTBUILDDEBUG; then
-  ANTBUILDTARGET=debug
-  THYMIOVPLPKG=thymiovpl-debug-unaligned.apk
-else
-  ANTBUILDTARGET=release
-  THYMIOVPLPKG=thymiovpl-release-unsigned.apk
-fi
+if false THYMIOVPLCLEAN; then
+  fs_abspath $ANDROIDSDKROOT ANDROIDSDKROOT
+  fs_abspath $THYMIOVPLSOURCES THYMIOVPLSOURCES
 
-cd $THYMIOVPLSOURCES && \
-  export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
-  export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
-  export THYMIO_VPL_BUILD=$THYMIOVPLBUILD/thymiovpl && \
-  ant $ANTBUILDTARGET && \
-  ANTBUILDSUCCESS=true
-
-if true ANTBUILDSUCCESS; then
-  if true THYMIOVPLINSTALL; then
-    $ANDROIDSDKROOT/platform-tools/adb -d install -r \
-      $THYMIOVPLBUILD/thymiovpl/$THYMIOVPLPKG
+  if true BUILDDEBUG; then
+    ANTBUILDTARGET=debug
+    THYMIOVPLPKG=thymiovpl-debug-unaligned.apk
+  else
+    ANTBUILDTARGET=release
+    THYMIOVPLPKG=thymiovpl-release-unsigned.apk
   fi
-fi
 
-if true THYMIOVPLCLEAN; then
-  execute "rm -rf $THYMIOVPLBUILD/thymiovpl"
+  cp -aT $THYMIOVPLSOURCES $BUILDROOT/thymiovpl && \
+    cd $BUILDROOT/thymiovpl && \
+    export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
+    export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
+    export DEBUGGABLE=$BUILDDEBUG && \
+    ant $ANTBUILDTARGET && \
+    ANTBUILDSUCCESS=true
+
+  if true ANTBUILDSUCCESS; then
+    if true THYMIOVPLINSTALL; then
+      $ANDROIDSDKROOT/platform-tools/adb -d install -r \
+        $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
+    fi
+  fi
+else
+  execute "rm -rf $BUILDROOT/thymiovpl"
 fi
 
 log_clean

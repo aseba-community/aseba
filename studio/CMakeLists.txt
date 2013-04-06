@@ -1,3 +1,5 @@
+# kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
+# vim: ts=4:sw=4:noexpandtab
 find_package(Qt4)
 
 set(DOC_NAME aseba-doc)
@@ -7,11 +9,11 @@ set(DOC_NAME aseba-doc)
 # This is a replacement...
 # From : http://www.cmake.org/pipermail/cmake/2006-July/010180.html
 MACRO(MAKE_WINDOWS_PATH pathname)
-  # An extra \\ escape is necessary to get a \ through CMake's processing.
-  STRING(REPLACE "/" "\\" ${pathname} "${${pathname}}")
-  # Enclose with UNESCAPED quotes.  This means we need to escape our
-  # quotes once here, i.e. with \"
-  SET(${pathname} \"${${pathname}}\")
+	# An extra \\ escape is necessary to get a \ through CMake's processing.
+	STRING(REPLACE "/" "\\" ${pathname} "${${pathname}}")
+	# Enclose with UNESCAPED quotes.  This means we need to escape our
+	# quotes once here, i.e. with \"
+	SET(${pathname} \"${${pathname}}\")
 ENDMACRO(MAKE_WINDOWS_PATH)
 
 if (QT4_FOUND)
@@ -41,16 +43,16 @@ if (QT4_FOUND)
 	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 
 	# generates the documentation
-	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+	if (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message("-- qcollectiongenerator executable found")
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch
 			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${DOC_NAME}.qhcp -o ${DOC_NAME}.qhc
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
-	else (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-		message(FATAL_ERROR "-- qcollectiongenerator executable not found (hint: on Ubuntu, install package qt4-dev-tools)")
-	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+	else (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+		message(WARNING "-- Qt help support missing, studio online help disabled (hint: on Ubuntu, install package qt4-dev-tools)")
+	endif (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
 	# code common to the use of Aseba under Qt
 	set(qt_common_SRCS
@@ -80,38 +82,41 @@ if (QT4_FOUND)
 	qt4_automoc(${qt_plugins_SRCS})
 	add_library(asebaqtplugins ${qt_plugins_SRCS})
 	
-	# studio for desktop use
-	set(studio_SRCS
-		StudioAeslEditor.cpp
-		PluginRegistry.cpp
-		MainWindow.cpp
-		NamedValuesVectorModel.cpp
-		ClickableLabel.cpp
-		CustomDelegate.cpp
-		main.cpp
-		FindDialog.cpp
-		EventViewer.cpp
-		HelpViewer.cpp
-		ConfigDialog.cpp
-		ModelAggregator.cpp
-	)
-	qt4_automoc(${studio_SRCS})
-	
 	qt4_add_resources(resfiles asebastudio.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-	
-	add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-	if (HAS_DYN_VERSION)
-		add_dependencies(asebastudio versionheader)
-	endif (HAS_DYN_VERSION)
-	if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-		add_dependencies(asebastudio documentation)
-	endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
-	target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+	if (QT_QTHELP_FOUND)
+		# studio for desktop use
+		set(studio_SRCS
+			StudioAeslEditor.cpp
+			PluginRegistry.cpp
+			MainWindow.cpp
+			NamedValuesVectorModel.cpp
+			ClickableLabel.cpp
+			CustomDelegate.cpp
+			main.cpp
+			FindDialog.cpp
+			EventViewer.cpp
+			HelpViewer.cpp
+			ConfigDialog.cpp
+			ModelAggregator.cpp
+		)
+		qt4_automoc(${studio_SRCS})
 
-	install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+		if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+			qt4_add_resources(resfiles asebastudiohelp.qrc)
+		endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+
+		add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+		if (HAS_DYN_VERSION)
+			add_dependencies(asebastudio versionheader)
+		endif (HAS_DYN_VERSION)
+
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
+
+		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+	endif (QT_QTHELP_FOUND)
 	
 	# Thymio VPL standalone
 	set(thymiovpl_SRCS
@@ -119,15 +124,17 @@ if (QT4_FOUND)
 		thymiovpl.cpp
 	)
 	qt4_automoc(${thymiovpl_SRCS})
-	
-	# TODO: 
-	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+
+	if (ANDROID)
+		add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	else (ANDROID)
+		add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	endif (ANDROID)
 	if (HAS_DYN_VERSION)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
-	
+
 	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler asebacore ${QT_LIBRARIES} ${EXTRA_LIBS})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-
 endif (QT4_FOUND)
