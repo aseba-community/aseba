@@ -211,7 +211,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void * /*reserved*/)
     s_javaVM = vm;
 
     // Do a kind of "linking".
-    jclass clazz = env->FindClass("org/kde/necessitas/origo/DashelSerial");
+    jclass clazz = env->FindClass("ch/ethz/thymiovpl/DashelSerial");
     if(!clazz)
     {
         return -1;

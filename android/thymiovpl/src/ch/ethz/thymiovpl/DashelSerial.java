@@ -17,7 +17,7 @@
         along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kde.necessitas.origo;
+package ch.ethz.thymiovpl;
 
 import android.util.Log;
 import android.hardware.usb.UsbManager;
@@ -76,7 +76,7 @@ public class DashelSerial {
             Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
             while(deviceIterator.hasNext()){
                 device = deviceIterator.next();
-                if(device.getVendorId() == 0x0617 || device.getProductId() == 0x000a) {
+                if(device.getVendorId() == 0x0617 || device.getProductId() == 0x07d3) {
                     RequestPermission();
                     break;
                 }

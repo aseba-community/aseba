@@ -122,6 +122,12 @@ public class QtActivity extends Activity
     private ActivityInfo m_activityInfo = null; // activity info object, used to access the libs and the strings
     private DexClassLoader m_classLoader = null; // loader object
     private String[] m_qtLibs = null; // required qt libs
+    private static QtActivity QtActivityInstance;
+
+    public static QtActivity getQtActivityInstance()
+    {
+        return QtActivity.QtActivityInstance;
+    }
 
     // this function is used to load and start the loader
     private void loadApplication(Bundle loaderParams)
@@ -178,6 +184,8 @@ public class QtActivity extends Activity
                 throw new Exception("");
 
             QtApplication.setQtActivityDelegate(qtLoader);
+
+            QtActivity.QtActivityInstance = this;
 
             // now load the application library so it's accessible from this class loader
             if (libName != null)
