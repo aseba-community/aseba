@@ -76,7 +76,7 @@ public class DashelSerial {
             Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
             while(deviceIterator.hasNext()){
                 device = deviceIterator.next();
-                if(device.getVendorId() == 0x0617 || device.getProductId() == 0x07d3) {
+                if(device.getVendorId() == 0x0617 || device.getProductId() == 0x000a) {
                     RequestPermission();
                     break;
                 }
