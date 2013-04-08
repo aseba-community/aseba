@@ -40,6 +40,8 @@ script_setopt "--build-root|-b" "PATH" BUILDROOT "build" \
   "path to the build root directory"
 script_setopt "--debug" "" BUILDDEBUG false \
   "build debug targets instead of release"
+script_setopt "--emu" "" USEEMU false \
+  "use emulator instead of real device"
 script_setopt "--install" "" ALLINSTALL false \
   "install package to Android device"
 script_setopt "--clean" "" ALLCLEAN false "remove build directories"
@@ -54,6 +56,9 @@ if false ALLCLEAN; then
   fi
   if true ALLINSTALL; then
     THYMIOVPLARGS="--install"
+  fi
+  if true USEEMU; then
+    THYMIOVPLARGS="$THYMIOVPLARGS --install"
   fi
 
   ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT && \

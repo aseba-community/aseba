@@ -32,9 +32,12 @@ script_setopt "--build-root|-b" "PATH" BUILDROOT "build" \
   "path to the build root directory"
 script_setopt "--debug" "" BUILDDEBUG false \
   "build debug targets instead of release"
+script_setopt "--emu" "" USEEMU false \
+  "use emulator instead of real device"
 script_setopt "--install" "" THYMIOVPLINSTALL false \
   "install package to Android device"
 script_setopt "--clean" "" THYMIOVPLCLEAN false "remove build directory"
+
 
 script_checkopts $*
 
@@ -64,8 +67,15 @@ if false THYMIOVPLCLEAN; then
 
   if true ANTBUILDSUCCESS; then
     if true THYMIOVPLINSTALL; then
-      $ANDROIDSDKROOT/platform-tools/adb -d install -r \
-        $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
+      if true USEEMU; then
+        echo $ANDROIDSDKROOT/platform-tools/adb -e install -r \
+          $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG      
+        $ANDROIDSDKROOT/platform-tools/adb -e install -r \
+          $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG      
+      else
+        $ANDROIDSDKROOT/platform-tools/adb -d install -r \
+          $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
+      fi
     fi
   fi
 else
