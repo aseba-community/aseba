@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QRegExp>
 #include "../compiler/compiler.h"
 

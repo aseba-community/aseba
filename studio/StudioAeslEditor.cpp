@@ -23,8 +23,6 @@
 #include <QtGui>
 #include <QtGlobal>
 
-#include <StudioAeslEditor.moc>
-
 namespace Aseba
 {
 	/** \addtogroup studio */

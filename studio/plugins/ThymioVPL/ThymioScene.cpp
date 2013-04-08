@@ -4,7 +4,6 @@
 #include "ThymioButtons.h"
 
 #include "ThymioScene.h"
-#include "ThymioScene.moc"
 
 using namespace std;
 

@@ -1,13 +1,9 @@
 #include "VariablesViewPlugin.h"
-#include <VariablesViewPlugin.moc>
 #include "../Target.h"
 #include <QtGui>
 #include <QtDebug>
 #include <limits>
 #include <cassert>
-
-
-//#include <VariablesViewPlugin.moc>
 
 namespace Aseba
 {

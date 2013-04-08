@@ -31,9 +31,6 @@
 #include <QLibraryInfo>
 #include <stdexcept>
 
-
-#include <DashelTarget.moc>
-
 #ifdef WIN32 // for Sleep
 #include <windows.h>
 #endif

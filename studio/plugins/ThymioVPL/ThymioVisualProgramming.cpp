@@ -11,7 +11,6 @@
 #include <QApplication>
 
 #include "ThymioVisualProgramming.h"
-#include "ThymioVisualProgramming.moc"
 #include "../../TargetModels.h"
 
 using namespace std;
@@ -119,7 +118,7 @@ namespace Aseba
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
-		eventButtons.push_back(proxGroundButton);		
+		eventButtons.push_back(proxGroundButton);
 		eventButtons.push_back(tapButton);
 		eventButtons.push_back(clapButton);
 		
@@ -153,8 +152,8 @@ namespace Aseba
 		// scene		
 		scene = new ThymioScene(this);
 		view = new QGraphicsView(scene);
-		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);		
-		view->setRenderHint(QPainter::Antialiasing);
+		//view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+		//view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		view->centerOn(200,0);
@@ -173,7 +172,7 @@ namespace Aseba
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
 		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
-								
+		
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
@@ -208,7 +207,7 @@ namespace Aseba
 		
 		QRect clientRect =  QApplication::desktop()->availableGeometry();
 
-		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )		
+		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )
 			resize(clientRect.width()-100, clientRect.height()-100);
 		
 		setWindowModality(Qt::ApplicationModal);
@@ -227,7 +226,7 @@ namespace Aseba
 		eventColors.push_back(QColor(67,205,128)); actionColors.push_back(QColor(0,197,205)); 
 		eventColors.push_back(QColor(255,215,0)); actionColors.push_back(QColor(255,99,71));
 		eventColors.push_back(QColor(255,97,3)); actionColors.push_back(QColor(142,56,142));
-		eventColors.push_back(QColor(125,158,192)); actionColors.push_back(QColor(56,142,142)); 	
+		eventColors.push_back(QColor(125,158,192)); actionColors.push_back(QColor(56,142,142)); 
 
 		if( button )
 		{

@@ -28,7 +28,6 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 
-#include <ThymioVPLStandalone.moc>
 #include <version.h>
 
 namespace Aseba

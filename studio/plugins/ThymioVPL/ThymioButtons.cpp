@@ -8,7 +8,6 @@
 #include <QApplication>
 
 #include "ThymioButtons.h"
-#include "ThymioButtons.moc"
 
 namespace Aseba
 {

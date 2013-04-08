@@ -63,8 +63,14 @@ if (QT4_FOUND)
 		AeslEditor.cpp
 		translations/CompilerTranslator.cpp
 	)
-	qt4_automoc(${qt_common_SRCS})
-	add_library(asebaqtcommon ${qt_common_SRCS})
+	qt4_wrap_cpp(qt_common_MOCS
+		Target.h
+		DashelTarget.h
+		TargetModels.h
+		AeslEditor.h
+		translations/CompilerTranslator.h
+	)
+	add_library(asebaqtcommon ${qt_common_SRCS} ${qt_common_MOCS})
 	
 	# plugins
 	set(qt_plugins_SRCS
@@ -79,8 +85,13 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioIRVisitors.cpp
 		plugins/ThymioVPL/ThymioCompiler.cpp
 	)
-	qt4_automoc(${qt_plugins_SRCS})
-	add_library(asebaqtplugins ${qt_plugins_SRCS})
+	qt4_wrap_cpp(qt_plugins_MOCS
+		plugins/VariablesViewPlugin.h
+		plugins/ThymioVPL/ThymioVisualProgramming.h
+		plugins/ThymioVPL/ThymioScene.h
+		plugins/ThymioVPL/ThymioButtons.h
+	)
+	add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 	
 	qt4_add_resources(resfiles asebastudio.qrc)
 	
@@ -102,13 +113,24 @@ if (QT4_FOUND)
 			ConfigDialog.cpp
 			ModelAggregator.cpp
 		)
-		qt4_automoc(${studio_SRCS})
+		qt4_wrap_cpp(studio_MOCS
+			StudioAeslEditor.h
+			MainWindow.h
+			NamedValuesVectorModel.h
+			ClickableLabel.h
+			CustomDelegate.h
+			FindDialog.h
+			EventViewer.h
+			HelpViewer.h
+			ConfigDialog.h
+			ModelAggregator.h
+		)
 
 		if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 			qt4_add_resources(resfiles asebastudiohelp.qrc)
 		endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
-		add_executable(asebastudio WIN32 ${studio_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+		add_executable(asebastudio WIN32 ${studio_SRCS} ${studio_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
 		if (HAS_DYN_VERSION)
 			add_dependencies(asebastudio versionheader)
 		endif (HAS_DYN_VERSION)
@@ -123,12 +145,14 @@ if (QT4_FOUND)
 		ThymioVPLStandalone.cpp
 		thymiovpl.cpp
 	)
-	qt4_automoc(${thymiovpl_SRCS})
+	qt4_wrap_cpp(thymiovpl_MOCS
+		ThymioVPLStandalone.h
+	)
 
 	if (ANDROID)
-		add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+		add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${thymiovpl_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
 	else (ANDROID)
-		add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+		add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${thymiovpl_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
 	endif (ANDROID)
 	if (HAS_DYN_VERSION)
 		add_dependencies(thymiovpl versionheader)

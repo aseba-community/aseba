@@ -22,8 +22,6 @@
 
 #include <QSettings>
 
-#include <ConfigDialog.moc>
-
 
 #define BOOL_TO_CHECKED(value)	(value == true ? Qt::Checked : Qt::Unchecked)
 #define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)

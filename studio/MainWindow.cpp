@@ -38,8 +38,7 @@
 #include <cassert>
 #include <QTabWidget>
 #include <QtConcurrentRun>
- 
-#include <MainWindow.moc>
+
 #include <version.h>
 
 #include <iostream>

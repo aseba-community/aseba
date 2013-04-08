@@ -41,8 +41,6 @@
 	#include <qwt_data.h>
 #endif
 
-#include <EventViewer.moc>
-
 namespace Aseba
 {
 	/** \addtogroup studio */
