@@ -3,21 +3,25 @@
 Requirements:
 
   Download the official Android Native Development Kit (NDK) from
-  http://developer.android.com/tools/sdk/ndk. Untar the archive in
+  http://developer.android.com/tools/sdk/ndk . Untar the archive in
   a location of choice, e.g., /opt/android/ndk.
 
   Download the official Android Source Development Kit (SDK) from
-  http://developer.android.com/tools/sdk. Untar the archive in
+  http://developer.android.com/sdk . Untar the archive in
   a location of choice, e.g., /opt/android/sdk.
 
   Download the Necessitas Qt Source Development Kit installer from
-  http://community.kde.org/Necessitas. Run the installer to deploy
+  http://community.kde.org/Necessitas . Run the installer to deploy
   Necessitas in a location of choice, e.g., /opt/necessitas.
 
   Install ubash from the ASL launchpad repository ppa:kralf/asl.
+  On Ubuntu:
   > (sudo) add-apt-repository ppa:kralf/asl
   > (sudo) apt-get update
   > (sudo) apt-get install ubash
+  
+  Install the ant build system, on Ubuntu:
+  > (sudo) apt-get install ant
 
 Build instructions:
 
