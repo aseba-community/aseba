@@ -1,6 +1,25 @@
                 Android build system for ASEBA
 
-Requirements:
+Requirements (using Necessitas bundled SDK and NDK):
+
+  Download the Necessitas Qt Source Development Kit installer from
+  http://community.kde.org/Necessitas . Run the installer to deploy
+  Necessitas in a location of choice, e.g., /opt/necessitas.
+  Choose to install at least API level 12.
+
+  Install ubash. On Ubuntu, use the ASL launchpad repository ppa:kralf/asl:
+  > (sudo) add-apt-repository ppa:kralf/asl
+  > (sudo) apt-get update
+  > (sudo) apt-get install ubash
+  On other platform, use the source from:
+  https://launchpad.net/~kralf/+archive/asl/+files/ubash_0.1-56%7Elucid.tar.gz
+  
+  Install the ant build system, on Ubuntu:
+  > (sudo) apt-get install ant
+  
+Requirements (using separated SDK and NDK)
+
+  In addition to the previous step, install these:
 
   Download the official Android Native Development Kit (NDK) from
   http://developer.android.com/tools/sdk/ndk . Untar the archive in
@@ -9,19 +28,6 @@ Requirements:
   Download the official Android Source Development Kit (SDK) from
   http://developer.android.com/sdk . Untar the archive in
   a location of choice, e.g., /opt/android/sdk.
-
-  Download the Necessitas Qt Source Development Kit installer from
-  http://community.kde.org/Necessitas . Run the installer to deploy
-  Necessitas in a location of choice, e.g., /opt/necessitas.
-
-  Install ubash from the ASL launchpad repository ppa:kralf/asl.
-  On Ubuntu:
-  > (sudo) add-apt-repository ppa:kralf/asl
-  > (sudo) apt-get update
-  > (sudo) apt-get install ubash
-  
-  Install the ant build system, on Ubuntu:
-  > (sudo) apt-get install ant
 
 Build instructions:
 

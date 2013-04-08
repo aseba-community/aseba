@@ -24,7 +24,7 @@
 script_init "Build Thymio VPL for Android"
 script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
-script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 17 \
+script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 12 \
   "level of the Android API"
 script_setopt "--sources" "PATH" THYMIOVPLSOURCES thymiovpl \
   "path to the Thymio VPL sources"

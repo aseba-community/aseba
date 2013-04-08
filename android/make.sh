@@ -26,7 +26,7 @@ script_setopt "--ndk-root" "PATH" ANDROIDNDKROOT "/opt/android/ndk" \
   "path to the Android NDK root directory"
 script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
-script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 17 \
+script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 12 \
   "level of the Android API"
 script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
   "path to the Necessitas root directory"
