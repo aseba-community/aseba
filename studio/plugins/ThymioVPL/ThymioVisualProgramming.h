@@ -5,7 +5,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGraphicsView>
-#include <QSvgRenderer>
 #include <QGraphicsSvgItem>
 #include <QGraphicsItem>
 #include <QGraphicsWidget>
@@ -105,9 +104,6 @@ namespace Aseba
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
 
-		QSvgRenderer *tapSvg;
-		QSvgRenderer *clapSvg;
-		
 		QString thymioFilename;
 
 		int windowWidth;

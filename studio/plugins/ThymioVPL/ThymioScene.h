@@ -72,7 +72,6 @@ namespace Aseba
 		QColor actionButtonColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
-		double scaleFactor;
 		bool newRow;
 		qreal buttonSetHeight;
 		bool advancedMode;

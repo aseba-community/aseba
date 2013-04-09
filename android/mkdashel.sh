@@ -26,6 +26,8 @@ script_setopt "--ndk-root" "PATH" ANDROIDNDKROOT "/opt/android/ndk" \
   "path to the Android NDK root directory"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 9 \
   "level of the Android API"
+script_setopt "--abi" "ABI" ANDROIDABI "armeabi-v7a" \
+  "name of the Android ABI"
 script_setopt "--toolchain|-t" "FILE" CMAKETOOLCHAIN "cmake/Android.cmake" \
   "name of the CMake toolchain file"
 script_setopt "--sources" "PATH" DASHELSOURCES ../../dashel \
@@ -54,6 +56,7 @@ if false DASHELCLEAN; then
   CMAKEOPTS="$CMAKEOPTS -DLIBRARY_OUTPUT_PATH_ROOT=$BUILDROOT/thymiovpl"
   CMAKEOPTS="$CMAKEOPTS -DBUILD_SHARED_LIBS=ON"
   CMAKEOPTS="$CMAKEOPTS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="
+  CMAKEOPTS="$CMAKEOPTS -DANDROID_ABI=$ANDROIDABI"
 
   if true BUILDDEBUG; then
     CMAKEOPTS="$CMAKEOPTS -DCMAKE_BUILD_TYPE=Debug"

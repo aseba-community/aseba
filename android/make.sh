@@ -28,6 +28,8 @@ script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 12 \
   "level of the Android API"
+script_setopt "--abi" "ABI" ANDROIDABI "armeabi-v7a" \
+  "name of the Android ABI"
 script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
   "path to the Necessitas root directory"
 script_setopt "--dashel-sources" "PATH" DASHELSOURCES ../../dashel \
@@ -61,10 +63,10 @@ if false ALLCLEAN; then
     THYMIOVPLARGS="$THYMIOVPLARGS --install"
   fi
 
-  ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT && \
+  ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --abi $ANDROIDABI && \
   ./mkaseba.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --necessitas-root \
-    $NECESSITASROOT && \
-  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT
+    $NECESSITASROOT --abi $ANDROIDABI && \
+  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT --emu $USEEMU
 else
   ./mkdashel.sh --clean && \
   ./mkaseba.sh --clean && \

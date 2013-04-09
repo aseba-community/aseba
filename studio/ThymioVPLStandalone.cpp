@@ -124,6 +124,7 @@ namespace Aseba
 	{
 		editor = new AeslEditor;
 		editor->setReadOnly(true);
+		editor->setTextInteractionFlags(Qt::NoTextInteraction);
 		new AeslHighlighter(editor, editor->document());
 		
 		layout = new QVBoxLayout;
@@ -134,9 +135,12 @@ namespace Aseba
 			arg(ASEBA_PROTOCOL_VERSION).
 			arg(DASHEL_VERSION).
 			arg(QString::fromStdString(Dashel::streamTypeRegistry.list()));
-		
-		layout->addWidget(new QLabel(text));
+		QLabel* label(new QLabel(text));
+		label->setWordWrap(true);
+		layout->addWidget(label);
 		setLayout(layout);
+		
+		resize(800,700);
 	}
 	
 	void ThymioVPLStandalone::setupConnections()
@@ -361,7 +365,6 @@ namespace Aseba
 		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false);
 		vpl->loadFromDom(savedContent, false);
 		layout->insertWidget(0, vpl, 3);
-		
 		
 		// do a first compilation
 		editorContentChanged();

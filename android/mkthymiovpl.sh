@@ -68,11 +68,11 @@ if false THYMIOVPLCLEAN; then
   if true ANTBUILDSUCCESS; then
     if true THYMIOVPLINSTALL; then
       if true USEEMU; then
-        echo $ANDROIDSDKROOT/platform-tools/adb -e install -r \
-          $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG      
+        echo "Installing to emulator"
         $ANDROIDSDKROOT/platform-tools/adb -e install -r \
           $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG      
       else
+        echo "Installing to real device"
         $ANDROIDSDKROOT/platform-tools/adb -d install -r \
           $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
       fi
