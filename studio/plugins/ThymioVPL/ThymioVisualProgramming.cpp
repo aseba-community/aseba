@@ -201,10 +201,6 @@ namespace Aseba
 		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
 		
 		setWindowModality(Qt::ApplicationModal);
-		
-		const QRect clientRect =  QApplication::desktop()->availableGeometry();
-		if( clientRect.width() < (width()+100) || clientRect.height() < (height()+100) )
-			resize(clientRect.width()-100, clientRect.height()-100);
 	}
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()

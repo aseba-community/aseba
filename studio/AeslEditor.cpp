@@ -672,15 +672,17 @@ namespace Aseba
 		cursor.beginEditBlock();
 		cursor.select(QTextCursor::Document);
 		cursor.removeSelectedText();
-		int pos=0;
+		int posStart = 0;
+		int posEnd =0;
 		
 		for (int i=0; i<code.size(); i++)
 		{
 			if (i == elementToHighlight)
 			{
 				format.setBackground(QBrush(QColor(255,255,200)));
+				posStart = cursor.position();
 				cursor.insertText(code[i], format);
-				pos = cursor.position();
+				posEnd = cursor.position();
 			} 
 			else
 			{
@@ -689,8 +691,10 @@ namespace Aseba
 			}
 		}
 		
-		cursor.setPosition(pos);
 		cursor.endEditBlock();
+		cursor.setPosition(posEnd);
+		setTextCursor(cursor);
+		cursor.setPosition(posStart);
 		setTextCursor(cursor);
 		ensureCursorVisible();
 	}

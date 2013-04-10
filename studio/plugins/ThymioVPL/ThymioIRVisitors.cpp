@@ -429,14 +429,14 @@ namespace Aseba
 						if( buttonToCodeMap[i]>=0 ) 
 							buttonToCodeMap[i]++;
 
-					block += 1;				
+					block += 1;
 				}
 				else
 					generatedCode[0].append(L"\nmic.threshold = 250\n");
 
 				generatedCode.push_back(L"\nonevent mic\n");
 				size++;
-				break;	
+				break;
 			default:
 				errorCode = THYMIO_INVALID_CODE;
 				return;
@@ -468,7 +468,7 @@ namespace Aseba
 				// find where "if" block starts for the current event
 				for(unsigned int i=0; i<buttonToCodeMap.size(); i++)
 					if( buttonToCodeMap[i] >= block && buttonToCodeMap[i] < currentBlock &&
-						generatedCode[buttonToCodeMap[i]].find(L"if ") != wstring::npos )				
+						generatedCode[buttonToCodeMap[i]].find(L"if ") != wstring::npos )
 						currentBlock = buttonToCodeMap[i];
 			}
 			
