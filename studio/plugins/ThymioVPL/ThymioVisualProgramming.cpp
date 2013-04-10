@@ -30,9 +30,6 @@ namespace Aseba
 		mainLayout = new QVBoxLayout(this);
 		
 		toolBar = new QToolBar();
-		toolBar->setMaximumHeight(36);
-		toolBar->setIconSize(QSize(24,24));
-		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		mainLayout->addWidget(toolBar);
 
 		newButton = new QToolButton();
@@ -62,7 +59,7 @@ namespace Aseba
 		toolBar->addWidget(runButton);
 
 		stopButton = new QToolButton();
-		stopButton->setIcon(QIcon(":/images/stop1.png"));
+		stopButton->setIcon(QIcon(":/images/stop1.svgz"));
 		stopButton->setToolTip(tr("Stop"));
 		toolBar->addWidget(stopButton);
 		toolBar->addSeparator();
@@ -70,7 +67,6 @@ namespace Aseba
 		colorComboButton = new QComboBox();
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
-		//colorComboButton->setIconSize(QSize(64,32));
 		toolBar->addWidget(colorComboButton);
 		toolBar->addSeparator();
 
@@ -78,16 +74,18 @@ namespace Aseba
 		advancedButton->setIcon(QIcon(":/images/run.png"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
-		toolBar->addSeparator();
 
 		if (showCloseButton)
 		{
+			toolBar->addSeparator();
 			quitButton = new QToolButton();
 			quitButton->setIcon(QIcon(":/images/exit.svgz"));
 			quitButton->setToolTip(tr("Quit"));
 			toolBar->addWidget(quitButton);
 			connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
 		}
+		else
+			quitButton = 0;
 		
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
@@ -603,14 +601,14 @@ namespace Aseba
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
-		
-	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
+	
+	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
 		// desired sizes for height
 		const int idealContentHeight(5*256);
 		const int uncompressibleHeight(
 			actionsLabel->height() +
-			toolBar->height() +
+			desiredToolbarIconSize + 2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
 			eventsLabel->height() +
 			5 * style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
 			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
@@ -638,17 +636,58 @@ namespace Aseba
 		
 		// compute and set scale
 		const qreal scale(qMin(scaleHeight, scaleWidth));
+		return scale;
+	}
+	
+	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
+	{
+		// compute size of elements for toolbar
+		const int toolbarWidgetCount(quitButton ? 9 : 8);
+		const int toolbarSepCount(quitButton ? 4 : 3);
+		// get width of combox box element (not content)
+		QStyleOptionComboBox opt;
+		QSize tmp(0, 0);
+		tmp = style()->sizeFromContents(QStyle::CT_ComboBox, &opt, tmp);
+		int desiredIconSize((
+			event->size().width() -
+			(
+				(toolbarWidgetCount-1) * style()->pixelMetric(QStyle::PM_ToolBarItemSpacing) +
+				(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + 
+				2 * style()->pixelMetric(QStyle::PM_ComboBoxFrameWidth) +
+				toolbarWidgetCount *  style()->pixelMetric(QStyle::PM_ButtonMargin) + 
+				toolbarSepCount * style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent) +
+				2 * style()->pixelMetric(QStyle::PM_ToolBarItemMargin) +
+				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
+				tmp.width()
+			)
+		) / (toolbarWidgetCount));
+		
+		// two pass of layout computation, should be a good-enough approximation
+		qreal testScale(computeScale(event, desiredIconSize));
+		desiredIconSize = qMin(desiredIconSize, int(256.*testScale));
+		const qreal scale(computeScale(event, desiredIconSize));
+		
+		// set toolbar
+		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
+		newButton->setIconSize(tbIconSize);
+		openButton->setIconSize(tbIconSize);
+		saveButton->setIconSize(tbIconSize);
+		saveAsButton->setIconSize(tbIconSize);
+		runButton->setIconSize(tbIconSize);
+		stopButton->setIconSize(tbIconSize);
+		colorComboButton->setIconSize(tbIconSize);
+		advancedButton->setIconSize(tbIconSize);
+		toolBar->setIconSize(tbIconSize);
+		
+		// set view and cards on sides
 		const QSize iconSize(256*scale, 256*scale);
 		view->resetTransform();
 		view->scale(scale, scale);
-		
 		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
-
 		for(QList<ThymioPushButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
 	}
-
 };

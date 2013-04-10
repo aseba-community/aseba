@@ -1,2 +1,3 @@
 kde crystal svg
 amarok
+http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/

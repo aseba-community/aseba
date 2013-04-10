@@ -111,6 +111,7 @@ namespace Aseba
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
 		
+		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 	};
 	/*@}*/
