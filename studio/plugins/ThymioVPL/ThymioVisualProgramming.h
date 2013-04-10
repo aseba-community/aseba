@@ -106,9 +106,6 @@ namespace Aseba
 
 		QString thymioFilename;
 
-		int windowWidth;
-		int windowHeight;
-		
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		bool warningDialog();
 		void setColors(QComboBox *button = 0);

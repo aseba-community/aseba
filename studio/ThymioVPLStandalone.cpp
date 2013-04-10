@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QScrollBar>
 
 #include <version.h>
 
@@ -124,23 +125,27 @@ namespace Aseba
 	{
 		editor = new AeslEditor;
 		editor->setReadOnly(true);
+		#ifdef ANDROID
 		editor->setTextInteractionFlags(Qt::NoTextInteraction);
+		editor->setStyleSheet(
+			"QTextEdit { font-size: 10pt; font-family: \"Courrier\" }"
+		);
+		editor->setTabStopWidth(QFontMetrics(editor->font()).width(' ') * 2);
+		#endif // ANDROID
 		new AeslHighlighter(editor, editor->document());
 		
 		layout = new QVBoxLayout;
 		layout->addWidget(editor, 1);
-		const QString text = tr("Aseba ver. %0 (build %1/protocol %2); Dashel ver. %3 (%4)").
+		const QString text = tr("Aseba ver. %0 (build %1/protocol %2); Dashel ver. %3").
 			arg(ASEBA_VERSION).
 			arg(ASEBA_BUILD_VERSION).
 			arg(ASEBA_PROTOCOL_VERSION).
-			arg(DASHEL_VERSION).
-			arg(QString::fromStdString(Dashel::streamTypeRegistry.list()));
+			arg(DASHEL_VERSION);
 		QLabel* label(new QLabel(text));
 		label->setWordWrap(true);
+		label->setStyleSheet("QLabel { font-size: 8pt; }");
 		layout->addWidget(label);
 		setLayout(layout);
-		
-		resize(800,700);
 	}
 	
 	void ThymioVPLStandalone::setupConnections()

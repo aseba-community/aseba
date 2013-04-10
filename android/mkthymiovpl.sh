@@ -51,10 +51,10 @@ if false THYMIOVPLCLEAN; then
 
   if true BUILDDEBUG; then
     ANTBUILDTARGET=debug
-    THYMIOVPLPKG=thymiovpl-debug-unaligned.apk
+    THYMIOVPLPKG=thymiovpl-debug.apk
   else
     ANTBUILDTARGET=release
-    THYMIOVPLPKG=thymiovpl-release-unsigned.apk
+    THYMIOVPLPKG=thymiovpl-release.apk
   fi
 
   cp -aT $THYMIOVPLSOURCES $BUILDROOT/thymiovpl && \

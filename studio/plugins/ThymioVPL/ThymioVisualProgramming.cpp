@@ -9,6 +9,7 @@
 #include <QDomElement>
 #include <QDesktopWidget>
 #include <QApplication>
+#include <QScrollBar>
 
 #include "ThymioVisualProgramming.h"
 #include "../../TargetModels.h"
@@ -24,8 +25,7 @@ namespace Aseba
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 
-		resize(windowWidth, windowHeight);
-		setMinimumSize(QSize(450,400));
+		setMinimumSize(QSize(600,400));
 		
 		mainLayout = new QVBoxLayout(this);
 		
@@ -134,7 +134,7 @@ namespace Aseba
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
-				
+		
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
@@ -147,15 +147,13 @@ namespace Aseba
 		// scene
 		scene = new ThymioScene(this);
 		view = new QGraphicsView(scene);
-		//view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//view->ensureVisible(scene->sceneRect());
 		sceneLayout->addWidget(view);
-		qDebug() << "found " << (scene->buttonsEnd() - scene->buttonsBegin()) << "buttons";
 		view->centerOn(*scene->buttonsBegin());
-
+		
 		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
 
 		horizontalLayout->addLayout(sceneLayout);
@@ -624,7 +622,7 @@ namespace Aseba
 			2 * 20
 		);
 		const int availableHeight(event->size().height() - uncompressibleHeight);
-		const float scaleHeight(float(availableHeight)/float(idealContentHeight));
+		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
 		
 		// desired sizes for width
 		const int idealContentWidth(1064+256*2);
@@ -632,14 +630,18 @@ namespace Aseba
 			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
 			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 
 			style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
+			#ifdef ANDROID
+			40 + 
+			#else // ANDROID
 			style()->pixelMetric(QStyle::PM_ScrollBarSliderMin) +
+			#endif // ANDROID
 			2 * 20
 		);
 		const int availableWidth(event->size().width() - uncompressibleWidth);
-		const float scaleWidth(float(availableWidth)/float(idealContentWidth));
+		const qreal scaleWidth(qreal(availableWidth)/qreal(idealContentWidth));
 		
 		// compute and set scale
-		const float scale(qMin(scaleHeight, scaleWidth));
+		const qreal scale(qMin(scaleHeight, scaleWidth));
 		const QSize iconSize(256*scale, 256*scale);
 		view->resetTransform();
 		view->scale(scale, scale);

@@ -19,18 +19,19 @@ namespace Aseba
 			QSlider *s = new QSlider(Qt::Vertical);
 			s->setRange(-500,500);
 			s->setStyleSheet(
-				"QSlider { border: 0px; padding: 0px; width: 36px; height: 226px; }"
+				"QSlider { border: 0px; padding: 0px; }"
 				"QSlider::groove:vertical { "
 					"border: 4px solid black; "
 					"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #00FF00, stop:0.25 #FFFF00, stop:0.5 #FF0000, stop:0.75 #FFFF00, stop:1 #00FF00 ); }"
 				"QSlider::handle:vertical { "
 					"background: white; "
-					"border: 4px solid black; width: 36px; height: 36px; margin: -4px; }"
+					"border: 4px solid black; height: 36px; margin: -4px; }"
 			);
 			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
+			w->resize(36, 226);
 			w->setPos(10+i*200, 15);
 			
 			sliders.push_back(s);
@@ -61,12 +62,10 @@ namespace Aseba
 		for(int i=0; i<2; i++) 
 			pt[i] = (sliders[i]->value())*0.06; // [-30,30]
 		
-		double angle = 0;
-		double center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));
+		const qreal step = frame/200.0;
+		const qreal angle = (pt[0]-pt[1]-0.04)*3*step;
+		const qreal center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));
 		
-		qreal step = frame/200.0;
-		
-		angle = (pt[0]-pt[1]-0.04)*3*step;
 		thymioBody->setPos(QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128));
 		thymioBody->setRotation(angle);
 	}
@@ -104,20 +103,21 @@ namespace Aseba
 			QSlider *s = new QSlider(Qt::Horizontal);
 			s->setRange(0,32);
 			s->setStyleSheet(QString(
-				"QSlider { border: 0px; padding: 0px; width: 202; height: 40px; }"
+				"QSlider { border: 0px; padding: 0px; }"
 				"QSlider::groove:horizontal { "
 					"border: 4px solid black;"
 					"background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #000000, stop:1 #%0); "
 				"}"
 				"QSlider::handle:horizontal { "
 					"background: white; "
-					"border: 4px solid black; height: 40px; width: 40px; margin: -4px;"
+					"border: 4px solid black; width: 40px; margin: -4px;"
 				"}"
 				";").arg(sliderColors[i]));
 			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
+			w->resize(202, 40);
 			w->setPos(27, 70+i*60);
 			
 			sliders.push_back(s);

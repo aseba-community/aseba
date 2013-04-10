@@ -146,13 +146,10 @@ namespace Aseba
 		ThymioIRButton *buttonIR;
 		QColor buttonColor;
 		int parentID;
-		qreal scaleFactor;
 		qreal trans;
 
 		QPointF dragStartPosition;
 
-		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-		virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 	};
 	
@@ -184,13 +181,14 @@ namespace Aseba
 		public:
 			ThymioAddButton(QGraphicsItem *parent=0);
 			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-64, -64, 128, 128); }
+			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
 		
 		ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return advancedMode? QRectF(0, 0, 1064, 400) : QRectF(0, 0, 1000, 400); }
+		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1064, 336) : QRectF(0, 0, 1000, 336); }
 
 		void addEventButton(ThymioButton *event);
 		void addActionButton(ThymioButton *action);
@@ -203,9 +201,6 @@ namespace Aseba
 		bool actionExists() { return actionButton == 0 ? false : true; }
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		
-		virtual QPixmap image();
-		void render(QPainter& painter);
-		void setScale(qreal factor);
 		void setAdvanced(bool advanced);
 		
 		ThymioIRButtonSet *getIRButtonSet() { return &buttonSetIR; }
@@ -235,10 +230,8 @@ namespace Aseba
 		qreal trans;
 		qreal xpos;
 		
-		virtual void mousePressEvent ( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
-		virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
-
+		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);

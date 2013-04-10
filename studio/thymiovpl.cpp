@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
 		
 		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget);
 		vpl.show();
+		app.setOverrideCursor(Qt::ArrowCursor);
 		return app.exec();
 	}
 	catch (std::runtime_error e)

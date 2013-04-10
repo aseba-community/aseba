@@ -26,7 +26,7 @@ script_setopt "--ndk-root" "PATH" ANDROIDNDKROOT "/opt/android/ndk" \
   "path to the Android NDK root directory"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 9 \
   "level of the Android API"
-script_setopt "--abi" "ABI" ANDROIDABI "armeabi-v7a" \
+script_setopt "--abi" "ABI" ANDROIDABI "armeabi" \
   "name of the Android ABI"
 script_setopt "--toolchain|-t" "FILE" CMAKETOOLCHAIN "cmake/Android.cmake" \
   "name of the CMake toolchain file"

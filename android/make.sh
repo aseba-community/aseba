@@ -28,7 +28,7 @@ script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 12 \
   "level of the Android API"
-script_setopt "--abi" "ABI" ANDROIDABI "armeabi-v7a" \
+script_setopt "--abi" "ABI" ANDROIDABI "armeabi" \
   "name of the Android ABI"
 script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
   "path to the Necessitas root directory"
@@ -60,13 +60,13 @@ if false ALLCLEAN; then
     THYMIOVPLARGS="--install"
   fi
   if true USEEMU; then
-    THYMIOVPLARGS="$THYMIOVPLARGS --install"
+    THYMIOVPLARGS="$THYMIOVPLARGS --emu"
   fi
 
   ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --abi $ANDROIDABI && \
   ./mkaseba.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --necessitas-root \
     $NECESSITASROOT --abi $ANDROIDABI && \
-  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT --emu $USEEMU
+  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT
 else
   ./mkdashel.sh --clean && \
   ./mkaseba.sh --clean && \
