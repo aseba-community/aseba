@@ -241,8 +241,8 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="210"/>
         <source>End of range index must be lower or equal to start of range index</source>
-        <translatorcomment>Non sembra un messaggio corretto, ma bisogna verificare nel codice a quale situazione si riferisce.</translatorcomment>
-        <translation type="unfinished">L&apos;indice di fine intervello deve essere minore o uguale all&apos;indice di inizio intervallo</translation>
+        <translatorcomment>It seems not a correct message but must be checked against the code</translatorcomment>
+        <translation>L&apos;indice di fine intervallo deve essere minore o uguale all&apos;indice di inizio intervallo</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="214"/>
@@ -612,12 +612,12 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="506"/>
         <source>+= (plus equal)</source>
-        <translation type="unfinished">+= (addizione e riassegnazione)</translation>
+        <translation>+= (addizione e riassegnazione)</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="510"/>
         <source>-= (minus equal)</source>
-        <translation type="unfinished">-= (sottrazione e riassegnazione)</translation>
+        <translation>-= (sottrazione e riassegnazione)</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="514"/>
