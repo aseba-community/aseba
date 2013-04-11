@@ -28,7 +28,7 @@ script_setopt "--sdk-root" "PATH" ANDROIDSDKROOT "/opt/android/sdk" \
   "path to the Android SDK root directory"
 script_setopt "--api-level|-a" "LEVEL" ANDROIDAPILEVEL 12 \
   "level of the Android API"
-script_setopt "--abi" "ABI" ANDROIDABI "armeabi" \
+script_setopt "--abi" "ABI" ANDROIDABI "armeabi-v7a" \
   "name of the Android ABI"
 script_setopt "--necessitas-root" "PATH" NECESSITASROOT "/opt/necessitas" \
   "path to the Necessitas root directory"

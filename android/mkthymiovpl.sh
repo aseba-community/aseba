@@ -54,6 +54,7 @@ if false THYMIOVPLCLEAN; then
     THYMIOVPLPKG=thymiovpl-debug.apk
   else
     ANTBUILDTARGET=release
+    THYMIOVPLPREPKG=thymiovpl-release-unsigned.apk
     THYMIOVPLPKG=thymiovpl-release.apk
   fi
 
@@ -65,6 +66,11 @@ if false THYMIOVPLCLEAN; then
     ant $ANTBUILDTARGET && \
     ANTBUILDSUCCESS=true
 
+  if false BUILDDEBUG; then
+    # align without signing
+    $ANDROIDSDKROOT/tools/zipalign 4 $BUILDROOT/thymiovpl/bin/$THYMIOVPLPREPKG $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
+  fi
+  
   if true ANTBUILDSUCCESS; then
     if true THYMIOVPLINSTALL; then
       if true USEEMU; then
