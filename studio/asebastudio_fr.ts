@@ -1516,12 +1516,12 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="110"/>
         <source>Pre-update warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Avis avant de mettre à jour</translation>
     </message>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="110"/>
         <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the update!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes en train d'écrire le firmware dans le Thymio II. Assurez-vous que le robot est chargé et que le câble USB est branché correctement. &lt;p&gt;&lt;b&gt;Ne pas débrancher le robot pendant la mise à jour! &lt;/b&gt; &lt;/p&gt; Êtes-vous sûr de vouloir continuer? </translation>
     </message>
     <message>
         <location filename="plugins/ThymioBootloader.cpp" line="119"/>

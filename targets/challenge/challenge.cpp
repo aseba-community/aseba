@@ -1076,6 +1076,7 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 	languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
 	languageSelectionBox->addItem(QString::fromUtf8("German"), "de");
 	languageSelectionBox->addItem(QString::fromUtf8("Español"), "es");
+	languageSelectionBox->addItem(QString::fromUtf8("Italiano"), "it");
 	//qDebug() << "locale is " << QLocale::system().name();
 	for (int i = 0; i < languageSelectionBox->count(); ++i)
 	{
