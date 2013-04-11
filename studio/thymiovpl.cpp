@@ -103,8 +103,11 @@ int main(int argc, char *argv[])
 
 	QTranslator compilerTranslator;
 	app.installTranslator(&compilerTranslator);
-	
-	
+#ifdef ANDROID
+	if (commandLineTarget.length() == 0) {
+		commandLineTarget = "android:";
+	}
+#endif
 	// start normal aseba studio
 	try
 	{
