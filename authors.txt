@@ -47,4 +47,4 @@ see there for the list of contributors. The license is
 Creative Commons Attribution-ShareAlike 3.0 License
 
 The icons used in studio are from http://www.everaldo.com/crystal/
-They can be found here: file:///home/steph/data/epfl-lsro/aseba-community/aseba/studio/images/stop1.svgz
+They can be found here: http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/

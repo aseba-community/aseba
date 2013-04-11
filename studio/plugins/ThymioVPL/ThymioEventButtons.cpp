@@ -102,7 +102,7 @@ namespace Aseba
 		setData(0, "event");
 		setData(1, "tap");
 		
-		new QGraphicsSvgItem (":/images/thymiotap.svg", this);
+		new QGraphicsSvgItem (":/images/thymiotap.svgz", this);
 	}
 	
 	
@@ -113,7 +113,7 @@ namespace Aseba
 		setData(0, "event");
 		setData(1, "clap");
 		
-		new QGraphicsSvgItem (":/images/thymioclap.svg", this);
+		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
 	
 

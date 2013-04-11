@@ -48,8 +48,8 @@
 	<file>images/eyeclose.png</file>
 	<file>images/kedit.png</file>
 	<file>images/exec.png</file>
-	<file>images/thymioclap.svg</file>
-	<file>images/thymiotap.svg</file>
+	<file>images/thymioclap.svgz</file>
+	<file>images/thymiotap.svgz</file>
 	<file>images/play.svgz</file>
 	<file>images/save.svgz</file>
 	<file>images/saveas.svgz</file>
@@ -57,7 +57,6 @@
 	<file>images/fileopen.svgz</file>
 	<file>images/exit.svgz</file>
 	<file>images/stop1.svgz</file>
-	<file>images/stop1.png</file>
-	<file>images/run.png</file>
+	<file>images/light.svgz</file>
 </qresource>
 </RCC>

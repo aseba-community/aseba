@@ -1,3 +1,4 @@
 kde crystal svg
 amarok
 http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/
+http://commons.wikimedia.org/wiki/File:Bombilla_amarilla_-_yellow_Edison_lamp.svg

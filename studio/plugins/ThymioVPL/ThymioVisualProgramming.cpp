@@ -71,7 +71,7 @@ namespace Aseba
 		toolBar->addSeparator();
 
 		advancedButton = new QToolButton();
-		advancedButton->setIcon(QIcon(":/images/run.png"));
+		advancedButton->setIcon(QIcon(":/images/light.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
 
