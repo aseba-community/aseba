@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QScrollBar>
+#include <QSplitter>
 
 #include <version.h>
 
@@ -112,6 +113,11 @@ namespace Aseba
 		
 		// when everything is ready, get description
 		target->broadcastGetDescription();
+		
+		// resize if not android
+		#ifndef ANDROID
+		resize(780,500);
+		#endif // ANDROID
 	}
 	
 	ThymioVPLStandalone::~ThymioVPLStandalone()
@@ -123,6 +129,14 @@ namespace Aseba
 	
 	void ThymioVPLStandalone::setupWidgets()
 	{
+		// VPL part
+		vplLayout = new QVBoxLayout;
+		QWidget* vplContainer = new QWidget;
+		vplContainer->setLayout(vplLayout);
+		
+		addWidget(vplContainer);
+		
+		// editor part
 		editor = new AeslEditor;
 		editor->setReadOnly(true);
 		#ifdef ANDROID
@@ -130,11 +144,11 @@ namespace Aseba
 		editor->setStyleSheet(
 			"QTextEdit { font-size: 10pt; font-family: \"Courrier\" }"
 		);
-		editor->setTabStopWidth(QFontMetrics(editor->font()).width(' ') * 2);
+		editor->setTabStopWidth(QFontMetrics(editor->font()).width(' '));
 		#endif // ANDROID
 		new AeslHighlighter(editor, editor->document());
 		
-		layout = new QVBoxLayout;
+		/*QVBoxLayout* layout = new QVBoxLayout;
 		layout->addWidget(editor, 1);
 		const QString text = tr("Aseba ver. %0 (build %1/protocol %2); Dashel ver. %3").
 			arg(ASEBA_VERSION).
@@ -145,7 +159,10 @@ namespace Aseba
 		label->setWordWrap(true);
 		label->setStyleSheet("QLabel { font-size: 8pt; }");
 		layout->addWidget(label);
-		setLayout(layout);
+		QWidget* textWidget = new QWidget;
+		textWidget->setLayout(layout);*/
+		
+		addWidget(editor);
 	}
 	
 	void ThymioVPLStandalone::setupConnections()
@@ -158,7 +175,7 @@ namespace Aseba
 		connect(target.get(), SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
 		connect(target.get(), SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
-		// TODO; later, have error message for these
+		// right now, we ignore errors
 		/*connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)));
 		connect(target, SIGNAL(divisionByZero(unsigned, unsigned)), SLOT(divisionByZero(unsigned, unsigned)));
 		connect(target, SIGNAL(eventExecutionKilled(unsigned, unsigned)), SLOT(eventExecutionKilled(unsigned, unsigned)));
@@ -167,6 +184,33 @@ namespace Aseba
 		
 		connect(target.get(), SIGNAL(variablesMemoryEstimatedDirty(unsigned)), SLOT(variablesMemoryEstimatedDirty(unsigned)));
 		connect(target.get(), SIGNAL(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)), SLOT(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)));
+	}
+	
+	void ThymioVPLStandalone::resizeEvent( QResizeEvent *event )
+	{
+		if (event->size().height() > event->size().width())
+			setOrientation(Qt::Vertical);
+		else
+			setOrientation(Qt::Horizontal);
+		QSplitter::resizeEvent(event);
+		resetSizes();
+	}
+	
+	void ThymioVPLStandalone::resetSizes()
+	{
+		// make sure that VPL is larger than the editor
+		QList<int> sizes;
+		if (orientation() == Qt::Vertical)
+		{
+			sizes.push_back((height() * 5) / 7);
+			sizes.push_back((height() * 2) / 7);
+		}
+		else
+		{
+			sizes.push_back((width() * 2) / 3);
+			sizes.push_back((width() * 1) / 3);
+		}
+		setSizes(sizes);
 	}
 	
 	//! The content of a variable has changed
@@ -379,7 +423,13 @@ namespace Aseba
 		// create the VPL widget
 		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false);
 		vpl->loadFromDom(savedContent, false);
-		layout->insertWidget(0, vpl, 3);
+		vplLayout->addWidget(vpl);
+		
+		// connect callbacks
+		connect(vpl, SIGNAL(compilationOutcome(bool)), editor, SLOT(setEnabled(bool)));
+		
+		// reset sizes
+		resetSizes();
 		
 		// do a first compilation
 		editorContentChanged();
@@ -401,7 +451,7 @@ namespace Aseba
 		if (vpl && (node == id))
 		{
 			savedContent = vpl->saveToDom();
-			layout->removeWidget(vpl);
+			vplLayout->removeWidget(vpl);
 			delete vpl;
 			vpl = 0;
 		}

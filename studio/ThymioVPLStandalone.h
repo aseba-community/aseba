@@ -24,6 +24,7 @@
 #include "Plugin.h"
 #include "Target.h"
 #include "TargetModels.h"
+#include <QSplitter>
 
 class QTranslator;
 class QVBoxLayout;
@@ -58,7 +59,7 @@ namespace Aseba
 	class AeslEditor;
 	
 	//! Container for VPL standalone and its code viewer
-	class ThymioVPLStandalone: public QWidget, public VariableListener
+	class ThymioVPLStandalone: public QSplitter, public VariableListener
 	{
 		Q_OBJECT
 		
@@ -69,6 +70,8 @@ namespace Aseba
 	protected:
 		void setupWidgets();
 		void setupConnections();
+		void resizeEvent( QResizeEvent *event );
+		void resetSizes();
 		void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void closeEvent ( QCloseEvent * event );
 		void timerEvent ( QTimerEvent * event );
@@ -90,7 +93,7 @@ namespace Aseba
 		
 		unsigned id; //!< node identifier
 		
-		QVBoxLayout* layout; //!< layout to add widgets to
+		QLayout* vplLayout; //!< layout to add/remove VPL to/from
 		ThymioVisualProgramming* vpl; //!< VPL widget 
 		QDomDocument savedContent; //!< saved VPL content across disconnections
 		AeslEditor* editor; //! viewer of code produced by VPL

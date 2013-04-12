@@ -527,11 +527,13 @@ namespace Aseba
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			de->displayCode(scene->getCode(), scene->getFocusItemId());
 			runButton->setEnabled(true);
+			emit compilationOutcome(true);
 		}
 		else
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
 			runButton->setEnabled(false);
+			emit compilationOutcome(false);
 		}
 	}
 

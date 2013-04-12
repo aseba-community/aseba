@@ -42,6 +42,9 @@ namespace Aseba
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
 	
+	signals:
+		void compilationOutcome(bool success);
+		
 	public slots:
 		bool closeFile();
 		
