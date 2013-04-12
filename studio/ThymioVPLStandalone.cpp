@@ -200,8 +200,12 @@ namespace Aseba
 		// open file
 		if (as || fileName.isEmpty())
 		{
+			#ifdef ANDROID
+			if (fileName.isEmpty())
+				fileName = "/sdcard/";
+			#endif // ANDROID
 			fileName = QFileDialog::getSaveFileName(this,
-				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
+				tr("Save Script"), "/sdcard", "Aseba scripts (*.aesl)");
 		}
 		
 		if (fileName.isEmpty())
@@ -244,9 +248,15 @@ namespace Aseba
 		if (!vpl)
 			return;
 		
+		#ifdef ANDROID
+		QString dir("/sdcard/");
+		#else // ANDROID
+		QString dir("");
+		#endif // ANDROID
+		
 		// get file name
 		const QString newFileName(QFileDialog::getOpenFileName(this,
-				tr("Open Script"), "", "Aseba scripts (*.aesl)"));
+				tr("Open Script"), dir, "Aseba scripts (*.aesl)"));
 		QFile file(newFileName);
 		if (!file.open(QFile::ReadOnly))
 			return;
