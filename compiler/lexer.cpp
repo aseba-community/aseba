@@ -42,7 +42,7 @@ namespace Aseba
 			else
 			{
 				const long int maskedVal(str[0] & (~(1<<5)));
-				v += (maskedVal - 'A');
+				v += (maskedVal - 'A') + 10;
 			}
 			++str;
 		}
