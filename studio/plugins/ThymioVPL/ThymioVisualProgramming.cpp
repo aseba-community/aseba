@@ -25,7 +25,7 @@ namespace Aseba
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 
-		setMinimumSize(QSize(600,400));
+		setMinimumSize(QSize(400,400));
 		
 		mainLayout = new QVBoxLayout(this);
 		
@@ -116,6 +116,7 @@ namespace Aseba
 		eventButtons.push_back(clapButton);
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
+		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->setSpacing(10);
 		eventsLayout->addWidget(eventsLabel);
@@ -132,6 +133,7 @@ namespace Aseba
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
+		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
 		
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 		compilationResult->setWordWrap(true);
@@ -165,6 +167,7 @@ namespace Aseba
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
 		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
+		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
