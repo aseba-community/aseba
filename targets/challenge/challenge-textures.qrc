@@ -10,5 +10,6 @@
 	<file>doc/challenge.en.html</file>
 	<file>doc/challenge.fr.html</file>
 	<file>doc/challenge.es.html</file>
+	<file>doc/challenge.it.html</file>
 </qresource>
 </RCC>
