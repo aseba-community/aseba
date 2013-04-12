@@ -143,14 +143,14 @@ namespace Aseba
 		// button shape
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(bodyColor);
-		painter->drawChord(-124, -118, 248, 144, 0, 2880);
-		painter->drawRoundedRect(-124, -52, 248, 176, 5, 5);
+		painter->drawChord(-124, -118+yShift, 248, 144, 0, 2880);
+		painter->drawRoundedRect(-124, -52+yShift, 248, 176, 5, 5);
 		
 		if(!up) 
 		{
 			painter->setBrush(Qt::black);
-			painter->drawRect(-128, 30, 18, 80);
-			painter->drawRect(110, 30, 18, 80);
+			painter->drawRect(-128, 30+yShift, 18, 80);
+			painter->drawRect(110, 30+yShift, 18, 80);
 		}
 	}
 

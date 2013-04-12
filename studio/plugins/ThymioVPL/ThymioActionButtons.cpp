@@ -25,14 +25,14 @@ namespace Aseba
 					"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #00FF00, stop:0.25 #FFFF00, stop:0.5 #FF0000, stop:0.75 #FFFF00, stop:1 #00FF00 ); }"
 				"QSlider::handle:vertical { "
 					"background: white; "
-					"border: 4px solid black; height: 36px; margin: -4px; }"
+					"border: 4px solid black; height: 44px; margin: -4px; }"
 			);
 			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
-			w->resize(36, 226);
-			w->setPos(10+i*200, 15);
+			w->resize(48, 226);
+			w->setPos(10+i*188, 15);
 			
 			sliders.push_back(s);
 			
@@ -40,13 +40,13 @@ namespace Aseba
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButton()));
 		}
 		
-		thymioBody = new ThymioBody(this);
+		thymioBody = new ThymioBody(this, -70);
 		thymioBody->setUp(false);
-		thymioBody->setPos(128,128);
+		thymioBody->setPos(128,128+14);
 		thymioBody->setScale(0.2);
 		
 		timer = new QTimeLine(2000, this);
-		timer->setFrameRange(0, 100);
+		timer->setFrameRange(0, 150);
 		timer->setCurveShape(QTimeLine::LinearCurve);
 		timer->setLoopCount(1);
 		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
@@ -66,7 +66,7 @@ namespace Aseba
 		const qreal angle = (pt[0]-pt[1]-0.04)*3*step;
 		const qreal center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));
 		
-		thymioBody->setPos(QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128));
+		thymioBody->setPos(QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128+14));
 		thymioBody->setRotation(angle);
 	}
 
@@ -117,8 +117,8 @@ namespace Aseba
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
-			w->resize(202, 40);
-			w->setPos(27, 70+i*60);
+			w->resize(202, 48);
+			w->setPos(27, 60+i*64);
 			
 			sliders.push_back(s);
 			

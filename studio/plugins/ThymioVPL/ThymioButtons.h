@@ -95,13 +95,14 @@ namespace Aseba
 		class ThymioBody : public QGraphicsItem
 		{
 		public:
-			ThymioBody(QGraphicsItem *parent=0) : QGraphicsItem(parent), bodyColor(Qt::white), up(true) { }
+			ThymioBody(QGraphicsItem *parent = 0, int yShift = 0) : QGraphicsItem(parent), bodyColor(Qt::white), yShift(yShift), up(true) { }
 			virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-128, -128, 256, 256); }
+			QRectF boundingRect() const { return QRectF(-128, -128+yShift, 256, 256); }
 			void setUp(bool u) { up = u; }
 			
 			QColor bodyColor;
 		private:
+			const int yShift;
 			bool up;
 		};
 		
