@@ -63,13 +63,8 @@ if false THYMIOVPLCLEAN; then
     export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
     export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
     export DEBUGGABLE=$BUILDDEBUG && \
-    ant $ANTBUILDTARGET && \
+    ant -propertyfile ant.properties -Dkey.store=${HOME}/.android/debug.keystore $ANTBUILDTARGET && \
     ANTBUILDSUCCESS=true
-
-  if false BUILDDEBUG; then
-    # align without signing
-    $ANDROIDSDKROOT/tools/zipalign 4 $BUILDROOT/thymiovpl/bin/$THYMIOVPLPREPKG $BUILDROOT/thymiovpl/bin/$THYMIOVPLPKG
-  fi
   
   if true ANTBUILDSUCCESS; then
     if true THYMIOVPLINSTALL; then
