@@ -871,6 +871,8 @@ namespace Enki
 			helpViewer->setSource(QString("qrc:/doc/challenge.fr.html"));
 		else if (localName.left(2) == "es")
 			helpViewer->setSource(QString("qrc:/doc/challenge.es.html"));
+		else if (localName.left(2) == "it")
+			helpViewer->setSource(QString("qrc:/doc/challenge.it.html"));
 		else
 			helpViewer->setSource(QString("qrc:/doc/challenge.en.html"));
 		helpViewer->moveCursor(QTextCursor::Start);
