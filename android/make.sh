@@ -46,7 +46,11 @@ script_setopt "--emu" "" USEEMU false \
   "use emulator instead of real device"
 script_setopt "--install" "" ALLINSTALL false \
   "install package to Android device"
-script_setopt "--clean" "" ALLCLEAN false "remove build directories"
+script_setopt "--clean" "" ALLCLEAN false \
+  "remove build directories"
+script_setopt "--antprop" "" ANTPROP "ant.properties" \
+  "ant.properties file for signing"
+
 
 script_checkopts $*
 
@@ -66,7 +70,7 @@ if false ALLCLEAN; then
   ./mkdashel.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --abi $ANDROIDABI && \
   ./mkaseba.sh $COMMONARGS --ndk-root $ANDROIDNDKROOT --necessitas-root \
     $NECESSITASROOT --abi $ANDROIDABI && \
-  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT
+  ./mkthymiovpl.sh $COMMONARGS $THYMIOVPLARGS --sdk-root $ANDROIDSDKROOT --antprop $ANTPROP
 else
   ./mkdashel.sh --clean && \
   ./mkaseba.sh --clean && \

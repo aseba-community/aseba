@@ -249,7 +249,7 @@ namespace Aseba
 				fileName = "/sdcard/";
 			#endif // ANDROID
 			fileName = QFileDialog::getSaveFileName(this,
-				tr("Save Script"), "/sdcard", "Aseba scripts (*.aesl)");
+				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
 		}
 		
 		if (fileName.isEmpty())

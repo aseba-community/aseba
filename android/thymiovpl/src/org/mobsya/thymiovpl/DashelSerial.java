@@ -17,7 +17,7 @@
         along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ch.ethz.thymiovpl;
+package org.mobsya.thymiovpl;
 
 import android.util.Log;
 import android.hardware.usb.UsbManager;

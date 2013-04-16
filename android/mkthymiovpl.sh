@@ -36,8 +36,10 @@ script_setopt "--emu" "" USEEMU false \
   "use emulator instead of real device"
 script_setopt "--install" "" THYMIOVPLINSTALL false \
   "install package to Android device"
-script_setopt "--clean" "" THYMIOVPLCLEAN false "remove build directory"
-
+script_setopt "--clean" "" THYMIOVPLCLEAN false \
+  "remove build directory"
+script_setopt "--antprop" "" ANTPROP "ant.properties" \
+  "ant.properties file for signing"
 
 script_checkopts $*
 
@@ -63,7 +65,7 @@ if false THYMIOVPLCLEAN; then
     export ANDROID_SDK_ROOT=$ANDROIDSDKROOT && \
     export ANDROID_API_LEVEL=$ANDROIDAPILEVEL && \
     export DEBUGGABLE=$BUILDDEBUG && \
-    ant -propertyfile ant.properties -Dkey.store=${HOME}/.android/debug.keystore $ANTBUILDTARGET && \
+    ant -propertyfile $ANTPROP $ANTBUILDTARGET && \
     ANTBUILDSUCCESS=true
   
   if true ANTBUILDSUCCESS; then
