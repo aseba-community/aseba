@@ -503,7 +503,7 @@ namespace Aseba
 	
 	
 	
-	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent) :
+	TargetFunctionsModel::TargetFunctionsModel(const TargetDescription *descriptionRead, bool showHidden, QObject *parent) :
 		QAbstractItemModel(parent),
 		root(0),
 		descriptionRead(descriptionRead),
@@ -511,7 +511,7 @@ namespace Aseba
 	{
 		Q_ASSERT(descriptionRead);
 		setSupportedDragActions(Qt::CopyAction);
-		recreateTreeFromDescription(false);
+		recreateTreeFromDescription(showHidden);
 	}
 	
 	TargetFunctionsModel::~TargetFunctionsModel()

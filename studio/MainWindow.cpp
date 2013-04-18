@@ -263,7 +263,7 @@ namespace Aseba
 		allocatedVariablesCount = 0;
 		
 		// create models
-		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id));
+		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), showHidden);
 		vmMemoryModel = new TargetVariablesModel();
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);

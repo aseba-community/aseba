@@ -135,7 +135,7 @@ namespace Aseba
 		struct TreeItem;
 		
 	public:
-		TargetFunctionsModel(const TargetDescription *descriptionRead, QObject *parent = 0);
+		TargetFunctionsModel(const TargetDescription *descriptionRead, bool showHidden, QObject *parent = 0);
 		~TargetFunctionsModel();
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
