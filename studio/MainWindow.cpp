@@ -400,6 +400,7 @@ namespace Aseba
 		// memory usage notification area
 		memoryUsageText = new QLabel();
 		memoryUsageText->setAlignment(Qt::AlignLeft);
+		memoryUsageText->setWordWrap(true);
 		
 		// editor area
 		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
