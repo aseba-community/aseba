@@ -36,6 +36,7 @@ private:
     bool urb_is_in_flight;
     int epin;
     int epout;
+    int disconnected;
 };
 
 #endif // ANDROID_H
