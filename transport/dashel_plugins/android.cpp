@@ -100,6 +100,10 @@ AndroidStream::AndroidStream(const string &targetName) :
     epin = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpInMethodID);
     epout = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpOutMethodID);
 
+    unlock_java();
+
+    disconnected = 0;
+
     // software-open the port
     set_ctrl_line(1);
 
@@ -124,7 +128,7 @@ void AndroidStream::write(const void *data, const size_t size)
     bulk.timeout = 1000;
     bulk.data = (void *) data;
     if(ioctl(fd, USBDEVFS_BULK, &bulk) < 0) {
-        // Check about disconnection here
+	disconnected = 1;
         throw DashelException(DashelException::IOError, 0, "Unable to write");
     }
 }
@@ -140,7 +144,7 @@ void AndroidStream::read(void *data, size_t size)
     while(size) {
         if(urb_is_in_flight) {
             if(ioctl(fd, USBDEVFS_REAPURB, &urb) < 0) {
-                // Todo handle disconnection ...
+		disconnected = 1;
                 throw DashelException(DashelException::IOError, 0, "Unable to read");
             }
             urb_is_in_flight = 0;
@@ -167,8 +171,8 @@ bool AndroidStream::receiveDataAndCheckDisconnection()
     if(ioctl(fd, USBDEVFS_REAPURBNDELAY, &urb) >= 0)
         urb_is_in_flight = 0;
 
-    // TODO: Check disconnection here ... ( the ioctl tells us how to handle that ).
-
+    if(disconnected == 1)
+	return true;
     return false;
 }
 
@@ -181,7 +185,7 @@ bool AndroidStream::isDataInRecvBuffer() const
 
 void AndroidStream::lock_java()
 {
-    // Kind of mutex_lock();
+    // Kind of mutex_lock();	    
     if(s_javaVM->AttachCurrentThread(&env, NULL)<0)
         throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed");
 }
