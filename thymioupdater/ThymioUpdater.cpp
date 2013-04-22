@@ -20,8 +20,8 @@
 #include "../common/consts.h"
 #include "../utils/HexFile.h"
 
-#include "ThymioFlasher.h"
-#include "ThymioFlasher.moc"
+#include "ThymioUpdater.h"
+#include "ThymioUpdater.moc"
 
 namespace Aseba
 {
@@ -54,7 +54,7 @@ namespace Aseba
 	}
 
 	
-	ThymioFlasherDialog::ThymioFlasherDialog(const std::string& target):
+	ThymioUpdaterDialog::ThymioUpdaterDialog(const std::string& target):
 		target(target)
 	{
 		// Create the gui ...
@@ -64,7 +64,7 @@ namespace Aseba
 		
 		QHBoxLayout *imageLayout = new QHBoxLayout();
 		QLabel* image = new QLabel(this);
-		image->setPixmap(QPixmap(":/images/thymioflasher.png"));
+		image->setPixmap(QPixmap(":/images/thymioupdater.png"));
 		imageLayout->addStretch();
 		imageLayout->addWidget(image);
 		imageLayout->addStretch();
@@ -105,26 +105,26 @@ namespace Aseba
 		show();
 	}
 	
-	ThymioFlasherDialog::~ThymioFlasherDialog()
+	ThymioUpdaterDialog::~ThymioUpdaterDialog()
 	{
 		flashFuture.waitForFinished();
 	}
 	
-	void ThymioFlasherDialog::setupFlashButtonState()
+	void ThymioUpdaterDialog::setupFlashButtonState()
 	{
 		flashButton->setEnabled(
 			!lineEdit->text().isEmpty()
 		);
 	}
 	
-	void ThymioFlasherDialog::openFile(void)
+	void ThymioUpdaterDialog::openFile(void)
 	{
 		QString name = QFileDialog::getOpenFileName(this, tr("Select hex file"), QString(), tr("Hex files (*.hex)"));
 		lineEdit->setText(name);
 		setupFlashButtonState();
 	}
 
-	void ThymioFlasherDialog::doFlash(void) 
+	void ThymioUpdaterDialog::doFlash(void) 
 	{
 		// warning message
 		const int warnRet = QMessageBox::warning(this, tr("Pre-update warning"), tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.<p><b>Do not unplug the robot during the update!</b></p>Are you sure you want to proceed?"), QMessageBox::No|QMessageBox::Yes, QMessageBox::No);
@@ -140,11 +140,11 @@ namespace Aseba
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
 		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
-		flashFuture = QtConcurrent::run(this, &ThymioFlasherDialog::flashThread, target, hexFileName);
+		flashFuture = QtConcurrent::run(this, &ThymioUpdaterDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioFlasherDialog::FlashResult ThymioFlasherDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
+	ThymioUpdaterDialog::FlashResult ThymioUpdaterDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
 	{
 		// open stream
 		Dashel::Hub hub;
@@ -180,12 +180,12 @@ namespace Aseba
 		return FlashResult();
 	}
 	
-	void ThymioFlasherDialog::flashProgress(int percentage)
+	void ThymioUpdaterDialog::flashProgress(int percentage)
 	{
 		progressBar->setValue(percentage);
 	}
 	
-	void ThymioFlasherDialog::flashFinished()
+	void ThymioUpdaterDialog::flashFinished()
 	{
 		// re-enable buttons
 		quitButton->setEnabled(true);
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&qtTranslator);
 	app.installTranslator(&translator);
 	qtTranslator.load(QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	translator.load(QString(":/thymioflasher_") + QLocale::system().name());
+	translator.load(QString(":/thymioupdater_") + QLocale::system().name());
 	
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
 	std::string target("ser:device=");
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 	
-	Aseba::ThymioFlasherDialog flasher(target);
+	Aseba::ThymioUpdaterDialog updater(target);
 	
 	return app.exec();
 }

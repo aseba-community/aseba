@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>thymioupdater_fr.qm</file>
+	<file>thymioupdater_de.qm</file>
+	<file>thymioupdater_es.qm</file>
+	<file>thymioupdater_it.qm</file>
+	<file>images/fileopen.svgz</file>
+	<file>images/thymioupdater.png</file>
+</qresource>
+</RCC>

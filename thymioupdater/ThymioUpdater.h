@@ -17,7 +17,7 @@ class QGroupBox;
 
 namespace Aseba
 {
-	/** \addtogroup thymioflasher */
+	/** \addtogroup thymioupdater */
 	/*@{*/
 	
 	class QtBootloaderInterface:public QObject, public BootloaderInterface
@@ -40,7 +40,7 @@ namespace Aseba
 		void flashProgress(int percentage);
 	};
 	
-	class ThymioFlasherDialog : public QWidget
+	class ThymioUpdaterDialog : public QWidget
 	{
 		Q_OBJECT
 		
@@ -74,8 +74,8 @@ namespace Aseba
 		QFutureWatcher<FlashResult> flashFutureWatcher;
 
 	public:
-		ThymioFlasherDialog(const std::string& target);
-		~ThymioFlasherDialog();
+		ThymioUpdaterDialog(const std::string& target);
+		~ThymioUpdaterDialog();
 		
 	private:
 		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
