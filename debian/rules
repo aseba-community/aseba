@@ -28,7 +28,7 @@ binary-arch:
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
 	cp debian/build/studio/asebastudio debian/tmp/usr/bin
-	cp debian/build/thymioflasher/thymioflasher debian/tmp/usr/bin
+	cp debian/build/thymioupdater/thymioupdater debian/tmp/usr/bin
 	cp debian/build/switch/asebaswitch debian/tmp/usr/bin
 	cp debian/build/dump/asebadump debian/tmp/usr/bin
 	cp debian/build/cmd/asebacmd debian/tmp/usr/bin
