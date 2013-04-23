@@ -53,9 +53,7 @@ void AndroidStream::usb_control_msg(int type, int req, int value, int index, cha
     ctrl.data = bytes;
     ctrl.timeout = timeout;
 
-    if(ioctl(fd, USBDEVFS_CONTROL, &ctrl) < 0)
-        // Todo handle disconnection here...
-        throw DashelException(DashelException::IOError, 0, "Unable to communicate with device");
+    ioctl(fd, USBDEVFS_CONTROL, &ctrl);
 }
 
 void AndroidStream::schedule_read() {
@@ -65,9 +63,10 @@ void AndroidStream::schedule_read() {
     rx_urb.endpoint = epin;
     rx_urb.buffer = rx_data;
     rx_urb.buffer_length = sizeof(rx_data);
-    if(ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0)
-        // Todo handle disconnection here...
+    if(ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0) {
+        disconnected = 1;
         throw DashelException(DashelException::IOError, 0, "Unable to read");
+    }
 }
 
 void AndroidStream::set_ctrl_line(unsigned int status) {
