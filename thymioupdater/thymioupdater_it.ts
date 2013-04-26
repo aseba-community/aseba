@@ -113,13 +113,14 @@
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target</source>
-        <translation>Impossibile collegarsi al target</translation>
+        <source>Cannot connect to Thymio II</source>
+        <oldsource>Cannot connect to target</oldsource>
+        <translation>Impossibile di connettersi al Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target: %1</source>
-        <translation>Impossibile collegarsi al target: %1</translation>
+        <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Updater running and try again.&lt;/p&gt;</source>
+        <translation>Impossibile di connettersi al Thymio II:%1.&lt;p&gt;Un altro programma è probabilmente attualmente connesso al Thymio II. Assicurarsi che non ce Asebastudio o un altra applicazione di aggiornamento in esecuzione. &lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="170"/>

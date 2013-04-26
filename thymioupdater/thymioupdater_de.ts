@@ -113,13 +113,14 @@
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target</source>
-        <translation>Kann nicht zu Ziel verbinden</translation>
+        <source>Cannot connect to Thymio II</source>
+        <oldsource>Cannot connect to target</oldsource>
+        <translation>Kann nicht zu Thymio II verbinden</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target: %1</source>
-        <translation>Kann nicht zu Ziel verbinden: %1</translation>
+        <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Updater running and try again.&lt;/p&gt;</source>
+        <translation>Die Verbindung mit Thymio II kann nicht hergestellt werden: %1.&lt;p&gt;Wahrscheinlich ist derzeit ein anderes Programm mit Thymio II verbunden. Wenn schon ein Aseba Studio oder ein anderes Firmware Updater Fenster geöffnet ist, bitte schliessen Sie es und versuchen Sie es erneut.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="170"/>
