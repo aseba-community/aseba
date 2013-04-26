@@ -117,13 +117,14 @@
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target</source>
-        <translation>Ne peut pas se connecter à la destination</translation>
+        <source>Cannot connect to Thymio II</source>
+        <oldsource>Cannot connect to target</oldsource>
+        <translation>Ne peut pas se connecter au Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="158"/>
-        <source>Cannot connect to target: %1</source>
-        <translation>Ne peut pas se connecter à la destination : %1</translation>
+        <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Updater running and try again.&lt;/p&gt;</source>
+        <translation>Ne peut pas se connecter au Thymio II: %1.&lt;p&gt;Un autre programme est probablement actuellement connecté au Thymio II. Assurez-vous qu&apos;il n&apos;y ait pas de Studio ou autre application de mise à jour en cours d&apos;exécution.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpdater.cpp" line="170"/>

@@ -155,7 +155,7 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Cannot connect to target"), tr("Cannot connect to target: %1").arg(e.what()));
+			return FlashResult(FlashResult::WARNING, tr("Cannot connect to Thymio II"), tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Updater running and try again.</p>").arg(e.what()));
 		}
 		
 		// do flash
