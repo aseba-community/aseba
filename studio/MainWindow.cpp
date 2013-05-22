@@ -23,7 +23,7 @@
 #include "DashelTarget.h"
 #include "TargetModels.h"
 #include "NamedValuesVectorModel.h"
-#include "AeslEditor.h"
+#include "StudioAeslEditor.h"
 #include "EventViewer.h"
 #include "FindDialog.h"
 #include "ModelAggregator.h"
@@ -38,8 +38,7 @@
 #include <cassert>
 #include <QTabWidget>
 #include <QtConcurrentRun>
- 
-#include <MainWindow.moc>
+
 #include <version.h>
 
 #include <iostream>
@@ -49,8 +48,70 @@ using std::copy;
 
 namespace Aseba
 {
-// 	/** \addtogroup studio */
+ 	/** \addtogroup studio */
 	/*@{*/
+	
+	StudioInterface::StudioInterface(NodeTab* nodeTab):
+		nodeTab(nodeTab)
+	{
+		mainWindow = nodeTab->mainWindow;
+	};
+
+	Target* StudioInterface::getTarget()
+	{
+		return nodeTab->target;
+	}
+	
+	unsigned StudioInterface::getNodeId()
+	{
+		return nodeTab->id;
+	}
+	
+	void StudioInterface::displayCode(const QList<QString>& code, int elementToHighlight)
+	{
+		nodeTab->editor->replaceAndHighlightCode(code, elementToHighlight);
+	}
+	
+	void StudioInterface::loadAndRun()
+	{
+		nodeTab->loadClicked();
+		nodeTab->target->run(nodeTab->id);
+	}
+
+	void StudioInterface::stop()
+	{
+		nodeTab->target->stop(nodeTab->id);
+	}
+	
+	bool StudioInterface::saveFile(bool as)
+	{
+		if( as )
+			return mainWindow->saveFile();
+		
+		return mainWindow->save();
+	}
+
+	void StudioInterface::openFile()
+	{
+		mainWindow->openFile();
+	}
+	
+	bool StudioInterface::newFile()
+	{
+		return mainWindow->newFile();
+	}
+	
+	TargetVariablesModel * StudioInterface::getVariablesModel()
+	{
+		return nodeTab->vmMemoryModel;
+	}
+	
+	void StudioInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		nodeTab->setVariableValues(addr, data);
+	}
+	
+	//////
 
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
 		QTextEdit(parent)
@@ -217,7 +278,7 @@ namespace Aseba
 	void ScriptTab::createEditor()
 	{
 		// editor widget
-		editor = new AeslEditor(this);
+		editor = new StudioAeslEditor(this);
 		breakpoints = new AeslBreakpointSidebar(editor);
 		linenumbers = new AeslLineNumberSidebar(editor);
 		highlighter = new AeslHighlighter(editor, editor->document());
@@ -311,8 +372,7 @@ namespace Aseba
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 		{
 			NodeToolInterface* tool(*it);
-			if (!tool->surviveTabDestruction())
-				delete (*it);
+			delete tool;
 		}
 		delete vmFunctionsModel;
 		delete vmMemoryModel;
@@ -906,33 +966,6 @@ namespace Aseba
 		cursor.insertText(keyword);
 		cursor.endEditBlock();
 		editorContentChanged();
-	}
-
-	void NodeTab::displayCode(QList<QString> code, int line)
-	{
-		editor->clear();
-		QTextCharFormat format;
-		QTextCursor cursor(editor->textCursor());
-		int pos=0;
-		
-		for(int i=0; i<code.size(); i++)
-		{
-			if( i == line )
-			{
-				format.setBackground(QBrush(QColor(255,255,200)));
-				cursor.insertText(code[i], format);
-				pos = cursor.position();
-			} 
-			else
-			{
-				format.setBackground(QBrush(Qt::white));
-				cursor.insertText(code[i], format);			
-			}
-		}
-		
-		cursor.setPosition(pos);
-		editor->setTextCursor(cursor);
-		editor->ensureCursorVisible();		
 	}
 
 	void NodeTab::showKeywords(bool show)
@@ -1700,7 +1733,6 @@ namespace Aseba
 						else
 							showKeywordsAct->setChecked(false);
 					}
-						
 				}
 				domNode = domNode.nextSibling();
 			}
@@ -1771,7 +1803,7 @@ namespace Aseba
 		document.appendChild(root);
 		
 		root.appendChild(document.createTextNode("\n\n\n"));
-		root.appendChild(document.createComment("list of global events"));		
+		root.appendChild(document.createComment("list of global events"));
 		
 		// events
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)

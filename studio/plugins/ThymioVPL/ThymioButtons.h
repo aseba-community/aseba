@@ -35,22 +35,22 @@ namespace Aseba
 	};
 
 	class ThymioClickableButton : public QGraphicsObject
-	{	
+	{
 		Q_OBJECT
 		
 	public:
-		ThymioClickableButton ( QRectF rect, ThymioButtonType type, int nstates = 2, QGraphicsItem *parent=0 );
+		ThymioClickableButton (const QRectF rect, const ThymioButtonType type, int nstates = 2, QGraphicsItem *parent=0 );
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		QRectF boundingRect() const { return boundingRectangle; }
 
 		int isClicked() { return buttonClicked; }
-		void setClicked(int clicked) { buttonClicked = clicked; }
-		void setToggleState(bool state) { toggleState = state; }
+		void setClicked(int clicked) { buttonClicked = clicked; update(); }
+		void setToggleState(bool state) { toggleState = state; update(); }
 		void setNumStates(int num) { numStates = num > 2 ? num : 2; }
 		int getNumStates() const { return numStates; }
 
-		QRectF boundingRect() const { return boundingRectangle; }
-		void setButtonColor(QColor color) { buttonColor = color; }
-		void setBeginButtonColor(QColor color) { buttonBeginColor = color; }
+		void setButtonColor(QColor color) { buttonColor = color; update(); }
+		void setBeginButtonColor(QColor color) { buttonBeginColor = color; update(); }
 
 		void addSibling(ThymioClickableButton *s) { siblings.push_back(s); }
 	
@@ -58,12 +58,13 @@ namespace Aseba
 		void stateChanged();
 	
 	protected:
-		ThymioButtonType buttonType;
+		const ThymioButtonType buttonType;
+		const QRectF boundingRectangle;
+		
 		int buttonClicked;
 		bool toggleState;
 		int numStates;
 		
-		QRectF boundingRectangle;		
 		QColor buttonColor;
 		QColor buttonBeginColor;
 
@@ -86,7 +87,7 @@ namespace Aseba
 	};
 
 	// Button
-	class ThymioButton : public QGraphicsSvgItem
+	class ThymioButton : public QGraphicsObject
 	{
 		Q_OBJECT
 		
@@ -94,21 +95,22 @@ namespace Aseba
 		class ThymioBody : public QGraphicsItem
 		{
 		public:
-			ThymioBody(QGraphicsItem *parent=0) : QGraphicsItem(parent), bodyColor(Qt::white), up(true) { }
+			ThymioBody(QGraphicsItem *parent = 0, int yShift = 0) : QGraphicsItem(parent), bodyColor(Qt::white), yShift(yShift), up(true) { }
 			virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
+			QRectF boundingRect() const { return QRectF(-128, -128+yShift, 256, 256); }
 			void setUp(bool u) { up = u; }
 			
 			QColor bodyColor;
 		private:
+			const int yShift;
 			bool up;
 		};
 		
-		ThymioButton(bool eventButton = true, qreal scale=1.0, bool up=true, bool advanced=false, QGraphicsItem *parent=0);
+		ThymioButton(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
 		~ThymioButton();
 
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return QRectF(0, 0, 256+trans, 256); }
+		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
 
 		void setButtonColor(QColor color) { buttonColor = color; update(); }
 		QColor getButtonColor() const { return buttonColor; }
@@ -125,7 +127,8 @@ namespace Aseba
 		int getState() const;
 		void setState(int val);
 		
-		virtual QPixmap image(bool on=true);
+		void render(QPainter& painter);
+		virtual QPixmap image(qreal factor=1);
 	
 		virtual bool isValid(); // returns true if the current button state is valid, i.e., at least one button is on
 	
@@ -140,18 +143,25 @@ namespace Aseba
 	protected:
 		QList<ThymioClickableButton*> thymioButtons;
 		QList<ThymioClickableButton*> stateButtons;
-		ThymioBody *thymioBody;
+		
 		ThymioIRButton *buttonIR;
 		QColor buttonColor;
 		int parentID;
-		qreal scaleFactor;
 		qreal trans;
 
 		QPointF dragStartPosition;
 
-		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-		virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+	};
+	
+	class ThymioButtonWithBody: public ThymioButton
+	{
+	public:
+		ThymioButtonWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
+		~ThymioButtonWithBody();
+		
+	protected:
+		ThymioBody *thymioBody;
 	};
 	
 	class ThymioButtonSet : public QGraphicsObject
@@ -163,7 +173,7 @@ namespace Aseba
 		{
 		public:
 			ThymioRemoveButton(QGraphicsItem *parent=0);
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);			
+			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 			QRectF boundingRect() const { return QRectF(-64, -64, 128, 128); }
 		};
 
@@ -171,14 +181,15 @@ namespace Aseba
 		{
 		public:
 			ThymioAddButton(QGraphicsItem *parent=0);
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);			
-			QRectF boundingRect() const { return QRectF(-64, -64, 128, 128); }
+			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
-			
+		
 		ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
-		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);		
+		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return advancedMode? QRectF(0, 0, 1064, 400) : QRectF(0, 0, 1000, 400); }
+		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1064, 336) : QRectF(0, 0, 1000, 336); }
 
 		void addEventButton(ThymioButton *event);
 		void addActionButton(ThymioButton *action);
@@ -191,8 +202,6 @@ namespace Aseba
 		bool actionExists() { return actionButton == 0 ? false : true; }
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		
-		virtual QPixmap image();
-		void setScale(qreal factor);
 		void setAdvanced(bool advanced);
 		
 		ThymioIRButtonSet *getIRButtonSet() { return &buttonSetIR; }
@@ -222,10 +231,8 @@ namespace Aseba
 		qreal trans;
 		qreal xpos;
 		
-		virtual void mousePressEvent ( QGraphicsSceneMouseEvent *event );
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
-		virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
-
+		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
@@ -235,11 +242,11 @@ namespace Aseba
 	class ThymioPushButton : public QPushButton
 	{
 		Q_OBJECT
-				
+		
 	public:
-		ThymioPushButton(QString name, QSvgRenderer *renderer=0, QWidget *parent=0);
+		ThymioPushButton(QString name, QWidget *parent=0);
 		~ThymioPushButton();
-			
+		
 		void changeButtonColor(QColor color);
 		
 	protected:
@@ -249,25 +256,24 @@ namespace Aseba
 
 	private:
 		ThymioButton *thymioButton;
-		int prevSpan;
 	};	
 	
 	// Buttons Event
-	class ThymioButtonsEvent : public ThymioButton
+	class ThymioButtonsEvent : public ThymioButtonWithBody
 	{
 	public:
 		ThymioButtonsEvent(QGraphicsItem *parent=0, bool advanced=false);
 	};
 	
 	// Proximity Event
-	class ThymioProxEvent : public ThymioButton
+	class ThymioProxEvent : public ThymioButtonWithBody
 	{
 	public:
 		ThymioProxEvent(QGraphicsItem *parent=0, bool advanced=false);
 	};
 
 	// Proximity Ground Event
-	class ThymioProxGroundEvent : public ThymioButton
+	class ThymioProxGroundEvent : public ThymioButtonWithBody
 	{
 	public:
 		ThymioProxGroundEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -291,35 +297,31 @@ namespace Aseba
 	class ThymioMoveAction : public ThymioButton
 	{
 		Q_OBJECT
-						
+	
 	public:
 		ThymioMoveAction(QGraphicsItem *parent=0);
 		virtual ~ThymioMoveAction();
-		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		virtual QPixmap image(bool on=true);
 		virtual void setClicked(int i, int status);
 		virtual int isClicked(int i);
-		virtual	int getNumButtons() { return 2; }
+		virtual int getNumButtons() { return 2; }
 
 	private slots:
+		void frameChanged(int frame);
 		void valueChangeDetected();
-				
+		
 	private:
-		QList<QGraphicsProxyWidget *> widgets;
 		QList<QSlider *> sliders;
-		QGraphicsItemAnimation *animation;
 		QTimeLine *timer;
+		ThymioBody* thymioBody;
 	};
 	
 	// Color Action
-	class ThymioColorAction : public ThymioButton
+	class ThymioColorAction : public ThymioButtonWithBody
 	{
 		Q_OBJECT
 		
 	public:
 		ThymioColorAction(QGraphicsItem *parent=0);
-		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		virtual QPixmap image(bool on=true);
 		virtual void setClicked(int i, int status);
 		virtual int isClicked(int i);
 		virtual	int getNumButtons() { return 3; }
@@ -328,19 +330,18 @@ namespace Aseba
 		void valueChangeDetected();
 	
 	private:
-		QList<QGraphicsProxyWidget *> widgets;
 		QList<QSlider *> sliders;
 	};
 	
 	// Circle Action
-	class ThymioCircleAction : public ThymioButton
+	class ThymioCircleAction : public ThymioButtonWithBody
 	{
 	public:
 		ThymioCircleAction(QGraphicsItem *parent=0);
 	};
 
 	// Sound Action
-	class ThymioSoundAction : public ThymioButton
+	class ThymioSoundAction : public ThymioButtonWithBody
 	{
 	public:
 		class Speaker : public QGraphicsItem
@@ -352,14 +353,13 @@ namespace Aseba
 		};
 	
 		ThymioSoundAction(QGraphicsItem *parent=0);
-		virtual QPixmap image(bool on=true);
 		
 	protected:
 		Speaker *speaker;
 	};
 
 	// Memory Action
-	class ThymioMemoryAction : public ThymioButton
+	class ThymioMemoryAction : public ThymioButtonWithBody
 	{		
 	public:
 		ThymioMemoryAction(QGraphicsItem *parent=0);

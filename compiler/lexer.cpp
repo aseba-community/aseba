@@ -28,6 +28,29 @@
 
 namespace Aseba
 {
+	#ifdef ANDROID
+	long int wcstol_fix( const wchar_t * str, wchar_t ** endptr, int base )
+	{
+		long int v(0);
+		while (*str)
+		{
+			v *= base;
+			if (str[0] <= '9')
+			{
+				v += (str[0] - '0');
+			}
+			else
+			{
+				const long int maskedVal(str[0] & (~(1<<5)));
+				v += (maskedVal - 'A') + 10;
+			}
+			++str;
+		}
+		return v;
+	}
+	#define wcstol wcstol_fix
+	#endif // ANDROID
+	
 	//! Construct a new token of given type and value
 	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) :
 		type(type),
@@ -338,7 +361,7 @@ namespace Aseba
 				default:
 				{
 					// check first character
-					if (!iswalnum(c) && (c != '_'))
+					if (!std::iswalnum(c) && (c != '_'))
 						throw TranslatableError(pos, ERROR_INVALID_IDENTIFIER).arg((unsigned)c, 0, 16);
 					
 					// get a string
@@ -346,7 +369,7 @@ namespace Aseba
 					s += c;
 					wchar_t nextC = source.peek();
 					int posIncrement = 0;
-					while ((source.good()) && (iswalnum(nextC) || (nextC == '_') || (nextC == '.')))
+					while ((source.good()) && (std::iswalnum(nextC) || (nextC == '_') || (nextC == '.')))
 					{
 						s += nextC;
 						source.get();
@@ -355,16 +378,16 @@ namespace Aseba
 					}
 					
 					// we now have a string, let's check what it is
-					if (std::isdigit(s[0]))
+					if (std::iswdigit(s[0]))
 					{
 						// check if hex or binary
-						if ((s.length() > 1) && (s[0] == '0') && (!std::isdigit(s[1])))
+						if ((s.length() > 1) && (s[0] == '0') && (!std::iswdigit(s[1])))
 						{
 							// check if we have a valid number
 							if (s[1] == 'x')
 							{
 								for (unsigned i = 2; i < s.size(); i++)
-									if (!std::isxdigit(s[i]))
+									if (!std::iswxdigit(s[i]))
 										throw TranslatableError(pos, ERROR_INVALID_HEXA_NUMBER);
 							}
 							else if (s[1] == 'b')
@@ -381,7 +404,7 @@ namespace Aseba
 						{
 							// check if we have a valid number
 							for (unsigned i = 1; i < s.size(); i++)
-								if (!std::isdigit(s[i]))
+								if (!std::iswdigit(s[i]))
 									throw TranslatableError(pos, ERROR_IN_NUMBER);
 						}
 						tokens.push_back(Token(Token::TOKEN_INT_LITERAL, pos, s));

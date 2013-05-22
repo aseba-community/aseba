@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="thymiovpl" default="help">
+  <property environment="env" />
+
+  <property name="sdk.dir" value="${env.ANDROID_SDK_ROOT}" />
+  <property name="target" value="android-${env.ANDROID_API_LEVEL}" />
+  <property name="debuggable" value="${env.DEBUGGABLE}" />
+  
+  <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+    <isset property="env.ANDROID_HOME" />
+  </condition>
+  
+  <replaceregexp
+    file="AndroidManifest.xml"
+    match="(android:debuggable=&#34;).*(&#34;)"
+    replace="\1${debuggable}\2" />
+
+  <import file="custom_rules.xml" optional="true" />
+  <import file="${sdk.dir}/tools/ant/build.xml" />
+</project>

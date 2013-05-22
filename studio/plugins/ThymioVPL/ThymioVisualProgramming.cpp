@@ -9,95 +9,90 @@
 #include <QDomElement>
 #include <QDesktopWidget>
 #include <QApplication>
-
-//#include "../../utils/HexFile.h"
+#include <QScrollBar>
 
 #include "ThymioVisualProgramming.h"
-#include "ThymioVisualProgramming.moc"
 #include "../../TargetModels.h"
 
 using namespace std;
 
 namespace Aseba
-{		
+{
 	// Visual Programming
-	ThymioVisualProgramming::ThymioVisualProgramming(NodeTab* nodeTab):
-		InvasivePlugin(nodeTab),
-		windowWidth(900),
-		windowHeight(800)
+	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
+		de(_de)
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 
-		resize(windowWidth, windowHeight);
-		setMinimumSize(QSize(450,400));
+		setMinimumSize(QSize(400,400));
 		
 		mainLayout = new QVBoxLayout(this);
 		
 		toolBar = new QToolBar();
-		toolBar->setMaximumHeight(36);
-		toolBar->setIconSize(QSize(24,24));
-		toolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		mainLayout->addWidget(toolBar);
 
 		newButton = new QToolButton();
-		openButton = new QToolButton();
-		saveButton = new QToolButton();
-		saveAsButton = new QToolButton();
-		runButton = new QToolButton();
-		stopButton = new QToolButton();	
-		colorComboButton = new QComboBox();
-		advancedButton = new QToolButton();
-		quitButton = new QToolButton();		
-
 		newButton->setIcon(QIcon(":/images/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
+		toolBar->addWidget(newButton);
 		
+		openButton = new QToolButton();
 		openButton->setIcon(QIcon(":/images/fileopen.svgz"));
-		openButton->setToolTip(tr("Open"));		
+		openButton->setToolTip(tr("Open"));
+		toolBar->addWidget(openButton);
 		
+		saveButton = new QToolButton();
 		saveButton->setIcon(QIcon(":/images/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
-
+		toolBar->addWidget(saveButton);
+		
+		saveAsButton = new QToolButton();
 		saveAsButton->setIcon(QIcon(":/images/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
-
-		runButton->setIcon(QIcon(":/images/play.svgz"));
-		runButton->setToolTip(tr("Load & Run"));
-
-		stopButton->setIcon(QIcon(":/images/stop1.png"));
-		stopButton->setToolTip(tr("Stop"));
-	
-		colorComboButton->setToolTip(tr("Color scheme"));
-		setColors(colorComboButton);
-		//colorComboButton->setIconSize(QSize(64,32));
-
-		advancedButton->setIcon(QIcon(":/images/run.png"));
-		advancedButton->setToolTip(tr("Advanced mode"));
-
-		quitButton->setIcon(QIcon(":/images/exit.svgz"));
-		quitButton->setToolTip(tr("Quit"));
-			
-		toolBar->addWidget(newButton);
-		toolBar->addWidget(openButton);
-		toolBar->addWidget(saveButton);
 		toolBar->addWidget(saveAsButton);
 		toolBar->addSeparator();
+
+		runButton = new QToolButton();
+		runButton->setIcon(QIcon(":/images/play.svgz"));
+		runButton->setToolTip(tr("Load & Run"));
 		toolBar->addWidget(runButton);
+
+		stopButton = new QToolButton();
+		stopButton->setIcon(QIcon(":/images/stop1.svgz"));
+		stopButton->setToolTip(tr("Stop"));
 		toolBar->addWidget(stopButton);
 		toolBar->addSeparator();
+	
+		colorComboButton = new QComboBox();
+		colorComboButton->setToolTip(tr("Color scheme"));
+		setColors(colorComboButton);
 		toolBar->addWidget(colorComboButton);
 		toolBar->addSeparator();
+
+		advancedButton = new QToolButton();
+		advancedButton->setIcon(QIcon(":/images/light.svgz"));
+		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
-		toolBar->addSeparator();
-		toolBar->addWidget(quitButton);
+
+		if (showCloseButton)
+		{
+			toolBar->addSeparator();
+			quitButton = new QToolButton();
+			quitButton->setIcon(QIcon(":/images/exit.svgz"));
+			quitButton->setToolTip(tr("Quit"));
+			toolBar->addWidget(quitButton);
+			connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
+		}
+		else
+			quitButton = 0;
 		
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(save()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
 		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
-		connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
+		
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(advancedMode()));
@@ -108,22 +103,20 @@ namespace Aseba
 		// events
 		eventsLayout = new QVBoxLayout();
 
-		tapSvg = new QSvgRenderer(QString(":/images/thymiotap.svg"));
-		clapSvg = new QSvgRenderer(QString(":/images/thymioclap.svg"));
-
 		ThymioPushButton *buttonsButton = new ThymioPushButton("button");
 		ThymioPushButton *proxButton = new ThymioPushButton("prox");
 		ThymioPushButton *proxGroundButton = new ThymioPushButton("proxground");
-		ThymioPushButton *tapButton = new ThymioPushButton("tap", tapSvg);
-		ThymioPushButton *clapButton = new ThymioPushButton("clap", clapSvg);
+		ThymioPushButton *tapButton = new ThymioPushButton("tap");
+		ThymioPushButton *clapButton = new ThymioPushButton("clap");
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
-		eventButtons.push_back(proxGroundButton);		
+		eventButtons.push_back(proxGroundButton);
 		eventButtons.push_back(tapButton);
 		eventButtons.push_back(clapButton);
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
+		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->setSpacing(10);
 		eventsLayout->addWidget(eventsLabel);
@@ -140,7 +133,8 @@ namespace Aseba
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
-				
+		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+		
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
@@ -150,16 +144,16 @@ namespace Aseba
 		compilationResultLayout->addWidget(compilationResult,10000);
 		sceneLayout->addLayout(compilationResultLayout);
 
-		// scene		
+		// scene
 		scene = new ThymioScene(this);
 		view = new QGraphicsView(scene);
-		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);		
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		view->centerOn(200,0);
+		//view->ensureVisible(scene->sceneRect());
 		sceneLayout->addWidget(view);
-
+		view->centerOn(*scene->buttonsBegin());
+		
 		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
 
 		horizontalLayout->addLayout(sceneLayout);
@@ -173,7 +167,8 @@ namespace Aseba
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
 		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
-								
+		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
+		
 		actionButtons.push_back(moveButton);
 		actionButtons.push_back(colorButton);
 		actionButtons.push_back(circleButton);
@@ -193,7 +188,7 @@ namespace Aseba
 
 		horizontalLayout->addLayout(actionsLayout);
 		
-		// make connections	
+		// make connections
 		connect(buttonsButton, SIGNAL(clicked()),this,SLOT(addButtonsEvent()));
 		connect(proxButton, SIGNAL(clicked()), this, SLOT(addProxEvent()));
 		connect(proxGroundButton, SIGNAL(clicked()), this, SLOT(addProxGroundEvent()));
@@ -206,16 +201,11 @@ namespace Aseba
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
 		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
 		
-		QRect clientRect =  QApplication::desktop()->availableGeometry();
-
-		if( clientRect.width() < (windowWidth+100) || clientRect.height() < (windowHeight+100) )		
-			resize(clientRect.width()-100, clientRect.height()-100);
+		setWindowModality(Qt::ApplicationModal);
 	}
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
-		delete(tapSvg);
-		delete(clapSvg);
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *button)
@@ -225,7 +215,7 @@ namespace Aseba
 		eventColors.push_back(QColor(67,205,128)); actionColors.push_back(QColor(0,197,205)); 
 		eventColors.push_back(QColor(255,215,0)); actionColors.push_back(QColor(255,99,71));
 		eventColors.push_back(QColor(255,97,3)); actionColors.push_back(QColor(142,56,142));
-		eventColors.push_back(QColor(125,158,192)); actionColors.push_back(QColor(56,142,142)); 	
+		eventColors.push_back(QColor(125,158,192)); actionColors.push_back(QColor(56,142,142)); 
 
 		if( button )
 		{
@@ -246,13 +236,13 @@ namespace Aseba
 		painter.setBrush(color2);
 		painter.drawRoundedRect(66,0,54,54,4,4);
 		
-		return pixmap;		
+		return pixmap;
 	}
 	
 	QWidget* ThymioVisualProgramming::createMenuEntry()
 	{
 		QPushButton *vplButton = new QPushButton(tr("Launch VPL"));
-		connect(vplButton, SIGNAL(clicked()), SLOT(showVPL()));
+		connect(vplButton, SIGNAL(clicked()), SLOT(showVPLModal()));
 		return vplButton;
 	}
 	
@@ -265,40 +255,40 @@ namespace Aseba
 		close();
 	}
 
-	void ThymioVisualProgramming::showVPL()
+	void ThymioVisualProgramming::showVPLModal()
 	{
-		if (InvasivePlugin::newFile())
-			exec();
+		if (de->newFile())
+			show();
 	}
 	
 	void ThymioVisualProgramming::newFile()
 	{
 		if( !scene->isEmpty() && warningDialog() ) 
 		{
-			bool advanced = scene->getAdvanced();
+			const bool advanced = scene->getAdvanced();
 			scene->reset();
 			thymioFilename.clear();
-			scene->setAdvanced(advanced);		
+			scene->setAdvanced(advanced);
 		}
 	}
 
 	void ThymioVisualProgramming::openFile()
 	{
 		if( scene->isEmpty() || warningDialog() ) 
-			InvasivePlugin::openFile();
+			de->openFile();
 	}
 	
 	bool ThymioVisualProgramming::save()
 	{
-		return InvasivePlugin::saveFile(false);
+		return de->saveFile(false);
 	}
 	
 	bool ThymioVisualProgramming::saveAs()
 	{
-		return InvasivePlugin::saveFile(true);
+		return de->saveFile(true);
 	}
 
-	void ThymioVisualProgramming::closeFile()
+	bool ThymioVisualProgramming::closeFile()
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
@@ -306,7 +296,10 @@ namespace Aseba
 			actionButtons.last()->hide(); // state button
 			scene->reset();
 			close();
+			return true;
 		}
+		else
+			return false;
 	}
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
@@ -325,16 +318,16 @@ namespace Aseba
 	void ThymioVisualProgramming::run()
 	{
 		if(runButton->isEnabled())
-			loadNrun();
+			de->loadAndRun();
 	}
 
 	void ThymioVisualProgramming::stop()
 	{
-		InvasivePlugin::stop();
-		const unsigned leftSpeedVarPos = getVariablesModel()->getVariablePos("motor.left.target");
-		setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
-		const unsigned rightSpeedVarPos = getVariablesModel()->getVariablePos("motor.right.target");
-		setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
+		de->stop();
+		const unsigned leftSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.left.target");
+		de->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
+		const unsigned rightSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.right.target");
+		de->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
 	
 	void ThymioVisualProgramming::advancedMode()
@@ -346,15 +339,7 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
-		if ( scene->isEmpty() || warningDialog() )
-		{
-			advancedButton->setEnabled(true);
-			actionButtons.last()->hide(); // state button
-//			scene->clear();
-			scene->reset();
-			close();
-		}
-		else
+		if (!closeFile())
 			event->ignore();
 	}
 	
@@ -421,7 +406,7 @@ namespace Aseba
 				element.setAttribute("event-name", button->getName() );
 			
 				for(int i=0; i<button->getNumButtons(); ++i)
-					element.setAttribute( QString("eb%0").arg(i), button->isClicked(i));					
+					element.setAttribute( QString("eb%0").arg(i), button->isClicked(i));
 				element.setAttribute("state", button->getState());
 			}
 			
@@ -482,15 +467,9 @@ namespace Aseba
 						else if ( buttonName == "proxground" )
 							eventButton = new ThymioProxGroundEvent(0,scene->getAdvanced());
 						else if ( buttonName == "tap" )
-						{					
 							eventButton = new ThymioTapEvent(0,scene->getAdvanced());
-							eventButton->setSharedRenderer(tapSvg);
-						}
 						else if ( buttonName == "clap" )
-						{
 							eventButton = new ThymioClapEvent(0,scene->getAdvanced());
-							eventButton->setSharedRenderer(clapSvg);
-						}
 						else
 						{
 							QMessageBox::warning(this,tr("Loading"),
@@ -536,7 +515,7 @@ namespace Aseba
 		scene->setModified(!fromFile);
 		
 		if (!scene->isEmpty())
-			QTimer::singleShot(0, this, SLOT(exec()));
+			show();
 	}
 
 	void ThymioVisualProgramming::recompileButtonSet()
@@ -546,107 +525,174 @@ namespace Aseba
 		if( scene->isSuccessful() ) 
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			displayCode(scene->getCode(), scene->getFocusItemId());
+			de->displayCode(scene->getCode(), scene->getFocusItemId());
 			runButton->setEnabled(true);
+			emit compilationOutcome(true);
 		}
 		else
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
 			runButton->setEnabled(false);
+			emit compilationOutcome(false);
 		}
 	}
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
 		ThymioButtonsEvent *button = new ThymioButtonsEvent(0, scene->getAdvanced());
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
 		ThymioProxEvent *button = new ThymioProxEvent(0, scene->getAdvanced());
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
 		ThymioProxGroundEvent *button = new ThymioProxGroundEvent(0, scene->getAdvanced());
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
 		ThymioTapEvent *button = new ThymioTapEvent(0, scene->getAdvanced());
-		button->setSharedRenderer(tapSvg);
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
 		ThymioClapEvent *button = new ThymioClapEvent(0, scene->getAdvanced());
-		button->setSharedRenderer(clapSvg);
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 	
 	void ThymioVisualProgramming::addMoveAction()
 	{
 		ThymioMoveAction *button = new ThymioMoveAction();
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 	
 	void ThymioVisualProgramming::addColorAction()
 	{
 		ThymioColorAction *button = new ThymioColorAction();
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 
 	void ThymioVisualProgramming::addCircleAction()
 	{
 		ThymioCircleAction *button = new ThymioCircleAction();
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 
 	void ThymioVisualProgramming::addSoundAction()
 	{
 		ThymioSoundAction *button = new ThymioSoundAction();
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 
 	void ThymioVisualProgramming::addMemoryAction()
 	{
 		ThymioMemoryAction *button = new ThymioMemoryAction();
-		scene->setFocus();
+		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
+	
+	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
+	{
+		// desired sizes for height
+		const int idealContentHeight(5*256);
+		const int uncompressibleHeight(
+			actionsLabel->height() +
+			desiredToolbarIconSize + 2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
+			eventsLabel->height() +
+			5 * style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
+			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
+			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin) +
+			2 * 20
+		);
+		const int availableHeight(event->size().height() - uncompressibleHeight);
+		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
 		
+		// desired sizes for width
+		const int idealContentWidth(1064+256*2);
+		const int uncompressibleWidth(
+			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
+			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 
+			style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
+			#ifdef ANDROID
+			40 + 
+			#else // ANDROID
+			style()->pixelMetric(QStyle::PM_ScrollBarSliderMin) +
+			#endif // ANDROID
+			2 * 20
+		);
+		const int availableWidth(event->size().width() - uncompressibleWidth);
+		const qreal scaleWidth(qreal(availableWidth)/qreal(idealContentWidth));
+		
+		// compute and set scale
+		const qreal scale(qMin(scaleHeight, scaleWidth));
+		return scale;
+	}
+	
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
-		QSize iconSize;
-		QSize deltaSize = (event->size() - QSize(windowWidth, windowHeight));
-		double scaleH = 1 + 1.2*(double)deltaSize.height()/windowHeight;
-		double scaleV = 1 + 1.2*(double)deltaSize.width()/windowWidth;
-		double scale = (scaleH < scaleV ? (scaleH > 1.95 ? 1.95 : scaleH) :
- 										  (scaleV > 1.95 ? 1.95 : scaleV) );
-
-		iconSize = QSize(128*scale, 128*scale);
-		scene->setScale(scale);
+		// compute size of elements for toolbar
+		const int toolbarWidgetCount(quitButton ? 9 : 8);
+		const int toolbarSepCount(quitButton ? 4 : 3);
+		// get width of combox box element (not content)
+		QStyleOptionComboBox opt;
+		QSize tmp(0, 0);
+		tmp = style()->sizeFromContents(QStyle::CT_ComboBox, &opt, tmp);
+		int desiredIconSize((
+			event->size().width() -
+			(
+				(toolbarWidgetCount-1) * style()->pixelMetric(QStyle::PM_ToolBarItemSpacing) +
+				(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + 
+				2 * style()->pixelMetric(QStyle::PM_ComboBoxFrameWidth) +
+				toolbarWidgetCount *  style()->pixelMetric(QStyle::PM_ButtonMargin) + 
+				toolbarSepCount * style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent) +
+				2 * style()->pixelMetric(QStyle::PM_ToolBarItemMargin) +
+				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
+				tmp.width()
+			)
+		) / (toolbarWidgetCount));
 		
+		// two pass of layout computation, should be a good-enough approximation
+		qreal testScale(computeScale(event, desiredIconSize));
+		desiredIconSize = qMin(desiredIconSize, int(256.*testScale));
+		const qreal scale(computeScale(event, desiredIconSize));
+		
+		// set toolbar
+		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
+		newButton->setIconSize(tbIconSize);
+		openButton->setIconSize(tbIconSize);
+		saveButton->setIconSize(tbIconSize);
+		saveAsButton->setIconSize(tbIconSize);
+		runButton->setIconSize(tbIconSize);
+		stopButton->setIconSize(tbIconSize);
+		colorComboButton->setIconSize(tbIconSize);
+		advancedButton->setIconSize(tbIconSize);
+		toolBar->setIconSize(tbIconSize);
+		
+		// set view and cards on sides
+		const QSize iconSize(256*scale, 256*scale);
+		view->resetTransform();
+		view->scale(scale, scale);
 		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
-
 		for(QList<ThymioPushButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
 	}
-
 };

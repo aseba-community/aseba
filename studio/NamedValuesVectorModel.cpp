@@ -22,8 +22,6 @@
 #include <QtDebug>
 #include <QtGui>
 
-#include <NamedValuesVectorModel.moc>
-
 namespace Aseba
 {
 	/** \addtogroup studio */

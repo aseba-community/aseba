@@ -32,8 +32,6 @@
 #include <QButtonGroup>
 #include <QGroupBox>
 
-#include <FindDialog.moc>
-
 namespace Aseba
 {
 	FindDialog::FindDialog(QWidget *parent, QTextEdit* editor):

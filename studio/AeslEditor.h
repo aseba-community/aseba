@@ -139,8 +139,6 @@ namespace Aseba
 		QRect breakpoint;
 	};
 	
-	class ScriptTab;
-	
 	enum LocalContext {
 		UnknownContext,
 		VarDefContext,
@@ -162,7 +160,7 @@ namespace Aseba
 		void refreshModelRequest(LocalContext context);
 		
 	public:
-		AeslEditor(const ScriptTab* tab);
+		AeslEditor();
 		virtual ~AeslEditor() { }
 		virtual void contextMenuEvent ( QContextMenuEvent * e );
 
@@ -184,18 +182,16 @@ namespace Aseba
 			UncommentSelection
 		};
 		void commentAndUncommentSelection(CommentOperation commentOperation);
+		
+		void replaceAndHighlightCode(const QList<QString>& code, int elementToHighlight);
 	
 	public:
-		const ScriptTab* tab;
 		bool debugging;
-		QWidget *dropSourceWidget;
 	
 	protected slots:
 		void insertCompletion(const QString &completion);
 
 	protected:
-		virtual void dropEvent(QDropEvent *event);
-		virtual void insertFromMimeData ( const QMimeData * source );
 		virtual void keyPressEvent(QKeyEvent * event);
 
 		virtual bool handleCompleter(QKeyEvent * event);

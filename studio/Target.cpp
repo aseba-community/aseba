@@ -20,8 +20,6 @@
 
 #include "Target.h"
 
-#include <Target.moc>
-
 namespace Aseba
 {
 	/** \addtogroup studio */

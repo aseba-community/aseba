@@ -31,9 +31,6 @@
 #include <QLibraryInfo>
 #include <stdexcept>
 
-
-#include <DashelTarget.moc>
-
 #ifdef WIN32 // for Sleep
 #include <windows.h>
 #endif
@@ -239,11 +236,11 @@ namespace Aseba
 				// exception, try again
 				failed = true;
 			}
-			
-			if (failed)
-				QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
-			else
+			if (!failed)
 				return;
+#ifndef ANDROID
+			QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
+#endif
 		}
 		// show connection dialog
 		while (true)

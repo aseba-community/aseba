@@ -28,45 +28,46 @@
 #include <stdexcept>
 #include <iostream>
 #include <set>
+#include <memory>
 #include "../compiler/compiler.h"
 
-class QMenu;
-
-namespace Dashel
-{
-	class Stream;
-}
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class NodeTab;
 	class Target;
 	class TargetVariablesModel;
-	class MainWindow;
 	
-	//! To access private members of MainWindow and its children, a plugin must inherit from this class
-	struct InvasivePlugin
+	// TODO: constify DevelopmentEnvironmentInterface
+	
+	//! To access private members of the development environment (MainWindow and its children), a plugin must use the method of a subclass of this class.
+	//! This class interfaces to a specific node
+	struct DevelopmentEnvironmentInterface
 	{
-		NodeTab* nodeTab;
-		MainWindow *mainWindow;
-		
-		InvasivePlugin(NodeTab* nodeTab);
-		virtual ~InvasivePlugin() {}
-		
-		Dashel::Stream* getDashelStream();
-		Target * getTarget();
-		unsigned getNodeId();
-		void displayCode(QList<QString> code, int line);
-		void loadNrun();
-		void stop();
-		TargetVariablesModel * getVariablesModel();
-		void setVariableValues(unsigned, const VariablesDataVector &);
-		bool saveFile(bool as=false);
-		void openFile();
-		bool newFile();
+		//! Virtual destructor
+		virtual ~DevelopmentEnvironmentInterface() {}
+		//! Return the target Aseba network
+		virtual Target * getTarget() = 0;
+		//! Return the node ID of the node this plugin talks to
+		virtual unsigned getNodeId() = 0;
+		//! Set the code of the editor from a sequence of elements (each can be multiple sloc) and highlight one of these elements
+		virtual void displayCode(const QList<QString>& code, int elementToHighlight) = 0;
+		//! Load code and runs it on the node
+		virtual void loadAndRun() = 0;
+		//! Stop execution of the node
+		virtual void stop() = 0;
+		//! Return the variables model of the node
+		virtual TargetVariablesModel * getVariablesModel() = 0;
+		//! Set variables on the node
+		virtual void setVariableValues(unsigned addr, const VariablesDataVector &data) = 0;
+		//! Request the DE to save the current file
+		virtual bool saveFile(bool as=false) = 0;
+		//! Request the DE to open an existing file
+		virtual void openFile() = 0;
+		//! Request the DE to create a new empty file
+		virtual bool newFile() = 0;
 	};
 	
 	//! A tool that is specific to a node
@@ -83,8 +84,6 @@ namespace Aseba
 		
 		virtual QWidget* createMenuEntry() = 0;
 		virtual void closeAsSoonAsPossible() = 0;
-		//! wether this tool should survive tab destruction, useful for flashers for instance
-		virtual bool surviveTabDestruction() const { return false; }
 	};
 	
 	//! A list of NodeToolInterface pointers
@@ -93,41 +92,6 @@ namespace Aseba
 		bool containsNamed(const QString& name) const;
 		NodeToolInterface* getNamed(const QString& name) const;
 	};
-	
-	//! Node tools are available per product id
-	struct NodeToolRegistrar
-	{
-		//! A product ID from Aseba
-		typedef int ProductId;
-		//! A list of product IDs
-		typedef QList<ProductId> ProductIds;
-		//! A function which creates an instance of a node tool
-		typedef NodeToolInterface* (*CreatorFunc)(NodeTab* node);
-		
-		void reg(const QString& name, const ProductIds& pid, const CreatorFunc func);
-		
-		void reg(const QString& name, const ProductId pid, const CreatorFunc func);
-		
-		void update(const ProductId pid, NodeTab* node, NodeToolInterfaces& tools) const;
-		
-		void update(const QString& name, NodeTab* node, NodeToolInterfaces& tools) const;
-		
-		void dump(std::ostream &stream);
-		
-	protected:
-		typedef QPair<CreatorFunc, QString> CreatorFuncNamePair;
-		typedef QMultiMap<ProductId, CreatorFuncNamePair> PidCreatorMap;
-		PidCreatorMap pidCreators;
-		typedef QMap<QString, CreatorFunc> NamedCreatorMap;
-		NamedCreatorMap namedCreators;
-	};
-	
-	struct NodeToolRegistrer: NodeToolRegistrar
-	{
-		NodeToolRegistrer();
-	};
-	
-	static NodeToolRegistrer nodeToolRegistrer;
 
 	/*@}*/
 }; // Aseba

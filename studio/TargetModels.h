@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QRegExp>
 #include "../compiler/compiler.h"
 
@@ -156,6 +157,7 @@ namespace Aseba
 		
 	private:
 		friend class AeslEditor;
+		friend class StudioAeslEditor;
 		TreeItem *getItem(const QModelIndex &index) const;
 		QString getToolTip(const TargetDescription::NativeFunction& function) const;
 		

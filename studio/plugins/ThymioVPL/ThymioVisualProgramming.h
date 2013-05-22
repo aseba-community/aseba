@@ -5,7 +5,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGraphicsView>
-#include <QSvgRenderer>
 #include <QGraphicsSvgItem>
 #include <QGraphicsItem>
 #include <QGraphicsWidget>
@@ -13,8 +12,6 @@
 #include <QComboBox>
 #include <QToolBar>
 #include <QToolButton>
-
-#include <dashel/dashel.h>
 
 #include <map>
 #include <vector>
@@ -31,12 +28,12 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	class ThymioVisualProgramming : public QDialog, public InvasivePlugin, public NodeToolInterface
+	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
 		
 	public:
-		ThymioVisualProgramming(NodeTab* nodeTab);
+		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
 		~ThymioVisualProgramming();
 		
 		virtual QWidget* createMenuEntry();
@@ -44,19 +41,24 @@ namespace Aseba
 
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
-		//virtual bool surviveTabDestruction() const;
+	
+	signals:
+		void compilationOutcome(bool success);
+		
+	public slots:
+		bool closeFile();
 		
 	private slots:
-		void showVPL();
+		void showVPLModal();
 		void addButtonsEvent();
 		void addProxEvent();
 		void addProxGroundEvent();
 		void addTapEvent();
 		void addClapEvent();
-				
+		
 		void addMoveAction();
 		void addColorAction();
-		void addCircleAction();	
+		void addCircleAction();
 		void addSoundAction();
 		void addMemoryAction();
 		
@@ -65,14 +67,13 @@ namespace Aseba
 		bool save();
 		bool saveAs();
 		void setColorScheme(int index);
-		void run();	
+		void run();
 		void stop();
 		void advancedMode();
-		void closeFile();
-		
 		void recompileButtonSet();
 		
 	protected:
+		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		ThymioScene *scene;
 
@@ -92,7 +93,7 @@ namespace Aseba
 		QToolButton *newButton;
 		QToolButton *openButton;
 		QToolButton *saveButton;
-		QToolButton *saveAsButton;		
+		QToolButton *saveAsButton;
 		QToolButton *runButton;
 		QToolButton *stopButton;
 		QToolButton *advancedButton;
@@ -106,27 +107,14 @@ namespace Aseba
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
 
-
-		QSvgRenderer *tapSvg;
-		QSvgRenderer *clapSvg;
-		
 		QString thymioFilename;
 
-		int windowWidth;
-		int windowHeight;
-		
-		// we must cache this because during the flashing process, the tab is not there any more
-		unsigned nodeId;
-//		Target * target;
-//		Dashel::Stream 	*stream;
-		
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		bool warningDialog();
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
-//		bool saveFile(QString filename);		
-//		bool loadFile(QString filename);
 		
+		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 	};
 	/*@}*/

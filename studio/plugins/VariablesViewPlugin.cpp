@@ -1,13 +1,9 @@
 #include "VariablesViewPlugin.h"
-#include <VariablesViewPlugin.moc>
 #include "../Target.h"
 #include <QtGui>
 #include <QtDebug>
 #include <limits>
 #include <cassert>
-
-
-//#include <VariablesViewPlugin.moc>
 
 namespace Aseba
 {
@@ -52,9 +48,10 @@ namespace Aseba
 		setWindowTitle(tr("Linear Camera View Plugin"));
 	}
 	
-	LinearCameraViewPlugin::LinearCameraViewPlugin(NodeTab* nodeTab) :
-		InvasivePlugin(nodeTab),
-		VariableListener(getVariablesModel()),
+	//! Construct the plugin, taking ownership of an interface to a development environment
+	LinearCameraViewPlugin::LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de) :
+		VariableListener(_de->getVariablesModel()),
+		de(_de),
 		componentsReceived(0)
 	{
 		QVBoxLayout *layout = new QVBoxLayout(this);
@@ -119,16 +116,16 @@ namespace Aseba
 			return;
 		}
 		
-		redPos = getVariablesModel()->getVariablePos(redName);
-		greenPos = getVariablesModel()->getVariablePos(greenName);
-		bluePos = getVariablesModel()->getVariablePos(blueName);
-		redSize = getVariablesModel()->getVariableSize(redName);
-		greenSize = getVariablesModel()->getVariableSize(greenName);
-		blueSize = getVariablesModel()->getVariableSize(blueName);
+		redPos = de->getVariablesModel()->getVariablePos(redName);
+		greenPos = de->getVariablesModel()->getVariablePos(greenName);
+		bluePos = de->getVariablesModel()->getVariablePos(blueName);
+		redSize = de->getVariablesModel()->getVariableSize(redName);
+		greenSize = de->getVariablesModel()->getVariableSize(greenName);
+		blueSize = de->getVariablesModel()->getVariableSize(blueName);
 		
-		getTarget()->getVariables(getNodeId(), redPos, redSize);
-		getTarget()->getVariables(getNodeId(), greenPos, greenSize);
-		getTarget()->getVariables(getNodeId(), bluePos, blueSize);
+		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
+		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
+		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
 		
 		// TODO: let the user choose the refresh rate
 		startTimer(100);
@@ -145,9 +142,9 @@ namespace Aseba
 	
 	void LinearCameraViewPlugin::timerEvent ( QTimerEvent * event )
 	{
-		getTarget()->getVariables(getNodeId(), redPos, redSize);
-		getTarget()->getVariables(getNodeId(), greenPos, greenSize);
-		getTarget()->getVariables(getNodeId(), bluePos, blueSize);
+		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
+		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
+		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
 	}
 	
 	void LinearCameraViewPlugin::variableValueUpdated(const QString& name, const VariablesDataVector& values)

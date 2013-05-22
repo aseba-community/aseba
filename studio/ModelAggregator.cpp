@@ -1,7 +1,5 @@
 #include "ModelAggregator.h"
 
-#include <ModelAggregator.moc>
-
 namespace Aseba
 {
 	ModelAggregator::ModelAggregator(QObject* parent) :

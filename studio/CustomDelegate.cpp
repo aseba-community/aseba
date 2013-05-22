@@ -21,8 +21,6 @@
 #include "CustomDelegate.h"
 #include <QtGui>
 
-#include <CustomDelegate.moc>
-
 namespace Aseba
 {
 	/** \addtogroup studio */

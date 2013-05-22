@@ -36,8 +36,6 @@
 
 #include <QDebug>
 
-#include <HelpViewer.moc>
-
 namespace Aseba
 {
 	const QString HelpViewer::DEFAULT_LANGUAGE = "en";
