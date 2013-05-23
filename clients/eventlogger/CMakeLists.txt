@@ -13,10 +13,6 @@ if (QT4_FOUND)
 	
 		set(eventlogger_SRCS eventlogger.cpp)
 		
-		#qt4_automoc(${eventlogger_SRCS})
-		
-		#qt4_add_resources(resfiles asebastudio.qrc)
-		
 		include_directories (${QWT_INCLUDE_DIR} ${QT_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/eventlogger)
 		
 		#add_executable(asebastudio WIN32 ${eventlogger_SRCS} ${resfiles})
