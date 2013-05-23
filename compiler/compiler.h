@@ -31,7 +31,7 @@
 
 #include "errors_code.h"
 #include "../common/types.h"
-#include "../utils/FormatableString.h"
+#include "../common/utils/FormatableString.h"
 
 namespace Aseba
 {

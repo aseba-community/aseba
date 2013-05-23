@@ -23,7 +23,7 @@
 
 #include "compiler.h"
 #include "../common/consts.h"
-#include "../utils/FormatableString.h"
+#include "../common/utils/FormatableString.h"
 #include <vector>
 #include <string>
 #include <ostream>

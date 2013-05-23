@@ -5,31 +5,29 @@ if (QT4_FOUND AND ENKI_FOUND)
 	find_package(SDL)
 	if (SDL_FOUND)
 		include_directories(${SDL_INCLUDE_DIR})
-		set(EXTRA_LIBS ${SDL_LIBRARY} ${EXTRA_LIBS})
+		set(EXTRA_LIBS ${SDL_LIBRARY})
 		add_definitions("-DUSE_SDL")
+	elseif (SDL_FOUND)
+		set(EXTRA_LIBS "")
 	endif (SDL_FOUND)
 
 	find_package(OpenGL REQUIRED)
 	
+	set(QT_USE_QTMAIN ON)
+	set(QT_USE_QTOPENGL ON)
+	set(QT_USE_QTXML ON)
 	include(${QT_USE_FILE})
 	
 	include_directories(${ENKI_INCLUDE_DIR})
 	
-	set(playground_SRCS playground.cpp playground-vm-description.c)
-	
-	#qt4_automoc(${playground_SRCS})
-	
-	#qt4_add_resources(playground_RCC_SRCS playground-textures.qrc)
-	
-	include_directories (${QT_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR} ${QT_QTXML_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/targets/playground .)
+	set(playground_SRCS
+		playground.cpp
+		playground-vm-description.c
+	)
 	
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_RCC_SRCS})
 	
-	if (WIN32)
-		target_link_libraries(asebaplayground asebavmbuffer asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTXML_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTMAIN_LIBRARY} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
-	else (WIN32)
-		target_link_libraries(asebaplayground asebavmbuffer asebavm asebacore ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARIES} ${QT_QTOPENGL_LIBRARIES} ${QT_QTXML_LIBRARIES} ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
-		install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-	endif (WIN32)
+	target_link_libraries(asebaplayground asebavmbuffer asebavm ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
+	install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 endif (QT4_FOUND AND ENKI_FOUND)

@@ -20,8 +20,8 @@
 
 #include "tree.h"
 #include "power-of-two.h"
-#include "../utils/FormatableString.h"
-#include "../utils/utils.h"
+#include "../common/utils/FormatableString.h"
+#include "../common/utils/utils.h"
 #include <cassert>
 #include <cstdlib>
 

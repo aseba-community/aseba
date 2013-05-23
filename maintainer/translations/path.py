@@ -21,7 +21,7 @@
 import sys
 import os.path
 
-STUDIO_PATH = "../../studio/"
+STUDIO_PATH = "../../clients/studio/"
 COMPILER_PATH = '../../compiler'
 CHALLENGE_PATH = "../../targets/challenge/"
 

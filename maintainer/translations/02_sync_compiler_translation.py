@@ -62,7 +62,7 @@ output_code_file_template = Template(output_code_file)
 output_qt_file = \
 """
 #include "CompilerTranslator.h"
-#include "../../compiler/errors_code.h"
+#include "../../../compiler/errors_code.h"
 
 #include <CompilerTranslator.moc>
 

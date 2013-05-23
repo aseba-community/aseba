@@ -1,23 +1,18 @@
+# two test executable
 add_executable(asebatest
 	asebatest.cpp
 )
-
-target_link_libraries(asebatest asebacompiler asebavm asebacore ${EXTRA_LIBS})
-
+target_link_libraries(asebatest asebacompiler asebavm ${ASEBA_CORE_LIBRARIES})
 install(TARGETS asebatest RUNTIME
 	DESTINATION bin
-	LIBRARY DESTINATION lib
 )
 
 add_executable(aseba-test-natives-count
 	aseba-test-natives-count.cpp
 )
-
 target_link_libraries(aseba-test-natives-count asebavm)
-
 install(TARGETS aseba-test-natives-count RUNTIME
 	DESTINATION bin
-	LIBRARY DESTINATION lib
 )
 
 # set the number of test loops for the fuzzy test
@@ -59,7 +54,6 @@ add_test(native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CU
 add_test(general-tuple-native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
 add_test(var-def-compat-issue135 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/var-def-compat-issue135.txt)
 add_test(array-indirect-access-issue134 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.txt)
-
 
 
 # the following tests should fail

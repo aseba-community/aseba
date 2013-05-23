@@ -41,7 +41,6 @@
 #include <QtGui>
 #include <QtDebug>
 #include "challenge.h"
-#include <challenge.moc>
 #include <string.h>
 
 #define SIMPLIFIED_EPUCK

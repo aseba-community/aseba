@@ -19,9 +19,9 @@
 */
 
 #include "compiler.h"
-#include "../common/consts.h"
 #include "tree.h"
-#include "../utils/FormatableString.h"
+#include "../common/consts.h"
+#include "../common/utils/FormatableString.h"
 #include <cassert>
 #include <cstdlib>
 #include <sstream>

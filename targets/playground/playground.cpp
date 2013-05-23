@@ -41,7 +41,6 @@
 #include <QtDebug>
 #include <QtXml>
 #include "playground.h"
-//#include <playground.moc>
 #include <string.h>
 
 #ifdef USE_SDL
