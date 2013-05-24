@@ -8,13 +8,13 @@ namespace Aseba
 		memory(-1),
 		numStates(states),
 		name(n)
-	{		 
+	{
 	}
 
 	ThymioIRButton::~ThymioIRButton() 
 	{ 
 		buttons.clear();
-	}	
+	}
 
 	void ThymioIRButton::setClicked(int i, int status) 
 	{ 
@@ -26,7 +26,6 @@ namespace Aseba
 	{ 
 		if( i<size() ) 
 			return buttons[i]; 
-
 		return -1;
 	}
 	

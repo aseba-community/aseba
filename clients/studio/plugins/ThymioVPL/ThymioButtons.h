@@ -44,10 +44,9 @@ namespace Aseba
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
 
-		int isClicked() { return curState != 0; }
+		int isClicked() { return curState; }
 		void setClicked(int state) { curState = state; update(); }
 		void setToggleState(bool state) { toggleState = state; update(); }
-		//int getNumStates() const { return numStates; }
 
 		void addState(const QColor& brushColor = Qt::white, const QColor& penColor = Qt::black);
 
@@ -115,6 +114,7 @@ namespace Aseba
 		QColor getButtonColor() const { return buttonColor; }
 		virtual void setClicked(int i, int status);
 		virtual int isClicked(int i) { if( i<thymioButtons.size() ) return thymioButtons.at(i)->isClicked(); return -1; }
+		// TODO: changed clicked to state
 
 		void setParentID(int id) { parentID = id; }
 		int getParentID() const { return parentID; }
