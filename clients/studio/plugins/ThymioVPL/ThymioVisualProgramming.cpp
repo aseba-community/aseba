@@ -282,7 +282,7 @@ namespace Aseba
 	
 	void ThymioVisualProgramming::newFile()
 	{
-		if( !scene->isEmpty() && warningDialog() ) 
+		if (scene->isEmpty() || warningDialog()) 
 		{
 			scene->reset();
 			recompileButtonSet();

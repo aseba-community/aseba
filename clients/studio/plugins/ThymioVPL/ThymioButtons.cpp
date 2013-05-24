@@ -532,12 +532,15 @@ namespace Aseba
 		pts[2] = QPointF(446+trans, 168);
 		painter->drawPolygon(pts, 3);
 
+		/*
+		// pair number, disabled for now as requested by Francesco
 		painter->setPen(errorFlag ? Qt::black : Qt::gray);
 		QFont font("Helvetica");
 		font.setPixelSize(50);
 		painter->setFont(font);
 		painter->drawText(QRect(790+trans, 20, 180, 84), Qt::AlignRight, QString("%0").arg(getRow()));
-
+		*/
+		
 		if( eventButton && eventButton->getParentID() < 0 ) 
 		{
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
