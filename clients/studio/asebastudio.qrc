@@ -64,5 +64,6 @@
 	<file>images/exit.svgz</file>
 	<file>images/stop1.svgz</file>
 	<file>images/light.svgz</file>
+	<file>images/info.svgz</file>
 </qresource>
 </RCC>

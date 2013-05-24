@@ -10,6 +10,9 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QScrollBar>
+#include <QAction>
+#include <QUrl>
+#include <QDesktopServices>
 
 #include "ThymioVisualProgramming.h"
 #include "../../TargetModels.h"
@@ -74,6 +77,16 @@ namespace Aseba
 		advancedButton->setIcon(QIcon(":/images/light.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
+		toolBar->addSeparator();
+		
+		helpButton = new QToolButton();
+		QAction* action = new QAction(helpButton);
+		action->setIcon(QIcon(":/images/info.svgz"));
+		action->setToolTip(tr("Help"));
+		action->setData(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
+		connect(action, SIGNAL(triggered()), this, SLOT(openToUrlFromAction()));
+		helpButton->setDefaultAction(action);
+		toolBar->addWidget(helpButton);
 
 		if (showCloseButton)
 		{
@@ -206,6 +219,12 @@ namespace Aseba
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
+	}
+	
+	void ThymioVisualProgramming::openToUrlFromAction() const
+	{
+		const QAction *action(reinterpret_cast<QAction *>(sender()));
+		QDesktopServices::openUrl(action->data().toUrl());
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *button)
@@ -646,8 +665,8 @@ namespace Aseba
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
-		const int toolbarWidgetCount(quitButton ? 9 : 8);
-		const int toolbarSepCount(quitButton ? 4 : 3);
+		const int toolbarWidgetCount(quitButton ? 10 : 9);
+		const int toolbarSepCount(quitButton ? 5 : 4);
 		// get width of combox box element (not content)
 		QStyleOptionComboBox opt;
 		QSize tmp(0, 0);
@@ -681,6 +700,9 @@ namespace Aseba
 		stopButton->setIconSize(tbIconSize);
 		colorComboButton->setIconSize(tbIconSize);
 		advancedButton->setIconSize(tbIconSize);
+		helpButton->setIconSize(tbIconSize);
+		if (quitButton)
+			quitButton->setIconSize(tbIconSize);
 		toolBar->setIconSize(tbIconSize);
 		
 		// set view and cards on sides

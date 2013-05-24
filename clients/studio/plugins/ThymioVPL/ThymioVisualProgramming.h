@@ -49,6 +49,7 @@ namespace Aseba
 		bool closeFile();
 		
 	private slots:
+		void openToUrlFromAction() const;
 		void showVPLModal();
 		void addButtonsEvent();
 		void addProxEvent();
@@ -97,6 +98,7 @@ namespace Aseba
 		QToolButton *runButton;
 		QToolButton *stopButton;
 		QToolButton *advancedButton;
+		QToolButton *helpButton;
 		QComboBox *colorComboButton;
 		QToolButton *quitButton;
 
