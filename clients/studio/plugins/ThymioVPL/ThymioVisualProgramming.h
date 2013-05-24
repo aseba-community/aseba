@@ -107,8 +107,6 @@ namespace Aseba
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
 
-		QString thymioFilename;
-
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		bool warningDialog();
 		void setColors(QComboBox *button = 0);

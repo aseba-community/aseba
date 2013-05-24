@@ -265,10 +265,9 @@ namespace Aseba
 	{
 		if( !scene->isEmpty() && warningDialog() ) 
 		{
-			const bool advanced = scene->getAdvanced();
 			scene->reset();
-			thymioFilename.clear();
-			scene->setAdvanced(advanced);
+			recompileButtonSet();
+			advancedButton->setEnabled(true);
 		}
 	}
 
