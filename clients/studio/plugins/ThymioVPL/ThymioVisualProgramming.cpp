@@ -681,7 +681,8 @@ namespace Aseba
 				toolbarSepCount * style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent) +
 				2 * style()->pixelMetric(QStyle::PM_ToolBarItemMargin) +
 				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
-				tmp.width()
+				tmp.width() +
+				20 // safety factor, as it seems that metrics do miss some space
 			)
 		) / (toolbarWidgetCount));
 		
