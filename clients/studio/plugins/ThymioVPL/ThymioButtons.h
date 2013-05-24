@@ -39,18 +39,17 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		ThymioClickableButton (const QRectF rect, const ThymioButtonType type, int nstates = 2, QGraphicsItem *parent=0 );
+		//! Create a button with initially one state
+		ThymioClickableButton (const QRectF rect, const ThymioButtonType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
 
-		int isClicked() { return buttonClicked; }
-		void setClicked(int clicked) { buttonClicked = clicked; update(); }
+		int isClicked() { return curState != 0; }
+		void setClicked(int state) { curState = state; update(); }
 		void setToggleState(bool state) { toggleState = state; update(); }
-		void setNumStates(int num) { numStates = num > 2 ? num : 2; }
-		int getNumStates() const { return numStates; }
+		//int getNumStates() const { return numStates; }
 
-		void setButtonColor(QColor color) { buttonColor = color; update(); }
-		void setBeginButtonColor(QColor color) { buttonBeginColor = color; update(); }
+		void addState(const QColor& brushColor = Qt::white, const QColor& penColor = Qt::black);
 
 		void addSibling(ThymioClickableButton *s) { siblings.push_back(s); }
 	
@@ -61,12 +60,12 @@ namespace Aseba
 		const ThymioButtonType buttonType;
 		const QRectF boundingRectangle;
 		
-		int buttonClicked;
+		int curState;
 		bool toggleState;
-		int numStates;
 		
-		QColor buttonColor;
-		QColor buttonBeginColor;
+		//! a (brush,pen) color pair
+		typedef QPair<QColor, QColor> ColorPair;
+		QList<ColorPair> colors;
 
 		QList<ThymioClickableButton*> siblings;
 

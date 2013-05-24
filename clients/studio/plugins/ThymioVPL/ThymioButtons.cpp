@@ -15,36 +15,26 @@
 namespace Aseba
 {
 	// Clickable button
-	ThymioClickableButton::ThymioClickableButton (const QRectF rect, const ThymioButtonType type,  int nstates, QGraphicsItem *parent ) :
+	ThymioClickableButton::ThymioClickableButton (const QRectF rect, const ThymioButtonType type, QGraphicsItem *parent, const QColor& initBrushColor, const QColor& initPenColor) :
 		QGraphicsObject(parent),
 		buttonType(type),
 		boundingRectangle(rect),
-		buttonClicked(false),
-		toggleState(true),
-		numStates(nstates),
-		buttonColor(Qt::gray),
-		buttonBeginColor(Qt::white)
+		curState(0),
+		toggleState(true)
 	{
-		
+		colors.push_back(qMakePair(initBrushColor, initPenColor));
+	}
+	
+	void ThymioClickableButton::addState(const QColor& brushColor, const QColor& penColor)
+	{
+		colors.push_back(qMakePair(brushColor, penColor));
 	}
 	
 	void ThymioClickableButton::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
-	{		
-		painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
+	{
+		painter->setBrush(colors[curState].first);
+		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 		
-		// filled
-		if( buttonClicked == 0 )
-			painter->setBrush(Qt::white);
-		else
-		{
-			qreal step = (numStates <= 2 ? 1 : (qreal)(buttonClicked-1)/(qreal)(numStates-2));
-			painter->setBrush(QColor(
-				buttonColor.red()*step + buttonBeginColor.red()*(1-step),
-				buttonColor.green()*step + buttonBeginColor.green()*(1-step),
-				buttonColor.blue()*step + buttonBeginColor.blue()*(1-step)
-			)); 
-		}
-
 		if ( buttonType == THYMIO_CIRCULAR_BUTTON )
 		{
 			painter->drawEllipse(boundingRectangle);
@@ -67,13 +57,12 @@ namespace Aseba
 		{
 			if( toggleState )
 			{
-				if( ++buttonClicked == numStates )
-					buttonClicked = 0;
+				curState = (curState + 1) % colors.size();
 				parentItem()->update();
 			}
 			else 
 			{
-				buttonClicked = 1;
+				curState = 1;
 				for( QList<ThymioClickableButton*>::iterator itr = siblings.begin();
 					 itr != siblings.end(); ++itr )
 					(*itr)->setClicked(0);
@@ -85,7 +74,7 @@ namespace Aseba
 		
 	// Face Button
 	ThymioFaceButton::ThymioFaceButton ( QRectF rect, ThymioSmileType type, QGraphicsItem *parent ) :
-		ThymioClickableButton( rect, THYMIO_CIRCULAR_BUTTON, 2, parent )
+		ThymioClickableButton( rect, THYMIO_CIRCULAR_BUTTON, parent )
 	{
 		qreal x = boundingRectangle.x();
 		qreal y = boundingRectangle.y();
@@ -118,13 +107,9 @@ namespace Aseba
 
 	void ThymioFaceButton::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		painter->setPen(QPen(QBrush(Qt::black), 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
-		
-		// filled
-		if ( buttonClicked )
-			painter->setBrush(buttonColor);
-		else
-			painter->setBrush(Qt::white);
+		Q_ASSERT(curState < colors.size());
+		painter->setBrush(colors[curState].first);
+		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 
 		painter->drawEllipse(boundingRectangle);
 
@@ -169,9 +154,9 @@ namespace Aseba
 		{
 			for(uint i=0; i<4; i++)
 			{
-				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
+				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this);
 				button->setPos(295, i*60 + 40);
-				button->setButtonColor(QColor(255,200,0));
+				button->addState(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
@@ -327,9 +312,9 @@ namespace Aseba
 		{
 			for(int i=0; i<4; i++)
 			{		
-				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, 2, this);
+				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this);
 				button->setPos(295, i*60 + 40);
-				button->setButtonColor(QColor(255,200,0));
+				button->addState(QColor(255,200,0));
 
 				stateButtons.push_back(button);
 				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));

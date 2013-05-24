@@ -13,25 +13,27 @@ namespace Aseba
 		setData(0, "event");
 		setData(1, "button");
 		
-		// top, left, bottom, right		
+		const QColor color(255, 128, 0);
+		
+		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON, 2, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON,  this);
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
 			button->setPos(128 - 70*qSin(1.57079633*offset), 
 						   128 - 70*qCos(1.57079633*offset));
-			button->setButtonColor(Qt::green);
+			button->addState(color);
 			
 			thymioButtons.push_back(button);
 
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
 
-		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, 2, this);
+		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, this);
 		button->setPos(QPointF(128, 128));
-		button->setButtonColor(Qt::green);
+		button->addState(color);
 		thymioButtons.push_back(button);
 		connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 	}
@@ -45,14 +47,16 @@ namespace Aseba
 		
 		for(int i=0; i<5; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
 			
 			const qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
 						   175 - 150*qCos(0.34906585*offset) );
-			button->setBeginButtonColor(QColor(110,255,110));
-			button->setButtonColor(QColor(230,0,0));
+			//button->addState(QColor(110,255,110));
+			//button->addState(QColor(230,0,0));
+			button->addState(Qt::white);
+			button->addState(Qt::red);
 
 			thymioButtons.push_back(button);
 			
@@ -61,11 +65,13 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
 
 			button->setPos(QPointF(64 + i*128, 234));
-			button->setBeginButtonColor(QColor(110,255,110));
-			button->setButtonColor(QColor(230,0,0));
+			//button->addState(QColor(110,255,110));
+			//button->addState(QColor(230,0,0));
+			button->addState(Qt::white);
+			button->addState(Qt::red);
 			
 			thymioButtons.push_back(button);
 			
@@ -83,18 +89,20 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, 3, this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
 
 			button->setPos(QPointF(98 + i*60, 40));
-			button->setBeginButtonColor(QColor(110,255,110));
-			button->setButtonColor(QColor(230,0,0));
+			//button->addState(QColor(110,255,110));
+			//button->addState(QColor(230,0,0));
+			button->addState(Qt::white);
+			button->addState(Qt::red);
 			
 			thymioButtons.push_back(button);
 			
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
-	}	
-			
+	}
+	
 	// Tap Event
 	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent, bool advanced ) :
 		ThymioButton(true, advanced, parent)
