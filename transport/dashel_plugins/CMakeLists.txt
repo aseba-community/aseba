@@ -1,13 +1,16 @@
 # Select plugins following system
-if (LINUX)
-	set (ASEBADASHEL_PLUGINS_SRC socketcan.cpp)
-endif (LINUX)
-if (ANDROID) # android overrides Linux
+if (ANDROID)
 	set (ASEBADASHEL_PLUGINS_SRC android.cpp)
+	message("-- Enabling Dashel android plugin")
+else (ANDROID)
+	if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+		set (ASEBADASHEL_PLUGINS_SRC socketcan.cpp)
+		message("-- Enabling Dashel socketcan plugin")
+	else (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+		set (ASEBADASHEL_PLUGINS_SRC none.cpp)
+		message("-- System is neither Linux nor Android, no Dashel plugins")
+	endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif (ANDROID)
-if ((NOT LINUX) AND (NOT ANDROID))
-	set (ASEBADASHEL_PLUGINS_SRC none.cpp)
-endif ((NOT LINUX) AND (NOT ANDROID))
 
 add_library(asebadashelplugins ${ASEBADASHEL_PLUGINS_SRC})
 install(TARGETS asebadashelplugins ARCHIVE
