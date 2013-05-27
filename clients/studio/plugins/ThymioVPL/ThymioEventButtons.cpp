@@ -47,7 +47,7 @@ namespace Aseba
 		
 		for(int i=0; i<5; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			
 			const qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
@@ -65,7 +65,7 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(64 + i*128, 234));
 			//button->addState(QColor(110,255,110));
@@ -89,7 +89,7 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::gray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), THYMIO_RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(98 + i*60, 40));
 			//button->addState(QColor(110,255,110));

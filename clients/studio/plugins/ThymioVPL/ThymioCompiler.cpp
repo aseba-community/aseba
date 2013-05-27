@@ -85,7 +85,7 @@ namespace Aseba
 			break;
 		case THYMIO_NO_TYPE_ERROR:
 		default:
-			break;			
+			break;
 		}
 		
 		return THYMIO_NO_ERROR;
@@ -122,7 +122,7 @@ namespace Aseba
 		{
 			errorLine++;
 			
-			(*itr)->accept(&syntaxChecker);			
+			(*itr)->accept(&syntaxChecker);
 			if( !syntaxChecker.isSuccessful() ) 
 			{
 				errorType = THYMIO_SYNTAX_ERROR;
@@ -135,7 +135,6 @@ namespace Aseba
 				errorType = THYMIO_TYPE_ERROR;
 				break;
 			}
-					
 		}
 	}
 
@@ -155,6 +154,8 @@ namespace Aseba
 					break;
 				}
 			}
+			
+			codeGenerator.addInitialisation();
 		}
 	}
 

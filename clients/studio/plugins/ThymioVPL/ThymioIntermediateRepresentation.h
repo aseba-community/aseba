@@ -56,6 +56,7 @@ namespace Aseba
 		int size() const;
 		void setMemoryState(int s);
 		int getMemoryState() const;
+		int getMemoryState(int i) const;
 
 		ThymioIRButtonName getName() const;
 		void setBasename(wstring n);
@@ -161,6 +162,7 @@ namespace Aseba
 		vector<wstring>::const_iterator endCode() const { return generatedCode.end(); }
 		void reset();
 		void clear();
+		void addInitialisation();
 		
 		int buttonToCode(int id) const;
 		
@@ -168,6 +170,8 @@ namespace Aseba
 		map<ThymioIRButtonName, pair<int, int> > editor;
 
 		vector<wstring> generatedCode;
+		bool advancedMode;
+		bool useMicrophone;
 		vector<wstring> directions;
 		int currentBlock;
 		bool inIfBlock;

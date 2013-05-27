@@ -48,6 +48,11 @@ namespace Aseba
 	{
 		return memory;
 	}
+	
+	int ThymioIRButton::getMemoryState(int i) const
+	{
+		return ((memory >> (i*2)) & 0x3);
+	}
 
 	void ThymioIRButton::setBasename(wstring n)
 	{
@@ -90,7 +95,7 @@ namespace Aseba
 		actionButton(action) 
 	{
 	}
-		
+	
 	void ThymioIRButtonSet::addEventButton(ThymioIRButton *event) 
 	{ 
 		eventButton = event; 
@@ -100,7 +105,7 @@ namespace Aseba
 	{
 		actionButton = action; 
 	}
-		
+	
 	ThymioIRButton *ThymioIRButtonSet::getEventButton() 
 	{ 
 		return eventButton; 

@@ -29,7 +29,7 @@ namespace Aseba
 		wstringstream streamVal;
 		streamVal << val;
 		
-		return streamVal.str();	
+		return streamVal.str();
 	}
 
 	// Type Checker //	
@@ -162,7 +162,8 @@ namespace Aseba
 	// Code Generator //
 	ThymioIRCodeGenerator::ThymioIRCodeGenerator() : 
 		ThymioIRVisitor(),
-		generatedCode(),
+		advancedMode(false),
+		useMicrophone(false),
 		currentBlock(0),
 		inIfBlock(false),
 		buttonToCodeMap()
@@ -196,9 +197,36 @@ namespace Aseba
 		editor[THYMIO_TAP_IR] = make_pair(-1,0);
 		editor[THYMIO_CLAP_IR] = make_pair(-1,0);
 		generatedCode.clear();
+		advancedMode = false;
+		useMicrophone = false;
 		inIfBlock = false;
 		buttonToCodeMap.clear();
-	}	
+	}
+	
+	void ThymioIRCodeGenerator::addInitialisation()
+	{
+		// if no code, no need for initialisation
+		if (generatedCode.empty())
+			return;
+		
+		// build initialisation code
+		wstring text;
+		if (advancedMode)
+		{
+			text += L"var state[4] = [0,0,0,0]\n";
+			text += L"var new_state[4] = [0,0,0,0]\n";
+			text += L"\n";
+		}
+		if (useMicrophone)
+		{
+			text += L"mic.threshold = 250\n";
+		}
+		text += L"call sound.system(-1)\n";
+		text += L"call leds.top(0,0,0)\n";
+		text += L"call leds.circle(0,0,0,0,0,0,0,0)\n";
+		
+		generatedCode[0] = text + generatedCode[0];
+	}
 
 	int ThymioIRCodeGenerator::buttonToCode(int id) const
 	{
@@ -286,10 +314,15 @@ namespace Aseba
 				
 				if( button->getMemoryState() > 0 )
 				{
-					text += L" and (state & ";
-					text += toWstring(button->getMemoryState());
-					text += L") == ";
-					text += toWstring(button->getMemoryState());
+					for (int i=0; i<4; ++i)
+					{
+						switch (button->getMemoryState(i))
+						{
+							case 1: text += L" and state[" + toWstring(i) + L"] == 1"; break;
+							case 2: text += L" and state[" + toWstring(i) + L"] == 0"; break;
+							default: break;
+						}
+					}
 				}
 				
 				text += L" then\n";
@@ -301,10 +334,28 @@ namespace Aseba
 			{
 				if( button->getMemoryState() > 0 )
 				{
-					text += L"\tif (state & ";
-					text += toWstring(button->getMemoryState());
-					text += L") == ";
-					text += toWstring(button->getMemoryState());
+					text += L"\tif ";
+					bool first(true);
+					for (int i=0; i<4; ++i)
+					{
+						switch (button->getMemoryState(i))
+						{
+							case 1:
+								if (!first)
+									text += L" and ";
+								text += L"state[" + toWstring(i) + L"] == 1";
+								first = false;
+							break;
+							case 2:
+								if (!first)
+									text += L" and ";
+								text += L"state[" + toWstring(i) + L"] == 0";
+								first = false;
+							break;
+							default:
+							break;
+						}
+					}
 					text += L" then\n";
 					
 					generatedCode[currentBlock] = text;
@@ -316,28 +367,31 @@ namespace Aseba
 		}
 		else
 		{
-			text = (inIfBlock ? L"\t\t" : L"\t");
-			int val=0;
+			const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 			switch( button->getName() )
 			{
 			case THYMIO_MOVE_IR:
+				text += indString;
 				text += L"motor.left.target = ";
 				text += toWstring(button->isClicked(0));
-				text += (inIfBlock ? L"\n\t\t" : L"\n\t");
+				text += L"\n";
+				text += indString;
 				text += L"motor.right.target = ";
 				text += toWstring(button->isClicked(1));
-				text += L"\n";				
+				text += L"\n";
 				break;
 			case THYMIO_COLOR_IR:
+				text += indString;
 				text += L"call leds.top(";
 				text += toWstring(button->isClicked(0));
 				text += L",";
 				text += toWstring(button->isClicked(1));
-				text += L",";								
+				text += L",";
 				text += toWstring(button->isClicked(2));
 				text += L")\n";
 				break;
 			case THYMIO_CIRCLE_IR:
+				text += indString;
 				text += L"call leds.circle(";
 				for(int i=0; i < button->size(); ++i)
 				{
@@ -347,6 +401,7 @@ namespace Aseba
 				text.replace(text.length()-1, 2,L")\n");
 				break;
 			case THYMIO_SOUND_IR:
+				text += indString;
 				if( button->isClicked(0) ) // friendly
 					text += L"call sound.system(7)\n";
 				else if( button->isClicked(1) ) // okay
@@ -355,11 +410,15 @@ namespace Aseba
 					text += L"call sound.system(4)\n"; // scared
 				break;
 			case THYMIO_MEMORY_IR:
-				text += L"new_state = ";
 				for(int i=0; i<button->size(); ++i)
-					val += (button->isClicked(i)*(0x01<<i));
-				text += toWstring(val);
-				text += L"\n";
+				{
+					switch (button->isClicked(i))
+					{
+						case 1: text += indString + L"new_state[" + toWstring(i) + L"] = 1\n"; break;
+						case 2: text += indString + L"new_state[" + toWstring(i) + L"] = 0\n"; break;
+						default: break; // do nothing
+					}
+				}
 				break;
 			default:
 				errorCode = THYMIO_INVALID_CODE;
@@ -381,14 +440,8 @@ namespace Aseba
 			return;
 		}
 		
+		advancedMode = advancedMode || (buttonSet->getEventButton()->getMemoryState() >= 0);
 		errorCode = THYMIO_NO_ERROR;
-		
-		if( generatedCode.empty() )
-		{
-			if( buttonSet->getEventButton()->getMemoryState() >= 0 )
-				generatedCode.push_back(L"var state = 0\nvar new_state = 0\n");
-			generatedCode.push_back(L"call sound.system(-1)\ncall leds.temperature(0,0)\ncall leds.top(0,0,0)\ncall leds.circle(0,0,0,0,0,0,0,0)\n");
-		}
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		if( name == THYMIO_PROX_GROUND_IR )
@@ -417,23 +470,7 @@ namespace Aseba
 				size++;
 				break;
 			case THYMIO_CLAP_IR:
-				if( generatedCode.empty() || generatedCode[0].find(L"var new_state = 0\n") == wstring::npos )
-				{
-					generatedCode.insert(generatedCode.begin(),L"mic.threshold = 250\n");
-					for(map<ThymioIRButtonName, pair<int, int> >::iterator itr = editor.begin();
-						itr != editor.end(); ++itr)
-						if( (itr->second).first >= 0 )
-							(itr->second).first++;
-
-					for(int i=0; i<(int)buttonToCodeMap.size(); i++)
-						if( buttonToCodeMap[i]>=0 ) 
-							buttonToCodeMap[i]++;
-
-					block += 1;
-				}
-				else
-					generatedCode[0].append(L"\nmic.threshold = 250\n");
-
+				useMicrophone = true;
 				generatedCode.push_back(L"\nonevent mic\n");
 				size++;
 				break;
@@ -443,9 +480,9 @@ namespace Aseba
 				break;
 			}
 
-			if(mflag)
+			if (mflag)
 			{
-				generatedCode.push_back(L"\n\tstate = new_state\n\tcall leds.temperature(((state>>0) & 1)*10+((state>>1) & 1)*22,((state>>2) & 1)*10+((state>>3) & 1)*22)\n");
+				generatedCode.push_back(L"\n\tcall math.copy(state, new_state)\n");
 				editor[name] = make_pair(block, size+1);
 			}
 			else
