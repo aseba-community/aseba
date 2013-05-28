@@ -526,26 +526,30 @@ namespace Aseba
 		}
 		
 		// then proceed with painting
-		painter->setPen(Qt::NoPen);
 		
 		// select colors (error, selected, normal)
 		const int bgColors[][3] = {
-			{255, 106, 69},
+			{255, 180, 180},
 			{255, 220, 211},
 			{255, 237, 233},
 		};
 		const int fgColors[][3] = {
-			{203, 85, 28},
+			{237, 120, 120},
 			{237, 172, 140},
 			{237, 208, 194},
 		};
 		const int i = (errorFlag ? 0 : hasFocus() ? 1 : 2);
 		
 		// background
+		if (errorFlag)
+			painter->setPen(QPen(Qt::red, 4));
+		else
+			painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(bgColors[i][0], bgColors[i][1], bgColors[i][2]));
 		painter->drawRoundedRect(0, 0, 1000+trans, 336, 5, 5);
 
 		// arrow
+		painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
 		painter->drawRect(340 + trans, 143, 55, 55);
 		QPointF pts[3];
@@ -566,7 +570,7 @@ namespace Aseba
 		if( eventButton == 0 )
 		{
 			if( !highlightEventButton )
-				eventButtonColor.setAlpha(50);
+				eventButtonColor.setAlpha(100);
 			painter->setPen(QPen(eventButtonColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
@@ -576,11 +580,11 @@ namespace Aseba
 		if( actionButton == 0 )
 		{
 			if( !highlightActionButton )
-				actionButtonColor.setAlpha(50);
+				actionButtonColor.setAlpha(100);
 			painter->setPen(QPen(actionButtonColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
-			actionButtonColor.setAlpha(255);	
+			actionButtonColor.setAlpha(255);
 		}
 	}
 
@@ -787,10 +791,13 @@ namespace Aseba
 					
 					if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
 					{
-						if (parentID == -1 && eventButton)
-							button->setState(eventButton->getState());
-						else
-							button->setState(state);
+						if (advancedMode)
+						{
+							if (parentID == -1 && eventButton)
+								button->setState(eventButton->getState());
+							else
+								button->setState(state);
+						}
 						addEventButton(button);
 						highlightEventButton = false;
 					}
