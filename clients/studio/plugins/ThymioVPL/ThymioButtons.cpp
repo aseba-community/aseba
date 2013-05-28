@@ -506,7 +506,6 @@ namespace Aseba
 		// first check whether some buttons have been removed
 		if( eventButton && eventButton->getParentID() < 0 ) 
 		{
-			qDebug() << "event removed";
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(eventButton);
 			delete(eventButton);
@@ -517,7 +516,6 @@ namespace Aseba
 		}
 		if( actionButton && actionButton->getParentID() < 0 )
 		{
-			qDebug() << "action removed";
 			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(actionButton);
 			delete(actionButton);
@@ -528,16 +526,28 @@ namespace Aseba
 		}
 		
 		// then proceed with painting
-		qreal alpha = (errorFlag ? 255 : hasFocus() ? 150 : 50);
-
 		painter->setPen(Qt::NoPen);
 		
-		painter->setBrush(QColor(255, 196, 180, alpha));
+		// select colors (error, selected, normal)
+		const int bgColors[][3] = {
+			{255, 106, 69},
+			{255, 220, 211},
+			{255, 237, 233},
+		};
+		const int fgColors[][3] = {
+			{203, 85, 28},
+			{237, 172, 140},
+			{237, 208, 194},
+		};
+		const int i = (errorFlag ? 0 : hasFocus() ? 1 : 2);
+		
+		// background
+		painter->setBrush(QColor(bgColors[i][0], bgColors[i][1], bgColors[i][2]));
 		painter->drawRoundedRect(0, 0, 1000+trans, 336, 5, 5);
 
-		painter->setBrush(QColor(167, 151, 128, alpha));
+		// arrow
+		painter->setBrush(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
 		painter->drawRect(340 + trans, 143, 55, 55);
-
 		QPointF pts[3];
 		pts[0] = QPointF(394.5+trans, 118);
 		pts[1] = QPointF(394.5+trans, 218);
