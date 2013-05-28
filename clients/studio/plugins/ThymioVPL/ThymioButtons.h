@@ -106,7 +106,7 @@ namespace Aseba
 		
 		ThymioButton(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
 		~ThymioButton();
-
+		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
 
@@ -136,8 +136,11 @@ namespace Aseba
 	signals:
 		void stateChanged();
 
-	private slots:
+	protected slots:
 		void updateIRButton();
+		
+	protected:
+		void addAdvancedModeButtons();
 		
 	protected:
 		QList<ThymioClickableButton*> thymioButtons;
@@ -187,7 +190,7 @@ namespace Aseba
 		ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return advancedMode? QRectF(0, 0, 1064, 400) : QRectF(0, 0, 1000, 400); }
+		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1064+2, 400) : QRectF(-2, -2, 1000+2, 400); }
 		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1064, 336) : QRectF(0, 0, 1000, 336); }
 
 		void addEventButton(ThymioButton *event);

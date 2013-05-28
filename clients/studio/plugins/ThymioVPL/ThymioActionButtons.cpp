@@ -246,7 +246,7 @@ namespace Aseba
 			//button->setRotation(90*(i+1));
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(128, i*60 + 40);
-			button->addState(QColor(255,200,0));
+			button->addState(QColor(255,128,0));
 			button->addState(Qt::white);
 
 			thymioButtons.push_back(button);

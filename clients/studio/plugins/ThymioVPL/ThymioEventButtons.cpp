@@ -13,12 +13,12 @@ namespace Aseba
 		setData(0, "event");
 		setData(1, "button");
 		
-		const QColor color(255, 128, 0);
+		const QColor color(Qt::red);
 		
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON,  this);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), THYMIO_TRIANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
@@ -31,7 +31,7 @@ namespace Aseba
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
 		}
 
-		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, this);
+		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		thymioButtons.push_back(button);

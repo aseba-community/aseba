@@ -150,18 +150,7 @@ namespace Aseba
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
 		if( advanced )
-		{
-			for(uint i=0; i<4; i++)
-			{
-				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
-				button->setPos(295, i*60 + 40);
-				button->addState(QColor(255,200,0));
-				button->addState(Qt::white);
-
-				stateButtons.push_back(button);
-				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-			}
-		}
+			addAdvancedModeButtons();
 	}
 	
 	ThymioButtonWithBody::ThymioButtonWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
@@ -244,6 +233,20 @@ namespace Aseba
 		}
 	}
 	
+	void ThymioButton::addAdvancedModeButtons()
+	{
+		for(uint i=0; i<4; i++)
+		{
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			button->setPos(295, i*60 + 40);
+			button->addState(QColor(255,128,0));
+			button->addState(Qt::white);
+
+			stateButtons.push_back(button);
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+		}
+	}
+	
 	void ThymioButton::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
@@ -305,16 +308,7 @@ namespace Aseba
 		
 		if( advanced && stateButtons.empty() )
 		{
-			for(int i=0; i<4; i++)
-			{
-				ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
-				button->setPos(295, i*60 + 40);
-				button->addState(QColor(255,200,0));
-				button->addState(Qt::white);
-
-				stateButtons.push_back(button);
-				connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-			}
+			addAdvancedModeButtons();
 			updateIRButton();
 		}	
 		else if( !advanced && !stateButtons.empty() )
@@ -676,7 +670,7 @@ namespace Aseba
 		if( actionButton )
 			actionButton->setPos(500+trans, 40);
 		
-		update();
+		prepareGeometryChange();
 	}
 
 	void ThymioButtonSet::stateChanged()
@@ -708,7 +702,7 @@ namespace Aseba
 
 	void ThymioButtonSet::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobuttonset") ||
+		/*if ( event->mimeData()->hasFormat("thymiobuttonset") ||
 			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
@@ -725,8 +719,9 @@ namespace Aseba
 			update();
 		}
 		else
-			event->ignore();
-	}	
+			event->ignore();*/
+		QGraphicsObject::dragMoveEvent(event);
+	}
 	
 	void ThymioButtonSet::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 	{
