@@ -497,15 +497,41 @@ namespace Aseba
 		
 		setPos(xpos, (row*400+20)*scale());
 	}
-
+	
 	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
+		// first check whether some buttons have been removed
+		if( eventButton && eventButton->getParentID() < 0 ) 
+		{
+			qDebug() << "event removed";
+			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
+			scene()->removeItem(eventButton);
+			delete(eventButton);
+			eventButton = 0;
+		
+			buttonSetIR.addEventButton(0);
+			emit buttonUpdated();
+		}
+		if( actionButton && actionButton->getParentID() < 0 )
+		{
+			qDebug() << "action removed";
+			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
+			scene()->removeItem(actionButton);
+			delete(actionButton);
+			actionButton = 0;
+
+			buttonSetIR.addActionButton(0);
+			emit buttonUpdated();
+		}
+		
+		// then proceed with painting
 		qreal alpha = (errorFlag ? 255 : hasFocus() ? 150 : 50);
 
 		painter->setPen(Qt::NoPen);
+		
 		painter->setBrush(QColor(255, 196, 180, alpha));
 		painter->drawRoundedRect(0, 0, 1000+trans, 336, 5, 5);
 
@@ -527,27 +553,6 @@ namespace Aseba
 		painter->drawText(QRect(790+trans, 20, 180, 84), Qt::AlignRight, QString("%0").arg(getRow()));
 		*/
 		
-		if( eventButton && eventButton->getParentID() < 0 ) 
-		{
-			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
-			scene()->removeItem(eventButton);
-			delete(eventButton);
-			eventButton = 0;
-		
-			buttonSetIR.addEventButton(0);
-			emit buttonUpdated();
-		}
-		if( actionButton && actionButton->getParentID() < 0 )
-		{
-			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
-			scene()->removeItem(actionButton);
-			delete(actionButton);
-			actionButton = 0;
-
-			buttonSetIR.addActionButton(0);
-			emit buttonUpdated();
-		}
-		
 		if( eventButton == 0 )
 		{
 			if( !highlightEventButton )
@@ -567,9 +572,6 @@ namespace Aseba
 			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
 			actionButtonColor.setAlpha(255);	
 		}
-
-		highlightEventButton = false;
-		highlightActionButton = false;
 	}
 
 	void ThymioButtonSet::setColorScheme(QColor eventColor, QColor actionColor)
@@ -683,9 +685,8 @@ namespace Aseba
 
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
-			update();
-			
 			scene()->setFocusItem(this);
+			update();
 		}
 		else
 			event->ignore();
@@ -706,9 +707,8 @@ namespace Aseba
 			
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
-			update();
-			
 			scene()->setFocusItem(this);
+			update();
 		}
 		else
 			event->ignore();
@@ -719,6 +719,8 @@ namespace Aseba
 		if ( event->mimeData()->hasFormat("thymiobutton") || 
 			 event->mimeData()->hasFormat("thymiobuttonset") )
 		{
+			highlightEventButton = false;
+			highlightActionButton = false;
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			update();
