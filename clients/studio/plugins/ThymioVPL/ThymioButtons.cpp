@@ -243,7 +243,7 @@ namespace Aseba
 			button->addState(Qt::white);
 
 			stateButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 	}
 	
