@@ -478,18 +478,8 @@ namespace Aseba
 					
 					if( !(buttonName = element.attribute("event-name")).isEmpty() )
 					{
-						
-						if ( buttonName == "button" )
-							eventButton = new ThymioButtonsEvent(0,scene->getAdvanced());
-						else if ( buttonName == "prox" )
-							eventButton = new ThymioProxEvent(0,scene->getAdvanced());
-						else if ( buttonName == "proxground" )
-							eventButton = new ThymioProxGroundEvent(0,scene->getAdvanced());
-						else if ( buttonName == "tap" )
-							eventButton = new ThymioTapEvent(0,scene->getAdvanced());
-						else if ( buttonName == "clap" )
-							eventButton = new ThymioClapEvent(0,scene->getAdvanced());
-						else
+						eventButton = ThymioButton::createButton(buttonName,scene->getAdvanced());
+						if (!eventButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),
 												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
@@ -498,23 +488,13 @@ namespace Aseba
 
 						for(int i=0; i<eventButton->getNumButtons(); ++i)
 							eventButton->setClicked(i,element.attribute(QString("eb%0").arg(i)).toInt());
-
 						eventButton->setState(element.attribute("state").toInt());
 					}
 					
 					if( !(buttonName = element.attribute("action-name")).isEmpty() )
 					{
-						if ( buttonName == "move" )
-							actionButton = new ThymioMoveAction();
-						else if ( buttonName == "colortop" )
-							actionButton = new ThymioColorTopAction();
-						else if ( buttonName == "colorbottom" )
-							actionButton = new ThymioColorBottomAction();
-						else if ( buttonName == "sound" )
-							actionButton = new ThymioSoundAction();
-						else if ( buttonName == "memory" )
-							actionButton = new ThymioMemoryAction();
-						else
+						actionButton = ThymioButton::createButton(buttonName,scene->getAdvanced());
+						if (!actionButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),
 												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
