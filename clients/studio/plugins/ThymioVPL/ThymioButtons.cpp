@@ -252,7 +252,8 @@ namespace Aseba
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		painter->setPen(QColor(147, 134, 115));
+		//painter->setPen(QColor(147, 134, 115),2);
+		painter->setPen(Qt::NoPen);
 		painter->setBrush(buttonColor); // filling
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
@@ -437,7 +438,7 @@ namespace Aseba
 			delete(thymioButton); 
 	}	
 	
-	void ThymioPushButton::changeButtonColor(QColor color) 
+	void ThymioPushButton::changeButtonColor(const QColor& color) 
 	{ 
 		thymioButton->setButtonColor(color); 
 		const qreal factor = width() / 256.;

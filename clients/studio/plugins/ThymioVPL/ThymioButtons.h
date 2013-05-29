@@ -109,6 +109,7 @@ namespace Aseba
 			void setUp(bool u) { up = u; }
 			
 			QColor bodyColor;
+			
 		private:
 			const int yShift;
 			bool up;
@@ -159,6 +160,7 @@ namespace Aseba
 		virtual ThymioIRButtonName getIRIdentifier() const = 0;
 		
 	protected:
+		// TODO: add only this in a subclass
 		QList<ThymioClickableButton*> thymioButtons;
 		QList<ThymioClickableButton*> stateButtons;
 		
@@ -190,7 +192,7 @@ namespace Aseba
 		ThymioPushButton(const QString& name, QWidget *parent=0);
 		~ThymioPushButton();
 		
-		void changeButtonColor(QColor color);
+		void changeButtonColor(const QColor& color);
 		
 	protected:
 		virtual void mouseMoveEvent( QMouseEvent *event );
