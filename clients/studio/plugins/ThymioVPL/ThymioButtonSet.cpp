@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsView>
+#include <QDebug>
 #include <cassert>
 
 #include "ThymioButtonSet.h"
@@ -380,8 +381,13 @@ namespace Aseba
 					{
 						if (advancedMode)
 						{
-							if (parentID == -1 && eventButton)
-								button->setStateFilter(eventButton->getStateFilter());
+							if (parentID == -1)
+							{
+								if (eventButton)
+									button->setStateFilter(eventButton->getStateFilter());
+								else
+									button->setStateFilter(0);
+							}
 							else
 								button->setStateFilter(state);
 						}

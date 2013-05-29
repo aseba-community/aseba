@@ -294,13 +294,12 @@ namespace Aseba
 	{
 		QByteArray buttonData;
 		QDataStream dataStream(&buttonData, QIODevice::WriteOnly);
-		const int numButtons = valuesCount();
-		dataStream << -1 << getName();
+		dataStream << parentID << getName();
 		
-		dataStream << 0;
+		dataStream << getStateFilter();
 		
-		dataStream << numButtons;
-		for(int i=0; i<numButtons; ++i)
+		dataStream << valuesCount();
+		for(int i=0; i<valuesCount(); ++i)
 			dataStream << getValue(i);
 		
 		QMimeData *mime = new QMimeData;
@@ -347,7 +346,7 @@ namespace Aseba
 
 	bool ThymioCard::isAnyStateFilter() const
 	{
-		for (size_t i=0; i<stateButtons.size(); ++i)
+		for (int i=0; i<stateButtons.size(); ++i)
 		{
 			if (stateButtons[i]->getValue() != 0)
 				return true;
