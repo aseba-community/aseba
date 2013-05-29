@@ -25,7 +25,6 @@ namespace Aseba
 	{
 		// create initial button
 		ThymioButtonSet *button = createNewButtonSet();
-		button->setPos(15, 20); //advancedMode = false
 		buttonSetHeight = button->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), this, SIGNAL(stateChanged()));
@@ -176,8 +175,7 @@ namespace Aseba
 	{
 		clear();
 
-		ThymioButtonSet *button = createNewButtonSet();
-		button->setPos(15, 20);
+		createNewButtonSet();
 	}
 	
 	void ThymioScene::clear()
@@ -246,11 +244,8 @@ namespace Aseba
 		
 		rearrangeButtons(row);
 
-		if( buttonSets.isEmpty() ) 
-		{
-			ThymioButtonSet *button = createNewButtonSet();
-			button->setPos(advancedMode?5:15,20);
-		}
+		if (buttonSets.isEmpty()) 
+			createNewButtonSet();
 
 		prevNewEventButton = false;
 		prevNewActionButton = false;

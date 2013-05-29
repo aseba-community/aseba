@@ -113,7 +113,7 @@ namespace Aseba
 		else
 		{
 			trans = 0;
-			xpos = 15;
+			xpos = 5+64;
 		}
 		
 		setPos(xpos, (getRow()*420+20));
