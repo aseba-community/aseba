@@ -660,10 +660,13 @@ namespace Aseba
 				2 * style()->pixelMetric(QStyle::PM_ComboBoxFrameWidth) +
 				toolbarWidgetCount *  style()->pixelMetric(QStyle::PM_ButtonMargin) + 
 				toolbarSepCount * style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent) +
+				style()->pixelMetric(QStyle::PM_LayoutLeftMargin) +
+				style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
 				2 * style()->pixelMetric(QStyle::PM_ToolBarItemMargin) +
 				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
 				tmp.width() +
-				20 // safety factor, as it seems that metrics do miss some space
+				0
+				//20 // safety factor, as it seems that metrics do miss some space
 			)
 		) / (toolbarWidgetCount));
 		
