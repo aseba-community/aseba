@@ -224,6 +224,11 @@ namespace Aseba
 		text += L"call sound.system(-1)\n";
 		text += L"call leds.top(0,0,0)\n";
 		text += L"call leds.circle(0,0,0,0,0,0,0,0)\n";
+		if (advancedMode)
+		{
+			text += L"\nsub display_state\n";
+			text += L"\tcall leds.circle(0,state[1]*32,0,state[2]*32,0,state[3]*32,0,state[0]*32)\n";
+		}
 		
 		generatedCode[0] = text + generatedCode[0];
 	}
@@ -482,7 +487,10 @@ namespace Aseba
 
 			if (mflag)
 			{
-				generatedCode.push_back(L"\n\tcall math.copy(state, new_state)\n");
+				generatedCode.push_back(
+					L"\n\tcall math.copy(state, new_state)"
+					L"\n\tcallsub display_state\n"
+				);
 				editor[name] = make_pair(block, size+1);
 			}
 			else

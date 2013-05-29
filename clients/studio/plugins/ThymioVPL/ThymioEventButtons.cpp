@@ -1,6 +1,7 @@
 #include <QPainter>
-
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSvgItem>
+#include <QtCore/qmath.h>
 
 #include "ThymioButtons.h"
 

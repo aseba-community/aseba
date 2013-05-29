@@ -1,4 +1,5 @@
 #include <QGraphicsSceneMouseEvent>
+#include <QMimeData>
 #include <QDebug>
 
 #include "ThymioButtons.h"

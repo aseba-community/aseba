@@ -52,7 +52,7 @@ namespace Aseba
 	{
 		ThymioIRButtonSet *set = buttonSet[row1];
 		buttonSet[row1] = buttonSet[row2];
-		buttonSet[row2] = set;	
+		buttonSet[row2] = set;
 	}
 	
 	int ThymioCompiler::buttonToCode(int id) const

@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 
 #include "ThymioButtons.h"
+#include "ThymioButtonSet.h"
 
 namespace Aseba
 {	

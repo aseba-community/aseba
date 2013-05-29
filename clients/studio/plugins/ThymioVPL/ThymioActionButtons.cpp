@@ -1,9 +1,12 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
+#include <QSlider>
+#include <QTimeLine>
+#include <QGraphicsProxyWidget>
+#include <QtCore/qmath.h>
 
 #include "ThymioButtons.h"
-
 
 namespace Aseba
 {
@@ -17,7 +20,7 @@ namespace Aseba
 		for(int i=0; i<2; i++)
 		{
 			QSlider *s = new QSlider(Qt::Vertical);
-			s->setRange(-500,500);
+			s->setRange(-10,10);
 			s->setStyleSheet(
 				"QSlider { border: 0px; padding: 0px; }"
 				"QSlider::groove:vertical { "
@@ -60,7 +63,7 @@ namespace Aseba
 	{
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
-			pt[i] = (sliders[i]->value())*0.06; // [-30,30]
+			pt[i] = (sliders[i]->value())*0.06*50; // [-30,30]
 		
 		const qreal step = frame/200.0;
 		const qreal angle = (pt[0]-pt[1]-0.04)*3*step;
@@ -78,14 +81,14 @@ namespace Aseba
 
 	void ThymioMoveAction::setClicked(int i, int status) 
 	{ 
-		if(i<getNumButtons()) 
-			sliders[i]->setSliderPosition(status);
+		if(i<sliders.size()) 
+			sliders[i]->setSliderPosition(status/50);
 	}
 
 	int ThymioMoveAction::isClicked(int i) 
 	{ 
-		if(i<getNumButtons()) 
-			return sliders[i]->value();
+		if (i<sliders.size()) 
+			return sliders[i]->value()*50;
 		return -1;
 	}
 	
