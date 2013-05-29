@@ -671,7 +671,11 @@ namespace Aseba
 				2 * style()->pixelMetric(QStyle::PM_ToolBarItemMargin) +
 				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
 				tmp.width() +
+				#ifdef Q_WS_MAC
+				30 // safety factor, as it seems that metrics do miss some space
+				#else // Q_WS_MAC
 				0
+				#endif // Q_WS_MAC
 				//20 // safety factor, as it seems that metrics do miss some space
 			)
 		) / (toolbarWidgetCount));
