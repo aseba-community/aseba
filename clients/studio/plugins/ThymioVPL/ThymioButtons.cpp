@@ -152,7 +152,7 @@ namespace Aseba
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
-		if( advanced )
+		if (advanced)
 			addAdvancedModeButtons();
 	}
 	
@@ -241,7 +241,7 @@ namespace Aseba
 		for(uint i=0; i<4; i++)
 		{
 			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
-			button->setPos(295, i*60 + 40);
+			button->setPos(310 + (i%2)*60, 100 + (i/2)*60);
 			button->addState(QColor(255,128,0));
 			button->addState(Qt::white);
 

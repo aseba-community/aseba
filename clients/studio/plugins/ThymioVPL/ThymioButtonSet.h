@@ -22,7 +22,7 @@ namespace Aseba
 		public:
 			ThymioRemoveButton(QGraphicsItem *parent=0);
 			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-64, -64, 128, 128); }
+			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
 
 		class ThymioAddButton : public QGraphicsItem
@@ -36,8 +36,8 @@ namespace Aseba
 		ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1064+2, 400) : QRectF(-2, -2, 1000+2, 400); }
-		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1064, 336) : QRectF(0, 0, 1000, 336); }
+		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
+		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1028, 336) : QRectF(0, 0, 900, 336); }
 
 		void addEventButton(ThymioButton *event);
 		void addActionButton(ThymioButton *action);
@@ -61,6 +61,9 @@ namespace Aseba
 	
 	public slots:
 		void stateChanged();
+		
+	protected:
+		void repositionElements();
 	
 	private:
 		ThymioButton *eventButton;

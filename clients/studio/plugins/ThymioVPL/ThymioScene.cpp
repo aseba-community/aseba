@@ -79,8 +79,6 @@ namespace Aseba
 			setFocusItem(0);
 		}
 
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));
-
 		return button;
 	}
 
@@ -129,8 +127,6 @@ namespace Aseba
 			setFocusItem(0);
 		}
 		
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));		
-
 		return button;
 	}
 
@@ -147,8 +143,6 @@ namespace Aseba
 		prevNewEventButton = false;
 		prevNewActionButton = false;
 		newRow = false;
-
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));
 	}
 
 	ThymioButtonSet *ThymioScene::createNewButtonSet()
@@ -184,8 +178,6 @@ namespace Aseba
 
 		ThymioButtonSet *button = createNewButtonSet();
 		button->setPos(15, 20); //advancedMode = false
-		
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));
 	}
 	
 	void ThymioScene::clear()
@@ -258,8 +250,6 @@ namespace Aseba
 	
 		sceneModified = true;
 		
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));
-		
 		buttonUpdateDetected();
 	}
 	
@@ -286,8 +276,6 @@ namespace Aseba
 	
 		sceneModified = true;
 		
-		//setSceneRect(QRectF(0, 0, 1030, (buttonSets.size()+2)*400));		
-
 		buttonUpdateDetected();
 	}
 

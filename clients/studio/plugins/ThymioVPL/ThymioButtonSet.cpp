@@ -32,21 +32,17 @@ namespace Aseba
 
 		qreal alpha = hasFocus() ? 255 : 150;
 		
-		QLinearGradient linearGrad(QPointF(-64, -64), QPointF(64, 64));
+		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
 		linearGrad.setColorAt(0, QColor(209, 196, 180, alpha));
 		linearGrad.setColorAt(1, QColor(167, 151, 128, alpha));
      
 		painter->setPen(QColor(147, 134, 115));
 		painter->setBrush(linearGrad);
-		painter->drawRoundedRect(-64,-64,128,128,4,4);
+		painter->drawEllipse(-32,-32,64,64);
 		
-		QRadialGradient radialGrad(QPointF(0, 0), 80);
-		radialGrad.setColorAt(0, Qt::red);
-		radialGrad.setColorAt(1, Qt::darkRed);
-
-		painter->setPen(Qt::black);
-		painter->setBrush(radialGrad);
-		painter->drawRect(-40,-20,80,40);
+		painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
+		painter->drawLine(-11,-11,11,11);
+		painter->drawLine(-11,11,11,-11);
 	}
 
 	ThymioButtonSet::ThymioAddButton::ThymioAddButton(QGraphicsItem *parent) : 
@@ -90,8 +86,8 @@ namespace Aseba
 		highlightActionButton(false),
 		errorFlag(false),
 		advancedMode(advanced),
-		trans(advanced ? 64 : 0),
-		xpos(advanced ? 5*scale() : 15*scale())
+		trans(0),
+		xpos(0)
 	{ 
 		setData(0, "buttonset"); 
 		setData(1, row);
@@ -99,15 +95,35 @@ namespace Aseba
 		deleteButton = new ThymioRemoveButton(this);
 		addButton = new ThymioAddButton(this);
 		
-		deleteButton->setPos(896+trans, 168);
-		addButton->setPos(500+trans/2, 368);
-		
 		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setAcceptDrops(true);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
-		setPos(xpos, (row*400+20)*scale());
+		repositionElements();
+	}
+	
+	void ThymioButtonSet::repositionElements()
+	{
+		if (advancedMode)
+		{
+			trans = 128;
+			xpos = 5;
+		} 
+		else
+		{
+			trans = 0;
+			xpos = 15;
+		}
+		
+		setPos(xpos, (getRow()*420+20));
+		deleteButton->setPos(830+trans, 70);
+		addButton->setPos(450+trans/2, 378);
+		
+		if (actionButton)
+			actionButton->setPos(500+trans, 40);
+		
+		prepareGeometryChange();
 	}
 	
 	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -158,26 +174,17 @@ namespace Aseba
 		else
 			painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(bgColors[i][0], bgColors[i][1], bgColors[i][2]));
-		painter->drawRoundedRect(0, 0, 1000+trans, 336, 5, 5);
+		painter->drawRoundedRect(0, 0, 900+trans, 336, 5, 5);
 
 		// arrow
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
-		painter->drawRect(340 + trans, 143, 55, 55);
+		painter->drawRect(350+trans, 143, 55, 55);
 		QPointF pts[3];
-		pts[0] = QPointF(394.5+trans, 118);
-		pts[1] = QPointF(394.5+trans, 218);
-		pts[2] = QPointF(446+trans, 168);
+		pts[0] = QPointF(404.5+trans, 118);
+		pts[1] = QPointF(404.5+trans, 218);
+		pts[2] = QPointF(456+trans, 168);
 		painter->drawPolygon(pts, 3);
-
-		/*
-		// pair number, disabled for now as requested by Francesco
-		painter->setPen(errorFlag ? Qt::black : Qt::gray);
-		QFont font("Helvetica");
-		font.setPixelSize(50);
-		painter->setFont(font);
-		painter->drawText(QRect(790+trans, 20, 180, 84), Qt::AlignRight, QString("%0").arg(getRow()));
-		*/
 		
 		if( eventButton == 0 )
 		{
@@ -218,7 +225,7 @@ namespace Aseba
 			eventButton->setParentID(row);
 		if( actionButton )
 			actionButton->setParentID(row);
-		setPos(xpos, (row*400+20)*scale());
+		setPos(xpos, (row*420+20)*scale());
 	}
 
 	void ThymioButtonSet::addEventButton(ThymioButton *event) 
@@ -268,27 +275,7 @@ namespace Aseba
 		advancedMode = advanced;
 		if( eventButton )
 			eventButton->setAdvanced(advanced);
-		
-		if( advanced ) 
-		{
-			trans = 64;
-			xpos = 5*scale();
-		} 
-		else
-		{
-			trans = 0;
-			xpos = 15*scale();
-		}
-
-		setPos(xpos, (getRow()*400+20)*scale());
-		
-		deleteButton->setPos(896+trans, 168);
-		addButton->setPos(500+trans/2, 368);
-		
-		if( actionButton )
-			actionButton->setPos(500+trans, 40);
-		
-		prepareGeometryChange();
+		repositionElements();
 	}
 
 	void ThymioButtonSet::stateChanged()
