@@ -136,7 +136,7 @@ namespace Aseba
 		{
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(eventButton);
-			eventButton->deleteLater();
+			delete eventButton;
 			eventButton = 0;
 		
 			buttonSetIR.addEventButton(0);
@@ -146,7 +146,7 @@ namespace Aseba
 		{
 			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(actionButton);
-			actionButton->deleteLater();
+			delete actionButton;
 			actionButton = 0;
 
 			buttonSetIR.addActionButton(0);

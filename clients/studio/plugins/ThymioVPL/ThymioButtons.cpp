@@ -61,7 +61,7 @@ namespace Aseba
 			if( toggleState )
 			{
 				curState = (curState + 1) % colors.size();
-				parentItem()->update();
+				//parentItem()->update();
 			}
 			else 
 			{
@@ -69,7 +69,7 @@ namespace Aseba
 				for( QList<ThymioClickableButton*>::iterator itr = siblings.begin();
 					 itr != siblings.end(); ++itr )
 					(*itr)->setValue(0);
-				parentItem()->update();
+				//parentItem()->update();
 			}
 			emit stateChanged();
 		}
@@ -398,6 +398,9 @@ namespace Aseba
 
 		if (drag->exec(Qt::MoveAction | Qt::CopyAction , Qt::CopyAction) == Qt::MoveAction)
 			parentID = -1;
+		
+		if (parentItem())
+			parentItem()->update();
 		#endif // ANDROID
 	}
 	
