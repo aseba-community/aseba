@@ -140,7 +140,34 @@ namespace Aseba
 			painter->drawRect(110, 30+yShift, 18, 80);
 		}
 	}
-
+	
+	//! Factor for buttons
+	ThymioButton* ThymioButton::createButton(const QString& name, bool advancedMode)
+	{
+		if ( name == "button" )
+			return new ThymioButtonsEvent(0, advancedMode);
+		else if ( name == "prox" )
+			return new ThymioProxEvent(0, advancedMode);
+		else if ( name == "proxground" )
+			return new ThymioProxGroundEvent(0, advancedMode);
+		else if ( name == "tap" )
+			return new ThymioTapEvent(0, advancedMode);
+		else if ( name == "clap" )
+			return new ThymioClapEvent(0, advancedMode);
+		else if ( name == "move" )
+			return new ThymioMoveAction();
+		else if ( name == "colortop" )
+			return new ThymioColorTopAction();
+		else if ( name == "colorbottom" )
+			return new ThymioColorBottomAction();
+		else if ( name == "sound" )
+			return new ThymioSoundAction();
+		else if ( name == "memory" )
+			return new ThymioMemoryAction();
+		else
+			return 0;
+	}
+	
 	ThymioButton::ThymioButton(bool eventButton, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		buttonIR(),
@@ -156,17 +183,6 @@ namespace Aseba
 			addAdvancedModeButtons();
 	}
 	
-	ThymioButtonWithBody::ThymioButtonWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		ThymioButton(eventButton, advanced, parent)
-	{
-		thymioBody = new ThymioBody(this);
-		thymioBody->setPos(128,128);
-		thymioBody->setUp(up);
-	}
-	
-	ThymioButtonWithBody::~ThymioButtonWithBody()
-	{
-	}
 
 	ThymioButton::~ThymioButton() 
 	{
@@ -201,10 +217,10 @@ namespace Aseba
 				buttonIR = new ThymioIRButton(num, THYMIO_CLAP_IR, 0);
 			else if( name == "move" )
 				buttonIR = new ThymioIRButton(num, THYMIO_MOVE_IR, 0);
-			else if( name == "color" )
-				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_IR, 0);
-			else if( name == "circle" )
-				buttonIR = new ThymioIRButton(num, THYMIO_CIRCLE_IR, 3);
+			else if( name == "colortop" )
+				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_TOP_IR, 0);
+			else if( name == "colorbottom" )
+				buttonIR = new ThymioIRButton(num, THYMIO_COLOR_BOTTOM_IR, 3);
 			else if( name == "sound" )
 				buttonIR = new ThymioIRButton(num, THYMIO_SOUND_IR, 2);
 			else if( name == "memory" )
@@ -398,33 +414,24 @@ namespace Aseba
 		parentItem()->update();
 		#endif // ANDROID
 	}
+	
+	ThymioButtonWithBody::ThymioButtonWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
+		ThymioButton(eventButton, advanced, parent)
+	{
+		thymioBody = new ThymioBody(this);
+		thymioBody->setPos(128,128);
+		thymioBody->setUp(up);
+	}
+	
+	ThymioButtonWithBody::~ThymioButtonWithBody()
+	{
+	}
 
 	// Thymio Push Button
-	ThymioPushButton::ThymioPushButton(QString name, QWidget *parent) : 
+	ThymioPushButton::ThymioPushButton(const QString& name, QWidget *parent) : 
 		QPushButton(parent), 
-		thymioButton(0)
-	{ 
-		if( name == "button" )
-			thymioButton = new ThymioButtonsEvent();
-		else if( name == "prox" )
-			thymioButton = new ThymioProxEvent();
-		else if( name == "proxground" )
-			thymioButton = new ThymioProxGroundEvent();
-		else if( name == "tap" )
-			thymioButton = new ThymioTapEvent();
-		else if( name == "clap" )
-			thymioButton = new ThymioClapEvent();
-		else if( name == "move" )
-			thymioButton = new ThymioMoveAction();
-		else if( name == "color" )
-			thymioButton = new ThymioColorAction();
-		else if( name == "circle" )
-			thymioButton = new ThymioCircleAction();
-		else if( name == "sound" )
-			thymioButton = new ThymioSoundAction();
-		else if( name == "memory" )
-			thymioButton = new ThymioMemoryAction();
-
+		thymioButton(ThymioButton::createButton(name))
+	{
 		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);

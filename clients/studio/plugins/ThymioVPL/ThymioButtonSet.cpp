@@ -361,29 +361,7 @@ namespace Aseba
 				int state;
 				dataStream >> buttonName >> state;
 				
-				ThymioButton *button = 0;
-
-				if ( buttonName == "button" )
-					button = new ThymioButtonsEvent(0,advancedMode);
-				else if ( buttonName == "prox" )
-					button = new ThymioProxEvent(0,advancedMode);
-				else if ( buttonName == "proxground" )
-					button = new ThymioProxGroundEvent(0,advancedMode);
-				else if ( buttonName == "tap" )
-					button = new ThymioTapEvent(0,advancedMode);
-				else if ( buttonName == "clap" )
-					button = new ThymioClapEvent(0,advancedMode);
-				else if ( buttonName == "move" )
-					button = new ThymioMoveAction();
-				else if ( buttonName == "color" )
-					button = new ThymioColorAction();
-				else if ( buttonName == "circle" )
-					button = new ThymioCircleAction();
-				else if ( buttonName == "sound" )
-					button = new ThymioSoundAction();
-				else if( buttonName == "memory" )
-					button = new ThymioMemoryAction();
-
+				ThymioButton *button(ThymioButton::createButton(buttonName, advancedMode));
 				if( button ) 
 				{
 					event->setDropAction(Qt::MoveAction);

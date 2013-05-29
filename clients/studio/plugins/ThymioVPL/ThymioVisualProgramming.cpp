@@ -132,12 +132,10 @@ namespace Aseba
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->setSpacing(10);
+		ThymioPushButton* button;
 		eventsLayout->addWidget(eventsLabel);
-		eventsLayout->addWidget(buttonsButton);
-		eventsLayout->addWidget(proxButton);
-		eventsLayout->addWidget(proxGroundButton);
-		eventsLayout->addWidget(tapButton);
-		eventsLayout->addWidget(clapButton);
+		foreach (button, eventButtons)
+			eventsLayout->addWidget(button);
 		
 		horizontalLayout->addLayout(eventsLayout);
 		
@@ -175,27 +173,24 @@ namespace Aseba
 		actionsLayout = new QVBoxLayout();
 
 		ThymioPushButton *moveButton = new ThymioPushButton("move");
-		ThymioPushButton *colorButton = new ThymioPushButton("color");
-		ThymioPushButton *circleButton = new ThymioPushButton("circle");
+		ThymioPushButton *colorTopButton = new ThymioPushButton("colortop");
+		ThymioPushButton *colorBottomButton = new ThymioPushButton("colorbottom");
 		ThymioPushButton *soundButton = new ThymioPushButton("sound");
 		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
 		actionButtons.push_back(moveButton);
-		actionButtons.push_back(colorButton);
-		actionButtons.push_back(circleButton);
+		actionButtons.push_back(colorTopButton);
+		actionButtons.push_back(colorBottomButton);
 		actionButtons.push_back(soundButton);
 		actionButtons.push_back(memoryButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->setSpacing(10);
 		actionsLayout->addWidget(actionsLabel);
-		actionsLayout->addWidget(moveButton);
-		actionsLayout->addWidget(colorButton);
-		actionsLayout->addWidget(circleButton);
-		actionsLayout->addWidget(soundButton);
-		actionsLayout->addWidget(memoryButton);
+		foreach (button, actionButtons)
+			actionsLayout->addWidget(button);
 		
 		memoryButton->hide(); // memory
 
@@ -209,8 +204,8 @@ namespace Aseba
 		connect(clapButton, SIGNAL(clicked()), this, SLOT(addClapEvent()));
 
 		connect(moveButton, SIGNAL(clicked()), this, SLOT(addMoveAction()));
-		connect(colorButton, SIGNAL(clicked()), this, SLOT(addColorAction()));	
-		connect(circleButton, SIGNAL(clicked()), this, SLOT(addCircleAction()));
+		connect(colorTopButton, SIGNAL(clicked()), this, SLOT(addColorTopAction()));	
+		connect(colorBottomButton, SIGNAL(clicked()), this, SLOT(addColorBottomAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
 		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
 		
@@ -511,10 +506,10 @@ namespace Aseba
 					{
 						if ( buttonName == "move" )
 							actionButton = new ThymioMoveAction();
-						else if ( buttonName == "color" )
-							actionButton = new ThymioColorAction();
-						else if ( buttonName == "circle" )
-							actionButton = new ThymioCircleAction();
+						else if ( buttonName == "colortop" )
+							actionButton = new ThymioColorTopAction();
+						else if ( buttonName == "colorbottom" )
+							actionButton = new ThymioColorBottomAction();
 						else if ( buttonName == "sound" )
 							actionButton = new ThymioSoundAction();
 						else if ( buttonName == "memory" )
@@ -603,16 +598,16 @@ namespace Aseba
 		view->centerOn(scene->addAction(button));
 	}
 	
-	void ThymioVisualProgramming::addColorAction()
+	void ThymioVisualProgramming::addColorTopAction()
 	{
-		ThymioColorAction *button = new ThymioColorAction();
+		ThymioColorAction *button = new ThymioColorTopAction();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
-
-	void ThymioVisualProgramming::addCircleAction()
+	
+	void ThymioVisualProgramming::addColorBottomAction()
 	{
-		ThymioCircleAction *button = new ThymioCircleAction();
+		ThymioColorAction *button = new ThymioColorBottomAction();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
@@ -648,7 +643,7 @@ namespace Aseba
 		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
 		
 		// desired sizes for width
-		const int idealContentWidth(1064+256*2);
+		const int idealContentWidth(1038+256*2);
 		const int uncompressibleWidth(
 			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
 			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 

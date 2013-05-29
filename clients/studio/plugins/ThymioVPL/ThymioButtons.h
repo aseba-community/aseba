@@ -101,6 +101,8 @@ namespace Aseba
 			bool up;
 		};
 		
+		static ThymioButton* createButton(const QString& name, bool advancedMode=false);
+		
 		ThymioButton(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
 		virtual ~ThymioButton();
 		
@@ -168,7 +170,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		ThymioPushButton(QString name, QWidget *parent=0);
+		ThymioPushButton(const QString& name, QWidget *parent=0);
 		~ThymioPushButton();
 		
 		void changeButtonColor(QColor color);
@@ -244,8 +246,10 @@ namespace Aseba
 	{
 		Q_OBJECT
 		
+	protected:
+		ThymioColorAction(QGraphicsItem *parent, bool top);
+	
 	public:
-		ThymioColorAction(QGraphicsItem *parent=0);
 		virtual void setClicked(int i, int status);
 		virtual int isClicked(int i);
 		virtual	int getNumButtons() { return 3; }
@@ -257,13 +261,16 @@ namespace Aseba
 		QList<QSlider *> sliders;
 	};
 	
-	// Circle Action
-	class ThymioCircleAction : public ThymioButtonWithBody
+	struct ThymioColorTopAction : public ThymioColorAction
 	{
-	public:
-		ThymioCircleAction(QGraphicsItem *parent=0);
+		ThymioColorTopAction(QGraphicsItem *parent=0);
 	};
-
+	
+	struct ThymioColorBottomAction : public ThymioColorAction
+	{
+		ThymioColorBottomAction(QGraphicsItem *parent=0);
+	};
+	
 	// Sound Action
 	class ThymioSoundAction : public ThymioButtonWithBody
 	{

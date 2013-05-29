@@ -46,8 +46,8 @@ namespace Aseba
 	void ThymioIRTypeChecker::clear()
 	{
 		moveHash.clear();
-		colorHash.clear();
-		circleHash.clear();
+		colorTopHash.clear();
+		colorBottomHash.clear();
 		soundHash.clear();
 		memoryHash.clear();
 		
@@ -72,13 +72,13 @@ namespace Aseba
 			currentHash = &moveHash;
 			tempHash = moveHash;
 			break;
-		case THYMIO_COLOR_IR:
-			currentHash = &colorHash;
-			tempHash = colorHash;
+		case THYMIO_COLOR_TOP_IR:
+			currentHash = &colorTopHash;
+			tempHash = colorTopHash;
 			break;
-		case THYMIO_CIRCLE_IR:
-			currentHash = &circleHash;
-			tempHash = circleHash;
+		case THYMIO_COLOR_BOTTOM_IR:
+			currentHash = &colorBottomHash;
+			tempHash = colorBottomHash;
 			break;
 		case THYMIO_SOUND_IR:
 			currentHash = &soundHash;
@@ -223,6 +223,8 @@ namespace Aseba
 		}
 		text += L"call sound.system(-1)\n";
 		text += L"call leds.top(0,0,0)\n";
+		text += L"call leds.bottom.left(0,0,0)\n";
+		text += L"call leds.bottom.right(0,0,0)\n";
 		text += L"call leds.circle(0,0,0,0,0,0,0,0)\n";
 		if (advancedMode)
 		{
@@ -385,7 +387,7 @@ namespace Aseba
 				text += toWstring(button->isClicked(1));
 				text += L"\n";
 				break;
-			case THYMIO_COLOR_IR:
+			case THYMIO_COLOR_TOP_IR:
 				text += indString;
 				text += L"call leds.top(";
 				text += toWstring(button->isClicked(0));
@@ -395,15 +397,23 @@ namespace Aseba
 				text += toWstring(button->isClicked(2));
 				text += L")\n";
 				break;
-			case THYMIO_CIRCLE_IR:
+			case THYMIO_COLOR_BOTTOM_IR:
 				text += indString;
-				text += L"call leds.circle(";
-				for(int i=0; i < button->size(); ++i)
-				{
-					text += toWstring((32*button->isClicked(i))/(button->getNumStates()-1)); 
-					text += L",";
-				}
-				text.replace(text.length()-1, 2,L")\n");
+				text += L"call leds.bottom.left(";
+				text += toWstring(button->isClicked(0));
+				text += L",";
+				text += toWstring(button->isClicked(1));
+				text += L",";
+				text += toWstring(button->isClicked(2));
+				text += L")\n";
+				text += indString;
+				text += L"call leds.bottom.right(";
+				text += toWstring(button->isClicked(0));
+				text += L",";
+				text += toWstring(button->isClicked(1));
+				text += L",";
+				text += toWstring(button->isClicked(2));
+				text += L")\n";
 				break;
 			case THYMIO_SOUND_IR:
 				text += indString;

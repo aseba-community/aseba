@@ -19,7 +19,8 @@ namespace Aseba
 		THYMIO_TAP_IR,
 		THYMIO_CLAP_IR,
 		THYMIO_MOVE_IR,
-		THYMIO_COLOR_IR,
+		THYMIO_COLOR_TOP_IR,
+		THYMIO_COLOR_BOTTOM_IR,
 		THYMIO_CIRCLE_IR,
 		THYMIO_SOUND_IR,
 		THYMIO_MEMORY_IR
@@ -128,8 +129,8 @@ namespace Aseba
 		ThymioIRButtonName activeActionName;
 		
 		multimap<wstring, ThymioIRButton*> moveHash;
-		multimap<wstring, ThymioIRButton*> colorHash;
-		multimap<wstring, ThymioIRButton*> circleHash;
+		multimap<wstring, ThymioIRButton*> colorTopHash;
+		multimap<wstring, ThymioIRButton*> colorBottomHash;
 		multimap<wstring, ThymioIRButton*> soundHash;
 		multimap<wstring, ThymioIRButton*> memoryHash;
 

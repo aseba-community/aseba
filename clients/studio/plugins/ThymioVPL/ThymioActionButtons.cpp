@@ -93,11 +93,14 @@ namespace Aseba
 	}
 	
 	// Color Action
-	ThymioColorAction::ThymioColorAction( QGraphicsItem *parent ) :
-		ThymioButtonWithBody(false, true, false, parent)
+	ThymioColorAction::ThymioColorAction( QGraphicsItem *parent, bool top) :
+		ThymioButtonWithBody(false, top, false, parent)
 	{
 		setData(0, "action");
-		setData(1, "color");
+		if (top)
+			setData(1, "colortop");
+		else
+			setData(1, "colorbottom");
 
 		const char *sliderColors[] = { "FF0000", "00FF00", "0000FF" };
 		
@@ -116,7 +119,7 @@ namespace Aseba
 					"border: 4px solid black; width: 40px; margin: -4px;"
 				"}"
 				";").arg(sliderColors[i]));
-			s->setSliderPosition(0);
+			s->setSliderPosition(16);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setWidget(s);
@@ -128,9 +131,7 @@ namespace Aseba
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButton()));
 		}
-		thymioBody->bodyColor = QColor(sliders[0]->value()*5.46875+80, 
-									   sliders[1]->value()*5.46875+80, 
-									   sliders[2]->value()*5.46875+80);
+		valueChangeDetected();
 	}
 
 	void ThymioColorAction::valueChangeDetected()
@@ -154,33 +155,14 @@ namespace Aseba
 		return -1;
 	}
 	
-	// Circle Action
-	ThymioCircleAction::ThymioCircleAction(QGraphicsItem *parent) : 
-		ThymioButtonWithBody(false, true, false, parent)
-	{
-		setData(0, "action");
-		setData(1, "circle");
-		
-		const QColor colorLow(QColor(231, 229, 127));
-		const QColor colorHigh(QColor(255, 203, 0));
-		
-		for(uint i=0; i<8; i++)
-		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25,-15,50,30), THYMIO_RECTANGULAR_BUTTON, this);
-
-			qreal offset = i;
-			button->setRotation(45*offset);
-			button->setPos(128 - 90*qCos(0.785398163*offset+1.57079633), 
-						   128 - 90*qSin(0.785398163*offset+1.57079633));
-
-			button->addState(colorLow);
-			button->addState(colorHigh);
-
-			thymioButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
-		}
-	}
-		
+	ThymioColorTopAction::ThymioColorTopAction(QGraphicsItem *parent):
+		ThymioColorAction(parent, true)
+	{}
+	
+	ThymioColorBottomAction::ThymioColorBottomAction(QGraphicsItem *parent):
+		ThymioColorAction(parent, false)
+	{}
+	
 	// Sound Action
 	void ThymioSoundAction::Speaker::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
 	{		

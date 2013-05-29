@@ -58,8 +58,8 @@ namespace Aseba
 		void addClapEvent();
 		
 		void addMoveAction();
-		void addColorAction();
-		void addCircleAction();
+		void addColorTopAction();
+		void addColorBottomAction();
 		void addSoundAction();
 		void addMemoryAction();
 		
