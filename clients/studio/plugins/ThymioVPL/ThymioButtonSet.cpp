@@ -206,6 +206,15 @@ namespace Aseba
 			actionButtonColor.setAlpha(255);
 		}
 	}
+	
+	bool ThymioButtonSet::isAnyStateFilter() const
+	{
+		if (eventButton && eventButton->isAnyStateFilter())
+			return true;
+		if (actionButton && (actionButton->getName() == "memory"))
+			return true;
+		return false;
+	}
 
 	void ThymioButtonSet::setColorScheme(QColor eventColor, QColor actionColor)
 	{

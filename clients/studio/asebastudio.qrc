@@ -65,5 +65,7 @@
 	<file>images/stop1.svgz</file>
 	<file>images/light.svgz</file>
 	<file>images/info.svgz</file>
+	<file>images/vpl_simple_mode.svgz</file>
+	<file>images/vpl_advanced_mode.svgz</file>
 </qresource>
 </RCC>

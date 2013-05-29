@@ -75,7 +75,7 @@ namespace Aseba
 		toolBar->addSeparator();
 
 		advancedButton = new QToolButton();
-		advancedButton->setIcon(QIcon(":/images/light.svgz"));
+		advancedButton->setIcon(QIcon(":/images/vpl_advanced_mode.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		toolBar->addWidget(advancedButton);
 		toolBar->addSeparator();
@@ -109,7 +109,7 @@ namespace Aseba
 		
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-		connect(advancedButton, SIGNAL(clicked()), this, SLOT(advancedMode()));
+		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
@@ -286,7 +286,7 @@ namespace Aseba
 	{
 		if (scene->isEmpty() || warningDialog()) 
 		{
-			simpleMode();
+			toggleAdvancedMode(false, true);
 			scene->reset();
 		}
 	}
@@ -349,18 +349,37 @@ namespace Aseba
 		de->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
 	
-	void ThymioVisualProgramming::advancedMode()
+	void ThymioVisualProgramming::toggleAdvancedMode()
 	{
-		advancedButton->setEnabled(false);
-		actionButtons.last()->show(); // state button
-		scene->setAdvanced(true);
+		toggleAdvancedMode(!scene->getAdvanced());
 	}
 	
-	void ThymioVisualProgramming::simpleMode()
+	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force)
 	{
-		advancedButton->setEnabled(true);
-		actionButtons.last()->hide(); // state button
-		scene->setAdvanced(false);
+		if (advanced)
+		{
+			advancedButton->setIcon(QIcon(":/images/vpl_simple_mode.svgz"));
+			actionButtons.last()->show(); // state button
+			scene->setAdvanced(true);
+		}
+		else
+		{
+			bool doClear(true);
+			if (!force && scene->isAnyStateFilter())
+			{
+				if (QMessageBox::warning(this, tr("Returning to simple mode"),
+					tr("You are currently using states. Returning to simple mode will discard any state filter or state setting card.<p>Are you sure you want to continue?"),
+				QMessageBox::Yes|QMessageBox::No, QMessageBox::No) == QMessageBox::No)
+					doClear = false;
+			}
+			
+			if (doClear)
+			{
+				advancedButton->setIcon(QIcon(":/images/vpl_advanced_mode.svgz"));
+				actionButtons.last()->hide(); // state button
+				scene->setAdvanced(false);
+			}
+		}
 	}
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
@@ -376,8 +395,7 @@ namespace Aseba
 		
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Warning"));
-		msgBox.setText(tr("The VPL document has been modified."));
-		msgBox.setInformativeText(tr("Do you want to save the changes?"));
+		msgBox.setText(tr("The VPL document has been modified.<p>Do you want to save the changes?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
 		
@@ -466,14 +484,7 @@ namespace Aseba
 				QDomElement element = domNode.toElement();
 				if (element.tagName() == "settings") 
 				{
-					if( element.attribute("advanced-mode") == "true" )
-						advancedMode();
-					else
-					{
-						advancedButton->setEnabled(true);
-						actionButtons.last()->hide(); // state button
-						scene->setAdvanced(false);
-					}
+					toggleAdvancedMode(element.attribute("advanced-mode") == "true", true);
 					
 					colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());
 				}

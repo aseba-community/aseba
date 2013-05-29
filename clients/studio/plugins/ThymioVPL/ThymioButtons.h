@@ -134,9 +134,11 @@ namespace Aseba
 		virtual int getValue(int i) const;
 		virtual void setValue(int i, int status);
 		
+		bool isAnyStateFilter() const;
 		int getStateFilter() const;
 		void setStateFilter(int val);
 		void setAdvanced(bool advanced);
+		
 		
 		void setScaleFactor(qreal factor);
 		

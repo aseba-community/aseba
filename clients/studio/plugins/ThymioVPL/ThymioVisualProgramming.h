@@ -70,9 +70,11 @@ namespace Aseba
 		void setColorScheme(int index);
 		void run();
 		void stop();
-		void advancedMode();
-		void simpleMode();
+		void toggleAdvancedMode();
 		void recompileButtonSet();
+		
+	private:
+		void toggleAdvancedMode(bool advanced, bool force=false);
 		
 	protected:
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;

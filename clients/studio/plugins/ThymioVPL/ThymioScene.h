@@ -29,6 +29,7 @@ namespace Aseba
 		void setScale(qreal scale);
 		void setAdvanced(bool advanced);
 		bool getAdvanced() const { return advancedMode; }
+		bool isAnyStateFilter() const;
 		int getNumberOfButtonSets() const { return buttonSets.size(); }
 		
 		QString getErrorMessage() const;
@@ -38,6 +39,7 @@ namespace Aseba
 		int getFocusItemId() const;
 		
 		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
+		typedef QList<ThymioButtonSet *>::const_iterator ButtonSetConstItr;
 		
 		ButtonSetItr buttonsBegin() { return buttonSets.begin(); }
 		ButtonSetItr buttonsEnd() { return buttonSets.end(); }

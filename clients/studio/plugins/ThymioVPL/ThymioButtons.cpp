@@ -341,12 +341,23 @@ namespace Aseba
 				delete(stateButtons[i]);
 			}
 			stateButtons.clear();
+			updateIRButtonAndNotify();
 		}
 	}
 
+	bool ThymioCard::isAnyStateFilter() const
+	{
+		for (size_t i=0; i<stateButtons.size(); ++i)
+		{
+			if (stateButtons[i]->getValue() != 0)
+				return true;
+		}
+		return false;
+	}
+	
 	int ThymioCard::getStateFilter() const
 	{
-		if( stateButtons.empty() )
+		if (stateButtons.empty())
 			return -1;
 
 		int val=0;

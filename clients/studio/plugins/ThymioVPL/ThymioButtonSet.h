@@ -42,12 +42,14 @@ namespace Aseba
 		void addEventButton(ThymioCard *event);
 		void addActionButton(ThymioCard *action);
 		void setRow(int row);
-		int getRow() { return data(1).toInt(); }
+		int getRow() const { return data(1).toInt(); }
 		ThymioCard *getEventButton() { return eventButton; }
 		ThymioCard *getActionButton() { return actionButton; }
 		
-		bool eventExists() { return eventButton == 0 ? false : true; }
-		bool actionExists() { return actionButton == 0 ? false : true; }
+		bool eventExists() const { return eventButton == 0 ? false : true; }
+		bool actionExists() const { return actionButton == 0 ? false : true; }
+		bool isAnyStateFilter() const;
+		
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		
 		void setAdvanced(bool advanced);

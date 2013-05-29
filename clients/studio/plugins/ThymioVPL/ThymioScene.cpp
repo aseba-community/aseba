@@ -177,7 +177,7 @@ namespace Aseba
 		clear();
 
 		ThymioButtonSet *button = createNewButtonSet();
-		button->setPos(15, 20); //advancedMode = false
+		button->setPos(15, 20);
 	}
 	
 	void ThymioScene::clear()
@@ -223,6 +223,14 @@ namespace Aseba
 		
 		buttonUpdateDetected();
 	}
+	
+	bool ThymioScene::isAnyStateFilter() const
+	{
+		for (ButtonSetConstItr itr = buttonSets.begin(); itr != buttonSets.end(); ++itr)
+			if ((*itr)->isAnyStateFilter())
+				return true;
+		return false;
+	}
 
 	void ThymioScene::removeButton(int row)
 	{
@@ -232,7 +240,7 @@ namespace Aseba
 		disconnect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 		buttonSets.removeAt(row);
 		thymioCompiler.removeButtonSet(row);
-				
+		
 		removeItem(button);
 		delete(button);
 		
@@ -376,7 +384,7 @@ namespace Aseba
 			buttonSets.removeAt(prevRow);
 			thymioCompiler.removeButtonSet(prevRow);
 
-			qreal currentYPos = event->scenePos().y();	
+			qreal currentYPos = event->scenePos().y();
 			currentRow = (int)((currentYPos-20)/(buttonSetHeight));
 			currentRow = (currentRow < 0 ? 0 : currentRow > buttonSets.size() ? buttonSets.size() : currentRow);
 
@@ -448,7 +456,7 @@ namespace Aseba
 			QGraphicsItem *item = focusItem();
 			if( item )
 			{
-				if( item->data(0) == "remove" ) 				
+				if( item->data(0) == "remove" ) 
 					removeButton((item->parentItem()->data(1)).toInt());
 				else if( item->data(0) == "add" )
 					insertButton((item->parentItem()->data(1)).toInt()+1);
