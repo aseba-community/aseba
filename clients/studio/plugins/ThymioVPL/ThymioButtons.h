@@ -34,6 +34,7 @@ namespace Aseba
 	public:
 		//! Create a button with initially one state
 		ThymioClickableButton (const QRectF rect, const ThymioButtonType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
+		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
 
@@ -68,7 +69,9 @@ namespace Aseba
 	{
 	public:
 		ThymioFaceButton ( QRectF rect, ThymioSmileType type, QGraphicsItem *parent=0 );
+		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
 	private:
 		QRectF leftEye;
 		QRectF rightEye;
@@ -87,7 +90,8 @@ namespace Aseba
 		{
 		public:
 			ThymioBody(QGraphicsItem *parent = 0, int yShift = 0) : QGraphicsItem(parent), bodyColor(Qt::white), yShift(yShift), up(true) { }
-			virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+			
+			void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 			QRectF boundingRect() const { return QRectF(-128, -128+yShift, 256, 256); }
 			void setUp(bool u) { up = u; }
 			
@@ -98,7 +102,7 @@ namespace Aseba
 		};
 		
 		ThymioButton(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
-		~ThymioButton();
+		virtual ~ThymioButton();
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }

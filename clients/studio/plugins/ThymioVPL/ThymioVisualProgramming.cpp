@@ -284,9 +284,8 @@ namespace Aseba
 	{
 		if (scene->isEmpty() || warningDialog()) 
 		{
+			simpleMode();
 			scene->reset();
-			recompileButtonSet();
-			advancedButton->setEnabled(true);
 		}
 	}
 
@@ -353,6 +352,13 @@ namespace Aseba
 		advancedButton->setEnabled(false);
 		actionButtons.last()->show(); // state button
 		scene->setAdvanced(true);
+	}
+	
+	void ThymioVisualProgramming::simpleMode()
+	{
+		advancedButton->setEnabled(true);
+		actionButtons.last()->hide(); // state button
+		scene->setAdvanced(false);
 	}
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )

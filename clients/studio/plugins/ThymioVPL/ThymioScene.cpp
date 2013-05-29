@@ -137,8 +137,10 @@ namespace Aseba
 	void ThymioScene::addButtonSet(ThymioButton *event, ThymioButton *action)
 	{
 		ThymioButtonSet *button = createNewButtonSet();
-		if(event) button->addEventButton(event);
-		if(action) button->addActionButton(action);
+		if(event)
+			button->addEventButton(event);
+		if(action)
+			button->addActionButton(action);
 		lastFocus = -1;
 		setFocusItem(0);
 
@@ -190,7 +192,7 @@ namespace Aseba
 	{
 		advancedMode = false;
 		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
-			(*itr)->setAdvanced(false);	
+			(*itr)->setAdvanced(false);
 		
 		for(int i=0; i<buttonSets.size(); i++)
 		{

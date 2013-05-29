@@ -71,6 +71,7 @@ namespace Aseba
 		void run();
 		void stop();
 		void advancedMode();
+		void simpleMode();
 		void recompileButtonSet();
 		
 	protected:
