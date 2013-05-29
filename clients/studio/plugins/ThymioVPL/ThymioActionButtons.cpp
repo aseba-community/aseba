@@ -33,6 +33,7 @@ namespace Aseba
 			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
+			w->setAcceptDrops(false);
 			w->setWidget(s);
 			w->resize(48, 226);
 			w->setPos(10+i*188, 15);
@@ -122,6 +123,7 @@ namespace Aseba
 			s->setSliderPosition(16);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
+			w->setAcceptDrops(false);
 			w->setWidget(s);
 			w->resize(202, 48);
 			w->setPos(27, 60+i*64);
