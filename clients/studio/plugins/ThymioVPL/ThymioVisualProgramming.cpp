@@ -132,11 +132,14 @@ namespace Aseba
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
-		eventsLayout->setSpacing(10);
+		eventsLayout->setSpacing(0);
 		ThymioPushButton* button;
 		eventsLayout->addWidget(eventsLabel);
 		foreach (button, eventButtons)
+		{
+			eventsLayout->addItem(new QSpacerItem(0,10));
 			eventsLayout->addWidget(button);
+		}
 		
 		horizontalLayout->addLayout(eventsLayout);
 		
@@ -188,10 +191,13 @@ namespace Aseba
 		actionButtons.push_back(memoryButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
-		actionsLayout->setSpacing(10);
+		actionsLayout->setSpacing(0);
 		actionsLayout->addWidget(actionsLabel);
 		foreach (button, actionButtons)
+		{
+			actionsLayout->addItem(new QSpacerItem(0,10));
 			actionsLayout->addWidget(button);
+		}
 		
 		memoryButton->hide(); // memory
 
