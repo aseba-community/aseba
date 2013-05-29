@@ -227,7 +227,7 @@ namespace Aseba
 		if (advancedMode)
 		{
 			text += L"\nsub display_state\n";
-			text += L"\tcall leds.circle(0,state[1]*32,0,state[2]*32,0,state[3]*32,0,state[0]*32)\n";
+			text += L"\tcall leds.circle(0,state[1]*32,0,state[3]*32,0,state[2]*32,0,state[0]*32)\n";
 		}
 		
 		generatedCode[0] = text + generatedCode[0];
