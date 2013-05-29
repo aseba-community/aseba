@@ -13,6 +13,7 @@
 #include <QAction>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
 #include "../../TargetModels.h"
@@ -424,17 +425,17 @@ namespace Aseba
 				ThymioButton *button = (*itr)->getEventButton();
 				element.setAttribute("event-name", button->getName() );
 			
-				for(int i=0; i<button->getNumButtons(); ++i)
-					element.setAttribute( QString("eb%0").arg(i), button->isClicked(i));
-				element.setAttribute("state", button->getState());
+				for(int i=0; i<button->valuesCount(); ++i)
+					element.setAttribute( QString("eb%0").arg(i), button->getValue(i));
+				element.setAttribute("state", button->getStateFilter());
 			}
 			
 			if( (*itr)->actionExists() ) 
 			{
 				ThymioButton *button = (*itr)->getActionButton();
 				element.setAttribute("action-name", button->getName() );
-				for(int i=0; i<button->getNumButtons(); ++i)					
-					element.setAttribute(QString("ab%0").arg(i), button->isClicked(i));
+				for(int i=0; i<button->valuesCount(); ++i)
+					element.setAttribute(QString("ab%0").arg(i), button->getValue(i));
 			}
 			
 			vplroot.appendChild(element);
@@ -486,9 +487,9 @@ namespace Aseba
 							return;
 						}
 
-						for(int i=0; i<eventButton->getNumButtons(); ++i)
-							eventButton->setClicked(i,element.attribute(QString("eb%0").arg(i)).toInt());
-						eventButton->setState(element.attribute("state").toInt());
+						for(int i=0; i<eventButton->valuesCount(); ++i)
+							eventButton->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
+						eventButton->setStateFilter(element.attribute("state").toInt());
 					}
 					
 					if( !(buttonName = element.attribute("action-name")).isEmpty() )
@@ -501,8 +502,8 @@ namespace Aseba
 							return;
 						}
 
-						for(int i=0; i<actionButton->getNumButtons(); ++i)
-							actionButton->setClicked(i,element.attribute(QString("ab%0").arg(i)).toInt());
+						for(int i=0; i<actionButton->valuesCount(); ++i)
+							actionButton->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
 					}
 
 					scene->addButtonSet(eventButton, actionButton);
@@ -520,7 +521,6 @@ namespace Aseba
 	void ThymioVisualProgramming::recompileButtonSet()
 	{
 		compilationResult->setText(scene->getErrorMessage());
-
 		if( scene->isSuccessful() ) 
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));

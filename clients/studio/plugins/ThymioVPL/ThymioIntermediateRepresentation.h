@@ -21,7 +21,6 @@ namespace Aseba
 		THYMIO_MOVE_IR,
 		THYMIO_COLOR_TOP_IR,
 		THYMIO_COLOR_BOTTOM_IR,
-		THYMIO_CIRCLE_IR,
 		THYMIO_SOUND_IR,
 		THYMIO_MEMORY_IR
 	};
@@ -45,33 +44,38 @@ namespace Aseba
 	
 	class ThymioIRVisitor;
 	
+	/**
+		An intermediate representation for an "event" or "action" card.
+		This is the parallel to ThymioButton but without any graphic
+		dependencies. The two classes have similar members such as
+		setValue()/getValue()/getStateFilter()/...
+	*/
 	class ThymioIRButton 
 	{
 	public:
-		ThymioIRButton(int size=0, ThymioIRButtonName n=THYMIO_BUTTONS_IR, int states=2);
+		ThymioIRButton(int size=0, ThymioIRButtonName n=THYMIO_BUTTONS_IR);
 		~ThymioIRButton();
 
-		void setClicked(int i, int status);
-		int isClicked(int i) const;
-		int getNumStates() const;
-		int size() const;
-		void setMemoryState(int s);
-		int getMemoryState() const;
-		int getMemoryState(int i) const;
+		int valuesCount() const;
+		int getValue(int i) const;
+		void setValue(int i, int status);
+		
+		int getStateFilter() const;
+		int getStateFilter(int i) const;
+		void setStateFilter(int s);
 
 		ThymioIRButtonName getName() const;
 		void setBasename(wstring n);
 		wstring getBasename() const;
-
+		
 		bool isEventButton() const;
 		bool isSet() const;
 
 		void accept(ThymioIRVisitor *visitor);
 
 	private:
-		vector<int> buttons;
+		vector<int> values;
 		int memory;
-		int numStates;
 		ThymioIRButtonName name;
 		wstring basename;
 	};

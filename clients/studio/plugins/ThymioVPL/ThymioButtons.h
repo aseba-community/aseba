@@ -8,6 +8,7 @@
 
 class QSlider;
 class QTimeLine;
+class QMimeData;
 
 namespace Aseba
 {
@@ -38,8 +39,8 @@ namespace Aseba
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
 
-		int isClicked() { return curState; }
-		void setClicked(int state) { curState = state; update(); }
+		int getValue() const { return curState; }
+		void setValue(int state) { curState = state; update(); }
 		void setToggleState(bool state) { toggleState = state; update(); }
 
 		void addState(const QColor& brushColor = Qt::white, const QColor& penColor = Qt::black);
@@ -80,7 +81,19 @@ namespace Aseba
 		qreal arcEnd;
 	};
 
-	// Button
+	/**
+		An "event" or "action" card.
+		
+		These cards have a type (event or action) and a name (prox, etc.)
+		and may provide several values (set/get by setValue()/getValue()).
+		These values are set by the user through buttons (typically
+		ThymioClickableButton), sliders, or specific widgets.
+		
+		In addition, event cards can have an associated state filter,
+		which is an array of 4 tri-bool value (yes/no/don't care) "serialized"
+		in a single integer (2 bits per value). The state filter
+		can be set/get using setStateFilter()/getStateFilter().
+	*/
 	class ThymioButton : public QGraphicsObject
 	{
 		Q_OBJECT
@@ -111,22 +124,24 @@ namespace Aseba
 
 		void setButtonColor(QColor color) { buttonColor = color; update(); }
 		QColor getButtonColor() const { return buttonColor; }
-		virtual void setClicked(int i, int status);
-		virtual int isClicked(int i) { if( i<thymioButtons.size() ) return thymioButtons.at(i)->isClicked(); return -1; }
-		// TODO: changed clicked to state
-
 		void setParentID(int id) { parentID = id; }
 		int getParentID() const { return parentID; }
 		QString getType() const { return data(0).toString(); }
 		QString getName() const { return data(1).toString(); }
-		virtual int getNumButtons() { return thymioButtons.size(); }
-		void setScaleFactor(qreal factor);
+		
+		virtual int valuesCount() const { return thymioButtons.size(); }
+		virtual int getValue(int i) const;
+		virtual void setValue(int i, int status);
+		
+		int getStateFilter() const;
+		void setStateFilter(int val);
 		void setAdvanced(bool advanced);
-		int getState() const;
-		void setState(int val);
+		
+		void setScaleFactor(qreal factor);
 		
 		void render(QPainter& painter);
 		virtual QPixmap image(qreal factor=1);
+		QMimeData* mimeData() const;
 	
 		virtual bool isValid(); // returns true if the current button state is valid, i.e., at least one button is on
 	
@@ -136,10 +151,12 @@ namespace Aseba
 		void stateChanged();
 
 	protected slots:
-		void updateIRButton();
+		void updateIRButtonAndNotify();
 		
 	protected:
+		void updateIRButton();
 		void addAdvancedModeButtons();
+		virtual ThymioIRButtonName getIRIdentifier() const = 0;
 		
 	protected:
 		QList<ThymioClickableButton*> thymioButtons;
@@ -189,6 +206,9 @@ namespace Aseba
 	{
 	public:
 		ThymioButtonsEvent(QGraphicsItem *parent=0, bool advanced=false);
+	
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_BUTTONS_IR; }
 	};
 	
 	// Proximity Event
@@ -196,6 +216,9 @@ namespace Aseba
 	{
 	public:
 		ThymioProxEvent(QGraphicsItem *parent=0, bool advanced=false);
+	
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_PROX_IR; }
 	};
 
 	// Proximity Ground Event
@@ -203,6 +226,9 @@ namespace Aseba
 	{
 	public:
 		ThymioProxGroundEvent(QGraphicsItem *parent=0, bool advanced=false);
+	
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_PROX_GROUND_IR; }
 	};
 
 	// Tap Event
@@ -210,6 +236,9 @@ namespace Aseba
 	{
 	public:
 		ThymioTapEvent(QGraphicsItem *parent=0, bool advanced=false);
+	
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_TAP_IR; }
 	};
 
 	// Clap Event
@@ -217,6 +246,9 @@ namespace Aseba
 	{
 	public:
 		ThymioClapEvent(QGraphicsItem *parent=0, bool advanced=false);
+		
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_CLAP_IR; }
 	};
 	
 	// Move Action
@@ -227,9 +259,13 @@ namespace Aseba
 	public:
 		ThymioMoveAction(QGraphicsItem *parent=0);
 		virtual ~ThymioMoveAction();
-		virtual void setClicked(int i, int status);
-		virtual int isClicked(int i);
-		virtual int getNumButtons() { return 2; }
+	
+		virtual int valuesCount() const { return 2; }
+		virtual int getValue(int i) const;
+		virtual void setValue(int i, int status);
+		
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_MOVE_IR; }
 
 	private slots:
 		void frameChanged(int frame);
@@ -250,10 +286,10 @@ namespace Aseba
 		ThymioColorAction(QGraphicsItem *parent, bool top);
 	
 	public:
-		virtual void setClicked(int i, int status);
-		virtual int isClicked(int i);
-		virtual	int getNumButtons() { return 3; }
-			
+		virtual int valuesCount() const { return 3; }
+		virtual int getValue(int i) const;
+		virtual void setValue(int i, int status);
+		
 	private slots:
 		void valueChangeDetected();
 	
@@ -264,11 +300,17 @@ namespace Aseba
 	struct ThymioColorTopAction : public ThymioColorAction
 	{
 		ThymioColorTopAction(QGraphicsItem *parent=0);
+		
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_COLOR_TOP_IR; }
 	};
 	
 	struct ThymioColorBottomAction : public ThymioColorAction
 	{
 		ThymioColorBottomAction(QGraphicsItem *parent=0);
+		
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_COLOR_BOTTOM_IR; }
 	};
 	
 	// Sound Action
@@ -286,6 +328,9 @@ namespace Aseba
 		ThymioSoundAction(QGraphicsItem *parent=0);
 		
 	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_SOUND_IR; }
+		
+	protected:
 		Speaker *speaker;
 	};
 
@@ -294,6 +339,9 @@ namespace Aseba
 	{		
 	public:
 		ThymioMemoryAction(QGraphicsItem *parent=0);
+		
+	protected:
+		ThymioIRButtonName getIRIdentifier() const { return THYMIO_MEMORY_IR; }
 	};
 	
 	/*@}*/

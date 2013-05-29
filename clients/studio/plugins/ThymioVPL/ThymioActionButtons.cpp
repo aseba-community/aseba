@@ -40,7 +40,7 @@ namespace Aseba
 			sliders.push_back(s);
 			
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButton()));
+			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButtonAndNotify()));
 		}
 		
 		thymioBody = new ThymioBody(this, -70);
@@ -78,18 +78,18 @@ namespace Aseba
 		timer->stop();
 		timer->start();
 	}
-
-	void ThymioMoveAction::setClicked(int i, int status) 
-	{ 
-		if(i<sliders.size()) 
-			sliders[i]->setSliderPosition(status/50);
-	}
-
-	int ThymioMoveAction::isClicked(int i) 
+	
+	int ThymioMoveAction::getValue(int i) const
 	{ 
 		if (i<sliders.size()) 
 			return sliders[i]->value()*50;
 		return -1;
+	}
+
+	void ThymioMoveAction::setValue(int i, int status) 
+	{ 
+		if(i<sliders.size()) 
+			sliders[i]->setSliderPosition(status/50);
 	}
 	
 	// Color Action
@@ -129,7 +129,7 @@ namespace Aseba
 			sliders.push_back(s);
 			
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButton()));
+			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButtonAndNotify()));
 		}
 		valueChangeDetected();
 	}
@@ -142,17 +142,17 @@ namespace Aseba
 		update();
 	}
 
-	void ThymioColorAction::setClicked(int i, int status) 
+	int ThymioColorAction::getValue(int i) const
 	{ 
-		if(i<getNumButtons()) 
-			sliders[i]->setSliderPosition(status);
-	}
-
-	int ThymioColorAction::isClicked(int i) 
-	{ 
-		if(i<getNumButtons()) 
+		if(i<sliders.size()) 
 			return sliders[i]->value(); 
 		return -1;
+	}
+	
+	void ThymioColorAction::setValue(int i, int status) 
+	{ 
+		if(i<sliders.size()) 
+			sliders[i]->setSliderPosition(status);
 	}
 	
 	ThymioColorTopAction::ThymioColorTopAction(QGraphicsItem *parent):
@@ -201,9 +201,9 @@ namespace Aseba
 			button->setToggleState(false);
 			
 			thymioButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
-		thymioButtons.at(0)->setClicked(1);
+		thymioButtons.at(0)->setValue(1);
 		
 		for(int i=0; i<3; i++)
 		{
@@ -235,7 +235,7 @@ namespace Aseba
 			button->addState(Qt::white);
 
 			thymioButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 	}	
 

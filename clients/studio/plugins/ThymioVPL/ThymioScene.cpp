@@ -425,8 +425,8 @@ namespace Aseba
 				for( int i=0; i<numButtons; ++i ) 
 				{
 					int status;
-					dataStream >> status;	
-					button->setClicked(i, status);
+					dataStream >> status;
+					button->setValue(i, status);
 				}
 			}
 		}

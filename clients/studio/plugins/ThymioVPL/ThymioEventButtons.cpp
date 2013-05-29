@@ -29,14 +29,14 @@ namespace Aseba
 			
 			thymioButtons.push_back(button);
 
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 
 		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		thymioButtons.push_back(button);
-		connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+		connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 	}
 	
 	// Prox Event
@@ -61,7 +61,7 @@ namespace Aseba
 
 			thymioButtons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 		
 		for(int i=0; i<2; ++i) 
@@ -76,7 +76,7 @@ namespace Aseba
 			
 			thymioButtons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 
 	}
@@ -100,7 +100,7 @@ namespace Aseba
 			
 			thymioButtons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButton()));
+			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 	}
 	

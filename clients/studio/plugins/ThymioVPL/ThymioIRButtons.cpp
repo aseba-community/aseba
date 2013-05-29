@@ -3,55 +3,49 @@
 namespace Aseba
 {
 
-	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n, int states) : 
-		buttons(size),
+	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n) : 
+		values(size),
 		memory(-1),
-		numStates(states),
 		name(n)
 	{
 	}
 
 	ThymioIRButton::~ThymioIRButton() 
 	{ 
-		buttons.clear();
-	}
-
-	void ThymioIRButton::setClicked(int i, int status) 
-	{ 
-		if( i<size() ) 
-			buttons[i] = status; 
+		values.clear();
 	}
 	
-	int ThymioIRButton::isClicked(int i) const
+	int ThymioIRButton::valuesCount() const
 	{ 
-		if( i<size() ) 
-			return buttons[i]; 
+		return values.size(); 
+	}
+
+	int ThymioIRButton::getValue(int i) const
+	{ 
+		if( size_t(i)<values.size() ) 
+			return values[i]; 
 		return -1;
 	}
 	
-	int ThymioIRButton::getNumStates() const
-	{
-		return numStates;
+	void ThymioIRButton::setValue(int i, int status) 
+	{ 
+		if( size_t(i)<values.size() ) 
+			values[i] = status; 
 	}
 	
-	int ThymioIRButton::size() const
-	{ 
-		return buttons.size(); 
-	}
-
-	void ThymioIRButton::setMemoryState(int s)
-	{
-		memory = s;
-	}
-
-	int ThymioIRButton::getMemoryState() const
+	int ThymioIRButton::getStateFilter() const
 	{
 		return memory;
 	}
 	
-	int ThymioIRButton::getMemoryState(int i) const
+	int ThymioIRButton::getStateFilter(int i) const
 	{
 		return ((memory >> (i*2)) & 0x3);
+	}
+
+	void ThymioIRButton::setStateFilter(int s)
+	{
+		memory = s;
 	}
 
 	void ThymioIRButton::setBasename(wstring n)
@@ -76,11 +70,11 @@ namespace Aseba
 	
 	bool ThymioIRButton::isSet() const
 	{
-		for(int i=0; i<size(); ++i)
+		for(int i=0; i<valuesCount(); ++i)
 		{
-			if( buttons[i] > 0 )
+			if( values[i] > 0 )
 				return true;
-		}		
+		}
 	
 		return false;
 	}

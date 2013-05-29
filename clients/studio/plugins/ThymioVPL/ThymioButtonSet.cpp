@@ -372,9 +372,9 @@ namespace Aseba
 						if (advancedMode)
 						{
 							if (parentID == -1 && eventButton)
-								button->setState(eventButton->getState());
+								button->setStateFilter(eventButton->getStateFilter());
 							else
-								button->setState(state);
+								button->setStateFilter(state);
 						}
 						addEventButton(button);
 						highlightEventButton = false;
@@ -391,7 +391,7 @@ namespace Aseba
 					{
 						int status;
 						dataStream >> status;
-						button->setClicked(i, status);
+						button->setValue(i, status);
 					}
 				}
 			}

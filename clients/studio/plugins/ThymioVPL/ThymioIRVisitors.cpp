@@ -102,24 +102,24 @@ namespace Aseba
 				currentHash->insert(*itr);
 		}
 
-		wstring buttonname = button->getBasename() + L"_" + toWstring(button->getMemoryState());;
-		for(int i=0; i<button->size(); i++)
+		wstring buttonname = button->getBasename() + L"_" + toWstring(button->getStateFilter());;
+		for(int i=0; i<button->valuesCount(); i++)
 		{	
-			if( button->isClicked(i) > 0 )
+			if( button->getValue(i) > 0 )
 			{
 				buttonname += L"_";
 				buttonname += toWstring(i);
 				buttonname += L"_";
-				buttonname += toWstring(button->isClicked(i));
+				buttonname += toWstring(button->getValue(i));
 			}
 		}
 
 		pair< multimap<wstring, ThymioIRButton*>::iterator,
 			  multimap<wstring, ThymioIRButton*>::iterator > ret;
-		ret = currentHash->equal_range(buttonname);		
+		ret = currentHash->equal_range(buttonname);
 
 		for(multimap<wstring, ThymioIRButton*>::iterator itr = ret.first; 
-			itr != ret.second; ++itr )				
+			itr != ret.second; ++itr )
 			if( itr->second != button )
 				errorCode = THYMIO_EVENT_MULTISET;
 				
@@ -260,7 +260,7 @@ namespace Aseba
 				case THYMIO_BUTTONS_IR:
 					for(int i=0; i<5; ++i)
 					{
-						if(button->isClicked(i) > 0)
+						if(button->getValue(i) > 0)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"button.";
@@ -271,9 +271,9 @@ namespace Aseba
 					}
 					break;
 				case THYMIO_PROX_IR:
-					for(int i=0; i<button->size(); ++i)
+					for(int i=0; i<button->valuesCount(); ++i)
 					{
-						if(button->isClicked(i) == 1)
+						if(button->getValue(i) == 1)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.horizontal[";
@@ -281,7 +281,7 @@ namespace Aseba
 							text += L"] < 400";
 							flag = true;
 						} 
-						else if(button->isClicked(i) == 2)
+						else if(button->getValue(i) == 2)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.horizontal[";
@@ -292,9 +292,9 @@ namespace Aseba
 					}
 					break;
 				case THYMIO_PROX_GROUND_IR:
-					for(int i=0; i<button->size(); ++i)
+					for(int i=0; i<button->valuesCount(); ++i)
 					{
-						if(button->isClicked(i) == 1)
+						if(button->getValue(i) == 1)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.ground.reflected[";
@@ -302,7 +302,7 @@ namespace Aseba
 							text += L"] < 150";
 							flag = true;
 						}
-						else if(button->isClicked(i) == 2)
+						else if(button->getValue(i) == 2)
 						{
 							text += (flag ? L" and " : L"");
 							text += L"prox.ground.reflected[";
@@ -319,11 +319,11 @@ namespace Aseba
 					break;
 				}
 				
-				if( button->getMemoryState() > 0 )
+				if( button->getStateFilter() > 0 )
 				{
 					for (int i=0; i<4; ++i)
 					{
-						switch (button->getMemoryState(i))
+						switch (button->getStateFilter(i))
 						{
 							case 1: text += L" and state[" + toWstring(i) + L"] == 1"; break;
 							case 2: text += L" and state[" + toWstring(i) + L"] == 0"; break;
@@ -339,13 +339,13 @@ namespace Aseba
 			}
 			else 
 			{
-				if( button->getMemoryState() > 0 )
+				if( button->getStateFilter() > 0 )
 				{
 					text += L"\tif ";
 					bool first(true);
 					for (int i=0; i<4; ++i)
 					{
-						switch (button->getMemoryState(i))
+						switch (button->getStateFilter(i))
 						{
 							case 1:
 								if (!first)
@@ -380,54 +380,54 @@ namespace Aseba
 			case THYMIO_MOVE_IR:
 				text += indString;
 				text += L"motor.left.target = ";
-				text += toWstring(button->isClicked(0));
+				text += toWstring(button->getValue(0));
 				text += L"\n";
 				text += indString;
 				text += L"motor.right.target = ";
-				text += toWstring(button->isClicked(1));
+				text += toWstring(button->getValue(1));
 				text += L"\n";
 				break;
 			case THYMIO_COLOR_TOP_IR:
 				text += indString;
 				text += L"call leds.top(";
-				text += toWstring(button->isClicked(0));
+				text += toWstring(button->getValue(0));
 				text += L",";
-				text += toWstring(button->isClicked(1));
+				text += toWstring(button->getValue(1));
 				text += L",";
-				text += toWstring(button->isClicked(2));
+				text += toWstring(button->getValue(2));
 				text += L")\n";
 				break;
 			case THYMIO_COLOR_BOTTOM_IR:
 				text += indString;
 				text += L"call leds.bottom.left(";
-				text += toWstring(button->isClicked(0));
+				text += toWstring(button->getValue(0));
 				text += L",";
-				text += toWstring(button->isClicked(1));
+				text += toWstring(button->getValue(1));
 				text += L",";
-				text += toWstring(button->isClicked(2));
+				text += toWstring(button->getValue(2));
 				text += L")\n";
 				text += indString;
 				text += L"call leds.bottom.right(";
-				text += toWstring(button->isClicked(0));
+				text += toWstring(button->getValue(0));
 				text += L",";
-				text += toWstring(button->isClicked(1));
+				text += toWstring(button->getValue(1));
 				text += L",";
-				text += toWstring(button->isClicked(2));
+				text += toWstring(button->getValue(2));
 				text += L")\n";
 				break;
 			case THYMIO_SOUND_IR:
 				text += indString;
-				if( button->isClicked(0) ) // friendly
+				if( button->getValue(0) ) // friendly
 					text += L"call sound.system(7)\n";
-				else if( button->isClicked(1) ) // okay
+				else if( button->getValue(1) ) // okay
 					text += L"call sound.system(6)\n";
 				else
 					text += L"call sound.system(4)\n"; // scared
 				break;
 			case THYMIO_MEMORY_IR:
-				for(int i=0; i<button->size(); ++i)
+				for(int i=0; i<button->valuesCount(); ++i)
 				{
-					switch (button->isClicked(i))
+					switch (button->getValue(i))
 					{
 						case 1: text += indString + L"new_state[" + toWstring(i) + L"] = 1\n"; break;
 						case 2: text += indString + L"new_state[" + toWstring(i) + L"] = 0\n"; break;
@@ -455,7 +455,7 @@ namespace Aseba
 			return;
 		}
 		
-		advancedMode = advancedMode || (buttonSet->getEventButton()->getMemoryState() >= 0);
+		advancedMode = advancedMode || (buttonSet->getEventButton()->getStateFilter() >= 0);
 		errorCode = THYMIO_NO_ERROR;
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
@@ -464,7 +464,7 @@ namespace Aseba
 		
 		int block = editor[name].first;
 		int size = editor[name].second;
-		bool mflag = (buttonSet->getEventButton()->getMemoryState() >= 0 ? true : false);
+		bool mflag = (buttonSet->getEventButton()->getStateFilter() >= 0 ? true : false);
 			
 		if( block < 0 )
 		{
