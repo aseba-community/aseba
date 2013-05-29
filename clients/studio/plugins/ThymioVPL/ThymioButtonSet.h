@@ -10,7 +10,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class ThymioButton;
+	class ThymioCard;
 	
 	class ThymioButtonSet : public QGraphicsObject
 	{
@@ -39,12 +39,12 @@ namespace Aseba
 		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
 		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1028, 336) : QRectF(0, 0, 900, 336); }
 
-		void addEventButton(ThymioButton *event);
-		void addActionButton(ThymioButton *action);
+		void addEventButton(ThymioCard *event);
+		void addActionButton(ThymioCard *action);
 		void setRow(int row);
 		int getRow() { return data(1).toInt(); }
-		ThymioButton *getEventButton() { return eventButton; }
-		ThymioButton *getActionButton() { return actionButton; }
+		ThymioCard *getEventButton() { return eventButton; }
+		ThymioCard *getActionButton() { return actionButton; }
 		
 		bool eventExists() { return eventButton == 0 ? false : true; }
 		bool actionExists() { return actionButton == 0 ? false : true; }
@@ -66,8 +66,8 @@ namespace Aseba
 		void repositionElements();
 	
 	private:
-		ThymioButton *eventButton;
-		ThymioButton *actionButton;
+		ThymioCard *eventButton;
+		ThymioCard *actionButton;
 		ThymioRemoveButton *deleteButton;
 		ThymioAddButton *addButton;
 		ThymioIRButtonSet buttonSetIR;

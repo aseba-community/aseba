@@ -136,7 +136,7 @@ namespace Aseba
 		{
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(eventButton);
-			delete(eventButton);
+			eventButton->deleteLater();
 			eventButton = 0;
 		
 			buttonSetIR.addEventButton(0);
@@ -146,7 +146,7 @@ namespace Aseba
 		{
 			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem(actionButton);
-			delete(actionButton);
+			actionButton->deleteLater();
 			actionButton = 0;
 
 			buttonSetIR.addActionButton(0);
@@ -228,13 +228,13 @@ namespace Aseba
 		setPos(xpos, (row*420+20)*scale());
 	}
 
-	void ThymioButtonSet::addEventButton(ThymioButton *event) 
+	void ThymioButtonSet::addEventButton(ThymioCard *event) 
 	{ 
 		if( eventButton ) 
 		{
 			disconnect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem( eventButton );
-			delete( eventButton );
+			eventButton->deleteLater();
 		}
 		
 		event->setButtonColor(eventButtonColor);
@@ -249,15 +249,15 @@ namespace Aseba
 		connect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 	}
 
-	void ThymioButtonSet::addActionButton(ThymioButton *action) 
+	void ThymioButtonSet::addActionButton(ThymioCard *action) 
 	{ 
 		if( actionButton )
 		{
 			disconnect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 			scene()->removeItem( actionButton );
-			delete(actionButton);
+			actionButton->deleteLater();
 		}
-			
+		
 		action->setButtonColor(actionButtonColor);
 		action->setPos(500+trans, 40);
 		action->setEnabled(true);
@@ -361,7 +361,7 @@ namespace Aseba
 				int state;
 				dataStream >> buttonName >> state;
 				
-				ThymioButton *button(ThymioButton::createButton(buttonName, advancedMode));
+				ThymioCard *button(ThymioCard::createButton(buttonName, advancedMode));
 				if( button ) 
 				{
 					event->setDropAction(Qt::MoveAction);

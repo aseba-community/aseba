@@ -14,7 +14,7 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	enum ThymioButtonType 
+	enum ThymioCardType 
 	{
 		THYMIO_CIRCULAR_BUTTON = 0,
 		THYMIO_TRIANGULAR_BUTTON,
@@ -34,7 +34,7 @@ namespace Aseba
 		
 	public:
 		//! Create a button with initially one state
-		ThymioClickableButton (const QRectF rect, const ThymioButtonType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
+		ThymioClickableButton (const QRectF rect, const ThymioCardType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
 		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
@@ -51,7 +51,7 @@ namespace Aseba
 		void stateChanged();
 	
 	protected:
-		const ThymioButtonType buttonType;
+		const ThymioCardType buttonType;
 		const QRectF boundingRectangle;
 		
 		int curState;
@@ -94,7 +94,7 @@ namespace Aseba
 		in a single integer (2 bits per value). The state filter
 		can be set/get using setStateFilter()/getStateFilter().
 	*/
-	class ThymioButton : public QGraphicsObject
+	class ThymioCard : public QGraphicsObject
 	{
 		Q_OBJECT
 		
@@ -115,10 +115,10 @@ namespace Aseba
 			bool up;
 		};
 		
-		static ThymioButton* createButton(const QString& name, bool advancedMode=false);
+		static ThymioCard* createButton(const QString& name, bool advancedMode=false);
 		
-		ThymioButton(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
-		virtual ~ThymioButton();
+		ThymioCard(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
+		virtual ~ThymioCard();
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
@@ -169,16 +169,14 @@ namespace Aseba
 		int parentID;
 		qreal trans;
 
-		QPointF dragStartPosition;
-
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 	};
 	
-	class ThymioButtonWithBody: public ThymioButton
+	class ThymioCardWithBody: public ThymioCard
 	{
 	public:
-		ThymioButtonWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
-		~ThymioButtonWithBody();
+		ThymioCardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
+		~ThymioCardWithBody();
 		
 	protected:
 		ThymioBody *thymioBody;
@@ -200,11 +198,11 @@ namespace Aseba
 		virtual void dropEvent( QDropEvent *event );
 
 	private:
-		ThymioButton *thymioButton;
-	};	
+		ThymioCard *thymioButton;
+	};
 	
 	// Buttons Event
-	class ThymioButtonsEvent : public ThymioButtonWithBody
+	class ThymioButtonsEvent : public ThymioCardWithBody
 	{
 	public:
 		ThymioButtonsEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -214,7 +212,7 @@ namespace Aseba
 	};
 	
 	// Proximity Event
-	class ThymioProxEvent : public ThymioButtonWithBody
+	class ThymioProxEvent : public ThymioCardWithBody
 	{
 	public:
 		ThymioProxEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -224,7 +222,7 @@ namespace Aseba
 	};
 
 	// Proximity Ground Event
-	class ThymioProxGroundEvent : public ThymioButtonWithBody
+	class ThymioProxGroundEvent : public ThymioCardWithBody
 	{
 	public:
 		ThymioProxGroundEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -234,7 +232,7 @@ namespace Aseba
 	};
 
 	// Tap Event
-	class ThymioTapEvent : public ThymioButton
+	class ThymioTapEvent : public ThymioCard
 	{
 	public:
 		ThymioTapEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -244,7 +242,7 @@ namespace Aseba
 	};
 
 	// Clap Event
-	class ThymioClapEvent : public ThymioButton
+	class ThymioClapEvent : public ThymioCard
 	{
 	public:
 		ThymioClapEvent(QGraphicsItem *parent=0, bool advanced=false);
@@ -254,7 +252,7 @@ namespace Aseba
 	};
 	
 	// Move Action
-	class ThymioMoveAction : public ThymioButton
+	class ThymioMoveAction : public ThymioCard
 	{
 		Q_OBJECT
 	
@@ -280,7 +278,7 @@ namespace Aseba
 	};
 	
 	// Color Action
-	class ThymioColorAction : public ThymioButtonWithBody
+	class ThymioColorAction : public ThymioCardWithBody
 	{
 		Q_OBJECT
 		
@@ -316,7 +314,7 @@ namespace Aseba
 	};
 	
 	// Sound Action
-	class ThymioSoundAction : public ThymioButtonWithBody
+	class ThymioSoundAction : public ThymioCardWithBody
 	{
 	public:
 		class Speaker : public QGraphicsItem
@@ -337,7 +335,7 @@ namespace Aseba
 	};
 
 	// Memory Action
-	class ThymioMemoryAction : public ThymioButtonWithBody
+	class ThymioMemoryAction : public ThymioCardWithBody
 	{		
 	public:
 		ThymioMemoryAction(QGraphicsItem *parent=0);

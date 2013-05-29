@@ -9,7 +9,7 @@ namespace Aseba
 {
 	// Buttons Event
 	ThymioButtonsEvent::ThymioButtonsEvent(QGraphicsItem *parent, bool advanced) : 
-		ThymioButtonWithBody(true, true, advanced, parent)
+		ThymioCardWithBody(true, true, advanced, parent)
 	{	
 		setData(0, "event");
 		setData(1, "button");
@@ -41,7 +41,7 @@ namespace Aseba
 	
 	// Prox Event
 	ThymioProxEvent::ThymioProxEvent(QGraphicsItem *parent, bool advanced) : 
-		ThymioButtonWithBody(true, true, advanced, parent)
+		ThymioCardWithBody(true, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "prox");
@@ -83,7 +83,7 @@ namespace Aseba
 	
 	// Prox Ground Event
 	ThymioProxGroundEvent::ThymioProxGroundEvent( QGraphicsItem *parent, bool advanced ) : 
-		ThymioButtonWithBody(true, false, advanced, parent)
+		ThymioCardWithBody(true, false, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "proxground");
@@ -106,7 +106,7 @@ namespace Aseba
 	
 	// Tap Event
 	ThymioTapEvent::ThymioTapEvent( QGraphicsItem *parent, bool advanced ) :
-		ThymioButton(true, advanced, parent)
+		ThymioCard(true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "tap");
@@ -117,7 +117,7 @@ namespace Aseba
 	
 	// Clap Event
 	ThymioClapEvent::ThymioClapEvent( QGraphicsItem *parent, bool advanced ) :
-		ThymioButton(true, advanced, parent)
+		ThymioCard(true, advanced, parent)
 	{		
 		setData(0, "event");
 		setData(1, "clap");

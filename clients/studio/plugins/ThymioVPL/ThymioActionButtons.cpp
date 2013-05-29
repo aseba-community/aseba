@@ -12,7 +12,7 @@ namespace Aseba
 {
 	// Move Action
 	ThymioMoveAction::ThymioMoveAction( QGraphicsItem *parent ) :
-		ThymioButton(false, false, parent)
+		ThymioCard(false, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "move");
@@ -94,7 +94,7 @@ namespace Aseba
 	
 	// Color Action
 	ThymioColorAction::ThymioColorAction( QGraphicsItem *parent, bool top) :
-		ThymioButtonWithBody(false, top, false, parent)
+		ThymioCardWithBody(false, top, false, parent)
 	{
 		setData(0, "action");
 		if (top)
@@ -186,13 +186,13 @@ namespace Aseba
 	}	
 	
 	ThymioSoundAction::ThymioSoundAction(QGraphicsItem *parent) :
-		ThymioButtonWithBody(false, true, false, parent)
+		ThymioCardWithBody(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "sound");
 
 		for(int i=0; i<3; i++) 
-		{		
+		{
 			ThymioFaceButton *button = new ThymioFaceButton(QRectF(-30,-30,60,60), (ThymioSmileType)i, this);
 
 			button->setPos(195,70+70*(qreal)i);
@@ -219,7 +219,7 @@ namespace Aseba
 
 	// Memory Action
 	ThymioMemoryAction::ThymioMemoryAction(QGraphicsItem *parent) : 
-		ThymioButtonWithBody(false, true, false, parent)
+		ThymioCardWithBody(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "memory");

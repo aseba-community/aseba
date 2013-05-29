@@ -422,7 +422,7 @@ namespace Aseba
 			
 			if( (*itr)->eventExists() ) 
 			{
-				ThymioButton *button = (*itr)->getEventButton();
+				ThymioCard *button = (*itr)->getEventButton();
 				element.setAttribute("event-name", button->getName() );
 			
 				for(int i=0; i<button->valuesCount(); ++i)
@@ -432,7 +432,7 @@ namespace Aseba
 			
 			if( (*itr)->actionExists() ) 
 			{
-				ThymioButton *button = (*itr)->getActionButton();
+				ThymioCard *button = (*itr)->getActionButton();
 				element.setAttribute("action-name", button->getName() );
 				for(int i=0; i<button->valuesCount(); ++i)
 					element.setAttribute(QString("ab%0").arg(i), button->getValue(i));
@@ -474,12 +474,12 @@ namespace Aseba
 				else if(element.tagName() == "buttonset")
 				{
 					QString buttonName;
-					ThymioButton *eventButton = 0;
-					ThymioButton *actionButton = 0;
+					ThymioCard *eventButton = 0;
+					ThymioCard *actionButton = 0;
 					
 					if( !(buttonName = element.attribute("event-name")).isEmpty() )
 					{
-						eventButton = ThymioButton::createButton(buttonName,scene->getAdvanced());
+						eventButton = ThymioCard::createButton(buttonName,scene->getAdvanced());
 						if (!eventButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),
@@ -494,7 +494,7 @@ namespace Aseba
 					
 					if( !(buttonName = element.attribute("action-name")).isEmpty() )
 					{
-						actionButton = ThymioButton::createButton(buttonName,scene->getAdvanced());
+						actionButton = ThymioCard::createButton(buttonName,scene->getAdvanced());
 						if (!actionButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),

@@ -16,9 +16,9 @@ namespace Aseba
 		ThymioScene(QObject *parent = 0);
 		~ThymioScene();
 		
-		QGraphicsItem *addAction(ThymioButton *item);
-		QGraphicsItem *addEvent(ThymioButton *item);
-		void addButtonSet(ThymioButton *event, ThymioButton *action);
+		QGraphicsItem *addAction(ThymioCard *item);
+		QGraphicsItem *addEvent(ThymioCard *item);
+		void addButtonSet(ThymioCard *event, ThymioCard *action);
 
 		bool isEmpty() const;
 		void reset();

@@ -36,7 +36,7 @@ namespace Aseba
 		clear();
 	}
 
-	QGraphicsItem *ThymioScene::addAction(ThymioButton *item) 
+	QGraphicsItem *ThymioScene::addAction(ThymioCard *item) 
 	{
 		ThymioButtonSet *button = 0; 
 		prevNewActionButton = false;
@@ -82,7 +82,7 @@ namespace Aseba
 		return button;
 	}
 
-	QGraphicsItem *ThymioScene::addEvent(ThymioButton *item) 
+	QGraphicsItem *ThymioScene::addEvent(ThymioCard *item) 
 	{
 		ThymioButtonSet *button = 0; 
 		prevNewEventButton = false;
@@ -130,7 +130,7 @@ namespace Aseba
 		return button;
 	}
 
-	void ThymioScene::addButtonSet(ThymioButton *event, ThymioButton *action)
+	void ThymioScene::addButtonSet(ThymioCard *event, ThymioCard *action)
 	{
 		ThymioButtonSet *button = createNewButtonSet();
 		if(event)
@@ -406,7 +406,7 @@ namespace Aseba
 			int numButtons;
 			dataStream >> buttonName >> numButtons;
 			
-			ThymioButton *button(ThymioButton::createButton(buttonName, advancedMode));
+			ThymioCard *button(ThymioCard::createButton(buttonName, advancedMode));
 			if( button ) 
 			{
 				event->setDropAction(Qt::MoveAction);
