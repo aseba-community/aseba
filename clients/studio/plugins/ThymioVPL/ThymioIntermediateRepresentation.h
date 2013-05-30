@@ -85,8 +85,8 @@ namespace Aseba
 	public:
 		ThymioIRButtonSet(ThymioIRButton *event=0, ThymioIRButton *action=0);
 		
-		void addEventButton(ThymioIRButton *event);
-		void addActionButton(ThymioIRButton *action);
+		void setEventButton(ThymioIRButton *event);
+		void setActionButton(ThymioIRButton *action);
 		
 		ThymioIRButton *getEventButton();
 		ThymioIRButton *getActionButton();

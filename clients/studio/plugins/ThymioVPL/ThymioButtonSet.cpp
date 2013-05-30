@@ -10,6 +10,7 @@
 #include <QGraphicsView>
 #include <QDebug>
 #include <cassert>
+#include <typeinfo>
 
 #include "ThymioButtonSet.h"
 #include "ThymioButtons.h"
@@ -140,7 +141,7 @@ namespace Aseba
 			delete eventButton;
 			eventButton = 0;
 		
-			buttonSetIR.addEventButton(0);
+			buttonSetIR.setEventButton(0);
 			emit buttonUpdated();
 		}
 		if( actionButton && actionButton->getParentID() < 0 )
@@ -150,7 +151,7 @@ namespace Aseba
 			delete actionButton;
 			actionButton = 0;
 
-			buttonSetIR.addActionButton(0);
+			buttonSetIR.setActionButton(0);
 			emit buttonUpdated();
 		}
 		
@@ -254,7 +255,7 @@ namespace Aseba
 		event->setParentID(data(1).toInt());
 		eventButton = event;
 		
-		buttonSetIR.addEventButton(event->getIRButton());
+		buttonSetIR.setEventButton(event->getIRButton());
 		emit buttonUpdated();
 		connect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 	}
@@ -275,7 +276,7 @@ namespace Aseba
 		action->setParentID(data(1).toInt());
 		actionButton = action;
 		
-		buttonSetIR.addActionButton(action->getIRButton());
+		buttonSetIR.setActionButton(action->getIRButton());
 		emit buttonUpdated();
 		connect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 	}
@@ -283,8 +284,17 @@ namespace Aseba
 	void ThymioButtonSet::setAdvanced(bool advanced)
 	{
 		advancedMode = advanced;
-		if( eventButton )
+		if (eventButton)
 			eventButton->setAdvanced(advanced);
+		// remove any "state setter" action card
+		if (!advanced && actionButton && typeid(*actionButton) == typeid(ThymioMemoryAction))
+		{
+			scene()->removeItem(actionButton);
+			delete actionButton;
+			actionButton = 0;
+			buttonSetIR.setActionButton(0);
+		}
+		
 		repositionElements();
 	}
 

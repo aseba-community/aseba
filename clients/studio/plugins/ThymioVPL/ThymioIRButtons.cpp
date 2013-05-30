@@ -90,12 +90,14 @@ namespace Aseba
 	{
 	}
 	
-	void ThymioIRButtonSet::addEventButton(ThymioIRButton *event) 
-	{ 
+	//! Set event button IR; if exists, replace but do not delete pointer as membership is hold by the caller
+	void ThymioIRButtonSet::setEventButton(ThymioIRButton *event) 
+	{
 		eventButton = event; 
 	}
 	
-	void ThymioIRButtonSet::addActionButton(ThymioIRButton *action) 
+	//! Set action button IR; if exists, replace but do not delete pointer as membership is hold by the caller
+	void ThymioIRButtonSet::setActionButton(ThymioIRButton *action) 
 	{
 		actionButton = action; 
 	}

@@ -129,13 +129,14 @@ namespace Aseba
 
 	void ThymioIRTypeChecker::visit(ThymioIRButtonSet *buttonSet)
 	{
-		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() ) return;
-				
+		if( !buttonSet->hasEventButton() || !buttonSet->hasActionButton() )
+			return;
+		
 		errorCode = THYMIO_NO_ERROR;
 
 		activeActionName = buttonSet->getActionButton()->getName();
 
-		visit(buttonSet->getEventButton());			
+		visit(buttonSet->getEventButton());
 	}
 
 	// Syntax Checker //
