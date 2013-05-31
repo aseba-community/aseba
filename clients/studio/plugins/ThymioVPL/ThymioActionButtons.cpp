@@ -205,7 +205,7 @@ namespace Aseba
 				if (notes[col] == 5-row)
 					painter->setBrush(Qt::black);
 				else
-					painter->setBrush(QColor::fromHsv(row*42, 80, 255));
+					painter->setBrush(QColor::fromHsv((5-row)*42, 80, 255));
 				painter->drawRect(28 + col*25, 88 + row*25, 25, 25);
 			}
 		}
