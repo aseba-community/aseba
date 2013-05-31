@@ -4,6 +4,7 @@
 #include <QSlider>
 #include <QTimeLine>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsSvgItem>
 #include <QtCore/qmath.h>
 
 #include "ThymioButtons.h"
@@ -87,10 +88,10 @@ namespace Aseba
 		return -1;
 	}
 
-	void ThymioMoveAction::setValue(int i, int status) 
+	void ThymioMoveAction::setValue(int i, int value) 
 	{ 
 		if(i<sliders.size()) 
-			sliders[i]->setSliderPosition(status/50);
+			sliders[i]->setSliderPosition(value/50);
 	}
 	
 	// Color Action
@@ -133,15 +134,6 @@ namespace Aseba
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButtonAndNotify()));
 		}
-		valueChangeDetected();
-	}
-
-	void ThymioColorAction::valueChangeDetected()
-	{
-		thymioBody->bodyColor = QColor(sliders[0]->value()*5.46875+80, 
-									   sliders[1]->value()*5.46875+80, 
-									   sliders[2]->value()*5.46875+80);
-		update();
 	}
 
 	int ThymioColorAction::getValue(int i) const
@@ -157,6 +149,20 @@ namespace Aseba
 			sliders[i]->setSliderPosition(status);
 	}
 	
+	void ThymioColorAction::valueChangeDetected()
+	{
+		update();
+	}
+	
+	void ThymioColorAction::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		ThymioCard::paint(painter, option, widget);
+		const QColor bodyColor( sliders[0]->value()*5.46875+80, 
+								sliders[1]->value()*5.46875+80, 
+								sliders[2]->value()*5.46875+80);
+		ThymioBody::drawBody(painter, 128, 128, up, bodyColor);
+	}
+	
 	ThymioColorTopAction::ThymioColorTopAction(QGraphicsItem *parent):
 		ThymioColorAction(parent, true)
 	{}
@@ -166,57 +172,75 @@ namespace Aseba
 	{}
 	
 	// Sound Action
-	void ThymioSoundAction::Speaker::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) 
-	{		
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-		
-		painter->setPen(QPen(Qt::black, 3.0, Qt::SolidLine, Qt::RoundCap));
-		painter->setBrush(Qt::black);
-		painter->drawRect(25, 108, 30, 50);
-
-		QPointF points[4];
-		points[0] = QPointF(52, 158);
-		points[1] = QPointF(52, 108);
-		points[2] = QPointF(84, 78);
-		points[3] = QPointF(84, 188);
-		painter->drawPolygon(points, 4);
-		painter->drawChord(64, 78, 40, 110, -1440, 2880);
-		
-		painter->drawArc(64, 68, 60, 130, -1440, 2880);
-		painter->drawArc(64, 53, 80, 160, -1440, 2880);
-	}	
-	
 	ThymioSoundAction::ThymioSoundAction(QGraphicsItem *parent) :
 		ThymioCardWithBody(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "sound");
-
-		for(int i=0; i<3; i++) 
-		{
-			ThymioFaceButton *button = new ThymioFaceButton(QRectF(-30,-30,60,60), (ThymioSmileType)i, this);
-
-			button->setPos(195,70+70*(qreal)i);
-			button->addState(i == 0 ? Qt::green : (i == 1 ? Qt::yellow : Qt::red) );
-			button->setData(0, i);
-			button->setToggleState(false);
-			
-			thymioButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
-		}
-		thymioButtons.at(0)->setValue(1);
 		
-		for(int i=0; i<3; i++)
+		notes[0] = 0;
+		notes[1] = 2;
+		notes[2] = 3;
+		notes[3] = 5;
+		notes[4] = 5;
+		notes[5] = 3;
+		notes[6] = 2;
+		notes[7] = 0;
+		
+		new QGraphicsSvgItem (":/images/notes.svgz", this);
+	}
+	
+	void ThymioSoundAction::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+		
+		ThymioCardWithBody::paint(painter, option, widget);
+		
+		painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		for (int row = 0; row < 6; ++row)
 		{
-			for(int j=0; j<3; j++) 
+			for (int col = 0; col < 8; ++col)
 			{
-				if( i!=j )
-					thymioButtons.at(i)->addSibling(thymioButtons.at(j));
+				if (notes[col] == 5-row)
+					painter->setBrush(Qt::black);
+				else
+					painter->setBrush(QColor::fromHsv(row*42, 80, 255));
+				painter->drawRect(28 + col*25, 88 + row*25, 25, 25);
 			}
 		}
-		
-		speaker = new Speaker(this);
+	}
+	
+	void ThymioSoundAction::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (event->button() == Qt::LeftButton)
+		{
+			const QPointF& pos(event->pos());
+			if (QRectF(28,78,200,150).contains(pos))
+			{
+				notes[(int(pos.x())-28)/25] = 5-(int(pos.y())-88)/25;
+			}
+			update();
+			updateIRButtonAndNotify();
+		}
+	}
+	
+	int ThymioSoundAction::getValue(int i) const
+	{ 
+		if (i<8) 
+			return notes[i]; 
+		return -1;
+	}
+	
+	// TODO: FIXME: use size_t for index
+	void ThymioSoundAction::setValue(int i, int value) 
+	{ 
+		if (i<8) 
+		{
+			notes[i] = value;
+			update();
+			updateIRButtonAndNotify();
+		}
 	}
 
 	// Memory Action

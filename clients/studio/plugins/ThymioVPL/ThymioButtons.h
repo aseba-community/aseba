@@ -108,6 +108,8 @@ namespace Aseba
 			QRectF boundingRect() const { return QRectF(-128, -128+yShift, 256, 256); }
 			void setUp(bool u) { up = u; }
 			
+			static void drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor);
+			
 			QColor bodyColor;
 			
 		private:
@@ -178,10 +180,10 @@ namespace Aseba
 	{
 	public:
 		ThymioCardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
-		~ThymioCardWithBody();
-		
+		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+	
 	protected:
-		ThymioBody *thymioBody;
+		bool up;
 	};
 	
 	class ThymioPushButton : public QPushButton
@@ -286,11 +288,13 @@ namespace Aseba
 		
 	protected:
 		ThymioColorAction(QGraphicsItem *parent, bool top);
+		
+		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
 	public:
 		virtual int valuesCount() const { return 3; }
 		virtual int getValue(int i) const;
-		virtual void setValue(int i, int status);
+		virtual void setValue(int i, int value);
 		
 	private slots:
 		void valueChangeDetected();
@@ -319,26 +323,25 @@ namespace Aseba
 	class ThymioSoundAction : public ThymioCardWithBody
 	{
 	public:
-		class Speaker : public QGraphicsItem
-		{
-		public:
-			Speaker(QGraphicsItem *parent=0) : QGraphicsItem(parent) {}
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
-		};
-	
 		ThymioSoundAction(QGraphicsItem *parent=0);
+		
+		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		virtual int valuesCount() const { return 8; }
+		virtual int getValue(int i) const;
+		virtual void setValue(int i, int value);
 		
 	protected:
 		ThymioIRButtonName getIRIdentifier() const { return THYMIO_SOUND_IR; }
+		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 		
 	protected:
-		Speaker *speaker;
+		int notes[8];
 	};
 
 	// Memory Action
 	class ThymioMemoryAction : public ThymioCardWithBody
-	{		
+	{
 	public:
 		ThymioMemoryAction(QGraphicsItem *parent=0);
 		

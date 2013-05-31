@@ -233,7 +233,7 @@ namespace Aseba
 	void ThymioScene::removeButton(int row)
 	{
 		Q_ASSERT( row < buttonSets.size() );
-			
+		
 		ThymioButtonSet *button = buttonSets[row];
 		disconnect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 		buttonSets.removeAt(row);

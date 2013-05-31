@@ -176,6 +176,7 @@ namespace Aseba
 
 		vector<wstring> generatedCode;
 		bool advancedMode;
+		bool useSound;
 		bool useMicrophone;
 		vector<wstring> directions;
 		int currentBlock;

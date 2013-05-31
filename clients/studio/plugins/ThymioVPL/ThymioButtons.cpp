@@ -127,17 +127,22 @@ namespace Aseba
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
+		drawBody(painter, 0, yShift, up, bodyColor);
+	}
+	
+	void ThymioCard::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
+	{
 		// button shape
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(bodyColor);
-		painter->drawChord(-124, -118+yShift, 248, 144, 0, 2880);
-		painter->drawRoundedRect(-124, -52+yShift, 248, 176, 5, 5);
+		painter->drawChord(-124+xShift, -118+yShift, 248, 144, 0, 2880);
+		painter->drawRoundedRect(-124+xShift, -52+yShift, 248, 176, 5, 5);
 		
 		if(!up) 
 		{
 			painter->setBrush(Qt::black);
-			painter->drawRect(-128, 30+yShift, 18, 80);
-			painter->drawRect(110, 30+yShift, 18, 80);
+			painter->drawRect(-128+xShift, 30+yShift, 18, 80);
+			painter->drawRect(110+xShift, 30+yShift, 18, 80);
 		}
 	}
 	
@@ -415,17 +420,17 @@ namespace Aseba
 	}
 	
 	ThymioCardWithBody::ThymioCardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		ThymioCard(eventButton, advanced, parent)
+		ThymioCard(eventButton, advanced, parent),
+		up(up)
 	{
-		thymioBody = new ThymioBody(this);
-		thymioBody->setPos(128,128);
-		thymioBody->setUp(up);
 	}
 	
-	ThymioCardWithBody::~ThymioCardWithBody()
+	void ThymioCardWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
+		ThymioCard::paint(painter, option, widget);
+		ThymioBody::drawBody(painter, 128, 128, up, Qt::white);
 	}
-
+	
 	// Thymio Push Button
 	ThymioPushButton::ThymioPushButton(const QString& name, QWidget *parent) : 
 		QPushButton(parent), 

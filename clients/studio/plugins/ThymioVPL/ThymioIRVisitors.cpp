@@ -1,4 +1,5 @@
 #include <sstream>
+#include <QtGlobal>
 #include "ThymioIntermediateRepresentation.h"
 
 namespace Aseba
@@ -32,7 +33,7 @@ namespace Aseba
 		return streamVal.str();
 	}
 
-	// Type Checker //	
+	// Type Checker //
 	ThymioIRTypeChecker::~ThymioIRTypeChecker()
 	{
 		clear();
@@ -164,6 +165,7 @@ namespace Aseba
 	ThymioIRCodeGenerator::ThymioIRCodeGenerator() : 
 		ThymioIRVisitor(),
 		advancedMode(false),
+		useSound(false),
 		useMicrophone(false),
 		currentBlock(0),
 		inIfBlock(false),
@@ -199,6 +201,7 @@ namespace Aseba
 		editor[THYMIO_CLAP_IR] = make_pair(-1,0);
 		generatedCode.clear();
 		advancedMode = false;
+		useSound = false;
 		useMicrophone = false;
 		inIfBlock = false;
 		buttonToCodeMap.clear();
@@ -218,10 +221,16 @@ namespace Aseba
 			text += L"var new_state[4] = [0,0,0,0]\n";
 			text += L"\n";
 		}
+		if (useSound)
+		{
+			text += L"var notes[8]\n";
+			text += L"var note_index = 8\n";
+		}
 		if (useMicrophone)
 		{
 			text += L"mic.threshold = 250\n";
 		}
+		
 		text += L"call sound.system(-1)\n";
 		text += L"call leds.top(0,0,0)\n";
 		text += L"call leds.bottom.left(0,0,0)\n";
@@ -232,7 +241,14 @@ namespace Aseba
 			text += L"\nsub display_state\n";
 			text += L"\tcall leds.circle(0,state[1]*32,0,state[3]*32,0,state[2]*32,0,state[0]*32)\n";
 		}
-		
+		if (useSound)
+		{
+			text += L"\nonevent sound.finished\n";
+			text += L"\tif note_index != 8 then\n";
+			text += L"\t\tcall sound.freq(notes[note_index], 15)\n";
+			text += L"\t\tnote_index += 1\n";
+			text += L"\tend\n";
+		}
 		generatedCode[0] = text + generatedCode[0];
 	}
 
@@ -418,12 +434,21 @@ namespace Aseba
 				break;
 			case THYMIO_SOUND_IR:
 				text += indString;
-				if( button->getValue(0) ) // friendly
-					text += L"call sound.system(7)\n";
-				else if( button->getValue(1) ) // okay
-					text += L"call sound.system(6)\n";
-				else
-					text += L"call sound.system(4)\n"; // scared
+				text += L"call math.copy(notes, [";
+				static const int noteTable[6] = { 262, 294, 330, 392, 440, 523 };
+				for (size_t i = 0; i<button->valuesCount(); ++i)
+				{
+					Q_ASSERT(button->getValue(i) >= 0);
+					Q_ASSERT(button->getValue(i) < 6);
+					text += toWstring(noteTable[button->getValue(i)]);
+					if (i+1 != button->valuesCount())
+						text += L", ";
+				}
+				text += L"])\n";
+				text += indString;
+				text += L"call sound.freq(notes[0], 15)\n";
+				text += indString;
+				text += L"note_index = 1\n";
 				break;
 			case THYMIO_MEMORY_IR:
 				for(int i=0; i<button->valuesCount(); ++i)
@@ -458,6 +483,9 @@ namespace Aseba
 		
 		advancedMode = advancedMode || (buttonSet->getEventButton()->getStateFilter() >= 0);
 		errorCode = THYMIO_NO_ERROR;
+		
+		if ( buttonSet->getActionButton()->getName() == THYMIO_SOUND_IR)
+			useSound = true;
 		
 		ThymioIRButtonName name = buttonSet->getEventButton()->getName();
 		if( name == THYMIO_PROX_GROUND_IR )
