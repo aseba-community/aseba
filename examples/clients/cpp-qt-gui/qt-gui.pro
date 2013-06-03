@@ -11,13 +11,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qt-gui
 TEMPLATE = app
 
-INCLUDEPATH += "../.."
-INCLUDEPATH += "../../../dashel"
+INCLUDEPATH += "../../.."
+INCLUDEPATH += "../../../../dashel"
 
-LIBS += "../../../dashel-build/libdashel.a"
-LIBS += "../../../aseba-build/transport/dashel_plugins/libasebadashelplugins.a"
-LIBS += "../../../aseba-build/compiler/libasebacompiler.a"
-LIBS += "../../../aseba-build/common/libasebacommon.a"
+LIBS += "../../../../dashel-build/libdashel.a"
+LIBS += "../../../../aseba-build/transport/dashel_plugins/libasebadashelplugins.a"
+LIBS += "../../../../aseba-build/compiler/libasebacompiler.a"
+LIBS += "../../../../aseba-build/common/libasebacommon.a"
 
 unix:LIBS += -ludev
 win32:LIBS += -lwinspool -lws2_32 -lsetupapi -luuid

@@ -1,1 +1,1 @@
-add_subdirectory(cpp-qt-gui)
+add_subdirectory(clients)
