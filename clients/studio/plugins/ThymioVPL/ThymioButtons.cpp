@@ -38,20 +38,33 @@ namespace Aseba
 		painter->setBrush(colors[curState].first);
 		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
 		
-		if ( buttonType == THYMIO_CIRCULAR_BUTTON )
+		switch (buttonType)
 		{
-			painter->drawEllipse(boundingRectangle);
+			case THYMIO_CIRCULAR_BUTTON:
+				painter->drawEllipse(boundingRectangle);
+			break;
+			case THYMIO_TRIANGULAR_BUTTON:
+			{
+				QPointF points[3];
+				points[0] = (boundingRectangle.topLeft() + boundingRectangle.topRight())*0.5;
+				points[1] = boundingRectangle.bottomLeft();
+				points[2] = boundingRectangle.bottomRight();
+				painter->drawPolygon(points, 3);
+			}
+			break;
+			case THYMIO_QUARTER_CIRCLE_BUTTON:
+			{
+				const int x(boundingRectangle.x());
+				const int y(boundingRectangle.y());
+				const int w(boundingRectangle.width());
+				const int h(boundingRectangle.height());
+				painter->drawPie(x,y,2*w,2*h,90*16, 90*16);
+			}
+			break;
+			default:
+				painter->drawRect(boundingRectangle);
+			break;
 		}
-		else if ( buttonType == THYMIO_TRIANGULAR_BUTTON )
-		{
-			QPointF points[3];
-			points[0] = (boundingRectangle.topLeft() + boundingRectangle.topRight())*0.5;
-			points[1] = boundingRectangle.bottomLeft();
-			points[2] = boundingRectangle.bottomRight();
-			painter->drawPolygon(points, 3);
-		}
-		else
-			painter->drawRect(boundingRectangle);
 	}
 
 	void ThymioClickableButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
@@ -240,10 +253,12 @@ namespace Aseba
 	
 	void ThymioCard::addAdvancedModeButtons()
 	{
+		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(310 + (i%2)*60, 100 + (i/2)*60);
+			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
 			button->addState(Qt::white);
 
