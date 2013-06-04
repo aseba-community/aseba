@@ -1198,43 +1198,31 @@ namespace Aseba
 //		qDebug() << "New context: " << context;
 		disconnect(mainWindow->eventsDescriptionsModel, 0, sortingProxy, 0);
 
-		// FIXME: code duplication, I let Florian clean it
-		if ((context == GeneralContext) || (context == UnknownContext))
+		switch (context)
 		{
-			sortingProxy->setSourceModel(variableAggregator);
-			sortingProxy->sort(0);
-			editor->setCompleterModel(sortingProxy);	// both variables and constants
+			case GeneralContext: // both variables and constants
+			case UnknownContext:
+				sortingProxy->setSourceModel(variableAggregator);
+				break;
+			case LeftValueContext: // only variables
+				sortingProxy->setSourceModel(vmMemoryModel);
+				break;
+			case FunctionContext: // native functions
+				sortingProxy->setSourceModel(functionsFlatModel);
+				break;
+			case SubroutineCallContext: // subroutines
+				sortingProxy->setSourceModel(vmSubroutinesModel);
+				break;
+			case EventContext: // events
+				sortingProxy->setSourceModel(eventAggregator);
+				break;
+			case VarDefContext:
+			default: // disable auto-completion in this case
+				editor->setCompleterModel(0);
+				return;
 		}
-		else if (context == LeftValueContext)
-		{
-			sortingProxy->setSourceModel(vmMemoryModel);
-			sortingProxy->sort(0);
-			editor->setCompleterModel(sortingProxy);	// only variables
-		}
-		else if (context == VarDefContext)
-		{
-			editor->setCompleterModel(0);		// disable auto-completion in this case
-		}
-		else if (context == FunctionContext)
-		{
-			sortingProxy->setSourceModel(functionsFlatModel);
-			sortingProxy->sort(0);
-			editor->setCompleterModel(sortingProxy);	// native functions
-		}
-		else if (context == SubroutineCallContext)
-		{
-			sortingProxy->setSourceModel(vmSubroutinesModel);
-			sortingProxy->sort(0);
-			editor->setCompleterModel(sortingProxy);	// subroutines
-		}
-		else if (context == EventContext)
-		{
-			sortingProxy->setSourceModel(eventAggregator);
-			sortingProxy->sort(0);
-			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsInserted()), SLOT(sortCompleterModel()));
-			//connect(mainWindow->eventsDescriptionsModel, SIGNAL(publicRowsRemoved()), SLOT(sortCompleterModel()));
-			editor->setCompleterModel(sortingProxy);	// both local and global events
-		}
+		sortingProxy->sort(0);
+		editor->setCompleterModel(sortingProxy);
 	}
 /*
 	void NodeTab::sortCompleterModel()
