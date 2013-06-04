@@ -174,18 +174,12 @@ namespace Aseba
 	void ThymioScene::reset()
 	{
 		clear();
-
 		createNewButtonSet();
-		
 		buttonUpdateDetected();
 	}
 	
 	void ThymioScene::clear()
 	{
-		advancedMode = false;
-		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
-			(*itr)->setAdvanced(false);
-		
 		for(int i=0; i<buttonSets.size(); i++)
 		{
 			disconnect(buttonSets.at(i), SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
@@ -199,7 +193,8 @@ namespace Aseba
 		
 		lastFocus = -1;
 		prevNewActionButton = false;
-		prevNewEventButton = false;	
+		prevNewEventButton = false;
+		advancedMode = false;
 	}
 	
 	void ThymioScene::haveAtLeastAnEmptyCard()
@@ -225,7 +220,12 @@ namespace Aseba
 	{
 		advancedMode = advanced;
 		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
-			(*itr)->setAdvanced(advanced);
+		{
+			ThymioButtonSet* button(*itr);
+			button->disconnect(SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
+			button->setAdvanced(advanced);
+			connect(button, SIGNAL(buttonUpdated()), SLOT(buttonUpdateDetected()));
+		}
 		
 		buttonUpdateDetected();
 	}

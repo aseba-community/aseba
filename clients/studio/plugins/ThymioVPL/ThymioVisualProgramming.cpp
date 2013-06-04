@@ -285,8 +285,8 @@ namespace Aseba
 	{
 		if (scene->isEmpty() || warningDialog()) 
 		{
-			toggleAdvancedMode(false, true);
 			scene->reset();
+			toggleAdvancedMode(false);
 		}
 	}
 
