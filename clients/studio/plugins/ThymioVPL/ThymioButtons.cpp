@@ -14,11 +14,14 @@
 #include <cassert>
 
 #include "ThymioButtons.h"
+#include "Card.h"
+#include "EventCards.h"
+#include "ActionCards.h"
 
 namespace Aseba
 {
 	// Clickable button
-	ThymioClickableButton::ThymioClickableButton (const QRectF rect, const ThymioCardType  type, QGraphicsItem *parent, const QColor& initBrushColor, const QColor& initPenColor) :
+	ThymioClickableButton::ThymioClickableButton (const QRectF rect, const ButtonType  type, QGraphicsItem *parent, const QColor& initBrushColor, const QColor& initPenColor) :
 		QGraphicsObject(parent),
 		buttonType(type),
 		boundingRectangle(rect),
@@ -40,10 +43,10 @@ namespace Aseba
 		
 		switch (buttonType)
 		{
-			case THYMIO_CIRCULAR_BUTTON:
+			case CIRCULAR_BUTTON:
 				painter->drawEllipse(boundingRectangle);
 			break;
-			case THYMIO_TRIANGULAR_BUTTON:
+			case TRIANGULAR_BUTTON:
 			{
 				QPointF points[3];
 				points[0] = (boundingRectangle.topLeft() + boundingRectangle.topRight())*0.5;
@@ -52,7 +55,7 @@ namespace Aseba
 				painter->drawPolygon(points, 3);
 			}
 			break;
-			case THYMIO_QUARTER_CIRCLE_BUTTON:
+			case QUARTER_CIRCLE_BUTTON:
 			{
 				const int x(boundingRectangle.x());
 				const int y(boundingRectangle.y());
@@ -87,55 +90,8 @@ namespace Aseba
 			emit stateChanged();
 		}
 	}
-	
-	// Face Button
-	ThymioFaceButton::ThymioFaceButton ( QRectF rect, ThymioSmileType type, QGraphicsItem *parent ) :
-		ThymioClickableButton( rect, THYMIO_CIRCULAR_BUTTON, parent )
-	{
-		const qreal x = boundingRectangle.x();
-		const qreal y = boundingRectangle.y();
-		const qreal w = boundingRectangle.width();
-		const qreal h = boundingRectangle.height();
-		const qreal s = (w+h)*0.05;
 
-		leftEye = QRectF(x+w*0.3, y+h*0.3, s, s);
-		rightEye = QRectF(x+w*0.7-s, y+h*0.3, s, s);
-		
-		if( type == THYMIO_SMILE_BUTTON ) 
-		{
-			mouth = QRectF(x+w*0.2, y+h*0.2, w*0.6, h*0.6);
-			arcStart = 0;
-			arcEnd = -2880;
-		} 
-		else if( type == THYMIO_FROWN_BUTTON )
-		{
-			mouth = QRectF(x+w*0.2, y+h*0.5, w*0.6, h*0.6);
-			arcStart = 1;
-			arcEnd = 2879;
-		}
-		else
-		{
-			mouth = QRectF(x+w*0.2, y+h*0.6, w*0.6, h*0.05);
-			arcStart = 0;
-			arcEnd = -2880;
-		}
-	}
-
-	void ThymioFaceButton::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
-	{
-		Q_ASSERT(curState < colors.size());
-		painter->setBrush(colors[curState].first);
-		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
-
-		painter->drawEllipse(boundingRectangle);
-
-		painter->setBrush(Qt::black);
-		painter->drawEllipse(leftEye);
-		painter->drawEllipse(rightEye);
-		painter->drawArc(mouth, arcStart, arcEnd);
-	}
-
-	void ThymioCard::ThymioBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void Card::ThymioBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -143,7 +99,7 @@ namespace Aseba
 		drawBody(painter, 0, yShift, up, bodyColor);
 	}
 	
-	void ThymioCard::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
+	void Card::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
 	{
 		// button shape
 		painter->setPen(Qt::NoPen);
@@ -160,33 +116,33 @@ namespace Aseba
 	}
 	
 	//! Factory for buttons
-	ThymioCard* ThymioCard::createButton(const QString& name, bool advancedMode)
+	Card* Card::createButton(const QString& name, bool advancedMode)
 	{
 		if ( name == "button" )
-			return new ThymioButtonsEvent(0, advancedMode);
+			return new ArrowButtonsEventCard(0, advancedMode);
 		else if ( name == "prox" )
-			return new ThymioProxEvent(0, advancedMode);
+			return new ProxEventCard(0, advancedMode);
 		else if ( name == "proxground" )
-			return new ThymioProxGroundEvent(0, advancedMode);
+			return new ProxGroundEventCard(0, advancedMode);
 		else if ( name == "tap" )
-			return new ThymioTapEvent(0, advancedMode);
+			return new TapEventCard(0, advancedMode);
 		else if ( name == "clap" )
-			return new ThymioClapEvent(0, advancedMode);
+			return new ClapEventCard(0, advancedMode);
 		else if ( name == "move" )
-			return new ThymioMoveAction();
+			return new MoveActionCard();
 		else if ( name == "colortop" )
-			return new ThymioColorTopAction();
+			return new TopColorActionCard();
 		else if ( name == "colorbottom" )
-			return new ThymioColorBottomAction();
+			return new BottomColorActionCard();
 		else if ( name == "sound" )
-			return new ThymioSoundAction();
+			return new SoundActionCard();
 		else if ( name == "memory" )
-			return new ThymioMemoryAction();
+			return new StateFilterActionCard();
 		else
 			return 0;
 	}
 	
-	ThymioCard::ThymioCard(bool eventButton, bool advanced, QGraphicsItem *parent) : 
+	Card::Card(bool eventButton, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		buttonIR(),
 		buttonColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
@@ -202,27 +158,15 @@ namespace Aseba
 	}
 	
 
-	ThymioCard::~ThymioCard() 
+	Card::~Card() 
 	{
 		if( buttonIR != 0 ) 
 			delete(buttonIR);
 	}
 	
-	int ThymioCard::getValue(int i) const
-	{
-		if( i<thymioButtons.size() )
-			return thymioButtons.at(i)->getValue();
-		return -1;
-	}
-
-	void ThymioCard::setValue(int i, int status)
-	{
-		if (i < thymioButtons.size())
-			thymioButtons.at(i)->setValue(status);
-		updateIRButtonAndNotify();
-	}
 	
-	ThymioIRButton *ThymioCard::getIRButton()
+	
+	ThymioIRButton *Card::getIRButton()
 	{
 		if (!buttonIR)
 		{
@@ -235,7 +179,7 @@ namespace Aseba
 		return buttonIR;
 	}
 
-	void ThymioCard::updateIRButton()
+	void Card::updateIRButton()
 	{ 
 		if( buttonIR ) 
 		{
@@ -245,18 +189,18 @@ namespace Aseba
 		}
 	}
 	
-	void ThymioCard::updateIRButtonAndNotify()
+	void Card::updateIRButtonAndNotify()
 	{
 		updateIRButton();
 		emit stateChanged();
 	}
 	
-	void ThymioCard::addAdvancedModeButtons()
+	void Card::addAdvancedModeButtons()
 	{
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), ThymioClickableButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(310 + (i%2)*60, 100 + (i/2)*60);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
@@ -267,7 +211,7 @@ namespace Aseba
 		}
 	}
 	
-	void ThymioCard::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void Card::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -278,7 +222,7 @@ namespace Aseba
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
-	QPixmap ThymioCard::image(qreal factor)
+	QPixmap Card::image(qreal factor)
 	{
 		const QRectF br(boundingRect());
 		QPixmap pixmap(br.width()*factor, br.height()*factor);
@@ -293,7 +237,7 @@ namespace Aseba
 		return pixmap;
 	}
 	
-	void ThymioCard::render(QPainter& painter)
+	void Card::render(QPainter& painter)
 	{
 		QStyleOptionGraphicsItem opt;
 		opt.exposedRect = boundingRect();
@@ -310,7 +254,7 @@ namespace Aseba
 		}
 	}
 	
-	QMimeData* ThymioCard::mimeData() const
+	QMimeData* Card::mimeData() const
 	{
 		QByteArray buttonData;
 		QDataStream dataStream(&buttonData, QIODevice::WriteOnly);
@@ -328,21 +272,8 @@ namespace Aseba
 		
 		return mime;
 	}
-	
-	bool ThymioCard::isValid()
-	{
-		if( thymioButtons.isEmpty() )
-			return true;
 
-		for(QList<ThymioClickableButton*>::iterator itr = thymioButtons.begin();
-			itr != thymioButtons.end(); ++itr)
-			if( (*itr)->getValue() > 0 )
-				return true;
-		
-		return false;
-	}
-
-	void ThymioCard::setAdvanced(bool advanced)
+	void Card::setAdvanced(bool advanced)
 	{
 		trans = advanced ? 64 : 0;
 		
@@ -364,7 +295,7 @@ namespace Aseba
 		}
 	}
 
-	bool ThymioCard::isAnyStateFilter() const
+	bool Card::isAnyStateFilter() const
 	{
 		for (int i=0; i<stateButtons.size(); ++i)
 		{
@@ -374,7 +305,7 @@ namespace Aseba
 		return false;
 	}
 	
-	int ThymioCard::getStateFilter() const
+	int Card::getStateFilter() const
 	{
 		if (stateButtons.empty())
 			return -1;
@@ -386,7 +317,7 @@ namespace Aseba
 		return val;
 	}
 	
-	void ThymioCard::setStateFilter(int val)
+	void Card::setStateFilter(int val)
 	{	
 		if( val >= 0 )
 		{
@@ -402,7 +333,7 @@ namespace Aseba
 		
 	}
 
-	void ThymioCard::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	void Card::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
@@ -434,22 +365,49 @@ namespace Aseba
 		#endif // ANDROID
 	}
 	
-	ThymioCardWithBody::ThymioCardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		ThymioCard(eventButton, advanced, parent),
-		up(up)
+	CardWithBody::CardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
+		Card(eventButton, advanced, parent),
+		up(up),
+		bodyColor(Qt::white)
 	{
 	}
 	
-	void ThymioCardWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void CardWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		ThymioCard::paint(painter, option, widget);
-		ThymioBody::drawBody(painter, 128, 128, up, Qt::white);
+		Card::paint(painter, option, widget);
+		ThymioBody::drawBody(painter, 128, 128, up, bodyColor);
 	}
+	
+	
+	CardWithButtons::CardWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
+		CardWithBody(eventButton, up, advanced, parent)
+	{
+	}
+	
+	int CardWithButtons::valuesCount() const
+	{
+		return buttons.size();
+	}
+	
+	int CardWithButtons::getValue(int i) const
+	{
+		if( i<buttons.size() )
+			return buttons.at(i)->getValue();
+		return -1;
+	}
+
+	void CardWithButtons::setValue(int i, int status)
+	{
+		if (i < buttons.size())
+			buttons.at(i)->setValue(status);
+		updateIRButtonAndNotify();
+	}
+	
 	
 	// Thymio Push Button
 	ThymioPushButton::ThymioPushButton(const QString& name, QWidget *parent) : 
 		QPushButton(parent), 
-		thymioButton(ThymioCard::createButton(name))
+		thymioButton(Card::createButton(name))
 	{
 		setToolTip(QString("%0 %1").arg(thymioButton->getName()).arg(thymioButton->getType()));
 		

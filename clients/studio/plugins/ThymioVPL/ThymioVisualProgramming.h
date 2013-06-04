@@ -18,6 +18,7 @@
 #include <iterator>
 #include <QDomDocument>
 
+#include "Card.h"
 #include "ThymioButtons.h"
 #include "ThymioScene.h"
 

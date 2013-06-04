@@ -16,6 +16,8 @@
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
+#include "EventCards.h"
+#include "ActionCards.h"
 #include "../../TargetModels.h"
 
 using namespace std;
@@ -441,7 +443,7 @@ namespace Aseba
 			
 			if( (*itr)->eventExists() ) 
 			{
-				ThymioCard *button = (*itr)->getEventButton();
+				Card *button = (*itr)->getEventButton();
 				element.setAttribute("event-name", button->getName() );
 			
 				for(int i=0; i<button->valuesCount(); ++i)
@@ -451,7 +453,7 @@ namespace Aseba
 			
 			if( (*itr)->actionExists() ) 
 			{
-				ThymioCard *button = (*itr)->getActionButton();
+				Card *button = (*itr)->getActionButton();
 				element.setAttribute("action-name", button->getName() );
 				for(int i=0; i<button->valuesCount(); ++i)
 					element.setAttribute(QString("ab%0").arg(i), button->getValue(i));
@@ -486,12 +488,12 @@ namespace Aseba
 				else if(element.tagName() == "buttonset")
 				{
 					QString buttonName;
-					ThymioCard *eventButton = 0;
-					ThymioCard *actionButton = 0;
+					Card *eventButton = 0;
+					Card *actionButton = 0;
 					
 					if( !(buttonName = element.attribute("event-name")).isEmpty() )
 					{
-						eventButton = ThymioCard::createButton(buttonName,scene->getAdvanced());
+						eventButton = Card::createButton(buttonName,scene->getAdvanced());
 						if (!eventButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),
@@ -506,7 +508,7 @@ namespace Aseba
 					
 					if( !(buttonName = element.attribute("action-name")).isEmpty() )
 					{
-						actionButton = ThymioCard::createButton(buttonName,scene->getAdvanced());
+						actionButton = Card::createButton(buttonName,scene->getAdvanced());
 						if (!actionButton)
 						{
 							QMessageBox::warning(this,tr("Loading"),
@@ -551,70 +553,70 @@ namespace Aseba
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ThymioButtonsEvent *button = new ThymioButtonsEvent(0, scene->getAdvanced());
+		ArrowButtonsEventCard *button = new ArrowButtonsEventCard(0, scene->getAdvanced());
 		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ThymioProxEvent *button = new ThymioProxEvent(0, scene->getAdvanced());
+		ProxEventCard *button = new ProxEventCard(0, scene->getAdvanced());
 		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ThymioProxGroundEvent *button = new ThymioProxGroundEvent(0, scene->getAdvanced());
+		ProxGroundEventCard *button = new ProxGroundEventCard(0, scene->getAdvanced());
 		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}	
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		ThymioTapEvent *button = new ThymioTapEvent(0, scene->getAdvanced());
+		TapEventCard *button = new TapEventCard(0, scene->getAdvanced());
 		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ThymioClapEvent *button = new ThymioClapEvent(0, scene->getAdvanced());
+		ClapEventCard *button = new ClapEventCard(0, scene->getAdvanced());
 		//scene->setFocus();
 		view->centerOn(scene->addEvent(button));
 	}
 	
 	void ThymioVisualProgramming::addMoveAction()
 	{
-		ThymioMoveAction *button = new ThymioMoveAction();
+		MoveActionCard *button = new MoveActionCard();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 	
 	void ThymioVisualProgramming::addColorTopAction()
 	{
-		ThymioColorAction *button = new ThymioColorTopAction();
+		ColorActionCard *button = new TopColorActionCard();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 	
 	void ThymioVisualProgramming::addColorBottomAction()
 	{
-		ThymioColorAction *button = new ThymioColorBottomAction();
+		ColorActionCard *button = new BottomColorActionCard();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 
 	void ThymioVisualProgramming::addSoundAction()
 	{
-		ThymioSoundAction *button = new ThymioSoundAction();
+		SoundActionCard *button = new SoundActionCard();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}
 
 	void ThymioVisualProgramming::addMemoryAction()
 	{
-		ThymioMemoryAction *button = new ThymioMemoryAction();
+		StateFilterActionCard *button = new StateFilterActionCard();
 		//scene->setFocus();
 		view->centerOn(scene->addAction(button));
 	}

@@ -1,5 +1,5 @@
-#ifndef THYMIO_BUTTON_SET_H
-#define THYMIO_BUTTON_SET_H
+#ifndef VPL_EVENT_ACTION_PAIR_H
+#define VPL_EVENT_ACTION_PAIR_H
 
 #include <QGraphicsItem>
 
@@ -10,9 +10,9 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class ThymioCard;
+	class Card;
 	
-	class ThymioButtonSet : public QGraphicsObject
+	class EventActionPair : public QGraphicsObject
 	{
 		Q_OBJECT
 		
@@ -33,18 +33,18 @@ namespace Aseba
 			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
 		
-		ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent=0);
+		EventActionPair(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
 		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1028, 336) : QRectF(0, 0, 900, 336); }
 
-		void addEventButton(ThymioCard *event);
-		void addActionButton(ThymioCard *action);
+		void addEventButton(Card *event);
+		void addActionButton(Card *action);
 		void setRow(int row);
 		int getRow() const { return data(1).toInt(); }
-		ThymioCard *getEventButton() { return eventButton; }
-		ThymioCard *getActionButton() { return actionButton; }
+		Card *getEventButton() { return eventButton; }
+		Card *getActionButton() { return actionButton; }
 		
 		bool eventExists() const { return eventButton == 0 ? false : true; }
 		bool actionExists() const { return actionButton == 0 ? false : true; }
@@ -68,8 +68,8 @@ namespace Aseba
 		void repositionElements();
 	
 	private:
-		ThymioCard *eventButton;
-		ThymioCard *actionButton;
+		Card *eventButton;
+		Card *actionButton;
 		ThymioRemoveButton *deleteButton;
 		ThymioAddButton *addButton;
 		ThymioIRButtonSet buttonSetIR;

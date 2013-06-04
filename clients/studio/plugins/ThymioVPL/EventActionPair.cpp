@@ -12,12 +12,14 @@
 #include <cassert>
 #include <typeinfo>
 
-#include "ThymioButtonSet.h"
+#include "EventActionPair.h"
 #include "ThymioButtons.h"
+#include "Card.h"
+#include "ActionCards.h"
 
 namespace Aseba
 {
-	ThymioButtonSet::ThymioRemoveButton::ThymioRemoveButton(QGraphicsItem *parent) : 
+	EventActionPair::ThymioRemoveButton::ThymioRemoveButton(QGraphicsItem *parent) : 
 		QGraphicsItem(parent) 
 	{
 		setFlag(QGraphicsItem::ItemIsFocusable);
@@ -27,7 +29,7 @@ namespace Aseba
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
 	
-	void ThymioButtonSet::ThymioRemoveButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void EventActionPair::ThymioRemoveButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -47,7 +49,7 @@ namespace Aseba
 		painter->drawLine(-11,11,11,-11);
 	}
 
-	ThymioButtonSet::ThymioAddButton::ThymioAddButton(QGraphicsItem *parent) : 
+	EventActionPair::ThymioAddButton::ThymioAddButton(QGraphicsItem *parent) : 
 		QGraphicsItem(parent) 
 	{ 
 		setFlag(QGraphicsItem::ItemIsFocusable);
@@ -57,7 +59,7 @@ namespace Aseba
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
 	
-	void ThymioButtonSet::ThymioAddButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void EventActionPair::ThymioAddButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -77,7 +79,7 @@ namespace Aseba
 		painter->drawLine(0,-16,0,16);
 	}
 
-	ThymioButtonSet::ThymioButtonSet(int row, bool advanced, QGraphicsItem *parent) : 
+	EventActionPair::EventActionPair(int row, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		eventButton(0),
 		actionButton(0),
@@ -105,7 +107,7 @@ namespace Aseba
 		repositionElements();
 	}
 	
-	void ThymioButtonSet::repositionElements()
+	void EventActionPair::repositionElements()
 	{
 		if (advancedMode)
 		{
@@ -128,7 +130,7 @@ namespace Aseba
 		prepareGeometryChange();
 	}
 	
-	void ThymioButtonSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void EventActionPair::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -209,7 +211,7 @@ namespace Aseba
 		}
 	}
 	
-	bool ThymioButtonSet::isAnyStateFilter() const
+	bool EventActionPair::isAnyStateFilter() const
 	{
 		if (eventButton && eventButton->isAnyStateFilter())
 			return true;
@@ -218,7 +220,7 @@ namespace Aseba
 		return false;
 	}
 
-	void ThymioButtonSet::setColorScheme(QColor eventColor, QColor actionColor)
+	void EventActionPair::setColorScheme(QColor eventColor, QColor actionColor)
 	{
 		eventButtonColor = eventColor;
 		actionButtonColor = actionColor;
@@ -229,7 +231,7 @@ namespace Aseba
 			actionButton->setButtonColor(actionColor);
 	}
 
-	void ThymioButtonSet::setRow(int row) 
+	void EventActionPair::setRow(int row) 
 	{ 
 		setData(1,row); 
 		if( eventButton )
@@ -239,7 +241,7 @@ namespace Aseba
 		setPos(xpos, (row*420+20)*scale());
 	}
 
-	void ThymioButtonSet::addEventButton(ThymioCard *event) 
+	void EventActionPair::addEventButton(Card *event) 
 	{ 
 		if( eventButton ) 
 		{
@@ -260,7 +262,7 @@ namespace Aseba
 		connect(eventButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 	}
 
-	void ThymioButtonSet::addActionButton(ThymioCard *action) 
+	void EventActionPair::addActionButton(Card *action) 
 	{ 
 		if( actionButton )
 		{
@@ -281,13 +283,13 @@ namespace Aseba
 		connect(actionButton, SIGNAL(stateChanged()), this, SLOT(stateChanged()));
 	}
 	
-	void ThymioButtonSet::setAdvanced(bool advanced)
+	void EventActionPair::setAdvanced(bool advanced)
 	{
 		advancedMode = advanced;
 		if (eventButton)
 			eventButton->setAdvanced(advanced);
 		// remove any "state setter" action card
-		if (!advanced && actionButton && typeid(*actionButton) == typeid(ThymioMemoryAction))
+		if (!advanced && actionButton && typeid(*actionButton) == typeid(StateFilterActionCard))
 		{
 			scene()->removeItem(actionButton);
 			delete actionButton;
@@ -298,14 +300,14 @@ namespace Aseba
 		repositionElements();
 	}
 
-	void ThymioButtonSet::stateChanged()
+	void EventActionPair::stateChanged()
 	{
 		emit buttonUpdated();
 	}
 	
-	void ThymioButtonSet::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
+	void EventActionPair::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("thymiobuttonset") || 
+		if ( event->mimeData()->hasFormat("EventActionPair") || 
 			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
@@ -325,9 +327,9 @@ namespace Aseba
 			event->ignore();
 	}
 
-	void ThymioButtonSet::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
+	void EventActionPair::dragMoveEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		/*if ( event->mimeData()->hasFormat("thymiobuttonset") ||
+		/*if ( event->mimeData()->hasFormat("EventActionPair") ||
 			 event->mimeData()->hasFormat("thymiobutton") )
 		{
 			if( event->mimeData()->hasFormat("thymiotype") )
@@ -348,10 +350,10 @@ namespace Aseba
 		QGraphicsObject::dragMoveEvent(event);
 	}
 	
-	void ThymioButtonSet::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+	void EventActionPair::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		if ( event->mimeData()->hasFormat("thymiobutton") || 
-			 event->mimeData()->hasFormat("thymiobuttonset") )
+			 event->mimeData()->hasFormat("EventActionPair") )
 		{
 			highlightEventButton = false;
 			highlightActionButton = false;
@@ -363,7 +365,7 @@ namespace Aseba
 			event->ignore();
 	}
 
-	void ThymioButtonSet::dropEvent(QGraphicsSceneDragDropEvent *event)
+	void EventActionPair::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		scene()->setFocusItem(0);
 	
@@ -381,7 +383,7 @@ namespace Aseba
 				int state;
 				dataStream >> buttonName >> state;
 				
-				ThymioCard *button(ThymioCard::createButton(buttonName, advancedMode));
+				Card *button(Card::createButton(buttonName, advancedMode));
 				if( button ) 
 				{
 					event->setDropAction(Qt::MoveAction);
@@ -427,7 +429,7 @@ namespace Aseba
 			event->ignore();
 	}
 
-	void ThymioButtonSet::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	void EventActionPair::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
@@ -439,7 +441,7 @@ namespace Aseba
 		dataStream << getRow();
 
 		QMimeData *mime = new QMimeData;
-		mime->setData("thymiobuttonset", buttonData);
+		mime->setData("EventActionPair", buttonData);
 		
 		Q_ASSERT(scene()->views().size() > 0);
 		QGraphicsView* view(scene()->views()[0]);

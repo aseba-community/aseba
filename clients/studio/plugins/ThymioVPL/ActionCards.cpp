@@ -7,13 +7,14 @@
 #include <QGraphicsSvgItem>
 #include <QtCore/qmath.h>
 
+#include "ActionCards.h"
 #include "ThymioButtons.h"
 
 namespace Aseba
 {
 	// Move Action
-	ThymioMoveAction::ThymioMoveAction( QGraphicsItem *parent ) :
-		ThymioCard(false, false, parent)
+	MoveActionCard::MoveActionCard( QGraphicsItem *parent ) :
+		Card(false, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "move");
@@ -57,11 +58,11 @@ namespace Aseba
 		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
 	}
 
-	ThymioMoveAction::~ThymioMoveAction()
+	MoveActionCard::~MoveActionCard()
 	{
 	}
 	
-	void ThymioMoveAction::frameChanged(int frame)
+	void MoveActionCard::frameChanged(int frame)
 	{
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
@@ -75,28 +76,28 @@ namespace Aseba
 		thymioBody->setRotation(angle);
 	}
 
-	void ThymioMoveAction::valueChangeDetected()
+	void MoveActionCard::valueChangeDetected()
 	{
 		timer->stop();
 		timer->start();
 	}
 	
-	int ThymioMoveAction::getValue(int i) const
+	int MoveActionCard::getValue(int i) const
 	{ 
 		if (i<sliders.size()) 
 			return sliders[i]->value()*50;
 		return -1;
 	}
 
-	void ThymioMoveAction::setValue(int i, int value) 
+	void MoveActionCard::setValue(int i, int value) 
 	{ 
 		if(i<sliders.size()) 
 			sliders[i]->setSliderPosition(value/50);
 	}
 	
 	// Color Action
-	ThymioColorAction::ThymioColorAction( QGraphicsItem *parent, bool top) :
-		ThymioCardWithBody(false, top, false, parent)
+	ColorActionCard::ColorActionCard( QGraphicsItem *parent, bool top) :
+		CardWithBody(false, top, false, parent)
 	{
 		setData(0, "action");
 		if (top)
@@ -136,106 +137,123 @@ namespace Aseba
 		}
 	}
 
-	int ThymioColorAction::getValue(int i) const
+	int ColorActionCard::getValue(int i) const
 	{ 
 		if(i<sliders.size()) 
 			return sliders[i]->value(); 
 		return -1;
 	}
 	
-	void ThymioColorAction::setValue(int i, int status) 
+	void ColorActionCard::setValue(int i, int status) 
 	{ 
 		if(i<sliders.size()) 
 			sliders[i]->setSliderPosition(status);
 	}
 	
-	void ThymioColorAction::valueChangeDetected()
+	void ColorActionCard::valueChangeDetected()
 	{
 		update();
 	}
 	
-	void ThymioColorAction::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void ColorActionCard::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		ThymioCard::paint(painter, option, widget);
-		const QColor bodyColor( sliders[0]->value()*5.46875+80, 
-								sliders[1]->value()*5.46875+80, 
-								sliders[2]->value()*5.46875+80);
-		ThymioBody::drawBody(painter, 128, 128, up, bodyColor);
+		bodyColor = QColor( sliders[0]->value()*5.46875+80, 
+							sliders[1]->value()*5.46875+80, 
+							sliders[2]->value()*5.46875+80);
+		CardWithBody::paint(painter, option, widget);
 	}
 	
-	ThymioColorTopAction::ThymioColorTopAction(QGraphicsItem *parent):
-		ThymioColorAction(parent, true)
+	TopColorActionCard::TopColorActionCard(QGraphicsItem *parent):
+		ColorActionCard(parent, true)
 	{}
 	
-	ThymioColorBottomAction::ThymioColorBottomAction(QGraphicsItem *parent):
-		ThymioColorAction(parent, false)
+	BottomColorActionCard::BottomColorActionCard(QGraphicsItem *parent):
+		ColorActionCard(parent, false)
 	{}
 	
 	// Sound Action
-	ThymioSoundAction::ThymioSoundAction(QGraphicsItem *parent) :
-		ThymioCardWithBody(false, true, false, parent)
+	SoundActionCard::SoundActionCard(QGraphicsItem *parent) :
+		CardWithBody(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "sound");
 		
-		notes[0] = 0;
-		notes[1] = 2;
-		notes[2] = 3;
-		notes[3] = 5;
-		notes[4] = 5;
-		notes[5] = 3;
-		notes[6] = 2;
-		notes[7] = 0;
+		notes[0] = 3; durations[0] = 1;
+		notes[1] = 4; durations[1] = 1;
+		notes[2] = 3; durations[2] = 2;
+		notes[3] = 2; durations[3] = 1;
+		notes[4] = 1; durations[4] = 1;
+		notes[5] = 2; durations[5] = 2;
 		
 		new QGraphicsSvgItem (":/images/notes.svgz", this);
 	}
 	
-	void ThymioSoundAction::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void SoundActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		ThymioCardWithBody::paint(painter, option, widget);
+		CardWithBody::paint(painter, option, widget);
 		
-		painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
-		for (int row = 0; row < 6; ++row)
+		painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
+		for (unsigned row = 0; row < 5; ++row)
 		{
-			for (int col = 0; col < 8; ++col)
+			
+			painter->fillRect(17, 60 + row*37, 222, 37, QColor::fromHsv((5-row)*51, 100, 255));
+			for (unsigned col = 0; col < 6; ++col)
 			{
-				if (notes[col] == 5-row)
-					painter->setBrush(Qt::black);
-				else
-					painter->setBrush(QColor::fromHsv((5-row)*42, 80, 255));
-				painter->drawRect(28 + col*25, 88 + row*25, 25, 25);
+				if (notes[col] == 4-row)
+				{
+					if (durations[col] == 2)
+					{
+						painter->setPen(QPen(Qt::black, 4, Qt::SolidLine));
+						painter->setBrush(Qt::white);
+						painter->drawEllipse(17 + col*37 + 3, 60 + row*37 + 3, 31, 31);
+						
+					}
+					else
+					{
+						painter->setPen(Qt::NoPen);
+						painter->setBrush(Qt::black);
+						painter->drawEllipse(17 + col*37 + 2, 60 + row*37 + 2, 33, 33);
+					}
+				}
 			}
 		}
 	}
 	
-	void ThymioSoundAction::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	void SoundActionCard::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
 		{
 			const QPointF& pos(event->pos());
-			if (QRectF(28,78,200,150).contains(pos))
+			if (QRectF(17,60,220,185).contains(pos))
 			{
-				notes[(int(pos.x())-28)/25] = 5-(int(pos.y())-88)/25;
+				const size_t noteIdx((int(pos.x())-17)/37);
+				const size_t noteVal(4-(int(pos.y())-60)/37);
+				unsigned& note(notes[noteIdx]);
+				
+				if (note == noteVal)
+					durations[noteIdx] = (durations[noteIdx] % 2) + 1;
+				else
+					note = noteVal;
 			}
 			update();
 			updateIRButtonAndNotify();
 		}
 	}
 	
-	int ThymioSoundAction::getValue(int i) const
+	int SoundActionCard::getValue(int i) const
 	{ 
-		if (i<8) 
-			return notes[i]; 
+		if (i<6) 
+			return notes[i] | (durations[i] << 8); 
 		return -1;
 	}
 	
 	// TODO: FIXME: use size_t for index
-	void ThymioSoundAction::setValue(int i, int value) 
+	void SoundActionCard::setValue(int i, int value) 
 	{ 
-		if (i<8) 
+		if (i<6) 
 		{
 			notes[i] = value;
 			update();
@@ -243,9 +261,9 @@ namespace Aseba
 		}
 	}
 
-	// Memory Action
-	ThymioMemoryAction::ThymioMemoryAction(QGraphicsItem *parent) : 
-		ThymioCardWithBody(false, true, false, parent)
+	// State Filter Action
+	StateFilterActionCard::StateFilterActionCard(QGraphicsItem *parent) : 
+		CardWithButtons(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "memory");
@@ -253,13 +271,13 @@ namespace Aseba
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), THYMIO_QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), ThymioClickableButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(98 + (i%2)*60, 98 + (i/2)*60);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
 			button->addState(Qt::white);
 
-			thymioButtons.push_back(button);
+			buttons.push_back(button);
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 	}	

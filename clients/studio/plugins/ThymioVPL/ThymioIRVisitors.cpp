@@ -223,8 +223,21 @@ namespace Aseba
 		}
 		if (useSound)
 		{
-			text += L"var notes[8]\n";
-			text += L"var note_index = 8\n";
+			text += L"# variables for notes\n";
+			text += L"var notes[6]\n";
+			text += L"var durations[6]\n";
+			text += L"var note_index = 6\n";
+			text += L"var wave[142]\n";
+			text += L"var i\n";
+			text += L"var angle\n";
+			text += L"var cos_result\n";
+			text += L"\n# compute a sinus wave for sound\n";
+			text += L"for i in 0:141 do\n";
+			text += L"\tangle = (i-70)*468\n";
+			text += L"\tcall math.cos(cos_result, angle)\n";
+			text += L"\twave[i] = cos_result/256\n";
+			text += L"end\n";
+			text += L"call sound.wave(wave)\n";
 		}
 		if (useMicrophone)
 		{
@@ -244,8 +257,8 @@ namespace Aseba
 		if (useSound)
 		{
 			text += L"\nonevent sound.finished\n";
-			text += L"\tif note_index != 8 then\n";
-			text += L"\t\tcall sound.freq(notes[note_index], 15)\n";
+			text += L"\tif note_index != 6 then\n";
+			text += L"\t\tcall sound.freq(notes[note_index], durations[note_index])\n";
 			text += L"\t\tnote_index += 1\n";
 			text += L"\tend\n";
 		}
@@ -433,20 +446,32 @@ namespace Aseba
 				text += L")\n";
 				break;
 			case THYMIO_SOUND_IR:
+				static const int noteTable[5] = { 262, 294, 330, 392, 440 };
+				static const int durationTable[3] = {-1, 20, 40};
+				// notes
 				text += indString;
 				text += L"call math.copy(notes, [";
-				static const int noteTable[6] = { 262, 294, 330, 392, 440, 523 };
 				for (size_t i = 0; i<button->valuesCount(); ++i)
 				{
-					Q_ASSERT(button->getValue(i) >= 0);
-					Q_ASSERT(button->getValue(i) < 6);
-					text += toWstring(noteTable[button->getValue(i)]);
+					const unsigned note(button->getValue(i) & 0xff);
+					text += toWstring(noteTable[note]);
 					if (i+1 != button->valuesCount())
 						text += L", ";
 				}
 				text += L"])\n";
 				text += indString;
-				text += L"call sound.freq(notes[0], 15)\n";
+				// durations
+				text += L"call math.copy(durations, [";
+				for (size_t i = 0; i<button->valuesCount(); ++i)
+				{
+					const unsigned duration((button->getValue(i)>>8) & 0xff);
+					text += toWstring(durationTable[duration]);
+					if (i+1 != button->valuesCount())
+						text += L", ";
+				}
+				text += L"])\n";
+				text += indString;
+				text += L"call sound.freq(notes[0], durations[0])\n";
 				text += indString;
 				text += L"note_index = 1\n";
 				break;

@@ -2,9 +2,8 @@
 #include <QMimeData>
 #include <QDebug>
 
-#include "ThymioButtons.h"
-
 #include "ThymioScene.h"
+#include "Card.h"
 
 using namespace std;
 
@@ -24,7 +23,7 @@ namespace Aseba
 		advancedMode(false)
 	{
 		// create initial button
-		ThymioButtonSet *button = createNewButtonSet();
+		EventActionPair *button = createNewButtonSet();
 		buttonSetHeight = button->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), this, SIGNAL(stateChanged()));
@@ -35,9 +34,9 @@ namespace Aseba
 		clear();
 	}
 
-	QGraphicsItem *ThymioScene::addAction(ThymioCard *item) 
+	QGraphicsItem *ThymioScene::addAction(Card *item) 
 	{
-		ThymioButtonSet *button = 0; 
+		EventActionPair *button = 0; 
 		prevNewActionButton = false;
 		
 		if( newRow )
@@ -81,9 +80,9 @@ namespace Aseba
 		return button;
 	}
 
-	QGraphicsItem *ThymioScene::addEvent(ThymioCard *item) 
+	QGraphicsItem *ThymioScene::addEvent(Card *item) 
 	{
-		ThymioButtonSet *button = 0; 
+		EventActionPair *button = 0; 
 		prevNewEventButton = false;
 
 		if( newRow )
@@ -129,9 +128,9 @@ namespace Aseba
 		return button;
 	}
 
-	void ThymioScene::addButtonSet(ThymioCard *event, ThymioCard *action)
+	void ThymioScene::addButtonSet(Card *event, Card *action)
 	{
-		ThymioButtonSet *button = createNewButtonSet();
+		EventActionPair *button = createNewButtonSet();
 		if(event)
 			button->addEventButton(event);
 		if(action)
@@ -144,9 +143,9 @@ namespace Aseba
 		newRow = false;
 	}
 
-	ThymioButtonSet *ThymioScene::createNewButtonSet()
+	EventActionPair *ThymioScene::createNewButtonSet()
 	{
-		ThymioButtonSet *button = new ThymioButtonSet(buttonSets.size(), advancedMode);
+		EventActionPair *button = new EventActionPair(buttonSets.size(), advancedMode);
 		button->setColorScheme(eventButtonColor, actionButtonColor);
 		buttonSets.push_back(button);
 		
@@ -221,7 +220,7 @@ namespace Aseba
 		advancedMode = advanced;
 		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
 		{
-			ThymioButtonSet* button(*itr);
+			EventActionPair* button(*itr);
 			button->disconnect(SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 			button->setAdvanced(advanced);
 			connect(button, SIGNAL(buttonUpdated()), SLOT(buttonUpdateDetected()));
@@ -242,7 +241,7 @@ namespace Aseba
 	{
 		Q_ASSERT( row < buttonSets.size() );
 		
-		ThymioButtonSet *button = buttonSets[row];
+		EventActionPair *button = buttonSets[row];
 		disconnect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 		buttonSets.removeAt(row);
 		thymioCompiler.removeButtonSet(row);
@@ -268,7 +267,7 @@ namespace Aseba
 	{
 		Q_ASSERT( row <= buttonSets.size() );
 
-		ThymioButtonSet *button = new ThymioButtonSet(row, advancedMode);
+		EventActionPair *button = new EventActionPair(row, advancedMode);
 		button->setColorScheme(eventButtonColor, actionButtonColor);
 		buttonSets.insert(row, button);
 		addItem(button);
@@ -375,15 +374,15 @@ namespace Aseba
 	
 	void ThymioScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if ( event->mimeData()->hasFormat("thymiobuttonset") )
+		if ( event->mimeData()->hasFormat("EventActionPair") )
 		{
-			QByteArray buttonData = event->mimeData()->data("thymiobuttonset");
+			QByteArray buttonData = event->mimeData()->data("EventActionPair");
 			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
 
 			int prevRow, currentRow;
 			dataStream >> prevRow;
 			
-			ThymioButtonSet *button = buttonSets.at(prevRow);
+			EventActionPair *button = buttonSets.at(prevRow);
 			buttonSets.removeAt(prevRow);
 			thymioCompiler.removeButtonSet(prevRow);
 
@@ -417,7 +416,7 @@ namespace Aseba
 			int numButtons;
 			dataStream >> buttonName >> numButtons;
 			
-			ThymioCard *button(ThymioCard::createButton(buttonName, advancedMode));
+			Card *button(Card::createButton(buttonName, advancedMode));
 			if( button ) 
 			{
 				event->setDropAction(Qt::MoveAction);

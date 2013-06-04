@@ -2,9 +2,7 @@
 #define THYMIO_SCENE_H
 
 #include <QGraphicsScene>
-
-#include "ThymioButtons.h"
-#include "ThymioButtonSet.h"
+#include "EventActionPair.h"
 
 namespace Aseba
 {	
@@ -16,9 +14,9 @@ namespace Aseba
 		ThymioScene(QObject *parent = 0);
 		~ThymioScene();
 		
-		QGraphicsItem *addAction(ThymioCard *item);
-		QGraphicsItem *addEvent(ThymioCard *item);
-		void addButtonSet(ThymioCard *event, ThymioCard *action);
+		QGraphicsItem *addAction(Card *item);
+		QGraphicsItem *addEvent(Card *item);
+		void addButtonSet(Card *event, Card *action);
 
 		bool isEmpty() const;
 		void reset();
@@ -39,8 +37,8 @@ namespace Aseba
 		bool isSuccessful() const { return  thymioCompiler.isSuccessful(); }
 		int getFocusItemId() const;
 		
-		typedef QList<ThymioButtonSet *>::iterator ButtonSetItr;
-		typedef QList<ThymioButtonSet *>::const_iterator ButtonSetConstItr;
+		typedef QList<EventActionPair *>::iterator ButtonSetItr;
+		typedef QList<EventActionPair *>::const_iterator ButtonSetConstItr;
 		
 		ButtonSetItr buttonsBegin() { return buttonSets.begin(); }
 		ButtonSetItr buttonsEnd() { return buttonSets.end(); }
@@ -63,13 +61,13 @@ namespace Aseba
 		void insertButton(int row);
 		void rearrangeButtons(int row=0);
 		
-		ThymioButtonSet *createNewButtonSet();
+		EventActionPair *createNewButtonSet();
 
 		bool prevNewEventButton;
 		bool prevNewActionButton;
 		int lastFocus;
 		
-		QList<ThymioButtonSet *> buttonSets;
+		QList<EventActionPair *> buttonSets;
 		ThymioCompiler thymioCompiler;
 		
 		QColor eventButtonColor;

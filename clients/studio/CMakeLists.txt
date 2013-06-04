@@ -79,9 +79,9 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
 		plugins/ThymioVPL/ThymioScene.cpp
 		plugins/ThymioVPL/ThymioButtons.cpp
-		plugins/ThymioVPL/ThymioButtonSet.cpp
-		plugins/ThymioVPL/ThymioEventButtons.cpp
-		plugins/ThymioVPL/ThymioActionButtons.cpp
+		plugins/ThymioVPL/EventActionPair.cpp
+		plugins/ThymioVPL/EventCards.cpp
+		plugins/ThymioVPL/ActionCards.cpp
 		plugins/ThymioVPL/ThymioIRButtons.cpp
 		plugins/ThymioVPL/ThymioIRVisitors.cpp
 		plugins/ThymioVPL/ThymioCompiler.cpp
@@ -91,7 +91,9 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/ThymioVisualProgramming.h
 		plugins/ThymioVPL/ThymioScene.h
 		plugins/ThymioVPL/ThymioButtons.h
-		plugins/ThymioVPL/ThymioButtonSet.h
+		plugins/ThymioVPL/Card.h
+		plugins/ThymioVPL/ActionCards.h
+		plugins/ThymioVPL/EventActionPair.h
 	)
 	add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 	
