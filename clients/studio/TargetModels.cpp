@@ -715,5 +715,18 @@ namespace Aseba
 	}
 	
 	
+	
+	TargetSubroutinesModel::TargetSubroutinesModel(QObject * parent):
+		QStringListModel(parent)
+	{}
+	
+	void TargetSubroutinesModel::updateSubroutineTable(const Compiler::SubroutineTable& subroutineTable)
+	{
+		QStringList subroutineNames;
+		for (Compiler::SubroutineTable::const_iterator it = subroutineTable.begin(); it != subroutineTable.end(); ++it)
+			subroutineNames.push_back(QString::fromStdWString(it->name));
+		setStringList(subroutineNames);
+	}
+	
 	/*@}*/
 }; // Aseba

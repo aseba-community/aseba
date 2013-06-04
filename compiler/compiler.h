@@ -362,6 +362,7 @@ namespace Aseba
 		void setTargetDescription(const TargetDescription *description);
 		const TargetDescription *getTargetDescription() const { return targetDescription;}
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
+		const SubroutineTable *getSubroutineTable() const { return &subroutineTable; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
 		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }

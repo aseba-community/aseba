@@ -144,6 +144,7 @@ namespace Aseba
 		VarDefContext,
 		LeftValueContext,
 		FunctionContext,
+		SubroutineCallContext,
 		EventContext,
 		GeneralContext
 	};

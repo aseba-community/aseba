@@ -197,6 +197,7 @@ namespace Aseba
 			BytecodeVector bytecode;
 			unsigned allocatedVariablesCount;
 			Compiler::VariablesMap variablesMap;
+			Compiler::SubroutineTable subroutineTable;
 			Error error;
 			std::wostringstream compilationMessages;
 			
@@ -321,6 +322,7 @@ namespace Aseba
 		QSignalMapper *signalMapper;
 		
 		TargetVariablesModel *vmMemoryModel;
+		TargetSubroutinesModel *vmSubroutinesModel;
 		QTreeView *vmMemoryView;
 		QLineEdit *vmMemoryFilter;
 		

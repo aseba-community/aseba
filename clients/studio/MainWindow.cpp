@@ -354,6 +354,9 @@ namespace Aseba
 		// create the chainsaw filter for native functions
 		functionsFlatModel = new TreeChainsawFilter(this);
 		functionsFlatModel->setSourceModel(vmFunctionsModel);
+		
+		// create the model for subroutines
+		vmSubroutinesModel = new TargetSubroutinesModel(this);
 
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -1018,7 +1021,10 @@ namespace Aseba
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
 		
 		if (result->success)
+		{
 			result->variablesMap = *compiler.getVariablesMap();
+			result->subroutineTable = *compiler.getSubroutineTable();
+		}
 		
 		return result;
 	}
@@ -1103,6 +1109,7 @@ namespace Aseba
 			bytecode = result->bytecode;
 			allocatedVariablesCount = result->allocatedVariablesCount;
 			vmMemoryModel->updateVariablesStructure(&result->variablesMap);
+			vmSubroutinesModel->updateSubroutineTable(result->subroutineTable);
 			
 			updateHidden();
 			compilationResultText->setText(tr("Compilation success."));
@@ -1191,6 +1198,7 @@ namespace Aseba
 //		qDebug() << "New context: " << context;
 		disconnect(mainWindow->eventsDescriptionsModel, 0, sortingProxy, 0);
 
+		// FIXME: code duplication, I let Florian clean it
 		if ((context == GeneralContext) || (context == UnknownContext))
 		{
 			sortingProxy->setSourceModel(variableAggregator);
@@ -1204,12 +1212,20 @@ namespace Aseba
 			editor->setCompleterModel(sortingProxy);	// only variables
 		}
 		else if (context == VarDefContext)
+		{
 			editor->setCompleterModel(0);		// disable auto-completion in this case
+		}
 		else if (context == FunctionContext)
 		{
 			sortingProxy->setSourceModel(functionsFlatModel);
 			sortingProxy->sort(0);
 			editor->setCompleterModel(sortingProxy);	// native functions
+		}
+		else if (context == SubroutineCallContext)
+		{
+			sortingProxy->setSourceModel(vmSubroutinesModel);
+			sortingProxy->sort(0);
+			editor->setCompleterModel(sortingProxy);	// subroutines
 		}
 		else if (context == EventContext)
 		{

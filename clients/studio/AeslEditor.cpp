@@ -821,6 +821,8 @@ namespace Aseba
 
 		if (previous == "call")
 			currentContext = FunctionContext;
+		else if (previous == "callsub")
+			currentContext = SubroutineCallContext;
 		else if (previous == "onevent" || previous == "emit")
 			currentContext = EventContext;
 		else if (vardefRegexp.indexIn(line) != -1)

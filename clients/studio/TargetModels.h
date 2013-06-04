@@ -23,6 +23,7 @@
 
 #include <QAbstractTableModel>
 #include <QAbstractItemModel>
+#include <QStringListModel>
 #include <QVector>
 #include <QList>
 #include <QString>
@@ -164,6 +165,14 @@ namespace Aseba
 		TreeItem* root; //!< root of functions description tree
 		const TargetDescription *descriptionRead; //!< description for read access
 		QRegExp regExp;
+	};
+	
+	class TargetSubroutinesModel: public QStringListModel 
+	{
+	public:
+		TargetSubroutinesModel(QObject * parent = 0);
+	
+		void updateSubroutineTable(const Compiler::SubroutineTable& subroutineTable);
 	};
 	
 	/*@}*/
