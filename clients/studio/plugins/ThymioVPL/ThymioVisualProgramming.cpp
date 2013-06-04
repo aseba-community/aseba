@@ -28,7 +28,6 @@ namespace Aseba
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
-
 		setMinimumSize(QSize(400,400));
 		
 		mainLayout = new QVBoxLayout(this);
@@ -165,8 +164,8 @@ namespace Aseba
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		//view->ensureVisible(scene->sceneRect());
 		sceneLayout->addWidget(view);
+		Q_ASSERT(scene->buttonsEnd() - scene->buttonsBegin());
 		view->centerOn(*scene->buttonsBegin());
 		
 		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
@@ -421,11 +420,7 @@ namespace Aseba
 	{
 		// if VPL is in its virign state, do not return a valid document
 		// to prevent erasing of text-base code
-		if (scene->getNumberOfButtonSets() == 0)
-			return QDomDocument();
-		if ((scene->getNumberOfButtonSets() == 1) &&
-			(!(*scene->buttonsBegin())->eventExists()) &&
-			(!(*scene->buttonsBegin())->actionExists()))
+		if (scene->isEmpty())
 			return QDomDocument();
 		
 		QDomDocument document("tool-plugin-data");
@@ -529,6 +524,7 @@ namespace Aseba
 			domNode = domNode.nextSibling();
 		}
 		
+		scene->haveAtLeastAnEmptyCard();
 		scene->setModified(!fromFile);
 		
 		if (!scene->isEmpty())

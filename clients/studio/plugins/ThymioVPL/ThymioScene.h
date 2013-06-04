@@ -23,6 +23,7 @@ namespace Aseba
 		bool isEmpty() const;
 		void reset();
 		void clear();
+		void haveAtLeastAnEmptyCard();
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod) { sceneModified=mod; }

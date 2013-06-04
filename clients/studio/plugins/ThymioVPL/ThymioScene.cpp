@@ -154,7 +154,7 @@ namespace Aseba
 
 		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
 		thymioCompiler.addButtonSet(button->getIRButtonSet());
-
+		
 		return button;
 	}
 
@@ -176,6 +176,8 @@ namespace Aseba
 		clear();
 
 		createNewButtonSet();
+		
+		buttonUpdateDetected();
 	}
 	
 	void ThymioScene::clear()
@@ -198,6 +200,12 @@ namespace Aseba
 		lastFocus = -1;
 		prevNewActionButton = false;
 		prevNewEventButton = false;	
+	}
+	
+	void ThymioScene::haveAtLeastAnEmptyCard()
+	{
+		if (buttonSets.empty())
+			createNewButtonSet();
 	}
 	
 	void ThymioScene::setColorScheme(QColor eventColor, QColor actionColor)
@@ -268,7 +276,7 @@ namespace Aseba
 		thymioCompiler.insertButtonSet(row, button->getIRButtonSet());
 		
 		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-			
+		
 		setFocusItem(button);
 		lastFocus = row;
 		

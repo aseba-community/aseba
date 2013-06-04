@@ -148,7 +148,7 @@ namespace Aseba
 	
 	void ThymioIRSyntaxChecker::visit(ThymioIRButtonSet *buttonSet)
 	{
-		errorCode = THYMIO_NO_ERROR;		
+		errorCode = THYMIO_NO_ERROR;
 		
 		if( !(buttonSet->hasEventButton()) )
 		{
