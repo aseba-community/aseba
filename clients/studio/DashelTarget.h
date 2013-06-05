@@ -120,7 +120,7 @@ namespace Aseba
 		void nodeDescriptionReceivedSignal(unsigned nodeId);
 	
 	protected:
-		virtual void nodeProtocolVersionMismatch(const std::string &nodeName, uint16 protocolVersion);
+		virtual void nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 	};
 	
@@ -220,6 +220,6 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif

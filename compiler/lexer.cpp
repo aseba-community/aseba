@@ -494,4 +494,4 @@ namespace Aseba
 		for (unsigned i = 0; i < tokens.size(); i++)
 			dest << tokens[i].toWString() << std::endl;
 	}
-}; // Aseba
+} // namespace Aseba

@@ -24,11 +24,11 @@
 #include <QLabel>
 #include <QDomDocument>
 #include <QMultiMap>
-#include <dashel/dashel.h>
 #include <stdexcept>
 #include <iostream>
 #include <set>
 #include <memory>
+#include <dashel/dashel.h>
 #include "../../compiler/compiler.h"
 
 
@@ -94,6 +94,6 @@ namespace Aseba
 	};
 
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif

@@ -2,15 +2,15 @@
 #include <QMimeData>
 #include <QDebug>
 
-#include "ThymioScene.h"
+#include "Scene.h"
 #include "Card.h"
 
 using namespace std;
 
-namespace Aseba
-{		
+namespace Aseba { namespace ThymioVPL
+{
 
-	ThymioScene::ThymioScene(QObject *parent) : 
+	Scene::Scene(QObject *parent) : 
 		QGraphicsScene(parent),
 		prevNewEventButton(false),
 		prevNewActionButton(false),
@@ -29,12 +29,12 @@ namespace Aseba
 		connect(this, SIGNAL(selectionChanged()), this, SIGNAL(stateChanged()));
 	}
 	
-	ThymioScene::~ThymioScene()
+	Scene::~Scene()
 	{
 		clear();
 	}
 
-	QGraphicsItem *ThymioScene::addAction(Card *item) 
+	QGraphicsItem *Scene::addAction(Card *item) 
 	{
 		EventActionPair *button = 0; 
 		prevNewActionButton = false;
@@ -80,7 +80,7 @@ namespace Aseba
 		return button;
 	}
 
-	QGraphicsItem *ThymioScene::addEvent(Card *item) 
+	QGraphicsItem *Scene::addEvent(Card *item) 
 	{
 		EventActionPair *button = 0; 
 		prevNewEventButton = false;
@@ -128,7 +128,7 @@ namespace Aseba
 		return button;
 	}
 
-	void ThymioScene::addButtonSet(Card *event, Card *action)
+	void Scene::addButtonSet(Card *event, Card *action)
 	{
 		EventActionPair *button = createNewButtonSet();
 		if(event)
@@ -143,7 +143,7 @@ namespace Aseba
 		newRow = false;
 	}
 
-	EventActionPair *ThymioScene::createNewButtonSet()
+	EventActionPair *Scene::createNewButtonSet()
 	{
 		EventActionPair *button = new EventActionPair(buttonSets.size(), advancedMode);
 		button->setColorScheme(eventButtonColor, actionButtonColor);
@@ -157,7 +157,7 @@ namespace Aseba
 		return button;
 	}
 
-	bool ThymioScene::isEmpty() const
+	bool Scene::isEmpty() const
 	{
 		if( buttonSets.isEmpty() )
 			return true;
@@ -170,14 +170,14 @@ namespace Aseba
 		return true;
 	}
 
-	void ThymioScene::reset()
+	void Scene::reset()
 	{
 		clear();
 		createNewButtonSet();
 		buttonUpdateDetected();
 	}
 	
-	void ThymioScene::clear()
+	void Scene::clear()
 	{
 		for(int i=0; i<buttonSets.size(); i++)
 		{
@@ -196,13 +196,13 @@ namespace Aseba
 		advancedMode = false;
 	}
 	
-	void ThymioScene::haveAtLeastAnEmptyCard()
+	void Scene::haveAtLeastAnEmptyCard()
 	{
 		if (buttonSets.empty())
 			createNewButtonSet();
 	}
 	
-	void ThymioScene::setColorScheme(QColor eventColor, QColor actionColor)
+	void Scene::setColorScheme(QColor eventColor, QColor actionColor)
 	{
 		eventButtonColor = eventColor;
 		actionButtonColor = actionColor;
@@ -215,7 +215,7 @@ namespace Aseba
 		sceneModified = true;
 	}
 
-	void ThymioScene::setAdvanced(bool advanced)
+	void Scene::setAdvanced(bool advanced)
 	{
 		advancedMode = advanced;
 		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
@@ -229,7 +229,7 @@ namespace Aseba
 		buttonUpdateDetected();
 	}
 	
-	bool ThymioScene::isAnyStateFilter() const
+	bool Scene::isAnyStateFilter() const
 	{
 		for (ButtonSetConstItr itr = buttonSets.begin(); itr != buttonSets.end(); ++itr)
 			if ((*itr)->isAnyStateFilter())
@@ -237,7 +237,7 @@ namespace Aseba
 		return false;
 	}
 
-	void ThymioScene::removeButton(int row)
+	void Scene::removeButton(int row)
 	{
 		Q_ASSERT( row < buttonSets.size() );
 		
@@ -263,7 +263,7 @@ namespace Aseba
 		buttonUpdateDetected();
 	}
 	
-	void ThymioScene::insertButton(int row) 
+	void Scene::insertButton(int row) 
 	{
 		Q_ASSERT( row <= buttonSets.size() );
 
@@ -289,13 +289,13 @@ namespace Aseba
 		buttonUpdateDetected();
 	}
 
-	void ThymioScene::rearrangeButtons(int row)
+	void Scene::rearrangeButtons(int row)
 	{
 		for(int i=row; i<buttonSets.size(); ++i) 
 			buttonSets.at(i)->setRow(i);
 	}
 	
-	QString ThymioScene::getErrorMessage() const
+	QString Scene::getErrorMessage() const
 	{ 
 		switch(thymioCompiler.getErrorCode()) {
 		case THYMIO_MISSING_EVENT:
@@ -318,7 +318,7 @@ namespace Aseba
 		}
 	}	
 	
-	QList<QString> ThymioScene::getCode() const
+	QList<QString> Scene::getCode() const
 	{
 		QList<QString> out;
 		
@@ -329,7 +329,7 @@ namespace Aseba
 		return out;
 	}
 
-	int ThymioScene::getFocusItemId() const 
+	int Scene::getFocusItemId() const 
 	{ 
 		QGraphicsItem *item = focusItem();
 		
@@ -344,7 +344,7 @@ namespace Aseba
 		return -1;
 	}
 	
-	void ThymioScene::buttonUpdateDetected()
+	void Scene::buttonUpdateDetected()
 	{
 		sceneModified = true;
 		
@@ -360,7 +360,7 @@ namespace Aseba
 		emit stateChanged();
 	}
 
-	void ThymioScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		if( event->mimeData()->hasFormat("thymiobutton") && 
 			((event->scenePos().y()-20)/(buttonSetHeight)) >= buttonSets.size() ) 
@@ -372,7 +372,7 @@ namespace Aseba
 			QGraphicsScene::dragMoveEvent(event);
 	}
 	
-	void ThymioScene::dropEvent(QGraphicsSceneDragDropEvent *event)
+	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		if ( event->mimeData()->hasFormat("EventActionPair") )
 		{
@@ -444,12 +444,12 @@ namespace Aseba
 			QGraphicsScene::dropEvent(event);
 	}
 
-	void ThymioScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+	void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	{		
 		QGraphicsScene::mousePressEvent(event);
 	}
 	
-	void ThymioScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+	void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	{
 		QGraphicsScene::mouseReleaseEvent(event);
 		
@@ -469,5 +469,4 @@ namespace Aseba
 		
 		update();
 	}
-
-};
+} } // namespace ThymioVPL / namespace Aseba

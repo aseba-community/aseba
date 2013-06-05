@@ -266,4 +266,4 @@ namespace Aseba
 	{
 		nodesDescriptions.clear();
 	}
-}
+} // namespace Aseba

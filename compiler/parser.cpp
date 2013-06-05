@@ -1159,7 +1159,7 @@ namespace Aseba
 
 	unsigned Compiler::parseVariableDefSize()
 	{
-		unsigned result = 0;
+		int result = 0;
 
 		if (tokens.front() == Token::TOKEN_BRACKET_OPEN)
 		{
@@ -1375,4 +1375,4 @@ namespace Aseba
 		// return the node for the function call
 		return callNode.release();
 	}
-}; // Aseba
+} // namespace Aseba

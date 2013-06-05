@@ -55,6 +55,6 @@ namespace Aseba
 
 	/*@}*/
 	
-}; // Aseba
+} // namespace Aseba
 
 #endif

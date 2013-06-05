@@ -1,8 +1,9 @@
 #include "ThymioIntermediateRepresentation.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
-
+	using namespace std;
+	
 	ThymioIRButton::ThymioIRButton(int size, ThymioIRButtonName n) : 
 		values(size),
 		memory(-1),
@@ -127,5 +128,4 @@ namespace Aseba
 		visitor->visit(this); 
 	}
 
-		
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba

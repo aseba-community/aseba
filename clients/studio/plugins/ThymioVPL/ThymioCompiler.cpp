@@ -4,9 +4,10 @@
 #include "ThymioIntermediateRepresentation.h"
 
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
-
+	using namespace std;
+	
 	ThymioCompiler::ThymioCompiler() : 
 		buttonSet(),
 		typeChecker(),
@@ -109,8 +110,8 @@ namespace Aseba
 	vector<wstring>::const_iterator ThymioCompiler::endCode() const
 	{ 
 		return codeGenerator.endCode(); 
-	}	
-			
+	}
+	
 	void ThymioCompiler::compile()
 	{
 		errorType = THYMIO_NO_TYPE_ERROR;
@@ -159,4 +160,4 @@ namespace Aseba
 		}
 	}
 
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba

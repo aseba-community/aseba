@@ -1,18 +1,18 @@
-#ifndef THYMIO_SCENE_H
-#define THYMIO_SCENE_H
+#ifndef VPL_SCENE_H
+#define VPL_SCENE_H
 
 #include <QGraphicsScene>
 #include "EventActionPair.h"
 
-namespace Aseba
-{	
-	class ThymioScene : public QGraphicsScene
+namespace Aseba { namespace ThymioVPL
+{
+	class Scene : public QGraphicsScene
 	{
 		Q_OBJECT
 		
 	public:
-		ThymioScene(QObject *parent = 0);
-		~ThymioScene();
+		Scene(QObject *parent = 0);
+		~Scene();
 		
 		QGraphicsItem *addAction(Card *item);
 		QGraphicsItem *addEvent(Card *item);
@@ -42,6 +42,9 @@ namespace Aseba
 		
 		ButtonSetItr buttonsBegin() { return buttonSets.begin(); }
 		ButtonSetItr buttonsEnd() { return buttonSets.end(); }
+		
+		ButtonSetConstItr buttonsBegin() const { return buttonSets.begin(); }
+		ButtonSetConstItr buttonsEnd() const { return buttonSets.end(); }
 		
 	signals:
 		void stateChanged();
@@ -78,6 +81,6 @@ namespace Aseba
 		qreal buttonSetHeight;
 		bool advancedMode;
 	};
-};
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

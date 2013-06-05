@@ -316,20 +316,20 @@ namespace Aseba
 		this->stream = 0;
 	}
 	
-	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(const std::string &nodeName, uint16 protocolVersion)
+	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion)
 	{
 		if (protocolVersion > ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
 				QApplication::tr("Protocol version mismatch"),
-				QApplication::tr("Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.").arg(QString::fromUtf8(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
+				QApplication::tr("Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.").arg(QString::fromStdWString(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
 			);
 		}
 		else if (protocolVersion < ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
 				QApplication::tr("Protocol version mismatch"),
-				QApplication::tr("Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.").arg(QString::fromUtf8(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
+				QApplication::tr("Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.").arg(QString::fromStdWString(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
 			);
 		}
 	}

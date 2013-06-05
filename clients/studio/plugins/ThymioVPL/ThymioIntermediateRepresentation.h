@@ -6,11 +6,10 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <utility>
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
-	using namespace std;
-	
 	enum ThymioIRButtonName 
 	{
 		THYMIO_BUTTONS_IR = 0,
@@ -65,8 +64,8 @@ namespace Aseba
 		void setStateFilter(int s);
 
 		ThymioIRButtonName getName() const;
-		void setBasename(wstring n);
-		wstring getBasename() const;
+		void setBasename(std::wstring n);
+		std::wstring getBasename() const;
 		
 		bool isEventButton() const;
 		bool isSet() const;
@@ -74,10 +73,10 @@ namespace Aseba
 		void accept(ThymioIRVisitor *visitor);
 
 	private:
-		vector<int> values;
+		std::vector<int> values;
 		int memory;
 		ThymioIRButtonName name;
-		wstring basename;
+		std::wstring basename;
 	};
 	
 	class ThymioIRButtonSet
@@ -114,7 +113,7 @@ namespace Aseba
 
 	protected:
 		ThymioIRErrorCode errorCode;
-		wstring toWstring(int val);
+		std::wstring toWstring(int val);
 	};
 
 	class ThymioIRTypeChecker : public ThymioIRVisitor
@@ -124,7 +123,7 @@ namespace Aseba
 		~ThymioIRTypeChecker();
 		
 		virtual void visit(ThymioIRButton *button);
-		virtual void visit(ThymioIRButtonSet *buttonSet);		
+		virtual void visit(ThymioIRButtonSet *buttonSet);
 		
 		void reset();
 		void clear();
@@ -132,14 +131,14 @@ namespace Aseba
 	private:
 		ThymioIRButtonName activeActionName;
 		
-		multimap<wstring, ThymioIRButton*> moveHash;
-		multimap<wstring, ThymioIRButton*> colorTopHash;
-		multimap<wstring, ThymioIRButton*> colorBottomHash;
-		multimap<wstring, ThymioIRButton*> soundHash;
-		multimap<wstring, ThymioIRButton*> memoryHash;
+		std::multimap<std::wstring, ThymioIRButton*> moveHash;
+		std::multimap<std::wstring, ThymioIRButton*> colorTopHash;
+		std::multimap<std::wstring, ThymioIRButton*> colorBottomHash;
+		std::multimap<std::wstring, ThymioIRButton*> soundHash;
+		std::multimap<std::wstring, ThymioIRButton*> memoryHash;
 
-		set<ThymioIRButtonName> tapSeenActions;
-		set<ThymioIRButtonName> clapSeenActions;
+		std::set<ThymioIRButtonName> tapSeenActions;
+		std::set<ThymioIRButtonName> clapSeenActions;
 	};
 
 	class ThymioIRSyntaxChecker : public ThymioIRVisitor
@@ -163,8 +162,8 @@ namespace Aseba
 		virtual void visit(ThymioIRButton *button);
 		virtual void visit(ThymioIRButtonSet *buttonSet);
 
-		vector<wstring>::const_iterator beginCode() const { return generatedCode.begin(); }
-		vector<wstring>::const_iterator endCode() const { return generatedCode.end(); }
+		std::vector<std::wstring>::const_iterator beginCode() const { return generatedCode.begin(); }
+		std::vector<std::wstring>::const_iterator endCode() const { return generatedCode.end(); }
 		void reset();
 		void clear();
 		void addInitialisation();
@@ -172,16 +171,16 @@ namespace Aseba
 		int buttonToCode(int id) const;
 		
 	private:
-		map<ThymioIRButtonName, pair<int, int> > editor;
+		std::map<ThymioIRButtonName, std::pair<int, int> > editor;
 
-		vector<wstring> generatedCode;
+		std::vector<std::wstring> generatedCode;
 		bool advancedMode;
 		bool useSound;
 		bool useMicrophone;
-		vector<wstring> directions;
+		std::vector<std::wstring> directions;
 		int currentBlock;
 		bool inIfBlock;
-		vector<int> buttonToCodeMap;
+		std::vector<int> buttonToCodeMap;
 	};
 
 	class ThymioCompiler 
@@ -203,14 +202,16 @@ namespace Aseba
 		ThymioIRErrorCode getErrorCode() const;
 		bool isSuccessful() const;
 		int getErrorLine() const;
+		
+		typedef std::vector<std::wstring>::const_iterator CodeConstIterator;
 
-		vector<wstring>::const_iterator beginCode() const;
-		vector<wstring>::const_iterator endCode() const; 
+		CodeConstIterator beginCode() const;
+		CodeConstIterator endCode() const; 
 
 		void clear();
 
 	private:
-		vector<ThymioIRButtonSet*> buttonSet;
+		std::vector<ThymioIRButtonSet*> buttonSet;
 		ThymioIRTypeChecker   typeChecker;
 		ThymioIRSyntaxChecker syntaxChecker;
 		ThymioIRCodeGenerator codeGenerator;
@@ -220,6 +221,6 @@ namespace Aseba
 		int errorLine;
 	};
 
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

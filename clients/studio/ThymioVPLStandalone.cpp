@@ -37,6 +37,9 @@ namespace Aseba
  	/** \addtogroup studio */
 	/*@{*/
 	
+	using namespace ThymioVPL;
+	using namespace std;
+	
 	ThymioVPLStandaloneInterface::ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone):
 		vplStandalone(vplStandalone)
 	{
@@ -484,4 +487,4 @@ namespace Aseba
 	}
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba

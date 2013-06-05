@@ -13,15 +13,15 @@
 #include <QDropEvent>
 #include <cassert>
 
-#include "ThymioButtons.h"
+#include "Buttons.h"
 #include "Card.h"
 #include "EventCards.h"
 #include "ActionCards.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	// Clickable button
-	ThymioClickableButton::ThymioClickableButton (const QRectF rect, const ButtonType  type, QGraphicsItem *parent, const QColor& initBrushColor, const QColor& initPenColor) :
+	GeometryShapeButton::GeometryShapeButton (const QRectF rect, const ButtonType  type, QGraphicsItem *parent, const QColor& initBrushColor, const QColor& initPenColor) :
 		QGraphicsObject(parent),
 		buttonType(type),
 		boundingRectangle(rect),
@@ -31,12 +31,12 @@ namespace Aseba
 		colors.push_back(qMakePair(initBrushColor, initPenColor));
 	}
 	
-	void ThymioClickableButton::addState(const QColor& brushColor, const QColor& penColor)
+	void GeometryShapeButton::addState(const QColor& brushColor, const QColor& penColor)
 	{
 		colors.push_back(qMakePair(brushColor, penColor));
 	}
 	
-	void ThymioClickableButton::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
+	void GeometryShapeButton::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
 	{
 		painter->setBrush(colors[curState].first);
 		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
@@ -70,7 +70,7 @@ namespace Aseba
 		}
 	}
 
-	void ThymioClickableButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+	void GeometryShapeButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
 		if( event->button() == Qt::LeftButton ) 
 		{
@@ -82,7 +82,7 @@ namespace Aseba
 			else 
 			{
 				curState = 1;
-				for( QList<ThymioClickableButton*>::iterator itr = siblings.begin();
+				for( QList<GeometryShapeButton*>::iterator itr = siblings.begin();
 					 itr != siblings.end(); ++itr )
 					(*itr)->setValue(0);
 				//parentItem()->update();
@@ -200,7 +200,7 @@ namespace Aseba
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), ThymioClickableButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(310 + (i%2)*60, 100 + (i/2)*60);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
@@ -404,8 +404,7 @@ namespace Aseba
 	}
 	
 	
-	// Thymio Push Button
-	ThymioPushButton::ThymioPushButton(const QString& name, QWidget *parent) : 
+	CardButton::CardButton(const QString& name, QWidget *parent) : 
 		QPushButton(parent), 
 		thymioButton(Card::createButton(name))
 	{
@@ -421,20 +420,20 @@ namespace Aseba
 		setAcceptDrops(true);
 	}
 	
-	ThymioPushButton::~ThymioPushButton()
+	CardButton::~CardButton()
 	{ 
 		if( thymioButton != 0 ) 
 			delete(thymioButton); 
 	}	
 	
-	void ThymioPushButton::changeButtonColor(const QColor& color) 
+	void CardButton::changeButtonColor(const QColor& color) 
 	{ 
 		thymioButton->setButtonColor(color); 
 		const qreal factor = width() / 256.;
 		setIcon(thymioButton->image(factor));
 	}	
 
-	void ThymioPushButton::mouseMoveEvent( QMouseEvent *event )
+	void CardButton::mouseMoveEvent( QMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if( thymioButton==0 )
@@ -449,7 +448,7 @@ namespace Aseba
 		#endif // ANDROID
 	}
 
-	void ThymioPushButton::dragEnterEvent( QDragEnterEvent *event )
+	void CardButton::dragEnterEvent( QDragEnterEvent *event )
 	{
 		if( event->mimeData()->hasFormat("thymiotype") &&
 			event->mimeData()->data("thymiotype") == thymioButton->getType().toLatin1() )
@@ -458,7 +457,7 @@ namespace Aseba
 			event->ignore();
 	}
 
-	void ThymioPushButton::dropEvent( QDropEvent *event )
+	void CardButton::dropEvent( QDropEvent *event )
 	{
 		if( event->mimeData()->hasFormat("thymiotype") &&
 			event->mimeData()->data("thymiotype") == thymioButton->getType().toLatin1() )
@@ -470,5 +469,4 @@ namespace Aseba
 			event->ignore();
 	}
 
-};
-
+} } // namespace ThymioVPL / namespace Aseba

@@ -387,4 +387,4 @@ namespace Aseba
 	}
 
 	/*@}*/
-}; // Aseba
+} // namespace Aseba

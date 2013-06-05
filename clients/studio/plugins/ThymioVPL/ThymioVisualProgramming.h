@@ -12,20 +12,21 @@
 #include <QComboBox>
 #include <QToolBar>
 #include <QToolButton>
+#include <QDomDocument>
 
 #include <map>
 #include <vector>
 #include <iterator>
-#include <QDomDocument>
-
-#include "Card.h"
-#include "ThymioButtons.h"
-#include "ThymioScene.h"
+#include <memory>
 
 #include "../../Plugin.h"
 #include "../../DashelTarget.h"
 
-namespace Aseba
+#include "Card.h"
+#include "Buttons.h"
+#include "Scene.h"
+
+namespace Aseba { namespace ThymioVPL
 {
 	/** \addtogroup studio */
 	/*@{*/
@@ -80,11 +81,11 @@ namespace Aseba
 	protected:
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
-		ThymioScene *scene;
+		Scene *scene;
 
 		// Event & Action buttons
-		QList<ThymioPushButton *> eventButtons;
-		QList<ThymioPushButton *> actionButtons;
+		QList<CardButton *> eventButtons;
+		QList<CardButton *> actionButtons;
 		QLabel *eventsLabel;
 		QLabel *actionsLabel;
 
@@ -122,6 +123,6 @@ namespace Aseba
 		virtual void resizeEvent( QResizeEvent *event );
 	};
 	/*@}*/
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

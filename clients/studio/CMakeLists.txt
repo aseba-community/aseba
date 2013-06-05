@@ -77,8 +77,8 @@ if (QT4_FOUND)
 		Plugin.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
-		plugins/ThymioVPL/ThymioScene.cpp
-		plugins/ThymioVPL/ThymioButtons.cpp
+		plugins/ThymioVPL/Scene.cpp
+		plugins/ThymioVPL/Buttons.cpp
 		plugins/ThymioVPL/EventActionPair.cpp
 		plugins/ThymioVPL/EventCards.cpp
 		plugins/ThymioVPL/ActionCards.cpp
@@ -89,8 +89,8 @@ if (QT4_FOUND)
 	qt4_wrap_cpp(qt_plugins_MOCS
 		plugins/VariablesViewPlugin.h
 		plugins/ThymioVPL/ThymioVisualProgramming.h
-		plugins/ThymioVPL/ThymioScene.h
-		plugins/ThymioVPL/ThymioButtons.h
+		plugins/ThymioVPL/Scene.h
+		plugins/ThymioVPL/Buttons.h
 		plugins/ThymioVPL/Card.h
 		plugins/ThymioVPL/ActionCards.h
 		plugins/ThymioVPL/EventActionPair.h

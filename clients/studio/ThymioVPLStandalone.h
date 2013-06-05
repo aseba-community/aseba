@@ -55,7 +55,10 @@ namespace Aseba
 		ThymioVPLStandalone* vplStandalone;
 	};
 	
-	class ThymioVisualProgramming;
+	namespace ThymioVPL
+	{
+		class ThymioVisualProgramming;
+	}
 	class AeslEditor;
 	
 	//! Container for VPL standalone and its code viewer
@@ -87,14 +90,14 @@ namespace Aseba
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
 		
 	protected:
-		friend class ThymioVPLStandaloneInterface;
+		friend struct ThymioVPLStandaloneInterface;
 		
 		std::auto_ptr<Target> target; //!< pointer to target
 		
 		unsigned id; //!< node identifier
 		
 		QLayout* vplLayout; //!< layout to add/remove VPL to/from
-		ThymioVisualProgramming* vpl; //!< VPL widget 
+		ThymioVPL::ThymioVisualProgramming* vpl; //!< VPL widget 
 		QDomDocument savedContent; //!< saved VPL content across disconnections
 		AeslEditor* editor; //! viewer of code produced by VPL
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
@@ -104,6 +107,6 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif // THYMIO_VPL_STANDALONE_H

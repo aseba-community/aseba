@@ -22,7 +22,7 @@
 
 using namespace std;
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
@@ -118,11 +118,11 @@ namespace Aseba
 		// events
 		eventsLayout = new QVBoxLayout();
 
-		ThymioPushButton *buttonsButton = new ThymioPushButton("button");
-		ThymioPushButton *proxButton = new ThymioPushButton("prox");
-		ThymioPushButton *proxGroundButton = new ThymioPushButton("proxground");
-		ThymioPushButton *tapButton = new ThymioPushButton("tap");
-		ThymioPushButton *clapButton = new ThymioPushButton("clap");
+		CardButton *buttonsButton = new CardButton("button");
+		CardButton *proxButton = new CardButton("prox");
+		CardButton *proxGroundButton = new CardButton("proxground");
+		CardButton *tapButton = new CardButton("tap");
+		CardButton *clapButton = new CardButton("clap");
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
@@ -134,7 +134,7 @@ namespace Aseba
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->setSpacing(0);
-		ThymioPushButton* button;
+		CardButton* button;
 		eventsLayout->addWidget(eventsLabel);
 		foreach (button, eventButtons)
 		{
@@ -161,7 +161,7 @@ namespace Aseba
 		sceneLayout->addLayout(compilationResultLayout);
 
 		// scene
-		scene = new ThymioScene(this);
+		scene = new Scene(this);
 		view = new QGraphicsView(scene);
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
@@ -177,11 +177,11 @@ namespace Aseba
 		// actions
 		actionsLayout = new QVBoxLayout();
 
-		ThymioPushButton *moveButton = new ThymioPushButton("move");
-		ThymioPushButton *colorTopButton = new ThymioPushButton("colortop");
-		ThymioPushButton *colorBottomButton = new ThymioPushButton("colorbottom");
-		ThymioPushButton *soundButton = new ThymioPushButton("sound");
-		ThymioPushButton *memoryButton = new ThymioPushButton("memory");
+		CardButton *moveButton = new CardButton("move");
+		CardButton *colorTopButton = new CardButton("colortop");
+		CardButton *colorBottomButton = new CardButton("colorbottom");
+		CardButton *soundButton = new CardButton("sound");
+		CardButton *memoryButton = new CardButton("memory");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
@@ -326,11 +326,11 @@ namespace Aseba
 	{
 		scene->setColorScheme(eventColors.at(index), actionColors.at(index));
 		
-		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
+		for(QList<CardButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->changeButtonColor(eventColors.at(index));
 
-		for(QList<ThymioPushButton*>::iterator itr = actionButtons.begin();
+		for(QList<CardButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->changeButtonColor(actionColors.at(index));
 	}
@@ -436,7 +436,7 @@ namespace Aseba
 		vplroot.appendChild(settings);
 		vplroot.appendChild(document.createTextNode("\n\n"));
 		
-		for (ThymioScene::ButtonSetItr itr = scene->buttonsBegin(); 
+		for (Scene::ButtonSetItr itr = scene->buttonsBegin(); 
 			  itr != scene->buttonsEnd(); ++itr )
 		{
 			QDomElement element = document.createElement("buttonset");
@@ -713,11 +713,11 @@ namespace Aseba
 		const QSize iconSize(256*scale, 256*scale);
 		view->resetTransform();
 		view->scale(scale, scale);
-		for(QList<ThymioPushButton*>::iterator itr = eventButtons.begin();
+		for(QList<CardButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
-		for(QList<ThymioPushButton*>::iterator itr = actionButtons.begin();
+		for(QList<CardButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
 	}
-};
+} } // namespace ThymioVPL / namespace Aseba

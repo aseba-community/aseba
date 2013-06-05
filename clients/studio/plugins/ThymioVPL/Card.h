@@ -3,17 +3,19 @@
 
 #include <QObject>
 #include <QGraphicsObject>
+#include <QList>
+
 #include "ThymioIntermediateRepresentation.h"
 
 class QMimeData;
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	/** \addtogroup studio */
 	/*@{*/
 	
 	class ThymioIRButton;
-	class ThymioClickableButton;
+	class GeometryShapeButton;
 	
 	/**
 		An "event" or "action" card.
@@ -21,7 +23,7 @@ namespace Aseba
 		These cards have a type (event or action) and a name (prox, etc.)
 		and may provide several values (set/get by setValue()/getValue()).
 		These values are set by the user through buttons (typically
-		ThymioClickableButton), sliders, or specific widgets.
+		GeometryShapeButton), sliders, or specific widgets.
 		
 		In addition, event cards can have an associated state filter,
 		which is an array of 4 tri-bool value (yes/no/don't care) "serialized"
@@ -95,7 +97,7 @@ namespace Aseba
 		virtual ThymioIRButtonName getIRIdentifier() const = 0;
 		
 	protected:
-		QList<ThymioClickableButton*> stateButtons;
+		QList<GeometryShapeButton*> stateButtons;
 		
 		ThymioIRButton *buttonIR;
 		QColor buttonColor;
@@ -126,10 +128,10 @@ namespace Aseba
 		virtual void setValue(int i, int status);
 		
 	protected:
-		QList<ThymioClickableButton*> buttons;
+		QList<GeometryShapeButton*> buttons;
 	};
 	
 	/*@}*/
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

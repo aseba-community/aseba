@@ -8,9 +8,9 @@
 #include <QtCore/qmath.h>
 
 #include "ActionCards.h"
-#include "ThymioButtons.h"
+#include "Buttons.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	// Move Action
 	MoveActionCard::MoveActionCard( QGraphicsItem *parent ) :
@@ -271,7 +271,7 @@ namespace Aseba
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-20,-20,40,40), ThymioClickableButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			button->setPos(98 + (i%2)*60, 98 + (i/2)*60);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
@@ -281,6 +281,4 @@ namespace Aseba
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 	}	
-
-};
-
+} } // namespace ThymioVPL / namespace Aseba

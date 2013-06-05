@@ -953,4 +953,4 @@ namespace Aseba
 		
 		stream << "start " << start << ", variables vector of size " << variables.size();
 	}
-}
+} // namespace Aseba

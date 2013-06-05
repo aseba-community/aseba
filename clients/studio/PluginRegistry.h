@@ -76,6 +76,6 @@ namespace Aseba
 	static NodeToolRegistrer nodeToolRegistrer;
 
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif

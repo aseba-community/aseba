@@ -1,19 +1,16 @@
-#ifndef ANDROID_H
-#define ANDROID_H
+#ifndef DASHEL_PLUGIN_ANDROID_H
+#define DASHEL_PLUGIN_ANDROID_H
+
 #include <jni.h>
 #include <dashel/dashel-posix.h>
 #include <dashel/dashel-private.h>
 #include <string>
 #include <linux/usbdevice_fs.h>
 
-using namespace Dashel;
-using namespace std;
-
-class AndroidStream: public SelectableStream
+class AndroidStream: public Dashel::SelectableStream
 {
-
 public:
-    AndroidStream(const string &targetName);
+    AndroidStream(const std::string &targetName);
     ~AndroidStream();
     virtual void write(const void *data, const size_t size);
     virtual void read(void *data, size_t size);
@@ -39,4 +36,4 @@ private:
     int disconnected;
 };
 
-#endif // ANDROID_H
+#endif // DASHEL_PLUGIN_ANDROID_H

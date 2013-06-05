@@ -83,6 +83,6 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}
+} // namespace Aseba
 
 #endif

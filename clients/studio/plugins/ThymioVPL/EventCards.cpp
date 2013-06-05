@@ -4,9 +4,9 @@
 #include <QtCore/qmath.h>
 
 #include "EventCards.h"
-#include "ThymioButtons.h"
+#include "Buttons.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	// Buttons Event
 	ArrowButtonsEventCard::ArrowButtonsEventCard(QGraphicsItem *parent, bool advanced) : 
@@ -20,7 +20,7 @@ namespace Aseba
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -21.5, 50, 43), ThymioClickableButton::TRIANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -21.5, 50, 43), GeometryShapeButton::TRIANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
@@ -32,7 +32,7 @@ namespace Aseba
 			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
 		}
 
-		ThymioClickableButton *button = new ThymioClickableButton(QRectF(-25, -25, 50, 50), ThymioClickableButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		buttons.push_back(button);
@@ -48,7 +48,7 @@ namespace Aseba
 		
 		for(int i=0; i<5; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), ThymioClickableButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 			
 			const qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
@@ -66,7 +66,7 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), ThymioClickableButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(64 + i*128, 234));
 			//button->addState(QColor(110,255,110));
@@ -90,7 +90,7 @@ namespace Aseba
 		
 		for(int i=0; i<2; ++i) 
 		{
-			ThymioClickableButton *button = new ThymioClickableButton(QRectF(-16,-16,32,32), ThymioClickableButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(98 + i*60, 40));
 			//button->addState(QColor(110,255,110));
@@ -124,7 +124,5 @@ namespace Aseba
 		
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
-	
 
-};
-
+} } // namespace ThymioVPL / namespace Aseba

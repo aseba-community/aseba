@@ -10,14 +10,14 @@ class QSlider;
 class QTimeLine;
 class QMimeData;
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	/** \addtogroup studio */
 	/*@{*/
 	
 	class Card;
 	
-	class ThymioClickableButton : public QGraphicsObject
+	class GeometryShapeButton : public QGraphicsObject
 	{
 		Q_OBJECT
 		
@@ -31,7 +31,7 @@ namespace Aseba
 		};
 		
 		//! Create a button with initially one state
-		ThymioClickableButton (const QRectF rect, const ButtonType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
+		GeometryShapeButton (const QRectF rect, const ButtonType type, QGraphicsItem *parent=0, const QColor& initBrushColor = Qt::white, const QColor& initPenColor = Qt::black);
 		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return boundingRectangle; }
@@ -42,7 +42,7 @@ namespace Aseba
 
 		void addState(const QColor& brushColor = Qt::white, const QColor& penColor = Qt::black);
 
-		void addSibling(ThymioClickableButton *s) { siblings.push_back(s); }
+		void addSibling(GeometryShapeButton *s) { siblings.push_back(s); }
 	
 	signals:
 		void stateChanged();
@@ -58,18 +58,18 @@ namespace Aseba
 		typedef QPair<QColor, QColor> ColorPair;
 		QList<ColorPair> colors;
 
-		QList<ThymioClickableButton*> siblings;
+		QList<GeometryShapeButton*> siblings;
 
 		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	};
 	
-	class ThymioPushButton : public QPushButton
+	class CardButton : public QPushButton
 	{
 		Q_OBJECT
 		
 	public:
-		ThymioPushButton(const QString& name, QWidget *parent=0);
-		~ThymioPushButton();
+		CardButton(const QString& name, QWidget *parent=0);
+		~CardButton();
 		
 		void changeButtonColor(const QColor& color);
 		
@@ -83,6 +83,6 @@ namespace Aseba
 	};
 		
 	/*@}*/
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

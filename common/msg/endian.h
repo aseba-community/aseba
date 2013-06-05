@@ -116,6 +116,6 @@ namespace Aseba
 	#endif
 	
 	/*@}*/
-}
+} // namespace Aseba
 
 #endif // ASEBA_ENDIAN

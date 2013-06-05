@@ -89,7 +89,7 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif // THYMIO_FLASHER_H
 

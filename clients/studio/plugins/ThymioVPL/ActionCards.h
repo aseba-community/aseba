@@ -7,7 +7,7 @@
 class QSlider;
 class QTimeLine;
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	/** \addtogroup studio */
 	/*@{*/
@@ -104,6 +104,6 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba
 
 #endif

@@ -289,7 +289,7 @@ namespace Aseba
 		friend class EditorsPlotsTabWidget;
 		
 		unsigned pid; //!< node product identifier
-		friend class StudioInterface;
+		friend struct StudioInterface;
 		Target *target; //!< pointer to target
 		const CommonDefinitions *commonDefinitions; //!< pointer to common definitions
 
@@ -599,7 +599,7 @@ namespace Aseba
 	};
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif
 

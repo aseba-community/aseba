@@ -244,6 +244,6 @@ namespace Aseba
 	}
 	
 	/*@}*/
-}; // Aseba
+} // namespace Aseba
 
 #endif // HAVE_QWT

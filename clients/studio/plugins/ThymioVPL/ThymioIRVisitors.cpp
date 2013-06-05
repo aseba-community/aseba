@@ -2,8 +2,10 @@
 #include <QtGlobal>
 #include "ThymioIntermediateRepresentation.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
+	using namespace std;
+	
 	// Visitor base //
 	void ThymioIRVisitor::visit(ThymioIRButton *button)
 	{
@@ -594,4 +596,4 @@ namespace Aseba
 		visit(buttonSet->getActionButton());
 	}
 
-}; // Aseba
+} } // namespace ThymioVPL / namespace Aseba

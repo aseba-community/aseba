@@ -13,11 +13,11 @@
 #include <typeinfo>
 
 #include "EventActionPair.h"
-#include "ThymioButtons.h"
+#include "Buttons.h"
 #include "Card.h"
 #include "ActionCards.h"
 
-namespace Aseba
+namespace Aseba { namespace ThymioVPL
 {
 	EventActionPair::ThymioRemoveButton::ThymioRemoveButton(QGraphicsItem *parent) : 
 		QGraphicsItem(parent) 
@@ -462,5 +462,4 @@ namespace Aseba
 		drag->exec(Qt::MoveAction);
 		#endif // ANDROID
 	}
-};
-
+} } // namespace ThymioVPL / namespace Aseba
