@@ -100,10 +100,8 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 			// check division by zero
 			if (valueTwo == 0)
 			{
-				#ifndef DISABLE_WEAK_CALLBACKS
 				if(AsebaVMErrorCB)
 					AsebaVMErrorCB(vm,NULL);
-				#endif // DISABLE_WEAK_CALLBACKS
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessageWords(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &vm->pc, 1);
 				return 0;
@@ -277,10 +275,8 @@ void AsebaVMStep(AsebaVMState *vm)
 				buffer[2] = variableIndex;
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessageWords(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, 3);
-				#ifndef DISABLE_WEAK_CALLBACKS
 				if(AsebaVMErrorCB)
 					AsebaVMErrorCB(vm,NULL);
-				#endif // DISABLE_WEAK_CALLBACKS
 				break;
 			}
 			
@@ -321,10 +317,8 @@ void AsebaVMStep(AsebaVMState *vm)
 				buffer[2] = variableIndex;
 				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 				AsebaSendMessageWords(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, buffer, 3);
-				#ifndef DISABLE_WEAK_CALLBACKS
 				if(AsebaVMErrorCB)
 					AsebaVMErrorCB(vm,NULL);
-				#endif // DISABLE_WEAK_CALLBACKS
 				break;
 			}
 			
@@ -522,10 +516,8 @@ void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
 	#error "Please provide a stack memory allocator for your compiler"
 #endif
 	
-	#ifndef DISABLE_WEAK_CALLBACKS
 	if (AsebaVMErrorCB)
 		AsebaVMErrorCB(vm, message);
-	#endif // DISABLE_WEAK_CALLBACKS
 	
 	vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 	
@@ -744,10 +736,8 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		case ASEBA_MESSAGE_RUN:
 		AsebaMaskClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 		AsebaVMSendExecutionStateChanged(vm);
-		#ifndef DISABLE_WEAK_CALLBACKS
 		if(AsebaVMRunCB)
 			AsebaVMRunCB(vm);
-		#endif // DISABLE_WEAK_CALLBACKS
 		break;
 		
 		case ASEBA_MESSAGE_PAUSE:
