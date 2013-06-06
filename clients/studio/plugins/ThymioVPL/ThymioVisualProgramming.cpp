@@ -626,13 +626,12 @@ namespace Aseba { namespace ThymioVPL
 		// desired sizes for height
 		const int idealContentHeight(5*256);
 		const int uncompressibleHeight(
-			actionsLabel->height() +
+			max(actionsLabel->height(), eventsLabel->height()) +
 			desiredToolbarIconSize + 2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
-			eventsLabel->height() +
-			5 * style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
+			style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
+			5 * 10 +
 			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
-			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin) +
-			2 * 20
+			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin)
 		);
 		const int availableHeight(event->size().height() - uncompressibleHeight);
 		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
