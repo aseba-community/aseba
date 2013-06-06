@@ -681,7 +681,7 @@ namespace Aseba { namespace ThymioVPL
 				2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
 				tmp.width() +
 				#ifdef Q_WS_MAC
-				30 // safety factor, as it seems that metrics do miss some space
+				55 // safety factor, as it seems that metrics do miss some space
 				#else // Q_WS_MAC
 				20
 				#endif // Q_WS_MAC
