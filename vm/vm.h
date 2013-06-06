@@ -173,7 +173,7 @@ void AsebaPutVmToSleep(AsebaVMState *vm);
 
 /*! Called by AsebaVMDebugMessage when VM is going to be run */
 #ifdef DISABLE_WEAK_CALLBACKS
-void AsebaVMRunCB(AsebaVMState *vm) {}
+static void AsebaVMRunCB(AsebaVMState *vm) {}
 #else // DISABLE_WEAK_CALLBACKS
 void __attribute__((weak)) AsebaVMRunCB(AsebaVMState *vm);
 #endif // DISABLE_WEAK_CALLBACKS
@@ -181,7 +181,7 @@ void __attribute__((weak)) AsebaVMRunCB(AsebaVMState *vm);
 /*! Called by AsebaVMEmitNodeSpecificError to be notified when VM hit an execution error
 	Is also called for wrong array access or division by 0 with message == NULL */
 #ifdef DISABLE_WEAK_CALLBACKS
-void AsebaVMErrorCB(AsebaVMState *vm, const char* message) {}
+static void AsebaVMErrorCB(AsebaVMState *vm, const char* message) {}
 #else // DISABLE_WEAK_CALLBACKS
 void __attribute__((weak)) AsebaVMErrorCB(AsebaVMState *vm, const char* message);
 #endif // DISABLE_WEAK_CALLBACKS
