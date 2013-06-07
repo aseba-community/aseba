@@ -80,6 +80,8 @@ add_subdirectory(compiler)
 
 add_subdirectory(clients)
 
+add_subdirectory(targets)
+
 add_subdirectory(examples)
 
 add_subdirectory(tests)

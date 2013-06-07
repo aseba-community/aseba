@@ -1,3 +1,6 @@
+if (APPLE)
+	add_definitions(-DDISABLE_WEAK_CALLBACKS)
+endif (APPLE)
 set (ASEBAVM_SRC
 	vm.c
 	natives.c
