@@ -5,8 +5,6 @@
 #include <QGraphicsObject>
 #include <QList>
 
-#include "ThymioIntermediateRepresentation.h"
-
 class QMimeData;
 
 namespace Aseba { namespace ThymioVPL
@@ -14,7 +12,6 @@ namespace Aseba { namespace ThymioVPL
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class ThymioIRButton;
 	class GeometryShapeButton;
 	
 	/**
@@ -53,7 +50,7 @@ namespace Aseba { namespace ThymioVPL
 			bool up;
 		};
 		
-		static Card* createButton(const QString& name, bool advancedMode=false);
+		static Card* createCard(const QString& name, bool advancedMode=false);
 		
 		Card(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
 		virtual ~Card();
@@ -61,20 +58,23 @@ namespace Aseba { namespace ThymioVPL
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
 
-		void setButtonColor(QColor color) { buttonColor = color; update(); }
-		QColor getButtonColor() const { return buttonColor; }
+		void setBackgroundColor(const QColor& color) { backgroundColor = color; update(); }
 		void setParentID(int id) { parentID = id; }
 		int getParentID() const { return parentID; }
 		QString getType() const { return data(0).toString(); }
 		QString getName() const { return data(1).toString(); }
 		
-		virtual int valuesCount() const = 0;
-		virtual int getValue(int i) const = 0;
-		virtual void setValue(int i, int status) = 0;
+		virtual unsigned valuesCount() const = 0;
+		virtual int getValue(unsigned i) const = 0;
+		virtual void setValue(unsigned i, int value) = 0;
+		bool isAnyValueSet() const;
 		
+		unsigned stateFilterCount() const;
 		bool isAnyStateFilter() const;
 		int getStateFilter() const;
+		int getStateFilter(unsigned i) const;
 		void setStateFilter(int val);
+		
 		void setAdvanced(bool advanced);
 		
 		void setScaleFactor(qreal factor);
@@ -82,29 +82,30 @@ namespace Aseba { namespace ThymioVPL
 		void render(QPainter& painter);
 		virtual QPixmap image(qreal factor=1);
 		QMimeData* mimeData() const;
-		
-		ThymioIRButton *getIRButton();
 
 	signals:
-		void stateChanged();
+		void contentChanged();
 
-	protected slots:
-		void updateIRButtonAndNotify();
-		
 	protected:
-		void updateIRButton();
 		void addAdvancedModeButtons();
-		virtual ThymioIRButtonName getIRIdentifier() const = 0;
+		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 		
 	protected:
 		QList<GeometryShapeButton*> stateButtons;
 		
-		ThymioIRButton *buttonIR;
-		QColor buttonColor;
+		QColor backgroundColor;
 		int parentID;
 		qreal trans;
-
-		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+	};
+	
+	class CardWithNoValues: public Card
+	{
+	public:
+		CardWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent);
+		
+		virtual unsigned valuesCount() const { return 0; }
+		virtual int getValue(unsigned i) const { return -1; }
+		virtual void setValue(unsigned i, int value) {}
 	};
 	
 	class CardWithBody: public Card
@@ -123,9 +124,9 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		CardWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
 		
-		virtual int valuesCount() const;
-		virtual int getValue(int i) const;
-		virtual void setValue(int i, int status);
+		virtual unsigned valuesCount() const;
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
 		
 	protected:
 		QList<GeometryShapeButton*> buttons;

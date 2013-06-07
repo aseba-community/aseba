@@ -22,12 +22,11 @@
 #include "../../Plugin.h"
 #include "../../DashelTarget.h"
 
-#include "Card.h"
-#include "Buttons.h"
-#include "Scene.h"
-
 namespace Aseba { namespace ThymioVPL
 {
+	class Scene;
+	class CardButton;
+	
 	/** \addtogroup studio */
 	/*@{*/
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
@@ -73,7 +72,7 @@ namespace Aseba { namespace ThymioVPL
 		void run();
 		void stop();
 		void toggleAdvancedMode();
-		void recompileButtonSet();
+		void processCompilationResult();
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);

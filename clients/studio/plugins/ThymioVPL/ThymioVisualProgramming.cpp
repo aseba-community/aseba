@@ -16,8 +16,12 @@
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
+#include "Card.h"
 #include "EventCards.h"
 #include "ActionCards.h"
+#include "Scene.h"
+#include "Buttons.h"
+
 #include "../../TargetModels.h"
 
 using namespace std;
@@ -167,10 +171,10 @@ namespace Aseba { namespace ThymioVPL
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		sceneLayout->addWidget(view);
-		Q_ASSERT(scene->buttonsEnd() - scene->buttonsBegin());
-		view->centerOn(*scene->buttonsBegin());
+		Q_ASSERT(scene->pairsEnd() - scene->pairsBegin());
+		view->centerOn(*scene->pairsBegin());
 		
-		connect(scene, SIGNAL(stateChanged()), this, SLOT(recompileButtonSet()));
+		connect(scene, SIGNAL(contentRecompiled()), this, SLOT(processCompilationResult()));
 
 		horizontalLayout->addLayout(sceneLayout);
      
@@ -181,7 +185,7 @@ namespace Aseba { namespace ThymioVPL
 		CardButton *colorTopButton = new CardButton("colortop");
 		CardButton *colorBottomButton = new CardButton("colorbottom");
 		CardButton *soundButton = new CardButton("sound");
-		CardButton *memoryButton = new CardButton("memory");
+		CardButton *memoryButton = new CardButton("statefilter");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
@@ -271,8 +275,7 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
 		advancedButton->setEnabled(true);
-		actionButtons.last()->hide(); // state button
-//		scene->clear();
+		actionButtons.last()->hide(); // state filter card
 		scene->reset();
 		close();
 	}
@@ -326,11 +329,11 @@ namespace Aseba { namespace ThymioVPL
 	{
 		scene->setColorScheme(eventColors.at(index), actionColors.at(index));
 		
-		for(QList<CardButton*>::iterator itr = eventButtons.begin();
+		for(QList<CardButton*>::iterator itr(eventButtons.begin());
 			itr != eventButtons.end(); ++itr)
 			(*itr)->changeButtonColor(eventColors.at(index));
 
-		for(QList<CardButton*>::iterator itr = actionButtons.begin();
+		for(QList<CardButton*>::iterator itr(actionButtons.begin());
 			itr != actionButtons.end(); ++itr)
 			(*itr)->changeButtonColor(actionColors.at(index));
 	}
@@ -436,27 +439,27 @@ namespace Aseba { namespace ThymioVPL
 		vplroot.appendChild(settings);
 		vplroot.appendChild(document.createTextNode("\n\n"));
 		
-		for (Scene::ButtonSetItr itr = scene->buttonsBegin(); 
-			  itr != scene->buttonsEnd(); ++itr )
+		for (Scene::PairConstItr itr(scene->pairsBegin()); 
+			  itr != scene->pairsEnd(); ++itr )
 		{
 			QDomElement element = document.createElement("buttonset");
 			
-			if( (*itr)->eventExists() ) 
+			if( (*itr)->hasEventCard() ) 
 			{
-				Card *button = (*itr)->getEventButton();
-				element.setAttribute("event-name", button->getName() );
+				const Card *card((*itr)->getEventCard());
+				element.setAttribute("event-name", card->getName() );
 			
-				for(int i=0; i<button->valuesCount(); ++i)
-					element.setAttribute( QString("eb%0").arg(i), button->getValue(i));
-				element.setAttribute("state", button->getStateFilter());
+				for(unsigned i=0; i<card->valuesCount(); ++i)
+					element.setAttribute( QString("eb%0").arg(i), card->getValue(i));
+				element.setAttribute("state", card->getStateFilter());
 			}
 			
-			if( (*itr)->actionExists() ) 
+			if( (*itr)->hasActionCard() ) 
 			{
-				Card *button = (*itr)->getActionButton();
-				element.setAttribute("action-name", button->getName() );
-				for(int i=0; i<button->valuesCount(); ++i)
-					element.setAttribute(QString("ab%0").arg(i), button->getValue(i));
+				const Card *card((*itr)->getActionCard());
+				element.setAttribute("action-name", card->getName() );
+				for(unsigned i=0; i<card->valuesCount(); ++i)
+					element.setAttribute(QString("ab%0").arg(i), card->getValue(i));
 			}
 			
 			vplroot.appendChild(element);
@@ -487,40 +490,40 @@ namespace Aseba { namespace ThymioVPL
 				}
 				else if(element.tagName() == "buttonset")
 				{
-					QString buttonName;
-					Card *eventButton = 0;
-					Card *actionButton = 0;
+					QString cardName;
+					Card *eventCard = 0;
+					Card *actionCard = 0;
 					
-					if( !(buttonName = element.attribute("event-name")).isEmpty() )
+					if( !(cardName = element.attribute("event-name")).isEmpty() )
 					{
-						eventButton = Card::createButton(buttonName,scene->getAdvanced());
-						if (!eventButton)
+						eventCard = Card::createCard(cardName,scene->getAdvanced());
+						if (!eventCard)
 						{
 							QMessageBox::warning(this,tr("Loading"),
-												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
+												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
 							return;
 						}
 
-						for(int i=0; i<eventButton->valuesCount(); ++i)
-							eventButton->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
-						eventButton->setStateFilter(element.attribute("state").toInt());
+						for (unsigned i=0; i<eventCard->valuesCount(); ++i)
+							eventCard->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
+						eventCard->setStateFilter(element.attribute("state").toInt());
 					}
 					
-					if( !(buttonName = element.attribute("action-name")).isEmpty() )
+					if( !(cardName = element.attribute("action-name")).isEmpty() )
 					{
-						actionButton = Card::createButton(buttonName,scene->getAdvanced());
-						if (!actionButton)
+						actionCard = Card::createCard(cardName,scene->getAdvanced());
+						if (!actionCard)
 						{
 							QMessageBox::warning(this,tr("Loading"),
-												 tr("Error in XML source file: %0 unknown event type").arg(buttonName));
+												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
 							return;
 						}
 
-						for(int i=0; i<actionButton->valuesCount(); ++i)
-							actionButton->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
+						for (unsigned i=0; i<actionCard->valuesCount(); ++i)
+							actionCard->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
 					}
 
-					scene->addButtonSet(eventButton, actionButton);
+					scene->addEventActionPair(eventCard, actionCard);
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -533,7 +536,7 @@ namespace Aseba { namespace ThymioVPL
 			show();
 	}
 
-	void ThymioVisualProgramming::recompileButtonSet()
+	void ThymioVisualProgramming::processCompilationResult()
 	{
 		compilationResult->setText(scene->getErrorMessage());
 		if( scene->isSuccessful() ) 

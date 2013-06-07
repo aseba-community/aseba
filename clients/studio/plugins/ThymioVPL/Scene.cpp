@@ -15,18 +15,18 @@ namespace Aseba { namespace ThymioVPL
 		prevNewEventButton(false),
 		prevNewActionButton(false),
 		lastFocus(-1),
-		thymioCompiler(),
-		eventButtonColor(QColor(0,191,255)),
-		actionButtonColor(QColor(218,112,214)),
+		compiler(*this),
+		eventCardColor(QColor(0,191,255)),
+		actionCardColor(QColor(218,112,214)),
 		sceneModified(false),
 		newRow(false),
 		advancedMode(false)
 	{
 		// create initial button
-		EventActionPair *button = createNewButtonSet();
+		EventActionPair *button = createNewEventActionPair();
 		buttonSetHeight = button->boundingRect().height();
 		
-		connect(this, SIGNAL(selectionChanged()), this, SIGNAL(stateChanged()));
+		connect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
 	}
 	
 	Scene::~Scene()
@@ -36,42 +36,43 @@ namespace Aseba { namespace ThymioVPL
 
 	QGraphicsItem *Scene::addAction(Card *item) 
 	{
+		// FIXME: redo this
 		EventActionPair *button = 0; 
 		prevNewActionButton = false;
 		
 		if( newRow )
-			button = createNewButtonSet();
+			button = createNewEventActionPair();
 		else if( prevNewEventButton )
-			button = buttonSets.last();
+			button = eventActionPairs.last();
 		else 
 		{
 			if( lastFocus >= 0 )
-				button = buttonSets.at(lastFocus);
+				button = eventActionPairs.at(lastFocus);
 			else
-				for(int i=0; i<buttonSets.size(); ++i)
-					if( buttonSets.at(i)->hasFocus() )
+				for(int i=0; i<eventActionPairs.size(); ++i)
+					if( eventActionPairs.at(i)->hasFocus() )
 					{
-						button = buttonSets.at(i);
+						button = eventActionPairs.at(i);
 						break;
 					}
 			
 			if( !button )
 			{
-				if(!buttonSets.isEmpty() && !(buttonSets.last()->actionExists()) )
-					button = buttonSets.last();
+				if(!eventActionPairs.isEmpty() && !(eventActionPairs.last()->hasActionCard()) )
+					button = eventActionPairs.last();
 				else
 				{
-					button = createNewButtonSet();
+					button = createNewEventActionPair();
 					prevNewActionButton = true;
 				}
 			}
 		}
 		
-		if( item ) button->addActionButton(item);
+		if( item ) button->addActionCard(item);
 		prevNewEventButton = false;
 		newRow = false;
 	
-		if( button->eventExists() ) 
+		if( button->hasEventCard() ) 
 		{
 			lastFocus = -1;
 			setFocusItem(0);
@@ -82,32 +83,33 @@ namespace Aseba { namespace ThymioVPL
 
 	QGraphicsItem *Scene::addEvent(Card *item) 
 	{
+		// FIXME: redo this
 		EventActionPair *button = 0; 
 		prevNewEventButton = false;
 
 		if( newRow )
-			button = createNewButtonSet();
+			button = createNewEventActionPair();
 		else if( prevNewActionButton )
-			button = buttonSets.last();
+			button = eventActionPairs.last();
 		else 
 		{
 			if( lastFocus >= 0 )
-				button = buttonSets.at(lastFocus);
+				button = eventActionPairs.at(lastFocus);
 			else
-				for(int i=0; i<buttonSets.size(); ++i)
-					if( buttonSets.at(i)->hasFocus() )
+				for(int i=0; i<eventActionPairs.size(); ++i)
+					if( eventActionPairs.at(i)->hasFocus() )
 					{
-						button = buttonSets.at(i);
+						button = eventActionPairs.at(i);
 						break;
 					}
 			
 			if( !button )
 			{
-				if(!buttonSets.isEmpty() && !(buttonSets.last()->eventExists()) )
-					button = buttonSets.last();
+				if(!eventActionPairs.isEmpty() && !(eventActionPairs.last()->hasEventCard()) )
+					button = eventActionPairs.last();
 				else
 				{
-					button = createNewButtonSet();
+					button = createNewEventActionPair();
 					prevNewEventButton = true;
 				}
 			}
@@ -115,11 +117,11 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		if( item )
-			button->addEventButton(item);
+			button->addEventCard(item);
 		prevNewActionButton = false;
 		newRow = false;
 		
-		if( button->actionExists() ) 
+		if( button->hasActionCard() ) 
 		{
 			lastFocus = -1;
 			setFocusItem(0);
@@ -128,13 +130,13 @@ namespace Aseba { namespace ThymioVPL
 		return button;
 	}
 
-	void Scene::addButtonSet(Card *event, Card *action)
+	void Scene::addEventActionPair(Card *event, Card *action)
 	{
-		EventActionPair *button = createNewButtonSet();
+		EventActionPair *p(createNewEventActionPair());
 		if(event)
-			button->addEventButton(event);
+			p->addEventCard(event);
 		if(action)
-			button->addActionButton(action);
+			p->addActionCard(action);
 		lastFocus = -1;
 		setFocusItem(0);
 
@@ -143,28 +145,27 @@ namespace Aseba { namespace ThymioVPL
 		newRow = false;
 	}
 
-	EventActionPair *Scene::createNewButtonSet()
+	EventActionPair *Scene::createNewEventActionPair()
 	{
-		EventActionPair *button = new EventActionPair(buttonSets.size(), advancedMode);
-		button->setColorScheme(eventButtonColor, actionButtonColor);
-		buttonSets.push_back(button);
+		EventActionPair *p(new EventActionPair(eventActionPairs.size(), advancedMode));
+		p->setColorScheme(eventCardColor, actionCardColor);
+		eventActionPairs.push_back(p);
 		
-		addItem(button);
+		addItem(p);
 
-		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-		thymioCompiler.addButtonSet(button->getIRButtonSet());
+		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
-		return button;
+		return p;
 	}
 
 	bool Scene::isEmpty() const
 	{
-		if( buttonSets.isEmpty() )
+		if( eventActionPairs.isEmpty() )
 			return true;
 			
-		if( buttonSets.size() > 1 ||
-			buttonSets[0]->actionExists() ||
-			buttonSets[0]->eventExists() )
+		if( eventActionPairs.size() > 1 ||
+			eventActionPairs[0]->hasActionCard() ||
+			eventActionPairs[0]->hasEventCard() )
 			return false;
 
 		return true;
@@ -173,20 +174,20 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::reset()
 	{
 		clear();
-		createNewButtonSet();
-		buttonUpdateDetected();
+		createNewEventActionPair();
+		recompile();
 	}
 	
 	void Scene::clear()
 	{
-		for(int i=0; i<buttonSets.size(); i++)
+		for(int i=0; i<eventActionPairs.size(); i++)
 		{
-			disconnect(buttonSets.at(i), SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-			removeItem(buttonSets.at(i));
-			delete(buttonSets.at(i));
+			disconnect(eventActionPairs.at(i), SIGNAL(contentChanged()), this, SLOT(recompile()));
+			removeItem(eventActionPairs.at(i));
+			delete(eventActionPairs.at(i));
 		}
-		buttonSets.clear();
-		thymioCompiler.clear();
+		eventActionPairs.clear();
+		compiler.clear();
 		
 		sceneModified = false;
 		
@@ -198,16 +199,16 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::haveAtLeastAnEmptyCard()
 	{
-		if (buttonSets.empty())
-			createNewButtonSet();
+		if (eventActionPairs.empty())
+			createNewEventActionPair();
 	}
 	
 	void Scene::setColorScheme(QColor eventColor, QColor actionColor)
 	{
-		eventButtonColor = eventColor;
-		actionButtonColor = actionColor;
+		eventCardColor = eventColor;
+		actionCardColor = actionColor;
 
-		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
+		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 			(*itr)->setColorScheme(eventColor, actionColor);
 
 		update();
@@ -218,20 +219,20 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::setAdvanced(bool advanced)
 	{
 		advancedMode = advanced;
-		for(ButtonSetItr itr = buttonsBegin(); itr != buttonsEnd(); ++itr)
+		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 		{
-			EventActionPair* button(*itr);
-			button->disconnect(SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-			button->setAdvanced(advanced);
-			connect(button, SIGNAL(buttonUpdated()), SLOT(buttonUpdateDetected()));
+			EventActionPair* p(*itr);
+			p->disconnect(SIGNAL(contentChanged()), this, SLOT(recompile()));
+			p->setAdvanced(advanced);
+			connect(p, SIGNAL(contentChanged()), SLOT(recompile()));
 		}
 		
-		buttonUpdateDetected();
+		recompile();
 	}
 	
 	bool Scene::isAnyStateFilter() const
 	{
-		for (ButtonSetConstItr itr = buttonSets.begin(); itr != buttonSets.end(); ++itr)
+		for (PairConstItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 			if ((*itr)->isAnyStateFilter())
 				return true;
 		return false;
@@ -239,20 +240,19 @@ namespace Aseba { namespace ThymioVPL
 
 	void Scene::removeButton(int row)
 	{
-		Q_ASSERT( row < buttonSets.size() );
+		Q_ASSERT( row < eventActionPairs.size() );
 		
-		EventActionPair *button = buttonSets[row];
-		disconnect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-		buttonSets.removeAt(row);
-		thymioCompiler.removeButtonSet(row);
+		EventActionPair *p(eventActionPairs[row]);
+		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		eventActionPairs.removeAt(row);
 		
-		removeItem(button);
-		delete(button);
+		removeItem(p);
+		delete(p);
 		
 		rearrangeButtons(row);
 
-		if (buttonSets.isEmpty()) 
-			createNewButtonSet();
+		if (eventActionPairs.isEmpty()) 
+			createNewEventActionPair();
 
 		prevNewEventButton = false;
 		prevNewActionButton = false;
@@ -260,23 +260,21 @@ namespace Aseba { namespace ThymioVPL
 	
 		sceneModified = true;
 		
-		buttonUpdateDetected();
+		recompile();
 	}
 	
 	void Scene::insertButton(int row) 
 	{
-		Q_ASSERT( row <= buttonSets.size() );
+		Q_ASSERT( row <= eventActionPairs.size() );
 
-		EventActionPair *button = new EventActionPair(row, advancedMode);
-		button->setColorScheme(eventButtonColor, actionButtonColor);
-		buttonSets.insert(row, button);
-		addItem(button);
+		EventActionPair *p(new EventActionPair(row, advancedMode));
+		p->setColorScheme(eventCardColor, actionCardColor);
+		eventActionPairs.insert(row, p);
+		addItem(p);
 		
-		thymioCompiler.insertButtonSet(row, button->getIRButtonSet());
+		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
-		connect(button, SIGNAL(buttonUpdated()), this, SLOT(buttonUpdateDetected()));
-		
-		setFocusItem(button);
+		setFocusItem(p);
 		lastFocus = row;
 		
 		rearrangeButtons(row+1);
@@ -286,35 +284,35 @@ namespace Aseba { namespace ThymioVPL
 	
 		sceneModified = true;
 		
-		buttonUpdateDetected();
+		recompile();
 	}
 
 	void Scene::rearrangeButtons(int row)
 	{
-		for(int i=row; i<buttonSets.size(); ++i) 
-			buttonSets.at(i)->setRow(i);
+		for(int i=row; i<eventActionPairs.size(); ++i) 
+			eventActionPairs.at(i)->setRow(i);
 	}
 	
 	QString Scene::getErrorMessage() const
 	{ 
-		switch(thymioCompiler.getErrorCode()) {
-		case THYMIO_MISSING_EVENT:
-			return tr("Line %0: Missing event").arg(thymioCompiler.getErrorLine());
+		switch(compiler.getErrorCode())
+		{
+		case Compiler::MISSING_EVENT:
+			return tr("Line %0: Missing event").arg(compiler.getErrorLine());
 			break;
-		case THYMIO_MISSING_ACTION:
-			return tr("Line %0: Missing action").arg(thymioCompiler.getErrorLine());
+		case Compiler::MISSING_ACTION:
+			return tr("Line %0: Missing action").arg(compiler.getErrorLine());
 			break;
-		case THYMIO_EVENT_MULTISET:
-			return tr("Line %0: Redeclaration of event").arg(thymioCompiler.getErrorLine());
+		case Compiler::EVENT_REPEATED:
+			return tr("Line %0: Redeclaration of event").arg(compiler.getErrorLine());
 			break;
-		case THYMIO_INVALID_CODE:
-			return tr("Line %0: Unknown event/action type").arg(thymioCompiler.getErrorLine());
+		case Compiler::INVALID_CODE:
+			return tr("Line %0: Unknown event/action type").arg(compiler.getErrorLine());
 			break;
-		case THYMIO_NO_ERROR:
+		case Compiler::NO_ERROR:
 			return tr("Compilation success");
 		default:
 			return tr("Unknown VPL error");
-			break;
 		}
 	}	
 	
@@ -322,8 +320,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		QList<QString> out;
 		
-		for(std::vector<std::wstring>::const_iterator itr = thymioCompiler.beginCode();
-			itr != thymioCompiler.endCode(); ++itr)
+		for(std::vector<std::wstring>::const_iterator itr = compiler.beginCode();
+			itr != compiler.endCode(); ++itr)
 			out.push_back(QString::fromStdWString(*itr));
 	
 		return out;
@@ -335,8 +333,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		while( item != 0 )
 		{
-			if( item->data(0).toString() == "buttonset" )
-				return thymioCompiler.buttonToCode(item->data(1).toInt());
+			if( item->data(0).toString() == "eventactionpair" )
+				return compiler.buttonToCode(item->data(1).toInt());
 			else
 				item = item->parentItem();
 		}
@@ -344,26 +342,26 @@ namespace Aseba { namespace ThymioVPL
 		return -1;
 	}
 	
-	void Scene::buttonUpdateDetected()
+	void Scene::recompile()
 	{
 		sceneModified = true;
 		
-		thymioCompiler.compile();
-		thymioCompiler.generateCode();
+		compiler.compile();
+		compiler.generateCode();
 		
-		for(int i=0; i<buttonSets.size(); i++)
-			buttonSets[i]->setErrorStatus(false);
+		for(int i=0; i<eventActionPairs.size(); i++)
+			eventActionPairs[i]->setErrorStatus(false);
 		
-		if( !thymioCompiler.isSuccessful() )
-			buttonSets[thymioCompiler.getErrorLine()]->setErrorStatus(true);
+		if( !compiler.isSuccessful() )
+			eventActionPairs[compiler.getErrorLine()]->setErrorStatus(true);
 		
-		emit stateChanged();
+		emit contentRecompiled();
 	}
 
 	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if( event->mimeData()->hasFormat("thymiobutton") && 
-			((event->scenePos().y()-20)/(buttonSetHeight)) >= buttonSets.size() ) 
+		if( event->mimeData()->hasFormat("Card") && 
+			((event->scenePos().y()-20)/(buttonSetHeight)) >= eventActionPairs.size() ) 
 		{
 			setFocusItem(0);
 			event->accept();
@@ -382,41 +380,39 @@ namespace Aseba { namespace ThymioVPL
 			int prevRow, currentRow;
 			dataStream >> prevRow;
 			
-			EventActionPair *button = buttonSets.at(prevRow);
-			buttonSets.removeAt(prevRow);
-			thymioCompiler.removeButtonSet(prevRow);
+			EventActionPair *p(eventActionPairs.at(prevRow));
+			eventActionPairs.removeAt(prevRow);
 
 			qreal currentYPos = event->scenePos().y();
 			currentRow = (int)((currentYPos-20)/(buttonSetHeight));
-			currentRow = (currentRow < 0 ? 0 : currentRow > buttonSets.size() ? buttonSets.size() : currentRow);
-
-			buttonSets.insert(currentRow, button);
-			thymioCompiler.insertButtonSet(currentRow, button->getIRButtonSet());
+			currentRow = (currentRow < 0 ? 0 : currentRow > eventActionPairs.size() ? eventActionPairs.size() : currentRow);
+			
+			eventActionPairs.insert(currentRow, p);
 
 			rearrangeButtons( prevRow < currentRow ? prevRow : currentRow );
 			
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 
-			setFocusItem(button);
+			setFocusItem(p);
 			lastFocus = currentRow;
 			
-			buttonUpdateDetected();
+			recompile();
 		}
-		else if( event->mimeData()->hasFormat("thymiobutton") && 
-				((event->scenePos().y()-20)/(buttonSetHeight)) >= buttonSets.size() )
+		else if( event->mimeData()->hasFormat("Card") && 
+				((event->scenePos().y()-20)/(buttonSetHeight)) >= eventActionPairs.size() )
 		{
-			QByteArray buttonData = event->mimeData()->data("thymiobutton");
+			QByteArray buttonData = event->mimeData()->data("Card");
 			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
 			
 			int parentID;
 			dataStream >> parentID;
 
-			QString buttonName;
+			QString cardName;
 			int numButtons;
-			dataStream >> buttonName >> numButtons;
+			dataStream >> cardName >> numButtons;
 			
-			Card *button(Card::createButton(buttonName, advancedMode));
+			Card *button(Card::createCard(cardName, advancedMode));
 			if( button ) 
 			{
 				event->setDropAction(Qt::MoveAction);
@@ -427,9 +423,9 @@ namespace Aseba { namespace ThymioVPL
 				prevNewEventButton = false;
 				newRow = true;
 				
-				if( event->mimeData()->data("thymiotype") == QString("event").toLatin1() )
+				if( event->mimeData()->data("CardType") == QString("event").toLatin1() )
 					addEvent(button);
-				else if( event->mimeData()->data("thymiotype") == QString("action").toLatin1() )
+				else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
 					addAction(button);
 
 				for( int i=0; i<numButtons; ++i ) 
@@ -445,7 +441,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 
 	void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
-	{		
+	{
 		QGraphicsScene::mousePressEvent(event);
 	}
 	
@@ -462,8 +458,6 @@ namespace Aseba { namespace ThymioVPL
 					removeButton((item->parentItem()->data(1)).toInt());
 				else if( item->data(0) == "add" )
 					insertButton((item->parentItem()->data(1)).toInt()+1);
-//				else if( item->data(0) == "buttonset" )
-//					lastFocus = item->data(1).toInt();
 			}
 		}
 		

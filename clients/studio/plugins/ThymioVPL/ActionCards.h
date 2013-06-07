@@ -1,8 +1,9 @@
 #ifndef VPL_ACTION_CARDS_H
 #define VPL_ACTION_CARDS_H
 
-#include "Card.h"
 #include <QList>
+
+#include "Card.h"
 
 class QSlider;
 class QTimeLine;
@@ -20,13 +21,10 @@ namespace Aseba { namespace ThymioVPL
 		MoveActionCard(QGraphicsItem *parent=0);
 		virtual ~MoveActionCard();
 	
-		virtual int valuesCount() const { return 2; }
-		virtual int getValue(int i) const;
-		virtual void setValue(int i, int status);
+		virtual unsigned valuesCount() const { return 2; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
 		
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_MOVE_IR; }
-
 	private slots:
 		void frameChanged(int frame);
 		void valueChangeDetected();
@@ -47,9 +45,9 @@ namespace Aseba { namespace ThymioVPL
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
 	public:
-		virtual int valuesCount() const { return 3; }
-		virtual int getValue(int i) const;
-		virtual void setValue(int i, int value);
+		virtual unsigned valuesCount() const { return 3; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
 		
 	private slots:
 		void valueChangeDetected();
@@ -61,17 +59,11 @@ namespace Aseba { namespace ThymioVPL
 	struct TopColorActionCard : public ColorActionCard
 	{
 		TopColorActionCard(QGraphicsItem *parent=0);
-		
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_COLOR_TOP_IR; }
 	};
 	
 	struct BottomColorActionCard : public ColorActionCard
 	{
 		BottomColorActionCard(QGraphicsItem *parent=0);
-		
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_COLOR_BOTTOM_IR; }
 	};
 	
 	class SoundActionCard : public CardWithBody
@@ -81,12 +73,11 @@ namespace Aseba { namespace ThymioVPL
 		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
-		virtual int valuesCount() const { return 6; }
-		virtual int getValue(int i) const;
-		virtual void setValue(int i, int value);
+		virtual unsigned valuesCount() const { return 6; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
 		
 	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_SOUND_IR; }
 		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 		
 	protected:
@@ -98,9 +89,6 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		StateFilterActionCard(QGraphicsItem *parent=0);
-		
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_MEMORY_IR; }
 	};
 	
 	/*@}*/

@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 
-#include "ThymioIntermediateRepresentation.h"
+#include "Compiler.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -38,44 +38,39 @@ namespace Aseba { namespace ThymioVPL
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
 		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1028, 336) : QRectF(0, 0, 900, 336); }
-
-		void addEventButton(Card *event);
-		void addActionButton(Card *action);
+		
 		void setRow(int row);
 		int getRow() const { return data(1).toInt(); }
-		Card *getEventButton() { return eventButton; }
-		Card *getActionButton() { return actionButton; }
 		
-		bool eventExists() const { return eventButton == 0 ? false : true; }
-		bool actionExists() const { return actionButton == 0 ? false : true; }
+		void addEventCard(Card *event);
+		void addActionCard(Card *action);
+		const bool hasEventCard() const { return eventCard != 0; }
+		const Card *getEventCard() const { return eventCard; }
+		const bool hasActionCard() const { return actionCard != 0; }
+		const Card *getActionCard() const { return actionCard; }
+		
 		bool isAnyStateFilter() const;
 		
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		
 		void setAdvanced(bool advanced);
-		
-		ThymioIRButtonSet *getIRButtonSet() { return &buttonSetIR; }
-
+	
 		void setErrorStatus(bool flag) { errorFlag = flag; }
 		
 	signals:
-		void buttonUpdated();
-	
-	public slots:
-		void stateChanged();
+		void contentChanged();
 		
 	protected:
 		void repositionElements();
 	
 	private:
-		Card *eventButton;
-		Card *actionButton;
+		Card *eventCard;
+		Card *actionCard;
 		ThymioRemoveButton *deleteButton;
 		ThymioAddButton *addButton;
-		ThymioIRButtonSet buttonSetIR;
 		
-		QColor eventButtonColor;
-		QColor actionButtonColor;
+		QColor eventCardColor;
+		QColor actionCardColor;
 		
 		bool highlightEventButton;
 		bool highlightActionButton;

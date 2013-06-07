@@ -12,53 +12,30 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		ArrowButtonsEventCard(QGraphicsItem *parent=0, bool advanced=false);
-	
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_BUTTONS_IR; }
 	};
 	
 	class ProxEventCard : public CardWithButtons
 	{
 	public:
 		ProxEventCard(QGraphicsItem *parent=0, bool advanced=false);
-	
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_PROX_IR; }
 	};
 
 	class ProxGroundEventCard : public CardWithButtons
 	{
 	public:
 		ProxGroundEventCard(QGraphicsItem *parent=0, bool advanced=false);
-	
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_PROX_GROUND_IR; }
 	};
 
-	class TapEventCard : public Card
+	class TapEventCard : public CardWithNoValues
 	{
 	public:
 		TapEventCard(QGraphicsItem *parent=0, bool advanced=false);
-		
-		virtual int valuesCount() const { return 0; }
-		virtual int getValue(int i) const { return -1; }
-		virtual void setValue(int i, int status) {}
-	
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_TAP_IR; }
 	};
 
-	class ClapEventCard : public Card
+	class ClapEventCard : public CardWithNoValues
 	{
 	public:
 		ClapEventCard(QGraphicsItem *parent=0, bool advanced=false);
-		
-		virtual int valuesCount() const { return 0; }
-		virtual int getValue(int i) const { return -1; }
-		virtual void setValue(int i, int status) {}
-		
-	protected:
-		ThymioIRButtonName getIRIdentifier() const { return THYMIO_CLAP_IR; }
 	};
 	
 	/*@}*/

@@ -43,7 +43,7 @@ namespace Aseba { namespace ThymioVPL
 			sliders.push_back(s);
 			
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButtonAndNotify()));
+			connect(s, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
 		}
 		
 		thymioBody = new ThymioBody(this, -70);
@@ -82,14 +82,14 @@ namespace Aseba { namespace ThymioVPL
 		timer->start();
 	}
 	
-	int MoveActionCard::getValue(int i) const
+	int MoveActionCard::getValue(unsigned i) const
 	{ 
 		if (i<sliders.size()) 
 			return sliders[i]->value()*50;
 		return -1;
 	}
 
-	void MoveActionCard::setValue(int i, int value) 
+	void MoveActionCard::setValue(unsigned i, int value) 
 	{ 
 		if(i<sliders.size()) 
 			sliders[i]->setSliderPosition(value/50);
@@ -107,7 +107,7 @@ namespace Aseba { namespace ThymioVPL
 
 		const char *sliderColors[] = { "FF0000", "00FF00", "0000FF" };
 		
-		for(int i=0; i<3; i++)
+		for(unsigned i=0; i<3; i++)
 		{
 			QSlider *s = new QSlider(Qt::Horizontal);
 			s->setRange(0,32);
@@ -133,21 +133,21 @@ namespace Aseba { namespace ThymioVPL
 			sliders.push_back(s);
 			
 			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(updateIRButtonAndNotify()));
+			connect(s, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
 		}
 	}
 
-	int ColorActionCard::getValue(int i) const
+	int ColorActionCard::getValue(unsigned i) const
 	{ 
 		if(i<sliders.size()) 
 			return sliders[i]->value(); 
 		return -1;
 	}
 	
-	void ColorActionCard::setValue(int i, int status) 
+	void ColorActionCard::setValue(unsigned i, int value) 
 	{ 
 		if(i<sliders.size()) 
-			sliders[i]->setSliderPosition(status);
+			sliders[i]->setSliderPosition(value);
 	}
 	
 	void ColorActionCard::valueChangeDetected()
@@ -239,25 +239,25 @@ namespace Aseba { namespace ThymioVPL
 					note = noteVal;
 			}
 			update();
-			updateIRButtonAndNotify();
+			emit contentChanged();
 		}
 	}
 	
-	int SoundActionCard::getValue(int i) const
+	int SoundActionCard::getValue(unsigned i) const
 	{ 
 		if (i<6) 
 			return notes[i] | (durations[i] << 8); 
 		return -1;
 	}
 	
-	// TODO: FIXME: use size_t for index
-	void SoundActionCard::setValue(int i, int value) 
+	void SoundActionCard::setValue(unsigned i, int value) 
 	{ 
-		if (i<6) 
+		if (i<6)
 		{
-			notes[i] = value;
+			notes[i] = value & 0xff;
+			durations[i] = (value >> 8) & 0xff;
 			update();
-			updateIRButtonAndNotify();
+			emit contentChanged();
 		}
 	}
 
@@ -266,7 +266,7 @@ namespace Aseba { namespace ThymioVPL
 		CardWithButtons(false, true, false, parent)
 	{
 		setData(0, "action");
-		setData(1, "memory");
+		setData(1, "statefilter");
 		
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
@@ -278,7 +278,7 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(Qt::white);
 
 			buttons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
 	}	
 } } // namespace ThymioVPL / namespace Aseba

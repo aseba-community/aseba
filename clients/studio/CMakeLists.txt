@@ -77,23 +77,23 @@ if (QT4_FOUND)
 		Plugin.cpp
 		plugins/VariablesViewPlugin.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
-		plugins/ThymioVPL/Scene.cpp
 		plugins/ThymioVPL/Buttons.cpp
-		plugins/ThymioVPL/EventActionPair.cpp
+		plugins/ThymioVPL/Card.cpp
 		plugins/ThymioVPL/EventCards.cpp
 		plugins/ThymioVPL/ActionCards.cpp
-		plugins/ThymioVPL/ThymioIRButtons.cpp
-		plugins/ThymioVPL/ThymioIRVisitors.cpp
-		plugins/ThymioVPL/ThymioCompiler.cpp
+		plugins/ThymioVPL/EventActionPair.cpp
+		plugins/ThymioVPL/Scene.cpp
+		plugins/ThymioVPL/Compiler.cpp
+		plugins/ThymioVPL/CompilerVisitors.cpp
 	)
 	qt4_wrap_cpp(qt_plugins_MOCS
 		plugins/VariablesViewPlugin.h
 		plugins/ThymioVPL/ThymioVisualProgramming.h
-		plugins/ThymioVPL/Scene.h
 		plugins/ThymioVPL/Buttons.h
 		plugins/ThymioVPL/Card.h
 		plugins/ThymioVPL/ActionCards.h
 		plugins/ThymioVPL/EventActionPair.h
+		plugins/ThymioVPL/Scene.h
 	)
 	add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 	

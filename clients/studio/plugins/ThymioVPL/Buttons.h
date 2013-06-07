@@ -4,8 +4,6 @@
 #include <QGraphicsItem>
 #include <QPushButton>
 
-#include "ThymioIntermediateRepresentation.h"
-
 class QSlider;
 class QTimeLine;
 class QMimeData;
@@ -78,8 +76,8 @@ namespace Aseba { namespace ThymioVPL
 		virtual void dragEnterEvent( QDragEnterEvent *event );
 		virtual void dropEvent( QDropEvent *event );
 
-	private:
-		Card *thymioButton;
+	protected:
+		Card *card;
 	};
 		
 	/*@}*/

@@ -16,7 +16,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		QGraphicsItem *addAction(Card *item);
 		QGraphicsItem *addEvent(Card *item);
-		void addButtonSet(Card *event, Card *action);
+		void addEventActionPair(Card *event, Card *action);
 
 		bool isEmpty() const;
 		void reset();
@@ -29,28 +29,27 @@ namespace Aseba { namespace ThymioVPL
 		void setAdvanced(bool advanced);
 		bool getAdvanced() const { return advancedMode; }
 		bool isAnyStateFilter() const;
-		int getNumberOfButtonSets() const { return buttonSets.size(); }
 		
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
 		
-		bool isSuccessful() const { return  thymioCompiler.isSuccessful(); }
+		bool isSuccessful() const { return  compiler.isSuccessful(); }
 		int getFocusItemId() const;
 		
-		typedef QList<EventActionPair *>::iterator ButtonSetItr;
-		typedef QList<EventActionPair *>::const_iterator ButtonSetConstItr;
+		typedef QList<EventActionPair *>::iterator PairItr;
+		typedef QList<EventActionPair *>::const_iterator PairConstItr;
 		
-		ButtonSetItr buttonsBegin() { return buttonSets.begin(); }
-		ButtonSetItr buttonsEnd() { return buttonSets.end(); }
+		PairItr pairsBegin() { return eventActionPairs.begin(); }
+		PairItr pairsEnd() { return eventActionPairs.end(); }
 		
-		ButtonSetConstItr buttonsBegin() const { return buttonSets.begin(); }
-		ButtonSetConstItr buttonsEnd() const { return buttonSets.end(); }
+		PairConstItr pairsBegin() const { return eventActionPairs.begin(); }
+		PairConstItr pairsEnd() const { return eventActionPairs.end(); }
 		
 	signals:
-		void stateChanged();
+		void contentRecompiled();
 		
-	private slots:
-		void buttonUpdateDetected();
+	protected slots:
+		void recompile();
 		
 	protected:
 		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
@@ -59,22 +58,22 @@ namespace Aseba { namespace ThymioVPL
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-	private:
+	protected:
 		void removeButton(int row);
 		void insertButton(int row);
 		void rearrangeButtons(int row=0);
 		
-		EventActionPair *createNewButtonSet();
+		EventActionPair *createNewEventActionPair();
 
 		bool prevNewEventButton;
 		bool prevNewActionButton;
 		int lastFocus;
 		
-		QList<EventActionPair *> buttonSets;
-		ThymioCompiler thymioCompiler;
+		QList<EventActionPair *> eventActionPairs;
+		Compiler compiler;
 		
-		QColor eventButtonColor;
-		QColor actionButtonColor;
+		QColor eventCardColor;
+		QColor actionCardColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
 		bool newRow;

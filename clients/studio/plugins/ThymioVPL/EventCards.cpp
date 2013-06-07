@@ -29,14 +29,14 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(color);
 			buttons.push_back(button);
 
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
 
 		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		buttons.push_back(button);
-		connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+		connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 	}
 	
 	// Prox Event
@@ -61,7 +61,7 @@ namespace Aseba { namespace ThymioVPL
 
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
 		
 		for(int i=0; i<2; ++i) 
@@ -76,9 +76,8 @@ namespace Aseba { namespace ThymioVPL
 			
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
-
 	}
 	
 	// Prox Ground Event
@@ -100,13 +99,13 @@ namespace Aseba { namespace ThymioVPL
 			
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SLOT(updateIRButtonAndNotify()));
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
 	}
 	
 	// Tap Event
 	TapEventCard::TapEventCard( QGraphicsItem *parent, bool advanced ) :
-		Card(true, advanced, parent)
+		CardWithNoValues(true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "tap");
@@ -117,8 +116,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Clap Event
 	ClapEventCard::ClapEventCard( QGraphicsItem *parent, bool advanced ) :
-		Card(true, advanced, parent)
-	{		
+		CardWithNoValues(true, advanced, parent)
+	{
 		setData(0, "event");
 		setData(1, "clap");
 		
