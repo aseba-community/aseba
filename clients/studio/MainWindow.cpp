@@ -114,17 +114,22 @@ namespace Aseba
 	//////
 
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
-		QTextEdit(parent)
+		QDialog(parent),
+		te(new QTextEdit())
 	{
+		QVBoxLayout *l(new QVBoxLayout);
+		l->addWidget(te);
+		setLayout(l);
+		
 		QFont font;
 		font.setFamily("");
 		font.setStyleHint(QFont::TypeWriter);
 		font.setFixedPitch(true);
 		font.setPointSize(10);
 		
-		setFont(font);
-		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
-		setReadOnly(true);
+		te->setFont(font);
+		te->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+		te->setReadOnly(true);
 		
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
 		
@@ -324,8 +329,8 @@ namespace Aseba
 		allocatedVariablesCount = 0;
 		
 		// create models
-		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), showHidden);
-		vmMemoryModel = new TargetVariablesModel();
+		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), showHidden, this);
+		vmMemoryModel = new TargetVariablesModel(this);
 		variablesModel = vmMemoryModel;
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
 
@@ -369,80 +374,14 @@ namespace Aseba
 
 	NodeTab::~NodeTab()
 	{
-		// Note: this might memory leak, depending on when the signal/slots get disconnected
-		// but this is a rare case and can be safely ignored
-		compilationFuture.waitForFinished();
+		// delete all tools
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 		{
 			NodeToolInterface* tool(*it);
 			delete tool;
 		}
-		delete vmFunctionsModel;
-		delete vmMemoryModel;
-	}
-	
-	void NodeTab::timerEvent ( QTimerEvent * event )
-	{
-		if (mainWindow->nodes->currentWidget() != this)
-			return;
-			
-		// only fetch what is visible
-		const QList<TargetVariablesModel::Variable> variables(variablesModel->getVariables());
-		assert(variables.size() == variablesModel->rowCount());
-		
-		unsigned currentReqCount(0);
-		unsigned currentReqPos(0);
-		for (int i = 0; i < variables.size(); ++i)
-		{
-			const TargetVariablesModel::Variable& var(variables[i]);
-			if  (((var.value.size() == 1) ||
-				 (vmMemoryView->isExpanded(variablesModel->index(i, 0)))
-				 ) &&
-				 (!vmMemoryView->isRowHidden(i, QModelIndex()))
-				)
-			{
-				if (currentReqCount == 0)
-				{
-					// new request
-					currentReqPos = var.pos;
-					currentReqCount = var.value.size();
-				}
-				else if (currentReqPos + currentReqCount == var.pos)
-				{
-					// continuous, append
-					currentReqCount += var.value.size();
-				}
-				else
-				{
-					// flush and reset
-					target->getVariables(id, currentReqPos, currentReqCount);
-					// new request
-					currentReqPos = var.pos;
-					currentReqCount = var.value.size();
-				}
-			}
-		}
-		if (currentReqCount != 0)
-		{
-			// flush request
-			target->getVariables(id, currentReqPos, currentReqCount);
-		}
-	}
-	
-	void NodeTab::variableValueUpdated(const QString& name, const VariablesDataVector& values)
-	{
-		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
-		{
-			// only regenerate if pid has changed
-			if (values[0] != int(pid))
-			{
-				pid = values[0];
-				nodeToolRegistrer.update(pid, this, tools);
-				updateToolList();
-				
-				mainWindow->regenerateHelpMenu();
-			}
-		}
+		// wait until thread has finished
+		compilationFuture.waitForFinished();
 	}
 	
 	void NodeTab::setupWidgets()
@@ -679,6 +618,70 @@ namespace Aseba
 		// following default settings
 		if (mainWindow->autoMemoryRefresh)
 			autoRefreshMemoryCheck->setChecked(true);
+	}
+	
+	void NodeTab::timerEvent ( QTimerEvent * event )
+	{
+		if (mainWindow->nodes->currentWidget() != this)
+			return;
+			
+		// only fetch what is visible
+		const QList<TargetVariablesModel::Variable> variables(variablesModel->getVariables());
+		assert(variables.size() == variablesModel->rowCount());
+		
+		unsigned currentReqCount(0);
+		unsigned currentReqPos(0);
+		for (int i = 0; i < variables.size(); ++i)
+		{
+			const TargetVariablesModel::Variable& var(variables[i]);
+			if  (((var.value.size() == 1) ||
+				 (vmMemoryView->isExpanded(variablesModel->index(i, 0)))
+				 ) &&
+				 (!vmMemoryView->isRowHidden(i, QModelIndex()))
+				)
+			{
+				if (currentReqCount == 0)
+				{
+					// new request
+					currentReqPos = var.pos;
+					currentReqCount = var.value.size();
+				}
+				else if (currentReqPos + currentReqCount == var.pos)
+				{
+					// continuous, append
+					currentReqCount += var.value.size();
+				}
+				else
+				{
+					// flush and reset
+					target->getVariables(id, currentReqPos, currentReqCount);
+					// new request
+					currentReqPos = var.pos;
+					currentReqCount = var.value.size();
+				}
+			}
+		}
+		if (currentReqCount != 0)
+		{
+			// flush request
+			target->getVariables(id, currentReqPos, currentReqCount);
+		}
+	}
+	
+	void NodeTab::variableValueUpdated(const QString& name, const VariablesDataVector& values)
+	{
+		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
+		{
+			// only regenerate if pid has changed
+			if (values[0] != int(pid))
+			{
+				pid = values[0];
+				nodeToolRegistrer.update(pid, this, tools);
+				updateToolList();
+				
+				mainWindow->regenerateHelpMenu();
+			}
+		}
 	}
 	
 	ScriptTab::SavedPlugins NodeTab::savePlugins() const
@@ -3089,9 +3092,8 @@ namespace Aseba
 		splitter->setSizes(QList<int>() << 800 << 200);
 		
 		// dialog box
-		compilationMessageBox = new CompilationLogDialog();
+		compilationMessageBox = new CompilationLogDialog(this);
 		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(close()));
-		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(deleteLater()));
 		findDialog = new FindDialog(this);
 		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
 		

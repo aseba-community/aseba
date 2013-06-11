@@ -101,7 +101,7 @@ namespace Aseba { namespace ThymioVPL
 			quitButton->setIcon(QIcon(":/images/exit.svgz"));
 			quitButton->setToolTip(tr("Quit"));
 			toolBar->addWidget(quitButton);
-			connect(quitButton, SIGNAL(clicked()), this, SLOT(closeFile()));
+			connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
 		}
 		else
 			quitButton = 0;
@@ -283,7 +283,11 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::showVPLModal()
 	{
 		if (de->newFile())
+		{
+			scene->reset();
+			toggleAdvancedMode(false);
 			show();
+		}
 	}
 	
 	void ThymioVisualProgramming::newFile()
@@ -315,10 +319,9 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
-			advancedButton->setEnabled(true);
+			/*advancedButton->setEnabled(true);
 			actionButtons.last()->hide(); // state button
-			scene->reset();
-			close();
+			scene->reset();*/
 			return true;
 		}
 		else

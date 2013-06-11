@@ -109,16 +109,18 @@ namespace Aseba
 		bool newFile();
 	};
 	
-	class CompilationLogDialog: public QTextEdit
+	class CompilationLogDialog: public QDialog
 	{
 		Q_OBJECT
 		
 	public:
 		CompilationLogDialog(QWidget *parent = 0);
+		void setText(const QString & text) { te->setText(text); }
 	signals:
 		void hidden();
 	protected:
 		virtual void hideEvent ( QHideEvent * event );
+		QTextEdit* te;
 	};
 
 	class EditorsPlotsTabWidget: public QTabWidget
@@ -511,7 +513,7 @@ namespace Aseba
 		// tabs and nodes
 		friend class NodeTab;
 		friend class StudioAeslEditor;
-		friend class StudioInterface;
+		friend struct StudioInterface;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
 		int getDescriptionTimer;

@@ -81,6 +81,12 @@ namespace Aseba
 			return variables.size();
 	}
 	
+	TargetVariablesModel::TargetVariablesModel(QObject *parent) :
+		QAbstractItemModel(parent)
+	{
+		setSupportedDragActions(Qt::CopyAction);
+	}
+	
 	int TargetVariablesModel::columnCount(const QModelIndex & parent) const
 	{
 		return 2;

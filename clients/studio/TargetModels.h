@@ -77,7 +77,7 @@ namespace Aseba
 		};
 		
 	public:
-		TargetVariablesModel() { setSupportedDragActions(Qt::CopyAction); }
+		TargetVariablesModel(QObject *parent = 0);
 		virtual ~TargetVariablesModel();
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
