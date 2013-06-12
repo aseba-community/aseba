@@ -468,8 +468,8 @@ namespace Aseba
 		vmMemoryView->setModel(vmMemoryModel);
 		vmMemoryView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 		vmMemoryView->setItemDelegate(new SpinBoxDelegate(-32768, 32767, this));
-		vmMemoryView->setColumnWidth(0, 200-QFontMetrics(QFont()).width("-8888888##"));
-		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-8888888##"));
+		vmMemoryView->setColumnWidth(0, 235-QFontMetrics(QFont()).width("-88888##"));
+		vmMemoryView->setColumnWidth(1, QFontMetrics(QFont()).width("-88888##"));
 		vmMemoryView->setSelectionMode(QAbstractItemView::SingleSelection);
 		vmMemoryView->setSelectionBehavior(QAbstractItemView::SelectItems);
 		vmMemoryView->setDragDropMode(QAbstractItemView::DragOnly);
@@ -557,7 +557,7 @@ namespace Aseba
 		QWidget *editorWidget = new QWidget;
 		editorWidget->setLayout(editorLayout);
 		addWidget(editorWidget);
-		setSizes(QList<int>() << 250 << 550);
+		setSizes(QList<int>() << 270 << 500);
 	}
 	
 	void NodeTab::setupConnections()
@@ -1112,6 +1112,11 @@ namespace Aseba
 			bytecode = result->bytecode;
 			allocatedVariablesCount = result->allocatedVariablesCount;
 			vmMemoryModel->updateVariablesStructure(&result->variablesMap);
+			// This is disabled because we do not want to override the user's choice.
+			// The best would be to use this until the user has done any change, and
+			// then stop using it. But as sizes are reloaded from settings, the
+			// gain is not worth the implementation work.
+			//vmMemoryView->resizeColumnToContents(0);
 			vmSubroutinesModel->updateSubroutineTable(result->subroutineTable);
 			
 			updateHidden();
@@ -2963,7 +2968,7 @@ namespace Aseba
 		constantsView->setDropIndicatorShown(true);
 		constantsView->setItemDelegateForColumn(1, new SpinBoxDelegate(-32768, 32767, this));
 		constantsView->setMinimumHeight(100);
-		constantsView->setSecondColumnLongestContent("-888888##");
+		constantsView->setSecondColumnLongestContent("-88888##");
 		constantsView->resizeRowsToContents();
 		
 		QGridLayout* constantsLayout = new QGridLayout;
