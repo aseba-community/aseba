@@ -130,7 +130,7 @@ namespace Aseba
 		{
 			QString name = variables.at(index.row()).name;
 			// hidden variable
-			if (name.left(1) == "_")
+			if ((name.left(1) == "_") || name.contains(QString("._")))
 			{
 				if (role == Qt::ForegroundRole)
 					return QApplication::palette().color(QPalette::Disabled, QPalette::Text);

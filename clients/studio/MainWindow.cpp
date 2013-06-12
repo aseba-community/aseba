@@ -995,10 +995,10 @@ namespace Aseba
 		// FIXME use a model proxy to perform this task
 		for(int i = 0; i < vmMemoryModel->rowCount(QModelIndex()); i++) 
 		{
-			QString name(vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString());
+			const QString name(vmMemoryModel->data(vmMemoryModel->index(i,0), Qt::DisplayRole).toString());
 			bool hidden(false);
 			if (
-				(!showHidden && (name.at(0) == '_' || name.contains(QString("._")))) ||
+				(!showHidden && ((name.left(1) == "_") || name.contains(QString("._")))) ||
 				(!filterString.isEmpty() && name.indexOf(filterRegexp)==-1)
 			)
 				hidden = true;
