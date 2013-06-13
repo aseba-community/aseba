@@ -296,13 +296,13 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (selectedItems().empty())
 			return 0;
-		QGraphicsItem *item(selectedItems().first());
-		while (item != 0)
+		QGraphicsItem *item;
+		foreach (item, selectedItems())
 		{
 			if (item->data(0).toString() == "eventactionpair")
+			{
 				return dynamic_cast<EventActionPair*>(item);
-			else
-				item = item->parentItem();
+			}
 		}
 		return 0;
 	}
