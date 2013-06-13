@@ -37,6 +37,10 @@ namespace Aseba { namespace ThymioVPL
 		int getSelectedPairId() const;
 		EventActionPair *getSelectedPair() const;
 		
+		void removePair(int row);
+		void insertPair(int row);
+		void recomputeSceneRect();
+		
 		typedef QList<EventActionPair *>::iterator PairItr;
 		typedef QList<EventActionPair *>::const_iterator PairConstItr;
 		
@@ -56,13 +60,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
 	protected:
-		void removePair(int row);
-		void insertPair(int row);
-		void recomputeSceneRect();
 		void rearrangeButtons(int row=0);
 		
 		EventActionPair *createNewEventActionPair();

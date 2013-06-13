@@ -16,69 +16,11 @@
 #include "Buttons.h"
 #include "Card.h"
 #include "ActionCards.h"
+#include "Scene.h"
+#include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
 {
-	EventActionPair::RemoveButton::RemoveButton(QGraphicsItem *parent) : 
-		QGraphicsItem(parent) 
-	{
-		setFlag(QGraphicsItem::ItemIsFocusable);
-		setFlag(QGraphicsItem::ItemIsSelectable);
-		setData(0, "remove"); 
-		
-		setAcceptedMouseButtons(Qt::LeftButton);
-	}
-	
-	void EventActionPair::RemoveButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
-	{
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-
-		qreal alpha = hasFocus() ? 255 : 150;
-		
-		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
-		linearGrad.setColorAt(0, QColor(209, 196, 180, alpha));
-		linearGrad.setColorAt(1, QColor(167, 151, 128, alpha));
-     
-		painter->setPen(QColor(147, 134, 115));
-		painter->setBrush(linearGrad);
-		painter->drawEllipse(-32,-32,64,64);
-		
-		painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
-		painter->drawLine(-11,-11,11,11);
-		painter->drawLine(-11,11,11,-11);
-	}
-
-	EventActionPair::AddButton::AddButton(QGraphicsItem *parent) : 
-		QGraphicsItem(parent) 
-	{ 
-		setFlag(QGraphicsItem::ItemIsFocusable);
-		setFlag(QGraphicsItem::ItemIsSelectable);
-		setData(0, "add"); 
-
-		setAcceptedMouseButtons(Qt::LeftButton);
-	}
-	
-	void EventActionPair::AddButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
-	{
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-		
-		qreal alpha = hasFocus() ? 255 : 150;
-		
-		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
-		linearGrad.setColorAt(0, QColor(209, 196, 180, alpha));
-		linearGrad.setColorAt(1, QColor(167, 151, 128, alpha));
-     
-		painter->setPen(QColor(147, 134, 115));
-		painter->setBrush(linearGrad);
-		painter->drawEllipse(-32,-32,64,64);
-		
-		painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
-		painter->drawLine(-16,0,16,0);
-		painter->drawLine(0,-16,0,16);
-	}
-
 	EventActionPair::EventActionPair(int row, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		eventCard(0),
@@ -95,15 +37,26 @@ namespace Aseba { namespace ThymioVPL
 		setData(0, "eventactionpair"); 
 		setData(1, row);
 		
-		deleteButton = new RemoveButton(this);
-		addButton = new AddButton(this);
+		deleteButton = new AddRemoveButton(false, this);
+		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
+		addButton = new AddRemoveButton(true, this);
+		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
 		
-		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setAcceptDrops(true);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
 		repositionElements();
+	}
+	
+	void EventActionPair::removeClicked()
+	{
+		polymorphic_downcast<Scene*>(scene())->removePair(data(1).toInt());
+	}
+	
+	void EventActionPair::addClicked()
+	{
+		polymorphic_downcast<Scene*>(scene())->insertPair(data(1).toInt()+1);
 	}
 	
 	void EventActionPair::repositionElements()
@@ -167,8 +120,7 @@ namespace Aseba { namespace ThymioVPL
 			{237, 172, 140},
 			{237, 208, 194},
 		};
-		//const int i = (errorFlag ? 0 : hasFocus() ? 1 : 2);
-		const int i = (hasFocus() ? 1 : 2);
+		const int i = (isSelected() ? 1 : 2);
 		
 		// background
 		if (errorFlag)
@@ -310,7 +262,6 @@ namespace Aseba { namespace ThymioVPL
 
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
-			//scene()->setFocusItem(this);
 			update();
 		}
 		else
@@ -334,8 +285,6 @@ namespace Aseba { namespace ThymioVPL
 
 	void EventActionPair::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		scene()->setFocusItem(this);
-	
 		if ( event->mimeData()->hasFormat("Card") )
 		{
 			QByteArray buttonData = event->mimeData()->data("Card");

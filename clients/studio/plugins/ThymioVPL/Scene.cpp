@@ -197,12 +197,13 @@ namespace Aseba { namespace ThymioVPL
 		eventActionPairs.removeAt(row);
 		
 		removeItem(p);
-		setSceneRect(sceneRect().adjusted(0,0,0,-420));
-		delete(p);
+		p->deleteLater();
 		
 		rearrangeButtons(row);
-
+		
 		haveAtLeastAnEmptyCard();
+		
+		recomputeSceneRect();
 	
 		sceneModified = true;
 		
@@ -221,8 +222,6 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		
-		setFocusItem(p);
 		
 		rearrangeButtons(row+1);
 		
@@ -329,7 +328,6 @@ namespace Aseba { namespace ThymioVPL
 		if( event->mimeData()->hasFormat("Card") && 
 			((event->scenePos().y()-20)/(buttonSetHeight)) >= eventActionPairs.size() ) 
 		{
-			//setFocusItem(0);
 			event->accept();
 		} 
 		else
@@ -360,7 +358,6 @@ namespace Aseba { namespace ThymioVPL
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 
-			setFocusItem(p);
 			
 			recompile();
 		}
@@ -398,29 +395,5 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 			QGraphicsScene::dropEvent(event);
-	}
-
-	void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
-	{
-		QGraphicsScene::mousePressEvent(event);
-	}
-	
-	void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-	{
-		QGraphicsScene::mouseReleaseEvent(event);
-		
-		if( event->button() == Qt::LeftButton ) 
-		{
-			QGraphicsItem *item(focusItem());
-			if( item )
-			{
-				if( item->data(0) == "remove" ) 
-					removePair((item->parentItem()->data(1)).toInt());
-				else if( item->data(0) == "add" )
-					insertPair((item->parentItem()->data(1)).toInt()+1);
-			}
-		}
-		
-		update();
 	}
 } } // namespace ThymioVPL / namespace Aseba

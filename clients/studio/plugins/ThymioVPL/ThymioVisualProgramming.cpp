@@ -534,6 +534,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		scene->haveAtLeastAnEmptyCard();
 		scene->setModified(!fromFile);
+		scene->recomputeSceneRect();
 		
 		if (!scene->isEmpty())
 			show();

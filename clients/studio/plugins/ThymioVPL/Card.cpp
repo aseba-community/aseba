@@ -77,7 +77,6 @@ namespace Aseba { namespace ThymioVPL
 		parentID(-1),
 		trans(advanced ? 64 : 0)
 	{
-		setFlag(QGraphicsItem::ItemIsFocusable);
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		

@@ -85,8 +85,62 @@ namespace Aseba { namespace ThymioVPL
 					 itr != siblings.end(); ++itr )
 					(*itr)->setValue(0);
 			}
+			update();
 			emit stateChanged();
 		}
+	}
+	
+	
+	AddRemoveButton::AddRemoveButton(bool add, QGraphicsItem *parent) : 
+		QGraphicsObject(parent),
+		add(add),
+		pressed(false)
+	{
+		setData(0, "add"); 
+		setData(0, "remove");
+		setAcceptedMouseButtons(Qt::LeftButton);
+	}
+	
+	void AddRemoveButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+
+ 		qreal alpha = pressed ? 255 : 150;
+		
+		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
+		linearGrad.setColorAt(0, QColor(209, 196, 180, alpha));
+		linearGrad.setColorAt(1, QColor(167, 151, 128, alpha));
+     
+		painter->setPen(QColor(147, 134, 115));
+		painter->setBrush(linearGrad);
+		painter->drawEllipse(-32,-32,64,64);
+		
+		painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
+		if (add)
+		{
+			painter->drawLine(-16,0,16,0);
+			painter->drawLine(0,-16,0,16);
+		}
+		else
+		{
+			painter->drawLine(-11,-11,11,11);
+			painter->drawLine(-11,11,11,-11);
+		}
+	}
+	
+	void AddRemoveButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+	{
+		pressed = true;
+		update();
+	}
+	
+	void AddRemoveButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
+	{
+		if (boundingRect().contains(event->pos()))
+			emit clicked();
+		pressed = false;
+		update();
 	}
 	
 	

@@ -11,28 +11,13 @@ namespace Aseba { namespace ThymioVPL
 	/*@{*/
 	
 	class Card;
+	class AddRemoveButton;
 	
 	class EventActionPair : public QGraphicsObject
 	{
 		Q_OBJECT
 		
 	public:
-		class RemoveButton : public QGraphicsItem
-		{
-		public:
-			RemoveButton(QGraphicsItem *parent=0);
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
-		};
-
-		class AddButton : public QGraphicsItem
-		{
-		public:
-			AddButton(QGraphicsItem *parent=0);
-			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
-		};
-		
 		EventActionPair(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
@@ -60,14 +45,18 @@ namespace Aseba { namespace ThymioVPL
 	signals:
 		void contentChanged();
 		
+	protected slots:
+		void removeClicked();
+		void addClicked();
+		
 	protected:
 		void repositionElements();
 	
 	private:
 		Card *eventCard;
 		Card *actionCard;
-		RemoveButton *deleteButton;
-		AddButton *addButton;
+		AddRemoveButton *deleteButton;
+		AddRemoveButton *addButton;
 		
 		QColor eventCardColor;
 		QColor actionCardColor;
