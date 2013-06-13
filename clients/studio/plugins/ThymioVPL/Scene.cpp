@@ -23,7 +23,7 @@ namespace Aseba { namespace ThymioVPL
 		EventActionPair *p(createNewEventActionPair());
 		buttonSetHeight = p->boundingRect().height();
 		
-		connect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
+		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
 	}
 	
 	Scene::~Scene()
@@ -132,15 +132,19 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::clear()
 	{
+		disconnect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
 		for(int i=0; i<eventActionPairs.size(); i++)
 		{
-			disconnect(eventActionPairs.at(i), SIGNAL(contentChanged()), this, SLOT(recompile()));
-			removeItem(eventActionPairs.at(i));
-			delete(eventActionPairs.at(i));
+			EventActionPair *p(eventActionPairs[i]);
+			disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+			removeItem(p);
+			delete(p);
 		}
 		setSceneRect(QRectF());
 		eventActionPairs.clear();
 		compiler.clear();
+		
+		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
 		
 		sceneModified = false;
 		
