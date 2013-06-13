@@ -62,6 +62,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		void removePair(int row);
 		void insertPair(int row);
+		void recomputeSceneRect();
 		void rearrangeButtons(int row=0);
 		
 		EventActionPair *createNewEventActionPair();

@@ -1,4 +1,5 @@
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QMimeData>
 #include <QDebug>
 
@@ -102,8 +103,7 @@ namespace Aseba { namespace ThymioVPL
 		eventActionPairs.push_back(p);
 		
 		addItem(p);
-		QRectF pSceneRect(p->scenePos(), p->boundingRect().size());
-		setSceneRect(sceneRect().united(pSceneRect).adjusted(0,0,0,20));
+		recomputeSceneRect();
 
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
@@ -218,16 +218,30 @@ namespace Aseba { namespace ThymioVPL
 		eventActionPairs.insert(row, p);
 		
 		addItem(p);
-		QRectF pSceneRect(p->scenePos(), p->boundingRect().size());
-		setSceneRect(sceneRect().united(pSceneRect).adjusted(0,0,0,20));
+		recomputeSceneRect();
 		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
 		setFocusItem(p);
 		
 		rearrangeButtons(row+1);
+		
+		QGraphicsView* view;
+		foreach (view, views())
+			view->ensureVisible(p);
 
 		sceneModified = true;
+	}
+	
+	void Scene::recomputeSceneRect()
+	{
+		QRectF r;
+		for(int i=0; i<eventActionPairs.size(); i++)
+		{
+			EventActionPair *p(eventActionPairs[i]);
+			r |= QRectF(p->scenePos(), p->boundingRect().size());
+		}
+		setSceneRect(r.adjusted(0,-20,0,20));
 	}
 
 	void Scene::rearrangeButtons(int row)
@@ -405,7 +419,6 @@ namespace Aseba { namespace ThymioVPL
 				else if( item->data(0) == "add" )
 					insertPair((item->parentItem()->data(1)).toInt()+1);
 			}
-			// TODO
 		}
 		
 		update();
