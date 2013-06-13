@@ -274,9 +274,6 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
-		advancedButton->setEnabled(true);
-		actionButtons.last()->hide(); // state filter card
-		scene->reset();
 		close();
 	}
 
@@ -319,9 +316,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if( scene->isEmpty() || warningDialog() ) 
 		{
-			/*advancedButton->setEnabled(true);
-			actionButtons.last()->hide(); // state button
-			scene->reset();*/
+			if (scene->isSuccessful())
+				de->displayCode(scene->getCode(), -1);
 			return true;
 		}
 		else
