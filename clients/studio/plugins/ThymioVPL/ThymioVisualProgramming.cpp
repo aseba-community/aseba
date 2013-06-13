@@ -545,7 +545,7 @@ namespace Aseba { namespace ThymioVPL
 		if( scene->isSuccessful() ) 
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			de->displayCode(scene->getCode(), scene->getFocusItemId());
+			de->displayCode(scene->getCode(), scene->getSelectedPairId());
 			runButton->setEnabled(true);
 			emit compilationOutcome(true);
 		}
@@ -559,72 +559,62 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ArrowButtonsEventCard *button = new ArrowButtonsEventCard(0, scene->getAdvanced());
-		//scene->setFocus();
-		view->centerOn(scene->addEvent(button));
+		ArrowButtonsEventCard *card(new ArrowButtonsEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ProxEventCard *button = new ProxEventCard(0, scene->getAdvanced());
-		//scene->setFocus();
-		view->centerOn(scene->addEvent(button));
-	}	
+		ProxEventCard *card(new ProxEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
+	}
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ProxGroundEventCard *button = new ProxGroundEventCard(0, scene->getAdvanced());
-		//scene->setFocus();
-		view->centerOn(scene->addEvent(button));
-	}	
+		ProxGroundEventCard *card(new ProxGroundEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
+	}
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		TapEventCard *button = new TapEventCard(0, scene->getAdvanced());
-		//scene->setFocus();
-		view->centerOn(scene->addEvent(button));
+		TapEventCard *card(new TapEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ClapEventCard *button = new ClapEventCard(0, scene->getAdvanced());
-		//scene->setFocus();
-		view->centerOn(scene->addEvent(button));
+		ClapEventCard *card(new ClapEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addMoveAction()
 	{
-		MoveActionCard *button = new MoveActionCard();
-		//scene->setFocus();
-		view->centerOn(scene->addAction(button));
+		MoveActionCard *card(new MoveActionCard());
+		view->ensureVisible(scene->addAction(card));
 	}
 	
 	void ThymioVisualProgramming::addColorTopAction()
 	{
-		ColorActionCard *button = new TopColorActionCard();
-		//scene->setFocus();
-		view->centerOn(scene->addAction(button));
+		ColorActionCard *card(new TopColorActionCard());
+		view->ensureVisible(scene->addAction(card));
 	}
 	
 	void ThymioVisualProgramming::addColorBottomAction()
 	{
-		ColorActionCard *button = new BottomColorActionCard();
-		//scene->setFocus();
-		view->centerOn(scene->addAction(button));
+		ColorActionCard *card(new BottomColorActionCard());
+		view->ensureVisible(scene->addAction(card));
 	}
 
 	void ThymioVisualProgramming::addSoundAction()
 	{
-		SoundActionCard *button = new SoundActionCard();
-		//scene->setFocus();
-		view->centerOn(scene->addAction(button));
+		SoundActionCard *card(new SoundActionCard());
+		view->ensureVisible(scene->addAction(card));
 	}
 
 	void ThymioVisualProgramming::addMemoryAction()
 	{
-		StateFilterActionCard *button = new StateFilterActionCard();
-		//scene->setFocus();
-		view->centerOn(scene->addAction(button));
+		StateFilterActionCard *card(new StateFilterActionCard());
+		view->ensureVisible(scene->addAction(card));
 	}
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)

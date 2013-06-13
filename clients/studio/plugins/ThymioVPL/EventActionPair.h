@@ -17,18 +17,18 @@ namespace Aseba { namespace ThymioVPL
 		Q_OBJECT
 		
 	public:
-		class ThymioRemoveButton : public QGraphicsItem
+		class RemoveButton : public QGraphicsItem
 		{
 		public:
-			ThymioRemoveButton(QGraphicsItem *parent=0);
+			RemoveButton(QGraphicsItem *parent=0);
 			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
 
-		class ThymioAddButton : public QGraphicsItem
+		class AddButton : public QGraphicsItem
 		{
 		public:
-			ThymioAddButton(QGraphicsItem *parent=0);
+			AddButton(QGraphicsItem *parent=0);
 			virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 			QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
 		};
@@ -66,8 +66,8 @@ namespace Aseba { namespace ThymioVPL
 	private:
 		Card *eventCard;
 		Card *actionCard;
-		ThymioRemoveButton *deleteButton;
-		ThymioAddButton *addButton;
+		RemoveButton *deleteButton;
+		AddButton *addButton;
 		
 		QColor eventCardColor;
 		QColor actionCardColor;
@@ -82,7 +82,6 @@ namespace Aseba { namespace ThymioVPL
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 	};

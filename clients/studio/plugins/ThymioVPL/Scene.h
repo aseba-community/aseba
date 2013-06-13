@@ -34,7 +34,8 @@ namespace Aseba { namespace ThymioVPL
 		QList<QString> getCode() const;
 		
 		bool isSuccessful() const { return  compiler.isSuccessful(); }
-		int getFocusItemId() const;
+		int getSelectedPairId() const;
+		EventActionPair *getSelectedPair() const;
 		
 		typedef QList<EventActionPair *>::iterator PairItr;
 		typedef QList<EventActionPair *>::const_iterator PairConstItr;
@@ -59,16 +60,12 @@ namespace Aseba { namespace ThymioVPL
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 	protected:
-		void removeButton(int row);
-		void insertButton(int row);
+		void removePair(int row);
+		void insertPair(int row);
 		void rearrangeButtons(int row=0);
 		
 		EventActionPair *createNewEventActionPair();
 
-		bool prevNewEventButton;
-		bool prevNewActionButton;
-		int lastFocus;
-		
 		QList<EventActionPair *> eventActionPairs;
 		Compiler compiler;
 		
@@ -76,7 +73,6 @@ namespace Aseba { namespace ThymioVPL
 		QColor actionCardColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
-		bool newRow;
 		qreal buttonSetHeight;
 		bool advancedMode;
 	};
