@@ -90,12 +90,12 @@ namespace Aseba { namespace ThymioVPL
 			int buttonToCode(int id) const;
 			
 		protected:
-			void visitEvent(const Card& card);
+			void visitEvent(const Card& card, unsigned currentBlock);
 			std::wstring visitEventArrowButtons(const Card& card);
 			std::wstring visitEventProx(const Card& card);
 			std::wstring visitEventProxGround(const Card& card);
 			
-			void visitAction(const Card& card);
+			void visitAction(const Card& card, unsigned currentBlock);
 			std::wstring visitActionMove(const Card& card);
 			std::wstring visitActionTopColor(const Card& card);
 			std::wstring visitActionBottomColor(const Card& card);
@@ -110,7 +110,6 @@ namespace Aseba { namespace ThymioVPL
 			bool advancedMode;
 			bool useSound;
 			bool useMicrophone;
-			int currentBlock;
 			bool inIfBlock;
 			std::vector<int> buttonToCodeMap;
 		};

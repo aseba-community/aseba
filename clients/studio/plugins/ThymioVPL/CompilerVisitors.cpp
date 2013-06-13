@@ -154,7 +154,6 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode(false),
 		useSound(false),
 		useMicrophone(false),
-		currentBlock(0),
 		inIfBlock(false),
 		buttonToCodeMap()
 	{
@@ -267,13 +266,14 @@ namespace Aseba { namespace ThymioVPL
 		const QString& actionName(p.getActionCard()->getName());
 		const QString& eventName(p.getEventCard()->getName());
 		QString lookupEventName;
-		if (actionName == "proxground")
+		if (eventName == "proxground")
 			lookupEventName = "prox";
 		else
 			lookupEventName = eventName;
 		
 		int block = editor[lookupEventName].first;
 		int size = editor[lookupEventName].second;
+		unsigned currentBlock(0);
 		const bool isStateFilter(p.getEventCard()->getStateFilter() >= 0 ? true : false);
 		
 		if( block < 0 )
@@ -319,6 +319,7 @@ namespace Aseba { namespace ThymioVPL
 				editor[lookupEventName] = make_pair(block, size);
 
 			currentBlock = block + size;
+			Q_ASSERT(currentBlock <= generatedCode.size());
 			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
 			buttonToCodeMap.push_back(currentBlock);
 		}
@@ -342,16 +343,17 @@ namespace Aseba { namespace ThymioVPL
 			for( unsigned int i=0; i<buttonToCodeMap.size(); i++)
 				if(buttonToCodeMap[i] >= currentBlock)
 					buttonToCodeMap[i]++;
-				
+			
+			Q_ASSERT(currentBlock <= generatedCode.size());
 			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
 			buttonToCodeMap.push_back(currentBlock);
 		}
 		
-		visitEvent(*p.getEventCard());
-		visitAction(*p.getActionCard());
+		visitEvent(*p.getEventCard(), currentBlock);
+		visitAction(*p.getActionCard(), currentBlock);
 	}
 
-	void Compiler::CodeGenerator::visitEvent(const Card& card)
+	void Compiler::CodeGenerator::visitEvent(const Card& card, unsigned currentBlock)
 	{
 		// set the generator in advanced mode if any state filter is set
 		advancedMode = advancedMode || (card.getStateFilter() >= 0);
@@ -511,7 +513,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	void Compiler::CodeGenerator::visitAction(const Card& card)
+	void Compiler::CodeGenerator::visitAction(const Card& card, unsigned currentBlock)
 	{
 		wstring text;
 		
