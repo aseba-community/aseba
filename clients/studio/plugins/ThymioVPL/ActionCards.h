@@ -84,6 +84,24 @@ namespace Aseba { namespace ThymioVPL
 		unsigned notes[6];
 		unsigned durations[6];
 	};
+	
+	class TimerActionCard: public CardWithBody
+	{
+	public:
+		TimerActionCard(QGraphicsItem *parent=0);
+		
+		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		virtual unsigned valuesCount() const { return 1; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
+		
+	protected:
+		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		
+	protected:
+		unsigned duration;
+	};
 
 	class StateFilterActionCard : public CardWithButtons
 	{

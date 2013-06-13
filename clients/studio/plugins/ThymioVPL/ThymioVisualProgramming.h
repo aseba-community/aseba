@@ -57,11 +57,13 @@ namespace Aseba { namespace ThymioVPL
 		void addProxGroundEvent();
 		void addTapEvent();
 		void addClapEvent();
+		void addTimeoutEvent();
 		
 		void addMoveAction();
 		void addColorTopAction();
 		void addColorBottomAction();
 		void addSoundAction();
+		void addTimerAction();
 		void addMemoryAction();
 		
 		void newFile();

@@ -57,6 +57,8 @@ namespace Aseba { namespace ThymioVPL
 			return new TapEventCard(0, advancedMode);
 		else if ( name == "clap" )
 			return new ClapEventCard(0, advancedMode);
+		else if ( name == "timeout" )
+			return new TimeoutEventCard(0, advancedMode);
 		else if ( name == "move" )
 			return new MoveActionCard();
 		else if ( name == "colortop" )
@@ -65,6 +67,8 @@ namespace Aseba { namespace ThymioVPL
 			return new BottomColorActionCard();
 		else if ( name == "sound" )
 			return new SoundActionCard();
+		else if ( name == "timer" )
+			return new TimerActionCard();
 		else if ( name == "statefilter" )
 			return new StateFilterActionCard();
 		else

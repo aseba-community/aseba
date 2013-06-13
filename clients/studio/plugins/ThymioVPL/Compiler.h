@@ -100,6 +100,7 @@ namespace Aseba { namespace ThymioVPL
 			std::wstring visitActionTopColor(const Card& card);
 			std::wstring visitActionBottomColor(const Card& card);
 			std::wstring visitActionSound(const Card& card);
+			std::wstring visitActionTimer(const Card& card);
 			std::wstring visitActionStateFilter(const Card& card);
 			
 		protected:

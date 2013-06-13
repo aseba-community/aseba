@@ -38,6 +38,12 @@ namespace Aseba { namespace ThymioVPL
 		ClapEventCard(QGraphicsItem *parent=0, bool advanced=false);
 	};
 	
+	class TimeoutEventCard : public CardWithNoValues
+	{
+	public:
+		TimeoutEventCard(QGraphicsItem *parent=0, bool advanced=false);
+	};
+	
 	/*@}*/
 } } // namespace ThymioVPL / namespace Aseba
 

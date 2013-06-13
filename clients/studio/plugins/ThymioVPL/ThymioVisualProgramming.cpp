@@ -127,12 +127,14 @@ namespace Aseba { namespace ThymioVPL
 		CardButton *proxGroundButton = new CardButton("proxground");
 		CardButton *tapButton = new CardButton("tap");
 		CardButton *clapButton = new CardButton("clap");
+		CardButton *timeoutButton = new CardButton("timeout");
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
 		eventButtons.push_back(proxGroundButton);
 		eventButtons.push_back(tapButton);
 		eventButtons.push_back(clapButton);
+		eventButtons.push_back(timeoutButton);
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
@@ -185,6 +187,7 @@ namespace Aseba { namespace ThymioVPL
 		CardButton *colorTopButton = new CardButton("colortop");
 		CardButton *colorBottomButton = new CardButton("colorbottom");
 		CardButton *soundButton = new CardButton("sound");
+		CardButton *timerButton = new CardButton("timer");
 		CardButton *memoryButton = new CardButton("statefilter");
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
@@ -193,6 +196,7 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(colorTopButton);
 		actionButtons.push_back(colorBottomButton);
 		actionButtons.push_back(soundButton);
+		actionButtons.push_back(timerButton);
 		actionButtons.push_back(memoryButton);
 		
 		actionsLayout->setAlignment(Qt::AlignTop);
@@ -214,11 +218,13 @@ namespace Aseba { namespace ThymioVPL
 		connect(proxGroundButton, SIGNAL(clicked()), this, SLOT(addProxGroundEvent()));
 		connect(tapButton, SIGNAL(clicked()), this, SLOT(addTapEvent()));
 		connect(clapButton, SIGNAL(clicked()), this, SLOT(addClapEvent()));
+		connect(timeoutButton, SIGNAL(clicked()), this, SLOT(addTimeoutEvent()));
 
 		connect(moveButton, SIGNAL(clicked()), this, SLOT(addMoveAction()));
 		connect(colorTopButton, SIGNAL(clicked()), this, SLOT(addColorTopAction()));	
 		connect(colorBottomButton, SIGNAL(clicked()), this, SLOT(addColorBottomAction()));
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
+		connect(timerButton, SIGNAL(clicked()), this, SLOT(addTimerAction()));
 		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
 		
 		setWindowModality(Qt::ApplicationModal);
@@ -584,6 +590,12 @@ namespace Aseba { namespace ThymioVPL
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
+	void ThymioVisualProgramming::addTimeoutEvent()
+	{
+		TimeoutEventCard *card(new TimeoutEventCard(0, scene->getAdvanced()));
+		view->ensureVisible(scene->addEvent(card));
+	}
+	
 	void ThymioVisualProgramming::addMoveAction()
 	{
 		MoveActionCard *card(new MoveActionCard());
@@ -607,6 +619,12 @@ namespace Aseba { namespace ThymioVPL
 		SoundActionCard *card(new SoundActionCard());
 		view->ensureVisible(scene->addAction(card));
 	}
+	
+	void ThymioVisualProgramming::addTimerAction()
+	{
+		TimerActionCard *card(new TimerActionCard());
+		view->ensureVisible(scene->addAction(card));
+	}
 
 	void ThymioVisualProgramming::addMemoryAction()
 	{
@@ -617,12 +635,12 @@ namespace Aseba { namespace ThymioVPL
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
 		// desired sizes for height
-		const int idealContentHeight(5*256);
+		const int idealContentHeight(6*256);
 		const int uncompressibleHeight(
 			max(actionsLabel->height(), eventsLabel->height()) +
 			desiredToolbarIconSize + 2 * style()->pixelMetric(QStyle::PM_ToolBarFrameWidth) +
 			style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
-			5 * 10 +
+			6 * 10 +
 			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
 			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin)
 		);

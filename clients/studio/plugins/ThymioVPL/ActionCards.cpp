@@ -6,6 +6,7 @@
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSvgItem>
 #include <QtCore/qmath.h>
+#include <QDebug>
 
 #include "ActionCards.h"
 #include "Buttons.h"
@@ -237,9 +238,9 @@ namespace Aseba { namespace ThymioVPL
 					durations[noteIdx] = (durations[noteIdx] % 2) + 1;
 				else
 					note = noteVal;
+				update();
+				emit contentChanged();
 			}
-			update();
-			emit contentChanged();
 		}
 	}
 	
@@ -259,6 +260,58 @@ namespace Aseba { namespace ThymioVPL
 			update();
 			emit contentChanged();
 		}
+	}
+	
+	// TimerActionCard
+	TimerActionCard::TimerActionCard(QGraphicsItem *parent) :
+		CardWithBody(false, true, false, parent),
+		duration(1.0)
+	{
+		setData(0, "action");
+		setData(1, "timer");
+		
+		new QGraphicsSvgItem (":/images/timer.svgz", this);
+	}
+	
+	void TimerActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+		
+		CardWithBody::paint(painter, option, widget);
+		
+		const float angle(float(duration) * 2.f * M_PI / 4000.f);
+		
+		painter->setBrush(Qt::blue);
+		painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -angle*16*360/(2*M_PI));
+		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine));
+		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
+	}
+	
+	void TimerActionCard::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (event->button() == Qt::LeftButton)
+		{
+			const QPointF& pos(event->pos()-QPointF(128,136));
+			if (sqrt(pos.x()*pos.x()+pos.y()*pos.y()) <= 70)
+			{
+				duration = unsigned((atan2(-pos.x(), pos.y()) + M_PI) * 4000. / (2*M_PI));
+				update();
+				emit contentChanged();
+			}
+		}
+	}
+	
+	int TimerActionCard::getValue(unsigned i) const
+	{ 
+		return duration;
+	}
+	
+	void TimerActionCard::setValue(unsigned i, int value) 
+	{ 
+		duration = value;
+		update();
+		emit contentChanged();
 	}
 
 	// State Filter Action

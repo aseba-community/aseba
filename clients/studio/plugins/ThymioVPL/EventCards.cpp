@@ -123,5 +123,15 @@ namespace Aseba { namespace ThymioVPL
 		
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
+	
+	// TimeoutEventCard
+	TimeoutEventCard::TimeoutEventCard(QGraphicsItem *parent, bool advanced):
+		CardWithNoValues(true, advanced, parent)
+	{
+		setData(0, "event");
+		setData(1, "timeout");
+	
+		new QGraphicsSvgItem (":/images/timeout.svgz", this);
+	}
 
 } } // namespace ThymioVPL / namespace Aseba

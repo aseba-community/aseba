@@ -178,6 +178,7 @@ namespace Aseba { namespace ThymioVPL
 		editor["prox"] = make_pair(-1,0);
 		editor["tap"] = make_pair(-1,0);
 		editor["clap"] = make_pair(-1,0);
+		editor["timeout"] = make_pair(-1,0);
 		generatedCode.clear();
 		advancedMode = false;
 		useSound = false;
@@ -299,6 +300,14 @@ namespace Aseba { namespace ThymioVPL
 			{
 				useMicrophone = true;
 				generatedCode.push_back(L"\nonevent mic\n");
+				size++;
+			}
+			else if (lookupEventName == "timeout")
+			{
+				generatedCode.push_back(
+					L"\nonevent timer0"
+					L"\n\ttimer.period[0] = 0\n"
+				);
 				size++;
 			}
 			else
@@ -533,6 +542,10 @@ namespace Aseba { namespace ThymioVPL
 		{
 			text += visitActionSound(card);
 		}
+		else if (card.getName() == "timer")
+		{
+			text += visitActionTimer(card);
+		}
 		else if (card.getName() == "statefilter")
 		{
 			text += visitActionStateFilter(card);
@@ -633,6 +646,15 @@ namespace Aseba { namespace ThymioVPL
 		text += L"call sound.freq(notes[0], durations[0])\n";
 		text += indString;
 		text += L"note_index = 1\n";
+		return text;
+	}
+	
+	wstring Compiler::CodeGenerator::visitActionTimer(const Card& card)
+	{
+		wstring text;
+		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		text += indString;
+		text += L"timer.period[0] = "+ toWstring(card.getValue(0)) + L"\n";
 		return text;
 	}
 	
