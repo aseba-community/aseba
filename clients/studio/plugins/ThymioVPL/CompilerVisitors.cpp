@@ -48,6 +48,7 @@ namespace Aseba { namespace ThymioVPL
 		colorTopHash.clear();
 		colorBottomHash.clear();
 		soundHash.clear();
+		timerHash.clear();
 		memoryHash.clear();
 	}
 
@@ -83,6 +84,11 @@ namespace Aseba { namespace ThymioVPL
 		{
 			currentHash = &soundHash;
 			tempHash = soundHash;
+		}
+		else if (action->getName() == "timer")
+		{
+			currentHash = &timerHash;
+			tempHash = timerHash;
 		}
 		else if (action->getName() == "statefilter")
 		{
@@ -270,7 +276,6 @@ namespace Aseba { namespace ThymioVPL
 		errorCode = NO_ERROR;
 		
 		// action and event name
-		const QString& actionName(p.getActionCard()->getName());
 		const QString& eventName(p.getEventCard()->getName());
 		QString lookupEventName;
 		if (eventName == "proxground")

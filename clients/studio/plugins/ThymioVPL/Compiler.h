@@ -64,6 +64,7 @@ namespace Aseba { namespace ThymioVPL
 			std::multimap<std::wstring, const Card*> colorTopHash;
 			std::multimap<std::wstring, const Card*> colorBottomHash;
 			std::multimap<std::wstring, const Card*> soundHash;
+			std::multimap<std::wstring, const Card*> timerHash;
 			std::multimap<std::wstring, const Card*> memoryHash;
 		};
 
