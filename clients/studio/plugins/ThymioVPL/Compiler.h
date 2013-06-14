@@ -110,6 +110,7 @@ namespace Aseba { namespace ThymioVPL
 			std::vector<std::wstring> generatedCode;
 			bool advancedMode;
 			bool useSound;
+			bool useTimer;
 			bool useMicrophone;
 			bool inIfBlock;
 			std::vector<int> buttonToCodeMap;

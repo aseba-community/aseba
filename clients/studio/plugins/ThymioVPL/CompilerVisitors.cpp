@@ -153,6 +153,7 @@ namespace Aseba { namespace ThymioVPL
 		Compiler::Visitor(),
 		advancedMode(false),
 		useSound(false),
+		useTimer(false),
 		useMicrophone(false),
 		inIfBlock(false),
 		buttonToCodeMap()
@@ -182,6 +183,7 @@ namespace Aseba { namespace ThymioVPL
 		generatedCode.clear();
 		advancedMode = false;
 		useSound = false;
+		useTimer= false;
 		useMicrophone = false;
 		inIfBlock = false;
 		buttonToCodeMap.clear();
@@ -218,6 +220,10 @@ namespace Aseba { namespace ThymioVPL
 			text += L"\twave[i] = cos_result/256\n";
 			text += L"end\n";
 			text += L"call sound.wave(wave)\n";
+		}
+		if (useTimer)
+		{
+			text += L"timer.period[0] = 0\n";
 		}
 		if (useMicrophone)
 		{
@@ -304,6 +310,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			else if (lookupEventName == "timeout")
 			{
+				useTimer = true;
 				generatedCode.push_back(
 					L"\nonevent timer0"
 					L"\n\ttimer.period[0] = 0\n"
