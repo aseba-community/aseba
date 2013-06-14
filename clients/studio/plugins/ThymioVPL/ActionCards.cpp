@@ -271,6 +271,12 @@ namespace Aseba { namespace ThymioVPL
 		setData(1, "timer");
 		
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
+		
+		timer = new QTimeLine(duration, this);
+		timer->setFrameRange(0, duration/40);
+		timer->setCurveShape(QTimeLine::LinearCurve);
+		timer->setLoopCount(1);
+		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
 	}
 	
 	void TimerActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -281,11 +287,24 @@ namespace Aseba { namespace ThymioVPL
 		CardWithBody::paint(painter, option, widget);
 		
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
-		
 		painter->setBrush(Qt::blue);
 		painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -angle*16*360/(2*M_PI));
-		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine));
+		
+		const float leftDuration(duration-float(timer->currentFrame())*40.f);
+		if (timer->state() == QTimeLine::Running)
+		{
+			const float leftAngle(leftDuration * 2.f * M_PI / (4000.f));
+			painter->setBrush(Qt::red);
+			painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -leftAngle*16*360/(2*M_PI));
+		}
+		
+		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine, Qt::RoundCap));
 		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
+	}
+	
+	void TimerActionCard::frameChanged(int frame)
+	{
+		update();
 	}
 	
 	void TimerActionCard::mousePressEvent(QGraphicsSceneMouseEvent * event)
@@ -296,8 +315,7 @@ namespace Aseba { namespace ThymioVPL
 			if (sqrt(pos.x()*pos.x()+pos.y()*pos.y()) <= 70)
 			{
 				duration = unsigned((atan2(-pos.x(), pos.y()) + M_PI) * 4000. / (2*M_PI));
-				update();
-				emit contentChanged();
+				durationUpdated();
 			}
 		}
 	}
@@ -310,8 +328,17 @@ namespace Aseba { namespace ThymioVPL
 	void TimerActionCard::setValue(unsigned i, int value) 
 	{ 
 		duration = value;
+		durationUpdated();
+	}
+	
+	void TimerActionCard::durationUpdated()
+	{
 		update();
 		emit contentChanged();
+		timer->stop();
+		timer->setDuration(duration);
+		timer->setFrameRange(0, duration/40);
+		timer->start();
 	}
 
 	// State Filter Action

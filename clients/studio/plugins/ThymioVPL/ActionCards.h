@@ -87,6 +87,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	class TimerActionCard: public CardWithBody
 	{
+		Q_OBJECT
+		
 	public:
 		TimerActionCard(QGraphicsItem *parent=0);
 		
@@ -95,12 +97,17 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 1; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+	
+	protected slots:
+		void frameChanged(int frame);
 		
 	protected:
 		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		void durationUpdated();
 		
 	protected:
 		unsigned duration;
+		QTimeLine *timer;
 	};
 
 	class StateFilterActionCard : public CardWithButtons
