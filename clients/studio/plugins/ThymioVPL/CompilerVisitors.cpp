@@ -627,8 +627,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	wstring Compiler::CodeGenerator::visitActionSound(const Card& card)
 	{
-		static const int noteTable[5] = { 262, 294, 330, 392, 440 };
-		static const int durationTable[3] = {-1, 20, 40};
+		static const int noteTable[5] = { 262, 311, 370, 440, 524 };
+		static const int durationTable[3] = {-1, 8, 15};
 		
 		useSound = true;
 		wstring text;
