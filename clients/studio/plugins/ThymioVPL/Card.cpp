@@ -11,6 +11,7 @@
 #include <QSlider>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QDebug>
 #include <cassert>
 
 #include "Card.h"
@@ -274,12 +275,7 @@ namespace Aseba { namespace ThymioVPL
 		drag->setMimeData(mimeData());
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
-
-		if (drag->exec(Qt::MoveAction | Qt::CopyAction , Qt::CopyAction) == Qt::MoveAction)
-			parentID = -1;
-		
-		if (parentItem())
-			parentItem()->update();
+		drag->exec();
 		#endif // ANDROID
 	}
 	

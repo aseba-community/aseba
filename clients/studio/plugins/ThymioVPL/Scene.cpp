@@ -313,6 +313,11 @@ namespace Aseba { namespace ThymioVPL
 		return 0;
 	}
 	
+	EventActionPair *Scene::getPairRow(int row) const
+	{
+		return eventActionPairs.at(row);
+	}
+	
 	void Scene::recompile()
 	{
 		sceneModified = true;

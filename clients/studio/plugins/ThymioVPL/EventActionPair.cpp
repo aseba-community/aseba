@@ -94,28 +94,6 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		// first check whether some buttons have been removed
-		if( eventCard && eventCard->getParentID() < 0 ) 
-		{
-			disconnect(eventCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
-			scene()->removeItem(eventCard);
-			delete eventCard;
-			eventCard = 0;
-		
-			emit contentChanged();
-		}
-		if( actionCard && actionCard->getParentID() < 0 )
-		{
-			disconnect(actionCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
-			scene()->removeItem(actionCard);
-			delete actionCard;
-			actionCard = 0;
-
-			emit contentChanged();
-		}
-		
-		// then proceed with painting
-		
 		// select colors (error, selected, normal)
 		const int bgColors[][3] = {
 			{255, 180, 180},
@@ -199,16 +177,21 @@ namespace Aseba { namespace ThymioVPL
 			actionCard->setParentID(row);
 		setPos(xpos, (row*420+20)*scale());
 	}
-
-	void EventActionPair::addEventCard(Card *event) 
-	{ 
+	
+	void EventActionPair::removeEventCard() 
+	{
 		if( eventCard ) 
 		{
 			disconnect(eventCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
 			scene()->removeItem( eventCard );
 			eventCard->deleteLater();
+			eventCard = 0;
 		}
-		
+	}
+
+	void EventActionPair::addEventCard(Card *event) 
+	{ 
+		removeEventCard();
 		event->setBackgroundColor(eventCardColor);
 		event->setPos(40, 40);
 		event->setEnabled(true);
@@ -219,16 +202,21 @@ namespace Aseba { namespace ThymioVPL
 		emit contentChanged();
 		connect(eventCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
 	}
-
-	void EventActionPair::addActionCard(Card *action) 
-	{ 
+	
+	void EventActionPair::removeActionCard()
+	{
 		if( actionCard )
 		{
 			disconnect(actionCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
 			scene()->removeItem( actionCard );
 			actionCard->deleteLater();
+			actionCard = 0;
 		}
-		
+	}
+
+	void EventActionPair::addActionCard(Card *action) 
+	{ 
+		removeActionCard();
 		action->setBackgroundColor(actionCardColor);
 		action->setPos(500+trans, 40);
 		action->setEnabled(true);
@@ -304,36 +292,40 @@ namespace Aseba { namespace ThymioVPL
 			
 			if( parentID != data(1).toInt() )
 			{
-				QString buttonName;
+				QString cardName;
 				int state;
-				dataStream >> buttonName >> state;
+				dataStream >> cardName >> state;
 				
-				Card *button(Card::createCard(buttonName, advancedMode));
-				if( button ) 
+				Card *card(Card::createCard(cardName, advancedMode));
+				if( card ) 
 				{
 					event->setDropAction(Qt::MoveAction);
 					event->accept();
 					
 					if( event->mimeData()->data("CardType") == QString("event").toLatin1() )
 					{
+						if (parentID >= 0)
+							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeEventCard();
 						if (advancedMode)
 						{
 							if (parentID == -1)
 							{
 								if (eventCard)
-									button->setStateFilter(eventCard->getStateFilter());
+									card->setStateFilter(eventCard->getStateFilter());
 								else
-									button->setStateFilter(0);
+									card->setStateFilter(0);
 							}
 							else
-								button->setStateFilter(state);
+								card->setStateFilter(state);
 						}
-						addEventCard(button);
+						addEventCard(card);
 						highlightEventButton = false;
 					}
 					else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
 					{
-						addActionCard(button);
+						if (parentID >= 0)
+							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeActionCard();
+						addActionCard(card);
 						highlightActionButton = false;
 					}
 					
@@ -343,12 +335,11 @@ namespace Aseba { namespace ThymioVPL
 					{
 						int status;
 						dataStream >> status;
-						button->setValue(i, status);
+						card->setValue(i, status);
 					}
+					update();
 				}
 			}
-			
-			update();
 		}
 		else
 			event->ignore();

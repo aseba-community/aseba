@@ -27,7 +27,9 @@ namespace Aseba { namespace ThymioVPL
 		void setRow(int row);
 		int getRow() const { return data(1).toInt(); }
 		
+		void removeEventCard();
 		void addEventCard(Card *event);
+		void removeActionCard();
 		void addActionCard(Card *action);
 		const bool hasEventCard() const { return eventCard != 0; }
 		const Card *getEventCard() const { return eventCard; }

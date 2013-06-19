@@ -36,6 +36,7 @@ namespace Aseba { namespace ThymioVPL
 		bool isSuccessful() const { return  compiler.isSuccessful(); }
 		int getSelectedPairId() const;
 		EventActionPair *getSelectedPair() const;
+		EventActionPair *getPairRow(int row) const;
 		
 		void removePair(int row);
 		void insertPair(int row);
