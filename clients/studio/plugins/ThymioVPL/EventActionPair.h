@@ -42,7 +42,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		void setAdvanced(bool advanced);
 	
-		void setErrorStatus(bool flag) { errorFlag = flag; }
+		void setErrorStatus(bool flag);
 		
 	signals:
 		void contentChanged();

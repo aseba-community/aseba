@@ -244,6 +244,15 @@ namespace Aseba { namespace ThymioVPL
 		repositionElements();
 	}
 	
+	void EventActionPair::setErrorStatus(bool flag)
+	{
+		if (flag != errorFlag)
+		{
+			errorFlag = flag;
+			update();
+		}
+	}
+	
 	void EventActionPair::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
 	{
 		if ( event->mimeData()->hasFormat("EventActionPair") || 

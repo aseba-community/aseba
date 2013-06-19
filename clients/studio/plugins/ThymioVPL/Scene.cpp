@@ -49,12 +49,14 @@ namespace Aseba { namespace ThymioVPL
 				if (!p->hasActionCard())
 				{
 					p->addActionCard(item);
+					clearSelection();
 					return p;
 				}
 			}
 			// none found, add a new pair and acc action there
 			EventActionPair* p(createNewEventActionPair());
 			p->addActionCard(item);
+			clearSelection();
 			return p;
 		}
 	}
@@ -77,12 +79,14 @@ namespace Aseba { namespace ThymioVPL
 				if (!p->hasEventCard())
 				{
 					p->addEventCard(item);
+					clearSelection();
 					return p;
 				}
 			}
-			// none found, add a new pair and acc action there
+			// none found, add a new pair and add event there
 			EventActionPair* p(createNewEventActionPair());
 			p->addEventCard(item);
+			clearSelection();
 			return p;
 		}
 	}
