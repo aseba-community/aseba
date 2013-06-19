@@ -223,11 +223,13 @@ namespace Aseba { namespace ThymioVPL
 		eventActionPairs.insert(row, p);
 		
 		addItem(p);
-		recomputeSceneRect();
 		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
 		rearrangeButtons(row+1);
+		recomputeSceneRect();
+		
+		p->setSoleSelection();
 		
 		QGraphicsView* view;
 		foreach (view, views())
@@ -361,7 +363,6 @@ namespace Aseba { namespace ThymioVPL
 			
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
-
 			
 			recompile();
 		}

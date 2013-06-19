@@ -45,6 +45,9 @@ namespace Aseba { namespace ThymioVPL
 	signals:
 		void contentChanged();
 		
+	public slots:
+		void setSoleSelection();
+		
 	protected slots:
 		void removeClicked();
 		void addClicked();

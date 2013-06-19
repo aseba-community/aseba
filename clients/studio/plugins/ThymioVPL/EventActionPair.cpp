@@ -37,16 +37,17 @@ namespace Aseba { namespace ThymioVPL
 		setData(0, "eventactionpair"); 
 		setData(1, row);
 		
-		deleteButton = new AddRemoveButton(false, this);
-		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
-		addButton = new AddRemoveButton(true, this);
-		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
-		
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setAcceptDrops(true);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		
+		deleteButton = new AddRemoveButton(false, this);
+		addButton = new AddRemoveButton(true, this);
 		repositionElements();
+		
+		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
+		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
+		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
 	void EventActionPair::removeClicked()
@@ -57,6 +58,12 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionPair::addClicked()
 	{
 		polymorphic_downcast<Scene*>(scene())->insertPair(data(1).toInt()+1);
+	}
+	
+	void EventActionPair::setSoleSelection()
+	{
+		scene()->clearSelection();
+		setSelected(true);
 	}
 	
 	void EventActionPair::repositionElements()
