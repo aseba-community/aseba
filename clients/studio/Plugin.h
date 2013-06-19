@@ -81,6 +81,7 @@ namespace Aseba
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile) {};
 		virtual QDomDocument saveToDom() const { return QDomDocument(); } 
 		SavedContent getSaved() const { return SavedContent(name, saveToDom()); }
+		virtual void codeChangedInEditor() {}
 		
 		virtual QWidget* createMenuEntry() = 0;
 		virtual void closeAsSoonAsPossible() = 0;

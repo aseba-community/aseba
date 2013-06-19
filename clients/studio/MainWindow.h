@@ -309,7 +309,6 @@ namespace Aseba
 		QPushButton *refreshMemoryButton;
 		QCheckBox *autoRefreshMemoryCheck;
 		
-				
 		// keywords // Jiwon
 		QToolButton *varButton;
 		QToolButton *ifButton;

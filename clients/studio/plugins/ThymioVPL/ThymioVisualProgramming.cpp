@@ -30,7 +30,8 @@ namespace Aseba { namespace ThymioVPL
 {
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
-		de(_de)
+		de(_de),
+		loading(false)
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
@@ -295,7 +296,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::newFile()
 	{
-		if (scene->isEmpty() || warningDialog()) 
+		if (scene->isEmpty() || warningModifiedDialog()) 
 		{
 			scene->reset();
 			toggleAdvancedMode(false);
@@ -304,7 +305,7 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::openFile()
 	{
-		if( scene->isEmpty() || warningDialog() ) 
+		if( scene->isEmpty() || warningModifiedDialog() ) 
 			de->openFile();
 	}
 	
@@ -320,10 +321,8 @@ namespace Aseba { namespace ThymioVPL
 
 	bool ThymioVisualProgramming::closeFile()
 	{
-		if( scene->isEmpty() || warningDialog() ) 
+		if( scene->isEmpty() || warningModifiedDialog(true) ) 
 		{
-			if (scene->isSuccessful())
-				de->displayCode(scene->getCode(), -1);
 			return true;
 		}
 		else
@@ -397,7 +396,7 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 	}
 	
-	bool ThymioVisualProgramming::warningDialog()
+	bool ThymioVisualProgramming::warningModifiedDialog(bool removeHighlight)
 	{
 		if(!scene->isModified())
 			return true;
@@ -412,10 +411,14 @@ namespace Aseba { namespace ThymioVPL
 		switch (ret)
 		{
 			case QMessageBox::Save:
+			{
+				if (removeHighlight && scene->isSuccessful())
+					de->displayCode(scene->getCode(), -1);
 				if (save())
 					return true;
 				else
 					return false;
+			}
 			case QMessageBox::Discard:
 				return true;
 			case QMessageBox::Cancel:
@@ -478,6 +481,7 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
+		loading = true;
 		scene->clear();
 
 		QDomNode domNode = document.documentElement().firstChild();
@@ -540,6 +544,18 @@ namespace Aseba { namespace ThymioVPL
 		
 		if (!scene->isEmpty())
 			show();
+		loading = false;
+	}
+	
+	void ThymioVisualProgramming::codeChangedInEditor()
+	{
+		if (!isVisible() && !loading)
+		{
+			// prevent recursion of changes triggered by VPL itself
+			loading = true;
+			scene->clear();
+			loading = false;
+		}
 	}
 
 	void ThymioVisualProgramming::processCompilationResult()

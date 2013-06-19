@@ -877,7 +877,11 @@ namespace Aseba
 		}
 		else
 		{
+			// notify plugins
+			for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
+				(*it)->codeChangedInEditor();
 			
+			// handle completion
 			QTextCursor cursor(editor->textCursor());
 			if (ConfigDialog::getAutoCompletion() && cursor.atBlockEnd())
 			{
@@ -956,6 +960,7 @@ namespace Aseba
 					}
 				}
 			}
+			// recompile
 			recompile();
 			if (!firstCompilation)
 				mainWindow->sourceChanged();

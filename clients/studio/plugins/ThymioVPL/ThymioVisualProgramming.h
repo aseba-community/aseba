@@ -42,6 +42,7 @@ namespace Aseba { namespace ThymioVPL
 
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
+		virtual void codeChangedInEditor();
 	
 	signals:
 		void compilationOutcome(bool success);
@@ -83,6 +84,7 @@ namespace Aseba { namespace ThymioVPL
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		Scene *scene;
+		bool loading;
 
 		// Event & Action buttons
 		QList<CardButton *> eventButtons;
@@ -114,9 +116,10 @@ namespace Aseba { namespace ThymioVPL
 		QVBoxLayout *sceneLayout;
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
-
+		
+	protected:
 		QPixmap drawColorScheme(QColor color1, QColor color2);
-		bool warningDialog();
+		bool warningModifiedDialog(bool removeHighlight = false);
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
 		
