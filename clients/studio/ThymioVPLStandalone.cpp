@@ -132,6 +132,8 @@ namespace Aseba
 	
 	void ThymioVPLStandalone::setupWidgets()
 	{
+		setWindowTitle(tr("Thymio Visual Programming Language"));
+		
 		// VPL part
 		vplLayout = new QVBoxLayout;
 		QWidget* vplContainer = new QWidget;
@@ -224,7 +226,10 @@ namespace Aseba
 			// make sure that pid is ASEBA_PID_THYMIO2, otherwise print an error and quit
 			if (values[0] != ASEBA_PID_THYMIO2)
 			{
-				QMessageBox::critical(this, tr("Thymio VPL Error"), tr("You need to connect a Thymio II to use this application"));
+				QMessageBox::critical(this,
+					tr("Thymio VPL Error"),
+					tr("You need to connect a Thymio II to use this application.")
+				);
 				close();
 			}
 		}
@@ -361,7 +366,7 @@ namespace Aseba
 			{
 				QMessageBox::warning(this,
 					tr("Loading"),
-					tr("No Thymio VPL data were found in the script file, file ignored")
+					tr("No Thymio VPL data were found in the script file, file ignored.")
 				);
 			}
 		}
@@ -415,7 +420,11 @@ namespace Aseba
 		// only allow a single node connected at a given time
 		if (vpl)
 		{
-			QMessageBox::critical(this, tr("Thymio VPL Error"), tr("This application only supports a single robot at a time"));
+			QMessageBox::critical(
+				this,
+				tr("Thymio VPL Error"),
+				tr("This application only supports a single robot at a time.")
+			);
 			close();
 			return;
 		}

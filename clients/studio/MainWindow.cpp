@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Aseba - an event-based framework for distributed robot control
 	Copyright (C) 2007--2012:
 		Stephane Magnenat <stephane at magnenat dot net>
@@ -1616,7 +1616,7 @@ namespace Aseba
 						"</li><li>Dashel ver. %3"\
 						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
-						"<p>(c) 2006-2012 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
+						"<p>(c) 2006-2013 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
 						"<p><a href=\"%5\">%5</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
