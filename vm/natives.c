@@ -26,7 +26,7 @@
 #include <assert.h>
 
 #if defined(__dsPIC30F__)
-#include <p30fxxxx.h>
+#include <p30Fxxxx.h>
 #define DSP_AVAILABLE
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
