@@ -52,6 +52,7 @@ namespace Aseba
 		void disablePlugin();
 		
 		virtual void timerEvent ( QTimerEvent * event );
+		virtual void closeEvent ( QCloseEvent * event );
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		
 	private:
@@ -68,6 +69,7 @@ namespace Aseba
 		unsigned redSize, greenSize, blueSize;
 		VariablesDataVector red, green, blue;
 		unsigned componentsReceived;
+		int timerId;
 	};
 	
 	/*@}*/

@@ -1,5 +1,6 @@
 #include "VariablesViewPlugin.h"
 #include "../Target.h"
+#include "../../../common/productids.h"
 #include <QtGui>
 #include <QtDebug>
 #include <limits>
@@ -41,9 +42,15 @@ namespace Aseba
 			blueVariable->addItem(variables[i].name);
 		}
 		
-		redVariable->setEditText("cam_red");
-		greenVariable->setEditText("cam_green");
-		blueVariable->setEditText("cam_blue");
+		const int redIndex(redVariable->findText("cam.red"));
+		if (redIndex != -1)
+			redVariable->setCurrentIndex(redIndex);
+		const int greenIndex(redVariable->findText("cam.green"));
+		if (greenIndex != -1)
+			greenVariable->setCurrentIndex(greenIndex);
+		const int blueIndex(redVariable->findText("cam.blue"));
+		if (blueIndex != -1)
+			blueVariable->setCurrentIndex(blueIndex);
 		
 		setWindowTitle(tr("Linear Camera View Plugin"));
 	}
@@ -52,7 +59,8 @@ namespace Aseba
 	LinearCameraViewPlugin::LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de) :
 		VariableListener(_de->getVariablesModel()),
 		de(_de),
-		componentsReceived(0)
+		componentsReceived(0),
+		timerId(0)
 	{
 		QVBoxLayout *layout = new QVBoxLayout(this);
 		image = new QLabel;
@@ -81,13 +89,13 @@ namespace Aseba
 		if (enabled)
 			enablePlugin();
 		else
-			disablePlugin();
+			close();
 	}
 	
 	void LinearCameraViewPlugin::enablePlugin()
 	{
 		// unsubscribe to existing variables, if any
-		unsubscribeToVariablesOfInterest();
+		disablePlugin();
 		
 		{
 			LinearCameraViewVariablesDialog linearCameraViewVariablesDialog(variablesModel);
@@ -127,8 +135,13 @@ namespace Aseba
 		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
 		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
 		
-		// TODO: let the user choose the refresh rate
-		startTimer(100);
+		if (!timerId)
+		{
+			if (de->getProductId() == ASEBA_PID_EPUCK)
+				timerId = startTimer(200);
+			else
+				timerId = startTimer(100);
+		}
 		
 		show();
 	}
@@ -137,7 +150,11 @@ namespace Aseba
 	{
 		// unsubscribe to existing variables, if any
 		unsubscribeToVariablesOfInterest();
-		hide();
+		if (timerId)
+		{
+			killTimer(timerId);
+			timerId = 0;
+		}
 	}
 	
 	void LinearCameraViewPlugin::timerEvent ( QTimerEvent * event )
@@ -145,6 +162,12 @@ namespace Aseba
 		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
 		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
 		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
+	}
+	
+	void LinearCameraViewPlugin::closeEvent ( QCloseEvent * event )
+	{
+		disablePlugin();
+		emit dialogBoxResult(false);
 	}
 	
 	void LinearCameraViewPlugin::variableValueUpdated(const QString& name, const VariablesDataVector& values)

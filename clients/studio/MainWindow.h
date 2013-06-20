@@ -98,7 +98,8 @@ namespace Aseba
 		StudioInterface(NodeTab* nodeTab);
 		
 		Target * getTarget();
-		unsigned getNodeId();
+		unsigned getNodeId() const;
+		unsigned getProductId() const;
 		void displayCode(const QList<QString>& code, int elementToHighlight);
 		void loadAndRun();
 		void stop();

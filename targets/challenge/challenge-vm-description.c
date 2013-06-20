@@ -34,47 +34,47 @@ AsebaVMDescription vmDescription_en = {
 	"e-puck",
 	{
 		{ 1, ASEBA_PID_VAR_NAME },
-		{ 1, "wheel_left_speed" },
-		{ 1, "wheel_right_speed" },
-		{ 1, "color_red" },
-		{ 1, "color_green" },
-		{ 1, "color_blue" },
+		{ 1, "wheel.left_speed" },
+		{ 1, "wheel.right_speed" },
+		{ 1, "color.red" },
+		{ 1, "color.green" },
+		{ 1, "color.blue" },
 		#ifdef SIMPLIFIED_EPUCK
-		{ 1, "dist_front_front_right" },
-		{ 1, "dist_front_right" },
-		{ 1, "dist_right" },
-		{ 1, "dist_back_right" },
-		{ 1, "dist_back_left" },
-		{ 1, "dist_left" },
-		{ 1, "dist_front_left" },
-		{ 1, "dist_front_front_left" },
-		{ 8, "dist" },
+		{ 1, "prox.front_front_right" },
+		{ 1, "prox.front_right" },
+		{ 1, "prox.right" },
+		{ 1, "prox.back_right" },
+		{ 1, "prox.back_left" },
+		{ 1, "prox.left" },
+		{ 1, "prox.front_left" },
+		{ 1, "prox.front_front_left" },
+		{ 8, "prox" },
 		#else
 		{ 8, "prox" },
 		#endif
 		#ifdef SIMPLIFIED_EPUCK
-		{ 1, "cam_red_left" },
-		{ 1, "cam_red_middle" },
-		{ 1, "cam_red_right" },
-		{ 3, "cam_red" },
+		{ 1, "cam.red_left" },
+		{ 1, "cam.red_middle" },
+		{ 1, "cam.red_right" },
+		{ 3, "cam.red" },
 		#else
-		{ 60, "camR" },
+		{ 60, "cam.red" },
 		#endif
 		#ifdef SIMPLIFIED_EPUCK
-		{ 1, "cam_green_left" },
-		{ 1, "cam_green_middle" },
-		{ 1, "cam_green_right" },
-		{ 3, "cam_green" },
+		{ 1, "cam.green_left" },
+		{ 1, "cam.green_middle" },
+		{ 1, "cam.green_right" },
+		{ 3, "cam.green" },
 		#else
-		{ 60, "camG" },
+		{ 60, "cam.green" },
 		#endif
 		#ifdef SIMPLIFIED_EPUCK
-		{ 1, "cam_blue_left" },
-		{ 1, "cam_blue_middle" },
-		{ 1, "cam_blue_right" },
-		{ 3, "cam_blue" },
+		{ 1, "cam.blue_left" },
+		{ 1, "cam.blue_middle" },
+		{ 1, "cam.blue_right" },
+		{ 3, "cam.blue" },
 		#else
-		{ 60, "camB" },
+		{ 60, "cam.blue" },
 		#endif
 		{ 1, "energy" },
 		{ 0, NULL }

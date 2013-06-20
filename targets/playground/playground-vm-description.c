@@ -36,15 +36,15 @@ AsebaVMDescription vmDescription = {
 		{ 1, "source" }, // nor this one
 		{ 32, "args" },	// neither this one
 		{ 1, ASEBA_PID_VAR_NAME },
-		{ 1, "leftSpeed" },
-		{ 1, "rightSpeed" },
-		{ 1, "colorR" },
-		{ 1, "colorG" },
-		{ 1, "colorB" },
+		{ 1, "speed.left" },
+		{ 1, "speed.right" },
+		{ 1, "color.red" },
+		{ 1, "color.green" },
+		{ 1, "color.blue" },
 		{ 8, "prox" },
-		{ 60, "camR" },
-		{ 60, "camG" },
-		{ 60, "camB" },
+		{ 60, "cam.red" },
+		{ 60, "cam.green" },
+		{ 60, "cam.blue" },
 		{ 1, "energy" },
 		{ 0, NULL }
 	}

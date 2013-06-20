@@ -50,9 +50,14 @@ namespace Aseba
 		return vplStandalone->target.get();
 	}
 	
-	unsigned ThymioVPLStandaloneInterface::getNodeId()
+	unsigned ThymioVPLStandaloneInterface::getNodeId() const
 	{
 		return vplStandalone->id;
+	}
+	
+	unsigned ThymioVPLStandaloneInterface::getProductId() const
+	{
+		return ASEBA_PID_THYMIO2;
 	}
 	
 	void ThymioVPLStandaloneInterface::displayCode(const QList<QString>& code, int elementToHighlight)

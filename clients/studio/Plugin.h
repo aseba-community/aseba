@@ -51,7 +51,9 @@ namespace Aseba
 		//! Return the target Aseba network
 		virtual Target * getTarget() = 0;
 		//! Return the node ID of the node this plugin talks to
-		virtual unsigned getNodeId() = 0;
+		virtual unsigned getNodeId() const = 0;
+		//! Return the product ID of the node this plugin talks to
+		virtual unsigned getProductId() const = 0;
 		//! Set the code of the editor from a sequence of elements (each can be multiple sloc) and highlight one of these elements
 		virtual void displayCode(const QList<QString>& code, int elementToHighlight) = 0;
 		//! Load code and runs it on the node

@@ -41,7 +41,8 @@ namespace Aseba
 		ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone);
 		
 		Target * getTarget();
-		unsigned getNodeId();
+		unsigned getNodeId() const;
+		unsigned getProductId() const;
 		void displayCode(const QList<QString>& code, int line);
 		void loadAndRun();
 		void stop();

@@ -62,9 +62,14 @@ namespace Aseba
 		return nodeTab->target;
 	}
 	
-	unsigned StudioInterface::getNodeId()
+	unsigned StudioInterface::getNodeId() const
 	{
 		return nodeTab->id;
+	}
+	
+	unsigned StudioInterface::getProductId() const
+	{
+		return nodeTab->pid;
 	}
 	
 	void StudioInterface::displayCode(const QList<QString>& code, int elementToHighlight)
