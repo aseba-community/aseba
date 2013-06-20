@@ -20,7 +20,7 @@
 #include "../../common/consts.h"
 #include "../../common/utils/HexFile.h"
 
-#include "ThymioUpdater.h"
+#include "ThymioUpgrader.h"
 
 namespace Aseba
 {
@@ -53,17 +53,17 @@ namespace Aseba
 	}
 
 	
-	ThymioUpdaterDialog::ThymioUpdaterDialog(const std::string& target):
+	ThymioUpgraderDialog::ThymioUpgraderDialog(const std::string& target):
 		target(target)
 	{
 		// Create the gui ...
-		setWindowTitle(tr("Thymio Firmware Updater"));
+		setWindowTitle(tr("Thymio Firmware Upgrader"));
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
 		QHBoxLayout *imageLayout = new QHBoxLayout();
 		QLabel* image = new QLabel(this);
-		image->setPixmap(QPixmap(":/images/thymioupdater.png"));
+		image->setPixmap(QPixmap(":/images/firmwareupgrade.png"));
 		imageLayout->addStretch();
 		imageLayout->addWidget(image);
 		imageLayout->addStretch();
@@ -88,7 +88,7 @@ namespace Aseba
 
 		// flash and quit buttons
 		QHBoxLayout *flashLayout = new QHBoxLayout();
-		flashButton = new QPushButton(tr("Update"), this);
+		flashButton = new QPushButton(tr("Upgrade"), this);
 		flashButton->setEnabled(false);
 		flashLayout->addWidget(flashButton);
 		quitButton = new QPushButton(tr("Quit"), this);
@@ -104,29 +104,29 @@ namespace Aseba
 		show();
 	}
 	
-	ThymioUpdaterDialog::~ThymioUpdaterDialog()
+	ThymioUpgraderDialog::~ThymioUpgraderDialog()
 	{
 		flashFuture.waitForFinished();
 	}
 	
-	void ThymioUpdaterDialog::setupFlashButtonState()
+	void ThymioUpgraderDialog::setupFlashButtonState()
 	{
 		flashButton->setEnabled(
 			!lineEdit->text().isEmpty()
 		);
 	}
 	
-	void ThymioUpdaterDialog::openFile(void)
+	void ThymioUpgraderDialog::openFile(void)
 	{
 		QString name = QFileDialog::getOpenFileName(this, tr("Select hex file"), QString(), tr("Hex files (*.hex)"));
 		lineEdit->setText(name);
 		setupFlashButtonState();
 	}
 
-	void ThymioUpdaterDialog::doFlash(void) 
+	void ThymioUpgraderDialog::doFlash(void) 
 	{
 		// warning message
-		const int warnRet = QMessageBox::warning(this, tr("Pre-update warning"), tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.<p><b>Do not unplug the robot during the update!</b></p>Are you sure you want to proceed?"), QMessageBox::No|QMessageBox::Yes, QMessageBox::No);
+		const int warnRet = QMessageBox::warning(this, tr("Pre-upgrade warning"), tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.<p><b>Do not unplug the robot during the upgrade!</b></p>Are you sure you want to proceed?"), QMessageBox::No|QMessageBox::Yes, QMessageBox::No);
 		if (warnRet != QMessageBox::Yes)
 			return;
 		
@@ -139,11 +139,11 @@ namespace Aseba
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
 		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
-		flashFuture = QtConcurrent::run(this, &ThymioUpdaterDialog::flashThread, target, hexFileName);
+		flashFuture = QtConcurrent::run(this, &ThymioUpgraderDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioUpdaterDialog::FlashResult ThymioUpdaterDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
+	ThymioUpgraderDialog::FlashResult ThymioUpgraderDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
 	{
 		// open stream
 		Dashel::Hub hub;
@@ -154,7 +154,7 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Cannot connect to Thymio II"), tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Updater running and try again.</p>").arg(e.what()));
+			return FlashResult(FlashResult::WARNING, tr("Cannot connect to Thymio II"), tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.</p>").arg(e.what()));
 		}
 		
 		// do flash
@@ -166,25 +166,25 @@ namespace Aseba
 		}
 		catch (HexFile::Error& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Update Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
+			return FlashResult(FlashResult::WARNING, tr("Upgrade Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
 		}
 		catch (BootloaderInterface::Error& e)
 		{
-			return FlashResult(FlashResult::FAILURE, tr("Update Error"), tr("A bootloader error happened during the update process: %1").arg(e.what()));
+			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A bootloader error happened during the upgrade process: %1").arg(e.what()));
 		}
 		catch (Dashel::DashelException& e)
 		{
-			return FlashResult(FlashResult::FAILURE, tr("Update Error"), tr("A communication error happened during the update process: %1").arg(e.what()));
+			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A communication error happened during the upgrade process: %1").arg(e.what()));
 		}
 		return FlashResult();
 	}
 	
-	void ThymioUpdaterDialog::flashProgress(int percentage)
+	void ThymioUpgraderDialog::flashProgress(int percentage)
 	{
 		progressBar->setValue(percentage);
 	}
 	
-	void ThymioUpdaterDialog::flashFinished()
+	void ThymioUpgraderDialog::flashFinished()
 	{
 		// re-enable buttons
 		quitButton->setEnabled(true);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&qtTranslator);
 	app.installTranslator(&translator);
 	qtTranslator.load(QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	translator.load(QString(":/thymioupdater_") + QLocale::system().name());
+	translator.load(QString(":/thymioupgrader_") + QLocale::system().name());
 	
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
 	std::string target("ser:device=");
@@ -237,16 +237,16 @@ int main(int argc, char *argv[])
 	}
 	if (!thymioFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Thymio II not found"), QApplication::tr("<p><b>Cannot find Thymio II!</b></p><p>Plug Thymio II or use the command-line updater.</p>"));
+		QMessageBox::critical(0, QApplication::tr("Thymio II not found"), QApplication::tr("<p><b>Cannot find Thymio II!</b></p><p>Plug Thymio II or use the command-line firmware upgrader (asebacmd).</p>"));
 		return 1;
 	}
 	if (thymiosFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Multiple Thymio II found"), QApplication::tr("<p><b>More than one Thymio II found!</b></p><p>Plug a single Thymio II or use the command-line updater.</p>"));
+		QMessageBox::critical(0, QApplication::tr("Multiple Thymio II found"), QApplication::tr("<p><b>More than one Thymio II found!</b></p><p>Plug a single Thymio II or use the command-line firmware upgrader (asebacmd).</p>"));
 		return 2;
 	}
 	
-	Aseba::ThymioUpdaterDialog updater(target);
+	Aseba::ThymioUpgraderDialog upgrader(target);
 	
 	return app.exec();
 }

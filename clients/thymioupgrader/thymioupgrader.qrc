@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>thymioupgrader_fr.qm</file>
+	<file>thymioupgrader_de.qm</file>
+	<file>thymioupgrader_es.qm</file>
+	<file>thymioupgrader_it.qm</file>
+	<file>images/fileopen.svgz</file>
+	<file>images/firmwareupgrade.png</file>
+</qresource>
+</RCC>

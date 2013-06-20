@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Thymio Firmware Upgrader
+Exec=thymioupgrader
+TryExec=thymioupgrader
+Categories=Education;Science
+Icon=thymioupgrader.png

@@ -7,4 +7,4 @@ add_subdirectory(exec)
 # gui
 add_subdirectory(eventlogger)
 add_subdirectory(studio)
-add_subdirectory(thymioupdater)
+add_subdirectory(thymioupgrader)

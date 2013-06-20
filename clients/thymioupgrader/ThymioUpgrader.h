@@ -40,7 +40,7 @@ namespace Aseba
 		void flashProgress(int percentage);
 	};
 	
-	class ThymioUpdaterDialog : public QWidget
+	class ThymioUpgraderDialog : public QWidget
 	{
 		Q_OBJECT
 		
@@ -74,8 +74,8 @@ namespace Aseba
 		QFutureWatcher<FlashResult> flashFutureWatcher;
 
 	public:
-		ThymioUpdaterDialog(const std::string& target);
-		~ThymioUpdaterDialog();
+		ThymioUpgraderDialog(const std::string& target);
+		~ThymioUpgraderDialog();
 		
 	private:
 		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
