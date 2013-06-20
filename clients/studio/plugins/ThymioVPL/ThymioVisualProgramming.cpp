@@ -274,7 +274,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	QWidget* ThymioVisualProgramming::createMenuEntry()
 	{
-		QPushButton *vplButton = new QPushButton(tr("Launch VPL"));
+		QPushButton *vplButton = new QPushButton(QIcon(":/images/thymiovpl.png"), tr("Launch VPL"));
+		vplButton->setIconSize(QSize(86,32));
 		connect(vplButton, SIGNAL(clicked()), SLOT(showVPLModal()));
 		return vplButton;
 	}
