@@ -8,6 +8,9 @@ interfaces.
 
 Here is a short summary of the content:
 
+- cpp-shell
+    This is a basic command-line shell done in pure C++, using Dashel and libxml2.
+
 - cpp-qt-gui
     This is a very basic GUI done in C++ / Qt to exchange messages with Aseba nodes.
     This program can be compiled either by using cmake, either by using qmake with the
@@ -15,5 +18,7 @@ Here is a short summary of the content:
     this case, you will need to comment the "#include <xxx.moc>" from the .cpp files.
     The .pro file was tested under windows and unix.
 
-- python-dbus: a Python script showing how to interface with Aseba (medulla) using D-Bus
+- python-dbus
+
+    This is a Python script showing how to interface with Aseba (medulla) using D-Bus.
 
