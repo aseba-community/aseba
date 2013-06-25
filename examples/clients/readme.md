@@ -9,7 +9,7 @@ interfaces.
 Here is a short summary of the content:
 
 - cpp-shell
-    This is a basic command-line shell done in pure C++, using Dashel and libxml2.
+	This is a basic command-line shell done in pure C++, using Dashel and libxml2.
 
 - cpp-qt-gui
     This is a very basic GUI done in C++ / Qt to exchange messages with Aseba nodes.
