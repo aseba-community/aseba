@@ -127,23 +127,29 @@ namespace Aseba { namespace ThymioVPL
 		pts[2] = QPointF(456+trans, 168);
 		painter->drawPolygon(pts, 3);
 		
-		if( eventCard == 0 )
+		if (eventCard == 0 || highlightEventButton)
 		{
-			if( !highlightEventButton )
+			if (!highlightEventButton)
 				eventCardColor.setAlpha(100);
 			painter->setPen(QPen(eventCardColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
-			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
+			if (eventCard)
+				painter->drawRoundedRect(35, 35, 266, 266, 5, 5);
+			else
+				painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
 			eventCardColor.setAlpha(255);
 		}
 
-		if( actionCard == 0 )
+		if (actionCard == 0 || highlightActionButton)
 		{
-			if( !highlightActionButton )
+			if (!highlightActionButton)
 				actionCardColor.setAlpha(100);
 			painter->setPen(QPen(actionCardColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
-			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
+			if (actionCard)
+				painter->drawRoundedRect(495+trans, 35, 266, 266, 5, 5);
+			else
+				painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
 			actionCardColor.setAlpha(255);
 		}
 	}
@@ -299,7 +305,7 @@ namespace Aseba { namespace ThymioVPL
 			int parentID;
 			dataStream >> parentID;
 			
-			if( parentID != data(1).toInt() )
+			if (parentID != data(1).toInt())
 			{
 				QString cardName;
 				int state;
@@ -328,14 +334,12 @@ namespace Aseba { namespace ThymioVPL
 								card->setStateFilter(state);
 						}
 						addEventCard(card);
-						highlightEventButton = false;
 					}
 					else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
 					{
 						if (parentID >= 0)
 							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeActionCard();
 						addActionCard(card);
-						highlightActionButton = false;
 					}
 					
 					int numButtons;
@@ -346,9 +350,11 @@ namespace Aseba { namespace ThymioVPL
 						dataStream >> status;
 						card->setValue(i, status);
 					}
-					update();
 				}
 			}
+			highlightEventButton = false;
+			highlightActionButton = false;
+			update();
 		}
 		else
 			event->ignore();
