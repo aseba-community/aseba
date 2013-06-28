@@ -293,8 +293,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if ( event->mimeData()->hasFormat("Card") )
 		{
-			QByteArray buttonData = event->mimeData()->data("Card");
-			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
+			QByteArray cardData(event->mimeData()->data("Card"));
+			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
 			
 			int parentID;
 			dataStream >> parentID;

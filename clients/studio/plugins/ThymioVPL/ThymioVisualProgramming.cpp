@@ -31,6 +31,7 @@ namespace Aseba { namespace ThymioVPL
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
+		scene(new Scene(this)),
 		loading(false)
 	{
 		// Create the gui ...
@@ -123,12 +124,12 @@ namespace Aseba { namespace ThymioVPL
 		// events
 		eventsLayout = new QVBoxLayout();
 
-		CardButton *buttonsButton = new CardButton("button");
-		CardButton *proxButton = new CardButton("prox");
-		CardButton *proxGroundButton = new CardButton("proxground");
-		CardButton *tapButton = new CardButton("tap");
-		CardButton *clapButton = new CardButton("clap");
-		CardButton *timeoutButton = new CardButton("timeout");
+		CardButton *buttonsButton = new CardButton("button", scene);
+		CardButton *proxButton = new CardButton("prox", scene);
+		CardButton *proxGroundButton = new CardButton("proxground", scene);
+		CardButton *tapButton = new CardButton("tap", scene);
+		CardButton *clapButton = new CardButton("clap", scene);
+		CardButton *timeoutButton = new CardButton("timeout", scene);
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
@@ -167,8 +168,7 @@ namespace Aseba { namespace ThymioVPL
 		compilationResultLayout->addWidget(compilationResult,10000);
 		sceneLayout->addLayout(compilationResultLayout);
 
-		// scene
-		scene = new Scene(this);
+		// view
 		view = new QGraphicsView(scene);
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
@@ -184,12 +184,12 @@ namespace Aseba { namespace ThymioVPL
 		// actions
 		actionsLayout = new QVBoxLayout();
 
-		CardButton *moveButton = new CardButton("move");
-		CardButton *colorTopButton = new CardButton("colortop");
-		CardButton *colorBottomButton = new CardButton("colorbottom");
-		CardButton *soundButton = new CardButton("sound");
-		CardButton *timerButton = new CardButton("timer");
-		CardButton *memoryButton = new CardButton("statefilter");
+		CardButton *moveButton = new CardButton("move", scene);
+		CardButton *colorTopButton = new CardButton("colortop", scene);
+		CardButton *colorBottomButton = new CardButton("colorbottom", scene);
+		CardButton *soundButton = new CardButton("sound", scene);
+		CardButton *timerButton = new CardButton("timer", scene);
+		CardButton *memoryButton = new CardButton("statefilter", scene);
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		

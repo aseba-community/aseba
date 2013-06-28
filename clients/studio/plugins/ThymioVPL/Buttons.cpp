@@ -11,12 +11,15 @@
 #include <QSlider>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QDebug>
 #include <cassert>
 
 #include "Buttons.h"
 #include "Card.h"
 #include "EventCards.h"
 #include "ActionCards.h"
+#include "Scene.h"
+#include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -144,9 +147,10 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardButton::CardButton(const QString& name, QWidget *parent) : 
+	CardButton::CardButton(const QString& name, Scene* scene, QWidget *parent) : 
 		QPushButton(parent), 
-		card(Card::createCard(name))
+		card(Card::createCard(name)),
+		scene(scene)
 	{
 		setToolTip(QString("%0 %1").arg(card->getName()).arg(card->getType()));
 		
@@ -202,6 +206,20 @@ namespace Aseba { namespace ThymioVPL
 		if( event->mimeData()->hasFormat("CardType") &&
 			event->mimeData()->data("CardType") == card->getType().toLatin1() )
 		{
+			// get data from mime
+			QByteArray cardData(event->mimeData()->data("Card"));
+			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
+			int parentID;
+			dataStream >> parentID;
+			// if originates from the scene, delete from the scene
+			if (parentID >= 0)
+			{
+				if (event->mimeData()->data("CardType") == QString("event").toLatin1())
+					scene->getPairRow(parentID)->removeEventCard();
+				else
+					scene->getPairRow(parentID)->removeActionCard();
+			}
+			// d&g handling
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 		}

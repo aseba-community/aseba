@@ -14,6 +14,7 @@ namespace Aseba { namespace ThymioVPL
 	/*@{*/
 	
 	class Card;
+	class Scene;
 	
 	class GeometryShapeButton : public QGraphicsObject
 	{
@@ -87,7 +88,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_OBJECT
 		
 	public:
-		CardButton(const QString& name, QWidget *parent=0);
+		CardButton(const QString& name, Scene* scene, QWidget *parent=0);
 		~CardButton();
 		
 		void changeButtonColor(const QColor& color);
@@ -99,6 +100,7 @@ namespace Aseba { namespace ThymioVPL
 
 	protected:
 		Card *card;
+		Scene* scene;
 	};
 		
 	/*@}*/
