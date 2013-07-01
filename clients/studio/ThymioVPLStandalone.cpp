@@ -104,7 +104,7 @@ namespace Aseba
 	//////
 	
 	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget):
-		VariableListener(new TargetVariablesModel()),
+		VariableListener(new TargetVariablesModel(this)),
 		// create target
 		target(new DashelTarget(translators, commandLineTarget)),
 		// setup initial values
@@ -469,7 +469,7 @@ namespace Aseba
 		{
 			savedContent = vpl->saveToDom();
 			vplLayout->removeWidget(vpl);
-			delete vpl;
+			vpl->deleteLater();
 			vpl = 0;
 		}
 	}
