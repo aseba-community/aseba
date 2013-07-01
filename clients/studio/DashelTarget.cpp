@@ -47,7 +47,6 @@ namespace Aseba
 	{
 		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		const PortsMap ports = SerialPortEnumerator::getPorts();
-		
 		QSettings settings;
 		unsigned sectionEnabled(settings.value("connection dialog enabled group", 0).toUInt());
 		if ((sectionEnabled == 1) && (ports.size() == 0))
@@ -76,20 +75,7 @@ namespace Aseba
 		serialGroupBox->setCheckable(true);
 		QHBoxLayout* serialLayout = new QHBoxLayout();
 		serial = new QListWidget();
-		bool serialPortSet(false);
-		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
-		{
-			const QString text(it->second.second.c_str());
-			QListWidgetItem* item = new QListWidgetItem(text);
-			item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
-			serial->addItem(item);
-			if (settings.value("serial name") == text)
-			{
-				serial->setCurrentItem(item);
-				serialPortSet = true;
-			}
-		}
-		if (sectionEnabled == 1 && !serialPortSet)
+		if (!updatePortList(settings.value("serial name").toString()) && sectionEnabled == 1)
 			sectionEnabled = 2;
 		serialGroupBox->setChecked(sectionEnabled == 1);
 		serial->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -138,6 +124,59 @@ namespace Aseba
 		mainLayout->addLayout(buttonLayout);
 		
 		setWindowTitle(tr("Aseba Target Selection"));
+		
+		startTimer(1000);
+	}
+	
+	//! Update the port list, if toSelect is not empty, select the added item matching this name, return whether an item was selected
+	bool DashelConnectionDialog::updatePortList(const QString& toSelect)
+	{
+		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
+		const PortsMap ports = SerialPortEnumerator::getPorts();
+		bool serialPortSet(false);
+		std::vector<bool> seen(serial->count(), false);
+		// add newly seen devices
+		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
+		{
+			const QVariant userRole(QString::fromUtf8(it->second.first.c_str()));
+			// look if item is already in the list
+			bool found(false);
+			for (int i = 0; i < serial->count(); ++i)
+			{
+				const QListWidgetItem *item(serial->item(i));
+				if (item->data(Qt::UserRole) == userRole)
+				{
+					seen[i] = true;
+					found = true;
+				}
+			}
+			// if not, add it
+			if (!found)
+			{
+				const QString text(it->second.second.c_str());
+				QListWidgetItem* item = new QListWidgetItem(text);
+				item->setData(Qt::UserRole, QVariant(QString::fromUtf8(it->second.first.c_str())));
+				serial->addItem(item);
+				if (!toSelect.isEmpty() && (toSelect == text))
+				{
+					serial->setCurrentItem(item);
+					serialPortSet = true;
+				}
+			}
+		}
+		// now removed unseen devices
+		for (int i=seen.size()-1; i>=0; --i)
+		{
+			if (!seen[i])
+				delete serial->takeItem(i);
+		}
+		
+		return serialPortSet;
+	}
+	
+	void DashelConnectionDialog::timerEvent(QTimerEvent * event)
+	{
+		updatePortList("");
 	}
 	
 	std::string DashelConnectionDialog::getTarget()
@@ -863,7 +902,7 @@ namespace Aseba
 		{
 			setWindowTitle(tr("Aseba Studio - Connection closed"));
 			setText(tr("Warning, connection closed: I am trying to reconnect."));
-			setStandardButtons(QMessageBox::Cancel);
+			addButton(tr("Stop trying"), QMessageBox::RejectRole);
 			setEscapeButton(QMessageBox::Cancel);
 			setIcon(QMessageBox::Warning);
 			

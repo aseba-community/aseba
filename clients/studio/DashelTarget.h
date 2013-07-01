@@ -71,7 +71,11 @@ namespace Aseba
 		std::string getTarget();
 		QString getLocaleName();
 		
-	public slots:
+	protected:
+		bool updatePortList(const QString& toSelect);
+		virtual void timerEvent ( QTimerEvent * event );
+		
+	protected slots:
 		void netGroupChecked();
 		void serialGroupChecked();
 		void customGroupChecked();
