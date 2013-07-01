@@ -272,19 +272,28 @@ namespace Aseba
 	
 	bool DashelInterface::attemptToReconnect()
 	{
-		assert(stream == 0);
+		try
+		{
+			lock();
+			assert(stream == 0);
+			stream = Hub::connect(lastConnectedTarget);
+			unlock();
+		}
+		catch (DashelException e)
+		{
+			unlock();
+		}
+		
 		try
 		{
 			// we have to stop hub because otherwise it will be forever in poll()
-			stream = Hub::connect(lastConnectedTarget);
 			Dashel::Hub::stop();
-			if (stream)
-				return true;
 		}
 		catch (DashelException e)
 		{
 		}
-		return false;
+		
+		return (stream != 0);
 	}
 	
 	
@@ -390,6 +399,7 @@ namespace Aseba
 	{
 		assert(writeBlocked == false);
 		
+		dashelInterface.lock();
 		if (dashelInterface.stream)
 		{
 			try
@@ -402,12 +412,16 @@ namespace Aseba
 					Run(node->first).serialize(dashelInterface.stream);
 				}
 				dashelInterface.stream->flush();
+				dashelInterface.unlock();
 			}
 			catch(Dashel::DashelException e)
 			{
+				dashelInterface.unlock();
 				handleDashelException(e);
 			}
 		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
@@ -417,220 +431,294 @@ namespace Aseba
 	
 	void DashelTarget::broadcastGetDescription()
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			GetDescription().serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				GetDescription().serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		NodesMap::iterator nodeIt = nodes.find(node);
-		assert(nodeIt != nodes.end());
-		
-		// fill debug bytecode and build address map
-		nodeIt->second.debugBytecode = bytecode;
-		nodeIt->second.eventAddressToId = bytecode.getEventAddressesToIds();
-		
-		// send bytecode
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
-			dashelInterface.stream->flush();
+			NodesMap::iterator nodeIt = nodes.find(node);
+			assert(nodeIt != nodes.end());
+			
+			// fill debug bytecode and build address map
+			nodeIt->second.debugBytecode = bytecode;
+			nodeIt->second.eventAddressToId = bytecode.getEventAddressesToIds();
+			
+			// send bytecode
+			try
+			{
+				sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::writeBytecode(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			WriteBytecode(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				WriteBytecode(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::reboot(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			Reboot(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				Reboot(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			UserMessage(id, data).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				UserMessage(id, data).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			SetVariables(node, start, data).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				SetVariables(node, start, data).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
-
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			while (length > variablesPayloadSize)
+			const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
+
+			try
 			{
-				GetVariables(node, start, variablesPayloadSize).serialize(dashelInterface.stream);
-				start += variablesPayloadSize;
-				length -= variablesPayloadSize;
-			}
+				while (length > variablesPayloadSize)
+				{
+					GetVariables(node, start, variablesPayloadSize).serialize(dashelInterface.stream);
+					start += variablesPayloadSize;
+					length -= variablesPayloadSize;
+				}
 
-			GetVariables(node, start, length).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+				GetVariables(node, start, length).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::reset(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			Reset(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				Reset(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::run(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		NodesMap::iterator nodeIt = nodes.find(node);
-		assert(nodeIt != nodes.end());
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			if (nodeIt->second.executionMode == EXECUTION_STEP_BY_STEP)
-				Step(node).serialize(dashelInterface.stream);
-			Run(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			NodesMap::iterator nodeIt = nodes.find(node);
+			assert(nodeIt != nodes.end());
+			
+			try
+			{
+				if (nodeIt->second.executionMode == EXECUTION_STEP_BY_STEP)
+					Step(node).serialize(dashelInterface.stream);
+				Run(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::pause(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			Pause(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				Pause(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::next(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		NodesMap::iterator nodeIt = nodes.find(node);
-		assert(nodeIt != nodes.end());
-		
-		nodeIt->second.steppingInNext = WAITING_INITAL_PC;
-		
-		GetExecutionState getExecutionStateMessage;
-		getExecutionStateMessage.dest = node;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			getExecutionStateMessage.serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			NodesMap::iterator nodeIt = nodes.find(node);
+			assert(nodeIt != nodes.end());
+			
+			nodeIt->second.steppingInNext = WAITING_INITAL_PC;
+			
+			GetExecutionState getExecutionStateMessage;
+			getExecutionStateMessage.dest = node;
+			
+			try
+			{
+				getExecutionStateMessage.serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::stop(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			Stop(node).serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			try
+			{
+				Stop(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::setBreakpoint(unsigned node, unsigned line)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
+		const int pc = getPCFromLine(node, line);
+		if (pc < 0)
+			return;
 		
-		int pc = getPCFromLine(node, line);
-		if (pc >= 0)
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
 			BreakpointSet breakpointSetMessage;
 			breakpointSetMessage.pc = pc;
@@ -640,20 +728,26 @@ namespace Aseba
 			{
 				breakpointSetMessage.serialize(dashelInterface.stream);
 				dashelInterface.stream->flush();
+				dashelInterface.unlock();
 			}
 			catch(Dashel::DashelException e)
 			{
+				dashelInterface.unlock();
 				handleDashelException(e);
 			}
 		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::clearBreakpoint(unsigned node, unsigned line)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
+		const int pc = getPCFromLine(node, line);
+		if (pc < 0)
+			return;
 		
-		int pc = getPCFromLine(node, line);
-		if (pc >= 0)
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
 			BreakpointClear breakpointClearMessage;
 			breakpointClearMessage.pc = pc;
@@ -663,30 +757,40 @@ namespace Aseba
 			{
 				breakpointClearMessage.serialize(dashelInterface.stream);
 				dashelInterface.stream->flush();
+				dashelInterface.unlock();
 			}
 			catch(Dashel::DashelException e)
 			{
+				dashelInterface.unlock();
 				handleDashelException(e);
 			}
 		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::clearBreakpoints(unsigned node)
 	{
-		if (writeBlocked || !dashelInterface.stream) return;
-		
-		BreakpointClearAll breakpointClearAllMessage;
-		breakpointClearAllMessage.dest = node;
-		
-		try
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
 		{
-			breakpointClearAllMessage.serialize(dashelInterface.stream);
-			dashelInterface.stream->flush();
+			BreakpointClearAll breakpointClearAllMessage;
+			breakpointClearAllMessage.dest = node;
+			
+			try
+			{
+				breakpointClearAllMessage.serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
 		}
-		catch(Dashel::DashelException e)
-		{
-			handleDashelException(e);
-		}
+		else
+			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::blockWrite()
@@ -859,7 +963,6 @@ namespace Aseba
 		int line = getLineFromPC(ess->source, ess->pc);
 		
 		assert(writeBlocked == false);
-		assert(dashelInterface.stream);
 		
 		Target::ExecutionMode mode;
 		if (ess->flags & ASEBA_VM_STEP_BY_STEP_MASK)
@@ -882,15 +985,23 @@ namespace Aseba
 						node.lineInNext = line;
 						node.steppingInNext = WAITING_LINE_CHANGE;
 						
-						try
+						dashelInterface.lock();
+						if (dashelInterface.stream)
 						{
-							Step(ess->source).serialize(dashelInterface.stream);
-							dashelInterface.stream->flush();
+							try
+							{
+								Step(ess->source).serialize(dashelInterface.stream);
+								dashelInterface.stream->flush();
+								dashelInterface.unlock();
+							}
+							catch(Dashel::DashelException e)
+							{
+								dashelInterface.unlock();
+								handleDashelException(e);
+							}
 						}
-						catch(Dashel::DashelException e)
-						{
-							handleDashelException(e);
-						}
+						else
+							dashelInterface.unlock();
 					}
 					else if (node.steppingInNext == WAITING_LINE_CHANGE)
 					{
@@ -906,15 +1017,23 @@ namespace Aseba
 						}
 						else
 						{
-							try
+							dashelInterface.lock();
+							if (dashelInterface.stream)
 							{
-								Step(ess->source).serialize(dashelInterface.stream);
-								dashelInterface.stream->flush();
+								try
+								{
+									Step(ess->source).serialize(dashelInterface.stream);
+									dashelInterface.stream->flush();
+									dashelInterface.unlock();
+								}
+								catch(Dashel::DashelException e)
+								{
+									dashelInterface.unlock();
+									handleDashelException(e);
+								}
 							}
-							catch(Dashel::DashelException e)
-							{
-								handleDashelException(e);
-							}
+							else
+								dashelInterface.unlock();
 						}
 					}
 					else
