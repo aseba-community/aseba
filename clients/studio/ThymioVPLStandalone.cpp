@@ -439,8 +439,8 @@ namespace Aseba
 		
 		// create the VPL widget
 		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false);
-		vpl->loadFromDom(savedContent, false);
 		vplLayout->addWidget(vpl);
+		vpl->loadFromDom(savedContent, false);
 		
 		// connect callbacks
 		connect(vpl, SIGNAL(compilationOutcome(bool)), editor, SLOT(setEnabled(bool)));
@@ -469,7 +469,10 @@ namespace Aseba
 		{
 			savedContent = vpl->saveToDom();
 			vplLayout->removeWidget(vpl);
-			vpl->deleteLater();
+			// explicitely set no parent to avoid crash on Windows
+			vpl->setParent(0);
+			delete vpl;
+			//vpl->deleteLater();
 			vpl = 0;
 		}
 	}
