@@ -82,6 +82,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);
+		void showAtSavedPosition();
 		
 	protected:
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;

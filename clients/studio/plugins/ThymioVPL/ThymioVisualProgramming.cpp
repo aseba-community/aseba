@@ -13,6 +13,7 @@
 #include <QAction>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QSettings>
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
@@ -239,6 +240,11 @@ namespace Aseba { namespace ThymioVPL
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
+		if (isVisible())
+		{
+			QSettings settings;
+			settings.setValue("ThymioVisualProgramming/geometry", saveGeometry());
+		}
 	}
 	
 	void ThymioVisualProgramming::openToUrlFromAction() const
@@ -290,6 +296,13 @@ namespace Aseba { namespace ThymioVPL
 	{
 		close();
 	}
+	
+	void ThymioVisualProgramming::showAtSavedPosition()
+	{
+		QSettings settings;
+		restoreGeometry(settings.value("ThymioVisualProgramming/geometry").toByteArray());
+		QWidget::show();
+	}
 
 	void ThymioVisualProgramming::showVPLModal()
 	{
@@ -297,7 +310,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			scene->reset();
 			toggleAdvancedMode(false);
-			show();
+			showAtSavedPosition();
 		}
 	}
 	
@@ -406,7 +419,14 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if (!closeFile())
+		{
 			event->ignore();
+		}
+		else
+		{
+			QSettings settings;
+			settings.setValue("ThymioVisualProgramming/geometry", saveGeometry());
+		}
 	}
 	
 	bool ThymioVisualProgramming::warningModifiedDialog(bool removeHighlight)
@@ -556,7 +576,7 @@ namespace Aseba { namespace ThymioVPL
 		scene->recomputeSceneRect();
 		
 		if (!scene->isEmpty())
-			show();
+			showAtSavedPosition();
 		loading = false;
 	}
 	
