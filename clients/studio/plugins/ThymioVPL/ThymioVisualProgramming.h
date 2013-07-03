@@ -40,6 +40,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
 
+		virtual void aboutToLoad();
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
@@ -124,6 +125,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		QPixmap drawColorScheme(QColor color1, QColor color2);
+		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);
 		void clearHighlighting(bool keepCode);
 		void setColors(QComboBox *button = 0);

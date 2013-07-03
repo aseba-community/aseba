@@ -90,7 +90,7 @@ namespace Aseba
 	
 	bool StudioInterface::saveFile(bool as)
 	{
-		if( as )
+		if (as)
 			return mainWindow->saveFile();
 		
 		return mainWindow->save();
@@ -699,6 +699,14 @@ namespace Aseba
 				savedPlugins.push_back(savedContent);
 		}
 		return savedPlugins;
+	}
+	
+	void NodeTab::notifyPluginsAboutToLoad()
+	{
+		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
+		{
+			(*it)->aboutToLoad();
+		}
 	}
 	
 	void NodeTab::restorePlugins(const SavedPlugins& savedPlugins, bool fromFile)
@@ -1666,6 +1674,15 @@ namespace Aseba
 		if (askUserBeforeDiscarding() == false)
 			return;
 		
+		// notify plugins
+		for (int i = 0; i < nodes->count(); i++)
+		{
+			NodeTab* tab(dynamic_cast<NodeTab*>(nodes->widget(i)));
+			if (tab)
+				tab->notifyPluginsAboutToLoad();
+		}
+		
+		// open the file
 		QString fileName = path;
 	
 		if (fileName.isEmpty())
@@ -1676,6 +1693,7 @@ namespace Aseba
 		if (!file.open(QFile::ReadOnly))
 			return;
 		
+		// load the document
 		QDomDocument document("aesl-source");
 		QString errorMsg;
 		int errorLine;

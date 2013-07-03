@@ -224,6 +224,7 @@ namespace Aseba
 		void setupWidgets();
 		void setupConnections();
 		virtual SavedPlugins savePlugins() const;
+		void notifyPluginsAboutToLoad();
 		void restorePlugins(const SavedPlugins& savedPlugins, bool fromFile);
 		void updateToolList();
 	

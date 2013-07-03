@@ -97,13 +97,18 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
+	// used by load, avoid recompiling
 	void Scene::addEventActionPair(Card *event, Card *action)
 	{
 		EventActionPair *p(createNewEventActionPair());
+		disconnect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
+		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		if(event)
 			p->addEventCard(event);
 		if(action)
 			p->addActionCard(action);
+		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
 	}
 	
 	void Scene::ensureOneEmptyPairAtEnd()
@@ -122,7 +127,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		addItem(p);
 		recomputeSceneRect();
-
+		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
 		return p;
@@ -153,7 +158,7 @@ namespace Aseba { namespace ThymioVPL
 		for(int i=0; i<eventActionPairs.size(); i++)
 		{
 			EventActionPair *p(eventActionPairs[i]);
-			disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+			//disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 			removeItem(p);
 			delete(p);
 		}
@@ -184,7 +189,6 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::setModified(bool mod)
 	{
 		sceneModified=mod;
-		qDebug() << "scene modified" << mod;
 	}
 
 	void Scene::setAdvanced(bool advanced)

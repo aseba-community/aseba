@@ -240,11 +240,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
-		if (isVisible())
-		{
-			QSettings settings;
-			settings.setValue("ThymioVisualProgramming/geometry", saveGeometry());
-		}
+		saveGeometryIfVisible();
 	}
 	
 	void ThymioVisualProgramming::openToUrlFromAction() const
@@ -327,8 +323,7 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::openFile()
 	{
-		if( scene->isEmpty() || preDiscardWarningDialog(false) )
-			de->openFile();
+		de->openFile();
 	}
 	
 	bool ThymioVisualProgramming::save()
@@ -343,8 +338,12 @@ namespace Aseba { namespace ThymioVPL
 
 	bool ThymioVisualProgramming::closeFile()
 	{
-		if( scene->isEmpty() || preDiscardWarningDialog(true) ) 
+		if (!isVisible())
+			return true;
+		
+		if (scene->isEmpty() || preDiscardWarningDialog(true)) 
 		{
+			clearHighlighting(true);
 			return true;
 		}
 		else
@@ -421,10 +420,14 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if (!closeFile())
-		{
 			event->ignore();
-		}
 		else
+			saveGeometryIfVisible();
+	}
+	
+	void ThymioVisualProgramming::saveGeometryIfVisible()
+	{
+		if (isVisible())
 		{
 			QSettings settings;
 			settings.setValue("ThymioVisualProgramming/geometry", saveGeometry());
@@ -434,10 +437,7 @@ namespace Aseba { namespace ThymioVPL
 	bool ThymioVisualProgramming::preDiscardWarningDialog(bool keepCode)
 	{
 		if (!scene->isModified())
-		{
-			clearHighlighting(keepCode);
 			return true;
-		}
 		
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Warning"));
@@ -450,7 +450,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			case QMessageBox::Save:
 			{
-				clearHighlighting(keepCode);
+				//clearHighlighting(keepCode);
 				if (save())
 					return true;
 				else
@@ -458,7 +458,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			case QMessageBox::Discard:
 			{
-				clearHighlighting(keepCode);
+				//clearHighlighting(keepCode);
 				return true;
 			}
 			case QMessageBox::Cancel:
@@ -526,6 +526,13 @@ namespace Aseba { namespace ThymioVPL
 
 		return document;
 	}
+	
+	void ThymioVisualProgramming::aboutToLoad()
+	{
+		clearHighlighting(false);
+		saveGeometryIfVisible();
+		hide();
+	}
 
 	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
@@ -533,7 +540,6 @@ namespace Aseba { namespace ThymioVPL
 		scene->clear();
 		
 		QDomNode domNode = document.documentElement().firstChild();
-
 		while (!domNode.isNull())
 		{
 			if (domNode.isElement())
@@ -589,9 +595,11 @@ namespace Aseba { namespace ThymioVPL
 		scene->ensureOneEmptyPairAtEnd();
 		scene->setModified(!fromFile);
 		scene->recomputeSceneRect();
+		scene->clearSelection();
 		
 		if (!scene->isEmpty())
 			showAtSavedPosition();
+		
 		loading = false;
 	}
 	

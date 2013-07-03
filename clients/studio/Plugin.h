@@ -80,6 +80,7 @@ namespace Aseba
 		
 		virtual ~NodeToolInterface() {}
 		
+		virtual void aboutToLoad() {};
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile) {};
 		virtual QDomDocument saveToDom() const { return QDomDocument(); } 
 		SavedContent getSaved() const { return SavedContent(name, saveToDom()); }
