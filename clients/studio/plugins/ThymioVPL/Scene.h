@@ -17,11 +17,11 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsItem *addAction(Card *item);
 		QGraphicsItem *addEvent(Card *item);
 		void addEventActionPair(Card *event, Card *action);
+		void ensureOneEmptyPairAtEnd();
 
 		bool isEmpty() const;
 		void reset();
 		void clear();
-		void haveAtLeastAnEmptyCard();
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod) { sceneModified=mod; }
@@ -58,7 +58,6 @@ namespace Aseba { namespace ThymioVPL
 		void recompile();
 		
 	protected:
-		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 
 	protected:

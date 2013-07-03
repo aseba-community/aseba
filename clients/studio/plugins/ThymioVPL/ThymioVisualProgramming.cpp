@@ -539,7 +539,7 @@ namespace Aseba { namespace ThymioVPL
 			domNode = domNode.nextSibling();
 		}
 		
-		scene->haveAtLeastAnEmptyCard();
+		scene->ensureOneEmptyPairAtEnd();
 		scene->setModified(!fromFile);
 		scene->recomputeSceneRect();
 		

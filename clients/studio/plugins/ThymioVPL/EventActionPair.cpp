@@ -162,6 +162,11 @@ namespace Aseba { namespace ThymioVPL
 			return true;
 		return false;
 	}
+	
+	bool EventActionPair::isEmpty() const
+	{
+		return (!hasEventCard() && !hasActionCard());
+	}
 
 	void EventActionPair::setColorScheme(QColor eventColor, QColor actionColor)
 	{
@@ -334,12 +339,14 @@ namespace Aseba { namespace ThymioVPL
 								card->setStateFilter(state);
 						}
 						addEventCard(card);
+						polymorphic_downcast<Scene*>(scene())->ensureOneEmptyPairAtEnd();
 					}
 					else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
 					{
 						if (parentID >= 0)
 							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeActionCard();
 						addActionCard(card);
+						polymorphic_downcast<Scene*>(scene())->ensureOneEmptyPairAtEnd();
 					}
 					
 					int numButtons;

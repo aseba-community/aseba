@@ -37,6 +37,7 @@ namespace Aseba { namespace ThymioVPL
 		const Card *getActionCard() const { return actionCard; }
 		
 		bool isAnyStateFilter() const;
+		bool isEmpty() const; 
 		
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		

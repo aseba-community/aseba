@@ -38,6 +38,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			// replaced action of selected pair
 			selectedPair->addActionCard(item);
+			ensureOneEmptyPairAtEnd();
 			return selectedPair;
 		}
 		else
@@ -50,6 +51,7 @@ namespace Aseba { namespace ThymioVPL
 				{
 					p->addActionCard(item);
 					clearSelection();
+					ensureOneEmptyPairAtEnd();
 					return p;
 				}
 			}
@@ -57,6 +59,7 @@ namespace Aseba { namespace ThymioVPL
 			EventActionPair* p(createNewEventActionPair());
 			p->addActionCard(item);
 			clearSelection();
+			ensureOneEmptyPairAtEnd();
 			return p;
 		}
 	}
@@ -68,6 +71,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			// replaced action of selected pair
 			selectedPair->addEventCard(item);
+			ensureOneEmptyPairAtEnd();
 			return selectedPair;
 		}
 		else
@@ -80,6 +84,7 @@ namespace Aseba { namespace ThymioVPL
 				{
 					p->addEventCard(item);
 					clearSelection();
+					ensureOneEmptyPairAtEnd();
 					return p;
 				}
 			}
@@ -87,10 +92,11 @@ namespace Aseba { namespace ThymioVPL
 			EventActionPair* p(createNewEventActionPair());
 			p->addEventCard(item);
 			clearSelection();
+			ensureOneEmptyPairAtEnd();
 			return p;
 		}
 	}
-
+	
 	void Scene::addEventActionPair(Card *event, Card *action)
 	{
 		EventActionPair *p(createNewEventActionPair());
@@ -98,6 +104,14 @@ namespace Aseba { namespace ThymioVPL
 			p->addEventCard(event);
 		if(action)
 			p->addActionCard(action);
+	}
+	
+	void Scene::ensureOneEmptyPairAtEnd()
+	{
+		if (eventActionPairs.empty())
+			createNewEventActionPair();
+		else if (!eventActionPairs.last()->isEmpty())
+			createNewEventActionPair();
 	}
 
 	EventActionPair *Scene::createNewEventActionPair()
@@ -155,12 +169,6 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode = false;
 	}
 	
-	void Scene::haveAtLeastAnEmptyCard()
-	{
-		if (eventActionPairs.empty())
-			createNewEventActionPair();
-	}
-	
 	void Scene::setColorScheme(QColor eventColor, QColor actionColor)
 	{
 		eventCardColor = eventColor;
@@ -209,12 +217,10 @@ namespace Aseba { namespace ThymioVPL
 		
 		rearrangeButtons(row);
 		
-		haveAtLeastAnEmptyCard();
+		ensureOneEmptyPairAtEnd();
 		
 		recomputeSceneRect();
 	
-		sceneModified = true;
-		
 		recompile();
 	}
 	
@@ -337,17 +343,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		emit contentRecompiled();
 	}
-
-	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-	{
-		if( event->mimeData()->hasFormat("Card") && 
-			((event->scenePos().y()-20)/(buttonSetHeight)) >= eventActionPairs.size() ) 
-		{
-			event->accept();
-		} 
-		else
-			QGraphicsScene::dragMoveEvent(event);
-	}
 	
 	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
@@ -370,42 +365,12 @@ namespace Aseba { namespace ThymioVPL
 
 			rearrangeButtons( prevRow < currentRow ? prevRow : currentRow );
 			
+			ensureOneEmptyPairAtEnd();
+			
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			
 			recompile();
-		}
-		else if( event->mimeData()->hasFormat("Card") && 
-				((event->scenePos().y()-20)/(buttonSetHeight)) >= eventActionPairs.size() )
-		{
-			QByteArray buttonData = event->mimeData()->data("Card");
-			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
-			
-			int parentID;
-			dataStream >> parentID;
-
-			QString cardName;
-			int numButtons;
-			dataStream >> cardName >> numButtons;
-			
-			Card *button(Card::createCard(cardName, advancedMode));
-			if( button ) 
-			{
-				event->setDropAction(Qt::MoveAction);
-				event->accept();
-				
-				if( event->mimeData()->data("CardType") == QString("event").toLatin1() )
-					addEvent(button);
-				else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
-					addAction(button);
-
-				for( int i=0; i<numButtons; ++i ) 
-				{
-					int status;
-					dataStream >> status;
-					button->setValue(i, status);
-				}
-			}
 		}
 		else
 			QGraphicsScene::dropEvent(event);
