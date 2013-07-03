@@ -50,6 +50,9 @@ namespace Aseba { namespace ThymioVPL
 	public slots:
 		bool closeFile();
 		
+	protected slots:
+		void showErrorLine();
+		
 	private slots:
 		void openToUrlFromAction() const;
 		void showVPLModal();
@@ -97,6 +100,7 @@ namespace Aseba { namespace ThymioVPL
 	
 		QLabel *compilationResult;
 		QLabel *compilationResultImage;
+		QPushButton *showCompilationError;
 
 		QToolBar *toolBar;
 		QToolButton *newButton;

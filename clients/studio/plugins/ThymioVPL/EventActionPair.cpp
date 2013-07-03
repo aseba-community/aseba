@@ -210,6 +210,7 @@ namespace Aseba { namespace ThymioVPL
 			scene()->removeItem( eventCard );
 			eventCard->deleteLater();
 			eventCard = 0;
+			polymorphic_downcast<Scene*>(scene())->recompile();
 		}
 	}
 
@@ -235,6 +236,7 @@ namespace Aseba { namespace ThymioVPL
 			scene()->removeItem( actionCard );
 			actionCard->deleteLater();
 			actionCard = 0;
+			polymorphic_downcast<Scene*>(scene())->recompile();
 		}
 	}
 

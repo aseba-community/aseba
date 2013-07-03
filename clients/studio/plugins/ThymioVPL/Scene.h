@@ -33,7 +33,8 @@ namespace Aseba { namespace ThymioVPL
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
 		
-		bool isSuccessful() const { return  compiler.isSuccessful(); }
+		bool isSuccessful() const { return compiler.isSuccessful(); }
+		int getErrorLine() const { return compiler.getErrorLine(); }
 		int getSelectedPairId() const;
 		EventActionPair *getSelectedPair() const;
 		EventActionPair *getPairRow(int row) const;
@@ -54,7 +55,7 @@ namespace Aseba { namespace ThymioVPL
 	signals:
 		void contentRecompiled();
 		
-	protected slots:
+	public slots:
 		void recompile();
 		
 	protected:

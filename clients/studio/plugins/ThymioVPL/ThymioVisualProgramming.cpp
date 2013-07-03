@@ -162,10 +162,14 @@ namespace Aseba { namespace ThymioVPL
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+		
+		showCompilationError = new QPushButton(tr("show line"));
+		showCompilationError->hide();
 
 		compilationResultLayout = new QHBoxLayout;
 		compilationResultLayout->addWidget(compilationResultImage);  
 		compilationResultLayout->addWidget(compilationResult,10000);
+		compilationResultLayout->addWidget(showCompilationError);
 		sceneLayout->addLayout(compilationResultLayout);
 
 		// view
@@ -227,6 +231,8 @@ namespace Aseba { namespace ThymioVPL
 		connect(soundButton, SIGNAL(clicked()), this, SLOT(addSoundAction()));
 		connect(timerButton, SIGNAL(clicked()), this, SLOT(addTimerAction()));
 		connect(memoryButton, SIGNAL(clicked()), this, SLOT(addMemoryAction()));
+		
+		connect(showCompilationError, SIGNAL(clicked()), this, SLOT(showErrorLine()));
 		
 		setWindowModality(Qt::ApplicationModal);
 	}
@@ -328,6 +334,12 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 			return false;
+	}
+	
+	void ThymioVisualProgramming::showErrorLine()
+	{
+		if (!scene->isSuccessful())
+			view->ensureVisible(scene->getPairRow(scene->getErrorLine()));
 	}
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
@@ -562,17 +574,19 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::processCompilationResult()
 	{
 		compilationResult->setText(scene->getErrorMessage());
-		if( scene->isSuccessful() ) 
+		if (scene->isSuccessful())
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			de->displayCode(scene->getCode(), scene->getSelectedPairId());
 			runButton->setEnabled(true);
+			showCompilationError->hide();
 			emit compilationOutcome(true);
 		}
 		else
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
 			runButton->setEnabled(false);
+			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
 	}

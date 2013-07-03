@@ -338,7 +338,7 @@ namespace Aseba { namespace ThymioVPL
 		for(int i=0; i<eventActionPairs.size(); i++)
 			eventActionPairs[i]->setErrorStatus(false);
 		
-		if( !compiler.isSuccessful() )
+		if (!compiler.isSuccessful())
 			eventActionPairs[compiler.getErrorLine()]->setErrorStatus(true);
 		
 		emit contentRecompiled();
