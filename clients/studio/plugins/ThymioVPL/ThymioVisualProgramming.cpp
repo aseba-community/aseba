@@ -316,7 +316,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::newFile()
 	{
-		if (scene->isEmpty() || warningModifiedDialog()) 
+		if (scene->isEmpty() || preDiscardWarningDialog(false)) 
 		{
 			scene->reset();
 			toggleAdvancedMode(false);
@@ -325,7 +325,7 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::openFile()
 	{
-		if( scene->isEmpty() || warningModifiedDialog() ) 
+		if( scene->isEmpty() || preDiscardWarningDialog(false) )
 			de->openFile();
 	}
 	
@@ -341,7 +341,7 @@ namespace Aseba { namespace ThymioVPL
 
 	bool ThymioVisualProgramming::closeFile()
 	{
-		if( scene->isEmpty() || warningModifiedDialog(true) ) 
+		if( scene->isEmpty() || preDiscardWarningDialog(true) ) 
 		{
 			return true;
 		}
@@ -429,10 +429,13 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	bool ThymioVisualProgramming::warningModifiedDialog(bool removeHighlight)
+	bool ThymioVisualProgramming::preDiscardWarningDialog(bool keepCode)
 	{
-		if(!scene->isModified())
+		if (!scene->isModified())
+		{
+			clearHighlighting(keepCode);
 			return true;
+		}
 		
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Warning"));
@@ -445,21 +448,31 @@ namespace Aseba { namespace ThymioVPL
 		{
 			case QMessageBox::Save:
 			{
-				if (removeHighlight && scene->isSuccessful())
-					de->displayCode(scene->getCode(), -1);
+				clearHighlighting(keepCode);
 				if (save())
 					return true;
 				else
 					return false;
 			}
 			case QMessageBox::Discard:
+			{
+				clearHighlighting(keepCode);
 				return true;
+			}
 			case QMessageBox::Cancel:
 			default:
 				return false;
 		}
 
 		return false;
+	}
+	
+	void ThymioVisualProgramming::clearHighlighting(bool keepCode)
+	{
+		if (keepCode && scene->isSuccessful())
+			de->displayCode(scene->getCode(), -1);
+		else
+			de->displayCode(QList<QString>(), -1);
 	}
 
 	QDomDocument ThymioVisualProgramming::saveToDom() const 

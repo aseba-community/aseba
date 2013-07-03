@@ -88,8 +88,8 @@ namespace Aseba { namespace ThymioVPL
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		Scene *scene;
-		bool loading;
-
+		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
+		
 		// Event & Action buttons
 		QList<CardButton *> eventButtons;
 		QList<CardButton *> actionButtons;
@@ -124,7 +124,8 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		QPixmap drawColorScheme(QColor color1, QColor color2);
-		bool warningModifiedDialog(bool removeHighlight = false);
+		bool preDiscardWarningDialog(bool keepCode);
+		void clearHighlighting(bool keepCode);
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
 		

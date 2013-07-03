@@ -180,6 +180,12 @@ namespace Aseba { namespace ThymioVPL
 	
 		sceneModified = true;
 	}
+	
+	void Scene::setModified(bool mod)
+	{
+		sceneModified=mod;
+		qDebug() << "scene modified" << mod;
+	}
 
 	void Scene::setAdvanced(bool advanced)
 	{

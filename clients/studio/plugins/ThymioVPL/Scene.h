@@ -24,7 +24,7 @@ namespace Aseba { namespace ThymioVPL
 		void clear();
 		void setColorScheme(QColor eventColor, QColor actionColor);
 		bool isModified() const { return sceneModified; }
-		void setModified(bool mod) { sceneModified=mod; }
+		void setModified(bool mod);
 		void setScale(qreal scale);
 		void setAdvanced(bool advanced);
 		bool getAdvanced() const { return advancedMode; }
