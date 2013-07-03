@@ -276,6 +276,10 @@ namespace Aseba
 				break;
 				case ASEBA_OP_MOD: result = valueOne % valueTwo; break;
 				
+				case ASEBA_OP_BIT_OR: result = valueOne | valueTwo; break;
+				case ASEBA_OP_BIT_XOR: result = valueOne ^ valueTwo; break;
+				case ASEBA_OP_BIT_AND: result = valueOne & valueTwo; break;
+				
 				case ASEBA_OP_EQUAL: result = valueOne == valueTwo; break;
 				case ASEBA_OP_NOT_EQUAL: result = valueOne != valueTwo; break;
 				case ASEBA_OP_BIGGER_THAN: result = valueOne > valueTwo; break;
