@@ -127,31 +127,44 @@ namespace Aseba { namespace ThymioVPL
 		pts[2] = QPointF(456+trans, 168);
 		painter->drawPolygon(pts, 3);
 		
-		if (eventCard == 0 || highlightEventButton)
+		// card place and highlight
+		painter->setBrush(Qt::NoBrush);
+		
+		if (eventCard)
+		{
+			if (highlightEventButton)
+			{
+				eventCardColor.setAlpha(130);
+				painter->setPen(QPen(eventCardColor, 20));
+				painter->drawRoundedRect(30, 30, 276, 276, 5, 5);
+			}
+		}
+		else
 		{
 			if (!highlightEventButton)
 				eventCardColor.setAlpha(100);
 			painter->setPen(QPen(eventCardColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
-			painter->setBrush(Qt::NoBrush);
-			if (eventCard)
-				painter->drawRoundedRect(35, 35, 266, 266, 5, 5);
-			else
-				painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
-			eventCardColor.setAlpha(255);
+			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
 		}
-
-		if (actionCard == 0 || highlightActionButton)
+		eventCardColor.setAlpha(255);
+		
+		if (actionCard)
+		{
+			if (highlightActionButton)
+			{
+				actionCardColor.setAlpha(130);
+				painter->setPen(QPen(actionCardColor, 20));
+				painter->drawRoundedRect(490+trans, 30, 276, 276, 5, 5);
+			}
+		}
+		else
 		{
 			if (!highlightActionButton)
 				actionCardColor.setAlpha(100);
 			painter->setPen(QPen(actionCardColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
-			painter->setBrush(Qt::NoBrush);
-			if (actionCard)
-				painter->drawRoundedRect(495+trans, 35, 266, 266, 5, 5);
-			else
-				painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
-			actionCardColor.setAlpha(255);
+			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
 		}
+		actionCardColor.setAlpha(255);
 	}
 	
 	bool EventActionPair::isAnyStateFilter() const
