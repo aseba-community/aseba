@@ -145,7 +145,6 @@ namespace Aseba { namespace ThymioVPL
 	{
 		clear();
 		createNewEventActionPair();
-		recompile();
 	}
 	
 	void Scene::clear()
@@ -184,16 +183,19 @@ namespace Aseba { namespace ThymioVPL
 
 	void Scene::setAdvanced(bool advanced)
 	{
-		advancedMode = advanced;
-		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+		if (advanced != advancedMode)
 		{
-			EventActionPair* p(*itr);
-			p->disconnect(SIGNAL(contentChanged()), this, SLOT(recompile()));
-			p->setAdvanced(advanced);
-			connect(p, SIGNAL(contentChanged()), SLOT(recompile()));
+			advancedMode = advanced;
+			for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+			{
+				EventActionPair* p(*itr);
+				p->disconnect(SIGNAL(contentChanged()), this, SLOT(recompile()));
+				p->setAdvanced(advanced);
+				connect(p, SIGNAL(contentChanged()), SLOT(recompile()));
+			}
+			
+			recompile();
 		}
-		
-		recompile();
 	}
 	
 	bool Scene::isAnyStateFilter() const

@@ -496,7 +496,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		loading = true;
 		scene->clear();
-
+		
 		QDomNode domNode = document.documentElement().firstChild();
 
 		while (!domNode.isNull())
