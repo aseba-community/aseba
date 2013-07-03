@@ -311,6 +311,7 @@ namespace Aseba { namespace ThymioVPL
 			scene->reset();
 			toggleAdvancedMode(false);
 			showAtSavedPosition();
+			processCompilationResult();
 		}
 	}
 	
@@ -320,6 +321,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			scene->reset();
 			toggleAdvancedMode(false);
+			processCompilationResult();
 		}
 	}
 
