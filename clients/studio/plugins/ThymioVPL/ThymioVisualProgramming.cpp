@@ -316,7 +316,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::newFile()
 	{
-		if (scene->isEmpty() || preDiscardWarningDialog(false)) 
+		if (de->newFile())
 		{
 			scene->reset();
 			toggleAdvancedMode(false);

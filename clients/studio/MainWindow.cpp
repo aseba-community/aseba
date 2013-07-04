@@ -323,13 +323,12 @@ namespace Aseba
 		mainWindow(mainWindow),
 		currentPC(0),
 		previousMode(Target::EXECUTION_UNKNOWN),
-		firstCompilation(true),
 		showHidden(mainWindow->showHiddenAct->isChecked()),
 		compilationDirty(false),
 		isSynchronized(true)
 	{
 		// setup some variables
-		rehighlighting = false;
+		//rehighlighting = false;
 		errorPos = -1;
 		allocatedVariablesCount = 0;
 		
@@ -884,102 +883,97 @@ namespace Aseba
 	
 	void NodeTab::editorContentChanged()
 	{
-		if (rehighlighting)
+		// only recompile if source code has actually changed
+		if (editor->toPlainText() == lastCompiledSource)
+			return;
+		lastCompiledSource = editor->toPlainText();
+		
+		// notify plugins
+		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
+			(*it)->codeChangedInEditor();
+		
+		// handle completion
+		QTextCursor cursor(editor->textCursor());
+		if (ConfigDialog::getAutoCompletion() && cursor.atBlockEnd())
 		{
-			rehighlighting = false;
-		}
-		else
-		{
-			// notify plugins
-			for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
-				(*it)->codeChangedInEditor();
+			// language completion
+			const QString& line(cursor.block().text());
+			QString keyword(line);
 			
-			// handle completion
-			QTextCursor cursor(editor->textCursor());
-			if (ConfigDialog::getAutoCompletion() && cursor.atBlockEnd())
+			// make sure the string does not have any trailing space
+			int nonWhitespace(0);
+			while ((nonWhitespace < keyword.size()) && ((keyword.at(nonWhitespace) == ' ') || (keyword.at(nonWhitespace) == '\t')))
+				++nonWhitespace;
+			keyword.remove(0,nonWhitespace);
+			
+			if (!keyword.trimmed().isEmpty())
 			{
-				// language completion
-				const QString& line(cursor.block().text());
-				QString keyword(line);
-				
-				// make sure the string does not have any trailing space
-				int nonWhitespace(0);
-				while ((nonWhitespace < keyword.size()) && ((keyword.at(nonWhitespace) == ' ') || (keyword.at(nonWhitespace) == '\t')))
-					++nonWhitespace;
-				keyword.remove(0,nonWhitespace);
-				
-				if (!keyword.trimmed().isEmpty())
+				QString prefix;
+				QString postfix;
+				if (keyword == "if")
 				{
-					QString prefix;
-					QString postfix;
-					if (keyword == "if")
+					const QString headSpace = line.left(line.indexOf("if"));
+					prefix = " ";
+					postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "when")
+				{
+					const QString headSpace = line.left(line.indexOf("when"));
+					prefix = " ";
+					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "for")
+				{
+					const QString headSpace = line.left(line.indexOf("for"));
+					prefix = " ";
+					postfix = "i in 0:0 do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if (keyword == "while")
+				{
+					const QString headSpace = line.left(line.indexOf("while"));
+					prefix = " ";
+					postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
+				}
+				else if ((keyword == "else") && cursor.block().next().isValid())
+				{
+					const QString tab = QString("\t");
+					QString headSpace = line.left(line.indexOf("else"));
+					
+					if( headSpace.size() >= tab.size())
 					{
-						const QString headSpace = line.left(line.indexOf("if"));
-						prefix = " ";
-						postfix = " then\n" + headSpace + "\t\n" + headSpace + "end";
-					}
-					else if (keyword == "when")
-					{
-						const QString headSpace = line.left(line.indexOf("when"));
-						prefix = " ";
-						postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
-					}
-					else if (keyword == "for")
-					{
-						const QString headSpace = line.left(line.indexOf("for"));
-						prefix = " ";
-						postfix = "i in 0:0 do\n" + headSpace + "\t\n" + headSpace + "end";
-					}
-					else if (keyword == "while")
-					{
-						const QString headSpace = line.left(line.indexOf("while"));
-						prefix = " ";
-						postfix = " do\n" + headSpace + "\t\n" + headSpace + "end";
-					}
-					else if ((keyword == "else") && cursor.block().next().isValid())
-					{
-						const QString tab = QString("\t");
-						QString headSpace = line.left(line.indexOf("else"));
-						
-						if( headSpace.size() >= tab.size())
+						headSpace = headSpace.left(headSpace.size() - tab.size());
+						if (cursor.block().next().text() == headSpace + "end")
 						{
-							headSpace = headSpace.left(headSpace.size() - tab.size());
-							if (cursor.block().next().text() == headSpace + "end")
-							{
-								prefix = "\n" + headSpace + "else";
-								postfix = "\n" + headSpace + "\t";
-								
-								cursor.select(QTextCursor::BlockUnderCursor);
-								cursor.removeSelectedText();
-							}
+							prefix = "\n" + headSpace + "else";
+							postfix = "\n" + headSpace + "\t";
+							
+							cursor.select(QTextCursor::BlockUnderCursor);
+							cursor.removeSelectedText();
 						}
 					}
-					else if (keyword == "elseif")
-					{
-						const QString headSpace = line.left(line.indexOf("elseif"));
-						prefix = " ";
-						postfix = " then";
-					}
+				}
+				else if (keyword == "elseif")
+				{
+					const QString headSpace = line.left(line.indexOf("elseif"));
+					prefix = " ";
+					postfix = " then";
+				}
 
-					if (!prefix.isNull() || !postfix.isNull())
-					{
-						cursor.beginEditBlock();
-						cursor.insertText(prefix);
-						const int pos = cursor.position();
-						cursor.insertText(postfix);
-						cursor.setPosition(pos);
-						cursor.endEditBlock();
-						editor->setTextCursor(cursor);
-					}
+				if (!prefix.isNull() || !postfix.isNull())
+				{
+					cursor.beginEditBlock();
+					cursor.insertText(prefix);
+					const int pos = cursor.position();
+					cursor.insertText(postfix);
+					cursor.setPosition(pos);
+					cursor.endEditBlock();
+					editor->setTextCursor(cursor);
 				}
 			}
-			// recompile
-			recompile();
-			if (!firstCompilation)
-				mainWindow->sourceChanged();
-			else
-				firstCompilation = false;
 		}
+		// recompile
+		recompile();
+		mainWindow->sourceChanged();
 	}
 
 	void NodeTab::keywordClicked(QString keyword)
@@ -1377,7 +1371,7 @@ namespace Aseba
 	
 	void NodeTab::rehighlight()
 	{
-		rehighlighting = true;
+		//rehighlighting = true;
 		highlighter->rehighlight();
 	}
 	
@@ -2777,7 +2771,7 @@ namespace Aseba
 		
 		if (tab->setEditorProperty("executionError", QVariant(), line, true))
 		{
-			tab->rehighlighting = true;
+			//tab->rehighlighting = true;
 			tab->highlighter->rehighlight();
 		}
 		

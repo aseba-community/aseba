@@ -88,7 +88,13 @@ namespace Aseba
 	
 	bool ThymioVPLStandaloneInterface::newFile()
 	{
-		return true;
+		Q_ASSERT(vplStandalone->vpl);
+		if (vplStandalone->vpl->preDiscardWarningDialog(false))
+		{
+			vplStandalone->fileName = "";
+			return true;
+		}
+		return false;
 	}
 	
 	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
@@ -450,7 +456,8 @@ namespace Aseba
 		connect(vpl, SIGNAL(compilationOutcome(bool)), editor, SLOT(setEnabled(bool)));
 		
 		// reload data
-		vpl->loadFromDom(savedContent, false);
+		if (!savedContent.isNull())
+			vpl->loadFromDom(savedContent, false);
 		
 		// reset sizes
 		resetSizes();

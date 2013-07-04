@@ -311,7 +311,7 @@ namespace Aseba
 		QPushButton *refreshMemoryButton;
 		QCheckBox *autoRefreshMemoryCheck;
 		
-		// keywords // Jiwon
+		// keywords
 		QToolButton *varButton;
 		QToolButton *ifButton;
 		QToolButton *elseifButton;
@@ -347,11 +347,10 @@ namespace Aseba
 		
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
 		
-		bool rehighlighting; //!< is the next contentChanged due to rehighlight() call ?
+		QString lastCompiledSource; //!< content of last source considered for compilation following a textChanged signal
 		int errorPos; //!< position of last error, -1 if compilation was success
 		int currentPC; //!< current program counter
 		Target::ExecutionMode previousMode;
-		bool firstCompilation; //!< true if first compilation after creation
 		bool showHidden;
 		
 		QFuture<CompilationResult*> compilationFuture;
