@@ -304,6 +304,10 @@ namespace Aseba
 		if (!vpl)
 			return;
 		
+		// ask user to save existing changes
+		if (!vpl->preDiscardWarningDialog(false))
+			return;
+		
 		#ifdef ANDROID
 		QString dir("/sdcard/");
 		#else // ANDROID
@@ -365,6 +369,7 @@ namespace Aseba
 			if(dataLoaded)
 			{
 				fileName = newFileName;
+				updateWindowTitle(vpl->isModified());
 			}
 			else
 			{

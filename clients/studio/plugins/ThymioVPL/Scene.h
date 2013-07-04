@@ -53,11 +53,13 @@ namespace Aseba { namespace ThymioVPL
 		PairConstItr pairsEnd() const { return eventActionPairs.end(); }
 		
 	signals:
+		void highlightChanged();
 		void contentRecompiled();
 		void modifiedStatusChanged(bool modified);
 		
 	public slots:
 		void recompile();
+		void recompileWithoutSetModified();
 		
 	protected:
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);

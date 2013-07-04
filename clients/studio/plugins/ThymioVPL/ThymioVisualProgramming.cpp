@@ -182,7 +182,8 @@ namespace Aseba { namespace ThymioVPL
 		Q_ASSERT(scene->pairsEnd() - scene->pairsBegin());
 		view->centerOn(*scene->pairsBegin());
 		
-		connect(scene, SIGNAL(contentRecompiled()), this, SLOT(processCompilationResult()));
+		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
+		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 
 		horizontalLayout->addLayout(sceneLayout);
      
@@ -595,9 +596,9 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		scene->ensureOneEmptyPairAtEnd();
-		scene->setModified(!fromFile);
 		scene->recomputeSceneRect();
 		scene->clearSelection();
+		scene->setModified(!fromFile);
 		
 		if (!scene->isEmpty())
 			showAtSavedPosition();
@@ -614,6 +615,11 @@ namespace Aseba { namespace ThymioVPL
 			scene->clear();
 			loading = false;
 		}
+	}
+	
+	bool ThymioVisualProgramming::isModified() const
+	{
+		return scene->isModified();
 	}
 
 	void ThymioVisualProgramming::processCompilationResult()
@@ -634,6 +640,12 @@ namespace Aseba { namespace ThymioVPL
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
+	}
+	
+	void ThymioVisualProgramming::processHighlightChange()
+	{
+		if (scene->isSuccessful())
+			de->displayCode(scene->getCode(), scene->getSelectedPairId());
 	}
 
 	void ThymioVisualProgramming::addButtonsEvent()

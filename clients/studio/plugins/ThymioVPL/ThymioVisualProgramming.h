@@ -44,6 +44,8 @@ namespace Aseba { namespace ThymioVPL
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
+		
+		bool isModified() const;
 	
 	signals:
 		void modifiedStatusChanged(bool modified);
@@ -81,6 +83,7 @@ namespace Aseba { namespace ThymioVPL
 		void stop();
 		void toggleAdvancedMode();
 		void processCompilationResult();
+		void processHighlightChange();
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);
@@ -125,6 +128,8 @@ namespace Aseba { namespace ThymioVPL
 		QVBoxLayout *actionsLayout;
 		
 	protected:
+		friend class ThymioVPLStandalone;
+		
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);

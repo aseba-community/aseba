@@ -23,7 +23,7 @@ namespace Aseba { namespace ThymioVPL
 		EventActionPair *p(createNewEventActionPair());
 		buttonSetHeight = p->boundingRect().height();
 		
-		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
+		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 	}
 	
 	Scene::~Scene()
@@ -101,14 +101,14 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::addEventActionPair(Card *event, Card *action)
 	{
 		EventActionPair *p(createNewEventActionPair());
-		disconnect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
+		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		if(event)
 			p->addEventCard(event);
 		if(action)
 			p->addActionCard(action);
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
+		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 	}
 	
 	void Scene::ensureOneEmptyPairAtEnd()
@@ -154,7 +154,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::clear()
 	{
-		disconnect(this, SIGNAL(selectionChanged()), this, SLOT(recompile()));
+		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		for(int i=0; i<eventActionPairs.size(); i++)
 		{
 			EventActionPair *p(eventActionPairs[i]);
@@ -166,7 +166,7 @@ namespace Aseba { namespace ThymioVPL
 		eventActionPairs.clear();
 		compiler.clear();
 		
-		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
+		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
 		setModified(false);
 		
@@ -344,7 +344,11 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::recompile()
 	{
 		setModified(true);
-		
+		recompileWithoutSetModified();
+	}
+	
+	void Scene::recompileWithoutSetModified()
+	{
 		compiler.compile();
 		compiler.generateCode();
 		
