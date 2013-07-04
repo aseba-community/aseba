@@ -89,6 +89,7 @@ namespace Aseba
 		void networkDisconnected();
 		void variablesMemoryEstimatedDirty(unsigned node);
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
+		void updateWindowTitle(bool modified);
 		
 	protected:
 		friend struct ThymioVPLStandaloneInterface;

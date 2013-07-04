@@ -46,6 +46,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 	
 	signals:
+		void modifiedStatusChanged(bool modified);
 		void compilationOutcome(bool success);
 		
 	public slots:

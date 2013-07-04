@@ -54,6 +54,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	signals:
 		void contentRecompiled();
+		void modifiedStatusChanged(bool modified);
 		
 	public slots:
 		void recompile();

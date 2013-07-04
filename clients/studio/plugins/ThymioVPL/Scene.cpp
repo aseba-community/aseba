@@ -168,7 +168,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		connect(this, SIGNAL(selectionChanged()), SLOT(recompile()));
 		
-		sceneModified = false;
+		setModified(false);
 		
 		advancedMode = false;
 	}
@@ -183,12 +183,13 @@ namespace Aseba { namespace ThymioVPL
 
 		update();
 	
-		sceneModified = true;
+		setModified(true);
 	}
 	
 	void Scene::setModified(bool mod)
 	{
-		sceneModified=mod;
+		sceneModified = mod;
+		emit modifiedStatusChanged(sceneModified);
 	}
 
 	void Scene::setAdvanced(bool advanced)
@@ -257,7 +258,7 @@ namespace Aseba { namespace ThymioVPL
 		foreach (view, views())
 			view->ensureVisible(p);
 
-		sceneModified = true;
+		setModified(true);
 	}
 	
 	void Scene::recomputeSceneRect()
@@ -342,7 +343,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::recompile()
 	{
-		sceneModified = true;
+		setModified(true);
 		
 		compiler.compile();
 		compiler.generateCode();

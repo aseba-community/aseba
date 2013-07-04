@@ -235,6 +235,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		connect(showCompilationError, SIGNAL(clicked()), this, SLOT(showErrorLine()));
 		
+		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
+		
 		setWindowModality(Qt::ApplicationModal);
 	}
 	

@@ -137,9 +137,8 @@ namespace Aseba
 	
 	void ThymioVPLStandalone::setupWidgets()
 	{
-		setWindowTitle(tr("Thymio Visual Programming Language"));
-		
 		// VPL part
+		updateWindowTitle(false);
 		vplLayout = new QVBoxLayout;
 		QWidget* vplContainer = new QWidget;
 		vplContainer->setLayout(vplLayout);
@@ -437,13 +436,16 @@ namespace Aseba
 		// save node information
 		id = node;
 		
-		// create the VPL widget
+		// create the VPL widget and add it
 		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false);
 		vplLayout->addWidget(vpl);
-		vpl->loadFromDom(savedContent, false);
 		
 		// connect callbacks
+		connect(vpl, SIGNAL(modifiedStatusChanged(bool)), SLOT(updateWindowTitle(bool)));
 		connect(vpl, SIGNAL(compilationOutcome(bool)), editor, SLOT(setEnabled(bool)));
+		
+		// reload data
+		vpl->loadFromDom(savedContent, false);
 		
 		// reset sizes
 		resetSizes();
@@ -501,6 +503,20 @@ namespace Aseba
 		// update variables model
 		if (node == id)
 			variablesModel->setVariablesData(start, variables);
+	}
+	
+	//! Update the window title with filename and modification status
+	void ThymioVPLStandalone::updateWindowTitle(bool modified)
+	{
+		QString modifiedText;
+		if (modified)
+			modifiedText = tr("[modified] ");
+		
+		QString docName(tr("Untitled"));
+		if (!fileName.isEmpty())
+			docName = fileName.mid(fileName.lastIndexOf("/") + 1);
+		
+		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language").arg(docName).arg(modifiedText));
 	}
 	
 	/*@}*/
