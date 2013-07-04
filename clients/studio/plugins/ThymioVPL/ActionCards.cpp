@@ -85,14 +85,14 @@ namespace Aseba { namespace ThymioVPL
 	
 	int MoveActionCard::getValue(unsigned i) const
 	{ 
-		if (i<sliders.size()) 
+		if (int(i)<sliders.size()) 
 			return sliders[i]->value()*50;
 		return -1;
 	}
 
 	void MoveActionCard::setValue(unsigned i, int value) 
 	{ 
-		if(i<sliders.size()) 
+		if(int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value/50);
 	}
 	
@@ -140,14 +140,14 @@ namespace Aseba { namespace ThymioVPL
 
 	int ColorActionCard::getValue(unsigned i) const
 	{ 
-		if(i<sliders.size()) 
+		if (int(i)<sliders.size()) 
 			return sliders[i]->value(); 
 		return -1;
 	}
 	
 	void ColorActionCard::setValue(unsigned i, int value) 
 	{ 
-		if(i<sliders.size()) 
+		if (int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value);
 	}
 	

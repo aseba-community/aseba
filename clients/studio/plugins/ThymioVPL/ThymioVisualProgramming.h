@@ -22,6 +22,12 @@
 #include "../../Plugin.h"
 #include "../../DashelTarget.h"
 
+namespace Aseba
+{
+	struct ThymioVPLStandaloneInterface;
+	class ThymioVPLStandalone;
+}
+
 namespace Aseba { namespace ThymioVPL
 {
 	class Scene;
@@ -128,8 +134,8 @@ namespace Aseba { namespace ThymioVPL
 		QVBoxLayout *actionsLayout;
 		
 	protected:
-		friend class ThymioVPLStandalone;
-		friend struct ThymioVPLStandaloneInterface;
+		friend class Aseba::ThymioVPLStandalone;
+		friend struct Aseba::ThymioVPLStandaloneInterface;
 		
 		QPixmap drawColorScheme(QColor color1, QColor color2);
 		void saveGeometryIfVisible();
