@@ -23,6 +23,11 @@
 #include <iterator>
 #include <cstdlib>
 
+#if defined(_WIN32) && defined(__MINGW32__)
+  /* This is a workaround for MinGW32, see libxml/xmlexports.h */
+  #define IN_LIBXML
+#endif
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
