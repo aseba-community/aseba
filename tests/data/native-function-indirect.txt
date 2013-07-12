@@ -1,0 +1,4 @@
+var dest = 0
+var i = 0
+
+call math.muldiv(dest[i], 10, 10, 2)
