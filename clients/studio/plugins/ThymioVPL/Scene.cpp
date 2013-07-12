@@ -289,7 +289,7 @@ namespace Aseba { namespace ThymioVPL
 			return tr("Line %0: Missing action").arg(compiler.getErrorLine());
 			break;
 		case Compiler::EVENT_REPEATED:
-			return tr("Line %0: Redeclaration of event").arg(compiler.getErrorLine());
+			return tr("Line %0: Twice the same event").arg(compiler.getErrorLine());
 			break;
 		case Compiler::INVALID_CODE:
 			return tr("Line %0: Unknown event/action type").arg(compiler.getErrorLine());
