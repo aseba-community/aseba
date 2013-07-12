@@ -1335,7 +1335,7 @@ event %0 : </source>
     <message>
         <location filename="DashelTarget.cpp" line="905"/>
         <source>Stop trying</source>
-        <translation type="unfinished"></translation>
+        <translation>Rinunciare alla riconnessione </translation>
     </message>
 </context>
 <context>
@@ -1550,7 +1550,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="167"/>
         <source>show line</source>
-        <translation type="unfinished"></translation>
+        <translation>monstrare linea</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="198"/>
@@ -1565,12 +1565,12 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="407"/>
         <source>Returning to simple mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ritornare al modo semplice </translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="408"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Siete utilizzando gli stati. Il ritorno al modo semplice annullerà qualsiasi filtro di stati o carta di impostazione di stati. &lt;p&gt; Siete sicuro di voler continuare?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="445"/>
@@ -1580,7 +1580,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="446"/>
         <source>The VPL document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Il documento VPL é stato modificato. &lt;p&gt; Volete salvare le modifiche?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="567"/>
@@ -1610,7 +1610,7 @@ event %0 : </source>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="235"/>
         <source>You need to connect a Thymio II to use this application.</source>
-        <translation type="unfinished"></translation>
+        <translation>È necessario collegare un Thymio II per utilizzare questa applicazione.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="264"/>
@@ -1631,12 +1631,12 @@ event %0 : </source>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="373"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun dato VPLè stato trovato nel documento di script, documento ignorato.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="430"/>
         <source>This application only supports a single robot at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa applicazione supporta un solo robot alla volta.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="513"/>
