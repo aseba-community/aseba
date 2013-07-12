@@ -1458,7 +1458,7 @@ event %0 : </source>
         <location filename="plugins/ThymioVPL/Scene.cpp" line="292"/>
         <source>Line %0: Twice the same event</source>
         <oldsource>Line %0: Redeclaration of event</oldsource>
-        <translation type="unfinished">Linea %0: evento ridichiarato</translation>
+        <translation>Linea %0: Due volte il stesso evento</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Scene.cpp" line="295"/>
