@@ -441,13 +441,33 @@ namespace Aseba
 		virtual unsigned getVectorAddr() const { return arrayAddr; }
 		virtual unsigned getVectorSize() const { return 1; }
 	};
+	
+	//! Node for loading the address of the argument of a native function
+	//! that is not known at compile time, but that does exist in memory
+	struct LoadNativeArgNode : Node
+	{
+		unsigned tempAddr; //!< address of temporary (end of memory) for stack value duplication
+		unsigned arrayAddr; //!< address of the first element of the array
+		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
+		std::wstring arrayName; //!< name of the array (for debug)
+		
+		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
+		virtual LoadNativeArgNode* shallowCopy() { return new LoadNativeArgNode(*this); }
+		
+		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual Node* optimize(std::wostream* dump);
+		virtual unsigned getStackDepth() const;
+		virtual void emit(PreLinkBytecode& bytecodes) const;
+		virtual std::wstring toWString() const;
+		virtual std::wstring toNodeName() const { return L"load native arg"; }
+	};
 
 	//! Node for calling a native function
 	//! may have children for pushing constants somewhere
 	struct CallNode : Node
 	{
 		unsigned funcId; //!< identifier of the function to be called
-		std::vector<unsigned> argumentsAddr; //!< address of all arguments
+		std::vector<unsigned> templateArgs; //!< sizes of templated arguments
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		virtual CallNode* shallowCopy() { return new CallNode(*this); }
@@ -517,8 +537,8 @@ namespace Aseba
 	//! If write == true, will expand to StoreNode or ArrayWriteNode
 	//! If write == false, will expand to LoadNode or ArrayReadNode
 	//! children[0] is an optional index
-	//! If children[0] is a StaticVector of one elements (int), it will be foo[x]
-	//! If children[0] is a StaticVector of two elements (int), it will be foo[x:y]
+	//! If children[0] is a TupleVectorNode of one elements (int), it will be foo[x]
+	//! If children[0] is a TupleVectorNode of two elements (int), it will be foo[x:y]
 	//! If children[0] is another type of node, it will be foo[whatever]
 	//! If children[0] doesn't exist, access to the full array is considered
 	struct MemoryVectorNode : AbstractTreeNode

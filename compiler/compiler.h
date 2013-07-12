@@ -388,7 +388,7 @@ namespace Aseba
 		void expectOneOf(const Token::Type types[length]) const;
 
 		void freeTemporaryMemory();
-		void allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr);
+		unsigned allocateTemporaryMemory(const SourcePos varPos, const unsigned size);
 		AssignmentNode* allocateTemporaryVariable(const SourcePos varPos, Node* rValue);
 
 		VariablesMap::const_iterator findVariable(const std::wstring& name, const SourcePos& pos) const;

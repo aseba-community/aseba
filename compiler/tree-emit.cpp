@@ -26,6 +26,25 @@ namespace Aseba
 {
 	/** \addtogroup compiler */
 	/*@{*/
+	
+	// helper function
+	static void addImmediateToBytecodes(int value, const SourcePos& sourcePos, PreLinkBytecode& bytecodes)
+	{
+		unsigned short bytecode;
+		
+		if ((abs(value) >> 11) == 0)
+		{
+			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
+			bytecode |= ((unsigned)value) & 0x0fff;
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		}
+		else
+		{
+			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LARGE_IMMEDIATE);
+			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+			bytecodes.current->push_back(BytecodeElement(value, sourcePos.row));
+		}
+	}
 
 	//! Add init event and point to currentBytecode it
 	PreLinkBytecode::PreLinkBytecode()
@@ -349,20 +368,7 @@ namespace Aseba
 	
 	void ImmediateNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		unsigned short bytecode;
-		
-		if ((abs(value) >> 11) == 0)
-		{
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
-			bytecode |= ((unsigned)value) & 0x0fff;
-			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
-		}
-		else
-		{
-			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LARGE_IMMEDIATE);
-			bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
-			bytecodes.current->push_back(BytecodeElement(value, sourcePos.row));
-		}
+		addImmediateToBytecodes(value, sourcePos, bytecodes);
 	}
 	
 	unsigned ImmediateNode::getStackDepth() const
@@ -390,6 +396,20 @@ namespace Aseba
 	}
 	
 	
+	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
+	{
+		// constant index should have been optimized out already
+		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		assert(immediateChild == 0);
+		
+		children[0]->emit(bytecodes);
+		
+		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT) | arrayAddr;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
+	}
+	
+	
 	void ArrayReadNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// constant index should have been optimized out already
@@ -404,57 +424,68 @@ namespace Aseba
 	}
 	
 	
-	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
+	void LoadNativeArgNode::emit(PreLinkBytecode& bytecodes) const
 	{
+		unsigned short bytecode;
+		
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
 		
+		// load variable
 		children[0]->emit(bytecodes);
 		
-		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE_INDIRECT) | arrayAddr;
+		// duplicate it: store once, load twice
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | tempAddr;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | tempAddr;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD) | tempAddr;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		
+		// load indirect to check for access error, store to discard
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LOAD_INDIRECT) | arrayAddr;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 		bytecodes.current->push_back(BytecodeElement(arraySize, sourcePos.row));
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_STORE) | tempAddr;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
+		
+		// compute address by pushing array address and adding
+		addImmediateToBytecodes(arrayAddr, sourcePos, bytecodes);
+		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_BINARY_ARITHMETIC) | ASEBA_OP_ADD;
+		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
+	
+	unsigned LoadNativeArgNode::getStackDepth() const
+	{
+		return std::max(children[0]->getStackDepth(), unsigned(2));
+	}
+	
 	
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		unsigned short bytecode;
-		
-		// emit code for children. They might contain code to store constants somewhere
-		for (size_t i = 0; i < children.size(); i++)
-			children[i]->emit(bytecodes);
-		
-		// generate load for arguments in reverse order
-		int i = (int)argumentsAddr.size() - 1;
+		// generate load for template parameters in reverse order
+		int i = (int)templateArgs.size() - 1;
 		while (i >= 0)
 		{
-			if ((abs(argumentsAddr[i]) >> 11) == 0)
-			{
-				bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_SMALL_IMMEDIATE);
-				bytecode |= ((unsigned)argumentsAddr[i]) & 0x0fff;
-				bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
-			}
-			else
-			{
-				bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_LARGE_IMMEDIATE);
-				bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
-				bytecodes.current->push_back(BytecodeElement(argumentsAddr[i], sourcePos.row));
-			}
+			addImmediateToBytecodes(templateArgs[i], sourcePos, bytecodes);
 			i--;
 		}
 		
+		// emit code for argument addresses in reverse order
+		for (NodesVector::const_reverse_iterator it(children.rbegin()); it != children.rend(); ++it)
+			(*it)->emit(bytecodes);
+		
 		// generate call itself
-		bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_NATIVE_CALL) | funcId;
+		const unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_NATIVE_CALL) | funcId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 	
 	unsigned CallNode::getStackDepth() const
 	{
-		size_t stackDepth = Node::getStackDepth();
-		
-		// get the stack depth for arguments
-		stackDepth = std::max(stackDepth, argumentsAddr.size());
+		unsigned stackDepth = 0;
+		for (size_t i = 0; i < children.size(); i++)
+			stackDepth = std::max(stackDepth, unsigned(templateArgs.size()+i)+children[i]->getStackDepth());
 		
 		return stackDepth;
 	}

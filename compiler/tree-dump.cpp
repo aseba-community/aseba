@@ -190,19 +190,24 @@ namespace Aseba
 
 	std::wstring ArrayReadNode::toWString() const
 	{
-		return WFormatableString(L"ArrayRead: addr %0 size %1").arg(arrayAddr).arg(arraySize);
+		return WFormatableString(L"ArrayRead: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
 	}
 	
 	std::wstring ArrayWriteNode::toWString() const
 	{
-		return WFormatableString(L"ArrayWrite: addr %0 size %1").arg(arrayAddr).arg(arraySize);
+		return WFormatableString(L"ArrayWrite: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
+	}
+	
+	std::wstring LoadNativeArgNode::toWString() const
+	{
+		return WFormatableString(L"LoadNativeArgNode: addr %0 size %1 (var %2) using temp %3").arg(arrayAddr).arg(arraySize).arg(arrayName).arg(tempAddr);
 	}
 
 	std::wstring CallNode::toWString() const
 	{
 		std::wstring s = WFormatableString(L"Call: id %0").arg(funcId);
-		for (unsigned i = 0; i < argumentsAddr.size(); i++)
-			s += WFormatableString(L", arg %0 is addr %1").arg(i).arg(argumentsAddr[i]);
+		for (unsigned i = 0; i < templateArgs.size(); i++)
+			s += WFormatableString(L", template %0 has size %1").arg(i).arg(templateArgs[i]);
 		return s;
 	}
 	

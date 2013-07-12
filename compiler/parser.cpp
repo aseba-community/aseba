@@ -21,6 +21,7 @@
 #include "compiler.h"
 #include "tree.h"
 #include "../common/utils/FormatableString.h"
+#include "../common/utils/utils.h"
 #include <memory>
 #include <valarray>
 #include <iostream>
@@ -234,16 +235,18 @@ namespace Aseba
 		endVariableIndex = 0;
 	}
 
-	void Compiler::allocateTemporaryMemory(const SourcePos varPos, const unsigned size, unsigned& varAddr)
+	unsigned Compiler::allocateTemporaryMemory(const SourcePos varPos, const unsigned size)
 	{
 		// allocate space at the end of the variables' memory
 		unsigned endOfMemory = targetDescription->variablesSize - endVariableIndex;
-		varAddr = endOfMemory - size;
+		unsigned varAddr = endOfMemory - size;
 		endVariableIndex += size;
 
 		// free space check
 		if (freeVariableIndex + endVariableIndex > targetDescription->variablesSize)
 			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_TEMP_SPACE);
+		
+		return varAddr;
 	}
 
 	AssignmentNode* Compiler::allocateTemporaryVariable(const SourcePos varPos, Node* rValue)
@@ -252,8 +255,7 @@ namespace Aseba
 
 		// allocate the temporary variable
 		const unsigned size = rValue->getVectorSize();
-		unsigned addr = Node::E_NOVAL;
-		allocateTemporaryMemory(varPos, size, addr);
+		const unsigned addr = allocateTemporaryMemory(varPos, size);
 
 		// create assignment
 		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
@@ -1308,16 +1310,38 @@ namespace Aseba
 				SourcePos varPos = tokens.front().pos;
 
 				std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+				
 				// get the address and size
 				varAddr = preNode->getVectorAddr();
 				varSize = preNode->getVectorSize();
 
-				// allocate memory?
-				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()) || varAddr == Node::E_NOVAL)
+				// is the argument a tuple?
+				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
 				{
+					// allocate memory and generate code to evaluate tuple arguments
 					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
 					varAddr = preNode->getVectorAddr();
-					callNode->children.push_back(preNode.release());
+					BlockNode* block(new BlockNode(varPos));
+					block->children.push_back(preNode.release());
+					block->children.push_back(new ImmediateNode(varPos, varAddr));
+					callNode->children.push_back(block);
+				}
+				// if not, is it an unresolved memory node?
+				else if (varAddr == Node::E_NOVAL)
+				{
+					// free space check
+					const unsigned tempAddr = allocateTemporaryMemory(varPos, 1);
+					// create a load native argument node to get address at run time
+					callNode->children.push_back(new LoadNativeArgNode(
+						polymorphic_downcast<MemoryVectorNode*>(preNode.release()),
+						tempAddr
+					));
+				}
+				// otherwise it is resolved
+				else
+				{
+					// we will just store the address
+					callNode->children.push_back(new ImmediateNode(varPos, varAddr));
 				}
 				
 				// check if variable size is correct
@@ -1342,11 +1366,8 @@ namespace Aseba
 				else
 				{
 					// any size, store variable size
-					callNode->argumentsAddr.push_back(varSize);
+					callNode->templateArgs.push_back(varSize);
 				}
-				
-				// store variable address
-				callNode->argumentsAddr.push_back(varAddr);
 				
 				// parse comma or end parenthesis
 				if (i + 1 == function.parameters.size())
@@ -1369,7 +1390,7 @@ namespace Aseba
 			// store template parameters size when initialized
 			for (unsigned i = 0; i < templateParameters.size(); i++)
 				if (templateParameters[i] >= 0)
-					callNode->argumentsAddr.push_back(templateParameters[i]);
+					callNode->templateArgs.push_back(templateParameters[i]);
 		} // if
 		
 		// return the node for the function call
