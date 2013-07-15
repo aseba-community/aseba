@@ -156,7 +156,7 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
@@ -166,13 +166,33 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
 		arrayName(arrayName)
 	{
 	
+	}
+	
+	//! Constructor, delete the provided memoryNode
+	LoadNativeArgNode::LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr):
+		Node(memoryNode->sourcePos),
+		tempAddr(tempAddr),
+		arrayAddr(memoryNode->arrayAddr),
+		arraySize(memoryNode->arraySize),
+		arrayName(memoryNode->arrayName)
+	{
+		// safety check
+		assert(memoryNode);
+		assert(memoryNode->children.size() == 1);
+		assert(memoryNode->children[0]);
+		assert(!dynamic_cast<TupleVectorNode*>(memoryNode->children[0]));
+		
+		// get the child from memoryNode
+		children.push_back(memoryNode->children[0]);
+		memoryNode->children[0] = 0;
+		delete memoryNode;
 	}
 
 	//! Constructor

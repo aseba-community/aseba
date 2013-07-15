@@ -506,12 +506,23 @@ namespace Aseba
 			return this;
 	}
 	
+	Node* LoadNativeArgNode::optimize(std::wostream* dump)
+	{
+		// optimize index expression
+		children[0] = children[0]->optimize(dump);
+		assert(children[0]);
+		// we should not have an immediate
+		assert(dynamic_cast<ImmediateNode*>(children[0]) == 0);
+		return this;
+	}
+	
 	Node* CallNode::optimize(std::wostream* dump)
 	{
 		for (NodesVector::iterator it = children.begin(); it != children.end();)
 		{
 			// generic optimization and removal
 			*it = (*it)->optimize(dump);
+			assert(*it);
 			++it;
 		}
 
