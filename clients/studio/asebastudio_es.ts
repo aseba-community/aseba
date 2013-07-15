@@ -1360,7 +1360,7 @@ evento %0 : </translation>
     <message>
         <location filename="DashelTarget.cpp" line="905"/>
         <source>Stop trying</source>
-        <translation type="unfinished"></translation>
+        <translation>Dejar de intentarlo</translation>
     </message>
 </context>
 <context>
@@ -1488,7 +1488,7 @@ evento %0 : </translation>
         <location filename="plugins/ThymioVPL/Scene.cpp" line="292"/>
         <source>Line %0: Twice the same event</source>
         <oldsource>Line %0: Redeclaration of event</oldsource>
-        <translation type="unfinished">Línea %0: Evento redeclarado</translation>
+        <translation>Línea %0: Evento repetido</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Scene.cpp" line="295"/>
@@ -1581,7 +1581,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="167"/>
         <source>show line</source>
-        <translation type="unfinished"></translation>
+        <translation>mostrar la línea</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="199"/>
@@ -1596,12 +1596,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="408"/>
         <source>Returning to simple mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver al modo básico</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="409"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Está trabajando en modo avanzado. Volver al modo básico eliminará qualquier filtro o modificador de estado que esté utilizando.&lt;p&gt;Seguro que quiere continuar?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="446"/>
@@ -1611,7 +1611,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="447"/>
         <source>The VPL document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>El documento VPL ha sido modificado.&lt;p&gt;Quiere guardar los cambios?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="568"/>
@@ -1641,7 +1641,7 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="241"/>
         <source>You need to connect a Thymio II to use this application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Debe conectar Thymio II para utilizar esta aplicación.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="270"/>
@@ -1662,12 +1662,12 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="384"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este archivo no contiene datos del tipo VPL y ha sido descartado.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="441"/>
         <source>This application only supports a single robot at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta aplicación no soporta más de un robot a la vez.</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="525"/>
