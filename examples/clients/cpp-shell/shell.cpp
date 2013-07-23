@@ -116,7 +116,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 	{
 		// if this stream has a problem, ignore it for now,
 		// and let Hub call connectionClosed later.
-		wcerr << "error while receiving message" << endl;
+		wcerr << "error while receiving message: " << e.what() << endl;
 		return;
 	}
 
