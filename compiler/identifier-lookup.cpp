@@ -133,13 +133,13 @@ namespace Aseba
 	}
 	
 	//! Look for a variable of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
+	VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
 	{
 		return findInTable<VariablesMap>(variablesMap, varName, varPos, ERROR_VARIABLE_NOT_DEFINED, ERROR_VARIABLE_NOT_DEFINED_GUESS);
 	}
 	
 	//! Look for a function of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
+	FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
 	{
 		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, ERROR_FUNCTION_NOT_DEFINED, ERROR_FUNCTION_NOT_DEFINED_GUESS);
 	}
@@ -187,7 +187,6 @@ namespace Aseba
 	void Compiler::buildMaps()
 	{
 		assert(targetDescription);
-		freeVariableIndex = 0;
 		
 		// erase tables
 		implementedEvents.clear();
@@ -195,20 +194,10 @@ namespace Aseba
 		subroutineReverseTable.clear();
 		
 		// fill variables map
-		variablesMap.clear();
-		for (unsigned i = 0; i < targetDescription->namedVariables.size(); i++)
-		{
-			variablesMap[targetDescription->namedVariables[i].name] =
-				std::make_pair(freeVariableIndex, targetDescription->namedVariables[i].size);
-			freeVariableIndex += targetDescription->namedVariables[i].size;
-		}
+		variablesMap = targetDescription->getVariablesMap(freeVariableIndex);
 		
 		// fill functions map
-		functionsMap.clear();
-		for (unsigned i = 0; i < targetDescription->nativeFunctions.size(); i++)
-		{
-			functionsMap[targetDescription->nativeFunctions[i].name] = i;
-		}
+		functionsMap = targetDescription->getFunctionsMap();
 		
 		// fill contants maps
 		constantsMap.clear();
@@ -225,7 +214,7 @@ namespace Aseba
 			globalEventsMap[commonDefinitions->events[i].name] = i;
 		}
 		
-		// fill global all events map
+		// fill all events map
 		allEventsMap = globalEventsMap;
 		for (unsigned i = 0; i < targetDescription->localEvents.size(); ++i)
 		{

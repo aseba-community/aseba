@@ -100,7 +100,7 @@ namespace Aseba
 		VariablesDataVector getVariableValue(const QString& name) const;
 		
 	public slots:
-		void updateVariablesStructure(const Compiler::VariablesMap *variablesMap);
+		void updateVariablesStructure(const VariablesMap *variablesMap);
 		void setVariablesData(unsigned start, const VariablesDataVector &data);
 		bool setVariableValues(const QString& name, const VariablesDataVector& values);
 	

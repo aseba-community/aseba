@@ -49,6 +49,11 @@ namespace Aseba
 	struct TupleVectorNode;
 	struct MemoryVectorNode;
 	
+	//! Lookup table for variables name => (pos, size))
+	typedef std::map<std::wstring, std::pair<unsigned, unsigned> > VariablesMap;
+	//! Lookup table for functions (name => id in target description)
+	typedef std::map<std::wstring, unsigned> FunctionsMap;
+	
 	//! Description of target VM
 	struct TargetDescription
 	{
@@ -103,6 +108,8 @@ namespace Aseba
 		
 		TargetDescription() { variablesSize = bytecodeSize = stackSize = 0; }
 		uint16 crc() const;
+		VariablesMap getVariablesMap(unsigned& freeVariableIndex) const;
+		FunctionsMap getFunctionsMap() const;
 	};
 	
 	//! A bytecode element 
@@ -333,10 +340,6 @@ namespace Aseba
 			operator Type () const { return type; }
 		};
 		
-		//! Lookup table for variables name => (pos, size))
-		typedef std::map<std::wstring, std::pair<unsigned, unsigned> > VariablesMap;
-		//! Lookup table for functions (name => id in target description)
-		typedef std::map<std::wstring, unsigned> FunctionsMap;
 		//! Description of a subroutine
 		struct SubroutineDescriptor
 		{

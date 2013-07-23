@@ -286,8 +286,8 @@ void Shell::listVariables(const strings& args)
 	if (allVarMapIt != allVariables.end())
 	{
 		// ... use it
-		const Compiler::VariablesMap& varMap(allVarMapIt->second);
-		Compiler::VariablesMap::const_iterator it(varMap.begin());
+		const VariablesMap& varMap(allVarMapIt->second);
+		VariablesMap::const_iterator it(varMap.begin());
 		for (;it != varMap.end(); ++it)
 			wcerr << "  " << it->first << " " << it->second.second << endl;
 	}
@@ -645,8 +645,8 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 	const NodeNameToVariablesMap::const_iterator allVarMapIt(allVariables.find(nodeName));
 	if (allVarMapIt != allVariables.end())
 	{
-		const Compiler::VariablesMap& varMap(allVarMapIt->second);
-		const Compiler::VariablesMap::const_iterator varIt(varMap.find(widen(variableName)));
+		const VariablesMap& varMap(allVarMapIt->second);
+		const VariablesMap::const_iterator varIt(varMap.find(widen(variableName)));
 		if (varIt != varMap.end())
 			pos = varIt->second.first;
 	}

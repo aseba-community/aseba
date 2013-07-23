@@ -66,6 +66,31 @@ namespace Aseba
 		return crc;
 	}
 	
+	//! Get a VariablesMap out of namedVariables, overwrite freeVariableIndex
+	VariablesMap TargetDescription::getVariablesMap(unsigned& freeVariableIndex) const
+	{
+		freeVariableIndex = 0;
+		VariablesMap variablesMap;
+		for (unsigned i = 0; i < namedVariables.size(); i++)
+		{
+			variablesMap[namedVariables[i].name] =
+			std::make_pair(freeVariableIndex, namedVariables[i].size);
+			freeVariableIndex += namedVariables[i].size;
+		}
+		return variablesMap;
+	}
+	
+	//! Get a FunctionsMap out of nativeFunctions
+	FunctionsMap TargetDescription::getFunctionsMap() const
+	{
+		FunctionsMap functionsMap;
+		for (unsigned i = 0; i < nativeFunctions.size(); i++)
+		{
+			functionsMap[nativeFunctions[i].name] = i;
+		}
+		return functionsMap;
+	}
+	
 	//! Return the number of words this element takes in memory
 	unsigned BytecodeElement::getWordSize() const
 	{

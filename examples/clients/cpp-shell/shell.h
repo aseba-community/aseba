@@ -43,7 +43,7 @@ struct Shell: public Dashel::Hub, public Aseba::DescriptionsManager
 {
 public:
 	typedef std::vector<std::string> strings;
-	typedef std::map<std::string, Aseba::Compiler::VariablesMap> NodeNameToVariablesMap;
+	typedef std::map<std::string, Aseba::VariablesMap> NodeNameToVariablesMap;
 	
 protected:
 	// streams

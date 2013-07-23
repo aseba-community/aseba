@@ -302,11 +302,11 @@ namespace Aseba
 		return VariablesDataVector();
 	}
 	
-	void TargetVariablesModel::updateVariablesStructure(const Compiler::VariablesMap *variablesMap)
+	void TargetVariablesModel::updateVariablesStructure(const VariablesMap *variablesMap)
 	{
 		// Build a new list of variables
 		QList<Variable> newVariables;
-		for (Compiler::VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
+		for (VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
 		{
 			// create new variable
 			Variable var;

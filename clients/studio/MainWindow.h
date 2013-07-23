@@ -199,7 +199,7 @@ namespace Aseba
 			bool success;
 			BytecodeVector bytecode;
 			unsigned allocatedVariablesCount;
-			Compiler::VariablesMap variablesMap;
+			VariablesMap variablesMap;
 			Compiler::SubroutineTable subroutineTable;
 			Error error;
 			std::wostringstream compilationMessages;

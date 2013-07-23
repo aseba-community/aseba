@@ -340,8 +340,8 @@ namespace Aseba
 			const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
 			if (userVarMapIt != userDefinedVariablesMap.end())
 			{
-				const Compiler::VariablesMap& variablesMap(*userVarMapIt);
-				for (Compiler::VariablesMap::const_iterator jt = variablesMap.begin(); jt != variablesMap.end(); ++jt)
+				const VariablesMap& variablesMap(*userVarMapIt);
+				for (VariablesMap::const_iterator jt = variablesMap.begin(); jt != variablesMap.end(); ++jt)
 				{
 					list.push_back(QString::fromStdWString(jt->first));
 				}
@@ -372,8 +372,8 @@ namespace Aseba
 		const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
 		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
-			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
-			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
+			const VariablesMap& userVarMap(userVarMapIt.value());
+			const VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
 			if (userVarIt != userVarMap.end())
 			{
 				pos = userVarIt->second.first;
@@ -414,8 +414,8 @@ namespace Aseba
 		const UserDefinedVariablesMap::const_iterator userVarMapIt(userDefinedVariablesMap.find(node));
 		if (userVarMapIt != userDefinedVariablesMap.end())
 		{
-			const Compiler::VariablesMap& userVarMap(userVarMapIt.value());
-			const Compiler::VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
+			const VariablesMap& userVarMap(userVarMapIt.value());
+			const VariablesMap::const_iterator userVarIt(userVarMap.find(variable.toStdWString()));
 			if (userVarIt != userVarMap.end())
 			{
 				pos = userVarIt->second.first;
