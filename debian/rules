@@ -37,6 +37,8 @@ binary-arch:
 	cp debian/build/clients/replay/asebaplay debian/tmp/usr/bin
 	cp debian/build/clients/exec/asebaexec debian/tmp/usr/bin
 	cp debian/build/switches/switch/asebaswitch debian/tmp/usr/bin
+	cp debian/build/switches/medulla/asebamedulla debian/tmp/usr/bin
+	cp debian/build/switches/botspeak/asebabotspeak debian/tmp/usr/bin
 	cp debian/build/targets/challenge/asebachallenge debian/tmp/usr/bin
 	cp debian/build/targets/playground/asebaplayground debian/tmp/usr/bin
 	cp targets/playground/unifr.playground debian/tmp/usr/share/doc/aseba/example-scenarios
