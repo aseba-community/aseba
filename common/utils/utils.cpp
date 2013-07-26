@@ -34,6 +34,7 @@
 #include <sstream>
 #include <cassert>
 #include <limits>
+#include <vector>
 #include <stdint.h>
 #include "utils.h"
 
@@ -262,6 +263,57 @@ namespace Aseba
 	{
 		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8*>(&v), 2);
 	}
+	
+	template<typename T>
+	std::vector<T> split(const T& s, const T& delim)
+	{
+		std::vector<T> result;
+		size_t delimPos(0);
+		size_t nextPos(0);
+		while ((nextPos=s.find_first_of(delim, delimPos)) != T::npos)
+		{
+			result.push_back(s.substr(delimPos, nextPos-delimPos));
+			delimPos = s.find_first_not_of(delim, nextPos);
+		}
+		if (delimPos != T::npos && delimPos < s.size())
+			result.push_back(s.substr(delimPos));
+		return result;
+	}
+	
+	template<>
+	std::vector<std::string> split(const std::string& s)
+	{
+		return split<std::string>(s, "\t ");
+	}
+	
+	template<>
+	std::vector<std::wstring> split(const std::wstring& s)
+	{
+		return split<std::wstring>(s, L"\t ");
+	}
+	
+	template<typename T>
+	T join(typename std::vector<T>::const_iterator first, typename std::vector<T>::const_iterator last, const T& delim)
+	{
+		T result;
+		while (first != last)
+		{
+			result += *first;
+			if (first + 1 != last)
+				result += delim;
+			++first;
+		}
+		return result;
+	}
+	
+	template<typename C>
+	typename C::value_type join(const C& values, const typename C::value_type& delim)
+	{
+		return join<typename C::value_type>(values.begin(), values.end(), delim);
+	}
+	
+	template std::string join(const std::vector<std::string>&, const std::string& delim);
+	template std::wstring join(const std::vector<std::wstring>&, const std::wstring& delim);
 	
 	/*@}*/
 }

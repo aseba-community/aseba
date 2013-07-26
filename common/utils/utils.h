@@ -118,6 +118,22 @@ namespace Aseba
 	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a uint16 value
 	uint16 crcXModem(const uint16 oldCrc, const uint16 v);
 	
+	//! Split a string using given delimiters
+	template<typename T>
+	std::vector<T> split(const T& s, const T& delim);
+	
+	//! Split a string using whitespaces
+	template<typename T>
+	std::vector<T> split(const T& s);
+	
+	//! Join a sequence using operator += and adding delim in-between elements
+	template<typename T>
+	T join(typename std::vector<T>::const_iterator first, typename std::vector<T>::const_iterator last, const T& delim);
+	
+	//! Join a sequence using operator += and adding delim in-between elements
+	template<typename C>
+	typename C::value_type join(const C& values, const typename C::value_type& delim);
+	
 	/*@}*/
 	
 };

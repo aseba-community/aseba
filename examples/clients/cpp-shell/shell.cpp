@@ -32,37 +32,11 @@
 #include <libxml/tree.h>
 
 #include "shell.h"
+#include "../../../common/utils/utils.h"
 
 using namespace std;
 using namespace Dashel;
 using namespace Aseba;
-
-// static helper functions
-
-// split a string on white spaces
-static Shell::strings split(const string& s)
-{
-	Shell::strings splittedStrings;
-	istringstream iss(s);
-	copy(istream_iterator<string>(iss),
-		istream_iterator<string>(),
-		back_insert_iterator<Shell::strings>(splittedStrings)
-	);
-	return splittedStrings;
-}
-
-// UTF8 to wstring
-static std::wstring widen(const char *src)
-{
-	const size_t destSize(mbstowcs(0, src, 0)+1);
-	std::vector<wchar_t> buffer(destSize, 0);
-	mbstowcs(&buffer[0], src, destSize);
-	return std::wstring(buffer.begin(), buffer.end() - 1);
-}
-static std::wstring widen(const std::string& src)
-{
-	return widen(src.c_str());
-}
 
 // code of the shell
 
@@ -91,7 +65,7 @@ void Shell::nodeDescriptionReceived(unsigned nodeId)
 	wcerr << '\r';
 	wcerr << "Received description for node " << getNodeName(nodeId) << endl;
 	wcerr << endl;
-	wcerr << "> " << widen(curShellCmd);
+	wcerr << "> " << UTF8ToWString(curShellCmd);
 }
 
 void Shell::incomingData(Dashel::Stream *stream)
@@ -138,7 +112,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		for (size_t i = 0; i < variables->variables.size(); ++i)
 			wcerr << variables->variables[i] << " ";
 		wcerr << endl;
-		wcerr << "> " << widen(curShellCmd);
+		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
 	
 	// if user event, print
@@ -154,7 +128,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		for (size_t i = 0; i < userMessage->data.size(); ++i)
 			wcerr << userMessage->data[i] << " ";
 		wcerr << endl;
-		wcerr << "> " << widen(curShellCmd);
+		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
 	
 	delete message;
@@ -227,7 +201,7 @@ void Shell::processShellCmd()
 	{
 		if (args[0] != "help")
 		{
-			wcerr << "Unknown command: " << widen(curShellCmd) << endl;
+			wcerr << "Unknown command: " << UTF8ToWString(curShellCmd) << endl;
 			wcerr << "Valid commands are:" << endl;
 		}
 		else
@@ -264,10 +238,10 @@ void Shell::listVariables(const strings& args)
 		return;
 	}
 	bool ok;
-	const unsigned nodeId(getNodeId(widen(args[1]), 0, &ok));
+	const unsigned nodeId(getNodeId(UTF8ToWString(args[1]), 0, &ok));
 	if (!ok)
 	{
-		wcerr << "invalid node name " << widen(args[1]) << endl;
+		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
 	const TargetDescription* desc(getDescription(nodeId));
@@ -343,7 +317,7 @@ void Shell::getVariable(const strings& args)
 	if (!exists)
 		return;
 	bool ok;
-	const unsigned length(getVariableSize(nodeId, widen(args[2]), &ok));
+	const unsigned length(getVariableSize(nodeId, UTF8ToWString(args[2]), &ok));
 	if (!ok)
 		return;
 
@@ -386,9 +360,9 @@ void Shell::emit(const strings& args)
 		return;
 	}
 	size_t pos;
-	if (!commonDefinitions.events.contains(widen(args[1]), &pos))
+	if (!commonDefinitions.events.contains(UTF8ToWString(args[1]), &pos))
 	{
-		wcerr << "event " << widen(args[1]) << " is unknown" << endl;
+		wcerr << "event " << UTF8ToWString(args[1]) << " is unknown" << endl;
 		return;
 	}
 	
@@ -415,7 +389,7 @@ void Shell::load(const strings& args)
 	xmlDoc *doc(xmlReadFile(fileName.c_str(), NULL, 0));
 	if (!doc)
 	{
-		wcerr << "cannot read XML from file " << widen(fileName) << endl;
+		wcerr << "cannot read XML from file " << UTF8ToWString(fileName) << endl;
 		return;
 	}
     xmlNode *domRoot(xmlDocGetRootElement(doc));
@@ -462,10 +436,10 @@ void Shell::load(const strings& args)
 						if (storedId)
 							preferedId = unsigned(atoi((char*)storedId));
 						bool ok;
-						unsigned nodeId(getNodeId(widen(_name), preferedId, &ok));
+						unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
 						if (ok)
 						{
-							if (!compileAndSendCode(widen((const char *)text), nodeId, _name))
+							if (!compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name))
 								wasError = true;
 						}
 						else
@@ -499,7 +473,7 @@ void Shell::load(const strings& args)
 					}
 					else
 					{
-						commonDefinitions.events.push_back(NamedValue(widen((const char *)name), eventSize));
+						commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
 					}
 				}
 				// free attributes
@@ -521,7 +495,7 @@ void Shell::load(const strings& args)
 				// add constant if attributes are valid
 				if (name && value)
 				{
-					commonDefinitions.constants.push_back(NamedValue(widen((const char *)name), atoi((const char *)value)));
+					commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name), atoi((const char *)value)));
 				}
 				// free attributes
 				if (name)
@@ -540,7 +514,7 @@ void Shell::load(const strings& args)
 	// check if there was an error
 	if (wasError)
 	{
-		wcerr << "There was an error while loading script " << widen(fileName) << endl;
+		wcerr << "There was an error while loading script " << UTF8ToWString(fileName) << endl;
 		commonDefinitions.events.clear();
 		commonDefinitions.constants.clear();
 		allVariables.clear();
@@ -580,7 +554,7 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 	}
 	else
 	{
-		wcerr << "compilation for node " << widen(nodeName) << " failed: " << error.toWString() << endl;
+		wcerr << "compilation for node " << UTF8ToWString(nodeName) << " failed: " << error.toWString() << endl;
 		return false;
 	}
 }
@@ -594,10 +568,10 @@ void Shell::stop(const strings& args)
 		return;
 	}
 	bool ok;
-	const unsigned nodeId(getNodeId(widen(args[1]), 0, &ok));
+	const unsigned nodeId(getNodeId(UTF8ToWString(args[1]), 0, &ok));
 	if (!ok)
 	{
-		wcerr << "invalid node name " << widen(args[1]) << endl;
+		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
 	
@@ -616,10 +590,10 @@ void Shell::run(const strings& args)
 		return;
 	}
 	bool ok;
-	const unsigned nodeId(getNodeId(widen(args[1]), 0, &ok));
+	const unsigned nodeId(getNodeId(UTF8ToWString(args[1]), 0, &ok));
 	if (!ok)
 	{
-		wcerr << "invalid node name " << widen(args[1]) << endl;
+		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
 	
@@ -633,10 +607,10 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 {
 	// make sure the node exists
 	bool ok;
-	nodeId = getNodeId(widen(nodeName), 0, &ok);
+	nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
 	if (!ok)
 	{
-		wcerr << "invalid node name " << widen(nodeName) << endl;
+		wcerr << "invalid node name " << UTF8ToWString(nodeName) << endl;
 		return false;
 	}
 	pos = unsigned(-1);
@@ -646,7 +620,7 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 	if (allVarMapIt != allVariables.end())
 	{
 		const VariablesMap& varMap(allVarMapIt->second);
-		const VariablesMap::const_iterator varIt(varMap.find(widen(variableName)));
+		const VariablesMap::const_iterator varIt(varMap.find(UTF8ToWString(variableName)));
 		if (varIt != varMap.end())
 			pos = varIt->second.first;
 	}
@@ -655,10 +629,10 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 	if (pos == unsigned(-1))
 	{
 		bool ok;
-		pos = getVariablePos(nodeId, widen(variableName), &ok);
+		pos = getVariablePos(nodeId, UTF8ToWString(variableName), &ok);
 		if (!ok)
 		{
-			wcerr << "variable " << widen(variableName) << " does not exists in node " << widen(nodeName);
+			wcerr << "variable " << UTF8ToWString(variableName) << " does not exists in node " << UTF8ToWString(nodeName);
 			return false;
 		}
 	}
