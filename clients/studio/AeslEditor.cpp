@@ -908,8 +908,18 @@ namespace Aseba
 	QString AeslEditor::previousWord() const
 	{
 		QTextCursor tc = textCursor();
+		// if we are right after a '.', go left
+		if ((document()->characterAt(tc.position() - 1)) == QChar('.'))
+			tc.movePosition(QTextCursor::Left);
+		// go at the begining of the current word (including possible '.' in the word)
 		tc.movePosition(QTextCursor::WordLeft);
+		while((document()->characterAt(tc.position() - 1)) == QChar('.') ) {
+			tc.movePosition(QTextCursor::Left);
+			tc.movePosition(QTextCursor::WordLeft);
+		}
+		// go to the previous word
 		tc.movePosition(QTextCursor::PreviousWord);
+		// select it
 		tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
 		return tc.selectedText();
 	}
