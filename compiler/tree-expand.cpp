@@ -28,80 +28,223 @@
 
 namespace Aseba
 {
-	Node* Node::expandToAsebaTree(std::wostream *dump, unsigned int index)
+	/*
+	 * Tree expansion: PASS 1 (Abstract nodes)
+	 *   - Nodes inherited from AbstractTreeNode are expanded into "real" nodes (one that can emit bytecode)
+	 *   - However, data and memory access nodes (TupleVectorNode and MemoryVectorNode) are not expanded, as they
+	 *     will be expanded during the second pass
+	 *   - Memory management rule: if a node must transform itself into another node, it create the new node, reparent
+	 *     the children to the new node, and return the newly created node. It is the responsability of the parent
+	 *     to remark the new node and delete the orphaned child (generically implemented in Node::expandAbstractNodes())
+	 *
+	 * Ex:
+	 *                  i++                                             i = i + 1
+	 *
+	 *     UnaryArithmeticAssignmentNode (++)      => =>              AssignmentNode
+	 *                   |                                                   |
+	 *                   |                                      ---------------------------
+	 *           MemoryVectorNode (i)                           |                         |
+	 *                                                MemoryVectorNode (i)     BinaryArithmeticNode (+)
+	 *                                                                                    |
+	 *                                                                       ----------------------------
+	 *                                                                       |                          |
+	 *                                                              MemoryVectorNode (i)         TupleVectorNode (1)
+	 *
+	 *     In this case, UnaryArithmeticAssignmentNode will create the new AssignmentNode, reparent its child, create the new subtree,
+	 *     and return the pointer to AssignmentNode. The parent of UnaryArithmeticAssignmentNode must delete its old child, and
+	 *     perform the substitution with the new one. Failing to do so will result in memory leaks.
+	 */
+
+	//! Generically traverse the tree, expand the children, and perform garbagge collection
+	Node* Node::expandAbstractNodes(std::wostream *dump)
 	{
+		Node * child;
 		// recursively walk the tree and expand children
+		// if the child return a new pointer, delete the orphaned node
 		for (NodesVector::iterator it = children.begin(); it != children.end();)
 		{
-			*(it) = (*it)->expandToAsebaTree(dump, index);
+			child = (*it)->expandAbstractNodes(dump);
+			if (child != *(it)) {
+				delete *(it);
+			}
+			*(it) = child;
 			++it;
 		}
 		return this;
 	}
 
+	//! Dummy function, the node will be expanded during the vectorial pass
+	Node* TupleVectorNode::expandAbstractNodes(std::wostream *dump)
+	{
+		return this;
+	}
 
-	Node* AssignmentNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
+	//! Dummy function, the node will be expanded during the vectorial pass
+	Node* MemoryVectorNode::expandAbstractNodes(std::wostream *dump)
+	{
+		return this;
+	}
+
+	//! Expand "vector (opop)" to "vector (op)= 1", and then call for the expansion of this last expression
+	Node* UnaryArithmeticAssignmentNode::expandAbstractNodes(std::wostream* dump)
+	{
+		assert(children.size() == 1);
+
+		Node* memoryVector = children[0];
+
+		// create a vector of 1's
+		std::auto_ptr<TupleVectorNode> constant(new TupleVectorNode(sourcePos));
+		for (unsigned int i = 0; i < memoryVector->getVectorSize(); i++)
+			constant->addImmediateValue(1);
+
+		// expand to "vector (op)= 1"
+		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector, constant.release()));
+
+		// perform the expansion of ArithmeticAssignmentNode
+		std::auto_ptr<Node> finalBlock(assignment->expandAbstractNodes(dump));
+
+		if (assignment.get() != finalBlock.get())
+			// delete the orphaned node
+			assignment.reset();
+		else
+			assignment.release();
+
+		// let our children to stay with the new node
+		// otherwise they will be freed when we are cleared
+		children.clear();
+
+		return finalBlock.release();
+	}
+
+	//! Expand "left (op)= right" to "left = left (op) right"
+	Node* ArithmeticAssignmentNode::expandAbstractNodes(std::wostream* dump)
 	{
 		assert(children.size() == 2);
 
+		// expand the sub-trees
+		Node::expandAbstractNodes(dump);
+
+		Node* leftVector = children[0];
+		Node* rightVector = children[1];
+
+		// create the replacement node
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
+		std::auto_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector, rightVector));
+		assignment->children.push_back(leftVector->deepCopy());
+		assignment->children.push_back(binary.release());
+
+		// let our children to stay with the new AssignmentNode
+		// otherwise they will be freed when we are cleared
+		children.clear();
+
+		return assignment.release();;
+	}
+
+
+
+	/*
+	 * Tree expansion: PASS 2 (Vectorial nodes)
+	 *   - Nodes performing operations on vectors are expanded into several equivalent operations on scalars
+	 *   - Memory management rule: To make it simple, the whole tree is duplicated (each node as to copy itself,
+	 *       or create new nodes to replace it). Then the old tree is deleted as a whole. I agree, this could
+	 *       be more subtle, but it is the easiest solution. A similar mechanism to pass 1 could be considered.
+	 *
+	 * Ex:                                                                         buffer[0] = 1
+	 *                   buffer = [1,2]                                            buffer[1] = 2
+	 *
+	 *                   AssignmentNode                   => =>                       BlockNode
+	 *                          |                                                         |
+	 *                ---------------------                                   ----------------------------
+	 *                |                   |                                   |                          |
+	 *        MemoryVectorNode     TupleVectorNode                     AssignmentNode             AssignmentNode
+	 *            (buffer)                |                                   |                          |
+	 *                                    |                          -----------------            ---------------
+	 *                         ---------------------                 |               |            |             |
+	 *                         |                   |             StoreNode     ImmediateNode  StoreNode   ImmediateNode
+	 *                  ImmediateNode (1)   ImmediateNode(2)    (buffer[0])         (1)      (buffer[1])        (2)
+	 *
+	 */
+
+	//! This is the root node, take in charge the tree creation / deletion
+	Node* ProgramNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	{
+		Node* newMe = Node::expandVectorialNodes(dump, index);
+
+		delete this;	// delete the whole (obsolete) vectorial tree
+		return newMe;
+	}
+
+	//! Generic implementation for non-vectorial nodes
+	Node* Node::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	{
+		// duplicate me
+		Node* newMe = this->shallowCopy();
+
+		// recursively walk the tree and expand children (of the newly created tree)
+		for (NodesVector::iterator it = newMe->children.begin(); it != newMe->children.end();)
+		{
+			*(it) = (*it)->expandVectorialNodes(dump, index);
+			++it;
+		}
+		return newMe;
+	}
+
+	//! Assignment between vectors is expanded into multiple scalar assignments
+	Node* AssignmentNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	{
+		assert(children.size() == 2);
+
+		// left vector should reference a memory location
 		MemoryVectorNode* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
 		if (!leftVector)
 			throw TranslatableError(sourcePos, ERROR_INCORRECT_LEFT_VALUE).arg(children[0]->toNodeName());
 		leftVector->setWrite(true);
+
+		// right vector can be anything
 		Node* rightVector = children[1];
 
-		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos));
+		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
+
 		for (unsigned int i = 0; i < leftVector->getVectorSize(); i++)
 		{
 			// expand to left[i] = right[i]
 			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
-			assignment->children.push_back(leftVector->expandToAsebaTree(dump, i));
-			assignment->children.push_back(rightVector->expandToAsebaTree(dump, i));
+
+			assignment->children.push_back(leftVector->expandVectorialNodes(dump, i));
+			assignment->children.push_back(rightVector->expandVectorialNodes(dump, i));
+
 			block->children.push_back(assignment.release());
 		}
 
-		delete this;
 		return block.release();
 	}
 
-
-	//! expand to left[index] (op) right[index]
-	Node* BinaryArithmeticNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
-	{
-		std::auto_ptr<Node> left(children[0]->expandToAsebaTree(dump, index));
-		std::auto_ptr<Node> right(children[1]->expandToAsebaTree(dump, index));
-		return new BinaryArithmeticNode(sourcePos, op, left.release(), right.release());
-	}
-
-
-	//! expand to (op)left[index]
-	Node* UnaryArithmeticNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
-	{
-		std::auto_ptr<Node> left(children[0]->expandToAsebaTree(dump, index));
-		return new UnaryArithmeticNode(sourcePos, op, left.release());
-	}
-
-
-	//! expand to vector[index]
-	Node* TupleVectorNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
+	//! Expand to vector[index]
+	Node* TupleVectorNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
 	{
 		size_t total = 0;
 		size_t prevTotal = 0;
+
+		// as a TupleVectorNode can be composed of several sub-vectors, find which child
+		// corresponds to the index
 		for (size_t i = 0; i < children.size(); i++)
 		{
 			prevTotal = total;
 			total += children[i]->getVectorSize();
 			if (index < total)
 			{
-				return children[i]->expandToAsebaTree(dump, index-prevTotal);
+				// the index points to this child
+				return children[i]->expandVectorialNodes(dump, index-prevTotal);
 			}
 		}
+
+		// should not happen !!
 		assert(0);
 		return 0;
 	}
 
-
-	Node* MemoryVectorNode::expandToAsebaTree(std::wostream *dump, unsigned int index)
+	//! Expand to memory[index]
+	Node* MemoryVectorNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
 	{
 		assert(index < getVectorSize());
 
@@ -112,7 +255,11 @@ namespace Aseba
 
 		if (accessIndex || children.size() == 0)
 		{
-			// immediate index "foo[n]" or "foo[n:m]" / full array access "foo"
+			// direct access. Several cases:
+			// -> an immediate index "foo[n]" or "foo[n:m]"
+			// -> full array access "foo"
+			// => use a StoreNode (lvalue) or LoadNode (rvalue)
+
 			unsigned pointer = getVectorAddr() + index;
 			// check if index is within bounds
 			if (pointer >= arrayAddr + arraySize)
@@ -126,61 +273,31 @@ namespace Aseba
 		else
 		{
 			// indirect access foo[expr]
+			// => use a ArrayWriteNode (lvalue) or ArrayReadNode (rvalue)
+
 			std::auto_ptr<Node> array;
 			if (write == true)
 				array.reset(new ArrayWriteNode(sourcePos, arrayAddr, arraySize, arrayName));
 			else
 				array.reset(new ArrayReadNode(sourcePos, arrayAddr, arraySize, arrayName));
 
-			array->children.push_back(children[0]->expandToAsebaTree(dump, index));
-			children[0] = 0;
+			array->children.push_back(children[0]->expandVectorialNodes(dump, index));
 			return array.release();
 		}
 	}
-	
-	Node* ArithmeticAssignmentNode::expandToAsebaTree(std::wostream* dump, unsigned int index)
+
+	//! Expand into a copy of itself
+	Node* ImmediateNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
 	{
-		assert(children.size() == 2);
+		assert(index == 0);
 
-		Node* leftVector = children[0];
-		Node* rightVector = children[1];
-
-		// expand to left = left + right
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
-		std::auto_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector->deepCopy(), rightVector->deepCopy()));
-		assignment->children.push_back(leftVector->deepCopy());
-		assignment->children.push_back(binary.release());
-
-		std::auto_ptr<Node> finalBlock(assignment->expandToAsebaTree(dump, index));
-
-		assignment.release();
-		delete this;
-
-		return finalBlock.release();
+		return shallowCopy();
 	}
 
 
-	Node* UnaryArithmeticAssignmentNode::expandToAsebaTree(std::wostream* dump, unsigned int index)
-	{
-		assert(children.size() == 1);
-
-		Node* memoryVector = children[0];
-
-		// create a vector of 1's
-		std::auto_ptr<TupleVectorNode> constant(new TupleVectorNode(sourcePos));
-		for (unsigned int i = 0; i < memoryVector->getVectorSize(); i++)
-			constant->addImmediateValue(1);
-
-		// expand to "vector (op)= 1"
-		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector->deepCopy(), constant.release()));
-		std::auto_ptr<Node> finalBlock(assignment->expandToAsebaTree(dump, index));
-
-		assignment.release();
-		delete this;
-
-		return finalBlock.release();
-	}
-
+	/*
+	 * Functions used to check vectors' consistency
+	 */
 
 	void Node::checkVectorSize() const
 	{
@@ -276,6 +393,10 @@ namespace Aseba
 			children[2]->checkVectorSize();
 	}
 
+
+	/*
+	 * Functions used to compute vectors' size and base memory address
+	 */
 
 	//! return the address of the left-most operand, or E_NOVAL if none
 	unsigned Node::getVectorAddr() const
@@ -383,6 +504,11 @@ namespace Aseba
 			return arraySize;
 	}
 	
+
+	/*
+	 * Convenience functions
+	 */
+
 	//! return whether this node accesses a static address
 	bool MemoryVectorNode::isAddressStatic() const
 	{

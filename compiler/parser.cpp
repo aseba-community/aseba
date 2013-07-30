@@ -1232,12 +1232,13 @@ namespace Aseba
 		//std::cerr << "Tree before expanding" << std::endl;
 		//tempTree1->dump(std::wcerr, indent);
 
-		std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
+		tempTree1->expandAbstractNodes(NULL);	// root node (AssignmentNode) is not abstract, so modify in place
+		std::auto_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(NULL));
 
 		//std::cerr << "Tree after expanding" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);
 
-		tempTree1.release();	// tree already deleted by expandToAsebaTree()
+		tempTree1.reset();
 		tempTree2->optimize(NULL);
 
 		//std::cerr << "Tree after optimization" << std::endl;
