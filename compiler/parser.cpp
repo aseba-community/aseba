@@ -605,13 +605,13 @@ namespace Aseba
 		WhileNode* whileNode = new WhileNode(whilePos);
 		blockNode->children.push_back(whileNode);
 		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+		whileNode->children.push_back(comparisonNode);
 		comparisonNode->children.push_back(variableRef->deepCopy());
 		if (rangeStartIndex <= rangeEndIndex)
 			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
 			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
 		comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
-		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
 		whileNode->children.push_back(new BlockNode(tokens.front().pos));
@@ -691,7 +691,9 @@ namespace Aseba
 			// allocate memory?
 			if (!dynamic_cast<MemoryVectorNode*>(preNode.get()) || preNode->getVectorAddr() == Node::E_NOVAL)
 			{
-				preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
+				Node* temp = allocateTemporaryVariable(pos, preNode.get());
+				preNode.release();
+				preNode.reset(temp);
 			}
 
 			//allocateTemporaryVariable(pos)
@@ -758,8 +760,11 @@ namespace Aseba
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseAnd();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_OR, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseAnd());
+			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_OR, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -774,8 +779,11 @@ namespace Aseba
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseNot();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_AND, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseNot());
+			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_AND, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -848,8 +856,11 @@ namespace Aseba
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseBinaryOrExpression();
-			node.reset(BinaryArithmeticNode::fromComparison(pos, op, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseBinaryOrExpression());
+			Node* temp = BinaryArithmeticNode::fromComparison(pos, op, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -864,8 +875,11 @@ namespace Aseba
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseBinaryXorExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_OR, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseBinaryXorExpression());
+			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_OR, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -880,8 +894,11 @@ namespace Aseba
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseBinaryAndExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_XOR, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseBinaryAndExpression());
+			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_XOR, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -896,8 +913,11 @@ namespace Aseba
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseShiftExpression();
-			node.reset(new BinaryArithmeticNode(pos, ASEBA_OP_BIT_AND, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseShiftExpression());
+			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_AND, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -915,8 +935,11 @@ namespace Aseba
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseAddExpression();
-			node.reset(BinaryArithmeticNode::fromShiftExpression(pos, op, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseAddExpression());
+			Node* temp = BinaryArithmeticNode::fromShiftExpression(pos, op, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -934,8 +957,11 @@ namespace Aseba
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseMultExpression();
-			node.reset(BinaryArithmeticNode::fromAddExpression(pos, op, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseMultExpression());
+			Node* temp = BinaryArithmeticNode::fromAddExpression(pos, op, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -953,8 +979,11 @@ namespace Aseba
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			Node *subExpression = parseUnaryExpression();
-			node.reset(BinaryArithmeticNode::fromMultExpression(pos, op, node.release(), subExpression));
+			std::auto_ptr<Node> subExpression(parseUnaryExpression());
+			Node* temp = BinaryArithmeticNode::fromMultExpression(pos, op, node.get(), subExpression.get());
+			subExpression.release();
+			node.release();
+			node.reset(temp);
 		}
 		
 		return node.release();
@@ -1232,12 +1261,13 @@ namespace Aseba
 		//std::cerr << "Tree before expanding" << std::endl;
 		//tempTree1->dump(std::wcerr, indent);
 
-		std::auto_ptr<Node> tempTree2(tempTree1->expandToAsebaTree(NULL));
+		tempTree1->expandAbstractNodes(NULL);	// root node (AssignmentNode) is not abstract, so modify in place
+		std::auto_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(NULL));
 
 		//std::cerr << "Tree after expanding" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);
 
-		tempTree1.release();	// tree already deleted by expandToAsebaTree()
+		tempTree1.reset();
 		tempTree2->optimize(NULL);
 
 		//std::cerr << "Tree after optimization" << std::endl;
@@ -1319,7 +1349,9 @@ namespace Aseba
 				if (!dynamic_cast<MemoryVectorNode*>(preNode.get()))
 				{
 					// allocate memory and generate code to evaluate tuple arguments
-					preNode.reset(allocateTemporaryVariable(pos, preNode.release()));
+					Node* temp = allocateTemporaryVariable(pos, preNode.get());
+					preNode.release();
+					preNode.reset(temp);
 					varAddr = preNode->getVectorAddr();
 					BlockNode* block(new BlockNode(varPos));
 					block->children.push_back(preNode.release());
@@ -1333,9 +1365,10 @@ namespace Aseba
 					const unsigned tempAddr = allocateTemporaryMemory(varPos, 1);
 					// create a load native argument node to get address at run time
 					callNode->children.push_back(new LoadNativeArgNode(
-						polymorphic_downcast<MemoryVectorNode*>(preNode.release()),
+						polymorphic_downcast<MemoryVectorNode*>(preNode.get()),
 						tempAddr
 					));
+					preNode.release();
 				}
 				// otherwise it is resolved
 				else

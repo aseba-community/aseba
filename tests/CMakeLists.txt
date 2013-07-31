@@ -151,3 +151,14 @@ if (zzuf_FOUND)
 else (zzuf_FOUND)
 	message("-- zzuf executable not found! Disabling fuzzy tests")
 endif (zzuf_FOUND)
+
+# use valgrind to test memory leaks inside the compiler
+find_program(valgrind_FOUND valgrind)
+if (valgrind_FOUND)
+	message("-- valgrind executable found: " ${valgrind_FOUND})
+	# test all the .txt files inside the data directory
+	add_test(valgrind-compiler-all ${CMAKE_CURRENT_SOURCE_DIR}/valgrind.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/)
+else (valgrind_FOUND)
+	message("-- valgrind executable not found! Disabling memory leaks tests")
+endif (valgrind_FOUND)
+
