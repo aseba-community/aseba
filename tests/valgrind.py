@@ -11,21 +11,6 @@ import stat
 import glob
 import subprocess
 
-import re
-
-valgrind_num = r"([\d',]+)"
-
-definitely_lost_re = re.compile(r"definitely lost: " + valgrind_num)
-indirectly_lost_re = re.compile(r"indirectly lost: " + valgrind_num)
-possibly_lost_re = re.compile(r"possibly lost: " + valgrind_num)
-
-def search_number(string, regexp):
-    # convenient function to search a number with a regex
-    # remove ' and , to successfully parse numbers
-    match = regexp.search(string)
-    if match:
-        return int(match.group(1).translate(None, ',\''))
-
 # Input arguments
 asebatest_bin = None
 input_scripts = None
@@ -48,8 +33,23 @@ else:
     input_scripts = [input_scripts]
 
 
-failed = False
-for input_script in input_scripts:
+import re
+
+valgrind_num = r"([\d',]+)"
+
+definitely_lost_re = re.compile(r"definitely lost: " + valgrind_num)
+indirectly_lost_re = re.compile(r"indirectly lost: " + valgrind_num)
+possibly_lost_re = re.compile(r"possibly lost: " + valgrind_num)
+
+def search_number(string, regexp):
+    # convenient function to search a number with a regex
+    # remove ' and , to successfully parse numbers
+    match = regexp.search(string)
+    if match:
+        return int(match.group(1).translate(None, ',\''))
+
+#
+def valgrind_test(input_script):
     print "Processing {}...".format(input_script)
     try:
         valgrind_output = subprocess.check_output(["valgrind", "--leak-check=summary", asebatest_bin, input_script], stderr=subprocess.STDOUT)
@@ -67,9 +67,19 @@ for input_script in input_scripts:
         print "{} failed: {} bytes definitely lost, {} bytes indirectly lost".format(input_script, definitely_lost, indirectly_lost)
         print "  for details run: valgrind --leak-check=full {} {}".format(asebatest_bin, input_script)
         print "***"
-        failed = True
+        return True # failed
+    else:
+        return False # no memleak
 
-if failed == True:
+
+# create a process pool
+from multiprocessing import Pool
+pool = Pool()
+
+# test all the scripts using the process pool
+failed = pool.map(valgrind_test, input_scripts)
+
+if True in failed:
     exit(2)
 else:
     exit(0)
