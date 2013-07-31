@@ -71,6 +71,7 @@ namespace Aseba
 		error_map[ERROR_NOT_ENOUGH_TEMP_SPACE] =		L"Not enough free space to allocate this tempory variable";
 		error_map[ERROR_MISPLACED_VARDEF] =			L"Variable definition is allowed only at the beginning of the program before any statement";
 		error_map[ERROR_EXPECTING_IDENTIFIER] =			L"Expecting identifier, found %0";
+		error_map[ERROR_CONST_ALREADY_DEFINED] =		L"Constant %0 is already defined";
 		error_map[ERROR_VAR_ALREADY_DEFINED] =			L"Variable %0 is already defined";
 		error_map[ERROR_VAR_CONST_COLLISION] =			L"Variable %0 has the same name as a constant";
 		error_map[ERROR_UNDEFINED_SIZE] =			L"Array %0 has undefined size";
@@ -126,6 +127,7 @@ namespace Aseba
 		error_map[ERROR_TOKEN_STR_elseif] =			L"elseif keyword";
 		error_map[ERROR_TOKEN_STR_end] =			L"end keyword";
 		error_map[ERROR_TOKEN_STR_var] =			L"var keyword";
+		error_map[ERROR_TOKEN_STR_const] =			L"const keyword";
 		error_map[ERROR_TOKEN_STR_call] =			L"call keyword";
 		error_map[ERROR_TOKEN_STR_sub] =			L"sub keyword";
 		error_map[ERROR_TOKEN_STR_callsub] =			L"callsub keyword";

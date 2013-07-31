@@ -56,7 +56,7 @@ add_test(native-function-indirect ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp $
 add_test(general-tuple-native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
 add_test(var-def-compat-issue135 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/var-def-compat-issue135.txt)
 add_test(array-indirect-access-issue134 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.txt)
-
+add_test(constdef ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)
@@ -92,7 +92,9 @@ add_test(if-condition-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_
 add_test(for-loop-condition-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-condition-vector.txt)
 add_test(constant-namespace-collision ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constant-namespace-collision.txt)
 add_test(array-constant-access-fail ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/array-constant-access-fail.txt)
-
+add_test(constdef-collision-1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-1.txt)
+add_test(constdef-collision-2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-2.txt)
+add_test(constdef-overriding ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-overriding.txt)
 
 # stress test the compiler, by simulating user's input
 # compiler should not crash. Exiting with an exception is OK

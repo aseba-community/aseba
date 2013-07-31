@@ -276,6 +276,7 @@ namespace Aseba
 				TOKEN_STR_elseif,
 				TOKEN_STR_end,
 				TOKEN_STR_var,
+				TOKEN_STR_const,
 				TOKEN_STR_call,
 				TOKEN_STR_sub,
 				TOKEN_STR_callsub,
@@ -418,6 +419,7 @@ namespace Aseba
 		Node* parseBlockStatement();
 		
 		Node* parseReturn();
+		void parseConstDef();
 		Node* parseVarDef();
 		AssignmentNode* parseVarDefInit(MemoryVectorNode* lValue);
 		Node* parseAssignment();

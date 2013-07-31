@@ -97,6 +97,7 @@ namespace Aseba
 			case TOKEN_STR_elseif: return translate(ERROR_TOKEN_STR_elseif);
 			case TOKEN_STR_end: return translate(ERROR_TOKEN_STR_end);
 			case TOKEN_STR_var: return translate(ERROR_TOKEN_STR_var);
+			case TOKEN_STR_const: return translate(ERROR_TOKEN_STR_const);
 			case TOKEN_STR_call: return translate(ERROR_TOKEN_STR_call);
 			case TOKEN_STR_sub: return translate(ERROR_TOKEN_STR_sub);
 			case TOKEN_STR_callsub: return translate(ERROR_TOKEN_STR_callsub);
@@ -438,6 +439,8 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_end, pos));
 						else if (s == L"var")
 							tokens.push_back(Token(Token::TOKEN_STR_var, pos));
+						else if (s == L"const")
+							tokens.push_back(Token(Token::TOKEN_STR_const, pos));
 						else if (s == L"call")
 							tokens.push_back(Token(Token::TOKEN_STR_call, pos));
 						else if (s == L"sub")

@@ -42,7 +42,7 @@ namespace Aseba
 		keywordPatterns << "\\bemit\\b" << "\\bwhile\\b" << "\\bdo\\b"
 						<< "\\bfor\\b" << "\\bin\\b" << "\\bstep\\b"
 						<< "\\bif\\b" << "\\bthen\\b" << "\\belse\\b" << "\\belseif\\b"
-						<< "\\bend\\b" << "\\bvar\\b" << "\\bcall\\b"
+						<< "\\bend\\b" << "\\bvar\\b" << "\\bconst\\b" << "\\bcall\\b"
 						<< "\\bonevent\\b" << "\\bontimer\\b" << "\\bwhen\\b"
 						<< "\\band\\b" << "\\bor\\b" << "\\bnot\\b" << "\\babs\\b"
 						<< "\\bsub\\b" << "\\bcallsub\\b" << "\\breturn\\b";
@@ -438,6 +438,7 @@ namespace Aseba
 		debugging(false),
 		completer(0),
 		vardefRegexp("^var .*"),
+		constdefRegexp("^const .*"),
 		leftValueRegexp("^\\w+\\s*=.*"),
 		previousContext(UnknownContext),
 		editingLeftValue(false)
@@ -825,7 +826,7 @@ namespace Aseba
 			currentContext = SubroutineCallContext;
 		else if (previous == "onevent" || previous == "emit")
 			currentContext = EventContext;
-		else if (vardefRegexp.indexIn(line) != -1)
+		else if (vardefRegexp.indexIn(line) != -1 || constdefRegexp.indexIn(line) != -1)
 			currentContext = VarDefContext;
 		else if (leftValueRegexp.indexIn(line) == -1)
 			currentContext = LeftValueContext;

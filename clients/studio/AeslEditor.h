@@ -208,6 +208,7 @@ namespace Aseba
 	protected:
 		QCompleter *completer;
 		const QRegExp vardefRegexp;
+		const QRegExp constdefRegexp;
 		const QRegExp leftValueRegexp;
 		LocalContext previousContext;
 		bool editingLeftValue;
