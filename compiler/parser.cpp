@@ -605,13 +605,13 @@ namespace Aseba
 		WhileNode* whileNode = new WhileNode(whilePos);
 		blockNode->children.push_back(whileNode);
 		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+		whileNode->children.push_back(comparisonNode);
 		comparisonNode->children.push_back(variableRef->deepCopy());
 		if (rangeStartIndex <= rangeEndIndex)
 			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
 		else
 			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
 		comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
-		whileNode->children.push_back(comparisonNode);
 		
 		// block and end keyword
 		whileNode->children.push_back(new BlockNode(tokens.front().pos));
