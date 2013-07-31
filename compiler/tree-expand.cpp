@@ -98,7 +98,8 @@ namespace Aseba
 			constant->addImmediateValue(1);
 
 		// expand to "vector (op)= 1"
-		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector, constant.release()));
+		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector, constant.get()));
+		constant.release();
 
 		// perform the expansion of ArithmeticAssignmentNode
 		std::auto_ptr<Node> finalBlock(assignment->expandAbstractNodes(dump));
