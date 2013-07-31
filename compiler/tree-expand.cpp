@@ -179,15 +179,14 @@ namespace Aseba
 	Node* Node::expandVectorialNodes(std::wostream *dump, unsigned int index)
 	{
 		// duplicate me
-		Node* newMe = this->shallowCopy();
+		std::auto_ptr<Node> newMe(this->shallowCopy());
+		newMe->children.clear();
 
 		// recursively walk the tree and expand children (of the newly created tree)
-		for (NodesVector::iterator it = newMe->children.begin(); it != newMe->children.end();)
-		{
-			*(it) = (*it)->expandVectorialNodes(dump, index);
-			++it;
-		}
-		return newMe;
+		for (unsigned int i = 0; i < this->children.size(); i++)
+			newMe->children.push_back(this->children[i]->expandVectorialNodes(dump, index));
+
+		return newMe.release();
 	}
 
 	//! Assignment between vectors is expanded into multiple scalar assignments
