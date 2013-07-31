@@ -1,0 +1,10 @@
+# FOO is already defined by asebatest, and equals 2
+
+const BAR = 2*FOO
+const TOTO = 13
+const FINAL = TOTO + BAR - FOO
+
+var bar = BAR
+var toto = TOTO
+var final = FINAL
+
