@@ -211,7 +211,7 @@ namespace Aseba
 		// expand the syntax tree to Aseba-like syntax
 		try
 		{
-			Node* expandedProgram(program->expandToAsebaTree(dump));
+			Node* expandedProgram(program->expandAbstractNodes(dump));
 			program.release();
 			program.reset(expandedProgram);
 		}
@@ -223,7 +223,28 @@ namespace Aseba
 
 		if (dump)
 		{
-			*dump << "Expanded syntax tree before optimisation:\n";
+			*dump << "Expanded syntax tree (pass 1):\n";
+			program->dump(*dump, indent);
+			*dump << "\n\n";
+			*dump << "Second pass for vectorial operations:\n";
+		}
+
+		// expand the vectorial nodes into scalar operations
+		try
+		{
+			Node* expandedProgram(program->expandVectorialNodes(dump));
+			program.release();
+			program.reset(expandedProgram);
+		}
+		catch (TranslatableError error)
+		{
+			errorDescription = error.toError();
+			return false;
+		}
+
+		if (dump)
+		{
+			*dump << "Expanded syntax tree (pass 2):\n";
 			program->dump(*dump, indent);
 			*dump << "\n\n";
 			*dump << "Type checking:\n";

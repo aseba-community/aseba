@@ -46,8 +46,10 @@ namespace Aseba
 	{
 		// we assume that if children is 0, another node has taken ownership of it
 		for (size_t i = 0; i < children.size(); i++)
-			if (children[i])
+			if (children[i]) {
 				delete children[i];
+				children[i] = 0;
+			}
 	}
 
 	Node* Node::deepCopy()
