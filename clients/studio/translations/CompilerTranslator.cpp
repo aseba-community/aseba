@@ -156,6 +156,10 @@ namespace Aseba
 				msg = tr("Expecting identifier, found %0");
 				break;
 
+			case ERROR_CONST_ALREADY_DEFINED:
+				msg = tr("Constant %0 is already defined");
+				break;
+
 			case ERROR_VAR_ALREADY_DEFINED:
 				msg = tr("Variable %0 is already defined");
 				break;
@@ -350,6 +354,10 @@ namespace Aseba
 
 			case ERROR_TOKEN_STR_var:
 				msg = tr("var keyword");
+				break;
+
+			case ERROR_TOKEN_STR_const:
+				msg = tr("const keyword");
 				break;
 
 			case ERROR_TOKEN_STR_call:

@@ -268,6 +268,11 @@ namespace Aseba
 	Node* Compiler::parseProgram()
 	{
 		std::auto_ptr<ProgramNode> block(new ProgramNode(tokens.front().pos));
+		// parse all declarations for constants
+		while (tokens.front() == Token::TOKEN_STR_const)
+		{
+			parseConstDef();
+		}
 		// parse all vars declarations
 		while (tokens.front() == Token::TOKEN_STR_var)
 		{
@@ -325,6 +330,35 @@ namespace Aseba
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		return new ReturnNode(pos);
+	}
+
+	//! Parse "const def" elements.
+	void Compiler::parseConstDef()
+	{
+		tokens.pop_front();
+
+		// check for string literal
+		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
+
+		std::wstring constName = tokens.front().sValue;
+		SourcePos constPos = tokens.front().pos;
+		tokens.pop_front();
+
+		// check if constant exists
+		if (constantsMap.find(constName) != constantsMap.end())
+			throw TranslatableError(constPos, ERROR_CONST_ALREADY_DEFINED).arg(constName);
+
+		// mandatory assignation, must resolve to a constant expression
+		if (tokens.front() != Token::TOKEN_ASSIGN)
+			throw TranslatableError(tokens.front().pos,
+				ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
+		tokens.pop_front();
+		int constValue = expectConstantExpression(constPos, parseBinaryOrExpression());
+
+		// save constant
+		constantsMap[constName] = constValue;
 	}
 	
 	//! Parse "var def" grammar element.
