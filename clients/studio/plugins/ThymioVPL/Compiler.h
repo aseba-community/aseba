@@ -54,7 +54,7 @@ namespace Aseba { namespace ThymioVPL
 		class TypeChecker : public Visitor
 		{
 		public:
-			virtual void visit(const EventActionPair& p);
+			virtual void visit(const EventActionPair& p, int& secondErrorLine);
 			
 			void reset();
 			void clear();
@@ -129,6 +129,7 @@ namespace Aseba { namespace ThymioVPL
 		ErrorCode getErrorCode() const;
 		bool isSuccessful() const;
 		int getErrorLine() const;
+		int getSecondErrorLine() const;
 		
 		typedef std::vector<std::wstring>::const_iterator CodeConstIterator;
 
@@ -147,6 +148,7 @@ namespace Aseba { namespace ThymioVPL
 		ErrorType errorType;
 
 		int errorLine;
+		int secondErrorLine;
 	};
 
 } } // namespace ThymioVPL / namespace Aseba
