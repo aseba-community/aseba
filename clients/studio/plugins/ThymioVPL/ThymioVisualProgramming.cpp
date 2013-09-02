@@ -599,6 +599,7 @@ namespace Aseba { namespace ThymioVPL
 		scene->recomputeSceneRect();
 		scene->clearSelection();
 		scene->setModified(!fromFile);
+		scene->recompileWithoutSetModified();
 		
 		if (!scene->isEmpty())
 			showAtSavedPosition();
