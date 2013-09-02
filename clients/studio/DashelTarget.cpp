@@ -269,6 +269,7 @@ namespace Aseba
 				const std::string& testTarget(commandLineTarget.toStdString());
 				stream = Hub::connect(testTarget);
 				lastConnectedTarget = testTarget;
+				lastConnectedTargetName = stream->getTargetName();
 			}
 			catch (DashelException e)
 			{
@@ -295,6 +296,7 @@ namespace Aseba
 				const std::string& testTarget(targetSelector.getTarget());
 				stream = Hub::connect(testTarget);
 				lastConnectedTarget = testTarget;
+				lastConnectedTargetName = stream->getTargetName();
 				assert(translators.size() == 3);
 				language = targetSelector.getLocaleName();
 				translators[0]->load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
@@ -898,25 +900,37 @@ namespace Aseba
 	struct ReconnectionDialog: public QMessageBox
 	{
 		ReconnectionDialog(DashelInterface& dashelInterface):
-			dashelInterface(dashelInterface)
+			dashelInterface(dashelInterface),
+			counter(0)
 		{
 			setWindowTitle(tr("Aseba Studio - Connection closed"));
 			setText(tr("Warning, connection closed: I am trying to reconnect."));
 			addButton(tr("Stop trying"), QMessageBox::RejectRole);
 			setEscapeButton(QMessageBox::Cancel);
-			setIcon(QMessageBox::Warning);
+			if (dashelInterface.lastConnectedTargetName.find("ser:") != 0)
+				setIcon(QMessageBox::Warning);
 			
-			startTimer(1000);
+			startTimer(200);
 		}
 	
 	protected:
 		virtual void timerEvent ( QTimerEvent * event )
 		{
-			if (dashelInterface.attemptToReconnect())
+			if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
+			{
+				// serial port, show Thymio animation
+				const unsigned iconStep(counter%15);
+				if (iconStep < 8)
+					setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
+			}
+			const unsigned connectStep(counter%5);
+			if ((connectStep == 0) && dashelInterface.attemptToReconnect())
 				accept();
+			counter++;
 		}
 		
 		DashelInterface& dashelInterface;
+		unsigned counter;
 	};
 	
 	void DashelTarget::disconnectionFromDashel()

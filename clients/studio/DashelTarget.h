@@ -93,6 +93,7 @@ namespace Aseba
 		bool isRunning;
 		Dashel::Stream* stream;
 		std::string lastConnectedTarget;
+		std::string lastConnectedTargetName;
 		QString language;
 		
 	public:
