@@ -123,7 +123,7 @@ namespace Aseba { namespace ThymioVPL
 					"border: 4px solid black; width: 40px; margin: -4px;"
 				"}"
 				";").arg(sliderColors[i]));
-			s->setSliderPosition(16);
+			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setAcceptDrops(false);
