@@ -252,6 +252,8 @@ namespace Aseba { namespace ThymioVPL
 		rearrangeButtons(row+1);
 		recomputeSceneRect();
 		
+		recompile();
+		
 		p->setSoleSelection();
 		
 		QGraphicsView* view;
