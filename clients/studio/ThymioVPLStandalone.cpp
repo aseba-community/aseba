@@ -290,11 +290,15 @@ namespace Aseba
 		element.setAttribute("name", target->getName(id));
 		element.setAttribute("nodeId", id);
 		element.appendChild(document.createTextNode(editor->toPlainText()));
-		QDomElement plugins = document.createElement("toolsPlugins");
-		QDomElement plugin(document.createElement("ThymioVisualProgramming"));
-		plugin.appendChild(document.importNode(vpl->saveToDom().documentElement(), true));
-		plugins.appendChild(plugin);
-		element.appendChild(plugins);
+		QDomDocument vplDocument(vpl->saveToDom());
+		if (!vplDocument.isNull())
+		{
+			QDomElement plugins = document.createElement("toolsPlugins");
+			QDomElement plugin(document.createElement("ThymioVisualProgramming"));
+			plugin.appendChild(document.importNode(vplDocument.documentElement(), true));
+			plugins.appendChild(plugin);
+			element.appendChild(plugins);
+		}
 		root.appendChild(element);
 		
 		QTextStream out(&file);
