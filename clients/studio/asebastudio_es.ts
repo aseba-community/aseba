@@ -1638,7 +1638,7 @@ evento %0 : </translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="240"/>
-        <location filename="ThymioVPLStandalone.cpp" line="440"/>
+        <location filename="ThymioVPLStandalone.cpp" line="444"/>
         <source>Thymio VPL Error</source>
         <translation>Error VPL desconocido</translation>
     </message>
@@ -1653,43 +1653,48 @@ evento %0 : </translation>
         <translation>Guardar Script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="325"/>
+        <location filename="ThymioVPLStandalone.cpp" line="329"/>
         <source>Open Script</source>
         <translation>Abrir script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="383"/>
-        <location filename="ThymioVPLStandalone.cpp" line="391"/>
+        <location filename="ThymioVPLStandalone.cpp" line="387"/>
+        <location filename="ThymioVPLStandalone.cpp" line="395"/>
         <source>Loading</source>
         <translation>Cargando</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="384"/>
+        <location filename="ThymioVPLStandalone.cpp" line="388"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
         <translation>Este archivo no contiene datos del tipo VPL y ha sido descartado.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="441"/>
+        <location filename="ThymioVPLStandalone.cpp" line="445"/>
         <source>This application only supports a single robot at a time.</source>
         <translation>Esta aplicación no soporta más de un robot a la vez.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="525"/>
+        <location filename="ThymioVPLStandalone.cpp" line="529"/>
         <source>[modified] </source>
         <translation>[modificado] </translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="527"/>
+        <location filename="ThymioVPLStandalone.cpp" line="531"/>
         <source>Untitled</source>
         <translation>Sin nombre</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="531"/>
-        <source>%0 %1- Thymio Visual Programming Language</source>
-        <translation>%0 %1- Lenguaje gráfico de programación para Thymio</translation>
+        <location filename="ThymioVPLStandalone.cpp" line="535"/>
+        <source>%0 %1- Thymio Visual Programming Language - ver. %2</source>
+        <translation>%0 %1- Lenguaje gráfico de programación para Thymio - ver. %2</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="392"/>
+        <source>%0 %1- Thymio Visual Programming Language %2</source>
+        <oldsource>%0 %1- Thymio Visual Programming Language</oldsource>
+        <translation type="obsolete">%0 %1- Lenguaje gráfico de programación para Thymio %2</translation>
+    </message>
+    <message>
+        <location filename="ThymioVPLStandalone.cpp" line="396"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
         <translation>Error en archivo fuente XML: %0, línea %1, columna %2</translation>
     </message>

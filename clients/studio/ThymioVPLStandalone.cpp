@@ -532,7 +532,8 @@ namespace Aseba
 		if (!fileName.isEmpty())
 			docName = fileName.mid(fileName.lastIndexOf("/") + 1);
 		
-		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language").arg(docName).arg(modifiedText));
+		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language - ver. %2").arg(docName).arg(modifiedText).arg(ASEBA_VERSION));
+		
 	}
 	
 	/*@}*/
