@@ -101,12 +101,12 @@
 <context>
     <name>Aseba::DashelInterface</name>
     <message>
-        <location filename="DashelTarget.cpp" line="281"/>
+        <location filename="DashelTarget.cpp" line="282"/>
         <source>Connection to command line target failed</source>
         <translation>Échec de connection à la destination passée en ligne de commande</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="281"/>
+        <location filename="DashelTarget.cpp" line="282"/>
         <source>Cannot connect to target %0</source>
         <translation>Ne peut pas se connecter à la destination %0</translation>
     </message>
@@ -122,12 +122,12 @@
         <translation type="obsolete">Attention, la connection a été perdue, enregistrez votre travail et quittez Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="1167"/>
+        <location filename="DashelTarget.cpp" line="1181"/>
         <source>Unexpected Dashel Error</source>
         <translation>Erreure Dashel inattendue</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="1167"/>
+        <location filename="DashelTarget.cpp" line="1181"/>
         <source>A communication error happened:</source>
         <translation>Une erreure de communication est survenue:</translation>
     </message>
@@ -1438,17 +1438,17 @@ event %0 : </source>
 <context>
     <name>Aseba::ReconnectionDialog</name>
     <message>
-        <location filename="DashelTarget.cpp" line="903"/>
+        <location filename="DashelTarget.cpp" line="906"/>
         <source>Aseba Studio - Connection closed</source>
         <translation>Aseba Studio - Connection terminée</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="904"/>
+        <location filename="DashelTarget.cpp" line="907"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
         <translation>Attention, la connection a été terminée : J&apos;essaye de reconnecter.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="905"/>
+        <location filename="DashelTarget.cpp" line="908"/>
         <source>Stop trying</source>
         <translation>Arrêter d&apos;essayer</translation>
     </message>
@@ -1593,33 +1593,37 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::Scene</name>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="286"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="288"/>
         <source>Line %0: Missing event</source>
         <translation>Ligne %0 : Il manque un événement</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="289"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="291"/>
         <source>Line %0: Missing action</source>
         <translation>Ligne %0 : Il manque une action</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="292"/>
         <source>Line %0: Twice the same event</source>
         <oldsource>Line %0: Redeclaration of event</oldsource>
-        <translation>Ligne %0 : Deux fois le même événement</translation>
+        <translation type="obsolete">Ligne %0 : Deux fois le même événement</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="295"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="294"/>
+        <source>The event-action pair in line %0 is the same as in line %1</source>
+        <translation>La pair événement-action à la ligne %0 est la même que celle à la ligne %1</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="298"/>
         <source>Line %0: Unknown event/action type</source>
         <translation>Ligne %0 : Type d&apos;action/d&apos;évenement inconnu</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="298"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="301"/>
         <source>Compilation success</source>
         <translation>Compilation terminée avec succès</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="300"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="303"/>
         <source>Unknown VPL error</source>
         <translation>Erreure VPL inconnue</translation>
     </message>
@@ -1918,18 +1922,18 @@ event %0 : </source>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="DashelTarget.cpp" line="372"/>
-        <location filename="DashelTarget.cpp" line="379"/>
+        <location filename="DashelTarget.cpp" line="374"/>
+        <location filename="DashelTarget.cpp" line="381"/>
         <source>Protocol version mismatch</source>
         <translation>Les version des protocoles ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="373"/>
+        <location filename="DashelTarget.cpp" line="375"/>
         <source>Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.</source>
         <translation>Aseba Studio utilise un protocole plus ancien (%1) que le noeud %0 (%2), veuillez mettre à jour Aseba Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="380"/>
+        <location filename="DashelTarget.cpp" line="382"/>
         <source>Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.</source>
         <translation>Le noeud %0 utilise un protocole plus ancien (%2) que Aseba Studio (%1), veuillez mettre à jour le microprogramme du noeud.</translation>
     </message>
