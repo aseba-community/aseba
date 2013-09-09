@@ -296,6 +296,14 @@ namespace Aseba { namespace ThymioVPL
 		close();
 	}
 	
+	//! prevent recursion of changes triggered by VPL itself
+	void ThymioVisualProgramming::clearSceneWithoutRecompilation()
+	{
+		loading = true;
+		scene->clear();
+		loading = false;
+	}
+	
 	void ThymioVisualProgramming::showAtSavedPosition()
 	{
 		QSettings settings;
@@ -347,6 +355,7 @@ namespace Aseba { namespace ThymioVPL
 		if (scene->isEmpty() || preDiscardWarningDialog(true)) 
 		{
 			clearHighlighting(true);
+			clearSceneWithoutRecompilation();
 			return true;
 		}
 		else
@@ -611,10 +620,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (!isVisible() && !loading)
 		{
-			// prevent recursion of changes triggered by VPL itself
-			loading = true;
-			scene->clear();
-			loading = false;
+			clearSceneWithoutRecompilation();
 		}
 	}
 	

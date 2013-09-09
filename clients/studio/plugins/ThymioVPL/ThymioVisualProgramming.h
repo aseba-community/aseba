@@ -57,11 +57,9 @@ namespace Aseba { namespace ThymioVPL
 		void modifiedStatusChanged(bool modified);
 		void compilationOutcome(bool success);
 		
-	public slots:
-		bool closeFile();
-		
 	protected slots:
 		void showErrorLine();
+		bool closeFile();
 		
 	private slots:
 		void openToUrlFromAction() const;
@@ -93,6 +91,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);
+		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
 		
 	protected:
