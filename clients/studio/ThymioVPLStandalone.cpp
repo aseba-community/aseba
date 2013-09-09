@@ -139,6 +139,9 @@ namespace Aseba
 		// delete variablesModel from VariableListener and set it to 0 to prevent double deletion
 		delete variablesModel;
 		variablesModel = 0;
+		
+		QSettings settings;
+		settings.setValue("ThymioVPLStandalone/fileName", fileName);
 	}
 	
 	void ThymioVPLStandalone::setupWidgets()
@@ -318,11 +321,18 @@ namespace Aseba
 		if (!vpl->preDiscardWarningDialog(false))
 			return;
 		
-		#ifdef ANDROID
-		QString dir("/sdcard/");
-		#else // ANDROID
-		QString dir("");
-		#endif // ANDROID
+		QString dir;
+		if (fileName.isEmpty())
+		{
+			QSettings settings;
+			#ifdef ANDROID
+			dir = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
+			#else // ANDROID
+			dir = settings.value("ThymioVPLStandalone/fileName", "").toString();
+			#endif // ANDROID
+		}
+		else
+			dir = fileName;
 		
 		// get file name
 		const QString newFileName(QFileDialog::getOpenFileName(0,
