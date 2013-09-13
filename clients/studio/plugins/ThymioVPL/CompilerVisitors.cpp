@@ -52,7 +52,7 @@ namespace Aseba { namespace ThymioVPL
 		memoryHash.clear();
 	}
 
-	void Compiler::TypeChecker::visit(const EventActionPair& p)
+	void Compiler::TypeChecker::visit(const EventActionPair& p, int& secondErrorLine)
 	{
 		if( !p.hasEventCard() || !p.hasActionCard() )
 			return;
@@ -126,6 +126,7 @@ namespace Aseba { namespace ThymioVPL
 			  multimap<wstring, const Card*>::iterator > ret;
 		ret = currentHash->equal_range(cardHashText);
 
+		secondErrorLine = 0;
 		for (multimap<wstring, const Card*>::iterator itr(ret.first); itr != ret.second; ++itr)
 		{
 			if (itr->second != event)
@@ -133,6 +134,7 @@ namespace Aseba { namespace ThymioVPL
 				errorCode = EVENT_REPEATED;
 				break;
 			}
+			++secondErrorLine;
 		}
 		
 		currentHash->insert(pair<wstring, const Card*>(cardHashText, event));

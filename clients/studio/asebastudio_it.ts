@@ -101,12 +101,12 @@
 <context>
     <name>Aseba::DashelInterface</name>
     <message>
-        <location filename="DashelTarget.cpp" line="281"/>
+        <location filename="DashelTarget.cpp" line="282"/>
         <source>Connection to command line target failed</source>
         <translation>Connessione al target da linea di comando fallita</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="281"/>
+        <location filename="DashelTarget.cpp" line="282"/>
         <source>Cannot connect to target %0</source>
         <translation>Impossibile collegarsi al target %0</translation>
     </message>
@@ -114,12 +114,12 @@
 <context>
     <name>Aseba::DashelTarget</name>
     <message>
-        <location filename="DashelTarget.cpp" line="1167"/>
+        <location filename="DashelTarget.cpp" line="1181"/>
         <source>Unexpected Dashel Error</source>
         <translation>Errore Dashel inatteso</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="1167"/>
+        <location filename="DashelTarget.cpp" line="1181"/>
         <source>A communication error happened:</source>
         <translation>E&apos; avvenuto un errore di comunicazione:</translation>
     </message>
@@ -1323,17 +1323,17 @@ event %0 : </source>
 <context>
     <name>Aseba::ReconnectionDialog</name>
     <message>
-        <location filename="DashelTarget.cpp" line="903"/>
+        <location filename="DashelTarget.cpp" line="906"/>
         <source>Aseba Studio - Connection closed</source>
         <translation>Aseba Studio - Connessione chiusa</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="904"/>
+        <location filename="DashelTarget.cpp" line="907"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
         <translation>Attenzione, connessione chiusa: tentativo di riconnessione in corso.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="905"/>
+        <location filename="DashelTarget.cpp" line="908"/>
         <source>Stop trying</source>
         <translation>Rinunciare alla riconnessione </translation>
     </message>
@@ -1445,33 +1445,37 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::Scene</name>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="286"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="288"/>
         <source>Line %0: Missing event</source>
         <translation>Linea %0: evento mancante</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="289"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="291"/>
         <source>Line %0: Missing action</source>
         <translation>Linea %0: azione mancante</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="292"/>
         <source>Line %0: Twice the same event</source>
         <oldsource>Line %0: Redeclaration of event</oldsource>
-        <translation>Linea %0: Due volte il stesso evento</translation>
+        <translation type="obsolete">Linea %0: Due volte il stesso evento</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="295"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="294"/>
+        <source>The event-action pair in line %0 is the same as in line %1</source>
+        <translation>La coppia di eventi-azioni della linea %0 è la stessa della linea %1</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="298"/>
         <source>Line %0: Unknown event/action type</source>
         <translation>Linea %0: tipo di evento/azione sconosciuto</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="298"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="301"/>
         <source>Compilation success</source>
         <translation>Compilazione avvenuta con successo</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="300"/>
+        <location filename="plugins/ThymioVPL/Scene.cpp" line="303"/>
         <source>Unknown VPL error</source>
         <translation>Errore VPL sconosciuto</translation>
     </message>
@@ -1604,7 +1608,7 @@ event %0 : </source>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="240"/>
-        <location filename="ThymioVPLStandalone.cpp" line="440"/>
+        <location filename="ThymioVPLStandalone.cpp" line="444"/>
         <source>Thymio VPL Error</source>
         <translation>Errore VPL sconosciuto</translation>
     </message>
@@ -1619,43 +1623,48 @@ event %0 : </source>
         <translation>Salva script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="325"/>
+        <location filename="ThymioVPLStandalone.cpp" line="329"/>
         <source>Open Script</source>
         <translation>Apri Script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="383"/>
-        <location filename="ThymioVPLStandalone.cpp" line="391"/>
+        <location filename="ThymioVPLStandalone.cpp" line="387"/>
+        <location filename="ThymioVPLStandalone.cpp" line="395"/>
         <source>Loading</source>
         <translation>Caricamento</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="384"/>
+        <location filename="ThymioVPLStandalone.cpp" line="388"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
         <translation>Nessun dato VPLè stato trovato nel documento di script, documento ignorato.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="441"/>
+        <location filename="ThymioVPLStandalone.cpp" line="445"/>
         <source>This application only supports a single robot at a time.</source>
         <translation>Questa applicazione supporta un solo robot alla volta.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="525"/>
+        <location filename="ThymioVPLStandalone.cpp" line="529"/>
         <source>[modified] </source>
         <translation>[modificato]</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="527"/>
+        <location filename="ThymioVPLStandalone.cpp" line="531"/>
         <source>Untitled</source>
         <translation>Senza titolo</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="531"/>
-        <source>%0 %1- Thymio Visual Programming Language</source>
-        <translation>%0 %1- Thymio VPL (Linguaggio di Programmazione Visuale)</translation>
+        <location filename="ThymioVPLStandalone.cpp" line="535"/>
+        <source>%0 %1- Thymio Visual Programming Language - ver. %2</source>
+        <translation>%0 %1- Thymio VPL (Linguaggio di Programmazione Visuale) - ver. %2</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="392"/>
+        <source>%0 %1- Thymio Visual Programming Language %2</source>
+        <oldsource>%0 %1- Thymio Visual Programming Language</oldsource>
+        <translation type="obsolete">%0 %1- Thymio VPL (Linguaggio di Programmazione Visuale) %2</translation>
+    </message>
+    <message>
+        <location filename="ThymioVPLStandalone.cpp" line="396"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
         <translation>Errore nel file sorgente XML %0 alla linea %1, colonna %2</translation>
     </message>
@@ -1742,18 +1751,18 @@ event %0 : </source>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="DashelTarget.cpp" line="372"/>
-        <location filename="DashelTarget.cpp" line="379"/>
+        <location filename="DashelTarget.cpp" line="374"/>
+        <location filename="DashelTarget.cpp" line="381"/>
         <source>Protocol version mismatch</source>
         <translation>Versione del protocollo non corretta</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="373"/>
+        <location filename="DashelTarget.cpp" line="375"/>
         <source>Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.</source>
         <translation>Aseba Studio usa una versione di protocollo (%1) più vecchia del nodo %0 (%2), Aggironare Aseba Studio.</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="380"/>
+        <location filename="DashelTarget.cpp" line="382"/>
         <source>Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.</source>
         <translation>Il Nodo %0 usa una versione di protocollo (%2) più vecchia di quello di Aseba Studio (%1), aggiornare il firmware del nodo.</translation>
     </message>

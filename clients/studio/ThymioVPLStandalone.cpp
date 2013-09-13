@@ -139,6 +139,9 @@ namespace Aseba
 		// delete variablesModel from VariableListener and set it to 0 to prevent double deletion
 		delete variablesModel;
 		variablesModel = 0;
+		
+		QSettings settings;
+		settings.setValue("ThymioVPLStandalone/fileName", fileName);
 	}
 	
 	void ThymioVPLStandalone::setupWidgets()
@@ -266,7 +269,7 @@ namespace Aseba
 			if (fileName.isEmpty())
 				fileName = "/sdcard/";
 			#endif // ANDROID
-			fileName = QFileDialog::getSaveFileName(this,
+			fileName = QFileDialog::getSaveFileName(0,
 				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
 		}
 		
@@ -290,11 +293,15 @@ namespace Aseba
 		element.setAttribute("name", target->getName(id));
 		element.setAttribute("nodeId", id);
 		element.appendChild(document.createTextNode(editor->toPlainText()));
-		QDomElement plugins = document.createElement("toolsPlugins");
-		QDomElement plugin(document.createElement("ThymioVisualProgramming"));
-		plugin.appendChild(document.importNode(vpl->saveToDom().documentElement(), true));
-		plugins.appendChild(plugin);
-		element.appendChild(plugins);
+		QDomDocument vplDocument(vpl->saveToDom());
+		if (!vplDocument.isNull())
+		{
+			QDomElement plugins = document.createElement("toolsPlugins");
+			QDomElement plugin(document.createElement("ThymioVisualProgramming"));
+			plugin.appendChild(document.importNode(vplDocument.documentElement(), true));
+			plugins.appendChild(plugin);
+			element.appendChild(plugins);
+		}
 		root.appendChild(element);
 		
 		QTextStream out(&file);
@@ -314,14 +321,21 @@ namespace Aseba
 		if (!vpl->preDiscardWarningDialog(false))
 			return;
 		
-		#ifdef ANDROID
-		QString dir("/sdcard/");
-		#else // ANDROID
-		QString dir("");
-		#endif // ANDROID
+		QString dir;
+		if (fileName.isEmpty())
+		{
+			QSettings settings;
+			#ifdef ANDROID
+			dir = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
+			#else // ANDROID
+			dir = settings.value("ThymioVPLStandalone/fileName", "").toString();
+			#endif // ANDROID
+		}
+		else
+			dir = fileName;
 		
 		// get file name
-		const QString newFileName(QFileDialog::getOpenFileName(this,
+		const QString newFileName(QFileDialog::getOpenFileName(0,
 				tr("Open Script"), dir, "Aseba scripts (*.aesl)"));
 		QFile file(newFileName);
 		if (!file.open(QFile::ReadOnly))
@@ -528,7 +542,8 @@ namespace Aseba
 		if (!fileName.isEmpty())
 			docName = fileName.mid(fileName.lastIndexOf("/") + 1);
 		
-		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language").arg(docName).arg(modifiedText));
+		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language - ver. %2").arg(docName).arg(modifiedText).arg(ASEBA_VERSION));
+		
 	}
 	
 	/*@}*/

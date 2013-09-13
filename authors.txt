@@ -48,3 +48,5 @@ Creative Commons Attribution-ShareAlike 3.0 License
 
 The icons used in studio are from http://www.everaldo.com/crystal/
 They can be found here: http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/
+
+

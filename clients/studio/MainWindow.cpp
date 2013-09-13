@@ -1679,9 +1679,28 @@ namespace Aseba
 		// open the file
 		QString fileName = path;
 	
+		// if no file to open is passed, show a dialog
 		if (fileName.isEmpty())
+		{
+			// try to guess the directory of the last opened or saved file
+			QString dir;
+			if (!actualFileName.isEmpty())
+			{
+				// a document is opened, propose to open it again
+				dir = actualFileName;
+			}
+			else
+			{
+				// no document is opened, try recent files
+				QSettings settings;
+				QStringList recentFiles = settings.value("recent files").toStringList();
+				if (recentFiles.size() > 0)
+					dir = recentFiles[0];
+			}
+			
 			fileName = QFileDialog::getOpenFileName(this,
-				tr("Open Script"), "", "Aseba scripts (*.aesl)");
+				tr("Open Script"), dir, "Aseba scripts (*.aesl)");
+		}
 		
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))

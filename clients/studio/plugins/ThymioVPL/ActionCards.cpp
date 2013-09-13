@@ -71,9 +71,10 @@ namespace Aseba { namespace ThymioVPL
 		
 		const qreal step = frame/200.0;
 		const qreal angle = (pt[0]-pt[1]-0.04)*3*step;
-		const qreal center = -23.5*(pt[1]+pt[0])/(pt[1] == pt[0] ? 0.03 : (pt[1]-pt[0]));
+		const qreal center = -23.5*(pt[1]+pt[0])/(fabs(pt[1] - pt[0]) < 10e-4 ? 0.03 : (pt[1]-pt[0]));
+		const qreal radNegAngle = -angle*3.14/180;
 		
-		thymioBody->setPos(QPointF(center*(1-cos(-angle*3.14/180))+128,center*sin(-angle*3.14/180)+128+14));
+		thymioBody->setPos(QPointF(center*(1-cos(radNegAngle))+128,center*sin(radNegAngle)+128+14));
 		thymioBody->setRotation(angle);
 	}
 
@@ -123,7 +124,7 @@ namespace Aseba { namespace ThymioVPL
 					"border: 4px solid black; width: 40px; margin: -4px;"
 				"}"
 				";").arg(sliderColors[i]));
-			s->setSliderPosition(16);
+			s->setSliderPosition(0);
 
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setAcceptDrops(false);

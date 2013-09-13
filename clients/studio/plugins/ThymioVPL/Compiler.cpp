@@ -66,6 +66,11 @@ namespace Aseba { namespace ThymioVPL
 		return ( errorType == COMPILATION_SUCCESS ? -1 : errorLine );
 	}
 	
+	int Compiler::getSecondErrorLine() const
+	{
+		return ( errorType == COMPILATION_SUCCESS ? -1 : secondErrorLine );
+	}
+	
 	vector<wstring>::const_iterator Compiler::beginCode() const
 	{ 
 		return codeGenerator.beginCode();
@@ -80,6 +85,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		errorType = COMPILATION_SUCCESS;
 		errorLine = -1;
+		secondErrorLine = -1;
 		typeChecker.reset();
 
 		for (Scene::PairConstItr it(scene.pairsBegin()); it != scene.pairsEnd(); ++it)
@@ -94,7 +100,7 @@ namespace Aseba { namespace ThymioVPL
 				break;
 			}
 
-			typeChecker.visit(p);
+			typeChecker.visit(p, secondErrorLine);
 			if( !typeChecker.isSuccessful() )
 			{
 				errorType = TYPE_ERROR;

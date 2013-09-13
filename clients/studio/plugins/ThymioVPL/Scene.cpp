@@ -252,6 +252,8 @@ namespace Aseba { namespace ThymioVPL
 		rearrangeButtons(row+1);
 		recomputeSceneRect();
 		
+		recompile();
+		
 		p->setSoleSelection();
 		
 		QGraphicsView* view;
@@ -289,8 +291,9 @@ namespace Aseba { namespace ThymioVPL
 			return tr("Line %0: Missing action").arg(compiler.getErrorLine());
 			break;
 		case Compiler::EVENT_REPEATED:
-			return tr("Line %0: Twice the same event").arg(compiler.getErrorLine());
+			return tr("The event-action pair in line %0 is the same as in line %1").arg(compiler.getErrorLine()).arg(compiler.getSecondErrorLine());
 			break;
+			// 
 		case Compiler::INVALID_CODE:
 			return tr("Line %0: Unknown event/action type").arg(compiler.getErrorLine());
 			break;
