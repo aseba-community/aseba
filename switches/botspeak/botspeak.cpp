@@ -166,7 +166,7 @@ namespace Aseba
 		{
 			if (userMsg->type == 1) // event stopped
 			{
-				cout << "Execution completed" << endl;
+				if (verbose) cout << "Execution completed" << endl;
 				if (runAndWait && botSpeakStream)
 				{
 					const char* version("1\r\n");
@@ -177,6 +177,7 @@ namespace Aseba
 			}
 			else if (userMsg->type == 2) // event running_ping
 			{
+				if (verbose) cout << "." << endl;
 				if (botSpeakStream)
 				{
 					const char c('\n');
@@ -330,8 +331,11 @@ namespace Aseba
 			{
 				if ((cmd[0] == "WAIT") && (i+1<script.size()))
 				{
-					if (i+1<script.size())
-						splits.insert(i+1);
+					splits.insert(i+1);
+				}
+				if ((cmd[0] == "GOTO") && (i+1<script.size()))
+				{
+					splits.insert(i+1);
 				}
 				if (cmd[0] == "IF")
 				{
@@ -479,6 +483,12 @@ namespace Aseba
 				}
 				nextBBDefined = true;
 			}
+			else if (cmd[0] == "GOTO")
+			{
+				const unsigned destLine(atoi(cmd.back().c_str()));
+				asebaSource += WFormatableString(L"\tcurrentBasicBlock = %0\n").arg(blocToLineTable[destLine]);
+				nextBBDefined = true;
+			}
 			else
 			{
 				cerr << "Ignoring unknown BotSpeak instruction " << cmd[0] << endl;
@@ -511,7 +521,7 @@ namespace Aseba
 		asebaSource += asebaCodeFooter();
 		
 		// print source
-		wcerr << "Aseba source:\n" << asebaSource;
+		if (verbose) wcerr << "Aseba source:\n" << asebaSource;
 		
 		// compile
 		CommonDefinitions commonDefinitions;
@@ -590,7 +600,7 @@ namespace Aseba
 		// user timer
 		code += L"\nonevent timer1\n";
 		code += L"\tTMR += 10\n";
-		code += L"\tif timer.period[0] != 0 and (TMR & 0x3ff) != 0 then\n";
+		code += L"\tif timer.period[0] != 0 and (TMR % 1000) == 0 then\n";
 		code += L"\t\temit running_ping\n";
 		code += L"\tend\n";
 // 		// get/set for HW
