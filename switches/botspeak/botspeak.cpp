@@ -153,7 +153,7 @@ namespace Aseba
 				{
 					cout << "Receiving temp variable with value " << variables->variables[0] << endl;
 					string data(FormatableString("%0\r\n").arg(variables->variables[0]));
-					botSpeakStream->write(data.c_str(), 3);
+					botSpeakStream->write(data.c_str(), data.length());
 					botSpeakStream->flush();
 				}
 			}
