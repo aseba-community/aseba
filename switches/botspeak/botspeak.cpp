@@ -108,6 +108,8 @@ namespace Aseba
 		else if (stream == botSpeakStream)
 		{
 			botSpeakStream = 0;
+			cout << "Connection closed to botspeak client" << endl;
+			stop();
 		}
 		else
 			abort();
