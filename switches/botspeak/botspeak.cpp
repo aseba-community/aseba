@@ -315,6 +315,7 @@ namespace Aseba
 		bridgeVars.insert("AI");
 		bridgeVars.insert("AO");
 		bridgeVars.insert("TMR");
+		bridgeVars.insert("temp");
 		if (verbose) cout << "Compiling " << script.size() << " lines" << endl;
 		for (size_t i(0); i<script.size(); ++i)
 		{
