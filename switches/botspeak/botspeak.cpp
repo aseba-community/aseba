@@ -103,13 +103,13 @@ namespace Aseba
 		if (stream == asebaStream)
 		{
 			asebaStream = 0;
+			cout << "Connection closed to Aseba target" << endl;
 			stop();
 		}
 		else if (stream == botSpeakStream)
 		{
 			botSpeakStream = 0;
 			cout << "Connection closed to botspeak client" << endl;
-			stop();
 		}
 		else
 			abort();
@@ -157,19 +157,22 @@ namespace Aseba
 			if (userMsg->type == 1) // event stopped
 			{
 				cout << "Execution completed" << endl;
-				if (runAndWait)
+				if (runAndWait && botSpeakStream)
 				{
 					const char* version("1\r\n");
 					botSpeakStream->write(version, 3);
 					botSpeakStream->flush();
-					runAndWait = 0;
 				}
+				runAndWait = 0;
 			}
 			else if (userMsg->type == 2) // event running_ping
 			{
-				const char c('\n');
-				botSpeakStream->write(&c, 1);
-				botSpeakStream->flush();
+				if (botSpeakStream)
+				{
+					const char c('\n');
+					botSpeakStream->write(&c, 1);
+					botSpeakStream->flush();
+				}
 			}
 		}
 		
@@ -206,9 +209,12 @@ namespace Aseba
 		{
 			if (verbose) cout << "stopping recording script" << endl;
 			recordScript = false;
-			const char* version("1\r\n");
-			botSpeakStream->write(version, 3);
-			botSpeakStream->flush();
+			if (botSpeakStream)
+			{
+				const char* version("1\r\n");
+				botSpeakStream->write(version, 3);
+				botSpeakStream->flush();
+			}
 			return;
 		}
 		if (recordScript)
@@ -236,9 +242,12 @@ namespace Aseba
 			else if (cmd[0] == "RUN")
 			{
 				compileAndRunScript();
-				const char* version("1\r\n");
-				botSpeakStream->write(version, 3);
-				botSpeakStream->flush();
+				if (botSpeakStream)
+				{
+					const char* version("1\r\n");
+					botSpeakStream->write(version, 3);
+					botSpeakStream->flush();
+				}
 			}
 			else if (cmd[0] == "RUN&WAIT")
 			{
@@ -249,17 +258,23 @@ namespace Aseba
 			{
 				if (verbose)
 					cout << "Reporting version" << endl;
-				const char* version("1\r\n");
-				botSpeakStream->write(version, 3);
-				botSpeakStream->flush();
+				if (botSpeakStream)
+				{
+					const char* version("1\r\n");
+					botSpeakStream->write(version, 3);
+					botSpeakStream->flush();
+				}
 			}
 			else
 			{
 				cerr << "unknown: \"" + command + "\"" << endl;
 				// TODO: do interprete command
-				const char* version("\r\n");
-				botSpeakStream->write(version, 2);
-				botSpeakStream->flush();
+				if (botSpeakStream)
+				{
+					const char* version("\r\n");
+					botSpeakStream->write(version, 2);
+					botSpeakStream->flush();
+				}
 			}
 		}
 	}
