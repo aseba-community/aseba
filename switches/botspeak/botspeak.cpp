@@ -41,6 +41,20 @@ namespace Aseba
 		return !s.empty() && (it == s.end());
 	}
 	
+	static struct OperationMap: public map<string, string>
+	{
+		OperationMap()
+		{
+			(*this)["ADD"] = "+=";
+			(*this)["SUB"] = "-=";
+			(*this)["MUL"] = "*=";
+			(*this)["DIV"] = "/=";
+			(*this)["MOD"] = "%=";
+			(*this)["SHR"] = ">>=";
+			(*this)["SHL"] = "<<=";
+		}
+	} operationMap;
+	
 	BotSpeakBridge::BotSpeakBridge(unsigned botSpeakPort, const char* asebaTarget):
 		botSpeakStream(0),
 		asebaStream(0),
@@ -260,7 +274,7 @@ namespace Aseba
 	
 	void BotSpeakBridge::compileAndRunScript()
 	{
-		// basic bloc extraction
+		// extraction of basic blocks and variable definitions
 		set<unsigned> splits;
 		map<string, unsigned> newVars;
 		set<string> bridgeVars;
@@ -346,7 +360,7 @@ namespace Aseba
 			cout << endl;
 		}
 		
-		// build basic bloc lookup table
+		// build basic block lookup table
 		vector<unsigned> blocToLineTable(script.size(), 0);
 		unsigned line(0); unsigned bb(0);
 		for (set<unsigned>::const_iterator it(splits.begin()); it!=splits.end(); ++it)
@@ -371,13 +385,15 @@ namespace Aseba
 		}
 		asebaSource += asebaCodeHeader();
 		
+		// macro acting like a local function
 		#define args1 (isSize(args.at(1)) ? FormatableString("%0").arg(newVars.at(baseNameSize(args.at(1)))) : args.at(1))
 		
-		// subroutines for basic blocs
+		// subroutines for basic blocks
 		set<unsigned>::const_iterator bbIt(splits.begin());
 		asebaSource += L"sub bb0\n";
 		bb = 0;
 		bool nextBBDefined(false);
+		// transform the source and put the result in the right basic block
 		for (size_t i(0); i<script.size(); ++i)
 		{
 			if ((bbIt != splits.end()) && (*bbIt == i))
@@ -398,40 +414,10 @@ namespace Aseba
 				if (!isSize(args.at(0)))
 					asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" = " + UTF8ToWString(args1) + L"\n";
 			}
-			else if (cmd[0] == "ADD")
+			else if (operationMap.find(cmd[0]) != operationMap.end())
 			{
 				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" += " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "SUB")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" -= " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "MUL")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" *= " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "DIV")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" /= " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "MOD")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" %= " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "SHR")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" >>= " + UTF8ToWString(args.at(1)) + L"\n";
-			}
-			else if (cmd[0] == "SHL")
-			{
-				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" <<= " + UTF8ToWString(args.at(1)) + L"\n";
+				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" " + UTF8ToWString(operationMap.at(cmd[0])) + L" " + UTF8ToWString(args.at(1)) + L"\n";
 			}
 			else if (cmd[0] == "WAIT")
 			{
