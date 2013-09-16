@@ -51,6 +51,9 @@ namespace Aseba
 		StringVector script; 
 		bool recordScript;
 		
+		// is in run&wait mode?
+		bool runAndWait;
+		
 		// debug variables
 		bool verbose;
 		
@@ -74,6 +77,8 @@ namespace Aseba
 		void compileAndRunScript();
 		
 		// helper functions
+		std::wstring asebaCodeHeader() const;
+		std::wstring asebaCodeFooter() const;
 		unsigned getVarAddress(const std::wstring& varName);
 	};
 	

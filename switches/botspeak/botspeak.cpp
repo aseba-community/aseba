@@ -47,6 +47,7 @@ namespace Aseba
 		nodeId(0),
 		freeVariableIndex(0),
 		recordScript(false),
+		runAndWait(false),
 		verbose(true)
 	{
 		// connect to the Aseba target
@@ -133,6 +134,29 @@ namespace Aseba
 			// TODO
 		}
 		
+		// if event
+		const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
+		if (userMsg)
+		{
+			if (userMsg->type == 1) // event stopped
+			{
+				cout << "Execution completed" << endl;
+				if (runAndWait)
+				{
+					const char* version("1\r\n");
+					botSpeakStream->write(version, 3);
+					botSpeakStream->flush();
+					runAndWait = 0;
+				}
+			}
+			else if (userMsg->type == 2) // event running_ping
+			{
+				const char c('\n');
+				botSpeakStream->write(&c, 1);
+				botSpeakStream->flush();
+			}
+		}
+		
 		delete message;
 	}
 	
@@ -193,12 +217,17 @@ namespace Aseba
 				script.clear();
 				recordScript = true;
 			}
-			else if ((cmd[0] == "RUN") || (cmd[0] == "RUN&WAIT"))
+			else if (cmd[0] == "RUN")
 			{
 				compileAndRunScript();
 				const char* version("1\r\n");
 				botSpeakStream->write(version, 3);
 				botSpeakStream->flush();
+			}
+			else if (cmd[0] == "RUN&WAIT")
+			{
+				compileAndRunScript();
+				runAndWait = true;
 			}
 			else if (command == "GET VER")
 			{
@@ -209,17 +238,37 @@ namespace Aseba
 				botSpeakStream->flush();
 			}
 			else
+			{
 				cerr << "unknown: \"" + command + "\"" << endl;
+				// TODO: do interprete command
+				const char* version("\r\n");
+				botSpeakStream->write(version, 2);
+				botSpeakStream->flush();
+			}
 		}
+	}
+	
+	bool isSize(const string& name)
+	{
+		return (name.length() > 5 && name.rfind("_SIZE") == name.length()-5);
+	}
+	
+	string baseNameSize(const string& name)
+	{
+		return name.substr(0, name.length()-5);
 	}
 	
 	void BotSpeakBridge::compileAndRunScript()
 	{
 		// basic bloc extraction
 		set<unsigned> splits;
-		set<string> newVars;
+		map<string, unsigned> newVars;
 		set<string> bridgeVars;
 		bridgeVars.insert("DIO");
+		bridgeVars.insert("PWM");
+		bridgeVars.insert("AI");
+		bridgeVars.insert("AO");
+		bridgeVars.insert("TMR");
 		if (verbose) cout << "Compiling " << script.size() << " lines" << endl;
 		for (size_t i(0); i<script.size(); ++i)
 		{
@@ -262,8 +311,25 @@ namespace Aseba
 						// if variable from bridge
 						if (bridgeVars.find(arg) != bridgeVars.end())
 							continue;
+						// if already declared
+						if (newVars.find(arg) != newVars.end())
+							continue;
 						// otherwise, define
-						newVars.insert(arg);
+						if (isSize(arg))
+						{
+							if (jt == args.begin())
+							{
+								// seen on left
+								const unsigned varSize(atoi(args.back().c_str()));
+								newVars[baseNameSize(arg)] = varSize;
+							}
+							else
+							{
+								// seen or right, must be known, but ignore for now
+							}
+						}
+						else
+							newVars[arg] = 1;
 					}
 				}
 			}
@@ -275,8 +341,8 @@ namespace Aseba
 				cout << *it << " ";
 			cout << endl;
 			cout << "Allocating " << newVars.size() << " variables: ";
-			for (set<string>::const_iterator it(newVars.begin()); it!=newVars.end(); ++it)
-				cout << *it << " ";
+			for (map<string, unsigned>::const_iterator it(newVars.begin()); it!=newVars.end(); ++it)
+				cout << it->first << " (" << it->second << ") ";
 			cout << endl;
 		}
 		
@@ -296,12 +362,16 @@ namespace Aseba
 		wstring asebaSource;
 		
 		// generate variable definition
-		for (set<string>::const_iterator it(newVars.begin()); it!=newVars.end(); ++it)
-			asebaSource += L"var " + UTF8ToWString(*it) + L"\n";
-		asebaSource += L"var currentBasicBlock = 0\n";
-		asebaSource += L"var DIO[8]\n\n";
-		asebaSource += L"sub updateOutputs\n";
-		asebaSource += L"\tcall leds.circle(DIO[0]*32, DIO[1]*32, DIO[2]*32, DIO[3]*32, DIO[4]*32, DIO[5]*32, DIO[6]*32, DIO[7]*32)\n\n";
+		for (map<string, unsigned>::const_iterator it(newVars.begin()); it!=newVars.end(); ++it)
+		{
+			asebaSource += L"var " + UTF8ToWString(it->first);
+			if (it->second != 1)
+				asebaSource += WFormatableString(L"[%0]").arg(it->second);
+			asebaSource += L"\n";
+		}
+		asebaSource += asebaCodeHeader();
+		
+		#define args1 (isSize(args.at(1)) ? FormatableString("%0").arg(newVars.at(baseNameSize(args.at(1)))) : args.at(1))
 		
 		// subroutines for basic blocs
 		set<unsigned>::const_iterator bbIt(splits.begin());
@@ -325,7 +395,8 @@ namespace Aseba
 			if (cmd[0] == "SET")
 			{
 				const StringVector args(split<string>(cmd.at(1), ","));
-				asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" = " + UTF8ToWString(args.at(1)) + L"\n";
+				if (!isSize(args.at(0)))
+					asebaSource += L"\t" + UTF8ToWString(args.at(0)) + L" = " + UTF8ToWString(args1) + L"\n";
 			}
 			else if (cmd[0] == "ADD")
 			{
@@ -416,13 +487,8 @@ namespace Aseba
 		asebaSource += L"\tend\n";
 		asebaSource += L"\tcallsub updateOutputs\n";
 		
-		// timer
-		asebaSource += L"\nonevent timer0\n";
-		asebaSource += L"\tcallsub dispatchBB\n";
-		
-		// start
-		asebaSource += L"\nonevent start\n";
-		asebaSource += L"\tcallsub dispatchBB\n";
+		// rest of code
+		asebaSource += asebaCodeFooter();
 		
 		// print source
 		wcerr << "Aseba source:\n" << asebaSource;
@@ -431,6 +497,7 @@ namespace Aseba
 		CommonDefinitions commonDefinitions;
 		commonDefinitions.events.push_back(NamedValue(L"start", 0));
 		commonDefinitions.events.push_back(NamedValue(L"stopped", 0));
+		commonDefinitions.events.push_back(NamedValue(L"running_ping", 0));
 		Error error;
 		BytecodeVector bytecode;
 		unsigned allocatedVariablesCount;
@@ -451,6 +518,75 @@ namespace Aseba
 		{
 			wcerr << L"Compilation failed: " << error.toWString() << endl;
 		}
+	}
+	
+	std::wstring BotSpeakBridge::asebaCodeHeader() const
+	{
+		std::wstring code;
+		code += L"var currentBasicBlock = 0\n";
+		code += L"var DIO[13]\n";
+		code += L"var AI[16]\n";
+		code += L"var AO[2]\n";
+		code += L"var PWM[9]\n";
+		code += L"var TMR = 0\n";
+		code += L"\n";
+		code += L"timer.period[1] = 10\n";
+		code += L"\n";
+		code += L"sub updateInputs\n";
+		code += L"\tDIO[8] = button.backward\n";
+		code += L"\tDIO[9] = button.left\n";
+		code += L"\tDIO[10] = button.center\n";
+		code += L"\tDIO[11] = button.forward\n";
+		code += L"\tDIO[12] = button.right\n";
+		code += L"\tcall math.copy(AI[0:6], prox.horizontal)\n";
+		code += L"\tcall math.copy(AI[7:8], prox.ground.delta)\n";
+		code += L"\tAI[9] = temperature\n";
+		code += L"\tcall math.copy(AI[10:12], acc)\n";
+		code += L"\tAI[13] = motor.left.speed\n";
+		code += L"\tAI[14] = motor.right.speed\n";
+		code += L"\tAI[15] = mic.intensity\n";
+		code += L"\n";
+		code += L"sub updateOutputs\n";
+		code += L"\tcall leds.circle(DIO[0]*32, DIO[1]*32, DIO[2]*32, DIO[3]*32, DIO[4]*32, DIO[5]*32, DIO[6]*32, DIO[7]*32)\n";
+		code += L"\tcall leds.top(PWM[0], PWM[1], PWM[2])\n";
+		code += L"\tcall leds.bottom.left(PWM[3], PWM[4], PWM[5])\n";
+		code += L"\tcall leds.bottom.right(PWM[6], PWM[7], PWM[8])\n";
+		code += L"\tmotor.left.target = AO[0]\n";
+		code += L"\tmotor.right.target = AO[1]\n";
+		code += L"\n";
+		return code;
+	}
+	
+	std::wstring BotSpeakBridge::asebaCodeFooter() const
+	{
+		std::wstring code;
+		// execution flow
+		code += L"\nonevent timer0\n";
+		code += L"\tcallsub updateInputs\n";
+		code += L"\tcallsub dispatchBB\n";
+		code += L"\nonevent start\n";
+		code += L"\tcallsub updateInputs\n";
+		code += L"\tcallsub dispatchBB\n";
+		// user timer
+		code += L"\nonevent timer1\n";
+		code += L"\tTMR += 10\n";
+		code += L"\tif timer.period[0] != 0 and (TMR & 0x3ff) != 0 then\n";
+		code += L"\t\temit running_ping\n";
+		code += L"\tend\n";
+// 		// get/set for HW
+// 		onevent get_AI
+// 		callsub 
+// 		
+// 		onevent set_AO
+// 		
+// 		onevent set_PWM
+// 		
+// 		onevent get_TMR
+// 		
+// 		onevent set_TMR
+// 		
+		
+		return code;
 	}
 	
 	unsigned BotSpeakBridge::getVarAddress(const wstring& varName)
