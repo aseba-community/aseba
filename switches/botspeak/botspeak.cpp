@@ -147,6 +147,16 @@ namespace Aseba
 		const Variables *variables(dynamic_cast<Variables *>(message));
 		if (variables)
 		{
+			if ((variables->start == freeVariableIndex) && (variables->variables.size() == 1))
+			{
+				if (botSpeakStream)
+				{
+					cout << "Receiving temp variable with value " << variables->variables[0] << endl;
+					string data(FormatableString("%0\r\n").arg(variables->variables[0]));
+					botSpeakStream->write(data.c_str(), 3);
+					botSpeakStream->flush();
+				}
+			}
 			// TODO
 		}
 		
@@ -264,6 +274,11 @@ namespace Aseba
 					botSpeakStream->write(version, 3);
 					botSpeakStream->flush();
 				}
+			}
+			else if (command == "GET temp")
+			{
+				GetVariables(nodeId, freeVariableIndex, 1).serialize(asebaStream);
+				asebaStream->flush();
 			}
 			else
 			{
@@ -393,6 +408,7 @@ namespace Aseba
 		wstring asebaSource;
 		
 		// generate variable definition
+		asebaSource += L"var temp\n";
 		for (map<string, unsigned>::const_iterator it(newVars.begin()); it!=newVars.end(); ++it)
 		{
 			asebaSource += L"var " + UTF8ToWString(it->first);
