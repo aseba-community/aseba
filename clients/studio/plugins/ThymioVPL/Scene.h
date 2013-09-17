@@ -48,14 +48,17 @@ namespace Aseba { namespace ThymioVPL
 		
 		PairItr pairsBegin() { return eventActionPairs.begin(); }
 		PairItr pairsEnd() { return eventActionPairs.end(); }
-		
 		PairConstItr pairsBegin() const { return eventActionPairs.begin(); }
 		PairConstItr pairsEnd() const { return eventActionPairs.end(); }
+		unsigned pairsCount() const { return eventActionPairs.size(); }
+		
+		unsigned getZoomLevel() const { return zoomLevel; }
 		
 	signals:
 		void highlightChanged();
 		void contentRecompiled();
 		void modifiedStatusChanged(bool modified);
+		void zoomChanged();
 		
 	public slots:
 		void recompile();
@@ -63,9 +66,11 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 	protected:
 		void rearrangeButtons(int row=0);
+		void relayout();
 		
 		EventActionPair *createNewEventActionPair();
 
@@ -78,6 +83,7 @@ namespace Aseba { namespace ThymioVPL
 		bool sceneModified;
 		qreal buttonSetHeight;
 		bool advancedMode;
+		unsigned zoomLevel;
 	};
 } } // namespace ThymioVPL / namespace Aseba
 

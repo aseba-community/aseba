@@ -32,6 +32,7 @@ namespace Aseba { namespace ThymioVPL
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
+		viewportScale(1.0),
 		scene(new Scene(this)),
 		loading(false)
 	{
@@ -184,6 +185,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
+		connect(scene, SIGNAL(zoomChanged()), SLOT(setViewScale()));
 
 		horizontalLayout->addLayout(sceneLayout);
      
@@ -654,6 +656,13 @@ namespace Aseba { namespace ThymioVPL
 		if (scene->isSuccessful())
 			de->displayCode(scene->getCode(), scene->getSelectedPairId());
 	}
+	
+	void ThymioVisualProgramming::setViewScale()
+	{
+		view->resetTransform();
+		const qreal scale(viewportScale/qreal(scene->getZoomLevel()));
+		view->scale(scale, scale);
+	}
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
@@ -816,8 +825,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set view and cards on sides
 		const QSize iconSize(256*scale, 256*scale);
-		view->resetTransform();
-		view->scale(scale, scale);
+		viewportScale = scale;
+		setViewScale();
 		for(QList<CardButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);

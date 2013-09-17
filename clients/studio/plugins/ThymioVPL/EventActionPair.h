@@ -45,6 +45,8 @@ namespace Aseba { namespace ThymioVPL
 	
 		void setErrorStatus(bool flag);
 		
+		void repositionElements();
+		
 	signals:
 		void contentChanged();
 		
@@ -54,9 +56,6 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void removeClicked();
 		void addClicked();
-		
-	protected:
-		void repositionElements();
 	
 	private:
 		Card *eventCard;

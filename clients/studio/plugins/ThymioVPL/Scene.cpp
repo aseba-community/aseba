@@ -17,7 +17,8 @@ namespace Aseba { namespace ThymioVPL
 		eventCardColor(QColor(0,191,255)),
 		actionCardColor(QColor(218,112,214)),
 		sceneModified(false),
-		advancedMode(false)
+		advancedMode(false),
+		zoomLevel(1)
 	{
 		// create initial button
 		EventActionPair *p(createNewEventActionPair());
@@ -117,6 +118,7 @@ namespace Aseba { namespace ThymioVPL
 			createNewEventActionPair();
 		else if (!eventActionPairs.last()->isEmpty())
 			createNewEventActionPair();
+		relayout();
 	}
 
 	EventActionPair *Scene::createNewEventActionPair()
@@ -250,7 +252,7 @@ namespace Aseba { namespace ThymioVPL
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
 		rearrangeButtons(row+1);
-		recomputeSceneRect();
+		relayout();
 		
 		recompile();
 		
@@ -278,6 +280,13 @@ namespace Aseba { namespace ThymioVPL
 	{
 		for(int i=row; i<eventActionPairs.size(); ++i) 
 			eventActionPairs.at(i)->setRow(i);
+	}
+	
+	void Scene::relayout()
+	{
+		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+			(*itr)->repositionElements();
+		recomputeSceneRect();
 	}
 	
 	QString Scene::getErrorMessage() const
@@ -394,5 +403,29 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 			QGraphicsScene::dropEvent(event);
+	}
+	
+	void Scene::wheelEvent(QGraphicsSceneWheelEvent * wheelEvent)
+	{
+		if (wheelEvent->modifiers() & Qt::ControlModifier)
+		{
+			bool changed(false);
+			if (wheelEvent->delta() > 0 && zoomLevel > 1)
+			{
+				zoomLevel--;
+				changed = true;
+			}
+			else if (wheelEvent->delta() < 0 && zoomLevel < 10)
+			{
+				zoomLevel++;
+				changed = true;
+			}
+			if (changed)
+			{
+				relayout();
+				emit zoomChanged();
+				wheelEvent->accept();
+			}
+		}
 	}
 } } // namespace ThymioVPL / namespace Aseba

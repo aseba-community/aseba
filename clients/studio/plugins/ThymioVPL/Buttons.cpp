@@ -183,7 +183,7 @@ namespace Aseba { namespace ThymioVPL
 		if( card==0 )
 			return;
 		
-		const qreal factor = width() / 256.;
+		const qreal factor = width() / (256.* qreal(scene->getZoomLevel()));
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(card->mimeData());
 		drag->setPixmap(card->image(factor));

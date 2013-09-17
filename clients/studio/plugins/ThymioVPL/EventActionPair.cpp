@@ -10,6 +10,7 @@
 #include <QGraphicsView>
 #include <QDebug>
 #include <cassert>
+#include <cmath>
 #include <typeinfo>
 
 #include "EventActionPair.h"
@@ -68,6 +69,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void EventActionPair::repositionElements()
 	{
+		Scene* vplScene(dynamic_cast<Scene*>(scene()));
+		
 		if (advancedMode)
 		{
 			trans = 128;
@@ -79,7 +82,11 @@ namespace Aseba { namespace ThymioVPL
 			xpos = 5+64;
 		}
 		
-		setPos(xpos, (getRow()*420+20));
+		const unsigned rowPerCol(vplScene ? ceilf(float(vplScene->pairsCount())/float(vplScene->getZoomLevel())) : 0);
+		const unsigned col(vplScene ? getRow()/rowPerCol : 0);
+		const unsigned row(vplScene ? getRow()%rowPerCol : getRow());
+		
+		setPos(xpos+col*(boundingRect().width()+60), row*420+20);
 		deleteButton->setPos(830+trans, 70);
 		addButton->setPos(450+trans/2, 378);
 		
@@ -204,7 +211,7 @@ namespace Aseba { namespace ThymioVPL
 			eventCard->setParentID(row);
 		if( actionCard )
 			actionCard->setParentID(row);
-		setPos(xpos, (row*420+20)*scale());
+		repositionElements();
 	}
 	
 	void EventActionPair::removeEventCard() 

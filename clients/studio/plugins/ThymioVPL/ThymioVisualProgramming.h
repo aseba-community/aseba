@@ -88,6 +88,7 @@ namespace Aseba { namespace ThymioVPL
 		void toggleAdvancedMode();
 		void processCompilationResult();
 		void processHighlightChange();
+		void setViewScale();
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);
@@ -97,6 +98,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
+		qreal viewportScale;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		
