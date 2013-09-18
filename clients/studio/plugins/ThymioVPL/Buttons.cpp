@@ -187,7 +187,7 @@ namespace Aseba { namespace ThymioVPL
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(card->mimeData());
 		drag->setPixmap(card->image(factor));
-		drag->setHotSpot(event->pos());
+		drag->setHotSpot(event->pos()/scene->getZoomLevel());
 		drag->exec();
 		#endif // ANDROID
 	}
