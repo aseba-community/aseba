@@ -186,6 +186,11 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(zoomChanged()), SLOT(setViewScale()));
+		
+		zoomSlider = new QSlider(Qt::Horizontal);
+		zoomSlider->setRange(1,10);
+		zoomSlider->setValue(1);
+		sceneLayout->addWidget(zoomSlider);
 
 		horizontalLayout->addLayout(sceneLayout);
      
@@ -239,6 +244,8 @@ namespace Aseba { namespace ThymioVPL
 		connect(showCompilationError, SIGNAL(clicked()), this, SLOT(showErrorLine()));
 		
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
+		
+		connect(zoomSlider, SIGNAL(valueChanged(int)), scene, SLOT(updateZoomLevel()));
 		
 		setWindowModality(Qt::ApplicationModal);
 	}

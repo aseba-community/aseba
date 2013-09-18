@@ -97,6 +97,8 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		friend class Aseba::ThymioVPL::CardButton;
+		friend class Aseba::ThymioVPL::Scene;
+		
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		qreal viewportScale;
@@ -115,6 +117,8 @@ namespace Aseba { namespace ThymioVPL
 		QLabel *compilationResult;
 		QLabel *compilationResultImage;
 		QPushButton *showCompilationError;
+		
+		QSlider *zoomSlider;
 
 		QToolBar *toolBar;
 		QToolButton *newButton;

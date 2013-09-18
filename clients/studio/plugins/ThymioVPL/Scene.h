@@ -6,12 +6,14 @@
 
 namespace Aseba { namespace ThymioVPL
 {
+	class ThymioVisualProgramming;
+	
 	class Scene : public QGraphicsScene
 	{
 		Q_OBJECT
 		
 	public:
-		Scene(QObject *parent = 0);
+		Scene(ThymioVisualProgramming *vpl);
 		~Scene();
 		
 		QGraphicsItem *addAction(Card *item);
@@ -63,6 +65,7 @@ namespace Aseba { namespace ThymioVPL
 	public slots:
 		void recompile();
 		void recompileWithoutSetModified();
+		void updateZoomLevel();
 		
 	protected:
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
@@ -74,6 +77,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		EventActionPair *createNewEventActionPair();
 
+		ThymioVisualProgramming* vpl;
+		
 		QList<EventActionPair *> eventActionPairs;
 		Compiler compiler;
 		

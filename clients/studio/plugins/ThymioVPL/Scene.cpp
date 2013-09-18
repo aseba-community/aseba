@@ -6,14 +6,16 @@
 
 #include "Scene.h"
 #include "Card.h"
+#include "ThymioVisualProgramming.h"
 
 using namespace std;
 
 namespace Aseba { namespace ThymioVPL
 {
 
-	Scene::Scene(QObject *parent) : 
-		QGraphicsScene(parent),
+	Scene::Scene(ThymioVisualProgramming *vpl) : 
+		QGraphicsScene(vpl),
+		vpl(vpl),
 		compiler(*this),
 		eventCardColor(QColor(0,191,255)),
 		actionCardColor(QColor(218,112,214)),
@@ -416,23 +418,19 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (wheelEvent->modifiers() & Qt::ControlModifier)
 		{
-			bool changed(false);
-			if (wheelEvent->delta() > 0 && zoomLevel > 1)
-			{
-				zoomLevel--;
-				changed = true;
-			}
-			else if (wheelEvent->delta() < 0 && zoomLevel < 10)
-			{
-				zoomLevel++;
-				changed = true;
-			}
-			if (changed)
-			{
-				relayout();
-				emit zoomChanged();
-				wheelEvent->accept();
-			}
+			if (wheelEvent->delta() > 0)
+				vpl->zoomSlider->setValue(vpl->zoomSlider->value()-1);
+			else if (wheelEvent->delta() < 0)
+				vpl->zoomSlider->setValue(vpl->zoomSlider->value()+1);
+			wheelEvent->accept();
 		}
+	}
+	
+	void Scene::updateZoomLevel()
+	{
+		// TODO: if we keep slider, use its value instead of doing copies
+		zoomLevel = vpl->zoomSlider->value();
+		relayout();
+		emit zoomChanged();
 	}
 } } // namespace ThymioVPL / namespace Aseba
