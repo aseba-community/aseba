@@ -74,19 +74,19 @@ namespace Aseba { namespace ThymioVPL
 		if (advancedMode)
 		{
 			trans = 128;
-			xpos = 5;
+			xpos = 0;
 		} 
 		else
 		{
 			trans = 0;
-			xpos = 5+64;
+			xpos = 0+64;
 		}
 		
 		const unsigned rowPerCol(vplScene ? ceilf(float(vplScene->pairsCount())/float(vplScene->getZoomLevel())) : 0);
 		const unsigned col(vplScene ? getRow()/rowPerCol : 0);
 		const unsigned row(vplScene ? getRow()%rowPerCol : getRow());
 		
-		setPos(xpos+col*(boundingRect().width()+60), row*420+20);
+		setPos(col*1088+xpos, row*420);
 		deleteButton->setPos(830+trans, 70);
 		addButton->setPos(450+trans/2, 378);
 		

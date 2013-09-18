@@ -19,6 +19,7 @@
 #include "EventCards.h"
 #include "ActionCards.h"
 #include "Scene.h"
+#include "ThymioVisualProgramming.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -147,10 +148,10 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardButton::CardButton(const QString& name, Scene* scene, QWidget *parent) : 
+	CardButton::CardButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
 		QPushButton(parent), 
 		card(Card::createCard(name)),
-		scene(scene)
+		vpl(vpl)
 	{
 		setToolTip(QString("%0 %1").arg(card->getName()).arg(card->getType()));
 		
@@ -183,11 +184,11 @@ namespace Aseba { namespace ThymioVPL
 		if( card==0 )
 			return;
 		
-		const qreal factor = width() / (256.* qreal(scene->getZoomLevel()));
+		const qreal factor = vpl->viewportScale/qreal(vpl->scene->getZoomLevel());
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(card->mimeData());
 		drag->setPixmap(card->image(factor));
-		drag->setHotSpot(event->pos()/scene->getZoomLevel());
+		drag->setHotSpot(event->pos()/vpl->scene->getZoomLevel());
 		drag->exec();
 		#endif // ANDROID
 	}
@@ -215,9 +216,9 @@ namespace Aseba { namespace ThymioVPL
 			if (parentID >= 0)
 			{
 				if (event->mimeData()->data("CardType") == QString("event").toLatin1())
-					scene->getPairRow(parentID)->removeEventCard();
+					vpl->scene->getPairRow(parentID)->removeEventCard();
 				else
-					scene->getPairRow(parentID)->removeActionCard();
+					vpl->scene->getPairRow(parentID)->removeActionCard();
 			}
 			// d&g handling
 			event->setDropAction(Qt::MoveAction);

@@ -52,7 +52,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 		
 		bool isModified() const;
-	
+		
 	signals:
 		void modifiedStatusChanged(bool modified);
 		void compilationOutcome(bool success);
@@ -96,6 +96,7 @@ namespace Aseba { namespace ThymioVPL
 		void showAtSavedPosition();
 		
 	protected:
+		friend class Aseba::ThymioVPL::CardButton;
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
 		qreal viewportScale;

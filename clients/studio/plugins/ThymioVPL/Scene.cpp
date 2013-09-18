@@ -2,6 +2,7 @@
 #include <QGraphicsView>
 #include <QMimeData>
 #include <QDebug>
+#include <cmath>
 
 #include "Scene.h"
 #include "Card.h"
@@ -383,12 +384,18 @@ namespace Aseba { namespace ThymioVPL
 			int prevRow, currentRow;
 			dataStream >> prevRow;
 			
+			const unsigned count(pairsCount());
 			EventActionPair *p(eventActionPairs.at(prevRow));
 			eventActionPairs.removeAt(prevRow);
+			
+			#define CLAMP(a, l, h) ((a)<(l)?(l):((a)>(h)?(h):(a)))
 
-			qreal currentYPos = event->scenePos().y();
-			currentRow = (int)((currentYPos-20)/(buttonSetHeight));
-			currentRow = (currentRow < 0 ? 0 : currentRow > eventActionPairs.size() ? eventActionPairs.size() : currentRow);
+			const qreal currentXPos = event->scenePos().x();
+			const qreal currentYPos = event->scenePos().y();
+			const unsigned rowPerCol(ceilf(float(count)/float(zoomLevel)));
+			const unsigned xIndex(CLAMP(currentXPos/1088, 0, zoomLevel-1));
+			const unsigned yIndex(CLAMP(currentYPos/420, 0, rowPerCol));
+			currentRow = xIndex*rowPerCol + yIndex;
 			
 			eventActionPairs.insert(currentRow, p);
 

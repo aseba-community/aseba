@@ -126,12 +126,12 @@ namespace Aseba { namespace ThymioVPL
 		// events
 		eventsLayout = new QVBoxLayout();
 
-		CardButton *buttonsButton = new CardButton("button", scene);
-		CardButton *proxButton = new CardButton("prox", scene);
-		CardButton *proxGroundButton = new CardButton("proxground", scene);
-		CardButton *tapButton = new CardButton("tap", scene);
-		CardButton *clapButton = new CardButton("clap", scene);
-		CardButton *timeoutButton = new CardButton("timeout", scene);
+		CardButton *buttonsButton = new CardButton("button", this);
+		CardButton *proxButton = new CardButton("prox", this);
+		CardButton *proxGroundButton = new CardButton("proxground", this);
+		CardButton *tapButton = new CardButton("tap", this);
+		CardButton *clapButton = new CardButton("clap", this);
+		CardButton *timeoutButton = new CardButton("timeout", this);
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
@@ -192,12 +192,12 @@ namespace Aseba { namespace ThymioVPL
 		// actions
 		actionsLayout = new QVBoxLayout();
 
-		CardButton *moveButton = new CardButton("move", scene);
-		CardButton *colorTopButton = new CardButton("colortop", scene);
-		CardButton *colorBottomButton = new CardButton("colorbottom", scene);
-		CardButton *soundButton = new CardButton("sound", scene);
-		CardButton *timerButton = new CardButton("timer", scene);
-		CardButton *memoryButton = new CardButton("statefilter", scene);
+		CardButton *moveButton = new CardButton("move", this);
+		CardButton *colorTopButton = new CardButton("colortop", this);
+		CardButton *colorBottomButton = new CardButton("colorbottom", this);
+		CardButton *soundButton = new CardButton("sound", this);
+		CardButton *timerButton = new CardButton("timer", this);
+		CardButton *memoryButton = new CardButton("statefilter", this);
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
@@ -752,7 +752,7 @@ namespace Aseba { namespace ThymioVPL
 		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
 		
 		// desired sizes for width
-		const int idealContentWidth(1038+256*2);
+		const int idealContentWidth(1088+256*2);
 		const int uncompressibleWidth(
 			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
 			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 
@@ -769,6 +769,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// compute and set scale
 		const qreal scale(qMin(scaleHeight, scaleWidth));
+		viewportScale = scaleWidth;
 		return scale;
 	}
 	
@@ -825,7 +826,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set view and cards on sides
 		const QSize iconSize(256*scale, 256*scale);
-		viewportScale = scale;
 		setViewScale();
 		for(QList<CardButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
