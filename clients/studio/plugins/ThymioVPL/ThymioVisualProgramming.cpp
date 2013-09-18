@@ -190,6 +190,8 @@ namespace Aseba { namespace ThymioVPL
 		zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
 		zoomSlider->setValue(1);
+		zoomSlider->setInvertedAppearance(true);
+		zoomSlider->setInvertedControls(true);
 		sceneLayout->addWidget(zoomSlider);
 
 		horizontalLayout->addLayout(sceneLayout);
