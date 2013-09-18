@@ -137,7 +137,7 @@ namespace Aseba { namespace ThymioVPL
 		// line number
 		painter->setPen(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
 		painter->setFont(QFont("Arial", 50));
-		painter->drawText(QRect(830+trans-32, 240, 64, 64), Qt::AlignCenter, QString("%0").arg(getRow()));
+		painter->drawText(QRect(830+trans-64, 240, 128, 64), Qt::AlignCenter, QString("%0").arg(getRow()));
 
 		// card place and highlight
 		painter->setBrush(Qt::NoBrush);
