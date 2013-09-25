@@ -140,19 +140,31 @@ namespace Aseba
 		else
 			return expectPositiveConstant();
 	}
-	
-	//! Check and return either a 16 bits signed integer or the value of a valid constant
-	int Compiler::expectInt16LiteralOrConstant()
+
+	//! Check and return a 16 bits signed integer
+	int Compiler::expectInt16Literal()
 	{
 		if (tokens.front() == Token::TOKEN_OP_NEG)
 		{
 			tokens.pop_front();
 			return -expectAbsoluteInt16Literal(true);
 		}
-		else if (tokens.front() == Token::TOKEN_INT_LITERAL)
+		else
 		{
-			return expectAbsoluteInt16Literal(false);
+			if (tokens.front().iValue < 0) {
+				tokens.front().iValue *= -1;
+				return -expectAbsoluteInt16Literal(true);
+			}
+			else
+				return expectAbsoluteInt16Literal(false);
 		}
+	}
+	
+	//! Check and return either a 16 bits signed integer or the value of a valid constant
+	int Compiler::expectInt16LiteralOrConstant()
+	{
+		if (tokens.front() == Token::TOKEN_OP_NEG || tokens.front() == Token::TOKEN_INT_LITERAL)
+			return expectInt16Literal();
 		else
 			return expectConstant();
 	}
@@ -1030,7 +1042,7 @@ namespace Aseba
 		
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
-		
+	
 		switch (tokens.front())
 		{
 			case Token::TOKEN_PAR_OPEN:
@@ -1052,9 +1064,19 @@ namespace Aseba
 			
 			case Token::TOKEN_OP_NEG:
 			{
-				tokens.pop_front();
+				// do we have an immediate after? If yes, we have a negative number (special case)
+				if (tokens.size() >= 2 && tokens[1] == Token::TOKEN_INT_LITERAL) {
+					// immediate -> negate it, then perform again the switch
+					tokens.pop_front();
+					tokens[0].iValue *= -1;
+					tokens[0].sValue = L"-" + tokens[0].sValue;
+					return parseUnaryExpression();	// recursive call
+				}
+				else {
+					tokens.pop_front();
+					return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
+				}
 				
-				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
 			}
 			
 			case Token::TOKEN_OP_BIT_NOT:
@@ -1074,7 +1096,7 @@ namespace Aseba
 			case Token::TOKEN_INT_LITERAL:
 			{
 				// immediate
-				std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(pos, expectUInt16Literal()));
+				std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(pos, expectInt16Literal()));
 				tokens.pop_front();
 				return arrayCtor.release();
 			}

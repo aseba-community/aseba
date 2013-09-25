@@ -383,6 +383,7 @@ namespace Aseba
 		unsigned expectPositiveConstant() const;
 		int expectConstant() const;
 		unsigned expectPositiveInt16LiteralOrConstant() const;
+		int expectInt16Literal();
 		int expectInt16LiteralOrConstant();
 		unsigned expectGlobalEventId() const;
 		unsigned expectAnyEventId() const;
