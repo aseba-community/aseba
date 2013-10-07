@@ -335,7 +335,7 @@ Occurrences</source>
     <message>
         <location filename="HelpViewer.cpp" line="59"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
-        <translation>El archivo de ayuda %0 no se cargó con éxito. El error es: %1.El archivo de ayuda puede encontrarse en el directorio temporal del sistema. Revise por favor su instalación o reporte este error.</translation>
+        <translation>El archivo de ayuda %0 no se cargó correctamente. El error es: %1.El archivo de ayuda puede encontrarse en el directorio temporal del sistema. Revise por favor su instalación o reporte este error.</translation>
     </message>
     <message>
         <location filename="HelpViewer.cpp" line="63"/>
@@ -628,7 +628,7 @@ Occurrences</source>
     <message>
         <location filename="MainWindow.cpp" line="2498"/>
         <source>Desynchronised! Please reload.</source>
-        <translation>Desincronizado!Recargar por favor.</translation>
+        <translation>Desincronizado! Recargar por favor.</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="2551"/>
@@ -1026,7 +1026,7 @@ evento %0 : </translation>
     <message>
         <location filename="MainWindow.cpp" line="3461"/>
         <source>&amp;View</source>
-        <translation></translation>
+        <translation>&amp;Vista</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3469"/>
