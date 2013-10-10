@@ -261,7 +261,7 @@ namespace Enki
 
 	const AsebaVMDescription* AsebaFeedableEPuck::getDescription() const
 	{
-		const unsigned id(Aseba::clamp<unsigned>(vm.nodeId,0,9));
+		const unsigned id(Aseba::clamp<unsigned>(vm.nodeId-1,0,9));
 		ePuckName[6] = '0' + id;
 		PlaygroundEPuckVMDescription.name = ePuckName;
 		return &PlaygroundEPuckVMDescription;
@@ -271,8 +271,8 @@ namespace Enki
 	// local events, static so only visible in this file
 	
 	static const AsebaLocalEventDescription localEvents[] = {
-		{ "ir_sensors", "New IR sensors values available" },
-		{"camera", "New camera picture available"},
+		{ "ir_sensors", "IR sensors updated" },
+		{"camera", "camera updated"},
 		{ NULL, NULL }
 	};
 	
