@@ -241,11 +241,11 @@ namespace Enki
 		// set physical variables
 		leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
 		rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
-		Color c;
-		c.setR(toDoubleClamp(variables.colorR, 0.01, 0, 1));
-		c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
-		c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
-		setColor(c);
+		setColor(Color(
+			Aseba::clamp<double>(variables.colorR*0.01, 0, 1),
+			Aseba::clamp<double>(variables.colorG*0.01, 0, 1),
+			Aseba::clamp<double>(variables.colorB*0.01, 0, 1)
+		));
 		
 		// set motion
 		FeedableEPuck::controlStep(dt);
@@ -257,12 +257,12 @@ namespace Enki
 	extern "C" AsebaVMDescription PlaygroundEPuckVMDescription;
 	
 	// really ugly and *thread unsafe* hack to have e-puck with different names
-	static char ePuckName[9] = "e-puck  ";
+	static char ePuckName[] = "e-puck0";
 
 	const AsebaVMDescription* AsebaFeedableEPuck::getDescription() const
 	{
-		const unsigned id = std::max<unsigned>(0, std::min<unsigned>(9, vm.nodeId));
-		ePuckName[7] = '0' + id;
+		const unsigned id(Aseba::clamp<unsigned>(vm.nodeId,0,9));
+		ePuckName[6] = '0' + id;
 		PlaygroundEPuckVMDescription.name = ePuckName;
 		return &PlaygroundEPuckVMDescription;
 	}
@@ -313,16 +313,4 @@ namespace Enki
 		nativeFunctions[id](&vm);
 	}
 	
-	
-	// utility functions
-	
-	double AsebaFeedableEPuck::toDoubleClamp(sint16 val, double mul, double min, double max) const
-	{
-		double v = static_cast<double>(val) * mul;
-		if (v > max)
-			v = max;
-		else if (v < min)
-			v = min;
-		return v;
-	}
 } // Enki

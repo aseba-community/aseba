@@ -110,9 +110,6 @@ namespace Enki
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
 		virtual void callNativeFunction(uint16 id);
-		
-	protected:
-		double toDoubleClamp(sint16 val, double mul, double min, double max) const;
 	};
 } // Enki
 

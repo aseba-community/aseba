@@ -134,6 +134,13 @@ namespace Aseba
 	template<typename C>
 	typename C::value_type join(const C& values, const typename C::value_type& delim);
 	
+	//! Clamp a value to a range
+	template<typename T>
+	T clamp(T v, T minV, T maxV)
+	{
+		return v < minV ? minV : (v > maxV ? maxV : v);
+	}
+	
 	/*@}*/
 	
 };
