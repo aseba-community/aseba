@@ -1,13 +1,13 @@
 /*
 	Playground - An active arena to learn multi-robots programming
-	Copyright (C) 1999--2008:
+	Copyright (C) 1999--2013:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 	3D models
 	Copyright (C) 2008:
 		Basilio Noris
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2010:
+	Copyright (C) 2007--2013:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -29,7 +29,7 @@
 #include "../../common/productids.h"
 
 
-AsebaVMDescription vmDescription = {
+AsebaVMDescription PlaygroundEPuckVMDescription = {
 	"e-puck  ",
 	{
 		{ 1, "id" },	// Do not touch it
@@ -50,7 +50,7 @@ AsebaVMDescription vmDescription = {
 	}
 };
 
-AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend =
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energysend =
 {
 	"energy.send",
 	"send energy to pool",
@@ -60,7 +60,7 @@ AsebaNativeFunctionDescription PlaygroundNativeDescription_energysend =
 	}
 };
 
-AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive =
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyreceive =
 {
 	"energy.receive",
 	"receive energy from pool",
@@ -70,7 +70,7 @@ AsebaNativeFunctionDescription PlaygroundNativeDescription_energyreceive =
 	}
 };
 
-AsebaNativeFunctionDescription PlaygroundNativeDescription_energyamount =
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyamount =
 {
 	"energy.amount",
 	"get the amount of energy available in pool",

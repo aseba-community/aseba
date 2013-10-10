@@ -1,13 +1,13 @@
 /*
 	Playground - An active arena to learn multi-robots programming
-	Copyright (C) 1999--2008:
+	Copyright (C) 1999--2013:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 	3D models
 	Copyright (C) 2008:
 		Basilio Noris
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2012:
+	Copyright (C) 2007--2013:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -25,50 +25,32 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_H
-#define __CHALLENGE_H
+#ifndef __PLAYGROUND_VIEWER_H
+#define __PLAYGROUND_VIEWER_H
 
 #include <viewer/Viewer.h>
-#include <dashel/dashel.h>
-#include <QVector>
-
-class QPushButton;
-class QCheckBox;
-#ifdef USE_SDL
-typedef struct _SDL_Joystick SDL_Joystick;
-#endif
 
 namespace Enki
 {
-	class PlaygroundViewer : public ViewerWidget, public Dashel::Hub
+	class World;
+	
+	class PlaygroundViewer : public ViewerWidget
 	{
 	public:
-		// these have to be public for the aseba C interface
-		Dashel::Stream* stream;
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
 		QFont font;
 		unsigned energyPool;
-		#ifdef USE_SDL
-		QVector<SDL_Joystick *> joysticks;
-		#endif // USE_SDL
 		
 	public:
 		PlaygroundViewer(World* world);
 		virtual ~PlaygroundViewer();
-		World* getWorld() { return world; }
+		
+		World* getWorld() const;
+		static PlaygroundViewer* getInstance();
 		
 	protected:
 		virtual void renderObjectsTypesHook();
 		virtual void sceneCompletedHook();
-		
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-		
-		virtual void timerEvent(QTimerEvent * event);
 	};
 }
 
-#endif
-
+#endif // __PLAYGROUND_VIEWER_H

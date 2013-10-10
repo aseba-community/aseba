@@ -100,7 +100,7 @@ namespace Aseba
 	NodeToolRegistrer::NodeToolRegistrer()
 	{
 		ProductIds linearCameraPids;
-		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
+		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND_EPUCK << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
 		reg("LinearCameraViewPlugin", linearCameraPids, &createInstance<LinearCameraViewPlugin>);
 		reg("ThymioVisualProgramming", ASEBA_PID_THYMIO2, &createInstance<ThymioVPL::ThymioVisualProgramming>);
 	}

@@ -2,14 +2,14 @@ find_package(Qt4)
 
 if (QT4_FOUND AND ENKI_FOUND)
 	# SDL
-	find_package(SDL)
-	if (SDL_FOUND)
-		include_directories(${SDL_INCLUDE_DIR})
-		set(EXTRA_LIBS ${SDL_LIBRARY})
-		add_definitions("-DUSE_SDL")
-	elseif (SDL_FOUND)
-		set(EXTRA_LIBS "")
-	endif (SDL_FOUND)
+# 	find_package(SDL)
+# 	if (SDL_FOUND)
+# 		include_directories(${SDL_INCLUDE_DIR})
+# 		set(EXTRA_LIBS ${SDL_LIBRARY})
+# 		add_definitions("-DUSE_SDL")
+# 	elseif (SDL_FOUND)
+# 		set(EXTRA_LIBS "")
+# 	endif (SDL_FOUND)
 
 	find_package(OpenGL REQUIRED)
 	
@@ -21,8 +21,12 @@ if (QT4_FOUND AND ENKI_FOUND)
 	include_directories(${ENKI_INCLUDE_DIR})
 	
 	set(playground_SRCS
+		AsebaGlue.cpp
+		Door.cpp
+		EPuck.cpp
+		EPuck-descriptions.c
+		PlaygroundViewer.cpp
 		playground.cpp
-		playground-vm-description.c
 	)
 	
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_RCC_SRCS})
