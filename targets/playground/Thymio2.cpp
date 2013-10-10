@@ -80,7 +80,8 @@ namespace Enki
 		// run VM
 		AsebaVMRun(&vm, 1000);
 		
-		// reschedule a IR sensors and camera events if we are not in step by step
+		// TODO: change execution policy of local events to match the one of Thymio2
+		// reschedule local events if we are not in step by step
 		if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 		{
 			// TODO: implement events

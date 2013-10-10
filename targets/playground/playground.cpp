@@ -29,6 +29,7 @@
 #include "AsebaGlue.h"
 #include "Door.h"
 #include "EPuck.h"
+#include "Thymio2.h"
 #include "PlaygroundViewer.h"
 #include <QtXml>
 #include <QApplication>
@@ -258,18 +259,29 @@ int main(int argc, char *argv[])
 	
 	// Scan for e-puck
 	QDomElement ePuckE = domDocument.documentElement().firstChildElement("e-puck");
-	int ePuckCount = 0;
+	unsigned asebaServerCount(0);
 	while (!ePuckE.isNull())
 	{
-		char buffer[9];
-		strncpy(buffer, "e-puck  ", sizeof(buffer));
-		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ASEBA_DEFAULT_PORT+ePuckCount, ePuckCount + 1);
-		buffer[7] = '0' + ePuckCount++;
+		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(ASEBA_DEFAULT_PORT+asebaServerCount, asebaServerCount + 1));
+		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
-		//epuck->name = buffer;
+		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
+	}
+	
+	// Scan for Thymio 2
+	QDomElement thymioE(domDocument.documentElement().firstChildElement("thymio2"));
+	while (!thymioE.isNull())
+	{
+		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(ASEBA_DEFAULT_PORT+asebaServerCount));
+		asebaServerCount++;
+		thymio->pos.x = thymioE.attribute("x").toDouble();
+		thymio->pos.y = thymioE.attribute("y").toDouble();
+		thymio->angle = thymioE.attribute("angle").toDouble();
+		world.addObject(thymio);
+		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
 	
 	// Create viewer

@@ -25,6 +25,8 @@ if (QT4_FOUND AND ENKI_FOUND)
 		Door.cpp
 		EPuck.cpp
 		EPuck-descriptions.c
+		Thymio2.cpp
+		Thymio2-descriptions.c
 		PlaygroundViewer.cpp
 		playground.cpp
 	)

@@ -1,11 +1,4 @@
 /*
-	Playground - An active arena to learn multi-robots programming
-	Copyright (C) 1999--2013:
-		Stephane Magnenat <stephane at magnenat dot net>
-		(http://stephane.magnenat.net)
-	3D models
-	Copyright (C) 2008:
-		Basilio Noris
 	Aseba - an event-based framework for distributed robot control
 	Copyright (C) 2007--2013:
 		Stephane Magnenat <stephane at magnenat dot net>

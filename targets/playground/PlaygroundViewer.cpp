@@ -65,6 +65,7 @@ namespace Enki
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
 		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
+		// TODO: add display of Thymio 2 in EnkiViewer, then add alias here
 	}
 	
 	void PlaygroundViewer::sceneCompletedHook()
