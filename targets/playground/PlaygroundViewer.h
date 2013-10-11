@@ -28,7 +28,13 @@
 #ifndef __PLAYGROUND_VIEWER_H
 #define __PLAYGROUND_VIEWER_H
 
+#include "../../common/utils/utils.h"
 #include <viewer/Viewer.h>
+
+#define LOG_COLOR(t,c) Enki::PlaygroundViewer::getInstance()->log(t,c)
+#define LOG_INFO(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::white)
+#define LOG_WARN(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::yellow)
+#define LOG_ERR(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::red)
 
 namespace Enki
 {
@@ -38,6 +44,10 @@ namespace Enki
 	{
 	public:
 		QFont font;
+		QString logText[10];
+		QColor logColor[10];
+		Aseba::UnifiedTime logTime[10];
+		unsigned logPos;
 		unsigned energyPool;
 		
 	public:
@@ -46,6 +56,8 @@ namespace Enki
 		
 		World* getWorld() const;
 		static PlaygroundViewer* getInstance();
+		
+		void log(const QString& entry, const QColor& color);
 		
 	protected:
 		virtual void renderObjectsTypesHook();

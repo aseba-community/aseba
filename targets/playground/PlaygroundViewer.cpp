@@ -34,14 +34,13 @@ namespace Enki
 {
 	static PlaygroundViewer* playgroundViewer = 0;
 
-	PlaygroundViewer::PlaygroundViewer(World* world) : ViewerWidget(world), energyPool(INITIAL_POOL_ENERGY)
+	PlaygroundViewer::PlaygroundViewer(World* world) : 
+		ViewerWidget(world),
+		font("Courier", 10),
+		logPos(0),
+		energyPool(INITIAL_POOL_ENERGY)
 	{
-		font.setPixelSize(16);
-		#if QT_VERSION >= 0x040400
-		font.setLetterSpacing(QFont::PercentageSpacing, 130);
-		#elif (!defined(_MSC_VER))
-		#warning "Some feature have been disabled because you are using Qt < 4.4.0 !"
-		#endif
+		//font.setPixelSize(14);
 		if (playgroundViewer)
 			abort();
 		playgroundViewer = this;
@@ -60,6 +59,14 @@ namespace Enki
 	PlaygroundViewer* PlaygroundViewer::getInstance()
 	{
 		return playgroundViewer;
+	}
+	
+	void PlaygroundViewer::log(const QString& entry, const QColor& color)
+	{
+		logText[logPos] = entry;
+		logColor[logPos] = color;
+		logTime[logPos] = Aseba::UnifiedTime();
+		logPos = (logPos+1) % 10;
 	}
 	
 	void PlaygroundViewer::renderObjectsTypesHook()
@@ -95,5 +102,26 @@ namespace Enki
 		renderText(16, 22, scoreString, font);
 		
 		renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
+		
+		// console background
+		glEnable(GL_BLEND);
+		qglColor(QColor(0,0,0,128));
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glBegin(GL_QUADS);
+			glVertex2f(-1,-1);
+			glVertex2f(1,-1);
+			glVertex2f(1,-0.5);
+			glVertex2f(-1,-0.5);
+		glEnd();
+		// console text
+		for (unsigned i=0; i<10; ++i)
+		{
+			const unsigned j((logPos+9-i) % 10);
+			qglColor(logColor[j]);
+			renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+		}
 	}
 } // Enki

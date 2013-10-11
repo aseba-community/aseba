@@ -209,14 +209,14 @@ namespace Enki
 		Hub::step();
 		
 		// get physical variables
-		variables.prox[0] = static_cast<sint16>(infraredSensor0.finalValue);
-		variables.prox[1] = static_cast<sint16>(infraredSensor1.finalValue);
-		variables.prox[2] = static_cast<sint16>(infraredSensor2.finalValue);
-		variables.prox[3] = static_cast<sint16>(infraredSensor3.finalValue);
-		variables.prox[4] = static_cast<sint16>(infraredSensor4.finalValue);
-		variables.prox[5] = static_cast<sint16>(infraredSensor5.finalValue);
-		variables.prox[6] = static_cast<sint16>(infraredSensor6.finalValue);
-		variables.prox[7] = static_cast<sint16>(infraredSensor7.finalValue);
+		variables.prox[0] = static_cast<sint16>(infraredSensor0.getValue());
+		variables.prox[1] = static_cast<sint16>(infraredSensor1.getValue());
+		variables.prox[2] = static_cast<sint16>(infraredSensor2.getValue());
+		variables.prox[3] = static_cast<sint16>(infraredSensor3.getValue());
+		variables.prox[4] = static_cast<sint16>(infraredSensor4.getValue());
+		variables.prox[5] = static_cast<sint16>(infraredSensor5.getValue());
+		variables.prox[6] = static_cast<sint16>(infraredSensor6.getValue());
+		variables.prox[7] = static_cast<sint16>(infraredSensor7.getValue());
 		for (size_t i = 0; i < 60; i++)
 		{
 			variables.camR[i] = static_cast<sint16>(camera.image[i].r() * 100.);

@@ -150,6 +150,8 @@ int main(int argc, char *argv[])
 		worldColor
 	);
 	
+	// Create viewer
+	Enki::PlaygroundViewer viewer(&world);
 	
 	// Scan for walls
 	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");
@@ -283,9 +285,6 @@ int main(int argc, char *argv[])
 		world.addObject(thymio);
 		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
-	
-	// Create viewer
-	Enki::PlaygroundViewer viewer(&world);
 	
 	// Show and run
 	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");

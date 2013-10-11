@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <cassert>
 #include "AsebaGlue.h"
+#include "PlaygroundViewer.h"
 #include "../../transport/buffer/vm-buffer.h"
 #include "../../common/utils/FormatableString.h"
 // #include "../../vm/vm.h"
@@ -51,7 +52,7 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException e)
 		{
-			QMessageBox::critical(0, QApplication::tr("Aseba Playground"), QApplication::tr("Cannot create listening port %0: %1 for object of type %2").arg(port).arg(e.what()).arg(typeid(this).name()));
+			QMessageBox::critical(0, QApplication::tr("Aseba Playground"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
 			abort();
 		}
 	}
@@ -74,7 +75,7 @@ namespace Aseba
 			}
 			catch (Dashel::DashelException e)
 			{
-				qDebug() << "Cannot write to socket: " << e.what();
+				LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
 			}
 		}
 	}
@@ -99,10 +100,10 @@ namespace Aseba
 			if (this->stream)
 			{
 				closeStream(this->stream);
-				qDebug() << "Old client disconnected.";
+				LOG_WARN(QString("Old client disconnected from ") + this->stream->getTargetName().c_str());
 			}
 			this->stream = stream;
-			qDebug() << "New client connected.";
+			LOG_INFO(QString("New client connected from ") + stream->getTargetName().c_str());
 		}
 	}
 
@@ -131,7 +132,7 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException e)
 		{
-			qDebug() << "Cannot read from socket: " << e.what();
+			LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
 		}
 	}
 
@@ -147,10 +148,7 @@ namespace Aseba
 					it.key()->breakpointsCount = 0;
 			}
 		}
-		if (abnormal)
-			qDebug() << "Client has disconnected unexpectedly.";
-		else
-			qDebug() << "Client has disconnected properly.";
+		LOG_INFO(QString("Client disconnected properly from ") + stream->getTargetName().c_str());
 	}
 
 } // Aseba

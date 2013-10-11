@@ -25,6 +25,7 @@
 #include <string>
 #include <cassert>
 #include <cstdlib>
+#include <vector>
 #include "../types.h"
 
 namespace Aseba
