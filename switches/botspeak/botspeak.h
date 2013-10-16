@@ -76,6 +76,9 @@ namespace Aseba
 		Dashel::Stream* asebaStream;
 		unsigned nodeId;
 		
+		// events used for running botspeak code
+		CommonDefinitions commonDefinitions;
+		
 		// known variables until now
 		unsigned freeVariableIndex;
 		VariablesMap variablesMap;
@@ -129,6 +132,7 @@ namespace Aseba
 		void createBotspeakVarIfUndefined(const std::wstring& varName, unsigned varSize);
 		unsigned getVarAddress(const std::string& varName);
 		unsigned getVarSize(const std::string& varName);
+		unsigned eventId(const std::wstring& eventName) const;
 		void outputBotspeak(int value);
 		void outputBotspeak(const std::string& message, bool noEol=false);
 	};

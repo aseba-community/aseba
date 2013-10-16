@@ -173,7 +173,7 @@ namespace Aseba
 		// write back result
 		SetVariables(bridge->nodeId, lhs.address, SetVariables::VariablesVector(1, result)).serialize(bridge->asebaStream);
 		// update outputs
-		UserMessage(3).serialize(bridge->asebaStream);
+		UserMessage(bridge->eventId(L"update_outputs")).serialize(bridge->asebaStream);
 		bridge->asebaStream->flush();
 		if (bridge->verbose) cout << "Set address " << lhs.address << " to value " << result << endl;
 	}
@@ -188,6 +188,13 @@ namespace Aseba
 		runAndWait(false),
 		verbose(true)
 	{
+		// fill common definitions
+		commonDefinitions.events.push_back(NamedValue(L"start", 0));
+		commonDefinitions.events.push_back(NamedValue(L"stopped", 0));
+		commonDefinitions.events.push_back(NamedValue(L"running_ping", 0));
+		commonDefinitions.events.push_back(NamedValue(L"update_inputs", 0));
+		commonDefinitions.events.push_back(NamedValue(L"update_outputs", 0));
+		
 		// connect to the Aseba target
 		connect(asebaTarget);
 		
@@ -311,14 +318,14 @@ namespace Aseba
 		const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
 		if (userMsg)
 		{
-			if (userMsg->type == 1) // event stopped
+			if (userMsg->type == eventId(L"stopped"))
 			{
 				if (verbose) cout << "Execution completed" << endl;
 				if (runAndWait)
 					outputBotspeak("Done");
 				runAndWait = 0;
 			}
-			else if (userMsg->type == 2) // event running_ping
+			else if (userMsg->type == eventId(L"running_ping"))
 			{
 				if (verbose) cout << "." << endl;
 				outputBotspeak(".", true);
@@ -625,12 +632,6 @@ namespace Aseba
 		if (verbose) wcerr << "Aseba source:\n" << asebaSource;
 		
 		// compile
-		CommonDefinitions commonDefinitions;
-		commonDefinitions.events.push_back(NamedValue(L"start", 0));
-		commonDefinitions.events.push_back(NamedValue(L"stopped", 0));
-		commonDefinitions.events.push_back(NamedValue(L"running_ping", 0));
-		commonDefinitions.events.push_back(NamedValue(L"update_inputs", 0));
-		commonDefinitions.events.push_back(NamedValue(L"update_outputs", 0));
 		Error error;
 		BytecodeVector bytecode;
 		unsigned allocatedVariablesCount;
@@ -644,7 +645,7 @@ namespace Aseba
 		{
 			sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
 			Run(nodeId).serialize(asebaStream);
-			UserMessage(0).serialize(asebaStream);
+			UserMessage(eventId(L"start")).serialize(asebaStream);
 			asebaStream->flush();
 		}
 		else
@@ -676,7 +677,7 @@ namespace Aseba
 		if (!currentOperation.get() && !getValue.get() && !nextOperationsOp.empty())
 		{
 			// pending one, update inputs and schedule next
-			UserMessage(4).serialize(asebaStream);
+			UserMessage(eventId(L"update_inputs")).serialize(asebaStream);
 			asebaStream->flush();
 			// depending whether it is a get or a binary operation
 			if (nextOperationsOp.front() == "GET")
@@ -799,6 +800,15 @@ namespace Aseba
 		if (varIt == variablesMap.end())
 			throw runtime_error("Variable " + varName + " is not defined");
 		return varIt->second.second;
+	}
+	
+	//! return the identifier of a global event given by name, the event must exist
+	unsigned BotSpeakBridge::eventId(const std::wstring& eventName) const
+	{
+		size_t id;
+		const bool ok(commonDefinitions.events.contains(eventName, &id));
+		assert(ok);
+		return id;
 	}
 	
 	//! output a value to the Botspeak client, if any
