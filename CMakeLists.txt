@@ -62,6 +62,9 @@ find_library(ENKI_LIBRARY enki)
 find_library(ENKI_VIEWER_LIBRARY enkiviewer)
 if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 	set(ENKI_FOUND 1)
+	message(STATUS "Enki found")
+else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+	message(STATUS "Enki *not* found, simulation targets disabled")
 endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 
 # Aseba itself
