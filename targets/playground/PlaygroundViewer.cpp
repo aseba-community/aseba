@@ -120,8 +120,11 @@ namespace Enki
 		for (unsigned i=0; i<10; ++i)
 		{
 			const unsigned j((logPos+9-i) % 10);
-			qglColor(logColor[j]);
-			renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+			if (!logText[j].isEmpty())
+			{
+				qglColor(logColor[j]);
+				renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+			}
 		}
 	}
 } // Enki
