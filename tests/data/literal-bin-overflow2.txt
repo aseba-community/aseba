@@ -1,0 +1,4 @@
+# this should fail
+
+var j = -0b1000000000000000  # -(-32768) = 32768 -> overflow!
+
