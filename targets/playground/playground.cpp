@@ -35,6 +35,7 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QProcess>
 
 int main(int argc, char *argv[])
 {
@@ -260,16 +261,20 @@ int main(int argc, char *argv[])
 	}
 	
 	// Scan for e-puck
+	// TODO: make sure we do not try to open twice the same ports
+	//QSet<unsigned> portUsed;
 	QDomElement ePuckE = domDocument.documentElement().firstChildElement("e-puck");
 	unsigned asebaServerCount(0);
 	while (!ePuckE.isNull())
 	{
-		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(ASEBA_DEFAULT_PORT+asebaServerCount, asebaServerCount + 1));
+		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());	
+		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(port, asebaServerCount + 1));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
+		viewer.log(QString("New e-puck on port %0").arg(port), Qt::white);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
@@ -277,18 +282,58 @@ int main(int argc, char *argv[])
 	QDomElement thymioE(domDocument.documentElement().firstChildElement("thymio2"));
 	while (!thymioE.isNull())
 	{
-		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(ASEBA_DEFAULT_PORT+asebaServerCount));
+		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
+		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(port));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();
 		thymio->angle = thymioE.attribute("angle").toDouble();
 		world.addObject(thymio);
+		viewer.log(QString("New Thymio II on port %0").arg(port), Qt::white);
 		thymioE = thymioE.nextSiblingElement ("thymio2");
+	}
+	
+	// Scan for external processes
+	QList<QProcess*> processes;
+	QDomElement procssE(domDocument.documentElement().firstChildElement("process"));
+	while (!procssE.isNull())
+	{
+		const QString &command(procssE.attribute("command"));
+		// create process
+		processes.push_back(new QProcess());
+		processes.back()->setProcessChannelMode(QProcess::MergedChannels);
+		// make sure it is killed when we close the window
+		QObject::connect(processes.back(), SIGNAL(started()), &viewer, SLOT(processStarted()));
+		QObject::connect(processes.back(), SIGNAL(error(QProcess::ProcessError)), &viewer, SLOT(processError(QProcess::ProcessError)));
+		QObject::connect(processes.back(), SIGNAL(readyReadStandardOutput()), &viewer, SLOT(processReadyRead()));
+		QObject::connect(processes.back(), SIGNAL(finished(int, QProcess::ExitStatus)), &viewer, SLOT(processFinished(int, QProcess::ExitStatus)));
+		// start the process
+		if (!command.isEmpty() && command[0] == ':')
+		{
+			// relative to the application directory
+			processes.back()->start(QCoreApplication::applicationDirPath()+'/'+command.mid(1), QIODevice::ReadOnly);
+		}
+		else
+		{
+			// normal command line
+			processes.back()->start(command, QIODevice::ReadOnly);
+		}
+		procssE = procssE.nextSiblingElement("process");
 	}
 	
 	// Show and run
 	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.show();
+	const int exitValue(app.exec());
 	
-	return app.exec();
+	// Stop and delete ongoing processes
+	foreach(QProcess*process,processes)
+	{
+		process->terminate();
+		if (!process->waitForFinished(1000))
+			process->kill();
+		delete process;
+	}
+	
+	return exitValue;
 }

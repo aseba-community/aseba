@@ -30,8 +30,11 @@ if (QT4_FOUND AND ENKI_FOUND)
 		PlaygroundViewer.cpp
 		playground.cpp
 	)
+	qt4_wrap_cpp(playground_MOCS
+		PlaygroundViewer.h
+	)
 	
-	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_RCC_SRCS})
+	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${playground_RCC_SRCS})
 	
 	target_link_libraries(asebaplayground asebavmbuffer asebavm ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
 	install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)

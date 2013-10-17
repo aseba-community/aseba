@@ -29,9 +29,12 @@
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
 #include "EPuck.h"
+#include "../../common/utils/utils.h"
 
 namespace Enki
 {
+	using namespace Aseba;
+	
 	static PlaygroundViewer* playgroundViewer = 0;
 
 	PlaygroundViewer::PlaygroundViewer(World* world) : 
@@ -66,7 +69,59 @@ namespace Enki
 		logText[logPos] = entry;
 		logColor[logPos] = color;
 		logTime[logPos] = Aseba::UnifiedTime();
-		logPos = (logPos+1) % 10;
+		logPos = (logPos+1) % LOG_HISTORY_COUNT;
+	}
+	
+	void PlaygroundViewer::processStarted()
+	{
+		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
+		// do not display to avoid clutter
+		//log(tr("%0: Process started").arg(process->pid()), Qt::white);
+		Q_UNUSED(process);
+	}
+	
+	void PlaygroundViewer::processError(QProcess::ProcessError error)
+	{
+		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
+		switch (error)
+		{
+			case QProcess::FailedToStart:
+				log(tr("%0: Process failed to start").arg(process->pid()), Qt::red);
+				break;
+			case QProcess::Crashed:
+				log(tr("%0: Process crashed").arg(process->pid()), Qt::red);
+				break;
+			case QProcess::WriteError:
+				log(tr("%0: Write error").arg(process->pid()), Qt::red);
+				break;
+			case QProcess::ReadError:
+				log(tr("%0: Read error").arg(process->pid()), Qt::red);
+				break;
+			case QProcess::UnknownError:
+				log(tr("%0: Unknown error").arg(process->pid()), Qt::red);
+				break;
+			default:
+				break;
+		}
+		
+	}
+	
+	void PlaygroundViewer::processReadyRead()
+	{
+		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
+		while (process->canReadLine())
+			log(tr("%0: %1").arg(process->pid()).arg(process->readLine().constData()), Qt::yellow);
+	}
+	
+	void PlaygroundViewer::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+	{
+		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
+		// do not display to avoid clutter
+		/*if (exitStatus == QProcess::NormalExit)
+			log(tr("Process finished").arg(process->pid()), Qt::yellow);
+		else
+			log(tr("Process finished abnormally").arg(process->pid()), Qt::red);*/
+		Q_UNUSED(process);
 	}
 	
 	void PlaygroundViewer::renderObjectsTypesHook()
@@ -105,7 +160,7 @@ namespace Enki
 		
 		// console background
 		glEnable(GL_BLEND);
-		qglColor(QColor(0,0,0,128));
+		qglColor(QColor(0,0,0,200));
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
@@ -117,9 +172,9 @@ namespace Enki
 			glVertex2f(-1,-0.5);
 		glEnd();
 		// console text
-		for (unsigned i=0; i<10; ++i)
+		for (unsigned i=0; i<LOG_HISTORY_COUNT; ++i)
 		{
-			const unsigned j((logPos+9-i) % 10);
+			const unsigned j((logPos+LOG_HISTORY_COUNT+LOG_HISTORY_COUNT-1-i) % LOG_HISTORY_COUNT);
 			if (!logText[j].isEmpty())
 			{
 				qglColor(logColor[j]);
