@@ -62,7 +62,7 @@ namespace Aseba
 		
 		// comments #
 		QTextCharFormat commentFormat;
-		commentFormat.setForeground(Qt::gray);
+		commentFormat.setForeground(Qt::darkGreen);
 		rule.pattern = QRegExp("(?!\\*)#(?!\\*).*");   // '#' without '*' right after or before
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
