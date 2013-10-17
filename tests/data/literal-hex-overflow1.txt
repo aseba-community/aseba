@@ -1,0 +1,4 @@
+# this should fail (i > s16)
+
+var i = 0x10000
+
