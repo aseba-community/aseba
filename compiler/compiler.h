@@ -196,6 +196,7 @@ namespace Aseba
 		TranslatableError() : Error() {}
 		TranslatableError(const SourcePos& pos, ErrorCode error);
 		TranslatableError &arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError &arg(long int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
 		TranslatableError &arg(unsigned value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
 		TranslatableError &arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
 		TranslatableError &arg(const std::wstring& value);

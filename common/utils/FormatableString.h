@@ -73,6 +73,16 @@ namespace Aseba
 			BasicFormatableString &arg(int value, int fieldWidth = 0, int base = 10, charT fillChar = ' ');
 			
 			/*!
+			* Replace the next arg by a long int value.
+			* \param value Value used to replace the current argument.
+			* \param fieldWidth min width of the displayed number
+			* \param base Radix of the number (8, 10 or 16)
+			* \param fillChar Character used to pad the number to reach fieldWidth
+			* \see arg(const T& value)
+			*/
+			BasicFormatableString &arg(long int value, int fieldWidth = 0, int base = 10, charT fillChar = ' ');
+
+			/*!
 			* Replace the next arg by an int value.
 			* \param value Value used to replace the current argument.
 			* \param fieldWidth min width of the displayed number

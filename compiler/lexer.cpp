@@ -59,18 +59,24 @@ namespace Aseba
 	{
 		if (type == TOKEN_INT_LITERAL)
 		{
-			bool wasSigned = false;
-			if ((value.length() > 1) && (value[1] == 'x'))
-				iValue = wcstol(value.c_str() + 2, NULL, 16);
-			else if ((value.length() > 1) && (value[1] == 'b'))
-				iValue = wcstol(value.c_str() + 2, NULL, 2);
-			else
-			{
-				iValue = wcstol(value.c_str(), NULL, 10);
-				wasSigned = true;
+			long int decode;
+			bool wasUnsigned = false;
+			// all values are assumed to be signed 16-bits
+			if ((value.length() > 1) && (value[1] == 'x')) {
+				decode = wcstol(value.c_str() + 2, NULL, 16);
+				wasUnsigned = true;
 			}
-			if ((wasSigned == false) && (iValue > 32767))
-				iValue -= 65536;
+			else if ((value.length() > 1) && (value[1] == 'b')) {
+				decode = wcstol(value.c_str() + 2, NULL, 2);
+				wasUnsigned = true;
+			}
+			else
+				decode = wcstol(value.c_str(), NULL, 10);
+			if (decode >= 65536)
+				throw TranslatableError(pos, ERROR_INT16_OUT_OF_RANGE).arg(decode);
+			if (wasUnsigned && decode > 32767)
+				decode -= 65536;
+			iValue = decode;
 		}
 		else
 			iValue = 0;
