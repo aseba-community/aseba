@@ -11,7 +11,7 @@
     <message>
         <location filename="challenge.cpp" line="890"/>
         <source>Add a new robot</source>
-        <translation>Eines Roboters hinzufügen</translation>
+        <translation>Einen Roboter hinzufügen</translation>
     </message>
     <message>
         <location filename="challenge.cpp" line="892"/>
@@ -36,7 +36,7 @@
     <message>
         <location filename="challenge.cpp" line="902"/>
         <source>Quit</source>
-        <translation>Verlassen</translation>
+        <translation>Beenden</translation>
     </message>
 </context>
 <context>
