@@ -19,19 +19,21 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setData(0, "action");
 		setData(1, "move");
+		
+		new QGraphicsSvgItem (":/images/vpl_background_motor.svgz", this);
 
 		for(int i=0; i<2; i++)
 		{
 			QSlider *s = new QSlider(Qt::Vertical);
 			s->setRange(-10,10);
 			s->setStyleSheet(
-				"QSlider { border: 0px; padding: 0px; }"
+				"QSlider { border: 0px; padding: 0px; background: transparent; }"
 				"QSlider::groove:vertical { "
-					"border: 4px solid black; "
-					"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #00FF00, stop:0.25 #FFFF00, stop:0.5 #FF0000, stop:0.75 #FFFF00, stop:1 #00FF00 ); }"
+					"border: none; "
+					"background: transparent; }"
 				"QSlider::handle:vertical { "
-					"background: white; "
-					"border: 4px solid black; height: 44px; margin: -4px; }"
+					"background: transparent; "
+					"border: 4px solid black; height: 40px; margin: 0px; }"
 			);
 			s->setSliderPosition(0);
 
