@@ -31,6 +31,12 @@
 #include "EPuck.h"
 #include "../../common/utils/utils.h"
 
+#ifdef Q_OS_WIN32
+	#define Q_PID_PRINT size_t
+#else // Q_OS_WIN32
+	#define Q_PID_PRINT qint64
+#endif // Q_OS_WIN32
+
 namespace Enki
 {
 	using namespace Aseba;
@@ -76,7 +82,7 @@ namespace Enki
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
 		// do not display to avoid clutter
-		//log(tr("%0: Process started").arg(process->pid()), Qt::white);
+		//log(tr("%0: Process started").arg((Q_PID_PRINT)process->pid()), Qt::white);
 		Q_UNUSED(process);
 	}
 	
@@ -86,19 +92,19 @@ namespace Enki
 		switch (error)
 		{
 			case QProcess::FailedToStart:
-				log(tr("%0: Process failed to start").arg(process->pid()), Qt::red);
+				log(tr("%0: Process failed to start").arg((Q_PID_PRINT)process->pid()), Qt::red);
 				break;
 			case QProcess::Crashed:
-				log(tr("%0: Process crashed").arg(process->pid()), Qt::red);
+				log(tr("%0: Process crashed").arg((Q_PID_PRINT)process->pid()), Qt::red);
 				break;
 			case QProcess::WriteError:
-				log(tr("%0: Write error").arg(process->pid()), Qt::red);
+				log(tr("%0: Write error").arg((Q_PID_PRINT)process->pid()), Qt::red);
 				break;
 			case QProcess::ReadError:
-				log(tr("%0: Read error").arg(process->pid()), Qt::red);
+				log(tr("%0: Read error").arg((Q_PID_PRINT)process->pid()), Qt::red);
 				break;
 			case QProcess::UnknownError:
-				log(tr("%0: Unknown error").arg(process->pid()), Qt::red);
+				log(tr("%0: Unknown error").arg((Q_PID_PRINT)process->pid()), Qt::red);
 				break;
 			default:
 				break;
@@ -110,7 +116,7 @@ namespace Enki
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
 		while (process->canReadLine())
-			log(tr("%0: %1").arg(process->pid()).arg(process->readLine().constData()), Qt::yellow);
+			log(tr("%0: %1").arg((Q_PID_PRINT)process->pid()).arg(process->readLine().constData()), Qt::yellow);
 	}
 	
 	void PlaygroundViewer::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -118,9 +124,9 @@ namespace Enki
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
 		// do not display to avoid clutter
 		/*if (exitStatus == QProcess::NormalExit)
-			log(tr("Process finished").arg(process->pid()), Qt::yellow);
+			log(tr("Process finished").arg((Q_PID_PRINT)process->pid()), Qt::yellow);
 		else
-			log(tr("Process finished abnormally").arg(process->pid()), Qt::red);*/
+			log(tr("Process finished abnormally").arg((Q_PID_PRINT)process->pid()), Qt::red);*/
 		Q_UNUSED(process);
 	}
 	
