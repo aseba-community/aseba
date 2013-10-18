@@ -65,7 +65,10 @@ namespace Aseba { namespace ThymioVPL
 				const int y(boundingRectangle.y());
 				const int w(boundingRectangle.width());
 				const int h(boundingRectangle.height());
-				painter->drawPie(x,y,2*w,2*h,90*16, 90*16);
+				painter->setPen(QPen(colors[curState].second, 20, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->drawArc(x,y,2*w,2*h,(90+10)*16, (90-20)*16);
+				painter->setPen(QPen(colors[curState].first, 10, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->drawArc(x,y,2*w,2*h,(90+10)*16, (90-20)*16);
 			}
 			break;
 			default:
