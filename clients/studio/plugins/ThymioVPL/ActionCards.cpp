@@ -290,7 +290,7 @@ namespace Aseba { namespace ThymioVPL
 		CardWithBody::paint(painter, option, widget);
 		
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
-		painter->setBrush(Qt::blue);
+		painter->setBrush(Qt::darkBlue);
 		painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -angle*16*360/(2*M_PI));
 		
 		const float leftDuration(duration-float(timer->currentFrame())*40.f);
