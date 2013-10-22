@@ -86,10 +86,14 @@ namespace Aseba
 		{
 			if (isNumber(parts[1]))
 			{
-				const unsigned index(atoi(parts[1].c_str()));
+				unsigned index(atoi(parts[1].c_str()));
 				const unsigned varSize(bridge->getVarSize(parts[0]));
+				assert(varSize != 0);
 				if (index >= varSize)
-					throw runtime_error(FormatableString("Attempting to access variable %0 at index %1 past its size %2").arg(parts[0]).arg(index).arg(varSize));
+				{
+					cerr << FormatableString("Attempting to access variable %0 at index %1 past its size %2, accessing last element %3 instead").arg(parts[0]).arg(index).arg(varSize).arg(varSize-1) << endl;
+					index = varSize-1;
+				}
 				address = bridge->getVarAddress(parts[0]) + index;
 				GetVariables(bridge->nodeId, address, 1).serialize(bridge->asebaStream);
 				bridge->asebaStream->flush();
