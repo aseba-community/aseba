@@ -57,6 +57,12 @@ add_test(general-tuple-native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMA
 add_test(var-def-compat-issue135 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/var-def-compat-issue135.txt)
 add_test(array-indirect-access-issue134 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.txt)
 add_test(constdef ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef.txt)
+add_test(literal-overflow-check1 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-ok1.txt)
+add_test(literal-overflow-check2 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-ok2.txt)
+add_test(literal-hex1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex1.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex1.txt)
+add_test(literal-hex2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex2.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex2.txt)
+add_test(literal-bin1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin1.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin1.txt)
+add_test(literal-bin2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin2.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin2.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)
@@ -95,6 +101,13 @@ add_test(array-constant-access-fail ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail $
 add_test(constdef-collision-1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-1.txt)
 add_test(constdef-collision-2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-2.txt)
 add_test(constdef-overriding ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-overriding.txt)
+add_test(literal-overflow-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-fail1.txt)
+add_test(literal-overflow-fail2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-fail2.txt)
+add_test(literal-hex-overflow-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex-overflow1.txt)
+add_test(literal-hex-overflow-fail2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex-overflow2.txt)
+add_test(literal-bin-overflow-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin-overflow1.txt)
+add_test(literal-bin-overflow-fail2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin-overflow2.txt)
+
 
 # stress test the compiler, by simulating user's input
 # compiler should not crash. Exiting with an exception is OK

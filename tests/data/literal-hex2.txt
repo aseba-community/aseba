@@ -1,0 +1,9 @@
+var i = -0x7fff  # -(32767) = -32767
+var j = -0x8001  # -(-32767) = 32767
+var k = -0xffff  # -(-1) = 1
+
+var ok = 0
+
+if (i == -32767 and j == 32767 and k == 1) then
+	ok = 1
+end

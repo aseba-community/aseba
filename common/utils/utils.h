@@ -35,6 +35,9 @@ namespace Aseba
 	*/
 	/*@{*/
 	
+	//! Macro to avoid the warning "unused variable", if we have a valid reason to keep this variable
+	#define UNUSED(expr) do { (void)(expr); } while (0)
+	
 	//! Asserts a dynamic cast. Similar to the one in boost/cast.hpp
 	template<typename Derived, typename Base>
 	static inline Derived polymorphic_downcast(Base base)

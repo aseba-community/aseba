@@ -223,6 +223,12 @@ namespace Aseba
 		return *this;
 	}
 
+	TranslatableError &TranslatableError::arg(long int value, int fieldWidth, int base, wchar_t fillChar)
+	{
+		message.arg(value, fieldWidth, base, fillChar);
+		return *this;
+	}
+
 	TranslatableError &TranslatableError::arg(unsigned value, int fieldWidth, int base, wchar_t fillChar)
 	{
 		message.arg(value, fieldWidth, base, fillChar);

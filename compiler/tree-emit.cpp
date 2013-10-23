@@ -19,6 +19,7 @@
 */
 
 #include "tree.h"
+#include "../common/utils/utils.h"
 #include <cassert>
 #include <cstdlib>
 
@@ -401,6 +402,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
+		UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
 		
@@ -415,6 +417,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
+		UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
 		
@@ -431,6 +434,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
+		UNUSED(immediateChild);
 		
 		// load variable
 		children[0]->emit(bytecodes);
