@@ -44,7 +44,8 @@ namespace Aseba
 	}
 	
 	template<typename charT>
-	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(int value, int fieldWidth, int base, charT fillChar)
+	template<typename intT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::argInt(intT value, int fieldWidth, int base, charT fillChar)
 	{
 		typename std::basic_ostringstream<charT> oss;
 		oss << std::setbase(base);
@@ -61,41 +62,8 @@ namespace Aseba
 	}
 	
 	template<typename charT>
-	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(long int value, int fieldWidth, int base, charT fillChar)
-	{
-		typename std::basic_ostringstream<charT> oss;
-		oss << std::setbase(base);
-		oss.width(fieldWidth);
-		oss.fill(fillChar);
-
-		// transform value into S
-		oss << value;
-
-		proceedReplace(oss.str());
-
-		// return reference to this so that .arg can proceed further
-		return *this;
-	}
-
-	template<typename charT>
-	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(unsigned value, int fieldWidth, int base, charT fillChar)
-	{
-		typename std::basic_ostringstream<charT> oss;
-		oss << std::setbase(base);
-		oss.width(fieldWidth);
-		oss.fill(fillChar);
-		
-		// transform value into S
-		oss << value;
-	
-		proceedReplace(oss.str());
-		
-		// return reference to this so that .arg can proceed further
-		return *this;
-	}
-	
-	template<typename charT>
-	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(float value, int fieldWidth, int precision, charT fillChar)
+	template<typename floatT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::argFloat(floatT value, int fieldWidth, int precision, charT fillChar)
 	{
 		typename std::basic_ostringstream<charT> oss;
 		oss.precision(precision);
@@ -110,6 +78,36 @@ namespace Aseba
 		
 		// return reference to this so that .arg can proceed further
 		return *this;
+	}
+	
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(int value, int fieldWidth, int base, charT fillChar)
+	{
+		return argInt<int>(value, fieldWidth, base, fillChar);
+	}
+	
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(long int value, int fieldWidth, int base, charT fillChar)
+	{
+		return argInt<long int>(value, fieldWidth, base, fillChar);
+	}
+
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(unsigned value, int fieldWidth, int base, charT fillChar)
+	{
+		return argInt<unsigned>(value, fieldWidth, base, fillChar);
+	}
+	
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(float value, int fieldWidth, int precision, charT fillChar)
+	{
+		return argFloat<float>(value, fieldWidth, precision, fillChar);
+	}
+	
+	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(double value, int fieldWidth, int precision, charT fillChar)
+	{
+		return argFloat<double>(value, fieldWidth, precision, fillChar);
 	}
 	
 	template<typename charT>
