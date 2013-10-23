@@ -211,7 +211,7 @@ namespace Aseba { namespace ThymioVPL
 
 	bool Card::isAnyStateFilter() const
 	{
-		for (unsigned i=0; i<stateButtons.size(); ++i)
+		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
 		{
 			if (stateButtons[i]->getValue() != 0)
 				return true;
@@ -225,7 +225,7 @@ namespace Aseba { namespace ThymioVPL
 			return -1;
 
 		unsigned val=0;
-		for (unsigned i=0; i<stateButtons.size(); ++i)
+		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
 			val |= stateButtons[i]->getValue() << (i*2);
 
 		return val;
@@ -241,7 +241,7 @@ namespace Aseba { namespace ThymioVPL
 		if( val >= 0 )
 		{
 			setAdvanced(true);
-			for (unsigned i=0; i<stateButtons.size(); ++i)
+			for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
 			{
 				const int v((val >> (i*2)) & 0x3);
 				stateButtons[i]->setValue(v);
@@ -306,14 +306,14 @@ namespace Aseba { namespace ThymioVPL
 	
 	int CardWithButtons::getValue(unsigned i) const
 	{
-		if( i<buttons.size() )
+		if( i < (unsigned)buttons.size() )
 			return buttons.at(i)->getValue();
 		return -1;
 	}
 
 	void CardWithButtons::setValue(unsigned i, int value)
 	{
-		if (i < buttons.size())
+		if (i < (unsigned)buttons.size())
 			buttons.at(i)->setValue(value);
 		emit contentChanged();
 	}

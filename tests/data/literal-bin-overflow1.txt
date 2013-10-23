@@ -1,0 +1,4 @@
+# this should fail
+
+var j = 0b10000000000000000
+

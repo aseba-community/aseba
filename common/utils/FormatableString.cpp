@@ -61,6 +61,23 @@ namespace Aseba
 	}
 	
 	template<typename charT>
+	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(long int value, int fieldWidth, int base, charT fillChar)
+	{
+		typename std::basic_ostringstream<charT> oss;
+		oss << std::setbase(base);
+		oss.width(fieldWidth);
+		oss.fill(fillChar);
+
+		// transform value into S
+		oss << value;
+
+		proceedReplace(oss.str());
+
+		// return reference to this so that .arg can proceed further
+		return *this;
+	}
+
+	template<typename charT>
 	BasicFormatableString<charT> &BasicFormatableString<charT>::arg(unsigned value, int fieldWidth, int base, charT fillChar)
 	{
 		typename std::basic_ostringstream<charT> oss;

@@ -358,13 +358,13 @@ namespace Aseba { namespace ThymioVPL
 			{
 				// find where "if" block starts for the current event
 				for(unsigned int i=0; i<buttonToCodeMap.size(); i++)
-					if( buttonToCodeMap[i] >= block && buttonToCodeMap[i] < currentBlock &&
+					if( buttonToCodeMap[i] >= block && buttonToCodeMap[i] < (int)currentBlock &&
 						generatedCode[buttonToCodeMap[i]].find(L"if ") != wstring::npos )
 						currentBlock = buttonToCodeMap[i];
 			}
 			
 			for( unsigned int i=0; i<buttonToCodeMap.size(); i++)
-				if(buttonToCodeMap[i] >= currentBlock)
+				if(buttonToCodeMap[i] >= (int)currentBlock)
 					buttonToCodeMap[i]++;
 			
 			Q_ASSERT(currentBlock <= generatedCode.size());

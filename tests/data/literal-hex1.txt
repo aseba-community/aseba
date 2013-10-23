@@ -1,0 +1,12 @@
+# check the correct signed interpretation of hex literals
+
+var i = 0x7fff
+var j = 0x8000
+var k = 0xffff
+
+var ok = 0
+
+if (i == 32767 and j == -32768 and k == -1) then
+	ok = 1
+end
+
