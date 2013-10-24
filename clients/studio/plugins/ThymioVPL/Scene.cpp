@@ -214,10 +214,10 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	bool Scene::isAnyStateFilter() const
+	bool Scene::isAnyAdvancedFeature() const
 	{
 		for (PairConstItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
-			if ((*itr)->isAnyStateFilter())
+			if ((*itr)->isAnyAdvancedFeature())
 				return true;
 		return false;
 	}

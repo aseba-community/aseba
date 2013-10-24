@@ -1,6 +1,8 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSvgItem>
+#include <QSlider>
+#include <QGraphicsProxyWidget>
 #include <QtCore/qmath.h>
 
 #include "EventCards.h"
@@ -41,11 +43,12 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventCard::ProxEventCard(QGraphicsItem *parent, bool advanced) : 
-		CardWithButtons(true, true, advanced, parent)
+		CardWithButtonsAndRange(true, true, 700, 4000, 1000, 2000, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "prox");
 		
+		// front sensors
 		for(int i=0; i<5; ++i) 
 		{
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
@@ -63,7 +66,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
-		
+		// back sensors
 		for(int i=0; i<2; ++i) 
 		{
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
@@ -82,11 +85,12 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventCard::ProxGroundEventCard( QGraphicsItem *parent, bool advanced ) : 
-		CardWithButtons(true, false, advanced, parent)
+		CardWithButtonsAndRange(true, false, 0, 1023, 150, 300, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "proxground");
 		
+		// sensors
 		for(int i=0; i<2; ++i) 
 		{
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
@@ -101,6 +105,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
+		//connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
 	}
 	
 	// Tap Event

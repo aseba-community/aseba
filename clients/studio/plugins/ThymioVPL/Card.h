@@ -6,6 +6,7 @@
 #include <QList>
 
 class QMimeData;
+class QSlider;
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -67,15 +68,15 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const = 0;
 		virtual int getValue(unsigned i) const = 0;
 		virtual void setValue(unsigned i, int value) = 0;
-		bool isAnyValueSet() const;
+		virtual bool isAnyValueSet() const;
 		
 		unsigned stateFilterCount() const;
-		bool isAnyStateFilter() const;
 		int getStateFilter() const;
 		int getStateFilter(unsigned i) const;
 		void setStateFilter(int val);
 		
-		void setAdvanced(bool advanced);
+		virtual bool isAnyAdvancedFeature() const;
+		virtual void setAdvanced(bool advanced);
 		
 		void setScaleFactor(qreal factor);
 		
@@ -112,7 +113,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		CardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
-		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
 	protected:
 		bool up;
@@ -130,6 +132,43 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		QList<GeometryShapeButton*> buttons;
+	};
+	
+	class CardWithButtonsAndRange: public CardWithButtons
+	{
+	public:
+		CardWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
+		
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		virtual unsigned valuesCount() const;
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
+		virtual bool isAnyValueSet() const;
+		
+		virtual bool isAnyAdvancedFeature() const;
+		virtual void setAdvanced(bool advanced);
+		
+	public:
+		const int lowerBound;
+		const int upperBound;
+		const int range;
+		const int defaultLow;
+		const int defaultHigh;
+	
+	protected:
+		virtual void mousePressEvent( QGraphicsSceneMouseEvent * event);
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		
+		QRectF rangeRect() const;
+		float pixelToVal(float pixel) const;
+		float valToPixel(float val) const;
+		
+	protected:
+		int low; // low activation threshold (at right)
+		int high; // high activation threshold (at left)
+		bool lastPressedIn; // whether last mouse press event was in
+		bool showRangeControl; // whether we are in advanced mode
 	};
 	
 	/*@}*/

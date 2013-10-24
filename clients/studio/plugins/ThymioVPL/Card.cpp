@@ -13,6 +13,7 @@
 #include <QDropEvent>
 #include <QDebug>
 #include <cassert>
+#include <cmath>
 
 #include "Card.h"
 #include "Buttons.h"
@@ -209,7 +210,7 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 
-	bool Card::isAnyStateFilter() const
+	bool Card::isAnyAdvancedFeature() const
 	{
 		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
 		{
@@ -280,6 +281,11 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
+	CardWithNoValues::CardWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent):
+		Card(eventButton, advanced, parent)
+	{}
+	
+	
 	CardWithBody::CardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
 		Card(eventButton, advanced, parent),
 		up(up),
@@ -306,7 +312,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	int CardWithButtons::getValue(unsigned i) const
 	{
-		if( i < (unsigned)buttons.size() )
+		if (i < (unsigned)buttons.size())
 			return buttons.at(i)->getValue();
 		return -1;
 	}
@@ -319,8 +325,188 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardWithNoValues::CardWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent):
-		Card(eventButton, advanced, parent)
-	{}
+	CardWithButtonsAndRange::CardWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
+		CardWithButtons(eventButton, up, advanced, parent),
+		lowerBound(lowerBound),
+		upperBound(upperBound),
+		range(upperBound-lowerBound),
+		defaultLow(defaultLow),
+		defaultHigh(defaultHigh),
+		low(defaultLow),
+		high(defaultHigh),
+		lastPressedIn(false),
+		showRangeControl(advanced)
+	{
+	}
+	
+	void CardWithButtonsAndRange::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		// paint parent
+		CardWithButtons::paint(painter, option, widget);
+		
+		if (showRangeControl)
+		{
+			// draw selectors
+			const int x(32);
+			const int y(100);
+			const int w(192);
+			const int h(96);
+			const int lowPos(valToPixel(low));
+			const int highPos(valToPixel(high));
+			//qDebug() << range << low << lowPos << high << highPos;
+			// background ranges
+			painter->fillRect(x,y+20,highPos,h-40,Qt::red);
+			painter->fillRect(x+highPos,y+20,lowPos-highPos,h-40,Qt::darkGray);
+			painter->fillRect(x+lowPos,y+20,w-lowPos,h-40,Qt::lightGray);
+			// cursors
+			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+			painter->setBrush(Qt::white);
+			QPolygon highCursor;
+			highCursor << QPoint(x+highPos+2, y+2) << QPoint(x+highPos+46, y+2) << QPoint(x+highPos+2, y+46);
+			painter->drawConvexPolygon(highCursor);
+			QPolygon lowCursor;
+			lowCursor << QPoint(x+lowPos-2, y+50) << QPoint(x+lowPos-46, y+94) << QPoint(x+lowPos-2, y+94);
+			painter->drawConvexPolygon(lowCursor);
+			// rectangle
+			painter->setBrush(Qt::NoBrush);
+			painter->drawRect(x+2,y+2,w-4,h-4);
+		}
+	}
+	
+	void CardWithButtonsAndRange::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (!showRangeControl)
+		{
+			CardWithButtons::mousePressEvent(event);
+			return;
+		}
+		QPointF pos(event->pos());
+		lastPressedIn = (event->button() == Qt::LeftButton && rangeRect().contains(pos));
+		if (lastPressedIn)
+			mouseMoveEvent(event);
+	}
+	
+	void CardWithButtonsAndRange::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (!showRangeControl || !lastPressedIn)
+		{
+			CardWithButtons::mouseMoveEvent(event);
+			return;
+		}
+		
+		const QRectF& r(rangeRect());
+		QPointF pos(event->pos());
+		if (!((event->buttons() & Qt::LeftButton) && r.contains(pos)))
+		{
+			pos -= r.topLeft();
+			if (pos.y() >= 48 && pos.x() >= r.width())
+			{
+				low = lowerBound;
+				update();
+				emit contentChanged();
+			}
+			if (pos.y() < 48 && pos.x() <= 0)
+			{
+				high = upperBound;
+				update();
+				emit contentChanged();
+			}
+			return;
+		}
+		
+		pos -= r.topLeft();
+		if (pos.y() >= 48)
+		{
+			low = pixelToVal(pos.x());
+			low = std::min<int>(low, pixelToVal(50));
+			high = std::max(low, high);
+		}
+		else
+		{
+			high = pixelToVal(pos.x());
+			high = std::max<int>(high, pixelToVal(r.width()-50));
+			low = std::min(low, high);
+		}
+		update();
+		emit contentChanged();
+	}
+	
+	unsigned CardWithButtonsAndRange::valuesCount() const
+	{
+		return CardWithButtons::valuesCount() + 2;
+	}
+	
+	int CardWithButtonsAndRange::getValue(unsigned i) const
+	{
+		const unsigned buttonsCount(buttons.size());
+		if (i < buttonsCount)
+			return CardWithButtons::getValue(i);
+		i -= buttonsCount;
+		if (i == 0)
+			return low;
+		else
+			return high;
+	}
+
+	void CardWithButtonsAndRange::setValue(unsigned i, int value)
+	{
+		const unsigned buttonsCount(buttons.size());
+		if (i < buttonsCount)
+		{
+			CardWithButtons::setValue(i, value);
+		}
+		else
+		{
+			i -= buttonsCount;
+			if (i == 0)
+				low = value;
+			else
+				high = value;
+			emit contentChanged();
+		}
+	}
+	
+	bool CardWithButtonsAndRange::isAnyValueSet() const
+	{
+		for (unsigned i=0; i<CardWithButtons::valuesCount(); ++i)
+		{
+			if (getValue(i) > 0)
+				return true;
+		}
+		return false;
+	}
+	
+	bool CardWithButtonsAndRange::isAnyAdvancedFeature() const
+	{
+		return (low != defaultLow) || (high != defaultHigh);
+	}
+	
+	void CardWithButtonsAndRange::setAdvanced(bool advanced)
+	{
+		if (!advanced)
+		{
+			low = defaultLow;
+			high = defaultHigh;
+		}
+		CardWithButtons::setAdvanced(advanced);
+		showRangeControl = advanced;
+		emit contentChanged();
+	}
+	
+	QRectF CardWithButtonsAndRange::rangeRect() const
+	{
+		return QRectF(32,100,192,96);
+	}
+	
+	float CardWithButtonsAndRange::pixelToVal(float pixel) const
+	{
+		const float factor(1. - pixel/rangeRect().width());
+		return range * factor * factor + lowerBound;
+	}
+	
+	float CardWithButtonsAndRange::valToPixel(float val) const
+	{
+		return rangeRect().width()*(1. - sqrt((val-lowerBound)/float(range)));
+	}
 
 } } // namespace ThymioVPL / namespace Aseba

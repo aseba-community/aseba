@@ -179,10 +179,11 @@ namespace Aseba { namespace ThymioVPL
 		actionCardColor.setAlpha(255);
 	}
 	
-	bool EventActionPair::isAnyStateFilter() const
+	bool EventActionPair::isAnyAdvancedFeature() const
 	{
-		if (eventCard && eventCard->isAnyStateFilter())
+		if (eventCard && eventCard->isAnyAdvancedFeature())
 			return true;
+		// FIXME: this is ugly, there should be something similar to isAnyAdvancedFeature and event should have an intermediate card for advanced feature
 		if (actionCard && (actionCard->getName() == "statefilter"))
 			return true;
 		return false;

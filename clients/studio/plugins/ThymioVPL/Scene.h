@@ -30,7 +30,7 @@ namespace Aseba { namespace ThymioVPL
 		void setScale(qreal scale);
 		void setAdvanced(bool advanced);
 		bool getAdvanced() const { return advancedMode; }
-		bool isAnyStateFilter() const;
+		bool isAnyAdvancedFeature() const;
 		
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;

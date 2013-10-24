@@ -488,6 +488,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		wstring text;
 		bool first(true);
+		const unsigned slidersIndex(card.valuesCount()-2);
 		for(unsigned i=0; i<card.valuesCount(); ++i)
 		{
 			if (card.getValue(i) == 1)
@@ -495,7 +496,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] < 400";
+				text += L"] < " + toWstring(card.getValue(slidersIndex));
 				first = false;
 			} 
 			else if(card.getValue(i) == 2)
@@ -503,7 +504,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] > 500";
+				text += L"] > " + toWstring(card.getValue(slidersIndex+1));
 				first = false;
 			} 
 		}
@@ -514,22 +515,23 @@ namespace Aseba { namespace ThymioVPL
 	{
 		wstring text;
 		bool first(true);
-		for(unsigned i=0; i<card.valuesCount(); ++i)
+		const unsigned slidersIndex(card.valuesCount()-2);
+		for(unsigned i=0; i<slidersIndex; ++i)
 		{
 			if(card.getValue(i) == 1)
 			{
 				text += (first ? L"": L" and ");
-				text += L"prox.ground.reflected[";
+				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] < 150";
+				text += L"] < " + toWstring(card.getValue(slidersIndex));
 				first = false;
 			} 
 			else if(card.getValue(i) == 2)
 			{
 				text += (first ? L"": L" and ");
-				text += L"prox.ground.reflected[";
+				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] > 300";
+				text += L"] > " + toWstring(card.getValue(slidersIndex+1));
 				first = false;
 			} 
 		}

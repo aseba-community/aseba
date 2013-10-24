@@ -14,13 +14,13 @@ namespace Aseba { namespace ThymioVPL
 		ArrowButtonsEventCard(QGraphicsItem *parent=0, bool advanced=false);
 	};
 	
-	class ProxEventCard : public CardWithButtons
+	class ProxEventCard : public CardWithButtonsAndRange
 	{
 	public:
 		ProxEventCard(QGraphicsItem *parent=0, bool advanced=false);
 	};
 
-	class ProxGroundEventCard : public CardWithButtons
+	class ProxGroundEventCard : public CardWithButtonsAndRange
 	{
 	public:
 		ProxGroundEventCard(QGraphicsItem *parent=0, bool advanced=false);

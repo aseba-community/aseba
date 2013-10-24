@@ -194,9 +194,6 @@ namespace Aseba { namespace ThymioVPL
 	
 	void SoundActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-		
 		CardWithBody::paint(painter, option, widget);
 		
 		painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
@@ -363,5 +360,11 @@ namespace Aseba { namespace ThymioVPL
 			buttons.push_back(button);
 			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
 		}
-	}	
+	}
+	
+	/* FIXME: use that once infrastructure is better
+	bool StateFilterActionCard::isAnyAdvancedFeature() const
+	{
+		return true;
+	}*/
 } } // namespace ThymioVPL / namespace Aseba

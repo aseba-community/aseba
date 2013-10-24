@@ -42,7 +42,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		ColorActionCard(QGraphicsItem *parent, bool top);
 		
-		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
 	public:
 		virtual unsigned valuesCount() const { return 3; }
@@ -71,7 +71,7 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		SoundActionCard(QGraphicsItem *parent=0);
 		
-		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
 		virtual unsigned valuesCount() const { return 6; }
 		virtual int getValue(unsigned i) const;
