@@ -137,6 +137,11 @@ void AsebaNative_vecmax(AsebaVMState *vm);
 /*! Description of AsebaNative_vecsmax */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecmax;
 
+/*! Function to clamp a vector of values element by element */
+void AsebaNative_vecclamp(AsebaVMState *vm);
+/*! Description of AsebaNative_vecclamp*/
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecclamp;
+
 /*! Function to perform a dot product on a vector */
 void AsebaNative_vecdot(AsebaVMState *vm);
 /*! Description of AsebaNative_vecdot */
@@ -202,7 +207,7 @@ void AsebaNative_rand(AsebaVMState *vm);
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 
 /*! Embedded targets must know the size of ASEBA_NATIVES_STD_FUNCTIONS without having to compute them by hand, please update this when adding a new function */
-#define ASEBA_NATIVES_STD_COUNT 20
+#define ASEBA_NATIVES_STD_COUNT 21
 
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
@@ -215,6 +220,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	AsebaNative_vecdiv, \
 	AsebaNative_vecmin, \
 	AsebaNative_vecmax, \
+	AsebaNative_vecclamp, \
 	AsebaNative_vecdot, \
 	AsebaNative_vecstat, \
 	AsebaNative_vecargbounds, \
@@ -238,6 +244,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	&AsebaNativeDescription_vecdiv, \
 	&AsebaNativeDescription_vecmin, \
 	&AsebaNativeDescription_vecmax, \
+	&AsebaNativeDescription_vecclamp, \
 	&AsebaNativeDescription_vecdot, \
 	&AsebaNativeDescription_vecstat, \
 	&AsebaNativeDescription_vecargbounds, \

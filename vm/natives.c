@@ -571,6 +571,40 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_vecmax =
 	}
 };
 
+void AsebaNative_vecclamp(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 low = AsebaNativePopArg(vm);
+	uint16 high = AsebaNativePopArg(vm);
+	
+	// variable size
+	uint16 length = AsebaNativePopArg(vm);
+	
+	uint16 i;
+	for (i = 0; i < length; i++)
+	{
+		sint16 v = vm->variables[src++];
+		sint16 l = vm->variables[low++];
+		sint16 h = vm->variables[high++];
+		sint16 res = v > h ? h : (v < l ? l : v);
+		vm->variables[dest++] = res;
+	}
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_vecclamp =
+{
+	"math.clamp",
+	"clamp src to low/high bounds into dest, element by element",
+	{
+		{ -1, "dest" },
+		{ -1, "src" },
+		{ -1, "low" },
+		{ -1, "high" },
+		{ 0, 0 }
+	}
+};
 
 void AsebaNative_vecdot(AsebaVMState *vm)
 {
