@@ -166,6 +166,26 @@ namespace Aseba
 	 *
 	 */
 
+	/*
+	 * helper function to know if a MemoryVectorNode belonging to the tree of 'root' as a name
+	 * matching 'name'
+	 */
+	static bool matchNameInMemoryVector(Node *root, std::wstring name)
+	{
+		// do I match?
+		MemoryVectorNode* vector = dynamic_cast<MemoryVectorNode*>(root);
+		if (vector && vector->arrayName == name)
+			return true;
+
+		// search inside children
+		for (unsigned int i = 0; i < root->children.size(); i++)
+			if (matchNameInMemoryVector(root->children[i], name))
+				return true;
+
+		// definitly no match
+		return false;
+	}
+
 	//! This is the root node, take in charge the tree creation / deletion
 	Node* ProgramNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
 	{
@@ -202,6 +222,14 @@ namespace Aseba
 
 		// right vector can be anything
 		Node* rightVector = children[1];
+
+		// check if the left vector appears somewhere on the right side
+		if (matchNameInMemoryVector(rightVector, leftVector->arrayName))
+		{
+			// in such case, there is a risk of involuntary overwriting the content
+			// we need to throw in a temporary variable to avoid this risk
+
+		}
 
 		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
 
