@@ -135,6 +135,7 @@ namespace Aseba
 	{
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		AssignmentNode(const SourcePos& sourcePos, Node* left, Node* right);
 		virtual AssignmentNode* shallowCopy() { return new AssignmentNode(*this); }
 
 		virtual void checkVectorSize() const;
