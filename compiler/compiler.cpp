@@ -207,7 +207,7 @@ namespace Aseba
 		// expand the vectorial nodes into scalar operations
 		try
 		{
-			Node* expandedProgram(program->expandVectorialNodes(dump));
+			Node* expandedProgram(program->expandVectorialNodes(dump, this));
 			program.release();
 			program.reset(expandedProgram);
 		}
