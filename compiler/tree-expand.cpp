@@ -228,8 +228,21 @@ namespace Aseba
 		{
 			// in such case, there is a risk of involuntary overwriting the content
 			// we need to throw in a temporary variable to avoid this risk
+			std::auto_ptr<BlockNode> tempBlock(new BlockNode(sourcePos));
 
+			// tempVar = rightVector
+			std::auto_ptr<AssignmentNode> temp(compiler->allocateTemporaryVariable(sourcePos, rightVector->deepCopy()));
+			MemoryVectorNode* tempVar = dynamic_cast<MemoryVectorNode*>(temp->children[0]);
+			assert(tempVar);
+			tempBlock->children.push_back(temp.release());
+
+			// leftVector = tempVar
+			temp.reset(new AssignmentNode(sourcePos, leftVector->deepCopy(), tempVar->deepCopy()));
+			tempBlock->children.push_back(temp.release());
+
+			return tempBlock->expandVectorialNodes(dump, compiler); // tempBlock will be reclaimed
 		}
+		// else
 
 		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
 
