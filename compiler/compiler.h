@@ -356,6 +356,8 @@ namespace Aseba
 		typedef std::map<std::wstring, int> ConstantsMap;
 		//! Lookup table for event name => id
 		typedef std::map<std::wstring, unsigned> EventsMap;
+
+		friend class AssignmentNode;
 	
 	public:
 		Compiler();

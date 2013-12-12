@@ -1,0 +1,5 @@
+var a[5] = [1,2,3,4,5] # array constructor to initialise an array
+var b[3] = [a[1:2],0] # results in array b initialised to [2,3,0]
+a = a + [1,1,1,1,1] # add 1 to each element of array a
+a = [b[1]+2,a[0:3]] # results in [5,2,3,4,5]
+
