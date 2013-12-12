@@ -56,6 +56,7 @@ add_test(native-function-indirect ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp $
 add_test(general-tuple-native-function ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/general-tuple-native-function.txt)
 add_test(var-def-compat-issue135 ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/var-def-compat-issue135.txt)
 add_test(array-indirect-access-issue134 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-indirect-access-issue134.txt)
+add_test(array-overwrite1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-overwrite.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-overwrite.txt)
 
 
 # the following tests should fail
