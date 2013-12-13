@@ -67,7 +67,7 @@ namespace Aseba
 		//! Second pass to expand "abstract" nodes into more concrete ones
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		//! Third pass to expand vectorial operations into mutliple scalar ones
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
 		virtual ReturnType typeCheck() const;
 		//! Optimize this node, return the optimized node
@@ -122,7 +122,7 @@ namespace Aseba
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
 		virtual ProgramNode* shallowCopy() { return new ProgramNode(*this); }
 
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const { return L"ProgramBlock"; }
 		virtual std::wstring toNodeName() const { return L"program block"; }
@@ -135,10 +135,11 @@ namespace Aseba
 	{
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		AssignmentNode(const SourcePos& sourcePos, Node* left, Node* right);
 		virtual AssignmentNode* shallowCopy() { return new AssignmentNode(*this); }
 
 		virtual void checkVectorSize() const;
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual ReturnType typeCheck() const;
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -350,7 +351,7 @@ namespace Aseba
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		virtual ImmediateNode* shallowCopy() { return new ImmediateNode(*this); }
 
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual ReturnType typeCheck() const { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
@@ -526,7 +527,7 @@ namespace Aseba
 		virtual TupleVectorNode* shallowCopy() { return new TupleVectorNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"array of constants"; }
 		virtual void dump(std::wostream& dest, unsigned& indent) const;
@@ -557,7 +558,7 @@ namespace Aseba
 		virtual MemoryVectorNode* shallowCopy() { return new MemoryVectorNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"vector access"; }
 
@@ -582,7 +583,7 @@ namespace Aseba
 
 		virtual void checkVectorSize() const;
 		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0) { abort(); } // should not happen
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0) { abort(); } // should not happen
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"arithmetic assignment"; }
 
@@ -605,7 +606,7 @@ namespace Aseba
 		virtual UnaryArithmeticAssignmentNode* shallowCopy() { return new UnaryArithmeticAssignmentNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, unsigned int index = 0) { abort(); } // should not happen
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0) { abort(); } // should not happen
 		virtual std::wstring toWString() const;
 		virtual std::wstring toNodeName() const { return L"unary arithmetic assignment"; }
 	};

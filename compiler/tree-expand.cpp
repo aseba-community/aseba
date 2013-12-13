@@ -166,17 +166,37 @@ namespace Aseba
 	 *
 	 */
 
-	//! This is the root node, take in charge the tree creation / deletion
-	Node* ProgramNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	/*
+	 * helper function to know if a MemoryVectorNode belonging to the tree of 'root' as a name
+	 * matching 'name'
+	 */
+	static bool matchNameInMemoryVector(Node *root, std::wstring name)
 	{
-		Node* newMe = Node::expandVectorialNodes(dump, index);
+		// do I match?
+		MemoryVectorNode* vector = dynamic_cast<MemoryVectorNode*>(root);
+		if (vector && vector->arrayName == name)
+			return true;
+
+		// search inside children
+		for (unsigned int i = 0; i < root->children.size(); i++)
+			if (matchNameInMemoryVector(root->children[i], name))
+				return true;
+
+		// definitly no match
+		return false;
+	}
+
+	//! This is the root node, take in charge the tree creation / deletion
+	Node* ProgramNode::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
+	{
+		Node* newMe = Node::expandVectorialNodes(dump, compiler, index);
 
 		delete this;	// delete the whole (obsolete) vectorial tree
 		return newMe;
 	}
 
 	//! Generic implementation for non-vectorial nodes
-	Node* Node::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	Node* Node::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		// duplicate me
 		std::auto_ptr<Node> newMe(this->shallowCopy());
@@ -184,13 +204,13 @@ namespace Aseba
 
 		// recursively walk the tree and expand children (of the newly created tree)
 		for (unsigned int i = 0; i < this->children.size(); i++)
-			newMe->children.push_back(this->children[i]->expandVectorialNodes(dump, index));
+			newMe->children.push_back(this->children[i]->expandVectorialNodes(dump, compiler, index));
 
 		return newMe.release();
 	}
 
 	//! Assignment between vectors is expanded into multiple scalar assignments
-	Node* AssignmentNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	Node* AssignmentNode::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		assert(children.size() == 2);
 
@@ -203,6 +223,27 @@ namespace Aseba
 		// right vector can be anything
 		Node* rightVector = children[1];
 
+		// check if the left vector appears somewhere on the right side
+		if (matchNameInMemoryVector(rightVector, leftVector->arrayName))
+		{
+			// in such case, there is a risk of involuntary overwriting the content
+			// we need to throw in a temporary variable to avoid this risk
+			std::auto_ptr<BlockNode> tempBlock(new BlockNode(sourcePos));
+
+			// tempVar = rightVector
+			std::auto_ptr<AssignmentNode> temp(compiler->allocateTemporaryVariable(sourcePos, rightVector->deepCopy()));
+			MemoryVectorNode* tempVar = dynamic_cast<MemoryVectorNode*>(temp->children[0]);
+			assert(tempVar);
+			tempBlock->children.push_back(temp.release());
+
+			// leftVector = tempVar
+			temp.reset(new AssignmentNode(sourcePos, leftVector->deepCopy(), tempVar->deepCopy()));
+			tempBlock->children.push_back(temp.release());
+
+			return tempBlock->expandVectorialNodes(dump, compiler); // tempBlock will be reclaimed
+		}
+		// else
+
 		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
 
 		for (unsigned int i = 0; i < leftVector->getVectorSize(); i++)
@@ -210,8 +251,8 @@ namespace Aseba
 			// expand to left[i] = right[i]
 			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
 
-			assignment->children.push_back(leftVector->expandVectorialNodes(dump, i));
-			assignment->children.push_back(rightVector->expandVectorialNodes(dump, i));
+			assignment->children.push_back(leftVector->expandVectorialNodes(dump, compiler, i));
+			assignment->children.push_back(rightVector->expandVectorialNodes(dump, compiler, i));
 
 			block->children.push_back(assignment.release());
 		}
@@ -220,7 +261,7 @@ namespace Aseba
 	}
 
 	//! Expand to vector[index]
-	Node* TupleVectorNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	Node* TupleVectorNode::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		size_t total = 0;
 		size_t prevTotal = 0;
@@ -234,7 +275,7 @@ namespace Aseba
 			if (index < total)
 			{
 				// the index points to this child
-				return children[i]->expandVectorialNodes(dump, index-prevTotal);
+				return children[i]->expandVectorialNodes(dump, compiler, index-prevTotal);
 			}
 		}
 
@@ -244,7 +285,7 @@ namespace Aseba
 	}
 
 	//! Expand to memory[index]
-	Node* MemoryVectorNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	Node* MemoryVectorNode::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		assert(index < getVectorSize());
 
@@ -281,13 +322,13 @@ namespace Aseba
 			else
 				array.reset(new ArrayReadNode(sourcePos, arrayAddr, arraySize, arrayName));
 
-			array->children.push_back(children[0]->expandVectorialNodes(dump, index));
+			array->children.push_back(children[0]->expandVectorialNodes(dump, compiler, index));
 			return array.release();
 		}
 	}
 
 	//! Expand into a copy of itself
-	Node* ImmediateNode::expandVectorialNodes(std::wostream *dump, unsigned int index)
+	Node* ImmediateNode::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		assert(index == 0);
 

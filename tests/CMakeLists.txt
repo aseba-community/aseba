@@ -63,6 +63,7 @@ add_test(literal-hex1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRE
 add_test(literal-hex2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex2.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex2.txt)
 add_test(literal-bin1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin1.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin1.txt)
 add_test(literal-bin2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin2.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-bin2.txt)
+add_test(array-overwrite1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/array-overwrite.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/array-overwrite.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)
