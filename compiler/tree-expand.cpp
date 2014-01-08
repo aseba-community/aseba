@@ -222,16 +222,10 @@ namespace Aseba
 		Node* rightVector = children[1];
 
 		// check if the left vector appears somewhere on the right side
-		do {
-		if (matchNameInMemoryVector(rightVector, leftVector->arrayName))
+		if (matchNameInMemoryVector(rightVector, leftVector->arrayName) && leftVector->getVectorSize() > 1)
 		{
 			// in such case, there is a risk of involuntary overwriting the content
 			// we need to throw in a temporary variable to avoid this risk
-			
-			if (leftVector->getVectorSize() <= 1)
-				// scalar do not need such a trick
-				break;
-
 			std::auto_ptr<BlockNode> tempBlock(new BlockNode(sourcePos));
 
 			// tempVar = rightVector
@@ -246,7 +240,6 @@ namespace Aseba
 
 			return tempBlock->expandVectorialNodes(dump, compiler); // tempBlock will be reclaimed
 		}
-		} while(0);
 		// else
 
 		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
