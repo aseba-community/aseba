@@ -30,6 +30,7 @@
 // plugins
 
 #include "plugins/VariablesViewPlugin.h"
+#include "plugins/StopThymioPlugin.h"
 #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
 
 namespace Aseba
@@ -103,6 +104,7 @@ namespace Aseba
 		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
 		reg("LinearCameraViewPlugin", linearCameraPids, &createInstance<LinearCameraViewPlugin>);
 		reg("ThymioVisualProgramming", ASEBA_PID_THYMIO2, &createInstance<ThymioVPL::ThymioVisualProgramming>);
+		reg("StopThymioPlugin", ASEBA_PID_THYMIO2, &createInstance<StopThymioPlugin>);
 	}
 	
 	/*@}*/

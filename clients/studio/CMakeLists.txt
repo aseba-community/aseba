@@ -76,6 +76,7 @@ if (QT4_FOUND)
 	set(qt_plugins_SRCS
 		Plugin.cpp
 		plugins/VariablesViewPlugin.cpp
+		plugins/StopThymioPlugin.cpp
 		plugins/ThymioVPL/ThymioVisualProgramming.cpp
 		plugins/ThymioVPL/Buttons.cpp
 		plugins/ThymioVPL/Card.cpp
@@ -88,6 +89,7 @@ if (QT4_FOUND)
 	)
 	qt4_wrap_cpp(qt_plugins_MOCS
 		plugins/VariablesViewPlugin.h
+		plugins/StopThymioPlugin.h
 		plugins/ThymioVPL/ThymioVisualProgramming.h
 		plugins/ThymioVPL/Buttons.h
 		plugins/ThymioVPL/Card.h
