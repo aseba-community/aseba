@@ -495,7 +495,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] < 400";
+				text += L"] < 1500";
 				first = false;
 			} 
 			else if(card.getValue(i) == 2)
@@ -503,7 +503,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] > 500";
+				text += L"] > 2500";
 				first = false;
 			} 
 		}
