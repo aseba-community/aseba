@@ -129,10 +129,8 @@ namespace Aseba
 		Node* rightVector = children[1];
 
 		// create the replacement node
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
 		std::auto_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector, rightVector));
-		assignment->children.push_back(leftVector->deepCopy());
-		assignment->children.push_back(binary.release());
+		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos, leftVector->deepCopy(), binary.release()));
 
 		// let our children to stay with the new AssignmentNode
 		// otherwise they will be freed when we are cleared
@@ -249,12 +247,9 @@ namespace Aseba
 		for (unsigned int i = 0; i < leftVector->getVectorSize(); i++)
 		{
 			// expand to left[i] = right[i]
-			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos));
-
-			assignment->children.push_back(leftVector->expandVectorialNodes(dump, compiler, i));
-			assignment->children.push_back(rightVector->expandVectorialNodes(dump, compiler, i));
-
-			block->children.push_back(assignment.release());
+			block->children.push_back(new AssignmentNode(sourcePos,
+								      leftVector->expandVectorialNodes(dump, compiler, i),
+								      rightVector->expandVectorialNodes(dump, compiler, i)));
 		}
 
 		return block.release();
