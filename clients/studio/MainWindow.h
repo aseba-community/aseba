@@ -78,6 +78,7 @@ namespace Aseba
 	class TargetMemoryModel;
 	class MaskableNamedValuesVectorModel;
 	class NamedValuesVectorModel;
+	class ConstantsModel;
 	class StudioAeslEditor;
 	class AeslLineNumberSidebar;
 	class AeslBreakpointSidebar;
@@ -150,7 +151,8 @@ namespace Aseba
 
 		int vmMemorySize[2];
 	};
-		
+	
+	//! Tab holding code (instead of plot)
 	class ScriptTab
 	{
 	public:
@@ -175,6 +177,7 @@ namespace Aseba
 		AeslHighlighter *highlighter;
 	};
 	
+	//! Tab for a target node that is not connected
 	class AbsentNodeTab : public QWidget, public ScriptTab
 	{
 		Q_OBJECT
@@ -188,6 +191,7 @@ namespace Aseba
 		SavedPlugins savedPlugins;
 	};
 	
+	//! Tab for a connected target node
 	class NodeTab : public QSplitter, public ScriptTab, public VariableListener
 	{
 		Q_OBJECT
@@ -384,6 +388,7 @@ namespace Aseba
 		int* value;
 	};
 
+	//! Studio main window
 	class MainWindow : public QMainWindow
 	{
 		Q_OBJECT
@@ -546,7 +551,7 @@ namespace Aseba
 		
 		// models
 		MaskableNamedValuesVectorModel* eventsDescriptionsModel;
-		NamedValuesVectorModel* constantsDefinitionsModel;
+		ConstantsModel* constantsDefinitionsModel;
 		
 		// global buttons
 		QAction* loadAllAct;

@@ -60,6 +60,8 @@ namespace Aseba
 		void setEditable(bool editable);
 		
 		virtual bool moveRow(int oldRow, int& newRow);
+		
+		virtual bool validateName(const QString& name) const;
 
 	public slots:
 		void addNamedValue(const NamedValue& namedValue, int index = -1);
@@ -78,6 +80,17 @@ namespace Aseba
 	private:
 		QString tooltipText;
 		bool editable;
+	};
+	
+	class ConstantsModel: public NamedValuesVectorModel
+	{
+		Q_OBJECT
+	
+	public:
+		ConstantsModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
+		ConstantsModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		
+		virtual bool validateName(const QString& name) const;
 	};
 
 	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel

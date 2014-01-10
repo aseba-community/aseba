@@ -21,6 +21,7 @@
 #include "NamedValuesVectorModel.h"
 #include <QtDebug>
 #include <QtGui>
+#include <QMessageBox>
 
 namespace Aseba
 {
@@ -193,6 +194,8 @@ namespace Aseba
 		{
 			if (index.column() == 0)
 			{
+				if (!validateName(value.toString()))
+					return false;
 				namedValues->at(index.row()).name = value.toString().toStdWString();
 				emit dataChanged(index, index);
 				wasModified = true;
@@ -284,6 +287,46 @@ namespace Aseba
 		wasModified = true;
 
 		endRemoveRows();
+	}
+	
+	//! Validate name, returns true if valid, false and displays an error message otherwise
+	bool NamedValuesVectorModel::validateName(const QString& name) const
+	{
+		return true;
+	}
+	
+	// ****************************************************************************** //
+	
+	ConstantsModel::ConstantsModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent):
+		NamedValuesVectorModel(namedValues, tooltipText, parent)
+	{
+		
+	}
+	
+	ConstantsModel::ConstantsModel(NamedValuesVector* namedValues, QObject *parent):
+		NamedValuesVectorModel(namedValues, parent)
+	{
+		
+	}
+	
+	//! Name is valid if not already existing and not a keyword
+	bool ConstantsModel::validateName(const QString& name) const
+	{
+		Q_ASSERT(namedValues);
+		
+		if (namedValues->contains(name.toStdWString()))
+		{
+			QMessageBox::warning(0, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(name));
+			return false;
+		}
+		
+		if (Compiler::isKeyword(name.toStdWString()))
+		{
+			QMessageBox::warning(0, tr("Name is a keyword"), tr("Name <tt>%0</tt> cannot be used as a constant, because it is a language keyword.").arg(name));
+			return false;
+		}
+		
+		return true;
 	}
 
 	// ****************************************************************************** //

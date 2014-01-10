@@ -1582,7 +1582,7 @@ namespace Aseba
 		// create models
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
-		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel = new ConstantsModel(&commonDefinitions.constants, this);
 		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
 		
@@ -2571,11 +2571,7 @@ namespace Aseba
 
 		if (ok && !constantName.isEmpty())
 		{
-			if (commonDefinitions.constants.contains(constantName.toStdWString()))
-			{
-				QMessageBox::warning(this, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(constantName));
-			}
-			else
+			if (constantsDefinitionsModel->validateName(constantName))
 			{
 				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdWString(), constantValue));
 				recompileAll();
