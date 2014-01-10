@@ -17,9 +17,9 @@
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
-#include "Card.h"
-#include "EventCards.h"
-#include "ActionCards.h"
+#include "Block.h"
+#include "EventBlocks.h"
+#include "ActionBlocks.h"
 #include "Scene.h"
 #include "Buttons.h"
 
@@ -126,12 +126,12 @@ namespace Aseba { namespace ThymioVPL
 		// events
 		eventsLayout = new QVBoxLayout();
 
-		CardButton *buttonsButton = new CardButton("button", this);
-		CardButton *proxButton = new CardButton("prox", this);
-		CardButton *proxGroundButton = new CardButton("proxground", this);
-		CardButton *tapButton = new CardButton("tap", this);
-		CardButton *clapButton = new CardButton("clap", this);
-		CardButton *timeoutButton = new CardButton("timeout", this);
+		BlockButton *buttonsButton = new BlockButton("button", this);
+		BlockButton *proxButton = new BlockButton("prox", this);
+		BlockButton *proxGroundButton = new BlockButton("proxground", this);
+		BlockButton *tapButton = new BlockButton("tap", this);
+		BlockButton *clapButton = new BlockButton("clap", this);
+		BlockButton *timeoutButton = new BlockButton("timeout", this);
 
 		eventButtons.push_back(buttonsButton);
 		eventButtons.push_back(proxButton);
@@ -144,7 +144,7 @@ namespace Aseba { namespace ThymioVPL
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->setSpacing(0);
-		CardButton* button;
+		BlockButton* button;
 		eventsLayout->addWidget(eventsLabel);
 		foreach (button, eventButtons)
 		{
@@ -199,12 +199,12 @@ namespace Aseba { namespace ThymioVPL
 		// actions
 		actionsLayout = new QVBoxLayout();
 
-		CardButton *moveButton = new CardButton("move", this);
-		CardButton *colorTopButton = new CardButton("colortop", this);
-		CardButton *colorBottomButton = new CardButton("colorbottom", this);
-		CardButton *soundButton = new CardButton("sound", this);
-		CardButton *timerButton = new CardButton("timer", this);
-		CardButton *memoryButton = new CardButton("statefilter", this);
+		BlockButton *moveButton = new BlockButton("move", this);
+		BlockButton *colorTopButton = new BlockButton("colortop", this);
+		BlockButton *colorBottomButton = new BlockButton("colorbottom", this);
+		BlockButton *soundButton = new BlockButton("sound", this);
+		BlockButton *timerButton = new BlockButton("timer", this);
+		BlockButton *memoryButton = new BlockButton("statefilter", this);
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		
@@ -383,11 +383,11 @@ namespace Aseba { namespace ThymioVPL
 	{
 		scene->setColorScheme(eventColors.at(index), actionColors.at(index));
 		
-		for(QList<CardButton*>::iterator itr(eventButtons.begin());
+		for(QList<BlockButton*>::iterator itr(eventButtons.begin());
 			itr != eventButtons.end(); ++itr)
 			(*itr)->changeButtonColor(eventColors.at(index));
 
-		for(QList<CardButton*>::iterator itr(actionButtons.begin());
+		for(QList<BlockButton*>::iterator itr(actionButtons.begin());
 			itr != actionButtons.end(); ++itr)
 			(*itr)->changeButtonColor(actionColors.at(index));
 	}
@@ -523,9 +523,9 @@ namespace Aseba { namespace ThymioVPL
 		{
 			QDomElement element = document.createElement("buttonset");
 			
-			if( (*itr)->hasEventCard() ) 
+			if( (*itr)->hasEventBlock() ) 
 			{
-				const Card *card((*itr)->getEventCard());
+				const Block *card((*itr)->getEventBlock());
 				element.setAttribute("event-name", card->getName() );
 			
 				for(unsigned i=0; i<card->valuesCount(); ++i)
@@ -533,9 +533,9 @@ namespace Aseba { namespace ThymioVPL
 				element.setAttribute("state", card->getStateFilter());
 			}
 			
-			if( (*itr)->hasActionCard() ) 
+			if( (*itr)->hasActionBlock() ) 
 			{
-				const Card *card((*itr)->getActionCard());
+				const Block *card((*itr)->getActionBlock());
 				element.setAttribute("action-name", card->getName() );
 				for(unsigned i=0; i<card->valuesCount(); ++i)
 					element.setAttribute(QString("ab%0").arg(i), card->getValue(i));
@@ -577,39 +577,39 @@ namespace Aseba { namespace ThymioVPL
 				else if(element.tagName() == "buttonset")
 				{
 					QString cardName;
-					Card *eventCard = 0;
-					Card *actionCard = 0;
+					Block *eventBlock = 0;
+					Block *actionBlock = 0;
 					
 					if( !(cardName = element.attribute("event-name")).isEmpty() )
 					{
-						eventCard = Card::createCard(cardName,scene->getAdvanced());
-						if (!eventCard)
+						eventBlock = Block::createBlock(cardName,scene->getAdvanced());
+						if (!eventBlock)
 						{
 							QMessageBox::warning(this,tr("Loading"),
 												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
 							return;
 						}
 
-						for (unsigned i=0; i<eventCard->valuesCount(); ++i)
-							eventCard->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
-						eventCard->setStateFilter(element.attribute("state").toInt());
+						for (unsigned i=0; i<eventBlock->valuesCount(); ++i)
+							eventBlock->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
+						eventBlock->setStateFilter(element.attribute("state").toInt());
 					}
 					
 					if( !(cardName = element.attribute("action-name")).isEmpty() )
 					{
-						actionCard = Card::createCard(cardName,scene->getAdvanced());
-						if (!actionCard)
+						actionBlock = Block::createBlock(cardName,scene->getAdvanced());
+						if (!actionBlock)
 						{
 							QMessageBox::warning(this,tr("Loading"),
 												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
 							return;
 						}
 
-						for (unsigned i=0; i<actionCard->valuesCount(); ++i)
-							actionCard->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
+						for (unsigned i=0; i<actionBlock->valuesCount(); ++i)
+							actionBlock->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
 					}
 
-					scene->addEventActionPair(eventCard, actionCard);
+					scene->addEventActionsSet(eventBlock, actionBlock);
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -675,73 +675,73 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ArrowButtonsEventCard *card(new ArrowButtonsEventCard(0, scene->getAdvanced()));
+		ArrowButtonsEventBlock *card(new ArrowButtonsEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ProxEventCard *card(new ProxEventCard(0, scene->getAdvanced()));
+		ProxEventBlock *card(new ProxEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ProxGroundEventCard *card(new ProxGroundEventCard(0, scene->getAdvanced()));
+		ProxGroundEventBlock *card(new ProxGroundEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		TapEventCard *card(new TapEventCard(0, scene->getAdvanced()));
+		TapEventBlock *card(new TapEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ClapEventCard *card(new ClapEventCard(0, scene->getAdvanced()));
+		ClapEventBlock *card(new ClapEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addTimeoutEvent()
 	{
-		TimeoutEventCard *card(new TimeoutEventCard(0, scene->getAdvanced()));
+		TimeoutEventBlock *card(new TimeoutEventBlock(0, scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addMoveAction()
 	{
-		MoveActionCard *card(new MoveActionCard());
+		MoveActionBlock *card(new MoveActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 	
 	void ThymioVisualProgramming::addColorTopAction()
 	{
-		ColorActionCard *card(new TopColorActionCard());
+		ColorActionBlock *card(new TopColorActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 	
 	void ThymioVisualProgramming::addColorBottomAction()
 	{
-		ColorActionCard *card(new BottomColorActionCard());
+		ColorActionBlock *card(new BottomColorActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 
 	void ThymioVisualProgramming::addSoundAction()
 	{
-		SoundActionCard *card(new SoundActionCard());
+		SoundActionBlock *card(new SoundActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 	
 	void ThymioVisualProgramming::addTimerAction()
 	{
-		TimerActionCard *card(new TimerActionCard());
+		TimerActionBlock *card(new TimerActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 
 	void ThymioVisualProgramming::addMemoryAction()
 	{
-		StateFilterActionCard *card(new StateFilterActionCard());
+		StateFilterActionBlock *card(new StateFilterActionBlock());
 		view->ensureVisible(scene->addAction(card));
 	}
 	
@@ -836,10 +836,10 @@ namespace Aseba { namespace ThymioVPL
 		// set view and cards on sides
 		const QSize iconSize(256*scale, 256*scale);
 		setViewScale();
-		for(QList<CardButton*>::iterator itr = eventButtons.begin();
+		for(QList<BlockButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
-		for(QList<CardButton*>::iterator itr = actionButtons.begin();
+		for(QList<BlockButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
 	}

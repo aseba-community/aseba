@@ -2,7 +2,7 @@
 #define VPL_SCENE_H
 
 #include <QGraphicsScene>
-#include "EventActionPair.h"
+#include "EventActionsSet.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -16,9 +16,9 @@ namespace Aseba { namespace ThymioVPL
 		Scene(ThymioVisualProgramming *vpl);
 		~Scene();
 		
-		QGraphicsItem *addAction(Card *item);
-		QGraphicsItem *addEvent(Card *item);
-		void addEventActionPair(Card *event, Card *action);
+		QGraphicsItem *addAction(Block *item);
+		QGraphicsItem *addEvent(Block *item);
+		void addEventActionsSet(Block *event, Block *action);
 		void ensureOneEmptyPairAtEnd();
 
 		bool isEmpty() const;
@@ -38,15 +38,15 @@ namespace Aseba { namespace ThymioVPL
 		bool isSuccessful() const { return compiler.isSuccessful(); }
 		int getErrorLine() const { return compiler.getErrorLine(); }
 		int getSelectedPairId() const;
-		EventActionPair *getSelectedPair() const;
-		EventActionPair *getPairRow(int row) const;
+		EventActionsSet *getSelectedPair() const;
+		EventActionsSet *getPairRow(int row) const;
 		
 		void removePair(int row);
 		void insertPair(int row);
 		void recomputeSceneRect();
 		
-		typedef QList<EventActionPair *>::iterator PairItr;
-		typedef QList<EventActionPair *>::const_iterator PairConstItr;
+		typedef QList<EventActionsSet *>::iterator PairItr;
+		typedef QList<EventActionsSet *>::const_iterator PairConstItr;
 		
 		PairItr pairsBegin() { return eventActionPairs.begin(); }
 		PairItr pairsEnd() { return eventActionPairs.end(); }
@@ -75,15 +75,15 @@ namespace Aseba { namespace ThymioVPL
 		void rearrangeButtons(int row=0);
 		void relayout();
 		
-		EventActionPair *createNewEventActionPair();
+		EventActionsSet *createNewEventActionsSet();
 
 		ThymioVisualProgramming* vpl;
 		
-		QList<EventActionPair *> eventActionPairs;
+		QList<EventActionsSet *> eventActionPairs;
 		Compiler compiler;
 		
-		QColor eventCardColor;
-		QColor actionCardColor;
+		QColor eventBlockColor;
+		QColor actionBlockColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
 		qreal buttonSetHeight;

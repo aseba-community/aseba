@@ -13,21 +13,21 @@
 #include <cmath>
 #include <typeinfo>
 
-#include "EventActionPair.h"
+#include "EventActionsSet.h"
 #include "Buttons.h"
-#include "Card.h"
-#include "ActionCards.h"
+#include "Block.h"
+#include "ActionBlocks.h"
 #include "Scene.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
 {
-	EventActionPair::EventActionPair(int row, bool advanced, QGraphicsItem *parent) : 
+	EventActionsSet::EventActionsSet(int row, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
-		eventCard(0),
-		actionCard(0),
-		eventCardColor(QColor(0,191,255)),
-		actionCardColor(QColor(218,112,214)),
+		eventBlock(0),
+		actionBlock(0),
+		eventBlockColor(QColor(0,191,255)),
+		actionBlockColor(QColor(218,112,214)),
 		highlightEventButton(false),
 		highlightActionButton(false),
 		errorFlag(false),
@@ -51,23 +51,23 @@ namespace Aseba { namespace ThymioVPL
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
-	void EventActionPair::removeClicked()
+	void EventActionsSet::removeClicked()
 	{
 		polymorphic_downcast<Scene*>(scene())->removePair(data(1).toInt());
 	}
 	
-	void EventActionPair::addClicked()
+	void EventActionsSet::addClicked()
 	{
 		polymorphic_downcast<Scene*>(scene())->insertPair(data(1).toInt()+1);
 	}
 	
-	void EventActionPair::setSoleSelection()
+	void EventActionsSet::setSoleSelection()
 	{
 		scene()->clearSelection();
 		setSelected(true);
 	}
 	
-	void EventActionPair::repositionElements()
+	void EventActionsSet::repositionElements()
 	{
 		Scene* vplScene(dynamic_cast<Scene*>(scene()));
 		
@@ -90,13 +90,13 @@ namespace Aseba { namespace ThymioVPL
 		deleteButton->setPos(830+trans, 70);
 		addButton->setPos(450+trans/2, 378);
 		
-		if (actionCard)
-			actionCard->setPos(500+trans, 40);
+		if (actionBlock)
+			actionBlock->setPos(500+trans, 40);
 		
 		prepareGeometryChange();
 	}
 	
-	void EventActionPair::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void EventActionsSet::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -142,148 +142,148 @@ namespace Aseba { namespace ThymioVPL
 		// card place and highlight
 		painter->setBrush(Qt::NoBrush);
 		
-		if (eventCard)
+		if (eventBlock)
 		{
 			if (highlightEventButton)
 			{
-				eventCardColor.setAlpha(130);
-				painter->setPen(QPen(eventCardColor, 20));
+				eventBlockColor.setAlpha(130);
+				painter->setPen(QPen(eventBlockColor, 20));
 				painter->drawRoundedRect(30, 30, 276, 276, 5, 5);
 			}
 		}
 		else
 		{
 			if (!highlightEventButton)
-				eventCardColor.setAlpha(100);
-			painter->setPen(QPen(eventCardColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
+				eventBlockColor.setAlpha(100);
+			painter->setPen(QPen(eventBlockColor, 10, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->drawRoundedRect(45, 45, 246, 246, 5, 5);
 		}
-		eventCardColor.setAlpha(255);
+		eventBlockColor.setAlpha(255);
 		
-		if (actionCard)
+		if (actionBlock)
 		{
 			if (highlightActionButton)
 			{
-				actionCardColor.setAlpha(130);
-				painter->setPen(QPen(actionCardColor, 20));
+				actionBlockColor.setAlpha(130);
+				painter->setPen(QPen(actionBlockColor, 20));
 				painter->drawRoundedRect(490+trans, 30, 276, 276, 5, 5);
 			}
 		}
 		else
 		{
 			if (!highlightActionButton)
-				actionCardColor.setAlpha(100);
-			painter->setPen(QPen(actionCardColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
+				actionBlockColor.setAlpha(100);
+			painter->setPen(QPen(actionBlockColor, 10,	Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->drawRoundedRect(505+trans, 45, 246, 246, 5, 5);
 		}
-		actionCardColor.setAlpha(255);
+		actionBlockColor.setAlpha(255);
 	}
 	
-	bool EventActionPair::isAnyAdvancedFeature() const
+	bool EventActionsSet::isAnyAdvancedFeature() const
 	{
-		if (eventCard && eventCard->isAnyAdvancedFeature())
+		if (eventBlock && eventBlock->isAnyAdvancedFeature())
 			return true;
 		// FIXME: this is ugly, there should be something similar to isAnyAdvancedFeature and event should have an intermediate card for advanced feature
-		if (actionCard && (actionCard->getName() == "statefilter"))
+		if (actionBlock && (actionBlock->getName() == "statefilter"))
 			return true;
 		return false;
 	}
 	
-	bool EventActionPair::isEmpty() const
+	bool EventActionsSet::isEmpty() const
 	{
-		return (!hasEventCard() && !hasActionCard());
+		return (!hasEventBlock() && !hasActionBlock());
 	}
 
-	void EventActionPair::setColorScheme(QColor eventColor, QColor actionColor)
+	void EventActionsSet::setColorScheme(QColor eventColor, QColor actionColor)
 	{
-		eventCardColor = eventColor;
-		actionCardColor = actionColor;
+		eventBlockColor = eventColor;
+		actionBlockColor = actionColor;
 		
-		if( eventCard )
-			eventCard->setBackgroundColor(eventColor);
-		if( actionCard )
-			actionCard->setBackgroundColor(actionColor);
+		if( eventBlock )
+			eventBlock->setBackgroundColor(eventColor);
+		if( actionBlock )
+			actionBlock->setBackgroundColor(actionColor);
 	}
 
-	void EventActionPair::setRow(int row) 
+	void EventActionsSet::setRow(int row) 
 	{ 
 		setData(1,row); 
-		if( eventCard )
-			eventCard->setParentID(row);
-		if( actionCard )
-			actionCard->setParentID(row);
+		if( eventBlock )
+			eventBlock->setParentID(row);
+		if( actionBlock )
+			actionBlock->setParentID(row);
 		repositionElements();
 	}
 	
-	void EventActionPair::removeEventCard() 
+	void EventActionsSet::removeEventBlock() 
 	{
-		if( eventCard ) 
+		if( eventBlock ) 
 		{
-			disconnect(eventCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
-			scene()->removeItem( eventCard );
-			eventCard->deleteLater();
-			eventCard = 0;
+			disconnect(eventBlock, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
+			scene()->removeItem( eventBlock );
+			eventBlock->deleteLater();
+			eventBlock = 0;
 			polymorphic_downcast<Scene*>(scene())->recompile();
 		}
 	}
 
-	void EventActionPair::addEventCard(Card *event) 
+	void EventActionsSet::addEventBlock(Block *event) 
 	{ 
-		removeEventCard();
-		event->setBackgroundColor(eventCardColor);
+		removeEventBlock();
+		event->setBackgroundColor(eventBlockColor);
 		event->setPos(40, 40);
 		event->setEnabled(true);
 		event->setParentItem(this);
 		event->setParentID(data(1).toInt());
-		eventCard = event;
+		eventBlock = event;
 		
 		emit contentChanged();
-		connect(eventCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
+		connect(eventBlock, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
 	}
 	
-	void EventActionPair::removeActionCard()
+	void EventActionsSet::removeActionBlock()
 	{
-		if( actionCard )
+		if( actionBlock )
 		{
-			disconnect(actionCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
-			scene()->removeItem( actionCard );
-			actionCard->deleteLater();
-			actionCard = 0;
+			disconnect(actionBlock, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
+			scene()->removeItem( actionBlock );
+			actionBlock->deleteLater();
+			actionBlock = 0;
 			polymorphic_downcast<Scene*>(scene())->recompile();
 		}
 	}
 
-	void EventActionPair::addActionCard(Card *action) 
+	void EventActionsSet::addActionBlock(Block *action) 
 	{ 
-		removeActionCard();
-		action->setBackgroundColor(actionCardColor);
+		removeActionBlock();
+		action->setBackgroundColor(actionBlockColor);
 		action->setPos(500+trans, 40);
 		action->setEnabled(true);
 		action->setParentItem(this);
 		action->setParentID(data(1).toInt());
-		actionCard = action;
+		actionBlock = action;
 		
 		emit contentChanged();
-		connect(actionCard, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
+		connect(actionBlock, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
 	}
 	
-	void EventActionPair::setAdvanced(bool advanced)
+	void EventActionsSet::setAdvanced(bool advanced)
 	{
 		advancedMode = advanced;
-		if (eventCard)
-			eventCard->setAdvanced(advanced);
+		if (eventBlock)
+			eventBlock->setAdvanced(advanced);
 		// remove any "state setter" action card
-		if (!advanced && actionCard && typeid(*actionCard) == typeid(StateFilterActionCard))
+		if (!advanced && actionBlock && typeid(*actionBlock) == typeid(StateFilterActionBlock))
 		{
-			scene()->removeItem(actionCard);
-			delete actionCard;
-			actionCard = 0;
+			scene()->removeItem(actionBlock);
+			delete actionBlock;
+			actionBlock = 0;
 		}
 		
 		repositionElements();
 	}
 	
-	void EventActionPair::setErrorStatus(bool flag)
+	void EventActionsSet::setErrorStatus(bool flag)
 	{
 		if (flag != errorFlag)
 		{
@@ -292,16 +292,16 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	void EventActionPair::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
+	void EventActionsSet::dragEnterEvent( QGraphicsSceneDragDropEvent *event )
 	{
-		if ( event->mimeData()->hasFormat("EventActionPair") || 
-			 event->mimeData()->hasFormat("Card") )
+		if ( event->mimeData()->hasFormat("EventActionsSet") || 
+			 event->mimeData()->hasFormat("Block") )
 		{
-			if( event->mimeData()->hasFormat("CardType") )
+			if( event->mimeData()->hasFormat("BlockType") )
 			{
-				if( event->mimeData()->data("CardType") == QString("event").toLatin1() )
+				if( event->mimeData()->data("BlockType") == QString("event").toLatin1() )
 					highlightEventButton = true;
-				else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
+				else if( event->mimeData()->data("BlockType") == QString("action").toLatin1() )
 					highlightActionButton = true;
 			}
 
@@ -313,10 +313,10 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 	}
 	
-	void EventActionPair::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+	void EventActionsSet::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if ( event->mimeData()->hasFormat("Card") || 
-			 event->mimeData()->hasFormat("EventActionPair") )
+		if ( event->mimeData()->hasFormat("Block") || 
+			 event->mimeData()->hasFormat("EventActionsSet") )
 		{
 			highlightEventButton = false;
 			highlightActionButton = false;
@@ -328,11 +328,11 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 	}
 
-	void EventActionPair::dropEvent(QGraphicsSceneDragDropEvent *event)
+	void EventActionsSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if ( event->mimeData()->hasFormat("Card") )
+		if ( event->mimeData()->hasFormat("Block") )
 		{
-			QByteArray cardData(event->mimeData()->data("Card"));
+			QByteArray cardData(event->mimeData()->data("Block"));
 			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
 			
 			int parentID;
@@ -344,36 +344,36 @@ namespace Aseba { namespace ThymioVPL
 				int state;
 				dataStream >> cardName >> state;
 				
-				Card *card(Card::createCard(cardName, advancedMode));
+				Block *card(Block::createBlock(cardName, advancedMode));
 				if( card ) 
 				{
 					event->setDropAction(Qt::MoveAction);
 					event->accept();
 					
-					if( event->mimeData()->data("CardType") == QString("event").toLatin1() )
+					if( event->mimeData()->data("BlockType") == QString("event").toLatin1() )
 					{
 						if (parentID >= 0)
-							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeEventCard();
+							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeEventBlock();
 						if (advancedMode)
 						{
 							if (parentID == -1)
 							{
-								if (eventCard)
-									card->setStateFilter(eventCard->getStateFilter());
+								if (eventBlock)
+									card->setStateFilter(eventBlock->getStateFilter());
 								else
 									card->setStateFilter(0);
 							}
 							else
 								card->setStateFilter(state);
 						}
-						addEventCard(card);
+						addEventBlock(card);
 						polymorphic_downcast<Scene*>(scene())->ensureOneEmptyPairAtEnd();
 					}
-					else if( event->mimeData()->data("CardType") == QString("action").toLatin1() )
+					else if( event->mimeData()->data("BlockType") == QString("action").toLatin1() )
 					{
 						if (parentID >= 0)
-							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeActionCard();
-						addActionCard(card);
+							polymorphic_downcast<Scene*>(scene())->getPairRow(parentID)->removeActionBlock();
+						addActionBlock(card);
 						polymorphic_downcast<Scene*>(scene())->ensureOneEmptyPairAtEnd();
 					}
 					
@@ -395,7 +395,7 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 	}
 
-	void EventActionPair::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	void EventActionsSet::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
@@ -407,7 +407,7 @@ namespace Aseba { namespace ThymioVPL
 		dataStream << getRow();
 
 		QMimeData *mime = new QMimeData;
-		mime->setData("EventActionPair", data);
+		mime->setData("EventActionsSet", data);
 		
 		Q_ASSERT(scene()->views().size() > 0);
 		QGraphicsView* view(scene()->views()[0]);

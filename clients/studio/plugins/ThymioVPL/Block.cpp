@@ -15,14 +15,14 @@
 #include <cassert>
 #include <cmath>
 
-#include "Card.h"
+#include "Block.h"
 #include "Buttons.h"
-#include "EventCards.h"
-#include "ActionCards.h"
+#include "EventBlocks.h"
+#include "ActionBlocks.h"
 
 namespace Aseba { namespace ThymioVPL
 {
-	void Card::ThymioBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void Block::ThymioBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -30,7 +30,7 @@ namespace Aseba { namespace ThymioVPL
 		drawBody(painter, 0, yShift, up, bodyColor);
 	}
 	
-	void Card::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
+	void Block::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
 	{
 		// button shape
 		painter->setPen(Qt::NoPen);
@@ -47,37 +47,37 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Factory for buttons
-	Card* Card::createCard(const QString& name, bool advancedMode)
+	Block* Block::createBlock(const QString& name, bool advancedMode)
 	{
 		if ( name == "button" )
-			return new ArrowButtonsEventCard(0, advancedMode);
+			return new ArrowButtonsEventBlock(0, advancedMode);
 		else if ( name == "prox" )
-			return new ProxEventCard(0, advancedMode);
+			return new ProxEventBlock(0, advancedMode);
 		else if ( name == "proxground" )
-			return new ProxGroundEventCard(0, advancedMode);
+			return new ProxGroundEventBlock(0, advancedMode);
 		else if ( name == "tap" )
-			return new TapEventCard(0, advancedMode);
+			return new TapEventBlock(0, advancedMode);
 		else if ( name == "clap" )
-			return new ClapEventCard(0, advancedMode);
+			return new ClapEventBlock(0, advancedMode);
 		else if ( name == "timeout" )
-			return new TimeoutEventCard(0, advancedMode);
+			return new TimeoutEventBlock(0, advancedMode);
 		else if ( name == "move" )
-			return new MoveActionCard();
+			return new MoveActionBlock();
 		else if ( name == "colortop" )
-			return new TopColorActionCard();
+			return new TopColorActionBlock();
 		else if ( name == "colorbottom" )
-			return new BottomColorActionCard();
+			return new BottomColorActionBlock();
 		else if ( name == "sound" )
-			return new SoundActionCard();
+			return new SoundActionBlock();
 		else if ( name == "timer" )
-			return new TimerActionCard();
+			return new TimerActionBlock();
 		else if ( name == "statefilter" )
-			return new StateFilterActionCard();
+			return new StateFilterActionBlock();
 		else
 			return 0;
 	}
 	
-	Card::Card(bool eventButton, bool advanced, QGraphicsItem *parent) : 
+	Block::Block(bool eventButton, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		backgroundColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
 		parentID(-1),
@@ -90,12 +90,12 @@ namespace Aseba { namespace ThymioVPL
 			addAdvancedModeButtons();
 	}
 
-	Card::~Card() 
+	Block::~Block() 
 	{
 		// doing nothing
 	}
 	
-	void Card::addAdvancedModeButtons()
+	void Block::addAdvancedModeButtons()
 	{
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
@@ -111,7 +111,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	void Card::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
@@ -122,7 +122,7 @@ namespace Aseba { namespace ThymioVPL
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
-	QPixmap Card::image(qreal factor)
+	QPixmap Block::image(qreal factor)
 	{
 		const QRectF br(boundingRect());
 		QPixmap pixmap(br.width()*factor, br.height()*factor);
@@ -137,7 +137,7 @@ namespace Aseba { namespace ThymioVPL
 		return pixmap;
 	}
 	
-	void Card::render(QPainter& painter)
+	void Block::render(QPainter& painter)
 	{
 		QStyleOptionGraphicsItem opt;
 		opt.exposedRect = boundingRect();
@@ -154,7 +154,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	QMimeData* Card::mimeData() const
+	QMimeData* Block::mimeData() const
 	{
 		QByteArray data;
 		QDataStream dataStream(&data, QIODevice::WriteOnly);
@@ -167,13 +167,13 @@ namespace Aseba { namespace ThymioVPL
 			dataStream << getValue(i);
 		
 		QMimeData *mime = new QMimeData;
-		mime->setData("Card", data);
-		mime->setData("CardType", getType().toLatin1());
+		mime->setData("Block", data);
+		mime->setData("BlockType", getType().toLatin1());
 		
 		return mime;
 	}
 
-	void Card::setAdvanced(bool advanced)
+	void Block::setAdvanced(bool advanced)
 	{
 		trans = advanced ? 64 : 0;
 		
@@ -195,12 +195,12 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	unsigned Card::stateFilterCount() const
+	unsigned Block::stateFilterCount() const
 	{
 		return stateButtons.size();
 	}
 	
-	bool Card::isAnyValueSet() const
+	bool Block::isAnyValueSet() const
 	{
 		for (unsigned i=0; i<valuesCount(); ++i)
 		{
@@ -210,7 +210,7 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 
-	bool Card::isAnyAdvancedFeature() const
+	bool Block::isAnyAdvancedFeature() const
 	{
 		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
 		{
@@ -220,7 +220,7 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 	
-	int Card::getStateFilter() const
+	int Block::getStateFilter() const
 	{
 		if (stateButtons.empty())
 			return -1;
@@ -232,12 +232,12 @@ namespace Aseba { namespace ThymioVPL
 		return val;
 	}
 	
-	int Card::getStateFilter(unsigned i) const
+	int Block::getStateFilter(unsigned i) const
 	{
 		return stateButtons[i]->getValue();
 	}
 	
-	void Card::setStateFilter(int val)
+	void Block::setStateFilter(int val)
 	{	
 		if( val >= 0 )
 		{
@@ -253,7 +253,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	}
 
-	void Card::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	void Block::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
@@ -281,43 +281,43 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardWithNoValues::CardWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent):
-		Card(eventButton, advanced, parent)
+	BlockWithNoValues::BlockWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent):
+		Block(eventButton, advanced, parent)
 	{}
 	
 	
-	CardWithBody::CardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		Card(eventButton, advanced, parent),
+	BlockWithBody::BlockWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
+		Block(eventButton, advanced, parent),
 		up(up),
 		bodyColor(Qt::white)
 	{
 	}
 	
-	void CardWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void BlockWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		Card::paint(painter, option, widget);
+		Block::paint(painter, option, widget);
 		ThymioBody::drawBody(painter, 128, 128, up, bodyColor);
 	}
 	
 	
-	CardWithButtons::CardWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		CardWithBody(eventButton, up, advanced, parent)
+	BlockWithButtons::BlockWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
+		BlockWithBody(eventButton, up, advanced, parent)
 	{
 	}
 	
-	unsigned CardWithButtons::valuesCount() const
+	unsigned BlockWithButtons::valuesCount() const
 	{
 		return buttons.size();
 	}
 	
-	int CardWithButtons::getValue(unsigned i) const
+	int BlockWithButtons::getValue(unsigned i) const
 	{
 		if (i < (unsigned)buttons.size())
 			return buttons.at(i)->getValue();
 		return -1;
 	}
 
-	void CardWithButtons::setValue(unsigned i, int value)
+	void BlockWithButtons::setValue(unsigned i, int value)
 	{
 		if (i < (unsigned)buttons.size())
 			buttons.at(i)->setValue(value);
@@ -325,8 +325,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardWithButtonsAndRange::CardWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
-		CardWithButtons(eventButton, up, advanced, parent),
+	BlockWithButtonsAndRange::BlockWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
+		BlockWithButtons(eventButton, up, advanced, parent),
 		lowerBound(lowerBound),
 		upperBound(upperBound),
 		range(upperBound-lowerBound),
@@ -339,10 +339,10 @@ namespace Aseba { namespace ThymioVPL
 	{
 	}
 	
-	void CardWithButtonsAndRange::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void BlockWithButtonsAndRange::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		// paint parent
-		CardWithButtons::paint(painter, option, widget);
+		BlockWithButtons::paint(painter, option, widget);
 		
 		if (showRangeControl)
 		{
@@ -373,11 +373,11 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	void CardWithButtonsAndRange::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	void BlockWithButtonsAndRange::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (!showRangeControl)
 		{
-			CardWithButtons::mousePressEvent(event);
+			BlockWithButtons::mousePressEvent(event);
 			return;
 		}
 		QPointF pos(event->pos());
@@ -386,11 +386,11 @@ namespace Aseba { namespace ThymioVPL
 			mouseMoveEvent(event);
 	}
 	
-	void CardWithButtonsAndRange::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+	void BlockWithButtonsAndRange::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (!showRangeControl || !lastPressedIn)
 		{
-			CardWithButtons::mouseMoveEvent(event);
+			BlockWithButtons::mouseMoveEvent(event);
 			return;
 		}
 		
@@ -431,16 +431,16 @@ namespace Aseba { namespace ThymioVPL
 		emit contentChanged();
 	}
 	
-	unsigned CardWithButtonsAndRange::valuesCount() const
+	unsigned BlockWithButtonsAndRange::valuesCount() const
 	{
-		return CardWithButtons::valuesCount() + 2;
+		return BlockWithButtons::valuesCount() + 2;
 	}
 	
-	int CardWithButtonsAndRange::getValue(unsigned i) const
+	int BlockWithButtonsAndRange::getValue(unsigned i) const
 	{
 		const unsigned buttonsCount(buttons.size());
 		if (i < buttonsCount)
-			return CardWithButtons::getValue(i);
+			return BlockWithButtons::getValue(i);
 		i -= buttonsCount;
 		if (i == 0)
 			return low;
@@ -448,12 +448,12 @@ namespace Aseba { namespace ThymioVPL
 			return high;
 	}
 
-	void CardWithButtonsAndRange::setValue(unsigned i, int value)
+	void BlockWithButtonsAndRange::setValue(unsigned i, int value)
 	{
 		const unsigned buttonsCount(buttons.size());
 		if (i < buttonsCount)
 		{
-			CardWithButtons::setValue(i, value);
+			BlockWithButtons::setValue(i, value);
 		}
 		else
 		{
@@ -466,9 +466,9 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	bool CardWithButtonsAndRange::isAnyValueSet() const
+	bool BlockWithButtonsAndRange::isAnyValueSet() const
 	{
-		for (unsigned i=0; i<CardWithButtons::valuesCount(); ++i)
+		for (unsigned i=0; i<BlockWithButtons::valuesCount(); ++i)
 		{
 			if (getValue(i) > 0)
 				return true;
@@ -476,35 +476,35 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 	
-	bool CardWithButtonsAndRange::isAnyAdvancedFeature() const
+	bool BlockWithButtonsAndRange::isAnyAdvancedFeature() const
 	{
 		return (low != defaultLow) || (high != defaultHigh);
 	}
 	
-	void CardWithButtonsAndRange::setAdvanced(bool advanced)
+	void BlockWithButtonsAndRange::setAdvanced(bool advanced)
 	{
 		if (!advanced)
 		{
 			low = defaultLow;
 			high = defaultHigh;
 		}
-		CardWithButtons::setAdvanced(advanced);
+		BlockWithButtons::setAdvanced(advanced);
 		showRangeControl = advanced;
 		emit contentChanged();
 	}
 	
-	QRectF CardWithButtonsAndRange::rangeRect() const
+	QRectF BlockWithButtonsAndRange::rangeRect() const
 	{
 		return QRectF(32,100,192,96);
 	}
 	
-	float CardWithButtonsAndRange::pixelToVal(float pixel) const
+	float BlockWithButtonsAndRange::pixelToVal(float pixel) const
 	{
 		const float factor(1. - pixel/rangeRect().width());
 		return range * factor * factor + lowerBound;
 	}
 	
-	float CardWithButtonsAndRange::valToPixel(float val) const
+	float BlockWithButtonsAndRange::valToPixel(float val) const
 	{
 		return rangeRect().width()*(1. - sqrt((val-lowerBound)/float(range)));
 	}

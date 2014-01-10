@@ -61,6 +61,7 @@ if (QT4_FOUND)
 		TargetModels.cpp
 		CustomWidgets.cpp
 		AeslEditor.cpp
+		Plugin.cpp
 		translations/CompilerTranslator.cpp
 	)
 	qt4_wrap_cpp(qt_common_MOCS
@@ -73,32 +74,9 @@ if (QT4_FOUND)
 	add_library(asebaqtcommon ${qt_common_SRCS} ${qt_common_MOCS})
 	
 	# plugins
-	set(qt_plugins_SRCS
-		Plugin.cpp
-		plugins/VariablesViewPlugin.cpp
-		plugins/StopThymioPlugin.cpp
-		plugins/ThymioVPL/ThymioVisualProgramming.cpp
-		plugins/ThymioVPL/Buttons.cpp
-		plugins/ThymioVPL/Card.cpp
-		plugins/ThymioVPL/EventCards.cpp
-		plugins/ThymioVPL/ActionCards.cpp
-		plugins/ThymioVPL/EventActionPair.cpp
-		plugins/ThymioVPL/Scene.cpp
-		plugins/ThymioVPL/Compiler.cpp
-		plugins/ThymioVPL/CompilerVisitors.cpp
-	)
-	qt4_wrap_cpp(qt_plugins_MOCS
-		plugins/VariablesViewPlugin.h
-		plugins/StopThymioPlugin.h
-		plugins/ThymioVPL/ThymioVisualProgramming.h
-		plugins/ThymioVPL/Buttons.h
-		plugins/ThymioVPL/Card.h
-		plugins/ThymioVPL/ActionCards.h
-		plugins/ThymioVPL/EventActionPair.h
-		plugins/ThymioVPL/Scene.h
-	)
-	add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
+	add_subdirectory(plugins)
 	
+	# resources
 	qt4_add_resources(resfiles asebastudio.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

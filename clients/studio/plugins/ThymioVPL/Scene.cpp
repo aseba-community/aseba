@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include "Scene.h"
-#include "Card.h"
+#include "Block.h"
 #include "ThymioVisualProgramming.h"
 
 using namespace std;
@@ -17,14 +17,14 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsScene(vpl),
 		vpl(vpl),
 		compiler(*this),
-		eventCardColor(QColor(0,191,255)),
-		actionCardColor(QColor(218,112,214)),
+		eventBlockColor(QColor(0,191,255)),
+		actionBlockColor(QColor(218,112,214)),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
 	{
 		// create initial button
-		EventActionPair *p(createNewEventActionPair());
+		EventActionsSet *p(createNewEventActionsSet());
 		buttonSetHeight = p->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
@@ -35,13 +35,13 @@ namespace Aseba { namespace ThymioVPL
 		clear();
 	}
 
-	QGraphicsItem *Scene::addAction(Card *item) 
+	QGraphicsItem *Scene::addAction(Block *item) 
 	{
-		EventActionPair* selectedPair(getSelectedPair());
+		EventActionsSet* selectedPair(getSelectedPair());
 		if (selectedPair)
 		{
 			// replaced action of selected pair
-			selectedPair->addActionCard(item);
+			selectedPair->addActionBlock(item);
 			ensureOneEmptyPairAtEnd();
 			return selectedPair;
 		}
@@ -50,31 +50,31 @@ namespace Aseba { namespace ThymioVPL
 			// find a pair without any action
 			for (PairItr pItr(pairsBegin()); pItr != pairsEnd(); ++pItr)
 			{
-				EventActionPair* p(*pItr);
-				if (!p->hasActionCard())
+				EventActionsSet* p(*pItr);
+				if (!p->hasActionBlock())
 				{
-					p->addActionCard(item);
+					p->addActionBlock(item);
 					clearSelection();
 					ensureOneEmptyPairAtEnd();
 					return p;
 				}
 			}
 			// none found, add a new pair and acc action there
-			EventActionPair* p(createNewEventActionPair());
-			p->addActionCard(item);
+			EventActionsSet* p(createNewEventActionsSet());
+			p->addActionBlock(item);
 			clearSelection();
 			ensureOneEmptyPairAtEnd();
 			return p;
 		}
 	}
 
-	QGraphicsItem *Scene::addEvent(Card *item) 
+	QGraphicsItem *Scene::addEvent(Block *item) 
 	{
-		EventActionPair* selectedPair(getSelectedPair());
+		EventActionsSet* selectedPair(getSelectedPair());
 		if (selectedPair)
 		{
 			// replaced action of selected pair
-			selectedPair->addEventCard(item);
+			selectedPair->addEventBlock(item);
 			ensureOneEmptyPairAtEnd();
 			return selectedPair;
 		}
@@ -83,18 +83,18 @@ namespace Aseba { namespace ThymioVPL
 			// find a pair without any action
 			for (PairItr pItr(pairsBegin()); pItr != pairsEnd(); ++pItr)
 			{
-				EventActionPair* p(*pItr);
-				if (!p->hasEventCard())
+				EventActionsSet* p(*pItr);
+				if (!p->hasEventBlock())
 				{
-					p->addEventCard(item);
+					p->addEventBlock(item);
 					clearSelection();
 					ensureOneEmptyPairAtEnd();
 					return p;
 				}
 			}
 			// none found, add a new pair and add event there
-			EventActionPair* p(createNewEventActionPair());
-			p->addEventCard(item);
+			EventActionsSet* p(createNewEventActionsSet());
+			p->addEventBlock(item);
 			clearSelection();
 			ensureOneEmptyPairAtEnd();
 			return p;
@@ -102,15 +102,15 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// used by load, avoid recompiling
-	void Scene::addEventActionPair(Card *event, Card *action)
+	void Scene::addEventActionsSet(Block *event, Block *action)
 	{
-		EventActionPair *p(createNewEventActionPair());
+		EventActionsSet *p(createNewEventActionsSet());
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		if(event)
-			p->addEventCard(event);
+			p->addEventBlock(event);
 		if(action)
-			p->addActionCard(action);
+			p->addActionBlock(action);
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 	}
@@ -118,16 +118,16 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::ensureOneEmptyPairAtEnd()
 	{
 		if (eventActionPairs.empty())
-			createNewEventActionPair();
+			createNewEventActionsSet();
 		else if (!eventActionPairs.last()->isEmpty())
-			createNewEventActionPair();
+			createNewEventActionsSet();
 		relayout();
 	}
 
-	EventActionPair *Scene::createNewEventActionPair()
+	EventActionsSet *Scene::createNewEventActionsSet()
 	{
-		EventActionPair *p(new EventActionPair(eventActionPairs.size(), advancedMode));
-		p->setColorScheme(eventCardColor, actionCardColor);
+		EventActionsSet *p(new EventActionsSet(eventActionPairs.size(), advancedMode));
+		p->setColorScheme(eventBlockColor, actionBlockColor);
 		eventActionPairs.push_back(p);
 		
 		addItem(p);
@@ -144,8 +144,8 @@ namespace Aseba { namespace ThymioVPL
 			return true;
 			
 		if( eventActionPairs.size() > 1 ||
-			eventActionPairs[0]->hasActionCard() ||
-			eventActionPairs[0]->hasEventCard() )
+			eventActionPairs[0]->hasActionBlock() ||
+			eventActionPairs[0]->hasEventBlock() )
 			return false;
 
 		return true;
@@ -154,7 +154,7 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::reset()
 	{
 		clear();
-		createNewEventActionPair();
+		createNewEventActionsSet();
 	}
 	
 	void Scene::clear()
@@ -162,7 +162,7 @@ namespace Aseba { namespace ThymioVPL
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		for(int i=0; i<eventActionPairs.size(); i++)
 		{
-			EventActionPair *p(eventActionPairs[i]);
+			EventActionsSet *p(eventActionPairs[i]);
 			//disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 			removeItem(p);
 			delete(p);
@@ -180,8 +180,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::setColorScheme(QColor eventColor, QColor actionColor)
 	{
-		eventCardColor = eventColor;
-		actionCardColor = actionColor;
+		eventBlockColor = eventColor;
+		actionBlockColor = actionColor;
 
 		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 			(*itr)->setColorScheme(eventColor, actionColor);
@@ -204,7 +204,7 @@ namespace Aseba { namespace ThymioVPL
 			advancedMode = advanced;
 			for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 			{
-				EventActionPair* p(*itr);
+				EventActionsSet* p(*itr);
 				p->disconnect(SIGNAL(contentChanged()), this, SLOT(recompile()));
 				p->setAdvanced(advanced);
 				connect(p, SIGNAL(contentChanged()), SLOT(recompile()));
@@ -226,7 +226,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		Q_ASSERT( row < eventActionPairs.size() );
 		
-		EventActionPair *p(eventActionPairs[row]);
+		EventActionsSet *p(eventActionPairs[row]);
 		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		eventActionPairs.removeAt(row);
 		
@@ -246,8 +246,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		Q_ASSERT( row <= eventActionPairs.size() );
 
-		EventActionPair *p(new EventActionPair(row, advancedMode));
-		p->setColorScheme(eventCardColor, actionCardColor);
+		EventActionsSet *p(new EventActionsSet(row, advancedMode));
+		p->setColorScheme(eventBlockColor, actionBlockColor);
 		eventActionPairs.insert(row, p);
 		
 		addItem(p);
@@ -273,7 +273,7 @@ namespace Aseba { namespace ThymioVPL
 		QRectF r;
 		for(int i=0; i<eventActionPairs.size(); i++)
 		{
-			EventActionPair *p(eventActionPairs[i]);
+			EventActionsSet *p(eventActionPairs[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
 		setSceneRect(r.adjusted(0,-20,0,20));
@@ -329,14 +329,14 @@ namespace Aseba { namespace ThymioVPL
 
 	int Scene::getSelectedPairId() const 
 	{ 
-		EventActionPair* selectedPair(getSelectedPair());
+		EventActionsSet* selectedPair(getSelectedPair());
 		if (selectedPair)
 			return compiler.buttonToCode(selectedPair->data(1).toInt());
 		else
 			return -1;
 	}
 	
-	EventActionPair *Scene::getSelectedPair() const
+	EventActionsSet *Scene::getSelectedPair() const
 	{
 		if (selectedItems().empty())
 			return 0;
@@ -345,13 +345,13 @@ namespace Aseba { namespace ThymioVPL
 		{
 			if (item->data(0).toString() == "eventactionpair")
 			{
-				return dynamic_cast<EventActionPair*>(item);
+				return dynamic_cast<EventActionsSet*>(item);
 			}
 		}
 		return 0;
 	}
 	
-	EventActionPair *Scene::getPairRow(int row) const
+	EventActionsSet *Scene::getPairRow(int row) const
 	{
 		return eventActionPairs.at(row);
 	}
@@ -378,16 +378,16 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if ( event->mimeData()->hasFormat("EventActionPair") )
+		if ( event->mimeData()->hasFormat("EventActionsSet") )
 		{
-			QByteArray buttonData = event->mimeData()->data("EventActionPair");
+			QByteArray buttonData = event->mimeData()->data("EventActionsSet");
 			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
 
 			int prevRow, currentRow;
 			dataStream >> prevRow;
 			
 			const unsigned count(pairsCount());
-			EventActionPair *p(eventActionPairs.at(prevRow));
+			EventActionsSet *p(eventActionPairs.at(prevRow));
 			eventActionPairs.removeAt(prevRow);
 			
 			#define CLAMP(a, l, h) ((a)<(l)?(l):((a)>(h)?(h):(a)))

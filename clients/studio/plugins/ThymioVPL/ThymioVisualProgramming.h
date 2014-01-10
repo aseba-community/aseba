@@ -31,7 +31,7 @@ namespace Aseba
 namespace Aseba { namespace ThymioVPL
 {
 	class Scene;
-	class CardButton;
+	class BlockButton;
 	
 	/** \addtogroup studio */
 	/*@{*/
@@ -96,7 +96,7 @@ namespace Aseba { namespace ThymioVPL
 		void showAtSavedPosition();
 		
 	protected:
-		friend class Aseba::ThymioVPL::CardButton;
+		friend class Aseba::ThymioVPL::BlockButton;
 		friend class Aseba::ThymioVPL::Scene;
 		
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
@@ -106,8 +106,8 @@ namespace Aseba { namespace ThymioVPL
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		
 		// Event & Action buttons
-		QList<CardButton *> eventButtons;
-		QList<CardButton *> actionButtons;
+		QList<BlockButton *> eventButtons;
+		QList<BlockButton *> actionButtons;
 		QLabel *eventsLabel;
 		QLabel *actionsLabel;
 

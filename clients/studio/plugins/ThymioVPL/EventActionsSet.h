@@ -10,15 +10,15 @@ namespace Aseba { namespace ThymioVPL
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class Card;
+	class Block;
 	class AddRemoveButton;
 	
-	class EventActionPair : public QGraphicsObject
+	class EventActionsSet : public QGraphicsObject
 	{
 		Q_OBJECT
 		
 	public:
-		EventActionPair(int row, bool advanced, QGraphicsItem *parent=0);
+		EventActionsSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
@@ -27,14 +27,14 @@ namespace Aseba { namespace ThymioVPL
 		void setRow(int row);
 		int getRow() const { return data(1).toInt(); }
 		
-		void removeEventCard();
-		void addEventCard(Card *event);
-		void removeActionCard();
-		void addActionCard(Card *action);
-		const bool hasEventCard() const { return eventCard != 0; }
-		const Card *getEventCard() const { return eventCard; }
-		const bool hasActionCard() const { return actionCard != 0; }
-		const Card *getActionCard() const { return actionCard; }
+		void removeEventBlock();
+		void addEventBlock(Block *event);
+		void removeActionBlock();
+		void addActionBlock(Block *action);
+		const bool hasEventBlock() const { return eventBlock != 0; }
+		const Block *getEventBlock() const { return eventBlock; }
+		const bool hasActionBlock() const { return actionBlock != 0; }
+		const Block *getActionBlock() const { return actionBlock; }
 		
 		bool isAnyAdvancedFeature() const;
 		bool isEmpty() const; 
@@ -58,13 +58,13 @@ namespace Aseba { namespace ThymioVPL
 		void addClicked();
 	
 	private:
-		Card *eventCard;
-		Card *actionCard;
+		Block *eventBlock;
+		Block *actionBlock;
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
 		
-		QColor eventCardColor;
-		QColor actionCardColor;
+		QColor eventBlockColor;
+		QColor actionBlockColor;
 		
 		bool highlightEventButton;
 		bool highlightActionButton;

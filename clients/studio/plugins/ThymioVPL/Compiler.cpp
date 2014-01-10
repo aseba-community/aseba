@@ -90,7 +90,7 @@ namespace Aseba { namespace ThymioVPL
 
 		for (Scene::PairConstItr it(scene.pairsBegin()); it != scene.pairsEnd(); ++it)
 		{
-			const EventActionPair& p(*(*it));
+			const EventActionsSet& p(*(*it));
 			errorLine++;
 			
 			syntaxChecker.visit(p);
@@ -117,7 +117,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			for (Scene::PairConstItr it(scene.pairsBegin()); it != scene.pairsEnd(); ++it)
 			{
-				const EventActionPair& p(*(*it));
+				const EventActionsSet& p(*(*it));
 				codeGenerator.visit(p);
 				if( !codeGenerator.isSuccessful() )
 				{

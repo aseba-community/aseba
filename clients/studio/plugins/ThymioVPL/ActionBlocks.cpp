@@ -8,14 +8,14 @@
 #include <QtCore/qmath.h>
 #include <QDebug>
 
-#include "ActionCards.h"
+#include "ActionBlocks.h"
 #include "Buttons.h"
 
 namespace Aseba { namespace ThymioVPL
 {
 	// Move Action
-	MoveActionCard::MoveActionCard( QGraphicsItem *parent ) :
-		Card(false, false, parent)
+	MoveActionBlock::MoveActionBlock( QGraphicsItem *parent ) :
+		Block(false, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "move");
@@ -61,11 +61,11 @@ namespace Aseba { namespace ThymioVPL
 		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
 	}
 
-	MoveActionCard::~MoveActionCard()
+	MoveActionBlock::~MoveActionBlock()
 	{
 	}
 	
-	void MoveActionCard::frameChanged(int frame)
+	void MoveActionBlock::frameChanged(int frame)
 	{
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
@@ -80,28 +80,28 @@ namespace Aseba { namespace ThymioVPL
 		thymioBody->setRotation(angle);
 	}
 
-	void MoveActionCard::valueChangeDetected()
+	void MoveActionBlock::valueChangeDetected()
 	{
 		timer->stop();
 		timer->start();
 	}
 	
-	int MoveActionCard::getValue(unsigned i) const
+	int MoveActionBlock::getValue(unsigned i) const
 	{ 
 		if (int(i)<sliders.size()) 
 			return sliders[i]->value()*50;
 		return -1;
 	}
 
-	void MoveActionCard::setValue(unsigned i, int value) 
+	void MoveActionBlock::setValue(unsigned i, int value) 
 	{ 
 		if(int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value/50);
 	}
 	
 	// Color Action
-	ColorActionCard::ColorActionCard( QGraphicsItem *parent, bool top) :
-		CardWithBody(false, top, false, parent)
+	ColorActionBlock::ColorActionBlock( QGraphicsItem *parent, bool top) :
+		BlockWithBody(false, top, false, parent)
 	{
 		setData(0, "action");
 		if (top)
@@ -141,43 +141,43 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 
-	int ColorActionCard::getValue(unsigned i) const
+	int ColorActionBlock::getValue(unsigned i) const
 	{ 
 		if (int(i)<sliders.size()) 
 			return sliders[i]->value(); 
 		return -1;
 	}
 	
-	void ColorActionCard::setValue(unsigned i, int value) 
+	void ColorActionBlock::setValue(unsigned i, int value) 
 	{ 
 		if (int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value);
 	}
 	
-	void ColorActionCard::valueChangeDetected()
+	void ColorActionBlock::valueChangeDetected()
 	{
 		update();
 	}
 	
-	void ColorActionCard::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void ColorActionBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		bodyColor = QColor( sliders[0]->value()*5.46875+80, 
 							sliders[1]->value()*5.46875+80, 
 							sliders[2]->value()*5.46875+80);
-		CardWithBody::paint(painter, option, widget);
+		BlockWithBody::paint(painter, option, widget);
 	}
 	
-	TopColorActionCard::TopColorActionCard(QGraphicsItem *parent):
-		ColorActionCard(parent, true)
+	TopColorActionBlock::TopColorActionBlock(QGraphicsItem *parent):
+		ColorActionBlock(parent, true)
 	{}
 	
-	BottomColorActionCard::BottomColorActionCard(QGraphicsItem *parent):
-		ColorActionCard(parent, false)
+	BottomColorActionBlock::BottomColorActionBlock(QGraphicsItem *parent):
+		ColorActionBlock(parent, false)
 	{}
 	
 	// Sound Action
-	SoundActionCard::SoundActionCard(QGraphicsItem *parent) :
-		CardWithBody(false, true, false, parent)
+	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
+		BlockWithBody(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "sound");
@@ -192,9 +192,9 @@ namespace Aseba { namespace ThymioVPL
 		new QGraphicsSvgItem (":/images/notes.svgz", this);
 	}
 	
-	void SoundActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void SoundActionBlock::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		CardWithBody::paint(painter, option, widget);
+		BlockWithBody::paint(painter, option, widget);
 		
 		painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		for (unsigned row = 0; row < 5; ++row)
@@ -223,7 +223,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	void SoundActionCard::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	void SoundActionBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
 		{
@@ -244,14 +244,14 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	int SoundActionCard::getValue(unsigned i) const
+	int SoundActionBlock::getValue(unsigned i) const
 	{ 
 		if (i<6) 
 			return notes[i] | (durations[i] << 8); 
 		return -1;
 	}
 	
-	void SoundActionCard::setValue(unsigned i, int value) 
+	void SoundActionBlock::setValue(unsigned i, int value) 
 	{ 
 		if (i<6)
 		{
@@ -262,9 +262,9 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	// TimerActionCard
-	TimerActionCard::TimerActionCard(QGraphicsItem *parent) :
-		CardWithBody(false, true, false, parent),
+	// TimerActionBlock
+	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
+		BlockWithBody(false, true, false, parent),
 		duration(1.0)
 	{
 		setData(0, "action");
@@ -279,12 +279,12 @@ namespace Aseba { namespace ThymioVPL
 		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
 	}
 	
-	void TimerActionCard::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void TimerActionBlock::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		CardWithBody::paint(painter, option, widget);
+		BlockWithBody::paint(painter, option, widget);
 		
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
 		painter->setBrush(Qt::darkBlue);
@@ -302,12 +302,12 @@ namespace Aseba { namespace ThymioVPL
 		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
 	}
 	
-	void TimerActionCard::frameChanged(int frame)
+	void TimerActionBlock::frameChanged(int frame)
 	{
 		update();
 	}
 	
-	void TimerActionCard::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	void TimerActionBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
 		{
@@ -320,18 +320,18 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	int TimerActionCard::getValue(unsigned i) const
+	int TimerActionBlock::getValue(unsigned i) const
 	{ 
 		return duration;
 	}
 	
-	void TimerActionCard::setValue(unsigned i, int value) 
+	void TimerActionBlock::setValue(unsigned i, int value) 
 	{ 
 		duration = value;
 		durationUpdated();
 	}
 	
-	void TimerActionCard::durationUpdated()
+	void TimerActionBlock::durationUpdated()
 	{
 		update();
 		emit contentChanged();
@@ -342,8 +342,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 
 	// State Filter Action
-	StateFilterActionCard::StateFilterActionCard(QGraphicsItem *parent) : 
-		CardWithButtons(false, true, false, parent)
+	StateFilterActionBlock::StateFilterActionBlock(QGraphicsItem *parent) : 
+		BlockWithButtons(false, true, false, parent)
 	{
 		setData(0, "action");
 		setData(1, "statefilter");
@@ -363,7 +363,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	/* FIXME: use that once infrastructure is better
-	bool StateFilterActionCard::isAnyAdvancedFeature() const
+	bool StateFilterActionBlock::isAnyAdvancedFeature() const
 	{
 		return true;
 	}*/

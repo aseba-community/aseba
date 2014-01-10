@@ -5,14 +5,14 @@
 #include <QGraphicsProxyWidget>
 #include <QtCore/qmath.h>
 
-#include "EventCards.h"
+#include "EventBlocks.h"
 #include "Buttons.h"
 
 namespace Aseba { namespace ThymioVPL
 {
 	// Buttons Event
-	ArrowButtonsEventCard::ArrowButtonsEventCard(QGraphicsItem *parent, bool advanced) : 
-		CardWithButtons(true, true, advanced, parent)
+	ArrowButtonsEventBlock::ArrowButtonsEventBlock(QGraphicsItem *parent, bool advanced) : 
+		BlockWithButtons(true, true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "button");
@@ -42,8 +42,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Prox Event
-	ProxEventCard::ProxEventCard(QGraphicsItem *parent, bool advanced) : 
-		CardWithButtonsAndRange(true, true, 700, 4000, 1000, 2000, advanced, parent)
+	ProxEventBlock::ProxEventBlock(QGraphicsItem *parent, bool advanced) : 
+		BlockWithButtonsAndRange(true, true, 700, 4000, 1000, 2000, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "prox");
@@ -84,8 +84,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Prox Ground Event
-	ProxGroundEventCard::ProxGroundEventCard( QGraphicsItem *parent, bool advanced ) : 
-		CardWithButtonsAndRange(true, false, 0, 1023, 150, 300, advanced, parent)
+	ProxGroundEventBlock::ProxGroundEventBlock( QGraphicsItem *parent, bool advanced ) : 
+		BlockWithButtonsAndRange(true, false, 0, 1023, 150, 300, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "proxground");
@@ -109,8 +109,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Tap Event
-	TapEventCard::TapEventCard( QGraphicsItem *parent, bool advanced ) :
-		CardWithNoValues(true, advanced, parent)
+	TapEventBlock::TapEventBlock( QGraphicsItem *parent, bool advanced ) :
+		BlockWithNoValues(true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "tap");
@@ -120,8 +120,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	
 	// Clap Event
-	ClapEventCard::ClapEventCard( QGraphicsItem *parent, bool advanced ) :
-		CardWithNoValues(true, advanced, parent)
+	ClapEventBlock::ClapEventBlock( QGraphicsItem *parent, bool advanced ) :
+		BlockWithNoValues(true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "clap");
@@ -129,9 +129,9 @@ namespace Aseba { namespace ThymioVPL
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
 	
-	// TimeoutEventCard
-	TimeoutEventCard::TimeoutEventCard(QGraphicsItem *parent, bool advanced):
-		CardWithNoValues(true, advanced, parent)
+	// TimeoutEventBlock
+	TimeoutEventBlock::TimeoutEventBlock(QGraphicsItem *parent, bool advanced):
+		BlockWithNoValues(true, advanced, parent)
 	{
 		setData(0, "event");
 		setData(1, "timeout");

@@ -15,9 +15,9 @@
 #include <cassert>
 
 #include "Buttons.h"
-#include "Card.h"
-#include "EventCards.h"
-#include "ActionCards.h"
+#include "Block.h"
+#include "EventBlocks.h"
+#include "ActionBlocks.h"
 #include "Scene.h"
 #include "ThymioVisualProgramming.h"
 #include "../../../../common/utils/utils.h"
@@ -151,9 +151,9 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardButton::CardButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
+	BlockButton::BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
 		QPushButton(parent), 
-		card(Card::createCard(name)),
+		card(Block::createBlock(name)),
 		vpl(vpl)
 	{
 		setToolTip(QString("%0 %1").arg(card->getName()).arg(card->getType()));
@@ -168,20 +168,20 @@ namespace Aseba { namespace ThymioVPL
 		setAcceptDrops(true);
 	}
 	
-	CardButton::~CardButton()
+	BlockButton::~BlockButton()
 	{ 
 		if( card != 0 ) 
 			delete(card); 
 	}
 	
-	void CardButton::changeButtonColor(const QColor& color) 
+	void BlockButton::changeButtonColor(const QColor& color) 
 	{ 
 		card->setBackgroundColor(color); 
 		const qreal factor = width() / 256.;
 		setIcon(card->image(factor));
 	}	
 
-	void CardButton::mouseMoveEvent( QMouseEvent *event )
+	void BlockButton::mouseMoveEvent( QMouseEvent *event )
 	{
 		#ifndef ANDROID
 		if( card==0 )
@@ -196,32 +196,32 @@ namespace Aseba { namespace ThymioVPL
 		#endif // ANDROID
 	}
 
-	void CardButton::dragEnterEvent( QDragEnterEvent *event )
+	void BlockButton::dragEnterEvent( QDragEnterEvent *event )
 	{
-		if( event->mimeData()->hasFormat("CardType") &&
-			event->mimeData()->data("CardType") == card->getType().toLatin1() )
+		if( event->mimeData()->hasFormat("BlockType") &&
+			event->mimeData()->data("BlockType") == card->getType().toLatin1() )
 			event->accept();
 		else
 			event->ignore();
 	}
 
-	void CardButton::dropEvent( QDropEvent *event )
+	void BlockButton::dropEvent( QDropEvent *event )
 	{
-		if( event->mimeData()->hasFormat("CardType") &&
-			event->mimeData()->data("CardType") == card->getType().toLatin1() )
+		if( event->mimeData()->hasFormat("BlockType") &&
+			event->mimeData()->data("BlockType") == card->getType().toLatin1() )
 		{
 			// get data from mime
-			QByteArray cardData(event->mimeData()->data("Card"));
+			QByteArray cardData(event->mimeData()->data("Block"));
 			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
 			int parentID;
 			dataStream >> parentID;
 			// if originates from the scene, delete from the scene
 			if (parentID >= 0)
 			{
-				if (event->mimeData()->data("CardType") == QString("event").toLatin1())
-					vpl->scene->getPairRow(parentID)->removeEventCard();
+				if (event->mimeData()->data("BlockType") == QString("event").toLatin1())
+					vpl->scene->getPairRow(parentID)->removeEventBlock();
 				else
-					vpl->scene->getPairRow(parentID)->removeActionCard();
+					vpl->scene->getPairRow(parentID)->removeActionBlock();
 			}
 			// d&g handling
 			event->setDropAction(Qt::MoveAction);

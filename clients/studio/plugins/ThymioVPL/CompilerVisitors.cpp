@@ -3,8 +3,8 @@
 #include <QDebug>
 #include <iostream>
 #include "Compiler.h"
-#include "Card.h"
-#include "EventActionPair.h"
+#include "Block.h"
+#include "EventActionsSet.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -21,7 +21,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Visitor base //
-	void Compiler::Visitor::visit(const EventActionPair& p)
+	void Compiler::Visitor::visit(const EventActionsSet& p)
 	{
 		errorCode = NO_ERROR;
 	}
@@ -52,19 +52,19 @@ namespace Aseba { namespace ThymioVPL
 		memoryHash.clear();
 	}
 
-	void Compiler::TypeChecker::visit(const EventActionPair& p, int& secondErrorLine)
+	void Compiler::TypeChecker::visit(const EventActionsSet& p, int& secondErrorLine)
 	{
-		if( !p.hasEventCard() || !p.hasActionCard() )
+		if( !p.hasEventBlock() || !p.hasActionBlock() )
 			return;
 		
 		errorCode = NO_ERROR;
 
 		// we know that p has an action card, so we can dereference it
-		multimap<wstring, const Card*> *currentHash;
-		multimap<wstring, const Card*> tempHash;
+		multimap<wstring, const Block*> *currentHash;
+		multimap<wstring, const Block*> tempHash;
 		
-		const Card* event(p.getEventCard());
-		const Card* action(p.getActionCard());
+		const Block* event(p.getEventBlock());
+		const Block* action(p.getActionBlock());
 		if (action->getName() == "move")
 		{
 			currentHash = &moveHash;
@@ -103,7 +103,7 @@ namespace Aseba { namespace ThymioVPL
 
 		currentHash->clear();
 	
-		for(multimap<wstring, const Card*>::iterator itr = tempHash.begin();
+		for(multimap<wstring, const Block*>::iterator itr = tempHash.begin();
 			itr != tempHash.end(); ++itr)
 		{
 			if (itr->second != event)
@@ -122,12 +122,12 @@ namespace Aseba { namespace ThymioVPL
 			}
 		}
 
-		pair< multimap<wstring, const Card*>::iterator,
-			  multimap<wstring, const Card*>::iterator > ret;
+		pair< multimap<wstring, const Block*>::iterator,
+			  multimap<wstring, const Block*>::iterator > ret;
 		ret = currentHash->equal_range(cardHashText);
 
 		secondErrorLine = 0;
-		for (multimap<wstring, const Card*>::iterator itr(ret.first); itr != ret.second; ++itr)
+		for (multimap<wstring, const Block*>::iterator itr(ret.first); itr != ret.second; ++itr)
 		{
 			if (itr->second != event)
 			{
@@ -137,20 +137,20 @@ namespace Aseba { namespace ThymioVPL
 			++secondErrorLine;
 		}
 		
-		currentHash->insert(pair<wstring, const Card*>(cardHashText, event));
+		currentHash->insert(pair<wstring, const Block*>(cardHashText, event));
 	}
 
 	// Syntax Checker //
-	void Compiler::SyntaxChecker::visit(const EventActionPair& p)
+	void Compiler::SyntaxChecker::visit(const EventActionsSet& p)
 	{
 		errorCode = NO_ERROR;
 		
-		if( !(p.hasEventCard()) )
+		if( !(p.hasEventBlock()) )
 		{
-			if( p.hasActionCard() )
+			if( p.hasActionBlock() )
 				errorCode = MISSING_EVENT;
 		} 
-		else if( !(p.hasActionCard()) )
+		else if( !(p.hasActionBlock()) )
 		{
 			errorCode = MISSING_ACTION;
 		}
@@ -267,9 +267,9 @@ namespace Aseba { namespace ThymioVPL
 		return (id < (int)buttonToCodeMap.size() ? buttonToCodeMap[id] : -1);
 	}
 	
-	void Compiler::CodeGenerator::visit(const EventActionPair& p)
+	void Compiler::CodeGenerator::visit(const EventActionsSet& p)
 	{
-		if( !p.hasEventCard() || !p.hasActionCard() ) 
+		if( !p.hasEventBlock() || !p.hasActionBlock() ) 
 		{
 			buttonToCodeMap.push_back(-1);
 			return;
@@ -278,7 +278,7 @@ namespace Aseba { namespace ThymioVPL
 		errorCode = NO_ERROR;
 		
 		// action and event name
-		const QString& eventName(p.getEventCard()->getName());
+		const QString& eventName(p.getEventBlock()->getName());
 		QString lookupEventName;
 		if (eventName == "proxground")
 			lookupEventName = "prox";
@@ -288,7 +288,7 @@ namespace Aseba { namespace ThymioVPL
 		int block = editor[lookupEventName].first;
 		int size = editor[lookupEventName].second;
 		unsigned currentBlock(0);
-		const bool isStateFilter(p.getEventCard()->getStateFilter() >= 0 ? true : false);
+		const bool isStateFilter(p.getEventBlock()->getStateFilter() >= 0 ? true : false);
 		
 		if( block < 0 )
 		{
@@ -354,7 +354,7 @@ namespace Aseba { namespace ThymioVPL
 				if( (itr->second).first > block )
 					(itr->second).first++;
 
-			if( !isStateFilter && !p.getEventCard()->isAnyValueSet() )
+			if( !isStateFilter && !p.getEventBlock()->isAnyValueSet() )
 			{
 				// find where "if" block starts for the current event
 				for(unsigned int i=0; i<buttonToCodeMap.size(); i++)
@@ -372,11 +372,11 @@ namespace Aseba { namespace ThymioVPL
 			buttonToCodeMap.push_back(currentBlock);
 		}
 		
-		visitEvent(*p.getEventCard(), currentBlock);
-		visitAction(*p.getActionCard(), currentBlock);
+		visitEvent(*p.getEventBlock(), currentBlock);
+		visitAction(*p.getActionBlock(), currentBlock);
 	}
 
-	void Compiler::CodeGenerator::visitEvent(const Card& card, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitEvent(const Block& card, unsigned currentBlock)
 	{
 		// set the generator in advanced mode if any state filter is set
 		advancedMode = advancedMode || (card.getStateFilter() >= 0);
@@ -459,7 +459,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Card& card)
+	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block& card)
 	{
 		wstring text;
 		bool first(true);
@@ -484,7 +484,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventProx(const Card& card)
+	wstring Compiler::CodeGenerator::visitEventProx(const Block& card)
 	{
 		wstring text;
 		bool first(true);
@@ -511,7 +511,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventProxGround(const Card& card)
+	wstring Compiler::CodeGenerator::visitEventProxGround(const Block& card)
 	{
 		wstring text;
 		bool first(true);
@@ -538,7 +538,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	void Compiler::CodeGenerator::visitAction(const Card& card, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitAction(const Block& card, unsigned currentBlock)
 	{
 		wstring text;
 		
@@ -576,7 +576,7 @@ namespace Aseba { namespace ThymioVPL
 		generatedCode[currentBlock].append(text);
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionMove(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionMove(const Block& card)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
@@ -591,7 +591,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionTopColor(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionTopColor(const Block& card)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
@@ -606,7 +606,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionBottomColor(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block& card)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
@@ -629,7 +629,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionSound(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionSound(const Block& card)
 	{
 		static const int noteTable[5] = { 262, 311, 370, 440, 524 };
 		static const int durationTable[3] = {-1, 8, 15};
@@ -665,7 +665,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionTimer(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionTimer(const Block& card)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
@@ -674,7 +674,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionStateFilter(const Card& card)
+	wstring Compiler::CodeGenerator::visitActionStateFilter(const Block& card)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");

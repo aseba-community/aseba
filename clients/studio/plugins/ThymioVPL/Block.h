@@ -28,7 +28,7 @@ namespace Aseba { namespace ThymioVPL
 		in a single integer (2 bits per value). The state filter
 		can be set/get using setStateFilter()/getStateFilter().
 	*/
-	class Card : public QGraphicsObject
+	class Block : public QGraphicsObject
 	{
 		Q_OBJECT
 		
@@ -51,10 +51,10 @@ namespace Aseba { namespace ThymioVPL
 			bool up;
 		};
 		
-		static Card* createCard(const QString& name, bool advancedMode=false);
+		static Block* createBlock(const QString& name, bool advancedMode=false);
 		
-		Card(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
-		virtual ~Card();
+		Block(bool eventButton = true, bool advanced=false, QGraphicsItem *parent=0);
+		virtual ~Block();
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
@@ -99,20 +99,20 @@ namespace Aseba { namespace ThymioVPL
 		qreal trans;
 	};
 	
-	class CardWithNoValues: public Card
+	class BlockWithNoValues: public Block
 	{
 	public:
-		CardWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent);
+		BlockWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent);
 		
 		virtual unsigned valuesCount() const { return 0; }
 		virtual int getValue(unsigned i) const { return -1; }
 		virtual void setValue(unsigned i, int value) {}
 	};
 	
-	class CardWithBody: public Card
+	class BlockWithBody: public Block
 	{
 	public:
-		CardWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
+		BlockWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
@@ -121,10 +121,10 @@ namespace Aseba { namespace ThymioVPL
 		QColor bodyColor;
 	};
 	
-	class CardWithButtons: public CardWithBody
+	class BlockWithButtons: public BlockWithBody
 	{
 	public:
-		CardWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
+		BlockWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent);
 		
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
@@ -134,10 +134,10 @@ namespace Aseba { namespace ThymioVPL
 		QList<GeometryShapeButton*> buttons;
 	};
 	
-	class CardWithButtonsAndRange: public CardWithButtons
+	class BlockWithButtonsAndRange: public BlockWithButtons
 	{
 	public:
-		CardWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
+		BlockWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		

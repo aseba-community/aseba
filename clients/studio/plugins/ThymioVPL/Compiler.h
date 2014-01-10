@@ -11,8 +11,8 @@
 namespace Aseba { namespace ThymioVPL
 {
 	class Scene;
-	class Card;
-	class EventActionPair;
+	class Block;
+	class EventActionsSet;
 	
 	class Compiler 
 	{
@@ -42,7 +42,7 @@ namespace Aseba { namespace ThymioVPL
 			Visitor() : errorCode(NO_ERROR) {}
 			virtual ~Visitor() {}
 			
-			virtual void visit(const EventActionPair& p);
+			virtual void visit(const EventActionsSet& p);
 
 			ErrorCode getErrorCode() const;
 			bool isSuccessful() const;
@@ -54,24 +54,24 @@ namespace Aseba { namespace ThymioVPL
 		class TypeChecker : public Visitor
 		{
 		public:
-			virtual void visit(const EventActionPair& p, int& secondErrorLine);
+			virtual void visit(const EventActionsSet& p, int& secondErrorLine);
 			
 			void reset();
 			void clear();
 			
 		private:
-			std::multimap<std::wstring, const Card*> moveHash;
-			std::multimap<std::wstring, const Card*> colorTopHash;
-			std::multimap<std::wstring, const Card*> colorBottomHash;
-			std::multimap<std::wstring, const Card*> soundHash;
-			std::multimap<std::wstring, const Card*> timerHash;
-			std::multimap<std::wstring, const Card*> memoryHash;
+			std::multimap<std::wstring, const Block*> moveHash;
+			std::multimap<std::wstring, const Block*> colorTopHash;
+			std::multimap<std::wstring, const Block*> colorBottomHash;
+			std::multimap<std::wstring, const Block*> soundHash;
+			std::multimap<std::wstring, const Block*> timerHash;
+			std::multimap<std::wstring, const Block*> memoryHash;
 		};
 
 		class SyntaxChecker : public Visitor
 		{
 		public:
-			virtual void visit(const EventActionPair& p); 
+			virtual void visit(const EventActionsSet& p); 
 		};
 
 		class CodeGenerator : public Visitor
@@ -80,7 +80,7 @@ namespace Aseba { namespace ThymioVPL
 			CodeGenerator();
 			~CodeGenerator();
 			
-			virtual void visit(const EventActionPair& p);
+			virtual void visit(const EventActionsSet& p);
 
 			std::vector<std::wstring>::const_iterator beginCode() const { return generatedCode.begin(); }
 			std::vector<std::wstring>::const_iterator endCode() const { return generatedCode.end(); }
@@ -91,18 +91,18 @@ namespace Aseba { namespace ThymioVPL
 			int buttonToCode(int id) const;
 			
 		protected:
-			void visitEvent(const Card& card, unsigned currentBlock);
-			std::wstring visitEventArrowButtons(const Card& card);
-			std::wstring visitEventProx(const Card& card);
-			std::wstring visitEventProxGround(const Card& card);
+			void visitEvent(const Block& card, unsigned currentBlock);
+			std::wstring visitEventArrowButtons(const Block& card);
+			std::wstring visitEventProx(const Block& card);
+			std::wstring visitEventProxGround(const Block& card);
 			
-			void visitAction(const Card& card, unsigned currentBlock);
-			std::wstring visitActionMove(const Card& card);
-			std::wstring visitActionTopColor(const Card& card);
-			std::wstring visitActionBottomColor(const Card& card);
-			std::wstring visitActionSound(const Card& card);
-			std::wstring visitActionTimer(const Card& card);
-			std::wstring visitActionStateFilter(const Card& card);
+			void visitAction(const Block& card, unsigned currentBlock);
+			std::wstring visitActionMove(const Block& card);
+			std::wstring visitActionTopColor(const Block& card);
+			std::wstring visitActionBottomColor(const Block& card);
+			std::wstring visitActionSound(const Block& card);
+			std::wstring visitActionTimer(const Block& card);
+			std::wstring visitActionStateFilter(const Block& card);
 			
 		protected:
 			typedef std::map<QString, std::pair<int, int> > EventToCodePosMap;

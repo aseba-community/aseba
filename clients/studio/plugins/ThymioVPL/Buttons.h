@@ -13,7 +13,7 @@ namespace Aseba { namespace ThymioVPL
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class Card;
+	class Block;
 	class ThymioVisualProgramming;
 	
 	class GeometryShapeButton : public QGraphicsObject
@@ -83,13 +83,13 @@ namespace Aseba { namespace ThymioVPL
 		bool pressed;
 	};
 	
-	class CardButton : public QPushButton
+	class BlockButton : public QPushButton
 	{
 		Q_OBJECT
 		
 	public:
-		CardButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent=0);
-		~CardButton();
+		BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent=0);
+		~BlockButton();
 		
 		void changeButtonColor(const QColor& color);
 		
@@ -99,7 +99,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void dropEvent( QDropEvent *event );
 
 	protected:
-		Card *card;
+		Block *card;
 		ThymioVisualProgramming* vpl;
 	};
 		
