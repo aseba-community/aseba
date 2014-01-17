@@ -54,6 +54,8 @@ namespace Aseba { namespace ThymioVPL
 
 	void Compiler::TypeChecker::visit(const EventActionsSet& p, int& secondErrorLine)
 	{
+		/*
+		FIXME: update
 		if( !p.hasEventBlock() || !p.hasActionBlock() )
 			return;
 		
@@ -138,11 +140,14 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		currentHash->insert(pair<wstring, const Block*>(cardHashText, event));
+		*/
 	}
 
 	// Syntax Checker //
 	void Compiler::SyntaxChecker::visit(const EventActionsSet& p)
 	{
+		/*
+		FIXME: update
 		errorCode = NO_ERROR;
 		
 		if( !(p.hasEventBlock()) )
@@ -154,6 +159,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			errorCode = MISSING_ACTION;
 		}
+		*/
 	}
 
 	// Code Generator //
@@ -269,6 +275,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Compiler::CodeGenerator::visit(const EventActionsSet& p)
 	{
+		/*
+		FIXME: update
 		if( !p.hasEventBlock() || !p.hasActionBlock() ) 
 		{
 			buttonToCodeMap.push_back(-1);
@@ -374,10 +382,13 @@ namespace Aseba { namespace ThymioVPL
 		
 		visitEvent(*p.getEventBlock(), currentBlock);
 		visitAction(*p.getActionBlock(), currentBlock);
+		*/
 	}
 
 	void Compiler::CodeGenerator::visitEvent(const Block& card, unsigned currentBlock)
 	{
+		/*
+		FIXME: update
 		// set the generator in advanced mode if any state filter is set
 		advancedMode = advancedMode || (card.getStateFilter() >= 0);
 		
@@ -457,6 +468,7 @@ namespace Aseba { namespace ThymioVPL
 			else
 				inIfBlock = false;
 		}
+		*/
 	}
 	
 	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block& card)

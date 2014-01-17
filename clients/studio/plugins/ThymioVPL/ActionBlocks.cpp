@@ -15,11 +15,8 @@ namespace Aseba { namespace ThymioVPL
 {
 	// Move Action
 	MoveActionBlock::MoveActionBlock( QGraphicsItem *parent ) :
-		Block(false, false, parent)
+		Block(false, "move", parent)
 	{
-		setData(0, "action");
-		setData(1, "move");
-		
 		new QGraphicsSvgItem (":/images/vpl_background_motor.svgz", this);
 
 		for(int i=0; i<2; i++)
@@ -101,14 +98,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Color Action
 	ColorActionBlock::ColorActionBlock( QGraphicsItem *parent, bool top) :
-		BlockWithBody(false, top, false, parent)
+		BlockWithBody(false, top ? "colortop" : "colorbottom", top, parent)
 	{
-		setData(0, "action");
-		if (top)
-			setData(1, "colortop");
-		else
-			setData(1, "colorbottom");
-
 		const char *sliderColors[] = { "FF0000", "00FF00", "0000FF" };
 		
 		for(unsigned i=0; i<3; i++)
@@ -177,7 +168,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Sound Action
 	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
-		BlockWithBody(false, true, false, parent)
+		BlockWithBody(false, "sound", true, parent)
 	{
 		setData(0, "action");
 		setData(1, "sound");
@@ -264,12 +255,9 @@ namespace Aseba { namespace ThymioVPL
 	
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
-		BlockWithBody(false, true, false, parent),
+		BlockWithBody(false, "timer", true, parent),
 		duration(1.0)
 	{
-		setData(0, "action");
-		setData(1, "timer");
-		
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
 		
 		timer = new QTimeLine(duration, this);
@@ -343,28 +331,8 @@ namespace Aseba { namespace ThymioVPL
 
 	// State Filter Action
 	StateFilterActionBlock::StateFilterActionBlock(QGraphicsItem *parent) : 
-		BlockWithButtons(false, true, false, parent)
+		StateFilterBlock(false, "setstate", parent)
 	{
-		setData(0, "action");
-		setData(1, "statefilter");
-		
-		const int angles[4] = {0,90,270,180};
-		for(uint i=0; i<4; i++)
-		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
-			button->setPos(98 + (i%2)*60, 98 + (i/2)*60);
-			button->setRotation(angles[i]);
-			button->addState(QColor(255,128,0));
-			button->addState(Qt::white);
-
-			buttons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
-		}
 	}
 	
-	/* FIXME: use that once infrastructure is better
-	bool StateFilterActionBlock::isAnyAdvancedFeature() const
-	{
-		return true;
-	}*/
 } } // namespace ThymioVPL / namespace Aseba

@@ -38,6 +38,10 @@ namespace Aseba { namespace ThymioVPL
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
+	
+	public:
+		static QColor currentEventColor;
+		static QColor currentActionColor;
 		
 	public:
 		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
@@ -52,6 +56,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 		
 		bool isModified() const;
+		qreal getViewScale() const;
 		
 	signals:
 		void modifiedStatusChanged(bool modified);
@@ -101,7 +106,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QGraphicsView *view;
-		qreal viewportScale;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		

@@ -91,7 +91,7 @@ namespace Aseba { namespace ThymioVPL
 		BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent=0);
 		~BlockButton();
 		
-		void changeButtonColor(const QColor& color);
+		void updateBlockImage();
 		
 	protected:
 		virtual void mouseMoveEvent( QMouseEvent *event );
@@ -99,7 +99,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void dropEvent( QDropEvent *event );
 
 	protected:
-		Block *card;
+		Block *block;
 		ThymioVisualProgramming* vpl;
 	};
 		

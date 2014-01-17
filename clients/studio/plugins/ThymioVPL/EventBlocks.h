@@ -11,37 +11,43 @@ namespace Aseba { namespace ThymioVPL
 	class ArrowButtonsEventBlock : public BlockWithButtons
 	{
 	public:
-		ArrowButtonsEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		ArrowButtonsEventBlock(QGraphicsItem *parent=0);
 	};
 	
 	class ProxEventBlock : public BlockWithButtonsAndRange
 	{
 	public:
-		ProxEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		ProxEventBlock(bool advanced, QGraphicsItem *parent=0);
 	};
 
 	class ProxGroundEventBlock : public BlockWithButtonsAndRange
 	{
 	public:
-		ProxGroundEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		ProxGroundEventBlock(bool advanced, QGraphicsItem *parent=0);
 	};
 
 	class TapEventBlock : public BlockWithNoValues
 	{
 	public:
-		TapEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		TapEventBlock(QGraphicsItem *parent=0);
 	};
 
 	class ClapEventBlock : public BlockWithNoValues
 	{
 	public:
-		ClapEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		ClapEventBlock(QGraphicsItem *parent=0);
 	};
 	
 	class TimeoutEventBlock : public BlockWithNoValues
 	{
 	public:
-		TimeoutEventBlock(QGraphicsItem *parent=0, bool advanced=false);
+		TimeoutEventBlock(QGraphicsItem *parent=0);
+	};
+	
+	class StateFilterEventBlock : public StateFilterBlock
+	{
+	public:
+		StateFilterEventBlock(QGraphicsItem *parent=0);
 	};
 	
 	/*@}*/

@@ -24,7 +24,6 @@ namespace Aseba { namespace ThymioVPL
 		bool isEmpty() const;
 		void reset();
 		void clear();
-		void setColorScheme(QColor eventColor, QColor actionColor);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod);
 		void setScale(qreal scale);
@@ -60,7 +59,7 @@ namespace Aseba { namespace ThymioVPL
 		void highlightChanged();
 		void contentRecompiled();
 		void modifiedStatusChanged(bool modified);
-		void zoomChanged();
+		void sceneSizeChanged();
 		
 	public slots:
 		void recompile();
@@ -72,7 +71,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 	protected:
-		void rearrangeButtons(int row=0);
+		void rearrangeSets(int row=0);
 		void relayout();
 		
 		EventActionsSet *createNewEventActionsSet();
@@ -82,8 +81,6 @@ namespace Aseba { namespace ThymioVPL
 		QList<EventActionsSet *> eventActionPairs;
 		Compiler compiler;
 		
-		QColor eventBlockColor;
-		QColor actionBlockColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
 		qreal buttonSetHeight;

@@ -32,7 +32,6 @@ namespace Aseba { namespace ThymioVPL
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
-		viewportScale(1.0),
 		scene(new Scene(this)),
 		loading(false)
 	{
@@ -185,7 +184,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
-		connect(scene, SIGNAL(zoomChanged()), SLOT(setViewScale()));
+		connect(scene, SIGNAL(sceneSizeChanged()), SLOT(setViewScale()));
 		
 		zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
@@ -262,6 +261,9 @@ namespace Aseba { namespace ThymioVPL
 		const QAction *action(reinterpret_cast<QAction *>(sender()));
 		QDesktopServices::openUrl(action->data().toUrl());
 	}
+	
+	QColor ThymioVisualProgramming::currentEventColor = QColor(0,191,255);
+	QColor ThymioVisualProgramming::currentActionColor = QColor(218,112,214);
 	
 	void ThymioVisualProgramming::setColors(QComboBox *button)
 	{
@@ -381,15 +383,18 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
 	{
-		scene->setColorScheme(eventColors.at(index), actionColors.at(index));
+		currentEventColor = eventColors.at(index);
+		currentActionColor = actionColors.at(index);
+		
+		scene->update();
 		
 		for(QList<BlockButton*>::iterator itr(eventButtons.begin());
 			itr != eventButtons.end(); ++itr)
-			(*itr)->changeButtonColor(eventColors.at(index));
+			(*itr)->updateBlockImage();
 
 		for(QList<BlockButton*>::iterator itr(actionButtons.begin());
 			itr != actionButtons.end(); ++itr)
-			(*itr)->changeButtonColor(actionColors.at(index));
+			(*itr)->updateBlockImage();
 	}
 
 	void ThymioVisualProgramming::run()
@@ -521,6 +526,8 @@ namespace Aseba { namespace ThymioVPL
 		for (Scene::PairConstItr itr(scene->pairsBegin()); 
 			  itr != scene->pairsEnd(); ++itr )
 		{
+			// FIXME: use the methods in their respective classes
+			/*
 			QDomElement element = document.createElement("buttonset");
 			
 			if( (*itr)->hasEventBlock() ) 
@@ -543,6 +550,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			vplroot.appendChild(element);
 			vplroot.appendChild(document.createTextNode("\n\n"));
+			*/
 		}
 
 		scene->setModified(false);
@@ -576,7 +584,8 @@ namespace Aseba { namespace ThymioVPL
 				}
 				else if(element.tagName() == "buttonset")
 				{
-					QString cardName;
+					// FIXME: use factory functions in their respective classes
+					/*QString cardName;
 					Block *eventBlock = 0;
 					Block *actionBlock = 0;
 					
@@ -610,6 +619,7 @@ namespace Aseba { namespace ThymioVPL
 					}
 
 					scene->addEventActionsSet(eventBlock, actionBlock);
+					*/
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -666,46 +676,53 @@ namespace Aseba { namespace ThymioVPL
 			de->displayCode(scene->getCode(), scene->getSelectedPairId());
 	}
 	
+	qreal ThymioVisualProgramming::getViewScale() const
+	{
+		return 0.95*qreal(view->viewport()->width())/qreal(scene->width());
+	}
+	
 	void ThymioVisualProgramming::setViewScale()
 	{
 		view->resetTransform();
-		const qreal scale(viewportScale/qreal(scene->getZoomLevel()));
+		const qreal scale(getViewScale());
 		view->scale(scale, scale);
 	}
+	
+	// TODO: add a resize event to the view, calling the set scale
 
 	void ThymioVisualProgramming::addButtonsEvent()
 	{
-		ArrowButtonsEventBlock *card(new ArrowButtonsEventBlock(0, scene->getAdvanced()));
+		ArrowButtonsEventBlock *card(new ArrowButtonsEventBlock());
 		view->ensureVisible(scene->addEvent(card));
 	}
 
 	void ThymioVisualProgramming::addProxEvent()
 	{
-		ProxEventBlock *card(new ProxEventBlock(0, scene->getAdvanced()));
+		ProxEventBlock *card(new ProxEventBlock(scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 
 	void ThymioVisualProgramming::addProxGroundEvent()
 	{
-		ProxGroundEventBlock *card(new ProxGroundEventBlock(0, scene->getAdvanced()));
+		ProxGroundEventBlock *card(new ProxGroundEventBlock(scene->getAdvanced()));
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addTapEvent()
 	{
-		TapEventBlock *card(new TapEventBlock(0, scene->getAdvanced()));
+		TapEventBlock *card(new TapEventBlock());
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addClapEvent()
 	{
-		ClapEventBlock *card(new ClapEventBlock(0, scene->getAdvanced()));
+		ClapEventBlock *card(new ClapEventBlock());
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
 	void ThymioVisualProgramming::addTimeoutEvent()
 	{
-		TimeoutEventBlock *card(new TimeoutEventBlock(0, scene->getAdvanced()));
+		TimeoutEventBlock *card(new TimeoutEventBlock());
 		view->ensureVisible(scene->addEvent(card));
 	}
 	
@@ -747,6 +764,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
+		// FIXME: scale should be updated 
 		// desired sizes for height
 		const int idealContentHeight(6*256);
 		const int uncompressibleHeight(
@@ -778,7 +796,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		// compute and set scale
 		const qreal scale(qMin(scaleHeight, scaleWidth));
-		viewportScale = scaleWidth;
 		return scale;
 	}
 	

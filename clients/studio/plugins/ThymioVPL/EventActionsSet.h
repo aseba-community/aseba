@@ -1,5 +1,5 @@
-#ifndef VPL_EVENT_ACTION_PAIR_H
-#define VPL_EVENT_ACTION_PAIR_H
+#ifndef VPL_EVENT_ACTIONS_SET_H
+#define VPL_EVENT_ACTIONS_SET_H
 
 #include <QGraphicsItem>
 
@@ -11,7 +11,9 @@ namespace Aseba { namespace ThymioVPL
 	/*@{*/
 	
 	class Block;
+	class BlockHolder;
 	class AddRemoveButton;
+	class StateFilterEventBlock;
 	
 	class EventActionsSet : public QGraphicsObject
 	{
@@ -21,30 +23,30 @@ namespace Aseba { namespace ThymioVPL
 		EventActionsSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return advancedMode? QRectF(-2, -2, 1028+2, 410) : QRectF(-2, -2, 900+2, 410); }
-		QRectF innerBoundingRect() const { return advancedMode? QRectF(0, 0, 1028, 336) : QRectF(0, 0, 900, 336); }
+		QRectF boundingRect() const { return QRectF(-2, -2, width+2, 410); }
+		QRectF innerBoundingRect() const { return QRectF(0, 0, width, 336); }
 		
 		void setRow(int row);
 		int getRow() const { return data(1).toInt(); }
 		
-		void removeEventBlock();
-		void addEventBlock(Block *event);
-		void removeActionBlock();
-		void addActionBlock(Block *action);
-		const bool hasEventBlock() const { return eventBlock != 0; }
-		const Block *getEventBlock() const { return eventBlock; }
-		const bool hasActionBlock() const { return actionBlock != 0; }
-		const Block *getActionBlock() const { return actionBlock; }
+		void addEventBlock(Block *block);
+		void addActionBlock(Block *block, int number = -1);
+		const bool hasEventBlock() const;
+		const Block *getEventBlock() const;
+		const bool hasAnyActionBlock() const;
+		const Block *getActionBlock(int number) const;
+		BlockHolder *getActionBlockHolder(const QString& name);
+		int getBlockHolderIndex(BlockHolder *holder) const;
 		
 		bool isAnyAdvancedFeature() const;
 		bool isEmpty() const; 
-		
-		void setColorScheme(QColor eventColor, QColor actionColor);
 		
 		void setAdvanced(bool advanced);
 	
 		void setErrorStatus(bool flag);
 		
+		bool hasActionBlock(const QString& blockName) const;
+		void cleanupActionSlots();
 		void repositionElements();
 		
 	signals:
@@ -57,21 +59,22 @@ namespace Aseba { namespace ThymioVPL
 		void removeClicked();
 		void addClicked();
 	
-	private:
-		Block *eventBlock;
-		Block *actionBlock;
+	protected:
+		BlockHolder* eventHolder;
+		StateFilterEventBlock* stateFilter;
+		friend class BlockHolder;
+		QList<BlockHolder*> actionHolders;
+		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
 		
-		QColor eventBlockColor;
-		QColor actionBlockColor;
+		const qreal spacing;
+		const qreal columnWidth;
+		qreal width;
+		qreal columnPos;
+		int row;
 		
-		bool highlightEventButton;
-		bool highlightActionButton;
 		bool errorFlag;
-		bool advancedMode;
-		qreal trans;
-		qreal xpos;
 		
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 		

@@ -11,12 +11,9 @@
 namespace Aseba { namespace ThymioVPL
 {
 	// Buttons Event
-	ArrowButtonsEventBlock::ArrowButtonsEventBlock(QGraphicsItem *parent, bool advanced) : 
-		BlockWithButtons(true, true, advanced, parent)
+	ArrowButtonsEventBlock::ArrowButtonsEventBlock(QGraphicsItem *parent) : 
+		BlockWithButtons(true, "button", true, parent)
 	{
-		setData(0, "event");
-		setData(1, "button");
-		
 		const QColor color(Qt::red);
 		
 		// top, left, bottom, right
@@ -42,12 +39,9 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Prox Event
-	ProxEventBlock::ProxEventBlock(QGraphicsItem *parent, bool advanced) : 
-		BlockWithButtonsAndRange(true, true, 700, 4000, 1000, 2000, advanced, parent)
+	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
+		BlockWithButtonsAndRange(true, "prox", true, 700, 4000, 1000, 2000, advanced, parent)
 	{
-		setData(0, "event");
-		setData(1, "prox");
-		
 		// front sensors
 		for(int i=0; i<5; ++i) 
 		{
@@ -84,12 +78,9 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Prox Ground Event
-	ProxGroundEventBlock::ProxGroundEventBlock( QGraphicsItem *parent, bool advanced ) : 
-		BlockWithButtonsAndRange(true, false, 0, 1023, 150, 300, advanced, parent)
+	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
+		BlockWithButtonsAndRange(true, "proxground", false, 0, 1023, 150, 300, advanced, parent)
 	{
-		setData(0, "event");
-		setData(1, "proxground");
-		
 		// sensors
 		for(int i=0; i<2; ++i) 
 		{
@@ -109,34 +100,32 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	// Tap Event
-	TapEventBlock::TapEventBlock( QGraphicsItem *parent, bool advanced ) :
-		BlockWithNoValues(true, advanced, parent)
+	TapEventBlock::TapEventBlock( QGraphicsItem *parent) :
+		BlockWithNoValues(true, "tap", parent)
 	{
-		setData(0, "event");
-		setData(1, "tap");
-		
 		new QGraphicsSvgItem (":/images/thymiotap.svgz", this);
 	}
 	
 	
 	// Clap Event
-	ClapEventBlock::ClapEventBlock( QGraphicsItem *parent, bool advanced ) :
-		BlockWithNoValues(true, advanced, parent)
+	ClapEventBlock::ClapEventBlock( QGraphicsItem *parent ) :
+		BlockWithNoValues(true, "clap", parent)
 	{
-		setData(0, "event");
-		setData(1, "clap");
-		
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
 	
 	// TimeoutEventBlock
-	TimeoutEventBlock::TimeoutEventBlock(QGraphicsItem *parent, bool advanced):
-		BlockWithNoValues(true, advanced, parent)
+	TimeoutEventBlock::TimeoutEventBlock(QGraphicsItem *parent):
+		BlockWithNoValues(true, "timeout", parent)
 	{
-		setData(0, "event");
-		setData(1, "timeout");
-	
 		new QGraphicsSvgItem (":/images/timeout.svgz", this);
+	}
+	
+	// State Filter Event
+	StateFilterEventBlock::StateFilterEventBlock(QGraphicsItem *parent) : 
+		StateFilterBlock(true, "statefilter", parent)
+	{
+		// TODO: do something with movability (only copiable)
 	}
 
 } } // namespace ThymioVPL / namespace Aseba

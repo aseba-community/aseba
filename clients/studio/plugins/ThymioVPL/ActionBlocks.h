@@ -110,7 +110,7 @@ namespace Aseba { namespace ThymioVPL
 		QTimeLine *timer;
 	};
 
-	class StateFilterActionBlock : public BlockWithButtons
+	class StateFilterActionBlock : public StateFilterBlock
 	{
 	public:
 		StateFilterActionBlock(QGraphicsItem *parent=0);

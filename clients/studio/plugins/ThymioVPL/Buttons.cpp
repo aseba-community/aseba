@@ -153,53 +153,51 @@ namespace Aseba { namespace ThymioVPL
 	
 	BlockButton::BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
 		QPushButton(parent), 
-		card(Block::createBlock(name)),
+		block(Block::createBlock(name)),
 		vpl(vpl)
 	{
-		setToolTip(QString("%0 %1").arg(card->getName()).arg(card->getType()));
+		setToolTip(QString("%0 %1").arg(block->getName()).arg(block->getType()));
 		
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		
 		setStyleSheet("QPushButton {border: none; }");
 		
-		const qreal factor = width() / 256.;
-		setIcon(card->image(factor)); 
+		updateBlockImage();
 		
 		setAcceptDrops(true);
 	}
 	
 	BlockButton::~BlockButton()
-	{ 
-		if( card != 0 ) 
-			delete(card); 
+	{
+		delete(block); 
 	}
 	
-	void BlockButton::changeButtonColor(const QColor& color) 
+	//! Re-render the block image
+	void BlockButton::updateBlockImage() 
 	{ 
-		card->setBackgroundColor(color); 
 		const qreal factor = width() / 256.;
-		setIcon(card->image(factor));
+		setIcon(block->image(factor));
 	}	
 
 	void BlockButton::mouseMoveEvent( QMouseEvent *event )
 	{
 		#ifndef ANDROID
-		if( card==0 )
-			return;
+		assert(block);
 		
-		const qreal factor = vpl->viewportScale/qreal(vpl->scene->getZoomLevel());
 		QDrag *drag = new QDrag(this);
-		drag->setMimeData(card->mimeData());
-		drag->setPixmap(card->image(factor));
-		drag->setHotSpot(event->pos()/vpl->scene->getZoomLevel());
-		drag->exec();
+		drag->setMimeData(block->mimeData());
+		drag->setPixmap(block->image(vpl->getViewScale()));
+		const qreal thisScale = width() / 256.;
+		drag->setHotSpot(event->pos()*vpl->getViewScale() / thisScale);
+		drag->exec(Qt::CopyAction);
 		#endif // ANDROID
 	}
 
 	void BlockButton::dragEnterEvent( QDragEnterEvent *event )
 	{
-		if( event->mimeData()->hasFormat("BlockType") &&
-			event->mimeData()->data("BlockType") == card->getType().toLatin1() )
+		if (event->mimeData()->hasFormat("Block") &&
+			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
+		)
 			event->accept();
 		else
 			event->ignore();
@@ -207,26 +205,10 @@ namespace Aseba { namespace ThymioVPL
 
 	void BlockButton::dropEvent( QDropEvent *event )
 	{
-		if( event->mimeData()->hasFormat("BlockType") &&
-			event->mimeData()->data("BlockType") == card->getType().toLatin1() )
-		{
-			// get data from mime
-			QByteArray cardData(event->mimeData()->data("Block"));
-			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
-			int parentID;
-			dataStream >> parentID;
-			// if originates from the scene, delete from the scene
-			if (parentID >= 0)
-			{
-				if (event->mimeData()->data("BlockType") == QString("event").toLatin1())
-					vpl->scene->getPairRow(parentID)->removeEventBlock();
-				else
-					vpl->scene->getPairRow(parentID)->removeActionBlock();
-			}
-			// d&g handling
-			event->setDropAction(Qt::MoveAction);
+		if (event->mimeData()->hasFormat("Block") &&
+			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
+		)
 			event->accept();
-		}
 		else
 			event->ignore();
 	}

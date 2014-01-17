@@ -17,13 +17,11 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsScene(vpl),
 		vpl(vpl),
 		compiler(*this),
-		eventBlockColor(QColor(0,191,255)),
-		actionBlockColor(QColor(218,112,214)),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
 	{
-		// create initial button
+		// create initial set
 		EventActionsSet *p(createNewEventActionsSet());
 		buttonSetHeight = p->boundingRect().height();
 		
@@ -40,18 +38,22 @@ namespace Aseba { namespace ThymioVPL
 		EventActionsSet* selectedPair(getSelectedPair());
 		if (selectedPair)
 		{
-			// replaced action of selected pair
-			selectedPair->addActionBlock(item);
-			ensureOneEmptyPairAtEnd();
+			// add action to the selected pair, if not already present
+			if (!selectedPair->hasActionBlock(item->getName()))
+			{
+				selectedPair->addActionBlock(item);
+				ensureOneEmptyPairAtEnd();
+			}
 			return selectedPair;
 		}
 		else
 		{
+			qDebug() << item->getName();
 			// find a pair without any action
 			for (PairItr pItr(pairsBegin()); pItr != pairsEnd(); ++pItr)
 			{
 				EventActionsSet* p(*pItr);
-				if (!p->hasActionBlock())
+				if (!p->hasActionBlock(item->getName()))
 				{
 					p->addActionBlock(item);
 					clearSelection();
@@ -127,7 +129,6 @@ namespace Aseba { namespace ThymioVPL
 	EventActionsSet *Scene::createNewEventActionsSet()
 	{
 		EventActionsSet *p(new EventActionsSet(eventActionPairs.size(), advancedMode));
-		p->setColorScheme(eventBlockColor, actionBlockColor);
 		eventActionPairs.push_back(p);
 		
 		addItem(p);
@@ -144,8 +145,7 @@ namespace Aseba { namespace ThymioVPL
 			return true;
 			
 		if( eventActionPairs.size() > 1 ||
-			eventActionPairs[0]->hasActionBlock() ||
-			eventActionPairs[0]->hasEventBlock() )
+			!eventActionPairs[0]->isEmpty() )
 			return false;
 
 		return true;
@@ -176,19 +176,6 @@ namespace Aseba { namespace ThymioVPL
 		setModified(false);
 		
 		advancedMode = false;
-	}
-	
-	void Scene::setColorScheme(QColor eventColor, QColor actionColor)
-	{
-		eventBlockColor = eventColor;
-		actionBlockColor = actionColor;
-
-		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
-			(*itr)->setColorScheme(eventColor, actionColor);
-
-		update();
-	
-		setModified(true);
 	}
 	
 	void Scene::setModified(bool mod)
@@ -233,7 +220,7 @@ namespace Aseba { namespace ThymioVPL
 		removeItem(p);
 		p->deleteLater();
 		
-		rearrangeButtons(row);
+		rearrangeSets(row);
 		
 		ensureOneEmptyPairAtEnd();
 		
@@ -247,14 +234,13 @@ namespace Aseba { namespace ThymioVPL
 		Q_ASSERT( row <= eventActionPairs.size() );
 
 		EventActionsSet *p(new EventActionsSet(row, advancedMode));
-		p->setColorScheme(eventBlockColor, actionBlockColor);
 		eventActionPairs.insert(row, p);
 		
 		addItem(p);
 		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
-		rearrangeButtons(row+1);
+		rearrangeSets(row+1);
 		relayout();
 		
 		recompile();
@@ -276,10 +262,11 @@ namespace Aseba { namespace ThymioVPL
 			EventActionsSet *p(eventActionPairs[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
-		setSceneRect(r.adjusted(0,-20,0,20));
+		setSceneRect(r.adjusted(-40,-40,40,40));
+		emit sceneSizeChanged();
 	}
 
-	void Scene::rearrangeButtons(int row)
+	void Scene::rearrangeSets(int row)
 	{
 		for(int i=row; i<eventActionPairs.size(); ++i) 
 			eventActionPairs.at(i)->setRow(i);
@@ -287,6 +274,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::relayout()
 	{
+		// FIXME: doing this properly would require two pass, but we are not sure that we want to keep the zoom
 		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
 			(*itr)->repositionElements();
 		recomputeSceneRect();
@@ -401,7 +389,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			eventActionPairs.insert(currentRow, p);
 
-			rearrangeButtons( prevRow < currentRow ? prevRow : currentRow );
+			rearrangeSets( prevRow < currentRow ? prevRow : currentRow );
 			
 			ensureOneEmptyPairAtEnd();
 			
@@ -431,6 +419,5 @@ namespace Aseba { namespace ThymioVPL
 		// TODO: if we keep slider, use its value instead of doing copies
 		zoomLevel = vpl->zoomSlider->value();
 		relayout();
-		emit zoomChanged();
 	}
 } } // namespace ThymioVPL / namespace Aseba

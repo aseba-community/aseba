@@ -6,6 +6,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/Block.cpp
 	ThymioVPL/EventBlocks.cpp
 	ThymioVPL/ActionBlocks.cpp
+	ThymioVPL/BlockHolder.cpp
 	ThymioVPL/EventActionsSet.cpp
 	ThymioVPL/Scene.cpp
 	ThymioVPL/Compiler.cpp
@@ -18,6 +19,7 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/Buttons.h
 	ThymioVPL/Block.h
 	ThymioVPL/ActionBlocks.h
+	ThymioVPL/BlockHolder.h
 	ThymioVPL/EventActionsSet.h
 	ThymioVPL/Scene.h
 )

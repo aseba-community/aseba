@@ -19,6 +19,8 @@
 #include "Buttons.h"
 #include "EventBlocks.h"
 #include "ActionBlocks.h"
+#include "ThymioVisualProgramming.h"
+#include "BlockHolder.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -47,47 +49,47 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Factory for buttons
-	Block* Block::createBlock(const QString& name, bool advancedMode)
+	Block* Block::createBlock(const QString& name, bool advanced, QGraphicsItem *parent)
 	{
 		if ( name == "button" )
-			return new ArrowButtonsEventBlock(0, advancedMode);
+			return new ArrowButtonsEventBlock(parent);
 		else if ( name == "prox" )
-			return new ProxEventBlock(0, advancedMode);
+			return new ProxEventBlock(advanced, parent);
 		else if ( name == "proxground" )
-			return new ProxGroundEventBlock(0, advancedMode);
+			return new ProxGroundEventBlock(advanced, parent);
 		else if ( name == "tap" )
-			return new TapEventBlock(0, advancedMode);
+			return new TapEventBlock(parent);
 		else if ( name == "clap" )
-			return new ClapEventBlock(0, advancedMode);
+			return new ClapEventBlock(parent);
 		else if ( name == "timeout" )
-			return new TimeoutEventBlock(0, advancedMode);
-		else if ( name == "move" )
-			return new MoveActionBlock();
-		else if ( name == "colortop" )
-			return new TopColorActionBlock();
-		else if ( name == "colorbottom" )
-			return new BottomColorActionBlock();
-		else if ( name == "sound" )
-			return new SoundActionBlock();
-		else if ( name == "timer" )
-			return new TimerActionBlock();
+			return new TimeoutEventBlock(parent);
 		else if ( name == "statefilter" )
-			return new StateFilterActionBlock();
+			return new StateFilterActionBlock(parent);
+		else if ( name == "move" )
+			return new MoveActionBlock(parent);
+		else if ( name == "colortop" )
+			return new TopColorActionBlock(parent);
+		else if ( name == "colorbottom" )
+			return new BottomColorActionBlock(parent);
+		else if ( name == "sound" )
+			return new SoundActionBlock(parent);
+		else if ( name == "timer" )
+			return new TimerActionBlock(parent);
+		else if ( name == "setstate" )
+			return new StateFilterActionBlock(parent);
 		else
 			return 0;
 	}
 	
-	Block::Block(bool eventButton, bool advanced, QGraphicsItem *parent) : 
+	Block::Block(bool isEvent, const QString& name, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
-		backgroundColor(eventButton ? QColor(0,191,255) : QColor(218, 112, 214)),
-		parentID(-1),
-		trans(advanced ? 64 : 0)
+		isEvent(isEvent),
+		name(name),
+		beingDragged(false),
+		parentID(-1)
 	{
 		setFlag(QGraphicsItem::ItemIsMovable);
 		setAcceptedMouseButtons(Qt::LeftButton);
-		
-		if (advanced)
-			addAdvancedModeButtons();
 	}
 
 	Block::~Block() 
@@ -95,30 +97,16 @@ namespace Aseba { namespace ThymioVPL
 		// doing nothing
 	}
 	
-	void Block::addAdvancedModeButtons()
-	{
-		const int angles[4] = {0,90,270,180};
-		for(uint i=0; i<4; i++)
-		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
-			button->setPos(310 + (i%2)*60, 100 + (i/2)*60);
-			button->setRotation(angles[i]);
-			button->addState(QColor(255,128,0));
-			button->addState(Qt::white);
-
-			stateButtons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
-		}
-	}
-	
 	void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		//painter->setPen(QColor(147, 134, 115),2);
 		painter->setPen(Qt::NoPen);
-		painter->setBrush(backgroundColor); // filling
+		if (isEvent)
+			painter->setBrush(ThymioVisualProgramming::currentEventColor);
+		else
+			painter->setBrush(ThymioVisualProgramming::currentActionColor);
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
@@ -154,52 +142,6 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	QMimeData* Block::mimeData() const
-	{
-		QByteArray data;
-		QDataStream dataStream(&data, QIODevice::WriteOnly);
-		dataStream << parentID << getName();
-		
-		dataStream << getStateFilter();
-		
-		dataStream << valuesCount();
-		for (unsigned i=0; i<valuesCount(); ++i)
-			dataStream << getValue(i);
-		
-		QMimeData *mime = new QMimeData;
-		mime->setData("Block", data);
-		mime->setData("BlockType", getType().toLatin1());
-		
-		return mime;
-	}
-
-	void Block::setAdvanced(bool advanced)
-	{
-		trans = advanced ? 64 : 0;
-		
-		if( advanced && stateButtons.empty() )
-		{
-			addAdvancedModeButtons();
-			//emit contentChanged;
-		}
-		else if( !advanced && !stateButtons.empty() )
-		{
-			for(int i=0; i<stateButtons.size(); i++)
-			{
-				disconnect(stateButtons[i], SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
-				stateButtons[i]->setParentItem(0);
-				delete(stateButtons[i]);
-			}
-			stateButtons.clear();
-			emit contentChanged();
-		}
-	}
-	
-	unsigned Block::stateFilterCount() const
-	{
-		return stateButtons.size();
-	}
-	
 	bool Block::isAnyValueSet() const
 	{
 		for (unsigned i=0; i<valuesCount(); ++i)
@@ -209,48 +151,68 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return false;
 	}
-
-	bool Block::isAnyAdvancedFeature() const
-	{
-		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
-		{
-			if (stateButtons[i]->getValue() != 0)
-				return true;
-		}
-		return false;
-	}
 	
-	int Block::getStateFilter() const
+	QMimeData* Block::mimeData() const
 	{
-		if (stateButtons.empty())
-			return -1;
-
-		unsigned val=0;
-		for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
-			val |= stateButtons[i]->getValue() << (i*2);
-
-		return val;
-	}
-	
-	int Block::getStateFilter(unsigned i) const
-	{
-		return stateButtons[i]->getValue();
-	}
-	
-	void Block::setStateFilter(int val)
-	{	
-		if( val >= 0 )
-		{
-			setAdvanced(true);
-			for (unsigned i = 0; i < (unsigned)stateButtons.size(); ++i)
-			{
-				const int v((val >> (i*2)) & 0x3);
-				stateButtons[i]->setValue(v);
-			}
-		}
-		else
-			setAdvanced(false);
+		// create a DOM document and serialize the content of this block in it
+		QDomDocument document("block");
+		document.appendChild(serialize(document));
 		
+		// create a MIME data for this block
+		QMimeData *mime = new QMimeData;
+		mime->setData("Block", document.toByteArray());
+		qDebug() << document.toString();
+		
+		return mime;
+	}
+	
+	QDomElement Block::serialize(QDomDocument& document) const
+	{
+		// create element
+		QDomElement element = document.createElement("block");
+		
+		// populate attributes from this block's informations
+		element.setAttribute("name", getName());
+		element.setAttribute("type", getType());
+		for (unsigned i=0; i<valuesCount(); ++i)
+			element.setAttribute(QString("value%0").arg(i), getValue(i));
+		
+		return element;
+	}
+	
+	Block* Block::deserialize(const QDomElement& element, bool advanced)
+	{
+		// create a block
+		Block *block(createBlock(element.attribute("name"), advanced));
+		
+		// set that block's informations from element's attributes
+		for (unsigned i=0; i<block->valuesCount(); ++i)
+			block->setValue(i, element.attribute(QString("value%0").arg(i), QString("%0").arg(block->getValue(i))).toInt());
+		
+		return block;
+	}
+	
+	Block* Block::deserialize(const QByteArray& data, bool advanced)
+	{
+		QDomDocument document;
+		document.setContent(data);
+		return deserialize(document.documentElement(), advanced);
+	}
+	
+	QString Block::deserializeType(const QByteArray& data)
+	{
+		QDomDocument document;
+		document.setContent(data);
+		const QDomElement element(document.documentElement());
+		return element.attribute("type");
+	}
+	
+	QString Block::deserializeName(const QByteArray& data)
+	{
+		QDomDocument document;
+		document.setContent(data);
+		const QDomElement element(document.documentElement());
+		return element.attribute("name");
 	}
 
 	void Block::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
@@ -272,22 +234,34 @@ namespace Aseba { namespace ThymioVPL
 		scene()->render(&painter, QRectF(), sceneRect);
 		painter.end();
 		
+		const bool isCopy(event->modifiers() & Qt::ControlModifier);
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
-		drag->exec();
+		
+		beingDragged = true;
+		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
+		if (!isCopy && (dragResult != Qt::IgnoreAction) && parentItem())
+		{
+			qDebug() << "drag res";
+			BlockHolder* holder(dynamic_cast<BlockHolder*>(parentItem()));
+			if (holder)
+				holder->removeBlock();
+		}
+		beingDragged = false;
 		#endif // ANDROID
 	}
 	
+	/////
 	
-	BlockWithNoValues::BlockWithNoValues(bool eventButton, bool advanced, QGraphicsItem *parent):
-		Block(eventButton, advanced, parent)
+	BlockWithNoValues::BlockWithNoValues(bool isEvent, const QString& name, QGraphicsItem *parent):
+		Block(isEvent, name, parent)
 	{}
 	
 	
-	BlockWithBody::BlockWithBody(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		Block(eventButton, advanced, parent),
+	BlockWithBody::BlockWithBody(bool isEvent, const QString& name, bool up, QGraphicsItem *parent) :
+		Block(isEvent, name, parent),
 		up(up),
 		bodyColor(Qt::white)
 	{
@@ -300,8 +274,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	BlockWithButtons::BlockWithButtons(bool eventButton, bool up, bool advanced, QGraphicsItem *parent) :
-		BlockWithBody(eventButton, up, advanced, parent)
+	BlockWithButtons::BlockWithButtons(bool isEvent, const QString& name, bool up, QGraphicsItem *parent) :
+		BlockWithBody(isEvent, name, up, parent)
 	{
 	}
 	
@@ -325,8 +299,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	BlockWithButtonsAndRange::BlockWithButtonsAndRange(bool eventButton, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
-		BlockWithButtons(eventButton, up, advanced, parent),
+	BlockWithButtonsAndRange::BlockWithButtonsAndRange(bool isEvent, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
+		BlockWithButtons(isEvent, name, up, parent),
 		lowerBound(lowerBound),
 		upperBound(upperBound),
 		range(upperBound-lowerBound),
@@ -507,6 +481,25 @@ namespace Aseba { namespace ThymioVPL
 	float BlockWithButtonsAndRange::valToPixel(float val) const
 	{
 		return rangeRect().width()*(1. - sqrt((val-lowerBound)/float(range)));
+	}
+	
+	// State Filter Action
+	
+	StateFilterBlock::StateFilterBlock(bool isEvent, const QString& name, QGraphicsItem *parent) : 
+		BlockWithButtons(isEvent, name, true, parent)
+	{
+		const int angles[4] = {0,90,270,180};
+		for(uint i=0; i<4; i++)
+		{
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			button->setPos(98 + (i%2)*60, 98 + (i/2)*60);
+			button->setRotation(angles[i]);
+			button->addState(QColor(255,128,0));
+			button->addState(Qt::white);
+
+			buttons.push_back(button);
+			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+		}
 	}
 
 } } // namespace ThymioVPL / namespace Aseba
