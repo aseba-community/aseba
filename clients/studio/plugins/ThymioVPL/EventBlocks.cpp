@@ -12,7 +12,7 @@ namespace Aseba { namespace ThymioVPL
 {
 	// Buttons Event
 	ArrowButtonsEventBlock::ArrowButtonsEventBlock(QGraphicsItem *parent) : 
-		BlockWithButtons(true, "button", true, parent)
+		BlockWithButtons("event", "button", true, parent)
 	{
 		const QColor color(Qt::red);
 		
@@ -40,7 +40,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange(true, "prox", true, 700, 4000, 1000, 2000, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, advanced, parent)
 	{
 		// front sensors
 		for(int i=0; i<5; ++i) 
@@ -79,7 +79,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange(true, "proxground", false, 0, 1023, 150, 300, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 150, 300, advanced, parent)
 	{
 		// sensors
 		for(int i=0; i<2; ++i) 
@@ -101,7 +101,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Tap Event
 	TapEventBlock::TapEventBlock( QGraphicsItem *parent) :
-		BlockWithNoValues(true, "tap", parent)
+		BlockWithNoValues("event", "tap", parent)
 	{
 		new QGraphicsSvgItem (":/images/thymiotap.svgz", this);
 	}
@@ -109,23 +109,16 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Clap Event
 	ClapEventBlock::ClapEventBlock( QGraphicsItem *parent ) :
-		BlockWithNoValues(true, "clap", parent)
+		BlockWithNoValues("event", "clap", parent)
 	{
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
 	
 	// TimeoutEventBlock
 	TimeoutEventBlock::TimeoutEventBlock(QGraphicsItem *parent):
-		BlockWithNoValues(true, "timeout", parent)
+		BlockWithNoValues("event", "timeout", parent)
 	{
 		new QGraphicsSvgItem (":/images/timeout.svgz", this);
-	}
-	
-	// State Filter Event
-	StateFilterEventBlock::StateFilterEventBlock(QGraphicsItem *parent) : 
-		StateFilterBlock(true, "statefilter", parent)
-	{
-		// TODO: do something with movability (only copiable)
 	}
 
 } } // namespace ThymioVPL / namespace Aseba

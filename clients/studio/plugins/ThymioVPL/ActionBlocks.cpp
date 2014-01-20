@@ -15,7 +15,7 @@ namespace Aseba { namespace ThymioVPL
 {
 	// Move Action
 	MoveActionBlock::MoveActionBlock( QGraphicsItem *parent ) :
-		Block(false, "move", parent)
+		Block("action", "move", parent)
 	{
 		new QGraphicsSvgItem (":/images/vpl_background_motor.svgz", this);
 
@@ -98,7 +98,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Color Action
 	ColorActionBlock::ColorActionBlock( QGraphicsItem *parent, bool top) :
-		BlockWithBody(false, top ? "colortop" : "colorbottom", top, parent)
+		BlockWithBody("action", top ? "colortop" : "colorbottom", top, parent)
 	{
 		const char *sliderColors[] = { "FF0000", "00FF00", "0000FF" };
 		
@@ -168,11 +168,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Sound Action
 	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
-		BlockWithBody(false, "sound", true, parent)
+		BlockWithBody("action", "sound", true, parent)
 	{
-		setData(0, "action");
-		setData(1, "sound");
-		
 		notes[0] = 3; durations[0] = 1;
 		notes[1] = 4; durations[1] = 1;
 		notes[2] = 3; durations[2] = 2;
@@ -255,7 +252,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
-		BlockWithBody(false, "timer", true, parent),
+		BlockWithBody("action", "timer", true, parent),
 		duration(1.0)
 	{
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
@@ -331,7 +328,7 @@ namespace Aseba { namespace ThymioVPL
 
 	// State Filter Action
 	StateFilterActionBlock::StateFilterActionBlock(QGraphicsItem *parent) : 
-		StateFilterBlock(false, "setstate", parent)
+		StateFilterBlock("action", "setstate", parent)
 	{
 	}
 	

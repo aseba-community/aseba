@@ -18,9 +18,12 @@
 #include "Block.h"
 #include "Buttons.h"
 #include "EventBlocks.h"
+#include "StateBlocks.h"
 #include "ActionBlocks.h"
+#include "EventActionsSet.h"
 #include "ThymioVisualProgramming.h"
 #include "BlockHolder.h"
+#include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -64,7 +67,7 @@ namespace Aseba { namespace ThymioVPL
 		else if ( name == "timeout" )
 			return new TimeoutEventBlock(parent);
 		else if ( name == "statefilter" )
-			return new StateFilterActionBlock(parent);
+			return new StateFilterCheckBlock(parent);
 		else if ( name == "move" )
 			return new MoveActionBlock(parent);
 		else if ( name == "colortop" )
@@ -81,9 +84,9 @@ namespace Aseba { namespace ThymioVPL
 			return 0;
 	}
 	
-	Block::Block(bool isEvent, const QString& name, QGraphicsItem *parent) : 
+	Block::Block(const QString& type, const QString& name, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
-		isEvent(isEvent),
+		type(type),
 		name(name),
 		beingDragged(false),
 		parentID(-1)
@@ -103,10 +106,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(widget);
 		
 		painter->setPen(Qt::NoPen);
-		if (isEvent)
-			painter->setBrush(ThymioVisualProgramming::currentEventColor);
-		else
-			painter->setBrush(ThymioVisualProgramming::currentActionColor);
+		painter->setBrush(ThymioVisualProgramming::getBlockColor(type));
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
@@ -152,6 +152,12 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 	
+	void Block::resetValues()
+	{
+		for (unsigned i=0; i<valuesCount(); ++i)
+			setValue(i, 0);
+	}
+	
 	QMimeData* Block::mimeData() const
 	{
 		// create a DOM document and serialize the content of this block in it
@@ -161,7 +167,6 @@ namespace Aseba { namespace ThymioVPL
 		// create a MIME data for this block
 		QMimeData *mime = new QMimeData;
 		mime->setData("Block", document.toByteArray());
-		qDebug() << document.toString();
 		
 		return mime;
 	}
@@ -234,7 +239,7 @@ namespace Aseba { namespace ThymioVPL
 		scene()->render(&painter, QRectF(), sceneRect);
 		painter.end();
 		
-		const bool isCopy(event->modifiers() & Qt::ControlModifier);
+		const bool isCopy((event->modifiers() & Qt::ControlModifier) || (name == "statefilter"));
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
 		drag->setHotSpot(hotspot);
@@ -244,10 +249,17 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (!isCopy && (dragResult != Qt::IgnoreAction) && parentItem())
 		{
-			qDebug() << "drag res";
 			BlockHolder* holder(dynamic_cast<BlockHolder*>(parentItem()));
 			if (holder)
+			{
+				// disconnect the selection setting mechanism, as we do not want this removal to select our set
+				EventActionsSet* eventActionsSet(polymorphic_downcast<EventActionsSet*>(holder->parentItem()));
+				disconnect(eventActionsSet, SIGNAL(contentChanged()), eventActionsSet, SLOT(setSoleSelection()));
+				
 				holder->removeBlock();
+				
+				connect(eventActionsSet, SIGNAL(contentChanged()), eventActionsSet, SLOT(setSoleSelection()));
+			}
 		}
 		beingDragged = false;
 		#endif // ANDROID
@@ -255,13 +267,13 @@ namespace Aseba { namespace ThymioVPL
 	
 	/////
 	
-	BlockWithNoValues::BlockWithNoValues(bool isEvent, const QString& name, QGraphicsItem *parent):
-		Block(isEvent, name, parent)
+	BlockWithNoValues::BlockWithNoValues(const QString& type, const QString& name, QGraphicsItem *parent):
+		Block(type, name, parent)
 	{}
 	
 	
-	BlockWithBody::BlockWithBody(bool isEvent, const QString& name, bool up, QGraphicsItem *parent) :
-		Block(isEvent, name, parent),
+	BlockWithBody::BlockWithBody(const QString& type, const QString& name, bool up, QGraphicsItem *parent) :
+		Block(type, name, parent),
 		up(up),
 		bodyColor(Qt::white)
 	{
@@ -274,8 +286,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	BlockWithButtons::BlockWithButtons(bool isEvent, const QString& name, bool up, QGraphicsItem *parent) :
-		BlockWithBody(isEvent, name, up, parent)
+	BlockWithButtons::BlockWithButtons(const QString& type, const QString& name, bool up, QGraphicsItem *parent) :
+		BlockWithBody(type, name, up, parent)
 	{
 	}
 	
@@ -299,8 +311,8 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	BlockWithButtonsAndRange::BlockWithButtonsAndRange(bool isEvent, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
-		BlockWithButtons(isEvent, name, up, parent),
+	BlockWithButtonsAndRange::BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent) :
+		BlockWithButtons(type, name, up, parent),
 		lowerBound(lowerBound),
 		upperBound(upperBound),
 		range(upperBound-lowerBound),
@@ -485,8 +497,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	// State Filter Action
 	
-	StateFilterBlock::StateFilterBlock(bool isEvent, const QString& name, QGraphicsItem *parent) : 
-		BlockWithButtons(isEvent, name, true, parent)
+	StateFilterBlock::StateFilterBlock(const QString& type, const QString& name, QGraphicsItem *parent) : 
+		BlockWithButtons(type, name, true, parent)
 	{
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)

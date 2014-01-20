@@ -1,5 +1,5 @@
-#ifndef VPL_ACTION_CARDS_H
-#define VPL_ACTION_CARDS_H
+#ifndef VPL_ACTION_BLOCKS_H
+#define VPL_ACTION_BLOCKS_H
 
 #include <QList>
 

@@ -8,6 +8,8 @@ class QSlider;
 class QTimeLine;
 class QMimeData;
 
+// FIXME: split this file into two
+
 namespace Aseba { namespace ThymioVPL
 {
 	/** \addtogroup studio */
@@ -90,6 +92,8 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent=0);
 		~BlockButton();
+		
+		QString getName() const;
 		
 		void updateBlockImage();
 		

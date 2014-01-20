@@ -16,28 +16,34 @@ namespace Aseba { namespace ThymioVPL
 		
 	public:
 		// constructor
-		BlockHolder(const QString& blockType, QGraphicsItem *parent=0);
+		BlockHolder(const QString& blockType, QGraphicsItem *parent=0, Block* block=0);
 		
 		// from QGraphicsObject
 		virtual QRectF boundingRect() const;
-		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget);
 		
 		// specific
 		void addBlock(Block* block);
 		void removeBlock(bool cleanupSet=true);
 		const Block* getBlock() const { return block; }
+		Block* getBlock() { return block; }
 		
 		void setAdvanced(bool advanced);
 		bool isAnyAdvancedFeature() const;
+		bool isAnyValueSet() const;
 		bool isEmpty() const;
 		
 	signals:
 		void contentChanged();
 		
 	protected:
+		// from QGraphicsObject
+		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+		
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget);
+		
+		// specific
 		bool isDnDValid(QGraphicsSceneDragDropEvent *event) const;
 	
 	protected:

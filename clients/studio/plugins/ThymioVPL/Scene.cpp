@@ -32,120 +32,123 @@ namespace Aseba { namespace ThymioVPL
 	{
 		clear();
 	}
+	
+	// FIXME: switch to name within these functinos instead of block
 
-	QGraphicsItem *Scene::addAction(Block *item) 
+	QGraphicsItem *Scene::addAction(const QString& name) 
 	{
-		EventActionsSet* selectedPair(getSelectedPair());
-		if (selectedPair)
+		Block* item(Block::createBlock(name, advancedMode));
+		EventActionsSet* selectedSet(getSelectedSet());
+		if (selectedSet)
 		{
-			// add action to the selected pair, if not already present
-			if (!selectedPair->hasActionBlock(item->getName()))
+			// add action to the selected set, if not already present
+			if (!selectedSet->hasActionBlock(item->getName()))
 			{
-				selectedPair->addActionBlock(item);
-				ensureOneEmptyPairAtEnd();
+				selectedSet->addActionBlock(item);
+				ensureOneEmptySetAtEnd();
 			}
-			return selectedPair;
+			return selectedSet;
 		}
 		else
 		{
-			qDebug() << item->getName();
-			// find a pair without any action
-			for (PairItr pItr(pairsBegin()); pItr != pairsEnd(); ++pItr)
+			// find a set without any action
+			for (SetItr pItr(setsBegin()); pItr != setsEnd(); ++pItr)
 			{
-				EventActionsSet* p(*pItr);
-				if (!p->hasActionBlock(item->getName()))
+				EventActionsSet* eventActionsSet(*pItr);
+				if (!eventActionsSet->hasActionBlock(item->getName()))
 				{
-					p->addActionBlock(item);
+					eventActionsSet->addActionBlock(item);
 					clearSelection();
-					ensureOneEmptyPairAtEnd();
-					return p;
+					ensureOneEmptySetAtEnd();
+					return eventActionsSet;
 				}
 			}
-			// none found, add a new pair and acc action there
-			EventActionsSet* p(createNewEventActionsSet());
-			p->addActionBlock(item);
+			// none found, add a new set and acc action there
+			EventActionsSet* eventActionsSet(createNewEventActionsSet());
+			eventActionsSet->addActionBlock(item);
 			clearSelection();
-			ensureOneEmptyPairAtEnd();
-			return p;
+			ensureOneEmptySetAtEnd();
+			return eventActionsSet;
 		}
 	}
 
-	QGraphicsItem *Scene::addEvent(Block *item) 
+	QGraphicsItem *Scene::addEvent(const QString& name) 
 	{
-		EventActionsSet* selectedPair(getSelectedPair());
-		if (selectedPair)
+		Block* item(Block::createBlock(name, advancedMode));
+		EventActionsSet* selectedSet(getSelectedSet());
+		if (selectedSet)
 		{
-			// replaced action of selected pair
-			selectedPair->addEventBlock(item);
-			ensureOneEmptyPairAtEnd();
-			return selectedPair;
+			// replaced action of selected set
+			selectedSet->addEventBlock(item);
+			ensureOneEmptySetAtEnd();
+			return selectedSet;
 		}
 		else
 		{
-			// find a pair without any action
-			for (PairItr pItr(pairsBegin()); pItr != pairsEnd(); ++pItr)
+			// find a set without any action
+			for (SetItr pItr(setsBegin()); pItr != setsEnd(); ++pItr)
 			{
-				EventActionsSet* p(*pItr);
-				if (!p->hasEventBlock())
+				EventActionsSet* eventActionsSet(*pItr);
+				if (!eventActionsSet->hasEventBlock())
 				{
-					p->addEventBlock(item);
+					eventActionsSet->addEventBlock(item);
 					clearSelection();
-					ensureOneEmptyPairAtEnd();
-					return p;
+					ensureOneEmptySetAtEnd();
+					return eventActionsSet;
 				}
 			}
-			// none found, add a new pair and add event there
-			EventActionsSet* p(createNewEventActionsSet());
-			p->addEventBlock(item);
+			// none found, add a new set and add event there
+			EventActionsSet* eventActionsSet(createNewEventActionsSet());
+			eventActionsSet->addEventBlock(item);
 			clearSelection();
-			ensureOneEmptyPairAtEnd();
-			return p;
+			ensureOneEmptySetAtEnd();
+			return eventActionsSet;
 		}
 	}
 	
 	// used by load, avoid recompiling
 	void Scene::addEventActionsSet(Block *event, Block *action)
 	{
-		EventActionsSet *p(createNewEventActionsSet());
+		EventActionsSet *eventActionsSet(createNewEventActionsSet());
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
-		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		disconnect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		if(event)
-			p->addEventBlock(event);
+			eventActionsSet->addEventBlock(event);
 		if(action)
-			p->addActionBlock(action);
-		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+			eventActionsSet->addActionBlock(action);
+		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 	}
 	
-	void Scene::ensureOneEmptyPairAtEnd()
+	void Scene::ensureOneEmptySetAtEnd()
 	{
-		if (eventActionPairs.empty())
+		if (eventActionsSets.empty())
 			createNewEventActionsSet();
-		else if (!eventActionPairs.last()->isEmpty())
+		else if (!eventActionsSets.last()->isEmpty())
 			createNewEventActionsSet();
 		relayout();
 	}
 
 	EventActionsSet *Scene::createNewEventActionsSet()
 	{
-		EventActionsSet *p(new EventActionsSet(eventActionPairs.size(), advancedMode));
-		eventActionPairs.push_back(p);
+		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
+		eventActionsSets.push_back(eventActionsSet);
 		
-		addItem(p);
+		addItem(eventActionsSet);
 		recomputeSceneRect();
 		
-		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		
-		return p;
+		return eventActionsSet;
 	}
 
 	bool Scene::isEmpty() const
 	{
-		if( eventActionPairs.isEmpty() )
+		if( eventActionsSets.isEmpty() )
 			return true;
 			
-		if( eventActionPairs.size() > 1 ||
-			!eventActionPairs[0]->isEmpty() )
+		if( eventActionsSets.size() > 1 ||
+			!eventActionsSets[0]->isEmpty() )
 			return false;
 
 		return true;
@@ -160,15 +163,15 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::clear()
 	{
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
-		for(int i=0; i<eventActionPairs.size(); i++)
+		for(int i=0; i<eventActionsSets.size(); i++)
 		{
-			EventActionsSet *p(eventActionPairs[i]);
+			EventActionsSet *p(eventActionsSets[i]);
 			//disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 			removeItem(p);
 			delete(p);
 		}
 		setSceneRect(QRectF());
-		eventActionPairs.clear();
+		eventActionsSets.clear();
 		compiler.clear();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
@@ -189,7 +192,7 @@ namespace Aseba { namespace ThymioVPL
 		if (advanced != advancedMode)
 		{
 			advancedMode = advanced;
-			for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+			for(SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			{
 				EventActionsSet* p(*itr);
 				p->disconnect(SIGNAL(contentChanged()), this, SLOT(recompile()));
@@ -203,38 +206,38 @@ namespace Aseba { namespace ThymioVPL
 	
 	bool Scene::isAnyAdvancedFeature() const
 	{
-		for (PairConstItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+		for (SetConstItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			if ((*itr)->isAnyAdvancedFeature())
 				return true;
 		return false;
 	}
 
-	void Scene::removePair(int row)
+	void Scene::removeSet(int row)
 	{
-		Q_ASSERT( row < eventActionPairs.size() );
+		Q_ASSERT( row < eventActionsSets.size() );
 		
-		EventActionsSet *p(eventActionPairs[row]);
+		EventActionsSet *p(eventActionsSets[row]);
 		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		eventActionPairs.removeAt(row);
+		eventActionsSets.removeAt(row);
 		
 		removeItem(p);
 		p->deleteLater();
 		
 		rearrangeSets(row);
 		
-		ensureOneEmptyPairAtEnd();
+		ensureOneEmptySetAtEnd();
 		
 		recomputeSceneRect();
 	
 		recompile();
 	}
 	
-	void Scene::insertPair(int row) 
+	void Scene::insertSet(int row) 
 	{
-		Q_ASSERT( row <= eventActionPairs.size() );
+		Q_ASSERT( row <= eventActionsSets.size() );
 
 		EventActionsSet *p(new EventActionsSet(row, advancedMode));
-		eventActionPairs.insert(row, p);
+		eventActionsSets.insert(row, p);
 		
 		addItem(p);
 		
@@ -257,9 +260,9 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::recomputeSceneRect()
 	{
 		QRectF r;
-		for(int i=0; i<eventActionPairs.size(); i++)
+		for(int i=0; i<eventActionsSets.size(); i++)
 		{
-			EventActionsSet *p(eventActionPairs[i]);
+			EventActionsSet *p(eventActionsSets[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
 		setSceneRect(r.adjusted(-40,-40,40,40));
@@ -268,14 +271,14 @@ namespace Aseba { namespace ThymioVPL
 
 	void Scene::rearrangeSets(int row)
 	{
-		for(int i=row; i<eventActionPairs.size(); ++i) 
-			eventActionPairs.at(i)->setRow(i);
+		for(int i=row; i<eventActionsSets.size(); ++i) 
+			eventActionsSets.at(i)->setRow(i);
 	}
 	
 	void Scene::relayout()
 	{
 		// FIXME: doing this properly would require two pass, but we are not sure that we want to keep the zoom
-		for(PairItr itr(pairsBegin()); itr != pairsEnd(); ++itr)
+		for(SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			(*itr)->repositionElements();
 		recomputeSceneRect();
 	}
@@ -291,7 +294,7 @@ namespace Aseba { namespace ThymioVPL
 			return tr("Line %0: Missing action").arg(compiler.getErrorLine());
 			break;
 		case Compiler::EVENT_REPEATED:
-			return tr("The event-action pair in line %0 is the same as in line %1").arg(compiler.getErrorLine()).arg(compiler.getSecondErrorLine());
+			return tr("The event-action set in line %0 is the same as in line %1").arg(compiler.getErrorLine()).arg(compiler.getSecondErrorLine());
 			break;
 			// 
 		case Compiler::INVALID_CODE:
@@ -315,33 +318,32 @@ namespace Aseba { namespace ThymioVPL
 		return out;
 	}
 
-	int Scene::getSelectedPairId() const 
+	int Scene::getSelectedSetId() const 
 	{ 
-		EventActionsSet* selectedPair(getSelectedPair());
-		if (selectedPair)
-			return compiler.buttonToCode(selectedPair->data(1).toInt());
+		EventActionsSet* selectedSet(getSelectedSet());
+		if (selectedSet)
+			return compiler.buttonToCode(selectedSet->getRow());
 		else
 			return -1;
 	}
 	
-	EventActionsSet *Scene::getSelectedPair() const
+	EventActionsSet *Scene::getSelectedSet() const
 	{
 		if (selectedItems().empty())
 			return 0;
 		QGraphicsItem *item;
 		foreach (item, selectedItems())
 		{
-			if (item->data(0).toString() == "eventactionpair")
-			{
-				return dynamic_cast<EventActionsSet*>(item);
-			}
+			EventActionsSet* eventActionsSet(dynamic_cast<EventActionsSet*>(item));
+			if (eventActionsSet)
+				return eventActionsSet;
 		}
 		return 0;
 	}
 	
-	EventActionsSet *Scene::getPairRow(int row) const
+	EventActionsSet *Scene::getSetRow(int row) const
 	{
-		return eventActionPairs.at(row);
+		return eventActionsSets.at(row);
 	}
 	
 	void Scene::recompile()
@@ -355,28 +357,34 @@ namespace Aseba { namespace ThymioVPL
 		compiler.compile();
 		compiler.generateCode();
 		
-		for(int i=0; i<eventActionPairs.size(); i++)
-			eventActionPairs[i]->setErrorStatus(false);
+		for(int i=0; i<eventActionsSets.size(); i++)
+			eventActionsSets[i]->setErrorStatus(false);
 		
 		if (!compiler.isSuccessful())
-			eventActionPairs[compiler.getErrorLine()]->setErrorStatus(true);
+			eventActionsSets[compiler.getErrorLine()]->setErrorStatus(true);
 		
 		emit contentRecompiled();
 	}
 	
 	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
-		if ( event->mimeData()->hasFormat("EventActionsSet") )
+		// FIXME: do we still need that?
+		qDebug() << "Scene::dropEvent";
+		qDebug() << event->isAccepted();
+		QGraphicsScene::dropEvent(event);
+		qDebug() << event->isAccepted();
+		if (!event->isAccepted() && event->mimeData()->hasFormat("EventActionsSet") )
 		{
-			QByteArray buttonData = event->mimeData()->data("EventActionsSet");
+			qDebug() << "dropped on scene";
+			/*QByteArray buttonData = event->mimeData()->data("EventActionsSet");
 			QDataStream dataStream(&buttonData, QIODevice::ReadOnly);
 
 			int prevRow, currentRow;
 			dataStream >> prevRow;
 			
-			const unsigned count(pairsCount());
-			EventActionsSet *p(eventActionPairs.at(prevRow));
-			eventActionPairs.removeAt(prevRow);
+			const unsigned count(setsCount());
+			EventActionsSet *p(eventActionsSets.at(prevRow));
+			eventActionsSets.removeAt(prevRow);
 			
 			#define CLAMP(a, l, h) ((a)<(l)?(l):((a)>(h)?(h):(a)))
 
@@ -387,19 +395,18 @@ namespace Aseba { namespace ThymioVPL
 			const unsigned yIndex(CLAMP(currentYPos/420, 0, rowPerCol));
 			currentRow = xIndex*rowPerCol + yIndex;
 			
-			eventActionPairs.insert(currentRow, p);
+			eventActionsSets.insert(currentRow, p);
 
 			rearrangeSets( prevRow < currentRow ? prevRow : currentRow );
 			
-			ensureOneEmptyPairAtEnd();
+			ensureOneEmptySetAtEnd();
 			
 			event->setDropAction(Qt::MoveAction);
 			event->accept();
 			
 			recompile();
+			*/
 		}
-		else
-			QGraphicsScene::dropEvent(event);
 	}
 	
 	void Scene::wheelEvent(QGraphicsSceneWheelEvent * wheelEvent)

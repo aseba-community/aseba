@@ -51,7 +51,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		static Block* createBlock(const QString& name, bool advanced=false, QGraphicsItem *parent=0);
 		
-		Block(bool isEvent, const QString& name, QGraphicsItem *parent=0);
+		Block(const QString& type, const QString& name, QGraphicsItem *parent=0);
 		virtual ~Block();
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
@@ -62,13 +62,14 @@ namespace Aseba { namespace ThymioVPL
 		void setParentID(int id) { parentID = id; }
 		int getParentID() const { return parentID; }
 		
-		QString getType() const { return isEvent ? "event" : "action"; }
+		QString getType() const { return type; }
 		QString getName() const { return name; }
 		
 		virtual unsigned valuesCount() const = 0;
 		virtual int getValue(unsigned i) const = 0;
 		virtual void setValue(unsigned i, int value) = 0;
 		virtual bool isAnyValueSet() const;
+		void resetValues();
 		
 		virtual bool isAnyAdvancedFeature() const { return false; }
 		virtual void setAdvanced(bool advanced) {}
@@ -84,7 +85,7 @@ namespace Aseba { namespace ThymioVPL
 		void contentChanged();
 		
 	public:
-		const bool isEvent;
+		const QString type;
 		const QString name;
 		bool beingDragged;
 
@@ -99,7 +100,7 @@ namespace Aseba { namespace ThymioVPL
 	class BlockWithNoValues: public Block
 	{
 	public:
-		BlockWithNoValues(bool isEvent, const QString& name, QGraphicsItem *parent);
+		BlockWithNoValues(const QString& type, const QString& name, QGraphicsItem *parent);
 		
 		virtual unsigned valuesCount() const { return 0; }
 		virtual int getValue(unsigned i) const { return -1; }
@@ -109,7 +110,7 @@ namespace Aseba { namespace ThymioVPL
 	class BlockWithBody: public Block
 	{
 	public:
-		BlockWithBody(bool isEvent, const QString& name, bool up, QGraphicsItem *parent);
+		BlockWithBody(const QString& type, const QString& name, bool up, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
@@ -123,7 +124,7 @@ namespace Aseba { namespace ThymioVPL
 	class BlockWithButtons: public BlockWithBody
 	{
 	public:
-		BlockWithButtons(bool isEvent, const QString& name, bool up, QGraphicsItem *parent);
+		BlockWithButtons(const QString& type, const QString& name, bool up, QGraphicsItem *parent);
 		
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
@@ -136,7 +137,7 @@ namespace Aseba { namespace ThymioVPL
 	class BlockWithButtonsAndRange: public BlockWithButtons
 	{
 	public:
-		BlockWithButtonsAndRange(bool isEvent, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
+		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
@@ -173,7 +174,7 @@ namespace Aseba { namespace ThymioVPL
 	class StateFilterBlock: public BlockWithButtons
 	{
 	public:
-		StateFilterBlock(bool isEvent, const QString& name, QGraphicsItem *parent=0);
+		StateFilterBlock(const QString& type, const QString& name, QGraphicsItem *parent=0);
 		
 		virtual bool isAnyAdvancedFeature() const { return true; }
 	};

@@ -16,10 +16,10 @@ namespace Aseba { namespace ThymioVPL
 		Scene(ThymioVisualProgramming *vpl);
 		~Scene();
 		
-		QGraphicsItem *addAction(Block *item);
-		QGraphicsItem *addEvent(Block *item);
+		QGraphicsItem *addAction(const QString& name);
+		QGraphicsItem *addEvent(const QString& name);
 		void addEventActionsSet(Block *event, Block *action);
-		void ensureOneEmptyPairAtEnd();
+		void ensureOneEmptySetAtEnd();
 
 		bool isEmpty() const;
 		void reset();
@@ -36,22 +36,22 @@ namespace Aseba { namespace ThymioVPL
 		
 		bool isSuccessful() const { return compiler.isSuccessful(); }
 		int getErrorLine() const { return compiler.getErrorLine(); }
-		int getSelectedPairId() const;
-		EventActionsSet *getSelectedPair() const;
-		EventActionsSet *getPairRow(int row) const;
+		int getSelectedSetId() const;
+		EventActionsSet *getSelectedSet() const;
+		EventActionsSet *getSetRow(int row) const;
 		
-		void removePair(int row);
-		void insertPair(int row);
+		void removeSet(int row);
+		void insertSet(int row);
 		void recomputeSceneRect();
 		
-		typedef QList<EventActionsSet *>::iterator PairItr;
-		typedef QList<EventActionsSet *>::const_iterator PairConstItr;
+		typedef QList<EventActionsSet *>::iterator SetItr;
+		typedef QList<EventActionsSet *>::const_iterator SetConstItr;
 		
-		PairItr pairsBegin() { return eventActionPairs.begin(); }
-		PairItr pairsEnd() { return eventActionPairs.end(); }
-		PairConstItr pairsBegin() const { return eventActionPairs.begin(); }
-		PairConstItr pairsEnd() const { return eventActionPairs.end(); }
-		unsigned pairsCount() const { return eventActionPairs.size(); }
+		SetItr setsBegin() { return eventActionsSets.begin(); }
+		SetItr setsEnd() { return eventActionsSets.end(); }
+		SetConstItr setsBegin() const { return eventActionsSets.begin(); }
+		SetConstItr setsEnd() const { return eventActionsSets.end(); }
+		unsigned setsCount() const { return eventActionsSets.size(); }
 		
 		unsigned getZoomLevel() const { return zoomLevel; }
 		
@@ -78,7 +78,7 @@ namespace Aseba { namespace ThymioVPL
 
 		ThymioVisualProgramming* vpl;
 		
-		QList<EventActionsSet *> eventActionPairs;
+		QList<EventActionsSet *> eventActionsSets;
 		Compiler compiler;
 		
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)

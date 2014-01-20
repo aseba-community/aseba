@@ -40,8 +40,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_OBJECT
 	
 	public:
-		static QColor currentEventColor;
-		static QColor currentActionColor;
+		static QColor getBlockColor(const QString& type);
 		
 	public:
 		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
@@ -69,19 +68,9 @@ namespace Aseba { namespace ThymioVPL
 	private slots:
 		void openToUrlFromAction() const;
 		void showVPLModal();
-		void addButtonsEvent();
-		void addProxEvent();
-		void addProxGroundEvent();
-		void addTapEvent();
-		void addClapEvent();
-		void addTimeoutEvent();
 		
-		void addMoveAction();
-		void addColorTopAction();
-		void addColorBottomAction();
-		void addSoundAction();
-		void addTimerAction();
-		void addMemoryAction();
+		void addEvent();
+		void addAction();
 		
 		void newFile();
 		void openFile();

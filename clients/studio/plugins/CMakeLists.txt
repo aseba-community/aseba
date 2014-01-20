@@ -5,6 +5,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/Buttons.cpp
 	ThymioVPL/Block.cpp
 	ThymioVPL/EventBlocks.cpp
+	ThymioVPL/StateBlocks.cpp
 	ThymioVPL/ActionBlocks.cpp
 	ThymioVPL/BlockHolder.cpp
 	ThymioVPL/EventActionsSet.cpp

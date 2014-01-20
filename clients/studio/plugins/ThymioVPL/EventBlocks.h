@@ -1,5 +1,5 @@
-#ifndef VPL_EVENT_CARDS_H
-#define VPL_EVENT_CARDS_H
+#ifndef VPL_EVENT_BLOCKS_H
+#define VPL_EVENT_BLOCKS_H
 
 #include "Block.h"
 
@@ -42,12 +42,6 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		TimeoutEventBlock(QGraphicsItem *parent=0);
-	};
-	
-	class StateFilterEventBlock : public StateFilterBlock
-	{
-	public:
-		StateFilterEventBlock(QGraphicsItem *parent=0);
 	};
 	
 	/*@}*/

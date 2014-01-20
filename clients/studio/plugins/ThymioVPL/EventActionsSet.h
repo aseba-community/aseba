@@ -2,8 +2,12 @@
 #define VPL_EVENT_ACTIONS_SET_H
 
 #include <QGraphicsItem>
+#include <QDomElement>
 
 #include "Compiler.h"
+
+class QMimeData;
+class QDomDocument;
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -22,12 +26,14 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		EventActionsSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
-		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return QRectF(-2, -2, width+2, 410); }
+		// from QGraphicsObject
+		virtual QRectF boundingRect() const { return QRectF(-2, -2, width+2, 410); }
+		
+		// specific
 		QRectF innerBoundingRect() const { return QRectF(0, 0, width, 336); }
 		
 		void setRow(int row);
-		int getRow() const { return data(1).toInt(); }
+		int getRow() const { return row; }
 		
 		void addEventBlock(Block *block);
 		void addActionBlock(Block *block, int number = -1);
@@ -46,6 +52,7 @@ namespace Aseba { namespace ThymioVPL
 		void setErrorStatus(bool flag);
 		
 		bool hasActionBlock(const QString& blockName) const;
+		
 		void cleanupActionSlots();
 		void repositionElements();
 		
@@ -58,10 +65,30 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void removeClicked();
 		void addClicked();
+		
+	protected:
+		// from QGraphicsObject
+		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+		
+		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+		
+		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		// specific
+		bool isDnDValid(QGraphicsSceneDragDropEvent *event) const;
+		QMimeData* mimeData() const;
+		QDomElement serialize(QDomDocument& document) const;
+		void deserialize(const QDomElement& element);
+		void deserialize(const QByteArray& data);
+		
+		void resetSet();
+		void ensureOneEmptyActionHolderAtEnd();
 	
 	protected:
 		BlockHolder* eventHolder;
-		StateFilterEventBlock* stateFilter;
+		BlockHolder* stateFilterHolder;
 		friend class BlockHolder;
 		QList<BlockHolder*> actionHolders;
 		
@@ -75,12 +102,7 @@ namespace Aseba { namespace ThymioVPL
 		int row;
 		
 		bool errorFlag;
-		
-		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
-		
-		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+		bool beingDragged;
 	};
 	
 	/*@}*/

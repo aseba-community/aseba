@@ -169,7 +169,14 @@ namespace Aseba { namespace ThymioVPL
 	
 	BlockButton::~BlockButton()
 	{
+		assert(block);
 		delete(block); 
+	}
+	
+	QString BlockButton::getName() const
+	{
+		assert(block);
+		return block->getName();
 	}
 	
 	//! Re-render the block image
