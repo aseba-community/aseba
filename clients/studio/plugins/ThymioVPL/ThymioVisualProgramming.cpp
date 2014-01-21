@@ -238,7 +238,7 @@ namespace Aseba { namespace ThymioVPL
 	// TODO: add state to color scheme, use static data for color arrays
 	
 	static QColor currentEventColor = QColor(0,191,255);
-	static QColor currentStateColor = QColor(152, 255, 0);
+	static QColor currentStateColor = QColor(122, 204, 0);
 	static QColor currentActionColor = QColor(218,112,214);
 	
 	void ThymioVisualProgramming::setColors(QComboBox *button)

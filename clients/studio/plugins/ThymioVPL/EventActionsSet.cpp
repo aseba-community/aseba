@@ -394,7 +394,6 @@ namespace Aseba { namespace ThymioVPL
 		// create a MIME data for this block
 		QMimeData *mime = new QMimeData;
 		mime->setData("EventActionsSet", document.toByteArray());
-		qDebug() << document.toString();
 		
 		return mime;
 	}

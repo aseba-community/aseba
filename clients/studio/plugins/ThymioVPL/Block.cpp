@@ -505,8 +505,8 @@ namespace Aseba { namespace ThymioVPL
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-20,-20,40,40), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
-			button->setPos(98 + (i%2)*60, 98 + (i/2)*60);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-30,-30,60,60), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			button->setPos(128 + (i%2)*90 - 45, 128 + (i/2)*90 - 45 + 5);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));
 			button->addState(Qt::white);
