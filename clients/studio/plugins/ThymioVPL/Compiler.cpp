@@ -8,126 +8,117 @@ namespace Aseba { namespace ThymioVPL
 {
 	using namespace std;
 	
-	Compiler::Compiler(Scene& scene) :
-		scene(scene),
-		typeChecker(),
-		syntaxChecker(),
-		codeGenerator(),
-		errorType(COMPILATION_SUCCESS)
+	//! Create a compilation result object representing a success
+	Compiler::CompilationResult::CompilationResult():
+		errorType(NO_ERROR),
+		errorLine(-1),
+		referredLine(-1)
+	{}
+	
+	//! Create a compilation result object with a given error type and lines
+	Compiler::CompilationResult::CompilationResult(ErrorType errorType, int errorLine, int referredLine):
+		errorType(errorType),
+		errorLine(errorLine),
+		referredLine(referredLine)
+	{}
+	
+	//! Return whether the compilation was a success or not
+	bool Compiler::CompilationResult::isSuccessful() const
 	{
+		return errorType == NO_ERROR;
 	}
 	
-	Compiler::~Compiler() 
-	{ 
-		clear();
+	//! Return the error message for this result
+	QString Compiler::CompilationResult::getMessage(bool advanced) const
+	{
+		switch (errorType)
+		{
+			case NO_ERROR:
+			{
+				return QObject::tr("Compilation success");
+			}
+			case MISSING_EVENT:
+			{
+				return QObject::tr("Line %0: Missing event").arg(errorLine+1);
+			}
+			case MISSING_ACTION:
+			{
+				return QObject::tr("Line %0: Missing action").arg(errorLine+1);
+			}
+			case DUPLICATED_EVENT:
+			{
+				if (advanced)
+					return QObject::tr("The event in line %0 is the same as in line %1").arg(errorLine+1).arg(referredLine+1);
+				else
+					return QObject::tr("The event and the state condition in line %0 are the same as in line %1").arg(errorLine+1).arg(referredLine+1);
+			}
+			case INVALID_CODE:
+			{
+				return QObject::tr("Line %0: Unknown event/action type").arg(errorLine+1);
+			}
+			default:
+				return QObject::tr("Unknown VPL error");
+		}
 	}
 	
-	int Compiler::buttonToCode(int id) const
-	{
-		return codeGenerator.buttonToCode(id);
-	}
+	//////
 	
-	void Compiler::clear()
+	//! Compile a scene, return the result
+	Compiler::CompilationResult Compiler::compile(const Scene* scene)
 	{
-		typeChecker.clear();
-		codeGenerator.clear();
+		definedEventMap.clear();
+		codeGenerator.reset(scene->getAdvanced());
 		
-		errorType = COMPILATION_SUCCESS;
-	}
-	
-	Compiler::ErrorCode Compiler::getErrorCode() const
-	{
-		switch(errorType)
+		unsigned errorLine = 0;
+		for (Scene::SetConstItr it(scene->setsBegin()); it != scene->setsEnd(); ++it, ++errorLine)
 		{
-		case SYNTAX_ERROR:
-			return syntaxChecker.getErrorCode();
-			break;
-		case TYPE_ERROR:
-			return typeChecker.getErrorCode();
-			break;
-		case CODE_ERROR:
-			return codeGenerator.getErrorCode();
-			break;
-		case COMPILATION_SUCCESS:
-		default:
-			break;
+			const EventActionsSet& eventActionsSet(*(*it));
+			
+			// ignore empty sets
+			if (eventActionsSet.isEmpty())
+				continue;
+			
+			// we need an event
+			if (!eventActionsSet.hasEventBlock())
+				return CompilationResult(MISSING_EVENT, errorLine);
+			
+			// we need at least one action
+			if (!eventActionsSet.hasAnyActionBlock())
+				return CompilationResult(MISSING_ACTION, errorLine);
+			
+			// event and state filter configurations must be unique
+			const QString hash(eventActionsSet.getEventAndStateFilterHash());
+			if (definedEventMap.contains(hash))
+				return CompilationResult(DUPLICATED_EVENT, errorLine, definedEventMap[hash]);
+			definedEventMap[hash] = errorLine;
+			
+			// dispatch to code generator
+			codeGenerator.visit(eventActionsSet);
 		}
 		
-		return NO_ERROR;
+		codeGenerator.addInitialisationCode();
+		
+		return CompilationResult();
 	}
 	
-	bool Compiler::isSuccessful() const
+	//! Return the mapping between a set identifier (its row) and the corresponding block of code
+	int Compiler::getSetToCodeIdMap(int id) const
 	{
-		return ( errorType == COMPILATION_SUCCESS ? true : false );
-	}
-
-	int Compiler::getErrorLine() const
-	{
-		return ( errorType == COMPILATION_SUCCESS ? -1 : errorLine );
+		if ((id >= 0) && (id < int(codeGenerator.setToCodeIdMap.size())))
+			return codeGenerator.setToCodeIdMap[id];
+		return -1;
 	}
 	
-	int Compiler::getSecondErrorLine() const
-	{
-		return ( errorType == COMPILATION_SUCCESS ? -1 : secondErrorLine );
-	}
-	
-	vector<wstring>::const_iterator Compiler::beginCode() const
+	//! Iterator to te start of the code
+	Compiler::CodeConstIterator Compiler::beginCode() const
 	{ 
-		return codeGenerator.beginCode();
+		return codeGenerator.generatedCode.begin();
 	}
 	
-	vector<wstring>::const_iterator Compiler::endCode() const
+	//! Iterator to te end of the code
+	Compiler::CodeConstIterator Compiler::endCode() const
 	{ 
-		return codeGenerator.endCode(); 
+		return codeGenerator.generatedCode.end(); 
 	}
 	
-	void Compiler::compile()
-	{
-		errorType = COMPILATION_SUCCESS;
-		errorLine = -1;
-		secondErrorLine = -1;
-		typeChecker.reset();
-
-		for (Scene::SetConstItr it(scene.setsBegin()); it != scene.setsEnd(); ++it)
-		{
-			const EventActionsSet& p(*(*it));
-			errorLine++;
-			
-			syntaxChecker.visit(p);
-			if( !syntaxChecker.isSuccessful() ) 
-			{
-				errorType = SYNTAX_ERROR;
-				break;
-			}
-
-			typeChecker.visit(p, secondErrorLine);
-			if( !typeChecker.isSuccessful() )
-			{
-				errorType = TYPE_ERROR;
-				break;
-			}
-		}
-	}
-
-	void Compiler::generateCode()
-	{
-		if( errorType == COMPILATION_SUCCESS )
-		{
-			codeGenerator.reset();
-			
-			for (Scene::SetConstItr it(scene.setsBegin()); it != scene.setsEnd(); ++it)
-			{
-				const EventActionsSet& p(*(*it));
-				codeGenerator.visit(p);
-				if( !codeGenerator.isSuccessful() )
-				{
-					errorType = CODE_ERROR;
-					break;
-				}
-			}
-			
-			codeGenerator.addInitialisation();
-		}
-	}
-
 } } // namespace ThymioVPL / namespace Aseba

@@ -39,9 +39,12 @@ namespace Aseba { namespace ThymioVPL
 		void addActionBlock(Block *block, int number = -1);
 		const bool hasEventBlock() const;
 		const Block *getEventBlock() const;
+		const Block *getStateFilterBlock() const;
+		QString getEventAndStateFilterHash() const;
 		
-		const bool hasAnyActionBlock() const;
+		bool hasAnyActionBlock() const;
 		bool hasActionBlock(const QString& blockName) const;
+		int actionBlocksCount() const;
 		const Block *getActionBlock(int number) const;
 		BlockHolder *getActionBlockHolder(const QString& name);
 		int getBlockHolderIndex(BlockHolder *holder) const;
@@ -50,6 +53,7 @@ namespace Aseba { namespace ThymioVPL
 		bool isEmpty() const; 
 		
 		void setAdvanced(bool advanced);
+		bool isAdvanced() const;
 	
 		void setErrorStatus(bool flag);
 		

@@ -95,10 +95,55 @@ namespace Aseba { namespace ThymioVPL
 		return eventHolder->getBlock();
 	}
 	
+	//! Return the block in the state filter holder if it exists, 0 otherwise
+	const Block *EventActionsSet::getStateFilterBlock() const
+	{
+		if (stateFilterHolder)
+			return stateFilterHolder->getBlock();
+		else
+			return 0;
+	}
+	
+	//! Return a string representing the event and the state filter, suitable for checking code duplications
+	QString EventActionsSet::getEventAndStateFilterHash() const
+	{
+		// create document
+		QDomDocument document("sethash");
+		QDomElement element(document.createElement("sethash"));
+		
+		// add event
+		if (!eventHolder->isEmpty())
+			element.appendChild(eventHolder->getBlock()->serialize(document));
+		
+		// add state
+		if (stateFilterHolder && !stateFilterHolder->isEmpty())
+			element.appendChild(stateFilterHolder->getBlock()->serialize(document));
+		
+		// return document as a string
+		document.appendChild(element);
+		return document.toString();
+	}
+	
 	//! Return whether the action holders have any block
-	const bool EventActionsSet::hasAnyActionBlock() const
+	bool EventActionsSet::hasAnyActionBlock() const
 	{
 		return actionHolders.size() > 1;
+	}
+	
+	//! Return whether a given block name is already present in this set
+	bool EventActionsSet::hasActionBlock(const QString& blockName) const
+	{
+		for (int i=0; i<actionHolders.size(); ++i)
+			if (actionHolders[i]->getBlock() && 
+				(actionHolders[i]->getBlock()->name == blockName))
+				return true;
+		return false;
+	}
+	
+	//! Return how many action blocks this set has (with possible empty ones)
+	int EventActionsSet::actionBlocksCount() const
+	{
+		return actionHolders.size();
 	}
 	
 	//! Return the block in one of the action holders
@@ -167,7 +212,7 @@ namespace Aseba { namespace ThymioVPL
 	//! Switch to or from advanced mode
 	void EventActionsSet::setAdvanced(bool advanced)
 	{
-		// Note: we do not emit contentChanged on purprose, as we know that the caller will recompile
+		// Note: we do not emit contentChanged on purpose, as we know that the caller will recompile
 		
 		// switch event and actions to given mode
 		eventHolder->setAdvanced(advanced);
@@ -192,6 +237,12 @@ namespace Aseba { namespace ThymioVPL
 		cleanupActionSlots();
 	}
 	
+	//! Return whether we are in advanced mode by testing whether stateFilterHolder is not null
+	bool EventActionsSet::isAdvanced() const
+	{
+		return stateFilterHolder != 0;
+	}
+	
 	//! Set whether or not this set has an error
 	void EventActionsSet::setErrorStatus(bool flag)
 	{
@@ -200,16 +251,6 @@ namespace Aseba { namespace ThymioVPL
 			errorFlag = flag;
 			update();
 		}
-	}
-	
-	//! Return whether a given block name is already present in this set
-	bool EventActionsSet::hasActionBlock(const QString& blockName) const
-	{
-		for (int i=0; i<actionHolders.size(); ++i)
-			if (actionHolders[i]->getBlock() && 
-				(actionHolders[i]->getBlock()->name == blockName))
-				return true;
-		return false;
 	}
 	
 	//! Make sure that there is no hole in action slots, and that there is a free slot at the end; reposition elements afterwards
@@ -621,6 +662,6 @@ namespace Aseba { namespace ThymioVPL
 		// line number
 		painter->setPen(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
 		painter->setFont(QFont("Arial", 50));
-		painter->drawText(QRect(width-spacing-128, 240, 128, 64), Qt::AlignRight, QString("%0").arg(getRow()));
+		painter->drawText(QRect(width-spacing-128, 240, 128, 64), Qt::AlignRight, QString("%0").arg(getRow()+1));
 	}
 } } // namespace ThymioVPL / namespace Aseba

@@ -10,200 +10,55 @@ namespace Aseba { namespace ThymioVPL
 {
 	using namespace std;
 	
-	// support functions //
-	
-	wstring toWstring(int val)
+	static wstring toWstring(int val)
 	{
 		wstringstream streamVal;
 		streamVal << val;
 		
 		return streamVal.str();
 	}
+
+	//////
 	
-	// Visitor base //
-	void Compiler::Visitor::visit(const EventActionsSet& p)
-	{
-		errorCode = NO_ERROR;
-	}
-
-	Compiler::ErrorCode Compiler::Visitor::getErrorCode() const
-	{
-		return errorCode;
-	}
-	
-	bool Compiler::Visitor::isSuccessful() const
-	{
-		return ( errorCode == NO_ERROR ? true : false );
-	}
-
-	// Type Checker //
-	void Compiler::TypeChecker::reset()
-	{
-		clear();
-	}
-	
-	void Compiler::TypeChecker::clear()
-	{
-		moveHash.clear();
-		colorTopHash.clear();
-		colorBottomHash.clear();
-		soundHash.clear();
-		timerHash.clear();
-		memoryHash.clear();
-	}
-
-	void Compiler::TypeChecker::visit(const EventActionsSet& p, int& secondErrorLine)
-	{
-		/*
-		FIXME: update
-		if( !p.hasEventBlock() || !p.hasActionBlock() )
-			return;
-		
-		errorCode = NO_ERROR;
-
-		// we know that p has an action card, so we can dereference it
-		multimap<wstring, const Block*> *currentHash;
-		multimap<wstring, const Block*> tempHash;
-		
-		const Block* event(p.getEventBlock());
-		const Block* action(p.getActionBlock());
-		if (action->getName() == "move")
-		{
-			currentHash = &moveHash;
-			tempHash = moveHash;
-		}
-		else if (action->getName() == "colortop")
-		{
-			currentHash = &colorTopHash;
-			tempHash = colorTopHash;
-		}
-		else if (action->getName() == "colorbottom")
-		{
-			currentHash = &colorBottomHash;
-			tempHash = colorBottomHash;
-		}
-		else if (action->getName() == "sound")
-		{
-			currentHash = &soundHash;
-			tempHash = soundHash;
-		}
-		else if (action->getName() == "timer")
-		{
-			currentHash = &timerHash;
-			tempHash = timerHash;
-		}
-		else if (action->getName() == "statefilter")
-		{
-			currentHash = &memoryHash;
-			tempHash = memoryHash;
-		}
-		else
-		{
-			qDebug() << L"Compiler::TypeChecker::visit(): unknown card name: " << action->getName();
-			return;
-		}
-
-		currentHash->clear();
-	
-		for(multimap<wstring, const Block*>::iterator itr = tempHash.begin();
-			itr != tempHash.end(); ++itr)
-		{
-			if (itr->second != event)
-				currentHash->insert(*itr);
-		}
-
-		wstring cardHashText(event->getName().toStdWString() + L"_" + toWstring(event->getStateFilter()));
-		for(unsigned i=0; i<event->valuesCount(); i++)
-		{	
-			if (event->getValue(i) > 0)
-			{
-				cardHashText += L"_";
-				cardHashText += toWstring(i);
-				cardHashText += L"_";
-				cardHashText += toWstring(event->getValue(i));
-			}
-		}
-
-		pair< multimap<wstring, const Block*>::iterator,
-			  multimap<wstring, const Block*>::iterator > ret;
-		ret = currentHash->equal_range(cardHashText);
-
-		secondErrorLine = 0;
-		for (multimap<wstring, const Block*>::iterator itr(ret.first); itr != ret.second; ++itr)
-		{
-			if (itr->second != event)
-			{
-				errorCode = EVENT_REPEATED;
-				break;
-			}
-			++secondErrorLine;
-		}
-		
-		currentHash->insert(pair<wstring, const Block*>(cardHashText, event));
-		*/
-	}
-
-	// Syntax Checker //
-	void Compiler::SyntaxChecker::visit(const EventActionsSet& p)
-	{
-		/*
-		FIXME: update
-		errorCode = NO_ERROR;
-		
-		if( !(p.hasEventBlock()) )
-		{
-			if( p.hasActionBlock() )
-				errorCode = MISSING_EVENT;
-		} 
-		else if( !(p.hasActionBlock()) )
-		{
-			errorCode = MISSING_ACTION;
-		}
-		*/
-	}
-
-	// Code Generator //
+	//! Create a compiler ready to be used
 	Compiler::CodeGenerator::CodeGenerator() : 
-		Compiler::Visitor(),
 		advancedMode(false),
 		useSound(false),
 		useTimer(false),
 		useMicrophone(false),
-		inIfBlock(false),
-		buttonToCodeMap()
+		inIfBlock(false)
 	{
-		reset();
+		initEventToCodePosMap();
 	}
 	
-	Compiler::CodeGenerator::~CodeGenerator()
+	//! reset the compiler to its initial state, for advanced or basic mode
+	void Compiler::CodeGenerator::reset(bool advanced) 
 	{
-		clear();
-	}
-	
-	void Compiler::CodeGenerator::clear()
-	{
-		editor.clear();
+		eventToCodePosMap.clear();
+		initEventToCodePosMap();
+		
 		generatedCode.clear();
-		inIfBlock = false;
-	}
-	
-	void Compiler::CodeGenerator::reset() 
-	{
-		editor["button"] = make_pair(-1,0);
-		editor["prox"] = make_pair(-1,0);
-		editor["tap"] = make_pair(-1,0);
-		editor["clap"] = make_pair(-1,0);
-		editor["timeout"] = make_pair(-1,0);
-		generatedCode.clear();
-		advancedMode = false;
+		setToCodeIdMap.clear();
+		
+		advancedMode = advanced;
 		useSound = false;
 		useTimer= false;
 		useMicrophone = false;
 		inIfBlock = false;
-		buttonToCodeMap.clear();
 	}
 	
-	void Compiler::CodeGenerator::addInitialisation()
+	//! Initialize the event to code position map
+	void Compiler::CodeGenerator::initEventToCodePosMap() 
+	{
+		eventToCodePosMap["button"] = qMakePair(-1,0);
+		eventToCodePosMap["prox"] = qMakePair(-1,0);
+		eventToCodePosMap["tap"] = qMakePair(-1,0);
+		eventToCodePosMap["clap"] = qMakePair(-1,0);
+		eventToCodePosMap["timeout"] = qMakePair(-1,0);
+	}
+	
+	//! Add initialization code after all pairs have been parsed
+	void Compiler::CodeGenerator::addInitialisationCode()
 	{
 		// if no code, no need for initialisation
 		if (generatedCode.empty())
@@ -264,41 +119,25 @@ namespace Aseba { namespace ThymioVPL
 		}
 		generatedCode[0] = text + generatedCode[0];
 	}
-
-	int Compiler::CodeGenerator::buttonToCode(int id) const
-	{
-		if( errorCode != NO_ERROR )
-			return -1;
-
-		return (id < (int)buttonToCodeMap.size() ? buttonToCodeMap[id] : -1);
-	}
 	
-	void Compiler::CodeGenerator::visit(const EventActionsSet& p)
+	//! Generate code for an event-actions set
+	void Compiler::CodeGenerator::visit(const EventActionsSet& eventActionsSet)
 	{
-		/*
-		FIXME: update
-		if( !p.hasEventBlock() || !p.hasActionBlock() ) 
-		{
-			buttonToCodeMap.push_back(-1);
-			return;
-		}
-		
-		errorCode = NO_ERROR;
-		
 		// action and event name
-		const QString& eventName(p.getEventBlock()->getName());
+		const QString& eventName(eventActionsSet.getEventBlock()->getName());
 		QString lookupEventName;
 		if (eventName == "proxground")
 			lookupEventName = "prox";
 		else
 			lookupEventName = eventName;
 		
-		int block = editor[lookupEventName].first;
-		int size = editor[lookupEventName].second;
+		// lookup corresponding block
+		int block = eventToCodePosMap[lookupEventName].first;
+		int size = eventToCodePosMap[lookupEventName].second;
 		unsigned currentBlock(0);
-		const bool isStateFilter(p.getEventBlock()->getStateFilter() >= 0 ? true : false);
 		
-		if( block < 0 )
+		// if block does not exist, create it for the corresponding event and set the usage flag
+		if (block < 0)
 		{
 			block = generatedCode.size();
 			
@@ -334,92 +173,96 @@ namespace Aseba { namespace ThymioVPL
 			}
 			else
 			{
-				errorCode = INVALID_CODE;
-				return;
+				// internal compiler error, invalid event found
+				abort();
 			}
-
-			if (isStateFilter)
+			
+			// if in advanced mode, copy setting of state
+			if (eventActionsSet.isAdvanced())
 			{
 				generatedCode.push_back(
 					L"\n\tcall math.copy(state, new_state)"
 					L"\n\tcallsub display_state\n"
 				);
-				editor[lookupEventName] = make_pair(block, size+1);
+				eventToCodePosMap[lookupEventName] = qMakePair(block, size+1);
 			}
 			else
-				editor[lookupEventName] = make_pair(block, size);
+				eventToCodePosMap[lookupEventName] = qMakePair(block, size);
 
+			// prepare to add the new code block
 			currentBlock = block + size;
-			Q_ASSERT(currentBlock <= generatedCode.size());
-			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
-			buttonToCodeMap.push_back(currentBlock);
 		}
 		else
 		{
-			currentBlock = (isStateFilter ? block + size : block + size + 1);
-			editor[lookupEventName].second++;
-			for (EventToCodePosMap::iterator itr(editor.begin()); itr != editor.end(); ++itr)
-				if( (itr->second).first > block )
-					(itr->second).first++;
-
-			if( !isStateFilter && !p.getEventBlock()->isAnyValueSet() )
+			// get current block, insert and update map
+			currentBlock = (eventActionsSet.isAdvanced() ? block + size : block + size + 1);
+			eventToCodePosMap[lookupEventName].second++;
+			for (EventToCodePosMap::iterator itr(eventToCodePosMap.begin()); itr != eventToCodePosMap.end(); ++itr)
+				if (itr->first > block)
+					itr->first++;
+			
+			// if non-conditional code
+			if (!eventActionsSet.isAdvanced() && !eventActionsSet.getEventBlock()->isAnyValueSet())
 			{
 				// find where "if" block starts for the current event
-				for(unsigned int i=0; i<buttonToCodeMap.size(); i++)
-					if( buttonToCodeMap[i] >= block && buttonToCodeMap[i] < (int)currentBlock &&
-						generatedCode[buttonToCodeMap[i]].find(L"if ") != wstring::npos )
-						currentBlock = buttonToCodeMap[i];
+				for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
+					if (setToCodeIdMap[i] >= block && setToCodeIdMap[i] < (int)currentBlock &&
+						generatedCode[setToCodeIdMap[i]].find(L"if ") != wstring::npos)
+						currentBlock = setToCodeIdMap[i];
 			}
 			
-			for( unsigned int i=0; i<buttonToCodeMap.size(); i++)
-				if(buttonToCodeMap[i] >= (int)currentBlock)
-					buttonToCodeMap[i]++;
-			
-			Q_ASSERT(currentBlock <= generatedCode.size());
-			generatedCode.insert(generatedCode.begin() + currentBlock, L"");
-			buttonToCodeMap.push_back(currentBlock);
+			// make "space" for this block
+			for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
+				if(setToCodeIdMap[i] >= (int)currentBlock)
+					setToCodeIdMap[i]++;
 		}
 		
-		visitEvent(*p.getEventBlock(), currentBlock);
-		visitAction(*p.getActionBlock(), currentBlock);
-		*/
+		// add the code block
+		Q_ASSERT(currentBlock <= generatedCode.size());
+		generatedCode.insert(generatedCode.begin() + currentBlock, L"");
+		setToCodeIdMap.push_back(currentBlock);
+		
+		// add event and actions details
+		visitEventAndStateFilter(eventActionsSet.getEventBlock(), eventActionsSet.getStateFilterBlock(), currentBlock);
+		for (int i=0; i<eventActionsSet.actionBlocksCount(); ++i)
+			visitAction(eventActionsSet.getActionBlock(i), currentBlock);
+		
+		// possibly close condition and add code
+		generatedCode[currentBlock].append(inIfBlock ? L"\tend\n" : L"");
+		inIfBlock = false;
 	}
 
-	void Compiler::CodeGenerator::visitEvent(const Block& card, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock)
 	{
-		/*
-		FIXME: update
-		// set the generator in advanced mode if any state filter is set
-		advancedMode = advancedMode || (card.getStateFilter() >= 0);
-		
 		// generate event code
 		wstring text;
-		if (card.isAnyValueSet())
+		if (block->isAnyValueSet())
 		{
 			text = L"\tif ";
-			if (card.getName() == "button")
+			if (block->getName() == "button")
 			{
-				text += visitEventArrowButtons(card);
+				text += visitEventArrowButtons(block);
 			}
-			else if (card.getName() == "prox")
+			else if (block->getName() == "prox")
 			{
-				text += visitEventProx(card);
+				text += visitEventProx(block);
 			}
-			else if (card.getName() == "proxground")
+			else if (block->getName() == "proxground")
 			{
-				text += visitEventProxGround(card);
+				text += visitEventProxGround(block);
 			}
 			else
 			{
-				errorCode = INVALID_CODE;
+				// internal compiler error
+				abort();
 			}
 			
 			// if set, add state filter tests
-			if (card.getStateFilter() > 0)
+			if (stateFilterBlock)
 			{
-				for (unsigned i=0; i<card.stateFilterCount(); ++i)
+				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
 				{
-					switch (card.getStateFilter(i))
+					switch (stateFilterBlock->getValue(i))
 					{
 						case 1: text += L" and state[" + toWstring(i) + L"] == 1"; break;
 						case 2: text += L" and state[" + toWstring(i) + L"] == 0"; break;
@@ -435,14 +278,14 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else 
 		{
-			// if card does not generate a test, see if state filter do
-			if( card.getStateFilter() > 0 )
+			// if block does not generate a test, see if state filter does
+			if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
 			{
 				text += L"\tif ";
 				bool first(true);
-				for (unsigned i=0; i<card.stateFilterCount(); ++i)
+				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
 				{
-					switch (card.getStateFilter(i))
+					switch (stateFilterBlock->getValue(i))
 					{
 						case 1:
 							if (!first)
@@ -468,16 +311,15 @@ namespace Aseba { namespace ThymioVPL
 			else
 				inIfBlock = false;
 		}
-		*/
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block& card)
+	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block* block)
 	{
 		wstring text;
 		bool first(true);
-		for (unsigned i=0; i<card.valuesCount(); ++i)
+		for (unsigned i=0; i<block->valuesCount(); ++i)
 		{
-			if (card.getValue(i) > 0)
+			if (block->getValue(i) > 0)
 			{
 				static const wchar_t* directions[] = {
 					L"forward",
@@ -496,152 +338,155 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventProx(const Block& card)
+	wstring Compiler::CodeGenerator::visitEventProx(const Block* block)
 	{
 		wstring text;
 		bool first(true);
-		const unsigned slidersIndex(card.valuesCount()-2);
-		for(unsigned i=0; i<card.valuesCount(); ++i)
+		const unsigned slidersIndex(block->valuesCount()-2);
+		for(unsigned i=0; i<block->valuesCount(); ++i)
 		{
-			if (card.getValue(i) == 1)
+			if (block->getValue(i) == 1)
 			{
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(card.getValue(slidersIndex));
+				text += L"] < " + toWstring(block->getValue(slidersIndex));
 				first = false;
 			} 
-			else if(card.getValue(i) == 2)
+			else if(block->getValue(i) == 2)
 			{
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(card.getValue(slidersIndex+1));
+				text += L"] > " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			} 
 		}
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitEventProxGround(const Block& card)
+	wstring Compiler::CodeGenerator::visitEventProxGround(const Block* block)
 	{
 		wstring text;
 		bool first(true);
-		const unsigned slidersIndex(card.valuesCount()-2);
+		const unsigned slidersIndex(block->valuesCount()-2);
 		for(unsigned i=0; i<slidersIndex; ++i)
 		{
-			if(card.getValue(i) == 1)
+			if (block->getValue(i) == 1)
 			{
 				text += (first ? L"": L" and ");
 				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(card.getValue(slidersIndex));
+				text += L"] < " + toWstring(block->getValue(slidersIndex));
 				first = false;
 			} 
-			else if(card.getValue(i) == 2)
+			else if (block->getValue(i) == 2)
 			{
 				text += (first ? L"": L" and ");
 				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(card.getValue(slidersIndex+1));
+				text += L"] > " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			} 
 		}
 		return text;
 	}
 	
-	void Compiler::CodeGenerator::visitAction(const Block& card, unsigned currentBlock)
+	//! Visit an action block, if 0 return directly
+	void Compiler::CodeGenerator::visitAction(const Block* block, unsigned currentBlock)
 	{
+		if (!block)
+			return;
+		
 		wstring text;
 		
-		if (card.getName() == "move")
+		if (block->getName() == "move")
 		{
-			text += visitActionMove(card);
+			text += visitActionMove(block);
 		}
-		else if (card.getName() == "colortop")
+		else if (block->getName() == "colortop")
 		{
-			text += visitActionTopColor(card);
+			text += visitActionTopColor(block);
 		}
-		else if (card.getName() == "colorbottom")
+		else if (block->getName() == "colorbottom")
 		{
-			text += visitActionBottomColor(card);
+			text += visitActionBottomColor(block);
 		}
-		else if (card.getName() == "sound")
+		else if (block->getName() == "sound")
 		{
-			text += visitActionSound(card);
+			text += visitActionSound(block);
 		}
-		else if (card.getName() == "timer")
+		else if (block->getName() == "timer")
 		{
-			text += visitActionTimer(card);
+			text += visitActionTimer(block);
 		}
-		else if (card.getName() == "statefilter")
+		else if (block->getName() == "setstate")
 		{
-			text += visitActionStateFilter(card);
+			text += visitActionSetState(block);
 		}
 		else
 		{
-			errorCode = INVALID_CODE;
+			// internal compiler error
+			abort();
 		}
-		text += (inIfBlock ? L"\tend\n" : L"");
-		inIfBlock = false;
-	
+		
 		generatedCode[currentBlock].append(text);
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionMove(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionMove(const Block* block)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 		text += indString;
 		text += L"motor.left.target = ";
-		text += toWstring(card.getValue(0));
+		text += toWstring(block->getValue(0));
 		text += L"\n";
 		text += indString;
 		text += L"motor.right.target = ";
-		text += toWstring(card.getValue(1));
+		text += toWstring(block->getValue(1));
 		text += L"\n";
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionTopColor(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionTopColor(const Block* block)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 		text += indString;
 		text += L"call leds.top(";
-		text += toWstring(card.getValue(0));
+		text += toWstring(block->getValue(0));
 		text += L",";
-		text += toWstring(card.getValue(1));
+		text += toWstring(block->getValue(1));
 		text += L",";
-		text += toWstring(card.getValue(2));
+		text += toWstring(block->getValue(2));
 		text += L")\n";
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block* block)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 		text += indString;
 		text += L"call leds.bottom.left(";
-		text += toWstring(card.getValue(0));
+		text += toWstring(block->getValue(0));
 		text += L",";
-		text += toWstring(card.getValue(1));
+		text += toWstring(block->getValue(1));
 		text += L",";
-		text += toWstring(card.getValue(2));
+		text += toWstring(block->getValue(2));
 		text += L")\n";
 		text += indString;
 		text += L"call leds.bottom.right(";
-		text += toWstring(card.getValue(0));
+		text += toWstring(block->getValue(0));
 		text += L",";
-		text += toWstring(card.getValue(1));
+		text += toWstring(block->getValue(1));
 		text += L",";
-		text += toWstring(card.getValue(2));
+		text += toWstring(block->getValue(2));
 		text += L")\n";
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionSound(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionSound(const Block* block)
 	{
 		static const int noteTable[5] = { 262, 311, 370, 440, 524 };
 		static const int durationTable[3] = {-1, 8, 15};
@@ -651,22 +496,22 @@ namespace Aseba { namespace ThymioVPL
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 		text += indString;
 		text += L"call math.copy(notes, [";
-		for (unsigned i = 0; i<card.valuesCount(); ++i)
+		for (unsigned i = 0; i<block->valuesCount(); ++i)
 		{
-			const unsigned note(card.getValue(i) & 0xff);
+			const unsigned note(block->getValue(i) & 0xff);
 			text += toWstring(noteTable[note]);
-			if (i+1 != card.valuesCount())
+			if (i+1 != block->valuesCount())
 				text += L", ";
 		}
 		text += L"])\n";
 		text += indString;
 		// durations
 		text += L"call math.copy(durations, [";
-		for (unsigned i = 0; i<card.valuesCount(); ++i)
+		for (unsigned i = 0; i<block->valuesCount(); ++i)
 		{
-			const unsigned duration((card.getValue(i)>>8) & 0xff);
+			const unsigned duration((block->getValue(i)>>8) & 0xff);
 			text += toWstring(durationTable[duration]);
-			if (i+1 != card.valuesCount())
+			if (i+1 != block->valuesCount())
 				text += L", ";
 		}
 		text += L"])\n";
@@ -677,22 +522,22 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionTimer(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionTimer(const Block* block)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
 		text += indString;
-		text += L"timer.period[0] = "+ toWstring(card.getValue(0)) + L"\n";
+		text += L"timer.period[0] = "+ toWstring(block->getValue(0)) + L"\n";
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionStateFilter(const Block& card)
+	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block)
 	{
 		wstring text;
 		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
-		for(unsigned i=0; i<card.valuesCount(); ++i)
+		for(unsigned i=0; i<block->valuesCount(); ++i)
 		{
-			switch (card.getValue(i))
+			switch (block->getValue(i))
 			{
 				case 1: text += indString + L"new_state[" + toWstring(i) + L"] = 1\n"; break;
 				case 2: text += indString + L"new_state[" + toWstring(i) + L"] = 0\n"; break;

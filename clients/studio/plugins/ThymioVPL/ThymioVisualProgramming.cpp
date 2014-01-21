@@ -363,8 +363,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::showErrorLine()
 	{
-		if (!scene->isSuccessful())
-			view->ensureVisible(scene->getSetRow(scene->getErrorLine()));
+		if (!scene->compilationResult().isSuccessful())
+			view->ensureVisible(scene->getSetRow(scene->compilationResult().errorLine));
 	}
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
@@ -485,7 +485,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::clearHighlighting(bool keepCode)
 	{
-		if (keepCode && scene->isSuccessful())
+		if (keepCode && scene->compilationResult().isSuccessful())
 			de->displayCode(scene->getCode(), -1);
 		else
 			de->displayCode(QList<QString>(), -1);
@@ -583,11 +583,11 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::processCompilationResult()
 	{
-		compilationResult->setText(scene->getErrorMessage());
-		if (scene->isSuccessful())
+		compilationResult->setText(scene->compilationResult().getMessage(scene->getAdvanced()));
+		if (scene->compilationResult().isSuccessful())
 		{
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
-			de->displayCode(scene->getCode(), scene->getSelectedSetId());
+			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
 			showCompilationError->hide();
 			emit compilationOutcome(true);
@@ -603,8 +603,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::processHighlightChange()
 	{
-		if (scene->isSuccessful())
-			de->displayCode(scene->getCode(), scene->getSelectedSetId());
+		if (scene->compilationResult().isSuccessful())
+			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 	}
 	
 	qreal ThymioVisualProgramming::getViewScale() const

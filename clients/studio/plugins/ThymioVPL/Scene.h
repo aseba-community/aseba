@@ -35,9 +35,8 @@ namespace Aseba { namespace ThymioVPL
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
 		
-		bool isSuccessful() const { return compiler.isSuccessful(); }
-		int getErrorLine() const { return compiler.getErrorLine(); }
-		int getSelectedSetId() const;
+		const Compiler::CompilationResult& compilationResult() { return lastCompilationResult; }
+		int getSelectedSetCodeId() const;
 		EventActionsSet *getSelectedSet() const;
 		EventActionsSet *getSetRow(int row) const;
 		
@@ -82,6 +81,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		QList<EventActionsSet *> eventActionsSets;
 		Compiler compiler;
+		Compiler::CompilationResult lastCompilationResult;
 		
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;

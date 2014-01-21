@@ -16,7 +16,6 @@ namespace Aseba { namespace ThymioVPL
 	Scene::Scene(ThymioVisualProgramming *vpl) : 
 		QGraphicsScene(vpl),
 		vpl(vpl),
-		compiler(*this),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
@@ -184,7 +183,6 @@ namespace Aseba { namespace ThymioVPL
 		}
 		setSceneRect(QRectF());
 		eventActionsSets.clear();
-		compiler.clear();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
@@ -296,46 +294,22 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 	}
 	
-	QString Scene::getErrorMessage() const
-	{ 
-		switch(compiler.getErrorCode())
-		{
-		case Compiler::MISSING_EVENT:
-			return tr("Line %0: Missing event").arg(compiler.getErrorLine());
-			break;
-		case Compiler::MISSING_ACTION:
-			return tr("Line %0: Missing action").arg(compiler.getErrorLine());
-			break;
-		case Compiler::EVENT_REPEATED:
-			return tr("The event-action set in line %0 is the same as in line %1").arg(compiler.getErrorLine()).arg(compiler.getSecondErrorLine());
-			break;
-			// 
-		case Compiler::INVALID_CODE:
-			return tr("Line %0: Unknown event/action type").arg(compiler.getErrorLine());
-			break;
-		case Compiler::NO_ERROR:
-			return tr("Compilation success");
-		default:
-			return tr("Unknown VPL error");
-		}
-	}
-	
 	QList<QString> Scene::getCode() const
 	{
 		QList<QString> out;
 		
-		for(std::vector<std::wstring>::const_iterator itr = compiler.beginCode();
+		for (std::vector<std::wstring>::const_iterator itr = compiler.beginCode();
 			itr != compiler.endCode(); ++itr)
 			out.push_back(QString::fromStdWString(*itr));
 	
 		return out;
 	}
 
-	int Scene::getSelectedSetId() const 
+	int Scene::getSelectedSetCodeId() const 
 	{ 
 		EventActionsSet* selectedSet(getSelectedSet());
 		if (selectedSet)
-			return compiler.buttonToCode(selectedSet->getRow());
+			return compiler.getSetToCodeIdMap(selectedSet->getRow());
 		else
 			return -1;
 	}
@@ -367,14 +341,13 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::recompileWithoutSetModified()
 	{
-		compiler.compile();
-		compiler.generateCode();
+		lastCompilationResult = compiler.compile(this);
 		
 		for(int i=0; i<eventActionsSets.size(); i++)
 			eventActionsSets[i]->setErrorStatus(false);
 		
-		if (!compiler.isSuccessful())
-			eventActionsSets[compiler.getErrorLine()]->setErrorStatus(true);
+		if (!lastCompilationResult.isSuccessful())
+			eventActionsSets.at(lastCompilationResult.errorLine)->setErrorStatus(true);
 		
 		emit contentRecompiled();
 	}
