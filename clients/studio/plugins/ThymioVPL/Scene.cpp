@@ -33,8 +33,7 @@ namespace Aseba { namespace ThymioVPL
 		clear();
 	}
 	
-	// FIXME: switch to name within these functinos instead of block
-
+	//! Add an action block of a given name to the scene, find the right place to put it
 	QGraphicsItem *Scene::addAction(const QString& name) 
 	{
 		Block* item(Block::createBlock(name, advancedMode));
@@ -52,9 +51,9 @@ namespace Aseba { namespace ThymioVPL
 		else
 		{
 			// find a set without any action
-			for (SetItr pItr(setsBegin()); pItr != setsEnd(); ++pItr)
+			for (SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			{
-				EventActionsSet* eventActionsSet(*pItr);
+				EventActionsSet* eventActionsSet(*itr);
 				if (!eventActionsSet->hasActionBlock(item->getName()))
 				{
 					eventActionsSet->addActionBlock(item);
@@ -72,6 +71,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 
+	//! Add an event block of a given name to the scene, find the right place to put it
 	QGraphicsItem *Scene::addEvent(const QString& name) 
 	{
 		Block* item(Block::createBlock(name, advancedMode));
@@ -86,9 +86,9 @@ namespace Aseba { namespace ThymioVPL
 		else
 		{
 			// find a set without any action
-			for (SetItr pItr(setsBegin()); pItr != setsEnd(); ++pItr)
+			for (SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			{
-				EventActionsSet* eventActionsSet(*pItr);
+				EventActionsSet* eventActionsSet(*itr);
 				if (!eventActionsSet->hasEventBlock())
 				{
 					eventActionsSet->addEventBlock(item);
@@ -106,20 +106,23 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	// used by load, avoid recompiling
-	void Scene::addEventActionsSet(Block *event, Block *action)
+	//! Add a new event-actions set from a DOM Element, used by load
+	void Scene::addEventActionsSet(const QDomElement& element)
 	{
-		EventActionsSet *eventActionsSet(createNewEventActionsSet());
-		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
-		disconnect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		if(event)
-			eventActionsSet->addEventBlock(event);
-		if(action)
-			eventActionsSet->addActionBlock(action);
-		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
+		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
+		eventActionsSet->deserialize(element);
+		addEventActionsSet(eventActionsSet);
 	}
 	
+	//! Add a new event-actions set from a DOM Element in 1.3 format, used by load
+	void Scene::addEventActionsSetOldFormat_1_3(const QDomElement& element)
+	{
+		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
+		eventActionsSet->deserializeOldFormat_1_3(element);
+		addEventActionsSet(eventActionsSet);
+	}
+	
+	//! Makes sure that there is at least one empty event-actions set at the end of the scene
 	void Scene::ensureOneEmptySetAtEnd()
 	{
 		if (eventActionsSets.empty())
@@ -129,19 +132,26 @@ namespace Aseba { namespace ThymioVPL
 		relayout();
 	}
 
+	//! Create a new event-actions set and adds it
 	EventActionsSet *Scene::createNewEventActionsSet()
 	{
 		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
+		addEventActionsSet(eventActionsSet);
+		return eventActionsSet;
+	}
+	
+	//! Adds an existing event-actions set, *must not* be in the scene already
+	void Scene::addEventActionsSet(EventActionsSet *eventActionsSet)
+	{
 		eventActionsSets.push_back(eventActionsSet);
 		
 		addItem(eventActionsSet);
 		recomputeSceneRect();
 		
 		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
-		
-		return eventActionsSet;
 	}
 
+	//! Return whether the scene is as when started
 	bool Scene::isEmpty() const
 	{
 		if( eventActionsSets.isEmpty() )
@@ -154,12 +164,14 @@ namespace Aseba { namespace ThymioVPL
 		return true;
 	}
 
+	//! Reset the scene to an empty one
 	void Scene::reset()
 	{
 		clear();
 		createNewEventActionsSet();
 	}
 	
+	//! Remove everything from the scene, leaving it with no object (hence not usable directly)
 	void Scene::clear()
 	{
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
@@ -187,6 +199,7 @@ namespace Aseba { namespace ThymioVPL
 		emit modifiedStatusChanged(sceneModified);
 	}
 
+	//! Switch the scene to and from advanced mode
 	void Scene::setAdvanced(bool advanced)
 	{
 		if (advanced != advancedMode)

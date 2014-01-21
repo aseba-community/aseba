@@ -501,6 +501,7 @@ namespace Aseba { namespace ThymioVPL
 		QDomDocument document("tool-plugin-data");
 		
 		QDomElement vplroot = document.createElement("vplroot");
+		vplroot.setAttribute("xml-format-version", 1);
 		document.appendChild(vplroot);
 
 		QDomElement settings = document.createElement("settings");
@@ -509,34 +510,11 @@ namespace Aseba { namespace ThymioVPL
 		vplroot.appendChild(settings);
 		vplroot.appendChild(document.createTextNode("\n\n"));
 		
-		for (Scene::SetConstItr itr(scene->setsBegin()); 
-			  itr != scene->setsEnd(); ++itr )
+		for (Scene::SetConstItr itr(scene->setsBegin()); itr != scene->setsEnd(); ++itr)
 		{
-			// FIXME: use the methods in their respective classes
-			/*
-			QDomElement element = document.createElement("buttonset");
-			
-			if( (*itr)->hasEventBlock() ) 
-			{
-				const Block *card((*itr)->getEventBlock());
-				element.setAttribute("event-name", card->getName() );
-			
-				for(unsigned i=0; i<card->valuesCount(); ++i)
-					element.setAttribute( QString("eb%0").arg(i), card->getValue(i));
-				element.setAttribute("state", card->getStateFilter());
-			}
-			
-			if( (*itr)->hasActionBlock() ) 
-			{
-				const Block *card((*itr)->getActionBlock());
-				element.setAttribute("action-name", card->getName() );
-				for(unsigned i=0; i<card->valuesCount(); ++i)
-					element.setAttribute(QString("ab%0").arg(i), card->getValue(i));
-			}
-			
-			vplroot.appendChild(element);
+			const EventActionsSet* eventActionsSet(*itr);
+			vplroot.appendChild(eventActionsSet->serialize(document));
 			vplroot.appendChild(document.createTextNode("\n\n"));
-			*/
 		}
 
 		scene->setModified(false);
@@ -556,59 +534,26 @@ namespace Aseba { namespace ThymioVPL
 		loading = true;
 		scene->clear();
 		
-		QDomNode domNode = document.documentElement().firstChild();
-		while (!domNode.isNull())
+		QDomElement element(document.documentElement().firstChildElement());
+		while (!element.isNull())
 		{
-			if (domNode.isElement())
+			if (element.tagName() == "settings") 
 			{
-				QDomElement element = domNode.toElement();
-				if (element.tagName() == "settings") 
-				{
-					toggleAdvancedMode(element.attribute("advanced-mode") == "true", true);
-					
-					colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());
-				}
-				else if(element.tagName() == "buttonset")
-				{
-					// FIXME: use factory functions in their respective classes
-					/*QString cardName;
-					Block *eventBlock = 0;
-					Block *actionBlock = 0;
-					
-					if( !(cardName = element.attribute("event-name")).isEmpty() )
-					{
-						eventBlock = Block::createBlock(cardName,scene->getAdvanced());
-						if (!eventBlock)
-						{
-							QMessageBox::warning(this,tr("Loading"),
-												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
-							return;
-						}
-
-						for (unsigned i=0; i<eventBlock->valuesCount(); ++i)
-							eventBlock->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
-						eventBlock->setStateFilter(element.attribute("state").toInt());
-					}
-					
-					if( !(cardName = element.attribute("action-name")).isEmpty() )
-					{
-						actionBlock = Block::createBlock(cardName,scene->getAdvanced());
-						if (!actionBlock)
-						{
-							QMessageBox::warning(this,tr("Loading"),
-												 tr("Error in XML source file: %0 unknown event type").arg(cardName));
-							return;
-						}
-
-						for (unsigned i=0; i<actionBlock->valuesCount(); ++i)
-							actionBlock->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
-					}
-
-					scene->addEventActionsSet(eventBlock, actionBlock);
-					*/
-				}
+				toggleAdvancedMode(element.attribute("advanced-mode") == "true", true);
+				colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());
 			}
-			domNode = domNode.nextSibling();
+			else if (element.tagName() == "set")
+			{
+				scene->addEventActionsSet(element);
+			}
+			else if(element.tagName() == "buttonset")
+			{
+				QMessageBox::warning(this, "Feature not implemented", "Loading of files from 1.3 is not implementd yet, it will be soon, please be patient. Thank you.");
+				break;
+				//scene->addEventActionsSetOldFormat_1_3(element);
+			}
+			
+			element = element.nextSiblingElement();
 		}
 		
 		scene->ensureOneEmptySetAtEnd();

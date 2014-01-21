@@ -18,7 +18,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		QGraphicsItem *addAction(const QString& name);
 		QGraphicsItem *addEvent(const QString& name);
-		void addEventActionsSet(Block *event, Block *action);
+		void addEventActionsSetOldFormat_1_3(const QDomElement& element);
+		void addEventActionsSet(const QDomElement& element);
 		void ensureOneEmptySetAtEnd();
 
 		bool isEmpty() const;
@@ -73,9 +74,10 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		void rearrangeSets(int row=0);
 		void relayout();
-		
+		void addEventActionsSet(EventActionsSet *eventActionsSet);
 		EventActionsSet *createNewEventActionsSet();
-
+		
+	protected:
 		ThymioVisualProgramming* vpl;
 		
 		QList<EventActionsSet *> eventActionsSets;

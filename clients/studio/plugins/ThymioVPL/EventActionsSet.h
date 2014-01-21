@@ -39,7 +39,9 @@ namespace Aseba { namespace ThymioVPL
 		void addActionBlock(Block *block, int number = -1);
 		const bool hasEventBlock() const;
 		const Block *getEventBlock() const;
+		
 		const bool hasAnyActionBlock() const;
+		bool hasActionBlock(const QString& blockName) const;
 		const Block *getActionBlock(int number) const;
 		BlockHolder *getActionBlockHolder(const QString& name);
 		int getBlockHolderIndex(BlockHolder *holder) const;
@@ -51,7 +53,10 @@ namespace Aseba { namespace ThymioVPL
 	
 		void setErrorStatus(bool flag);
 		
-		bool hasActionBlock(const QString& blockName) const;
+		QDomElement serialize(QDomDocument& document) const;
+		void deserialize(const QDomElement& element);
+		void deserializeOldFormat_1_3(const QDomElement& element);
+		void deserialize(const QByteArray& data);
 		
 		void cleanupActionSlots();
 		void repositionElements();
@@ -79,9 +84,6 @@ namespace Aseba { namespace ThymioVPL
 		// specific
 		bool isDnDValid(QGraphicsSceneDragDropEvent *event) const;
 		QMimeData* mimeData() const;
-		QDomElement serialize(QDomDocument& document) const;
-		void deserialize(const QDomElement& element);
-		void deserialize(const QByteArray& data);
 		
 		void resetSet();
 		void ensureOneEmptyActionHolderAtEnd();

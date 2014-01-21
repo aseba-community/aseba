@@ -189,6 +189,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// create a block
 		Block *block(createBlock(element.attribute("name"), advanced));
+		if (!block)
+			return 0;
 		
 		// set that block's informations from element's attributes
 		for (unsigned i=0; i<block->valuesCount(); ++i)

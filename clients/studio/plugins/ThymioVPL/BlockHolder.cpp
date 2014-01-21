@@ -33,18 +33,6 @@ namespace Aseba { namespace ThymioVPL
 		return QRectF(0,0,256,256);
 	}
 	
-	/*void BlockHolder::addBlock(const QString& name)
-	{
-		const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
-		
-		// create block from name
-		Block *newBlock(Block::createBlock(name, advanced));
-		assert(newBlock);
-		
-		// add it to this holder
-		addBlock(newBlock);
-	}*/
-	
 	void BlockHolder::addBlock(Block* newBlock)
 	{
 		// remove existing block if any
@@ -68,7 +56,8 @@ namespace Aseba { namespace ThymioVPL
 			disconnect(block, SIGNAL(contentChanged()), this,  SIGNAL(contentChanged()));
 			
 			// remove and delete block
-			scene()->removeItem(block);
+			if (scene())
+				scene()->removeItem(block);
 			block->deleteLater();
 			block = 0;
 			

@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsView>
+#include <QMessageBox>
 #include <QDebug>
 #include <cassert>
 #include <cmath>
@@ -326,8 +327,11 @@ namespace Aseba { namespace ThymioVPL
 	//! Select only this set and nothing else
 	void EventActionsSet::setSoleSelection()
 	{
-		scene()->clearSelection();
-		setSelected(true);
+		if (scene())
+		{
+			scene()->clearSelection();
+			setSelected(true);
+		}
 	}
 	
 	void EventActionsSet::removeClicked()
@@ -385,27 +389,106 @@ namespace Aseba { namespace ThymioVPL
 		{
 			// following type ...
 			const QString& type(blockElement.attribute("type"));
+			const QString& name(blockElement.attribute("name"));
+			
+			// deserialize block
+			Block* block(Block::deserialize(blockElement, advanced));
+			if (!block)
+			{
+				QMessageBox::warning(0,tr("Loading"),
+					tr("Error in XML source file at %0:%1 cannot create block %2").arg(blockElement.lineNumber()).arg(blockElement.columnNumber()).arg(name));
+				return;
+			}
 			
 			if (type == "event")
 			{
-				eventHolder->addBlock(Block::deserialize(blockElement, advanced));
+				eventHolder->addBlock(block);
 			}
 			else if (type == "state")
 			{
 				assert(advanced);
-				stateFilterHolder->addBlock(Block::deserialize(blockElement, advanced));
+				stateFilterHolder->addBlock(block);
 			}
 			else if (type == "action")
 			{
-				addActionBlock(Block::deserialize(blockElement, advanced));
+				addActionBlock(block);
 			}
 			else
-				// should never happen
-				abort();
+			{
+				QMessageBox::warning(0,tr("Loading"),
+					tr("Error in XML source file at %0:%1: unknown block type %2").arg(blockElement.lineNumber()).arg(blockElement.columnNumber()).arg(type));
+				return;
+			}
 			
 			// get next element
 			blockElement = blockElement.nextSiblingElement("block");
 		}
+	}
+	
+	//! This is compatibility code for 1.3 and earlier VPL format
+	void EventActionsSet::deserializeOldFormat_1_3(const QDomElement& element)
+	{
+		// we assume tag name is "buttonset"
+		const bool advanced(stateFilterHolder != 0);
+		
+		/*
+		// event
+		QString blockName;
+		if (!(blockName = element.attribute("event-name")).isEmpty())
+		{
+			eventBlock = Block::createBlock(blockName, advanced);
+			if (!eventBlock)
+			{
+				QMessageBox::warning(this,tr("Loading"),
+					tr("Error in XML source file: %0 unknown event type").arg(cardName));
+				return;
+			}
+
+		}
+		
+		// TODO!!!
+			
+		eventHolder->addBlock(Block::deserialize(blockElement, advanced));
+		
+		// TODO: add compatibility
+		else if(element.tagName() == "buttonset")
+		{
+			// FIXME: use factory functions in their respective classes
+			QString cardName;
+			Block *eventBlock = 0;
+			Block *actionBlock = 0;
+			
+			if( !(cardName = element.attribute("event-name")).isEmpty() )
+			{
+				eventBlock = Block::createBlock(cardName,scene->getAdvanced());
+				if (!eventBlock)
+				{
+					QMessageBox::warning(this,tr("Loading"),
+											tr("Error in XML source file: %0 unknown event type").arg(cardName));
+					return;
+				}
+
+				for (unsigned i=0; i<eventBlock->valuesCount(); ++i)
+					eventBlock->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
+				eventBlock->setStateFilter(element.attribute("state").toInt());
+			}
+			
+			if( !(cardName = element.attribute("action-name")).isEmpty() )
+			{
+				actionBlock = Block::createBlock(cardName,scene->getAdvanced());
+				if (!actionBlock)
+				{
+					QMessageBox::warning(this,tr("Loading"),
+											tr("Error in XML source file: %0 unknown event type").arg(cardName));
+					return;
+				}
+
+				for (unsigned i=0; i<actionBlock->valuesCount(); ++i)
+					actionBlock->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
+			}
+
+			scene->addEventActionsSet(eventBlock, actionBlock);
+		*/
 	}
 	
 	void EventActionsSet::deserialize(const QByteArray& data)
