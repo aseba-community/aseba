@@ -599,6 +599,8 @@ namespace Aseba { namespace ThymioVPL
 			resetSet();
 			deserialize(event->mimeData()->data("EventActionsSet"));
 			setSoleSelection();
+			if (scene())
+				polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
 			update();
 		}
 	}

@@ -160,6 +160,8 @@ namespace Aseba { namespace ThymioVPL
 		// accept and redraw
 		highlight = false;
 		eventActionsSet->setSoleSelection();
+		if (scene())
+			polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
 		update();
 	}
 	
