@@ -30,6 +30,28 @@ using namespace std;
 
 namespace Aseba { namespace ThymioVPL
 {
+	ResizingView::ResizingView(QGraphicsScene * scene, QWidget * parent):
+		QGraphicsView(scene, parent),
+		computedScale(1)
+	{
+		assert(scene);
+		connect(scene, SIGNAL(sceneSizeChanged()), SLOT(recomputeScale()));
+	}
+	
+	void ResizingView::resizeEvent(QResizeEvent * event)
+	{
+		QGraphicsView::resizeEvent(event);
+		recomputeScale();
+	}
+	
+	void ResizingView::recomputeScale()
+	{
+		// set transform
+		resetTransform();
+		computedScale = 0.95*qreal(viewport()->width())/qreal(scene()->width());
+		scale(computedScale, computedScale);
+	}
+	
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
@@ -170,7 +192,7 @@ namespace Aseba { namespace ThymioVPL
 		sceneLayout->addLayout(compilationResultLayout);
 
 		// view
-		view = new QGraphicsView(scene);
+		view = new ResizingView(scene);
 		view->setRenderHint(QPainter::Antialiasing);
 		view->setAcceptDrops(true);
 		view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -180,7 +202,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
-		connect(scene, SIGNAL(sceneSizeChanged()), SLOT(setViewScale()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
 		zoomSlider = new QSlider(Qt::Horizontal);
@@ -607,20 +628,6 @@ namespace Aseba { namespace ThymioVPL
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 	}
 	
-	qreal ThymioVisualProgramming::getViewScale() const
-	{
-		return 0.95*qreal(view->viewport()->width())/qreal(scene->width());
-	}
-	
-	void ThymioVisualProgramming::setViewScale()
-	{
-		view->resetTransform();
-		const qreal scale(getViewScale());
-		view->scale(scale, scale);
-	}
-	
-	// TODO: add a resize event to the view, calling the set scale
-	
 	void ThymioVisualProgramming::addEvent()
 	{
 		BlockButton* button(polymorphic_downcast<BlockButton*>(sender()));
@@ -723,7 +730,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set view and cards on sides
 		const QSize iconSize(256*scale, 256*scale);
-		setViewScale();
 		for(QList<BlockButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);

@@ -35,6 +35,25 @@ namespace Aseba { namespace ThymioVPL
 	
 	/** \addtogroup studio */
 	/*@{*/
+	
+	class ResizingView: public QGraphicsView
+	{
+		Q_OBJECT
+	
+	public:
+		ResizingView(QGraphicsScene * scene, QWidget * parent = 0);
+		qreal getScale() const { return computedScale; }
+		
+	protected:
+		virtual void resizeEvent(QResizeEvent * event);
+		
+	protected slots:
+		void recomputeScale();
+		
+	protected:
+		qreal computedScale;
+	};
+	
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
@@ -55,7 +74,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 		
 		bool isModified() const;
-		qreal getViewScale() const;
+		qreal getViewScale() const { return view->getScale(); }
 		
 	signals:
 		void modifiedStatusChanged(bool modified);
@@ -82,7 +101,6 @@ namespace Aseba { namespace ThymioVPL
 		void toggleAdvancedMode();
 		void processCompilationResult();
 		void processHighlightChange();
-		void setViewScale();
 		
 	private:
 		void toggleAdvancedMode(bool advanced, bool force=false);
@@ -94,7 +112,7 @@ namespace Aseba { namespace ThymioVPL
 		friend class Aseba::ThymioVPL::Scene;
 		
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
-		QGraphicsView *view;
+		ResizingView *view;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		
