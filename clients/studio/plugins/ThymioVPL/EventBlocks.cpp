@@ -53,7 +53,7 @@ namespace Aseba { namespace ThymioVPL
 						   175 - 150*qCos(0.34906585*offset) );
 			//button->addState(QColor(110,255,110));
 			//button->addState(QColor(230,0,0));
-			button->addState(Qt::white);
+			button->addState(Qt::black);
 			button->addState(Qt::red);
 
 			buttons.push_back(button);
@@ -68,7 +68,7 @@ namespace Aseba { namespace ThymioVPL
 			button->setPos(QPointF(64 + i*128, 234));
 			//button->addState(QColor(110,255,110));
 			//button->addState(QColor(230,0,0));
-			button->addState(Qt::white);
+			button->addState(Qt::black);
 			button->addState(Qt::red);
 			
 			buttons.push_back(button);
@@ -89,8 +89,8 @@ namespace Aseba { namespace ThymioVPL
 			button->setPos(QPointF(98 + i*60, 40));
 			//button->addState(QColor(110,255,110));
 			//button->addState(QColor(230,0,0));
+			button->addState(Qt::black);
 			button->addState(Qt::white);
-			button->addState(Qt::red);
 			
 			buttons.push_back(button);
 			
