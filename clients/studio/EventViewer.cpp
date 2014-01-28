@@ -87,6 +87,8 @@ namespace Aseba
 		values(eventVariablesCount),
 		startingTime(QTime::currentTime())
 	{
+		QSettings settings;
+		
 		// create plot
 		plot = new QwtPlot;
 		plot->setCanvasBackground(Qt::white);
@@ -126,14 +128,16 @@ namespace Aseba
 		connect(clearButton, SIGNAL(clicked()), SLOT(clearPlot()));
 		controlLayout->addWidget(clearButton);
 		
+		const bool timeWindowEnabled(settings.value("EventViewer/timeWindowEnabled", false).toBool());
 		timeWindowCheckBox = new QCheckBox(tr("time &window:"));
 		controlLayout->addWidget(timeWindowCheckBox);
+		timeWindowCheckBox->setChecked(timeWindowEnabled);
 		
 		timeWindowLength = new QDoubleSpinBox;
 		timeWindowLength->setSuffix("s");
 		connect(timeWindowCheckBox, SIGNAL(toggled(bool)), timeWindowLength, SLOT(setEnabled(bool))); 
-		timeWindowLength->setValue(10);
-		timeWindowLength->setEnabled(false);
+		timeWindowLength->setValue(settings.value("EventViewer/timeWindowLength", 10.).toDouble());
+		timeWindowLength->setEnabled(timeWindowEnabled);
 		controlLayout->addWidget(timeWindowLength);
 		controlLayout->addStretch();
 		
@@ -150,6 +154,9 @@ namespace Aseba
 	
 	EventViewer::~EventViewer()
 	{
+		QSettings settings;
+		settings.setValue("EventViewer/timeWindowEnabled", timeWindowCheckBox->isChecked());
+		settings.setValue("EventViewer/timeWindowLength", timeWindowLength->value());
 		if (eventsViewers && isCapturing)
 			eventsViewers->remove(eventId, this);
 	}
