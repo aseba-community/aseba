@@ -80,6 +80,8 @@ namespace Aseba
 		error_map[ERROR_FOR_NULL_STEPS] =			L"Null steps are not allowed in for loops";
 		error_map[ERROR_FOR_START_HIGHER_THAN_END] =		L"Start index must be lower than end index in increasing loops";
 		error_map[ERROR_FOR_START_LOWER_THAN_END] =		L"Start index must be higher than end index in decreasing loops";
+		error_map[ERROR_FOR_INVALID_INC_END_INDEX] = 	L"End index cannot be 32767 in increasing loops";
+		error_map[ERROR_FOR_INVALID_DEC_END_INDEX] = 	L"End index cannot be -32768 in decreasing loops";
 		error_map[ERROR_EVENT_ALREADY_IMPL] =			L"Event %0 is already implemented";
 		error_map[ERROR_EVENT_WRONG_ARG_SIZE] =			L"Event %0 needs an array of size %1, but one of size %2 is passed";
 		error_map[ERROR_SUBROUTINE_ALREADY_DEF] =		L"Subroutine %0 is already defined";
