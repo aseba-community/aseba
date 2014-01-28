@@ -214,6 +214,7 @@ namespace Aseba
 		for (size_t i = 0; i < values.size(); i++)
 			values[i].clear();
 		timeStamps.clear();
+		startingTime = QTime::currentTime();
 		plot->replot();
 	}
 	
