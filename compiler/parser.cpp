@@ -583,11 +583,15 @@ namespace Aseba
 		{
 			if (rangeStartIndex > rangeEndIndex)
 				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_HIGHER_THAN_END);
+			if (rangeEndIndex == 32767)
+				throw TranslatableError(rangeEndIndexPos, ERROR_FOR_INVALID_INC_END_INDEX);
 		}
 		else
 		{
 			if (rangeStartIndex < rangeEndIndex)
 				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_LOWER_THAN_END);
+			if (rangeEndIndex == -32768)
+				throw TranslatableError(rangeEndIndexPos, ERROR_FOR_INVALID_DEC_END_INDEX);
 		}
 		
 		// do keyword
