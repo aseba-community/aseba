@@ -638,28 +638,42 @@ namespace Aseba
 						      new TupleVectorNode(rangeStartIndexPos, rangeStartIndex))
 					      );
 		
-		// create while and condition
-		WhileNode* whileNode = new WhileNode(whilePos);
-		blockNode->children.push_back(whileNode);
-		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
-		whileNode->children.push_back(comparisonNode);
-		comparisonNode->children.push_back(variableRef->deepCopy());
-		if (rangeStartIndex <= rangeEndIndex)
-			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
+		// build while content
+		if (rangeStartIndex == rangeEndIndex)
+		{
+			// start and end indexes are the same, do not loop
+			
+			// if start and end indexes are the same, do not loop
+			while (tokens.front() != Token::TOKEN_STR_end)
+					blockNode->children.push_back(parseBlockStatement());
+		}
 		else
-			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
+		{
+			// start and end indexes are the same, loop
 		
-		// block and end keyword
-		whileNode->children.push_back(new BlockNode(tokens.front().pos));
-		while (tokens.front() != Token::TOKEN_STR_end)
-			whileNode->children[1]->children.push_back(parseBlockStatement());
-		
-		// increment variable
-		AssignmentNode* assignmentNode = new AssignmentNode(varPos,
-								    variableRef->deepCopy(),
-								    new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
-		whileNode->children[1]->children.push_back(assignmentNode);
+			// create while and condition
+			WhileNode* whileNode = new WhileNode(whilePos);
+			blockNode->children.push_back(whileNode);
+			BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+			whileNode->children.push_back(comparisonNode);
+			comparisonNode->children.push_back(variableRef->deepCopy());
+			if (rangeStartIndex <= rangeEndIndex)
+				comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
+			else
+				comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
+			comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
+			
+			// block and end keyword
+			whileNode->children.push_back(new BlockNode(tokens.front().pos));
+			while (tokens.front() != Token::TOKEN_STR_end)
+				whileNode->children[1]->children.push_back(parseBlockStatement());
+			
+			// increment variable
+			AssignmentNode* assignmentNode = new AssignmentNode(varPos,
+										variableRef->deepCopy(),
+										new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
+			whileNode->children[1]->children.push_back(assignmentNode);
+		}
 		
 		tokens.pop_front();
 		
