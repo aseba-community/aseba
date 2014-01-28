@@ -5,6 +5,7 @@
 #include "Compiler.h"
 #include "Card.h"
 #include "EventActionPair.h"
+#include "Scene.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -52,13 +53,13 @@ namespace Aseba { namespace ThymioVPL
 		memoryHash.clear();
 	}
 
-	void Compiler::TypeChecker::visit(const EventActionPair& p, int& secondErrorLine)
+	void Compiler::TypeChecker::visit(const EventActionPair& p, int& secondErrorLine, const Scene& scene)
 	{
+		Visitor::visit(p);
+		
 		if( !p.hasEventCard() || !p.hasActionCard() )
 			return;
 		
-		errorCode = NO_ERROR;
-
 		// we know that p has an action card, so we can dereference it
 		multimap<wstring, const Card*> *currentHash;
 		multimap<wstring, const Card*> tempHash;
@@ -126,15 +127,23 @@ namespace Aseba { namespace ThymioVPL
 			  multimap<wstring, const Card*>::iterator > ret;
 		ret = currentHash->equal_range(cardHashText);
 
-		secondErrorLine = 0;
 		for (multimap<wstring, const Card*>::iterator itr(ret.first); itr != ret.second; ++itr)
 		{
 			if (itr->second != event)
 			{
+				// duplication, find in which pair that happened
+				secondErrorLine = 0;
+				for (Scene::PairConstItr jtr(scene.pairsBegin()); jtr != scene.pairsEnd(); ++jtr)
+				{
+					const EventActionPair *thatP(*jtr);
+					const Card *thatEventCard(thatP->getEventCard());
+					if (thatEventCard && thatEventCard == itr->second)
+						break;
+					++secondErrorLine;
+				}
 				errorCode = EVENT_REPEATED;
 				break;
 			}
-			++secondErrorLine;
 		}
 		
 		currentHash->insert(pair<wstring, const Card*>(cardHashText, event));

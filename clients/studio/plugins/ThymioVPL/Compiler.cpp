@@ -100,7 +100,7 @@ namespace Aseba { namespace ThymioVPL
 				break;
 			}
 
-			typeChecker.visit(p, secondErrorLine);
+			typeChecker.visit(p, secondErrorLine, scene);
 			if( !typeChecker.isSuccessful() )
 			{
 				errorType = TYPE_ERROR;

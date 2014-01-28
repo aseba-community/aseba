@@ -54,7 +54,7 @@ namespace Aseba { namespace ThymioVPL
 		class TypeChecker : public Visitor
 		{
 		public:
-			virtual void visit(const EventActionPair& p, int& secondErrorLine);
+			virtual void visit(const EventActionPair& p, int& secondErrorLine, const Scene& scene);
 			
 			void reset();
 			void clear();
