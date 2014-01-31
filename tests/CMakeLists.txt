@@ -37,6 +37,8 @@ add_test(optimisation-binary-not ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CUR
 add_test(optimisation-bit-to-bit ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-bit-to-bit.txt)
 add_test(for-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.txt)
 add_test(for-loop-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.txt)
+add_test(for-loop-single-inc ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.txt)
+add_test(for-loop-single-dec ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-dec.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-dec.txt)
 add_test(while-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop.txt)
 add_test(while-loop-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop-vector.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/while-loop-vector.txt)
 add_test(when-conditional ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/when-conditional.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/when-conditional.txt)
