@@ -142,6 +142,11 @@ namespace Aseba { namespace ThymioVPL
 		QToolButton *helpButton;
 		QComboBox *colorComboButton;
 		QToolButton *quitButton;
+		
+		// run button animation
+		QVector<QPixmap> runAnimFrames;
+		int runAnimFrame;
+		int runAnimTimer;
 
 		QVBoxLayout *mainLayout;
 		QHBoxLayout *horizontalLayout;
@@ -161,8 +166,10 @@ namespace Aseba { namespace ThymioVPL
 		void setColors(QComboBox *button = 0);
 		void closeEvent(QCloseEvent * event);
 		
+		void regenerateRunButtonAnimation(const QSize& iconSize);
 		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
+		virtual void timerEvent ( QTimerEvent * event );
 	};
 	/*@}*/
 } } // namespace ThymioVPL / namespace Aseba

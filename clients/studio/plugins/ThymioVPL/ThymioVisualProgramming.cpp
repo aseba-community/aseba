@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QSettings>
+#include <QImageReader>
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
@@ -56,8 +57,12 @@ namespace Aseba { namespace ThymioVPL
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
 		scene(new Scene(this)),
-		loading(false)
+		loading(false),
+		runAnimFrame(0),
+		runAnimTimer(0)
 	{
+		runAnimFrames.resize(17);
+		
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 		setMinimumSize(QSize(400,400));
@@ -407,7 +412,15 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::run()
 	{
 		if(runButton->isEnabled())
+		{
 			de->loadAndRun();
+			if (runAnimTimer)
+			{
+				killTimer(runAnimTimer);
+				runAnimTimer = 0;
+				runButton->setIcon(runAnimFrames[0]);
+			}
+		}
 	}
 
 	void ThymioVisualProgramming::stop()
@@ -620,6 +633,9 @@ namespace Aseba { namespace ThymioVPL
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
+		// content changed but not uploaded
+		if (!runAnimTimer)
+			runAnimTimer = startTimer(50);
 	}
 	
 	void ThymioVisualProgramming::processHighlightChange()
@@ -638,6 +654,54 @@ namespace Aseba { namespace ThymioVPL
 	{
 		BlockButton* button(polymorphic_downcast<BlockButton*>(sender()));
 		view->ensureVisible(scene->addAction(button->getName()));
+	}
+	
+	void ThymioVisualProgramming::regenerateRunButtonAnimation(const QSize& iconSize)
+	{
+		// load the play animation
+		// first image
+		QImageReader playReader(":/images/play.svgz");
+		playReader.setScaledSize(iconSize);
+		const QPixmap playPixmap(QPixmap::fromImageReader(&playReader));
+		// last image
+		QImageReader playRedReader(":/images/play-red.svgz");
+		playRedReader.setScaledSize(iconSize);
+		const QPixmap playRedImage(QPixmap::fromImageReader(&playRedReader));
+		
+		const int count(runAnimFrames.size());
+		for (int i = 0; i<count; ++i)
+		{
+			qreal alpha((1.+cos(qreal(i)*M_PI/qreal(count)))*.5);
+			QPixmap &pixmap(runAnimFrames[i]);
+			pixmap = QPixmap(iconSize);
+			pixmap.fill(Qt::transparent);
+			QPainter painter(&pixmap);
+			painter.setCompositionMode(QPainter::CompositionMode_Plus);
+			// copy first pixmap
+			{
+				QPixmap temp(iconSize);
+				temp.fill(Qt::transparent);
+				QPainter p(&temp);
+				p.setCompositionMode(QPainter::CompositionMode_Source);
+				p.drawPixmap(0, 0, playPixmap);
+				p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+				p.fillRect(temp.rect(), QColor(0, 0, 0, alpha*255));
+				p.end();
+				painter.drawPixmap(0,0,temp);
+			}
+			// copy second pixmap
+			{
+				QPixmap temp(iconSize);
+				temp.fill(Qt::transparent);
+				QPainter p(&temp);
+				p.setCompositionMode(QPainter::CompositionMode_Source);
+				p.drawPixmap(0, 0, playRedImage);
+				p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+				p.fillRect(temp.rect(), QColor(0, 0, 0, (1.-alpha)*255));
+				p.end();
+				painter.drawPixmap(0,0,temp);
+			}
+		}
 	}
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
@@ -715,10 +779,12 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
+		regenerateRunButtonAnimation(tbIconSize);
 		newButton->setIconSize(tbIconSize);
 		openButton->setIconSize(tbIconSize);
 		saveButton->setIconSize(tbIconSize);
 		saveAsButton->setIconSize(tbIconSize);
+		runButton->setIconSize(tbIconSize);
 		runButton->setIconSize(tbIconSize);
 		stopButton->setIconSize(tbIconSize);
 		colorComboButton->setIconSize(tbIconSize);
@@ -736,5 +802,16 @@ namespace Aseba { namespace ThymioVPL
 		for(QList<BlockButton*>::iterator itr = actionButtons.begin();
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
+	}
+	
+	void ThymioVisualProgramming::timerEvent ( QTimerEvent * event )
+	{
+		if (runAnimFrame >= 0)
+			runButton->setIcon(runAnimFrames[runAnimFrame]);
+		else
+			runButton->setIcon(runAnimFrames[-runAnimFrame]);
+		runAnimFrame++;
+		if (runAnimFrame == runAnimFrames.size())
+			runAnimFrame = -runAnimFrames.size()+1;
 	}
 } } // namespace ThymioVPL / namespace Aseba
