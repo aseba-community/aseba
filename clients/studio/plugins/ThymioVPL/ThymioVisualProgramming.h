@@ -129,7 +129,7 @@ namespace Aseba { namespace ThymioVPL
 		QLabel *compilationResultImage;
 		QPushButton *showCompilationError;
 		
-		QSlider *zoomSlider;
+		//QSlider *zoomSlider;
 
 		QToolBar *toolBar;
 		QToolButton *newButton;

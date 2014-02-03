@@ -209,14 +209,14 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
-		zoomSlider = new QSlider(Qt::Horizontal);
+		/*zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
 		zoomSlider->setValue(1);
 		zoomSlider->setInvertedAppearance(true);
 		zoomSlider->setInvertedControls(true);
 		sceneLayout->addWidget(zoomSlider);
 		
-		connect(zoomSlider, SIGNAL(valueChanged(int)), scene, SLOT(updateZoomLevel()));
+		connect(zoomSlider, SIGNAL(valueChanged(int)), scene, SLOT(updateZoomLevel()));*/
 
 		horizontalLayout->addLayout(sceneLayout);
      

@@ -395,7 +395,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	void Scene::wheelEvent(QGraphicsSceneWheelEvent * wheelEvent)
+	/*void Scene::wheelEvent(QGraphicsSceneWheelEvent * wheelEvent)
 	{
 		if (wheelEvent->modifiers() & Qt::ControlModifier)
 		{
@@ -412,5 +412,5 @@ namespace Aseba { namespace ThymioVPL
 		// TODO: if we keep slider, use its value instead of doing copies
 		zoomLevel = vpl->zoomSlider->value();
 		relayout();
-	}
+	}*/
 } } // namespace ThymioVPL / namespace Aseba
