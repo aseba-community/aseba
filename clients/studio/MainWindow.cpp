@@ -552,10 +552,10 @@ namespace Aseba
 		QWidget* memoryWidget = new QWidget;
 		memoryWidget->setLayout(memoryLayout);
 		panelSplitter->addWidget(memoryWidget);
-		panelSplitter->setStretchFactor(1, 3);
+		panelSplitter->setStretchFactor(1, 9);
 		
 		panelSplitter->addWidget(toolBoxWidget);
-		panelSplitter->setStretchFactor(2, 1);
+		panelSplitter->setStretchFactor(2, 4);
 		
 		addWidget(panelSplitter);
 		QWidget *editorWidget = new QWidget;
