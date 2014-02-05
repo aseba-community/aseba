@@ -125,8 +125,8 @@ class CanStream: public SelectableStream
 			if(ioctl(fd, SIOCGIFINDEX, &ifr) < 0)
 				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to get interface");
 			
-                        // Try to have 2Mb RX buffer
-			int options = 2*1024*1024;
+                        // Try to have 20Mb RX buffer
+			int options = 20*1024*1024;
 			setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &options, sizeof(options));
                         
                         // Enable monitoring of dropped packets
