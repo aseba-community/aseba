@@ -362,7 +362,7 @@ namespace Aseba
 		//! Lookup table for event name => id
 		typedef std::map<std::wstring, unsigned> EventsMap;
 
-		friend class AssignmentNode;
+		friend struct AssignmentNode;
 	
 	public:
 		Compiler();
