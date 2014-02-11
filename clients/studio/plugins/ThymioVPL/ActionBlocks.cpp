@@ -253,6 +253,7 @@ namespace Aseba { namespace ThymioVPL
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
 		BlockWithBody("action", "timer", true, parent),
+		draggingHand(false),
 		duration(1.0)
 	{
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
@@ -294,15 +295,52 @@ namespace Aseba { namespace ThymioVPL
 	
 	void TimerActionBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
-		if (event->button() == Qt::LeftButton)
+		bool ok;
+		const unsigned duration(durationFromPos(event->pos(), &ok));
+		if (event->button() == Qt::LeftButton && ok)
 		{
-			const QPointF& pos(event->pos()-QPointF(128,136));
-			if (sqrt(pos.x()*pos.x()+pos.y()*pos.y()) <= 70)
+			draggingHand = true;
+			this->duration = duration;
+			durationUpdated();
+		}
+		else
+			BlockWithBody::mousePressEvent(event);
+	}
+	
+	void TimerActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (draggingHand)
+		{
+			bool ok;
+			const unsigned duration(durationFromPos(event->pos(), &ok));
+			if (ok)
 			{
-				duration = unsigned((atan2(-pos.x(), pos.y()) + M_PI) * 4000. / (2*M_PI));
+				this->duration = duration;
 				durationUpdated();
 			}
 		}
+		else
+			BlockWithBody::mouseMoveEvent(event);
+	}
+	
+	void TimerActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (draggingHand)
+			draggingHand = false;
+		else
+			BlockWithBody::mouseReleaseEvent(event);
+	}
+	
+	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
+	{
+		const QPointF localPos(pos-QPointF(128,136));
+		if (sqrt(localPos.x()*localPos.x()+localPos.y()*localPos.y()) <= 70)
+		{
+			if (ok) *ok = true;
+			return unsigned((atan2(-localPos.x(), localPos.y()) + M_PI) * 4000. / (2*M_PI));
+		}
+		if (ok) *ok = false;
+		return 0;
 	}
 	
 	int TimerActionBlock::getValue(unsigned i) const

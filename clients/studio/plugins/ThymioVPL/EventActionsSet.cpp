@@ -469,7 +469,7 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionsSet::deserializeOldFormat_1_3(const QDomElement& element)
 	{
 		// we assume tag name is "buttonset"
-		const bool advanced(stateFilterHolder != 0);
+		//const bool advanced(stateFilterHolder != 0);
 		
 		/*
 		// event

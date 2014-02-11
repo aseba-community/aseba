@@ -102,10 +102,14 @@ namespace Aseba { namespace ThymioVPL
 		void frameChanged(int frame);
 		
 	protected:
-		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		unsigned durationFromPos(const QPointF& pos, bool* ok) const;
 		void durationUpdated();
 		
 	protected:
+		bool draggingHand;
 		unsigned duration;
 		QTimeLine *timer;
 	};
