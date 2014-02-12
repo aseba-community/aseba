@@ -91,13 +91,13 @@ namespace Aseba { namespace ThymioVPL
 			text += L"var note_index = 6\n";
 			text += L"var wave[142]\n";
 			text += L"var i\n";
-			text += L"var angle\n";
-			text += L"var cos_result\n";
+			text += L"var wave_phase\n";
+			text += L"var wave_intensity\n";
 			text += L"\n# compute a sinus wave for sound\n";
 			text += L"for i in 0:141 do\n";
-			text += L"\tangle = (i-70)*468\n";
-			text += L"\tcall math.cos(cos_result, angle)\n";
-			text += L"\twave[i] = cos_result/256\n";
+			text += L"\twave_phase = (i-70)*468\n";
+			text += L"\tcall math.cos(wave_intensity, wave_phase)\n";
+			text += L"\twave[i] = wave_intensity/256\n";
 			text += L"end\n";
 			text += L"call sound.wave(wave)\n";
 		}
