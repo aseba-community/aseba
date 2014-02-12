@@ -168,7 +168,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Sound Action
 	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
-		BlockWithBody("action", "sound", true, parent)
+		BlockWithBody("action", "sound", true, parent),
+		dragging(false)
 	{
 		notes[0] = 3; durations[0] = 1;
 		notes[1] = 4; durations[1] = 1;
@@ -215,20 +216,80 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (event->button() == Qt::LeftButton)
 		{
-			const QPointF& pos(event->pos());
-			if (QRectF(17,60,220,185).contains(pos))
+			unsigned noteIdx, noteVal;
+			bool ok;
+			idxAndValFromPos(event->pos(), &ok, noteIdx, noteVal);
+			if (ok)
 			{
-				const size_t noteIdx((int(pos.x())-17)/37);
-				const size_t noteVal(4-(int(pos.y())-60)/37);
-				unsigned& note(notes[noteIdx]);
-				
+				const unsigned& note(notes[noteIdx]);
 				if (note == noteVal)
-					durations[noteIdx] = (durations[noteIdx] % 2) + 1;
+					setDuration(noteIdx, (durations[noteIdx] % 2) + 1);
 				else
-					note = noteVal;
-				update();
-				emit contentChanged();
+					setNote(noteIdx, noteVal);
+				
+				dragging = true;
+				return;
 			}
+		}
+		
+		Block::mousePressEvent(event);
+	}
+	
+	void SoundActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (dragging)
+		{
+			unsigned noteIdx, noteVal;
+			bool ok;
+			idxAndValFromPos(event->pos(), &ok, noteIdx, noteVal);
+			if (ok)
+				setNote(noteIdx, noteVal);
+		}
+		else
+			Block::mouseMoveEvent(event);
+	}
+	
+	void SoundActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (dragging)
+			dragging = false;
+		else
+			Block::mouseReleaseEvent(event);
+	}
+	
+	void SoundActionBlock::idxAndValFromPos(const QPointF& pos, bool* ok, unsigned& noteIdx, unsigned& noteVal)
+	{
+		if (QRectF(17,60,220,185).contains(pos))
+		{
+			noteIdx = (int(pos.x())-17)/37;
+			noteVal = 4-(int(pos.y())-60)/37;
+			if (ok) *ok = true;
+		}
+		else
+		{
+			if (ok) *ok = false;
+		}
+	}
+	
+	void SoundActionBlock::setNote(unsigned noteIdx, unsigned noteVal)
+	{
+		unsigned& note(notes[noteIdx]);
+		if (note != noteVal)
+		{
+			note = noteVal;
+			update();
+			emit contentChanged();
+		}
+	}
+	
+	void SoundActionBlock::setDuration(unsigned noteIdx, unsigned durationVal)
+	{
+		unsigned& duration(durations[noteIdx]);
+		if (duration != durationVal)
+		{
+			duration = durationVal;
+			update();
+			emit contentChanged();
 		}
 	}
 	
@@ -253,7 +314,7 @@ namespace Aseba { namespace ThymioVPL
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
 		BlockWithBody("action", "timer", true, parent),
-		draggingHand(false),
+		dragging(false),
 		duration(1.0)
 	{
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
@@ -299,7 +360,7 @@ namespace Aseba { namespace ThymioVPL
 		const unsigned duration(durationFromPos(event->pos(), &ok));
 		if (event->button() == Qt::LeftButton && ok)
 		{
-			draggingHand = true;
+			dragging = true;
 			this->duration = duration;
 			durationUpdated();
 		}
@@ -309,7 +370,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void TimerActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
-		if (draggingHand)
+		if (dragging)
 		{
 			bool ok;
 			const unsigned duration(durationFromPos(event->pos(), &ok));
@@ -325,8 +386,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void TimerActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
-		if (draggingHand)
-			draggingHand = false;
+		if (dragging)
+			dragging = false;
 		else
 			BlockWithBody::mouseReleaseEvent(event);
 	}

@@ -78,9 +78,16 @@ namespace Aseba { namespace ThymioVPL
 		virtual void setValue(unsigned i, int value);
 		
 	protected:
-		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		
+		void idxAndValFromPos(const QPointF& pos, bool* ok, unsigned& noteIdx, unsigned& noteVal);
+		void setNote(unsigned noteIdx, unsigned noteVal);
+		void setDuration(unsigned noteIdx, unsigned durationVal);
 		
 	protected:
+		bool dragging;
 		unsigned notes[6];
 		unsigned durations[6];
 	};
@@ -105,11 +112,12 @@ namespace Aseba { namespace ThymioVPL
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		
 		unsigned durationFromPos(const QPointF& pos, bool* ok) const;
 		void durationUpdated();
 		
 	protected:
-		bool draggingHand;
+		bool dragging;
 		unsigned duration;
 		QTimeLine *timer;
 	};

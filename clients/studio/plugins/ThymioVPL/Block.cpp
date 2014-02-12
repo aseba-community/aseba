@@ -60,8 +60,8 @@ namespace Aseba { namespace ThymioVPL
 			return new ProxEventBlock(advanced, parent);
 		else if ( name == "proxground" )
 			return new ProxGroundEventBlock(advanced, parent);
-		else if ( name == "tap" )
-			return new TapEventBlock(parent);
+		else if ( name == "acc" )
+			return new AccEventBlock(parent);
 		else if ( name == "clap" )
 			return new ClapEventBlock(parent);
 		else if ( name == "timeout" )
@@ -125,6 +125,7 @@ namespace Aseba { namespace ThymioVPL
 		return pixmap;
 	}
 	
+	//! Manual rendering of this block and its children, do not use a scene
 	void Block::render(QPainter& painter)
 	{
 		QStyleOptionGraphicsItem opt;
@@ -133,6 +134,8 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsItem *child;
 		foreach(child, childItems())
 		{
+			if (!child->isVisible())
+				continue;
 			painter.save();
 			painter.translate(child->pos());
 			painter.rotate(child->rotation());

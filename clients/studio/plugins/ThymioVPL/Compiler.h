@@ -65,6 +65,8 @@ namespace Aseba { namespace ThymioVPL
 			std::wstring visitEventArrowButtons(const Block* block);
 			std::wstring visitEventProx(const Block* block);
 			std::wstring visitEventProxGround(const Block* block);
+			std::wstring visitEventAccPre(const Block* block);
+			std::wstring visitEventAcc(const Block* block);
 			
 			void visitAction(const Block* block, unsigned currentBlock);
 			std::wstring visitActionMove(const Block* block);
@@ -86,6 +88,7 @@ namespace Aseba { namespace ThymioVPL
 			bool useSound;
 			bool useTimer;
 			bool useMicrophone;
+			bool useAccAngle;
 			bool inIfBlock;
 		};
 		

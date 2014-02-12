@@ -2,9 +2,11 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <iostream>
+#include <cassert>
 #include "Compiler.h"
 #include "Block.h"
 #include "EventActionsSet.h"
+#include "EventBlocks.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -26,6 +28,7 @@ namespace Aseba { namespace ThymioVPL
 		useSound(false),
 		useTimer(false),
 		useMicrophone(false),
+		useAccAngle(false),
 		inIfBlock(false)
 	{
 		initEventToCodePosMap();
@@ -44,6 +47,7 @@ namespace Aseba { namespace ThymioVPL
 		useSound = false;
 		useTimer= false;
 		useMicrophone = false;
+		useAccAngle = false;
 		inIfBlock = false;
 	}
 	
@@ -53,6 +57,7 @@ namespace Aseba { namespace ThymioVPL
 		eventToCodePosMap["button"] = qMakePair(-1,0);
 		eventToCodePosMap["prox"] = qMakePair(-1,0);
 		eventToCodePosMap["tap"] = qMakePair(-1,0);
+		eventToCodePosMap["acc"] = qMakePair(-1,0);
 		eventToCodePosMap["clap"] = qMakePair(-1,0);
 		eventToCodePosMap["timeout"] = qMakePair(-1,0);
 	}
@@ -68,9 +73,15 @@ namespace Aseba { namespace ThymioVPL
 		wstring text;
 		if (advancedMode)
 		{
+			text += L"# variables for state\n";
 			text += L"var state[4] = [0,0,0,0]\n";
 			text += L"var new_state[4] = [0,0,0,0]\n";
 			text += L"\n";
+		}
+		if (useAccAngle)
+		{
+			text += L"# variable for angle\n";
+			text += L"var angle\n";
 		}
 		if (useSound)
 		{
@@ -92,13 +103,15 @@ namespace Aseba { namespace ThymioVPL
 		}
 		if (useTimer)
 		{
+			text += L"# stop timer 0\n";
 			text += L"timer.period[0] = 0\n";
 		}
 		if (useMicrophone)
 		{
+			text += L"# setup threshold for detecting claps\n";
 			text += L"mic.threshold = 250\n";
 		}
-		
+		text += L"# reset outputs\n";
 		text += L"call sound.system(-1)\n";
 		text += L"call leds.top(0,0,0)\n";
 		text += L"call leds.bottom.left(0,0,0)\n";
@@ -106,12 +119,14 @@ namespace Aseba { namespace ThymioVPL
 		text += L"call leds.circle(0,0,0,0,0,0,0,0)\n";
 		if (advancedMode)
 		{
-			text += L"\nsub display_state\n";
+			text += L"\n# subroutine to display the current state\n";
+			text += L"sub display_state\n";
 			text += L"\tcall leds.circle(0,state[1]*32,0,state[3]*32,0,state[2]*32,0,state[0]*32)\n";
 		}
 		if (useSound)
 		{
-			text += L"\nonevent sound.finished\n";
+			text += L"\n# when a note is finished, play the next note\n";
+			text += L"onevent sound.finished\n";
 			text += L"\tif note_index != 6 then\n";
 			text += L"\t\tcall sound.freq(notes[note_index], durations[note_index])\n";
 			text += L"\t\tnote_index += 1\n";
@@ -130,6 +145,10 @@ namespace Aseba { namespace ThymioVPL
 			lookupEventName = "prox";
 		else
 			lookupEventName = eventName;
+		
+		// the first mode of the acc event is just a tap
+		if ((eventName == "acc") && (eventActionsSet.getEventBlock()->getValue(0) == AccEventBlock::MODE_TAP))
+			lookupEventName = "tap";
 		
 		// lookup corresponding block
 		int block = eventToCodePosMap[lookupEventName].first;
@@ -154,6 +173,12 @@ namespace Aseba { namespace ThymioVPL
 			else if (lookupEventName == "tap")
 			{
 				generatedCode.push_back(L"\nonevent tap\n");
+				size++;
+			}
+			else if (lookupEventName == "acc")
+			{
+				useAccAngle = true;
+				generatedCode.push_back(L"\nonevent acc\n");
 				size++;
 			}
 			else if (lookupEventName == "clap")
@@ -238,7 +263,14 @@ namespace Aseba { namespace ThymioVPL
 		wstring text;
 		if (block->isAnyValueSet())
 		{
-			text = L"\tif ";
+			// pre-test code
+			if (block->getName() == "acc")
+			{
+				text += visitEventAccPre(block);
+			}
+			
+			// test code
+			text += L"\tif ";
 			if (block->getName() == "button")
 			{
 				text += visitEventArrowButtons(block);
@@ -250,6 +282,10 @@ namespace Aseba { namespace ThymioVPL
 			else if (block->getName() == "proxground")
 			{
 				text += visitEventProxGround(block);
+			}
+			else if (block->getName() == "acc")
+			{
+				text += visitEventAcc(block);
 			}
 			else
 			{
@@ -389,6 +425,42 @@ namespace Aseba { namespace ThymioVPL
 				first = false;
 			} 
 		}
+		return text;
+	}
+	
+	//! Pretest, compute angle
+	wstring Compiler::CodeGenerator::visitEventAccPre(const Block* block)
+	{
+		if (block->getValue(0) == AccEventBlock::MODE_PITCH)
+			return L"\tcall math.atan2(angle, acc[1], acc[2])\n";
+		else if (block->getValue(0) == AccEventBlock::MODE_ROLL)
+			return L"\tcall math.atan2(angle, acc[0], acc[2])\n";
+		else
+			abort();
+	}
+	
+	//! Test, use computed angle
+	wstring Compiler::CodeGenerator::visitEventAcc(const Block* block)
+	{
+		int testValue(0);
+		if (block->getValue(0) == AccEventBlock::MODE_PITCH)
+			testValue = block->getValue(1);
+		else if (block->getValue(0) == AccEventBlock::MODE_ROLL)
+			testValue = -block->getValue(1);
+		else
+			abort();
+		
+		const int middleValue(testValue * 16384 / AccEventBlock::resolution);
+		const int lowBound(middleValue - 8192 / AccEventBlock::resolution);
+		const int highBound(middleValue + 8192 / AccEventBlock::resolution);
+		
+		wstring text;
+		if (block->getValue(1) != -AccEventBlock::resolution)
+			text += L"angle > " + toWstring(lowBound);
+		if (!text.empty() && (block->getValue(1) != AccEventBlock::resolution))
+			text += L" and ";
+		if (block->getValue(1) != AccEventBlock::resolution)
+			text += L"angle < " + toWstring(highBound);
 		return text;
 	}
 	

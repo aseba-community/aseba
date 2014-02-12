@@ -55,6 +55,8 @@
 	<file>images/kedit.png</file>
 	<file>images/exec.png</file>
 	<file>images/thymiovpl.png</file>
+	<file>images/edit-undo.svgz</file>
+	<file>images/edit-redo.svgz</file>
 	<file>images/thymioclap.svgz</file>
 	<file>images/thymiotap.svgz</file>
 	<file>images/timeout.svgz</file>
@@ -73,6 +75,9 @@
 	<file>images/vpl_advanced_mode.svgz</file>
 	<file>images/notes.svgz</file>
 	<file>images/vpl_background_motor.svgz</file>
+	<file>images/vpl_block_acc_quadrant.svgz</file>
+	<file>images/vpl_block_acc_pitch.svgz</file>
+	<file>images/vpl_block_acc_roll.svgz</file>
 	<file>images/thymio-plugin-anim0.png</file>
 	<file>images/thymio-plugin-anim1.png</file>
 	<file>images/thymio-plugin-anim2.png</file>

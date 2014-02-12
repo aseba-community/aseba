@@ -156,7 +156,7 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("button", this));
 		eventButtons.push_back(new BlockButton("prox", this));
 		eventButtons.push_back(new BlockButton("proxground", this));
-		eventButtons.push_back(new BlockButton("tap", this));
+		eventButtons.push_back(new BlockButton("acc", this));
 		eventButtons.push_back(new BlockButton("clap", this));
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
