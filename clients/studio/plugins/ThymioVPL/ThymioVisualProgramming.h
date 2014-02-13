@@ -11,7 +11,7 @@
 #include <QGraphicsLinearLayout>
 #include <QComboBox>
 #include <QToolBar>
-#include <QToolButton>
+#include <QPushButton>
 #include <QDomDocument>
 
 #include <map>
@@ -87,7 +87,7 @@ namespace Aseba { namespace ThymioVPL
 		bool closeFile();
 		
 	private slots:
-		void openToUrlFromAction() const;
+		void openHelp() const;
 		void showVPLModal();
 		
 		void addEvent();
@@ -134,16 +134,20 @@ namespace Aseba { namespace ThymioVPL
 		//QSlider *zoomSlider;
 
 		QToolBar *toolBar;
-		QToolButton *newButton;
-		QToolButton *openButton;
-		QToolButton *saveButton;
-		QToolButton *saveAsButton;
-		QToolButton *runButton;
-		QToolButton *stopButton;
-		QToolButton *advancedButton;
-		QToolButton *helpButton;
+		QGridLayout *toolLayout;
+		QPushButton *newButton;
+		QPushButton *openButton;
+		QPushButton *saveButton;
+		QPushButton *saveAsButton;
+		QPushButton *undoButton;
+		QPushButton *redoButton;
+		QPushButton *runButton;
+		QPushButton *stopButton;
+		QPushButton *advancedButton;
+		QPushButton *helpButton;
 		QComboBox *colorComboButton;
-		QToolButton *quitButton;
+		QPushButton *quitButton;
+		QSpacerItem *quitSpotSpacer;
 		
 		// run button animation
 		QVector<QPixmap> runAnimFrames;
