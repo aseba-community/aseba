@@ -49,8 +49,10 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected slots:
 		void recomputeScale();
+		void resetResizedFlag();
 		
 	protected:
+		bool wasResized;
 		qreal computedScale;
 	};
 	

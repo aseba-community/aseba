@@ -33,6 +33,7 @@ namespace Aseba { namespace ThymioVPL
 {
 	ResizingView::ResizingView(QGraphicsScene * scene, QWidget * parent):
 		QGraphicsView(scene, parent),
+		wasResized(false),
 		computedScale(1)
 	{
 		assert(scene);
@@ -42,7 +43,8 @@ namespace Aseba { namespace ThymioVPL
 	void ResizingView::resizeEvent(QResizeEvent * event)
 	{
 		QGraphicsView::resizeEvent(event);
-		recomputeScale();
+		if (!wasResized)
+			recomputeScale();
 	}
 	
 	void ResizingView::recomputeScale()
@@ -51,6 +53,13 @@ namespace Aseba { namespace ThymioVPL
 		resetTransform();
 		computedScale = 0.95*qreal(viewport()->width())/qreal(scene()->width());
 		scale(computedScale, computedScale);
+		wasResized = true;
+		QTimer::singleShot(0, this, SLOT(resetResizedFlag()));
+	}
+	
+	void ResizingView::resetResizedFlag()
+	{
+		wasResized = false;
 	}
 	
 	// Visual Programming
