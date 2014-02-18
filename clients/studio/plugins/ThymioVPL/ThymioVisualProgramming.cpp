@@ -51,7 +51,9 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// set transform
 		resetTransform();
-		computedScale = 0.95*qreal(viewport()->width())/qreal(scene()->width());
+		const qreal widthScale(0.95*qreal(viewport()->width())/qreal(scene()->width()));
+		const qreal heightScale(qreal(viewport()->height()) / qreal(80+410*3));
+		computedScale = qMin(widthScale, heightScale);
 		scale(computedScale, computedScale);
 		wasResized = true;
 		QTimer::singleShot(0, this, SLOT(resetResizedFlag()));
