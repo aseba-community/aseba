@@ -40,13 +40,16 @@ namespace Aseba { namespace ThymioVPL
 		static const int resolution;
 		
 	public:
-		AccEventBlock(QGraphicsItem *parent=0);
+		AccEventBlock(bool advanced, QGraphicsItem *parent=0);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
 		virtual unsigned valuesCount() const { return 2; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		
+		virtual bool isAnyAdvancedFeature() const;
+		virtual void setAdvanced(bool advanced);
 		
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
@@ -64,7 +67,8 @@ namespace Aseba { namespace ThymioVPL
 		int orientation;
 		bool dragging;
 		
-		QGraphicsSvgItem* tapSvg;
+		QGraphicsSvgItem* tapSimpleSvg;
+		QGraphicsSvgItem* tapAdvancedSvg;
 		QGraphicsSvgItem* quadrantSvg;
 		QGraphicsSvgItem* pitchSvg;
 		QGraphicsSvgItem* rollSvg;

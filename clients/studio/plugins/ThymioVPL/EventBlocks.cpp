@@ -113,16 +113,19 @@ namespace Aseba { namespace ThymioVPL
 	};
 	const int AccEventBlock::resolution = 6;
 	
-	AccEventBlock::AccEventBlock( QGraphicsItem *parent) :
+	AccEventBlock::AccEventBlock(bool advanced, QGraphicsItem *parent) :
 		Block("event", "acc", parent),
 		mode(MODE_TAP),
 		orientation(0),
 		dragging(false),
-		tapSvg(new QGraphicsSvgItem (":/images/thymiotap.svgz", this)),
+		tapSimpleSvg(new QGraphicsSvgItem (":/images/vpl_block_acc_tap_simple.svgz", this)),
+		tapAdvancedSvg(new QGraphicsSvgItem (":/images/vpl_block_acc_tap_advanced.svgz", this)),
 		quadrantSvg(new QGraphicsSvgItem (":/images/vpl_block_acc_quadrant.svgz", this)),
 		pitchSvg(new QGraphicsSvgItem (":/images/vpl_block_acc_pitch.svgz", this)),
 		rollSvg(new QGraphicsSvgItem (":/images/vpl_block_acc_roll.svgz", this))
 	{
+		tapSimpleSvg->setVisible(!advanced);
+		tapAdvancedSvg->setVisible(advanced);
 		quadrantSvg->setVisible(false);
 		pitchSvg->setVisible(false);
 		pitchSvg->setTransformOriginPoint(128, 128);
@@ -137,6 +140,10 @@ namespace Aseba { namespace ThymioVPL
 		
 		// paint parent
 		Block::paint(painter, option, widget);
+		
+		// if simple mode, simply return
+		if (tapSimpleSvg->isVisible())
+			return;
 		
 		// prepare line
 		painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -154,7 +161,7 @@ namespace Aseba { namespace ThymioVPL
 				painter->setBrush(QColor(255,128,0));
 			else
 				painter->setBrush(Qt::white);
-			painter->drawRect(buttonPoses[i]);
+			painter->drawEllipse(buttonPoses[i]);
 		}
 	}
 	
@@ -242,6 +249,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void AccEventBlock::setMode(unsigned mode)
 	{
+		if (tapSimpleSvg->isVisible())
+			return;
 		if (mode != this->mode)
 		{
 			this->mode = mode;
@@ -252,7 +261,7 @@ namespace Aseba { namespace ThymioVPL
 				rollSvg->setRotation(0);
 				orientation = 0;
 			}
-			tapSvg->setVisible(mode == MODE_TAP);
+			tapAdvancedSvg->setVisible(mode == MODE_TAP);
 			quadrantSvg->setVisible(mode != MODE_TAP);
 			pitchSvg->setVisible(mode == MODE_PITCH);
 			rollSvg->setVisible(mode == MODE_ROLL);
@@ -273,6 +282,26 @@ namespace Aseba { namespace ThymioVPL
 			
 			update();
 			emit contentChanged();
+		}
+	}
+	
+	bool AccEventBlock::isAnyAdvancedFeature() const
+	{
+		return (!tapSimpleSvg->isVisible() && !tapAdvancedSvg->isVisible());
+	}
+	
+	void AccEventBlock::setAdvanced(bool advanced)
+	{
+		if (!advanced)
+		{
+			setMode(0);
+			tapAdvancedSvg->setVisible(false);
+			tapSimpleSvg->setVisible(true);
+		}
+		else
+		{
+			tapAdvancedSvg->setVisible(true);
+			tapSimpleSvg->setVisible(false);
 		}
 	}
 	

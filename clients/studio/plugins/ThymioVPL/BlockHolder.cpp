@@ -74,7 +74,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// apply changes to block for advanced mode
 		if (block)
-			block->setAdvanced(block);
+			block->setAdvanced(advanced);
 		
 		// remove state filter actions if going away from advanced mode
 		// FIXME: maybe we should use block name instead of typeid

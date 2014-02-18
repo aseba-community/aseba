@@ -61,7 +61,7 @@ namespace Aseba { namespace ThymioVPL
 		else if ( name == "proxground" )
 			return new ProxGroundEventBlock(advanced, parent);
 		else if ( name == "acc" )
-			return new AccEventBlock(parent);
+			return new AccEventBlock(advanced, parent);
 		else if ( name == "clap" )
 			return new ClapEventBlock(parent);
 		else if ( name == "timeout" )
