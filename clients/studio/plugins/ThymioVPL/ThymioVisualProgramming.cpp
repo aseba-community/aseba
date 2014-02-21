@@ -449,14 +449,18 @@ namespace Aseba { namespace ThymioVPL
 		currentActionColor = actionColors.at(index);
 		
 		scene->update();
-		
+		updateBlockButtonImages();
+	}
+	
+	void ThymioVisualProgramming::updateBlockButtonImages()
+	{
 		for(QList<BlockButton*>::iterator itr(eventButtons.begin());
 			itr != eventButtons.end(); ++itr)
-			(*itr)->updateBlockImage();
+			(*itr)->updateBlockImage(scene->getAdvanced());
 
 		for(QList<BlockButton*>::iterator itr(actionButtons.begin());
 			itr != actionButtons.end(); ++itr)
-			(*itr)->updateBlockImage();
+			(*itr)->updateBlockImage(scene->getAdvanced());
 	}
 	
 	void ThymioVisualProgramming::run()
@@ -516,6 +520,7 @@ namespace Aseba { namespace ThymioVPL
 				scene->setAdvanced(false);
 			}
 		}
+		updateBlockButtonImages();
 	}
 	
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
@@ -635,6 +640,7 @@ namespace Aseba { namespace ThymioVPL
 			showAtSavedPosition();
 		
 		loading = false;
+		clearUndo();
 	}
 	
 	void ThymioVisualProgramming::codeChangedInEditor()
@@ -910,3 +916,4 @@ namespace Aseba { namespace ThymioVPL
 			runAnimFrame = -runAnimFrames.size()+1;
 	}
 } } // namespace ThymioVPL / namespace Aseba
+// 

@@ -178,6 +178,7 @@ namespace Aseba { namespace ThymioVPL
 		bool preDiscardWarningDialog(bool keepCode);
 		void clearHighlighting(bool keepCode);
 		void setColors(QComboBox *button = 0);
+		void updateBlockButtonImages();
 		void closeEvent(QCloseEvent * event);
 		
 		void regenerateRunButtonAnimation(const QSize& iconSize);

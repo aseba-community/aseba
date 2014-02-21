@@ -266,8 +266,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		// reset visuals
 		ensureOneEmptySetAtEnd();
-		recomputeSceneRect();
-		clearSelection();
 	}
 	
 	//! Serialize to string through DOM document

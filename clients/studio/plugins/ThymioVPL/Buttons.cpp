@@ -162,7 +162,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		setStyleSheet("QPushButton {border: none; }");
 		
-		updateBlockImage();
+		updateBlockImage(false, width());
 		
 		setAcceptDrops(true);
 	}
@@ -180,9 +180,14 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Re-render the block image
-	void BlockButton::updateBlockImage() 
-	{ 
-		const qreal factor = width() / 256.;
+	void BlockButton::updateBlockImage(bool advanced, int w) 
+	{
+		qreal factor;
+		if (w == -1)
+			factor = iconSize().width() / 256.;
+		else
+			factor = w / 256;
+		block->setAdvanced(advanced);
 		setIcon(block->image(factor));
 	}	
 
