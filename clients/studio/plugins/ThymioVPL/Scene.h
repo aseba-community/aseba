@@ -32,6 +32,9 @@ namespace Aseba { namespace ThymioVPL
 		bool getAdvanced() const { return advancedMode; }
 		bool isAnyAdvancedFeature() const;
 		
+		QDomElement serialize(QDomDocument& document) const;
+		void deserialize(const QDomElement& programElement);
+		
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
 		
@@ -71,6 +74,7 @@ namespace Aseba { namespace ThymioVPL
 		//virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 	protected:
+		void clearContent();
 		void rearrangeSets(int row=0);
 		void relayout();
 		void addEventActionsSet(EventActionsSet *eventActionsSet);

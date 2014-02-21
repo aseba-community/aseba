@@ -245,6 +245,7 @@ namespace Aseba { namespace ThymioVPL
 		view->centerOn(*scene->setsBegin());
 		
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
+		connect(scene, SIGNAL(contentRecompiled()), SLOT(pushUndo()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
@@ -379,6 +380,7 @@ namespace Aseba { namespace ThymioVPL
 		if (de->newFile())
 		{
 			scene->reset();
+			clearUndo();
 			toggleAdvancedMode(false);
 			showAtSavedPosition();
 			processCompilationResult();
@@ -390,6 +392,7 @@ namespace Aseba { namespace ThymioVPL
 		if (de->newFile())
 		{
 			scene->reset();
+			clearUndo();
 			toggleAdvancedMode(false);
 			processCompilationResult();
 		}
@@ -477,6 +480,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force)
 	{
+		qDebug() << "toggling advanced mode to" << advanced;
 		if (advanced)
 		{
 			advancedButton->setIcon(QIcon(":/images/vpl_simple_mode.svgz"));
@@ -580,14 +584,7 @@ namespace Aseba { namespace ThymioVPL
 		settings.setAttribute("advanced-mode", scene->getAdvanced() ? "true" : "false");
 		settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
 		vplroot.appendChild(settings);
-		vplroot.appendChild(document.createTextNode("\n\n"));
-		
-		for (Scene::SetConstItr itr(scene->setsBegin()); itr != scene->setsEnd(); ++itr)
-		{
-			const EventActionsSet* eventActionsSet(*itr);
-			vplroot.appendChild(eventActionsSet->serialize(document));
-			vplroot.appendChild(document.createTextNode("\n\n"));
-		}
+		vplroot.appendChild(scene->serialize(document));
 
 		scene->setModified(false);
 
@@ -604,33 +601,22 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
 		loading = true;
-		scene->clear();
 		
-		QDomElement element(document.documentElement().firstChildElement());
-		while (!element.isNull())
+		// first load settings
+		const QDomElement settingsElement(document.documentElement().firstChildElement("settings"));
+		if (!settingsElement.isNull())
 		{
-			if (element.tagName() == "settings") 
-			{
-				toggleAdvancedMode(element.attribute("advanced-mode") == "true", true);
-				colorComboButton->setCurrentIndex(element.attribute("color-scheme").toInt());
-			}
-			else if (element.tagName() == "set")
-			{
-				scene->addEventActionsSet(element);
-			}
-			else if(element.tagName() == "buttonset")
-			{
-				QMessageBox::warning(this, "Feature not implemented", "Loading of files from 1.3 is not implementd yet, it will be soon, please be patient. Thank you.");
-				break;
-				//scene->addEventActionsSetOldFormat_1_3(element);
-			}
-			
-			element = element.nextSiblingElement();
+			toggleAdvancedMode(settingsElement.attribute("advanced-mode") == "true", true);
+			colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
 		}
 		
-		scene->ensureOneEmptySetAtEnd();
-		scene->recomputeSceneRect();
-		scene->clearSelection();
+		// then load program
+		const QDomElement programElement(document.documentElement().firstChildElement("program"));
+		if (!programElement.isNull())
+		{
+			scene->deserialize(programElement);
+		}
+		
 		scene->setModified(!fromFile);
 		scene->recompileWithoutSetModified();
 		
@@ -651,6 +637,25 @@ namespace Aseba { namespace ThymioVPL
 	bool ThymioVisualProgramming::isModified() const
 	{
 		return scene->isModified();
+	}
+	
+	void ThymioVisualProgramming::pushUndo()
+	{
+		qDebug() << "push undo";
+		undoButton->setEnabled(true);
+		// TODO
+		/*undoStack.push(serialize().toString());
+		if (undoStack.size() > 50)
+			undoStack.pop_front();*/
+	}
+	
+	void ThymioVisualProgramming::clearUndo()
+	{
+		qDebug() << "clear undo";
+		undoButton->setEnabled(false);
+		// TODO
+		/*undoStack.clear();
+		undoStack.push(serialize().toString());*/
 	}
 
 	void ThymioVisualProgramming::processCompilationResult()

@@ -13,6 +13,7 @@
 #include <QToolBar>
 #include <QPushButton>
 #include <QDomDocument>
+#include <QStack>
 
 #include <map>
 #include <vector>
@@ -101,10 +102,12 @@ namespace Aseba { namespace ThymioVPL
 		void run();
 		void stop();
 		void toggleAdvancedMode();
+		void pushUndo();
 		void processCompilationResult();
 		void processHighlightChange();
 		
 	private:
+		void clearUndo();
 		void toggleAdvancedMode(bool advanced, bool force=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
@@ -117,6 +120,8 @@ namespace Aseba { namespace ThymioVPL
 		ResizingView *view;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
+		
+		QStack<QString> undoStack; //! keep string version of QDomDocument
 		
 		// Event & Action buttons
 		QList<BlockButton *> eventButtons;

@@ -1,6 +1,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QMimeData>
+#include <QMessageBox>
 #include <QDebug>
 #include <cmath>
 
@@ -29,7 +30,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	Scene::~Scene()
 	{
-		clear();
+		clearContent();
 	}
 	
 	//! Add an action block of a given name to the scene, find the right place to put it
@@ -171,7 +172,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Remove everything from the scene, leaving it with no object (hence not usable directly)
-	void Scene::clear()
+	void Scene::clearContent()
 	{
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		for(int i=0; i<eventActionsSets.size(); i++)
@@ -187,10 +188,16 @@ namespace Aseba { namespace ThymioVPL
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
 		setModified(false);
-		
+	}
+	
+	//! Clear content and reset advanced mode
+	void Scene::clear()
+	{
+		clearContent();
 		advancedMode = false;
 	}
 	
+	//! Set the modified boolean to mod, emit status change
 	void Scene::setModified(bool mod)
 	{
 		sceneModified = mod;
@@ -215,12 +222,54 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
+	//! Return whether the scene is using any advanced feature
 	bool Scene::isAnyAdvancedFeature() const
 	{
 		for (SetConstItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			if ((*itr)->isAnyAdvancedFeature())
 				return true;
 		return false;
+	}
+	
+	//! Serialize the scene to DOM
+	QDomElement Scene::serialize(QDomDocument& document) const
+	{
+		QDomElement program = document.createElement("program");
+		
+		for (Scene::SetConstItr itr(setsBegin()); itr != setsEnd(); ++itr)
+			program.appendChild((*itr)->serialize(document));
+		
+		return program;
+	}
+	
+	//! Clear the existing scene and deserialize from DOM
+	void Scene::deserialize(const QDomElement& programElement)
+	{
+		// remove current content
+		clearContent();
+		
+		// deserialize
+		QDomElement element(programElement.firstChildElement());
+		while (!element.isNull())
+		{
+			if (element.tagName() == "set")
+			{
+				addEventActionsSet(element);
+			}
+			else if(element.tagName() == "buttonset")
+			{
+				QMessageBox::warning(0, "Feature not implemented", "Loading of files from 1.3 is not implementd yet, it will be soon, please be patient. Thank you.");
+				break;
+				//addEventActionsSetOldFormat_1_3(element);
+			}
+			
+			element = element.nextSiblingElement();
+		}
+		
+		// reset visuals
+		ensureOneEmptySetAtEnd();
+		recomputeSceneRect();
+		clearSelection();
 	}
 
 	void Scene::removeSet(int row)
@@ -341,6 +390,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::recompileWithoutSetModified()
 	{
+		qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
 		
 		for(int i=0; i<eventActionsSets.size(); i++)
