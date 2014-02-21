@@ -760,6 +760,7 @@ namespace Aseba { namespace ThymioVPL
 		if ((firstImage.format() != QImage::Format_ARGB32) && (firstImage.format() != QImage::Format_ARGB32_Premultiplied))
 			return QImage();
 		
+		// handcoded blend, because Qt painter-based function have problems on many platforms
 		QImage destImage(firstImage.size(), firstImage.format());
 		const quint32 a(ratio*255.);
 		const quint32 oma(255-a);
@@ -781,8 +782,7 @@ namespace Aseba { namespace ThymioVPL
 					(((((vF >>  0) & 0xff) * a + ((vS >>  0) & 0xff) * oma) & 0xff00) >>  8);
 			}
 		}
-		// handcoded blend
-		// TODO
+		
 		return destImage;
 	}
 	
