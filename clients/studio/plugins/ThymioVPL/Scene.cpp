@@ -337,7 +337,6 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::relayout()
 	{
-		// FIXME: doing this properly would require two pass, but we are not sure that we want to keep the zoom
 		for(SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			(*itr)->repositionElements();
 		recomputeSceneRect();

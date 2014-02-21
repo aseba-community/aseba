@@ -178,7 +178,7 @@ namespace Aseba { namespace ThymioVPL
 		if (i == 0)
 			setMode(value);
 		else
-			orientation = value;
+			setOrientation(value);
 	}
 	
 	void AccEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
