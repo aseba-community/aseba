@@ -750,51 +750,59 @@ namespace Aseba { namespace ThymioVPL
 		view->ensureVisible(scene->addAction(button->getName()));
 	}
 	
+	static QImage blend(const QImage& firstImage, const QImage& secondImage, qreal ratio)
+	{
+		// only attempt to blend images of similar sizes and formats
+		if (firstImage.size() != secondImage.size())
+			return QImage();
+		if (firstImage.format() != secondImage.format())
+			return QImage();
+		if ((firstImage.format() != QImage::Format_ARGB32) && (firstImage.format() != QImage::Format_ARGB32_Premultiplied))
+			return QImage();
+		
+		QImage destImage(firstImage.size(), firstImage.format());
+		const quint32 a(ratio*255.);
+		const quint32 oma(255-a);
+		for (int y=0; y<firstImage.height(); ++y)
+		{
+			const quint32 *pF(reinterpret_cast<const quint32*>(firstImage.scanLine(y)));
+			const quint32 *pS(reinterpret_cast<const quint32*>(secondImage.scanLine(y)));
+			quint32 *pD(reinterpret_cast<quint32*>(destImage.scanLine(y)));
+			
+			for (int x=0; x<firstImage.width(); ++x)
+			{
+				const quint32 vF(*pF++);
+				const quint32 vS(*pS++);
+				
+				*pD++ = 
+					(((((vF >> 24) & 0xff) * a + ((vS >> 24) & 0xff) * oma) & 0xff00) << 16) |
+					(((((vF >> 16) & 0xff) * a + ((vS >> 16) & 0xff) * oma) & 0xff00) <<  8) |
+					(((((vF >>  8) & 0xff) * a + ((vS >>  8) & 0xff) * oma) & 0xff00)      ) |
+					(((((vF >>  0) & 0xff) * a + ((vS >>  0) & 0xff) * oma) & 0xff00) >>  8);
+			}
+		}
+		// handcoded blend
+		// TODO
+		return destImage;
+	}
+	
 	void ThymioVisualProgramming::regenerateRunButtonAnimation(const QSize& iconSize)
 	{
 		// load the play animation
 		// first image
 		QImageReader playReader(":/images/play.svgz");
 		playReader.setScaledSize(iconSize);
-		const QPixmap playPixmap(QPixmap::fromImageReader(&playReader));
+		const QImage playImage(playReader.read());
 		// last image
 		QImageReader playRedReader(":/images/play-red.svgz");
 		playRedReader.setScaledSize(iconSize);
-		const QPixmap playRedImage(QPixmap::fromImageReader(&playRedReader));
+		const QImage playRedImage(playRedReader.read());
 		
 		const int count(runAnimFrames.size());
 		for (int i = 0; i<count; ++i)
 		{
 			qreal alpha((1.+cos(qreal(i)*M_PI/qreal(count)))*.5);
-			QPixmap &pixmap(runAnimFrames[i]);
-			pixmap = QPixmap(iconSize);
-			pixmap.fill(Qt::transparent);
-			QPainter painter(&pixmap);
-			painter.setCompositionMode(QPainter::CompositionMode_Plus);
-			// copy first pixmap
-			{
-				QPixmap temp(iconSize);
-				temp.fill(Qt::transparent);
-				QPainter p(&temp);
-				p.setCompositionMode(QPainter::CompositionMode_Source);
-				p.drawPixmap(0, 0, playPixmap);
-				p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-				p.fillRect(temp.rect(), QColor(0, 0, 0, alpha*255));
-				p.end();
-				painter.drawPixmap(0,0,temp);
-			}
-			// copy second pixmap
-			{
-				QPixmap temp(iconSize);
-				temp.fill(Qt::transparent);
-				QPainter p(&temp);
-				p.setCompositionMode(QPainter::CompositionMode_Source);
-				p.drawPixmap(0, 0, playRedImage);
-				p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-				p.fillRect(temp.rect(), QColor(0, 0, 0, (1.-alpha)*255));
-				p.end();
-				painter.drawPixmap(0,0,temp);
-			}
+			runAnimFrames[i] = QPixmap::fromImage(blend(playImage, playRedImage, alpha));
 		}
 	}
 	
