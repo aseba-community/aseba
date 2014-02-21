@@ -31,14 +31,16 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(color);
 			buttons.push_back(button);
 
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		}
 
 		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		buttons.push_back(button);
-		connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 	}
 	
 	
@@ -62,7 +64,8 @@ namespace Aseba { namespace ThymioVPL
 
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		}
 		// back sensors
 		for(int i=0; i<2; ++i) 
@@ -77,7 +80,8 @@ namespace Aseba { namespace ThymioVPL
 			
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		}
 	}
 	
@@ -99,7 +103,8 @@ namespace Aseba { namespace ThymioVPL
 			
 			buttons.push_back(button);
 			
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		}
 		//connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
 	}
@@ -190,6 +195,7 @@ namespace Aseba { namespace ThymioVPL
 				if (buttonPoses[i].contains(event->pos()))
 				{
 					setMode(i);
+					emit undoCheckpoint();
 					return;
 				}
 			}
@@ -201,6 +207,7 @@ namespace Aseba { namespace ThymioVPL
 			const int orientation(orientationFromPos(event->pos(), &ok));
 			if (ok)
 			{
+				clearChangedFlag();
 				setOrientation(orientation);
 				dragging = true;
 				return;
@@ -226,7 +233,10 @@ namespace Aseba { namespace ThymioVPL
 	void AccEventBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
+		{
 			dragging = false;
+			emitUndoCheckpointAndClearIfChanged();
+		}
 		else
 			Block::mouseReleaseEvent(event);
 	}
@@ -282,6 +292,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			update();
 			emit contentChanged();
+			setChangedFlag();
 		}
 	}
 	

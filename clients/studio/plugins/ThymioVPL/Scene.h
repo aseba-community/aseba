@@ -24,7 +24,7 @@ namespace Aseba { namespace ThymioVPL
 
 		bool isEmpty() const;
 		void reset();
-		void clear();
+		void clear(bool advanced);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod);
 		void setScale(qreal scale);
@@ -34,6 +34,9 @@ namespace Aseba { namespace ThymioVPL
 		
 		QDomElement serialize(QDomDocument& document) const;
 		void deserialize(const QDomElement& programElement);
+		
+		QString toString() const;
+		void fromString(const QString& text);
 		
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
@@ -61,6 +64,7 @@ namespace Aseba { namespace ThymioVPL
 	signals:
 		void highlightChanged();
 		void contentRecompiled();
+		void undoCheckpoint();
 		void modifiedStatusChanged(bool modified);
 		void sceneSizeChanged();
 		
@@ -74,7 +78,6 @@ namespace Aseba { namespace ThymioVPL
 		//virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 	protected:
-		void clearContent();
 		void rearrangeSets(int row=0);
 		void relayout();
 		void addEventActionsSet(EventActionsSet *eventActionsSet);

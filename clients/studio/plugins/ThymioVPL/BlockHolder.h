@@ -34,6 +34,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	signals:
 		void contentChanged();
+		void undoCheckpoint();
 		
 	protected:
 		// from QGraphicsObject

@@ -103,6 +103,8 @@ namespace Aseba { namespace ThymioVPL
 		void stop();
 		void toggleAdvancedMode();
 		void pushUndo();
+		void undo();
+		void redo();
 		void processCompilationResult();
 		void processHighlightChange();
 		
@@ -121,7 +123,8 @@ namespace Aseba { namespace ThymioVPL
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		
-		QStack<QString> undoStack; //! keep string version of QDomDocument
+		QStack<QString> undoStack; //!< keep string version of QDomDocument
+		int undoPos; //!< current position of undo in the stack, -1 if invalid
 		
 		// Event & Action buttons
 		QList<BlockButton *> eventButtons;

@@ -42,8 +42,11 @@ namespace Aseba { namespace ThymioVPL
 			
 			sliders.push_back(s);
 			
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
+			connect(s, SIGNAL(valueChanged(int)), SLOT(valueChangeDetected()));
+			connect(s, SIGNAL(valueChanged(int)), SIGNAL(contentChanged()));
+			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
+			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
+			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
 		}
 		
 		thymioBody = new ThymioBody(this, -70);
@@ -127,8 +130,11 @@ namespace Aseba { namespace ThymioVPL
 			
 			sliders.push_back(s);
 			
-			connect(s, SIGNAL(valueChanged(int)), this, SLOT(valueChangeDetected()));
-			connect(s, SIGNAL(valueChanged(int)), this, SIGNAL(contentChanged()));
+			connect(s, SIGNAL(valueChanged(int)), SLOT(valueChangeDetected()));
+			connect(s, SIGNAL(valueChanged(int)), SIGNAL(contentChanged()));
+			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
+			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
+			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
 		}
 	}
 
@@ -228,6 +234,7 @@ namespace Aseba { namespace ThymioVPL
 					setNote(noteIdx, noteVal);
 				
 				dragging = true;
+				setChangedFlag();
 				return;
 			}
 		}
@@ -252,7 +259,10 @@ namespace Aseba { namespace ThymioVPL
 	void SoundActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
+		{
 			dragging = false;
+			emitUndoCheckpointAndClearIfChanged();
+		}
 		else
 			Block::mouseReleaseEvent(event);
 	}
@@ -360,9 +370,9 @@ namespace Aseba { namespace ThymioVPL
 		const unsigned duration(durationFromPos(event->pos(), &ok));
 		if (event->button() == Qt::LeftButton && ok)
 		{
+			clearChangedFlag();
+			setDuration(duration);
 			dragging = true;
-			this->duration = duration;
-			durationUpdated();
 		}
 		else
 			BlockWithBody::mousePressEvent(event);
@@ -375,10 +385,7 @@ namespace Aseba { namespace ThymioVPL
 			bool ok;
 			const unsigned duration(durationFromPos(event->pos(), &ok));
 			if (ok)
-			{
-				this->duration = duration;
-				durationUpdated();
-			}
+				setDuration(duration);
 		}
 		else
 			BlockWithBody::mouseMoveEvent(event);
@@ -387,7 +394,10 @@ namespace Aseba { namespace ThymioVPL
 	void TimerActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
+		{
 			dragging = false;
+			emitUndoCheckpointAndClearIfChanged();
+		}
 		else
 			BlockWithBody::mouseReleaseEvent(event);
 	}
@@ -411,18 +421,24 @@ namespace Aseba { namespace ThymioVPL
 	
 	void TimerActionBlock::setValue(unsigned i, int value) 
 	{ 
-		duration = value;
-		durationUpdated();
+		setDuration(value);
 	}
 	
-	void TimerActionBlock::durationUpdated()
+	void TimerActionBlock::setDuration(unsigned duration)
 	{
-		update();
-		emit contentChanged();
-		timer->stop();
-		timer->setDuration(duration);
-		timer->setFrameRange(0, duration/40);
-		timer->start();
+		if (duration != this->duration)
+		{
+			this->duration = duration;
+			
+			update();
+			emit contentChanged();
+			setChangedFlag();
+			
+			timer->stop();
+			timer->setDuration(duration);
+			timer->setFrameRange(0, duration/40);
+			timer->start();
+		}
 	}
 
 	// State Filter Action

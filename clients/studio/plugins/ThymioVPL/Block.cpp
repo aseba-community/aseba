@@ -89,7 +89,7 @@ namespace Aseba { namespace ThymioVPL
 		type(type),
 		name(name),
 		beingDragged(false),
-		parentID(-1)
+		changed(false)
 	{
 		setFlag(QGraphicsItem::ItemIsMovable);
 		setAcceptedMouseButtons(Qt::LeftButton);
@@ -223,6 +223,23 @@ namespace Aseba { namespace ThymioVPL
 		document.setContent(data);
 		const QDomElement element(document.documentElement());
 		return element.attribute("name");
+	}
+	
+	void Block::clearChangedFlag()
+	{
+		changed = false;
+	}
+	
+	void Block::setChangedFlag()
+	{
+		changed = true;
+	}
+	
+	void Block::emitUndoCheckpointAndClearIfChanged()
+	{
+		if (changed)
+			emit undoCheckpoint();
+		changed = false;
 	}
 
 	void Block::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
@@ -422,6 +439,12 @@ namespace Aseba { namespace ThymioVPL
 		emit contentChanged();
 	}
 	
+	void BlockWithButtonsAndRange::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+	{
+		BlockWithButtons::mouseReleaseEvent(event);
+		emit undoCheckpoint();
+	}
+	
 	unsigned BlockWithButtonsAndRange::valuesCount() const
 	{
 		return BlockWithButtons::valuesCount() + 2;
@@ -515,7 +538,8 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(Qt::white);
 
 			buttons.push_back(button);
-			connect(button, SIGNAL(stateChanged()), this, SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		}
 	}
 

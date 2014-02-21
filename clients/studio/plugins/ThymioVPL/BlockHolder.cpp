@@ -46,7 +46,9 @@ namespace Aseba { namespace ThymioVPL
 		// make sure that there is still a free action slot in parent and notify changes
 		polymorphic_downcast<EventActionsSet*>(parentItem())->cleanupActionSlots();
 		connect(block, SIGNAL(contentChanged()), SIGNAL(contentChanged()));
+		connect(block, SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
 		emit contentChanged();
+		emit undoCheckpoint();
 	}
 	
 	void BlockHolder::removeBlock(bool cleanupSet)
@@ -66,6 +68,7 @@ namespace Aseba { namespace ThymioVPL
 			{
 				polymorphic_downcast<EventActionsSet*>(parentItem())->cleanupActionSlots();
 				emit contentChanged();
+				emit undoCheckpoint();
 			}
 		}
 	}

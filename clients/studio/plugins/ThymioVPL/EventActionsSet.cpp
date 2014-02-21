@@ -48,6 +48,7 @@ namespace Aseba { namespace ThymioVPL
 		setAdvanced(advanced);
 		
 		connect(eventHolder, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
+		connect(eventHolder, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
 		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
@@ -225,6 +226,7 @@ namespace Aseba { namespace ThymioVPL
 			// switching to advanced mode, create state filter
 			stateFilterHolder = new BlockHolder("state", this, new StateFilterCheckBlock());
 			connect(stateFilterHolder, SIGNAL(contentChanged()), SIGNAL(contentChanged()));
+			connect(stateFilterHolder, SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
 		}
 		else if (!advanced && stateFilterHolder)
 		{
@@ -311,6 +313,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			actionHolders.push_back(new BlockHolder("action", this));
 			connect(actionHolders.last(), SIGNAL(contentChanged()), SIGNAL(contentChanged()));
+			connect(actionHolders.last(), SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
 		}
 	}
 	

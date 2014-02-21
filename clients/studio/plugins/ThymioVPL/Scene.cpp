@@ -30,7 +30,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	Scene::~Scene()
 	{
-		clearContent();
+		clear(false);
 	}
 	
 	//! Add an action block of a given name to the scene, find the right place to put it
@@ -149,6 +149,7 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 		
 		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		connect(eventActionsSet, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 	}
 
 	//! Return whether the scene is as when started
@@ -167,12 +168,12 @@ namespace Aseba { namespace ThymioVPL
 	//! Reset the scene to an empty one
 	void Scene::reset()
 	{
-		clear();
+		clear(false);
 		createNewEventActionsSet();
 	}
 	
-	//! Remove everything from the scene, leaving it with no object (hence not usable directly)
-	void Scene::clearContent()
+	//! Remove everything from the scene, leaving it with no object (hence not usable directly), and set advanced mode or not
+	void Scene::clear(bool advanced)
 	{
 		disconnect(this, SIGNAL(selectionChanged()), this, SIGNAL(highlightChanged()));
 		for(int i=0; i<eventActionsSets.size(); i++)
@@ -188,13 +189,8 @@ namespace Aseba { namespace ThymioVPL
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
 		setModified(false);
-	}
-	
-	//! Clear content and reset advanced mode
-	void Scene::clear()
-	{
-		clearContent();
-		advancedMode = false;
+		
+		advancedMode = advanced;
 	}
 	
 	//! Set the modified boolean to mod, emit status change
@@ -219,6 +215,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			recompile();
+			emit undoCheckpoint();
 		}
 	}
 	
@@ -235,6 +232,7 @@ namespace Aseba { namespace ThymioVPL
 	QDomElement Scene::serialize(QDomDocument& document) const
 	{
 		QDomElement program = document.createElement("program");
+		program.setAttribute("advanced_mode", advancedMode);
 		
 		for (Scene::SetConstItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			program.appendChild((*itr)->serialize(document));
@@ -245,8 +243,8 @@ namespace Aseba { namespace ThymioVPL
 	//! Clear the existing scene and deserialize from DOM
 	void Scene::deserialize(const QDomElement& programElement)
 	{
-		// remove current content
-		clearContent();
+		// remove current content and set mode
+		clear(programElement.attribute("advanced_mode", "false").toInt());
 		
 		// deserialize
 		QDomElement element(programElement.firstChildElement());
@@ -271,6 +269,22 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 		clearSelection();
 	}
+	
+	//! Serialize to string through DOM document
+	QString Scene::toString() const
+	{
+		QDomDocument document("scene");
+		document.appendChild(serialize(document));
+		return document.toString();
+	}
+	
+	//! Deserialize from string through DOM document
+	void Scene::fromString(const QString& text)
+	{
+		QDomDocument document("scene");
+		document.setContent(text);
+		deserialize(document.firstChildElement());
+	}
 
 	void Scene::removeSet(int row)
 	{
@@ -290,6 +304,7 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 	
 		recompile();
+		emit undoCheckpoint();
 	}
 	
 	void Scene::insertSet(int row) 
@@ -302,11 +317,13 @@ namespace Aseba { namespace ThymioVPL
 		addItem(p);
 		
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
+		connect(p, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 		
 		rearrangeSets(row+1);
 		relayout();
 		
 		recompile();
+		emit undoCheckpoint();
 		
 		p->setSoleSelection();
 		

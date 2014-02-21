@@ -67,6 +67,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	signals:
 		void contentChanged();
+		void undoCheckpoint();
 		
 	public slots:
 		void setSoleSelection();

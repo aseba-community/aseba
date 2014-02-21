@@ -69,6 +69,7 @@ namespace Aseba { namespace ThymioVPL
 		de(_de),
 		scene(new Scene(this)),
 		loading(false),
+		undoPos(-1),
 		runAnimFrame(0),
 		runAnimTimer(0)
 	{
@@ -114,6 +115,7 @@ namespace Aseba { namespace ThymioVPL
 		undoButton->setToolTip(tr("Undo"));
 		undoButton->setFlat(true);
 		undoButton->setEnabled(false);
+		undoButton->setShortcut(QKeySequence::Undo);
 		toolLayout->addWidget(undoButton,0,2);
 		
 		redoButton = new QPushButton();
@@ -121,6 +123,7 @@ namespace Aseba { namespace ThymioVPL
 		redoButton->setToolTip(tr("Redo"));
 		redoButton->setFlat(true);
 		redoButton->setEnabled(false);
+		redoButton->setShortcut(QKeySequence::Redo);
 		toolLayout->addWidget(redoButton,1,2);
 		//toolLayout->addSeparator();
 
@@ -179,12 +182,15 @@ namespace Aseba { namespace ThymioVPL
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(save()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
-		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
+		connect(undoButton, SIGNAL(clicked()), this, SLOT(undo()));
+		connect(redoButton, SIGNAL(clicked()), this, SLOT(redo()));
 		
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
+		
+		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
@@ -245,7 +251,7 @@ namespace Aseba { namespace ThymioVPL
 		view->centerOn(*scene->setsBegin());
 		
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
-		connect(scene, SIGNAL(contentRecompiled()), SLOT(pushUndo()));
+		connect(scene, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
@@ -288,6 +294,9 @@ namespace Aseba { namespace ThymioVPL
 		
 		// window properties
 		setWindowModality(Qt::ApplicationModal);
+		
+		// save initial state
+		pushUndo();
 	}
 	
 	ThymioVisualProgramming::~ThymioVisualProgramming()
@@ -364,7 +373,7 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::clearSceneWithoutRecompilation()
 	{
 		loading = true;
-		scene->clear();
+		scene->clear(false);
 		loading = false;
 	}
 	
@@ -480,6 +489,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force)
 	{
+		if (actionButtons.last()->isVisible() == advanced)
+			return;
 		qDebug() << "toggling advanced mode to" << advanced;
 		if (advanced)
 		{
@@ -581,9 +592,9 @@ namespace Aseba { namespace ThymioVPL
 		document.appendChild(vplroot);
 
 		QDomElement settings = document.createElement("settings");
-		settings.setAttribute("advanced-mode", scene->getAdvanced() ? "true" : "false");
 		settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
 		vplroot.appendChild(settings);
+		
 		vplroot.appendChild(scene->serialize(document));
 
 		scene->setModified(false);
@@ -606,7 +617,6 @@ namespace Aseba { namespace ThymioVPL
 		const QDomElement settingsElement(document.documentElement().firstChildElement("settings"));
 		if (!settingsElement.isNull())
 		{
-			toggleAdvancedMode(settingsElement.attribute("advanced-mode") == "true", true);
 			colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
 		}
 		
@@ -615,6 +625,7 @@ namespace Aseba { namespace ThymioVPL
 		if (!programElement.isNull())
 		{
 			scene->deserialize(programElement);
+			toggleAdvancedMode(scene->getAdvanced(), true);
 		}
 		
 		scene->setModified(!fromFile);
@@ -641,21 +652,55 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::pushUndo()
 	{
-		qDebug() << "push undo";
-		undoButton->setEnabled(true);
-		// TODO
-		/*undoStack.push(serialize().toString());
+		undoStack.push(scene->toString());
+		undoPos = undoStack.size()-2;
+		undoButton->setEnabled(undoPos >= 0);
+		
 		if (undoStack.size() > 50)
-			undoStack.pop_front();*/
+			undoStack.pop_front();
+		
+		redoButton->setEnabled(false);
 	}
 	
 	void ThymioVisualProgramming::clearUndo()
 	{
-		qDebug() << "clear undo";
 		undoButton->setEnabled(false);
-		// TODO
-		/*undoStack.clear();
-		undoStack.push(serialize().toString());*/
+		redoButton->setEnabled(false);
+		undoStack.clear();
+		undoPos = -1;
+		pushUndo();
+	}
+	
+	void ThymioVisualProgramming::undo()
+	{
+		if (undoPos < 0)
+			return;
+		
+		scene->fromString(undoStack[undoPos]);
+		toggleAdvancedMode(scene->getAdvanced(), true);
+		scene->setModified(true);
+		scene->recompileWithoutSetModified();
+
+		--undoPos;
+		
+		undoButton->setEnabled(undoPos >= 0);
+		redoButton->setEnabled(true);
+	}
+	
+	void ThymioVisualProgramming::redo()
+	{
+		if (undoPos >= undoStack.size()-2)
+			return;
+		
+		++undoPos;
+		
+		scene->fromString(undoStack[undoPos+1]);
+		toggleAdvancedMode(scene->getAdvanced(), true);
+		scene->setModified(true);
+		scene->recompileWithoutSetModified();
+		
+		undoButton->setEnabled(true);
+		redoButton->setEnabled(undoPos < undoStack.size()-2);
 	}
 
 	void ThymioVisualProgramming::processCompilationResult()

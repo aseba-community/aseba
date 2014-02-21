@@ -58,10 +58,6 @@ namespace Aseba { namespace ThymioVPL
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
 		virtual QPixmap image(qreal factor=1);
 
-		// TODO: remove?
-		void setParentID(int id) { parentID = id; }
-		int getParentID() const { return parentID; }
-		
 		QString getType() const { return type; }
 		QString getName() const { return name; }
 		
@@ -80,9 +76,15 @@ namespace Aseba { namespace ThymioVPL
 		static Block* deserialize(const QByteArray& data, bool advanced);
 		static QString deserializeType(const QByteArray& data);
 		static QString deserializeName(const QByteArray& data);
-
+		
+	protected slots:
+		void clearChangedFlag();
+		void setChangedFlag();
+		void emitUndoCheckpointAndClearIfChanged();
+	
 	signals:
 		void contentChanged();
+		void undoCheckpoint();
 		
 	public:
 		const QString type;
@@ -93,8 +95,7 @@ namespace Aseba { namespace ThymioVPL
 		void render(QPainter& painter);
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 		
-		// TODO: remove?
-		int parentID;
+		bool changed;
 	};
 	
 	class BlockWithNoValues: public Block
@@ -159,6 +160,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		virtual void mousePressEvent( QGraphicsSceneMouseEvent * event);
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
 		
 		QRectF rangeRect() const;
 		float pixelToVal(float pixel) const;

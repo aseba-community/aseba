@@ -114,7 +114,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
 		
 		unsigned durationFromPos(const QPointF& pos, bool* ok) const;
-		void durationUpdated();
+		void setDuration(unsigned duration);
 		
 	protected:
 		bool dragging;
