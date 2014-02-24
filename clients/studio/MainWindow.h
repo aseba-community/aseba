@@ -109,6 +109,7 @@ namespace Aseba
 		bool saveFile(bool as=false);
 		void openFile();
 		bool newFile();
+		void clearOpenedFileName();
 	};
 	
 	class CompilationLogDialog: public QDialog
@@ -514,6 +515,7 @@ namespace Aseba
 		void closeEvent ( QCloseEvent * event );
 		bool readSettings();
 		void writeSettings();
+		void clearOpenedFileName();
 		
 		// tabs and nodes
 		friend class NodeTab;

@@ -106,6 +106,11 @@ namespace Aseba
 		return mainWindow->newFile();
 	}
 	
+	void StudioInterface::clearOpenedFileName()
+	{
+		mainWindow->clearOpenedFileName();
+	}
+	
 	TargetVariablesModel * StudioInterface::getVariablesModel()
 	{
 		return nodeTab->vmMemoryModel;
@@ -1642,6 +1647,7 @@ namespace Aseba
 	{
 		if (askUserBeforeDiscarding())
 		{
+			// clear content
 			clearDocumentSpecificTabs();
 			// we must only have NodeTab* left.
 			for (int i = 0; i < nodes->count(); i++)
@@ -1650,13 +1656,13 @@ namespace Aseba
 				Q_ASSERT(tab);
 				tab->editor->clear();
 			}
-			actualFileName.clear();
-			sourceModified = false;
 			constantsDefinitionsModel->clear();
 			constantsDefinitionsModel->clearWasModified();
 			eventsDescriptionsModel->clear();
 			eventsDescriptionsModel->clearWasModified();
-			updateWindowTitle();
+			
+			// reset opened file name
+			clearOpenedFileName();
 			return true;
 		}
 		return false;
@@ -3653,6 +3659,13 @@ namespace Aseba
 		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
 		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
 		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
+	}
+	
+	void MainWindow::clearOpenedFileName()
+	{
+		actualFileName.clear();
+		sourceModified = false;
+		updateWindowTitle();
 	}
 	
 	/*@}*/

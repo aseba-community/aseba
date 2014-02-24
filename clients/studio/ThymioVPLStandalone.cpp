@@ -76,6 +76,16 @@ namespace Aseba
 		getTarget()->stop(vplStandalone->id);
 	}
 	
+	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
+	{
+		return vplStandalone->variablesModel;
+	}
+	
+	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		getTarget()->setVariables(vplStandalone->id, addr, data);
+	}
+	
 	bool ThymioVPLStandaloneInterface::saveFile(bool as)
 	{
 		return vplStandalone->saveFile(as);
@@ -97,15 +107,11 @@ namespace Aseba
 		return false;
 	}
 	
-	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
+	void ThymioVPLStandaloneInterface::clearOpenedFileName()
 	{
-		return vplStandalone->variablesModel;
+		// do nothing
 	}
 	
-	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
-	{
-		getTarget()->setVariables(vplStandalone->id, addr, data);
-	}
 	
 	//////
 	

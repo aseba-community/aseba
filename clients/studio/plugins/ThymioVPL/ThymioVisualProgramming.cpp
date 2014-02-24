@@ -529,6 +529,7 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 		else
 			saveGeometryIfVisible();
+		de->clearOpenedFileName();
 	}
 	
 	void ThymioVisualProgramming::saveGeometryIfVisible()
