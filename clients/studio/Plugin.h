@@ -71,7 +71,7 @@ namespace Aseba
 		//! Request the DE to create a new empty file
 		virtual bool newFile() = 0;
 		//! Request the DE to clear the name of the opened file, without any check for change
-		virtual void clearOpenedFileName() = 0;
+		virtual void clearOpenedFileName(bool isModified) = 0;
 	};
 	
 	//! A tool that is specific to a node

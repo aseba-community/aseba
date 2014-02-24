@@ -429,12 +429,16 @@ namespace Aseba { namespace ThymioVPL
 		
 		if (scene->isEmpty() || preDiscardWarningDialog(true)) 
 		{
+			de->clearOpenedFileName(scene->isModified());
 			clearHighlighting(true);
 			clearSceneWithoutRecompilation();
 			return true;
 		}
 		else
+		{
+			de->clearOpenedFileName(scene->isModified());
 			return false;
+		}
 	}
 	
 	void ThymioVisualProgramming::showErrorLine()
@@ -529,7 +533,6 @@ namespace Aseba { namespace ThymioVPL
 			event->ignore();
 		else
 			saveGeometryIfVisible();
-		de->clearOpenedFileName();
 	}
 	
 	void ThymioVisualProgramming::saveGeometryIfVisible()

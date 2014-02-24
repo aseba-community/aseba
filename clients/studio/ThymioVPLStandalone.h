@@ -51,7 +51,7 @@ namespace Aseba
 		bool saveFile(bool as=false);
 		void openFile();
 		bool newFile();
-		void clearOpenedFileName();
+		void clearOpenedFileName(bool isModified);
 		
 	private:
 		ThymioVPLStandalone* vplStandalone;

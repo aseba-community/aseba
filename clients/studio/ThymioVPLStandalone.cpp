@@ -107,8 +107,9 @@ namespace Aseba
 		return false;
 	}
 	
-	void ThymioVPLStandaloneInterface::clearOpenedFileName()
+	void ThymioVPLStandaloneInterface::clearOpenedFileName(bool isModified)
 	{
+		Q_UNUSED(isModified);
 		// do nothing
 	}
 	

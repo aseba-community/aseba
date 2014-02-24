@@ -106,9 +106,9 @@ namespace Aseba
 		return mainWindow->newFile();
 	}
 	
-	void StudioInterface::clearOpenedFileName()
+	void StudioInterface::clearOpenedFileName(bool isModified)
 	{
-		mainWindow->clearOpenedFileName();
+		mainWindow->clearOpenedFileName(isModified);
 	}
 	
 	TargetVariablesModel * StudioInterface::getVariablesModel()
@@ -1662,7 +1662,7 @@ namespace Aseba
 			eventsDescriptionsModel->clearWasModified();
 			
 			// reset opened file name
-			clearOpenedFileName();
+			clearOpenedFileName(false);
 			return true;
 		}
 		return false;
@@ -3661,10 +3661,10 @@ namespace Aseba
 		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 	}
 	
-	void MainWindow::clearOpenedFileName()
+	void MainWindow::clearOpenedFileName(bool isModified)
 	{
 		actualFileName.clear();
-		sourceModified = false;
+		sourceModified = isModified;
 		updateWindowTitle();
 	}
 	
