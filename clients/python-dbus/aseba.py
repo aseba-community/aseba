@@ -18,6 +18,11 @@ Typical usage:
         aseba.set("node_name", "var_name", value)
         value = aseba.get("node_name", "var_name")
 
+
+Aseba.event_freq is a dictionary that store the frequency at which each
+(subscribed) event is received. For events that are emitted at fixed period, it
+may be a convenient way to make sure the connection is in good shape.
+
 """
 
 __author__ = "Séverin Lemaignan, Stéphane Magnenat"
