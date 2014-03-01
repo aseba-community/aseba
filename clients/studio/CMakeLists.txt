@@ -70,7 +70,7 @@ if (QT4_FOUND)
 		AeslEditor.h
 		translations/CompilerTranslator.h
 	)
-	add_library(asebaqtcommon ${qt_common_SRCS} ${qt_common_MOCS})
+	add_library(asebaqtcommon STATIC ${qt_common_SRCS} ${qt_common_MOCS})
 	
 	# plugins
 	set(qt_plugins_SRCS
@@ -97,7 +97,7 @@ if (QT4_FOUND)
 		plugins/ThymioVPL/EventActionPair.h
 		plugins/ThymioVPL/Scene.h
 	)
-	add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
+	add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 	
 	qt4_add_resources(resfiles asebastudio.qrc)
 	

@@ -7,9 +7,13 @@ set (ASEBACOMMON_SRC
 	msg/descriptions-manager.cpp
 )
 add_library(asebacommon ${ASEBACOMMON_SRC})
-install(TARGETS asebacommon ARCHIVE
-	DESTINATION lib
-)
+set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
+                                        SOVERSION ${LIB_VERSION_MAJOR})
+
+install(TARGETS asebacommon 
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+		ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
+) 
 
 set (ASEBA_HDR_UTILS 
 	utils/utils.h
