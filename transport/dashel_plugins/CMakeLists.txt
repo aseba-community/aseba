@@ -13,8 +13,12 @@ else (ANDROID)
 endif (ANDROID)
 
 add_library(asebadashelplugins ${ASEBADASHEL_PLUGINS_SRC})
-install(TARGETS asebadashelplugins ARCHIVE
-	DESTINATION lib
+set_target_properties(asebadashelplugins PROPERTIES VERSION ${LIB_VERSION_STRING} 
+                                        SOVERSION ${LIB_VERSION_MAJOR})
+
+install(TARGETS asebadashelplugins
+                LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+                ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
 
 set(ASEBACORE_HDR_DASHEL_PLUGINS
