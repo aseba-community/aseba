@@ -170,6 +170,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		clear(false);
 		createNewEventActionsSet();
+		// TODO: fixme
+		lastCompilationResult = Compiler::CompilationResult();
 	}
 	
 	//! Remove everything from the scene, leaving it with no object (hence not usable directly), and set advanced mode or not
@@ -404,7 +406,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void Scene::recompileWithoutSetModified()
 	{
-		qDebug() << "recompiling";
+		//qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
 		
 		for(int i=0; i<eventActionsSets.size(); i++)

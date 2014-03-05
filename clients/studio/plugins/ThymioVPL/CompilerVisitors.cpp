@@ -455,11 +455,11 @@ namespace Aseba { namespace ThymioVPL
 		const int highBound(middleValue + 8192 / AccEventBlock::resolution);
 		
 		wstring text;
-		if (block->getValue(1) != AccEventBlock::resolution)
+		if (testValue != -AccEventBlock::resolution)
 			text += L"angle > " + toWstring(lowBound);
-		if (!text.empty() && (block->getValue(1) != -AccEventBlock::resolution))
+		if (!text.empty() && (testValue != AccEventBlock::resolution))
 			text += L" and ";
-		if (block->getValue(1) != -AccEventBlock::resolution)
+		if (testValue != AccEventBlock::resolution)
 			text += L"angle < " + toWstring(highBound);
 		return text;
 	}
