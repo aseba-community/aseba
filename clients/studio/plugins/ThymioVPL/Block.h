@@ -56,7 +56,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
-		virtual QPixmap image(qreal factor=1);
+		virtual QImage image(qreal factor=1);
+		QImage translucidImage(qreal factor=1);
 
 		QString getType() const { return type; }
 		QString getName() const { return name; }

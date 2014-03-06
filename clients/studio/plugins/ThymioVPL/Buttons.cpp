@@ -188,8 +188,8 @@ namespace Aseba { namespace ThymioVPL
 		else
 			factor = w / 256;
 		block->setAdvanced(advanced);
-		setIcon(block->image(factor));
-	}	
+		setIcon(QPixmap::fromImage(block->image(factor)));
+	}
 
 	void BlockButton::mouseMoveEvent( QMouseEvent *event )
 	{
@@ -198,7 +198,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(block->mimeData());
-		drag->setPixmap(block->image(vpl->getViewScale()));
+		drag->setPixmap(QPixmap::fromImage(block->translucidImage(vpl->getViewScale())));
 		const qreal thisScale = width() / 256.;
 		drag->setHotSpot(event->pos()*vpl->getViewScale() / thisScale);
 		drag->exec(Qt::CopyAction);

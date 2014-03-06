@@ -11,6 +11,7 @@
 #include <QSlider>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QX11Info>
 #include <QDebug>
 #include <cassert>
 #include <cmath>
@@ -110,19 +111,48 @@ namespace Aseba { namespace ThymioVPL
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
-	QPixmap Block::image(qreal factor)
+	QImage Block::image(qreal factor)
 	{
 		const QRectF br(boundingRect());
-		QPixmap pixmap(br.width()*factor, br.height()*factor);
-		pixmap.fill(Qt::transparent);
-		QPainter painter(&pixmap);
+		QImage img(br.width()*factor, br.height()*factor, QImage::Format_ARGB32);
+		img.fill(Qt::transparent);
+		QPainter painter(&img);
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.scale(factor, factor);
 		painter.translate(-br.topLeft());
 		render(painter);
 		painter.end();
 		
-		return pixmap;
+		return img;
+	}
+	
+	QImage Block::translucidImage(qreal factor)
+	{
+		QImage img(image(factor));
+		
+		// Set transparent block FIXME: test ugly
+		#ifdef Q_WS_X11
+		if (!QX11Info::isCompositingManagerRunning())
+		{
+			for (int y = 0; y < img.height(); ++y) {
+				QRgb *row = (QRgb*)img.scanLine(y);
+				for (int x = 0; x < img.width(); ++x) {
+					((unsigned char*)&row[x])[3] = (x+y) % 2 == 0 ? 255 : 0;
+				}
+			}
+		}
+		else
+			#endif // Q_WS_X11
+		{
+			for (int y = 0; y < img.height(); ++y) {
+				QRgb *row = (QRgb*)img.scanLine(y);
+				for (int x = 0; x < img.width(); ++x) {
+					((unsigned char*)&row[x])[3] = 128;
+				}
+			}
+		}
+		
+		return img;
 	}
 	
 	//! Manual rendering of this block and its children, do not use a scene
@@ -250,22 +280,16 @@ namespace Aseba { namespace ThymioVPL
 		
 		Q_ASSERT(scene());
 		Q_ASSERT(scene()->views().size() > 0);
-		QGraphicsView* view(scene()->views()[0]);
+		ResizingView* view(polymorphic_downcast<ResizingView*>(scene()->views()[0]));
 		const QRectF sceneRect(mapRectToScene(boundingRect()));
 		const QRect viewRect(view->mapFromScene(sceneRect).boundingRect());
 		const QPoint hotspot(view->mapFromScene(event->scenePos()) - viewRect.topLeft());
-		QPixmap pixmap(viewRect.size());
-		pixmap.fill(Qt::transparent);
-		QPainter painter(&pixmap);
-		painter.setRenderHint(QPainter::Antialiasing);
-		scene()->render(&painter, QRectF(), sceneRect);
-		painter.end();
 		
 		const bool isCopy((event->modifiers() & Qt::ControlModifier) || (name == "statefilter"));
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
 		drag->setHotSpot(hotspot);
-		drag->setPixmap(pixmap);
+		drag->setPixmap(QPixmap::fromImage(translucidImage(view->getScale())));
 		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
