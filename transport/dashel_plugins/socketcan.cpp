@@ -17,10 +17,11 @@
         along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/uio.h>
 #include <net/if.h>
+#include <poll.h>
 
 #include <sys/socket.h>
 #include <linux/can.h>
@@ -160,6 +161,28 @@ class CanStream: public SelectableStream
 			return 0;
 		}
 
+		void can_write_frame(struct can_frame * f)
+		{
+			ssize_t ret;
+
+			do {
+				ret = ::write(fd, f, sizeof(*f));
+
+				if(ret == -1 && errno == ENOBUFS)
+				{
+					struct pollfd pf;
+					pf.fd = fd;
+					pf.events = POLLOUT | POLLHUP;
+					pf.revents = 0;
+					poll(&pf, 1, 0);
+					continue;
+				}
+
+				if(ret != sizeof(*f))
+					throw DashelException(DashelException::IOError, 0, "Write error", this);
+			} while(0);
+		}
+
 		void send_aseba_packet()
 		{
 			struct can_frame frame;
@@ -175,8 +198,7 @@ class CanStream: public SelectableStream
 				frame.data[0] = msgId;
 				frame.data[1] = msgId >> 8;
 				memcpy(&frame.data[2], &tx_buffer[6], packet_len);
-				if(::write(fd,&frame, sizeof(frame)) != sizeof(frame))
-					throw DashelException(DashelException::IOError, 0, "Write error", this);
+				can_write_frame(&frame);
 			} 
 			else 
 			{
@@ -188,8 +210,7 @@ class CanStream: public SelectableStream
 				memcpy(&frame.data[2], p, 6);
 				p += 6;
 				packet_len -= 6;
-				if(::write(fd, &frame, sizeof(frame)) != sizeof(frame)) 
-					throw DashelException(DashelException::IOError, 0, "Write error", this);
+				can_write_frame(&frame);
 
 				while(packet_len > 8)
 				{
@@ -198,14 +219,12 @@ class CanStream: public SelectableStream
 					memcpy(frame.data, p, 8);
 					p+=8;
 					packet_len -= 8;
-					if(::write(fd, &frame, sizeof(frame)) != sizeof(frame))
-						throw DashelException(DashelException::IOError, 0, "Write error", this);
+					can_write_frame(&frame);
 				}
 				frame.can_id = TO_CANID(TYPE_PACKET_STOP, nodeId);
 				frame.can_dlc = packet_len;
 				memcpy(frame.data, p, packet_len);
-				if(::write(fd, &frame, sizeof(frame)) != sizeof(frame))
-					throw DashelException(DashelException::IOError, 0, "Write error", this);
+				can_write_frame(&frame);
 			}
 			tx_len = 0;
 		}
