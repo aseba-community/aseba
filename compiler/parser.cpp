@@ -270,10 +270,8 @@ namespace Aseba
 		const unsigned addr = allocateTemporaryMemory(varPos, size);
 
 		// create assignment
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(varPos));
-		assignment->children.push_back(new MemoryVectorNode(varPos, addr, size, WFormatableString(L"temp%0").arg(uid++)));
-		assignment->children.push_back(rValue);
-		return assignment.release();
+		MemoryVectorNode* lValue = new MemoryVectorNode(varPos, addr, size, WFormatableString(L"temp%0").arg(uid++));
+		return new AssignmentNode(varPos, lValue, rValue);
 	}
 	
 	//! Parse "program" grammar element.
@@ -452,10 +450,7 @@ namespace Aseba
 				lValue->arraySize = rValue->getVectorSize();
 			}
 
-			std::auto_ptr<AssignmentNode> assign(new AssignmentNode(pos));
-			assign->children.push_back(lValue);
-			assign->children.push_back(rValue.release());
-			return assign.release();
+			return new AssignmentNode(pos, lValue, rValue.release());
 		}
 
 		return NULL;
@@ -474,21 +469,18 @@ namespace Aseba
 
 		// parse left value
 		std::auto_ptr<Node> lValue(parseBinaryOrExpression());
-		
+
+		SourcePos pos = tokens.front().pos;
+		Compiler::Token op = tokens.front();
+
 		// parse right value
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
-			std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(tokens.front().pos));
 			tokens.pop_front();
-			
-			assignment->children.push_back(lValue.release());
-			assignment->children.push_back(parseBinaryOrExpression());
-			return assignment.release();
+			return new AssignmentNode(pos, lValue.release(), parseBinaryOrExpression());
 		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
 		{
-			SourcePos pos = tokens.front().pos;
-			Compiler::Token op = tokens.front();
 			tokens.pop_front();
 
 			std::auto_ptr<UnaryArithmeticAssignmentNode> assignment(
@@ -501,8 +493,6 @@ namespace Aseba
 		}
 		else if (IS_ONE_OF(compoundBinaryAssignment))
 		{
-			SourcePos pos = tokens.front().pos;
-			Compiler::Token op = tokens.front();
 			tokens.pop_front();
 
 			std::auto_ptr<ArithmeticAssignmentNode> assignment(
@@ -629,11 +619,15 @@ namespace Aseba
 		{
 			if (rangeStartIndex > rangeEndIndex)
 				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_HIGHER_THAN_END);
+			if (rangeEndIndex == 32767)
+				throw TranslatableError(rangeEndIndexPos, ERROR_FOR_INVALID_INC_END_INDEX);
 		}
 		else
 		{
 			if (rangeStartIndex < rangeEndIndex)
 				throw TranslatableError(rangeStartIndexPos, ERROR_FOR_START_LOWER_THAN_END);
+			if (rangeEndIndex == -32768)
+				throw TranslatableError(rangeEndIndexPos, ERROR_FOR_INVALID_DEC_END_INDEX);
 		}
 		
 		// do keyword
@@ -642,33 +636,48 @@ namespace Aseba
 		
 		// create enclosing block and initial variable state
 		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(rangeStartIndexPos));
-		assignment->children.push_back(variable.release());
-		assignment->children.push_back(new TupleVectorNode(rangeStartIndexPos, rangeStartIndex));
-		blockNode->children.push_back(assignment.release());
+		blockNode->children.push_back(new AssignmentNode(
+						      rangeStartIndexPos,
+						      variable.release(),
+						      new TupleVectorNode(rangeStartIndexPos, rangeStartIndex))
+					      );
 		
-		// create while and condition
-		WhileNode* whileNode = new WhileNode(whilePos);
-		blockNode->children.push_back(whileNode);
-		BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
-		whileNode->children.push_back(comparisonNode);
-		comparisonNode->children.push_back(variableRef->deepCopy());
-		if (rangeStartIndex <= rangeEndIndex)
-			comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
+		// build while content
+		if (rangeStartIndex == rangeEndIndex)
+		{
+			// start and end indexes are the same, do not loop
+			
+			// if start and end indexes are the same, do not loop
+			while (tokens.front() != Token::TOKEN_STR_end)
+					blockNode->children.push_back(parseBlockStatement());
+		}
 		else
-			comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
-		comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
+		{
+			// start and end indexes are the same, loop
 		
-		// block and end keyword
-		whileNode->children.push_back(new BlockNode(tokens.front().pos));
-		while (tokens.front() != Token::TOKEN_STR_end)
-			whileNode->children[1]->children.push_back(parseBlockStatement());
-		
-		// increment variable
-		AssignmentNode* assignmentNode = new AssignmentNode(varPos);
-		whileNode->children[1]->children.push_back(assignmentNode);
-		assignmentNode->children.push_back(variableRef->deepCopy());
-		assignmentNode->children.push_back(new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
+			// create while and condition
+			WhileNode* whileNode = new WhileNode(whilePos);
+			blockNode->children.push_back(whileNode);
+			BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+			whileNode->children.push_back(comparisonNode);
+			comparisonNode->children.push_back(variableRef->deepCopy());
+			if (rangeStartIndex <= rangeEndIndex)
+				comparisonNode->op = ASEBA_OP_SMALLER_EQUAL_THAN;
+			else
+				comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
+			comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
+			
+			// block and end keyword
+			whileNode->children.push_back(new BlockNode(tokens.front().pos));
+			while (tokens.front() != Token::TOKEN_STR_end)
+				whileNode->children[1]->children.push_back(parseBlockStatement());
+			
+			// increment variable
+			AssignmentNode* assignmentNode = new AssignmentNode(varPos,
+										variableRef->deepCopy(),
+										new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
+			whileNode->children[1]->children.push_back(assignmentNode);
+		}
 		
 		tokens.pop_front();
 		
@@ -1307,9 +1316,7 @@ namespace Aseba
 
 		// create a temporary "var = expr" tree
 		// used to access the facility offered by the AssignmentNode (size check,...)
-		std::auto_ptr<Node> tempTree1(new AssignmentNode(pos));
-		tempTree1->children.push_back(new MemoryVectorNode(pos, 0, 1, L"fake"));
-		tempTree1->children.push_back(tree);
+		std::auto_ptr<Node> tempTree1(new AssignmentNode(pos, new MemoryVectorNode(pos, 0, 1, L"fake"), tree));
 
 		//tempTree1->children.push_back(parseBinaryOrExpression());
 

@@ -361,6 +361,8 @@ namespace Aseba
 		typedef std::map<std::wstring, int> ConstantsMap;
 		//! Lookup table for event name => id
 		typedef std::map<std::wstring, unsigned> EventsMap;
+
+		friend struct AssignmentNode;
 	
 	public:
 		Compiler();
@@ -372,6 +374,7 @@ namespace Aseba
 		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
 		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
+		static bool isKeyword(const std::wstring& word);
 		
 	protected:
 		void internalCompilerError() const;

@@ -1,9 +1,9 @@
-#ifndef VPL_ACTION_CARDS_H
-#define VPL_ACTION_CARDS_H
+#ifndef VPL_ACTION_BLOCKS_H
+#define VPL_ACTION_BLOCKS_H
 
 #include <QList>
 
-#include "Card.h"
+#include "Block.h"
 
 class QSlider;
 class QTimeLine;
@@ -13,13 +13,13 @@ namespace Aseba { namespace ThymioVPL
 	/** \addtogroup studio */
 	/*@{*/
 	
-	class MoveActionCard : public Card
+	class MoveActionBlock : public Block
 	{
 		Q_OBJECT
 	
 	public:
-		MoveActionCard(QGraphicsItem *parent=0);
-		virtual ~MoveActionCard();
+		MoveActionBlock(QGraphicsItem *parent=0);
+		virtual ~MoveActionBlock();
 	
 		virtual unsigned valuesCount() const { return 2; }
 		virtual int getValue(unsigned i) const;
@@ -35,12 +35,12 @@ namespace Aseba { namespace ThymioVPL
 		ThymioBody* thymioBody;
 	};
 	
-	class ColorActionCard : public CardWithBody
+	class ColorActionBlock : public BlockWithBody
 	{
 		Q_OBJECT
 		
 	protected:
-		ColorActionCard(QGraphicsItem *parent, bool top);
+		ColorActionBlock(QGraphicsItem *parent, bool top);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 	
@@ -56,20 +56,20 @@ namespace Aseba { namespace ThymioVPL
 		QList<QSlider *> sliders;
 	};
 	
-	struct TopColorActionCard : public ColorActionCard
+	struct TopColorActionBlock : public ColorActionBlock
 	{
-		TopColorActionCard(QGraphicsItem *parent=0);
+		TopColorActionBlock(QGraphicsItem *parent=0);
 	};
 	
-	struct BottomColorActionCard : public ColorActionCard
+	struct BottomColorActionBlock : public ColorActionBlock
 	{
-		BottomColorActionCard(QGraphicsItem *parent=0);
+		BottomColorActionBlock(QGraphicsItem *parent=0);
 	};
 	
-	class SoundActionCard : public CardWithBody
+	class SoundActionBlock : public BlockWithBody
 	{
 	public:
-		SoundActionCard(QGraphicsItem *parent=0);
+		SoundActionBlock(QGraphicsItem *parent=0);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
@@ -78,19 +78,26 @@ namespace Aseba { namespace ThymioVPL
 		virtual void setValue(unsigned i, int value);
 		
 	protected:
-		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		
+		void idxAndValFromPos(const QPointF& pos, bool* ok, unsigned& noteIdx, unsigned& noteVal);
+		void setNote(unsigned noteIdx, unsigned noteVal);
+		void setDuration(unsigned noteIdx, unsigned durationVal);
 		
 	protected:
+		bool dragging;
 		unsigned notes[6];
 		unsigned durations[6];
 	};
 	
-	class TimerActionCard: public CardWithBody
+	class TimerActionBlock: public BlockWithBody
 	{
 		Q_OBJECT
 		
 	public:
-		TimerActionCard(QGraphicsItem *parent=0);
+		TimerActionBlock(QGraphicsItem *parent=0);
 		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
@@ -102,18 +109,23 @@ namespace Aseba { namespace ThymioVPL
 		void frameChanged(int frame);
 		
 	protected:
-		void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-		void durationUpdated();
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		
+		unsigned durationFromPos(const QPointF& pos, bool* ok) const;
+		void setDuration(unsigned duration);
 		
 	protected:
+		bool dragging;
 		unsigned duration;
 		QTimeLine *timer;
 	};
 
-	class StateFilterActionCard : public CardWithButtons
+	class StateFilterActionBlock : public StateFilterBlock
 	{
 	public:
-		StateFilterActionCard(QGraphicsItem *parent=0);
+		StateFilterActionBlock(QGraphicsItem *parent=0);
 	};
 	
 	/*@}*/

@@ -23,13 +23,18 @@ using namespace Aseba;
 std::wstring read_source(const std::string& filename);
 void dump_source(const std::wstring& source);
 
-static const char short_options [] = "fsdm:";
+static const char short_options [] = "fcepnsdmi:";
 static const struct option long_options[] = { 
-	{ "fail",	no_argument,		NULL,		'f'},
-	{ "source",	no_argument,		NULL,		's'},
-	{ "dump",	no_argument,		NULL,		'd'},
-	{ "memdump",	no_argument,		NULL,		'u'},
-	{ "memcmp", 	required_argument,	NULL,		'm'},
+	{ "fail",	no_argument,			NULL,	'f'},
+	{ "comp_fail",	no_argument,		NULL,	'c'},
+	{ "exec_fail",	no_argument,		NULL,	'e'},
+	{ "post_fail",	no_argument,		NULL,	'p'},
+	{ "memcmp_fail",no_argument,		NULL,	'n'},
+	{ "source",		no_argument,		NULL,	's'},
+	{ "dump",		no_argument,		NULL,	'd'},
+	{ "memdump",	no_argument,		NULL,	'u'},
+	{ "memcmp", 	required_argument,	NULL,	'm'},
+	{ "steps", 		required_argument,	NULL,	'i'},
 	{ 0, 0, 0, 0 } 
 };
 
@@ -37,7 +42,11 @@ static void usage (int argc, char** argv)
 {
 	std::cerr 	<< "Usage: " << argv[0] << " [options] source" << std::endl << std::endl
 			<< "Options:" << std::endl
-			<< "    -f | --fail         Return EXIT_SUCCESS if compilation fail" << std::endl
+			<< "    -f | --fail         Return EXIT_SUCCESS if anything fails" << std::endl
+			<< "    -c | --comp_fail    Return EXIT_SUCCESS if compilation fails" << std::endl
+			<< "    -e | --exec_fail    Return EXIT_SUCCESS if execution fails" << std::endl
+			<< "    -p | --post_fail    Return EXIT_SUCCESS if post-execution state fails" << std::endl
+			<< "    -n | --memcmp_fail  Return EXIT_SUCCESS if memory comparison fails" << std::endl
 			<< "    -s | --source       Dump the source code" << std::endl
 			<< "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
 			<< "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
@@ -232,11 +241,11 @@ struct AsebaNode
 		return true;
 	}
 	
-	void run()
+	void run(int stepCount)
 	{
 		// run VM
 		AsebaVMSetupEvent(&vm, ASEBA_EVENT_INIT);
-		AsebaVMRun(&vm, 1000);
+		AsebaVMRun(&vm, stepCount);
 	}
 };
 
@@ -270,11 +279,15 @@ void checkForError(const std::string& module, bool shouldFail, bool wasError, co
 
 int main(int argc, char** argv)
 {
-	bool should_fail = false;
+	bool should_compilation_fail = false;
+	bool should_execution_fail = false;
+	bool should_postexecution_fail = false;
+	bool should_memcmp_fail = false;
 	bool source = false;
 	bool dump = false;
 	bool memDump = false;
 	bool memCmp = false;
+	int stepCount = 1000;
 	std::string memCmpFileName;
 	
 	std::locale::global(std::locale(""));
@@ -295,7 +308,22 @@ int main(int argc, char** argv)
 			case 0: // getopt_long() flag
 				break;
 			case 'f':
-				should_fail = true;
+				should_compilation_fail = true;
+				should_execution_fail = true;
+				should_postexecution_fail = true;
+				should_memcmp_fail = true;
+				break;
+			case 'c':
+				should_compilation_fail = true;
+				break;
+			case 'e':
+				should_execution_fail = true;
+				break;
+			case 'p':
+				should_postexecution_fail = true;
+				break;
+			case 'n':
+				should_memcmp_fail = true;
 				break;
 			case 's':
 				source = true;
@@ -310,11 +338,15 @@ int main(int argc, char** argv)
 				memCmp = true;
 				memCmpFileName = optarg;
 				break;
+			case 'i':
+				stepCount = atoi(optarg);
 			default:
 				usage(argc, argv);
 				exit(EXIT_FAILURE);
 		}
 	}
+	
+	const bool should_any_fail(should_compilation_fail || should_execution_fail || should_postexecution_fail || should_memcmp_fail);
 
 	std::string filename;
 	
@@ -362,7 +394,7 @@ int main(int argc, char** argv)
 
 	//ifs.close();
 	
-	checkForError("Compilation", should_fail, (outError.message != L"not defined"), outError.toWString());
+	checkForError("Compilation", should_compilation_fail, (outError.message != L"not defined"), outError.toWString());
 	
 	// run
 	if (!node.loadBytecode(bytecode))
@@ -370,9 +402,13 @@ int main(int argc, char** argv)
 		std::cerr << "Load bytecode failure" << std::endl;
 		return EXIT_FAILURE;
 	}
-	node.run();
+	node.run(stepCount);
 	
-	checkForError("Execution", should_fail, executionError);
+	checkForError("Execution", should_execution_fail, executionError);
+	
+	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
+	
+	checkForError("PostExecution", should_postexecution_fail, stillExecuting, WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
 
 	if (memDump)
 	{
@@ -404,7 +440,7 @@ int main(int argc, char** argv)
 			if (node.vm.variables[i] != v)
 			{
 				std::cerr << "VM variable value at pos " << i << " after execution differs from dump; expected: " << v << ", found: " << node.vm.variables[i] << std::endl;
-				if (should_fail)
+				if (should_memcmp_fail)
 				{
 					std::cerr << "Failure was expected" << std::endl;
 					exit(EXIT_SUCCESS);
@@ -417,8 +453,7 @@ int main(int argc, char** argv)
 		ifs.close();
 	}
 	
-	
-	if (should_fail)
+	if (should_any_fail)
 	{
 		std::cerr << "All tests passed successfully, but failure was expected" << std::endl;
 		exit(EXIT_FAILURE);

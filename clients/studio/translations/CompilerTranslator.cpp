@@ -192,6 +192,14 @@ namespace Aseba
 				msg = tr("Start index must be higher than end index in decreasing loops");
 				break;
 
+			case ERROR_FOR_INVALID_INC_END_INDEX:
+				msg = tr("End index cannot be 32767 in increasing loops");
+				break;
+
+			case ERROR_FOR_INVALID_DEC_END_INDEX:
+				msg = tr("End index cannot be -32768 in decreasing loops");
+				break;
+
 			case ERROR_EVENT_ALREADY_IMPL:
 				msg = tr("Event %0 is already implemented");
 				break;

@@ -179,11 +179,11 @@ namespace Enki
 	{
 		vm.nodeId = id;
 		
-		bytecode.resize(512);
+		bytecode.resize(1024);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
 		
-		stack.resize(64);
+		stack.resize(32);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 		

@@ -419,6 +419,7 @@ namespace Aseba
 					else
 					{
 						// check if it is a known keyword
+						// FIXME: clean-up that with a table
 						if (s == L"when")
 							tokens.push_back(Token(Token::TOKEN_STR_when, pos));
 						else if (s == L"emit")
@@ -502,5 +503,59 @@ namespace Aseba
 	{
 		for (unsigned i = 0; i < tokens.size(); i++)
 			dest << tokens[i].toWString() << std::endl;
+	}
+	
+	//! Return whether a string is a language keyword
+	bool Compiler::isKeyword(const std::wstring& s)
+	{
+		// FIXME: clean-up that with a table
+		if (s == L"when")
+			return true;
+		else if (s == L"emit")
+			return true;
+		else if (s == L"for")
+			return true;
+		else if (s == L"in")
+			return true;
+		else if (s == L"step")
+			return true;
+		else if (s == L"while")
+			return true;
+		else if (s == L"do")
+			return true;
+		else if (s == L"if")
+			return true;
+		else if (s == L"then")
+			return true;
+		else if (s == L"else")
+			return true;
+		else if (s == L"elseif")
+			return true;
+		else if (s == L"end")
+			return true;
+		else if (s == L"var")
+			return true;
+		else if (s == L"const")
+			return true;
+		else if (s == L"call")
+			return true;
+		else if (s == L"sub")
+			return true;
+		else if (s == L"callsub")
+			return true;
+		else if (s == L"onevent")
+			return true;
+		else if (s == L"abs")
+			return true;
+		else if (s == L"return")
+			return true;
+		else if (s == L"or")
+			return true;
+		else if (s == L"and")
+			return true;
+		else if (s == L"not")
+			return true;
+		else
+			return false;
 	}
 } // namespace Aseba

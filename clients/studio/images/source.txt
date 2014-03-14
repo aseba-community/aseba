@@ -1,6 +1,7 @@
 kde crystal svg
 amarok
 http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/
+http://websvn.kde.org/trunk/kdesupport/oxygen-icons/
 http://commons.wikimedia.org/wiki/File:Bombilla_amarilla_-_yellow_Edison_lamp.svg
 http://commons.wikimedia.org/wiki/File:Graduate.svg
 http://commons.wikimedia.org/wiki/File:Nuvola_apps_kuser.svg

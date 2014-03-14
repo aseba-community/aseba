@@ -106,6 +106,11 @@ namespace Aseba
 		return mainWindow->newFile();
 	}
 	
+	void StudioInterface::clearOpenedFileName(bool isModified)
+	{
+		mainWindow->clearOpenedFileName(isModified);
+	}
+	
 	TargetVariablesModel * StudioInterface::getVariablesModel()
 	{
 		return nodeTab->vmMemoryModel;
@@ -552,10 +557,10 @@ namespace Aseba
 		QWidget* memoryWidget = new QWidget;
 		memoryWidget->setLayout(memoryLayout);
 		panelSplitter->addWidget(memoryWidget);
-		panelSplitter->setStretchFactor(1, 3);
+		panelSplitter->setStretchFactor(1, 9);
 		
 		panelSplitter->addWidget(toolBoxWidget);
-		panelSplitter->setStretchFactor(2, 1);
+		panelSplitter->setStretchFactor(2, 4);
 		
 		addWidget(panelSplitter);
 		QWidget *editorWidget = new QWidget;
@@ -1582,7 +1587,7 @@ namespace Aseba
 		// create models
 		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
 		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
-		constantsDefinitionsModel = new NamedValuesVectorModel(&commonDefinitions.constants, this);
+		constantsDefinitionsModel = new ConstantsModel(&commonDefinitions.constants, this);
 		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
 		
@@ -1642,6 +1647,7 @@ namespace Aseba
 	{
 		if (askUserBeforeDiscarding())
 		{
+			// clear content
 			clearDocumentSpecificTabs();
 			// we must only have NodeTab* left.
 			for (int i = 0; i < nodes->count(); i++)
@@ -1650,13 +1656,13 @@ namespace Aseba
 				Q_ASSERT(tab);
 				tab->editor->clear();
 			}
-			actualFileName.clear();
-			sourceModified = false;
 			constantsDefinitionsModel->clear();
 			constantsDefinitionsModel->clearWasModified();
 			eventsDescriptionsModel->clear();
 			eventsDescriptionsModel->clearWasModified();
-			updateWindowTitle();
+			
+			// reset opened file name
+			clearOpenedFileName(false);
 			return true;
 		}
 		return false;
@@ -2571,11 +2577,7 @@ namespace Aseba
 
 		if (ok && !constantName.isEmpty())
 		{
-			if (commonDefinitions.constants.contains(constantName.toStdWString()))
-			{
-				QMessageBox::warning(this, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(constantName));
-			}
-			else
+			if (constantsDefinitionsModel->validateName(constantName))
 			{
 				constantsDefinitionsModel->addNamedValue(NamedValue(constantName.toStdWString(), constantValue));
 				recompileAll();
@@ -3657,6 +3659,13 @@ namespace Aseba
 		showMemoryUsageAct->setChecked(ConfigDialog::getShowMemoryUsage());
 		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
 		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
+	}
+	
+	void MainWindow::clearOpenedFileName(bool isModified)
+	{
+		actualFileName.clear();
+		sourceModified = isModified;
+		updateWindowTitle();
 	}
 	
 	/*@}*/

@@ -62,6 +62,14 @@ namespace Aseba
 	}
 
 	//! Constructor
+	AssignmentNode::AssignmentNode(const SourcePos &sourcePos, Node *left, Node *right) :
+		Node(sourcePos)
+	{
+		children.push_back(left);
+		children.push_back(right);
+	}
+
+	//! Constructor
 	EventDeclNode::EventDeclNode(const SourcePos& sourcePos, unsigned eventId) :
 		Node(sourcePos),
 		eventId(eventId)

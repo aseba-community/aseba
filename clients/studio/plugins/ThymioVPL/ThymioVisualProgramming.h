@@ -11,8 +11,9 @@
 #include <QGraphicsLinearLayout>
 #include <QComboBox>
 #include <QToolBar>
-#include <QToolButton>
+#include <QPushButton>
 #include <QDomDocument>
+#include <QStack>
 
 #include <map>
 #include <vector>
@@ -31,13 +32,37 @@ namespace Aseba
 namespace Aseba { namespace ThymioVPL
 {
 	class Scene;
-	class CardButton;
+	class BlockButton;
 	
 	/** \addtogroup studio */
 	/*@{*/
+	
+	class ResizingView: public QGraphicsView
+	{
+		Q_OBJECT
+	
+	public:
+		ResizingView(QGraphicsScene * scene, QWidget * parent = 0);
+		qreal getScale() const { return computedScale; }
+		
+	protected:
+		virtual void resizeEvent(QResizeEvent * event);
+		
+	protected slots:
+		void recomputeScale();
+		void resetResizedFlag();
+		
+	protected:
+		bool wasResized;
+		qreal computedScale;
+	};
+	
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
+	
+	public:
+		static QColor getBlockColor(const QString& type);
 		
 	public:
 		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
@@ -52,6 +77,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 		
 		bool isModified() const;
+		qreal getViewScale() const { return view->getScale(); }
 		
 	signals:
 		void modifiedStatusChanged(bool modified);
@@ -62,21 +88,11 @@ namespace Aseba { namespace ThymioVPL
 		bool closeFile();
 		
 	private slots:
-		void openToUrlFromAction() const;
+		void openHelp() const;
 		void showVPLModal();
-		void addButtonsEvent();
-		void addProxEvent();
-		void addProxGroundEvent();
-		void addTapEvent();
-		void addClapEvent();
-		void addTimeoutEvent();
 		
-		void addMoveAction();
-		void addColorTopAction();
-		void addColorBottomAction();
-		void addSoundAction();
-		void addTimerAction();
-		void addMemoryAction();
+		void addEvent();
+		void addAction();
 		
 		void newFile();
 		void openFile();
@@ -86,28 +102,33 @@ namespace Aseba { namespace ThymioVPL
 		void run();
 		void stop();
 		void toggleAdvancedMode();
+		void pushUndo();
+		void undo();
+		void redo();
 		void processCompilationResult();
 		void processHighlightChange();
-		void setViewScale();
 		
 	private:
+		void clearUndo();
 		void toggleAdvancedMode(bool advanced, bool force=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
 		
 	protected:
-		friend class Aseba::ThymioVPL::CardButton;
+		friend class Aseba::ThymioVPL::BlockButton;
 		friend class Aseba::ThymioVPL::Scene;
 		
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
-		QGraphicsView *view;
-		qreal viewportScale;
+		ResizingView *view;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
 		
+		QStack<QString> undoStack; //!< keep string version of QDomDocument
+		int undoPos; //!< current position of undo in the stack, -1 if invalid
+		
 		// Event & Action buttons
-		QList<CardButton *> eventButtons;
-		QList<CardButton *> actionButtons;
+		QList<BlockButton *> eventButtons;
+		QList<BlockButton *> actionButtons;
 		QLabel *eventsLabel;
 		QLabel *actionsLabel;
 
@@ -118,19 +139,28 @@ namespace Aseba { namespace ThymioVPL
 		QLabel *compilationResultImage;
 		QPushButton *showCompilationError;
 		
-		QSlider *zoomSlider;
+		//QSlider *zoomSlider;
 
 		QToolBar *toolBar;
-		QToolButton *newButton;
-		QToolButton *openButton;
-		QToolButton *saveButton;
-		QToolButton *saveAsButton;
-		QToolButton *runButton;
-		QToolButton *stopButton;
-		QToolButton *advancedButton;
-		QToolButton *helpButton;
+		QGridLayout *toolLayout;
+		QPushButton *newButton;
+		QPushButton *openButton;
+		QPushButton *saveButton;
+		QPushButton *saveAsButton;
+		QPushButton *undoButton;
+		QPushButton *redoButton;
+		QPushButton *runButton;
+		QPushButton *stopButton;
+		QPushButton *advancedButton;
+		QPushButton *helpButton;
 		QComboBox *colorComboButton;
-		QToolButton *quitButton;
+		QPushButton *quitButton;
+		QSpacerItem *quitSpotSpacer;
+		
+		// run button animation
+		QVector<QPixmap> runAnimFrames;
+		int runAnimFrame;
+		int runAnimTimer;
 
 		QVBoxLayout *mainLayout;
 		QHBoxLayout *horizontalLayout;
@@ -148,10 +178,13 @@ namespace Aseba { namespace ThymioVPL
 		bool preDiscardWarningDialog(bool keepCode);
 		void clearHighlighting(bool keepCode);
 		void setColors(QComboBox *button = 0);
+		void updateBlockButtonImages();
 		void closeEvent(QCloseEvent * event);
 		
+		void regenerateRunButtonAnimation(const QSize& iconSize);
 		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
+		virtual void timerEvent ( QTimerEvent * event );
 	};
 	/*@}*/
 } } // namespace ThymioVPL / namespace Aseba

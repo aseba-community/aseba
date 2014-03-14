@@ -1,0 +1,6 @@
+var j = 0
+var i
+
+for i in 1000:1000 step 1 do
+	j = i
+end

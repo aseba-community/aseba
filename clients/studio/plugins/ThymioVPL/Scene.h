@@ -2,7 +2,7 @@
 #define VPL_SCENE_H
 
 #include <QGraphicsScene>
-#include "EventActionPair.h"
+#include "EventActionsSet.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -16,15 +16,15 @@ namespace Aseba { namespace ThymioVPL
 		Scene(ThymioVisualProgramming *vpl);
 		~Scene();
 		
-		QGraphicsItem *addAction(Card *item);
-		QGraphicsItem *addEvent(Card *item);
-		void addEventActionPair(Card *event, Card *action);
-		void ensureOneEmptyPairAtEnd();
+		QGraphicsItem *addAction(const QString& name);
+		QGraphicsItem *addEvent(const QString& name);
+		void addEventActionsSetOldFormat_1_3(const QDomElement& element);
+		void addEventActionsSet(const QDomElement& element);
+		void ensureOneEmptySetAtEnd();
 
 		bool isEmpty() const;
 		void reset();
-		void clear();
-		void setColorScheme(QColor eventColor, QColor actionColor);
+		void clear(bool advanced);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod);
 		void setScale(qreal scale);
@@ -32,58 +32,64 @@ namespace Aseba { namespace ThymioVPL
 		bool getAdvanced() const { return advancedMode; }
 		bool isAnyAdvancedFeature() const;
 		
+		QDomElement serialize(QDomDocument& document) const;
+		void deserialize(const QDomElement& programElement);
+		
+		QString toString() const;
+		void fromString(const QString& text);
+		
 		QString getErrorMessage() const;
 		QList<QString> getCode() const;
 		
-		bool isSuccessful() const { return compiler.isSuccessful(); }
-		int getErrorLine() const { return compiler.getErrorLine(); }
-		int getSelectedPairId() const;
-		EventActionPair *getSelectedPair() const;
-		EventActionPair *getPairRow(int row) const;
+		const Compiler::CompilationResult& compilationResult() { return lastCompilationResult; }
+		int getSelectedSetCodeId() const;
+		EventActionsSet *getSelectedSet() const;
+		EventActionsSet *getSetRow(int row) const;
 		
-		void removePair(int row);
-		void insertPair(int row);
+		void removeSet(int row);
+		void insertSet(int row);
 		void recomputeSceneRect();
 		
-		typedef QList<EventActionPair *>::iterator PairItr;
-		typedef QList<EventActionPair *>::const_iterator PairConstItr;
+		typedef QList<EventActionsSet *>::iterator SetItr;
+		typedef QList<EventActionsSet *>::const_iterator SetConstItr;
 		
-		PairItr pairsBegin() { return eventActionPairs.begin(); }
-		PairItr pairsEnd() { return eventActionPairs.end(); }
-		PairConstItr pairsBegin() const { return eventActionPairs.begin(); }
-		PairConstItr pairsEnd() const { return eventActionPairs.end(); }
-		unsigned pairsCount() const { return eventActionPairs.size(); }
+		SetItr setsBegin() { return eventActionsSets.begin(); }
+		SetItr setsEnd() { return eventActionsSets.end(); }
+		SetConstItr setsBegin() const { return eventActionsSets.begin(); }
+		SetConstItr setsEnd() const { return eventActionsSets.end(); }
+		unsigned setsCount() const { return eventActionsSets.size(); }
 		
 		unsigned getZoomLevel() const { return zoomLevel; }
 		
 	signals:
 		void highlightChanged();
 		void contentRecompiled();
+		void undoCheckpoint();
 		void modifiedStatusChanged(bool modified);
-		void zoomChanged();
+		void sceneSizeChanged();
 		
 	public slots:
 		void recompile();
 		void recompileWithoutSetModified();
-		void updateZoomLevel();
+		//void updateZoomLevel();
 		
 	protected:
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-		virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
+		//virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 	protected:
-		void rearrangeButtons(int row=0);
+		void rearrangeSets(int row=0);
 		void relayout();
+		void addEventActionsSet(EventActionsSet *eventActionsSet);
+		EventActionsSet *createNewEventActionsSet();
 		
-		EventActionPair *createNewEventActionPair();
-
+	protected:
 		ThymioVisualProgramming* vpl;
 		
-		QList<EventActionPair *> eventActionPairs;
+		QList<EventActionsSet *> eventActionsSets;
 		Compiler compiler;
+		Compiler::CompilationResult lastCompilationResult;
 		
-		QColor eventCardColor;
-		QColor actionCardColor;
 		// TODO: set this always through a function and emit a signal when it is changed, to update windows title (see issue 154)
 		bool sceneModified;
 		qreal buttonSetHeight;

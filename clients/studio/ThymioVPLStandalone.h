@@ -51,6 +51,7 @@ namespace Aseba
 		bool saveFile(bool as=false);
 		void openFile();
 		bool newFile();
+		void clearOpenedFileName(bool isModified);
 		
 	private:
 		ThymioVPLStandalone* vplStandalone;
@@ -68,7 +69,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget);
+		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget);
 		~ThymioVPLStandalone();
 	
 	protected:
@@ -95,6 +96,8 @@ namespace Aseba
 		friend struct ThymioVPLStandaloneInterface;
 		
 		std::auto_ptr<Target> target; //!< pointer to target
+		
+		const bool useAnyTarget; //!< if true, allow to connect to non-Thymoi II targets
 		
 		unsigned id; //!< node identifier
 		

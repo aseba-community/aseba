@@ -116,18 +116,18 @@ class CanStream: public SelectableStream
 			}
 			fd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 			if(fd < 0)
-				throw DashelException(DashelException::ConnectionFailed, 0, "Socket creation failed");
+				throw DashelException(DashelException::ConnectionFailed, 0, "Socket creation failed", this);
 			
 			addr.can_family = AF_CAN;
 			if(strlen(ifName.c_str()) >= IFNAMSIZ)
-				throw DashelException(DashelException::ConnectionFailed, 0, "Interface name too long");
+				throw DashelException(DashelException::ConnectionFailed, 0, "Interface name too long", this);
 			
 			strcpy(ifr.ifr_name, ifName.c_str());
 			if(ioctl(fd, SIOCGIFINDEX, &ifr) < 0)
-				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to get interface");
+				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to get interface", this);
 			
-                        // Try to have 2Mb RX buffer
-			int options = 2*1024*1024;
+                        // Try to have 20Mb RX buffer
+			int options = 20*1024*1024;
 			setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &options, sizeof(options));
                         
                         // Enable monitoring of dropped packets
@@ -136,7 +136,7 @@ class CanStream: public SelectableStream
 
 			addr.can_ifindex = ifr.ifr_ifindex;
 			if(bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
-				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to bind");
+				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to bind", this);
 
 			rx_insert = rx_consume = 0;
 			tx_len = 0;
@@ -179,7 +179,7 @@ class CanStream: public SelectableStream
 				}
 
 				if(ret != sizeof(*f))
-					throw DashelException(DashelException::IOError, 0, "Write error");
+					throw DashelException(DashelException::IOError, 0, "Write error", this);
 			} while(0);
 		}
 
@@ -270,7 +270,7 @@ class CanStream: public SelectableStream
 					if(CANID_TO_TYPE(rx_fifo[i].f.can_id) == TYPE_SMALL_PACKET)
 					{
 						if(rx_fifo[i].f.can_dlc < 2)
-							throw DashelException(DashelException::IOError, 0, "Packet too short");
+							throw DashelException(DashelException::IOError, 0, "Packet too short", this);
 
 						rx_buffer[0] = rx_fifo[i].f.can_dlc - 2;
 						rx_buffer[1] = 0;
@@ -311,7 +311,7 @@ class CanStream: public SelectableStream
 						ignore = 1;
 
 					if(rx_len + rx_fifo[i].f.can_dlc > sizeof(rx_buffer))
-						throw DashelException(DashelException::IOError, 0, "Packet too large!");
+						throw DashelException(DashelException::IOError, 0, "Packet too large!", this);
 
 					memcpy(&rx_buffer[rx_len], rx_fifo[i].f.data, rx_fifo[i].f.can_dlc);
 					rx_len += rx_fifo[i].f.can_dlc;
@@ -360,7 +360,7 @@ class CanStream: public SelectableStream
 				msg.msg_controllen = sizeof(ctrlmsg);
 				msg.msg_flags = 0;
 				if(recvmsg(fd, &msg, 0) < (int) sizeof(rframe))
-					throw DashelException(DashelException::IOError, 0, "Read error");
+					throw DashelException(DashelException::IOError, 0, "Read error", this);
 
 				for(cmsg = CMSG_FIRSTHDR(&msg); 
 					cmsg && (cmsg->cmsg_level == SOL_SOCKET);
@@ -370,12 +370,12 @@ class CanStream: public SelectableStream
 					{
 						__u32 * dropcnt = (__u32 *) CMSG_DATA(cmsg);
 						if(*dropcnt)
-							throw DashelException(DashelException::IOError, 0, "Packet dropped");
+							throw DashelException(DashelException::IOError, 0, "Packet dropped", this);
 					}
 				}
 			
 				if(fifo_full())
-					throw DashelException(DashelException::IOError, 0, "Fifo full");
+					throw DashelException(DashelException::IOError, 0, "Fifo full", this);
 
 				// push to fifo ...
 				memcpy(&rx_fifo[rx_insert].f,&rframe,sizeof(rframe));

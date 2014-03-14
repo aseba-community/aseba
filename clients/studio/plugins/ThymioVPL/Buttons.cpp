@@ -15,9 +15,9 @@
 #include <cassert>
 
 #include "Buttons.h"
-#include "Card.h"
-#include "EventCards.h"
-#include "ActionCards.h"
+#include "Block.h"
+#include "EventBlocks.h"
+#include "ActionBlocks.h"
 #include "Scene.h"
 #include "ThymioVisualProgramming.h"
 #include "../../../../common/utils/utils.h"
@@ -65,10 +65,10 @@ namespace Aseba { namespace ThymioVPL
 				const int y(boundingRectangle.y());
 				const int w(boundingRectangle.width());
 				const int h(boundingRectangle.height());
-				painter->setPen(QPen(colors[curState].second, 20, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-				painter->drawArc(x,y,2*w,2*h,(90+10)*16, (90-20)*16);
-				painter->setPen(QPen(colors[curState].first, 10, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-				painter->drawArc(x,y,2*w,2*h,(90+10)*16, (90-20)*16);
+				painter->setPen(QPen(colors[curState].second, 35, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->drawArc(x,y,2*w,2*h,(90+15)*16, (90-30)*16);
+				painter->setPen(QPen(colors[curState].first, 25, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->drawArc(x,y,2*w,2*h,(90+15)*16, (90-30)*16);
 			}
 			break;
 			default:
@@ -151,82 +151,76 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	CardButton::CardButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
+	BlockButton::BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
 		QPushButton(parent), 
-		card(Card::createCard(name)),
+		block(Block::createBlock(name)),
 		vpl(vpl)
 	{
-		setToolTip(QString("%0 %1").arg(card->getName()).arg(card->getType()));
+		setToolTip(QString("%0 %1").arg(block->getName()).arg(block->getType()));
 		
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		
 		setStyleSheet("QPushButton {border: none; }");
 		
-		const qreal factor = width() / 256.;
-		setIcon(card->image(factor)); 
+		updateBlockImage(false, width());
 		
 		setAcceptDrops(true);
 	}
 	
-	CardButton::~CardButton()
-	{ 
-		if( card != 0 ) 
-			delete(card); 
+	BlockButton::~BlockButton()
+	{
+		assert(block);
+		delete(block); 
 	}
 	
-	void CardButton::changeButtonColor(const QColor& color) 
-	{ 
-		card->setBackgroundColor(color); 
-		const qreal factor = width() / 256.;
-		setIcon(card->image(factor));
-	}	
+	QString BlockButton::getName() const
+	{
+		assert(block);
+		return block->getName();
+	}
+	
+	//! Re-render the block image
+	void BlockButton::updateBlockImage(bool advanced, int w) 
+	{
+		qreal factor;
+		if (w == -1)
+			factor = iconSize().width() / 256.;
+		else
+			factor = w / 256;
+		block->setAdvanced(advanced);
+		setIcon(QPixmap::fromImage(block->image(factor)));
+	}
 
-	void CardButton::mouseMoveEvent( QMouseEvent *event )
+	void BlockButton::mouseMoveEvent( QMouseEvent *event )
 	{
 		#ifndef ANDROID
-		if( card==0 )
-			return;
+		assert(block);
 		
-		const qreal factor = vpl->viewportScale/qreal(vpl->scene->getZoomLevel());
 		QDrag *drag = new QDrag(this);
-		drag->setMimeData(card->mimeData());
-		drag->setPixmap(card->image(factor));
-		drag->setHotSpot(event->pos()/vpl->scene->getZoomLevel());
-		drag->exec();
+		drag->setMimeData(block->mimeData());
+		drag->setPixmap(QPixmap::fromImage(block->translucidImage(vpl->getViewScale())));
+		const qreal thisScale = width() / 256.;
+		drag->setHotSpot(event->pos()*vpl->getViewScale() / thisScale);
+		drag->exec(Qt::CopyAction);
 		#endif // ANDROID
 	}
 
-	void CardButton::dragEnterEvent( QDragEnterEvent *event )
+	void BlockButton::dragEnterEvent( QDragEnterEvent *event )
 	{
-		if( event->mimeData()->hasFormat("CardType") &&
-			event->mimeData()->data("CardType") == card->getType().toLatin1() )
+		if (event->mimeData()->hasFormat("Block") &&
+			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
+		)
 			event->accept();
 		else
 			event->ignore();
 	}
 
-	void CardButton::dropEvent( QDropEvent *event )
+	void BlockButton::dropEvent( QDropEvent *event )
 	{
-		if( event->mimeData()->hasFormat("CardType") &&
-			event->mimeData()->data("CardType") == card->getType().toLatin1() )
-		{
-			// get data from mime
-			QByteArray cardData(event->mimeData()->data("Card"));
-			QDataStream dataStream(&cardData, QIODevice::ReadOnly);
-			int parentID;
-			dataStream >> parentID;
-			// if originates from the scene, delete from the scene
-			if (parentID >= 0)
-			{
-				if (event->mimeData()->data("CardType") == QString("event").toLatin1())
-					vpl->scene->getPairRow(parentID)->removeEventCard();
-				else
-					vpl->scene->getPairRow(parentID)->removeActionCard();
-			}
-			// d&g handling
-			event->setDropAction(Qt::MoveAction);
+		if (event->mimeData()->hasFormat("Block") &&
+			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
+		)
 			event->accept();
-		}
 		else
 			event->ignore();
 	}

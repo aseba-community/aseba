@@ -76,6 +76,16 @@ namespace Aseba
 		getTarget()->stop(vplStandalone->id);
 	}
 	
+	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
+	{
+		return vplStandalone->variablesModel;
+	}
+	
+	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		getTarget()->setVariables(vplStandalone->id, addr, data);
+	}
+	
 	bool ThymioVPLStandaloneInterface::saveFile(bool as)
 	{
 		return vplStandalone->saveFile(as);
@@ -97,22 +107,21 @@ namespace Aseba
 		return false;
 	}
 	
-	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
+	void ThymioVPLStandaloneInterface::clearOpenedFileName(bool isModified)
 	{
-		return vplStandalone->variablesModel;
+		Q_UNUSED(isModified);
+		// do nothing
 	}
 	
-	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
-	{
-		getTarget()->setVariables(vplStandalone->id, addr, data);
-	}
 	
 	//////
 	
-	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget):
+	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget):
 		VariableListener(new TargetVariablesModel(this)),
 		// create target
 		target(new DashelTarget(translators, commandLineTarget)),
+		// options
+		useAnyTarget(useAnyTarget),
 		// setup initial values
 		id(0),
 		vpl(0),
@@ -234,6 +243,10 @@ namespace Aseba
 	//! The content of a variable has changed
 	void ThymioVPLStandalone::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
+		// we do not perform this check if we are forced to use any target
+		if (useAnyTarget)
+			return;
+		
 		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
 		{
 			// make sure that pid is ASEBA_PID_THYMIO2, otherwise print an error and quit
