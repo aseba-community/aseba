@@ -694,12 +694,13 @@ namespace Aseba
 				Node* temp = allocateTemporaryVariable(pos, preNode.get());
 				preNode.release();
 				preNode.reset(temp);
+				emitNode->children.push_back(preNode.get());
 			}
 
 			//allocateTemporaryVariable(pos)
 			emitNode->arrayAddr = preNode->getVectorAddr();
 			emitNode->arraySize = preNode->getVectorSize();
-			emitNode->children.push_back(preNode.release());
+			preNode.release();
 
 			if (emitNode->arraySize != eventSize)
 				throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
