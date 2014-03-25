@@ -705,6 +705,7 @@ namespace Aseba
 		if (eventSize > 0)
 		{
 			std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+			bool memoryAllocated = false;
 
 			// allocate memory?
 			if (!dynamic_cast<MemoryVectorNode*>(preNode.get()) || preNode->getVectorAddr() == Node::E_NOVAL)
@@ -712,12 +713,18 @@ namespace Aseba
 				Node* temp = allocateTemporaryVariable(pos, preNode.get());
 				preNode.release();
 				preNode.reset(temp);
+				emitNode->children.push_back(preNode.get());
+				memoryAllocated = true;
 			}
 
 			//allocateTemporaryVariable(pos)
 			emitNode->arrayAddr = preNode->getVectorAddr();
 			emitNode->arraySize = preNode->getVectorSize();
-			emitNode->children.push_back(preNode.release());
+
+			if (memoryAllocated)
+				preNode.release();
+			else
+				preNode.reset(); // we do not need a pointer to it anymore
 
 			if (emitNode->arraySize != eventSize)
 				throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
