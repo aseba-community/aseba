@@ -15,7 +15,6 @@ namespace Aseba { namespace ThymioVPL
 	/*@{*/
 	
 	class Block;
-	class BlockHolder;
 	class AddRemoveButton;
 	class StateFilterEventBlock;
 	
@@ -27,10 +26,10 @@ namespace Aseba { namespace ThymioVPL
 		EventActionsSet(int row, bool advanced, QGraphicsItem *parent=0);
 		
 		// from QGraphicsObject
-		virtual QRectF boundingRect() const { return QRectF(-2, -2, width+2, 410); }
+		virtual QRectF boundingRect() const;
 		
 		// specific
-		QRectF innerBoundingRect() const { return QRectF(0, 0, width, 336); }
+		QRectF innerBoundingRect() const;
 		
 		void setRow(int row);
 		int getRow() const { return row; }
@@ -44,10 +43,12 @@ namespace Aseba { namespace ThymioVPL
 		
 		bool hasAnyActionBlock() const;
 		bool hasActionBlock(const QString& blockName) const;
+		int getActionBlockIndex(const QString& blockName) const;
+		const Block *getActionBlock(int index) const;
+		const Block *getActionBlock(const QString& blockName) const;
 		int actionBlocksCount() const;
-		const Block *getActionBlock(int number) const;
-		BlockHolder *getActionBlockHolder(const QString& name);
-		int getBlockHolderIndex(BlockHolder *holder) const;
+		
+		void removeBlock(Block* block);
 		
 		bool isAnyAdvancedFeature() const;
 		bool isEmpty() const; 
@@ -62,7 +63,6 @@ namespace Aseba { namespace ThymioVPL
 		void deserializeOldFormat_1_3(const QDomElement& element);
 		void deserialize(const QByteArray& data);
 		
-		void cleanupActionSlots();
 		void repositionElements();
 		
 	signals:
@@ -82,29 +82,49 @@ namespace Aseba { namespace ThymioVPL
 		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
+		virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 		
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		void drawBlockArea(QPainter * painter, const QString& type, const QPointF& pos, bool highlight) const;
 		
 		// specific
+		void setVisualFromEvent(QGraphicsSceneDragDropEvent *event);
+		void clearVisualFromEvent(QGraphicsSceneDragDropEvent *event);
 		bool isDnDValid(QGraphicsSceneDragDropEvent *event) const;
+		bool isDnDAction(QGraphicsSceneDragDropEvent *event) const;
+		bool isDnDNewAction(QGraphicsSceneDragDropEvent *event) const;
 		QMimeData* mimeData() const;
 		
 		void resetSet();
 		void ensureOneEmptyActionHolderAtEnd();
+		void updateActionPositions(qreal dropXPos);
+		void updateDropIndex(qreal dropXPos);
+		
+		void addActionBlockNoEmit(Block *block, int number = -1);
+		void setBlock(Block*& blockPointer, Block* newBlock);
+		Block *getActionBlock(const QString& blockName);
 	
 	protected:
-		BlockHolder* eventHolder;
-		BlockHolder* stateFilterHolder;
-		friend class BlockHolder;
-		QList<BlockHolder*> actionHolders;
+		Block* event;
+		Block* stateFilter;
+		QList<Block*> actions;
 		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
 		
-		const qreal spacing;
-		const qreal columnWidth;
-		qreal width;
+		enum HighlightMode
+		{
+			HIGHLIGHT_NONE = 0,
+			HIGHLIGHT_EVENT,
+			HIGHLIGHT_ACTION
+		} highlightMode;
+		
+		qreal dropAreaXPos;
+		int dropIndex;
+		qreal currentWidth;
+		qreal basicWidth;
+		qreal totalWidth;
 		qreal columnPos;
 		int row;
 		

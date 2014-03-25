@@ -33,37 +33,15 @@ namespace Aseba { namespace ThymioVPL
 {
 	class Scene;
 	class BlockButton;
+	class ResizingView;
 	
 	/** \addtogroup studio */
 	/*@{*/
-	
-	class ResizingView: public QGraphicsView
-	{
-		Q_OBJECT
-	
-	public:
-		ResizingView(QGraphicsScene * scene, QWidget * parent = 0);
-		qreal getScale() const { return computedScale; }
-		
-	protected:
-		virtual void resizeEvent(QResizeEvent * event);
-		
-	protected slots:
-		void recomputeScale();
-		void resetResizedFlag();
-		
-	protected:
-		bool wasResized;
-		qreal computedScale;
-	};
 	
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
 	
-	public:
-		static QColor getBlockColor(const QString& type);
-		
 	public:
 		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true);
 		~ThymioVisualProgramming();
@@ -77,7 +55,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void codeChangedInEditor();
 		
 		bool isModified() const;
-		qreal getViewScale() const { return view->getScale(); }
+		qreal getViewScale() const;
 		
 	signals:
 		void modifiedStatusChanged(bool modified);
@@ -131,9 +109,6 @@ namespace Aseba { namespace ThymioVPL
 		QList<BlockButton *> actionButtons;
 		QLabel *eventsLabel;
 		QLabel *actionsLabel;
-
-		QList<QColor> eventColors;
-		QList<QColor> actionColors;
 	
 		QLabel *compilationResult;
 		QLabel *compilationResultImage;
@@ -177,7 +152,7 @@ namespace Aseba { namespace ThymioVPL
 		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);
 		void clearHighlighting(bool keepCode);
-		void setColors(QComboBox *button = 0);
+		void setColors(QComboBox *comboBox);
 		void updateBlockButtonImages();
 		void closeEvent(QCloseEvent * event);
 		

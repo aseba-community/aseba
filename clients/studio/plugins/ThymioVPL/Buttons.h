@@ -71,7 +71,7 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		AddRemoveButton(bool add, QGraphicsItem *parent=0);
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return QRectF(-32, -32, 64, 64); }
+		QRectF boundingRect() const { return QRectF(0, 0, 64, 64); }
 	
 	signals:
 		void clicked();
@@ -88,6 +88,10 @@ namespace Aseba { namespace ThymioVPL
 	class BlockButton : public QPushButton
 	{
 		Q_OBJECT
+		
+	signals:
+		void contentChanged();
+		void undoCheckpoint();
 		
 	public:
 		BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent=0);

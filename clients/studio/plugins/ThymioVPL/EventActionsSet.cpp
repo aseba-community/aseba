@@ -21,7 +21,7 @@
 #include "StateBlocks.h"
 #include "ActionBlocks.h"
 #include "Scene.h"
-#include "BlockHolder.h"
+#include "Style.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -29,13 +29,16 @@ namespace Aseba { namespace ThymioVPL
 	//! Construct an new event-action set
 	EventActionsSet::EventActionsSet(int row, bool advanced, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
-		eventHolder(new BlockHolder("event", this)),
-		stateFilterHolder(0),
+		event(0),
+		stateFilter(0),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
-		spacing(40),
-		columnWidth(40),
-		width(0),
+		highlightMode(HIGHLIGHT_NONE),
+		dropAreaXPos(0),
+		dropIndex(-1),
+		currentWidth(0),
+		basicWidth(0),
+		totalWidth(0),
 		columnPos(0),
 		row(row),
 		errorFlag(false),
@@ -47,62 +50,67 @@ namespace Aseba { namespace ThymioVPL
 		
 		setAdvanced(advanced);
 		
-		connect(eventHolder, SIGNAL(contentChanged()), this, SIGNAL(contentChanged()));
-		connect(eventHolder, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
 		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
+	QRectF EventActionsSet::boundingRect() const
+	{
+		return QRectF(-4, -4, totalWidth+8, Style::blockHeight+2*Style::blockSpacing+8);
+		
+	}
+	
+	//! Bounding rect of visible area
+	QRectF EventActionsSet::innerBoundingRect() const
+	{
+		return QRectF(0, 0, currentWidth, Style::blockHeight+2*Style::blockSpacing);
+	}
+	
 	void EventActionsSet::setRow(int row) 
 	{ 
+		// set row and pos
 		this->row = row;
-		repositionElements();
+		setPos(0, row*Style::eventActionsSetRowStep);
+		
+		// update scene rect
+		Scene* vplScene(dynamic_cast<Scene*>(scene()));
+		if (vplScene)
+			vplScene->recomputeSceneRect();
 	}
 	
 	//! Add an event block, call the event holder
 	void EventActionsSet::addEventBlock(Block *block) 
-	{ 
-		eventHolder->addBlock(block);
+	{
+		setBlock(event, block);
+		emit contentChanged();
+		emit undoCheckpoint();
 	}
 	
-	//! Add an action block, optionally at a given position (which must be valid)
+	//! Add an action block, optionally at a given position (which must be valid, i.e. >= 0)
 	void EventActionsSet::addActionBlock(Block *block, int number) 
 	{
-		// add block
-		if (number == -1)
-		{
-			assert(actionHolders.size() > 0);
-			actionHolders.last()->addBlock(block);
-		}
-		else
-		{
-			actionHolders.at(number)->addBlock(block);
-		}
-		
-		// make sure that there is a free one at the end and cleanup layout
-		cleanupActionSlots();
+		addActionBlockNoEmit(block, number);
+		emit contentChanged();
+		emit undoCheckpoint();
 	}
 	
 	//! Return whether the event holder has a block 
 	const bool EventActionsSet::hasEventBlock() const
 	{
-		return eventHolder->getBlock() != 0;
+		return event != 0;
 	}
 	
 	//! Return the block in the event holder
 	const Block *EventActionsSet::getEventBlock() const
 	{
-		return eventHolder->getBlock();
+		return event;
 	}
 	
 	//! Return the block in the state filter holder if it exists, 0 otherwise
 	const Block *EventActionsSet::getStateFilterBlock() const
 	{
-		if (stateFilterHolder)
-			return stateFilterHolder->getBlock();
-		else
-			return 0;
+		return stateFilter;
 	}
 	
 	//! Return a string representing the event and the state filter, suitable for checking code duplications
@@ -113,12 +121,12 @@ namespace Aseba { namespace ThymioVPL
 		QDomElement element(document.createElement("sethash"));
 		
 		// add event
-		if (!eventHolder->isEmpty())
-			element.appendChild(eventHolder->getBlock()->serialize(document));
+		if (event)
+			element.appendChild(event->serialize(document));
 		
 		// add state
-		if (stateFilterHolder && !stateFilterHolder->isEmpty())
-			element.appendChild(stateFilterHolder->getBlock()->serialize(document));
+		if (stateFilter)
+			element.appendChild(stateFilter->serialize(document));
 		
 		// return document as a string
 		document.appendChild(element);
@@ -128,70 +136,78 @@ namespace Aseba { namespace ThymioVPL
 	//! Return whether the action holders have any block
 	bool EventActionsSet::hasAnyActionBlock() const
 	{
-		return actionHolders.size() > 1;
+		return actions.size() >= 1;
 	}
 	
 	//! Return whether a given block name is already present in this set
 	bool EventActionsSet::hasActionBlock(const QString& blockName) const
 	{
-		for (int i=0; i<actionHolders.size(); ++i)
-			if (actionHolders[i]->getBlock() && 
-				(actionHolders[i]->getBlock()->name == blockName))
+		foreach (Block* action, actions)
+		{
+			if (action->name == blockName)
 				return true;
+		}
 		return false;
+	}
+	
+	//! Return the index of an action block given its name, -1 if not present
+	int EventActionsSet::getActionBlockIndex(const QString& blockName) const
+	{
+		for (int i=0; i<actions.size(); ++i)
+			if (actions[i]->name == blockName)
+				return i;
+		return -1;
+	}
+	
+	//! Return an action block given its name, 0 if not present, const version
+	const Block *EventActionsSet::getActionBlock(const QString& blockName) const
+	{
+		foreach (const Block* action, actions)
+		{
+			if (action->name == blockName)
+				return action;
+		}
+		return 0;
+	}
+	
+	//! Return an action block given its name, 0 if not present
+	Block *EventActionsSet::getActionBlock(const QString& blockName)
+	{
+		foreach (Block* action, actions)
+		{
+			if (action->name == blockName)
+				return action;
+		}
+		return 0;
+	}
+	
+	//! Return the block in one of the action holders
+	const Block *EventActionsSet::getActionBlock(int index) const
+	{
+		return actions.at(index);
 	}
 	
 	//! Return how many action blocks this set has (with possible empty ones)
 	int EventActionsSet::actionBlocksCount() const
 	{
-		return actionHolders.size();
-	}
-	
-	//! Return the block in one of the action holders
-	const Block *EventActionsSet::getActionBlock(int number) const
-	{
-		return actionHolders.at(number)->getBlock();
-	}
-	
-	//! Return an action block holder by block name, 0 if not found
-	BlockHolder *EventActionsSet::getActionBlockHolder(const QString& name)
-	{
-		for (int i=0; i<actionHolders.size(); ++i)
-		{
-			const Block* actionBlock(actionHolders[i]->getBlock());
-			if (actionBlock && actionBlock->name == name)
-				return actionHolders[i];
-		}
-		return 0;
-	}
-	
-	//! Return the index of a given block holder, -1 if not found
-	int EventActionsSet::getBlockHolderIndex(BlockHolder *holder) const
-	{
-		for (int i=0; i<actionHolders.size(); ++i)
-		{
-			if (actionHolders[i] == holder)
-				return i;
-		}
-		return -1;
+		return actions.size();
 	}
 	
 	//! Does this set uses any feature from the advanced mode?
 	bool EventActionsSet::isAnyAdvancedFeature() const
 	{
 		// is the event using an advanced feature
-		if (eventHolder->getBlock() && (eventHolder->getBlock()->isAnyAdvancedFeature()))
+		if (event && (event->isAnyAdvancedFeature()))
 			return true;
 		
 		// is the state filter set?
-		if (stateFilterHolder && stateFilterHolder->isAnyValueSet())
+		if (stateFilter && stateFilter->isAnyValueSet())
 			return true;
 	
 		// is any action using an advanced feature
-		for (int i=0; i<actionHolders.size(); ++i)
+		foreach (Block* action, actions)
 		{
-			const Block* actionBlock(actionHolders[i]->getBlock());
-			if (actionBlock && actionBlock->isAnyAdvancedFeature())
+			if (action->isAnyAdvancedFeature())
 				return true;
 		}
 		
@@ -203,7 +219,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (hasEventBlock())
 			return false;
-		if (stateFilterHolder && stateFilterHolder->isAnyValueSet())
+		if (stateFilter && stateFilter->isAnyValueSet())
 			return false;
 		if (hasAnyActionBlock())
 			return false;
@@ -216,33 +232,42 @@ namespace Aseba { namespace ThymioVPL
 		// Note: we do not emit contentChanged on purpose, as we know that the caller will recompile
 		
 		// switch event and actions to given mode
-		eventHolder->setAdvanced(advanced);
-		for (int i=0; i<actionHolders.size(); ++i)
-			actionHolders[i]->setAdvanced(advanced);
+		if (event)
+			event->setAdvanced(advanced);
+		// delete action if not valid any more
+		int i = 0;
+		while (i<actions.size())
+		{
+			if (!advanced && (typeid(*actions[i]) == typeid(StateFilterActionBlock)))
+			{
+				Block* action(actions[i]);
+				actions.removeAt(i);
+				action->deleteLater();
+			}
+			else
+				++i;
+		}
 		
 		// create and delete state filter
-		if (advanced && !stateFilterHolder)
+		if (advanced && !stateFilter)
 		{
 			// switching to advanced mode, create state filter
-			stateFilterHolder = new BlockHolder("state", this, new StateFilterCheckBlock());
-			connect(stateFilterHolder, SIGNAL(contentChanged()), SIGNAL(contentChanged()));
-			connect(stateFilterHolder, SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
+			setBlock(stateFilter, new StateFilterCheckBlock());
 		}
-		else if (!advanced && stateFilterHolder)
+		else if (!advanced && stateFilter)
 		{
 			// switching from advanced mode, delete state filter
-			delete stateFilterHolder;
-			stateFilterHolder = 0;
+			setBlock(stateFilter, 0);
 		}
 		
-		// these operations might have left holes in the action blocks
-		cleanupActionSlots();
+		// we might have to reposition some elements, because we might have removed some actions
+		repositionElements();
 	}
 	
-	//! Return whether we are in advanced mode by testing whether stateFilterHolder is not null
+	//! Return whether we are in advanced mode by testing whether stateFilter is not null
 	bool EventActionsSet::isAdvanced() const
 	{
-		return stateFilterHolder != 0;
+		return stateFilter != 0;
 	}
 	
 	//! Set whether or not this set has an error
@@ -255,28 +280,6 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	//! Make sure that there is no hole in action slots, and that there is a free slot at the end; reposition elements afterwards
-	void EventActionsSet::cleanupActionSlots()
-	{
-		// remove empty holders except the last
-		int i = 0;
-		while (i<actionHolders.size())
-		{
-			if (actionHolders[i]->isEmpty())
-			{
-				BlockHolder* holder(actionHolders[i]);
-				actionHolders.removeAt(i);
-				holder->deleteLater();
-			}
-			else
-				++i;
-		}
-		
-		ensureOneEmptyActionHolderAtEnd();
-		
-		repositionElements();
-	}
-	
 	//! Clear set to its default status
 	void EventActionsSet::resetSet()
 	{
@@ -284,88 +287,111 @@ namespace Aseba { namespace ThymioVPL
 		disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 		
 		// delete event
-		eventHolder->removeBlock();
+		setBlock(event, 0);
 		
 		// clear filter
-		if (stateFilterHolder)
-			stateFilterHolder->getBlock()->resetValues();
+		if (stateFilter)
+			stateFilter->resetValues();
 		
 		// delete all actions
-		for (int i=0; i<actionHolders.size(); ++i)
-			actionHolders[i]->deleteLater();
-		actionHolders.clear();
-		
-		ensureOneEmptyActionHolderAtEnd();
+		foreach (Block* action, actions)
+			action->deleteLater();
+		actions.clear();
 		
 		repositionElements();
 		
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
-	//! If action holders are not saturated, ensure at least one empty one
-	void EventActionsSet::ensureOneEmptyActionHolderAtEnd()
-	{
-		const int maxCount(stateFilterHolder ? 6 : 5);
-		
-		if ((actionHolders.isEmpty()) ||
-			(!actionHolders.last()->isEmpty() && (actionHolders.size() < maxCount))
-		)
-		{
-			actionHolders.push_back(new BlockHolder("action", this));
-			connect(actionHolders.last(), SIGNAL(contentChanged()), SIGNAL(contentChanged()));
-			connect(actionHolders.last(), SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
-		}
-	}
-	
 	//! Recompute the positions of the different elements for this set
 	void EventActionsSet::repositionElements()
 	{
 		// constants and initialization
-		const qreal ypos = spacing;
-		qreal xpos = spacing;
+		const qreal ypos = Style::blockSpacing;
+		qreal xpos = Style::blockSpacing;
 		
 		// add event block holder
-		eventHolder->setPos(xpos, ypos);
-		xpos += eventHolder->boundingRect().width() + spacing;
+		if (event)
+			event->setPos(xpos, ypos);
+		xpos += Style::blockWidth + Style::blockSpacing;
 		
 		// if state filter holder, add it
-		if (stateFilterHolder)
+		if (stateFilter)
 		{
-			stateFilterHolder->setPos(xpos, ypos);
-			xpos += stateFilterHolder->boundingRect().width() + spacing;
+			stateFilter->setPos(xpos, ypos);
+			xpos += Style::blockWidth + Style::blockSpacing;
 		}
 		
 		// add column
 		columnPos = xpos;
-		xpos += columnWidth + spacing;
+		xpos += Style::eventActionsSetColumnWidth + Style::blockSpacing;
+		dropAreaXPos = xpos;
 		
 		// add every action holder
-		for (int i=0; i<actionHolders.size(); ++i)
+		foreach (Block* action, actions)
 		{
-			actionHolders[i]->setPos(xpos, ypos);
-			xpos += actionHolders[i]->boundingRect().width() + spacing;
+			action->setPos(xpos, ypos);
+			xpos += Style::blockWidth + Style::blockSpacing;
 		}
 		
-		// delete button
-		deleteButton->setPos(xpos+32, 70);
-		xpos += deleteButton->boundingRect().width() + spacing;
+		// if we have no action, we leave space for one
+		xpos += (actions.empty() ? Style::blockWidth + Style::blockSpacing : 0);
+		
+		// leave space for delete button
+		xpos += deleteButton->boundingRect().width() + Style::blockSpacing;
+		deleteButton->setPos(xpos-deleteButton->boundingRect().width()-Style::blockSpacing, Style::blockSpacing);
 		
 		// add button, under column
-		addButton->setPos(columnPos+20, 378);
+		addButton->setPos(columnPos+(Style::eventActionsSetColumnWidth-64)/2, innerBoundingRect().height() + Style::blockSpacing/2);
 		
 		// store width
-		width = xpos;
+		basicWidth = xpos;
+		currentWidth = basicWidth;
+		totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
+		
+		// clear highlight
+		highlightMode = HIGHLIGHT_NONE;
 		
 		// compute global position
-		Scene* vplScene(dynamic_cast<Scene*>(scene()));
-		const unsigned rowPerCol(vplScene ? ceilf(float(vplScene->setsCount())/float(vplScene->getZoomLevel())) : 0);
-		const unsigned col(vplScene ? getRow()/rowPerCol : 0);
-		const unsigned row(vplScene ? getRow()%rowPerCol : getRow());
-		setPos(col*1088, row*420);
+		setPos(0, row*Style::eventActionsSetRowStep);
 		
 		// notify scene of changes
 		prepareGeometryChange();
-		if (vplScene) vplScene->recomputeSceneRect();
+		
+		// update scene rect
+		Scene* vplScene(dynamic_cast<Scene*>(scene()));
+		if (vplScene)
+			vplScene->recomputeSceneRect();
+	}
+	
+	//! Recompute the positions of the actions for this set
+	void EventActionsSet::updateActionPositions(qreal dropXPos)
+	{
+		const qreal ypos = Style::blockSpacing;
+		qreal xpos = columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing;
+		
+		dropAreaXPos = xpos + actions.size() * (Style::blockWidth + Style::blockSpacing);
+		for (int i=0; i<actions.size(); ++i)
+		{
+			if (dropXPos > xpos && dropXPos < xpos + Style::blockWidth + Style::blockSpacing)
+			{
+				dropAreaXPos = xpos;
+				xpos += Style::blockSpacing + Style::blockWidth;
+			}
+			actions[i]->setPos(xpos, ypos);
+			xpos += Style::blockSpacing + Style::blockWidth;
+		}
+	}
+	
+	//! Recompute the drop index for a given position
+	void EventActionsSet::updateDropIndex(qreal dropXPos)
+	{
+		// start of actions
+		dropXPos -= columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing;
+		if (dropXPos < 0)
+			dropIndex = -1;
+		else
+			dropIndex = dropXPos / (Style::blockSpacing + Style::blockWidth);
 	}
 	
 	//! Select only this set and nothing else
@@ -407,15 +433,14 @@ namespace Aseba { namespace ThymioVPL
 		QDomElement element = document.createElement("set");
 		
 		// event
-		if (!eventHolder->isEmpty())
-			element.appendChild(eventHolder->getBlock()->serialize(document));
+		if (event)
+			element.appendChild(event->serialize(document));
 		// state
-		if (stateFilterHolder && !stateFilterHolder->isEmpty())
-			element.appendChild(stateFilterHolder->getBlock()->serialize(document));
+		if (stateFilter)
+			element.appendChild(stateFilter->serialize(document));
 		// actions
-		for (int i=0; i<actionHolders.size(); ++i)
-			if (!actionHolders[i]->isEmpty())
-				element.appendChild(actionHolders[i]->getBlock()->serialize(document));
+		foreach (Block* action, actions)
+			element.appendChild(action->serialize(document));
 		
 		return element;
 	}
@@ -423,7 +448,7 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionsSet::deserialize(const QDomElement& element)
 	{
 		// this function assumes an empty set
-		const bool advanced(stateFilterHolder != 0);
+		const bool advanced(stateFilter != 0);
 		assert(isEmpty());
 		
 		// iterate on all stored block
@@ -445,16 +470,16 @@ namespace Aseba { namespace ThymioVPL
 			
 			if (type == "event")
 			{
-				eventHolder->addBlock(block);
+				setBlock(event, block);
 			}
 			else if (type == "state")
 			{
 				assert(advanced);
-				stateFilterHolder->addBlock(block);
+				setBlock(stateFilter, block);
 			}
 			else if (type == "action")
 			{
-				addActionBlock(block);
+				addActionBlockNoEmit(block);
 			}
 			else
 			{
@@ -472,7 +497,7 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionsSet::deserializeOldFormat_1_3(const QDomElement& element)
 	{
 		// we assume tag name is "buttonset"
-		//const bool advanced(stateFilterHolder != 0);
+		//const bool advanced(stateFilter != 0);
 		
 		/*
 		// event
@@ -541,6 +566,82 @@ namespace Aseba { namespace ThymioVPL
 		return deserialize(document.documentElement());
 	}
 	
+	//! Remove this block for this set if present, does not select the set
+	void EventActionsSet::removeBlock(Block* block)
+	{
+		// disconnect the selection setting mechanism, as we do not want this removal to select our set
+		disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
+		
+		if (block == event)
+		{
+			setBlock(event, 0);
+		}
+		else
+		{
+			int i = 0;
+			while (i<actions.size())
+			{
+				if (actions[i] == block)
+				{
+					actions.removeAt(i);
+					block->deleteLater();
+				}
+				else
+					++i;
+			}
+		}
+		
+		repositionElements();
+		
+		connect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
+	}
+	
+	//! Add an action block, optionally at a given position (which must be valid, i.e. >= 0), do not emit changes or undo checkpoint
+	void EventActionsSet::addActionBlockNoEmit(Block *block, int number) 
+	{
+		// add block
+		if (number == -1)
+		{
+			actions.push_back(0);
+			setBlock(actions.last(), block);
+		}
+		else
+		{
+			number = qMin(number, actions.size());
+			actions.insert(number, 0);
+			setBlock(actions[number], block);
+		}
+	}
+	
+	//! Replace an existing block of this set with a new one
+	void EventActionsSet::setBlock(Block*& blockPointer, Block* newBlock)
+	{
+		// remove existing block
+		if (blockPointer)
+		{
+			disconnect(blockPointer, SIGNAL(contentChanged()), this,  SIGNAL(contentChanged()));
+			
+			// remove and delete block
+			blockPointer->deleteLater();
+		}
+		
+		// add new one
+		blockPointer = newBlock;
+		
+		// if non zero, add it to the scene
+		if (blockPointer)
+		{
+			blockPointer->setParentItem(this);
+			blockPointer->setPos(0,0);
+			
+			connect(blockPointer, SIGNAL(contentChanged()), SIGNAL(contentChanged()));
+			connect(blockPointer, SIGNAL(undoCheckpoint()), SIGNAL(undoCheckpoint()));
+		}
+		
+		// change element positions
+		repositionElements();
+	}
+	
 	void EventActionsSet::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 	{
 		#ifndef ANDROID
@@ -567,8 +668,13 @@ namespace Aseba { namespace ThymioVPL
 		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
-		if (!isCopy && (dragResult != Qt::IgnoreAction))
-			resetSet();
+		if (dragResult != Qt::IgnoreAction)
+		{
+			if (!isCopy)
+				resetSet();
+			emit contentChanged();
+			emit undoCheckpoint();
+		}
 		beingDragged = false;
 		#endif // ANDROID
 	}
@@ -578,7 +684,7 @@ namespace Aseba { namespace ThymioVPL
 		if (isDnDValid(event))
 		{
 			event->accept();
-			//update();
+			setVisualFromEvent(event);
 		}
 		else
 			event->ignore();
@@ -589,30 +695,180 @@ namespace Aseba { namespace ThymioVPL
 		if (isDnDValid(event))
 		{
 			event->accept();
-			//update();
+			clearVisualFromEvent(event);
+			updateActionPositions(-1);
 		} 
 		else
 			event->ignore();
+	}
+	
+	void EventActionsSet::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		// we assume the event has been accepted
+		assert(isDnDValid(event));
+		
+		if (isDnDAction(event))
+		{
+			if (isDnDNewAction(event))
+				updateActionPositions(event->pos().x());
+			updateDropIndex(event->pos().x());
+		}
 	}
 
 	void EventActionsSet::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		if (isDnDValid(event))
 		{
-			resetSet();
-			deserialize(event->mimeData()->data("EventActionsSet"));
-			setSoleSelection();
-			if (scene())
-				polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
-			update();
+			const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
+			
+			// It is a set
+			if (event->mimeData()->hasFormat("EventActionsSet"))
+			{
+				resetSet();
+				deserialize(event->mimeData()->data("EventActionsSet"));
+				repositionElements();
+				
+				setSoleSelection();
+				if (scene())
+					polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
+				update();
+			}
+			
+			// It is a block
+			if (event->mimeData()->hasFormat("Block"))
+			{
+				// create block from mime data
+				Block *newBlock(Block::deserialize(event->mimeData()->data("Block"), advanced));
+				assert(newBlock);
+				
+				if (newBlock->type == "event")
+				{
+					setBlock(this->event, newBlock);
+				}
+				else if (newBlock->type == "state")
+				{
+					setBlock(this->stateFilter, newBlock);
+				}
+				else if (newBlock->type == "action")
+				{
+					Block* actionBlock(getActionBlock(newBlock->name));
+					if (actionBlock)
+					{
+						assert(actionBlock->beingDragged);
+						
+						// tell the block not to delete itself
+						actionBlock->keepAfterDrop = true;
+						
+						// exchange the blocks
+						const int thatIndex(getActionBlockIndex(newBlock->name));
+						dropIndex = qMax(0, qMin(dropIndex, actions.size()-1));
+						assert(dropIndex < actions.size());
+						assert(thatIndex < actions.size());
+						qSwap(actions[dropIndex], actions[thatIndex]);
+						repositionElements();
+						
+						// delete the newly created one
+						delete newBlock;
+						
+						// this code for action->beingDragged==false should never happen with current code in isDnDValid
+						/*
+						// if drop index is larger than 0, exchange, otherwise do nothing
+						if (dropIndex >= 0)
+						{
+							int thatIndex(getActionBlockIndex(newBlock->name));
+							if (thatIndex < dropIndex)
+								thatIndex += 1;
+							assert(dropIndex < actions.size());
+							assert(thatIndex < actions.size());
+							qSwap(actions[dropIndex], actions[thatIndex]);
+							repositionElements();
+						}
+						delete newBlock;
+						*/
+					}
+					else
+					{
+						addActionBlockNoEmit(newBlock, dropIndex);
+					}
+				}
+				else
+					abort();
+			}
 		}
 	}
 	
+	//! Set the visual elements of this set given the stuff being dragged in
+	void EventActionsSet::setVisualFromEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		if (event->mimeData()->hasFormat("EventActionsSet"))
+		{
+			// TODO: do something?
+		}
+		else if (isDnDNewAction(event))
+		{
+			currentWidth = totalWidth;
+			deleteButton->setPos(currentWidth-deleteButton->boundingRect().width()-Style::blockSpacing, Style::blockSpacing);
+			highlightMode = HIGHLIGHT_ACTION;
+		}
+		else if (Block::deserializeType(event->mimeData()->data("Block")) == "event")
+		{
+			highlightMode = HIGHLIGHT_EVENT;
+		}
+		update();
+	}
+	
+	//! Remove the visual elements that were linked to the stuff being dragged in
+	void EventActionsSet::clearVisualFromEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		if (isDnDNewAction(event))
+		{
+			currentWidth = basicWidth;
+			deleteButton->setPos(currentWidth-deleteButton->boundingRect().width()-Style::blockSpacing, Style::blockSpacing);
+		}
+		highlightMode = HIGHLIGHT_NONE;
+		update();
+	}
+	
+	//! Return whether the proposed drag&drop is valid (i.e. acceptable)
 	bool EventActionsSet::isDnDValid(QGraphicsSceneDragDropEvent *event) const
 	{
-		if (!event->mimeData()->hasFormat("EventActionsSet"))
-			return false;
 		if (beingDragged)
+			return false;
+		if (event->mimeData()->hasFormat("EventActionsSet"))
+			return true;
+		if (event->mimeData()->hasFormat("Block"))
+		{
+			if (Block::deserializeType(event->mimeData()->data("Block")) == "action")
+			{
+				// only allow to d&d existing actions from within the same set
+				const QString& name(Block::deserializeName(event->mimeData()->data("Block")));
+				if (hasActionBlock(name) && !getActionBlock(name)->beingDragged)
+					return false;
+				else
+					return true;
+			}
+			else
+				return true;
+		}
+		return false;
+	}
+	
+	//! Return whether the drag&drop is about an action
+	bool EventActionsSet::isDnDAction(QGraphicsSceneDragDropEvent *event) const
+	{
+		if (!event->mimeData()->hasFormat("Block"))
+			return false;
+		if (Block::deserializeType(event->mimeData()->data("Block")) != "action")
+			return false;
+		return true;
+	}
+	
+	//! Return whether the drag&drop is about an action not currently present in the set
+	bool EventActionsSet::isDnDNewAction(QGraphicsSceneDragDropEvent *event) const
+	{
+		if (!isDnDAction(event))
+			return false;
+		if (hasActionBlock(Block::deserializeName(event->mimeData()->data("Block"))))
 			return false;
 		return true;
 	}
@@ -622,35 +878,31 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		// select colors (error, selected, normal)
-		const int bgColors[][3] = {
-			{255, 180, 180},
-			{255, 220, 211},
-			//{255, 237, 233},
-			{241, 241, 241},
-		};
-		const int fgColors[][3] = {
-			{237, 120, 120},
-			{237, 172, 140},
-			//{237, 208, 194},
-			{213, 213, 213},
-		};
-		const int i = (isSelected() ? 1 : 2);
+		const int colorId = (isSelected() ? 1 : 0);
 		
 		// background
 		if (errorFlag)
-			painter->setPen(QPen(Qt::red, 4));
+			painter->setPen(QPen(Qt::red, 8));
 		else
 			painter->setPen(Qt::NoPen);
-		painter->setBrush(QColor(bgColors[i][0], bgColors[i][1], bgColors[i][2]));
-		painter->drawRoundedRect(innerBoundingRect(), 5, 5);
+		painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
+		painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
+		
+		// event drop area
+		if (!event)
+			drawBlockArea(painter, "event", QPointF(Style::blockSpacing, Style::blockSpacing), highlightMode == HIGHLIGHT_EVENT);
 
 		// column
 		painter->setPen(Qt::NoPen);
-		painter->setBrush(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
+		painter->setBrush(Style::eventActionsSetForegroundColors[colorId]);
 		const qreal ymiddle(innerBoundingRect().height()/2);
-		painter->drawEllipse(columnPos, ymiddle-2*columnWidth, columnWidth, columnWidth);
-		painter->drawEllipse(columnPos, ymiddle+columnWidth, columnWidth, columnWidth);
+		painter->drawEllipse(columnPos, ymiddle-2*Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth);
+		painter->drawEllipse(columnPos, ymiddle+Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth);
+		
+		// action drop area
+		if (actions.empty() || currentWidth == totalWidth)
+			drawBlockArea(painter, "action", QPointF(dropAreaXPos, Style::blockSpacing), highlightMode == HIGHLIGHT_ACTION);
+			
 		
 		/* Note: that was arrow code:
 		painter->setPen(Qt::NoPen);
@@ -664,8 +916,30 @@ namespace Aseba { namespace ThymioVPL
 		*/
 		
 		// line number
-		painter->setPen(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
+		painter->setBrush(Style::eventActionsSetForegroundColors[colorId]);
 		painter->setFont(QFont("Arial", 50));
-		painter->drawText(QRect(width-spacing-128, 240, 128, 64), Qt::AlignRight, QString("%0").arg(getRow()+1));
+		painter->drawText(QRect(currentWidth-Style::blockSpacing-128, 240, 128, 64), Qt::AlignRight, QString("%0").arg(getRow()+1));
+	}
+	
+	//! Draw the drop area for block
+	void EventActionsSet::drawBlockArea(QPainter * painter, const QString& type, const QPointF& pos, bool highlight) const
+	{
+		// get color
+		const qreal borderWidth(Style::blockDropAreaBorderWidth);
+		QColor color(Style::blockCurrentColor(type));
+		if (!highlight)
+		{
+			color.setAlpha(130);
+			painter->setPen(QPen(color, borderWidth, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
+		}
+		else
+		{
+			painter->setPen(QPen(color, borderWidth));
+		}
+		painter->setBrush(Qt::transparent);
+		
+		// compute size and draw
+		const qreal halfBorderWidth(borderWidth/2);
+		painter->drawRoundedRect(pos.x()+halfBorderWidth, pos.y()+halfBorderWidth, Style::blockWidth-borderWidth, Style::blockHeight-borderWidth, borderWidth, borderWidth);
 	}
 } } // namespace ThymioVPL / namespace Aseba

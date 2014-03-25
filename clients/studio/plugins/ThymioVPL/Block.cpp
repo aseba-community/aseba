@@ -22,8 +22,8 @@
 #include "StateBlocks.h"
 #include "ActionBlocks.h"
 #include "EventActionsSet.h"
-#include "ThymioVisualProgramming.h"
-#include "BlockHolder.h"
+#include "Style.h"
+#include "ResizingView.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -107,7 +107,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(widget);
 		
 		painter->setPen(Qt::NoPen);
-		painter->setBrush(ThymioVisualProgramming::getBlockColor(type));
+		painter->setBrush(Style::blockCurrentColor(type));
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
 	
@@ -134,12 +134,13 @@ namespace Aseba { namespace ThymioVPL
 		#ifdef Q_WS_X11
 		if (!QX11Info::isCompositingManagerRunning())
 		{
-			for (int y = 0; y < img.height(); ++y) {
+			// Note: disabled for now as this is slow
+			/*for (int y = 0; y < img.height(); ++y) {
 				QRgb *row = (QRgb*)img.scanLine(y);
 				for (int x = 0; x < img.width(); ++x) {
 					((unsigned char*)&row[x])[3] = (x+y) % 2 == 0 ? 255 : 0;
 				}
-			}
+			}*/
 		}
 		else
 			#endif // Q_WS_X11
@@ -292,20 +293,18 @@ namespace Aseba { namespace ThymioVPL
 		drag->setPixmap(QPixmap::fromImage(translucidImage(view->getScale())));
 		
 		beingDragged = true;
+		keepAfterDrop = false;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
-		if (!isCopy && (dragResult != Qt::IgnoreAction) && parentItem())
+		if (dragResult != Qt::IgnoreAction)
 		{
-			BlockHolder* holder(dynamic_cast<BlockHolder*>(parentItem()));
-			if (holder)
+			if (!isCopy && parentItem())
 			{
-				// disconnect the selection setting mechanism, as we do not want this removal to select our set
-				EventActionsSet* eventActionsSet(polymorphic_downcast<EventActionsSet*>(holder->parentItem()));
-				disconnect(eventActionsSet, SIGNAL(contentChanged()), eventActionsSet, SLOT(setSoleSelection()));
-				
-				holder->removeBlock();
-				
-				connect(eventActionsSet, SIGNAL(contentChanged()), eventActionsSet, SLOT(setSoleSelection()));
+				EventActionsSet* eventActionsSet(polymorphic_downcast<EventActionsSet*>(parentItem()));
+				if (eventActionsSet && !keepAfterDrop)
+					eventActionsSet->removeBlock(this);
 			}
+			emit contentChanged();
+			emit undoCheckpoint();
 		}
 		beingDragged = false;
 		#endif // ANDROID

@@ -91,6 +91,7 @@ namespace Aseba { namespace ThymioVPL
 		const QString type;
 		const QString name;
 		bool beingDragged;
+		bool keepAfterDrop;
 
 	protected:
 		void render(QPainter& painter);

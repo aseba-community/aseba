@@ -71,12 +71,7 @@ namespace Aseba { namespace ThymioVPL
 	public slots:
 		void recompile();
 		void recompileWithoutSetModified();
-		//void updateZoomLevel();
 		
-	protected:
-		virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-		//virtual void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
-
 	protected:
 		void rearrangeSets(int row=0);
 		void relayout();

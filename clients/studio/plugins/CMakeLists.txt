@@ -2,25 +2,26 @@ set(qt_plugins_SRCS
 	VariablesViewPlugin.cpp
 	StopThymioPlugin.cpp
 	ThymioVPL/ThymioVisualProgramming.cpp
+	ThymioVPL/ResizingView.cpp
 	ThymioVPL/Buttons.cpp
 	ThymioVPL/Block.cpp
 	ThymioVPL/EventBlocks.cpp
 	ThymioVPL/StateBlocks.cpp
 	ThymioVPL/ActionBlocks.cpp
-	ThymioVPL/BlockHolder.cpp
 	ThymioVPL/EventActionsSet.cpp
 	ThymioVPL/Scene.cpp
 	ThymioVPL/Compiler.cpp
 	ThymioVPL/CompilerVisitors.cpp
+	ThymioVPL/Style.cpp
 )
 qt4_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h
 	StopThymioPlugin.h
 	ThymioVPL/ThymioVisualProgramming.h
+	ThymioVPL/ResizingView.h
 	ThymioVPL/Buttons.h
 	ThymioVPL/Block.h
 	ThymioVPL/ActionBlocks.h
-	ThymioVPL/BlockHolder.h
 	ThymioVPL/EventActionsSet.h
 	ThymioVPL/Scene.h
 )

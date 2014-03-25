@@ -18,52 +18,24 @@
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
+#include "ResizingView.h"
 #include "Block.h"
 #include "EventBlocks.h"
 #include "ActionBlocks.h"
 #include "Scene.h"
 #include "Buttons.h"
+#include "Style.h"
 
 #include "../../TargetModels.h"
 #include "../../../../common/utils/utils.h"
+
+// for backtrace
+//#include <execinfo.h>
 
 using namespace std;
 
 namespace Aseba { namespace ThymioVPL
 {
-	ResizingView::ResizingView(QGraphicsScene * scene, QWidget * parent):
-		QGraphicsView(scene, parent),
-		wasResized(false),
-		computedScale(1)
-	{
-		assert(scene);
-		connect(scene, SIGNAL(sceneSizeChanged()), SLOT(recomputeScale()));
-	}
-	
-	void ResizingView::resizeEvent(QResizeEvent * event)
-	{
-		QGraphicsView::resizeEvent(event);
-		if (!wasResized)
-			recomputeScale();
-	}
-	
-	void ResizingView::recomputeScale()
-	{
-		// set transform
-		resetTransform();
-		const qreal widthScale(0.95*qreal(viewport()->width())/qreal(scene()->width()));
-		const qreal heightScale(qreal(viewport()->height()) / qreal(80+410*3));
-		computedScale = qMin(widthScale, heightScale);
-		scale(computedScale, computedScale);
-		wasResized = true;
-		QTimer::singleShot(0, this, SLOT(resetResizedFlag()));
-	}
-	
-	void ResizingView::resetResizedFlag()
-	{
-		wasResized = false;
-	}
-	
 	// Visual Programming
 	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
 		de(_de),
@@ -216,6 +188,8 @@ namespace Aseba { namespace ThymioVPL
 			eventsLayout->addItem(new QSpacerItem(0,10));
 			eventsLayout->addWidget(button);
 			connect(button, SIGNAL(clicked()), SLOT(addEvent()));
+			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
+			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
 		
 		horizontalLayout->addLayout(eventsLayout);
@@ -286,6 +260,8 @@ namespace Aseba { namespace ThymioVPL
 			actionsLayout->addItem(new QSpacerItem(0,10));
 			actionsLayout->addWidget(button);
 			connect(button, SIGNAL(clicked()), SLOT(addAction()));
+			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
+			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
 		
 		actionButtons.last()->hide(); // memory
@@ -309,36 +285,11 @@ namespace Aseba { namespace ThymioVPL
 		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
 	}
 	
-	// TODO: add state to color scheme, use static data for color arrays
-	
-	static QColor currentEventColor = QColor(0,191,255);
-	static QColor currentStateColor = QColor(122, 204, 0);
-	static QColor currentActionColor = QColor(218,112,214);
-	
-	void ThymioVisualProgramming::setColors(QComboBox *button)
+	void ThymioVisualProgramming::setColors(QComboBox *comboBox)
 	{
-		eventColors.push_back(QColor(0,191,255)); actionColors.push_back(QColor(218,112,214));
-		eventColors.push_back(QColor(155,48,255)); actionColors.push_back(QColor(159,182,205));
-		eventColors.push_back(QColor(67,205,128)); actionColors.push_back(QColor(0,197,205)); 
-		eventColors.push_back(QColor(255,215,0)); actionColors.push_back(QColor(255,99,71));
-		eventColors.push_back(QColor(255,97,3)); actionColors.push_back(QColor(142,56,142));
-		eventColors.push_back(QColor(125,158,192)); actionColors.push_back(QColor(56,142,142)); 
-
-		if( button )
-		{
-			for(int i=0; i<eventColors.size(); ++i)
-				button->addItem(drawColorScheme(eventColors.at(i), actionColors.at(i)), "");
-		}
-	}
-	
-	QColor ThymioVisualProgramming::getBlockColor(const QString& type)
-	{
-		if (type == "event")
-			return currentEventColor;
-		else if (type == "state")
-			return currentStateColor;
-		else
-			return currentActionColor;
+		assert(comboBox);
+		for (unsigned i=0; i<Style::blockColorsCount(); ++i)
+			comboBox->addItem(drawColorScheme(Style::blockColor("event", i), Style::blockColor("action", i)), "");
 	}
 	
 	QPixmap ThymioVisualProgramming::drawColorScheme(QColor color1, QColor color2)
@@ -449,8 +400,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::setColorScheme(int index)
 	{
-		currentEventColor = eventColors.at(index);
-		currentActionColor = actionColors.at(index);
+		Style::blockSetCurrentColorIndex(index);
 		
 		scene->update();
 		updateBlockButtonImages();
@@ -660,8 +610,32 @@ namespace Aseba { namespace ThymioVPL
 		return scene->isModified();
 	}
 	
+	qreal ThymioVisualProgramming::getViewScale() const
+	{
+		return view->getScale();
+	}
+	
 	void ThymioVisualProgramming::pushUndo()
 	{
+		/* Useful code for printing backtrace
+		#ifdef Q_OS_LINUX
+		// dump call stack
+		const size_t SIZE(100);
+		void *buffer[SIZE];
+		char **strings;
+		int nptrs = backtrace(buffer, SIZE);
+		printf("backtrace() returned %d addresses\n", nptrs);
+		strings = backtrace_symbols(buffer, nptrs);
+		if (strings == NULL) {
+			perror("backtrace_symbols");
+			exit(EXIT_FAILURE);
+		}
+		for (int j = 0; j < nptrs; j++)
+			printf("%s\n", strings[j]);
+		printf("\n");
+		#endif // Q_OS_LINUX
+		*/
+		
 		undoStack.push(scene->toString());
 		undoPos = undoStack.size()-2;
 		undoButton->setEnabled(undoPos >= 0);
@@ -928,4 +902,3 @@ namespace Aseba { namespace ThymioVPL
 			runAnimFrame = -runAnimFrames.size()+1;
 	}
 } } // namespace ThymioVPL / namespace Aseba
-// 

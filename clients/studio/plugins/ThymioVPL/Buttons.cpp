@@ -20,6 +20,7 @@
 #include "ActionBlocks.h"
 #include "Scene.h"
 #include "ThymioVisualProgramming.h"
+#include "Style.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -113,26 +114,32 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 
- 		qreal alpha = pressed ? 255 : 150;
+		//qreal alpha = pressed ? 255 : 150;
 		
-		QLinearGradient linearGrad(QPointF(-32, -32), QPointF(32, 32));
-		linearGrad.setColorAt(0, QColor(209, 196, 180, alpha));
-		linearGrad.setColorAt(1, QColor(167, 151, 128, alpha));
-     
-		painter->setPen(QColor(147, 134, 115));
-		painter->setBrush(linearGrad);
-		painter->drawEllipse(-32,-32,64,64);
+		// background
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Style::addRemoveButtonBackgroundColor);
+		painter->drawRoundedRect(0, 0, 64, 64, Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
+
+		/* this code changes the colour of button when pressed
+		if (pressed)
+		{
+			painter->setPen(QPen(QBrush(QPalette::Highlight), 4));
+			painter->setBrush(Qt::NoBrush);
+			painter->drawRoundedRect(0, 0, 64, 64, Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
+		}*/
 		
-		painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
+		//painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
+		painter->setPen(QPen(Qt::white,5,Qt::SolidLine,Qt::RoundCap));
 		if (add)
 		{
-			painter->drawLine(-16,0,16,0);
-			painter->drawLine(0,-16,0,16);
+			painter->drawLine(32+-16,32+0,32+16,32+0);
+			painter->drawLine(32+0,32+-16,32+0,32+16);
 		}
 		else
 		{
-			painter->drawLine(-11,-11,11,11);
-			painter->drawLine(-11,11,11,-11);
+			painter->drawLine(32+-11,32+-11,32+11,32+11);
+			painter->drawLine(32+-11,32+11,32+11,32+-11);
 		}
 	}
 	
@@ -201,7 +208,12 @@ namespace Aseba { namespace ThymioVPL
 		drag->setPixmap(QPixmap::fromImage(block->translucidImage(vpl->getViewScale())));
 		const qreal thisScale = width() / 256.;
 		drag->setHotSpot(event->pos()*vpl->getViewScale() / thisScale);
-		drag->exec(Qt::CopyAction);
+		Qt::DropAction dragResult(drag->exec(Qt::CopyAction));
+		if (dragResult != Qt::IgnoreAction)
+		{
+			emit contentChanged();
+			emit undoCheckpoint();
+		}
 		#endif // ANDROID
 	}
 
