@@ -91,6 +91,7 @@ namespace Aseba
 		void variablesMemoryEstimatedDirty(unsigned node);
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
 		void updateWindowTitle(bool modified);
+		void toggleFullScreen();
 		
 	protected:
 		friend struct ThymioVPLStandaloneInterface;

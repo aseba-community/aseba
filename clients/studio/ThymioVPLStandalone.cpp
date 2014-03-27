@@ -29,6 +29,7 @@
 #include <QFileDialog>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QShortcut>
 
 #include <version.h>
 
@@ -190,6 +191,10 @@ namespace Aseba
 		textWidget->setLayout(layout);*/
 		
 		addWidget(editor);
+		
+		// shortcut
+		QShortcut * shwHide = new QShortcut(QKeySequence("Ctrl+f"), this);
+		connect(shwHide, SIGNAL(activated()), SLOT(toggleFullScreen()));
 	}
 	
 	void ThymioVPLStandalone::setupConnections()
@@ -557,6 +562,15 @@ namespace Aseba
 		
 		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language - ver. %2").arg(docName).arg(modifiedText).arg(ASEBA_VERSION));
 		
+	}
+	
+	//! Toggle on/off full screen
+	void ThymioVPLStandalone::toggleFullScreen()
+	{
+		if (isFullScreen())
+			showNormal();
+		else
+			showFullScreen();
 	}
 	
 	/*@}*/
