@@ -916,9 +916,9 @@ namespace Aseba { namespace ThymioVPL
 		*/
 		
 		// line number
-		painter->setBrush(Style::eventActionsSetForegroundColors[colorId]);
+		painter->setPen(Style::eventActionsSetForegroundColors[colorId]);
 		painter->setFont(QFont("Arial", 50));
-		painter->drawText(QRect(currentWidth-Style::blockSpacing-128, 240, 128, 64), Qt::AlignRight, QString("%0").arg(getRow()+1));
+		painter->drawText(QRect(currentWidth-Style::blockSpacing-128, Style::blockHeight+Style::blockSpacing-128, 128, 128), Qt::AlignRight|Qt::AlignBottom, QString("%0").arg(getRow()+1));
 	}
 	
 	//! Draw the drop area for block
