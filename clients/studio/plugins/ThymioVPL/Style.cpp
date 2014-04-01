@@ -22,6 +22,13 @@ namespace Aseba { namespace ThymioVPL {
 	const int Style::blockDropAreaBorderWidth = 20;
 	
 	
+	//! The width of the add/remove button
+	const int Style::addRemoveButtonWidth = 64;
+	
+	//! The height of the add/remove button
+	const int Style::addRemoveButtonHeight = 64;
+	
+	
 	//! The width of the column in the middle of the set
 	const int Style::eventActionsSetColumnWidth = 40;
 	

@@ -13,6 +13,9 @@ namespace Aseba { namespace ThymioVPL {
 		static const int blockSpacing;
 		static const int blockDropAreaBorderWidth;
 		
+		static const int addRemoveButtonWidth;
+		static const int addRemoveButtonHeight;
+		
 		static const int eventActionsSetColumnWidth;
 		static const int eventActionsSetRowStep;
 		static const int eventActionsSetCornerSize;
@@ -26,8 +29,6 @@ namespace Aseba { namespace ThymioVPL {
 		static QColor blockColor(const QString& type, unsigned index);
 		static void blockSetCurrentColorIndex(unsigned index);
 		static unsigned blockColorsCount();
-		
-		// TODO; move ThymioVisualProgramming::getBlockColor here
 	};
 	
 } }  // namespace ThymioVPL / namespace Aseba

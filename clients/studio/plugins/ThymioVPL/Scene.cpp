@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "Block.h"
 #include "ThymioVisualProgramming.h"
+#include "Style.h"
 
 using namespace std;
 
@@ -342,7 +343,7 @@ namespace Aseba { namespace ThymioVPL
 			EventActionsSet *p(eventActionsSets[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
-		setSceneRect(r.adjusted(-40,-40,40,40));
+		setSceneRect(r.adjusted(-40,-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
 	}
 

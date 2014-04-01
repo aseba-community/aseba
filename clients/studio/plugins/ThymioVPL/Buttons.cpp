@@ -119,28 +119,26 @@ namespace Aseba { namespace ThymioVPL
 		// background
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::addRemoveButtonBackgroundColor);
-		painter->drawRoundedRect(0, 0, 64, 64, Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
+		painter->drawRoundedRect(boundingRect(), Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
 
-		/* this code changes the colour of button when pressed
-		if (pressed)
-		{
-			painter->setPen(QPen(QBrush(QPalette::Highlight), 4));
-			painter->setBrush(Qt::NoBrush);
-			painter->drawRoundedRect(0, 0, 64, 64, Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
-		}*/
-		
-		//painter->setPen(QPen(QColor(147, 134, 115),5,Qt::SolidLine,Qt::RoundCap));
+		const int hx(boundingRect().width()/2);
+		const int hy(boundingRect().height()/2);
 		painter->setPen(QPen(Qt::white,5,Qt::SolidLine,Qt::RoundCap));
 		if (add)
 		{
-			painter->drawLine(32+-16,32+0,32+16,32+0);
-			painter->drawLine(32+0,32+-16,32+0,32+16);
+			painter->drawLine(hx+-16,hy+0,hx+16,hy+0);
+			painter->drawLine(hx+0,hy+-16,hx+0,hy+16);
 		}
 		else
 		{
-			painter->drawLine(32+-11,32+-11,32+11,32+11);
-			painter->drawLine(32+-11,32+11,32+11,32+-11);
+			painter->drawLine(hx+-11,hy+-11,hx+11,hy+11);
+			painter->drawLine(hx+-11,hy+11,hx+11,hy+-11);
 		}
+	}
+	
+	QRectF AddRemoveButton::boundingRect() const
+	{
+		return QRectF(0, 0, Style::addRemoveButtonWidth, Style::addRemoveButtonHeight);
 	}
 	
 	void AddRemoveButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )

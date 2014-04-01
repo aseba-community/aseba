@@ -71,7 +71,7 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		AddRemoveButton(bool add, QGraphicsItem *parent=0);
 		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return QRectF(0, 0, 64, 64); }
+		QRectF boundingRect() const;
 	
 	signals:
 		void clicked();
