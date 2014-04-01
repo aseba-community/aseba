@@ -148,7 +148,7 @@ namespace Aseba { namespace ThymioVPL
 		friend class Aseba::ThymioVPLStandalone;
 		friend struct Aseba::ThymioVPLStandaloneInterface;
 		
-		QPixmap drawColorScheme(QColor color1, QColor color2);
+		QPixmap drawColorScheme(const QColor& eventColor, const QColor& stateColor, const QColor& actionColor);
 		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);
 		void clearHighlighting(bool keepCode);

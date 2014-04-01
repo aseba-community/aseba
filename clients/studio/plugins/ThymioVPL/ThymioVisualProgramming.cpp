@@ -289,20 +289,23 @@ namespace Aseba { namespace ThymioVPL
 	{
 		assert(comboBox);
 		for (unsigned i=0; i<Style::blockColorsCount(); ++i)
-			comboBox->addItem(drawColorScheme(Style::blockColor("event", i), Style::blockColor("action", i)), "");
+			comboBox->addItem(drawColorScheme(Style::blockColor("event", i), Style::blockColor("state", i), Style::blockColor("action", i)), "");
 	}
 	
-	QPixmap ThymioVisualProgramming::drawColorScheme(QColor color1, QColor color2)
+	QPixmap ThymioVisualProgramming::drawColorScheme(const QColor& eventColor, const QColor& stateColor, const QColor& actionColor)
 	{
-		QPixmap pixmap(128,58);
+		QPixmap pixmap(192,58);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
 		
-		painter.setBrush(color1);
+		painter.setBrush(eventColor);
 		painter.drawRoundedRect(0,0,54,54,4,4);
 		
-		painter.setBrush(color2);
+		painter.setBrush(stateColor);
 		painter.drawRoundedRect(66,0,54,54,4,4);
+		
+		painter.setBrush(actionColor);
+		painter.drawRoundedRect(130,0,54,54,4,4);
 		
 		return pixmap;
 	}
