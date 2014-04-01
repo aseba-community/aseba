@@ -32,10 +32,10 @@ namespace Aseba { namespace ThymioVPL {
 	const int Style::eventActionsSetCornerSize = 5;
 	
 	//! The normal/selected background colors of event-actions sets
-	const QColor Style::eventActionsSetBackgroundColors[2] = { QColor(231, 231, 231), QColor(255, 220, 211) };
+	const QColor Style::eventActionsSetBackgroundColors[2] = { QColor(234, 234, 234), QColor(255, 220, 211) };
 	
 	//! The normal/selected foreground colors of event-actions sets
-	const QColor Style::eventActionsSetForegroundColors[2] = { QColor(213, 213, 213), QColor(237, 172, 140) };
+	const QColor Style::eventActionsSetForegroundColors[2] = { QColor(204, 204, 204), QColor(237, 172, 140) };
 	
 	
 	//! Size of the rounded corner of add/remove buttons
@@ -52,10 +52,10 @@ namespace Aseba { namespace ThymioVPL {
 		typedef QList<QColor> ColorList;
 		
 		ColorList eventColors;
+		ColorList stateColors;
 		ColorList actionColors;
 		unsigned currentColor;
 		
-		// FIXME: define colors for events
 		PrivateStyle():
 			eventColors(ColorList()
 				<< QColor(0,191,255)
@@ -64,6 +64,14 @@ namespace Aseba { namespace ThymioVPL {
 				<< QColor(255,215,0)
 				<< QColor(255,97,3)
 				<< QColor(125,158,192)
+			),
+			stateColors(ColorList()
+				<< QColor(122, 204, 0)
+				<< QColor(122, 204, 0)
+				<< QColor(122, 204, 0)
+				<< QColor(122, 204, 0)
+				<< QColor(122, 204, 0)
+				<< QColor(122, 204, 0)
 			),
 			actionColors(ColorList()
 				<< QColor(218,112,214)
@@ -76,6 +84,7 @@ namespace Aseba { namespace ThymioVPL {
 			currentColor(0)
 		{
 			assert(eventColors.size() == actionColors.size());
+			assert(eventColors.size() == stateColors.size());
 		}
 	} privateStyle;
 	
@@ -92,7 +101,7 @@ namespace Aseba { namespace ThymioVPL {
 		if (type == "event")
 			return privateStyle.eventColors[index];
 		else if (type == "state")
-			return QColor(122, 204, 0);
+			return privateStyle.stateColors[index];
 		else
 			return privateStyle.actionColors[index];
 	}
