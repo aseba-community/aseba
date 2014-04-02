@@ -4,17 +4,17 @@
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
-        <location filename="AeslEditor.cpp" line="491"/>
+        <location filename="AeslEditor.cpp" line="492"/>
         <source>Clear breakpoint</source>
         <translation>Azzera breakpoint</translation>
     </message>
     <message>
-        <location filename="AeslEditor.cpp" line="493"/>
+        <location filename="AeslEditor.cpp" line="494"/>
         <source>Set breakpoint</source>
         <translation>Inserisci breakpoint</translation>
     </message>
     <message>
-        <location filename="AeslEditor.cpp" line="494"/>
+        <location filename="AeslEditor.cpp" line="495"/>
         <source>Clear all breakpoints</source>
         <translation>Elimina tutti i breakpoint</translation>
     </message>
@@ -22,7 +22,7 @@
 <context>
     <name>Aseba::CompilationLogDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="139"/>
+        <location filename="MainWindow.cpp" line="144"/>
         <source>Aseba Studio: Output of last compilation</source>
         <translation>Aseba Studio: Risultato dell&apos;ultima compilazione</translation>
     </message>
@@ -53,6 +53,29 @@
         <location filename="ConfigDialog.cpp" line="313"/>
         <source>Aseba Studio - Settings</source>
         <translation>Aseba Studio - Configurazione</translation>
+    </message>
+</context>
+<context>
+    <name>Aseba::ConstantsModel</name>
+    <message>
+        <location filename="NamedValuesVectorModel.cpp" line="319"/>
+        <source>Constant already defined</source>
+        <translation>Costante già definta</translation>
+    </message>
+    <message>
+        <location filename="NamedValuesVectorModel.cpp" line="319"/>
+        <source>Constant %0 is already defined.</source>
+        <translation>La Costante %0 è già definita.</translation>
+    </message>
+    <message>
+        <location filename="NamedValuesVectorModel.cpp" line="325"/>
+        <source>Name is a keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="NamedValuesVectorModel.cpp" line="325"/>
+        <source>Name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -145,54 +168,54 @@
 <context>
     <name>Aseba::EventViewer</name>
     <message>
-        <location filename="EventViewer.cpp" line="93"/>
+        <location filename="EventViewer.cpp" line="95"/>
         <source>Time (seconds)</source>
         <translation>Tempo (secondi)</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="94"/>
+        <location filename="EventViewer.cpp" line="96"/>
         <source>Values</source>
         <translation>Valori</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="118"/>
-        <location filename="EventViewer.cpp" line="206"/>
+        <location filename="EventViewer.cpp" line="120"/>
+        <location filename="EventViewer.cpp" line="213"/>
         <source>Recording...</source>
         <translation>In registrazione...</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="121"/>
-        <location filename="EventViewer.cpp" line="208"/>
+        <location filename="EventViewer.cpp" line="123"/>
+        <location filename="EventViewer.cpp" line="215"/>
         <source>&amp;Pause</source>
         <translation>&amp;Pausa</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="125"/>
+        <location filename="EventViewer.cpp" line="127"/>
         <source>&amp;Clear</source>
         <translation>&amp;Cancella</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="129"/>
+        <location filename="EventViewer.cpp" line="132"/>
         <source>time &amp;window:</source>
         <translation>&amp;w finestra temporale:</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="140"/>
+        <location filename="EventViewer.cpp" line="144"/>
         <source>Save &amp;As...</source>
         <translation>S&amp;Alva come...</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="197"/>
+        <location filename="EventViewer.cpp" line="204"/>
         <source>Paused...</source>
         <translation>In Pausa...</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="199"/>
+        <location filename="EventViewer.cpp" line="206"/>
         <source>&amp;Record</source>
         <translation>&amp;Registra</translation>
     </message>
     <message>
-        <location filename="EventViewer.cpp" line="224"/>
+        <location filename="EventViewer.cpp" line="232"/>
         <source>Save plot data to file</source>
         <translation>Salva dati per grafico su file</translation>
     </message>
@@ -440,7 +463,7 @@ Occurrences</source>
 <context>
     <name>Aseba::MainWindow</name>
     <message>
-        <location filename="MainWindow.cpp" line="1583"/>
+        <location filename="MainWindow.cpp" line="1588"/>
         <source>Event number %0</source>
         <translation>Evento numero %0</translation>
     </message>
@@ -449,717 +472,715 @@ Occurrences</source>
         <translation type="obsolete">&lt;p&gt;Informazioni sulla versione:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Versione %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(c) 2006-2012 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; e altri collaboratori.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%5&quot;&gt;%5&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Aseba è open-source con licenza LGPL versione 3.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1620"/>
+        <location filename="MainWindow.cpp" line="1625"/>
         <source>&lt;p&gt;Aseba version informations:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(c) 2006-2013 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%5&quot;&gt;%5&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the LGPL version 3.&lt;/p&gt;</source>
         <oldsource>&lt;p&gt;Aseba version informations:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(c) 2006-2012 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%5&quot;&gt;%5&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the LGPL version 3.&lt;/p&gt;</oldsource>
         <translation>&lt;p&gt;Informazioni sulla versione:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Versione %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(tipi di flusso supportati: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(c) 2006-2013 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; e altri collaboratori.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%5&quot;&gt;%5&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Aseba è open-source con licenza LGPL versione 3.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1636"/>
-        <location filename="MainWindow.cpp" line="3281"/>
+        <location filename="MainWindow.cpp" line="1641"/>
+        <location filename="MainWindow.cpp" line="3283"/>
         <source>http://aseba.wikidot.com/en:start</source>
         <translation>http://aseba.wikidot.com/it:start</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1638"/>
+        <location filename="MainWindow.cpp" line="1643"/>
         <source>About Aseba Studio</source>
         <translation>Riguardo Aseba Studio</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1702"/>
+        <location filename="MainWindow.cpp" line="1708"/>
         <source>Open Script</source>
         <translation>Apri Script</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1767"/>
+        <location filename="MainWindow.cpp" line="1773"/>
         <source> (not available)</source>
         <translation> (non disponibile)</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1796"/>
-        <location filename="MainWindow.cpp" line="1813"/>
+        <location filename="MainWindow.cpp" line="1802"/>
+        <location filename="MainWindow.cpp" line="1819"/>
         <source>Loading</source>
         <translation>Caricamento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1797"/>
+        <location filename="MainWindow.cpp" line="1803"/>
         <source>%0 scripts have no corresponding nodes in the current network and have not been loaded.</source>
         <translation>gli script %0 non hanno nodi corrispondenti nella rete corrente e non sono stati caricati.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1814"/>
+        <location filename="MainWindow.cpp" line="1820"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
         <translation>Errore nel file sorgente XML %0 alla linea %1, colonna %2</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1838"/>
+        <location filename="MainWindow.cpp" line="1844"/>
         <source>Save Script</source>
         <translation>Salva script</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1950"/>
+        <location filename="MainWindow.cpp" line="1956"/>
         <source>Export memory content</source>
         <translation>Esporta contenuto memoria</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1982"/>
+        <location filename="MainWindow.cpp" line="1988"/>
         <source>Import memory content</source>
         <translation>Importa contenuto memoria</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2018"/>
+        <location filename="MainWindow.cpp" line="2024"/>
         <source>%0 on node %1</source>
         <translation>%0 su nodo %1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2031"/>
+        <location filename="MainWindow.cpp" line="2037"/>
         <source>The following nodes are not present in the current network and their associated content was not imported:
 </source>
         <translation>I nodi seguenti non sono presenti nella rete corrente e i contenuti associati non sono stati importati:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2037"/>
+        <location filename="MainWindow.cpp" line="2043"/>
         <source>The following variables are not present in the current network and their associated content was not imported:
 </source>
         <translation>Le variabili seguenti non sono presenti nella rete corrente e i contenuti associati non sono stati importati:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2042"/>
+        <location filename="MainWindow.cpp" line="2048"/>
         <source>Some content was not imported</source>
         <translation>Alcuni contenuti non sono stati importati</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2120"/>
+        <location filename="MainWindow.cpp" line="2126"/>
         <source>Go To Line</source>
         <translation>Vai alla linea</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2120"/>
+        <location filename="MainWindow.cpp" line="2126"/>
         <source>Line:</source>
         <translation>Linea:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2265"/>
+        <location filename="MainWindow.cpp" line="2271"/>
         <source>Specify event arguments</source>
         <translation>Specificare gli argomenti dell&apos;evento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2265"/>
+        <location filename="MainWindow.cpp" line="2271"/>
         <source>Please specify the %0 arguments of event %1</source>
         <translation>Cortesemente specificare l&apos;argomento %0 dell&apos;evento %1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2272"/>
+        <location filename="MainWindow.cpp" line="2278"/>
         <source>Wrong number of arguments</source>
         <translation>Numero di argomenti errato</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2273"/>
+        <location filename="MainWindow.cpp" line="2279"/>
         <source>You gave %0 arguments where event %1 requires %2</source>
         <translation>Avete fornito %0 argomenti per l&apos;evento %1 che ne richiede %2</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2283"/>
+        <location filename="MainWindow.cpp" line="2289"/>
         <source>Invalid value</source>
         <translation>Valore non valido</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2284"/>
+        <location filename="MainWindow.cpp" line="2290"/>
         <source>Invalid value for argument %0 of event %1</source>
         <translation>Valore non valido  per l&apos;argomento %0 dell&apos;evento %1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2331"/>
+        <location filename="MainWindow.cpp" line="2337"/>
         <source>Plot event %1</source>
         <translation>Grafico evento %1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2347"/>
+        <location filename="MainWindow.cpp" line="2353"/>
         <source>plot of %1</source>
         <translation>grafico di %1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2479"/>
-        <location filename="MainWindow.cpp" line="3061"/>
+        <location filename="MainWindow.cpp" line="2485"/>
+        <location filename="MainWindow.cpp" line="3063"/>
         <source>Add a new event</source>
         <translation>Aggiungi un nuovo evento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2479"/>
-        <location filename="MainWindow.cpp" line="2570"/>
+        <location filename="MainWindow.cpp" line="2485"/>
+        <location filename="MainWindow.cpp" line="2576"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2479"/>
+        <location filename="MainWindow.cpp" line="2485"/>
         <source>Number of arguments</source>
         <comment>For the newly created event</comment>
         <translatorcomment>Per l&apos;evento appena creato</translatorcomment>
         <translation>Numero di argomenti</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2486"/>
+        <location filename="MainWindow.cpp" line="2492"/>
         <source>Event already exists</source>
         <translation>L&apos;evento esiste già</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2486"/>
+        <location filename="MainWindow.cpp" line="2492"/>
         <source>Event %0 already exists.</source>
         <translation>L&apos;evento %0 esiste già.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2490"/>
+        <location filename="MainWindow.cpp" line="2496"/>
         <source>Invalid event name</source>
         <translation>Nome evento non valido</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2490"/>
+        <location filename="MainWindow.cpp" line="2496"/>
         <source>Event %0 has an invalid name. Valid names start with an alphabetical character or an &quot;_&quot;, and continue with any number of alphanumeric characters, &quot;_&quot; and &quot;.&quot;</source>
         <translation>L&apos;evento %0 ha un nome non valido. I nomi validi iniziano con una lettera o un &quot;_&quot;; e continuano con un numero qualsiasi di lettere, &quot;_&quot; o &quot;.&quot;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2517"/>
+        <location filename="MainWindow.cpp" line="2523"/>
         <source>Desynchronised! Please reload.</source>
         <translation>Desincronizzato! Ricaricare per favore.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2570"/>
-        <location filename="MainWindow.cpp" line="2995"/>
+        <location filename="MainWindow.cpp" line="2576"/>
+        <location filename="MainWindow.cpp" line="2997"/>
         <source>Add a new constant</source>
         <translation>Aggiungere unanuova costante</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2570"/>
+        <location filename="MainWindow.cpp" line="2576"/>
         <source>Value</source>
         <comment>Value assigned to the constant</comment>
         <translation>Valore</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2576"/>
         <source>Constant already defined</source>
-        <translation>Costante già definta</translation>
+        <translation type="obsolete">Costante già definta</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2576"/>
         <source>Constant %0 is already defined.</source>
-        <translation>La Costante %0 è già definita.</translation>
+        <translation type="obsolete">La Costante %0 è già definita.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2725"/>
+        <location filename="MainWindow.cpp" line="2727"/>
         <source>
 event %0 : </source>
         <translation>evento %0:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2764"/>
+        <location filename="MainWindow.cpp" line="2766"/>
         <source>array access at %0 out of bounds [0..%1]</source>
         <translation>Accesso ad array %0 fuori dai limiti [0..%1]</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2770"/>
+        <location filename="MainWindow.cpp" line="2772"/>
         <source>division by zero</source>
         <translation>divisione per zero</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2776"/>
+        <location filename="MainWindow.cpp" line="2778"/>
         <source>event execution killed</source>
         <translation>esecuzione dell&apos;evento soppressa</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2798"/>
+        <location filename="MainWindow.cpp" line="2800"/>
         <source>%0:%1: %2</source>
         <translation>%0:%1: %2</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="2996"/>
+        <location filename="MainWindow.cpp" line="2998"/>
         <source>Remove this constant</source>
         <translation>Rimuovere questa costante</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3016"/>
+        <location filename="MainWindow.cpp" line="3018"/>
         <source>&lt;b&gt;Constants&lt;/b&gt;</source>
         <translation>&lt;b&gt;Constanti&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3062"/>
+        <location filename="MainWindow.cpp" line="3064"/>
         <source>Remove this event</source>
         <translation>Rimuovere questo evento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3063"/>
+        <location filename="MainWindow.cpp" line="3065"/>
         <source>Send this event</source>
         <translation>Inviare questo evento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3068"/>
+        <location filename="MainWindow.cpp" line="3070"/>
         <source>Plot this event</source>
         <translation>Tracciare questo evento</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3089"/>
+        <location filename="MainWindow.cpp" line="3091"/>
         <source>&lt;b&gt;Global Events&lt;/b&gt;</source>
         <translation>&lt;b&gt;Eventi globali&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3112"/>
+        <location filename="MainWindow.cpp" line="3114"/>
         <source>Clear</source>
         <translation>Azzera</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3254"/>
+        <location filename="MainWindow.cpp" line="3256"/>
         <source>...inside %0</source>
         <translation>...dentro %0</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3257"/>
+        <location filename="MainWindow.cpp" line="3259"/>
         <source>...%0</source>
         <translation>...%0</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3259"/>
+        <location filename="MainWindow.cpp" line="3261"/>
         <source>...of %0</source>
         <translation>...di %0</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3267"/>
+        <location filename="MainWindow.cpp" line="3269"/>
         <source>...inside all nodes</source>
         <translation>...dentro tutti i nodi</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3270"/>
+        <location filename="MainWindow.cpp" line="3272"/>
         <source>...all nodes</source>
         <translation>...tutti i nodi</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3277"/>
+        <location filename="MainWindow.cpp" line="3279"/>
         <source>&amp;User Manual...</source>
         <translation>Manuale &amp;Utente...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3277"/>
+        <location filename="MainWindow.cpp" line="3279"/>
         <source>F1</source>
         <comment>Help|User Manual</comment>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3281"/>
+        <location filename="MainWindow.cpp" line="3283"/>
         <source>Web site Aseba...</source>
         <translation>Sito Web Aseba...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3282"/>
+        <location filename="MainWindow.cpp" line="3284"/>
         <source>Report bug...</source>
         <translation>Riporta un bug...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3282"/>
+        <location filename="MainWindow.cpp" line="3284"/>
         <source>http://github.com/aseba-community/aseba/issues/new</source>
         <translation>http://github.com/aseba-community/aseba/issues/new</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3289"/>
+        <location filename="MainWindow.cpp" line="3291"/>
         <source>&amp;About...</source>
         <translation>&amp;A proposito di...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3290"/>
+        <location filename="MainWindow.cpp" line="3292"/>
         <source>About &amp;Qt...</source>
         <translation>A prosito di &amp;Qt...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3319"/>
+        <location filename="MainWindow.cpp" line="3321"/>
         <source>Thymio programming tutorial...</source>
         <translation>Tutorial per la programmazione di Thymio...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3321"/>
+        <location filename="MainWindow.cpp" line="3323"/>
         <source>http://aseba.wikidot.com/en:thymiotutoriel</source>
         <translation>http://aseba.wikidot.com/it:thymiotutoriel</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3324"/>
+        <location filename="MainWindow.cpp" line="3326"/>
         <source>Thymio programming interface...</source>
         <translation>Interfaccia di programmazione di Thymio...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3326"/>
+        <location filename="MainWindow.cpp" line="3328"/>
         <source>http://aseba.wikidot.com/en:thymioapi</source>
         <translation>http://aseba.wikidot.com/it:thymioapi</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3332"/>
+        <location filename="MainWindow.cpp" line="3334"/>
         <source>Challenge tutorial...</source>
         <translation>Tutorial per Challenge...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3334"/>
+        <location filename="MainWindow.cpp" line="3336"/>
         <source>http://aseba.wikidot.com/en:gettingstarted</source>
         <translation>http://aseba.wikidot.com/it:gettingstarted</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3340"/>
+        <location filename="MainWindow.cpp" line="3342"/>
         <source>MarXbot user manual...</source>
         <translation>Manuale utente di MarXbot...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3342"/>
+        <location filename="MainWindow.cpp" line="3344"/>
         <source>http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf</source>
         <translation>http://mobots.epfl.ch/data/robots/marxbot-user-manual.pdf</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3362"/>
+        <location filename="MainWindow.cpp" line="3364"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3365"/>
+        <location filename="MainWindow.cpp" line="3367"/>
         <source>&amp;New</source>
         <translation>&amp;Nuovo</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3367"/>
+        <location filename="MainWindow.cpp" line="3369"/>
         <source>Ctrl+N</source>
         <comment>File|New</comment>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3368"/>
+        <location filename="MainWindow.cpp" line="3370"/>
         <source>&amp;Open...</source>
         <translation>&amp;Apertura...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3370"/>
+        <location filename="MainWindow.cpp" line="3372"/>
         <source>Ctrl+O</source>
         <comment>File|Open</comment>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3371"/>
+        <location filename="MainWindow.cpp" line="3373"/>
         <source>Open &amp;Recent</source>
         <translation>Apri &amp;Recente</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3375"/>
+        <location filename="MainWindow.cpp" line="3377"/>
         <source>&amp;Save...</source>
         <translation>&amp;Salva...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3377"/>
+        <location filename="MainWindow.cpp" line="3379"/>
         <source>Ctrl+S</source>
         <comment>File|Save</comment>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3378"/>
+        <location filename="MainWindow.cpp" line="3380"/>
         <source>Save &amp;As...</source>
         <translation>Salva &amp;come...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3386"/>
+        <location filename="MainWindow.cpp" line="3388"/>
         <source>Export &amp;memories content...</source>
         <translation>Esporta il contenuto delle &amp;memorie...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3388"/>
+        <location filename="MainWindow.cpp" line="3390"/>
         <source>&amp;Import memories content...</source>
         <translation>&amp;Importazione contenuti delle memorie...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3394"/>
-        <location filename="MainWindow.cpp" line="3398"/>
+        <location filename="MainWindow.cpp" line="3396"/>
+        <location filename="MainWindow.cpp" line="3400"/>
         <source>Ctrl+Q</source>
         <comment>File|Quit</comment>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3396"/>
+        <location filename="MainWindow.cpp" line="3398"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quit</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3402"/>
+        <location filename="MainWindow.cpp" line="3404"/>
         <source>Cu&amp;t</source>
         <translation>&amp;taglia</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3403"/>
+        <location filename="MainWindow.cpp" line="3405"/>
         <source>Ctrl+X</source>
         <comment>Edit|Cut</comment>
         <translation>Ctrl+X</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3406"/>
+        <location filename="MainWindow.cpp" line="3408"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copia</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3407"/>
+        <location filename="MainWindow.cpp" line="3409"/>
         <source>Ctrl+C</source>
         <comment>Edit|Copy</comment>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3410"/>
+        <location filename="MainWindow.cpp" line="3412"/>
         <source>&amp;Paste</source>
         <translation>&amp;Incolla</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3411"/>
+        <location filename="MainWindow.cpp" line="3413"/>
         <source>Ctrl+V</source>
         <comment>Edit|Paste</comment>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3414"/>
+        <location filename="MainWindow.cpp" line="3416"/>
         <source>&amp;Undo</source>
         <translation>&amp;Undo</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3415"/>
+        <location filename="MainWindow.cpp" line="3417"/>
         <source>Ctrl+Z</source>
         <comment>Edit|Undo</comment>
         <translation>Ctrl+Z</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3418"/>
+        <location filename="MainWindow.cpp" line="3420"/>
         <source>Re&amp;do</source>
         <translation>Re&amp;do</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3419"/>
+        <location filename="MainWindow.cpp" line="3421"/>
         <source>Ctrl+Shift+Z</source>
         <comment>Edit|Redo</comment>
         <translation>Ctrl+Shift+Z</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3422"/>
+        <location filename="MainWindow.cpp" line="3424"/>
         <source>&amp;Find...</source>
         <translation>&amp;Trova...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3423"/>
+        <location filename="MainWindow.cpp" line="3425"/>
         <source>Ctrl+F</source>
         <comment>Edit|Find</comment>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3427"/>
+        <location filename="MainWindow.cpp" line="3429"/>
         <source>&amp;Replace...</source>
         <translation>&amp;Sostituisci...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3428"/>
+        <location filename="MainWindow.cpp" line="3430"/>
         <source>Ctrl+R</source>
         <comment>Edit|Replace</comment>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3432"/>
+        <location filename="MainWindow.cpp" line="3434"/>
         <source>Comment the selection</source>
         <translation>Commentare la selezione</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3433"/>
+        <location filename="MainWindow.cpp" line="3435"/>
         <source>Ctrl+D</source>
         <comment>Edit|Comment the selection</comment>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3436"/>
+        <location filename="MainWindow.cpp" line="3438"/>
         <source>Uncomment the selection</source>
         <translation>Scommentare la selezione</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3437"/>
+        <location filename="MainWindow.cpp" line="3439"/>
         <source>Shift+Ctrl+D</source>
         <comment>Edit|Uncomment the selection</comment>
         <translation>Shift+Ctrl+D</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3440"/>
+        <location filename="MainWindow.cpp" line="3442"/>
         <source>&amp;Edit</source>
         <translation>&amp;Edit</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3446"/>
+        <location filename="MainWindow.cpp" line="3448"/>
         <source>Copy &amp;all</source>
         <translation>Copi&amp;a tutto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3458"/>
+        <location filename="MainWindow.cpp" line="3460"/>
         <source>Show &amp;keywords</source>
         <translation>Mostra parole c&amp;hiave</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3462"/>
+        <location filename="MainWindow.cpp" line="3464"/>
         <source>Show memory usage</source>
         <translation>Mostra l&apos;utilizzo di memoria</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3466"/>
+        <location filename="MainWindow.cpp" line="3468"/>
         <source>S&amp;how hidden variables and functions</source>
         <translation>Mostra le variabili e le funzioni &amp;nascoste</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3470"/>
+        <location filename="MainWindow.cpp" line="3472"/>
         <source>Show Line Numbers</source>
         <translation>Mostra il numero di linea</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3471"/>
+        <location filename="MainWindow.cpp" line="3473"/>
         <source>F11</source>
         <comment>Edit|Show Line Numbers</comment>
         <translation>F11</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3475"/>
+        <location filename="MainWindow.cpp" line="3477"/>
         <source>&amp;Go To Line...</source>
         <translation>Vai alla &amp;linea...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3476"/>
+        <location filename="MainWindow.cpp" line="3478"/>
         <source>Ctrl+G</source>
         <comment>Edit|Go To Line</comment>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3480"/>
+        <location filename="MainWindow.cpp" line="3482"/>
         <source>&amp;View</source>
         <translation>&amp;Visualizza</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3488"/>
+        <location filename="MainWindow.cpp" line="3490"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configurazione</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3492"/>
+        <location filename="MainWindow.cpp" line="3494"/>
         <source>&amp;Load all</source>
         <translation>Carica &amp;tutto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3493"/>
+        <location filename="MainWindow.cpp" line="3495"/>
         <source>F7</source>
         <comment>Load|Load all</comment>
         <translation>F7</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3495"/>
+        <location filename="MainWindow.cpp" line="3497"/>
         <source>&amp;Reset all</source>
         <translation>&amp;Ripristina tutto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3496"/>
+        <location filename="MainWindow.cpp" line="3498"/>
         <source>F8</source>
         <comment>Debug|Reset all</comment>
         <translation>F8</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3498"/>
+        <location filename="MainWindow.cpp" line="3500"/>
         <source>Ru&amp;n all</source>
         <translation>&amp;Esegui tutto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3499"/>
+        <location filename="MainWindow.cpp" line="3501"/>
         <source>F9</source>
         <comment>Debug|Run all</comment>
         <translation>F9</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3501"/>
+        <location filename="MainWindow.cpp" line="3503"/>
         <source>&amp;Pause all</source>
         <translation>Metti in &amp;pausa tutto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3502"/>
+        <location filename="MainWindow.cpp" line="3504"/>
         <source>F10</source>
         <comment>Debug|Pause all</comment>
         <translation>F10</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3505"/>
+        <location filename="MainWindow.cpp" line="3507"/>
         <source>Debug</source>
         <translation>Debug</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3514"/>
+        <location filename="MainWindow.cpp" line="3516"/>
         <source>Toggle breakpoint</source>
         <translation>attivare o disattivare breakpoint</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3515"/>
+        <location filename="MainWindow.cpp" line="3517"/>
         <source>Ctrl+B</source>
         <comment>Debug|Toggle breakpoint</comment>
         <translation>Ctrl+B</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3518"/>
+        <location filename="MainWindow.cpp" line="3520"/>
         <source>Clear all breakpoints</source>
         <translation>Azzera tutti breakpoint</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3522"/>
+        <location filename="MainWindow.cpp" line="3524"/>
         <source>&amp;Debug</source>
         <translation>&amp;Debug</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3533"/>
+        <location filename="MainWindow.cpp" line="3535"/>
         <source>&amp;Tools</source>
         <translation>s&amp;trumenti</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3538"/>
+        <location filename="MainWindow.cpp" line="3540"/>
         <source>&amp;Show last compilation messages</source>
         <translation>Mo&amp;stra tutti i messaggi di compilazione</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3544"/>
+        <location filename="MainWindow.cpp" line="3546"/>
         <source>Write the program(s)...</source>
         <translation>Scrivi i programmi...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3546"/>
+        <location filename="MainWindow.cpp" line="3548"/>
         <source>Reboot...</source>
         <translation>Riavvia...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3548"/>
+        <location filename="MainWindow.cpp" line="3550"/>
         <source>Save the binary code...</source>
         <translation>Salva il codice binario...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3552"/>
+        <location filename="MainWindow.cpp" line="3554"/>
         <source>&amp;Help</source>
         <translation>&amp;Aiuto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3573"/>
-        <location filename="MainWindow.cpp" line="3647"/>
+        <location filename="MainWindow.cpp" line="3575"/>
+        <location filename="MainWindow.cpp" line="3649"/>
         <source>Untitled</source>
         <translation>Senza titolo</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3578"/>
+        <location filename="MainWindow.cpp" line="3580"/>
         <source>Aseba Studio - Confirmation Dialog</source>
         <translation>Aseba Studio - Conferma</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3579"/>
+        <location filename="MainWindow.cpp" line="3581"/>
         <source>The document &quot;%0&quot; has been modified.</source>
         <translation>Il documento &quot;%0&quot; è stato modificato.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3580"/>
+        <location filename="MainWindow.cpp" line="3582"/>
         <source>Do you want to save your changes or discard them?</source>
         <translation>Vuoi salvare le tue modifiche o annullarle?</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3645"/>
+        <location filename="MainWindow.cpp" line="3647"/>
         <source>[modified] </source>
         <translation>[modificato]</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="3651"/>
+        <location filename="MainWindow.cpp" line="3653"/>
         <source>%0 %1- Aseba Studio</source>
         <translation>%0 %1- Aseba Studio</translation>
     </message>
@@ -1167,12 +1188,12 @@ event %0 : </source>
 <context>
     <name>Aseba::MaskableNamedValuesVectorModel</name>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="326"/>
+        <location filename="NamedValuesVectorModel.cpp" line="369"/>
         <source>Hide</source>
         <translation>Nascondi</translation>
     </message>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="327"/>
+        <location filename="NamedValuesVectorModel.cpp" line="370"/>
         <source>View</source>
         <translation>Visualizza</translation>
     </message>
@@ -1180,13 +1201,13 @@ event %0 : </source>
 <context>
     <name>Aseba::NewNamedValueDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="1516"/>
+        <location filename="MainWindow.cpp" line="1521"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1518"/>
+        <location filename="MainWindow.cpp" line="1523"/>
         <source>Default description</source>
         <comment>When no description is given for the named value</comment>
         <translation>Descrizione predefinita</translation>
@@ -1195,127 +1216,127 @@ event %0 : </source>
 <context>
     <name>Aseba::NodeTab</name>
     <message>
-        <location filename="MainWindow.cpp" line="429"/>
+        <location filename="MainWindow.cpp" line="434"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
         <translation>&lt;b&gt;Parole chiave&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="450"/>
-        <location filename="MainWindow.cpp" line="1188"/>
+        <location filename="MainWindow.cpp" line="455"/>
+        <location filename="MainWindow.cpp" line="1193"/>
         <source>unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="452"/>
+        <location filename="MainWindow.cpp" line="457"/>
         <source>Load</source>
         <translation>Carica</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="453"/>
+        <location filename="MainWindow.cpp" line="458"/>
         <source>Reset</source>
         <translation>Ripristina</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="455"/>
-        <location filename="MainWindow.cpp" line="770"/>
-        <location filename="MainWindow.cpp" line="1331"/>
-        <location filename="MainWindow.cpp" line="1345"/>
+        <location filename="MainWindow.cpp" line="460"/>
+        <location filename="MainWindow.cpp" line="775"/>
+        <location filename="MainWindow.cpp" line="1336"/>
+        <location filename="MainWindow.cpp" line="1350"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="457"/>
+        <location filename="MainWindow.cpp" line="462"/>
         <source>Next</source>
         <translation>Successivo</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="459"/>
+        <location filename="MainWindow.cpp" line="464"/>
         <source>refresh</source>
         <translation>aggiorna</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="460"/>
+        <location filename="MainWindow.cpp" line="465"/>
         <source>auto</source>
         <translation>auto</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="463"/>
+        <location filename="MainWindow.cpp" line="468"/>
         <source>&lt;b&gt;Execution&lt;/b&gt;</source>
         <translation>&lt;b&gt;Esecuzione&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="486"/>
+        <location filename="MainWindow.cpp" line="491"/>
         <source>&lt;b&gt;Variables&lt;/b&gt;</source>
         <translation>&lt;b&gt;Variabili&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="493"/>
+        <location filename="MainWindow.cpp" line="498"/>
         <source>F&amp;ilter:</source>
         <translation>F&amp;iltro:</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="533"/>
+        <location filename="MainWindow.cpp" line="538"/>
         <source>Native Functions</source>
         <translation>Funzioni native</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="534"/>
+        <location filename="MainWindow.cpp" line="539"/>
         <source>Local Events</source>
         <translation>Eventi locali</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="538"/>
+        <location filename="MainWindow.cpp" line="543"/>
         <source>Local Tools</source>
         <translation>Strumenti locali</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="841"/>
+        <location filename="MainWindow.cpp" line="846"/>
         <source>Save the binary code of %0</source>
         <translation>Salva il codice binario di %0</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1091"/>
+        <location filename="MainWindow.cpp" line="1096"/>
         <source>Aseba Studio: Output of last compilation for %0</source>
         <translation>Aseba Studio: Output dell&apos;ultima compilazione per %0</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1096"/>
-        <location filename="MainWindow.cpp" line="1135"/>
+        <location filename="MainWindow.cpp" line="1101"/>
+        <location filename="MainWindow.cpp" line="1140"/>
         <source>Compilation success.</source>
         <translation>Compilazione avvenuta con successo.</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1116"/>
+        <location filename="MainWindow.cpp" line="1121"/>
         <source>variables: %1 on %2 (%3%)</source>
         <translation>variabili: %1 su %2 (%3%)</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1117"/>
+        <location filename="MainWindow.cpp" line="1122"/>
         <source>bytecode: %1 on %2 (%3%)</source>
         <translation>bytecode: %1 su %2 (%3%)</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1118"/>
+        <location filename="MainWindow.cpp" line="1123"/>
         <source>&lt;b&gt;Memory usage&lt;/b&gt; : %1, %2</source>
         <translation>&lt;b&gt;Utilizzo della memoria&lt;/b&gt; : %1, %2</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1317"/>
+        <location filename="MainWindow.cpp" line="1322"/>
         <source>running</source>
         <translation>in esecuzione</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1319"/>
+        <location filename="MainWindow.cpp" line="1324"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1329"/>
+        <location filename="MainWindow.cpp" line="1334"/>
         <source>step by step</source>
         <translation>passo passo</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="1343"/>
+        <location filename="MainWindow.cpp" line="1348"/>
         <source>stopped</source>
         <translation>arrestato</translation>
     </message>
@@ -1451,16 +1472,34 @@ event %0 : </source>
     </message>
 </context>
 <context>
-    <name>Aseba::ThymioVPL::Scene</name>
+    <name>Aseba::ThymioVPL::EventActionsSet</name>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="288"/>
-        <source>Line %0: Missing event</source>
-        <translation>Linea %0: evento mancante</translation>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="466"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="486"/>
+        <source>Loading</source>
+        <translation>Caricamento</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="291"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="467"/>
+        <source>Error in XML source file at %0:%1: cannot create block %2</source>
+        <oldsource>Error in XML source file at %0:%1 cannot create block %2</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="487"/>
+        <source>Error in XML source file at %0:%1: unknown block type %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Aseba::ThymioVPL::Scene</name>
+    <message>
+        <source>Line %0: Missing event</source>
+        <translation type="obsolete">Linea %0: evento mancante</translation>
+    </message>
+    <message>
         <source>Line %0: Missing action</source>
-        <translation>Linea %0: azione mancante</translation>
+        <translation type="obsolete">Linea %0: azione mancante</translation>
     </message>
     <message>
         <source>Line %0: Twice the same event</source>
@@ -1468,144 +1507,146 @@ event %0 : </source>
         <translation type="obsolete">Linea %0: Due volte il stesso evento</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="294"/>
         <source>The event-action pair in line %0 is the same as in line %1</source>
-        <translation>La coppia di eventi-azioni della linea %0 è la stessa della linea %1</translation>
+        <translation type="obsolete">La coppia di eventi-azioni della linea %0 è la stessa della linea %1</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="298"/>
         <source>Line %0: Unknown event/action type</source>
-        <translation>Linea %0: tipo di evento/azione sconosciuto</translation>
+        <translation type="obsolete">Linea %0: tipo di evento/azione sconosciuto</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="301"/>
         <source>Compilation success</source>
-        <translation>Compilazione avvenuta con successo</translation>
+        <translation type="obsolete">Compilazione avvenuta con successo</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Scene.cpp" line="303"/>
         <source>Unknown VPL error</source>
-        <translation>Errore VPL sconosciuto</translation>
+        <translation type="obsolete">Errore VPL sconosciuto</translation>
     </message>
 </context>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="39"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="51"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Thymio VPL (Linguaggio di Programmazione Visuale)</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="49"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="63"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="54"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="69"/>
         <source>Open</source>
         <translation>Apri</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="59"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="75"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="64"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="81"/>
         <source>Save as</source>
         <translation>Salva come</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="70"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="105"/>
         <source>Load &amp; Run</source>
         <translation>Carica ed esegui</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="75"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="111"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="80"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="124"/>
         <source>Color scheme</source>
         <translation>Schema colori</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="87"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="118"/>
         <source>Advanced mode</source>
         <translation>Modo avanzato</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="94"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="131"/>
         <source>Help</source>
         <translation>Aiuto</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="95"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="285"/>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation>http://aseba.wikidot.com/it:thymiovpl</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="105"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="140"/>
         <source>Quit</source>
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="142"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="87"/>
+        <source>Undo</source>
+        <translation>Undo</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="95"/>
+        <source>Redo</source>
+        <translation>Redo</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="180"/>
         <source>&lt;b&gt;Events&lt;/b&gt;</source>
         <translation>&lt;b&gt;Eventi&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="160"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="201"/>
         <source>Compilation success.</source>
         <translation>Compilazione avvenuta con successo.</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="167"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="208"/>
         <source>show line</source>
         <translation>monstrare linea</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="199"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="253"/>
         <source>&lt;b&gt;Actions&lt;/b&gt;</source>
         <translation>&lt;b&gt;Azioni&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="288"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="315"/>
         <source>Launch VPL</source>
         <translation>Lancio VPL</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="417"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="467"/>
         <source>Returning to simple mode</source>
         <translation>Ritornare al modo semplice </translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="418"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="468"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
         <translation>Siete utilizzando gli stati. Il ritorno al modo semplice annullerà qualsiasi filtro di stati o carta di impostazione di stati. &lt;p&gt; Siete sicuro di voler continuare?</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="455"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="506"/>
         <source>Warning</source>
         <translation>Attenzione</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="456"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="507"/>
         <source>The VPL document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation>Il documento VPL é stato modificato. &lt;p&gt; Volete salvare le modifiche?</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="577"/>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="592"/>
         <source>Loading</source>
-        <translation>Caricamento</translation>
+        <translation type="obsolete">Caricamento</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="578"/>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="593"/>
         <source>Error in XML source file: %0 unknown event type</source>
-        <translation>Errore nel file sorgente XML %0 tipo di evento sconosciuto</translation>
+        <translation type="obsolete">Errore nel file sorgente XML %0 tipo di evento sconosciuto</translation>
     </message>
 </context>
 <context>
@@ -1615,54 +1656,54 @@ event %0 : </source>
         <translation type="obsolete">Thymio VPL (Linguaggio di Programmazione Visuale)</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="243"/>
-        <location filename="ThymioVPLStandalone.cpp" line="454"/>
+        <location filename="ThymioVPLStandalone.cpp" line="261"/>
+        <location filename="ThymioVPLStandalone.cpp" line="472"/>
         <source>Thymio VPL Error</source>
         <translation>Errore VPL sconosciuto</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="244"/>
+        <location filename="ThymioVPLStandalone.cpp" line="262"/>
         <source>You need to connect a Thymio II to use this application.</source>
         <translation>È necessario collegare un Thymio II per utilizzare questa applicazione.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="273"/>
+        <location filename="ThymioVPLStandalone.cpp" line="291"/>
         <source>Save Script</source>
         <translation>Salva script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="339"/>
+        <location filename="ThymioVPLStandalone.cpp" line="357"/>
         <source>Open Script</source>
         <translation>Apri Script</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="397"/>
-        <location filename="ThymioVPLStandalone.cpp" line="405"/>
+        <location filename="ThymioVPLStandalone.cpp" line="415"/>
+        <location filename="ThymioVPLStandalone.cpp" line="423"/>
         <source>Loading</source>
         <translation>Caricamento</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="398"/>
+        <location filename="ThymioVPLStandalone.cpp" line="416"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
         <translation>Nessun dato VPLè stato trovato nel documento di script, documento ignorato.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="455"/>
+        <location filename="ThymioVPLStandalone.cpp" line="473"/>
         <source>This application only supports a single robot at a time.</source>
         <translation>Questa applicazione supporta un solo robot alla volta.</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="539"/>
+        <location filename="ThymioVPLStandalone.cpp" line="557"/>
         <source>[modified] </source>
         <translation>[modificato]</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="541"/>
+        <location filename="ThymioVPLStandalone.cpp" line="559"/>
         <source>Untitled</source>
         <translation>Senza titolo</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="545"/>
+        <location filename="ThymioVPLStandalone.cpp" line="563"/>
         <source>%0 %1- Thymio Visual Programming Language - ver. %2</source>
         <translation>%0 %1- Thymio VPL (Linguaggio di Programmazione Visuale) - ver. %2</translation>
     </message>
@@ -1672,7 +1713,7 @@ event %0 : </source>
         <translation type="obsolete">%0 %1- Thymio VPL (Linguaggio di Programmazione Visuale) %2</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="406"/>
+        <location filename="ThymioVPLStandalone.cpp" line="424"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
         <translation>Errore nel file sorgente XML %0 alla linea %1, colonna %2</translation>
     </message>
@@ -1837,6 +1878,41 @@ event %0 : </source>
     <message>
         <source>VM Assertion Failed</source>
         <translation type="obsolete">VM Assertion fallita</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="38"/>
+        <source>Compilation success</source>
+        <translation>Compilazione avvenuta con successo</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="42"/>
+        <source>Line %0: Missing event</source>
+        <translation>Linea %0: evento mancante</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="46"/>
+        <source>Line %0: Missing action</source>
+        <translation>Linea %0: azione mancante</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="51"/>
+        <source>The event in line %0 is the same as in line %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="53"/>
+        <source>The event and the state condition in line %0 are the same as in line %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="57"/>
+        <source>Line %0: Unknown event/action type</source>
+        <translation>Linea %0: tipo di evento/azione sconosciuto</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="60"/>
+        <source>Unknown VPL error</source>
+        <translation>Errore VPL sconosciuto</translation>
     </message>
 </context>
 </TS>

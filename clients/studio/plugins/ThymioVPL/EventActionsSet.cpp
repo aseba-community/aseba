@@ -464,7 +464,7 @@ namespace Aseba { namespace ThymioVPL
 			if (!block)
 			{
 				QMessageBox::warning(0,tr("Loading"),
-					tr("Error in XML source file at %0:%1 cannot create block %2").arg(blockElement.lineNumber()).arg(blockElement.columnNumber()).arg(name));
+					tr("Error in XML source file at %0:%1: cannot create block %2").arg(blockElement.lineNumber()).arg(blockElement.columnNumber()).arg(name));
 				return;
 			}
 			
