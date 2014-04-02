@@ -327,7 +327,9 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::clearSceneWithoutRecompilation()
 	{
 		loading = true;
-		scene->clear(false);
+		toggleAdvancedMode(false, true);
+		scene->reset();
+		clearUndo();
 		loading = false;
 	}
 	
@@ -342,9 +344,9 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
+			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
-			toggleAdvancedMode(false);
 			showAtSavedPosition();
 			processCompilationResult();
 		}
@@ -354,9 +356,9 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
+			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
-			toggleAdvancedMode(false);
 			processCompilationResult();
 		}
 	}
@@ -450,7 +452,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force)
 	{
-		if (actionButtons.last()->isVisible() == advanced)
+		if (scene->getAdvanced() == advanced)
 			return;
 		qDebug() << "toggling advanced mode to" << advanced;
 		if (advanced)
