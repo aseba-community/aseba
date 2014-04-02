@@ -46,7 +46,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::red, advanced, parent)
 	{
 		// front sensors
 		for(int i=0; i<5; ++i) 
@@ -57,10 +57,8 @@ namespace Aseba { namespace ThymioVPL
 			button->setRotation(-20*offset);
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
 						   175 - 150*qCos(0.34906585*offset) );
-			//button->addState(QColor(110,255,110));
-			//button->addState(QColor(230,0,0));
-			button->addState(Qt::black);
 			button->addState(Qt::red);
+			button->addState(Qt::black);
 
 			buttons.push_back(button);
 			
@@ -73,10 +71,8 @@ namespace Aseba { namespace ThymioVPL
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(64 + i*128, 234));
-			//button->addState(QColor(110,255,110));
-			//button->addState(QColor(230,0,0));
-			button->addState(Qt::black);
 			button->addState(Qt::red);
+			button->addState(Qt::black);
 			
 			buttons.push_back(button);
 			
@@ -88,7 +84,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 150, 300, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 150, 300, QColor(32,32,32), Qt::white, advanced, parent)
 	{
 		// sensors
 		for(int i=0; i<2; ++i) 
@@ -96,10 +92,8 @@ namespace Aseba { namespace ThymioVPL
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
 
 			button->setPos(QPointF(98 + i*60, 40));
-			//button->addState(QColor(110,255,110));
-			//button->addState(QColor(230,0,0));
-			button->addState(Qt::black);
 			button->addState(Qt::white);
+			button->addState(Qt::black);
 			
 			buttons.push_back(button);
 			

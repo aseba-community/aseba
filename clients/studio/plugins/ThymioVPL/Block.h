@@ -140,7 +140,7 @@ namespace Aseba { namespace ThymioVPL
 	class BlockWithButtonsAndRange: public BlockWithButtons
 	{
 	public:
-		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, bool advanced, QGraphicsItem *parent);
+		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
@@ -158,6 +158,8 @@ namespace Aseba { namespace ThymioVPL
 		const int range;
 		const int defaultLow;
 		const int defaultHigh;
+		const QColor lowColor;
+		const QColor highColor;
 	
 	protected:
 		virtual void mousePressEvent( QGraphicsSceneMouseEvent * event);
