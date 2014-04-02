@@ -804,7 +804,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (event->mimeData()->hasFormat("EventActionsSet"))
 		{
-			// TODO: do something?
+			highlightMode = HIGHLIGHT_SET;
 		}
 		else if (isDnDNewAction(event))
 		{
@@ -881,6 +881,25 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(widget);
 		
 		const int colorId = (isSelected() ? 1 : 0);
+		
+		// if we are the last one, do not show buttons
+		Scene* vplScene(dynamic_cast<Scene*>(scene()));
+		if (vplScene)
+		{
+			assert(vplScene->setsBegin() != vplScene->setsEnd());
+			const bool isLast(*(vplScene->setsEnd()-1) == this);
+			addButton->setVisible(!isLast);
+			deleteButton->setVisible(!isLast);
+			if (isLast && (highlightMode == HIGHLIGHT_NONE))
+			{
+				const qreal borderWidth(Style::blockDropAreaBorderWidth);
+				const qreal hb(borderWidth/2);
+				painter->setBrush(Qt::transparent);
+				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->drawRoundedRect(boundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
+				return;
+			}
+		}
 		
 		// background
 		if (errorFlag)

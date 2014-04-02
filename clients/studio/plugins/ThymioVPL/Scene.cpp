@@ -127,11 +127,21 @@ namespace Aseba { namespace ThymioVPL
 	//! Makes sure that there is at least one empty event-actions set at the end of the scene
 	void Scene::ensureOneEmptySetAtEnd()
 	{
+		EventActionsSet *newSet(0);
 		if (eventActionsSets.empty())
-			createNewEventActionsSet();
+			newSet = createNewEventActionsSet();
 		else if (!eventActionsSets.last()->isEmpty())
-			createNewEventActionsSet();
-		relayout();
+			newSet = createNewEventActionsSet();
+		
+		if (newSet)
+		{
+			relayout();
+		
+			// make sure the newly set is visible
+			QGraphicsView* view;
+			foreach (view, views())
+				view->ensureVisible(newSet);
+		}
 	}
 
 	//! Create a new event-actions set and adds it

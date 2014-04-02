@@ -117,7 +117,8 @@ namespace Aseba { namespace ThymioVPL
 		{
 			HIGHLIGHT_NONE = 0,
 			HIGHLIGHT_EVENT,
-			HIGHLIGHT_ACTION
+			HIGHLIGHT_ACTION,
+			HIGHLIGHT_SET
 		} highlightMode;
 		
 		qreal dropAreaXPos;
