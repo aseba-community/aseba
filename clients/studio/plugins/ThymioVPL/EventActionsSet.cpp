@@ -729,13 +729,10 @@ namespace Aseba { namespace ThymioVPL
 				repositionElements();
 				
 				setSoleSelection();
-				if (scene())
-					polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
 				update();
 			}
-			
 			// It is a block
-			if (event->mimeData()->hasFormat("Block"))
+			else if (event->mimeData()->hasFormat("Block"))
 			{
 				// create block from mime data
 				Block *newBlock(Block::deserialize(event->mimeData()->data("Block"), advanced));
@@ -794,6 +791,11 @@ namespace Aseba { namespace ThymioVPL
 				else
 					abort();
 			}
+			else
+				abort();
+			
+			if (scene())
+				polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
 		}
 	}
 	
