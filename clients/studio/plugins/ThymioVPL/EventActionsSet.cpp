@@ -386,12 +386,22 @@ namespace Aseba { namespace ThymioVPL
 	//! Recompute the drop index for a given position
 	void EventActionsSet::updateDropIndex(qreal dropXPos)
 	{
+		const int oldIndex(dropIndex);
+		
 		// start of actions
 		dropXPos -= columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing;
 		if (dropXPos < 0)
 			dropIndex = -1;
 		else
 			dropIndex = dropXPos / (Style::blockSpacing + Style::blockWidth);
+		
+		// if action already exists, restrict index
+		if (highlightMode == HIGHLIGHT_EXISTING_ACTION)
+		{
+			dropIndex = qMax(0, qMin(dropIndex, actions.size()-1));
+			if (dropIndex != oldIndex)
+				update();
+		}
 	}
 	
 	//! Select only this set and nothing else
@@ -758,7 +768,6 @@ namespace Aseba { namespace ThymioVPL
 						
 						// exchange the blocks
 						const int thatIndex(getActionBlockIndex(newBlock->name));
-						dropIndex = qMax(0, qMin(dropIndex, actions.size()-1));
 						assert(dropIndex < actions.size());
 						assert(thatIndex < actions.size());
 						qSwap(actions[dropIndex], actions[thatIndex]);
@@ -766,22 +775,6 @@ namespace Aseba { namespace ThymioVPL
 						
 						// delete the newly created one
 						delete newBlock;
-						
-						// this code for action->beingDragged==false should never happen with current code in isDnDValid
-						/*
-						// if drop index is larger than 0, exchange, otherwise do nothing
-						if (dropIndex >= 0)
-						{
-							int thatIndex(getActionBlockIndex(newBlock->name));
-							if (thatIndex < dropIndex)
-								thatIndex += 1;
-							assert(dropIndex < actions.size());
-							assert(thatIndex < actions.size());
-							qSwap(actions[dropIndex], actions[thatIndex]);
-							repositionElements();
-						}
-						delete newBlock;
-						*/
 					}
 					else
 					{
@@ -806,11 +799,19 @@ namespace Aseba { namespace ThymioVPL
 		{
 			highlightMode = HIGHLIGHT_SET;
 		}
-		else if (isDnDNewAction(event))
+		else if (isDnDAction(event))
 		{
-			currentWidth = totalWidth;
-			deleteButton->setPos(currentWidth-deleteButton->boundingRect().width()-Style::blockSpacing, Style::blockSpacing);
-			highlightMode = HIGHLIGHT_ACTION;
+			if (isDnDNewAction(event))
+			{
+				currentWidth = totalWidth;
+				deleteButton->setPos(currentWidth-deleteButton->boundingRect().width()-Style::blockSpacing, Style::blockSpacing);
+				highlightMode = HIGHLIGHT_NEW_ACTION;
+			}
+			else
+			{
+				highlightMode = HIGHLIGHT_EXISTING_ACTION;
+			}
+			updateDropIndex(event->pos().x());
 		}
 		else if (Block::deserializeType(event->mimeData()->data("Block")) == "event")
 		{
@@ -920,11 +921,6 @@ namespace Aseba { namespace ThymioVPL
 		painter->drawEllipse(columnPos, ymiddle-2*Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth);
 		painter->drawEllipse(columnPos, ymiddle+Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth, Style::eventActionsSetColumnWidth);
 		
-		// action drop area
-		if (actions.empty() || currentWidth == totalWidth)
-			drawBlockArea(painter, "action", QPointF(dropAreaXPos, Style::blockSpacing), highlightMode == HIGHLIGHT_ACTION);
-			
-		
 		/* Note: that was arrow code:
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(QColor(fgColors[i][0], fgColors[i][1], fgColors[i][2]));
@@ -935,6 +931,22 @@ namespace Aseba { namespace ThymioVPL
 		pts[2] = QPointF(456+trans, 168);
 		painter->drawPolygon(pts, 3);
 		*/
+		
+		// action drop area
+		if (actions.empty() || currentWidth == totalWidth)
+			drawBlockArea(painter, "action", QPointF(dropAreaXPos, Style::blockSpacing), highlightMode == HIGHLIGHT_NEW_ACTION);
+		
+		// if inner drag&drop, show drop indicator
+		if (highlightMode == HIGHLIGHT_EXISTING_ACTION)
+		{
+			const qreal borderWidth(Style::blockDropAreaBorderWidth);
+			qreal xpos(columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing);
+			qDebug() << dropIndex;
+			xpos += dropIndex * (Style::blockSpacing + Style::blockWidth);
+			painter->setBrush(Style::blockCurrentColor("action"));
+			painter->setPen(Qt::NoPen);
+			painter->drawRoundedRect(xpos, Style::blockSpacing/2, Style::blockWidth, Style::blockSpacing+Style::blockHeight, borderWidth, borderWidth);
+		}
 		
 		// line number
 		painter->setPen(Style::eventActionsSetForegroundColors[colorId]);
