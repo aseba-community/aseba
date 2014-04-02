@@ -55,7 +55,8 @@ namespace Aseba { namespace ThymioVPL
 			for (SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			{
 				EventActionsSet* eventActionsSet(*itr);
-				if (!eventActionsSet->hasActionBlock(item->getName()))
+				//if (!eventActionsSet->hasActionBlock(item->getName()))
+				if (!eventActionsSet->hasAnyActionBlock())
 				{
 					eventActionsSet->addActionBlock(item);
 					clearSelection();
