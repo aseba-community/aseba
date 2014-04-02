@@ -12,6 +12,8 @@ namespace Aseba { namespace ThymioVPL {
 		static const int blockHeight;
 		static const int blockSpacing;
 		static const int blockDropAreaBorderWidth;
+		static const qreal blockDropAreaSaturationFactor;
+		static const qreal blockDropAreaValueFactor;
 		
 		static const int addRemoveButtonWidth;
 		static const int addRemoveButtonHeight;

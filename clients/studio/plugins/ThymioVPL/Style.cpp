@@ -21,6 +21,12 @@ namespace Aseba { namespace ThymioVPL {
 	//! The width of the border of the block drop area
 	const int Style::blockDropAreaBorderWidth = 20;
 	
+	//! The multiplicative factor to apply to the color saturation (in HSV) of the block drop area when it is not highlighted
+	const qreal Style::blockDropAreaSaturationFactor = 0.7;
+	
+	//! The multiplicative factor to apply to the color value (in HSV) of the block drop area when it is not highlighted
+	const qreal Style::blockDropAreaValueFactor = 1.0;
+	
 	
 	//! The width of the add/remove button
 	const int Style::addRemoveButtonWidth = 64;

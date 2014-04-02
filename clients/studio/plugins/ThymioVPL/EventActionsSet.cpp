@@ -929,8 +929,13 @@ namespace Aseba { namespace ThymioVPL
 		QColor color(Style::blockCurrentColor(type));
 		if (!highlight)
 		{
-			color.setAlpha(130);
-			painter->setPen(QPen(color, borderWidth, Qt::DotLine, Qt::SquareCap, Qt::RoundJoin));
+			qreal h,s,v,a;
+			color.getHsvF(&h, &s, &v, &a);
+			s *= Style::blockDropAreaSaturationFactor;
+			v = qMin(1.0, v*Style::blockDropAreaValueFactor);
+			color.setHsvF(h,s,v,a);
+			//color.setAlpha(130);
+			painter->setPen(QPen(color, borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
 		}
 		else
 		{
