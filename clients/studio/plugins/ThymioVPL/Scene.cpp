@@ -171,8 +171,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		clear(false);
 		createNewEventActionsSet();
-		// TODO: fixme
-		lastCompilationResult = Compiler::CompilationResult();
+		lastCompilationResult = compiler.compile(this);
 	}
 	
 	//! Remove everything from the scene, leaving it with no object (hence not usable directly), and set advanced mode or not
