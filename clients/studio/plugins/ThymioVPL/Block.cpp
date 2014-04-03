@@ -169,7 +169,9 @@ namespace Aseba { namespace ThymioVPL
 				continue;
 			painter.save();
 			painter.translate(child->pos());
+			painter.translate(child->transformOriginPoint());
 			painter.rotate(child->rotation());
+			painter.translate(-child->transformOriginPoint());
 			painter.scale(child->scale(), child->scale());
 			child->paint(&painter, &opt, 0);
 			painter.restore();

@@ -454,7 +454,6 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (scene->getAdvanced() == advanced)
 			return;
-		qDebug() << "toggling advanced mode to" << advanced;
 		if (advanced)
 		{
 			advancedButton->setIcon(QIcon(":/images/vpl_simple_mode.svgz"));

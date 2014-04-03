@@ -941,7 +941,6 @@ namespace Aseba { namespace ThymioVPL
 		{
 			const qreal borderWidth(Style::blockDropAreaBorderWidth);
 			qreal xpos(columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing);
-			qDebug() << dropIndex;
 			xpos += dropIndex * (Style::blockSpacing + Style::blockWidth);
 			painter->setBrush(Style::blockCurrentColor("action"));
 			painter->setPen(Qt::NoPen);
