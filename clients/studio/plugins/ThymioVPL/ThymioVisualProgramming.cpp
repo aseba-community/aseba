@@ -776,7 +776,7 @@ namespace Aseba { namespace ThymioVPL
 		playReader.setScaledSize(iconSize);
 		const QImage playImage(playReader.read());
 		// last image
-		QImageReader playRedReader(":/images/play-red.svgz");
+		QImageReader playRedReader(":/images/play-green.svgz");
 		playRedReader.setScaledSize(iconSize);
 		const QImage playRedImage(playRedReader.read());
 		
