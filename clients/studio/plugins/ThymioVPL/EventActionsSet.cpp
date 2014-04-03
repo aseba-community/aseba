@@ -881,6 +881,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
+		const qreal borderWidth(Style::blockDropAreaBorderWidth);
 		const int colorId = (isSelected() ? 1 : 0);
 		
 		// if we are the last one, do not show buttons
@@ -893,7 +894,6 @@ namespace Aseba { namespace ThymioVPL
 			deleteButton->setVisible(!isLast);
 			if (isLast && (highlightMode == HIGHLIGHT_NONE))
 			{
-				const qreal borderWidth(Style::blockDropAreaBorderWidth);
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
 				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
@@ -912,7 +912,19 @@ namespace Aseba { namespace ThymioVPL
 		
 		// event drop area
 		if (!event)
+		{
 			drawBlockArea(painter, "event", QPointF(Style::blockSpacing, Style::blockSpacing), highlightMode == HIGHLIGHT_EVENT);
+		}
+		else
+		{
+			// if event drag&drop
+			if (highlightMode == HIGHLIGHT_EVENT)
+			{
+				painter->setBrush(Style::blockCurrentColor("event"));
+				painter->setPen(Qt::NoPen);
+				painter->drawRoundedRect(Style::blockSpacing, Style::blockSpacing/2, Style::blockWidth, Style::blockSpacing+Style::blockHeight, borderWidth, borderWidth);
+			}
+		}
 
 		// column
 		painter->setPen(Qt::NoPen);
@@ -939,7 +951,6 @@ namespace Aseba { namespace ThymioVPL
 		// if inner drag&drop, show drop indicator
 		if (highlightMode == HIGHLIGHT_EXISTING_ACTION)
 		{
-			const qreal borderWidth(Style::blockDropAreaBorderWidth);
 			qreal xpos(columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing);
 			xpos += dropIndex * (Style::blockSpacing + Style::blockWidth);
 			painter->setBrush(Style::blockCurrentColor("action"));
