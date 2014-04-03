@@ -57,7 +57,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	QRectF EventActionsSet::boundingRect() const
 	{
-		return QRectF(-4, -4, totalWidth+8, Style::blockHeight+2*Style::blockSpacing+8);
+		const qreal xmargin(qMax(Style::blockSpacing/2,4));
+		return QRectF(-xmargin, -4, totalWidth+2*xmargin, Style::blockHeight+2*Style::blockSpacing);
 		
 	}
 	
@@ -908,7 +909,10 @@ namespace Aseba { namespace ThymioVPL
 		else
 			painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
-		painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
+		if (highlightMode == HIGHLIGHT_SET)
+			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
+		else
+			painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 		
 		// event drop area
 		if (!event)
