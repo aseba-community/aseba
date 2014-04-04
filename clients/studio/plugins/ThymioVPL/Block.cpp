@@ -388,15 +388,18 @@ namespace Aseba { namespace ThymioVPL
 			const int h(96);
 			const int lowPos(valToPixel(low));
 			const int highPos(valToPixel(high));
-			//qDebug() << range << low << lowPos << high << highPos;
-			// background ranges
-			/*painter->fillRect(x,y+20,highPos,h-40,Qt::red);
-			painter->fillRect(x+highPos,y+20,lowPos-highPos,h-40,Qt::darkGray);
-			painter->fillRect(x+lowPos,y+20,w-lowPos,h-40,Qt::lightGray);*/
-			painter->fillRect(x,y,w,48,highColor);
-			painter->fillRect(x,y+48,w,48,lowColor);
-			// cursors
+			painter->fillRect(x,y,highPos,48,Qt::lightGray);
+			painter->fillRect(x+highPos,y,w-highPos,48,highColor);
+			painter->fillRect(x,y+48,lowPos,48,lowColor);
+			painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
+			
+			// rectangle
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			painter->setBrush(Qt::NoBrush);
+			painter->drawRect(x,y,w,h);
+			painter->drawLine(x,y+48,x+w,y+48);
+			
+			// cursors
 			painter->setBrush(Qt::white);
 			QPolygon highCursor;
 			highCursor << QPoint(x+highPos, y) << QPoint(x+highPos-46, y) << QPoint(x+highPos, y+46);
@@ -404,9 +407,6 @@ namespace Aseba { namespace ThymioVPL
 			QPolygon lowCursor;
 			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+46, y+96) << QPoint(x+lowPos, y+96);
 			painter->drawConvexPolygon(lowCursor);
-			// rectangle
-			painter->setBrush(Qt::NoBrush);
-			painter->drawRect(x,y,w,h);
 		}
 	}
 	
