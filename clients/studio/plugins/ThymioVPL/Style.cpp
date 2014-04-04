@@ -45,10 +45,10 @@ namespace Aseba { namespace ThymioVPL {
 	const int Style::eventActionsSetCornerSize = 5;
 	
 	//! The normal/selected background colors of event-actions sets
-	const QColor Style::eventActionsSetBackgroundColors[2] = { QColor(234, 234, 234), QColor(255, 220, 211) };
+	const QColor Style::eventActionsSetBackgroundColors[2] = { QColor(234, 234, 234), QColor(255, 255, 180) };
 	
 	//! The normal/selected foreground colors of event-actions sets
-	const QColor Style::eventActionsSetForegroundColors[2] = { QColor(204, 204, 204), QColor(237, 172, 140) };
+	const QColor Style::eventActionsSetForegroundColors[2] = { QColor(204, 204, 204), QColor(237, 237, 80) };
 	
 	
 	//! Size of the rounded corner of add/remove buttons
