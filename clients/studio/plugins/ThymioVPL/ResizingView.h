@@ -19,11 +19,13 @@ namespace Aseba { namespace ThymioVPL
 		ResizingView(QGraphicsScene * scene, QWidget * parent = 0);
 		qreal getScale() const { return computedScale; }
 		
+	public slots:
+		void recomputeScale();
+		
 	protected:
 		virtual void resizeEvent(QResizeEvent * event);
 		
 	protected slots:
-		void recomputeScale();
 		void resetResizedFlag();
 		
 	protected:

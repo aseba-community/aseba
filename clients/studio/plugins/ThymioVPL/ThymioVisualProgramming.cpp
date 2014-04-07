@@ -338,6 +338,7 @@ namespace Aseba { namespace ThymioVPL
 		QSettings settings;
 		restoreGeometry(settings.value("ThymioVisualProgramming/geometry").toByteArray());
 		QWidget::show();
+		view->recomputeScale();
 	}
 
 	void ThymioVisualProgramming::showVPLModal()
