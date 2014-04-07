@@ -99,7 +99,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		QString getName() const;
 		
-		void updateBlockImage(bool advanced, int w = -1);
+		void updateBlockImage(bool advanced);
 		
 	protected:
 		virtual void mouseMoveEvent( QMouseEvent *event );

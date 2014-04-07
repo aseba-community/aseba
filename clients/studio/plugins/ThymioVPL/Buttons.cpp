@@ -167,7 +167,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		setStyleSheet("QPushButton {border: none; }");
 		
-		updateBlockImage(false, width());
+		updateBlockImage(false);
 		
 		setAcceptDrops(true);
 	}
@@ -185,15 +185,10 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Re-render the block image
-	void BlockButton::updateBlockImage(bool advanced, int w) 
+	void BlockButton::updateBlockImage(bool advanced) 
 	{
-		qreal factor;
-		if (w == -1)
-			factor = iconSize().width() / 256.;
-		else
-			factor = w / 256;
 		block->setAdvanced(advanced);
-		setIcon(QPixmap::fromImage(block->image(factor)));
+		setIcon(QPixmap::fromImage(block->image(1.)));
 	}
 
 	void BlockButton::mouseMoveEvent( QMouseEvent *event )
