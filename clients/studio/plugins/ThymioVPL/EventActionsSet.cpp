@@ -883,7 +883,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(widget);
 		
 		const qreal borderWidth(Style::blockDropAreaBorderWidth);
-		const int colorId = (isSelected() ? 1 : 0);
+		int colorId = (isSelected() ? 1 : 0);
 		
 		// if we are the last one, do not show buttons
 		Scene* vplScene(dynamic_cast<Scene*>(scene()));
@@ -893,6 +893,8 @@ namespace Aseba { namespace ThymioVPL
 			const bool isLast(*(vplScene->setsEnd()-1) == this);
 			addButton->setVisible(!isLast);
 			deleteButton->setVisible(!isLast);
+			if (stateFilter)
+				stateFilter->setVisible(!isLast);
 			if (isLast && (highlightMode == HIGHLIGHT_NONE))
 			{
 				const qreal hb(borderWidth/2);
