@@ -34,8 +34,8 @@ namespace Aseba { namespace ThymioVPL
 		enum
 		{
 			MODE_TAP = 0,
-			MODE_PITCH,
-			MODE_ROLL
+			MODE_ROLL,
+			MODE_PITCH
 		};
 		static const int resolution;
 		
