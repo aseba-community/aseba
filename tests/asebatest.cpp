@@ -19,6 +19,9 @@ using namespace Aseba;
 #include <getopt.h>		// getopt_long()
 #include <stdlib.h>		// exit()
 
+// defines
+#define DEFAULT_STEPS	1000
+
 // helper function
 std::wstring read_source(const std::string& filename);
 void dump_source(const std::wstring& source);
@@ -50,7 +53,8 @@ static void usage (int argc, char** argv)
 			<< "    -s | --source       Dump the source code" << std::endl
 			<< "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
 			<< "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
-			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl;
+			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl
+			<< "    -i | --steps        Number of VM execution steps (default: " << DEFAULT_STEPS << ")" << std::endl;
 }
 
 static bool executionError(false);
@@ -287,7 +291,7 @@ int main(int argc, char** argv)
 	bool dump = false;
 	bool memDump = false;
 	bool memCmp = false;
-	int stepCount = 1000;
+	int stepCount = DEFAULT_STEPS;
 	std::string memCmpFileName;
 	
 	std::locale::global(std::locale(""));
