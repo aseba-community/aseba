@@ -209,7 +209,7 @@ namespace Aseba
 			Error error;
 			std::wostringstream compilationMessages;
 			
-			CompilationResult(bool dump):dump(dump) {}
+			CompilationResult(bool dump):dump(dump), success(false), allocatedVariablesCount(0) {}
 		};
 		
 		
