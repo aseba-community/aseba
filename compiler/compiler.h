@@ -61,7 +61,7 @@ namespace Aseba
 		struct NamedVariable
 		{
 			NamedVariable(const std::wstring &name, unsigned size) : size(size), name(name) {}
-			NamedVariable() {}
+			NamedVariable() : size(0) {}
 			
 			unsigned size; //!< size of variable in words
 			std::wstring name; //!< name of the variable
