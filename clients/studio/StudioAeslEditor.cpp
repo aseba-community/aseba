@@ -23,6 +23,8 @@
 #include <QtGui>
 #include <QtGlobal>
 
+#include <cassert>
+
 namespace Aseba
 {
 	/** \addtogroup studio */
@@ -59,6 +61,7 @@ namespace Aseba
 		if (dropSourceWidget && startOfLine)
 		{
 			const NodeTab* nodeTab(dynamic_cast<const NodeTab*>(tab));
+			assert(nodeTab);
 			QString prefix(""); // before the text
 			QString midfix(""); // between the text and the cursor
 			QString postfix(""); // after the curser
