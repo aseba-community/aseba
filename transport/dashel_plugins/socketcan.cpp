@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include <cstring>
+#include <cstdio>
 
 #include <dashel/dashel.h>
 #include <dashel/dashel-posix.h>
@@ -128,11 +129,13 @@ class CanStream: public SelectableStream
 			
                         // Try to have 20Mb RX buffer
 			int options = 20*1024*1024;
-			setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &options, sizeof(options));
-                        
+			if (setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &options, sizeof(options)))
+				perror("socketcan: cannot set Rx buffer");
+
                         // Enable monitoring of dropped packets
 			options = 1;
-			setsockopt(fd, SOL_SOCKET, SO_RXQ_OVFL, &options, sizeof(options));
+			if (setsockopt(fd, SOL_SOCKET, SO_RXQ_OVFL, &options, sizeof(options)))
+				perror("socketcan: cannot set monitoring for dropped packets");
 
 			addr.can_ifindex = ifr.ifr_ifindex;
 			if(bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
