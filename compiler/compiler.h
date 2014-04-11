@@ -161,7 +161,7 @@ namespace Aseba
 		bool valid; //!< true if character, row and column hold valid values
 		
 		SourcePos(unsigned character, unsigned row, unsigned column) : character(character - 1), row(row), column(column - 1) { valid = true; }
-		SourcePos() { valid = false; }
+		SourcePos() : character(0), row(0), column(0), valid(false) { }
 		std::wstring toWString() const;
 	};
 	
