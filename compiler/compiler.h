@@ -106,7 +106,7 @@ namespace Aseba
 		std::vector<LocalEvent> localEvents; //!< events available locally on target
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
-		TargetDescription() { variablesSize = bytecodeSize = stackSize = 0; }
+		TargetDescription() : protocolVersion(0), bytecodeSize(0), variablesSize(0), stackSize(0) { }
 		uint16 crc() const;
 		VariablesMap getVariablesMap(unsigned& freeVariableIndex) const;
 		FunctionsMap getFunctionsMap() const;
