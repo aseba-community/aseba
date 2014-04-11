@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit f44652ddf4c3aed2ef8e89e0ff0e3441cb51deef
+%global commit 8358704d2416104400ad32f63b13f4d7010c4701
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.3%{?snapshot}%{?dist}
+Release:        0.4%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -175,6 +175,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Fri Apr 11 2014 Your Name <your@email> - 1.3.2-0.4.20140411git8358704
+- Updated to latest 1.3.2 prerelease and made some libs static and notinstalled.
+
 * Mon Mar 03 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.3.20140303gitf44652d
 - Updated spec to build on openSUSE and put libs in libaseba1 package.
 

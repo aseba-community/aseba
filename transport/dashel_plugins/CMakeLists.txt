@@ -12,18 +12,8 @@ else (ANDROID)
 	endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif (ANDROID)
 
-add_library(asebadashelplugins ${ASEBADASHEL_PLUGINS_SRC})
+add_library(asebadashelplugins STATIC ${ASEBADASHEL_PLUGINS_SRC})
 set_target_properties(asebadashelplugins PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 
-install(TARGETS asebadashelplugins
-                LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
-                ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
-)
 
-set(ASEBACORE_HDR_DASHEL_PLUGINS
-	dashel-plugins.h
-)
-install(FILES ${ASEBACORE_HDR_DASHEL_PLUGINS}
-	DESTINATION include/aseba/transport/dashel_plugins
-)
