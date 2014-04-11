@@ -340,6 +340,7 @@ int main(int argc, char** argv)
 				break;
 			case 'i':
 				stepCount = atoi(optarg);
+				break;
 			default:
 				usage(argc, argv);
 				exit(EXIT_FAILURE);
