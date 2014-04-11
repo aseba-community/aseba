@@ -78,7 +78,7 @@ namespace Aseba
 		struct NativeFunctionParameter
 		{
 			NativeFunctionParameter(const std::wstring &name, int size) : size(size), name(name) {}
-			NativeFunctionParameter() {}
+			NativeFunctionParameter() : size(0) {}
 
 			int size; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
 			std::wstring name; //!< name of the parameter
