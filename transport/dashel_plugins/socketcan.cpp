@@ -149,8 +149,11 @@ class CanStream: public SelectableStream
 			iov.iov_base = &rframe;
 			msg.msg_iov = &iov;
 			msg.msg_name = &addr;
+			msg.msg_namelen = sizeof(addr);
 			msg.msg_iovlen = 1;
 			msg.msg_control = ctrlmsg;
+			msg.msg_controllen = sizeof(ctrlmsg);
+			msg.msg_flags = 0;
 		}
 	private:
 		int is_packet_tx(void)
@@ -360,8 +363,6 @@ class CanStream: public SelectableStream
 
 				struct cmsghdr *cmsg;
 				iov.iov_len = sizeof(rframe);
-				msg.msg_namelen = sizeof(addr);
-				msg.msg_controllen = sizeof(ctrlmsg);
 				msg.msg_flags = 0;
 				if(recvmsg(fd, &msg, 0) < (int) sizeof(rframe))
 					throw DashelException(DashelException::IOError, 0, "Read error", this);
