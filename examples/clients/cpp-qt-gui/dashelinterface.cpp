@@ -30,7 +30,7 @@
 
 
 DashelInterface::DashelInterface() :
-	isRunning(false), isConnected(false)
+	stream(0), isRunning(false), isConnected(false)
 {
 }
 
