@@ -177,7 +177,8 @@ class CanStream: public SelectableStream
 					pf.fd = fd;
 					pf.events = POLLOUT | POLLHUP;
 					pf.revents = 0;
-					poll(&pf, 1, 0);
+					if (poll(&pf, 1, 0) == -1)
+						perror("socketcan: can_write_frame: error while polling the socket");
 					continue;
 				}
 
