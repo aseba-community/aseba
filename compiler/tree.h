@@ -253,7 +253,7 @@ namespace Aseba
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument
 		
 		//! Constructor
-		EmitNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
 		virtual EmitNode* shallowCopy() { return new EmitNode(*this); }
 
 		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
