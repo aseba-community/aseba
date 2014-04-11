@@ -397,9 +397,11 @@ namespace Aseba
 		WAITING_LINE_CHANGE
 	};
 	
-	DashelTarget::Node::Node()
+	DashelTarget::Node::Node() :
+		steppingInNext(NOT_IN_NEXT),
+		lineInNext(0),
+		executionMode(EXECUTION_UNKNOWN)
 	{
-		executionMode = EXECUTION_UNKNOWN;
 	}
 	
 	DashelTarget::DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget) :
