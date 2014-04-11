@@ -115,6 +115,8 @@ namespace Aseba
 	{
 		targetDescription = 0;
 		commonDefinitions = 0;
+		freeVariableIndex = 0;
+		endVariableIndex = 0;
 		TranslatableError::setTranslateCB(ErrorMessages::defaultCallback);
 	}
 	
