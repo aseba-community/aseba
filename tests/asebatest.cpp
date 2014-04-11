@@ -19,6 +19,19 @@ using namespace Aseba;
 #include <getopt.h>		// getopt_long()
 #include <stdlib.h>		// exit()
 
+extern "C" bool AsebaExecutionErrorOccurred();
+
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
+{
+	ASEBA_NATIVES_STD_DESCRIPTIONS,
+	0
+};
+
+extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+{
+	return nativeFunctionsDescriptions;
+}
+
 // helper function
 std::wstring read_source(const std::string& filename);
 void dump_source(const std::wstring& source);
@@ -53,104 +66,8 @@ static void usage (int argc, char** argv)
 			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl;
 }
 
-static bool executionError(false);
 
-extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, const void *data, uint16 size)
-{
-	switch (type)
-	{
-		case ASEBA_MESSAGE_DIVISION_BY_ZERO:
-		std::cerr << "Division by zero" << std::endl;
-		executionError = true;
-		break;
-		
-		case ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS:
-		std::cerr << "Array access out of bounds" << std::endl;
-		executionError = true;
-		break;
-		
-		default:
-		std::cerr << "AsebaSendMessage of type " << type << ", size " << size << std::endl;
-		break;
-	}
-}
 
-#ifdef __BIG_ENDIAN__
-extern "C" void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count)
-{
-	AsebaSendMessage(vm, type, data, count*2);
-}
-#endif
-
-extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
-{
-	std::cerr << "AsebaSendVariables at pos " << start << ", length " << length << std::endl;
-}
-
-extern "C" void AsebaSendDescription(AsebaVMState *vm)
-{
-	std::cerr << "AsebaSendDescription" << std::endl;
-}
-
-extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
-{
-	std::cerr << "AsebaPutVmToSleep" << std::endl;
-}
-
-static AsebaNativeFunctionPointer nativeFunctions[] =
-{
-	ASEBA_NATIVES_STD_FUNCTIONS,
-};
-
-static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-{
-	ASEBA_NATIVES_STD_DESCRIPTIONS,
-	0
-};
-
-extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
-{
-	return nativeFunctionsDescriptions;
-}
-
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
-{
-	nativeFunctions[id](vm);
-}
-
-extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
-{
-	std::cerr << "AsebaWriteBytecode" << std::endl;
-}
-
-extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
-{
-	std::cerr << "AsebaResetIntoBootloader" << std::endl;
-}
-
-extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
-{
-	std::cerr << "\nFatal error, internal VM exception: ";
-	switch (reason)
-	{
-		case ASEBA_ASSERT_UNKNOWN: std::cerr << "undefined"; break;
-		case ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR: std::cerr << "unknown unary operator"; break;
-		case ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR: std::cerr << "unknown binary operator"; break;
-		case ASEBA_ASSERT_UNKNOWN_BYTECODE: std::cerr << "unknown bytecode"; break;
-		case ASEBA_ASSERT_STACK_OVERFLOW: std::cerr << "stack overflow"; break;
-		case ASEBA_ASSERT_STACK_UNDERFLOW: std::cerr << "stack underflow"; break;
-		case ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS: std::cerr << "out of variables bounds"; break;
-		case ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS: std::cerr << "out of bytecode bounds"; break;
-		case ASEBA_ASSERT_STEP_OUT_OF_RUN: std::cerr << "step out of run"; break;
-		case ASEBA_ASSERT_BREAKPOINT_OUT_OF_BYTECODE_BOUNDS: std::cerr << "breakpoint out of bytecode bounds"; break;
-		case ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG: std::cerr << "tried to emit a buffer too long"; break;
-		default: std::cerr << "unknown exception"; break;
-	}
-	std::cerr << ".\npc = " << vm->pc << ", sp = " << vm->sp;
-	std::cerr << "\nResetting VM" << std::endl;
-	executionError = true;
-	AsebaVMInit(vm);
-}
 
 struct AsebaNode
 {
@@ -193,7 +110,7 @@ struct AsebaNode
 		d.namedVariables.push_back(TargetDescription::NamedVariable("source", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));*/
 		
-		const AsebaNativeFunctionDescription** nativeDescs(nativeFunctionsDescriptions);
+		const AsebaNativeFunctionDescription* const* nativeDescs(AsebaGetNativeFunctionsDescriptions(&vm));
 		while (*nativeDescs)
 		{
 			const AsebaNativeFunctionDescription* nativeDesc(*nativeDescs);
@@ -404,7 +321,7 @@ int main(int argc, char** argv)
 	}
 	node.run(stepCount);
 	
-	checkForError("Execution", should_execution_fail, executionError);
+	checkForError("Execution", should_execution_fail, AsebaExecutionErrorOccurred());
 	
 	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
 	
