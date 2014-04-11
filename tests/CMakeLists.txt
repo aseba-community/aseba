@@ -1,8 +1,13 @@
 # two test executable
+add_library(asebavmdummycallbacks STATIC
+	asebavmdummycallbacks.cpp
+)
+target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+
 add_executable(asebatest
 	asebatest.cpp
 )
-target_link_libraries(asebatest asebacompiler asebavm ${ASEBA_CORE_LIBRARIES})
+target_link_libraries(asebatest asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
 install(TARGETS asebatest RUNTIME
 	DESTINATION bin
 )
@@ -10,7 +15,7 @@ install(TARGETS asebatest RUNTIME
 add_executable(aseba-test-natives-count
 	aseba-test-natives-count.cpp
 )
-target_link_libraries(aseba-test-natives-count asebavm)
+target_link_libraries(aseba-test-natives-count asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
 install(TARGETS aseba-test-natives-count RUNTIME
 	DESTINATION bin
 )
