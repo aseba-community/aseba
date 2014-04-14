@@ -51,6 +51,10 @@ namespace Aseba
 		QModelIndex index(int row, int column, const QModelIndex &parent) const;
 		QModelIndex parent(const QModelIndex &child) const;
 
+	public slots:
+		void resetInternalData(void);
+
+	public:
 		// proxy interface
 		void setSourceModel(QAbstractItemModel *sourceModel);
 		QModelIndex mapFromSource(const QModelIndex & sourceIndex) const;
