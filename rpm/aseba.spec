@@ -175,8 +175,11 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Fri Apr 14 2014 Your Name <your@email> - 1.3.2-0.4.20140414git8358704
+- Added vm/*.h to the aseba-devel package.
+
 * Fri Apr 11 2014 Your Name <your@email> - 1.3.2-0.4.20140411git8358704
-- Updated to latest 1.3.2 prerelease and made some libs static and notinstalled.
+- Updated to latest 1.3.2 prerelease and made some libs static and not installed.
 
 * Mon Mar 03 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.3.20140303gitf44652d
 - Updated spec to build on openSUSE and put libs in libaseba1 package.
