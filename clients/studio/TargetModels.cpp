@@ -592,6 +592,8 @@ namespace Aseba
 	
 	void TargetFunctionsModel::recreateTreeFromDescription(bool showHidden)
 	{
+		beginResetModel();
+
 		if (root)
 			delete root;
 		root = new TreeItem;
@@ -626,7 +628,7 @@ namespace Aseba
 			entry->children.push_back(new TreeItem(entry, name, getToolTip(descriptionRead->nativeFunctions[i]), entry->enabled, true));
 		}
 		
-		reset();
+		endResetModel();
 	}
 	
 	QModelIndex TargetFunctionsModel::parent(const QModelIndex &index) const
