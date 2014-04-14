@@ -78,7 +78,11 @@ namespace Aseba
 	// *** TreeChainsawFilter ***
 	void TreeChainsawFilter::setSourceModel(QAbstractItemModel *sourceModel)
 	{
+		QAbstractItemModel* oldSource = this->sourceModel();
+		if (oldSource)
+			oldSource->disconnect(this);
 		QAbstractProxyModel::setSourceModel(sourceModel);
+		connect(sourceModel, SIGNAL(modelReset()), this, SLOT(resetInternalData()));
 		sort(0, Qt::AscendingOrder);
 	}
 
@@ -111,6 +115,11 @@ namespace Aseba
 	QModelIndex TreeChainsawFilter::parent(const QModelIndex &child) const
 	{
 		return QModelIndex();
+	}
+
+	void TreeChainsawFilter::resetInternalData(void)
+	{
+		sort(0, Qt::AscendingOrder);
 	}
 
 	// sourceIndex -> proxyIndex
@@ -149,6 +158,7 @@ namespace Aseba
 		if (!sourceModel())
 			return;
 
+		indexList.clear();
 		// get the root and walk the tree
 		sortWalkTree(QModelIndex());
 	}
