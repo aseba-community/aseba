@@ -683,8 +683,11 @@ namespace Aseba { namespace ThymioVPL
 		{
 			if (!isCopy)
 				resetSet();
+			// disconnect the selection setting mechanism, emit, and then re-enable
+			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 			emit contentChanged();
 			emit undoCheckpoint();
+			connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 		}
 		beingDragged = false;
 		#endif // ANDROID
@@ -740,7 +743,6 @@ namespace Aseba { namespace ThymioVPL
 				repositionElements();
 				
 				setSoleSelection();
-				update();
 			}
 			// It is a block
 			else if (event->mimeData()->hasFormat("Block"))
@@ -784,6 +786,7 @@ namespace Aseba { namespace ThymioVPL
 				}
 				else
 					abort();
+				setSoleSelection();
 			}
 			else
 				abort();
