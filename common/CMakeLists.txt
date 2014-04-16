@@ -10,15 +10,17 @@ add_library(asebacommon ${ASEBACOMMON_SRC})
 install(TARGETS asebacommon ARCHIVE
 	DESTINATION lib
 )
-
+#It may be: set (ASEBACORE_HDR_UTILS
 set (ASEBA_HDR_UTILS 
 	utils/utils.h
 	utils/FormatableString.h
 )
+#It may be: set (ASEBACORE_HDR_MSG
 set (ASEBA_HDR_MSG
 	msg/msg.h
 	msg/descriptions-manager.h
 )
+#It may be: set (ASEBACORE_HDR_COMMON
 set (ASEBA_HDR_COMMON
 	consts.h
 	types.h
