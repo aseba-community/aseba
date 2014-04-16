@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.4%{?snapshot}%{?dist}
+Release:        0.5%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -175,10 +175,13 @@ fi
 %{_libdir}/*.so
 
 %changelog
-* Fri Apr 14 2014 Your Name <your@email> - 1.3.2-0.4.20140414git8358704
+* Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git8358704
+- Added asebavmbuffer shared lib and headers.
+
+* Mon Apr 14 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.4.20140414git8358704
 - Added vm/*.h to the aseba-devel package.
 
-* Fri Apr 11 2014 Your Name <your@email> - 1.3.2-0.4.20140411git8358704
+* Fri Apr 11 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.4.20140411git8358704
 - Updated to latest 1.3.2 prerelease and made some libs static and not installed.
 
 * Mon Mar 03 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.3.20140303gitf44652d
