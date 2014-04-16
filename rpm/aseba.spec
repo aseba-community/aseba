@@ -176,7 +176,8 @@ fi
 
 %changelog
 * Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git8358704
-- Added asebavmbuffer shared lib and headers.
+- Added asebavmbuffer shared lib and headers and made examples/clients buildable
+  after installation.
 
 * Mon Apr 14 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.4.20140414git8358704
 - Added vm/*.h to the aseba-devel package.
