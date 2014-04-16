@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 8358704d2416104400ad32f63b13f4d7010c4701
+%global commit 952606f6f3309d71492321cdf794c761896fb018
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -175,9 +175,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
-* Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git8358704
-- Added asebavmbuffer shared lib and headers and made examples/clients buildable
-  after installation.
+* Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git96fb018
+- Updated to latest 1.3.2 prerelease, added asebavmbuffer shared lib and headers,
+  and made examples/clients buildable after installation.
 
 * Mon Apr 14 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.4.20140414git8358704
 - Added vm/*.h to the aseba-devel package.
