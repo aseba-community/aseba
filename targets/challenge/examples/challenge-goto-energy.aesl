@@ -8,13 +8,17 @@
 <!--list of constants-->
 
 
-<!--source code of node e-puck-->
-<node name="e-puck" >var maxBlueVal
+<!--show keywords state-->
+<keywords flag="false"/>
+
+
+<!--node e-puck-->
+<node nodeId="1" name="e-puck">var maxBlueVal
 var maxBluePos
 var i
 
-wheel_left_speed = 100
-wheel_right_speed = 100
+wheel.left_speed = 100
+wheel.right_speed = 100
 
 onevent timer
 maxBlueVal = 0
@@ -22,29 +26,29 @@ maxBluePos = 0
 i = 0
 
 while i &lt; 3 do
-        if cam_blue[i] > maxBlueVal then
+        if cam.blue[i] > maxBlueVal then
                 maxBluePos = i
-                maxBlueVal = cam_blue[i]
+                maxBlueVal = cam.blue[i]
         end
         i = i + 1
 end
 
 if maxBluePos == 0 then
-        wheel_left_speed = 0
-        wheel_right_speed = 13
+        wheel.left_speed = 0
+        wheel.right_speed = 13
 else
         if maxBluePos == 1 then
-                wheel_left_speed = 10
-                wheel_right_speed = 10
+                wheel.left_speed = 10
+                wheel.right_speed = 10
         else
-                wheel_left_speed = 13
-                wheel_right_speed = 0
+                wheel.left_speed = 13
+                wheel.right_speed = 0
         end
 end
 
 if maxBlueVal &lt;= 50 then
-        wheel_left_speed = -10
-        wheel_right_speed = -5
+        wheel.left_speed = -10
+        wheel.right_speed = -5
 end
 </node>
 
