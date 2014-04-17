@@ -11,15 +11,15 @@ install(TARGETS asebacommon ARCHIVE
 	DESTINATION lib
 )
 
-set (ASEBA_HDR_UTILS 
+set (ASEBACORE_HDR_UTILS 
 	utils/utils.h
 	utils/FormatableString.h
 )
-set (ASEBA_HDR_MSG
+set (ASEBACORE_HDR_MSG
 	msg/msg.h
 	msg/descriptions-manager.h
 )
-set (ASEBA_HDR_COMMON
+set (ASEBACORE_HDR_COMMON
 	consts.h
 	types.h
 )
