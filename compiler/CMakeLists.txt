@@ -13,8 +13,12 @@ set (ASEBACOMPILER_SRC
 	tree-emit.cpp
 )
 add_library(asebacompiler ${ASEBACOMPILER_SRC})
-install(TARGETS asebacompiler ARCHIVE
-	DESTINATION lib
+set_target_properties(asebacompiler PROPERTIES VERSION ${LIB_VERSION_STRING} 
+                                        SOVERSION ${LIB_VERSION_MAJOR})
+
+install(TARGETS asebacompiler
+                LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+                ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
 
 set (ASEBACORE_HDR_COMPILER
