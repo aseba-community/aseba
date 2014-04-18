@@ -3,13 +3,13 @@ Name:           aseba
 # Update the following lines to reflect the source release version you will be
 # referencing below
 %global source_major 1
-%global source_minor 3
-%global source_patch 2
+%global source_minor 4
+%global source_patch 0
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 952606f6f3309d71492321cdf794c761896fb018
+%global commit 38a184705a07bad16bd87c57357d596810f13478
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.5%{?snapshot}%{?dist}
+Release:        0.1%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -175,6 +175,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Fri Apr 18 2014 Dean Brettle <dean@brettle.com> - 1.4.0-0.1.20140419git38a1847
+- Using 1.4.0-0.xYYYYMMDDgitSHORTCOMMIT for releases based on master snapshots.
+
 * Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git96fb018
 - Updated to latest 1.3.2 prerelease, added asebavmbuffer shared lib and headers,
   and made examples/clients buildable after installation.
