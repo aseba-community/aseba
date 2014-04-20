@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 952606f6f3309d71492321cdf794c761896fb018
+%global commit fb11585e185d8825f10264d0d87e7f8ee7fbec33
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -44,7 +44,7 @@ License:        LGPL-3.0
 License:        LGPLv3
 %endif
 URL:            http://aseba.wikidot.com
-Source0:        https://github.com/aseba-community/aseba/archive/%{commit}/%{name}-%{version}-%{shortcommit}.tar.gz
+Source0:        https://github.com/aseba-community/aseba/archive/%{commit}/%{name}-%{version}-%{commit}.tar.gz
 Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
