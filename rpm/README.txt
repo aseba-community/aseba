@@ -38,23 +38,18 @@ spec file.
 
     spectool -g -R ${PACKAGE_NAME}.spec
 
-6. Create a patch file containing all the changes since the specified commit 
-by running:
-
-    git diff $GITHUB_RELEASE_NUMBER \
-	> ~/rpmbuild/SOURCES/${PACKAGE_NAME}-rpm.patch
-
-7. Build the RPMs and SRPM with:
+6. Build the RPMs and SRPM with:
 
     rpmbuild -ba ${PACKAGE_NAME}.spec
 
 If there are problems, fix them, update the most recent changelog entry
-in the %changelog section at the bottom of the spec file and return to step 6.
+in the %changelog section at the bottom of the spec file, commit and push the
+your changes to the official github repository, and update the commit hash in
+the spec file with the hash of that commit, and return to step 5.
 
-8. Commit and push the updated spec file and your changes to the official
-github repository.
+7. Commit and push the spec file (which contains a correct a commit hash).
 
-9. Publish the RPMs and SRPM found in ~/rpmbuild/RPMS and ~/rpmbuild/SRPMS
+8. Publish the RPMs and SRPM found in ~/rpmbuild/RPMS and ~/rpmbuild/SRPMS
 
 
 To create pre-release or post-release RPMs 

@@ -45,12 +45,7 @@ License:        LGPLv3
 %endif
 URL:            http://aseba.wikidot.com
 Source0:        https://github.com/aseba-community/aseba/archive/%{commit}/%{name}-%{version}-%{commit}.tar.gz
-
-# By the time we are building from OpenSUSE Build Service, no patches should be needed. 
-%if 0%{?opensuse_bs}
-%else
-Patch0:         aseba-rpm.patch
-%endif
+# Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
 BuildRequires: ImageMagick-devel
@@ -109,10 +104,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{commit}
-%if 0%{?opensuse_bs}
-%else
-%patch0 -p1
-%endif
+# %patch0 -p1
 
 %build
 %cmake
