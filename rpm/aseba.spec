@@ -45,6 +45,7 @@ License:        LGPLv3
 %endif
 URL:            http://aseba.wikidot.com
 Source0:        https://github.com/aseba-community/aseba/archive/%{commit}/%{name}-%{version}-%{commit}.tar.gz
+Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
 BuildRequires: ImageMagick-devel
@@ -103,6 +104,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{commit}
+%patch0 -p1
 
 %build
 %cmake
