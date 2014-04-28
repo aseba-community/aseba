@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.5%{?snapshot}%{?dist}
+Release:        0.6%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -175,6 +175,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Mon Apr 28 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.6.20140427git265d828
+- Changed shortcommit to commit in Source0 to help OpenSUSE build server
+
 * Wed Apr 16 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.5.20140416git96fb018
 - Updated to latest 1.3.2 prerelease, added asebavmbuffer shared lib and headers,
   and made examples/clients buildable after installation.
