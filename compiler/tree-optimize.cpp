@@ -402,7 +402,7 @@ namespace Aseba
 						result = abs(immediateChild->value);
 				break;
 				case ASEBA_UNARY_OP_BIT_NOT: result = ~immediateChild->value; break;
-				
+				case ASEBA_UNARY_OP_NOT: result = !immediateChild->value; break;
 				default: abort();
 			}
 			
