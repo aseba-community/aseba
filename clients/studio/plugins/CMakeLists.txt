@@ -25,4 +25,5 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/EventActionsSet.h
 	ThymioVPL/Scene.h
 )
-add_library(asebaqtplugins ${qt_plugins_SRCS} ${qt_plugins_MOCS})
+add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
+

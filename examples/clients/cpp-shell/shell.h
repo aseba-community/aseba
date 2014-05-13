@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 #include <dashel/dashel.h>
-#include "../../../common/msg/descriptions-manager.h"
+#include "common/msg/descriptions-manager.h"
 
 /*
 	This is the main class of the Aseba client, called Shell

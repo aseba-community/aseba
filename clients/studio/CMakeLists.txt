@@ -71,7 +71,7 @@ if (QT4_FOUND)
 		AeslEditor.h
 		translations/CompilerTranslator.h
 	)
-	add_library(asebaqtcommon ${qt_common_SRCS} ${qt_common_MOCS})
+	add_library(asebaqtcommon STATIC ${qt_common_SRCS} ${qt_common_MOCS})
 	
 	# plugins
 	add_subdirectory(plugins)
