@@ -19,6 +19,10 @@ find_library(DASHEL_LIBRARY dashel CMAKE_FIND_ROOT_PATH_BOTH)
 include_directories(${DASHEL_INCLUDE_DIR})
 set(EXTRA_LIBS ${DASHEL_LIBRARY})
 
+if (WIN32)
+	set(EXTRA_LIBS ${EXTRA_LIBS} winspool ws2_32 setupapi)
+endif (WIN32)
+
 # Enki
 
 find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
