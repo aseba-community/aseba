@@ -72,7 +72,6 @@ class Aseba(object):
 
 
             # Configure event management
-            self.clear_events()
             eventfilter = self.network.CreateEventFilter()
             self.events = dbus.Interface(
                         self.bus.get_object('ch.epfl.mobots.Aseba', eventfilter), 
