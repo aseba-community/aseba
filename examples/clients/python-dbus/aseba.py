@@ -34,7 +34,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 # required to prevent the glib main loop to interfere with Python threads
 gobject.threads_init()
-
+dbus.mainloop.glib.threads_init()
 
 class AsebaException(Exception):
     def __init__(self, value):
