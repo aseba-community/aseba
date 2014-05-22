@@ -21,7 +21,7 @@ Typical usage:
 
 Aseba.event_freq is a dictionary that store the frequency at which each
 (subscribed) event is received. For events that are emitted at fixed period, it
-may be a convenient way to make sure the connection is in good shape.
+may be a convenient way to make sure the connection is in good state.
 
 """
 
@@ -174,30 +174,41 @@ class Aseba(object):
 
 
     def load_scripts(self, path):
+        """ Loads a given Aseba script (aesl) on the Aseba network.
+        """
         if self.dummy: return
         self.network.LoadScripts(path)
 
     def _dispatch_events(self, *args):
         id, name, vals = args
-        #if id in self.callbacks:
-        #    self.callbacks[id](vals)
+
+        key = None
+
         if name in self.callbacks:
-            self.callbacks[name](vals)
+            key = name
+        elif id in self.callbacks:
+            # event registered from ID, not from name
+            key = id
+
+        if key:
+            self.callbacks[key](vals)
 
             # update frequency for this event
             now = time.time()
-            self._events_periods[name].append(now - self._events_last_evt[name])
-            self._events_last_evt[name] = now
-            if len(self._events_periods[name]) == Aseba.NB_EVTS_FREQ:
-                self.events_freq[name] = 1. / (sum(self._events_periods[name]) / float(Aseba.NB_EVTS_FREQ))
-                self._events_periods[name] = []
+            self._events_periods[key].append(now - self._events_last_evt[key])
+            self._events_last_evt[key] = now
+            if len(self._events_periods[key]) == Aseba.NB_EVTS_FREQ:
+                self.events_freq[key] = 1. / (sum(self._events_periods[key]) / float(Aseba.NB_EVTS_FREQ))
+                self._events_periods[key] = []
 
     def on_event(self, event_id, cb):
-        if self.dummy: return
+        """
+        Subscribe to an Aseba event
 
-        if not isinstance(event_id, basestring):
-            # supporting events by ID would be easy to add. Actually, it only requires more code in _dispatch_events
-            raise Exception("Only setting event by name is currently supported")
+        :param event_id: the event name or the event numerical ID
+        :param cb: the callback function that will be called with the content of the event as parameter
+        """
+        if self.dummy: return
 
         self.callbacks[event_id] = cb
         self._events_last_evt[event_id] = time.time()
