@@ -123,7 +123,7 @@ class Aseba(object):
         pass
 
     def dbus_error(self, e):
-        assert(not dummy)
+        assert(not self.dummy)
 
         # there was an error on D-Bus, stop loop
         self.close()
