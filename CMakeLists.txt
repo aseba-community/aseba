@@ -11,20 +11,10 @@ add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)
 
 # Dashel
-
-find_path(DASHEL_INCLUDE_DIR dashel/dashel.h CMAKE_FIND_ROOT_PATH_BOTH)
-
-find_library(DASHEL_LIBRARY dashel CMAKE_FIND_ROOT_PATH_BOTH)
-
-include_directories(${DASHEL_INCLUDE_DIR})
-set(EXTRA_LIBS ${DASHEL_LIBRARY})
-
-if (WIN32)
-	set(EXTRA_LIBS ${EXTRA_LIBS} winspool ws2_32 setupapi)
-endif (WIN32)
+find_package(dashel REQUIRED)
+include_directories(${dashel_INCLUDE_DIRS})
 
 # Enki
-
 find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
 find_library(ENKI_LIBRARY enki)
 find_library(ENKI_VIEWER_LIBRARY enkiviewer)
@@ -46,7 +36,7 @@ add_subdirectory(common)
 
 add_subdirectory(transport)
 
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${EXTRA_LIBS})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
 
 add_subdirectory(switches)
 

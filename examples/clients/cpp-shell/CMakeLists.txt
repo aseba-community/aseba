@@ -6,7 +6,7 @@ if (LIBXML2_FOUND)
 	add_executable(asebashell
 		shell.cpp
 	)
-	target_link_libraries(asebashell asebacompiler ${ASEBA_CORE_LIBRARIES} ${LIBXML2_LIBRARIES})
+	target_link_libraries(asebashell asebacompiler ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 	install(TARGETS asebashell RUNTIME
 		DESTINATION bin
 	)
