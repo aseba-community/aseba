@@ -88,7 +88,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	private:
 		void clearUndo();
-		void toggleAdvancedMode(bool advanced, bool force=false);
+		void toggleAdvancedMode(bool advanced, bool force=false, bool ignoreSceneCheck=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
 		

@@ -451,9 +451,9 @@ namespace Aseba { namespace ThymioVPL
 		toggleAdvancedMode(!scene->getAdvanced());
 	}
 	
-	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force)
+	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force, bool ignoreSceneCheck)
 	{
-		if (scene->getAdvanced() == advanced)
+		if (!ignoreSceneCheck && (scene->getAdvanced() == advanced))
 			return;
 		if (advanced)
 		{
@@ -666,7 +666,7 @@ namespace Aseba { namespace ThymioVPL
 			return;
 		
 		scene->fromString(undoStack[undoPos]);
-		toggleAdvancedMode(scene->getAdvanced(), true);
+		toggleAdvancedMode(scene->getAdvanced(), true, true);
 		scene->setModified(true);
 		scene->recompileWithoutSetModified();
 
@@ -684,7 +684,7 @@ namespace Aseba { namespace ThymioVPL
 		++undoPos;
 		
 		scene->fromString(undoStack[undoPos+1]);
-		toggleAdvancedMode(scene->getAdvanced(), true);
+		toggleAdvancedMode(scene->getAdvanced(), true, true);
 		scene->setModified(true);
 		scene->recompileWithoutSetModified();
 		
