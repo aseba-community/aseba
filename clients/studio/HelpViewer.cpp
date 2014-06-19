@@ -64,7 +64,19 @@ namespace Aseba
 		}
 		else
 			helpFound = true;
+	}
 
+	HelpViewer::~HelpViewer()
+	{
+		writeSettings();
+		// remove help files from tmp
+		QFile(tmpHelpFileNameHC).remove();
+		QFile(tmpHelpFileNameCH).remove();
+		QDir::temp().rmdir(tmpHelpSubDir);
+	}
+	
+	void HelpViewer::setupWidgets()
+	{
 		// navigation buttons
 		previous = new QPushButton(tr("Previous"));
 		previous->setEnabled(false);
@@ -80,9 +92,6 @@ namespace Aseba
 		// QTextBrower
 		viewer = new HelpBrowser(helpEngine);
 
-		// set default language
-		setLanguage();
-
 		// help layout
 		QSplitter *helpSplitter = new QSplitter(Qt::Horizontal);
 		helpSplitter->addWidget(helpEngine->contentWidget());
@@ -97,7 +106,15 @@ namespace Aseba
 
 		setLayout(mainLayout);
 
-		// connect
+		// restore window state, if available
+		if (readSettings() == false)
+			resize(800, 500);
+
+		setWindowTitle(tr("Aseba Studio Help"));
+	}
+	
+	void HelpViewer::setupConnections()
+	{
 		connect(previous, SIGNAL(clicked()), this, SLOT(previousClicked()));
 		connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
 		connect(home, SIGNAL(clicked()), this, SLOT(homeClicked()));
@@ -105,21 +122,6 @@ namespace Aseba
 		connect(viewer, SIGNAL(forwardAvailable(bool)), this, SLOT(forwardAvailable(bool)));
 		connect(helpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)), viewer, SLOT(setSource(const QUrl&)));
 		connect(viewer, SIGNAL(sourceChanged(const QUrl&)), this, SLOT(sourceChanged(const QUrl&)));
-
-		// restore window state, if available
-		if (readSettings() == false)
-			resize(800, 500);
-
-		setWindowTitle(tr("Aseba Studio Help"));
-	}
-
-	HelpViewer::~HelpViewer()
-	{
-		writeSettings();
-		// remove help files from tmp
-		QFile(tmpHelpFileNameHC).remove();
-		QFile(tmpHelpFileNameCH).remove();
-		QDir::temp().rmdir(tmpHelpSubDir);
 	}
 
 	void HelpViewer::setLanguage(const QString& lang)

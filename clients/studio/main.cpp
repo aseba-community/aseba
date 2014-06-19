@@ -97,25 +97,34 @@ int main(int argc, char *argv[])
 	}
 
 	// translation files are loaded in DashelTarget.cpp
+	// these translators are useful both for documentation and normal GUI
 	QTranslator qtTranslator;
 	app.installTranslator(&qtTranslator);
-
 	QTranslator translator;
 	app.installTranslator(&translator);
 
-	QTranslator compilerTranslator;
-	app.installTranslator(&compilerTranslator);
-
 	if (showDoc)
 	{
+		const QString language(QLocale::system().name());
+		
+		// load translations
+		qtTranslator.load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+		qtTranslator.load(QString(":/asebastudio_") + language);
+		
 		// directly show doc browser
 		Aseba::HelpViewer helpViewer;
-		helpViewer.setLanguage(QLocale::system().name());
+		helpViewer.setupWidgets();
+		helpViewer.setupConnections();
+		helpViewer.setLanguage(language);
 		helpViewer.show();
 		return app.exec();
 	}
 	else
 	{
+		// this translator is useful only for normal GUI
+		QTranslator compilerTranslator;
+		app.installTranslator(&compilerTranslator);
+	
 		// start normal aseba studio
 		try
 		{
@@ -127,7 +136,7 @@ int main(int argc, char *argv[])
 			window.show();
 			return app.exec();
 		}
-		catch (std::runtime_error e)
+		catch (const std::runtime_error& e)
 		{
 			std::cerr << "Program terminated with runtime error: " << e.what() << std::endl;
 			return -1;

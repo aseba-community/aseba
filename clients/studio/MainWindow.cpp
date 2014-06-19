@@ -1591,6 +1591,10 @@ namespace Aseba
 		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
 		
+		// create help viwer
+		helpViewer.setupWidgets();
+		helpViewer.setupConnections();
+		
 		// create config dialog + read settings on-disk
 		ConfigDialog::init(this);
 

@@ -48,6 +48,9 @@ namespace Aseba
 
 		static const QString DEFAULT_LANGUAGE;
 
+		void setupWidgets();
+		void setupConnections();
+		
 		void setLanguage(const QString& lang = DEFAULT_LANGUAGE);
 		void showHelp(helpType type);
 
