@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit aaf2e88d36bc787bf97e7c89429bc721a5bd1324
+%global commit 1914f85183871150997c47d99bb018ddad63f2f0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -176,6 +176,7 @@ fi
 
 %changelog
 * Fri Jun 20 2014 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20140620gitaaf2e88
+- Sync with latest upstream master.
 - Make build require at least 1.0.8 of dashel-devel to get required
   dashelConfig.cmake file.
 
