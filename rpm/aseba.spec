@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.2%{?snapshot}%{?dist}
+Release:        0.3%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -52,7 +52,7 @@ BuildRequires: ImageMagick-devel
 BuildRequires: SDL-devel
 BuildRequires: binutils
 BuildRequires: cmake
-BuildRequires: dashel-devel
+BuildRequires: dashel-devel >= 1.0.8
 BuildRequires: desktop-file-utils
 BuildRequires: elfutils
 BuildRequires: enki-devel
@@ -175,6 +175,10 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Fri Jun 20 2014 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20140620gitaaf2e88
+- Make build require at least 1.0.8 of dashel-devel to get required
+  dashelConfig.cmake file.
+
 * Tue May 06 2014 Dean Brettle <dean@brettle.com> - 1.4.0-0.2.20140505gitaaf2e88
 - Removed dashel's dependencies since linking to dashel should pull them in
   automatically.
