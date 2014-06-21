@@ -1,0 +1,9 @@
+var a = 0
+
+if not 5<6 then
+	# wrong
+	a = 1
+else
+	# true
+	a = 2
+end

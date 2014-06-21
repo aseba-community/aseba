@@ -308,14 +308,14 @@ namespace Aseba
 			{
 				if (immediateRightChild && (immediateRightChild->value == 1))
 					survivor = &children[0];
-				if (immediateLeftChild && (immediateLeftChild->value == 1))
+				if (immediateLeftChild && (immediateLeftChild->value == 1) && (op == ASEBA_OP_MULT))
 					survivor = &children[1];
 			}
 			else
 			{
 				if (immediateRightChild && (immediateRightChild->value == 0))
 					survivor = &children[0];
-				if (immediateLeftChild && (immediateLeftChild->value == 0))
+				if (immediateLeftChild && (immediateLeftChild->value == 0) && (op == ASEBA_OP_ADD))
 					survivor = &children[1];
 			}
 			if (survivor)
@@ -402,7 +402,7 @@ namespace Aseba
 						result = abs(immediateChild->value);
 				break;
 				case ASEBA_UNARY_OP_BIT_NOT: result = ~immediateChild->value; break;
-				
+				case ASEBA_UNARY_OP_NOT: result = !immediateChild->value; break;
 				default: abort();
 			}
 			
