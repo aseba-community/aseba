@@ -4,12 +4,12 @@ Name:           aseba
 # referencing below
 %global source_major 1
 %global source_minor 3
-%global source_patch 2
+%global source_patch 3
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 265d8289cb049e419eafdfff9fca226e53e5aeb6
+%global commit 250edff92b279094fac786660b312f4be31ae1ad
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
@@ -27,7 +27,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.6%{?snapshot}%{?dist}
+Release:        1%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -52,7 +52,7 @@ BuildRequires: ImageMagick-devel
 BuildRequires: SDL-devel
 BuildRequires: binutils
 BuildRequires: cmake
-BuildRequires: dashel-devel
+BuildRequires: dashel-devel >= 1.0.8
 BuildRequires: desktop-file-utils
 BuildRequires: elfutils
 BuildRequires: enki-devel
@@ -175,6 +175,12 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Sun Jun 22 2014 Dean Brettle <dean@brettle.com> - 1.3.3-1.20140622git250edff
+- Make build require at least 1.0.8 of dashel-devel to get required
+  dashelConfig.cmake file.
+- Sync with latest upstream.
+- Bumped version to 1.3.3 to sync with upstream.
+
 * Mon Apr 28 2014 Dean Brettle <dean@brettle.com> - 1.3.2-0.6.20140427git265d828
 - Changed shortcommit to commit in Source0 to help OpenSUSE build server
 
