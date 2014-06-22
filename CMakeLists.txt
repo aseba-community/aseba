@@ -26,7 +26,7 @@ endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
 set(LIB_VERSION_MAJOR 1) # Must be bumped for incompatible ABI changes
 set(LIB_VERSION_MINOR 3)
-set(LIB_VERSION_PATCH 2)
+set(LIB_VERSION_PATCH 3)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 
 add_subdirectory(common)
