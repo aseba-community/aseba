@@ -3,7 +3,7 @@ Maintainer: Stephane Magnenat <stephane@nospam.magnenant.net>
 Section:devel
 Priority:optional
 Standards-Version: 3.7.2
-Build-Depends: cmake (>=2.6), libdashel (>=1.0.4), libenki (>=1.9), libqt4-dev, libqt4-opengl-dev, qt4-dev-tools, libqwt5-qt4-dev, libudev-dev
+Build-Depends: cmake (>=2.6), libdashel (>=1.0.8), libenki (>=1.9), libqt4-dev, libqt4-opengl-dev, qt4-dev-tools, libqwt5-qt4-dev, libudev-dev
 
 Package:aseba
 Architecture: any
