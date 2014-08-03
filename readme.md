@@ -37,7 +37,7 @@ Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba 
 	# fetch and compile dashel
 	git clone git://github.com/aseba-community/dashel.git
 	cd build-dashel
-	cmake ../dashel -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake ../dashel -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF
 	make
 	cd ..
 	# fetch and compile enki
@@ -49,7 +49,7 @@ Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba 
 	# fetch and compile aseba, telling it where to find dashel and enki
 	git clone git://github.com/aseba-community/aseba.git
 	cd build-aseba
-	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -DDASHEL_INCLUDE_DIR=../dashel -DDASHEL_LIBRARY=../build-dashel/libdashel.a -DENKI_INCLUDE_DIR=../enki -DENKI_LIBRARY=../build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=../build-enki/viewer/libenkiviewer.a
+	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -Ddashel_DIR=../build-dashel -DDASHEL_INCLUDE_DIR=../dashel -DDASHEL_LIBRARY=../build-dashel/libdashel.a -DENKI_INCLUDE_DIR=../enki -DENKI_LIBRARY=../build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=../build-enki/viewer/libenkiviewer.a
 	make
 
 Once this script has run, you can find the executables in `build-aseba/`, in their respective sub-directories. 
