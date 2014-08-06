@@ -327,6 +327,7 @@ namespace Aseba
 			case Token::TOKEN_STR_for: return parseFor();
 			case Token::TOKEN_STR_while: return parseWhile();
 			case Token::TOKEN_STR_emit: return parseEmit();
+			case Token::TOKEN_STR_hidden_emit: return parseEmit(true);
 			case Token::TOKEN_STR_call: return parseFunctionCall();
 			case Token::TOKEN_STR_callsub: return parseCallSub();
 			case Token::TOKEN_STR_return: return parseReturn();
@@ -726,7 +727,7 @@ namespace Aseba
 	}
 	
 	//! Parse "event" grammar element
-	Node* Compiler::parseEmit()
+	Node* Compiler::parseEmit(bool shorterArgsAllowed)
 	{
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
@@ -763,8 +764,16 @@ namespace Aseba
 			else
 				preNode.reset(); // we do not need a pointer to it anymore
 
-			if (emitNode->arraySize != eventSize)
-				throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
+			if (shorterArgsAllowed)
+			{
+				if (emitNode->arraySize > eventSize)
+					throw TranslatableError(pos, ERROR_EVENT_ARG_TOO_BIG).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
+			}
+			else
+			{
+				if (emitNode->arraySize != eventSize)
+					throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
+			}
 		}
 		else
 		{

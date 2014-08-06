@@ -266,6 +266,7 @@ namespace Aseba
 				TOKEN_END_OF_STREAM = 0,
 				TOKEN_STR_when,
 				TOKEN_STR_emit,
+				TOKEN_STR_hidden_emit,
 				TOKEN_STR_for,
 				TOKEN_STR_in,
 				TOKEN_STR_step,
@@ -432,7 +433,7 @@ namespace Aseba
 		Node* parseFor();
 		Node* parseWhile();
 		Node* parseOnEvent();
-		Node* parseEmit();
+		Node* parseEmit(bool shorterArgsAllowed = false);
 		Node* parseSubDecl();
 		Node* parseCallSub();
 		

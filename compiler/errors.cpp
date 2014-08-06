@@ -83,6 +83,7 @@ namespace Aseba
 		error_map[ERROR_FOR_INVALID_INC_END_INDEX] = 	L"End index cannot be 32767 in increasing loops";
 		error_map[ERROR_FOR_INVALID_DEC_END_INDEX] = 	L"End index cannot be -32768 in decreasing loops";
 		error_map[ERROR_EVENT_ALREADY_IMPL] =			L"Event %0 is already implemented";
+		error_map[ERROR_EVENT_ARG_TOO_BIG] = 			L"Event %0 needs an array of size %1 or smaller, but one of size %2 is passed";
 		error_map[ERROR_EVENT_WRONG_ARG_SIZE] =			L"Event %0 needs an array of size %1, but one of size %2 is passed";
 		error_map[ERROR_SUBROUTINE_ALREADY_DEF] =		L"Subroutine %0 is already defined";
 		error_map[ERROR_INDEX_EXPECTING_CONSTANT] =		L"Expecting a constant expression as a second index";
@@ -118,6 +119,7 @@ namespace Aseba
 		error_map[ERROR_TOKEN_END_OF_STREAM] =			L"end of stream";
 		error_map[ERROR_TOKEN_STR_when] =			L"when keyword";
 		error_map[ERROR_TOKEN_STR_emit] =			L"emit keyword";
+		error_map[ERROR_TOKEN_STR_hidden_emit] =	L"_emit keyword";
 		error_map[ERROR_TOKEN_STR_for] =			L"for keyword";
 		error_map[ERROR_TOKEN_STR_in] =				L"in keyword";
 		error_map[ERROR_TOKEN_STR_step] =			L"step keyword";

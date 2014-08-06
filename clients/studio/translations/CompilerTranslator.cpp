@@ -204,6 +204,10 @@ namespace Aseba
 				msg = tr("Event %0 is already implemented");
 				break;
 
+			case ERROR_EVENT_ARG_TOO_BIG:
+				msg = tr("Event %0 needs an array of size %1 or smaller, but one of size %2 is passed");
+				break;
+
 			case ERROR_EVENT_WRONG_ARG_SIZE:
 				msg = tr("Event %0 needs an array of size %1, but one of size %2 is passed");
 				break;
@@ -318,6 +322,10 @@ namespace Aseba
 
 			case ERROR_TOKEN_STR_emit:
 				msg = tr("emit keyword");
+				break;
+
+			case ERROR_TOKEN_STR_hidden_emit:
+				msg = tr("_emit keyword");
 				break;
 
 			case ERROR_TOKEN_STR_for:

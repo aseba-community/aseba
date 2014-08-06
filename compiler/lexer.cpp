@@ -92,6 +92,7 @@ namespace Aseba
 			case TOKEN_END_OF_STREAM: return translate(ERROR_TOKEN_END_OF_STREAM);
 			case TOKEN_STR_when: return translate(ERROR_TOKEN_STR_when);
 			case TOKEN_STR_emit: return translate(ERROR_TOKEN_STR_emit);
+			case TOKEN_STR_hidden_emit: return translate(ERROR_TOKEN_STR_hidden_emit);
 			case TOKEN_STR_for: return translate(ERROR_TOKEN_STR_for);
 			case TOKEN_STR_in: return translate(ERROR_TOKEN_STR_in);
 			case TOKEN_STR_step: return translate(ERROR_TOKEN_STR_step);
@@ -424,6 +425,8 @@ namespace Aseba
 							tokens.push_back(Token(Token::TOKEN_STR_when, pos));
 						else if (s == L"emit")
 							tokens.push_back(Token(Token::TOKEN_STR_emit, pos));
+						else if (s == L"_emit")
+							tokens.push_back(Token(Token::TOKEN_STR_hidden_emit, pos));
 						else if (s == L"for")
 							tokens.push_back(Token(Token::TOKEN_STR_for, pos));
 						else if (s == L"in")
@@ -512,6 +515,8 @@ namespace Aseba
 		if (s == L"when")
 			return true;
 		else if (s == L"emit")
+			return true;
+		else if (s == L"_emit")
 			return true;
 		else if (s == L"for")
 			return true;
