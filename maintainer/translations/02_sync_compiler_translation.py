@@ -64,8 +64,6 @@ output_qt_file = \
 #include "CompilerTranslator.h"
 #include "../../../compiler/errors_code.h"
 
-#include <CompilerTranslator.moc>
-
 namespace Aseba
 {
 	CompilerTranslator::CompilerTranslator()
