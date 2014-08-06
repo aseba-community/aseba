@@ -8,6 +8,8 @@
 #include <QtCore/qmath.h>
 #include <QDebug>
 
+#include <cassert>
+
 #include "ActionBlocks.h"
 #include "Buttons.h"
 
@@ -99,6 +101,14 @@ namespace Aseba { namespace ThymioVPL
 			sliders[i]->setSliderPosition(value/50);
 	}
 	
+	QVector<quint16> MoveActionBlock::getValuesCompressed() const
+	{
+		return QVector<quint16>(1, 
+			((sliders[0]->value()+10) << 8) |
+			 (sliders[1]->value()+10)
+		);
+	}
+	
 	// Color Action
 	ColorActionBlock::ColorActionBlock( QGraphicsItem *parent, bool top) :
 		BlockWithBody("action", top ? "colortop" : "colorbottom", top, parent)
@@ -149,6 +159,18 @@ namespace Aseba { namespace ThymioVPL
 	{ 
 		if (int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value);
+	}
+	
+	QVector<quint16> ColorActionBlock::getValuesCompressed() const
+	{
+		unsigned value(0);
+		for (int i=0; i<sliders.size(); ++i)
+		{
+			value *= 33;
+			value += sliders[i]->value();
+		}
+		assert(value <= 65535);
+		return QVector<quint16>(1, value);
 	}
 	
 	void ColorActionBlock::valueChangeDetected()
@@ -321,6 +343,20 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
+	QVector<quint16> SoundActionBlock::getValuesCompressed() const
+	{
+		unsigned compressedNotes = 0;
+		unsigned compressedDurations = 0;
+		for (unsigned i = 0; i < 6; ++i)
+		{
+			compressedNotes *= 6;
+			compressedNotes += notes[i];
+			compressedDurations *= 2;
+			compressedDurations += durations[i];
+		}
+		return (QVector<quint16>() << compressedNotes << compressedDurations);
+	}
+	
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
 		BlockWithBody("action", "timer", true, parent),
@@ -422,6 +458,11 @@ namespace Aseba { namespace ThymioVPL
 	void TimerActionBlock::setValue(unsigned i, int value) 
 	{ 
 		setDuration(value);
+	}
+	
+	QVector<quint16> TimerActionBlock::getValuesCompressed() const
+	{
+		return QVector<quint16>(1, duration);
 	}
 	
 	void TimerActionBlock::setDuration(unsigned duration)

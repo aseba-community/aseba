@@ -58,6 +58,8 @@ namespace Aseba { namespace ThymioVPL
 	
 		void setErrorStatus(bool flag);
 		
+		QVector<quint16> getContentCompressed() const;
+		
 		QDomElement serialize(QDomDocument& document) const;
 		void deserialize(const QDomElement& element);
 		void deserializeOldFormat_1_3(const QDomElement& element);

@@ -69,7 +69,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget);
+		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget, bool debugLog);
 		~ThymioVPLStandalone();
 	
 	protected:
@@ -99,6 +99,7 @@ namespace Aseba
 		std::auto_ptr<Target> target; //!< pointer to target
 		
 		const bool useAnyTarget; //!< if true, allow to connect to non-Thymoi II targets
+		const bool debugLog; //!< if true, generate debug log events
 		
 		unsigned id; //!< node identifier
 		

@@ -93,7 +93,7 @@ namespace Aseba { namespace ThymioVPL
 			definedEventMap[hash] = errorLine;
 			
 			// dispatch to code generator
-			codeGenerator.visit(eventActionsSet);
+			codeGenerator.visit(eventActionsSet, scene->debugLog());
 		}
 		
 		codeGenerator.addInitialisationCode();

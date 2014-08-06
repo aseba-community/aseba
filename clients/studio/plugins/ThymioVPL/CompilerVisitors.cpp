@@ -1,8 +1,12 @@
+#include <algorithm>
+#include <iostream>
+#include <iterator>
 #include <sstream>
+#include <iostream>
+#include <iomanip>
+#include <cassert>
 #include <QtGlobal>
 #include <QDebug>
-#include <iostream>
-#include <cassert>
 #include "Compiler.h"
 #include "Block.h"
 #include "EventActionsSet.h"
@@ -136,7 +140,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Generate code for an event-actions set
-	void Compiler::CodeGenerator::visit(const EventActionsSet& eventActionsSet)
+	void Compiler::CodeGenerator::visit(const EventActionsSet& eventActionsSet, bool debugLog)
 	{
 		// action and event name
 		const QString& eventName(eventActionsSet.getEventBlock()->getName());
@@ -252,9 +256,30 @@ namespace Aseba { namespace ThymioVPL
 		for (int i=0; i<eventActionsSet.actionBlocksCount(); ++i)
 			visitAction(eventActionsSet.getActionBlock(i), currentBlock);
 		
+		// possibly add the debug event
+		if (debugLog)
+			visitDebugLog(eventActionsSet, currentBlock);
+		
 		// possibly close condition and add code
 		generatedCode[currentBlock].append(inIfBlock ? L"\tend\n" : L"");
 		inIfBlock = false;
+	}
+	
+	//! Generate the debug log event for this set
+	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock)
+	{
+		wstring text(inIfBlock ? L"\t\t" : L"\t");
+		text += L"_emit DebugLog [";
+		
+		wstringstream ostr;
+		ostr << hex << showbase;
+		const QVector<quint16> compressedContent(eventActionsSet.getContentCompressed());
+        copy(compressedContent.begin(), compressedContent.end(), ostream_iterator<quint16, wchar_t>(ostr, L", "));
+		text += ostr.str();
+		text.erase(text.size() - 2);
+		
+		text += L"]\n";
+		generatedCode[currentBlock].append(text);
 	}
 
 	void Compiler::CodeGenerator::visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock)

@@ -22,6 +22,7 @@ namespace Aseba { namespace ThymioVPL
 		void addEventActionsSet(const QDomElement& element);
 		void ensureOneEmptySetAtEnd();
 
+		bool debugLog() const;
 		bool isEmpty() const;
 		void reset();
 		void clear(bool advanced);

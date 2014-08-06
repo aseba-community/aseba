@@ -37,7 +37,8 @@ using namespace std;
 namespace Aseba { namespace ThymioVPL
 {
 	// Visual Programming
-	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton):
+	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton, bool debugLog):
+		debugLog(debugLog),
 		de(_de),
 		scene(new Scene(this)),
 		loading(false),

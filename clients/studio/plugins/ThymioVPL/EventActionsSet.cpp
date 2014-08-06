@@ -281,6 +281,51 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
+	//! Return the content compressed into a uint16 vector, to be used as debug events
+	QVector<quint16> EventActionsSet::getContentCompressed() const
+	{
+		// invalid sets have no content
+		if ((!event) || actions.empty())
+			return QVector<quint16>();
+		
+		// the first word of the content is the number of the set
+		QVector<quint16> content(1, row);
+		// the second word is the is the number of blocks in this set
+		content.push_back(1 + (stateFilter ? 1 : 0) + actions.size());
+		
+		// the next words are the types of the blocks, as uint4, compressed 4-by-4 into uint16s, big-endian
+		quint16 curWord(event->getNameAsUInt4());
+		unsigned bitLeft(12);
+		if (stateFilter)
+		{
+			curWord <<= 4;
+			curWord |= event->getNameAsUInt4();
+			bitLeft -= 4;
+		}
+		foreach (Block* action, actions)
+		{
+			if (bitLeft == 0)
+			{
+				content += curWord;
+				curWord = 0;
+				bitLeft = 16;
+			}
+			else
+				curWord <<= 4;
+			curWord |= action->getNameAsUInt4();
+			bitLeft -= 4;
+		}
+		
+		// then comes the data from the blocks
+		content += event->getValuesCompressed();
+		if (stateFilter)
+			content += stateFilter->getValuesCompressed();
+		foreach (Block* action, actions)
+			content += action->getValuesCompressed();
+		
+		return content;
+	}
+	
 	//! Clear set to its default status
 	void EventActionsSet::resetSet()
 	{

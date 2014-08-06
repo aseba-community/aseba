@@ -53,18 +53,15 @@ namespace Aseba { namespace ThymioVPL
 		
 		Block(const QString& type, const QString& name, QGraphicsItem *parent=0);
 		virtual ~Block();
-		
-		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
-		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
-		virtual QImage image(qreal factor=1);
-		QImage translucidImage(qreal factor=1);
 
 		QString getType() const { return type; }
 		QString getName() const { return name; }
+		unsigned getNameAsUInt4() const;
 		
 		virtual unsigned valuesCount() const = 0;
 		virtual int getValue(unsigned i) const = 0;
 		virtual void setValue(unsigned i, int value) = 0;
+		virtual QVector<quint16> getValuesCompressed() const = 0;
 		virtual bool isAnyValueSet() const;
 		void resetValues();
 		
@@ -77,6 +74,11 @@ namespace Aseba { namespace ThymioVPL
 		static Block* deserialize(const QByteArray& data, bool advanced);
 		static QString deserializeType(const QByteArray& data);
 		static QString deserializeName(const QByteArray& data);
+		
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		QRectF boundingRect() const { return QRectF(0, 0, 256, 256); }
+		virtual QImage image(qreal factor=1);
+		QImage translucidImage(qreal factor=1);
 		
 	protected slots:
 		void clearChangedFlag();
@@ -108,6 +110,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 0; }
 		virtual int getValue(unsigned i) const { return -1; }
 		virtual void setValue(unsigned i, int value) {}
+		virtual QVector<quint16> getValuesCompressed() const { return QVector<quint16>(); }
 	};
 	
 	class BlockWithBody: public Block
@@ -132,6 +135,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		
 	protected:
 		QList<GeometryShapeButton*> buttons;
@@ -147,6 +151,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		virtual bool isAnyValueSet() const;
 		
 		virtual bool isAnyAdvancedFeature() const;

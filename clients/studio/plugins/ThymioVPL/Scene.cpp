@@ -163,15 +163,21 @@ namespace Aseba { namespace ThymioVPL
 		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		connect(eventActionsSet, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 	}
+	
+	//! Return whether we have to generate debug log information
+	bool Scene::debugLog() const
+	{
+		return vpl->debugLog;
+	}
 
 	//! Return whether the scene is as when started
 	bool Scene::isEmpty() const
 	{
-		if( eventActionsSets.isEmpty() )
+		if (eventActionsSets.isEmpty())
 			return true;
 			
-		if( eventActionsSets.size() > 1 ||
-			!eventActionsSets[0]->isEmpty() )
+		if (eventActionsSets.size() > 1 ||
+			!eventActionsSets[0]->isEmpty())
 			return false;
 
 		return true;

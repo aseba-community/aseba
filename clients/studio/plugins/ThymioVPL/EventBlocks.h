@@ -47,6 +47,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 2; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		
 		virtual bool isAnyAdvancedFeature() const;
 		virtual void setAdvanced(bool advanced);

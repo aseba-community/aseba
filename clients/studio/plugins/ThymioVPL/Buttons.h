@@ -39,6 +39,8 @@ namespace Aseba { namespace ThymioVPL
 
 		int getValue() const { return curState; }
 		void setValue(int state) { curState = state; update(); }
+		unsigned valuesCount() const;
+		
 		void setToggleState(bool state) { toggleState = state; update(); }
 
 		void addState(const QColor& brushColor = Qt::white, const QColor& penColor = Qt::black);

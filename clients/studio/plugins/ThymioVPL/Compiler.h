@@ -56,10 +56,12 @@ namespace Aseba { namespace ThymioVPL
 			
 			void reset(bool advanced);
 			void addInitialisationCode();
-			void visit(const EventActionsSet& eventActionsSet);
+			void visit(const EventActionsSet& eventActionsSet, bool debugLog);
 			
 		protected:
 			void initEventToCodePosMap();
+			
+			void visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			
 			void visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock);
 			std::wstring visitEventArrowButtons(const Block* block);

@@ -24,6 +24,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 2; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		
 	private slots:
 		void frameChanged(int frame);
@@ -48,6 +49,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 3; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		
 	private slots:
 		void valueChangeDetected();
@@ -76,6 +78,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 6; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 		
 	protected:
 		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -104,6 +107,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 1; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
 	
 	protected slots:
 		void frameChanged(int frame);

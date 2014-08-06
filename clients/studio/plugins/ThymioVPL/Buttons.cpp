@@ -36,6 +36,12 @@ namespace Aseba { namespace ThymioVPL
 		colors.push_back(qMakePair(initBrushColor, initPenColor));
 	}
 	
+	//! Return the number of states
+	unsigned GeometryShapeButton::valuesCount() const
+	{
+		return colors.size();
+	}
+	
 	void GeometryShapeButton::addState(const QColor& brushColor, const QColor& penColor)
 	{
 		colors.push_back(qMakePair(brushColor, penColor));

@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <cassert>
 #include <cmath>
+#include <stdexcept>
 
 #include "Block.h"
 #include "Buttons.h"
@@ -101,81 +102,38 @@ namespace Aseba { namespace ThymioVPL
 		// doing nothing
 	}
 	
-	void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	//! Return a 4-bit unsigned integer encoding the name
+	unsigned Block::getNameAsUInt4() const
 	{
-		Q_UNUSED(option);
-		Q_UNUSED(widget);
-		
-		painter->setPen(Qt::NoPen);
-		painter->setBrush(Style::blockCurrentColor(type));
-		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
-	}
-	
-	QImage Block::image(qreal factor)
-	{
-		const QRectF br(boundingRect());
-		QImage img(br.width()*factor, br.height()*factor, QImage::Format_ARGB32);
-		img.fill(Qt::transparent);
-		QPainter painter(&img);
-		painter.setRenderHint(QPainter::Antialiasing);
-		painter.scale(factor, factor);
-		painter.translate(-br.topLeft());
-		render(painter);
-		painter.end();
-		
-		return img;
-	}
-	
-	QImage Block::translucidImage(qreal factor)
-	{
-		QImage img(image(factor));
-		
-		// Set transparent block FIXME: test ugly
-		#ifdef Q_WS_X11
-		if (!QX11Info::isCompositingManagerRunning())
-		{
-			// Note: disabled for now as this is slow
-			/*for (int y = 0; y < img.height(); ++y) {
-				QRgb *row = (QRgb*)img.scanLine(y);
-				for (int x = 0; x < img.width(); ++x) {
-					((unsigned char*)&row[x])[3] = (x+y) % 2 == 0 ? 255 : 0;
-				}
-			}*/
-		}
+		// 0 is reserved
+		if ( name == "button" )
+			return 1;
+		else if ( name == "prox" )
+			return 2;
+		else if ( name == "proxground" )
+			return 3;
+		else if ( name == "acc" )
+			return 4;
+		else if ( name == "clap" )
+			return 5;
+		else if ( name == "timeout" )
+			return 6;
+		else if ( name == "statefilter" )
+			return 7;
+		else if ( name == "move" )
+			return 9;
+		else if ( name == "colortop" )
+			return 10;
+		else if ( name == "colorbottom" )
+			return 11;
+		else if ( name == "sound" )
+			return 12;
+		else if ( name == "timer" )
+			return 13;
+		else if ( name == "setstate" )
+			return 14;
 		else
-			#endif // Q_WS_X11
-		{
-			for (int y = 0; y < img.height(); ++y) {
-				QRgb *row = (QRgb*)img.scanLine(y);
-				for (int x = 0; x < img.width(); ++x) {
-					((unsigned char*)&row[x])[3] = 128;
-				}
-			}
-		}
-		
-		return img;
-	}
-	
-	//! Manual rendering of this block and its children, do not use a scene
-	void Block::render(QPainter& painter)
-	{
-		QStyleOptionGraphicsItem opt;
-		opt.exposedRect = boundingRect();
-		paint(&painter, &opt, 0);
-		QGraphicsItem *child;
-		foreach(child, childItems())
-		{
-			if (!child->isVisible())
-				continue;
-			painter.save();
-			painter.translate(child->pos());
-			painter.translate(child->transformOriginPoint());
-			painter.rotate(child->rotation());
-			painter.translate(-child->transformOriginPoint());
-			painter.scale(child->scale(), child->scale());
-			child->paint(&painter, &opt, 0);
-			painter.restore();
-		}
+			throw std::runtime_error("unknown name");
 	}
 	
 	bool Block::isAnyValueSet() const
@@ -256,6 +214,83 @@ namespace Aseba { namespace ThymioVPL
 		document.setContent(data);
 		const QDomElement element(document.documentElement());
 		return element.attribute("name");
+	}
+	
+		void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+		
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Style::blockCurrentColor(type));
+		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
+	}
+	
+	QImage Block::image(qreal factor)
+	{
+		const QRectF br(boundingRect());
+		QImage img(br.width()*factor, br.height()*factor, QImage::Format_ARGB32);
+		img.fill(Qt::transparent);
+		QPainter painter(&img);
+		painter.setRenderHint(QPainter::Antialiasing);
+		painter.scale(factor, factor);
+		painter.translate(-br.topLeft());
+		render(painter);
+		painter.end();
+		
+		return img;
+	}
+	
+	QImage Block::translucidImage(qreal factor)
+	{
+		QImage img(image(factor));
+		
+		// Set transparent block FIXME: test ugly
+		#ifdef Q_WS_X11
+		if (!QX11Info::isCompositingManagerRunning())
+		{
+			// Note: disabled for now as this is slow
+			/*for (int y = 0; y < img.height(); ++y) {
+				QRgb *row = (QRgb*)img.scanLine(y);
+				for (int x = 0; x < img.width(); ++x) {
+					((unsigned char*)&row[x])[3] = (x+y) % 2 == 0 ? 255 : 0;
+				}
+			}*/
+		}
+		else
+			#endif // Q_WS_X11
+		{
+			for (int y = 0; y < img.height(); ++y) {
+				QRgb *row = (QRgb*)img.scanLine(y);
+				for (int x = 0; x < img.width(); ++x) {
+					((unsigned char*)&row[x])[3] = 128;
+				}
+			}
+		}
+		
+		return img;
+	}
+	
+	//! Manual rendering of this block and its children, do not use a scene
+	void Block::render(QPainter& painter)
+	{
+		QStyleOptionGraphicsItem opt;
+		opt.exposedRect = boundingRect();
+		paint(&painter, &opt, 0);
+		QGraphicsItem *child;
+		foreach(child, childItems())
+		{
+			if (!child->isVisible())
+				continue;
+			painter.save();
+			painter.translate(child->pos());
+			painter.translate(child->transformOriginPoint());
+			painter.rotate(child->rotation());
+			painter.translate(-child->transformOriginPoint());
+			painter.scale(child->scale(), child->scale());
+			child->paint(&painter, &opt, 0);
+			painter.restore();
+		}
 	}
 	
 	void Block::clearChangedFlag()
@@ -355,6 +390,18 @@ namespace Aseba { namespace ThymioVPL
 		if (i < (unsigned)buttons.size())
 			buttons.at(i)->setValue(value);
 		emit contentChanged();
+	}
+	
+	QVector<quint16> BlockWithButtons::getValuesCompressed() const
+	{
+		unsigned value(0);
+		for (int i=0; i<buttons.size(); ++i)
+		{
+			value *= buttons[i]->valuesCount();
+			value += buttons[i]->getValue();
+		}
+		assert(value <= 65535);
+		return QVector<quint16>(1, value);
 	}
 	
 	
@@ -507,6 +554,14 @@ namespace Aseba { namespace ThymioVPL
 				high = value;
 			emit contentChanged();
 		}
+	}
+	
+	QVector<quint16> BlockWithButtonsAndRange::getValuesCompressed() const
+	{
+		QVector<quint16> values(BlockWithButtons::getValuesCompressed());
+		values.append(low);
+		values.append(high);
+		return values;
 	}
 	
 	bool BlockWithButtonsAndRange::isAnyValueSet() const

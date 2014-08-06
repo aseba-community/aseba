@@ -52,6 +52,7 @@ void usage(const char *execName)
 	cout << "OPTION is one of:" << endl;
 	cout << " -h          this help" << endl;
 	cout << " -anytarget  allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
+	cout << " -debuglog   emit debug log events" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
 }
 
@@ -77,6 +78,7 @@ int main(int argc, char *argv[])
 	signal(SIGINT, SIG_DFL);
 	
 	bool useAnyTarget(false);
+	bool debugLog(false);
 	QString commandLineTarget;
 	for (int i = 1; i < argc; ++i)
 	{
@@ -96,6 +98,10 @@ int main(int argc, char *argv[])
 			else if (cmd == "anytarget")
 			{
 				useAnyTarget = true;
+			}
+			else if (cmd == "debuglog")
+			{
+				debugLog = true;
 			}
 		}
 	}
@@ -122,7 +128,7 @@ int main(int argc, char *argv[])
 		translators.push_back(&translator);
 		translators.push_back(&compilerTranslator);
 		
-		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget);
+		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget, debugLog);
 		vpl.show();
 		app.setOverrideCursor(Qt::ArrowCursor);
 		return app.exec();
