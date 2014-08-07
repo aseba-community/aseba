@@ -70,12 +70,12 @@
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="325"/>
         <source>Name is a keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Il Nome scelto è una parola chiave</translation>
     </message>
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="325"/>
         <source>Name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il Nome &lt;tt&gt;%0&lt;/tt&gt; non può essere usato come costante, perchè è una parola chiave del linguaggio.</translation>
     </message>
 </context>
 <context>
@@ -649,7 +649,7 @@ Occurrences</source>
         <location filename="MainWindow.cpp" line="2576"/>
         <location filename="MainWindow.cpp" line="2997"/>
         <source>Add a new constant</source>
-        <translation>Aggiungere unanuova costante</translation>
+        <translation>Aggiungere una nuova costante</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="2576"/>
@@ -1364,7 +1364,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/StopThymioPlugin.cpp" line="34"/>
         <source>Stop Thymio</source>
-        <translation>smettere Thymio</translation>
+        <translation>Fermare Thymio</translation>
     </message>
 </context>
 <context>
@@ -1483,12 +1483,12 @@ event %0 : </source>
         <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="467"/>
         <source>Error in XML source file at %0:%1: cannot create block %2</source>
         <oldsource>Error in XML source file at %0:%1 cannot create block %2</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Errore nel file sorgente XML alla linea %0:%1: non si può creare il blocco %2</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="487"/>
         <source>Error in XML source file at %0:%1: unknown block type %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore nel file sorgente XML alla linea %0:%1: tipo di blocco sconosciuto %2 </translation>
     </message>
 </context>
 <context>
@@ -1608,7 +1608,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="208"/>
         <source>show line</source>
-        <translation>monstrare linea</translation>
+        <translation>mostrare linea</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="253"/>
@@ -1628,7 +1628,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="468"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation>Siete utilizzando gli stati. Il ritorno al modo semplice annullerà qualsiasi filtro di stati o carta di impostazione di stati. &lt;p&gt; Siete sicuro di voler continuare?</translation>
+        <translation>State utilizzando il modo avanzato (gestione stati). Il ritorno al modo semplice annullerà qualsiasi filtro di stati o blocco di impostazione degli stati. &lt;p&gt; Siete sicuri di voler continuare?</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="506"/>
@@ -1646,7 +1646,7 @@ event %0 : </source>
     </message>
     <message>
         <source>Error in XML source file: %0 unknown event type</source>
-        <translation type="obsolete">Errore nel file sorgente XML %0 tipo di evento sconosciuto</translation>
+        <translation type="obsolete">Errore nel file sorgente XML: %0 tipo di evento sconosciuto</translation>
     </message>
 </context>
 <context>
@@ -1861,7 +1861,7 @@ event %0 : </source>
     </message>
     <message>
         <source>step called while not thread running</source>
-        <translation type="obsolete">chaiamta di uno step quando nessun thread è in escuzione</translation>
+        <translation type="obsolete">chiamata di uno step quando nessun thread è in escuzione</translation>
     </message>
     <message>
         <source>a breakpoint has been set out of bytecode bounds</source>
@@ -1897,12 +1897,12 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="51"/>
         <source>The event in line %0 is the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;evento nella linea %0 è lo stesso della linea %1</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="53"/>
         <source>The event and the state condition in line %0 are the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;evento e la condizione di stato alla linea %0 sono gli stessi della linea %1</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="57"/>

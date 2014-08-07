@@ -31,12 +31,12 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="40"/>
         <source>Target does not provide function %0</source>
-        <translation>Il destinatario non fornisce la funzione %0</translation>
+        <translation>Il Targe non fornisce la funzione %0</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="44"/>
         <source>Target does not provide function %0, do you mean %1?</source>
-        <translation>Il destinatario non fornisce la funzione %0, vuoi dire %1?</translation>
+        <translation>Il Target non fornisce la funzione %0, vuoi dire %1?</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="48"/>
@@ -181,7 +181,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="160"/>
         <source>Constant %0 is already defined</source>
-        <translation type="unfinished"></translation>
+        <translation>La costante %0 è già definita</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="164"/>
@@ -442,7 +442,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="368"/>
         <source>const keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Parole chiave &quot;const&quot;</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="372"/>

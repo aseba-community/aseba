@@ -5,7 +5,7 @@
     <name>Aseba::ThymioFlasherDialog</name>
     <message>
         <source>Thymio Firmware Updater</source>
-        <translation type="obsolete">Aggirnamento del Firmware di Thymio</translation>
+        <translation type="obsolete">Aggiornamento del Firmware di Thymio</translation>
     </message>
     <message>
         <source>Firmware file</source>
@@ -68,7 +68,7 @@
     <name>Aseba::ThymioUpdaterDialog</name>
     <message>
         <source>Thymio Firmware Updater</source>
-        <translation type="obsolete">Aggirnamento del Firmware di Thymio</translation>
+        <translation type="obsolete">Aggiornamento del Firmware di Thymio</translation>
     </message>
     <message>
         <source>Firmware file</source>
@@ -133,7 +133,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="60"/>
         <source>Thymio Firmware Upgrader</source>
-        <translation>Aggirnamento del Firmware di Thymio</translation>
+        <translation>Aggiornamento del Firmware di Thymio</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="73"/>
@@ -178,12 +178,12 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="157"/>
         <source>Cannot connect to Thymio II</source>
-        <translation>Impossibile di connettersi al Thymio II</translation>
+        <translation>Impossibile connettersi al Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="157"/>
         <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.&lt;/p&gt;</source>
-        <translation>Impossibile di connettersi al Thymio II:%1.&lt;p&gt;Un altro programma è probabilmente attualmente connesso al Thymio II. Assicurarsi che non ce Asebastudio o un altra applicazione di aggiornamento in esecuzione. &lt;/p&gt;</translation>
+        <translation>Impossibile di connettersi al Thymio II:%1.&lt;p&gt;Un altro programma è probabilmente attualmente connesso al Thymio II. Assicurarsi che non vi sia Asebastudio o un'altra applicazione di aggiornamento in esecuzione. &lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="169"/>
