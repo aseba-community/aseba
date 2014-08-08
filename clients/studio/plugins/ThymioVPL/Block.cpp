@@ -277,8 +277,16 @@ namespace Aseba { namespace ThymioVPL
 		QStyleOptionGraphicsItem opt;
 		opt.exposedRect = boundingRect();
 		paint(&painter, &opt, 0);
+		renderChildItems(painter, this, opt);
+	}
+	
+	//! Manual rendering of this block and its children, do not use a scene, for child items
+	void Block::renderChildItems(QPainter& painter, QGraphicsItem* item, QStyleOptionGraphicsItem& opt)
+	{
+		if (!item)
+			return;
 		QGraphicsItem *child;
-		foreach(child, childItems())
+		foreach(child, item->childItems())
 		{
 			if (!child->isVisible())
 				continue;
@@ -288,6 +296,7 @@ namespace Aseba { namespace ThymioVPL
 			painter.rotate(child->rotation());
 			painter.translate(-child->transformOriginPoint());
 			painter.scale(child->scale(), child->scale());
+			renderChildItems(painter, child, opt);
 			child->paint(&painter, &opt, 0);
 			painter.restore();
 		}
@@ -605,6 +614,37 @@ namespace Aseba { namespace ThymioVPL
 	float BlockWithButtonsAndRange::valToPixel(float val) const
 	{
 		return rangeRect().width()*(sqrt((val-lowerBound)/float(range)));
+	}
+	
+	//! Create a point with a gradient representing a LED on the robot
+	QGraphicsItem* BlockWithButtonsAndRange::createIndicationLED(int x, int y)
+	{
+		QGraphicsEllipseItem* ledIndication = new QGraphicsEllipseItem(x-12,y-12,24,24,this);
+		QRadialGradient grad(x,y,12);
+		grad.setColorAt(0, Qt::red);
+		grad.setColorAt(1, Qt::transparent);
+		ledIndication->setBrush(grad);
+		ledIndication->setPen(Qt::NoPen);
+		return ledIndication;
+	}
+	
+	//! For every button, update the indication LED accordingly
+	void BlockWithButtonsAndRange::updateIndicationLEDsOpacity(void)
+	{
+		// we need to have one LED per button for this function to work
+		if (indicationLEDs.size() != buttons.size())
+			return;
+		
+		for (int i=0; i<indicationLEDs.size(); ++i)
+		{
+			switch (buttons[i]->getValue())
+			{
+				case 0: indicationLEDs[i]->setOpacity(0); break;
+				case 1: indicationLEDs[i]->setOpacity(1); break;
+				case 2: indicationLEDs[i]->setOpacity(0.4); break;
+				default: assert(false);
+			}
+		}
 	}
 	
 	// State Filter Action

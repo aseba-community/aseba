@@ -97,6 +97,7 @@ namespace Aseba { namespace ThymioVPL
 
 	protected:
 		void render(QPainter& painter);
+		void renderChildItems(QPainter& painter, QGraphicsItem* item, QStyleOptionGraphicsItem& opt);
 		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
 		
 		bool changed;
@@ -143,6 +144,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	class BlockWithButtonsAndRange: public BlockWithButtons
 	{
+		Q_OBJECT
+		
 	public:
 		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent);
 		
@@ -175,11 +178,18 @@ namespace Aseba { namespace ThymioVPL
 		float pixelToVal(float pixel) const;
 		float valToPixel(float val) const;
 		
+		QGraphicsItem* createIndicationLED(int x, int y);
+		
+	protected slots:
+		void updateIndicationLEDsOpacity(void);
+		
 	protected:
-		int low; // low activation threshold (at right)
-		int high; // high activation threshold (at left)
-		bool lastPressedIn; // whether last mouse press event was in
-		bool showRangeControl; // whether we are in advanced mode
+		int low; //< low activation threshold (at right)
+		int high; //< high activation threshold (at left)
+		bool lastPressedIn; //< whether last mouse press event was in
+		bool showRangeControl; //< whether we are in advanced mode
+		
+		QList<QGraphicsItem*> indicationLEDs; //< indication LEDs on the robot's body
 	};
 	
 	class StateFilterBlock: public BlockWithButtons
