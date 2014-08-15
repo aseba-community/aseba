@@ -391,7 +391,7 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -leftAngle*16*360/(2*M_PI));
 		}
 		
-		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine, Qt::RoundCap));
+		painter->setPen(QPen(Qt::white, 10, Qt::SolidLine, Qt::RoundCap));
 		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
 	}
 	
