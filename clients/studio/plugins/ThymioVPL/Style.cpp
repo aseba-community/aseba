@@ -71,7 +71,8 @@ namespace Aseba { namespace ThymioVPL {
 		
 		PrivateStyle():
 			eventColors(ColorList()
-				<< QColor(0,191,255)
+				//<< QColor(0,191,255)
+				<<  QColor(246,135,31)
 				<< QColor(155,48,255)
 				<< QColor(67,205,128)
 				<< QColor(255,215,0)
@@ -79,7 +80,7 @@ namespace Aseba { namespace ThymioVPL {
 				<< QColor(125,158,192)
 			),
 			stateColors(ColorList()
-				<< QColor(122, 204, 0)
+				<< QColor(0, 218, 3)
 				<< QColor(122, 204, 0)
 				<< QColor(122, 204, 0)
 				<< QColor(122, 204, 0)
@@ -87,7 +88,8 @@ namespace Aseba { namespace ThymioVPL {
 				<< QColor(122, 204, 0)
 			),
 			actionColors(ColorList()
-				<< QColor(218,112,214)
+				//<< QColor(218,112,214)
+				<< QColor(0,150,219)
 				<< QColor(159,182,205)
 				<< QColor(0,197,205)
 				<< QColor(255,99,71)

@@ -121,10 +121,11 @@ namespace Aseba { namespace ThymioVPL
 		toolLayout->addWidget(advancedButton,0,7,2,2);
 		//toolLayout->addSeparator();
 	
-		colorComboButton = new QComboBox();
+		/*colorComboButton = new QComboBox();
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
 		toolLayout->addWidget(colorComboButton,1,9,1,2);
+		*/
 		//toolLayout->addSeparator();
 
 		helpButton = new QPushButton();
@@ -163,7 +164,7 @@ namespace Aseba { namespace ThymioVPL
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 		
-		connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
+		//connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
@@ -557,7 +558,8 @@ namespace Aseba { namespace ThymioVPL
 		document.appendChild(vplroot);
 
 		QDomElement settings = document.createElement("settings");
-		settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
+		//settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
+		settings.setAttribute("color-scheme", 0);
 		vplroot.appendChild(settings);
 		
 		vplroot.appendChild(scene->serialize(document));
@@ -582,7 +584,7 @@ namespace Aseba { namespace ThymioVPL
 		const QDomElement settingsElement(document.documentElement().firstChildElement("settings"));
 		if (!settingsElement.isNull())
 		{
-			colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
+			//colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
 		}
 		
 		// then load program
@@ -876,7 +878,7 @@ namespace Aseba { namespace ThymioVPL
 		runButton->setIconSize(importantIconSize);
 		stopButton->setIconSize(importantIconSize);
 		advancedButton->setIconSize(importantIconSize);
-		colorComboButton->setIconSize(QSize((desiredIconSize*3)/2,desiredIconSize));
+		//colorComboButton->setIconSize(QSize((desiredIconSize*3)/2,desiredIconSize));
 		helpButton->setIconSize(tbIconSize);
 		if (quitButton)
 			quitButton->setIconSize(tbIconSize);
