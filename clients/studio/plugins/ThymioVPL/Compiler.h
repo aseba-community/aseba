@@ -1,5 +1,5 @@
-#ifndef THYMIO_INTERMEDIATE_REPRESENTATION_H
-#define THYMIO_INTERMEDIATE_REPRESENTATION_H
+#ifndef VPL_COMPILER_H
+#define VPL_COMPILER_H
 
 #include <vector>
 #include <string>

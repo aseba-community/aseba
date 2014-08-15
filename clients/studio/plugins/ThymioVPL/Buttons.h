@@ -1,5 +1,5 @@
-#ifndef THYMIO_BUTTONS_H
-#define THYMIO_BUTTONS_H
+#ifndef VPL_BUTTONS_H
+#define VPL_BUTTONS_H
 
 #include <QGraphicsItem>
 #include <QPushButton>
@@ -116,4 +116,4 @@ namespace Aseba { namespace ThymioVPL
 	/*@}*/
 } } // namespace ThymioVPL / namespace Aseba
 
-#endif
+#endif // VPL_BUTTONS_H

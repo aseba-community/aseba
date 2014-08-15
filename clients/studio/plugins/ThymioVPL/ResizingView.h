@@ -1,5 +1,5 @@
-#ifndef THYMIO_RESIZING_VIEW_H
-#define THYMIO_RESIZING_VIEW_H
+#ifndef VPL_RESIZING_VIEW_H
+#define VPL_RESIZING_VIEW_H
 
 #include <QGraphicsView>
 
@@ -36,5 +36,5 @@ namespace Aseba { namespace ThymioVPL
 	/*@}*/
 } } // namespace ThymioVPL / namespace Aseba
 
-#endif // THYMIO_RESIZING_VIEW_H
+#endif // VPL_RESIZING_VIEW_H
 
