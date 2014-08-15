@@ -52,6 +52,7 @@ namespace Aseba
 		void openFile();
 		bool newFile();
 		void clearOpenedFileName(bool isModified);
+		QString openedFileName() const;
 		
 	private:
 		ThymioVPLStandalone* vplStandalone;

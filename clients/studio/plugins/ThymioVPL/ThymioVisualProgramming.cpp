@@ -15,6 +15,9 @@
 #include <QDesktopServices>
 #include <QSettings>
 #include <QImageReader>
+#include <QFileInfo>
+#include <QDir>
+#include <QSvgGenerator>
 #include <QtDebug>
 
 #include "ThymioVisualProgramming.h"
@@ -120,7 +123,7 @@ namespace Aseba { namespace ThymioVPL
 		advancedButton->setFlat(true);
 		toolLayout->addWidget(advancedButton,0,7,2,2);
 		//toolLayout->addSeparator();
-	
+		
 		/*colorComboButton = new QComboBox();
 		colorComboButton->setToolTip(tr("Color scheme"));
 		setColors(colorComboButton);
@@ -133,6 +136,12 @@ namespace Aseba { namespace ThymioVPL
 		helpButton->setToolTip(tr("Help"));
 		helpButton->setFlat(true);
 		toolLayout->addWidget(helpButton,0,9);
+		
+		snapshotButton = new QPushButton();
+		snapshotButton->setIcon(QIcon(":/images/ksnapshot.svgz"));
+		snapshotButton->setToolTip(tr("Snapshot"));
+		snapshotButton->setFlat(true);
+		toolLayout->addWidget(snapshotButton,1,9);
 
 		if (showCloseButton)
 		{
@@ -163,6 +172,7 @@ namespace Aseba { namespace ThymioVPL
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
+		connect(snapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshot()));
 		
 		//connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		
@@ -285,6 +295,34 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::openHelp() const
 	{
 		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
+	}
+	
+	void ThymioVisualProgramming::saveSnapshot() const
+	{
+		QString initialFile;
+		if (!de->openedFileName().isEmpty())
+		{
+			const QFileInfo pf(de->openedFileName());
+			initialFile = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
+		}
+		QString fileName(QFileDialog::getSaveFileName(0,
+			tr("Export program as SVG"), initialFile, "Scalable Vector Graphics (*.svg)"));
+		
+		if (fileName.isEmpty())
+			return;
+		
+		if (fileName.lastIndexOf(".") < 0)
+			fileName += ".svg";
+		
+		QSvgGenerator generator;
+		generator.setFileName(fileName);
+		generator.setSize(scene->sceneRect().size().toSize());
+		generator.setViewBox(scene->sceneRect());
+		generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
+		generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
+		
+		QPainter painter(&generator);
+		scene->render(&painter);
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *comboBox)
@@ -880,6 +918,7 @@ namespace Aseba { namespace ThymioVPL
 		advancedButton->setIconSize(importantIconSize);
 		//colorComboButton->setIconSize(QSize((desiredIconSize*3)/2,desiredIconSize));
 		helpButton->setIconSize(tbIconSize);
+		snapshotButton->setIconSize(tbIconSize);
 		if (quitButton)
 			quitButton->setIconSize(tbIconSize);
 		if (quitSpotSpacer)

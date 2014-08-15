@@ -114,6 +114,11 @@ namespace Aseba
 		// do nothing
 	}
 	
+	QString ThymioVPLStandaloneInterface::openedFileName() const
+	{
+		return vplStandalone->fileName;
+	}
+	
 	
 	//////
 	

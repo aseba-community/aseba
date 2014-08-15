@@ -72,6 +72,8 @@ namespace Aseba
 		virtual bool newFile() = 0;
 		//! Request the DE to clear the name of the opened file, without any check for change
 		virtual void clearOpenedFileName(bool isModified) = 0;
+		//! Request the name of the opened file, if any
+		virtual QString openedFileName() const = 0;
 	};
 	
 	//! A tool that is specific to a node

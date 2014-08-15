@@ -67,6 +67,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	private slots:
 		void openHelp() const;
+		void saveSnapshot() const;
 		void showVPLModal();
 		
 		void addEvent();
@@ -131,6 +132,7 @@ namespace Aseba { namespace ThymioVPL
 		QPushButton *stopButton;
 		QPushButton *advancedButton;
 		QPushButton *helpButton;
+		QPushButton *snapshotButton;
 		QComboBox *colorComboButton;
 		QPushButton *quitButton;
 		QSpacerItem *quitSpotSpacer;

@@ -88,6 +88,16 @@ namespace Aseba
 		nodeTab->target->stop(nodeTab->id);
 	}
 	
+	TargetVariablesModel * StudioInterface::getVariablesModel()
+	{
+		return nodeTab->vmMemoryModel;
+	}
+	
+	void StudioInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	{
+		nodeTab->setVariableValues(addr, data);
+	}
+	
 	bool StudioInterface::saveFile(bool as)
 	{
 		if (as)
@@ -111,14 +121,9 @@ namespace Aseba
 		mainWindow->clearOpenedFileName(isModified);
 	}
 	
-	TargetVariablesModel * StudioInterface::getVariablesModel()
+	QString StudioInterface::openedFileName() const
 	{
-		return nodeTab->vmMemoryModel;
-	}
-	
-	void StudioInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
-	{
-		nodeTab->setVariableValues(addr, data);
+		return mainWindow->actualFileName;
 	}
 	
 	//////

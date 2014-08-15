@@ -110,6 +110,7 @@ namespace Aseba
 		void openFile();
 		bool newFile();
 		void clearOpenedFileName(bool isModified);
+		QString openedFileName() const;
 	};
 	
 	class CompilationLogDialog: public QDialog
