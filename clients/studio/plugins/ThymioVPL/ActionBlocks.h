@@ -68,7 +68,7 @@ namespace Aseba { namespace ThymioVPL
 		BottomColorActionBlock(QGraphicsItem *parent=0);
 	};
 	
-	class SoundActionBlock : public BlockWithBody
+	class SoundActionBlock : public Block
 	{
 	public:
 		SoundActionBlock(QGraphicsItem *parent=0);
@@ -95,7 +95,7 @@ namespace Aseba { namespace ThymioVPL
 		unsigned durations[6];
 	};
 	
-	class TimerActionBlock: public BlockWithBody
+	class TimerActionBlock: public Block
 	{
 		Q_OBJECT
 		

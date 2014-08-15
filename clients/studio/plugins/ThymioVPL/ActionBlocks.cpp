@@ -196,7 +196,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Sound Action
 	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
-		BlockWithBody("action", "sound", true, parent),
+		Block("action", "sound", parent),
 		dragging(false)
 	{
 		notes[0] = 3; durations[0] = 1;
@@ -211,7 +211,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void SoundActionBlock::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
-		BlockWithBody::paint(painter, option, widget);
+		Block::paint(painter, option, widget);
 		
 		painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		for (unsigned row = 0; row < 5; ++row)
@@ -359,7 +359,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
-		BlockWithBody("action", "timer", true, parent),
+		Block("action", "timer", parent),
 		dragging(false),
 		duration(1.0)
 	{
@@ -377,7 +377,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 		
-		BlockWithBody::paint(painter, option, widget);
+		Block::paint(painter, option, widget);
 		
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
 		painter->setBrush(Qt::darkBlue);
@@ -411,7 +411,7 @@ namespace Aseba { namespace ThymioVPL
 			dragging = true;
 		}
 		else
-			BlockWithBody::mousePressEvent(event);
+			Block::mousePressEvent(event);
 	}
 	
 	void TimerActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
@@ -424,7 +424,7 @@ namespace Aseba { namespace ThymioVPL
 				setDuration(duration);
 		}
 		else
-			BlockWithBody::mouseMoveEvent(event);
+			Block::mouseMoveEvent(event);
 	}
 	
 	void TimerActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
@@ -435,7 +435,7 @@ namespace Aseba { namespace ThymioVPL
 			emitUndoCheckpointAndClearIfChanged();
 		}
 		else
-			BlockWithBody::mouseReleaseEvent(event);
+			Block::mouseReleaseEvent(event);
 	}
 	
 	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
