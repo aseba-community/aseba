@@ -46,7 +46,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::red, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
 	{
 		// indication LEDs for front sensors
 		indicationLEDs.push_back(createIndicationLED(15,78));

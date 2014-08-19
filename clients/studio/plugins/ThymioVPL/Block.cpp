@@ -450,18 +450,19 @@ namespace Aseba { namespace ThymioVPL
 			painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
 			
 			// rectangle
-			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
 			painter->drawRect(x,y,w,h);
 			painter->drawLine(x,y+48,x+w,y+48);
 			
 			// cursors
+			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
 			QPolygon highCursor;
-			highCursor << QPoint(x+highPos, y) << QPoint(x+highPos-46, y) << QPoint(x+highPos, y+46);
+			highCursor << QPoint(x+highPos, y) << QPoint(x+highPos-46, y) << QPoint(x+highPos-46, y+23) << QPoint(x+highPos, y+46);
 			painter->drawConvexPolygon(highCursor);
 			QPolygon lowCursor;
-			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+46, y+96) << QPoint(x+lowPos, y+96);
+			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+46, y+50+23) << QPoint(x+lowPos+46, y+96) << QPoint(x+lowPos, y+96);
 			painter->drawConvexPolygon(lowCursor);
 		}
 	}

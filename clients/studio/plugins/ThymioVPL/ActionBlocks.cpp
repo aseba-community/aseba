@@ -35,7 +35,7 @@ namespace Aseba { namespace ThymioVPL
 					"border: 4px solid black; height: 40px; margin: 0px; }"
 			);
 			s->setSliderPosition(0);
-
+			
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setAcceptDrops(false);
 			w->setWidget(s);
@@ -122,7 +122,7 @@ namespace Aseba { namespace ThymioVPL
 			s->setStyleSheet(QString(
 				"QSlider { border: 0px; padding: 0px; }"
 				"QSlider::groove:horizontal { "
-					"border: 4px solid black;"
+					"border: 4px solid #808080;"
 					"background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #000000, stop:1 #%0); "
 				"}"
 				"QSlider::handle:horizontal { "
@@ -184,6 +184,15 @@ namespace Aseba { namespace ThymioVPL
 							sliders[1]->value()*5.46875+80, 
 							sliders[2]->value()*5.46875+80);
 		BlockWithBody::paint(painter, option, widget);
+		if (!up)
+		{
+			painter->setBrush(Qt::white);
+			const QRect myRect(128-15, 25, 30, 30);
+			QRadialGradient gradient(128, 40, 15);
+			gradient.setColorAt(0, Qt::white);
+			gradient.setColorAt(1, Qt::transparent);
+			painter->fillRect(myRect, gradient);
+		}
 	}
 	
 	TopColorActionBlock::TopColorActionBlock(QGraphicsItem *parent):
@@ -379,6 +388,9 @@ namespace Aseba { namespace ThymioVPL
 		
 		Block::paint(painter, option, widget);
 		
+		painter->setBrush(Qt::white);
+		painter->drawEllipse(128-72, 136-72, 72*2, 72*2);
+		
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
 		painter->setBrush(Qt::darkBlue);
 		painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -angle*16*360/(2*M_PI));
@@ -391,7 +403,7 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -leftAngle*16*360/(2*M_PI));
 		}
 		
-		painter->setPen(QPen(Qt::white, 10, Qt::SolidLine, Qt::RoundCap));
+		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine, Qt::RoundCap));
 		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
 	}
 	
