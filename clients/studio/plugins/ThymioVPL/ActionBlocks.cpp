@@ -122,12 +122,12 @@ namespace Aseba { namespace ThymioVPL
 			s->setStyleSheet(QString(
 				"QSlider { border: 0px; padding: 0px; }"
 				"QSlider::groove:horizontal { "
-					"border: 4px solid #808080;"
+					"border: transparent;"
 					"background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #000000, stop:1 #%0); "
 				"}"
 				"QSlider::handle:horizontal { "
 					"background: white; "
-					"border: 4px solid black; width: 40px; margin: -4px;"
+					"border: 4px solid black; width: 40px; margin: 0px;"
 				"}"
 				";").arg(sliderColors[i]));
 			s->setSliderPosition(0);
