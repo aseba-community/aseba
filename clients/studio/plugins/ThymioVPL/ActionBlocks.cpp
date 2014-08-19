@@ -226,7 +226,8 @@ namespace Aseba { namespace ThymioVPL
 		for (unsigned row = 0; row < 5; ++row)
 		{
 			
-			painter->fillRect(17, 60 + row*37, 222, 37, QColor::fromHsv((5-row)*51, 100, 255));
+			//painter->fillRect(17, 60 + row*37, 222, 37, QColor::fromHsv((5-row)*51, 100, 255));
+			painter->fillRect(17, 60 + row*37 + 2, 222, 33, Qt::lightGray);
 			for (unsigned col = 0; col < 6; ++col)
 			{
 				if (notes[col] == 4-row)
