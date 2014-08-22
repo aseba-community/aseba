@@ -167,22 +167,19 @@ namespace Aseba { namespace ThymioVPL
 		if (tapSimpleSvg->isVisible())
 			return;
 		
-		// prepare line
-		painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-		
-		// draw tab-style line
-		/*painter->drawLine(20, 190, 32+(40+36)*mode, 190);
-		painter->drawLine(32+(40+36)*mode+40, 190, 256-20, 190);
-		painter->drawLine(32+(40+36)*mode, 190, 32+(40+36)*mode, 200);
-		painter->drawLine(32+(40+36)*mode+40, 190, 32+(40+36)*mode+40, 200);*/
-		
 		// draw buttons
 		for (unsigned i=0; i<3; ++i)
 		{
 			if (mode == i)
-				painter->setBrush(QColor(255,128,0));
+			{
+				painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(QColor(255,255,0));
+			}
 			else
-				painter->setBrush(Qt::white);
+			{
+				painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Qt::lightGray);
+			}
 			painter->drawEllipse(buttonPoses[i]);
 		}
 	}
