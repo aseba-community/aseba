@@ -295,26 +295,24 @@ namespace Aseba { namespace ThymioVPL
 		
 		// the next words are the types of the blocks, as uint4, compressed 4-by-4 into uint16s, big-endian
 		quint16 curWord(event->getNameAsUInt4());
-		unsigned bitLeft(12);
+		unsigned bitUsed(4);
 		if (stateFilter)
 		{
-			curWord <<= 4;
-			curWord |= event->getNameAsUInt4();
-			bitLeft -= 4;
+			curWord |= (stateFilter->getNameAsUInt4() << bitUsed);
+			bitUsed += 4;
 		}
 		foreach (Block* action, actions)
 		{
-			if (bitLeft == 0)
+			if (bitUsed == 16)
 			{
 				content += curWord;
 				curWord = 0;
-				bitLeft = 16;
+				bitUsed = 4;
 			}
-			else
-				curWord <<= 4;
-			curWord |= action->getNameAsUInt4();
-			bitLeft -= 4;
+			curWord |= (action->getNameAsUInt4() << bitUsed);
+			bitUsed += 4;
 		}
+		content += curWord;
 		
 		// then comes the data from the blocks
 		content += event->getValuesCompressed();
