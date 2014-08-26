@@ -191,13 +191,16 @@ namespace Aseba { namespace ThymioVPL
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
 		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
+		#ifdef Q_WS_MACX
+		eventsLayout->setSpacing(20);
+		#else // Q_WS_MACX
+		eventsLayout->setSpacing(10);
+		#endif // Q_WS_MACX
 		eventsLayout->setAlignment(Qt::AlignTop);
-		eventsLayout->setSpacing(0);
-		BlockButton* button;
 		eventsLayout->addWidget(eventsLabel);
+		BlockButton* button;
 		foreach (button, eventButtons)
 		{
-			eventsLayout->addItem(new QSpacerItem(0,10));
 			eventsLayout->addWidget(button);
 			connect(button, SIGNAL(clicked()), SLOT(addEvent()));
 			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
@@ -265,11 +268,14 @@ namespace Aseba { namespace ThymioVPL
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
 		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
 		actionsLayout->setAlignment(Qt::AlignTop);
-		actionsLayout->setSpacing(0);
+		#ifdef Q_WS_MACX
+		actionsLayout->setSpacing(20);
+		#else // Q_WS_MACX
+		actionsLayout->setSpacing(10);
+		#endif // Q_WS_MACX
 		actionsLayout->addWidget(actionsLabel);
 		foreach (button, actionButtons)
 		{
-			actionsLayout->addItem(new QSpacerItem(0,10));
 			actionsLayout->addWidget(button);
 			connect(button, SIGNAL(clicked()), SLOT(addAction()));
 			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
@@ -929,7 +935,11 @@ namespace Aseba { namespace ThymioVPL
 		//toolBar->setIconSize(tbIconSize);
 		
 		// set view and cards on sides
+		#ifdef Q_WS_MACX // we have to work around bugs in size reporting in OS X
+		const QSize iconSize(243*scale, 243*scale);
+		#else // Q_WS_MACX
 		const QSize iconSize(256*scale, 256*scale);
+		#endif // Q_WS_MACX
 		for(QList<BlockButton*>::iterator itr = eventButtons.begin();
 			itr != eventButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);

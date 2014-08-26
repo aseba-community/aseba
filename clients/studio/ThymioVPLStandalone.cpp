@@ -165,6 +165,9 @@ namespace Aseba
 		// VPL part
 		updateWindowTitle(false);
 		vplLayout = new QVBoxLayout;
+		#ifdef Q_WS_MACX
+		vplLayout->setContentsMargins(0,0,0,0);
+		#endif // Q_WS_MACX
 		QWidget* vplContainer = new QWidget;
 		vplContainer->setLayout(vplLayout);
 		
