@@ -146,7 +146,7 @@ namespace Aseba
 		
 		// resize if not android
 		#ifndef ANDROID
-		resize(780,500);
+		resize(1000,700);
 		#endif // ANDROID
 	}
 	

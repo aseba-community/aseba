@@ -173,7 +173,7 @@ namespace Aseba { namespace ThymioVPL
 			if (mode == i)
 			{
 				painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-				painter->setBrush(QColor(255,255,0));
+				painter->setBrush(Qt::red);
 			}
 			else
 			{
