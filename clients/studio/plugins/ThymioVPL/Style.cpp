@@ -19,7 +19,7 @@ namespace Aseba { namespace ThymioVPL {
 	const int Style::blockSpacing = 40;
 	
 	//! The width of the border of the block drop area
-	const int Style::blockDropAreaBorderWidth = 20;
+	const int Style::blockDropAreaBorderWidth = 10;
 	
 	//! The multiplicative factor to apply to the color saturation (in HSV) of the block drop area when it is not highlighted
 	const qreal Style::blockDropAreaSaturationFactor = 0.7;

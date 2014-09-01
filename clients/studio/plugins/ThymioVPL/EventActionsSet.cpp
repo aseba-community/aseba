@@ -290,7 +290,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// the first word of the content is the number of the set
 		QVector<quint16> content(1, row);
-		// the second word is the is the number of blocks in this set
+		// the second word is the number of blocks in this set
 		content.push_back(1 + (stateFilter ? 1 : 0) + actions.size());
 		
 		// the next words are the types of the blocks, as uint4, compressed 4-by-4 into uint16s, big-endian
@@ -391,6 +391,7 @@ namespace Aseba { namespace ThymioVPL
 		// store width
 		basicWidth = xpos;
 		currentWidth = basicWidth;
+		// TODO: handle case when we cannot add more
 		totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
 		
 		// clear highlight
@@ -929,6 +930,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(widget);
 		
 		const qreal borderWidth(Style::blockDropAreaBorderWidth);
+		//const qreal borderWidth(Style::eventActionsSetCornerSize);
 		int colorId = (isSelected() ? 1 : 0);
 		
 		// if we are the last one, do not show buttons
@@ -946,7 +948,8 @@ namespace Aseba { namespace ThymioVPL
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
 				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
-				painter->drawRoundedRect(boundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
+				//painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
+				painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 				return;
 			}
 		}
@@ -961,6 +964,15 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
 		else
 			painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
+		// extension drop area
+		if (!actions.empty())
+		{
+			const qreal hb(borderWidth/2);
+			painter->setBrush(Qt::NoBrush);
+			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
+			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
+		}
 		
 		// event drop area
 		if (!event)
