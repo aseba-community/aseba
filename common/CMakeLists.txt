@@ -26,6 +26,7 @@ set (ASEBACORE_HDR_MSG
 set (ASEBACORE_HDR_COMMON
 	consts.h
 	types.h
+	productids.h
 )
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/common/utils
