@@ -86,6 +86,7 @@ namespace Aseba { namespace ThymioVPL
 		void redo();
 		void processCompilationResult();
 		void processHighlightChange();
+		void userEvent(unsigned id, const VariablesDataVector& data);
 		
 	private:
 		void clearUndo();

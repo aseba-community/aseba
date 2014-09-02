@@ -244,6 +244,9 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
+		if (debugLog)
+			connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
+		
 		/*zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
 		zoomSlider->setValue(1);
@@ -766,6 +769,16 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (scene->compilationResult().isSuccessful())
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
+	}
+	
+	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
+	{
+		// NOTE: here we can add react to incoming events
+		if (id != 0)
+			return;
+		
+		// TODO: highlight pair
+		cerr << "event " << data.at(0) << endl;
 	}
 	
 	void ThymioVisualProgramming::addEvent()
