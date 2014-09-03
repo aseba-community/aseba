@@ -954,6 +954,16 @@ namespace Aseba { namespace ThymioVPL
 			}
 		}
 		
+		// extension drop area
+		if (!actions.empty())
+		{
+			const qreal hb(borderWidth/2);
+			painter->setBrush(Qt::NoBrush);
+			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
+			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
+		}
+		
 		// background
 		if (errorFlag)
 			painter->setPen(QPen(Qt::red, 8));
@@ -964,15 +974,6 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
 		else
 			painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
-		// extension drop area
-		if (!actions.empty())
-		{
-			const qreal hb(borderWidth/2);
-			painter->setBrush(Qt::NoBrush);
-			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
-			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
-			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
-		}
 		
 		// event drop area
 		if (!event)
