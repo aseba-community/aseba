@@ -1,0 +1,19 @@
+package Aseba.ThymioVPL;
+
+message Action{
+	enum ActionType{
+		LOAD = 1;
+		SAVE = 2;
+	}
+	message ProgramState{
+		required string xml = 1;
+	}
+	
+	required ActionType type = 1;
+	required ProgramState stateBeforeAction = 2;
+}
+
+
+message Usage{
+	repeated Action action = 1;
+}
