@@ -9,6 +9,7 @@
 #include "Block.h"
 #include "ThymioVisualProgramming.h"
 #include "Style.h"
+#include "UsageLogger.h"
 
 using namespace std;
 
@@ -341,6 +342,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		recompile();
 		emit undoCheckpoint();
+		UsageLogger::getLogger().logInsertSet(row);
 		
 		p->setSoleSelection();
 		
