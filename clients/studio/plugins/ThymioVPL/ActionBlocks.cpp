@@ -53,7 +53,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		thymioBody = new ThymioBody(this, -70);
 		thymioBody->setUp(false);
-		thymioBody->setPos(128,128+14);
+		thymioBody->setPos(128,128);
 		thymioBody->setScale(0.2);
 		
 		timer = new QTimeLine(2000, this);
@@ -74,11 +74,18 @@ namespace Aseba { namespace ThymioVPL
 			pt[i] = (sliders[i]->value())*0.06*50; // [-30,30]
 		
 		const qreal step = frame/200.0;
-		const qreal angle = (pt[0]-pt[1]-0.04)*3*step;
-		const qreal center = -23.5*(pt[1]+pt[0])/(fabs(pt[1] - pt[0]) < 10e-4 ? 0.03 : (pt[1]-pt[0]));
-		const qreal radNegAngle = -angle*3.14/180;
+		const qreal angle = (pt[0]-pt[1])*3*step;
 		
-		thymioBody->setPos(QPointF(center*(1-cos(radNegAngle))+128,center*sin(radNegAngle)+128+14));
+		if (fabs(pt[1]-pt[0]) < 10e-4)
+		{
+			thymioBody->setPos(QPointF(128,128-(pt[1]+pt[0])*1.2*step));
+		}
+		else
+		{
+			const qreal center = -23.5*(pt[1]+pt[0])/(pt[1]-pt[0]);
+			const qreal radNegAngle = -angle*3.14/180;
+			thymioBody->setPos(QPointF(center*(1-cos(radNegAngle))+128,center*sin(radNegAngle)+128));
+		}
 		thymioBody->setRotation(angle);
 	}
 
@@ -361,7 +368,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			compressedNotes *= 6;
 			compressedNotes += notes[i];
-			compressedDurations *= 2;
+			compressedDurations *= 3;
 			compressedDurations += durations[i];
 		}
 		return (QVector<quint16>() << compressedNotes << compressedDurations);
