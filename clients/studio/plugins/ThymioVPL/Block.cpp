@@ -121,17 +121,17 @@ namespace Aseba { namespace ThymioVPL
 		else if ( name == "statefilter" )
 			return 7;
 		else if ( name == "move" )
-			return 9;
+			return 8;
 		else if ( name == "colortop" )
-			return 10;
+			return 9;
 		else if ( name == "colorbottom" )
-			return 11;
+			return 10;
 		else if ( name == "sound" )
-			return 12;
+			return 11;
 		else if ( name == "timer" )
-			return 13;
+			return 12;
 		else if ( name == "setstate" )
-			return 14;
+			return 13;
 		else
 			throw std::runtime_error("unknown name");
 	}
