@@ -23,6 +23,7 @@
 #include "Scene.h"
 #include "Style.h"
 #include "../../../../common/utils/utils.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -85,6 +86,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setBlock(event, block);
 		emit contentChanged();
+		UsageLogger::getLogger().logAddEventBlock(this->row,block);
 		emit undoCheckpoint();
 	}
 	
@@ -93,6 +95,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		addActionBlockNoEmit(block, number);
 		emit contentChanged();
+		UsageLogger::getLogger().logAddActionBlock(this->row, block, number);
 		emit undoCheckpoint();
 	}
 	
@@ -730,6 +733,7 @@ namespace Aseba { namespace ThymioVPL
 			// disconnect the selection setting mechanism, emit, and then re-enable
 			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 			emit contentChanged();
+			UsageLogger::getLogger().logActionSetDrag(this->row,event, drag);
 			emit undoCheckpoint();
 			connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 		}

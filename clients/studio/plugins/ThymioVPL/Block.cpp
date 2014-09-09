@@ -25,6 +25,7 @@
 #include "EventActionsSet.h"
 #include "Style.h"
 #include "ResizingView.h"
+#include "UsageLogger.h"
 #include "../../../../common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -350,6 +351,7 @@ namespace Aseba { namespace ThymioVPL
 					eventActionsSet->removeBlock(this);
 			}
 			emit contentChanged();
+			UsageLogger::getLogger().logBlockMouseMove(this->name, this->type, event);
 			emit undoCheckpoint();
 		}
 		beingDragged = false;
@@ -528,6 +530,8 @@ namespace Aseba { namespace ThymioVPL
 	void BlockWithButtonsAndRange::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		BlockWithButtons::mouseReleaseEvent(event);
+		
+		UsageLogger::getLogger().logBlockMouseRelease(this->name, this->type, event);
 		emit undoCheckpoint();
 	}
 	

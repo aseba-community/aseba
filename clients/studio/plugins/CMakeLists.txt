@@ -14,7 +14,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/CompilerVisitors.cpp
 	ThymioVPL/Style.cpp
 	ThymioVPL/UsageLogger.cpp
-	ThymioVPL/UsageProfile.pb.cpp
+	ThymioVPL/UsageProfile.pb.cc
 )
 qt4_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h

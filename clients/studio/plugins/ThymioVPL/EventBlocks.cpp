@@ -9,6 +9,7 @@
 
 #include "EventBlocks.h"
 #include "Buttons.h"
+#include "UsageLogger.h"
 
 #define deg2rad(x) ((x) * M_PI / 180.)
 
@@ -214,6 +215,7 @@ namespace Aseba { namespace ThymioVPL
 				if (buttonPoses[i].contains(event->pos()))
 				{
 					setMode(i);
+					UsageLogger::getLogger().logAccEventBlockMode(this->name, this->type,i);
 					emit undoCheckpoint();
 					return;
 				}

@@ -1,16 +1,116 @@
 package Aseba.ThymioVPL;
 
+enum MouseButton{
+	LEFT =1;
+	MIDDLE = 2;
+	RIGHT = 3;
+	NO=4;
+}
+
+enum BlockType{
+	EVENT = 1;
+	ACTION = 2;
+}
+
+message RowAction{
+	enum ActionType{
+		REMOVE = 1;
+		INSERT = 2;
+	}
+	optional int32 row = 1;
+	required ActionType type = 2;
+	
+}
+
+message BlockMouseMoveAction{
+	required MouseButton button = 1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+	optional double x = 4;
+	optional double y = 5;
+}
+
+message BlockMouseReleaseAction{
+	required MouseButton button = 1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+	optional double x = 4;
+	optional double y = 5;
+}
+
+message ButtonDragAction{
+	optional MouseButton button = 1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+	optional double x = 4;
+	optional double y = 5;
+}
+
+message ActionSetDragAction{
+	optional MouseButton button = 1;
+	optional int32 row= 2;
+	optional double x = 3;
+	optional double y = 4;
+}
+
+message AccBlockModeAction{
+	required int32 mode =1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+}
+
+message AdvancedModeAction{
+	required bool isAdvanced=1;
+}
+
+message AddBlockAction{
+	required BlockType type =1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+	optional int32 row=4;
+}
+
+enum MenuEntry{
+	OPEN_HELP=1;
+	SAVE=2;
+	SAVE_AS=3;
+	NEW_FILE=4;
+	OPEN_FILE=5;
+	CLOSE_FILE=6;
+	SAVE_SNAPSHOT=7;
+	STOP=8;
+}
+
+message MenuAction{
+	required MenuEntry entry=1;
+}
+
 message Action{
 	enum ActionType{
-		LOAD = 1;
-		SAVE = 2;
-	}
-	message ProgramState{
-		required string xml = 1;
+		ROW = 1;
+		BLOCK_MOUSE_MOVE =2;
+		BLOCK_MOUSE_RELEASE = 3;
+		BUTTON_DRAG =4;
+		ADVANCED_MODE=5;
+		ADD_BLOCK = 6;
+		ACTION_SET_DRAG = 7;
+		ACC_BLOCK_MODE = 8;
+		MENU = 9;
 	}
 	
 	required ActionType type = 1;
-	required ProgramState stateBeforeAction = 2;
+	optional string programStateAsXml = 2;	// The current program state (before! the action is applied)
+	oneof actual_action {
+		RowAction rowAction = 10;
+		BlockMouseMoveAction blockMouseMoveAction = 11;
+		BlockMouseReleaseAction blockMouseReleaseAction = 12;
+		ButtonDragAction buttonDragAction =13;
+		AdvancedModeAction advancedModeAction=14;
+		AddBlockAction addBlockAction=15;
+		ActionSetDragAction actionSetDragAction=16;
+		AccBlockModeAction accBlockModeAction=17;
+		MenuAction menuAction=18;
+	}
 }
 
 
