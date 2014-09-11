@@ -212,7 +212,7 @@ namespace Aseba { namespace ThymioVPL
 		if (dragResult != Qt::IgnoreAction)
 		{
 			emit contentChanged();
-			UsageLogger::getLogger().logButtonDrag(block->name, block->type, event, drag);
+			LOG(logButtonDrag(block->name, block->type, event, drag));
 			emit undoCheckpoint();
 		}
 		#endif // ANDROID
@@ -232,8 +232,10 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (event->mimeData()->hasFormat("Block") &&
 			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
-		)
+		){
 			event->accept();
+			LOG(logDropButton(this, event));
+		}
 		else
 			event->ignore();
 	}

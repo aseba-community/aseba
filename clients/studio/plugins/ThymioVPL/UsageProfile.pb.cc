@@ -25,6 +25,9 @@ const ::google::protobuf::Descriptor* RowAction_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   RowAction_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* RowAction_ActionType_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* MouseAction_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  MouseAction_reflection_ = NULL;
 const ::google::protobuf::Descriptor* BlockMouseMoveAction_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   BlockMouseMoveAction_reflection_ = NULL;
@@ -62,6 +65,7 @@ struct ActionOneofInstance {
   const ::Aseba::ThymioVPL::ActionSetDragAction* actionsetdragaction_;
   const ::Aseba::ThymioVPL::AccBlockModeAction* accblockmodeaction_;
   const ::Aseba::ThymioVPL::MenuAction* menuaction_;
+  const ::Aseba::ThymioVPL::MouseAction* mouseaction_;
 }* Action_default_oneof_instance_ = NULL;
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Usage_descriptor_ = NULL;
@@ -69,6 +73,7 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
   Usage_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* MouseButton_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* BlockType_descriptor_ = NULL;
+const ::google::protobuf::EnumDescriptor* MouseActionType_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* MenuEntry_descriptor_ = NULL;
 
 }  // namespace
@@ -97,7 +102,28 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RowAction));
   RowAction_ActionType_descriptor_ = RowAction_descriptor_->enum_type(0);
-  BlockMouseMoveAction_descriptor_ = file->message_type(1);
+  MouseAction_descriptor_ = file->message_type(1);
+  static const int MouseAction_offsets_[7] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, button_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, xpos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, ypos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, blockname_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, blocktype_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, row_),
+  };
+  MouseAction_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      MouseAction_descriptor_,
+      MouseAction::default_instance_,
+      MouseAction_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(MouseAction));
+  BlockMouseMoveAction_descriptor_ = file->message_type(2);
   static const int BlockMouseMoveAction_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockMouseMoveAction, button_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockMouseMoveAction, blockname_),
@@ -116,7 +142,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockMouseMoveAction));
-  BlockMouseReleaseAction_descriptor_ = file->message_type(2);
+  BlockMouseReleaseAction_descriptor_ = file->message_type(3);
   static const int BlockMouseReleaseAction_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockMouseReleaseAction, button_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockMouseReleaseAction, blockname_),
@@ -135,7 +161,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockMouseReleaseAction));
-  ButtonDragAction_descriptor_ = file->message_type(3);
+  ButtonDragAction_descriptor_ = file->message_type(4);
   static const int ButtonDragAction_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ButtonDragAction, button_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ButtonDragAction, blockname_),
@@ -154,7 +180,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ButtonDragAction));
-  ActionSetDragAction_descriptor_ = file->message_type(4);
+  ActionSetDragAction_descriptor_ = file->message_type(5);
   static const int ActionSetDragAction_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ActionSetDragAction, button_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ActionSetDragAction, row_),
@@ -172,7 +198,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ActionSetDragAction));
-  AccBlockModeAction_descriptor_ = file->message_type(5);
+  AccBlockModeAction_descriptor_ = file->message_type(6);
   static const int AccBlockModeAction_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccBlockModeAction, mode_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccBlockModeAction, blockname_),
@@ -189,7 +215,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AccBlockModeAction));
-  AdvancedModeAction_descriptor_ = file->message_type(6);
+  AdvancedModeAction_descriptor_ = file->message_type(7);
   static const int AdvancedModeAction_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AdvancedModeAction, isadvanced_),
   };
@@ -204,7 +230,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AdvancedModeAction));
-  AddBlockAction_descriptor_ = file->message_type(7);
+  AddBlockAction_descriptor_ = file->message_type(8);
   static const int AddBlockAction_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddBlockAction, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddBlockAction, blockname_),
@@ -222,7 +248,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AddBlockAction));
-  MenuAction_descriptor_ = file->message_type(8);
+  MenuAction_descriptor_ = file->message_type(9);
   static const int MenuAction_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MenuAction, entry_),
   };
@@ -237,8 +263,8 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MenuAction));
-  Action_descriptor_ = file->message_type(9);
-  static const int Action_offsets_[12] = {
+  Action_descriptor_ = file->message_type(10);
+  static const int Action_offsets_[13] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, programstateasxml_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, rowaction_),
@@ -250,6 +276,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, actionsetdragaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, accblockmodeaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, menuaction_),
+    PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, mouseaction_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, actual_action_),
   };
   Action_reflection_ =
@@ -266,7 +293,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Action));
   Action_ActionType_descriptor_ = Action_descriptor_->enum_type(0);
-  Usage_descriptor_ = file->message_type(10);
+  Usage_descriptor_ = file->message_type(11);
   static const int Usage_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Usage, action_),
   };
@@ -283,7 +310,8 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       sizeof(Usage));
   MouseButton_descriptor_ = file->enum_type(0);
   BlockType_descriptor_ = file->enum_type(1);
-  MenuEntry_descriptor_ = file->enum_type(2);
+  MouseActionType_descriptor_ = file->enum_type(2);
+  MenuEntry_descriptor_ = file->enum_type(3);
 }
 
 namespace {
@@ -298,6 +326,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     RowAction_descriptor_, &RowAction::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    MouseAction_descriptor_, &MouseAction::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     BlockMouseMoveAction_descriptor_, &BlockMouseMoveAction::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -325,6 +355,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_UsageProfile_2eproto() {
   delete RowAction::default_instance_;
   delete RowAction_reflection_;
+  delete MouseAction::default_instance_;
+  delete MouseAction_reflection_;
   delete BlockMouseMoveAction::default_instance_;
   delete BlockMouseMoveAction_reflection_;
   delete BlockMouseReleaseAction::default_instance_;
@@ -358,58 +390,69 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
     "\n\022UsageProfile.proto\022\017Aseba.ThymioVPL\"s\n"
     "\tRowAction\022\013\n\003row\030\001 \001(\005\0223\n\004type\030\002 \002(\0162%."
     "Aseba.ThymioVPL.RowAction.ActionType\"$\n\n"
-    "ActionType\022\n\n\006REMOVE\020\001\022\n\n\006INSERT\020\002\"\200\001\n\024B"
-    "lockMouseMoveAction\022,\n\006button\030\001 \002(\0162\034.As"
-    "eba.ThymioVPL.MouseButton\022\021\n\tblockName\030\002"
-    " \001(\t\022\021\n\tblockType\030\003 \001(\t\022\t\n\001x\030\004 \001(\001\022\t\n\001y\030"
-    "\005 \001(\001\"\203\001\n\027BlockMouseReleaseAction\022,\n\006but"
-    "ton\030\001 \002(\0162\034.Aseba.ThymioVPL.MouseButton\022"
-    "\021\n\tblockName\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\022\t\n"
-    "\001x\030\004 \001(\001\022\t\n\001y\030\005 \001(\001\"|\n\020ButtonDragAction\022"
-    ",\n\006button\030\001 \001(\0162\034.Aseba.ThymioVPL.MouseB"
-    "utton\022\021\n\tblockName\030\002 \001(\t\022\021\n\tblockType\030\003 "
-    "\001(\t\022\t\n\001x\030\004 \001(\001\022\t\n\001y\030\005 \001(\001\"f\n\023ActionSetDr"
-    "agAction\022,\n\006button\030\001 \001(\0162\034.Aseba.ThymioV"
-    "PL.MouseButton\022\013\n\003row\030\002 \001(\005\022\t\n\001x\030\003 \001(\001\022\t"
-    "\n\001y\030\004 \001(\001\"H\n\022AccBlockModeAction\022\014\n\004mode\030"
-    "\001 \002(\005\022\021\n\tblockName\030\002 \001(\t\022\021\n\tblockType\030\003 "
-    "\001(\t\"(\n\022AdvancedModeAction\022\022\n\nisAdvanced\030"
-    "\001 \002(\010\"m\n\016AddBlockAction\022(\n\004type\030\001 \002(\0162\032."
-    "Aseba.ThymioVPL.BlockType\022\021\n\tblockName\030\002"
-    " \001(\t\022\021\n\tblockType\030\003 \001(\t\022\013\n\003row\030\004 \001(\005\"7\n\n"
-    "MenuAction\022)\n\005entry\030\001 \002(\0162\032.Aseba.Thymio"
-    "VPL.MenuEntry\"\320\006\n\006Action\0220\n\004type\030\001 \002(\0162\""
-    ".Aseba.ThymioVPL.Action.ActionType\022\031\n\021pr"
-    "ogramStateAsXml\030\002 \001(\t\022/\n\trowAction\030\n \001(\013"
-    "2\032.Aseba.ThymioVPL.RowActionH\000\022E\n\024blockM"
-    "ouseMoveAction\030\013 \001(\0132%.Aseba.ThymioVPL.B"
-    "lockMouseMoveActionH\000\022K\n\027blockMouseRelea"
-    "seAction\030\014 \001(\0132(.Aseba.ThymioVPL.BlockMo"
-    "useReleaseActionH\000\022=\n\020buttonDragAction\030\r"
-    " \001(\0132!.Aseba.ThymioVPL.ButtonDragActionH"
-    "\000\022A\n\022advancedModeAction\030\016 \001(\0132#.Aseba.Th"
-    "ymioVPL.AdvancedModeActionH\000\0229\n\016addBlock"
-    "Action\030\017 \001(\0132\037.Aseba.ThymioVPL.AddBlockA"
-    "ctionH\000\022C\n\023actionSetDragAction\030\020 \001(\0132$.A"
-    "seba.ThymioVPL.ActionSetDragActionH\000\022A\n\022"
-    "accBlockModeAction\030\021 \001(\0132#.Aseba.ThymioV"
-    "PL.AccBlockModeActionH\000\0221\n\nmenuAction\030\022 "
-    "\001(\0132\033.Aseba.ThymioVPL.MenuActionH\000\"\252\001\n\nA"
-    "ctionType\022\007\n\003ROW\020\001\022\024\n\020BLOCK_MOUSE_MOVE\020\002"
-    "\022\027\n\023BLOCK_MOUSE_RELEASE\020\003\022\017\n\013BUTTON_DRAG"
-    "\020\004\022\021\n\rADVANCED_MODE\020\005\022\r\n\tADD_BLOCK\020\006\022\023\n\017"
-    "ACTION_SET_DRAG\020\007\022\022\n\016ACC_BLOCK_MODE\020\010\022\010\n"
-    "\004MENU\020\tB\017\n\ractual_action\"0\n\005Usage\022\'\n\006act"
-    "ion\030\001 \003(\0132\027.Aseba.ThymioVPL.Action*6\n\013Mo"
-    "useButton\022\010\n\004LEFT\020\001\022\n\n\006MIDDLE\020\002\022\t\n\005RIGHT"
-    "\020\003\022\006\n\002NO\020\004*\"\n\tBlockType\022\t\n\005EVENT\020\001\022\n\n\006AC"
-    "TION\020\002*{\n\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SA"
-    "VE\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_"
-    "FILE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020"
-    "\007\022\010\n\004STOP\020\010", 2051);
+    "ActionType\022\n\n\006REMOVE\020\001\022\n\n\006INSERT\020\002\"\272\001\n\013M"
+    "ouseAction\022.\n\004type\030\001 \002(\0162 .Aseba.ThymioV"
+    "PL.MouseActionType\022,\n\006button\030\002 \002(\0162\034.Ase"
+    "ba.ThymioVPL.MouseButton\022\014\n\004xPos\030\003 \001(\001\022\014"
+    "\n\004yPos\030\004 \001(\001\022\021\n\tblockName\030\005 \001(\t\022\021\n\tblock"
+    "Type\030\006 \001(\t\022\013\n\003row\030\007 \001(\005\"\200\001\n\024BlockMouseMo"
+    "veAction\022,\n\006button\030\001 \002(\0162\034.Aseba.ThymioV"
+    "PL.MouseButton\022\021\n\tblockName\030\002 \001(\t\022\021\n\tblo"
+    "ckType\030\003 \001(\t\022\t\n\001x\030\004 \001(\001\022\t\n\001y\030\005 \001(\001\"\203\001\n\027B"
+    "lockMouseReleaseAction\022,\n\006button\030\001 \002(\0162\034"
+    ".Aseba.ThymioVPL.MouseButton\022\021\n\tblockNam"
+    "e\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\022\t\n\001x\030\004 \001(\001\022\t\n"
+    "\001y\030\005 \001(\001\"|\n\020ButtonDragAction\022,\n\006button\030\001"
+    " \001(\0162\034.Aseba.ThymioVPL.MouseButton\022\021\n\tbl"
+    "ockName\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\022\t\n\001x\030\004 "
+    "\001(\001\022\t\n\001y\030\005 \001(\001\"f\n\023ActionSetDragAction\022,\n"
+    "\006button\030\001 \001(\0162\034.Aseba.ThymioVPL.MouseBut"
+    "ton\022\013\n\003row\030\002 \001(\005\022\t\n\001x\030\003 \001(\001\022\t\n\001y\030\004 \001(\001\"H"
+    "\n\022AccBlockModeAction\022\014\n\004mode\030\001 \002(\005\022\021\n\tbl"
+    "ockName\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\"(\n\022Adva"
+    "ncedModeAction\022\022\n\nisAdvanced\030\001 \002(\010\"m\n\016Ad"
+    "dBlockAction\022(\n\004type\030\001 \002(\0162\032.Aseba.Thymi"
+    "oVPL.BlockType\022\021\n\tblockName\030\002 \001(\t\022\021\n\tblo"
+    "ckType\030\003 \001(\t\022\013\n\003row\030\004 \001(\005\"7\n\nMenuAction\022"
+    ")\n\005entry\030\001 \002(\0162\032.Aseba.ThymioVPL.MenuEnt"
+    "ry\"\227\007\n\006Action\0220\n\004type\030\001 \002(\0162\".Aseba.Thym"
+    "ioVPL.Action.ActionType\022\031\n\021programStateA"
+    "sXml\030\002 \001(\t\022/\n\trowAction\030\n \001(\0132\032.Aseba.Th"
+    "ymioVPL.RowActionH\000\022E\n\024blockMouseMoveAct"
+    "ion\030\013 \001(\0132%.Aseba.ThymioVPL.BlockMouseMo"
+    "veActionH\000\022K\n\027blockMouseReleaseAction\030\014 "
+    "\001(\0132(.Aseba.ThymioVPL.BlockMouseReleaseA"
+    "ctionH\000\022=\n\020buttonDragAction\030\r \001(\0132!.Aseb"
+    "a.ThymioVPL.ButtonDragActionH\000\022A\n\022advanc"
+    "edModeAction\030\016 \001(\0132#.Aseba.ThymioVPL.Adv"
+    "ancedModeActionH\000\0229\n\016addBlockAction\030\017 \001("
+    "\0132\037.Aseba.ThymioVPL.AddBlockActionH\000\022C\n\023"
+    "actionSetDragAction\030\020 \001(\0132$.Aseba.Thymio"
+    "VPL.ActionSetDragActionH\000\022A\n\022accBlockMod"
+    "eAction\030\021 \001(\0132#.Aseba.ThymioVPL.AccBlock"
+    "ModeActionH\000\0221\n\nmenuAction\030\022 \001(\0132\033.Aseba"
+    ".ThymioVPL.MenuActionH\000\0223\n\013mouseAction\030\023"
+    " \001(\0132\034.Aseba.ThymioVPL.MouseActionH\000\"\274\001\n"
+    "\nActionType\022\007\n\003ROW\020\001\022\024\n\020BLOCK_MOUSE_MOVE"
+    "\020\002\022\027\n\023BLOCK_MOUSE_RELEASE\020\003\022\017\n\013BUTTON_DR"
+    "AG\020\004\022\021\n\rADVANCED_MODE\020\005\022\r\n\tADD_BLOCK\020\006\022\023"
+    "\n\017ACTION_SET_DRAG\020\007\022\022\n\016ACC_BLOCK_MODE\020\010\022"
+    "\010\n\004MENU\020\t\022\020\n\014MOUSE_ACTION\020\nB\017\n\ractual_ac"
+    "tion\"0\n\005Usage\022\'\n\006action\030\001 \003(\0132\027.Aseba.Th"
+    "ymioVPL.Action*6\n\013MouseButton\022\010\n\004LEFT\020\001\022"
+    "\n\n\006MIDDLE\020\002\022\t\n\005RIGHT\020\003\022\006\n\002NO\020\004*\"\n\tBlockT"
+    "ype\022\t\n\005EVENT\020\001\022\n\n\006ACTION\020\002*\200\001\n\017MouseActi"
+    "onType\022\016\n\nMOVE_BLOCK\020\001\022\021\n\rRELEASE_BLOCK\020"
+    "\002\022\017\n\013DRAG_BUTTON\020\003\022\023\n\017DRAG_ACTION_SET\020\004\022"
+    "\017\n\013DROP_BUTTON\020\005\022\023\n\017DROP_ACTION_SET\020\006*{\n"
+    "\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SAVE\020\002\022\013\n\007S"
+    "AVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_FILE\020\005\022\016\n"
+    "\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020\007\022\010\n\004STOP"
+    "\020\010", 2442);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "UsageProfile.proto", &protobuf_RegisterTypes);
   RowAction::default_instance_ = new RowAction();
+  MouseAction::default_instance_ = new MouseAction();
   BlockMouseMoveAction::default_instance_ = new BlockMouseMoveAction();
   BlockMouseReleaseAction::default_instance_ = new BlockMouseReleaseAction();
   ButtonDragAction::default_instance_ = new ButtonDragAction();
@@ -422,6 +465,7 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
   Action_default_oneof_instance_ = new ActionOneofInstance;
   Usage::default_instance_ = new Usage();
   RowAction::default_instance_->InitAsDefaultInstance();
+  MouseAction::default_instance_->InitAsDefaultInstance();
   BlockMouseMoveAction::default_instance_->InitAsDefaultInstance();
   BlockMouseReleaseAction::default_instance_->InitAsDefaultInstance();
   ButtonDragAction::default_instance_->InitAsDefaultInstance();
@@ -465,6 +509,24 @@ bool BlockType_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::google::protobuf::EnumDescriptor* MouseActionType_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return MouseActionType_descriptor_;
+}
+bool MouseActionType_IsValid(int value) {
+  switch(value) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
       return true;
     default:
       return false;
@@ -779,6 +841,527 @@ void RowAction::Swap(RowAction* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = RowAction_descriptor_;
   metadata.reflection = RowAction_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int MouseAction::kTypeFieldNumber;
+const int MouseAction::kButtonFieldNumber;
+const int MouseAction::kXPosFieldNumber;
+const int MouseAction::kYPosFieldNumber;
+const int MouseAction::kBlockNameFieldNumber;
+const int MouseAction::kBlockTypeFieldNumber;
+const int MouseAction::kRowFieldNumber;
+#endif  // !_MSC_VER
+
+MouseAction::MouseAction()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Aseba.ThymioVPL.MouseAction)
+}
+
+void MouseAction::InitAsDefaultInstance() {
+}
+
+MouseAction::MouseAction(const MouseAction& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Aseba.ThymioVPL.MouseAction)
+}
+
+void MouseAction::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  type_ = 1;
+  button_ = 1;
+  xpos_ = 0;
+  ypos_ = 0;
+  blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  row_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+MouseAction::~MouseAction() {
+  // @@protoc_insertion_point(destructor:Aseba.ThymioVPL.MouseAction)
+  SharedDtor();
+}
+
+void MouseAction::SharedDtor() {
+  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete blockname_;
+  }
+  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete blocktype_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void MouseAction::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MouseAction::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return MouseAction_descriptor_;
+}
+
+const MouseAction& MouseAction::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_UsageProfile_2eproto();
+  return *default_instance_;
+}
+
+MouseAction* MouseAction::default_instance_ = NULL;
+
+MouseAction* MouseAction::New() const {
+  return new MouseAction;
+}
+
+void MouseAction::Clear() {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<MouseAction*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 127) {
+    ZR_(xpos_, ypos_);
+    type_ = 1;
+    button_ = 1;
+    if (has_blockname()) {
+      if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        blockname_->clear();
+      }
+    }
+    if (has_blocktype()) {
+      if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        blocktype_->clear();
+      }
+    }
+    row_ = 0;
+  }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool MouseAction::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Aseba.ThymioVPL.MouseAction)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required .Aseba.ThymioVPL.MouseActionType type = 1;
+      case 1: {
+        if (tag == 8) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::Aseba::ThymioVPL::MouseActionType_IsValid(value)) {
+            set_type(static_cast< ::Aseba::ThymioVPL::MouseActionType >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_button;
+        break;
+      }
+
+      // required .Aseba.ThymioVPL.MouseButton button = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_button:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::Aseba::ThymioVPL::MouseButton_IsValid(value)) {
+            set_button(static_cast< ::Aseba::ThymioVPL::MouseButton >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(2, value);
+          }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(25)) goto parse_xPos;
+        break;
+      }
+
+      // optional double xPos = 3;
+      case 3: {
+        if (tag == 25) {
+         parse_xPos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &xpos_)));
+          set_has_xpos();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(33)) goto parse_yPos;
+        break;
+      }
+
+      // optional double yPos = 4;
+      case 4: {
+        if (tag == 33) {
+         parse_yPos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &ypos_)));
+          set_has_ypos();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(42)) goto parse_blockName;
+        break;
+      }
+
+      // optional string blockName = 5;
+      case 5: {
+        if (tag == 42) {
+         parse_blockName:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_blockname()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->blockname().data(), this->blockname().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "blockname");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(50)) goto parse_blockType;
+        break;
+      }
+
+      // optional string blockType = 6;
+      case 6: {
+        if (tag == 50) {
+         parse_blockType:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_blocktype()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->blocktype().data(), this->blocktype().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "blocktype");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(56)) goto parse_row;
+        break;
+      }
+
+      // optional int32 row = 7;
+      case 7: {
+        if (tag == 56) {
+         parse_row:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &row_)));
+          set_has_row();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Aseba.ThymioVPL.MouseAction)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Aseba.ThymioVPL.MouseAction)
+  return false;
+#undef DO_
+}
+
+void MouseAction::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Aseba.ThymioVPL.MouseAction)
+  // required .Aseba.ThymioVPL.MouseActionType type = 1;
+  if (has_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->type(), output);
+  }
+
+  // required .Aseba.ThymioVPL.MouseButton button = 2;
+  if (has_button()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      2, this->button(), output);
+  }
+
+  // optional double xPos = 3;
+  if (has_xpos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(3, this->xpos(), output);
+  }
+
+  // optional double yPos = 4;
+  if (has_ypos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(4, this->ypos(), output);
+  }
+
+  // optional string blockName = 5;
+  if (has_blockname()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->blockname().data(), this->blockname().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "blockname");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      5, this->blockname(), output);
+  }
+
+  // optional string blockType = 6;
+  if (has_blocktype()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->blocktype().data(), this->blocktype().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "blocktype");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      6, this->blocktype(), output);
+  }
+
+  // optional int32 row = 7;
+  if (has_row()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->row(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Aseba.ThymioVPL.MouseAction)
+}
+
+::google::protobuf::uint8* MouseAction::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Aseba.ThymioVPL.MouseAction)
+  // required .Aseba.ThymioVPL.MouseActionType type = 1;
+  if (has_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->type(), target);
+  }
+
+  // required .Aseba.ThymioVPL.MouseButton button = 2;
+  if (has_button()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      2, this->button(), target);
+  }
+
+  // optional double xPos = 3;
+  if (has_xpos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(3, this->xpos(), target);
+  }
+
+  // optional double yPos = 4;
+  if (has_ypos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(4, this->ypos(), target);
+  }
+
+  // optional string blockName = 5;
+  if (has_blockname()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->blockname().data(), this->blockname().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "blockname");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        5, this->blockname(), target);
+  }
+
+  // optional string blockType = 6;
+  if (has_blocktype()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->blocktype().data(), this->blocktype().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "blocktype");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        6, this->blocktype(), target);
+  }
+
+  // optional int32 row = 7;
+  if (has_row()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->row(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Aseba.ThymioVPL.MouseAction)
+  return target;
+}
+
+int MouseAction::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required .Aseba.ThymioVPL.MouseActionType type = 1;
+    if (has_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
+    }
+
+    // required .Aseba.ThymioVPL.MouseButton button = 2;
+    if (has_button()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->button());
+    }
+
+    // optional double xPos = 3;
+    if (has_xpos()) {
+      total_size += 1 + 8;
+    }
+
+    // optional double yPos = 4;
+    if (has_ypos()) {
+      total_size += 1 + 8;
+    }
+
+    // optional string blockName = 5;
+    if (has_blockname()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->blockname());
+    }
+
+    // optional string blockType = 6;
+    if (has_blocktype()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->blocktype());
+    }
+
+    // optional int32 row = 7;
+    if (has_row()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->row());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MouseAction::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const MouseAction* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const MouseAction*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void MouseAction::MergeFrom(const MouseAction& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_type()) {
+      set_type(from.type());
+    }
+    if (from.has_button()) {
+      set_button(from.button());
+    }
+    if (from.has_xpos()) {
+      set_xpos(from.xpos());
+    }
+    if (from.has_ypos()) {
+      set_ypos(from.ypos());
+    }
+    if (from.has_blockname()) {
+      set_blockname(from.blockname());
+    }
+    if (from.has_blocktype()) {
+      set_blocktype(from.blocktype());
+    }
+    if (from.has_row()) {
+      set_row(from.row());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void MouseAction::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MouseAction::CopyFrom(const MouseAction& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MouseAction::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void MouseAction::Swap(MouseAction* other) {
+  if (other != this) {
+    std::swap(type_, other->type_);
+    std::swap(button_, other->button_);
+    std::swap(xpos_, other->xpos_);
+    std::swap(ypos_, other->ypos_);
+    std::swap(blockname_, other->blockname_);
+    std::swap(blocktype_, other->blocktype_);
+    std::swap(row_, other->row_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata MouseAction::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = MouseAction_descriptor_;
+  metadata.reflection = MouseAction_reflection_;
   return metadata;
 }
 
@@ -3648,6 +4231,7 @@ bool Action_ActionType_IsValid(int value) {
     case 7:
     case 8:
     case 9:
+    case 10:
       return true;
     default:
       return false;
@@ -3664,6 +4248,7 @@ const Action_ActionType Action::ADD_BLOCK;
 const Action_ActionType Action::ACTION_SET_DRAG;
 const Action_ActionType Action::ACC_BLOCK_MODE;
 const Action_ActionType Action::MENU;
+const Action_ActionType Action::MOUSE_ACTION;
 const Action_ActionType Action::ActionType_MIN;
 const Action_ActionType Action::ActionType_MAX;
 const int Action::ActionType_ARRAYSIZE;
@@ -3680,6 +4265,7 @@ const int Action::kAddBlockActionFieldNumber;
 const int Action::kActionSetDragActionFieldNumber;
 const int Action::kAccBlockModeActionFieldNumber;
 const int Action::kMenuActionFieldNumber;
+const int Action::kMouseActionFieldNumber;
 #endif  // !_MSC_VER
 
 Action::Action()
@@ -3698,6 +4284,7 @@ void Action::InitAsDefaultInstance() {
   Action_default_oneof_instance_->actionsetdragaction_ = const_cast< ::Aseba::ThymioVPL::ActionSetDragAction*>(&::Aseba::ThymioVPL::ActionSetDragAction::default_instance());
   Action_default_oneof_instance_->accblockmodeaction_ = const_cast< ::Aseba::ThymioVPL::AccBlockModeAction*>(&::Aseba::ThymioVPL::AccBlockModeAction::default_instance());
   Action_default_oneof_instance_->menuaction_ = const_cast< ::Aseba::ThymioVPL::MenuAction*>(&::Aseba::ThymioVPL::MenuAction::default_instance());
+  Action_default_oneof_instance_->mouseaction_ = const_cast< ::Aseba::ThymioVPL::MouseAction*>(&::Aseba::ThymioVPL::MouseAction::default_instance());
 }
 
 Action::Action(const Action& from)
@@ -3789,6 +4376,10 @@ void Action::clear_actual_action() {
     }
     case kMenuAction: {
       delete actual_action_.menuaction_;
+      break;
+    }
+    case kMouseAction: {
+      delete actual_action_.mouseaction_;
       break;
     }
     case ACTUAL_ACTION_NOT_SET: {
@@ -3972,6 +4563,19 @@ bool Action::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(154)) goto parse_mouseAction;
+        break;
+      }
+
+      // optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+      case 19: {
+        if (tag == 154) {
+         parse_mouseAction:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_mouseaction()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -4071,6 +4675,12 @@ void Action::SerializeWithCachedSizes(
       18, this->menuaction(), output);
   }
 
+  // optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+  if (has_mouseaction()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      19, this->mouseaction(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -4159,6 +4769,13 @@ void Action::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         18, this->menuaction(), target);
+  }
+
+  // optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+  if (has_mouseaction()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        19, this->mouseaction(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -4251,6 +4868,13 @@ int Action::ByteSize() const {
           this->menuaction());
       break;
     }
+    // optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+    case kMouseAction: {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->mouseaction());
+      break;
+    }
     case ACTUAL_ACTION_NOT_SET: {
       break;
     }
@@ -4317,6 +4941,10 @@ void Action::MergeFrom(const Action& from) {
       mutable_menuaction()->::Aseba::ThymioVPL::MenuAction::MergeFrom(from.menuaction());
       break;
     }
+    case kMouseAction: {
+      mutable_mouseaction()->::Aseba::ThymioVPL::MouseAction::MergeFrom(from.mouseaction());
+      break;
+    }
     case ACTUAL_ACTION_NOT_SET: {
       break;
     }
@@ -4367,6 +4995,9 @@ bool Action::IsInitialized() const {
   }
   if (has_menuaction()) {
     if (!this->menuaction().IsInitialized()) return false;
+  }
+  if (has_mouseaction()) {
+    if (!this->mouseaction().IsInitialized()) return false;
   }
   return true;
 }

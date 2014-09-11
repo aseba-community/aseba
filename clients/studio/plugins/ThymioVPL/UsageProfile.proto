@@ -12,6 +12,15 @@ enum BlockType{
 	ACTION = 2;
 }
 
+enum MouseActionType{
+	MOVE_BLOCK = 1;
+	RELEASE_BLOCK = 2;
+	DRAG_BUTTON = 3;
+	DRAG_ACTION_SET = 4;
+	DROP_BUTTON = 5;
+	DROP_ACTION_SET = 6;
+}
+
 message RowAction{
 	enum ActionType{
 		REMOVE = 1;
@@ -20,6 +29,18 @@ message RowAction{
 	optional int32 row = 1;
 	required ActionType type = 2;
 	
+}
+
+message MouseAction{
+	required MouseActionType type = 1;
+	required MouseButton button = 2;
+	optional double xPos = 3;
+	optional double yPos = 4;
+	
+	// Drag and drop events (either button or action set)
+	optional string blockName = 5;
+	optional string blockType = 6;
+	optional int32 row= 7;
 }
 
 message BlockMouseMoveAction{
@@ -96,6 +117,7 @@ message Action{
 		ACTION_SET_DRAG = 7;
 		ACC_BLOCK_MODE = 8;
 		MENU = 9;
+		MOUSE_ACTION =10;
 	}
 	
 	required ActionType type = 1;
@@ -110,6 +132,7 @@ message Action{
 		ActionSetDragAction actionSetDragAction=16;
 		AccBlockModeAction accBlockModeAction=17;
 		MenuAction menuAction=18;
+		MouseAction mouseAction = 19;
 	}
 }
 

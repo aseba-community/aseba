@@ -341,6 +341,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		beingDragged = true;
 		keepAfterDrop = false;
+		LOG(logBlockMouseMove(this->name, this->type, event));
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
@@ -351,7 +352,6 @@ namespace Aseba { namespace ThymioVPL
 					eventActionsSet->removeBlock(this);
 			}
 			emit contentChanged();
-			UsageLogger::getLogger().logBlockMouseMove(this->name, this->type, event);
 			emit undoCheckpoint();
 		}
 		beingDragged = false;

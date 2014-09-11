@@ -724,6 +724,8 @@ namespace Aseba { namespace ThymioVPL
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
+		LOG(logActionSetDrag(this->row,event, drag));
+		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
@@ -733,7 +735,6 @@ namespace Aseba { namespace ThymioVPL
 			// disconnect the selection setting mechanism, emit, and then re-enable
 			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 			emit contentChanged();
-			UsageLogger::getLogger().logActionSetDrag(this->row,event, drag);
 			emit undoCheckpoint();
 			connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 		}
@@ -782,6 +783,8 @@ namespace Aseba { namespace ThymioVPL
 		if (isDnDValid(event))
 		{
 			const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
+			
+			LOG(logEventActionSetDrop(this->row, event));
 			
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))

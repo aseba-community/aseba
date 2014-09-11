@@ -7,9 +7,6 @@ using namespace std;
 
 namespace Aseba{ namespace ThymioVPL
 {
-
-#if defined(PROTOBUF_FOUND)
-
 UsageLogger::UsageLogger()
 {
 	fileOut = new ofstream("test.log"/*getFileName().c_str()*/, ios::app | ios::binary);
@@ -39,69 +36,24 @@ UsageLogger& UsageLogger::getLogger()
 
 void UsageLogger::logInsertSet(int row)
 {
+	logSetAction(RowAction::INSERT,row);
+}
+
+void UsageLogger::logRemoveSet(int row){
+	logSetAction(RowAction::REMOVE,row);
+}
+
+void UsageLogger::logSetAction(RowAction_ActionType type, int row){
 	Action * wrapper = getActionWithCurrentState();
 	RowAction * rowAction = new RowAction();
 	rowAction->set_row(row);
-	rowAction->set_type(RowAction::INSERT);
+	rowAction->set_type(type);
 	
 	wrapper->set_type(Action_ActionType_ROW);
 	wrapper->set_allocated_rowaction(rowAction);
 	storeAction(wrapper);
 }
 
-void UsageLogger::logRemoveSet(int row){
-	Action * wrapper = getActionWithCurrentState();
-	RowAction * rowAction = new RowAction();
-	rowAction->set_row(row);
-	rowAction->set_type(RowAction::REMOVE);
-	
-	wrapper->set_type(Action_ActionType_ROW);
-	wrapper->set_allocated_rowaction(rowAction);
-	storeAction(wrapper);
-}
-void UsageLogger::logBlockMouseMove(QString name, QString type, QGraphicsSceneMouseEvent *event){
-	MouseButton button = mapButtons(event->button());
-	
-	Action * wrapper = getActionWithCurrentState();
-	BlockMouseMoveAction * a = new BlockMouseMoveAction();
-	a->set_button(button);
-	a->set_blockname(name.toUtf8().constData());
-	a->set_blocktype(type.toUtf8().constData());
-	a->set_x(event->scenePos().x());
-	a->set_y(event->scenePos().y());
-	wrapper->set_type(Action_ActionType_BLOCK_MOUSE_MOVE);
-	wrapper->set_allocated_blockmousemoveaction(a);
-	storeAction(wrapper);
-}
-void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsSceneMouseEvent *event){
-	MouseButton button = mapButtons(event->button());
-	
-	Action * wrapper = getActionWithCurrentState();
-	BlockMouseReleaseAction * a = new BlockMouseReleaseAction();
-	a->set_button(button);
-	a->set_blockname(name.toUtf8().constData());
-	a->set_blocktype(type.toUtf8().constData());
-	a->set_x(event->scenePos().x());
-	a->set_y(event->scenePos().y());
-	wrapper->set_type(Action_ActionType_BLOCK_MOUSE_RELEASE);
-	wrapper->set_allocated_blockmousereleaseaction(a);
-	storeAction(wrapper);
-}
-void UsageLogger::logButtonDrag(QString name, QString type, QMouseEvent *event, QDrag *drag){
-	MouseButton button = mapButtons(event->button());
-	
-	Action * wrapper = getActionWithCurrentState();
-	ButtonDragAction *a = new ButtonDragAction();
-	a->set_button(button);
-	a->set_blockname(name.toUtf8().constData());
-	a->set_blocktype(type.toUtf8().constData());
-	a->set_x(event->posF().x());
-	a->set_y(event->posF().y());
-	
-	wrapper->set_type(Action_ActionType_BUTTON_DRAG);
-	wrapper->set_allocated_buttondragaction(a);
-	storeAction(wrapper);
-}
 void UsageLogger::logSetAdvanced(bool advanced){
 	Action * wrapper = getActionWithCurrentState();
 	AdvancedModeAction *a = new AdvancedModeAction();
@@ -112,10 +64,17 @@ void UsageLogger::logSetAdvanced(bool advanced){
 	storeAction(wrapper);
 }
 void UsageLogger::logAddEventBlock(int row, Block *block){
+	logAddBlock(EVENT,row,block);
+}
+void UsageLogger::logAddActionBlock(int row, Block *block, int position){	
+	logAddBlock(ACTION,row,block);
+}
+
+void UsageLogger::logAddBlock(BlockType type,int row, Block *block){
 	Action * wrapper = getActionWithCurrentState();
 	
 	AddBlockAction *a = new AddBlockAction();
-	a->set_type(EVENT);
+	a->set_type(type);
 	a->set_blockname(block->getName().toUtf8().constData());
 	a->set_blocktype(block->getType().toUtf8().constData());
 	a->set_row(row);
@@ -123,31 +82,7 @@ void UsageLogger::logAddEventBlock(int row, Block *block){
 	wrapper->set_allocated_addblockaction(a);
 	storeAction(wrapper);
 }
-void UsageLogger::logAddActionBlock(int row, Block *block, int position){
-	Action * wrapper = getActionWithCurrentState();
-	
-	AddBlockAction *a = new AddBlockAction();
-	a->set_type(ACTION);
-	a->set_blockname(block->getName().toUtf8().constData());
-	a->set_blocktype(block->getType().toUtf8().constData());
-	a->set_row(row);
-	wrapper->set_type(Action_ActionType_ADD_BLOCK);
-	wrapper->set_allocated_addblockaction(a);
-	storeAction(wrapper);
-}
-void UsageLogger::logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag){
-	Action * wrapper = getActionWithCurrentState();
-	ActionSetDragAction *a = new ActionSetDragAction();
-	
-	a->set_button(mapButtons(event->button()));
-	a->set_row(row);
-	a->set_x(event->scenePos().x());
-	a->set_y(event->scenePos().y());
-	
-	wrapper->set_type(Action_ActionType_ACTION_SET_DRAG);
-	wrapper->set_allocated_actionsetdragaction(a);
-	storeAction(wrapper);
-}
+
 void UsageLogger::logAccEventBlockMode(QString name, QString type, int mode){
 	Action * wrapper = getActionWithCurrentState();
 	AccBlockModeAction *a = new AccBlockModeAction();
@@ -167,6 +102,55 @@ void UsageLogger::logMenuAction(MenuEntry entry){
 	a->set_entry(entry);
 	wrapper->set_type(Action_ActionType_MENU);
 	wrapper->set_allocated_menuaction(a);
+	
+	storeAction(wrapper);
+}
+
+void UsageLogger::logBlockMouseMove(QString name, QString type, QGraphicsSceneMouseEvent *event){
+	logMouseAction(MOVE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+}
+
+
+void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsSceneMouseEvent *event){
+	logMouseAction(RELEASE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+}
+void UsageLogger::logButtonDrag(QString name, QString type, QMouseEvent *event, QDrag *drag){
+	logMouseAction(DRAG_BUTTON,event->posF().x(),event->posF().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+}
+
+void UsageLogger::logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag){
+	logMouseAction(DRAG_ACTION_SET,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),&row,NULL,NULL);
+}
+
+void UsageLogger::logDropButton(BlockButton *button, QDropEvent *event){
+	logMouseAction(DROP_BUTTON,event->pos().x(),event->pos().y(),mapButtons(event->mouseButtons()),NULL,button->getName().toUtf8().constData(),NULL);
+}
+
+void UsageLogger::logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event){
+	logMouseAction(DROP_ACTION_SET,event->pos().x(),event->pos().y(),mapButtons(event->buttons()),&row,NULL,NULL);
+}
+
+void UsageLogger::logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType){
+	Action * wrapper = getActionWithCurrentState();
+	
+	MouseAction *a = new MouseAction();
+	a->set_type(type);
+	a->set_button(button);
+	a->set_xpos(xPos);
+	a->set_ypos(yPos);
+	
+	if(row != 0){
+		a->set_row(*row);
+	}
+	if(blockName != 0){
+		a->set_blockname(blockName);
+	}
+	if(blockType != 0){
+		a->set_blocktype(blockType);
+	}
+	
+	wrapper->set_type(Action_ActionType_MOUSE_ACTION);
+	wrapper->set_allocated_mouseaction(a);
 	
 	storeAction(wrapper);
 }
@@ -199,6 +183,7 @@ void UsageLogger::logStop(){
 void UsageLogger::storeAction(Action * a){
 	int size = a->ByteSize();
 	fileOut->write((char*)&size,4);
+	fileOut->flush();
 	a->SerializeToOstream(fileOut);
 }
 
@@ -258,39 +243,22 @@ MouseButton UsageLogger::mapButtons(Qt::MouseButton b){
 	return button;
 }
 
-
-
-#else
-// Provide dummy implementation in case no usage logging is desired.
-UsageLogger::UsageLogger(){}
-UsageLogger::~UsageLogger(){}
-UsageLogger& UsageLogger::getLogger()
-{
-	static UsageLogger instance;
-	return instance;
+MouseButton UsageLogger::mapButtons(Qt::MouseButtons b){
+	MouseButton button;
+	if(b.testFlag(Qt::LeftButton)){
+		button = LEFT;
+	}
+	else if(b.testFlag(Qt::RightButton)){
+		button = RIGHT;
+	}
+	else if(b.testFlag(Qt::MidButton)){
+		button = MIDDLE;
+	}
+	else{
+		button = NO;
+	}
+	return button;
 }
-void UsageLogger::logSave(){}
-void UsageLogger::logRemoveSet(int row){}
-void UsageLogger::logBlockMouseMove(QString name, QString type, QGraphicsSceneMouseEvent *event){}
-void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsSceneMouseEvent *event){}
-void UsageLogger::logButtonDrag(QString name, QString type, QMouseEvent *event, QDrag *drag){}
-void UsageLogger::logSetAdvanced(bool advanced){}
-void UsageLogger::logAddEventBlock(int row, Block *block){}
-void UsageLogger::logAddActionBlock(int row, Block *block, int position){}
-void UsageLogger::logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag){}
-void UsageLogger::logAccEventBlockMode(QString name, QString type, int mode){}
-void UsageLogger::logOpenHelp(){}
-void UsageLogger::logSaveSnapshot(){}
-void UsageLogger::logSave(){}
-void UsageLogger::logNewFile(){}
-void UsageLogger::logOpenFile(){}
-void UsageLogger::logSaveAs(){}
-void UsageLogger::logCloseFile(){}
-void UsageLogger::logStop(){}
-
-	
-#endif //#ifdef PROTOBUF_FOUND
-
 
 }
 }
