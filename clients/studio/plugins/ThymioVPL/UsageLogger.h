@@ -25,11 +25,15 @@
 namespace Aseba { namespace ThymioVPL
 {
 
-class UsageLogger
+class UsageLogger : public QObject
 {
+	Q_OBJECT
+	
 public:
 	static UsageLogger & getLogger();
 	
+	public slots:
+	void logGUIEvents();
 
 	public:
 	void setScene(Scene * scene);

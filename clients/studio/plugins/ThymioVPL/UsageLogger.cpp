@@ -35,6 +35,21 @@ UsageLogger& UsageLogger::getLogger()
 	return instance;
 }
 
+void UsageLogger::logGUIEvents(){
+	QObject s = sender();
+	
+	if(s == 0){
+		
+		QSlider * q = dynamic_cast<QSlider*>(s);
+		if(q != 0){
+			
+		}
+		
+		
+		return;
+	}
+}
+
 void UsageLogger::logInsertSet(int row)
 {
 	logSetAction(RowAction::INSERT,row);
