@@ -179,6 +179,18 @@ void UsageLogger::logCloseFile(){
 void UsageLogger::logStop(){
 	logMenuAction(STOP);	
 }
+void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
+	Action * wrapper = getActionWithCurrentState();
+	DeviceAction *a = new DeviceAction();
+	a->set_id(id);
+	for(unsigned i=0; i < data.size(); i++){
+		a->add_variable(data[i]);
+	}
+	
+	wrapper->set_type(Action_ActionType_DEVICE_ACTION);
+	wrapper->set_allocated_deviceaction(a);
+	storeAction(wrapper);
+}
 
 void UsageLogger::storeAction(Action * a){
 	int size = a->ByteSize();

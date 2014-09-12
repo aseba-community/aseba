@@ -18,6 +18,7 @@
 
 #include "Scene.h"
 #include "Buttons.h"
+#include "../../../../compiler/compiler.h"
 #include "UsageProfile.pb.h"
 
 
@@ -54,6 +55,7 @@ public:
 	void logAccEventBlockMode(QString name, QString type, int mode);
 	void logDropButton(BlockButton *block, QDropEvent *event);
 	void logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event);
+	void logUserEvent(unsigned id, const VariablesDataVector& data);
 	
 private:
 	UsageLogger();

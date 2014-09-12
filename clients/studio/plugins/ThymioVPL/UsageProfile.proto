@@ -28,7 +28,11 @@ message RowAction{
 	}
 	optional int32 row = 1;
 	required ActionType type = 2;
-	
+}
+
+message DeviceAction{
+	required int32 id = 1;
+	repeated int32 variable = 2 [packed=true]; 
 }
 
 message MouseAction{
@@ -118,6 +122,7 @@ message Action{
 		ACC_BLOCK_MODE = 8;
 		MENU = 9;
 		MOUSE_ACTION =10;
+		DEVICE_ACTION =11;
 	}
 	
 	required ActionType type = 1;
@@ -133,6 +138,7 @@ message Action{
 		AccBlockModeAction accBlockModeAction=17;
 		MenuAction menuAction=18;
 		MouseAction mouseAction = 19;
+		DeviceAction deviceAction = 20;
 	}
 }
 

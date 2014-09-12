@@ -36,6 +36,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto();
 void protobuf_ShutdownFile_UsageProfile_2eproto();
 
 class RowAction;
+class DeviceAction;
 class MouseAction;
 class BlockMouseMoveAction;
 class BlockMouseReleaseAction;
@@ -77,11 +78,12 @@ enum Action_ActionType {
   Action_ActionType_ACTION_SET_DRAG = 7,
   Action_ActionType_ACC_BLOCK_MODE = 8,
   Action_ActionType_MENU = 9,
-  Action_ActionType_MOUSE_ACTION = 10
+  Action_ActionType_MOUSE_ACTION = 10,
+  Action_ActionType_DEVICE_ACTION = 11
 };
 bool Action_ActionType_IsValid(int value);
 const Action_ActionType Action_ActionType_ActionType_MIN = Action_ActionType_ROW;
-const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_MOUSE_ACTION;
+const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_DEVICE_ACTION;
 const int Action_ActionType_ActionType_ARRAYSIZE = Action_ActionType_ActionType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor();
@@ -294,6 +296,99 @@ class RowAction : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static RowAction* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DeviceAction : public ::google::protobuf::Message {
+ public:
+  DeviceAction();
+  virtual ~DeviceAction();
+
+  DeviceAction(const DeviceAction& from);
+
+  inline DeviceAction& operator=(const DeviceAction& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DeviceAction& default_instance();
+
+  void Swap(DeviceAction* other);
+
+  // implements Message ----------------------------------------------
+
+  DeviceAction* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DeviceAction& from);
+  void MergeFrom(const DeviceAction& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int32 id = 1;
+  inline bool has_id() const;
+  inline void clear_id();
+  static const int kIdFieldNumber = 1;
+  inline ::google::protobuf::int32 id() const;
+  inline void set_id(::google::protobuf::int32 value);
+
+  // repeated int32 variable = 2 [packed = true];
+  inline int variable_size() const;
+  inline void clear_variable();
+  static const int kVariableFieldNumber = 2;
+  inline ::google::protobuf::int32 variable(int index) const;
+  inline void set_variable(int index, ::google::protobuf::int32 value);
+  inline void add_variable(::google::protobuf::int32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+      variable() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+      mutable_variable();
+
+  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.DeviceAction)
+ private:
+  inline void set_has_id();
+  inline void clear_has_id();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > variable_;
+  mutable int _variable_cached_byte_size_;
+  ::google::protobuf::int32 id_;
+  friend void  protobuf_AddDesc_UsageProfile_2eproto();
+  friend void protobuf_AssignDesc_UsageProfile_2eproto();
+  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
+
+  void InitAsDefaultInstance();
+  static DeviceAction* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1362,6 +1457,7 @@ class Action : public ::google::protobuf::Message {
     kAccBlockModeAction = 17,
     kMenuAction = 18,
     kMouseAction = 19,
+    kDeviceAction = 20,
     ACTUAL_ACTION_NOT_SET = 0,
   };
 
@@ -1404,6 +1500,7 @@ class Action : public ::google::protobuf::Message {
   static const ActionType ACC_BLOCK_MODE = Action_ActionType_ACC_BLOCK_MODE;
   static const ActionType MENU = Action_ActionType_MENU;
   static const ActionType MOUSE_ACTION = Action_ActionType_MOUSE_ACTION;
+  static const ActionType DEVICE_ACTION = Action_ActionType_DEVICE_ACTION;
   static inline bool ActionType_IsValid(int value) {
     return Action_ActionType_IsValid(value);
   }
@@ -1536,6 +1633,15 @@ class Action : public ::google::protobuf::Message {
   inline ::Aseba::ThymioVPL::MouseAction* release_mouseaction();
   inline void set_allocated_mouseaction(::Aseba::ThymioVPL::MouseAction* mouseaction);
 
+  // optional .Aseba.ThymioVPL.DeviceAction deviceAction = 20;
+  inline bool has_deviceaction() const;
+  inline void clear_deviceaction();
+  static const int kDeviceActionFieldNumber = 20;
+  inline const ::Aseba::ThymioVPL::DeviceAction& deviceaction() const;
+  inline ::Aseba::ThymioVPL::DeviceAction* mutable_deviceaction();
+  inline ::Aseba::ThymioVPL::DeviceAction* release_deviceaction();
+  inline void set_allocated_deviceaction(::Aseba::ThymioVPL::DeviceAction* deviceaction);
+
   inline ActualActionCase actual_action_case() const;
   // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.Action)
  private:
@@ -1553,6 +1659,7 @@ class Action : public ::google::protobuf::Message {
   inline void set_has_accblockmodeaction();
   inline void set_has_menuaction();
   inline void set_has_mouseaction();
+  inline void set_has_deviceaction();
 
   inline bool has_actual_action();
   void clear_actual_action();
@@ -1575,6 +1682,7 @@ class Action : public ::google::protobuf::Message {
     ::Aseba::ThymioVPL::AccBlockModeAction* accblockmodeaction_;
     ::Aseba::ThymioVPL::MenuAction* menuaction_;
     ::Aseba::ThymioVPL::MouseAction* mouseaction_;
+    ::Aseba::ThymioVPL::DeviceAction* deviceaction_;
   } actual_action_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
@@ -1721,6 +1829,64 @@ inline void RowAction::set_type(::Aseba::ThymioVPL::RowAction_ActionType value) 
   set_has_type();
   type_ = value;
   // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.RowAction.type)
+}
+
+// -------------------------------------------------------------------
+
+// DeviceAction
+
+// required int32 id = 1;
+inline bool DeviceAction::has_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DeviceAction::set_has_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DeviceAction::clear_has_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DeviceAction::clear_id() {
+  id_ = 0;
+  clear_has_id();
+}
+inline ::google::protobuf::int32 DeviceAction::id() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.DeviceAction.id)
+  return id_;
+}
+inline void DeviceAction::set_id(::google::protobuf::int32 value) {
+  set_has_id();
+  id_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.DeviceAction.id)
+}
+
+// repeated int32 variable = 2 [packed = true];
+inline int DeviceAction::variable_size() const {
+  return variable_.size();
+}
+inline void DeviceAction::clear_variable() {
+  variable_.Clear();
+}
+inline ::google::protobuf::int32 DeviceAction::variable(int index) const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.DeviceAction.variable)
+  return variable_.Get(index);
+}
+inline void DeviceAction::set_variable(int index, ::google::protobuf::int32 value) {
+  variable_.Set(index, value);
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.DeviceAction.variable)
+}
+inline void DeviceAction::add_variable(::google::protobuf::int32 value) {
+  variable_.Add(value);
+  // @@protoc_insertion_point(field_add:Aseba.ThymioVPL.DeviceAction.variable)
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+DeviceAction::variable() const {
+  // @@protoc_insertion_point(field_list:Aseba.ThymioVPL.DeviceAction.variable)
+  return variable_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+DeviceAction::mutable_variable() {
+  // @@protoc_insertion_point(field_mutable_list:Aseba.ThymioVPL.DeviceAction.variable)
+  return &variable_;
 }
 
 // -------------------------------------------------------------------
@@ -3763,6 +3929,49 @@ inline void Action::set_allocated_mouseaction(::Aseba::ThymioVPL::MouseAction* m
   if (mouseaction) {
     set_has_mouseaction();
     actual_action_.mouseaction_ = mouseaction;
+  }
+}
+
+// optional .Aseba.ThymioVPL.DeviceAction deviceAction = 20;
+inline bool Action::has_deviceaction() const {
+  return actual_action_case() == kDeviceAction;
+}
+inline void Action::set_has_deviceaction() {
+  _oneof_case_[0] = kDeviceAction;
+}
+inline void Action::clear_deviceaction() {
+  if (has_deviceaction()) {
+    delete actual_action_.deviceaction_;
+    clear_has_actual_action();
+  }
+}
+inline const ::Aseba::ThymioVPL::DeviceAction& Action::deviceaction() const {
+  return has_deviceaction() ? *actual_action_.deviceaction_
+                      : ::Aseba::ThymioVPL::DeviceAction::default_instance();
+}
+inline ::Aseba::ThymioVPL::DeviceAction* Action::mutable_deviceaction() {
+  if (!has_deviceaction()) {
+    clear_actual_action();
+    set_has_deviceaction();
+    actual_action_.deviceaction_ = new ::Aseba::ThymioVPL::DeviceAction;
+  }
+  return actual_action_.deviceaction_;
+}
+inline ::Aseba::ThymioVPL::DeviceAction* Action::release_deviceaction() {
+  if (has_deviceaction()) {
+    clear_has_actual_action();
+    ::Aseba::ThymioVPL::DeviceAction* temp = actual_action_.deviceaction_;
+    actual_action_.deviceaction_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Action::set_allocated_deviceaction(::Aseba::ThymioVPL::DeviceAction* deviceaction) {
+  clear_actual_action();
+  if (deviceaction) {
+    set_has_deviceaction();
+    actual_action_.deviceaction_ = deviceaction;
   }
 }
 
