@@ -46,6 +46,7 @@ class AccBlockModeAction;
 class AdvancedModeAction;
 class AddBlockAction;
 class MenuAction;
+class TimeStamp;
 class Action;
 class Usage;
 
@@ -1423,6 +1424,95 @@ class MenuAction : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class TimeStamp : public ::google::protobuf::Message {
+ public:
+  TimeStamp();
+  virtual ~TimeStamp();
+
+  TimeStamp(const TimeStamp& from);
+
+  inline TimeStamp& operator=(const TimeStamp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const TimeStamp& default_instance();
+
+  void Swap(TimeStamp* other);
+
+  // implements Message ----------------------------------------------
+
+  TimeStamp* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const TimeStamp& from);
+  void MergeFrom(const TimeStamp& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint32 timestamp = 1;
+  inline bool has_timestamp() const;
+  inline void clear_timestamp();
+  static const int kTimestampFieldNumber = 1;
+  inline ::google::protobuf::uint32 timestamp() const;
+  inline void set_timestamp(::google::protobuf::uint32 value);
+
+  // required uint32 milliseconds = 2;
+  inline bool has_milliseconds() const;
+  inline void clear_milliseconds();
+  static const int kMillisecondsFieldNumber = 2;
+  inline ::google::protobuf::uint32 milliseconds() const;
+  inline void set_milliseconds(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.TimeStamp)
+ private:
+  inline void set_has_timestamp();
+  inline void clear_has_timestamp();
+  inline void set_has_milliseconds();
+  inline void clear_has_milliseconds();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 timestamp_;
+  ::google::protobuf::uint32 milliseconds_;
+  friend void  protobuf_AddDesc_UsageProfile_2eproto();
+  friend void protobuf_AssignDesc_UsageProfile_2eproto();
+  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
+
+  void InitAsDefaultInstance();
+  static TimeStamp* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Action : public ::google::protobuf::Message {
  public:
   Action();
@@ -1543,6 +1633,15 @@ class Action : public ::google::protobuf::Message {
   inline ::std::string* release_programstateasxml();
   inline void set_allocated_programstateasxml(::std::string* programstateasxml);
 
+  // required .Aseba.ThymioVPL.TimeStamp time = 3;
+  inline bool has_time() const;
+  inline void clear_time();
+  static const int kTimeFieldNumber = 3;
+  inline const ::Aseba::ThymioVPL::TimeStamp& time() const;
+  inline ::Aseba::ThymioVPL::TimeStamp* mutable_time();
+  inline ::Aseba::ThymioVPL::TimeStamp* release_time();
+  inline void set_allocated_time(::Aseba::ThymioVPL::TimeStamp* time);
+
   // optional .Aseba.ThymioVPL.RowAction rowAction = 10;
   inline bool has_rowaction() const;
   inline void clear_rowaction();
@@ -1649,6 +1748,8 @@ class Action : public ::google::protobuf::Message {
   inline void clear_has_type();
   inline void set_has_programstateasxml();
   inline void clear_has_programstateasxml();
+  inline void set_has_time();
+  inline void clear_has_time();
   inline void set_has_rowaction();
   inline void set_has_blockmousemoveaction();
   inline void set_has_blockmousereleaseaction();
@@ -1670,6 +1771,7 @@ class Action : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::std::string* programstateasxml_;
+  ::Aseba::ThymioVPL::TimeStamp* time_;
   int type_;
   union ActualActionUnion {
     ::Aseba::ThymioVPL::RowAction* rowaction_;
@@ -3399,6 +3501,58 @@ inline void MenuAction::set_entry(::Aseba::ThymioVPL::MenuEntry value) {
 
 // -------------------------------------------------------------------
 
+// TimeStamp
+
+// required uint32 timestamp = 1;
+inline bool TimeStamp::has_timestamp() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void TimeStamp::set_has_timestamp() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void TimeStamp::clear_has_timestamp() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void TimeStamp::clear_timestamp() {
+  timestamp_ = 0u;
+  clear_has_timestamp();
+}
+inline ::google::protobuf::uint32 TimeStamp::timestamp() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TimeStamp.timestamp)
+  return timestamp_;
+}
+inline void TimeStamp::set_timestamp(::google::protobuf::uint32 value) {
+  set_has_timestamp();
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TimeStamp.timestamp)
+}
+
+// required uint32 milliseconds = 2;
+inline bool TimeStamp::has_milliseconds() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void TimeStamp::set_has_milliseconds() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void TimeStamp::clear_has_milliseconds() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void TimeStamp::clear_milliseconds() {
+  milliseconds_ = 0u;
+  clear_has_milliseconds();
+}
+inline ::google::protobuf::uint32 TimeStamp::milliseconds() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TimeStamp.milliseconds)
+  return milliseconds_;
+}
+inline void TimeStamp::set_milliseconds(::google::protobuf::uint32 value) {
+  set_has_milliseconds();
+  milliseconds_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TimeStamp.milliseconds)
+}
+
+// -------------------------------------------------------------------
+
 // Action
 
 // required .Aseba.ThymioVPL.Action.ActionType type = 1;
@@ -3500,6 +3654,47 @@ inline void Action::set_allocated_programstateasxml(::std::string* programstatea
     programstateasxml_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.Action.programStateAsXml)
+}
+
+// required .Aseba.ThymioVPL.TimeStamp time = 3;
+inline bool Action::has_time() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Action::set_has_time() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Action::clear_has_time() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Action::clear_time() {
+  if (time_ != NULL) time_->::Aseba::ThymioVPL::TimeStamp::Clear();
+  clear_has_time();
+}
+inline const ::Aseba::ThymioVPL::TimeStamp& Action::time() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.Action.time)
+  return time_ != NULL ? *time_ : *default_instance_->time_;
+}
+inline ::Aseba::ThymioVPL::TimeStamp* Action::mutable_time() {
+  set_has_time();
+  if (time_ == NULL) time_ = new ::Aseba::ThymioVPL::TimeStamp;
+  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.Action.time)
+  return time_;
+}
+inline ::Aseba::ThymioVPL::TimeStamp* Action::release_time() {
+  clear_has_time();
+  ::Aseba::ThymioVPL::TimeStamp* temp = time_;
+  time_ = NULL;
+  return temp;
+}
+inline void Action::set_allocated_time(::Aseba::ThymioVPL::TimeStamp* time) {
+  delete time_;
+  time_ = time;
+  if (time) {
+    set_has_time();
+  } else {
+    clear_has_time();
+  }
+  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.Action.time)
 }
 
 // optional .Aseba.ThymioVPL.RowAction rowAction = 10;

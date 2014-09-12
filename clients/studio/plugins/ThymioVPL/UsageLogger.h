@@ -73,6 +73,7 @@ protected:
 	void logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType);
 	void logSetAction(RowAction_ActionType type, int row);
 	void logAddBlock(BlockType type,int row, Block *block);
+	unsigned int getMilliseconds();
 	
 	std::ofstream * fileOut;
 	Scene * scene;

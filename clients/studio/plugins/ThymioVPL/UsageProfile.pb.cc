@@ -55,6 +55,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* MenuAction_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   MenuAction_reflection_ = NULL;
+const ::google::protobuf::Descriptor* TimeStamp_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  TimeStamp_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Action_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Action_reflection_ = NULL;
@@ -283,10 +286,27 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MenuAction));
-  Action_descriptor_ = file->message_type(11);
-  static const int Action_offsets_[14] = {
+  TimeStamp_descriptor_ = file->message_type(11);
+  static const int TimeStamp_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, timestamp_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, milliseconds_),
+  };
+  TimeStamp_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      TimeStamp_descriptor_,
+      TimeStamp::default_instance_,
+      TimeStamp_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(TimeStamp));
+  Action_descriptor_ = file->message_type(12);
+  static const int Action_offsets_[15] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, programstateasxml_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, time_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, rowaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, blockmousemoveaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, blockmousereleaseaction_),
@@ -314,7 +334,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Action));
   Action_ActionType_descriptor_ = Action_descriptor_->enum_type(0);
-  Usage_descriptor_ = file->message_type(12);
+  Usage_descriptor_ = file->message_type(13);
   static const int Usage_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Usage, action_),
   };
@@ -368,6 +388,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     MenuAction_descriptor_, &MenuAction::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    TimeStamp_descriptor_, &TimeStamp::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Action_descriptor_, &Action::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Usage_descriptor_, &Usage::default_instance());
@@ -398,6 +420,8 @@ void protobuf_ShutdownFile_UsageProfile_2eproto() {
   delete AddBlockAction_reflection_;
   delete MenuAction::default_instance_;
   delete MenuAction_reflection_;
+  delete TimeStamp::default_instance_;
+  delete TimeStamp_reflection_;
   delete Action::default_instance_;
   delete Action_default_oneof_instance_;
   delete Action_reflection_;
@@ -441,42 +465,44 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
     "seba.ThymioVPL.BlockType\022\021\n\tblockName\030\002 "
     "\001(\t\022\021\n\tblockType\030\003 \001(\t\022\013\n\003row\030\004 \001(\005\"7\n\nM"
     "enuAction\022)\n\005entry\030\001 \002(\0162\032.Aseba.ThymioV"
-    "PL.MenuEntry\"\341\007\n\006Action\0220\n\004type\030\001 \002(\0162\"."
-    "Aseba.ThymioVPL.Action.ActionType\022\031\n\021pro"
-    "gramStateAsXml\030\002 \001(\t\022/\n\trowAction\030\n \001(\0132"
-    "\032.Aseba.ThymioVPL.RowActionH\000\022E\n\024blockMo"
-    "useMoveAction\030\013 \001(\0132%.Aseba.ThymioVPL.Bl"
-    "ockMouseMoveActionH\000\022K\n\027blockMouseReleas"
-    "eAction\030\014 \001(\0132(.Aseba.ThymioVPL.BlockMou"
-    "seReleaseActionH\000\022=\n\020buttonDragAction\030\r "
-    "\001(\0132!.Aseba.ThymioVPL.ButtonDragActionH\000"
-    "\022A\n\022advancedModeAction\030\016 \001(\0132#.Aseba.Thy"
-    "mioVPL.AdvancedModeActionH\000\0229\n\016addBlockA"
-    "ction\030\017 \001(\0132\037.Aseba.ThymioVPL.AddBlockAc"
-    "tionH\000\022C\n\023actionSetDragAction\030\020 \001(\0132$.As"
-    "eba.ThymioVPL.ActionSetDragActionH\000\022A\n\022a"
-    "ccBlockModeAction\030\021 \001(\0132#.Aseba.ThymioVP"
-    "L.AccBlockModeActionH\000\0221\n\nmenuAction\030\022 \001"
-    "(\0132\033.Aseba.ThymioVPL.MenuActionH\000\0223\n\013mou"
-    "seAction\030\023 \001(\0132\034.Aseba.ThymioVPL.MouseAc"
-    "tionH\000\0225\n\014deviceAction\030\024 \001(\0132\035.Aseba.Thy"
-    "mioVPL.DeviceActionH\000\"\317\001\n\nActionType\022\007\n\003"
-    "ROW\020\001\022\024\n\020BLOCK_MOUSE_MOVE\020\002\022\027\n\023BLOCK_MOU"
-    "SE_RELEASE\020\003\022\017\n\013BUTTON_DRAG\020\004\022\021\n\rADVANCE"
-    "D_MODE\020\005\022\r\n\tADD_BLOCK\020\006\022\023\n\017ACTION_SET_DR"
-    "AG\020\007\022\022\n\016ACC_BLOCK_MODE\020\010\022\010\n\004MENU\020\t\022\020\n\014MO"
-    "USE_ACTION\020\n\022\021\n\rDEVICE_ACTION\020\013B\017\n\ractua"
-    "l_action\"0\n\005Usage\022\'\n\006action\030\001 \003(\0132\027.Aseb"
-    "a.ThymioVPL.Action*6\n\013MouseButton\022\010\n\004LEF"
-    "T\020\001\022\n\n\006MIDDLE\020\002\022\t\n\005RIGHT\020\003\022\006\n\002NO\020\004*\"\n\tBl"
-    "ockType\022\t\n\005EVENT\020\001\022\n\n\006ACTION\020\002*\200\001\n\017Mouse"
-    "ActionType\022\016\n\nMOVE_BLOCK\020\001\022\021\n\rRELEASE_BL"
-    "OCK\020\002\022\017\n\013DRAG_BUTTON\020\003\022\023\n\017DRAG_ACTION_SE"
-    "T\020\004\022\017\n\013DROP_BUTTON\020\005\022\023\n\017DROP_ACTION_SET\020"
-    "\006*{\n\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SAVE\020\002\022"
-    "\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_FILE\020"
-    "\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020\007\022\010\n\004"
-    "STOP\020\010", 2566);
+    "PL.MenuEntry\"4\n\tTimeStamp\022\021\n\ttimestamp\030\001"
+    " \002(\r\022\024\n\014milliseconds\030\002 \002(\r\"\213\010\n\006Action\0220\n"
+    "\004type\030\001 \002(\0162\".Aseba.ThymioVPL.Action.Act"
+    "ionType\022\031\n\021programStateAsXml\030\002 \001(\t\022(\n\004ti"
+    "me\030\003 \002(\0132\032.Aseba.ThymioVPL.TimeStamp\022/\n\t"
+    "rowAction\030\n \001(\0132\032.Aseba.ThymioVPL.RowAct"
+    "ionH\000\022E\n\024blockMouseMoveAction\030\013 \001(\0132%.As"
+    "eba.ThymioVPL.BlockMouseMoveActionH\000\022K\n\027"
+    "blockMouseReleaseAction\030\014 \001(\0132(.Aseba.Th"
+    "ymioVPL.BlockMouseReleaseActionH\000\022=\n\020but"
+    "tonDragAction\030\r \001(\0132!.Aseba.ThymioVPL.Bu"
+    "ttonDragActionH\000\022A\n\022advancedModeAction\030\016"
+    " \001(\0132#.Aseba.ThymioVPL.AdvancedModeActio"
+    "nH\000\0229\n\016addBlockAction\030\017 \001(\0132\037.Aseba.Thym"
+    "ioVPL.AddBlockActionH\000\022C\n\023actionSetDragA"
+    "ction\030\020 \001(\0132$.Aseba.ThymioVPL.ActionSetD"
+    "ragActionH\000\022A\n\022accBlockModeAction\030\021 \001(\0132"
+    "#.Aseba.ThymioVPL.AccBlockModeActionH\000\0221"
+    "\n\nmenuAction\030\022 \001(\0132\033.Aseba.ThymioVPL.Men"
+    "uActionH\000\0223\n\013mouseAction\030\023 \001(\0132\034.Aseba.T"
+    "hymioVPL.MouseActionH\000\0225\n\014deviceAction\030\024"
+    " \001(\0132\035.Aseba.ThymioVPL.DeviceActionH\000\"\317\001"
+    "\n\nActionType\022\007\n\003ROW\020\001\022\024\n\020BLOCK_MOUSE_MOV"
+    "E\020\002\022\027\n\023BLOCK_MOUSE_RELEASE\020\003\022\017\n\013BUTTON_D"
+    "RAG\020\004\022\021\n\rADVANCED_MODE\020\005\022\r\n\tADD_BLOCK\020\006\022"
+    "\023\n\017ACTION_SET_DRAG\020\007\022\022\n\016ACC_BLOCK_MODE\020\010"
+    "\022\010\n\004MENU\020\t\022\020\n\014MOUSE_ACTION\020\n\022\021\n\rDEVICE_A"
+    "CTION\020\013B\017\n\ractual_action\"0\n\005Usage\022\'\n\006act"
+    "ion\030\001 \003(\0132\027.Aseba.ThymioVPL.Action*6\n\013Mo"
+    "useButton\022\010\n\004LEFT\020\001\022\n\n\006MIDDLE\020\002\022\t\n\005RIGHT"
+    "\020\003\022\006\n\002NO\020\004*\"\n\tBlockType\022\t\n\005EVENT\020\001\022\n\n\006AC"
+    "TION\020\002*\200\001\n\017MouseActionType\022\016\n\nMOVE_BLOCK"
+    "\020\001\022\021\n\rRELEASE_BLOCK\020\002\022\017\n\013DRAG_BUTTON\020\003\022\023"
+    "\n\017DRAG_ACTION_SET\020\004\022\017\n\013DROP_BUTTON\020\005\022\023\n\017"
+    "DROP_ACTION_SET\020\006*{\n\tMenuEntry\022\r\n\tOPEN_H"
+    "ELP\020\001\022\010\n\004SAVE\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE"
+    "\020\004\022\r\n\tOPEN_FILE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAV"
+    "E_SNAPSHOT\020\007\022\010\n\004STOP\020\010", 2662);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "UsageProfile.proto", &protobuf_RegisterTypes);
   RowAction::default_instance_ = new RowAction();
@@ -490,6 +516,7 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
   AdvancedModeAction::default_instance_ = new AdvancedModeAction();
   AddBlockAction::default_instance_ = new AddBlockAction();
   MenuAction::default_instance_ = new MenuAction();
+  TimeStamp::default_instance_ = new TimeStamp();
   Action::default_instance_ = new Action();
   Action_default_oneof_instance_ = new ActionOneofInstance;
   Usage::default_instance_ = new Usage();
@@ -504,6 +531,7 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
   AdvancedModeAction::default_instance_->InitAsDefaultInstance();
   AddBlockAction::default_instance_->InitAsDefaultInstance();
   MenuAction::default_instance_->InitAsDefaultInstance();
+  TimeStamp::default_instance_->InitAsDefaultInstance();
   Action::default_instance_->InitAsDefaultInstance();
   Usage::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_UsageProfile_2eproto);
@@ -4532,6 +4560,281 @@ void MenuAction::Swap(MenuAction* other) {
 
 // ===================================================================
 
+#ifndef _MSC_VER
+const int TimeStamp::kTimestampFieldNumber;
+const int TimeStamp::kMillisecondsFieldNumber;
+#endif  // !_MSC_VER
+
+TimeStamp::TimeStamp()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Aseba.ThymioVPL.TimeStamp)
+}
+
+void TimeStamp::InitAsDefaultInstance() {
+}
+
+TimeStamp::TimeStamp(const TimeStamp& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Aseba.ThymioVPL.TimeStamp)
+}
+
+void TimeStamp::SharedCtor() {
+  _cached_size_ = 0;
+  timestamp_ = 0u;
+  milliseconds_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+TimeStamp::~TimeStamp() {
+  // @@protoc_insertion_point(destructor:Aseba.ThymioVPL.TimeStamp)
+  SharedDtor();
+}
+
+void TimeStamp::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void TimeStamp::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* TimeStamp::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return TimeStamp_descriptor_;
+}
+
+const TimeStamp& TimeStamp::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_UsageProfile_2eproto();
+  return *default_instance_;
+}
+
+TimeStamp* TimeStamp::default_instance_ = NULL;
+
+TimeStamp* TimeStamp::New() const {
+  return new TimeStamp;
+}
+
+void TimeStamp::Clear() {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<TimeStamp*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  ZR_(timestamp_, milliseconds_);
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool TimeStamp::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Aseba.ThymioVPL.TimeStamp)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required uint32 timestamp = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &timestamp_)));
+          set_has_timestamp();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_milliseconds;
+        break;
+      }
+
+      // required uint32 milliseconds = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_milliseconds:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &milliseconds_)));
+          set_has_milliseconds();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Aseba.ThymioVPL.TimeStamp)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Aseba.ThymioVPL.TimeStamp)
+  return false;
+#undef DO_
+}
+
+void TimeStamp::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Aseba.ThymioVPL.TimeStamp)
+  // required uint32 timestamp = 1;
+  if (has_timestamp()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->timestamp(), output);
+  }
+
+  // required uint32 milliseconds = 2;
+  if (has_milliseconds()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->milliseconds(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Aseba.ThymioVPL.TimeStamp)
+}
+
+::google::protobuf::uint8* TimeStamp::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Aseba.ThymioVPL.TimeStamp)
+  // required uint32 timestamp = 1;
+  if (has_timestamp()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->timestamp(), target);
+  }
+
+  // required uint32 milliseconds = 2;
+  if (has_milliseconds()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->milliseconds(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Aseba.ThymioVPL.TimeStamp)
+  return target;
+}
+
+int TimeStamp::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required uint32 timestamp = 1;
+    if (has_timestamp()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->timestamp());
+    }
+
+    // required uint32 milliseconds = 2;
+    if (has_milliseconds()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->milliseconds());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void TimeStamp::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const TimeStamp* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const TimeStamp*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void TimeStamp::MergeFrom(const TimeStamp& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_timestamp()) {
+      set_timestamp(from.timestamp());
+    }
+    if (from.has_milliseconds()) {
+      set_milliseconds(from.milliseconds());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void TimeStamp::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TimeStamp::CopyFrom(const TimeStamp& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TimeStamp::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void TimeStamp::Swap(TimeStamp* other) {
+  if (other != this) {
+    std::swap(timestamp_, other->timestamp_);
+    std::swap(milliseconds_, other->milliseconds_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata TimeStamp::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = TimeStamp_descriptor_;
+  metadata.reflection = TimeStamp_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor() {
   protobuf_AssignDescriptorsOnce();
   return Action_ActionType_descriptor_;
@@ -4574,6 +4877,7 @@ const int Action::ActionType_ARRAYSIZE;
 #ifndef _MSC_VER
 const int Action::kTypeFieldNumber;
 const int Action::kProgramStateAsXmlFieldNumber;
+const int Action::kTimeFieldNumber;
 const int Action::kRowActionFieldNumber;
 const int Action::kBlockMouseMoveActionFieldNumber;
 const int Action::kBlockMouseReleaseActionFieldNumber;
@@ -4594,6 +4898,7 @@ Action::Action()
 }
 
 void Action::InitAsDefaultInstance() {
+  time_ = const_cast< ::Aseba::ThymioVPL::TimeStamp*>(&::Aseba::ThymioVPL::TimeStamp::default_instance());
   Action_default_oneof_instance_->rowaction_ = const_cast< ::Aseba::ThymioVPL::RowAction*>(&::Aseba::ThymioVPL::RowAction::default_instance());
   Action_default_oneof_instance_->blockmousemoveaction_ = const_cast< ::Aseba::ThymioVPL::BlockMouseMoveAction*>(&::Aseba::ThymioVPL::BlockMouseMoveAction::default_instance());
   Action_default_oneof_instance_->blockmousereleaseaction_ = const_cast< ::Aseba::ThymioVPL::BlockMouseReleaseAction*>(&::Aseba::ThymioVPL::BlockMouseReleaseAction::default_instance());
@@ -4619,6 +4924,7 @@ void Action::SharedCtor() {
   _cached_size_ = 0;
   type_ = 1;
   programstateasxml_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  time_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   clear_has_actual_action();
 }
@@ -4636,6 +4942,7 @@ void Action::SharedDtor() {
     clear_actual_action();
   }
   if (this != default_instance_) {
+    delete time_;
   }
 }
 
@@ -4715,12 +5022,15 @@ void Action::clear_actual_action() {
 
 
 void Action::Clear() {
-  if (_has_bits_[0 / 32] & 3) {
+  if (_has_bits_[0 / 32] & 7) {
     type_ = 1;
     if (has_programstateasxml()) {
       if (programstateasxml_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         programstateasxml_->clear();
       }
+    }
+    if (has_time()) {
+      if (time_ != NULL) time_->::Aseba::ThymioVPL::TimeStamp::Clear();
     }
   }
   clear_actual_action();
@@ -4767,6 +5077,19 @@ bool Action::MergePartialFromCodedStream(
             this->programstateasxml().data(), this->programstateasxml().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "programstateasxml");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_time;
+        break;
+      }
+
+      // required .Aseba.ThymioVPL.TimeStamp time = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_time:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_time()));
         } else {
           goto handle_unusual;
         }
@@ -4958,6 +5281,12 @@ void Action::SerializeWithCachedSizes(
       2, this->programstateasxml(), output);
   }
 
+  // required .Aseba.ThymioVPL.TimeStamp time = 3;
+  if (has_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->time(), output);
+  }
+
   // optional .Aseba.ThymioVPL.RowAction rowAction = 10;
   if (has_rowaction()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -5049,6 +5378,13 @@ void Action::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->programstateasxml(), target);
+  }
+
+  // required .Aseba.ThymioVPL.TimeStamp time = 3;
+  if (has_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        3, this->time(), target);
   }
 
   // optional .Aseba.ThymioVPL.RowAction rowAction = 10;
@@ -5151,6 +5487,13 @@ int Action::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->programstateasxml());
+    }
+
+    // required .Aseba.ThymioVPL.TimeStamp time = 3;
+    if (has_time()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->time());
     }
 
   }
@@ -5317,6 +5660,9 @@ void Action::MergeFrom(const Action& from) {
     if (from.has_programstateasxml()) {
       set_programstateasxml(from.programstateasxml());
     }
+    if (from.has_time()) {
+      mutable_time()->::Aseba::ThymioVPL::TimeStamp::MergeFrom(from.time());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -5334,8 +5680,11 @@ void Action::CopyFrom(const Action& from) {
 }
 
 bool Action::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000005) != 0x00000005) return false;
 
+  if (has_time()) {
+    if (!this->time().IsInitialized()) return false;
+  }
   if (has_rowaction()) {
     if (!this->rowaction().IsInitialized()) return false;
   }
@@ -5370,6 +5719,7 @@ void Action::Swap(Action* other) {
   if (other != this) {
     std::swap(type_, other->type_);
     std::swap(programstateasxml_, other->programstateasxml_);
+    std::swap(time_, other->time_);
     std::swap(actual_action_, other->actual_action_);
     std::swap(_oneof_case_[0], other->_oneof_case_[0]);
     std::swap(_has_bits_[0], other->_has_bits_[0]);

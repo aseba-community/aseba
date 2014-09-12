@@ -1,6 +1,7 @@
 #include "UsageLogger.h"
 
 #include <ctime>
+#include <sys/time.h>
 #include "Block.h"
 
 using namespace std;
@@ -206,6 +207,11 @@ Action * UsageLogger::getActionWithCurrentState()
 		action->set_programstateasxml(scene->toString().toUtf8().constData());
 	}
 	
+	TimeStamp *t = new TimeStamp();
+	t->set_timestamp(time(NULL));
+	t->set_milliseconds(getMilliseconds());
+	action->set_allocated_time(t);
+	
 	return action;
 }
 
@@ -234,6 +240,14 @@ void UsageLogger::gen_random(char *s, const int len) {
     }
 
     s[len] = 0;
+}
+
+unsigned int UsageLogger::getMilliseconds(){
+	unsigned int millis = 0;
+	timeval t;
+	gettimeofday(&t, NULL);
+	millis = t.tv_usec;
+	return millis;
 }
 
 MouseButton UsageLogger::mapButtons(Qt::MouseButton b){

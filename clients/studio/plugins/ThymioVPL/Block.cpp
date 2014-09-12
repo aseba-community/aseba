@@ -316,6 +316,7 @@ namespace Aseba { namespace ThymioVPL
 	void Block::emitUndoCheckpointAndClearIfChanged()
 	{
 		if (changed)
+			LOG(logBlockChang(this));
 			emit undoCheckpoint();
 		changed = false;
 	}

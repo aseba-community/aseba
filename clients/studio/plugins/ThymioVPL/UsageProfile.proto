@@ -110,6 +110,11 @@ message MenuAction{
 	required MenuEntry entry=1;
 }
 
+message TimeStamp{
+	required uint32 timestamp = 1;		// UNIX timestamp
+	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolut value might not be meaningful
+}
+
 message Action{
 	enum ActionType{
 		ROW = 1;
@@ -127,6 +132,7 @@ message Action{
 	
 	required ActionType type = 1;
 	optional string programStateAsXml = 2;	// The current program state (before! the action is applied)
+	required TimeStamp time = 3;
 	oneof actual_action {
 		RowAction rowAction = 10;
 		BlockMouseMoveAction blockMouseMoveAction = 11;
