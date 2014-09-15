@@ -20,6 +20,7 @@
 #include "Buttons.h"
 #include "../../../../compiler/compiler.h"
 #include "UsageProfile.pb.h"
+#include "LogSignalMapper.h"
 
 
 namespace Aseba { namespace ThymioVPL
@@ -33,7 +34,7 @@ public:
 	static UsageLogger & getLogger();
 	
 	public slots:
-	void logGUIEvents();
+	void logGUIEvents(unsigned int senderId, QObject * logicalParent);
 
 	public:
 	void setScene(Scene * scene);
@@ -60,11 +61,13 @@ public:
 	void logDropButton(BlockButton *block, QDropEvent *event);
 	void logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event);
 	void logUserEvent(unsigned id, const VariablesDataVector& data);
+	void logSignal(const QObject * sender, const char * signal, const char * method, unsigned int senderId, QObject * logicalParent);
 	
 private:
 	UsageLogger();
 	~UsageLogger();
 	Action *action;
+	LogSignalMapper signalMapper;
 	
 protected:
 	void storeAction(Action * action);

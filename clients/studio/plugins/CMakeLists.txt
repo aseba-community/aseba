@@ -15,6 +15,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/Style.cpp
 	ThymioVPL/UsageLogger.cpp
 	ThymioVPL/UsageProfile.pb.cc
+	ThymioVPL/LogSignalMapper.cpp
 )
 qt4_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h
@@ -28,6 +29,7 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/Scene.h
 	ThymioVPL/UsageLogger.h
 	ThymioVPL/UsageProfile.pb.h
+	ThymioVPL/LogSignalMapper.h
 )
 add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 

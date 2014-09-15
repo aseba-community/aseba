@@ -3,6 +3,10 @@
 #include <ctime>
 #include <sys/time.h>
 #include "Block.h"
+#include <iostream>
+
+
+#include <QSlider>
 
 using namespace std;
 
@@ -13,6 +17,7 @@ UsageLogger::UsageLogger()
 	fileOut = new ofstream("test.log"/*getFileName().c_str()*/, ios::app | ios::binary);
 	scene = 0;
 	action = new Action();
+	connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *)),this, SIGNAL(logGUIEvents(unsigned int, QObject*)));
 }
 
 UsageLogger::~UsageLogger()
@@ -35,19 +40,22 @@ UsageLogger& UsageLogger::getLogger()
 	return instance;
 }
 
-void UsageLogger::logGUIEvents(){
-	QObject s = sender();
+void UsageLogger::logGUIEvents(unsigned int senderId, QObject * logicalParent){
+	QObject * s = sender();
 	
 	if(s == 0){
-		
-		QSlider * q = dynamic_cast<QSlider*>(s);
-		if(q != 0){
-			
-		}
-		
-		
 		return;
 	}
+	
+	QSlider * q = dynamic_cast<QSlider*>(s);
+	if(q != 0){
+		cout << "slide realease" << endl;
+	}
+}
+
+void UsageLogger::logSignal(const QObject * sender, const char * signal, const char * method, unsigned int senderId, QObject * logicalParent){
+	connect(sender, signal, &signalMapper, SLOT(map()));
+	signalMapper.setMapping(sender, senderId, logicalParent);
 }
 
 void UsageLogger::logInsertSet(int row)

@@ -12,6 +12,7 @@
 
 #include "ActionBlocks.h"
 #include "Buttons.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -145,6 +146,8 @@ namespace Aseba { namespace ThymioVPL
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
 			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
 			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
+			connect(s, SIGNAL(sliderReleased()), &UsageLogger::getLogger(),SLOT(logGUIEvents()));
+			
 		}
 	}
 
