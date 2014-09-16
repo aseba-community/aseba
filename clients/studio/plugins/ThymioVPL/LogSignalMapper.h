@@ -13,7 +13,7 @@ class LogSignalMapper : public QObject{
 	Q_OBJECT
 	
 signals:
-	void mapped(unsigned int senderId, QObject * logicalParent);
+	void mapped(unsigned int senderId, QObject *originalSender, QObject *logicalParent);
 	
 public slots:
 	void map();

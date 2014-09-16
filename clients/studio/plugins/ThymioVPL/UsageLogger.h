@@ -32,9 +32,10 @@ class UsageLogger : public QObject
 	
 public:
 	static UsageLogger & getLogger();
+	static int getRow(Block * b);
 	
 	public slots:
-	void logGUIEvents(unsigned int senderId, QObject * logicalParent);
+	void logGUIEvents(unsigned int senderId, QObject *originalSender, QObject * logicalParent);
 
 	public:
 	void setScene(Scene * scene);
@@ -61,7 +62,8 @@ public:
 	void logDropButton(BlockButton *block, QDropEvent *event);
 	void logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event);
 	void logUserEvent(unsigned id, const VariablesDataVector& data);
-	void logSignal(const QObject * sender, const char * signal, const char * method, unsigned int senderId, QObject * logicalParent);
+	void logSignal(const QObject * sender, const char * signal, unsigned int senderId, QObject * logicalParent);
+	void logBlockAction(BlockActionType type, QString blockName, QString blockType, int row, int elementId, int * sliderValue, unsigned int * soundValue, unsigned int * timeValue, int * buttonValue);
 	
 private:
 	UsageLogger();
@@ -80,6 +82,7 @@ protected:
 	void logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType);
 	void logSetAction(RowAction_ActionType type, int row);
 	void logAddBlock(BlockType type,int row, Block *block);
+	
 	unsigned int getMilliseconds();
 	
 	std::ofstream * fileOut;

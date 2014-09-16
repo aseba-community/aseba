@@ -20,6 +20,16 @@ enum MouseActionType{
 	DROP_BUTTON = 5;
 	DROP_ACTION_SET = 6;
 }
+enum MenuEntry{
+	OPEN_HELP=1;
+	SAVE=2;
+	SAVE_AS=3;
+	NEW_FILE=4;
+	OPEN_FILE=5;
+	CLOSE_FILE=6;
+	SAVE_SNAPSHOT=7;
+	STOP=8;
+}
 
 message RowAction{
 	enum ActionType{
@@ -47,37 +57,6 @@ message MouseAction{
 	optional int32 row= 7;
 }
 
-message BlockMouseMoveAction{
-	required MouseButton button = 1;
-	optional string blockName = 2;
-	optional string blockType = 3;
-	optional double x = 4;
-	optional double y = 5;
-}
-
-message BlockMouseReleaseAction{
-	required MouseButton button = 1;
-	optional string blockName = 2;
-	optional string blockType = 3;
-	optional double x = 4;
-	optional double y = 5;
-}
-
-message ButtonDragAction{
-	optional MouseButton button = 1;
-	optional string blockName = 2;
-	optional string blockType = 3;
-	optional double x = 4;
-	optional double y = 5;
-}
-
-message ActionSetDragAction{
-	optional MouseButton button = 1;
-	optional int32 row= 2;
-	optional double x = 3;
-	optional double y = 4;
-}
-
 message AccBlockModeAction{
 	required int32 mode =1;
 	optional string blockName = 2;
@@ -95,15 +74,25 @@ message AddBlockAction{
 	optional int32 row=4;
 }
 
-enum MenuEntry{
-	OPEN_HELP=1;
-	SAVE=2;
-	SAVE_AS=3;
-	NEW_FILE=4;
-	OPEN_FILE=5;
-	CLOSE_FILE=6;
-	SAVE_SNAPSHOT=7;
-	STOP=8;
+enum BlockActionType{
+	SLIDER = 1;
+	BUTTON = 2;
+	SET_NOTE = 3;
+	SET_DURATION = 4;
+	TIMER = 5;
+}
+
+message BlockAction{
+	required BlockActionType type = 1;
+	optional int32 row =2;
+	optional string blockName = 3;
+	optional string blockType = 4;
+	optional int32 elementId = 5;
+	
+	optional int32 sliderValue = 6;
+	optional int32 soundValue = 7;
+	optional int32 timerValue = 8;
+	optional int32 buttonValue = 9;
 }
 
 message MenuAction{
@@ -117,17 +106,14 @@ message TimeStamp{
 
 message Action{
 	enum ActionType{
-		ROW = 1;
-		BLOCK_MOUSE_MOVE =2;
-		BLOCK_MOUSE_RELEASE = 3;
-		BUTTON_DRAG =4;
-		ADVANCED_MODE=5;
-		ADD_BLOCK = 6;
-		ACTION_SET_DRAG = 7;
-		ACC_BLOCK_MODE = 8;
-		MENU = 9;
-		MOUSE_ACTION =10;
-		DEVICE_ACTION =11;
+		ADVANCED_MODE=1;
+		ADD_BLOCK = 2;
+		ACC_BLOCK_MODE = 3;
+		MENU = 4;
+		MOUSE_ACTION =5;
+		DEVICE_ACTION =6;
+		BLOCK_ACTION=7;
+		ROW = 8;
 	}
 	
 	required ActionType type = 1;
@@ -135,16 +121,13 @@ message Action{
 	required TimeStamp time = 3;
 	oneof actual_action {
 		RowAction rowAction = 10;
-		BlockMouseMoveAction blockMouseMoveAction = 11;
-		BlockMouseReleaseAction blockMouseReleaseAction = 12;
-		ButtonDragAction buttonDragAction =13;
-		AdvancedModeAction advancedModeAction=14;
-		AddBlockAction addBlockAction=15;
-		ActionSetDragAction actionSetDragAction=16;
-		AccBlockModeAction accBlockModeAction=17;
-		MenuAction menuAction=18;
-		MouseAction mouseAction = 19;
-		DeviceAction deviceAction = 20;
+		AdvancedModeAction advancedModeAction=11;
+		AddBlockAction addBlockAction=12;
+		AccBlockModeAction accBlockModeAction=13;
+		MenuAction menuAction=14;
+		MouseAction mouseAction = 15;
+		DeviceAction deviceAction = 16;
+		BlockAction blockAction = 17;
 	}
 }
 

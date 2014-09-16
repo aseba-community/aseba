@@ -4,6 +4,8 @@
 #include <sys/time.h>
 #include "Block.h"
 #include <iostream>
+#include <typeinfo>
+#include "EventActionsSet.h"
 
 
 #include <QSlider>
@@ -17,7 +19,7 @@ UsageLogger::UsageLogger()
 	fileOut = new ofstream("test.log"/*getFileName().c_str()*/, ios::app | ios::binary);
 	scene = 0;
 	action = new Action();
-	connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *)),this, SIGNAL(logGUIEvents(unsigned int, QObject*)));
+	connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *, QObject *)),this, SLOT(logGUIEvents(unsigned int, QObject*, QObject *)));
 }
 
 UsageLogger::~UsageLogger()
@@ -27,6 +29,18 @@ UsageLogger::~UsageLogger()
 		fileOut->close();
 		delete fileOut;
 	}
+}
+
+int UsageLogger::getRow(Block * b){
+	int row = -1;
+	QGraphicsItem  *parent = b->parentItem();
+	if(parent){
+		EventActionsSet * eas = dynamic_cast<EventActionsSet*>(parent);
+		if(eas){
+			row = eas->getRow();
+		}
+	}
+	return row;
 }
 
 void UsageLogger::setScene(Scene * scene)
@@ -40,20 +54,59 @@ UsageLogger& UsageLogger::getLogger()
 	return instance;
 }
 
-void UsageLogger::logGUIEvents(unsigned int senderId, QObject * logicalParent){
-	QObject * s = sender();
-	
-	if(s == 0){
+void UsageLogger::logGUIEvents(unsigned int senderId, QObject *originalSender, QObject * logicalParent){
+	if(originalSender == 0){
 		return;
 	}
-	
-	QSlider * q = dynamic_cast<QSlider*>(s);
-	if(q != 0){
-		cout << "slide realease" << endl;
+	Block *b = dynamic_cast<Block*>(logicalParent);
+	if(b != 0){
+		int row = getRow(b);
+		
+		QSlider * q = dynamic_cast<QSlider*>(originalSender);
+		GeometryShapeButton * button = dynamic_cast<GeometryShapeButton*>(originalSender);
+		
+		if(q != 0){
+			cout << "slide realease " << senderId << " " << b->getName().toUtf8().constData() << " " << b->getType().toUtf8().constData()  << " at row " << row << endl;
+			int sliderValue = q->value();
+			logBlockAction(SLIDER,b->getName(),b->getType(), row, senderId, &sliderValue, NULL, NULL,NULL);
+		}
+		else if(button != 0){
+			int buttonValue = button->getValue();
+			logBlockAction(BUTTON,b->getName(),b->getType(), row, senderId, NULL, NULL, NULL, &buttonValue);
+		}
 	}
 }
 
-void UsageLogger::logSignal(const QObject * sender, const char * signal, const char * method, unsigned int senderId, QObject * logicalParent){
+
+void UsageLogger::logBlockAction(BlockActionType type, QString blockName, QString blockType, int row, int elementId, int * sliderValue, unsigned int * soundValue, unsigned int * timerValue, int * buttonValue){
+	Action * wrapper = getActionWithCurrentState();
+	BlockAction *a = new BlockAction();
+	
+	a->set_type(type);
+	a->set_blockname(blockName.toUtf8().constData());
+	a->set_blocktype(blockType.toUtf8().constData());
+	a->set_row(row);
+	a->set_elementid(elementId);
+	
+	if(sliderValue){
+		a->set_slidervalue(*sliderValue);
+	}
+	if(soundValue){
+		a->set_soundvalue(*soundValue);
+	}
+	if(timerValue){
+		a->set_timervalue(*timerValue);
+	}
+	if(buttonValue){
+		a->set_buttonvalue(*buttonValue);
+	}
+	
+	wrapper->set_type(Action_ActionType_BLOCK_ACTION);
+	wrapper->set_allocated_blockaction(a);
+	storeAction(wrapper);
+}
+
+void UsageLogger::logSignal(const QObject * sender, const char * signal, unsigned int senderId, QObject * logicalParent){
 	connect(sender, signal, &signalMapper, SLOT(map()));
 	signalMapper.setMapping(sender, senderId, logicalParent);
 }

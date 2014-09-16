@@ -38,13 +38,10 @@ void protobuf_ShutdownFile_UsageProfile_2eproto();
 class RowAction;
 class DeviceAction;
 class MouseAction;
-class BlockMouseMoveAction;
-class BlockMouseReleaseAction;
-class ButtonDragAction;
-class ActionSetDragAction;
 class AccBlockModeAction;
 class AdvancedModeAction;
 class AddBlockAction;
+class BlockAction;
 class MenuAction;
 class TimeStamp;
 class Action;
@@ -70,21 +67,18 @@ inline bool RowAction_ActionType_Parse(
     RowAction_ActionType_descriptor(), name, value);
 }
 enum Action_ActionType {
-  Action_ActionType_ROW = 1,
-  Action_ActionType_BLOCK_MOUSE_MOVE = 2,
-  Action_ActionType_BLOCK_MOUSE_RELEASE = 3,
-  Action_ActionType_BUTTON_DRAG = 4,
-  Action_ActionType_ADVANCED_MODE = 5,
-  Action_ActionType_ADD_BLOCK = 6,
-  Action_ActionType_ACTION_SET_DRAG = 7,
-  Action_ActionType_ACC_BLOCK_MODE = 8,
-  Action_ActionType_MENU = 9,
-  Action_ActionType_MOUSE_ACTION = 10,
-  Action_ActionType_DEVICE_ACTION = 11
+  Action_ActionType_ADVANCED_MODE = 1,
+  Action_ActionType_ADD_BLOCK = 2,
+  Action_ActionType_ACC_BLOCK_MODE = 3,
+  Action_ActionType_MENU = 4,
+  Action_ActionType_MOUSE_ACTION = 5,
+  Action_ActionType_DEVICE_ACTION = 6,
+  Action_ActionType_BLOCK_ACTION = 7,
+  Action_ActionType_ROW = 8
 };
 bool Action_ActionType_IsValid(int value);
-const Action_ActionType Action_ActionType_ActionType_MIN = Action_ActionType_ROW;
-const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_DEVICE_ACTION;
+const Action_ActionType Action_ActionType_ActionType_MIN = Action_ActionType_ADVANCED_MODE;
+const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_ROW;
 const int Action_ActionType_ActionType_ARRAYSIZE = Action_ActionType_ActionType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor();
@@ -184,6 +178,28 @@ inline bool MenuEntry_Parse(
     const ::std::string& name, MenuEntry* value) {
   return ::google::protobuf::internal::ParseNamedEnum<MenuEntry>(
     MenuEntry_descriptor(), name, value);
+}
+enum BlockActionType {
+  SLIDER = 1,
+  BUTTON = 2,
+  SET_NOTE = 3,
+  SET_DURATION = 4,
+  TIMER = 5
+};
+bool BlockActionType_IsValid(int value);
+const BlockActionType BlockActionType_MIN = SLIDER;
+const BlockActionType BlockActionType_MAX = TIMER;
+const int BlockActionType_ARRAYSIZE = BlockActionType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* BlockActionType_descriptor();
+inline const ::std::string& BlockActionType_Name(BlockActionType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    BlockActionType_descriptor(), value);
+}
+inline bool BlockActionType_Parse(
+    const ::std::string& name, BlockActionType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<BlockActionType>(
+    BlockActionType_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -542,502 +558,6 @@ class MouseAction : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class BlockMouseMoveAction : public ::google::protobuf::Message {
- public:
-  BlockMouseMoveAction();
-  virtual ~BlockMouseMoveAction();
-
-  BlockMouseMoveAction(const BlockMouseMoveAction& from);
-
-  inline BlockMouseMoveAction& operator=(const BlockMouseMoveAction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const BlockMouseMoveAction& default_instance();
-
-  void Swap(BlockMouseMoveAction* other);
-
-  // implements Message ----------------------------------------------
-
-  BlockMouseMoveAction* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const BlockMouseMoveAction& from);
-  void MergeFrom(const BlockMouseMoveAction& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required .Aseba.ThymioVPL.MouseButton button = 1;
-  inline bool has_button() const;
-  inline void clear_button();
-  static const int kButtonFieldNumber = 1;
-  inline ::Aseba::ThymioVPL::MouseButton button() const;
-  inline void set_button(::Aseba::ThymioVPL::MouseButton value);
-
-  // optional string blockName = 2;
-  inline bool has_blockname() const;
-  inline void clear_blockname();
-  static const int kBlockNameFieldNumber = 2;
-  inline const ::std::string& blockname() const;
-  inline void set_blockname(const ::std::string& value);
-  inline void set_blockname(const char* value);
-  inline void set_blockname(const char* value, size_t size);
-  inline ::std::string* mutable_blockname();
-  inline ::std::string* release_blockname();
-  inline void set_allocated_blockname(::std::string* blockname);
-
-  // optional string blockType = 3;
-  inline bool has_blocktype() const;
-  inline void clear_blocktype();
-  static const int kBlockTypeFieldNumber = 3;
-  inline const ::std::string& blocktype() const;
-  inline void set_blocktype(const ::std::string& value);
-  inline void set_blocktype(const char* value);
-  inline void set_blocktype(const char* value, size_t size);
-  inline ::std::string* mutable_blocktype();
-  inline ::std::string* release_blocktype();
-  inline void set_allocated_blocktype(::std::string* blocktype);
-
-  // optional double x = 4;
-  inline bool has_x() const;
-  inline void clear_x();
-  static const int kXFieldNumber = 4;
-  inline double x() const;
-  inline void set_x(double value);
-
-  // optional double y = 5;
-  inline bool has_y() const;
-  inline void clear_y();
-  static const int kYFieldNumber = 5;
-  inline double y() const;
-  inline void set_y(double value);
-
-  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.BlockMouseMoveAction)
- private:
-  inline void set_has_button();
-  inline void clear_has_button();
-  inline void set_has_blockname();
-  inline void clear_has_blockname();
-  inline void set_has_blocktype();
-  inline void clear_has_blocktype();
-  inline void set_has_x();
-  inline void clear_has_x();
-  inline void set_has_y();
-  inline void clear_has_y();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::std::string* blockname_;
-  ::std::string* blocktype_;
-  double x_;
-  double y_;
-  int button_;
-  friend void  protobuf_AddDesc_UsageProfile_2eproto();
-  friend void protobuf_AssignDesc_UsageProfile_2eproto();
-  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
-
-  void InitAsDefaultInstance();
-  static BlockMouseMoveAction* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class BlockMouseReleaseAction : public ::google::protobuf::Message {
- public:
-  BlockMouseReleaseAction();
-  virtual ~BlockMouseReleaseAction();
-
-  BlockMouseReleaseAction(const BlockMouseReleaseAction& from);
-
-  inline BlockMouseReleaseAction& operator=(const BlockMouseReleaseAction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const BlockMouseReleaseAction& default_instance();
-
-  void Swap(BlockMouseReleaseAction* other);
-
-  // implements Message ----------------------------------------------
-
-  BlockMouseReleaseAction* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const BlockMouseReleaseAction& from);
-  void MergeFrom(const BlockMouseReleaseAction& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required .Aseba.ThymioVPL.MouseButton button = 1;
-  inline bool has_button() const;
-  inline void clear_button();
-  static const int kButtonFieldNumber = 1;
-  inline ::Aseba::ThymioVPL::MouseButton button() const;
-  inline void set_button(::Aseba::ThymioVPL::MouseButton value);
-
-  // optional string blockName = 2;
-  inline bool has_blockname() const;
-  inline void clear_blockname();
-  static const int kBlockNameFieldNumber = 2;
-  inline const ::std::string& blockname() const;
-  inline void set_blockname(const ::std::string& value);
-  inline void set_blockname(const char* value);
-  inline void set_blockname(const char* value, size_t size);
-  inline ::std::string* mutable_blockname();
-  inline ::std::string* release_blockname();
-  inline void set_allocated_blockname(::std::string* blockname);
-
-  // optional string blockType = 3;
-  inline bool has_blocktype() const;
-  inline void clear_blocktype();
-  static const int kBlockTypeFieldNumber = 3;
-  inline const ::std::string& blocktype() const;
-  inline void set_blocktype(const ::std::string& value);
-  inline void set_blocktype(const char* value);
-  inline void set_blocktype(const char* value, size_t size);
-  inline ::std::string* mutable_blocktype();
-  inline ::std::string* release_blocktype();
-  inline void set_allocated_blocktype(::std::string* blocktype);
-
-  // optional double x = 4;
-  inline bool has_x() const;
-  inline void clear_x();
-  static const int kXFieldNumber = 4;
-  inline double x() const;
-  inline void set_x(double value);
-
-  // optional double y = 5;
-  inline bool has_y() const;
-  inline void clear_y();
-  static const int kYFieldNumber = 5;
-  inline double y() const;
-  inline void set_y(double value);
-
-  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.BlockMouseReleaseAction)
- private:
-  inline void set_has_button();
-  inline void clear_has_button();
-  inline void set_has_blockname();
-  inline void clear_has_blockname();
-  inline void set_has_blocktype();
-  inline void clear_has_blocktype();
-  inline void set_has_x();
-  inline void clear_has_x();
-  inline void set_has_y();
-  inline void clear_has_y();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::std::string* blockname_;
-  ::std::string* blocktype_;
-  double x_;
-  double y_;
-  int button_;
-  friend void  protobuf_AddDesc_UsageProfile_2eproto();
-  friend void protobuf_AssignDesc_UsageProfile_2eproto();
-  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
-
-  void InitAsDefaultInstance();
-  static BlockMouseReleaseAction* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class ButtonDragAction : public ::google::protobuf::Message {
- public:
-  ButtonDragAction();
-  virtual ~ButtonDragAction();
-
-  ButtonDragAction(const ButtonDragAction& from);
-
-  inline ButtonDragAction& operator=(const ButtonDragAction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ButtonDragAction& default_instance();
-
-  void Swap(ButtonDragAction* other);
-
-  // implements Message ----------------------------------------------
-
-  ButtonDragAction* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ButtonDragAction& from);
-  void MergeFrom(const ButtonDragAction& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // optional .Aseba.ThymioVPL.MouseButton button = 1;
-  inline bool has_button() const;
-  inline void clear_button();
-  static const int kButtonFieldNumber = 1;
-  inline ::Aseba::ThymioVPL::MouseButton button() const;
-  inline void set_button(::Aseba::ThymioVPL::MouseButton value);
-
-  // optional string blockName = 2;
-  inline bool has_blockname() const;
-  inline void clear_blockname();
-  static const int kBlockNameFieldNumber = 2;
-  inline const ::std::string& blockname() const;
-  inline void set_blockname(const ::std::string& value);
-  inline void set_blockname(const char* value);
-  inline void set_blockname(const char* value, size_t size);
-  inline ::std::string* mutable_blockname();
-  inline ::std::string* release_blockname();
-  inline void set_allocated_blockname(::std::string* blockname);
-
-  // optional string blockType = 3;
-  inline bool has_blocktype() const;
-  inline void clear_blocktype();
-  static const int kBlockTypeFieldNumber = 3;
-  inline const ::std::string& blocktype() const;
-  inline void set_blocktype(const ::std::string& value);
-  inline void set_blocktype(const char* value);
-  inline void set_blocktype(const char* value, size_t size);
-  inline ::std::string* mutable_blocktype();
-  inline ::std::string* release_blocktype();
-  inline void set_allocated_blocktype(::std::string* blocktype);
-
-  // optional double x = 4;
-  inline bool has_x() const;
-  inline void clear_x();
-  static const int kXFieldNumber = 4;
-  inline double x() const;
-  inline void set_x(double value);
-
-  // optional double y = 5;
-  inline bool has_y() const;
-  inline void clear_y();
-  static const int kYFieldNumber = 5;
-  inline double y() const;
-  inline void set_y(double value);
-
-  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.ButtonDragAction)
- private:
-  inline void set_has_button();
-  inline void clear_has_button();
-  inline void set_has_blockname();
-  inline void clear_has_blockname();
-  inline void set_has_blocktype();
-  inline void clear_has_blocktype();
-  inline void set_has_x();
-  inline void clear_has_x();
-  inline void set_has_y();
-  inline void clear_has_y();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::std::string* blockname_;
-  ::std::string* blocktype_;
-  double x_;
-  double y_;
-  int button_;
-  friend void  protobuf_AddDesc_UsageProfile_2eproto();
-  friend void protobuf_AssignDesc_UsageProfile_2eproto();
-  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
-
-  void InitAsDefaultInstance();
-  static ButtonDragAction* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class ActionSetDragAction : public ::google::protobuf::Message {
- public:
-  ActionSetDragAction();
-  virtual ~ActionSetDragAction();
-
-  ActionSetDragAction(const ActionSetDragAction& from);
-
-  inline ActionSetDragAction& operator=(const ActionSetDragAction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ActionSetDragAction& default_instance();
-
-  void Swap(ActionSetDragAction* other);
-
-  // implements Message ----------------------------------------------
-
-  ActionSetDragAction* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ActionSetDragAction& from);
-  void MergeFrom(const ActionSetDragAction& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // optional .Aseba.ThymioVPL.MouseButton button = 1;
-  inline bool has_button() const;
-  inline void clear_button();
-  static const int kButtonFieldNumber = 1;
-  inline ::Aseba::ThymioVPL::MouseButton button() const;
-  inline void set_button(::Aseba::ThymioVPL::MouseButton value);
-
-  // optional int32 row = 2;
-  inline bool has_row() const;
-  inline void clear_row();
-  static const int kRowFieldNumber = 2;
-  inline ::google::protobuf::int32 row() const;
-  inline void set_row(::google::protobuf::int32 value);
-
-  // optional double x = 3;
-  inline bool has_x() const;
-  inline void clear_x();
-  static const int kXFieldNumber = 3;
-  inline double x() const;
-  inline void set_x(double value);
-
-  // optional double y = 4;
-  inline bool has_y() const;
-  inline void clear_y();
-  static const int kYFieldNumber = 4;
-  inline double y() const;
-  inline void set_y(double value);
-
-  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.ActionSetDragAction)
- private:
-  inline void set_has_button();
-  inline void clear_has_button();
-  inline void set_has_row();
-  inline void clear_has_row();
-  inline void set_has_x();
-  inline void clear_has_x();
-  inline void set_has_y();
-  inline void clear_has_y();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  int button_;
-  ::google::protobuf::int32 row_;
-  double x_;
-  double y_;
-  friend void  protobuf_AddDesc_UsageProfile_2eproto();
-  friend void protobuf_AssignDesc_UsageProfile_2eproto();
-  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
-
-  void InitAsDefaultInstance();
-  static ActionSetDragAction* default_instance_;
-};
-// -------------------------------------------------------------------
-
 class AccBlockModeAction : public ::google::protobuf::Message {
  public:
   AccBlockModeAction();
@@ -1345,6 +865,175 @@ class AddBlockAction : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class BlockAction : public ::google::protobuf::Message {
+ public:
+  BlockAction();
+  virtual ~BlockAction();
+
+  BlockAction(const BlockAction& from);
+
+  inline BlockAction& operator=(const BlockAction& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const BlockAction& default_instance();
+
+  void Swap(BlockAction* other);
+
+  // implements Message ----------------------------------------------
+
+  BlockAction* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const BlockAction& from);
+  void MergeFrom(const BlockAction& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required .Aseba.ThymioVPL.BlockActionType type = 1;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 1;
+  inline ::Aseba::ThymioVPL::BlockActionType type() const;
+  inline void set_type(::Aseba::ThymioVPL::BlockActionType value);
+
+  // optional int32 row = 2;
+  inline bool has_row() const;
+  inline void clear_row();
+  static const int kRowFieldNumber = 2;
+  inline ::google::protobuf::int32 row() const;
+  inline void set_row(::google::protobuf::int32 value);
+
+  // optional string blockName = 3;
+  inline bool has_blockname() const;
+  inline void clear_blockname();
+  static const int kBlockNameFieldNumber = 3;
+  inline const ::std::string& blockname() const;
+  inline void set_blockname(const ::std::string& value);
+  inline void set_blockname(const char* value);
+  inline void set_blockname(const char* value, size_t size);
+  inline ::std::string* mutable_blockname();
+  inline ::std::string* release_blockname();
+  inline void set_allocated_blockname(::std::string* blockname);
+
+  // optional string blockType = 4;
+  inline bool has_blocktype() const;
+  inline void clear_blocktype();
+  static const int kBlockTypeFieldNumber = 4;
+  inline const ::std::string& blocktype() const;
+  inline void set_blocktype(const ::std::string& value);
+  inline void set_blocktype(const char* value);
+  inline void set_blocktype(const char* value, size_t size);
+  inline ::std::string* mutable_blocktype();
+  inline ::std::string* release_blocktype();
+  inline void set_allocated_blocktype(::std::string* blocktype);
+
+  // optional int32 elementId = 5;
+  inline bool has_elementid() const;
+  inline void clear_elementid();
+  static const int kElementIdFieldNumber = 5;
+  inline ::google::protobuf::int32 elementid() const;
+  inline void set_elementid(::google::protobuf::int32 value);
+
+  // optional int32 sliderValue = 6;
+  inline bool has_slidervalue() const;
+  inline void clear_slidervalue();
+  static const int kSliderValueFieldNumber = 6;
+  inline ::google::protobuf::int32 slidervalue() const;
+  inline void set_slidervalue(::google::protobuf::int32 value);
+
+  // optional int32 soundValue = 7;
+  inline bool has_soundvalue() const;
+  inline void clear_soundvalue();
+  static const int kSoundValueFieldNumber = 7;
+  inline ::google::protobuf::int32 soundvalue() const;
+  inline void set_soundvalue(::google::protobuf::int32 value);
+
+  // optional int32 timerValue = 8;
+  inline bool has_timervalue() const;
+  inline void clear_timervalue();
+  static const int kTimerValueFieldNumber = 8;
+  inline ::google::protobuf::int32 timervalue() const;
+  inline void set_timervalue(::google::protobuf::int32 value);
+
+  // optional int32 buttonValue = 9;
+  inline bool has_buttonvalue() const;
+  inline void clear_buttonvalue();
+  static const int kButtonValueFieldNumber = 9;
+  inline ::google::protobuf::int32 buttonvalue() const;
+  inline void set_buttonvalue(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.BlockAction)
+ private:
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_row();
+  inline void clear_has_row();
+  inline void set_has_blockname();
+  inline void clear_has_blockname();
+  inline void set_has_blocktype();
+  inline void clear_has_blocktype();
+  inline void set_has_elementid();
+  inline void clear_has_elementid();
+  inline void set_has_slidervalue();
+  inline void clear_has_slidervalue();
+  inline void set_has_soundvalue();
+  inline void clear_has_soundvalue();
+  inline void set_has_timervalue();
+  inline void clear_has_timervalue();
+  inline void set_has_buttonvalue();
+  inline void clear_has_buttonvalue();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  int type_;
+  ::google::protobuf::int32 row_;
+  ::std::string* blockname_;
+  ::std::string* blocktype_;
+  ::google::protobuf::int32 elementid_;
+  ::google::protobuf::int32 slidervalue_;
+  ::google::protobuf::int32 soundvalue_;
+  ::google::protobuf::int32 timervalue_;
+  ::google::protobuf::int32 buttonvalue_;
+  friend void  protobuf_AddDesc_UsageProfile_2eproto();
+  friend void protobuf_AssignDesc_UsageProfile_2eproto();
+  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
+
+  void InitAsDefaultInstance();
+  static BlockAction* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class MenuAction : public ::google::protobuf::Message {
  public:
   MenuAction();
@@ -1538,16 +1227,13 @@ class Action : public ::google::protobuf::Message {
 
   enum ActualActionCase {
     kRowAction = 10,
-    kBlockMouseMoveAction = 11,
-    kBlockMouseReleaseAction = 12,
-    kButtonDragAction = 13,
-    kAdvancedModeAction = 14,
-    kAddBlockAction = 15,
-    kActionSetDragAction = 16,
-    kAccBlockModeAction = 17,
-    kMenuAction = 18,
-    kMouseAction = 19,
-    kDeviceAction = 20,
+    kAdvancedModeAction = 11,
+    kAddBlockAction = 12,
+    kAccBlockModeAction = 13,
+    kMenuAction = 14,
+    kMouseAction = 15,
+    kDeviceAction = 16,
+    kBlockAction = 17,
     ACTUAL_ACTION_NOT_SET = 0,
   };
 
@@ -1580,17 +1266,14 @@ class Action : public ::google::protobuf::Message {
   // nested types ----------------------------------------------------
 
   typedef Action_ActionType ActionType;
-  static const ActionType ROW = Action_ActionType_ROW;
-  static const ActionType BLOCK_MOUSE_MOVE = Action_ActionType_BLOCK_MOUSE_MOVE;
-  static const ActionType BLOCK_MOUSE_RELEASE = Action_ActionType_BLOCK_MOUSE_RELEASE;
-  static const ActionType BUTTON_DRAG = Action_ActionType_BUTTON_DRAG;
   static const ActionType ADVANCED_MODE = Action_ActionType_ADVANCED_MODE;
   static const ActionType ADD_BLOCK = Action_ActionType_ADD_BLOCK;
-  static const ActionType ACTION_SET_DRAG = Action_ActionType_ACTION_SET_DRAG;
   static const ActionType ACC_BLOCK_MODE = Action_ActionType_ACC_BLOCK_MODE;
   static const ActionType MENU = Action_ActionType_MENU;
   static const ActionType MOUSE_ACTION = Action_ActionType_MOUSE_ACTION;
   static const ActionType DEVICE_ACTION = Action_ActionType_DEVICE_ACTION;
+  static const ActionType BLOCK_ACTION = Action_ActionType_BLOCK_ACTION;
+  static const ActionType ROW = Action_ActionType_ROW;
   static inline bool ActionType_IsValid(int value) {
     return Action_ActionType_IsValid(value);
   }
@@ -1651,95 +1334,68 @@ class Action : public ::google::protobuf::Message {
   inline ::Aseba::ThymioVPL::RowAction* release_rowaction();
   inline void set_allocated_rowaction(::Aseba::ThymioVPL::RowAction* rowaction);
 
-  // optional .Aseba.ThymioVPL.BlockMouseMoveAction blockMouseMoveAction = 11;
-  inline bool has_blockmousemoveaction() const;
-  inline void clear_blockmousemoveaction();
-  static const int kBlockMouseMoveActionFieldNumber = 11;
-  inline const ::Aseba::ThymioVPL::BlockMouseMoveAction& blockmousemoveaction() const;
-  inline ::Aseba::ThymioVPL::BlockMouseMoveAction* mutable_blockmousemoveaction();
-  inline ::Aseba::ThymioVPL::BlockMouseMoveAction* release_blockmousemoveaction();
-  inline void set_allocated_blockmousemoveaction(::Aseba::ThymioVPL::BlockMouseMoveAction* blockmousemoveaction);
-
-  // optional .Aseba.ThymioVPL.BlockMouseReleaseAction blockMouseReleaseAction = 12;
-  inline bool has_blockmousereleaseaction() const;
-  inline void clear_blockmousereleaseaction();
-  static const int kBlockMouseReleaseActionFieldNumber = 12;
-  inline const ::Aseba::ThymioVPL::BlockMouseReleaseAction& blockmousereleaseaction() const;
-  inline ::Aseba::ThymioVPL::BlockMouseReleaseAction* mutable_blockmousereleaseaction();
-  inline ::Aseba::ThymioVPL::BlockMouseReleaseAction* release_blockmousereleaseaction();
-  inline void set_allocated_blockmousereleaseaction(::Aseba::ThymioVPL::BlockMouseReleaseAction* blockmousereleaseaction);
-
-  // optional .Aseba.ThymioVPL.ButtonDragAction buttonDragAction = 13;
-  inline bool has_buttondragaction() const;
-  inline void clear_buttondragaction();
-  static const int kButtonDragActionFieldNumber = 13;
-  inline const ::Aseba::ThymioVPL::ButtonDragAction& buttondragaction() const;
-  inline ::Aseba::ThymioVPL::ButtonDragAction* mutable_buttondragaction();
-  inline ::Aseba::ThymioVPL::ButtonDragAction* release_buttondragaction();
-  inline void set_allocated_buttondragaction(::Aseba::ThymioVPL::ButtonDragAction* buttondragaction);
-
-  // optional .Aseba.ThymioVPL.AdvancedModeAction advancedModeAction = 14;
+  // optional .Aseba.ThymioVPL.AdvancedModeAction advancedModeAction = 11;
   inline bool has_advancedmodeaction() const;
   inline void clear_advancedmodeaction();
-  static const int kAdvancedModeActionFieldNumber = 14;
+  static const int kAdvancedModeActionFieldNumber = 11;
   inline const ::Aseba::ThymioVPL::AdvancedModeAction& advancedmodeaction() const;
   inline ::Aseba::ThymioVPL::AdvancedModeAction* mutable_advancedmodeaction();
   inline ::Aseba::ThymioVPL::AdvancedModeAction* release_advancedmodeaction();
   inline void set_allocated_advancedmodeaction(::Aseba::ThymioVPL::AdvancedModeAction* advancedmodeaction);
 
-  // optional .Aseba.ThymioVPL.AddBlockAction addBlockAction = 15;
+  // optional .Aseba.ThymioVPL.AddBlockAction addBlockAction = 12;
   inline bool has_addblockaction() const;
   inline void clear_addblockaction();
-  static const int kAddBlockActionFieldNumber = 15;
+  static const int kAddBlockActionFieldNumber = 12;
   inline const ::Aseba::ThymioVPL::AddBlockAction& addblockaction() const;
   inline ::Aseba::ThymioVPL::AddBlockAction* mutable_addblockaction();
   inline ::Aseba::ThymioVPL::AddBlockAction* release_addblockaction();
   inline void set_allocated_addblockaction(::Aseba::ThymioVPL::AddBlockAction* addblockaction);
 
-  // optional .Aseba.ThymioVPL.ActionSetDragAction actionSetDragAction = 16;
-  inline bool has_actionsetdragaction() const;
-  inline void clear_actionsetdragaction();
-  static const int kActionSetDragActionFieldNumber = 16;
-  inline const ::Aseba::ThymioVPL::ActionSetDragAction& actionsetdragaction() const;
-  inline ::Aseba::ThymioVPL::ActionSetDragAction* mutable_actionsetdragaction();
-  inline ::Aseba::ThymioVPL::ActionSetDragAction* release_actionsetdragaction();
-  inline void set_allocated_actionsetdragaction(::Aseba::ThymioVPL::ActionSetDragAction* actionsetdragaction);
-
-  // optional .Aseba.ThymioVPL.AccBlockModeAction accBlockModeAction = 17;
+  // optional .Aseba.ThymioVPL.AccBlockModeAction accBlockModeAction = 13;
   inline bool has_accblockmodeaction() const;
   inline void clear_accblockmodeaction();
-  static const int kAccBlockModeActionFieldNumber = 17;
+  static const int kAccBlockModeActionFieldNumber = 13;
   inline const ::Aseba::ThymioVPL::AccBlockModeAction& accblockmodeaction() const;
   inline ::Aseba::ThymioVPL::AccBlockModeAction* mutable_accblockmodeaction();
   inline ::Aseba::ThymioVPL::AccBlockModeAction* release_accblockmodeaction();
   inline void set_allocated_accblockmodeaction(::Aseba::ThymioVPL::AccBlockModeAction* accblockmodeaction);
 
-  // optional .Aseba.ThymioVPL.MenuAction menuAction = 18;
+  // optional .Aseba.ThymioVPL.MenuAction menuAction = 14;
   inline bool has_menuaction() const;
   inline void clear_menuaction();
-  static const int kMenuActionFieldNumber = 18;
+  static const int kMenuActionFieldNumber = 14;
   inline const ::Aseba::ThymioVPL::MenuAction& menuaction() const;
   inline ::Aseba::ThymioVPL::MenuAction* mutable_menuaction();
   inline ::Aseba::ThymioVPL::MenuAction* release_menuaction();
   inline void set_allocated_menuaction(::Aseba::ThymioVPL::MenuAction* menuaction);
 
-  // optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+  // optional .Aseba.ThymioVPL.MouseAction mouseAction = 15;
   inline bool has_mouseaction() const;
   inline void clear_mouseaction();
-  static const int kMouseActionFieldNumber = 19;
+  static const int kMouseActionFieldNumber = 15;
   inline const ::Aseba::ThymioVPL::MouseAction& mouseaction() const;
   inline ::Aseba::ThymioVPL::MouseAction* mutable_mouseaction();
   inline ::Aseba::ThymioVPL::MouseAction* release_mouseaction();
   inline void set_allocated_mouseaction(::Aseba::ThymioVPL::MouseAction* mouseaction);
 
-  // optional .Aseba.ThymioVPL.DeviceAction deviceAction = 20;
+  // optional .Aseba.ThymioVPL.DeviceAction deviceAction = 16;
   inline bool has_deviceaction() const;
   inline void clear_deviceaction();
-  static const int kDeviceActionFieldNumber = 20;
+  static const int kDeviceActionFieldNumber = 16;
   inline const ::Aseba::ThymioVPL::DeviceAction& deviceaction() const;
   inline ::Aseba::ThymioVPL::DeviceAction* mutable_deviceaction();
   inline ::Aseba::ThymioVPL::DeviceAction* release_deviceaction();
   inline void set_allocated_deviceaction(::Aseba::ThymioVPL::DeviceAction* deviceaction);
+
+  // optional .Aseba.ThymioVPL.BlockAction blockAction = 17;
+  inline bool has_blockaction() const;
+  inline void clear_blockaction();
+  static const int kBlockActionFieldNumber = 17;
+  inline const ::Aseba::ThymioVPL::BlockAction& blockaction() const;
+  inline ::Aseba::ThymioVPL::BlockAction* mutable_blockaction();
+  inline ::Aseba::ThymioVPL::BlockAction* release_blockaction();
+  inline void set_allocated_blockaction(::Aseba::ThymioVPL::BlockAction* blockaction);
 
   inline ActualActionCase actual_action_case() const;
   // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.Action)
@@ -1751,16 +1407,13 @@ class Action : public ::google::protobuf::Message {
   inline void set_has_time();
   inline void clear_has_time();
   inline void set_has_rowaction();
-  inline void set_has_blockmousemoveaction();
-  inline void set_has_blockmousereleaseaction();
-  inline void set_has_buttondragaction();
   inline void set_has_advancedmodeaction();
   inline void set_has_addblockaction();
-  inline void set_has_actionsetdragaction();
   inline void set_has_accblockmodeaction();
   inline void set_has_menuaction();
   inline void set_has_mouseaction();
   inline void set_has_deviceaction();
+  inline void set_has_blockaction();
 
   inline bool has_actual_action();
   void clear_actual_action();
@@ -1775,16 +1428,13 @@ class Action : public ::google::protobuf::Message {
   int type_;
   union ActualActionUnion {
     ::Aseba::ThymioVPL::RowAction* rowaction_;
-    ::Aseba::ThymioVPL::BlockMouseMoveAction* blockmousemoveaction_;
-    ::Aseba::ThymioVPL::BlockMouseReleaseAction* blockmousereleaseaction_;
-    ::Aseba::ThymioVPL::ButtonDragAction* buttondragaction_;
     ::Aseba::ThymioVPL::AdvancedModeAction* advancedmodeaction_;
     ::Aseba::ThymioVPL::AddBlockAction* addblockaction_;
-    ::Aseba::ThymioVPL::ActionSetDragAction* actionsetdragaction_;
     ::Aseba::ThymioVPL::AccBlockModeAction* accblockmodeaction_;
     ::Aseba::ThymioVPL::MenuAction* menuaction_;
     ::Aseba::ThymioVPL::MouseAction* mouseaction_;
     ::Aseba::ThymioVPL::DeviceAction* deviceaction_;
+    ::Aseba::ThymioVPL::BlockAction* blockaction_;
   } actual_action_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
@@ -2271,794 +1921,6 @@ inline void MouseAction::set_row(::google::protobuf::int32 value) {
 
 // -------------------------------------------------------------------
 
-// BlockMouseMoveAction
-
-// required .Aseba.ThymioVPL.MouseButton button = 1;
-inline bool BlockMouseMoveAction::has_button() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void BlockMouseMoveAction::set_has_button() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void BlockMouseMoveAction::clear_has_button() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void BlockMouseMoveAction::clear_button() {
-  button_ = 1;
-  clear_has_button();
-}
-inline ::Aseba::ThymioVPL::MouseButton BlockMouseMoveAction::button() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseMoveAction.button)
-  return static_cast< ::Aseba::ThymioVPL::MouseButton >(button_);
-}
-inline void BlockMouseMoveAction::set_button(::Aseba::ThymioVPL::MouseButton value) {
-  assert(::Aseba::ThymioVPL::MouseButton_IsValid(value));
-  set_has_button();
-  button_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseMoveAction.button)
-}
-
-// optional string blockName = 2;
-inline bool BlockMouseMoveAction::has_blockname() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void BlockMouseMoveAction::set_has_blockname() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void BlockMouseMoveAction::clear_has_blockname() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void BlockMouseMoveAction::clear_blockname() {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_->clear();
-  }
-  clear_has_blockname();
-}
-inline const ::std::string& BlockMouseMoveAction::blockname() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-  return *blockname_;
-}
-inline void BlockMouseMoveAction::set_blockname(const ::std::string& value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-}
-inline void BlockMouseMoveAction::set_blockname(const char* value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-}
-inline void BlockMouseMoveAction::set_blockname(const char* value, size_t size) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-}
-inline ::std::string* BlockMouseMoveAction::mutable_blockname() {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-  return blockname_;
-}
-inline ::std::string* BlockMouseMoveAction::release_blockname() {
-  clear_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blockname_;
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void BlockMouseMoveAction::set_allocated_blockname(::std::string* blockname) {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blockname_;
-  }
-  if (blockname) {
-    set_has_blockname();
-    blockname_ = blockname;
-  } else {
-    clear_has_blockname();
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockMouseMoveAction.blockName)
-}
-
-// optional string blockType = 3;
-inline bool BlockMouseMoveAction::has_blocktype() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void BlockMouseMoveAction::set_has_blocktype() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void BlockMouseMoveAction::clear_has_blocktype() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void BlockMouseMoveAction::clear_blocktype() {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_->clear();
-  }
-  clear_has_blocktype();
-}
-inline const ::std::string& BlockMouseMoveAction::blocktype() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-  return *blocktype_;
-}
-inline void BlockMouseMoveAction::set_blocktype(const ::std::string& value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-}
-inline void BlockMouseMoveAction::set_blocktype(const char* value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-}
-inline void BlockMouseMoveAction::set_blocktype(const char* value, size_t size) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-}
-inline ::std::string* BlockMouseMoveAction::mutable_blocktype() {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-  return blocktype_;
-}
-inline ::std::string* BlockMouseMoveAction::release_blocktype() {
-  clear_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blocktype_;
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void BlockMouseMoveAction::set_allocated_blocktype(::std::string* blocktype) {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blocktype_;
-  }
-  if (blocktype) {
-    set_has_blocktype();
-    blocktype_ = blocktype;
-  } else {
-    clear_has_blocktype();
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockMouseMoveAction.blockType)
-}
-
-// optional double x = 4;
-inline bool BlockMouseMoveAction::has_x() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void BlockMouseMoveAction::set_has_x() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void BlockMouseMoveAction::clear_has_x() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void BlockMouseMoveAction::clear_x() {
-  x_ = 0;
-  clear_has_x();
-}
-inline double BlockMouseMoveAction::x() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseMoveAction.x)
-  return x_;
-}
-inline void BlockMouseMoveAction::set_x(double value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseMoveAction.x)
-}
-
-// optional double y = 5;
-inline bool BlockMouseMoveAction::has_y() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void BlockMouseMoveAction::set_has_y() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void BlockMouseMoveAction::clear_has_y() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void BlockMouseMoveAction::clear_y() {
-  y_ = 0;
-  clear_has_y();
-}
-inline double BlockMouseMoveAction::y() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseMoveAction.y)
-  return y_;
-}
-inline void BlockMouseMoveAction::set_y(double value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseMoveAction.y)
-}
-
-// -------------------------------------------------------------------
-
-// BlockMouseReleaseAction
-
-// required .Aseba.ThymioVPL.MouseButton button = 1;
-inline bool BlockMouseReleaseAction::has_button() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void BlockMouseReleaseAction::set_has_button() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void BlockMouseReleaseAction::clear_has_button() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void BlockMouseReleaseAction::clear_button() {
-  button_ = 1;
-  clear_has_button();
-}
-inline ::Aseba::ThymioVPL::MouseButton BlockMouseReleaseAction::button() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseReleaseAction.button)
-  return static_cast< ::Aseba::ThymioVPL::MouseButton >(button_);
-}
-inline void BlockMouseReleaseAction::set_button(::Aseba::ThymioVPL::MouseButton value) {
-  assert(::Aseba::ThymioVPL::MouseButton_IsValid(value));
-  set_has_button();
-  button_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseReleaseAction.button)
-}
-
-// optional string blockName = 2;
-inline bool BlockMouseReleaseAction::has_blockname() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void BlockMouseReleaseAction::set_has_blockname() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void BlockMouseReleaseAction::clear_has_blockname() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void BlockMouseReleaseAction::clear_blockname() {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_->clear();
-  }
-  clear_has_blockname();
-}
-inline const ::std::string& BlockMouseReleaseAction::blockname() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-  return *blockname_;
-}
-inline void BlockMouseReleaseAction::set_blockname(const ::std::string& value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-}
-inline void BlockMouseReleaseAction::set_blockname(const char* value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-}
-inline void BlockMouseReleaseAction::set_blockname(const char* value, size_t size) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-}
-inline ::std::string* BlockMouseReleaseAction::mutable_blockname() {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-  return blockname_;
-}
-inline ::std::string* BlockMouseReleaseAction::release_blockname() {
-  clear_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blockname_;
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void BlockMouseReleaseAction::set_allocated_blockname(::std::string* blockname) {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blockname_;
-  }
-  if (blockname) {
-    set_has_blockname();
-    blockname_ = blockname;
-  } else {
-    clear_has_blockname();
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockMouseReleaseAction.blockName)
-}
-
-// optional string blockType = 3;
-inline bool BlockMouseReleaseAction::has_blocktype() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void BlockMouseReleaseAction::set_has_blocktype() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void BlockMouseReleaseAction::clear_has_blocktype() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void BlockMouseReleaseAction::clear_blocktype() {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_->clear();
-  }
-  clear_has_blocktype();
-}
-inline const ::std::string& BlockMouseReleaseAction::blocktype() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-  return *blocktype_;
-}
-inline void BlockMouseReleaseAction::set_blocktype(const ::std::string& value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-}
-inline void BlockMouseReleaseAction::set_blocktype(const char* value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-}
-inline void BlockMouseReleaseAction::set_blocktype(const char* value, size_t size) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-}
-inline ::std::string* BlockMouseReleaseAction::mutable_blocktype() {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-  return blocktype_;
-}
-inline ::std::string* BlockMouseReleaseAction::release_blocktype() {
-  clear_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blocktype_;
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void BlockMouseReleaseAction::set_allocated_blocktype(::std::string* blocktype) {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blocktype_;
-  }
-  if (blocktype) {
-    set_has_blocktype();
-    blocktype_ = blocktype;
-  } else {
-    clear_has_blocktype();
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockMouseReleaseAction.blockType)
-}
-
-// optional double x = 4;
-inline bool BlockMouseReleaseAction::has_x() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void BlockMouseReleaseAction::set_has_x() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void BlockMouseReleaseAction::clear_has_x() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void BlockMouseReleaseAction::clear_x() {
-  x_ = 0;
-  clear_has_x();
-}
-inline double BlockMouseReleaseAction::x() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseReleaseAction.x)
-  return x_;
-}
-inline void BlockMouseReleaseAction::set_x(double value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseReleaseAction.x)
-}
-
-// optional double y = 5;
-inline bool BlockMouseReleaseAction::has_y() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void BlockMouseReleaseAction::set_has_y() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void BlockMouseReleaseAction::clear_has_y() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void BlockMouseReleaseAction::clear_y() {
-  y_ = 0;
-  clear_has_y();
-}
-inline double BlockMouseReleaseAction::y() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockMouseReleaseAction.y)
-  return y_;
-}
-inline void BlockMouseReleaseAction::set_y(double value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockMouseReleaseAction.y)
-}
-
-// -------------------------------------------------------------------
-
-// ButtonDragAction
-
-// optional .Aseba.ThymioVPL.MouseButton button = 1;
-inline bool ButtonDragAction::has_button() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void ButtonDragAction::set_has_button() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void ButtonDragAction::clear_has_button() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void ButtonDragAction::clear_button() {
-  button_ = 1;
-  clear_has_button();
-}
-inline ::Aseba::ThymioVPL::MouseButton ButtonDragAction::button() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ButtonDragAction.button)
-  return static_cast< ::Aseba::ThymioVPL::MouseButton >(button_);
-}
-inline void ButtonDragAction::set_button(::Aseba::ThymioVPL::MouseButton value) {
-  assert(::Aseba::ThymioVPL::MouseButton_IsValid(value));
-  set_has_button();
-  button_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ButtonDragAction.button)
-}
-
-// optional string blockName = 2;
-inline bool ButtonDragAction::has_blockname() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void ButtonDragAction::set_has_blockname() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void ButtonDragAction::clear_has_blockname() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void ButtonDragAction::clear_blockname() {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_->clear();
-  }
-  clear_has_blockname();
-}
-inline const ::std::string& ButtonDragAction::blockname() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ButtonDragAction.blockName)
-  return *blockname_;
-}
-inline void ButtonDragAction::set_blockname(const ::std::string& value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ButtonDragAction.blockName)
-}
-inline void ButtonDragAction::set_blockname(const char* value) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.ButtonDragAction.blockName)
-}
-inline void ButtonDragAction::set_blockname(const char* value, size_t size) {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  blockname_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.ButtonDragAction.blockName)
-}
-inline ::std::string* ButtonDragAction::mutable_blockname() {
-  set_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blockname_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.ButtonDragAction.blockName)
-  return blockname_;
-}
-inline ::std::string* ButtonDragAction::release_blockname() {
-  clear_has_blockname();
-  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blockname_;
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void ButtonDragAction::set_allocated_blockname(::std::string* blockname) {
-  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blockname_;
-  }
-  if (blockname) {
-    set_has_blockname();
-    blockname_ = blockname;
-  } else {
-    clear_has_blockname();
-    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.ButtonDragAction.blockName)
-}
-
-// optional string blockType = 3;
-inline bool ButtonDragAction::has_blocktype() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void ButtonDragAction::set_has_blocktype() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void ButtonDragAction::clear_has_blocktype() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void ButtonDragAction::clear_blocktype() {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_->clear();
-  }
-  clear_has_blocktype();
-}
-inline const ::std::string& ButtonDragAction::blocktype() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ButtonDragAction.blockType)
-  return *blocktype_;
-}
-inline void ButtonDragAction::set_blocktype(const ::std::string& value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ButtonDragAction.blockType)
-}
-inline void ButtonDragAction::set_blocktype(const char* value) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.ButtonDragAction.blockType)
-}
-inline void ButtonDragAction::set_blocktype(const char* value, size_t size) {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  blocktype_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.ButtonDragAction.blockType)
-}
-inline ::std::string* ButtonDragAction::mutable_blocktype() {
-  set_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    blocktype_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.ButtonDragAction.blockType)
-  return blocktype_;
-}
-inline ::std::string* ButtonDragAction::release_blocktype() {
-  clear_has_blocktype();
-  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = blocktype_;
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void ButtonDragAction::set_allocated_blocktype(::std::string* blocktype) {
-  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete blocktype_;
-  }
-  if (blocktype) {
-    set_has_blocktype();
-    blocktype_ = blocktype;
-  } else {
-    clear_has_blocktype();
-    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.ButtonDragAction.blockType)
-}
-
-// optional double x = 4;
-inline bool ButtonDragAction::has_x() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void ButtonDragAction::set_has_x() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void ButtonDragAction::clear_has_x() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void ButtonDragAction::clear_x() {
-  x_ = 0;
-  clear_has_x();
-}
-inline double ButtonDragAction::x() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ButtonDragAction.x)
-  return x_;
-}
-inline void ButtonDragAction::set_x(double value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ButtonDragAction.x)
-}
-
-// optional double y = 5;
-inline bool ButtonDragAction::has_y() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void ButtonDragAction::set_has_y() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void ButtonDragAction::clear_has_y() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void ButtonDragAction::clear_y() {
-  y_ = 0;
-  clear_has_y();
-}
-inline double ButtonDragAction::y() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ButtonDragAction.y)
-  return y_;
-}
-inline void ButtonDragAction::set_y(double value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ButtonDragAction.y)
-}
-
-// -------------------------------------------------------------------
-
-// ActionSetDragAction
-
-// optional .Aseba.ThymioVPL.MouseButton button = 1;
-inline bool ActionSetDragAction::has_button() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void ActionSetDragAction::set_has_button() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void ActionSetDragAction::clear_has_button() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void ActionSetDragAction::clear_button() {
-  button_ = 1;
-  clear_has_button();
-}
-inline ::Aseba::ThymioVPL::MouseButton ActionSetDragAction::button() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ActionSetDragAction.button)
-  return static_cast< ::Aseba::ThymioVPL::MouseButton >(button_);
-}
-inline void ActionSetDragAction::set_button(::Aseba::ThymioVPL::MouseButton value) {
-  assert(::Aseba::ThymioVPL::MouseButton_IsValid(value));
-  set_has_button();
-  button_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ActionSetDragAction.button)
-}
-
-// optional int32 row = 2;
-inline bool ActionSetDragAction::has_row() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void ActionSetDragAction::set_has_row() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void ActionSetDragAction::clear_has_row() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void ActionSetDragAction::clear_row() {
-  row_ = 0;
-  clear_has_row();
-}
-inline ::google::protobuf::int32 ActionSetDragAction::row() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ActionSetDragAction.row)
-  return row_;
-}
-inline void ActionSetDragAction::set_row(::google::protobuf::int32 value) {
-  set_has_row();
-  row_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ActionSetDragAction.row)
-}
-
-// optional double x = 3;
-inline bool ActionSetDragAction::has_x() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void ActionSetDragAction::set_has_x() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void ActionSetDragAction::clear_has_x() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void ActionSetDragAction::clear_x() {
-  x_ = 0;
-  clear_has_x();
-}
-inline double ActionSetDragAction::x() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ActionSetDragAction.x)
-  return x_;
-}
-inline void ActionSetDragAction::set_x(double value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ActionSetDragAction.x)
-}
-
-// optional double y = 4;
-inline bool ActionSetDragAction::has_y() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void ActionSetDragAction::set_has_y() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void ActionSetDragAction::clear_has_y() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void ActionSetDragAction::clear_y() {
-  y_ = 0;
-  clear_has_y();
-}
-inline double ActionSetDragAction::y() const {
-  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.ActionSetDragAction.y)
-  return y_;
-}
-inline void ActionSetDragAction::set_y(double value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.ActionSetDragAction.y)
-}
-
-// -------------------------------------------------------------------
-
 // AccBlockModeAction
 
 // required int32 mode = 1;
@@ -3472,6 +2334,331 @@ inline void AddBlockAction::set_row(::google::protobuf::int32 value) {
 
 // -------------------------------------------------------------------
 
+// BlockAction
+
+// required .Aseba.ThymioVPL.BlockActionType type = 1;
+inline bool BlockAction::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void BlockAction::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void BlockAction::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void BlockAction::clear_type() {
+  type_ = 1;
+  clear_has_type();
+}
+inline ::Aseba::ThymioVPL::BlockActionType BlockAction::type() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.type)
+  return static_cast< ::Aseba::ThymioVPL::BlockActionType >(type_);
+}
+inline void BlockAction::set_type(::Aseba::ThymioVPL::BlockActionType value) {
+  assert(::Aseba::ThymioVPL::BlockActionType_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.type)
+}
+
+// optional int32 row = 2;
+inline bool BlockAction::has_row() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void BlockAction::set_has_row() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void BlockAction::clear_has_row() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void BlockAction::clear_row() {
+  row_ = 0;
+  clear_has_row();
+}
+inline ::google::protobuf::int32 BlockAction::row() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.row)
+  return row_;
+}
+inline void BlockAction::set_row(::google::protobuf::int32 value) {
+  set_has_row();
+  row_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.row)
+}
+
+// optional string blockName = 3;
+inline bool BlockAction::has_blockname() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void BlockAction::set_has_blockname() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void BlockAction::clear_has_blockname() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void BlockAction::clear_blockname() {
+  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blockname_->clear();
+  }
+  clear_has_blockname();
+}
+inline const ::std::string& BlockAction::blockname() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.blockName)
+  return *blockname_;
+}
+inline void BlockAction::set_blockname(const ::std::string& value) {
+  set_has_blockname();
+  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blockname_ = new ::std::string;
+  }
+  blockname_->assign(value);
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.blockName)
+}
+inline void BlockAction::set_blockname(const char* value) {
+  set_has_blockname();
+  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blockname_ = new ::std::string;
+  }
+  blockname_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockAction.blockName)
+}
+inline void BlockAction::set_blockname(const char* value, size_t size) {
+  set_has_blockname();
+  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blockname_ = new ::std::string;
+  }
+  blockname_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockAction.blockName)
+}
+inline ::std::string* BlockAction::mutable_blockname() {
+  set_has_blockname();
+  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blockname_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockAction.blockName)
+  return blockname_;
+}
+inline ::std::string* BlockAction::release_blockname() {
+  clear_has_blockname();
+  if (blockname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = blockname_;
+    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void BlockAction::set_allocated_blockname(::std::string* blockname) {
+  if (blockname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete blockname_;
+  }
+  if (blockname) {
+    set_has_blockname();
+    blockname_ = blockname;
+  } else {
+    clear_has_blockname();
+    blockname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockAction.blockName)
+}
+
+// optional string blockType = 4;
+inline bool BlockAction::has_blocktype() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void BlockAction::set_has_blocktype() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void BlockAction::clear_has_blocktype() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void BlockAction::clear_blocktype() {
+  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blocktype_->clear();
+  }
+  clear_has_blocktype();
+}
+inline const ::std::string& BlockAction::blocktype() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.blockType)
+  return *blocktype_;
+}
+inline void BlockAction::set_blocktype(const ::std::string& value) {
+  set_has_blocktype();
+  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blocktype_ = new ::std::string;
+  }
+  blocktype_->assign(value);
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.blockType)
+}
+inline void BlockAction::set_blocktype(const char* value) {
+  set_has_blocktype();
+  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blocktype_ = new ::std::string;
+  }
+  blocktype_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Aseba.ThymioVPL.BlockAction.blockType)
+}
+inline void BlockAction::set_blocktype(const char* value, size_t size) {
+  set_has_blocktype();
+  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blocktype_ = new ::std::string;
+  }
+  blocktype_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Aseba.ThymioVPL.BlockAction.blockType)
+}
+inline ::std::string* BlockAction::mutable_blocktype() {
+  set_has_blocktype();
+  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    blocktype_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Aseba.ThymioVPL.BlockAction.blockType)
+  return blocktype_;
+}
+inline ::std::string* BlockAction::release_blocktype() {
+  clear_has_blocktype();
+  if (blocktype_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = blocktype_;
+    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void BlockAction::set_allocated_blocktype(::std::string* blocktype) {
+  if (blocktype_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete blocktype_;
+  }
+  if (blocktype) {
+    set_has_blocktype();
+    blocktype_ = blocktype;
+  } else {
+    clear_has_blocktype();
+    blocktype_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Aseba.ThymioVPL.BlockAction.blockType)
+}
+
+// optional int32 elementId = 5;
+inline bool BlockAction::has_elementid() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void BlockAction::set_has_elementid() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void BlockAction::clear_has_elementid() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void BlockAction::clear_elementid() {
+  elementid_ = 0;
+  clear_has_elementid();
+}
+inline ::google::protobuf::int32 BlockAction::elementid() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.elementId)
+  return elementid_;
+}
+inline void BlockAction::set_elementid(::google::protobuf::int32 value) {
+  set_has_elementid();
+  elementid_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.elementId)
+}
+
+// optional int32 sliderValue = 6;
+inline bool BlockAction::has_slidervalue() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void BlockAction::set_has_slidervalue() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void BlockAction::clear_has_slidervalue() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void BlockAction::clear_slidervalue() {
+  slidervalue_ = 0;
+  clear_has_slidervalue();
+}
+inline ::google::protobuf::int32 BlockAction::slidervalue() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.sliderValue)
+  return slidervalue_;
+}
+inline void BlockAction::set_slidervalue(::google::protobuf::int32 value) {
+  set_has_slidervalue();
+  slidervalue_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.sliderValue)
+}
+
+// optional int32 soundValue = 7;
+inline bool BlockAction::has_soundvalue() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void BlockAction::set_has_soundvalue() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void BlockAction::clear_has_soundvalue() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void BlockAction::clear_soundvalue() {
+  soundvalue_ = 0;
+  clear_has_soundvalue();
+}
+inline ::google::protobuf::int32 BlockAction::soundvalue() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.soundValue)
+  return soundvalue_;
+}
+inline void BlockAction::set_soundvalue(::google::protobuf::int32 value) {
+  set_has_soundvalue();
+  soundvalue_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.soundValue)
+}
+
+// optional int32 timerValue = 8;
+inline bool BlockAction::has_timervalue() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void BlockAction::set_has_timervalue() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void BlockAction::clear_has_timervalue() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void BlockAction::clear_timervalue() {
+  timervalue_ = 0;
+  clear_has_timervalue();
+}
+inline ::google::protobuf::int32 BlockAction::timervalue() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.timerValue)
+  return timervalue_;
+}
+inline void BlockAction::set_timervalue(::google::protobuf::int32 value) {
+  set_has_timervalue();
+  timervalue_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.timerValue)
+}
+
+// optional int32 buttonValue = 9;
+inline bool BlockAction::has_buttonvalue() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void BlockAction::set_has_buttonvalue() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void BlockAction::clear_has_buttonvalue() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void BlockAction::clear_buttonvalue() {
+  buttonvalue_ = 0;
+  clear_has_buttonvalue();
+}
+inline ::google::protobuf::int32 BlockAction::buttonvalue() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.BlockAction.buttonValue)
+  return buttonvalue_;
+}
+inline void BlockAction::set_buttonvalue(::google::protobuf::int32 value) {
+  set_has_buttonvalue();
+  buttonvalue_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.BlockAction.buttonValue)
+}
+
+// -------------------------------------------------------------------
+
 // MenuAction
 
 // required .Aseba.ThymioVPL.MenuEntry entry = 1;
@@ -3740,136 +2927,7 @@ inline void Action::set_allocated_rowaction(::Aseba::ThymioVPL::RowAction* rowac
   }
 }
 
-// optional .Aseba.ThymioVPL.BlockMouseMoveAction blockMouseMoveAction = 11;
-inline bool Action::has_blockmousemoveaction() const {
-  return actual_action_case() == kBlockMouseMoveAction;
-}
-inline void Action::set_has_blockmousemoveaction() {
-  _oneof_case_[0] = kBlockMouseMoveAction;
-}
-inline void Action::clear_blockmousemoveaction() {
-  if (has_blockmousemoveaction()) {
-    delete actual_action_.blockmousemoveaction_;
-    clear_has_actual_action();
-  }
-}
-inline const ::Aseba::ThymioVPL::BlockMouseMoveAction& Action::blockmousemoveaction() const {
-  return has_blockmousemoveaction() ? *actual_action_.blockmousemoveaction_
-                      : ::Aseba::ThymioVPL::BlockMouseMoveAction::default_instance();
-}
-inline ::Aseba::ThymioVPL::BlockMouseMoveAction* Action::mutable_blockmousemoveaction() {
-  if (!has_blockmousemoveaction()) {
-    clear_actual_action();
-    set_has_blockmousemoveaction();
-    actual_action_.blockmousemoveaction_ = new ::Aseba::ThymioVPL::BlockMouseMoveAction;
-  }
-  return actual_action_.blockmousemoveaction_;
-}
-inline ::Aseba::ThymioVPL::BlockMouseMoveAction* Action::release_blockmousemoveaction() {
-  if (has_blockmousemoveaction()) {
-    clear_has_actual_action();
-    ::Aseba::ThymioVPL::BlockMouseMoveAction* temp = actual_action_.blockmousemoveaction_;
-    actual_action_.blockmousemoveaction_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline void Action::set_allocated_blockmousemoveaction(::Aseba::ThymioVPL::BlockMouseMoveAction* blockmousemoveaction) {
-  clear_actual_action();
-  if (blockmousemoveaction) {
-    set_has_blockmousemoveaction();
-    actual_action_.blockmousemoveaction_ = blockmousemoveaction;
-  }
-}
-
-// optional .Aseba.ThymioVPL.BlockMouseReleaseAction blockMouseReleaseAction = 12;
-inline bool Action::has_blockmousereleaseaction() const {
-  return actual_action_case() == kBlockMouseReleaseAction;
-}
-inline void Action::set_has_blockmousereleaseaction() {
-  _oneof_case_[0] = kBlockMouseReleaseAction;
-}
-inline void Action::clear_blockmousereleaseaction() {
-  if (has_blockmousereleaseaction()) {
-    delete actual_action_.blockmousereleaseaction_;
-    clear_has_actual_action();
-  }
-}
-inline const ::Aseba::ThymioVPL::BlockMouseReleaseAction& Action::blockmousereleaseaction() const {
-  return has_blockmousereleaseaction() ? *actual_action_.blockmousereleaseaction_
-                      : ::Aseba::ThymioVPL::BlockMouseReleaseAction::default_instance();
-}
-inline ::Aseba::ThymioVPL::BlockMouseReleaseAction* Action::mutable_blockmousereleaseaction() {
-  if (!has_blockmousereleaseaction()) {
-    clear_actual_action();
-    set_has_blockmousereleaseaction();
-    actual_action_.blockmousereleaseaction_ = new ::Aseba::ThymioVPL::BlockMouseReleaseAction;
-  }
-  return actual_action_.blockmousereleaseaction_;
-}
-inline ::Aseba::ThymioVPL::BlockMouseReleaseAction* Action::release_blockmousereleaseaction() {
-  if (has_blockmousereleaseaction()) {
-    clear_has_actual_action();
-    ::Aseba::ThymioVPL::BlockMouseReleaseAction* temp = actual_action_.blockmousereleaseaction_;
-    actual_action_.blockmousereleaseaction_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline void Action::set_allocated_blockmousereleaseaction(::Aseba::ThymioVPL::BlockMouseReleaseAction* blockmousereleaseaction) {
-  clear_actual_action();
-  if (blockmousereleaseaction) {
-    set_has_blockmousereleaseaction();
-    actual_action_.blockmousereleaseaction_ = blockmousereleaseaction;
-  }
-}
-
-// optional .Aseba.ThymioVPL.ButtonDragAction buttonDragAction = 13;
-inline bool Action::has_buttondragaction() const {
-  return actual_action_case() == kButtonDragAction;
-}
-inline void Action::set_has_buttondragaction() {
-  _oneof_case_[0] = kButtonDragAction;
-}
-inline void Action::clear_buttondragaction() {
-  if (has_buttondragaction()) {
-    delete actual_action_.buttondragaction_;
-    clear_has_actual_action();
-  }
-}
-inline const ::Aseba::ThymioVPL::ButtonDragAction& Action::buttondragaction() const {
-  return has_buttondragaction() ? *actual_action_.buttondragaction_
-                      : ::Aseba::ThymioVPL::ButtonDragAction::default_instance();
-}
-inline ::Aseba::ThymioVPL::ButtonDragAction* Action::mutable_buttondragaction() {
-  if (!has_buttondragaction()) {
-    clear_actual_action();
-    set_has_buttondragaction();
-    actual_action_.buttondragaction_ = new ::Aseba::ThymioVPL::ButtonDragAction;
-  }
-  return actual_action_.buttondragaction_;
-}
-inline ::Aseba::ThymioVPL::ButtonDragAction* Action::release_buttondragaction() {
-  if (has_buttondragaction()) {
-    clear_has_actual_action();
-    ::Aseba::ThymioVPL::ButtonDragAction* temp = actual_action_.buttondragaction_;
-    actual_action_.buttondragaction_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline void Action::set_allocated_buttondragaction(::Aseba::ThymioVPL::ButtonDragAction* buttondragaction) {
-  clear_actual_action();
-  if (buttondragaction) {
-    set_has_buttondragaction();
-    actual_action_.buttondragaction_ = buttondragaction;
-  }
-}
-
-// optional .Aseba.ThymioVPL.AdvancedModeAction advancedModeAction = 14;
+// optional .Aseba.ThymioVPL.AdvancedModeAction advancedModeAction = 11;
 inline bool Action::has_advancedmodeaction() const {
   return actual_action_case() == kAdvancedModeAction;
 }
@@ -3912,7 +2970,7 @@ inline void Action::set_allocated_advancedmodeaction(::Aseba::ThymioVPL::Advance
   }
 }
 
-// optional .Aseba.ThymioVPL.AddBlockAction addBlockAction = 15;
+// optional .Aseba.ThymioVPL.AddBlockAction addBlockAction = 12;
 inline bool Action::has_addblockaction() const {
   return actual_action_case() == kAddBlockAction;
 }
@@ -3955,50 +3013,7 @@ inline void Action::set_allocated_addblockaction(::Aseba::ThymioVPL::AddBlockAct
   }
 }
 
-// optional .Aseba.ThymioVPL.ActionSetDragAction actionSetDragAction = 16;
-inline bool Action::has_actionsetdragaction() const {
-  return actual_action_case() == kActionSetDragAction;
-}
-inline void Action::set_has_actionsetdragaction() {
-  _oneof_case_[0] = kActionSetDragAction;
-}
-inline void Action::clear_actionsetdragaction() {
-  if (has_actionsetdragaction()) {
-    delete actual_action_.actionsetdragaction_;
-    clear_has_actual_action();
-  }
-}
-inline const ::Aseba::ThymioVPL::ActionSetDragAction& Action::actionsetdragaction() const {
-  return has_actionsetdragaction() ? *actual_action_.actionsetdragaction_
-                      : ::Aseba::ThymioVPL::ActionSetDragAction::default_instance();
-}
-inline ::Aseba::ThymioVPL::ActionSetDragAction* Action::mutable_actionsetdragaction() {
-  if (!has_actionsetdragaction()) {
-    clear_actual_action();
-    set_has_actionsetdragaction();
-    actual_action_.actionsetdragaction_ = new ::Aseba::ThymioVPL::ActionSetDragAction;
-  }
-  return actual_action_.actionsetdragaction_;
-}
-inline ::Aseba::ThymioVPL::ActionSetDragAction* Action::release_actionsetdragaction() {
-  if (has_actionsetdragaction()) {
-    clear_has_actual_action();
-    ::Aseba::ThymioVPL::ActionSetDragAction* temp = actual_action_.actionsetdragaction_;
-    actual_action_.actionsetdragaction_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline void Action::set_allocated_actionsetdragaction(::Aseba::ThymioVPL::ActionSetDragAction* actionsetdragaction) {
-  clear_actual_action();
-  if (actionsetdragaction) {
-    set_has_actionsetdragaction();
-    actual_action_.actionsetdragaction_ = actionsetdragaction;
-  }
-}
-
-// optional .Aseba.ThymioVPL.AccBlockModeAction accBlockModeAction = 17;
+// optional .Aseba.ThymioVPL.AccBlockModeAction accBlockModeAction = 13;
 inline bool Action::has_accblockmodeaction() const {
   return actual_action_case() == kAccBlockModeAction;
 }
@@ -4041,7 +3056,7 @@ inline void Action::set_allocated_accblockmodeaction(::Aseba::ThymioVPL::AccBloc
   }
 }
 
-// optional .Aseba.ThymioVPL.MenuAction menuAction = 18;
+// optional .Aseba.ThymioVPL.MenuAction menuAction = 14;
 inline bool Action::has_menuaction() const {
   return actual_action_case() == kMenuAction;
 }
@@ -4084,7 +3099,7 @@ inline void Action::set_allocated_menuaction(::Aseba::ThymioVPL::MenuAction* men
   }
 }
 
-// optional .Aseba.ThymioVPL.MouseAction mouseAction = 19;
+// optional .Aseba.ThymioVPL.MouseAction mouseAction = 15;
 inline bool Action::has_mouseaction() const {
   return actual_action_case() == kMouseAction;
 }
@@ -4127,7 +3142,7 @@ inline void Action::set_allocated_mouseaction(::Aseba::ThymioVPL::MouseAction* m
   }
 }
 
-// optional .Aseba.ThymioVPL.DeviceAction deviceAction = 20;
+// optional .Aseba.ThymioVPL.DeviceAction deviceAction = 16;
 inline bool Action::has_deviceaction() const {
   return actual_action_case() == kDeviceAction;
 }
@@ -4167,6 +3182,49 @@ inline void Action::set_allocated_deviceaction(::Aseba::ThymioVPL::DeviceAction*
   if (deviceaction) {
     set_has_deviceaction();
     actual_action_.deviceaction_ = deviceaction;
+  }
+}
+
+// optional .Aseba.ThymioVPL.BlockAction blockAction = 17;
+inline bool Action::has_blockaction() const {
+  return actual_action_case() == kBlockAction;
+}
+inline void Action::set_has_blockaction() {
+  _oneof_case_[0] = kBlockAction;
+}
+inline void Action::clear_blockaction() {
+  if (has_blockaction()) {
+    delete actual_action_.blockaction_;
+    clear_has_actual_action();
+  }
+}
+inline const ::Aseba::ThymioVPL::BlockAction& Action::blockaction() const {
+  return has_blockaction() ? *actual_action_.blockaction_
+                      : ::Aseba::ThymioVPL::BlockAction::default_instance();
+}
+inline ::Aseba::ThymioVPL::BlockAction* Action::mutable_blockaction() {
+  if (!has_blockaction()) {
+    clear_actual_action();
+    set_has_blockaction();
+    actual_action_.blockaction_ = new ::Aseba::ThymioVPL::BlockAction;
+  }
+  return actual_action_.blockaction_;
+}
+inline ::Aseba::ThymioVPL::BlockAction* Action::release_blockaction() {
+  if (has_blockaction()) {
+    clear_has_actual_action();
+    ::Aseba::ThymioVPL::BlockAction* temp = actual_action_.blockaction_;
+    actual_action_.blockaction_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Action::set_allocated_blockaction(::Aseba::ThymioVPL::BlockAction* blockaction) {
+  clear_actual_action();
+  if (blockaction) {
+    set_has_blockaction();
+    actual_action_.blockaction_ = blockaction;
   }
 }
 
@@ -4252,6 +3310,11 @@ template <> struct is_proto_enum< ::Aseba::ThymioVPL::MenuEntry> : ::google::pro
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Aseba::ThymioVPL::MenuEntry>() {
   return ::Aseba::ThymioVPL::MenuEntry_descriptor();
+}
+template <> struct is_proto_enum< ::Aseba::ThymioVPL::BlockActionType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Aseba::ThymioVPL::BlockActionType>() {
+  return ::Aseba::ThymioVPL::BlockActionType_descriptor();
 }
 
 }  // namespace google

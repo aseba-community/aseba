@@ -22,7 +22,7 @@ void LogSignalMapper::map(QObject *sender)
     if (senderHash.contains(sender))
 	{
 		SenderInfo p = senderHash.value(sender);
-		emit mapped(p.first,p.second);
+		emit mapped(p.first, sender, p.second);
 	}
         
     
