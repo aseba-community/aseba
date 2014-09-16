@@ -86,7 +86,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setBlock(event, block);
 		emit contentChanged();
-		UsageLogger::getLogger().logAddEventBlock(this->row,block);
+		LOG(logAddEventBlock(this->row,block));
 		emit undoCheckpoint();
 	}
 	
@@ -95,7 +95,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		addActionBlockNoEmit(block, number);
 		emit contentChanged();
-		UsageLogger::getLogger().logAddActionBlock(this->row, block, number);
+		LOG(logAddActionBlock(this->row, block, number));
 		emit undoCheckpoint();
 	}
 	

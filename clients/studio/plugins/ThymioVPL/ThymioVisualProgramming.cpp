@@ -305,13 +305,13 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::openHelp() const
 	{
-		UsageLogger::getLogger().logOpenHelp();
+		LOG(logOpenHelp());
 		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
 	}
 	
 	void ThymioVisualProgramming::saveSnapshot() const
 	{
-		UsageLogger::getLogger().logSaveSnapshot();
+		LOG(logSaveSnapshot());
 		QString initialFile;
 		if (!de->openedFileName().isEmpty())
 		{
@@ -410,7 +410,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
-			UsageLogger::getLogger().logNewFile();
+			LOG(logNewFile());
 			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
@@ -420,25 +420,25 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::openFile()
 	{
-		UsageLogger::getLogger().logOpenFile();
+		LOG(logOpenFile());
 		de->openFile();
 	}
 	
 	bool ThymioVisualProgramming::save()
 	{
-		UsageLogger::getLogger().logSave();
+		LOG(logSave());
 		return de->saveFile(false);
 	}
 	
 	bool ThymioVisualProgramming::saveAs()
 	{
-		UsageLogger::getLogger().logSaveAs();
+		LOG(logSaveAs());
 		return de->saveFile(true);
 	}
 
 	bool ThymioVisualProgramming::closeFile()
 	{
-		UsageLogger::getLogger().logCloseFile();
+		LOG(logCloseFile());
 		if (!isVisible())
 			return true;
 		
@@ -497,7 +497,7 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::stop()
 	{
-		UsageLogger::getLogger().logStop();
+		LOG(logStop());
 		de->stop();
 		const unsigned leftSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.left.target");
 		de->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));

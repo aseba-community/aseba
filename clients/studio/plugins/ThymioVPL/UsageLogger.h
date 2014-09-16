@@ -14,6 +14,7 @@
 #include <QDrag>
 #include <QDropEvent>
 #include <QGraphicsSceneDragDropEvent>
+#include <QObject>
 
 
 #include "Scene.h"
@@ -70,11 +71,12 @@ private:
 	~UsageLogger();
 	Action *action;
 	LogSignalMapper signalMapper;
+	QString groupName;
 	
 protected:
 	void storeAction(Action * action);
 	Action * getActionWithCurrentState();
-	std::string getFileName();
+	QString getTimeStampString();
 	void gen_random(char *s, const int len);
 	MouseButton mapButtons(Qt::MouseButton b);
 	MouseButton mapButtons(Qt::MouseButtons b);
@@ -82,7 +84,7 @@ protected:
 	void logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType);
 	void logSetAction(RowAction_ActionType type, int row);
 	void logAddBlock(BlockType type,int row, Block *block);
-	
+	void askForGroupName();
 	unsigned int getMilliseconds();
 	
 	std::ofstream * fileOut;

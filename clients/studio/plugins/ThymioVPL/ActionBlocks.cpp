@@ -50,7 +50,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
 			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
 			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
-			UsageLogger::getLogger().logSignal(s,SIGNAL(sliderReleased()),i,this);
+			LOG(logSignal(s,SIGNAL(sliderReleased()),i,this));
 		}
 		
 		thymioBody = new ThymioBody(this, -70);

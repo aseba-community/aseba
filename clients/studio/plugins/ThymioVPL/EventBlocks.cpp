@@ -220,7 +220,7 @@ namespace Aseba { namespace ThymioVPL
 				if (buttonPoses[i].contains(event->pos()))
 				{
 					setMode(i);
-					UsageLogger::getLogger().logAccEventBlockMode(this->name, this->type,i);
+					LOG(logAccEventBlockMode(this->name, this->type,i));
 					emit undoCheckpoint();
 					return;
 				}

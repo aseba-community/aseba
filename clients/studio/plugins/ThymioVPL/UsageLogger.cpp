@@ -2,13 +2,15 @@
 
 #include <ctime>
 #include <sys/time.h>
-#include "Block.h"
 #include <iostream>
-#include <typeinfo>
-#include "EventActionsSet.h"
-
 
 #include <QSlider>
+#include <QInputDialog>
+#include <QDir>
+#include <QSettings>
+
+#include "EventActionsSet.h"
+#include "Block.h"
 
 using namespace std;
 
@@ -16,7 +18,12 @@ namespace Aseba{ namespace ThymioVPL
 {
 UsageLogger::UsageLogger()
 {
-	fileOut = new ofstream("test.log"/*getFileName().c_str()*/, ios::app | ios::binary);
+	askForGroupName();
+	
+	QString homePath = QDir::homePath();
+	QString filePath = homePath + "/" + groupName + "_" + getTimeStampString() + ".log";
+	
+	fileOut = new ofstream(filePath.toUtf8().constData(), ios::app | ios::binary);
 	scene = 0;
 	action = new Action();
 	connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *, QObject *)),this, SLOT(logGUIEvents(unsigned int, QObject*, QObject *)));
@@ -28,6 +35,19 @@ UsageLogger::~UsageLogger()
 	if(fileOut != 0){
 		fileOut->close();
 		delete fileOut;
+	}
+}
+
+void UsageLogger::askForGroupName(){
+	QSettings settings;
+	groupName = settings.value("logging/groupname","group").toString();
+	bool ok;
+	QString text = QInputDialog::getText(0, tr("Login"),
+				  tr("Please enter your user or group name:"), QLineEdit::Normal,
+				  groupName, &ok);
+	if (ok && !text.isEmpty()){
+		groupName = text;
+		settings.setValue("logging/groupname", groupName); 
 	}
 }
 
@@ -58,16 +78,16 @@ void UsageLogger::logGUIEvents(unsigned int senderId, QObject *originalSender, Q
 	if(originalSender == 0){
 		return;
 	}
+	
 	Block *b = dynamic_cast<Block*>(logicalParent);
 	if(b != 0){
 		int row = getRow(b);
 		
-		QSlider * q = dynamic_cast<QSlider*>(originalSender);
+		QSlider * slider = dynamic_cast<QSlider*>(originalSender);
 		GeometryShapeButton * button = dynamic_cast<GeometryShapeButton*>(originalSender);
 		
-		if(q != 0){
-			cout << "slide realease " << senderId << " " << b->getName().toUtf8().constData() << " " << b->getType().toUtf8().constData()  << " at row " << row << endl;
-			int sliderValue = q->value();
+		if(slider != 0){
+			int sliderValue = slider->value();
 			logBlockAction(SLIDER,b->getName(),b->getType(), row, senderId, &sliderValue, NULL, NULL,NULL);
 		}
 		else if(button != 0){
@@ -187,7 +207,6 @@ void UsageLogger::logBlockMouseMove(QString name, QString type, QGraphicsSceneMo
 	logMouseAction(MOVE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
 }
 
-
 void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsSceneMouseEvent *event){
 	logMouseAction(RELEASE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
 }
@@ -291,7 +310,11 @@ Action * UsageLogger::getActionWithCurrentState()
 	return action;
 }
 
-string UsageLogger::getFileName(){
+QString UsageLogger::getTimeStampString(){
+	// For debugging
+	if(groupName == "test"){
+		return QString("000");
+	}
 	time_t rawtime;
 	struct tm * timeinfo;
 	char buffer[100];
@@ -299,9 +322,8 @@ string UsageLogger::getFileName(){
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 	strftime(buffer,80,"%Y%m%d_%I-%M-%S_",timeinfo);
-	gen_random(buffer+strlen(buffer), 10);
-	string str(buffer);
-	return str + ".log";
+	QString str(buffer);
+	return str;
 }
 
 // Taken from stackoverflow
@@ -330,17 +352,20 @@ MouseButton UsageLogger::mapButtons(Qt::MouseButton b){
 	MouseButton button;
 	switch(b){
 		case Qt::NoButton:
-		button = NO;
-		break;
+			button = NO;
+			break;
 		case Qt::LeftButton:
-		button = LEFT;
-		break;
+			button = LEFT;
+			break;
 		case Qt::RightButton:
-		button = RIGHT;
-		break;
+			button = RIGHT;
+			break;
 		case Qt::MidButton:
-		button = MIDDLE;
-		break;
+			button = MIDDLE;
+			break;
+		default:
+			button = NO;
+			break;
 	}
 	return button;
 }

@@ -31,6 +31,14 @@ enum MenuEntry{
 	STOP=8;
 }
 
+enum BlockActionType{
+	SLIDER = 1;
+	BUTTON = 2;
+	SET_NOTE = 3;
+	SET_DURATION = 4;
+	TIMER = 5;
+}
+
 message RowAction{
 	enum ActionType{
 		REMOVE = 1;
@@ -72,14 +80,6 @@ message AddBlockAction{
 	optional string blockName = 2;
 	optional string blockType = 3;
 	optional int32 row=4;
-}
-
-enum BlockActionType{
-	SLIDER = 1;
-	BUTTON = 2;
-	SET_NOTE = 3;
-	SET_DURATION = 4;
-	TIMER = 5;
 }
 
 message BlockAction{

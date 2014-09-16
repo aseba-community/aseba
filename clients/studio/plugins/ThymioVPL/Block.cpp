@@ -531,7 +531,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		BlockWithButtons::mouseReleaseEvent(event);
 		
-		UsageLogger::getLogger().logBlockMouseRelease(this->name, this->type, event);
+		LOG(logBlockMouseRelease(this->name, this->type, event));
 		emit undoCheckpoint();
 	}
 	
