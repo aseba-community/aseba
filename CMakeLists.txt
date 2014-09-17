@@ -50,7 +50,7 @@ add_subdirectory(common)
 
 add_subdirectory(transport)
 
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES} ${PROTOBUF_LIBRARY})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
 
 add_subdirectory(switches)
 

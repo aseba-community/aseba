@@ -16,6 +16,18 @@ MACRO(MAKE_WINDOWS_PATH pathname)
 	SET(${pathname} \"${${pathname}}\")
 ENDMACRO(MAKE_WINDOWS_PATH)
 
+# Google protobuf
+find_path(PROTOBUF_INCLUDE_DIR google/protobuf/stubs/common.h)
+find_library(PROTOBUF_LIBRARY protobuf)
+if (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	set(PROTOBUF_FOUND 1)
+	add_definitions(-DPROTOBUF_FOUND)
+	include_directories(${PROTOBUF_INCLUDE_DIR})
+	message(STATUS "Google Protobuf found")
+else (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
+endif (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+
 if (QT4_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
@@ -119,8 +131,12 @@ if (QT4_FOUND)
 			add_dependencies(asebastudio versionheader)
 		endif (HAS_DYN_VERSION)
 
-		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-
+		if (PROTOBUF_FOUND)
+			target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
+		else()
+			target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+		endif()
+		
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif (QT_QTHELP_FOUND)
 	
