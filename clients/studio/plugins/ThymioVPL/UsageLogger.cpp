@@ -16,17 +16,22 @@ using namespace std;
 
 namespace Aseba{ namespace ThymioVPL
 {
+	
+bool UsageLogger::loggingEnabled = false;
 UsageLogger::UsageLogger()
 {
-	askForGroupName();
+	if(loggingEnabled){
+		askForGroupName();
 	
-	QString homePath = QDir::homePath();
-	QString filePath = homePath + "/" + groupName + "_" + getTimeStampString() + ".log";
-	
-	fileOut = new ofstream(filePath.toUtf8().constData(), ios::app | ios::binary);
-	scene = 0;
+		QString homePath = QDir::homePath();
+		QString filePath = homePath + "/" + groupName + "_" + getTimeStampString() + ".log";
+		
+		fileOut = new ofstream(filePath.toUtf8().constData(), ios::app | ios::binary);
+		scene = 0;
+		
+		connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *, QObject *)),this, SLOT(logGUIEvents(unsigned int, QObject*, QObject *)));
+	}
 	action = new Action();
-	connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *, QObject *)),this, SLOT(logGUIEvents(unsigned int, QObject*, QObject *)));
 }
 
 UsageLogger::~UsageLogger()
@@ -36,6 +41,10 @@ UsageLogger::~UsageLogger()
 		fileOut->close();
 		delete fileOut;
 	}
+}
+
+void UsageLogger::setLoggingState(bool enabled){
+	loggingEnabled = enabled;
 }
 
 void UsageLogger::askForGroupName(){
@@ -289,10 +298,12 @@ void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 }
 
 void UsageLogger::storeAction(Action * a){
-	int size = a->ByteSize();
-	fileOut->write((char*)&size,4);
-	fileOut->flush();
-	a->SerializeToOstream(fileOut);
+	if(loggingEnabled){
+		int size = a->ByteSize();
+		fileOut->write((char*)&size,4);
+		fileOut->flush();
+		a->SerializeToOstream(fileOut);
+	}
 }
 
 Action * UsageLogger::getActionWithCurrentState()

@@ -3,6 +3,7 @@
 
 #ifdef PROTOBUF_FOUND
 #define USAGE_LOG(x) UsageLogger::getLogger().x
+#define ENABLE_USAGE_LOG() Aseba::ThymioVPL::UsageLogger::setLoggingState(true)
 
 #include <iostream>
 #include <fstream>
@@ -27,6 +28,8 @@
 namespace Aseba { namespace ThymioVPL
 {
 
+	class DisabledLogger;
+	
 class UsageLogger : public QObject
 {
 	Q_OBJECT
@@ -34,6 +37,7 @@ class UsageLogger : public QObject
 public:
 	static UsageLogger & getLogger();
 	static int getRow(Block * b);
+	static void setLoggingState(bool enabled);
 	
 	public slots:
 	void logGUIEvents(unsigned int senderId, QObject *originalSender, QObject * logicalParent);
@@ -68,13 +72,16 @@ public:
 	
 private:
 	UsageLogger();
-	~UsageLogger();
+	virtual ~UsageLogger();
 	Action *action;
 	LogSignalMapper signalMapper;
 	QString groupName;
+	static bool loggingEnabled;
+	
+	friend DisabledLogger;
 	
 protected:
-	void storeAction(Action * action);
+	virtual void storeAction(Action * action);
 	Action * getActionWithCurrentState();
 	QString getTimeStampString();
 	void gen_random(char *s, const int len);
@@ -95,6 +102,7 @@ protected:
 
 #else /*PROTOBUF_FOUND*/
 #define USAGE_LOG(x) 
+#define ENABLE_USAGE_LOG() 
 #endif
 
 #endif // VPL_USAGE_LOGGER_H
