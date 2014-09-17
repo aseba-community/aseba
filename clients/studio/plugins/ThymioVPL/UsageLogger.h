@@ -2,7 +2,7 @@
 #define VPL_USAGE_LOGGER_H
 
 #ifdef PROTOBUF_FOUND
-#define LOG(x) UsageLogger::getLogger().x
+#define USAGE_LOG(x) UsageLogger::getLogger().x
 
 #include <iostream>
 #include <fstream>
@@ -94,7 +94,7 @@ protected:
 }}
 
 #else /*PROTOBUF_FOUND*/
-#define LOG(x) 
+#define USAGE_LOG(x) 
 #endif
 
 #endif // VPL_USAGE_LOGGER_H

@@ -86,7 +86,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setBlock(event, block);
 		emit contentChanged();
-		LOG(logAddEventBlock(this->row,block));
+		USAGE_LOG(logAddEventBlock(this->row,block));
 		emit undoCheckpoint();
 	}
 	
@@ -95,7 +95,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		addActionBlockNoEmit(block, number);
 		emit contentChanged();
-		LOG(logAddActionBlock(this->row, block, number));
+		USAGE_LOG(logAddActionBlock(this->row, block, number));
 		emit undoCheckpoint();
 	}
 	
@@ -724,7 +724,7 @@ namespace Aseba { namespace ThymioVPL
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
-		LOG(logActionSetDrag(this->row,event, drag));
+		USAGE_LOG(logActionSetDrag(this->row,event, drag));
 		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
@@ -784,7 +784,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
 			
-			LOG(logEventActionSetDrop(this->row, event));
+			USAGE_LOG(logEventActionSetDrop(this->row, event));
 			
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))

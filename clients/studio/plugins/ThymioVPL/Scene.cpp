@@ -28,7 +28,7 @@ namespace Aseba { namespace ThymioVPL
 		buttonSetHeight = p->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
-		LOG(setScene(this));
+		USAGE_LOG(setScene(this));
 	}
 	
 	Scene::~Scene()
@@ -236,7 +236,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			recompile();
-			LOG(logSetAdvanced(advanced));
+			USAGE_LOG(logSetAdvanced(advanced));
 			emit undoCheckpoint();
 		}
 	}
@@ -324,7 +324,7 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 	
 		recompile();
-		LOG(logRemoveSet(row));
+		USAGE_LOG(logRemoveSet(row));
 		emit undoCheckpoint();
 	}
 	
@@ -344,7 +344,7 @@ namespace Aseba { namespace ThymioVPL
 		relayout();
 		
 		recompile();
-		LOG(logInsertSet(row));
+		USAGE_LOG(logInsertSet(row));
 		
 		emit undoCheckpoint();
 		
