@@ -23,6 +23,7 @@
 #include "Scene.h"
 #include "Style.h"
 #include "../../../../common/utils/utils.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -85,6 +86,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setBlock(event, block);
 		emit contentChanged();
+		USAGE_LOG(logAddEventBlock(this->row,block));
 		emit undoCheckpoint();
 	}
 	
@@ -93,6 +95,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		addActionBlockNoEmit(block, number);
 		emit contentChanged();
+		USAGE_LOG(logAddActionBlock(this->row, block, number));
 		emit undoCheckpoint();
 	}
 	
@@ -721,6 +724,8 @@ namespace Aseba { namespace ThymioVPL
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
+		USAGE_LOG(logActionSetDrag(this->row,event, drag));
+		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
@@ -778,6 +783,8 @@ namespace Aseba { namespace ThymioVPL
 		if (isDnDValid(event))
 		{
 			const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
+			
+			USAGE_LOG(logEventActionSetDrop(this->row, event));
 			
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))

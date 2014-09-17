@@ -25,6 +25,20 @@ else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 	message(STATUS "Enki *not* found, simulation targets disabled")
 endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 
+# Google protobuf
+find_path(PROTOBUF_INCLUDE_DIR google/protobuf/stubs/common.h)
+find_library(PROTOBUF_LIBRARY protobuf)
+if (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	set(PROTOBUF_FOUND 1)
+	add_definitions(-DPROTOBUF_FOUND)
+	include_directories(${PROTOBUF_INCLUDE_DIR})
+	message(STATUS "Google Protobuf found")
+else (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
+endif (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	
+	
+
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
 set(LIB_VERSION_MAJOR 1) # Must be bumped for incompatible ABI changes
@@ -36,7 +50,7 @@ add_subdirectory(common)
 
 add_subdirectory(transport)
 
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES} ${PROTOBUF_LIBRARY})
 
 add_subdirectory(switches)
 

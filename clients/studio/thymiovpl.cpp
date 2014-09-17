@@ -42,6 +42,7 @@ Possible issues:
 #include "DashelTarget.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include "ThymioVPLStandalone.h"
+#include "plugins/ThymioVPL/UsageLogger.h"
 
 using namespace std;
 
@@ -53,6 +54,7 @@ void usage(const char *execName)
 	cout << " -h          this help" << endl;
 	cout << " -anytarget  allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
 	cout << " -debuglog   emit debug log events" << endl;
+	cout << " -usagelog   create a usage log of all the user events" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
 }
 
@@ -102,6 +104,9 @@ int main(int argc, char *argv[])
 			else if (cmd == "debuglog")
 			{
 				debugLog = true;
+			}
+			else if(cmd == "usagelog"){
+				ENABLE_USAGE_LOG();
 			}
 		}
 	}

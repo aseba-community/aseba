@@ -12,6 +12,7 @@
 
 #include "ActionBlocks.h"
 #include "Buttons.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -49,6 +50,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
 			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
 			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
+			USAGE_LOG(logSignal(s,SIGNAL(sliderReleased()),i,this));
 		}
 		
 		thymioBody = new ThymioBody(this, -70);
@@ -152,6 +154,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
 			connect(s, SIGNAL(sliderMoved(int)), SLOT(setChangedFlag()));
 			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
+			USAGE_LOG(logSignal(s,SIGNAL(sliderReleased()),i,this));
 		}
 	}
 
@@ -327,6 +330,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			note = noteVal;
 			update();
+			USAGE_LOG(logBlockAction(SET_NOTE, getName(), getType(), UsageLogger::getRow(this), noteIdx, NULL, &noteVal, NULL,NULL));
 			emit contentChanged();
 		}
 	}
@@ -338,6 +342,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			duration = durationVal;
 			update();
+			USAGE_LOG(logBlockAction(SET_DURATION, getName(), getType(), UsageLogger::getRow(this), noteIdx, NULL, &durationVal, NULL,NULL));
 			emit contentChanged();
 		}
 	}
@@ -453,6 +458,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			dragging = false;
 			emitUndoCheckpointAndClearIfChanged();
+			USAGE_LOG(logBlockAction(TIMER, getName(), getType(), UsageLogger::getRow(this), 0, NULL, NULL, &this->duration, NULL));
 		}
 		else
 			Block::mouseReleaseEvent(event);

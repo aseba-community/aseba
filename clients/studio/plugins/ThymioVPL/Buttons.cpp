@@ -22,6 +22,7 @@
 #include "ThymioVisualProgramming.h"
 #include "Style.h"
 #include "../../../../common/utils/utils.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -211,6 +212,7 @@ namespace Aseba { namespace ThymioVPL
 		if (dragResult != Qt::IgnoreAction)
 		{
 			emit contentChanged();
+			USAGE_LOG(logButtonDrag(block->name, block->type, event, drag));
 			emit undoCheckpoint();
 		}
 		#endif // ANDROID
@@ -230,8 +232,10 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (event->mimeData()->hasFormat("Block") &&
 			(Block::deserializeType(event->mimeData()->data("Block")) == block->getType())
-		)
+		){
 			event->accept();
+			USAGE_LOG(logDropButton(this, event));
+		}
 		else
 			event->ignore();
 	}

@@ -1,0 +1,137 @@
+package Aseba.ThymioVPL;
+
+enum MouseButton{
+	LEFT =1;
+	MIDDLE = 2;
+	RIGHT = 3;
+	NO=4;
+}
+
+enum BlockType{
+	EVENT = 1;
+	ACTION = 2;
+}
+
+enum MouseActionType{
+	MOVE_BLOCK = 1;
+	RELEASE_BLOCK = 2;
+	DRAG_BUTTON = 3;
+	DRAG_ACTION_SET = 4;
+	DROP_BUTTON = 5;
+	DROP_ACTION_SET = 6;
+}
+enum MenuEntry{
+	OPEN_HELP=1;
+	SAVE=2;
+	SAVE_AS=3;
+	NEW_FILE=4;
+	OPEN_FILE=5;
+	CLOSE_FILE=6;
+	SAVE_SNAPSHOT=7;
+	STOP=8;
+}
+
+enum BlockActionType{
+	SLIDER = 1;
+	BUTTON = 2;
+	SET_NOTE = 3;
+	SET_DURATION = 4;
+	TIMER = 5;
+}
+
+message RowAction{
+	enum ActionType{
+		REMOVE = 1;
+		INSERT = 2;
+	}
+	optional int32 row = 1;
+	required ActionType type = 2;
+}
+
+message DeviceAction{
+	required int32 id = 1;
+	repeated int32 variable = 2 [packed=true]; 
+}
+
+message MouseAction{
+	required MouseActionType type = 1;
+	required MouseButton button = 2;
+	optional double xPos = 3;
+	optional double yPos = 4;
+	
+	// Drag and drop events (either button or action set)
+	optional string blockName = 5;
+	optional string blockType = 6;
+	optional int32 row= 7;
+}
+
+message AccBlockModeAction{
+	required int32 mode =1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+}
+
+message AdvancedModeAction{
+	required bool isAdvanced=1;
+}
+
+message AddBlockAction{
+	required BlockType type =1;
+	optional string blockName = 2;
+	optional string blockType = 3;
+	optional int32 row=4;
+}
+
+message BlockAction{
+	required BlockActionType type = 1;
+	optional int32 row =2;
+	optional string blockName = 3;
+	optional string blockType = 4;
+	optional int32 elementId = 5;
+	
+	optional int32 sliderValue = 6;
+	optional int32 soundValue = 7;
+	optional int32 timerValue = 8;
+	optional int32 buttonValue = 9;
+}
+
+message MenuAction{
+	required MenuEntry entry=1;
+}
+
+message TimeStamp{
+	required uint32 timestamp = 1;		// UNIX timestamp
+	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolut value might not be meaningful
+}
+
+message Action{
+	enum ActionType{
+		ADVANCED_MODE=1;
+		ADD_BLOCK = 2;
+		ACC_BLOCK_MODE = 3;
+		MENU = 4;
+		MOUSE_ACTION =5;
+		DEVICE_ACTION =6;
+		BLOCK_ACTION=7;
+		ROW = 8;
+	}
+	
+	required ActionType type = 1;
+	optional string programStateAsXml = 2;	// The current program state (before! the action is applied)
+	required TimeStamp time = 3;
+	oneof actual_action {
+		RowAction rowAction = 10;
+		AdvancedModeAction advancedModeAction=11;
+		AddBlockAction addBlockAction=12;
+		AccBlockModeAction accBlockModeAction=13;
+		MenuAction menuAction=14;
+		MouseAction mouseAction = 15;
+		DeviceAction deviceAction = 16;
+		BlockAction blockAction = 17;
+	}
+}
+
+
+message Usage{
+	repeated Action action = 1;
+}

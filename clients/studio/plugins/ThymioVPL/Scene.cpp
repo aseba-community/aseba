@@ -9,6 +9,7 @@
 #include "Block.h"
 #include "ThymioVisualProgramming.h"
 #include "Style.h"
+#include "UsageLogger.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ namespace Aseba { namespace ThymioVPL
 		buttonSetHeight = p->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
+		USAGE_LOG(setScene(this));
 	}
 	
 	Scene::~Scene()
@@ -234,6 +236,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			recompile();
+			USAGE_LOG(logSetAdvanced(advanced));
 			emit undoCheckpoint();
 		}
 	}
@@ -321,6 +324,7 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 	
 		recompile();
+		USAGE_LOG(logRemoveSet(row));
 		emit undoCheckpoint();
 	}
 	
@@ -340,6 +344,8 @@ namespace Aseba { namespace ThymioVPL
 		relayout();
 		
 		recompile();
+		USAGE_LOG(logInsertSet(row));
+		
 		emit undoCheckpoint();
 		
 		p->setSoleSelection();

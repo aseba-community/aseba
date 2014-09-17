@@ -13,6 +13,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/Compiler.cpp
 	ThymioVPL/CompilerVisitors.cpp
 	ThymioVPL/Style.cpp
+	ThymioVPL/LogSignalMapper.cpp
 )
 qt4_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h
@@ -24,6 +25,14 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/ActionBlocks.h
 	ThymioVPL/EventActionsSet.h
 	ThymioVPL/Scene.h
+	ThymioVPL/UsageLogger.h
+	ThymioVPL/LogSignalMapper.h
 )
+
+if (PROTOBUF_FOUND)
+	set(qt_plugins_SRCS ${qt_plugins_SRCS} ThymioVPL/UsageProfile.pb.cc ThymioVPL/UsageLogger.cpp)
+endif (PROTOBUF_FOUND)
+
+
 add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 
