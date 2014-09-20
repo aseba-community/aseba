@@ -490,7 +490,11 @@ namespace Aseba { namespace ThymioVPL
 			{
 				killTimer(runAnimTimer);
 				runAnimTimer = 0;
+				#ifdef Q_OS_WIN
+				runButton->setIcon(QIcon(":/images/play.svgz"));
+				#else // Q_OS_WIN
 				runButton->setIcon(runAnimFrames[0]);
+				#endif // Q_OS_WIN
 			}
 		}
 	}
@@ -840,6 +844,8 @@ namespace Aseba { namespace ThymioVPL
 		return destImage;
 	}
 	
+	#ifndef Q_OS_WIN
+	
 	void ThymioVisualProgramming::regenerateRunButtonAnimation(const QSize& iconSize)
 	{
 		// load the play animation
@@ -859,6 +865,8 @@ namespace Aseba { namespace ThymioVPL
 			runAnimFrames[i] = QPixmap::fromImage(blend(playImage, playRedImage, alpha));
 		}
 	}
+	
+	#endif // Q_OS_WIN
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
@@ -936,7 +944,9 @@ namespace Aseba { namespace ThymioVPL
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
 		const QSize importantIconSize(tbIconSize * 2);
+		#ifndef Q_OS_WIN
 		regenerateRunButtonAnimation(importantIconSize);
+		#endif // Q_OS_WIN
 		newButton->setIconSize(tbIconSize);
 		openButton->setIconSize(tbIconSize);
 		saveButton->setIconSize(tbIconSize);
@@ -974,10 +984,18 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::timerEvent ( QTimerEvent * event )
 	{
+		#ifdef Q_OS_WIN
+		// for unknown reason, animation does not work some times on Windows, so setting image directly from QIcon	
+		if (runAnimFrame >= 0)
+			runButton->setIcon(QIcon(":/images/play.svgz"));
+		else
+			runButton->setIcon(QIcon(":/images/play-green.svgz"));
+		#else // Q_OS_WIN
 		if (runAnimFrame >= 0)
 			runButton->setIcon(runAnimFrames[runAnimFrame]);
 		else
 			runButton->setIcon(runAnimFrames[-runAnimFrame]);
+		#endif // Q_OS_WIN
 		runAnimFrame++;
 		if (runAnimFrame == runAnimFrames.size())
 			runAnimFrame = -runAnimFrames.size()+1;
