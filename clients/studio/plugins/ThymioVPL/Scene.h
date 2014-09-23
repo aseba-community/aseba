@@ -74,6 +74,11 @@ namespace Aseba { namespace ThymioVPL
 		void recompileWithoutSetModified();
 		
 	protected:
+		/*void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+		void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
+		void dropEvent(QGraphicsSceneDragDropEvent *event);
+		bool isDnDValid(QGraphicsSceneDragDropEvent *event) const;
+		*/
 		void rearrangeSets(int row=0);
 		void relayout();
 		void addEventActionsSet(EventActionsSet *eventActionsSet);

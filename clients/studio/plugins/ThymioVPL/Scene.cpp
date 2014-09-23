@@ -368,6 +368,48 @@ namespace Aseba { namespace ThymioVPL
 		setSceneRect(r.adjusted(-40,-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
 	}
+	
+	/*void Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dragEnterEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dragMoveEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dropEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	bool Scene::isDnDValid(QGraphicsSceneDragDropEvent *event) const
+	{
+		if (event->mimeData()->hasFormat("EventActionsSet") ||
+			event->mimeData()->hasFormat("Block")
+		)
+		{
+			if (items(event->pos(), Qt::ContainsItemBoundingRect, Qt::AscendingOrder).empty())
+				return true;
+		}
+		return false;
+	}*/
 
 	void Scene::rearrangeSets(int row)
 	{

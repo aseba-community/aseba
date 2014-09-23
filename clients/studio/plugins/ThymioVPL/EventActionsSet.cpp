@@ -905,6 +905,20 @@ namespace Aseba { namespace ThymioVPL
 				else
 					return true;
 			}
+			else if (Block::deserializeType(event->mimeData()->data("Block")) == "event")
+			{
+				if (this->event && this->event->beingDragged)
+					return false;
+				else
+					return true;
+			}
+			else if (Block::deserializeType(event->mimeData()->data("Block")) == "state")
+			{
+				if (this->stateFilter && this->stateFilter->beingDragged)
+					return false;
+				else
+					return true;
+			}
 			else
 				return true;
 		}
