@@ -106,7 +106,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 150, 300, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 350, 450, QColor(32,32,32), Qt::white, advanced, parent)
 	{
 		// indication LEDs
 		indicationLEDs.push_back(createIndicationLED(72,40));
