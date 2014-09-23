@@ -157,8 +157,12 @@ if (QT4_FOUND)
 	if (HAS_DYN_VERSION)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
-
-	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	
+	if (PROTOBUF_FOUND)
+		target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
+	else()
+		target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	endif()
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (QT4_FOUND)
