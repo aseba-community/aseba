@@ -25,12 +25,10 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		virtual void resizeEvent(QResizeEvent * event);
 		
-	protected slots:
-		void resetResizedFlag();
-		
 	protected:
-		bool wasResized;
 		qreal computedScale;
+	
+		QTimer *recomputeTimer;
 	};
 	
 	/*@}*/
