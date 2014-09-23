@@ -27,8 +27,6 @@
 
 namespace Aseba { namespace ThymioVPL
 {
-
-	class DisabledLogger;
 	
 class UsageLogger : public QObject
 {
@@ -77,8 +75,6 @@ private:
 	LogSignalMapper signalMapper;
 	QString groupName;
 	static bool loggingEnabled;
-	
-	friend DisabledLogger;
 	
 protected:
 	virtual void storeAction(Action * action);
