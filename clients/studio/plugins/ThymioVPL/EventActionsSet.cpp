@@ -968,7 +968,7 @@ namespace Aseba { namespace ThymioVPL
 			{
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
-				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[0], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
 				//painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
 				painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 				return;
@@ -980,7 +980,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			const qreal hb(borderWidth/2);
 			painter->setBrush(Qt::NoBrush);
-			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[0], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
 			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
 			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 		}
