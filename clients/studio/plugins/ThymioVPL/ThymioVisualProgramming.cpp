@@ -141,7 +141,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/ksnapshot.svgz"));
-		snapshotButton->setToolTip(tr("Snapshot"));
+		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
 		toolLayout->addWidget(snapshotButton,1,9);
 
@@ -318,24 +318,42 @@ namespace Aseba { namespace ThymioVPL
 			const QFileInfo pf(de->openedFileName());
 			initialFile = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
 		}
+		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
-			tr("Export program as SVG"), initialFile, "Scalable Vector Graphics (*.svg)"));
+			tr("Export program as image"), initialFile, "Scalable Vector Graphics (*.svg);;Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
 		
 		if (fileName.isEmpty())
 			return;
 		
-		if (fileName.lastIndexOf(".") < 0)
-			fileName += ".svg";
-		
-		QSvgGenerator generator;
-		generator.setFileName(fileName);
-		generator.setSize(scene->sceneRect().size().toSize());
-		generator.setViewBox(scene->sceneRect());
-		generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
-		generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
-		
-		QPainter painter(&generator);
-		scene->render(&painter);
+		if (selectedFilter.at(0) == 'S')
+		{
+			// SVG
+			if (fileName.lastIndexOf(".") < 0)
+				fileName += ".svg";
+			
+			QSvgGenerator generator;
+			generator.setFileName(fileName);
+			generator.setSize(scene->sceneRect().size().toSize());
+			generator.setViewBox(scene->sceneRect());
+			generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
+			generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
+			
+			QPainter painter(&generator);
+			scene->render(&painter);
+		}
+		else
+		{
+			// image
+			if (fileName.lastIndexOf(".") < 0)
+				fileName += ".png";
+			
+			QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+			{ // paint into image
+				QPainter painter(&image);
+				scene->render(&painter);
+			}
+			image.save(fileName);
+		}
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *comboBox)
