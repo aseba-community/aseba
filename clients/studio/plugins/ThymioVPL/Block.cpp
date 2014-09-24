@@ -416,8 +416,9 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	
-	BlockWithButtonsAndRange::BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent) :
+	BlockWithButtonsAndRange::BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, const PixelToValModel pixelToValModel, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent) :
 		BlockWithButtons(type, name, up, parent),
+		pixelToValModel(pixelToValModel),
 		lowerBound(lowerBound),
 		upperBound(upperBound),
 		range(upperBound-lowerBound),
@@ -461,10 +462,10 @@ namespace Aseba { namespace ThymioVPL
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
 			QPolygon highCursor;
-			highCursor << QPoint(x+highPos, y) << QPoint(x+highPos-46, y) << QPoint(x+highPos-46, y+23) << QPoint(x+highPos, y+46);
+			highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
 			painter->drawConvexPolygon(highCursor);
 			QPolygon lowCursor;
-			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+46, y+50+23) << QPoint(x+lowPos+46, y+96) << QPoint(x+lowPos, y+96);
+			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
 			painter->drawConvexPolygon(lowCursor);
 		}
 	}
@@ -514,13 +515,13 @@ namespace Aseba { namespace ThymioVPL
 		if (pos.y() >= 48)
 		{
 			low = pixelToVal(pos.x());
-			low = std::min<int>(low, pixelToVal(r.width()-46));
+			low = std::min<int>(low, pixelToVal(r.width()-23));
 			high = std::max(low, high);
 		}
 		else
 		{
 			high = pixelToVal(pos.x());
-			high = std::max<int>(high, pixelToVal(47));
+			high = std::max<int>(high, pixelToVal(23));
 			low = std::min(low, high);
 		}
 		update();
@@ -612,13 +613,24 @@ namespace Aseba { namespace ThymioVPL
 	
 	float BlockWithButtonsAndRange::pixelToVal(float pixel) const
 	{
-		const float factor(pixel/rangeRect().width());
-		return range * factor * factor + lowerBound;
+		const float width(rangeRect().width() - 46);
+		pixel -= 23;
+		pixel = std::min(std::max(0.f, pixel), width);
+		const float factor(pixel/width);
+		if (pixelToValModel == PIXEL_TO_VAL_LINEAR)
+			return range * factor + lowerBound;
+		else
+			return range * factor * factor + lowerBound;
 	}
 	
 	float BlockWithButtonsAndRange::valToPixel(float val) const
 	{
-		return rangeRect().width()*(sqrt((val-lowerBound)/float(range)));
+		val = std::min(std::max((float)lowerBound, val), (float)upperBound);
+		const float width(rangeRect().width() - 46);
+		if (pixelToValModel == PIXEL_TO_VAL_LINEAR)
+			return 23+width*((val-lowerBound)/float(range));
+		else
+			return 23+width*(sqrt((val-lowerBound)/float(range)));
 	}
 	
 	//! Create a point with a gradient representing a LED on the robot
