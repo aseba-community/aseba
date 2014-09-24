@@ -409,7 +409,6 @@ namespace Aseba { namespace ThymioVPL
 		QSettings settings;
 		restoreGeometry(settings.value("ThymioVisualProgramming/geometry").toByteArray());
 		QWidget::show();
-		view->recomputeScale();
 	}
 
 	void ThymioVisualProgramming::showVPLModal()
@@ -671,7 +670,7 @@ namespace Aseba { namespace ThymioVPL
 		if (!programElement.isNull())
 		{
 			scene->deserialize(programElement);
-			toggleAdvancedMode(scene->getAdvanced(), true);
+			toggleAdvancedMode(scene->getAdvanced(), true, true);
 		}
 		
 		scene->setModified(!fromFile);

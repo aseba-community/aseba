@@ -8,14 +8,14 @@ namespace Aseba { namespace ThymioVPL
 {
 	ResizingView::ResizingView(QGraphicsScene * scene, QWidget * parent):
 		QGraphicsView(scene, parent),
-		computedScale(1),
-		ignoreResize(false)
+		computedScale(1)/*,
+		ignoreResize(false)*/
 	{
 		assert(scene);
 		recomputeTimer = new QTimer(this);
-		ignoreResizeTimer = new QTimer(this);
+		//ignoreResizeTimer = new QTimer(this);
 		connect(recomputeTimer, SIGNAL(timeout()), SLOT(recomputeScale()));
-		connect(ignoreResizeTimer, SIGNAL(timeout()), SLOT(clearIgnoreResize()));
+		//connect(ignoreResizeTimer, SIGNAL(timeout()), SLOT(clearIgnoreResize()));
 		connect(scene, SIGNAL(sceneSizeChanged()), recomputeTimer, SLOT(start()));
 	}
 	
@@ -24,8 +24,8 @@ namespace Aseba { namespace ThymioVPL
 		//qDebug() << "resive event";
 		QGraphicsView::resizeEvent(event);
 		
-		if (ignoreResize)
-			return;
+		/*if (ignoreResize)
+			return;*/
 		recomputeTimer->start();
 	}
 	
@@ -45,14 +45,14 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene(), SIGNAL(sceneSizeChanged()), this, SLOT(recomputeScale()));
 		
 		recomputeTimer->stop();
-		ignoreResize = true;
-		ignoreResizeTimer->start();
+		/*ignoreResize = true;
+		ignoreResizeTimer->start();*/
 	}
-	
+	/*
 	void ResizingView::clearIgnoreResize()
 	{
 		ignoreResize = false;
 		ignoreResizeTimer->stop();
-	}
+	}*/
 	
 } } // namespace ThymioVPL / namespace Aseba
