@@ -29,6 +29,7 @@ enum MenuEntry{
 	CLOSE_FILE=6;
 	SAVE_SNAPSHOT=7;
 	STOP=8;
+	RUN = 9;
 }
 
 enum BlockActionType{
