@@ -28,9 +28,11 @@
 #include "Scene.h"
 #include "Buttons.h"
 #include "Style.h"
+#include "UsageLogger.h"
 
 #include "../../TargetModels.h"
 #include "../../../../common/utils/utils.h"
+
 
 // for backtrace
 //#include <execinfo.h>
@@ -139,7 +141,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/ksnapshot.svgz"));
-		snapshotButton->setToolTip(tr("Snapshot"));
+		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
 		toolLayout->addWidget(snapshotButton,1,9);
 
@@ -303,35 +305,55 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::openHelp() const
 	{
+		USAGE_LOG(logOpenHelp());
 		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
 	}
 	
 	void ThymioVisualProgramming::saveSnapshot() const
 	{
+		USAGE_LOG(logSaveSnapshot());
 		QString initialFile;
 		if (!de->openedFileName().isEmpty())
 		{
 			const QFileInfo pf(de->openedFileName());
 			initialFile = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
 		}
+		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
-			tr("Export program as SVG"), initialFile, "Scalable Vector Graphics (*.svg)"));
+			tr("Export program as image"), initialFile, "Scalable Vector Graphics (*.svg);;Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
 		
 		if (fileName.isEmpty())
 			return;
 		
-		if (fileName.lastIndexOf(".") < 0)
-			fileName += ".svg";
-		
-		QSvgGenerator generator;
-		generator.setFileName(fileName);
-		generator.setSize(scene->sceneRect().size().toSize());
-		generator.setViewBox(scene->sceneRect());
-		generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
-		generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
-		
-		QPainter painter(&generator);
-		scene->render(&painter);
+		if (selectedFilter.at(0) == 'S')
+		{
+			// SVG
+			if (fileName.lastIndexOf(".") < 0)
+				fileName += ".svg";
+			
+			QSvgGenerator generator;
+			generator.setFileName(fileName);
+			generator.setSize(scene->sceneRect().size().toSize());
+			generator.setViewBox(scene->sceneRect());
+			generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
+			generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
+			
+			QPainter painter(&generator);
+			scene->render(&painter);
+		}
+		else
+		{
+			// image
+			if (fileName.lastIndexOf(".") < 0)
+				fileName += ".png";
+			
+			QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+			{ // paint into image
+				QPainter painter(&image);
+				scene->render(&painter);
+			}
+			image.save(fileName);
+		}
 	}
 	
 	void ThymioVisualProgramming::setColors(QComboBox *comboBox)
@@ -387,7 +409,6 @@ namespace Aseba { namespace ThymioVPL
 		QSettings settings;
 		restoreGeometry(settings.value("ThymioVisualProgramming/geometry").toByteArray());
 		QWidget::show();
-		view->recomputeScale();
 	}
 
 	void ThymioVisualProgramming::showVPLModal()
@@ -406,6 +427,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
+			USAGE_LOG(logNewFile());
 			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
@@ -415,21 +437,25 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::openFile()
 	{
+		USAGE_LOG(logOpenFile());
 		de->openFile();
 	}
 	
 	bool ThymioVisualProgramming::save()
 	{
+		USAGE_LOG(logSave());
 		return de->saveFile(false);
 	}
 	
 	bool ThymioVisualProgramming::saveAs()
 	{
+		USAGE_LOG(logSaveAs());
 		return de->saveFile(true);
 	}
 
 	bool ThymioVisualProgramming::closeFile()
 	{
+		USAGE_LOG(logCloseFile());
 		if (!isVisible())
 			return true;
 		
@@ -481,13 +507,18 @@ namespace Aseba { namespace ThymioVPL
 			{
 				killTimer(runAnimTimer);
 				runAnimTimer = 0;
+				#ifdef Q_OS_WIN
+				runButton->setIcon(QIcon(":/images/play.svgz"));
+				#else // Q_OS_WIN
 				runButton->setIcon(runAnimFrames[0]);
+				#endif // Q_OS_WIN
 			}
 		}
 	}
 
 	void ThymioVisualProgramming::stop()
 	{
+		USAGE_LOG(logStop());
 		de->stop();
 		const unsigned leftSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.left.target");
 		de->setVariableValues(leftSpeedVarPos, VariablesDataVector(1, 0));
@@ -639,7 +670,7 @@ namespace Aseba { namespace ThymioVPL
 		if (!programElement.isNull())
 		{
 			scene->deserialize(programElement);
-			toggleAdvancedMode(scene->getAdvanced(), true);
+			toggleAdvancedMode(scene->getAdvanced(), true, true);
 		}
 		
 		scene->setModified(!fromFile);
@@ -774,6 +805,7 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
 		// NOTE: here we can add react to incoming events
+		USAGE_LOG(logUserEvent(id,data));
 		if (id != 0)
 			return;
 		
@@ -829,6 +861,8 @@ namespace Aseba { namespace ThymioVPL
 		return destImage;
 	}
 	
+	#ifndef Q_OS_WIN
+	
 	void ThymioVisualProgramming::regenerateRunButtonAnimation(const QSize& iconSize)
 	{
 		// load the play animation
@@ -848,6 +882,8 @@ namespace Aseba { namespace ThymioVPL
 			runAnimFrames[i] = QPixmap::fromImage(blend(playImage, playRedImage, alpha));
 		}
 	}
+	
+	#endif // Q_OS_WIN
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
@@ -925,7 +961,9 @@ namespace Aseba { namespace ThymioVPL
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
 		const QSize importantIconSize(tbIconSize * 2);
+		#ifndef Q_OS_WIN
 		regenerateRunButtonAnimation(importantIconSize);
+		#endif // Q_OS_WIN
 		newButton->setIconSize(tbIconSize);
 		openButton->setIconSize(tbIconSize);
 		saveButton->setIconSize(tbIconSize);
@@ -963,10 +1001,18 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::timerEvent ( QTimerEvent * event )
 	{
+		#ifdef Q_OS_WIN
+		// for unknown reason, animation does not work some times on Windows, so setting image directly from QIcon	
+		if (runAnimFrame >= 0)
+			runButton->setIcon(QIcon(":/images/play.svgz"));
+		else
+			runButton->setIcon(QIcon(":/images/play-green.svgz"));
+		#else // Q_OS_WIN
 		if (runAnimFrame >= 0)
 			runButton->setIcon(runAnimFrames[runAnimFrame]);
 		else
 			runButton->setIcon(runAnimFrames[-runAnimFrame]);
+		#endif // Q_OS_WIN
 		runAnimFrame++;
 		if (runAnimFrame == runAnimFrames.size())
 			runAnimFrame = -runAnimFrames.size()+1;

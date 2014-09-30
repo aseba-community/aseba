@@ -162,7 +162,9 @@ namespace Aseba { namespace ThymioVPL
 		void updateBlockButtonImages();
 		void closeEvent(QCloseEvent * event);
 		
+		#ifndef Q_OS_WIN
 		void regenerateRunButtonAnimation(const QSize& iconSize);
+		#endif // Q_OS_WIN
 		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 		virtual void timerEvent ( QTimerEvent * event );

@@ -9,6 +9,7 @@
 
 #include "EventBlocks.h"
 #include "Buttons.h"
+#include "UsageLogger.h"
 
 #define deg2rad(x) ((x) * M_PI / 180.)
 
@@ -34,6 +35,7 @@ namespace Aseba { namespace ThymioVPL
 
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
 		}
 
 		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
@@ -42,11 +44,12 @@ namespace Aseba { namespace ThymioVPL
 		buttons.push_back(button);
 		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
+		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),4,this));
 	}
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "prox", true, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
 	{
 		// indication LEDs for front sensors
 		indicationLEDs.push_back(createIndicationLED(15,78));
@@ -78,6 +81,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
 		}
 		// back sensors
 		for(int i=0; i<2; ++i) 
@@ -93,6 +97,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i+5,this));
 		}
 		
 		updateIndicationLEDsOpacity();
@@ -101,7 +106,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "proxground", false, 0, 1023, 150, 300, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 350, 450, QColor(32,32,32), Qt::white, advanced, parent)
 	{
 		// indication LEDs
 		indicationLEDs.push_back(createIndicationLED(72,40));
@@ -121,6 +126,7 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
 		}
 		
 		updateIndicationLEDsOpacity();
@@ -214,6 +220,7 @@ namespace Aseba { namespace ThymioVPL
 				if (buttonPoses[i].contains(event->pos()))
 				{
 					setMode(i);
+					USAGE_LOG(logAccEventBlockMode(this->name, this->type,i));
 					emit undoCheckpoint();
 					return;
 				}

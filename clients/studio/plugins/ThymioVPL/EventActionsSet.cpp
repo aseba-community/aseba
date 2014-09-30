@@ -23,6 +23,7 @@
 #include "Scene.h"
 #include "Style.h"
 #include "../../../../common/utils/utils.h"
+#include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -85,6 +86,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		setBlock(event, block);
 		emit contentChanged();
+		USAGE_LOG(logAddEventBlock(this->row,block));
 		emit undoCheckpoint();
 	}
 	
@@ -93,6 +95,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		addActionBlockNoEmit(block, number);
 		emit contentChanged();
+		USAGE_LOG(logAddActionBlock(this->row, block, number));
 		emit undoCheckpoint();
 	}
 	
@@ -721,6 +724,8 @@ namespace Aseba { namespace ThymioVPL
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
+		USAGE_LOG(logActionSetDrag(this->row,event, drag));
+		
 		beingDragged = true;
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
@@ -778,6 +783,8 @@ namespace Aseba { namespace ThymioVPL
 		if (isDnDValid(event))
 		{
 			const bool advanced(polymorphic_downcast<Scene*>(scene())->getAdvanced());
+			
+			USAGE_LOG(logEventActionSetDrop(this->row, event));
 			
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))
@@ -898,6 +905,20 @@ namespace Aseba { namespace ThymioVPL
 				else
 					return true;
 			}
+			else if (Block::deserializeType(event->mimeData()->data("Block")) == "event")
+			{
+				if (this->event && this->event->beingDragged)
+					return false;
+				else
+					return true;
+			}
+			else if (Block::deserializeType(event->mimeData()->data("Block")) == "state")
+			{
+				if (this->stateFilter && this->stateFilter->beingDragged)
+					return false;
+				else
+					return true;
+			}
 			else
 				return true;
 		}
@@ -947,11 +968,21 @@ namespace Aseba { namespace ThymioVPL
 			{
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
-				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setPen(QPen(Style::eventActionsSetBackgroundColors[0], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
 				//painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
 				painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 				return;
 			}
+		}
+		
+		// extension drop area
+		if (!actions.empty())
+		{
+			const qreal hb(borderWidth/2);
+			painter->setBrush(Qt::NoBrush);
+			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[0], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
+			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 		}
 		
 		// background
@@ -964,15 +995,6 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
 		else
 			painter->drawRoundedRect(innerBoundingRect(), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
-		// extension drop area
-		if (!actions.empty())
-		{
-			const qreal hb(borderWidth/2);
-			painter->setBrush(Qt::NoBrush);
-			painter->setPen(QPen(Style::eventActionsSetBackgroundColors[colorId], borderWidth, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
-			const QRectF rect(QRectF(totalWidth-Style::blockWidth-Style::blockSpacing,0,Style::blockWidth+Style::blockSpacing,innerBoundingRect().height()).adjusted(-hb,hb,-hb,-hb));
-			painter->drawRoundedRect(rect, Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
-		}
 		
 		// event drop area
 		if (!event)

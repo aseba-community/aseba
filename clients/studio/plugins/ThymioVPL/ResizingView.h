@@ -22,15 +22,18 @@ namespace Aseba { namespace ThymioVPL
 	public slots:
 		void recomputeScale();
 		
+	/*protected slots:
+		void clearIgnoreResize();*/
+		
 	protected:
 		virtual void resizeEvent(QResizeEvent * event);
 		
-	protected slots:
-		void resetResizedFlag();
-		
 	protected:
-		bool wasResized;
 		qreal computedScale;
+		//bool ignoreResize;
+	
+		QTimer *recomputeTimer;
+		//QTimer *ignoreResizeTimer;
 	};
 	
 	/*@}*/

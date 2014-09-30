@@ -278,7 +278,7 @@ namespace Aseba
 				}
 				else if (element.tagName() == "constant")
 				{
-					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toUInt()));
+					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
 				}
 			}
 			domNode = domNode.nextSibling();

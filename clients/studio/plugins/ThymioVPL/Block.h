@@ -147,7 +147,14 @@ namespace Aseba { namespace ThymioVPL
 		Q_OBJECT
 		
 	public:
-		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent);
+		enum PixelToValModel
+		{
+			PIXEL_TO_VAL_LINEAR,
+			PIXEL_TO_VAL_SQUARE
+		};
+		
+	public:
+		BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, const PixelToValModel pixelToValModel, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent);
 		
 		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
@@ -161,6 +168,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void setAdvanced(bool advanced);
 		
 	public:
+		const PixelToValModel pixelToValModel; //< whether we have a linear or square mapping
 		const int lowerBound;
 		const int upperBound;
 		const int range;

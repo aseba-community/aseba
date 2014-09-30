@@ -9,6 +9,7 @@
 #include "Block.h"
 #include "ThymioVisualProgramming.h"
 #include "Style.h"
+#include "UsageLogger.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ namespace Aseba { namespace ThymioVPL
 		buttonSetHeight = p->boundingRect().height();
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
+		USAGE_LOG(setScene(this));
 	}
 	
 	Scene::~Scene()
@@ -234,6 +236,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			recompile();
+			USAGE_LOG(logSetAdvanced(advanced));
 			emit undoCheckpoint();
 		}
 	}
@@ -321,6 +324,7 @@ namespace Aseba { namespace ThymioVPL
 		recomputeSceneRect();
 	
 		recompile();
+		USAGE_LOG(logRemoveSet(row));
 		emit undoCheckpoint();
 	}
 	
@@ -340,6 +344,8 @@ namespace Aseba { namespace ThymioVPL
 		relayout();
 		
 		recompile();
+		USAGE_LOG(logInsertSet(row));
+		
 		emit undoCheckpoint();
 		
 		p->setSoleSelection();
@@ -362,6 +368,48 @@ namespace Aseba { namespace ThymioVPL
 		setSceneRect(r.adjusted(-40,-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
 	}
+	
+	/*void Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dragEnterEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dragMoveEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
+	{
+		Scene::dropEvent(event);
+		if (isDnDValid(event))
+		{
+			event->setDropAction(Qt::MoveAction);
+			event->accept();
+		}
+	}
+	
+	bool Scene::isDnDValid(QGraphicsSceneDragDropEvent *event) const
+	{
+		if (event->mimeData()->hasFormat("EventActionsSet") ||
+			event->mimeData()->hasFormat("Block")
+		)
+		{
+			if (items(event->pos(), Qt::ContainsItemBoundingRect, Qt::AscendingOrder).empty())
+				return true;
+		}
+		return false;
+	}*/
 
 	void Scene::rearrangeSets(int row)
 	{
