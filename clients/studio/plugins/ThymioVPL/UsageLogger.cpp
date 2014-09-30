@@ -284,6 +284,9 @@ void UsageLogger::logCloseFile(){
 void UsageLogger::logStop(){
 	logMenuAction(STOP);	
 }
+void UsageLogger::logRun(){
+	logMenuAction(RUN);	
+}
 void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 	Action * wrapper = getActionWithCurrentState();
 	DeviceAction *a = new DeviceAction();

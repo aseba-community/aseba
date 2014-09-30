@@ -162,11 +162,12 @@ enum MenuEntry {
   OPEN_FILE = 5,
   CLOSE_FILE = 6,
   SAVE_SNAPSHOT = 7,
-  STOP = 8
+  STOP = 8,
+  RUN = 9
 };
 bool MenuEntry_IsValid(int value);
 const MenuEntry MenuEntry_MIN = OPEN_HELP;
-const MenuEntry MenuEntry_MAX = STOP;
+const MenuEntry MenuEntry_MAX = RUN;
 const int MenuEntry_ARRAYSIZE = MenuEntry_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MenuEntry_descriptor();

@@ -52,6 +52,7 @@ public:
 	void logSaveAs();
 	void logCloseFile();
 	void logStop();
+	void logRun();
 	void logInsertSet(int row);
 	void logRemoveSet(int row);
 	void logBlockMouseMove(QString name, QString type, QGraphicsSceneMouseEvent *event);
