@@ -9,6 +9,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsView>
 #include <QMessageBox>
+#include <QTimer>
 #include <QDebug>
 #include <cassert>
 #include <cmath>
@@ -32,6 +33,7 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsObject(parent),
 		event(0),
 		stateFilter(0),
+		isBlinking(false),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
 		highlightMode(HIGHLIGHT_NONE),
@@ -284,6 +286,14 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
+	//! Blink the set
+	void EventActionsSet::blink()
+	{
+		isBlinking = true;
+		update();
+		QTimer::singleShot(200, this, SLOT(clearBlink()));
+	}
+	
 	//! Return the content compressed into a uint16 vector, to be used as debug events
 	QVector<quint16> EventActionsSet::getContentCompressed() const
 	{
@@ -470,6 +480,12 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionsSet::addClicked()
 	{
 		polymorphic_downcast<Scene*>(scene())->insertSet(row+1);
+	}
+	
+	void EventActionsSet::clearBlink()
+	{
+		isBlinking = false;
+		update();
 	}
 	
 	QMimeData* EventActionsSet::mimeData() const
@@ -964,6 +980,7 @@ namespace Aseba { namespace ThymioVPL
 			deleteButton->setVisible(!isLast);
 			if (stateFilter)
 				stateFilter->setVisible(!isLast);
+			// if last and not drop target, draw dotted area
 			if (isLast && (highlightMode == HIGHLIGHT_NONE))
 			{
 				const qreal hb(borderWidth/2);
@@ -990,7 +1007,11 @@ namespace Aseba { namespace ThymioVPL
 			painter->setPen(QPen(Qt::red, 8));
 		else
 			painter->setPen(Qt::NoPen);
-		painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
+		
+		if (isBlinking)
+			painter->setBrush(QColor(180, 255, 181));
+		else
+			painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
 		if (highlightMode == HIGHLIGHT_SET)
 			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
 		else

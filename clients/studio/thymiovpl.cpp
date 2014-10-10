@@ -52,12 +52,13 @@ void usage(const char *execName)
 	cout << "Usage: " << execName << " (OPTIONS|TARGET)* " << endl;
 	cout << "  where" << endl;
 	cout << "OPTION is one of:" << endl;
-	cout << " -anytarget  allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
-	cout << " -debuglog   emit debug log events" << endl;
+	cout << " -anytarget     allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
+	cout << " -debuglog      emit debug log events" << endl;
+	cout << " -execfeedback  blink set being executed" << endl;
 	#ifdef PROTOBUF_FOUND // only show if it actually works
-	cout << " -usagelog   create a usage log of all the user events" << endl;
+	cout << " -usagelog      create a usage log of all the user events" << endl;
 	#endif // PROTOBUF_FOUND
-	cout << " -h          this help" << endl;
+	cout << " -h             this help" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
 	cout << endl;
 	cout << "Version " << ASEBA_VERSION << ", Aseba protocol " << ASEBA_PROTOCOL_VERSION << endl;
@@ -89,6 +90,7 @@ int main(int argc, char *argv[])
 	
 	bool useAnyTarget(false);
 	bool debugLog(false);
+	bool execFeedback(false);
 	QString commandLineTarget;
 	for (int i = 1; i < argc; ++i)
 	{
@@ -113,8 +115,14 @@ int main(int argc, char *argv[])
 			{
 				debugLog = true;
 			}
-			else if(cmd == "usagelog"){
+			else if (cmd == "usagelog")
+			{
 				ENABLE_USAGE_LOG();
+			}
+			else if (cmd == "execfeedback")
+			{
+				debugLog = true;
+				execFeedback = true;
 			}
 		}
 	}
@@ -141,7 +149,7 @@ int main(int argc, char *argv[])
 		translators.push_back(&translator);
 		translators.push_back(&compilerTranslator);
 		
-		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget, debugLog);
+		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget, debugLog, execFeedback);
 		vpl.show();
 		app.setOverrideCursor(Qt::ArrowCursor);
 		return app.exec();
