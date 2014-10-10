@@ -65,6 +65,7 @@ public:
 	void logDropButton(BlockButton *block, QDropEvent *event);
 	void logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event);
 	void logUserEvent(unsigned id, const VariablesDataVector& data);
+	void logTabletData(const VariablesDataVector& data);
 	void logSignal(const QObject * sender, const char * signal, unsigned int senderId, QObject * logicalParent);
 	void logBlockAction(BlockActionType type, QString blockName, QString blockType, int row, int elementId, int * sliderValue, unsigned int * soundValue, unsigned int * timeValue, int * buttonValue);
 	

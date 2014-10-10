@@ -804,12 +804,15 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
-		// NOTE: here we can add react to incoming events
-		USAGE_LOG(logUserEvent(id,data));
-		if (id != 0)
-			return;
+		// here we can add react to incoming events
+		if (id == 1)
+			USAGE_LOG(logTabletData(data));
+		else
+			USAGE_LOG(logUserEvent(id,data));
 		
 		// TODO: highlight pair
+		if (id != 0)
+			return;
 		cerr << "event " << data.at(0) << endl;
 	}
 	
