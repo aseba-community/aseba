@@ -408,12 +408,12 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
     "useActionType\022\016\n\nMOVE_BLOCK\020\001\022\021\n\rRELEASE"
     "_BLOCK\020\002\022\017\n\013DRAG_BUTTON\020\003\022\023\n\017DRAG_ACTION"
     "_SET\020\004\022\017\n\013DROP_BUTTON\020\005\022\023\n\017DROP_ACTION_S"
-    "ET\020\006*{\n\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SAVE"
-    "\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_FI"
-    "LE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020\007\022"
-    "\010\n\004STOP\020\010*T\n\017BlockActionType\022\n\n\006SLIDER\020\001"
-    "\022\n\n\006BUTTON\020\002\022\014\n\010SET_NOTE\020\003\022\020\n\014SET_DURATI"
-    "ON\020\004\022\t\n\005TIMER\020\005", 2175);
+    "ET\020\006*\204\001\n\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SAV"
+    "E\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_F"
+    "ILE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020\007"
+    "\022\010\n\004STOP\020\010\022\007\n\003RUN\020\t*T\n\017BlockActionType\022\n"
+    "\n\006SLIDER\020\001\022\n\n\006BUTTON\020\002\022\014\n\010SET_NOTE\020\003\022\020\n\014"
+    "SET_DURATION\020\004\022\t\n\005TIMER\020\005", 2185);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "UsageProfile.proto", &protobuf_RegisterTypes);
   RowAction::default_instance_ = new RowAction();
@@ -510,6 +510,7 @@ bool MenuEntry_IsValid(int value) {
     case 6:
     case 7:
     case 8:
+    case 9:
       return true;
     default:
       return false;

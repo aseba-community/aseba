@@ -500,6 +500,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::run()
 	{
+		USAGE_LOG(logRun());
 		if(runButton->isEnabled())
 		{
 			de->loadAndRun();
