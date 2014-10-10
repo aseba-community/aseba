@@ -48,15 +48,23 @@ using namespace std;
 
 void usage(const char *execName)
 {
+	cout << "Thymio VPL, a standalone VPL editor" << endl << endl;
 	cout << "Usage: " << execName << " (OPTIONS|TARGET)* " << endl;
 	cout << "  where" << endl;
 	cout << "OPTION is one of:" << endl;
-	cout << " -h          this help" << endl;
 	cout << " -anytarget  allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
 	cout << " -debuglog   emit debug log events" << endl;
+	#ifdef PROTOBUF_FOUND // only show if it actually works
 	cout << " -usagelog   create a usage log of all the user events" << endl;
+	#endif // PROTOBUF_FOUND
+	cout << " -h          this help" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
+	cout << endl;
+	cout << "Version " << ASEBA_VERSION << ", Aseba protocol " << ASEBA_PROTOCOL_VERSION << endl;
+	cout << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>" << endl;
+	cout << "Report bugs to: https://github.com/aseba-community/aseba/issues/new" << endl;
 }
+
 
 /**
 	\defgroup thymiovpl VPL-only container application
