@@ -37,6 +37,7 @@ void protobuf_ShutdownFile_UsageProfile_2eproto();
 
 class RowAction;
 class DeviceAction;
+class TabletAction;
 class MouseAction;
 class AccBlockModeAction;
 class AdvancedModeAction;
@@ -74,11 +75,12 @@ enum Action_ActionType {
   Action_ActionType_MOUSE_ACTION = 5,
   Action_ActionType_DEVICE_ACTION = 6,
   Action_ActionType_BLOCK_ACTION = 7,
-  Action_ActionType_ROW = 8
+  Action_ActionType_ROW = 8,
+  Action_ActionType_TABLET = 9
 };
 bool Action_ActionType_IsValid(int value);
 const Action_ActionType Action_ActionType_ActionType_MIN = Action_ActionType_ADVANCED_MODE;
-const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_ROW;
+const Action_ActionType Action_ActionType_ActionType_MAX = Action_ActionType_TABLET;
 const int Action_ActionType_ActionType_ARRAYSIZE = Action_ActionType_ActionType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor();
@@ -407,6 +409,245 @@ class DeviceAction : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static DeviceAction* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class TabletAction : public ::google::protobuf::Message {
+ public:
+  TabletAction();
+  virtual ~TabletAction();
+
+  TabletAction(const TabletAction& from);
+
+  inline TabletAction& operator=(const TabletAction& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const TabletAction& default_instance();
+
+  void Swap(TabletAction* other);
+
+  // implements Message ----------------------------------------------
+
+  TabletAction* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const TabletAction& from);
+  void MergeFrom(const TabletAction& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required float cameraX = 1;
+  inline bool has_camerax() const;
+  inline void clear_camerax();
+  static const int kCameraXFieldNumber = 1;
+  inline float camerax() const;
+  inline void set_camerax(float value);
+
+  // required float cameraY = 2;
+  inline bool has_cameray() const;
+  inline void clear_cameray();
+  static const int kCameraYFieldNumber = 2;
+  inline float cameray() const;
+  inline void set_cameray(float value);
+
+  // required float cameraZ = 3;
+  inline bool has_cameraz() const;
+  inline void clear_cameraz();
+  static const int kCameraZFieldNumber = 3;
+  inline float cameraz() const;
+  inline void set_cameraz(float value);
+
+  // required float cameraAngleX = 4;
+  inline bool has_cameraanglex() const;
+  inline void clear_cameraanglex();
+  static const int kCameraAngleXFieldNumber = 4;
+  inline float cameraanglex() const;
+  inline void set_cameraanglex(float value);
+
+  // required float cameraAngleY = 5;
+  inline bool has_cameraangley() const;
+  inline void clear_cameraangley();
+  static const int kCameraAngleYFieldNumber = 5;
+  inline float cameraangley() const;
+  inline void set_cameraangley(float value);
+
+  // required float cameraAngleZ = 6;
+  inline bool has_cameraanglez() const;
+  inline void clear_cameraanglez();
+  static const int kCameraAngleZFieldNumber = 6;
+  inline float cameraanglez() const;
+  inline void set_cameraanglez(float value);
+
+  // required float thymioX = 7;
+  inline bool has_thymiox() const;
+  inline void clear_thymiox();
+  static const int kThymioXFieldNumber = 7;
+  inline float thymiox() const;
+  inline void set_thymiox(float value);
+
+  // required float thymioZ = 8;
+  inline bool has_thymioz() const;
+  inline void clear_thymioz();
+  static const int kThymioZFieldNumber = 8;
+  inline float thymioz() const;
+  inline void set_thymioz(float value);
+
+  // required float thymioAngleY = 9;
+  inline bool has_thymioangley() const;
+  inline void clear_thymioangley();
+  static const int kThymioAngleYFieldNumber = 9;
+  inline float thymioangley() const;
+  inline void set_thymioangley(float value);
+
+  // required int32 recordingDuration = 10;
+  inline bool has_recordingduration() const;
+  inline void clear_recordingduration();
+  static const int kRecordingDurationFieldNumber = 10;
+  inline ::google::protobuf::int32 recordingduration() const;
+  inline void set_recordingduration(::google::protobuf::int32 value);
+
+  // required int32 leftTimelinePos = 11;
+  inline bool has_lefttimelinepos() const;
+  inline void clear_lefttimelinepos();
+  static const int kLeftTimelinePosFieldNumber = 11;
+  inline ::google::protobuf::int32 lefttimelinepos() const;
+  inline void set_lefttimelinepos(::google::protobuf::int32 value);
+
+  // required int32 rightTimelinePos = 12;
+  inline bool has_righttimelinepos() const;
+  inline void clear_righttimelinepos();
+  static const int kRightTimelinePosFieldNumber = 12;
+  inline ::google::protobuf::int32 righttimelinepos() const;
+  inline void set_righttimelinepos(::google::protobuf::int32 value);
+
+  // required bool appRecording = 13;
+  inline bool has_apprecording() const;
+  inline void clear_apprecording();
+  static const int kAppRecordingFieldNumber = 13;
+  inline bool apprecording() const;
+  inline void set_apprecording(bool value);
+
+  // required bool thymioIsTracked = 14;
+  inline bool has_thymioistracked() const;
+  inline void clear_thymioistracked();
+  static const int kThymioIsTrackedFieldNumber = 14;
+  inline bool thymioistracked() const;
+  inline void set_thymioistracked(bool value);
+
+  // required bool boardIsTracked = 15;
+  inline bool has_boardistracked() const;
+  inline void clear_boardistracked();
+  static const int kBoardIsTrackedFieldNumber = 15;
+  inline bool boardistracked() const;
+  inline void set_boardistracked(bool value);
+
+  // optional int32 selectedSetId = 16;
+  inline bool has_selectedsetid() const;
+  inline void clear_selectedsetid();
+  static const int kSelectedSetIdFieldNumber = 16;
+  inline ::google::protobuf::int32 selectedsetid() const;
+  inline void set_selectedsetid(::google::protobuf::int32 value);
+
+  // optional float selectedSetTime = 17;
+  inline bool has_selectedsettime() const;
+  inline void clear_selectedsettime();
+  static const int kSelectedSetTimeFieldNumber = 17;
+  inline float selectedsettime() const;
+  inline void set_selectedsettime(float value);
+
+  // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.TabletAction)
+ private:
+  inline void set_has_camerax();
+  inline void clear_has_camerax();
+  inline void set_has_cameray();
+  inline void clear_has_cameray();
+  inline void set_has_cameraz();
+  inline void clear_has_cameraz();
+  inline void set_has_cameraanglex();
+  inline void clear_has_cameraanglex();
+  inline void set_has_cameraangley();
+  inline void clear_has_cameraangley();
+  inline void set_has_cameraanglez();
+  inline void clear_has_cameraanglez();
+  inline void set_has_thymiox();
+  inline void clear_has_thymiox();
+  inline void set_has_thymioz();
+  inline void clear_has_thymioz();
+  inline void set_has_thymioangley();
+  inline void clear_has_thymioangley();
+  inline void set_has_recordingduration();
+  inline void clear_has_recordingduration();
+  inline void set_has_lefttimelinepos();
+  inline void clear_has_lefttimelinepos();
+  inline void set_has_righttimelinepos();
+  inline void clear_has_righttimelinepos();
+  inline void set_has_apprecording();
+  inline void clear_has_apprecording();
+  inline void set_has_thymioistracked();
+  inline void clear_has_thymioistracked();
+  inline void set_has_boardistracked();
+  inline void clear_has_boardistracked();
+  inline void set_has_selectedsetid();
+  inline void clear_has_selectedsetid();
+  inline void set_has_selectedsettime();
+  inline void clear_has_selectedsettime();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  float camerax_;
+  float cameray_;
+  float cameraz_;
+  float cameraanglex_;
+  float cameraangley_;
+  float cameraanglez_;
+  float thymiox_;
+  float thymioz_;
+  float thymioangley_;
+  ::google::protobuf::int32 recordingduration_;
+  ::google::protobuf::int32 lefttimelinepos_;
+  ::google::protobuf::int32 righttimelinepos_;
+  bool apprecording_;
+  bool thymioistracked_;
+  bool boardistracked_;
+  ::google::protobuf::int32 selectedsetid_;
+  float selectedsettime_;
+  friend void  protobuf_AddDesc_UsageProfile_2eproto();
+  friend void protobuf_AssignDesc_UsageProfile_2eproto();
+  friend void protobuf_ShutdownFile_UsageProfile_2eproto();
+
+  void InitAsDefaultInstance();
+  static TabletAction* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1235,6 +1476,7 @@ class Action : public ::google::protobuf::Message {
     kMouseAction = 15,
     kDeviceAction = 16,
     kBlockAction = 17,
+    kTabletAction = 18,
     ACTUAL_ACTION_NOT_SET = 0,
   };
 
@@ -1275,6 +1517,7 @@ class Action : public ::google::protobuf::Message {
   static const ActionType DEVICE_ACTION = Action_ActionType_DEVICE_ACTION;
   static const ActionType BLOCK_ACTION = Action_ActionType_BLOCK_ACTION;
   static const ActionType ROW = Action_ActionType_ROW;
+  static const ActionType TABLET = Action_ActionType_TABLET;
   static inline bool ActionType_IsValid(int value) {
     return Action_ActionType_IsValid(value);
   }
@@ -1398,6 +1641,15 @@ class Action : public ::google::protobuf::Message {
   inline ::Aseba::ThymioVPL::BlockAction* release_blockaction();
   inline void set_allocated_blockaction(::Aseba::ThymioVPL::BlockAction* blockaction);
 
+  // optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+  inline bool has_tabletaction() const;
+  inline void clear_tabletaction();
+  static const int kTabletActionFieldNumber = 18;
+  inline const ::Aseba::ThymioVPL::TabletAction& tabletaction() const;
+  inline ::Aseba::ThymioVPL::TabletAction* mutable_tabletaction();
+  inline ::Aseba::ThymioVPL::TabletAction* release_tabletaction();
+  inline void set_allocated_tabletaction(::Aseba::ThymioVPL::TabletAction* tabletaction);
+
   inline ActualActionCase actual_action_case() const;
   // @@protoc_insertion_point(class_scope:Aseba.ThymioVPL.Action)
  private:
@@ -1415,6 +1667,7 @@ class Action : public ::google::protobuf::Message {
   inline void set_has_mouseaction();
   inline void set_has_deviceaction();
   inline void set_has_blockaction();
+  inline void set_has_tabletaction();
 
   inline bool has_actual_action();
   void clear_actual_action();
@@ -1436,6 +1689,7 @@ class Action : public ::google::protobuf::Message {
     ::Aseba::ThymioVPL::MouseAction* mouseaction_;
     ::Aseba::ThymioVPL::DeviceAction* deviceaction_;
     ::Aseba::ThymioVPL::BlockAction* blockaction_;
+    ::Aseba::ThymioVPL::TabletAction* tabletaction_;
   } actual_action_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
@@ -1640,6 +1894,418 @@ inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
 DeviceAction::mutable_variable() {
   // @@protoc_insertion_point(field_mutable_list:Aseba.ThymioVPL.DeviceAction.variable)
   return &variable_;
+}
+
+// -------------------------------------------------------------------
+
+// TabletAction
+
+// required float cameraX = 1;
+inline bool TabletAction::has_camerax() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void TabletAction::set_has_camerax() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void TabletAction::clear_has_camerax() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void TabletAction::clear_camerax() {
+  camerax_ = 0;
+  clear_has_camerax();
+}
+inline float TabletAction::camerax() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraX)
+  return camerax_;
+}
+inline void TabletAction::set_camerax(float value) {
+  set_has_camerax();
+  camerax_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraX)
+}
+
+// required float cameraY = 2;
+inline bool TabletAction::has_cameray() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void TabletAction::set_has_cameray() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void TabletAction::clear_has_cameray() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void TabletAction::clear_cameray() {
+  cameray_ = 0;
+  clear_has_cameray();
+}
+inline float TabletAction::cameray() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraY)
+  return cameray_;
+}
+inline void TabletAction::set_cameray(float value) {
+  set_has_cameray();
+  cameray_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraY)
+}
+
+// required float cameraZ = 3;
+inline bool TabletAction::has_cameraz() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void TabletAction::set_has_cameraz() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void TabletAction::clear_has_cameraz() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void TabletAction::clear_cameraz() {
+  cameraz_ = 0;
+  clear_has_cameraz();
+}
+inline float TabletAction::cameraz() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraZ)
+  return cameraz_;
+}
+inline void TabletAction::set_cameraz(float value) {
+  set_has_cameraz();
+  cameraz_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraZ)
+}
+
+// required float cameraAngleX = 4;
+inline bool TabletAction::has_cameraanglex() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void TabletAction::set_has_cameraanglex() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void TabletAction::clear_has_cameraanglex() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void TabletAction::clear_cameraanglex() {
+  cameraanglex_ = 0;
+  clear_has_cameraanglex();
+}
+inline float TabletAction::cameraanglex() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraAngleX)
+  return cameraanglex_;
+}
+inline void TabletAction::set_cameraanglex(float value) {
+  set_has_cameraanglex();
+  cameraanglex_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraAngleX)
+}
+
+// required float cameraAngleY = 5;
+inline bool TabletAction::has_cameraangley() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void TabletAction::set_has_cameraangley() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void TabletAction::clear_has_cameraangley() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void TabletAction::clear_cameraangley() {
+  cameraangley_ = 0;
+  clear_has_cameraangley();
+}
+inline float TabletAction::cameraangley() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraAngleY)
+  return cameraangley_;
+}
+inline void TabletAction::set_cameraangley(float value) {
+  set_has_cameraangley();
+  cameraangley_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraAngleY)
+}
+
+// required float cameraAngleZ = 6;
+inline bool TabletAction::has_cameraanglez() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void TabletAction::set_has_cameraanglez() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void TabletAction::clear_has_cameraanglez() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void TabletAction::clear_cameraanglez() {
+  cameraanglez_ = 0;
+  clear_has_cameraanglez();
+}
+inline float TabletAction::cameraanglez() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.cameraAngleZ)
+  return cameraanglez_;
+}
+inline void TabletAction::set_cameraanglez(float value) {
+  set_has_cameraanglez();
+  cameraanglez_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.cameraAngleZ)
+}
+
+// required float thymioX = 7;
+inline bool TabletAction::has_thymiox() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void TabletAction::set_has_thymiox() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void TabletAction::clear_has_thymiox() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void TabletAction::clear_thymiox() {
+  thymiox_ = 0;
+  clear_has_thymiox();
+}
+inline float TabletAction::thymiox() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.thymioX)
+  return thymiox_;
+}
+inline void TabletAction::set_thymiox(float value) {
+  set_has_thymiox();
+  thymiox_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.thymioX)
+}
+
+// required float thymioZ = 8;
+inline bool TabletAction::has_thymioz() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void TabletAction::set_has_thymioz() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void TabletAction::clear_has_thymioz() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void TabletAction::clear_thymioz() {
+  thymioz_ = 0;
+  clear_has_thymioz();
+}
+inline float TabletAction::thymioz() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.thymioZ)
+  return thymioz_;
+}
+inline void TabletAction::set_thymioz(float value) {
+  set_has_thymioz();
+  thymioz_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.thymioZ)
+}
+
+// required float thymioAngleY = 9;
+inline bool TabletAction::has_thymioangley() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void TabletAction::set_has_thymioangley() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void TabletAction::clear_has_thymioangley() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void TabletAction::clear_thymioangley() {
+  thymioangley_ = 0;
+  clear_has_thymioangley();
+}
+inline float TabletAction::thymioangley() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.thymioAngleY)
+  return thymioangley_;
+}
+inline void TabletAction::set_thymioangley(float value) {
+  set_has_thymioangley();
+  thymioangley_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.thymioAngleY)
+}
+
+// required int32 recordingDuration = 10;
+inline bool TabletAction::has_recordingduration() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void TabletAction::set_has_recordingduration() {
+  _has_bits_[0] |= 0x00000200u;
+}
+inline void TabletAction::clear_has_recordingduration() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline void TabletAction::clear_recordingduration() {
+  recordingduration_ = 0;
+  clear_has_recordingduration();
+}
+inline ::google::protobuf::int32 TabletAction::recordingduration() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.recordingDuration)
+  return recordingduration_;
+}
+inline void TabletAction::set_recordingduration(::google::protobuf::int32 value) {
+  set_has_recordingduration();
+  recordingduration_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.recordingDuration)
+}
+
+// required int32 leftTimelinePos = 11;
+inline bool TabletAction::has_lefttimelinepos() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+inline void TabletAction::set_has_lefttimelinepos() {
+  _has_bits_[0] |= 0x00000400u;
+}
+inline void TabletAction::clear_has_lefttimelinepos() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+inline void TabletAction::clear_lefttimelinepos() {
+  lefttimelinepos_ = 0;
+  clear_has_lefttimelinepos();
+}
+inline ::google::protobuf::int32 TabletAction::lefttimelinepos() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.leftTimelinePos)
+  return lefttimelinepos_;
+}
+inline void TabletAction::set_lefttimelinepos(::google::protobuf::int32 value) {
+  set_has_lefttimelinepos();
+  lefttimelinepos_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.leftTimelinePos)
+}
+
+// required int32 rightTimelinePos = 12;
+inline bool TabletAction::has_righttimelinepos() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+inline void TabletAction::set_has_righttimelinepos() {
+  _has_bits_[0] |= 0x00000800u;
+}
+inline void TabletAction::clear_has_righttimelinepos() {
+  _has_bits_[0] &= ~0x00000800u;
+}
+inline void TabletAction::clear_righttimelinepos() {
+  righttimelinepos_ = 0;
+  clear_has_righttimelinepos();
+}
+inline ::google::protobuf::int32 TabletAction::righttimelinepos() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.rightTimelinePos)
+  return righttimelinepos_;
+}
+inline void TabletAction::set_righttimelinepos(::google::protobuf::int32 value) {
+  set_has_righttimelinepos();
+  righttimelinepos_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.rightTimelinePos)
+}
+
+// required bool appRecording = 13;
+inline bool TabletAction::has_apprecording() const {
+  return (_has_bits_[0] & 0x00001000u) != 0;
+}
+inline void TabletAction::set_has_apprecording() {
+  _has_bits_[0] |= 0x00001000u;
+}
+inline void TabletAction::clear_has_apprecording() {
+  _has_bits_[0] &= ~0x00001000u;
+}
+inline void TabletAction::clear_apprecording() {
+  apprecording_ = false;
+  clear_has_apprecording();
+}
+inline bool TabletAction::apprecording() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.appRecording)
+  return apprecording_;
+}
+inline void TabletAction::set_apprecording(bool value) {
+  set_has_apprecording();
+  apprecording_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.appRecording)
+}
+
+// required bool thymioIsTracked = 14;
+inline bool TabletAction::has_thymioistracked() const {
+  return (_has_bits_[0] & 0x00002000u) != 0;
+}
+inline void TabletAction::set_has_thymioistracked() {
+  _has_bits_[0] |= 0x00002000u;
+}
+inline void TabletAction::clear_has_thymioistracked() {
+  _has_bits_[0] &= ~0x00002000u;
+}
+inline void TabletAction::clear_thymioistracked() {
+  thymioistracked_ = false;
+  clear_has_thymioistracked();
+}
+inline bool TabletAction::thymioistracked() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.thymioIsTracked)
+  return thymioistracked_;
+}
+inline void TabletAction::set_thymioistracked(bool value) {
+  set_has_thymioistracked();
+  thymioistracked_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.thymioIsTracked)
+}
+
+// required bool boardIsTracked = 15;
+inline bool TabletAction::has_boardistracked() const {
+  return (_has_bits_[0] & 0x00004000u) != 0;
+}
+inline void TabletAction::set_has_boardistracked() {
+  _has_bits_[0] |= 0x00004000u;
+}
+inline void TabletAction::clear_has_boardistracked() {
+  _has_bits_[0] &= ~0x00004000u;
+}
+inline void TabletAction::clear_boardistracked() {
+  boardistracked_ = false;
+  clear_has_boardistracked();
+}
+inline bool TabletAction::boardistracked() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.boardIsTracked)
+  return boardistracked_;
+}
+inline void TabletAction::set_boardistracked(bool value) {
+  set_has_boardistracked();
+  boardistracked_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.boardIsTracked)
+}
+
+// optional int32 selectedSetId = 16;
+inline bool TabletAction::has_selectedsetid() const {
+  return (_has_bits_[0] & 0x00008000u) != 0;
+}
+inline void TabletAction::set_has_selectedsetid() {
+  _has_bits_[0] |= 0x00008000u;
+}
+inline void TabletAction::clear_has_selectedsetid() {
+  _has_bits_[0] &= ~0x00008000u;
+}
+inline void TabletAction::clear_selectedsetid() {
+  selectedsetid_ = 0;
+  clear_has_selectedsetid();
+}
+inline ::google::protobuf::int32 TabletAction::selectedsetid() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.selectedSetId)
+  return selectedsetid_;
+}
+inline void TabletAction::set_selectedsetid(::google::protobuf::int32 value) {
+  set_has_selectedsetid();
+  selectedsetid_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.selectedSetId)
+}
+
+// optional float selectedSetTime = 17;
+inline bool TabletAction::has_selectedsettime() const {
+  return (_has_bits_[0] & 0x00010000u) != 0;
+}
+inline void TabletAction::set_has_selectedsettime() {
+  _has_bits_[0] |= 0x00010000u;
+}
+inline void TabletAction::clear_has_selectedsettime() {
+  _has_bits_[0] &= ~0x00010000u;
+}
+inline void TabletAction::clear_selectedsettime() {
+  selectedsettime_ = 0;
+  clear_has_selectedsettime();
+}
+inline float TabletAction::selectedsettime() const {
+  // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.selectedSetTime)
+  return selectedsettime_;
+}
+inline void TabletAction::set_selectedsettime(float value) {
+  set_has_selectedsettime();
+  selectedsettime_ = value;
+  // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.selectedSetTime)
 }
 
 // -------------------------------------------------------------------
@@ -3226,6 +3892,49 @@ inline void Action::set_allocated_blockaction(::Aseba::ThymioVPL::BlockAction* b
   if (blockaction) {
     set_has_blockaction();
     actual_action_.blockaction_ = blockaction;
+  }
+}
+
+// optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+inline bool Action::has_tabletaction() const {
+  return actual_action_case() == kTabletAction;
+}
+inline void Action::set_has_tabletaction() {
+  _oneof_case_[0] = kTabletAction;
+}
+inline void Action::clear_tabletaction() {
+  if (has_tabletaction()) {
+    delete actual_action_.tabletaction_;
+    clear_has_actual_action();
+  }
+}
+inline const ::Aseba::ThymioVPL::TabletAction& Action::tabletaction() const {
+  return has_tabletaction() ? *actual_action_.tabletaction_
+                      : ::Aseba::ThymioVPL::TabletAction::default_instance();
+}
+inline ::Aseba::ThymioVPL::TabletAction* Action::mutable_tabletaction() {
+  if (!has_tabletaction()) {
+    clear_actual_action();
+    set_has_tabletaction();
+    actual_action_.tabletaction_ = new ::Aseba::ThymioVPL::TabletAction;
+  }
+  return actual_action_.tabletaction_;
+}
+inline ::Aseba::ThymioVPL::TabletAction* Action::release_tabletaction() {
+  if (has_tabletaction()) {
+    clear_has_actual_action();
+    ::Aseba::ThymioVPL::TabletAction* temp = actual_action_.tabletaction_;
+    actual_action_.tabletaction_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Action::set_allocated_tabletaction(::Aseba::ThymioVPL::TabletAction* tabletaction) {
+  clear_actual_action();
+  if (tabletaction) {
+    set_has_tabletaction();
+    actual_action_.tabletaction_ = tabletaction;
   }
 }
 

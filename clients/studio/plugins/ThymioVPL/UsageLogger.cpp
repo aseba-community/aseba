@@ -303,6 +303,8 @@ void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 
 void UsageLogger::logTabletData(const VariablesDataVector& data){
 	assert(data.size() == 15);
+	
+	
 	const float cam_x = float(data[0]) * 0.001;
 	const float cam_y = float(data[1]) * 0.001;
 	const float cam_z = float(data[2]) * 0.001;
@@ -322,6 +324,32 @@ void UsageLogger::logTabletData(const VariablesDataVector& data){
 	const bool board_is_tracked = data[14] & (1<<1);
 	const bool thymio_is_tracked = data[14] & (1<<2);
 	qDebug() << "app state" << recording_duration << timeline_left << timeline_right << selected_set_id << selected_set_time << app_recording << board_is_tracked << thymio_is_tracked;
+	
+	
+	Action * wrapper = getActionWithCurrentState();
+	TabletAction *a = new TabletAction();
+	
+	a->set_camerax(cam_x);
+	a->set_cameray(cam_y);
+	a->set_cameraz(cam_z);
+	a->set_cameraanglex(cam_ax);
+	a->set_cameraangley(cam_ay);
+	a->set_cameraanglez(cam_az);
+	a->set_thymiox(thymio_x);
+	a->set_thymioangley(thymio_ay);
+	a->set_thymioz(thymio_z);
+	a->set_recordingduration(recording_duration);
+	a->set_lefttimelinepos(timeline_left);
+	a->set_righttimelinepos(timeline_right);
+	a->set_selectedsetid(selected_set_id);
+	a->set_selectedsettime(selected_set_time);
+	a->set_apprecording(app_recording);
+	a->set_boardistracked(board_is_tracked);
+	a->set_thymioistracked(thymio_is_tracked);
+	
+	wrapper->set_type(Action_ActionType_TABLET);
+	wrapper->set_allocated_tabletaction(a);
+	storeAction(wrapper);
 }
 
 void UsageLogger::storeAction(Action * a){

@@ -54,6 +54,27 @@ message DeviceAction{
 	repeated int32 variable = 2 [packed=true]; 
 }
 
+message TabletAction{
+	required float cameraX = 1;
+	required float cameraY = 2;
+	required float cameraZ = 3;
+	required float cameraAngleX = 4;
+	required float cameraAngleY = 5;
+	required float cameraAngleZ = 6;
+	required float thymioX = 7;
+	required float thymioZ = 8;
+	required float thymioAngleY = 9;
+	required int32 recordingDuration = 10;
+	required int32 leftTimelinePos = 11;
+	required int32 rightTimelinePos = 12;
+	required bool appRecording = 13;
+	required bool thymioIsTracked = 14;
+	required bool boardIsTracked = 15;
+	
+	optional int32 selectedSetId = 16;
+	optional float selectedSetTime = 17;
+}
+
 message MouseAction{
 	required MouseActionType type = 1;
 	required MouseButton button = 2;
@@ -102,7 +123,7 @@ message MenuAction{
 
 message TimeStamp{
 	required uint32 timestamp = 1;		// UNIX timestamp
-	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolute value might not be meaningful
+	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolut value might not be meaningful
 }
 
 message Action{
@@ -115,6 +136,7 @@ message Action{
 		DEVICE_ACTION =6;
 		BLOCK_ACTION=7;
 		ROW = 8;
+		TABLET=9;
 	}
 	
 	required ActionType type = 1;
@@ -129,6 +151,7 @@ message Action{
 		MouseAction mouseAction = 15;
 		DeviceAction deviceAction = 16;
 		BlockAction blockAction = 17;
+		TabletAction tabletAction = 18;
 	}
 }
 
