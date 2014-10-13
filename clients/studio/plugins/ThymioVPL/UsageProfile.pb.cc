@@ -28,6 +28,9 @@ const ::google::protobuf::EnumDescriptor* RowAction_ActionType_descriptor_ = NUL
 const ::google::protobuf::Descriptor* DeviceAction_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   DeviceAction_reflection_ = NULL;
+const ::google::protobuf::Descriptor* TabletAction_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  TabletAction_reflection_ = NULL;
 const ::google::protobuf::Descriptor* MouseAction_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   MouseAction_reflection_ = NULL;
@@ -61,6 +64,7 @@ struct ActionOneofInstance {
   const ::Aseba::ThymioVPL::MouseAction* mouseaction_;
   const ::Aseba::ThymioVPL::DeviceAction* deviceaction_;
   const ::Aseba::ThymioVPL::BlockAction* blockaction_;
+  const ::Aseba::ThymioVPL::TabletAction* tabletaction_;
 }* Action_default_oneof_instance_ = NULL;
 const ::google::protobuf::EnumDescriptor* Action_ActionType_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Usage_descriptor_ = NULL;
@@ -114,7 +118,38 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DeviceAction));
-  MouseAction_descriptor_ = file->message_type(2);
+  TabletAction_descriptor_ = file->message_type(2);
+  static const int TabletAction_offsets_[17] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, camerax_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, cameray_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, cameraz_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, cameraanglex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, cameraangley_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, cameraanglez_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, thymiox_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, thymioz_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, thymioangley_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, recordingduration_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, lefttimelinepos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, righttimelinepos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, apprecording_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, thymioistracked_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, boardistracked_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, selectedsetid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, selectedsettime_),
+  };
+  TabletAction_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      TabletAction_descriptor_,
+      TabletAction::default_instance_,
+      TabletAction_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TabletAction, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(TabletAction));
+  MouseAction_descriptor_ = file->message_type(3);
   static const int MouseAction_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MouseAction, button_),
@@ -135,7 +170,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MouseAction));
-  AccBlockModeAction_descriptor_ = file->message_type(3);
+  AccBlockModeAction_descriptor_ = file->message_type(4);
   static const int AccBlockModeAction_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccBlockModeAction, mode_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccBlockModeAction, blockname_),
@@ -152,7 +187,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AccBlockModeAction));
-  AdvancedModeAction_descriptor_ = file->message_type(4);
+  AdvancedModeAction_descriptor_ = file->message_type(5);
   static const int AdvancedModeAction_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AdvancedModeAction, isadvanced_),
   };
@@ -167,7 +202,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AdvancedModeAction));
-  AddBlockAction_descriptor_ = file->message_type(5);
+  AddBlockAction_descriptor_ = file->message_type(6);
   static const int AddBlockAction_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddBlockAction, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddBlockAction, blockname_),
@@ -185,7 +220,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AddBlockAction));
-  BlockAction_descriptor_ = file->message_type(6);
+  BlockAction_descriptor_ = file->message_type(7);
   static const int BlockAction_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockAction, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockAction, row_),
@@ -208,7 +243,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockAction));
-  MenuAction_descriptor_ = file->message_type(7);
+  MenuAction_descriptor_ = file->message_type(8);
   static const int MenuAction_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MenuAction, entry_),
   };
@@ -223,7 +258,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MenuAction));
-  TimeStamp_descriptor_ = file->message_type(8);
+  TimeStamp_descriptor_ = file->message_type(9);
   static const int TimeStamp_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, timestamp_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TimeStamp, milliseconds_),
@@ -239,8 +274,8 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TimeStamp));
-  Action_descriptor_ = file->message_type(9);
-  static const int Action_offsets_[12] = {
+  Action_descriptor_ = file->message_type(10);
+  static const int Action_offsets_[13] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, programstateasxml_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, time_),
@@ -252,6 +287,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, mouseaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, deviceaction_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, blockaction_),
+    PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Action_default_oneof_instance_, tabletaction_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Action, actual_action_),
   };
   Action_reflection_ =
@@ -268,7 +304,7 @@ void protobuf_AssignDesc_UsageProfile_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Action));
   Action_ActionType_descriptor_ = Action_descriptor_->enum_type(0);
-  Usage_descriptor_ = file->message_type(10);
+  Usage_descriptor_ = file->message_type(11);
   static const int Usage_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Usage, action_),
   };
@@ -305,6 +341,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DeviceAction_descriptor_, &DeviceAction::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    TabletAction_descriptor_, &TabletAction::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     MouseAction_descriptor_, &MouseAction::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     AccBlockModeAction_descriptor_, &AccBlockModeAction::default_instance());
@@ -331,6 +369,8 @@ void protobuf_ShutdownFile_UsageProfile_2eproto() {
   delete RowAction_reflection_;
   delete DeviceAction::default_instance_;
   delete DeviceAction_reflection_;
+  delete TabletAction::default_instance_;
+  delete TabletAction_reflection_;
   delete MouseAction::default_instance_;
   delete MouseAction_reflection_;
   delete AccBlockModeAction::default_instance_;
@@ -364,60 +404,72 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
     "Aseba.ThymioVPL.RowAction.ActionType\"$\n\n"
     "ActionType\022\n\n\006REMOVE\020\001\022\n\n\006INSERT\020\002\"0\n\014De"
     "viceAction\022\n\n\002id\030\001 \002(\005\022\024\n\010variable\030\002 \003(\005"
-    "B\002\020\001\"\272\001\n\013MouseAction\022.\n\004type\030\001 \002(\0162 .Ase"
-    "ba.ThymioVPL.MouseActionType\022,\n\006button\030\002"
-    " \002(\0162\034.Aseba.ThymioVPL.MouseButton\022\014\n\004xP"
-    "os\030\003 \001(\001\022\014\n\004yPos\030\004 \001(\001\022\021\n\tblockName\030\005 \001("
-    "\t\022\021\n\tblockType\030\006 \001(\t\022\013\n\003row\030\007 \001(\005\"H\n\022Acc"
-    "BlockModeAction\022\014\n\004mode\030\001 \002(\005\022\021\n\tblockNa"
-    "me\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\"(\n\022AdvancedM"
-    "odeAction\022\022\n\nisAdvanced\030\001 \002(\010\"m\n\016AddBloc"
-    "kAction\022(\n\004type\030\001 \002(\0162\032.Aseba.ThymioVPL."
-    "BlockType\022\021\n\tblockName\030\002 \001(\t\022\021\n\tblockTyp"
-    "e\030\003 \001(\t\022\013\n\003row\030\004 \001(\005\"\325\001\n\013BlockAction\022.\n\004"
-    "type\030\001 \002(\0162 .Aseba.ThymioVPL.BlockAction"
-    "Type\022\013\n\003row\030\002 \001(\005\022\021\n\tblockName\030\003 \001(\t\022\021\n\t"
-    "blockType\030\004 \001(\t\022\021\n\telementId\030\005 \001(\005\022\023\n\013sl"
-    "iderValue\030\006 \001(\005\022\022\n\nsoundValue\030\007 \001(\005\022\022\n\nt"
-    "imerValue\030\010 \001(\005\022\023\n\013buttonValue\030\t \001(\005\"7\n\n"
-    "MenuAction\022)\n\005entry\030\001 \002(\0162\032.Aseba.Thymio"
-    "VPL.MenuEntry\"4\n\tTimeStamp\022\021\n\ttimestamp\030"
-    "\001 \002(\r\022\024\n\014milliseconds\030\002 \002(\r\"\345\005\n\006Action\0220"
-    "\n\004type\030\001 \002(\0162\".Aseba.ThymioVPL.Action.Ac"
-    "tionType\022\031\n\021programStateAsXml\030\002 \001(\t\022(\n\004t"
-    "ime\030\003 \002(\0132\032.Aseba.ThymioVPL.TimeStamp\022/\n"
-    "\trowAction\030\n \001(\0132\032.Aseba.ThymioVPL.RowAc"
-    "tionH\000\022A\n\022advancedModeAction\030\013 \001(\0132#.Ase"
-    "ba.ThymioVPL.AdvancedModeActionH\000\0229\n\016add"
-    "BlockAction\030\014 \001(\0132\037.Aseba.ThymioVPL.AddB"
-    "lockActionH\000\022A\n\022accBlockModeAction\030\r \001(\013"
-    "2#.Aseba.ThymioVPL.AccBlockModeActionH\000\022"
-    "1\n\nmenuAction\030\016 \001(\0132\033.Aseba.ThymioVPL.Me"
-    "nuActionH\000\0223\n\013mouseAction\030\017 \001(\0132\034.Aseba."
-    "ThymioVPL.MouseActionH\000\0225\n\014deviceAction\030"
-    "\020 \001(\0132\035.Aseba.ThymioVPL.DeviceActionH\000\0223"
-    "\n\013blockAction\030\021 \001(\0132\034.Aseba.ThymioVPL.Bl"
-    "ockActionH\000\"\214\001\n\nActionType\022\021\n\rADVANCED_M"
-    "ODE\020\001\022\r\n\tADD_BLOCK\020\002\022\022\n\016ACC_BLOCK_MODE\020\003"
-    "\022\010\n\004MENU\020\004\022\020\n\014MOUSE_ACTION\020\005\022\021\n\rDEVICE_A"
-    "CTION\020\006\022\020\n\014BLOCK_ACTION\020\007\022\007\n\003ROW\020\010B\017\n\rac"
-    "tual_action\"0\n\005Usage\022\'\n\006action\030\001 \003(\0132\027.A"
-    "seba.ThymioVPL.Action*6\n\013MouseButton\022\010\n\004"
-    "LEFT\020\001\022\n\n\006MIDDLE\020\002\022\t\n\005RIGHT\020\003\022\006\n\002NO\020\004*\"\n"
-    "\tBlockType\022\t\n\005EVENT\020\001\022\n\n\006ACTION\020\002*\200\001\n\017Mo"
-    "useActionType\022\016\n\nMOVE_BLOCK\020\001\022\021\n\rRELEASE"
-    "_BLOCK\020\002\022\017\n\013DRAG_BUTTON\020\003\022\023\n\017DRAG_ACTION"
-    "_SET\020\004\022\017\n\013DROP_BUTTON\020\005\022\023\n\017DROP_ACTION_S"
-    "ET\020\006*\204\001\n\tMenuEntry\022\r\n\tOPEN_HELP\020\001\022\010\n\004SAV"
-    "E\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FILE\020\004\022\r\n\tOPEN_F"
-    "ILE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rSAVE_SNAPSHOT\020\007"
-    "\022\010\n\004STOP\020\010\022\007\n\003RUN\020\t*T\n\017BlockActionType\022\n"
-    "\n\006SLIDER\020\001\022\n\n\006BUTTON\020\002\022\014\n\010SET_NOTE\020\003\022\020\n\014"
-    "SET_DURATION\020\004\022\t\n\005TIMER\020\005", 2185);
+    "B\002\020\001\"\200\003\n\014TabletAction\022\017\n\007cameraX\030\001 \002(\002\022\017"
+    "\n\007cameraY\030\002 \002(\002\022\017\n\007cameraZ\030\003 \002(\002\022\024\n\014came"
+    "raAngleX\030\004 \002(\002\022\024\n\014cameraAngleY\030\005 \002(\002\022\024\n\014"
+    "cameraAngleZ\030\006 \002(\002\022\017\n\007thymioX\030\007 \002(\002\022\017\n\007t"
+    "hymioZ\030\010 \002(\002\022\024\n\014thymioAngleY\030\t \002(\002\022\031\n\021re"
+    "cordingDuration\030\n \002(\005\022\027\n\017leftTimelinePos"
+    "\030\013 \002(\005\022\030\n\020rightTimelinePos\030\014 \002(\005\022\024\n\014appR"
+    "ecording\030\r \002(\010\022\027\n\017thymioIsTracked\030\016 \002(\010\022"
+    "\026\n\016boardIsTracked\030\017 \002(\010\022\025\n\rselectedSetId"
+    "\030\020 \001(\005\022\027\n\017selectedSetTime\030\021 \001(\002\"\272\001\n\013Mous"
+    "eAction\022.\n\004type\030\001 \002(\0162 .Aseba.ThymioVPL."
+    "MouseActionType\022,\n\006button\030\002 \002(\0162\034.Aseba."
+    "ThymioVPL.MouseButton\022\014\n\004xPos\030\003 \001(\001\022\014\n\004y"
+    "Pos\030\004 \001(\001\022\021\n\tblockName\030\005 \001(\t\022\021\n\tblockTyp"
+    "e\030\006 \001(\t\022\013\n\003row\030\007 \001(\005\"H\n\022AccBlockModeActi"
+    "on\022\014\n\004mode\030\001 \002(\005\022\021\n\tblockName\030\002 \001(\t\022\021\n\tb"
+    "lockType\030\003 \001(\t\"(\n\022AdvancedModeAction\022\022\n\n"
+    "isAdvanced\030\001 \002(\010\"m\n\016AddBlockAction\022(\n\004ty"
+    "pe\030\001 \002(\0162\032.Aseba.ThymioVPL.BlockType\022\021\n\t"
+    "blockName\030\002 \001(\t\022\021\n\tblockType\030\003 \001(\t\022\013\n\003ro"
+    "w\030\004 \001(\005\"\325\001\n\013BlockAction\022.\n\004type\030\001 \002(\0162 ."
+    "Aseba.ThymioVPL.BlockActionType\022\013\n\003row\030\002"
+    " \001(\005\022\021\n\tblockName\030\003 \001(\t\022\021\n\tblockType\030\004 \001"
+    "(\t\022\021\n\telementId\030\005 \001(\005\022\023\n\013sliderValue\030\006 \001"
+    "(\005\022\022\n\nsoundValue\030\007 \001(\005\022\022\n\ntimerValue\030\010 \001"
+    "(\005\022\023\n\013buttonValue\030\t \001(\005\"7\n\nMenuAction\022)\n"
+    "\005entry\030\001 \002(\0162\032.Aseba.ThymioVPL.MenuEntry"
+    "\"4\n\tTimeStamp\022\021\n\ttimestamp\030\001 \002(\r\022\024\n\014mill"
+    "iseconds\030\002 \002(\r\"\250\006\n\006Action\0220\n\004type\030\001 \002(\0162"
+    "\".Aseba.ThymioVPL.Action.ActionType\022\031\n\021p"
+    "rogramStateAsXml\030\002 \001(\t\022(\n\004time\030\003 \002(\0132\032.A"
+    "seba.ThymioVPL.TimeStamp\022/\n\trowAction\030\n "
+    "\001(\0132\032.Aseba.ThymioVPL.RowActionH\000\022A\n\022adv"
+    "ancedModeAction\030\013 \001(\0132#.Aseba.ThymioVPL."
+    "AdvancedModeActionH\000\0229\n\016addBlockAction\030\014"
+    " \001(\0132\037.Aseba.ThymioVPL.AddBlockActionH\000\022"
+    "A\n\022accBlockModeAction\030\r \001(\0132#.Aseba.Thym"
+    "ioVPL.AccBlockModeActionH\000\0221\n\nmenuAction"
+    "\030\016 \001(\0132\033.Aseba.ThymioVPL.MenuActionH\000\0223\n"
+    "\013mouseAction\030\017 \001(\0132\034.Aseba.ThymioVPL.Mou"
+    "seActionH\000\0225\n\014deviceAction\030\020 \001(\0132\035.Aseba"
+    ".ThymioVPL.DeviceActionH\000\0223\n\013blockAction"
+    "\030\021 \001(\0132\034.Aseba.ThymioVPL.BlockActionH\000\0225"
+    "\n\014tabletAction\030\022 \001(\0132\035.Aseba.ThymioVPL.T"
+    "abletActionH\000\"\230\001\n\nActionType\022\021\n\rADVANCED"
+    "_MODE\020\001\022\r\n\tADD_BLOCK\020\002\022\022\n\016ACC_BLOCK_MODE"
+    "\020\003\022\010\n\004MENU\020\004\022\020\n\014MOUSE_ACTION\020\005\022\021\n\rDEVICE"
+    "_ACTION\020\006\022\020\n\014BLOCK_ACTION\020\007\022\007\n\003ROW\020\010\022\n\n\006"
+    "TABLET\020\tB\017\n\ractual_action\"0\n\005Usage\022\'\n\006ac"
+    "tion\030\001 \003(\0132\027.Aseba.ThymioVPL.Action*6\n\013M"
+    "ouseButton\022\010\n\004LEFT\020\001\022\n\n\006MIDDLE\020\002\022\t\n\005RIGH"
+    "T\020\003\022\006\n\002NO\020\004*\"\n\tBlockType\022\t\n\005EVENT\020\001\022\n\n\006A"
+    "CTION\020\002*\200\001\n\017MouseActionType\022\016\n\nMOVE_BLOC"
+    "K\020\001\022\021\n\rRELEASE_BLOCK\020\002\022\017\n\013DRAG_BUTTON\020\003\022"
+    "\023\n\017DRAG_ACTION_SET\020\004\022\017\n\013DROP_BUTTON\020\005\022\023\n"
+    "\017DROP_ACTION_SET\020\006*\204\001\n\tMenuEntry\022\r\n\tOPEN"
+    "_HELP\020\001\022\010\n\004SAVE\020\002\022\013\n\007SAVE_AS\020\003\022\014\n\010NEW_FI"
+    "LE\020\004\022\r\n\tOPEN_FILE\020\005\022\016\n\nCLOSE_FILE\020\006\022\021\n\rS"
+    "AVE_SNAPSHOT\020\007\022\010\n\004STOP\020\010\022\007\n\003RUN\020\t*T\n\017Blo"
+    "ckActionType\022\n\n\006SLIDER\020\001\022\n\n\006BUTTON\020\002\022\014\n\010"
+    "SET_NOTE\020\003\022\020\n\014SET_DURATION\020\004\022\t\n\005TIMER\020\005", 2639);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "UsageProfile.proto", &protobuf_RegisterTypes);
   RowAction::default_instance_ = new RowAction();
   DeviceAction::default_instance_ = new DeviceAction();
+  TabletAction::default_instance_ = new TabletAction();
   MouseAction::default_instance_ = new MouseAction();
   AccBlockModeAction::default_instance_ = new AccBlockModeAction();
   AdvancedModeAction::default_instance_ = new AdvancedModeAction();
@@ -430,6 +482,7 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
   Usage::default_instance_ = new Usage();
   RowAction::default_instance_->InitAsDefaultInstance();
   DeviceAction::default_instance_->InitAsDefaultInstance();
+  TabletAction::default_instance_->InitAsDefaultInstance();
   MouseAction::default_instance_->InitAsDefaultInstance();
   AccBlockModeAction::default_instance_->InitAsDefaultInstance();
   AdvancedModeAction::default_instance_->InitAsDefaultInstance();
@@ -1108,6 +1161,839 @@ void DeviceAction::Swap(DeviceAction* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = DeviceAction_descriptor_;
   metadata.reflection = DeviceAction_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int TabletAction::kCameraXFieldNumber;
+const int TabletAction::kCameraYFieldNumber;
+const int TabletAction::kCameraZFieldNumber;
+const int TabletAction::kCameraAngleXFieldNumber;
+const int TabletAction::kCameraAngleYFieldNumber;
+const int TabletAction::kCameraAngleZFieldNumber;
+const int TabletAction::kThymioXFieldNumber;
+const int TabletAction::kThymioZFieldNumber;
+const int TabletAction::kThymioAngleYFieldNumber;
+const int TabletAction::kRecordingDurationFieldNumber;
+const int TabletAction::kLeftTimelinePosFieldNumber;
+const int TabletAction::kRightTimelinePosFieldNumber;
+const int TabletAction::kAppRecordingFieldNumber;
+const int TabletAction::kThymioIsTrackedFieldNumber;
+const int TabletAction::kBoardIsTrackedFieldNumber;
+const int TabletAction::kSelectedSetIdFieldNumber;
+const int TabletAction::kSelectedSetTimeFieldNumber;
+#endif  // !_MSC_VER
+
+TabletAction::TabletAction()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Aseba.ThymioVPL.TabletAction)
+}
+
+void TabletAction::InitAsDefaultInstance() {
+}
+
+TabletAction::TabletAction(const TabletAction& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Aseba.ThymioVPL.TabletAction)
+}
+
+void TabletAction::SharedCtor() {
+  _cached_size_ = 0;
+  camerax_ = 0;
+  cameray_ = 0;
+  cameraz_ = 0;
+  cameraanglex_ = 0;
+  cameraangley_ = 0;
+  cameraanglez_ = 0;
+  thymiox_ = 0;
+  thymioz_ = 0;
+  thymioangley_ = 0;
+  recordingduration_ = 0;
+  lefttimelinepos_ = 0;
+  righttimelinepos_ = 0;
+  apprecording_ = false;
+  thymioistracked_ = false;
+  boardistracked_ = false;
+  selectedsetid_ = 0;
+  selectedsettime_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+TabletAction::~TabletAction() {
+  // @@protoc_insertion_point(destructor:Aseba.ThymioVPL.TabletAction)
+  SharedDtor();
+}
+
+void TabletAction::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void TabletAction::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* TabletAction::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return TabletAction_descriptor_;
+}
+
+const TabletAction& TabletAction::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_UsageProfile_2eproto();
+  return *default_instance_;
+}
+
+TabletAction* TabletAction::default_instance_ = NULL;
+
+TabletAction* TabletAction::New() const {
+  return new TabletAction;
+}
+
+void TabletAction::Clear() {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<TabletAction*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 255) {
+    ZR_(camerax_, thymioz_);
+  }
+  if (_has_bits_[8 / 32] & 65280) {
+    ZR_(thymioangley_, selectedsetid_);
+  }
+  selectedsettime_ = 0;
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool TabletAction::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Aseba.ThymioVPL.TabletAction)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(16383);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required float cameraX = 1;
+      case 1: {
+        if (tag == 13) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &camerax_)));
+          set_has_camerax();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(21)) goto parse_cameraY;
+        break;
+      }
+
+      // required float cameraY = 2;
+      case 2: {
+        if (tag == 21) {
+         parse_cameraY:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &cameray_)));
+          set_has_cameray();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(29)) goto parse_cameraZ;
+        break;
+      }
+
+      // required float cameraZ = 3;
+      case 3: {
+        if (tag == 29) {
+         parse_cameraZ:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &cameraz_)));
+          set_has_cameraz();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(37)) goto parse_cameraAngleX;
+        break;
+      }
+
+      // required float cameraAngleX = 4;
+      case 4: {
+        if (tag == 37) {
+         parse_cameraAngleX:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &cameraanglex_)));
+          set_has_cameraanglex();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(45)) goto parse_cameraAngleY;
+        break;
+      }
+
+      // required float cameraAngleY = 5;
+      case 5: {
+        if (tag == 45) {
+         parse_cameraAngleY:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &cameraangley_)));
+          set_has_cameraangley();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(53)) goto parse_cameraAngleZ;
+        break;
+      }
+
+      // required float cameraAngleZ = 6;
+      case 6: {
+        if (tag == 53) {
+         parse_cameraAngleZ:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &cameraanglez_)));
+          set_has_cameraanglez();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(61)) goto parse_thymioX;
+        break;
+      }
+
+      // required float thymioX = 7;
+      case 7: {
+        if (tag == 61) {
+         parse_thymioX:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &thymiox_)));
+          set_has_thymiox();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(69)) goto parse_thymioZ;
+        break;
+      }
+
+      // required float thymioZ = 8;
+      case 8: {
+        if (tag == 69) {
+         parse_thymioZ:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &thymioz_)));
+          set_has_thymioz();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(77)) goto parse_thymioAngleY;
+        break;
+      }
+
+      // required float thymioAngleY = 9;
+      case 9: {
+        if (tag == 77) {
+         parse_thymioAngleY:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &thymioangley_)));
+          set_has_thymioangley();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(80)) goto parse_recordingDuration;
+        break;
+      }
+
+      // required int32 recordingDuration = 10;
+      case 10: {
+        if (tag == 80) {
+         parse_recordingDuration:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &recordingduration_)));
+          set_has_recordingduration();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(88)) goto parse_leftTimelinePos;
+        break;
+      }
+
+      // required int32 leftTimelinePos = 11;
+      case 11: {
+        if (tag == 88) {
+         parse_leftTimelinePos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &lefttimelinepos_)));
+          set_has_lefttimelinepos();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(96)) goto parse_rightTimelinePos;
+        break;
+      }
+
+      // required int32 rightTimelinePos = 12;
+      case 12: {
+        if (tag == 96) {
+         parse_rightTimelinePos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &righttimelinepos_)));
+          set_has_righttimelinepos();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(104)) goto parse_appRecording;
+        break;
+      }
+
+      // required bool appRecording = 13;
+      case 13: {
+        if (tag == 104) {
+         parse_appRecording:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &apprecording_)));
+          set_has_apprecording();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(112)) goto parse_thymioIsTracked;
+        break;
+      }
+
+      // required bool thymioIsTracked = 14;
+      case 14: {
+        if (tag == 112) {
+         parse_thymioIsTracked:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &thymioistracked_)));
+          set_has_thymioistracked();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(120)) goto parse_boardIsTracked;
+        break;
+      }
+
+      // required bool boardIsTracked = 15;
+      case 15: {
+        if (tag == 120) {
+         parse_boardIsTracked:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &boardistracked_)));
+          set_has_boardistracked();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(128)) goto parse_selectedSetId;
+        break;
+      }
+
+      // optional int32 selectedSetId = 16;
+      case 16: {
+        if (tag == 128) {
+         parse_selectedSetId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &selectedsetid_)));
+          set_has_selectedsetid();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(141)) goto parse_selectedSetTime;
+        break;
+      }
+
+      // optional float selectedSetTime = 17;
+      case 17: {
+        if (tag == 141) {
+         parse_selectedSetTime:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &selectedsettime_)));
+          set_has_selectedsettime();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Aseba.ThymioVPL.TabletAction)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Aseba.ThymioVPL.TabletAction)
+  return false;
+#undef DO_
+}
+
+void TabletAction::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Aseba.ThymioVPL.TabletAction)
+  // required float cameraX = 1;
+  if (has_camerax()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(1, this->camerax(), output);
+  }
+
+  // required float cameraY = 2;
+  if (has_cameray()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->cameray(), output);
+  }
+
+  // required float cameraZ = 3;
+  if (has_cameraz()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->cameraz(), output);
+  }
+
+  // required float cameraAngleX = 4;
+  if (has_cameraanglex()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->cameraanglex(), output);
+  }
+
+  // required float cameraAngleY = 5;
+  if (has_cameraangley()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(5, this->cameraangley(), output);
+  }
+
+  // required float cameraAngleZ = 6;
+  if (has_cameraanglez()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(6, this->cameraanglez(), output);
+  }
+
+  // required float thymioX = 7;
+  if (has_thymiox()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(7, this->thymiox(), output);
+  }
+
+  // required float thymioZ = 8;
+  if (has_thymioz()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(8, this->thymioz(), output);
+  }
+
+  // required float thymioAngleY = 9;
+  if (has_thymioangley()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(9, this->thymioangley(), output);
+  }
+
+  // required int32 recordingDuration = 10;
+  if (has_recordingduration()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(10, this->recordingduration(), output);
+  }
+
+  // required int32 leftTimelinePos = 11;
+  if (has_lefttimelinepos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(11, this->lefttimelinepos(), output);
+  }
+
+  // required int32 rightTimelinePos = 12;
+  if (has_righttimelinepos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(12, this->righttimelinepos(), output);
+  }
+
+  // required bool appRecording = 13;
+  if (has_apprecording()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(13, this->apprecording(), output);
+  }
+
+  // required bool thymioIsTracked = 14;
+  if (has_thymioistracked()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(14, this->thymioistracked(), output);
+  }
+
+  // required bool boardIsTracked = 15;
+  if (has_boardistracked()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(15, this->boardistracked(), output);
+  }
+
+  // optional int32 selectedSetId = 16;
+  if (has_selectedsetid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(16, this->selectedsetid(), output);
+  }
+
+  // optional float selectedSetTime = 17;
+  if (has_selectedsettime()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(17, this->selectedsettime(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Aseba.ThymioVPL.TabletAction)
+}
+
+::google::protobuf::uint8* TabletAction::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Aseba.ThymioVPL.TabletAction)
+  // required float cameraX = 1;
+  if (has_camerax()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(1, this->camerax(), target);
+  }
+
+  // required float cameraY = 2;
+  if (has_cameray()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(2, this->cameray(), target);
+  }
+
+  // required float cameraZ = 3;
+  if (has_cameraz()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->cameraz(), target);
+  }
+
+  // required float cameraAngleX = 4;
+  if (has_cameraanglex()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->cameraanglex(), target);
+  }
+
+  // required float cameraAngleY = 5;
+  if (has_cameraangley()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(5, this->cameraangley(), target);
+  }
+
+  // required float cameraAngleZ = 6;
+  if (has_cameraanglez()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(6, this->cameraanglez(), target);
+  }
+
+  // required float thymioX = 7;
+  if (has_thymiox()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(7, this->thymiox(), target);
+  }
+
+  // required float thymioZ = 8;
+  if (has_thymioz()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(8, this->thymioz(), target);
+  }
+
+  // required float thymioAngleY = 9;
+  if (has_thymioangley()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(9, this->thymioangley(), target);
+  }
+
+  // required int32 recordingDuration = 10;
+  if (has_recordingduration()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(10, this->recordingduration(), target);
+  }
+
+  // required int32 leftTimelinePos = 11;
+  if (has_lefttimelinepos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(11, this->lefttimelinepos(), target);
+  }
+
+  // required int32 rightTimelinePos = 12;
+  if (has_righttimelinepos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(12, this->righttimelinepos(), target);
+  }
+
+  // required bool appRecording = 13;
+  if (has_apprecording()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(13, this->apprecording(), target);
+  }
+
+  // required bool thymioIsTracked = 14;
+  if (has_thymioistracked()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(14, this->thymioistracked(), target);
+  }
+
+  // required bool boardIsTracked = 15;
+  if (has_boardistracked()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(15, this->boardistracked(), target);
+  }
+
+  // optional int32 selectedSetId = 16;
+  if (has_selectedsetid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(16, this->selectedsetid(), target);
+  }
+
+  // optional float selectedSetTime = 17;
+  if (has_selectedsettime()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(17, this->selectedsettime(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Aseba.ThymioVPL.TabletAction)
+  return target;
+}
+
+int TabletAction::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required float cameraX = 1;
+    if (has_camerax()) {
+      total_size += 1 + 4;
+    }
+
+    // required float cameraY = 2;
+    if (has_cameray()) {
+      total_size += 1 + 4;
+    }
+
+    // required float cameraZ = 3;
+    if (has_cameraz()) {
+      total_size += 1 + 4;
+    }
+
+    // required float cameraAngleX = 4;
+    if (has_cameraanglex()) {
+      total_size += 1 + 4;
+    }
+
+    // required float cameraAngleY = 5;
+    if (has_cameraangley()) {
+      total_size += 1 + 4;
+    }
+
+    // required float cameraAngleZ = 6;
+    if (has_cameraanglez()) {
+      total_size += 1 + 4;
+    }
+
+    // required float thymioX = 7;
+    if (has_thymiox()) {
+      total_size += 1 + 4;
+    }
+
+    // required float thymioZ = 8;
+    if (has_thymioz()) {
+      total_size += 1 + 4;
+    }
+
+  }
+  if (_has_bits_[8 / 32] & (0xffu << (8 % 32))) {
+    // required float thymioAngleY = 9;
+    if (has_thymioangley()) {
+      total_size += 1 + 4;
+    }
+
+    // required int32 recordingDuration = 10;
+    if (has_recordingduration()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->recordingduration());
+    }
+
+    // required int32 leftTimelinePos = 11;
+    if (has_lefttimelinepos()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->lefttimelinepos());
+    }
+
+    // required int32 rightTimelinePos = 12;
+    if (has_righttimelinepos()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->righttimelinepos());
+    }
+
+    // required bool appRecording = 13;
+    if (has_apprecording()) {
+      total_size += 1 + 1;
+    }
+
+    // required bool thymioIsTracked = 14;
+    if (has_thymioistracked()) {
+      total_size += 1 + 1;
+    }
+
+    // required bool boardIsTracked = 15;
+    if (has_boardistracked()) {
+      total_size += 1 + 1;
+    }
+
+    // optional int32 selectedSetId = 16;
+    if (has_selectedsetid()) {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->selectedsetid());
+    }
+
+  }
+  if (_has_bits_[16 / 32] & (0xffu << (16 % 32))) {
+    // optional float selectedSetTime = 17;
+    if (has_selectedsettime()) {
+      total_size += 2 + 4;
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void TabletAction::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const TabletAction* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const TabletAction*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void TabletAction::MergeFrom(const TabletAction& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_camerax()) {
+      set_camerax(from.camerax());
+    }
+    if (from.has_cameray()) {
+      set_cameray(from.cameray());
+    }
+    if (from.has_cameraz()) {
+      set_cameraz(from.cameraz());
+    }
+    if (from.has_cameraanglex()) {
+      set_cameraanglex(from.cameraanglex());
+    }
+    if (from.has_cameraangley()) {
+      set_cameraangley(from.cameraangley());
+    }
+    if (from.has_cameraanglez()) {
+      set_cameraanglez(from.cameraanglez());
+    }
+    if (from.has_thymiox()) {
+      set_thymiox(from.thymiox());
+    }
+    if (from.has_thymioz()) {
+      set_thymioz(from.thymioz());
+    }
+  }
+  if (from._has_bits_[8 / 32] & (0xffu << (8 % 32))) {
+    if (from.has_thymioangley()) {
+      set_thymioangley(from.thymioangley());
+    }
+    if (from.has_recordingduration()) {
+      set_recordingduration(from.recordingduration());
+    }
+    if (from.has_lefttimelinepos()) {
+      set_lefttimelinepos(from.lefttimelinepos());
+    }
+    if (from.has_righttimelinepos()) {
+      set_righttimelinepos(from.righttimelinepos());
+    }
+    if (from.has_apprecording()) {
+      set_apprecording(from.apprecording());
+    }
+    if (from.has_thymioistracked()) {
+      set_thymioistracked(from.thymioistracked());
+    }
+    if (from.has_boardistracked()) {
+      set_boardistracked(from.boardistracked());
+    }
+    if (from.has_selectedsetid()) {
+      set_selectedsetid(from.selectedsetid());
+    }
+  }
+  if (from._has_bits_[16 / 32] & (0xffu << (16 % 32))) {
+    if (from.has_selectedsettime()) {
+      set_selectedsettime(from.selectedsettime());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void TabletAction::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TabletAction::CopyFrom(const TabletAction& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TabletAction::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00007fff) != 0x00007fff) return false;
+
+  return true;
+}
+
+void TabletAction::Swap(TabletAction* other) {
+  if (other != this) {
+    std::swap(camerax_, other->camerax_);
+    std::swap(cameray_, other->cameray_);
+    std::swap(cameraz_, other->cameraz_);
+    std::swap(cameraanglex_, other->cameraanglex_);
+    std::swap(cameraangley_, other->cameraangley_);
+    std::swap(cameraanglez_, other->cameraanglez_);
+    std::swap(thymiox_, other->thymiox_);
+    std::swap(thymioz_, other->thymioz_);
+    std::swap(thymioangley_, other->thymioangley_);
+    std::swap(recordingduration_, other->recordingduration_);
+    std::swap(lefttimelinepos_, other->lefttimelinepos_);
+    std::swap(righttimelinepos_, other->righttimelinepos_);
+    std::swap(apprecording_, other->apprecording_);
+    std::swap(thymioistracked_, other->thymioistracked_);
+    std::swap(boardistracked_, other->boardistracked_);
+    std::swap(selectedsetid_, other->selectedsetid_);
+    std::swap(selectedsettime_, other->selectedsettime_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata TabletAction::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = TabletAction_descriptor_;
+  metadata.reflection = TabletAction_reflection_;
   return metadata;
 }
 
@@ -3706,6 +4592,7 @@ bool Action_ActionType_IsValid(int value) {
     case 6:
     case 7:
     case 8:
+    case 9:
       return true;
     default:
       return false;
@@ -3721,6 +4608,7 @@ const Action_ActionType Action::MOUSE_ACTION;
 const Action_ActionType Action::DEVICE_ACTION;
 const Action_ActionType Action::BLOCK_ACTION;
 const Action_ActionType Action::ROW;
+const Action_ActionType Action::TABLET;
 const Action_ActionType Action::ActionType_MIN;
 const Action_ActionType Action::ActionType_MAX;
 const int Action::ActionType_ARRAYSIZE;
@@ -3737,6 +4625,7 @@ const int Action::kMenuActionFieldNumber;
 const int Action::kMouseActionFieldNumber;
 const int Action::kDeviceActionFieldNumber;
 const int Action::kBlockActionFieldNumber;
+const int Action::kTabletActionFieldNumber;
 #endif  // !_MSC_VER
 
 Action::Action()
@@ -3755,6 +4644,7 @@ void Action::InitAsDefaultInstance() {
   Action_default_oneof_instance_->mouseaction_ = const_cast< ::Aseba::ThymioVPL::MouseAction*>(&::Aseba::ThymioVPL::MouseAction::default_instance());
   Action_default_oneof_instance_->deviceaction_ = const_cast< ::Aseba::ThymioVPL::DeviceAction*>(&::Aseba::ThymioVPL::DeviceAction::default_instance());
   Action_default_oneof_instance_->blockaction_ = const_cast< ::Aseba::ThymioVPL::BlockAction*>(&::Aseba::ThymioVPL::BlockAction::default_instance());
+  Action_default_oneof_instance_->tabletaction_ = const_cast< ::Aseba::ThymioVPL::TabletAction*>(&::Aseba::ThymioVPL::TabletAction::default_instance());
 }
 
 Action::Action(const Action& from)
@@ -3844,6 +4734,10 @@ void Action::clear_actual_action() {
     }
     case kBlockAction: {
       delete actual_action_.blockaction_;
+      break;
+    }
+    case kTabletAction: {
+      delete actual_action_.tabletaction_;
       break;
     }
     case ACTUAL_ACTION_NOT_SET: {
@@ -4030,6 +4924,19 @@ bool Action::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(146)) goto parse_tabletAction;
+        break;
+      }
+
+      // optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+      case 18: {
+        if (tag == 146) {
+         parse_tabletAction:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_tabletaction()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -4129,6 +5036,12 @@ void Action::SerializeWithCachedSizes(
       17, this->blockaction(), output);
   }
 
+  // optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+  if (has_tabletaction()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      18, this->tabletaction(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -4217,6 +5130,13 @@ void Action::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         17, this->blockaction(), target);
+  }
+
+  // optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+  if (has_tabletaction()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        18, this->tabletaction(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -4309,6 +5229,13 @@ int Action::ByteSize() const {
           this->blockaction());
       break;
     }
+    // optional .Aseba.ThymioVPL.TabletAction tabletAction = 18;
+    case kTabletAction: {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->tabletaction());
+      break;
+    }
     case ACTUAL_ACTION_NOT_SET: {
       break;
     }
@@ -4371,6 +5298,10 @@ void Action::MergeFrom(const Action& from) {
       mutable_blockaction()->::Aseba::ThymioVPL::BlockAction::MergeFrom(from.blockaction());
       break;
     }
+    case kTabletAction: {
+      mutable_tabletaction()->::Aseba::ThymioVPL::TabletAction::MergeFrom(from.tabletaction());
+      break;
+    }
     case ACTUAL_ACTION_NOT_SET: {
       break;
     }
@@ -4430,6 +5361,9 @@ bool Action::IsInitialized() const {
   }
   if (has_blockaction()) {
     if (!this->blockaction().IsInitialized()) return false;
+  }
+  if (has_tabletaction()) {
+    if (!this->tabletaction().IsInitialized()) return false;
   }
   return true;
 }
