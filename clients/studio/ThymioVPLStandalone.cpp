@@ -122,13 +122,14 @@ namespace Aseba
 	
 	//////
 	
-	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget, bool debugLog):
+	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget, bool debugLog, bool execFeedback):
 		VariableListener(new TargetVariablesModel(this)),
 		// create target
 		target(new DashelTarget(translators, commandLineTarget)),
 		// options
 		useAnyTarget(useAnyTarget),
 		debugLog(debugLog),
+		execFeedback(execFeedback),
 		// setup initial values
 		id(0),
 		vpl(0),
@@ -490,7 +491,7 @@ namespace Aseba
 		id = node;
 		
 		// create the VPL widget and add it
-		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false, debugLog);
+		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false, debugLog, execFeedback);
 		vplLayout->addWidget(vpl);
 		
 		// connect callbacks

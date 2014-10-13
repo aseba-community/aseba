@@ -8,6 +8,7 @@
 #include <QInputDialog>
 #include <QDir>
 #include <QSettings>
+#include <QDebug>
 
 #include "EventActionsSet.h"
 #include "Block.h"
@@ -298,6 +299,29 @@ void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 	wrapper->set_type(Action_ActionType_DEVICE_ACTION);
 	wrapper->set_allocated_deviceaction(a);
 	storeAction(wrapper);
+}
+
+void UsageLogger::logTabletData(const VariablesDataVector& data){
+	assert(data.size() == 15);
+	const float cam_x = float(data[0]) * 0.001;
+	const float cam_y = float(data[1]) * 0.001;
+	const float cam_z = float(data[2]) * 0.001;
+	const float cam_ax = float(data[3]) * 0.1;
+	const float cam_ay = float(data[4]) * 0.1;
+	const float cam_az = float(data[5]) * 0.1;
+	const float thymio_x = float(data[6]) * 0.001;
+	const float thymio_z = float(data[7]) * 0.001;
+	const float thymio_ay = float(data[8]) * 0.1;
+	qDebug() << "pos data" << cam_x << cam_y << cam_z << cam_ax << cam_ay << cam_az << thymio_x << thymio_z << thymio_ay;
+	const unsigned recording_duration = data[9];
+	const float timeline_left = float(data[10]) / 10000.f;
+	const float timeline_right = float(data[11]) / 10000.f;
+	const unsigned selected_set_id = data[12];
+	const float selected_set_time = float(data[11]) / 10000.f;
+	const bool app_recording = data[14] & (1<<0);
+	const bool board_is_tracked = data[14] & (1<<1);
+	const bool thymio_is_tracked = data[14] & (1<<2);
+	qDebug() << "app state" << recording_duration << timeline_left << timeline_right << selected_set_id << selected_set_time << app_recording << board_is_tracked << thymio_is_tracked;
 }
 
 void UsageLogger::storeAction(Action * a){

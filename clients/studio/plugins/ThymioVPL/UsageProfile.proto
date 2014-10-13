@@ -102,7 +102,7 @@ message MenuAction{
 
 message TimeStamp{
 	required uint32 timestamp = 1;		// UNIX timestamp
-	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolut value might not be meaningful
+	required uint32 milliseconds = 2;	// For fine graind timing requirements, absolute value might not be meaningful
 }
 
 message Action{

@@ -57,6 +57,7 @@ namespace Aseba { namespace ThymioVPL
 		bool isAdvanced() const;
 	
 		void setErrorStatus(bool flag);
+		void blink();
 		
 		QVector<quint16> getContentCompressed() const;
 		
@@ -77,6 +78,7 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void removeClicked();
 		void addClicked();
+		void clearBlink();
 		
 	protected:
 		// from QGraphicsObject
@@ -111,6 +113,7 @@ namespace Aseba { namespace ThymioVPL
 		Block* event;
 		Block* stateFilter;
 		QList<Block*> actions;
+		int isBlinking; //!< show blink background
 		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;

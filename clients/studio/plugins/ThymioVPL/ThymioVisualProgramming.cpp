@@ -42,8 +42,9 @@ using namespace std;
 namespace Aseba { namespace ThymioVPL
 {
 	// Visual Programming
-	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton, bool debugLog):
+	ThymioVisualProgramming::ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton, bool debugLog, bool execFeedback):
 		debugLog(debugLog),
+		execFeedback(execFeedback),
 		de(_de),
 		scene(new Scene(this)),
 		loading(false),
@@ -805,13 +806,15 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
-		// NOTE: here we can add react to incoming events
-		USAGE_LOG(logUserEvent(id,data));
-		if (id != 0)
-			return;
+		// here we can add react to incoming events
+		if (id == 1)
+			USAGE_LOG(logTabletData(data));
+		else
+			USAGE_LOG(logUserEvent(id,data));
 		
-		// TODO: highlight pair
-		cerr << "event " << data.at(0) << endl;
+		// a set was executed on target, highlight in program
+		if (execFeedback && id == 0)
+			(*(scene->setsBegin() + data[0]))->blink();
 	}
 	
 	void ThymioVisualProgramming::addEvent()

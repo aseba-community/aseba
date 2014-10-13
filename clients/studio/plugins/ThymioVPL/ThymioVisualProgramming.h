@@ -43,7 +43,7 @@ namespace Aseba { namespace ThymioVPL
 		Q_OBJECT
 	
 	public:
-		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true, bool debugLog = false);
+		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true, bool debugLog = false, bool execFeedback = false);
 		~ThymioVisualProgramming();
 		
 		virtual QWidget* createMenuEntry();
@@ -96,6 +96,7 @@ namespace Aseba { namespace ThymioVPL
 		
 	public:
 		const bool debugLog;
+		const bool execFeedback;
 		
 	protected:
 		friend class Aseba::ThymioVPL::BlockButton;
