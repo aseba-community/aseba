@@ -65,8 +65,8 @@ message TabletAction{
 	required float thymioZ = 8;
 	required float thymioAngleY = 9;
 	required int32 recordingDuration = 10;
-	required int32 leftTimelinePos = 11;
-	required int32 rightTimelinePos = 12;
+	required float leftTimelinePos = 11;
+	required float rightTimelinePos = 12;
 	required bool appRecording = 13;
 	required bool thymioIsTracked = 14;
 	required bool boardIsTracked = 15;
