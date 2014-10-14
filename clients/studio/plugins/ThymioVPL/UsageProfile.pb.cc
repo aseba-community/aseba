@@ -410,7 +410,7 @@ void protobuf_AddDesc_UsageProfile_2eproto() {
     "cameraAngleZ\030\006 \002(\002\022\017\n\007thymioX\030\007 \002(\002\022\017\n\007t"
     "hymioZ\030\010 \002(\002\022\024\n\014thymioAngleY\030\t \002(\002\022\031\n\021re"
     "cordingDuration\030\n \002(\005\022\027\n\017leftTimelinePos"
-    "\030\013 \002(\005\022\030\n\020rightTimelinePos\030\014 \002(\005\022\024\n\014appR"
+    "\030\013 \002(\002\022\030\n\020rightTimelinePos\030\014 \002(\002\022\024\n\014appR"
     "ecording\030\r \002(\010\022\027\n\017thymioIsTracked\030\016 \002(\010\022"
     "\026\n\016boardIsTracked\030\017 \002(\010\022\025\n\rselectedSetId"
     "\030\020 \001(\005\022\027\n\017selectedSetTime\030\021 \001(\002\"\272\001\n\013Mous"
@@ -1437,31 +1437,31 @@ bool TabletAction::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(88)) goto parse_leftTimelinePos;
+        if (input->ExpectTag(93)) goto parse_leftTimelinePos;
         break;
       }
 
-      // required int32 leftTimelinePos = 11;
+      // required float leftTimelinePos = 11;
       case 11: {
-        if (tag == 88) {
+        if (tag == 93) {
          parse_leftTimelinePos:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &lefttimelinepos_)));
           set_has_lefttimelinepos();
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(96)) goto parse_rightTimelinePos;
+        if (input->ExpectTag(101)) goto parse_rightTimelinePos;
         break;
       }
 
-      // required int32 rightTimelinePos = 12;
+      // required float rightTimelinePos = 12;
       case 12: {
-        if (tag == 96) {
+        if (tag == 101) {
          parse_rightTimelinePos:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &righttimelinepos_)));
           set_has_righttimelinepos();
         } else {
@@ -1621,14 +1621,14 @@ void TabletAction::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(10, this->recordingduration(), output);
   }
 
-  // required int32 leftTimelinePos = 11;
+  // required float leftTimelinePos = 11;
   if (has_lefttimelinepos()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(11, this->lefttimelinepos(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(11, this->lefttimelinepos(), output);
   }
 
-  // required int32 rightTimelinePos = 12;
+  // required float rightTimelinePos = 12;
   if (has_righttimelinepos()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(12, this->righttimelinepos(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(12, this->righttimelinepos(), output);
   }
 
   // required bool appRecording = 13;
@@ -1716,14 +1716,14 @@ void TabletAction::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(10, this->recordingduration(), target);
   }
 
-  // required int32 leftTimelinePos = 11;
+  // required float leftTimelinePos = 11;
   if (has_lefttimelinepos()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(11, this->lefttimelinepos(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(11, this->lefttimelinepos(), target);
   }
 
-  // required int32 rightTimelinePos = 12;
+  // required float rightTimelinePos = 12;
   if (has_righttimelinepos()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(12, this->righttimelinepos(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(12, this->righttimelinepos(), target);
   }
 
   // required bool appRecording = 13;
@@ -1817,18 +1817,14 @@ int TabletAction::ByteSize() const {
           this->recordingduration());
     }
 
-    // required int32 leftTimelinePos = 11;
+    // required float leftTimelinePos = 11;
     if (has_lefttimelinepos()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->lefttimelinepos());
+      total_size += 1 + 4;
     }
 
-    // required int32 rightTimelinePos = 12;
+    // required float rightTimelinePos = 12;
     if (has_righttimelinepos()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->righttimelinepos());
+      total_size += 1 + 4;
     }
 
     // required bool appRecording = 13;

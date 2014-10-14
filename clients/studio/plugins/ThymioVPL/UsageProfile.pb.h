@@ -535,19 +535,19 @@ class TabletAction : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 recordingduration() const;
   inline void set_recordingduration(::google::protobuf::int32 value);
 
-  // required int32 leftTimelinePos = 11;
+  // required float leftTimelinePos = 11;
   inline bool has_lefttimelinepos() const;
   inline void clear_lefttimelinepos();
   static const int kLeftTimelinePosFieldNumber = 11;
-  inline ::google::protobuf::int32 lefttimelinepos() const;
-  inline void set_lefttimelinepos(::google::protobuf::int32 value);
+  inline float lefttimelinepos() const;
+  inline void set_lefttimelinepos(float value);
 
-  // required int32 rightTimelinePos = 12;
+  // required float rightTimelinePos = 12;
   inline bool has_righttimelinepos() const;
   inline void clear_righttimelinepos();
   static const int kRightTimelinePosFieldNumber = 12;
-  inline ::google::protobuf::int32 righttimelinepos() const;
-  inline void set_righttimelinepos(::google::protobuf::int32 value);
+  inline float righttimelinepos() const;
+  inline void set_righttimelinepos(float value);
 
   // required bool appRecording = 13;
   inline bool has_apprecording() const;
@@ -635,8 +635,8 @@ class TabletAction : public ::google::protobuf::Message {
   float thymioz_;
   float thymioangley_;
   ::google::protobuf::int32 recordingduration_;
-  ::google::protobuf::int32 lefttimelinepos_;
-  ::google::protobuf::int32 righttimelinepos_;
+  float lefttimelinepos_;
+  float righttimelinepos_;
   bool apprecording_;
   bool thymioistracked_;
   bool boardistracked_;
@@ -2140,7 +2140,7 @@ inline void TabletAction::set_recordingduration(::google::protobuf::int32 value)
   // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.recordingDuration)
 }
 
-// required int32 leftTimelinePos = 11;
+// required float leftTimelinePos = 11;
 inline bool TabletAction::has_lefttimelinepos() const {
   return (_has_bits_[0] & 0x00000400u) != 0;
 }
@@ -2154,17 +2154,17 @@ inline void TabletAction::clear_lefttimelinepos() {
   lefttimelinepos_ = 0;
   clear_has_lefttimelinepos();
 }
-inline ::google::protobuf::int32 TabletAction::lefttimelinepos() const {
+inline float TabletAction::lefttimelinepos() const {
   // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.leftTimelinePos)
   return lefttimelinepos_;
 }
-inline void TabletAction::set_lefttimelinepos(::google::protobuf::int32 value) {
+inline void TabletAction::set_lefttimelinepos(float value) {
   set_has_lefttimelinepos();
   lefttimelinepos_ = value;
   // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.leftTimelinePos)
 }
 
-// required int32 rightTimelinePos = 12;
+// required float rightTimelinePos = 12;
 inline bool TabletAction::has_righttimelinepos() const {
   return (_has_bits_[0] & 0x00000800u) != 0;
 }
@@ -2178,11 +2178,11 @@ inline void TabletAction::clear_righttimelinepos() {
   righttimelinepos_ = 0;
   clear_has_righttimelinepos();
 }
-inline ::google::protobuf::int32 TabletAction::righttimelinepos() const {
+inline float TabletAction::righttimelinepos() const {
   // @@protoc_insertion_point(field_get:Aseba.ThymioVPL.TabletAction.rightTimelinePos)
   return righttimelinepos_;
 }
-inline void TabletAction::set_righttimelinepos(::google::protobuf::int32 value) {
+inline void TabletAction::set_righttimelinepos(float value) {
   set_has_righttimelinepos();
   righttimelinepos_ = value;
   // @@protoc_insertion_point(field_set:Aseba.ThymioVPL.TabletAction.rightTimelinePos)
