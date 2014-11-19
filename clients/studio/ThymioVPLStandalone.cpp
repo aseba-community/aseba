@@ -156,9 +156,6 @@ namespace Aseba
 		// delete variablesModel from VariableListener and set it to 0 to prevent double deletion
 		delete variablesModel;
 		variablesModel = 0;
-		
-		QSettings settings;
-		settings.setValue("ThymioVPLStandalone/fileName", fileName);
 	}
 	
 	void ThymioVPLStandalone::setupWidgets()
@@ -311,6 +308,9 @@ namespace Aseba
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
 			return false;
 		
+		// save file name to settings
+		QSettings().setValue("ThymioVPLStandalone/fileName", fileName);
+		
 		// initiate DOM tree
 		QDomDocument document("aesl-source");
 		QDomElement root = document.createElement("network");
@@ -414,9 +414,10 @@ namespace Aseba
 				domNode = domNode.nextSibling();
 			}
 			// check whether we did load data
-			if(dataLoaded)
+			if (dataLoaded)
 			{
 				fileName = newFileName;
+				QSettings().setValue("ThymioVPLStandalone/fileName", fileName);
 				updateWindowTitle(vpl->isModified());
 			}
 			else
