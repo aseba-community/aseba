@@ -312,19 +312,24 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::saveSnapshot() const
 	{
+		QSettings settings;
+		
 		USAGE_LOG(logSaveSnapshot());
-		QString initialFile;
-		if (!de->openedFileName().isEmpty())
+		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", "").toString());
+		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
 		{
 			const QFileInfo pf(de->openedFileName());
-			initialFile = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
+			initialFileName = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
 		}
 		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
-			tr("Export program as image"), initialFile, "Scalable Vector Graphics (*.svg);;Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
+			tr("Export program as image"), initialFileName, "Scalable Vector Graphics (*.svg);;Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
 		
 		if (fileName.isEmpty())
 			return;
+		
+		// save file name to settings
+		settings.setValue("ThymioVPL/snapshotFileName", fileName);
 		
 		if (selectedFilter.at(0) == 'S')
 		{
