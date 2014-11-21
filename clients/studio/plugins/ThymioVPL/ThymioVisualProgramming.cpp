@@ -323,7 +323,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
-			tr("Export program as image"), initialFileName, "Scalable Vector Graphics (*.svg);;Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
+			tr("Export program as image"), initialFileName, "Images (*.png *.jpg *.bmp *.ppm *.tiff);;Scalable Vector Graphics (*.svg)", &selectedFilter));
 		
 		if (fileName.isEmpty())
 			return;
