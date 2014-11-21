@@ -274,7 +274,12 @@ namespace Aseba
 					else
 						result = valueOne / valueTwo;
 				break;
-				case ASEBA_OP_MOD: result = valueOne % valueTwo; break;
+				case ASEBA_OP_MOD:
+					if (valueTwo == 0)
+						throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
+					else
+						result = valueOne % valueTwo;
+				break;
 				
 				case ASEBA_OP_BIT_OR: result = valueOne | valueTwo; break;
 				case ASEBA_OP_BIT_XOR: result = valueOne ^ valueTwo; break;
