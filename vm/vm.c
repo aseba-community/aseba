@@ -110,8 +110,21 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 			{
 				return valueOne / valueTwo;
 			}
-		case ASEBA_OP_MOD: return valueOne % valueTwo;
-		
+		case ASEBA_OP_MOD: 
+			// check modulo by zero
+			if (valueTwo == 0)
+			{
+				if(AsebaVMErrorCB)
+					AsebaVMErrorCB(vm,NULL);
+				vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+				AsebaSendMessageWords(vm, ASEBA_MESSAGE_DIVISION_BY_ZERO, &vm->pc, 1);
+				return 0;
+			}
+			else
+			{
+				return valueOne % valueTwo;
+			}
+			
 		case ASEBA_OP_BIT_OR: return valueOne | valueTwo;
 		case ASEBA_OP_BIT_XOR: return valueOne ^ valueTwo;
 		case ASEBA_OP_BIT_AND: return valueOne & valueTwo;
