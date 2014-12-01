@@ -319,7 +319,7 @@ namespace Aseba { namespace ThymioVPL
 		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
 		{
 			const QFileInfo pf(de->openedFileName());
-			initialFileName = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".svg");
+			initialFileName = (pf.absolutePath() + QDir::separator() + pf.baseName() + ".png");
 		}
 		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
