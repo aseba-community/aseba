@@ -30,6 +30,7 @@
 #include <QScrollBar>
 #include <QSplitter>
 #include <QShortcut>
+#include <QDesktopServices>
 
 #include <version.h>
 
@@ -283,6 +284,8 @@ namespace Aseba
 	//! Save a minimal but valid aesl file
 	bool ThymioVPLStandalone::saveFile(bool as)
 	{
+		QSettings settings;
+		
 		// we need a valid VPL to save something
 		if (!vpl)
 			return false;
@@ -290,10 +293,18 @@ namespace Aseba
 		// open file
 		if (as || fileName.isEmpty())
 		{
-			#ifdef ANDROID
 			if (fileName.isEmpty())
-				fileName = "/sdcard/";
-			#endif // ANDROID
+			{
+				// get last file name
+				
+				#ifdef ANDROID
+				fileName = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
+				#else // ANDROID
+				fileName = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::displayName(QDesktopServices::DocumentsLocation)).toString();
+				#endif // ANDROID
+				// keep only the path of the directory
+				fileName = QFileInfo(fileName).dir().path();
+			}
 			fileName = QFileDialog::getSaveFileName(0,
 				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
 		}
@@ -309,7 +320,7 @@ namespace Aseba
 			return false;
 		
 		// save file name to settings
-		QSettings().setValue("ThymioVPLStandalone/fileName", fileName);
+		settings.setValue("ThymioVPLStandalone/fileName", fileName);
 		
 		// initiate DOM tree
 		QDomDocument document("aesl-source");
@@ -356,7 +367,7 @@ namespace Aseba
 			#ifdef ANDROID
 			dir = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
 			#else // ANDROID
-			dir = settings.value("ThymioVPLStandalone/fileName", "").toString();
+			dir = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::displayName(QDesktopServices::DocumentsLocation)).toString();
 			#endif // ANDROID
 		}
 		else
