@@ -37,6 +37,7 @@
 #include <iostream>
 #include <cassert>
 #include <QTabWidget>
+#include <QDesktopServices>
 #include <QtConcurrentRun>
 
 #include <version.h>
@@ -1711,6 +1712,8 @@ namespace Aseba
 				QStringList recentFiles = settings.value("recent files").toStringList();
 				if (recentFiles.size() > 0)
 					dir = recentFiles[0];
+				else
+					dir = QDesktopServices::displayName(QDesktopServices::DocumentsLocation);
 			}
 			
 			fileName = QFileDialog::getOpenFileName(this,
@@ -1849,8 +1852,12 @@ namespace Aseba
 		QString fileName = previousFileName;
 		
 		if (fileName.isEmpty())
-			fileName = QFileDialog::getSaveFileName(this,
-				tr("Save Script"), actualFileName, "Aseba scripts (*.aesl)");
+			fileName = QFileDialog::getSaveFileName(
+				this,
+				tr("Save Script"),
+				actualFileName.isEmpty() ? QDesktopServices::displayName(QDesktopServices::DocumentsLocation) : actualFileName,
+				"Aseba scripts (*.aesl)"
+			);
 		
 		if (fileName.isEmpty())
 			return false;
