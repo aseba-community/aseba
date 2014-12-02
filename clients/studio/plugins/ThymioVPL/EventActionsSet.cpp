@@ -239,19 +239,27 @@ namespace Aseba { namespace ThymioVPL
 		
 		// switch event and actions to given mode
 		if (event)
-			event->setAdvanced(advanced);
+		{
+			if (event->isAdvancedBlock())
+				setBlock(event, 0);
+			else
+				event->setAdvanced(advanced);
+		}
 		// delete action if not valid any more
 		int i = 0;
 		while (i<actions.size())
 		{
-			if (!advanced && (typeid(*actions[i]) == typeid(StateFilterActionBlock)))
+			if (!advanced && actions[i]->isAdvancedBlock())
 			{
 				Block* action(actions[i]);
 				actions.removeAt(i);
 				action->deleteLater();
 			}
 			else
+			{
+				actions[i]->setAdvanced(advanced);
 				++i;
+			}
 		}
 		
 		// create and delete state filter

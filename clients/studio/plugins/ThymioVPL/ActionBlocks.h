@@ -108,7 +108,9 @@ namespace Aseba { namespace ThymioVPL
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
 		virtual QVector<quint16> getValuesCompressed() const;
-	
+		
+		virtual bool isAdvancedBlock() const { return true; }
+		
 	protected slots:
 		void frameChanged(int frame);
 		

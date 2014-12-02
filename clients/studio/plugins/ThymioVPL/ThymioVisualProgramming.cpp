@@ -210,6 +210,8 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
 		
+		eventButtons[eventButtons.size()-1]->hide(); // timeout
+		
 		horizontalLayout->addLayout(eventsLayout);
 		
 		sceneLayout = new QVBoxLayout();
@@ -288,7 +290,8 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
 		
-		actionButtons.last()->hide(); // memory
+		actionButtons[actionButtons.size()-2]->hide(); // timer
+		actionButtons[actionButtons.size()-1]->hide(); // set state
 
 		horizontalLayout->addLayout(actionsLayout);
 		
@@ -545,7 +548,9 @@ namespace Aseba { namespace ThymioVPL
 		if (advanced)
 		{
 			advancedButton->setIcon(QIcon(":/images/vpl_simple_mode.svgz"));
-			actionButtons.last()->show(); // state button
+			eventButtons[eventButtons.size()-1]->show(); // timeout
+			actionButtons[actionButtons.size()-2]->show(); // timer
+			actionButtons[actionButtons.size()-1]->show(); // set state
 			scene->setAdvanced(true);
 		}
 		else
@@ -562,7 +567,9 @@ namespace Aseba { namespace ThymioVPL
 			if (doClear)
 			{
 				advancedButton->setIcon(QIcon(":/images/vpl_advanced_mode.svgz"));
-				actionButtons.last()->hide(); // state button
+				eventButtons[eventButtons.size()-1]->hide(); // timeout
+				actionButtons[actionButtons.size()-2]->hide(); // timer
+				actionButtons[actionButtons.size()-1]->hide(); // set state
 				scene->setAdvanced(false);
 			}
 		}

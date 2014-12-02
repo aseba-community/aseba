@@ -65,7 +65,8 @@ namespace Aseba { namespace ThymioVPL
 		virtual bool isAnyValueSet() const;
 		void resetValues();
 		
-		virtual bool isAnyAdvancedFeature() const { return false; }
+		virtual bool isAdvancedBlock() const { return false; }
+		virtual bool isAnyAdvancedFeature() const { return isAdvancedBlock(); }
 		virtual void setAdvanced(bool advanced) {}
 		
 		QMimeData* mimeData() const;
@@ -205,7 +206,7 @@ namespace Aseba { namespace ThymioVPL
 	public:
 		StateFilterBlock(const QString& type, const QString& name, QGraphicsItem *parent=0);
 		
-		virtual bool isAnyAdvancedFeature() const { return true; }
+		virtual bool isAdvancedBlock() const { return true; }
 	};
 	
 	/*@}*/

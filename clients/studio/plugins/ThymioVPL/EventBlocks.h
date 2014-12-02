@@ -85,6 +85,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		TimeoutEventBlock(QGraphicsItem *parent=0);
+		
+		virtual bool isAdvancedBlock() const { return true; }
 	};
 	
 	/*@}*/
