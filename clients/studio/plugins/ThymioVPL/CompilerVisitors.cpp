@@ -421,7 +421,18 @@ namespace Aseba { namespace ThymioVPL
 				text += toWstring(i);
 				text += L"] < " + toWstring(block->getValue(slidersIndex));
 				first = false;
-			} 
+			}
+			else if (block->getValue(i) == 3)
+			{
+				text += (first ? L"": L" and ");
+				text += L"prox.horizontal[";
+				text += toWstring(i);
+				text += L"] > " + toWstring(block->getValue(slidersIndex));
+				text += L" and prox.horizontal[";
+				text += toWstring(i);
+				text += L"] < " + toWstring(block->getValue(slidersIndex+1));
+				first = false;
+			}
 		}
 		return text;
 	}
@@ -448,7 +459,18 @@ namespace Aseba { namespace ThymioVPL
 				text += toWstring(i);
 				text += L"] < " + toWstring(block->getValue(slidersIndex));
 				first = false;
-			} 
+			}
+			else if (block->getValue(i) == 3)
+			{
+				text += (first ? L"": L" and ");
+				text += L"prox.ground.delta[";
+				text += toWstring(i);
+				text += L"] > " + toWstring(block->getValue(slidersIndex));
+				text += L" and prox.ground.delta[";
+				text += toWstring(i);
+				text += L"] < " + toWstring(block->getValue(slidersIndex+1));
+				first = false;
+			}
 		}
 		return text;
 	}

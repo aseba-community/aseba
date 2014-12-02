@@ -38,8 +38,9 @@ namespace Aseba { namespace ThymioVPL
 		QRectF boundingRect() const { return boundingRectangle; }
 
 		int getValue() const { return curState; }
-		void setValue(int state) { curState = state; update(); }
+		void setValue(int state);
 		unsigned valuesCount() const;
+		void setStateCountLimit(int limit);
 		
 		void setToggleState(bool state) { toggleState = state; update(); }
 
@@ -54,6 +55,7 @@ namespace Aseba { namespace ThymioVPL
 		const ButtonType buttonType;
 		const QRectF boundingRectangle;
 		
+		int stateCountLimit; //!< limit of the value of curState, -1 if disabled
 		int curState;
 		bool toggleState;
 		

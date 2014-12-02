@@ -195,6 +195,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		int low; //< low activation threshold (at right)
 		int high; //< high activation threshold (at left)
+		int buttonsCountSimple; //< only show that number of buttons in basic mode, default is -1, no limitation
 		bool lastPressedIn; //< whether last mouse press event was in
 		bool showRangeControl; //< whether we are in advanced mode
 		

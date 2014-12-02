@@ -428,6 +428,7 @@ namespace Aseba { namespace ThymioVPL
 		highColor(highColor),
 		low(defaultLow),
 		high(defaultHigh),
+		buttonsCountSimple(-1),
 		lastPressedIn(false),
 		showRangeControl(advanced)
 	{
@@ -591,7 +592,14 @@ namespace Aseba { namespace ThymioVPL
 	
 	bool BlockWithButtonsAndRange::isAnyAdvancedFeature() const
 	{
-		return (low != defaultLow) || (high != defaultHigh);
+		bool isButtonAdvanced(false);
+		
+		// check whether any button is in advanced mode
+		if (buttonsCountSimple >= 0)
+			for (int i=0; i<buttons.size(); ++i)
+				isButtonAdvanced = isButtonAdvanced || (buttons[i]->getValue() >= buttonsCountSimple);
+		
+		return (low != defaultLow) || (high != defaultHigh) || isButtonAdvanced;
 	}
 	
 	void BlockWithButtonsAndRange::setAdvanced(bool advanced)
@@ -600,6 +608,16 @@ namespace Aseba { namespace ThymioVPL
 		{
 			low = defaultLow;
 			high = defaultHigh;
+			// make sure no button is in advanced mode
+			if (buttonsCountSimple >= 0)
+				for (int i=0; i<buttons.size(); ++i)
+					buttons[i]->setStateCountLimit(buttonsCountSimple);
+		}
+		else
+		{
+			// disable limit in any case
+			for (int i=0; i<buttons.size(); ++i)
+				buttons[i]->setStateCountLimit(-1);
 		}
 		BlockWithButtons::setAdvanced(advanced);
 		showRangeControl = advanced;
