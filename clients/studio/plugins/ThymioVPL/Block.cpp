@@ -677,6 +677,7 @@ namespace Aseba { namespace ThymioVPL
 				case 0: indicationLEDs[i]->setOpacity(0); break;
 				case 1: indicationLEDs[i]->setOpacity(1); break;
 				case 2: indicationLEDs[i]->setOpacity(0); break;
+				case 3: indicationLEDs[i]->setOpacity(0); break;
 				default: assert(false);
 			}
 		}
