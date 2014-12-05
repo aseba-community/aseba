@@ -1,0 +1,8 @@
+GET /uri/a/b/c HTTP/1.1
+Host: localhost
+Content-Length: 19
+
+payload uri a b c
+GET /uri HTTP/1.1
+Host: localhost
+
