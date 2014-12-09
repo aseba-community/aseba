@@ -76,6 +76,7 @@ namespace Aseba
         virtual void aeslLoadMemory(const char* buffer, const int size);
         virtual mg_result evNodes(struct mg_connection* conn, strings& args);
         virtual mg_result evVariableOrEvent(struct mg_connection* conn, strings& args);
+        virtual mg_result evSubscribe(struct mg_connection *conn, strings& args);
         virtual mg_result evLoad(struct mg_connection *conn, strings& args);
         
     protected:

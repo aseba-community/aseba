@@ -25,13 +25,13 @@
     - POST /nodes/:NODENAME/:EVENT (fixme: sloppily allows GET and values in the request)
     - handle asynchronous variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
+    - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
  
  TODO:
     - allow only POST requests for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
     - form processing for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
     - handle more than just one Thymio-II node!
     - program flashing (PUT  /nodes/:NODENAME)
-    - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
  
  This code includes source code from the Mongoose embedded web server from Cesanta
  Software Limited, Dublin, Ireland, and licensed under the GPL 2.
@@ -85,6 +85,11 @@
 #if DASHEL_VERSION_INT < 10003
 #	error "You need at least Dashel version 1.0.3 to compile Http"
 #endif // DAHSEL_VERSION_INT
+
+// forward
+//static int user_message(struct mg_connection *conn, enum mg_event ev);
+static int http_event_handler(struct mg_connection *conn, enum mg_event ev);
+
 
 // hack because I don't understand locales yet
 char* wstringtocstr(std::wstring w)
@@ -166,6 +171,12 @@ namespace Aseba
             // the node descriptions in background
             DescriptionsManager::processMessage(message);
             
+            if (! http_server)
+            {
+                cout << "incomingData NO http_server" << endl;
+                return;
+            }
+            
             // if variables, check for pending requests
             const Variables *variables(dynamic_cast<Variables *>(message));
             if (variables)
@@ -178,14 +189,10 @@ namespace Aseba
                 
                 pending_variable pending = pending_vars_map[std::make_pair(variables->source,variables->start)];
                 if (pending.connection) {
-                    //mg_printf(pending.connection, "{ \"name\": \"%s\", \"result\": [ %s ] }\n", pending.name.c_str(), result);
-                    //pending.connection->connection_param = this; // just a flag for next MG_POLL
                     pending.result = result;
                     pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
                 }
                 
-//                mg_wakeup_server_ex(http_server, check_receive_variable, "%u %u %s",
-//                                    variables->source, variables->start, (const char*)result);
                 free(result);
             }
             
@@ -193,11 +200,29 @@ namespace Aseba
             const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
             if (userMsg)
             {
-                // In the HTTP world we should set up a stream of Server-Sent Events for this.
+                if (verbose)
+                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
+                // In the HTTP world we set up a stream of Server-Sent Events for this.
                 // Useful bits:
-                //  userMessage->type
-                //  userMessage->data
-                //  commonDefinitions.events[userMessage->type].name
+                //  userMsg->type
+                //  userMsg->data
+                //  commonDefinitions.events[userMsg->type].name
+                for (struct mg_connection * c = mg_next(http_server, NULL); c != NULL; c = mg_next(http_server, c)) {
+                    if (! c->connection_param)
+                        continue;
+                    strings& tokens = *((strings *)c->connection_param);
+                    if (tokens.size() >= 1 && strcmp(tokens[0].c_str(),"events")==0)
+                    {
+                        const char* filter_event = tokens[1].c_str();
+                        const char* this_event = wstringtocstr(commonDefinitions.events[userMsg->type].name);
+                        if (tokens.size() >= 2 && strcmp(filter_event,this_event)!=0)
+                            return;
+                        mg_printf(c, "data: %s", wstringtocstr(commonDefinitions.events[userMsg->type].name));
+                        for (size_t i = 0; i < userMsg->data.size(); ++i)
+                            mg_printf(c, " %d", userMsg->data[i]);
+                        mg_printf(c, "\n\n");
+                    }
+                }
             }
             
             delete message;
@@ -455,6 +480,13 @@ namespace Aseba
             }
         }
         return true;
+    }
+    
+    // Subscribe to an event stream
+    mg_result HttpInterface::evSubscribe(struct mg_connection *conn, strings& args)
+    {
+        conn->connection_param = new strings(args);
+        return MG_MORE;
     }
     
     // Flash a program into the node, and remember it for introspection
@@ -715,12 +747,9 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
         case MG_REQUEST:
             if (!strncmp(conn->uri, "/nodes", 6))
             {
-                std::stringstream ss(conn->uri);
                 std::vector<std::string> tokens;
-                std::string item;
-                std::getline(ss, item, '/');std::getline(ss, item, '/'); // skip first (empty) and second ("nodes")
-                while (std::getline(ss, item, '/'))
-                    tokens.push_back(item);
+                split_string(std::string(conn->uri), '/', tokens);
+                tokens.erase(tokens.begin(),tokens.begin()+1);
                 
                 if (tokens.size() <= 1)
                 {
@@ -730,9 +759,23 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
                     else
                         return network->evNodes(conn, tokens);
                 }
+                else if (tokens.size() >= 2 && strcmp(tokens[1].c_str(),"events")==0)
+                {
+                    tokens.erase(tokens.begin(),tokens.begin()+1);
+                    return network->evSubscribe(conn, tokens);
+                }
                 else
+                {
+                    conn->connection_param = new std::vector<std::string>(tokens);
                     return network->evVariableOrEvent(conn, tokens);
+                }
                 return MG_TRUE;
+            }
+            if (!strncmp(conn->uri, "/events", 7))
+            {
+                std::vector<std::string> tokens;
+                split_string(std::string(conn->uri), '/', tokens);
+                return network->evSubscribe(conn, tokens);
             }
         case MG_POLL:
 //            std::cout << "MG_POLL cxn=" << conn << " param=" << conn->server_param << "\n";
