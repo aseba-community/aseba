@@ -196,6 +196,8 @@ namespace Aseba
                     pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
                 }
                 
+                variable_cache[pending.name] = std::vector<short>(variables->variables);
+                
                 free(result);
             }
             
@@ -217,10 +219,10 @@ namespace Aseba
                         const char* this_event = wstringtocstr(commonDefinitions.events[userMsg->type].name);
                         if (tokens.size() >= 2 && strcmp(filter_event,this_event)!=0)
                             return;
-                        mg_printf(c, "data: %s", wstringtocstr(commonDefinitions.events[userMsg->type].name));
+                        mg_printf_data(c, "data: %s", wstringtocstr(commonDefinitions.events[userMsg->type].name));
                         for (size_t i = 0; i < userMsg->data.size(); ++i)
-                            mg_printf(c, " %d", userMsg->data[i]);
-                        mg_printf(c, "\n\n");
+                            mg_printf_data(c, " %d", userMsg->data[i]);
+                        mg_printf_data(c, "\n\n");
                     }
                 }
             }
@@ -342,8 +344,6 @@ namespace Aseba
                 
                 pending_variable pending = { 0,0, values[0], conn };
                 
-                //pending_variable* pending = (pending_variable*)malloc(sizeof(pending_variable));
-                //strncpy(pending->name, values[0].c_str(), 64);
                 unsigned source, start;
                 if (getNodeAndVarPos(nodeName, values[0], source, start))
                 {
@@ -504,6 +504,21 @@ namespace Aseba
         conn->connection_param = new strings(args);
         return MG_MORE;
     }
+    
+    // Poll cached variable values
+    mg_result HttpInterface::evPoll(struct mg_connection *conn)
+    {
+        for (std::map<std::string, std::vector<short> >::iterator it=variable_cache.begin(); it != variable_cache.end(); ++it)
+        {
+            mg_printf_data(conn, "%s", it->first.c_str());
+            for (std::vector<short>::iterator i = it->second.begin(); i != it->second.end(); ++i)
+                mg_printf_data(conn, " %d", *i);
+            mg_printf_data(conn, "\n");
+        }
+        mg_printf_data(conn, "\n");
+        return MG_TRUE;
+    }
+
     
     // Flash a program into the node, and remember it for introspection
     mg_result HttpInterface::evLoad(struct mg_connection *conn, strings& args)
@@ -794,12 +809,16 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
                 split_string(std::string(conn->uri), '/', tokens);
                 return network->evSubscribe(conn, tokens);
             }
+            if (!strncmp(conn->uri, "/poll", 7))
+            {
+                return network->evPoll(conn);
+            }
         case MG_POLL:
 //            std::cout << "MG_POLL cxn=" << conn << " param=" << conn->server_param << "\n";
             if (Aseba::HttpInterface::pending_variable* pending = network->pending_cxn_map[conn])
                 if (! pending->result.empty())
                 {
-                    mg_printf(conn, "{ \"name\": \"%s\", \"result\": [ %s ] }\n",
+                    mg_printf_data(conn, "{ \"name\": \"%s\", \"result\": [ %s ] }\n",
                               pending->name.c_str(), pending->result.c_str());
                     network->pending_cxn_map.erase(conn);
                     return MG_TRUE;
