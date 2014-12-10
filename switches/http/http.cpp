@@ -21,17 +21,18 @@
     - Dashel connection to one Thymio-II and round-robin scheduling between Dashel and Mongoose
     - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
     - GET /nodes, GET /nodes/:NODENAME with introspection
-    - POST /nodes/:NODENAME/:VARIABLE (fixme: sloppily allows GET and values in the request)
-    - POST /nodes/:NODENAME/:EVENT (fixme: sloppily allows GET and values in the request)
+    - POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE[/:VALUE]*)
+    - POST /nodes/:NODENAME/:EVENT (sloppily allows GET /nodes/:NODENAME/:EVENT[/:VALUE]*)
+    - form processing for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
     - handle asynchronous variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
+    - program flashing (PUT  /nodes/:NODENAME)
+      use curl --data-urlencode "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
  
  TODO:
-    - allow only POST requests for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
-    - form processing for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
+    - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
     - handle more than just one Thymio-II node!
-    - program flashing (PUT  /nodes/:NODENAME)
  
  This code includes source code from the Mongoose embedded web server from Cesanta
  Software Limited, Dublin, Ireland, and licensed under the GPL 2.
@@ -104,9 +105,11 @@ void split_string(std::string s, char delim, std::vector<std::string>& tokens)
 {
     std::stringstream ss( s );
     std::string item;
-    std::getline(ss, item, delim);
-    while (std::getline(ss, item, '/'))
+    //std::getline(ss, item, delim);
+    while (std::getline(ss, item, delim))
         tokens.push_back(item);
+    if (tokens[0].size() == 0)
+        tokens.erase(tokens.begin(),tokens.begin()+1);
 }
 
 namespace Aseba
@@ -173,7 +176,7 @@ namespace Aseba
             
             if (! http_server)
             {
-                cout << "incomingData NO http_server" << endl;
+                //cout << "incomingData NO http_server" << endl;
                 return;
             }
             
@@ -200,13 +203,10 @@ namespace Aseba
             const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
             if (userMsg)
             {
-                if (verbose)
-                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
+//                if (verbose)
+//                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
                 // In the HTTP world we set up a stream of Server-Sent Events for this.
-                // Useful bits:
-                //  userMsg->type
-                //  userMsg->data
-                //  commonDefinitions.events[userMsg->type].name
+                // Note that event name is in commonDefinitions.events[userMsg->type].name
                 for (struct mg_connection * c = mg_next(http_server, NULL); c != NULL; c = mg_next(http_server, c)) {
                     if (! c->connection_param)
                         continue;
@@ -311,7 +311,7 @@ namespace Aseba
         if (!commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
         {
             // this is a variable
-            if (strcmp(conn->request_method, "PUT") == 0 || conn->query_string != NULL || args.size() >= 3)
+            if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL || args.size() >= 3)
             {
                 // set variable value
                 strings values;
@@ -319,8 +319,16 @@ namespace Aseba
                     values.assign(args.begin()+1, args.end());
                 else
                 {
-                    // TODO parse POST form data
+                    // Parse POST form data
+                    char buffer[8 * 1024]; // if more would need to use multipart chunking
+                    if (mg_get_var(conn, args[1].c_str(), buffer, 8*1024) > 0)
+                    {
+                        split_string(std::string(buffer), ' ', values);
+                        values.insert(values.begin(), args[1].c_str());
+                    }
                 }
+                if (values.size() == 0)
+                    return MG_FALSE;
                 setVariable(nodeName, values);
                 mg_send_data(conn, NULL, 0);
                 return MG_TRUE;
@@ -359,9 +367,17 @@ namespace Aseba
             if (args.size() >= 3)
                 for (size_t i=2; i<args.size(); ++i)
                     data.push_back(atoi(args[i].c_str()));
-            else
+            else if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL)
             {
-                // TODO parse POST form data
+                // Parse POST form data
+                char buffer[8 * 1024]; // if more would need to use multipart chunking
+                if (mg_get_var(conn, args[1].c_str(), buffer, 8*1024) > 0)
+                {
+                    strings values;
+                    split_string(std::string(buffer), ' ', values);
+                    for (size_t i=0; i<values.size(); ++i)
+                        data.push_back(atoi(values[i].c_str()));
+                }
             }
             UserMessage userMessage(eventPos, data);
             userMessage.serialize(asebaStream);
@@ -499,6 +515,7 @@ namespace Aseba
         if (size > 0)
         {
             aeslLoadMemory(buffer, size);
+            mg_printf_data(conn,"\n");
             return MG_TRUE; // assume success (!)
         }
         return MG_FALSE; // send error result
@@ -844,7 +861,8 @@ int main(int argc, char *argv[])
         network->http_server = mg_create_server((void*)network, http_event_handler);
         mg_set_option(network->http_server, "document_root", ".");      // Serve current directory -- should disallow this!!
         mg_set_option(network->http_server, "listening_port", http_port.c_str());  // Open port 3000
-        
+        mg_set_option(network->http_server, "auth_domain", "inirobot.inria.fr");
+
         for (;;) {
             // single-threaded polling loop, limited to around 20 Hz. Expect more traffic on Dashel than on HTTP.
             mg_poll_server(network->http_server, 10);
