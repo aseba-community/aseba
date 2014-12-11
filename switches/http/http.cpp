@@ -569,7 +569,7 @@ namespace Aseba
                 args.push_back("motor.left.target");
                 args.push_back("0");
                 setVariable(nodeName, args);
-                args[1] = "motor.right.target";
+                args[0] = "motor.right.target";
                 setVariable(nodeName, args);
             }
             size_t eventPos;
