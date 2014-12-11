@@ -71,17 +71,19 @@ namespace Aseba
         pending_variable_map pending_vars_map;
         
         //variable cache
-        std::map<std::string, std::vector<short> > variable_cache;
+        std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
         
     public:
         HttpInterface(const std::string& target, const std::string& http_port);
         virtual void aeslLoadFile(const std::string& filename);
         virtual void aeslLoadMemory(const char* buffer, const int size);
+        virtual void updateVariables(const std::string nodeName);
         virtual mg_result evNodes(struct mg_connection* conn, strings& args);
         virtual mg_result evVariableOrEvent(struct mg_connection* conn, strings& args);
         virtual mg_result evSubscribe(struct mg_connection *conn, strings& args);
         virtual mg_result evLoad(struct mg_connection *conn, strings& args);
-        virtual mg_result evPoll(struct mg_connection *conn);
+        virtual mg_result evPoll(struct mg_connection *conn, strings& args);
+        virtual mg_result evReset(struct mg_connection *conn, strings& args);
         
     protected:
         /* // reimplemented from parent classes */

@@ -93,9 +93,9 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev);
 
 
 // hack because I don't understand locales yet
-char* wstringtocstr(std::wstring w)
+char* wstringtocstr(std::wstring w, char* name)
 {
-    char* name = (char*)malloc(128);
+    //char* name = (char*)malloc(128);
     std::wcstombs(name, w.c_str(), 127);
     return name;
 }
@@ -123,7 +123,7 @@ namespace Aseba
     HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port) :
     asebaStream(0),
     nodeId(0),
-    verbose(true)
+    verbose(false)
     {
         // connect to the Aseba target
         std::cerr << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
@@ -176,7 +176,8 @@ namespace Aseba
             
             if (! http_server)
             {
-                //cout << "incomingData NO http_server" << endl;
+                if (verbose)
+                    cout << "incomingData NO http_server" << endl;
                 return;
             }
             
@@ -190,13 +191,13 @@ namespace Aseba
                 if (verbose)
                     cout << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result << endl;
                 
+                variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
+                
                 pending_variable pending = pending_vars_map[std::make_pair(variables->source,variables->start)];
                 if (pending.connection) {
                     pending.result = result;
                     pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
                 }
-                
-                variable_cache[pending.name] = std::vector<short>(variables->variables);
                 
                 free(result);
             }
@@ -205,8 +206,8 @@ namespace Aseba
             const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
             if (userMsg)
             {
-//                if (verbose)
-//                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
+                if (verbose)
+                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
                 // In the HTTP world we set up a stream of Server-Sent Events for this.
                 // Note that event name is in commonDefinitions.events[userMsg->type].name
                 for (struct mg_connection * c = mg_next(http_server, NULL); c != NULL; c = mg_next(http_server, c)) {
@@ -216,10 +217,12 @@ namespace Aseba
                     if (tokens.size() >= 1 && strcmp(tokens[0].c_str(),"events")==0)
                     {
                         const char* filter_event = tokens[1].c_str();
-                        const char* this_event = wstringtocstr(commonDefinitions.events[userMsg->type].name);
+                        char this_event[128];
+                        wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
                         if (tokens.size() >= 2 && strcmp(filter_event,this_event)!=0)
                             return;
-                        mg_printf_data(c, "data: %s", wstringtocstr(commonDefinitions.events[userMsg->type].name));
+                        mg_printf_data(c, "data: %s", this_event);
+                        free(this_event);
                         for (size_t i = 0; i < userMsg->data.size(); ++i)
                             mg_printf_data(c, " %d", userMsg->data[i]);
                         mg_printf_data(c, "\n\n");
@@ -256,9 +259,11 @@ namespace Aseba
             mg_printf_data(conn, "[\n");
         else
             indent[0] = 0;
+        
+        char wbuf[128];
 
         mg_printf_data(conn, "%s{\n", indent);
-        mg_printf_data(conn, "%s  \"name\": \"%s\",\n", indent, wstringtocstr(description.name));
+        mg_printf_data(conn, "%s  \"name\": \"%s\",\n", indent, wstringtocstr(description.name,wbuf));
         mg_printf_data(conn, "%s  \"protocolVersion\": \"%d\",\n", indent, description.protocolVersion);
         //mg_printf_data(conn, "    \"id\": \"%d\",\n", XXX);
         //mg_printf_data(conn, "    \"productId\": \"%d\",\n", XXX);
@@ -273,25 +278,25 @@ namespace Aseba
             mg_printf_data(conn, "    \"namedVariables\": {\n" );
             for (size_t i = 0; i < description.namedVariables.size(); ++i)
                 mg_printf_data(conn, "      \"%s\": %d,\n",
-                               wstringtocstr(description.namedVariables[i].name), description.namedVariables[i].size);
+                               wstringtocstr(description.namedVariables[i].name,wbuf), description.namedVariables[i].size);
             mg_printf_data(conn, "    },\n");
             // local events variables
             mg_printf_data(conn, "    \"localEvents\": [\n" );
             for (size_t i = 0; i < description.localEvents.size(); ++i)
                 mg_printf_data(conn, "      { \"name\": \"%s\", \"description\": \"%s\" }\n",
-                               wstringtocstr(description.localEvents[i].name), wstringtocstr(description.localEvents[i].description));
+                               wstringtocstr(description.localEvents[i].name,wbuf), wstringtocstr(description.localEvents[i].description,wbuf));
             mg_printf_data(conn, "    ],\n");
             // constants from introspection
             mg_printf_data(conn, "    \"constants\": [\n" );
             for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
                 mg_printf_data(conn, "      { \"name\": \"%s\", \"value\": %d }\n",
-                               wstringtocstr(commonDefinitions.constants[i].name), commonDefinitions.constants[i].value);
+                               wstringtocstr(commonDefinitions.constants[i].name,wbuf), commonDefinitions.constants[i].value);
             mg_printf_data(conn, "    ],\n");
             // events from introspection
             mg_printf_data(conn, "    \"events\": [\n" );
             for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
                 mg_printf_data(conn, "      { \"name\": \"%s\", \"size\": %d }\n",
-                               wstringtocstr(commonDefinitions.events[i].name), commonDefinitions.events[i].value);
+                               wstringtocstr(commonDefinitions.events[i].name,wbuf), commonDefinitions.events[i].value);
             mg_printf_data(conn, "    ],\n");
 
         }
@@ -353,7 +358,7 @@ namespace Aseba
                     conn->connection_param = &(pending_vars_map[std::make_pair(source,start)]); // doesn't work, connection forgets this
                     pending_cxn_map[conn] = &(pending_vars_map[std::make_pair(source,start)]);
                 }
-                if (verbose)
+                //if (verbose)
                     cout << "evVariableOrEevent schedule var " << pending.name << "(" << pending.source << ","
                     << pending.start << ") cxn=" << pending.connection << endl;
                 return MG_TRUE; //MG_MORE;
@@ -363,10 +368,11 @@ namespace Aseba
         {
             // this is an event
             // arguments are args 1..N
-            UserMessage::DataVector data;
+            strings data;
+            data.push_back(args[1]);
             if (args.size() >= 3)
                 for (size_t i=2; i<args.size(); ++i)
-                    data.push_back(atoi(args[i].c_str()));
+                    data.push_back((args[i].c_str()));
             else if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL)
             {
                 // Parse POST form data
@@ -376,12 +382,10 @@ namespace Aseba
                     strings values;
                     split_string(std::string(buffer), ' ', values);
                     for (size_t i=0; i<values.size(); ++i)
-                        data.push_back(atoi(values[i].c_str()));
+                        data.push_back((values[i].c_str()));
                 }
             }
-            UserMessage userMessage(eventPos, data);
-            userMessage.serialize(asebaStream);
-            asebaStream->flush();
+            sendEvent(nodeName, data);
             mg_send_data(conn, NULL, 0);
             return MG_TRUE;
         }
@@ -389,26 +393,20 @@ namespace Aseba
 
     void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
     {
-        // check that there are enough arguments
-        if (args.size() < 2)
-        {
-            wcerr << "missing argument, usage: emit EVENT_NAME EVENT_DATA*" << endl;
-            return;
-        }
-        size_t pos;
-        if (!commonDefinitions.events.contains(UTF8ToWString(args[1]), &pos))
-        {
-            wcerr << "event " << UTF8ToWString(args[1]) << " is unknown" << endl;
-            return;
-        }
+        size_t eventPos;
         
-        // build event and emit
-        UserMessage::DataVector data;
-        for (size_t i=2; i<args.size(); ++i)
-            data.push_back(atoi(args[i].c_str()));
-        UserMessage userMessage(pos, data);
-        userMessage.serialize(asebaStream);
-        asebaStream->flush();
+        if (commonDefinitions.events.contains(UTF8ToWString(args[0]), &eventPos))
+        {
+            // build event and emit
+            UserMessage::DataVector data;
+            for (size_t i=1; i<args.size(); ++i)
+                data.push_back(atoi(args[i].c_str()));
+            UserMessage userMessage(eventPos, data);
+            userMessage.serialize(asebaStream);
+            asebaStream->flush();
+        }
+        else if (verbose)
+            cerr << "sendEvent " << nodeName << ": no event " << args[0] << endl;
     }
     
     void HttpInterface::getVariables(const std::string nodeName, const strings& args)
@@ -422,10 +420,12 @@ namespace Aseba
             const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
             if (!exists)
                 continue;
-            bool ok;
-            const unsigned length(getVariableSize(nodePos, UTF8ToWString(*it), &ok));
-            if (!ok)
-                continue;
+//            bool ok;
+//            const unsigned length(getVariableSize(nodePos, UTF8ToWString(*it), &ok));
+//            if (!ok)
+//                continue;
+            VariablesMap vm = allVariables[nodeName];
+            const unsigned length(vm[UTF8ToWString(*it)].second);
             
             if (verbose)
                 cout << " (" << nodePos << "," << varPos << "):" << length << "\n";
@@ -506,21 +506,94 @@ namespace Aseba
     }
     
     // Poll cached variable values
-    mg_result HttpInterface::evPoll(struct mg_connection *conn)
+    mg_result HttpInterface::evPoll(struct mg_connection *conn, strings& args)
     {
-        for (std::map<std::string, std::vector<short> >::iterator it=variable_cache.begin(); it != variable_cache.end(); ++it)
+        string nodeName("thymio-II");
+        bool ok;
+        nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
+
+        for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
         {
-            mg_printf_data(conn, "%s", it->first.c_str());
-            for (std::vector<short>::iterator i = it->second.begin(); i != it->second.end(); ++i)
-                mg_printf_data(conn, " %d", *i);
-            mg_printf_data(conn, "\n");
+            bool is_boolean_variable = (it->first.find(L"b_",0) == 0);
+            
+            std::vector<short> cachedval = variable_cache[std::make_pair(nodeId,it->second.first)];
+
+            std::stringstream result;
+            for (std::vector<short>::iterator i = cachedval.begin(); i != cachedval.end(); ++i)
+                if (is_boolean_variable)
+                    result << " " << (*i ? "true" : "false");
+                else
+                    result << " " << *i;
+            
+            char wbuf[128];
+            mg_printf_data(conn, "%s%s\n", wstringtocstr(it->first,wbuf), result.str().c_str());
+            
+            std::string patched_name(wbuf);
+            std::string::size_type n = 0;
+            while ( (n=patched_name.find(".",n)) != std::string::npos)
+                patched_name.replace(n,1,"/"), n += 1;
+
+            mg_printf_data(conn, "%s%s\n", patched_name.c_str(), result.str().c_str());
         }
         mg_printf_data(conn, "\n");
         return MG_TRUE;
     }
 
+    void HttpInterface::updateVariables(const std::string nodeName)
+    {
+        strings all_variables;
+        char wbuf[128];
+        for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
+            all_variables.push_back(wstringtocstr(it->first,wbuf));
+        getVariables(nodeName, all_variables);
+    }
+
+    // Reset nodes and rerun
+    mg_result HttpInterface::evReset(struct mg_connection *conn, strings& args)
+    {
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
+        {
+            bool ok;
+            nodeId = getNodeId(descIt->second.name, 0, &ok);
+            if (!ok)
+                continue;
+            char nodeName[128];
+            wstringtocstr(descIt->second.name, nodeName);
+            
+            this->lock(); // inherited from Dashel::Hub
+
+            Reset(nodeId).serialize(asebaStream); // reset node
+            asebaStream->flush();
+            Run(nodeId).serialize(asebaStream);   // re-run node
+            asebaStream->flush();
+            if (strcmp(nodeName, "thymio-II") == 0)
+            {
+                strings args;
+                //args.push_back(nodeName);
+                args.push_back("motor.left.target");
+                args.push_back("0");
+                setVariable(nodeName, args);
+                args[1] = "motor.right.target";
+                setVariable(nodeName, args);
+            }
+            size_t eventPos;
+            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
+            {
+                strings data;
+                data.push_back("reset");
+                sendEvent(nodeName,data);
+            }
+
+            this->unlock();
+            
+            mg_send_data(conn, NULL, 0);
+            
+        }
+        return MG_TRUE;
+    }
     
-    // Flash a program into the node, and remember it for introspection
+    
+    // Compile and store a program into the node, and remember it for introspection
     mg_result HttpInterface::evLoad(struct mg_connection *conn, strings& args)
     {
         if (verbose)
@@ -545,7 +618,7 @@ namespace Aseba
         else
         {
             aeslLoad(doc);
-            if (verbose)
+            //if (verbose)
                 wcout << L"Loaded aesl script from " << filename.c_str() << "\n";
         }
     }
@@ -559,7 +632,7 @@ namespace Aseba
         else
         {
             aeslLoad(doc);
-            if (verbose)
+            //if (verbose)
                 wcout << L"Loaded aesl script in-memory buffer " << buffer << "\n";
         }
     }
@@ -710,6 +783,7 @@ namespace Aseba
             wcerr << noNodeCount << " scripts have no corresponding nodes in the current network and have not been loaded." << endl;
         }
     }
+    
     bool HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
     {
         // compile code
@@ -753,8 +827,9 @@ void dumpHelp(std::ostream &stream, const char *programName)
     stream << "Options:\n";
     stream << "-v, --verbose   : makes the switch verbose\n";
     stream << "-d, --dump      : makes the switch dump the content of messages\n";
-    stream << "-p port         : listens to incoming connection HTTP on this port\n";
-    stream << "-a aesl         : load program definitions from AESL file\n";
+    stream << "-p, --port port : listens to incoming connection HTTP on this port\n";
+    stream << "-a, --aesl file : load program definitions from AESL file\n";
+    stream << "-u, --update    : update variables at 10 Hz for polling\n";
     stream << "-h, --help      : shows this help\n";
     stream << "-V, --version   : shows the version number\n";
     stream << "Additional targets are any valid Dashel targets." << std::endl;
@@ -773,14 +848,16 @@ void dumpVersion(std::ostream &stream)
 // Mongoose
 static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
     Aseba::HttpInterface* network = (Aseba::HttpInterface*)conn->server_param; // else 505!
+    std::vector<std::string> tokens;
     switch (ev) {
         case MG_AUTH:
             return MG_TRUE;
         case MG_REQUEST:
+        {
+            split_string(std::string(conn->uri), '/', tokens);
+            // route based on uri prefix
             if (!strncmp(conn->uri, "/nodes", 6))
             {
-                std::vector<std::string> tokens;
-                split_string(std::string(conn->uri), '/', tokens);
                 tokens.erase(tokens.begin(),tokens.begin()+1);
                 
                 if (tokens.size() <= 1)
@@ -805,15 +882,19 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
             }
             if (!strncmp(conn->uri, "/events", 7))
             {
-                std::vector<std::string> tokens;
-                split_string(std::string(conn->uri), '/', tokens);
                 return network->evSubscribe(conn, tokens);
             }
             if (!strncmp(conn->uri, "/poll", 7))
             {
-                return network->evPoll(conn);
+                return network->evPoll(conn, tokens);
             }
+            if (!strncmp(conn->uri, "/reset", 7))
+            {
+                return network->evReset(conn, tokens);
+            }
+        }
         case MG_POLL:
+        {
 //            std::cout << "MG_POLL cxn=" << conn << " param=" << conn->server_param << "\n";
             if (Aseba::HttpInterface::pending_variable* pending = network->pending_cxn_map[conn])
                 if (! pending->result.empty())
@@ -824,6 +905,9 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
                     return MG_TRUE;
                 }
             return MG_FALSE; // since pending variable request not yet satisfied...
+        }
+        case MG_CLOSE:
+            delete (std::vector<std::string> *)conn->connection_param;
         default:
             return MG_FALSE;
     }
@@ -838,6 +922,7 @@ int main(int argc, char *argv[])
     std::string aesl_filename;
     std::string dashel_target;
     bool verbose = false;
+    bool update = false;
     bool dump = false;
     
     // process command line
@@ -852,7 +937,9 @@ int main(int argc, char *argv[])
             dump = true;
         else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
             dumpHelp(std::cout, argv[0]), exit(1);
-        else if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--version") == 0))
+        else if ((strcmp(arg, "-u") == 0) || (strcmp(arg, "--update") == 0))
+            update = true;
+        else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
             dumpVersion(std::cout), exit(1);
         else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0))
             http_port = argv[argCounter++];
@@ -885,6 +972,8 @@ int main(int argc, char *argv[])
         for (;;) {
             // single-threaded polling loop, limited to around 20 Hz. Expect more traffic on Dashel than on HTTP.
             mg_poll_server(network->http_server, 10);
+            if (update)
+                network->updateVariables("thymio-II");
             for (int i = 0; i < 5; i++)
                 network->step(2); // inherited from Dashel::Hub; poll Dashel once, or timeout
         }
