@@ -451,11 +451,7 @@ namespace Aseba
         // send the message
         SetVariables::VariablesVector data;
         for (size_t i=1; i<args.size(); ++i)
-        {
             data.push_back(atoi(args[i].c_str()));
-            cout << " " << args[i].c_str();
-        }
-        cout << "\n";
         SetVariables setVariables(nodePos, varPos, data);
         setVariables.serialize(asebaStream);
         asebaStream->flush();
@@ -884,11 +880,11 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
             {
                 return network->evSubscribe(conn, tokens);
             }
-            if (!strncmp(conn->uri, "/poll", 7))
+            if (!strncmp(conn->uri, "/poll", 5))
             {
                 return network->evPoll(conn, tokens);
             }
-            if (!strncmp(conn->uri, "/reset", 7))
+            if (!strncmp(conn->uri, "/reset", 6) || !strncmp(conn->uri, "/reset_all", 10))
             {
                 return network->evReset(conn, tokens);
             }
