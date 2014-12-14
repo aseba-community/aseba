@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <queue>
 #include <dashel/dashel.h>
+#include <libjson/libjson.h>
 #include "mongoose.h"
 #include "../../common/msg/msg.h"
 #include "../../common/msg/descriptions-manager.h"
@@ -50,10 +51,11 @@ namespace Aseba
         typedef std::map<std::string, Aseba::VariablesMap> NodeNameToVariablesMap;
         // embedded http server
         struct mg_server *http_server;
-        struct pending_variable  {  unsigned source;  unsigned start;  std::string name; struct mg_connection* connection; std::string result;};
+        struct pending_variable  {  unsigned source;  unsigned start;  std::string name; struct mg_connection* connection; JSONNode result;};
         typedef std::map<std::pair<unsigned,unsigned>, pending_variable> pending_variable_map;
         // remember pending variables
         std::map<struct mg_connection *, pending_variable *> pending_cxn_map;
+        JSONNode nodeInfoJson;
 
     protected:
         // streams
@@ -92,11 +94,12 @@ namespace Aseba
         virtual void incomingData(Dashel::Stream* stream);
         virtual void nodeDescriptionReceived(unsigned nodeId);
         // specific to http interface
-        virtual void getVariables(const std::string nodeName, const strings& args);
+        virtual std::pair<unsigned,unsigned> getVariables(const std::string nodeName, const strings& args);
         virtual void setVariable(const std::string nodeName, const strings& args);
         virtual void sendEvent(const std::string nodeName, const strings& args);
         virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
         virtual void aeslLoad(xmlDoc* doc);
+        virtual void parse_json_form(std::string content, strings& values);
         
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;

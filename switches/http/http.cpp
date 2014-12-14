@@ -29,9 +29,9 @@
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
     - program flashing (PUT  /nodes/:NODENAME)
       use curl --data-urlencode "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
+    - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
  
  TODO:
-    - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
     - handle more than just one Thymio-II node!
  
  This code includes source code from the Mongoose embedded web server from Cesanta
@@ -69,6 +69,7 @@
 #include <valarray>
 #include <vector>
 #include <iterator>
+#include <libjson/libjson.h>
 #include "http.h"
 #include "mongoose.h"
 #include "../../common/consts.h"
@@ -110,6 +111,16 @@ void split_string(std::string s, char delim, std::vector<std::string>& tokens)
         tokens.push_back(item);
     if (tokens[0].size() == 0)
         tokens.erase(tokens.begin(),tokens.begin()+1);
+}
+
+// make JSON array from std::vector<short>
+JSONNode json_vector(std::string name, std::vector<short> cachedval)
+{
+    JSONNode node(JSON_NODE);
+    node.set_name(name);
+    for (std::vector<short>::iterator i = cachedval.begin(); i != cachedval.end(); ++i)
+        node.push_back(JSONNode(*i));
+    return node;
 }
 
 namespace Aseba
@@ -185,11 +196,16 @@ namespace Aseba
             const Variables *variables(dynamic_cast<Variables *>(message));
             if (variables)
             {
-                char* result = (char *)malloc(10 * variables->variables.size()), *pos = result;
+                JSONNode result(JSON_ARRAY);
+                result.set_name("result");
                 for (size_t i = 0; i < variables->variables.size(); ++i)
-                    pos += sprintf(pos, "%s%d", (i>0 ? "," : ""), variables->variables[i]);
+                    result.push_back(JSONNode("", variables->variables[i]));
+
+//                char* result = (char *)malloc(10 * variables->variables.size()), *pos = result;
+//                for (size_t i = 0; i < variables->variables.size(); ++i)
+//                    pos += sprintf(pos, "%s%d", (i>0 ? "," : ""), variables->variables[i]);
                 if (verbose)
-                    cout << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result << endl;
+                    cout << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result.write_formatted() << endl;
                 
                 variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
                 
@@ -199,7 +215,7 @@ namespace Aseba
                     pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
                 }
                 
-                free(result);
+                //free(result);
             }
             
             // if event, retransmit it on an HTTP SSE channel if one exists
@@ -243,67 +259,78 @@ namespace Aseba
     
     mg_result HttpInterface::evNodes(struct mg_connection *conn, strings& args)
     {
-        bool do_one_node(args.size() > 0 && !strcmp(args[0].c_str(),"thymio-II"));
-        char indent[] = "  ";
-
-        const NodesDescriptionsMap::const_iterator descIt(nodesDescriptions.find(nodeId));
-        const NodeDescription& description(descIt->second);
+        bool do_one_node(args.size() > 0);
         
-        strings desc_vars;
-        desc_vars.push_back("_id");
-        desc_vars.push_back("_fwversion");
-        desc_vars.push_back("_productId");
-        getVariables("thymio-II", desc_vars);
-
-        if (!do_one_node)
-            mg_printf_data(conn, "[\n");
-        else
-            indent[0] = 0;
+        JSONNode list(JSON_ARRAY);
         
-        char wbuf[128];
-
-        mg_printf_data(conn, "%s{\n", indent);
-        mg_printf_data(conn, "%s  \"name\": \"%s\",\n", indent, wstringtocstr(description.name,wbuf));
-        mg_printf_data(conn, "%s  \"protocolVersion\": \"%d\",\n", indent, description.protocolVersion);
-        //mg_printf_data(conn, "    \"id\": \"%d\",\n", XXX);
-        //mg_printf_data(conn, "    \"productId\": \"%d\",\n", XXX);
-        //mg_printf_data(conn, "    \"firmwareVersion\": \"%d\",\n", XXX);
-        if (do_one_node)
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
         {
-            // For one node, list details
-            mg_printf_data(conn, "    \"bytecodeSize\": \"%d\",\n",  description.bytecodeSize);
-            mg_printf_data(conn, "    \"variablesSize\": \"%d\",\n", description.variablesSize);
-            mg_printf_data(conn, "    \"stackSize\": \"%d\",\n",     description.stackSize);
-            // named variables
-            mg_printf_data(conn, "    \"namedVariables\": {\n" );
-            for (size_t i = 0; i < description.namedVariables.size(); ++i)
-                mg_printf_data(conn, "      \"%s\": %d,\n",
-                               wstringtocstr(description.namedVariables[i].name,wbuf), description.namedVariables[i].size);
-            mg_printf_data(conn, "    },\n");
-            // local events variables
-            mg_printf_data(conn, "    \"localEvents\": [\n" );
-            for (size_t i = 0; i < description.localEvents.size(); ++i)
-                mg_printf_data(conn, "      { \"name\": \"%s\", \"description\": \"%s\" }\n",
-                               wstringtocstr(description.localEvents[i].name,wbuf), wstringtocstr(description.localEvents[i].description,wbuf));
-            mg_printf_data(conn, "    ],\n");
-            // constants from introspection
-            mg_printf_data(conn, "    \"constants\": [\n" );
-            for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
-                mg_printf_data(conn, "      { \"name\": \"%s\", \"value\": %d }\n",
-                               wstringtocstr(commonDefinitions.constants[i].name,wbuf), commonDefinitions.constants[i].value);
-            mg_printf_data(conn, "    ],\n");
-            // events from introspection
-            mg_printf_data(conn, "    \"events\": [\n" );
-            for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
-                mg_printf_data(conn, "      { \"name\": \"%s\", \"size\": %d }\n",
-                               wstringtocstr(commonDefinitions.events[i].name,wbuf), commonDefinitions.events[i].value);
-            mg_printf_data(conn, "    ],\n");
+            const NodeDescription& description(descIt->second);
+            
+//            strings vars;
+//            vars.push_back("_id");      std::pair<unsigned,unsigned> addr_id = getVariables("thymio-II", vars);
+//            vars[0] = "_fwversion";     std::pair<unsigned,unsigned> addr_fw = getVariables("thymio-II", vars);
+//            vars[0] = "_productId";     std::pair<unsigned,unsigned> addr_pi = getVariables("thymio-II", vars);
+            
+            char wbuf[128];
+            
+            JSONNode node(JSON_NODE);
+            node.set_name("nodeInfo");
+            node.push_back(JSONNode("name", wstringtocstr(description.name,wbuf)));
+            node.push_back(JSONNode("protocolVersion", description.protocolVersion));
+//            // if available, need to get _id, _productId, _fwVersion from variable cache ...
+//            node.push_back(json_vector("id", variable_cache[addr_id]));
+//            node.push_back(json_vector("productId", variable_cache[addr_pi]));
+//            node.push_back(json_vector("firmwareVersion", variable_cache[addr_fw]));
 
+            
+            if (do_one_node)
+            {
+                node.push_back(JSONNode("bytecodeSize", description.bytecodeSize));
+                node.push_back(JSONNode("variablesSize", description.variablesSize));
+                node.push_back(JSONNode("stackSize", description.stackSize));
+                
+                // named variables
+                JSONNode named_variables(JSON_NODE);
+                named_variables.set_name("namedVariables");
+                for (size_t i = 0; i < description.namedVariables.size(); ++i)
+                    named_variables.push_back(JSONNode(wstringtocstr(description.namedVariables[i].name,wbuf),
+                                                       description.namedVariables[i].size));
+                node.push_back(named_variables);
+                
+                // local events variables
+                JSONNode local_events(JSON_NODE);
+                local_events.set_name("localEvents");
+                for (size_t i = 0; i < description.localEvents.size(); ++i)
+                {
+                    string ev(wstringtocstr(description.localEvents[i].name,wbuf));
+                    local_events.push_back(JSONNode(ev,wstringtocstr(description.localEvents[i].description,wbuf)));
+                }
+                node.push_back(local_events);
+                
+                // constants from introspection
+                JSONNode constants(JSON_NODE);
+                constants.set_name("constants");
+                for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
+                    constants.push_back(JSONNode(wstringtocstr(commonDefinitions.constants[i].name,wbuf),
+                                                 commonDefinitions.constants[i].value));
+                node.push_back(constants);
+                
+                // events from introspection
+                JSONNode events(JSON_NODE);
+                events.set_name("events");
+                for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
+                    events.push_back(JSONNode(wstringtocstr(commonDefinitions.events[i].name,wbuf),
+                                              commonDefinitions.events[i].value));
+                node.push_back(events);
+            }
+            list.push_back(node);
         }
-        mg_printf_data(conn, "%s},\n", indent);
         
-        if (!do_one_node)
-            mg_printf_data(conn, "]");
+        std::string jc = (do_one_node && !list.empty()) ? list[0].write_formatted() : list.write_formatted();
+
+        mg_printf_data(conn, "%s\n", jc.c_str());
+
         return MG_TRUE;
     }
     
@@ -315,7 +342,7 @@ namespace Aseba
         string nodeName(args[0]);
         size_t eventPos;
         
-        if (!commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
+        if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
         {
             // this is a variable
             if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL || args.size() >= 3)
@@ -327,12 +354,8 @@ namespace Aseba
                 else
                 {
                     // Parse POST form data
-                    char buffer[8 * 1024]; // if more would need to use multipart chunking
-                    if (mg_get_var(conn, args[1].c_str(), buffer, 8*1024) > 0)
-                    {
-                        split_string(std::string(buffer), ' ', values);
-                        values.insert(values.begin(), args[1].c_str());
-                    }
+                    values.push_back(args[1]);
+                    parse_json_form(std::string(conn->content,conn->content_len), values);
                 }
                 if (values.size() == 0)
                     return MG_FALSE;
@@ -358,7 +381,7 @@ namespace Aseba
                     conn->connection_param = &(pending_vars_map[std::make_pair(source,start)]); // doesn't work, connection forgets this
                     pending_cxn_map[conn] = &(pending_vars_map[std::make_pair(source,start)]);
                 }
-                //if (verbose)
+                if (verbose)
                     cout << "evVariableOrEevent schedule var " << pending.name << "(" << pending.source << ","
                     << pending.start << ") cxn=" << pending.connection << endl;
                 return MG_TRUE; //MG_MORE;
@@ -376,21 +399,56 @@ namespace Aseba
             else if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL)
             {
                 // Parse POST form data
-                char buffer[8 * 1024]; // if more would need to use multipart chunking
-                if (mg_get_var(conn, args[1].c_str(), buffer, 8*1024) > 0)
-                {
-                    strings values;
-                    split_string(std::string(buffer), ' ', values);
-                    for (size_t i=0; i<values.size(); ++i)
-                        data.push_back((values[i].c_str()));
-                }
+                parse_json_form(std::string(conn->content,conn->content_len), data);
             }
             sendEvent(nodeName, data);
             mg_send_data(conn, NULL, 0);
+//            JSONNode n(JSON_NODE);
+//            n.push_back(JSONNode("return_value", JSON_NULL));
+//            n.push_back(JSONNode("cmd", "sendEvent"));
+//            n.push_back(JSONNode("name", nodeName));
+//            mg_printf_data(conn, "%s\n", libjson::strip_white_space(n.write_formatted()).c_str());
+
             return MG_TRUE;
         }
     }
 
+    void HttpInterface::parse_json_form(std::string content, strings& values)
+    {
+        try
+        {
+            JSONNode form = libjson::parse(content);
+
+            if (form.type() == JSON_ARRAY)
+            {
+                // array of scalars
+                for (JSONNode::const_iterator i = form.begin(); i != form.end(); ++i)
+                    values.push_back(i->as_string());
+            }
+            else if (form.type() == JSON_NODE)
+            {
+                // hash that must contain args: member
+                JSONNode::const_iterator args = form.find("args");
+                if ( ! args->empty())
+                {
+                    for (JSONNode::const_iterator i = args->begin(); i != args->end(); ++i)
+                        values.push_back(i->as_string());
+                }
+            }
+            else {
+                // a single scalar value -- this is probably not allowed
+                // values is empty, request will fail
+            }
+        }
+        catch(std::invalid_argument e)
+        {
+            std::cerr << "Invalid JSON value \"" << content << "\"; libjson exception: " << e.what() << std::endl;
+            // values is empty, request will fail
+        }
+        
+        return;
+    }
+    
     void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
     {
         size_t eventPos;
@@ -409,14 +467,14 @@ namespace Aseba
             cerr << "sendEvent " << nodeName << ": no event " << args[0] << endl;
     }
     
-    void HttpInterface::getVariables(const std::string nodeName, const strings& args)
+    std::pair<unsigned,unsigned> HttpInterface::getVariables(const std::string nodeName, const strings& args)
     {
+        unsigned nodePos, varPos;
         for (strings::const_iterator it(args.begin()); it != args.end(); ++it)
         {
             // get node id, variable position and length
             if (verbose)
                 cout << "getVariables " << nodeName << " " << *it;
-            unsigned nodePos, varPos;
             const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
             if (!exists)
                 continue;
@@ -427,6 +485,8 @@ namespace Aseba
             VariablesMap vm = allVariables[nodeName];
             const unsigned length(vm[UTF8ToWString(*it)].second);
             
+            variable_cache[std::pair<unsigned,unsigned>(nodePos,varPos)] = std::vector<short>();
+            
             if (verbose)
                 cout << " (" << nodePos << "," << varPos << "):" << length << "\n";
             // send the message
@@ -434,6 +494,7 @@ namespace Aseba
             getVariables.serialize(asebaStream);
         }
         asebaStream->flush();
+        return std::pair<unsigned,unsigned>(nodePos,varPos); // just last one
     }
     
     void HttpInterface::setVariable(const std::string nodeName, const strings& args)
@@ -525,11 +586,13 @@ namespace Aseba
             mg_printf_data(conn, "%s%s\n", wstringtocstr(it->first,wbuf), result.str().c_str());
             
             std::string patched_name(wbuf);
-            std::string::size_type n = 0;
-            while ( (n=patched_name.find(".",n)) != std::string::npos)
-                patched_name.replace(n,1,"/"), n += 1;
-
-            mg_printf_data(conn, "%s%s\n", patched_name.c_str(), result.str().c_str());
+            if (patched_name.find(".") != std::string::npos)
+            {
+                std::string::size_type n = 0;
+                while ( (n=patched_name.find(".",n)) != std::string::npos)
+                    patched_name.replace(n,1,"/"), n += 1;
+                mg_printf_data(conn, "%s%s\n", patched_name.c_str(), result.str().c_str());
+            }
         }
         mg_printf_data(conn, "\n");
         return MG_TRUE;
@@ -616,6 +679,10 @@ namespace Aseba
             aeslLoad(doc);
             //if (verbose)
                 wcout << L"Loaded aesl script from " << filename.c_str() << "\n";
+            this->nodeInfoJson = JSONNode(JSON_NODE);
+            this->nodeInfoJson.set_name("nodeInfo");
+            this->nodeInfoJson.push_back(JSONNode("id", this->nodeId));
+            this->nodeInfoJson.push_back(JSONNode("connected", true));
         }
     }
 
@@ -895,8 +962,14 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
             if (Aseba::HttpInterface::pending_variable* pending = network->pending_cxn_map[conn])
                 if (! pending->result.empty())
                 {
-                    mg_printf_data(conn, "{ \"name\": \"%s\", \"result\": [ %s ] }\n",
-                              pending->name.c_str(), pending->result.c_str());
+                    JSONNode n(JSON_NODE);
+                    n.push_back(pending->result);
+                    n.push_back(JSONNode("cmd", "getVariable"));
+                    n.push_back(JSONNode("name", pending->name.c_str()));
+                    n.push_back(network->nodeInfoJson);
+                    std::string jc = n.write_formatted();
+
+                    mg_printf_data(conn, "%s\n", libjson::strip_white_space(jc).c_str());
                     network->pending_cxn_map.erase(conn);
                     return MG_TRUE;
                 }
