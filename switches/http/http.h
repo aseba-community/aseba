@@ -25,7 +25,6 @@
 #include <queue>
 #include <dashel/dashel.h>
 #include <libjson/libjson.h>
-#include "mongoose.h"
 #include "../../common/msg/msg.h"
 #include "../../common/msg/descriptions-manager.h"
 
@@ -35,6 +34,8 @@
 #endif
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 
 namespace Aseba
 {
@@ -43,6 +44,8 @@ namespace Aseba
      */
     /*@{*/
     
+    class HttpRequest;
+    
     //! HTTP interface for aseba network
     class HttpInterface:  public Dashel::Hub, public Aseba::DescriptionsManager
     {
@@ -50,17 +53,25 @@ namespace Aseba
         typedef std::vector<std::string> strings;
         typedef std::map<std::string, Aseba::VariablesMap> NodeNameToVariablesMap;
         // embedded http server
-        struct mg_server *http_server;
-        struct pending_variable  {  unsigned source;  unsigned start;  std::string name; struct mg_connection* connection; JSONNode result;};
+        struct pending_variable  {  unsigned source;  unsigned start;  std::string name; Dashel::Stream* connection; JSONNode result;};
         typedef std::map<std::pair<unsigned,unsigned>, pending_variable> pending_variable_map;
-        // remember pending variables
-        std::map<struct mg_connection *, pending_variable *> pending_cxn_map;
+        struct http_request {
+            std::string method;
+            std::string uri;
+            strings tokens;
+            std::map<std::string,std::string> headers;
+            bool headers_done;
+            std::string content;
+        };
         JSONNode nodeInfoJson;
 
     protected:
         // streams
         Dashel::Stream* asebaStream;
+        Dashel::Stream* httpStream;
         std::vector<char*> knownNodes;
+        std::map<Dashel::Stream*, HttpRequest*> httpRequests;
+        std::map<Dashel::Stream*, std::set<std::string> > eventSubscriptions;
         unsigned nodeId;
         // debug variables
         bool verbose;
@@ -77,15 +88,14 @@ namespace Aseba
         
     public:
         HttpInterface(const std::string& target, const std::string& http_port);
+        virtual void evNodes(Dashel::Stream* conn, strings& args);
+        virtual void evVariableOrEvent(Dashel::Stream* conn, strings& args);
+        virtual void evSubscribe(Dashel::Stream* conn, strings& args);
+        virtual void evLoad(Dashel::Stream* conn, strings& args);
+        virtual void evReset(Dashel::Stream* conn, strings& args);
         virtual void aeslLoadFile(const std::string& filename);
         virtual void aeslLoadMemory(const char* buffer, const int size);
         virtual void updateVariables(const std::string nodeName);
-        virtual mg_result evNodes(struct mg_connection* conn, strings& args);
-        virtual mg_result evVariableOrEvent(struct mg_connection* conn, strings& args);
-        virtual mg_result evSubscribe(struct mg_connection *conn, strings& args);
-        virtual mg_result evLoad(struct mg_connection *conn, strings& args);
-        virtual mg_result evPoll(struct mg_connection *conn, strings& args);
-        virtual mg_result evReset(struct mg_connection *conn, strings& args);
         
     protected:
         /* // reimplemented from parent classes */
@@ -94,18 +104,49 @@ namespace Aseba
         virtual void incomingData(Dashel::Stream* stream);
         virtual void nodeDescriptionReceived(unsigned nodeId);
         // specific to http interface
-        virtual std::pair<unsigned,unsigned> getVariables(const std::string nodeName, const strings& args);
-        virtual void setVariable(const std::string nodeName, const strings& args);
         virtual void sendEvent(const std::string nodeName, const strings& args);
+        virtual void sendSetVariable(const std::string nodeName, const strings& args);
+        virtual std::pair<unsigned,unsigned> sendGetVariables(const std::string nodeName, const strings& args);
         virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
         virtual void aeslLoad(xmlDoc* doc);
-        virtual void parse_json_form(std::string content, strings& values);
+        virtual void incomingVariables(const Variables *variables);
+        virtual void incomingUserMsg(const UserMessage *userMsg);
+        virtual void routeRequest(HttpRequest* req);
         
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
         bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
+        virtual void parse_json_form(std::string content, strings& values);
 
     };
+    
+    class HttpRequest
+    {
+    public:
+        typedef std::vector<std::string> strings;
+        std::string method;
+        std::string uri;
+        Dashel::Stream* stream;
+        strings tokens;
+        std::map<std::string,std::string> headers;
+        std::string content;
+        bool complete;
+    protected:
+        bool headers_done;
+        bool verbose;
+        
+    public:
+        HttpRequest();
+        virtual ~HttpRequest();
+        HttpRequest( std::string const& method,  std::string const& uri, Dashel::Stream *stream);
+        virtual void incomingData();
+        virtual void sendStatus(unsigned status, std::string& payload, strings& headers);
+        virtual void sendStatus(unsigned status, std::string& payload);
+        virtual void sendStatus(unsigned status, strings& headers);
+        virtual void sendStatus(unsigned status);
+    };
+
+
     /*@}*/
 };
 

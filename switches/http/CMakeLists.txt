@@ -8,11 +8,9 @@ if (LIBXML2_FOUND AND LIBJSON_FOUND)
 
 	set(http_SRCS
 		http.cpp
-		mongoose.c
 	)
 	set(http_MOCS
 		http.h
-		mongoose.h
 	)
 	
 	add_executable(asebahttp ${http_SRCS} ${http_MOCS})

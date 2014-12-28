@@ -28,14 +28,11 @@
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
     - program flashing (PUT  /nodes/:NODENAME)
-      use curl --data-urlencode "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
+      use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
     - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
  
  TODO:
     - handle more than just one Thymio-II node!
- 
- This code includes source code from the Mongoose embedded web server from Cesanta
- Software Limited, Dublin, Ireland, and licensed under the GPL 2.
  
  This code borrows heavily from the rest of Aseba, especially switches/medulla and
  examples/clients/cpp-shell, which bear the copyright and LGPL 3 licensing notice below.
@@ -69,9 +66,9 @@
 #include <valarray>
 #include <vector>
 #include <iterator>
+#include <regex>
 #include <libjson/libjson.h>
 #include "http.h"
-#include "mongoose.h"
 #include "../../common/consts.h"
 #include "../../common/types.h"
 #include "../../common/utils/utils.h"
@@ -88,12 +85,9 @@
 #	error "You need at least Dashel version 1.0.3 to compile Http"
 #endif // DAHSEL_VERSION_INT
 
-// forward
-//static int user_message(struct mg_connection *conn, enum mg_event ev);
-static int http_event_handler(struct mg_connection *conn, enum mg_event ev);
+//== Some utility functions and diverse hacks ==============================================
 
-
-// hack because I don't understand locales yet
+// because I don't understand locales and wide strings yet
 char* wstringtocstr(std::wstring w, char* name)
 {
     //char* name = (char*)malloc(128);
@@ -123,6 +117,28 @@ JSONNode json_vector(std::string name, std::vector<short> cachedval)
     return node;
 }
 
+// close the stream, this is a hack because Dashel lacks a proper shutdown mechanism
+void shutdownStream(Dashel::Stream* stream)
+{
+    stream->fail(Dashel::DashelException::Unknown, 0, "Request handling complete");
+}
+
+std::string readLine(Dashel::Stream* stream)
+{
+    char c;
+    std::string line;
+    do
+    {
+        stream->read(&c, 1);
+        line += c;
+    }
+    while (c != '\n');
+    return line;
+}
+
+
+//== Main event ============================================================================
+
 namespace Aseba
 {
     using namespace std;
@@ -131,28 +147,61 @@ namespace Aseba
     /** \addtogroup http */
     /*@{*/
     
+    //-- Subclassing Dashel::Hub -----------------------------------------------------------
+    
     HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port) :
     asebaStream(0),
     nodeId(0),
     verbose(false)
     {
         // connect to the Aseba target
-        std::cerr << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
+        std::cout << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
         connect(asebaTarget);
         
         // request a description for aseba target
         GetDescription getDescription;
         getDescription.serialize(asebaStream);
         asebaStream->flush();
+        
+        // listen for incoming HTTP requests
+        httpStream = connect("tcpin:port=" + http_port);
     }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {
         if (!asebaStream)
         {
-            if (verbose)
-                cout << "Incoming Aseba connection from " << stream->getTargetName() << endl;
+            // this is the connection to the Thymio-II
+            std::cout << "Incoming Aseba connection from " << stream->getTargetName() << endl;
             asebaStream = stream;
+        }
+        else
+        {
+            // this is an incoming HTTP connection
+            if (verbose)
+                cerr << stream << " Connection created to " << stream->getTargetName() << endl;
+            string start_line = readLine(stream);
+            strings parts;
+            split_string(start_line, ' ',parts);
+            if (parts.size() == 3
+                && (parts[0].find("GET",0)==0 || parts[0].find("PUT",0)==0 || parts[0].find("POST",0)==0)
+                && (parts[2].find("HTTP/1.1\r\n",0)==0 || parts[2].find("HTTP/1.0\r\n",0)==0) )
+            {
+                // valid start-line, parse uri
+                httpRequests[stream] = new HttpRequest(parts[0], parts[1], stream);
+                
+                if (verbose)
+                {
+                    cerr << stream << " Request " << httpRequests[stream]->method.c_str() << " " << httpRequests[stream]->uri.c_str() << " [ ";
+                    for (int i = 0; i < httpRequests[stream]->tokens.size(); ++i)
+                        cerr << httpRequests[stream]->tokens[i] << " ";
+                    cerr << "]" << endl;
+                }
+            }
+            else {
+                stream->write("HTTP/1.1 400 Bad request\r\n");
+                stream->fail(DashelException::Unknown, 0, "400 Bad request");
+            }
         }
     }
     
@@ -161,103 +210,158 @@ namespace Aseba
         if (stream == asebaStream)
         {
             asebaStream = 0;
-            cout << "Connection closed to Aseba target" << endl;
+            if (verbose)
+                cerr << "Connection closed to Aseba target" << endl;
             stop();
         }
         else
-            abort();
+            if (verbose)
+                cerr << stream << " Connection closed to " << stream->getTargetName() << endl;
     }
     
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
-            wcout << L"Received description for " << getNodeName(nodeId) << endl;
+            wcerr << L"Received description for " << getNodeName(nodeId) << endl;
         this->nodeId = nodeId;
     }
     
     void HttpInterface::incomingData(Stream *stream)
     {
         if (stream == asebaStream) {
-            // receive message
+            // incoming Aseba message
+            if (verbose)
+                cerr << "incoming for asebaStream " << stream << endl;
+
             Message *message(Message::receive(stream));
             
             // pass message to description manager, which builds
             // the node descriptions in background
             DescriptionsManager::processMessage(message);
             
-            if (! http_server)
-            {
-                if (verbose)
-                    cout << "incomingData NO http_server" << endl;
-                return;
-            }
-            
             // if variables, check for pending requests
             const Variables *variables(dynamic_cast<Variables *>(message));
             if (variables)
-            {
-                JSONNode result(JSON_ARRAY);
-                result.set_name("result");
-                for (size_t i = 0; i < variables->variables.size(); ++i)
-                    result.push_back(JSONNode("", variables->variables[i]));
-
-//                char* result = (char *)malloc(10 * variables->variables.size()), *pos = result;
-//                for (size_t i = 0; i < variables->variables.size(); ++i)
-//                    pos += sprintf(pos, "%s%d", (i>0 ? "," : ""), variables->variables[i]);
-                if (verbose)
-                    cout << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result.write_formatted() << endl;
-                
-                variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
-                
-                pending_variable pending = pending_vars_map[std::make_pair(variables->source,variables->start)];
-                if (pending.connection) {
-                    pending.result = result;
-                    pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
-                }
-                
-                //free(result);
-            }
+                incomingVariables(variables);
             
             // if event, retransmit it on an HTTP SSE channel if one exists
             const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
             if (userMsg)
-            {
-                if (verbose)
-                    cout << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
-                // In the HTTP world we set up a stream of Server-Sent Events for this.
-                // Note that event name is in commonDefinitions.events[userMsg->type].name
-                for (struct mg_connection * c = mg_next(http_server, NULL); c != NULL; c = mg_next(http_server, c)) {
-                    if (! c->connection_param)
-                        continue;
-                    strings& tokens = *((strings *)c->connection_param);
-                    if (tokens.size() >= 1 && strcmp(tokens[0].c_str(),"events")==0)
-                    {
-                        const char* filter_event = tokens[1].c_str();
-                        char this_event[128];
-                        wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
-                        if (tokens.size() >= 2 && strcmp(filter_event,this_event)!=0)
-                            return;
-                        mg_printf_data(c, "data: %s", this_event);
-                        free(this_event);
-                        for (size_t i = 0; i < userMsg->data.size(); ++i)
-                            mg_printf_data(c, " %d", userMsg->data[i]);
-                        mg_printf_data(c, "\n\n");
-                    }
-                }
-            }
-            
+                incomingUserMsg(userMsg);
+
             delete message;
-            
-            return; //incomingAsebaData(stream);
         }
         else
-            abort();
-        return;
+        {
+            // incoming HTTP request
+            if (verbose)
+                cerr << "incoming for an http stream " << stream << endl;
+            httpRequests[stream]->incomingData();
+            if (httpRequests[stream]->complete)
+                routeRequest(httpRequests[stream]);
+        }
     }
     
-    // Handlers for HTTP requests
+    // Incoming Variables
+    void HttpInterface::incomingVariables(const Variables *variables)
+    {
+        JSONNode result(JSON_ARRAY);
+        result.set_name("result");
+        for (size_t i = 0; i < variables->variables.size(); ++i)
+            result.push_back(JSONNode("", variables->variables[i]));
+        
+        if (verbose)
+            cerr << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result.write_formatted() << endl;
+        
+        variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
+        
+        pending_variable pending = pending_vars_map[std::make_pair(variables->source,variables->start)];
+        if (pending.connection) {
+            pending.result = result;
+            pending_vars_map[std::make_pair(variables->source,variables->start)] = pending;
+            // here is where we transmit the result on the stream, which we then close
+            Stream* conn = pending.connection;
+            string jc = libjson::strip_white_space(result.write_formatted());
+            
+            httpRequests[conn]->sendStatus(200,jc);
+            delete httpRequests[conn];
+        }
+
+    }
     
-    mg_result HttpInterface::evNodes(struct mg_connection *conn, strings& args)
+    // Incoming User Messages
+    void HttpInterface::incomingUserMsg(const UserMessage *userMsg)
+    {
+        if (verbose)
+            cerr << "incomingData msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
+        
+        // set up SSE message
+        std::stringstream reply;
+        char this_event[128];
+        wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
+        string event_name = std::string(this_event);
+        reply << "data: " << event_name;
+        for (size_t i = 0; i < userMsg->data.size(); ++i)
+            reply << " " << userMsg->data[i];
+        reply << "\r\n" << "\r\n";
+        
+        // In the HTTP world we set up a stream of Server-Sent Events for this.
+        // Note that event name is in commonDefinitions.events[userMsg->type].name
+        
+        for (std::map<Dashel::Stream*, std::set<std::string> >::iterator subscriber = eventSubscriptions.begin();
+             subscriber != eventSubscriptions.end(); ++subscriber)
+        {
+            if (subscriber->second.count("*") >= 1 || subscriber->second.count(event_name) >= 1)
+            {
+                Stream* conn = subscriber->first;
+                const char* reply_str = reply.str().c_str();
+                int reply_len = reply.str().size();
+                conn->write(reply_str, reply_len);
+                conn->flush();
+            }
+        }
+    }
+
+    //-- Routing for HTTP requests ---------------------------------------------------------
+
+    void HttpInterface::routeRequest(HttpRequest* req)
+    {
+        // route based on uri prefix
+        if (req->tokens[0].find("nodes")==0)
+        {
+            req->tokens.erase(req->tokens.begin(),req->tokens.begin()+1);
+            
+            if (req->tokens.size() <= 1)
+            {   // one named node
+                if (req->method.find("PUT")==0)
+                    evLoad(req->stream, req->tokens);  // load bytecode for one node
+                else
+                    evNodes(req->stream, req->tokens); // get info for one node
+            }
+            else if (req->tokens.size() >= 2 && req->tokens[1].find("events")==0)
+            {   // subscribe to event stream for this node
+                req->tokens.erase(req->tokens.begin(),req->tokens.begin()+1);
+                evSubscribe(req->stream, req->tokens);
+            }
+            else
+            {   // request for a varibale or an event
+                evVariableOrEvent(req->stream, req->tokens);
+            }
+            return;
+        }
+        if (req->tokens[0].find("events")==0)
+        {   // subscribe to event stream for all nodes
+            return evSubscribe(req->stream, req->tokens);
+        }
+        if (req->tokens[0].find("reset")==0 || req->tokens[0].find("reset_all")==0)
+        {   // reset nodes
+            return evReset(req->stream, req->tokens);
+        }
+    }
+    
+    // Handler: Node descriptions
+    
+    void HttpInterface::evNodes(Stream *conn, strings& args)
     {
         bool do_one_node(args.size() > 0);
         
@@ -266,23 +370,12 @@ namespace Aseba
         for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
         {
             const NodeDescription& description(descIt->second);
-            
-//            strings vars;
-//            vars.push_back("_id");      std::pair<unsigned,unsigned> addr_id = getVariables("thymio-II", vars);
-//            vars[0] = "_fwversion";     std::pair<unsigned,unsigned> addr_fw = getVariables("thymio-II", vars);
-//            vars[0] = "_productId";     std::pair<unsigned,unsigned> addr_pi = getVariables("thymio-II", vars);
-            
             char wbuf[128];
             
             JSONNode node(JSON_NODE);
             node.set_name("nodeInfo");
             node.push_back(JSONNode("name", wstringtocstr(description.name,wbuf)));
             node.push_back(JSONNode("protocolVersion", description.protocolVersion));
-//            // if available, need to get _id, _productId, _fwVersion from variable cache ...
-//            node.push_back(json_vector("id", variable_cache[addr_id]));
-//            node.push_back(json_vector("productId", variable_cache[addr_pi]));
-//            node.push_back(json_vector("firmwareVersion", variable_cache[addr_fw]));
-
             
             if (do_one_node)
             {
@@ -328,24 +421,21 @@ namespace Aseba
         }
         
         std::string jc = (do_one_node && !list.empty()) ? list[0].write_formatted() : list.write_formatted();
-
-        mg_printf_data(conn, "%s\n", jc.c_str());
-
-        return MG_TRUE;
+        httpRequests[conn]->sendStatus(200,jc);
+        delete httpRequests[conn];
     }
     
-    mg_result HttpInterface::evVariableOrEvent(struct mg_connection *conn, strings& args)
+    // Handler: Variable get/set or Event call
+    
+    void HttpInterface::evVariableOrEvent(Stream *conn, strings& args)
     {
-        //const NodesDescriptionsMap::const_iterator descIt(nodesDescriptions.find(nodeId));
-        //const NodeDescription& description(descIt->second);
-        
         string nodeName(args[0]);
         size_t eventPos;
         
         if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
         {
             // this is a variable
-            if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL || args.size() >= 3)
+            if (httpRequests[conn]->method.find("POST") == 0 || args.size() >= 3)
             {
                 // set variable value
                 strings values;
@@ -355,20 +445,24 @@ namespace Aseba
                 {
                     // Parse POST form data
                     values.push_back(args[1]);
-                    parse_json_form(std::string(conn->content,conn->content_len), values);
+                    parse_json_form(httpRequests[conn]->content, values);
                 }
                 if (values.size() == 0)
-                    return MG_FALSE;
-                setVariable(nodeName, values);
-                mg_send_data(conn, NULL, 0);
-                return MG_TRUE;
+                {
+                    httpRequests[conn]->sendStatus(404);
+                    delete httpRequests[conn];
+                    return;
+                }
+                sendSetVariable(nodeName, values);
+                httpRequests[conn]->sendStatus(200);
+                delete httpRequests[conn];
             }
             else
             {
                 // get variable value
                 strings values;
                 values.assign(args.begin()+1, args.begin()+2);
-                getVariables(nodeName, values);
+                sendGetVariables(nodeName, values);
                 
                 pending_variable pending = { 0,0, values[0], conn };
                 
@@ -378,13 +472,17 @@ namespace Aseba
                     pending.source = source;
                     pending.start = start;
                     pending_vars_map[std::make_pair(source,start)] = pending;
-                    conn->connection_param = &(pending_vars_map[std::make_pair(source,start)]); // doesn't work, connection forgets this
-                    pending_cxn_map[conn] = &(pending_vars_map[std::make_pair(source,start)]);
+                }
+                else
+                {
+                    httpRequests[conn]->sendStatus(404);
+                    delete httpRequests[conn];
+                    return;
                 }
                 if (verbose)
-                    cout << "evVariableOrEevent schedule var " << pending.name << "(" << pending.source << ","
+                    cerr << "evVariableOrEevent schedule var " << pending.name << "(" << pending.source << ","
                     << pending.start << ") cxn=" << pending.connection << endl;
-                return MG_TRUE; //MG_MORE;
+                return;
             }
         }
         else
@@ -396,59 +494,106 @@ namespace Aseba
             if (args.size() >= 3)
                 for (size_t i=2; i<args.size(); ++i)
                     data.push_back((args[i].c_str()));
-            else if (strcmp(conn->request_method, "POST") == 0 || conn->query_string != NULL)
+            else if (httpRequests[conn]->method.find("POST") == 0)
             {
                 // Parse POST form data
-                parse_json_form(std::string(conn->content,conn->content_len), data);
+                parse_json_form(std::string(httpRequests[conn]->content,httpRequests[conn]->content.size()), data);
             }
             sendEvent(nodeName, data);
-            mg_send_data(conn, NULL, 0);
 //            JSONNode n(JSON_NODE);
 //            n.push_back(JSONNode("return_value", JSON_NULL));
 //            n.push_back(JSONNode("cmd", "sendEvent"));
 //            n.push_back(JSONNode("name", nodeName));
-//            mg_printf_data(conn, "%s\n", libjson::strip_white_space(n.write_formatted()).c_str());
-
-            return MG_TRUE;
+            httpRequests[conn]->sendStatus(200);
+            delete httpRequests[conn];
+            return;
         }
-    }
-
-    void HttpInterface::parse_json_form(std::string content, strings& values)
-    {
-        try
-        {
-            JSONNode form = libjson::parse(content);
-
-            if (form.type() == JSON_ARRAY)
-            {
-                // array of scalars
-                for (JSONNode::const_iterator i = form.begin(); i != form.end(); ++i)
-                    values.push_back(i->as_string());
-            }
-            else if (form.type() == JSON_NODE)
-            {
-                // hash that must contain args: member
-                JSONNode::const_iterator args = form.find("args");
-                if ( ! args->empty())
-                {
-                    for (JSONNode::const_iterator i = args->begin(); i != args->end(); ++i)
-                        values.push_back(i->as_string());
-                }
-            }
-            else {
-                // a single scalar value -- this is probably not allowed
-                // values is empty, request will fail
-            }
-        }
-        catch(std::invalid_argument e)
-        {
-            std::cerr << "Invalid JSON value \"" << content << "\"; libjson exception: " << e.what() << std::endl;
-            // values is empty, request will fail
-        }
-        
-        return;
     }
     
+    // Handler: Subscribe to an event stream
+    
+    void HttpInterface::evSubscribe(Stream *conn, strings& args)
+    {
+        // eventSubscriptions[conn] is an unordered set of strings
+        if (args.size() == 1)
+            eventSubscriptions[conn].insert("*");
+        else
+            for (strings::iterator i = args.begin()+1; i != args.end(); ++i)
+                eventSubscriptions[conn].insert(*i);
+        
+        strings headers;
+        headers.push_back("Content-Type: text/event-stream");
+        headers.push_back("Cache-Control: no-cache");
+        headers.push_back("Connection: keep-alive");
+        httpRequests[conn]->sendStatus(200,headers);
+        // connection must stay open!
+    }
+    
+    // Handler: Compile and store a program into the node, and remember it for introspection
+    
+    void HttpInterface::evLoad(Stream *conn, strings& args)
+    {
+        if (verbose)
+            cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
+        const char* buffer = httpRequests[conn]->content.c_str();
+        int pos = httpRequests[conn]->content.find("file=");
+        if (pos != std::string::npos)
+        {
+            aeslLoadMemory(buffer+pos+5, httpRequests[conn]->content.size()-pos-5);
+            httpRequests[conn]->sendStatus(200);
+        }
+        else
+            httpRequests[conn]->sendStatus(400);
+        delete httpRequests[conn];
+    }
+    
+    // Handler: Reset nodes and rerun
+    
+    void HttpInterface::evReset(Stream *conn, strings& args)
+    {
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
+        {
+            bool ok;
+            nodeId = getNodeId(descIt->second.name, 0, &ok);
+            if (!ok)
+                continue;
+            char nodeName[128];
+            wstringtocstr(descIt->second.name, nodeName);
+            
+            this->lock(); // inherited from Dashel::Hub
+            
+            Reset(nodeId).serialize(asebaStream); // reset node
+            asebaStream->flush();
+            Run(nodeId).serialize(asebaStream);   // re-run node
+            asebaStream->flush();
+            if (strcmp(nodeName, "thymio-II") == 0)
+            {
+                strings args;
+                args.push_back("motor.left.target");
+                args.push_back("0");
+                sendSetVariable(nodeName, args);
+                args[0] = "motor.right.target";
+                sendSetVariable(nodeName, args);
+            }
+            size_t eventPos;
+            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
+            {
+                strings data;
+                data.push_back("reset");
+                sendEvent(nodeName,data);
+            }
+            
+            this->unlock();
+            
+            httpRequests[conn]->sendStatus(200);
+            delete httpRequests[conn];
+        }
+    }
+    
+
+    
+    //-- Sending messages on the Aseba bus -------------------------------------------------
+
     void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
     {
         size_t eventPos;
@@ -467,28 +612,25 @@ namespace Aseba
             cerr << "sendEvent " << nodeName << ": no event " << args[0] << endl;
     }
     
-    std::pair<unsigned,unsigned> HttpInterface::getVariables(const std::string nodeName, const strings& args)
+    std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const std::string nodeName, const strings& args)
     {
         unsigned nodePos, varPos;
         for (strings::const_iterator it(args.begin()); it != args.end(); ++it)
         {
             // get node id, variable position and length
             if (verbose)
-                cout << "getVariables " << nodeName << " " << *it;
+                cerr << "getVariables " << nodeName << " " << *it;
             const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
             if (!exists)
                 continue;
-//            bool ok;
-//            const unsigned length(getVariableSize(nodePos, UTF8ToWString(*it), &ok));
-//            if (!ok)
-//                continue;
+
             VariablesMap vm = allVariables[nodeName];
             const unsigned length(vm[UTF8ToWString(*it)].second);
             
             variable_cache[std::pair<unsigned,unsigned>(nodePos,varPos)] = std::vector<short>();
             
             if (verbose)
-                cout << " (" << nodePos << "," << varPos << "):" << length << "\n";
+                cerr << " (" << nodePos << "," << varPos << "):" << length << "\n";
             // send the message
             GetVariables getVariables(nodePos, varPos, length);
             getVariables.serialize(asebaStream);
@@ -497,18 +639,18 @@ namespace Aseba
         return std::pair<unsigned,unsigned>(nodePos,varPos); // just last one
     }
     
-    void HttpInterface::setVariable(const std::string nodeName, const strings& args)
+    void HttpInterface::sendSetVariable(const std::string nodeName, const strings& args)
     {
         // get node id, variable position and length
         if (verbose)
-            cout << "setVariables " << nodeName << " " << args[0];
+            cerr << "setVariables " << nodeName << " " << args[0];
         unsigned nodePos, varPos;
         const bool exists(getNodeAndVarPos(nodeName, args[0], nodePos, varPos));
         if (!exists)
             return;
         
         if (verbose)
-            cout << " (" << nodePos << "," << varPos << "):" << args.size() << " =";
+            cerr << " (" << nodePos << "," << varPos << "):" << args.size() << " =";
         // send the message
         SetVariables::VariablesVector data;
         for (size_t i=1; i<args.size(); ++i)
@@ -555,119 +697,46 @@ namespace Aseba
         return true;
     }
     
-    // Subscribe to an event stream
-    mg_result HttpInterface::evSubscribe(struct mg_connection *conn, strings& args)
-    {
-        conn->connection_param = new strings(args);
-        return MG_MORE;
-    }
-    
-    // Poll cached variable values
-    mg_result HttpInterface::evPoll(struct mg_connection *conn, strings& args)
-    {
-        string nodeName("thymio-II");
-        bool ok;
-        nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
-
-        for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
-        {
-            bool is_boolean_variable = (it->first.find(L"b_",0) == 0);
-            
-            std::vector<short> cachedval = variable_cache[std::make_pair(nodeId,it->second.first)];
-
-            std::stringstream result;
-            for (std::vector<short>::iterator i = cachedval.begin(); i != cachedval.end(); ++i)
-                if (is_boolean_variable)
-                    result << " " << (*i ? "true" : "false");
-                else
-                    result << " " << *i;
-            
-            char wbuf[128];
-            mg_printf_data(conn, "%s%s\n", wstringtocstr(it->first,wbuf), result.str().c_str());
-            
-            std::string patched_name(wbuf);
-            if (patched_name.find(".") != std::string::npos)
-            {
-                std::string::size_type n = 0;
-                while ( (n=patched_name.find(".",n)) != std::string::npos)
-                    patched_name.replace(n,1,"/"), n += 1;
-                mg_printf_data(conn, "%s%s\n", patched_name.c_str(), result.str().c_str());
-            }
-        }
-        mg_printf_data(conn, "\n");
-        return MG_TRUE;
-    }
-
+    // Utility: request update of all variables, used for variable caching
     void HttpInterface::updateVariables(const std::string nodeName)
     {
         strings all_variables;
         char wbuf[128];
         for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
             all_variables.push_back(wstringtocstr(it->first,wbuf));
-        getVariables(nodeName, all_variables);
+        sendGetVariables(nodeName, all_variables);
     }
 
-    // Reset nodes and rerun
-    mg_result HttpInterface::evReset(struct mg_connection *conn, strings& args)
+    // Utility: extract argument values from JSON request body
+    void HttpInterface::parse_json_form(std::string content, strings& values)
     {
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
+        try
         {
-            bool ok;
-            nodeId = getNodeId(descIt->second.name, 0, &ok);
-            if (!ok)
-                continue;
-            char nodeName[128];
-            wstringtocstr(descIt->second.name, nodeName);
+            JSONNode form = libjson::parse(content);
             
-            this->lock(); // inherited from Dashel::Hub
-
-            Reset(nodeId).serialize(asebaStream); // reset node
-            asebaStream->flush();
-            Run(nodeId).serialize(asebaStream);   // re-run node
-            asebaStream->flush();
-            if (strcmp(nodeName, "thymio-II") == 0)
+            if (form.type() == JSON_NODE)
             {
-                strings args;
-                //args.push_back(nodeName);
-                args.push_back("motor.left.target");
-                args.push_back("0");
-                setVariable(nodeName, args);
-                args[0] = "motor.right.target";
-                setVariable(nodeName, args);
+                JSONNode::const_iterator args = form.find("args");
+                if (! args->empty())
+                    form = *args;
             }
-            size_t eventPos;
-            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
-            {
-                strings data;
-                data.push_back("reset");
-                sendEvent(nodeName,data);
-            }
-
-            this->unlock();
+            if (form.type() != JSON_ARRAY)
+                throw std::invalid_argument("not a JSON_ARRAY");
             
-            mg_send_data(conn, NULL, 0);
-            
+            for (JSONNode::const_iterator i = form.begin(); i != form.end(); ++i)
+                values.push_back(i->as_string());
         }
-        return MG_TRUE;
+        catch(std::invalid_argument e)
+        {
+            std::cerr << "Invalid JSON value \"" << content << "\"; libjson exception: " << e.what() << std::endl;
+            // values is empty, request will fail
+        }
+        
+        return;
     }
     
-    
-    // Compile and store a program into the node, and remember it for introspection
-    mg_result HttpInterface::evLoad(struct mg_connection *conn, strings& args)
-    {
-        if (verbose)
-            wcout << L"MG_PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
-        char buffer[8 * 1024]; // if more would need to use multipart chunking
-        int size = mg_get_var(conn, "file", buffer, 8*1024);
-        if (size > 0)
-        {
-            aeslLoadMemory(buffer, size);
-            mg_printf_data(conn,"\n");
-            return MG_TRUE; // assume success (!)
-        }
-        return MG_FALSE; // send error result
-    }
-    
+
+    // Load Aesl file from file
     void HttpInterface::aeslLoadFile(const std::string& filename)
     {
         // local file or URL
@@ -678,7 +747,7 @@ namespace Aseba
         {
             aeslLoad(doc);
             //if (verbose)
-                wcout << L"Loaded aesl script from " << filename.c_str() << "\n";
+                cerr << "Loaded aesl script from " << filename.c_str() << "\n";
             this->nodeInfoJson = JSONNode(JSON_NODE);
             this->nodeInfoJson.set_name("nodeInfo");
             this->nodeInfoJson.push_back(JSONNode("id", this->nodeId));
@@ -686,6 +755,7 @@ namespace Aseba
         }
     }
 
+    // Load Aesl file from memory
     void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
     {
         // open document
@@ -696,15 +766,13 @@ namespace Aseba
         {
             aeslLoad(doc);
             //if (verbose)
-                wcout << L"Loaded aesl script in-memory buffer " << buffer << "\n";
+                cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
     }
     
-    // Stolen from Shell::load in examples/clients/cpp-shell by Stephane Magnenat et alii
+    // Parse Aesl program using XPath
     void HttpInterface::aeslLoad(xmlDoc* doc)
     {
-        xmlNode *domRoot(xmlDocGetRootElement(doc));
-        
         // clear existing data
         commonDefinitions.events.clear();
         commonDefinitions.constants.clear();
@@ -713,124 +781,94 @@ namespace Aseba
         // load new data
         int noNodeCount(0);
         bool wasError(false);
-        if (!xmlStrEqual(domRoot->name, BAD_CAST("network")))
+
+        xmlXPathContextPtr context = xmlXPathNewContext(doc);
+        xmlXPathObjectPtr obj;
+        
+        // 1. Path network/event
+        if ((obj = xmlXPathEvalExpression(BAD_CAST"/network/event", context)))
         {
-            wcerr << "root node is not \"network\", XML considered invalid" << endl;
-            wasError = true;
-        }
-        else for (xmlNode *domNode(xmlFirstElementChild(domRoot)); domNode; domNode = domNode->next)
-        {
-            if (domNode->type == XML_ELEMENT_NODE)
+            xmlNodeSetPtr nodeset = obj->nodesetval;
+            for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
             {
-                // an Aseba node, which contains a virtual machine
-                if (xmlStrEqual(domNode->name, BAD_CAST("node")))
+                xmlChar *name  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+                xmlChar *size  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("size")));
+                if (name && size)
                 {
-                    // get attributes, child and content
-                    xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-                    if (!name)
+                    int eventSize = atoi((const char *)size);
+                    if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
                     {
-                        wcerr << "missing \"name\" attribute in \"node\" entry" << endl;
+                        wcerr << "Event " << name << " has a length " << eventSize << " larger than maximum" <<  ASEBA_MAX_EVENT_ARG_SIZE << endl;
+                        wasError = true;
+                        break;
                     }
                     else
-                    {
-                        const string _name((const char *)name);
-                        xmlChar * text(xmlNodeGetContent(domNode));
-                        if (!text)
-                        {
-                            wcerr << "missing text in \"node\" entry" << endl;
-                        }
-                        else
-                        {
-                            // got the identifier of the node and compile the code
-                            unsigned preferedId(0);
-                            xmlChar *storedId = xmlGetProp(domNode, BAD_CAST("nodeId"));
-                            if (storedId)
-                                preferedId = unsigned(atoi((char*)storedId));
-                            bool ok;
-                            unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-                            if (ok)
-                            {
-                                if (!compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name))
-                                    wasError = true;
-                            }
-                            else
-                                noNodeCount++;
-                            
-                            // free attribute and content
-                            xmlFree(text);
-                        }
-                        xmlFree(name);
-                    }
+                        commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
                 }
-                // a global event
-                else if (xmlStrEqual(domNode->name, BAD_CAST("event")))
-                {
-                    // get attributes
-                    xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-                    if (!name)
-                        wcerr << "missing \"name\" attribute in \"event\" entry" << endl;
-                    xmlChar *size(xmlGetProp(domNode, BAD_CAST("size")));
-                    if (!size)
-                        wcerr << "missing \"size\" attribute in \"event\" entry" << endl;
-                    // add event
-                    if (name && size)
-                    {
-                        int eventSize(atoi((const char *)size));
-                        if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
-                        {
-                            wcerr << "Event " << name << " has a length " << eventSize << "larger than maximum" <<  ASEBA_MAX_EVENT_ARG_SIZE << endl;
-                            wasError = true;
-                            break;
-                        }
-                        else
-                        {
-                            commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
-                        }
-                    }
-                    // free attributes
-                    if (name)
-                        xmlFree(name);
-                    if (size)
-                        xmlFree(size);
-                }
-                // a keyword
-                else if (xmlStrEqual(domNode->name, BAD_CAST("keywords")))
-                {
-                    // get attributes
-                    xmlChar *name(xmlGetProp(domNode, BAD_CAST("flag")));
-                    if (!name)
-                        wcerr << "missing \"flag\" attribute in \"keywords\" entry" << endl;
-                    // anyway, do nothing because compiler doesn't pay attention to keywords
-                }
-                // a global constant
-                else if (xmlStrEqual(domNode->name, BAD_CAST("constant")))
-                {
-                    // get attributes
-                    xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-                    if (!name)
-                        wcerr << "missing \"name\" attribute in \"constant\" entry" << endl;
-                    xmlChar *value(xmlGetProp(domNode, BAD_CAST("value"))); 
-                    if (!value)
-                        wcerr << "missing \"value\" attribute in \"constant\" entry" << endl;
-                    // add constant if attributes are valid
-                    if (name && value)
-                    {
-                        commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name), atoi((const char *)value)));
-                    }
-                    // free attributes
-                    if (name)
-                        xmlFree(name);
-                    if (value)
-                        xmlFree(value);
-                }
+                xmlFree(name);
+                xmlFree(size);
+            }
+        }
+        // 2. Path network/constant
+        if ((obj = xmlXPathEvalExpression(BAD_CAST"/network/constant", context)))
+        {
+            xmlNodeSetPtr nodeset = obj->nodesetval;
+            for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+            {
+                xmlChar *name  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+                xmlChar *value (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
+                if (name && value)
+                    commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name), atoi((const char *)value)));
+                xmlFree(name);  // nop if name is NULL
+                xmlFree(value); // nop if value is NULL
+            }
+        }
+        // 3. Path network/keywords
+        if ((obj = xmlXPathEvalExpression(BAD_CAST"/network/keywords", context)))
+        {
+            xmlNodeSetPtr nodeset = obj->nodesetval;
+            for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+            {
+                xmlChar *flag  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("flag")));
+                // do nothing because compiler doesn't pay attention to keywords
+                xmlFree(flag);
+            }
+        }
+        // 4. Path network/node
+        if ((obj = xmlXPathEvalExpression(BAD_CAST"/network/node", context)))
+        {
+            xmlNodeSetPtr nodeset = obj->nodesetval;
+            for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+            {
+                xmlChar *name     (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+                xmlChar *storedId (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("nodeId")));
+                xmlChar *text     (xmlNodeGetContent(nodeset->nodeTab[i]));
+                
+                if (!name)
+                    wcerr << "missing \"name\" attribute in \"node\" entry" << endl;
+                else if (!text)
+                    wcerr << "missing text in \"node\" entry" << endl;
                 else
-                    wcerr << "Unknown XML node seen in .aesl file: " << domNode->name << endl;
+                {
+                    const string _name((const char *)name);
+                    // get the identifier of the node and compile the code
+                    unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
+                    bool ok;
+                    unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
+                    if (ok)
+                        wasError = !compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name);
+                    else
+                        noNodeCount++;
+                }
+                // free attribute and content
+                xmlFree(text); // nop if text is NULL
+                xmlFree(name); // nop if name is NULL
             }
         }
         
         // release memory
         xmlFreeDoc(doc);
-        
+    
         // check if there was an error
         if (wasError)
         {
@@ -847,6 +885,7 @@ namespace Aseba
         }
     }
     
+    // Upload bytecode to node
     bool HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
     {
         // compile code
@@ -878,8 +917,123 @@ namespace Aseba
             return false;
         }
     }
+    //== end of class HttpInterface ============================================================
     
-}; // end of class HttpInterface
+    HttpRequest::HttpRequest(){};
+
+    HttpRequest::~HttpRequest()
+    {
+        shutdownStream(stream);
+    }
+
+    HttpRequest::HttpRequest( std::string const& _method,  std::string const& _uri, Dashel::Stream *_stream)
+    {
+        tokens.clear();
+        headers.clear();
+        content.clear();
+        headers_done = false;
+        complete = false;
+        verbose = false;
+
+        method = std::string(_method);
+        uri = std::string(_uri);
+        stream = _stream;
+        split_string(uri, '/', tokens);
+    }
+    
+    void HttpRequest::incomingData()
+    {
+        if (! headers_done)
+        {
+            const string header_field(readLine(stream));
+            if (header_field.find("\r\n",0) != 0)
+            {
+                std::smatch field;
+                std::regex e ("([-A-Za-z0-9_]+): (.*)\r\n");
+                std::regex_match (header_field,field,e);
+                if (field.size() == 3)
+                {
+                    headers[field[1]] = field[2];
+                }
+                // continue Dashel loop
+                return;
+            }
+            else
+            {
+                headers_done = true;
+                if (verbose)
+                {
+                    cerr << stream << " Headers complete; (" << headers.size() << " headers)\n";
+                    for (std::map<std::string,std::string>::iterator i = headers.begin(); i != headers.end(); ++i)
+                        cerr << "\t\t" << i->first.c_str() << ": " << i->second.c_str() << endl;
+                }
+                int content_length = atoi(headers["Content-Length"].c_str());
+                content_length = (content_length > 40000) ? 40000 : content_length; // truncate at 40000 bytes
+                char* buffer = new char[ content_length ];
+                stream->read(buffer, content_length);
+                content = std::string(buffer,content_length);
+                delete buffer;
+                complete = true;
+            }
+        }
+ 
+    }
+
+    void HttpRequest::sendStatus(unsigned status)
+    {
+        string empty;
+        sendStatus(status,empty);
+    }
+
+    void HttpRequest::sendStatus(unsigned status, strings& headers)
+    {
+        string empty;
+        sendStatus(status,empty,headers);
+    }
+
+    void HttpRequest::sendStatus(unsigned status, std::string& payload)
+    {
+        strings empty;
+        sendStatus(status,payload,empty);
+    }
+    
+    void HttpRequest::sendStatus(unsigned status, std::string& payload, strings& headers)
+    {
+        std::stringstream reply;
+        reply << "HTTP/1.1 " << status << " ";
+        switch (status)
+        {
+            case 200: reply << "OK";                    break;
+            case 201: reply << "Created";               break;
+            case 400: reply << "Bad Request";           break;
+            case 403: reply << "Forbidden";             break;
+            case 408: reply << "Request Timeout";       break;
+            case 500: reply << "Internal Server Error"; break;
+            case 501: reply << "Not Implemented";       break;
+            case 503: reply << "Service Unavailable";   break;
+            case 404:
+            default:  reply << "Not Found";
+        }
+        string message = reply.str();
+        if (headers.size() == 0)
+            reply << "\r\nContent-Length: " << payload.size();
+        for (strings::iterator i = headers.begin(); i != headers.end(); i++)
+            reply << *i << "\r\n";
+        reply << "\r\n\r\n" << payload.c_str();
+        
+        const char* reply_str = reply.str().c_str();
+        int reply_len = reply.str().size();
+        stream->write(reply_str, reply_len);
+        stream->flush();
+        
+//        if (close_connection)
+//            shutdownStream(stream);
+        if (status / 100 != 2)
+            stream->fail(DashelException::Unknown, 0, message.c_str());
+    }
+    //== end of class HttpInterface ============================================================
+
+};  //== end of namespace Aseba ================================================================
 
 
 //! Show usage
@@ -906,81 +1060,6 @@ void dumpVersion(std::ostream &stream)
     stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
     stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
     stream << "Mongoose embedded HTTP server: GNU GPL version 2 <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>\n";
-}
-
-// Mongoose
-static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
-    Aseba::HttpInterface* network = (Aseba::HttpInterface*)conn->server_param; // else 505!
-    std::vector<std::string> tokens;
-    switch (ev) {
-        case MG_AUTH:
-            return MG_TRUE;
-        case MG_REQUEST:
-        {
-            split_string(std::string(conn->uri), '/', tokens);
-            // route based on uri prefix
-            if (!strncmp(conn->uri, "/nodes", 6))
-            {
-                tokens.erase(tokens.begin(),tokens.begin()+1);
-                
-                if (tokens.size() <= 1)
-                {
-                    // one named node
-                    if (strcmp(conn->request_method, "PUT") == 0)
-                        return network->evLoad(conn, tokens);
-                    else
-                        return network->evNodes(conn, tokens);
-                }
-                else if (tokens.size() >= 2 && strcmp(tokens[1].c_str(),"events")==0)
-                {
-                    tokens.erase(tokens.begin(),tokens.begin()+1);
-                    return network->evSubscribe(conn, tokens);
-                }
-                else
-                {
-                    conn->connection_param = new std::vector<std::string>(tokens);
-		    std::cout << "call " << tokens[0] << "/" << tokens[1] << "\n";
-                    return network->evVariableOrEvent(conn, tokens);
-                }
-                return MG_TRUE;
-            }
-            if (!strncmp(conn->uri, "/events", 7))
-            {
-                return network->evSubscribe(conn, tokens);
-            }
-            if (!strncmp(conn->uri, "/poll", 5))
-            {
-                return network->evPoll(conn, tokens);
-            }
-            if (!strncmp(conn->uri, "/reset", 6) || !strncmp(conn->uri, "/reset_all", 10))
-            {
-                return network->evReset(conn, tokens);
-            }
-        }
-        case MG_POLL:
-        {
-//            std::cout << "MG_POLL cxn=" << conn << " param=" << conn->server_param << "\n";
-            if (Aseba::HttpInterface::pending_variable* pending = network->pending_cxn_map[conn])
-                if (! pending->result.empty())
-                {
-                    JSONNode n(JSON_NODE);
-                    n.push_back(pending->result);
-                    n.push_back(JSONNode("cmd", "getVariable"));
-                    n.push_back(JSONNode("name", pending->name.c_str()));
-                    n.push_back(network->nodeInfoJson);
-                    std::string jc = n.write_formatted();
-
-                    mg_printf_data(conn, "%s\n", libjson::strip_white_space(jc).c_str());
-                    network->pending_cxn_map.erase(conn);
-                    return MG_TRUE;
-                }
-            return MG_FALSE; // since pending variable request not yet satisfied...
-        }
-        case MG_CLOSE:
-            delete (std::vector<std::string> *)conn->connection_param;
-        default:
-            return MG_FALSE;
-    }
 }
 
 // Main
@@ -1034,20 +1113,15 @@ int main(int argc, char *argv[])
             network->aeslLoadFile(aesl_filename);
         }
 
-        network->http_server = mg_create_server((void*)network, http_event_handler);
-        mg_set_option(network->http_server, "document_root", ".");      // Serve current directory -- should disallow this!!
-        mg_set_option(network->http_server, "listening_port", http_port.c_str());  // Open port 3000
-        mg_set_option(network->http_server, "auth_domain", "inirobot.inria.fr");
-
-        for (;;) {
-            // single-threaded polling loop, limited to around 20 Hz. Expect more traffic on Dashel than on HTTP.
-            mg_poll_server(network->http_server, 10);
-            if (update)
-                network->updateVariables("thymio-II");
-            for (int i = 0; i < 5; i++)
-                network->step(2); // inherited from Dashel::Hub; poll Dashel once, or timeout
-        }
-        mg_destroy_server(&(network->http_server));
+        network->run();
+//        for (;;)
+//        {
+//            // single-threaded polling loop, limited to around 20 Hz. Expect more traffic on Dashel than on HTTP.
+//            if (update)
+//                network->updateVariables("thymio-II");
+//            for (int i = 0; i < 5; i++)
+//                network->step(2); // inherited from Dashel::Hub; poll Dashel once, or timeout
+//        }
     }
     catch(Dashel::DashelException e)
     {
