@@ -939,6 +939,7 @@ static int http_event_handler(struct mg_connection *conn, enum mg_event ev) {
                 else
                 {
                     conn->connection_param = new std::vector<std::string>(tokens);
+		    std::cout << "call " << tokens[0] << "/" << tokens[1] << "\n";
                     return network->evVariableOrEvent(conn, tokens);
                 }
                 return MG_TRUE;

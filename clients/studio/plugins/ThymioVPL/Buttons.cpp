@@ -31,6 +31,7 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsObject(parent),
 		buttonType(type),
 		boundingRectangle(rect),
+		stateCountLimit(-1),
 		curState(0),
 		toggleState(true)
 	{
@@ -41,6 +42,22 @@ namespace Aseba { namespace ThymioVPL
 	unsigned GeometryShapeButton::valuesCount() const
 	{
 		return colors.size();
+	}
+	
+	void GeometryShapeButton::setValue(int state)
+	{
+		if (state < colors.size())
+		{
+			curState = state;
+			update();
+		}
+	}
+	
+	void GeometryShapeButton::setStateCountLimit(int limit)
+	{
+		stateCountLimit = limit;
+		if (limit > 0 && curState >= limit)
+			setValue(limit);
 	}
 	
 	void GeometryShapeButton::addState(const QColor& brushColor, const QColor& penColor)
@@ -91,7 +108,8 @@ namespace Aseba { namespace ThymioVPL
 		{
 			if( toggleState )
 			{
-				curState = (curState + 1) % colors.size();
+				int stateCount(stateCountLimit > 0 ? qMin(colors.size(), stateCountLimit) : colors.size());
+				curState = (curState + 1) % stateCount;
 			}
 			else 
 			{

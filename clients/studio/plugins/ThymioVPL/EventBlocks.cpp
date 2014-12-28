@@ -51,6 +51,8 @@ namespace Aseba { namespace ThymioVPL
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
 	{
+		buttonsCountSimple = 3;
+		
 		// indication LEDs for front sensors
 		indicationLEDs.push_back(createIndicationLED(15,78));
 		indicationLEDs.push_back(createIndicationLED(54,43));
@@ -75,6 +77,9 @@ namespace Aseba { namespace ThymioVPL
 						   175 - 150*qCos(0.34906585*offset) );
 			button->addState(Qt::white);
 			button->addState(Qt::black);
+			button->addState(Qt::yellow);
+			if (!advanced)
+				button->setStateCountLimit(buttonsCountSimple);
 
 			buttons.push_back(button);
 			
@@ -91,6 +96,9 @@ namespace Aseba { namespace ThymioVPL
 			button->setPos(QPointF(64 + i*128, 234));
 			button->addState(Qt::white);
 			button->addState(Qt::black);
+			button->addState(Qt::yellow);
+			if (!advanced)
+				button->setStateCountLimit(buttonsCountSimple);
 			
 			buttons.push_back(button);
 			
@@ -108,6 +116,8 @@ namespace Aseba { namespace ThymioVPL
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, QColor(32,32,32), Qt::white, advanced, parent)
 	{
+		buttonsCountSimple = 3;
+		
 		// indication LEDs
 		indicationLEDs.push_back(createIndicationLED(72,40));
 		indicationLEDs.push_back(createIndicationLED(184,40));
@@ -120,6 +130,9 @@ namespace Aseba { namespace ThymioVPL
 			button->setPos(QPointF(98 + i*60, 40));
 			button->addState(Qt::white);
 			button->addState(Qt::black);
+			button->addState(Qt::yellow);
+			if (!advanced)
+				button->setStateCountLimit(buttonsCountSimple);
 			
 			buttons.push_back(button);
 			

@@ -466,11 +466,13 @@ namespace Aseba { namespace ThymioVPL
 	
 	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
 	{
+		const double TIMER_RESOLUTION = 10;
 		const QPointF localPos(pos-QPointF(128,136));
 		if (sqrt(localPos.x()*localPos.x()+localPos.y()*localPos.y()) <= 70)
 		{
 			if (ok) *ok = true;
-			return unsigned((atan2(-localPos.x(), localPos.y()) + M_PI) * 4000. / (2*M_PI));
+			double duration = (atan2(-localPos.x(), localPos.y()) + M_PI) * 4. / (2*M_PI);
+			return round(duration * TIMER_RESOLUTION) * 1000 / TIMER_RESOLUTION;
 		}
 		if (ok) *ok = false;
 		return 0;
