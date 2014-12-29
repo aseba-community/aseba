@@ -18,7 +18,7 @@
  If a variable and an events have the same name, it is the EVENT the is called.
  
  DONE (mostly):
-    - Dashel connection to one Thymio-II and round-robin scheduling between Dashel and Mongoose
+    - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
     - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
     - GET /nodes, GET /nodes/:NODENAME with introspection
     - POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE[/:VALUE]*)
@@ -152,7 +152,7 @@ namespace Aseba
     HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port) :
     asebaStream(0),
     nodeId(0),
-    verbose(false)
+    verbose(true)
     {
         // connect to the Aseba target
         std::cout << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
@@ -192,7 +192,8 @@ namespace Aseba
                 
                 if (verbose)
                 {
-                    cerr << stream << " Request " << httpRequests[stream]->method.c_str() << " " << httpRequests[stream]->uri.c_str() << " [ ";
+                    cerr << stream << " Request " << httpRequests[stream]->method.c_str()
+                         << " " << httpRequests[stream]->uri.c_str() << " [ ";
                     for (int i = 0; i < httpRequests[stream]->tokens.size(); ++i)
                         cerr << httpRequests[stream]->tokens[i] << " ";
                     cerr << "]" << endl;
@@ -271,7 +272,8 @@ namespace Aseba
             result.push_back(JSONNode("", variables->variables[i]));
         
         if (verbose)
-            cerr << "incomingData var ("<<variables->source<<","<<variables->start<<") = "<<result.write_formatted() << endl;
+            cerr << "incomingData var (" << variables->source << "," << variables->start << ") = "
+                 << result.write_formatted() << endl;
         
         variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
         
@@ -367,7 +369,8 @@ namespace Aseba
         
         JSONNode list(JSON_ARRAY);
         
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
+             descIt != nodesDescriptions.end(); ++descIt)
         {
             const NodeDescription& description(descIt->second);
             char wbuf[128];
@@ -551,7 +554,8 @@ namespace Aseba
     
     void HttpInterface::evReset(Stream *conn, strings& args)
     {
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin(); descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
+             descIt != nodesDescriptions.end(); ++descIt)
         {
             bool ok;
             nodeId = getNodeId(descIt->second.name, 0, &ok);
@@ -661,7 +665,8 @@ namespace Aseba
     }
     
     // Utility: find variable address
-    bool HttpInterface::getNodeAndVarPos(const string& nodeName, const string& variableName, unsigned& nodeId, unsigned& pos)
+    bool HttpInterface::getNodeAndVarPos(const string& nodeName, const string& variableName,
+                                         unsigned& nodeId, unsigned& pos)
     {
         // make sure the node exists
         bool ok;
@@ -690,7 +695,8 @@ namespace Aseba
             pos = getVariablePos(nodeId, UTF8ToWString(variableName), &ok);
             if (!ok)
             {
-                wcerr << "variable " << UTF8ToWString(variableName) << " does not exist in node " << UTF8ToWString(nodeName);
+                wcerr << "variable " << UTF8ToWString(variableName) << " does not exist in node "
+                      << UTF8ToWString(nodeName);
                 return false;
             }
         }
@@ -798,7 +804,8 @@ namespace Aseba
                     int eventSize = atoi((const char *)size);
                     if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
                     {
-                        wcerr << "Event " << name << " has a length " << eventSize << " larger than maximum" <<  ASEBA_MAX_EVENT_ARG_SIZE << endl;
+                        wcerr << "Event " << name << " has a length " << eventSize << " larger than maximum"
+                              <<  ASEBA_MAX_EVENT_ARG_SIZE << endl;
                         wasError = true;
                         break;
                     }
@@ -818,7 +825,8 @@ namespace Aseba
                 xmlChar *name  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
                 xmlChar *value (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
                 if (name && value)
-                    commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name), atoi((const char *)value)));
+                    commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name),
+                                                                     atoi((const char *)value)));
                 xmlFree(name);  // nop if name is NULL
                 xmlFree(value); // nop if value is NULL
             }
@@ -1059,7 +1067,6 @@ void dumpVersion(std::ostream &stream)
     stream << "Aseba http " << ASEBA_VERSION << std::endl;
     stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
     stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
-    stream << "Mongoose embedded HTTP server: GNU GPL version 2 <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>\n";
 }
 
 // Main
