@@ -52,17 +52,7 @@ namespace Aseba
     public: 
         typedef std::vector<std::string> strings;
         typedef std::map<std::string, Aseba::VariablesMap> NodeNameToVariablesMap;
-        // embedded http server
-        struct pending_variable  {  unsigned source;  unsigned start;  std::string name; Dashel::Stream* connection; JSONNode result;};
-        typedef std::map<std::pair<unsigned,unsigned>, pending_variable> pending_variable_map;
-        struct http_request {
-            std::string method;
-            std::string uri;
-            strings tokens;
-            std::map<std::string,std::string> headers;
-            bool headers_done;
-            std::string content;
-        };
+        typedef std::map<std::pair<unsigned,unsigned>, std::set<Dashel::Stream*> > pending_variable_map;
         JSONNode nodeInfoJson;
 
     protected:
@@ -70,7 +60,7 @@ namespace Aseba
         Dashel::Stream* asebaStream;
         Dashel::Stream* httpStream;
         std::vector<char*> knownNodes;
-        std::map<Dashel::Stream*, HttpRequest*> httpRequests;
+        std::map<Dashel::Stream*, HttpRequest> httpRequests;
         std::map<Dashel::Stream*, std::set<std::string> > eventSubscriptions;
         unsigned nodeId;
         // debug variables
@@ -87,7 +77,9 @@ namespace Aseba
         std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
         
     public:
+        HttpInterface();
         HttpInterface(const std::string& target, const std::string& http_port);
+        virtual void init(const std::string& target, const std::string& http_port);
         virtual void evNodes(Dashel::Stream* conn, strings& args);
         virtual void evVariableOrEvent(Dashel::Stream* conn, strings& args);
         virtual void evSubscribe(Dashel::Stream* conn, strings& args);
@@ -111,7 +103,7 @@ namespace Aseba
         virtual void aeslLoad(xmlDoc* doc);
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
-        virtual void routeRequest(HttpRequest* req);
+        virtual void routeRequest(HttpRequest& req);
         
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
@@ -130,7 +122,7 @@ namespace Aseba
         strings tokens;
         std::map<std::string,std::string> headers;
         std::string content;
-        bool complete;
+        bool ready;
     protected:
         bool headers_done;
         bool verbose;
@@ -138,7 +130,9 @@ namespace Aseba
     public:
         HttpRequest();
         virtual ~HttpRequest();
-        HttpRequest( std::string const& method,  std::string const& uri, Dashel::Stream *stream);
+        virtual bool initialize( Dashel::Stream *stream);
+        virtual bool initialize( std::string const& start_line, Dashel::Stream *stream);
+        virtual bool initialize( std::string const& method,  std::string const& uri, Dashel::Stream *stream);
         virtual void incomingData();
         virtual void sendStatus(unsigned status, std::string& payload, strings& headers);
         virtual void sendStatus(unsigned status, std::string& payload);

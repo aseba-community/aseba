@@ -10,6 +10,11 @@ include(ParseVersion.cmake)
 add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)
 
+# External tools
+add_subdirectory(catch)
+include_directories(${CATCH_INCLUDE_DIR} ${COMMON_INCLUDES})
+enable_testing(true)  # Enables unit-testing.
+
 # Dashel
 find_package(dashel REQUIRED)
 include_directories(${dashel_INCLUDE_DIRS})
