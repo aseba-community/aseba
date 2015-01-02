@@ -93,14 +93,6 @@ int main(int argc, char *argv[])
         }
         
         network->run();
-        //        for (;;)
-        //        {
-        //            // single-threaded polling loop, limited to around 20 Hz. Expect more traffic on Dashel than on HTTP.
-        //            if (update)
-        //                network->updateVariables("thymio-II");
-        //            for (int i = 0; i < 5; i++)
-        //                network->step(2); // inherited from Dashel::Hub; poll Dashel once, or timeout
-        //        }
     }
     catch(Dashel::DashelException e)
     {

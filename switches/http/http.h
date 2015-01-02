@@ -22,6 +22,7 @@
 #define ASEBA_HTTP
 
 #include <stdint.h>
+#include <list>
 #include <queue>
 #include <dashel/dashel.h>
 #include <libjson/libjson.h>
@@ -50,44 +51,56 @@ namespace Aseba
     class HttpInterface:  public Dashel::Hub, public Aseba::DescriptionsManager
     {
     public: 
-        typedef std::vector<std::string> strings;
-        typedef std::map<std::string, Aseba::VariablesMap> NodeNameToVariablesMap;
-        typedef std::map<std::pair<unsigned,unsigned>, std::set<Dashel::Stream*> > pending_variable_map;
+        typedef std::vector<std::string>      strings;
+        typedef std::list<HttpRequest*>       ResponseQueue;
+        typedef std::set<HttpRequest*>        ResponseSet;
+        typedef std::pair<unsigned,unsigned>  VariableAddress;
+        typedef std::map<std::string, Aseba::VariablesMap>      NodeNameVariablesMap;
+        typedef std::map<VariableAddress, ResponseSet>          VariableResponseSetMap;
+        typedef std::map<Dashel::Stream*, ResponseQueue>        StreamResponseQueueMap;
+        typedef std::map<HttpRequest*, std::set<std::string> >  StreamEventSubscriptionMap;
         JSONNode nodeInfoJson;
 
     protected:
         // streams
         Dashel::Stream* asebaStream;
         Dashel::Stream* httpStream;
-        std::vector<char*> knownNodes;
+        StreamResponseQueueMap     pendingResponses;
+        VariableResponseSetMap     pendingVariables;
+        StreamEventSubscriptionMap eventSubscriptions;
         std::map<Dashel::Stream*, HttpRequest> httpRequests;
-        std::map<Dashel::Stream*, std::set<std::string> > eventSubscriptions;
+        std::set<Dashel::Stream*>  streamsToShutdown;
         unsigned nodeId;
         // debug variables
         bool verbose;
         
         // Extract definitions from AESL file
         Aseba::CommonDefinitions commonDefinitions;
-        NodeNameToVariablesMap allVariables;
-        
-        // variables
-        pending_variable_map pending_vars_map;
-        
+        NodeNameVariablesMap allVariables;
+
         //variable cache
         std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
         
     public:
-        HttpInterface();
-        HttpInterface(const std::string& target, const std::string& http_port);
-        virtual void init(const std::string& target, const std::string& http_port);
-        virtual void evNodes(Dashel::Stream* conn, strings& args);
-        virtual void evVariableOrEvent(Dashel::Stream* conn, strings& args);
-        virtual void evSubscribe(Dashel::Stream* conn, strings& args);
-        virtual void evLoad(Dashel::Stream* conn, strings& args);
-        virtual void evReset(Dashel::Stream* conn, strings& args);
+        //default values needed for unit testing
+        HttpInterface(const std::string& target="tcp:;port=33333", const std::string& http_port="3000");
+        virtual void run();
+        virtual void evNodes(HttpRequest* req, strings& args);
+        virtual void evVariableOrEvent(HttpRequest* req, strings& args);
+        virtual void evSubscribe(HttpRequest* req, strings& args);
+        virtual void evLoad(HttpRequest* req, strings& args);
+        virtual void evReset(HttpRequest* req, strings& args);
         virtual void aeslLoadFile(const std::string& filename);
         virtual void aeslLoadMemory(const char* buffer, const int size);
         virtual void updateVariables(const std::string nodeName);
+        
+        virtual void scheduleResponse(Dashel::Stream* stream, HttpRequest* req);
+        virtual void addHeaders(HttpRequest* req, strings& headers);
+        virtual void finishResponse(HttpRequest* req, unsigned status, std::string result);
+        virtual void appendResponse(HttpRequest* req, unsigned status, const bool& keep_open, std::string result);
+        virtual void sendAvailableResponses();
+        virtual void unscheduleResponse(Dashel::Stream* stream, HttpRequest* req);
+        virtual void unscheduleAllResponses(Dashel::Stream* stream);
         
     protected:
         /* // reimplemented from parent classes */
@@ -103,7 +116,7 @@ namespace Aseba
         virtual void aeslLoad(xmlDoc* doc);
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
-        virtual void routeRequest(HttpRequest& req);
+        virtual void routeRequest(HttpRequest* req);
         
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
@@ -118,26 +131,31 @@ namespace Aseba
         typedef std::vector<std::string> strings;
         std::string method;
         std::string uri;
+        std::string protocol_version;
         Dashel::Stream* stream;
-        strings tokens;
-        std::map<std::string,std::string> headers;
-        std::string content;
-        bool ready;
+        strings tokens;  // parsed URI
+        std::map<std::string,std::string> headers; // incoming headers
+        std::string content; // incoming payload
+        bool ready; // incoming request is ready
+        unsigned status; // outging status
+        std::string result; // outgoing payload
+        strings outheaders;
+        bool more; // keep connection open for SSE
     protected:
-        bool headers_done;
+        bool headers_done; // flag for header parsing
+        bool status_sent;  // flag for SSE
         bool verbose;
         
     public:
         HttpRequest();
-        virtual ~HttpRequest();
-        virtual bool initialize( Dashel::Stream *stream);
-        virtual bool initialize( std::string const& start_line, Dashel::Stream *stream);
-        virtual bool initialize( std::string const& method,  std::string const& uri, Dashel::Stream *stream);
+        virtual ~HttpRequest() {};
+        virtual bool initialize( Dashel::Stream *stream); //
+        virtual bool initialize( std::string const& start_line, Dashel::Stream *stream); //
+        virtual bool initialize( std::string const& method,  std::string const& uri, std::string const& _protocol_version, Dashel::Stream *stream);
         virtual void incomingData();
-        virtual void sendStatus(unsigned status, std::string& payload, strings& headers);
-        virtual void sendStatus(unsigned status, std::string& payload);
-        virtual void sendStatus(unsigned status, strings& headers);
-        virtual void sendStatus(unsigned status);
+        virtual void sendResponse();
+        virtual void sendStatus();
+        virtual void sendPayload();
     };
 
 

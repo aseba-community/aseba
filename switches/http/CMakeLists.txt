@@ -25,6 +25,10 @@ if (LIBXML2_FOUND AND LIBJSON_FOUND)
 	target_link_libraries(test-asebahttp asebacompiler ${LIBXML2_LIBRARIES} ${LIBJSON_LIBRARY} ${ASEBA_CORE_LIBRARIES})
 
 	configure_file(testdata-HttpRequest.txt ${CMAKE_CURRENT_BINARY_DIR}/testdata-HttpRequest.txt COPYONLY)
+	configure_file(do_valgrind_macosx.sh ${CMAKE_CURRENT_BINARY_DIR}/do_valgrind_macosx.sh COPYONLY)
+	configure_file(valgrind-macosx.supp ${CMAKE_CURRENT_BINARY_DIR}/valgrind-macosx.supp COPYONLY)
+	configure_file(dummynode-1-tick.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1-tick.aesl COPYONLY)
+	configure_file(dummynode-1.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1.aesl COPYONLY)
 
 	add_test(NAME test-asebahttp
 	         COMMAND test-asebahttp)

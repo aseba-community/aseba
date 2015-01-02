@@ -11,9 +11,10 @@ add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)
 
 # External tools
-add_subdirectory(catch)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/externals/Modules/")
+add_subdirectory(externals/catch)
 include_directories(${CATCH_INCLUDE_DIR} ${COMMON_INCLUDES})
-enable_testing(true)  # Enables unit-testing.
+enable_testing(true)  # Enables unit testing.
 
 # Dashel
 find_package(dashel REQUIRED)
