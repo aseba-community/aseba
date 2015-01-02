@@ -1,6 +1,6 @@
 asebahttp - a switch to bridge HTTP to Aseba
 
-2014-12-01 David James Sherman <david dot sherman at inria dot fr>
+2015-01-01 David James Sherman <david dot sherman at inria dot fr>
 
 Provide a simple REST interface with introspection for Aseba devices.
 
@@ -10,34 +10,42 @@ Provide a simple REST interface with introspection for Aseba devices.
 - GET  /nodes/:NODENAME/:VARIABLE             - retrieve JSON value for :VARIABLE
 - POST /nodes/:NODENAME/:VARIABLE             - send new values(s) for :VARIABLE
 - POST /nodes/:NODENAME/:EVENT                - call an event :EVENT
-- GET  /events[/:EVENT]*                      - create SSE stream for all known nodes
-- GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
+- GET  /events\[/:EVENT\]*                      - create SSE stream for all known nodes
+- GET  /nodes/:NODENAME/events\[/:EVENT\]*      - create SSE stream for :NODENAME
 
 Server-side event (SSE) streams are updated as events arrive.
-SSE stream for reserved event "poll" sends variables at approx 10 Hz.
-If a variable and an events have the same name, it is the EVENT the is called.
+If a variable and an event have the same name, it is the EVENT the is called.
+On a local machine the server can handle 600 requests/sec with 10 concurrent connections,
+more (up to 2.5 times more) if the requests are pipelined as is the HTTP/1.1 default.
+
+A typical execution is: asebahttp --port 3000 --aesl mycode.aesl 'ser:name=Thymio-II' &
+After myevents.aesl is compiled and uploaded, check with 'curl http://127.0.0.1:3000/nodes/thymio-II'
+
+Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests.
+Run the script 'do_valgrind_macosx.sh' to valgrind the server using curl and siege.
+An example [Node-RED](http://nodered.org) flow can be copy/pasted from test-nodered-simple.json.
 
 DONE (mostly):
-- Dashel connection to one Thymio-II and round-robin scheduling between Dashel and Mongoose
+- Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
 - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
 - GET /nodes, GET /nodes/:NODENAME with introspection
-- POST /nodes/:NODENAME/:VARIABLE (fixme: sloppily allows GET and values in the request)
-- POST /nodes/:NODENAME/:EVENT (fixme: sloppily allows GET and values in the request)
+- POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE\[/:VALUE\]*)
+- POST /nodes/:NODENAME/:EVENT (sloppily allows GET /nodes/:NODENAME/:EVENT\[/:VALUE\]*)
+- form processing for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
 - handle asynchronous variable reporting (GET /nodes/:NODENAME/:VARIABLE)
 - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
-- program flashing (PUT /nodes/:NODENAME) although body format is tricky
+- implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
+- Aesl program bytecode upload (PUT /nodes/:NODENAME)
+  use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
+- accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
 
 TODO:
-- allow only POST requests for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
-- form processing for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
-- handle more than just one Thymio-II node!
-- implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
+- handle more than just one Thymio-II node
+- gracefully shut down TCP/IP connections (half-close, wait, close)
+- remove dependency on libjson? Our output is trivial and input syntax is limited to unsigned vectors
 
-This code includes source code from the Mongoose embedded web server from Cesanta
-Software Limited, Dublin, Ireland, and licensed under the GPL 2.
-
-This code borrows heavily from the rest of Aseba, especially switches/medulla and
-examples/clients/cpp-shell, which bear the copyright and LGPL 3 licensing notice below.
+This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
+which bear the copyright and LGPL 3 licensing notice below.
 
 
 /*

@@ -29,6 +29,7 @@ if (LIBXML2_FOUND AND LIBJSON_FOUND)
 	configure_file(valgrind-macosx.supp ${CMAKE_CURRENT_BINARY_DIR}/valgrind-macosx.supp COPYONLY)
 	configure_file(dummynode-1-tick.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1-tick.aesl COPYONLY)
 	configure_file(dummynode-1.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1.aesl COPYONLY)
+	configure_file(example-nodered-simple.json ${CMAKE_CURRENT_BINARY_DIR}/example-nodered-simple.json COPYONLY)
 
 	add_test(NAME test-asebahttp
 	         COMMAND test-asebahttp)

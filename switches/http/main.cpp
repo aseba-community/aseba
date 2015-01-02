@@ -36,9 +36,10 @@ void dumpHelp(std::ostream &stream, const char *programName)
 //! Show version
 void dumpVersion(std::ostream &stream)
 {
-    stream << "Aseba http " << ASEBA_VERSION << std::endl;
+    stream << "asebahttp 2015-01-01 David James Sherman <david dot sherman at inria dot fr>" << std::endl;
+    stream << "Aseba version " << ASEBA_VERSION << std::endl;
     stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
-    stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
+    stream << "Aseba library licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
 

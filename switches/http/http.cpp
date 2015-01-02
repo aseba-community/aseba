@@ -15,8 +15,8 @@
     GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
  
  Server-side event (SSE) streams are updated as events arrive.
- If a variable and an events have the same name, it is the EVENT the is called.
- Typically handles
+ If a variable and an event have the same name, it is the EVENT the is called.
+ On a local machine typically handles 600 requests/sec with 10 concurrent connections.
  
  DONE (mostly):
     - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
