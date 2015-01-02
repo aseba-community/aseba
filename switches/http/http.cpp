@@ -15,8 +15,8 @@
     GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
  
  Server-side event (SSE) streams are updated as events arrive.
- SSE stream for reserved event "poll" sends variables at approx 10 Hz.
  If a variable and an events have the same name, it is the EVENT the is called.
+ Typically handles
  
  DONE (mostly):
     - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
@@ -28,15 +28,17 @@
     - handle asynchronous variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
-    - program flashing (PUT  /nodes/:NODENAME)
+    - Aesl program bytecode upload (PUT /nodes/:NODENAME)
       use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
     - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
  
  TODO:
-    - handle more than just one Thymio-II node!
+    - handle more than just one Thymio-II node
+    - gracefully shut down TCP/IP connections (half-close, wait, close)
+    - remove dependency on libjson? Our output is trivial and input syntax is limited to unsigned vectors
  
- This code borrows heavily from the rest of Aseba, especially switches/medulla and
- examples/clients/cpp-shell, which bear the copyright and LGPL 3 licensing notice below.
+ This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
+ which bear the copyright and LGPL 3 licensing notice below.
  
  */
 /*
@@ -108,16 +110,6 @@ void split_string(std::string s, char delim, std::vector<std::string>& tokens)
         tokens.erase(tokens.begin(),tokens.begin()+1);
 }
 
-// make JSON array from std::vector<short>
-JSONNode json_vector(std::string name, std::vector<short> cachedval)
-{
-    JSONNode node(JSON_NODE);
-    node.set_name(name);
-    for (std::vector<short>::iterator i = cachedval.begin(); i != cachedval.end(); ++i)
-        node.push_back(JSONNode(*i));
-    return node;
-}
-
 // close the stream, this is a hack because Dashel lacks a proper shutdown mechanism
 void shutdownStream(Dashel::Stream* stream)
 {
@@ -148,15 +140,17 @@ namespace Aseba
     /** \addtogroup http */
     /*@{*/
     
+    
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port) :
+    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port, const int iterations) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStream(0),
     httpStream(0),
     nodeId(0),
-    verbose(false)
+    verbose(false),
+    iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // connect to the Aseba target
@@ -174,12 +168,10 @@ namespace Aseba
     
     void HttpInterface::run()
     {
-        //                                int tick = 120;  // just for valgrind...
         do
         {
             sendAvailableResponses();
-            //for (int i = 0; i < 50; i++)
-                step(2);
+            step(2);
             if (verbose && streamsToShutdown.size() > 0)
             {
                 cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
@@ -201,9 +193,9 @@ namespace Aseba
                 catch(Dashel::DashelException& e)
                 { }
             }
-            //                            cerr<<tick<<"."; // just for valgrind...
-        } while (true); //                (tick--);        // just for valgrind...
-
+        } while (iterations-- != 0);
+        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
+            unscheduleAllResponses(i->first);
     }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
@@ -318,8 +310,6 @@ namespace Aseba
         for (size_t i = 0; i < variables->variables.size(); ++i)
             result.push_back(JSONNode("", variables->variables[i]));
         string result_str = libjson::strip_white_space(result.write_formatted());
-        
-        // variable_cache[std::make_pair(variables->source,variables->start)] = std::vector<short>(variables->variables);
         
         VariableAddress address = std::make_pair(variables->source,variables->start);
         ResponseSet *pending = &pendingVariables[address];
@@ -686,8 +676,6 @@ namespace Aseba
 
             VariablesMap vm = allVariables[nodeName];
             const unsigned length(vm[UTF8ToWString(*it)].second);
-            
-            // variable_cache[std::pair<unsigned,unsigned>(nodePos,varPos)] = std::vector<short>();
             
             if (verbose)
                 cerr << " (" << nodePos << "," << varPos << "):" << length << "\n";
@@ -1242,5 +1230,5 @@ namespace Aseba
         result = "";
     }
     //== end of class HttpInterface ============================================================
-
+    
 };  //== end of namespace Aseba ================================================================

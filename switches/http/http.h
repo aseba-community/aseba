@@ -73,6 +73,7 @@ namespace Aseba
         unsigned nodeId;
         // debug variables
         bool verbose;
+        int iterations;
         
         // Extract definitions from AESL file
         Aseba::CommonDefinitions commonDefinitions;
@@ -83,7 +84,7 @@ namespace Aseba
         
     public:
         //default values needed for unit testing
-        HttpInterface(const std::string& target="tcp:;port=33333", const std::string& http_port="3000");
+        HttpInterface(const std::string& target="tcp:;port=33333", const std::string& http_port="3000", const int iterations=-1);
         virtual void run();
         virtual void evNodes(HttpRequest* req, strings& args);
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);
@@ -158,7 +159,13 @@ namespace Aseba
         virtual void sendPayload();
     };
 
-
+    class InterruptException : public std::exception
+    {
+    public:
+        InterruptException(int s) : S(s) {}
+        int S;
+    };
+    
     /*@}*/
 };
 
