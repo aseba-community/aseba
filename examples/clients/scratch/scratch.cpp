@@ -170,7 +170,7 @@ namespace Aseba
                     args.at(0) = "V_leds_bottom", leds[1]=color, sendEvent(req->tokens[1], args);
                 args.at(1) = "1";
                 if ((mask & 4) == 4)
-                    leds[2]=color, sendEvent(req->tokens[1], args);
+                    args.at(0) = "V_leds_bottom", leds[2]=color, sendEvent(req->tokens[1], args);
                 finishResponse(req, 200, "");
                 return;
             }
@@ -211,7 +211,7 @@ namespace Aseba
                         getCachedVal("thymio-II", "motor.right.target", right_target))
                     {
                         int vL = ((-1520 + 12*dist_front.front() + 400*angle_front.front()) * left_target.front()) / 760;
-                        int vR = ((-1520 + 12*dist_front.front() + 400*angle_front.front()) * right_target.front()) / 760;
+                        int vR = ((-1520 + 12*dist_front.front() - 400*angle_front.front()) * right_target.front()) / 760;
                         if (abs(vL-vR) < 20)
                             vL += (rand() % 33) - 16;
                         strings args;
@@ -327,38 +327,54 @@ namespace Aseba
             result << endl;
         }
         
-        
-//        b_touching/front
-//        b_touching/back
-//        b_button/center
-//        b_button/forward
-//        b_button/backward
-//        b_button/left
-//        b_button/right
-//        b_clap
-//        distance/front
-//        distance/back
-//        distance/ground
-//        angle
-//        motor.speed/left
-//        motor.speed/right
-//        tilt/right_left
-//        tilt/front_back
-//        tilt/top_bottom
-//        leds/top
-//        leds/bottom/left
-//        leds/bottom/right
-//        
-//        prox.horizontal
-//        prox.ground.delta
-//        mic.threshold
-//        mic.intensity
-//        prox.comm.rx
-//        prox.comm.tx
-//        acc
-//        temperature
+        std::vector<short> cv;
+        result << "b_button/center " << (getCachedVal("thymio-II", "button.center", cv) && cv.front() ? "true" : "false") << endl;
+        result << "b_button/forward " << (getCachedVal("thymio-II", "button.forward", cv) && cv.front() ? "true" : "false") << endl;
+        result << "b_button/backward " << (getCachedVal("thymio-II", "button.backward", cv) && cv.front() ? "true" : "false") << endl;
+        result << "b_button/left " << (getCachedVal("thymio-II", "button.left", cv) && cv.front() ? "true" : "false") << endl;
+        result << "b_button/right " << (getCachedVal("thymio-II", "button.right", cv) && cv.front() ? "true" : "false") << endl;
 
-        cerr << "poll result " << result.str() << endl;
+        if (getCachedVal("thymio-II", "prox.horizontal", cv))
+        {
+            result << "b_touching/front " << ((cv[0]+cv[1]+cv[2]+cv[3]+cv[4])/1000 > 0 ? "true" : "false") << endl;
+            result << "b_touching/front " << ((cv[5]+cv[6])/1000 > 0 ? "true" : "false") << endl;
+        }
+        if (getCachedVal("thymio-II", "prox.ground.delta", cv))
+        {
+            result << "b_touching/ground " << ((cv[0]+cv[1])/500 > 0 ? "true" : "false") << endl;
+        }
+        
+        if (getCachedVal("thymio-II", "distance.front", cv))
+            result << "distance/front " << cv.front() << endl;
+        if (getCachedVal("thymio-II", "distance.back", cv))
+            result << "distance/back " << cv.front() << endl;
+        
+        if (getCachedVal("thymio-II", "motor.left.speed", cv))
+            result << "motor.speed/left " << cv.front() << endl;
+        if (getCachedVal("thymio-II", "motor.right.speed", cv))
+            result << "motor.speed/right " << cv.front() << endl;
+        if (getCachedVal("thymio-II", "motor.left.target", cv))
+            result << "motor.target/left " << cv.front() << endl;
+        if (getCachedVal("thymio-II", "motor.right.target", cv))
+            result << "motor.target/right " << cv.front() << endl;
+        
+        if (getCachedVal("thymio-II", "acc", cv))
+        {
+            result << "tilt/right_left " << cv[0] << endl;
+            result << "tilt/front_back " << cv[1] << endl;
+            result << "tilt/top_bottom " << cv[2] << endl;
+        }
+
+        result << "leds/top " << leds[0] << endl;
+        result << "leds/bottom/left " << leds[1] << endl;
+        result << "leds/bottom/right " << leds[2] << endl;
+        
+        std::vector<short> mic_threshold, mic_intensity;
+        if (getCachedVal("thymio-II", "mic.threshold", mic_threshold) &&
+            getCachedVal("thymio-II", "mic.intensity", mic_intensity))
+            result << "b_clap " << ((mic_intensity.front() >= mic_threshold.front()) ? "true" : "false") << endl;
+
+        //cerr << "poll result " << result.str() << endl;
         return result.str();
     }
     
