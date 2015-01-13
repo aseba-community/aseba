@@ -202,6 +202,30 @@ namespace Aseba
             }
             else if (req->tokens[2].find("scratch_avoid")==0)
             { //
+                std::vector<short> dist_front, angle_front, left_target, right_target;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (getCachedVal("thymio-II", "distance.front", dist_front) &&
+                        getCachedVal("thymio-II", "angle.front", angle_front) &&
+                        getCachedVal("thymio-II", "motor.left.target", left_target) &&
+                        getCachedVal("thymio-II", "motor.right.target", right_target))
+                    {
+                        int vL = ((-1520 + 12*dist_front.front() + 400*angle_front.front()) * left_target.front()) / 760;
+                        int vR = ((-1520 + 12*dist_front.front() + 400*angle_front.front()) * right_target.front()) / 760;
+                        if (abs(vL-vR) < 20)
+                            vL += (rand() % 33) - 16;
+                        strings args;
+                        args.push_back("motor.left.target");
+                        args.push_back(std::to_string(vL));
+                        sendSetVariable(req->tokens[1], args);
+                        args.at(0) = "motor.right.target";
+                        args.at(1) = std::to_string(vR);
+                        sendSetVariable(req->tokens[1], args);
+                    }
+                    sendPollVariables("thymio-II");
+                    sendPollVariables("thymio-II");
+                }
+                finishResponse(req, 200, "");
                 return;
             }
         }
