@@ -410,6 +410,8 @@ namespace Aseba
         {   // reset nodes
             return evReset(req, req->tokens);
         }
+        else
+            finishResponse(req, 404, "");
     }
     
     // Handler: Node descriptions
@@ -425,10 +427,11 @@ namespace Aseba
         {
             const NodeDescription& description(descIt->second);
             char wbuf[128];
+            string nodeName = wstringtocstr(description.name,wbuf);
             
             JSONNode node(JSON_NODE);
             node.set_name("nodeInfo");
-            node.push_back(JSONNode("name", wstringtocstr(description.name,wbuf)));
+            node.push_back(JSONNode("name", nodeName));
             node.push_back(JSONNode("protocolVersion", description.protocolVersion));
             
             if (do_one_node)
@@ -440,9 +443,18 @@ namespace Aseba
                 // named variables
                 JSONNode named_variables(JSON_NODE);
                 named_variables.set_name("namedVariables");
-                for (size_t i = 0; i < description.namedVariables.size(); ++i)
-                    named_variables.push_back(JSONNode(wstringtocstr(description.namedVariables[i].name,wbuf),
-                                                       description.namedVariables[i].size));
+//                for (size_t i = 0; i < description.namedVariables.size(); ++i)
+//                    named_variables.push_back(JSONNode(wstringtocstr(description.namedVariables[i].name,wbuf),
+//                                                       description.namedVariables[i].size));
+                for (NodeNameVariablesMap::const_iterator n(allVariables.find(nodeName));
+                     n != allVariables.end(); ++n)
+                {
+                    VariablesMap vm = n->second;
+                    for (VariablesMap::iterator i = vm.begin();
+                         i != vm.end(); ++i)
+                        named_variables.push_back(JSONNode(wstringtocstr(i->first, wbuf),
+                                                  i->second.second));
+                }
                 node.push_back(named_variables);
                 
                 // local events variables
@@ -611,7 +623,7 @@ namespace Aseba
             char nodeName[128];
             wstringtocstr(descIt->second.name, nodeName);
             
-            this->lock(); // inherited from Dashel::Hub
+            //this->lock(); // inherited from Dashel::Hub
             
             Reset(nodeId).serialize(asebaStream); // reset node
             asebaStream->flush();
