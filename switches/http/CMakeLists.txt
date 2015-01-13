@@ -37,4 +37,24 @@ if (LIBXML2_FOUND AND LIBJSON_FOUND)
 	install(TARGETS asebahttp RUNTIME
 		DESTINATION bin
 	)
+
+add_library(asebahttphub ${http_SRCS})
+set_target_properties(asebahttphub PROPERTIES VERSION ${LIB_VERSION_STRING} 
+                                            SOVERSION ${LIB_VERSION_MAJOR})
+
+install(TARGETS asebahttphub
+                LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+                ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
+)
+
+set (ASEBACORE_HDR_HTTP
+        http.h
+)
+install(FILES ${ASEBACORE_HDR_HTTP}
+        DESTINATION include/aseba/switches/http
+)
+
+
+
+
 endif (LIBXML2_FOUND AND LIBJSON_FOUND)
