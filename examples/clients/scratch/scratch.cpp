@@ -268,9 +268,9 @@ namespace Aseba
                 int busyid = stoi(req->tokens[3]);
                 int degrees = stoi(req->tokens[4]);
                 int speed = (abs(degrees) > 90) ? 65 : 43;
-                int dist = 39.76 * abs(degrees) + 1.225 * speed - 96.57;
-                int time = dist * 16 / speed;
-                speed = speed *32 / 10;
+                int dist = 3976 * abs(degrees) / 100 + 73;
+                speed = speed * 32 / 10;
+                int time = dist / speed;
                 strings args;
                 args.push_back("Q_add_motion");
                 args.push_back(std::to_string(busyid));
@@ -288,16 +288,17 @@ namespace Aseba
                 int radius = stoi(req->tokens[4]);
                 int degrees = stoi(req->tokens[5]);
                 int ratio = (abs(radius)-95) * 10000 / abs(radius);
-                int t4 = degrees * abs(radius) * 35 / 2000; // degrees * radius * pi/180
-                //int t5 = t4 * ratio / 10000;
-                int t6 = 400 * ratio / 10000;
-                int time = t4 * 50 / 400;
+                int time = degrees * 35 * radius / 8 / 2000;
+                int v_out = 400;
+                int v_in = v_out * ratio / 10000;
+                if (radius < 0)
+                    v_in = -v_in, v_out = -v_out;
                 strings args;
                 args.push_back("Q_add_motion");
                 args.push_back(std::to_string(busyid));
                 args.push_back(std::to_string(time));
-                args.push_back(std::to_string((degrees > 0) ?  400 :  t6 ));
-                args.push_back(std::to_string((degrees > 0) ?   t6 : 400 ));
+                args.push_back(std::to_string((degrees > 0) ?  v_out : v_in  ));
+                args.push_back(std::to_string((degrees > 0) ?  v_in  : v_out ));
                 sendEvent(req->tokens[1], args);
                 busy_threads.insert(busyid);
                 finishResponse(req, 200, "");
