@@ -21,6 +21,7 @@ namespace Aseba
         //std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
         std::map<VariableAddress, std::vector<short> > variable_cache;
         std::list<GetVariables> polled_variables;
+        std::set<int> busy_threads;
         unsigned blink_state;
         unsigned scratch_dial;
         std::vector<unsigned> leds; // top, bottom-left, bottom-right
@@ -32,6 +33,7 @@ namespace Aseba
     protected:
         virtual void routeRequest(HttpRequest* req);
         virtual void incomingVariables(const Variables *variables);
+        virtual void incomingUserMsg(const UserMessage *userMsg);
         virtual void sendPollVariables(const std::string nodeName);
         virtual bool getCachedVal(const std::string& nodeName, const std::string& varName,
                                   std::vector<short>& cachedval);

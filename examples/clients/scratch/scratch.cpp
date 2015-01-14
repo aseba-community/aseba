@@ -49,6 +49,23 @@ namespace Aseba
         variable_cache[VariableAddress(variables->source,variables->start)] = std::vector<short>(variables->variables);
         HttpInterface::incomingVariables(variables); // then use base class method
     }
+    
+    void ScratchInterface::incomingUserMsg(const UserMessage *userMsg)
+    {
+        if (commonDefinitions.events[userMsg->type].name.find(L"Q_motion_ended") &&
+            userMsg->data.size() >= 1)
+        {
+            // Qid, Qtime, QspL, QspR, Qpc
+            // remove userMsg->data[0] from busy_threads
+            busy_threads.erase(userMsg->data[0]);
+            if (verbose)
+            {
+                cerr << "Q_motion_ended id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
+                     << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
+            }
+        }
+        HttpInterface::incomingUserMsg(userMsg);
+    }
 
     void ScratchInterface::routeRequest(HttpRequest* req)
     {
@@ -228,6 +245,72 @@ namespace Aseba
                 finishResponse(req, 200, "");
                 return;
             }
+            else if (req->tokens[2].find("scratch_move")==0)
+            { //
+                int busyid = stoi(req->tokens[3]);
+                int mm = stoi(req->tokens[4]);
+                int speed = abs(mm) < 20 ? 20 : (abs(mm) > 150 ? 150 : abs(mm));
+                int time = abs(mm) * 16 / speed; // time measured in 16 Hz ticks
+                speed = speed * 32 / 10;
+                strings args;
+                args.push_back("Q_add_motion");
+                args.push_back(std::to_string(busyid));
+                args.push_back(std::to_string(time));
+                args.push_back(std::to_string((mm > 0) ? speed : -speed ));
+                args.push_back(std::to_string((mm > 0) ? speed : -speed ));
+                sendEvent(req->tokens[1], args);
+                busy_threads.insert(busyid);
+                finishResponse(req, 200, "");
+                return;
+            }
+            else if (req->tokens[2].find("scratch_turn")==0)
+            { // dist = 39.76 * degrees + 1.225 * speed - 96.57
+                int busyid = stoi(req->tokens[3]);
+                int degrees = stoi(req->tokens[4]);
+                int speed = (abs(degrees) > 90) ? 65 : 43;
+                int dist = 39.76 * abs(degrees) + 1.225 * speed - 96.57;
+                int time = dist * 16 / speed;
+                speed = speed *32 / 10;
+                strings args;
+                args.push_back("Q_add_motion");
+                args.push_back(std::to_string(busyid));
+                args.push_back(std::to_string(time));
+                args.push_back(std::to_string((degrees > 0) ?  speed : -speed ));
+                args.push_back(std::to_string((degrees > 0) ? -speed :  speed ));
+                sendEvent(req->tokens[1], args);
+                busy_threads.insert(busyid);
+                finishResponse(req, 200, "");
+                return;
+            }
+            else if (req->tokens[2].find("scratch_arc")==0)
+            { //
+                int busyid = stoi(req->tokens[3]);
+                int radius = stoi(req->tokens[4]);
+                int degrees = stoi(req->tokens[5]);
+                int ratio = (abs(radius)-95) * 10000 / abs(radius);
+                int t4 = degrees * abs(radius) * 35 / 2000; // degrees * radius * pi/180
+                //int t5 = t4 * ratio / 10000;
+                int t6 = 400 * ratio / 10000;
+                int time = t4 * 50 / 400;
+                strings args;
+                args.push_back("Q_add_motion");
+                args.push_back(std::to_string(busyid));
+                args.push_back(std::to_string(time));
+                args.push_back(std::to_string((degrees > 0) ?  400 :  t6 ));
+                args.push_back(std::to_string((degrees > 0) ?   t6 : 400 ));
+                sendEvent(req->tokens[1], args);
+                busy_threads.insert(busyid);
+                finishResponse(req, 200, "");
+                return;
+            }
+            else if (req->tokens[2].find("scratch_sound_freq")==0)
+            { // TODO: need to set timer!
+//                int busyid = stoi(req->tokens[3]);
+//                int freq = stoi(req->tokens[4]);
+//                int sixtieths = stoi(req->tokens[5]);
+                finishResponse(req, 200, "");
+                return;
+            }
         }
         HttpInterface::routeRequest(req); // else use base class method
     }
@@ -304,6 +387,11 @@ namespace Aseba
         nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
         std::stringstream result;
         char wbuf[128];
+        
+        result << "_busy";
+        for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
+            result << " " << *i;
+        result << endl;
         
         for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
         {
