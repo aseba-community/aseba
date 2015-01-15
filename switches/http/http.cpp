@@ -1137,6 +1137,13 @@ namespace Aseba
         uri = std::string(_uri);
         protocol_version = std::string(_protocol_version);
         stream = _stream;
+        
+        // Also allow %2F as URL part delimiter (see Scratch v430)
+        //std::string patched_uri(uri);
+        std::string::size_type n = 0;
+        while ( (n=uri.find("%2F",n)) != std::string::npos)
+            uri.replace(n,3,"/"), n += 1;
+        
         split_string(uri, '/', tokens);
         return true;
     }
