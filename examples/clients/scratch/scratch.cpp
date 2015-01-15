@@ -25,6 +25,12 @@ std::vector<std::string>&  append_strings_unsigned_vector(std::vector<unsigned>&
     return result;
 }
 
+short clamp(short& var, short min, short max)
+{
+    return var = (var < min ? min : (var > max ? max : var));
+}
+
+
 //== Main event ============================================================================
 
 namespace Aseba
@@ -41,7 +47,7 @@ namespace Aseba
     scratch_dial(0),
     leds(3,0)
     {
-        verbose=true;
+        verbose=false;
     };
     
     void ScratchInterface::incomingVariables(const Variables *variables)
@@ -52,7 +58,7 @@ namespace Aseba
     
     void ScratchInterface::incomingUserMsg(const UserMessage *userMsg)
     {
-        if (commonDefinitions.events[userMsg->type].name.find(L"Q_motion_ended") &&
+        if (commonDefinitions.events[userMsg->type].name.find(L"Q_motion_ended")==0 &&
             userMsg->data.size() >= 1)
         {
             // Qid, Qtime, QspL, QspR, Qpc
@@ -402,11 +408,6 @@ namespace Aseba
             if (cachedval.size() == 0)
                 continue;
             
-//            std::string patched_name(wbuf);
-//            std::string::size_type n = 0;
-//            while ( (n=patched_name.find(".",n)) != std::string::npos)
-//                patched_name.replace(n,1,"/"), n += 1;
-            
             result << wstringtocstr(it->first,wbuf);
             for (std::vector<short>::iterator i = cachedval.begin(); i != cachedval.end(); ++i)
                 if (is_boolean_variable)
@@ -426,7 +427,7 @@ namespace Aseba
         if (getCachedVal("thymio-II", "prox.horizontal", cv))
         {
             result << "b_touching/front " << ((cv[0]+cv[1]+cv[2]+cv[3]+cv[4])/1000 > 0 ? "true" : "false") << endl;
-            result << "b_touching/front " << ((cv[5]+cv[6])/1000 > 0 ? "true" : "false") << endl;
+            result << "b_touching/back " << ((cv[5]+cv[6])/1000 > 0 ? "true" : "false") << endl;
         }
         if (getCachedVal("thymio-II", "prox.ground.delta", cv))
         {
@@ -434,18 +435,23 @@ namespace Aseba
         }
         
         if (getCachedVal("thymio-II", "distance.front", cv))
-            result << "distance/front " << cv.front() << endl;
+            result << "distance/front " << clamp(cv.front(),(short)0,(short)190) << endl;
         if (getCachedVal("thymio-II", "distance.back", cv))
-            result << "distance/back " << cv.front() << endl;
+            result << "distance/back " << clamp(cv.front(),(short)0,(short)120) << endl;
+        if (getCachedVal("thymio-II", "prox.ground.delta", cv))
+            result << "distance/ground " << (cv[0]+cv[1] > 1000 ? 0 : 500) << endl;
         
+        if (getCachedVal("thymio-II", "angle.front", cv))
+            result << "angle/front " << cv.front() << endl;
+
         if (getCachedVal("thymio-II", "motor.left.speed", cv))
-            result << "motor.speed/left " << cv.front() << endl;
+            result << "motor.speed/left " << cv.front()  *10/32 << endl;
         if (getCachedVal("thymio-II", "motor.right.speed", cv))
-            result << "motor.speed/right " << cv.front() << endl;
+            result << "motor.speed/right " << cv.front() *10/32 << endl;
         if (getCachedVal("thymio-II", "motor.left.target", cv))
-            result << "motor.target/left " << cv.front() << endl;
+            result << "motor.target/left " << cv.front() *10/32 << endl;
         if (getCachedVal("thymio-II", "motor.right.target", cv))
-            result << "motor.target/right " << cv.front() << endl;
+            result << "motor.target/right " << cv.front()*10/32 << endl;
         
         if (getCachedVal("thymio-II", "acc", cv))
         {
@@ -514,15 +520,18 @@ namespace Aseba
                 polled_variables.push_back(GetVariables(source, pos, len));
         }
         std::list<GetVariables>::iterator pvi = polled_variables.begin();
-        cerr << "poll ";
+        if (verbose)
+            cerr << "poll ";
         int window = polled_variables.size() <= 18 ? polled_variables.size() : polled_variables.size()/3;
         for (int i = 0; i < window; i++, pvi++)
         {
             GetVariables getVariables(*pvi);
             getVariables.serialize(asebaStream);
-            cerr << "1," << pvi->start << "(" << pvi->length << ") ";
+            if (verbose)
+                cerr << "1," << pvi->start << "(" << pvi->length << ") ";
         }
-        cerr << endl;
+        if (verbose)
+            cerr << endl;
         asebaStream->flush();
         std::rotate(polled_variables.begin(), pvi, polled_variables.end());
     }
