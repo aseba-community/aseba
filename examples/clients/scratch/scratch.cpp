@@ -256,7 +256,7 @@ namespace Aseba
                 int busyid = stoi(req->tokens[3]);
                 int mm = stoi(req->tokens[4]);
                 int speed = abs(mm) < 20 ? 20 : (abs(mm) > 150 ? 150 : abs(mm));
-                int time = abs(mm) * 16 / speed; // time measured in 16 Hz ticks
+                int time = abs(mm) * 100 / speed; // time measured in 16 Hz ticks
                 speed = speed * 32 / 10;
                 strings args;
                 args.push_back("Q_add_motion");
@@ -271,12 +271,20 @@ namespace Aseba
             }
             else if (req->tokens[2].find("scratch_turn")==0)
             { // dist = 39.76 * degrees + 1.225 * speed - 96.57
+              // int dist = (24850 * abs(degrees) + 763 * speed) / 100;
                 int busyid = stoi(req->tokens[3]);
                 int degrees = stoi(req->tokens[4]);
-                int speed = (abs(degrees) > 90) ? 65 : 43;
-                int dist = 3976 * abs(degrees) / 100 + 73;
-                speed = speed * 32 / 10;
-                int time = dist / speed;
+                int speed, time;
+                if (abs(degrees) > 90)
+                {
+                    speed = 65 * 32/10;
+                    time = abs(degrees) * 1.3;
+                }
+                else
+                {
+                    speed = 43 * 32/10;
+                    time = abs(degrees) * 2.0;
+                }
                 strings args;
                 args.push_back("Q_add_motion");
                 args.push_back(std::to_string(busyid));
@@ -294,7 +302,8 @@ namespace Aseba
                 int radius = stoi(req->tokens[4]);
                 int degrees = stoi(req->tokens[5]);
                 int ratio = (abs(radius)-95) * 10000 / abs(radius);
-                int time = degrees * 35 * radius / 8 / 2000;
+//                int time = degrees * 35 * radius / 8 / 2000;
+                int time = (degrees * (50.36 * radius + 25)) / 3600;
                 int v_out = 400;
                 int v_in = v_out * ratio / 10000;
                 if (radius < 0)
@@ -444,6 +453,13 @@ namespace Aseba
         if (getCachedVal("thymio-II", "angle.front", cv))
             result << "angle/front " << cv.front() << endl;
 
+        if (getCachedVal("thymio-II", "odo.theta", cv))
+            result << "odo/theta " << 90 - cv.front()/182 << endl;
+        if (getCachedVal("thymio-II", "odo.x", cv))
+            result << "odo/x " << cv.front()/28 << endl;
+        if (getCachedVal("thymio-II", "odo.y", cv))
+            result << "odo/y " << cv.front()/28 << endl;
+
         if (getCachedVal("thymio-II", "motor.left.speed", cv))
             result << "motor.speed/left " << cv.front()  *10/32 << endl;
         if (getCachedVal("thymio-II", "motor.right.speed", cv))
@@ -494,6 +510,14 @@ namespace Aseba
                 polled_variables.push_back(GetVariables(source, pos, len));
             if (getVarAddrLen(nodeName, "angle.front", source, pos, len))
                 polled_variables.push_back(GetVariables(source, pos, len));
+            if (getVarAddrLen(nodeName, "odo.delta", source, pos, len))
+                polled_variables.push_back(GetVariables(source, pos, len));
+            if (getVarAddrLen(nodeName, "odo.theta", source, pos, len))
+                polled_variables.push_back(GetVariables(source, pos, len));
+            if (getVarAddrLen(nodeName, "odo.x", source, pos, len))
+                polled_variables.push_back(GetVariables(source, pos, len));
+            if (getVarAddrLen(nodeName, "odo.y", source, pos, len))
+                polled_variables.push_back(GetVariables(source, pos, len));
             if (getVarAddrLen(nodeName, "motor.left.speed", source, pos, len))
                 polled_variables.push_back(GetVariables(source, pos, len));
             if (getVarAddrLen(nodeName, "motor.right.speed", source, pos, len))
@@ -522,7 +546,7 @@ namespace Aseba
         std::list<GetVariables>::iterator pvi = polled_variables.begin();
         if (verbose)
             cerr << "poll ";
-        int window = polled_variables.size() <= 18 ? polled_variables.size() : polled_variables.size()/3;
+        int window = polled_variables.size() <= 50 ? polled_variables.size() : polled_variables.size()/3;
         for (int i = 0; i < window; i++, pvi++)
         {
             GetVariables getVariables(*pvi);
