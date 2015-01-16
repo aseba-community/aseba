@@ -301,6 +301,8 @@ namespace Aseba
                 int busyid = stoi(req->tokens[3]);
                 int radius = stoi(req->tokens[4]);
                 int degrees = stoi(req->tokens[5]);
+                if (abs(radius) < 100)
+                    radius = (radius < 0) ? -100 : 100; // although actually, we should just call scratch_turn
                 int ratio = (abs(radius)-95) * 10000 / abs(radius);
 //                int time = degrees * 35 * radius / 8 / 2000;
                 int time = (degrees * (50.36 * radius + 25)) / 3600;
@@ -454,7 +456,7 @@ namespace Aseba
             result << "angle/front " << cv.front() << endl;
 
         if (getCachedVal("thymio-II", "odo.theta", cv))
-            result << "odo/theta " << 90 - cv.front()/182 << endl;
+            result << "odo/direction " << 90 - cv.front()/182 << endl;
         if (getCachedVal("thymio-II", "odo.x", cv))
             result << "odo/x " << cv.front()/28 << endl;
         if (getCachedVal("thymio-II", "odo.y", cv))
