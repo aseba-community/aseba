@@ -158,12 +158,17 @@ namespace Aseba
         connect(asebaTarget); // triggers connectionCreated, which assigns asebaStream
         
         // request a description for aseba target
-        GetDescription getDescription;
-        getDescription.serialize(asebaStream);
-        asebaStream->flush();
+        broadcastGetDescription();
         
         // listen for incoming HTTP requests
         httpStream = connect("tcpin:port=" + http_port);
+    }
+    
+    void HttpInterface::broadcastGetDescription()
+    {
+        GetDescription getDescription;
+        getDescription.serialize(asebaStream);
+        asebaStream->flush();
     }
     
     void HttpInterface::run()
@@ -193,7 +198,7 @@ namespace Aseba
                 catch(Dashel::DashelException& e)
                 { }
             }
-        } while (iterations-- != 0);
+        } while (iterations-- != 0 and asebaStream != 0);
         for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
             unscheduleAllResponses(i->first);
     }
@@ -220,6 +225,10 @@ namespace Aseba
     {
         if (stream == asebaStream)
         {
+            // first close all HTTP connections
+            for (StreamResponseQueueMap::iterator m = pendingResponses.begin(); m != pendingResponses.end(); m++)
+                closeStream(m->first);
+            // then stop the hub
             asebaStream = 0;
             if (verbose)
                 cerr << "Connection closed to Aseba target" << endl;
@@ -242,6 +251,11 @@ namespace Aseba
         if (verbose)
             wcerr << L"Received description for " << getNodeName(nodeId) << endl;
         this->nodeId = nodeId;
+    }
+    
+    bool HttpInterface::descriptionReceived()
+    {
+        return (nodeId != 0);
     }
     
     void HttpInterface::incomingData(Stream *stream)
