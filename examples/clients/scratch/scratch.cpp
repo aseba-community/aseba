@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "../../../switches/http/http.h"
 #include "../../../common/consts.h"
@@ -635,28 +637,39 @@ int main(int argc, char *argv[])
     Dashel::initPlugins();
     
     // create and run bridge, catch Dashel exceptions
-    try
-    {
-        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target, http_port, 1000*Kiterations));
-        
-        if (aesl_filename.size() > 0)
+    do {
+        try
         {
-            for (int i = 0; i < 500; i++)
-                network->step(2); // wait for description, variables, etc
-            network->aeslLoadFile(aesl_filename);
+            Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target, http_port, 1000*Kiterations));
+            
+            if (aesl_filename.size() > 0)
+            {
+                while (! network->descriptionReceived())
+                {
+                    network->broadcastGetDescription();
+                    network->step(20); // wait for description, variables, etc
+                }
+                network->aeslLoadFile(aesl_filename);
+            }
+            
+            network->run();
+            delete network;
         }
-        
-        network->run();
-        delete network;
-    }
-    catch(Dashel::DashelException e)
-    {
-        std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
-        return 1;
-    }
-    catch (Aseba::InterruptException& e) {
-        std::cerr << " attempting graceful network shutdown" << std::endl;
-    }
+        catch(Dashel::DashelException e)
+        {
+            if (e.source == Dashel::DashelException::ConnectionFailed)
+                std::this_thread::sleep_for (std::chrono::seconds(2)); // cable disconnected, keep looking
+            else
+            {
+                std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
+                return 1;
+            }
+        }
+        catch (Aseba::InterruptException& e) {
+            std::cerr << " attempting graceful network shutdown" << std::endl;
+        }
+        //std::this_thread::sleep_for (std::chrono::seconds(10));
+    } while (true);
 
     return 0;
 }
