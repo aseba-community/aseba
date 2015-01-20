@@ -646,9 +646,12 @@ int main(int argc, char *argv[])
             {
                 while (! network->descriptionReceived())
                 {
+                    std::cerr << "Look for node description" << std::endl;
                     network->broadcastGetDescription();
-                    network->step(20); // wait for description, variables, etc
+                    for (int i = 0; i < 50; i++)
+                        network->step(20); // wait for description, variables, etc
                 }
+                std::cerr << "Node description received" << std::endl;
                 network->aeslLoadFile(aesl_filename);
             }
             
