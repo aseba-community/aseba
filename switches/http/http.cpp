@@ -251,11 +251,12 @@ namespace Aseba
         if (verbose)
             wcerr << L"Received description for " << getNodeName(nodeId) << endl;
         this->nodeId = nodeId;
+        this->descComplete = true;
     }
     
-    bool HttpInterface::descriptionReceived()
+    bool HttpInterface::descriptionComplete()
     {
-        return (nodeId != 0);
+        return descComplete;
     }
     
     void HttpInterface::incomingData(Stream *stream)
@@ -266,6 +267,10 @@ namespace Aseba
                 cerr << "incoming for asebaStream " << stream << endl;
 
             Message *message(Message::receive(stream));
+            
+            // dump
+            message->dump(std::wcout);
+            std::wcout << std::endl;
             
             // pass message to description manager, which builds
             // the node descriptions in background

@@ -644,12 +644,12 @@ int main(int argc, char *argv[])
             
             if (aesl_filename.size() > 0)
             {
-                while (! network->descriptionReceived())
+                while (! network->descriptionComplete())
                 {
-                    std::cerr << "Look for node description" << std::endl;
+                    std::cerr << "Looking for node description" << std::endl;
                     network->broadcastGetDescription();
-                    for (int i = 0; i < 50; i++)
-                        network->step(20); // wait for description, variables, etc
+                    //for (int i = 0; i < 50; i++)
+                        network->step(-1); // wait for description, variables, etc
                 }
                 std::cerr << "Node description received" << std::endl;
                 network->aeslLoadFile(aesl_filename);
