@@ -51,6 +51,7 @@ namespace Aseba { namespace ThymioVPL
 
 		virtual void aboutToLoad();
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
+		virtual QDomDocument transformDomToVersion1(const QDomDocument& content0);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
 		
