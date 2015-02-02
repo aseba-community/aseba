@@ -680,7 +680,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		if (version != "1")
 		{
-			QMessageBox::warning(0, "Incompatible version", "This file is incompatible with this version of ThymioVPL, it might not work correctly.");
+			QMessageBox::warning(0, tr("Incompatible Version"), tr("This file is incompatible with this version of ThymioVPL. It might not work correctly."));
 		}
 		
 		loading = true;
