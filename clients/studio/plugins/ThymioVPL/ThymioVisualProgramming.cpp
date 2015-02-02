@@ -670,17 +670,30 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
+		const QDomElement vplroot(document.documentElement());
+		const QString version(vplroot.attribute("xml-format-version"));
+		
+		if (version.isNull())
+		{
+			loadFromDom(transformDomToVersion1(document), fromFile);
+			return;
+		}
+		if (version != "1")
+		{
+			QMessageBox::warning(0, tr("Incompatible Version"), tr("This file is incompatible with this version of ThymioVPL. It might not work correctly."));
+		}
+		
 		loading = true;
 		
 		// first load settings
-		const QDomElement settingsElement(document.documentElement().firstChildElement("settings"));
+		const QDomElement settingsElement(vplroot.firstChildElement("settings"));
 		if (!settingsElement.isNull())
 		{
 			//colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
 		}
 		
 		// then load program
-		const QDomElement programElement(document.documentElement().firstChildElement("program"));
+		const QDomElement programElement(vplroot.firstChildElement("program"));
 		if (!programElement.isNull())
 		{
 			scene->deserialize(programElement);
@@ -695,6 +708,96 @@ namespace Aseba { namespace ThymioVPL
 		
 		loading = false;
 		clearUndo();
+	}
+	
+	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
+	{
+		const QDomElement vplroot0(document0.documentElement());
+		const QDomElement settings0(vplroot0.firstChildElement("settings"));
+		
+		QDomDocument document1;
+		
+		QDomElement vplroot1(document1.createElement("vplroot"));
+		document1.appendChild(vplroot1);
+		vplroot1.setAttribute("xml-format-version", "1");
+		
+		QDomElement settings1(document1.createElement("settings"));
+		vplroot1.appendChild(settings1);
+		settings1.setAttribute("color-scheme", settings0.attribute("color-scheme"));
+		
+		QDomElement program1(document1.createElement("program"));
+		vplroot1.appendChild(program1);
+		program1.setAttribute("advanced_mode", settings0.attribute("advanced-mode") == "true");
+		
+		// track duplicate events
+		QMap<QString, QDomElement> setsByEvent;
+		
+		for (QDomElement buttonset0(vplroot0.firstChildElement("buttonset")); !buttonset0.isNull(); buttonset0 = buttonset0.nextSiblingElement("buttonset"))
+		{
+			QDomElement set1(document1.createElement("set"));
+			
+			QString eventName(buttonset0.attribute("event-name"));
+			if (!eventName.isNull())
+			{
+				QDomElement event1(document1.createElement("block"));
+				set1.appendChild(event1);
+				event1.setAttribute("type", "event");
+				event1.setAttribute("name", eventName);
+				for (unsigned i(0);; ++i)
+				{
+					QString value(buttonset0.attribute(QString("eb%0").arg(i)));
+					if (value.isNull())
+						break;
+					event1.setAttribute(QString("value%0").arg(i), value);
+				}
+			}
+			
+			QString stateValue(buttonset0.attribute("state"));
+			if (!stateValue.isNull() && stateValue != "-1")
+			{
+				QDomElement state1(document1.createElement("block"));
+				set1.appendChild(state1);
+				state1.setAttribute("type", "state");
+				state1.setAttribute("name", "statefilter");
+				state1.setAttribute("value0", stateValue);
+			}
+			
+			{
+				// check for duplicate events
+				QString setKey;
+				QTextStream setKeyStream(&setKey);
+				set1.save(setKeyStream, 0);
+				if (!setsByEvent.contains(setKey))
+				{
+					// new event => insert the new set in the document
+					setsByEvent.insert(setKey, set1);
+					program1.appendChild(set1);
+				}
+				else
+				{
+					// duplicate event => reuse previously-inserted set
+					set1 = setsByEvent.value(setKey);
+				}
+			}
+
+			QString actionName(buttonset0.attribute("action-name"));
+			if (!actionName.isNull())
+			{
+				QDomElement action1(document1.createElement("block"));
+				set1.appendChild(action1);
+				action1.setAttribute("type", "action");
+				action1.setAttribute("name", actionName);
+				for (unsigned i(0);; ++i)
+				{
+					QString value(buttonset0.attribute(QString("ab%0").arg(i)));
+					if (value.isNull())
+						break;
+					action1.setAttribute(QString("value%0").arg(i), value);
+				}
+			}
+		}
+		
+		return document1;
 	}
 	
 	void ThymioVisualProgramming::codeChangedInEditor()

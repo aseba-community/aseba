@@ -63,7 +63,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		QDomElement serialize(QDomDocument& document) const;
 		void deserialize(const QDomElement& element);
-		void deserializeOldFormat_1_3(const QDomElement& element);
 		void deserialize(const QByteArray& data);
 		
 		void repositionElements();
