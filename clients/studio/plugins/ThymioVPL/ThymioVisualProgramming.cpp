@@ -729,10 +729,12 @@ namespace Aseba { namespace ThymioVPL
 		vplroot1.appendChild(program1);
 		program1.setAttribute("advanced_mode", settings0.attribute("advanced-mode") == "true");
 		
+		// track duplicate events
+		QMap<QString, QDomElement> setsByEvent;
+		
 		for (QDomElement buttonset0(vplroot0.firstChildElement("buttonset")); !buttonset0.isNull(); buttonset0 = buttonset0.nextSiblingElement("buttonset"))
 		{
 			QDomElement set1(document1.createElement("set"));
-			program1.appendChild(set1);
 			
 			QString eventName(buttonset0.attribute("event-name"));
 			if (!eventName.isNull())
@@ -760,6 +762,24 @@ namespace Aseba { namespace ThymioVPL
 				state1.setAttribute("value0", stateValue);
 			}
 			
+			{
+				// check for duplicate events
+				QString setKey;
+				QTextStream setKeyStream(&setKey);
+				set1.save(setKeyStream, 0);
+				if (!setsByEvent.contains(setKey))
+				{
+					// new event => insert the new set in the document
+					setsByEvent.insert(setKey, set1);
+					program1.appendChild(set1);
+				}
+				else
+				{
+					// duplicate event => reuse previously-inserted set
+					set1 = setsByEvent.value(setKey);
+				}
+			}
+
 			QString actionName(buttonset0.attribute("action-name"));
 			if (!actionName.isNull())
 			{
