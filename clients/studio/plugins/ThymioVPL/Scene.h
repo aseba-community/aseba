@@ -18,7 +18,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		QGraphicsItem *addAction(const QString& name);
 		QGraphicsItem *addEvent(const QString& name);
-		void addEventActionsSetOldFormat_1_3(const QDomElement& element);
 		void addEventActionsSet(const QDomElement& element);
 		void ensureOneEmptySetAtEnd();
 

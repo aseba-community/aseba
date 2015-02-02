@@ -118,14 +118,6 @@ namespace Aseba { namespace ThymioVPL
 		addEventActionsSet(eventActionsSet);
 	}
 	
-	//! Add a new event-actions set from a DOM Element in 1.3 format, used by load
-	void Scene::addEventActionsSetOldFormat_1_3(const QDomElement& element)
-	{
-		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
-		eventActionsSet->deserializeOldFormat_1_3(element);
-		addEventActionsSet(eventActionsSet);
-	}
-	
 	//! Makes sure that there is at least one empty event-actions set at the end of the scene
 	void Scene::ensureOneEmptySetAtEnd()
 	{
@@ -275,12 +267,6 @@ namespace Aseba { namespace ThymioVPL
 			if (element.tagName() == "set")
 			{
 				addEventActionsSet(element);
-			}
-			else if(element.tagName() == "buttonset")
-			{
-				QMessageBox::warning(0, "Feature not implemented", "Loading of files from 1.3 is not implementd yet, it will be soon, please be patient. Thank you.");
-				break;
-				//addEventActionsSetOldFormat_1_3(element);
 			}
 			
 			element = element.nextSiblingElement();
