@@ -752,14 +752,18 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 			
-			QString stateValue(buttonset0.attribute("state"));
-			if (!stateValue.isNull() && stateValue != "-1")
+			int state(buttonset0.attribute("state").toInt());
+			if (state >= 0)
 			{
 				QDomElement state1(document1.createElement("block"));
 				set1.appendChild(state1);
 				state1.setAttribute("type", "state");
 				state1.setAttribute("name", "statefilter");
-				state1.setAttribute("value0", stateValue);
+				for (unsigned i(0); i < 4; ++i)
+				{
+					const unsigned value((state >> (i * 2)) & 0x3);
+					state1.setAttribute(QString("value%0").arg(i), value);
+				}
 			}
 			
 			{
@@ -783,6 +787,11 @@ namespace Aseba { namespace ThymioVPL
 			QString actionName(buttonset0.attribute("action-name"));
 			if (!actionName.isNull())
 			{
+				if (actionName == "statefilter")
+				{
+					actionName = "setstate";
+				}
+				
 				QDomElement action1(document1.createElement("block"));
 				set1.appendChild(action1);
 				action1.setAttribute("type", "action");
