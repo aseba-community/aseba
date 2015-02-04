@@ -739,6 +739,12 @@ namespace Aseba { namespace ThymioVPL
 			QString eventName(buttonset0.attribute("event-name"));
 			if (!eventName.isNull())
 			{
+				if (eventName == "tap")
+				{
+					// tap event was renamed to acc
+					eventName = "acc";
+				}
+				
 				QDomElement event1(document1.createElement("block"));
 				set1.appendChild(event1);
 				event1.setAttribute("type", "event");
@@ -748,18 +754,30 @@ namespace Aseba { namespace ThymioVPL
 					QString value(buttonset0.attribute(QString("eb%0").arg(i)));
 					if (value.isNull())
 						break;
+					if (eventName == "prox" || eventName == "proxground")
+					{
+						// values 1 and 2 have exchanged semantics
+						if (value == "1")
+							value = "2";
+						else if (value == "2")
+							value = "1";
+					}
 					event1.setAttribute(QString("value%0").arg(i), value);
 				}
 			}
 			
-			QString stateValue(buttonset0.attribute("state"));
-			if (!stateValue.isNull() && stateValue != "-1")
+			int state(buttonset0.attribute("state").toInt());
+			if (state >= 0)
 			{
 				QDomElement state1(document1.createElement("block"));
 				set1.appendChild(state1);
 				state1.setAttribute("type", "state");
 				state1.setAttribute("name", "statefilter");
-				state1.setAttribute("value0", stateValue);
+				for (unsigned i(0); i < 4; ++i)
+				{
+					const unsigned value((state >> (i * 2)) & 0x3);
+					state1.setAttribute(QString("value%0").arg(i), value);
+				}
 			}
 			
 			{
@@ -783,6 +801,12 @@ namespace Aseba { namespace ThymioVPL
 			QString actionName(buttonset0.attribute("action-name"));
 			if (!actionName.isNull())
 			{
+				if (actionName == "statefilter")
+				{
+					// statefilter action was renamed to setstate
+					actionName = "setstate";
+				}
+				
 				QDomElement action1(document1.createElement("block"));
 				set1.appendChild(action1);
 				action1.setAttribute("type", "action");
