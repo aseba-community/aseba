@@ -748,6 +748,14 @@ namespace Aseba { namespace ThymioVPL
 					QString value(buttonset0.attribute(QString("eb%0").arg(i)));
 					if (value.isNull())
 						break;
+					if (eventName == "prox" || eventName == "proxground")
+					{
+						// values 1 and 2 have exchanged semantics
+						if (value == "1")
+							value = "2";
+						else if (value == "2")
+							value = "1";
+					}
 					event1.setAttribute(QString("value%0").arg(i), value);
 				}
 			}
@@ -789,6 +797,7 @@ namespace Aseba { namespace ThymioVPL
 			{
 				if (actionName == "statefilter")
 				{
+					// statefilter action was renamed to setstate
 					actionName = "setstate";
 				}
 				
