@@ -739,6 +739,12 @@ namespace Aseba { namespace ThymioVPL
 			QString eventName(buttonset0.attribute("event-name"));
 			if (!eventName.isNull())
 			{
+				if (eventName == "tap")
+				{
+					// tap event was renamed to acc
+					eventName = "acc";
+				}
+				
 				QDomElement event1(document1.createElement("block"));
 				set1.appendChild(event1);
 				event1.setAttribute("type", "event");
