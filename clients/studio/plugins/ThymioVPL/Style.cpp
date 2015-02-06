@@ -134,5 +134,11 @@ namespace Aseba { namespace ThymioVPL {
 		return privateStyle.eventColors.size();
 	}
 	
+	//! The color to fill unused buttons
+	QColor Style::unusedButtonFillColor = QColor(220,220,220);
+	
+	//! The color to draw the stroke of unused buttons
+	QColor Style::unusedButtonStrokeColor = Qt::lightGray;
+	
 } }  // namespace ThymioVPL / namespace Aseba
 

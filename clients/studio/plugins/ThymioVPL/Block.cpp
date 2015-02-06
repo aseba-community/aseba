@@ -297,6 +297,7 @@ namespace Aseba { namespace ThymioVPL
 			painter.rotate(child->rotation());
 			painter.translate(-child->transformOriginPoint());
 			painter.scale(child->scale(), child->scale());
+			painter.setOpacity(painter.opacity() * child->opacity());
 			renderChildItems(painter, child, opt);
 			child->paint(&painter, &opt, 0);
 			painter.restore();
@@ -460,20 +461,24 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			// background
-			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
+			painter->fillRect(x,y,w,h,Style::unusedButtonFillColor);
+			painter->drawRect(x,y,w,h/2);
+			painter->drawRect(x,y+h/2,w,h/2);
 			if (isAnyClose)
 			{
-				painter->fillRect(x,y,highPos,48,Qt::lightGray);
+				painter->setPen(QPen(Qt::red, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 				painter->fillRect(x+highPos,y,w-highPos,48,highColor);
-				painter->drawRect(x,y,w,h/2);
+				painter->drawRect(x+highPos,y,w-highPos,48);
 			}
+			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			if (isAnyFar)
 			{
 				painter->fillRect(x,y+48,lowPos,48,lowColor);
-				painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
-				painter->drawRect(x,y+h/2,w,h/2);
+				painter->drawRect(x,y+48,lowPos,48);
 			}
+			
 			
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
@@ -713,7 +718,7 @@ namespace Aseba { namespace ThymioVPL
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-30,-30,60,60), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-30,-30,60,60), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
 			button->setPos(128 + (i%2)*90 - 45, 128 + (i/2)*90 - 45 + 5);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));

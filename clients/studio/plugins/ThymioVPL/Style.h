@@ -31,6 +31,9 @@ namespace Aseba { namespace ThymioVPL {
 		static QColor blockColor(const QString& type, unsigned index);
 		static void blockSetCurrentColorIndex(unsigned index);
 		static unsigned blockColorsCount();
+		
+		static QColor unusedButtonFillColor;
+		static QColor unusedButtonStrokeColor;
 	};
 	
 } }  // namespace ThymioVPL / namespace Aseba
