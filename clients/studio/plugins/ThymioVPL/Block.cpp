@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 
 #include "Block.h"
@@ -665,14 +666,39 @@ namespace Aseba { namespace ThymioVPL
 	
 	float BlockWithButtonsAndRange::pixelToVal(float pixel) const
 	{
+		// pixel to relative
 		const float width(rangeRect().width() - 46);
 		pixel -= 23;
 		pixel = std::min(std::max(0.f, pixel), width);
 		const float factor(pixel/width);
+		// log/linear correction and precision setting
+		int v, precision;
 		if (pixelToValModel == PIXEL_TO_VAL_LINEAR)
-			return range * factor + lowerBound;
+		{
+			v = range * factor + lowerBound;
+			precision = 25;
+		}
 		else
-			return range * factor * factor + lowerBound;
+		{
+			v = range * factor * factor + lowerBound;
+			const int midpoint_table[] = {  10, 100, 200, 500, 750, 1000, 2000, 4000, -1 };
+			int bestDist = std::numeric_limits<int>::max();
+			precision = 10;
+			int i = 0;
+			while (midpoint_table[i] != -1)
+			{
+				int d = abs(midpoint_table[i] - v);
+				if (d < bestDist)
+				{
+					bestDist = d;
+					precision = midpoint_table[i] / 10;
+				}
+				++i;
+			}
+		}
+		// rounding
+		v = round(v / precision) * precision;
+		return std::min(std::max(lowerBound, v), lowerBound + range);
 	}
 	
 	float BlockWithButtonsAndRange::valToPixel(float val) const
