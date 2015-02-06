@@ -453,11 +453,13 @@ namespace Aseba { namespace ThymioVPL
 			// compute what we should show
 			bool isAnyClose(false);
 			bool isAnyFar(false);
+			bool isAnyRange(false);
 			for (int i=0; i<buttons.size(); ++i)
 			{
 				const int value(buttons[i]->getValue());
 				isAnyClose = isAnyClose || value == 1 || value == 3;
 				isAnyFar = isAnyFar || value == 2 || value == 3;
+				isAnyRange = isAnyRange || value == 3;
 			}
 			
 			// background
@@ -472,13 +474,18 @@ namespace Aseba { namespace ThymioVPL
 				painter->fillRect(x+highPos,y,w-highPos,48,highColor);
 				painter->drawRect(x+highPos,y,w-highPos,48);
 			}
-			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			if (isAnyFar)
 			{
 				painter->fillRect(x,y+48,lowPos,48,lowColor);
 				painter->drawRect(x,y+48,lowPos,48);
 			}
-			
+			painter->setPen(QPen(QColor(128,0,0), 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			if (isAnyRange)
+			{
+				painter->fillRect(x+highPos,y+24,lowPos-highPos,48,Qt::darkGray);
+				painter->drawRect(x+highPos,y+24,lowPos-highPos,48);
+			}
 			
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));

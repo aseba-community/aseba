@@ -50,7 +50,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
 		
@@ -77,8 +77,8 @@ namespace Aseba { namespace ThymioVPL
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
 						   175 - 150*qCos(0.34906585*offset) );
 			button->addState(Qt::white, Qt::red);
-			button->addState(Qt::black, Qt::darkGray);
-			button->addState(Qt::yellow);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 
@@ -96,8 +96,8 @@ namespace Aseba { namespace ThymioVPL
 
 			button->setPos(QPointF(64 + i*128, 234));
 			button->addState(Qt::white, Qt::red);
-			button->addState(Qt::black, Qt::darkGray);
-			button->addState(Qt::yellow);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 			
@@ -115,7 +115,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
 		
@@ -130,8 +130,8 @@ namespace Aseba { namespace ThymioVPL
 
 			button->setPos(QPointF(98 + i*60, 40));
 			button->addState(Qt::white, Qt::red);
-			button->addState(Qt::black, Qt::darkGray);
-			button->addState(Qt::yellow);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 			
