@@ -448,26 +448,48 @@ namespace Aseba { namespace ThymioVPL
 			const int h(96);
 			const int lowPos(valToPixel(low));
 			const int highPos(valToPixel(high));
-			painter->fillRect(x,y,highPos,48,Qt::lightGray);
-			painter->fillRect(x+highPos,y,w-highPos,48,highColor);
-			painter->fillRect(x,y+48,lowPos,48,lowColor);
-			painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
 			
-			// rectangle
+			// compute what we should show
+			bool isAnyClose(false);
+			bool isAnyFar(false);
+			for (int i=0; i<buttons.size(); ++i)
+			{
+				const int value(buttons[i]->getValue());
+				isAnyClose = isAnyClose || value == 1 || value == 3;
+				isAnyFar = isAnyFar || value == 2 || value == 3;
+			}
+			
+			// background
 			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
-			painter->drawRect(x,y,w,h);
-			painter->drawLine(x,y+48,x+w,y+48);
+			if (isAnyClose)
+			{
+				painter->fillRect(x,y,highPos,48,Qt::lightGray);
+				painter->fillRect(x+highPos,y,w-highPos,48,highColor);
+				painter->drawRect(x,y,w,h/2);
+			}
+			if (isAnyFar)
+			{
+				painter->fillRect(x,y+48,lowPos,48,lowColor);
+				painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
+				painter->drawRect(x,y+h/2,w,h/2);
+			}
 			
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
-			QPolygon highCursor;
-			highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
-			painter->drawConvexPolygon(highCursor);
-			QPolygon lowCursor;
-			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
-			painter->drawConvexPolygon(lowCursor);
+			if (isAnyClose)
+			{
+				QPolygon highCursor;
+				highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
+				painter->drawConvexPolygon(highCursor);
+			}
+			if (isAnyFar)
+			{
+				QPolygon lowCursor;
+				lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
+				painter->drawConvexPolygon(lowCursor);
+			}
 		}
 	}
 	
