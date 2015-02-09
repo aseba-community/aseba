@@ -458,8 +458,8 @@ namespace Aseba { namespace ThymioVPL
 			for (int i=0; i<buttons.size(); ++i)
 			{
 				const int value(buttons[i]->getValue());
-				isAnyClose = isAnyClose || value == 1 || value == 3;
-				isAnyFar = isAnyFar || value == 2 || value == 3;
+				isAnyClose = isAnyClose || value == 1;
+				isAnyFar = isAnyFar || value == 2;
 				isAnyRange = isAnyRange || value == 3;
 			}
 			
@@ -484,20 +484,24 @@ namespace Aseba { namespace ThymioVPL
 			painter->setPen(QPen(QColor(128,0,0), 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			if (isAnyRange)
 			{
-				painter->fillRect(x+highPos,y+24,lowPos-highPos,48,Qt::darkGray);
+				//painter->fillRect(x+highPos,y+24,lowPos-highPos,48,Qt::darkGray);
+				QLinearGradient linearGrad(QPointF(x+highPos, 0), QPointF(x+lowPos, 0));
+				linearGrad.setColorAt(0,highColor);
+				linearGrad.setColorAt(1,lowColor);
+				painter->fillRect(x+highPos,y+24,lowPos-highPos,48,QBrush(linearGrad));
 				painter->drawRect(x+highPos,y+24,lowPos-highPos,48);
 			}
 			
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
-			if (isAnyClose)
+			if (isAnyClose || isAnyRange)
 			{
 				QPolygon highCursor;
 				highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
 				painter->drawConvexPolygon(highCursor);
 			}
-			if (isAnyFar)
+			if (isAnyFar || isAnyRange)
 			{
 				QPolygon lowCursor;
 				lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
