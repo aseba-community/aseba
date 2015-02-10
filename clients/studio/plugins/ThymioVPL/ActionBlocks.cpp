@@ -466,7 +466,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
 	{
-		const double TIMER_RESOLUTION = 10;
+		const double TIMER_RESOLUTION = 4;
 		const QPointF localPos(pos-QPointF(128,136));
 		if (sqrt(localPos.x()*localPos.x()+localPos.y()*localPos.y()) <= 70)
 		{
