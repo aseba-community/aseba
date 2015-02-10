@@ -2,6 +2,7 @@
 #define VPL_SCENE_H
 
 #include <QGraphicsScene>
+#include <QGraphicsSvgItem>
 #include "EventActionsSet.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -86,6 +87,9 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		ThymioVisualProgramming* vpl;
 		
+		QGraphicsSvgItem* errorGraphicsItem;
+		QGraphicsSvgItem* referredGraphicsItem;
+		QGraphicsLineItem* referredLineItem;
 		QList<EventActionsSet *> eventActionsSets;
 		Compiler compiler;
 		Compiler::CompilationResult lastCompilationResult;

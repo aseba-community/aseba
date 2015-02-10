@@ -44,7 +44,7 @@ namespace Aseba { namespace ThymioVPL
 		totalWidth(0),
 		columnPos(0),
 		row(row),
-		errorFlag(false),
+		errorType(Compiler::NO_ERROR),
 		beingDragged(false)
 	{
 		setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
@@ -285,11 +285,11 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Set whether or not this set has an error
-	void EventActionsSet::setErrorStatus(bool flag)
+	void EventActionsSet::setErrorType(Compiler::ErrorType errorType)
 	{
-		if (flag != errorFlag)
+		if (this->errorType != errorType)
 		{
-			errorFlag = flag;
+			this->errorType = errorType;
 			update();
 		}
 	}
@@ -945,7 +945,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		// background
-		if (errorFlag)
+		if (errorType != Compiler::NO_ERROR)
 			painter->setPen(QPen(Qt::red, 8));
 		else
 			painter->setPen(Qt::NoPen);
@@ -1011,6 +1011,32 @@ namespace Aseba { namespace ThymioVPL
 		painter->setPen(Style::eventActionsSetForegroundColors[colorId]);
 		painter->setFont(QFont("Arial", 50));
 		painter->drawText(QRect(currentWidth-Style::blockSpacing-128, Style::blockHeight+Style::blockSpacing-128, 128, 128), Qt::AlignRight|Qt::AlignBottom, QString("%0").arg(getRow()+1));
+		
+		// error marker
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Qt::red);
+		if (errorType == Compiler::MISSING_EVENT)
+		{
+			static const qreal x(Style::blockSpacing + Style::blockWidth / 2);
+			static const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			static const QPointF points[3] = {
+				QPointF(x - 40, y + 30),
+				QPointF(x, y),
+				QPointF(x + 40, y + 30),
+			};
+			painter->drawConvexPolygon(points, 3);
+		}
+		else if (errorType == Compiler::MISSING_ACTION)
+		{
+			static const qreal x(dropAreaXPos + Style::blockWidth / 2);
+			static const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			static const QPointF points[3] = {
+				QPointF(x - 40, y + 30),
+				QPointF(x, y),
+				QPointF(x + 40, y + 30),
+			};
+			painter->drawConvexPolygon(points, 3);
+		}
 	}
 	
 	//! Draw the drop area for block

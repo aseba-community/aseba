@@ -919,6 +919,7 @@ namespace Aseba { namespace ThymioVPL
 		compilationResult->setText(scene->compilationResult().getMessage(scene->getAdvanced()));
 		if (scene->compilationResult().isSuccessful())
 		{
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
@@ -927,7 +928,8 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 		{
-			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: red; }");
+			compilationResultImage->setPixmap(QPixmap(QString(":/images/vpl_error.svg")));
 			runButton->setEnabled(false);
 			showCompilationError->show();
 			emit compilationOutcome(false);

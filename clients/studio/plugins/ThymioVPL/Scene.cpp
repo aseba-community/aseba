@@ -19,10 +19,19 @@ namespace Aseba { namespace ThymioVPL
 	Scene::Scene(ThymioVisualProgramming *vpl) : 
 		QGraphicsScene(vpl),
 		vpl(vpl),
+		errorGraphicsItem(new QGraphicsSvgItem(":/images/vpl_error.svg")),
+		referredGraphicsItem(new QGraphicsSvgItem(":/images/vpl_error.svg")),
+		referredLineItem(addLine(0, 0, 0, 0, QPen(Qt::red, 8, Qt::DashLine))),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
 	{
+		addItem(errorGraphicsItem);
+		errorGraphicsItem->setVisible(false);
+		addItem(referredGraphicsItem);
+		referredGraphicsItem->setVisible(false);
+		referredLineItem->setVisible(false);
+		
 		// create initial set
 		EventActionsSet *p(createNewEventActionsSet());
 		buttonSetHeight = p->boundingRect().height();
@@ -351,7 +360,7 @@ namespace Aseba { namespace ThymioVPL
 			EventActionsSet *p(eventActionsSets[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
-		setSceneRect(r.adjusted(-40,-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
+		setSceneRect(r.adjusted(-(40+errorGraphicsItem->boundingRect().width()+40),-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
 	}
 	
@@ -460,11 +469,48 @@ namespace Aseba { namespace ThymioVPL
 		//qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
 		
-		for(int i=0; i<eventActionsSets.size(); i++)
-			eventActionsSets[i]->setErrorStatus(false);
-		
-		if (!lastCompilationResult.isSuccessful())
-			eventActionsSets.at(lastCompilationResult.errorLine)->setErrorStatus(true);
+		errorGraphicsItem->setVisible(lastCompilationResult.errorLine != -1);
+		referredGraphicsItem->setVisible(lastCompilationResult.referredLine != -1);
+		referredLineItem->setVisible(lastCompilationResult.referredLine != -1);
+
+		EventActionsSet* errorEventActionsSet(0);
+		EventActionsSet* referredEventActionsSet(0);
+		for (int i = 0; i < eventActionsSets.size(); ++i)
+		{
+			EventActionsSet* eventActionsSet(eventActionsSets[i]);
+			Compiler::ErrorType errorType;
+			if (i == lastCompilationResult.errorLine)
+			{
+				errorType = lastCompilationResult.errorType;
+				errorEventActionsSet = eventActionsSet;
+			}
+			else if (i == lastCompilationResult.referredLine)
+			{
+				errorType = lastCompilationResult.errorType;
+				referredEventActionsSet = eventActionsSet;
+			}
+			else
+			{
+				errorType = Compiler::NO_ERROR;
+			}
+			eventActionsSet->setErrorType(errorType);
+		}
+
+		if (errorEventActionsSet)
+		{
+			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
+			
+			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->boundingRect().height() / 2);
+			errorGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
+			
+			if (referredEventActionsSet)
+			{
+				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->boundingRect().height() / 2);
+				referredGraphicsItem->setPos(-(errorSize.width() + 40), referredY - errorSize.height() / 2);
+				
+				referredLineItem->setLine(-(errorSize.width() / 2 + 40), referredY + errorSize.height() / 2 + 10, -(errorSize.width() / 2 + 40), errorY - errorSize.height() / 2 - 10);
+			}
+		}
 		
 		emit contentRecompiled();
 	}
