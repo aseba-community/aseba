@@ -47,7 +47,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			case DUPLICATED_EVENT:
 			{
-				if (advanced)
+				if (!advanced)
 					return QObject::tr("The event in line %0 is the same as in line %1").arg(errorLine+1).arg(referredLine+1);
 				else
 					return QObject::tr("The event and the state condition in line %0 are the same as in line %1").arg(errorLine+1).arg(referredLine+1);
