@@ -12,6 +12,7 @@ namespace Aseba { namespace ThymioVPL
 		ignoreResize(false)*/
 	{
 		assert(scene);
+		setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 		recomputeTimer = new QTimer(this);
 		//ignoreResizeTimer = new QTimer(this);
 		connect(recomputeTimer, SIGNAL(timeout()), SLOT(recomputeScale()));
