@@ -52,10 +52,6 @@ namespace Aseba { namespace ThymioVPL
 				else
 					return QObject::tr("The event and the state condition in line %0 are the same as in line %1").arg(errorLine+1).arg(referredLine+1);
 			}
-			case INVALID_CODE:
-			{
-				return QObject::tr("Line %0: Unknown event/action type").arg(errorLine+1);
-			}
 			default:
 				return QObject::tr("Unknown VPL error");
 		}

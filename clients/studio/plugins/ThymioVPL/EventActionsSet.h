@@ -56,7 +56,7 @@ namespace Aseba { namespace ThymioVPL
 		void setAdvanced(bool advanced);
 		bool isAdvanced() const;
 	
-		void setErrorStatus(bool flag);
+		void setErrorType(Compiler::ErrorType errorType);
 		void blink();
 		
 		QVector<quint16> getContentCompressed() const;
@@ -134,7 +134,7 @@ namespace Aseba { namespace ThymioVPL
 		qreal columnPos;
 		int row;
 		
-		bool errorFlag;
+		Compiler::ErrorType errorType;
 		bool beingDragged;
 	};
 	
