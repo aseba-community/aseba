@@ -945,7 +945,8 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		// background
-		if (errorType != Compiler::NO_ERROR)
+		//if (errorType != Compiler::NO_ERROR)
+		if (errorType == Compiler::DUPLICATED_EVENT)
 			painter->setPen(QPen(Qt::red, 8));
 		else
 			painter->setPen(Qt::NoPen);
@@ -1014,7 +1015,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		// error marker
 		painter->setPen(Qt::NoPen);
-		painter->setBrush(Qt::red);
+		//painter->setBrush(Qt::red);
+		painter->setBrush(QColor(Qt::red).lighter());
 		if (errorType == Compiler::MISSING_EVENT)
 		{
 			static const qreal x(Style::blockSpacing + Style::blockWidth / 2);
