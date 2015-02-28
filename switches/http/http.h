@@ -71,7 +71,7 @@ namespace Aseba
         std::map<Dashel::Stream*, HttpRequest> httpRequests;
         std::set<Dashel::Stream*>  streamsToShutdown;
         unsigned nodeId;
-        bool descComplete;
+        bool nodeDescriptionComplete;
         // debug variables
         bool verbose;
         int iterations;
@@ -87,7 +87,7 @@ namespace Aseba
         //default values needed for unit testing
         HttpInterface(const std::string& target="tcp:;port=33333", const std::string& http_port="3000", const int iterations=-1);
         virtual void run();
-        virtual bool descriptionComplete();
+        virtual bool descriptionReceived();
         virtual void broadcastGetDescription();
         virtual void evNodes(HttpRequest* req, strings& args);
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);

@@ -149,6 +149,7 @@ namespace Aseba
     asebaStream(0),
     httpStream(0),
     nodeId(0),
+    nodeDescriptionComplete(false),
     verbose(false),
     iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
@@ -249,14 +250,18 @@ namespace Aseba
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
-            wcerr << L"Received description for " << getNodeName(nodeId) << endl;
+	  wcerr << this << L"Received description for " << getNodeName(nodeId) << endl;
+	if (!nodeId) return;
         this->nodeId = nodeId;
-        this->descComplete = true;
+        nodeDescriptionComplete = true;
     }
     
-    bool HttpInterface::descriptionComplete()
+    bool HttpInterface::descriptionReceived()
     {
-        return descComplete;
+        if (verbose)
+	  wcerr << this << L"check descriptionReceived: nodeId = " << nodeId << L", flag = " << nodeDescriptionComplete << L", name=" << getNodeName(nodeId) << endl;
+        //return (nodeId > 0);
+        return nodeDescriptionComplete;
     }
     
     void HttpInterface::incomingData(Stream *stream)
@@ -267,10 +272,6 @@ namespace Aseba
                 cerr << "incoming for asebaStream " << stream << endl;
 
             Message *message(Message::receive(stream));
-            
-            // dump
-            message->dump(std::wcout);
-            std::wcout << std::endl;
             
             // pass message to description manager, which builds
             // the node descriptions in background
@@ -306,7 +307,7 @@ namespace Aseba
             if (verbose)
             {
                 cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
-                for (int i = 0; i < req->tokens.size(); ++i)
+                for (unsigned int i = 0; i < req->tokens.size(); ++i)
                     cerr << req->tokens[i] << " ";
                 cerr << "] " << req->protocol_version << " new req " << req << endl;
             }
@@ -618,7 +619,7 @@ namespace Aseba
         if (verbose)
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
-        int pos = req->content.find("file=");
+        unsigned int pos = req->content.find("file=");
         if (pos != std::string::npos)
         {
             aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
@@ -1202,7 +1203,7 @@ namespace Aseba
         char* buffer = new char[ content_length ];
         stream->read(buffer, content_length);
         content = std::string(buffer,content_length);
-        delete buffer;
+        delete []buffer;
         ready = true;
     }
 

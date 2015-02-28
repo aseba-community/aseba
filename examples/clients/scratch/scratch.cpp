@@ -550,7 +550,7 @@ namespace Aseba
         std::list<GetVariables>::iterator pvi = polled_variables.begin();
         if (verbose)
             cerr << "poll ";
-        int window = polled_variables.size() <= 50 ? polled_variables.size() : polled_variables.size()/3;
+        int window = polled_variables.size(); //!// <= 50 ? polled_variables.size() : polled_variables.size()/3;
         for (int i = 0; i < window; i++, pvi++)
         {
             GetVariables getVariables(*pvi);
@@ -561,7 +561,7 @@ namespace Aseba
         if (verbose)
             cerr << endl;
         asebaStream->flush();
-        std::rotate(polled_variables.begin(), pvi, polled_variables.end());
+        //!// std::rotate(polled_variables.begin(), pvi, polled_variables.end());
     }
 
     //== end of class ScratchInterface ============================================================
@@ -637,21 +637,21 @@ int main(int argc, char *argv[])
     Dashel::initPlugins();
     
     // create and run bridge, catch Dashel exceptions
-    do {
+    //    do {
         try
         {
             Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target, http_port, 1000*Kiterations));
             
             if (aesl_filename.size() > 0)
             {
-                while (! network->descriptionComplete())
+                while (! network->descriptionReceived())
                 {
-                    std::cerr << "Looking for node description" << std::endl;
+		    std::cerr << network << "Broadcast look for node description" << std::endl;
                     network->broadcastGetDescription();
-                    //for (int i = 0; i < 50; i++)
-                        network->step(-1); // wait for description, variables, etc
+                    for (int i = 0; i < 50; i++)
+                        network->step(20); // wait for description, variables, etc
                 }
-                std::cerr << "Node description received" << std::endl;
+                std::cerr << network << "Node description received" << std::endl;
                 network->aeslLoadFile(aesl_filename);
             }
             
@@ -672,7 +672,7 @@ int main(int argc, char *argv[])
             std::cerr << " attempting graceful network shutdown" << std::endl;
         }
         //std::this_thread::sleep_for (std::chrono::seconds(10));
-    } while (true);
+	//    } while (true);
 
     return 0;
 }
