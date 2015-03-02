@@ -81,10 +81,10 @@ namespace Aseba
         {   // poll for variables
             strings args;
             //args.push_back("thymio-II");
-            args.push_back("V_leds_temperature");
-            args.push_back(std::to_string(abs( (int)(blink_state = (blink_state+1)%240)/12 - 10 )));
-            args.push_back(std::to_string(abs( (int)(blink_state = (blink_state+121)%240)/12 - 10 )));
-            sendSetVariable(req->tokens[1], args);
+//            args.push_back("V_leds_temperature");
+//            args.push_back(std::to_string(abs( (int)(blink_state = (blink_state+1)%240)/12 - 10 )));
+//            args.push_back(std::to_string(abs( (int)(blink_state = (blink_state+121)%240)/12 - 10 )));
+//            sendSetVariable(req->tokens[1], args);
             string result = evPoll("thymio-II");
             finishResponse(req, 200, result);
             return;
