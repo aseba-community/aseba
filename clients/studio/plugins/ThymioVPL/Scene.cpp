@@ -504,12 +504,12 @@ namespace Aseba { namespace ThymioVPL
 		{
 			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
 			
-			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->boundingRect().height() / 2);
+			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->innerBoundingRect().height() / 2);
 			errorGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
 			
 			if (referredEventActionsSet)
 			{
-				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->boundingRect().height() / 2);
+				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->innerBoundingRect().height() / 2);
 				referredGraphicsItem->setPos(-(errorSize.width() + 40), referredY - errorSize.height() / 2);
 				
 				referredLineItem->setLine(-(errorSize.width() / 2 + 40), referredY + errorSize.height() / 2 + 10, -(errorSize.width() / 2 + 40), errorY - errorSize.height() / 2 - 10);
