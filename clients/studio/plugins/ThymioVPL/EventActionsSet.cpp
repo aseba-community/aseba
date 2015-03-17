@@ -61,7 +61,8 @@ namespace Aseba { namespace ThymioVPL
 	QRectF EventActionsSet::boundingRect() const
 	{
 		const qreal xmargin(qMax(Style::blockSpacing/2,4));
-		return QRectF(-xmargin, -4, totalWidth+2*xmargin, Style::blockHeight+2*Style::blockSpacing);
+		// we consider the space for the error marker
+		return QRectF(-xmargin, -4, totalWidth+2*xmargin, Style::blockHeight+2*Style::blockSpacing+50+4);
 		
 	}
 	
