@@ -1020,9 +1020,9 @@ namespace Aseba { namespace ThymioVPL
 		painter->setBrush(QColor(Qt::red).lighter());
 		if (errorType == Compiler::MISSING_EVENT)
 		{
-			static const qreal x(Style::blockSpacing + Style::blockWidth / 2);
-			static const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
-			static const QPointF points[3] = {
+			const qreal x(Style::blockSpacing + Style::blockWidth / 2);
+			const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			const QPointF points[3] = {
 				QPointF(x - 40, y + 30),
 				QPointF(x, y),
 				QPointF(x + 40, y + 30),
@@ -1031,9 +1031,9 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else if (errorType == Compiler::MISSING_ACTION)
 		{
-			static const qreal x(dropAreaXPos + Style::blockWidth / 2);
-			static const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
-			static const QPointF points[3] = {
+			const qreal x(dropAreaXPos + Style::blockWidth / 2);
+			const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			const QPointF points[3] = {
 				QPointF(x - 40, y + 30),
 				QPointF(x, y),
 				QPointF(x + 40, y + 30),
