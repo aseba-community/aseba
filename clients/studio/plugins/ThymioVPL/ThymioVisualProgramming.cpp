@@ -513,16 +513,7 @@ namespace Aseba { namespace ThymioVPL
 		if(runButton->isEnabled())
 		{
 			de->loadAndRun();
-			if (runAnimTimer)
-			{
-				killTimer(runAnimTimer);
-				runAnimTimer = 0;
-				#ifdef Q_OS_WIN
-				runButton->setIcon(QIcon(":/images/play.svgz"));
-				#else // Q_OS_WIN
-				runButton->setIcon(runAnimFrames[0]);
-				#endif // Q_OS_WIN
-			}
+			stopRunButtonAnimationTimer();
 		}
 	}
 
@@ -923,6 +914,8 @@ namespace Aseba { namespace ThymioVPL
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
+			// content changed but not uploaded, show animation
+			startRunButtonAnimationTimer();
 			showCompilationError->hide();
 			emit compilationOutcome(true);
 		}
@@ -931,12 +924,12 @@ namespace Aseba { namespace ThymioVPL
 			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: red; }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/vpl_error.svg")));
 			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
-		// content changed but not uploaded
-		if (!runAnimTimer)
-			runAnimTimer = startTimer(50);
+		
 	}
 	
 	void ThymioVisualProgramming::processHighlightChange()
@@ -1029,6 +1022,28 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	#endif // Q_OS_WIN
+	
+	//! Start the run button animation timer, safe even if the timer is already running
+	void ThymioVisualProgramming::startRunButtonAnimationTimer()
+	{
+		if (!runAnimTimer)
+			runAnimTimer = startTimer(50);
+	}
+	
+	//! Stop the run button animation timer, safe even if the timer is not running
+	void ThymioVisualProgramming::stopRunButtonAnimationTimer()
+	{
+		if (runAnimTimer)
+		{
+			killTimer(runAnimTimer);
+			runAnimTimer = 0;
+			#ifdef Q_OS_WIN
+			runButton->setIcon(QIcon(":/images/play.svgz"));
+			#else // Q_OS_WIN
+			runButton->setIcon(runAnimFrames[0]);
+			#endif // Q_OS_WIN
+		}
+	}
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{

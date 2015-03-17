@@ -167,6 +167,8 @@ namespace Aseba { namespace ThymioVPL
 		#ifndef Q_OS_WIN
 		void regenerateRunButtonAnimation(const QSize& iconSize);
 		#endif // Q_OS_WIN
+		void startRunButtonAnimationTimer();
+		void stopRunButtonAnimationTimer();
 		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 		virtual void timerEvent ( QTimerEvent * event );
