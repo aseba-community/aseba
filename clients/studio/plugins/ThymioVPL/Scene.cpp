@@ -207,6 +207,10 @@ namespace Aseba { namespace ThymioVPL
 		}
 		setSceneRect(QRectF());
 		eventActionsSets.clear();
+		// hide any error
+		errorGraphicsItem->setVisible(false);
+		referredGraphicsItem->setVisible(false);
+		referredLineItem->setVisible(false);
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
