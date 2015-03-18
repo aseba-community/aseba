@@ -413,8 +413,14 @@ namespace Aseba { namespace ThymioVPL
 		// store width
 		basicWidth = xpos;
 		currentWidth = basicWidth;
-		// TODO: handle case when we cannot add more
-		totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
+		// handle case when we cannot add more
+		if (actions.empty())
+			totalWidth = basicWidth;
+		else if (actions.size() == 6)
+			totalWidth = basicWidth;
+		else
+			totalWidth = basicWidth + Style::blockWidth + Style::blockSpacing;
+		//totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
 		
 		// clear highlight
 		highlightMode = HIGHLIGHT_NONE;
@@ -996,7 +1002,7 @@ namespace Aseba { namespace ThymioVPL
 		*/
 		
 		// action drop area
-		if (actions.empty() || currentWidth == totalWidth)
+		if ((actions.empty() || currentWidth == totalWidth) && (actions.size() != 6))
 			drawBlockArea(painter, "action", QPointF(dropAreaXPos, Style::blockSpacing), highlightMode == HIGHLIGHT_NEW_ACTION);
 		
 		// if inner drag&drop, show drop indicator
