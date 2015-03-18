@@ -36,7 +36,9 @@ namespace Aseba { namespace ThymioVPL
 		isBlinking(false),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
+		deleteBlockButton(new AddRemoveButton(false, this)),
 		highlightMode(HIGHLIGHT_NONE),
+		removeBlockIndex(-1),
 		dropAreaXPos(0),
 		dropIndex(-1),
 		currentWidth(0),
@@ -48,13 +50,18 @@ namespace Aseba { namespace ThymioVPL
 		beingDragged(false)
 	{
 		setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+		setAcceptHoverEvents(true);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		setAcceptDrops(true);
 		
 		setAdvanced(advanced);
 		
+		deleteBlockButton->setZValue(1);
+		deleteBlockButton->setVisible(false);
+		
 		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
 		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
+		connect(deleteBlockButton, SIGNAL(clicked()), SLOT(removeBlockClicked()));
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
@@ -497,6 +504,18 @@ namespace Aseba { namespace ThymioVPL
 		polymorphic_downcast<Scene*>(scene())->insertSet(row+1);
 	}
 	
+	void EventActionsSet::removeBlockClicked()
+	{
+		if (removeBlockIndex == -2)
+		{
+			removeBlock(event);
+		}
+		else if (removeBlockIndex >= 0)
+		{
+			removeBlock(actions.at(removeBlockIndex));
+		}
+	}
+	
 	void EventActionsSet::clearBlink()
 	{
 		isBlinking = false;
@@ -665,8 +684,69 @@ namespace Aseba { namespace ThymioVPL
 		repositionElements();
 	}
 	
-	void EventActionsSet::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	//! Update the delete block button position and visibility while hovering
+	void EventActionsSet::hoverMoveEvent(QGraphicsSceneHoverEvent * hoverEvent)
 	{
+		const int x(hoverEvent->pos().x());
+		const int y(hoverEvent->pos().y());
+		const int dw(Style::addRemoveButtonWidth/2);
+		const int dh(Style::addRemoveButtonHeight/2);
+		const int dl(0);
+		const int dr(Style::blockWidth+dw);
+		const int bw(dr-dl);
+		const int bstride(Style::blockWidth+Style::blockSpacing);
+		
+		// if out of bound on y, hide and return
+		if ((y < Style::blockSpacing - dh) || (y >= Style::blockSpacing + Style::blockHeight))
+		{
+			deleteBlockButton->hide();
+			removeBlockIndex = -1;
+			return;
+		}
+		
+		const qreal actionsXPos(columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing);
+		const int actionsStartPos(actionsXPos + dl);
+		const int actionsStopPos(actionsXPos + actions.size() * bstride + dr);
+		
+		// delete button
+		if (
+			event && 
+			(x >= event->pos().x() + dl) &&
+			(x < event->pos().x() + dr)
+		)
+		{
+			deleteBlockButton->setPos(event->pos().x() + Style::blockWidth - dw, Style::blockSpacing - dh);
+			deleteBlockButton->show();
+			removeBlockIndex = -2;
+		}
+		else if (
+			(x >= actionsStartPos) &&
+			(x < actionsStopPos) &&
+			(fmod(x-dl-actionsXPos, bstride) < bw) &&
+			((x-dl-actionsXPos) / bstride < actions.size())
+		)
+		{
+			removeBlockIndex = (x-dl-actionsXPos) / bstride;
+			deleteBlockButton->setPos(actionsXPos + removeBlockIndex * bstride + Style::blockWidth - dw, Style::blockSpacing - dh);
+			deleteBlockButton->show();
+		}
+		else
+		{
+			deleteBlockButton->hide();
+			removeBlockIndex = -1;
+		}
+	}
+	
+	//! Disable delete block button
+	void EventActionsSet::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+	{
+		deleteBlockButton->hide();
+		removeBlockIndex = -1;
+	}
+	
+	void EventActionsSet::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+	{
+		// drag and drop start
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
 			return;
@@ -982,7 +1062,7 @@ namespace Aseba { namespace ThymioVPL
 				painter->drawRoundedRect(Style::blockSpacing, Style::blockSpacing/2, Style::blockWidth, Style::blockSpacing+Style::blockHeight, borderWidth, borderWidth);
 			}
 		}
-
+		
 		// column
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::eventActionsSetForegroundColors[colorId]);

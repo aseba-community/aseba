@@ -77,11 +77,15 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void removeClicked();
 		void addClicked();
+		void removeBlockClicked();
 		void clearBlink();
 		
 	protected:
 		// from QGraphicsObject
-		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+		virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+		
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
@@ -116,6 +120,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
+		AddRemoveButton *deleteBlockButton;
 		
 		enum HighlightMode
 		{
@@ -126,6 +131,7 @@ namespace Aseba { namespace ThymioVPL
 			HIGHLIGHT_SET
 		} highlightMode;
 		
+		int removeBlockIndex; // -1: none, -2: event, 0 or larger: action
 		qreal dropAreaXPos;
 		int dropIndex;
 		qreal currentWidth;
