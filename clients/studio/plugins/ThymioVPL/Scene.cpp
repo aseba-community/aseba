@@ -500,21 +500,32 @@ namespace Aseba { namespace ThymioVPL
 			eventActionsSet->setErrorType(errorType);
 		}
 
+		// force update when error notification changed position to work around issue 360
+		bool forceUpdate(false);
 		if (errorEventActionsSet)
 		{
 			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
 			
 			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->innerBoundingRect().height() / 2);
+			qreal oldPosY(errorGraphicsItem->pos().y());
 			errorGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
+			if (errorGraphicsItem->pos().y() != oldPosY)
+				forceUpdate = true;
 			
 			if (referredEventActionsSet)
 			{
 				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->innerBoundingRect().height() / 2);
+				oldPosY = referredGraphicsItem->pos().y();
 				referredGraphicsItem->setPos(-(errorSize.width() + 40), referredY - errorSize.height() / 2);
+				if (referredGraphicsItem->pos().y() != oldPosY)
+					forceUpdate = true;
 				
 				referredLineItem->setLine(-(errorSize.width() / 2 + 40), referredY + errorSize.height() / 2 + 10, -(errorSize.width() / 2 + 40), errorY - errorSize.height() / 2 - 10);
 			}
 		}
+		
+		if (forceUpdate)
+			update();
 		
 		emit contentRecompiled();
 	}
