@@ -344,8 +344,8 @@ namespace Aseba { namespace ThymioVPL
 			generator.setFileName(fileName);
 			generator.setSize(scene->sceneRect().size().toSize());
 			generator.setViewBox(scene->sceneRect());
-			generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
-			generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
+			generator.setTitle(QString("VPL program %0").arg(de->openedFileName()));
+			generator.setDescription("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org");
 			
 			QPainter painter(&generator);
 			scene->render(&painter);
