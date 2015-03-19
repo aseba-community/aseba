@@ -509,10 +509,14 @@ namespace Aseba { namespace ThymioVPL
 		if (removeBlockIndex == -2)
 		{
 			removeBlock(event);
+			emit contentChanged();
+			emit undoCheckpoint();
 		}
 		else if (removeBlockIndex >= 0)
 		{
 			removeBlock(actions.at(removeBlockIndex));
+			emit contentChanged();
+			emit undoCheckpoint();
 		}
 	}
 	
