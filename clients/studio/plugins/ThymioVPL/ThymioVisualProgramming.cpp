@@ -921,7 +921,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 		{
-			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: red; }");
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: rgb(231,19,0); }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/vpl_error.svg")));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
