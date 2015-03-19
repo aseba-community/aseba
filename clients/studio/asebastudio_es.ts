@@ -71,12 +71,12 @@
         <location filename="NamedValuesVectorModel.cpp" line="325"/>
         <source>The name is a keyword</source>
         <oldsource>Name is a keyword</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>El nombre es una palabra clave</translation>
     </message>
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="325"/>
         <source>The name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre &lt;tt&gt;%0&lt;/tt&gt; no puede ser una constante, porque es una palabra clave propia del lenguaje.</translation>
     </message>
 </context>
 <context>
@@ -1514,12 +1514,12 @@ evento %0 : </translation>
         <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="579"/>
         <source>Error in XML source file at %0:%1: cannot create block %2</source>
         <oldsource>Error in XML source file at %0:%1 cannot create block %2</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Error del archivo fuente XML en %0:%1: no se puede crear el bloque %2</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="599"/>
         <source>Error in XML source file at %0:%1: unknown block type %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Error en el archivo fuente XML en %0:%1: tipo de bloque desconocido %2</translation>
     </message>
 </context>
 <context>
@@ -1628,7 +1628,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="145"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Captura de pantalla</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="195"/>
@@ -1653,7 +1653,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="329"/>
         <source>Export program as image</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar programa como imagen</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="395"/>
@@ -1683,12 +1683,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="674"/>
         <source>Incompatible Version</source>
-        <translation type="unfinished"></translation>
+        <translation>Versión incompatible</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="674"/>
         <source>This file is incompatible with this version of ThymioVPL. It might not work correctly.</source>
-        <translation type="unfinished"></translation>
+        <translation>El archivo es incompatible con la versión actual de ThymioVPL. Es posible que no trabaje correctamente.</translation>
     </message>
     <message>
         <source>Loading</source>
@@ -1976,12 +1976,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="51"/>
         <source>The event in line %0 is the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>El evento de la línea %0 es el mismo que el de la línea %1</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="53"/>
         <source>The event and the state condition in line %0 are the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>El evento y la condición de estado de la línea %0 son los mismos que los de la línea %1</translation>
     </message>
     <message>
         <source>Line %0: Unknown event/action type</source>
