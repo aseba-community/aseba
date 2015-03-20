@@ -193,7 +193,7 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
 		eventsLabel = new QLabel(tr("<b>Events</b>"));
-		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
+		eventsLabel ->setStyleSheet("QLabel { font-size: 14px; }");
 		#ifdef Q_WS_MACX
 		eventsLayout->setSpacing(20);
 		#else // Q_WS_MACX
@@ -219,7 +219,7 @@ namespace Aseba { namespace ThymioVPL
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
-		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+		compilationResult->setStyleSheet("QLabel { font-size: 14px; }");
 		
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 		compilationResult->setWordWrap(true);
@@ -274,7 +274,7 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(new BlockButton("setstate", this));
 		
 		actionsLabel = new QLabel(tr("<b>Actions</b>"));
-		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
+		actionsLabel ->setStyleSheet("QLabel { font-size: 14px; }");
 		actionsLayout->setAlignment(Qt::AlignTop);
 		#ifdef Q_WS_MACX
 		actionsLayout->setSpacing(20);
@@ -910,7 +910,7 @@ namespace Aseba { namespace ThymioVPL
 		compilationResult->setText(scene->compilationResult().getMessage(scene->getAdvanced()));
 		if (scene->compilationResult().isSuccessful())
 		{
-			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+			compilationResult->setStyleSheet("QLabel { font-size: 14px; }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
@@ -921,7 +921,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 		{
-			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: rgb(231,19,0); }");
+			compilationResult->setStyleSheet("QLabel { font-size: 14px; color: rgb(231,19,0); }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/vpl_error.svg")));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
