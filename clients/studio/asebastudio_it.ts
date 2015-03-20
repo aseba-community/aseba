@@ -1602,7 +1602,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="145"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Cattura di schermo</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="195"/>
@@ -1627,7 +1627,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="329"/>
         <source>Export program as image</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il programma come immagine</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="395"/>
@@ -1657,12 +1657,12 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="674"/>
         <source>Incompatible Version</source>
-        <translation type="unfinished"></translation>
+        <translation>Versione incompatibile</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="674"/>
         <source>This file is incompatible with this version of ThymioVPL. It might not work correctly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questo documento é incompatibile con questa versione di ThymioVPL. Potrebbe non funzionare correttamente.</translation>
     </message>
     <message>
         <source>Loading</source>
