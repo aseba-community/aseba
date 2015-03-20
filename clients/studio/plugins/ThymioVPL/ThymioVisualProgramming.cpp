@@ -907,8 +907,9 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::processCompilationResult()
 	{
-		compilationResult->setText(scene->compilationResult().getMessage(scene->getAdvanced()));
-		if (scene->compilationResult().isSuccessful())
+		const Compiler::CompilationResult compilation(scene->compilationResult());
+		compilationResult->setText(compilation.getMessage(scene->getAdvanced()));
+		if (compilation.isSuccessful())
 		{
 			compilationResult->setStyleSheet("QLabel { font-size: 14px; }");
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
@@ -918,6 +919,28 @@ namespace Aseba { namespace ThymioVPL
 			startRunButtonAnimationTimer();
 			showCompilationError->hide();
 			emit compilationOutcome(true);
+		}
+		else if ((compilation.errorType == Compiler::MISSING_EVENT) && (scene->isSetLast(compilation.errorLine)))
+		{
+			compilationResult->setText(tr("Please add an event"));
+			compilationResult->setStyleSheet("QLabel { font-size: 14px; }");
+			compilationResultImage->setPixmap(QPixmap());
+			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
+			showCompilationError->show();
+			emit compilationOutcome(false);
+		}
+		else if ((compilation.errorType == Compiler::MISSING_ACTION) && (scene->isSetLast(compilation.errorLine)))
+		{
+			compilationResult->setText(tr("Please add an action"));
+			compilationResult->setStyleSheet("QLabel { font-size: 14px; }");
+			compilationResultImage->setPixmap(QPixmap());
+			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
+			showCompilationError->show();
+			emit compilationOutcome(false);
 		}
 		else
 		{

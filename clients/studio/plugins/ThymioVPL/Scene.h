@@ -59,6 +59,7 @@ namespace Aseba { namespace ThymioVPL
 		SetConstItr setsBegin() const { return eventActionsSets.begin(); }
 		SetConstItr setsEnd() const { return eventActionsSets.end(); }
 		unsigned setsCount() const { return eventActionsSets.size(); }
+		bool isSetLast(unsigned setId) const;
 		
 		unsigned getZoomLevel() const { return zoomLevel; }
 		
