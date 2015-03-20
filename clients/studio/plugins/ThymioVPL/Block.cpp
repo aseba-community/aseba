@@ -347,14 +347,14 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
-			if (!isCopy && parentItem())
+			EventActionsSet* eventActionsSet(dynamic_cast<EventActionsSet*>(parentItem()));
+			if (eventActionsSet)
 			{
-				EventActionsSet* eventActionsSet(polymorphic_downcast<EventActionsSet*>(parentItem()));
-				if (eventActionsSet && !keepAfterDrop)
+				if (!isCopy && !keepAfterDrop)
 					eventActionsSet->removeBlock(this);
+				emit eventActionsSet->contentChanged();
+				emit eventActionsSet->undoCheckpoint();
 			}
-			emit contentChanged();
-			emit undoCheckpoint();
 		}
 		beingDragged = false;
 		#endif // ANDROID

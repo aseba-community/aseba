@@ -68,6 +68,7 @@ namespace Aseba { namespace ThymioVPL
 		void repositionElements();
 		
 	signals:
+		friend class Block;
 		void contentChanged();
 		void undoCheckpoint();
 		
