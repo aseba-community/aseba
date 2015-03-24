@@ -1012,9 +1012,10 @@ namespace Aseba { namespace ThymioVPL
 			addButton->setVisible(!isLast);
 			deleteButton->setVisible(!isLast);
 			if (stateFilter)
-				stateFilter->setVisible(!isLast);
+				stateFilter->setVisible(!isEmpty());
 			// if last and not drop target, draw dotted area
-			if (isLast && (highlightMode == HIGHLIGHT_NONE))
+			//if (/*isLast && */(highlightMode == HIGHLIGHT_NONE))
+			if (isEmpty() && (highlightMode == HIGHLIGHT_NONE))
 			{
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
