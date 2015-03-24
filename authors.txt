@@ -1,9 +1,9 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2011:
+Copyright (C) 2007--2015:
 	
 	Stephane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
-	(original idea, framework architecture, core coder)
+	(original idea, architecture, core coder)
 	
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
 	(core coder, Windows maintainer)
@@ -13,6 +13,12 @@ Copyright (C) 2007--2011:
 
 	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
 	(coder, VPL)
+	
+	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [1]
+	(VPL design)
+	
+	Manon Briod <manon dot briod at epfl dot ch> [1]
+	(VPL design)
 
 	Sandra Moser [2]
 	(German translation)
