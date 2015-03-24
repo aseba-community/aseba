@@ -1635,15 +1635,16 @@ namespace Aseba
 	{
 		QMessageBox aboutBox(this);
 		
-		QString text = tr("<p>Aseba version informations:</p>" \
+		QString text = tr("<h1>About Aseba</h1>" \
+						"Version information" \
 						"<ul><li>Aseba ver. %0"\
 						"<br/>(build ver. %1/protocol ver. %2)" \
 						"</li><li>Dashel ver. %3"\
 						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
-						"<p>(c) 2006-2015 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (clik \"Show details\" for full list).</p>" \
-						"<p><a href=\"%5\">%5</a></p>" \
-						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
+						"<p>Read more on <a href=\"%5\">aseba.wikidot.com</a></p>" \
+						"<p>(c) 2006-2015 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
+						"<p>Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.</p>");
 		
 		text = text.
 			arg(ASEBA_VERSION).
@@ -1658,7 +1659,6 @@ namespace Aseba
 		aboutBox.setWindowTitle(tr("About Aseba Studio"));
 		aboutBox.setStandardButtons(QMessageBox::Ok);
 		aboutBox.exec();
-		//QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
 	
 	bool MainWindow::newFile()
