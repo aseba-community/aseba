@@ -31,6 +31,7 @@
 #include "../../common/consts.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
+#include "../../common/authors.h"
 #include <QtGui>
 #include <QtXml>
 #include <sstream>
@@ -1632,13 +1633,15 @@ namespace Aseba
 	
 	void MainWindow::about()
 	{
+		QMessageBox aboutBox(this);
+		
 		QString text = tr("<p>Aseba version informations:</p>" \
 						"<ul><li>Aseba ver. %0"\
 						"<br/>(build ver. %1/protocol ver. %2)" \
 						"</li><li>Dashel ver. %3"\
 						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
-						"<p>(c) 2006-2013 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors.</p>" \
+						"<p>(c) 2006-2015 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (clik \"Show details\" for full list).</p>" \
 						"<p><a href=\"%5\">%5</a></p>" \
 						"<p>Aseba is open-source licensed under the LGPL version 3.</p>");
 		
@@ -1650,7 +1653,12 @@ namespace Aseba
 			arg(QString::fromStdString(Dashel::streamTypeRegistry.list())).
 			arg(tr("http://aseba.wikidot.com/en:start"));
 		
-		QMessageBox::about(this, tr("About Aseba Studio"), text);
+		aboutBox.setText(text);
+		aboutBox.setDetailedText(ASEBA_AUTHORS_FULL_LIST);
+		aboutBox.setWindowTitle(tr("About Aseba Studio"));
+		aboutBox.setStandardButtons(QMessageBox::Ok);
+		aboutBox.exec();
+		//QMessageBox::about(this, tr("About Aseba Studio"), text);
 	}
 	
 	bool MainWindow::newFile()

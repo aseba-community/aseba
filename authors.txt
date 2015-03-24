@@ -1,43 +1,43 @@
 Aseba - an event-based framework for distributed robot control
 Copyright (C) 2007--2015:
 	
-	Stephane Magnenat <stephane at magnenat dot net> [1] [2]
+	Stéphane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
-	(original idea, architecture, core coder)
+	original idea, architecture, core coder
 	
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	(core coder, Windows maintainer)
+	core coder, Windows maintainer
 	
 	Philippe Retornaz <philippe dot retornaz at epfl dot ch> [1]
-	(coder, embedded integration)
-
+	coder, embedded integration
+	
 	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
-	(coder, VPL)
+	coder, VPL
 	
 	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [1]
-	(VPL design)
+	VPL design - funded by Gebert Rüf Stiftung
 	
 	Manon Briod <manon dot briod at epfl dot ch> [1]
-	(VPL design)
-
+	VPL design - funded by Gebert Rüf Stiftung
+	
 	Sandra Moser [2]
-	(German translation)
-
+	German translation
+	
 	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
-	(Spanish translation)
-
+	Spanish translation
+	
 	Ezio Somá <ezio dot soma at gmail dot com>
-	(Italian translation)
-
+	Italian translation
+	
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
-	(Apple maintainer)
+	Apple maintainer
 	
 	Valentin Longchamp <valentin dot longchamp at epfl dot ch> [1]
-	(inputs on framework architecture, additional coding)
+	inputs on framework architecture, additional coding
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
-	(inputs on challenge, graphics design on challenge)
-
+	inputs on challenge, graphics design on challenge
+	
 	
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
