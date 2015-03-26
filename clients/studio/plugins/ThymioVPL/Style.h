@@ -18,6 +18,9 @@ namespace Aseba { namespace ThymioVPL {
 		static const int addRemoveButtonWidth;
 		static const int addRemoveButtonHeight;
 		
+		static const int removeBlockButtonWidth;
+		static const int removeBlockButtonHeight;
+		
 		static const int eventActionsSetColumnWidth;
 		static const int eventActionsSetRowStep;
 		static const int eventActionsSetCornerSize;

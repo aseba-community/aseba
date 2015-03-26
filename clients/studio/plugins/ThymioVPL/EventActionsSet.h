@@ -16,6 +16,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	class Block;
 	class AddRemoveButton;
+	class RemoveBlockButton;
 	class StateFilterEventBlock;
 	
 	class EventActionsSet : public QGraphicsObject
@@ -121,7 +122,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
-		AddRemoveButton *deleteBlockButton;
+		RemoveBlockButton *deleteBlockButton;
 		
 		enum HighlightMode
 		{

@@ -36,7 +36,7 @@ namespace Aseba { namespace ThymioVPL
 		isBlinking(false),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
-		deleteBlockButton(new AddRemoveButton(false, this)),
+		deleteBlockButton(new RemoveBlockButton(this)),
 		highlightMode(HIGHLIGHT_NONE),
 		removeBlockIndex(-1),
 		dropAreaXPos(0),

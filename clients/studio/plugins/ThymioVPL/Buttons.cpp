@@ -129,8 +129,6 @@ namespace Aseba { namespace ThymioVPL
 		add(add),
 		pressed(false)
 	{
-		setData(0, "add"); 
-		setData(0, "remove");
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
 	
@@ -169,7 +167,7 @@ namespace Aseba { namespace ThymioVPL
 	void AddRemoveButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
 		pressed = true;
-		update();
+		//update();
 	}
 	
 	void AddRemoveButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
@@ -177,7 +175,46 @@ namespace Aseba { namespace ThymioVPL
 		if (boundingRect().contains(event->pos()))
 			emit clicked();
 		pressed = false;
-		update();
+		//update();
+	}
+	
+	
+	RemoveBlockButton::RemoveBlockButton(QGraphicsItem *parent) : 
+		QGraphicsObject(parent)
+	{
+		setAcceptedMouseButtons(Qt::LeftButton);
+	}
+	
+	void RemoveBlockButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+
+		// background
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Qt::white);
+		painter->drawRoundedRect(boundingRect(), Style::addRemoveButtonCornerSize, Style::addRemoveButtonCornerSize);
+
+		const int hx(boundingRect().width()/2);
+		const int hy(boundingRect().height()/2);
+		painter->setPen(QPen(Style::addRemoveButtonBackgroundColor,5,Qt::SolidLine,Qt::RoundCap));
+		painter->drawLine(hx+-11,hy+-11,hx+11,hy+11);
+		painter->drawLine(hx+-11,hy+11,hx+11,hy+-11);
+	}
+	
+	QRectF RemoveBlockButton::boundingRect() const
+	{
+		return QRectF(0, 0, Style::removeBlockButtonWidth, Style::removeBlockButtonHeight);
+	}
+	
+	void RemoveBlockButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+	{
+	}
+	
+	void RemoveBlockButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
+	{
+		if (boundingRect().contains(event->pos()))
+			emit clicked();
 	}
 	
 	
