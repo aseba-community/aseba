@@ -60,7 +60,8 @@ namespace Aseba
     
     void ScratchInterface::incomingUserMsg(const UserMessage *userMsg)
     {
-        if (commonDefinitions.events[userMsg->type].name.find(L"Q_motion_ended")==0 &&
+        if (commonDefinitions.events.size() >= userMsg->type &&
+            commonDefinitions.events[userMsg->type].name.find(L"Q_motion_ended")==0 &&
             userMsg->data.size() >= 1)
         {
             // Qid, Qtime, QspL, QspR, Qpc
@@ -72,6 +73,13 @@ namespace Aseba
                      << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
             }
         }
+        if (commonDefinitions.events.size() >= userMsg->type &&
+            commonDefinitions.events[userMsg->type].name.find(L"R_state")==0 &&
+            userMsg->data.size() >= 1)
+        {
+            receiveStateVariables(userMsg);
+        }
+        
         HttpInterface::incomingUserMsg(userMsg);
     }
 
@@ -563,6 +571,16 @@ namespace Aseba
         asebaStream->flush();
         //!// std::rotate(polled_variables.begin(), pvi, polled_variables.end());
     }
+    
+    void ScratchInterface::receiveStateVariables(const UserMessage *userMsg)
+    {
+        unsigned source, pos, len;
+        if (getVarAddrLen("thymio-II", "acc", source, pos, len))
+        {
+            //variable_cache[std::make_pair(source, pos)] = std::vector::range(data,0,2);
+        }
+    }
+
 
     //== end of class ScratchInterface ============================================================
     

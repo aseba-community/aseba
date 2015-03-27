@@ -69,7 +69,7 @@
 #include <valarray>
 #include <vector>
 #include <iterator>
-#include <regex>
+//#include <regex>
 #include <libjson/libjson.h>
 #include "http.h"
 #include "../../common/consts.h"
@@ -371,26 +371,33 @@ namespace Aseba
         // skip if event not known (yet, aesl probably not loaded)
         try { commonDefinitions.events.at(userMsg->type); }
         catch (const std::out_of_range& oor) { return; }
-            
-        // set up SSE message
-        std::stringstream reply;
-        char this_event[128];
-        wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
-        string event_name = std::string(this_event);
-        reply << "data: " << event_name;
-        for (size_t i = 0; i < userMsg->data.size(); ++i)
-            reply << " " << userMsg->data[i];
-        reply << "\r\n\r\n";
         
-        // In the HTTP world we set up a stream of Server-Sent Events for this.
-        // Note that event name is in commonDefinitions.events[userMsg->type].name
-        
-        for (StreamEventSubscriptionMap::iterator subscriber = eventSubscriptions.begin();
-             subscriber != eventSubscriptions.end(); ++subscriber)
+        if (commonDefinitions.events[userMsg->type].name.find(L"_update_vars ")==0)
         {
-            if (subscriber->second.count("*") >= 1 || subscriber->second.count(event_name) >= 1)
+            // update variables
+        }
+        if (eventSubscriptions.size() > 0)
+        {
+            // set up SSE message
+            std::stringstream reply;
+            char this_event[128];
+            wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
+            string event_name = std::string(this_event);
+            reply << "data: " << event_name;
+            for (size_t i = 0; i < userMsg->data.size(); ++i)
+                reply << " " << userMsg->data[i];
+            reply << "\r\n\r\n";
+            
+            // In the HTTP world we set up a stream of Server-Sent Events for this.
+            // Note that event name is in commonDefinitions.events[userMsg->type].name
+            
+            for (StreamEventSubscriptionMap::iterator subscriber = eventSubscriptions.begin();
+                 subscriber != eventSubscriptions.end(); ++subscriber)
             {
-                appendResponse(subscriber->first, 200, true, reply.str().c_str());
+                if (subscriber->second.count("*") >= 1 || subscriber->second.count(event_name) >= 1)
+                {
+                    appendResponse(subscriber->first, 200, true, reply.str().c_str());
+                }
             }
         }
     }
@@ -619,7 +626,7 @@ namespace Aseba
         if (verbose)
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
-        unsigned int pos = req->content.find("file=");
+        size_t pos = req->content.find("file=");
         if (pos != std::string::npos)
         {
             aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
@@ -1242,6 +1249,8 @@ namespace Aseba
         if (outheaders.size() == 0)
         {
             reply << "\r\nContent-Length: " << result.size() << "\r\n";
+            reply << "Content-Type: application/json\r\n"; // NO ";charset=UTF-8" cf. RFC 7159
+            reply << "Access-Control-Allow-Origin: *\r\n";
             if (headers["Connection"].find("Keep-Alive")==0)
                 reply << "Connection: Keep-Alive\r\n";
         }

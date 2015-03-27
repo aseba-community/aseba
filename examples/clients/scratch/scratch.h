@@ -41,5 +41,6 @@ namespace Aseba
                                    unsigned& source, unsigned& pos, unsigned& length);
         virtual strings makeLedsCircleVector(unsigned dial);
         virtual strings makeLedsRGBVector(unsigned color);
+        virtual void receiveStateVariables(const UserMessage *userMsg);
     };
 };
