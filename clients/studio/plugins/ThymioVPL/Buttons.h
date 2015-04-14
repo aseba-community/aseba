@@ -86,7 +86,6 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		bool add;
-		bool pressed;
 	};
 	
 	class RemoveBlockButton : public QGraphicsObject

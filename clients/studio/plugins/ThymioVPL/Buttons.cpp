@@ -126,8 +126,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	AddRemoveButton::AddRemoveButton(bool add, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
-		add(add),
-		pressed(false)
+		add(add)
 	{
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
@@ -137,8 +136,6 @@ namespace Aseba { namespace ThymioVPL
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
 
-		//qreal alpha = pressed ? 255 : 150;
-		
 		// background
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::addRemoveButtonBackgroundColor);
@@ -166,16 +163,12 @@ namespace Aseba { namespace ThymioVPL
 	
 	void AddRemoveButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
-		pressed = true;
-		//update();
 	}
 	
 	void AddRemoveButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
 	{
 		if (boundingRect().contains(event->pos()))
 			emit clicked();
-		pressed = false;
-		//update();
 	}
 	
 	
