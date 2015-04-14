@@ -49,6 +49,7 @@ Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba 
 	# fetch and compile aseba, telling it where to find dashel and enki
 	git clone https://github.com/aseba-community/aseba.git
 	cd build-aseba
+	export dashel_DIR=../build-dashel
 	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -Ddashel_DIR=../build-dashel -DDASHEL_INCLUDE_DIR=../dashel -DDASHEL_LIBRARY=../build-dashel/libdashel.a -DENKI_INCLUDE_DIR=../enki -DENKI_LIBRARY=../build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=../build-enki/viewer/libenkiviewer.a
 	make
 
