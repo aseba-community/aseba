@@ -99,7 +99,8 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		void render(QPainter& painter);
 		void renderChildItems(QPainter& painter, QGraphicsItem* item, QStyleOptionGraphicsItem& opt);
-		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
 		
 		bool changed;
 	};

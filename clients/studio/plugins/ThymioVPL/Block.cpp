@@ -360,6 +360,16 @@ namespace Aseba { namespace ThymioVPL
 		#endif // ANDROID
 	}
 	
+	void Block::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		EventActionsSet* parentSet(dynamic_cast<EventActionsSet*>(parentItem()));
+		if (parentSet)
+		{
+			parentSet->setSoleSelection();
+		}
+		QGraphicsItem::mousePressEvent(event);
+	}
+	
 	/////
 	
 	BlockWithNoValues::BlockWithNoValues(const QString& type, const QString& name, QGraphicsItem *parent):
