@@ -313,6 +313,22 @@ namespace Aseba
 	
 	bool DashelInterface::attemptToReconnect()
 	{
+		#ifndef WIN32
+		// first try with 0 baud to clear DTR
+		try
+		{
+			lock();
+			stream = Hub::connect(lastConnectedTarget + ";baud=0");
+			closeStream(stream);
+			unlock();
+		}
+		catch (DashelException e)
+		{
+			unlock();
+		}
+		#endif // WIN32
+		
+		// then try normal opening
 		try
 		{
 			lock();
