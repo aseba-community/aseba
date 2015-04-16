@@ -97,8 +97,18 @@ void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, ui
 
 void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {
+
 	uint16 i;
-#define MAX_VARIABLES_SIZE ((100 - 6)/2)
+#ifndef ASEBA_LIMITED_MESSAGE_SIZE 
+        buffer_pos = 0;
+        AsebaSendBuffer(vm, buffer, buffer_pos);
+	buffer_add_uint16(ASEBA_MESSAGE_VARIABLES);
+	buffer_add_uint16(start);
+	for (i = start; i < start + length; i++)
+		buffer_add_uint16(vm->variables[i]);
+        AsebaSendBuffer(vm, buffer, buffer_pos);
+#else
+        const uint16 MAX_VARIABLES_SIZE = ((100 - 6)/2);
 	do {
 		uint16 size;
 		buffer_pos = 0;
@@ -116,6 +126,7 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 		start += size;
 		length -= size;
 	} while(length);
+#endif        
 }
 
 void AsebaSendDescription(AsebaVMState *vm)
