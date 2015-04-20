@@ -619,6 +619,7 @@ namespace Aseba { namespace ThymioVPL
 				high = value;
 			emit contentChanged();
 		}
+		updateIndicationLEDsOpacity();
 	}
 	
 	QVector<quint16> BlockWithButtonsAndRange::getValuesCompressed() const

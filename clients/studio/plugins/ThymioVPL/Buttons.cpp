@@ -57,7 +57,10 @@ namespace Aseba { namespace ThymioVPL
 	{
 		stateCountLimit = limit;
 		if (limit > 0 && curState >= limit)
-			setValue(limit);
+		{
+			setValue(limit-1);
+			emit stateChanged();
+		}
 	}
 	
 	void GeometryShapeButton::addState(const QColor& brushColor, const QColor& penColor)
