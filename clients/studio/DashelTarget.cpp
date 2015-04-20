@@ -487,6 +487,14 @@ namespace Aseba
 			dashelInterface.unlock();
 	}
 	
+	QList<unsigned> DashelTarget::getNodesList() const
+	{
+		QList<unsigned> nodeIds;
+		for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+			nodeIds.append(node->first);
+		return nodeIds;
+	}
+	
 	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
 	{
 		return descriptionManager.getDescription(node);

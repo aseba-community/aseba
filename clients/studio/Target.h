@@ -101,6 +101,9 @@ namespace Aseba
 		//! Return the language that we choosen for this connection
 		virtual QString getLanguage() const = 0;
 		
+		//! Return all the nodes
+		virtual QList<unsigned> getNodesList() const = 0;
+		
 		//! Return the name of a node. Returned value is always valid if node exists
 		const QString getName(unsigned node) const;
 		

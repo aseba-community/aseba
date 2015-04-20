@@ -165,6 +165,7 @@ namespace Aseba
 		~DashelTarget();
 		
 		virtual QString getLanguage() const { return dashelInterface.language; }
+		virtual QList<unsigned> getNodesList() const;
 		
 		virtual void disconnect();
 		
