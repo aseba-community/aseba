@@ -105,9 +105,9 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 	buffer_add_uint16(start);
 	for (i = start; i < start + length; i++)
 		buffer_add_uint16(vm->variables[i]);
-        AsebaSendBuffer(vm, buffer, buffer_pos);
+	AsebaSendBuffer(vm, buffer, buffer_pos);
 #else
-        const uint16 MAX_VARIABLES_SIZE = ((100 - 6)/2);
+	const uint16 MAX_VARIABLES_SIZE = ((100 - 6)/2);
 	do {
 		uint16 size;
 		buffer_pos = 0;
