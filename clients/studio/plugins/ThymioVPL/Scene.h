@@ -88,6 +88,7 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		ThymioVisualProgramming* vpl;
 		
+		QGraphicsSvgItem* warningGraphicsItem;
 		QGraphicsSvgItem* errorGraphicsItem;
 		QGraphicsSvgItem* referredGraphicsItem;
 		QGraphicsLineItem* referredLineItem;

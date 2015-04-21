@@ -19,13 +19,16 @@ namespace Aseba { namespace ThymioVPL
 	Scene::Scene(ThymioVisualProgramming *vpl) : 
 		QGraphicsScene(vpl),
 		vpl(vpl),
-		errorGraphicsItem(new QGraphicsSvgItem(":/images/vpl_error.svg")),
-		referredGraphicsItem(new QGraphicsSvgItem(":/images/vpl_error.svg")),
+		warningGraphicsItem(new QGraphicsSvgItem(":/images/vpl/missing_block.svgz")),
+		errorGraphicsItem(new QGraphicsSvgItem(":/images/vpl/error.svgz")),
+		referredGraphicsItem(new QGraphicsSvgItem(":/images/vpl/error.svgz")),
 		referredLineItem(addLine(0, 0, 0, 0, QPen(Qt::red, 8, Qt::DashLine))),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
 	{
+		addItem(warningGraphicsItem);
+		warningGraphicsItem->setVisible(false);
 		addItem(errorGraphicsItem);
 		errorGraphicsItem->setVisible(false);
 		addItem(referredGraphicsItem);
@@ -208,6 +211,7 @@ namespace Aseba { namespace ThymioVPL
 		setSceneRect(QRectF());
 		eventActionsSets.clear();
 		// hide any error
+		warningGraphicsItem->setVisible(false);
 		errorGraphicsItem->setVisible(false);
 		referredGraphicsItem->setVisible(false);
 		referredLineItem->setVisible(false);
@@ -484,10 +488,17 @@ namespace Aseba { namespace ThymioVPL
 		//qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
 		
-		errorGraphicsItem->setVisible(lastCompilationResult.errorLine != -1);
+		const bool isWarning(
+			isSetLast(lastCompilationResult.errorLine) &&
+			((lastCompilationResult.errorType == Compiler::MISSING_ACTION) || (lastCompilationResult.errorType == Compiler::MISSING_EVENT))
+		);
+		
+		warningGraphicsItem->setVisible(isWarning);
+		errorGraphicsItem->setVisible(!isWarning && lastCompilationResult.errorLine != -1);
 		referredGraphicsItem->setVisible(lastCompilationResult.referredLine != -1);
 		referredLineItem->setVisible(lastCompilationResult.referredLine != -1);
 
+		EventActionsSet* warningEventActionsSet(0);
 		EventActionsSet* errorEventActionsSet(0);
 		EventActionsSet* referredEventActionsSet(0);
 		for (int i = 0; i < eventActionsSets.size(); ++i)
@@ -497,7 +508,10 @@ namespace Aseba { namespace ThymioVPL
 			if (i == lastCompilationResult.errorLine)
 			{
 				errorType = lastCompilationResult.errorType;
-				errorEventActionsSet = eventActionsSet;
+				if (isWarning)
+					warningEventActionsSet = eventActionsSet;
+				else
+					errorEventActionsSet = eventActionsSet;
 			}
 			else if (i == lastCompilationResult.referredLine)
 			{
@@ -513,6 +527,16 @@ namespace Aseba { namespace ThymioVPL
 
 		// force update when error notification changed position to work around issue 360
 		bool forceUpdate(false);
+		if (warningEventActionsSet)
+		{
+			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
+			
+			qreal errorY(warningEventActionsSet->scenePos().y() + warningEventActionsSet->innerBoundingRect().height() / 2);
+			qreal oldPosY(warningGraphicsItem->pos().y());
+			warningGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
+			if (warningGraphicsItem->pos().y() != oldPosY)
+				forceUpdate = true;
+		}
 		if (errorEventActionsSet)
 		{
 			QSizeF errorSize(errorGraphicsItem->boundingRect().size());

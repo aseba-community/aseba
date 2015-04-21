@@ -79,7 +79,6 @@
 	<file>images/vpl_block_acc_quadrant.svgz</file>
 	<file>images/vpl_block_acc_pitch.svgz</file>
 	<file>images/vpl_block_acc_roll.svgz</file>
-	<file>images/vpl_error.svg</file>
 	<file>images/thymio-plugin-anim0.png</file>
 	<file>images/thymio-plugin-anim1.png</file>
 	<file>images/thymio-plugin-anim2.png</file>
@@ -103,5 +102,8 @@
 	<file>images/icons/vpl-advanced_on.svgz</file>
 	<file>images/icons/asebastudio.svgz</file>
 	<file>images/icons/thymiovpl.svgz</file>
+	<file>images/vpl/success.svgz</file>
+	<file>images/vpl/missing_block.svgz</file>
+	<file>images/vpl/error.svgz</file>
 </qresource>
 </RCC>
