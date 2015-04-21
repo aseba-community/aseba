@@ -40,6 +40,7 @@
 #include <QTabWidget>
 #include <QDesktopServices>
 #include <QtConcurrentRun>
+#include <QSvgRenderer>
 
 #include <version.h>
 
@@ -1654,6 +1655,11 @@ namespace Aseba
 			arg(QString::fromStdString(Dashel::streamTypeRegistry.list())).
 			arg(tr("http://aseba.wikidot.com/en:start"));
 		
+		QSvgRenderer iconRenderer(QString(":/images/icons/asebastudio.svgz"));
+		QPixmap iconPixmap(128,128);
+		QPainter iconPainter(&iconPixmap);
+		iconRenderer.render(&iconPainter);
+		aboutBox.setIconPixmap(iconPixmap);
 		aboutBox.setText(text);
 		aboutBox.setDetailedText(ASEBA_AUTHORS_FULL_LIST);
 		aboutBox.setWindowTitle(tr("About Aseba Studio"));
