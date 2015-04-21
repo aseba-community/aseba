@@ -54,7 +54,6 @@
 	<file>images/eyeclose.png</file>
 	<file>images/kedit.png</file>
 	<file>images/exec.png</file>
-	<file>images/thymiovpl.png</file>
 	<file>images/edit-undo.svgz</file>
 	<file>images/edit-redo.svgz</file>
 	<file>images/thymioclap.svgz</file>
@@ -102,5 +101,6 @@
 	<file>images/icons/info.svgz</file>
 	<file>images/icons/vpl-advanced_off.svgz</file>
 	<file>images/icons/vpl-advanced_on.svgz</file>
+	<file>images/icons/thymiovpl.svgz</file>
 </qresource>
 </RCC>
