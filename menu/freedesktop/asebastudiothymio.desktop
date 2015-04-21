@@ -7,4 +7,4 @@ GenericName[fr]=Environnement de développement intégré
 Exec=asebastudio "ser:name=Thymio-II" -ar
 TryExec=asebastudio
 Categories=Education;Science
-Icon=asebathymio.png
+Icon=asebathymio

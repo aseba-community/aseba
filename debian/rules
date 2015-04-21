@@ -23,7 +23,8 @@ binary-arch:
 	install -d debian/tmp/usr/share/doc/aseba/example-code
 	install -d debian/tmp/usr/share/doc/aseba/example-scenarios
 	install -d debian/tmp/usr/share/applications
-	install -d debian/tmp/usr/share/icons
+	install -d debian/tmp/usr/share/icons/hicolor/48x48/apps
+	install -d debian/tmp/usr/share/icons/hicolor/scalable/apps
 #	cp changelog debian/tmp/usr/share/doc/aseba/changelog
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
@@ -44,7 +45,8 @@ binary-arch:
 	cp targets/playground/unifr.playground debian/tmp/usr/share/doc/aseba/example-scenarios
 	cp targets/challenge/examples/challenge-goto-energy.aesl debian/tmp/usr/share/doc/aseba/example-code
 	cp menu/freedesktop/*.desktop debian/tmp/usr/share/applications
-	cp menu/freedesktop/*.png debian/tmp/usr/share/icons
+	cp menu/freedesktop/48x48/*.png debian/tmp/usr/share/icons/hicolor/48x48/apps
+	cp menu/src/*.svg debian/tmp/icons/hicolor/scalable/apps
 	strip --strip-unneeded -R .note -R .comment  debian/build/*/*.a
 	strip --strip-unneeded -R .note -R .comment  debian/build/*/*/*.a
 	cd debian/build && make install

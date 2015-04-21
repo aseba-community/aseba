@@ -4,4 +4,4 @@ Name=Thymio Firmware Upgrader
 Exec=thymioupgrader
 TryExec=thymioupgrader
 Categories=Education;Science
-Icon=thymioupgrader.png
+Icon=thymioupgrader
