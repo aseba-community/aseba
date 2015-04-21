@@ -781,6 +781,7 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
+			// find on which set the drag was droppes
 			EventActionsSet* target(0);
 			Scene* vplScene(polymorphic_downcast<Scene*>(scene()));
 			for (Scene::SetItr it(vplScene->setsBegin()); it != vplScene->setsEnd(); ++it)
@@ -791,19 +792,23 @@ namespace Aseba { namespace ThymioVPL
 					target->wasDroppedTarget = false;
 				}
 			}
+			// if it is this one, there is a bug
 			assert(target != this);
 			if (!isCopy)
 			{
-				// copy target to this
+				// copy target content to this
 				resetSet();
 				deserialize(target->mimeData()->data("EventActionsSet"));
 				repositionElements();
 			}
-			// copy content to target
+			// copy this content to target
 			target->resetSet();
 			target->deserialize(myData->data("EventActionsSet"));
 			target->repositionElements();
 			target->setSoleSelection();
+			
+			// make sure that we have an empty set at the end
+			polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
 			
 			// disconnect the selection setting mechanism, emit, and then re-enable
 			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
