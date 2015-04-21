@@ -144,6 +144,9 @@ namespace Aseba { namespace ThymioVPL
 		
 		Compiler::ErrorType errorType;
 		bool beingDragged;
+	
+	public:
+		bool wasDroppedTarget; //!< true if this set was target of set drag & drop
 	};
 	
 	/*@}*/

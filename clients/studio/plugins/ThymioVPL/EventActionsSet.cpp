@@ -47,7 +47,8 @@ namespace Aseba { namespace ThymioVPL
 		columnPos(0),
 		row(row),
 		errorType(Compiler::NO_ERROR),
-		beingDragged(false)
+		beingDragged(false),
+		wasDroppedTarget(false)
 	{
 		setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 		setAcceptHoverEvents(true);
@@ -770,6 +771,7 @@ namespace Aseba { namespace ThymioVPL
 		const bool isCopy(event->modifiers() & Qt::ControlModifier);
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
+		QMimeData* myData(mimeData());
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
@@ -779,14 +781,37 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
+			EventActionsSet* target(0);
+			Scene* vplScene(polymorphic_downcast<Scene*>(scene()));
+			for (Scene::SetItr it(vplScene->setsBegin()); it != vplScene->setsEnd(); ++it)
+			{
+				if ((*it)->wasDroppedTarget)
+				{
+					target = *it;
+					target->wasDroppedTarget = false;
+				}
+			}
+			assert(target != this);
 			if (!isCopy)
+			{
+				// copy target to this
 				resetSet();
+				deserialize(target->mimeData()->data("EventActionsSet"));
+				repositionElements();
+			}
+			// copy content to target
+			target->resetSet();
+			target->deserialize(myData->data("EventActionsSet"));
+			target->repositionElements();
+			target->setSoleSelection();
+			
 			// disconnect the selection setting mechanism, emit, and then re-enable
 			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 			emit contentChanged();
 			emit undoCheckpoint();
 			connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 		}
+		delete myData;
 		beingDragged = false;
 		#endif // ANDROID
 	}
@@ -838,11 +863,9 @@ namespace Aseba { namespace ThymioVPL
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))
 			{
-				resetSet();
-				deserialize(event->mimeData()->data("EventActionsSet"));
-				repositionElements();
-				
-				setSoleSelection();
+				wasDroppedTarget = true;
+				// we just take note that this set was the target of the drop, as the drop
+				// initiator will take care of changing our content
 			}
 			// It is a block
 			else if (event->mimeData()->hasFormat("Block"))
