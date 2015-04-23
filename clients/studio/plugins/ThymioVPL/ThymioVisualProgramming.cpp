@@ -62,6 +62,8 @@ namespace Aseba { namespace ThymioVPL
 		mainLayout = new QVBoxLayout(this);
 		
 		toolLayout = new  QGridLayout();
+		toolLayout->setHorizontalSpacing(0);
+		toolLayout->setVerticalSpacing(0);
 		mainLayout->addLayout(toolLayout);
 
 		newButton = new QPushButton();
@@ -88,13 +90,24 @@ namespace Aseba { namespace ThymioVPL
 		saveAsButton->setFlat(true);
 		toolLayout->addWidget(saveAsButton,1,1);
 		
+		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer1,0,2,2,1);
+		
+		firstSeparator = new QFrame();
+		firstSeparator->setFrameShape(QFrame::VLine);
+		firstSeparator->setFrameShadow(QFrame::Sunken);
+		toolLayout->addWidget(firstSeparator,0,3,2,1);
+		
+		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer2,0,4,2,1);
+		
 		undoButton = new QPushButton();
 		undoButton->setIcon(QIcon(":/images/icons/edit-undo.svgz"));
 		undoButton->setToolTip(tr("Undo"));
 		undoButton->setFlat(true);
 		undoButton->setEnabled(false);
 		undoButton->setShortcut(QKeySequence::Undo);
-		toolLayout->addWidget(undoButton,0,2,2,1);
+		toolLayout->addWidget(undoButton,0,5,2,1);
 		
 		redoButton = new QPushButton();
 		redoButton->setIcon(QIcon(":/images/icons/edit-redo.svgz"));
@@ -102,43 +115,57 @@ namespace Aseba { namespace ThymioVPL
 		redoButton->setFlat(true);
 		redoButton->setEnabled(false);
 		redoButton->setShortcut(QKeySequence::Redo);
-		toolLayout->addWidget(redoButton,0,3,2,1);
+		toolLayout->addWidget(redoButton,0,6,2,1);
 		
-		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer1,0,4,2,1);
+		spacer3 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer3,0,7,2,1);
 
 		runButton = new QPushButton();
 		runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
 		runButton->setFlat(true);
-		toolLayout->addWidget(runButton,0,5,2,2);
+		toolLayout->addWidget(runButton,0,8,2,1);
+		
+		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacerRunStop,0,9,2,1);
 
 		stopButton = new QPushButton();
 		stopButton->setIcon(QIcon(":/images/icons/stop.svgz"));
 		stopButton->setToolTip(tr("Stop"));
 		stopButton->setFlat(true);
-		toolLayout->addWidget(stopButton,0,7,2,2);
+		toolLayout->addWidget(stopButton,0,10,2,1);
 		
-		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer2,0,9,2,1);
+		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer4,0,11,2,1);
 		
 		advancedButton = new QPushButton();
 		advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		advancedButton->setFlat(true);
-		toolLayout->addWidget(advancedButton,0,10,2,1);
+		toolLayout->addWidget(advancedButton,0,12,2,1);
+		
+		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer5,0,13,2,1);
+		
+		secondSeparator = new QFrame();
+		secondSeparator->setFrameShape(QFrame::VLine);
+		secondSeparator->setFrameShadow(QFrame::Sunken);
+		toolLayout->addWidget(secondSeparator,0,14,2,1);
+		
+		spacer6 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer6,0,15,2,1);
 
 		helpButton = new QPushButton();
 		helpButton->setIcon(QIcon(":/images/icons/info.svgz"));
 		helpButton->setToolTip(tr("Help"));
 		helpButton->setFlat(true);
-		toolLayout->addWidget(helpButton,0,11);
+		toolLayout->addWidget(helpButton,0,16);
 		
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
-		toolLayout->addWidget(snapshotButton,1,11);
+		toolLayout->addWidget(snapshotButton,1,16);
 
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
@@ -1074,16 +1101,16 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
-		const int toolbarWidgetCount(10);
+		const float toolbarWidgetCount(12.25);
 		// get width of combox box element (not content)
 		int desiredIconSize((
 			event->size().width() -
 			(
-				(toolbarWidgetCount-1) * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
-				(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + 
-				toolbarWidgetCount * 2 * style()->pixelMetric(QStyle::PM_ButtonMargin) + 
+				/*(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + */
+				toolbarWidgetCount * 2 * style()->pixelMetric(QStyle::PM_ButtonMargin) +
 				style()->pixelMetric(QStyle::PM_LayoutLeftMargin) +
-				style()->pixelMetric(QStyle::PM_LayoutRightMargin)
+				style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
+				6 // vertical lines
 				/*#ifdef Q_WS_MAC
 				55 // safety factor, as it seems that metrics do miss some space
 				#else // Q_WS_MAC
@@ -1101,7 +1128,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
-		const QSize importantIconSize(tbIconSize * 1.7);
+		const QSize importantIconSize(tbIconSize * 1.41);
 		#ifndef Q_OS_WIN
 		regenerateRunButtonAnimation(importantIconSize);
 		#endif // Q_OS_WIN
@@ -1116,8 +1143,13 @@ namespace Aseba { namespace ThymioVPL
 		advancedButton->setIconSize(tbIconSize);
 		helpButton->setIconSize(tbIconSize);
 		snapshotButton->setIconSize(tbIconSize);
-		spacer1->changeSize(desiredIconSize/2, desiredIconSize);
-		spacer2->changeSize(desiredIconSize/2, desiredIconSize);
+		spacer1->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer2->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer3->changeSize(desiredIconSize, desiredIconSize);
+		spacerRunStop->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer4->changeSize(desiredIconSize, desiredIconSize);
+		spacer5->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer6->changeSize(desiredIconSize/4, desiredIconSize);
 		toolLayout->invalidate();
 		
 		// set view and cards on sides

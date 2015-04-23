@@ -136,8 +136,15 @@ namespace Aseba { namespace ThymioVPL
 		QPushButton *advancedButton;
 		QPushButton *helpButton;
 		QPushButton *snapshotButton;
+		QFrame *firstSeparator;
+		QFrame *secondSeparator;
 		QSpacerItem *spacer1;
 		QSpacerItem *spacer2;
+		QSpacerItem *spacer3;
+		QSpacerItem *spacerRunStop;
+		QSpacerItem *spacer4;
+		QSpacerItem *spacer5;
+		QSpacerItem *spacer6;
 		
 		// run button animation
 		QVector<QPixmap> runAnimFrames;
