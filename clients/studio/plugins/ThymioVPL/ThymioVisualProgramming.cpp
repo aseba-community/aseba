@@ -225,11 +225,12 @@ namespace Aseba { namespace ThymioVPL
 		compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
 		
-		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize));
+		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 		
 		showCompilationError = new QPushButton(tr("show line"));
+		showCompilationError->setStyleSheet("QPushButton { font-size: 16px; }");
 		showCompilationError->hide();
 		connect(showCompilationError, SIGNAL(clicked()), SLOT(showErrorLine()));
 
@@ -905,7 +906,7 @@ namespace Aseba { namespace ThymioVPL
 		if (compilation.isSuccessful())
 		{
 			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize));
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
 			// content changed but not uploaded, show animation
@@ -917,7 +918,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			compilationResult->setText(tr("Please add an event"));
 			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize));
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
@@ -928,7 +929,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			compilationResult->setText(tr("Please add an action"));
 			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize));
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
@@ -938,7 +939,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 		{
 			compilationResult->setStyleSheet("QLabel { font-size: 16px; color: rgb(231,19,0); }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/error.svgz", fontSize));
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/error.svgz", fontSize*1.6));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
