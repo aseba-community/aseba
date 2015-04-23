@@ -65,6 +65,8 @@ namespace Aseba { namespace ThymioVPL
 		toolLayout->setHorizontalSpacing(0);
 		toolLayout->setVerticalSpacing(0);
 		mainLayout->addLayout(toolLayout);
+		// add back the spacing we removed
+		mainLayout->addSpacing(style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing));
 
 		newButton = new QPushButton();
 		newButton->setIcon(QIcon(":/images/icons/filenew.svgz"));
