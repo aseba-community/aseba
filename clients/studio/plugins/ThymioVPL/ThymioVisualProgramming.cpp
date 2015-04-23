@@ -196,13 +196,13 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
 		eventsLabel = new QLabel(tr("Events"));
-		eventsLabel ->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; text-align: center; }");
+		eventsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		eventsLayout->setSpacing(20);
 		#else // Q_WS_MACX
 		eventsLayout->setSpacing(10);
 		#endif // Q_WS_MACX
-		eventsLayout->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+		eventsLayout->setAlignment(Qt::AlignTop);
 		eventsLayout->addWidget(eventsLabel);
 		BlockButton* button;
 		foreach (button, eventButtons)
@@ -279,13 +279,13 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(new BlockButton("setstate", this));
 		
 		actionsLabel = new QLabel(tr("Actions"));
-		actionsLabel ->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; text-align: center; }");
+		actionsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		actionsLayout->setSpacing(20);
 		#else // Q_WS_MACX
 		actionsLayout->setSpacing(10);
 		#endif // Q_WS_MACX
-		actionsLayout->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
 		foreach (button, actionButtons)
 		{
