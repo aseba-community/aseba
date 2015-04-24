@@ -1610,6 +1610,7 @@ namespace Aseba
 		setupWidgets();
 		setupMenu();
 		setupConnections();
+		setWindowIcon(QIcon(":/images/icons/asebastudio.svgz"));
 		
 		// cosmetic fix-up
 		updateWindowTitle();

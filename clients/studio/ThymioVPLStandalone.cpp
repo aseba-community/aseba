@@ -142,6 +142,7 @@ namespace Aseba
 		// create gui
 		setupWidgets();
 		setupConnections();
+		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
 		
 		// when everything is ready, get description
 		target->broadcastGetDescription();
