@@ -313,6 +313,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// window properties
 		setWindowModality(Qt::ApplicationModal);
+		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
 		
 		// save initial state
 		pushUndo();
