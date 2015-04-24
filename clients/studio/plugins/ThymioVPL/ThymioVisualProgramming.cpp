@@ -72,24 +72,28 @@ namespace Aseba { namespace ThymioVPL
 		newButton->setIcon(QIcon(":/images/icons/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
 		newButton->setFlat(true);
+		newButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(newButton,0,0);
 		
 		openButton = new QPushButton();
 		openButton->setIcon(QIcon(":/images/icons/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
 		openButton->setFlat(true);
+		openButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(openButton,0,1);
 		
 		saveButton = new QPushButton();
 		saveButton->setIcon(QIcon(":/images/icons/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 		saveButton->setFlat(true);
+		saveButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveButton,1,0);
 		
 		saveAsButton = new QPushButton();
 		saveAsButton->setIcon(QIcon(":/images/icons/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 		saveAsButton->setFlat(true);
+		saveAsButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveAsButton,1,1);
 		
 		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
@@ -107,6 +111,7 @@ namespace Aseba { namespace ThymioVPL
 		undoButton->setIcon(QIcon(":/images/icons/edit-undo.svgz"));
 		undoButton->setToolTip(tr("Undo"));
 		undoButton->setFlat(true);
+		undoButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		undoButton->setEnabled(false);
 		undoButton->setShortcut(QKeySequence::Undo);
 		toolLayout->addWidget(undoButton,0,5,2,1);
@@ -115,6 +120,7 @@ namespace Aseba { namespace ThymioVPL
 		redoButton->setIcon(QIcon(":/images/icons/edit-redo.svgz"));
 		redoButton->setToolTip(tr("Redo"));
 		redoButton->setFlat(true);
+		redoButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		redoButton->setEnabled(false);
 		redoButton->setShortcut(QKeySequence::Redo);
 		toolLayout->addWidget(redoButton,0,6,2,1);
@@ -126,6 +132,7 @@ namespace Aseba { namespace ThymioVPL
 		runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
 		runButton->setFlat(true);
+		runButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(runButton,0,8,2,1);
 		
 		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
@@ -135,6 +142,7 @@ namespace Aseba { namespace ThymioVPL
 		stopButton->setIcon(QIcon(":/images/icons/stop.svgz"));
 		stopButton->setToolTip(tr("Stop"));
 		stopButton->setFlat(true);
+		stopButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(stopButton,0,10,2,1);
 		
 		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
@@ -144,6 +152,7 @@ namespace Aseba { namespace ThymioVPL
 		advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		advancedButton->setFlat(true);
+		advancedButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(advancedButton,0,12,2,1);
 		
 		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
@@ -161,12 +170,14 @@ namespace Aseba { namespace ThymioVPL
 		helpButton->setIcon(QIcon(":/images/icons/info.svgz"));
 		helpButton->setToolTip(tr("Help"));
 		helpButton->setFlat(true);
+		helpButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(helpButton,0,16);
 		
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
+		snapshotButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(snapshotButton,1,16);
 
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
