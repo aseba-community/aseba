@@ -81,6 +81,8 @@ namespace Aseba { namespace ThymioVPL
 		virtual QImage image(qreal factor=1);
 		QImage translucidImage(qreal factor=1);
 		
+		void render(QPainter& painter);
+		
 	protected slots:
 		void clearChangedFlag();
 		void setChangedFlag();
@@ -97,7 +99,6 @@ namespace Aseba { namespace ThymioVPL
 		bool keepAfterDrop;
 
 	protected:
-		void render(QPainter& painter);
 		void renderChildItems(QPainter& painter, QGraphicsItem* item, QStyleOptionGraphicsItem& opt);
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
