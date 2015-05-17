@@ -799,7 +799,7 @@ namespace Aseba
             int i;
             while (ss >> i)
             {
-                //values.push_back(std::to_string(short(i)));
+	        values.push_back(std::to_string(short(i)));
                 if (ss.peek() == ']')
                     break;
                 else if (ss.peek() == ',')
