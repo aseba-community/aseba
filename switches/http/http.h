@@ -25,7 +25,6 @@
 #include <list>
 #include <queue>
 #include <dashel/dashel.h>
-#include <libjson/libjson.h>
 #include "../../common/msg/msg.h"
 #include "../../common/msg/descriptions-manager.h"
 
@@ -59,7 +58,6 @@ namespace Aseba
         typedef std::map<VariableAddress, ResponseSet>          VariableResponseSetMap;
         typedef std::map<Dashel::Stream*, ResponseQueue>        StreamResponseQueueMap;
         typedef std::map<HttpRequest*, std::set<std::string> >  StreamEventSubscriptionMap;
-        JSONNode nodeInfoJson;
 
     protected:
         // streams

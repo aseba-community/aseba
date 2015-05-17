@@ -35,7 +35,6 @@
  TODO:
     - handle more than just one Thymio-II node
     - gracefully shut down TCP/IP connections (half-close, wait, close)
-    - remove dependency on libjson? Our output is trivial and input syntax is limited to unsigned vectors
  
  This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
  which bear the copyright and LGPL 3 licensing notice below.
@@ -69,8 +68,6 @@
 #include <valarray>
 #include <vector>
 #include <iterator>
-//#include <regex>
-#include <libjson/libjson.h>
 #include "http.h"
 #include "../../common/consts.h"
 #include "../../common/types.h"
@@ -325,11 +322,12 @@ namespace Aseba
     void HttpInterface::incomingVariables(const Variables *variables)
     {
         // first, build result string from message
-        JSONNode result(JSON_ARRAY);
-        result.set_name("result");
+        std::stringstream result;
+        result << "[";
         for (size_t i = 0; i < variables->variables.size(); ++i)
-            result.push_back(JSONNode("", variables->variables[i]));
-        string result_str = libjson::strip_white_space(result.write_formatted());
+            result << (i ? "," : "") << variables->variables[i];
+        result << "]";
+        string result_str = result.str();
         
         VariableAddress address = std::make_pair(variables->source,variables->start);
         ResponseSet *pending = &pendingVariables[address];
@@ -447,7 +445,8 @@ namespace Aseba
     {
         bool do_one_node(args.size() > 0);
         
-        JSONNode list(JSON_ARRAY);
+        std::stringstream json;
+        json << (do_one_node ? "" : "[");
         
         for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
              descIt != nodesDescriptions.end(); ++descIt)
@@ -456,65 +455,60 @@ namespace Aseba
             char wbuf[128];
             string nodeName = wstringtocstr(description.name,wbuf);
             
-            JSONNode node(JSON_NODE);
-            node.set_name("nodeInfo");
-            node.push_back(JSONNode("name", nodeName));
-            node.push_back(JSONNode("protocolVersion", description.protocolVersion));
+            json << "{";
+            json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
             
             if (do_one_node)
             {
-                node.push_back(JSONNode("bytecodeSize", description.bytecodeSize));
-                node.push_back(JSONNode("variablesSize", description.variablesSize));
-                node.push_back(JSONNode("stackSize", description.stackSize));
+                json << ",\"bytecodeSize\":" << description.bytecodeSize;
+                json << ",\"variablesSize\":" <<description.variablesSize;
+                json << ",\"stackSize\":" << description.stackSize;
                 
                 // named variables
-                JSONNode named_variables(JSON_NODE);
-                named_variables.set_name("namedVariables");
-//                for (size_t i = 0; i < description.namedVariables.size(); ++i)
-//                    named_variables.push_back(JSONNode(wstringtocstr(description.namedVariables[i].name,wbuf),
-//                                                       description.namedVariables[i].size));
+                json << ",\"namedVariables\":{";
                 for (NodeNameVariablesMap::const_iterator n(allVariables.find(nodeName));
                      n != allVariables.end(); ++n)
                 {
                     VariablesMap vm = n->second;
                     for (VariablesMap::iterator i = vm.begin();
                          i != vm.end(); ++i)
-                        named_variables.push_back(JSONNode(wstringtocstr(i->first, wbuf),
-                                                  i->second.second));
+                        json << (i == vm.begin() ? "" : ",")
+                             << "\"" << wstringtocstr(i->first, wbuf) << "\":" << i->second.second;
                 }
-                node.push_back(named_variables);
+                json << "}";
                 
                 // local events variables
-                JSONNode local_events(JSON_NODE);
-                local_events.set_name("localEvents");
+                json << ",\"localEvents\":{";
                 for (size_t i = 0; i < description.localEvents.size(); ++i)
                 {
                     string ev(wstringtocstr(description.localEvents[i].name,wbuf));
-                    local_events.push_back(JSONNode(ev,wstringtocstr(description.localEvents[i].description,wbuf)));
+                    json << (i == 0 ? "" : ",")
+                    << "\"" << ev << "\":"
+                    << "\"" << wstringtocstr(description.localEvents[i].description, wbuf) << "\"";
                 }
-                node.push_back(local_events);
+                json << "}";
                 
                 // constants from introspection
-                JSONNode constants(JSON_NODE);
-                constants.set_name("constants");
+                json << ",\"constants\":{";
                 for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
-                    constants.push_back(JSONNode(wstringtocstr(commonDefinitions.constants[i].name,wbuf),
-                                                 commonDefinitions.constants[i].value));
-                node.push_back(constants);
+                    json << (i == 0 ? "" : ",")
+                    << "\"" << wstringtocstr(commonDefinitions.constants[i].name,wbuf) << "\":"
+                    << commonDefinitions.constants[i].value;
+                json << "}";
                 
                 // events from introspection
-                JSONNode events(JSON_NODE);
-                events.set_name("events");
+                json << ",\"events\":{";
                 for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
-                    events.push_back(JSONNode(wstringtocstr(commonDefinitions.events[i].name,wbuf),
-                                              commonDefinitions.events[i].value));
-                node.push_back(events);
+                    json << (i == 0 ? "" : ",")
+                    << "\"" << wstringtocstr(commonDefinitions.events[i].name,wbuf) << "\":"
+                    << commonDefinitions.events[i].value;
+                json << "}";
             }
-            list.push_back(node);
+            json << "}";
         }
         
-        std::string jc = (do_one_node && !list.empty()) ? list[0].write_formatted() : list.write_formatted();
-        finishResponse(req,200,jc);
+        json <<(do_one_node ? "" : "]");
+        finishResponse(req,200,json.str());
     }
     
     // Handler: Variable get/set or Event call
@@ -590,11 +584,7 @@ namespace Aseba
                 parse_json_form(std::string(req->content, req->content.size()), data);
             }
             sendEvent(nodeName, data);
-//            JSONNode n(JSON_NODE);
-//            n.push_back(JSONNode("return_value", JSON_NULL));
-//            n.push_back(JSONNode("cmd", "sendEvent"));
-//            n.push_back(JSONNode("name", nodeName));
-            finishResponse(req, 200, "");
+            finishResponse(req, 200, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
             return;
         }
     }
@@ -800,26 +790,23 @@ namespace Aseba
     // Utility: extract argument values from JSON request body
     void HttpInterface::parse_json_form(std::string content, strings& values)
     {
-        try
+        std::string buffer = content;
+        buffer.erase(std::remove_if(buffer.begin(), buffer.end(), ::isspace), buffer.end());
+        std::stringstream ss(buffer);
+        
+        if (ss.get() == '[')
         {
-            JSONNode form = libjson::parse(content);
-            
-            if (form.type() == JSON_NODE)
+            int i;
+            while (ss >> i)
             {
-                JSONNode::const_iterator args = form.find("args");
-                if (! args->empty())
-                    form = *args;
+                //values.push_back(std::to_string(short(i)));
+                if (ss.peek() == ']')
+                    break;
+                else if (ss.peek() == ',')
+                    ss.ignore();
             }
-            if (form.type() != JSON_ARRAY)
-                throw std::invalid_argument("not a JSON_ARRAY");
-            
-            for (JSONNode::const_iterator i = form.begin(); i != form.end(); ++i)
-                values.push_back(i->as_string());
-        }
-        catch(std::invalid_argument e)
-        {
-            std::cerr << "Invalid JSON value \"" << content << "\"; libjson exception: " << e.what() << std::endl;
-            // values is empty, request will fail
+            if (ss.get() != ']')
+                values.erase(values.begin(),values.end());
         }
         
         return;
@@ -838,10 +825,6 @@ namespace Aseba
             aeslLoad(doc);
             //if (verbose)
                 cerr << "Loaded aesl script from " << filename.c_str() << "\n";
-            this->nodeInfoJson = JSONNode(JSON_NODE);
-            this->nodeInfoJson.set_name("nodeInfo");
-            this->nodeInfoJson.push_back(JSONNode("id", this->nodeId));
-            this->nodeInfoJson.push_back(JSONNode("connected", true));
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();

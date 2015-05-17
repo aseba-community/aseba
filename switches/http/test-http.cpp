@@ -164,3 +164,107 @@ TEST_CASE_METHOD(Aseba::HttpInterface, "StreamResponseQueueMap should manage pen
         }
     }
 }
+
+typedef std::vector<std::string> strings;
+
+TEST_CASE_METHOD(Aseba::HttpInterface, "JSON input is empty", "[empty]" ) {
+    std::string content = "";
+    strings values;
+    REQUIRE( values.size() == 0 );
+
+    GIVEN( "input is empty" ) {
+        parse_json_form(content, values); // no CHECK_THROWS because catch
+	REQUIRE( values.size() == 0 );
+    }
+}
+
+TEST_CASE_METHOD(Aseba::HttpInterface, "JSON input is integer array", "[array]" ) {
+    std::string content;
+    strings values;
+    REQUIRE( values.size() == 0 );
+
+    GIVEN( "a JSON array of one value " ) {
+        content = "[42]";
+        WHEN( "parse JSON string " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "array of single value 42 is returned" ) {
+	        REQUIRE( values.size() == 1 );
+	        REQUIRE( atoi(values[0].c_str()) == 42 );
+	    }
+        }
+    }
+    GIVEN( "a JSON array of zero values " ) {
+        content = "[]";
+        WHEN( "parse JSON string " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+	        REQUIRE( values.size() == 0 );
+	    }
+        }
+    }
+    GIVEN( "a JSON array of four mixed values " ) {
+        content = "[42,63,27,\"hike\"]";
+        WHEN( "parse JSON string " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "array of four values is returned" ) {
+	        REQUIRE( values.size() == 0 );
+	    }
+        }
+    }
+    GIVEN( "a JSON array of two values with white space" ) {
+        content = " [\t42,\r\n\t 63\n\r]\t\n";
+        WHEN( "parse JSON string with white space " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "array of two values is returned" ) {
+	        REQUIRE( values.size() == 2 );
+	        REQUIRE( atoi(values[0].c_str()) == 42 );
+	        REQUIRE( atoi(values[1].c_str()) == 63 );
+	    }
+        }
+    }
+    GIVEN( "a malformed JSON array with a bad separator" ) {
+        content = "[42;63]";
+        WHEN( "parse JSON string with white space " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+	        REQUIRE( values.size() == 0 );
+	    }
+        }
+    }
+    GIVEN( "a malformed JSON array with no opening" ) {
+        content = "42,63]";
+        WHEN( "parse JSON string with white space " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+	        REQUIRE( values.size() == 0 );
+	    }
+        }
+    }
+    GIVEN( "a malformed JSON array with no close" ) {
+        content = "[42,63";
+        WHEN( "parse JSON string with white space " + content ) {
+	    Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+	        REQUIRE( values.size() == 0 );
+	    }
+        }
+    }
+    GIVEN( "a JSON object" ) {
+        content = "{ \"abc\": 12, \"def\": [1,2,3] }";
+        WHEN( "parse JSON string " + content ) {
+            Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+                REQUIRE( values.size() == 0 );
+            }
+        }
+    }
+    GIVEN( "a JSON array containing an object" ) {
+        content = "[42, { \"abc\": 12, \"def\": [1,2,3] }, 63]";
+        WHEN( "parse JSON string " + content ) {
+            Aseba::HttpInterface::parse_json_form(content, values);
+            THEN( "an empty array is returned" ) {
+                REQUIRE( values.size() == 0 );
+            }
+        }
+    }
+}

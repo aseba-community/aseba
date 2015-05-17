@@ -1,10 +1,8 @@
-# libjson
-find_package(LibJson)
 # libxml2
 find_package(LibXml2)
-if (LIBXML2_FOUND AND LIBJSON_FOUND)
+if (LIBXML2_FOUND)
 	
-        include_directories(${LIBXML2_INCLUDE_DIR} ${LIBJSON_INCLUDE_DIR})
+        include_directories(${LIBXML2_INCLUDE_DIR})
 
 	set(http_SRCS
 		http.cpp
@@ -21,8 +19,8 @@ if (LIBXML2_FOUND AND LIBJSON_FOUND)
 	add_executable(asebahttp ${http_SRCS} ${http_MOCS})
 	add_executable(test-asebahttp ${test_http_SRCS} ${http_MOCS})
 	
-	target_link_libraries(asebahttp asebacompiler ${LIBXML2_LIBRARIES} ${LIBJSON_LIBRARY} ${ASEBA_CORE_LIBRARIES})
-	target_link_libraries(test-asebahttp asebacompiler ${LIBXML2_LIBRARIES} ${LIBJSON_LIBRARY} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebahttp asebacompiler ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(test-asebahttp asebacompiler ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 	configure_file(testdata-HttpRequest.txt ${CMAKE_CURRENT_BINARY_DIR}/testdata-HttpRequest.txt COPYONLY)
 	configure_file(do_valgrind_macosx.sh ${CMAKE_CURRENT_BINARY_DIR}/do_valgrind_macosx.sh COPYONLY)
@@ -57,4 +55,4 @@ install(FILES ${ASEBACORE_HDR_HTTP}
 
 
 
-endif (LIBXML2_FOUND AND LIBJSON_FOUND)
+endif (LIBXML2_FOUND)
