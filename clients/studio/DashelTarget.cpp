@@ -313,6 +313,26 @@ namespace Aseba
 	
 	bool DashelInterface::attemptToReconnect()
 	{
+		#ifndef WIN32
+		// first try with 0 baud to clear DTR
+		try
+		{
+			lock();
+			stream = Hub::connect(lastConnectedTarget + ";baud=0");
+			closeStream(stream);
+			unlock();
+		}
+		catch (DashelException e)
+		{
+			unlock();
+		}
+		
+		// wait 10 ms to let Thymio time to get that DTR is clear
+		// this wait is ugly, but still reasonably short and simpler to implement than a timer
+		QThread::msleep(10);
+		#endif // WIN32
+		
+		// then try normal opening
 		try
 		{
 			lock();
