@@ -19,10 +19,22 @@ namespace Aseba { namespace ThymioVPL
 	Scene::Scene(ThymioVisualProgramming *vpl) : 
 		QGraphicsScene(vpl),
 		vpl(vpl),
+		warningGraphicsItem(new QGraphicsSvgItem(":/images/vpl/missing_block.svgz")),
+		errorGraphicsItem(new QGraphicsSvgItem(":/images/vpl/error.svgz")),
+		referredGraphicsItem(new QGraphicsSvgItem(":/images/vpl/error.svgz")),
+		referredLineItem(addLine(0, 0, 0, 0, QPen(Qt::red, 8, Qt::DashLine))),
 		sceneModified(false),
 		advancedMode(false),
 		zoomLevel(1)
 	{
+		addItem(warningGraphicsItem);
+		warningGraphicsItem->setVisible(false);
+		addItem(errorGraphicsItem);
+		errorGraphicsItem->setVisible(false);
+		addItem(referredGraphicsItem);
+		referredGraphicsItem->setVisible(false);
+		referredLineItem->setVisible(false);
+		
 		// create initial set
 		EventActionsSet *p(createNewEventActionsSet());
 		buttonSetHeight = p->boundingRect().height();
@@ -118,14 +130,6 @@ namespace Aseba { namespace ThymioVPL
 		addEventActionsSet(eventActionsSet);
 	}
 	
-	//! Add a new event-actions set from a DOM Element in 1.3 format, used by load
-	void Scene::addEventActionsSetOldFormat_1_3(const QDomElement& element)
-	{
-		EventActionsSet *eventActionsSet(new EventActionsSet(eventActionsSets.size(), advancedMode));
-		eventActionsSet->deserializeOldFormat_1_3(element);
-		addEventActionsSet(eventActionsSet);
-	}
-	
 	//! Makes sure that there is at least one empty event-actions set at the end of the scene
 	void Scene::ensureOneEmptySetAtEnd()
 	{
@@ -206,6 +210,11 @@ namespace Aseba { namespace ThymioVPL
 		}
 		setSceneRect(QRectF());
 		eventActionsSets.clear();
+		// hide any error
+		warningGraphicsItem->setVisible(false);
+		errorGraphicsItem->setVisible(false);
+		referredGraphicsItem->setVisible(false);
+		referredLineItem->setVisible(false);
 		
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		
@@ -275,12 +284,6 @@ namespace Aseba { namespace ThymioVPL
 			if (element.tagName() == "set")
 			{
 				addEventActionsSet(element);
-			}
-			else if(element.tagName() == "buttonset")
-			{
-				QMessageBox::warning(0, "Feature not implemented", "Loading of files from 1.3 is not implementd yet, it will be soon, please be patient. Thank you.");
-				break;
-				//addEventActionsSetOldFormat_1_3(element);
 			}
 			
 			element = element.nextSiblingElement();
@@ -365,8 +368,19 @@ namespace Aseba { namespace ThymioVPL
 			EventActionsSet *p(eventActionsSets[i]);
 			r |= QRectF(p->scenePos(), p->boundingRect().size());
 		}
-		setSceneRect(r.adjusted(-40,-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
+		setSceneRect(r.adjusted(-(40+errorGraphicsItem->boundingRect().width()+40),-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
+	}
+	
+	//! Is a set, given by its id, the last non-empty set of the scene?
+	bool Scene::isSetLast(unsigned setId) const
+	{
+		if (setId+1 >= eventActionsSets.size())
+			return true;
+		for (unsigned i=setId+1; i<eventActionsSets.size(); ++i)
+			if (!eventActionsSets[i]->isEmpty())
+				return false;
+		return true;
 	}
 	
 	/*void Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
@@ -474,11 +488,79 @@ namespace Aseba { namespace ThymioVPL
 		//qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
 		
-		for(int i=0; i<eventActionsSets.size(); i++)
-			eventActionsSets[i]->setErrorStatus(false);
+		const bool isWarning(
+			isSetLast(lastCompilationResult.errorLine) &&
+			((lastCompilationResult.errorType == Compiler::MISSING_ACTION) || (lastCompilationResult.errorType == Compiler::MISSING_EVENT))
+		);
 		
-		if (!lastCompilationResult.isSuccessful())
-			eventActionsSets.at(lastCompilationResult.errorLine)->setErrorStatus(true);
+		warningGraphicsItem->setVisible(isWarning);
+		errorGraphicsItem->setVisible(!isWarning && lastCompilationResult.errorLine != -1);
+		referredGraphicsItem->setVisible(lastCompilationResult.referredLine != -1);
+		referredLineItem->setVisible(lastCompilationResult.referredLine != -1);
+
+		EventActionsSet* warningEventActionsSet(0);
+		EventActionsSet* errorEventActionsSet(0);
+		EventActionsSet* referredEventActionsSet(0);
+		for (int i = 0; i < eventActionsSets.size(); ++i)
+		{
+			EventActionsSet* eventActionsSet(eventActionsSets[i]);
+			Compiler::ErrorType errorType;
+			if (i == lastCompilationResult.errorLine)
+			{
+				errorType = lastCompilationResult.errorType;
+				if (isWarning)
+					warningEventActionsSet = eventActionsSet;
+				else
+					errorEventActionsSet = eventActionsSet;
+			}
+			else if (i == lastCompilationResult.referredLine)
+			{
+				errorType = lastCompilationResult.errorType;
+				referredEventActionsSet = eventActionsSet;
+			}
+			else
+			{
+				errorType = Compiler::NO_ERROR;
+			}
+			eventActionsSet->setErrorType(errorType);
+		}
+
+		// force update when error notification changed position to work around issue 360
+		bool forceUpdate(false);
+		if (warningEventActionsSet)
+		{
+			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
+			
+			qreal errorY(warningEventActionsSet->scenePos().y() + warningEventActionsSet->innerBoundingRect().height() / 2);
+			qreal oldPosY(warningGraphicsItem->pos().y());
+			warningGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
+			if (warningGraphicsItem->pos().y() != oldPosY)
+				forceUpdate = true;
+		}
+		if (errorEventActionsSet)
+		{
+			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
+			
+			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->innerBoundingRect().height() / 2);
+			qreal oldPosY(errorGraphicsItem->pos().y());
+			errorGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
+			if (errorGraphicsItem->pos().y() != oldPosY)
+				forceUpdate = true;
+			
+			if (referredEventActionsSet)
+			{
+				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->innerBoundingRect().height() / 2);
+				oldPosY = referredGraphicsItem->pos().y();
+				referredGraphicsItem->setPos(-(errorSize.width() + 40), referredY - errorSize.height() / 2);
+				if (referredGraphicsItem->pos().y() != oldPosY)
+					forceUpdate = true;
+				
+				referredLineItem->setLine(-(errorSize.width() / 2 + 40), referredY + errorSize.height() / 2 + 10, -(errorSize.width() / 2 + 40), errorY - errorSize.height() / 2 - 10);
+			}
+		}
+		
+		if (forceUpdate)
+			update();
 		
 		emit contentRecompiled();
 	}

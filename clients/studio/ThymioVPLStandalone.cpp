@@ -142,6 +142,7 @@ namespace Aseba
 		// create gui
 		setupWidgets();
 		setupConnections();
+		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
 		
 		// when everything is ready, get description
 		target->broadcastGetDescription();
@@ -399,8 +400,9 @@ namespace Aseba
 					if (element.tagName() == "node")
 					{
 						// if node corresponds to the connected robot
-						if ((element.attribute("nodeId").toUInt() == id) &&
-							(element.attribute("name") == target->getName(id)))
+						if ((element.attribute("name") == target->getName(id)) &&
+							((element.attribute("nodeId").toUInt() == id) || (target->getNodesList().size() == 1))
+						)
 						{
 							// restore VPL
 							QDomElement toolsPlugins(element.firstChildElement("toolsPlugins"));

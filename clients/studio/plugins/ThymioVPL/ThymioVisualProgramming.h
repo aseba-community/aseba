@@ -51,6 +51,7 @@ namespace Aseba { namespace ThymioVPL
 
 		virtual void aboutToLoad();
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
+		virtual QDomDocument transformDomToVersion1(const QDomDocument& content0);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
 		
@@ -135,9 +136,15 @@ namespace Aseba { namespace ThymioVPL
 		QPushButton *advancedButton;
 		QPushButton *helpButton;
 		QPushButton *snapshotButton;
-		QComboBox *colorComboButton;
-		QPushButton *quitButton;
-		QSpacerItem *quitSpotSpacer;
+		QFrame *firstSeparator;
+		QFrame *secondSeparator;
+		QSpacerItem *spacer1;
+		QSpacerItem *spacer2;
+		QSpacerItem *spacer3;
+		QSpacerItem *spacerRunStop;
+		QSpacerItem *spacer4;
+		QSpacerItem *spacer5;
+		QSpacerItem *spacer6;
 		
 		// run button animation
 		QVector<QPixmap> runAnimFrames;
@@ -166,6 +173,8 @@ namespace Aseba { namespace ThymioVPL
 		#ifndef Q_OS_WIN
 		void regenerateRunButtonAnimation(const QSize& iconSize);
 		#endif // Q_OS_WIN
+		void startRunButtonAnimationTimer();
+		void stopRunButtonAnimationTimer();
 		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 		virtual void timerEvent ( QTimerEvent * event );

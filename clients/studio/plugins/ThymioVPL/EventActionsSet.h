@@ -16,6 +16,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	class Block;
 	class AddRemoveButton;
+	class RemoveBlockButton;
 	class StateFilterEventBlock;
 	
 	class EventActionsSet : public QGraphicsObject
@@ -56,19 +57,19 @@ namespace Aseba { namespace ThymioVPL
 		void setAdvanced(bool advanced);
 		bool isAdvanced() const;
 	
-		void setErrorStatus(bool flag);
+		void setErrorType(Compiler::ErrorType errorType);
 		void blink();
 		
 		QVector<quint16> getContentCompressed() const;
 		
 		QDomElement serialize(QDomDocument& document) const;
 		void deserialize(const QDomElement& element);
-		void deserializeOldFormat_1_3(const QDomElement& element);
 		void deserialize(const QByteArray& data);
 		
 		void repositionElements();
 		
 	signals:
+		friend class Block;
 		void contentChanged();
 		void undoCheckpoint();
 		
@@ -78,11 +79,15 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void removeClicked();
 		void addClicked();
+		void removeBlockClicked();
 		void clearBlink();
 		
 	protected:
 		// from QGraphicsObject
-		virtual void mouseMoveEvent( QGraphicsSceneMouseEvent *event );
+		virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+		
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 		
 		virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 		virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
@@ -117,6 +122,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
+		RemoveBlockButton *deleteBlockButton;
 		
 		enum HighlightMode
 		{
@@ -127,6 +133,7 @@ namespace Aseba { namespace ThymioVPL
 			HIGHLIGHT_SET
 		} highlightMode;
 		
+		int removeBlockIndex; // -1: none, -2: event, 0 or larger: action
 		qreal dropAreaXPos;
 		int dropIndex;
 		qreal currentWidth;
@@ -135,8 +142,11 @@ namespace Aseba { namespace ThymioVPL
 		qreal columnPos;
 		int row;
 		
-		bool errorFlag;
+		Compiler::ErrorType errorType;
 		bool beingDragged;
+	
+	public:
+		bool wasDroppedTarget; //!< true if this set was target of set drag & drop
 	};
 	
 	/*@}*/

@@ -1,0 +1,3 @@
+Launch generate-pixmaps.py from this directory on a Unix system to re-create all pixmap icons from the SVG ones
+
+This requires inkscape (for all) and imagemagick (for Windows icons) and makeicns (for OS X icons) to be available in the path.

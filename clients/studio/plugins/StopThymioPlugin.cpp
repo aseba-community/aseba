@@ -31,7 +31,7 @@ namespace Aseba
 	
 	QWidget* StopThymioPlugin::createMenuEntry()
 	{
-		QPushButton *button(new QPushButton(QIcon(":/images/stop1.svgz"), tr("Stop Thymio")));
+		QPushButton *button(new QPushButton(QIcon(":/images/icons/stop.svgz"), tr("Stop Thymio")));
 		button->setIconSize(QSize(32,32));
 		connect(button, SIGNAL(clicked()), SLOT(stopThymio()));
 		return button;

@@ -129,12 +129,10 @@ cd %{_builddir}/%{buildsubdir}
 
 install -d ${RPM_BUILD_ROOT}%{_datadir}/applications
 install -d ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps
+install -d ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/scalable/apps
 cp menu/freedesktop/*.desktop ${RPM_BUILD_ROOT}%{_datadir}/applications
-cp menu/freedesktop/*.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps
-convert ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps/thymiovpl.png -resize 48x48 ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps/thymiovpl.png
-for file in ${RPM_BUILD_ROOT}%{_datadir}/applications/*.desktop; do
-   sed -i 's|Icon=\(.*\).png|Icon=\1|g' $file
-done
+cp menu/freedesktop/48x48/*.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps
+cp menu/src/*.svg ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/scalable/apps
 
 desktop-file-install --remove-category="Aseba" --dir=${RPM_BUILD_ROOT}%{_datadir}/applications ${RPM_BUILD_ROOT}%{_datadir}/applications/*.desktop
 

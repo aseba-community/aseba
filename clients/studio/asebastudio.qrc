@@ -54,7 +54,6 @@
 	<file>images/eyeclose.png</file>
 	<file>images/kedit.png</file>
 	<file>images/exec.png</file>
-	<file>images/thymiovpl.png</file>
 	<file>images/edit-undo.svgz</file>
 	<file>images/edit-redo.svgz</file>
 	<file>images/thymioclap.svgz</file>
@@ -88,5 +87,23 @@
 	<file>images/thymio-plugin-anim5.png</file>
 	<file>images/thymio-plugin-anim6.png</file>
 	<file>images/thymio-plugin-anim7.png</file>
+	<file>images/icons/filenew.svgz</file>
+	<file>images/icons/fileopen.svgz</file>
+	<file>images/icons/save.svgz</file>
+	<file>images/icons/saveas.svgz</file>
+	<file>images/icons/edit-undo.svgz</file>
+	<file>images/icons/edit-redo.svgz</file>
+	<file>images/icons/play.svgz</file>
+	<file>images/icons/play-green.svgz</file>
+	<file>images/icons/stop.svgz</file>
+	<file>images/icons/screenshot.svgz</file>
+	<file>images/icons/info.svgz</file>
+	<file>images/icons/vpl-advanced_off.svgz</file>
+	<file>images/icons/vpl-advanced_on.svgz</file>
+	<file>images/icons/asebastudio.svgz</file>
+	<file>images/icons/thymiovpl.svgz</file>
+	<file>images/vpl/success.svgz</file>
+	<file>images/vpl/missing_block.svgz</file>
+	<file>images/vpl/error.svgz</file>
 </qresource>
 </RCC>

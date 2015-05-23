@@ -36,7 +36,9 @@ namespace Aseba { namespace ThymioVPL
 		isBlinking(false),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
+		deleteBlockButton(new RemoveBlockButton(this)),
 		highlightMode(HIGHLIGHT_NONE),
+		removeBlockIndex(-1),
 		dropAreaXPos(0),
 		dropIndex(-1),
 		currentWidth(0),
@@ -44,24 +46,31 @@ namespace Aseba { namespace ThymioVPL
 		totalWidth(0),
 		columnPos(0),
 		row(row),
-		errorFlag(false),
-		beingDragged(false)
+		errorType(Compiler::NO_ERROR),
+		beingDragged(false),
+		wasDroppedTarget(false)
 	{
 		setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+		setAcceptHoverEvents(true);
 		setAcceptedMouseButtons(Qt::LeftButton);
 		setAcceptDrops(true);
 		
 		setAdvanced(advanced);
 		
+		deleteBlockButton->setZValue(1);
+		deleteBlockButton->setVisible(false);
+		
 		connect(deleteButton, SIGNAL(clicked()), SLOT(removeClicked()));
 		connect(addButton, SIGNAL(clicked()), SLOT(addClicked()));
+		connect(deleteBlockButton, SIGNAL(clicked()), SLOT(removeBlockClicked()));
 		connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 	}
 	
 	QRectF EventActionsSet::boundingRect() const
 	{
 		const qreal xmargin(qMax(Style::blockSpacing/2,4));
-		return QRectF(-xmargin, -4, totalWidth+2*xmargin, Style::blockHeight+2*Style::blockSpacing);
+		// we consider the space for the error marker
+		return QRectF(-xmargin, -4, totalWidth+2*xmargin, Style::blockHeight+2*Style::blockSpacing+50+4);
 		
 	}
 	
@@ -285,11 +294,11 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Set whether or not this set has an error
-	void EventActionsSet::setErrorStatus(bool flag)
+	void EventActionsSet::setErrorType(Compiler::ErrorType errorType)
 	{
-		if (flag != errorFlag)
+		if (this->errorType != errorType)
 		{
-			errorFlag = flag;
+			this->errorType = errorType;
 			update();
 		}
 	}
@@ -412,8 +421,14 @@ namespace Aseba { namespace ThymioVPL
 		// store width
 		basicWidth = xpos;
 		currentWidth = basicWidth;
-		// TODO: handle case when we cannot add more
-		totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
+		// handle case when we cannot add more
+		if (actions.empty())
+			totalWidth = basicWidth;
+		else if (actions.size() == 6)
+			totalWidth = basicWidth;
+		else
+			totalWidth = basicWidth + Style::blockWidth + Style::blockSpacing;
+		//totalWidth = (actions.empty() ? basicWidth : basicWidth + Style::blockWidth + Style::blockSpacing);
 		
 		// clear highlight
 		highlightMode = HIGHLIGHT_NONE;
@@ -488,6 +503,22 @@ namespace Aseba { namespace ThymioVPL
 	void EventActionsSet::addClicked()
 	{
 		polymorphic_downcast<Scene*>(scene())->insertSet(row+1);
+	}
+	
+	void EventActionsSet::removeBlockClicked()
+	{
+		if (removeBlockIndex == -2)
+		{
+			removeBlock(event);
+			emit contentChanged();
+			emit undoCheckpoint();
+		}
+		else if (removeBlockIndex >= 0)
+		{
+			removeBlock(actions.at(removeBlockIndex));
+			emit contentChanged();
+			emit undoCheckpoint();
+		}
 	}
 	
 	void EventActionsSet::clearBlink()
@@ -575,72 +606,6 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	//! This is compatibility code for 1.3 and earlier VPL format
-	void EventActionsSet::deserializeOldFormat_1_3(const QDomElement& element)
-	{
-		// we assume tag name is "buttonset"
-		//const bool advanced(stateFilter != 0);
-		
-		/*
-		// event
-		QString blockName;
-		if (!(blockName = element.attribute("event-name")).isEmpty())
-		{
-			eventBlock = Block::createBlock(blockName, advanced);
-			if (!eventBlock)
-			{
-				QMessageBox::warning(this,tr("Loading"),
-					tr("Error in XML source file: %0 unknown event type").arg(cardName));
-				return;
-			}
-
-		}
-		
-		// TODO!!!
-			
-		eventHolder->addBlock(Block::deserialize(blockElement, advanced));
-		
-		// TODO: add compatibility
-		else if(element.tagName() == "buttonset")
-		{
-			// FIXME: use factory functions in their respective classes
-			QString cardName;
-			Block *eventBlock = 0;
-			Block *actionBlock = 0;
-			
-			if( !(cardName = element.attribute("event-name")).isEmpty() )
-			{
-				eventBlock = Block::createBlock(cardName,scene->getAdvanced());
-				if (!eventBlock)
-				{
-					QMessageBox::warning(this,tr("Loading"),
-											tr("Error in XML source file: %0 unknown event type").arg(cardName));
-					return;
-				}
-
-				for (unsigned i=0; i<eventBlock->valuesCount(); ++i)
-					eventBlock->setValue(i,element.attribute(QString("eb%0").arg(i)).toInt());
-				eventBlock->setStateFilter(element.attribute("state").toInt());
-			}
-			
-			if( !(cardName = element.attribute("action-name")).isEmpty() )
-			{
-				actionBlock = Block::createBlock(cardName,scene->getAdvanced());
-				if (!actionBlock)
-				{
-					QMessageBox::warning(this,tr("Loading"),
-											tr("Error in XML source file: %0 unknown event type").arg(cardName));
-					return;
-				}
-
-				for (unsigned i=0; i<actionBlock->valuesCount(); ++i)
-					actionBlock->setValue(i,element.attribute(QString("ab%0").arg(i)).toInt());
-			}
-
-			scene->addEventActionsSet(eventBlock, actionBlock);
-		*/
-	}
-	
 	void EventActionsSet::deserialize(const QByteArray& data)
 	{
 		QDomDocument document;
@@ -724,8 +689,69 @@ namespace Aseba { namespace ThymioVPL
 		repositionElements();
 	}
 	
-	void EventActionsSet::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+	//! Update the delete block button position and visibility while hovering
+	void EventActionsSet::hoverMoveEvent(QGraphicsSceneHoverEvent * hoverEvent)
 	{
+		const int x(hoverEvent->pos().x());
+		const int y(hoverEvent->pos().y());
+		const int dw(Style::addRemoveButtonWidth/2);
+		const int dh(Style::addRemoveButtonHeight/2);
+		const int dl(0);
+		const int dr(Style::blockWidth+dw);
+		const int bw(dr-dl);
+		const int bstride(Style::blockWidth+Style::blockSpacing);
+		
+		// if out of bound on y, hide and return
+		if ((y < Style::blockSpacing - dh) || (y >= Style::blockSpacing + Style::blockHeight))
+		{
+			deleteBlockButton->hide();
+			removeBlockIndex = -1;
+			return;
+		}
+		
+		const qreal actionsXPos(columnPos + Style::eventActionsSetColumnWidth + Style::blockSpacing);
+		const int actionsStartPos(actionsXPos + dl);
+		const int actionsStopPos(actionsXPos + actions.size() * bstride + dr);
+		
+		// delete button
+		if (
+			event && 
+			(x >= event->pos().x() + dl) &&
+			(x < event->pos().x() + dr)
+		)
+		{
+			deleteBlockButton->setPos(event->pos().x() + Style::blockWidth - dw, Style::blockSpacing - dh);
+			deleteBlockButton->show();
+			removeBlockIndex = -2;
+		}
+		else if (
+			(x >= actionsStartPos) &&
+			(x < actionsStopPos) &&
+			(fmod(x-dl-actionsXPos, bstride) < bw) &&
+			((x-dl-actionsXPos) / bstride < actions.size())
+		)
+		{
+			removeBlockIndex = (x-dl-actionsXPos) / bstride;
+			deleteBlockButton->setPos(actionsXPos + removeBlockIndex * bstride + Style::blockWidth - dw, Style::blockSpacing - dh);
+			deleteBlockButton->show();
+		}
+		else
+		{
+			deleteBlockButton->hide();
+			removeBlockIndex = -1;
+		}
+	}
+	
+	//! Disable delete block button
+	void EventActionsSet::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+	{
+		deleteBlockButton->hide();
+		removeBlockIndex = -1;
+	}
+	
+	void EventActionsSet::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+	{
+		// drag and drop start
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
 			return;
@@ -745,6 +771,7 @@ namespace Aseba { namespace ThymioVPL
 		const bool isCopy(event->modifiers() & Qt::ControlModifier);
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
+		QMimeData* myData(mimeData());
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(pixmap);
 		
@@ -754,14 +781,42 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
+			// find on which set the drag was droppes
+			EventActionsSet* target(0);
+			Scene* vplScene(polymorphic_downcast<Scene*>(scene()));
+			for (Scene::SetItr it(vplScene->setsBegin()); it != vplScene->setsEnd(); ++it)
+			{
+				if ((*it)->wasDroppedTarget)
+				{
+					target = *it;
+					target->wasDroppedTarget = false;
+				}
+			}
+			// if it is this one, there is a bug
+			assert(target != this);
 			if (!isCopy)
+			{
+				// copy target content to this
 				resetSet();
+				deserialize(target->mimeData()->data("EventActionsSet"));
+				repositionElements();
+			}
+			// copy this content to target
+			target->resetSet();
+			target->deserialize(myData->data("EventActionsSet"));
+			target->repositionElements();
+			target->setSoleSelection();
+			
+			// make sure that we have an empty set at the end
+			polymorphic_downcast<Scene*>(scene())->ensureOneEmptySetAtEnd();
+			
 			// disconnect the selection setting mechanism, emit, and then re-enable
 			disconnect(this, SIGNAL(contentChanged()), this, SLOT(setSoleSelection()));
 			emit contentChanged();
 			emit undoCheckpoint();
 			connect(this, SIGNAL(contentChanged()), SLOT(setSoleSelection()));
 		}
+		delete myData;
 		beingDragged = false;
 		#endif // ANDROID
 	}
@@ -813,11 +868,9 @@ namespace Aseba { namespace ThymioVPL
 			// It is a set
 			if (event->mimeData()->hasFormat("EventActionsSet"))
 			{
-				resetSet();
-				deserialize(event->mimeData()->data("EventActionsSet"));
-				repositionElements();
-				
-				setSoleSelection();
+				wasDroppedTarget = true;
+				// we just take note that this set was the target of the drop, as the drop
+				// initiator will take care of changing our content
 			}
 			// It is a block
 			else if (event->mimeData()->hasFormat("Block"))
@@ -983,13 +1036,16 @@ namespace Aseba { namespace ThymioVPL
 		if (vplScene)
 		{
 			assert(vplScene->setsBegin() != vplScene->setsEnd());
+			//const bool isFirst(*vplScene->setsBegin() == this);
 			const bool isLast(*(vplScene->setsEnd()-1) == this);
 			addButton->setVisible(!isLast);
 			deleteButton->setVisible(!isLast);
 			if (stateFilter)
-				stateFilter->setVisible(!isLast);
+				stateFilter->setVisible(!isEmpty());
 			// if last and not drop target, draw dotted area
-			if (isLast && (highlightMode == HIGHLIGHT_NONE))
+			//if (/*isLast && */(highlightMode == HIGHLIGHT_NONE))
+			//if (!isFirst && isEmpty() && (highlightMode == HIGHLIGHT_NONE))
+			/*if (false)
 			{
 				const qreal hb(borderWidth/2);
 				painter->setBrush(Qt::transparent);
@@ -997,7 +1053,7 @@ namespace Aseba { namespace ThymioVPL
 				//painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), borderWidth, borderWidth);
 				painter->drawRoundedRect(innerBoundingRect().adjusted(hb,hb,-hb,-hb), Style::eventActionsSetCornerSize, Style::eventActionsSetCornerSize);
 				return;
-			}
+			}*/
 		}
 		
 		// extension drop area
@@ -1011,7 +1067,8 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		// background
-		if (errorFlag)
+		//if (errorType != Compiler::NO_ERROR)
+		if (errorType == Compiler::DUPLICATED_EVENT)
 			painter->setPen(QPen(Qt::red, 8));
 		else
 			painter->setPen(Qt::NoPen);
@@ -1040,7 +1097,7 @@ namespace Aseba { namespace ThymioVPL
 				painter->drawRoundedRect(Style::blockSpacing, Style::blockSpacing/2, Style::blockWidth, Style::blockSpacing+Style::blockHeight, borderWidth, borderWidth);
 			}
 		}
-
+		
 		// column
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::eventActionsSetForegroundColors[colorId]);
@@ -1060,7 +1117,7 @@ namespace Aseba { namespace ThymioVPL
 		*/
 		
 		// action drop area
-		if (actions.empty() || currentWidth == totalWidth)
+		if ((actions.empty() || currentWidth == totalWidth) && (actions.size() != 6))
 			drawBlockArea(painter, "action", QPointF(dropAreaXPos, Style::blockSpacing), highlightMode == HIGHLIGHT_NEW_ACTION);
 		
 		// if inner drag&drop, show drop indicator
@@ -1077,6 +1134,33 @@ namespace Aseba { namespace ThymioVPL
 		painter->setPen(Style::eventActionsSetForegroundColors[colorId]);
 		painter->setFont(QFont("Arial", 50));
 		painter->drawText(QRect(currentWidth-Style::blockSpacing-128, Style::blockHeight+Style::blockSpacing-128, 128, 128), Qt::AlignRight|Qt::AlignBottom, QString("%0").arg(getRow()+1));
+		
+		// error marker
+		painter->setPen(Qt::NoPen);
+		//painter->setBrush(Qt::red);
+		painter->setBrush(QColor(Qt::red).lighter());
+		if (errorType == Compiler::MISSING_EVENT)
+		{
+			const qreal x(Style::blockSpacing + Style::blockWidth / 2);
+			const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			const QPointF points[3] = {
+				QPointF(x - 40, y + 30),
+				QPointF(x, y),
+				QPointF(x + 40, y + 30),
+			};
+			painter->drawConvexPolygon(points, 3);
+		}
+		else if (errorType == Compiler::MISSING_ACTION)
+		{
+			const qreal x(dropAreaXPos + Style::blockWidth / 2);
+			const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);
+			const QPointF points[3] = {
+				QPointF(x - 40, y + 30),
+				QPointF(x, y),
+				QPointF(x + 40, y + 30),
+			};
+			painter->drawConvexPolygon(points, 3);
+		}
 	}
 	
 	//! Draw the drop area for block

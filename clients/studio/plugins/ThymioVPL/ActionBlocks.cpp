@@ -417,7 +417,29 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine, Qt::RoundCap));
-		painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
+		
+		// drawing handle
+		{
+			static const QPointF points[5] = {
+				QPointF(0, 5),
+				QPointF(35, 12),
+				QPointF(60, 0),
+				QPointF(35, -12),
+				QPointF(0, -5)
+			};
+			painter->save();
+			painter->translate(128,136);
+			painter->rotate((angle-M_PI/2) * 180 / M_PI);
+			painter->setBrush(Qt::white);
+			painter->setPen(QPen(Qt::black, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+			painter->drawConvexPolygon(points, 5);
+			painter->setBrush(Qt::lightGray);
+			painter->drawEllipse(-10,-10,20,20);
+			painter->restore();
+		}
+		//painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
+		
+		
 	}
 	
 	void TimerActionBlock::frameChanged(int frame)
@@ -466,7 +488,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
 	{
-		const double TIMER_RESOLUTION = 10;
+		const double TIMER_RESOLUTION = 4;
 		const QPointF localPos(pos-QPointF(128,136));
 		if (sqrt(localPos.x()*localPos.x()+localPos.y()*localPos.y()) <= 70)
 		{

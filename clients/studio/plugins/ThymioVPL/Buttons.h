@@ -86,7 +86,23 @@ namespace Aseba { namespace ThymioVPL
 		
 	protected:
 		bool add;
-		bool pressed;
+	};
+	
+	class RemoveBlockButton : public QGraphicsObject
+	{
+		Q_OBJECT
+		
+	public:
+		RemoveBlockButton(QGraphicsItem *parent=0);
+		virtual void paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		QRectF boundingRect() const;
+	
+	signals:
+		void clicked();
+		
+	protected:
+		virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+		virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
 	};
 	
 	class BlockButton : public QPushButton

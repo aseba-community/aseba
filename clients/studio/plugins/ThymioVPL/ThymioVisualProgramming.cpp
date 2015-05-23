@@ -28,6 +28,7 @@
 #include "Scene.h"
 #include "Buttons.h"
 #include "Style.h"
+#include "Utils.h"
 #include "UsageLogger.h"
 
 #include "../../TargetModels.h"
@@ -60,110 +61,125 @@ namespace Aseba { namespace ThymioVPL
 		
 		mainLayout = new QVBoxLayout(this);
 		
-		//toolBar = new QToolBar();
-		//mainLayout->addWidget(toolBar);
 		toolLayout = new  QGridLayout();
+		toolLayout->setHorizontalSpacing(0);
+		toolLayout->setVerticalSpacing(0);
 		mainLayout->addLayout(toolLayout);
+		// add back the spacing we removed
+		mainLayout->addSpacing(style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing));
 
 		newButton = new QPushButton();
-		newButton->setIcon(QIcon(":/images/filenew.svgz"));
+		newButton->setIcon(QIcon(":/images/icons/filenew.svgz"));
 		newButton->setToolTip(tr("New"));
 		newButton->setFlat(true);
+		newButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(newButton,0,0);
 		
 		openButton = new QPushButton();
-		openButton->setIcon(QIcon(":/images/fileopen.svgz"));
+		openButton->setIcon(QIcon(":/images/icons/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
 		openButton->setFlat(true);
+		openButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(openButton,0,1);
 		
 		saveButton = new QPushButton();
-		saveButton->setIcon(QIcon(":/images/save.svgz"));
+		saveButton->setIcon(QIcon(":/images/icons/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 		saveButton->setFlat(true);
+		saveButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveButton,1,0);
 		
 		saveAsButton = new QPushButton();
-		saveAsButton->setIcon(QIcon(":/images/saveas.svgz"));
+		saveAsButton->setIcon(QIcon(":/images/icons/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 		saveAsButton->setFlat(true);
+		saveAsButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveAsButton,1,1);
 		
+		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer1,0,2,2,1);
+		
+		firstSeparator = new QFrame();
+		firstSeparator->setFrameShape(QFrame::VLine);
+		firstSeparator->setFrameShadow(QFrame::Sunken);
+		toolLayout->addWidget(firstSeparator,0,3,2,1);
+		
+		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer2,0,4,2,1);
+		
 		undoButton = new QPushButton();
-		undoButton->setIcon(QIcon(":/images/edit-undo.svgz"));
+		undoButton->setIcon(QIcon(":/images/icons/edit-undo.svgz"));
 		undoButton->setToolTip(tr("Undo"));
 		undoButton->setFlat(true);
+		undoButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		undoButton->setEnabled(false);
 		undoButton->setShortcut(QKeySequence::Undo);
-		toolLayout->addWidget(undoButton,0,2);
+		toolLayout->addWidget(undoButton,0,5,2,1);
 		
 		redoButton = new QPushButton();
-		redoButton->setIcon(QIcon(":/images/edit-redo.svgz"));
+		redoButton->setIcon(QIcon(":/images/icons/edit-redo.svgz"));
 		redoButton->setToolTip(tr("Redo"));
 		redoButton->setFlat(true);
+		redoButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		redoButton->setEnabled(false);
 		redoButton->setShortcut(QKeySequence::Redo);
-		toolLayout->addWidget(redoButton,1,2);
-		//toolLayout->addSeparator();
+		toolLayout->addWidget(redoButton,0,6,2,1);
+		
+		spacer3 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer3,0,7,2,1);
 
-		//runButton = new QPushButton();
 		runButton = new QPushButton();
-		runButton->setIcon(QIcon(":/images/play.svgz"));
+		runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
 		runButton->setFlat(true);
-		toolLayout->addWidget(runButton,0,3,2,2);
+		runButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
+		toolLayout->addWidget(runButton,0,8,2,1);
+		
+		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacerRunStop,0,9,2,1);
 
 		stopButton = new QPushButton();
-		stopButton->setIcon(QIcon(":/images/stop1.svgz"));
+		stopButton->setIcon(QIcon(":/images/icons/stop.svgz"));
 		stopButton->setToolTip(tr("Stop"));
 		stopButton->setFlat(true);
-		toolLayout->addWidget(stopButton,0,5,2,2);
-		//toolLayout->addSeparator();
+		stopButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
+		toolLayout->addWidget(stopButton,0,10,2,1);
+		
+		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer4,0,11,2,1);
 		
 		advancedButton = new QPushButton();
-		advancedButton->setIcon(QIcon(":/images/vpl_advanced_mode.svgz"));
+		advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		advancedButton->setFlat(true);
-		toolLayout->addWidget(advancedButton,0,7,2,2);
-		//toolLayout->addSeparator();
+		advancedButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
+		toolLayout->addWidget(advancedButton,0,12,2,1);
 		
-		/*colorComboButton = new QComboBox();
-		colorComboButton->setToolTip(tr("Color scheme"));
-		setColors(colorComboButton);
-		toolLayout->addWidget(colorComboButton,1,9,1,2);
-		*/
-		//toolLayout->addSeparator();
+		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer5,0,13,2,1);
+		
+		secondSeparator = new QFrame();
+		secondSeparator->setFrameShape(QFrame::VLine);
+		secondSeparator->setFrameShadow(QFrame::Sunken);
+		toolLayout->addWidget(secondSeparator,0,14,2,1);
+		
+		spacer6 = new QSpacerItem(1,1,QSizePolicy::Expanding);
+		toolLayout->addItem(spacer6,0,15,2,1);
 
 		helpButton = new QPushButton();
-		helpButton->setIcon(QIcon(":/images/info.svgz"));
+		helpButton->setIcon(QIcon(":/images/icons/info.svgz"));
 		helpButton->setToolTip(tr("Help"));
 		helpButton->setFlat(true);
-		toolLayout->addWidget(helpButton,0,9);
+		helpButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
+		toolLayout->addWidget(helpButton,0,16);
 		
 		snapshotButton = new QPushButton();
-		snapshotButton->setIcon(QIcon(":/images/ksnapshot.svgz"));
+		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
-		toolLayout->addWidget(snapshotButton,1,9);
+		snapshotButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
+		toolLayout->addWidget(snapshotButton,1,16);
 
-		if (showCloseButton)
-		{
-			//toolLayout->addSeparator();
-			quitButton = new QPushButton();
-			quitButton->setIcon(QIcon(":/images/exit.svgz"));
-			quitButton->setToolTip(tr("Quit"));
-			quitButton->setFlat(true);
-			toolLayout->addWidget(quitButton,0,10);
-			connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
-			quitSpotSpacer = 0;
-		}
-		else
-		{
-			quitSpotSpacer = new QSpacerItem(1,1);
-			toolLayout->addItem(quitSpotSpacer, 0, 10);
-			quitButton = 0;
-		}
-		
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(save()));
@@ -176,8 +192,6 @@ namespace Aseba { namespace ThymioVPL
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 		connect(snapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshot()));
-		
-		//connect(colorComboButton, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorScheme(int)));
 		
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
@@ -192,8 +206,8 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("clap", this));
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
-		eventsLabel = new QLabel(tr("<b>Events</b>"));
-		eventsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
+		eventsLabel = new QLabel(tr("Events"));
+		eventsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		eventsLayout->setSpacing(20);
 		#else // Q_WS_MACX
@@ -219,13 +233,15 @@ namespace Aseba { namespace ThymioVPL
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
-		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+		compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
+		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
 		
-		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
+		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 		
 		showCompilationError = new QPushButton(tr("show line"));
+		showCompilationError->setStyleSheet("QPushButton { font-size: 16px; }");
 		showCompilationError->hide();
 		connect(showCompilationError, SIGNAL(clicked()), SLOT(showErrorLine()));
 
@@ -273,14 +289,14 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(new BlockButton("timer", this));
 		actionButtons.push_back(new BlockButton("setstate", this));
 		
-		actionsLabel = new QLabel(tr("<b>Actions</b>"));
-		actionsLabel ->setStyleSheet("QLabel { font-size: 10pt; }");
-		actionsLayout->setAlignment(Qt::AlignTop);
+		actionsLabel = new QLabel(tr("Actions"));
+		actionsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		actionsLayout->setSpacing(20);
 		#else // Q_WS_MACX
 		actionsLayout->setSpacing(10);
 		#endif // Q_WS_MACX
+		actionsLayout->setAlignment(Qt::AlignTop);
 		actionsLayout->addWidget(actionsLabel);
 		foreach (button, actionButtons)
 		{
@@ -297,6 +313,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// window properties
 		setWindowModality(Qt::ApplicationModal);
+		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
 		
 		// save initial state
 		pushUndo();
@@ -344,8 +361,8 @@ namespace Aseba { namespace ThymioVPL
 			generator.setFileName(fileName);
 			generator.setSize(scene->sceneRect().size().toSize());
 			generator.setViewBox(scene->sceneRect());
-			generator.setTitle(tr("VPL program %0").arg(de->openedFileName()));
-			generator.setDescription(tr("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org"));
+			generator.setTitle(QString("VPL program %0").arg(de->openedFileName()));
+			generator.setDescription("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org");
 			
 			QPainter painter(&generator);
 			scene->render(&painter);
@@ -392,8 +409,8 @@ namespace Aseba { namespace ThymioVPL
 	
 	QWidget* ThymioVisualProgramming::createMenuEntry()
 	{
-		QPushButton *vplButton = new QPushButton(QIcon(":/images/thymiovpl.png"), tr("Launch VPL"));
-		vplButton->setIconSize(QSize(86,32));
+		QPushButton *vplButton = new QPushButton(QIcon(":/images/icons/thymiovpl.svgz"), tr("Launch VPL"));
+		vplButton->setIconSize(QSize(32,32));
 		connect(vplButton, SIGNAL(clicked()), SLOT(showVPLModal()));
 		return vplButton;
 	}
@@ -513,16 +530,7 @@ namespace Aseba { namespace ThymioVPL
 		if(runButton->isEnabled())
 		{
 			de->loadAndRun();
-			if (runAnimTimer)
-			{
-				killTimer(runAnimTimer);
-				runAnimTimer = 0;
-				#ifdef Q_OS_WIN
-				runButton->setIcon(QIcon(":/images/play.svgz"));
-				#else // Q_OS_WIN
-				runButton->setIcon(runAnimFrames[0]);
-				#endif // Q_OS_WIN
-			}
+			stopRunButtonAnimationTimer();
 		}
 	}
 
@@ -547,7 +555,7 @@ namespace Aseba { namespace ThymioVPL
 			return;
 		if (advanced)
 		{
-			advancedButton->setIcon(QIcon(":/images/vpl_simple_mode.svgz"));
+			advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_on.svgz"));
 			eventButtons[eventButtons.size()-1]->show(); // timeout
 			actionButtons[actionButtons.size()-2]->show(); // timer
 			actionButtons[actionButtons.size()-1]->show(); // set state
@@ -566,7 +574,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			if (doClear)
 			{
-				advancedButton->setIcon(QIcon(":/images/vpl_advanced_mode.svgz"));
+				advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
 				eventButtons[eventButtons.size()-1]->hide(); // timeout
 				actionButtons[actionButtons.size()-2]->hide(); // timer
 				actionButtons[actionButtons.size()-1]->hide(); // set state
@@ -649,11 +657,6 @@ namespace Aseba { namespace ThymioVPL
 		vplroot.setAttribute("xml-format-version", 1);
 		document.appendChild(vplroot);
 
-		QDomElement settings = document.createElement("settings");
-		//settings.setAttribute("color-scheme", QString::number(colorComboButton->currentIndex()));
-		settings.setAttribute("color-scheme", 0);
-		vplroot.appendChild(settings);
-		
 		vplroot.appendChild(scene->serialize(document));
 
 		scene->setModified(false);
@@ -670,17 +673,23 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
 	{
-		loading = true;
+		const QDomElement vplroot(document.documentElement());
+		const QString version(vplroot.attribute("xml-format-version"));
 		
-		// first load settings
-		const QDomElement settingsElement(document.documentElement().firstChildElement("settings"));
-		if (!settingsElement.isNull())
+		if (version.isNull())
 		{
-			//colorComboButton->setCurrentIndex(settingsElement.attribute("color-scheme").toInt());
+			loadFromDom(transformDomToVersion1(document), fromFile);
+			return;
+		}
+		if (version != "1")
+		{
+			QMessageBox::warning(0, tr("Incompatible Version"), tr("This file is incompatible with this version of ThymioVPL. It might not work correctly."));
 		}
 		
-		// then load program
-		const QDomElement programElement(document.documentElement().firstChildElement("program"));
+		loading = true;
+		
+		// load program
+		const QDomElement programElement(vplroot.firstChildElement("program"));
 		if (!programElement.isNull())
 		{
 			scene->deserialize(programElement);
@@ -695,6 +704,120 @@ namespace Aseba { namespace ThymioVPL
 		
 		loading = false;
 		clearUndo();
+	}
+	
+	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
+	{
+		const QDomElement vplroot0(document0.documentElement());
+		const QDomElement settings0(vplroot0.firstChildElement("settings"));
+		
+		QDomDocument document1;
+		
+		QDomElement vplroot1(document1.createElement("vplroot"));
+		document1.appendChild(vplroot1);
+		vplroot1.setAttribute("xml-format-version", "1");
+		
+		QDomElement settings1(document1.createElement("settings"));
+		vplroot1.appendChild(settings1);
+		settings1.setAttribute("color-scheme", settings0.attribute("color-scheme"));
+		
+		QDomElement program1(document1.createElement("program"));
+		vplroot1.appendChild(program1);
+		program1.setAttribute("advanced_mode", settings0.attribute("advanced-mode") == "true");
+		
+		// track duplicate events
+		QMap<QString, QDomElement> setsByEvent;
+		
+		for (QDomElement buttonset0(vplroot0.firstChildElement("buttonset")); !buttonset0.isNull(); buttonset0 = buttonset0.nextSiblingElement("buttonset"))
+		{
+			QDomElement set1(document1.createElement("set"));
+			
+			QString eventName(buttonset0.attribute("event-name"));
+			if (!eventName.isNull())
+			{
+				if (eventName == "tap")
+				{
+					// tap event was renamed to acc
+					eventName = "acc";
+				}
+				
+				QDomElement event1(document1.createElement("block"));
+				set1.appendChild(event1);
+				event1.setAttribute("type", "event");
+				event1.setAttribute("name", eventName);
+				for (unsigned i(0);; ++i)
+				{
+					QString value(buttonset0.attribute(QString("eb%0").arg(i)));
+					if (value.isNull())
+						break;
+					if (eventName == "prox" || eventName == "proxground")
+					{
+						// values 1 and 2 have exchanged semantics
+						if (value == "1")
+							value = "2";
+						else if (value == "2")
+							value = "1";
+					}
+					event1.setAttribute(QString("value%0").arg(i), value);
+				}
+			}
+			
+			int state(buttonset0.attribute("state").toInt());
+			if (state >= 0)
+			{
+				QDomElement state1(document1.createElement("block"));
+				set1.appendChild(state1);
+				state1.setAttribute("type", "state");
+				state1.setAttribute("name", "statefilter");
+				for (unsigned i(0); i < 4; ++i)
+				{
+					const unsigned value((state >> (i * 2)) & 0x3);
+					state1.setAttribute(QString("value%0").arg(i), value);
+				}
+			}
+			
+			{
+				// check for duplicate events
+				QString setKey;
+				QTextStream setKeyStream(&setKey);
+				set1.save(setKeyStream, 0);
+				if (!setsByEvent.contains(setKey))
+				{
+					// new event => insert the new set in the document
+					setsByEvent.insert(setKey, set1);
+					program1.appendChild(set1);
+				}
+				else
+				{
+					// duplicate event => reuse previously-inserted set
+					set1 = setsByEvent.value(setKey);
+				}
+			}
+
+			QString actionName(buttonset0.attribute("action-name"));
+			if (!actionName.isNull())
+			{
+				if (actionName == "statefilter")
+				{
+					// statefilter action was renamed to setstate
+					actionName = "setstate";
+				}
+				
+				QDomElement action1(document1.createElement("block"));
+				set1.appendChild(action1);
+				action1.setAttribute("type", "action");
+				action1.setAttribute("name", actionName);
+				for (unsigned i(0);; ++i)
+				{
+					QString value(buttonset0.attribute(QString("ab%0").arg(i)));
+					if (value.isNull())
+						break;
+					action1.setAttribute(QString("value%0").arg(i), value);
+				}
+			}
+		}
+		
+		return document1;
 	}
 	
 	void ThymioVisualProgramming::codeChangedInEditor()
@@ -789,25 +912,53 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::processCompilationResult()
 	{
-		compilationResult->setText(scene->compilationResult().getMessage(scene->getAdvanced()));
-		if (scene->compilationResult().isSuccessful())
+		const Compiler::CompilationResult compilation(scene->compilationResult());
+		compilationResult->setText(compilation.getMessage(scene->getAdvanced()));
+		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
+		if (compilation.isSuccessful())
 		{
-			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
+			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
+			// content changed but not uploaded, show animation
+			startRunButtonAnimationTimer();
 			showCompilationError->hide();
 			emit compilationOutcome(true);
 		}
-		else
+		else if ((compilation.errorType == Compiler::MISSING_EVENT) && (scene->isSetLast(compilation.errorLine)))
 		{
-			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
+			compilationResult->setText(tr("Please add an event"));
+			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
 			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
-		// content changed but not uploaded
-		if (!runAnimTimer)
-			runAnimTimer = startTimer(50);
+		else if ((compilation.errorType == Compiler::MISSING_ACTION) && (scene->isSetLast(compilation.errorLine)))
+		{
+			compilationResult->setText(tr("Please add an action"));
+			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
+			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
+			showCompilationError->show();
+			emit compilationOutcome(false);
+		}
+		else
+		{
+			compilationResult->setStyleSheet("QLabel { font-size: 16px; color: rgb(231,19,0); }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/error.svgz", fontSize*1.6));
+			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
+			showCompilationError->show();
+			emit compilationOutcome(false);
+		}
+		
 	}
 	
 	void ThymioVisualProgramming::processHighlightChange()
@@ -883,11 +1034,11 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// load the play animation
 		// first image
-		QImageReader playReader(":/images/play.svgz");
+		QImageReader playReader(":/images/icons/play.svgz");
 		playReader.setScaledSize(iconSize);
 		const QImage playImage(playReader.read());
 		// last image
-		QImageReader playRedReader(":/images/play-green.svgz");
+		QImageReader playRedReader(":/images/icons/play-green.svgz");
 		playRedReader.setScaledSize(iconSize);
 		const QImage playRedImage(playRedReader.read());
 		
@@ -900,6 +1051,28 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	#endif // Q_OS_WIN
+	
+	//! Start the run button animation timer, safe even if the timer is already running
+	void ThymioVisualProgramming::startRunButtonAnimationTimer()
+	{
+		if (!runAnimTimer)
+			runAnimTimer = startTimer(50);
+	}
+	
+	//! Stop the run button animation timer, safe even if the timer is not running
+	void ThymioVisualProgramming::stopRunButtonAnimationTimer()
+	{
+		if (runAnimTimer)
+		{
+			killTimer(runAnimTimer);
+			runAnimTimer = 0;
+			#ifdef Q_OS_WIN
+			runButton->setIcon(QIcon(":/images/icons/play.svgz"));
+			#else // Q_OS_WIN
+			runButton->setIcon(runAnimFrames[0]);
+			#endif // Q_OS_WIN
+		}
+	}
 	
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
@@ -943,22 +1116,16 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
-		const int toolbarWidgetCount(11);
-		//const int toolbarSepCount(quitButton ? 5 : 4);
+		const float toolbarWidgetCount(12.25);
 		// get width of combox box element (not content)
-		QStyleOptionComboBox opt;
-		QSize tmp(0, 0);
-		tmp = style()->sizeFromContents(QStyle::CT_ComboBox, &opt, tmp);
 		int desiredIconSize((
 			event->size().width() -
 			(
-				(toolbarWidgetCount-1) * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
-				(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + 
-				2 * style()->pixelMetric(QStyle::PM_ComboBoxFrameWidth) +
-				toolbarWidgetCount * 2 * style()->pixelMetric(QStyle::PM_ButtonMargin) + 
+				/*(toolbarWidgetCount-1) * 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + */
+				toolbarWidgetCount * 2 * style()->pixelMetric(QStyle::PM_ButtonMargin) +
 				style()->pixelMetric(QStyle::PM_LayoutLeftMargin) +
 				style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
-				tmp.width()
+				6 // vertical lines
 				/*#ifdef Q_WS_MAC
 				55 // safety factor, as it seems that metrics do miss some space
 				#else // Q_WS_MAC
@@ -976,7 +1143,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
-		const QSize importantIconSize(tbIconSize * 2);
+		const QSize importantIconSize(tbIconSize * 1.41);
 		#ifndef Q_OS_WIN
 		regenerateRunButtonAnimation(importantIconSize);
 		#endif // Q_OS_WIN
@@ -988,18 +1155,17 @@ namespace Aseba { namespace ThymioVPL
 		redoButton->setIconSize(tbIconSize);
 		runButton->setIconSize(importantIconSize);
 		stopButton->setIconSize(importantIconSize);
-		advancedButton->setIconSize(importantIconSize);
-		//colorComboButton->setIconSize(QSize((desiredIconSize*3)/2,desiredIconSize));
+		advancedButton->setIconSize(tbIconSize);
 		helpButton->setIconSize(tbIconSize);
 		snapshotButton->setIconSize(tbIconSize);
-		if (quitButton)
-			quitButton->setIconSize(tbIconSize);
-		if (quitSpotSpacer)
-		{
-			quitSpotSpacer->changeSize(desiredIconSize, desiredIconSize);
-			quitSpotSpacer->invalidate();
-		}
-		//toolBar->setIconSize(tbIconSize);
+		spacer1->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer2->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer3->changeSize(desiredIconSize, desiredIconSize);
+		spacerRunStop->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer4->changeSize(desiredIconSize, desiredIconSize);
+		spacer5->changeSize(desiredIconSize/4, desiredIconSize);
+		spacer6->changeSize(desiredIconSize/4, desiredIconSize);
+		toolLayout->invalidate();
 		
 		// set view and cards on sides
 		#ifdef Q_WS_MACX // we have to work around bugs in size reporting in OS X
@@ -1020,9 +1186,9 @@ namespace Aseba { namespace ThymioVPL
 		#ifdef Q_OS_WIN
 		// for unknown reason, animation does not work some times on Windows, so setting image directly from QIcon	
 		if (runAnimFrame >= 0)
-			runButton->setIcon(QIcon(":/images/play.svgz"));
+			runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		else
-			runButton->setIcon(QIcon(":/images/play-green.svgz"));
+			runButton->setIcon(QIcon(":/images/icons/play-green.svgz"));
 		#else // Q_OS_WIN
 		if (runAnimFrame >= 0)
 			runButton->setIcon(runAnimFrames[runAnimFrame]);

@@ -322,7 +322,7 @@ namespace Aseba
 		
 		if (Compiler::isKeyword(name.toStdWString()))
 		{
-			QMessageBox::warning(0, tr("Name is a keyword"), tr("Name <tt>%0</tt> cannot be used as a constant, because it is a language keyword.").arg(name));
+			QMessageBox::warning(0, tr("The name is a keyword"), tr("The name <tt>%0</tt> cannot be used as a constant, because it is a language keyword.").arg(name));
 			return false;
 		}
 		

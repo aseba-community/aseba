@@ -23,6 +23,7 @@ if (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
 	set(PROTOBUF_FOUND 1)
 	add_definitions(-DPROTOBUF_FOUND)
 	include_directories(${PROTOBUF_INCLUDE_DIR})
+	set(ASEBA_CORE_LIBRARIES ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
 	message(STATUS "Google Protobuf found")
 else (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
 	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
@@ -131,11 +132,7 @@ if (QT4_FOUND)
 			add_dependencies(asebastudio versionheader)
 		endif (HAS_DYN_VERSION)
 
-		if (PROTOBUF_FOUND)
-			target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
-		else()
-			target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-		endif()
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 		
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif (QT_QTHELP_FOUND)
@@ -158,11 +155,14 @@ if (QT4_FOUND)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
 	
-	if (PROTOBUF_FOUND)
-		target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
-	else()
-		target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-	endif()
+	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	
+	# Render blocks helper
+	set(rendervplblocks_SRCS
+		rendervplblocks.cpp
+	)
+	add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (QT4_FOUND)

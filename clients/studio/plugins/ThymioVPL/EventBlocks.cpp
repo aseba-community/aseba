@@ -10,6 +10,7 @@
 #include "EventBlocks.h"
 #include "Buttons.h"
 #include "UsageLogger.h"
+#include "Style.h"
 
 #define deg2rad(x) ((x) * M_PI / 180.)
 
@@ -24,7 +25,7 @@ namespace Aseba { namespace ThymioVPL
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -21.5, 50, 43), GeometryShapeButton::TRIANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -21.5, 50, 43), GeometryShapeButton::TRIANGULAR_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
@@ -38,7 +39,7 @@ namespace Aseba { namespace ThymioVPL
 			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
 		}
 
-		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
 		button->setPos(QPointF(128, 128));
 		button->addState(color);
 		buttons.push_back(button);
@@ -49,7 +50,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
 		
@@ -69,15 +70,15 @@ namespace Aseba { namespace ThymioVPL
 		// front sensors
 		for(int i=0; i<5; ++i) 
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
 			
 			const qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
 						   175 - 150*qCos(0.34906585*offset) );
-			button->addState(Qt::white);
-			button->addState(Qt::black);
-			button->addState(Qt::yellow);
+			button->addState(Qt::white, Qt::red);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 
@@ -91,12 +92,12 @@ namespace Aseba { namespace ThymioVPL
 		// back sensors
 		for(int i=0; i<2; ++i) 
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
 
 			button->setPos(QPointF(64 + i*128, 234));
-			button->addState(Qt::white);
-			button->addState(Qt::black);
-			button->addState(Qt::yellow);
+			button->addState(Qt::white, Qt::red);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 			
@@ -114,7 +115,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
-		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, QColor(32,32,32), Qt::white, advanced, parent)
+		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
 		
@@ -125,12 +126,12 @@ namespace Aseba { namespace ThymioVPL
 		// sensors
 		for(int i=0; i<2; ++i) 
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
 
 			button->setPos(QPointF(98 + i*60, 40));
-			button->addState(Qt::white);
-			button->addState(Qt::black);
-			button->addState(Qt::yellow);
+			button->addState(Qt::white, Qt::red);
+			button->addState(Qt::black, Qt::black);
+			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
 			
@@ -196,8 +197,8 @@ namespace Aseba { namespace ThymioVPL
 			}
 			else
 			{
-				painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-				painter->setBrush(Qt::lightGray);
+				painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Style::unusedButtonFillColor);
 			}
 			painter->drawEllipse(buttonPoses[i]);
 		}

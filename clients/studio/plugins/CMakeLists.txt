@@ -13,6 +13,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/Compiler.cpp
 	ThymioVPL/CompilerVisitors.cpp
 	ThymioVPL/Style.cpp
+	ThymioVPL/Utils.cpp
 	ThymioVPL/LogSignalMapper.cpp
 )
 qt4_wrap_cpp(qt_plugins_MOCS

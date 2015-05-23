@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 
 #include "Block.h"
@@ -297,6 +298,7 @@ namespace Aseba { namespace ThymioVPL
 			painter.rotate(child->rotation());
 			painter.translate(-child->transformOriginPoint());
 			painter.scale(child->scale(), child->scale());
+			painter.setOpacity(painter.opacity() * child->opacity());
 			renderChildItems(painter, child, opt);
 			child->paint(&painter, &opt, 0);
 			painter.restore();
@@ -345,17 +347,27 @@ namespace Aseba { namespace ThymioVPL
 		Qt::DropAction dragResult(drag->exec(isCopy ? Qt::CopyAction : Qt::MoveAction));
 		if (dragResult != Qt::IgnoreAction)
 		{
-			if (!isCopy && parentItem())
+			EventActionsSet* eventActionsSet(dynamic_cast<EventActionsSet*>(parentItem()));
+			if (eventActionsSet)
 			{
-				EventActionsSet* eventActionsSet(polymorphic_downcast<EventActionsSet*>(parentItem()));
-				if (eventActionsSet && !keepAfterDrop)
+				if (!isCopy && !keepAfterDrop)
 					eventActionsSet->removeBlock(this);
+				emit eventActionsSet->contentChanged();
+				emit eventActionsSet->undoCheckpoint();
 			}
-			emit contentChanged();
-			emit undoCheckpoint();
 		}
 		beingDragged = false;
 		#endif // ANDROID
+	}
+	
+	void Block::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		EventActionsSet* parentSet(dynamic_cast<EventActionsSet*>(parentItem()));
+		if (parentSet)
+		{
+			parentSet->setSoleSelection();
+		}
+		QGraphicsItem::mousePressEvent(event);
 	}
 	
 	/////
@@ -448,26 +460,63 @@ namespace Aseba { namespace ThymioVPL
 			const int h(96);
 			const int lowPos(valToPixel(low));
 			const int highPos(valToPixel(high));
-			painter->fillRect(x,y,highPos,48,Qt::lightGray);
-			painter->fillRect(x+highPos,y,w-highPos,48,highColor);
-			painter->fillRect(x,y+48,lowPos,48,lowColor);
-			painter->fillRect(x+lowPos,y+48,w-lowPos,48,Qt::lightGray);
 			
-			// rectangle
-			painter->setPen(QPen(Qt::darkGray, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			// compute what we should show
+			bool isAnyClose(false);
+			bool isAnyFar(false);
+			bool isAnyRange(false);
+			for (int i=0; i<buttons.size(); ++i)
+			{
+				const int value(buttons[i]->getValue());
+				isAnyClose = isAnyClose || value == 1;
+				isAnyFar = isAnyFar || value == 2;
+				isAnyRange = isAnyRange || value == 3;
+			}
+			
+			// background
+			painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
-			painter->drawRect(x,y,w,h);
-			painter->drawLine(x,y+48,x+w,y+48);
+			painter->fillRect(x,y,w,h,Style::unusedButtonFillColor);
+			painter->drawRect(x,y,w,h/2);
+			painter->drawRect(x,y+h/2,w,h/2);
+			if (isAnyClose)
+			{
+				painter->setPen(QPen(Qt::red, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+				painter->fillRect(x+highPos,y,w-highPos,48,highColor);
+				painter->drawRect(x+highPos,y,w-highPos,48);
+			}
+			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			if (isAnyFar)
+			{
+				painter->fillRect(x,y+48,lowPos,48,lowColor);
+				painter->drawRect(x,y+48,lowPos,48);
+			}
+			painter->setPen(QPen(QColor(128,0,0), 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+			if (isAnyRange)
+			{
+				//painter->fillRect(x+highPos,y+24,lowPos-highPos,48,Qt::darkGray);
+				QLinearGradient linearGrad(QPointF(x+highPos, 0), QPointF(x+lowPos, 0));
+				linearGrad.setColorAt(0,highColor);
+				linearGrad.setColorAt(1,lowColor);
+				painter->fillRect(x+highPos,y+24,lowPos-highPos,48,QBrush(linearGrad));
+				painter->drawRect(x+highPos,y+24,lowPos-highPos,48);
+			}
 			
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
-			QPolygon highCursor;
-			highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
-			painter->drawConvexPolygon(highCursor);
-			QPolygon lowCursor;
-			lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
-			painter->drawConvexPolygon(lowCursor);
+			if (isAnyClose || isAnyRange)
+			{
+				QPolygon highCursor;
+				highCursor << QPoint(x+highPos+23, y) << QPoint(x+highPos-23, y) << QPoint(x+highPos-23, y+23) << QPoint(x+highPos, y+46) << QPoint(x+highPos+23, y+23);
+				painter->drawConvexPolygon(highCursor);
+			}
+			if (isAnyFar || isAnyRange)
+			{
+				QPolygon lowCursor;
+				lowCursor << QPoint(x+lowPos, y+50) << QPoint(x+lowPos+23, y+50+23) << QPoint(x+lowPos+23, y+96) << QPoint(x+lowPos-23, y+96) << QPoint(x+lowPos-23, y+50+23);
+				painter->drawConvexPolygon(lowCursor);
+			}
 		}
 	}
 	
@@ -570,6 +619,7 @@ namespace Aseba { namespace ThymioVPL
 				high = value;
 			emit contentChanged();
 		}
+		updateIndicationLEDsOpacity();
 	}
 	
 	QVector<quint16> BlockWithButtonsAndRange::getValuesCompressed() const
@@ -631,14 +681,39 @@ namespace Aseba { namespace ThymioVPL
 	
 	float BlockWithButtonsAndRange::pixelToVal(float pixel) const
 	{
+		// pixel to relative
 		const float width(rangeRect().width() - 46);
 		pixel -= 23;
 		pixel = std::min(std::max(0.f, pixel), width);
 		const float factor(pixel/width);
+		// log/linear correction and precision setting
+		int v, precision;
 		if (pixelToValModel == PIXEL_TO_VAL_LINEAR)
-			return range * factor + lowerBound;
+		{
+			v = range * factor + lowerBound;
+			precision = 25;
+		}
 		else
-			return range * factor * factor + lowerBound;
+		{
+			v = range * factor * factor + lowerBound;
+			const int midpoint_table[] = {  10, 100, 200, 500, 750, 1000, 2000, 4000, -1 };
+			int bestDist = std::numeric_limits<int>::max();
+			precision = 10;
+			int i = 0;
+			while (midpoint_table[i] != -1)
+			{
+				int d = abs(midpoint_table[i] - v);
+				if (d < bestDist)
+				{
+					bestDist = d;
+					precision = midpoint_table[i] / 10;
+				}
+				++i;
+			}
+		}
+		// rounding
+		v = round(v / precision) * precision;
+		return std::min(std::max(lowerBound, v), lowerBound + range);
 	}
 	
 	float BlockWithButtonsAndRange::valToPixel(float val) const
@@ -691,7 +766,7 @@ namespace Aseba { namespace ThymioVPL
 		const int angles[4] = {0,90,270,180};
 		for(uint i=0; i<4; i++)
 		{
-			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-30,-30,60,60), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Qt::lightGray, Qt::darkGray);
+			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-30,-30,60,60), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
 			button->setPos(128 + (i%2)*90 - 45, 128 + (i/2)*90 - 45 + 5);
 			button->setRotation(angles[i]);
 			button->addState(QColor(255,128,0));

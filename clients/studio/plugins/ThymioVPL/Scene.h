@@ -2,6 +2,7 @@
 #define VPL_SCENE_H
 
 #include <QGraphicsScene>
+#include <QGraphicsSvgItem>
 #include "EventActionsSet.h"
 
 namespace Aseba { namespace ThymioVPL
@@ -18,7 +19,6 @@ namespace Aseba { namespace ThymioVPL
 		
 		QGraphicsItem *addAction(const QString& name);
 		QGraphicsItem *addEvent(const QString& name);
-		void addEventActionsSetOldFormat_1_3(const QDomElement& element);
 		void addEventActionsSet(const QDomElement& element);
 		void ensureOneEmptySetAtEnd();
 
@@ -59,6 +59,7 @@ namespace Aseba { namespace ThymioVPL
 		SetConstItr setsBegin() const { return eventActionsSets.begin(); }
 		SetConstItr setsEnd() const { return eventActionsSets.end(); }
 		unsigned setsCount() const { return eventActionsSets.size(); }
+		bool isSetLast(unsigned setId) const;
 		
 		unsigned getZoomLevel() const { return zoomLevel; }
 		
@@ -87,6 +88,10 @@ namespace Aseba { namespace ThymioVPL
 	protected:
 		ThymioVisualProgramming* vpl;
 		
+		QGraphicsSvgItem* warningGraphicsItem;
+		QGraphicsSvgItem* errorGraphicsItem;
+		QGraphicsSvgItem* referredGraphicsItem;
+		QGraphicsLineItem* referredLineItem;
 		QList<EventActionsSet *> eventActionsSets;
 		Compiler compiler;
 		Compiler::CompilationResult lastCompilationResult;

@@ -6,4 +6,4 @@ GenericName[fr]=Simulateur de robot Aseba pour jeu solo
 Exec=asebaplayground
 TryExec=asebaplayground
 Categories=Education;Science;Aseba
-Icon=asebaplayground.png
+Icon=asebaplayground

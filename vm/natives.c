@@ -197,7 +197,7 @@ sint16 aseba_sin(sint16 angle)
 	{
 		if (angle > 16384)
 			lookupAngle = 32767 - angle + 1;
-		else if (angle < 16484)
+		else if (angle < 16384)
 			lookupAngle = angle;
 		else
 			return 32767;
