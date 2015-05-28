@@ -1,0 +1,126 @@
+[
+  {
+    "id": "578e9f0f.a8716",
+    "type": "inject",
+    "name": "every minute",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "repeat": "",
+    "crontab": "*\/1 * * * *",
+    "once": false,
+    "x": 100,
+    "y": 240,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        "93eb914c.6c147"
+      ]
+    ]
+  },
+  {
+    "id": "93eb914c.6c147",
+    "type": "http request",
+    "name": "beep thymio-II",
+    "method": "GET",
+    "url": "http:\/\/127.0.0.1:3000\/nodes\/thymio-II\/A_sound_system\/8",
+    "x": 300,
+    "y": 180,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        "24eb13b2.db14ec"
+      ]
+    ]
+  },
+  {
+    "id": "1a145ef5.e5eba1",
+    "type": "inject",
+    "name": "300 msec",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "repeat": "0.3",
+    "crontab": "",
+    "once": true,
+    "x": 100,
+    "y": 60,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        "1d14413.fe2ebbf"
+      ]
+    ]
+  },
+  {
+    "id": "1d14413.fe2ebbf",
+    "type": "function",
+    "name": "breathe leds",
+    "func": "var tick = Math.floor(msg.payload \/ 300) % 13;\nmsg.green = tick<5            ?  8 + 8*(3-Math.abs(tick-2))  : 0;\nmsg.red   = tick>2 && tick<7  ?      5*(3-Math.abs(tick-4))  : 0;\nmsg.blue = 0;\nmsg.payload = \"rgb=(\"+ msg.red +\" \"+ msg.green +\" \"+ msg.blue +\")\";\nreturn msg;",
+    "outputs": 1,
+    "x": 300,
+    "y": 60,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        "e8c06fe3.173f9",
+        "fd51c6b5.02ae38"
+      ]
+    ]
+  },
+  {
+    "id": "e8c06fe3.173f9",
+    "type": "http request",
+    "name": "top leds thymio-II",
+    "method": "GET",
+    "url": "http:\/\/127.0.0.1:3000\/nodes\/thymio-II\/V_leds_top\/{{red}}\/{{green}}\/{{blue}}",
+    "x": 500,
+    "y": 60,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        
+      ]
+    ]
+  },
+  {
+    "id": "fd51c6b5.02ae38",
+    "type": "debug",
+    "name": "debug RGB",
+    "active": false,
+    "console": "false",
+    "complete": "false",
+    "x": 500,
+    "y": 120,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      
+    ]
+  },
+  {
+    "id": "7e30981a.81cf68",
+    "type": "http in",
+    "name": "",
+    "url": "\/beep",
+    "method": "get",
+    "x": 100,
+    "y": 180,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      [
+        "93eb914c.6c147"
+      ]
+    ]
+  },
+  {
+    "id": "24eb13b2.db14ec",
+    "type": "http response",
+    "name": "http ack",
+    "x": 500,
+    "y": 180,
+    "z": "460ba41.fb9f45c",
+    "wires": [
+      
+    ]
+  }
+]
