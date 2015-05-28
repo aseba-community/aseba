@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="it">
+<TS version="2.1" language="it">
 <context>
     <name>Aseba::CompilerTranslator</name>
     <message>
@@ -241,7 +241,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="208"/>
         <source>Event %0 needs an array of size %1 or smaller, but one of size %2 is passed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;evento %0 richiede una matrice di dimensione %1 o inferiore, ma ne viene passata una di dimensione %2</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="212"/>
@@ -392,7 +392,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="328"/>
         <source>_emit keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Parola chiave &quot;_emit&quot;</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="332"/>
