@@ -58,6 +58,8 @@ public:
 	std::valarray<uint8> lastMessageData;
 	// this must be public because of bindings to C functions
 	Dashel::Stream* stream;
+	// all streams that must be disconnected at next step
+	std::vector<Dashel::Stream*> toDisconnect;
 	
 public:
 	
@@ -108,13 +110,13 @@ public:
 		std::string targetName = stream->getTargetName();
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
 		{
-			std::cerr << this << " : New client connected." << std::endl;
+			// schedule current stream for disconnection
 			if (this->stream)
-			{
-				closeStream(this->stream);
-				std::cerr << this << " : Disconnected old client." << std::endl;
-			}
+				toDisconnect.push_back(this->stream);
+			
+			// set new stream as current stream
 			this->stream = stream;
+			std::cerr << this << " : New client connected." << std::endl;
 		}
 	}
 	
@@ -132,6 +134,10 @@ public:
 	
 	virtual void incomingData(Dashel::Stream *stream)
 	{
+		// only process data for the current stream
+		if (stream != this->stream)
+			return;
+		
 		uint16 temp;
 		uint16 len;
 		
@@ -283,6 +289,15 @@ int main(int argc, char* argv[])
 	node.listen(basePort, deltaPort);
 	while (node.step(10))
 	{
+		// disconnect old streams
+		for (size_t i = 0; i < node.toDisconnect.size(); ++i)
+		{
+			node.closeStream(node.toDisconnect[i]);
+			std::cerr << &node << " : Old client disconnected by new client." << std::endl;
+		}
+		node.toDisconnect.clear();
+		
+		// run VM
 		node.applicationStep();
 	}
 }
