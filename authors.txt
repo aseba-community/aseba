@@ -14,6 +14,9 @@ Copyright (C) 2007--2015:
 	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
 	coder, VPL
 	
+	David James Sherman <david dot sherman at inria dot fr>
+	asebahttp, Scratch integration
+	
 	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [1]
 	VPL design - funded by Gebert Rüf Stiftung
 	
@@ -30,7 +33,7 @@ Copyright (C) 2007--2015:
 	Italian translation
 	
 	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
-	Apple maintainer
+	OS X maintainer
 	
 	Valentin Longchamp <valentin dot longchamp at epfl dot ch> [1]
 	inputs on framework architecture, additional coding
