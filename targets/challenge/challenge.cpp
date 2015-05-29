@@ -151,7 +151,10 @@ namespace Enki
 	class AsebaFeedableEPuck : public FeedableEPuck, public Dashel::Hub
 	{
 	public:
+		// public because accessed from a glue function
 		Dashel::Stream* stream;
+		// all streams that must be disconnected at next step
+		std::vector<Dashel::Stream*> toDisconnect;
 		AsebaVMState vm;
 		std::valarray<unsigned short> bytecode;
 		std::valarray<signed short> stack;
@@ -236,13 +239,13 @@ namespace Enki
 			std::string targetName = stream->getTargetName();
 			if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
 			{
-				qDebug() << this << " : New client connected.";
+				// schedule current stream for disconnection
 				if (this->stream)
-				{
-					closeStream(this->stream);
-					qDebug() << this << " : Disconnected old client.";
-				}
+					toDisconnect.push_back(this->stream);
+				
+				// set new stream as current stream
 				this->stream = stream;
+				qDebug() << this << " : New client connected.";
 			}
 		}
 		
@@ -343,6 +346,14 @@ namespace Enki
 			
 			// do a network step
 			Hub::step();
+			
+			// disconnect old streams
+			for (size_t i = 0; i < toDisconnect.size(); ++i)
+			{
+				closeStream(toDisconnect[i]);
+				qDebug() << this << " : Disconnected old client.";
+			}
+			toDisconnect.clear();
 			
 			// run VM
 			AsebaVMRun(&vm, 65535);

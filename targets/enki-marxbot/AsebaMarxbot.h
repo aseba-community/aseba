@@ -154,6 +154,8 @@ namespace Enki
 		
 		// this must be public because of bindings to C functions
 		Dashel::Stream* stream;
+		// all streams that must be disconnected at next step
+		std::vector<Dashel::Stream*> toDisconnect;
 	};
 
 }

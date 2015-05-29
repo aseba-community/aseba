@@ -26,6 +26,7 @@
 #include "../../vm/natives.h"
 #include <dashel/dashel.h>
 #include <valarray>
+#include <vector>
 #include <QMap>
 #include <QPair>
 
@@ -59,6 +60,7 @@ namespace Aseba
 	class SimpleDashelConnection: public AbstractNodeConnection, public Dashel::Hub
 	{
 		Dashel::Stream* stream;
+		std::vector<Dashel::Stream*> toDisconnect; // all streams that must be disconnected at next step
 		uint16 lastMessageSource;
 		std::valarray<uint8> lastMessageData;
 
@@ -71,6 +73,8 @@ namespace Aseba
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+		
+		void closeOldStreams();
 	};
 	
 } // Aseba

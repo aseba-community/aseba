@@ -322,6 +322,15 @@ namespace Enki
 		// do a network step
 		Hub::step();
 		
+		// disconnect old streams
+		for (size_t i = 0; i < toDisconnect.size(); ++i)
+		{
+			qDebug() << this << " : Disconnected old client.";
+			closeStream(toDisconnect[i]);
+		}
+		toDisconnect.clear();
+		
+		// run each module
 		for (size_t i = 0; i < modules.size(); i++)
 		{
 			AsebaVMState* vm = &(modules[i]->vm);
@@ -346,13 +355,13 @@ namespace Enki
 		std::string targetName = stream->getTargetName();
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
 		{
-			qDebug() << this << " : New client connected.";
+			// schedule current stream for disconnection
 			if (this->stream)
-			{
-				closeStream(this->stream);
-				qDebug() << this << " : Disconnected old client.";
-			}
+				toDisconnect.push_back(this->stream);
+			
+			// set new stream as current stream
 			this->stream = stream;
+			qDebug() << this << " : New client connected.";
 		}
 	}
 	
