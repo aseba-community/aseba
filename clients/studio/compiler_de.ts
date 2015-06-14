@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_DE">
+<TS version="2.1" language="de_DE">
 <context>
     <name>Aseba::CompilerTranslator</name>
     <message>
@@ -248,7 +248,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="208"/>
         <source>Event %0 needs an array of size %1 or smaller, but one of size %2 is passed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ereignis %0 benötigt ein Array der Größe %1 oder kleiner, aber eines der Größe %2 wurde übergeben</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="212"/>
@@ -401,7 +401,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="328"/>
         <source>_emit keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>_emit Schlüsselwort</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="332"/>

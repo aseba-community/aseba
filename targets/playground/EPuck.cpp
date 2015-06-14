@@ -208,6 +208,9 @@ namespace Enki
 		// do a network step
 		Hub::step();
 		
+		// disconnect old streams
+		closeOldStreams();
+		
 		// get physical variables
 		variables.prox[0] = static_cast<sint16>(infraredSensor0.getValue());
 		variables.prox[1] = static_cast<sint16>(infraredSensor1.getValue());

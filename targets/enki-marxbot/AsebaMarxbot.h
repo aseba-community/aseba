@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2012:
+	Copyright (C) 2007--2015:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -154,6 +154,8 @@ namespace Enki
 		
 		// this must be public because of bindings to C functions
 		Dashel::Stream* stream;
+		// all streams that must be disconnected at next step
+		std::vector<Dashel::Stream*> toDisconnect;
 	};
 
 }

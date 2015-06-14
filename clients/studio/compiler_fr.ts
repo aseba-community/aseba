@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr">
+<TS version="2.1" language="fr">
 <context>
     <name>Aseba::CompilerTranslator</name>
     <message>
@@ -256,7 +256,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="208"/>
         <source>Event %0 needs an array of size %1 or smaller, but one of size %2 is passed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;événement %0 requiert un tableau de taille %1 ou plus petit, mais un tableau de taille %2 est donné</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="212"/>
@@ -409,7 +409,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="328"/>
         <source>_emit keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>mot-clé _emit</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="332"/>

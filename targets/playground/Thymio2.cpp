@@ -74,6 +74,9 @@ namespace Enki
 		// do a network step
 		Hub::step();
 		
+		// disconnect old streams
+		closeOldStreams();
+		
 		// get physical variables
 		// TODO: implement
 		

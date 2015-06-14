@@ -5,7 +5,7 @@ Aseba
 Aseba is a set of tools which allow beginners to program robots easily and efficiently.
 For more information, see: http://aseba.wikidot.com
 
-	Copyright (C) 2007--2014:
+	Copyright (C) 2007--2015:
 	Stephane Magnenat <stephane at magnenat dot net>
 	(http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
@@ -47,7 +47,7 @@ Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba 
 	make
 	cd ..
 	# fetch and compile aseba, telling it where to find dashel and enki
-	git clone https://github.com/aseba-community/aseba.git
+	git clone --recursive https://github.com/aseba-community/aseba.git
 	cd build-aseba
 	export dashel_DIR=../build-dashel
 	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -Ddashel_DIR=../build-dashel -DDASHEL_INCLUDE_DIR=../dashel -DDASHEL_LIBRARY=../build-dashel/libdashel.a -DENKI_INCLUDE_DIR=../enki -DENKI_LIBRARY=../build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=../build-enki/viewer/libenkiviewer.a

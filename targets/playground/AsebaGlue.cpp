@@ -97,11 +97,11 @@ namespace Aseba
 		const std::string& targetName(stream->getTargetName());
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
 		{
+			// schedule current stream for disconnection
 			if (this->stream)
-			{
-				closeStream(this->stream);
-				LOG_WARN(QString("Old client disconnected from ") + this->stream->getTargetName().c_str());
-			}
+				toDisconnect.push_back(this->stream);
+			
+			// set new stream as current stream
 			this->stream = stream;
 			LOG_INFO(QString("New client connected from ") + stream->getTargetName().c_str());
 		}
@@ -149,6 +149,17 @@ namespace Aseba
 			}
 		}
 		LOG_INFO(QString("Client disconnected properly from ") + stream->getTargetName().c_str());
+	}
+	
+	void SimpleDashelConnection::closeOldStreams()
+	{
+		// disconnect old streams
+		for (size_t i = 0; i < toDisconnect.size(); ++i)
+		{
+			LOG_WARN(QString("Old client disconnected from ") + toDisconnect[i]->getTargetName().c_str());
+			closeStream(toDisconnect[i]);
+		}
+		toDisconnect.clear();
 	}
 
 } // Aseba

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
+<TS version="2.1" language="es_ES">
 <context>
     <name>Aseba::CompilerTranslator</name>
     <message>
@@ -188,7 +188,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="160"/>
         <source>Constant %0 is already defined</source>
-        <translation type="unfinished"></translation>
+        <translation>La constante %0 ya fue definida</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="164"/>
@@ -248,7 +248,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="208"/>
         <source>Event %0 needs an array of size %1 or smaller, but one of size %2 is passed</source>
-        <translation type="unfinished"></translation>
+        <translation>El evento %0 requiere de un arreglo de tamaño %1 o menor, pero se pasó uno de tamaño %2</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="212"/>
@@ -402,7 +402,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="328"/>
         <source>_emit keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>comando _EMIT</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="332"/>
@@ -462,7 +462,7 @@
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="376"/>
         <source>const keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>comando CONST</translation>
     </message>
     <message>
         <location filename="translations/CompilerTranslator.cpp" line="380"/>

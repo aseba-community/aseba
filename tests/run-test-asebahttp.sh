@@ -7,5 +7,5 @@
 sleep 2
 ./test-asebahttp
 status=$?
-[ -z "$(jobs -p)" ] || kill %%
+kill %%
 exit $status

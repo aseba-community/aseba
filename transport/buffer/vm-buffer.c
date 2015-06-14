@@ -98,7 +98,7 @@ void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, ui
 void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 {
 	uint16 i;
-
+#ifndef ASEBA_LIMITED_MESSAGE_SIZE  //This is usefull with device that cannot send big packets like Thymio Wireless module.
 	buffer_pos = 0;
 	buffer_add_uint16(ASEBA_MESSAGE_VARIABLES);
 	buffer_add_uint16(start);
@@ -106,6 +106,26 @@ void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
 		buffer_add_uint16(vm->variables[i]);
 
 	AsebaSendBuffer(vm, buffer, buffer_pos);
+#else
+	const uint16 MAX_VARIABLES_SIZE = ((100 - 6)/2);
+	do {
+		uint16 size;
+		buffer_pos = 0;
+		buffer_add_uint16(ASEBA_MESSAGE_VARIABLES);
+		buffer_add_uint16(start);
+		if (length > MAX_VARIABLES_SIZE)
+			size = MAX_VARIABLES_SIZE;
+		else
+			size = length;
+		for (i = start; i < start + size; i++)
+			buffer_add_uint16(vm->variables[i]);
+
+		AsebaSendBuffer(vm, buffer, buffer_pos);
+
+		start += size;
+		length -= size;
+	} while(length);
+#endif
 }
 
 void AsebaSendDescription(AsebaVMState *vm)
