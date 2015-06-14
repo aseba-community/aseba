@@ -1,4 +1,4 @@
-asebahttp - a switch to bridge HTTP to Aseba
+asebahttp - a switch to bridge Aseba to HTTP
 
 2015-01-01 David James Sherman <david dot sherman at inria dot fr>
 
@@ -13,19 +13,26 @@ Provide a simple REST interface with introspection for Aseba devices.
 - GET  /events\[/:EVENT\]*                      - create SSE stream for all known nodes
 - GET  /nodes/:NODENAME/events\[/:EVENT\]*      - create SSE stream for :NODENAME
 
+Typical use: `asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II &`
+After vmcode.aesl is compiled and uploaded, check with `curl http://127.0.0.1:3000/nodes/thymio-II`
+                
+Substitute appropriate values for :NODENAME, :VARIABLE, :EVENT and their parameters. In most cases,
+:NODENAME is `thymio-II`) For example.
+- `curl http://localhost:3000/nodes/thymio-II/motor.left.target/100`
+  sets the speed of the left motor
+- `curl http://nodes/thymio-II/sound_system/4/10`
+  might record sound number 4 for 10 seconds, if such an event were defined in AESL.
+                
+Variables and events are learned from the node description and parsed from AESL source when provided.
 Server-side event (SSE) streams are updated as events arrive.
-If a variable and an event have the same name, it is the EVENT the is called.
+If a variable and an event have the same name, it is the EVENT that is called.
 On a local machine the server can handle 600 requests/sec with 10 concurrent connections,
 more (up to 2.5 times more) if the requests are pipelined as is the HTTP/1.1 default.
 
-A typical execution is: asebahttp --port 3000 --aesl mycode.aesl 'ser:name=Thymio-II' &
-After myevents.aesl is compiled and uploaded, check with 'curl http://127.0.0.1:3000/nodes/thymio-II'
-
 Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests.
-Run the script 'do_valgrind_macosx.sh' to valgrind the server using curl and siege.
-An example [Node-RED](http://nodered.org) flow can be copy/pasted from test-nodered-simple.json.
+Example [Node-RED](http://nodered.org) flows can be found in ../../examples/http/node-red.
 
-DONE (mostly):
+DONE:
 - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
 - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
 - GET /nodes, GET /nodes/:NODENAME with introspection
@@ -42,7 +49,6 @@ DONE (mostly):
 TODO:
 - handle more than just one Thymio-II node
 - gracefully shut down TCP/IP connections (half-close, wait, close)
-- remove dependency on libjson? Our output is trivial and input syntax is limited to unsigned vectors
 
 This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
 which bear the copyright and LGPL 3 licensing notice below.
@@ -50,7 +56,7 @@ which bear the copyright and LGPL 3 licensing notice below.
 
 /*
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2012:
+Copyright (C) 2007--2015:
 Stephane Magnenat <stephane at magnenat dot net>
 (http://stephane.magnenat.net)
 and other contributors, see authors.txt for details

@@ -1,6 +1,6 @@
 
 /*
- asebahttp - a switch to bridge HTTP to Aseba
+ asebahttp - a switch to bridge Aseba to HTTP
  2014-12-01 David James Sherman <david dot sherman at inria dot fr>
  
  Provide a simple REST interface with introspection for Aseba devices.
@@ -14,9 +14,22 @@
     GET  /events[/:EVENT]*                      - create SSE stream for all known nodes
     GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
  
- Server-side event (SSE) streams are updated as events arrive.
- If a variable and an event have the same name, it is the EVENT the is called.
- On a local machine typically handles 600 requests/sec with 10 concurrent connections.
+ Typical use: asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II & After vmcode.aesl is compiled 
+ and uploaded, check with curl http://127.0.0.1:3000/nodes/thymio-II
+ 
+ Substitute appropriate values for :NODENAME, :VARIABLE, :EVENT and their parameters. In most cases, 
+ :NODENAME is thymio-II. For example.
+ 
+   - curl http://localhost:3000/nodes/thymio-II/motor.left.target/100 sets the speed of the left motor
+   - curl http://nodes/thymio-II/sound_system/4/10 might record sound number 4 for 10 seconds, if such an event were defined in AESL.
+ 
+ Variables and events are learned from the node description and parsed from AESL source when provided. 
+ Server-side event (SSE) streams are updated as events arrive. If a variable and an event have the same 
+ name, it is the EVENT that is called. On a local machine the server can handle 600 requests/sec with 10 
+ concurrent connections, more (up to 2.5 times more) if the requests are pipelined as is the HTTP/1.1 default.
+ 
+ Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests. Example Node-RED flows 
+ can be found in ../../examples/http/node-red.
  
  DONE (mostly):
     - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
@@ -86,26 +99,6 @@
 #endif // DAHSEL_VERSION_INT
 
 //== Some utility functions and diverse hacks ==============================================
-
-// because I don't understand locales and wide strings yet
-char* wstringtocstr(std::wstring w, char* name)
-{
-    //char* name = (char*)malloc(128);
-    std::wcstombs(name, w.c_str(), 127);
-    return name;
-}
-
-// split strings on delimiter
-void split_string(std::string s, char delim, std::vector<std::string>& tokens)
-{
-    std::stringstream ss( s );
-    std::string item;
-    //std::getline(ss, item, delim);
-    while (std::getline(ss, item, delim))
-        tokens.push_back(item);
-    if (tokens[0].size() == 0)
-        tokens.erase(tokens.begin(),tokens.begin()+1);
-}
 
 // close the stream, this is a hack because Dashel lacks a proper shutdown mechanism
 void shutdownStream(Dashel::Stream* stream)
@@ -247,8 +240,8 @@ namespace Aseba
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
-	  wcerr << this << L"Received description for " << getNodeName(nodeId) << endl;
-	if (!nodeId) return;
+            wcerr << this << L"Received description for " << getNodeName(nodeId) << endl;
+        if (!nodeId) return;
         this->nodeId = nodeId;
         nodeDescriptionComplete = true;
     }
@@ -256,7 +249,7 @@ namespace Aseba
     bool HttpInterface::descriptionReceived()
     {
         if (verbose)
-	  wcerr << this << L"check descriptionReceived: nodeId = " << nodeId << L", flag = " << nodeDescriptionComplete << L", name=" << getNodeName(nodeId) << endl;
+            wcerr << this << L"check descriptionReceived: nodeId = " << nodeId << L", flag = " << nodeDescriptionComplete << L", name=" << getNodeName(nodeId) << endl;
         //return (nodeId > 0);
         return nodeDescriptionComplete;
     }
@@ -267,7 +260,7 @@ namespace Aseba
             // incoming Aseba message
             if (verbose)
                 cerr << "incoming for asebaStream " << stream << endl;
-
+            
             Message *message(Message::receive(stream));
             
             // pass message to description manager, which builds
@@ -283,7 +276,7 @@ namespace Aseba
             const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
             if (userMsg)
                 incomingUserMsg(userMsg);
-
+            
             delete message;
         }
         else
@@ -291,16 +284,16 @@ namespace Aseba
             // incoming HTTP request
             if (verbose)
                 cerr << "incoming for HTTP stream " << stream << endl;
-            HttpRequest* req = new HttpRequest;
+            HttpRequest* req = new HttpRequest; // [promise] we will eventually delete req in sendAvailableResponses, unscheduleResponse, or stream shutdown
             if ( ! req->initialize(stream))
             {   // protocol failure, shut down connection
                 stream->write("HTTP/1.1 400 Bad request\r\n");
                 stream->fail(DashelException::Unknown, 0, "400 Bad request");
                 unscheduleAllResponses(stream);
-                delete req; // not yet in queue, so delete it here
+                delete req; // not yet in queue, so delete it here [promise]
                 return;
             }
-
+            
             if (verbose)
             {
                 cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
@@ -331,7 +324,7 @@ namespace Aseba
         
         VariableAddress address = std::make_pair(variables->source,variables->start);
         ResponseSet *pending = &pendingVariables[address];
-
+        
         if (verbose)
         {
             cerr << "incomingVariables var (" << variables->source << "," << variables->start << ") = "
@@ -370,7 +363,7 @@ namespace Aseba
         try { commonDefinitions.events.at(userMsg->type); }
         catch (const std::out_of_range& oor) { return; }
         
-        if (commonDefinitions.events[userMsg->type].name.find(L"_update_vars ")==0)
+        if (commonDefinitions.events[userMsg->type].name.find(L"R_state")==0)
         {
             // update variables
         }
@@ -378,9 +371,7 @@ namespace Aseba
         {
             // set up SSE message
             std::stringstream reply;
-            char this_event[128];
-            wstringtocstr(commonDefinitions.events[userMsg->type].name, this_event);
-            string event_name = std::string(this_event);
+            string event_name = WStringToUTF8(commonDefinitions.events[userMsg->type].name);
             reply << "data: " << event_name;
             for (size_t i = 0; i < userMsg->data.size(); ++i)
                 reply << " " << userMsg->data[i];
@@ -399,9 +390,9 @@ namespace Aseba
             }
         }
     }
-
+    
     //-- Routing for HTTP requests ---------------------------------------------------------
-
+    
     void HttpInterface::routeRequest(HttpRequest* req)
     {
         // route based on uri prefix
@@ -452,8 +443,7 @@ namespace Aseba
              descIt != nodesDescriptions.end(); ++descIt)
         {
             const NodeDescription& description(descIt->second);
-            char wbuf[128];
-            string nodeName = wstringtocstr(description.name,wbuf);
+            string nodeName = WStringToUTF8(description.name);
             
             json << "{";
             json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
@@ -466,14 +456,25 @@ namespace Aseba
                 
                 // named variables
                 json << ",\"namedVariables\":{";
+                bool seen_named_variables = false;
                 for (NodeNameVariablesMap::const_iterator n(allVariables.find(nodeName));
                      n != allVariables.end(); ++n)
                 {
                     VariablesMap vm = n->second;
                     for (VariablesMap::iterator i = vm.begin();
                          i != vm.end(); ++i)
-                        json << (i == vm.begin() ? "" : ",")
-                             << "\"" << wstringtocstr(i->first, wbuf) << "\":" << i->second.second;
+                    {
+                        json << (i == vm.begin() ? "" : ",") << "\"" << WStringToUTF8(i->first) << "\":" << i->second.second;
+                        seen_named_variables = true;
+                    }
+                }
+                if ( ! seen_named_variables )
+                {
+                    // failsafe: if compiler hasn't found any variables, get them from the node description
+                    for (vector<Aseba::TargetDescription::NamedVariable>::const_iterator i(description.namedVariables.begin());
+                         i != description.namedVariables.end(); ++i)
+                        json << (i == description.namedVariables.begin() ? "" : ",")
+                        << "\"" << WStringToUTF8(i->name) << "\":" << i->size;
                 }
                 json << "}";
                 
@@ -481,10 +482,10 @@ namespace Aseba
                 json << ",\"localEvents\":{";
                 for (size_t i = 0; i < description.localEvents.size(); ++i)
                 {
-                    string ev(wstringtocstr(description.localEvents[i].name,wbuf));
+                    string ev(WStringToUTF8(description.localEvents[i].name));
                     json << (i == 0 ? "" : ",")
                     << "\"" << ev << "\":"
-                    << "\"" << wstringtocstr(description.localEvents[i].description, wbuf) << "\"";
+                    << "\"" << WStringToUTF8(description.localEvents[i].description) << "\"";
                 }
                 json << "}";
                 
@@ -492,7 +493,7 @@ namespace Aseba
                 json << ",\"constants\":{";
                 for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << wstringtocstr(commonDefinitions.constants[i].name,wbuf) << "\":"
+                    << "\"" << WStringToUTF8(commonDefinitions.constants[i].name) << "\":"
                     << commonDefinitions.constants[i].value;
                 json << "}";
                 
@@ -500,7 +501,7 @@ namespace Aseba
                 json << ",\"events\":{";
                 for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << wstringtocstr(commonDefinitions.events[i].name,wbuf) << "\":"
+                    << "\"" << WStringToUTF8(commonDefinitions.events[i].name) << "\":"
                     << commonDefinitions.events[i].value;
                 json << "}";
             }
@@ -559,10 +560,10 @@ namespace Aseba
                         cerr << req << " evVariableOrEevent 404 no such variable " << values[0] <<  endl;
                     return;
                 }
-
+                
                 sendGetVariables(nodeName, values);
                 pendingVariables[std::make_pair(source,start)].insert(req);
-
+                
                 if (verbose)
                     cerr << req << " evVariableOrEevent schedule var " << values[0]
                     << "(" << source << "," << start << ") add " << req << " to subscribers" <<  endl;
@@ -637,16 +638,13 @@ namespace Aseba
             nodeId = getNodeId(descIt->second.name, 0, &ok);
             if (!ok)
                 continue;
-            char nodeName[128];
-            wstringtocstr(descIt->second.name, nodeName);
-            
-            //this->lock(); // inherited from Dashel::Hub
+            string nodeName = WStringToUTF8(descIt->second.name);
             
             Reset(nodeId).serialize(asebaStream); // reset node
             asebaStream->flush();
             Run(nodeId).serialize(asebaStream);   // re-run node
             asebaStream->flush();
-            if (strcmp(nodeName, "thymio-II") == 0)
+            if (nodeName.find("thymio-II") == 0)
             {
                 strings args;
                 args.push_back("motor.left.target");
@@ -663,16 +661,14 @@ namespace Aseba
                 sendEvent(nodeName,data);
             }
             
-            this->unlock();
-            
             finishResponse(req, 200, "");
         }
     }
     
-
+    
     
     //-- Sending messages on the Aseba bus -------------------------------------------------
-
+    
     void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
     {
         size_t eventPos;
@@ -702,7 +698,7 @@ namespace Aseba
             const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
             if (!exists)
                 continue;
-
+            
             VariablesMap vm = allVariables[nodeName];
             const unsigned length(vm[UTF8ToWString(*it)].second);
             
@@ -781,12 +777,11 @@ namespace Aseba
     void HttpInterface::updateVariables(const std::string nodeName)
     {
         strings all_variables;
-        char wbuf[128];
         for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
-            all_variables.push_back(wstringtocstr(it->first,wbuf));
+            all_variables.push_back(WStringToUTF8(it->first));
         sendGetVariables(nodeName, all_variables);
     }
-
+    
     // Utility: extract argument values from JSON request body
     void HttpInterface::parse_json_form(std::string content, strings& values)
     {
@@ -799,7 +794,10 @@ namespace Aseba
             int i;
             while (ss >> i)
             {
-	        values.push_back(std::to_string(short(i)));
+                // values.push_back(std::to_string(short(i)));
+                std::stringstream valss;
+                valss << short(i);
+                values.push_back(valss.str());
                 if (ss.peek() == ']')
                     break;
                 else if (ss.peek() == ',')
@@ -812,7 +810,7 @@ namespace Aseba
         return;
     }
     
-
+    
     // Load Aesl file from file
     void HttpInterface::aeslLoadFile(const std::string& filename)
     {
@@ -824,24 +822,24 @@ namespace Aseba
         {
             aeslLoad(doc);
             //if (verbose)
-                cerr << "Loaded aesl script from " << filename.c_str() << "\n";
+            cerr << "Loaded aesl script from " << filename.c_str() << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
     }
-
+    
     // Load Aesl file from memory
     void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
     {
         // open document
-        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.xml", NULL, 0));
+        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
         if (!doc)
             wcerr << "cannot read XML from memory " << buffer << endl;
         else
         {
             aeslLoad(doc);
             //if (verbose)
-                cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
+            cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
@@ -858,7 +856,7 @@ namespace Aseba
         // load new data
         int noNodeCount(0);
         bool wasError(false);
-
+        
         xmlXPathContextPtr context = xmlXPathNewContext(doc);
         xmlXPathObjectPtr obj;
         
@@ -952,7 +950,7 @@ namespace Aseba
         
         // release memory
         xmlXPathFreeContext(context);
-    
+        
         // check if there was an error
         if (wasError)
         {
@@ -1014,7 +1012,7 @@ namespace Aseba
              i != pendingResponses[stream].end(); ++i)
             if (*i == req)
             {
-                delete req;
+                delete req; // [promise]
                 pendingResponses[stream].erase(i);
                 break;
             }
@@ -1025,7 +1023,7 @@ namespace Aseba
         while(!pendingResponses[stream].empty())
         {
             eventSubscriptions.erase(pendingResponses[stream].front());
-            delete pendingResponses[stream].front();
+            delete pendingResponses[stream].front(); // [promise]
             pendingResponses[stream].pop_front();
         }
     }
@@ -1034,7 +1032,7 @@ namespace Aseba
     {
         req->outheaders = outheaders;
     }
-
+    
     void HttpInterface::finishResponse(HttpRequest* req, unsigned status, std::string result)
     {
         req->result = result;
@@ -1088,7 +1086,7 @@ namespace Aseba
                 else
                 {
                     // just this request is finished, delete and remove from queue
-                    delete req;
+                    delete req; // [promise]
                     q->pop_front();
                 }
             }
@@ -1105,7 +1103,7 @@ namespace Aseba
     HttpRequest::HttpRequest():
     verbose(false)
     {};
-
+    
     bool HttpRequest::initialize( Dashel::Stream *_stream)
     {
         string start_line = readLine(_stream);
@@ -1114,8 +1112,7 @@ namespace Aseba
     
     bool HttpRequest::initialize( std::string const& start_line, Dashel::Stream *_stream)
     {
-        strings parts;
-        split_string(start_line, ' ',parts);
+        strings parts = split<string>(start_line, " ");
         if (parts.size() == 3
             && (parts[0].find("GET",0)==0 || parts[0].find("PUT",0)==0 || parts[0].find("POST",0)==0)
             && (parts[2].find("HTTP/1.1\r\n",0)==0 || parts[2].find("HTTP/1.0\r\n",0)==0) )
@@ -1142,19 +1139,20 @@ namespace Aseba
         more = false;
         headers_done = false;
         status_sent = false;
-
+        
         method = std::string(_method);
         uri = std::string(_uri);
         protocol_version = std::string(_protocol_version);
         stream = _stream;
         
         // Also allow %2F as URL part delimiter (see Scratch v430)
-        //std::string patched_uri(uri);
         std::string::size_type n = 0;
         while ( (n=uri.find("%2F",n)) != std::string::npos)
             uri.replace(n,3,"/"), n += 1;
         
-        split_string(uri, '/', tokens);
+        tokens = split<string>(uri, "/");
+        if (tokens[0].size() == 0)
+            tokens.erase(tokens.begin(),tokens.begin()+1);
         return true;
     }
     
@@ -1167,12 +1165,12 @@ namespace Aseba
             int term = header_field.find("\r\n",0);
             if (term != 0)
             {
-                // LLVM regexp search is incredibly slow
-//                std::smatch field;
-//                std::regex e ("([-A-Za-z0-9_]+): (.*)\r\n");
-//                std::regex_match (header_field,field,e);
-//                if (field.size() == 3)
-//                    headers[field[1]] = field[2];
+                //                // LLVM regexp search is incredibly slow
+                //                std::smatch field;
+                //                std::regex e ("([-A-Za-z0-9_]+): (.*)\r\n");
+                //                std::regex_match (header_field,field,e);
+                //                if (field.size() == 3)
+                //                    headers[field[1]] = field[2];
                 if (header_field.find("Content-Length: ",0,16)==0)
                     headers["Content-Length"] = header_field.substr(16,term-16);
                 else if (header_field.find("Connection: ",0,12)==0)
@@ -1196,7 +1194,7 @@ namespace Aseba
         delete []buffer;
         ready = true;
     }
-
+    
     void HttpRequest::sendResponse()
     {
         if (verbose)

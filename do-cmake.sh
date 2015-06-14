@@ -1,2 +1,0 @@
-export PATH=$PATH:/sw/lib/qt4-mac/bin/
-LIBJSON_HOME=/sw dashel_DIR=$HOME/src/build-dashel/ cmake ~/work/aseba -Ddashel_DIR=$HOME/src/build-dashel/ -DDASHEL_INCLUDE_DIR=$HOME/src/dashel/ -DDASHEL_LIBRARY=$HOME/src/build-dashel/libdashel.a -DENKI_INCLUDE_DIR=$HOME/src/enki/ -DENKI_LIBRARY=$HOME/src/build-enki/enki/libenki.a -DENKI_VIEWER_LIBRARY=$HOME/src/build-enki/viewer/libenkiviewer.a  -DCMAKE_BUILD_TYPE=DEBUG

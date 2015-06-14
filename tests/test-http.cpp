@@ -1,10 +1,22 @@
+/*
+ asebahttp - a switch to bridge HTTP to Aseba
+ 2014-12-01 David James Sherman <david dot sherman at inria dot fr>
+ 
+ Provide a simple REST interface with introspection for Aseba devices.
+
+ Unit tests:
+ 1. Aseba::HttpRequest object
+ 2. Aseba::HttpInterface hub -- "asebadummynode 0" must be running
+ 3. JSON parsing for integer arrays
+*/
+
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.hpp"
-#include "http.h"
-//#include "../../common/consts.h"
-//#include "../../common/types.h"
-//#include "../../common/utils/utils.h"
-//#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "catch.hpp"       // Catch is header-only
+#if defined(_WIN32) && defined(__MINGW32__)
+// Avoid conflict from /mingw32/.../include/winerror.h */
+#undef ERROR_STACK_OVERFLOW
+#endif
+#include "../switches/http/http.h"
 
 class Dummy: public Dashel::Hub
 {
@@ -37,6 +49,10 @@ TEST_CASE( "HttpRequest using default constructor", "[init]" ) {
     REQUIRE( req.headers.empty() );
     REQUIRE( req.content.empty() );
 }
+
+/*
+  Use Catch to write tests in Behavior-driven design (BDD) style
+*/
 
 SCENARIO( "HttpRequest should be initialized", "[init]" ) {
     Dashel::Stream* cxn = dummy->instream;
