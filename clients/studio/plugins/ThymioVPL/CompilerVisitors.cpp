@@ -251,7 +251,7 @@ namespace Aseba { namespace ThymioVPL
 					itr->first++;
 			
 			// if non-conditional code
-			if (!eventActionsSet.isAdvanced() && !eventActionsSet.getEventBlock()->isAnyValueSet())
+			if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
 			{
 				// find where "if" block starts for the current event
 				for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
