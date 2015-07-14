@@ -249,6 +249,18 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 	
+	//! Does the action list contains a set state?
+	bool EventActionsSet::hasSetStateAction() const
+	{
+		foreach (Block* action, actions)
+		{
+			if (action->getName() == "setstate")
+				return true;
+		}
+		
+		return false;
+	}
+	
 	//! Is this pair empty?
 	bool EventActionsSet::isEmpty() const
 	{

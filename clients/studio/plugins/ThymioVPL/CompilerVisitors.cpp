@@ -53,6 +53,7 @@ namespace Aseba { namespace ThymioVPL
 		useTimer(false),
 		useMicrophone(false),
 		useAccAngle(false),
+		inWhenBlock(false),
 		inIfBlock(false)
 	{
 		initEventToCodePosMap();
@@ -72,6 +73,7 @@ namespace Aseba { namespace ThymioVPL
 		useTimer= false;
 		useMicrophone = false;
 		useAccAngle = false;
+		inWhenBlock = false;
 		inIfBlock = false;
 	}
 	
@@ -159,6 +161,16 @@ namespace Aseba { namespace ThymioVPL
 		generatedCode[0] = text + generatedCode[0];
 	}
 	
+	wstring Compiler::CodeGenerator::indentText() const
+	{
+		wstring text(L"\t");
+		if (inWhenBlock)
+			text += L"\t";
+		if (inIfBlock)
+			text += L"\t";
+		return text;
+	}
+	
 	//! Generate code for an event-actions set
 	void Compiler::CodeGenerator::visit(const EventActionsSet& eventActionsSet, bool debugLog)
 	{
@@ -227,7 +239,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			// if in advanced mode, copy setting of state
-			if (eventActionsSet.isAdvanced())
+			if (eventActionsSet.hasSetStateAction())
 			{
 				generatedCode.push_back(
 					L"\n\tcall math.copy(state, new_state)"
@@ -281,14 +293,13 @@ namespace Aseba { namespace ThymioVPL
 			visitDebugLog(eventActionsSet, currentBlock);
 		
 		// possibly close condition and add code
-		generatedCode[currentBlock].append(inIfBlock ? L"\tend\n" : L"");
-		inIfBlock = false;
+		visitEndOfLine(currentBlock);
 	}
 	
 	//! Generate the debug log event for this set
 	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock)
 	{
-		wstring text(inIfBlock ? L"\t\t" : L"\t");
+		wstring text(indentText());
 		text += L"_emit DebugLog [";
 		
 		wstringstream ostr;
@@ -306,6 +317,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// generate event code
 		wstring text;
+		
+		// if block generates a test
 		if (block->isAnyValueSet())
 		{
 			// pre-test code
@@ -315,7 +328,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			// test code
-			text += L"\tif ";
+			text += L"\twhen ";
 			if (block->getName() == "button")
 			{
 				text += visitEventArrowButtons(block);
@@ -338,59 +351,60 @@ namespace Aseba { namespace ThymioVPL
 				abort();
 			}
 			
-			// if set, add state filter tests
-			if (stateFilterBlock)
-			{
-				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
-				{
-					switch (stateFilterBlock->getValue(i))
-					{
-						case 1: text += L" and state[" + toWstring(i) + L"] == 1"; break;
-						case 2: text += L" and state[" + toWstring(i) + L"] == 0"; break;
-						default: break;
-					}
-				}
-			}
+			text += L" do\n";
 			
-			text += L" then\n";
-			inIfBlock = true;
-			
-			generatedCode[currentBlock] = text;
+			inWhenBlock = true;
 		}
-		else 
+		
+		// if state filter does generate a test
+		if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
 		{
-			// if block does not generate a test, see if state filter does
-			if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
+			if (inWhenBlock)
+				text += L"\t";
+			text += L"\tif ";
+			bool first(true);
+			for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
 			{
-				text += L"\tif ";
-				bool first(true);
-				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
+				switch (stateFilterBlock->getValue(i))
 				{
-					switch (stateFilterBlock->getValue(i))
-					{
-						case 1:
-							if (!first)
-								text += L" and ";
-							text += L"state[" + toWstring(i) + L"] == 1";
-							first = false;
-						break;
-						case 2:
-							if (!first)
-								text += L" and ";
-							text += L"state[" + toWstring(i) + L"] == 0";
-							first = false;
-						break;
-						default:
-						break;
-					}
+					case 1:
+						if (!first)
+							text += L" and ";
+						text += L"state[" + toWstring(i) + L"] == 1";
+						first = false;
+					break;
+					case 2:
+						if (!first)
+							text += L" and ";
+						text += L"state[" + toWstring(i) + L"] == 0";
+						first = false;
+					break;
+					default:
+					break;
 				}
-				text += L" then\n";
-				
-				generatedCode[currentBlock] = text;
-				inIfBlock = true;
 			}
-			else
-				inIfBlock = false;
+			text += L" then\n";
+			
+			inIfBlock = true;
+		}
+		
+		generatedCode[currentBlock] = text;
+	}
+	
+	//! End the generated code of a VPL line, close whens and ifs
+	void Compiler::CodeGenerator::visitEndOfLine(unsigned currentBlock)
+	{
+		if (inIfBlock)
+		{
+			if (inWhenBlock)
+				generatedCode[currentBlock].append(L"\t");
+			generatedCode[currentBlock].append(L"\tend\n");
+			inIfBlock = false;
+		}
+		if (inWhenBlock)
+		{
+			generatedCode[currentBlock].append(L"\tend\n");
+			inWhenBlock = false;
 		}
 	}
 	
@@ -575,7 +589,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionMove(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"motor.left.target = ";
 		text += toWstring(block->getValue(0));
@@ -590,7 +604,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionTopColor(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"call leds.top(";
 		text += toWstring(block->getValue(0));
@@ -605,7 +619,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"call leds.bottom.left(";
 		text += toWstring(block->getValue(0));
@@ -632,7 +646,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		useSound = true;
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"call math.copy(notes, [";
 		for (unsigned i = 0; i<block->valuesCount(); ++i)
@@ -664,7 +678,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionTimer(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"timer.period[0] = "+ toWstring(block->getValue(0)) + L"\n";
 		return text;
@@ -673,7 +687,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		for(unsigned i=0; i<block->valuesCount(); ++i)
 		{
 			switch (block->getValue(i))

@@ -72,6 +72,7 @@ namespace Aseba { namespace ThymioVPL
 		void removeBlock(Block* block);
 		
 		bool isAnyAdvancedFeature() const;
+		bool hasSetStateAction() const;
 		bool isEmpty() const; 
 		
 		void setAdvanced(bool advanced);

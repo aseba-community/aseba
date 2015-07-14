@@ -79,6 +79,9 @@ namespace Aseba { namespace ThymioVPL
 			
 		protected:
 			void initEventToCodePosMap();
+			std::wstring indentText() const;
+			
+			void visitEndOfLine(unsigned currentBlock);
 			
 			void visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			
@@ -110,6 +113,7 @@ namespace Aseba { namespace ThymioVPL
 			bool useTimer;
 			bool useMicrophone;
 			bool useAccAngle;
+			bool inWhenBlock;
 			bool inIfBlock;
 		};
 		
