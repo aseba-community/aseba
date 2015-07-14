@@ -422,7 +422,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			// check sp
 			#ifdef ASEBA_ASSERT
 			if (vm->sp < 1)
-				AsebaAssert(vm, ASEBA_ASSERT_STACK_OVERFLOW);
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
 			// evaluate condition
