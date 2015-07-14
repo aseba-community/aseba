@@ -722,8 +722,12 @@ namespace Aseba { namespace ThymioVPL
 		if (!scene->isEmpty())
 			showAtSavedPosition();
 		
-		loading = false;
 		clearUndo();
+		
+		loading = false;
+		
+		// once loaded, process the result of compilation
+		processCompilationResult();
 	}
 	
 	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
@@ -845,6 +849,7 @@ namespace Aseba { namespace ThymioVPL
 		if (!isVisible() && !loading)
 		{
 			clearSceneWithoutRecompilation();
+			processCompilationResult();
 		}
 	}
 	
@@ -932,6 +937,9 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::processCompilationResult()
 	{
+		if (loading)
+			return;
+		
 		const Compiler::CompilationResult compilation(scene->compilationResult());
 		compilationResult->setText(compilation.getMessage(scene->getAdvanced()));
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
@@ -978,7 +986,6 @@ namespace Aseba { namespace ThymioVPL
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
-		
 	}
 	
 	void ThymioVisualProgramming::processHighlightChange()
