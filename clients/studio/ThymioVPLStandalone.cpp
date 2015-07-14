@@ -234,7 +234,7 @@ namespace Aseba
 		else
 			setOrientation(Qt::Horizontal);
 		QSplitter::resizeEvent(event);
-		resetSizes();
+		//resetSizes();
 	}
 	
 	void ThymioVPLStandalone::resetSizes()
