@@ -238,8 +238,9 @@ namespace Aseba { namespace ThymioVPL
 				abort();
 			}
 			
+			// FIXME: do this in a second pass, once we have written all the code for this event, and only if the state is actually assigned
 			// if in advanced mode, copy setting of state
-			if (eventActionsSet.hasSetStateAction())
+			if (eventActionsSet.isAdvanced())
 			{
 				generatedCode.push_back(
 					L"\n\tcall math.copy(state, new_state)"
