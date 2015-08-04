@@ -849,7 +849,6 @@ namespace Aseba { namespace ThymioVPL
 		if (!isVisible() && !loading)
 		{
 			clearSceneWithoutRecompilation();
-			processCompilationResult();
 		}
 	}
 	
