@@ -115,6 +115,7 @@ namespace Aseba { namespace ThymioVPL
 			text += L"var notes[6]\n";
 			text += L"var durations[6]\n";
 			text += L"var note_index = 6\n";
+			text += L"var note_count = 6\n";
 			text += L"var wave[142]\n";
 			text += L"var i\n";
 			text += L"var wave_phase\n";
@@ -153,7 +154,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			text += L"\n# when a note is finished, play the next note\n";
 			text += L"onevent sound.finished\n";
-			text += L"\tif note_index != 6 then\n";
+			text += L"\tif note_index != note_count then\n";
 			text += L"\t\tcall sound.freq(notes[note_index], durations[note_index])\n";
 			text += L"\t\tnote_index += 1\n";
 			text += L"\tend\n";
@@ -642,37 +643,76 @@ namespace Aseba { namespace ThymioVPL
 	
 	wstring Compiler::CodeGenerator::visitActionSound(const Block* block)
 	{
-		static const int noteTable[5] = { 262, 311, 370, 440, 524 };
-		static const int durationTable[3] = {-1, 8, 15};
+		static const int noteTable[6] = { 262, 311, 370, 440, 524, 0 };
+		static const int durationTable[3] = {-1, 7, 14};
 		
-		useSound = true;
-		wstring text;
-		const wstring indString(indentText());
-		text += indString;
-		text += L"call math.copy(notes, [";
-		for (unsigned i = 0; i<block->valuesCount(); ++i)
+		// find last non-silent note
+		unsigned noteCount(block->valuesCount());
+		assert(noteCount > 0);
+		while ((noteCount > 0) && ((block->getValue(noteCount-1) & 0xff) == 5))
+			--noteCount;
+		
+		// if there is no note, return
+		if (noteCount == 0)
+			return indentText() + L"# zero notes in sound block\n";
+		
+		// generate code for notes
+		wstring notesCopyText;
+		wstring durationsCopyText;
+		unsigned accumulatedDuration(0);
+		unsigned activeNoteCount(0);
+		for (unsigned i = 0; i<noteCount; ++i)
 		{
 			const unsigned note(block->getValue(i) & 0xff);
-			text += toWstring(noteTable[note]);
-			if (i+1 != block->valuesCount())
-				text += L", ";
-		}
-		text += L"])\n";
-		text += indString;
-		// durations
-		text += L"call math.copy(durations, [";
-		for (unsigned i = 0; i<block->valuesCount(); ++i)
-		{
 			const unsigned duration((block->getValue(i)>>8) & 0xff);
-			text += toWstring(durationTable[duration]);
-			if (i+1 != block->valuesCount())
-				text += L", ";
+			
+			if (note == 5 && i+1 < noteCount && (block->getValue(i+1) & 0xff) == 5)
+			{
+				// next note is silence, skip
+				accumulatedDuration += durationTable[duration];
+			}
+			else
+			{
+				notesCopyText += toWstring(noteTable[note]);
+				if (i+1 != noteCount)
+					notesCopyText += L", ";
+				durationsCopyText += toWstring(durationTable[duration]+accumulatedDuration);
+				if (i+1 != noteCount)
+					durationsCopyText += L", ";
+				++activeNoteCount;
+				accumulatedDuration = 0;
+			}
 		}
-		text += L"])\n";
+		
+		// enable sound
+		useSound = true;
+		
+		// prepare target string
+		wstring text;
+		const wstring indString(indentText());
+		// notes
 		text += indString;
-		text += L"call sound.freq(notes[0], durations[0])\n";
+		text += L"call math.copy(notes[0:";
+		text += toWstring(activeNoteCount-1);
+		text += L"], [";
+		text += notesCopyText;
+		text += L"])\n";
+		// durations
+		text += indString;
+		text += L"call math.copy(durations[0:";
+		text += toWstring(activeNoteCount-1);
+		text += L"], [";
+		text += durationsCopyText;
+		text += L"])\n";
+		// write variables
 		text += indString;
 		text += L"note_index = 1\n";
+		text += indString;
+		text += L"note_count = " + toWstring(activeNoteCount) + L"\n";
+		// start playing
+		text += indString;
+		text += L"call sound.freq(notes[0], durations[0])\n";
+		
 		return text;
 	}
 	

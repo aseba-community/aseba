@@ -290,8 +290,21 @@ namespace Aseba { namespace ThymioVPL
 			if (ok)
 			{
 				const unsigned& note(notes[noteIdx]);
-				if (note == noteVal)
-					setDuration(noteIdx, (durations[noteIdx] % 2) + 1);
+				if (note == 5)
+				{
+					setDuration(noteIdx, 1);
+					setNote(noteIdx, noteVal);
+				}
+				else if (note == noteVal)
+				{
+					if (durations[noteIdx] == 2)
+					{
+						setDuration(noteIdx, 2);
+						setNote(noteIdx, 5);
+					}
+					else
+						setDuration(noteIdx, (durations[noteIdx] % 2) + 1);
+				}
 				else
 					setNote(noteIdx, noteVal);
 				
