@@ -58,7 +58,7 @@ namespace Aseba
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Firmware Upgrader"));
-		
+        setWindowIcon(QIcon(":/images/thymioupgrader.svgz"));
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
 		QHBoxLayout *imageLayout = new QHBoxLayout();
