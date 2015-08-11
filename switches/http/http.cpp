@@ -1057,13 +1057,13 @@ namespace Aseba
         for (StreamResponseQueueMap::iterator m = pendingResponses.begin();
              m != pendingResponses.end(); m++)
         {
-            if (verbose)
+            /*if (verbose)
             {
                 cerr << m->first << " sendAvailableResponses " << m->second.size() << " in queue";
                 for (ResponseQueue::iterator qi = m->second.begin(); qi != m->second.end(); qi++)
                     cerr << " " << *qi;
                 cerr << endl;
-            }
+            }*/
             bool close_this_stream = false;
             ResponseQueue* q = &(m->second);
             
@@ -1090,8 +1090,8 @@ namespace Aseba
                     q->pop_front();
                 }
             }
-            if (verbose)
-                cerr << m->first << " available responses sent, now " << m->second.size() << " in queue" << endl;
+            /*if (verbose)
+                cerr << m->first << " available responses sent, now " << m->second.size() << " in queue" << endl;*/
             
             if (close_this_stream)
                 streamsToShutdown.insert(m->first);
