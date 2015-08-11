@@ -93,7 +93,7 @@ namespace Aseba
         virtual void evLoad(HttpRequest* req, strings& args);
         virtual void evReset(HttpRequest* req, strings& args);
         virtual void aeslLoadFile(const std::string& filename);
-        virtual void aeslLoadMemory(const char* buffer, const int size);
+        virtual std::string aeslLoadMemory(const char* buffer, const int size);
         virtual void updateVariables(const std::string nodeName);
         
         virtual void scheduleResponse(Dashel::Stream* stream, HttpRequest* req);
@@ -115,14 +115,14 @@ namespace Aseba
         virtual void sendSetVariable(const std::string nodeName, const strings& args);
         virtual std::pair<unsigned,unsigned> sendGetVariables(const std::string nodeName, const strings& args);
         virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
-        virtual void aeslLoad(xmlDoc* doc);
+        virtual std::string aeslLoad(xmlDoc* doc);
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
         virtual void routeRequest(HttpRequest* req);
         
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
-        bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
+        std::string compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
         virtual void parse_json_form(std::string content, strings& values);
 
     };

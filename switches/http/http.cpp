@@ -614,14 +614,24 @@ namespace Aseba
     
     void HttpInterface::evLoad(HttpRequest* req, strings& args)
     {
+        bool shouldReturnErrors = false;
+
         if (verbose)
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
-        size_t pos = req->content.find("file=");
+
+        size_t pos = req->content.find("verbose=true");
         if (pos != std::string::npos)
         {
-            aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
-            finishResponse(req, 200, "");
+            shouldReturnErrors = true;
+            cerr << " --> verbose flag on" << endl;
+        }
+
+        pos = req->content.find("file=");
+        if (pos != std::string::npos)
+        {
+            std::string err = aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
+            finishResponse(req, 200, shouldReturnErrors ? err : "");
         }
         else
             finishResponse(req, 400, "");
@@ -828,26 +838,31 @@ namespace Aseba
         xmlCleanupParser();
     }
     
-    // Load Aesl file from memory
-    void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
+    // Load Aesl file from memory and return compilation error message, if any
+    std::string HttpInterface::aeslLoadMemory(const char * buffer, const int size)
     {
+        std::string ret = "";
+
         // open document
         xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
         if (!doc)
             wcerr << "cannot read XML from memory " << buffer << endl;
         else
         {
-            aeslLoad(doc);
+            ret = aeslLoad(doc);
             //if (verbose)
             cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
+        return ret;
     }
     
     // Parse Aesl program using XPath
-    void HttpInterface::aeslLoad(xmlDoc* doc)
+    std::string HttpInterface::aeslLoad(xmlDoc* doc)
     {
+        std::string ret;
+
         // clear existing data
         commonDefinitions.events.clear();
         commonDefinitions.constants.clear();
@@ -935,10 +950,12 @@ namespace Aseba
                     unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
                     bool ok;
                     unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-                    if (ok)
-                        wasError = !compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name);
-                    else
+                    if (ok){
+                        ret = compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name);
+                        wasError = !ret.empty();
+                    }else{
                         noNodeCount++;
+                    }
                 }
                 // free attribute and content
                 xmlFree(name);     // nop if name is NULL
@@ -965,10 +982,12 @@ namespace Aseba
         {
             wcerr << noNodeCount << " scripts have no corresponding nodes in the current network and have not been loaded." << endl;
         }
+
+        return ret;
     }
     
-    // Upload bytecode to node
-    bool HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
+    // Upload bytecode to node, return "" upon success, the compilation error upon error
+    std::string HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
     {
         // compile code
         std::wistringstream is(source);
@@ -991,12 +1010,13 @@ namespace Aseba
             asebaStream->flush();
             // retrieve user-defined variables for use in get/set
             allVariables[nodeName] = *compiler.getVariablesMap();
-            return true;
+            return "";
         }
         else
         {
-            wcerr << "compilation for node " << UTF8ToWString(nodeName) << " failed: " << error.toWString() << endl;
-            return false;
+            std::wstring wide_err = error.toWString();
+            wcerr << "compilation for node " << UTF8ToWString(nodeName) << " failed: " << wide_err << endl;
+            return std::string(wide_err.begin(), wide_err.end());
         }
     }
     
