@@ -134,13 +134,13 @@ namespace Aseba
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port, const int iterations) :
+    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port, const int iterations, bool verbose) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStream(0),
     httpStream(0),
     nodeId(0),
     nodeDescriptionComplete(false),
-    verbose(false),
+    verbose(verbose),
     iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
