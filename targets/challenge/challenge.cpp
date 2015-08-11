@@ -1180,6 +1180,7 @@ int main(int argc, char *argv[])
 	
 	// Show and run
 	viewer.setWindowTitle("ASEBA Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowIcon(QIcon(":/textures/asebachallenge.svgz"));
 	viewer.show();
 	
 	return app.exec();
