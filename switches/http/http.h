@@ -91,7 +91,8 @@ namespace Aseba
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);
         virtual void evSubscribe(HttpRequest* req, strings& args);
         virtual void evLoad(HttpRequest* req, strings& args);
-        virtual void evReset(HttpRequest* req, strings& args);
+        virtual void evResetAll(HttpRequest* req, strings& args, bool rerun);
+        virtual void evReset(HttpRequest* req, strings& args, bool rerun);
         virtual void aeslLoadFile(const std::string& filename);
         virtual void aeslLoadMemory(const char* buffer, const int size);
         virtual void updateVariables(const std::string nodeName);
@@ -123,6 +124,7 @@ namespace Aseba
         // helper functions
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
         bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
+        bool resetNode(const std::string& nodeName, bool rerun = true);
         virtual void parse_json_form(std::string content, strings& values);
 
     };
