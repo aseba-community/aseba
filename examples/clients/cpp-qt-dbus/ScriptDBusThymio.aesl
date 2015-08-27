@@ -1,0 +1,44 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="0" name="Falling"/>
+<event size="0" name="Stop"/>
+<event size="7" name="ObstacleDetected"/>
+<event size="1" name="lala"/>
+<event size="1" name="PlaySound"/>
+
+
+<!--list of constants-->
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node thymio-II-->
+<node nodeId="1" name="thymio-II">var sum
+
+onevent prox
+	call math.dot(sum, prox.horizontal,[1,1,1,1,1,1,1],0)
+	#if prox.horizontal[2] > 2000 then
+	if sum >0 then
+		emit ObstacleDetected prox.horizontal
+	end
+	
+onevent acc
+	if acc[2]&lt;15 then
+		emit Falling
+	end
+	
+onevent Stop
+	motor.left.target = 0
+	motor.right.target = 0
+	
+onevent PlaySound
+	call sound.system(event.args[0])	
+</node>
+
+
+</network>
