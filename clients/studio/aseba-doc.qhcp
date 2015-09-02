@@ -16,12 +16,6 @@
 	</assistant>
 
 	<docFiles>
-		<generate>
-			<file>
-				<input>aseba-doc.qhp</input>
-				<output>aseba-doc.qch</output>
-			</file>
-		</generate>
 		<register>
 			<file>aseba-doc.qch</file>
 		</register>
