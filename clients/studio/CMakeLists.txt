@@ -58,11 +58,17 @@ if (QT4_FOUND)
 	# generates the documentation
 	if (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message("-- qcollectiongenerator executable found")
+		set(QT_QHELPGENERATOR_DIRECTORY get_filename_component(${QT_QCOLLECTIONGENERATOR_EXECUTABLE} DIRECTORY))
+		set(QT_QHELPGENERATOR_EXT get_filename_component(${QT_QCOLLECTIONGENERATOR_EXECUTABLE} EXT))
+		set(QT_QHELPGENERATOR_EXECUTABLE "${QT_QCOLLECTIONGENERATOR_DIRECTORY}qhelpgenerator${QT_QCOLLECTIONGENERATOR_EXT}")
 		add_custom_command(
-			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch
+			OUTPUT ${DOC_NAME}.qch
+			COMMAND ${QT_QHELPGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp -o ${CMAKE_CURRENT_BINARY_DIR}/${DOC_NAME}.qch
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+		add_custom_command(
+			OUTPUT ${DOC_NAME}.qhc
 			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${DOC_NAME}.qhcp -o ${DOC_NAME}.qhc
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+			DEPENDS ${DOC_NAME}.qhcp ${DOC_NAME}.qch)
 	else (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 		message(WARNING "-- Qt help support missing, studio online help disabled (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
@@ -124,7 +130,8 @@ if (QT4_FOUND)
 		)
 
 		if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-			qt4_add_resources(resfiles asebastudiohelp.qrc)
+			file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/asebastudiohelp.qrc ${CMAKE_CURRENT_SOURCE_DIR}/aseba-doc.qhcp DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+			qt4_add_resources(resfiles ${CMAKE_CURRENT_BINARY_DIR}/asebastudiohelp.qrc)
 		endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
 		add_executable(asebastudio WIN32 ${studio_SRCS} ${studio_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
