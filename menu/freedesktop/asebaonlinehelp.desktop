@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Link
+Name=Online Help
+Name[fr]=Aide en ligne
+Name[de]=Hilfedatei
+Name[es]=Ayuda en línea
+Name[it]=L'aiuto in linea
+Name[pt]=ajuda on-line (Inglês)
+URL=http://www.thymio.org/en:start
+URL[fr]=http://www.thymio.org/fr:start
+URL[de]=http://www.thymio.org/de:start
+URL[es]=http://www.thymio.org/es:start
+URL[it]=http://www.thymio.org/it:start
+URL[pt]=http://www.thymio.org/en:start
+Categories=Education;Science;Aseba
+Icon=asebahelp

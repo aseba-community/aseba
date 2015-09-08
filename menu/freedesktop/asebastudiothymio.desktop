@@ -15,4 +15,4 @@ GenericName[pt]=Ambiente de desenvolvimento integrado
 Exec=asebastudio "ser:name=Thymio-II" -ar
 TryExec=asebastudio
 Categories=Education;Science
-Icon=asebathymio
+Icon=asebastudiothymio
