@@ -118,7 +118,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/asebatest
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-test-natives-count
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/asebashell
-rm -rf ${RPM_BUILD_ROOT}%{_bindir}/qt-gui
+rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-qt-gui
+rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-qt-dbus
 
 cd examples
 make clean
