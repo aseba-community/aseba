@@ -9,5 +9,5 @@ GenericName[es]=Ambiente de desarrollo integrado
 GenericName[pt]=Ambiente de desenvolvimento integrado
 Exec=asebastudio
 TryExec=asebastudio
-Categories=Education;Science
+Categories=Education;Science;
 Icon=asebastudio

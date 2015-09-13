@@ -1,16 +1,12 @@
 [Desktop Entry]
-Type=Link
+Type=Application
 Name=Aseba Online Help
 Name[fr]=Aide en ligne Aseba
 Name[de]=Aseba Hilfedatei
 Name[es]=Ayuda en línea Aseba
 Name[it]=L'aiuto in linea Aseba
 Name[pt]=ajuda on-line Aseba (Inglês)
-URL=http://www.thymio.org/en:start
-URL[fr]=http://www.thymio.org/fr:start
-URL[de]=http://www.thymio.org/de:start
-URL[es]=http://www.thymio.org/es:start
-URL[it]=http://www.thymio.org/it:start
-URL[pt]=http://www.thymio.org/en:start
-Categories=Education;Science;Aseba
+Exec=xdg-open http://www.thymio.org/en:start
+TryExec=xdg-open
+Categories=Education;Science;
 Icon=asebahelp
