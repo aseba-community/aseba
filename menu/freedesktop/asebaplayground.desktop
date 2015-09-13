@@ -9,5 +9,5 @@ GenericName[es]=Aseba simulador de robot para jugar en solitario
 GenericName[pt]=Aseba simulador de robô para jogar sozinho
 Exec=asebaplayground
 TryExec=asebaplayground
-Categories=Education;Science;Aseba
+Categories=Education;Science;
 Icon=asebaplayground

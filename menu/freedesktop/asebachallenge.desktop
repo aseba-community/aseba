@@ -9,5 +9,5 @@ GenericName[es]=Aseba simulador de robot para jugar en la red
 GenericName[pt]=Aseba simulador de robô para jogar em rede
 Exec=asebachallenge
 TryExec=asebachallenge
-Categories=Education;Science;Aseba;
+Categories=Education;Science;
 Icon=asebachallenge

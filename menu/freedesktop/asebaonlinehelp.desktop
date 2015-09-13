@@ -8,5 +8,5 @@ Name[it]=L'aiuto in linea Aseba
 Name[pt]=ajuda on-line Aseba (Inglês)
 Exec=xdg-open http://www.thymio.org/en:start
 TryExec=xdg-open
-Categories=Education;Science;Aseba;
+Categories=Education;Science;
 Icon=asebahelp
