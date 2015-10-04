@@ -134,32 +134,54 @@ namespace Aseba
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port, const int iterations) :
+    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const int iterations) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
-    asebaStream(0),
+    asebaStreams(),
     httpStream(0),
     nodeId(0),
     nodeDescriptionComplete(false),
-    verbose(false),
+    verbose(true),
     iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
-        // connect to the Aseba target
-        std::cout << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
-        connect(asebaTarget); // triggers connectionCreated, which assigns asebaStream
-        
-        // request a description for aseba target
-        broadcastGetDescription();
-        
         // listen for incoming HTTP requests
         httpStream = connect("tcpin:port=" + http_port);
+
+        // connect to each Aseba target
+        for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
+        {
+            try {
+                std::cout << "HttpInterface connect asebaTarget " << *it << "\n";
+                if (Dashel::Stream *cxn = connect(*it)) // triggers connectionCreated
+                {
+                    asebaStreams[cxn] = 0; // no node id until description is received
+                    Dashel::ParameterSet parser;
+                    parser.add("dummy:remapLocal=0;remapTarget=0");
+                    parser.add((*it).c_str());
+                    const int idLocal(parser.get<int>("remapLocal"));
+                    const int idTarget(parser.get<int>("remapTarget"));
+                    if (idLocal > 0)
+                        idSubstitutions[cxn][idLocal] = idTarget;
+                }
+            }
+            catch(Dashel::DashelException e)
+            {
+                std::cout << "HttpInterface can't connect target " << *it << ": " << e.what() << std::endl;
+            }
+        }
+      
+        // request a description for aseba target
+        broadcastGetDescription();
     }
     
     void HttpInterface::broadcastGetDescription()
     {
         GetDescription getDescription;
-        getDescription.serialize(asebaStream);
-        asebaStream->flush();
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
+        {
+            getDescription.serialize(it->first);
+            it->first->flush();
+        }
     }
     
     void HttpInterface::run()
@@ -171,13 +193,13 @@ namespace Aseba
             if (verbose && streamsToShutdown.size() > 0)
             {
                 cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
-                for (std::set<Dashel::Stream*>::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
                     cerr << " " << *si;
                 cerr << endl;
             }
             if (!streamsToShutdown.empty())
             {
-                std::set<Dashel::Stream*>::iterator i = streamsToShutdown.begin();
+                StreamSet::iterator i = streamsToShutdown.begin();
                 Dashel::Stream* stream_to_shutdown = *i;
                 streamsToShutdown.erase(*i); // invalidates iterator
                 try
@@ -189,43 +211,36 @@ namespace Aseba
                 catch(Dashel::DashelException& e)
                 { }
             }
-        } while (iterations-- != 0 and asebaStream != 0);
+        } while (iterations-- != 0 and asebaStreams.size() != 0);
         for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
             unscheduleAllResponses(i->first);
     }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {
-        if (!asebaStream)
-        {
-            // this is the connection to the Thymio-II
-            std::cout << "Incoming Aseba connection from " << stream->getTargetName() << endl;
-            asebaStream = stream;
-        }
-        else
-        {
-            // this is an incoming HTTP connection
-            if (verbose)
-                cerr << stream << " Connection created to " << stream->getTargetName() << endl;
-            
-            assert( pendingResponses[stream].empty() );
-        }
+        std::cout << stream << " Incoming connection from " << stream->getTargetName() << endl;
+        // assert( pendingResponses[stream].empty() );
     }
     
     void HttpInterface::connectionClosed(Stream * stream, bool abnormal)
     {
-        if (stream == asebaStream)
+        if (asebaStreams.count(stream) != 0) // this is a dashel target
         {
-            // first close all HTTP connections
+            // first close all HTTP connections to this target
             for (StreamResponseQueueMap::iterator m = pendingResponses.begin(); m != pendingResponses.end(); m++)
-                closeStream(m->first);
-            // then stop the hub
-            asebaStream = 0;
+                if (m->first == stream)
+                    closeStream(m->first);
+            // then remove this stream
+            asebaStreams.erase(stream);
             if (verbose)
-                cerr << "Connection closed to Aseba target" << endl;
-            stop();
+                cerr << "Connection closed to Aseba target " << stream->getTargetName() << endl;
+            if (asebaStreams.size() == 0)
+            {
+                cerr << "Last dashel connection closed, stopping hub" << endl;
+                stop();
+            }
         }
-        else
+        else                                 // this is the HTTP stream
         {
             if (verbose)
                 cerr << stream << " Connection closed to " << stream->getTargetName() << endl;
@@ -240,9 +255,9 @@ namespace Aseba
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
-            wcerr << this << L"Received description for " << getNodeName(nodeId) << endl;
+            wcerr << this << L"Received description for node " << nodeId << " " << getNodeName(nodeId) << endl;
         if (!nodeId) return;
-        this->nodeId = nodeId;
+//        this->nodeId = nodeId;
         nodeDescriptionComplete = true;
     }
     
@@ -256,16 +271,28 @@ namespace Aseba
     
     void HttpInterface::incomingData(Stream *stream)
     {
-        if (stream == asebaStream) {
+        if (asebaStreams.count(stream) != 0) // this is a dashel target
+        {
             // incoming Aseba message
             if (verbose)
                 cerr << "incoming for asebaStream " << stream << endl;
             
             Message *message(Message::receive(stream));
             
-            // pass message to description manager, which builds
-            // the node descriptions in background
+            // pass message to description manager, which builds the node descriptions in background
+            // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
             DescriptionsManager::processMessage(message);
+            
+            // if description, record the stream -- node id correspondence
+            const Description *description = dynamic_cast<const Description *>(message);
+            if (description)
+            {
+                asebaStreams[stream] = message->source;
+                // patch id substitutions
+                for (NodeIdSubstitution::iterator it = idSubstitutions[stream].begin(); it != idSubstitutions[stream].end(); ++it)
+                    if (it->second == 0)
+                        it->second = message->source;
+            }
             
             // if variables, check for pending requests
             const Variables *variables(dynamic_cast<Variables *>(message));
@@ -277,9 +304,26 @@ namespace Aseba
             if (userMsg)
                 incomingUserMsg(userMsg);
             
+            // act like asebaswitch: rebroadcast this message to the other streams
+            for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); ++it)
+            {
+                Stream* outStream = it->first;
+                if (outStream == stream)
+                    continue; // don't echo!
+                try
+                {
+                    message->serialize(outStream);
+                    outStream->flush();
+                }
+                catch (DashelException e)
+                {
+                    std::cerr << "error while writing to stream " << outStream << std::endl;
+                }
+            }
+            
             delete message;
         }
-        else
+        else                                 // this is the HTTP stream
         {
             // incoming HTTP request
             if (verbose)
@@ -437,7 +481,7 @@ namespace Aseba
         bool do_one_node(args.size() > 0);
         
         std::stringstream json;
-        json << (do_one_node ? "" : "[");
+        json << (do_one_node ? "" : "["); // hack, should first select list of matching nodes, then check size
         
         for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
              descIt != nodesDescriptions.end(); ++descIt)
@@ -445,11 +489,24 @@ namespace Aseba
             const NodeDescription& description(descIt->second);
             string nodeName = WStringToUTF8(description.name);
             
-            json << "{";
-            json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
-            
-            if (do_one_node)
+            if (! do_one_node)
             {
+                json << (descIt == nodesDescriptions.begin() ? "" : ",");
+                json << "{";
+                json << "\"node\":\"" << descIt->first << "\",";
+                json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
+                json << "}";
+            }
+            else // (do_one_node)
+            {
+                if (! (descIt->first == atoi(args[0].c_str()) ||
+                       nodeName.find(args[0])==0) )
+                    continue; // this is not a match, skip to next candidate
+
+                json << "{"; // begin node
+                json << "\"node\":\"" << descIt->first << "\",";
+                json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
+
                 json << ",\"bytecodeSize\":" << description.bytecodeSize;
                 json << ",\"variablesSize\":" <<description.variablesSize;
                 json << ",\"stackSize\":" << description.stackSize;
@@ -457,7 +514,7 @@ namespace Aseba
                 // named variables
                 json << ",\"namedVariables\":{";
                 bool seen_named_variables = false;
-                for (NodeNameVariablesMap::const_iterator n(allVariables.find(nodeName));
+                for (NodeIdVariablesMap::const_iterator n(allVariables.find(descIt->first));
                      n != allVariables.end(); ++n)
                 {
                     VariablesMap vm = n->second;
@@ -504,11 +561,15 @@ namespace Aseba
                     << "\"" << WStringToUTF8(commonDefinitions.events[i].name) << "\":"
                     << commonDefinitions.events[i].value;
                 json << "}";
+
+                json << "}"; // end node
+                break; // only show first matching node :-(
             }
-            json << "}";
         }
         
         json <<(do_one_node ? "" : "]");
+        if (json.str().size() == 0)
+            json << "[]";
         finishResponse(req,200,json.str());
     }
     
@@ -516,77 +577,81 @@ namespace Aseba
     
     void HttpInterface::evVariableOrEvent(HttpRequest* req, strings& args)
     {
-        string nodeName(args[0]);
+        std::vector<unsigned> todo = getIdsFromArgs(args);
         size_t eventPos;
         
-        if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
+        for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
         {
-            // this is a variable
-            if (req->method.find("POST") == 0 || args.size() >= 3)
+            unsigned nodeId = *it;
+            if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
             {
-                // set variable value
-                strings values;
-                if (args.size() >= 3)
-                    values.assign(args.begin()+1, args.end());
+                // this is a variable
+                if (req->method.find("POST") == 0 || args.size() >= 3)
+                {
+                    // set variable value
+                    strings values;
+                    if (args.size() >= 3)
+                        values.assign(args.begin()+1, args.end());
+                    else
+                    {
+                        // Parse POST form data
+                        values.push_back(args[1]);
+                        parse_json_form(req->content, values);
+                    }
+                    if (values.size() == 0)
+                    {
+                        finishResponse(req, 404, "");
+                        if (verbose)
+                            cerr << req << " evVariableOrEevent 404 can't set variable " << args[0] << ", no values" <<  endl;
+                        continue;
+                    }
+                    sendSetVariable(nodeId, values);
+                    finishResponse(req, 200, "");
+                    if (verbose)
+                        cerr << req << " evVariableOrEevent 200 set variable " << values[0] <<  endl;
+                }
                 else
                 {
-                    // Parse POST form data
-                    values.push_back(args[1]);
-                    parse_json_form(req->content, values);
-                }
-                if (values.size() == 0)
-                {
-                    finishResponse(req, 404, "");
+                    // get variable value
+                    strings values;
+                    values.assign(args.begin()+1, args.begin()+2);
+                    
+                    unsigned start;
+                    if ( ! getVarPos(nodeId, values[0], start))
+                    {
+                        finishResponse(req, 404, "");
+                        if (verbose)
+                            cerr << req << " evVariableOrEevent 404 no such variable " << values[0] <<  endl;
+                        continue;
+                    }
+                    
+                    sendGetVariables(nodeId, values);
+                    pendingVariables[std::make_pair(nodeId,start)].insert(req);
+                    
                     if (verbose)
-                        cerr << req << " evVariableOrEevent 404 can't set variable " << args[0] << ", no values" <<  endl;
-                    return;
+                        cerr << req << " evVariableOrEevent schedule var " << values[0]
+                        << "(" << nodeId << "," << start << ") add " << req << " to subscribers" <<  endl;
+                    continue;
                 }
-                sendSetVariable(nodeName, values);
-                finishResponse(req, 200, "");
-                if (verbose)
-                    cerr << req << " evVariableOrEevent 200 set variable " << values[0] <<  endl;
             }
             else
             {
-                // get variable value
-                strings values;
-                values.assign(args.begin()+1, args.begin()+2);
-                
-                unsigned source, start;
-                if ( ! getNodeAndVarPos(nodeName, values[0], source, start))
+                // this is an event
+                // arguments are args 1..N
+                strings data;
+                data.push_back(args[1]);
+                if (args.size() >= 3)
+                    for (size_t i=2; i<args.size(); ++i)
+                        data.push_back((args[i].c_str()));
+                else if (req->method.find("POST") == 0)
                 {
-                    finishResponse(req, 404, "");
-                    if (verbose)
-                        cerr << req << " evVariableOrEevent 404 no such variable " << values[0] <<  endl;
-                    return;
+                    // Parse POST form data
+                    parse_json_form(std::string(req->content, req->content.size()), data);
                 }
-                
-                sendGetVariables(nodeName, values);
-                pendingVariables[std::make_pair(source,start)].insert(req);
-                
-                if (verbose)
-                    cerr << req << " evVariableOrEevent schedule var " << values[0]
-                    << "(" << source << "," << start << ") add " << req << " to subscribers" <<  endl;
-                return;
+                sendEvent(nodeId, data);
+                finishResponse(req, 200, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
+                continue;
             }
-        }
-        else
-        {
-            // this is an event
-            // arguments are args 1..N
-            strings data;
-            data.push_back(args[1]);
-            if (args.size() >= 3)
-                for (size_t i=2; i<args.size(); ++i)
-                    data.push_back((args[i].c_str()));
-            else if (req->method.find("POST") == 0)
-            {
-                // Parse POST form data
-                parse_json_form(std::string(req->content, req->content.size()), data);
-            }
-            sendEvent(nodeName, data);
-            finishResponse(req, 200, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
-            return;
         }
     }
     
@@ -620,7 +685,9 @@ namespace Aseba
         size_t pos = req->content.find("file=");
         if (pos != std::string::npos)
         {
-            aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
+            std::vector<unsigned> todo = getIdsFromArgs(args);
+            for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
+                aeslLoadMemory(*it, buffer+pos+5, req->content.size()-pos-5);
             finishResponse(req, 200, "");
         }
         else
@@ -640,25 +707,32 @@ namespace Aseba
                 continue;
             string nodeName = WStringToUTF8(descIt->second.name);
             
-            Reset(nodeId).serialize(asebaStream); // reset node
-            asebaStream->flush();
-            Run(nodeId).serialize(asebaStream);   // re-run node
-            asebaStream->flush();
-            if (nodeName.find("thymio-II") == 0)
+            for (StreamNodeIdMap::iterator it=asebaStreams.begin(); it!=asebaStreams.end(); ++it)
             {
-                strings args;
-                args.push_back("motor.left.target");
-                args.push_back("0");
-                sendSetVariable(nodeName, args);
-                args[0] = "motor.right.target";
-                sendSetVariable(nodeName, args);
-            }
-            size_t eventPos;
-            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
-            {
-                strings data;
-                data.push_back("reset");
-                sendEvent(nodeName,data);
+                Dashel::Stream* stream = it->first;
+                unsigned nodeId = it->second;
+                Reset(nodeId).serialize(stream); // reset node
+                stream->flush();
+                Run(nodeId).serialize(stream);   // re-run node
+                stream->flush();
+                if (descIt->second.name.find(L"thymio-II") == 0)
+                {   // Special case for Thymio-II. Should we instead just check whether motor.*.target exists?
+                    strings args;
+                    args.push_back("motor.left.target");
+                    args.push_back("0");
+                    sendSetVariable(nodeId, args);
+                    args[0] = "motor.right.target";
+                    sendSetVariable(nodeId, args);
+                }
+                size_t eventPos;
+                if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
+                {
+                    // bug: assumes AESL file is common to all nodes
+                    // can we get this from the node description?
+                    strings data;
+                    data.push_back("reset");
+                    sendEvent(nodeId,data);
+                }
             }
             
             finishResponse(req, 200, "");
@@ -669,87 +743,83 @@ namespace Aseba
     
     //-- Sending messages on the Aseba bus -------------------------------------------------
     
-    void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
+    void HttpInterface::sendEvent(const unsigned nodeId, const strings& args)
     {
         size_t eventPos;
-        
+
+        // bug: assumes AESL file is common to all nodes
+        // can we get this from the node description?
         if (commonDefinitions.events.contains(UTF8ToWString(args[0]), &eventPos))
         {
+            Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
+            
             // build event and emit
             UserMessage::DataVector data;
             for (size_t i=1; i<args.size(); ++i)
                 data.push_back(atoi(args[i].c_str()));
             UserMessage userMessage(eventPos, data);
-            userMessage.serialize(asebaStream);
-            asebaStream->flush();
+            userMessage.serialize(stream);
+            stream->flush();
         }
         else if (verbose)
-            cerr << "sendEvent " << nodeName << ": no event " << args[0] << endl;
+            cerr << "sendEvent node id " << nodeId << ": no event " << args[0] << endl;
     }
     
-    std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const std::string nodeName, const strings& args)
+    std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const unsigned nodeId, const strings& args)
     {
-        unsigned nodePos, varPos;
+        unsigned varPos;
+        Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
         for (strings::const_iterator it(args.begin()); it != args.end(); ++it)
         {
             // get node id, variable position and length
             if (verbose)
-                cerr << "getVariables " << nodeName << " " << *it;
-            const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
+                cerr << "getVariables node id " << nodeId << " " << *it;
+            const bool exists(getVarPos(nodeId, *it, varPos));
             if (!exists)
                 continue;
             
-            VariablesMap vm = allVariables[nodeName];
+            VariablesMap vm = allVariables[nodeId];
             const unsigned length(vm[UTF8ToWString(*it)].second);
             
             if (verbose)
-                cerr << " (" << nodePos << "," << varPos << "):" << length << "\n";
+                cerr << " (" << nodeId << "," << varPos << "):" << length << "\n";
             // send the message
-            GetVariables getVariables(nodePos, varPos, length);
-            getVariables.serialize(asebaStream);
+            GetVariables getVariables(nodeId, varPos, length);
+            getVariables.serialize(stream);
         }
-        asebaStream->flush();
-        return std::pair<unsigned,unsigned>(nodePos,varPos); // just last one
+        stream->flush();
+        return std::pair<unsigned,unsigned>(nodeId,varPos); // just last one
     }
     
-    void HttpInterface::sendSetVariable(const std::string nodeName, const strings& args)
+    void HttpInterface::sendSetVariable(const unsigned nodeId, const strings& args)
     {
         // get node id, variable position and length
         if (verbose)
-            cerr << "setVariables " << nodeName << " " << args[0];
-        unsigned nodePos, varPos;
-        const bool exists(getNodeAndVarPos(nodeName, args[0], nodePos, varPos));
+            cerr << "setVariables " << nodeId << " " << args[0];
+        unsigned varPos;
+        const bool exists(getVarPos(nodeId, args[0], varPos));
         if (!exists)
             return;
         
         if (verbose)
-            cerr << " (" << nodePos << "," << varPos << "):" << args.size()-1 << endl;
+            cerr << " (" << nodeId << "," << varPos << "):" << args.size()-1 << endl;
         // send the message
         SetVariables::VariablesVector data;
+        Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
         for (size_t i=1; i<args.size(); ++i)
             data.push_back(atoi(args[i].c_str()));
-        SetVariables setVariables(nodePos, varPos, data);
-        setVariables.serialize(asebaStream);
-        asebaStream->flush();
+        SetVariables setVariables(nodeId, varPos, data);
+        setVariables.serialize(stream);
+        stream->flush();
     }
     
-    // Utility: find variable address
-    bool HttpInterface::getNodeAndVarPos(const string& nodeName, const string& variableName,
-                                         unsigned& nodeId, unsigned& pos)
+    // Utility: find variable address from node id and variable name
+    bool HttpInterface::getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos)
     {
-        // make sure the node exists
-        bool ok;
-        nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
-        if (!ok)
-        {
-            if (verbose)
-                wcerr << "invalid node name " << UTF8ToWString(nodeName) << endl;
-            return false;
-        }
         pos = unsigned(-1);
         
         // check whether variable is known from a compilation, if so, get position
-        const NodeNameVariablesMap::const_iterator allVarMapIt(allVariables.find(nodeName));
+        const NodeIdVariablesMap::const_iterator allVarMapIt(allVariables.find(nodeId));
         if (allVarMapIt != allVariables.end())
         {
             const VariablesMap& varMap(allVarMapIt->second);
@@ -766,20 +836,20 @@ namespace Aseba
             if (!ok)
             {
                 if (verbose)
-                    wcerr << "no variable " << UTF8ToWString(variableName) << " in node " << UTF8ToWString(nodeName);
+                    wcerr << "no variable " << UTF8ToWString(variableName) << " in node id " << nodeId;
                 return false;
             }
         }
         return true;
     }
-    
+
     // Utility: request update of all variables, used for variable caching
-    void HttpInterface::updateVariables(const std::string nodeName)
+    void HttpInterface::updateVariables(const unsigned nodeId)
     {
         strings all_variables;
-        for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
+        for(VariablesMap::iterator it = allVariables[nodeId].begin(); it != allVariables[nodeId].end(); ++it)
             all_variables.push_back(WStringToUTF8(it->first));
-        sendGetVariables(nodeName, all_variables);
+        sendGetVariables(nodeId, all_variables);
     }
     
     // Utility: extract argument values from JSON request body
@@ -810,9 +880,41 @@ namespace Aseba
         return;
     }
     
+    // Utility: search stream map to find a given node id
+    std::vector<unsigned> HttpInterface::getIdsFromArgs(const strings& args)
+    {
+        std::vector<unsigned> found;
+        // first, look for named nodes
+        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
+             descIt != nodesDescriptions.end(); ++descIt)
+            if (descIt->second.name.find(UTF8ToWString(args[0])) == 0)
+                found.push_back(descIt->first);
+        if (found.size() > 0)
+            return found;
+
+        // otherwise, try to convert to a node id
+        unsigned nodeId;
+        if (istringstream ( args[0] ) >> nodeId)
+            found.push_back(nodeId);
+        return found;
+    }
+    
+    
+    // Utility: search stream map to find a given node id
+    Dashel::Stream* HttpInterface::getStreamFromNodeId(const unsigned nodeId)
+    {
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
+            if (it->second == nodeId)
+                return it->first;
+        // bug: need to raise exception here
+        cerr << "error: can't find stream for node id " << nodeId << endl;
+        return NULL;
+    }
+
+    
     
     // Load Aesl file from file
-    void HttpInterface::aeslLoadFile(const std::string& filename)
+    void HttpInterface::aeslLoadFile(const unsigned nodeId, const std::string& filename)
     {
         // local file or URL
         xmlDoc *doc(xmlReadFile(filename.c_str(), NULL, 0));
@@ -820,7 +922,7 @@ namespace Aseba
             wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
         else
         {
-            aeslLoad(doc);
+            aeslLoad(nodeId, doc);
             //if (verbose)
             cerr << "Loaded aesl script from " << filename.c_str() << "\n";
         }
@@ -829,7 +931,7 @@ namespace Aseba
     }
     
     // Load Aesl file from memory
-    void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
+    void HttpInterface::aeslLoadMemory(const unsigned nodeId, const char * buffer, const int size)
     {
         // open document
         xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
@@ -837,7 +939,7 @@ namespace Aseba
             wcerr << "cannot read XML from memory " << buffer << endl;
         else
         {
-            aeslLoad(doc);
+            aeslLoad(nodeId, doc);
             //if (verbose)
             cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
@@ -846,7 +948,7 @@ namespace Aseba
     }
     
     // Parse Aesl program using XPath
-    void HttpInterface::aeslLoad(xmlDoc* doc)
+    void HttpInterface::aeslLoad(const unsigned nodeId, xmlDoc* doc)
     {
         // clear existing data
         commonDefinitions.events.clear();
@@ -930,15 +1032,22 @@ namespace Aseba
                     wcerr << "missing text in \"node\" entry" << endl;
                 else
                 {
-                    const string _name((const char *)name);
                     // get the identifier of the node and compile the code
-                    unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
-                    bool ok;
-                    unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-                    if (ok)
-                        wasError = !compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name);
-                    else
-                        noNodeCount++;
+                    // this is a mess, we need a clearer policy for deciding which aesl programs go to which nodes
+                    wstring program = UTF8ToWString((const char *)text);
+                    if (nodeId > 0)
+                        wasError = !compileAndSendCode(nodeId, program);
+                    else // nodeId == 0, can happen when aesl file is provided on command line
+                    {
+                        bool ok = (nodeId > 0);
+                        const string _name((const char *)name);
+                        unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
+                        unsigned _nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
+                        if (ok)
+                            wasError = !compileAndSendCode(_nodeId, program);
+                        else
+                            noNodeCount++;
+                    }
                 }
                 // free attribute and content
                 xmlFree(name);     // nop if name is NULL
@@ -968,10 +1077,10 @@ namespace Aseba
     }
     
     // Upload bytecode to node
-    bool HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
+    bool HttpInterface::compileAndSendCode(const unsigned nodeId, const wstring& program)
     {
         // compile code
-        std::wistringstream is(source);
+        std::wistringstream is(program);
         Error error;
         BytecodeVector bytecode;
         unsigned allocatedVariablesCount;
@@ -983,19 +1092,21 @@ namespace Aseba
         
         if (result)
         {
+            Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
+
             // send bytecode
-            sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+            sendBytecode(stream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
             // run node
             Run msg(nodeId);
-            msg.serialize(asebaStream);
-            asebaStream->flush();
+            msg.serialize(stream);
+            stream->flush();
             // retrieve user-defined variables for use in get/set
-            allVariables[nodeName] = *compiler.getVariablesMap();
+            allVariables[nodeId] = *compiler.getVariablesMap();
             return true;
         }
         else
         {
-            wcerr << "compilation for node " << UTF8ToWString(nodeName) << " failed: " << error.toWString() << endl;
+            wcerr << "compilation for node " << getNodeName(nodeId) << " failed: " << error.toWString() << endl;
             return false;
         }
     }

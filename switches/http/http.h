@@ -54,20 +54,27 @@ namespace Aseba
         typedef std::list<HttpRequest*>       ResponseQueue;
         typedef std::set<HttpRequest*>        ResponseSet;
         typedef std::pair<unsigned,unsigned>  VariableAddress;
+        typedef std::map<uint16, uint16>      NodeIdSubstitution;
         typedef std::map<std::string, Aseba::VariablesMap>      NodeNameVariablesMap;
+        typedef std::map<unsigned, Aseba::VariablesMap>         NodeIdVariablesMap;
         typedef std::map<VariableAddress, ResponseSet>          VariableResponseSetMap;
         typedef std::map<Dashel::Stream*, ResponseQueue>        StreamResponseQueueMap;
+        typedef std::map<Dashel::Stream*, HttpRequest>          StreamRequestMap;
         typedef std::map<HttpRequest*, std::set<std::string> >  StreamEventSubscriptionMap;
+        typedef std::map<Dashel::Stream*, unsigned>             StreamNodeIdMap;
+        typedef std::set<Dashel::Stream*>                       StreamSet;
+        typedef std::map<Dashel::Stream*, NodeIdSubstitution>   StreamNodeIdSubstitutionMap;
 
     protected:
         // streams
-        Dashel::Stream* asebaStream;
-        Dashel::Stream* httpStream;
-        StreamResponseQueueMap     pendingResponses;
-        VariableResponseSetMap     pendingVariables;
-        StreamEventSubscriptionMap eventSubscriptions;
-        std::map<Dashel::Stream*, HttpRequest> httpRequests;
-        std::set<Dashel::Stream*>  streamsToShutdown;
+        StreamNodeIdMap             asebaStreams;
+        Dashel::Stream*             httpStream;
+        StreamNodeIdSubstitutionMap idSubstitutions;
+        StreamResponseQueueMap      pendingResponses;
+        VariableResponseSetMap      pendingVariables;
+        StreamEventSubscriptionMap  eventSubscriptions;
+        StreamRequestMap            httpRequests;
+        StreamSet                   streamsToShutdown;
         unsigned nodeId;
         bool nodeDescriptionComplete;
         // debug variables
@@ -76,14 +83,14 @@ namespace Aseba
         
         // Extract definitions from AESL file
         Aseba::CommonDefinitions commonDefinitions;
-        NodeNameVariablesMap allVariables;
+        NodeIdVariablesMap allVariables;
 
         //variable cache
         std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
         
     public:
         //default values needed for unit testing
-        HttpInterface(const std::string& target="tcp:127.0.0.1;port=33333", const std::string& http_port="3000", const int iterations=-1);
+        HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
         virtual void run();
         virtual bool descriptionReceived();
         virtual void broadcastGetDescription();
@@ -92,9 +99,9 @@ namespace Aseba
         virtual void evSubscribe(HttpRequest* req, strings& args);
         virtual void evLoad(HttpRequest* req, strings& args);
         virtual void evReset(HttpRequest* req, strings& args);
-        virtual void aeslLoadFile(const std::string& filename);
-        virtual void aeslLoadMemory(const char* buffer, const int size);
-        virtual void updateVariables(const std::string nodeName);
+        virtual void aeslLoadFile(const unsigned nodeId, const std::string& filename);
+        virtual void aeslLoadMemory(const unsigned nodeId, const char* buffer, const int size);
+        virtual void updateVariables(const unsigned nodeId);
         
         virtual void scheduleResponse(Dashel::Stream* stream, HttpRequest* req);
         virtual void addHeaders(HttpRequest* req, strings& headers);
@@ -111,20 +118,23 @@ namespace Aseba
         virtual void incomingData(Dashel::Stream* stream);
         virtual void nodeDescriptionReceived(unsigned nodeId);
         // specific to http interface
-        virtual void sendEvent(const std::string nodeName, const strings& args);
-        virtual void sendSetVariable(const std::string nodeName, const strings& args);
-        virtual std::pair<unsigned,unsigned> sendGetVariables(const std::string nodeName, const strings& args);
-        virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
-        virtual void aeslLoad(xmlDoc* doc);
+        virtual void sendEvent(const unsigned nodeId, const strings& args);
+        virtual void sendSetVariable(const unsigned nodeId, const strings& args);
+        virtual std::pair<unsigned,unsigned> sendGetVariables(const unsigned nodeId, const strings& args);
+        //virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
+        virtual bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos);
+        virtual void aeslLoad(const unsigned nodeId, xmlDoc* doc);
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
         virtual void routeRequest(HttpRequest* req);
         
         // helper functions
-        bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
-        bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
+        //bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
+//        bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos) const;
+        bool compileAndSendCode(const unsigned nodeId, const std::wstring& program);
         virtual void parse_json_form(std::string content, strings& values);
-
+        std::vector<unsigned> getIdsFromArgs(const strings& args);
+        Dashel::Stream* getStreamFromNodeId(const unsigned nodeId);
     };
     
     class HttpRequest

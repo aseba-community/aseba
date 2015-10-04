@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
     
     std::string http_port = "3000";
     std::string aesl_filename;
-    std::string dashel_target;
+    std::vector<std::string> dashel_target_list;
     bool verbose = false;
     bool dump = false;
     int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
-        
+  
     // process command line
     int argCounter = 1;
     while (argCounter < argc)
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
         else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
             Kiterations = atoi(argv[argCounter++]);
         else if (strncmp(arg, "-", 1) != 0)
-            dashel_target = arg;
+            dashel_target_list.push_back(arg);
     }
     
     // initialize Dashel plugins
@@ -85,18 +85,18 @@ int main(int argc, char *argv[])
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target, http_port, 1000*Kiterations));
+        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, 1000*Kiterations));
         
         for (int i = 0; i < 500; i++)
             network->step(10); // wait for description, variables, etc
         if (aesl_filename.size() > 0)
         {
-            network->aeslLoadFile(aesl_filename);
+            network->aeslLoadFile(0, aesl_filename);
         }
         else
         {
             const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-            network->aeslLoadMemory(failsafe,strlen(failsafe));
+            network->aeslLoadMemory(0, failsafe,strlen(failsafe));
         }
         
         network->run();
