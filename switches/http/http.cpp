@@ -751,8 +751,16 @@ namespace Aseba
         // can we get this from the node description?
         if (commonDefinitions.events.contains(UTF8ToWString(args[0]), &eventPos))
         {
-            Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
-            
+            Dashel::Stream* stream;
+            try {
+                stream = getStreamFromNodeId(nodeId); // may fail
+            }
+            catch(runtime_error(e))
+            {
+                cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+                // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+                return; // hack, should be using exceptions for HTTP errors
+            }
             // build event and emit
             UserMessage::DataVector data;
             for (size_t i=1; i<args.size(); ++i)
@@ -768,7 +776,16 @@ namespace Aseba
     std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const unsigned nodeId, const strings& args)
     {
         unsigned varPos;
-        Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
+        Dashel::Stream* stream;
+        try {
+            stream = getStreamFromNodeId(nodeId); // may fail
+        }
+        catch(runtime_error(e))
+        {
+            cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+            // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+            return std::pair<unsigned,unsigned>(0,0); // hack, should be using exceptions for HTTP errors
+        }
         for (strings::const_iterator it(args.begin()); it != args.end(); ++it)
         {
             // get node id, variable position and length
@@ -805,7 +822,16 @@ namespace Aseba
             cerr << " (" << nodeId << "," << varPos << "):" << args.size()-1 << endl;
         // send the message
         SetVariables::VariablesVector data;
-        Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
+        Dashel::Stream* stream;
+        try {
+            stream = getStreamFromNodeId(nodeId); // may fail
+        }
+        catch(runtime_error(e))
+        {
+            cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+            // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+            return; // hack, should be using exceptions for HTTP errors
+        }
         for (size_t i=1; i<args.size(); ++i)
             data.push_back(atoi(args[i].c_str()));
         SetVariables setVariables(nodeId, varPos, data);
@@ -906,8 +932,8 @@ namespace Aseba
         for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
             if (it->second == nodeId)
                 return it->first;
-        // bug: need to raise exception here
-        cerr << "error: can't find stream for node id " << nodeId << endl;
+        // otherwise, raise exception
+        throw runtime_error(FormatableString("getStreamFromNodeId: can't find stream for node id %0").arg(nodeId));
         return NULL;
     }
 
@@ -1092,7 +1118,16 @@ namespace Aseba
         
         if (result)
         {
-            Dashel::Stream* stream = getStreamFromNodeId(nodeId); // may fail
+            Dashel::Stream* stream;
+            try {
+                stream = getStreamFromNodeId(nodeId); // may fail
+            }
+            catch(runtime_error(e))
+            {
+                cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+                // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+                return false; // hack, should be using exceptions for HTTP errors
+            }
 
             // send bytecode
             sendBytecode(stream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
@@ -1107,6 +1142,7 @@ namespace Aseba
         else
         {
             wcerr << "compilation for node " << getNodeName(nodeId) << " failed: " << error.toWString() << endl;
+            // HTTP response should be 400 BAD REQUEST, response body should be compiler messages
             return false;
         }
     }
