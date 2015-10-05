@@ -138,7 +138,6 @@ namespace Aseba
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStreams(),
     httpStream(0),
-    nodeId(0),
     nodeDescriptionComplete(false),
     verbose(true),
     iterations(iterations)
@@ -255,18 +254,9 @@ namespace Aseba
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
-            wcerr << this << L"Received description for node " << nodeId << " " << getNodeName(nodeId) << endl;
+            wcerr << this << L" Received description for node " << nodeId << " " << getNodeName(nodeId) << endl;
         if (!nodeId) return;
-//        this->nodeId = nodeId;
         nodeDescriptionComplete = true;
-    }
-    
-    bool HttpInterface::descriptionReceived()
-    {
-        if (verbose)
-            wcerr << this << L"check descriptionReceived: nodeId = " << nodeId << L", flag = " << nodeDescriptionComplete << L", name=" << getNodeName(nodeId) << endl;
-        //return (nodeId > 0);
-        return nodeDescriptionComplete;
     }
     
     void HttpInterface::incomingData(Stream *stream)
@@ -403,11 +393,13 @@ namespace Aseba
         if (verbose)
             cerr << "incomingUserMsg msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
         
+        unsigned nodeId = userMsg->source;
+        
         // skip if event not known (yet, aesl probably not loaded)
-        try { commonDefinitions.events.at(userMsg->type); }
+        try { commonDefinitions[nodeId].events.at(userMsg->type); }
         catch (const std::out_of_range& oor) { return; }
         
-        if (commonDefinitions.events[userMsg->type].name.find(L"R_state")==0)
+        if (commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state")==0)
         {
             // update variables
         }
@@ -415,7 +407,7 @@ namespace Aseba
         {
             // set up SSE message
             std::stringstream reply;
-            string event_name = WStringToUTF8(commonDefinitions.events[userMsg->type].name);
+            string event_name = WStringToUTF8(commonDefinitions[nodeId].events[userMsg->type].name);
             reply << "data: " << event_name;
             for (size_t i = 0; i < userMsg->data.size(); ++i)
                 reply << " " << userMsg->data[i];
@@ -488,12 +480,13 @@ namespace Aseba
         {
             const NodeDescription& description(descIt->second);
             string nodeName = WStringToUTF8(description.name);
+            unsigned nodeId = descIt->first;
             
             if (! do_one_node)
             {
                 json << (descIt == nodesDescriptions.begin() ? "" : ",");
                 json << "{";
-                json << "\"node\":\"" << descIt->first << "\",";
+                json << "\"node\":" << nodeId << ",";
                 json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
                 json << "}";
             }
@@ -504,7 +497,7 @@ namespace Aseba
                     continue; // this is not a match, skip to next candidate
 
                 json << "{"; // begin node
-                json << "\"node\":\"" << descIt->first << "\",";
+                json << "\"node\":\"" << nodeId << "\",";
                 json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
 
                 json << ",\"bytecodeSize\":" << description.bytecodeSize;
@@ -514,7 +507,7 @@ namespace Aseba
                 // named variables
                 json << ",\"namedVariables\":{";
                 bool seen_named_variables = false;
-                for (NodeIdVariablesMap::const_iterator n(allVariables.find(descIt->first));
+                for (NodeIdVariablesMap::const_iterator n(allVariables.find(nodeId));
                      n != allVariables.end(); ++n)
                 {
                     VariablesMap vm = n->second;
@@ -548,18 +541,18 @@ namespace Aseba
                 
                 // constants from introspection
                 json << ",\"constants\":{";
-                for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
+                for (size_t i = 0; i < commonDefinitions[nodeId].constants.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << WStringToUTF8(commonDefinitions.constants[i].name) << "\":"
-                    << commonDefinitions.constants[i].value;
+                    << "\"" << WStringToUTF8(commonDefinitions[nodeId].constants[i].name) << "\":"
+                    << commonDefinitions[nodeId].constants[i].value;
                 json << "}";
                 
                 // events from introspection
                 json << ",\"events\":{";
-                for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
+                for (size_t i = 0; i < commonDefinitions[nodeId].events.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << WStringToUTF8(commonDefinitions.events[i].name) << "\":"
-                    << commonDefinitions.events[i].value;
+                    << "\"" << WStringToUTF8(commonDefinitions[nodeId].events[i].name) << "\":"
+                    << commonDefinitions[nodeId].events[i].value;
                 json << "}";
 
                 json << "}"; // end node
@@ -583,7 +576,7 @@ namespace Aseba
         for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
         {
             unsigned nodeId = *it;
-            if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
+            if ( ! commonDefinitions[nodeId].events.contains(UTF8ToWString(args[1]), &eventPos))
             {
                 // this is a variable
                 if (req->method.find("POST") == 0 || args.size() >= 3)
@@ -701,8 +694,8 @@ namespace Aseba
         for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
              descIt != nodesDescriptions.end(); ++descIt)
         {
-            bool ok;
-            nodeId = getNodeId(descIt->second.name, 0, &ok);
+            bool ok = true;
+            // nodeId = getNodeId(descIt->second.name, 0, &ok);
             if (!ok)
                 continue;
             string nodeName = WStringToUTF8(descIt->second.name);
@@ -725,7 +718,7 @@ namespace Aseba
                     sendSetVariable(nodeId, args);
                 }
                 size_t eventPos;
-                if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
+                if (commonDefinitions[nodeId].events.contains(UTF8ToWString("reset"), &eventPos))
                 {
                     // bug: assumes AESL file is common to all nodes
                     // can we get this from the node description?
@@ -749,7 +742,7 @@ namespace Aseba
 
         // bug: assumes AESL file is common to all nodes
         // can we get this from the node description?
-        if (commonDefinitions.events.contains(UTF8ToWString(args[0]), &eventPos))
+        if (commonDefinitions[nodeId].events.contains(UTF8ToWString(args[0]), &eventPos))
         {
             Dashel::Stream* stream;
             try {
@@ -977,9 +970,9 @@ namespace Aseba
     void HttpInterface::aeslLoad(const unsigned nodeId, xmlDoc* doc)
     {
         // clear existing data
-        commonDefinitions.events.clear();
-        commonDefinitions.constants.clear();
-        allVariables.clear();
+        commonDefinitions[nodeId].events.clear();
+        commonDefinitions[nodeId].constants.clear();
+        allVariables[nodeId].clear();
         
         // load new data
         int noNodeCount(0);
@@ -1007,7 +1000,7 @@ namespace Aseba
                         break;
                     }
                     else
-                        commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
+                        commonDefinitions[nodeId].events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
                 }
                 xmlFree(name);
                 xmlFree(size);
@@ -1023,7 +1016,7 @@ namespace Aseba
                 xmlChar *name  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
                 xmlChar *value (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
                 if (name && value)
-                    commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name),
+                    commonDefinitions[nodeId].constants.push_back(NamedValue(UTF8ToWString((const char *)name),
                                                                      atoi((const char *)value)));
                 xmlFree(name);  // nop if name is NULL
                 xmlFree(value); // nop if value is NULL
@@ -1090,8 +1083,8 @@ namespace Aseba
         if (wasError)
         {
             wcerr << "There was an error while loading script " << endl;
-            commonDefinitions.events.clear();
-            commonDefinitions.constants.clear();
+            commonDefinitions[nodeId].events.clear();
+            commonDefinitions[nodeId].constants.clear();
             allVariables.clear();
         }
         
@@ -1113,7 +1106,7 @@ namespace Aseba
         
         Compiler compiler;
         compiler.setTargetDescription(getDescription(nodeId));
-        compiler.setCommonDefinitions(&commonDefinitions);
+        compiler.setCommonDefinitions(&(commonDefinitions[nodeId]));
         bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
         
         if (result)

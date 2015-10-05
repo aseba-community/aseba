@@ -64,6 +64,7 @@ namespace Aseba
         typedef std::map<Dashel::Stream*, unsigned>             StreamNodeIdMap;
         typedef std::set<Dashel::Stream*>                       StreamSet;
         typedef std::map<Dashel::Stream*, NodeIdSubstitution>   StreamNodeIdSubstitutionMap;
+        typedef std::map<unsigned, Aseba::CommonDefinitions>    NodeIdCommonDefinitionsMap;
 
     protected:
         // streams
@@ -75,15 +76,14 @@ namespace Aseba
         StreamEventSubscriptionMap  eventSubscriptions;
         StreamRequestMap            httpRequests;
         StreamSet                   streamsToShutdown;
-        unsigned nodeId;
         bool nodeDescriptionComplete;
         // debug variables
         bool verbose;
         int iterations;
         
         // Extract definitions from AESL file
-        Aseba::CommonDefinitions commonDefinitions;
-        NodeIdVariablesMap allVariables;
+        NodeIdCommonDefinitionsMap  commonDefinitions;
+        NodeIdVariablesMap          allVariables;
 
         //variable cache
         std::map<std::pair<unsigned,unsigned>, std::vector<short> > variable_cache;
@@ -92,7 +92,6 @@ namespace Aseba
         //default values needed for unit testing
         HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
         virtual void run();
-        virtual bool descriptionReceived();
         virtual void broadcastGetDescription();
         virtual void evNodes(HttpRequest* req, strings& args);
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);
