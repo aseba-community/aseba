@@ -2,7 +2,7 @@
 add_library(asebavmdummycallbacks STATIC
 	asebavmdummycallbacks.cpp
 )
-target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
 
 add_executable(asebatest
 	asebatest.cpp
