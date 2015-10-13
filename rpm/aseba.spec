@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 04b42d4a5ead7ebe202786dcaf8f981275b712a9
+%global commit b2255c64be631fec2d71555a45043cfc60561d36
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line with the git commit has of the revision of Catch
@@ -31,7 +31,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.2%{?snapshot}%{?dist}
+Release:        0.3%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -183,6 +183,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Tue Oct 13 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20151013gitb2255c6
+- Incorporate fixes needed by other platforms and package systems
+
 * Fri Sep 11 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.2.20150910git04b42d4
 - Sync with latest upstream master and fix build errors.
 
