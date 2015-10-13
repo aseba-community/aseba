@@ -2,7 +2,17 @@
 add_library(asebavmdummycallbacks STATIC
 	asebavmdummycallbacks.cpp
 )
-target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+
+# If the asebavm is built as a shared lib, it must not be a dependency of
+# asebavmdummycallbacks because if it is, it will not be able to resolve refs
+# using asebavmdummycallbacks. On the other hand, if asabavm is not built as a
+# shared lib, it must be a dependency so that it can be used to resolve refs 
+# in asebavmdummycallbacks.
+if (BUILD_SHARED_LIBS)
+  target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+else (BUILD_SHARED_LIBS)
+  target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+endif (BUILD_SHARED_LIBS)
 
 add_executable(asebatest
 	asebatest.cpp
