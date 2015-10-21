@@ -36,6 +36,7 @@ if (QT4_FOUND)
 	set(QT_USE_QTHELP ON)
 	set(QT_USE_QTCONCURRENT ON)
 	set(QT_USE_QTSVG ON)
+	set(QT_USE_QTWEBKIT ON)
 	include(${QT_USE_FILE})
 
 	# add a console for debug messages under Windows
