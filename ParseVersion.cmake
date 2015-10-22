@@ -72,14 +72,8 @@ if (GIT_FOUND AND HAS_GIT_REP)
 	# write a file with the GIT_REV define
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_BUILD_VERSION \"git-${GIT_REV}\"\n")
 	# write NSIS version file (for Windows build)
-	execute_process(COMMAND grep -o [0-9]\\.[0-9]\\.[0-9] common/consts.h
-		OUTPUT_VARIABLE ASEBA_VERSION
-		RESULT_VARIABLE aseba_version_result
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-	if(NOT ${aseba_version_result} EQUAL 0)
-		set(ASEBA_VERSION "Unknown")
-	endif(NOT ${aseba_version_result} EQUAL 0)
+	file(READ "${PROJECT_SOURCE_DIR}/common/consts.h" COMMON_CONSTS_H)
+	string(REGEX MATCH [0-9]\\.[0-9]\\.[0-9] ASEBA_VERSION ${COMMON_CONSTS_H})
 	file(WRITE ${CMAKE_BINARY_DIR}/version.nsi "!define VERSION \"${ASEBA_VERSION}-git-${GIT_REV}\"\n")
 	# copy the file to the final header only if the version changes
 	# reduces needless rebuilds
