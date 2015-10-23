@@ -4,6 +4,7 @@ if(LIBXML2_FOUND)
 	include_directories(${LIBXML2_INCLUDE_DIR})
 
 	set(http2_SRCS
+		AeslProgram.cpp
 		HttpDashelTarget.cpp
 		HttpInterface.cpp
 		main.cpp
@@ -26,6 +27,7 @@ if(LIBXML2_FOUND)
 	)
 
 	set(ASEBACORE_HDR_HTTP2
+		AeslProgram.h
 		HttpDashelTarget.h
 		HttpInterface.h
 	)
