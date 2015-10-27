@@ -7,6 +7,7 @@ if(LIBXML2_FOUND)
 		AeslProgram.cpp
 		HttpDashelTarget.cpp
 		HttpInterface.cpp
+		HttpInterfaceHandlers.cpp
 		HttpRequest.cpp
 		HttpResponse.cpp
 		main.cpp
@@ -33,6 +34,7 @@ if(LIBXML2_FOUND)
 		HttpDashelTarget.h
 		HttpHandler.h
 		HttpInterface.h
+		HttpInterfaceHandlers.h
 		HttpRequest.h
 		HttpResponse.h
 	)
