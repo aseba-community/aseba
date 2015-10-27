@@ -7,6 +7,7 @@ if(LIBXML2_FOUND)
 		AeslProgram.cpp
 		HttpDashelTarget.cpp
 		HttpInterface.cpp
+		HttpRequest.cpp
 		main.cpp
 	)
 	
@@ -30,6 +31,7 @@ if(LIBXML2_FOUND)
 		AeslProgram.h
 		HttpDashelTarget.h
 		HttpInterface.h
+		HttpRequest.h
 	)
 	
 	install(FILES ${ASEBACORE_HDR_HTTP2}
