@@ -31,6 +31,7 @@ if(LIBXML2_FOUND)
 	set(ASEBACORE_HDR_HTTP2
 		AeslProgram.h
 		HttpDashelTarget.h
+		HttpHandler.h
 		HttpInterface.h
 		HttpRequest.h
 		HttpResponse.h
