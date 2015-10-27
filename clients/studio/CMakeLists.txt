@@ -1,6 +1,6 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-find_package(Qt4)
+find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit REQUIRED)
 
 set(DOC_NAME aseba-doc)
 
