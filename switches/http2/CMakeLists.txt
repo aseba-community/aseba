@@ -4,6 +4,7 @@ if(LIBXML2_FOUND)
 	include_directories(${LIBXML2_INCLUDE_DIR})
 
 	set(http2_SRCS
+		main.cpp
 	)
 	
 	add_executable(asebahttp2 ${http2_SRCS})
