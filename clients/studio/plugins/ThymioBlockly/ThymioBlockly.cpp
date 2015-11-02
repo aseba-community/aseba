@@ -184,7 +184,12 @@ namespace Aseba { namespace ThymioBlockly
 		mainLayout->addLayout(horizontalLayout);
 
 		sceneLayout = new QVBoxLayout();
-		webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.html"));
+
+		if(de->getTarget()->getLanguage() == "de") {
+			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.de.html"));
+		} else {
+			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.html"));
+		}
 		webview->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::NonCosmeticDefaultPen | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
 		webview->setContextMenuPolicy(Qt::CustomContextMenu);
 
