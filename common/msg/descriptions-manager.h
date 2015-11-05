@@ -60,7 +60,7 @@ namespace Aseba
 		//! Return the id of the node corresponding to name and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false. If several nodes have this name, either return preferedId if it exists otherwise return the first found.
 		unsigned getNodeId(const std::wstring& name, unsigned preferedId = 0, bool *ok = 0) const;
 		//! Return the description of a node and set ok to true, if provided; if invalid, return 0 and set ok to false
-		const TargetDescription * const getDescription(unsigned nodeId, bool *ok = 0) const;
+		const TargetDescription *getDescription(unsigned nodeId, bool *ok = 0) const;
 		//! Return the position of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
 		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
