@@ -195,7 +195,7 @@ namespace Aseba
 		return 0xFFFFFFFF;
 	}
 	
-	const TargetDescription * const DescriptionsManager::getDescription(unsigned nodeId, bool *ok) const
+	const TargetDescription * DescriptionsManager::getDescription(unsigned nodeId, bool *ok) const
 	{
 		NodesDescriptionsMap::const_iterator it = nodesDescriptions.find(nodeId);
 		
