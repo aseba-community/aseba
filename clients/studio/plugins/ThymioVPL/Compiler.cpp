@@ -23,6 +23,7 @@
 #include <QObject>
 #include "Compiler.h"
 #include "Scene.h"
+#include "Block.h"
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -72,6 +73,10 @@ namespace Aseba { namespace ThymioVPL
 				else
 					return QObject::tr("The event and the state condition in line %0 are the same as in line %1").arg(errorLine+1).arg(referredLine+1);
 			}
+			case INEFFECTIVE_EVENT:
+			{
+				return QObject::tr("Line %0: No sensor selected, this line will never run").arg(errorLine+1);
+			}
 			default:
 				return QObject::tr("Unknown VPL error");
 		}
@@ -97,6 +102,11 @@ namespace Aseba { namespace ThymioVPL
 			// we need an event
 			if (!eventActionsSet.hasEventBlock())
 				return CompilationResult(MISSING_EVENT, errorLine);
+			
+			// some event blocks need at least one sensor selected
+			const Block* eventBlock = eventActionsSet.getEventBlock();
+			if (eventBlock->needsAnyValueSet() && !eventBlock->isAnyValueSet())
+				return CompilationResult(INEFFECTIVE_EVENT, errorLine);
 			
 			// we need at least one action
 			if (!eventActionsSet.hasAnyActionBlock())

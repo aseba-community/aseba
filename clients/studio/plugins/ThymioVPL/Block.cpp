@@ -168,6 +168,11 @@ namespace Aseba { namespace ThymioVPL
 		return false;
 	}
 	
+	bool Block::needsAnyValueSet() const
+	{
+		return false;
+	}
+	
 	void Block::resetValues()
 	{
 		for (unsigned i=0; i<valuesCount(); ++i)
