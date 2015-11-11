@@ -178,6 +178,13 @@ static void AsebaVMRunCB(AsebaVMState *vm) {}
 void __attribute__((weak)) AsebaVMRunCB(AsebaVMState *vm);
 #endif // DISABLE_WEAK_CALLBACKS
 
+/*! Called by AsebaVMDebugMessage when VM is being resetted */
+#ifdef DISABLE_WEAK_CALLBACKS
+static void AsebaVMResetCB(AsebaVMState *vm) {}
+#else // DISABLE_WEAK_CALLBACKS
+void __attribute__((weak)) AsebaVMResetCB(AsebaVMState *vm);
+#endif // DISABLE_WEAK_CALLBACKS
+
 /*! Called by AsebaVMEmitNodeSpecificError to be notified when VM hit an execution error
 	Is also called for wrong array access or division by 0 with message == NULL */
 #ifdef DISABLE_WEAK_CALLBACKS
