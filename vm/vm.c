@@ -494,6 +494,12 @@ void AsebaVMStep(AsebaVMState *vm)
 		{
 			uint16 dest = bytecode & 0x0fff;
 			
+			// check sp
+			#ifdef ASEBA_ASSERT
+			if (vm->sp + 1 >= vm->stackSize)
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_OVERFLOW);
+			#endif
+			
 			// store return value on stack
 			vm->stack[++vm->sp] = vm->pc + 1;
 			
@@ -505,6 +511,12 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Subroutine return
 		case ASEBA_BYTECODE_SUB_RET:
 		{
+			// check sp
+			#ifdef ASEBA_ASSERT
+			if (vm->sp < 0)
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
+			#endif
+			
 			// do return
 			vm->pc = vm->stack[vm->sp--];
 		}
