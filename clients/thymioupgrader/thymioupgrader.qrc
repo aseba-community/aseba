@@ -5,7 +5,6 @@
 	<file>thymioupgrader_es.qm</file>
 	<file>thymioupgrader_it.qm</file>
 	<file>images/fileopen.svgz</file>
-	<file>images/firmwareupgrade.png</file>
 	<file>images/thymioupgrader.svgz</file>
 </qresource>
 </RCC>
