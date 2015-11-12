@@ -706,6 +706,18 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 	AsebaSendMessageWords(vm, ASEBA_MESSAGE_EXECUTION_STATE_CHANGED, buffer, 2);
 }
 
+/*! Reset all when flags in their default states in the bytecode */
+static void AsebaVMResetWhenFlags(AsebaVMState *vm)
+{
+	uint16 i;
+	for (i = 0; i < vm->bytecodeSize; i++)
+	{
+		uint16 bytecode = vm->bytecode[i];
+		if ((bytecode >> 12) == ASEBA_BYTECODE_CONDITIONAL_BRANCH)
+			BIT_CLR(vm->bytecode[i], ASEBA_IF_WAS_TRUE_BIT);
+	}
+}
+
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
 {
 	
@@ -741,11 +753,12 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_RESET:
 		vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+		AsebaVMResetWhenFlags(vm);
+		if (AsebaVMResetCB)
+			AsebaVMResetCB(vm);
 		// try to setup event, if it fails, return the execution state anyway
 		if (AsebaVMSetupEvent(vm, ASEBA_EVENT_INIT) == 0)
 			AsebaVMSendExecutionStateChanged(vm);
-		if (AsebaVMResetCB)
-			AsebaVMResetCB(vm);
 		break;
 		
 		case ASEBA_MESSAGE_RUN:
