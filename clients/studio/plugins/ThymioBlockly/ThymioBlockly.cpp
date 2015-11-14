@@ -413,9 +413,21 @@ namespace Aseba { namespace ThymioBlockly
 	
 	QDomDocument ThymioBlockly::saveToDom() const
 	{
-		QDomDocument document("tool-plugin-data");
-		document.setContent(currentSavedXml);
-		return document;
+		if (currentSavedXml.isEmpty()) {
+			return QDomDocument();
+		}
+		else {
+			QDomDocument document("tool-plugin-data");
+			if (document.setContent(currentSavedXml)) {
+				return document;
+			}
+			else {
+				// this is an error - I'm not sure if it still occurs under any circumstance, but if it does, some diagnostic output may be helpful
+				printf("ThymioBlockly::saveToDom(): invalid XML content\n%s\n", currentSavedXml.toUtf8().constData());
+				// document is in an invalid state now that would make MainWindow::saveFile crash, return a null document instead
+				return QDomDocument();
+			}
+		}
 	}
 	
 	void ThymioBlockly::aboutToLoad()
