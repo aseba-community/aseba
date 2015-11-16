@@ -82,7 +82,7 @@ namespace Aseba
 		pairing(false)
 	{
 		// Create the gui ...
-		setWindowTitle(tr("Thymio Wireless Network Configurator"));
+		setWindowTitle(tr("Wireless Thymio Network Configurator"));
 		// TODO: add icon
 		//setWindowIcon(QIcon(":/images/thymioupgrader.svgz"));
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -158,7 +158,7 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException& e)
 		{
-			QMessageBox::critical(0, tr("Connection error"), tr("<p><b>Cannot connect to dongle!</b></p><p>Make sure a Thymio Wireless dongle is connected!</p>"));
+			QMessageBox::critical(0, tr("Connection error"), tr("<p><b>Cannot connect to dongle!</b></p><p>Make sure a Wireless Thymio dongle is connected!</p>"));
 			close();
 			return;
 		}
@@ -262,12 +262,12 @@ int main(int argc, char *argv[])
 	}
 	if (!thymioFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Thymio Wireless dongle not found"), QApplication::tr("<p><b>Cannot find a Thymio Wireless dongle!</b></p><p>Plug a dongle into one of your USB ports and try again.</p>"));
+		QMessageBox::critical(0, QApplication::tr("Wireless Thymio dongle not found"), QApplication::tr("<p><b>Cannot find a Wireless Thymio dongle!</b></p><p>Plug a dongle into one of your USB ports and try again.</p>"));
 		return 1;
 	}
 	if (thymiosFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Multiple Thymio Wireless dongles found"), QApplication::tr("<p><b>More than one Thymio Wireless dongles found!</b></p><p>Plug a single dongle into your computer and try again.</p>"));
+		QMessageBox::critical(0, QApplication::tr("Multiple Wireless Thymio dongles found"), QApplication::tr("<p><b>More than one Wireless Thymio dongles found!</b></p><p>Plug a single dongle into your computer and try again.</p>"));
 		return 2;
 	}
 	
