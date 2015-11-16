@@ -135,7 +135,7 @@ namespace Aseba
 		// open stream and read initial data
 		try
 		{
-			std::string modifiedTarget = target + ";baud=0;fc=hard";
+			std::string modifiedTarget = target + ";baud=0;fc=hard;dtr=false";
 			stream = hub.connect(modifiedTarget);
 			// we want to read values, not set them
 			settings.nodeId = 0xffff;
