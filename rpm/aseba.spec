@@ -3,7 +3,7 @@ Name:           aseba
 # Update the following lines to reflect the source release version you will be
 # referencing below
 %global source_major 1
-%global source_minor 4
+%global source_minor 5
 %global source_patch 0
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 

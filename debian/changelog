@@ -1,3 +1,9 @@
+aseba (1.5.0) trusty; urgency=low
+
+  * Upstream 1.5.0
+
+ -- Stéphane Magnenat <stephane@nospam.magnenat.net>  Mon, 16 Nov 2015 12:54:01 +0100
+
 aseba (1.4.0) trusty; urgency=low
 
   * Upstream 1.4.0
