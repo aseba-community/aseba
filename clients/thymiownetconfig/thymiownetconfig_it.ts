@@ -4,13 +4,10 @@
 <context>
     <name>Aseba::ThymioWNetConfigDialog</name>
     <message>
-        <source>Thymio Wireless Network Configurator</source>
-        <translation type="obsolete">Configurateur de Réseau pour Thymio Wireless</translation>
-    </message>
-    <message>
         <location filename="ThymioWNetConfig.cpp" line="85"/>
         <source>Wireless Thymio Network Configurator</source>
-        <translation>Configurateur de Réseau pour Thymio Wireless</translation>
+        <oldsource>Thymio Wireless Network Configurator</oldsource>
+        <translation>Configuratore di rete per Wireless Thymio </translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="95"/>
@@ -30,57 +27,57 @@
     <message>
         <location filename="ThymioWNetConfig.cpp" line="99"/>
         <source>Channel:</source>
-        <translation>Canal :</translation>
+        <translation>Canale :</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="111"/>
         <source>Network identifier:</source>
-        <translation>Identificateur de réseau :</translation>
+        <translation>Identificatore di rete :</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="121"/>
         <source>Dongle node identifier:</source>
-        <translation>Identificateur de nœud du dongle :</translation>
+        <translation>Identificativo del nodo del dongle:</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="128"/>
-        <location filename="ThymioWNetConfig.cpp" line="218"/>
+        <location filename="ThymioWNetConfig.cpp" line="219"/>
         <source>Enable pairing</source>
-        <translation>Activer le pairage</translation>
+        <translation type="unfinished">Attivare l&apos;abbinamento</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="129"/>
         <source>Flash into dongle</source>
-        <translation>Flasher dans le dongle</translation>
+        <translation>Salvare nello dongle</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="130"/>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation>Chiudere</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="148"/>
+        <location filename="ThymioWNetConfig.cpp" line="149"/>
         <source>Wireless dongle firmware version %0</source>
-        <translation>Version du firmware du dongle wireless %0</translation>
+        <translation>Versione del firmware del wireless dongle %0</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="161"/>
+        <location filename="ThymioWNetConfig.cpp" line="162"/>
         <source>Connection error</source>
-        <translation>Erreure de connexion</translation>
+        <translation>Errore di connessione</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="161"/>
+        <location filename="ThymioWNetConfig.cpp" line="162"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Wireless Thymio dongle is connected!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Ne peut pas se connecter au dongle !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Assurez-vous qu&apos;un dongle de Thymio Wireless est connecté !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossibile connettersi al dongle !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Assicurarsi che un dongle wireless Thymio è collegato !&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Thymio Wireless dongle is connected!&lt;/p&gt;</source>
         <translation type="obsolete">&lt;p&gt;&lt;b&gt;Ne peut pas se connecter au dongle !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Assurez-vous qu&apos;un dongle de Thymio Wireless est connecté !&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="214"/>
+        <location filename="ThymioWNetConfig.cpp" line="215"/>
         <source>Disable pairing</source>
-        <translation>Désactiver le pairage</translation>
+        <translation type="unfinished">Disattivare l&apos;abbinamento</translation>
     </message>
 </context>
 <context>
@@ -112,24 +109,24 @@
         <translation type="obsolete">&lt;p&gt;&lt;b&gt;Plus d&apos;un dongle pour Thymio Wireless trouvés !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connectez un seul dongle à votre ordinateur et réessayez.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="265"/>
-        <source>Wireless Thymio dongle not found</source>
-        <translation>Aucun dongle de Thymio Wireless trouvé</translation>
-    </message>
-    <message>
-        <location filename="ThymioWNetConfig.cpp" line="265"/>
+        <location filename="ThymioWNetConfig.cpp" line="266"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find a Wireless Thymio dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a dongle into one of your USB ports and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Ne peut pas trouver un dongle de Thymio Wireless !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connectez un dongle dans l&apos;un de vos ports USB et réessayez.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Non riesci a trovare un dongle wireless Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un dongle in una delle porte USB e riprovare.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="270"/>
-        <source>Multiple Wireless Thymio dongles found</source>
-        <translation>Plusieurs dongles de Thymio Wireless trouvés</translation>
+        <location filename="ThymioWNetConfig.cpp" line="266"/>
+        <source>Wireless Thymio dongle not found</source>
+        <translation type="unfinished">Nessun wireless Thymio dongle trovato</translation>
     </message>
     <message>
-        <location filename="ThymioWNetConfig.cpp" line="270"/>
+        <location filename="ThymioWNetConfig.cpp" line="271"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Wireless Thymio dongles found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single dongle into your computer and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Plus d&apos;un dongle pour Thymio Wireless trouvés !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connectez un seul dongle à votre ordinateur et réessayez.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Più di un dongle wireless Thymio trovato !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un solo dongle nel computer e riprovare.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="ThymioWNetConfig.cpp" line="271"/>
+        <source>Multiple Wireless Thymio dongles found</source>
+        <translation>Molteplici dongle wireless Thymio trovati</translation>
     </message>
 </context>
 </TS>
