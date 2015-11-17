@@ -58,7 +58,7 @@
     <message>
         <location filename="ThymioWNetConfig.cpp" line="149"/>
         <source>Wireless dongle firmware version %0</source>
-        <translation>Version du firmware du dongle wireless %0</translation>
+        <translation>Wireless Dongle Firmware-Version %0</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="162"/>
