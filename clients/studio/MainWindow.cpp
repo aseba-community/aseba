@@ -1619,6 +1619,8 @@ namespace Aseba
 		
 		// when everything is ready, get description
 		target->broadcastGetDescription();
+		// start timer in case we do not receive any description now
+		getDescriptionTimer = startTimer(2000);
 	}
 	
 	MainWindow::~MainWindow()
@@ -2883,17 +2885,25 @@ namespace Aseba
 		tab->breakpointSetResult(line, success);
 	}
 	
-	//! If any node was disconnected, send get description
+	//! If any node was disconnected or no nodes were found, send get description
 	void MainWindow::timerEvent ( QTimerEvent * event )
 	{
 		bool doSend(false);
-		
+		bool anyNodeTab(false);
 		for (int i = 0; i < nodes->count(); i++)
 		{
+			// is there at least one node tab?
+			NodeTab* nodeTab = dynamic_cast<NodeTab*>(nodes->widget(i));
+			if (nodeTab)
+				anyNodeTab = true;
+			// is there any absent node tab corresponding to a node that was seen?
 			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
 			if (tab)
 				doSend = doSend || (tab->id != 0);
 		}
+		
+		// is there tab?
+		doSend = doSend || (!anyNodeTab);
 		
 		if (doSend)
 		{
