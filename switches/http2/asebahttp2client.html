@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>asebahttp2 client</title>
+<script>
+thymio = [];
+thymio.source = null;
+thymio.aseba = false;
+thymio.robot = false;
+thymio.executing = false;
+
+function sendRequest(url, callback, method, payload)
+{
+	if(typeof method === "undefined") {
+		method = "GET";
+	}
+	
+	if(typeof payload === "undefined") {
+		payload = "";
+	}
+	
+	var req = new XMLHttpRequest();
+	if(!req) {
+		return;
+	}
+	req.open(method, url, true);
+	req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	req.onreadystatechange = function () {
+		if(req.readyState != 4) {
+			return;
+		}
+		callback(req);
+	}
+	if(req.readyState == 4) {
+		return;
+	}
+	req.send(payload);
+}
+
+function reconnectThymio()
+{
+	thymio.robot = false;
+	thymio.executing = false;
+	document.getElementById('thymio').innerHTML = 'Connecting...';
+	document.getElementById('thymio').style.color = 'orange';
+	
+	sendRequest('http://localhost:3000/nodes', function(e)
+	{
+		if(e.status == 200) {
+			var obj = JSON.parse(e.responseText);
+			
+			if(Array.isArray(obj)) {
+				for(var i = 0; i < obj.length; i++) {
+					if(obj[i].name == 'thymio-II') {
+						console.log('Connected to Thymio!');
+						thymio.robot = true;
+						document.getElementById('thymio').innerHTML = 'Connected';
+						document.getElementById('thymio').style.color = 'green';
+						document.getElementById('status').innerHTML = 'Ready';
+						document.getElementById('status').style.color = 'green';
+					}
+				}
+			}
+		}
+	});
+}
+
+function disconnectThymio()
+{
+	thymio.robot = false;
+	thymio.executing = false;
+	
+	console.log('Disconnected from Thymio!');
+	document.getElementById('thymio').innerHTML = 'Connecting...';
+	document.getElementById('thymio').style.color = 'orange';
+	document.getElementById('status').innerHTML = 'Thymio disconnected';
+	document.getElementById('status').style.color = 'red';
+}
+
+function connect()
+{
+	if(thymio.source) {
+		thymio.source.close();
+		thymio.source = null;
+	}
+
+	thymio.aseba = false;
+	thymio.robot = false;
+	thymio.executing = false;
+	document.getElementById('aseba').innerHTML = 'Connecting...';
+	document.getElementById('aseba').style.color = 'orange';
+	document.getElementById('thymio').innerHTML = '';
+	document.getElementById('thymio').style.color = 'red';
+
+	thymio.source = new EventSource('http://localhost:3000/events');
+	
+	thymio.source.addEventListener('open', function(e)
+	{
+		console.log('Event source connected');
+		
+		thymio.aseba = true;
+		document.getElementById('aseba').innerHTML = 'Connected';
+		document.getElementById('aseba').style.color = 'green';
+		
+		reconnectThymio();
+	});
+	
+	thymio.source.addEventListener('message', function(e)
+	{
+		console.log('Event: ' + e.data);
+		
+		var eventData = e.data.split(" ");
+		
+		if(eventData[0] == 'array_access_out_of_bounds') {
+			stopExecution('Array access out of bounds');
+		} else if(eventData[0] == 'division_by_zero') {
+			stopExecution('Division by zero');
+		} else if(eventData[0] == 'event_execution_killed') {
+			stopExecution('Event execution killed');
+		} else if(eventData[0] == 'node_specific_error') {
+			stopExecution('Node specific error');
+		} else if(eventData[0] == 'disconnect') {
+			disconnectThymio();
+		} else if(eventData[0] == 'connect') {
+			reconnectThymio();
+		}
+	});
+
+	thymio.source.addEventListener('error', function(e)
+	{
+		if(thymio.aseba) {
+			disconnect('Event stream closed');
+			connect();
+		}
+	});
+}
+
+function stopExecution(reason)
+{
+	thymio.executing = false;
+	
+	document.getElementById('status').innerHTML = 'Execution error: ' + reason;
+	document.getElementById('status').style.color = 'orange';
+}
+
+function disconnect(reason)
+{
+	thymio.aseba = false;
+	thymio.robot = false;
+	thymio.executing = false;
+	
+	document.getElementById('aseba').innerHTML = 'Disconnected';
+	document.getElementById('aseba').style.color = 'red';
+	document.getElementById('thymio').innerHTML = 'Disconnected';
+	document.getElementById('thymio').style.color = 'red';
+	document.getElementById('status').innerHTML = 'Error (' + reason + ')';
+	document.getElementById('status').style.color = 'red';
+
+	if(thymio.source) {
+		thymio.source.close();
+		thymio.source = null;
+	}
+}
+
+function run()
+{
+	if(!thymio.aseba) {
+		return;
+	}
+	
+	var aesl = document.getElementById('aesl').value;
+	var payload = 'file=' + aesl;
+
+	sendRequest('http://localhost:3000/nodes/thymio-II', function(e)
+	{
+		if(e.status == 200) {
+			document.getElementById('status').innerHTML = 'Executing program';
+			document.getElementById('status').style.color = 'green';
+			thymio.executing = true;
+		} else {
+			document.getElementById('status').innerHTML = 'Compilation error: ' + e.responseText;
+			document.getElementById('status').style.color = 'orange';
+			thymio.executing = false;
+		}
+	}, 'PUT', payload);
+}
+</script>
+</head>
+<body onload="connect()">
+<div style="text-align: center">
+	asebahttp2 bridge: <span id="aseba" style="font-style: italic"></span><br>
+	Thymio: <span id="thymio" style="font-style: italic"></span><br>
+	Status: <span id="status" style="font-style: italic"></span><br>
+	<input type="button" onclick="connect()" value="Connect">&nbsp;
+	<input type="button" onclick="disconnect('Manual disconnect')" value="Disconnect">
+	<br><br>
+	<textarea rows="20" cols="100" id="aesl">&#x3C;!DOCTYPE aesl-source&#x3E;
+&#x3C;network&#x3E;
+
+&#x3C;!--list of global events--&#x3E;
+&#x3C;event size=&#x22;1&#x22; name=&#x22;testevent&#x22;/&#x3E;
+&#x3C;event size=&#x22;3&#x22; name=&#x22;testevent2&#x22;/&#x3E;
+
+&#x3C;!--show keywords state--&#x3E;
+&#x3C;keywords flag=&#x22;true&#x22;/&#x3E;
+
+&#x3C;!--node thymio-II--&#x3E;
+&#x3C;node nodeId=&#x22;1&#x22; name=&#x22;thymio-II&#x22;&#x3E;
+var a = 0
+var b = 0
+
+onevent button.center
+&#x9;emit testevent(button.center)
+
+onevent button.backward
+&#x9;a = a / b
+&#x9;
+onevent testevent2
+&#x9;call leds.top(event.args[0], event.args[1], event.args[2])
+&#x9;
+&#x3C;/node&#x3E;
+&#x3C;/network&#x3E;</textarea><br>
+	<button onclick="run()">Run AESL</button>
+</div>
+
+
+</body>
+</html>

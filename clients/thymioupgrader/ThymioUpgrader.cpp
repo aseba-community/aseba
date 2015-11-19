@@ -63,7 +63,8 @@ namespace Aseba
 		
 		QHBoxLayout *imageLayout = new QHBoxLayout();
 		QLabel* image = new QLabel(this);
-		image->setPixmap(QPixmap(":/images/firmwareupgrade.png"));
+		QPixmap logo(":/images/thymioupgrader.svgz");
+		image->setPixmap(logo.scaledToWidth(384));
 		imageLayout->addStretch();
 		imageLayout->addWidget(image);
 		imageLayout->addStretch();

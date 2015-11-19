@@ -1,6 +1,6 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-find_package(Qt4)
+find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit REQUIRED)
 
 set(DOC_NAME aseba-doc)
 
@@ -36,6 +36,7 @@ if (QT4_FOUND)
 	set(QT_USE_QTHELP ON)
 	set(QT_USE_QTCONCURRENT ON)
 	set(QT_USE_QTSVG ON)
+	set(QT_USE_QTWEBKIT ON)
 	include(${QT_USE_FILE})
 
 	# add a console for debug messages under Windows

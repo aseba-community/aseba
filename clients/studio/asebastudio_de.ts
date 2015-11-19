@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de">
+<TS version="2.0" language="de">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -1478,6 +1478,74 @@ Ereignis %0: </translation>
     </message>
 </context>
 <context>
+    <name>Aseba::ThymioBlockly::ThymioBlockly</name>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <source>Thymio Blockly Interface</source>
+        <translation>Blockly-Oberfläche für Thymio</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <source>New</source>
+        <translation>Neu</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <source>Open</source>
+        <translation>Öffnen</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <source>Save as</source>
+        <translation>Speichern als</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <source>Load &amp; Run</source>
+        <translation>Laden und ausführen</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <source>Stop</source>
+        <translation>Stoppen</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="168"/>
+        <source>Screenshot</source>
+        <translation>Bildschirmfoto</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="213"/>
+        <source>http://aseba.wikidot.com/en:thymiovpl</source>
+        <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="228"/>
+        <source>Export program as image</source>
+        <translation>Programm als Bild exportieren</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="250"/>
+        <source>Launch Blockly</source>
+        <translation>Blockly starten</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="382"/>
+        <source>Warning</source>
+        <translation>Achtung</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="383"/>
+        <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
+        <translation>Das Blockly-Dokument wurde bearbeitet. Möchten Sie diese Änderungen speichern? </translation>
+    </message>
+</context>
+<context>
     <name>Aseba::ThymioBootloaderDialog</name>
     <message>
         <source>Thymio Firmware Updater</source>
@@ -1578,19 +1646,19 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioVPL::EventActionsSet</name>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="579"/>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="599"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="611"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="631"/>
         <source>Loading</source>
         <translation>Laden</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="580"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="612"/>
         <source>Error in XML source file at %0:%1: cannot create block %2</source>
         <oldsource>Error in XML source file at %0:%1 cannot create block %2</oldsource>
         <translation>Fehler im XML Quelltext bei %0:%1: kann Block %2 nicht erzeugen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="600"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="632"/>
         <source>Error in XML source file at %0:%1: unknown block type %2</source>
         <translation>Fehler im XML Quelltext bei %0:%1: unbekannter Block-Typ %2</translation>
     </message>
@@ -1630,37 +1698,37 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="59"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="79"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Visuelle Programmiersprache für Thymio</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="73"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="93"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="80"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="100"/>
         <source>Open</source>
         <translation>Öffnen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="87"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="107"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="94"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="114"/>
         <source>Save as</source>
         <translation>Speichern als</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="133"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="153"/>
         <source>Load &amp; Run</source>
         <translation>Laden und ausführen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="143"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="163"/>
         <source>Stop</source>
         <translation>Halten</translation>
     </message>
@@ -1669,27 +1737,27 @@ Ereignis %0: </translation>
         <translation type="obsolete">Farbschema</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="153"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="173"/>
         <source>Advanced mode</source>
         <translation>Fortgeschrittener Modus</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="171"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="191"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="209"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="229"/>
         <source>Events</source>
         <translation>Ereignisse</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="292"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="312"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="330"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="350"/>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
@@ -1698,17 +1766,17 @@ Ereignis %0: </translation>
         <translation type="obsolete">Verlassen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="112"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="132"/>
         <source>Undo</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="121"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="141"/>
         <source>Redo</source>
         <translation>Vorwärts machen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="178"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="198"/>
         <source>Screenshot</source>
         <translation>Bildschirmfoto</translation>
     </message>
@@ -1717,12 +1785,12 @@ Ereignis %0: </translation>
         <translation type="obsolete">&lt;b&gt;Ereignisse&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="235"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="255"/>
         <source>Compilation success.</source>
         <translation>Berechnung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="243"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="263"/>
         <source>show line</source>
         <translation>Die Linie anzeigen</translation>
     </message>
@@ -1731,52 +1799,52 @@ Ereignis %0: </translation>
         <translation type="obsolete">&lt;b&gt;Aktionen&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="346"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="366"/>
         <source>Export program as image</source>
         <translation>Programm als image exportieren</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="412"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="432"/>
         <source>Launch VPL</source>
         <translation>VPL laden</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="569"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="589"/>
         <source>Returning to simple mode</source>
         <translation>Zurück zum einfachen Modus</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="570"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="590"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
         <translation>Sie verwenden Zustände. Wenn Sie in den einfachen Modus wechseln, werden alle Zustandsfilter und Zustandseinstellungen gelöscht.&lt;p&gt;Möchten Sie weiterfahren?</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="610"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="630"/>
         <source>Warning</source>
         <translation>Achtung</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="611"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="631"/>
         <source>The VPL document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation>Das VPL Dokument wurde verändert. Möchten Sie die Veränderungen speichern?</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="686"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="706"/>
         <source>Incompatible Version</source>
         <translation>Inkompatible Version</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="686"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="706"/>
         <source>This file is incompatible with this version of ThymioVPL. It might not work correctly.</source>
         <translation>Diese Datei ist inkompatibel mit dieser Version von ThymioVPL. Es könnte nicht korrekt funktionieren.</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="931"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="958"/>
         <source>Please add an event</source>
         <translation>Bitte fügen Sie ein Ereignis hinzu</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="942"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="969"/>
         <source>Please add an action</source>
         <translation>Bitte fügen Sie eine Aktion hinzu</translation>
     </message>
@@ -1792,14 +1860,14 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioVPL::UsageLogger</name>
     <message>
-        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="55"/>
+        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="75"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="56"/>
+        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="76"/>
         <source>Please enter your user or group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte geben Sie Ihren Benutzer- oder Gruppennamen ein:</translation>
     </message>
 </context>
 <context>
@@ -2066,27 +2134,27 @@ Ereignis %0: </translation>
         <translation type="obsolete">Berechnung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="38"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="58"/>
         <source>Compilation success</source>
         <translation>Berechnung war erfolgreich</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="42"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="62"/>
         <source>Line %0: Missing event</source>
         <translation>Linie %0: Fehlendes Ereignis</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="46"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="66"/>
         <source>Line %0: Missing action</source>
         <translation>Linie %0: Fehlende Aktion</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="51"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="71"/>
         <source>The event in line %0 is the same as in line %1</source>
         <translation>Das Ereignis in Linie %0 ist das gleiche wie in Linie %1</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="53"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="73"/>
         <source>The event and the state condition in line %0 are the same as in line %1</source>
         <translation>Das Ereignis und die Bedingung in Linie %0 sind die gleichen wie in Linie %1</translation>
     </message>
@@ -2095,7 +2163,7 @@ Ereignis %0: </translation>
         <translation type="obsolete">Linie %0: Unbekannter Ereignis/Aktion Typ</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="56"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="76"/>
         <source>Unknown VPL error</source>
         <translation>Unbekannt VPLFehler</translation>
     </message>
