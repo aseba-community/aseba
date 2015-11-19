@@ -2707,7 +2707,12 @@ namespace Aseba
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
 		const int index = getIndexFromId(node);
-		Q_ASSERT(index >= 0);
+		// Q_ASSERT(index >= 0);
+		// this is a temporary hack, it should be fixed in DashelTarget
+		// and Studio should not receive multiple disconnected messages...
+		// if we receive a disconnected message from an already-disconnected node, ignore it
+		if (index < 0)
+			return;
 		const NodeTab* tab = getTabFromId(node);
 		const QString& tabName = nodes->tabText(index);
 		
