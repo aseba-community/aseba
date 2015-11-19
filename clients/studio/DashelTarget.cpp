@@ -400,7 +400,10 @@ namespace Aseba
 	DashelTarget::Node::Node() :
 		steppingInNext(NOT_IN_NEXT),
 		lineInNext(0),
-		executionMode(EXECUTION_UNKNOWN)
+		executionMode(EXECUTION_UNKNOWN),
+		connected(false),
+		lastSeen(QTime::currentTime()),
+		protocolVersion(0)
 	{
 	}
 	
@@ -418,6 +421,7 @@ namespace Aseba
 		// we also connect to the description manager to know when we have a new node available
 		connect(&descriptionManager, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
 		
+		// table for handling incoming messages
 		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
@@ -429,10 +433,15 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BOOTLOADER_ACK] = &Aseba::DashelTarget::receivedBootloaderAck;
 
 		dashelInterface.start();
+		
+		// list nodes every 1s
+		connect(&listNodesTimer, SIGNAL(timeout()), SLOT(listNodes()));
+		listNodesTimer.start(1000);
 	}
 	
 	DashelTarget::~DashelTarget()
 	{
+		listNodesTimer.stop();
 		dashelInterface.stop();
 		dashelInterface.wait();
 		DashelTarget::disconnect();
@@ -450,7 +459,6 @@ namespace Aseba
 				// detach all nodes
 				for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 				{
-					//DetachDebugger(node->first).serialize(dashelInterface.stream);
 					BreakpointClearAll(node->first).serialize(dashelInterface.stream);
 					Run(node->first).serialize(dashelInterface.stream);
 				}
@@ -480,6 +488,7 @@ namespace Aseba
 		return descriptionManager.getDescription(node);
 	}
 	
+	//! Request descriptions from the aseba network
 	void DashelTarget::broadcastGetDescription()
 	{
 		dashelInterface.lock();
@@ -488,6 +497,28 @@ namespace Aseba
 			try
 			{
 				GetDescription().serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
+		}
+		else
+			dashelInterface.unlock();
+	}
+	
+	//! List all present nodes on the aseba network
+	void DashelTarget::broadcastListNodes()
+	{
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
+		{
+			try
+			{
+				ListNodes().serialize(dashelInterface.stream);
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}
@@ -854,6 +885,27 @@ namespace Aseba
 		writeBlocked = false;
 	}
 	
+	void DashelTarget::getNodeDescription(unsigned node)
+	{
+		dashelInterface.lock();
+		if (dashelInterface.stream && !writeBlocked)
+		{
+			try
+			{
+				GetNodeDescription(node).serialize(dashelInterface.stream);
+				dashelInterface.stream->flush();
+				dashelInterface.unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				dashelInterface.unlock();
+				handleDashelException(e);
+			}
+		}
+		else
+			dashelInterface.unlock();
+	}
+	
 	void DashelTarget::updateUserEvents()
 	{
 		// send only 20 latest user events
@@ -873,6 +925,33 @@ namespace Aseba
 		}
 	}
 	
+	//! regularly probe aseba network for new connections
+	void DashelTarget::listNodes()
+	{
+		// check whether there are new nodes in the network, for new targets (protocol >= 5)
+		broadcastListNodes();
+		
+		// check nodes that have not been seen for long, mark them as disconnected
+		const QTime now(QTime::currentTime());
+		const int delayToDisconnect(3000);
+		bool isAnyConnected(false);
+		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		{
+			// if node supports listing, 
+			if (nodeIt->second.protocolVersion >= 5 && nodeIt->second.lastSeen.msecsTo(now) > delayToDisconnect)
+			{
+				nodeIt->second.connected = false;
+				emit nodeDisconnected(nodeIt->first);
+			}
+			// is this node connected?
+			isAnyConnected = isAnyConnected || nodeIt->second.connected;
+		}
+		
+		// if no node is connected, broadcast get description as well, for old targets (protocol 4)
+		if (!isAnyConnected)
+			broadcastGetDescription();
+	}
+	
 	void DashelTarget::messageFromDashel(Message *message)
 	{
 		bool deleteMessage = true;
@@ -881,6 +960,34 @@ namespace Aseba
 		
 		// let the description manager filter the message
 		descriptionManager.processMessage(message);
+		
+		// check whether the node is known
+		NodesMap::iterator nodeIt(nodes.find(message->source));
+		if (nodeIt == nodes.end())
+		{
+			// node is not known, so ignore excepted if the message type 
+			// is node present; in that case, request description
+			if (message->type == ASEBA_MESSAGE_NODE_PRESENT)
+				getNodeDescription(message->source);
+			delete message;
+			return;
+		}
+		else
+		{
+			// node is known, check if connected...
+			if (!nodeIt->second.connected)
+			{
+				// if not, set as connected and notify client
+				nodeIt->second.executionMode = EXECUTION_UNKNOWN;
+				nodeIt->second.steppingInNext = NOT_IN_NEXT;
+				nodeIt->second.lineInNext = 0;
+				nodeIt->second.connected = true;
+				
+				emit nodeConnected(nodeIt->first);
+			}
+			// update last seen time
+			nodeIt->second.lastSeen = QTime::currentTime();
+		}
 		
 		// see if we have a registered handler for this message
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
@@ -942,12 +1049,15 @@ namespace Aseba
 		DashelInterface& dashelInterface;
 		unsigned counter;
 	};
-	
+
 	void DashelTarget::disconnectionFromDashel()
 	{
+		// tell user client the network was disconnected
 		emit networkDisconnected();
-		nodes.clear();
-		descriptionManager.reset();
+		
+		// set all nodes as disconnected
+		for (NodesMap::iterator node = nodes.begin(); node != nodes.end(); ++node)
+			node->second.connected = false;
 		
 		// show a dialog box that is trying to reconnect
 		ReconnectionDialog reconnectionDialog(dashelInterface);
@@ -960,13 +1070,21 @@ namespace Aseba
 		
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
+		const bool alreadyConnected(node.connected);
+		if (alreadyConnected)
+			qDebug() << "Warning, received description from already-connected node" << nodeId;
+		node.connected = true;
+		node.lastSeen = QTime::currentTime();
+		node.protocolVersion = descriptionManager.getDescription(nodeId)->protocolVersion;
 		
-		emit nodeConnected(nodeId);
+		if (!alreadyConnected)
+			emit nodeConnected(nodeId);
 	}
 	
 	void DashelTarget::receivedVariables(Message *message)
 	{
 		Variables *variables = polymorphic_downcast<Variables *>(message);
+		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 	
@@ -1128,6 +1246,8 @@ namespace Aseba
 	void DashelTarget::receivedDisconnected(Message *message)
 	{
 		Disconnected *disconnected = polymorphic_downcast<Disconnected *>(message);
+		
+		nodes[disconnected->source].connected = false;
 		
 		emit nodeDisconnected(disconnected->source);
 	}

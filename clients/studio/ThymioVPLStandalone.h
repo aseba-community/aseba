@@ -80,7 +80,6 @@ namespace Aseba
 		void resetSizes();
 		void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void closeEvent ( QCloseEvent * event );
-		void timerEvent ( QTimerEvent * event );
 		bool saveFile(bool as);
 		void openFile();
 		

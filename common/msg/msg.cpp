@@ -44,6 +44,13 @@ namespace Aseba
 			registerMessageType<BootloaderDataRead>(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ);
 			registerMessageType<BootloaderAck>(ASEBA_MESSAGE_BOOTLOADER_ACK);
 			
+			registerMessageType<ListNodes>(ASEBA_MESSAGE_LIST_NODES);
+			
+			registerMessageType<NodePresent>(ASEBA_MESSAGE_NODE_PRESENT);
+			
+			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
+			registerMessageType<GetNodeDescription>(ASEBA_MESSAGE_GET_NODE_DESCRIPTION);
+			
 			registerMessageType<Description>(ASEBA_MESSAGE_DESCRIPTION);
 			registerMessageType<NamedVariableDescription>(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION);
 			registerMessageType<LocalEventDescription>(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION);
@@ -57,15 +64,11 @@ namespace Aseba
 			registerMessageType<ExecutionStateChanged>(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED);
 			registerMessageType<BreakpointSetResult>(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT);
 			
-			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
-			
 			registerMessageType<BootloaderReset>(ASEBA_MESSAGE_BOOTLOADER_RESET);
 			registerMessageType<BootloaderReadPage>(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE);
 			registerMessageType<BootloaderWritePage>(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE);
 			registerMessageType<BootloaderPageDataWrite>(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE);
 			
-			//registerMessageType<AttachDebugger>(ASEBA_MESSAGE_ATTACH_DEBUGGER);
-			//registerMessageType<DetachDebugger>(ASEBA_MESSAGE_DETACH_DEBUGGER);
 			registerMessageType<SetBytecode>(ASEBA_MESSAGE_SET_BYTECODE);
 			registerMessageType<Reset>(ASEBA_MESSAGE_RESET);
 			registerMessageType<Run>(ASEBA_MESSAGE_RUN);
@@ -311,6 +314,23 @@ namespace Aseba
 	
 	//
 	
+	void CmdMessage::serializeSpecific()
+	{
+		add(dest);
+	}
+	
+	void CmdMessage::deserializeSpecific()
+	{
+		dest = get<uint16>();
+	}
+	
+	void CmdMessage::dumpSpecific(wostream &stream) const
+	{
+		stream << "dest " << dest << " ";
+	}
+	
+	//
+	
 	void BootloaderDescription::serializeSpecific()
 	{
 		add(pageSize);
@@ -384,6 +404,40 @@ namespace Aseba
 	
 	//
 	
+	void ListNodes::serializeSpecific()
+	{
+		add(version);
+	}
+	
+	void ListNodes::deserializeSpecific()
+	{
+		version = get<uint16>();
+	}
+	
+	void ListNodes::dumpSpecific(std::wostream  &stream) const
+	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
+	void NodePresent::serializeSpecific()
+	{
+		add(version);
+	}
+	
+	void NodePresent::deserializeSpecific()
+	{
+		version = get<uint16>();
+	}
+	
+	void NodePresent::dumpSpecific(std::wostream  &stream) const
+	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
 	void GetDescription::serializeSpecific()
 	{
 		add(version);
@@ -396,6 +450,29 @@ namespace Aseba
 	
 	void GetDescription::dumpSpecific(std::wostream  &stream) const
 	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
+	void GetNodeDescription::serializeSpecific()
+	{
+		CmdMessage::serializeSpecific();
+		
+		add(version);
+	}
+	
+	void GetNodeDescription::deserializeSpecific()
+	{
+		CmdMessage::deserializeSpecific();
+		
+		version = get<uint16>();
+	}
+	
+	void GetNodeDescription::dumpSpecific(wostream &stream) const
+	{
+		CmdMessage::dumpSpecific(stream);
+		
 		stream << "protocol version " << version;
 	}
 	
@@ -670,23 +747,6 @@ namespace Aseba
 	void BreakpointSetResult::dumpSpecific(wostream &stream) const
 	{
 		stream << "pc " << pc << ", success " << success;
-	}
-	
-	//
-	
-	void CmdMessage::serializeSpecific()
-	{
-		add(dest);
-	}
-	
-	void CmdMessage::deserializeSpecific()
-	{
-		dest = get<uint16>();
-	}
-	
-	void CmdMessage::dumpSpecific(wostream &stream) const
-	{
-		stream << "dest " << dest << " ";
 	}
 	
 	//

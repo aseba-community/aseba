@@ -1585,7 +1585,6 @@ namespace Aseba
 
 	MainWindow::MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent) :
 		QMainWindow(parent),
-		getDescriptionTimer(0),
 		sourceModified(false),
 		autoMemoryRefresh(autoRefresh)
 	{
@@ -1616,11 +1615,6 @@ namespace Aseba
 		updateWindowTitle();
 		if (readSettings() == false)
 			resize(1000,700);
-		
-		// when everything is ready, get description
-		target->broadcastGetDescription();
-		// start timer in case we do not receive any description now
-		getDescriptionTimer = startTimer(2000);
 	}
 	
 	MainWindow::~MainWindow()
@@ -2730,9 +2724,6 @@ namespace Aseba
 		
 		regenerateToolsMenus();
 		regenerateHelpMenu();
-		
-		if (!getDescriptionTimer)
-			getDescriptionTimer = startTimer(2000);
 	}
 	
 	//! The network connection has been cut: all nodes have disconnected.
@@ -2888,37 +2879,6 @@ namespace Aseba
 		Q_ASSERT(tab);
 		
 		tab->breakpointSetResult(line, success);
-	}
-	
-	//! If any node was disconnected or no nodes were found, send get description
-	void MainWindow::timerEvent ( QTimerEvent * event )
-	{
-		bool doSend(false);
-		bool anyNodeTab(false);
-		for (int i = 0; i < nodes->count(); i++)
-		{
-			// is there at least one node tab?
-			NodeTab* nodeTab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (nodeTab)
-				anyNodeTab = true;
-			// is there any absent node tab corresponding to a node that was seen?
-			AbsentNodeTab* tab = dynamic_cast<AbsentNodeTab*>(nodes->widget(i));
-			if (tab)
-				doSend = doSend || (tab->id != 0);
-		}
-		
-		// is there tab?
-		doSend = doSend || (!anyNodeTab);
-		
-		if (doSend)
-		{
-			target->broadcastGetDescription();
-		}
-		else
-		{
-			killTimer(getDescriptionTimer);
-			getDescriptionTimer = 0;
-		}
 	}
 	
 	//! Get the tab widget index of a corresponding node id

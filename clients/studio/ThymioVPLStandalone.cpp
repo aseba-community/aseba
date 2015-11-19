@@ -134,8 +134,7 @@ namespace Aseba
 		// setup initial values
 		id(0),
 		vpl(0),
-		allocatedVariablesCount(0),
-		getDescriptionTimer(0)
+		allocatedVariablesCount(0)
 	{
 		subscribeToVariableOfInterest(ASEBA_PID_VAR_NAME);
 		
@@ -143,9 +142,6 @@ namespace Aseba
 		setupWidgets();
 		setupConnections();
 		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
-		
-		// when everything is ready, get description
-		target->broadcastGetDescription();
 		
 		// resize if not android
 		#ifndef ANDROID
@@ -452,12 +448,6 @@ namespace Aseba
 		file.close();
 	}
 	
-	//! If any node was disconnected, send get description
-	void ThymioVPLStandalone::timerEvent ( QTimerEvent * event )
-	{
-		target.get()->broadcastGetDescription();
-	}
-	
 	//! The content of the editor was changed by VPL, recompile
 	void ThymioVPLStandalone::editorContentChanged()
 	{
@@ -524,13 +514,6 @@ namespace Aseba
 		
 		// read variables once to get PID
 		target->getVariables(id, 0, allocatedVariablesCount);
-		
-		// stop timer if any
-		if (getDescriptionTimer)
-		{
-			killTimer(getDescriptionTimer);
-			getDescriptionTimer = 0;
-		}
 	}
 	
 	//! A node has disconnected from the network.
@@ -554,9 +537,6 @@ namespace Aseba
 		// disconnect VPL if present
 		if (vpl)
 			nodeDisconnected(id);
-		// start timer for reconnection
-		if (!getDescriptionTimer)
-			getDescriptionTimer = startTimer(2000);
 	}
 	
 	//! The execution state logic thinks variables might need a refresh

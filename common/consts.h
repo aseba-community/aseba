@@ -33,7 +33,10 @@
 #define ASEBA_VERSION_INT 10498
 
 /*! version of aseba protocol, including bytecodes types and constants */
-#define ASEBA_PROTOCOL_VERSION 4
+#define ASEBA_PROTOCOL_VERSION 5
+
+/*! minimal accepted protocol version in targets */
+#define ASEBA_MIN_TARGET_PROTOCOL_VERSION 4
 
 /*! default listen target for aseba */
 #define ASEBA_DEFAULT_LISTEN_TARGET "tcpin:33333"
@@ -163,6 +166,7 @@ typedef enum
 	ASEBA_MESSAGE_NODE_SPECIFIC_ERROR,
 	ASEBA_MESSAGE_EXECUTION_STATE_CHANGED,
 	ASEBA_MESSAGE_BREAKPOINT_SET_RESULT,
+	ASEBA_MESSAGE_NODE_PRESENT,
 	
 	/* from IDE to all nodes */
 	ASEBA_MESSAGE_GET_DESCRIPTION = 0xA000,
@@ -183,6 +187,10 @@ typedef enum
 	ASEBA_MESSAGE_WRITE_BYTECODE,
 	ASEBA_MESSAGE_REBOOT,
 	ASEBA_MESSAGE_SUSPEND_TO_RAM,
+	ASEBA_MESSAGE_GET_NODE_DESCRIPTION,
+	
+	/* from IDE to all nodes, here because it was added later */
+	ASEBA_MESSAGE_LIST_NODES,
 	
 	ASEBA_MESSAGE_INVALID = 0xFFFF
 } AsebaSystemMessagesTypes;

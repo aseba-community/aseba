@@ -92,6 +92,22 @@ namespace Aseba
 		virtual operator const char * () const { return "user message"; }
 	};
 	
+	//! Commands messages talk to a specific node
+	class CmdMessage : public Message
+	{
+	public:
+		uint16 dest;
+	
+	public:
+		CmdMessage(uint16 type, uint16 dest) : Message(type), dest(dest) { }
+		
+	protected:	
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::wostream &stream) const;
+		virtual operator const char * () const { return "command message super class"; }
+	};
+	
 	//! Message for bootloader: description of the flash memory layout
 	class BootloaderDescription : public Message
 	{
@@ -152,7 +168,39 @@ namespace Aseba
 		virtual operator const char * () const { return "bootloader ack"; }
 	};
 	
-	//! Request nodes to send their description
+	//! Request nodes to notify their presence
+	class ListNodes : public Message
+	{
+	public:
+		uint16 version;
+		
+	public:
+		ListNodes() : Message(ASEBA_MESSAGE_LIST_NODES), version(ASEBA_PROTOCOL_VERSION) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::wostream &) const;
+		virtual operator const char * () const { return "list nodes"; }
+	};
+	
+	//! Ansewer of a node notifying its presence
+	class NodePresent : public Message
+	{
+	public:
+		uint16 version;
+		
+	public:
+		NodePresent() : Message(ASEBA_MESSAGE_NODE_PRESENT), version(ASEBA_PROTOCOL_VERSION) { }
+		
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::wostream &) const;
+		virtual operator const char * () const { return "node present"; }
+	};
+	
+	//! Request all nodes to send their description
 	class GetDescription : public Message
 	{
 	public:
@@ -166,6 +214,23 @@ namespace Aseba
 		virtual void deserializeSpecific();
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "presence"; }
+	};
+	
+	//! Request a specific node to send its description
+	class GetNodeDescription : public CmdMessage
+	{
+	public:
+		uint16 version;
+		
+	public:
+		GetNodeDescription() : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, ASEBA_DEST_INVALID), version(ASEBA_PROTOCOL_VERSION) { }
+		GetNodeDescription(uint16 dest) : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, dest), version(ASEBA_PROTOCOL_VERSION) { }
+	
+	protected:
+		virtual void serializeSpecific();
+		virtual void deserializeSpecific();
+		virtual void dumpSpecific(std::wostream &) const;
+		virtual operator const char * () const { return "get node description"; }
 	};
 	
 	//! Description of a node, local events and native functions are omitted and further received by other messages
@@ -349,22 +414,6 @@ namespace Aseba
 		virtual void deserializeSpecific();
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "breakpoint set result"; }
-	};
-	
-	//! Commands messages talk to a specific node
-	class CmdMessage : public Message
-	{
-	public:
-		uint16 dest;
-	
-	public:
-		CmdMessage(uint16 type, uint16 dest) : Message(type), dest(dest) { }
-		
-	protected:	
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
-		virtual void dumpSpecific(std::wostream &stream) const;
-		virtual operator const char * () const { return "command message super class"; }
 	};
 	
 	//! Message for bootloader: reset node

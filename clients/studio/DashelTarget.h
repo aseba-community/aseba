@@ -29,6 +29,8 @@
 #include <QQueue>
 #include <QTimer>
 #include <QThread>
+#include <QTime>
+#include <QMap>
 #include <map>
 #include <dashel/dashel.h>
 
@@ -143,6 +145,10 @@ namespace Aseba
 			unsigned steppingInNext; //!< state of node when in next and stepping
 			unsigned lineInNext; //!< line of node to execute when in next and stepping
 			ExecutionMode executionMode; //!< last known execution mode if this node
+			
+			bool connected; //!< whether this node is considered connected
+			QTime lastSeen; //!< when this node was last seen?
+			unsigned protocolVersion; //!< version of the protocol
 		};
 		
 		typedef void (DashelTarget::*MessageHandler)(Message *message);
@@ -157,6 +163,7 @@ namespace Aseba
 		SignalingDescriptionsManager descriptionManager;
 		NodesMap nodes;
 		QTimer userEventsTimer;
+		QTimer listNodesTimer;
 		bool writeBlocked; //!< true if write is being blocked by invasive plugins, false if write is allowed
 		
 	public:
@@ -170,8 +177,6 @@ namespace Aseba
 		virtual void disconnect();
 		
 		virtual const TargetDescription * const getDescription(unsigned node) const;
-		
-		virtual void broadcastGetDescription();
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
 		virtual void writeBytecode(unsigned node);
@@ -195,9 +200,15 @@ namespace Aseba
 	protected:
 		virtual void blockWrite();
 		virtual void unblockWrite();
+		
+	protected:
+		void broadcastGetDescription();
+		void broadcastListNodes();
+		void getNodeDescription(unsigned node);
 	
 	protected slots:
 		void updateUserEvents();
+		void listNodes();
 		void messageFromDashel(Message *message);
 		void disconnectionFromDashel();
 		void nodeDescriptionReceived(unsigned node);

@@ -732,15 +732,28 @@ static void AsebaVMResetWhenFlags(AsebaVMState *vm)
 
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
 {
-	
 	// react to global presence
 	if (id == ASEBA_MESSAGE_GET_DESCRIPTION)
 	{
-		AsebaSendDescription(vm);
+		const uint16 protocolVersion = bswap16(data[0]);
+		// up to protocol version 4 included, target must answer to GetDescription
+		if (protocolVersion <= 4)
+			AsebaSendDescription(vm);
+		return;
+	}
+	// react to global list nodes
+	if (id == ASEBA_MESSAGE_LIST_NODES)
+	{
+		const uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
+		AsebaSendMessageWords(vm, ASEBA_MESSAGE_NODE_PRESENT, &protocolVersion, 1);
 		return;
 	}
 	
-	// check if we are the destination, return otherwise
+	// safety check to avoid memory trash in case of unknown messages with 0 length
+	if (dataLength == 0)
+		return;
+	
+	// assume we have a command message, check if we are the destination, return otherwise
 	if (bswap16(data[0]) != vm->nodeId)
 		return;
 
@@ -857,6 +870,10 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		AsebaPutVmToSleep(vm);
 		break;
 		
+		case ASEBA_MESSAGE_GET_NODE_DESCRIPTION:
+		AsebaSendDescription(vm);
+		break;
+		
 		default:
 		break;
 	}
@@ -874,7 +891,8 @@ uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* dat
 	{
 		// debug message
 		uint16 dest = bswap16(((const uint16*)data)[1]);
-		if (type == ASEBA_MESSAGE_GET_DESCRIPTION)
+		if ((type == ASEBA_MESSAGE_GET_DESCRIPTION) ||
+			(type == ASEBA_MESSAGE_LIST_NODES))
 			return 0;
 		
 		// check it is for us

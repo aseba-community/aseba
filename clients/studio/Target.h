@@ -33,6 +33,8 @@ namespace Aseba
 	struct TargetDescription;
 	
 	//! The interface to an aseba network. Used to interact with the nodes
+	/*! The target is responsible for maintaining the state of the network, querying new nodes, etc.
+	*/
 	class Target: public QObject
 	{
 		Q_OBJECT
@@ -93,10 +95,6 @@ namespace Aseba
 		//! Virtual destructor.
 		virtual ~Target() { }
 	
-	/*public slots:
-		//! Try to connect to the aseba network.
-		virtual void connect() = 0;*/
-	
 	public:
 		//! Return the language that we choosen for this connection
 		virtual QString getLanguage() const = 0;
@@ -109,9 +107,6 @@ namespace Aseba
 		
 		//! Return a constant description of a node. Returned value is always valid if node exists
 		virtual const TargetDescription * const getDescription(unsigned node) const = 0;
-		
-		//! Request descriptions from the aseba network
-		virtual void broadcastGetDescription() = 0;
 		
 		//! Upload bytecode to target.
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode) = 0;
