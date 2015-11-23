@@ -83,9 +83,18 @@ namespace Aseba
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Wireless Thymio Network Configurator"));
-		// TODO: add icon
-		//setWindowIcon(QIcon(":/images/thymioupgrader.svgz"));
+		setWindowIcon(QIcon(":/images/thymiownetconfig.svgz"));
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
+		
+		// image
+		QHBoxLayout *imageLayout = new QHBoxLayout();
+		QLabel* image = new QLabel(this);
+		QPixmap logo(":/images/thymiownetconfig.svgz");
+		image->setPixmap(logo.scaledToWidth(384));
+		imageLayout->addStretch();
+		imageLayout->addWidget(image);
+		imageLayout->addStretch();
+		mainLayout->addLayout(imageLayout);
 		
 		// version
 		versionLabel = new QLabel();
