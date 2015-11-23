@@ -9,7 +9,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit b2255c64be631fec2d71555a45043cfc60561d36
+%global commit 2fae6157d060479ae5d5bd825b000ccd4b7b8d57
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line with the git commit has of the revision of Catch
@@ -31,7 +31,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.3%{?snapshot}%{?dist}
+Release:        0.4%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -57,7 +57,7 @@ BuildRequires: ImageMagick-devel
 BuildRequires: SDL-devel
 BuildRequires: binutils
 BuildRequires: cmake
-BuildRequires: dashel-devel >= 1.0.8
+BuildRequires: dashel-devel >= 1.1.0
 BuildRequires: desktop-file-utils
 BuildRequires: elfutils
 BuildRequires: enki-devel
@@ -94,6 +94,7 @@ using a cozy integrated development environment.
 %package -n %{lib_pkg_name}
 Summary:        Libraries for %{name}
 Group: System/Libraries
+Requires:       libdashel1 >= 1.1.0
 
 %description  -n %{lib_pkg_name}
 The %{lib_pkg_name} package contains libraries running applications that use
@@ -183,6 +184,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Thu Nov 19 2015 Dean Brettle <dean@brettle.com> - 1.5.0-0.4.20151119git2fae615
+- Require libdashel1 >= 1.1.0
+
 * Tue Oct 13 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20151013gitb2255c6
 - Incorporate fixes needed by other platforms and package systems
 
