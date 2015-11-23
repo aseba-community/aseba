@@ -76,7 +76,7 @@ namespace Aseba
 		void checkIfNodeDescriptionComplete(unsigned id, const NodeDescription& description);
 		
 		//! Virtual function that is called when a version mismatches
-		virtual void nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion) { }
+		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion) { }
 		
 		//! Virtual function that is called when a node description has been fully received
 		virtual void nodeDescriptionReceived(unsigned nodeId) { }

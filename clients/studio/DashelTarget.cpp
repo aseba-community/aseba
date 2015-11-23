@@ -366,8 +366,16 @@ namespace Aseba
 		this->stream = 0;
 	}
 	
-	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion)
+	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion)
 	{
+		// show warning only once
+		if (notifiedMismatch.contains(nodeId))
+			return;
+		
+		// store id to prevent further notification
+		notifiedMismatch.insert(nodeId);
+		
+		// show a different warning in function of the mismatch
 		if (protocolVersion > ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
@@ -966,8 +974,10 @@ namespace Aseba
 		if (nodeIt == nodes.end())
 		{
 			// node is not known, so ignore excepted if the message type 
-			// is node present; in that case, request description
-			if (message->type == ASEBA_MESSAGE_NODE_PRESENT)
+			// is node present and it is not a known mismatch protocol;
+			// in that case, request description
+			if ((message->type == ASEBA_MESSAGE_NODE_PRESENT) &&
+				!descriptionManager.hasNodeProtocolMismatch(message->source))
 				getNodeDescription(message->source);
 			delete message;
 			return;

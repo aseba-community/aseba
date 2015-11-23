@@ -68,9 +68,8 @@ namespace Aseba
 				// Call a user function when a node protocol version mismatches
 				if ((description->protocolVersion < ASEBA_MIN_TARGET_PROTOCOL_VERSION) ||
 					(description->protocolVersion > ASEBA_PROTOCOL_VERSION))
-				//if (description->protocolVersion != ASEBA_PROTOCOL_VERSION)
 				{
-					nodeProtocolVersionMismatch(description->name, description->protocolVersion);
+					nodeProtocolVersionMismatch(description->source, description->name, description->protocolVersion);
 					return;
 				}
 				

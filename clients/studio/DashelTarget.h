@@ -31,6 +31,7 @@
 #include <QThread>
 #include <QTime>
 #include <QMap>
+#include <QSet>
 #include <map>
 #include <dashel/dashel.h>
 
@@ -127,8 +128,15 @@ namespace Aseba
 		void nodeDescriptionReceivedSignal(unsigned nodeId);
 	
 	protected:
-		virtual void nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion);
+		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
+		
+	public:
+		//! Return true if this nodeId is known to have 
+		bool hasNodeProtocolMismatch(unsigned nodeId) const { return notifiedMismatch.contains(nodeId); }
+		
+	protected:
+		QSet<unsigned> notifiedMismatch;
 	};
 	
 	class DashelTarget: public Target
