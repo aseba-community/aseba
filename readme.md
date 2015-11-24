@@ -17,17 +17,17 @@ platforms: http://www.cmake.org/cmake/help/runningcmake.html
 
 Aseba depends on the following libraries:
 - Dashel (http://home.gna.org/dashel/)
-- Boost (http://www.boost.org/)
+- Enki (http://home.gna.org/enki/, optional, for simulators)
 - Qt4 (http://www.qtsoftware.com/products/, for IDE)
 - Qwt (http://qwt.sourceforge.net/, optional, for graphs)
-- Enki (http://home.gna.org/enki/, optional, for simulators)
+- libxml2 (http://www.xmlsoft.org/, optional, for switches)
 
-And optionally, to enumerate serial ports properly on linux:
+And optionally, to enumerate serial ports properly on Linux:
 - libudev (http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/)
 
-On Linux, the first four libraries are packages available in your distribution. For instance, on Ubuntu, you can install them, along cmake and the compiler, with:
+On Linux, the Qt4, Qwt, libxml2 and udev are packages available in your distribution. For instance, on Ubuntu, you can install them, along cmake and the compiler, with:
 
-	sudo apt-get install libboost-dev libqt4-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev cmake g++ subversion git
+	sudo apt-get install libboost-dev libqt4-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev libxml2-dev cmake g++ subversion git
 
 Then you have to fetch Dashel, Enki, compile them, and then you can fetch Aseba and tell it where it can find Dashel and Enki. Then you can compile Aseba. The following script does this for you:
 
