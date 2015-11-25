@@ -20,7 +20,6 @@
 */
 
 #include "dbusinterface.h"
-#include <iostream>
 
 namespace Aseba
 {
@@ -28,12 +27,12 @@ namespace Aseba
 	DBusInterface::DBusInterface() :
 		bus(QDBusConnection::sessionBus()),
 		callbacks({}),
-		dbus_iface("ch.epfl.mobots.Aseba", "/", "ch.epfl.mobots.AsebaNetwork",bus)
+		dbusMainInterface("ch.epfl.mobots.Aseba", "/", "ch.epfl.mobots.AsebaNetwork",bus)
 	{
 		checkConnection();
 
 		// setup event filter
-		QDBusMessage eventfilterMessage = dbus_iface.call("CreateEventFilter");
+		QDBusMessage eventfilterMessage = dbusMainInterface.call("CreateEventFilter");
 		QDBusObjectPath eventfilterPath = eventfilterMessage.arguments().at(0).value<QDBusObjectPath>();
 		eventfilterInterface = new QDBusInterface("ch.epfl.mobots.Aseba", eventfilterPath.path(), "ch.epfl.mobots.EventFilter",bus);
 		if(!bus.connect("ch.epfl.mobots.Aseba",
@@ -43,7 +42,7 @@ namespace Aseba
 						this,
 						SLOT(dispatchEvent(const QDBusMessage&))))
 		{
-			std::cout << "failed to connect eventfilter signal to dispatchEvent slot!";
+			qDebug() << "failed to connect eventfilter signal to dispatchEvent slot!";
 		}
 	}
 
@@ -59,7 +58,7 @@ namespace Aseba
 	}
 
 	// Convert  QDBusMessage to QList<qint16> Values, extracting data at a particular index of the construct
-	Values DBusInterface::dBusMessagetoValues(QDBusMessage dbmess,int index)
+	Values DBusInterface::dBusMessagetoValues(const QDBusMessage& dbmess, int index)
 	{
 		QDBusArgument read = dbmess.arguments().at(index).value<QDBusArgument>();
 		Values values;
@@ -68,7 +67,7 @@ namespace Aseba
 	}
 
 	// Display a list of qint's nicely as a string
-	std::string DBusInterface::toString(Values v)
+	std::string DBusInterface::toString(const Values& v)
 	{
 		std::string out = "[";
 		for (int i=0;i<v.size();i++)
@@ -91,12 +90,12 @@ namespace Aseba
 			fprintf(stderr, "Cannot connect to the D-Bus session bus.\n"
 							"To start it, run:\n"
 							"\teval `dbus-launch --auto-syntax`\n");
-			std::cout<<"erreur"<<std::endl;
+			qDebug() << "error";
 			return false;
 		}
-		std::cout<<"You are connected to the D-Bus session bus"<<std::endl;
+		qDebug() << "You are connected to the D-Bus session bus";
 
-		QDBusMessage nodelist=dbus_iface.call("GetNodesList");
+		QDBusMessage nodelist=dbusMainInterface.call("GetNodesList");
 
 		for (int i=0;i<nodelist.arguments().size();++i)
 		{
@@ -112,8 +111,8 @@ namespace Aseba
 	//Display the list of Aseba Nodes connected on the Aseba Network
 	void DBusInterface::displayNodeList()
 	{
-		qDebug()<<"Aseba nodes list: ";
-		qDebug()<<nodeList;
+		qDebug() << "Aseba nodes list: ";
+		qDebug() << nodeList;
 	}
 
 	//Load an Aseba script (.aesl) on an Aseba Node
@@ -131,24 +130,24 @@ namespace Aseba
 		else
 		{
 			// load the script
-			dbus_iface.call("LoadScripts",path_to_script);
+			dbusMainInterface.call("LoadScripts",path_to_script);
 		}
 	}
 
 	//Get an Aseba variable from a Aseba node
 	Values DBusInterface::getVariable(const QString& node, const QString& variable)
 	{
-		return dBusMessagetoValues(dbus_iface.call( "GetVariable",node, variable),0);
+		return dBusMessagetoValues(dbusMainInterface.call( "GetVariable",node, variable),0);
 	}
 
 	//Set an Aseba variable from a Aseba node
-	void DBusInterface::setVariable(const QString& node, const QString& variable,Values& value)
+	void DBusInterface::setVariable(const QString& node, const QString& variable, const Values& value)
 	{
-		dbus_iface.call("SetVariable",node,variable,valuetoVariant(value));
+		dbusMainInterface.call("SetVariable",node,variable,valuetoVariant(value));
 	}
 
 	// Flag an event to listen for, and associate callback function (passed by pointer)
-	void DBusInterface::connectEvent(const QString& eventName, std::function<void(Values)> callback)
+	void DBusInterface::connectEvent(const QString& eventName, EventCallback callback)
 	{
 		// associate callback with event name
 		callbacks[eventName] = callback;
@@ -158,19 +157,19 @@ namespace Aseba
 	}
 
 	//Send Aseba Event using the ID of the Event
-	void DBusInterface::sendEvent(quint16 eventID, Values& value)
+	void DBusInterface::sendEvent(quint16 eventID, const Values& value)
 	{
 		QDBusArgument argument;
 		argument<<eventID;
 		QVariant variant;
 		variant.setValue(argument);
-		dbus_iface.call("SendEvent",variant,valuetoVariant(value));
+		dbusMainInterface.call("SendEvent",variant,valuetoVariant(value));
 	}
 
 	//Send Aseba Event using the name of the Event
 	void DBusInterface::sendEventName(const QString& eventName, const Values& value)
 	{
-		dbus_iface.call("SendEventName",eventName,valuetoVariant(value));
+		dbusMainInterface.call("SendEventName",eventName,valuetoVariant(value));
 	}
 
 	//Callback (slot) used to retrieve subscribed event information

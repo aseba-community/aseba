@@ -36,7 +36,7 @@ DBusInterface *ThymioIIInterface;
 
 // Example of a custom callback function, to connect to ThymioIIInterface
 // Note: connected callbacks need not be global (see std::function documentation in C++11 for more information)
-void my_callback(Values event_values)
+void my_callback(const Values& event_values)
 {
 	cout << "\nThymio encountered an obstacle " << DBusInterface::toString(event_values) << endl;
 
@@ -52,13 +52,13 @@ void my_callback(Values event_values)
 		}
 	}
 	Values sound_index({max_index});
-	ThymioIIInterface->sendEventName("PlaySound",sound_index);
+	ThymioIIInterface->sendEventName("PlaySound", sound_index);
 }
 
 
 int main(int argc, char *argv[])
 {
-	// QT init
+	// Qt init
 	QCoreApplication a(argc, argv);
 
 	// interface instantiation
@@ -71,24 +71,19 @@ int main(int argc, char *argv[])
 
 	// set Aseba variables
 	cout << "\n-setting wheel speeds to move forward-" << endl;
-	qint16 speedInitLeft=100;
-	qint16 speedInitRight=100;
-	Values data({speedInitLeft});
-	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", data);
-	data.clear();
-	data.append(speedInitRight);
-	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", data);
+	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", Values({100}));
+	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", Values({100}));
 
 	sleep(5);
 
 	// send an Event
 	cout << "\n-sending stop event-" << endl;
 	Values event_args({});
-	ThymioIIInterface->sendEventName("Stop",event_args);
+	ThymioIIInterface->sendEventName("Stop", event_args);
 
 	// flag an envent to be listened to, and connect its occurence with your own callback funtion
 	cout << "\n-listening for ObstacleDetected events-" << endl;
-	ThymioIIInterface->connectEvent("ObstacleDetected",my_callback);
+	ThymioIIInterface->connectEvent("ObstacleDetected", my_callback);
 
 	return a.exec();
 }

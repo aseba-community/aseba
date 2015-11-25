@@ -39,8 +39,9 @@ namespace Aseba
 	private:
 
 		QDBusConnection bus;
-		std::map<QString, std::function<void(Values)>> callbacks;
-		QDBusInterface dbus_iface;
+		typedef std::function<void(const Values&)> EventCallback;
+		std::map<QString, EventCallback> callbacks;
+		QDBusInterface dbusMainInterface;
 		QDBusInterface* eventfilterInterface;
 
 	public:
@@ -50,18 +51,18 @@ namespace Aseba
 		QList<QString> nodeList;
 
 		static QVariant valuetoVariant(const Values& value);
-		static Values dBusMessagetoValues(QDBusMessage dbmess,int index);
-		static std::string toString(Values v);
+		static Values dBusMessagetoValues(const QDBusMessage& dbmess, int index);
+		static std::string toString(const Values& v);
 
 
 		bool checkConnection();
 		void displayNodeList();
 		void loadScript(const QString& script);
 		Values getVariable(const QString& node, const QString& variable);
-		void setVariable(const QString& node, const QString& variable,Values& value);
-		void connectEvent(const QString& eventName, std::function<void(Values)> callback);
+		void setVariable(const QString& node, const QString& variable, const Values& value);
+		void connectEvent(const QString& eventName, EventCallback callback);
 
-		void sendEvent(quint16 eventID, Values& value);
+		void sendEvent(quint16 eventID, const Values& value);
 		void sendEventName(const QString& eventName, const Values& value);
 
 	public slots:
