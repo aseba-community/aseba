@@ -126,6 +126,14 @@ namespace Aseba
 		// scan this message for nodes descriptions
 		DescriptionsManager::processMessage(message);
 		
+		// if node present
+		NodePresent *nodePresent = dynamic_cast<NodePresent *>(message);
+		if (nodePresent)
+		{
+			GetNodeDescription getNodeDescription(nodePresent->source);
+			hub->sendMessage(getNodeDescription);
+		}
+		
 		// if user message, send to D-Bus as well
 		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
 		if (userMessage)
@@ -561,6 +569,7 @@ namespace Aseba
 	void Hub::requestDescription()
 	{
 		emit messageAvailable(new GetDescription(), 0);
+		emit messageAvailable(new ListNodes(), 0);
 	}
 	
 	// the following methods run in the blocking reception thread
