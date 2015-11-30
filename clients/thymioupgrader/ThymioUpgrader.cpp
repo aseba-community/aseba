@@ -1,3 +1,4 @@
+#include <QQueue>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
@@ -20,6 +21,7 @@
 #include "../../common/consts.h"
 #include "../../common/msg/msg.h"
 #include "../../common/utils/HexFile.h"
+#include "../../common/utils/utils.h"
 
 #include "ThymioUpgrader.h"
 
@@ -32,29 +34,37 @@ namespace Aseba
 	class MessageHub: public Hub
 	{
 	public:
-		Message* message;
+		QQueue<Message*> messages;
 		
 	public:
-		MessageHub():
-			message(0)
+		MessageHub()
 		{}
 		
 		virtual ~MessageHub()
 		{
-			clearMessage();
+			while (!messages.empty())
+				delete messages.dequeue();
 		}
 		
 		virtual void incomingData(Stream * stream)
 		{
-			clearMessage();
-			message = Message::receive(stream);
+			messages.enqueue(Message::receive(stream));
+		}
+		
+		bool isMessage() const
+		{
+			return !messages.empty();
+		}
+		
+		Message* getMessage() const
+		{
+			return messages.head();
 		}
 		
 		void clearMessage()
 		{
-			if (message)
-				delete(message);
-			message = 0;
+			if (!messages.empty())
+				delete messages.dequeue();
 		}
 	};
 	
@@ -192,10 +202,10 @@ namespace Aseba
 		while (restDuration > 0)
 		{
 			hub.step(restDuration);
-			if (hub.message)
+			while (hub.isMessage())
 			{
 				// if node present, store id from source
-				NodePresent* nodePresent(dynamic_cast<NodePresent*>(hub.message));
+				NodePresent* nodePresent(dynamic_cast<NodePresent*>(hub.getMessage()));
 				if (nodePresent)
 				{
 					nodeId = nodePresent->source;
@@ -203,7 +213,7 @@ namespace Aseba
 					break;
 				}
 				// if description, store id frome source, but continue reading
-				Description* description(dynamic_cast<Description*>(hub.message));
+				Description* description(dynamic_cast<Description*>(hub.getMessage()));
 				if (description)
 				{
 					nodeId = description->source;
@@ -225,9 +235,9 @@ namespace Aseba
 		while (restDuration > 0)
 		{
 			hub.step(restDuration);
-			if (hub.message)
+			while (hub.isMessage())
 			{
-				Variables* variables(dynamic_cast<Variables*>(hub.message));
+				Variables* variables(dynamic_cast<Variables*>(hub.getMessage()));
 				if (variables && variables->start == firmwareAddress && variables->variables.size() == 2)
 				{
 					const unsigned version(variables->variables[0]);
@@ -298,6 +308,10 @@ namespace Aseba
 		{
 			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A communication error happened during the upgrade process: %1").arg(e.what()));
 		}
+		
+		// sleep 1 second
+		UnifiedTime(1000).sleep();
+		
 		return FlashResult();
 	}
 	
@@ -324,6 +338,11 @@ namespace Aseba
 		{
 			QMessageBox::critical(this, result.title, result.text);
 			close();
+		}
+		else
+		{
+			// reread version
+			readIdVersion();
 		}
 	}
 };
