@@ -9,6 +9,7 @@
 
 class QVBoxLayout;
 class QHBoxLayout;
+class QLabel;
 class QProgressBar;
 class QPushButton;
 class QLineEdit;
@@ -25,7 +26,7 @@ namespace Aseba
 		Q_OBJECT
 		
 	public:
-		QtBootloaderInterface(Dashel::Stream* stream, int dest);
+		QtBootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
 		
 	protected:
 		virtual void writeHexGotDescription(unsigned pagesCount);
@@ -62,9 +63,13 @@ namespace Aseba
 		
 	private:
 		std::string target;
+		unsigned nodeId;
+		
 		QVBoxLayout* mainLayout;
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
+		QLabel* firmwareVersion;
+		QLabel* nodeIdText;
 		QLineEdit* lineEdit;
 		QPushButton* fileButton;
 		QProgressBar* progressBar;
@@ -78,7 +83,8 @@ namespace Aseba
 		~ThymioUpgraderDialog();
 		
 	private:
-		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
+		void readIdVersion();
+		FlashResult flashThread(const std::string& _target, const int _nodeId, const std::string& hexFileName) const;
 	
 	private slots:
 		void setupFlashButtonState();

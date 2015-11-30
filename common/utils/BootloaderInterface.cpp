@@ -36,6 +36,18 @@ namespace Aseba
 	BootloaderInterface::BootloaderInterface(Stream* stream, int dest) :
 		stream(stream),
 		dest(dest),
+		bootloaderDest(dest),
+		pageSize(0),
+		pagesStart(0),
+		pagesCount(0)
+	{
+		
+	}
+	
+	BootloaderInterface::BootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest) :
+		stream(stream),
+		dest(dest),
+		bootloaderDest(bootloaderDest),
 		pageSize(0),
 		pagesStart(0),
 		pagesCount(0)
@@ -112,7 +124,7 @@ namespace Aseba
 		
 		// send command
 		BootloaderWritePage writePage;
-		writePage.dest = dest;
+		writePage.dest = bootloaderDest;
 		writePage.pageNumber = pageNumber;
 		writePage.serialize(stream);
 		
@@ -133,7 +145,7 @@ namespace Aseba
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
-				if (ackMessage && (ackMessage->source == dest))
+				if (ackMessage && (ackMessage->source == bootloaderDest))
 				{
 					uint16 errorCode = ackMessage->errorCode;
 					if(errorCode == BootloaderAck::SUCCESS)
@@ -147,7 +159,7 @@ namespace Aseba
 			for (unsigned dataWritten = 0; dataWritten < pageSize;)
 			{
 				BootloaderPageDataWrite pageData;
-				pageData.dest = dest;
+				pageData.dest = bootloaderDest;
 				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
 				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
@@ -184,7 +196,7 @@ namespace Aseba
 			
 			// handle ack
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
-			if (ackMessage && (ackMessage->source == dest))
+			if (ackMessage && (ackMessage->source == bootloaderDest))
 			{
 				uint16 errorCode = ackMessage->errorCode;
 				if(errorCode == BootloaderAck::SUCCESS)
@@ -246,7 +258,7 @@ namespace Aseba
 			{
 				auto_ptr<Message> message(Message::receive(stream));
 				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message.get());
-				if (bDescMessage && (bDescMessage->source == dest))
+				if (bDescMessage && (bDescMessage->source == bootloaderDest))
 				{
 					pageSize = bDescMessage->pageSize;
 					pagesStart = bDescMessage->pagesStart;
@@ -329,7 +341,7 @@ namespace Aseba
 
 		if (reset) 
 		{
-			BootloaderReset msg(dest);
+			BootloaderReset msg(bootloaderDest);
 			msg.serialize(stream);
 			stream->flush();
 			

@@ -184,7 +184,7 @@ namespace Aseba
 		virtual operator const char * () const { return "list nodes"; }
 	};
 	
-	//! Ansewer of a node notifying its presence
+	//! Answer of a node notifying its presence
 	class NodePresent : public Message
 	{
 	public:
