@@ -183,8 +183,9 @@ namespace Aseba
 		
 		// list nodes to get ids
 		ListNodes().serialize(stream);
+		GetDescription().serialize(stream);;
 		stream->flush();
-		
+
 		// process data for up to one second
 		QTime listNodeTime(QTime::currentTime());
 		int restDuration(1000);
@@ -200,6 +201,12 @@ namespace Aseba
 					nodeId = nodePresent->source;
 					hub.clearMessage();
 					break;
+				}
+				// if description, store id frome source, but continue reading
+				Description* description(dynamic_cast<Description*>(hub.message));
+				if (description)
+				{
+					nodeId = description->source;
 				}
 				hub.clearMessage();
 			}
