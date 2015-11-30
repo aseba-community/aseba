@@ -79,7 +79,7 @@ namespace Aseba
 		ts.tv_nsec = ((value % 1000) * 1000000);
 		nanosleep(&ts, 0);
 		#else // WIN32
-		assert(value < (1 << 32));
+		assert(value <= 4294967295);
 		Sleep((DWORD)value);
 		#endif // WIN32
 	}

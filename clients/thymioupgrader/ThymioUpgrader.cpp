@@ -309,8 +309,8 @@ namespace Aseba
 			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A communication error happened during the upgrade process: %1").arg(e.what()));
 		}
 		
-		// sleep 1 second
-		UnifiedTime(1000).sleep();
+		// sleep 100 ms
+		UnifiedTime(100).sleep();
 		
 		return FlashResult();
 	}
