@@ -149,16 +149,19 @@ public:
 		stream->read(&lastMessageData[0], lastMessageData.size());
 		
 		AsebaProcessIncomingEvents(&vm);
+		
+		// run VM
+		AsebaVMRun(&vm, 1000);
 	}
 	
 	virtual void applicationStep()
 	{
-		// run VM
-		AsebaVMRun(&vm, 65535);
-		
 		// reschedule a periodic event if we are not in step by step
 		if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 			AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
+		
+		// run VM
+		AsebaVMRun(&vm, 1000);
 	}
 } node;
 
