@@ -9,6 +9,7 @@ interfaces.
 Here is a short summary of the content:
 
 - cpp-qt-dbus
+
     This is a C++/QT project showing how to interface with Aseba (medulla) using
     D-Bus (QDBus). The class dbusinterface contains methods that establish the D-Bus
     interface with an Aseba Network. An interface with Thymio II is shown in the 
