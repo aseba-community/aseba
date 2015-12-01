@@ -332,6 +332,9 @@ namespace Aseba
 		QTextBlock block = editor->document()->firstBlock();
 
 		painter.setPen(Qt::darkGray);
+		// set font from editor
+		painter.setFont(editor->font());
+		
 		// iterate over all text blocks
 		// FIXME: do clever painting
 		while(block.isValid())
@@ -341,7 +344,7 @@ namespace Aseba
 				QString number = QString::number(block.blockNumber() + 1);
 				// paint the line number
 				int y = block.layout()->position().y() + region.top() - verticalScroll;
-				painter.drawText(0, y, width(), fontMetrics().height(), Qt::AlignRight, number);
+				painter.drawText(0, y, width(), editor->fontMetrics().height(), Qt::AlignRight, number);
 			}
 
 			block = block.next();
@@ -359,7 +362,7 @@ namespace Aseba
 			digits++;
 		}
 
-		int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+		int space = 3 + editor->fontMetrics().width(QLatin1Char('9')) * digits;
 
 		return space;
 	}
@@ -368,15 +371,16 @@ namespace Aseba
 		AeslEditorSidebar(editor),
 		borderSize(1)
 	{
-		// define the breakpoint geometry, according to the font metrics
-		QFontMetrics metrics = fontMetrics();
-		int lineSpacing = metrics.lineSpacing();
-		breakpoint = QRect(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
+		
 	}
 
 	void AeslBreakpointSidebar::paintEvent(QPaintEvent *event)
 	{
 		AeslEditorSidebar::paintEvent(event);
+		
+		// define the breakpoint geometry, according to the font metrics from the editor
+		const int lineSpacing = editor->fontMetrics().lineSpacing();
+		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
 
 		// begin painting
 		QPainter painter(this);
@@ -431,6 +435,9 @@ namespace Aseba
 
 	int AeslBreakpointSidebar::idealWidth() const
 	{
+		// get metrics from editor
+		const int lineSpacing = editor->fontMetrics().lineSpacing();
+		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
 		return breakpoint.width() + 2*borderSize;
 	}
 
@@ -699,9 +706,37 @@ namespace Aseba
 		setTextCursor(cursor);
 		ensureCursorVisible();
 	}
+	
+	void AeslEditor::wheelEvent(QWheelEvent * event)
+	{
+		// handle zooming of text
+		if (event->modifiers() & Qt::ControlModifier)
+		{
+			if (event->delta() > 0)
+				zoomIn();
+			else if (event->delta() < 0)
+				zoomOut();
+		}
+	}
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
+		// handle zooming of text
+		if (event->modifiers() & Qt::ControlModifier)
+		{
+			if (event->key() == Qt::Key_Plus)
+			{
+				zoomIn();
+				return;
+			}
+			if (event->key() == Qt::Key_Minus)
+			{
+				zoomOut();
+				return;
+			}
+		}
+		
+		// handle special pressed
 		if (handleCompleter(event))
 			return;
 		if (handleTab(event))
