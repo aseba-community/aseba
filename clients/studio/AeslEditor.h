@@ -136,7 +136,6 @@ namespace Aseba
 
 	protected:
 		const int borderSize;
-		QRect breakpoint;
 	};
 	
 	enum LocalContext {
@@ -193,6 +192,7 @@ namespace Aseba
 		void insertCompletion(const QString &completion);
 
 	protected:
+		virtual void wheelEvent(QWheelEvent * event);
 		virtual void keyPressEvent(QKeyEvent * event);
 
 		virtual bool handleCompleter(QKeyEvent * event);
