@@ -168,17 +168,17 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="208"/>
         <source>Thymio node identifier: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Identificativo del nodo del Thymio :%1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="229"/>
         <source>Current firmware: version %1 - production</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware attuale: %1 - produzione</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="231"/>
         <source>Current firmware: version %1 - development %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware attuale: %1 - sviluppo %2</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="244"/>
@@ -231,34 +231,34 @@
         <location filename="ThymioUpgrader.cpp" line="359"/>
         <source>Wireless Thymio found</source>
         <oldsource>Wireless Thymio II found</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Wireless Thymio trovato</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="359"/>
         <source>&lt;p&gt;&lt;b&gt;Wireless connection to Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Una connessione wireless a Thymio è stato trovato!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un singolo Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="364"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt; Collegare un Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="369"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Trovati più di un Thymio !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un singolo Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="369"/>
         <source>Multiple Thymios found</source>
         <oldsource>Multiple Thymio found</oldsource>
-        <translation type="unfinished">Trovati più Thymio II</translation>
+        <translation>Diversi Thymio trovati</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="364"/>
         <source>Thymio not found</source>
         <oldsource>Thymio II not found</oldsource>
-        <translation type="unfinished">Thymio II non trovato</translation>
+        <translation>Thymio non trovato</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug Thymio II or use the command-line firmware upgrader (asebacmd).&lt;/p&gt;</source>
