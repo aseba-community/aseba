@@ -713,10 +713,17 @@ namespace Aseba
 		if (event->modifiers() & Qt::ControlModifier)
 		{
 			if (event->delta() > 0)
+			{
 				zoomIn();
+				return;
+			}
 			else if (event->delta() < 0)
+			{
 				zoomOut();
+				return;
+			}
 		}
+		QTextEdit::wheelEvent(event);
 	}
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
