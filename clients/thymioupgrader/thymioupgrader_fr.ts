@@ -182,6 +182,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="231"/>
         <source>Current firmware: version %1 - development %2</source>
+        <translatorcomment> </translatorcomment>
         <translation>Firmware actuel : %1 - développement %2</translation>
     </message>
     <message>
@@ -255,7 +256,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="369"/>
         <source>Multiple Thymios found</source>
-        <translation>Plusieurs Thymios trouvés</translation>
+        <translation>Plusieurs Thymio trouvés</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Wireless connection to Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio using the USB cable.&lt;/p&gt;</source>

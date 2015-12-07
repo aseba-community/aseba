@@ -187,6 +187,8 @@ namespace Aseba { namespace ThymioBlockly
 
 		if(de->getTarget()->getLanguage() == "de") {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.de.html"));
+        } else if(de->getTarget()->getLanguage() == "fr") {
+			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html"));
 		} else {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.html"));
 		}
