@@ -73,9 +73,9 @@ namespace Aseba { namespace ThymioBlockly
 		
 		mainLayout = new QVBoxLayout(this);
 		
-		toolLayout = new  QGridLayout();
-		toolLayout->setHorizontalSpacing(0);
-		toolLayout->setVerticalSpacing(0);
+		toolLayout = new  QHBoxLayout();
+		//toolLayout->setHorizontalSpacing(0);
+		//toolLayout->setVerticalSpacing(0);
 		mainLayout->addLayout(toolLayout);
 		// add back the spacing we removed
 		mainLayout->addSpacing(style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing));
@@ -85,90 +85,87 @@ namespace Aseba { namespace ThymioBlockly
 		newButton->setToolTip(tr("New"));
 		newButton->setFlat(true);
 		newButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(newButton,0,0);
+		toolLayout->addWidget(newButton);
 		
 		openButton = new QPushButton();
 		openButton->setIcon(QIcon(":/images/icons/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
 		openButton->setFlat(true);
 		openButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(openButton,0,1);
+		toolLayout->addWidget(openButton);
 		
 		saveButton = new QPushButton();
 		saveButton->setIcon(QIcon(":/images/icons/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 		saveButton->setFlat(true);
 		saveButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(saveButton,1,0);
+		toolLayout->addWidget(saveButton);
 		
 		saveAsButton = new QPushButton();
 		saveAsButton->setIcon(QIcon(":/images/icons/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 		saveAsButton->setFlat(true);
 		saveAsButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(saveAsButton,1,1);
+		toolLayout->addWidget(saveAsButton);
 		
 		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer1,0,2,2,1);
+		toolLayout->addItem(spacer1);
 		
 		firstSeparator = new QFrame();
 		firstSeparator->setFrameShape(QFrame::VLine);
 		firstSeparator->setFrameShadow(QFrame::Sunken);
-		toolLayout->addWidget(firstSeparator,0,3,2,1);
+		toolLayout->addWidget(firstSeparator);
 		
 		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer2,0,4,2,1);
+		toolLayout->addItem(spacer2);
 
 		spacer3 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer3,0,7,2,1);
+		toolLayout->addItem(spacer3);
 
 		runButton = new QPushButton();
 		runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		runButton->setToolTip(tr("Load & Run"));
 		runButton->setFlat(true);
 		runButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(runButton,0,8,2,1);
+		toolLayout->addWidget(runButton);
 		
 		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacerRunStop,0,9,2,1);
+		toolLayout->addItem(spacerRunStop);
 
 		stopButton = new QPushButton();
 		stopButton->setIcon(QIcon(":/images/icons/stop.svgz"));
 		stopButton->setToolTip(tr("Stop"));
 		stopButton->setFlat(true);
 		stopButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(stopButton,0,10,2,1);
+		toolLayout->addWidget(stopButton);
 		
 		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer4,0,11,2,1);
+		toolLayout->addItem(spacer4);
 		
 		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer5,0,13,2,1);
+		toolLayout->addItem(spacer5);
 		
 		secondSeparator = new QFrame();
 		secondSeparator->setFrameShape(QFrame::VLine);
 		secondSeparator->setFrameShadow(QFrame::Sunken);
-		toolLayout->addWidget(secondSeparator,0,14,2,1);
+		toolLayout->addWidget(secondSeparator);
 		
 		spacer6 = new QSpacerItem(1,1,QSizePolicy::Expanding);
-		toolLayout->addItem(spacer6,0,15,2,1);
+		toolLayout->addItem(spacer6);
 
-		/*
-		// FIXME: renable this button when there is an actual help URL (see openHelp() below)
 		helpButton = new QPushButton();
 		helpButton->setIcon(QIcon(":/images/icons/info.svgz"));
 		helpButton->setToolTip(tr("Help"));
 		helpButton->setFlat(true);
 		helpButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(helpButton,0,16);
-		*/
+		toolLayout->addWidget(helpButton);
 		
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
 		snapshotButton->setFlat(true);
 		snapshotButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
-		toolLayout->addWidget(snapshotButton,1,16);
+		toolLayout->addWidget(snapshotButton);
 
 		connect(newButton, SIGNAL(clicked()), this, SLOT(newFile()));
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
@@ -177,7 +174,7 @@ namespace Aseba { namespace ThymioBlockly
 		
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-		// connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
+		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 		connect(snapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshot()));
 		
 		horizontalLayout = new QHBoxLayout();
@@ -217,7 +214,7 @@ namespace Aseba { namespace ThymioBlockly
 	
 	void ThymioBlockly::openHelp() const
 	{
-		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
+		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:blocklyprogramming")));
 	}
 	
 	void ThymioBlockly::saveSnapshot() const
@@ -470,48 +467,10 @@ namespace Aseba { namespace ThymioBlockly
 		return 1.0;
 	}
 	
-	float ThymioBlockly::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
-	{
-		// FIXME: scale computation should be updated 
-		// desired sizes for height
-		const int idealContentHeight(6*256);
-		const int uncompressibleHeight(
-			desiredToolbarIconSize * 2 + 
-			4 * style()->pixelMetric(QStyle::PM_ButtonMargin) + 
-			4 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) +
-			style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
-			6 * 10 +
-			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
-			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin)
-		);
-		const int availableHeight(event->size().height() - uncompressibleHeight);
-		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
-		
-		// desired sizes for width
-		const int idealContentWidth(1088+256*2);
-		const int uncompressibleWidth(
-			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
-			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 
-			style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
-			#ifdef ANDROID
-			40 + 
-			#else // ANDROID
-			style()->pixelMetric(QStyle::PM_ScrollBarSliderMin) +
-			#endif // ANDROID
-			2 * 20
-		);
-		const int availableWidth(event->size().width() - uncompressibleWidth);
-		const qreal scaleWidth(qreal(availableWidth)/qreal(idealContentWidth));
-		
-		// compute and set scale
-		const qreal scale(qMin(scaleHeight, scaleWidth));
-		return scale;
-	}
-	
 	void ThymioBlockly::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
-		const float toolbarWidgetCount(12.25);
+		const float toolbarWidgetCount(16);
 		// get width of combox box element (not content)
 		int desiredIconSize((
 			event->size().width() -
@@ -530,11 +489,7 @@ namespace Aseba { namespace ThymioBlockly
 			)
 		) / (toolbarWidgetCount));
 		
-		// two pass of layout computation, should be a good-enough approximation
-		qreal testScale(computeScale(event, desiredIconSize));
-		desiredIconSize = qMin(desiredIconSize, int(256.*testScale));
 		desiredIconSize = qMin(desiredIconSize, event->size().height()/14);
-		const qreal scale(computeScale(event, desiredIconSize));
 		
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
@@ -545,23 +500,10 @@ namespace Aseba { namespace ThymioBlockly
 		saveAsButton->setIconSize(tbIconSize);
 		runButton->setIconSize(importantIconSize);
 		stopButton->setIconSize(importantIconSize);
-		// helpButton->setIconSize(tbIconSize);
+		helpButton->setIconSize(tbIconSize);
 		snapshotButton->setIconSize(tbIconSize);
-		spacer1->changeSize(desiredIconSize/4, desiredIconSize);
-		spacer2->changeSize(desiredIconSize/4, desiredIconSize);
-		spacer3->changeSize(desiredIconSize, desiredIconSize);
 		spacerRunStop->changeSize(desiredIconSize/4, desiredIconSize);
-		spacer4->changeSize(desiredIconSize, desiredIconSize);
-		spacer5->changeSize(desiredIconSize/4, desiredIconSize);
-		spacer6->changeSize(desiredIconSize/4, desiredIconSize);
 		toolLayout->invalidate();
-		
-		// set view and cards on sides
-		#ifdef Q_WS_MACX // we have to work around bugs in size reporting in OS X
-		const QSize iconSize(243*scale, 243*scale);
-		#else // Q_WS_MACX
-		const QSize iconSize(256*scale, 256*scale);
-		#endif // Q_WS_MACX
 	}
 	
 } } // namespace ThymioVPL / namespace Aseba

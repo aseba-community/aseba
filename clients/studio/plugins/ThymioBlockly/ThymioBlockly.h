@@ -98,7 +98,7 @@ namespace Aseba { namespace ThymioBlockly
 		bool skipNextUpdate;
 
 		QToolBar *toolBar;
-		QGridLayout *toolLayout;
+		QHBoxLayout *toolLayout;
 		QPushButton *newButton;
 		QPushButton *openButton;
 		QPushButton *saveButton;
@@ -126,7 +126,6 @@ namespace Aseba { namespace ThymioBlockly
 		bool preDiscardWarningDialog(bool keepCode);
 		void closeEvent(QCloseEvent * event);
 		
-		float computeScale(QResizeEvent *event, int desiredToolbarIconSize);
 		virtual void resizeEvent( QResizeEvent *event );
 	};
 
