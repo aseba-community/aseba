@@ -73,7 +73,7 @@ if (GIT_FOUND AND HAS_GIT_REP)
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_BUILD_VERSION \"git-${GIT_REV}\"\n")
 	# write NSIS version file (for Windows build)
 	file(READ "${PROJECT_SOURCE_DIR}/common/consts.h" COMMON_CONSTS_H)
-	string(REGEX MATCH [0-9]\\.[0-9]\\.[0-9] ASEBA_VERSION ${COMMON_CONSTS_H})
+	string(REGEX MATCH [0-9]+\\.[0-9]+\\.[0-9]+ ASEBA_VERSION ${COMMON_CONSTS_H})
 	file(WRITE ${CMAKE_BINARY_DIR}/version.nsi "!define VERSION \"${ASEBA_VERSION}-git-${GIT_REV}\"\n")
 	# copy the file to the final header only if the version changes
 	# reduces needless rebuilds
