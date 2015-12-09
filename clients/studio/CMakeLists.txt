@@ -1,7 +1,5 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit REQUIRED)
-
 set(DOC_NAME aseba-doc)
 
 # file(TO_NATIVE_PATH ...) is broken with MSYS generator 
@@ -29,7 +27,7 @@ else (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
 	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
 endif (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
 
-if (QT4_FOUND)
+if (QT4_FOUND AND QT4_QTWEBKIT_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
 	set(QT_USE_QTMAIN ON)
@@ -171,4 +169,4 @@ if (QT4_FOUND)
 	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-endif (QT4_FOUND)
+endif (QT4_FOUND AND QT4_QTWEBKIT_FOUND)

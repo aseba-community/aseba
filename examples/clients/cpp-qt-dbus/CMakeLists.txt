@@ -1,10 +1,6 @@
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 
-if (NOT WIN32)
-	find_package(Qt4 COMPONENTS QtCore QtDBus)
-endif (NOT WIN32)
-
 if(COMPILER_SUPPORTS_CXX0X)
 	if(QT4_FOUND AND QT_QTDBUS_FOUND)
 		set(CMAKE_CXX_FLAGS "-std=c++0x")

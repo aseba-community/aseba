@@ -1,5 +1,3 @@
-find_package(Qt4)
-
 if (QT4_FOUND AND ENKI_FOUND)
 	# SDL
 # 	find_package(SDL)

@@ -1,5 +1,3 @@
-find_package(Qt4)
-
 if (QT4_FOUND)
 	set(QT_USE_QTNETWORK ON)
 	set(QT_USE_QTMAIN ON)
