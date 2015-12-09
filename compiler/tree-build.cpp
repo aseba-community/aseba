@@ -86,9 +86,10 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	CallSubNode::CallSubNode(const SourcePos& sourcePos, unsigned subroutineId) :
+	CallSubNode::CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName) :
 		Node(sourcePos),
-		subroutineId(subroutineId)
+		subroutineName(subroutineName),
+		subroutineId(-1)
 	{
 	
 	}

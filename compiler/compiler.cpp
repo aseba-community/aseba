@@ -255,7 +255,7 @@ namespace Aseba
 		// typecheck
 		try
 		{
-			program->typeCheck();
+			program->typeCheck(this);
 		}
 		catch(TranslatableError error)
 		{
