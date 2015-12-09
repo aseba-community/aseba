@@ -364,6 +364,7 @@ namespace Aseba
 		typedef std::map<std::wstring, unsigned> EventsMap;
 
 		friend struct AssignmentNode;
+		friend struct CallSubNode;
 	
 	public:
 		Compiler();

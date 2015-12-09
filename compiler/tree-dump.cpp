@@ -156,7 +156,9 @@ namespace Aseba
 	
 	std::wstring CallSubNode::toWString() const
 	{
-		return WFormatableString(L"CallSub: %0").arg(subroutineId);
+		std::wstring s = L"CallSub: ";
+		s += subroutineName;
+		return s;
 	}
 
 	std::wstring BinaryArithmeticNode::toWString() const

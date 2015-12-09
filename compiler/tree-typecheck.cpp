@@ -44,28 +44,28 @@ namespace Aseba
 			throw TranslatableError(sourcePos, ERROR_EXPECTING_TYPE).arg(typeName(expected)).arg(typeName(type));
 	};
 	
-	Node::ReturnType Node::typeCheck() const
+	Node::ReturnType Node::typeCheck(Compiler* compiler)
 	{
 		for (NodesVector::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
-			(*it)->typeCheck();
+			(*it)->typeCheck(compiler);
 		}
 		return TYPE_UNIT;
 	}
 	
-	Node::ReturnType AssignmentNode::typeCheck() const
+	Node::ReturnType AssignmentNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_UNIT, children[0]->typeCheck());
-		expectType(TYPE_INT, children[1]->typeCheck());
+		expectType(TYPE_UNIT, children[0]->typeCheck(compiler));
+		expectType(TYPE_INT, children[1]->typeCheck(compiler));
 		return TYPE_UNIT;
 	}
 	
-	Node::ReturnType IfWhenNode::typeCheck() const
+	Node::ReturnType IfWhenNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_BOOL, children[0]->typeCheck());
-		expectType(TYPE_UNIT, children[1]->typeCheck());
+		expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
+		expectType(TYPE_UNIT, children[1]->typeCheck(compiler));
 		if (children.size() > 2)
-			expectType(TYPE_UNIT, children[2]->typeCheck());
+			expectType(TYPE_UNIT, children[2]->typeCheck(compiler));
 		
 		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
@@ -80,10 +80,10 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
-	Node::ReturnType WhileNode::typeCheck() const
+	Node::ReturnType WhileNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_BOOL, children[0]->typeCheck());
-		expectType(TYPE_UNIT, children[1]->typeCheck());
+		expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
+		expectType(TYPE_UNIT, children[1]->typeCheck(compiler));
 		
 		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
@@ -98,7 +98,13 @@ namespace Aseba
 		return TYPE_UNIT;
 	}
 	
-	Node::ReturnType BinaryArithmeticNode::typeCheck() const
+	Node::ReturnType CallSubNode::typeCheck(Compiler* compiler)
+	{
+		subroutineId = compiler->findSubroutine(subroutineName, sourcePos)->second;
+		return TYPE_UNIT;
+	}
+
+	Node::ReturnType BinaryArithmeticNode::typeCheck(Compiler* compiler)
 	{
 		switch (op)
 		{
@@ -112,8 +118,8 @@ namespace Aseba
 			case ASEBA_OP_BIT_OR:
 			case ASEBA_OP_BIT_XOR:
 			case ASEBA_OP_BIT_AND:
-				expectType(TYPE_INT, children[0]->typeCheck());
-				expectType(TYPE_INT, children[1]->typeCheck());
+				expectType(TYPE_INT, children[0]->typeCheck(compiler));
+				expectType(TYPE_INT, children[1]->typeCheck(compiler));
 				return TYPE_INT;
 			
 			case ASEBA_OP_EQUAL:
@@ -122,14 +128,14 @@ namespace Aseba
 			case ASEBA_OP_BIGGER_EQUAL_THAN:
 			case ASEBA_OP_SMALLER_THAN:
 			case ASEBA_OP_SMALLER_EQUAL_THAN:
-				expectType(TYPE_INT, children[0]->typeCheck());
-				expectType(TYPE_INT, children[1]->typeCheck());
+				expectType(TYPE_INT, children[0]->typeCheck(compiler));
+				expectType(TYPE_INT, children[1]->typeCheck(compiler));
 				return TYPE_BOOL;
 			
 			case ASEBA_OP_OR:
 			case ASEBA_OP_AND:
-				expectType(TYPE_BOOL, children[0]->typeCheck());
-				expectType(TYPE_BOOL, children[1]->typeCheck());
+				expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
+				expectType(TYPE_BOOL, children[1]->typeCheck(compiler));
 				return TYPE_BOOL;
 				
 			default:
@@ -138,18 +144,18 @@ namespace Aseba
 		}
 	}
 	
-	Node::ReturnType UnaryArithmeticNode::typeCheck() const
+	Node::ReturnType UnaryArithmeticNode::typeCheck(Compiler* compiler)
 	{
 		switch (op)
 		{
 			case ASEBA_UNARY_OP_SUB:
 			case ASEBA_UNARY_OP_ABS:
 			case ASEBA_UNARY_OP_BIT_NOT:
-				expectType(TYPE_INT, children[0]->typeCheck());
+				expectType(TYPE_INT, children[0]->typeCheck(compiler));
 				return TYPE_INT;
 			
 			case ASEBA_UNARY_OP_NOT:
-				expectType(TYPE_BOOL, children[0]->typeCheck());
+				expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
 				return TYPE_BOOL;
 			
 			default:

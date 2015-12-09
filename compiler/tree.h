@@ -69,7 +69,7 @@ namespace Aseba
 		//! Third pass to expand vectorial operations into mutliple scalar ones
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		//! Optimize this node, return the optimized node
 		virtual Node* optimize(std::wostream* dump) = 0;
 		//! Return the stack depth requirement for this node and its children
@@ -140,7 +140,7 @@ namespace Aseba
 
 		virtual void checkVectorSize() const;
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const { return L"Assign"; }
@@ -161,7 +161,7 @@ namespace Aseba
 		virtual IfWhenNode* shallowCopy() { return new IfWhenNode(*this); }
 
 		virtual void checkVectorSize() const;
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -201,7 +201,7 @@ namespace Aseba
 		virtual WhileNode* shallowCopy() { return new WhileNode(*this); }
 
 		virtual void checkVectorSize() const;
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -237,7 +237,7 @@ namespace Aseba
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		virtual EventDeclNode* shallowCopy() { return new EventDeclNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -256,7 +256,7 @@ namespace Aseba
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
 		virtual EmitNode* shallowCopy() { return new EmitNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -272,7 +272,7 @@ namespace Aseba
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
 		virtual SubDeclNode* shallowCopy() { return new SubDeclNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -283,11 +283,13 @@ namespace Aseba
 	//! no children
 	struct CallSubNode : Node
 	{
-		unsigned subroutineId; //!< the subroutine to call
-		
-		CallSubNode(const SourcePos& sourcePos, unsigned subroutineId);
+		std::wstring subroutineName; //!< the subroutine to call
+		unsigned subroutineId;
+
+		CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName);
 		virtual CallSubNode* shallowCopy() { return new CallSubNode(*this); }
 
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -307,7 +309,7 @@ namespace Aseba
 
 		void deMorganNotRemoval();
 		
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -332,7 +334,7 @@ namespace Aseba
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
 		virtual UnaryArithmeticNode* shallowCopy() { return new UnaryArithmeticNode(*this); }
 
-		virtual ReturnType typeCheck() const;
+		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -352,7 +354,7 @@ namespace Aseba
 		virtual ImmediateNode* shallowCopy() { return new ImmediateNode(*this); }
 
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -372,7 +374,7 @@ namespace Aseba
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		virtual StoreNode* shallowCopy() { return new StoreNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -392,7 +394,7 @@ namespace Aseba
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		virtual LoadNode* shallowCopy() { return new LoadNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -414,7 +416,7 @@ namespace Aseba
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
 		virtual ArrayWriteNode* shallowCopy() { return new ArrayWriteNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -435,7 +437,7 @@ namespace Aseba
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
 		virtual ArrayReadNode* shallowCopy() { return new ArrayReadNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
 		virtual std::wstring toWString() const;
@@ -457,7 +459,7 @@ namespace Aseba
 		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
 		virtual LoadNativeArgNode* shallowCopy() { return new LoadNativeArgNode(*this); }
 		
-		virtual ReturnType typeCheck() const { return TYPE_INT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -475,7 +477,7 @@ namespace Aseba
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		virtual CallNode* shallowCopy() { return new CallNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
 		virtual unsigned getStackDepth() const;
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -490,7 +492,7 @@ namespace Aseba
 		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		virtual ReturnNode* shallowCopy() { return new ReturnNode(*this); }
 
-		virtual ReturnType typeCheck() const { return TYPE_UNIT; }
+		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump) { return this; }
 		virtual unsigned getStackDepth() const { return 0; }
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -511,7 +513,7 @@ namespace Aseba
 		virtual Node* expandAbstractNodes(std::wostream* dump) = 0;
 
 		// Following operations should not be performed on abstraction nodes
-		virtual ReturnType typeCheck() const { abort(); }
+		virtual ReturnType typeCheck(Compiler* compiler) { abort(); }
 		virtual Node* optimize(std::wostream* dump) { abort(); }
 		virtual unsigned getStackDepth() const { abort(); }
 		virtual void emit(PreLinkBytecode& bytecodes) const { abort(); }
