@@ -32,6 +32,8 @@ else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 	message(STATUS "Enki *not* found, simulation targets disabled")
 endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 
+find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
+find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
