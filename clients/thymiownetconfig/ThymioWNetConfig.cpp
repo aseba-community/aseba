@@ -262,7 +262,8 @@ int main(int argc, char *argv[])
 	bool thymiosFound(false);
 	for (Aseba::PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 	{
-		if (it->second.second.compare(0,18,"Thymio-II Wireless") == 0)
+		if ((it->second.second.compare(0, 18, "Thymio-II Wireless") == 0) ||
+			(it->second.second.compare(0, 18, "Thymio_II Wireless") == 0))
 		{
 			if (thymioFound)
 				thymiosFound = true;
