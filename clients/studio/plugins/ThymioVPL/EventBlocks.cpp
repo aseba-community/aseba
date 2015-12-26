@@ -401,15 +401,85 @@ namespace Aseba { namespace ThymioVPL
 		period(1000),
 		lastPressedIn(false)
 	{
+		svgRenderer = new QSvgRenderer(QString(":/images/heartbeat.svgz"), this);
+		
 		timer = new QTimeLine(period, this);
 		timer->setCurveShape(QTimeLine::LinearCurve);
 		timer->setLoopCount(0);
 		connect(timer, SIGNAL(valueChanged(qreal)), SLOT(valueChanged(qreal)));
 	}
 	
+	// one-dimensional Bezier interpolation x(t) in n segments given by n+1 t coordinates of segment endpoints and 3*n+1 x coordinates of control points
+	static qreal bezier(unsigned int n, const qreal* ts, const qreal* xs, qreal t) {
+		// if out of bounds, clamp to edge values
+		if (t <= ts[0]) return xs[0];
+		if (t >= ts[n]) return xs[3*n];
+		// binary search for segment index l such that ts[l] <= t < ts[l+1]
+		unsigned int l = 0, h = n;
+		while (h - l > 1)
+		{
+			unsigned int m = (h+l)/2;
+			if (t < ts[m]) h = m;
+			else l = m;
+		}
+		// compute segment-internal parameter st
+		qreal sl = ts[l+1] - ts[l];
+		qreal st = (sl == 0) ? 0 : (t - ts[l])/sl;
+		// interpolate according to De Casteljau
+		qreal mst = 1.0 - st;
+		qreal xm = mst*xs[3*l] + st*xs[3*l+1];
+		qreal xn = mst*xs[3*l+1] + st*xs[3*l+2];
+		qreal xo = mst*xs[3*l+2] + st*xs[3*l+3];
+		qreal xp = mst*xm + st*xn;
+		qreal xq = mst*xn + st*xo;
+		return mst*xp + st*xq;
+	}
+	
 	void PeriodicEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
+		static const qreal heartbeatX[] = {1.0, 1.0, 1.2, 1.2, 1.2, 0.95, 0.95, 0.95, 1.0, 1.0};
+		static const qreal heartbeatT[] = {0.0, 0.1, 0.25, 0.4};
+		
 		Block::paint(painter, option, widget);
+		
+		if (timer->state() == QTimeLine::Running)
+		{
+			// animated size of beating heart
+			qreal t = timer->currentValue();
+			// for periods longer than 1 second, restrict the heartbeat to the first second
+			if (period > 1000) t *= period/1000;
+			qreal hw = 128*bezier(sizeof(heartbeatT)/sizeof(heartbeatT[0]) - 1, heartbeatT, heartbeatX, t);
+			
+			// draw timer wedge
+			QConicalGradient wedgeGradient(128, 96, timer->currentValue()*360 + 90);
+			wedgeGradient.setColorAt(0, Qt::red);
+			wedgeGradient.setColorAt(0.98, Qt::white);
+			wedgeGradient.setColorAt(1, Qt::red);
+			painter->fillRect(QRectF(40, 24, 176, 144), QBrush(wedgeGradient));
+			
+			QConicalGradient sectorGradient(128, 96, 0);
+			QColor white(255, 255, 255, 64);
+			QColor red(255, 0, 0, 64);
+			sectorGradient.setColorAt(0, white);
+			sectorGradient.setColorAt(0.24999, red);
+			sectorGradient.setColorAt(0.25001, white);
+			sectorGradient.setColorAt(0.49999, red);
+			sectorGradient.setColorAt(0.50001, white);
+			sectorGradient.setColorAt(0.74999, red);
+			sectorGradient.setColorAt(0.75001, white);
+			sectorGradient.setColorAt(1, red);
+			painter->fillRect(QRectF(40, 24, 176, 144), QBrush(sectorGradient));
+			
+			// draw heart shape
+			svgRenderer->render(painter, QRectF(128-hw, 96-3*hw/4, 2*hw, 2*hw));
+		}
+		else
+		{
+			// draw stationary heart
+			qreal hw = 128;
+			painter->fillRect(QRectF(40, 24, 176, 144), QBrush(Qt::white));
+			svgRenderer->render(painter, QRectF(128-hw, 96-3*hw/4, 2*hw, 2*hw));
+		}
 		
 		// draw slider
 		QRectF rect = rangeRect();
