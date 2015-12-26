@@ -120,7 +120,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
 		
-		virtual unsigned valuesCount() const { return 1; }
+		virtual unsigned valuesCount() const { return 2; }
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
 		virtual QVector<quint16> getValuesCompressed() const;
@@ -134,6 +134,7 @@ namespace Aseba { namespace ThymioVPL
 	protected slots:
 		void valueChanged(qreal value);
 		void setPeriod(unsigned period);
+		void setPhase(unsigned phase);
 		
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
@@ -147,7 +148,10 @@ namespace Aseba { namespace ThymioVPL
 		float valToPixel(float val) const;
 		
 	protected:
+		static const QRectF buttonPoses[2];
+		
 		unsigned period;
+		unsigned phase;
 		QSvgRenderer *svgRenderer;
 		QTimeLine *timer;
 		bool lastPressedIn;

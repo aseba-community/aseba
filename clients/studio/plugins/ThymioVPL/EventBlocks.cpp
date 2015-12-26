@@ -396,11 +396,19 @@ namespace Aseba { namespace ThymioVPL
 	
 	
 	// PeriodicEventBlock
+	const QRectF PeriodicEventBlock::buttonPoses[2] = {
+		QRectF(32, 32, 40, 40),
+		QRectF(256-32-40, 32, 40, 40)
+	};
+	
 	PeriodicEventBlock::PeriodicEventBlock(QGraphicsItem *parent):
 		Block("event", "periodic", parent),
 		period(1000),
+		phase(0),
 		lastPressedIn(false)
 	{
+		svgRenderer = new QSvgRenderer(QString(":/images/periodic.svgz"), this);
+		
 		timer = new QTimeLine(period, this);
 		timer->setCurveShape(QTimeLine::LinearCurve);
 		timer->setLoopCount(0);
@@ -410,6 +418,53 @@ namespace Aseba { namespace ThymioVPL
 	void PeriodicEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Block::paint(painter, option, widget);
+		
+		// draw metronome rod
+		svgRenderer->render(painter, QRectF(0, 0, 256, 256));
+		painter->save();
+		painter->translate(128, 136);
+		painter->rotate((2*(int)phase - 1)*25.0*((timer->state() == QTimeLine::Running) ? cos(timer->currentValue()*2*M_PI) : 1.0));
+		QRectF weight(-9, 0, 18, 12);
+		weight.moveTop(-28*log10f(period)+20);
+		painter->setPen(QPen(Qt::white, 12, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+		painter->drawLine(0, -20, 0, -95);
+		painter->setPen(QPen(Qt::white, 6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+		painter->drawRect(weight);
+		painter->setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+		painter->drawLine(0, 0, 0, -95);
+		painter->fillRect(weight, Qt::black);
+		painter->restore();
+		
+		// draw tick lines
+		if (timer->state() == QTimeLine::Running && timer->currentValue() < 0.25 && timer->currentValue() < 150.0/period)
+		{
+			static const QPointF soundLines[] = {
+				QPointF(189.8, 144.6), QPointF(220.7, 152.8),
+				QPointF(191.8, 122.4), QPointF(223.6, 119.6),
+				QPointF(186.0, 101.0), QPointF(215.0, 87.4),
+				QPointF(66.2, 144.6), QPointF(35.3, 152.8),
+				QPointF(64.2, 122.4), QPointF(32.4, 119.6),
+				QPointF(70.0, 101.0), QPointF(41.0, 87.4)
+			};
+			painter->setPen(QPen(Qt::white, 6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+			painter->drawLines(soundLines, sizeof(soundLines)/sizeof(soundLines[0])/2);
+		}
+		
+		// draw buttons
+		for (unsigned i=0; i<2; ++i)
+		{
+			if (phase == i)
+			{
+				painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Qt::red);
+			}
+			else
+			{
+				painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Style::unusedButtonFillColor);
+			}
+			painter->drawEllipse(buttonPoses[i]);
+		}
 		
 		// draw slider
 		QRectF rect = rangeRect();
@@ -433,6 +488,21 @@ namespace Aseba { namespace ThymioVPL
 	
 	void PeriodicEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
+		if (event->button() == Qt::LeftButton)
+		{
+			for (unsigned i=0; i<2; ++i)
+			{
+				if (buttonPoses[i].contains(event->pos()))
+				{
+					setPhase(i);
+					USAGE_LOG(logAccEventBlockMode(this->name, this->type,i));
+					emit undoCheckpoint();
+					lastPressedIn = false;
+					return;
+				}
+			}
+		}
+		
 		lastPressedIn = (event->button() == Qt::LeftButton && rangeRect().contains(event->pos()));
 		if (lastPressedIn)
 		{
@@ -491,17 +561,23 @@ namespace Aseba { namespace ThymioVPL
 	
 	int PeriodicEventBlock::getValue(unsigned i) const
 	{
-		return period;
+		if (i == 0)
+			return period;
+		else
+			return phase;
 	}
 	
 	void PeriodicEventBlock::setValue(unsigned i, int value) 
 	{
-		setPeriod(value);
+		if (i == 0)
+			setPeriod(value);
+		else
+			setPhase(value);
 	}
 	
 	QVector<quint16> PeriodicEventBlock::getValuesCompressed() const
 	{
-		return QVector<quint16>(1, getValue(0));
+		return QVector<quint16>(1, (period<<1) | phase);
 	}
 	
 	void PeriodicEventBlock::setPeriod(unsigned period)
@@ -527,6 +603,18 @@ namespace Aseba { namespace ThymioVPL
 			timer->setCurrentTime(period*t/oldperiod);
 			// this is needed to work around weird behavior of setCurrentTime() which would otherwise be undone at the next timer tick
 			timer->setDirection(QTimeLine::Forward);
+		}
+	}
+	
+	void PeriodicEventBlock::setPhase(unsigned phase)
+	{
+		if (phase != this->phase)
+		{
+			this->phase = phase;
+			
+			update();
+			emit contentChanged();
+			setChangedFlag();
 		}
 	}
 	
