@@ -100,7 +100,8 @@ namespace Aseba { namespace ThymioVPL {
 		renderBlockValue<AccEventBlock>("event-roll", 0, 1);
 		renderBlockValue<AccEventBlock>("event-pitch", 0, 2);
 		renderBlock<ClapEventBlock>("event-clap");
-		renderBlock<TimeoutEventBlock>("");
+		renderBlock<TimeoutEventBlock>("event-timeout");
+		renderBlock<PeriodicEventBlock>("event-periodic");
 		
 		// filters
 		renderBlock<StateFilterCheckBlock>("state-filter");

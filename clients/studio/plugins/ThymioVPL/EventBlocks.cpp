@@ -19,6 +19,8 @@
 */
 
 #include <QPainter>
+#include <QSvgRenderer>
+#include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSvgItem>
 #include <QSlider>
@@ -31,6 +33,7 @@
 #include "Buttons.h"
 #include "UsageLogger.h"
 #include "Style.h"
+#include "Scene.h"
 
 #define deg2rad(x) ((x) * M_PI / 180.)
 
@@ -390,5 +393,160 @@ namespace Aseba { namespace ThymioVPL
 	{
 		new QGraphicsSvgItem (":/images/timeout.svgz", this);
 	}
-
+	
+	
+	// PeriodicEventBlock
+	PeriodicEventBlock::PeriodicEventBlock(QGraphicsItem *parent):
+		Block("event", "periodic", parent),
+		period(1000),
+		lastPressedIn(false)
+	{
+		timer = new QTimeLine(period, this);
+		timer->setCurveShape(QTimeLine::LinearCurve);
+		timer->setLoopCount(0);
+		connect(timer, SIGNAL(valueChanged(qreal)), SLOT(valueChanged(qreal)));
+	}
+	
+	void PeriodicEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Block::paint(painter, option, widget);
+		
+		// draw slider
+		QRectF rect = rangeRect();
+		const int x(rect.x());
+		const int y(rect.y());
+		const int lowPos(valToPixel(period));
+		painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+		painter->setBrush(Style::unusedButtonFillColor);
+		painter->drawRect(rect);
+		painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+		painter->setBrush(Qt::white);
+		QPolygon lowCursor;
+		lowCursor << QPoint(x+lowPos, y+2) << QPoint(x+lowPos+23, y+2+23) << QPoint(x+lowPos+23, y+48) << QPoint(x+lowPos-23, y+48) << QPoint(x+lowPos-23, y+2+23);
+		painter->drawConvexPolygon(lowCursor);
+	}
+	
+	void PeriodicEventBlock::valueChanged(qreal value)
+	{
+		update();
+	}
+	
+	void PeriodicEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		lastPressedIn = (event->button() == Qt::LeftButton && rangeRect().contains(event->pos()));
+		if (lastPressedIn)
+		{
+			timer->start();
+			mouseMoveEvent(event);
+		}
+		else
+			Block::mousePressEvent(event);
+	}
+	
+	void PeriodicEventBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (!lastPressedIn)
+		{
+			Block::mouseMoveEvent(event);
+			return;
+		}
+		
+		QPointF pos(event->pos());
+		pos -= rangeRect().topLeft();
+		setPeriod(pixelToVal(pos.x()));
+	}
+	
+	void PeriodicEventBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+	{
+		timer->stop();
+		update();
+		Block::mouseReleaseEvent(event);
+		
+		USAGE_LOG(logBlockMouseRelease(this->name, this->type, event));
+		emit undoCheckpoint();
+	}
+	
+	QVariant PeriodicEventBlock::itemChange(GraphicsItemChange change, const QVariant & value)
+	{
+		if (change == ItemSceneChange)
+		{
+			Scene* oldScene = qobject_cast<Scene*>(scene());
+			if (oldScene)
+			{
+				disconnect(this, SIGNAL(periodChanged(unsigned)), oldScene, SLOT(synchronizeTimer1Period(unsigned)));
+				disconnect(oldScene, SIGNAL(timer1PeriodChanged(unsigned)), this, SLOT(setPeriod(unsigned)));
+			}
+			Scene* newScene = qobject_cast<Scene*>(value.value<QGraphicsScene*>());
+			if (newScene)
+			{
+				connect(newScene, SIGNAL(timer1PeriodChanged(unsigned)), SLOT(setPeriod(unsigned)));
+				// ask any potential other PeriodicEventBlocks to impose their current period on us
+				newScene->synchronizeTimer1Period(0);
+				newScene->connect(this, SIGNAL(periodChanged(unsigned)), SLOT(synchronizeTimer1Period(unsigned)));
+			}
+			return value;
+		}
+		return Block::itemChange(change, value);
+	}
+	
+	int PeriodicEventBlock::getValue(unsigned i) const
+	{
+		return period;
+	}
+	
+	void PeriodicEventBlock::setValue(unsigned i, int value) 
+	{
+		setPeriod(value);
+	}
+	
+	QVector<quint16> PeriodicEventBlock::getValuesCompressed() const
+	{
+		return QVector<quint16>(1, getValue(0));
+	}
+	
+	void PeriodicEventBlock::setPeriod(unsigned period)
+	{
+		if (period == 0)
+		{
+			// we're being asked for our current period
+			emit periodChanged(this->period);
+		}
+		else if (period != this->period)
+		{
+			unsigned oldperiod = this->period;
+			this->period = period;
+			
+			update();
+			emit periodChanged(period);
+			emit contentChanged();
+			setChangedFlag();
+			
+			int t = timer->currentTime();
+			timer->setDuration(period);
+			// preserve phase
+			timer->setCurrentTime(period*t/oldperiod);
+			// this is needed to work around weird behavior of setCurrentTime() which would otherwise be undone at the next timer tick
+			timer->setDirection(QTimeLine::Forward);
+		}
+	}
+	
+	QRectF PeriodicEventBlock::rangeRect() const
+	{
+		return QRectF(32, 184, 192, 48);
+	}
+	
+	float PeriodicEventBlock::pixelToVal(float pixel) const
+	{
+		static const int multipliers[] = {1, 2, 5};
+		float valLog = log10f(10000) - (pixel - 23)/(rangeRect().width() - 46)*(log10f(10000)-log10f(50));
+		valLog = std::max(std::min(valLog, log10f(10000)), log10f(50));
+		int valLogRounded = (int)floorf(3*valLog + 0.5f);
+		return powf(10, valLogRounded/3)*multipliers[valLogRounded % 3];
+	}
+	
+	float PeriodicEventBlock::valToPixel(float val) const
+	{
+		return 23 + (rangeRect().width() - 46)*((log10f(10000)-log10f(val))/(log10f(10000)-log10f(50)));
+	}
+	
 } } // namespace ThymioVPL / namespace Aseba

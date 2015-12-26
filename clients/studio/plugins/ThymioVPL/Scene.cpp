@@ -45,7 +45,8 @@ namespace Aseba { namespace ThymioVPL
 		referredLineItem(addLine(0, 0, 0, 0, QPen(Qt::red, 8, Qt::DashLine))),
 		sceneModified(false),
 		advancedMode(false),
-		zoomLevel(1)
+		zoomLevel(1),
+		synchronizing(false)
 	{
 		addItem(warningGraphicsItem);
 		warningGraphicsItem->setVisible(false);
@@ -497,8 +498,21 @@ namespace Aseba { namespace ThymioVPL
 		return eventActionsSets.at(row);
 	}
 	
+	void Scene::synchronizeTimer1Period(unsigned period)
+	{
+		if (!synchronizing)
+		{
+			if (period != 0) synchronizing = true;
+			emit timer1PeriodChanged(period);
+			synchronizing = false;
+		}
+	}
+	
 	void Scene::recompile()
 	{
+		// skip extra calls during timer period synchronization
+		if (synchronizing) return;
+		
 		setModified(true);
 		recompileWithoutSetModified();
 	}

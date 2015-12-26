@@ -51,6 +51,7 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode(false),
 		useSound(false),
 		useTimer(false),
+		timer1Period(0),
 		useMicrophone(false),
 		useAccAngle(false),
 		inWhenBlock(false),
@@ -71,6 +72,7 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode = advanced;
 		useSound = false;
 		useTimer= false;
+		timer1Period = 0;
 		useMicrophone = false;
 		useAccAngle = false;
 		inWhenBlock = false;
@@ -86,6 +88,7 @@ namespace Aseba { namespace ThymioVPL
 		eventToCodePosMap["acc"] = qMakePair(-1,0);
 		eventToCodePosMap["clap"] = qMakePair(-1,0);
 		eventToCodePosMap["timeout"] = qMakePair(-1,0);
+		eventToCodePosMap["periodic"] = qMakePair(-1,0);
 	}
 	
 	//! Add initialization code after all pairs have been parsed
@@ -132,6 +135,11 @@ namespace Aseba { namespace ThymioVPL
 		{
 			text += L"# stop timer 0\n";
 			text += L"timer.period[0] = 0\n";
+		}
+		if (timer1Period)
+		{
+			text += L"# start timer 1\n";
+			text += L"timer.period[1] = " + toWstring(timer1Period) + L"\n";
 		}
 		if (useMicrophone)
 		{
@@ -231,6 +239,12 @@ namespace Aseba { namespace ThymioVPL
 					L"\nonevent timer0"
 					L"\n\ttimer.period[0] = 0\n"
 				);
+				size++;
+			}
+			else if (lookupEventName == "periodic")
+			{
+				timer1Period = eventActionsSet.getEventBlock()->getValue(0);
+				generatedCode.push_back(L"\nonevent timer1\n");
 				size++;
 			}
 			else

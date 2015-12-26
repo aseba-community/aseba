@@ -111,6 +111,7 @@ namespace Aseba { namespace ThymioVPL
 			bool advancedMode;
 			bool useSound;
 			bool useTimer;
+			int timer1Period;
 			bool useMicrophone;
 			bool useAccAngle;
 			bool inWhenBlock;
