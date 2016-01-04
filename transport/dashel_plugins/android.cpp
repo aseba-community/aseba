@@ -65,7 +65,7 @@ void AndroidStream::schedule_read() {
     rx_urb.buffer_length = sizeof(rx_data);
     if(ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0) {
         disconnected = 1;
-        throw DashelException(DashelException::IOError, 0, "Unable to read");
+        throw DashelException(DashelException::IOError, 0, "Unable to read", this);
     }
 }
 
@@ -128,7 +128,7 @@ void AndroidStream::write(const void *data, const size_t size)
     bulk.data = (void *) data;
     if(ioctl(fd, USBDEVFS_BULK, &bulk) < 0) {
 	disconnected = 1;
-        throw DashelException(DashelException::IOError, 0, "Unable to write");
+        throw DashelException(DashelException::IOError, 0, "Unable to write", this);
     }
 }
 
@@ -144,7 +144,7 @@ void AndroidStream::read(void *data, size_t size)
         if(urb_is_in_flight) {
             if(ioctl(fd, USBDEVFS_REAPURB, &urb) < 0) {
 		disconnected = 1;
-                throw DashelException(DashelException::IOError, 0, "Unable to read");
+                throw DashelException(DashelException::IOError, 0, "Unable to read", this);
             }
             urb_is_in_flight = 0;
         }
@@ -186,7 +186,7 @@ void AndroidStream::lock_java()
 {
     // Kind of mutex_lock();	    
     if(s_javaVM->AttachCurrentThread(&env, NULL)<0)
-        throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed");
+        throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed", this);
 }
 
 void AndroidStream::unlock_java()
