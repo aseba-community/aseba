@@ -21,7 +21,18 @@
 #ifndef VPL_USAGE_LOGGER_H
 #define VPL_USAGE_LOGGER_H
 
-#ifdef PROTOBUF_FOUND
+#ifdef PROTOBUF_FOUND 
+
+#include <google/protobuf/stubs/common.h>
+
+#if (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
+
+#warning "Incompatible protobuf version found, disabling usage logging"
+#define USAGE_LOG(x) 
+#define ENABLE_USAGE_LOG() 
+
+#else // (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
+
 #define USAGE_LOG(x) UsageLogger::getLogger().x
 #define ENABLE_USAGE_LOG() Aseba::ThymioVPL::UsageLogger::setLoggingState(true)
 
@@ -118,9 +129,13 @@ protected:
 
 }}
 
+#endif // (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
+
 #else /*PROTOBUF_FOUND*/
+
 #define USAGE_LOG(x) 
 #define ENABLE_USAGE_LOG() 
+
 #endif
 
 #endif // VPL_USAGE_LOGGER_H
