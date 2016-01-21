@@ -3479,7 +3479,7 @@ namespace Aseba
 		showKeywordsAct->setCheckable(true);
 		connect(showKeywordsAct, SIGNAL(toggled(bool)), SLOT(showKeywords(bool)));
 
-		showMemoryUsageAct = new QAction(tr("Show memory usage"), this);
+		showMemoryUsageAct = new QAction(tr("Show &memory usage"), this);
 		showMemoryUsageAct->setCheckable(true);
 		connect(showMemoryUsageAct, SIGNAL(toggled(bool)), SLOT(showMemoryUsage(bool)));
 
@@ -3487,17 +3487,17 @@ namespace Aseba
 		showHiddenAct->setCheckable(true);
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 
-		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
+		showLineNumbers = new QAction(tr("Show &Line Numbers"), this);
 		showLineNumbers->setShortcut(tr("F11", "View|Show Line Numbers"));
 		showLineNumbers->setCheckable(true);
 		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
 		
-		zoomInAct = new QAction(tr("&Enlarge Font"), this);
+		zoomInAct = new QAction(tr("&Increase font size"), this);
 		zoomInAct->setShortcut(QKeySequence::ZoomIn);
 		zoomInAct->setEnabled(false);
 		connect(zoomInAct, SIGNAL(triggered()), SLOT(zoomIn()));
 		
-		zoomOutAct = new QAction(tr("Shrink &Font"), this);
+		zoomOutAct = new QAction(tr("&Decrease font size"), this);
 		zoomOutAct->setShortcut(QKeySequence::ZoomOut);
 		zoomOutAct->setEnabled(false);
 		connect(zoomOutAct, SIGNAL(triggered()), SLOT(zoomOut()));
