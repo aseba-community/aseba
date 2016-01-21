@@ -39,7 +39,7 @@ binary-arch:
 	cp debian/build/clients/exec/asebaexec debian/tmp/usr/bin
 	cp debian/build/switches/switch/asebaswitch debian/tmp/usr/bin
 	cp debian/build/switches/medulla/asebamedulla debian/tmp/usr/bin
-	cp debian/build/switches/http/asebahttp debian/tmp/usr/bin
+#	cp debian/build/switches/http/asebahttp debian/tmp/usr/bin
 	cp debian/build/switches/http2/asebahttp2 debian/tmp/usr/bin
 	cp debian/build/targets/challenge/asebachallenge debian/tmp/usr/bin
 	cp debian/build/targets/playground/asebaplayground debian/tmp/usr/bin
