@@ -169,7 +169,6 @@ namespace Aseba
 		catch (Dashel::DashelException& e)
 		{
 			QMessageBox::critical(0, tr("Connection error"), tr("<p><b>Cannot connect to dongle!</b></p><p>Make sure a Wireless Thymio dongle is connected!</p>"));
-			close();
 			return;
 		}
 		
@@ -284,5 +283,8 @@ int main(int argc, char *argv[])
 	
 	Aseba::ThymioWNetConfigDialog configurator(target);
 	
-	return app.exec();
+	if (configurator.isVisible())
+		return app.exec();
+	else
+		return 1;
 }
