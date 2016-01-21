@@ -418,6 +418,8 @@ namespace Aseba
 		void uncommentTriggered();
 		void showLineNumbersChanged(bool state);
 		void goToLine();
+		void zoomIn();
+		void zoomOut();
 		void showSettings();
 		void showHidden(bool show);
 		void showKeywords(bool show);
@@ -585,6 +587,8 @@ namespace Aseba
 		QAction *uncommentAct;
 		QAction *showLineNumbers;
 		QAction *goToLineAct;
+		QAction *zoomInAct;
+		QAction *zoomOutAct;
 		QAction *toggleBreakpointAct;
 		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;

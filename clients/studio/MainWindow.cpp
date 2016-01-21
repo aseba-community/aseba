@@ -2154,6 +2154,20 @@ namespace Aseba
 		if (ok)
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
 	}
+	
+	void MainWindow::zoomIn()
+	{
+		assert(currentScriptTab);
+		QTextEdit* editor(currentScriptTab->editor);
+		editor->zoomIn();
+	}
+	
+	void MainWindow::zoomOut()
+	{
+		assert(currentScriptTab);
+		QTextEdit* editor(currentScriptTab->editor);
+		editor->zoomOut();
+	}
 
 	void MainWindow::showSettings()
 	{
@@ -2419,6 +2433,8 @@ namespace Aseba
 			findAct->setEnabled(false);
 			replaceAct->setEnabled(false);
 			goToLineAct->setEnabled(false);
+			zoomInAct->setEnabled(false);
+			zoomOutAct->setEnabled(false);
 		}
 		
 		// reconnect to new
@@ -2433,6 +2449,8 @@ namespace Aseba
 				findDialog->editor = tab->editor;
 				findAct->setEnabled(true);
 				goToLineAct->setEnabled(true);
+				zoomInAct->setEnabled(true);
+				zoomOutAct->setEnabled(true);
 				
 				NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
 				if (nodeTab)
@@ -3282,7 +3300,7 @@ namespace Aseba
 	
 	void MainWindow::generateHelpMenu()
 	{
-		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()), QKeySequence(tr("F1", "Help|User Manual")));
+		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()), QKeySequence::HelpContents);
 		helpMenu->addSeparator();
 		
 		helpMenuTargetSpecificSeparator = helpMenu->addSeparator();
@@ -3371,71 +3389,63 @@ namespace Aseba
 		menuBar()->addMenu(fileMenu);
 	
 		fileMenu->addAction(QIcon(":/images/filenew.png"), tr("&New"),
-							this, SLOT(newFile()),
-							QKeySequence(tr("Ctrl+N", "File|New")));
+							this, SLOT(newFile()), QKeySequence::New);
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Open..."), 
-							this, SLOT(openFile()),
-							QKeySequence(tr("Ctrl+O", "File|Open")));
+							this, SLOT(openFile()), QKeySequence::Open);
 		openRecentMenu = new QMenu(tr("Open &Recent"), fileMenu);
 		regenerateOpenRecentMenu();
 		fileMenu->addMenu(openRecentMenu)->setIcon(QIcon(":/images/fileopen.png"));
 		
 		fileMenu->addAction(QIcon(":/images/filesave.png"), tr("&Save..."),
-							this, SLOT(save()),
-							QKeySequence(tr("Ctrl+S", "File|Save")));
+							this, SLOT(save()), QKeySequence::Save);
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
-							this, SLOT(saveFile()));
+							this, SLOT(saveFile()), QKeySequence::SaveAs);
 		
 		fileMenu->addSeparator();
-		/*fileMenu->addAction(QIcon(":/images/network.png"), tr("Connect to &target"),
-							target, SLOT(connect()),
-							QKeySequence(tr("Ctrl+T", "File|Connect to target")));
-		fileMenu->addSeparator();*/
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Export &memories content..."),
 							this, SLOT(exportMemoriesContent()));
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Import memories content..."),
 							this, SLOT(importMemoriesContent()));
+		
 		fileMenu->addSeparator();
-		#ifdef Q_WS_MAC
-		fileMenu->addAction(QIcon(":/images/exit.png"), "quit",
-							this, SLOT(close()),
-							QKeySequence(tr("Ctrl+Q", "File|Quit")));
-		#else // Q_WS_MAC
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
-							this, SLOT(close()),
-							QKeySequence(tr("Ctrl+Q", "File|Quit")));
-		#endif // Q_WS_MAC
+							this, SLOT(close()), QKeySequence::Quit);
 		
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
-		cutAct->setShortcut(tr("Ctrl+X", "Edit|Cut"));
+		cutAct->setShortcut(QKeySequence::Cut);
 		cutAct->setEnabled(false);
 		
 		copyAct = new QAction(QIcon(":/images/editcopy.png"), tr("&Copy"), this);
-		copyAct->setShortcut(tr("Ctrl+C", "Edit|Copy"));
+		copyAct->setShortcut(QKeySequence::Copy);
 		copyAct->setEnabled(false);
 		
 		pasteAct = new QAction(QIcon(":/images/editpaste.png"), tr("&Paste"), this);
-		pasteAct->setShortcut(tr("Ctrl+V", "Edit|Paste"));
+		pasteAct->setShortcut(QKeySequence::Paste);
 		pasteAct->setEnabled(false);
 		
 		undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
-		undoAct->setShortcut(tr("Ctrl+Z", "Edit|Undo"));
+		undoAct->setShortcut(QKeySequence::Undo);
 		undoAct->setEnabled(false);
 		
 		redoAct = new QAction(QIcon(":/images/redo.png"), tr("Re&do"), this);
-		redoAct->setShortcut(tr("Ctrl+Shift+Z", "Edit|Redo"));
+		redoAct->setShortcut(QKeySequence::Redo);
 		redoAct->setEnabled(false);
 		
 		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find..."), this);
-		findAct->setShortcut(tr("Ctrl+F", "Edit|Find"));
+		findAct->setShortcut(QKeySequence::Find);
 		connect(findAct, SIGNAL(triggered()), SLOT(findTriggered()));
 		findAct->setEnabled(false);
 		
 		replaceAct = new QAction(QIcon(":/images/edit.png"), tr("&Replace..."), this);
-		replaceAct->setShortcut(tr("Ctrl+R", "Edit|Replace"));
+		replaceAct->setShortcut(QKeySequence::Replace);
 		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
 		replaceAct->setEnabled(false);
+		
+		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
+		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
+		goToLineAct->setEnabled(false);
+		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
 
 		commentAct = new QAction(tr("Comment the selection"), this);
 		commentAct->setShortcut(tr("Ctrl+D", "Edit|Comment the selection"));
@@ -3459,6 +3469,8 @@ namespace Aseba
 		editMenu->addAction(findAct);
 		editMenu->addAction(replaceAct);
 		editMenu->addSeparator();
+		editMenu->addAction(goToLineAct);
+		editMenu->addSeparator();
 		editMenu->addAction(commentAct);
 		editMenu->addAction(uncommentAct);
 		
@@ -3476,24 +3488,30 @@ namespace Aseba
 		connect(showHiddenAct, SIGNAL(toggled(bool)), SLOT(showHidden(bool)));
 
 		showLineNumbers = new QAction(tr("Show Line Numbers"), this);
-		showLineNumbers->setShortcut(tr("F11", "Edit|Show Line Numbers"));
+		showLineNumbers->setShortcut(tr("F11", "View|Show Line Numbers"));
 		showLineNumbers->setCheckable(true);
 		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
-
-		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
-		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
-		goToLineAct->setEnabled(false);
-		connect(goToLineAct, SIGNAL(triggered()), SLOT(goToLine()));
+		
+		zoomInAct = new QAction(tr("&Enlarge Font"), this);
+		zoomInAct->setShortcut(QKeySequence::ZoomIn);
+		zoomInAct->setEnabled(false);
+		connect(zoomInAct, SIGNAL(triggered()), SLOT(zoomIn()));
+		
+		zoomOutAct = new QAction(tr("Shrink &Font"), this);
+		zoomOutAct->setShortcut(QKeySequence::ZoomOut);
+		zoomOutAct->setEnabled(false);
+		connect(zoomOutAct, SIGNAL(triggered()), SLOT(zoomOut()));
 
 		QMenu *viewMenu = new QMenu(tr("&View"), this);
 		viewMenu->addAction(showKeywordsAct);
 		viewMenu->addAction(showMemoryUsageAct);
 		viewMenu->addAction(showHiddenAct);
-		viewMenu->addSeparator();
 		viewMenu->addAction(showLineNumbers);
-		viewMenu->addAction(goToLineAct);
 		viewMenu->addSeparator();
-		viewMenu->addAction(tr("&Settings"), this, SLOT(showSettings()));
+		viewMenu->addAction(zoomInAct);
+		viewMenu->addAction(zoomOutAct);
+		viewMenu->addSeparator();
+		viewMenu->addAction(tr("&Settings"), this, SLOT(showSettings()), QKeySequence::Preferences);
 		menuBar()->addMenu(viewMenu);
 
 		// Debug actions

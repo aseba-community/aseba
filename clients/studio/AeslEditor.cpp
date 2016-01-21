@@ -728,21 +728,6 @@ namespace Aseba
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
-		// handle zooming of text
-		if (event->modifiers() & Qt::ControlModifier)
-		{
-			if (event->key() == Qt::Key_Plus)
-			{
-				zoomIn();
-				return;
-			}
-			if (event->key() == Qt::Key_Minus)
-			{
-				zoomOut();
-				return;
-			}
-		}
-		
 		// handle special pressed
 		if (handleCompleter(event))
 			return;
