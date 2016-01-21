@@ -26,7 +26,7 @@
 #include "HttpRequest.h"
 #include "HttpInterface.h"
 
-using Aseba::DescriptionsManager;
+using Aseba::NodesManager;
 using Aseba::Http::DashelHttpRequest;
 using Aseba::Http::HttpDashelTarget;
 using Aseba::Http::HttpInterface;
@@ -311,6 +311,12 @@ bool HttpDashelTarget::getVariableInfo(const Node& node, const std::string& vari
 		cerr << "Target " << address << " failed to find variable '" << variableName << "' address for node " << node.globalId << " (" << node.name << ")" << endl;
 	}
 	return false;
+}
+
+void HttpDashelTarget::sendMessage(const Message& message)
+{
+	message.serialize(stream);
+	stream->flush();
 }
 
 void HttpDashelTarget::nodeDescriptionReceived(unsigned localNodeId)

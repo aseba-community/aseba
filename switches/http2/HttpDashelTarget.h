@@ -25,7 +25,7 @@
 #include <string>
 #include <set>
 #include <dashel/dashel.h>
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 #include "AeslProgram.h"
 
 namespace Aseba { namespace Http
@@ -43,7 +43,7 @@ namespace Aseba { namespace Http
 	 * Aseba network. Nodes also store a list of their defined variables for the currently compiled
 	 * AESL program, as well as a list of pending variable values requested by HTTP requests.
 	 */
-	class HttpDashelTarget : public DescriptionsManager
+	class HttpDashelTarget : public NodesManager
 	{
 		public:
 			struct Node {
@@ -109,7 +109,9 @@ namespace Aseba { namespace Http
 
 		protected:
 			virtual bool getVariableInfo(const Node& node, const std::string& variableName, unsigned& position, unsigned& size);
+			virtual void sendMessage(const Message& message);
 			virtual void nodeDescriptionReceived(unsigned localNodeId);
+			
 
 		private:
 			HttpInterface *interface;

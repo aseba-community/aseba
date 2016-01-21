@@ -4,7 +4,7 @@ set (ASEBACOMMON_SRC
 	utils/HexFile.cpp
 	utils/BootloaderInterface.cpp
 	msg/msg.cpp
-	msg/descriptions-manager.cpp
+	msg/NodesManager.cpp
 )
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
@@ -21,7 +21,7 @@ set (ASEBACORE_HDR_UTILS
 )
 set (ASEBACORE_HDR_MSG
 	msg/msg.h
-	msg/descriptions-manager.h
+	msg/NodesManager.h
 )
 set (ASEBACORE_HDR_COMMON
 	consts.h

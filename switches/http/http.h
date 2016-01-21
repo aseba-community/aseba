@@ -26,7 +26,7 @@
 #include <queue>
 #include <dashel/dashel.h>
 #include "../../common/msg/msg.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 
 #if defined(_WIN32) && defined(__MINGW32__)
 /* This is a workaround for MinGW32, see libxml/xmlexports.h */

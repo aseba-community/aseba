@@ -116,23 +116,20 @@ namespace Aseba
 		//FIXME: here no error handling is done, with system bus these calls can fail	
 		DBusConnectionBus().registerObject("/", hub);
 		DBusConnectionBus().registerService("ch.epfl.mobots.Aseba");
+		
+		// regular network pinging
+		QTimer *timer = new QTimer(this);
+		connect(timer, SIGNAL(timeout()), this, SLOT(PingNetwork()));
+		timer->start(1000);
 	}
 	
-	void AsebaNetworkInterface::processMessage(Message *message, Dashel::Stream* sourceStream)
+	void AsebaNetworkInterface::processMessage(Message *message, const Dashel::Stream* sourceStream)
 	{
 		// send messages to Dashel peers
 		hub->sendMessage(message, sourceStream);
 		
 		// scan this message for nodes descriptions
-		DescriptionsManager::processMessage(message);
-		
-		// if node present
-		NodePresent *nodePresent = dynamic_cast<NodePresent *>(message);
-		if (nodePresent)
-		{
-			GetNodeDescription getNodeDescription(nodePresent->source);
-			hub->sendMessage(getNodeDescription);
-		}
+		NodesManager::processMessage(message);
 		
 		// if user message, send to D-Bus as well
 		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
@@ -328,7 +325,30 @@ namespace Aseba
 		}
 		return nodeIt.value();	
 	}
+	
+	QString AsebaNetworkInterface::GetNodeName(const quint16 nodeId, const QDBusMessage &message) const
+	{
+		const QString nodeName(QString::fromStdWString(getNodeName(nodeId)));
+		if (nodeName.isEmpty())
+		{
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(nodeId)));
+			return 0;
+		}
+		return nodeName;
+	}
+	
+	bool AsebaNetworkInterface::IsConnected(const QString& node, const QDBusMessage &message) const
+	{
+		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
+		if (nodeIt == nodesNames.end())
+		{
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			return 0;
+		}
+		return nodes.find(nodeIt.value())->second.connected;
+	}
 
+	//! Send the list of variables if the node is fully known, or an empty list otherwise
 	QStringList AsebaNetworkInterface::GetVariablesList(const QString& node) const
 	{
 		NodesNamesMap::const_iterator it(nodesNames.find(node));
@@ -336,8 +356,8 @@ namespace Aseba
 		{
 			// node defined variables
 			const unsigned nodeId(it.value());
-			const NodesDescriptionsMap::const_iterator descIt(nodesDescriptions.find(nodeId));
-			const NodeDescription& description(descIt->second);
+			const NodesMap::const_iterator descIt(nodes.find(nodeId));
+			const Node& description(descIt->second);
 			QStringList list;
 			for (size_t i = 0; i < description.namedVariables.size(); ++i)
 			{
@@ -487,9 +507,19 @@ namespace Aseba
 		return path;
 	}
 	
+	void AsebaNetworkInterface::PingNetwork()
+	{
+		pingNetwork();
+	}
+	
+	void AsebaNetworkInterface::sendMessage(const Message& message)
+	{
+		hub->sendMessage(message);
+	}
+	
 	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
 	{
-		nodesNames[QString::fromStdWString(nodesDescriptions[nodeId].name)] = nodeId;
+		nodesNames[QString::fromStdWString(nodes[nodeId].name)] = nodeId;
 	}
 
 	inline QDBusConnection AsebaNetworkInterface::DBusConnectionBus() const
@@ -513,14 +543,13 @@ namespace Aseba
 	{
 		// TODO: work in progress to remove ugly delay
 		AsebaNetworkInterface* network(new AsebaNetworkInterface(this, systemBus));
-		QObject::connect(this, SIGNAL(messageAvailable(Message*, Dashel::Stream*)), network, SLOT(processMessage(Message*, Dashel::Stream*)));
-		QObject::connect(this, SIGNAL(firstConnectionCreated()), SLOT(firstConnectionAvailable()));
+		QObject::connect(this, SIGNAL(messageAvailable(Message*, const Dashel::Stream*)), network, SLOT(processMessage(Message*, const Dashel::Stream*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
 	}
 	
-	void Hub::sendMessage(Message *message, Stream* sourceStream)
+	void Hub::sendMessage(const Message *message, const Stream* sourceStream)
 	{
 		// dump if requested
 		if (dump)
@@ -556,20 +585,9 @@ namespace Aseba
 		unlock();
 	}
 	
-	void Hub::sendMessage(Message& message, Dashel::Stream* sourceStream)
+	void Hub::sendMessage(const Message& message, const Stream* sourceStream)
 	{
 		sendMessage(&message, sourceStream);
-	}
-	
-	void Hub::firstConnectionAvailable()
-	{
-		QTimer::singleShot(200, this, SLOT(requestDescription()));
-	}
-	
-	void Hub::requestDescription()
-	{
-		emit messageAvailable(new GetDescription(), 0);
-		emit messageAvailable(new ListNodes(), 0);
 	}
 	
 	// the following methods run in the blocking reception thread
@@ -606,11 +624,6 @@ namespace Aseba
 		{
 			dumpTime(cout, rawTime);
 			cout << "Incoming connection from " << stream->getTargetName() << endl;
-		}
-		
-		if (dataStreams.size() == 1)
-		{
-			emit firstConnectionCreated();
 		}
 	}
 	

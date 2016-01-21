@@ -91,8 +91,12 @@ namespace Aseba
 		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return UnifiedTime(value / factor); }
 		//! Multiply time by an amount
 		UnifiedTime operator *(const long long unsigned factor) const { return UnifiedTime(value * factor); }
-		//! Time comparison
 		bool operator <(const UnifiedTime &that) const { return value < that.value; }
+		bool operator <=(const UnifiedTime &that) const { return value <= that.value; }
+		bool operator >(const UnifiedTime &that) const { return value > that.value; }
+		bool operator >=(const UnifiedTime &that) const { return value >= that.value; }
+		bool operator ==(const UnifiedTime &that) const { return value == that.value; }
+		bool operator !=(const UnifiedTime &that) const { return value != that.value; }
 		
 		//! Sleep for this amount of time
 		void sleep() const;

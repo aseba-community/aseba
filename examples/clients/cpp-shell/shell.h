@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 #include <dashel/dashel.h>
-#include "common/msg/descriptions-manager.h"
+#include "common/msg/NodesManager.h"
 
 /*
 	This is the main class of the Aseba client, called Shell
@@ -32,14 +32,14 @@
 	to interact with an Aseba network. Start this program
 	and type "help" to see the list of commands.
 	
-	This class inherits from Dashel::Hub and Aseba::DescriptionsManager.
+	This class inherits from Dashel::Hub and Aseba::NodesManager.
 	The first provides the synchronisation between the command-line
 	inputs and the Aseba messages from an Aseba target, through the
 	streams shellStream and targetStream.
 	The second reconstruct target descriptions by filtering
-	Aseba messages through DescriptionsManager::processMessage().
+	Aseba messages through NodesManager::processMessage().
 */
-struct Shell: public Dashel::Hub, public Aseba::DescriptionsManager
+struct Shell: public Dashel::Hub, public Aseba::NodesManager
 {
 public:
 	typedef std::vector<std::string> strings;
@@ -61,9 +61,11 @@ public:
 	// interface with main()
 	Shell(const char* target);
 	bool isValid() const;
+	bool run1s();
 	
 protected:
 	// reimplemented from parent classes
+	virtual void sendMessage(const Aseba::Message& message);
 	virtual void nodeDescriptionReceived(unsigned nodeId);
 	virtual void incomingData(Dashel::Stream *stream);
 	

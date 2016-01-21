@@ -53,24 +53,29 @@ namespace Aseba
 		Message(uint16 type);
 		virtual ~Message();
 		
-		void serialize(Dashel::Stream* stream);
+		void serialize(Dashel::Stream* stream) const;
 		static Message *receive(Dashel::Stream* stream);
 		void dump(std::wostream &stream) const;
-		void dumpBuffer(std::wostream &stream) const;
+
+	protected:
+		//! Helper class that contains the raw data being (de-)serialialized
+		struct SerializationBuffer
+		{
+			SerializationBuffer():readPos(0) {}
+			
+			template<typename T> void add(const T& val);
+			template<typename T> T get();
+			void dump(std::wostream &stream) const;
+			
+			std::vector<uint8> rawData;
+			size_t readPos;
+		};
 		
 	protected:
-		virtual void serializeSpecific() = 0;
-		virtual void deserializeSpecific() = 0;
+		virtual void serializeSpecific(SerializationBuffer& buffer) const = 0;
+		virtual void deserializeSpecific(SerializationBuffer& buffer) = 0;
 		virtual void dumpSpecific(std::wostream &stream) const = 0;
 		virtual operator const char * () const { return "message super class"; }
-	
-	protected:
-		template<typename T> void add(const T& val);
-		template<typename T> T get();
-		
-	protected:
-		std::vector<uint8> rawData;
-		size_t readPos;
 	};
 	
 	//! Any message sent by a script on a node
@@ -86,8 +91,8 @@ namespace Aseba
 		UserMessage(uint16 type, const sint16* data, const size_t length);
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "user message"; }
 	};
@@ -102,8 +107,8 @@ namespace Aseba
 		CmdMessage(uint16 type, uint16 dest) : Message(type), dest(dest) { }
 		
 	protected:	
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "command message super class"; }
 	};
@@ -120,8 +125,8 @@ namespace Aseba
 		BootloaderDescription() : Message(ASEBA_MESSAGE_BOOTLOADER_DESCRIPTION) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader description"; }
 	};
@@ -136,8 +141,8 @@ namespace Aseba
 		BootloaderDataRead() : Message(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader page data read"; }
 	};
@@ -162,8 +167,8 @@ namespace Aseba
 		BootloaderAck() : Message(ASEBA_MESSAGE_BOOTLOADER_ACK) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader ack"; }
 	};
@@ -178,8 +183,8 @@ namespace Aseba
 		ListNodes() : Message(ASEBA_MESSAGE_LIST_NODES), version(ASEBA_PROTOCOL_VERSION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "list nodes"; }
 	};
@@ -194,8 +199,8 @@ namespace Aseba
 		NodePresent() : Message(ASEBA_MESSAGE_NODE_PRESENT), version(ASEBA_PROTOCOL_VERSION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "node present"; }
 	};
@@ -210,8 +215,8 @@ namespace Aseba
 		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION), version(ASEBA_PROTOCOL_VERSION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "presence"; }
 	};
@@ -227,8 +232,8 @@ namespace Aseba
 		GetNodeDescription(uint16 dest) : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, dest), version(ASEBA_PROTOCOL_VERSION) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "get node description"; }
 	};
@@ -240,8 +245,8 @@ namespace Aseba
 		Description() : Message(ASEBA_MESSAGE_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "description"; }
 	};
@@ -253,8 +258,8 @@ namespace Aseba
 		NamedVariableDescription() : Message(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "named variable"; }
 	};
@@ -266,8 +271,8 @@ namespace Aseba
 		LocalEventDescription() : Message(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "local event"; }
 	};
@@ -279,8 +284,8 @@ namespace Aseba
 		NativeFunctionDescription() : Message(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "native function description"; }
 	};
@@ -292,8 +297,8 @@ namespace Aseba
 		Disconnected() : Message(ASEBA_MESSAGE_DISCONNECTED) { }
 		
 	protected:
-		virtual void serializeSpecific() {}
-		virtual void deserializeSpecific() {}
+		virtual void serializeSpecific(SerializationBuffer& buffer) const {}
+		virtual void deserializeSpecific(SerializationBuffer& buffer) {}
 		virtual void dumpSpecific(std::wostream &) const {}
 		virtual operator const char * () const { return "disconnected"; }
 	};
@@ -309,8 +314,8 @@ namespace Aseba
 		Variables() : Message(ASEBA_MESSAGE_VARIABLES) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "variables"; }
 	};
@@ -327,8 +332,8 @@ namespace Aseba
 		ArrayAccessOutOfBounds() : Message(ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "array access out of bounds"; }
 	};
@@ -343,8 +348,8 @@ namespace Aseba
 		DivisionByZero() : Message(ASEBA_MESSAGE_DIVISION_BY_ZERO) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "division by zero"; }
 	};
@@ -359,8 +364,8 @@ namespace Aseba
 		EventExecutionKilled() : Message(ASEBA_MESSAGE_EVENT_EXECUTION_KILLED) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "event execution killed"; }
 	};
@@ -376,8 +381,8 @@ namespace Aseba
 		NodeSpecificError() : Message(ASEBA_MESSAGE_NODE_SPECIFIC_ERROR) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &) const;
 		virtual operator const char * () const { return "node specific error"; }
 	};
@@ -393,8 +398,8 @@ namespace Aseba
 		ExecutionStateChanged() : Message(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "execution state"; }
 	};
@@ -410,8 +415,8 @@ namespace Aseba
 		BreakpointSetResult() : Message(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "breakpoint set result"; }
 	};
@@ -438,8 +443,8 @@ namespace Aseba
 		BootloaderReadPage(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader read page"; }
 	};
@@ -455,8 +460,8 @@ namespace Aseba
 		BootloaderWritePage(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader write page"; }
 	};
@@ -472,8 +477,8 @@ namespace Aseba
 		BootloaderPageDataWrite(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "bootloader page data write"; }
 	};
@@ -490,8 +495,8 @@ namespace Aseba
 		SetBytecode(uint16 dest, uint16 start) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest), start(start) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "set bytecode"; }
 	};
@@ -575,11 +580,11 @@ namespace Aseba
 		
 	public:
 		BreakpointSet() : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, ASEBA_DEST_INVALID) { }
-		BreakpointSet(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, dest) { }
+		BreakpointSet(uint16 dest, uint16 pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, dest), pc(pc) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "breakpoint set"; }
 	};
@@ -592,11 +597,11 @@ namespace Aseba
 		
 	public:
 		BreakpointClear() : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, ASEBA_DEST_INVALID) { }
-		BreakpointClear(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, dest) { }
+		BreakpointClear(uint16 dest, uint16 pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, dest), pc(pc) { }
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "breakpoint clear"; }
 	};
@@ -624,8 +629,8 @@ namespace Aseba
 		GetVariables(uint16 dest, uint16 start, uint16 length);
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "get variables"; }
 	};
@@ -643,8 +648,8 @@ namespace Aseba
 		SetVariables(uint16 dest, uint16 start, const VariablesVector& variables);
 		
 	protected:
-		virtual void serializeSpecific();
-		virtual void deserializeSpecific();
+		virtual void serializeSpecific(SerializationBuffer& buffer) const;
+		virtual void deserializeSpecific(SerializationBuffer& buffer);
 		virtual void dumpSpecific(std::wostream &stream) const;
 		virtual operator const char * () const { return "set variables"; }
 	};

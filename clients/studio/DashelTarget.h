@@ -23,7 +23,7 @@
 
 #include "Target.h"
 #include "../../common/consts.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 #include <QString>
 #include <QDialog>
 #include <QQueue>
@@ -88,7 +88,7 @@ namespace Aseba
 	class Message;
 	class UserMessage;
 	
-	class DashelInterface: public QThread, public Dashel::Hub
+	class DashelInterface: public QThread, public Dashel::Hub, public NodesManager
 	{
 		Q_OBJECT
 		
@@ -109,6 +109,9 @@ namespace Aseba
 	signals:
 		void messageAvailable(Message *message);
 		void dashelDisconnection();
+		void nodeDescriptionReceivedSignal(unsigned nodeId);
+		void nodeConnectedSignal(unsigned nodeId);
+		void nodeDisconnectedSignal(unsigned nodeId);
 	
 	protected:
 		// from QThread
@@ -117,26 +120,15 @@ namespace Aseba
 		// from Dashel::Hub
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-	};
-	
-	//! Provides a signal/slot interface for the description manager
-	class SignalingDescriptionsManager: public QObject, public DescriptionsManager
-	{
-		Q_OBJECT
-	
-	signals:
-		void nodeDescriptionReceivedSignal(unsigned nodeId);
-	
-	protected:
+		
+		// from NodesManager
 		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
-		
+		virtual void nodeConnected(unsigned nodeId);
+		virtual void nodeDisconnected(unsigned nodeId);
 	public:
-		//! Return true if this nodeId is known to have 
-		bool hasNodeProtocolMismatch(unsigned nodeId) const { return notifiedMismatch.contains(nodeId); }
-		
-	protected:
-		QSet<unsigned> notifiedMismatch;
+		// from NodesManager, now as public as we want DashelTarget to call this method
+		virtual void sendMessage(const Message& message);
 	};
 	
 	class DashelTarget: public Target
@@ -153,10 +145,6 @@ namespace Aseba
 			unsigned steppingInNext; //!< state of node when in next and stepping
 			unsigned lineInNext; //!< line of node to execute when in next and stepping
 			ExecutionMode executionMode; //!< last known execution mode if this node
-			
-			bool connected; //!< whether this node is considered connected
-			QTime lastSeen; //!< when this node was last seen?
-			unsigned protocolVersion; //!< version of the protocol
 		};
 		
 		typedef void (DashelTarget::*MessageHandler)(Message *message);
@@ -168,9 +156,9 @@ namespace Aseba
 		MessagesHandlersMap messagesHandlersMap;
 		
 		QQueue<UserMessage *> userEventsQueue;
-		SignalingDescriptionsManager descriptionManager;
 		NodesMap nodes;
 		QTimer userEventsTimer;
+		// Note: this timer is here rather than in DashelInterface because writeBlocked is here, if wiretBlocked is removed, this timer should be moved
 		QTimer listNodesTimer;
 		bool writeBlocked; //!< true if write is being blocked by invasive plugins, false if write is allowed
 		
@@ -208,11 +196,6 @@ namespace Aseba
 	protected:
 		virtual void blockWrite();
 		virtual void unblockWrite();
-		
-	protected:
-		void broadcastGetDescription();
-		void broadcastListNodes();
-		void getNodeDescription(unsigned node);
 	
 	protected slots:
 		void updateUserEvents();
@@ -225,7 +208,6 @@ namespace Aseba
 		void receivedDescription(Message *message);
 		void receivedLocalEventDescription(Message *message);
 		void receivedNativeFunctionDescription(Message *message);
-		void receivedDisconnected(Message *message);
 		void receivedVariables(Message *message);
 		void receivedArrayAccessOutOfBounds(Message *message);
 		void receivedDivisionByZero(Message *message);
@@ -239,9 +221,6 @@ namespace Aseba
 		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
 		int getPCFromLine(unsigned node, unsigned line);
 		int getLineFromPC(unsigned node, unsigned pc);
-
-	protected:
-		void handleDashelException(Dashel::DashelException e);
 	};
 	
 	/*@}*/

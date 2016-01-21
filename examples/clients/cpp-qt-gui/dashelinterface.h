@@ -30,7 +30,7 @@
 
 #include <dashel/dashel.h>
 #include "common/msg/msg.h"
-#include "common/msg/descriptions-manager.h"
+#include "common/msg/NodesManager.h"
 
 
 class DashelInterface : public QThread, public Dashel::Hub

@@ -85,6 +85,7 @@ void HttpInterface::step()
 		if(iter->second == NULL) {
 			UnifiedTime now;
 			if((now - targetAddressReconnectionTime[address]).value > RECONNECT_TIMEOUT) {
+				// trying to reconnect to disconnected targets
 				Dashel::Stream *stream = NULL;
 				try {
 					stream = connect(address);
@@ -93,10 +94,6 @@ void HttpInterface::step()
 					if(verbose) {
 						cerr << "Successfully connected target " << address << " with stream " << stream << endl;
 					}
-
-			        GetDescription getDescription;
-		            getDescription.serialize(stream);
-		            stream->flush();
 				} catch(Dashel::DashelException e) {
 					if(verbose) {
 						cerr << "Failed to connect target " << address << ": " << e.what() << endl;
@@ -111,6 +108,11 @@ void HttpInterface::step()
 					}
 
 					targetAddressReconnectionTime[address] = now;
+				}
+				// ping the connected networks
+				for(map<Dashel::Stream *, HttpDashelTarget *>::iterator iter = targets.begin(); iter != targets.end(); ++iter) {
+					HttpDashelTarget *target = iter->second;
+					target->pingNetwork();
 				}
 			}
 		}
