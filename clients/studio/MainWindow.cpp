@@ -3408,8 +3408,11 @@ namespace Aseba
 							this, SLOT(importMemoriesContent()));
 		
 		fileMenu->addSeparator();
-		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"),
-							this, SLOT(close()), QKeySequence::Quit);
+		#ifdef Q_WS_MAC
+		fileMenu->addAction(QIcon(":/images/exit.png"), "quit", this, SLOT(close()), QKeySequence::Quit);
+		#else // Q_WS_MAC
+		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"), this, SLOT(close()), QKeySequence::Quit);
+		#endif // Q_WS_MAC
 		
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
@@ -3511,7 +3514,11 @@ namespace Aseba
 		viewMenu->addAction(zoomInAct);
 		viewMenu->addAction(zoomOutAct);
 		viewMenu->addSeparator();
+		#ifdef Q_WS_MAC
+		viewMenu->addAction("settings", this, SLOT(showSettings()), QKeySequence::Preferences);
+		#else // Q_WS_MAC
 		viewMenu->addAction(tr("&Settings"), this, SLOT(showSettings()), QKeySequence::Preferences);
+		#endif // Q_WS_MAC
 		menuBar()->addMenu(viewMenu);
 
 		// Debug actions
