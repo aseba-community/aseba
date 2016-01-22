@@ -139,8 +139,9 @@ namespace Aseba { namespace ThymioVPL
 		Block* event;
 		Block* stateFilter;
 		QList<Block*> actions;
-		int isBlinking; //!< show blink background
 		
+		QGraphicsItem* blinkGraphicsItem;
+		QTimer* clearBlinkTimer;
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
 		RemoveBlockButton *deleteBlockButton;

@@ -104,6 +104,7 @@
 	<file>images/vpl/success.svgz</file>
 	<file>images/vpl/missing_block.svgz</file>
 	<file>images/vpl/error.svgz</file>
+	<file>images/vpl/blink.svg</file>
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.html</file>
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.de.html</file>
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html</file>

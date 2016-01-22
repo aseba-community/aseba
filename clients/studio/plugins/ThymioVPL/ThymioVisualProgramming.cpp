@@ -1001,9 +1001,13 @@ namespace Aseba { namespace ThymioVPL
 		else
 			USAGE_LOG(logUserEvent(id,data));
 		
-		// a set was executed on target, highlight in program
-		if (execFeedback && id == 0)
-			(*(scene->setsBegin() + data[0]))->blink();
+		// a set was executed on target, highlight in program if the code in the robot is the same as in this editor
+		if (execFeedback && id == 0 && runButton->isEnabled() && !runAnimTimer)
+		{
+			const unsigned index(data[0]);
+			assert (index < scene->setsCount());
+			(*(scene->setsBegin() + index))->blink();
+		}
 	}
 	
 	void ThymioVisualProgramming::addEvent()

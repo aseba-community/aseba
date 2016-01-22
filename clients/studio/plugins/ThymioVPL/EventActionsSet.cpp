@@ -53,7 +53,7 @@ namespace Aseba { namespace ThymioVPL
 		QGraphicsObject(parent),
 		event(0),
 		stateFilter(0),
-		isBlinking(false),
+		blinkGraphicsItem(new QGraphicsSvgItem(":/images/vpl/blink.svg", this)),
 		deleteButton(new AddRemoveButton(false, this)),
 		addButton(new AddRemoveButton(true, this)),
 		deleteBlockButton(new RemoveBlockButton(this)),
@@ -76,6 +76,11 @@ namespace Aseba { namespace ThymioVPL
 		setAcceptDrops(true);
 		
 		setAdvanced(advanced);
+		
+		blinkGraphicsItem->setVisible(false);
+		blinkGraphicsItem->setPos(-90, (innerBoundingRect().height()-160)/2);
+		clearBlinkTimer = new QTimer(this);
+		connect(clearBlinkTimer, SIGNAL(timeout()), SLOT(clearBlink()));
 		
 		deleteBlockButton->setZValue(1);
 		deleteBlockButton->setVisible(false);
@@ -338,9 +343,9 @@ namespace Aseba { namespace ThymioVPL
 	//! Blink the set
 	void EventActionsSet::blink()
 	{
-		isBlinking = true;
+		blinkGraphicsItem->setVisible(true);
 		update();
-		QTimer::singleShot(200, this, SLOT(clearBlink()));
+		clearBlinkTimer->start(300);
 	}
 	
 	//! Return the content compressed into a uint16 vector, to be used as debug events
@@ -555,7 +560,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	void EventActionsSet::clearBlink()
 	{
-		isBlinking = false;
+		blinkGraphicsItem->setVisible(false);
 		update();
 	}
 	
@@ -1102,13 +1107,12 @@ namespace Aseba { namespace ThymioVPL
 		//if (errorType != Compiler::NO_ERROR)
 		if (errorType == Compiler::DUPLICATED_EVENT)
 			painter->setPen(QPen(Qt::red, 8));
+		else if (blinkGraphicsItem->isVisible())
+			painter->setPen(QPen(QColor("#f5e800"), 8));
 		else
 			painter->setPen(Qt::NoPen);
 		
-		if (isBlinking)
-			painter->setBrush(QColor(180, 255, 181));
-		else
-			painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
+		painter->setBrush(Style::eventActionsSetBackgroundColors[colorId]);
 		if (highlightMode == HIGHLIGHT_SET)
 			painter->drawRoundedRect(-Style::blockSpacing/2,0,currentWidth+Style::blockSpacing,Style::blockHeight+2*Style::blockSpacing,borderWidth,borderWidth);
 		else
