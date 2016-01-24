@@ -14,6 +14,7 @@
 #include "../../common/consts.h"
 #include "../../common/types.h"
 #include "../../common/utils/utils.h"
+#include "../../common/msg/descriptions-manager.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 
 //! Show usage
@@ -89,14 +90,18 @@ int main(int argc, char *argv[])
         
         for (int i = 0; i < 500; i++)
             network->step(10); // wait for description, variables, etc
-        if (aesl_filename.size() > 0)
+
+        for (auto nodeId: network->allNodeIds())
         {
-            network->aeslLoadFile(0, aesl_filename);
-        }
-        else
-        {
-            const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-            network->aeslLoadMemory(0, failsafe,strlen(failsafe));
+            if (aesl_filename.size() > 0)
+            {
+                network->aeslLoadFile(nodeId, aesl_filename);
+            }
+            else
+            {
+                const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+                network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+            }
         }
         
         network->run();

@@ -61,7 +61,7 @@ namespace Aseba
         typedef std::map<Dashel::Stream*, ResponseQueue>        StreamResponseQueueMap;
         typedef std::map<Dashel::Stream*, HttpRequest>          StreamRequestMap;
         typedef std::map<HttpRequest*, std::set<std::string> >  StreamEventSubscriptionMap;
-        typedef std::map<Dashel::Stream*, unsigned>             StreamNodeIdMap;
+        typedef std::map<Dashel::Stream*, std::set<unsigned> >  StreamNodeIdMap;
         typedef std::set<Dashel::Stream*>                       StreamSet;
         typedef std::map<Dashel::Stream*, NodeIdSubstitution>   StreamNodeIdSubstitutionMap;
         typedef std::map<unsigned, Aseba::CommonDefinitions>    NodeIdCommonDefinitionsMap;
@@ -109,6 +109,7 @@ namespace Aseba
         virtual void sendAvailableResponses();
         virtual void unscheduleResponse(Dashel::Stream* stream, HttpRequest* req);
         virtual void unscheduleAllResponses(Dashel::Stream* stream);
+        virtual std::vector<unsigned> allNodeIds();
         
     protected:
         /* // reimplemented from parent classes */
@@ -132,7 +133,7 @@ namespace Aseba
 //        bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos) const;
         bool compileAndSendCode(const unsigned nodeId, const std::wstring& program);
         virtual void parse_json_form(std::string content, strings& values);
-        std::vector<unsigned> getIdsFromArgs(const strings& args);
+        std::vector<unsigned> getIdsFromURI(const strings& args);
         Dashel::Stream* getStreamFromNodeId(const unsigned nodeId);
     };
     
@@ -152,6 +153,7 @@ namespace Aseba
         std::string result; // outgoing payload
         strings outheaders;
         bool more; // keep connection open for SSE
+        int sse_todo;
     protected:
         bool headers_done; // flag for header parsing
         bool status_sent;  // flag for SSE

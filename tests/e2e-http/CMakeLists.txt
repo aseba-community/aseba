@@ -1,0 +1,6 @@
+configure_file(1-http_spec.js ${CMAKE_CURRENT_BINARY_DIR}/1-http_spec.js COPYONLY)
+configure_file(2-interaction_spec.js ${CMAKE_CURRENT_BINARY_DIR}/2-interaction_spec.js COPYONLY)
+configure_file(package.json ${CMAKE_CURRENT_BINARY_DIR}/package.json COPYONLY)
+configure_file(ping0123.aesl ${CMAKE_CURRENT_BINARY_DIR}/ping0123.aesl COPYONLY)
+configure_file(run-e2e-http.sh ${CMAKE_CURRENT_BINARY_DIR}/run-e2e-http.sh COPYONLY)
+add_test(NAME e2e-http COMMAND bash run-e2e-http.sh)

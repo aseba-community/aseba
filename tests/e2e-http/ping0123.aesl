@@ -1,0 +1,90 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="1" name="wakeup"/>
+<event size="0" name="start"/>
+<event size="0" name="stop"/>
+<event size="3" name="ping"/>
+
+
+<!--list of constants-->
+<constant value="3" name="LISTENERS"/>
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node dummynode-0-->
+<node nodeId="1" name="dummynode-0"># listener 1 is dummynode-0
+var whoami = 1000
+var counter = 0
+var seen[2] = [0,0]
+
+onevent wakeup
+if args[0] == whoami then
+	counter = (counter + 1) % 1000
+	emit ping [whoami+counter,seen]
+end
+
+onevent ping
+seen = [source,args[0]]</node>
+
+
+<!--node dummynode-1-->
+<node nodeId="2" name="dummynode-1"># listener 2 is dummynode-1
+var whoami = 2000
+var counter = 0
+var seen[2] = [0,0]
+
+onevent wakeup
+if args[0] == whoami then
+    counter = (counter + 1) % 1000
+    emit ping [whoami+counter,seen]
+end
+
+onevent ping
+seen = [source,args[0]]</node>
+
+
+<!--node dummynode-2-->
+<node nodeId="3" name="dummynode-2"># stuck listener 3 is dummynode-2
+var whoami = 3000
+var seen[2] = [0,0]
+
+onevent wakeup
+if args[0] == whoami then
+	emit ping [whoami,seen]
+end
+
+onevent ping
+seen = [source,args[0]]</node>
+
+
+<!--node dummynode-3-->
+<node nodeId="4" name="dummynode-3"># clock is dummynode-3
+# randomly wake up a listener every 1-second tick
+var running = 1
+var tick = 0
+var who
+
+onevent timer
+if running==1 then
+    tick += 1
+    if tick % 50 == 0 then
+        call math.rand(who)
+        who = (tick &amp; (3 &lt;&lt; 6)) >> 6
+        emit wakeup 1000*(who+1)
+    end
+end
+
+onevent start
+running = 1
+
+onevent stop
+running = 0</node>
+
+
+</network>

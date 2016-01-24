@@ -204,3 +204,5 @@ if (LIBXML2_FOUND)
 else (LIBXML2_FOUND)
 	message("-- libXML2 not found! Disabling HTTP switch tests")
 endif (LIBXML2_FOUND)
+
+add_subdirectory(e2e-http)
