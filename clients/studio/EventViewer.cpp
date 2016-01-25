@@ -228,7 +228,7 @@ namespace Aseba
 	void EventViewer::saveToFile()
 	{
 		QSettings settings;
-		QString lastFileName(settings.value("EventViewer/exportFileName", "").toString());
+		QString lastFileName(settings.value("EventViewer/exportFileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString());
 		QString filter = "Text files (*.txt);;CSV files (*.csv);;All Files (*)";
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, filter);
 		

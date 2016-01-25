@@ -355,7 +355,7 @@ namespace Aseba { namespace ThymioVPL
 		QSettings settings;
 		
 		USAGE_LOG(logSaveSnapshot());
-		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", "").toString());
+		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString());
 		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
 		{
 			const QFileInfo pf(de->openedFileName());

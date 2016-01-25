@@ -297,7 +297,7 @@ namespace Aseba
 				#ifdef ANDROID
 				fileName = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
 				#else // ANDROID
-				fileName = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::displayName(QDesktopServices::DocumentsLocation)).toString();
+				fileName = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString();
 				#endif // ANDROID
 				// keep only the path of the directory
 				fileName = QFileInfo(fileName).dir().path();
