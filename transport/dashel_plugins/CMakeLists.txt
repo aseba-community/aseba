@@ -19,3 +19,6 @@ install(TARGETS asebadashelplugins
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
 		ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
+install(FILES dashel-plugins.h
+	DESTINATION include/aseba/transport/dashel_plugins
+)
