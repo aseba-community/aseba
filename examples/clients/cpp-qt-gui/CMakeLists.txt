@@ -15,5 +15,4 @@ if (QT4_FOUND)
 
 	add_executable(aseba-qt-gui WIN32 ${aseba-qt-gui_SRCS})
 	target_link_libraries(aseba-qt-gui ${ASEBA_CORE_LIBRARIES} ${QT_LIBRARIES} ${EXTRA_LIBS})
-	install(TARGETS aseba-qt-gui RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (QT4_FOUND)

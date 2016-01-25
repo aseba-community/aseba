@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <queue>
 #include <dashel/dashel.h>
-#include "../../common/msg/NodesManager.h"
+#include "common/msg/NodesManager.h"
 
 namespace Aseba
 {

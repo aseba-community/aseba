@@ -32,7 +32,8 @@
 #include <libxml/tree.h>
 
 #include "shell.h"
-#include "../../../common/utils/utils.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 using namespace std;
 using namespace Dashel;
@@ -661,6 +662,9 @@ int main(int argc, char *argv[])
 		wcerr << "Usage: " << argv[0] << " TARGET" << endl;
 		return 1;
 	}
+	
+	// initialize Dashel plugins
+	Dashel::initPlugins();
 	
 	// create the shell
 	Shell shell(argv[1]);

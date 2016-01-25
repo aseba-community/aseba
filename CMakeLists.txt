@@ -50,22 +50,24 @@ set(LIB_VERSION_MINOR 4)
 set(LIB_VERSION_PATCH 0)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 
+# Core libraries
 add_subdirectory(common)
-
 add_subdirectory(transport)
 
+# define the core libraries variable, to be used by all Aseba programs
 set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
 
-add_subdirectory(switches)
-
+# Target and client specific libraries
 add_subdirectory(vm)
-
 add_subdirectory(compiler)
 
+# User programs
 add_subdirectory(clients)
-
+add_subdirectory(switches)
 add_subdirectory(targets)
 
+# Examples for developers
 add_subdirectory(examples)
 
+# Unit tests
 add_subdirectory(tests)

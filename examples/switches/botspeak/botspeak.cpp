@@ -25,8 +25,8 @@
 #include <functional>
 #include <cstdlib>
 #include "botspeak.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 namespace Aseba
 {

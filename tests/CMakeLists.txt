@@ -18,17 +18,11 @@ add_executable(asebatest
 	asebatest.cpp
 )
 target_link_libraries(asebatest asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
-install(TARGETS asebatest RUNTIME
-	DESTINATION bin
-)
 
 add_executable(aseba-test-natives-count
 	aseba-test-natives-count.cpp
 )
 target_link_libraries(aseba-test-natives-count asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
-install(TARGETS aseba-test-natives-count RUNTIME
-	DESTINATION bin
-)
 
 # set the number of test loops for the fuzzy test
 set(fuzzy_loop "500")

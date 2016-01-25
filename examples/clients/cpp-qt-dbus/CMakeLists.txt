@@ -23,7 +23,6 @@ if(COMPILER_SUPPORTS_CXX0X)
 
 		add_executable(aseba-qt-dbus ${aseba-qt-dbus_SRCS} ${aseba-qt-dbus_MOC_SRCS})
 		target_link_libraries(aseba-qt-dbus ${QT_LIBRARIES})
-		install(TARGETS aseba-qt-dbus RUNTIME DESTINATION bin)
 	endif()
 else()
 	message(WARNING "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support, so we will skip building the example interface qt-dbus.")
