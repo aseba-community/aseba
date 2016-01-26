@@ -75,6 +75,16 @@ namespace Aseba
 		return nodeTab->pid;
 	}
 	
+	void StudioInterface::setCommonDefinitions(const CommonDefinitions& commonDefinitions)
+	{
+		mainWindow->eventsDescriptionsModel->clear();
+		for (NamedValuesVector::const_iterator it(commonDefinitions.events.begin()); it != commonDefinitions.events.end(); ++it)
+			mainWindow->eventsDescriptionsModel->addNamedValue(*it);
+		mainWindow->constantsDefinitionsModel->clear();
+		for (NamedValuesVector::const_iterator it(commonDefinitions.constants.begin()); it != commonDefinitions.constants.end(); ++it)
+			mainWindow->constantsDefinitionsModel->addNamedValue(*it);
+	}
+	
 	void StudioInterface::displayCode(const QList<QString>& code, int elementToHighlight)
 	{
 		nodeTab->editor->replaceAndHighlightCode(code, elementToHighlight);

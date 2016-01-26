@@ -291,11 +291,20 @@ namespace Aseba { namespace ThymioVPL
 			visitAction(eventActionsSet.getActionBlock(i), currentBlock);
 		
 		// possibly add the debug event
+		visitExecFeedback(eventActionsSet, currentBlock);
 		if (debugLog)
 			visitDebugLog(eventActionsSet, currentBlock);
 		
 		// possibly close condition and add code
 		visitEndOfLine(currentBlock);
+	}
+	
+	//! Generate the debug log event for this set
+	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock)
+	{
+		wstring text(indentText());
+		text += L"emit PairExecuted " + toWstring(eventActionsSet.getRow()) + L"\n";
+		generatedCode[currentBlock].append(text);
 	}
 	
 	//! Generate the debug log event for this set

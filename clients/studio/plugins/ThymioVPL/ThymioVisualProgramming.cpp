@@ -285,8 +285,7 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
-		if (debugLog)
-			connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
+		connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
 		
 		/*zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
@@ -461,6 +460,9 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
+			CommonDefinitions commonDefinitions;
+			commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
+			de->setCommonDefinitions(commonDefinitions);
 			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
@@ -996,13 +998,13 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
 		// here we can add react to incoming events
-		if (id == 1)
+		if (id == 2)
 			USAGE_LOG(logTabletData(data));
-		else
+		else if (id > 2)
 			USAGE_LOG(logUserEvent(id,data));
 		
 		// a set was executed on target, highlight in program if the code in the robot is the same as in this editor
-		if (execFeedback && id == 0 && runButton->isEnabled() && !runAnimTimer)
+		if (id == 0 && runButton->isEnabled() && !runAnimTimer)
 		{
 			const unsigned index(data[0]);
 			assert (index < scene->setsCount());

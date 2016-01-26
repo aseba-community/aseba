@@ -43,6 +43,7 @@ namespace Aseba
 		Target * getTarget();
 		unsigned getNodeId() const;
 		unsigned getProductId() const;
+		void setCommonDefinitions(const CommonDefinitions& commonDefinitions);
 		void displayCode(const QList<QString>& code, int line);
 		void loadAndRun();
 		void stop();

@@ -83,6 +83,7 @@ namespace Aseba { namespace ThymioVPL
 			
 			void visitEndOfLine(unsigned currentBlock);
 			
+			void visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			void visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			
 			void visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock);

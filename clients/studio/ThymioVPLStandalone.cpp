@@ -62,6 +62,11 @@ namespace Aseba
 		return ASEBA_PID_THYMIO2;
 	}
 	
+	void ThymioVPLStandaloneInterface::setCommonDefinitions(const CommonDefinitions& commonDefinitions)
+	{
+		// ignore this for VPL Standalone, as it is done once in the main app
+	}
+	
 	void ThymioVPLStandaloneInterface::displayCode(const QList<QString>& code, int elementToHighlight)
 	{
 		vplStandalone->editor->replaceAndHighlightCode(code, elementToHighlight);
@@ -455,6 +460,7 @@ namespace Aseba
 		if (targetDescription)
 		{
 			CommonDefinitions commonDefinitions;
+			commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
 			commonDefinitions.events.push_back(NamedValue(L"DebugLog", 14));
 			Compiler compiler;
 			compiler.setTargetDescription(target->getDescription(id));
