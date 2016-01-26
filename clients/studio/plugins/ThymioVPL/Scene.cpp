@@ -212,7 +212,7 @@ namespace Aseba { namespace ThymioVPL
 	//! Reset the scene to an empty one
 	void Scene::reset()
 	{
-		clear(false);
+		clear(advancedMode);
 		createNewEventActionsSet();
 		lastCompilationResult = compiler.compile(this);
 	}

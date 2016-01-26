@@ -476,7 +476,6 @@ namespace Aseba { namespace ThymioVPL
 		if (de->newFile())
 		{
 			USAGE_LOG(logNewFile());
-			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
 			processCompilationResult();
