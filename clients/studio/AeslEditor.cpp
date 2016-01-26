@@ -777,7 +777,7 @@ namespace Aseba
 
 		while (cursor.position() < textCursor().selectionEnd())
 		{
-			cursor.movePosition(QTextCursor::StartOfLine);
+			cursor.movePosition(QTextCursor::StartOfBlock);
 			if (event->modifiers() & Qt::ControlModifier)
 			{
 				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
@@ -791,11 +791,11 @@ namespace Aseba
 			}
 			else
 				cursor.insertText("\t");
-			cursor.movePosition(QTextCursor::Down);
-			cursor.movePosition(QTextCursor::EndOfLine);
+			cursor.movePosition(QTextCursor::NextBlock);
+			cursor.movePosition(QTextCursor::EndOfBlock);
 		}
 
-		cursor.movePosition(QTextCursor::StartOfLine);
+		cursor.movePosition(QTextCursor::StartOfBlock);
 		if (event->modifiers() & Qt::ControlModifier)
 		{
 			cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
