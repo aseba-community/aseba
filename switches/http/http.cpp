@@ -162,12 +162,27 @@ namespace Aseba
         asebaStream->flush();
     }
     
+    bool HttpInterface::run2s()
+	{
+		int timeout(2000);
+		UnifiedTime startTime;
+		while (timeout > 0)
+		{
+			if (!step(timeout))
+				return false;
+			timeout -= (Aseba::UnifiedTime() - startTime).value;
+		}
+		return true;
+	}
+    
     void HttpInterface::run()
     {
         do
         {
             sendAvailableResponses();
-            step(2);
+			pingNetwork();
+            if (!run2s())
+				break;
             if (verbose && streamsToShutdown.size() > 0)
             {
                 cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
@@ -237,6 +252,12 @@ namespace Aseba
         }
     }
     
+    void HttpInterface::sendMessage(const Message& message)
+	{
+		message.serialize(asebaStream);
+		asebaStream->flush();
+	}
+    
     void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
     {
         if (verbose)
@@ -265,7 +286,7 @@ namespace Aseba
             
             // pass message to description manager, which builds
             // the node descriptions in background
-            DescriptionsManager::processMessage(message);
+            NodesManager::processMessage(message);
             
             // if variables, check for pending requests
             const Variables *variables(dynamic_cast<Variables *>(message));
@@ -439,10 +460,10 @@ namespace Aseba
         std::stringstream json;
         json << (do_one_node ? "" : "[");
         
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-             descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
         {
-            const NodeDescription& description(descIt->second);
+            const Node& description(descIt->second);
             string nodeName = WStringToUTF8(description.name);
             
             json << "{";
@@ -631,8 +652,8 @@ namespace Aseba
     
     void HttpInterface::evReset(HttpRequest* req, strings& args)
     {
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-             descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
         {
             bool ok;
             nodeId = getNodeId(descIt->second.name, 0, &ok);

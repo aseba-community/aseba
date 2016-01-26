@@ -47,7 +47,7 @@ namespace Aseba
     class HttpRequest;
     
     //! HTTP interface for aseba network
-    class HttpInterface:  public Dashel::Hub, public Aseba::DescriptionsManager
+    class HttpInterface:  public Dashel::Hub, public Aseba::NodesManager
     {
     public: 
         typedef std::vector<std::string>      strings;
@@ -109,6 +109,7 @@ namespace Aseba
         virtual void connectionCreated(Dashel::Stream* stream);
         virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
         virtual void incomingData(Dashel::Stream* stream);
+		virtual void sendMessage(const Message& message);
         virtual void nodeDescriptionReceived(unsigned nodeId);
         // specific to http interface
         virtual void sendEvent(const std::string nodeName, const strings& args);
@@ -121,6 +122,7 @@ namespace Aseba
         virtual void routeRequest(HttpRequest* req);
         
         // helper functions
+		bool run2s();
         bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
         bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
         virtual void parse_json_form(std::string content, strings& values);
