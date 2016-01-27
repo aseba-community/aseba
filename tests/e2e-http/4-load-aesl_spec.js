@@ -63,5 +63,5 @@ frisby.create('PUT a malformed program to ' + NODE)
             "Content-Length": fileSize - 100
         }
     })
-.expectStatus(500)
+.expectStatus(400)
 .toss();

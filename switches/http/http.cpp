@@ -1,21 +1,23 @@
 
 /*
  asebahttp - a switch to bridge Aseba to HTTP
- 2014-12-01 David James Sherman <david dot sherman at inria dot fr>
+ 2014-12-01
+ 2015-01-01
+ 2016-01-27 David James Sherman <david dot sherman at inria dot fr>
  
  Provide a simple REST interface with introspection for Aseba devices.
  
     GET  /nodes                                 - JSON list of all known nodes
     GET  /nodes/:NODENAME                       - JSON attributes for :NODENAME
-    PUT  /nodes/:NODENAME                       - write new Aesl program (file= in multipart/form-data)
+    PUT  /nodes/:NODENAME                       - write new Aesl program
     GET  /nodes/:NODENAME/:VARIABLE             - retrieve JSON value for :VARIABLE
     POST /nodes/:NODENAME/:VARIABLE             - send new values(s) for :VARIABLE
     POST /nodes/:NODENAME/:EVENT                - call an event :EVENT
     GET  /events[/:EVENT]*                      - create SSE stream for all known nodes
     GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
  
- Typical use: asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II & After vmcode.aesl is compiled 
- and uploaded, check with curl http://127.0.0.1:3000/nodes/thymio-II
+ Typical use: asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II & 
+ After vmcode.aesl is compiled and uploaded, check with curl http://127.0.0.1:3000/nodes/thymio-II
  
  Substitute appropriate values for :NODENAME, :VARIABLE, :EVENT and their parameters. In most cases, 
  :NODENAME is thymio-II. For example.
@@ -31,8 +33,8 @@
  Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests. Example Node-RED flows 
  can be found in ../../examples/http/node-red.
  
- DONE (mostly):
-    - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
+ DONE:
+    - Dashel connection to nodes and round-robin scheduling between Aseba and HTTP connections
     - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
     - GET /nodes, GET /nodes/:NODENAME with introspection
     - POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE[/:VALUE]*)
@@ -42,11 +44,11 @@
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
     - Aesl program bytecode upload (PUT /nodes/:NODENAME)
-      use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
+      use curl -H 'Content-Type: application/octet-stream' --data-ascii "$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
     - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
+    - connect more than one node on an aesl bus like asebaswitch
  
  TODO:
-    - handle more than just one Thymio-II node
     - gracefully shut down TCP/IP connections (half-close, wait, close)
  
  This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
@@ -477,6 +479,7 @@ namespace Aseba
     void HttpInterface::evNodes(HttpRequest* req, strings& args)
     {
         bool do_one_node(args.size() > 0);
+        int successful_output = 0;
         
         std::stringstream json;
         json << (do_one_node ? "" : "["); // hack, should first select list of matching nodes, then check size
@@ -497,6 +500,7 @@ namespace Aseba
                 json << ",\"protocolVersion\":" << description.protocolVersion;
                 json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
                 json << "}";
+                successful_output++;
             }
             else // (do_one_node)
             {
@@ -569,6 +573,8 @@ namespace Aseba
                 json << "}";
 
                 json << "}"; // end node
+                successful_output++;
+
                 break; // only show first matching node :-(
             }
         }
@@ -576,7 +582,7 @@ namespace Aseba
         json <<(do_one_node ? "" : "]");
         if (json.str().size() == 0)
             json << "[]";
-        finishResponse(req,200,json.str());
+        finishResponse(req, successful_output > 0 ? 200 : 404, json.str());
     }
     
     // Handler: Variable get/set or Event call
@@ -688,16 +694,18 @@ namespace Aseba
         if (verbose)
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
-        size_t pos = req->content.find("file=");
-        if (pos != std::string::npos)
+        std::vector<unsigned> todo = getIdsFromURI(args);
+        for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
         {
-            std::vector<unsigned> todo = getIdsFromURI(args);
-            for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
-                aeslLoadMemory(*it, buffer+pos+5, req->content.size()-pos-5);
-            finishResponse(req, 204, "");
+            try {
+                aeslLoadMemory(*it, buffer, req->content.size());
+            } catch ( runtime_error(e) ) {
+                finishResponse(req, 400, e.what());
+                return;
+            }
         }
-        else
-            finishResponse(req, 400, "");
+
+        finishResponse(req, 204, "");
     }
     
     // Handler: Reset nodes and rerun
@@ -953,7 +961,8 @@ namespace Aseba
         // local file or URL
         xmlDoc *doc(xmlReadFile(filename.c_str(), NULL, 0));
         if (!doc)
-            wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
+            throw runtime_error(FormatableString("Cannot read aesl script XML from file %1 for nodeId %0").arg(nodeId).arg(filename));
+//            wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
         else
         {
             aeslLoad(nodeId, doc);
@@ -970,12 +979,13 @@ namespace Aseba
         // open document
         xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
         if (!doc)
-            wcerr << "cannot read XML from memory " << buffer << endl;
+            throw runtime_error(FormatableString("Cannot read aesl script XML from memory for nodeId %0").arg(nodeId));
+//            wcerr << "cannot read XML from memory " << buffer << endl;
         else
         {
             aeslLoad(nodeId, doc);
-            //if (verbose)
-            cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
+            if (verbose)
+                cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
@@ -1091,6 +1101,7 @@ namespace Aseba
             commonDefinitions[nodeId].events.clear();
             commonDefinitions[nodeId].constants.clear();
             allVariables.clear();
+            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
         }
         
         // check if there was some matching problem

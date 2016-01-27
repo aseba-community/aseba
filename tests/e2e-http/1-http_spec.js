@@ -38,6 +38,11 @@ for (node of [1,CLOCK]) {
     .toss();
 }
 
+frisby.create('Fail to connect to nonexistant node')
+.get('http://localhost:3000/nodes/' + 'does-not-exist')
+.expectStatus(404)
+.toss();
+
 frisby.create('Get the id variable')
 .get('http://localhost:3000/nodes/' + CLOCK + '/id')
 .expectStatus(200)
