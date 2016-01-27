@@ -138,7 +138,6 @@ namespace Aseba
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStreams(),
     httpStream(0),
-    nodeDescriptionComplete(false),
     verbose(false),
     iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
@@ -155,12 +154,16 @@ namespace Aseba
                 {
                     asebaStreams[cxn].clear(); // no node id until description is received
                     Dashel::ParameterSet parser;
-                    parser.add("dummy:remapLocal=0;remapTarget=0");
+                    parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
                     parser.add((*it).c_str());
-                    const int idLocal(parser.get<int>("remapLocal"));
-                    const int idTarget(parser.get<int>("remapTarget"));
-                    if (idLocal > 0)
-                        idSubstitutions[cxn][idLocal] = idTarget;
+                    const unsigned localId(parser.get<unsigned>("remapLocal"));
+                    const unsigned targetId(parser.get<unsigned>("remapTarget"));
+                    const unsigned aeslId(parser.get<unsigned>("remapAesl"));
+                    // remember localId and aeslId as wishes to be answered when node description arrives
+                    if (localId > 0 && targetId > 0)
+                        localIdWishes[cxn][targetId] = localId;
+                    if (aeslId > 0)
+                        aeslIdWishes[cxn][targetId] = aeslId;
                 }
             }
             catch(Dashel::DashelException e)
@@ -251,12 +254,12 @@ namespace Aseba
         }
     }
     
-    void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
+    void HttpInterface::nodeDescriptionReceived(unsigned targetId)
     {
+        if (!targetId) return;
+        unsigned nodeId = targetId;
         if (verbose)
-            wcerr << this << L" Received description for node " << nodeId << " " << getNodeName(nodeId) << endl;
-        if (!nodeId) return;
-        nodeDescriptionComplete = true;
+            wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
     }
     
     void HttpInterface::incomingData(Stream *stream)
@@ -269,6 +272,9 @@ namespace Aseba
             
             Message *message(Message::receive(stream));
             
+            // rewrite message->source using targetToNodeIdSubstitutions
+            message->source = updateNodeId(stream, message->source);
+            
             // pass message to description manager, which builds the node descriptions in background
             // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
             DescriptionsManager::processMessage(message);
@@ -276,13 +282,7 @@ namespace Aseba
             // if description, record the stream -- node id correspondence
             const Description *description = dynamic_cast<const Description *>(message);
             if (description)
-            {
                 asebaStreams[stream].insert(message->source);
-                // patch id substitutions
-                for (NodeIdSubstitution::iterator it = idSubstitutions[stream].begin(); it != idSubstitutions[stream].end(); ++it)
-                    if (it->second == 0)
-                        it->second = message->source;
-            }
             
             // if variables, check for pending requests
             const Variables *variables(dynamic_cast<Variables *>(message));
@@ -490,8 +490,10 @@ namespace Aseba
             {
                 json << (descIt == nodesDescriptions.begin() ? "" : ",");
                 json << "{";
-                json << "\"node\":" << nodeId << ",";
-                json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
+                json << "\"node\":" << nodeId;
+                json << ",\"name\":\"" << nodeName << "\"";
+                json << ",\"protocolVersion\":" << description.protocolVersion;
+                json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
                 json << "}";
             }
             else // (do_one_node)
@@ -501,8 +503,10 @@ namespace Aseba
                     continue; // this is not a match, skip to next candidate
 
                 json << "{"; // begin node
-                json << "\"node\":\"" << nodeId << "\",";
-                json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
+                json << "\"node\":" << nodeId;
+                json << ",\"name\":\"" << nodeName << "\"";
+                json << ",\"protocolVersion\":" << description.protocolVersion;
+                json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
 
                 json << ",\"bytecodeSize\":" << description.bytecodeSize;
                 json << ",\"variablesSize\":" <<description.variablesSize;
@@ -1061,25 +1065,10 @@ namespace Aseba
                 else
                 {
                     // get the identifier of the node and compile the code
-                    // this is a mess, we need a clearer policy for deciding which aesl programs go to which nodes
                     wstring program = UTF8ToWString((const char *)text);
-                    if (nodeId > 0 && nodeId == unsigned(atoi((char*)storedId)))
-                    {
+                    unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
+                    if (preferredId == unsigned(atoi((char*)storedId)))
                         wasError = !compileAndSendCode(nodeId, program);
-                        if (!wasError)
-                            break;
-                    }
-                    else if (nodeId == 0) // can happen when aesl file is provided on command line
-                    {
-                        bool ok = (nodeId > 0);
-                        const string _name((const char *)name);
-                        unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
-                        unsigned _nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-                        if (ok)
-                            wasError = !compileAndSendCode(_nodeId, program);
-                        else
-                            noNodeCount++;
-                    }
                     // else continue looking at XML nodes in hope of a match
                 }
                 // free attribute and content
@@ -1252,12 +1241,49 @@ namespace Aseba
         }
     }
     
-    std::vector<unsigned> HttpInterface::allNodeIds()
+    std::set<unsigned> HttpInterface::allNodeIds()
     {
-        std::vector<unsigned> nodes;
+        std::set<unsigned> nodeIds;
         for(auto i: nodesDescriptions)
-            nodes.push_back(i.first);
-        return nodes;
+            nodeIds.insert( i.first );
+        return nodeIds;
+    }
+    
+    unsigned HttpInterface::updateNodeId(Dashel::Stream* stream, unsigned targetId)
+    {
+        NodeIdSubstitution known = targetToNodeIdSubstitutions[stream];
+        NodeIdSubstitution::iterator it = known.find(targetId);
+        if (it != known.end())
+            // already know about this targetId in this stream, return its assigned nodeId
+            return it->second;
+        else
+        {
+            // this is a new source, find an available nodeId
+            NodeIdSubstitution localWishes = localIdWishes[stream];
+            std::set<unsigned> used = allNodeIds();
+            unsigned newId = targetId;
+            NodeIdSubstitution::iterator localWish = localWishes.find(targetId);
+            if (localWish != localWishes.end())
+                newId = localWish->second;
+            while (used.find(newId) != used.end() && (newId += 20) <= 30000);
+            if (newId == 0 || newId > 30000) //
+                throw runtime_error(FormatableString("Can't allocate an unused node id for target id %0 in stream %1").arg(targetId).arg(stream));
+
+            // remember the assigned nodeId for this targetId in this stream
+            targetToNodeIdSubstitutions[stream][targetId] = newId;
+
+            // if we had a promise for aeslId, add the substitution
+            NodeIdSubstitution aeslWishes = aeslIdWishes[stream];
+            NodeIdSubstitution::iterator aeslWish = aeslWishes.find(targetId);
+            if (aeslWish != aeslWishes.end())
+                nodeToAeslIdSubstitutions[newId] = aeslWish->second;
+            else if (localWish != localWishes.end())
+                nodeToAeslIdSubstitutions[newId] = localWish->second;
+            else
+                nodeToAeslIdSubstitutions[newId] = targetId;
+            
+            return newId;
+        }
     }
     //== end of class HttpInterface ============================================================
     

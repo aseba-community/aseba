@@ -70,13 +70,16 @@ namespace Aseba
         // streams
         StreamNodeIdMap             asebaStreams;
         Dashel::Stream*             httpStream;
-        StreamNodeIdSubstitutionMap idSubstitutions;
+        StreamNodeIdSubstitutionMap targetToNodeIdSubstitutions;
+        NodeIdSubstitution          nodeToAeslIdSubstitutions;
+        StreamNodeIdSubstitutionMap localIdWishes;
+        StreamNodeIdSubstitutionMap aeslIdWishes;
         StreamResponseQueueMap      pendingResponses;
         VariableResponseSetMap      pendingVariables;
         StreamEventSubscriptionMap  eventSubscriptions;
         StreamRequestMap            httpRequests;
         StreamSet                   streamsToShutdown;
-        bool nodeDescriptionComplete;
+        
         // debug variables
         bool verbose;
         int iterations;
@@ -109,7 +112,8 @@ namespace Aseba
         virtual void sendAvailableResponses();
         virtual void unscheduleResponse(Dashel::Stream* stream, HttpRequest* req);
         virtual void unscheduleAllResponses(Dashel::Stream* stream);
-        virtual std::vector<unsigned> allNodeIds();
+        virtual std::set<unsigned> allNodeIds();
+        virtual unsigned updateNodeId(Dashel::Stream* stream, unsigned targetId);
         
     protected:
         /* // reimplemented from parent classes */
@@ -121,7 +125,6 @@ namespace Aseba
         virtual void sendEvent(const unsigned nodeId, const strings& args);
         virtual void sendSetVariable(const unsigned nodeId, const strings& args);
         virtual std::pair<unsigned,unsigned> sendGetVariables(const unsigned nodeId, const strings& args);
-        //virtual bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos);
         virtual bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos);
         virtual void aeslLoad(const unsigned nodeId, xmlDoc* doc);
         virtual void incomingVariables(const Variables *variables);
