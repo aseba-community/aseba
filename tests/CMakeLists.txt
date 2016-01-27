@@ -199,7 +199,7 @@ if (LIBXML2_FOUND)
 	configure_file(testdata-HttpRequest.txt ${CMAKE_CURRENT_BINARY_DIR}/testdata-HttpRequest.txt COPYONLY)
 	configure_file(http-valgrind-macosx.supp ${CMAKE_CURRENT_BINARY_DIR}/http-valgrind-macosx.supp COPYONLY)
 	# test HTTP requests and JSON parsing
-	configure_file(run-test-asebahttp.sh ${CMAKE_CURRENT_BINARY_DIR}/run-test-asebahttp.sh COPYONLY)
+
 	add_test(NAME test-asebahttp COMMAND bash run-test-asebahttp.sh)
 else (LIBXML2_FOUND)
 	message("-- libXML2 not found! Disabling HTTP switch tests")
