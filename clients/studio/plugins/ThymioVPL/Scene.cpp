@@ -395,9 +395,9 @@ namespace Aseba { namespace ThymioVPL
 	//! Is a set, given by its id, the last non-empty set of the scene?
 	bool Scene::isSetLast(unsigned setId) const
 	{
-		if (setId+1 >= eventActionsSets.size())
+		if (setId+1 >= (unsigned)eventActionsSets.size())
 			return true;
-		for (unsigned i=setId+1; i<eventActionsSets.size(); ++i)
+		for (unsigned i=setId+1; i<(unsigned)eventActionsSets.size(); ++i)
 			if (!eventActionsSets[i]->isEmpty())
 				return false;
 		return true;
