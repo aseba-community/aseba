@@ -69,6 +69,7 @@ seen = [source,args[0]]</node>
 var running = 1
 var tick = 0
 var who
+var vec10[10]
 
 onevent timer
 if running==1 then

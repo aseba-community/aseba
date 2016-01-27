@@ -9,11 +9,11 @@ for i in 0 1 2 3 4 5 6 7; do ASEBADUMMYNODE $i & done
 #   dummynode-1 targetId=2 aeslId=2 LISTENER2
 #   dummynode-2 targetId=3 aeslId=3 LISTENER3
 #   dummynode-3 targetId=4 aeslId=4 CLOCK
-ASEBASWITCH -p 33332 $(for i in 0 1 2 3; do echo 'tcp:;port='$[ 33333 + $i ]; done) &
-ASEBAMASSLOADER ping0123.aesl 'tcp:;port=33332' & sleep 10 ; kill $!
-ASEBASWITCH -d -p 33331 'tcp:;port=33332' | head -20
+ASEBASWITCH -p 33332 $(for i in 0 1 2 3; do echo 'tcp:;port='$[ 33333 + $i ]; done) 1>&2 &
+ASEBAMASSLOADER ping0123.aesl 'tcp:;port=33332' 1>&2 & sleep 10 ; kill $!
+ASEBASWITCH -d -p 33331 'tcp:;port=33332' 1>&2 2| head -20 1>&2
 ASEBAHTTP -p 3000 -a ping0123.aesl \
-    'tcp:;port=33332' &
+    'tcp:;port=33332' 1>&2 &
 
 # localhost:3001 is its own switch with 4 cooperating nodes:
 #   dummynode-4 targetId=5 aeslId=1 LISTENER1
@@ -24,9 +24,16 @@ ASEBAHTTP -p 3001 -a ping0123.aesl \
     'tcp:;port=33337;remapTarget=5;remapLocal=1' \
     'tcp:;port=33338;remapAesl=1;remapTarget=6' \
     'tcp:;port=33339;remapAesl=4;remapTarget=7' \
-    'tcp:;port=33340;remapAesl=2;remapTarget=8;remapLocal=6' &
+    'tcp:;port=33340;remapAesl=2;remapTarget=8;remapLocal=6' 1>&2 &
 
 sleep 10 # let switches start up
 
 # run e2e tests
-jasmine-node --verbose --color *_spec.js
+# jasmine-node --verbose --color *_spec.js
+jasmine-node *_spec.js
+status=$?
+
+# clean up
+[ -z "$(jobs -p)" ] || kill %%
+
+exit $status

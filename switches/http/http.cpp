@@ -149,7 +149,8 @@ namespace Aseba
         for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
         {
             try {
-                std::cout << "HttpInterface connect asebaTarget " << *it << "\n";
+                if (verbose)
+                    std::cout << "HttpInterface connect asebaTarget " << *it << "\n";
                 if (Dashel::Stream *cxn = connect(*it)) // triggers connectionCreated
                 {
                     asebaStreams[cxn].clear(); // no node id until description is received
@@ -220,7 +221,8 @@ namespace Aseba
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {
-        std::cout << stream << " Incoming connection from " << stream->getTargetName() << endl;
+        if (verbose)
+            std::cout << stream << " Incoming connection from " << stream->getTargetName() << endl;
         // assert( pendingResponses[stream].empty() );
     }
     
@@ -955,8 +957,8 @@ namespace Aseba
         else
         {
             aeslLoad(nodeId, doc);
-            //if (verbose)
-            cerr << "Loaded aesl script from " << filename.c_str() << "\n";
+            if (verbose)
+                cerr << "Loaded aesl script from " << filename.c_str() << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
