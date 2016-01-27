@@ -114,6 +114,7 @@ namespace Aseba { namespace ThymioVPL
 		void toggleAdvancedMode(bool advanced, bool force=false, bool ignoreSceneCheck=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
+		void setupGlobalEvents();
 		
 	public:
 		const bool debugLog;

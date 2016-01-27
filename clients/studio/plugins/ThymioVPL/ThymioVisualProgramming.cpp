@@ -460,15 +460,20 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (de->newFile())
 		{
-			CommonDefinitions commonDefinitions;
-			commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
-			de->setCommonDefinitions(commonDefinitions);
 			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
+			setupGlobalEvents();
 			showAtSavedPosition();
 			processCompilationResult();
 		}
+	}
+	
+	void ThymioVisualProgramming::setupGlobalEvents()
+	{
+		CommonDefinitions commonDefinitions;
+		commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
+		de->setCommonDefinitions(commonDefinitions);
 	}
 	
 	void ThymioVisualProgramming::newFile()
@@ -721,14 +726,18 @@ namespace Aseba { namespace ThymioVPL
 		scene->recompileWithoutSetModified();
 		
 		if (!scene->isEmpty())
+		{
+			setupGlobalEvents();
 			showAtSavedPosition();
+		}
 		
 		clearUndo();
 		
 		loading = false;
 		
-		// once loaded, process the result of compilation
-		processCompilationResult();
+		// once loaded, process the result of compilation if there is anything to compile
+		if (!scene->isEmpty())
+			processCompilationResult();
 	}
 	
 	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
