@@ -873,7 +873,7 @@ namespace Aseba
 		const char* magic = "ABO";
 		file.write(magic, 4);
 		write16(file, 0); // binary format version
-		write16(file, ASEBA_PROTOCOL_VERSION);
+		write16(file, target->getDescription(id)->protocolVersion);
 		write16(file, vmMemoryModel->getVariableValue("_productId"), "product identifier (_productId)");
 		write16(file, vmMemoryModel->getVariableValue("_fwversion"), "firmware version (_fwversion)");
 		write16(file, id);
