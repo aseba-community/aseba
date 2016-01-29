@@ -303,7 +303,7 @@ namespace Aseba { namespace ThymioVPL
 	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock)
 	{
 		wstring text(indentText());
-		text += L"emit PairExecuted " + toWstring(eventActionsSet.getRow()) + L"\n";
+		text += L"emit pair_run " + toWstring(eventActionsSet.getRow()) + L"\n";
 		generatedCode[currentBlock].append(text);
 	}
 	
@@ -311,7 +311,7 @@ namespace Aseba { namespace ThymioVPL
 	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock)
 	{
 		wstring text(indentText());
-		text += L"_emit DebugLog [";
+		text += L"_emit debug_log [";
 		
 		wstringstream ostr;
 		ostr << hex << showbase;

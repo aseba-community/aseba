@@ -472,7 +472,7 @@ namespace Aseba { namespace ThymioVPL
 	void ThymioVisualProgramming::setupGlobalEvents()
 	{
 		CommonDefinitions commonDefinitions;
-		commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
+		commonDefinitions.events.push_back(NamedValue(L"pair_run", 1));
 		de->setCommonDefinitions(commonDefinitions);
 	}
 	

@@ -460,8 +460,8 @@ namespace Aseba
 		if (targetDescription)
 		{
 			CommonDefinitions commonDefinitions;
-			commonDefinitions.events.push_back(NamedValue(L"PairExecuted", 1));
-			commonDefinitions.events.push_back(NamedValue(L"DebugLog", 14));
+			commonDefinitions.events.push_back(NamedValue(L"pair_run", 1));
+			commonDefinitions.events.push_back(NamedValue(L"debug_log", 14));
 			Compiler compiler;
 			compiler.setTargetDescription(target->getDescription(id));
 			compiler.setTranslateCallback(CompilerTranslator::translate);
