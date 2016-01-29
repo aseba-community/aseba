@@ -1792,8 +1792,8 @@ namespace Aseba
 						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt());
 						if (tab)
 						{
-							tab->restorePlugins(savedPlugins, true);
 							tab->editor->setPlainText(text);
+							tab->restorePlugins(savedPlugins, true);
 						}
 						else
 						{
