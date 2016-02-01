@@ -21,6 +21,8 @@ namespace Aseba
 	/** \addtogroup thymioupdater */
 	/*@{*/
 	
+	class MessageHub;
+	
 	class QtBootloaderInterface:public QObject, public BootloaderInterface
 	{
 		Q_OBJECT
@@ -63,7 +65,6 @@ namespace Aseba
 		
 	private:
 		std::string target;
-		unsigned nodeId;
 		
 		QVBoxLayout* mainLayout;
 		QHBoxLayout* fileLayout;
@@ -83,8 +84,9 @@ namespace Aseba
 		~ThymioUpgraderDialog();
 		
 	private:
+		unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
 		void readIdVersion();
-		FlashResult flashThread(const std::string& _target, const int _nodeId, const std::string& hexFileName) const;
+		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
 	
 	private slots:
 		void setupFlashButtonState();

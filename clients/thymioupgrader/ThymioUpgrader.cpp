@@ -95,8 +95,7 @@ namespace Aseba
 
 	
 	ThymioUpgraderDialog::ThymioUpgraderDialog(const std::string& target):
-		target(target),
-		nodeId(1)
+		target(target)
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Firmware Upgrader"));
@@ -176,6 +175,45 @@ namespace Aseba
 		setupFlashButtonState();
 	}
 	
+	unsigned ThymioUpgraderDialog::readId(MessageHub& hub, Dashel::Stream* stream) const
+	{
+		// default id
+		unsigned nodeId = 1;
+		
+		// list nodes to get ids
+		ListNodes().serialize(stream);
+		GetDescription().serialize(stream);;
+		stream->flush();
+
+		// process data for up to two seconds
+		QTime listNodeTime(QTime::currentTime());
+		int restDuration(2000);
+		while (restDuration > 0)
+		{
+			hub.step(restDuration);
+			while (hub.isMessage())
+			{
+				// if node present, store id from source and quit (protocol 5)
+				NodePresent* nodePresent(dynamic_cast<NodePresent*>(hub.getMessage()));
+				if (nodePresent)
+				{
+					nodeId = nodePresent->source;
+					hub.clearMessage();
+					break;
+				}
+				// if description, store id from source, but continue reading (protocol 4)
+				Description* description(dynamic_cast<Description*>(hub.getMessage()));
+				if (description)
+				{
+					nodeId = description->source;
+				}
+				hub.clearMessage();
+			}
+			restDuration = 2000 - listNodeTime.msecsTo(QTime::currentTime());
+		}
+		return nodeId;
+	}
+	
 	void ThymioUpgraderDialog::readIdVersion(void)
 	{
 		// open stream
@@ -191,37 +229,8 @@ namespace Aseba
 			return;
 		}
 		
-		// list nodes to get ids
-		ListNodes().serialize(stream);
-		GetDescription().serialize(stream);;
-		stream->flush();
-
-		// process data for up to one second
-		QTime listNodeTime(QTime::currentTime());
-		int restDuration(1000);
-		while (restDuration > 0)
-		{
-			hub.step(restDuration);
-			while (hub.isMessage())
-			{
-				// if node present, store id from source
-				NodePresent* nodePresent(dynamic_cast<NodePresent*>(hub.getMessage()));
-				if (nodePresent)
-				{
-					nodeId = nodePresent->source;
-					hub.clearMessage();
-					break;
-				}
-				// if description, store id frome source, but continue reading
-				Description* description(dynamic_cast<Description*>(hub.getMessage()));
-				if (description)
-				{
-					nodeId = description->source;
-				}
-				hub.clearMessage();
-			}
-			restDuration = 1000 - listNodeTime.msecsTo(QTime::currentTime());
-		}
+		// read node id
+		const unsigned nodeId(readId(hub, stream));
 		nodeIdText->setText(tr("Thymio node identifier: %1").arg(nodeId));
 		
 		// read firmware version
@@ -231,7 +240,7 @@ namespace Aseba
 		
 		// process data for up to one second
 		QTime getVariablesTime(QTime::currentTime());
-		restDuration = 1000;
+		int restDuration(1000);
 		while (restDuration > 0)
 		{
 			hub.step(restDuration);
@@ -251,7 +260,7 @@ namespace Aseba
 				}
 				hub.clearMessage();
 			}
-			restDuration = 1000 - listNodeTime.msecsTo(QTime::currentTime());
+			restDuration = 1000 - getVariablesTime.msecsTo(QTime::currentTime());
 		}
 	}
 
@@ -271,14 +280,14 @@ namespace Aseba
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
 		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
-		flashFuture = QtConcurrent::run(this, &ThymioUpgraderDialog::flashThread, target, nodeId, hexFileName);
+		flashFuture = QtConcurrent::run(this, &ThymioUpgraderDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 	
-	ThymioUpgraderDialog::FlashResult ThymioUpgraderDialog::flashThread(const std::string& _target, const int _nodeId, const std::string& hexFileName) const
+	ThymioUpgraderDialog::FlashResult ThymioUpgraderDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
 	{
 		// open stream
-		Dashel::Hub hub;
+		MessageHub hub;
 		Dashel::Stream* stream(0);
 		try
 		{
@@ -292,7 +301,11 @@ namespace Aseba
 		// do flash
 		try
 		{
-			QtBootloaderInterface bootloaderInterface(stream, _nodeId, 1);
+			// read again node id, in case a different robot was plugged in
+			const unsigned nodeId(readId(hub, stream));
+			
+			// then flash
+			QtBootloaderInterface bootloaderInterface(stream, nodeId, 1);
 			connect(&bootloaderInterface, SIGNAL(flashProgress(int)), this, SLOT(flashProgress(int)), Qt::QueuedConnection);
 			bootloaderInterface.writeHex(hexFileName, true, true);
 		}
@@ -341,7 +354,7 @@ namespace Aseba
 		}
 		else
 		{
-			// reread version
+			// re-read version
 			readIdVersion();
 		}
 	}
