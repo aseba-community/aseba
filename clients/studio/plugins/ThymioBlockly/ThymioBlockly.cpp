@@ -182,9 +182,10 @@ namespace Aseba { namespace ThymioBlockly
 
 		sceneLayout = new QVBoxLayout();
 
-		if(de->getTarget()->getLanguage() == "de") {
+		const QString lang(de->getTarget()->getLanguage().left(2));
+		if(lang == "de") {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.de.html"));
-        } else if(de->getTarget()->getLanguage() == "fr") {
+        } else if(lang == "fr") {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html"));
 		} else {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.html"));

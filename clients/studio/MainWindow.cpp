@@ -3180,7 +3180,7 @@ namespace Aseba
 		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
 		
 		// help viewer
-		QString lang = target->getLanguage().left(2);
+		const QString lang(target->getLanguage().left(2));
 		if (lang != "")
 			helpViewer.setLanguage(lang);
 		else
