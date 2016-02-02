@@ -1528,60 +1528,74 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
         <source>Thymio Blockly Interface</source>
-        <translation type="obsolete">Interface Blockly pour Thymio</translation>
+        <translation>Interface Blockly pour Thymio</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
         <source>New</source>
-        <translation type="obsolete">Nouveau</translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
         <source>Open</source>
-        <translation type="obsolete">Ouvrir</translation>
+        <translation>Ouvrir</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
         <source>Save</source>
-        <translation type="obsolete">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
         <source>Save as</source>
-        <translation type="obsolete">Enregistrer sous</translation>
+        <translation>Enregistrer sous</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
         <source>Load &amp; Run</source>
-        <translation type="obsolete">Charger et exécuter</translation>
+        <translation>Charger et exécuter</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
         <source>Stop</source>
-        <translation type="obsolete">Arrêter</translation>
+        <translation>Arrêter</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
         <source>Help</source>
-        <translation type="obsolete">Aide</translation>
+        <translation>Aide</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
         <source>Screenshot</source>
-        <translation type="obsolete">Capture d&apos;écran</translation>
+        <translation>Capture d&apos;écran</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="218"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation type="obsolete">http://aseba.wikidot.com/fr:blocklyprogramming</translation>
+        <translation>http://aseba.wikidot.com/fr:blocklyprogramming</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="233"/>
         <source>Export program as image</source>
-        <translation type="obsolete">Exporter en tant qu&apos;image</translation>
+        <translation>Exporter en tant qu&apos;image</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="255"/>
         <source>Launch Blockly</source>
-        <translation type="obsolete">Démarrer Blockly</translation>
+        <translation>Démarrer Blockly</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="387"/>
         <source>Warning</source>
-        <translation type="obsolete">Attention</translation>
+        <translation>Attention</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="388"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="obsolete">Le document Blockly a été modifié. Voulez-vous sauvegarder les changements ?</translation>
+        <translation>Le document Blockly a été modifié. Voulez-vous sauvegarder les changements ?</translation>
     </message>
 </context>
 <context>

@@ -1488,64 +1488,78 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
         <source>Thymio Blockly Interface</source>
-        <translation type="obsolete">Blockly-Oberfläche für Thymio</translation>
+        <translation>Blockly-Oberfläche für Thymio</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
         <source>New</source>
-        <translation type="obsolete">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
         <source>Open</source>
-        <translation type="obsolete">Öffnen</translation>
+        <translation>Öffnen</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
         <source>Save</source>
-        <translation type="obsolete">Speichern</translation>
+        <translation>Speichern</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
         <source>Save as</source>
-        <translation type="obsolete">Speichern als</translation>
+        <translation>Speichern als</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
         <source>Load &amp; Run</source>
-        <translation type="obsolete">Laden und ausführen</translation>
+        <translation>Laden und ausführen</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
         <source>Stop</source>
-        <translation type="obsolete">Stoppen</translation>
+        <translation>Stoppen</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
         <source>Help</source>
-        <translation type="obsolete">Hilfe</translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
         <source>Screenshot</source>
-        <translation type="obsolete">Bildschirmfoto</translation>
+        <translation>Bildschirmfoto</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="218"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation type="obsolete">http://aseba.wikidot.com/de:blocklyprogramming</translation>
+        <translation>http://aseba.wikidot.com/de:blocklyprogramming</translation>
     </message>
     <message>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation type="obsolete">http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="233"/>
         <source>Export program as image</source>
-        <translation type="obsolete">Programm als Bild exportieren</translation>
+        <translation>Programm als Bild exportieren</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="255"/>
         <source>Launch Blockly</source>
-        <translation type="obsolete">Blockly starten</translation>
+        <translation>Blockly starten</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="387"/>
         <source>Warning</source>
-        <translation type="obsolete">Achtung</translation>
+        <translation>Achtung</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="388"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="obsolete">Das Blockly-Dokument wurde bearbeitet. Möchten Sie diese Änderungen speichern?</translation>
+        <translation>Das Blockly-Dokument wurde bearbeitet. Möchten Sie diese Änderungen speichern?</translation>
     </message>
 </context>
 <context>

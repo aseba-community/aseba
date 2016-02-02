@@ -1315,24 +1315,74 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <source>Thymio Blockly Interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
         <source>New</source>
-        <translation type="obsolete">新規</translation>
+        <translation>新規</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
         <source>Open</source>
-        <translation type="obsolete">開ける</translation>
+        <translation>開ける</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
         <source>Save</source>
-        <translation type="obsolete">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
         <source>Save as</source>
-        <translation type="obsolete">名前を付けて保存</translation>
+        <translation>名前を付けて保存</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <source>Load &amp; Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
         <source>Help</source>
-        <translation type="obsolete">ヘルプ</translation>
+        <translation>ヘルプ</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="218"/>
+        <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="233"/>
+        <source>Export program as image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="255"/>
+        <source>Launch Blockly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="387"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="388"/>
+        <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

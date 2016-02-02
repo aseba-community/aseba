@@ -29,7 +29,7 @@ import translation_tools
 translation_tools.init_commands()
 
 # asebastudio
-translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path]))
+translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path, blockly_path]))
 
 # compiler
 translation_tools.do_lupdate_lrelease_all(studio_path, "compiler", compiler_ts_path)

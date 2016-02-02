@@ -1430,60 +1430,74 @@ evento %0 : </translation>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
         <source>Thymio Blockly Interface</source>
-        <translation type="obsolete">Interfaz Blockly para Thymio</translation>
+        <translation>Interfaz Blockly para Thymio</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
         <source>New</source>
-        <translation type="obsolete">Nuevo</translation>
+        <translation>Nuevo</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
         <source>Open</source>
-        <translation type="obsolete">Abrir</translation>
+        <translation>Abrir</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
         <source>Save</source>
-        <translation type="obsolete">Guardar</translation>
+        <translation>Guardar</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
         <source>Save as</source>
-        <translation type="obsolete">Guardar como</translation>
+        <translation>Guardar como</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
         <source>Load &amp; Run</source>
-        <translation type="obsolete">Cargar y ejecutar</translation>
+        <translation>Cargar y ejecutar</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
         <source>Stop</source>
-        <translation type="obsolete">Detener</translation>
+        <translation>Detener</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
         <source>Help</source>
-        <translation type="obsolete">Ayuda</translation>
+        <translation>Ayuda</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
         <source>Screenshot</source>
-        <translation type="obsolete">Captura de pantalla</translation>
+        <translation>Captura de pantalla</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="218"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation type="obsolete">http://aseba.wikidot.com/es:blocklyprogramming</translation>
+        <translation>http://aseba.wikidot.com/es:blocklyprogramming</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="233"/>
         <source>Export program as image</source>
-        <translation type="obsolete">Exportar programa como imagen</translation>
+        <translation>Exportar programa como imagen</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="255"/>
         <source>Launch Blockly</source>
-        <translation type="obsolete">Lanzar Blockly</translation>
+        <translation>Lanzar Blockly</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="387"/>
         <source>Warning</source>
-        <translation type="obsolete">Atención</translation>
+        <translation>Atención</translation>
     </message>
     <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="388"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="obsolete">El documento Blockly ha sido modificado. Quiere guardar los cambios?</translation>
+        <translation>El documento Blockly ha sido modificado. Quiere guardar los cambios?</translation>
     </message>
 </context>
 <context>
