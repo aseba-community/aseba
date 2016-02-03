@@ -287,13 +287,5 @@ int main(int argc, char *argv[])
 			retCode = app.exec();
 	}
 	
-	// workaround on OS X to reset the driver with DRT=true
-	#ifdef __APPLE__
-	{
-		Dashel::Hub hub;
-		hub.connect(target + ";fc=hard;dtr=true");
-	}
-	#endif // __APPLE__
-	
 	return retCode;
 }
