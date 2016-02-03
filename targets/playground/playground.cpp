@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 		if (!command.isEmpty() && command[0] == ':')
 		{
 			// relative to the application directory
-			processes.back()->start(QCoreApplication::applicationDirPath()+'/'+command.mid(1), QIODevice::ReadOnly);
+			processes.back()->start(QDir::toNativeSeparators(QCoreApplication::applicationDirPath())+QDir::separator()+command.mid(1), QIODevice::ReadOnly);
 		}
 		else
 		{
