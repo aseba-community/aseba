@@ -47,5 +47,5 @@
 	<e-puck x="20" y="30" port="33336"/>
 	<e-puck x="20" y="40" port="33337"/>
 	
-	<process command=":asebaswitch -v &quot;tcp:localhost;33334&quot; &quot;tcp:localhost;33335&quot; &quot;tcp:localhost;33336&quot; &quot;tcp:localhost;33337&quot;" />
+	<process command=":asebaswitch -v tcp:localhost;33334 tcp:localhost;33335 tcp:localhost;33336 tcp:localhost;33337" />
 </aseba-playground>
