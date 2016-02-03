@@ -241,7 +241,6 @@ namespace Aseba
 	}
 };
 
-
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
@@ -289,12 +288,12 @@ int main(int argc, char *argv[])
 	}
 	
 	// workaround on OS X to reset the driver with DRT=true
-	#ifdef APPLE
+	#ifdef __APPLE__
 	{
 		Dashel::Hub hub;
 		hub.connect(target + ";fc=hard;dtr=true");
 	}
-	#endif // APPLE
+	#endif // __APPLE__
 	
 	return retCode;
 }
