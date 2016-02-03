@@ -281,10 +281,20 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 	
-	Aseba::ThymioWNetConfigDialog configurator(target);
+	int retCode(1);
+	{
+		Aseba::ThymioWNetConfigDialog configurator(target);
+		if (configurator.isVisible())
+			retCode = app.exec();
+	}
 	
-	if (configurator.isVisible())
-		return app.exec();
-	else
-		return 1;
+	// workaround on OS X to reset the driver with DRT=true
+	#ifdef APPLE
+	{
+		Dashel::Hub hub;
+		hub.connect(target + ";fc=hard;dtr=true");
+	}
+	#endif // APPLE
+	
+	return retCode;
 }
