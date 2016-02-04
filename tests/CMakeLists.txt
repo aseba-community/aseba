@@ -164,7 +164,7 @@ add_test(simulate-inconsistent-input4 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.p
 # compiler should not crash
 find_program(zzuf_FOUND zzuf)
 if (zzuf_FOUND)
-	message("-- zzuf executable found: " ${zzuf_FOUND})
+	message(STATUS "zzuf executable found: " ${zzuf_FOUND})
 	add_test(fuzzy-basic-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt ${fuzzy_loop})
 	add_test(fuzzy-advanced-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt ${fuzzy_loop})
 	add_test(fuzzy-binary-op ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-op.txt ${fuzzy_loop})
@@ -181,17 +181,17 @@ if (zzuf_FOUND)
 	add_test(fuzzy-comments ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/comments.txt ${fuzzy_loop})
 	add_test(fuzzy-subroutine ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/subroutine.txt ${fuzzy_loop})
 else (zzuf_FOUND)
-	message("-- zzuf executable not found! Disabling fuzzy tests")
+	message(WARNING "zzuf executable not found! Disabling fuzzy tests")
 endif (zzuf_FOUND)
 
 # use valgrind to test memory leaks inside the compiler
 find_program(valgrind_FOUND valgrind)
 if (valgrind_FOUND)
-	message("-- valgrind executable found: " ${valgrind_FOUND})
+	message(STATUS "valgrind executable found: " ${valgrind_FOUND})
 	# test all the .txt files inside the data directory
 	add_test(valgrind-compiler-all ${CMAKE_CURRENT_SOURCE_DIR}/valgrind.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/)
 else (valgrind_FOUND)
-	message("-- valgrind executable not found! Disabling memory leaks tests")
+	message(WARNING "valgrind executable not found! Disabling memory leaks tests")
 endif (valgrind_FOUND)
 
 # test asebahttp
@@ -212,5 +212,5 @@ endif (valgrind_FOUND)
 #	configure_file(run-test-asebahttp.sh ${CMAKE_CURRENT_BINARY_DIR}/run-test-asebahttp.sh COPYONLY)
 #	add_test(NAME test-asebahttp COMMAND bash run-test-asebahttp.sh)
 #else (LIBXML2_FOUND)
-#	message("-- libXML2 not found! Disabling HTTP switch tests")
+#	message(WARNING "libXML2 not found! Disabling HTTP switch tests")
 #endif (LIBXML2_FOUND)

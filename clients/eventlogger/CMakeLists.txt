@@ -19,7 +19,7 @@ if (QT4_FOUND)
 	
 	else (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
 	
-		message("Cannot find Qwt")
+		message(WARNING "Cannot find Qwt")
 		
 	endif (QWT_INCLUDE_DIR AND QWT_LIBRARIES)
 	
