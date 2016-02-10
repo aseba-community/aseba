@@ -278,6 +278,7 @@ namespace Aseba
 		
 		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
+		language = targetSelector.getLocaleName();
 		if (!commandLineTarget.isEmpty())
 		{
 			bool failed = false;
@@ -299,6 +300,7 @@ namespace Aseba
 			QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
 #endif
 		}
+		
 		// show connection dialog
 		while (true)
 		{
