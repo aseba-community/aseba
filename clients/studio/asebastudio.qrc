@@ -108,11 +108,15 @@
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.html</file>
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.de.html</file>
 	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.es.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.it.html</file>
 	<file>plugins/ThymioBlockly/blockly/blockly_compressed.js</file>
 	<file>plugins/ThymioBlockly/blockly/blocks_compressed.js</file>
 	<file>plugins/ThymioBlockly/blockly/msg/js/en.js</file>
 	<file>plugins/ThymioBlockly/blockly/msg/js/de.js</file>
 	<file>plugins/ThymioBlockly/blockly/msg/js/fr.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/es.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/it.js</file>
 	<file>plugins/ThymioBlockly/blockly/aesl_compressed.js</file>
 	<file>plugins/ThymioBlockly/blockly/overrides_compressed.js</file>
 	<file>plugins/ThymioBlockly/blockly/media/1x1.gif</file>

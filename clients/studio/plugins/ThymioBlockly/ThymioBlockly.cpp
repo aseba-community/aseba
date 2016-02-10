@@ -187,6 +187,10 @@ namespace Aseba { namespace ThymioBlockly
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.de.html"));
         } else if(lang == "fr") {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html"));
+		} else if(lang == "es") {
+			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.es.html"));
+		} else if(lang == "it") {
+			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.it.html"));
 		} else {
 			webview->load(QUrl("qrc:/plugins/ThymioBlockly/blockly/tests/asebastudio.html"));
 		}
