@@ -896,12 +896,12 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3424"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Quit</translation>
+        <translation type="unfinished">&amp;Chuidi</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3428"/>
         <source>Cu&amp;t</source>
-        <translation>&amp;taglia</translation>
+        <translation type="unfinished">&amp;Taglia</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
@@ -1122,7 +1122,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3557"/>
         <source>Toggle breakpoint</source>
-        <translation>attivare o disattivare breakpoint</translation>
+        <translation>Attivare o disattivare breakpoint</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3558"/>
@@ -1143,7 +1143,7 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3576"/>
         <source>&amp;Tools</source>
-        <translation>s&amp;trumenti</translation>
+        <translation>S&amp;trumenti</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3581"/>
