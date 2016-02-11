@@ -45,8 +45,8 @@ find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
-set(LIB_VERSION_MAJOR 1) # Must be bumped for incompatible ABI changes
-set(LIB_VERSION_MINOR 4)
+set(LIB_VERSION_MAJOR 2) # Must be bumped for incompatible ABI changes
+set(LIB_VERSION_MINOR 0)
 set(LIB_VERSION_PATCH 0)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 
