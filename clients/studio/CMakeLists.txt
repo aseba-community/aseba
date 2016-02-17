@@ -19,14 +19,14 @@ set(ADDITIONAL_LIBRARIES "")
 
 # Google protobuf
 find_package(Protobuf)
-if (PROTOBUF_FOUND)
+if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 	add_definitions(-DPROTOBUF_FOUND)
 	include_directories(${PROTOBUF_INCLUDE_DIR})
 	set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${PROTOBUF_LIBRARY})
-	message(STATUS "Google Protobuf found, enabling usage logging")
-else (PROTOBUF_FOUND)
-	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
-endif (PROTOBUF_FOUND)
+	message(STATUS "Google Protobuf library and compiler found, enabling usage logging")
+else (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
+	message(STATUS "Google Protobuf library and compiler *not* found, usage logging disabled.") 
+endif (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 
 if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 	set(QT_USE_QTXML ON)
@@ -143,6 +143,7 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 	endif (QT_QTHELP_FOUND)
 	
 	# Thymio VPL standalone
+	include_directories(${CMAKE_CURRENT_BINARY_DIR}/plugins/ThymioVPL)
 	set(thymiovpl_SRCS
 		ThymioVPLStandalone.cpp
 		thymiovpl.cpp

@@ -25,14 +25,6 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#if (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
-
-#warning "Incompatible protobuf version found, disabling usage logging"
-#define USAGE_LOG(x) 
-#define ENABLE_USAGE_LOG() 
-
-#else // (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
-
 #define USAGE_LOG(x) UsageLogger::getLogger().x
 #define ENABLE_USAGE_LOG() Aseba::ThymioVPL::UsageLogger::setLoggingState(true)
 
@@ -52,7 +44,7 @@
 #include "Scene.h"
 #include "Buttons.h"
 #include "../../../../compiler/compiler.h"
-#include "UsageProfile.pb.h"
+#include <UsageProfile.pb.h>
 #include "LogSignalMapper.h"
 
 
@@ -128,8 +120,6 @@ protected:
 };
 
 }}
-
-#endif // (GOOGLE_PROTOBUF_VERSION < 2006000) || (2006000 < GOOGLE_PROTOBUF_MIN_PROTOC_VERSION)
 
 #else /*PROTOBUF_FOUND*/
 
