@@ -3,7 +3,7 @@
 
 # version management
 if (USER_BUILD_VERSION)
-	message("-- User version given: " ${USER_BUILD_VERSION})
+	message(STATUS "User version given: " ${USER_BUILD_VERSION})
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_BUILD_VERSION \"${USER_BUILD_VERSION}\"\n")
 	return()
 endif (USER_BUILD_VERSION)
@@ -14,9 +14,9 @@ endif (USER_BUILD_VERSION)
 find_package(Subversion)
 
 if (Subversion_FOUND)
-	message("-- Subversion executable found")
+	message(STATUS "Subversion executable found")
 else (Subversion_FOUND)
-	message("-- Subversion executable NOT found")
+	message(STATUS "Subversion executable NOT found")
 endif (Subversion_FOUND)
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
@@ -25,7 +25,7 @@ endif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
 
 # react accordingly
 if (Subversion_FOUND AND HAS_SVN_REP)
-	message("-- SVN repository found")
+	message(STATUS "SVN repository found")
 	set(HAS_DYN_VERSION)
 	# extract working copy information for SOURCE_DIR into MY_XXX variables
 	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
@@ -51,7 +51,7 @@ if (NOT GIT_FOUND)
 endif (NOT GIT_FOUND)
 
 if (GIT_FOUND)
-	message("-- Git executable found")
+	message(STATUS "Git executable found")
 	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short --verify HEAD
 		OUTPUT_VARIABLE GIT_REV
 		ERROR_VARIABLE git_rev_error
@@ -62,12 +62,12 @@ if (GIT_FOUND)
 		set(HAS_GIT_REP 1)
 	endif(${git_rev_result} EQUAL 0)
 else (GIT_FOUND)
-	message("-- Git executable NOT found")
+	message(STATUS "Git executable NOT found")
 endif (GIT_FOUND)
 
 # react accordingly
 if (GIT_FOUND AND HAS_GIT_REP)
-	message("-- Git repository found")
+	message(STATUS "Git repository found")
 	set(HAS_DYN_VERSION)
 	# write a file with the GIT_REV define
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_BUILD_VERSION \"git-${GIT_REV}\"\n")
@@ -86,6 +86,6 @@ endif (GIT_FOUND AND HAS_GIT_REP)
 ##########
 # default
 ##########
-message("-- (svn / git executable not found OR not a svn / git repository) and no user version given, version is unknown.")
+message(STATUS "(svn / git executable not found OR not a svn / git repository) and no user version given, version is unknown.")
 file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_BUILD_VERSION \"unknown\"\n")
 
