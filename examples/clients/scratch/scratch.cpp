@@ -196,7 +196,7 @@ namespace Aseba
                     args.push_back("V_leds_top");
                     append_strings_unsigned_vector(v3, args);
                     sendEvent(nodeId, args);
-                    leds[nodeId][0] = 200;
+                    leds[std::make_pair(nodeId,0)] = 200;
                     
                     std::vector<unsigned> v4(4,0);
                     args.clear();
@@ -207,8 +207,8 @@ namespace Aseba
                     sendEvent(nodeId, args);
                     args.at(1) = "1";
                     sendEvent(nodeId, args);
-                    leds[nodeId][1] = 200;
-                    leds[nodeId][2] = 200;
+                    leds[std::make_pair(nodeId,1)] = 200;
+                    leds[std::make_pair(nodeId,2)] = 200;
                     
                     finishResponse(req, 200, "");
                     return;
@@ -219,13 +219,13 @@ namespace Aseba
                     unsigned mask = stoi(req->tokens[4]) & 7;
                     strings args = makeLedsRGBVector(color); // by default, "V_leds_top"
                     if ((mask & 1) == 1)
-                        leds[nodeId][0]=color, sendEvent(nodeId, args);
+                        leds[std::make_pair(nodeId,0)]=color, sendEvent(nodeId, args);
                     args.insert(args.begin()+1,"0");
                     if ((mask & 2) == 2)
-                        args.at(0) = "V_leds_bottom", leds[nodeId][1]=color, sendEvent(nodeId, args);
+                        args.at(0) = "V_leds_bottom", leds[std::make_pair(nodeId,1)]=color, sendEvent(nodeId, args);
                     args.at(1) = "1";
                     if ((mask & 4) == 4)
-                        args.at(0) = "V_leds_bottom", leds[nodeId][2]=color, sendEvent(nodeId, args);
+                        args.at(0) = "V_leds_bottom", leds[std::make_pair(nodeId,2)]=color, sendEvent(nodeId, args);
                     finishResponse(req, 200, "");
                     return;
                 }
@@ -235,19 +235,19 @@ namespace Aseba
                     unsigned mask = stoi(req->tokens[4]) & 7;
                     if ((mask & 1) == 1)
                     {
-                        strings args = makeLedsRGBVector(leds[nodeId][0] = (leds[nodeId][0] + delta) % 198);
+                        strings args = makeLedsRGBVector(leds[std::make_pair(nodeId,0)] = (leds[std::make_pair(nodeId,0)] + delta) % 198);
                         sendEvent(nodeId, args);
                     }
                     if ((mask & 2) == 2)
                     {
-                        strings args = makeLedsRGBVector(leds[nodeId][1] = (leds[nodeId][1] + delta) % 198);
+                        strings args = makeLedsRGBVector(leds[std::make_pair(nodeId,1)] = (leds[std::make_pair(nodeId,1)] + delta) % 198);
                         args.at(0) = "V_leds_bottom";
                         args.insert(args.begin()+1,"0");
                         sendEvent(nodeId, args);
                     }
                     if ((mask & 4) == 4)
                     {
-                        strings args = makeLedsRGBVector(leds[nodeId][2] = (leds[nodeId][2] + delta) % 198);
+                        strings args = makeLedsRGBVector(leds[std::make_pair(nodeId,2)] = (leds[std::make_pair(nodeId,2)] + delta) % 198);
                         args.at(0) = "V_leds_bottom";
                         args.insert(args.begin()+1,"1");
                         sendEvent(nodeId, args);
@@ -512,9 +512,9 @@ namespace Aseba
             result << "tilt/top_bottom " << cv[2] << endl;
         }
 
-        result << "leds/top " << leds[nodeId][0] << endl;
-        result << "leds/bottom/left " << leds[nodeId][1] << endl;
-        result << "leds/bottom/right " << leds[nodeId][2] << endl;
+        result << "leds/top " << leds[std::make_pair(nodeId,0)] << endl;
+        result << "leds/bottom/left " << leds[std::make_pair(nodeId,1)] << endl;
+        result << "leds/bottom/right " << leds[std::make_pair(nodeId,2)] << endl;
         
         std::vector<short> mic_threshold, mic_intensity;
         if (getCachedVal(nodeId, "mic.threshold", mic_threshold) &&

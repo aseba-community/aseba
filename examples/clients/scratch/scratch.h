@@ -26,7 +26,7 @@ namespace Aseba
         std::set<int> busy_threads;
         std::map<unsigned, unsigned> blink_state;
         std::map<unsigned, unsigned> scratch_dial;
-        std::map<unsigned, std::vector<unsigned> > leds; // top, bottom-left, bottom-right
+        std::map< std::pair<unsigned,unsigned>, unsigned > leds; // top, bottom-left, bottom-right
         
     public:
         ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
