@@ -15,10 +15,9 @@ if (LIBXML2_FOUND)
 	
 	target_link_libraries(asebascratch asebahttphub asebacompiler asebadashelplugins ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
-	configure_file(../../../switches/http/dummynode-1-tick.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1-tick.aesl COPYONLY)
-	configure_file(../../../switches/http/dummynode-1.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1.aesl COPYONLY)
-
 	install(TARGETS asebascratch RUNTIME
 		DESTINATION bin
 	)
+
+	add_subdirectory(e2e-scratch)
 endif (LIBXML2_FOUND)

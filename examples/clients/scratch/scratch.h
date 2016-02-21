@@ -24,22 +24,22 @@ namespace Aseba
         std::list<GetVariables> polled_variables;
         time_t state_variable_update_time;
         std::set<int> busy_threads;
-        unsigned blink_state;
-        unsigned scratch_dial;
-        std::vector<unsigned> leds; // top, bottom-left, bottom-right
+        std::map<unsigned, unsigned> blink_state;
+        std::map<unsigned, unsigned> scratch_dial;
+        std::map<unsigned, std::vector<unsigned> > leds; // top, bottom-left, bottom-right
         
     public:
-        ScratchInterface(const std::string& target, const std::string& http_port, const int iterations);
-        virtual std::string evPoll(const std::string nodeName);
+        ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
+        virtual std::string evPoll(const unsigned nodeId);
         
     protected:
         virtual void routeRequest(HttpRequest* req);
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
-        virtual void sendPollVariables(const std::string nodeName);
-        virtual bool getCachedVal(const std::string& nodeName, const std::string& varName,
+        virtual void sendPollVariables(const unsigned nodeId);
+        virtual bool getCachedVal(const unsigned nodeId, const std::string& varName,
                                   std::vector<short>& cachedval);
-        virtual bool getVarAddrLen(const std::string& nodeName, const std::string& varName,
+        virtual bool getVarAddrLen(const unsigned nodeId, const std::string& varName,
                                    unsigned& source, unsigned& pos, unsigned& length);
         virtual strings makeLedsCircleVector(unsigned dial);
         virtual strings makeLedsRGBVector(unsigned color);
