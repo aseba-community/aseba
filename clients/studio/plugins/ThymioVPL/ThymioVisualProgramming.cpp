@@ -1005,6 +1005,10 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
+		// if hidden, do not react
+		if (isHidden())
+			return;
+		
 		// here we can add react to incoming events
 		if (id == 2)
 			USAGE_LOG(logTabletData(data));
