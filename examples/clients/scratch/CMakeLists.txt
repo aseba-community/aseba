@@ -19,5 +19,6 @@ if (LIBXML2_FOUND)
 		DESTINATION bin
 	)
 
-	add_subdirectory(e2e-scratch)
 endif (LIBXML2_FOUND)
+
+add_subdirectory(e2e-scratch)
