@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 2.6)
 project(aseba)
 enable_testing()
 
-include(ParseVersion.cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+include(CMakeModules/ParseVersion.cmake)
 
 add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)

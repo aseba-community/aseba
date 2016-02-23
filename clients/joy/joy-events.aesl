@@ -1,0 +1,21 @@
+<!DOCTYPE aesl-source>
+<network>
+
+<!--list of global events-->
+<event size="2" name="joy_axis0" />
+<event size="2" name="joy_axis1" />
+<event size="2" name="joy_axis2" />
+<event size="2" name="joy_axis3" />
+<event size="2" name="joy_axis4" />
+<event size="2" name="joy_hat" />
+<event size="2" name="joy_button0" />
+<event size="2" name="joy_button1" />
+<event size="2" name="joy_button2" />
+<event size="2" name="joy_button3" />
+<event size="2" name="joy_button4" />
+<event size="2" name="joy_button5" />
+<event size="2" name="joy_button6" />
+<event size="2" name="joy_button7" />
+<event size="2" name="joy_button8" />
+
+</network>
