@@ -5,7 +5,7 @@ targets, and provides a REST interface for communicating with them
 using HTTP over a TCP/IP connection. The tests in this directory
 verify these interconnections.
 
-There are four test specifications:
+There are five test specifications:
 * `1-http_spec.js` verifies that through the HTTP REST interface one
 can inspect and command Aseba nodes,
 * `2-interaction_spec.js` verifies that Aseba nodes can communicate
@@ -14,11 +14,13 @@ over the Aseba bus implemented by **asebahttp**,
 identifiers to avoid conflicts. 
 * `4-load-aesl_spec.js` verifies that **asebahttp** can upload a
 new aesl program to a node.
+* `5-thymio-II_spec.js` optionally verifies that **asebahttp** can
+communicate with a real Thymio-II connected on a USB serial port.
 
 ## Installation
 
-CMake should have installed the necessary NPM modules and created a
-test runner `run-e2e-http.sh`. The command
+CMake and the build process will install the necessary NPM modules
+and will create a test runner `run-e2e-http.sh`. The command
 
 `npm install`
 
@@ -57,6 +59,11 @@ also asks for aeslId 2 and so gains the listener 2 role.
 
 Node **dummynode-8** is used to test loading aesl programs using the
 HTTP PUT method of the REST interface.
+
+The optional test scenario with a real Thymio-II first loads a simple
+program with variables, events, and an event stream at 1.5 second
+intervals, then verifies that **asebahttp** can change variables, call
+events, and inspect an event stream.
 
 ## Implementation
 
