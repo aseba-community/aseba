@@ -8,6 +8,7 @@ add_custom_command(
 	    ASEBASWITCH=$<TARGET_FILE:asebaswitch> 
 	    ASEBAMASSLOADER=$<TARGET_FILE:asebamassloader>
 	    ASEBASCRATCH=$<TARGET_FILE:asebascratch>
+	    DASHELPORTLIST=${dashel_DIR}/portlist
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-scratch.sh.in
 )
@@ -30,8 +31,10 @@ endif (HAVE_NPM)
 configure_file(1-http_spec.js ${CMAKE_CURRENT_BINARY_DIR}/1-http_spec.js COPYONLY)
 configure_file(2-interaction_spec.js ${CMAKE_CURRENT_BINARY_DIR}/2-interaction_spec.js COPYONLY)
 configure_file(3-remap_spec.js ${CMAKE_CURRENT_BINARY_DIR}/3-remap_spec.js COPYONLY)
+configure_file(5-thymio-II_spec.js ${CMAKE_CURRENT_BINARY_DIR}/5-thymio-II_spec.js COPYONLY)
 configure_file(package.json ${CMAKE_CURRENT_BINARY_DIR}/package.json COPYONLY)
 configure_file(ping0123.aesl ${CMAKE_CURRENT_BINARY_DIR}/ping0123.aesl COPYONLY)
+configure_file(thymio.aesl ${CMAKE_CURRENT_BINARY_DIR}/thymio.aesl COPYONLY)
 configure_file(README.md ${CMAKE_CURRENT_BINARY_DIR}/README.md COPYONLY)
 
 add_test(NAME e2e-scratch COMMAND bash run-e2e-scratch.sh )
