@@ -658,7 +658,8 @@ namespace Aseba
                 else if (req->method.find("POST") == 0)
                 {
                     // Parse POST form data
-                    parse_json_form(std::string(req->content, req->content.size()), data);
+                    string formdata(req->content.c_str(), req->content.size());
+                    parse_json_form(formdata, data);
                 }
                 sendEvent(nodeId, data);
                 finishResponse(req, 204, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
@@ -895,7 +896,7 @@ namespace Aseba
     }
     
     // Utility: extract argument values from JSON request body
-    void HttpInterface::parse_json_form(std::string content, strings& values)
+    void HttpInterface::parse_json_form(const std::string content, strings& values)
     {
         std::string buffer = content;
         buffer.erase(std::remove_if(buffer.begin(), buffer.end(), ::isspace), buffer.end());
@@ -1278,8 +1279,8 @@ namespace Aseba
             NodeIdSubstitution::iterator localWish = localWishes.find(targetId);
             if (localWish != localWishes.end())
                 newId = localWish->second;
-            while (used.find(newId) != used.end() && (newId += 20) <= 30000);
-            if (newId == 0 || newId > 30000) //
+            while (used.find(newId) != used.end() && (newId += 20) <= 50000);
+            if (newId == 0 || newId > 50000) //
                 throw runtime_error(FormatableString("Can't allocate an unused node id for target id %0 in stream %1").arg(targetId).arg(stream));
 
             // remember the assigned nodeId for this targetId in this stream

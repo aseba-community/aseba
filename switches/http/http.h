@@ -135,7 +135,7 @@ namespace Aseba
         //bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
 //        bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos) const;
         bool compileAndSendCode(const unsigned nodeId, const std::wstring& program);
-        virtual void parse_json_form(std::string content, strings& values);
+        virtual void parse_json_form(const std::string content, strings& values);
         std::vector<unsigned> getIdsFromURI(const strings& args);
         Dashel::Stream* getStreamFromNodeId(const unsigned nodeId);
     };
