@@ -3,9 +3,11 @@
 # run this from cmake
 # bash works on Windows if we run under MSYS2 / MINGW
 
-../targets/dummy/asebadummynode 0 &
+killall aseba{dummynode,switch,massloader}
+
+ASEBADUMMYNODE 0 &
 sleep 2
-./test-asebahttp
+TESTASEBAHTTP
 status=$?
 kill %%
 exit $status

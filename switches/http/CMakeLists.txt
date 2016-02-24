@@ -39,7 +39,4 @@ if (LIBXML2_FOUND)
 		DESTINATION include/aseba/switches/http
 	)
 
-	configure_file(dummynode-1-tick.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1-tick.aesl COPYONLY)
-	configure_file(dummynode-1.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1.aesl COPYONLY)
-
 endif (LIBXML2_FOUND)
