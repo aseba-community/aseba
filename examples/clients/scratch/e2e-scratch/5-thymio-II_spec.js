@@ -59,16 +59,16 @@ for (node of [THYMIO2]) {
     .expectStatus(200)
     .expectHeader('Content-Type', 'application/json')
     .expectJSON({
-        namedVariables: { "_fwversion":2, "motor.left.target":1, acc:3, leds_circle:8 }
+        namedVariables: { "_fwversion":2, "motor.left.target":1, acc:3, Qid:4, Qtime:4 }
     })
     .toss();
 }
 
 frisby.create('Get user variables for ' + THYMIO2)
-.get(ASEBASCRATCH + THYMIO2 + '/leds_circle')
+.get(ASEBASCRATCH + THYMIO2 + '/Qid')
 .expectStatus(200)
 .expectHeader('Content-Type', 'application/json')
-.expectJSONTypes([Number,Number,Number,Number,Number,Number,Number,Number])
+.expectJSONTypes([Number,Number,Number,Number])
 .toss();
 
 frisby.create('Fail to get undefined user variables for ' + THYMIO2)
@@ -76,20 +76,33 @@ frisby.create('Fail to get undefined user variables for ' + THYMIO2)
 .expectStatus(404)
 .toss();
 
-frisby.create('Set/get/set the LED circle variable on ' + THYMIO2)
-.post(ASEBASCRATCH + THYMIO2 + '/V_leds_circle', Array(8).fill(16), {json: true})
+frisby.create('Set/get/set the Q variables on ' + THYMIO2)
+.post(ASEBASCRATCH + THYMIO2 + '/Q_add_motion', [1,500,1,1], {json: true})
 .expectStatus(204)
 .after(function(err, res, body) {
-    // Assume no events are running!
-    frisby.create('Get the value of V_leds_circle on ' + THYMIO2)
-    .get(ASEBASCRATCH + THYMIO2 + '/leds_circle')
+    frisby.create('Get the value of Qtime on ' + THYMIO2)
+    .get(ASEBASCRATCH + THYMIO2 + '/Qtime')
     .expectStatus(200)
     .expectHeader('Content-Type', 'application/json')
-    .expectJSONLength(8)
-    .expectJSON([16,16,16,16,16,16,16,16])
+    .expectJSONLength(4)
     .afterJSON(function (body) {
-        frisby.create('Reset the value of V_leds_circle on ' + THYMIO2)
-	.post(ASEBASCRATCH + THYMIO2 + '/V_leds_circle', Array(8).fill(0), {json: true})
+	expect(body[0]).toBeLessThan(0)
+	expect(body[0]).toBeGreaterThan(-500)
+    })
+    //.expectJSON([1,0,0,0])
+    .afterJSON(function (body) {
+	frisby.create('See event streams')
+	.get(ASEBASCRATCH + 'events?todo=2')
+        .inspectBody()
+	.expectStatus(200)
+	.expectHeader('Content-Type', 'text/event-stream')
+	.expectHeader('Connection', 'keep-alive')
+	.expectBodyContains('data: Q_motion_ended')
+	.toss()
+    })
+    .afterJSON(function (body) {
+        frisby.create('Reset the value of Qtime on ' + THYMIO2)
+	.post(ASEBASCRATCH + THYMIO2 + '/Qtime', Array(4).fill(0), {json: true})
 	.expectStatus(204)
         .toss()
     })
@@ -97,30 +110,30 @@ frisby.create('Set/get/set the LED circle variable on ' + THYMIO2)
 })
 .toss();
 
-frisby.create('Set then reset the user variable motor.left.target, using POST & JSON')
-.get(ASEBASCRATCH + THYMIO2 + '/motor.left.target')
+frisby.create('Set then reset the user variable R_state.do, using POST & JSON')
+.get(ASEBASCRATCH + THYMIO2 + '/R_state.do')
 .expectStatus(200)
 .expectHeader('Content-Type', 'application/json')
 .expectJSONLength(1)
 .afterJSON(function (body) {
-    var old_motor_left_target = body[0]
-    frisby.create('Set the value of motor.left.target')
-    .post(ASEBASCRATCH + THYMIO2 + '/motor.left.target', [143], {json: true})
+    var old_flag = body[0]
+    frisby.create('Set the value of R_state.do')
+    .post(ASEBASCRATCH + THYMIO2 + '/R_state.do', [143], {json: true})
     .expectStatus(204)
     .after(function(err, res, body) {
-        frisby.create('Get the value of motor.left.target')
-        .get(ASEBASCRATCH + THYMIO2 + '/motor.left.target')
+        frisby.create('Get the value of R_state.do')
+        .get(ASEBASCRATCH + THYMIO2 + '/R_state.do')
         .expectStatus(200)
         .expectJSON([143])
         .afterJSON(function (body) {
-            frisby.create('Set the value of motor.left.target')
-            .post(ASEBASCRATCH + THYMIO2 + '/motor.left.target', [old_motor_left_target], {json: true})
+            frisby.create('Set the value of R_state.do')
+            .post(ASEBASCRATCH + THYMIO2 + '/R_state.do', [old_flag], {json: true})
             .expectStatus(204)
             .after(function(err, res, body) {
-                frisby.create('Get the value of motor.left.target')
-                .get(ASEBASCRATCH + THYMIO2 + '/motor.left.target')
+                frisby.create('Get the value of R_state.do')
+                .get(ASEBASCRATCH + THYMIO2 + '/R_state.do')
                 .expectStatus(200)
-                .expectJSON([old_motor_left_target])
+                .expectJSON([old_flag])
                 .toss()
             })
             .toss()
@@ -131,30 +144,30 @@ frisby.create('Set then reset the user variable motor.left.target, using POST & 
 })
 .toss()
 
-frisby.create('Set then reset the user variable motor.right.target, using GET & URI args')
-.get(ASEBASCRATCH + THYMIO2 + '/motor.right.target')
+frisby.create('Set then reset the user variable mic.threshold, using GET & URI args')
+.get(ASEBASCRATCH + THYMIO2 + '/mic.threshold')
 .expectStatus(200)
 .expectHeader('Content-Type', 'application/json')
 .expectJSONLength(1)
 .afterJSON(function (body) {
-    var old_motor_right_target = body[0]
-    frisby.create('Set the value of motor.right.target')
-    .get(ASEBASCRATCH + THYMIO2 + '/motor.right.target/143')
+    var old_threshold = body[0]
+    frisby.create('Set the value of mic.threshold')
+    .get(ASEBASCRATCH + THYMIO2 + '/mic.threshold/20')
     .expectStatus(204)
     .after(function(err, res, body) {
-        frisby.create('Get the value of motor.right.target')
-        .get(ASEBASCRATCH + THYMIO2 + '/motor.right.target')
+        frisby.create('Get the value of mic.threshold')
+        .get(ASEBASCRATCH + THYMIO2 + '/mic.threshold')
         .expectStatus(200)
-        .expectJSON([143])
+        .expectJSON([20])
         .afterJSON(function (body) {
-            frisby.create('Set the value of motor.right.target')
-            .get(ASEBASCRATCH + THYMIO2 + '/motor.right.target/' + old_motor_right_target)
+            frisby.create('Set the value of mic.threshold')
+            .get(ASEBASCRATCH + THYMIO2 + '/mic.threshold/' + old_threshold)
             .expectStatus(204)
             .after(function(err, res, body) {
-                frisby.create('Get the value of motor.right.target')
-                .get(ASEBASCRATCH + THYMIO2 + '/motor.right.target')
+                frisby.create('Get the value of mic.threshold')
+                .get(ASEBASCRATCH + THYMIO2 + '/mic.threshold')
                 .expectStatus(200)
-                .expectJSON([old_motor_right_target])
+                .expectJSON([old_threshold])
                 .toss()
             })
             .toss()
@@ -166,14 +179,14 @@ frisby.create('Set then reset the user variable motor.right.target, using GET & 
 .toss()
 
 frisby.create('Check that state changes are seen in R_state')
-.get(ASEBASCRATCH + THYMIO2 + '/motor.left.target')
+.get(ASEBASCRATCH + THYMIO2 + '/prox.comm.tx')
 .expectStatus(200)
 .expectHeader('Content-Type', 'application/json')
 .expectJSONLength(1)
 .afterJSON(function (body) {
     var old_motor_left_target = body[0]
-    frisby.create('Set the value of motor.left.target')
-    .post(ASEBASCRATCH + THYMIO2 + '/motor.left.target', [143], {json: true})
+    frisby.create('Set the value of prox.comm.tx')
+    .post(ASEBASCRATCH + THYMIO2 + '/prox.comm.tx', [143], {json: true})
     .expectStatus(204)
     .after(function(err, res, body) {
         frisby.create('Get the value of R_state')
@@ -182,15 +195,15 @@ frisby.create('Check that state changes are seen in R_state')
 	.expectJSONTypes('*', Number)
 	// .inspectBody()
         .afterJSON(function (body) {
-	    expect(body[5]).toEqual(143)
+	    expect(body[13]).toEqual(143)
 	})
         .afterJSON(function (body) {
-            frisby.create('Set the value of motor.left.target')
-            .post(ASEBASCRATCH + THYMIO2 + '/motor.left.target', [old_motor_left_target], {json: true})
+            frisby.create('Set the value of prox.comm.tx')
+            .post(ASEBASCRATCH + THYMIO2 + '/prox.comm.tx', [old_motor_left_target], {json: true})
             .expectStatus(204)
             .after(function(err, res, body) {
-                frisby.create('Get the value of motor.left.target')
-                .get(ASEBASCRATCH + THYMIO2 + '/motor.left.target')
+                frisby.create('Get the value of prox.comm.tx')
+                .get(ASEBASCRATCH + THYMIO2 + '/prox.comm.tx')
                 .expectStatus(200)
                 .expectJSON([old_motor_left_target])
                 .toss()
@@ -201,15 +214,6 @@ frisby.create('Check that state changes are seen in R_state')
     })
     .toss()
 })
-.toss()
-
-frisby.create('See event streams')
-.get(ASEBASCRATCH + 'events?todo=2')
-.expectStatus(200)
-.expectHeader('Content-Type', 'text/event-stream')
-.expectHeader('Connection', 'keep-alive')
-.expectBodyContains('data: Q_motion_started')
-.expectBodyContains('data: Q_motion_ended')
 .toss()
 
 frisby.create('Sound shutdown')

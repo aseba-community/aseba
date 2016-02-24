@@ -33,10 +33,14 @@ jasmine-node [1-4]*_spec.js
 status=$?
 
 # optional tests with a real Thymio-II
-[ -x "DASHELPORTLIST" ] && DASHELPORTLIST | grep -qi thymio.ii &&
-    ( ASEBASCRATCH -p 3002 -a thymio_motion.aesl 'ser:name=Thymio-II' & ) &&
-    sleep 5 &&
-    jasmine-node 5-thymio-II_spec.js
+if [ -x "DASHELPORTLIST" ] && DASHELPORTLIST | grep -qi thymio.ii; then
+    ASEBASCRATCH -p 3002 -a thymio_motion.aesl 'ser:name=Thymio-II' &
+    sleep 5
+    jasmine-node 5*_spec.js
+    status=$?
+    jasmine-node 6*_spec.js
+    jasmine-node 7*_spec.js
+fi
 
 # clean up
 [ -z "$(jobs -p)" ] || kill %%
