@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # clean up previous session
-killall aseba{dummynode,switch,massloader}
+killall aseba{dummynode,switch,massloader,http}
 for i in 0 1 2 3 4 5 6 7 8; do ASEBADUMMYNODE $i & done
 
 # localhost:3000 bridges a switch with 4 cooperating nodes:
@@ -31,8 +31,14 @@ sleep 10 # let switches start up
 
 # run e2e tests
 # jasmine-node --verbose --color *_spec.js
-jasmine-node *_spec.js
+jasmine-node [1-4]*_spec.js
 status=$?
+
+# optional tests with a real Thymio-II
+[ -x "DASHELPORTLIST" ] && DASHELPORTLIST | grep -qi thymio.ii &&
+    ( ASEBAHTTP -p 3002 -a thymio.aesl 'ser:name=Thymio-II' & ) &&
+    sleep 10 &&
+    jasmine-node 5-thymio-II_spec.js
 
 # clean up
 [ -z "$(jobs -p)" ] || kill %%
