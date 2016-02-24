@@ -37,7 +37,7 @@ status=$?
 # optional tests with a real Thymio-II
 [ -x "DASHELPORTLIST" ] && DASHELPORTLIST | grep -qi thymio.ii &&
     ( ASEBAHTTP -p 3002 -a thymio.aesl 'ser:name=Thymio-II' & ) &&
-    sleep 10 &&
+    sleep 5 &&
     jasmine-node 5-thymio-II_spec.js
 
 # clean up

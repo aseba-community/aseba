@@ -78,7 +78,7 @@ call sound.system(event.args[0])
 onevent acc
 if beacon%24 == 0 then
 	emit Q_motion_started([beacon>>1, 1,2,3,4])
-elseif beacon%32 == 8 then
+elseif beacon%24 == 8 then
 	emit Q_motion_ended([beacon>>1, 0,0,0,0])
 end
 if R_state.do==1 and beacon%16==0 then

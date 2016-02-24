@@ -204,7 +204,7 @@ frisby.create('Check that state changes are seen in R_state')
 .toss()
 
 frisby.create('See event streams')
-.get(ASEBASCRATCH + 'events?todo=2')
+.get(ASEBASCRATCH + 'events?todo=4')
 .expectStatus(200)
 .expectHeader('Content-Type', 'text/event-stream')
 .expectHeader('Connection', 'keep-alive')
