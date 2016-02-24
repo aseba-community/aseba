@@ -107,6 +107,9 @@ namespace Aseba
 //            args.push_back(std::to_string(abs( (int)(blink_state = (blink_state+121)%240)/12 - 10 )));
 //            sendSetVariable(req->tokens[1], args);
             string result = evPoll(nodeId);
+            req->outheaders.push_back("Content-Length: " + std::to_string(result.size()));
+            req->outheaders.push_back("Content-Type: text/plain");
+            req->outheaders.push_back("Access-Control-Allow-Origin: *");
             finishResponse(req, 200, result);
             return;
         }
@@ -130,7 +133,7 @@ namespace Aseba
                     args.at(0) = "motor.right.target";
                     args.at(1) = std::to_string(stoi(req->tokens[4])*32/10);
                     sendSetVariable(nodeId, args);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_change_speed")==0)
@@ -144,9 +147,9 @@ namespace Aseba
                         args.push_back(std::to_string(stoi(req->tokens[3])*32/10 + left_target.front()));
                         sendSetVariable(nodeId, args);
                         args.at(0) = "motor.right.target";
-                        args.at(1) = std::to_string(stoi(req->tokens[3])*32/10 + right_target.front());
+                        args.at(1) = std::to_string(stoi(req->tokens[4])*32/10 + right_target.front());
                         sendSetVariable(nodeId, args);
-                        finishResponse(req, 200, "");
+                        finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     }
                     return;
                 }
@@ -158,21 +161,21 @@ namespace Aseba
                     sendSetVariable(nodeId, args);
                     args.at(0) = "motor.right.target";
                     sendSetVariable(nodeId, args);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_set_dial")==0)
                 { //
                     scratch_dial[nodeId] = stoi(req->tokens[3]);
                     sendEvent(nodeId, makeLedsCircleVector(scratch_dial[nodeId]));
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                 }
                 else if (req->tokens[2].find("scratch_next_dial_limit")==0)
                 { //
                     unsigned limit = stoi(req->tokens[3]) % 648;
                     scratch_dial[nodeId] = (scratch_dial[nodeId] + 1) % limit;
                     sendEvent(nodeId, makeLedsCircleVector(scratch_dial[nodeId]));
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_next_dial")==0)
@@ -180,7 +183,7 @@ namespace Aseba
                     unsigned limit = 8;
                     scratch_dial[nodeId] = (scratch_dial[nodeId] + 1) % limit;
                     sendEvent(nodeId, makeLedsCircleVector(scratch_dial[nodeId]));
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_clear_leds")==0)
@@ -210,7 +213,7 @@ namespace Aseba
                     leds[std::make_pair(nodeId,1)] = 200;
                     leds[std::make_pair(nodeId,2)] = 200;
                     
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_set_leds")==0)
@@ -226,7 +229,7 @@ namespace Aseba
                     args.at(1) = "1";
                     if ((mask & 4) == 4)
                         args.at(0) = "V_leds_bottom", leds[std::make_pair(nodeId,2)]=color, sendEvent(nodeId, args);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_change_leds")==0)
@@ -252,7 +255,7 @@ namespace Aseba
                         args.insert(args.begin()+1,"1");
                         sendEvent(nodeId, args);
                     }
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_avoid")==0)
@@ -280,7 +283,7 @@ namespace Aseba
                         sendPollVariables(nodeId);
                         sendPollVariables(nodeId);
                     }
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
                 }
                 else if (req->tokens[2].find("scratch_move")==0)
@@ -288,7 +291,7 @@ namespace Aseba
                     int busyid = stoi(req->tokens[3]);
                     int mm = stoi(req->tokens[4]);
                     int speed = abs(mm) < 20 ? 20 : (abs(mm) > 150 ? 150 : abs(mm));
-                    int time = abs(mm) * 100 / speed; // time measured in 16 Hz ticks
+                    int time = abs(mm) * 100 / speed; // time measured in 100 Hz ticks
                     speed = speed * 32 / 10;
                     strings args;
                     args.push_back("Q_add_motion");
@@ -298,7 +301,7 @@ namespace Aseba
                     args.push_back(std::to_string((mm > 0) ? speed : -speed ));
                     sendEvent(nodeId, args);
                     busy_threads.insert(busyid);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
                 else if (req->tokens[2].find("scratch_turn")==0)
@@ -325,7 +328,7 @@ namespace Aseba
                     args.push_back(std::to_string((degrees > 0) ? -speed :  speed ));
                     sendEvent(nodeId, args);
                     busy_threads.insert(busyid);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
                 else if (req->tokens[2].find("scratch_arc")==0)
@@ -350,7 +353,7 @@ namespace Aseba
                     args.push_back(std::to_string((degrees > 0) ?  v_in  : v_out ));
                     sendEvent(nodeId, args);
                     busy_threads.insert(busyid);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
                 else if (req->tokens[2].find("scratch_sound_freq")==0)
@@ -358,12 +361,23 @@ namespace Aseba
                     //                int busyid = stoi(req->tokens[3]);
                     //                int freq = stoi(req->tokens[4]);
                     //                int sixtieths = stoi(req->tokens[5]);
-                    finishResponse(req, 200, "");
+                    finishResponse(req, 501, ""); // fails with NOT IMPLEMENTED
                     return;
                 }
             }
         }
         HttpInterface::routeRequest(req); // else use base class method
+    }
+    
+    void ScratchInterface::sendSetVariable(const unsigned nodeId, const strings& args)
+    {
+        // update variable cache
+        SetVariables::VariablesVector data;
+        for (size_t i=1; i<args.size(); ++i)
+            data.push_back(atoi(args[i].c_str()));
+        setCachedVal(nodeId, args[0], data);
+        // then continue with base class method
+        HttpInterface::sendSetVariable(nodeId, args);
     }
     
     // helpers
@@ -407,13 +421,24 @@ namespace Aseba
         return name;
     }
     bool ScratchInterface::getCachedVal(const unsigned nodeId, const std::string& varName,
-                      std::vector<short>& cachedval)
+                                        std::vector<short>& cachedval)
     {
         unsigned source, pos, len;
         if (getVarAddrLen(nodeId, varName, source, pos, len))
         {
             cachedval = variable_cache[std::make_pair(source, pos)];
             return ! cachedval.empty();
+        }
+        return false;
+    }
+    bool ScratchInterface::setCachedVal(const unsigned nodeId, const std::string& varName,
+                                        std::vector<short>& val)
+    {
+        unsigned source, pos, len;
+        if (getVarAddrLen(nodeId, varName, source, pos, len))
+        {
+            variable_cache[std::make_pair(source, pos)] = val;
+            return ! val.empty();
         }
         return false;
     }

@@ -37,8 +37,11 @@ namespace Aseba
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
         virtual void sendPollVariables(const unsigned nodeId);
+        virtual void sendSetVariable(const unsigned nodeId, const strings& args);
         virtual bool getCachedVal(const unsigned nodeId, const std::string& varName,
                                   std::vector<short>& cachedval);
+        virtual bool setCachedVal(const unsigned nodeId, const std::string& varName,
+                                  std::vector<short>& val);
         virtual bool getVarAddrLen(const unsigned nodeId, const std::string& varName,
                                    unsigned& source, unsigned& pos, unsigned& length);
         virtual strings makeLedsCircleVector(unsigned dial);
