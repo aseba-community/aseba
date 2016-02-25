@@ -27,6 +27,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "dbusinterface.h"
+#include <QTest>
 
 using namespace std;
 using namespace Aseba;
@@ -74,11 +75,7 @@ int main(int argc, char *argv[])
 	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", Values({100}));
 	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", Values({100}));
 
-	#ifdef Q_OS_WIN
-	Sleep(5000);
-	#else // Q_OS_WIN
-	sleep(5);
-	#endif // Q_OS_WIN
+	QTest::qSleep(5000);
 
 	// send an Event
 	cout << "\n-sending stop event-" << endl;
