@@ -74,11 +74,11 @@ int main(int argc, char *argv[])
 	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", Values({100}));
 	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", Values({100}));
 
-	#ifdef WIN32
+	#ifdef Q_OS_WIN
 	Sleep(5000);
-	#else // WIN32
+	#else // Q_OS_WIN
 	sleep(5);
-	#endif // WIN32
+	#endif // Q_OS_WIN
 
 	// send an Event
 	cout << "\n-sending stop event-" << endl;
