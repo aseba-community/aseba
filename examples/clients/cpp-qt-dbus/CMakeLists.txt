@@ -6,6 +6,7 @@ if(COMPILER_SUPPORTS_CXX0X)
 		set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 		set(QT_USE_QTMAIN ON)
+		set(QT_USE_QTDBUS ON)
 		include(${QT_USE_FILE})
 	
 		set(aseba-qt-dbus_SRCS
