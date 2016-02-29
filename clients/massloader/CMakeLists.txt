@@ -1,5 +1,3 @@
-find_package(Qt4)
-
 if (QT4_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_DONT_USE_QTGUI ON)

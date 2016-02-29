@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -86,9 +86,10 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	CallSubNode::CallSubNode(const SourcePos& sourcePos, unsigned subroutineId) :
+	CallSubNode::CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName) :
 		Node(sourcePos),
-		subroutineId(subroutineId)
+		subroutineName(subroutineName),
+		subroutineId(-1)
 	{
 	
 	}

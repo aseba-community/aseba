@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -53,6 +53,7 @@ namespace Aseba { namespace ThymioVPL
 		useTimer(false),
 		useMicrophone(false),
 		useAccAngle(false),
+		inWhenBlock(false),
 		inIfBlock(false)
 	{
 		initEventToCodePosMap();
@@ -72,6 +73,7 @@ namespace Aseba { namespace ThymioVPL
 		useTimer= false;
 		useMicrophone = false;
 		useAccAngle = false;
+		inWhenBlock = false;
 		inIfBlock = false;
 	}
 	
@@ -113,6 +115,7 @@ namespace Aseba { namespace ThymioVPL
 			text += L"var notes[6]\n";
 			text += L"var durations[6]\n";
 			text += L"var note_index = 6\n";
+			text += L"var note_count = 6\n";
 			text += L"var wave[142]\n";
 			text += L"var i\n";
 			text += L"var wave_phase\n";
@@ -151,12 +154,22 @@ namespace Aseba { namespace ThymioVPL
 		{
 			text += L"\n# when a note is finished, play the next note\n";
 			text += L"onevent sound.finished\n";
-			text += L"\tif note_index != 6 then\n";
+			text += L"\tif note_index != note_count then\n";
 			text += L"\t\tcall sound.freq(notes[note_index], durations[note_index])\n";
 			text += L"\t\tnote_index += 1\n";
 			text += L"\tend\n";
 		}
 		generatedCode[0] = text + generatedCode[0];
+	}
+	
+	wstring Compiler::CodeGenerator::indentText() const
+	{
+		wstring text(L"\t");
+		if (inWhenBlock)
+			text += L"\t";
+		if (inIfBlock)
+			text += L"\t";
+		return text;
 	}
 	
 	//! Generate code for an event-actions set
@@ -226,6 +239,7 @@ namespace Aseba { namespace ThymioVPL
 				abort();
 			}
 			
+			// FIXME: do this in a second pass, once we have written all the code for this event, and only if the state is actually assigned
 			// if in advanced mode, copy setting of state
 			if (eventActionsSet.isAdvanced())
 			{
@@ -251,7 +265,7 @@ namespace Aseba { namespace ThymioVPL
 					itr->first++;
 			
 			// if non-conditional code
-			if (!eventActionsSet.isAdvanced() && !eventActionsSet.getEventBlock()->isAnyValueSet())
+			if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
 			{
 				// find where "if" block starts for the current event
 				for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
@@ -277,19 +291,27 @@ namespace Aseba { namespace ThymioVPL
 			visitAction(eventActionsSet.getActionBlock(i), currentBlock);
 		
 		// possibly add the debug event
+		visitExecFeedback(eventActionsSet, currentBlock);
 		if (debugLog)
 			visitDebugLog(eventActionsSet, currentBlock);
 		
 		// possibly close condition and add code
-		generatedCode[currentBlock].append(inIfBlock ? L"\tend\n" : L"");
-		inIfBlock = false;
+		visitEndOfLine(currentBlock);
+	}
+	
+	//! Generate the debug log event for this set
+	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock)
+	{
+		wstring text(indentText());
+		text += L"emit pair_run " + toWstring(eventActionsSet.getRow()) + L"\n";
+		generatedCode[currentBlock].append(text);
 	}
 	
 	//! Generate the debug log event for this set
 	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock)
 	{
-		wstring text(inIfBlock ? L"\t\t" : L"\t");
-		text += L"_emit DebugLog [";
+		wstring text(indentText());
+		text += L"_emit debug_log [";
 		
 		wstringstream ostr;
 		ostr << hex << showbase;
@@ -306,6 +328,8 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// generate event code
 		wstring text;
+		
+		// if block generates a test
 		if (block->isAnyValueSet())
 		{
 			// pre-test code
@@ -315,7 +339,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			// test code
-			text += L"\tif ";
+			text += L"\twhen ";
 			if (block->getName() == "button")
 			{
 				text += visitEventArrowButtons(block);
@@ -338,59 +362,60 @@ namespace Aseba { namespace ThymioVPL
 				abort();
 			}
 			
-			// if set, add state filter tests
-			if (stateFilterBlock)
-			{
-				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
-				{
-					switch (stateFilterBlock->getValue(i))
-					{
-						case 1: text += L" and state[" + toWstring(i) + L"] == 1"; break;
-						case 2: text += L" and state[" + toWstring(i) + L"] == 0"; break;
-						default: break;
-					}
-				}
-			}
+			text += L" do\n";
 			
-			text += L" then\n";
-			inIfBlock = true;
-			
-			generatedCode[currentBlock] = text;
+			inWhenBlock = true;
 		}
-		else 
+		
+		// if state filter does generate a test
+		if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
 		{
-			// if block does not generate a test, see if state filter does
-			if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
+			if (inWhenBlock)
+				text += L"\t";
+			text += L"\tif ";
+			bool first(true);
+			for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
 			{
-				text += L"\tif ";
-				bool first(true);
-				for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
+				switch (stateFilterBlock->getValue(i))
 				{
-					switch (stateFilterBlock->getValue(i))
-					{
-						case 1:
-							if (!first)
-								text += L" and ";
-							text += L"state[" + toWstring(i) + L"] == 1";
-							first = false;
-						break;
-						case 2:
-							if (!first)
-								text += L" and ";
-							text += L"state[" + toWstring(i) + L"] == 0";
-							first = false;
-						break;
-						default:
-						break;
-					}
+					case 1:
+						if (!first)
+							text += L" and ";
+						text += L"state[" + toWstring(i) + L"] == 1";
+						first = false;
+					break;
+					case 2:
+						if (!first)
+							text += L" and ";
+						text += L"state[" + toWstring(i) + L"] == 0";
+						first = false;
+					break;
+					default:
+					break;
 				}
-				text += L" then\n";
-				
-				generatedCode[currentBlock] = text;
-				inIfBlock = true;
 			}
-			else
-				inIfBlock = false;
+			text += L" then\n";
+			
+			inIfBlock = true;
+		}
+		
+		generatedCode[currentBlock] = text;
+	}
+	
+	//! End the generated code of a VPL line, close whens and ifs
+	void Compiler::CodeGenerator::visitEndOfLine(unsigned currentBlock)
+	{
+		if (inIfBlock)
+		{
+			if (inWhenBlock)
+				generatedCode[currentBlock].append(L"\t");
+			generatedCode[currentBlock].append(L"\tend\n");
+			inIfBlock = false;
+		}
+		if (inWhenBlock)
+		{
+			generatedCode[currentBlock].append(L"\tend\n");
+			inWhenBlock = false;
 		}
 	}
 	
@@ -431,7 +456,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(block->getValue(slidersIndex+1));
+				text += L"] >= " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			} 
 			else if(block->getValue(i) == 2)
@@ -439,7 +464,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(block->getValue(slidersIndex));
+				text += L"] <= " + toWstring(block->getValue(slidersIndex));
 				first = false;
 			}
 			else if (block->getValue(i) == 3)
@@ -447,10 +472,10 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.horizontal[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(block->getValue(slidersIndex));
+				text += L"] >= " + toWstring(block->getValue(slidersIndex));
 				text += L" and prox.horizontal[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(block->getValue(slidersIndex+1));
+				text += L"] <= " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			}
 		}
@@ -469,7 +494,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(block->getValue(slidersIndex+1));
+				text += L"] >= " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			} 
 			else if (block->getValue(i) == 2)
@@ -477,7 +502,7 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(block->getValue(slidersIndex));
+				text += L"] <= " + toWstring(block->getValue(slidersIndex));
 				first = false;
 			}
 			else if (block->getValue(i) == 3)
@@ -485,10 +510,10 @@ namespace Aseba { namespace ThymioVPL
 				text += (first ? L"": L" and ");
 				text += L"prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] > " + toWstring(block->getValue(slidersIndex));
+				text += L"] >= " + toWstring(block->getValue(slidersIndex));
 				text += L" and prox.ground.delta[";
 				text += toWstring(i);
-				text += L"] < " + toWstring(block->getValue(slidersIndex+1));
+				text += L"] <= " + toWstring(block->getValue(slidersIndex+1));
 				first = false;
 			}
 		}
@@ -575,7 +600,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionMove(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"motor.left.target = ";
 		text += toWstring(block->getValue(0));
@@ -590,7 +615,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionTopColor(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"call leds.top(";
 		text += toWstring(block->getValue(0));
@@ -605,7 +630,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"call leds.bottom.left(";
 		text += toWstring(block->getValue(0));
@@ -627,44 +652,83 @@ namespace Aseba { namespace ThymioVPL
 	
 	wstring Compiler::CodeGenerator::visitActionSound(const Block* block)
 	{
-		static const int noteTable[5] = { 262, 311, 370, 440, 524 };
-		static const int durationTable[3] = {-1, 8, 15};
+		static const int noteTable[6] = { 262, 311, 370, 440, 524, 0 };
+		static const int durationTable[3] = {-1, 7, 14};
 		
-		useSound = true;
-		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
-		text += indString;
-		text += L"call math.copy(notes, [";
-		for (unsigned i = 0; i<block->valuesCount(); ++i)
+		// find last non-silent note
+		unsigned noteCount(block->valuesCount());
+		assert(noteCount > 0);
+		while ((noteCount > 0) && ((block->getValue(noteCount-1) & 0xff) == 5))
+			--noteCount;
+		
+		// if there is no note, return
+		if (noteCount == 0)
+			return indentText() + L"# zero notes in sound block\n";
+		
+		// generate code for notes
+		wstring notesCopyText;
+		wstring durationsCopyText;
+		unsigned accumulatedDuration(0);
+		unsigned activeNoteCount(0);
+		for (unsigned i = 0; i<noteCount; ++i)
 		{
 			const unsigned note(block->getValue(i) & 0xff);
-			text += toWstring(noteTable[note]);
-			if (i+1 != block->valuesCount())
-				text += L", ";
-		}
-		text += L"])\n";
-		text += indString;
-		// durations
-		text += L"call math.copy(durations, [";
-		for (unsigned i = 0; i<block->valuesCount(); ++i)
-		{
 			const unsigned duration((block->getValue(i)>>8) & 0xff);
-			text += toWstring(durationTable[duration]);
-			if (i+1 != block->valuesCount())
-				text += L", ";
+			
+			if (note == 5 && i+1 < noteCount && (block->getValue(i+1) & 0xff) == 5)
+			{
+				// next note is silence, skip
+				accumulatedDuration += durationTable[duration];
+			}
+			else
+			{
+				notesCopyText += toWstring(noteTable[note]);
+				if (i+1 != noteCount)
+					notesCopyText += L", ";
+				durationsCopyText += toWstring(durationTable[duration]+accumulatedDuration);
+				if (i+1 != noteCount)
+					durationsCopyText += L", ";
+				++activeNoteCount;
+				accumulatedDuration = 0;
+			}
 		}
-		text += L"])\n";
+		
+		// enable sound
+		useSound = true;
+		
+		// prepare target string
+		wstring text;
+		const wstring indString(indentText());
+		// notes
 		text += indString;
-		text += L"call sound.freq(notes[0], durations[0])\n";
+		text += L"call math.copy(notes[0:";
+		text += toWstring(activeNoteCount-1);
+		text += L"], [";
+		text += notesCopyText;
+		text += L"])\n";
+		// durations
+		text += indString;
+		text += L"call math.copy(durations[0:";
+		text += toWstring(activeNoteCount-1);
+		text += L"], [";
+		text += durationsCopyText;
+		text += L"])\n";
+		// write variables
 		text += indString;
 		text += L"note_index = 1\n";
+		text += indString;
+		text += L"note_count = " + toWstring(activeNoteCount) + L"\n";
+		// start playing
+		text += indString;
+		text += L"call sound.freq(notes[0], durations[0])\n";
+		
 		return text;
 	}
 	
 	wstring Compiler::CodeGenerator::visitActionTimer(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		text += indString;
 		text += L"timer.period[0] = "+ toWstring(block->getValue(0)) + L"\n";
 		return text;
@@ -673,7 +737,7 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block)
 	{
 		wstring text;
-		const wstring indString(inIfBlock ? L"\t\t" : L"\t");
+		const wstring indString(indentText());
 		for(unsigned i=0; i<block->valuesCount(); ++i)
 		{
 			switch (block->getValue(i))

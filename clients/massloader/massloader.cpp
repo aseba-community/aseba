@@ -24,7 +24,7 @@
 #include <dashel/dashel.h>
 #include "../../common/consts.h"
 #include "../../common/msg/msg.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 #include "../../common/utils/utils.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include <QCoreApplication>
@@ -38,7 +38,7 @@ namespace Aseba
 	using namespace Dashel;
 	using namespace std;
 	
-	class MassLoader: public Hub, public DescriptionsManager
+	class MassLoader: public Hub, public NodesManager
 	{
 	protected:
 		QString fileName;
@@ -54,7 +54,8 @@ namespace Aseba
 		virtual void incomingData(Stream *stream);
 		virtual void connectionClosed(Stream *stream, bool abnormal);
 	
-		// from DescriptionsManager
+		// from NodesManager
+		virtual void sendMessage(const Message& message);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 	};
 	
@@ -121,6 +122,12 @@ namespace Aseba
 		this->stream = 0;
 		stop();
 		reset();
+	}
+	
+	void MassLoader::sendMessage(const Message& message)
+	{
+		message.serialize(stream);
+		stream->flush();
 	}
 	
 	void MassLoader::nodeDescriptionReceived(unsigned nodeId)

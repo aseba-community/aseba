@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -227,7 +227,7 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
 		eventsLabel = new QLabel(tr("Events"));
-		eventsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
+		eventsLabel->setStyleSheet("QLabel { font-size: 10pt; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		eventsLayout->setSpacing(20);
 		#else // Q_WS_MACX
@@ -253,15 +253,15 @@ namespace Aseba { namespace ThymioVPL
 		// compilation
 		compilationResultImage = new QLabel();
 		compilationResult = new QLabel(tr("Compilation success."));
-		compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
+		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
 		
-		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
+		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.2));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 		
 		showCompilationError = new QPushButton(tr("show line"));
-		showCompilationError->setStyleSheet("QPushButton { font-size: 16px; }");
+		showCompilationError->setStyleSheet("QPushButton { font-size: 10pt; }");
 		showCompilationError->hide();
 		connect(showCompilationError, SIGNAL(clicked()), SLOT(showErrorLine()));
 
@@ -285,8 +285,7 @@ namespace Aseba { namespace ThymioVPL
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
 		
-		if (debugLog)
-			connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
+		connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
 		
 		/*zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
@@ -310,7 +309,7 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(new BlockButton("setstate", this));
 		
 		actionsLabel = new QLabel(tr("Actions"));
-		actionsLabel->setStyleSheet("QLabel { font-size: 14px; font-weight: bold; }");
+		actionsLabel->setStyleSheet("QLabel { font-size: 10pt; font-weight: bold; }");
 		#ifdef Q_WS_MACX
 		actionsLayout->setSpacing(20);
 		#else // Q_WS_MACX
@@ -355,7 +354,7 @@ namespace Aseba { namespace ThymioVPL
 		QSettings settings;
 		
 		USAGE_LOG(logSaveSnapshot());
-		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", "").toString());
+		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString());
 		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
 		{
 			const QFileInfo pf(de->openedFileName());
@@ -464,9 +463,17 @@ namespace Aseba { namespace ThymioVPL
 			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
+			setupGlobalEvents();
 			showAtSavedPosition();
 			processCompilationResult();
 		}
+	}
+	
+	void ThymioVisualProgramming::setupGlobalEvents()
+	{
+		CommonDefinitions commonDefinitions;
+		commonDefinitions.events.push_back(NamedValue(L"pair_run", 1));
+		de->setCommonDefinitions(commonDefinitions);
 	}
 	
 	void ThymioVisualProgramming::newFile()
@@ -474,7 +481,6 @@ namespace Aseba { namespace ThymioVPL
 		if (de->newFile())
 		{
 			USAGE_LOG(logNewFile());
-			toggleAdvancedMode(false, true);
 			scene->reset();
 			clearUndo();
 			processCompilationResult();
@@ -720,10 +726,18 @@ namespace Aseba { namespace ThymioVPL
 		scene->recompileWithoutSetModified();
 		
 		if (!scene->isEmpty())
+		{
+			setupGlobalEvents();
 			showAtSavedPosition();
+		}
+		
+		clearUndo();
 		
 		loading = false;
-		clearUndo();
+		
+		// once loaded, process the result of compilation if there is anything to compile
+		if (!scene->isEmpty())
+			processCompilationResult();
 	}
 	
 	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
@@ -932,13 +946,16 @@ namespace Aseba { namespace ThymioVPL
 
 	void ThymioVisualProgramming::processCompilationResult()
 	{
+		if (loading)
+			return;
+		
 		const Compiler::CompilationResult compilation(scene->compilationResult());
 		compilationResult->setText(compilation.getMessage(scene->getAdvanced()));
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
 		if (compilation.isSuccessful())
 		{
-			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.6));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.2));
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 			runButton->setEnabled(true);
 			// content changed but not uploaded, show animation
@@ -949,8 +966,8 @@ namespace Aseba { namespace ThymioVPL
 		else if ((compilation.errorType == Compiler::MISSING_EVENT) && (scene->isSetLast(compilation.errorLine)))
 		{
 			compilationResult->setText(tr("Please add an event"));
-			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.2));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
@@ -960,8 +977,8 @@ namespace Aseba { namespace ThymioVPL
 		else if ((compilation.errorType == Compiler::MISSING_ACTION) && (scene->isSetLast(compilation.errorLine)))
 		{
 			compilationResult->setText(tr("Please add an action"));
-			compilationResult->setStyleSheet("QLabel { font-size: 16px; }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.6));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.2));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
@@ -970,15 +987,14 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 		{
-			compilationResult->setStyleSheet("QLabel { font-size: 16px; color: rgb(231,19,0); }");
-			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/error.svgz", fontSize*1.6));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: rgb(231,19,0); }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/error.svgz", fontSize*1.2));
 			runButton->setEnabled(false);
 			// error, cannot upload, stop animation
 			stopRunButtonAnimationTimer();
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
-		
 	}
 	
 	void ThymioVisualProgramming::processHighlightChange()
@@ -989,15 +1005,23 @@ namespace Aseba { namespace ThymioVPL
 	
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
+		// if hidden, do not react
+		if (isHidden())
+			return;
+		
 		// here we can add react to incoming events
-		if (id == 1)
+		if (id == 2)
 			USAGE_LOG(logTabletData(data));
-		else
+		else if (id > 2)
 			USAGE_LOG(logUserEvent(id,data));
 		
-		// a set was executed on target, highlight in program
-		if (execFeedback && id == 0)
-			(*(scene->setsBegin() + data[0]))->blink();
+		// a set was executed on target, highlight in program if the code in the robot is the same as in this editor
+		if (id == 0 && runButton->isEnabled() && !runAnimTimer)
+		{
+			const unsigned index(data[0]);
+			assert (index < scene->setsCount());
+			(*(scene->setsBegin() + index))->blink();
+		}
 	}
 	
 	void ThymioVisualProgramming::addEvent()

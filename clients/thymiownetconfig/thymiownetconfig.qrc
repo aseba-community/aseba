@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>images/thymiownetconfig.svgz</file>
+	<file>thymiownetconfig_fr.qm</file>
+	<file>thymiownetconfig_de.qm</file>
+	<file>thymiownetconfig_it.qm</file>
+	<file>thymiownetconfig_es.qm</file>
+</qresource>
+</RCC>

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -176,6 +176,13 @@ void AsebaPutVmToSleep(AsebaVMState *vm);
 static void AsebaVMRunCB(AsebaVMState *vm) {}
 #else // DISABLE_WEAK_CALLBACKS
 void __attribute__((weak)) AsebaVMRunCB(AsebaVMState *vm);
+#endif // DISABLE_WEAK_CALLBACKS
+
+/*! Called by AsebaVMDebugMessage when VM is being resetted */
+#ifdef DISABLE_WEAK_CALLBACKS
+static void AsebaVMResetCB(AsebaVMState *vm) {}
+#else // DISABLE_WEAK_CALLBACKS
+void __attribute__((weak)) AsebaVMResetCB(AsebaVMState *vm);
 #endif // DISABLE_WEAK_CALLBACKS
 
 /*! Called by AsebaVMEmitNodeSpecificError to be notified when VM hit an execution error

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -101,6 +101,7 @@ namespace Aseba
 		Target * getTarget();
 		unsigned getNodeId() const;
 		unsigned getProductId() const;
+		void setCommonDefinitions(const CommonDefinitions& commonDefinitions);
 		void displayCode(const QList<QString>& code, int elementToHighlight);
 		void loadAndRun();
 		void stop();
@@ -418,6 +419,8 @@ namespace Aseba
 		void uncommentTriggered();
 		void showLineNumbersChanged(bool state);
 		void goToLine();
+		void zoomIn();
+		void zoomOut();
 		void showSettings();
 		void showHidden(bool show);
 		void showKeywords(bool show);
@@ -492,8 +495,6 @@ namespace Aseba
 		void applySettings();
 	
 	private:
-		virtual void timerEvent ( QTimerEvent * event );
-		
 		// utility functions
 		int getIndexFromId(unsigned node) const;
 		NodeTab* getTabFromId(unsigned node) const;
@@ -524,7 +525,6 @@ namespace Aseba
 		friend struct StudioInterface;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
-		int getDescriptionTimer;
 		
 		#ifdef HAVE_QWT
 		
@@ -588,6 +588,8 @@ namespace Aseba
 		QAction *uncommentAct;
 		QAction *showLineNumbers;
 		QAction *goToLineAct;
+		QAction *zoomInAct;
+		QAction *zoomOutAct;
 		QAction *toggleBreakpointAct;
 		QAction *clearAllBreakpointsAct;
 		QAction *showHiddenAct;

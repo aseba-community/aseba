@@ -2,23 +2,27 @@
 add_library(asebavmdummycallbacks STATIC
 	asebavmdummycallbacks.cpp
 )
-target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+
+# If the asebavm is built as a shared lib, it must not be a dependency of
+# asebavmdummycallbacks because if it is, it will not be able to resolve refs
+# using asebavmdummycallbacks. On the other hand, if asabavm is not built as a
+# shared lib, it must be a dependency so that it can be used to resolve refs 
+# in asebavmdummycallbacks.
+if (BUILD_SHARED_LIBS)
+  target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+else (BUILD_SHARED_LIBS)
+  target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+endif (BUILD_SHARED_LIBS)
 
 add_executable(asebatest
 	asebatest.cpp
 )
 target_link_libraries(asebatest asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
-install(TARGETS asebatest RUNTIME
-	DESTINATION bin
-)
 
 add_executable(aseba-test-natives-count
 	aseba-test-natives-count.cpp
 )
 target_link_libraries(aseba-test-natives-count asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
-install(TARGETS aseba-test-natives-count RUNTIME
-	DESTINATION bin
-)
 
 # set the number of test loops for the fuzzy test
 set(fuzzy_loop "500")
@@ -74,6 +78,7 @@ add_test(array-overwrite1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_C
 add_test(negation-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/negation-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/negation-optimisation.txt)
 add_test(division-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/division-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/division-optimisation.txt)
 add_test(if-not-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.txt)
+add_test(callsub-before-sub-decl ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/callsub-before-sub-decl.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --exec_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)
@@ -159,7 +164,7 @@ add_test(simulate-inconsistent-input4 ${CMAKE_CURRENT_SOURCE_DIR}/simulateuser.p
 # compiler should not crash
 find_program(zzuf_FOUND zzuf)
 if (zzuf_FOUND)
-	message("-- zzuf executable found: " ${zzuf_FOUND})
+	message(STATUS "zzuf executable found: " ${zzuf_FOUND})
 	add_test(fuzzy-basic-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt ${fuzzy_loop})
 	add_test(fuzzy-advanced-arithmetic ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/advanced-arithmetic.txt ${fuzzy_loop})
 	add_test(fuzzy-binary-op ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/binary-op.txt ${fuzzy_loop})
@@ -176,17 +181,17 @@ if (zzuf_FOUND)
 	add_test(fuzzy-comments ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/comments.txt ${fuzzy_loop})
 	add_test(fuzzy-subroutine ${CMAKE_CURRENT_SOURCE_DIR}/fuzzyinput.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/subroutine.txt ${fuzzy_loop})
 else (zzuf_FOUND)
-	message("-- zzuf executable not found! Disabling fuzzy tests")
+	message(WARNING "zzuf executable not found! Disabling fuzzy tests")
 endif (zzuf_FOUND)
 
 # use valgrind to test memory leaks inside the compiler
 find_program(valgrind_FOUND valgrind)
 if (valgrind_FOUND)
-	message("-- valgrind executable found: " ${valgrind_FOUND})
+	message(STATUS "valgrind executable found: " ${valgrind_FOUND})
 	# test all the .txt files inside the data directory
 	add_test(valgrind-compiler-all ${CMAKE_CURRENT_SOURCE_DIR}/valgrind.py ${CMAKE_CURRENT_BINARY_DIR}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/)
 else (valgrind_FOUND)
-	message("-- valgrind executable not found! Disabling memory leaks tests")
+	message(WARNING "valgrind executable not found! Disabling memory leaks tests")
 endif (valgrind_FOUND)
 
 # test asebahttp

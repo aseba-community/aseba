@@ -7,7 +7,4 @@ if (LIBXML2_FOUND)
 		shell.cpp
 	)
 	target_link_libraries(asebashell asebacompiler ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-	install(TARGETS asebashell RUNTIME
-		DESTINATION bin
-	)
 endif (LIBXML2_FOUND)

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <queue>
 #include <dashel/dashel.h>
-#include "../../common/msg/descriptions-manager.h"
+#include "common/msg/NodesManager.h"
 
 namespace Aseba
 {
@@ -33,7 +33,7 @@ namespace Aseba
 	*/
 	/*@{*/
 	
-	class BotSpeakBridge:  public Dashel::Hub, public Aseba::DescriptionsManager
+	class BotSpeakBridge:  public Dashel::Hub, public Aseba::NodesManager
 	{
 	protected:
 		typedef std::vector<std::string> StringVector;
@@ -106,11 +106,14 @@ namespace Aseba
 	public:
 		BotSpeakBridge(unsigned botSpeakPort, const char* asebaTarget);
 		
+		bool run1s();
+		
 	protected:
 		// reimplemented from parent classes
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal);
 		virtual void incomingData(Dashel::Stream *stream);
+		virtual void sendMessage(const Message& message);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 		
 		// main handlers for activites on streams

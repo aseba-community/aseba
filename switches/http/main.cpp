@@ -8,7 +8,7 @@
 
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -34,7 +34,7 @@
 #include "../../common/consts.h"
 #include "../../common/types.h"
 #include "../../common/utils/utils.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 
 //! Show usage
@@ -108,8 +108,12 @@ int main(int argc, char *argv[])
     {
         Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, 1000*Kiterations));
         
-        for (int i = 0; i < 500; i++)
-            network->step(10); // wait for description, variables, etc
+//        for (int i = 0; i < 500; i++)
+//            network->step(10); // wait for description, variables, etc
+        // ask for descriptions
+        network->pingNetwork();
+        network->run1s();
+        network->run1s();
 
         for (auto nodeId: network->allNodeIds())
         {
@@ -124,7 +128,10 @@ int main(int argc, char *argv[])
             }
         }
         
-        network->run();
+//        network->run();
+        do {
+            network->pingNetwork();
+        } while (network->run1s());
         delete network;
     }
     catch(Dashel::DashelException e)

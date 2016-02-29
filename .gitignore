@@ -1,6 +1,8 @@
 *~
 *.pyc
+._*
 .DS_Store
 .gitignore
 aseba.xcworkspace
 aseba.xcodeproj
+.directory

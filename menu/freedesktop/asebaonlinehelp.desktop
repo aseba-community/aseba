@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Aseba Online Help
+Name[fr]=Aide en ligne Aseba
+Name[de]=Aseba Hilfedatei
+Name[es]=Ayuda en línea Aseba
+Name[it]=L'aiuto in linea Aseba
+Name[pt]=ajuda on-line Aseba (Inglês)
+Exec=xdg-open http://www.thymio.org/en:start
+TryExec=xdg-open
+Categories=Education;Science;
+Icon=asebahelp

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -91,8 +91,12 @@ namespace Aseba
 		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return UnifiedTime(value / factor); }
 		//! Multiply time by an amount
 		UnifiedTime operator *(const long long unsigned factor) const { return UnifiedTime(value * factor); }
-		//! Time comparison
 		bool operator <(const UnifiedTime &that) const { return value < that.value; }
+		bool operator <=(const UnifiedTime &that) const { return value <= that.value; }
+		bool operator >(const UnifiedTime &that) const { return value > that.value; }
+		bool operator >=(const UnifiedTime &that) const { return value >= that.value; }
+		bool operator ==(const UnifiedTime &that) const { return value == that.value; }
+		bool operator !=(const UnifiedTime &that) const { return value != that.value; }
 		
 		//! Sleep for this amount of time
 		void sleep() const;

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -72,6 +72,7 @@ namespace Aseba { namespace ThymioVPL
 		void removeBlock(Block* block);
 		
 		bool isAnyAdvancedFeature() const;
+		bool hasSetStateAction() const;
 		bool isEmpty() const; 
 		
 		void setAdvanced(bool advanced);
@@ -138,8 +139,9 @@ namespace Aseba { namespace ThymioVPL
 		Block* event;
 		Block* stateFilter;
 		QList<Block*> actions;
-		int isBlinking; //!< show blink background
 		
+		QGraphicsItem* blinkGraphicsItem;
+		QTimer* clearBlinkTimer;
 		AddRemoveButton *deleteButton;
 		AddRemoveButton *addButton;
 		RemoveBlockButton *deleteBlockButton;

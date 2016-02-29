@@ -3,5 +3,5 @@ Type=Application
 Name=Thymio Firmware Upgrader
 Exec=thymioupgrader
 TryExec=thymioupgrader
-Categories=Education;Science
+Categories=Education;Science;
 Icon=thymioupgrader

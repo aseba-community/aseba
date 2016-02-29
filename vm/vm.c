@@ -422,7 +422,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			// check sp
 			#ifdef ASEBA_ASSERT
 			if (vm->sp < 1)
-				AsebaAssert(vm, ASEBA_ASSERT_STACK_OVERFLOW);
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
 			#endif
 			
 			// evaluate condition
@@ -494,6 +494,12 @@ void AsebaVMStep(AsebaVMState *vm)
 		{
 			uint16 dest = bytecode & 0x0fff;
 			
+			// check sp
+			#ifdef ASEBA_ASSERT
+			if (vm->sp + 1 >= vm->stackSize)
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_OVERFLOW);
+			#endif
+			
 			// store return value on stack
 			vm->stack[++vm->sp] = vm->pc + 1;
 			
@@ -505,6 +511,12 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Subroutine return
 		case ASEBA_BYTECODE_SUB_RET:
 		{
+			// check sp
+			#ifdef ASEBA_ASSERT
+			if (vm->sp < 0)
+				AsebaAssert(vm, ASEBA_ASSERT_STACK_UNDERFLOW);
+			#endif
+			
 			// do return
 			vm->pc = vm->stack[vm->sp--];
 		}
@@ -706,17 +718,42 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 	AsebaSendMessageWords(vm, ASEBA_MESSAGE_EXECUTION_STATE_CHANGED, buffer, 2);
 }
 
+/*! Reset all when flags in their default states in the bytecode */
+static void AsebaVMResetWhenFlags(AsebaVMState *vm)
+{
+	uint16 i;
+	for (i = 0; i < vm->bytecodeSize; i++)
+	{
+		uint16 bytecode = vm->bytecode[i];
+		if ((bytecode >> 12) == ASEBA_BYTECODE_CONDITIONAL_BRANCH)
+			BIT_CLR(vm->bytecode[i], ASEBA_IF_WAS_TRUE_BIT);
+	}
+}
+
 void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
 {
-	
 	// react to global presence
 	if (id == ASEBA_MESSAGE_GET_DESCRIPTION)
 	{
-		AsebaSendDescription(vm);
+		const uint16 protocolVersion = bswap16(data[0]);
+		// up to protocol version 4 included, target must answer to GetDescription
+		if (protocolVersion <= 4)
+			AsebaSendDescription(vm);
+		return;
+	}
+	// react to global list nodes
+	if (id == ASEBA_MESSAGE_LIST_NODES)
+	{
+		const uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
+		AsebaSendMessageWords(vm, ASEBA_MESSAGE_NODE_PRESENT, &protocolVersion, 1);
 		return;
 	}
 	
-	// check if we are the destination, return otherwise
+	// safety check to avoid memory trash in case of unknown messages with 0 length
+	if (dataLength == 0)
+		return;
+	
+	// assume we have a command message, check if we are the destination, return otherwise
 	if (bswap16(data[0]) != vm->nodeId)
 		return;
 
@@ -741,6 +778,9 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_RESET:
 		vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+		AsebaVMResetWhenFlags(vm);
+		if (AsebaVMResetCB)
+			AsebaVMResetCB(vm);
 		// try to setup event, if it fails, return the execution state anyway
 		if (AsebaVMSetupEvent(vm, ASEBA_EVENT_INIT) == 0)
 			AsebaVMSendExecutionStateChanged(vm);
@@ -749,7 +789,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		case ASEBA_MESSAGE_RUN:
 		AsebaMaskClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK);
 		AsebaVMSendExecutionStateChanged(vm);
-		if(AsebaVMRunCB)
+		if (AsebaVMRunCB)
 			AsebaVMRunCB(vm);
 		break;
 		
@@ -830,6 +870,10 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		AsebaPutVmToSleep(vm);
 		break;
 		
+		case ASEBA_MESSAGE_GET_NODE_DESCRIPTION:
+		AsebaSendDescription(vm);
+		break;
+		
 		default:
 		break;
 	}
@@ -847,7 +891,8 @@ uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* dat
 	{
 		// debug message
 		uint16 dest = bswap16(((const uint16*)data)[1]);
-		if (type == ASEBA_MESSAGE_GET_DESCRIPTION)
+		if ((type == ASEBA_MESSAGE_GET_DESCRIPTION) ||
+			(type == ASEBA_MESSAGE_LIST_NODES))
 			return 0;
 		
 		// check it is for us

@@ -1,12 +1,12 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2015:
+Copyright (C) 2007--2016:
 	
 	Stéphane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
 	original idea, architecture, core coder
 	
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	core coder, Windows maintainer
+	core coder, Windows maintainer (until 2015)
 	
 	Philippe Retornaz <philippe dot retornaz at epfl dot ch> [1]
 	coder, embedded integration
@@ -16,6 +16,9 @@ Copyright (C) 2007--2015:
 	
 	David James Sherman <david dot sherman at inria dot fr>
 	asebahttp, Scratch integration
+	
+	Fabian Hahn <fabian at hahn dot graphics> [1]
+	Blockly integration
 	
 	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [1]
 	VPL design - funded by Gebert Rüf Stiftung
@@ -32,7 +35,10 @@ Copyright (C) 2007--2015:
 	Ezio Somá <ezio dot soma at gmail dot com>
 	Italian translation
 	
-	Fanny Riedo <fanny dot riedo at epfl dot ch> [1]
+	Michael Bonani <michael dot bonani at mobsya dot org> [3]
+	French translation, packaging, testing
+	
+	Fanny Riedo <fanny dot riedo at mobsya dot org> [1] [3]
 	OS X maintainer
 	
 	Valentin Longchamp <valentin dot longchamp at epfl dot ch> [1]
@@ -48,7 +54,9 @@ Copyright (C) 2007--2015:
 	
 	[2] Autonomous Systems Lab (http://www.asl.ethz.ch)
 	ETHZ, Zurich (http://www.ethz.ch)
-	(as from September 2010)
+	(from September 2010 to June 2014)
+	
+	[3] Mobsya Association (http://www.mobsya.org)
 
 
 The user manual is fetched from the Wiki at http://aseba.wikidot.com,

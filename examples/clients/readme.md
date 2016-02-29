@@ -8,6 +8,16 @@ interfaces.
 
 Here is a short summary of the content:
 
+- cpp-qt-dbus
+
+    This is a C++/QT project showing how to interface with Aseba (medulla) using
+    D-Bus (QDBus). The class dbusinterface contains methods that establish the D-Bus
+    interface with an Aseba Network. An interface with Thymio II is shown in the 
+    main.cpp as an example, in which an Aseba script (ScriptDBusThymio.aesl) is
+    loaded on Thymio II and the user can then manage the Aseba variables/events. 
+    The project is compatible with QT4/QT5 and uses some C++11 functionalities.
+
+
 - cpp-shell
 
     This is a basic command-line shell done in pure C++, using Dashel and libxml2.

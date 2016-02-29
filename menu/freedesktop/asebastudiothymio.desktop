@@ -2,9 +2,17 @@
 Type=Application
 Name=Aseba Studio for Thymio
 Name[fr]=Aseba Studio pour Thymio
+Name[de]=Aseba Studio für Thymio
+Name[it]=Aseba Studio per Thymio
+Name[es]=Aseba Studio para Thymio
+Name[pt]=Aseba Studio para Thymio
 GenericName=Integrated Development Environment
 GenericName[fr]=Environnement de développement intégré
+GenericName[de]=Integrierte Entwicklungsumgebung
+GenericName[it]=Ambiente di sviluppo integrato
+GenericName[es]=Ambiente de desarrollo integrado
+GenericName[pt]=Ambiente de desenvolvimento integrado
 Exec=asebastudio "ser:name=Thymio-II" -ar
 TryExec=asebastudio
-Categories=Education;Science
-Icon=asebathymio
+Categories=Education;Science;
+Icon=asebastudiothymio

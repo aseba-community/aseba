@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -79,7 +79,7 @@ namespace Aseba
 		ts.tv_nsec = ((value % 1000) * 1000000);
 		nanosleep(&ts, 0);
 		#else // WIN32
-		assert(value < (1 << 32));
+		assert(value <= 4294967295);
 		Sleep((DWORD)value);
 		#endif // WIN32
 	}

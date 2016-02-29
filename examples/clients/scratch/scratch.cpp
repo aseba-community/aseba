@@ -96,8 +96,8 @@ namespace Aseba
             strings args;
             
             unsigned nodeId;
-            for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-                 descIt != nodesDescriptions.end(); ++descIt)
+            for (NodesMap::iterator descIt = nodes.begin();
+                 descIt != nodes.end(); ++descIt)
                 nodeId = descIt->first;
             
 //            // breathe temperature led to show polling

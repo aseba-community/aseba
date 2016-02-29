@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -79,7 +79,11 @@ namespace Aseba { namespace ThymioVPL
 			
 		protected:
 			void initEventToCodePosMap();
+			std::wstring indentText() const;
 			
+			void visitEndOfLine(unsigned currentBlock);
+			
+			void visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			void visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock);
 			
 			void visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock);
@@ -110,6 +114,7 @@ namespace Aseba { namespace ThymioVPL
 			bool useTimer;
 			bool useMicrophone;
 			bool useAccAngle;
+			bool inWhenBlock;
 			bool inIfBlock;
 		};
 		

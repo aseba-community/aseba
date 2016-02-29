@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -42,6 +42,23 @@ namespace Aseba
 
 	/** \addtogroup studio */
 	/*@{*/
+	
+	void handleDashelException(Dashel::DashelException e)
+	{
+		switch(e.source)
+		{
+		case Dashel::DashelException::ConnectionLost:
+		case Dashel::DashelException::IOError:
+			// "normal" disconnections, managed internally in Dashel::Hub, so don't care about
+			break;
+		case Dashel::DashelException::ConnectionFailed:
+			// should not happen here, but can because of typos in Dashel, catch it for now
+			break;
+		default:
+			QMessageBox::critical(NULL, QObject::tr("Unexpected Dashel Error"), QObject::tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
+			break;
+		}
+	}
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
@@ -261,6 +278,7 @@ namespace Aseba
 		
 		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
+		language = targetSelector.getLocaleName();
 		if (!commandLineTarget.isEmpty())
 		{
 			bool failed = false;
@@ -282,6 +300,7 @@ namespace Aseba
 			QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
 #endif
 		}
+		
 		// show connection dialog
 		while (true)
 		{
@@ -319,6 +338,7 @@ namespace Aseba
 			assert(stream == 0);
 			stream = Hub::connect(lastConnectedTarget);
 			unlock();
+			reset();
 		}
 		catch (DashelException e)
 		{
@@ -353,6 +373,7 @@ namespace Aseba
 	
 	void DashelInterface::incomingData(Stream *stream)
 	{
+		
 		Message *message = Message::receive(stream);
 		emit messageAvailable(message);
 	}
@@ -366,8 +387,33 @@ namespace Aseba
 		this->stream = 0;
 	}
 	
-	void SignalingDescriptionsManager::nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion)
+	void DashelInterface::sendMessage(const Message& message)
 	{
+		// this is called from the GUI thread through processMessage() or pingNetwork(), so we must lock the Hub before sending
+		lock();
+		if (stream)
+		{
+			try
+			{
+				message.serialize(stream);
+				stream->flush();
+				unlock();
+			}
+			catch(Dashel::DashelException e)
+			{
+				unlock();
+				handleDashelException(e);
+			}
+		}
+		else
+		{
+			unlock();
+		}
+	}
+	
+	void DashelInterface::nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion)
+	{
+		// show a different warning in function of the mismatch
 		if (protocolVersion > ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
@@ -384,9 +430,19 @@ namespace Aseba
 		}
 	}
 	
-	void SignalingDescriptionsManager::nodeDescriptionReceived(unsigned nodeId)
+	void DashelInterface::nodeDescriptionReceived(unsigned nodeId)
 	{
 		emit nodeDescriptionReceivedSignal(nodeId);
+	}
+	
+	void DashelInterface::nodeConnected(unsigned nodeId)
+	{
+		emit nodeConnectedSignal(nodeId);
+	}
+	
+	void DashelInterface::nodeDisconnected(unsigned nodeId)
+	{
+		emit nodeDisconnectedSignal(nodeId);
 	}
 	
 	
@@ -416,9 +472,12 @@ namespace Aseba
 		connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
 		
 		// we also connect to the description manager to know when we have a new node available
-		connect(&descriptionManager, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
+		connect(&dashelInterface, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
+		// note: queued connections are necessary to prevent multiple locking of Hub by the GUI thread
+		connect(&dashelInterface, SIGNAL(nodeConnectedSignal(unsigned)), SIGNAL(nodeConnected(unsigned)));
+		connect(&dashelInterface, SIGNAL(nodeDisconnectedSignal(unsigned)), SIGNAL(nodeDisconnected(unsigned)));
 		
-		messagesHandlersMap[ASEBA_MESSAGE_DISCONNECTED] = &Aseba::DashelTarget::receivedDisconnected;
+		// table for handling incoming messages
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
 		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
 		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
@@ -429,10 +488,15 @@ namespace Aseba
 		messagesHandlersMap[ASEBA_MESSAGE_BOOTLOADER_ACK] = &Aseba::DashelTarget::receivedBootloaderAck;
 
 		dashelInterface.start();
+		
+		// list nodes every 1s
+		connect(&listNodesTimer, SIGNAL(timeout()), SLOT(listNodes()));
+		listNodesTimer.start(1000);
 	}
 	
 	DashelTarget::~DashelTarget()
 	{
+		listNodesTimer.stop();
 		dashelInterface.stop();
 		dashelInterface.wait();
 		DashelTarget::disconnect();
@@ -450,7 +514,6 @@ namespace Aseba
 				// detach all nodes
 				for (NodesMap::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 				{
-					//DetachDebugger(node->first).serialize(dashelInterface.stream);
 					BreakpointClearAll(node->first).serialize(dashelInterface.stream);
 					Run(node->first).serialize(dashelInterface.stream);
 				}
@@ -477,28 +540,7 @@ namespace Aseba
 	
 	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
 	{
-		return descriptionManager.getDescription(node);
-	}
-	
-	void DashelTarget::broadcastGetDescription()
-	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
-		{
-			try
-			{
-				GetDescription().serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
-		}
-		else
-			dashelInterface.unlock();
+		return dashelInterface.getDescription(node);
 	}
 	
 	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
@@ -532,86 +574,38 @@ namespace Aseba
 	
 	void DashelTarget::writeBytecode(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				WriteBytecode(node).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			WriteBytecode writeBytecodeMessage(node);
+			dashelInterface.sendMessage(writeBytecodeMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::reboot(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				Reboot(node).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			Reboot rebootMessage(node);
+			dashelInterface.sendMessage(rebootMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				UserMessage(id, data).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			UserMessage userMessage(id, data);
+			dashelInterface.sendMessage(userMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				SetVariables(node, start, data).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			SetVariables setVariablesMessage(node, start, data);
+			dashelInterface.sendMessage(setVariablesMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
@@ -646,23 +640,11 @@ namespace Aseba
 	
 	void DashelTarget::reset(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				Reset(node).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			Reset resetMessage(node);
+			dashelInterface.sendMessage(resetMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::run(unsigned node)
@@ -693,73 +675,34 @@ namespace Aseba
 	
 	void DashelTarget::pause(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				Pause(node).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			Pause pauseMessage(node);
+			dashelInterface.sendMessage(pauseMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::next(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
 			NodesMap::iterator nodeIt = nodes.find(node);
 			assert(nodeIt != nodes.end());
 			
 			nodeIt->second.steppingInNext = WAITING_INITAL_PC;
 			
-			GetExecutionState getExecutionStateMessage;
-			getExecutionStateMessage.dest = node;
-			
-			try
-			{
-				getExecutionStateMessage.serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			GetExecutionState getExecutionStateMessage(node);
+			dashelInterface.sendMessage(getExecutionStateMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::stop(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			try
-			{
-				Stop(node).serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			Stop stopMessage(node);
+			dashelInterface.sendMessage(stopMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::setBreakpoint(unsigned node, unsigned line)
@@ -768,27 +711,11 @@ namespace Aseba
 		if (pc < 0)
 			return;
 		
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			BreakpointSet breakpointSetMessage;
-			breakpointSetMessage.pc = pc;
-			breakpointSetMessage.dest = node;
-			
-			try
-			{
-				breakpointSetMessage.serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			BreakpointSet breakpointSetMessage(node, pc);
+			dashelInterface.sendMessage(breakpointSetMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::clearBreakpoint(unsigned node, unsigned line)
@@ -797,51 +724,20 @@ namespace Aseba
 		if (pc < 0)
 			return;
 		
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			BreakpointClear breakpointClearMessage;
-			breakpointClearMessage.pc = pc;
-			breakpointClearMessage.dest = node;
-			
-			try
-			{
-				breakpointClearMessage.serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			BreakpointClear breakpointClearMessage(node, pc);
+			dashelInterface.sendMessage(breakpointClearMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::clearBreakpoints(unsigned node)
 	{
-		dashelInterface.lock();
-		if (dashelInterface.stream && !writeBlocked)
+		if (!writeBlocked)
 		{
-			BreakpointClearAll breakpointClearAllMessage;
-			breakpointClearAllMessage.dest = node;
-			
-			try
-			{
-				breakpointClearAllMessage.serialize(dashelInterface.stream);
-				dashelInterface.stream->flush();
-				dashelInterface.unlock();
-			}
-			catch(Dashel::DashelException e)
-			{
-				dashelInterface.unlock();
-				handleDashelException(e);
-			}
+			BreakpointClearAll breakpointClearAllMessage(node);
+			dashelInterface.sendMessage(breakpointClearAllMessage);
 		}
-		else
-			dashelInterface.unlock();
 	}
 	
 	void DashelTarget::blockWrite()
@@ -873,14 +769,21 @@ namespace Aseba
 		}
 	}
 	
+	//! regularly probe aseba network for new connections
+	void DashelTarget::listNodes()
+	{
+		dashelInterface.pingNetwork();
+	}
+	
 	void DashelTarget::messageFromDashel(Message *message)
 	{
 		bool deleteMessage = true;
 		//message->dump(std::cout);
 		//std::cout << std::endl;
 		
-		// let the description manager filter the message
-		descriptionManager.processMessage(message);
+		// let the nodes manager filter the message
+		if (!writeBlocked)
+			dashelInterface.processMessage(message);
 		
 		// see if we have a registered handler for this message
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
@@ -942,12 +845,11 @@ namespace Aseba
 		DashelInterface& dashelInterface;
 		unsigned counter;
 	};
-	
+
 	void DashelTarget::disconnectionFromDashel()
 	{
+		// tell user client the network was disconnected
 		emit networkDisconnected();
-		nodes.clear();
-		descriptionManager.reset();
 		
 		// show a dialog box that is trying to reconnect
 		ReconnectionDialog reconnectionDialog(dashelInterface);
@@ -960,13 +862,12 @@ namespace Aseba
 		
 		node.steppingInNext = NOT_IN_NEXT;
 		node.lineInNext = 0;
-		
-		emit nodeConnected(nodeId);
 	}
 	
 	void DashelTarget::receivedVariables(Message *message)
 	{
 		Variables *variables = polymorphic_downcast<Variables *>(message);
+		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 	
@@ -1125,13 +1026,6 @@ namespace Aseba
 		}
 	}
 	
-	void DashelTarget::receivedDisconnected(Message *message)
-	{
-		Disconnected *disconnected = polymorphic_downcast<Disconnected *>(message);
-		
-		emit nodeDisconnected(disconnected->source);
-	}
-	
 	void DashelTarget::receivedBreakpointSetResult(Message *message)
 	{
 		BreakpointSetResult *bsr = polymorphic_downcast<BreakpointSetResult *>(message);
@@ -1174,23 +1068,6 @@ namespace Aseba
 			return nodeIt->second.debugBytecode[pc].line;
 		
 		return -1;
-	}
-
-	void DashelTarget::handleDashelException(Dashel::DashelException e)
-	{
-		switch(e.source)
-		{
-		case Dashel::DashelException::ConnectionLost:
-		case Dashel::DashelException::IOError:
-			// "normal" disconnections, managed internally in Dashel::Hub, so don't care about
-			break;
-		case Dashel::DashelException::ConnectionFailed:
-			// should not happen here, but can because of typos in Dashel, catch it for now
-			break;
-		default:
-			QMessageBox::critical(NULL, tr("Unexpected Dashel Error"), tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
-			break;
-		}
 	}
 	
 	/*@}*/

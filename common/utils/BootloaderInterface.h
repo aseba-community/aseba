@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -58,6 +58,9 @@ namespace Aseba
 		//! Create an interface to bootloader with id dest using a socket
 		BootloaderInterface(Dashel::Stream* stream, int dest);
 		
+		//! Create an interface to bootloader with id dest and different id within bootloader bootloaderDest (currently only deployed for simple mode), using a socket
+		BootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
+		
 		//! Return the size of a page
 		int getPageSize() const { return pageSize; }
 		
@@ -99,7 +102,7 @@ namespace Aseba
 	protected:
 		// member variables
 		Dashel::Stream* stream;
-		int dest;
+		int dest, bootloaderDest;
 		unsigned pageSize;
 		unsigned pagesStart;
 		unsigned pagesCount;

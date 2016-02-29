@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -23,12 +23,15 @@
 
 #include "Target.h"
 #include "../../common/consts.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 #include <QString>
 #include <QDialog>
 #include <QQueue>
 #include <QTimer>
 #include <QThread>
+#include <QTime>
+#include <QMap>
+#include <QSet>
 #include <map>
 #include <dashel/dashel.h>
 
@@ -85,7 +88,7 @@ namespace Aseba
 	class Message;
 	class UserMessage;
 	
-	class DashelInterface: public QThread, public Dashel::Hub
+	class DashelInterface: public QThread, public Dashel::Hub, public NodesManager
 	{
 		Q_OBJECT
 		
@@ -106,6 +109,9 @@ namespace Aseba
 	signals:
 		void messageAvailable(Message *message);
 		void dashelDisconnection();
+		void nodeDescriptionReceivedSignal(unsigned nodeId);
+		void nodeConnectedSignal(unsigned nodeId);
+		void nodeDisconnectedSignal(unsigned nodeId);
 	
 	protected:
 		// from QThread
@@ -114,19 +120,15 @@ namespace Aseba
 		// from Dashel::Hub
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-	};
-	
-	//! Provides a signal/slot interface for the description manager
-	class SignalingDescriptionsManager: public QObject, public DescriptionsManager
-	{
-		Q_OBJECT
-	
-	signals:
-		void nodeDescriptionReceivedSignal(unsigned nodeId);
-	
-	protected:
-		virtual void nodeProtocolVersionMismatch(const std::wstring &nodeName, uint16 protocolVersion);
+		
+		// from NodesManager
+		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
+		virtual void nodeConnected(unsigned nodeId);
+		virtual void nodeDisconnected(unsigned nodeId);
+	public:
+		// from NodesManager, now as public as we want DashelTarget to call this method
+		virtual void sendMessage(const Message& message);
 	};
 	
 	class DashelTarget: public Target
@@ -154,9 +156,10 @@ namespace Aseba
 		MessagesHandlersMap messagesHandlersMap;
 		
 		QQueue<UserMessage *> userEventsQueue;
-		SignalingDescriptionsManager descriptionManager;
 		NodesMap nodes;
 		QTimer userEventsTimer;
+		// Note: this timer is here rather than in DashelInterface because writeBlocked is here, if wiretBlocked is removed, this timer should be moved
+		QTimer listNodesTimer;
 		bool writeBlocked; //!< true if write is being blocked by invasive plugins, false if write is allowed
 		
 	public:
@@ -170,8 +173,6 @@ namespace Aseba
 		virtual void disconnect();
 		
 		virtual const TargetDescription * const getDescription(unsigned node) const;
-		
-		virtual void broadcastGetDescription();
 		
 		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
 		virtual void writeBytecode(unsigned node);
@@ -198,6 +199,7 @@ namespace Aseba
 	
 	protected slots:
 		void updateUserEvents();
+		void listNodes();
 		void messageFromDashel(Message *message);
 		void disconnectionFromDashel();
 		void nodeDescriptionReceived(unsigned node);
@@ -206,7 +208,6 @@ namespace Aseba
 		void receivedDescription(Message *message);
 		void receivedLocalEventDescription(Message *message);
 		void receivedNativeFunctionDescription(Message *message);
-		void receivedDisconnected(Message *message);
 		void receivedVariables(Message *message);
 		void receivedArrayAccessOutOfBounds(Message *message);
 		void receivedDivisionByZero(Message *message);
@@ -220,9 +221,6 @@ namespace Aseba
 		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
 		int getPCFromLine(unsigned node, unsigned line);
 		int getLineFromPC(unsigned node, unsigned pc);
-
-	protected:
-		void handleDashelException(Dashel::DashelException e);
 	};
 	
 	/*@}*/

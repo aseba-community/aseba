@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -23,10 +23,15 @@
 
 #include <QtGui/QApplication>
 #include "mainwindow.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+	
+	// initialize Dashel plugins
+	Dashel::initPlugins();
+	
 	MainWindow w;
 	w.show();
 

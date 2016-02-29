@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -814,12 +814,11 @@ namespace Aseba
 		
 		expect(Token::TOKEN_STRING_LITERAL);
 		
-		const std::wstring& name = tokens.front().sValue;
-		const SubroutineReverseTable::const_iterator it(findSubroutine(name, pos));
+		const std::wstring name = tokens.front().sValue;
 		
 		tokens.pop_front();
 		
-		return new CallSubNode(pos, it->second);
+		return new CallSubNode(pos, name);
 	}
 	
 	//! Parse "or" grammar element.

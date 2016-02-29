@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -136,7 +136,6 @@ namespace Aseba
 
 	protected:
 		const int borderSize;
-		QRect breakpoint;
 	};
 	
 	enum LocalContext {
@@ -193,6 +192,7 @@ namespace Aseba
 		void insertCompletion(const QString &completion);
 
 	protected:
+		virtual void wheelEvent(QWheelEvent * event);
 		virtual void keyPressEvent(QKeyEvent * event);
 
 		virtual bool handleCompleter(QKeyEvent * event);

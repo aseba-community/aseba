@@ -176,7 +176,7 @@ namespace Aseba
         }
       
         // request a description for aseba target
-        broadcastGetDescription();
+        // broadcastGetDescription();
     }
     
     void HttpInterface::broadcastGetDescription()
@@ -258,6 +258,71 @@ namespace Aseba
         }
     }
     
+    bool HttpInterface::run1s()
+    {
+        int timeout(1000);
+        UnifiedTime startTime;
+        while (timeout > 0)
+        {
+            // special handling for HTTP streams
+            sendAvailableResponses();
+            if (verbose && streamsToShutdown.size() > 0)
+            {
+                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
+                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+                    cerr << " " << *si;
+                cerr << endl;
+            }
+            if (!streamsToShutdown.empty())
+            {
+                StreamSet::iterator i = streamsToShutdown.begin();
+                Dashel::Stream* stream_to_shutdown = *i;
+                streamsToShutdown.erase(*i); // invalidates iterator
+                try
+                {
+                    if (verbose)
+                        cerr << stream_to_shutdown << " shutting down stream" << endl;
+                    shutdownStream(stream_to_shutdown);
+                }
+                catch(Dashel::DashelException& e)
+                { }
+            }
+
+            // standard Aseba run loop
+            if (!step(timeout))
+                return false;
+            timeout -= (Aseba::UnifiedTime() - startTime).value;
+        }
+        return true;
+    }
+    
+    void HttpInterface::sendMessage(const Message& message)
+    {
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
+        {
+            // patch message source if target id is remapped
+            // but really, node id remapping should be handled closer to the dashel target
+            NodeIdSubstitution subs = targetToNodeIdSubstitutions[it->first];
+            const CmdMessage *cmdMsg(dynamic_cast<const CmdMessage *>(&message));
+            if (cmdMsg)
+            {
+                for (NodeIdSubstitution::iterator m = subs.begin(); m != subs.end(); ++m)
+                    if (m->first != m->second && m->second == cmdMsg->dest)
+                    {   // ugly hack to copy normally const message
+                        CmdMessage patched_message = *cmdMsg;
+                        patched_message.dest = m->first;
+                        patched_message.serialize(it->first);
+                        it->first->flush();
+                        return;
+                    }
+            }
+            
+            // serialize and send message
+            message.serialize(it->first);
+            it->first->flush();
+        }
+    }
+
     void HttpInterface::nodeDescriptionReceived(unsigned targetId)
     {
         if (!targetId) return;
@@ -277,11 +342,12 @@ namespace Aseba
             Message *message(Message::receive(stream));
             
             // rewrite message->source using targetToNodeIdSubstitutions
-            message->source = updateNodeId(stream, message->source);
+            unsigned newId = updateNodeId(stream, message->source);
+            message->source = newId;
             
             // pass message to description manager, which builds the node descriptions in background
             // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
-            DescriptionsManager::processMessage(message);
+            NodesManager::processMessage(message);
             
             // if description, record the stream -- node id correspondence
             const Description *description = dynamic_cast<const Description *>(message);
@@ -484,16 +550,16 @@ namespace Aseba
         std::stringstream json;
         json << (do_one_node ? "" : "["); // hack, should first select list of matching nodes, then check size
         
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-             descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
         {
-            const NodeDescription& description(descIt->second);
+            const Node& description(descIt->second);
             string nodeName = WStringToUTF8(description.name);
             unsigned nodeId = descIt->first;
             
             if (! do_one_node)
             {
-                json << (descIt == nodesDescriptions.begin() ? "" : ",");
+                json << (descIt == nodes.begin() ? "" : ",");
                 json << "{";
                 json << "\"node\":" << nodeId;
                 json << ",\"name\":\"" << nodeName << "\"";
@@ -713,8 +779,8 @@ namespace Aseba
     
     void HttpInterface::evReset(HttpRequest* req, strings& args)
     {
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-             descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
         {
             bool ok = true;
             // nodeId = getNodeId(descIt->second.name, 0, &ok);
@@ -928,8 +994,8 @@ namespace Aseba
     {
         std::vector<unsigned> found;
         // first, look for named nodes
-        for (NodesDescriptionsMap::iterator descIt = nodesDescriptions.begin();
-             descIt != nodesDescriptions.end(); ++descIt)
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
             if (descIt->second.name.find(UTF8ToWString(args[0])) == 0)
                 found.push_back(descIt->first);
         if (found.size() > 0)
@@ -1258,8 +1324,11 @@ namespace Aseba
     std::set<unsigned> HttpInterface::allNodeIds()
     {
         std::set<unsigned> nodeIds;
-        for(auto i: nodesDescriptions)
+        for(auto i: nodes)
             nodeIds.insert( i.first );
+        for(auto k: targetToNodeIdSubstitutions)
+            for(auto t: targetToNodeIdSubstitutions[k.first])
+                nodeIds.insert( t.second );
         return nodeIds;
     }
     

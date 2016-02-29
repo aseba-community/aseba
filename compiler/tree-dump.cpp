@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -156,7 +156,9 @@ namespace Aseba
 	
 	std::wstring CallSubNode::toWString() const
 	{
-		return WFormatableString(L"CallSub: %0").arg(subroutineId);
+		std::wstring s = L"CallSub: ";
+		s += subroutineName;
+		return s;
 	}
 
 	std::wstring BinaryArithmeticNode::toWString() const

@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -54,6 +54,8 @@ namespace Aseba
 		virtual unsigned getNodeId() const = 0;
 		//! Return the product ID of the node this plugin talks to
 		virtual unsigned getProductId() const = 0;
+		//! Set constants and global events
+		virtual void setCommonDefinitions(const CommonDefinitions& commonDefinitions) = 0;
 		//! Set the code of the editor from a sequence of elements (each can be multiple sloc) and highlight one of these elements
 		virtual void displayCode(const QList<QString>& code, int elementToHighlight) = 0;
 		//! Load code and runs it on the node

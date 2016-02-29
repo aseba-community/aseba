@@ -6,18 +6,20 @@ var LISTENER3 = 'dummynode-2';
 var CLOCK = 'dummynode-3';
 var CLOCK2 = 'dummynode-6';
 
-frisby.create('Verify no root endpoint')
-.get('http://localhost:3000/')
-.expectStatus(404)
-.toss();
+for (port of [3000,3001]) {
+    frisby.create('Verify no root endpoint')
+    .get('http://localhost:' + port + '/')
+    .expectStatus(404)
+    .toss();
 
-frisby.create('Get an initial list of nodes')
-.get('http://localhost:3000/nodes')
-.expectStatus(200)
-.expectHeader('Content-Type', 'application/json')
-.expectJSONTypes('*', { name: String, protocolVersion: Number })
-.expectJSONLength(4)
-.toss();
+    frisby.create('Get an initial list of nodes')
+    .get('http://localhost:' + port + '/nodes')
+    .expectStatus(200)
+    .expectHeader('Content-Type', 'application/json')
+    .expectJSONTypes('*', { name: String, protocolVersion: Number })
+    .expectJSONLength(4)
+    .toss();
+}
 
 for (node of [1,CLOCK]) {
     frisby.create('Get node description for ' + node)

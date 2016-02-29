@@ -9,6 +9,7 @@
 
 class QVBoxLayout;
 class QHBoxLayout;
+class QLabel;
 class QProgressBar;
 class QPushButton;
 class QLineEdit;
@@ -20,12 +21,14 @@ namespace Aseba
 	/** \addtogroup thymioupdater */
 	/*@{*/
 	
+	class MessageHub;
+	
 	class QtBootloaderInterface:public QObject, public BootloaderInterface
 	{
 		Q_OBJECT
 		
 	public:
-		QtBootloaderInterface(Dashel::Stream* stream, int dest);
+		QtBootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
 		
 	protected:
 		virtual void writeHexGotDescription(unsigned pagesCount);
@@ -62,9 +65,12 @@ namespace Aseba
 		
 	private:
 		std::string target;
+		
 		QVBoxLayout* mainLayout;
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
+		QLabel* firmwareVersion;
+		QLabel* nodeIdText;
 		QLineEdit* lineEdit;
 		QPushButton* fileButton;
 		QProgressBar* progressBar;
@@ -78,6 +84,8 @@ namespace Aseba
 		~ThymioUpgraderDialog();
 		
 	private:
+		unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
+		void readIdVersion();
 		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
 	
 	private slots:

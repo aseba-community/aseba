@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -32,7 +32,8 @@
 #include <libxml/tree.h>
 
 #include "shell.h"
-#include "../../../common/utils/utils.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 using namespace std;
 using namespace Dashel;
@@ -46,11 +47,6 @@ Shell::Shell(const char* target):
 	// connect to the Aseba target
 	targetStream(connect(target))
 {
-	// request a description of the target
-	GetDescription getDescription;
-	getDescription.serialize(targetStream);
-	targetStream->flush();
-	
 	// first prompt
 	wcerr << "> ";
 }
@@ -58,6 +54,25 @@ Shell::Shell(const char* target):
 bool Shell::isValid() const
 {
 	return shellStream && targetStream;
+}
+
+bool Shell::run1s()
+{
+	int timeout(1000);
+	UnifiedTime startTime;
+	while (timeout > 0)
+	{
+		if (!step(timeout))
+			return false;
+		timeout -= (Aseba::UnifiedTime() - startTime).value;
+	}
+	return true;
+}
+
+void Shell::sendMessage(const Message& message)
+{
+	message.serialize(targetStream);
+	targetStream->flush();
 }
 
 void Shell::nodeDescriptionReceived(unsigned nodeId)
@@ -96,7 +111,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 
 	// pass message to description manager, which builds
 	// the node descriptions in background
-	DescriptionsManager::processMessage(message);
+	NodesManager::processMessage(message);
 	
 	// if variables, print
 	const Variables *variables(dynamic_cast<Variables *>(message));
@@ -225,7 +240,7 @@ void Shell::processShellCmd()
 
 void Shell::listNodes()
 {
-	for (NodesDescriptionsMap::const_iterator it(nodesDescriptions.begin()); it != nodesDescriptions.end(); ++it)
+	for (NodesMap::const_iterator it(nodes.begin()); it != nodes.end(); ++it)
 		wcerr << (it->second).name << endl;
 }
 
@@ -648,6 +663,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
+	// initialize Dashel plugins
+	Dashel::initPlugins();
+	
 	// create the shell
 	Shell shell(argv[1]);
 	// check whether connection was successful
@@ -658,7 +676,9 @@ int main(int argc, char *argv[])
 	}
 	
 	// run the Dashel Hub
-	shell.Hub::run();
+	do {
+		shell.pingNetwork();
+	} while (shell.run1s());
 	
 	return 0;
 }

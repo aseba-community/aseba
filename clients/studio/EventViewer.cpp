@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -228,8 +228,9 @@ namespace Aseba
 	void EventViewer::saveToFile()
 	{
 		QSettings settings;
-		QString lastFileName(settings.value("EventViewer/exportFileName", "").toString());
-		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		QString lastFileName(settings.value("EventViewer/exportFileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString());
+		QString filter = "Text files (*.txt);;CSV files (*.csv);;All Files (*)";
+		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, filter);
 		
 		QFile file(fileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))

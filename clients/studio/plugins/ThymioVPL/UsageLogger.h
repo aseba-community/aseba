@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -21,7 +21,10 @@
 #ifndef VPL_USAGE_LOGGER_H
 #define VPL_USAGE_LOGGER_H
 
-#ifdef PROTOBUF_FOUND
+#ifdef PROTOBUF_FOUND 
+
+#include <google/protobuf/stubs/common.h>
+
 #define USAGE_LOG(x) UsageLogger::getLogger().x
 #define ENABLE_USAGE_LOG() Aseba::ThymioVPL::UsageLogger::setLoggingState(true)
 
@@ -41,7 +44,7 @@
 #include "Scene.h"
 #include "Buttons.h"
 #include "../../../../compiler/compiler.h"
-#include "UsageProfile.pb.h"
+#include <UsageProfile.pb.h>
 #include "LogSignalMapper.h"
 
 
@@ -119,8 +122,10 @@ protected:
 }}
 
 #else /*PROTOBUF_FOUND*/
+
 #define USAGE_LOG(x) 
 #define ENABLE_USAGE_LOG() 
+
 #endif
 
 #endif // VPL_USAGE_LOGGER_H

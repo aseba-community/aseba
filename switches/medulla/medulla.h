@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -31,7 +31,7 @@
 #include <QMetaType>
 #include <QList>
 #include "../../common/msg/msg.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 
 typedef QList<qint16> Values;
 
@@ -76,7 +76,7 @@ namespace Aseba
 	};
 	
 	//! DBus interface for aseba network
-	class AsebaNetworkInterface: public QDBusAbstractAdaptor, public DescriptionsManager
+	class AsebaNetworkInterface: public QDBusAbstractAdaptor, public NodesManager
 	{
 		Q_OBJECT
 		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.AsebaNetwork")
@@ -94,7 +94,7 @@ namespace Aseba
 		
 		private slots:
 			friend class Hub;
-			void processMessage(Message *message, Dashel::Stream* sourceStream);
+			void processMessage(Message *message, const Dashel::Stream* sourceStream);
 			friend class EventFilterInterface;
 			void sendEventOnDBus(const quint16 event, const Values& data);
 			void listenEvent(EventFilterInterface* filter, quint16 event);
@@ -105,14 +105,18 @@ namespace Aseba
 			Q_NOREPLY void LoadScripts(const QString& fileName, const QDBusMessage &message);
 			QStringList GetNodesList() const;
 			qint16 GetNodeId(const QString& node, const QDBusMessage &message) const;
+			QString GetNodeName(const quint16 nodeId, const QDBusMessage &message) const;
+			bool IsConnected(const QString& node, const QDBusMessage &message) const;
 			QStringList GetVariablesList(const QString& node) const;
 			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
 			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);
 			Q_NOREPLY void SendEvent(const quint16 event, const Values& data);
 			Q_NOREPLY void SendEventName(const QString& name, const Values& data, const QDBusMessage &message);
 			QDBusObjectPath CreateEventFilter();
+			void PingNetwork();
 		
 		protected:
+			virtual void sendMessage(const Message& message);
 			virtual void nodeDescriptionReceived(unsigned nodeId);
 			QDBusConnection DBusConnectionBus() const;
 			
@@ -157,22 +161,15 @@ namespace Aseba
 				@param message aseba message to send
 				@param sourceStream originate of the message, if from Dashel.
 			*/
-			void sendMessage(Message *message, Dashel::Stream* sourceStream = 0);
+			void sendMessage(const Message *message, const Dashel::Stream* sourceStream = 0);
 			/*! Sends a message to Dashel peers.
 				Convenience overload
 			*/
-			void sendMessage(Message& message, Dashel::Stream* sourceStream = 0);
+			void sendMessage(const Message& message, const Dashel::Stream* sourceStream = 0);
 			
 		signals:
-			void firstConnectionCreated();
-			void messageAvailable(Message *message, Dashel::Stream* sourceStream);
+			void messageAvailable(Message *message, const Dashel::Stream* sourceStream);
 		
-		protected slots:
-			//! If no description has been previously requested, requests one in 200 ms
-			void firstConnectionAvailable();
-			//! Timer has elapsed, request a description
-			void requestDescription();
-			
 		private:
 			virtual void run();
 			virtual void connectionCreated(Dashel::Stream *stream);

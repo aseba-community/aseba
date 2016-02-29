@@ -1,7 +1,5 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-find_package(Qt4)
-
 set(DOC_NAME aseba-doc)
 
 # file(TO_NATIVE_PATH ...) is broken with MSYS generator 
@@ -16,26 +14,28 @@ MACRO(MAKE_WINDOWS_PATH pathname)
 	SET(${pathname} \"${${pathname}}\")
 ENDMACRO(MAKE_WINDOWS_PATH)
 
+# link for Studio
+set(ADDITIONAL_LIBRARIES "")
+
 # Google protobuf
-find_path(PROTOBUF_INCLUDE_DIR google/protobuf/stubs/common.h)
-find_library(PROTOBUF_LIBRARY protobuf)
-if (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
-	set(PROTOBUF_FOUND 1)
+find_package(Protobuf)
+if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 	add_definitions(-DPROTOBUF_FOUND)
 	include_directories(${PROTOBUF_INCLUDE_DIR})
-	set(ASEBA_CORE_LIBRARIES ${ASEBA_CORE_LIBRARIES} ${PROTOBUF_LIBRARY})
-	message(STATUS "Google Protobuf found")
-else (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
-	message(STATUS "Google Protobuf *not* found, usage logging disabled.") 
-endif (PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY)
+	set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${PROTOBUF_LIBRARY})
+	message(STATUS "Google Protobuf library and compiler found, enabling usage logging")
+else (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
+	message(STATUS "Google Protobuf library and compiler *not* found, usage logging disabled.") 
+endif (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 
-if (QT4_FOUND)
+if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 	set(QT_USE_QTXML ON)
 	set(QT_USE_QTNETWORK ON)
 	set(QT_USE_QTMAIN ON)
 	set(QT_USE_QTHELP ON)
 	set(QT_USE_QTCONCURRENT ON)
 	set(QT_USE_QTSVG ON)
+	set(QT_USE_QTWEBKIT ON)
 	include(${QT_USE_FILE})
 
 	# add a console for debug messages under Windows
@@ -43,13 +43,10 @@ if (QT4_FOUND)
 		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-Wl,-subsystem,console ${CMAKE_EXE_LINKER_FLAGS}")
 	endif (WIN32)
 	
-	find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
-	find_library(QWT_LIBRARIES qwt-qt4)
-	
 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt found")
 		include_directories (${QWT_INCLUDE_DIR})
-		set(ASEBA_CORE_LIBRARIES ${ASEBA_CORE_LIBRARIES} ${QWT_LIBRARIES})
+		set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${QWT_LIBRARIES})
 		add_definitions(-DHAVE_QWT)
 	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt not found")
@@ -57,14 +54,21 @@ if (QT4_FOUND)
 
 	# generates the documentation
 	if (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-		message("-- qcollectiongenerator executable found")
+		message(STATUS "qcollectiongenerator executable found")
+		# Use PATH instead of DIRECTORY on next line to support CMake < 2.8.11
+		get_filename_component(QT_QCOLLECTIONGENERATOR_DIRECTORY ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} PATH)
+		get_filename_component(QT_QCOLLECTIONGENERATOR_EXT ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} EXT)
+		set(QT_QHELPGENERATOR_EXECUTABLE "${QT_QCOLLECTIONGENERATOR_DIRECTORY}/qhelpgenerator${QT_QCOLLECTIONGENERATOR_EXT}")
 		add_custom_command(
-			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhc ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qch
+			OUTPUT ${DOC_NAME}.qch
+			COMMAND ${QT_QHELPGENERATOR_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp -o ${CMAKE_CURRENT_BINARY_DIR}/${DOC_NAME}.qch
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+		add_custom_command(
+			OUTPUT ${DOC_NAME}.qhc
 			COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} ARGS ${DOC_NAME}.qhcp -o ${DOC_NAME}.qhc
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhcp ${CMAKE_CURRENT_SOURCE_DIR}/${DOC_NAME}.qhp)
+			DEPENDS ${DOC_NAME}.qhcp ${DOC_NAME}.qch)
 	else (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-		message(WARNING "-- Qt help support missing, studio online help disabled (hint: on Ubuntu, install package qt4-dev-tools)")
+		message(WARNING "Qt help support missing, studio online help disabled (hint: on Ubuntu, install package qt4-dev-tools)")
 	endif (QT_QTHELP_FOUND AND QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	
 	# code common to the use of Aseba under Qt
@@ -124,7 +128,8 @@ if (QT4_FOUND)
 		)
 
 		if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
-			qt4_add_resources(resfiles asebastudiohelp.qrc)
+			file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/asebastudiohelp.qrc ${CMAKE_CURRENT_SOURCE_DIR}/aseba-doc.qhcp DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+			qt4_add_resources(resfiles ${CMAKE_CURRENT_BINARY_DIR}/asebastudiohelp.qrc)
 		endif (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 
 		add_executable(asebastudio WIN32 ${studio_SRCS} ${studio_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
@@ -132,12 +137,13 @@ if (QT4_FOUND)
 			add_dependencies(asebastudio versionheader)
 		endif (HAS_DYN_VERSION)
 
-		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 		
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif (QT_QTHELP_FOUND)
 	
 	# Thymio VPL standalone
+	include_directories(${CMAKE_CURRENT_BINARY_DIR}/plugins/ThymioVPL)
 	set(thymiovpl_SRCS
 		ThymioVPLStandalone.cpp
 		thymiovpl.cpp
@@ -155,14 +161,14 @@ if (QT4_FOUND)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
 	
-	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 	
 	# Render blocks helper
 	set(rendervplblocks_SRCS
 		rendervplblocks.cpp
 	)
 	add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon  ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-endif (QT4_FOUND)
+endif (QT4_FOUND AND QT_QTWEBKIT_FOUND)

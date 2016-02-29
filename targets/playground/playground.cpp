@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
 	QDomElement procssE(domDocument.documentElement().firstChildElement("process"));
 	while (!procssE.isNull())
 	{
-		const QString &command(procssE.attribute("command"));
+		QString command(procssE.attribute("command"));
 		// create process
 		processes.push_back(new QProcess());
 		processes.back()->setProcessChannelMode(QProcess::MergedChannels);
@@ -307,16 +307,27 @@ int main(int argc, char *argv[])
 		QObject::connect(processes.back(), SIGNAL(error(QProcess::ProcessError)), &viewer, SLOT(processError(QProcess::ProcessError)));
 		QObject::connect(processes.back(), SIGNAL(readyReadStandardOutput()), &viewer, SLOT(processReadyRead()));
 		QObject::connect(processes.back(), SIGNAL(finished(int, QProcess::ExitStatus)), &viewer, SLOT(processFinished(int, QProcess::ExitStatus)));
-		// start the process
+		// check whether it is a relative command
+		bool isRelative(false);
 		if (!command.isEmpty() && command[0] == ':')
 		{
-			// relative to the application directory
-			processes.back()->start(QCoreApplication::applicationDirPath()+'/'+command.mid(1), QIODevice::ReadOnly);
+			isRelative = true;
+			command = command.mid(1);
+		}
+		// process the command into its components
+		QStringList args(command.split(" ", QString::SkipEmptyParts));
+		if (args.size() == 0)
+		{
+			viewer.log("Missing program in command", Qt::red);
 		}
 		else
 		{
-			// normal command line
-			processes.back()->start(command, QIODevice::ReadOnly);
+			const QString program(QDir::toNativeSeparators(args[0]));
+			args.pop_front();
+			if (isRelative)
+				processes.back()->start(QCoreApplication::applicationDirPath() + QDir::separator() + program, args, QIODevice::ReadOnly);
+			else
+				processes.back()->start(program, args, QIODevice::ReadOnly);
 		}
 		procssE = procssE.nextSiblingElement("process");
 	}

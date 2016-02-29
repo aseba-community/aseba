@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -25,8 +25,8 @@
 #include <functional>
 #include <cstdlib>
 #include "botspeak.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 namespace Aseba
 {
@@ -215,6 +215,19 @@ namespace Aseba
 		asebaStream->flush();
 	}
 	
+	bool BotSpeakBridge::run1s()
+	{
+		int timeout(1000);
+		UnifiedTime startTime;
+		while (timeout > 0)
+		{
+			if (!step(timeout))
+				return false;
+			timeout -= (Aseba::UnifiedTime() - startTime).value;
+		}
+		return true;
+	}
+	
 	void BotSpeakBridge::connectionCreated(Dashel::Stream *stream)
 	{
 		if (!asebaStream)
@@ -250,6 +263,12 @@ namespace Aseba
 		}
 		else
 			abort();
+	}
+	
+	void BotSpeakBridge::sendMessage(const Message& message)
+	{
+		message.serialize(asebaStream);
+		asebaStream->flush();
 	}
 	
 	void BotSpeakBridge::nodeDescriptionReceived(unsigned nodeId)
@@ -290,7 +309,7 @@ namespace Aseba
 		
 		// pass message to description manager, which builds
 		// the node descriptions in background
-		DescriptionsManager::processMessage(message);
+		NodesManager::processMessage(message);
 		
 		// if variables, check for pending requests
 		const Variables *variables(dynamic_cast<Variables *>(message));
@@ -765,7 +784,7 @@ namespace Aseba
 		assert(variablesMap.find(varName) == variablesMap.end());
 		// check for freeVariableIndex overflow
 		const unsigned requiredSize(freeVariableIndex+varSize);
-		const unsigned variablesSize(nodesDescriptions.at(nodeId).variablesSize);
+		const unsigned variablesSize(nodes.at(nodeId).variablesSize);
 		if (requiredSize > variablesSize)
 			throw runtime_error(WStringToUTF8(WFormatableString(L"Error, not enough space in target for variable %0 of size %1: requiring %2 words, only %3 available").arg(varName).arg(varSize).arg(requiredSize).arg(variablesSize)));
 		// ok, allocate variable
@@ -875,7 +894,14 @@ int main(int argc, char *argv[])
 	try
 	{
 		Aseba::BotSpeakBridge bridge(botSpeakPort, argv[1]);
-		bridge.run();
+		while (true)
+		{
+			// ping the network
+			bridge.pingNetwork();
+			// wait 1s
+			if (!bridge.run1s())
+				break;
+		}
 	}
 	catch(Dashel::DashelException e)
 	{

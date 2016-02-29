@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -44,6 +44,13 @@ namespace Aseba
 			registerMessageType<BootloaderDataRead>(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ);
 			registerMessageType<BootloaderAck>(ASEBA_MESSAGE_BOOTLOADER_ACK);
 			
+			registerMessageType<ListNodes>(ASEBA_MESSAGE_LIST_NODES);
+			
+			registerMessageType<NodePresent>(ASEBA_MESSAGE_NODE_PRESENT);
+			
+			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
+			registerMessageType<GetNodeDescription>(ASEBA_MESSAGE_GET_NODE_DESCRIPTION);
+			
 			registerMessageType<Description>(ASEBA_MESSAGE_DESCRIPTION);
 			registerMessageType<NamedVariableDescription>(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION);
 			registerMessageType<LocalEventDescription>(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION);
@@ -57,15 +64,11 @@ namespace Aseba
 			registerMessageType<ExecutionStateChanged>(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED);
 			registerMessageType<BreakpointSetResult>(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT);
 			
-			registerMessageType<GetDescription>(ASEBA_MESSAGE_GET_DESCRIPTION);
-			
 			registerMessageType<BootloaderReset>(ASEBA_MESSAGE_BOOTLOADER_RESET);
 			registerMessageType<BootloaderReadPage>(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE);
 			registerMessageType<BootloaderWritePage>(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE);
 			registerMessageType<BootloaderPageDataWrite>(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE);
 			
-			//registerMessageType<AttachDebugger>(ASEBA_MESSAGE_ATTACH_DEBUGGER);
-			//registerMessageType<DetachDebugger>(ASEBA_MESSAGE_DETACH_DEBUGGER);
 			registerMessageType<SetBytecode>(ASEBA_MESSAGE_SET_BYTECODE);
 			registerMessageType<Reset>(ASEBA_MESSAGE_RESET);
 			registerMessageType<Run>(ASEBA_MESSAGE_RUN);
@@ -125,8 +128,7 @@ namespace Aseba
 	
 	Message::Message(uint16 type) :
 		source(ASEBA_DEST_DEBUG),
-		type(type),
-		readPos(0)
+		type(type)
 	{
 	}
 	
@@ -135,11 +137,11 @@ namespace Aseba
 	
 	}
 	
-	void Message::serialize(Stream* stream)
+	void Message::serialize(Stream* stream) const
 	{
-		rawData.resize(0);
-		serializeSpecific();
-		uint16 len = static_cast<uint16>(rawData.size());
+		SerializationBuffer buffer;
+		serializeSpecific(buffer);
+		uint16 len = static_cast<uint16>(buffer.rawData.size());
 		
 		if (len > ASEBA_MAX_EVENT_ARG_SIZE)
 		{
@@ -155,8 +157,8 @@ namespace Aseba
 		stream->write(&t, 2);
 		t = swapEndianCopy(type);
 		stream->write(&t, 2);
-		if(rawData.size())
-			stream->write(&rawData[0], rawData.size());
+		if (buffer.rawData.size())
+			stream->write(&buffer.rawData[0], buffer.rawData.size());
 	}
 	
 	Message *Message::receive(Stream* stream)
@@ -176,19 +178,19 @@ namespace Aseba
 		// preapare message
 		message->source = source;
 		message->type = type;
-		message->rawData.resize(len);
+		SerializationBuffer buffer;
+		buffer.rawData.resize(len);
 		if (len)
-			stream->read(&message->rawData[0], len);
-		message->readPos = 0;
+			stream->read(&buffer.rawData[0], len);
 		
 		// deserialize it
-		message->deserializeSpecific();
+		message->deserializeSpecific(buffer);
 		
-		if (message->readPos != message->rawData.size())
+		if (buffer.readPos != buffer.rawData.size())
 		{
 			cerr << "Message::receive() : fatal error: message not fully read.\n";
-			cerr << "type: " << type << ", readPos: " << message->readPos << ", rawData size: " << message->rawData.size() << endl;
-			message->dumpBuffer(wcerr);
+			cerr << "type: " << type << ", readPos: " << buffer.readPos << ", rawData size: " << buffer.rawData.size() << endl;
+			buffer.dump(wcerr);
 			abort();
 		}
 		
@@ -203,15 +205,8 @@ namespace Aseba
 		dumpSpecific(stream);
 	}
 	
-	void Message::dumpBuffer(std::wostream &stream) const
-	{
-		for (size_t i = 0; i < rawData.size(); ++i)
-			stream << (unsigned)(rawData[i]) << " (" << rawData[i] << "), ";
-		stream << endl;
-	}
-	
 	template<typename T>
-	void Message::add(const T& val)
+	void Message::SerializationBuffer::add(const T& val)
 	{
 		size_t pos = rawData.size();
 		rawData.reserve(pos + sizeof(T));
@@ -223,14 +218,14 @@ namespace Aseba
 	}
 	
 	template<>
-	void Message::add(const string& val)
+	void Message::SerializationBuffer::add(const string& val)
 	{
 		if (val.length() > 255)
 		{
-			cerr << "Message::add<string>() : fatal error, string length exceeds 255 characters.\n";
+			cerr << "Message::SerializationBuffer::add<string>() : fatal error, string length exceeds 255 characters.\n";
 			cerr << "string size: " << val.length();
 			cerr << endl;
-			dumpBuffer(wcerr);
+			dump(wcerr);
 			abort();
 		}
 		
@@ -240,14 +235,14 @@ namespace Aseba
 	}
 	
 	template<typename T>
-	T Message::get()
+	T Message::SerializationBuffer::get()
 	{
 		if (readPos + sizeof(T) > rawData.size())
 		{
-			cerr << "Message<" << typeid(T).name() << ">::get() : fatal error: attempt to overread.\n";
-			cerr << "type: " << type << ", readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
+			cerr << "Message::SerializationBuffer::get<" << typeid(T).name() << ">() : fatal error: attempt to overread.\n";
+			cerr << "readPos: " << readPos << ", rawData size: " << rawData.size() << ", element size: " << sizeof(T);
 			cerr << endl;
-			dumpBuffer(wcerr);
+			dump(wcerr);
 			abort();
 		}
 		
@@ -261,7 +256,7 @@ namespace Aseba
 	}
 	
 	template<>
-	string Message::get()
+	string Message::SerializationBuffer::get()
 	{
 		string s;
 		size_t len = get<uint8>();
@@ -269,6 +264,13 @@ namespace Aseba
 		for (size_t i = 0; i < len; i++)
 			s[i] = get<uint8>();
 		return s;
+	}
+	
+	void Message::SerializationBuffer::dump(std::wostream &stream) const
+	{
+		for (size_t i = 0; i < rawData.size(); ++i)
+			stream << (unsigned)(rawData[i]) << " (" << rawData[i] << "), ";
+		stream << endl;
 	}
 	
 	//
@@ -280,25 +282,25 @@ namespace Aseba
 		copy(data, data+length, this->data.begin());
 	}
 	
-	void UserMessage::serializeSpecific()
+	void UserMessage::serializeSpecific(SerializationBuffer& buffer) const
 	{
 		for (size_t i = 0; i < data.size(); i++)
-			add(data[i]);
+			buffer.add(data[i]);
 	}
 	
-	void UserMessage::deserializeSpecific()
+	void UserMessage::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		if (rawData.size() % 2 != 0)
+		if (buffer.rawData.size() % 2 != 0)
 		{
-			cerr << "UserMessage::deserializeSpecific() : fatal error: odd size.\n";
-			cerr << "message size: " << rawData.size() << ", message type: " << type;
+			cerr << "UserMessage::deserializeSpecific(SerializationBuffer& buffer) : fatal error: odd size.\n";
+			cerr << "message size: " << buffer.rawData.size() << ", message type: " << type;
 			cerr << endl;
 			abort();
 		}
-		data.resize(rawData.size() / 2);
+		data.resize(buffer.rawData.size() / 2);
 		
 		for (size_t i = 0; i < data.size(); i++)
-			data[i] = get<sint16>();
+			data[i] = buffer.get<sint16>();
 	}
 	
 	void UserMessage::dumpSpecific(wostream &stream) const
@@ -311,18 +313,35 @@ namespace Aseba
 	
 	//
 	
-	void BootloaderDescription::serializeSpecific()
+	void CmdMessage::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pageSize);
-		add(pagesStart);
-		add(pagesCount);
+		buffer.add(dest);
 	}
 	
-	void BootloaderDescription::deserializeSpecific()
+	void CmdMessage::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pageSize = get<uint16>();
-		pagesStart = get<uint16>();
-		pagesCount = get<uint16>();
+		dest = buffer.get<uint16>();
+	}
+	
+	void CmdMessage::dumpSpecific(wostream &stream) const
+	{
+		stream << "dest " << dest << " ";
+	}
+	
+	//
+	
+	void BootloaderDescription::serializeSpecific(SerializationBuffer& buffer) const
+	{
+		buffer.add(pageSize);
+		buffer.add(pagesStart);
+		buffer.add(pagesCount);
+	}
+	
+	void BootloaderDescription::deserializeSpecific(SerializationBuffer& buffer)
+	{
+		pageSize = buffer.get<uint16>();
+		pagesStart = buffer.get<uint16>();
+		pagesCount = buffer.get<uint16>();
 	}
 	
 	void BootloaderDescription::dumpSpecific(wostream &stream) const
@@ -333,16 +352,16 @@ namespace Aseba
 	
 	//
 	
-	void BootloaderDataRead::serializeSpecific()
+	void BootloaderDataRead::serializeSpecific(SerializationBuffer& buffer) const
 	{
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			add(data[i]);
+			buffer.add(data[i]);
 	}
 	
-	void BootloaderDataRead::deserializeSpecific()
+	void BootloaderDataRead::deserializeSpecific(SerializationBuffer& buffer)
 	{
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			data[i] = get<uint8>();
+			data[i] = buffer.get<uint8>();
 	}
 	
 	void BootloaderDataRead::dumpSpecific(wostream &stream) const
@@ -355,18 +374,18 @@ namespace Aseba
 	
 	//
 	
-	void BootloaderAck::serializeSpecific()
+	void BootloaderAck::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(errorCode);
+		buffer.add(errorCode);
 		if (errorCode == 2)
-			add(errorAddress);
+			buffer.add(errorAddress);
 	}
 	
-	void BootloaderAck::deserializeSpecific()
+	void BootloaderAck::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		errorCode = get<uint16>();
+		errorCode = buffer.get<uint16>();
 		if (errorCode == 2)
-			errorAddress = get<uint16>();
+			errorAddress = buffer.get<uint16>();
 	}
 	
 	void BootloaderAck::dumpSpecific(wostream &stream) const
@@ -384,14 +403,48 @@ namespace Aseba
 	
 	//
 	
-	void GetDescription::serializeSpecific()
+	void ListNodes::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(version);
+		buffer.add(version);
 	}
 	
-	void GetDescription::deserializeSpecific()
+	void ListNodes::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		version = get<uint16>();
+		version = buffer.get<uint16>();
+	}
+	
+	void ListNodes::dumpSpecific(std::wostream  &stream) const
+	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
+	void NodePresent::serializeSpecific(SerializationBuffer& buffer) const
+	{
+		buffer.add(version);
+	}
+	
+	void NodePresent::deserializeSpecific(SerializationBuffer& buffer)
+	{
+		version = buffer.get<uint16>();
+	}
+	
+	void NodePresent::dumpSpecific(std::wostream  &stream) const
+	{
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
+	void GetDescription::serializeSpecific(SerializationBuffer& buffer) const
+	{
+		buffer.add(version);
+	}
+	
+	void GetDescription::deserializeSpecific(SerializationBuffer& buffer)
+	{
+		version = buffer.get<uint16>();
 	}
 	
 	void GetDescription::dumpSpecific(std::wostream  &stream) const
@@ -401,41 +454,64 @@ namespace Aseba
 	
 	//
 	
-	void Description::serializeSpecific()
+	void GetNodeDescription::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(WStringToUTF8(name));
-		add(static_cast<uint16>(protocolVersion));
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(static_cast<uint16>(bytecodeSize));
-		add(static_cast<uint16>(stackSize));
-		add(static_cast<uint16>(variablesSize));
+		buffer.add(version);
+	}
+	
+	void GetNodeDescription::deserializeSpecific(SerializationBuffer& buffer)
+	{
+		CmdMessage::deserializeSpecific(buffer);
 		
-		add(static_cast<uint16>(namedVariables.size()));
+		version = buffer.get<uint16>();
+	}
+	
+	void GetNodeDescription::dumpSpecific(wostream &stream) const
+	{
+		CmdMessage::dumpSpecific(stream);
+		
+		stream << "protocol version " << version;
+	}
+	
+	//
+	
+	void Description::serializeSpecific(SerializationBuffer& buffer) const
+	{
+		buffer.add(WStringToUTF8(name));
+		buffer.add(static_cast<uint16>(protocolVersion));
+		
+		buffer.add(static_cast<uint16>(bytecodeSize));
+		buffer.add(static_cast<uint16>(stackSize));
+		buffer.add(static_cast<uint16>(variablesSize));
+		
+		buffer.add(static_cast<uint16>(namedVariables.size()));
 		// named variables are sent separately
 		
-		add(static_cast<uint16>(localEvents.size()));
+		buffer.add(static_cast<uint16>(localEvents.size()));
 		// local events are sent separately
 		
-		add(static_cast<uint16>(nativeFunctions.size()));
+		buffer.add(static_cast<uint16>(nativeFunctions.size()));
 		// native functions are sent separately
 	}
 	
-	void Description::deserializeSpecific()
+	void Description::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		name = UTF8ToWString(get<string>());
-		protocolVersion = get<uint16>();
+		name = UTF8ToWString(buffer.get<string>());
+		protocolVersion = buffer.get<uint16>();
 		
-		bytecodeSize = get<uint16>();
-		stackSize = get<uint16>();
-		variablesSize = get<uint16>();
+		bytecodeSize = buffer.get<uint16>();
+		stackSize = buffer.get<uint16>();
+		variablesSize = buffer.get<uint16>();
 		
-		namedVariables.resize(get<uint16>());
+		namedVariables.resize(buffer.get<uint16>());
 		// named variables are received separately
 		
-		localEvents.resize(get<uint16>());
+		localEvents.resize(buffer.get<uint16>());
 		// local events are received separately
 		
-		nativeFunctions.resize(get<uint16>());
+		nativeFunctions.resize(buffer.get<uint16>());
 		// native functions are received separately
 	}
 	
@@ -456,16 +532,16 @@ namespace Aseba
 	
 	//
 	
-	void NamedVariableDescription::serializeSpecific()
+	void NamedVariableDescription::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(static_cast<sint16>(size));
-		add(WStringToUTF8(name));
+		buffer.add(static_cast<sint16>(size));
+		buffer.add(WStringToUTF8(name));
 	}
 	
-	void NamedVariableDescription::deserializeSpecific()
+	void NamedVariableDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		size = get<uint16>();
-		name = UTF8ToWString(get<string>());
+		size = buffer.get<uint16>();
+		name = UTF8ToWString(buffer.get<string>());
 	}
 	
 	void NamedVariableDescription::dumpSpecific(std::wostream  &stream) const
@@ -475,16 +551,16 @@ namespace Aseba
 	
 	//
 	
-	void LocalEventDescription::serializeSpecific()
+	void LocalEventDescription::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(WStringToUTF8(name));
-		add(WStringToUTF8(description));
+		buffer.add(WStringToUTF8(name));
+		buffer.add(WStringToUTF8(description));
 	}
 	
-	void LocalEventDescription::deserializeSpecific()
+	void LocalEventDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		name = UTF8ToWString(get<string>());
-		description = UTF8ToWString(get<string>());
+		name = UTF8ToWString(buffer.get<string>());
+		description = UTF8ToWString(buffer.get<string>());
 	}
 	
 	void LocalEventDescription::dumpSpecific(std::wostream  &stream) const
@@ -494,29 +570,29 @@ namespace Aseba
 	
 	//
 	
-	void NativeFunctionDescription::serializeSpecific()
+	void NativeFunctionDescription::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(WStringToUTF8(name));
-		add(WStringToUTF8(description));
+		buffer.add(WStringToUTF8(name));
+		buffer.add(WStringToUTF8(description));
 		
-		add(static_cast<uint16>(parameters.size()));
+		buffer.add(static_cast<uint16>(parameters.size()));
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			add(static_cast<sint16>(parameters[j].size));
-			add(WStringToUTF8(parameters[j].name));
+			buffer.add(static_cast<sint16>(parameters[j].size));
+			buffer.add(WStringToUTF8(parameters[j].name));
 		}
 	}
 	
-	void NativeFunctionDescription::deserializeSpecific()
+	void NativeFunctionDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		name = UTF8ToWString(get<string>());
-		description = UTF8ToWString(get<string>());
+		name = UTF8ToWString(buffer.get<string>());
+		description = UTF8ToWString(buffer.get<string>());
 		
-		parameters.resize(get<uint16>());
+		parameters.resize(buffer.get<uint16>());
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			parameters[j].size = get<sint16>();
-			parameters[j].name = UTF8ToWString(get<string>());
+			parameters[j].size = buffer.get<sint16>();
+			parameters[j].name = UTF8ToWString(buffer.get<string>());
 		}
 	}
 	
@@ -535,19 +611,19 @@ namespace Aseba
 	
 	//
 	
-	void Variables::serializeSpecific()
+	void Variables::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(start);
+		buffer.add(start);
 		for (size_t i = 0; i < variables.size(); i++)
-			add(variables[i]);
+			buffer.add(variables[i]);
 	}
 	
-	void Variables::deserializeSpecific()
+	void Variables::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		start = get<uint16>();
-		variables.resize((rawData.size() - readPos) / 2);
+		start = buffer.get<uint16>();
+		variables.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < variables.size(); i++)
-			variables[i] = get<sint16>();
+			variables[i] = buffer.get<sint16>();
 	}
 	
 	void Variables::dumpSpecific(wostream &stream) const
@@ -560,18 +636,18 @@ namespace Aseba
 	
 	//
 	
-	void ArrayAccessOutOfBounds::serializeSpecific()
+	void ArrayAccessOutOfBounds::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
-		add(size);
-		add(index);
+		buffer.add(pc);
+		buffer.add(size);
+		buffer.add(index);
 	}
 	
-	void ArrayAccessOutOfBounds::deserializeSpecific()
+	void ArrayAccessOutOfBounds::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
-		size = get<uint16>();
-		index = get<uint16>();
+		pc = buffer.get<uint16>();
+		size = buffer.get<uint16>();
+		index = buffer.get<uint16>();
 	}
 	
 	void ArrayAccessOutOfBounds::dumpSpecific(wostream &stream) const
@@ -581,14 +657,14 @@ namespace Aseba
 	
 	//
 	
-	void DivisionByZero::serializeSpecific()
+	void DivisionByZero::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
+		buffer.add(pc);
 	}
 	
-	void DivisionByZero::deserializeSpecific()
+	void DivisionByZero::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
+		pc = buffer.get<uint16>();
 	}
 	
 	void DivisionByZero::dumpSpecific(wostream &stream) const
@@ -598,14 +674,14 @@ namespace Aseba
 	
 	//
 	
-	void EventExecutionKilled::serializeSpecific()
+	void EventExecutionKilled::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
+		buffer.add(pc);
 	}
 	
-	void EventExecutionKilled::deserializeSpecific()
+	void EventExecutionKilled::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
+		pc = buffer.get<uint16>();
 	}
 	
 	void EventExecutionKilled::dumpSpecific(wostream &stream) const
@@ -615,16 +691,16 @@ namespace Aseba
 	
 	//
 	
-	void NodeSpecificError::serializeSpecific()
+	void NodeSpecificError::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
-		add(WStringToUTF8(message));
+		buffer.add(pc);
+		buffer.add(WStringToUTF8(message));
 	}
 	
-	void NodeSpecificError::deserializeSpecific()
+	void NodeSpecificError::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
-		message = UTF8ToWString(get<std::string>());
+		pc = buffer.get<uint16>();
+		message = UTF8ToWString(buffer.get<std::string>());
 	}
 	
 	void NodeSpecificError::dumpSpecific(wostream &stream) const
@@ -634,16 +710,16 @@ namespace Aseba
 	
 	//
 	
-	void ExecutionStateChanged::serializeSpecific()
+	void ExecutionStateChanged::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
-		add(flags);
+		buffer.add(pc);
+		buffer.add(flags);
 	}
 	
-	void ExecutionStateChanged::deserializeSpecific()
+	void ExecutionStateChanged::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
-		flags = get<uint16>();
+		pc = buffer.get<uint16>();
+		flags = buffer.get<uint16>();
 	}
 	
 	void ExecutionStateChanged::dumpSpecific(wostream &stream) const
@@ -655,16 +731,16 @@ namespace Aseba
 	
 	//
 	
-	void BreakpointSetResult::serializeSpecific()
+	void BreakpointSetResult::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(pc);
-		add(success);
+		buffer.add(pc);
+		buffer.add(success);
 	}
 	
-	void BreakpointSetResult::deserializeSpecific()
+	void BreakpointSetResult::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = get<uint16>();
-		success = get<uint16>();
+		pc = buffer.get<uint16>();
+		success = buffer.get<uint16>();
 	}
 	
 	void BreakpointSetResult::dumpSpecific(wostream &stream) const
@@ -674,35 +750,18 @@ namespace Aseba
 	
 	//
 	
-	void CmdMessage::serializeSpecific()
+	void BootloaderReadPage::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		add(dest);
-	}
-	
-	void CmdMessage::deserializeSpecific()
-	{
-		dest = get<uint16>();
-	}
-	
-	void CmdMessage::dumpSpecific(wostream &stream) const
-	{
-		stream << "dest " << dest << " ";
-	}
-	
-	//
-	
-	void BootloaderReadPage::serializeSpecific()
-	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(pageNumber);
+		buffer.add(pageNumber);
 	}
 	
-	void BootloaderReadPage::deserializeSpecific()
+	void BootloaderReadPage::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		pageNumber = get<uint16>();
+		pageNumber = buffer.get<uint16>();
 	}
 	
 	void BootloaderReadPage::dumpSpecific(wostream &stream) const
@@ -714,18 +773,18 @@ namespace Aseba
 	
 	//
 	
-	void BootloaderWritePage::serializeSpecific()
+	void BootloaderWritePage::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(pageNumber);
+		buffer.add(pageNumber);
 	}
 	
-	void BootloaderWritePage::deserializeSpecific()
+	void BootloaderWritePage::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		pageNumber = get<uint16>();
+		pageNumber = buffer.get<uint16>();
 	}
 	
 	void BootloaderWritePage::dumpSpecific(wostream &stream) const
@@ -737,20 +796,20 @@ namespace Aseba
 	
 	//
 	
-	void BootloaderPageDataWrite::serializeSpecific()
+	void BootloaderPageDataWrite::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			add(data[i]);
+			buffer.add(data[i]);
 	}
 	
-	void BootloaderPageDataWrite::deserializeSpecific()
+	void BootloaderPageDataWrite::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			data[i] = get<uint8>();
+			data[i] = buffer.get<uint8>();
 	}
 	
 	void BootloaderPageDataWrite::dumpSpecific(wostream &stream) const
@@ -765,23 +824,23 @@ namespace Aseba
 	
 	//
 	
-	void SetBytecode::serializeSpecific()
+	void SetBytecode::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(start);
+		buffer.add(start);
 		for (size_t i = 0; i < bytecode.size(); i++)
-			add(bytecode[i]);
+			buffer.add(bytecode[i]);
 	}
 	
-	void SetBytecode::deserializeSpecific()
+	void SetBytecode::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		start = get<uint16>();
-		bytecode.resize((rawData.size() - readPos) / 2);
+		start = buffer.get<uint16>();
+		bytecode.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < bytecode.size(); i++)
-			bytecode[i] = get<uint16>();
+			bytecode[i] = buffer.get<uint16>();
 	}
 	
 	void SetBytecode::dumpSpecific(wostream &stream) const
@@ -843,18 +902,18 @@ namespace Aseba
 	
 	//
 	
-	void BreakpointSet::serializeSpecific()
+	void BreakpointSet::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(pc);
+		buffer.add(pc);
 	}
 	
-	void BreakpointSet::deserializeSpecific()
+	void BreakpointSet::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		pc = get<uint16>();
+		pc = buffer.get<uint16>();
 	}
 	
 	void BreakpointSet::dumpSpecific(wostream &stream) const
@@ -866,18 +925,18 @@ namespace Aseba
 	
 	//
 	
-	void BreakpointClear::serializeSpecific()
+	void BreakpointClear::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(pc);
+		buffer.add(pc);
 	}
 	
-	void BreakpointClear::deserializeSpecific()
+	void BreakpointClear::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		pc = get<uint16>();
+		pc = buffer.get<uint16>();
 	}
 	
 	void BreakpointClear::dumpSpecific(wostream &stream) const
@@ -896,20 +955,20 @@ namespace Aseba
 	{
 	}
 	
-	void GetVariables::serializeSpecific()
+	void GetVariables::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(start);
-		add(length);
+		buffer.add(start);
+		buffer.add(length);
 	}
 	
-	void GetVariables::deserializeSpecific()
+	void GetVariables::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		start = get<uint16>();
-		length = get<uint16>();
+		start = buffer.get<uint16>();
+		length = buffer.get<uint16>();
 	}
 	
 	void GetVariables::dumpSpecific(wostream &stream) const
@@ -928,23 +987,23 @@ namespace Aseba
 	{
 	}
 	
-	void SetVariables::serializeSpecific()
+	void SetVariables::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		CmdMessage::serializeSpecific();
+		CmdMessage::serializeSpecific(buffer);
 		
-		add(start);
+		buffer.add(start);
 		for (size_t i = 0; i < variables.size(); i++)
-			add(variables[i]);
+			buffer.add(variables[i]);
 	}
 	
-	void SetVariables::deserializeSpecific()
+	void SetVariables::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		CmdMessage::deserializeSpecific();
+		CmdMessage::deserializeSpecific(buffer);
 		
-		start = get<uint16>();
-		variables.resize((rawData.size() - readPos) / 2);
+		start = buffer.get<uint16>();
+		variables.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < variables.size(); i++)
-			variables[i] = get<sint16>();
+			variables[i] = buffer.get<sint16>();
 	}
 	
 	void SetVariables::dumpSpecific(wostream &stream) const

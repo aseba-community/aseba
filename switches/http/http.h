@@ -26,7 +26,7 @@
 #include <queue>
 #include <dashel/dashel.h>
 #include "../../common/msg/msg.h"
-#include "../../common/msg/descriptions-manager.h"
+#include "../../common/msg/NodesManager.h"
 
 #if defined(_WIN32) && defined(__MINGW32__)
 /* This is a workaround for MinGW32, see libxml/xmlexports.h */
@@ -47,7 +47,7 @@ namespace Aseba
     class HttpRequest;
     
     //! HTTP interface for aseba network
-    class HttpInterface:  public Dashel::Hub, public Aseba::DescriptionsManager
+    class HttpInterface:  public Dashel::Hub, public Aseba::NodesManager
     {
     public: 
         typedef std::vector<std::string>      strings;
@@ -114,12 +114,14 @@ namespace Aseba
         virtual void unscheduleAllResponses(Dashel::Stream* stream);
         virtual std::set<unsigned> allNodeIds();
         virtual unsigned updateNodeId(Dashel::Stream* stream, unsigned targetId);
+        virtual bool run1s();
         
     protected:
         /* // reimplemented from parent classes */
         virtual void connectionCreated(Dashel::Stream* stream);
         virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
         virtual void incomingData(Dashel::Stream* stream);
+        virtual void sendMessage(const Message& message);
         virtual void nodeDescriptionReceived(unsigned nodeId);
         // specific to http interface
         virtual void sendEvent(const unsigned nodeId, const strings& args);

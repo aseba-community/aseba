@@ -131,79 +131,96 @@
 <context>
     <name>Aseba::ThymioUpgraderDialog</name>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="60"/>
+        <location filename="ThymioUpgrader.cpp" line="92"/>
         <source>Thymio Firmware Upgrader</source>
         <translation>Aggiornamento del Firmware di Thymio</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="73"/>
+        <location filename="ThymioUpgrader.cpp" line="113"/>
         <source>Firmware file</source>
         <translation>File del firmware</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="76"/>
+        <location filename="ThymioUpgrader.cpp" line="116"/>
         <source>Select...</source>
         <translation>Seleziona...</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="91"/>
+        <location filename="ThymioUpgrader.cpp" line="131"/>
         <source>Upgrade</source>
         <translation>Aggiorna</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="94"/>
+        <location filename="ThymioUpgrader.cpp" line="134"/>
         <source>Quit</source>
         <translation>Interrompi</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="121"/>
+        <location filename="ThymioUpgrader.cpp" line="164"/>
         <source>Select hex file</source>
         <translation>Seleziona file hex</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="121"/>
+        <location filename="ThymioUpgrader.cpp" line="164"/>
         <source>Hex files (*.hex)</source>
         <translation>File Hex (*.hex)</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="129"/>
+        <location filename="ThymioUpgrader.cpp" line="208"/>
+        <source>Thymio node identifier: %1</source>
+        <translation>Identificativo del nodo del Thymio :%1</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="229"/>
+        <source>Current firmware: version %1 - production</source>
+        <translation>Firmware attuale: %1 - produzione</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="231"/>
+        <source>Current firmware: version %1 - development %2</source>
+        <translation>Firmware attuale: %1 - sviluppo %2</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="244"/>
         <source>Pre-upgrade warning</source>
         <translation>Avviso di pre-aggiornamento</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="129"/>
+        <location filename="ThymioUpgrader.cpp" line="244"/>
         <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the upgrade!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
         <translation>Stai per scrivere un nuovo firmware in Thymio II. Assicurarsi che il robot sia carico al massimo e che il cavo USB sia collegato corretttamente.&lt;p&gt;&lt;b&gt;Non scollegare il robot durante l&apos;aggiornamento!&lt;/b&gt;&lt;/p&gt;Siete sicuri di voler procedere?</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="157"/>
+        <location filename="ThymioUpgrader.cpp" line="180"/>
+        <location filename="ThymioUpgrader.cpp" line="272"/>
         <source>Cannot connect to Thymio II</source>
         <translation>Impossibile connettersi al Thymio II</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="157"/>
+        <location filename="ThymioUpgrader.cpp" line="180"/>
+        <location filename="ThymioUpgrader.cpp" line="272"/>
         <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.&lt;/p&gt;</source>
-        <translation>Impossibile di connettersi al Thymio II:%1.&lt;p&gt;Un altro programma è probabilmente attualmente connesso al Thymio II. Assicurarsi che non vi sia Asebastudio o un'altra applicazione di aggiornamento in esecuzione. &lt;/p&gt;</translation>
+        <translation>Impossibile di connettersi al Thymio II:%1.&lt;p&gt;Un altro programma è probabilmente attualmente connesso al Thymio II. Assicurarsi che non vi sia Asebastudio o un&apos;altra applicazione di aggiornamento in esecuzione. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="169"/>
-        <location filename="ThymioUpgrader.cpp" line="173"/>
-        <location filename="ThymioUpgrader.cpp" line="177"/>
+        <location filename="ThymioUpgrader.cpp" line="284"/>
+        <location filename="ThymioUpgrader.cpp" line="288"/>
+        <location filename="ThymioUpgrader.cpp" line="292"/>
         <source>Upgrade Error</source>
         <translation>Errore di aggiornamento</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="169"/>
+        <location filename="ThymioUpgrader.cpp" line="284"/>
         <source>Unable to read Hex file: %1</source>
         <translation>Impossibile leggere il file Hex %1</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="173"/>
+        <location filename="ThymioUpgrader.cpp" line="288"/>
         <source>A bootloader error happened during the upgrade process: %1</source>
         <translation>E&apos; successo un errore del bootloader durante il processo di aggiornamento: %1</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="177"/>
+        <location filename="ThymioUpgrader.cpp" line="292"/>
         <source>A communication error happened during the upgrade process: %1</source>
         <translation>E&apos; successo un errore di comunicazione durante il processo di aggiornamento: %1</translation>
     </message>
@@ -211,28 +228,49 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="240"/>
-        <source>Thymio II not found</source>
-        <translation>Thymio II non trovato</translation>
+        <location filename="ThymioUpgrader.cpp" line="359"/>
+        <source>Wireless Thymio found</source>
+        <oldsource>Wireless Thymio II found</oldsource>
+        <translation>Wireless Thymio trovato</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="240"/>
+        <location filename="ThymioUpgrader.cpp" line="359"/>
+        <source>&lt;p&gt;&lt;b&gt;Wireless connection to Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Una connessione wireless a Thymio è stato trovato!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un singolo Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="364"/>
+        <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a Thymio to your computer using the USB cable.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt; Collegare un Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="369"/>
+        <source>&lt;p&gt;&lt;b&gt;More than one Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Trovati più di un Thymio !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un singolo Thymio al computer utilizzando il cavo USB.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="369"/>
+        <source>Multiple Thymios found</source>
+        <oldsource>Multiple Thymio found</oldsource>
+        <translation>Diversi Thymio trovati</translation>
+    </message>
+    <message>
+        <location filename="ThymioUpgrader.cpp" line="364"/>
+        <source>Thymio not found</source>
+        <oldsource>Thymio II not found</oldsource>
+        <translation>Thymio non trovato</translation>
+    </message>
+    <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug Thymio II or use the command-line firmware upgrader (asebacmd).&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare Thymio II o utilizzare l&apos;aggiornamento tramite linea di comando (asebacmd).&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare Thymio II o utilizzare l&apos;aggiornamento tramite linea di comando (asebacmd).&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="ThymioUpgrader.cpp" line="245"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Thymio II found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio II or use the command-line firmware upgrader (asebacmd).&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Trovati più di un Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un solo Thymio II o utilizzare l&apos;aggiornamento tramite linea di comando (asebacmd).&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;&lt;b&gt;Trovati più di un Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un solo Thymio II o utilizzare l&apos;aggiornamento tramite linea di comando (asebacmd).&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug Thymio II or use the command-line updater.&lt;/p&gt;</source>
         <translation type="obsolete">&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio II!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare Thymio II o utilizzare l&apos;aggiornamento tramite linea di comando.&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <location filename="ThymioUpgrader.cpp" line="245"/>
-        <source>Multiple Thymio II found</source>
-        <translation>Trovati più Thymio II</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;More than one Thymio II found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio II or use the command-line updater.&lt;/p&gt;</source>

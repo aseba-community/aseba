@@ -3,14 +3,18 @@ Name:           aseba
 # Update the following lines to reflect the source release version you will be
 # referencing below
 %global source_major 1
-%global source_minor 4
+%global source_minor 5
 %global source_patch 0
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 1914f85183871150997c47d99bb018ddad63f2f0
+%global commit 2fae6157d060479ae5d5bd825b000ccd4b7b8d57
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+# Update the following line with the git commit has of the revision of Catch
+# associated with the Catch submodule. Run 'git submodule' to find it.
+%global catchcommit 3b18d9e962835100d7e12ac80d22882e408e40dc
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
 # and only if the commit hash is not from a git tag for an existing source
@@ -27,7 +31,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.3%{?snapshot}%{?dist}
+Release:        0.4%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -44,7 +48,8 @@ License:        LGPL-3.0
 License:        LGPLv3
 %endif
 URL:            http://aseba.wikidot.com
-Source0:        https://github.com/aseba-community/aseba/archive/%{commit}/%{name}-%{version}-%{shortcommit}.tar.gz
+Source0:        https://github.com/aseba-community/aseba/archive/%{commit}.tar.gz
+Source1:        https://github.com/philsquared/Catch/archive/%{catchcommit}.tar.gz
 Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
@@ -52,7 +57,7 @@ BuildRequires: ImageMagick-devel
 BuildRequires: SDL-devel
 BuildRequires: binutils
 BuildRequires: cmake
-BuildRequires: dashel-devel >= 1.0.8
+BuildRequires: dashel-devel >= 1.1.0
 BuildRequires: desktop-file-utils
 BuildRequires: elfutils
 BuildRequires: enki-devel
@@ -89,6 +94,7 @@ using a cozy integrated development environment.
 %package -n %{lib_pkg_name}
 Summary:        Libraries for %{name}
 Group: System/Libraries
+Requires:       libdashel1 >= 1.1.0
 
 %description  -n %{lib_pkg_name}
 The %{lib_pkg_name} package contains libraries running applications that use
@@ -104,6 +110,9 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{commit}
+%setup -q -T -D -b 1 -n %{name}-%{commit}
+rm -rf tests/externals/Catch
+mv ../Catch-%{catchcommit} tests/externals/Catch
 %patch0 -p1
 
 %build
@@ -118,7 +127,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/asebatest
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-test-natives-count
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/asebashell
-rm -rf ${RPM_BUILD_ROOT}%{_bindir}/qt-gui
+rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-qt-gui
+rm -rf ${RPM_BUILD_ROOT}%{_bindir}/aseba-qt-dbus
 
 cd examples
 make clean
@@ -162,6 +172,7 @@ fi
 %{_bindir}/*
 %{_datadir}/applications/*
 %{_datadir}/icons/hicolor/48x48/apps/*
+%{_datadir}/icons/hicolor/scalable/apps/*
 
 %files -n %{lib_pkg_name}
 %doc debian/copyright
@@ -173,6 +184,18 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Thu Nov 19 2015 Dean Brettle <dean@brettle.com> - 1.5.0-0.4.20151119git2fae615
+- Require libdashel1 >= 1.1.0
+
+* Tue Oct 13 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20151013gitb2255c6
+- Incorporate fixes needed by other platforms and package systems
+
+* Fri Sep 11 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.2.20150910git04b42d4
+- Sync with latest upstream master and fix build errors.
+
+* Wed Sep 09 2015 Dean Brettle <dean@brettle.com> - 1.4.0-0.1.20150909git10ef28e
+- Sync with latest upstream master
+
 * Fri Jun 20 2014 Dean Brettle <dean@brettle.com> - 1.4.0-0.3.20140620gitaaf2e88
 - Sync with latest upstream master.
 - Make build require at least 1.0.8 of dashel-devel to get required

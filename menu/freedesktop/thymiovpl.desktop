@@ -3,5 +3,5 @@ Type=Application
 Name=Thymio VPL
 Exec=thymiovpl
 TryExec=thymiovpl
-Categories=Education;Science
+Categories=Education;Science;
 Icon=thymiovpl

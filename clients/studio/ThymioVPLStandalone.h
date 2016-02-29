@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -43,6 +43,7 @@ namespace Aseba
 		Target * getTarget();
 		unsigned getNodeId() const;
 		unsigned getProductId() const;
+		void setCommonDefinitions(const CommonDefinitions& commonDefinitions);
 		void displayCode(const QList<QString>& code, int line);
 		void loadAndRun();
 		void stop();
@@ -80,7 +81,6 @@ namespace Aseba
 		void resetSizes();
 		void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		void closeEvent ( QCloseEvent * event );
-		void timerEvent ( QTimerEvent * event );
 		bool saveFile(bool as);
 		void openFile();
 		

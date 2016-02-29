@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -30,7 +30,7 @@
 
 #include <dashel/dashel.h>
 #include "common/msg/msg.h"
-#include "common/msg/descriptions-manager.h"
+#include "common/msg/NodesManager.h"
 
 
 class DashelInterface : public QThread, public Dashel::Hub

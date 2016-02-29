@@ -1,6 +1,6 @@
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
@@ -114,6 +114,7 @@ namespace Aseba { namespace ThymioVPL
 		void toggleAdvancedMode(bool advanced, bool force=false, bool ignoreSceneCheck=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
+		void setupGlobalEvents();
 		
 	public:
 		const bool debugLog;
