@@ -12,7 +12,7 @@ else (ANDROID)
 	endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif (ANDROID)
 
-add_library(asebadashelplugins STATIC ${ASEBADASHEL_PLUGINS_SRC})
+add_library(asebadashelplugins ${ASEBADASHEL_PLUGINS_SRC})
 set_target_properties(asebadashelplugins PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 install(TARGETS asebadashelplugins 
