@@ -79,12 +79,14 @@ namespace Aseba
         StreamEventSubscriptionMap  eventSubscriptions;
         StreamRequestMap            httpRequests;
         StreamSet                   streamsToShutdown;
+        std::set<unsigned>          nodeDescriptionsReceived;
+        std::set<unsigned>          nodeProgramsSent;
         
         // debug variables
         bool verbose;
         int iterations;
         
-        // Extract definitions from AESL file
+        // Extract definitions from AESL files
         NodeIdCommonDefinitionsMap  commonDefinitions;
         NodeIdVariablesMap          allVariables;
 

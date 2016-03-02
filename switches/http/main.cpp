@@ -108,13 +108,6 @@ int main(int argc, char *argv[])
     {
         Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, 1000*Kiterations));
         
-//        for (int i = 0; i < 500; i++)
-//            network->step(10); // wait for description, variables, etc
-        // ask for descriptions
-        network->pingNetwork();
-        network->run1s();
-        network->run1s();
-
         for (auto nodeId: network->allNodeIds())
         {
             if (aesl_filename.size() > 0)

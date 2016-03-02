@@ -175,8 +175,16 @@ namespace Aseba
             }
         }
       
-        // request a description for aseba target
-        // broadcastGetDescription();
+        // wait for descriptions
+        for (int i = 0; i < 40; i++) // 40 seconds
+        {
+            // ask for descriptions
+            this->pingNetwork();
+            this->run1s();
+            if (nodeDescriptionsReceived.size() == targets.size())
+                break;
+        }
+
     }
     
     void HttpInterface::broadcastGetDescription()
@@ -327,6 +335,7 @@ namespace Aseba
     {
         if (!targetId) return;
         unsigned nodeId = targetId;
+        nodeDescriptionsReceived.insert(nodeId);
         if (verbose)
             wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
     }
@@ -1148,7 +1157,7 @@ namespace Aseba
                     unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
                     if (preferredId == unsigned(atoi((char*)storedId)))
                         wasError = !compileAndSendCode(nodeId, program);
-                    // else continue looking at XML nodes in hope of a match
+                    // else send to all XML nodes (really should only send to those without preferred!)
                 }
                 // free attribute and content
                 xmlFree(name);     // nop if name is NULL
@@ -1213,6 +1222,8 @@ namespace Aseba
             stream->flush();
             // retrieve user-defined variables for use in get/set
             allVariables[nodeId] = *compiler.getVariablesMap();
+            // remember that this node has received a program
+            nodeProgramsSent.insert(nodeId);
             return true;
         }
         else
@@ -1344,7 +1355,7 @@ namespace Aseba
             // this is a new source, find an available nodeId
             NodeIdSubstitution localWishes = localIdWishes[stream];
             std::set<unsigned> used = allNodeIds();
-            unsigned newId = targetId;
+            unsigned newId = targetId ? targetId : 1;
             NodeIdSubstitution::iterator localWish = localWishes.find(targetId);
             if (localWish != localWishes.end())
                 newId = localWish->second;
