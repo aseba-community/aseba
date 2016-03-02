@@ -17,7 +17,9 @@ for (port of [3000,3001]) {
     .expectStatus(200)
     .expectHeader('Content-Type', 'application/json')
     .expectJSONTypes('*', { name: String, protocolVersion: Number })
-    .expectJSONLength(4)
+    .afterJSON(function (body) {
+        expect(body.length).toBeGreaterThan(3)
+    })
     .toss();
 }
 

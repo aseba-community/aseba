@@ -17,24 +17,32 @@ frisby.create('Get an initial list of nodes')
 .expectJSONLength(1)
 .toss();
 
-for (node of [NODENUM,THYMIO2]) {
-    frisby.create('Get node description for ' + node)
-    .get(ASEBASCRATCH + node)
-    .expectStatus(200)
-    .expectHeader('Content-Type', 'application/json')
-    .expectJSONTypes({
-        name: String,
-        protocolVersion: Number,
-        bytecodeSize: Number,
-        variablesSize: Number,
-        stackSize: Number,
-        namedVariables: Object,
-        localEvents: Object,
-        constants: Object,
-        events: Object
-    })
-    .toss();
-}
+frisby.create('Get node description for ' + THYMIO2)
+.get(ASEBASCRATCH + THYMIO2)
+.expectStatus(200)
+.expectHeader('Content-Type', 'application/json')
+.afterJSON(function (body) {
+    var node_id = body["node"]
+    for (node of [THYMIO2, 'nodes/'+node_id]) {
+	frisby.create('Get node description for ' + node)
+	.get(ASEBASCRATCH + node)
+	.expectStatus(200)
+	.expectHeader('Content-Type', 'application/json')
+	.expectJSONTypes({
+	    name: String,
+	    protocolVersion: Number,
+	    bytecodeSize: Number,
+	    variablesSize: Number,
+	    stackSize: Number,
+	    namedVariables: Object,
+	    localEvents: Object,
+	    constants: Object,
+	    events: Object
+	})
+	.toss();
+    }
+})
+.toss();
 
 frisby.create('Fail to connect to nonexistant node')
 .get(ASEBASCRATCH + 'does-not-exist')
