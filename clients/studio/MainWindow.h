@@ -498,7 +498,7 @@ namespace Aseba
 		// utility functions
 		int getIndexFromId(unsigned node) const;
 		NodeTab* getTabFromId(unsigned node) const;
-		NodeTab* getTabFromName(const QString& name, unsigned preferedId = 0) const;
+		NodeTab* getTabFromName(const QString& name, unsigned preferedId = 0, bool* isPrefered = 0) const;
 		int getAbsentIndexFromId(unsigned node) const;
 		AbsentNodeTab* getAbsentTabFromId(unsigned node) const;
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);

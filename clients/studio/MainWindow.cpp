@@ -1680,7 +1680,7 @@ namespace Aseba
 		{
 			// clear content
 			clearDocumentSpecificTabs();
-			// we must only have NodeTab* left.
+			// we must only have NodeTab* left, clear content of editors in tabs
 			for (int i = 0; i < nodes->count(); i++)
 			{
 				NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
@@ -1752,13 +1752,46 @@ namespace Aseba
 		int errorColumn;
 		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
+			// remove event and constant definitions
 			eventsDescriptionsModel->clear();
 			constantsDefinitionsModel->clear();
-			
-			int noNodeCount = 0;
+			// delete all absent node tabs
 			clearDocumentSpecificTabs();
-			actualFileName = fileName;
+			// we must only have NodeTab* left, clear content of editors in tabs
+			for (int i = 0; i < nodes->count(); i++)
+			{
+				NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+				Q_ASSERT(tab);
+				tab->editor->clear();
+			}
+			
+			// build list of tabs filled from file to be loaded
+			QSet<int> filledList;
 			QDomNode domNode = document.documentElement().firstChild();
+			while (!domNode.isNull())
+			{
+				if (domNode.isElement())
+				{
+					QDomElement element = domNode.toElement();
+					if (element.tagName() == "node")
+					{
+						bool prefered;
+						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt(), &prefered);
+						if (prefered)
+						{
+							const int index(nodes->indexOf(tab));
+							assert (index >= 0);
+							filledList.insert(index);
+						}
+					}
+				}
+				domNode = domNode.nextSibling();
+			}
+			
+			// load file
+			int noNodeCount = 0;
+			actualFileName = fileName;
+			domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
 			{
 				if (domNode.isElement())
@@ -1789,22 +1822,42 @@ namespace Aseba
 						}
 						
 						// reconstruct nodes
-						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt());
+						bool prefered;
+						const QString nodeName(element.attribute("name"));
+						const unsigned nodeId(element.attribute("nodeId", 0).toUInt());
+						NodeTab* tab = getTabFromName(nodeName, nodeId, &prefered);
 						if (tab)
 						{
-							tab->editor->setPlainText(text);
-							tab->restorePlugins(savedPlugins, true);
+							// matching tab name
+							if (prefered)
+							{
+								// the node is the prefered one, fill now
+								tab->editor->setPlainText(text);
+								tab->restorePlugins(savedPlugins, true);
+								// note that the node is already marked in filledList
+							}
+							else
+							{
+								const int index(nodes->indexOf(tab));
+								if (filledList.contains(index))
+								{
+									// the node is already filled, create an absent tab
+									nodes->addTab(new AbsentNodeTab(nodeId, nodeName, text, savedPlugins), nodeName + tr(" (not available)"));
+									noNodeCount++;
+								}
+								else
+								{
+									// the node is not filled, fill now
+									tab->editor->setPlainText(text);
+									tab->restorePlugins(savedPlugins, true);
+									filledList.insert(index);
+								}
+							}
 						}
 						else
 						{
-							nodes->addTab(
-								new AbsentNodeTab(
-									0, 
-									element.attribute("name"), text,
-									savedPlugins
-								),
-								element.attribute("name") + tr(" (not available)")
-							);
+							// no matching name, create an absent tab
+							nodes->addTab(new AbsentNodeTab(nodeId, nodeName, text, savedPlugins), nodeName + tr(" (not available)"));
 							noNodeCount++;
 						}
 					}
@@ -1950,29 +2003,32 @@ namespace Aseba
 					nodeName = absentNodeTab->name;
 				
 				const QString& nodeContent = tab->editor->toPlainText();
-				
-				root.appendChild(document.createTextNode("\n\n\n"));
-				root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
-				
-				QDomElement element = document.createElement("node");
-				element.setAttribute("name", nodeName);
-				element.setAttribute("nodeId", tab->nodeId());
-				QDomText text = document.createTextNode(nodeContent);
-				element.appendChild(text);
 				ScriptTab::SavedPlugins savedPlugins(tab->savePlugins());
-				if (!savedPlugins.isEmpty())
+				// is there something to save?
+				if (!nodeContent.isEmpty() || !savedPlugins.isEmpty())
 				{
-					QDomElement plugins = document.createElement("toolsPlugins");
-					for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+					root.appendChild(document.createTextNode("\n\n\n"));
+					root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
+					
+					QDomElement element = document.createElement("node");
+					element.setAttribute("name", nodeName);
+					element.setAttribute("nodeId", tab->nodeId());
+					QDomText text = document.createTextNode(nodeContent);
+					element.appendChild(text);
+					if (!savedPlugins.isEmpty())
 					{
-						const NodeToolInterface::SavedContent content(*it);
-						QDomElement plugin(document.createElement(content.first));
-						plugin.appendChild(document.importNode(content.second.documentElement(), true));
-						plugins.appendChild(plugin);
+						QDomElement plugins = document.createElement("toolsPlugins");
+						for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+						{
+							const NodeToolInterface::SavedContent content(*it);
+							QDomElement plugin(document.createElement(content.first));
+							plugin.appendChild(document.importNode(content.second.documentElement(), true));
+							plugins.appendChild(plugin);
+						}
+						element.appendChild(plugins);
 					}
-					element.appendChild(plugins);
+					root.appendChild(element);
 				}
-				root.appendChild(element);
 			}
 		}
 		root.appendChild(document.createTextNode("\n\n\n"));
@@ -2940,7 +2996,7 @@ namespace Aseba
 	}
 	
 	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise
-	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId) const
+	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId, bool* isPrefered) const
 	{
 		NodeTab* bestFound(0);
 		for (int i = 0; i < nodes->count(); i++)
@@ -2952,12 +3008,16 @@ namespace Aseba
 				if (target->getName(id) == name)
 				{
 					if (id == preferedId)
+					{
+						if (isPrefered) *isPrefered = true;
 						return tab;
+					}
 					else if (!bestFound)
 						bestFound = tab;
 				}
 			}
 		}
+		if (isPrefered) *isPrefered = false;
 		return bestFound;
 	}
 	
