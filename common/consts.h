@@ -27,10 +27,10 @@
 /*@{*/
 
 /*! version of Aseba as string */
-#define ASEBA_VERSION "1.5.1"
+#define ASEBA_VERSION "1.5.2"
 
 /*! version of Aseba as an int */
-#define ASEBA_VERSION_INT 10501
+#define ASEBA_VERSION_INT 10502
 
 /*! version of aseba protocol, including bytecodes types and constants */
 #define ASEBA_PROTOCOL_VERSION 5
