@@ -336,7 +336,7 @@ namespace Aseba
 	
 	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
 	
-	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
+	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent) :
 		QSplitter(parent),
 		ScriptTab(id),
 		VariableListener(0),
@@ -1825,7 +1825,7 @@ namespace Aseba
 						bool prefered;
 						const QString nodeName(element.attribute("name"));
 						const unsigned nodeId(element.attribute("nodeId", 0).toUInt());
-						NodeTab* tab = getTabFromName(nodeName, nodeId, &prefered);
+						NodeTab* tab = getTabFromName(nodeName, nodeId, &prefered, &filledList);
 						if (tab)
 						{
 							// matching tab name
@@ -1839,24 +1839,15 @@ namespace Aseba
 							else
 							{
 								const int index(nodes->indexOf(tab));
-								if (filledList.contains(index))
-								{
-									// the node is already filled, create an absent tab
-									nodes->addTab(new AbsentNodeTab(nodeId, nodeName, text, savedPlugins), nodeName + tr(" (not available)"));
-									noNodeCount++;
-								}
-								else
-								{
-									// the node is not filled, fill now
-									tab->editor->setPlainText(text);
-									tab->restorePlugins(savedPlugins, true);
-									filledList.insert(index);
-								}
+								// the node is not filled, fill now
+								tab->editor->setPlainText(text);
+								tab->restorePlugins(savedPlugins, true);
+								filledList.insert(index);
 							}
 						}
 						else
 						{
-							// no matching name, create an absent tab
+							// no matching name or no free slot, create an absent tab
 							nodes->addTab(new AbsentNodeTab(nodeId, nodeName, text, savedPlugins), nodeName + tr(" (not available)"));
 							noNodeCount++;
 						}
@@ -2995,10 +2986,11 @@ namespace Aseba
 		return 0;
 	}
 	
-	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise
-	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId, bool* isPrefered) const
+	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise.
+	//! Do not consider tabs indices in filledList for non-prefered tabs
+	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId, bool* isPrefered, QSet<int>* filledList) const
 	{
-		NodeTab* bestFound(0);
+		NodeTab* freeSlotFound(0);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
@@ -3012,13 +3004,16 @@ namespace Aseba
 						if (isPrefered) *isPrefered = true;
 						return tab;
 					}
-					else if (!bestFound)
-						bestFound = tab;
+					else if (!freeSlotFound)
+					{
+						if (!filledList || !filledList->contains(i))
+							freeSlotFound = tab;
+					}
 				}
 			}
 		}
 		if (isPrefered) *isPrefered = false;
-		return bestFound;
+		return freeSlotFound;
 	}
 	
 	//! Get the absent tab widget index of a corresponding node id
