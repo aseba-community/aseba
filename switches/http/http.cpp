@@ -176,7 +176,7 @@ namespace Aseba
         }
       
         // wait for descriptions
-        for (int i = 0; i < 40; i++) // 40 seconds
+        for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
             this->pingNetwork();
@@ -338,6 +338,8 @@ namespace Aseba
         nodeDescriptionsReceived.insert(nodeId);
         if (verbose)
             wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
+        if (nodeProgramsSent.find(targetId) == nodeProgramsSent.end() && nodeProgram.find(targetId) != nodeProgram.end())
+            compileAndSendCode(targetId, nodeProgram[targetId]);
     }
     
     void HttpInterface::incomingData(Stream *stream)
@@ -771,10 +773,10 @@ namespace Aseba
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
         std::vector<unsigned> todo = getIdsFromURI(args);
-        for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
+        for (std::vector<unsigned>::const_iterator node_it = todo.begin(); node_it != todo.end(); ++node_it)
         {
             try {
-                aeslLoadMemory(*it, buffer, req->content.size());
+                aeslLoadMemory(*node_it, buffer, req->content.size());
             } catch ( runtime_error(e) ) {
                 finishResponse(req, 400, e.what());
                 return;
@@ -1156,7 +1158,12 @@ namespace Aseba
                     wstring program = UTF8ToWString((const char *)text);
                     unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
                     if (preferredId == unsigned(atoi((char*)storedId)))
-                        wasError = !compileAndSendCode(nodeId, program);
+                    {
+                        // wasError = !compileAndSendCode(nodeId, program);
+                        nodeProgram[nodeId] = program;
+                        if (nodeDescriptionsReceived.find(nodeId) != nodeDescriptionsReceived.end())
+                            compileAndSendCode(nodeId,program);
+                    }
                     // else send to all XML nodes (really should only send to those without preferred!)
                 }
                 // free attribute and content
@@ -1170,15 +1177,15 @@ namespace Aseba
         // release memory
         xmlXPathFreeContext(context);
         
-        // check if there was an error
-        if (wasError)
-        {
-            wcerr << "There was an error while loading script " << endl;
-            commonDefinitions[nodeId].events.clear();
-            commonDefinitions[nodeId].constants.clear();
-            allVariables.clear();
-            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
-        }
+//        // check if there was an error
+//        if (wasError)
+//        {
+//            wcerr << "There was an error while loading script " << endl;
+//            commonDefinitions[nodeId].events.clear();
+//            commonDefinitions[nodeId].constants.clear();
+//            allVariables.clear();
+//            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
+//        }
         
         // check if there was some matching problem
         if (noNodeCount)
@@ -1228,7 +1235,12 @@ namespace Aseba
         }
         else
         {
-            wcerr << "compilation for node " << getNodeName(nodeId) << " failed: " << error.toWString() << endl;
+            wcerr << "Compilation for node " << getNodeName(nodeId) << " failed: " << error.toWString() << endl;
+            commonDefinitions[nodeId].events.clear();
+            commonDefinitions[nodeId].constants.clear();
+            // allVariables.clear();
+            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
+
             // HTTP response should be 400 BAD REQUEST, response body should be compiler messages
             return false;
         }

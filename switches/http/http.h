@@ -65,6 +65,7 @@ namespace Aseba
         typedef std::set<Dashel::Stream*>                       StreamSet;
         typedef std::map<Dashel::Stream*, NodeIdSubstitution>   StreamNodeIdSubstitutionMap;
         typedef std::map<unsigned, Aseba::CommonDefinitions>    NodeIdCommonDefinitionsMap;
+        typedef std::map<unsigned, std::wstring>                NodeIdProgramMap;
 
     protected:
         // streams
@@ -81,6 +82,7 @@ namespace Aseba
         StreamSet                   streamsToShutdown;
         std::set<unsigned>          nodeDescriptionsReceived;
         std::set<unsigned>          nodeProgramsSent;
+        NodeIdProgramMap            nodeProgram;
         
         // debug variables
         bool verbose;
