@@ -1157,9 +1157,9 @@ namespace Aseba
                     // get the identifier of the node and compile the code
                     wstring program = UTF8ToWString((const char *)text);
                     unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
-                    if (preferredId == unsigned(atoi((char*)storedId)))
+                    if (preferredId == unsigned(atoi((char*)storedId))
+                        || i == nodeset->nodeNr - 1) // hack: failsafe is last program in set
                     {
-                        // wasError = !compileAndSendCode(nodeId, program);
                         nodeProgram[nodeId] = program;
                         if (nodeDescriptionsReceived.find(nodeId) != nodeDescriptionsReceived.end())
                             compileAndSendCode(nodeId,program);
