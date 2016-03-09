@@ -802,23 +802,22 @@ int main(int argc, char *argv[])
     {
         Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, 1000*Kiterations));
         
-        for (int i = 0; i < 500; i++)
-            network->step(10); // wait for description, variables, etc
-        
         for (auto nodeId: network->allNodeIds())
-        {
-            if (aesl_filename.size() > 0)
-            {
-                network->aeslLoadFile(nodeId, aesl_filename);
+            try {
+                if (aesl_filename.size() > 0)
+                    network->aeslLoadFile(nodeId, aesl_filename);
+                else
+                {
+                    const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+                    network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+                }
+            } catch ( std::runtime_error(e) ) {
+                std::cerr << "Error loading aesl for nodeId " << nodeId << std::endl;
             }
-            else
-            {
-                const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-                network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
-            }
-        }
         
-        network->run();
+        do {
+            network->pingNetwork();
+        } while (network->run1s());
         delete network;
     }
     catch(Dashel::DashelException e)
