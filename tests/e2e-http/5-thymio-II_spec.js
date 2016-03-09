@@ -72,36 +72,53 @@ for (node of [THYMIO2]) {
     .toss();
 }
 
-frisby.create('Get user variables for ' + THYMIO2)
-.get(ASEBAHTTP + THYMIO2 + '/leds_circle')
-.expectStatus(200)
-.expectHeader('Content-Type', 'application/json')
-.expectJSONTypes([Number,Number,Number,Number,Number,Number,Number,Number])
-.toss();
-
 frisby.create('Fail to get undefined user variables for ' + THYMIO2)
 .get(ASEBAHTTP + THYMIO2 + '/whoami')
 .expectStatus(404)
 .toss();
 
-frisby.create('Set/get/set the LED circle variable on ' + THYMIO2)
-.post(ASEBAHTTP + THYMIO2 + '/V_leds_circle', Array(8).fill(16), {json: true})
-.expectStatus(204)
-.after(function(err, res, body) {
-    // Assume no events are running!
-    frisby.create('Get the value of leds_circle on ' + THYMIO2)
-    .get(ASEBAHTTP + THYMIO2 + '/leds_circle')
-    .expectStatus(200)
-    .expectHeader('Content-Type', 'application/json')
-    .expectJSONLength(8)
-    .expectJSON([16,16,16,16,16,16,16,16])
-    .afterJSON(function (body) {
-        frisby.create('Reset the value of V_leds_circle on ' + THYMIO2)
-	.post(ASEBAHTTP + THYMIO2 + '/V_leds_circle', Array(8).fill(0), {json: true})
-	.expectStatus(204)
-        .toss()
+frisby.create('Get/set/get/set the LED circle variable on ' + THYMIO2)
+.get(ASEBAHTTP + THYMIO2 + '/leds_circle')
+.expectStatus(200)
+.expectHeader('Content-Type', 'application/json')
+.expectJSONTypes([Number,Number,Number,Number,Number,Number,Number,Number])
+.afterJSON(function (body) {
+    frisby.create('Call event ' + THYMIO2 + '/V_leds_circle using POST to set LEDs')
+    .post(ASEBAHTTP + THYMIO2 + '/V_leds_circle', Array(8).fill(16), {json: true})
+    .expectStatus(204)
+    .after(function(err, res, body) {
+        // Assume no events are running!
+        frisby.create('Check the values of ' + THYMIO2+ ' leds_circle, after POST V_leds_circle')
+        .get(ASEBAHTTP + THYMIO2 + '/leds_circle')
+        .expectStatus(200)
+        .expectHeader('Content-Type', 'application/json')
+        .expectJSONLength(8)
+        .expectJSON([16,16,16,16,16,16,16,16])
+        .afterJSON(function (body) {
+            frisby.create('Call event ' + THYMIO2 + '/V_leds_circle using GET to set LEDs')
+            .get(ASEBAHTTP + THYMIO2 + '/V_leds_circle/8/8/8/8/8/8/8/8')
+            .expectStatus(204)
+            .after(function(err, res, body) {
+                // Assume no events are running!
+                frisby.create('Check the values of ' + THYMIO2+ ' leds_circle, after GET V_leds_circle')
+                .get(ASEBAHTTP + THYMIO2 + '/leds_circle')
+                .expectStatus(200)
+                .expectHeader('Content-Type', 'application/json')
+                .expectJSONLength(8)
+                .expectJSON([8,8,8,8,8,8,8,8])
+                .afterJSON(function (body) {
+                    frisby.create('Call event ' + THYMIO2 + '/V_leds_circle to reset the values of leds_circle')
+                    .post(ASEBAHTTP + THYMIO2 + '/V_leds_circle', Array(8).fill(0), {json: true})
+                    .expectStatus(204)
+                    .toss()
+                })
+                .toss()
+            })
+            .toss();
+        })
+        .toss();
     })
-    .toss()
+    .toss();
 })
 .toss();
 
