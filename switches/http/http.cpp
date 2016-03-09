@@ -181,7 +181,7 @@ namespace Aseba
             // ask for descriptions
             this->pingNetwork();
             this->run1s();
-            if (nodeDescriptionsReceived.size() == targets.size())
+            if (nodeDescriptionsReceived.size() >= targets.size())
                 break;
         }
 
@@ -1076,6 +1076,7 @@ namespace Aseba
         commonDefinitions[nodeId].events.clear();
         commonDefinitions[nodeId].constants.clear();
         allVariables[nodeId].clear();
+        nodeProgram[nodeId].clear();
         
         // load new data
         int noNodeCount(0);
@@ -1158,7 +1159,7 @@ namespace Aseba
                     wstring program = UTF8ToWString((const char *)text);
                     unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
                     if (preferredId == unsigned(atoi((char*)storedId))
-                        || i == nodeset->nodeNr - 1) // hack: failsafe is last program in set
+                        || (nodeProgram[nodeId].size()==0 && i == nodeset->nodeNr - 1)) // hack: failsafe is last program in set
                     {
                         nodeProgram[nodeId] = program;
                         if (nodeDescriptionsReceived.find(nodeId) != nodeDescriptionsReceived.end())

@@ -21,13 +21,14 @@ ASEBAHTTP -p 3000 -a ping0123.aesl \
 #   dummynode-6 targetId=7 aeslId=4 CLOCK)
 #   dummynode-7 targetId=8 aeslId=4 LISTENER2 (same id dummynode-5)
 ASEBAHTTP -p 3001 -a ping0123.aesl \
-    'tcp:;port=33337;remapTarget=5;remapLocal=1' \
-    'tcp:;port=33338;remapAesl=1;remapTarget=6' \
-    'tcp:;port=33339;remapAesl=4;remapTarget=7' \
-    'tcp:;port=33341;remapAesl=3;remapTarget=9' \
-    'tcp:;port=33340;remapAesl=2;remapTarget=8;remapLocal=6' 1>&2 &
+'tcp:;port=33337;remapTarget=5;remapLocal=1' \
+'tcp:;port=33337;remapTarget=5;remapAesl=1' \
+'tcp:;port=33338;remapTarget=6;remapAesl=1' \
+'tcp:;port=33339;remapTarget=7;remapAesl=4' \
+'tcp:;port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
+'tcp:;port=33341;remapTarget=9;remapAesl=3' 1>&2 &
 
-sleep 10 # let switches start up
+sleep 30 # let switches start up
 
 # run e2e tests
 # jasmine-node --verbose --color *_spec.js
@@ -35,8 +36,9 @@ jasmine-node [1-4]*_spec.js
 status=$?
 
 # optional tests with a real Thymio-II
-[ -x "DASHELPORTLIST" ] && DASHELPORTLIST | grep -qi thymio.ii &&
-    ( ASEBAHTTP -p 3002 -a thymio.aesl 'ser:name=Thymio-II' & ) &&
+[ -x "DASHELPORTLIST" ] && target=$(DASHELPORTLIST | grep -i -m1 thymio.ii) &&
+    target="$(echo "$target"|perl -p -e 's{.*\[(.*?)\s*\(.*}{$1}')" &&
+    ( ASEBAHTTP -p 3002 -a thymio.aesl "ser:name=$target" & ) &&
     sleep 5 &&
     jasmine-node 5-thymio-II_spec.js
 
