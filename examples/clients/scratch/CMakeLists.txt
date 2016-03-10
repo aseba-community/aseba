@@ -1,4 +1,7 @@
 # libxml2
+
+set (CMAKE_CXX_STANDARD 11)
+
 find_package(LibXml2)
 if (LIBXML2_FOUND)
 	
