@@ -3,6 +3,7 @@
 # clean up previous session
 killall aseba{dummynode,switch,massloader,http,scratch}
 for i in 0 1 2 3 4 5 6 7 8; do ASEBADUMMYNODE $i & done
+sleep 3
 
 # localhost:3000 is a switch with 4 cooperating nodes:
 #   dummynode-0 targetId=1 aeslId=1 LISTENER1
@@ -20,15 +21,16 @@ ASEBASCRATCH -p 3000 -a ping0123.aesl \
 #   dummynode-8 targetId=9 aeslId=3 LISTENER3
 ASEBASCRATCH -p 3001 -a ping0123.aesl \
     'tcp:;port=33337;remapTarget=5;remapLocal=1' \
-    'tcp:;port=33338;remapAesl=1;remapTarget=6' \
-    'tcp:;port=33339;remapAesl=4;remapTarget=7' \
-    'tcp:;port=33341;remapAesl=3;remapTarget=9' \
-    'tcp:;port=33340;remapAesl=2;remapTarget=8;remapLocal=6' 1>&2 &
+    'tcp:;port=33338;remapTarget=6;remapAesl=1' \
+    'tcp:;port=33339;remapTarget=7;remapAesl=4' \
+    'tcp:;port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
+    'tcp:;port=33341;remapTarget=9;remapAesl=3' 1>&2 &
 
-sleep 10 # let switches start up
+sleep 30 # let switches start up
 
 # run e2e tests
 # jasmine-node --verbose --color *_spec.js
+export PATH=${PATH}:./node_modules/jasmine-node/bin
 jasmine-node [1-4]*_spec.js
 status=$?
 

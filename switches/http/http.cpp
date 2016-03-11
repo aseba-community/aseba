@@ -581,7 +581,7 @@ namespace Aseba
             }
             else // (do_one_node)
             {
-                if (! (descIt->first == atoi(args[0].c_str()) ||
+	      if (! (int(nodeId) == atoi(args[0].c_str()) ||
                        nodeName.find(args[0])==0) )
                     continue; // this is not a match, skip to next candidate
 
