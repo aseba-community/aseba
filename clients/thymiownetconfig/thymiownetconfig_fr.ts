@@ -48,7 +48,7 @@
     <message>
         <location filename="ThymioWNetConfig.cpp" line="129"/>
         <source>Flash into dongle</source>
-        <translation>Enregister dans le dongle</translation>
+        <translation>Enregistrer dans le dongle</translation>
     </message>
     <message>
         <location filename="ThymioWNetConfig.cpp" line="130"/>
