@@ -297,7 +297,11 @@ namespace Aseba
 			if (!failed)
 				return;
 #ifndef ANDROID
-			QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
+			// have user-friendly Thymio-specific message
+			if (commandLineTarget == "ser:name=Thymio-II")
+				QMessageBox::warning(0, tr("Thymio not found"), tr("<p><b>Cannot find Thymio!</b></p><p>Plug a Thymio to your computer using the USB cable, and make sure no other program is using Thymio.</p>"));
+			else
+				QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
 #endif
 		}
 		
