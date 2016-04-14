@@ -2776,12 +2776,14 @@ namespace Aseba
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
 		const int index = getIndexFromId(node);
-		// Q_ASSERT(index >= 0);
-		// this is a temporary hack, it should be fixed in DashelTarget
-		// and Studio should not receive multiple disconnected messages...
-		// if we receive a disconnected message from an already-disconnected node, ignore it
+		// Double disconnection might happen if the reception of the target description
+		// hang. Studio handles this nicely, simply ignoring the message, but prints a warning 
+		// because this behaviour likely indicates a problem with the node or a bug somewhere.
 		if (index < 0)
+		{
+			std::cerr << "Warning: Received double disconnection from node " << node << ", the node might experience connection problems!" << std::endl;
 			return;
+		}
 		const NodeTab* tab = getTabFromId(node);
 		const QString& tabName = nodes->tabText(index);
 		
@@ -2799,23 +2801,6 @@ namespace Aseba
 		
 		regenerateToolsMenus();
 		regenerateHelpMenu();
-	}
-	
-	//! The network connection has been cut: all nodes have disconnected.
-	void MainWindow::networkDisconnected()
-	{
-		// collect all node ids to disconnect
-		std::vector<unsigned> toDisconnect;
-		for (int i = 0; i < nodes->count(); i++)
-		{
-			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (tab)
-				toDisconnect.push_back(tab->nodeId());
-		}
-		
-		// disconnect all node ids
-		for (size_t i = 0; i < toDisconnect.size(); i++)
-			nodeDisconnected(toDisconnect[i]);
 	}
 	
 	//! A user event has arrived from the network.
@@ -3281,7 +3266,6 @@ namespace Aseba
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target, SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
-		connect(target, SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(userEventsDropped(unsigned)), SLOT(userEventsDropped(unsigned)));

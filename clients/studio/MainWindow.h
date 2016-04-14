@@ -463,7 +463,6 @@ namespace Aseba
 		
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
-		void networkDisconnected();
 		
 		void userEventsDropped(unsigned amount);
 		void userEvent(unsigned id, const VariablesDataVector &data);

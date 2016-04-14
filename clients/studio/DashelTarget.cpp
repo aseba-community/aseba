@@ -382,6 +382,15 @@ namespace Aseba
 	{
 		Q_UNUSED(stream);
 		Q_UNUSED(abnormal);
+		
+		// mark all nodes as being disconnected
+		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		{
+			nodeIt->second.connected = false;
+			nodeDisconnected(nodeIt->first);
+		}
+		
+		// notify target for showing reconnection message
 		emit dashelDisconnection();
 		Q_ASSERT(stream == this->stream);
 		this->stream = 0;
@@ -848,9 +857,6 @@ namespace Aseba
 
 	void DashelTarget::disconnectionFromDashel()
 	{
-		// tell user client the network was disconnected
-		emit networkDisconnected();
-		
 		// show a dialog box that is trying to reconnect
 		ReconnectionDialog reconnectionDialog(dashelInterface);
 		reconnectionDialog.exec();
