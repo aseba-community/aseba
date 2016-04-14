@@ -215,7 +215,6 @@ namespace Aseba
 		// target events
 		connect(target.get(), SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target.get(), SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
-		connect(target.get(), SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
 		// right now, we ignore errors
 		/*connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)));
@@ -535,14 +534,6 @@ namespace Aseba
 			//vpl->deleteLater();
 			vpl = 0;
 		}
-	}
-	
-	//! The network connection has been cut: disconnect VPL node if connected
-	void ThymioVPLStandalone::networkDisconnected()
-	{
-		// disconnect VPL if present
-		if (vpl)
-			nodeDisconnected(id);
 	}
 	
 	//! The execution state logic thinks variables might need a refresh

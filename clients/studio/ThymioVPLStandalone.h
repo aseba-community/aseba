@@ -88,7 +88,6 @@ namespace Aseba
 		void editorContentChanged();
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
-		void networkDisconnected();
 		void variablesMemoryEstimatedDirty(unsigned node);
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
 		void updateWindowTitle(bool modified);
