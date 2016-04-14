@@ -829,7 +829,7 @@ namespace Aseba
 			dashelInterface(dashelInterface),
 			counter(0)
 		{
-			setWindowTitle(tr("Aseba Studio - Connection closed"));
+			setWindowTitle(tr("Connection closed"));
 			setText(tr("Warning, connection closed: I am trying to reconnect."));
 			addButton(tr("Stop trying"), QMessageBox::RejectRole);
 			setEscapeButton(QMessageBox::Cancel);
