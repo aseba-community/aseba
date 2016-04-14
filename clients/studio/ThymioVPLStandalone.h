@@ -106,6 +106,7 @@ namespace Aseba
 		
 		QLayout* vplLayout; //!< layout to add/remove VPL to/from
 		ThymioVPL::ThymioVisualProgramming* vpl; //!< VPL widget 
+		QLabel* disconnectedMessage; //!< message for VPL area when disconnected
 		QDomDocument savedContent; //!< saved VPL content across disconnections
 		AeslEditor* editor; //! viewer of code produced by VPL
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation

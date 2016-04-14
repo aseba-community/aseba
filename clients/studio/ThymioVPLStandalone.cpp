@@ -169,6 +169,10 @@ namespace Aseba
 		#ifdef Q_WS_MACX
 		vplLayout->setContentsMargins(0,0,0,0);
 		#endif // Q_WS_MACX
+		disconnectedMessage = new QLabel(tr("Connecting to Thymio..."));
+		disconnectedMessage->setAlignment(Qt::AlignCenter);
+		disconnectedMessage->setWordWrap(true);
+		vplLayout->addWidget(disconnectedMessage);
 		QWidget* vplContainer = new QWidget;
 		vplContainer->setLayout(vplLayout);
 		
@@ -495,7 +499,11 @@ namespace Aseba
 			close();
 			return;
 		}
-			
+		
+		// hide the disconnected message
+		disconnectedMessage->hide();
+		disconnectedMessage->setText(tr("Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle"));
+		
 		// save node information
 		id = node;
 		
@@ -533,6 +541,8 @@ namespace Aseba
 			delete vpl;
 			//vpl->deleteLater();
 			vpl = 0;
+			
+			disconnectedMessage->show();
 		}
 	}
 	
