@@ -268,7 +268,7 @@ namespace Aseba
     
     bool HttpInterface::run1s()
     {
-        int timeout(1000);
+        int timeout(50);
         UnifiedTime startTime;
         while (timeout > 0)
         {

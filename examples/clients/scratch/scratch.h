@@ -46,6 +46,19 @@ namespace Aseba
                                    unsigned& source, unsigned& pos, unsigned& length);
         virtual strings makeLedsCircleVector(unsigned dial);
         virtual strings makeLedsRGBVector(unsigned color);
-        virtual void receiveStateVariables(const UserMessage *userMsg);
+        virtual void receiveStateVariables(const unsigned nodeId, const std::vector<short> data);
+        
+    protected:
+        const std::map<std::string, std::pair<unsigned, unsigned> > pollable_variables =
+        std::map<std::string, std::pair<unsigned, unsigned> >({
+            {"acc",{0,1}}, {"button.backward",{1,2}}, {"button.center",{1,2}},
+            {"button.forward",{1,2}}, {"button.left",{1,2}}, {"button.right",{1,2}},
+            {"mic.intensity",{1,2}},
+            {"angle.front",{2,3}}, {"angle.front",{3,4}},
+            {"distance.back",{4,5}}, {"distance.front",{4,5}}, {"motor.left.target",{5,6}},
+            {"motor.right.target",{6,7}}, {"motor.left.speed",{7,8}}, {"motor.right.speed",{8,9}},
+            {"odo.degree",{9,10}}, {"odo.x",{10,11}}, {"odo.y",{11,12}}, {"prox.comm.rx",{12,13}},
+            {"prox.comm.tx",{13,14}}, {"prox.ground.delta",{14,16}}, {"prox.horizontal",{16,23}}});
+        std::map<unsigned, GetVariables> node_r_state;
     };
 };

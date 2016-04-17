@@ -56,8 +56,20 @@ namespace Aseba
     
     void ScratchInterface::incomingVariables(const Variables *variables)
     {
+        // first record incoming value to variable cache
         variable_cache[VariableAddress(variables->source,variables->start)] = std::vector<short>(variables->variables);
-        HttpInterface::incomingVariables(variables); // then use base class method
+        
+        // if this is R_state, update the variables it encodes
+        VariablesMap vm = allVariables[variables->source];
+        VariablesMap::iterator v = vm.find(UTF8ToWString("R_state"));
+        if (v != vm.end())
+        {
+            if (v->second.first == variables->start)
+                receiveStateVariables(variables->source, variables->variables);
+        }
+        
+        // finally, use base class method
+        HttpInterface::incomingVariables(variables);
     }
     
     void ScratchInterface::incomingUserMsg(const UserMessage *userMsg)
@@ -83,7 +95,7 @@ namespace Aseba
             commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state")==0 &&
             userMsg->data.size() >= 1)
         {
-            receiveStateVariables(userMsg);
+            receiveStateVariables(userMsg->source, userMsg->data);
         }
         
         HttpInterface::incomingUserMsg(userMsg);
@@ -280,8 +292,7 @@ namespace Aseba
                             args.at(1) = std::to_string(vR);
                             sendSetVariable(nodeId, args);
                         }
-                        sendPollVariables(nodeId);
-                        sendPollVariables(nodeId);
+                        sendPollVariables(nodeId); // urgently get updated sensor values
                     }
                     finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
                     return;
@@ -460,16 +471,20 @@ namespace Aseba
     }
     string ScratchInterface::evPoll(const unsigned nodeId)
     {
-        if (difftime(time(0), state_variable_update_time) > 2)
-            sendPollVariables(nodeId);
+        // If it is time to poll for an update, send a request for variables
+        // if (difftime(time(0), state_variable_update_time) > 2)
+        sendPollVariables(nodeId);
         std::stringstream result;
         char wbuf[128];
         
+        // Tell Scratch which threads are still busy
         result << "_busy";
         for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
             result << " " << *i;
         result << endl;
         
+        // Tell Scratch the values of all variables named in the AESL program
+        // If the variable name starts with "b_" report its boolean value as a string "true" or "false"
         for(VariablesMap::iterator it = allVariables[nodeId].begin(); it != allVariables[nodeId].end(); ++it)
         {
             bool is_boolean_variable = (it->first.find(L"b_",0) == 0);
@@ -487,6 +502,8 @@ namespace Aseba
             result << endl;
         }
         
+        // Tell Scratch the values of derived variables that are created on the fly
+        // derived 1: button boolean flags; formatted for menus
         std::vector<short> cv;
         result << "b_button/center " << (getCachedVal(nodeId, "button.center", cv) && cv.front() ? "true" : "false") << endl;
         result << "b_button/forward " << (getCachedVal(nodeId, "button.forward", cv) && cv.front() ? "true" : "false") << endl;
@@ -494,6 +511,7 @@ namespace Aseba
         result << "b_button/left " << (getCachedVal(nodeId, "button.left", cv) && cv.front() ? "true" : "false") << endl;
         result << "b_button/right " << (getCachedVal(nodeId, "button.right", cv) && cv.front() ? "true" : "false") << endl;
 
+        // derived 2: proximity warnings; formatted for menus
         if (getCachedVal(nodeId, "prox.horizontal", cv))
         {
             result << "b_touching/front " << ((cv[0]+cv[1]+cv[2]+cv[3]+cv[4])/1000 > 0 ? "true" : "false") << endl;
@@ -504,6 +522,7 @@ namespace Aseba
             result << "b_touching/ground " << ((cv[0]+cv[1])/500 > 0 ? "true" : "false") << endl;
         }
         
+        // derived 3: proximity distances; formatted for menus
         if (getCachedVal(nodeId, "distance.front", cv))
             result << "distance/front " << clamp(cv.front(),(short)0,(short)190) << endl;
         if (getCachedVal(nodeId, "distance.back", cv))
@@ -514,13 +533,15 @@ namespace Aseba
         if (getCachedVal(nodeId, "angle.front", cv))
             result << "angle/front " << cv.front() << endl;
 
-        if (getCachedVal(nodeId, "odo.theta", cv))
-            result << "odo/direction " << 90 - cv.front()/182 << endl;
+        // derived 4: odometry; formatted for menus
+        if (getCachedVal(nodeId, "odo.degree", cv))
+            result << "odo/direction " << cv.front() << endl; // same as 90 - odo.theta/182
         if (getCachedVal(nodeId, "odo.x", cv))
             result << "odo/x " << cv.front()/28 << endl;
         if (getCachedVal(nodeId, "odo.y", cv))
             result << "odo/y " << cv.front()/28 << endl;
 
+        // derived 5: motor speeds; formatted for menus
         if (getCachedVal(nodeId, "motor.left.speed", cv))
             result << "motor.speed/left " << cv.front()  *10/32 << endl;
         if (getCachedVal(nodeId, "motor.right.speed", cv))
@@ -530,17 +551,20 @@ namespace Aseba
         if (getCachedVal(nodeId, "motor.right.target", cv))
             result << "motor.target/right " << cv.front()*10/32 << endl;
         
+        // derived 6: accelerometer values; formatted for menus
         if (getCachedVal(nodeId, "acc", cv))
         {
             result << "tilt/right_left " << cv[0] << endl;
             result << "tilt/front_back " << cv[1] << endl;
             result << "tilt/top_bottom " << cv[2] << endl;
         }
-
+        
+        // derived 7: LED values; formatted for menus
         result << "leds/top " << leds[std::make_pair(nodeId,0)] << endl;
         result << "leds/bottom/left " << leds[std::make_pair(nodeId,1)] << endl;
         result << "leds/bottom/right " << leds[std::make_pair(nodeId,2)] << endl;
         
+        // derived 8: clap warning
         std::vector<short> mic_threshold, mic_intensity;
         if (getCachedVal(nodeId, "mic.threshold", mic_threshold) &&
             getCachedVal(nodeId, "mic.intensity", mic_intensity))
@@ -555,54 +579,22 @@ namespace Aseba
         if (polled_variables.size() == 0)
         {
             unsigned source, pos, len;
-            if (getVarAddrLen(nodeId, "button.center", source, pos, len))
+            
+            std::map<unsigned, GetVariables>::iterator i = node_r_state.find(source);
+            if (i != node_r_state.end())
+                polled_variables.push_back(i->second);
+            else if (getVarAddrLen(nodeId, "R_state", source, pos, len))
+            {
+                node_r_state[source] = GetVariables(source, pos, len);
                 polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "button.forward", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "button.backward", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "button.left", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "button.right", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "distance.front", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "distance.back", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "angle.front", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "odo.delta", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "odo.theta", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "odo.x", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "odo.y", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "motor.left.speed", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "motor.right.speed", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "motor.left.target", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "motor.right.target", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "prox.horizontal", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "prox.ground.delta", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "mic.threshold", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "mic.intensity", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "prox.comm.rx", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "prox.comm.tx", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "acc", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
-            if (getVarAddrLen(nodeId, "temperature", source, pos, len))
-                polled_variables.push_back(GetVariables(source, pos, len));
+            }
+            else
+                // we can't use R_state, so ask for variables separately
+                for (auto variable: pollable_variables) {
+                    if (getVarAddrLen(nodeId, variable.first, source, pos, len))
+                        polled_variables.push_back(GetVariables(source, pos, len));
+            }
+
         }
         std::list<GetVariables>::iterator pvi = polled_variables.begin();
         if (verbose)
@@ -633,96 +625,87 @@ namespace Aseba
         //!// std::rotate(polled_variables.begin(), pvi, polled_variables.end());
     }
     
-    void ScratchInterface::receiveStateVariables(const UserMessage *userMsg)
+    void ScratchInterface::receiveStateVariables(const unsigned nodeId, const std::vector<short> data)
     {
-        unsigned nodeId = userMsg->source;
-        if (state_variable_addresses.size() == 0)
-        {
-//            [acc[0:2], angle.front,
-//             (button.backward&lt;&lt;4) + (button.center&lt;&lt;3) + (button.forward&lt;&lt;2) +
-//             (button.left&lt;&lt;1) + button.right,
-//             distance.back, distance.front, mic.intensity, mic.threshold,
-//             motor.left.speed, motor.left.target, motor.right.speed, motor.right.target,
-//             odo.delta, odo.theta, odo.x, odo.y,
-//             prox.comm.rx, prox.comm.tx, prox.ground.delta, prox.horizontal,
-//             temperature]
-            unsigned source, pos, len;
-            if (getVarAddrLen(nodeId, "acc", source, pos, len))
-                state_variable_addresses["acc"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "angle.front", source, pos, len))
-                state_variable_addresses["angle.front"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "button.backward", source, pos, len))
-                state_variable_addresses["button.backward"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "button.center", source, pos, len))
-                state_variable_addresses["button.center"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "button.forward", source, pos, len))
-                state_variable_addresses["button.forward"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "button.left", source, pos, len))
-                state_variable_addresses["button.left"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "button.right", source, pos, len))
-                state_variable_addresses["button.right"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "distance.back", source, pos, len))
-                state_variable_addresses["distance.back"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "distance.front", source, pos, len))
-                state_variable_addresses["distance.front"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "mic.intensity", source, pos, len))
-                state_variable_addresses["mic.intensity"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "mic.threshold", source, pos, len))
-                state_variable_addresses["mic.threshold"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "motor.left.speed", source, pos, len))
-                state_variable_addresses["motor.left.speed"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "motor.left.target", source, pos, len))
-                state_variable_addresses["motor.left.target"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "motor.right.speed", source, pos, len))
-                state_variable_addresses["motor.right.speed"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "motor.right.target", source, pos, len))
-                state_variable_addresses["motor.right.target"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "odo.delta", source, pos, len))
-                state_variable_addresses["odo.delta"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "odo.theta", source, pos, len))
-                state_variable_addresses["odo.theta"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "odo.x", source, pos, len))
-                state_variable_addresses["odo.x"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "odo.y", source, pos, len))
-                state_variable_addresses["odo.y"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "prox.comm.rx", source, pos, len))
-                state_variable_addresses["prox.comm.rx"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "prox.comm.tx", source, pos, len))
-                state_variable_addresses["prox.comm.tx"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "prox.ground.delta", source, pos, len))
-                state_variable_addresses["prox.ground.delta"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "prox.horizontal", source, pos, len))
-                state_variable_addresses["prox.horizontal"] = make_pair(source, pos);
-            if (getVarAddrLen(nodeId, "temperature", source, pos, len))
-                state_variable_addresses["temperature"] = make_pair(source, pos);
-        }
-        variable_cache[state_variable_addresses["acc"]].assign(userMsg->data.begin(), userMsg->data.begin()+3);
-        variable_cache[state_variable_addresses["angle.front"]].assign(userMsg->data.begin()+3, userMsg->data.begin()+4);
-        variable_cache[state_variable_addresses["button.backward"]].assign(1, (userMsg->data[4] >> 4) % 1);
-        variable_cache[state_variable_addresses["button.center"]].assign(1, (userMsg->data[4] >> 3) % 1);
-        variable_cache[state_variable_addresses["button.forward"]].assign(1, (userMsg->data[4] >> 2) % 1);
-        variable_cache[state_variable_addresses["button.left"]].assign(1, (userMsg->data[4] >> 1) % 1);
-        variable_cache[state_variable_addresses["button.right"]].assign(1, userMsg->data[4] % 1);
-        variable_cache[state_variable_addresses["distance.back"]].assign(1, userMsg->data[5]);
-        variable_cache[state_variable_addresses["distance.front"]].assign(1, userMsg->data[6]);
-        variable_cache[state_variable_addresses["mic.intensity"]].assign(1, userMsg->data[7]);
-        variable_cache[state_variable_addresses["mic.threshold"]].assign(1, userMsg->data[8]);
-        variable_cache[state_variable_addresses["motor.left.speed"]].assign(1, userMsg->data[9]);
-        variable_cache[state_variable_addresses["motor.left.target"]].assign(1, userMsg->data[10]);
-        variable_cache[state_variable_addresses["motor.right.speed"]].assign(1, userMsg->data[11]);
-        variable_cache[state_variable_addresses["motor.right.target"]].assign(1, userMsg->data[12]);
-        variable_cache[state_variable_addresses["odo.delta"]].assign(1, userMsg->data[13]);
-        variable_cache[state_variable_addresses["odo.theta"]].assign(1, userMsg->data[14]);
-        variable_cache[state_variable_addresses["odo.x"]].assign(1, userMsg->data[15]);
-        variable_cache[state_variable_addresses["odo.y"]].assign(1, userMsg->data[16]);
-        variable_cache[state_variable_addresses["prox.comm.rx"]].assign(1, userMsg->data[17]);
-        variable_cache[state_variable_addresses["prox.comm.tx"]].assign(1, userMsg->data[18]);
-        variable_cache[state_variable_addresses["prox.ground.delta"]].assign(userMsg->data.begin()+19, userMsg->data.begin()+21);;
-        variable_cache[state_variable_addresses["prox.horizontal"]].assign(userMsg->data.begin()+21, userMsg->data.begin()+28);;
-        variable_cache[state_variable_addresses["temperature"]].assign(1, userMsg->data[28]);
-        
+        unsigned source, pos, len;
         time(&state_variable_update_time);
+        
+        for (auto variable: pollable_variables) {
+            string varName = variable.first;
+            unsigned dataBegin = variable.second.first;
+            unsigned dataEnd = variable.second.second;
+            // fill in state variable addresses if needed
+            if (state_variable_addresses.count(variable.first) == 0)
+                if (getVarAddrLen(nodeId, variable.first, source, pos, len))
+                    state_variable_addresses[variable.first] = make_pair(source, pos);
+
+            // continue if we know this variable
+            if (state_variable_addresses.count(variable.first) > 0)
+            {
+                variable_cache[state_variable_addresses[varName]].assign(data.begin()+dataBegin, data.begin()+dataEnd);
+            }
+        }
+        // extract encoded values 1: buttons + thresholded microphone
+        std::vector<short> payload = variable_cache[state_variable_addresses["button.backward"]];
+        if (payload.size() == 1)
+        {
+            variable_cache[state_variable_addresses["button.backward"]].assign(1, (payload[0] >> 4) % 1);
+            variable_cache[state_variable_addresses["button.center"]].assign(1, (payload[0] >> 3) % 1);
+            variable_cache[state_variable_addresses["button.forward"]].assign(1, (payload[0] >> 2) % 1);
+            variable_cache[state_variable_addresses["button.left"]].assign(1, (payload[0] >> 1) % 1);
+            variable_cache[state_variable_addresses["button.right"]].assign(1, payload[0] % 1);
+            variable_cache[state_variable_addresses["mic.intensity"]].assign(1, (payload[0] >> 8) % 8);
+        }
+        // extract encoded values 2: acc
+        payload = variable_cache[state_variable_addresses["acc"]];
+        if (payload.size() == 1)
+        {
+            variable_cache[state_variable_addresses["acc"]].assign(1, (payload[0] >> 10) % 32);
+            variable_cache[state_variable_addresses["acc"]].assign(2, (payload[0] >> 5) % 32);
+            variable_cache[state_variable_addresses["acc"]].assign(3, payload[0] % 32);
+        }
+        // extract encoded values 3: distance
+        payload = variable_cache[state_variable_addresses["distance.back"]];
+        if (payload.size() == 1)
+        {
+            variable_cache[state_variable_addresses["distance.back"]].assign(1, (payload[0] >> 8) % 255);
+            variable_cache[state_variable_addresses["distance.front"]].assign(1, payload[0] % 255);
+        }
     }
+    
+//        if (state_variable_addresses.size() == 0)
+//        {
+//            unsigned source, pos, len;
+//            for (auto variable: pollable_variables) {
+//                if (getVarAddrLen(nodeId, variable.first, source, pos, len))
+//                    state_variable_addresses[variable.first] = make_pair(source, pos);
+//            }
+//        }
+//        variable_cache[state_variable_addresses["acc"]].assign(userMsg->data.begin(), userMsg->data.begin()+3);
+//        variable_cache[state_variable_addresses["angle.front"]].assign(userMsg->data.begin()+3, userMsg->data.begin()+4);
+//        variable_cache[state_variable_addresses["button.backward"]].assign(1, (userMsg->data[4] >> 4) % 1);
+//        variable_cache[state_variable_addresses["button.center"]].assign(1, (userMsg->data[4] >> 3) % 1);
+//        variable_cache[state_variable_addresses["button.forward"]].assign(1, (userMsg->data[4] >> 2) % 1);
+//        variable_cache[state_variable_addresses["button.left"]].assign(1, (userMsg->data[4] >> 1) % 1);
+//        variable_cache[state_variable_addresses["button.right"]].assign(1, userMsg->data[4] % 1);
+//        variable_cache[state_variable_addresses["distance.back"]].assign(1, userMsg->data[5]);
+//        variable_cache[state_variable_addresses["distance.front"]].assign(1, userMsg->data[6]);
+//        variable_cache[state_variable_addresses["mic.intensity"]].assign(1, userMsg->data[7]);
+//        variable_cache[state_variable_addresses["mic.threshold"]].assign(1, userMsg->data[8]);
+//        variable_cache[state_variable_addresses["motor.left.speed"]].assign(1, userMsg->data[9]);
+//        variable_cache[state_variable_addresses["motor.left.target"]].assign(1, userMsg->data[10]);
+//        variable_cache[state_variable_addresses["motor.right.speed"]].assign(1, userMsg->data[11]);
+//        variable_cache[state_variable_addresses["motor.right.target"]].assign(1, userMsg->data[12]);
+//        variable_cache[state_variable_addresses["odo.delta"]].assign(1, userMsg->data[13]);
+//        variable_cache[state_variable_addresses["odo.theta"]].assign(1, userMsg->data[14]);
+//        variable_cache[state_variable_addresses["odo.x"]].assign(1, userMsg->data[15]);
+//        variable_cache[state_variable_addresses["odo.y"]].assign(1, userMsg->data[16]);
+//        variable_cache[state_variable_addresses["prox.comm.rx"]].assign(1, userMsg->data[17]);
+//        variable_cache[state_variable_addresses["prox.comm.tx"]].assign(1, userMsg->data[18]);
+//        variable_cache[state_variable_addresses["prox.ground.delta"]].assign(userMsg->data.begin()+19, userMsg->data.begin()+21);;
+//        variable_cache[state_variable_addresses["prox.horizontal"]].assign(userMsg->data.begin()+21, userMsg->data.begin()+28);;
+//        variable_cache[state_variable_addresses["temperature"]].assign(1, userMsg->data[28]);
+//    }
 
 
     //== end of class ScratchInterface ============================================================
