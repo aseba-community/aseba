@@ -3,6 +3,11 @@ var frisby = require('frisby');
 var ASEBASCRATCH = 'http://localhost:3002/';
 var THYMIO2 = 'nodes/thymio-II';
 
+frisby.create('Reset Thymio-II')
+.get(ASEBASCRATCH + 'reset')
+.expectStatus(204)
+.toss();
+
 frisby.create('Check motion queue')
 .get(ASEBASCRATCH + THYMIO2 + '/scratch_move/99/20')
 .expectStatus(200)

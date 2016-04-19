@@ -4,6 +4,11 @@ var ASEBASCRATCH = 'http://localhost:3002/';
 var NODENUM = 'nodes/1';
 var THYMIO2 = 'nodes/thymio-II';
 
+frisby.create('Reset Thymio-II')
+.get(ASEBASCRATCH + 'reset')
+.expectStatus(204)
+.toss();
+
 frisby.create('Verify no root endpoint')
 .get(ASEBASCRATCH)
 .expectStatus(404)
