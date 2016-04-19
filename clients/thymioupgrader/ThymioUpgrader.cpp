@@ -132,7 +132,7 @@ namespace Aseba
 		officialFirmwareText->setWordWrap(true);
 		officialLayout->addWidget(officialFirmwareText);
 		officialGroupBox->setLayout(officialLayout);
-		connect(officialGroupBox, SIGNAL(toggled(bool)), SLOT(officialGroupChecked(bool)));
+		connect(officialGroupBox, SIGNAL(clicked(bool)), SLOT(officialGroupChecked(bool)));
 		mainLayout->addWidget(officialGroupBox);
 		
 		// file selector
@@ -146,7 +146,7 @@ namespace Aseba
 		fileLayout->addWidget(fileButton);
 		fileLayout->addWidget(lineEdit);
 		fileGroupBox->setLayout(fileLayout);
-		connect(fileGroupBox, SIGNAL(toggled(bool)), SLOT(fileGroupChecked(bool)));
+		connect(fileGroupBox, SIGNAL(clicked(bool)), SLOT(fileGroupChecked(bool)));
 		mainLayout->addWidget(fileGroupBox);
 
 		// progress bar
@@ -189,19 +189,31 @@ namespace Aseba
 	void ThymioUpgraderDialog::officialGroupChecked(bool on)
 	{
 		if (on)
-		{
-			fileGroupBox->setChecked(false);
-			setupFlashButtonState();
-		}
+			selectOfficialFirmware();
+		else
+			selectUserFirmware();
 	}
 	
 	void ThymioUpgraderDialog::fileGroupChecked(bool on)
 	{
 		if (on)
-		{
-			officialGroupBox->setChecked(false);
-			setupFlashButtonState();
-		}
+			selectUserFirmware();
+		else
+			selectOfficialFirmware();
+	}
+	
+	void ThymioUpgraderDialog::selectOfficialFirmware()
+	{
+		officialGroupBox->setChecked(true);
+		fileGroupBox->setChecked(false);
+		setupFlashButtonState();
+	}
+	
+	void ThymioUpgraderDialog::selectUserFirmware()
+	{
+		officialGroupBox->setChecked(false);
+		fileGroupBox->setChecked(true);
+		setupFlashButtonState();
 	}
 	
 	void ThymioUpgraderDialog::setupFlashButtonState()
@@ -457,8 +469,7 @@ namespace Aseba
 					officialHexFile.waitForBytesWritten(-1);
 					officialFirmwareText->setText(tr("Official firmware: %1").arg(versionDevStatusToString(officialVersion, officialDevStatus)));
 					officialGroupBox->setCheckable(true);
-					officialGroupBox->setChecked(true);
-					fileGroupBox->setChecked(false);
+					selectOfficialFirmware();
 				}
 				else
 					officialFirmwareText->setText(tr("Cannot open temporary file!"));

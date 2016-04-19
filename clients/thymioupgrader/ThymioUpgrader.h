@@ -102,6 +102,8 @@ namespace Aseba
 		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
 		void networkError();
 		QString versionDevStatusToString(unsigned version, unsigned devStatus) const;
+		void selectOfficialFirmware();
+		void selectUserFirmware();
 	
 	private slots:
 		void officialGroupChecked(bool on);
