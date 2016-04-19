@@ -137,8 +137,6 @@ namespace Aseba
 		
 		// file selector
 		fileGroupBox = new QGroupBox(tr("Custom firmware file"));
-		fileGroupBox->setCheckable(true);
-		fileGroupBox->setChecked(true);
 		QHBoxLayout *fileLayout = new QHBoxLayout();
 		lineEdit = new QLineEdit(this);
 		fileButton = new QPushButton(tr("Select..."), this);
@@ -469,12 +467,12 @@ namespace Aseba
 					officialHexFile.waitForBytesWritten(-1);
 					officialFirmwareText->setText(tr("Official firmware: %1").arg(versionDevStatusToString(officialVersion, officialDevStatus)));
 					officialGroupBox->setCheckable(true);
+					fileGroupBox->setCheckable(true);
 					selectOfficialFirmware();
 				}
 				else
 					officialFirmwareText->setText(tr("Cannot open temporary file!"));
 			}
-			
 		}
 		reply->deleteLater();
 	}
