@@ -125,6 +125,13 @@ namespace Aseba
             finishResponse(req, 200, result);
             return;
         }
+        if (req->tokens[0].find("reset")==0 || req->tokens[0].find("reset_all")==0)
+        {
+            // first, empty busy queue
+            busy_threads.clear();
+            // then, call base class method HttpInterface::evReset
+            return HttpInterface::evReset(req, req->tokens );
+        }
         if (req->tokens[0].find("nodes")==0)
         {
             strings args(&(req->tokens[1]),&(req->tokens[req->tokens.size()]));

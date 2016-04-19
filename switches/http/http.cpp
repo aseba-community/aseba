@@ -268,7 +268,7 @@ namespace Aseba
     
     bool HttpInterface::run1s()
     {
-        int timeout(50);
+        int timeout(1000);
         UnifiedTime startTime;
         while (timeout > 0)
         {
@@ -297,7 +297,7 @@ namespace Aseba
             }
 
             // standard Aseba run loop
-            if (!step(timeout))
+            if (!step(50))
                 return false;
             timeout -= (Aseba::UnifiedTime() - startTime).value;
         }
@@ -1372,8 +1372,8 @@ namespace Aseba
             NodeIdSubstitution::iterator localWish = localWishes.find(targetId);
             if (localWish != localWishes.end())
                 newId = localWish->second;
-            while (used.find(newId) != used.end() && (newId += 20) <= 50000);
-            if (newId == 0 || newId > 50000) //
+            while (used.count(newId) != 0 && (newId += 20)); // unsigned newId will wrap around
+            if (newId == 0) //
                 throw runtime_error(FormatableString("Can't allocate an unused node id for target id %0 in stream %1").arg(targetId).arg(stream));
 
             // remember the assigned nodeId for this targetId in this stream
