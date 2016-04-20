@@ -196,12 +196,13 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="129"/>
         <source>Latest official firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Letzte offizielle Firmware</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="139"/>
         <source>Custom firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinierte Firmware-Datei</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="289"/>
@@ -249,17 +250,17 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="468"/>
         <source>Official firmware: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Offizielle Firmware: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="474"/>
         <source>Cannot open temporary file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporäre Datei kann nicht geöffnet werden!</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="482"/>
         <source>Error connecting to official firmware server!</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Verbinden mit offiziellen Firmware-Server!</translation>
     </message>
 </context>
 <context>
