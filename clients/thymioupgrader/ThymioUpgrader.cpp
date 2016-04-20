@@ -327,7 +327,7 @@ namespace Aseba
 		if (devStatus == 0)
 			return tr("version %1 - production").arg(version);
 		else
-			return tr("version %1 - development %2").arg(version, devStatus);
+			return tr("version %1 - development %2").arg(version).arg(devStatus);
 	}
 
 	void ThymioUpgraderDialog::doFlash(void) 
