@@ -136,7 +136,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="302"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossibile trovare Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un Thymio al computer utilizzando il cavo USB o il dongle. Assicurarsi che nessun altro programma stia usando il Thymio.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="304"/>
@@ -906,12 +906,12 @@ event %0 : </source>
     <message>
         <location filename="MainWindow.cpp" line="3459"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Chuidi</translation>
+        <translation>&amp;Chuidi</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="3463"/>
         <source>Cu&amp;t</source>
-        <translation type="unfinished">&amp;Taglia</translation>
+        <translation>&amp;Taglia</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
@@ -1862,12 +1862,12 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="75"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="76"/>
         <source>Please enter your user or group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Si prega di inserire il proprio nome utente o il nome del gruppo:</translation>
     </message>
 </context>
 <context>
@@ -1879,7 +1879,7 @@ event %0 : </source>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="172"/>
         <source>Connecting to Thymio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Collegamento con Thymio...</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="274"/>
@@ -1921,7 +1921,7 @@ event %0 : </source>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="505"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>Collegamento a Thymio perso ... assicurarsi che Thymio sia acceso e collegare il cavo USB o il dongle</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="569"/>

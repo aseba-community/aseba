@@ -136,7 +136,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="302"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Kann Thymio nicht finden!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Schließen Sie einen Thymio an Ihren Computer über das USB-Kabel / Dongle, und stellen Sie sicher, dass kein anderes Programm mit Thymio unter Verwendung ist&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="304"/>
@@ -1988,7 +1988,7 @@ Ereignis %0: </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="172"/>
         <source>Connecting to Thymio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Anbindung an Thymio ...</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="275"/>
@@ -2024,7 +2024,7 @@ Ereignis %0: </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="505"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>Anschluss an Thymio verloren... stellen Sie sicher, Thymio ist eingeschaltet und verbinden Sie das USB-Kabel oder Dongle</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="569"/>
