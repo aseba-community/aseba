@@ -486,8 +486,19 @@ namespace Aseba
         
         // Tell Scratch which threads are still busy
         result << "_busy";
-        for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
-            result << " " << *i;
+
+        unsigned source, pos, len;
+        if (getVarAddrLen(nodeId, "Qid", source, pos, len))
+        {
+            std::vector<short> busy_ids = variable_cache[std::make_pair(source,pos)];
+            for (std::vector<short>::iterator i = busy_ids.begin(); i != busy_ids.end(); i++)
+                if (*i != 0)
+                    result << " " << *i;
+            // temp for testing, check whether Q_motion_ended event had arrived
+            for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
+                if (std::find(busy_ids.begin(), busy_ids.end(), *i) != busy_ids.end())
+                    cerr << "Warning " << *i << " in busy_threads but not in Qid" << endl;
+        }
         result << endl;
         
         // Tell Scratch the values of all variables named in the AESL program
@@ -587,20 +598,29 @@ namespace Aseba
         {
             unsigned source, pos, len;
             
+            // poll R_state if we can to learn values of state variables
             std::map<unsigned, GetVariables>::iterator i = node_r_state.find(source);
             if (i != node_r_state.end())
+            {
+                // already know address of R_state
                 polled_variables.push_back(i->second);
+            }
             else if (getVarAddrLen(nodeId, "R_state", source, pos, len))
             {
+                // didn't know address but can find it
                 node_r_state[source] = GetVariables(source, pos, len);
-                polled_variables.push_back(GetVariables(source, pos, len));
+                polled_variables.push_back(node_r_state[source]);
             }
+            // if we can't use R_state, then poll all variables individually
             else
-                // we can't use R_state, so ask for variables separately
-                for (auto variable: pollable_variables) {
+                for (auto variable: interesting_state_variables) {
                     if (getVarAddrLen(nodeId, variable.first, source, pos, len))
                         polled_variables.push_back(GetVariables(source, pos, len));
             }
+
+            // poll Qid to learn which threads are busy
+            if (getVarAddrLen(nodeId, "Qid", source, pos, len))
+                polled_variables.push_back(GetVariables(source, pos, len));
 
         }
         std::list<GetVariables>::iterator pvi = polled_variables.begin();
@@ -637,7 +657,7 @@ namespace Aseba
         unsigned source, pos, len;
         time(&state_variable_update_time);
         
-        for (auto variable: pollable_variables) {
+        for (auto variable: interesting_state_variables) {
             string varName = variable.first;
             unsigned dataBegin = variable.second.first;
             unsigned dataEnd = variable.second.second;
@@ -679,41 +699,6 @@ namespace Aseba
             variable_cache[state_variable_addresses["distance.front"]].assign(1, payload[0] % 255);
         }
     }
-    
-//        if (state_variable_addresses.size() == 0)
-//        {
-//            unsigned source, pos, len;
-//            for (auto variable: pollable_variables) {
-//                if (getVarAddrLen(nodeId, variable.first, source, pos, len))
-//                    state_variable_addresses[variable.first] = make_pair(source, pos);
-//            }
-//        }
-//        variable_cache[state_variable_addresses["acc"]].assign(userMsg->data.begin(), userMsg->data.begin()+3);
-//        variable_cache[state_variable_addresses["angle.front"]].assign(userMsg->data.begin()+3, userMsg->data.begin()+4);
-//        variable_cache[state_variable_addresses["button.backward"]].assign(1, (userMsg->data[4] >> 4) % 1);
-//        variable_cache[state_variable_addresses["button.center"]].assign(1, (userMsg->data[4] >> 3) % 1);
-//        variable_cache[state_variable_addresses["button.forward"]].assign(1, (userMsg->data[4] >> 2) % 1);
-//        variable_cache[state_variable_addresses["button.left"]].assign(1, (userMsg->data[4] >> 1) % 1);
-//        variable_cache[state_variable_addresses["button.right"]].assign(1, userMsg->data[4] % 1);
-//        variable_cache[state_variable_addresses["distance.back"]].assign(1, userMsg->data[5]);
-//        variable_cache[state_variable_addresses["distance.front"]].assign(1, userMsg->data[6]);
-//        variable_cache[state_variable_addresses["mic.intensity"]].assign(1, userMsg->data[7]);
-//        variable_cache[state_variable_addresses["mic.threshold"]].assign(1, userMsg->data[8]);
-//        variable_cache[state_variable_addresses["motor.left.speed"]].assign(1, userMsg->data[9]);
-//        variable_cache[state_variable_addresses["motor.left.target"]].assign(1, userMsg->data[10]);
-//        variable_cache[state_variable_addresses["motor.right.speed"]].assign(1, userMsg->data[11]);
-//        variable_cache[state_variable_addresses["motor.right.target"]].assign(1, userMsg->data[12]);
-//        variable_cache[state_variable_addresses["odo.delta"]].assign(1, userMsg->data[13]);
-//        variable_cache[state_variable_addresses["odo.theta"]].assign(1, userMsg->data[14]);
-//        variable_cache[state_variable_addresses["odo.x"]].assign(1, userMsg->data[15]);
-//        variable_cache[state_variable_addresses["odo.y"]].assign(1, userMsg->data[16]);
-//        variable_cache[state_variable_addresses["prox.comm.rx"]].assign(1, userMsg->data[17]);
-//        variable_cache[state_variable_addresses["prox.comm.tx"]].assign(1, userMsg->data[18]);
-//        variable_cache[state_variable_addresses["prox.ground.delta"]].assign(userMsg->data.begin()+19, userMsg->data.begin()+21);;
-//        variable_cache[state_variable_addresses["prox.horizontal"]].assign(userMsg->data.begin()+21, userMsg->data.begin()+28);;
-//        variable_cache[state_variable_addresses["temperature"]].assign(1, userMsg->data[28]);
-//    }
-
 
     //== end of class ScratchInterface ============================================================
     

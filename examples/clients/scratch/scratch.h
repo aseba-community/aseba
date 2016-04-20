@@ -49,7 +49,7 @@ namespace Aseba
         virtual void receiveStateVariables(const unsigned nodeId, const std::vector<short> data);
         
     protected:
-        const std::map<std::string, std::pair<unsigned, unsigned> > pollable_variables =
+        const std::map<std::string, std::pair<unsigned, unsigned> > interesting_state_variables =
         std::map<std::string, std::pair<unsigned, unsigned> >({
             {"acc",{0,1}}, {"button.backward",{1,2}}, {"button.center",{1,2}},
             {"button.forward",{1,2}}, {"button.left",{1,2}}, {"button.right",{1,2}},
