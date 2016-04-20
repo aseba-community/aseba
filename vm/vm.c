@@ -149,6 +149,7 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 
 static sint16 AsebaVMDoUnaryOperation(AsebaVMState *vm, sint16 value, uint16 op)
 {
+	(void) vm;
 	switch (op)
 	{
 		case ASEBA_UNARY_OP_SUB: return -value;
@@ -881,6 +882,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 
 uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data)
 {
+	(void) source;
 	uint16 type = bswap16(((const uint16*)data)[0]);
 	if (type < 0x8000)
 	{

@@ -200,7 +200,7 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzeroseq
 /*! Functon to set the seed of random generator */
 void AsebaSetRandomSeed(uint16 seed);
 /*! Functon to get a random number */
-uint16 AsebaGetRandom();
+uint16 AsebaGetRandom(void);
 /*! Function to get a 16-bit signed random number */
 void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */
