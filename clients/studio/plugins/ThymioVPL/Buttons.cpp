@@ -239,7 +239,7 @@ namespace Aseba { namespace ThymioVPL
 		block(Block::createBlock(name)),
 		vpl(vpl)
 	{
-		setToolTip(tr("%0 %1 block").arg(block->getTranslatedName()).arg(block->getTranslatedType()));
+		setToolTip(block->getTranslatedName());
 		
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		

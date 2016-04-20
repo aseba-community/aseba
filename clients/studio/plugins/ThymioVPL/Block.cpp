@@ -124,19 +124,6 @@ namespace Aseba { namespace ThymioVPL
 		// doing nothing
 	}
 	
-	//! Return the type of the block translated in the local language
-	QString Block::getTranslatedType() const
-	{
-		if (type == "event")
-			return tr("event");
-		else if (type == "action")
-			return tr("action");
-		else if (type == "state")
-			return tr("condition");
-		else
-			return "unknown block type";
-	}
-	
 	//! Return the name of the block translated in the local language
 	QString Block::getTranslatedName() const
 	{
