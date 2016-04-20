@@ -24,6 +24,8 @@ import os.path
 STUDIO_PATH = "../../clients/studio/"
 COMPILER_PATH = '../../compiler'
 CHALLENGE_PATH = "../../targets/challenge/"
+THYMIOUPGRADER_PATH = "../../clients/thymioupgrader/"
+THYMIOWNETCONFIG_PATH = "../../clients/thymiownetconfig/"
 
 # will be the working directory
 my_path = os.path.dirname(os.path.abspath(sys.argv[0])) # getcwd won't work in all cases
@@ -32,6 +34,8 @@ compiler_path = os.path.abspath(COMPILER_PATH)
 studio_path = os.path.abspath(STUDIO_PATH)
 compiler_ts_path = os.path.join(studio_path, "translations/")
 challenge_path = os.path.abspath(CHALLENGE_PATH)
+thymioupgrader_path = os.path.abspath(THYMIOUPGRADER_PATH)
+thymiownetconfig_path = os.path.abspath(THYMIOWNETCONFIG_PATH)
 
 # files used when updating translations for the compiler
 # errors_cpp -> errors_code_h -> compiler_ts_cpp
