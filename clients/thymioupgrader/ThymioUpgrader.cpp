@@ -174,7 +174,7 @@ namespace Aseba
 		// create network stuff to get latest firmware
 		networkManager = new QNetworkAccessManager(this);
 		connect(networkManager, SIGNAL(finished(QNetworkReply*)), SLOT(networkReplyFinished(QNetworkReply*)));
-		networkManager->get(QNetworkRequest(QUrl("https://www.thymio.org/local--files/en:thymioupdate/Thymio2-firmware-meta.xml")));
+		networkManager->get(QNetworkRequest(QUrl("http://firmwarefiles.thymio.org/Thymio2-firmware-meta.xml")));
 		
 		show();
 	}
