@@ -20,7 +20,7 @@
 
 #include "../buffer/vm-buffer.h"
 #include "can-net.h"
-#include "common/consts.h"
+#include "../../common/consts.h"
 
 void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
