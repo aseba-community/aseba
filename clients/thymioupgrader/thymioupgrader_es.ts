@@ -200,15 +200,12 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="129"/>
         <source>Latest official firmware</source>
-        <translatorcomment>google translate</translatorcomment>
-        <translation type="unfinished">Última versión del firmware oficial</translation>
+        <translation>Última versión oficial del firmware</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="139"/>
         <source>Custom firmware file</source>
-        <translatorcomment>google translate</translatorcomment>
-        <translation type="unfinished">
-archivo de firmware personalizado</translation>
+        <translation>Archivo de firmware personalizado</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="289"/>
@@ -261,14 +258,12 @@ archivo de firmware personalizado</translation>
     <message>
         <location filename="ThymioUpgrader.cpp" line="474"/>
         <source>Cannot open temporary file!</source>
-        <translatorcomment>google translate</translatorcomment>
-        <translation type="unfinished">No se puede abrir el archivo temporal!</translation>
+        <translation>No se puede abrir el archivo temporal!</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="482"/>
         <source>Error connecting to official firmware server!</source>
-        <translatorcomment>google translate</translatorcomment>
-        <translation type="unfinished">Error al conectar con el servidor oficial de firmware!</translation>
+        <translation>Error al conectar con el servidor oficial del firmware!</translation>
     </message>
 </context>
 <context>
