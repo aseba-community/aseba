@@ -56,10 +56,10 @@ typedef struct
 } CanFrame;
 
 /*! Pointer to a void function */
-typedef void (*AsebaCanVoidVoidFP)();
+typedef void (*AsebaCanVoidVoidFP)(void);
 
 /*! Pointer to a void function returning int*/
-typedef int (*AsebaCanIntVoidFP)();
+typedef int (*AsebaCanIntVoidFP)(void);
 
 /*! Pointer to a function that sends a CAN frame (max 8 bytes) */
 typedef void (*AsebaCanSendFrameFP)(const CanFrame *frame);
@@ -123,7 +123,7 @@ uint16 AsebaShouldDropPacket(uint16 source, const uint8* data);
 void AsebaCanFrameReceived(const CanFrame *frame);
 
 /*! Data layer should call this function when the CAN frame (max 8 bytes) was sent successfully */
-void AsebaCanFrameSent();
+void AsebaCanFrameSent(void);
 
 /*! Return true if the recv buffer is empty, false otherwise */
 uint16 AsebaCanRecvBufferEmpty(void);
