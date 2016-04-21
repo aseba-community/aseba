@@ -132,7 +132,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="302"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt; No se puede encontrar Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conectar Thymio al ordenador mediante el cable USB o el dongle, y asegurarse de que ningún otro programa está utilizando Thymio.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="304"/>
@@ -1606,67 +1606,67 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="131"/>
         <source>buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>botones</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="133"/>
         <source>horizontal proximity sensors</source>
-        <translation type="unfinished"></translation>
+        <translation>captores de distancia horizontales</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="135"/>
         <source>ground proximity sensors</source>
-        <translation type="unfinished"></translation>
+        <translation>captores de distancia hacia el piso</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="137"/>
         <source>tap detection / tilt</source>
-        <translation type="unfinished"></translation>
+        <translation>detección de choque / inclinación</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="139"/>
         <source>clap detection</source>
-        <translation type="unfinished"></translation>
+        <translation>detección de aplauso</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="141"/>
         <source>timer elapsed</source>
-        <translation type="unfinished"></translation>
+        <translation>minutero finalizado</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="143"/>
         <source>state filter</source>
-        <translation type="unfinished"></translation>
+        <translation>filtro de estado</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="145"/>
         <source>motors</source>
-        <translation type="unfinished"></translation>
+        <translation>motores</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="147"/>
         <source>top colour</source>
-        <translation type="unfinished"></translation>
+        <translation>color en la parte superior</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="149"/>
         <source>bottom colour</source>
-        <translation type="unfinished"></translation>
+        <translation>color en la parte inferior</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="151"/>
         <source>music</source>
-        <translation type="unfinished"></translation>
+        <translation>música</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="153"/>
         <source>timer</source>
-        <translation type="unfinished"></translation>
+        <translation>minutero</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="155"/>
         <source>state</source>
-        <translation type="unfinished"></translation>
+        <translation>estado</translation>
     </message>
 </context>
 <context>
@@ -1888,12 +1888,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="75"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="76"/>
         <source>Please enter your user or group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor introduzca su nombre de usuario o grupo:</translation>
     </message>
 </context>
 <context>
@@ -1905,7 +1905,7 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="172"/>
         <source>Connecting to Thymio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Conexión a Thymio ...</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="274"/>
@@ -1947,7 +1947,7 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="505"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>Conexión a Thymio perdida ... asegúrese de que Thymio está prendido y conecte el cable USB o el dongle</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="569"/>
