@@ -220,6 +220,9 @@ typedef enum
 /*! *DEPRECATED*, please use one of the more explicit defines above */
 #define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE
 
+/*! Macro to prevent compiler warnings for unused variables */
+#define ASEBA_UNUSED(x) (void)x;
+
 /*@}*/
 
 #endif
