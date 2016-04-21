@@ -1,7 +1,11 @@
 #!/bin/bash
 
+[ "$MSYSTEM" = "MINGW32" ] && TCP="tcp:127.0.0.1" || TCP="tcp:"
+
 # clean up previous session
-killall aseba{dummynode,switch,massloader,http,scratch}
+which killall >/dev/null 2>&1 \
+    && killall aseba{dummynode,switch,massloader,http,scratch} \
+    || ps | egrep 'aseba(dummynode|switch|massloader|http)' | while read pid rest; do kill $pid; done
 for i in 0 1 2 3 4 5 6 7 8; do ASEBADUMMYNODE $i & done
 sleep 3
 
@@ -11,7 +15,7 @@ sleep 3
 #   dummynode-2 targetId=3 aeslId=3 LISTENER3
 #   dummynode-3 targetId=4 aeslId=4 CLOCK
 ASEBASCRATCH -p 3000 -a ping0123.aesl \
-    $(for i in 0 1 2 3; do echo 'tcp:;port='$[ 33333 + $i ]; done) 1>&2 &
+    $(for i in 0 1 2 3; do echo $TCP';port='$[ 33333 + $i ]; done) 1>&2 &
 
 # localhost:3001 is a switch with 5 cooperating nodes:
 #   dummynode-4 targetId=5 aeslId=1 LISTENER1
@@ -20,11 +24,11 @@ ASEBASCRATCH -p 3000 -a ping0123.aesl \
 #   dummynode-7 targetId=8 aeslId=2 LISTENER2 (same id dummynode-5)
 #   dummynode-8 targetId=9 aeslId=3 LISTENER3
 ASEBASCRATCH -p 3001 -a ping0123.aesl \
-    'tcp:;port=33337;remapTarget=5;remapLocal=1' \
-    'tcp:;port=33338;remapTarget=6;remapAesl=1' \
-    'tcp:;port=33339;remapTarget=7;remapAesl=4' \
-    'tcp:;port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
-    'tcp:;port=33341;remapTarget=9;remapAesl=3' 1>&2 &
+    $TCP';port=33337;remapTarget=5;remapLocal=1' \
+    $TCP';port=33338;remapTarget=6;remapAesl=1' \
+    $TCP';port=33339;remapTarget=7;remapAesl=4' \
+    $TCP';port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
+    $TCP';port=33341;remapTarget=9;remapAesl=3' 1>&2 &
 
 sleep 30 # let switches start up
 

@@ -19,9 +19,14 @@ add_custom_target(
 find_program( HAVE_NPM npm )
 
 if (HAVE_NPM)
+    if (WIN32)
+        set(NPM_INSTALL cmd //c npm install)
+    else (WIN32)
+        set(NPM_INSTALL npm install)
+    endif (WIN32)
     add_custom_target(
 	install_jasmine ALL
-	COMMAND npm install
+	COMMAND ${NPM_INSTALL}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Installing jasmine"
     )
