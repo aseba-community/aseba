@@ -45,8 +45,8 @@ endif()
 # Enki
 set(ENKI_FOUND 1)
 set(ENKI_INCLUDE_DIR "${aseba_SOURCE_DIR}/thirdparty/enki")
-set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenki.a")
-set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenkiviewer.a")
+set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/enki/libenki.a")
+set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/viewer/libenkiviewer.a")
 include_directories("${ENKI_INCLUDE_DIR}" "${aseba_BINARY_DIR}/thirdparty/enki/viewer")
 add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/enki" "${aseba_BINARY_DIR}/thirdparty/enki")
 
