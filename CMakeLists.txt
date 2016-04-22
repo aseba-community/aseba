@@ -51,8 +51,18 @@ else (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 # Qwt
-find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
-find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
+ExternalProject_Add(qwt
+    PREFIX ${aseba_BINARY_DIR}/thirdparty/qwt
+    SOURCE_DIR ${aseba_SOURCE_DIR}/thirdparty/qwt
+    CONFIGURE_COMMAND qmake PREFIX=${aseba_BINARY_DIR}/thirdparty/qwt ${aseba_SOURCE_DIR}/thirdparty/qwt
+    BUILD_COMMAND make
+)
+if(APPLE)
+    set(QWT_INCLUDE_DIR "${aseba_BINARY_DIR}/thirdparty/qwt/src/qwt-build/lib/qwt.framework/Headers")
+
+
+else()
+endif()
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
