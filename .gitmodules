@@ -4,3 +4,6 @@
 [submodule "clients/studio/plugins/ThymioBlockly/blockly"]
 	path = clients/studio/plugins/ThymioBlockly/blockly
 	url = https://github.com/aseba-community/blockly.git
+[submodule "thirdparty/dashel"]
+	path = thirdparty/dashel
+	url = https://github.com/aseba-community/dashel.git
