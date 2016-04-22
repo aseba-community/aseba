@@ -22,12 +22,18 @@ endif(DEFINED CMAKE_SHARED_LINKER_FLAGS)
 # Dashel
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared instead of static libs")
 add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/dashel")
+include_directories("${aseba_SOURCE_DIR}/thirdparty/dashel")
 if (APPLE)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(IOKIT_LIBRARY IOKit)
     set(DASHEL_LIBRARIES
         "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
         ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY}
+        )
+elseif(WIN32)
+    set(DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+		winspool ws2_32 setupapi
         )
 else()
     set(DASHEL_LIBRARIES
