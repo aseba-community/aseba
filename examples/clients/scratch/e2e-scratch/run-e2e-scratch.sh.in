@@ -14,7 +14,7 @@ sleep 3
 #   dummynode-1 targetId=2 aeslId=2 LISTENER2
 #   dummynode-2 targetId=3 aeslId=3 LISTENER3
 #   dummynode-3 targetId=4 aeslId=4 CLOCK
-ASEBASCRATCH -p 3000 -a ping0123.aesl \
+ASEBASCRATCH --http 3000 --aesl ping0123.aesl \
     $(for i in 0 1 2 3; do echo $TCP';port='$[ 33333 + $i ]; done) 1>&2 &
 
 # localhost:3001 is a switch with 5 cooperating nodes:
@@ -23,7 +23,7 @@ ASEBASCRATCH -p 3000 -a ping0123.aesl \
 #   dummynode-6 targetId=7 aeslId=4 CLOCK)
 #   dummynode-7 targetId=8 aeslId=2 LISTENER2 (same id dummynode-5)
 #   dummynode-8 targetId=9 aeslId=3 LISTENER3
-ASEBASCRATCH -p 3001 -a ping0123.aesl \
+ASEBASCRATCH --http 3001 --aesl ping0123.aesl \
     $TCP';port=33337;remapTarget=5;remapLocal=1' \
     $TCP';port=33338;remapTarget=6;remapAesl=1' \
     $TCP';port=33339;remapTarget=7;remapAesl=4' \
@@ -41,7 +41,7 @@ status=$?
 # optional tests with a real Thymio-II
 if [ -x "DASHELPORTLIST" ] && target=$(DASHELPORTLIST | grep -i -m1 thymio.ii); then
     target="$(echo "$target"|perl -p -e 's{.*\[(.*?)\s*\(.*}{$1}')" &&
-    ASEBASCRATCH -p 3002 -a thymio_motion.aesl "ser:name=$target" &
+    ASEBASCRATCH --http 3002 --aesl thymio_motion.aesl "ser:name=$target" &
     sleep 25
     jasmine-node 5*_spec.js
     status=$?

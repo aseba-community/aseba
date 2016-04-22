@@ -1,0 +1,32 @@
+#!/bin/bash
+
+[ "$MSYSTEM" = "MINGW32" ] && TCP="tcp:127.0.0.1" || TCP="tcp:"
+
+# clean up previous session
+which killall >/dev/null 2>&1 \
+    && killall aseba{dummynode,switch,massloader,http,scratch} \
+    || ps | egrep 'aseba(dummynode|switch|massloader|http)' | while read pid rest; do kill $pid; done
+for i in 0 3; do ASEBADUMMYNODE $i & done
+sleep 3
+
+ASEBAHTTP --http 3004 --aesl ping0123.aesl --port 33353 \
+    $TCP';port=33333;remapTarget=1;remapAesl=1' \
+    $TCP';port=33336;remapTarget=4;remapAesl=4' \
+    1>&2 &
+
+sleep 30 # let switches start up
+
+ASEBAHTTP --http 3005 --port 33354 \
+	  $TCP';port=33353' 1>&2 &
+
+sleep 30 # let switches start up
+
+# run e2e tests
+export PATH=${PATH}:./node_modules/jasmine-node/bin
+jasmine-node 3004-*_spec.js 3005-*_spec.js
+status=$?
+
+# clean up
+[ -z "$(jobs -p)" ] || kill %%
+
+exit $status

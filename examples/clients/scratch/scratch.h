@@ -29,7 +29,7 @@ namespace Aseba
         std::map< std::pair<unsigned,unsigned>, unsigned > leds; // top, bottom-left, bottom-right
         
     public:
-        ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
+        ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& dashel_port="33332", const int iterations=-1);
         virtual std::string evPoll(const unsigned nodeId);
         
     protected:
