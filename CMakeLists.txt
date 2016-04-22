@@ -17,35 +17,40 @@ add_definitions(-DASEBA_ASSERT)
 # callbacks that will be provided by other libs when the executable is linked.
 if (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 	STRING(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-endif (DEFINED CMAKE_SHARED_LINKER_FLAGS)
+endif(DEFINED CMAKE_SHARED_LINKER_FLAGS)
 
 # Dashel
-set (BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared instead of static libs")
 add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/dashel")
 if (APPLE)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(IOKIT_LIBRARY IOKit)
-    set (DASHEL_LIBRARIES
+    set(DASHEL_LIBRARIES
         "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
         ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY}
         )
 else()
-    set (DASHEL_LIBRARIES
+    set(DASHEL_LIBRARIES
         "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
         )
 endif()
 
 
 # Enki
-find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
-find_library(ENKI_LIBRARY enki)
-find_library(ENKI_VIEWER_LIBRARY enkiviewer)
-if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	set(ENKI_FOUND 1)
-	message(STATUS "Enki found")
-else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	message(STATUS "Enki *not* found, simulation targets disabled")
-endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+#find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
+#find_library(ENKI_LIBRARY enki)
+#find_library(ENKI_VIEWER_LIBRARY enkiviewer)
+#if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+#	set(ENKI_FOUND 1)
+#	message(STATUS "Enki found")
+#else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+#	message(STATUS "Enki *not* found, simulation targets disabled")
+#endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+set(ENKI_INCLUDE_DIR "${aseba_SOURCE_DIR}/thirdparty/enki")
+set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenki.a")
+set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenkiviewer.a")
+include_directories("${ENKI_INCLUDE_DIR}" "${aseba_BINARY_DIR}/thirdparty/enki/viewer")
+add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/enki" "${aseba_BINARY_DIR}/thirdparty/enki")
 
 # Qt
 if (UNIX AND NOT APPLE)
