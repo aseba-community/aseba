@@ -1,6 +1,6 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 project(aseba)
 enable_testing()
@@ -37,15 +37,6 @@ endif()
 
 
 # Enki
-#find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
-#find_library(ENKI_LIBRARY enki)
-#find_library(ENKI_VIEWER_LIBRARY enkiviewer)
-#if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-#	set(ENKI_FOUND 1)
-#	message(STATUS "Enki found")
-#else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-#	message(STATUS "Enki *not* found, simulation targets disabled")
-#endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
 set(ENKI_INCLUDE_DIR "${aseba_SOURCE_DIR}/thirdparty/enki")
 set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenki.a")
 set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenkiviewer.a")
