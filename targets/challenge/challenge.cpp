@@ -38,10 +38,15 @@
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
 #include <iostream>
+#include <iomanip>
 #include <QtGui>
 #include <QtDebug>
+#include <QFileDialog>
 #include "challenge.h"
 #include <string.h>
+#include <memory>
+#include <fstream>
+#include <QFileInfo>
 
 #define SIMPLIFIED_EPUCK
 
@@ -119,6 +124,7 @@ namespace Enki
 	extern GLint GenFeederCharge2();
 	extern GLint GenFeederCharge3();
 	extern GLint GenFeederRing();
+
 	
 	class FeedableEPuck: public EPuck
 	{
@@ -127,9 +133,14 @@ namespace Enki
 		double score;
 		QString name;
 		int diedAnimation;
+        int deathCounter;
+
+        std::shared_ptr<std::ofstream>& log;
 	
 	public:
-		FeedableEPuck() : EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), energy(EPUCK_INITIAL_ENERGY), score(0), diedAnimation(-1) { }
+		FeedableEPuck(std::shared_ptr<std::ofstream>& logStream) 
+            : EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), energy(EPUCK_INITIAL_ENERGY), 
+            score(0), diedAnimation(-1), deathCounter(0), log(logStream) { }
 		
 		virtual void controlStep(double dt)
 		{
@@ -142,10 +153,20 @@ namespace Enki
 				score /= 2;
 				energy = EPUCK_INITIAL_ENERGY;
 				diedAnimation = DEATH_ANIMATION_STEPS;
+                deathCounter += 1;
 			}
 			else if (diedAnimation >= 0)
 				diedAnimation--;
 		}
+
+        ~FeedableEPuck() {
+            if (log && log->is_open()) {
+                std::ostream& out = *log;
+                out << name.toStdString() << "," << score << "," << deathCounter << std::endl;
+            }
+        }
+
+        
 	};
 	
 	class AsebaFeedableEPuck : public FeedableEPuck, public Dashel::Hub
@@ -193,8 +214,8 @@ namespace Enki
 		std::valarray<uint8> lastMessageData;
 		
 	public:
-		AsebaFeedableEPuck(int id) :
-			stream(0)
+        AsebaFeedableEPuck(int id, std::shared_ptr<std::ofstream>& logStream) 
+            : FeedableEPuck(logStream), stream(0) 
 		{
 			asebaEPuckMap[&vm] = this;
 			
@@ -227,6 +248,7 @@ namespace Enki
 			variables.productId = ASEBA_PID_CHALLENGE;
 			variables.colorG = 100;
 		}
+
 		
 		virtual ~AsebaFeedableEPuck()
 		{
@@ -570,7 +592,7 @@ namespace Enki
 
 	// Challenge Viewer
 	
-	ChallengeViewer::ChallengeViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
+	ChallengeViewer::ChallengeViewer(World* world) : ViewerWidget(world), ePuckCount(0)
 	{
 		savingVideo = false;
 		autoCamera = false;
@@ -597,13 +619,24 @@ namespace Enki
 		QString eventName = QInputDialog::getText(this, tr("Add a new robot"), tr("Robot name:"), QLineEdit::Normal, "", &ok);
 		if (ok && !eventName.isEmpty())
 		{
-			// TODO change ePuckCount to port
-			Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ePuckCount++);
-			epuck->pos.x = Enki::random.getRange(120)+10;
-			epuck->pos.y = Enki::random.getRange(120)+10;
-			epuck->name = eventName;
-			world->addObject(epuck);
+            addNewRobotWithName(eventName);
 		}
+	}
+
+    // If not there, no robot's destructor is called
+    ChallengeViewer::~ChallengeViewer() {
+        removeRobot();
+    }
+	
+	void ChallengeViewer::addNewRobotWithName(QString robotName)
+	{
+        // TODO change ePuckCount to port
+        std::shared_ptr<std::ofstream>& logStream = getLogStream();
+        Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(ePuckCount++, logStream);
+        epuck->pos.x = Enki::random.getRange(120)+10;
+        epuck->pos.y = Enki::random.getRange(120)+10;
+        epuck->name = robotName;
+        world->addObject(epuck);
 	}
 	
 	void ChallengeViewer::removeRobot()
@@ -624,6 +657,46 @@ namespace Enki
 		}
 		ePuckCount = 0;
 	}
+
+    void ChallengeViewer::logDirectory()
+    {
+        logDirectoryPath = QFileDialog::getExistingDirectory(
+                this, tr("Open Directory"), QString(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if (!logStream) {
+            logStream.reset(new std::ofstream());
+        }
+        if (logStream->is_open()) {
+            logStream->close();
+        }
+        int fcounter = 0;
+        std::string fname = logDirectoryPath.toStdString();
+        while (true) {
+            fname = logDirectoryPath.toStdString();
+            if (fcounter == 0) {
+                fname += "/challenge.log";
+            } else {
+                fname += "/challenge_" + std::to_string(fcounter) + ".log";
+            }
+            QFileInfo checkFile(fname.c_str());
+            if (!checkFile.exists()) {
+                break;
+            }
+            if (fcounter == 20) {
+                QErrorMessage msg;
+                msg.showMessage("Reached maximum number of log file create attempts");
+                return;
+            }
+            fcounter += 1;
+        }
+        logStream->open(fname, std::ios::out);
+        if (!logStream->is_open()) {
+            QErrorMessage msg;
+            msg.showMessage("Wasn't able to open log file. No logging will be done");
+        } else {
+            std::ofstream& out = *logStream;
+            out << "robotName,score,died" << std::endl;
+        }
+    }
 
 	void ChallengeViewer::autoCameraStateChanged(bool state)
 	{
@@ -868,9 +941,12 @@ namespace Enki
 			grabFrameBuffer().save(QString("frame%0.bmp").arg(imageCounter++), "BMP");
 	}
 
+    std::shared_ptr<std::ofstream>& ChallengeViewer::getLogStream() {
+        return logStream;
+    }
 
-	ChallengeApplication::ChallengeApplication(World* world, int ePuckCount) :
-		viewer(world, ePuckCount)
+	ChallengeApplication::ChallengeApplication(World* world) :
+		viewer(world)
 	{
 		// help viewer
 		helpViewer = new QTextBrowser();
@@ -905,6 +981,8 @@ namespace Enki
 		frameLayout->addWidget(addRobotButton);
 		QPushButton* delRobotButton = new QPushButton(tr("Remove all robots"));
 		frameLayout->addWidget(delRobotButton);
+		QPushButton* logDirectoryButton = new QPushButton(tr("Log directory"));
+		frameLayout->addWidget(logDirectoryButton);
 		QCheckBox* autoCamera = new QCheckBox(tr("Auto camera"));
 		frameLayout->addWidget(autoCamera);
 		QCheckBox* fullScreen = new QCheckBox(tr("Full screen"));
@@ -932,6 +1010,7 @@ namespace Enki
 
 		connect(addRobotButton, SIGNAL(clicked()), &viewer, SLOT(addNewRobot()));
 		connect(delRobotButton, SIGNAL(clicked()), &viewer, SLOT(removeRobot()));
+		connect(logDirectoryButton, SIGNAL(clicked()), &viewer, SLOT(logDirectory()));
 		connect(autoCamera, SIGNAL(toggled(bool)), &viewer, SLOT(autoCameraStateChanged(bool)));
 		connect(fullScreen, SIGNAL(toggled(bool)), SLOT(fullScreenStateChanged(bool)));
 		connect(helpButton, SIGNAL(clicked()), helpViewer, SLOT(show()));
@@ -956,6 +1035,10 @@ namespace Enki
 		#endif // Q_WS_MAC
 		*/
 	}
+
+    void ChallengeApplication::addNewRobotWithName(QString robotName) {
+        viewer.addNewRobotWithName(robotName);
+    }
 	
 	void ChallengeApplication::fullScreenStateChanged(bool fullScreen)
 	{
@@ -1163,20 +1246,14 @@ int main(int argc, char *argv[])
 	feeders[3]->pos.y = 100;
 	world.addObject(feeders[3]);
 	
+	// Create viewer
+	Enki::ChallengeApplication viewer(&world);
+
 	// Add e-puck
-	int ePuckCount = 0;
 	for (int i = 1; i < argc; i++)
 	{
-		Enki::AsebaFeedableEPuck* epuck = new Enki::AsebaFeedableEPuck(i-1);
-		epuck->pos.x = Enki::random.getRange(120)+10;
-		epuck->pos.y = Enki::random.getRange(120)+10;
-		epuck->name = argv[i];
-		world.addObject(epuck);
-		ePuckCount++;
+        viewer.addNewRobotWithName(QString(argv[i]));
 	}
-	
-	// Create viewer
-	Enki::ChallengeApplication viewer(&world, ePuckCount);
 	
 	// Show and run
 	viewer.setWindowTitle("ASEBA Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");

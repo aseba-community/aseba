@@ -28,6 +28,7 @@
 #ifndef __CHALLENGE_H
 #define __CHALLENGE_H
 
+#include <memory>
 #include <viewer/Viewer.h>
 #include <QDialog>
 #include <QWidget>
@@ -52,13 +53,19 @@ namespace Enki
 		QFont titleFont;
 		QFont entryFont;
 		QFont labelFont;
+
+        QString logDirectoryPath;
+        std::shared_ptr<std::ofstream> logStream;
 		
 	public:
-		ChallengeViewer(World* world, int ePuckCount);
+		ChallengeViewer(World* world);
+        void addNewRobotWithName(QString robotName);
+        ~ChallengeViewer();
 	
 	public slots:
 		void addNewRobot();
 		void removeRobot();
+		void logDirectory();
 		void autoCameraStateChanged(bool state);
 	
 	protected:
@@ -74,6 +81,8 @@ namespace Enki
 		virtual void renderObjectsTypesHook();
 		virtual void displayObjectHook(PhysicalObject *object);
 		virtual void sceneCompletedHook();
+
+        std::shared_ptr<std::ofstream>& getLogStream();
 	};
 
 	class ChallengeApplication : public QWidget
@@ -86,7 +95,8 @@ namespace Enki
 		QTextBrowser* helpViewer;
 
 	public:
-		ChallengeApplication(World* world, int ePuckCount);
+		ChallengeApplication(World* world);
+        void addNewRobotWithName(QString robotName);
 		
 	public slots:
 		void fullScreenStateChanged(bool fullScreen);
