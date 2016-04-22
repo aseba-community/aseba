@@ -1,12 +1,13 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(aseba)
 enable_testing()
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
+include(ExternalProject)
 
 add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)
@@ -19,8 +20,21 @@ if (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 endif (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 
 # Dashel
-find_package(dashel REQUIRED)
-include_directories(${dashel_INCLUDE_DIRS})
+set (BUILD_SHARED_LIBS OFF)
+add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/dashel")
+if (APPLE)
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(IOKIT_LIBRARY IOKit)
+    set (DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+        ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY}
+        )
+else()
+    set (DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+        )
+endif()
+
 
 # Enki
 find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
@@ -56,7 +70,7 @@ add_subdirectory(common)
 add_subdirectory(transport)
 
 # define the core libraries variable, to be used by all Aseba programs
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${DASHEL_LIBRARIES})
 
 # Target and client specific libraries
 add_subdirectory(vm)
