@@ -43,6 +43,7 @@ endif()
 
 
 # Enki
+set(ENKI_FOUND 1)
 set(ENKI_INCLUDE_DIR "${aseba_SOURCE_DIR}/thirdparty/enki")
 set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenki.a")
 set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/libenkiviewer.a")
