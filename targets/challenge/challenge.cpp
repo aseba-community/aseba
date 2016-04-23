@@ -1221,30 +1221,17 @@ int main(int argc, char *argv[])
 	}
 	
 	// Create the world
-	Enki::World world(140, 140, Enki::Color(0.4, 0.4, 0.4));
+	Enki::World world(280, 280, Enki::Color(0.4, 0.4, 0.4));
 	
 	// Add feeders
-	Enki::EPuckFeeder* feeders[4];
-	
-	feeders[0] = new Enki::EPuckFeeder(0);
-	feeders[0]->pos.x = 40;
-	feeders[0]->pos.y = 40;
-	world.addObject(feeders[0]);
-	
-	feeders[1] = new Enki::EPuckFeeder(15);
-	feeders[1]->pos.x = 100;
-	feeders[1]->pos.y = 40;
-	world.addObject(feeders[1]);
-	
-	feeders[2] = new Enki::EPuckFeeder(45);
-	feeders[2]->pos.x = 40;
-	feeders[2]->pos.y = 100;
-	world.addObject(feeders[2]);
-	
-	feeders[3] = new Enki::EPuckFeeder(30);
-	feeders[3]->pos.x = 100;
-	feeders[3]->pos.y = 100;
-	world.addObject(feeders[3]);
+	Enki::EPuckFeeder* feeders[16];
+
+    for (int i = 0; i < 16; ++i) {
+        feeders[i] = new Enki::EPuckFeeder(i);
+        feeders[i]->pos.x = 40 + (i/4)*60;
+        feeders[i]->pos.y = 40 + (i%4)*60;
+        world.addObject(feeders[i]);
+    }
 	
 	// Create viewer
 	Enki::ChallengeApplication viewer(&world);
