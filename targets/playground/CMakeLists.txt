@@ -24,12 +24,14 @@ if (QT4_FOUND AND ENKI_FOUND)
 		EPuck.cpp
 		EPuck-descriptions.c
 		Thymio2.cpp
+		Thymio2-natives.cpp
 		Thymio2-descriptions.c
 		PlaygroundViewer.cpp
 		playground.cpp
 	)
 	qt4_wrap_cpp(playground_MOCS
 		PlaygroundViewer.h
+		Thymio2.h
 	)
 	
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${playground_RCC_SRCS})
