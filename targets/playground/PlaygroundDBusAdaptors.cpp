@@ -30,6 +30,7 @@
 #include "PlaygroundDBusAdaptors.h"
 #include "PlaygroundViewer.h"
 #include <QDBusConnection>
+#include <QDBusMessage>
 
 namespace Enki
 {
@@ -118,7 +119,7 @@ namespace Enki
 		return PhysicalObjectsByType("");
 	}
 	
-	QDBusObjectPath EnkiWorldInterface::PhysicalObject(QString number)
+	QDBusObjectPath EnkiWorldInterface::PhysicalObject(QString number, const QDBusMessage &message)
 	{
 		const World* world(playground->getWorld());
 		for (World::ObjectsIterator it(world->objects.begin()); it != world->objects.end(); ++it)
@@ -130,8 +131,8 @@ namespace Enki
 				return path;
 			}
 		}
-		// TODO: make an error if object does not exist
-		return QDBusObjectPath();
+		QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("object %0 does not exists").arg(number)));
+		return QDBusObjectPath("/");
 	}
 	
 	bool EnkiWorldInterface::isPointerValid(Enki::PhysicalObject* physicalObject) const

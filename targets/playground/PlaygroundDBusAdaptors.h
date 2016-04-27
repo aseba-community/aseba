@@ -34,6 +34,8 @@
 #include <QDBusObjectPath>
 #include <QStringList>
 
+class QDBusMessage;
+
 namespace Enki
 {
 	class PlaygroundViewer;
@@ -80,7 +82,7 @@ namespace Enki
 	public slots:
 		QStringList PhysicalObjectsByType(QString type) const;
 		QStringList AllPhysicalObjects() const;
-		QDBusObjectPath PhysicalObject(QString number);
+		QDBusObjectPath PhysicalObject(QString number, const QDBusMessage &message);
 		
 	protected:
 		friend class PhysicalObjectInterface;
