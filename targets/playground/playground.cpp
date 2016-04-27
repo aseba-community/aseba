@@ -37,6 +37,11 @@
 #include <QMessageBox>
 #include <QProcess>
 
+#ifdef HAVE_DBUS
+#include "PlaygroundDBusAdaptors.h"
+#include <QDBusConnection>
+#endif // HAVE_DBUS
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
@@ -335,6 +340,14 @@ int main(int argc, char *argv[])
 	// Show and run
 	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.show();
+	
+	// If D-Bus is used, register the viewer object
+	#ifdef HAVE_DBUS
+	new Enki::EnkiWorldInterface(&viewer);
+	QDBusConnection::sessionBus().registerObject("/ch/epfl/mobots/AsebaPlayground/world", &viewer);	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
+	#endif // HAVE_DBUS
+	
+	// Run the application
 	const int exitValue(app.exec());
 	
 	// Stop and delete ongoing processes

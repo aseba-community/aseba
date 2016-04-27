@@ -14,6 +14,10 @@ if (QT4_FOUND AND ENKI_FOUND)
 	set(QT_USE_QTMAIN ON)
 	set(QT_USE_QTOPENGL ON)
 	set(QT_USE_QTXML ON)
+	if (QT_QTDBUS_FOUND)
+		set(QT_USE_QTDBUS ON)
+		add_definitions("-DHAVE_DBUS")
+	endif (QT_QTDBUS_FOUND)
 	include(${QT_USE_FILE})
 	
 	include_directories(${ENKI_INCLUDE_DIR})
@@ -27,11 +31,13 @@ if (QT4_FOUND AND ENKI_FOUND)
 		Thymio2-natives.cpp
 		Thymio2-descriptions.c
 		PlaygroundViewer.cpp
+		PlaygroundDBusAdaptors.cpp
 		playground.cpp
 	)
 	qt4_wrap_cpp(playground_MOCS
-		PlaygroundViewer.h
 		Thymio2.h
+		PlaygroundViewer.h
+		PlaygroundDBusAdaptors.h
 	)
 	
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${playground_RCC_SRCS})
