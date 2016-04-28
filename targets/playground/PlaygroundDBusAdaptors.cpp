@@ -126,7 +126,7 @@ namespace Enki
 		{
 			if (ptrToString(*it) == number)
 			{
-				QDBusObjectPath path(QString("/ch/epfl/mobots/AsebaPlayground/world/objects/%0").arg(number));
+				QDBusObjectPath path(QString("/world/objects/%0").arg(number));
 				QDBusConnection::sessionBus().registerObject(path.path(), new PhysicalObjectInterface(this, *it), QDBusConnection::ExportAllContents);
 				return path;
 			}

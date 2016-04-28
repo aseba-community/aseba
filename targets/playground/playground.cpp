@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
 	// If D-Bus is used, register the viewer object
 	#ifdef HAVE_DBUS
 	new Enki::EnkiWorldInterface(&viewer);
-	QDBusConnection::sessionBus().registerObject("/ch/epfl/mobots/AsebaPlayground/world", &viewer);	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
+	QDBusConnection::sessionBus().registerObject("/world", &viewer);	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
 	#endif // HAVE_DBUS
 	
 	// Run the application
