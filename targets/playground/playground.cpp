@@ -181,6 +181,27 @@ int main(int argc, char *argv[])
 		wallE  = wallE.nextSiblingElement ("wall");
 	}
 	
+	// Scan for cylinders
+	QDomElement cylinderE = domDocument.documentElement().firstChildElement("cylinder");
+	while (!cylinderE.isNull())
+	{
+		Enki::PhysicalObject* cylinder = new Enki::PhysicalObject();
+		if (!colorsMap.contains(cylinderE.attribute("color")))
+			std::cerr << "Warning, color " << cylinderE.attribute("color").toStdString() << " undefined\n";
+		else
+			cylinder->setColor(colorsMap[cylinderE.attribute("color")]);
+		cylinder->pos.x = cylinderE.attribute("x").toDouble();
+		cylinder->pos.y = cylinderE.attribute("y").toDouble();
+		cylinder->setCylindric(
+			cylinderE.attribute("r").toDouble(), 
+			cylinderE.attribute("h").toDouble(),
+			-1
+		);
+		world.addObject(cylinder);
+		
+		cylinderE = cylinderE.nextSiblingElement("cylinder");
+	}
+	
 	// Scan for feeders
 	QDomElement feederE = domDocument.documentElement().firstChildElement("feeder");
 	while (!feederE.isNull())
