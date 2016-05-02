@@ -70,7 +70,10 @@ namespace Aseba
     protected:
         // streams
         StreamNodeIdMap             asebaStreams;
-        Dashel::Stream*             httpStream;
+        Dashel::Stream*             inHttpStream;
+        Dashel::Stream*             inAsebaStream;
+        std::string                 inHttpPort;
+        std::string                 inAsebaPort;
         StreamNodeIdSubstitutionMap targetToNodeIdSubstitutions;
         NodeIdSubstitution          nodeToAeslIdSubstitutions;
         StreamNodeIdSubstitutionMap localIdWishes;
@@ -97,7 +100,7 @@ namespace Aseba
         
     public:
         //default values needed for unit testing
-        HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const int iterations=-1);
+        HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1);
         virtual void run();
         virtual void broadcastGetDescription();
         virtual void evNodes(HttpRequest* req, strings& args);
@@ -127,6 +130,11 @@ namespace Aseba
         virtual void incomingData(Dashel::Stream* stream);
         virtual void sendMessage(const Message& message);
         virtual void nodeDescriptionReceived(unsigned nodeId);
+        // helpers for standard methods
+        virtual void incomingDataHTTP(Dashel::Stream* stream);
+        virtual void incomingDataAseba(Dashel::Stream* stream);
+        virtual void incomingDataTarget(Dashel::Stream* stream);
+        virtual void propagateCmdMessage(Message* message);
         // specific to http interface
         virtual void sendEvent(const unsigned nodeId, const strings& args);
         virtual void sendSetVariable(const unsigned nodeId, const strings& args);

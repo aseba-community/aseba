@@ -44,8 +44,8 @@ namespace Aseba
     //-- Subclassing Aseba::HttpInterface ------------------------------------------------------
     
     ScratchInterface::ScratchInterface(const strings& targets, const std::string& http_port,
-                     const int iterations) :
-    Aseba::HttpInterface(targets, http_port, iterations), // use base class constructor
+                     const std::string& dashel_port, const int iterations) :
+    Aseba::HttpInterface(targets, http_port, dashel_port, iterations), // use base class constructor
     state_variable_update_time(0)
     // blink_state(0), // default empty
     // scratch_dial(0), // default empty
@@ -764,6 +764,7 @@ int main(int argc, char *argv[])
     Dashel::initPlugins();
     
     std::string http_port = "3000";
+    std::string dashel_port = "33332";
     std::string aesl_filename;
     std::vector<std::string> dashel_target_list;
     bool verbose = false;
@@ -784,8 +785,10 @@ int main(int argc, char *argv[])
             dumpHelp(std::cout, argv[0]), exit(1);
         else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
             dumpVersion(std::cout), exit(1);
-        else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0))
+        else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--http") == 0))
             http_port = argv[argCounter++];
+        else if ((strcmp(arg, "-s") == 0) || (strcmp(arg, "--port") == 0))
+            dashel_port = argv[argCounter++];
         else if ((strcmp(arg, "-a") == 0) || (strcmp(arg, "--aesl") == 0))
             aesl_filename = argv[argCounter++];
         else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
@@ -794,13 +797,15 @@ int main(int argc, char *argv[])
             dashel_target_list.push_back(arg);
     }
     
+    dashel_target_list.push_back("tcpin:port=" + dashel_port);
+
     // initialize Dashel plugins
     Dashel::initPlugins();
     
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, 1000*Kiterations));
+        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, dashel_port, 1000*Kiterations));
         
         for (auto nodeId: network->allNodeIds())
             try {
