@@ -33,6 +33,8 @@ ASEBAHTTP --http 3001 --aesl ping0123.aesl \
     $TCP';port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
     $TCP';port=33341;remapTarget=9;remapAesl=3' 1>&2 &
 
+sleep 30 # let switches start up
+
 # localhost:3003 is a switch that cascades localhost:3001 through its Dashel target tcp:;port=33330
 ASEBAHTTP --http 3003 --aesl ping0123.aesl \
 	  'tcp:;port=33330' 1>&2 &

@@ -5,22 +5,28 @@ targets, and provides a REST interface for communicating with them
 using HTTP over a TCP/IP connection. The tests in this directory
 verify these interconnections.
 
-There are five test specifications:
-* `1-http_spec.js` verifies that through the HTTP REST interface one
-can inspect and command Aseba nodes,
-* `2-interaction_spec.js` verifies that Aseba nodes can communicate
+There are seven test specification sets:
+* `3000-1-http_spec.js` and `3001-1-http_spec.js` verify that one
+can inspect and command Aseba nodes through the HTTP REST interface,
+* `3000-2-interaction_spec.js` verifies that Aseba nodes can communicate
 over the Aseba bus implemented by **asebahttp**, 
-* `3-remap_spec.js` verifies that **asebahttp** will remap node
+* `3001-2-remap_spec.js` verifies that **asebahttp** will remap node
 identifiers to avoid conflicts. 
-* `4-load-aesl_spec.js` verifies that **asebahttp** can upload a
+* `3001-3-load-aesl_spec.js` verifies that **asebahttp** can upload a
 new aesl program to a node.
-* `5-thymio-II_spec.js` optionally verifies that **asebahttp** can
+* `3002-1-thymio-II_spec.js` optionally verifies that **asebahttp** can
 communicate with a real Thymio-II connected on a USB serial port.
+* `3003-1-dashel-target_spec.js` optionally verifies that **asebahttp**
+offers a Dashel target and can  communicate with Aseba clients.
+* `3004-1-switch_spec.js` and `3004-1-switch_spec.js` verify that
+**asebahttp** switches can chain together and offer both Aseba and
+HTTP connections.
 
 ## Installation
 
 CMake and the build process will install the necessary NPM modules
-and will create a test runner `run-e2e-http.sh`. The command
+and will create the test runners `run-e2e-http.sh` and `run-e2e-switch.sh`.
+The command
 
 `npm install`
 
@@ -28,8 +34,8 @@ will reinstall the necessary NPM modules.
 
 ## Test scenario
 
-The test runner will start nine nodes with **asebadummynode**. The
-first four, **dummynode-**0—3, are connected using **asebaswitch**,
+The `run-e2e-http.sh` test runner will start nine nodes with **asebadummynode**.
+The first four, **dummynode-**0—3, are connected using **asebaswitch**,
 which is itself connected to an **asebahttp** listening to port 3000.
 The next five, **dummynode-**4—8, are individually connected to
 an **asebahttp** listening to port 3001.
@@ -64,6 +70,13 @@ The optional test scenario with a real Thymio-II first loads a simple
 program with variables, events, and an event stream at 1.5 second
 intervals, then verifies that **asebahttp** can change variables, call
 events, and inspect an event stream.
+
+The `run-e2e-switch.sh` test runner sets up two dummy nodes, listener 1
+and clock from above, connected by an **asebahttp** switch listening on
+HTTP port 3004 and Aseba port 33343, itself connected to a second **asebahttp*
+switch listening on HTTP port 3005 and Aseba port 33344. Simple tests are
+run over HTTP using jasmine, although alternatively you could connect Aseba
+Studio to one or the other of the **asebahttp* switches for your own tests.
 
 ## Implementation
 
