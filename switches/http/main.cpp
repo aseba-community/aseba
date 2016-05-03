@@ -9,9 +9,9 @@
 /*
 	Aseba - an event-based framework for distributed robot control
 	Copyright (C) 2007--2016:
- Stephane Magnenat <stephane at magnenat dot net>
- (http://stephane.magnenat.net)
- and other contributors, see authors.txt for details
+	Stephane Magnenat <stephane at magnenat dot net>
+	(http://stephane.magnenat.net)
+	and other contributors, see authors.txt for details
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
