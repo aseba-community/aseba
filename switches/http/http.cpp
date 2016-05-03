@@ -326,8 +326,6 @@ namespace Aseba
                         patched_message.dest = m->first;
                         patched_message.serialize(it->first);
                         it->first->flush();
-                        patched_message.dump(std::wcout);
-                        std::wcout << std::endl;
                         return; // found a substitution, message sent to break out
                     }
             }
