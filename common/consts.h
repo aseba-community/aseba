@@ -27,10 +27,10 @@
 /*@{*/
 
 /*! version of Aseba as string */
-#define ASEBA_VERSION "1.5.1"
+#define ASEBA_VERSION "1.5.3"
 
 /*! version of Aseba as an int */
-#define ASEBA_VERSION_INT 10501
+#define ASEBA_VERSION_INT 10503
 
 /*! version of aseba protocol, including bytecodes types and constants */
 #define ASEBA_PROTOCOL_VERSION 5
@@ -219,6 +219,9 @@ typedef enum
 
 /*! *DEPRECATED*, please use one of the more explicit defines above */
 #define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE
+
+/*! Macro to prevent compiler warnings for unused variables */
+#define ASEBA_UNUSED(x) (void)x;
 
 /*@}*/
 

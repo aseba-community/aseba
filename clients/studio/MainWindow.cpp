@@ -336,7 +336,7 @@ namespace Aseba
 	
 	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
 	
-	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent) :
+	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent) :
 		QSplitter(parent),
 		ScriptTab(id),
 		VariableListener(0),
@@ -1680,7 +1680,7 @@ namespace Aseba
 		{
 			// clear content
 			clearDocumentSpecificTabs();
-			// we must only have NodeTab* left.
+			// we must only have NodeTab* left, clear content of editors in tabs
 			for (int i = 0; i < nodes->count(); i++)
 			{
 				NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
@@ -1752,13 +1752,46 @@ namespace Aseba
 		int errorColumn;
 		if (document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
+			// remove event and constant definitions
 			eventsDescriptionsModel->clear();
 			constantsDefinitionsModel->clear();
-			
-			int noNodeCount = 0;
+			// delete all absent node tabs
 			clearDocumentSpecificTabs();
-			actualFileName = fileName;
+			// we must only have NodeTab* left, clear content of editors in tabs
+			for (int i = 0; i < nodes->count(); i++)
+			{
+				NodeTab* tab = polymorphic_downcast<NodeTab*>(nodes->widget(i));
+				Q_ASSERT(tab);
+				tab->editor->clear();
+			}
+			
+			// build list of tabs filled from file to be loaded
+			QSet<int> filledList;
 			QDomNode domNode = document.documentElement().firstChild();
+			while (!domNode.isNull())
+			{
+				if (domNode.isElement())
+				{
+					QDomElement element = domNode.toElement();
+					if (element.tagName() == "node")
+					{
+						bool prefered;
+						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt(), &prefered);
+						if (prefered)
+						{
+							const int index(nodes->indexOf(tab));
+							assert (index >= 0);
+							filledList.insert(index);
+						}
+					}
+				}
+				domNode = domNode.nextSibling();
+			}
+			
+			// load file
+			int noNodeCount = 0;
+			actualFileName = fileName;
+			domNode = document.documentElement().firstChild();
 			while (!domNode.isNull())
 			{
 				if (domNode.isElement())
@@ -1789,22 +1822,33 @@ namespace Aseba
 						}
 						
 						// reconstruct nodes
-						NodeTab* tab = getTabFromName(element.attribute("name"), element.attribute("nodeId", 0).toUInt());
+						bool prefered;
+						const QString nodeName(element.attribute("name"));
+						const unsigned nodeId(element.attribute("nodeId", 0).toUInt());
+						NodeTab* tab = getTabFromName(nodeName, nodeId, &prefered, &filledList);
 						if (tab)
 						{
-							tab->editor->setPlainText(text);
-							tab->restorePlugins(savedPlugins, true);
+							// matching tab name
+							if (prefered)
+							{
+								// the node is the prefered one, fill now
+								tab->editor->setPlainText(text);
+								tab->restorePlugins(savedPlugins, true);
+								// note that the node is already marked in filledList
+							}
+							else
+							{
+								const int index(nodes->indexOf(tab));
+								// the node is not filled, fill now
+								tab->editor->setPlainText(text);
+								tab->restorePlugins(savedPlugins, true);
+								filledList.insert(index);
+							}
 						}
 						else
 						{
-							nodes->addTab(
-								new AbsentNodeTab(
-									0, 
-									element.attribute("name"), text,
-									savedPlugins
-								),
-								element.attribute("name") + tr(" (not available)")
-							);
+							// no matching name or no free slot, create an absent tab
+							nodes->addTab(new AbsentNodeTab(nodeId, nodeName, text, savedPlugins), nodeName + tr(" (not available)"));
 							noNodeCount++;
 						}
 					}
@@ -1950,29 +1994,32 @@ namespace Aseba
 					nodeName = absentNodeTab->name;
 				
 				const QString& nodeContent = tab->editor->toPlainText();
-				
-				root.appendChild(document.createTextNode("\n\n\n"));
-				root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
-				
-				QDomElement element = document.createElement("node");
-				element.setAttribute("name", nodeName);
-				element.setAttribute("nodeId", tab->nodeId());
-				QDomText text = document.createTextNode(nodeContent);
-				element.appendChild(text);
 				ScriptTab::SavedPlugins savedPlugins(tab->savePlugins());
-				if (!savedPlugins.isEmpty())
+				// is there something to save?
+				if (!nodeContent.isEmpty() || !savedPlugins.isEmpty())
 				{
-					QDomElement plugins = document.createElement("toolsPlugins");
-					for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+					root.appendChild(document.createTextNode("\n\n\n"));
+					root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
+					
+					QDomElement element = document.createElement("node");
+					element.setAttribute("name", nodeName);
+					element.setAttribute("nodeId", tab->nodeId());
+					QDomText text = document.createTextNode(nodeContent);
+					element.appendChild(text);
+					if (!savedPlugins.isEmpty())
 					{
-						const NodeToolInterface::SavedContent content(*it);
-						QDomElement plugin(document.createElement(content.first));
-						plugin.appendChild(document.importNode(content.second.documentElement(), true));
-						plugins.appendChild(plugin);
+						QDomElement plugins = document.createElement("toolsPlugins");
+						for (ScriptTab::SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
+						{
+							const NodeToolInterface::SavedContent content(*it);
+							QDomElement plugin(document.createElement(content.first));
+							plugin.appendChild(document.importNode(content.second.documentElement(), true));
+							plugins.appendChild(plugin);
+						}
+						element.appendChild(plugins);
 					}
-					element.appendChild(plugins);
+					root.appendChild(element);
 				}
-				root.appendChild(element);
 			}
 		}
 		root.appendChild(document.createTextNode("\n\n\n"));
@@ -2729,12 +2776,14 @@ namespace Aseba
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
 		const int index = getIndexFromId(node);
-		// Q_ASSERT(index >= 0);
-		// this is a temporary hack, it should be fixed in DashelTarget
-		// and Studio should not receive multiple disconnected messages...
-		// if we receive a disconnected message from an already-disconnected node, ignore it
+		// Double disconnection might happen if the reception of the target description
+		// hang. Studio handles this nicely, simply ignoring the message, but prints a warning 
+		// because this behaviour likely indicates a problem with the node or a bug somewhere.
 		if (index < 0)
+		{
+			std::cerr << "Warning: Received double disconnection from node " << node << ", the node might experience connection problems!" << std::endl;
 			return;
+		}
 		const NodeTab* tab = getTabFromId(node);
 		const QString& tabName = nodes->tabText(index);
 		
@@ -2752,23 +2801,6 @@ namespace Aseba
 		
 		regenerateToolsMenus();
 		regenerateHelpMenu();
-	}
-	
-	//! The network connection has been cut: all nodes have disconnected.
-	void MainWindow::networkDisconnected()
-	{
-		// collect all node ids to disconnect
-		std::vector<unsigned> toDisconnect;
-		for (int i = 0; i < nodes->count(); i++)
-		{
-			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
-			if (tab)
-				toDisconnect.push_back(tab->nodeId());
-		}
-		
-		// disconnect all node ids
-		for (size_t i = 0; i < toDisconnect.size(); i++)
-			nodeDisconnected(toDisconnect[i]);
 	}
 	
 	//! A user event has arrived from the network.
@@ -2939,10 +2971,11 @@ namespace Aseba
 		return 0;
 	}
 	
-	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise
-	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId) const
+	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise.
+	//! Do not consider tabs indices in filledList for non-prefered tabs
+	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId, bool* isPrefered, QSet<int>* filledList) const
 	{
-		NodeTab* bestFound(0);
+		NodeTab* freeSlotFound(0);
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
@@ -2952,13 +2985,20 @@ namespace Aseba
 				if (target->getName(id) == name)
 				{
 					if (id == preferedId)
+					{
+						if (isPrefered) *isPrefered = true;
 						return tab;
-					else if (!bestFound)
-						bestFound = tab;
+					}
+					else if (!freeSlotFound)
+					{
+						if (!filledList || !filledList->contains(i))
+							freeSlotFound = tab;
+					}
 				}
 			}
 		}
-		return bestFound;
+		if (isPrefered) *isPrefered = false;
+		return freeSlotFound;
 	}
 	
 	//! Get the absent tab widget index of a corresponding node id
@@ -3226,7 +3266,6 @@ namespace Aseba
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target, SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
-		connect(target, SIGNAL(networkDisconnected()),  SLOT(networkDisconnected()));
 		
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(userEventsDropped(unsigned)), SLOT(userEventsDropped(unsigned)));

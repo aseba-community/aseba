@@ -202,6 +202,7 @@ namespace Aseba { namespace ThymioBlockly
 		connect(frame, SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initAsebaJavascriptInterface()));
 		connect(&asebaJavascriptInterface, SIGNAL(compiled(const QString&)), this, SLOT(codeUpdated(const QString&)));
 		connect(&asebaJavascriptInterface, SIGNAL(saved(const QString&)), this, SLOT(workspaceSaved(const QString&)));
+		connect(webview, SIGNAL(loadFinished(bool)), this, SLOT(blocklyLoaded()));
 
 		sceneLayout->addWidget(webview);
 
@@ -287,7 +288,6 @@ namespace Aseba { namespace ThymioBlockly
 		{
 			asebaJavascriptInterface.requestReset();
 			showAtSavedPosition();
-			QWidget::show();
 		}
 	}
 
@@ -298,15 +298,15 @@ namespace Aseba { namespace ThymioBlockly
 	
 	bool ThymioBlockly::save()
 	{
-		currentSaveAs = false;
 		asebaJavascriptInterface.requestSave();
+		de->saveFile(false);
 		return true;
 	}
 	
 	bool ThymioBlockly::saveAs()
 	{
-		currentSaveAs = true;
 		asebaJavascriptInterface.requestSave();
+		de->saveFile(true);
 		return true;
 	}
 
@@ -365,7 +365,14 @@ namespace Aseba { namespace ThymioBlockly
 	void ThymioBlockly::workspaceSaved(const QString& xml)
 	{
 		currentSavedXml = xml;
-		de->saveFile(currentSaveAs);
+	}
+
+	void ThymioBlockly::blocklyLoaded()
+	{
+		if (!currentSavedXml.isEmpty())
+		{
+			asebaJavascriptInterface.requestLoad(currentSavedXml);
+		}
 	}
 
 	void ThymioBlockly::closeEvent ( QCloseEvent * event )
@@ -417,7 +424,8 @@ namespace Aseba { namespace ThymioBlockly
 	
 	QDomDocument ThymioBlockly::saveToDom() const
 	{
-		if (currentSavedXml.isEmpty()) {
+		asebaJavascriptInterface.requestSave();
+		if (currentSavedXml.isEmpty() || currentSavedXml == "<xml></xml>") {
 			return QDomDocument();
 		}
 		else {
@@ -442,16 +450,14 @@ namespace Aseba { namespace ThymioBlockly
 
 	void ThymioBlockly::loadFromDom(const QDomDocument& document, bool fromFile)
 	{
-		QString xml = document.toString();
+		currentSavedXml = document.toString();
 
 		// remove <!DOCTYPE tool-plugin-data>, blockly can't handle it...
-		xml.remove("<!DOCTYPE tool-plugin-data>");
-
-		asebaJavascriptInterface.requestLoad(xml);
-
+		currentSavedXml.remove("<!DOCTYPE tool-plugin-data>");
+		
+		asebaJavascriptInterface.requestLoad(currentSavedXml);
+		
 		showAtSavedPosition();
-
-		QWidget::show();
 	}
 	
 	void ThymioBlockly::codeChangedInEditor()

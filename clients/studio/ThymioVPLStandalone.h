@@ -88,7 +88,6 @@ namespace Aseba
 		void editorContentChanged();
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
-		void networkDisconnected();
 		void variablesMemoryEstimatedDirty(unsigned node);
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
 		void updateWindowTitle(bool modified);
@@ -107,6 +106,7 @@ namespace Aseba
 		
 		QLayout* vplLayout; //!< layout to add/remove VPL to/from
 		ThymioVPL::ThymioVisualProgramming* vpl; //!< VPL widget 
+		QLabel* disconnectedMessage; //!< message for VPL area when disconnected
 		QDomDocument savedContent; //!< saved VPL content across disconnections
 		AeslEditor* editor; //! viewer of code produced by VPL
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation

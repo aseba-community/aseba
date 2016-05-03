@@ -58,8 +58,6 @@ namespace Aseba
 		void nodeConnected(unsigned node);
 		//! A node has disconnected from the network.
 		void nodeDisconnected(unsigned node);
-		//! The network connection has been cut: all nodes have disconnected.
-		void networkDisconnected();
 		
 		//! A user event has arrived from the network.
 		void userEvent(unsigned id, const VariablesDataVector data);

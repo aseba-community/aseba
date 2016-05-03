@@ -75,7 +75,7 @@ uint16 AsebaCanGetMinMultipleOfHeight(uint16 v)
 }
 
 /*! Returned the number of used frames in the send queue*/
-static uint16 AsebaCanSendQueueGetUsedFrames()
+static uint16 AsebaCanSendQueueGetUsedFrames(void)
 {
 	uint16 ipos, cpos;
 	ipos = asebaCan.sendQueueInsertPos;
@@ -88,7 +88,7 @@ static uint16 AsebaCanSendQueueGetUsedFrames()
 }
 
 /*! Returned the number of free frames in the send queue */
-static uint16 AsebaCanSendQueueGetFreeFrames()
+static uint16 AsebaCanSendQueueGetFreeFrames(void)
 {
 	return asebaCan.sendQueueSize - AsebaCanSendQueueGetUsedFrames();
 }
@@ -109,7 +109,7 @@ static void AsebaCanSendQueueInsert(uint16 canid, const uint8 *data, size_t size
 }
 
 /*! Send frames in send queue to physical layer until it is full */
-static void AsebaCanSendQueueToPhysicalLayer()
+static void AsebaCanSendQueueToPhysicalLayer(void)
 {
 	uint16 temp;
 	
@@ -134,7 +134,7 @@ static void AsebaCanSendQueueToPhysicalLayer()
 }
 
 /*! Returned the maximum number of used frames in the reception queue*/
-static uint16 AsebaCanRecvQueueGetMaxUsedFrames()
+static uint16 AsebaCanRecvQueueGetMaxUsedFrames(void)
 {
 	uint16 ipos, cpos;
 	ipos = asebaCan.recvQueueInsertPos;
@@ -146,13 +146,13 @@ static uint16 AsebaCanRecvQueueGetMaxUsedFrames()
 }
 
 /*! Returned the minimum number of free frames in the reception queue */
-static uint16 AsebaCanRecvQueueGetMinFreeFrames()
+static uint16 AsebaCanRecvQueueGetMinFreeFrames(void)
 {
 	return asebaCan.recvQueueSize - AsebaCanRecvQueueGetMaxUsedFrames();
 }
 
 /*! Readjust the fifo pointers */
-static void AsebaCanRecvQueueGarbageCollect()
+static void AsebaCanRecvQueueGarbageCollect(void)
 {
 	uint16 temp;
 	while (asebaCan.recvQueueConsumePos != asebaCan.recvQueueInsertPos)
@@ -413,7 +413,7 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 
 void AsebaCanRecvFreeQueue(void)
 {
-	int i;
+	size_t i;
 	for(i = 0; i < asebaCan.recvQueueSize; i++)
 		asebaCan.recvQueue[i].used = 0;
 	asebaCan.recvQueueInsertPos = 0;

@@ -15,6 +15,9 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QtConcurrentRun>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QDomDocument>
 #include <memory>
 #include <iostream>
 
@@ -95,7 +98,11 @@ namespace Aseba
 
 	
 	ThymioUpgraderDialog::ThymioUpgraderDialog(const std::string& target):
-		target(target)
+		target(target),
+		currentVersion(0),
+		currentDevStatus(-1),
+		officialVersion(0),
+		officialDevStatus(-1)
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Firmware Upgrader"));
@@ -118,8 +125,18 @@ namespace Aseba
 		nodeIdText = new QLabel(this);
 		mainLayout->addWidget(nodeIdText);
 		
+		// latest file
+		officialGroupBox = new QGroupBox(tr("Latest official firmware"));
+		QVBoxLayout *officialLayout = new QVBoxLayout();
+		officialFirmwareText = new QLabel("Connection to official firmware server in progress...");
+		officialFirmwareText->setWordWrap(true);
+		officialLayout->addWidget(officialFirmwareText);
+		officialGroupBox->setLayout(officialLayout);
+		connect(officialGroupBox, SIGNAL(clicked(bool)), SLOT(officialGroupChecked(bool)));
+		mainLayout->addWidget(officialGroupBox);
+		
 		// file selector
-		QGroupBox* fileGroupBox = new QGroupBox(tr("Firmware file"));
+		fileGroupBox = new QGroupBox(tr("Custom firmware file"));
 		QHBoxLayout *fileLayout = new QHBoxLayout();
 		lineEdit = new QLineEdit(this);
 		fileButton = new QPushButton(tr("Select..."), this);
@@ -127,6 +144,7 @@ namespace Aseba
 		fileLayout->addWidget(fileButton);
 		fileLayout->addWidget(lineEdit);
 		fileGroupBox->setLayout(fileLayout);
+		connect(fileGroupBox, SIGNAL(clicked(bool)), SLOT(fileGroupChecked(bool)));
 		mainLayout->addWidget(fileGroupBox);
 
 		// progress bar
@@ -153,6 +171,11 @@ namespace Aseba
 		// read id and version
 		readIdVersion();
 		
+		// create network stuff to get latest firmware
+		networkManager = new QNetworkAccessManager(this);
+		connect(networkManager, SIGNAL(finished(QNetworkReply*)), SLOT(networkReplyFinished(QNetworkReply*)));
+		networkManager->get(QNetworkRequest(QUrl("http://firmwarefiles.thymio.org/Thymio2-firmware-meta.xml")));
+		
 		show();
 	}
 	
@@ -161,11 +184,49 @@ namespace Aseba
 		flashFuture.waitForFinished();
 	}
 	
+	void ThymioUpgraderDialog::officialGroupChecked(bool on)
+	{
+		if (on)
+			selectOfficialFirmware();
+		else
+			selectUserFirmware();
+	}
+	
+	void ThymioUpgraderDialog::fileGroupChecked(bool on)
+	{
+		if (on)
+			selectUserFirmware();
+		else
+			selectOfficialFirmware();
+	}
+	
+	void ThymioUpgraderDialog::selectOfficialFirmware()
+	{
+		officialGroupBox->setChecked(true);
+		fileGroupBox->setChecked(false);
+		setupFlashButtonState();
+	}
+	
+	void ThymioUpgraderDialog::selectUserFirmware()
+	{
+		officialGroupBox->setChecked(false);
+		fileGroupBox->setChecked(true);
+		setupFlashButtonState();
+	}
+	
 	void ThymioUpgraderDialog::setupFlashButtonState()
 	{
-		flashButton->setEnabled(
-			!lineEdit->text().isEmpty()
-		);
+		if (flashFuture.isRunning())
+		{
+			flashButton->setEnabled(false);
+		}
+		else
+		{
+			if (officialGroupBox->isChecked())
+				flashButton->setEnabled(true);
+			else
+				flashButton->setEnabled(!lineEdit->text().isEmpty());
+		}
 	}
 	
 	void ThymioUpgraderDialog::openFile(void)
@@ -249,12 +310,9 @@ namespace Aseba
 				Variables* variables(dynamic_cast<Variables*>(hub.getMessage()));
 				if (variables && variables->start == firmwareAddress && variables->variables.size() == 2)
 				{
-					const unsigned version(variables->variables[0]);
-					const unsigned devStatus(variables->variables[1]);
-					if (devStatus == 0)
-						firmwareVersion->setText(tr("Current firmware: version %1 - production").arg(version));
-					else
-						firmwareVersion->setText(tr("Current firmware: version %1 - development %2").arg(version, devStatus));
+					const unsigned currentVersion = variables->variables[0];
+					const unsigned currentDevStatus = variables->variables[1];
+					firmwareVersion->setText(tr("Current firmware: %1").arg(versionDevStatusToString(currentVersion, currentDevStatus)));
 					hub.clearMessage();
 					break;
 				}
@@ -262,6 +320,14 @@ namespace Aseba
 			}
 			restDuration = 1000 - getVariablesTime.msecsTo(QTime::currentTime());
 		}
+	}
+	
+	QString ThymioUpgraderDialog::versionDevStatusToString(unsigned version, unsigned devStatus) const
+	{
+		if (devStatus == 0)
+			return tr("version %1 - production").arg(version);
+		else
+			return tr("version %1 - development %2").arg(version).arg(devStatus);
 	}
 
 	void ThymioUpgraderDialog::doFlash(void) 
@@ -274,12 +340,16 @@ namespace Aseba
 		// disable buttons while flashing
 		quitButton->setEnabled(false);
 		flashButton->setEnabled(false);
-		fileButton->setEnabled(false);
-		lineEdit->setEnabled(false);
-	
+		officialGroupBox->setEnabled(false);
+		fileGroupBox->setEnabled(false);
+		
 		// start flash thread
 		Q_ASSERT(!flashFuture.isRunning());
-		const string hexFileName(lineEdit->text().toLocal8Bit().constData());
+		string hexFileName;
+		if (officialGroupBox->isChecked())
+			hexFileName = officialHexFile.fileName().toStdString();
+		else
+			hexFileName = lineEdit->text().toLocal8Bit().constData();
 		flashFuture = QtConcurrent::run(this, &ThymioUpgraderDialog::flashThread, target, hexFileName);
 		flashFutureWatcher.setFuture(flashFuture);
 	}
@@ -337,9 +407,9 @@ namespace Aseba
 	{
 		// re-enable buttons
 		quitButton->setEnabled(true);
-		flashButton->setEnabled(true);
-		fileButton->setEnabled(true);
-		lineEdit->setEnabled(true);
+		officialGroupBox->setEnabled(true);
+		fileGroupBox->setEnabled(true);
+		setupFlashButtonState();
 		
 		// handle flash result
 		const FlashResult& result(flashFutureWatcher.result());
@@ -357,6 +427,59 @@ namespace Aseba
 			// re-read version
 			readIdVersion();
 		}
+	}
+	
+	void ThymioUpgraderDialog::networkReplyFinished(QNetworkReply* reply)
+	{
+		QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+		if (reply->error())
+		{
+			networkError();
+		}
+		else if (!redirectionTarget.isNull())
+		{
+			networkManager->get(QNetworkRequest(redirectionTarget.toUrl()));
+		}
+		else
+		{	
+			if (officialDevStatus == unsigned(-1))
+			{
+				QDomDocument document;
+				document.setContent(reply->readAll(), true);
+				QDomElement firmwareMeta(document.firstChildElement("firmware"));
+				if (!firmwareMeta.isNull())
+				{
+					officialVersion = firmwareMeta.attribute("version").toUInt();
+					officialDevStatus = firmwareMeta.attribute("devStatus").toUInt();
+					networkManager->get(QNetworkRequest(QUrl(firmwareMeta.attribute("url"))));
+					
+				}
+				else
+				{
+					networkError();
+				}
+			}
+			else
+			{
+				if (officialHexFile.open())
+				{
+					officialHexFile.write(reply->readAll());
+					officialHexFile.waitForBytesWritten(-1);
+					officialFirmwareText->setText(tr("Official firmware: %1").arg(versionDevStatusToString(officialVersion, officialDevStatus)));
+					officialGroupBox->setCheckable(true);
+					fileGroupBox->setCheckable(true);
+					selectOfficialFirmware();
+				}
+				else
+					officialFirmwareText->setText(tr("Cannot open temporary file!"));
+			}
+		}
+		reply->deleteLater();
+	}
+	
+	void ThymioUpgraderDialog::networkError()
+	{
+		officialFirmwareText->setText(tr("Error connecting to official firmware server!"));
 	}
 };
 

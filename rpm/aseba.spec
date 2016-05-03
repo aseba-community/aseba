@@ -4,12 +4,12 @@ Name:           aseba
 # referencing below
 %global source_major 1
 %global source_minor 5
-%global source_patch 0
+%global source_patch 2
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit 2fae6157d060479ae5d5bd825b000ccd4b7b8d57
+%global commit c20f34d28b045198fdde4e8734461dac1fdf3899
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line with the git commit has of the revision of Catch
@@ -20,7 +20,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # and only if the commit hash is not from a git tag for an existing source
 # release (i.e. it is a commit hash for a pre-release or post-release
 # revision). Otherwise set it to 1.
-%global commit_is_tagged_as_source_release 0
+%global commit_is_tagged_as_source_release 1
 %if %{commit_is_tagged_as_source_release} == 0
   %global snapshot .%(date +%%Y%%m%%d)git%{shortcommit}
 %endif
@@ -31,7 +31,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        0.4%{?snapshot}%{?dist}
+Release:        1%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -184,6 +184,12 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Mon Mar 07 2016 Dean Brettle <dean@brettle.com> - 1.5.2-1
+- Sync with upstream 1.5.2
+
+* Mon Feb 29 2016 Dean Brettle <dean@brettle.com> - 1.5.1-1
+- Sync with upstream 1.5.1
+
 * Thu Nov 19 2015 Dean Brettle <dean@brettle.com> - 1.5.0-0.4.20151119git2fae615
 - Require libdashel1 >= 1.1.0
 
