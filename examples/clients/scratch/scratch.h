@@ -29,7 +29,7 @@ namespace Aseba
         std::map< std::pair<unsigned,unsigned>, unsigned > leds; // top, bottom-left, bottom-right
         
     public:
-        ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& dashel_port="33332", const int iterations=-1);
+        ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1);
         virtual std::string evPoll(const unsigned nodeId);
         
     protected:
@@ -54,7 +54,7 @@ namespace Aseba
             {"acc",{0,1}}, {"button.backward",{1,2}}, {"button.center",{1,2}},
             {"button.forward",{1,2}}, {"button.left",{1,2}}, {"button.right",{1,2}},
             {"mic.intensity",{1,2}},
-            {"angle.front",{2,3}}, {"angle.front",{3,4}},
+            {"angle.back",{2,3}}, {"angle.front",{3,4}},
             {"distance.back",{4,5}}, {"distance.front",{4,5}}, {"motor.left.target",{5,6}},
             {"motor.right.target",{6,7}}, {"motor.left.speed",{7,8}}, {"motor.right.speed",{8,9}},
             {"odo.degree",{9,10}}, {"odo.x",{10,11}}, {"odo.y",{11,12}}, {"prox.comm.rx",{12,13}},

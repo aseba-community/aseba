@@ -44,8 +44,8 @@ namespace Aseba
     //-- Subclassing Aseba::HttpInterface ------------------------------------------------------
     
     ScratchInterface::ScratchInterface(const strings& targets, const std::string& http_port,
-                     const std::string& dashel_port, const int iterations) :
-    Aseba::HttpInterface(targets, http_port, dashel_port, iterations), // use base class constructor
+                     const std::string& aseba_port, const int iterations) :
+    Aseba::HttpInterface(targets, http_port, aseba_port, iterations), // use base class constructor
     state_variable_update_time(0)
     // blink_state(0), // default empty
     // scratch_dial(0), // default empty
@@ -494,10 +494,10 @@ namespace Aseba
             for (std::vector<short>::iterator i = busy_ids.begin(); i != busy_ids.end(); i++)
                 if (*i != 0)
                     result << " " << *i;
-            // temp for testing, check whether Q_motion_ended event had arrived
-            for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
-                if (std::find(busy_ids.begin(), busy_ids.end(), *i) != busy_ids.end())
-                    cerr << "Warning " << *i << " in busy_threads but not in Qid" << endl;
+//            // temp for testing, check whether Q_motion_ended event had arrived
+//            for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
+//                if (std::find(busy_ids.begin(), busy_ids.end(), *i) != busy_ids.end())
+//                    cerr << "Warning " << *i << " in busy_threads but not in Qid" << endl;
         }
         result << endl;
         
@@ -695,8 +695,8 @@ namespace Aseba
         payload = variable_cache[state_variable_addresses["distance.back"]];
         if (payload.size() == 1)
         {
-            variable_cache[state_variable_addresses["distance.back"]].assign(1, (payload[0] >> 8) % 255);
-            variable_cache[state_variable_addresses["distance.front"]].assign(1, payload[0] % 255);
+            variable_cache[state_variable_addresses["distance.back"]].assign(1, (payload[0] >> 8) % 256);
+            variable_cache[state_variable_addresses["distance.front"]].assign(1, payload[0] % 256);
         }
     }
 
@@ -739,7 +739,7 @@ int main(int argc, char *argv[])
     Dashel::initPlugins();
     
     std::string http_port = "3000";
-    std::string dashel_port = "33332";
+    std::string aseba_port;
     std::string aesl_filename;
     std::vector<std::string> dashel_target_list;
     bool verbose = false;
@@ -763,7 +763,7 @@ int main(int argc, char *argv[])
         else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--http") == 0))
             http_port = argv[argCounter++];
         else if ((strcmp(arg, "-s") == 0) || (strcmp(arg, "--port") == 0))
-            dashel_port = argv[argCounter++];
+            aseba_port = argv[argCounter++];
         else if ((strcmp(arg, "-a") == 0) || (strcmp(arg, "--aesl") == 0))
             aesl_filename = argv[argCounter++];
         else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
@@ -772,15 +772,13 @@ int main(int argc, char *argv[])
             dashel_target_list.push_back(arg);
     }
     
-    dashel_target_list.push_back("tcpin:port=" + dashel_port);
-
     // initialize Dashel plugins
     Dashel::initPlugins();
     
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, dashel_port, 1000*Kiterations));
+        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, aseba_port, 1000*Kiterations));
         
         for (auto nodeId: network->allNodeIds())
             try {
