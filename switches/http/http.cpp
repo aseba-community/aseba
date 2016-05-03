@@ -1,4 +1,3 @@
-
 /*
  asebahttp - a switch to bridge Aseba to HTTP
  2014-12-01
@@ -57,7 +56,7 @@
  */
 /*
 	Aseba - an event-based framework for distributed robot control
-	Copyright (C) 2007--2015:
+	Copyright (C) 2007--2016:
  Stephane Magnenat <stephane at magnenat dot net>
  (http://stephane.magnenat.net)
  and other contributors, see authors.txt for details
@@ -136,16 +135,22 @@ namespace Aseba
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const int iterations) :
+    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStreams(),
-    httpStream(0),
+    inHttpStream(0),
+    inAsebaStream(0),
+    inHttpPort(http_port),
+    inAsebaPort(aseba_port),
     verbose(false),
     iterations(iterations)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
-        // listen for incoming HTTP requests
-        httpStream = connect("tcpin:port=" + http_port);
+        // listen for incoming HTTP and Aseba requests
+        if (! inHttpPort.empty())
+            inHttpStream = connect("tcpin:port=" + inHttpPort);
+        if (! inAsebaPort.empty())
+            inAsebaStream = connect("tcpin:port=" + inAsebaPort);
 
         // connect to each Aseba target
         for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
@@ -321,7 +326,9 @@ namespace Aseba
                         patched_message.dest = m->first;
                         patched_message.serialize(it->first);
                         it->first->flush();
-                        return;
+                        patched_message.dump(std::wcout);
+                        std::wcout << std::endl;
+                        return; // found a substitution, message sent to break out
                     }
             }
             
@@ -331,6 +338,35 @@ namespace Aseba
         }
     }
 
+    void HttpInterface::propagateCmdMessage(Message* message)
+    {
+        CmdMessage *cmdMsg(dynamic_cast<CmdMessage *>(message));
+        if (cmdMsg)
+        {
+            for (auto& stream_nodeid: asebaStreams)
+            {
+                NodeIdSubstitution subs = targetToNodeIdSubstitutions[stream_nodeid.first];
+
+                // UGLY: subs doesn't have a reverse index, so we have to scan through
+                // FRAGILE: rely on identity substitution in targetToNodeIdSubstitutions
+                for (NodeIdSubstitution::iterator node2sub = subs.begin(); node2sub != subs.end(); ++node2sub)
+                    if (node2sub->second == cmdMsg->dest) // the dest node is remapped to here, so reverse the map
+                    {
+                        if (node2sub->second != node2sub->second)
+                        {
+                            const uint16 oldDest(cmdMsg->dest); // save previous value
+                            cmdMsg->dest = node2sub->first; // original node id is rewritten destination
+                            message->serialize(stream_nodeid.first); // send message with rewritten destination
+                            cmdMsg->dest = oldDest; // restore previous value
+                        }
+                        else
+                            message->serialize(stream_nodeid.first);
+                    }
+                stream_nodeid.first->flush();
+            }
+        }
+    }
+    
     void HttpInterface::nodeDescriptionReceived(unsigned targetId)
     {
         if (!targetId) return;
@@ -344,86 +380,114 @@ namespace Aseba
     
     void HttpInterface::incomingData(Stream *stream)
     {
-        if (asebaStreams.count(stream) != 0) // this is a dashel target
+        if (asebaStreams.count(stream) != 0)
         {
-            // incoming Aseba message
-            if (verbose)
-                cerr << "incoming for asebaStream " << stream << endl;
-            
-            Message *message(Message::receive(stream));
-            
-            // rewrite message->source using targetToNodeIdSubstitutions
-            unsigned newId = updateNodeId(stream, message->source);
-            message->source = newId;
-            
-            // pass message to description manager, which builds the node descriptions in background
-            // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
-            NodesManager::processMessage(message);
-            
-            // if description, record the stream -- node id correspondence
-            const Description *description = dynamic_cast<const Description *>(message);
-            if (description)
-                asebaStreams[stream].insert(message->source);
-            
-            // if variables, check for pending requests
-            const Variables *variables(dynamic_cast<Variables *>(message));
-            if (variables)
-                incomingVariables(variables);
-            
-            // if event, retransmit it on an HTTP SSE channel if one exists
-            const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
-            if (userMsg)
-                incomingUserMsg(userMsg);
-            
-            // act like asebaswitch: rebroadcast this message to the other streams
-            for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); ++it)
-            {
-                Stream* outStream = it->first;
-                if (outStream == stream)
-                    continue; // don't echo!
-                try
-                {
-                    message->serialize(outStream);
-                    outStream->flush();
-                }
-                catch (DashelException e)
-                {
-                    std::cerr << "error while writing to stream " << outStream << std::endl;
-                }
-            }
-            
-            delete message;
+            // this is a dashel target
+            incomingDataTarget(stream);
         }
-        else                                 // this is the HTTP stream
+        else if (stream->getTargetParameter("connectionPort").compare(inAsebaPort) == 0)
         {
-            // incoming HTTP request
-            if (verbose)
-                cerr << "incoming for HTTP stream " << stream << endl;
-            HttpRequest* req = new HttpRequest; // [promise] we will eventually delete req in sendAvailableResponses, unscheduleResponse, or stream shutdown
-            if ( ! req->initialize(stream))
-            {   // protocol failure, shut down connection
-                stream->write("HTTP/1.1 400 Bad request\r\n");
-                stream->fail(DashelException::Unknown, 0, "400 Bad request");
-                unscheduleAllResponses(stream);
-                delete req; // not yet in queue, so delete it here [promise]
-                return;
-            }
-            
-            if (verbose)
-            {
-                cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
-                for (unsigned int i = 0; i < req->tokens.size(); ++i)
-                    cerr << req->tokens[i] << " ";
-                cerr << "] " << req->protocol_version << " new req " << req << endl;
-            }
-            // continue with incomingData
-            scheduleResponse(stream, req);
-            req->incomingData(); // read request all at once
-            if (req->ready)
-                routeRequest(req);
-            // run response queues immediately to save time
-            sendAvailableResponses();
+            // this is a new Aseba connection
+            incomingDataAseba(stream);
+            incomingDataTarget(stream);
         }
+        else
+        {
+            // this is an HTTP stream
+            incomingDataHTTP(stream);
+        }
+    }
+    
+    // incoming HTTP request
+    void HttpInterface::incomingDataHTTP(Stream *stream)
+    {
+        if (verbose)
+            cerr << "incoming for HTTP stream " << stream << endl;
+        HttpRequest* req = new HttpRequest; // [promise] we will eventually delete req in sendAvailableResponses, unscheduleResponse, or stream shutdown
+        if ( ! req->initialize(stream))
+        {   // protocol failure, shut down connection
+            stream->write("HTTP/1.1 400 Bad request\r\n");
+            stream->fail(DashelException::Unknown, 0, "400 Bad request");
+            unscheduleAllResponses(stream);
+            delete req; // not yet in queue, so delete it here [promise]
+            return;
+        }
+        
+        if (verbose)
+        {
+            cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
+            for (unsigned int i = 0; i < req->tokens.size(); ++i)
+                cerr << req->tokens[i] << " ";
+            cerr << "] " << req->protocol_version << " new req " << req << endl;
+        }
+        // continue with incomingData
+        scheduleResponse(stream, req);
+        req->incomingData(); // read request all at once
+        if (req->ready)
+            routeRequest(req);
+        // run response queues immediately to save time
+        sendAvailableResponses();
+    }
+    
+    // incoming Aseba request
+    void HttpInterface::incomingDataAseba(Stream *stream)
+    {
+        if (verbose)
+            cerr << "new incoming for asebaStream " << stream << " con port " << stream->getTargetParameter("connectionPort") << endl;
+        asebaStreams[stream].clear();
+    }
+    
+    // incoming Aseba message
+    void HttpInterface::incomingDataTarget(Stream *stream)
+    {
+//        if (verbose)
+//            cerr << "incoming for asebaStream " << stream << endl;
+//        
+        Message *message(Message::receive(stream));
+        
+        // rewrite message source using targetToNodeIdSubstitutions
+        unsigned newId = updateNodeId(stream, message->source);
+        message->source = newId;
+        
+        // pass message to description manager, which builds the node descriptions in background
+        // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
+        NodesManager::processMessage(message);
+        
+        // if description, record the stream -- node id correspondence
+        const Description *description = dynamic_cast<const Description *>(message);
+        if (description)
+            asebaStreams[stream].insert(message->source);
+        
+        // if variables, check for pending requests
+        const Variables *variables(dynamic_cast<Variables *>(message));
+        if (variables)
+            incomingVariables(variables);
+        
+        // if event, retransmit it on an HTTP SSE channel if one exists
+        const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
+        if (userMsg)
+            incomingUserMsg(userMsg);
+        
+        // act like asebaswitch: rebroadcast this message to the other streams
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); ++it)
+        {
+            Stream* outStream = it->first;
+            if (outStream == stream)
+                continue; // don't echo!
+            try
+            {
+                message->serialize(outStream);
+                outStream->flush();
+            }
+            catch (DashelException e)
+            {
+                std::cerr << "error while writing to stream " << outStream << std::endl;
+            }
+        }
+        // propagate rewritten Cmd message to all connected Aseba streams
+        propagateCmdMessage(message);
+        
+        delete message;
     }
     
     // Incoming Variables
@@ -1204,6 +1268,8 @@ namespace Aseba
         BytecodeVector bytecode;
         unsigned allocatedVariablesCount;
         
+        bool is_failsafe = (program.empty() || program.compare(UTF8ToWString("<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n")) == 0);
+        
         Compiler compiler;
         compiler.setTargetDescription(getDescription(nodeId));
         compiler.setCommonDefinitions(&(commonDefinitions[nodeId]));
@@ -1222,12 +1288,14 @@ namespace Aseba
                 return false; // hack, should be using exceptions for HTTP errors
             }
 
-            // send bytecode
-            sendBytecode(stream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
-            // run node
-            Run msg(nodeId);
-            msg.serialize(stream);
-            stream->flush();
+            if (! is_failsafe) {
+                // send bytecode
+                sendBytecode(stream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+                // run node
+                Run msg(nodeId);
+                msg.serialize(stream);
+                stream->flush();
+            }
             // retrieve user-defined variables for use in get/set
             allVariables[nodeId] = *compiler.getVariablesMap();
             // remember that this node has received a program

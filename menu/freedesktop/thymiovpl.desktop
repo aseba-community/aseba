@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Thymio VPL
-Exec=thymiovpl
+Exec=thymiovpl "ser:name=Thymio-II"
 TryExec=thymiovpl
 Categories=Education;Science;
 Icon=thymiovpl

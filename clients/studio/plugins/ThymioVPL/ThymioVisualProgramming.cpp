@@ -483,6 +483,7 @@ namespace Aseba { namespace ThymioVPL
 			USAGE_LOG(logNewFile());
 			scene->reset();
 			clearUndo();
+			setupGlobalEvents();
 			processCompilationResult();
 		}
 	}

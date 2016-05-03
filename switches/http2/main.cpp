@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <memory>
 
 #include "HttpInterface.h"
 #include "../../common/consts.h"
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 
 	// create and run bridge, catch Dashel exceptions
 	try {
-		Aseba::Http::HttpInterface *interface = new Aseba::Http::HttpInterface(httpPort);
+		std::auto_ptr<Aseba::Http::HttpInterface> interface(new Aseba::Http::HttpInterface(httpPort));
 		interface->setVerbose(verbose);
 
 		int numTargets = (int) dashelTargetList.size();

@@ -84,6 +84,7 @@ namespace Aseba { namespace ThymioBlockly
 		void initAsebaJavascriptInterface();
 		void codeUpdated(const QString& code);
 		void workspaceSaved(const QString& xml);
+		void blocklyLoaded();
 
 	private:
 		void clearSceneWithoutRecompilation();
@@ -92,8 +93,7 @@ namespace Aseba { namespace ThymioBlockly
 	protected:
 		std::auto_ptr<DevelopmentEnvironmentInterface> de;
 		QWebView *webview;
-		AsebaJavascriptInterface asebaJavascriptInterface;
-		bool currentSaveAs;
+		mutable AsebaJavascriptInterface asebaJavascriptInterface;
 		QString currentSavedXml;
 		bool skipNextUpdate;
 

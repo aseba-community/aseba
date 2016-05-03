@@ -76,6 +76,7 @@ namespace Aseba { namespace ThymioVPL
 
 		QString getType() const { return type; }
 		QString getName() const { return name; }
+		QString getTranslatedName() const;
 		unsigned getNameAsUInt4() const;
 		
 		virtual unsigned valuesCount() const = 0;

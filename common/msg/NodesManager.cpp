@@ -63,7 +63,7 @@ namespace Aseba
 		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
 		{
 			// if node supports listing, 
-			if (nodeIt->second.protocolVersion >= 5 && (now - nodeIt->second.lastSeen) > delayToDisconnect)
+			if (nodeIt->second.protocolVersion >= 5 && (now - nodeIt->second.lastSeen) > delayToDisconnect && nodeIt->second.connected)
 			{
 				nodeIt->second.connected = false;
 				nodeDisconnected(nodeIt->first);

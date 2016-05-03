@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QTemporaryFile>
 #include <dashel/dashel.h>
 #include "../../common/utils/BootloaderInterface.h"
 
@@ -15,6 +16,8 @@ class QPushButton;
 class QLineEdit;
 class QListWidget;
 class QGroupBox;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 namespace Aseba
 {
@@ -66,9 +69,18 @@ namespace Aseba
 	private:
 		std::string target;
 		
+		unsigned currentVersion;
+		unsigned currentDevStatus;
+		unsigned officialVersion;
+		unsigned officialDevStatus;
+		QTemporaryFile  officialHexFile;
+		
+		QGroupBox* officialGroupBox;
+		QGroupBox* fileGroupBox;
 		QVBoxLayout* mainLayout;
 		QHBoxLayout* fileLayout;
 		QHBoxLayout* flashLayout;
+		QLabel* officialFirmwareText;
 		QLabel* firmwareVersion;
 		QLabel* nodeIdText;
 		QLineEdit* lineEdit;
@@ -78,6 +90,7 @@ namespace Aseba
 		QPushButton* quitButton;
 		QFuture<FlashResult> flashFuture;
 		QFutureWatcher<FlashResult> flashFutureWatcher;
+		QNetworkAccessManager *networkManager;
 
 	public:
 		ThymioUpgraderDialog(const std::string& target);
@@ -87,13 +100,20 @@ namespace Aseba
 		unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
 		void readIdVersion();
 		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
+		void networkError();
+		QString versionDevStatusToString(unsigned version, unsigned devStatus) const;
+		void selectOfficialFirmware();
+		void selectUserFirmware();
 	
 	private slots:
+		void officialGroupChecked(bool on);
+		void fileGroupChecked(bool on);
 		void setupFlashButtonState();
 		void openFile(void);
 		void doFlash(void);
 		void flashProgress(int percentage);
 		void flashFinished();
+		void networkReplyFinished(QNetworkReply*);
 	};
 	
 	/*@}*/

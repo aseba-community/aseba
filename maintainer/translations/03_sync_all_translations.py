@@ -37,4 +37,11 @@ translation_tools.do_lupdate_lrelease_all(studio_path, "compiler", compiler_ts_p
 # challenge
 translation_tools.do_lupdate_lrelease_all(challenge_path, "asebachallenge", challenge_cpp)
 
+# upgrader
+translation_tools.do_lupdate_lrelease_all(thymioupgrader_path, "thymioupgrader", thymioupgrader_path)
+
+# wnetconfig
+translation_tools.do_lupdate_lrelease_all(thymiownetconfig_path, "thymiownetconfig", thymiownetconfig_path)
+
+
 

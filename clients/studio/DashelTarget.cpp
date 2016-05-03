@@ -297,7 +297,11 @@ namespace Aseba
 			if (!failed)
 				return;
 #ifndef ANDROID
-			QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
+			// have user-friendly Thymio-specific message
+			if (commandLineTarget == "ser:name=Thymio-II")
+				QMessageBox::warning(0, tr("Thymio not found"), tr("<p><b>Cannot find Thymio!</b></p><p>Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.</p>"));
+			else
+				QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
 #endif
 		}
 		
@@ -382,6 +386,15 @@ namespace Aseba
 	{
 		Q_UNUSED(stream);
 		Q_UNUSED(abnormal);
+		
+		// mark all nodes as being disconnected
+		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		{
+			nodeIt->second.connected = false;
+			nodeDisconnected(nodeIt->first);
+		}
+		
+		// notify target for showing reconnection message
 		emit dashelDisconnection();
 		Q_ASSERT(stream == this->stream);
 		this->stream = 0;
@@ -816,7 +829,7 @@ namespace Aseba
 			dashelInterface(dashelInterface),
 			counter(0)
 		{
-			setWindowTitle(tr("Aseba Studio - Connection closed"));
+			setWindowTitle(tr("Connection closed"));
 			setText(tr("Warning, connection closed: I am trying to reconnect."));
 			addButton(tr("Stop trying"), QMessageBox::RejectRole);
 			setEscapeButton(QMessageBox::Cancel);
@@ -848,9 +861,6 @@ namespace Aseba
 
 	void DashelTarget::disconnectionFromDashel()
 	{
-		// tell user client the network was disconnected
-		emit networkDisconnected();
-		
 		// show a dialog box that is trying to reconnect
 		ReconnectionDialog reconnectionDialog(dashelInterface);
 		reconnectionDialog.exec();

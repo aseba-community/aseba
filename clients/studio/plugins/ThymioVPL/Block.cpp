@@ -124,6 +124,39 @@ namespace Aseba { namespace ThymioVPL
 		// doing nothing
 	}
 	
+	//! Return the name of the block translated in the local language
+	QString Block::getTranslatedName() const
+	{
+		if (name == "button")
+			return tr("buttons");
+		else if (name == "prox")
+			return tr("horizontal proximity sensors");
+		else if (name == "proxground")
+			return tr("ground proximity sensors");
+		else if (name == "acc")
+			return tr("tap detection / tilt");
+		else if (name == "clap")
+			return tr("clap detection");
+		else if (name == "timeout")
+			return tr("timer elapsed");
+		else if (name == "statefilter")
+			return tr("state filter");
+		else if (name == "move")
+			return tr("motors");
+		else if (name == "colortop")
+			return tr("top colour");
+		else if (name == "colorbottom")
+			return tr("bottom colour");
+		else if (name == "sound")
+			return tr("music");
+		else if (name == "timer")
+			return tr("timer");
+		else if (name == "setstate")
+			return tr("state");
+		else
+			return "unknown block name";
+	}
+	
 	//! Return a 4-bit unsigned integer encoding the name
 	unsigned Block::getNameAsUInt4() const
 	{

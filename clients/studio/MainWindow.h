@@ -216,7 +216,7 @@ namespace Aseba
 		
 		
 	public:
-		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, int id, QWidget *parent = 0);
+		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned productId() const  { return pid; }
 		
@@ -463,7 +463,6 @@ namespace Aseba
 		
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
-		void networkDisconnected();
 		
 		void userEventsDropped(unsigned amount);
 		void userEvent(unsigned id, const VariablesDataVector &data);
@@ -498,7 +497,7 @@ namespace Aseba
 		// utility functions
 		int getIndexFromId(unsigned node) const;
 		NodeTab* getTabFromId(unsigned node) const;
-		NodeTab* getTabFromName(const QString& name, unsigned preferedId = 0) const;
+		NodeTab* getTabFromName(const QString& name, unsigned preferedId = 0, bool* isPrefered = 0, QSet<int>* filledList = 0) const;
 		int getAbsentIndexFromId(unsigned node) const;
 		AbsentNodeTab* getAbsentTabFromId(unsigned node) const;
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
