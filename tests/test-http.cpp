@@ -107,9 +107,9 @@ TEST_CASE_METHOD(Aseba::HttpInterface, "Aseba::HttpInterface should be initializ
     REQUIRE( this != NULL );
     for (int i = 50; --i; )
         this->step(20);
-    REQUIRE( asebaStream != NULL );
-    REQUIRE( ! nodesDescriptions.empty() );
-    REQUIRE( nodesDescriptions[1].name.size() != 0 );
+//    REQUIRE( asebaStreams != NULL );
+    REQUIRE( ! nodes.empty() );
+    REQUIRE( nodes[1].name.size() != 0 );
 };
 
 TEST_CASE_METHOD(Aseba::HttpInterface, "StreamResponseQueueMap should manage pending responses" ) {
