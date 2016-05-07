@@ -150,10 +150,30 @@ int main(int argc, char *argv[])
 		std::cerr << "Warning, world walls color " << worldE.attribute("color").toStdString() << " undefined\n";
 	else
 		worldColor = colorsMap[worldE.attribute("color")];
+	Enki::World::GroundTexture groundTexture;
+	if (worldE.hasAttribute("groundTexture"))
+	{
+		const QString groundTextureFileName(QFileInfo(fileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
+		QImage image(groundTextureFileName);
+		if (!image.isNull())
+		{
+			image = image.convertToFormat(QImage::Format_ARGB32);
+			groundTexture.width = image.width();
+			groundTexture.height = image.height();
+			const uint32_t* imageData(reinterpret_cast<const uint32_t*>(image.constBits()));
+			std::copy(imageData, imageData+image.width()*image.height(), std::back_inserter(groundTexture.data));
+			// Note: this works in little endian, in big endian data should be swapped
+		}
+		else
+		{
+			qDebug() << "Could not load ground texture file named" << groundTextureFileName;
+		}
+	}
 	Enki::World world(
 		worldE.attribute("w").toDouble(),
 		worldE.attribute("h").toDouble(),
-		worldColor
+		worldColor,
+		groundTexture
 	);
 	
 	// Create viewer
