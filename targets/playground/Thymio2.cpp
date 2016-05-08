@@ -134,28 +134,6 @@ namespace Enki
 	
 	// local events, static so only visible in this file
 	
-	enum ThymioEvents
-	{
-		EVENT_B_BACKWARD = 0,
-		EVENT_B_LEFT,
-		EVENT_B_CENTER,
-		EVENT_B_FORWARD,
-		EVENT_B_RIGHT,
-		EVENT_BUTTONS,
-		EVENT_PROX,
-		EVENT_PROX_COMM,
-		EVENT_TAP,
-		EVENT_ACC,
-		EVENT_MIC,
-		EVENT_SOUND_FINISHED,
-		EVENT_TEMPERATURE,
-		EVENT_RC5,
-		EVENT_MOTOR,
-		EVENT_TIMER0,
-		EVENT_TIMER1,
-		EVENT_COUNT // number of events
-	};
-	
 	static const AsebaLocalEventDescription localEvents[] = {
 		{ "button.backward", "Backward button status changed"},
 		{ "button.left", "Left button status changed"},

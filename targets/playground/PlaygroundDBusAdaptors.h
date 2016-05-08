@@ -41,6 +41,7 @@ namespace Enki
 	class PlaygroundViewer;
 	class EnkiWorldInterface;
 	class PhysicalObject;
+	class AsebaThymio2;
 	
 	class PhysicalObjectInterface: public QObject
 	{
@@ -67,6 +68,25 @@ namespace Enki
 	public slots:
 		void Free();
 	};
+	
+	class Thymio2Interface: public QObject
+	{
+		Q_OBJECT
+		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.PlaygroundThymio2")
+		
+	private:
+		EnkiWorldInterface* enkiWorldInterface;
+		AsebaThymio2* thymio;
+	
+	public:
+		Thymio2Interface(EnkiWorldInterface* enkiWorldInterface, AsebaThymio2* thymio);
+	
+	public slots:
+		void Clap();
+		void Tap();
+		void SetButton(unsigned number, bool value, const QDBusMessage &message);
+		void Free();
+	};
 
 	class EnkiWorldInterface: public QDBusAbstractAdaptor
 	{
@@ -86,6 +106,7 @@ namespace Enki
 		
 	protected:
 		friend class PhysicalObjectInterface;
+		friend class Thymio2Interface;
 		bool isPointerValid(Enki::PhysicalObject* physicalObject) const;
 	};
 }

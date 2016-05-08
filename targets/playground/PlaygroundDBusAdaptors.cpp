@@ -29,8 +29,10 @@
 
 #include "PlaygroundDBusAdaptors.h"
 #include "PlaygroundViewer.h"
+#include "Thymio2.h"
 #include <QDBusConnection>
 #include <QDBusMessage>
+#include <QtDebug>
 
 namespace Enki
 {
@@ -89,6 +91,53 @@ namespace Enki
 	}
 	
 	
+	Thymio2Interface::Thymio2Interface(EnkiWorldInterface* enkiWorldInterface, AsebaThymio2* thymio):
+		QObject(enkiWorldInterface),
+		enkiWorldInterface(enkiWorldInterface),
+		thymio(thymio)
+	{
+	}
+	
+	void Thymio2Interface::Clap()
+	{
+		if (!enkiWorldInterface->isPointerValid(thymio))
+			return;
+		thymio->execLocalEvent(AsebaThymio2::EVENT_MIC);
+	}
+	
+	void Thymio2Interface::Tap()
+	{
+		if (!enkiWorldInterface->isPointerValid(thymio))
+			return;
+		thymio->execLocalEvent(AsebaThymio2::EVENT_TAP);
+	}
+	
+	void Thymio2Interface::SetButton(unsigned number, bool value, const QDBusMessage &message)
+	{
+		if (!enkiWorldInterface->isPointerValid(thymio))
+			return;
+		
+		if (number > 4)
+		{
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("Button number %0 does not exist on Thymio II, it only has 5 buttons numbered from 0 to 4.").arg(number)));
+			return;
+		}
+		
+		const sint16 bValue(value ? 1 : 0);
+		sint16* memoryValue(&thymio->variables.buttonBackward + number);
+		if (bValue != *memoryValue)
+		{
+			*memoryValue = bValue;
+			thymio->execLocalEvent(AsebaThymio2::EVENT_B_BACKWARD + number);
+		}
+	}
+	
+	void Thymio2Interface::Free()
+	{
+		deleteLater();
+	}
+	
+	
 	EnkiWorldInterface::EnkiWorldInterface(PlaygroundViewer *playground):
 		QDBusAbstractAdaptor(playground),
 		playground(playground)
@@ -127,7 +176,16 @@ namespace Enki
 			if (ptrToString(*it) == number)
 			{
 				QDBusObjectPath path(QString("/world/objects/%0").arg(number));
+				
+				// interface to Enki's physical object
 				QDBusConnection::sessionBus().registerObject(path.path(), new PhysicalObjectInterface(this, *it), QDBusConnection::ExportAllContents);
+				
+				// if robot is Thymio2, provide robot-specific interface
+				AsebaThymio2* thymio2(dynamic_cast<AsebaThymio2*>(*it));
+				qDebug() << "thymio" << thymio2;
+				if (thymio2)
+					QDBusConnection::sessionBus().registerObject(path.path() + "/thymio2", new Thymio2Interface(this, thymio2), QDBusConnection::ExportAllContents);
+				
 				return path;
 			}
 		}

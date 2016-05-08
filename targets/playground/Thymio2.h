@@ -33,6 +33,29 @@ namespace Enki
 		Q_OBJECT
 		
 	public:
+		enum Thymio2Events
+		{
+			EVENT_B_BACKWARD = 0,
+			EVENT_B_LEFT,
+			EVENT_B_CENTER,
+			EVENT_B_FORWARD,
+			EVENT_B_RIGHT,
+			EVENT_BUTTONS,
+			EVENT_PROX,
+			EVENT_PROX_COMM,
+			EVENT_TAP,
+			EVENT_ACC,
+			EVENT_MIC,
+			EVENT_SOUND_FINISHED,
+			EVENT_TEMPERATURE,
+			EVENT_RC5,
+			EVENT_MOTOR,
+			EVENT_TIMER0,
+			EVENT_TIMER1,
+			EVENT_COUNT // number of events
+		};
+		
+	public:
 		AsebaVMState vm;
 		std::valarray<unsigned short> bytecode;
 		std::valarray<signed short> stack;
@@ -109,6 +132,7 @@ namespace Enki
 		void timer100HzTimeout();
 		
 	protected:
+		friend class Thymio2Interface;
 		void execLocalEvent(uint16 number);
 	};
 } // Enki
