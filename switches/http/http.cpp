@@ -135,7 +135,7 @@ namespace Aseba
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations) :
+    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations, bool dump) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
     asebaStreams(),
     inHttpStream(0),
@@ -143,7 +143,8 @@ namespace Aseba
     inHttpPort(http_port),
     inAsebaPort(aseba_port),
     verbose(false),
-    iterations(iterations)
+    iterations(iterations),
+    dump(dump)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -487,7 +488,17 @@ namespace Aseba
         }
         // propagate rewritten Cmd message to all connected Aseba streams
         propagateCmdMessage(message);
-        
+
+        //
+        if (dump)
+        {
+            dumpTime(cout, true);
+            std::wcout << message->source << " ";
+            std::wcout << message->type << " ";
+            message->dump(std::wcout);
+            std::wcout << endl;
+        }
+
         delete message;
     }
     

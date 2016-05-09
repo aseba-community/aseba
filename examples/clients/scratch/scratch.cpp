@@ -44,8 +44,8 @@ namespace Aseba
     //-- Subclassing Aseba::HttpInterface ------------------------------------------------------
     
     ScratchInterface::ScratchInterface(const strings& targets, const std::string& http_port,
-                     const std::string& aseba_port, const int iterations) :
-    Aseba::HttpInterface(targets, http_port, aseba_port, iterations), // use base class constructor
+                     const std::string& aseba_port, const int iterations, bool dump) :
+    Aseba::HttpInterface(targets, http_port, aseba_port, iterations, dump), // use base class constructor
     state_variable_update_time(0)
     // blink_state(0), // default empty
     // scratch_dial(0), // default empty
@@ -778,7 +778,7 @@ int main(int argc, char *argv[])
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, aseba_port, 1000*Kiterations));
+        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, aseba_port, 1000*Kiterations, dump));
         
         for (auto nodeId: network->allNodeIds())
             try {
