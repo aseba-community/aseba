@@ -207,7 +207,8 @@ namespace Aseba
         do
         {
             sendAvailableResponses();
-            step(2);
+            if (!run1s())
+                break;
             if (verbose && streamsToShutdown.size() > 0)
             {
                 cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
