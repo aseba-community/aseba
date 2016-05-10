@@ -89,28 +89,30 @@ namespace Aseba
 		
 		void sendLine()
 		{
-			// parse line and build user message
-			UserMessage userMessage;
-			
+			// parse line
 			StringList tokenizedLine(tokenize(line));
 			
 			UnifiedTime timeStamp(UnifiedTime::fromRawTimeString(tokenizedLine.front()));
 			tokenizedLine.pop_front();
 			
-			userMessage.source = atoi(tokenizedLine.front().c_str());
+			const uint16 source = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
 			
-			userMessage.type = atoi(tokenizedLine.front().c_str());
+			const uint16 type = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
 			
-			userMessage.data.reserve(size_t(atoi(tokenizedLine.front().c_str())));
+			Message::SerializationBuffer buffer;
+			buffer.rawData.reserve(atoi(tokenizedLine.front().c_str()));
 			tokenizedLine.pop_front();
 			
 			while (!tokenizedLine.empty())
 			{
-				userMessage.data.push_back(atoi(tokenizedLine.front().c_str()));
+				buffer.rawData.push_back(strtol(tokenizedLine.front().c_str(), 0, 16));
 				tokenizedLine.pop_front();
 			}
+			
+			// build message
+			Message* message(Message::create(source, type, buffer));
 			
 			// if required, sleep
 			if ((respectTimings) && (lastTimeStamp.value != 0))
@@ -131,7 +133,7 @@ namespace Aseba
 				Stream* destStream(*it);
 				if (destStream != in)
 				{
-					userMessage.serialize(destStream);
+					message->serialize(destStream);
 					destStream->flush();
 				}
 			}
@@ -140,6 +142,7 @@ namespace Aseba
 			lastTimeStamp = timeStamp;
 			
 			line.clear();
+			delete message;
 		}
 		
 	protected:

@@ -172,23 +172,31 @@ namespace Aseba
 		stream->read(&type, 2);
 		swapEndian(type);
 		
+		// read content
+		SerializationBuffer buffer;
+		buffer.rawData.resize(len);
+		if (len)
+			stream->read(&buffer.rawData[0], len);
+		
+		// deserialize message
+		return create(source, type, buffer);
+	}
+	
+	Message *Message::create(uint16 source, uint16 type, SerializationBuffer& buffer)
+	{
 		// create message
 		Message *message = messageTypesInitializer.createMessage(type);
 		
 		// preapare message
 		message->source = source;
 		message->type = type;
-		SerializationBuffer buffer;
-		buffer.rawData.resize(len);
-		if (len)
-			stream->read(&buffer.rawData[0], len);
 		
 		// deserialize it
 		message->deserializeSpecific(buffer);
 		
 		if (buffer.readPos != buffer.rawData.size())
 		{
-			cerr << "Message::receive() : fatal error: message not fully read.\n";
+			cerr << "Message::create() : fatal error: message not fully deserialized.\n";
 			cerr << "type: " << type << ", readPos: " << buffer.readPos << ", rawData size: " << buffer.rawData.size() << endl;
 			buffer.dump(wcerr);
 			abort();
