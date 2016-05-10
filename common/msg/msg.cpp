@@ -207,8 +207,8 @@ namespace Aseba
 	
 	void Message::dump(wostream &stream) const
 	{
-		stream << hex << showbase << setw(4) << type << " ";
-		stream << dec << noshowbase << *this << " from ";
+		stream << hex << setw(4) << setfill(wchar_t('0')) << type << " ";
+		stream << dec << setfill(wchar_t(' ')) << *this << " from ";
 		stream << source << " : ";
 		dumpSpecific(stream);
 	}
