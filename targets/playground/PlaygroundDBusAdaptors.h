@@ -32,6 +32,7 @@
 
 #include <QDBusAbstractAdaptor>
 #include <QDBusObjectPath>
+#include <QDBusConnection>
 #include <QDBusMessage>
 #include <QStringList>
 
