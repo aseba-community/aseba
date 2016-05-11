@@ -39,7 +39,6 @@
 
 #ifdef HAVE_DBUS
 #include "PlaygroundDBusAdaptors.h"
-#include <QDBusConnection>
 #endif // HAVE_DBUS
 
 int main(int argc, char *argv[])
