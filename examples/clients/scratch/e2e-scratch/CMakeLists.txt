@@ -70,3 +70,9 @@ configure_file(README.md ${CMAKE_CURRENT_BINARY_DIR}/README.md COPYONLY)
 
 add_test(NAME e2e-scratch COMMAND bash run-e2e-scratch.sh )
 add_test(NAME e2e-scratch-switch COMMAND bash run-e2e-scratch-switch.sh )
+
+find_program( HAVE_SIEGE siege )
+
+if (HAVE_SIEGE)
+	configure_file(run-generate-messages.perl ${CMAKE_CURRENT_BINARY_DIR}/run-generate-messages.perl COPYONLY)
+endif (HAVE_SIEGE)
