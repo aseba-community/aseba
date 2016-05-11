@@ -32,9 +32,8 @@
 
 #include <QDBusAbstractAdaptor>
 #include <QDBusObjectPath>
+#include <QDBusMessage>
 #include <QStringList>
-
-class QDBusMessage;
 
 namespace Enki
 {

@@ -31,7 +31,7 @@
 #include "PlaygroundViewer.h"
 #include "Thymio2.h"
 #include <QDBusConnection>
-#include <QDBusMessage>
+#include <QDBusMetaType>
 #include <QtDebug>
 
 namespace Enki
