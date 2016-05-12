@@ -75,4 +75,5 @@ find_program( HAVE_SIEGE siege )
 
 if (HAVE_SIEGE)
 	configure_file(run-generate-messages.perl ${CMAKE_CURRENT_BINARY_DIR}/run-generate-messages.perl COPYONLY)
+	configure_file(run-record.sh ${CMAKE_CURRENT_BINARY_DIR}/run-record.sh COPYONLY)
 endif (HAVE_SIEGE)
