@@ -305,7 +305,9 @@ namespace Aseba
             // standard Aseba run loop
             if (!step(timeout))
                 return false;
-            timeout -= (Aseba::UnifiedTime() - startTime).value;
+	    const UnifiedTime now;
+	    timeout -= (now - startTime).value;
+	    startTime = now;
         }
         return true;
     }
