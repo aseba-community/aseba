@@ -92,7 +92,7 @@ namespace Aseba
             }
         }
         if (commonDefinitions[userMsg->source].events.size() >= userMsg->type &&
-            commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state")==0 &&
+            commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state_update")==0 &&
             userMsg->data.size() >= 1)
         {
             receiveStateVariables(userMsg->source, userMsg->data);
@@ -479,8 +479,11 @@ namespace Aseba
     string ScratchInterface::evPoll(const unsigned nodeId)
     {
         // If it is time to poll for an update, send a request for variables
-        // if (difftime(time(0), state_variable_update_time) > 2)
-        sendPollVariables(nodeId);
+        UnifiedTime now;
+        if (now - state_variable_update_time > 2000)
+            sendPollVariables(nodeId); // ask for value of R_state
+
+        // each line of the poll result given
         std::stringstream result;
         char wbuf[128];
         
@@ -655,7 +658,8 @@ namespace Aseba
     void ScratchInterface::receiveStateVariables(const unsigned nodeId, const std::vector<short> data)
     {
         unsigned source, pos, len;
-        time(&state_variable_update_time);
+        UnifiedTime now;
+        state_variable_update_time = now; // set to current time
         
         for (auto variable: interesting_state_variables) {
             string varName = variable.first;

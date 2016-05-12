@@ -22,7 +22,7 @@ namespace Aseba
         std::map<VariableAddress, std::vector<short> > variable_cache;
         std::map<std::string, VariableAddress> state_variable_addresses;
         std::list<GetVariables> polled_variables;
-        time_t state_variable_update_time;
+        UnifiedTime state_variable_update_time;
         std::set<int> busy_threads;
         std::map<unsigned, unsigned> blink_state;
         std::map<unsigned, unsigned> scratch_dial;

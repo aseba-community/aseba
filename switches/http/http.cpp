@@ -304,7 +304,7 @@ namespace Aseba
             }
 
             // standard Aseba run loop
-            if (!step(50))
+            if (!step(timeout))
                 return false;
             timeout -= (Aseba::UnifiedTime() - startTime).value;
         }
