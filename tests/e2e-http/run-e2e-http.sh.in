@@ -50,9 +50,8 @@ jasmine-node 3003-*_spec.js
 status=$?
 
 # optional tests with a real Thymio-II
-[ -x "DASHELPORTLIST" ] && target=$(DASHELPORTLIST | grep -i -m1 thymio.ii) &&
-    target="$(echo "$target"|perl -p -e 's{.*\[(.*?)\s*\(.*}{$1}')" &&
-    ( ASEBAHTTP --http 3002 --aesl thymio.aesl "ser:name=$target" & ) &&
+[ -x "DASHELPORTLIST" ] && target=$(DASHELPORTLIST | grep -m1 Thymio) &&
+    ( ASEBAHTTP --http 3002 --aesl thymio.aesl "ser:name=Thymio" & ) &&
     sleep 5 &&
     jasmine-node 3002-*_spec.js
 
