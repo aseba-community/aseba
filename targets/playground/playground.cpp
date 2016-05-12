@@ -178,6 +178,22 @@ int main(int argc, char *argv[])
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);
 	
+	// Scan for camera
+	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
+	if (!cameraE.isNull())
+	{
+		const double largestDim(qMax(world.h, world.w));
+		viewer.setCamera(
+			QPointF(
+				cameraE.attribute("x", QString::number(world.w / 2)).toDouble(),
+				cameraE.attribute("y", QString::number(0)).toDouble()
+			),
+			cameraE.attribute("altitude", QString::number(0.85 * largestDim)).toDouble(),
+			cameraE.attribute("yaw", QString::number(-M_PI/2)).toDouble(),
+			cameraE.attribute("pitch", QString::number((3*M_PI)/8)).toDouble()
+		);
+	}
+	
 	// Scan for walls
 	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");
 	while (!wallE.isNull())
