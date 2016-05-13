@@ -206,6 +206,7 @@ int main(int argc, char *argv[])
 		else if ((strcmp(arg, "-d") == 0) || (strcmp(arg, "--dump") == 0))
 		{
 			dump = true;
+			verbose = true;
 		}
 		else if ((strcmp(arg, "-l") == 0) || (strcmp(arg, "--loop") == 0))
 		{
