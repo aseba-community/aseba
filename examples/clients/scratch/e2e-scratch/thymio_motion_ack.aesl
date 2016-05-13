@@ -1,0 +1,275 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="4" name="Q_add_motion"/>
+<event size="1" name="Q_cancel_motion"/>
+<event size="5" name="Q_motion_added"/>
+<event size="5" name="Q_motion_cancelled"/>
+<event size="5" name="Q_motion_started"/>
+<event size="5" name="Q_motion_ended"/>
+<event size="1" name="Q_motion_noneleft"/>
+<event size="3" name="Q_set_odometer"/>
+<event size="8" name="V_leds_prox_h"/>
+<event size="8" name="V_leds_circle"/>
+<event size="3" name="V_leds_top"/>
+<event size="4" name="V_leds_bottom"/>
+<event size="2" name="V_leds_prox_v"/>
+<event size="4" name="V_leds_buttons"/>
+<event size="1" name="V_leds_rc"/>
+<event size="2" name="V_leds_temperature"/>
+<event size="1" name="V_leds_sound"/>
+<event size="2" name="A_sound_freq"/>
+<event size="1" name="A_sound_play"/>
+<event size="1" name="A_sound_system"/>
+<event size="1" name="A_sound_replay"/>
+<event size="1" name="A_sound_record"/>
+<event size="1" name="M_motor_left"/>
+<event size="1" name="M_motor_right"/>
+<event size="27" name="R_state_update"/>
+<event size="4" name="ack_Q_add_motion"/>
+
+
+<!--list of constants-->
+<constant value="4" name="QUEUE"/>
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node thymio-II-->
+<node nodeId="1" name="thymio-II">### Basic motion queue for Thymio-II
+### David J Sherman - david.sherman@inria.fr
+### 
+### 1. Local state for motion queue and program counter
+### 2. Motion update at 16Hz triggered by acc
+### 3. Emit informative events when motion queue changes state
+### 4. Events to change queue: Q_add_motion, Q_cancel_motion
+### 5. Events for native functions: V_leds_*, A_sound_*, M_motor_*
+
+### Variables for additional local state or simplified reporters
+var tmp[9] # reusable temp for event handlers
+
+## simple queue for motion commands
+var Qid[QUEUE]   = [ 0,0,0,0 ] # task id
+var Qtime[QUEUE] = [ 0,0,0,0 ] # remaining time
+var QspL[QUEUE]  = [ 0,0,0,0 ] # motor speed L
+var QspR[QUEUE]  = [ 0,0,0,0 ] # motor speed R
+var Qpc = 0                    # program counter
+var Qnx = 0                    # next queue position
+
+## simplified reporters
+var distance.front = 190
+var distance.back  = 125
+var angle.front    = 0
+var angle.back    = 0
+var angle.ground    = 0
+
+## odometry
+var odo.delta
+var odo.theta = 0
+var odo.x = 0
+var odo.y = 0
+var odo.degree
+
+## broadcast variables
+var R_state.do = 1
+var R_state[27]
+
+mic.threshold = 12
+
+### Motion update
+## Every 16 Hz tick from acc event: if motion task at Qpc is active, turn
+## motors, else look for a next task to perform
+
+onevent motor # loop runs at 100 Hz
+odo.delta = (motor.right.target + motor.left.target) / 2
+call math.muldiv(tmp[0], (motor.right.target - motor.left.target), 3406, 10000)
+odo.theta += tmp[0]
+call math.cos(tmp[0:1],[odo.theta,16384-odo.theta])
+call math.muldiv(tmp[0:1], [odo.delta,odo.delta],tmp[0:1], [32767,32767])
+odo.x += tmp[0]/45
+odo.y += tmp[1]/45
+odo.degree = 90 - (odo.theta / 182)
+if Qtime[Qpc] > 0 then
+	# start new motion
+	emit Q_motion_started([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
+	Qtime[Qpc] = 0 - Qtime[Qpc] # mark as current by setting negative value
+end
+if Qtime[Qpc] &lt; 0 then
+	# continue motion
+	motor.left.target = QspL[Qpc]
+	motor.right.target = QspR[Qpc]
+	Qtime[Qpc] += 1
+	if Qtime[Qpc] == 0 then
+		emit Q_motion_ended([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
+		Qid[Qpc] = 0
+		Qpc = (Qpc+1)%QUEUE
+		if Qtime[Qpc] == 0 and Qpc == Qnx then
+			emit Q_motion_noneleft([Qpc])
+			motor.left.target = 0
+			motor.right.target = 0
+		end
+	end
+end
+if Qtime[Qpc] == 0 and Qpc != Qnx then
+	# scan forward in the queue
+	Qpc = (Qpc+1)%QUEUE
+end
+
+# Add motion task to queue
+sub motion_add
+if Qnx != Qpc or (Qnx == Qpc and Qtime[Qpc] == 0) then
+	Qid[Qnx]   = tmp[0]
+	Qtime[Qnx] = tmp[1]
+	QspL[Qnx]  = tmp[2]
+	QspR[Qnx]  = tmp[3]
+	emit Q_motion_added([Qid[Qnx], Qtime[Qnx], QspL[Qnx], QspR[Qnx], Qnx])
+	Qnx = (Qnx+1)%QUEUE
+# else silently ignore queue overruns
+end
+
+# Cancel motion task from queue using task id
+sub motion_cancel
+for tmp[1] in 1:QUEUE do
+	if Qid[tmp[1]-1] == tmp[0] then
+		emit Q_motion_cancelled([Qid[tmp[1]-1], Qtime[tmp[1]-1], QspL[tmp[1]-1], QspR[tmp[1]-1], tmp[1]-1])
+		Qtime[tmp[1]-1] = 0
+		Qid[tmp[1]-1] = 0
+	end
+end
+
+# Event handlers to call motion subroutines
+onevent Q_add_motion
+emit ack_Q_add_motion(event.args[0:3])
+tmp[0:3] = event.args[0:3] 
+callsub motion_add
+
+onevent Q_cancel_motion
+tmp[0] = event.args[0]
+callsub motion_cancel
+
+onevent Q_set_odometer
+odo.theta = (((event.args[0] + 360) % 360) - 90) * 182
+odo.x = event.args[1] * 28
+odo.y = event.args[2] * 28
+
+
+### Simplified reporters
+## Every 10 Hz tick from buttons event, update reporters
+onevent buttons
+call math.dot(distance.front, prox.horizontal,[13,26,39,26,13,0,0],11)
+call math.clamp(distance.front,190-distance.front,0,190) # client should clamp to 0..190
+call math.max(distance.back, prox.horizontal[5],prox.horizontal[6])
+call math.muldiv(distance.back, distance.back, 267,10000)
+call math.clamp(distance.back,125-distance.back,0,125) # client should clamp to 0..125
+call math.dot(angle.front, prox.horizontal,[4,3,0,-3,-4,0,0],9)
+call math.dot(angle.back, prox.horizontal,[0,0,0,0,0,-4,4],9)
+call math.dot(angle.ground, prox.ground.delta,[4,-4],7)
+R_state = [	(((acc[0]+32)%32)&lt;&lt;10) + (((acc[1]+32)%32)&lt;&lt;5) + ((acc[2]+32)%32),
+			(((mic.intensity/mic.threshold)%8)&lt;&lt;8) +
+				(0&lt;&lt;5) +
+				(button.backward&lt;&lt;4) +
+				(button.center&lt;&lt;3) +
+				(button.forward&lt;&lt;2) +
+				(button.left&lt;&lt;1) +
+				button.right,
+			angle.back,
+			angle.front,
+			(distance.back&lt;&lt;8) + distance.front,
+			motor.left.target,
+			motor.right.target,
+			motor.left.speed,
+			motor.right.speed,
+			odo.degree,
+			odo.x,
+			odo.y,
+			prox.comm.rx,
+			prox.comm.tx,
+			prox.ground.delta[0:1],
+			prox.horizontal[0:6],
+			Qid[0:3]
+		  ]
+
+### Compressed state 258 bits
+# acc                   5 bit x 3       R_state[0]
+# buttons, tap  6 bit           R_state[1]
+# mic.intensity 8 bit           R_state[1]
+# angle                         16 bit x 2       R_state[2:3]
+# distance              8 bit x 2       R_state[4]
+# motor target  9 bit x 2       R_state[5:6]
+# motor speed   9 bit x 2       R_state[7:8]
+# odo theta             9 bit           R_state[9]
+# odo x y          16 bit x 2   R_state[10:11]
+# prox rx tx       11 bit x 2   R_state[12:13]
+# prox gnd          5 bit x 2   R_state[14:15]
+# prox horiz       12 bit x 7   R_state[16:22]
+
+onevent temperature
+if R_state.do==1 then
+	emit R_state_update(R_state)
+end
+
+
+### Event handlers for native functions
+onevent V_leds_bottom # (red,green,blue) on the left (0) or the right (1)
+if event.args[0]==0 then
+	call leds.bottom.left(event.args[1],event.args[2],event.args[3])
+else
+	call leds.bottom.right(event.args[1],event.args[2],event.args[3])
+end
+
+onevent V_leds_buttons # four near the buttons
+call leds.buttons(event.args[0],event.args[1],
+                  event.args[2],event.args[3])
+
+onevent V_leds_circle # eight around the buttonsin a circle 
+call leds.circle(event.args[0],event.args[1],event.args[2],
+	             event.args[3],event.args[4],event.args[5],
+	             event.args[6],event.args[7])
+
+onevent V_leds_prox_h # six in the front, two in the back
+call leds.prox.h(event.args[0],event.args[1],event.args[2],
+	             event.args[3],event.args[4],event.args[5],
+	             event.args[6],event.args[7])
+
+onevent V_leds_prox_v # two underneath
+call leds.prox.v(event.args[0],event.args[1])
+
+onevent V_leds_rc # one on the right side
+call leds.rc(event.args[0])
+
+onevent V_leds_sound # one in the back center
+call leds.sound(event.args[0])
+
+onevent V_leds_temperature # one red, one blue on the left side
+call leds.temperature(event.args[0],event.args[1])
+
+onevent V_leds_top # (red,green,blue) on the top
+call leds.top(event.args[0],event.args[1],event.args[2])
+
+onevent A_sound_system # play a system sound
+call sound.system(event.args[0])
+
+onevent A_sound_freq # play a note (Hz) for a time (msec)
+call sound.freq(event.args[0],event.args[1])
+
+onevent A_sound_play # play a sound from the SD
+call sound.play(event.args[0])
+
+onevent A_sound_record # start, stop recording
+call sound.record(event.args[0])
+
+onevent A_sound_replay # play a recorded sound
+call sound.replay(event.args[0])
+
+onevent M_motor_left # run the left motor
+motor.left.target = event.args[0]
+
+onevent M_motor_right # run the right motor
+motor.right.target = event.args[0]</node>
+
+
+</network>

@@ -2,17 +2,19 @@
 
 SET=${1:-thymio}
 DIR=${2:-.}
+AESL=${3:-thymio_motion.aesl}
 
 killall aseba{switch,rec,play,scratch}
 
 asebaswitch -d 'ser:name=Thymio' > ${DIR}/sw.${SET}.txt &
 asebarec 'tcp:;port=33333' > ${DIR}/rec.${SET}.txt &
-asebascratch --http 3002 --aesl thymio_motion.aesl 'tcp:;port=33333' &
+../Debug/asebascratch --http 3002 --aesl ${AESL} 'tcp:;port=33333' &
 sleep 30
 
 curl --silent --output ${DIR}/ev.${SET}.txt http://localhost:3002/events &
 
 perl run-generate-messages.perl
+sleep 5
 
 killall aseba{switch,rec,play,scratch} # also terminates curl
 

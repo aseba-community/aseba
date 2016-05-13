@@ -137,6 +137,7 @@ namespace Aseba
     
     HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations, bool dump) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
+    do_ping(true),
     asebaStreams(),
     inHttpStream(0),
     inAsebaStream(0),
@@ -144,7 +145,7 @@ namespace Aseba
     inAsebaPort(aseba_port),
     verbose(false),
     iterations(iterations),
-    dump(dump)
+    do_dump(dump)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -185,7 +186,8 @@ namespace Aseba
         for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
-            this->pingNetwork();
+            if (do_ping)
+                this->pingNetwork();
             this->run1s();
             if (nodeDescriptionsReceived.size() >= targets.size())
                 break;
@@ -330,8 +332,8 @@ namespace Aseba
                         patched_message.dest = m->first;
                         patched_message.serialize(it->first);
                         it->first->flush();
-                        patched_message.dump(std::wcout);
-                        std::wcout << std::endl;
+//                        patched_message.dump(std::wcout);
+//                        std::wcout << std::endl;
                         return; // found a substitution, message sent to break out
                     }
             }
@@ -376,8 +378,12 @@ namespace Aseba
         if (!targetId) return;
         unsigned nodeId = targetId;
         nodeDescriptionsReceived.insert(nodeId);
+        // stop pinging while description is coming
+        do_ping = false;
+        // verbose
         if (verbose)
             wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
+        // if we known a program for this target and it hasn't been sent yet, send it
         if (nodeProgramsSent.find(targetId) == nodeProgramsSent.end() && nodeProgram.find(targetId) != nodeProgram.end())
             compileAndSendCode(targetId, nodeProgram[targetId]);
     }
@@ -492,7 +498,7 @@ namespace Aseba
         propagateCmdMessage(message);
 
         //
-        if (dump)
+        if (do_dump)
         {
             dumpTime(cout, true);
             std::wcout << message->source << " ";

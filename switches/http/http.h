@@ -66,6 +66,7 @@ namespace Aseba
         typedef std::map<Dashel::Stream*, NodeIdSubstitution>   StreamNodeIdSubstitutionMap;
         typedef std::map<unsigned, Aseba::CommonDefinitions>    NodeIdCommonDefinitionsMap;
         typedef std::map<unsigned, std::wstring>                NodeIdProgramMap;
+        bool do_ping;
 
     protected:
         // streams
@@ -90,7 +91,7 @@ namespace Aseba
         // debug variables
         bool verbose;
         int iterations;
-        bool dump;
+        bool do_dump;
         
         // Extract definitions from AESL files
         NodeIdCommonDefinitionsMap  commonDefinitions;

@@ -798,7 +798,8 @@ int main(int argc, char *argv[])
             }
         
         do {
-            network->pingNetwork();
+            if (network->do_ping)
+                network->pingNetwork();
         } while (network->run1s());
         delete network;
     }
