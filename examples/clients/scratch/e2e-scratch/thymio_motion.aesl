@@ -27,7 +27,7 @@
 <event size="1" name="A_sound_record"/>
 <event size="1" name="M_motor_left"/>
 <event size="1" name="M_motor_right"/>
-<event size="23" name="R_state_update"/>
+<event size="27" name="R_state_update"/>
 
 
 <!--list of constants-->
@@ -74,8 +74,8 @@ var odo.y = 0
 var odo.degree
 
 ## broadcast variables
-var R_state.do = 0
-var R_state[23]
+var R_state.do = 1
+var R_state[27]
 
 mic.threshold = 12
 
@@ -187,7 +187,8 @@ R_state = [	(((acc[0]+32)%32)&lt;&lt;10) + (((acc[1]+32)%32)&lt;&lt;5) + ((acc[2
 			prox.comm.rx,
 			prox.comm.tx,
 			prox.ground.delta[0:1],
-			prox.horizontal[0:6]
+			prox.horizontal[0:6],
+			Qid[0:3]
 		  ]
 
 ### Compressed state 258 bits

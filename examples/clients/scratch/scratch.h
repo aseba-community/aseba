@@ -58,7 +58,8 @@ namespace Aseba
             {"distance.back",{4,5}}, {"distance.front",{4,5}}, {"motor.left.target",{5,6}},
             {"motor.right.target",{6,7}}, {"motor.left.speed",{7,8}}, {"motor.right.speed",{8,9}},
             {"odo.degree",{9,10}}, {"odo.x",{10,11}}, {"odo.y",{11,12}}, {"prox.comm.rx",{12,13}},
-            {"prox.comm.tx",{13,14}}, {"prox.ground.delta",{14,16}}, {"prox.horizontal",{16,23}}});
+            {"prox.comm.tx",{13,14}}, {"prox.ground.delta",{14,16}}, {"prox.horizontal",{16,23}},
+            {"Qid",{23,26}} });
         std::map<unsigned, GetVariables> node_r_state;
     };
 };
