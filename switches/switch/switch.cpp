@@ -130,7 +130,7 @@ namespace Aseba
 	{
 		if (verbose)
 		{
-			dumpTime(cout);
+			dumpTime(cout, rawTime);
 			if (abnormal)
 				cout << "* Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
 			else
