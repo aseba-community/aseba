@@ -61,7 +61,7 @@ namespace Aseba
 		if (verbose)
 		{
 			dumpTime(cout, rawTime);
-			cout << "Incoming connection from " << stream->getTargetName() << endl;
+			cout << "* Incoming connection from " << stream->getTargetName() << endl;
 		}
 	}
 	
@@ -81,6 +81,8 @@ namespace Aseba
 		// if requested, dump
 		if (dump)
 		{
+			dumpTime(cout, rawTime);
+			std::cout << "  ";
 			message->dump(std::wcout);
 			std::wcout << std::endl;
 		}
@@ -130,9 +132,9 @@ namespace Aseba
 		{
 			dumpTime(cout);
 			if (abnormal)
-				cout << "Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+				cout << "* Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
 			else
-				cout << "Normal connection closed to " << stream->getTargetName() << endl;
+				cout << "* Normal connection closed to " << stream->getTargetName() << endl;
 		}
 	}
 	
@@ -258,7 +260,7 @@ int main(int argc, char *argv[])
 			{
 				aswitch.remapId(stream, uint16(remappedLocalId), uint16(remappedTargetId));
 				if (verbose)
-					std::cout << "Remapping local " << remappedLocalId << " with remote " << remappedTargetId << std::endl;
+					std::cout << "* Remapping local " << remappedLocalId << " with remote " << remappedTargetId << std::endl;
 			}
 		}
 		/*
