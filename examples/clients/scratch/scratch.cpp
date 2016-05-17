@@ -97,12 +97,11 @@ namespace Aseba
             userMsg->data.size() >= 1)
         {
             // Qid, Qtime, QspL, QspR, Qpc
-            // remove userMsg->data[0] from busy_threads
             busy_threads.insert(userMsg->data[0]);
             busy_threads_timeout[userMsg->data[0]] = UnifiedTime(1000);
             if (verbose)
             {
-                cerr << "Q_motion_started id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
+                cerr << "Q_motion_added id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
                 << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
             }
         }
