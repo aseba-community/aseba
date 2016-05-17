@@ -306,7 +306,7 @@ namespace Aseba
             }
 
             // standard Aseba run loop
-            if (!step(timeout))
+            if (!step(50))
                 return false;
             const UnifiedTime now;
             timeout -= (now - startTime).value;
