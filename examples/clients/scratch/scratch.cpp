@@ -11,6 +11,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 #include <time.h>
 
 #include "../../../switches/http/http.h"
@@ -89,6 +90,20 @@ namespace Aseba
             {
                 cerr << "Q_motion_ended id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
                      << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
+            }
+        }
+        if (commonDefinitions[userMsg->source].events.size() >= userMsg->type &&
+            commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"Q_motion_added")==0 &&
+            userMsg->data.size() >= 1)
+        {
+            // Qid, Qtime, QspL, QspR, Qpc
+            // remove userMsg->data[0] from busy_threads
+            busy_threads.insert(userMsg->data[0]);
+            busy_threads_timeout[userMsg->data[0]] = UnifiedTime(1000);
+            if (verbose)
+            {
+                cerr << "Q_motion_started id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
+                << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
             }
         }
         if (commonDefinitions[userMsg->source].events.size() >= userMsg->type &&
@@ -318,7 +333,9 @@ namespace Aseba
                     args.push_back(std::to_string((mm > 0) ? speed : -speed ));
                     args.push_back(std::to_string((mm > 0) ? speed : -speed ));
                     sendEvent(nodeId, args);
-                    busy_threads.insert(busyid);
+                    busy_threads.insert(busyid); // don't rely on Q_motion_started
+                    busy_threads_timeout[busyid] = UnifiedTime(1000);
+                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -345,7 +362,9 @@ namespace Aseba
                     args.push_back(std::to_string((degrees > 0) ?  speed : -speed ));
                     args.push_back(std::to_string((degrees > 0) ? -speed :  speed ));
                     sendEvent(nodeId, args);
-                    busy_threads.insert(busyid);
+                    busy_threads.insert(busyid); // don't rely on Q_motion_started
+                    busy_threads_timeout[busyid] = UnifiedTime(1000);
+                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -370,7 +389,9 @@ namespace Aseba
                     args.push_back(std::to_string((degrees > 0) ?  v_out : v_in  ));
                     args.push_back(std::to_string((degrees > 0) ?  v_in  : v_out ));
                     sendEvent(nodeId, args);
-                    busy_threads.insert(busyid);
+                    busy_threads.insert(busyid); // don't rely on Q_motion_started
+                    busy_threads_timeout[busyid] = UnifiedTime(1000);
+                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -490,17 +511,54 @@ namespace Aseba
         // Tell Scratch which threads are still busy
         result << "_busy";
 
-        unsigned source, pos, len;
-        if (getVarAddrLen(nodeId, "Qid", source, pos, len))
+        // - look in Qid for threads not in busy_threads
+        std::set<int> busy_qid;
+        unsigned qid_source, qid_pos, qid_len;
+        if (getVarAddrLen(nodeId, "Qid", qid_source, qid_pos, qid_len))
         {
-            std::vector<short> busy_ids = variable_cache[std::make_pair(source,pos)];
-            for (std::vector<short>::iterator i = busy_ids.begin(); i != busy_ids.end(); i++)
-                if (*i != 0)
-                    result << " " << *i;
-//            // temp for testing, check whether Q_motion_ended event had arrived
-//            for (std::set<int>::iterator i = busy_threads.begin(); i != busy_threads.end(); i++)
-//                if (std::find(busy_ids.begin(), busy_ids.end(), *i) != busy_ids.end())
-//                    cerr << "Warning " << *i << " in busy_threads but not in Qid" << endl;
+            for (auto i: variable_cache[std::make_pair(qid_source,qid_pos)])
+                if (i != 0)
+                    busy_qid.insert(i);
+        }
+        for (auto i: busy_qid)
+            busy_threads_timeout[i] = UnifiedTime(1000);
+        
+        // - temp for testing, check whether Q_motion_ended event had arrived
+        std::vector<int> vec_qid(busy_qid.begin(),busy_qid.end());
+        std::sort(vec_qid.begin(),vec_qid.end());
+        std::vector<int> vec_thr(busy_threads.begin(),busy_threads.end());
+        std::sort(vec_thr.begin(),vec_thr.end());
+        
+        std::vector<int> diff_qid_thr;
+        if (vec_qid.size() > 0 && vec_thr.size() > 0)
+            std::set_difference(vec_qid.begin(), vec_qid.end(), vec_thr.begin(), vec_thr.end(), diff_qid_thr.begin());
+        for (auto i: diff_qid_thr)
+            cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
+
+        std::vector<int> diff_thr_qid;
+        if (vec_qid.size() > 0 && vec_thr.size() > 0)
+            std::set_difference(vec_thr.begin(), vec_thr.end(), vec_qid.begin(), vec_qid.end(), diff_thr_qid.begin());
+        for (auto i: diff_thr_qid)
+            cerr << "Warning " << i << " in busy_threads but not in Qid" << endl;
+
+        // - report all busy threads conservatively
+        std::set<int> busy_all(busy_threads.begin(), busy_threads.end());
+        for (auto i: busy_qid)
+            busy_all.insert(i);
+        for (auto i: busy_all)
+        {
+            if (busy_threads_timeout[i] < UnifiedTime(33))
+            {
+                busy_threads_timeout.erase(i);
+                busy_threads.erase(i);
+                cerr << "Warning killing unresponsive thread " << i << endl;
+                continue;
+            }
+            busy_threads_timeout[i] -= UnifiedTime(33);
+            result << " " << i;
+            // temp for testing, check whether Q_motion_ended event had arrived
+            if (std::count(busy_threads.begin(), busy_threads.end(), i) == 0 && i != 0)
+                cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
         }
         result << endl;
         

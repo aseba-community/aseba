@@ -24,6 +24,7 @@ namespace Aseba
         std::list<GetVariables> polled_variables;
         UnifiedTime state_variable_update_time;
         std::set<int> busy_threads;
+        std::map<int, UnifiedTime> busy_threads_timeout;
         std::map<unsigned, unsigned> blink_state;
         std::map<unsigned, unsigned> scratch_dial;
         std::map< std::pair<unsigned,unsigned>, unsigned > leds; // top, bottom-left, bottom-right
@@ -59,7 +60,7 @@ namespace Aseba
             {"motor.right.target",{6,7}}, {"motor.left.speed",{7,8}}, {"motor.right.speed",{8,9}},
             {"odo.degree",{9,10}}, {"odo.x",{10,11}}, {"odo.y",{11,12}}, {"prox.comm.rx",{12,13}},
             {"prox.comm.tx",{13,14}}, {"prox.ground.delta",{14,16}}, {"prox.horizontal",{16,23}},
-            {"Qid",{23,26}} });
+            {"Qid",{23,27}} });
         std::map<unsigned, GetVariables> node_r_state;
     };
 };
