@@ -210,6 +210,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
     stream << "--EVENT=ID      : redefine an AESL event id\n";
     stream << "-k ITERATIONS   : run for ITERATIONS steps (default: 13)\n";
     stream << "-t TIMEOUT      : maximum wait for motion event (default: 20000 ms)\n";
+    stream << "-w WAIT         : wait between iterations (default: 0 ms)\n";
     stream << "-h, --help      : shows this help\n";
     stream << "-V, --version   : shows the version number\n";
     stream << "Targets are any valid Dashel targets." << std::endl;
