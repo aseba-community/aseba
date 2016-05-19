@@ -128,30 +128,42 @@ namespace Aseba
     class EventGenerator
     {
     public:
-        EventGenerator(Aseba::MockAsebascratch * mock, unsigned duration) :
+        EventGenerator(Aseba::MockAsebascratch * mock, unsigned duration, unsigned timeout, unsigned delay) :
         mock(mock),
-        duration(duration)
+        duration(duration),
+        timeout(timeout),
+        delay(UnifiedTime(delay))
         {
         }
         
         void waitFor(unsigned jobid)
         {
-            cout << "Wait for " << jobid << " in busy ";
-            UnifiedTime tick(100);
-            do {
-                cout << (mock->busy.count(jobid) == 0 ? "!" : ".");
-                tick.sleep();
-            } while (mock->busy.count(jobid) != 0);
-            cout << endl;
+            const UnifiedTime startTime;
+            const UnifiedTime endTime(timeout + startTime.value);
+
+            cout << "Wait for " << jobid << " in busy" << endl;
+            while (mock->busy.count(jobid) != 0)
+            {
+                const UnifiedTime scratch_video_refresh(33);
+                scratch_video_refresh.sleep();
+                const UnifiedTime now;
+                if (now > endTime)
+                {
+                    cerr << "Timeout for " << jobid << endl;
+                    cout << "Q_cancel_motion " << jobid << endl;
+                    mock->sendEvent(mock->eventid["Q_cancel_motion"],
+                                    UserMessage::DataVector({(sint16)jobid}));
+                    break;
+                }
+                std::this_thread::yield();
+            }
         }
         
         void run()
         {
-            for (sint16 jobid = 0; jobid <= duration; jobid++)
+            for (sint16 jobid = 1; jobid <= duration * 2; jobid++)
             {
-                UnifiedTime delay(1000);
-                cout << "EventGenerator::run " << jobid << endl;
-                delay.sleep();
+                cout << "EventGenerator::run jobid " << jobid << endl;
 
                 // Each step combines wait events and instantaneous events.
                 // The pattern is: long arc forward (wait), short arc backwards (wait), beep.
@@ -163,16 +175,20 @@ namespace Aseba
                 cout << "Q_add_motion " << jobid << endl;
                 mock->sendEvent(mock->eventid["Q_add_motion"],
                                 jobid % 2
-                                ? UserMessage::DataVector({jobid,187,-400,-20})
-                                : UserMessage::DataVector({jobid,699,400,362}));
+                                ? UserMessage::DataVector({jobid,350,400,324})
+                                : UserMessage::DataVector({jobid,187,-400,-20}));
                 mock->busy.insert(jobid);
                 waitFor(jobid);
                 
                 mock->sendEvent(mock->eventid["V_leds_top"],
                                 UserMessage::DataVector({0,8,0}));
-                if ( (jobid % 2) > 0)
+                if ((jobid % 2) == 0)
+                {
                     mock->sendEvent(mock->eventid["A_sound_system"],
                                     UserMessage::DataVector({5}));
+                    if (delay.value > 0)
+                        delay.sleep();
+                }
             }
             
             mock->stop();
@@ -181,6 +197,8 @@ namespace Aseba
     protected:
         Aseba::MockAsebascratch * mock;
         unsigned duration;
+        unsigned timeout;
+        UnifiedTime delay;
     };
 }
 
@@ -190,7 +208,8 @@ void dumpHelp(std::ostream &stream, const char *programName)
     stream << programName << " [options] [targets]*\n";
     stream << "Options:\n";
     stream << "--EVENT=ID      : redefine an AESL event id\n";
-    stream << "-k ITERATIONS   : run for ITERATIONS steps (default: 16)\n";
+    stream << "-k ITERATIONS   : run for ITERATIONS steps (default: 13)\n";
+    stream << "-t TIMEOUT      : maximum wait for motion event (default: 20000 ms)\n";
     stream << "-h, --help      : shows this help\n";
     stream << "-V, --version   : shows the version number\n";
     stream << "Targets are any valid Dashel targets." << std::endl;
@@ -208,8 +227,9 @@ int main(int argc, char *argv[])
 {
     Dashel::initPlugins();
     std::vector<std::string> targets;
-    unsigned iterations = 16;
-    
+    unsigned iterations = 13;  //
+    unsigned timeout = 20000;  // roughly 4 meters at Thymio top speed
+    unsigned delay = 0;        // if necessary to imitate Scratch
     
     int argCounter = 1;
     
@@ -238,6 +258,28 @@ int main(int argc, char *argv[])
             else
                 iterations = atoi(argv[argCounter]);
         }
+        else if (strcmp(arg, "-t") == 0)
+        {
+            argCounter++;
+            if (argCounter >= argc)
+            {
+                dumpHelp(std::cout, argv[0]);
+                return 1;
+            }
+            else
+                timeout = atoi(argv[argCounter]);
+        }
+        else if (strcmp(arg, "-w") == 0)
+        {
+            argCounter++;
+            if (argCounter >= argc)
+            {
+                dumpHelp(std::cout, argv[0]);
+                return 1;
+            }
+            else
+                delay = atoi(argv[argCounter]);
+        }
         else
         {
             targets.push_back(argv[argCounter]);
@@ -256,7 +298,8 @@ int main(int argc, char *argv[])
             mock.connect(targets[i]);
 
         // Create EventGenerator thread with chosen number of iterations
-        std::thread gen_thread(&Aseba::EventGenerator::run, Aseba::EventGenerator(&mock,iterations));
+        std::thread gen_thread(&Aseba::EventGenerator::run,
+                               Aseba::EventGenerator(&mock,iterations,timeout,delay));
         
         // Run threads. Mock will be stopped by EventGenerator::run
         mock.run();
