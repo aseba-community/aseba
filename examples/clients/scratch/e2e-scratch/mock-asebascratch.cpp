@@ -25,6 +25,7 @@
 #include "../../../../transport/dashel_plugins/dashel-plugins.h"
 #include <time.h>
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <thread>
 
@@ -161,7 +162,7 @@ namespace Aseba
         
         void run()
         {
-            for (sint16 jobid = 1; jobid <= duration * 2; jobid++)
+	  for (sint16 jobid = 1; jobid <= sint16(duration) * 2; jobid++)
             {
                 cout << "EventGenerator::run jobid " << jobid << endl;
 
