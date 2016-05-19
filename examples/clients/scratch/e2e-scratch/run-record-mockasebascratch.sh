@@ -7,7 +7,7 @@ killall aseba{switch,rec,play,scratch}
 
 asebaswitch -d 'ser:name=Thymio' --rawtime > ${DIR}/sw.${SET}.txt &
 asebarec 'tcp:;port=33333' > ${DIR}/rec.${SET}.txt &
-asebascratch --http 3000 --aesl thymio_motion\ blink.aesl 'tcp:;port=33333' &
+asebascratch --http 3000 --aesl thymio_motion.aesl 'tcp:;port=33333' &
 sleep 30
 
 curl --silent --output ${DIR}/ev.${SET}.txt http://localhost:3002/events &
