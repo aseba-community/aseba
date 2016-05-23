@@ -1,0 +1,9 @@
+<!DOCTYPE aseba-playground>
+<aseba-playground>
+	<color name="white" r="1.0" g="1.0" b="1.0" />
+	
+	<world w="200.0" h="120.0" color="white" groundTexture="thymio-barcodelightpainting.png" />
+	<camera x="100" y="40" altitude="110" yaw=" 1.57" pitch="-1.5" />
+	
+	<thymio2 x="50" y="52" />
+</aseba-playground>
