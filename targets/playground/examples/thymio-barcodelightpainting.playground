@@ -1,5 +1,15 @@
 <!DOCTYPE aseba-playground>
 <aseba-playground>
+	<author name="Stéphane Magnenat" email="stephane at magnenat dot net" />
+	<author name="Francesco Mondada" email="francesco dot mondada at epfl dot ch" />
+	<author name="David Doak" email="david at ddoak dot com" />
+	
+	<description lang="en">A demonstration of light painting using a track and bar codes on the ground.</description>
+	<description lang="fr">Une démonstration de peinture lumineuse en utilisant une piste et des codes barres sur le sol.</description>
+	
+	<externalLink lang="en" type="wiki" target="creations-en:simulated-barcode-lightpainting" />
+	<externalLink lang="en" type="youtube" target="Rpzy3AcC4JI" />
+	
 	<color name="white" r="1.0" g="1.0" b="1.0" />
 	
 	<world w="200.0" h="120.0" color="white" groundTexture="thymio-barcodelightpainting.png" />
