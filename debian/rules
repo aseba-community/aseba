@@ -28,7 +28,9 @@ binary-arch:
 #	cp changelog debian/tmp/usr/share/doc/aseba/changelog
 	cp debian/changelog debian/tmp/usr/share/doc/aseba/changelog.debian
 	cp debian/copyright debian/tmp/usr/share/doc/aseba
-	cp targets/playground/unifr.playground debian/tmp/usr/share/doc/aseba/example-scenarios
+	cp targets/playground/examples/*.png debian/tmp/usr/share/doc/aseba/example-scenarios
+	cp targets/playground/examples/*.playground debian/tmp/usr/share/doc/aseba/example-scenarios
+	cp targets/playground/examples/*.aesl debian/tmp/usr/share/doc/aseba/example-code
 	cp targets/challenge/examples/challenge-goto-energy.aesl debian/tmp/usr/share/doc/aseba/example-code
 	cp menu/freedesktop/*.desktop debian/tmp/usr/share/applications
 	cp menu/freedesktop/48x48/*.png debian/tmp/usr/share/icons/hicolor/48x48/apps

@@ -200,7 +200,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="129"/>
         <source>Latest official firmware</source>
-        <translation>Última versión oficial del firmware</translation>
+        <translation>Último firmware oficial</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="139"/>
@@ -263,7 +263,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="482"/>
         <source>Error connecting to official firmware server!</source>
-        <translation>Error al conectar con el servidor oficial del firmware!</translation>
+        <translation>Error al conectarse con el servidor del firmware oficial!</translation>
     </message>
 </context>
 <context>

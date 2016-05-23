@@ -46,18 +46,6 @@ namespace Aseba
 	class Message
 	{
 	public:
-		uint16 source;
-		uint16 type;
-		
-	public:
-		Message(uint16 type);
-		virtual ~Message();
-		
-		void serialize(Dashel::Stream* stream) const;
-		static Message *receive(Dashel::Stream* stream);
-		void dump(std::wostream &stream) const;
-
-	protected:
 		//! Helper class that contains the raw data being (de-)serialialized
 		struct SerializationBuffer
 		{
@@ -71,10 +59,22 @@ namespace Aseba
 			size_t readPos;
 		};
 		
-	protected:
+		uint16 source;
+		uint16 type;
+		
+		Message(uint16 type);
+		virtual ~Message();
+		
+		void serialize(Dashel::Stream* stream) const;
+		static Message *receive(Dashel::Stream* stream);
+		static Message *create(uint16 source, uint16 type, SerializationBuffer& buffer);
+		void dump(std::wostream &stream) const;
+		
 		virtual void serializeSpecific(SerializationBuffer& buffer) const = 0;
 		virtual void deserializeSpecific(SerializationBuffer& buffer) = 0;
 		virtual void dumpSpecific(std::wostream &stream) const = 0;
+		
+	protected:
 		virtual operator const char * () const { return "message super class"; }
 	};
 	

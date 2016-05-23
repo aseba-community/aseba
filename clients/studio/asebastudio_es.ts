@@ -132,7 +132,7 @@
     <message>
         <location filename="DashelTarget.cpp" line="302"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt; No se puede encontrar Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conectar Thymio al ordenador mediante el cable USB o el dongle, y asegurarse de que ningún otro programa está utilizando Thymio.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Thymio no encontrado!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte a Thymio a su computador usando el cable usb o adaptador inalámbrico, y asegúrese de que ningún otro programa esté usando el robot.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="304"/>
@@ -1611,17 +1611,17 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="133"/>
         <source>horizontal proximity sensors</source>
-        <translation>captores de distancia horizontales</translation>
+        <translation>sensores de proximidad horizontales</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="135"/>
         <source>ground proximity sensors</source>
-        <translation>captores de distancia hacia el piso</translation>
+        <translation>sensores de proximidad de suelo</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="137"/>
         <source>tap detection / tilt</source>
-        <translation>detección de choque / inclinación</translation>
+        <translation>detección de impacto / inclinación</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="139"/>
@@ -1631,7 +1631,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="141"/>
         <source>timer elapsed</source>
-        <translation>minutero finalizado</translation>
+        <translation>tiempo de espera</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="143"/>
@@ -1646,12 +1646,12 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="147"/>
         <source>top colour</source>
-        <translation>color en la parte superior</translation>
+        <translation>color superior</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="149"/>
         <source>bottom colour</source>
-        <translation>color en la parte inferior</translation>
+        <translation>color inferior</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="151"/>
@@ -1661,7 +1661,7 @@ evento %0 : </translation>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="153"/>
         <source>timer</source>
-        <translation>minutero</translation>
+        <translation>temporizador</translation>
     </message>
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="155"/>
@@ -1905,7 +1905,8 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="172"/>
         <source>Connecting to Thymio...</source>
-        <translation>Conexión a Thymio ...</translation>
+        <translation>
+Conectándose a Thymio...</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="274"/>
@@ -1947,7 +1948,7 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="505"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation>Conexión a Thymio perdida ... asegúrese de que Thymio está prendido y conecte el cable USB o el dongle</translation>
+        <translation>Se perdió la conexión con Thymio... verifique que Thymio esté encendido y conectado a traves del cable usb o del adaptador inalámbrico</translation>
     </message>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="569"/>
