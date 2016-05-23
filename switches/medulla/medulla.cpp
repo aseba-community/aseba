@@ -32,7 +32,6 @@
 #include "../../common/types.h"
 #include "../../common/utils/utils.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
-#include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QtXml>
 #include <QtDebug>

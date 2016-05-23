@@ -127,7 +127,10 @@ namespace Aseba
 			for (VMStateToEnvironment::iterator it(Aseba::vmStateToEnvironment.begin()); it != vmStateToEnvironment.end(); ++it)
 			{
 				if (it.value().second == this)
+				{
 					AsebaProcessIncomingEvents(it.key());
+					AsebaVMRun(it.key(), 1000);
+				}
 			}
 		}
 		catch (Dashel::DashelException e)

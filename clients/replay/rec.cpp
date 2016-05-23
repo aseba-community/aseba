@@ -25,6 +25,7 @@
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include <time.h>
 #include <iostream>
+#include <iomanip>
 #include <cstring>
 
 namespace Aseba
@@ -45,18 +46,21 @@ namespace Aseba
 		
 		void incomingData(Stream *stream)
 		{
+			dumpTime(cout, true);
+			
+			// receive and deserialize message
 			Message *message = Message::receive(stream);
-			UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
-			if (userMessage)
-			{
-				dumpTime(cout, true);
-				cout << userMessage->source << " ";
-				cout << userMessage->type << " ";
-				cout << userMessage->data.size() << " ";
-				for (UserMessage::DataVector::const_iterator it = userMessage->data.begin(); it != userMessage->data.end(); ++it)
-					cout << *it << " ";
-				cout << endl;
-			}
+			Message::SerializationBuffer buffer;
+			message->serializeSpecific(buffer);
+			
+			// system messages have their arguments as bytes in hexadecimal
+			cout << hex << setw(4) << setfill('0') << message->source << " ";
+			cout << hex << setw(4) << setfill('0') << message->type << dec << " ";
+			cout << dec << buffer.rawData.size() << " ";
+			cout << hex;
+			for (std::vector<uint8>::const_iterator it = buffer.rawData.begin(); it != buffer.rawData.end(); ++it)
+					cout << setw(2) << setfill('0') << unsigned(*it) << " ";
+			cout << dec << endl;
 		}
 	};
 	

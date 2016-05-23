@@ -37,6 +37,10 @@
 #include <QMessageBox>
 #include <QProcess>
 
+#ifdef HAVE_DBUS
+#include "PlaygroundDBusAdaptors.h"
+#endif // HAVE_DBUS
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
@@ -145,14 +149,50 @@ int main(int argc, char *argv[])
 		std::cerr << "Warning, world walls color " << worldE.attribute("color").toStdString() << " undefined\n";
 	else
 		worldColor = colorsMap[worldE.attribute("color")];
+	Enki::World::GroundTexture groundTexture;
+	if (worldE.hasAttribute("groundTexture"))
+	{
+		const QString groundTextureFileName(QFileInfo(fileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
+		QImage image(groundTextureFileName);
+		if (!image.isNull())
+		{
+			image = image.convertToFormat(QImage::Format_ARGB32);
+			groundTexture.width = image.width();
+			groundTexture.height = image.height();
+			const uint32_t* imageData(reinterpret_cast<const uint32_t*>(image.constBits()));
+			std::copy(imageData, imageData+image.width()*image.height(), std::back_inserter(groundTexture.data));
+			// Note: this works in little endian, in big endian data should be swapped
+		}
+		else
+		{
+			qDebug() << "Could not load ground texture file named" << groundTextureFileName;
+		}
+	}
 	Enki::World world(
 		worldE.attribute("w").toDouble(),
 		worldE.attribute("h").toDouble(),
-		worldColor
+		worldColor,
+		groundTexture
 	);
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);
+	
+	// Scan for camera
+	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
+	if (!cameraE.isNull())
+	{
+		const double largestDim(qMax(world.h, world.w));
+		viewer.setCamera(
+			QPointF(
+				cameraE.attribute("x", QString::number(world.w / 2)).toDouble(),
+				cameraE.attribute("y", QString::number(0)).toDouble()
+			),
+			cameraE.attribute("altitude", QString::number(0.85 * largestDim)).toDouble(),
+			cameraE.attribute("yaw", QString::number(-M_PI/2)).toDouble(),
+			cameraE.attribute("pitch", QString::number((3*M_PI)/8)).toDouble()
+		);
+	}
 	
 	// Scan for walls
 	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");
@@ -174,6 +214,27 @@ int main(int argc, char *argv[])
 		world.addObject(wall);
 		
 		wallE  = wallE.nextSiblingElement ("wall");
+	}
+	
+	// Scan for cylinders
+	QDomElement cylinderE = domDocument.documentElement().firstChildElement("cylinder");
+	while (!cylinderE.isNull())
+	{
+		Enki::PhysicalObject* cylinder = new Enki::PhysicalObject();
+		if (!colorsMap.contains(cylinderE.attribute("color")))
+			std::cerr << "Warning, color " << cylinderE.attribute("color").toStdString() << " undefined\n";
+		else
+			cylinder->setColor(colorsMap[cylinderE.attribute("color")]);
+		cylinder->pos.x = cylinderE.attribute("x").toDouble();
+		cylinder->pos.y = cylinderE.attribute("y").toDouble();
+		cylinder->setCylindric(
+			cylinderE.attribute("r").toDouble(), 
+			cylinderE.attribute("h").toDouble(),
+			-1
+		);
+		world.addObject(cylinder);
+		
+		cylinderE = cylinderE.nextSiblingElement("cylinder");
 	}
 	
 	// Scan for feeders
@@ -335,6 +396,14 @@ int main(int argc, char *argv[])
 	// Show and run
 	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.show();
+	
+	// If D-Bus is used, register the viewer object
+	#ifdef HAVE_DBUS
+	new Enki::EnkiWorldInterface(&viewer);
+	QDBusConnection::sessionBus().registerObject("/world", &viewer);	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
+	#endif // HAVE_DBUS
+	
+	// Run the application
 	const int exitValue(app.exec());
 	
 	// Stop and delete ongoing processes
