@@ -211,10 +211,10 @@ int main(int argc, char *argv[])
 			wallE.attribute("h").toDouble(),
 			-1
 		);
-        if (! wallE.attribute("angle").isNull())
-        {
-            wall->angle = wallE.attribute("angle").toDouble(); // radians
-        }
+		if (! wallE.attribute("angle").isNull())
+		{
+			wall->angle = wallE.attribute("angle").toDouble(); // radians
+		}
 		world.addObject(wall);
 		
 		wallE  = wallE.nextSiblingElement ("wall");
