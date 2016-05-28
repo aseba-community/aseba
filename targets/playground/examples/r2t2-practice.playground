@@ -1,0 +1,41 @@
+<!DOCTYPE aseba-playground>
+<!-- Aseba playground for practicing algorithms for R2T2, Remote Rescue using Thymio2 -->
+<!-- (https://www.thymio.org/en:thymio-r2t2). Completing the exercise requires  steps. -->
+<!-- 1. Push the blue obstacle out of the way to free the access to the door -->
+<!-- 2. Find the spots on the floor and place one robot on each -->
+<!-- 3. Look at the generator by placing a robot in front of each window -->
+<!-- 4. Restart the generator by blinking the LEDs in sequence -->
+<aseba-playground>
+	<color name="white" r="1.0" g="1.0" b="1.0" />
+	<color name="wall" r="0.9" g="0.9" b="0.9" />
+	<color name="red" r="0.77" g="0.2" b="0.15" />
+	<color name="green" r="0" g="0.5" b="0.17" />
+	<color name="blue" r="0" g="0.38" b="0.61" />
+	<color name="cornflower" r="0.39" g="0.58" b="0.93" />
+
+	<world w="344.8891" h="252.76343" color="white" groundTexture="r2t2-practice.png" />
+	<wall x="210.25" y="77.26" l1="48.50" l2="2.00" h="15.00" color="wall" />
+	<wall x="122.50" y="77.26" l1="71.00" l2="2.00" h="15.00" color="wall" />
+	<wall x="88.00" y="89.26" l1="2.00" l2="26.00" h="15.00" color="wall" />
+	<wall x="122.50" y="101.26" l1="71.00" l2="2.00" h="15.00" color="wall" />
+	<wall x="222.00" y="101.26" l1="72.00" l2="2.00" h="15.00" color="wall" />
+	<wall x="272.00" y="116.26" l1="44.43" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="74.00" y="148.76" l1="205.65" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="271.00" y="148.76" l1="205.65" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="172.50" y="198.76" l1="2.00" l2="21.00" h="15.00" color="wall" />
+	<wall x="73.00" y="116.26" l1="44.43" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="172.50" y="209.76" l1="11.00" l2="2.00" h="15.00" color="wall" />
+	<wall x="146.25" y="220.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="198.75" y="220.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="186.75" y="212.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="0.391" />
+	<wall x="158.25" y="212.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="2.751" />
+	<wall x="154.00" y="202.51" l1="20.85" l2="2.00" h="15.00" color="wall" angle="1.190" />
+	<wall x="191.25" y="202.51" l1="21.04" l2="2.00" h="15.00" color="wall" angle="1.976" />
+
+	<wall x="171.50" y="89.26" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" />
+
+	<thymio2 x="278" y="108" port="33333" angle="3.93" />
+	<thymio2 x="289" y="119" port="33334" angle="3.93" />
+	<thymio2 x="300" y="108" port="33335" angle="3.93" />
+	<thymio2 x="311" y="97" port="33336" angle="3.93" />
+</aseba-playground>
