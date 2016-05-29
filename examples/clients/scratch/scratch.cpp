@@ -153,10 +153,27 @@ namespace Aseba
             if (args.size() > 0)
                 todo = HttpInterface::getIdsFromURI(args);
 
+            // Try to find a node for this request. Only the first one can succeed, it will end break out of the loop with return
             for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
             {
                 unsigned nodeId = *it;
+                size_t eventPos;
 
+                // If this node isn't running thymio_motion.aesl, try next node or else fall through to HttpInterface::routeRequest
+                if (! commonDefinitions[nodeId].events.contains(L"Q_add_motion", &eventPos))
+                    continue;
+
+                // If requesting a scratch event, check that enough args are supplied
+                for (auto scratch_event: standard_scratch_events)
+                    if (req->tokens[2].find(WStringToUTF8(scratch_event.first))==0 &&
+                        req->tokens.size() < scratch_event.second + 3)
+                        {
+                            finishResponse(req, 400, WStringToUTF8(scratch_event.first)+" requires "+to_string(scratch_event.second)+
+                                           " args but request provided "+to_string(req->tokens.size()-3)+"\n"); // fails with BAD REQUEST
+                            return;
+                        }
+
+                // Try to route a scratch event; if not, fall through to HttpInterface::routeRequest
                 if (req->tokens[2].find("scratch_start")==0)
                 { //
                     strings args;
@@ -405,6 +422,22 @@ namespace Aseba
             }
         }
         HttpInterface::routeRequest(req); // else use base class method
+    }
+
+    void ScratchInterface::evNodes(HttpRequest* req, strings& args)
+    {
+        // Patch the events map of every node running thymio_motion.aesl to add scratch-specific events if needed.
+        // They are implemented by hard-coded routes in ScratchInterface::routeRequest and will never be called by HttpInterface::sendEvent
+        for (NodesMap::iterator descIt = nodes.begin(); descIt != nodes.end(); ++descIt)
+        {
+            unsigned nodeId = descIt->first;
+            size_t eventPos;
+            if (commonDefinitions[nodeId].events.contains(L"Q_add_motion", &eventPos))
+                for (auto ev: standard_scratch_events)
+                    if ( ! commonDefinitions[nodeId].events.contains(ev.first, &eventPos))
+                        commonDefinitions[nodeId].events.push_back(NamedValue(ev.first, ev.second));
+        }
+        HttpInterface::evNodes(req, args); // else use base class method
     }
     
     void ScratchInterface::sendSetVariable(const unsigned nodeId, const strings& args)
@@ -839,7 +872,8 @@ int main(int argc, char *argv[])
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, aseba_port, 1000*Kiterations, dump));
+        Aseba::ScratchInterface* network(new Aseba::ScratchInterface(dashel_target_list, http_port, aseba_port,
+                                                                     Kiterations > 0 ? 1000*Kiterations : 10, dump));
         
         for (auto nodeId: network->allNodeIds())
             try {

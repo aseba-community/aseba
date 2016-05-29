@@ -1,0 +1,82 @@
+<!DOCTYPE aseba-playground>
+<aseba-playground>
+	<color name="white" r="1.0" g="1.0" b="1.0" />
+	<color name="wall" r="0.9" g="0.9" b="0.9" />
+	<color name="red" r="0.77" g="0.2" b="0.15" />
+	<color name="green" r="0" g="0.5" b="0.17" />
+	<color name="blue" r="0" g="0.38" b="0.61" />
+
+	<world w="240" h="240" color="white" groundTexture="thymio-maze-6x6.png" />
+	<thymio2 x="145" y="20" port="33333" angle="0.00" />
+	<thymio2 x="220" y="180" port="33334" angle="1.57" />
+	<wall x="120.00" y="105.00" l1="2.00" l2="32.00" h="10.00" color="wall" />
+	<wall x="125.00" y="85.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="145.00" y="80.00" l1="32.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="75.00" y="125.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="55.00" y="120.00" l1="32.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="40.00" y="120.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="40.00" y="120.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="40.00" y="120.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="25.00" y="160.00" l1="32.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="5.00" y="165.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="0.00" y="200.00" l1="2.00" l2="62.00" h="10.00" color="wall" />
+	<wall x="5.00" y="235.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="120.00" y="240.00" l1="222.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="235.00" y="235.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="240.00" y="200.00" l1="2.00" l2="62.00" h="10.00" color="wall" />
+	<wall x="235.00" y="165.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="215.00" y="160.00" l1="32.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="195.00" y="165.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="190.00" y="180.00" l1="2.00" l2="22.00" h="10.00" color="wall" />
+	<wall x="195.00" y="195.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="165.00" y="200.00" l1="72.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="125.00" y="195.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="120.00" y="155.00" l1="2.00" l2="72.00" h="10.00" color="wall" />
+	<wall x="100.00" y="120.00" l1="42.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="80.00" y="137.50" l1="2.00" l2="37.00" h="10.00" color="wall" />
+	<wall x="80.00" y="172.50" l1="2.00" l2="37.00" h="10.00" color="wall" />
+	<wall x="75.00" y="195.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="55.00" y="200.00" l1="32.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="40.00" y="200.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="5.00" y="155.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="0.00" y="120.00" l1="2.00" l2="62.00" h="10.00" color="wall" />
+	<wall x="5.00" y="85.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="40.00" y="80.00" l1="62.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="75.00" y="75.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="80.00" y="60.00" l1="2.00" l2="22.00" h="10.00" color="wall" />
+	<wall x="240.00" y="80.00" l1="2.00" l2="142.00" h="10.00" color="wall" />
+	<wall x="235.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="180.00" y="0.00" l1="102.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="125.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="5.00" y="75.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="0.00" y="40.00" l1="2.00" l2="62.00" h="10.00" color="wall" />
+	<wall x="5.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="30.00" y="0.00" l1="42.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="55.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="60.00" y="20.00" l1="2.00" l2="22.00" h="10.00" color="wall" />
+	<wall x="55.00" y="35.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="50.00" y="40.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="50.00" y="40.00" l1="2.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="85.00" y="45.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="65.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="90.00" y="0.00" l1="42.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="115.00" y="5.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="120.00" y="20.00" l1="2.00" l2="22.00" h="10.00" color="wall" />
+	<wall x="125.00" y="35.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="160.00" y="40.00" l1="62.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="195.00" y="45.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="0.785" />
+	<wall x="200.00" y="80.00" l1="2.00" l2="62.00" h="10.00" color="wall" />
+	<wall x="195.00" y="115.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="180.00" y="120.00" l1="22.00" l2="2.00" h="10.00" color="wall" />
+	<wall x="165.00" y="125.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<wall x="160.00" y="140.00" l1="2.00" l2="22.00" h="10.00" color="wall" />
+	<wall x="235.00" y="155.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
+	<area name="cage">
+	  <point x="-5" y="-53" />
+	  <point x="-5" y="-113" />
+	  <point x="35" y="-113" />
+	  <point x="35" y="-53" />
+	</area>
+	<door openedX="180.00" openedY="200.00" closedX="220.00" closedY="200.00" l1="40.00" l2="1.80" h="10.00" moveDuration="3" name="exit" color="blue" />
+	<activation x="95.00" y="228.00" l1="7.00" l2="7.00" area="cage" door="exit" />
+</aseba-playground>
