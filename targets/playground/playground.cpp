@@ -209,8 +209,10 @@ int main(int argc, char *argv[])
 			wallE.attribute("l1").toDouble(),
 			wallE.attribute("l2").toDouble(),
 			wallE.attribute("h").toDouble(),
-			-1
+			!wallE.attribute("mass").isNull() ? wallE.attribute("mass").toDouble() : -1 // normally -1 because immobile
 		);
+		if (! wallE.attribute("angle").isNull())
+			wall->angle = wallE.attribute("angle").toDouble(); // radians
 		world.addObject(wall);
 		
 		wallE  = wallE.nextSiblingElement ("wall");
@@ -230,7 +232,7 @@ int main(int argc, char *argv[])
 		cylinder->setCylindric(
 			cylinderE.attribute("r").toDouble(), 
 			cylinderE.attribute("h").toDouble(),
-			-1
+			!cylinderE.attribute("mass").isNull() ? cylinderE.attribute("mass").toDouble() : -1 // normally -1 because immobile
 		);
 		world.addObject(cylinder);
 		
