@@ -31,6 +31,7 @@ namespace Aseba
     public:
         ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false);
         virtual std::string evPoll(const unsigned nodeId);
+        virtual void evNodes(HttpRequest* req, strings& args);
         
     protected:
         virtual void routeRequest(HttpRequest* req);
@@ -61,5 +62,11 @@ namespace Aseba
             {"prox.comm.tx",{13,14}}, {"prox.ground.delta",{14,16}}, {"prox.horizontal",{16,23}},
             {"Qid",{23,26}} });
         std::map<unsigned, GetVariables> node_r_state;
+        const std::map<std::wstring, unsigned> standard_scratch_events =
+        std::map<std::wstring, unsigned>({
+            {L"scratch_start",2}, {L"scratch_change_speed",2}, {L"scratch_stop",0},
+            {L"scratch_set_dial",1}, {L"scratch_next_dial_limit",1}, {L"scratch_next_dial",0},
+            {L"scratch_clear_leds",0}, {L"scratch_set_leds",2}, {L"scratch_change_leds",2},
+            {L"scratch_move",2}, {L"scratch_turn",2}, {L"scratch_arc",3} });
     };
 };
