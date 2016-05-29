@@ -196,8 +196,7 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="129"/>
         <source>Latest official firmware</source>
-        <translation>
-Letzte offizielle Firmware</translation>
+        <translation>Letzte offizielle Firmware</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="139"/>

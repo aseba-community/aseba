@@ -219,6 +219,26 @@ namespace Aseba
 						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
 				}
 				break;
+
+				case 5: // start linear address record
+				{
+					// Start linear address record are not used by the Aseba
+					// bootloader protocol so we can ignore them.
+
+					// Skip data
+					for (int i = 0; i < 4; i++)
+						computedCheckSum += getUint8(ifs);
+
+					computedCheckSum = 1 + ~computedCheckSum;
+
+					uint8 checkSum = getUint8(ifs);
+
+					if (checkSum != computedCheckSum)
+						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
+				}
+
+				break;
+
 				
 				default:
 				throw UnknownRecordType(lineCounter, recordType);

@@ -42,7 +42,9 @@ namespace Aseba
 	//! Show list of known commands
 	void dumpCommandList(ostream &stream)
 	{
-		stream << "* presence : broadcast presence message\n";
+		stream << "* presence : broadcast presence message (node detection version < 5)\n";
+		stream << "* listnodes : list nodes on network (node detection version >= 5)\n";
+		stream << "* getnodedescr : get the description of a given onde (version >= 5)\n";
 		stream << "* usermsg: user message [type] [word0] ... [wordN]\n";
 		stream << "* rdpage : bootloader read page [dest] [page number]\n";
 		stream << "* rdpageusb : bootloader read page usb [dest] [page number]\n";
@@ -204,9 +206,25 @@ namespace Aseba
 			message.serialize(stream);
 			stream->flush();
 		}
+		else if (strcmp(cmd, "listnodes") == 0)
+		{
+			ListNodes message;
+			message.serialize(stream);
+			stream->flush();
+		}
+		else if (strcmp(cmd, "getnodedescr") == 0)
+		{
+			// arg is node id
+			if (argc < 2)
+				errorMissingArgument(argv[0]);
+			argEaten = 1;
+			GetNodeDescription message(atoi(argv[1]));
+			message.serialize(stream);
+			stream->flush();
+		}
 		else if (strcmp(cmd, "usermsg") == 0)
 		{
-			// first arg is type, second is length
+			// first arg is type, nexts are data
 			if (argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = argc;

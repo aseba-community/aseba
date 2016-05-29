@@ -1,0 +1,18 @@
+<!DOCTYPE aseba-playground>
+<aseba-playground>
+	<color name="wall" r="0.9" g="0.9" b="0.9" />
+	<color name="red" r="0.77" g="0.2" b="0.15" />
+	<color name="green" r="0" g="0." b="0.17" />
+	<color name="blue" r="0" g="0.38" b="0.61" />
+	
+	<world w="110.4" h="110.4" color="wall"/>
+	
+	<wall x="32.8" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
+	<wall x="77.6" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
+	<wall x="55.2" y="77.6" l1="46.4" l2="1.6" h="10" color="wall" />
+	<wall x="55.2" y="32.8" l1="46.4" l2="1.6" h="10" color="wall" />
+	
+	<cylinder x="15" y="50" r="3" h="10" color="wall" />
+	
+	<thymio2 x="15" y="30"/>
+</aseba-playground>

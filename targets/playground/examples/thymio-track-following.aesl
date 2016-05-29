@@ -1,0 +1,81 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="1" name="pair_run"/>
+
+
+<!--list of constants-->
+
+
+<!--show keywords state-->
+<keywords flag="false"/>
+
+
+<!--node thymio-II-->
+<node nodeId="1" name="thymio-II"># reset outputs
+call sound.system(-1)
+call leds.top(0,0,0)
+call leds.bottom.left(0,0,0)
+call leds.bottom.right(0,0,0)
+call leds.circle(0,0,0,0,0,0,0,0)
+
+onevent prox
+	when prox.ground.delta[0] &lt;= 400 and prox.ground.delta[1] &lt;= 400 do
+		motor.left.target = 250
+		motor.right.target = 250
+		call leds.top(0,32,0)
+		emit pair_run 0
+	end
+	when prox.ground.delta[0] >= 450 and prox.ground.delta[1] &lt;= 400 do
+		motor.left.target = 100
+		motor.right.target = -200
+		call leds.top(32,32,0)
+		emit pair_run 1
+	end
+	when prox.ground.delta[0] &lt;= 400 and prox.ground.delta[1] >= 450 do
+		motor.left.target = -200
+		motor.right.target = 100
+		call leds.top(32,32,0)
+		emit pair_run 2
+	end
+	when prox.ground.delta[0] >= 450 and prox.ground.delta[1] >= 450 do
+		motor.left.target = 0
+		motor.right.target = 0
+		call leds.top(32,0,0)
+		emit pair_run 3
+	end
+<toolsPlugins>
+<ThymioVisualProgramming>
+<vplroot xml-format-version="1">
+<program advanced_mode="0">
+<set>
+<block value0="2" value1="2" value2="400" value3="450" type="event" name="proxground"/>
+<block value0="250" value1="250" type="action" name="move"/>
+<block value0="0" value1="32" value2="0" type="action" name="colortop"/>
+</set>
+<set>
+<block value0="1" value1="2" value2="400" value3="450" type="event" name="proxground"/>
+<block value0="100" value1="-200" type="action" name="move"/>
+<block value0="32" value1="32" value2="0" type="action" name="colortop"/>
+</set>
+<set>
+<block value0="2" value1="1" value2="400" value3="450" type="event" name="proxground"/>
+<block value0="-200" value1="100" type="action" name="move"/>
+<block value0="32" value1="32" value2="0" type="action" name="colortop"/>
+</set>
+<set>
+<block value0="1" value1="1" value2="400" value3="450" type="event" name="proxground"/>
+<block value0="0" value1="0" type="action" name="move"/>
+<block value0="32" value1="0" value2="0" type="action" name="colortop"/>
+</set>
+<set/>
+</program>
+</vplroot>
+</ThymioVisualProgramming>
+</toolsPlugins>
+</node>
+
+
+</network>
