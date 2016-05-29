@@ -110,7 +110,8 @@ int main(int argc, char *argv[])
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, aseba_port, 1000*Kiterations, dump));
+        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, aseba_port,
+                                                               Kiterations > 0 ? 1000*Kiterations : 5, dump));
 
         for (auto nodeId: network->allNodeIds())
             try {

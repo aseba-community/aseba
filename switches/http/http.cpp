@@ -309,6 +309,8 @@ namespace Aseba
             const UnifiedTime now;
             timeout -= (now - startTime).value;
             startTime = now;
+            if (iterations > 0 && --iterations == 0) // never if infinite Kiter (iterations < 0)
+                return false;
         }
         return true;
     }
