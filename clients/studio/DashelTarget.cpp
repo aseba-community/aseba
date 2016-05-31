@@ -119,6 +119,7 @@ namespace Aseba
 		languageSelectionBox->addItem(QString::fromUtf8("Español"), "es");
 		languageSelectionBox->addItem(QString::fromUtf8("Italiano"), "it");
 		languageSelectionBox->addItem(QString::fromUtf8("日本語"), "ja");
+		languageSelectionBox->addItem(QString::fromUtf8("汉语"), "zh");
 		/* insert translation here (DO NOT REMOVE -> for automated script) */
 		//qDebug() << "locale is " << QLocale::system().name();
 		for (int i = 0; i < languageSelectionBox->count(); ++i)
@@ -603,7 +604,7 @@ namespace Aseba
 		}
 	}
 	
-	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
+ 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
 	{
 		if (!writeBlocked)
 		{
@@ -621,8 +622,14 @@ namespace Aseba
 		}
 	}
 	
+	static QDateTime lastTime;
+	static unsigned getVariablesCounter = 0;
+	static unsigned VariablesCounter = 0;
+	
 	void DashelTarget::getVariables(unsigned node, unsigned start, unsigned length)
 	{
+		QElapsedTimer timer;
+		timer.start();
 		dashelInterface.lock();
 		if (dashelInterface.stream && !writeBlocked)
 		{
@@ -632,11 +639,13 @@ namespace Aseba
 			{
 				while (length > variablesPayloadSize)
 				{
+					getVariablesCounter++;
 					GetVariables(node, start, variablesPayloadSize).serialize(dashelInterface.stream);
 					start += variablesPayloadSize;
 					length -= variablesPayloadSize;
 				}
 
+				getVariablesCounter++;
 				GetVariables(node, start, length).serialize(dashelInterface.stream);
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
@@ -649,6 +658,11 @@ namespace Aseba
 		}
 		else
 			dashelInterface.unlock();
+		qDebug() << "getVariables duration: " << timer.elapsed();
+		
+		QDateTime curTime(QDateTime::currentDateTime());
+		//qDebug() << "variable rate" << lastTime.msecsTo(curTime);
+		lastTime = curTime;
 	}
 	
 	void DashelTarget::reset(unsigned node)
@@ -876,6 +890,9 @@ namespace Aseba
 	
 	void DashelTarget::receivedVariables(Message *message)
 	{
+		VariablesCounter++;
+		//qDebug() << "diff get recv variables" << int(getVariablesCounter) - int(VariablesCounter);
+		
 		Variables *variables = polymorphic_downcast<Variables *>(message);
 		
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
