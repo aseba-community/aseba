@@ -561,13 +561,13 @@ namespace Aseba
         std::vector<int> vec_thr(busy_threads.begin(),busy_threads.end());
         std::sort(vec_thr.begin(),vec_thr.end());
         
-        std::vector<int> diff_qid_thr;
+        std::vector<int> diff_qid_thr(4);
         if (vec_qid.size() > 0 && vec_thr.size() > 0)
             std::set_difference(vec_qid.begin(), vec_qid.end(), vec_thr.begin(), vec_thr.end(), diff_qid_thr.begin());
         for (auto i: diff_qid_thr)
             cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
 
-        std::vector<int> diff_thr_qid;
+        std::vector<int> diff_thr_qid(4);
         if (vec_qid.size() > 0 && vec_thr.size() > 0)
             std::set_difference(vec_thr.begin(), vec_thr.end(), vec_qid.begin(), vec_qid.end(), diff_thr_qid.begin());
         for (auto i: diff_thr_qid)
