@@ -808,7 +808,10 @@ int main(int argc, char *argv[])
         else if (strncmp(arg, "-", 1) != 0)
             dashel_target_list.push_back(arg);
     }
-    
+
+    if (dashel_target_list.size() == 0)
+        dashel_target_list.push_back("ser:name=Thymio");
+
     // initialize Dashel plugins
     Dashel::initPlugins();
     
@@ -824,11 +827,11 @@ int main(int argc, char *argv[])
                     network->aeslLoadFile(nodeId, aesl_filename);
                 else
                 {
-                    const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-                    network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+                    network->aeslLoadFile(nodeId, "thymio_motion.aesl"); // in Windows will be in same directory as executable
                 }
             } catch ( std::runtime_error(e) ) {
-                std::cerr << "Error loading aesl for nodeId " << nodeId << std::endl;
+                const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+                network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
             }
         
         do {
