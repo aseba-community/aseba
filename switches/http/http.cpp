@@ -137,7 +137,6 @@ namespace Aseba
     
     HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations, bool dump) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
-    do_ping(true),
     asebaStreams(),
     inHttpStream(0),
     inAsebaStream(0),
@@ -145,7 +144,8 @@ namespace Aseba
     inAsebaPort(aseba_port),
     verbose(false),
     iterations(iterations),
-    do_dump(dump)
+    do_dump(dump),
+    do_ping(true)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -186,8 +186,8 @@ namespace Aseba
         for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
-            if (do_ping)
-                this->pingNetwork();
+            // if (do_ping) // redundant, pingNetwork looks at do_ping flag
+            this->pingNetwork();
             this->run1s();
             if (nodeDescriptionsReceived.size() >= targets.size())
                 break;
@@ -205,38 +205,44 @@ namespace Aseba
         }
     }
     
-    void HttpInterface::run()
+    void HttpInterface::pingNetwork()
     {
-        do
-        {
-            sendAvailableResponses();
-            if (!run1s())
-                break;
-            if (verbose && streamsToShutdown.size() > 0)
-            {
-                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
-                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
-                    cerr << " " << *si;
-                cerr << endl;
-            }
-            if (!streamsToShutdown.empty())
-            {
-                StreamSet::iterator i = streamsToShutdown.begin();
-                Dashel::Stream* stream_to_shutdown = *i;
-                streamsToShutdown.erase(*i); // invalidates iterator
-                try
-                {
-                    if (verbose)
-                        cerr << stream_to_shutdown << " shutting down stream" << endl;
-                    shutdownStream(stream_to_shutdown);
-                }
-                catch(Dashel::DashelException& e)
-                { }
-            }
-        } while (iterations-- != 0 and asebaStreams.size() != 0);
-        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
-            unscheduleAllResponses(i->first);
+        if (do_ping)
+            NodesManager::pingNetwork();
     }
+    
+//    void HttpInterface::run()
+//    {
+//        do
+//        {
+//            sendAvailableResponses();
+//            if (!run1s())
+//                break;
+//            if (verbose && streamsToShutdown.size() > 0)
+//            {
+//                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
+//                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+//                    cerr << " " << *si;
+//                cerr << endl;
+//            }
+//            if (!streamsToShutdown.empty())
+//            {
+//                StreamSet::iterator i = streamsToShutdown.begin();
+//                Dashel::Stream* stream_to_shutdown = *i;
+//                streamsToShutdown.erase(*i); // invalidates iterator
+//                try
+//                {
+//                    if (verbose)
+//                        cerr << stream_to_shutdown << " shutting down stream" << endl;
+//                    shutdownStream(stream_to_shutdown);
+//                }
+//                catch(Dashel::DashelException& e)
+//                { }
+//            }
+//        } while (iterations-- != 0 and asebaStreams.size() != 0);
+//        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
+//            unscheduleAllResponses(i->first);
+//    }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {

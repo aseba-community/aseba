@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
             }
 
         do {
-            network->pingNetwork();
+            network->pingNetwork(); // possibly not, if do_ping == false
         } while (network->run1s());
         delete network;
     }

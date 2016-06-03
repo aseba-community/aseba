@@ -77,6 +77,7 @@ var odo.degree
 ## broadcast variables
 var R_state.do = 1
 var R_state[27]
+var Unused = 42
 
 mic.threshold = 12
 
@@ -169,10 +170,10 @@ call math.fill(Qnx,0)
 motor.left.target = 0
 motor.right.target = 0
 emit Q_motion_noneleft([Qpc])
-
+  
 
 ### Simplified reporters
-## Every 10 Hz tick from buttons event, update reporters
+## Every 20 Hz tick from buttons event, update reporters
 onevent buttons
 call math.dot(distance.front, prox.horizontal,[13,26,39,26,13,0,0],11)
 call math.clamp(distance.front,190-distance.front,0,190) # client should clamp to 0..190
@@ -206,7 +207,7 @@ R_state = [	(((acc[0]+32)%32)&lt;&lt;10) + (((acc[1]+32)%32)&lt;&lt;5) + ((acc[2
 			prox.horizontal[0:6],
 			Qid[0:3]
 		  ]
-
+  
 ### Compressed state 258 bits
 # acc                   5 bit x 3       R_state[0]
 # buttons, tap  6 bit           R_state[1]
