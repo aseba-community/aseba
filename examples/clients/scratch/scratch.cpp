@@ -554,13 +554,13 @@ namespace Aseba
         }
         for (auto i: busy_qid)
             busy_threads_timeout[i] = UnifiedTime(1000);
-        
+
         // - temp for testing, check whether Q_motion_ended event had arrived
         std::vector<int> vec_qid(busy_qid.begin(),busy_qid.end());
         std::sort(vec_qid.begin(),vec_qid.end());
         std::vector<int> vec_thr(busy_threads.begin(),busy_threads.end());
         std::sort(vec_thr.begin(),vec_thr.end());
-        
+
         std::vector<int> diff_qid_thr;
         if (vec_qid.size() > 0 && vec_thr.size() > 0)
             std::set_difference(vec_qid.begin(), vec_qid.end(), vec_thr.begin(), vec_thr.end(),
