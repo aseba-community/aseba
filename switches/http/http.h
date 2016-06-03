@@ -90,7 +90,8 @@ namespace Aseba
         // debug variables
         bool verbose;
         int iterations;
-        bool dump;
+        bool do_dump;
+        bool do_ping;
         
         // Extract definitions from AESL files
         NodeIdCommonDefinitionsMap  commonDefinitions;
@@ -102,7 +103,8 @@ namespace Aseba
     public:
         //default values needed for unit testing
         HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false);
-        virtual void run();
+        //virtual void run();
+        virtual void pingNetwork();
         virtual void broadcastGetDescription();
         virtual void evNodes(HttpRequest* req, strings& args);
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);

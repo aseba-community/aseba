@@ -144,7 +144,8 @@ namespace Aseba
     inAsebaPort(aseba_port),
     verbose(false),
     iterations(iterations),
-    dump(dump)
+    do_dump(dump),
+    do_ping(true)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -185,6 +186,7 @@ namespace Aseba
         for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
+            // if (do_ping) // redundant, pingNetwork looks at do_ping flag
             this->pingNetwork();
             this->run1s();
             if (nodeDescriptionsReceived.size() >= targets.size())
@@ -203,38 +205,44 @@ namespace Aseba
         }
     }
     
-    void HttpInterface::run()
+    void HttpInterface::pingNetwork()
     {
-        do
-        {
-            sendAvailableResponses();
-            if (!run1s())
-                break;
-            if (verbose && streamsToShutdown.size() > 0)
-            {
-                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
-                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
-                    cerr << " " << *si;
-                cerr << endl;
-            }
-            if (!streamsToShutdown.empty())
-            {
-                StreamSet::iterator i = streamsToShutdown.begin();
-                Dashel::Stream* stream_to_shutdown = *i;
-                streamsToShutdown.erase(*i); // invalidates iterator
-                try
-                {
-                    if (verbose)
-                        cerr << stream_to_shutdown << " shutting down stream" << endl;
-                    shutdownStream(stream_to_shutdown);
-                }
-                catch(Dashel::DashelException& e)
-                { }
-            }
-        } while (iterations-- != 0 and asebaStreams.size() != 0);
-        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
-            unscheduleAllResponses(i->first);
+        if (do_ping)
+            NodesManager::pingNetwork();
     }
+    
+//    void HttpInterface::run()
+//    {
+//        do
+//        {
+//            sendAvailableResponses();
+//            if (!run1s())
+//                break;
+//            if (verbose && streamsToShutdown.size() > 0)
+//            {
+//                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
+//                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+//                    cerr << " " << *si;
+//                cerr << endl;
+//            }
+//            if (!streamsToShutdown.empty())
+//            {
+//                StreamSet::iterator i = streamsToShutdown.begin();
+//                Dashel::Stream* stream_to_shutdown = *i;
+//                streamsToShutdown.erase(*i); // invalidates iterator
+//                try
+//                {
+//                    if (verbose)
+//                        cerr << stream_to_shutdown << " shutting down stream" << endl;
+//                    shutdownStream(stream_to_shutdown);
+//                }
+//                catch(Dashel::DashelException& e)
+//                { }
+//            }
+//        } while (iterations-- != 0 and asebaStreams.size() != 0);
+//        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
+//            unscheduleAllResponses(i->first);
+//    }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {
@@ -304,7 +312,7 @@ namespace Aseba
             }
 
             // standard Aseba run loop
-            if (!step(timeout))
+            if (!step(50))
                 return false;
             const UnifiedTime now;
             timeout -= (now - startTime).value;
@@ -332,8 +340,8 @@ namespace Aseba
                         patched_message.dest = m->first;
                         patched_message.serialize(it->first);
                         it->first->flush();
-                        patched_message.dump(std::wcout);
-                        std::wcout << std::endl;
+//                        patched_message.dump(std::wcout);
+//                        std::wcout << std::endl;
                         return; // found a substitution, message sent to break out
                     }
             }
@@ -378,8 +386,12 @@ namespace Aseba
         if (!targetId) return;
         unsigned nodeId = targetId;
         nodeDescriptionsReceived.insert(nodeId);
+        // stop pinging while description is coming
+        do_ping = false;
+        // verbose
         if (verbose)
             wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
+        // if we known a program for this target and it hasn't been sent yet, send it
         if (nodeProgramsSent.find(targetId) == nodeProgramsSent.end() && nodeProgram.find(targetId) != nodeProgram.end())
             compileAndSendCode(targetId, nodeProgram[targetId]);
     }
@@ -494,7 +506,7 @@ namespace Aseba
         propagateCmdMessage(message);
 
         //
-        if (dump)
+        if (do_dump)
         {
             dumpTime(cout, true);
             std::wcout << message->source << " ";
