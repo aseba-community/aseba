@@ -39,13 +39,14 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 std::wstring read_source(const std::string& filename);
 void dump_source(const std::wstring& source);
 
-static const char short_options [] = "fcepnsdmi:";
+static const char short_options [] = "fcepnvsdumi:";
 static const struct option long_options[] = { 
 	{ "fail",	no_argument,			NULL,	'f'},
 	{ "comp_fail",	no_argument,		NULL,	'c'},
 	{ "exec_fail",	no_argument,		NULL,	'e'},
 	{ "post_fail",	no_argument,		NULL,	'p'},
 	{ "memcmp_fail",no_argument,		NULL,	'n'},
+	{ "event",		no_argument,		NULL,	'v'},
 	{ "source",		no_argument,		NULL,	's'},
 	{ "dump",		no_argument,		NULL,	'd'},
 	{ "memdump",	no_argument,		NULL,	'u'},
@@ -63,6 +64,7 @@ static void usage (int argc, char** argv)
 			<< "    -e | --exec_fail    Return EXIT_SUCCESS if execution fails" << std::endl
 			<< "    -p | --post_fail    Return EXIT_SUCCESS if post-execution state fails" << std::endl
 			<< "    -n | --memcmp_fail  Return EXIT_SUCCESS if memory comparison fails" << std::endl
+			<< "    -v | --event        Generate one internal event after executing the starting code" << std::endl
 			<< "    -s | --source       Dump the source code" << std::endl
 			<< "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
 			<< "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
@@ -142,6 +144,11 @@ struct AsebaNode
 			
 			++nativeDescs;
 		}
+		
+		TargetDescription::LocalEvent testLocalEvent;
+		testLocalEvent.name = L"test";
+		testLocalEvent.description = L"test local event";
+		d.localEvents.push_back(testLocalEvent);
 	}
 	
 	const TargetDescription* getTargetDescription() const
@@ -166,6 +173,13 @@ struct AsebaNode
 	{
 		// run VM
 		AsebaVMSetupEvent(&vm, ASEBA_EVENT_INIT);
+		AsebaVMRun(&vm, stepCount);
+	}
+	
+	void runEvent(int stepCount)
+	{
+		// run VM with user event
+		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
 		AsebaVMRun(&vm, stepCount);
 	}
 };
@@ -204,6 +218,7 @@ int main(int argc, char** argv)
 	bool should_execution_fail = false;
 	bool should_postexecution_fail = false;
 	bool should_memcmp_fail = false;
+	bool event = false;
 	bool source = false;
 	bool dump = false;
 	bool memDump = false;
@@ -245,6 +260,9 @@ int main(int argc, char** argv)
 				break;
 			case 'n':
 				should_memcmp_fail = true;
+				break;
+			case 'v':
+				event = true;
 				break;
 			case 's':
 				source = true;
@@ -325,6 +343,12 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 	node.run(stepCount);
+	
+	// setup extra event
+	if (event)
+	{
+		node.runEvent(stepCount);
+	}
 	
 	checkForError("Execution", should_execution_fail, AsebaExecutionErrorOccurred());
 	
