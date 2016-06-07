@@ -399,11 +399,12 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 		// warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
 		target->processMessage(message);
 
-		// See if we know this node already
+		// See if we know this node already or if the source is 0 (meaning coming from IDE)
 		const HttpDashelTarget::Node *node = target->getNodeByLocalId(message->source);
-		if(node != NULL) { // else if we cannot remap the source, discard the message and do not relay it
-			// remap source node to global node id
-			message->source = node->globalId;
+		if(node != NULL || message->source == 0) { // else if we cannot remap the source, discard the message and do not relay it
+			// remap source node to global node id if not sent from IDE
+			if (node != NULL)
+				message->source = node->globalId;
 
 			// check for execution error messages
 			switch(message->type) {
