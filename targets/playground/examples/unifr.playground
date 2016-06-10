@@ -1,5 +1,10 @@
 <!DOCTYPE aseba-playground>
 <aseba-playground>
+	<author name="Stéphane Magnenat" email="stephane at magnenat dot net" />
+	
+	<description lang="en">A multi-robot programming puzzle used by first year course at University of Fribourg (Switzerland).</description>
+	<description lang="fr">Un puzzle de programmation multi-robots utilisé dans un cours de première année à l'Université de Fribourg (Suisse).</description>
+	
 	<color name="wall" r="0.9" g="0.9" b="0.9" />
 	<color name="red" r="0.77" g="0.2" b="0.15" />
 	<color name="green" r="0" g="0." b="0.17" />
