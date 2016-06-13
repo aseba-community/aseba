@@ -31,7 +31,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        1%{?snapshot}%{?dist}
+Release:        2%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -78,6 +78,7 @@ BuildRequires: mesa-libGL-devel
 BuildRequires: mesa-libGLU-devel
 %endif
 BuildRequires: qt-devel
+BuildRequires: qtwebkit-devel
 BuildRequires: qwt-devel
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -184,6 +185,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-2
+- Add qt-webkit-devel build dependency so that Qt binaries are built
+
 * Fri Apr 22 2016 Dean Brettle <dean@brettle.com> - 1.5.3-1
 - Sync with upstream 1.5.3
 
