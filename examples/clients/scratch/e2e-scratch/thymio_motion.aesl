@@ -126,14 +126,14 @@ call leds.buttons(tmp[0],tmp[1],tmp[2],tmp[3])
 
 # Add motion task to queue
 sub motion_add
-if Qnx != Qpc or (Qnx == Qpc and Qtime[Qpc] == 0) then
+if (Qnx != Qpc or (Qnx == Qpc and Qtime[Qpc] == 0)) and Qid[0]!=tmp[0] and Qid[2]!=tmp[0] and Qid[2]!=tmp[0] and Qid[3]!=tmp[0] then
 	Qid[Qnx]   = tmp[0]
 	Qtime[Qnx] = tmp[1]
 	QspL[Qnx]  = tmp[2]
 	QspR[Qnx]  = tmp[3]
 	emit Q_motion_added([Qid[Qnx], Qtime[Qnx], QspL[Qnx], QspR[Qnx], Qnx])
 	Qnx = (Qnx+1)%QUEUE
-# else silently ignore queue overruns
+# else silently ignore
 end
 
 # Cancel motion task from queue using task id
