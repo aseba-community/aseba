@@ -352,6 +352,7 @@ namespace Aseba
                     busy_threads.insert(busyid); // don't rely on Q_motion_started
                     busy_threads_timeout[busyid] = UnifiedTime(1000);
                     UnifiedTime delayForPoll(200); delayForPoll.sleep();
+                    sendEvent(nodeId, args); // resend
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -381,6 +382,7 @@ namespace Aseba
                     busy_threads.insert(busyid); // don't rely on Q_motion_started
                     busy_threads_timeout[busyid] = UnifiedTime(1000);
                     UnifiedTime delayForPoll(200); delayForPoll.sleep();
+                    sendEvent(nodeId, args); // resend
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -408,6 +410,7 @@ namespace Aseba
                     busy_threads.insert(busyid); // don't rely on Q_motion_started
                     busy_threads_timeout[busyid] = UnifiedTime(1000);
                     UnifiedTime delayForPoll(200); delayForPoll.sleep();
+                    sendEvent(nodeId, args); // resend
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
