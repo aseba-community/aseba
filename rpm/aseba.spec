@@ -35,7 +35,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        3%{?snapshot}%{?dist}
+Release:        4%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -76,14 +76,15 @@ BuildRequires: libxml2-devel
 BuildRequires: hicolor-icon-theme
 BuildRequires: Mesa-libGL-devel
 BuildRequires: Mesa-libGLU-devel
+BuildRequires: libQtWebKit-devel
 # SUSE puts qcollectiongenerator in qt-devel-doc instead of qt-devel
 BuildRequires: qt-devel-doc
 %else
 BuildRequires: mesa-libGL-devel
 BuildRequires: mesa-libGLU-devel
+BuildRequires: qtwebkit-devel
 %endif
 BuildRequires: qt-devel
-BuildRequires: qtwebkit-devel
 BuildRequires: qwt-devel
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -193,6 +194,9 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-4
+- Use libQtWebKit-devel on SUSE
+
 * Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-3
 - Add blockly submodule fix build
 
