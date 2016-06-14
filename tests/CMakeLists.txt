@@ -44,6 +44,7 @@ add_test(multiple-logic-op ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_
 add_test(unicode ${EXECUTABLE_OUTPUT_PATH}/asebatest -d -s ${CMAKE_CURRENT_SOURCE_DIR}/data/unicode.txt)
 add_test(optimisation-binary-not ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-binary-not.txt)
 add_test(optimisation-bit-to-bit ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-bit-to-bit.txt)
+add_test(optimisation-absorbing-element ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-absorbing-element.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-absorbing-element.txt)
 add_test(for-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.txt)
 add_test(for-loop-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.txt)
 add_test(for-loop-single-inc ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.txt)

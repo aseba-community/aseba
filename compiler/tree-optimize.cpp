@@ -337,7 +337,7 @@ namespace Aseba
 		// POT mult/div to shift conversion
 		if (immediateRightChild && isPOT(immediateRightChild->value))
 		{
-			if (op == ASEBA_OP_MULT)
+			if (op == ASEBA_OP_MULT && immediateRightChild->value != 0)
 			{
 				op = ASEBA_OP_SHIFT_LEFT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
