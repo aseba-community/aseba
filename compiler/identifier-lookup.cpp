@@ -49,7 +49,7 @@ namespace Aseba
 		if (valid)
 		{
 			std::wostringstream oss;
-			oss << row + 1 << ':' << column;
+			oss << std::setw(4) << row + 1 << ':' << std::setw(4) << std::left << column;
 			return oss.str();
 		}
 		else

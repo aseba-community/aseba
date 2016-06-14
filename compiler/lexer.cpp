@@ -160,7 +160,7 @@ namespace Aseba
 	std::wstring Compiler::Token::toWString() const
 	{
 		std::wostringstream oss;
-		oss << translate(ERROR_LINE) << pos.row + 1 << translate(ERROR_COL) << pos.column + 1 << L" : ";
+		oss << pos.toWString() << " ";
 		oss << typeName();
 		if (type == TOKEN_INT_LITERAL)
 			oss << L" : " << iValue;

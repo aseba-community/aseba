@@ -72,6 +72,7 @@ namespace Aseba
 	
 	void Node::dump(std::wostream& dest, unsigned& indent) const
 	{
+		dest << sourcePos.toWString() << " ";
 		for (unsigned i = 0; i < indent; i++)
 			dest << L"    ";
 		dest << toWString() << L"\n";
@@ -83,12 +84,14 @@ namespace Aseba
 
 	void TupleVectorNode::dump(std::wostream& dest, unsigned& indent) const
 	{
+		dest << sourcePos.toWString() << " ";
 		for (unsigned i = 0; i < indent; i++)
 			dest << L"    ";
 		dest << toWString() << L"\n";
 		indent++;
 		for (size_t i = 0; i < children.size(); i++)
 		{
+			dest << sourcePos.toWString() << " ";
 			for (unsigned j = 0; j < indent; j++)
 				dest << L"    ";
 			dest << WFormatableString(L"[%0]:\n").arg(i);
