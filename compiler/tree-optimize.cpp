@@ -307,7 +307,6 @@ namespace Aseba
 		
 		// neutral element optimisation
 		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
-		if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV || op == ASEBA_OP_ADD || op == ASEBA_OP_SUB || op == ASEBA_OP_BIT_OR || op == ASEBA_OP_BIT_AND || op == ASEBA_OP_OR || op == ASEBA_OP_AND)
 		{
 			Node **survivor(0);
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
@@ -354,6 +353,45 @@ namespace Aseba
 				delete this;
 				return returNode;
 			}
+		}
+		
+		// absorbing element optimisation
+		{
+			SourcePos pos = sourcePos;
+			if (op == ASEBA_OP_MULT || op == ASEBA_OP_BIT_AND || op == ASEBA_OP_AND)
+			{
+				if ((immediateRightChild && (immediateRightChild->value == 0)) ||
+					(immediateLeftChild && (immediateLeftChild->value == 0)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L": operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, 0);
+				}
+			}
+			if (op == ASEBA_OP_BIT_OR)
+			{
+				if ((immediateRightChild && (immediateRightChild->value == -1)) ||
+					(immediateLeftChild && (immediateLeftChild->value == -1)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L": operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, -1);
+				}
+			}
+			if (op == ASEBA_OP_OR)
+			{
+				if ((immediateRightChild && (immediateRightChild->value != 0)) ||
+					(immediateLeftChild && (immediateLeftChild->value != 0)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L": operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, 1);
+				}
+			}
+				
 		}
 		
 		// POT mult/div to shift conversion
