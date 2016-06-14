@@ -252,6 +252,7 @@ namespace Aseba
 		assert(children[1]);
 		
 		// constants elimination
+		// if both children are constants, pre-compute the result
 		ImmediateNode* immediateLeftChild = dynamic_cast<ImmediateNode*>(children[0]);
 		ImmediateNode* immediateRightChild = dynamic_cast<ImmediateNode*>(children[1]);
 		if (immediateLeftChild && immediateRightChild)
@@ -304,9 +305,9 @@ namespace Aseba
 			return new ImmediateNode(pos, result);
 		}
 		
-		// multiplications by 1 or addition of 0
-		// TODO: make more generic the concept of neutral element
-		if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV || op == ASEBA_OP_ADD || op == ASEBA_OP_SUB)
+		// neutral element optimisation
+		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
+		if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV || op == ASEBA_OP_ADD || op == ASEBA_OP_SUB || op == ASEBA_OP_BIT_OR || op == ASEBA_OP_BIT_AND || op == ASEBA_OP_OR || op == ASEBA_OP_AND)
 		{
 			Node **survivor(0);
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
@@ -316,11 +317,32 @@ namespace Aseba
 				if (immediateLeftChild && (immediateLeftChild->value == 1) && (op == ASEBA_OP_MULT))
 					survivor = &children[1];
 			}
-			else
+			else if (op == ASEBA_OP_ADD || op == ASEBA_OP_SUB)
 			{
 				if (immediateRightChild && (immediateRightChild->value == 0))
 					survivor = &children[0];
 				if (immediateLeftChild && (immediateLeftChild->value == 0) && (op == ASEBA_OP_ADD))
+					survivor = &children[1];
+			}
+			else if (op == ASEBA_OP_BIT_OR || op == ASEBA_OP_OR)
+			{
+				if (immediateRightChild && (immediateRightChild->value == 0))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == 0))
+					survivor = &children[1];
+			}
+			else if (op == ASEBA_OP_BIT_AND)
+			{
+				if (immediateRightChild && (immediateRightChild->value == -1))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == -1))
+					survivor = &children[1];
+			}
+			else if (op == ASEBA_OP_AND)
+			{
+				if (immediateRightChild && (immediateRightChild->value != 0))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value != 0))
 					survivor = &children[1];
 			}
 			if (survivor)
