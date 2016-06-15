@@ -346,13 +346,17 @@ namespace Aseba
 			}
 			else if (op == ASEBA_OP_DIV)
 			{
-				if (immediateRightChild->value == 0)
-					throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
 					*dump << sourcePos.toWString() << L": division transformed to right shift\n";
 			}
+		}
+		
+		// detect static division by zero
+		if (op == ASEBA_OP_DIV && immediateRightChild && immediateRightChild->value == 0)
+		{
+			throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 		}
 		
 		return this;
