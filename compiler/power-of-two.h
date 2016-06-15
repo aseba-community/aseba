@@ -32,7 +32,7 @@ namespace Aseba
 	bool isPOT(T number)
 	{
 		if (number == 0)
-			return true;
+			return false;
 		while ((number & 1) == 0)
 			number >>= 1;
 		return number == 1;
