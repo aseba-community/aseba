@@ -65,6 +65,7 @@ namespace Aseba
         VariablesMap::iterator v = vm.find(UTF8ToWString("R_state"));
         if (v != vm.end())
         {
+            // parse R_state and store values in variable cache
             if (v->second.first == variables->start)
                 receiveStateVariables(variables->source, variables->variables);
         }
@@ -91,6 +92,8 @@ namespace Aseba
                 cerr << "Q_motion_ended id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
                      << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
             }
+            // remove from outgoingMessage queue
+            unscheduleMessage(userMsg->source, userMsg->data[0]);
         }
         if (commonDefinitions[userMsg->source].events.size() >= userMsg->type &&
             commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"Q_motion_added")==0 &&
@@ -104,12 +107,18 @@ namespace Aseba
                 cerr << "Q_motion_added id " << userMsg->data[0] << " time " << userMsg->data[1] << " spL "
                 << userMsg->data[2] << " spR " << userMsg->data[3] << " pc " << userMsg->data[4] << endl;
             }
+            // remove from outgoingMessage queue
+            unscheduleMessage(userMsg->source, userMsg->data[0]);
         }
         if (commonDefinitions[userMsg->source].events.size() >= userMsg->type &&
             commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state_update")==0 &&
             userMsg->data.size() >= 1)
         {
+            // parse R_state and store values in variable cache
             receiveStateVariables(userMsg->source, userMsg->data);
+
+            // resend unacknowledged messages
+            resendScheduledMessage(userMsg->source);
         }
         
         HttpInterface::incomingUserMsg(userMsg);
@@ -348,11 +357,7 @@ namespace Aseba
                     args.push_back(std::to_string(time));
                     args.push_back(std::to_string((mm > 0) ? speed : -speed ));
                     args.push_back(std::to_string((mm > 0) ? speed : -speed ));
-                    sendEvent(nodeId, args);
-                    busy_threads.insert(busyid); // don't rely on Q_motion_started
-                    busy_threads_timeout[busyid] = UnifiedTime(1000);
-                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
-                    sendEvent(nodeId, args); // resend
+                    sendScheduledEvent(nodeId, args, busyid);
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -378,11 +383,7 @@ namespace Aseba
                     args.push_back(std::to_string(time));
                     args.push_back(std::to_string((degrees > 0) ?  speed : -speed ));
                     args.push_back(std::to_string((degrees > 0) ? -speed :  speed ));
-                    sendEvent(nodeId, args);
-                    busy_threads.insert(busyid); // don't rely on Q_motion_started
-                    busy_threads_timeout[busyid] = UnifiedTime(1000);
-                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
-                    sendEvent(nodeId, args); // resend
+                    sendScheduledEvent(nodeId, args, busyid);
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -406,11 +407,7 @@ namespace Aseba
                     args.push_back(std::to_string(time));
                     args.push_back(std::to_string((degrees > 0) ?  v_out : v_in  ));
                     args.push_back(std::to_string((degrees > 0) ?  v_in  : v_out ));
-                    sendEvent(nodeId, args);
-                    busy_threads.insert(busyid); // don't rely on Q_motion_started
-                    busy_threads_timeout[busyid] = UnifiedTime(1000);
-                    UnifiedTime delayForPoll(200); delayForPoll.sleep();
-                    sendEvent(nodeId, args); // resend
+                    sendScheduledEvent(nodeId, args, busyid);
                     finishResponse(req, 200, std::to_string(busyid)); // succeeds with 200 OK, reports busy id
                     return;
                 }
@@ -494,6 +491,48 @@ namespace Aseba
         std::wcstombs(name, w.c_str(), 127);
         return name;
     }
+    
+    void ScratchInterface::sendScheduledEvent(const unsigned nodeId, const strings& args, int busyid)
+    {
+        assert(busyid == atoi(args[1].c_str()));
+        sendEvent(nodeId, args);
+        
+        UnifiedTime now;
+        ScheduledUserMessage msg(now,args);
+        outgoingMessages[nodeId].push(msg);
+
+        busy_threads.insert(busyid); // don't rely on Q_motion_added
+        busy_threads_timeout[busyid] = UnifiedTime(5000);
+        UnifiedTime delayForPoll(200);
+        delayForPoll.sleep();
+        // sendEvent(nodeId, args); // resend
+    }
+    
+    void ScratchInterface::unscheduleMessage(const unsigned nodeId, const unsigned busyid)
+    {
+        if ( ! outgoingMessages[nodeId].empty())
+        {
+            strings args(outgoingMessages[nodeId].front().second);
+            if (args.size() > 1)
+                if (busyid == atoi(args[1].c_str()))
+                    outgoingMessages[nodeId].pop();
+        }
+        
+    }
+
+    void ScratchInterface::resendScheduledMessage(const unsigned nodeId)
+    {
+        if ( ! outgoingMessages[nodeId].empty())
+        {
+            UnifiedTime scheduled = outgoingMessages[nodeId].front().first;
+            UnifiedTime now;
+            if (now - scheduled <= 600)
+                sendEvent(nodeId, outgoingMessages[nodeId].front().second);
+            else
+                outgoingMessages[nodeId].pop();
+        }
+    }
+    
     bool ScratchInterface::getCachedVal(const unsigned nodeId, const std::string& varName,
                                         std::vector<short>& cachedval)
     {
@@ -564,19 +603,19 @@ namespace Aseba
         std::vector<int> vec_thr(busy_threads.begin(),busy_threads.end());
         std::sort(vec_thr.begin(),vec_thr.end());
 
-        std::vector<int> diff_qid_thr;
-        if (vec_qid.size() > 0 && vec_thr.size() > 0)
-            std::set_difference(vec_qid.begin(), vec_qid.end(), vec_thr.begin(), vec_thr.end(),
-                                std::inserter(diff_qid_thr, diff_qid_thr.end()));
-        for (auto i: diff_qid_thr)
-            cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
-
-        std::vector<int> diff_thr_qid;
-        if (vec_qid.size() > 0 && vec_thr.size() > 0)
-            std::set_difference(vec_thr.begin(), vec_thr.end(), vec_qid.begin(), vec_qid.end(),
-                                std::inserter(diff_thr_qid, diff_thr_qid.end()));
-        for (auto i: diff_thr_qid)
-            cerr << "Warning " << i << " in busy_threads but not in Qid" << endl;
+//        std::vector<int> diff_qid_thr;
+//        if (vec_qid.size() > 0 && vec_thr.size() > 0)
+//            std::set_difference(vec_qid.begin(), vec_qid.end(), vec_thr.begin(), vec_thr.end(),
+//                                std::inserter(diff_qid_thr, diff_qid_thr.end()));
+//        for (auto i: diff_qid_thr)
+//            cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
+//
+//        std::vector<int> diff_thr_qid;
+//        if (vec_qid.size() > 0 && vec_thr.size() > 0)
+//            std::set_difference(vec_thr.begin(), vec_thr.end(), vec_qid.begin(), vec_qid.end(),
+//                                std::inserter(diff_thr_qid, diff_thr_qid.end()));
+//        for (auto i: diff_thr_qid)
+//            cerr << "Warning " << i << " in busy_threads but not in Qid" << endl;
 
         // - report all busy threads conservatively
         std::set<int> busy_all(busy_threads.begin(), busy_threads.end());
@@ -588,6 +627,7 @@ namespace Aseba
             {
                 busy_threads_timeout.erase(i);
                 busy_threads.erase(i);
+                unscheduleMessage(nodeId, i);
                 cerr << "Warning killing unresponsive thread " << i << endl;
                 continue;
             }

@@ -15,6 +15,9 @@ namespace Aseba
     {
     public:
         typedef std::vector<std::string>      strings;
+        typedef std::pair<UnifiedTime, strings> ScheduledUserMessage;
+        typedef std::queue<ScheduledUserMessage> UserMessageQueue;
+        typedef std::map<unsigned, UserMessageQueue> NodeUserMessageQueueMap;
         
     protected:
         //variable cache
@@ -28,6 +31,7 @@ namespace Aseba
         std::map<unsigned, unsigned> blink_state;
         std::map<unsigned, unsigned> scratch_dial;
         std::map< std::pair<unsigned,unsigned>, unsigned > leds; // top, bottom-left, bottom-right
+        NodeUserMessageQueueMap outgoingMessages;
         
     public:
         ScratchInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false);
@@ -49,6 +53,9 @@ namespace Aseba
         virtual strings makeLedsCircleVector(unsigned dial);
         virtual strings makeLedsRGBVector(unsigned color);
         virtual void receiveStateVariables(const unsigned nodeId, const std::vector<short> data);
+        virtual void sendScheduledEvent(const unsigned nodeId, const strings& args, int busyid);
+        virtual void unscheduleMessage(const unsigned nodeId, const unsigned busyid);
+        virtual void resendScheduledMessage(const unsigned nodeId);
         
     protected:
         const std::map<std::string, std::pair<unsigned, unsigned> > interesting_state_variables =
