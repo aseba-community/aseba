@@ -278,7 +278,19 @@ namespace Aseba
                 else if (req->tokens[2].find("scratch_set_leds")==0)
                 { //
                     unsigned color = stoi(req->tokens[3]) % 198;
-                    unsigned mask = stoi(req->tokens[4]) & 7;
+                    unsigned mask;
+                    if (req->tokens[4].compare("all")==0)
+                        mask = 7;
+                    else if (req->tokens[4].compare("top")==0)
+                        mask = 1;
+                    else if (req->tokens[4].compare("bottom")==0)
+                        mask = 6;
+                    else if (req->tokens[4].compare("bottom%20left")==0)
+                        mask = 2;
+                    else if (req->tokens[4].compare("bottom%20right")==0)
+                        mask = 4;
+                    else
+                        mask = stoi(req->tokens[4]) & 7;
                     strings args = makeLedsRGBVector(color); // by default, "V_leds_top"
                     if ((mask & 1) == 1)
                         leds[std::make_pair(nodeId,0)]=color, sendEvent(nodeId, args);
@@ -294,7 +306,19 @@ namespace Aseba
                 else if (req->tokens[2].find("scratch_change_leds")==0)
                 { //
                     unsigned delta = stoi(req->tokens[3]) % 198;
-                    unsigned mask = stoi(req->tokens[4]) & 7;
+                    unsigned mask;
+                    if (req->tokens[4].compare("all")==0)
+                        mask = 7;
+                    else if (req->tokens[4].compare("top")==0)
+                        mask = 1;
+                    else if (req->tokens[4].compare("bottom")==0)
+                        mask = 6;
+                    else if (req->tokens[4].compare("bottom%20left")==0)
+                        mask = 2;
+                    else if (req->tokens[4].compare("bottom%20right")==0)
+                        mask = 4;
+                    else
+                        mask = stoi(req->tokens[4]) & 7;
                     if ((mask & 1) == 1)
                     {
                         strings args = makeLedsRGBVector(leds[std::make_pair(nodeId,0)] = (leds[std::make_pair(nodeId,0)] + delta) % 198);
@@ -714,15 +738,15 @@ namespace Aseba
         // derived 6: accelerometer values; formatted for menus
         if (getCachedVal(nodeId, "acc", cv))
         {
-            result << "tilt/right_left " << cv[0] << endl;
-            result << "tilt/front_back " << cv[1] << endl;
-            result << "tilt/top_bottom " << cv[2] << endl;
+            result << "tilt/right-left " << cv[0] << endl;
+            result << "tilt/front-back " << cv[1] << endl;
+            result << "tilt/top-bottom " << cv[2] << endl;
         }
         
         // derived 7: LED values; formatted for menus
         result << "leds/top " << leds[std::make_pair(nodeId,0)] << endl;
-        result << "leds/bottom/left " << leds[std::make_pair(nodeId,1)] << endl;
-        result << "leds/bottom/right " << leds[std::make_pair(nodeId,2)] << endl;
+        result << "leds/bottom%20left " << leds[std::make_pair(nodeId,1)] << endl;
+        result << "leds/bottom%20right " << leds[std::make_pair(nodeId,2)] << endl;
         
         // derived 8: clap warning
         std::vector<short> mic_threshold, mic_intensity;
@@ -830,9 +854,9 @@ namespace Aseba
         payload = variable_cache[state_variable_addresses["acc"]];
         if (payload.size() == 1)
         {
-            variable_cache[state_variable_addresses["acc"]].assign(1, (payload[0] >> 10) % 32);
-            variable_cache[state_variable_addresses["acc"]].assign(2, (payload[0] >> 5) % 32);
-            variable_cache[state_variable_addresses["acc"]].assign(3, payload[0] % 32);
+            variable_cache[state_variable_addresses["acc"]].assign(3, (((payload[0] >> 10) % 32) - 16) * 2);
+            variable_cache[state_variable_addresses["acc"]][1] = (((payload[0] >> 5) % 32) - 16) * 2;
+            variable_cache[state_variable_addresses["acc"]][2] = ((payload[0] % 32) - 16) * 2;
         }
         // extract encoded values 3: distance
         payload = variable_cache[state_variable_addresses["distance.back"]];
