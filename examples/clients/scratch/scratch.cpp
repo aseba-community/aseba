@@ -688,6 +688,10 @@ namespace Aseba
         
         if (getCachedVal(nodeId, "angle.front", cv))
             result << "angle/front " << cv.front() << endl;
+        if (getCachedVal(nodeId, "angle.back", cv))
+            result << "angle/back " << cv.front() << endl;
+        if (getCachedVal(nodeId, "angle.ground", cv))
+            result << "angle/ground " << cv.front() << endl;
 
         // derived 4: odometry; formatted for menus
         if (getCachedVal(nodeId, "odo.degree", cv))
@@ -836,6 +840,13 @@ namespace Aseba
         {
             variable_cache[state_variable_addresses["distance.back"]].assign(1, (payload[0] >> 8) % 256);
             variable_cache[state_variable_addresses["distance.front"]].assign(1, payload[0] % 256);
+        }
+        // extract encoded values 4: angle.back and angle.ground
+        payload = variable_cache[state_variable_addresses["angle.back"]];
+        if (payload.size() == 1)
+        {
+            variable_cache[state_variable_addresses["angle.ground"]].assign(1, ((payload[0] >> 8) % 256) - 90);
+            variable_cache[state_variable_addresses["angle.back"]].assign(1, (payload[0] % 256) - 90);
         }
     }
 
