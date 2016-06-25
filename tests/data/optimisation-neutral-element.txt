@@ -1,0 +1,71 @@
+var a = 13
+var b = a
+var c = a - 1
+
+var result[18]
+
+# addition
+result[0] = a + 0
+result[1] = 0 + a
+
+# substraction
+result[2] = a - 0
+
+# multiplication
+result[3] = a * 1
+result[4] = 1 * a
+
+# division
+result[5] = a / 1
+
+# binary or
+result[6] = a | 0
+result[7] = a | a
+
+# binary and
+result[8] = a & -1
+result[9] = -1 & a
+
+# logical and
+if ((0 == 0) and (a == b)) then
+	result[10] = 1
+else
+	result[10] = 0
+end
+if ((0 == 0) and (a == c)) then
+	result[11] = 0
+else
+	result[11] = 1
+end
+if ((a == b) and (0 == 0)) then
+	result[12] = 1
+else
+	result[12] = 0
+end
+if ((a == c) and (0 == 0)) then
+	result[13] = 0
+else
+	result[13] = 1
+end
+
+# logical or
+if ((0 == 1) or (a == b)) then
+	result[14] = 1
+else
+	result[14] = 0
+end
+if ((0 == 1) or (a == c)) then
+	result[15] = 0
+else
+	result[15] = 1
+end
+if ((a == b) or (0 == 1)) then
+	result[16] = 1
+else
+	result[16] = 0
+end
+if ((a == c) or (0 == 1)) then
+	result[17] = 0
+else
+	result[17] = 1
+end

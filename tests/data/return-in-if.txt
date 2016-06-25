@@ -1,0 +1,7 @@
+var a = 1
+
+onevent test
+	a = 3
+	if a == 2 then
+		return
+	end

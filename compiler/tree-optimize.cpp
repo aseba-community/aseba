@@ -96,7 +96,7 @@ namespace Aseba
 		)
 		{
 			if (dump)
-				*dump << sourcePos.toWString() << L": if test removed because it had no associated code\n";
+				*dump << sourcePos.toWString() << L" if test removed because it had no associated code\n";
 			delete this;
 			return NULL;
 		}
@@ -108,7 +108,7 @@ namespace Aseba
 			if (constantExpression->value != 0)
 			{
 				if (dump)
-					*dump << sourcePos.toWString() << L": if test simplified because condition was always true\n";
+					*dump << sourcePos.toWString() << L" if test simplified because condition was always true\n";
 				children[1] = 0;
 				delete this;
 				return trueBlock;
@@ -116,7 +116,7 @@ namespace Aseba
 			else
 			{
 				if (dump)
-					*dump << sourcePos.toWString() << L": if test simplified because condition was always false\n";
+					*dump << sourcePos.toWString() << L" if test simplified because condition was always false\n";
 				if (children.size() > 2)
 					children[2] = 0;
 				delete this;
@@ -146,7 +146,7 @@ namespace Aseba
 		}
 		
 		if (dump)
-			*dump << sourcePos.toWString() << L": if condition folded inside node\n";
+			*dump << sourcePos.toWString() << L" if condition folded inside node\n";
 		
 		delete this;
 		
@@ -178,7 +178,7 @@ namespace Aseba
 			else
 			{
 				if (dump)
-					*dump << sourcePos.toWString() << L": while removed because condition is always false\n";
+					*dump << sourcePos.toWString() << L" while removed because condition is always false\n";
 				delete this;
 				return NULL;
 			}
@@ -188,7 +188,7 @@ namespace Aseba
 		if ((children[1] == 0) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
 		{
 			if (dump)
-				*dump << sourcePos.toWString() << L": while removed because it contained no statement\n";
+				*dump << sourcePos.toWString() << L" while removed because it contained no statement\n";
 			delete this;
 			return NULL;
 		}
@@ -204,7 +204,7 @@ namespace Aseba
 		children[1] = 0;
 		
 		if (dump)
-			*dump << sourcePos.toWString() << L": while condition folded inside node\n";
+			*dump << sourcePos.toWString() << L" while condition folded inside node\n";
 		
 		delete this;
 		
@@ -252,6 +252,7 @@ namespace Aseba
 		assert(children[1]);
 		
 		// constants elimination
+		// if both children are constants, pre-compute the result
 		ImmediateNode* immediateLeftChild = dynamic_cast<ImmediateNode*>(children[0]);
 		ImmediateNode* immediateRightChild = dynamic_cast<ImmediateNode*>(children[1]);
 		if (immediateLeftChild && immediateRightChild)
@@ -299,14 +300,13 @@ namespace Aseba
 			}
 			
 			if (dump)
-				*dump << sourcePos.toWString() << L": binary arithmetic expression simplified\n";
+				*dump << sourcePos.toWString() << L" binary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
 		
-		// multiplications by 1 or addition of 0
-		// TODO: make more generic the concept of neutral element
-		if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV || op == ASEBA_OP_ADD || op == ASEBA_OP_SUB)
+		// neutral element optimisation
+		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
 		{
 			Node **survivor(0);
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
@@ -316,22 +316,82 @@ namespace Aseba
 				if (immediateLeftChild && (immediateLeftChild->value == 1) && (op == ASEBA_OP_MULT))
 					survivor = &children[1];
 			}
-			else
+			else if (op == ASEBA_OP_ADD || op == ASEBA_OP_SUB)
 			{
 				if (immediateRightChild && (immediateRightChild->value == 0))
 					survivor = &children[0];
 				if (immediateLeftChild && (immediateLeftChild->value == 0) && (op == ASEBA_OP_ADD))
 					survivor = &children[1];
 			}
+			else if (op == ASEBA_OP_BIT_OR || op == ASEBA_OP_OR)
+			{
+				if (immediateRightChild && (immediateRightChild->value == 0))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == 0))
+					survivor = &children[1];
+			}
+			else if (op == ASEBA_OP_BIT_AND)
+			{
+				if (immediateRightChild && (immediateRightChild->value == -1))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value == -1))
+					survivor = &children[1];
+			}
+			else if (op == ASEBA_OP_AND)
+			{
+				if (immediateRightChild && (immediateRightChild->value != 0))
+					survivor = &children[0];
+				if (immediateLeftChild && (immediateLeftChild->value != 0))
+					survivor = &children[1];
+			}
 			if (survivor)
 			{
 				if (dump)
-					*dump << sourcePos.toWString() << L": operation with neutral element removed\n";
+					*dump << sourcePos.toWString() << L" operation with neutral element removed\n";
 				Node *returNode = *survivor;
 				*survivor = 0;
 				delete this;
 				return returNode;
 			}
+		}
+		
+		// absorbing element optimisation
+		{
+			SourcePos pos = sourcePos;
+			if (op == ASEBA_OP_MULT || op == ASEBA_OP_BIT_AND || op == ASEBA_OP_AND)
+			{
+				if ((immediateRightChild && (immediateRightChild->value == 0)) ||
+					(immediateLeftChild && (immediateLeftChild->value == 0)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, 0);
+				}
+			}
+			if (op == ASEBA_OP_BIT_OR)
+			{
+				if ((immediateRightChild && (immediateRightChild->value == -1)) ||
+					(immediateLeftChild && (immediateLeftChild->value == -1)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, -1);
+				}
+			}
+			if (op == ASEBA_OP_OR)
+			{
+				if ((immediateRightChild && (immediateRightChild->value != 0)) ||
+					(immediateLeftChild && (immediateLeftChild->value != 0)))
+				{
+					if (dump)
+						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
+					delete this;
+					return new ImmediateNode(pos, 1);
+				}
+			}
+				
 		}
 		
 		// POT mult/div to shift conversion
@@ -342,17 +402,21 @@ namespace Aseba
 				op = ASEBA_OP_SHIFT_LEFT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
-					*dump << sourcePos.toWString() << L": multiplication transformed to left shift\n";
+					*dump << sourcePos.toWString() << L" multiplication transformed to left shift\n";
 			}
 			else if (op == ASEBA_OP_DIV)
 			{
-				if (immediateRightChild->value == 0)
-					throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 				op = ASEBA_OP_SHIFT_RIGHT;
 				immediateRightChild->value = shiftFromPOT(immediateRightChild->value);
 				if (dump)
-					*dump << sourcePos.toWString() << L": division transformed to right shift\n";
+					*dump << sourcePos.toWString() << L" division transformed to right shift\n";
 			}
+		}
+		
+		// detect static division by zero
+		if (op == ASEBA_OP_DIV && immediateRightChild && immediateRightChild->value == 0)
+		{
+			throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 		}
 		
 		return this;
@@ -412,7 +476,7 @@ namespace Aseba
 			}
 			
 			if (dump)
-				*dump << sourcePos.toWString() << L": unary arithmetic expression simplified\n";
+				*dump << sourcePos.toWString() << L" unary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
@@ -423,7 +487,7 @@ namespace Aseba
 			{
 				// de Morgan removal of not
 				if (dump)
-					*dump << sourcePos.toWString() << L": not removed using de Morgan\n";
+					*dump << sourcePos.toWString() << L" not removed using de Morgan\n";
 				binaryNodeChild->deMorganNotRemoval();
 				children.clear();
 				delete this;
@@ -473,7 +537,7 @@ namespace Aseba
 			SourcePos pos = sourcePos;
 			
 			if (dump)
-				*dump << sourcePos.toWString() << L": array access transformed to single variable access\n";
+				*dump << sourcePos.toWString() << L" array access transformed to single variable access\n";
 			delete this;
 			return new LoadNode(pos, varAddr);
 		}
@@ -503,7 +567,7 @@ namespace Aseba
 			SourcePos pos = sourcePos;
 			
 			if (dump)
-				*dump << sourcePos.toWString() << L": array access transformed to single variable access\n";
+				*dump << sourcePos.toWString() << L" array access transformed to single variable access\n";
 			delete this;
 			return new StoreNode(pos, varAddr);
 		}

@@ -4,17 +4,21 @@ Name:           aseba
 # referencing below
 %global source_major 1
 %global source_minor 5
-%global source_patch 2
+%global source_patch 3
 Version:        %{source_major}.%{source_minor}.%{source_patch}
 
 # Update the following line with the git commit hash of the revision to use
 # for example by running git show-ref -s --tags RELEASE_TAG
-%global commit c20f34d28b045198fdde4e8734461dac1fdf3899
+%global commit b18fb8f21a866495ef379c551ef104f88d37bd72
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # Update the following line with the git commit has of the revision of Catch
 # associated with the Catch submodule. Run 'git submodule' to find it.
 %global catchcommit 3b18d9e962835100d7e12ac80d22882e408e40dc
+
+# Update the following line with the git commit has of the revision of blockly
+# associated with the blockly submodule. Run 'git submodule' to find it.
+%global blocklycommit 38e4085359a7b9578d0d5d26e9e291413d97e335
 
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
 # and only if the commit hash is not from a git tag for an existing source
@@ -31,7 +35,7 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # release version (i.e. the "Version:" line above refers to a future
 # source release version), then set the number to 0.0. Otherwise, leave the
 # the number unchanged. It will get bumped when you run rpmdev-bumpspec.
-Release:        1%{?snapshot}%{?dist}
+Release:        4%{?snapshot}%{?dist}
 Summary:        A set of tools which allow beginners to program robots easily and efficiently
 
 %global lib_pkg_name lib%{name}%{source_major}
@@ -50,6 +54,7 @@ License:        LGPLv3
 URL:            http://aseba.wikidot.com
 Source0:        https://github.com/aseba-community/aseba/archive/%{commit}.tar.gz
 Source1:        https://github.com/philsquared/Catch/archive/%{catchcommit}.tar.gz
+Source2:        https://github.com/aseba-community/blockly/archive/%{blocklycommit}.tar.gz
 Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
@@ -71,11 +76,13 @@ BuildRequires: libxml2-devel
 BuildRequires: hicolor-icon-theme
 BuildRequires: Mesa-libGL-devel
 BuildRequires: Mesa-libGLU-devel
+BuildRequires: libQtWebKit-devel
 # SUSE puts qcollectiongenerator in qt-devel-doc instead of qt-devel
 BuildRequires: qt-devel-doc
 %else
 BuildRequires: mesa-libGL-devel
 BuildRequires: mesa-libGLU-devel
+BuildRequires: qtwebkit-devel
 %endif
 BuildRequires: qt-devel
 BuildRequires: qwt-devel
@@ -111,8 +118,11 @@ developing applications that use %{name}.
 %prep
 %setup -q -n %{name}-%{commit}
 %setup -q -T -D -b 1 -n %{name}-%{commit}
+%setup -q -T -D -b 2 -n %{name}-%{commit}
 rm -rf tests/externals/Catch
 mv ../Catch-%{catchcommit} tests/externals/Catch
+rm -rf clients/studio/plugins/ThymioBlockly/blockly
+mv ../blockly-%{blocklycommit} clients/studio/plugins/ThymioBlockly/blockly
 %patch0 -p1
 
 %build
@@ -184,6 +194,18 @@ fi
 %{_libdir}/*.so
 
 %changelog
+* Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-4
+- Use libQtWebKit-devel on SUSE
+
+* Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-3
+- Add blockly submodule fix build
+
+* Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-2
+- Add qt-webkit-devel build dependency so that Qt binaries are built
+
+* Fri Apr 22 2016 Dean Brettle <dean@brettle.com> - 1.5.3-1
+- Sync with upstream 1.5.3
+
 * Mon Mar 07 2016 Dean Brettle <dean@brettle.com> - 1.5.2-1
 - Sync with upstream 1.5.2
 

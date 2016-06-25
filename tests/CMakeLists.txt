@@ -44,6 +44,8 @@ add_test(multiple-logic-op ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_
 add_test(unicode ${EXECUTABLE_OUTPUT_PATH}/asebatest -d -s ${CMAKE_CURRENT_SOURCE_DIR}/data/unicode.txt)
 add_test(optimisation-binary-not ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-binary-not.txt)
 add_test(optimisation-bit-to-bit ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-bit-to-bit.txt)
+add_test(optimisation-neutral-element ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-neutral-element.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-neutral-element.txt)
+add_test(optimisation-absorbing-element ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-absorbing-element.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/optimisation-absorbing-element.txt)
 add_test(for-loop ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop.txt)
 add_test(for-loop-vector ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-vector.txt)
 add_test(for-loop-single-inc ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/for-loop-single-inc.txt)
@@ -79,6 +81,7 @@ add_test(negation-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CM
 add_test(division-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/division-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/division-optimisation.txt)
 add_test(if-not-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.txt)
 add_test(callsub-before-sub-decl ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/callsub-before-sub-decl.txt)
+add_test(return-in-if ${EXECUTABLE_OUTPUT_PATH}/asebatest --event --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/return-in-if.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/return-in-if.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --exec_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)

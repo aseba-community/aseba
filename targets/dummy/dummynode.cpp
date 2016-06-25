@@ -26,6 +26,7 @@
 #include "../../vm/natives.h"
 #include "../../common/productids.h"
 #include "../../common/consts.h"
+#include "../../common/utils/utils.h"
 #include "../../transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <iostream>
@@ -48,6 +49,7 @@ private:
 		sint16 source;
 		sint16 args[32];
 		sint16 productId;
+		sint16 timerPeriod;
 		sint16 user[1024];
 	} variables;
 	char mutableName[12];
@@ -154,14 +156,45 @@ public:
 		AsebaVMRun(&vm, 1000);
 	}
 	
-	virtual void applicationStep()
+	void run()
 	{
-		// reschedule a periodic event if we are not in step by step
-		if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
-			AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
-		
-		// run VM
-		AsebaVMRun(&vm, 1000);
+		// wait a given time, return if stop was called
+		Aseba::UnifiedTime startTime;
+		int timeout(variables.timerPeriod > 0 ? variables.timerPeriod : -1);
+		while (step(timeout))
+		{
+			if (variables.timerPeriod > 0)
+			{
+				if (int((Aseba::UnifiedTime() - startTime).value) >= variables.timerPeriod)
+				{
+					// reschedule a periodic event if we are not in step by step
+					if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+						AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
+					
+					// run VM
+					AsebaVMRun(&vm, 1000);
+					
+					// save current time for next iteration
+					Aseba::UnifiedTime currentTime;
+					timeout = 2*int(variables.timerPeriod) - int((currentTime - startTime).value);
+					if (timeout < 0)
+						timeout = 0;
+					startTime = currentTime;
+				}
+			}
+			else
+			{
+				timeout = -1;
+			}
+			
+			// disconnect old streams
+			for (size_t i = 0; i < toDisconnect.size(); ++i)
+			{
+				closeStream(toDisconnect[i]);
+				std::cerr << this << " : Old client disconnected by new client." << std::endl;
+			}
+			toDisconnect.clear();
+		}
 	}
 } node;
 
@@ -234,7 +267,7 @@ extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 
 
 static const AsebaLocalEventDescription localEvents[] = {
-	{ "timer", "periodic timer at 50 Hz" },
+	{ "timer", "periodic timer at a given frequency" },
 	{ NULL, NULL }
 };
 
@@ -290,17 +323,5 @@ int main(int argc, char* argv[])
 		}
 	}
 	node.listen(basePort, deltaPort);
-	while (node.step(10))
-	{
-		// disconnect old streams
-		for (size_t i = 0; i < node.toDisconnect.size(); ++i)
-		{
-			node.closeStream(node.toDisconnect[i]);
-			std::cerr << &node << " : Old client disconnected by new client." << std::endl;
-		}
-		node.toDisconnect.clear();
-		
-		// run VM
-		node.applicationStep();
-	}
+	node.run();
 }
