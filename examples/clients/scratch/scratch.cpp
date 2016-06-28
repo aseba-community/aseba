@@ -400,6 +400,7 @@ namespace Aseba
                     {
                         speed = 43 * 32/10;
                         time = abs(degrees) * 2.0;
+                        time = degrees*degrees * 2.0 / (abs(degrees)*1.016 - 0.52); // nonlinear correction
                     }
                     strings args;
                     args.push_back("Q_add_motion");
@@ -529,7 +530,6 @@ namespace Aseba
         busy_threads_timeout[busyid] = UnifiedTime(5000);
         UnifiedTime delayForPoll(200);
         delayForPoll.sleep();
-        // sendEvent(nodeId, args); // resend
     }
     
     void ScratchInterface::unscheduleMessage(const unsigned nodeId, const unsigned busyid)
@@ -550,7 +550,7 @@ namespace Aseba
         {
             UnifiedTime scheduled = outgoingMessages[nodeId].front().first;
             UnifiedTime now;
-            if (now - scheduled <= 600)
+            if (now - scheduled <= 800)
                 sendEvent(nodeId, outgoingMessages[nodeId].front().second);
             else
                 outgoingMessages[nodeId].pop();
