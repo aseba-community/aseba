@@ -114,7 +114,7 @@ AndroidStream::~AndroidStream()
     set_ctrl_line(0); // software-close the port
 
     lock_java();
-    env->CallIntMethod(m_DashelSerialObject, s_DashelSerialCloseDeviceMethodID);
+    env->CallBooleanMethod(m_DashelSerialObject, s_DashelSerialCloseDeviceMethodID);
     env->DeleteGlobalRef(m_DashelSerialObject);
     unlock_java();
 }
