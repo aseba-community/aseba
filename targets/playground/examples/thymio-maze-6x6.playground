@@ -1,5 +1,15 @@
 <!DOCTYPE aseba-playground>
 <aseba-playground>
+	<author name="David James Sherman" email="david dot sherman at inria dot fr" />
+	<description lang="en">This 6x6 maze can be used to develop navigation strategies. The walls can be avoided using the proximity sensors. The large cul-de-sacs should permit a robot to escape using simple wall avoidance. The tracks on the ground can be followed with ground sensors. The loops in the wide green track can be followed to turn around. The arrows on the narrow track should help the robot find the track if it gets lost. The colored tracks are dark enough to be seen by the proximity sensors with values around 160–180, but not so dark that they will trigger table edge detection.
+	  <p>Success is when a robot finds the blue center region and stops on the black band. Additionally this will open the blue door and allow the second robot to escape, to test a different strategy or simply for a victory dance.
+	  <p>One simple success story is to run the standard Investigator behavior (cyan) on the robot in the top right corner, target <b>tcp:;port=33334</b>, and run the standard Explorer behavior (yellow) on the bottommost robot, target <b>tcp:;port=33333</b>. The explorer will succeed and stop on the black band, opening the door for the investigator, who will run victory laps around the green track.
+	</description>
+	<description lang="fr">Ce labyrinthe 6x6 peut être utilisé pour développer des stratégies de navigation. Les murs peuvent être évités grâce aux capteur de proximité. Les culs-de-sac larges devront permettre à un robot de s'y échapper par simple évitement de murs. Les pistes au sol peuvent être suivies par les capteurs de sol. Les boucles dans la piste verte large peuvent être suivis pour rebrousser chemin. Les flèches sur la piste étroite devront permettre à un robot à retrouver la piste s'il se perd. Les pistes colorées sont suffisamment sobres pour être vues par les capteurs avec des valeurs de 160&ndash;180, mais pas trop sombres pour déclencher la détection de bord de table.
+	  <p>Le succès est quand un robot trouve la région bleue au centre et s'arrête sur la bande noire. En plus ceci ouvre la porte bleue et permet au deuxième robot à s'échapper, soit pour tester une nouvelle stratégie, soit pour faire une danse de victoire.
+	  <p>Une histoire simple qui réussit est de mettre le comportement standard Investigateur (cyan) sur le robot en haut à droite, cible <b>tcp:;port=33334</b>, et mettre le comportement standard Explorateur (jaune) sur le robot en bas, <b>tcp:;port=33333</b>. L'explorateur réussira et s'arrêtera sur la bande noire, et ainsi ouvrir la porte pour l'investigateur, qui fera un tour de la victoire sur la piste verte.
+	</description>
+
 	<color name="white" r="1.0" g="1.0" b="1.0" />
 	<color name="wall" r="0.9" g="0.9" b="0.9" />
 	<color name="red" r="0.77" g="0.2" b="0.15" />

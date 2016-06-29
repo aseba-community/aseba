@@ -1,11 +1,40 @@
 <!DOCTYPE aseba-playground>
 <!-- Aseba playground for practicing algorithms for R2T2, Remote Rescue using Thymio2 -->
-<!-- (https://www.thymio.org/en:thymio-r2t2). Completing the exercise requires  steps. -->
+<!-- (https://www.thymio.org/en:thymio-r2t2). Completing the exercise requires 4 steps. -->
 <!-- 1. Push the blue obstacle out of the way to free the access to the door -->
 <!-- 2. Find the spots on the floor and place one robot on each -->
 <!-- 3. Look at the generator by placing a robot in front of each window -->
 <!-- 4. Restart the generator by blinking the LEDs in sequence -->
 <aseba-playground>
+	<author name="Francesco Mondada" email="francesco dot mondada at epfl dot ch" />
+	<author name="Norbert Crot" email="norbert dot crot at epfl dot ch" />
+	<author name="David James Sherman" email="david dot sherman at inria dot fr" />
+	<description lang="en"><i>Remote Rescue using Thymio2</i> is a multi-team exercise
+	  with 16 robots that must collaborate to restart a failed generator on a Mars base.
+	  Completing the exercise requires 4 steps:
+	  <ol>
+	    <li>Push the blue obstacle out of the way to free the access to the door </li>
+	    <li>Find the spots on the floor and place one robot on each </li>
+	    <li>Look at the generator by placing a robot in front of each window </li>
+	    <li>Restart the generator by blinking the LEDs in sequence </li>
+	  <ol>
+	  This playground represents one sector and 4 robots, Thymio-II targets 33333&ndash;33336. It can be used for team training.
+	</description>
+	<description lang="fr"><i>Remote Rescue using Thymio2</i> est un exercice multi-équipe
+	  avec 16 robots qui doivent collaborer pour rédémarrer un générateur endommagé sur une base martienne.
+	  Pour réussir l'exercice il faut accomplir 4 étapes :
+	  <ol>
+	    <li>Pousser l'obstacle bleue pour libérer l'accès à la porte </li>
+	    <li>Trouver les points blancs et placer un robbot dessus </li>
+	    <li>Contrôler le générateur en plaçant un robot devant chaque fenêtre </li>
+	    <li>Rédémarrer le generateur en cligotant les LEDs en cadence </li>
+	  <ol>
+	  Ce terrain représente un secteur et 4 robots, cibles Thymio-II 33333&ndash;33336. Il peut être utilisé pour former les équipes.
+	</description>
+	<externalLink lang="en" type="wiki" target="https://www.thymio.org/en:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+	<externalLink lang="fr" type="wiki" target="https://www.thymio.org/fr:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+	<externalLink lang="it" type="wiki" target="https://www.thymio.org/it:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+  
 	<color name="white" r="1.0" g="1.0" b="1.0" />
 	<color name="wall" r="0.9" g="0.9" b="0.9" />
 	<color name="red" r="0.77" g="0.2" b="0.15" />
