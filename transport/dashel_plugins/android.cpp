@@ -124,11 +124,12 @@ void AndroidStream::write(const void *data, const size_t size)
     struct usbdevfs_bulktransfer bulk;
     bulk.ep = epout;
     bulk.len = size;
-    bulk.timeout = 1000;
+	bulk.timeout = -1;
     bulk.data = (void *) data;
-    if(ioctl(fd, USBDEVFS_BULK, &bulk) < 0) {
-	disconnected = 1;
-        throw DashelException(DashelException::IOError, 0, "Unable to write", this);
+	const int result = ioctl(fd, USBDEVFS_BULK, &bulk);
+	if (result < 0) {
+		disconnected = 1;
+		throw DashelException(DashelException::IOError, result, "Unable to write", this);
     }
 }
 
@@ -142,9 +143,10 @@ void AndroidStream::read(void *data, size_t size)
     struct usbdevfs_urb * urb;
     while(size) {
         if(urb_is_in_flight) {
-            if(ioctl(fd, USBDEVFS_REAPURB, &urb) < 0) {
-		disconnected = 1;
-                throw DashelException(DashelException::IOError, 0, "Unable to read", this);
+			const int result = ioctl(fd, USBDEVFS_REAPURB, &urb);
+			if (result < 0) {
+				disconnected = 1;
+				throw DashelException(DashelException::IOError, result, "Unable to read", this);
             }
             urb_is_in_flight = 0;
         }
