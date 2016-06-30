@@ -27,7 +27,7 @@
 	    <li>Find the spots on the floor and place one robot on each </li>
 	    <li>Look at the generator by placing a robot in front of each window </li>
 	    <li>Restart the generator by blinking the LEDs in sequence </li>
-	  <ol>
+	  </ol>
 	  This playground represents the <b>starting position</b> of the complete scenario.
 	  <ul>
 	    <li><b>Sector A:</b> Thymio-II targets 33333&ndash;33336 </li>
@@ -35,7 +35,7 @@
 	    <li><b>Sector C:</b> Thymio-II targets 33341&ndash;33344 </li>
 	    <li><b>Sector D:</b> Thymio-II targets 33345&ndash;33348 </li>
 	    <li><b>Generator:</b> E-puck targets 33331 (center), 33332 (runner) </li>
-	  <ul>
+	  </ul>
 	</description>
 	<description lang="fr">Position initiale de R2T2. <br/>
 	  <i>Remote Rescue using Thymio2</i> est un exercice multi-équipe
@@ -46,7 +46,7 @@
 	    <li>Trouver les points blancs et placer un robbot dessus </li>
 	    <li>Contrôler le générateur en plaçant un robot devant chaque fenêtre </li>
 	    <li>Rédémarrer le generateur en cligotant les LEDs en cadence </li>
-	  <ol>
+	  </ol>
 	  Ce terrain représente la <b>position initiale</b> du scénario complet.
 	  <ul>
 	    <li><b>Sector A:</b> cibles Thymio-II 33333&ndash;33336 </li>
@@ -54,7 +54,7 @@
 	    <li><b>Sector C:</b> cibles Thymio-II 33341&ndash;33344 </li>
 	    <li><b>Sector D:</b> cibles Thymio-II 33345&ndash;33348 </li>
 	    <li><b>Generator:</b> cibles E-puck 33331 (centre), 33332 (coureur) </li>
-	  <ul>
+	  </ul>
 	</description>
 	<externalLink lang="en" type="wiki" target="https://www.thymio.org/en:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
 	<externalLink lang="fr" type="wiki" target="https://www.thymio.org/fr:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
