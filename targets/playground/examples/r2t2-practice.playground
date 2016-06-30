@@ -17,7 +17,7 @@
 	    <li>Find the spots on the floor and place one robot on each </li>
 	    <li>Look at the generator by placing a robot in front of each window </li>
 	    <li>Restart the generator by blinking the LEDs in sequence </li>
-	  <ol>
+	  </ol>
 	  This playground represents one sector and 4 robots, Thymio-II targets 33333&ndash;33336. It can be used for team training.
 	</description>
 	<description lang="fr"><i>Remote Rescue using Thymio2</i> est un exercice multi-équipe
@@ -28,7 +28,7 @@
 	    <li>Trouver les points blancs et placer un robbot dessus </li>
 	    <li>Contrôler le générateur en plaçant un robot devant chaque fenêtre </li>
 	    <li>Rédémarrer le generateur en cligotant les LEDs en cadence </li>
-	  <ol>
+	  </ol>
 	  Ce terrain représente un secteur et 4 robots, cibles Thymio-II 33333&ndash;33336. Il peut être utilisé pour former les équipes.
 	</description>
 	<externalLink lang="en" type="wiki" target="https://www.thymio.org/en:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
