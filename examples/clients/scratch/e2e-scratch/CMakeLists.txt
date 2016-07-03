@@ -79,6 +79,14 @@ if (HAVE_SIEGE)
 	configure_file(run-record-mockasebascratch.sh ${CMAKE_CURRENT_BINARY_DIR}/run-record-mockasebascratch.sh COPYONLY)
 endif (HAVE_SIEGE)
 
-set (CMAKE_CXX_STANDARD 11) # mock-asebascratch uses std::thread
+# mock-asebascratch uses std::thread
+if (CMAKE_VERSION VERSION_LESS "3.1")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set (CMAKE_CXX_FLAGS "--std=gnu++11 ${CMAKE_CXX_FLAGS}")
+	endif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+else (CMAKE_VERSION VERSION_LESS "3.1")
+	set (CMAKE_CXX_STANDARD 11)
+endif (CMAKE_VERSION VERSION_LESS "3.1")
+
 add_executable( mock-asebascratch mock-asebascratch.cpp )
 target_link_libraries( mock-asebascratch ${ASEBA_CORE_LIBRARIES} )
