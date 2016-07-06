@@ -110,10 +110,16 @@ namespace Enki
 		sint16 oldTimerPeriod[2];
 		QTimer* timer100Hz;
 		unsigned counter100Hz;
+		bool lastStepCollided;
+		bool thisStepCollided;
 		
 	public:
 		AsebaThymio2(unsigned port);
 		virtual ~AsebaThymio2();
+		
+		// from PhysicalObject
+		
+		virtual void collisionEvent(PhysicalObject *o);
 		
 		// from Thymio2
 		

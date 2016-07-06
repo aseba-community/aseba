@@ -34,7 +34,9 @@ namespace Enki
 		timer0(new QTimer(this)),
 		timer1(new QTimer(this)),
 		timer100Hz(new QTimer(this)),
-		counter100Hz(0)
+		counter100Hz(0),
+		lastStepCollided(false),
+		thisStepCollided(false)
 	{
 		oldTimerPeriod[0] = 0;
 		oldTimerPeriod[1] = 0;
@@ -72,6 +74,11 @@ namespace Enki
 	AsebaThymio2::~AsebaThymio2()
 	{
 		vmStateToEnvironment.remove(&vm);
+	}
+	
+	void AsebaThymio2::collisionEvent(PhysicalObject *o)
+	{
+		thisStepCollided = true;
 	}
 	
 	void AsebaThymio2::controlStep(double dt)
@@ -121,6 +128,12 @@ namespace Enki
 		
 		// set motion
 		Thymio2::controlStep(dt);
+		
+		// trigger tap event
+		if (thisStepCollided && !lastStepCollided)
+			execLocalEvent(EVENT_TAP);
+		lastStepCollided = thisStepCollided;
+		thisStepCollided = false;
 	}
 	
 	// robot description

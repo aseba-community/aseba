@@ -74,8 +74,7 @@ namespace Aseba
 		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
 		{
 			BytecodeVector& bytecode = it->second;
-			if (bytecode.getTypeOfLast() != ASEBA_BYTECODE_STOP)
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
+			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
 		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
 		{
