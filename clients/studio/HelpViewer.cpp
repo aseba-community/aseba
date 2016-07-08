@@ -136,7 +136,7 @@ namespace Aseba
 			QString message = tr("The help filter for the langauge \"%0\" has not been found. " \
 					     "Falling back to the default language (%1). " \
 					     "This is probably a bug, please report it.").arg(lang).arg(DEFAULT_LANGUAGE);
-			QMessageBox::warning(this, tr("Help filter not found"), message);
+			//QMessageBox::warning(this, tr("Help filter not found"), message);
 			helpEngine->setCurrentFilter(DEFAULT_LANGUAGE);
 			this->language = DEFAULT_LANGUAGE;
 		}

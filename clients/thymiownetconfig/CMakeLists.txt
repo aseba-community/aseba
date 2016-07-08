@@ -22,3 +22,8 @@ if (QT4_FOUND)
 	install(TARGETS thymiownetconfig RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 endif (QT4_FOUND)
+
+if (UNIX)
+	add_executable(thymiownetconfig-cli thymiownetconfig-cli.c)
+	install(TARGETS thymiownetconfig-cli RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+endif (UNIX)
