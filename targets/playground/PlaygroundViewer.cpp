@@ -65,14 +65,6 @@ namespace Enki
 		return world;
 	}
 	
-	void PlaygroundViewer::setCamera(QPointF pos, double altitude, double yaw, double pitch)
-	{
-		this->pos = QPointF(-pos.x(), -pos.y());
-		this->altitude = altitude;
-		this->yaw = -yaw;
-		this->pitch = -pitch;
-	}
-	
 	PlaygroundViewer* PlaygroundViewer::getInstance()
 	{
 		return playgroundViewer;

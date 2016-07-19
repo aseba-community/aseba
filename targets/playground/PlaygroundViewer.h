@@ -60,7 +60,6 @@ namespace Enki
 		virtual ~PlaygroundViewer();
 		
 		World* getWorld() const;
-		void setCamera(QPointF pos, double altitude, double yaw, double pitch);
 		static PlaygroundViewer* getInstance();
 		
 		void log(const QString& entry, const QColor& color);
