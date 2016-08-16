@@ -168,13 +168,13 @@ namespace Aseba
 	//! Return error messages based on error ID (needed to translate messages for other applications)
 	class ErrorMessages
 	{
-		public:
-			ErrorMessages();
+	public:
+		ErrorMessages();
 
-			//! Type of the callback
-			typedef const std::wstring (*ErrorCallback)(ErrorCode error);
-			//! Default callback
-			static const std::wstring defaultCallback(ErrorCode error);
+		//! Type of the callback
+		typedef const std::wstring (*ErrorCallback)(ErrorCode error);
+		//! Default callback
+		static const std::wstring defaultCallback(ErrorCode error);
 	};
 
 	//! Compilation error
@@ -184,15 +184,17 @@ namespace Aseba
 		std::wstring message; //!< message
 		//! Create an error at pos
 		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
-		//! Create an empty error
+		//! Create an undefined error
 		Error() { message = L"not defined"; }
 
 		//! Return a string describing the error
 		std::wstring toWString() const;
 	};
 
+	//! A subclass of error that supports translation
 	struct TranslatableError : public Error
 	{
+		//! Construct an undefined error
 		TranslatableError() : Error() {}
 		TranslatableError(const SourcePos& pos, ErrorCode error);
 		TranslatableError &arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
