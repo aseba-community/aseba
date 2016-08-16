@@ -32,13 +32,18 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 	
+	template<typename V>
 	class NamedValuesVectorModel: public QAbstractTableModel
 	{
-		Q_OBJECT
-	
+		// moved all QObject-related features to subclasses, working around no-template limitation with QObjects
+		//Q_OBJECT
+		
 	public:
-		NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		typedef NamedValuesVector<V> NamedValuesVectorV;
+		
+	public:
+		NamedValuesVectorModel(NamedValuesVectorV* namedValues, const QString &tooltipText, QObject *parent = 0);
+		NamedValuesVectorModel(NamedValuesVectorV* namedValues, QObject *parent = 0);
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -63,6 +68,39 @@ namespace Aseba
 		
 		virtual bool validateName(const QString& name) const;
 
+	protected:
+		// implementation for slots, working around no-template limitation with QObjects
+		void _addNamedValue(const NamedValue& namedValue, int index = -1);
+		void _delNamedValue(int index);
+		void _clear();
+		
+	protected:
+		// callbacks for signals, working around no-template limitation with QObjects
+		virtual void publicRowsInsertedCallback() = 0;
+		virtual void publicRowsRemovedCallback() = 0;
+		
+	protected:
+		NamedValuesVectorV* namedValues;
+		bool wasModified;
+		QString privateMimeType;
+
+	private:
+		QString tooltipText;
+		bool editable;
+	};
+	
+	class ConstantsModel: public NamedValuesVectorModel<ConstantDefinition>
+	{
+		Q_OBJECT
+	
+	public:
+		ConstantsModel(ConstantsDefinitions* namedValues, const QString &tooltipText, QObject *parent = 0);
+		ConstantsModel(ConstantsDefinitions* namedValues, QObject *parent = 0);
+		
+		virtual bool validateName(const QString& name) const;
+		
+	// working around no-template limitation with QObjects
+	
 	public slots:
 		void addNamedValue(const NamedValue& namedValue, int index = -1);
 		void delNamedValue(int index);
@@ -73,33 +111,18 @@ namespace Aseba
 		void publicRowsRemoved();
 		
 	protected:
-		NamedValuesVector* namedValues;
-		bool wasModified;
-		QString privateMimeType;
-
-	private:
-		QString tooltipText;
-		bool editable;
-	};
-	
-	class ConstantsModel: public NamedValuesVectorModel
-	{
-		Q_OBJECT
-	
-	public:
-		ConstantsModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		ConstantsModel(NamedValuesVector* namedValues, QObject *parent = 0);
-		
-		virtual bool validateName(const QString& name) const;
+		virtual void publicRowsInsertedCallback();
+		virtual void publicRowsRemovedCallback();
 	};
 
-	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel
+	
+	class EventsModel: public NamedValuesVectorModel<EventDescription>
 	{
 		Q_OBJECT
 
 	public:
-		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		EventsModel(EventsDescriptions* namedValues, const QString &tooltipText, QObject *parent = 0);
+		EventsModel(EventsDescriptions* namedValues, QObject *parent = 0);
 
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -117,6 +140,19 @@ namespace Aseba
 
 	private:
 		std::vector<bool> viewEvent;
+		
+	// working around no-template limitation with QObjects
+	
+	public slots:
+		void clear();
+
+	signals:
+		void publicRowsInserted();
+		void publicRowsRemoved();
+		
+	protected:
+		virtual void publicRowsInsertedCallback();
+		virtual void publicRowsRemovedCallback();
 	};
 	
 	/*@}*/

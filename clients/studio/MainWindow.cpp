@@ -78,10 +78,10 @@ namespace Aseba
 	void StudioInterface::setCommonDefinitions(const CommonDefinitions& commonDefinitions)
 	{
 		mainWindow->eventsDescriptionsModel->clear();
-		for (NamedValuesVector::const_iterator it(commonDefinitions.events.begin()); it != commonDefinitions.events.end(); ++it)
+		for (EventsDescriptions::const_iterator it(commonDefinitions.events.begin()); it != commonDefinitions.events.end(); ++it)
 			mainWindow->eventsDescriptionsModel->addNamedValue(*it);
 		mainWindow->constantsDefinitionsModel->clear();
-		for (NamedValuesVector::const_iterator it(commonDefinitions.constants.begin()); it != commonDefinitions.constants.end(); ++it)
+		for (ConstantsDefinitions::const_iterator it(commonDefinitions.constants.begin()); it != commonDefinitions.constants.end(); ++it)
 			mainWindow->constantsDefinitionsModel->addNamedValue(*it);
 	}
 	
@@ -1602,7 +1602,7 @@ namespace Aseba
 		target = new DashelTarget(translators, commandLineTarget);
 
 		// create models
-		eventsDescriptionsModel = new MaskableNamedValuesVectorModel(&commonDefinitions.events, tr("Event number %0"), this);
+		eventsDescriptionsModel = new EventsModel(&commonDefinitions.events, tr("Event number %0"), this);
 		eventsDescriptionsModel->setExtraMimeType("application/aseba-events");
 		constantsDefinitionsModel = new ConstantsModel(&commonDefinitions.constants, this);
 		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");

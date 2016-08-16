@@ -57,9 +57,10 @@ namespace Aseba
 	}
 	
 	//! Return whether a named-value vector contains a certain value, by iterating
-	bool NamedValuesVector::contains(const std::wstring& s, size_t* position) const
+	template<typename T>
+	bool NamedValuesVector<T>::contains(const std::wstring& s, size_t* position) const
 	{
-		for (size_t i = 0; i < size(); i++)
+		for (size_t i = 0; i < this->size(); i++)
 		{
 			if ((*this)[i].name == s)
 			{
@@ -70,6 +71,10 @@ namespace Aseba
 		}
 		return false;
 	}
+	
+	// explicit instantiation
+	template struct NamedValuesVector<EventDescription>;
+	template struct NamedValuesVector<ConstantDefinition>;
 	
 	//! Compute the edit distance between two vector-style containers, inspired from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
 	template <class T> unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)

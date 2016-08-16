@@ -207,13 +207,13 @@ namespace Aseba
 		static void setTranslateCB(ErrorMessages::ErrorCallback newCB);
 
 		static ErrorMessages::ErrorCallback translateCB;
-		WFormatableString message;
+		WFormatableString message; //!< translated error message
 	};
 
 	//! Vector of names of variables
 	typedef std::vector<std::wstring> VariablesNamesVector;
 	
-	//! A name - value pair
+	//! A name - value pair, with an optional description
 	struct NamedValue
 	{
 		//! Create a filled pair
@@ -221,31 +221,40 @@ namespace Aseba
 		
 		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
+		std::wstring description; //!< description of the pair
 	};
 	
-	//! An event description is a name - value pair
-	typedef NamedValue EventDescription;
+	//! The description of an event, comes with a list of parameters
+	struct EventDescription: NamedValue
+	{
+		//! Construct using by copying an instance of the super class
+		EventDescription(const NamedValue& namedValue): NamedValue(namedValue) {}
+		
+		//! Description of the different parameters of the event
+		std::vector<NamedValue> parameters;
+	};
 	
 	//! An constant definition is a name - value pair
 	typedef NamedValue ConstantDefinition;
 	
 	//! Generic vector of name - value pairs
-	struct NamedValuesVector: public std::vector<NamedValue>
+	template<typename T>
+	struct NamedValuesVector: public std::vector<T>
 	{
 		bool contains(const std::wstring& s, size_t* position = 0) const;
 	};
 	
 	//! Vector of events descriptions
-	typedef NamedValuesVector EventsDescriptionsVector;
+	typedef NamedValuesVector<EventDescription> EventsDescriptions;
 	
 	//! Vector of constants definitions
-	typedef NamedValuesVector ConstantsDefinitions;
+	typedef NamedValuesVector<ConstantDefinition> ConstantsDefinitions;
 	
 	//! Definitions common to several nodes, such as events or some constants
 	struct CommonDefinitions
 	{
 		//! All defined events
-		EventsDescriptionsVector events;
+		EventsDescriptions events;
 		//! All globally defined constants
 		ConstantsDefinitions constants;
 		
