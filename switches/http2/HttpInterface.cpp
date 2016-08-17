@@ -121,6 +121,7 @@ void HttpInterface::step()
 	closeClosingHttpConnections();
 	sendHttpResponses();
 
+	// FIXME: this might not wait 2s
 	Dashel::Hub::step(2);
 }
 
