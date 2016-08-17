@@ -786,7 +786,7 @@ namespace Aseba
 		assert(variablesMap.find(varName) == variablesMap.end());
 		// check for freeVariableIndex overflow
 		const unsigned requiredSize(freeVariableIndex+varSize);
-		const unsigned variablesSize(nodes.at(nodeId).variablesSize);
+		const unsigned variablesSize(nodes.at(nodeId)->variablesSize);
 		if (requiredSize > variablesSize)
 			throw runtime_error(WStringToUTF8(WFormatableString(L"Error, not enough space in target for variable %0 of size %1: requiring %2 words, only %3 available").arg(varName).arg(varSize).arg(requiredSize).arg(variablesSize)));
 		// ok, allocate variable

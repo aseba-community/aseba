@@ -391,7 +391,7 @@ namespace Aseba
 		// mark all nodes as being disconnected
 		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
 		{
-			nodeIt->second.connected = false;
+			nodeIt->second->connected = false;
 			nodeDisconnected(nodeIt->first);
 		}
 		

@@ -26,14 +26,6 @@ using namespace std;
 
 namespace Aseba
 {
-	NodesManager::Node::Node() :
-		namedVariablesReceptionCounter(0),
-		localEventsReceptionCounter(0),
-		nativeFunctionReceptionCounter(0),
-		connected(true)
-	{
-	}
-	
 	NodesManager::Node::Node(const TargetDescription& targetDescription) :
 		TargetDescription(targetDescription),
 		namedVariablesReceptionCounter(0),
@@ -60,16 +52,17 @@ namespace Aseba
 		const UnifiedTime now;
 		const UnifiedTime delayToDisconnect(3000);
 		bool isAnyConnected(false);
-		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		for (auto& nodeKV: nodes)
 		{
+			Node* node(nodeKV.second.get());
 			// if node supports listing, 
-			if (nodeIt->second.protocolVersion >= 5 && (now - nodeIt->second.lastSeen) > delayToDisconnect && nodeIt->second.connected)
+			if (node->protocolVersion >= 5 && (now - node->lastSeen) > delayToDisconnect && node->connected)
 			{
-				nodeIt->second.connected = false;
-				nodeDisconnected(nodeIt->first);
+				node->connected = false;
+				nodeDisconnected(nodeKV.first);
 			}
 			// is this node connected?
-			isAnyConnected = isAnyConnected || nodeIt->second.connected;
+			isAnyConnected = isAnyConnected || node->connected;
 		}
 		
 		// if no node is connected, broadcast get description as well, for old targets (protocol 4)
@@ -83,7 +76,7 @@ namespace Aseba
 	void NodesManager::processMessage(const Message* message)
 	{
 		// check whether the node is known
-		NodesMap::iterator nodeIt(nodes.find(message->source));
+		auto const nodeIt(nodes.find(message->source));
 		if (nodeIt == nodes.end())
 		{
 			// node is not known, so ignore excepted if the message type 
@@ -101,19 +94,20 @@ namespace Aseba
 		}
 		else
 		{
+			Node* node(nodeIt->second.get());
 			// node is known, check if connected...
-			if (!nodeIt->second.connected)
+			if (!node->connected)
 			{
 				// if not, build complete, set as connected and notify client
-				nodeIt->second.connected = true;
-				if (nodeIt->second.isComplete())
+				node->connected = true;
+				if (node->isComplete())
 				{
 					// only notify connections of completed known nodes
 					nodeConnected(nodeIt->first);
 				}
 			}
 			// update last seen time
-			nodeIt->second.lastSeen = UnifiedTime();
+			node->lastSeen = UnifiedTime();
 		}
 		
 		// if we have a disconnection message
@@ -122,7 +116,7 @@ namespace Aseba
 			const Disconnected *disconnected = dynamic_cast<const Disconnected *>(message);
 			if (disconnected)
 			{
-				NodesMap::iterator nodeIt = nodes.find(disconnected->source);
+				auto const nodeIt = nodes.find(disconnected->source);
 				assert (nodeIt != nodes.end());
 				nodes.erase(nodeIt);
 			}
@@ -133,7 +127,7 @@ namespace Aseba
 			const Description *description = dynamic_cast<const Description *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto const nodeIt = nodes.find(description->source);
 				
 				// We can receive a description twice, for instance if there is another IDE connected
 				if (nodeIt != nodes.end() || (mismatchingNodes.find(description->source) != mismatchingNodes.end()))
@@ -149,8 +143,8 @@ namespace Aseba
 				}
 				
 				// create node and copy description into it
-				nodes[description->source] = Node(*description);
-				checkIfNodeDescriptionComplete(description->source, nodes[description->source]);
+				nodes[description->source] = std::unique_ptr<Node>(createNode(*description));
+				checkIfNodeDescriptionComplete(description->source, *nodes[description->source].get());
 			}
 		}
 		
@@ -159,14 +153,15 @@ namespace Aseba
 			const NamedVariableDescription *description = dynamic_cast<const NamedVariableDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto const nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array if array is empty
-				if (nodeIt->second.namedVariablesReceptionCounter < nodeIt->second.namedVariables.size())
+				Node* node(nodeIt->second.get());
+				if (node->namedVariablesReceptionCounter < node->namedVariables.size())
 				{
-					nodeIt->second.namedVariables[nodeIt->second.namedVariablesReceptionCounter++] = *description;
-					checkIfNodeDescriptionComplete(nodeIt->first, nodeIt->second);
+					node->namedVariables[node->namedVariablesReceptionCounter++] = *description;
+					checkIfNodeDescriptionComplete(nodeIt->first, *node);
 				}
 			}
 		}
@@ -176,14 +171,15 @@ namespace Aseba
 			const LocalEventDescription *description = dynamic_cast<const LocalEventDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto const nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array if array is empty
-				if (nodeIt->second.localEventsReceptionCounter < nodeIt->second.localEvents.size())
+				Node* node(nodeIt->second.get());
+				if (node->localEventsReceptionCounter < node->localEvents.size())
 				{
-					nodeIt->second.localEvents[nodeIt->second.localEventsReceptionCounter++] = *description;
-					checkIfNodeDescriptionComplete(nodeIt->first, nodeIt->second);
+					node->localEvents[node->localEventsReceptionCounter++] = *description;
+					checkIfNodeDescriptionComplete(nodeIt->first, *node);
 				}
 			}
 		}
@@ -193,14 +189,15 @@ namespace Aseba
 			const NativeFunctionDescription *description = dynamic_cast<const NativeFunctionDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto const nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array
-				if (nodeIt->second.nativeFunctionReceptionCounter < nodeIt->second.nativeFunctions.size())
+				Node* node(nodeIt->second.get());
+				if (node->nativeFunctionReceptionCounter < node->nativeFunctions.size())
 				{
-					nodeIt->second.nativeFunctions[nodeIt->second.nativeFunctionReceptionCounter++] = *description;
-					checkIfNodeDescriptionComplete(nodeIt->first, nodeIt->second);
+					node->nativeFunctions[node->nativeFunctionReceptionCounter++] = *description;
+					checkIfNodeDescriptionComplete(nodeIt->first, *node);
 				}
 			}
 		}
@@ -218,10 +215,10 @@ namespace Aseba
 	
 	std::wstring NodesManager::getNodeName(unsigned nodeId) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto const nodeIt = nodes.find(nodeId);
 		if (nodeIt != nodes.end())
 		{
-			return nodeIt->second.name;
+			return nodeIt->second->name;
 		}
 		else
 		{
@@ -234,17 +231,18 @@ namespace Aseba
 		// search for the first node with a given name
 		bool found(false);
 		unsigned foundId(0);
-		for (NodesMap::const_iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		for (auto const& nodeKV: nodes)
 		{
-			if (nodeIt->second.name == name)
+			const Node* node(nodeKV.second.get());
+			if (node->name == name)
 			{
 				if (ok)
 					*ok = true;
 				
-				if (nodeIt->first == preferedId)
-					return nodeIt->first;
+				if (nodeKV.first == preferedId)
+					return nodeKV.first;
 				else if (!found)
-					foundId = nodeIt->first;
+					foundId = nodeKV.first;
 				
 				found = true;
 			}
@@ -262,7 +260,7 @@ namespace Aseba
 	
 	const TargetDescription * NodesManager::getDescription(unsigned nodeId, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto const nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt == nodes.end())
@@ -274,26 +272,27 @@ namespace Aseba
 		
 		if (ok)
 			*ok = true;
-		return &(nodeIt->second);
+		return nodeIt->second.get();
 	}
 	
 	unsigned NodesManager::getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto const nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt != nodes.end())
 		{
+			const Node* node(nodeIt->second.get());
 			size_t pos = 0;
-			for (size_t i = 0; i < nodeIt->second.namedVariables.size(); ++i)
+			for (size_t i = 0; i < node->namedVariables.size(); ++i)
 			{
-				if (nodeIt->second.namedVariables[i].name == name)
+				if (node->namedVariables[i].name == name)
 				{
 					if (ok)
 						*ok = true;
 					return pos;
 				}
-				pos += nodeIt->second.namedVariables[i].size;
+				pos += node->namedVariables[i].size;
 			}
 		}
 		
@@ -305,18 +304,19 @@ namespace Aseba
 	
 	unsigned NodesManager::getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto const nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt != nodes.end())
 		{
-			for (size_t i = 0; i < nodeIt->second.namedVariables.size(); ++i)
+			const Node* node(nodeIt->second.get());
+			for (size_t i = 0; i < node->namedVariables.size(); ++i)
 			{
-				if (nodeIt->second.namedVariables[i].name == name)
+				if (node->namedVariables[i].name == name)
 				{
 					if (ok)
 						*ok = true;
-					return nodeIt->second.namedVariables[i].size;
+					return node->namedVariables[i].size;
 				}
 			}
 		}
@@ -330,5 +330,10 @@ namespace Aseba
 	void NodesManager::reset()
 	{
 		nodes.clear();
+	}
+	
+	NodesManager::Node* NodesManager::createNode(const TargetDescription& targetDescription)
+	{
+		return new Node(targetDescription);
 	}
 } // namespace Aseba

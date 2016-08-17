@@ -344,7 +344,7 @@ namespace Aseba
 			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return 0;
 		}
-		return nodes.find(nodeIt.value())->second.connected;
+		return nodes.find(nodeIt.value())->second->connected;
 	}
 
 	//! Send the list of variables if the node is fully known, or an empty list otherwise
@@ -356,7 +356,7 @@ namespace Aseba
 			// node defined variables
 			const unsigned nodeId(it.value());
 			const NodesMap::const_iterator descIt(nodes.find(nodeId));
-			const Node& description(descIt->second);
+			const Node& description(*descIt->second);
 			QStringList list;
 			for (size_t i = 0; i < description.namedVariables.size(); ++i)
 			{
@@ -518,7 +518,7 @@ namespace Aseba
 	
 	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
 	{
-		nodesNames[QString::fromStdWString(nodes[nodeId].name)] = nodeId;
+		nodesNames[QString::fromStdWString(nodes[nodeId]->name)] = nodeId;
 	}
 
 	inline QDBusConnection AsebaNetworkInterface::DBusConnectionBus() const

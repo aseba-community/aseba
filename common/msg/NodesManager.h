@@ -24,6 +24,7 @@
 #include "msg.h"
 #include "../utils/utils.h"
 #include <string>
+#include <memory>
 
 namespace Aseba
 {
@@ -38,7 +39,6 @@ namespace Aseba
 		//! Potentially partial Descriptions of nodes along with their reception status
 		struct Node: public TargetDescription
 		{
-			Node();
 			Node(const TargetDescription& targetDescription);
 			
 			unsigned namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
@@ -51,7 +51,7 @@ namespace Aseba
 			bool isComplete() const;
 		};
 		//! Map from nodes id to nodes descriptions
-		typedef std::map<unsigned, Node> NodesMap;
+		typedef std::map<unsigned, std::unique_ptr<Node> > NodesMap;
 		NodesMap nodes; //!< all known nodes descriptions and connection status
 		std::set<unsigned> mismatchingNodes; //<! seen nodes with mismatching protocol versions
 		
@@ -80,6 +80,9 @@ namespace Aseba
 	protected:
 		//! Check if a node description has been fully received, and if so, call the nodeDescriptionReceived() virtual function
 		void checkIfNodeDescriptionComplete(unsigned id, const Node& description);
+		
+		//! Virtual factory function that is called when a Node or a child class must be instantiated
+		virtual Node* createNode(const TargetDescription& targetDescription);
 		
 		//! Virtual function that is called when a message must be sent
 		virtual void sendMessage(const Message& message) = 0;
