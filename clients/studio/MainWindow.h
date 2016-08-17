@@ -200,22 +200,6 @@ namespace Aseba
 		Q_OBJECT
 	
 	public:
-		struct CompilationResult
-		{
-			bool dump;
-			bool success;
-			BytecodeVector bytecode;
-			unsigned allocatedVariablesCount;
-			VariablesMap variablesMap;
-			Compiler::SubroutineTable subroutineTable;
-			Error error;
-			std::wostringstream compilationMessages;
-			
-			CompilationResult(bool dump):dump(dump), success(false), allocatedVariablesCount(0) {}
-		};
-		
-		
-	public:
 		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned productId() const  { return pid; }

@@ -334,7 +334,7 @@ namespace Aseba
 	
 	//////
 	
-	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
+	CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
 	
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent) :
 		QSplitter(parent),
@@ -395,7 +395,7 @@ namespace Aseba
 		
 		// get the value of the variables
 		// compile in this thread the first time
-		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
+		CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
 		processCompilationResult(result);
 	}
 
@@ -1042,9 +1042,9 @@ namespace Aseba
 
 	}
 	
-	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump)
+	CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump)
 	{
-		NodeTab::CompilationResult* result(new NodeTab::CompilationResult(dump));
+		CompilationResult* result(new CompilationResult());
 		
 		Compiler compiler;
 		compiler.setTargetDescription(&targetDescription);
@@ -1054,14 +1054,18 @@ namespace Aseba
 		std::wistringstream is(source.toStdWString());
 		
 		if (dump)
-			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error, &result->compilationMessages);
+		{
+			std::wostringstream os;
+			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error, &os);
+			result->compilationLog = os.str();
+		}
 		else
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
 		
 		if (result->success)
 		{
-			result->variablesMap = *compiler.getVariablesMap();
-			result->subroutineTable = *compiler.getSubroutineTable();
+			result->variables = compiler.getVariablesMap();
+			result->subroutinesNames = compiler.getSubroutinesNames();
 		}
 		
 		return result;
@@ -1108,7 +1112,7 @@ namespace Aseba
 		// to differentiate user changes from highlight changes in documents
 		bool doRehighlight = clearEditorProperty("errorPos");
 		
-		if (result->dump)
+		if (!result->compilationLog.empty())
 		{
 			mainWindow->compilationMessageBox->setWindowTitle(
 				tr("Aseba Studio: Output of last compilation for %0").arg(target->getName(id))
@@ -1117,12 +1121,12 @@ namespace Aseba
 			if (result->success)
 				mainWindow->compilationMessageBox->setText(
 					tr("Compilation success.") + QString("\n\n") + 
-					QString::fromStdWString(result->compilationMessages.str())
+					QString::fromStdWString(result->compilationLog)
 				);
 			else 	
 				mainWindow->compilationMessageBox->setText(
 					QString::fromStdWString(result->error.toWString()) + ".\n\n" +
-					QString::fromStdWString(result->compilationMessages.str())
+					QString::fromStdWString(result->compilationLog)
 				);
 				
 		}
@@ -1146,13 +1150,13 @@ namespace Aseba
 		{
 			bytecode = result->bytecode;
 			allocatedVariablesCount = result->allocatedVariablesCount;
-			vmMemoryModel->updateVariablesStructure(&result->variablesMap);
+			vmMemoryModel->updateVariablesStructure(result->variables);
 			// This is disabled because we do not want to override the user's choice.
 			// The best would be to use this until the user has done any change, and
 			// then stop using it. But as sizes are reloaded from settings, the
 			// gain is not worth the implementation work.
 			//vmMemoryView->resizeColumnToContents(0);
-			vmSubroutinesModel->updateSubroutineTable(result->subroutineTable);
+			vmSubroutinesModel->updateSubroutinesNames(result->subroutinesNames);
 			
 			updateHidden();
 			compilationResultText->setText(tr("Compilation success."));

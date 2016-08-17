@@ -126,6 +126,15 @@ namespace Aseba
 		targetDescription = description;
 	}
 	
+	//! Return a list of all subroutines by extracting names from the subroutine tables
+	StringVector Compiler::getSubroutinesNames() const
+	{
+		StringVector subroutinesNames;
+		for (auto const& subroutine: subroutineTable)
+			subroutinesNames.push_back(subroutine.name);
+		return subroutinesNames;
+	}
+	
 	//! Set the common definitions, such as events or some constants
 	void Compiler::setCommonDefinitions(const CommonDefinitions *definitions)
 	{

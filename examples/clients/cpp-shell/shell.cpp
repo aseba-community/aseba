@@ -243,7 +243,7 @@ void Shell::processShellCmd()
 void Shell::listNodes()
 {
 	for (NodesMap::const_iterator it(nodes.begin()); it != nodes.end(); ++it)
-		wcerr << (it->second).name << endl;
+		wcerr << (it->second)->name << endl;
 }
 
 void Shell::listVariables(const strings& args)
@@ -566,7 +566,7 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 		msg.serialize(targetStream);
 		targetStream->flush();
 		// retrieve user-defined variables for use in get/set
-		allVariables[nodeName] = *compiler.getVariablesMap();
+		allVariables[nodeName] = compiler.getVariablesMap();
 		return true;
 	}
 	else

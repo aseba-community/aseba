@@ -302,11 +302,11 @@ namespace Aseba
 		return VariablesDataVector();
 	}
 	
-	void TargetVariablesModel::updateVariablesStructure(const VariablesMap *variablesMap)
+	void TargetVariablesModel::updateVariablesStructure(const VariablesMap& variablesMap)
 	{
 		// Build a new list of variables
 		QList<Variable> newVariables;
-		for (VariablesMap::const_iterator it = variablesMap->begin(); it != variablesMap->end(); ++it)
+		for (VariablesMap::const_iterator it = variablesMap.begin(); it != variablesMap.end(); ++it)
 		{
 			// create new variable
 			Variable var;
@@ -728,12 +728,12 @@ namespace Aseba
 		QStringListModel(parent)
 	{}
 	
-	void TargetSubroutinesModel::updateSubroutineTable(const Compiler::SubroutineTable& subroutineTable)
+	void TargetSubroutinesModel::updateSubroutinesNames(const StringVector& subroutinesNames)
 	{
-		QStringList subroutineNames;
-		for (Compiler::SubroutineTable::const_iterator it = subroutineTable.begin(); it != subroutineTable.end(); ++it)
-			subroutineNames.push_back(QString::fromStdWString(it->name));
-		setStringList(subroutineNames);
+		QStringList subroutineNamesQ;
+		for (auto const& name: subroutinesNames)
+			subroutineNamesQ.push_back(QString::fromStdWString(name));
+		setStringList(subroutineNamesQ);
 	}
 	
 	/*@}*/

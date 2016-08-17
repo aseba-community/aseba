@@ -260,7 +260,7 @@ namespace Aseba
 							break;
 						}
 						// retrieve user-defined variables for use in get/set
-						userDefinedVariablesMap[element.attribute("name")] = *compiler.getVariablesMap();
+						userDefinedVariablesMap[element.attribute("name")] = compiler.getVariablesMap();
 					}
 					else
 						noNodeCount++;
