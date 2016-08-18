@@ -49,6 +49,19 @@ namespace Aseba
 	
 	// Switch
 	
+	//! Give the list of arguments this module can understand
+	ArgumentDescriptions Switch::describeArguments() const
+	{
+		return ArgumentDescriptions();
+	
+	}
+	
+	//! Pass all parsed arguments to this module
+	void processArguments(const Arguments& arguments)
+	{
+		
+	}
+	
 	void Switch::handleAutomaticReconnection(Dashel::Stream* stream)
 	{
 		automaticReconnectionStreams.insert(stream);

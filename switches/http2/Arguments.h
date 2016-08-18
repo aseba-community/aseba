@@ -44,10 +44,18 @@ namespace Aseba
 		std::vector<std::string> values; //!< values as string, could be converted by user class
 	};
 
-	//! Possible command-line arguments
-	typedef std::vector<ArgumentDescription> ArgumentDescriptions;
 	//! Filled command-line arguments
 	typedef std::vector<Argument> Arguments;
+	
+	//! Possible command-line arguments, typedef for constructor inheritance
+	typedef std::vector<ArgumentDescription> ArgumentDescriptionsBase;
+	
+	//! Possible command-line arguments
+	struct ArgumentDescriptions: public ArgumentDescriptionsBase
+	{
+		using ArgumentDescriptionsBase::ArgumentDescriptionsBase;
+		bool parse(const char* arg, int argc, const char* argv[], int& argCounter, Arguments& parsedArgs);
+	};
 
 } // namespace Aseba
 

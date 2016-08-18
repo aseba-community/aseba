@@ -46,6 +46,10 @@ namespace Aseba
 		};
 		
 	public:
+		// public API for main
+		ArgumentDescriptions describeArguments() const;
+		void processArguments(const Arguments& arguments);
+		
 		// public API for modules
 		void handleAutomaticReconnection(Dashel::Stream* stream);
 		void delegateHandlingToModule(Dashel::Stream* stream, Module* owner);

@@ -46,6 +46,7 @@
 
 	set(switch_SRCS
 		modules/http/HttpModule.cpp
+		Arguments.cpp
 		Switch.cpp
 		main.cpp
 	)
