@@ -32,6 +32,8 @@ namespace Aseba
 	protected:
 		//! An association of stream to module
 		typedef std::map<Dashel::Stream*, Module*> StreamModuleMap;
+		//! A set of streams
+		typedef std::set<Dashel::Stream*> StreamSet;
 		
 		//! A node that has a program and the result of compilation attached
 		struct NodeWithProgram: public Node, public CompilationResult
@@ -45,6 +47,7 @@ namespace Aseba
 		
 	public:
 		// public API for modules
+		void handleAutomaticReconnection(Dashel::Stream* stream);
 		void delegateHandlingToModule(Dashel::Stream* stream, Module* owner);
 		
 	protected:
@@ -56,6 +59,7 @@ namespace Aseba
 	protected:
 		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
 		StreamModuleMap moduleSpecificStreams; //!< streams whose data processing responsibility are delegated to a module
+		StreamSet automaticReconnectionStreams; //!< streams that must be reconnected automatically if disconnected
 	};
 	
 } // namespace Aseba

@@ -22,6 +22,8 @@
 
 namespace Aseba
 {
+	// Switch::NodeWithProgram
+	
 	Switch::NodeWithProgram::NodeWithProgram(const TargetDescription& targetDescription):
 		Node(targetDescription)
 	{
@@ -42,6 +44,19 @@ namespace Aseba
 			variables = compiler.getVariablesMap();
 			subroutinesNames = compiler.getSubroutinesNames();
 		}
+	}
+	
+	
+	// Switch
+	
+	void Switch::handleAutomaticReconnection(Dashel::Stream* stream)
+	{
+		automaticReconnectionStreams.insert(stream);
+	}
+	
+	void Switch::delegateHandlingToModule(Dashel::Stream* stream, Module* owner)
+	{
+		moduleSpecificStreams[stream] = owner;
 	}
 	
 	Switch::Node* Switch::createNode(const TargetDescription& targetDescription)

@@ -45,6 +45,7 @@
 #endif(LIBXML2_FOUND)
 
 	set(switch_SRCS
+		modules/http/HttpModule.cpp
 		Switch.cpp
 		main.cpp
 	)
