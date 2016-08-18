@@ -23,12 +23,16 @@
 
 #include <dashel/dashel.h>
 #include "../../common/msg/NodesManager.h"
+#include "Module.h"
 
 namespace Aseba
 {
 	class Switch: public Dashel::Hub, public NodesManager
 	{
 	protected:
+		//! An association of stream to module
+		typedef std::map<Dashel::Stream*, Module*> StreamModuleMap;
+		
 		//! A node that has a program and the result of compilation attached
 		struct NodeWithProgram: public Node, public CompilationResult
 		{
@@ -39,16 +43,19 @@ namespace Aseba
 			std::wstring code; //!< the source code of the program
 		};
 		
+	public:
+		// public API for modules
+		void delegateHandlingToModule(Dashel::Stream* stream, Module* owner);
+		
 	protected:
 		// from NodesManager
 		
 		virtual Node* createNode(const TargetDescription& targetDescription);
 		virtual void sendMessage(const Message& message);
 		
-		
 	protected:
 		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
-		
+		StreamModuleMap moduleSpecificStreams; //!< streams whose data processing responsibility are delegated to a module
 	};
 	
 } // namespace Aseba
