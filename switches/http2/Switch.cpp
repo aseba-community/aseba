@@ -49,11 +49,29 @@ namespace Aseba
 	
 	// Switch
 	
+	void Switch::dumpArgumentsDescription(std::ostream &stream) const
+	{
+		stream << "  Core features of the switch\n";
+		stream << "    -v, --verbose   : makes the switch verbose (default: silent)\n";
+		stream << "    -d, --dump      : makes the switch dump the content of messages (default: do not dump)\n";
+		stream << "    -p, --port port : listens to incoming Aseba connection on this port (default: 33333)\n";
+		stream << "    --rawtime       : shows time in the form of sec:usec since 1970 (default: user readable)\n";
+		stream << "    --duration sec  : run the switch only for a given duration (default: run forever)\n";
+	}
+	
 	//! Give the list of arguments this module can understand
 	ArgumentDescriptions Switch::describeArguments() const
 	{
-		return ArgumentDescriptions();
-	
+		return {
+			{ "-v", 0 },
+			{ "--verbose", 0 },
+			{ "-d", 0 },
+			{ "--dump", 0 },
+			{ "-p", 1 },
+			{ "--port", 1 },
+			{ "--rawtime", 0 },
+			{ "--duration", 1 }
+		};
 	}
 	
 	//! Pass all parsed arguments to this module

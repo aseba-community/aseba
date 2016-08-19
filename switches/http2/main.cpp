@@ -37,31 +37,31 @@
 using namespace std;
 using namespace Aseba;
 
+//! List of instanciated modules
 typedef vector<unique_ptr<Module>> Modules;
 
 //! Show version
 void dumpVersion(std::ostream &stream, const char *programName)
 {
-	stream << programName << "\n";
+	// TODO: add copyright
 	stream << "Aseba version " << ASEBA_VERSION << "\n";
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << "\n";
-	stream << "Aseba library licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
+	stream << "Aseba library licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>";
 	stream << endl;
 }
 
 //! Show usage
-void dumpHelp(ostream &stream, const char *programName, const Modules& modules)
+void dumpHelp(ostream &stream, const char *programName, const Switch* asebaSwitch, const Modules& modules)
 {
 	stream << "Usage: " << programName << " [options] [additional targets]*\n";
 	stream << "Aseba Switch, connects Aseba networks together and with HTTP.\n\n";
-	stream << "Options:\n";
-// 	stream << "-v, --verbose   : makes the switch verbose\n";
-// 	stream << "-p, --port port : listens to incoming connection HTTP on this port\n";
-// 	stream << "-K, --Kiter n   : run I/O loop n thousand times (for profiling)\n";
- 	stream << "-h, --help      : shows this help\n";
- 	stream << "-V, --version   : shows the version number\n";
+	stream << "Valid command-line options:\n";
+	stream << "  General\n";
+ 	stream << "    -h, --help      : shows this help, and exit\n";
+ 	stream << "    -V, --version   : shows the version number, and exit\n";
+	asebaSwitch->dumpArgumentsDescription(stream);
 	for (auto const& module: modules)
-		module->dumpDescription(stream);
+		module->dumpArgumentsDescription(stream);
 	stream << "\nAdditional targets are any valid Dashel targets.\n\n";
 	dumpVersion(stream, programName);
 }
@@ -72,10 +72,6 @@ int main(int argc, const char *argv[])
 	// initialize Dashel plugins
 	Dashel::initPlugins();
 	
-//	std::string httpPort = "3000";
-//	bool verbose = false;
-// //	int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
-// 
 	// create switch
 	unique_ptr<Switch> asebaSwitch(new Switch());
 	
@@ -94,7 +90,7 @@ int main(int argc, const char *argv[])
 		
 		// show help/version and quit
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
-			dumpHelp(cout, argv[0], modules), exit(0);
+			dumpHelp(cout, argv[0], asebaSwitch.get(), modules), exit(0);
 		if((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
 			dumpVersion(cout, argv[0]), exit(0);
 		// find whether the switch knows this argument

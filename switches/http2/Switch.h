@@ -47,6 +47,7 @@ namespace Aseba
 		
 	public:
 		// public API for main
+		void dumpArgumentsDescription(std::ostream &stream) const;
 		ArgumentDescriptions describeArguments() const;
 		void processArguments(const Arguments& arguments);
 		

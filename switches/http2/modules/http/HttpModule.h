@@ -30,7 +30,7 @@ namespace Aseba
 	public:
 		HttpModule(Switch*);
 		
-		virtual void dumpDescription(std::ostream &stream);
+		virtual void dumpArgumentsDescription(std::ostream &stream) const;
 		virtual ArgumentDescriptions describeArguments() const;
 		
 		virtual void incomingData(Dashel::Stream * stream);

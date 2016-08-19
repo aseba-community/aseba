@@ -27,10 +27,10 @@ namespace Aseba
 		
 	}
 		
-	void HttpModule::dumpDescription(std::ostream &stream)
+	void HttpModule::dumpArgumentsDescription(std::ostream &stream) const
 	{
-		stream << "HTTP module, provides access to the network from a web application\n";
-		stream << "-w, --http      : listens to incoming HTTP connections on this port\n";
+		stream << "  HTTP module, provides access to the network from a web application\n";
+		stream << "    -w, --http      : listens to incoming HTTP connections on this port (default: 3000)\n";
 	}
 	
 	ArgumentDescriptions HttpModule::describeArguments() const
