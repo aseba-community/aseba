@@ -26,7 +26,7 @@
 #include <vector>
 #include <dashel/dashel.h>
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
 	class HttpResponse; // forward declaration
 
@@ -40,100 +40,31 @@ namespace Aseba { namespace Http
 	 */
 	class HttpRequest
 	{
-		public:
-			static const int CONTENT_BYTES_LIMIT = 40000;
+	public:
+		typedef std::map<std::string, std::string> Headers;
+		
+		static const int CONTENT_BYTES_LIMIT = 40000;
+		
+		struct Error: public std::runtime_error
+		{
+			Error(const std::string& whatArg, unsigned errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
+			const unsigned errorCode;
+		};
 
-			HttpRequest();
-			virtual ~HttpRequest();
-
-			/**
-			 * Receive the HTTP request and parse its headers and content.
-			 *
-			 * Returns true if successful.
-			 */
-			virtual bool receive();
-
-			/**
-			 * Returns a HTTP response for this object. Repeated calls to this method will
-			 * always return the same HTTP response reference. The HTTP request is stalled
-			 * in the HTTP interface until this method is called for the first time.
-			 */
-			virtual HttpResponse& respond();
-
-			virtual bool isResponseReady() const { return !blocking && response != NULL; }
-
-			virtual void setVerbose(bool verbose) { this->verbose = verbose; }
-			virtual bool isValid() const { return valid; }
-			virtual void setBlocking(bool blocking) { this->blocking = blocking; }
-			virtual bool isBlocking() { return blocking; }
-
-			virtual const std::string& getMethod() const { return method; }
-			virtual const std::string& getUri() const { return uri; }
-			virtual const std::string& getProtocol() const { return protocol; }
-			virtual const std::vector<std::string>& getTokens() const { return tokens; }
-			virtual const std::map<std::string, std::string>& getHeaders() const { return headers; }
-			virtual const std::string& getContent() const { return content; }
-
-			std::string getHeader(const std::string& header) const {
-				std::map<std::string, std::string>::const_iterator query = headers.find(header);
-
-				if(query != headers.end()) {
-					return query->second;
-				} else {
-					return "";
-				}
-			}
-
-		protected:
-			virtual bool readRequestLine();
-			virtual bool readHeaders();
-			virtual bool readContent();
-
-			virtual HttpResponse *createResponse() = 0;
-
-			virtual std::string readLine() = 0;
-			virtual void readRaw(char *buffer, int size) = 0;
-
-		private:
-			static std::string trim(const std::string& s)
-			{
-				static const char *whitespaceChars = "\n\r\t ";
-				std::string::size_type start = s.find_first_not_of(whitespaceChars);
-				std::string::size_type end = s.find_last_not_of(whitespaceChars);
-
-				return start != std::string::npos ? s.substr(start, 1 + end - start) : "";
-			}
-
-			bool verbose;
-			bool valid;
-			bool blocking;
-			HttpResponse *response;
-
-			std::string method;
-			std::string uri;
-			std::string protocol;
-			std::vector<std::string> tokens;
-			std::map<std::string, std::string> headers;
-			std::string content;
+	public:
+		//! Receive the HTTP request and parse its headers and content.
+		static HttpRequest receive(Dashel::Stream* stream);
+		void dump(std::ostream& os);
+	
+	public:
+		const std::string method;
+		const std::string uri;
+		const std::vector<std::string> tokenizedUri;
+		const std::string protocol;
+		const Headers headers;
+		const std::vector<uint8_t> content;
 	};
+	
+} // namespace Aseba
 
-	class DashelHttpRequest : public HttpRequest
-	{
-		public:
-    		DashelHttpRequest(Dashel::Stream *stream);
-			virtual ~DashelHttpRequest();
-
-			virtual Dashel::Stream *getStream() { return stream; }
-
-		protected:
-			virtual HttpResponse *createResponse();
-
-			virtual std::string readLine();
-			virtual void readRaw(char *buffer, int size);
-
-		private:
-			Dashel::Stream *stream;
-	};
-} }
-
-#endif
+#endif // ASEBA_HTTP_REQUEST

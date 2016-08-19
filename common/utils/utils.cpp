@@ -35,6 +35,11 @@
 #include <cassert>
 #include <limits>
 #include <vector>
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>
+#include <string>
 #include <stdint.h>
 #include "utils.h"
 
@@ -314,6 +319,34 @@ namespace Aseba
 	
 	template std::string join(const std::vector<std::string>&, const std::string& delim);
 	template std::wstring join(const std::vector<std::wstring>&, const std::wstring& delim);
+	
+	
+	template<typename CharT>
+	std::basic_string<CharT> ltrim(const std::basic_string<CharT> &s)
+	{
+		std::basic_string<CharT> r(s);
+		r.erase(r.begin(), std::find_if(r.begin(), r.end(),
+				std::not1(std::ptr_fun<int, int>(std::isspace))));
+		return r;
+	}
+
+	template<typename CharT>
+	std::basic_string<CharT> rtrim(const std::basic_string<CharT> &s)
+	{
+		std::basic_string<CharT> r(s);
+		r.erase(std::find_if(r.rbegin(), r.rend(),
+				std::not1(std::ptr_fun<int, int>(std::isspace))).base(), r.end());
+		return r;
+	}
+
+	template<typename CharT>
+	std::basic_string<CharT> trim(const std::basic_string<CharT> &s)
+	{
+		return ltrim(rtrim(s));
+	}
+	
+	template std::string trim(const std::string&);
+	template std::wstring trim(const std::wstring&);
 	
 	/*@}*/
 }

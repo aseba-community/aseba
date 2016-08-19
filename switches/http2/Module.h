@@ -36,7 +36,7 @@ namespace Aseba
 	class Module
 	{
 	public:
-		//! Dump a line describing this module and the list of arguments it eats
+		//! Dump a short description of this module and the list of arguments it eats
 		virtual void dumpArgumentsDescription(std::ostream &stream) const = 0;
 		//! Give the list of arguments this module can understand
 		virtual ArgumentDescriptions describeArguments() const { return ArgumentDescriptions(); }

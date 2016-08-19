@@ -49,6 +49,7 @@ namespace Aseba
 	
 	// Switch
 	
+	//! Dump a short description of this module and the list of arguments it eats
 	void Switch::dumpArgumentsDescription(std::ostream &stream) const
 	{
 		stream << "  Core features of the switch\n";
@@ -77,14 +78,16 @@ namespace Aseba
 	//! Pass all parsed arguments to this module
 	void processArguments(const Arguments& arguments)
 	{
-		
+		// TODO
 	}
 	
+	// TODO: document
 	void Switch::handleAutomaticReconnection(Dashel::Stream* stream)
 	{
 		automaticReconnectionStreams.insert(stream);
 	}
 	
+	// TODO: document
 	void Switch::delegateHandlingToModule(Dashel::Stream* stream, Module* owner)
 	{
 		moduleSpecificStreams[stream] = owner;

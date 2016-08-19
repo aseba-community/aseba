@@ -126,6 +126,12 @@ namespace Aseba
 	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a uint16 value
 	uint16 crcXModem(const uint16 oldCrc, const uint16 v);
 	
+	//! A convenience typedef for vector<string>
+	typedef std::vector<std::string> strings;
+	
+	//! A convenience typedef for vector<wstring>
+	typedef std::vector<std::wstring> wstrings;
+	
 	//! Split a string using given delimiters
 	template<typename T>
 	std::vector<T> split(const T& s, const T& delim);
@@ -141,6 +147,18 @@ namespace Aseba
 	//! Join a sequence using operator += and adding delim in-between elements
 	template<typename C>
 	typename C::value_type join(const C& values, const typename C::value_type& delim);
+	
+	//! Trim a string of whitespaces at the beginning
+	template<typename CharT>
+	std::basic_string<CharT> ltrim(const std::basic_string<CharT> &s);
+
+	//! Trim a string of whitespaces at the end
+	template<typename CharT>
+	std::basic_string<CharT> rtrim(const std::basic_string<CharT> &s);
+
+	//! Trim a string of whitespaces at the beginning and at the end
+	template<typename CharT>
+	std::basic_string<CharT> trim(const std::basic_string<CharT> &s);
 	
 	//! Clamp a value to a range
 	template<typename T>

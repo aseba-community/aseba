@@ -19,201 +19,137 @@
 */
 
 #include <iostream>
-#include "HttpRequest.h"
-#include "HttpResponse.h"
 #include "../../common/utils/utils.h"
+#include "../../common/utils/FormatableString.h"
+#include "HttpRequest.h"
+#include "DashelUtils.h"
+#include "Globals.h"
 
-using Aseba::Http::DashelHttpRequest;
-using Aseba::Http::DashelHttpResponse;
-using Aseba::Http::HttpRequest;
-using Aseba::Http::HttpResponse;
-using std::cerr;
-using std::endl;
-using std::map;
-using std::string;
-using std::vector;
-
-HttpRequest::HttpRequest() :
-	verbose(false),
-	valid(false),
-	blocking(false),
-	response(NULL)
+namespace Aseba
 {
+	using namespace std;
+	using namespace Dashel;
+	
+	void readRequestLine(Stream* stream, string& method, string& uri, string& protocol, strings& tokenizedUri)
+	{
+		const string requestLine(readLine(stream));
+		const vector<string> parts(split<string>(requestLine, " "));
 
-}
+		if (parts.size() != 3)
+			throw HttpRequest::Error(FormatableString("Header line does not have three parts, it has %0 parts").arg(parts.size()), 400);
 
-HttpRequest::~HttpRequest()
-{
-	delete response;
-}
+		method = parts[0];
+		uri = parts[1];
+		protocol = trim(parts[2]);
+		
+		const set<string> supportedMethods = {
+			"GET",
+			"PUT",
+			"POST",
+			"OPTIONS",
+			"DELETE"
+		};
+		if (supportedMethods.find(method) == supportedMethods.end())
+			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(method), 405);
 
+		const set<string> supportedProtocolVersions = {
+			"HTTP/1.0",
+			"HTTP/1.1"
+		};
+		if (supportedProtocolVersions.find(protocol) == supportedProtocolVersions.end())
+			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), 400);
 
-bool HttpRequest::receive()
-{
-	valid = false;
-
-	if(!readRequestLine()) {
-		return false;
-	}
-
-	if(!readHeaders()) {
-		return false;
-	}
-
-	if(!readContent()) {
-		return false;
-	}
-
-	valid = true;
-
-	if(verbose) {
-		cerr << this << " Received valid " << getProtocol() << " " << getMethod() << " request for " << getUri() << " with " << content.size() << " byte(s) payload ";
-
-		cerr << "(headers:";
-
-		map<string, string>::const_iterator end = headers.end();
-		for(map<string, string>::const_iterator iter = headers.begin(); iter != end; ++iter) {
-			cerr << " " << iter->first << "=" << iter->second;
+		// Also allow %2F as URL part delimiter (see Scratch v430)
+		string::size_type n = 0;
+		while((n = uri.find("%2F", n)) != string::npos)
+		{
+			uri.replace(n, 3, "/"), n += 1;
 		}
 
-		cerr << ")" << endl;
-	}
-
-	return true;
-}
-
-HttpResponse& HttpRequest::respond()
-{
-	if(response == NULL) {
-		response = createResponse();
-		response->setVerbose(verbose);
-	}
-
-	return *response;
-}
-
-bool HttpRequest::readRequestLine()
-{
-	string requestLine = readLine();
-	vector<string> parts = split<string>(requestLine, " ");
-
-	if(parts.size() != 3) {
-		if(verbose) {
-			cerr << this << " Header line doesn't have three parts" << endl;
+		tokenizedUri = split<string>(uri, "/");
+		
+		// eat leading empty tokens, but leave at least one
+		while (tokenizedUri.size() > 1 && tokenizedUri[0].size() == 0)
+		{
+			tokenizedUri.erase(tokenizedUri.begin(), tokenizedUri.begin() + 1);
 		}
-		return false;
 	}
+	
+	void readHeaders(Stream* stream, HttpRequest::Headers& headers)
+	{
+		while (true)
+		{
+			const string headerLine(trim(readLine(stream)));
 
-	method = parts[0];
-	uri = parts[1];
-	protocol = trim(parts[2]);
-
-	if(!(method.find("GET", 0) == 0 || method.find("PUT", 0) == 0 || method.find("POST", 0) == 0 || method.find("OPTIONS", 0) == 0)) {
-		if(verbose) {
-			cerr << this << " Unsupported method" << endl;
-		}
-		return false;
-	}
-
-	if(!(protocol == "HTTP/1.0" || protocol == "HTTP/1.1")) {
-		if(verbose) {
-			cerr << this << " Unsupported HTTP protocol version" << endl;
-		}
-		return false;
-	}
-
-	// Also allow %2F as URL part delimiter (see Scratch v430)
-	std::string::size_type n = 0;
-	while((n = uri.find("%2F", n)) != std::string::npos) {
-		uri.replace(n, 3, "/"), n += 1;
-	}
-
-	tokens = split<string>(uri, "/");
-	// eat leading empty tokens, but leave at least one
-	while(tokens.size() > 1 && tokens[0].size() == 0) {
-		tokens.erase(tokens.begin(), tokens.begin() + 1);
-	}
-
-	return true;
-}
-
-bool HttpRequest::readHeaders()
-{
-	headers.clear();
-
-	while(true) {
-		const string headerLine(trim(readLine()));
-
-		if(headerLine.empty()) { // header section ends with empty line
-			break;
-		}
-
-		size_t firstColon = headerLine.find(": ");
-
-		if(firstColon != string::npos) {
-			string header = headerLine.substr(0, firstColon);
-			string value = headerLine.substr(firstColon + 2);
-
-			headers[header] = value;
-		} else {
-			if(verbose) {
-				cerr << this << " Invalid header line: " << headerLine << endl;
+			if (headerLine.empty()) { // header section ends with empty line
+				break;
 			}
-			return false;
+
+			const size_t firstColon(headerLine.find(": "));
+
+			if (firstColon != string::npos)
+			{
+				string header = headerLine.substr(0, firstColon);
+				string value = headerLine.substr(firstColon + 2);
+				headers[header] = value;
+			}
+			else
+				throw HttpRequest::Error(FormatableString("Invalid header line: %0").arg(headerLine), 400);
 		}
 	}
 
-	return true;
-}
-
-bool HttpRequest::readContent()
-{
-	// to make our life easier, we will require the presence of Content-Length in order to parse content
-	int contentLength = atoi(headers["Content-Length"].c_str());
-	contentLength = (contentLength > CONTENT_BYTES_LIMIT) ? CONTENT_BYTES_LIMIT : contentLength; // truncate at limit
-
-	if(contentLength > 0) {
-		char *buffer = new char[contentLength];
-		readRaw(buffer, contentLength);
-		content = string(buffer, contentLength);
-		delete[] buffer;
-	} else {
-		content = "";
+	void readContent(Stream* stream, const HttpRequest::Headers& headers, vector<uint8_t>& content)
+	{
+		auto contentLengthIt(headers.find("Content-Length"));
+		if (contentLengthIt == headers.end())
+			throw HttpRequest::Error("Invalid header, missing \"Content-Length\" field", 400);
+		
+		// to make our life easier, we will require the presence of Content-Length in order to parse content
+		const size_t contentLength(atoi(contentLengthIt->second.c_str()));
+		if (contentLength > HttpRequest::CONTENT_BYTES_LIMIT)
+			throw HttpRequest::Error(FormatableString("Request content length is %0 which exceeds limit %1").arg(contentLength).arg(HttpRequest::CONTENT_BYTES_LIMIT), 400);
+			
+		if (contentLength > 0)
+		{
+			content.resize(contentLength);
+			stream->read(&content[0], contentLength);
+		}
+	}
+	
+	HttpRequest HttpRequest::receive(Dashel::Stream* stream)
+	{
+		string method;
+		string uri;
+		strings tokenizedUri;
+		string protocol;
+		readRequestLine(stream, method, uri, protocol, tokenizedUri);
+		
+		Headers headers;
+		readHeaders(stream, headers);
+		
+		vector<uint8_t> content;
+		readContent(stream, headers, content);
+		
+		HttpRequest request = {
+			method,
+			uri,
+			tokenizedUri,
+			protocol,
+			headers,
+			content
+		};
+		
+		if (_globals.verbose)
+		{
+			cerr << " Received HTTP request" << endl;
+			request.dump(cerr);
+		}
+		
+		return request;
 	}
 
-	return true;
-}
-
-DashelHttpRequest::DashelHttpRequest(Dashel::Stream *stream_) :
-	stream(stream_)
-{
-
-
-}
-
-DashelHttpRequest::~DashelHttpRequest()
-{
-
-}
-
-HttpResponse *DashelHttpRequest::createResponse()
-{
-	return new DashelHttpResponse(this);
-}
-
-std::string DashelHttpRequest::readLine()
-{
-	char c;
-	std::string line;
-	do {
-		stream->read(&c, 1);
-		line += c;
-	} while(c != '\n');
-
-	return line;
-}
-
-void DashelHttpRequest::readRaw(char *buffer, int size)
-{
-	stream->read(buffer, size);
-}
+	void HttpRequest::dump(ostream& os)
+	{
+		// TODO: write json
+	}
+};

@@ -46,7 +46,10 @@
 
 	set(switch_SRCS
 		modules/http/HttpModule.cpp
+		Globals.cpp
+		DashelUtils.cpp
 		Arguments.cpp
+		HttpRequest.cpp
 		Switch.cpp
 		main.cpp
 	)
