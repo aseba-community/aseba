@@ -33,14 +33,7 @@ namespace Aseba
 {
 	class HttpResponse; // forward declaration
 
-	/**
-	 * Represents HTTP requests being parsed and responded to.
-	 *
-	 * Incoming requests start out without a HTTP response and are stalled in the HTTP interface
-	 * until a response was created by using the HTTP request's respond() method. Since a request
-	 * can have only one response, calling respond() repeatedly will simply return a reference
-	 * to the same response, which makes it very easy to add things like multiple output headers.
-	 */
+	//! Represents a parsed HTTP requests
 	class HttpRequest
 	{
 	public:

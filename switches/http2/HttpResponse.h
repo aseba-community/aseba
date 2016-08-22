@@ -26,14 +26,13 @@
 #include <string>
 #include <vector>
 #include <dashel/dashel.h>
+#include "HttpStatus.h"
+#include "HttpMethod.h"
+#include "HttpProtocol.h"
 
-#include "HttpRequest.h"
-
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	/**
-	 * Represents HTTP responses being sent as a reply to incoming HTTP requests.
-	 */
+	//! Represents HTTP responses being sent as a reply to incoming HTTP requests.
 	class HttpResponse
 	{
 	public:
@@ -44,19 +43,18 @@ namespace Aseba { namespace Http
 		HttpResponse();
 		void send(Dashel::Stream* stream);
 		void dump(std::ostream& os);
-
-	protected:
-		virtual void addStatusReply(std::ostringstream& reply);
-		virtual void addHeadersReply(std::ostringstream& reply);
-
-		virtual void writeRaw(const char *buffer, int length) = 0;
+		
+		void setServerSideEvent();
+		
+		std::string getHeader(const std::string& header) const;
 
 	public:
 		HttpProtocol protocol;
-		HttpStatus status;
+		HttpStatus::Code status;
 		Headers headers;
 		std::vector<uint8_t> content;
 	};
-} }
+} // namespace Aseba
+
 
 #endif

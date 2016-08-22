@@ -53,6 +53,7 @@
 		HttpMethod.cpp
 		HttpProtocol.cpp
 		HttpRequest.cpp
+		HttpResponse.cpp
 		Switch.cpp
 		main.cpp
 	)

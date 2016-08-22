@@ -20,78 +20,81 @@
 
 #include <iostream>
 #include "HttpResponse.h"
+#include "Globals.h"
 
-using Aseba::Http::HttpRequest;
-using Aseba::Http::HttpResponse;
-using std::cerr;
-using std::endl;
-using std::map;
-using std::ostringstream;
-using std::string;
-
-//! Constructor, sets status to OK and sets content type to JSON
-HttpResponse::HttpResponse():
-	status(HTTP_STATUS_OK)
+namespace Aseba
 {
-	// these can be overwritten later
-	headers["Content-Length"] = "";
-	headers["Content-Type"] = "application/json";
-	headers["Access-Control-Allow-Origin"] = "*";
-}
+	using namespace std;
+	using namespace Dashel;
 
-//! Set this response as Server-Side Event
-void HttpResponse::setSSE()
-{
-	headers["Content-Type"] = "text/event-stream";
-	headers["Cache-Control"] = "no-cache";
-	headers["Connection"] = "keep-alive";
-}
-
-//! Send the response
-void HttpResponse::send(Dashel::Stream* stream)
-{
-	// send reply with status and headers first
-	ostringstream reply;
-
-	addStatusReply(reply);
-	addHeadersReply(reply);
-
-	const std::string replyString(reply.str());
-	writeRaw(replyString.c_str(), replyString.size());
-
-	// send content payload second
-	writeRaw(content.c_str(), content.size());
-
-	if(verbose) {
-		cerr << getOriginatingRequest() << " Sent HTTP response with status " << status << " and " << content.size() << " byte(s) payload" << endl;
-	}
-}
-
-void HttpResponse::addStatusReply(std::ostringstream& reply)
-{
-	if(originatingRequest->getProtocol() == "HTTP/1.0" || originatingRequest->getProtocol() == "HTTP/1.1") {
-		reply << originatingRequest->getProtocol();
-	} else {
-		reply << "HTTP/1.1";
+	//! Constructor, sets status to OK and sets content type to JSON
+	HttpResponse::HttpResponse():
+		protocol(HttpProtocol::HTTP_1_1),
+		status(HttpStatus::OK)
+	{
+		// these can be overwritten later
+		headers["Content-Length"] = "";
+		headers["Content-Type"] = "application/json";
+		headers["Access-Control-Allow-Origin"] = "*";
 	}
 
-	reply << " " << status << " " << toString(status);
+	//! Set headers to make this response Server-Side Event declaration for the client
+	void HttpResponse::setServerSideEvent()
+	{
+		headers["Content-Type"] = "text/event-stream";
+		headers["Cache-Control"] = "no-cache";
+		headers["Connection"] = "keep-alive";
+	}
+	
+	//! Return a header or an empty string if not present
+	std::string HttpResponse::getHeader(const std::string& header) const
+	{
+		const auto headerIt(headers.find(header));
+		if (headerIt != headers.end())
+			return headerIt->second;
+		else
+			return "";
+	}
 
-	reply << "\r\n";
-}
-
-void HttpResponse::addHeadersReply(std::ostringstream& reply)
-{
-	map<string, string>::const_iterator end = headers.end();
-	for(map<string, string>::const_iterator iter = headers.begin(); iter != end; ++iter) {
-		if(iter->first == "Content-Length") { // override with actual size
-			if(getHeader("Content-Type") != "text/event-stream") { // but only if this is not an event stream
-				reply << iter->first << ": " << content.size() << "\r\n";
+	//! Send the response
+	void HttpResponse::send(Dashel::Stream* stream)
+	{
+		ostringstream reply;
+		
+		// write status
+		reply << toString(protocol) << " " << unsigned(status) << " " << HttpStatus::toString(status) << "\r\n";
+		
+		// write headers
+		for (const auto& headerKV: headers)
+		{
+			if (headerKV. first == "Content-Length") // override with actual size
+			{
+				if (getHeader("Content-Type") != "text/event-stream") // but only if this is not an event stream
+					reply << headerKV.first << ": " << content.size() << "\r\n";
 			}
-		} else {
-			reply << iter->first << ": " << iter->second << "\r\n";
+			else
+				reply << headerKV.first << ": " << headerKV.second << "\r\n";
+		}
+		reply << "\r\n";
+
+		// write reply
+		const std::string replyString(reply.str());
+		stream->write(replyString.c_str(), replyString.size());
+
+		// send content payload
+		stream->write(&content[0], content.size());
+		
+		if (_globals.verbose)
+		{
+			cerr << " Sent HTTP response " << status << " and " << content.size() << " byte(s) payload" << endl;
+			dump(cerr);
 		}
 	}
-
-	reply << "\r\n";
-}
+	
+	//! Write the response as JSON
+	void HttpResponse::dump(ostream& os)
+	{
+		// TODO: write json
+	}
+	
+} // namespace Aseba
