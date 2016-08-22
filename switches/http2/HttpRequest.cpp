@@ -36,7 +36,7 @@ namespace Aseba
 		const vector<string> parts(split<string>(requestLine, " "));
 
 		if (parts.size() != 3)
-			throw HttpRequest::Error(FormatableString("Header line does not have three parts, it has %0 parts").arg(parts.size()), 400);
+			throw HttpRequest::Error(FormatableString("Header line does not have three parts, it has %0 parts").arg(parts.size()), HttpStatus::BAD_REQUEST);
 
 		method = parts[0];
 		uri = parts[1];
@@ -50,14 +50,14 @@ namespace Aseba
 			"DELETE"
 		};
 		if (supportedMethods.find(method) == supportedMethods.end())
-			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(method), 405);
+			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(method), HttpStatus::METHOD_NOT_ALLOWED);
 
 		const set<string> supportedProtocolVersions = {
 			"HTTP/1.0",
 			"HTTP/1.1"
 		};
 		if (supportedProtocolVersions.find(protocol) == supportedProtocolVersions.end())
-			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), 505);
+			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), HttpStatus::HTTP_VERSION_NOT_SUPPORTED);
 
 		// Also allow %2F as URL part delimiter (see Scratch v430)
 		string::size_type n = 0;
@@ -94,7 +94,7 @@ namespace Aseba
 				headers[header] = value;
 			}
 			else
-				throw HttpRequest::Error(FormatableString("Invalid header line: %0").arg(headerLine), 400);
+				throw HttpRequest::Error(FormatableString("Invalid header line: %0").arg(headerLine), HttpStatus::BAD_REQUEST);
 		}
 	}
 
@@ -102,12 +102,12 @@ namespace Aseba
 	{
 		auto contentLengthIt(headers.find("Content-Length"));
 		if (contentLengthIt == headers.end())
-			throw HttpRequest::Error("Invalid header, missing \"Content-Length\" field", 400);
+			throw HttpRequest::Error("Invalid header, missing \"Content-Length\" field", HttpStatus::BAD_REQUEST);
 		
 		// to make our life easier, we will require the presence of Content-Length in order to parse content
 		const size_t contentLength(atoi(contentLengthIt->second.c_str()));
 		if (contentLength > HttpRequest::CONTENT_BYTES_LIMIT)
-			throw HttpRequest::Error(FormatableString("Request content length is %0 which exceeds limit %1").arg(contentLength).arg(HttpRequest::CONTENT_BYTES_LIMIT), 400);
+			throw HttpRequest::Error(FormatableString("Request content length is %0 which exceeds limit %1").arg(contentLength).arg(HttpRequest::CONTENT_BYTES_LIMIT), HttpStatus::BAD_REQUEST);
 			
 		if (contentLength > 0)
 		{

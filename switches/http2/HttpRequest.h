@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <dashel/dashel.h>
+#include "HttpStatus.h"
 
 namespace Aseba
 {
@@ -51,8 +52,8 @@ namespace Aseba
 		struct Error: public std::runtime_error
 		{
 			//! Create the error form a message and an HTTP status code
-			Error(const std::string& whatArg, unsigned errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
-			const unsigned errorCode; //!< 4xx/5xx error code
+			Error(const std::string& whatArg, HttpStatus errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
+			const HttpStatus errorCode; //!< 4xx/5xx error code
 		};
 
 	public:
