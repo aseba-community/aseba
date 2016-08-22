@@ -26,6 +26,8 @@
 #include <vector>
 #include <dashel/dashel.h>
 #include "HttpStatus.h"
+#include "HttpMethod.h"
+#include "HttpProtocol.h"
 
 namespace Aseba
 {
@@ -52,8 +54,8 @@ namespace Aseba
 		struct Error: public std::runtime_error
 		{
 			//! Create the error form a message and an HTTP status code
-			Error(const std::string& whatArg, HttpStatus errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
-			const HttpStatus errorCode; //!< 4xx/5xx error code
+			Error(const std::string& whatArg, HttpStatus::Code errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
+			const HttpStatus::Code errorCode; //!< 4xx/5xx error code
 		};
 
 	public:
@@ -61,10 +63,10 @@ namespace Aseba
 		void dump(std::ostream& os);
 	
 	public:
-		const std::string method;
+		const HttpMethod method;
 		const std::string uri;
 		const std::vector<std::string> tokenizedUri;
-		const std::string protocol;
+		const HttpProtocol protocol;
 		const Headers headers;
 		const std::vector<uint8_t> content;
 	};

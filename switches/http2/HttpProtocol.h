@@ -18,41 +18,30 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASEBA_HTTP_STATUS
-#define ASEBA_HTTP_STATUS
+#ifndef ASEBA_HTTP_PROTOCOL
+#define ASEBA_HTTP_PROTOCOL
 
 #include <string>
 #include <stdexcept>
 
 namespace Aseba
 {
-	//! A list of used HTTP status
-	struct HttpStatus
+	//! Possible HTTP protocols
+	enum struct HttpProtocol
 	{
-		enum Code
-		{
-			OK = 200,
-			CREATED = 201,
-			BAD_REQUEST = 400,
-			FORBIDDEN = 403,
-			NOT_FOUND = 404,
-			METHOD_NOT_ALLOWED = 405,
-			REQUEST_TIMEOUT = 408,
-			INTERNAL_SERVER_ERROR = 500,
-			NOT_IMPLEMENTED = 501,
-			SERVICE_UNAVAILABLE = 503,
-			HTTP_VERSION_NOT_SUPPORTED = 505
-		};
-		
-		//! An HTTP error, providing a status code
-		struct InvalidCode: public std::runtime_error
-		{
-			InvalidCode(Code code);
-		};
-		
-		static std::string toString(Code code);
+		HTTP_1_0 = 0,
+		HTTP_1_1
 	};
+	
+	//! Invalid protocol
+	struct InvalidHttpProtocol: public std::runtime_error
+	{
+		InvalidHttpProtocol(const std::string& protocol): std::runtime_error(protocol) {}
+	};
+	
+	std::string toString(const HttpProtocol& protocol);
+	HttpProtocol fromProtocolString(const std::string& protocol);
 	
 } // namespace Aseba
 
-#endif // ASEBA_HTTP_STATUS
+#endif // ASEBA_HTTP_PROTOCOL

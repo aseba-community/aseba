@@ -49,6 +49,9 @@
 		Globals.cpp
 		DashelUtils.cpp
 		Arguments.cpp
+		HttpStatus.cpp
+		HttpMethod.cpp
+		HttpProtocol.cpp
 		HttpRequest.cpp
 		Switch.cpp
 		main.cpp

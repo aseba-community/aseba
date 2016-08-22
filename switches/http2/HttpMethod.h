@@ -18,41 +18,33 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASEBA_HTTP_STATUS
-#define ASEBA_HTTP_STATUS
+#ifndef ASEBA_HTTP_METHOD
+#define ASEBA_HTTP_METHOD
 
 #include <string>
 #include <stdexcept>
 
 namespace Aseba
 {
-	//! A list of used HTTP status
-	struct HttpStatus
+	//! Possible HTTP methods
+	enum struct HttpMethod
 	{
-		enum Code
-		{
-			OK = 200,
-			CREATED = 201,
-			BAD_REQUEST = 400,
-			FORBIDDEN = 403,
-			NOT_FOUND = 404,
-			METHOD_NOT_ALLOWED = 405,
-			REQUEST_TIMEOUT = 408,
-			INTERNAL_SERVER_ERROR = 500,
-			NOT_IMPLEMENTED = 501,
-			SERVICE_UNAVAILABLE = 503,
-			HTTP_VERSION_NOT_SUPPORTED = 505
-		};
-		
-		//! An HTTP error, providing a status code
-		struct InvalidCode: public std::runtime_error
-		{
-			InvalidCode(Code code);
-		};
-		
-		static std::string toString(Code code);
+		GET = 0,
+		PUT,
+		POST,
+		OPTIONS,
+		DELETE
 	};
+	
+	//! Invalid method
+	struct InvalidHttpMethod: public std::runtime_error
+	{
+		InvalidHttpMethod(const std::string& method): std::runtime_error(method) {}
+	};
+	
+	std::string toString(const HttpMethod& method);
+	HttpMethod fromMethodString(const std::string& method);
 	
 } // namespace Aseba
 
-#endif // ASEBA_HTTP_STATUS
+#endif // ASEBA_HTTP_METHOD

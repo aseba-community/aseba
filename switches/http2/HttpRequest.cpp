@@ -30,48 +30,48 @@ namespace Aseba
 	using namespace std;
 	using namespace Dashel;
 	
-	void readRequestLine(Stream* stream, string& method, string& uri, string& protocol, strings& tokenizedUri)
+	void readRequestLine(Stream* stream, HttpMethod& method, string& uri, HttpProtocol& protocol, strings& tokenizedUri)
 	{
 		const string requestLine(readLine(stream));
 		const vector<string> parts(split<string>(requestLine, " "));
 
+		// do we have the right number of elements in the header?
 		if (parts.size() != 3)
 			throw HttpRequest::Error(FormatableString("Header line does not have three parts, it has %0 parts").arg(parts.size()), HttpStatus::BAD_REQUEST);
 
-		method = parts[0];
-		uri = parts[1];
-		protocol = trim(parts[2]);
+		// read the method
+		try
+		{
+			method = fromMethodString(parts[0]);
+		}
+		catch (const InvalidHttpMethod& e)
+		{
+			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(e.what()), HttpStatus::METHOD_NOT_ALLOWED);
+		}
 		
-		const set<string> supportedMethods = {
-			"GET",
-			"PUT",
-			"POST",
-			"OPTIONS",
-			"DELETE"
-		};
-		if (supportedMethods.find(method) == supportedMethods.end())
-			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(method), HttpStatus::METHOD_NOT_ALLOWED);
-
-		const set<string> supportedProtocolVersions = {
-			"HTTP/1.0",
-			"HTTP/1.1"
-		};
-		if (supportedProtocolVersions.find(protocol) == supportedProtocolVersions.end())
-			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), HttpStatus::HTTP_VERSION_NOT_SUPPORTED);
-
+		// read the URI
+		uri = parts[1];
 		// Also allow %2F as URL part delimiter (see Scratch v430)
 		string::size_type n = 0;
-		while((n = uri.find("%2F", n)) != string::npos)
+		while ((n = uri.find("%2F", n)) != string::npos)
 		{
 			uri.replace(n, 3, "/"), n += 1;
 		}
-
 		tokenizedUri = split<string>(uri, "/");
-		
 		// eat leading empty tokens, but leave at least one
 		while (tokenizedUri.size() > 1 && tokenizedUri[0].size() == 0)
 		{
 			tokenizedUri.erase(tokenizedUri.begin(), tokenizedUri.begin() + 1);
+		}
+		
+		// read the protocol
+		try
+		{
+			protocol = fromProtocolString(trim(parts[2]));
+		}
+		catch (const InvalidHttpProtocol& e)
+		{
+			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(e.what()), HttpStatus::HTTP_VERSION_NOT_SUPPORTED);
 		}
 	}
 	
@@ -119,10 +119,10 @@ namespace Aseba
 	//! Receive the HTTP request and parse its headers and content.
 	HttpRequest HttpRequest::receive(Dashel::Stream* stream)
 	{
-		string method;
+		HttpMethod method;
 		string uri;
 		strings tokenizedUri;
-		string protocol;
+		HttpProtocol protocol;
 		readRequestLine(stream, method, uri, protocol, tokenizedUri);
 		
 		Headers headers;

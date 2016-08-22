@@ -29,27 +29,26 @@ using std::map;
 using std::ostringstream;
 using std::string;
 
-HttpResponse::HttpResponse(const HttpRequest *originatingRequest_) :
-	originatingRequest(originatingRequest_),
-	verbose(false),
+//! Constructor, sets status to OK and sets content type to JSON
+HttpResponse::HttpResponse():
 	status(HTTP_STATUS_OK)
 {
-	// add some default headers, these can be overwritten later
-	setHeader("Content-Length", "");
-	setHeader("Content-Type", "application/json");
-	setHeader("Access-Control-Allow-Origin", "*");
-
-	if(originatingRequest->getHeader("Connection") == "keep-alive") {
-		setHeader("Connection", "keep-alive");
-	}
+	// these can be overwritten later
+	headers["Content-Length"] = "";
+	headers["Content-Type"] = "application/json";
+	headers["Access-Control-Allow-Origin"] = "*";
 }
 
-HttpResponse::~HttpResponse()
+//! Set this response as Server-Side Event
+void HttpResponse::setSSE()
 {
-
+	headers["Content-Type"] = "text/event-stream";
+	headers["Cache-Control"] = "no-cache";
+	headers["Connection"] = "keep-alive";
 }
 
-void HttpResponse::send()
+//! Send the response
+void HttpResponse::send(Dashel::Stream* stream)
 {
 	// send reply with status and headers first
 	ostringstream reply;
@@ -57,7 +56,7 @@ void HttpResponse::send()
 	addStatusReply(reply);
 	addHeadersReply(reply);
 
-	std::string replyString(reply.str());
+	const std::string replyString(reply.str());
 	writeRaw(replyString.c_str(), replyString.size());
 
 	// send content payload second
@@ -76,40 +75,7 @@ void HttpResponse::addStatusReply(std::ostringstream& reply)
 		reply << "HTTP/1.1";
 	}
 
-	reply << " " << status << " ";
-
-	switch(status) {
-		case HTTP_STATUS_OK:
-			reply << "OK";
-		break;
-		case HTTP_STATUS_CREATED:
-			reply << "Created";
-		break;
-		case HTTP_STATUS_BAD_REQUEST:
-			reply << "Bad Request";
-		break;
-		case HTTP_STATUS_FORBIDDEN:
-			reply << "Forbidden";
-		break;
-		case HTTP_STATUS_NOT_FOUND:
-			reply << "Not Found";
-		break;
-		case HTTP_STATUS_REQUEST_TIMEOUT:
-			reply << "Request Timeout";
-		break;
-		case HTTP_STATUS_INTERNAL_SERVER_ERROR:
-			reply << "Internal Server Error";
-		break;
-		case HTTP_STATUS_NOT_IMPLEMENTED:
-			reply << "Not Implemented";
-		break;
-		case HTTP_STATUS_SERVICE_UNAVAILABLE:
-			reply << "Service Unavailable";
-		break;
-		default:
-			reply << "Unknown";
-		break;
-	}
+	reply << " " << status << " " << toString(status);
 
 	reply << "\r\n";
 }
