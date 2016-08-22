@@ -41,18 +41,21 @@ namespace Aseba
 	class HttpRequest
 	{
 	public:
+		//! Headers are a map of key-value as strings
 		typedef std::map<std::string, std::string> Headers;
 		
+		//! We limit the size of the request's content
 		static const int CONTENT_BYTES_LIMIT = 40000;
 		
+		//! An HTTP error, providing a status code
 		struct Error: public std::runtime_error
 		{
+			//! Create the error form a message and an HTTP status code
 			Error(const std::string& whatArg, unsigned errorCode): std::runtime_error(whatArg), errorCode(errorCode) {}
-			const unsigned errorCode;
+			const unsigned errorCode; //!< 4xx/5xx error code
 		};
 
 	public:
-		//! Receive the HTTP request and parse its headers and content.
 		static HttpRequest receive(Dashel::Stream* stream);
 		void dump(std::ostream& os);
 	

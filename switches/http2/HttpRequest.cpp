@@ -57,7 +57,7 @@ namespace Aseba
 			"HTTP/1.1"
 		};
 		if (supportedProtocolVersions.find(protocol) == supportedProtocolVersions.end())
-			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), 400);
+			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(method), 505);
 
 		// Also allow %2F as URL part delimiter (see Scratch v430)
 		string::size_type n = 0;
@@ -116,6 +116,7 @@ namespace Aseba
 		}
 	}
 	
+	//! Receive the HTTP request and parse its headers and content.
 	HttpRequest HttpRequest::receive(Dashel::Stream* stream)
 	{
 		string method;
@@ -148,6 +149,7 @@ namespace Aseba
 		return request;
 	}
 
+	//! Write the request as JSON
 	void HttpRequest::dump(ostream& os)
 	{
 		// TODO: write json
