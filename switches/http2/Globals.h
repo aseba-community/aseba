@@ -23,7 +23,7 @@
 
 #define LOG_VERBOSE \
     if (!Aseba::_globals.verbose) {} \
-    else Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+    else Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
 
 #define LOG_ERROR \
 	Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr

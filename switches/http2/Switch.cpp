@@ -94,8 +94,7 @@ namespace Aseba
 		
 		// switch-specific arguments
 		printMessageContent = arguments.find("-d") || arguments.find("--dump");
-		if (printMessageContent)
-			_globals.verbose = true;
+		_globals.verbose = _globals.verbose || printMessageContent;
 		strings args;
 		if (arguments.find("--duration", &args))
 			runDuration = stoi(args[0]);
@@ -140,6 +139,8 @@ namespace Aseba
 		// it is an Aseba stream, receive message
 		const unique_ptr<Message> message(Message::receive(stream));
 		
+		// TODO: block list nodes
+		
 		// remap identifier if message not from IDE, update tables if previously unseen id
 		if (message->source != 0)
 		{
@@ -151,6 +152,15 @@ namespace Aseba
 			if (remapIt == remapTable.end())
 				remapIt = newRemapEntry(remapTable, stream, message->source);
 			message->source = remapIt->second;
+		}
+		
+		// dump message if enabled
+		if (printMessageContent)
+		{
+			dumpTime(cout, _globals.rawTime);
+			cout << "Core | Message from " << stream->getTargetName() << " : ";
+			message->dump(wcout);
+			wcout << endl;
 		}
 		
 		// pass message to nodes manager, which builds the node descriptions in background
@@ -202,13 +212,22 @@ namespace Aseba
 	
 	void Switch::sendMessage(const Message& message)
 	{
+		// dump message if enabled
+		if (printMessageContent)
+		{
+			dumpTime(cout, _globals.rawTime);
+			cout << "Core | Message from self : ";
+			message.dump(wcout);
+			wcout << endl;
+		}
+		
 		broadcastMessage(&message, nullptr);
 	}
 	
 	//! Broadcast a message without rewrite, assuming this message is not a subclass of CmdMessage
 	void Switch::broadcastMessage(const Message* message, const Stream* exceptedThis)
 	{
-		assert(!dynamic_cast<const CmdMessage *>(message));
+		assert(!dynamic_cast<const CmdMessage *>(message) || (dynamic_cast<const CmdMessage *>(message)->source == 0));
 		
 		// broadcast on all the network
 		for (auto stream: dataStreams)
@@ -285,6 +304,14 @@ namespace Aseba
 		// get next free global id
 		while (globalIdStreamMap.find(globalId) != globalIdStreamMap.end())
 			++globalId;
+		
+		// log if effective remapping
+		if (localId != globalId)
+		{
+			LOG_VERBOSE << "Core | Remapping local Id " << localId << " to global Id " << globalId << " for stream " << stream->getTargetName() << endl;
+		}
+		
+		// fill remap tables
 		globalIdStreamMap.emplace(globalId, stream);
 		return remapTable.emplace(localId, globalId).first;
 	}
