@@ -29,6 +29,7 @@
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
 #include "EPuck.h"
+#include "Thymio2.h"
 #include "../../common/utils/utils.h"
 
 #ifdef Q_OS_WIN32
@@ -43,16 +44,18 @@ namespace Enki
 	
 	static PlaygroundViewer* playgroundViewer = 0;
 
-	PlaygroundViewer::PlaygroundViewer(World* world) : 
-		ViewerWidget(world),
+	PlaygroundViewer::PlaygroundViewer(World* world) :
 		font("Courier", 10),
 		logPos(0),
+		timerPeriodMs(30),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
-		//font.setPixelSize(14);
 		if (playgroundViewer)
 			abort();
 		playgroundViewer = this;
+
+		viewer = new ViewerWidget(world);
+		setCentralWidget(viewer);
 	}
 	
 	PlaygroundViewer::~PlaygroundViewer()
@@ -62,7 +65,12 @@ namespace Enki
 	
 	World* PlaygroundViewer::getWorld() const
 	{
-		return world;
+		return viewer->getWorld();
+	}
+
+	ViewerWidget* PlaygroundViewer::getViewer()
+	{
+		return viewer;
 	}
 	
 	PlaygroundViewer* PlaygroundViewer::getInstance()
@@ -76,6 +84,20 @@ namespace Enki
 		logColor[logPos] = color;
 		logTime[logPos] = Aseba::UnifiedTime();
 		logPos = (logPos+1) % LOG_HISTORY_COUNT;
+	}
+
+	void PlaygroundViewer::timerEvent(QTimerEvent * event)
+	{
+		viewer->timerEvent(timerPeriodMs/1000.);
+	}
+
+	void PlaygroundViewer::startSimulation()
+	{
+		startTimer(timerPeriodMs);
+	}
+
+	void PlaygroundViewer::setCamera(QPointF planPosition, double altitude, double yaw, double pitch)
+	{
 	}
 	
 	void PlaygroundViewer::processStarted()
@@ -129,24 +151,25 @@ namespace Enki
 			log(tr("Process finished abnormally").arg((Q_PID_PRINT)process->pid()), Qt::red);*/
 		Q_UNUSED(process);
 	}
-	
+
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
-		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-		// TODO: add display of Thymio 2 in EnkiViewer, then add alias here
+		viewer->addManagedObjectsAlias(&typeid(AsebaFeedableEPuck),&typeid(EPuck));
+		viewer->addManagedObjectsAlias(&typeid(AsebaThymio2),&typeid(Thymio2));
 	}
 	
 	void PlaygroundViewer::sceneCompletedHook()
 	{
 		// create a map with names and scores
 		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
-		qglColor(Qt::black);
+		getViewer()->qglColor(Qt::black);
 		
 		// TODO: clean-up that
 		int i = 0;
 		QString scoreString("Id.: E./Score. - ");
 		int totalScore = 0;
-		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		for (World::ObjectsIterator it = getWorld()->objects.begin(); it != getWorld()->objects.end();
+			 ++it)
 		{
 			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
 			if (epuck)
@@ -155,18 +178,18 @@ namespace Enki
 				if (i != 0)
 					scoreString += " - ";
 				scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
-				renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
+				getViewer()->renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
 				i++;
 			}
 		}
 		
-		renderText(16, 22, scoreString, font);
+		getViewer()->renderText(16, 22, scoreString, font);
 		
-		renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
+		getViewer()->renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		
 		// console background
 		glEnable(GL_BLEND);
-		qglColor(QColor(0,0,0,200));
+		getViewer()->qglColor(QColor(0,0,0,200));
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
@@ -183,9 +206,14 @@ namespace Enki
 			const unsigned j((logPos+LOG_HISTORY_COUNT+LOG_HISTORY_COUNT-1-i) % LOG_HISTORY_COUNT);
 			if (!logText[j].isEmpty())
 			{
-				qglColor(logColor[j]);
-				renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+				getViewer()->qglColor(logColor[j]);
+				getViewer()->renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
 			}
 		}
+	}
+
+	void PlaygroundViewer::keyPressEvent(QKeyEvent* event)
+	{
+		viewer->keyPressEvent(event);
 	}
 } // Enki

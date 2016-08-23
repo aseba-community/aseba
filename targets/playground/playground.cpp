@@ -177,6 +177,7 @@ int main(int argc, char *argv[])
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world);
+	viewer.resize(1000, 800);
 	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
@@ -395,8 +396,14 @@ int main(int argc, char *argv[])
 		procssE = procssE.nextSiblingElement("process");
 	}
 	
+	// Allow picking for objects with finite mass
+	for (auto o: world.objects)
+		if (o->getMass() != -1)
+			viewer.getViewer()->setMovableByPicking(o, true);
+	
 	// Show and run
 	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.startSimulation();
 	viewer.show();
 	
 	// If D-Bus is used, register the viewer object
