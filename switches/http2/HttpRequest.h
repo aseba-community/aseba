@@ -58,7 +58,7 @@ namespace Aseba
 	public:
 		const HttpMethod method;
 		const std::string uri;
-		const std::vector<std::string> tokenizedUri;
+		const strings tokenizedUri;
 		const HttpProtocol protocol;
 		const Headers headers;
 		const std::vector<uint8_t> content;

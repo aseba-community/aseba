@@ -19,12 +19,13 @@
 */
 
 #include "HttpModule.h"
+#include "../../Switch.h"
 
 namespace Aseba
 {
 	HttpModule::HttpModule(Switch* asebaSwitch)
 	{
-		
+		asebaSwitch->registerModuleNotification(this);
 	}
 		
 	void HttpModule::dumpArgumentsDescription(std::ostream &stream) const
