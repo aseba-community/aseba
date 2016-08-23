@@ -21,12 +21,19 @@
 #ifndef ASEBA_SWITCH_GLOBALS
 #define ASEBA_SWITCH_GLOBALS
 
+#define LOG_VERBOSE \
+    if (!Aseba::_globals.verbose) {} \
+    else Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+
+#define LOG_ERROR \
+	Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+
 namespace Aseba
 {
-	
 	struct Globals
 	{
-		bool verbose;
+		bool verbose; //!< whether to be verbose
+		bool rawTime; //!< if true, use raw time for logging
 	};
 	
 	extern Globals _globals;

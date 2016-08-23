@@ -19,6 +19,7 @@
 */
 
 #include "Switch.h"
+#include "Globals.h"
 
 namespace Aseba
 {
@@ -52,15 +53,21 @@ namespace Aseba
 	
 	// Switch
 	
+	Switch::Switch():
+		printMessageContent(false),
+		runDuration(-1)
+	{
+	}
+	
 	//! Dump a short description of this module and the list of arguments it eats
 	void Switch::dumpArgumentsDescription(ostream &stream) const
 	{
 		stream << "  Core features of the switch\n";
 		stream << "    -v, --verbose   : makes the switch verbose (default: silent)\n";
-		stream << "    -d, --dump      : makes the switch dump the content of messages (default: do not dump)\n";
+		stream << "    -d, --dump      : makes the switch dump the content of messages, implies verbose (default: do not dump)\n";
 		stream << "    -p, --port port : listens to incoming Aseba connection on this port (default: 33333)\n";
 		stream << "    --rawtime       : shows time in the form of sec:usec since 1970 (default: user readable)\n";
-		stream << "    --duration sec  : run the switch only for a given duration (default: run forever)\n";
+		stream << "    --duration sec  : run the switch only for a given duration in s (default: run forever)\n";
 	}
 	
 	//! Give the list of arguments this module can understand
@@ -79,15 +86,28 @@ namespace Aseba
 	}
 	
 	//! Pass all parsed arguments to this module
-	void processArguments(const Arguments& arguments)
+	void Switch::processArguments(const Arguments& arguments)
 	{
-		// TODO
-	}
-	
-	// TODO: document
-	void Switch::handleAutomaticReconnection(Stream* stream)
-	{
-		automaticReconnectionStreams.insert(stream);
+		// global arguments
+		_globals.verbose = arguments.find("-v") || arguments.find("--verbose");
+		_globals.rawTime = arguments.find("--rawtime");
+		
+		// switch-specific arguments
+		printMessageContent = arguments.find("-d") || arguments.find("--dump");
+		if (printMessageContent)
+			_globals.verbose = true;
+		strings args;
+		if (arguments.find("--duration", &args))
+			runDuration = stoi(args[0]);
+		
+		// open tcpin port for Aseba Dashel streams
+		unsigned port(33333);
+		if (arguments.find("-p", &args) || arguments.find("--port", &args))
+			port = stoi(args[0]);
+		ostringstream oss;
+		oss << "tcpin:port=" << port;
+		Stream* serverStream(connect(oss.str()));
+		LOG_VERBOSE << "Core | Aseba listening stream on " << serverStream->getTargetName() << endl;
 	}
 	
 	//! Register a module to be notified of incoming messages
@@ -102,11 +122,13 @@ namespace Aseba
 		moduleSpecificStreams[stream] = owner;
 	}
 	
+	void Switch::connectionCreated(Stream *stream)
+	{
+		LOG_VERBOSE << "Core | Incoming connection from " << stream->getTargetName() << endl;
+	}
+	
 	void Switch::incomingData(Stream * stream)
 	{
-		// if it is our listen stream, answer the connection
-		// TODO
-		
 		// if specific to a module, delegate management of the stream to the module
 		auto moduleIt(moduleSpecificStreams.find(stream));
 		if (moduleIt != moduleSpecificStreams.end())
@@ -121,13 +143,13 @@ namespace Aseba
 		// remap identifier if message not from IDE, update tables if previously unseen id
 		if (message->source != 0)
 		{
-			auto remapTablesIt(idRemapTables.find(stream));
+			auto remapTablesIt(idRemapTables.find(stream->getTargetName()));
 			if (remapTablesIt == idRemapTables.end())
 				remapTablesIt = newRemapTable(stream);
 			IdRemapTable& remapTable(remapTablesIt->second);
 			auto remapIt(remapTable.find(message->source));
 			if (remapIt == remapTable.end())
-				remapIt = newRemapEntry(remapTable, message->source);
+				remapIt = newRemapEntry(remapTable, stream, message->source);
 			message->source = remapIt->second;
 		}
 		
@@ -145,7 +167,31 @@ namespace Aseba
 	
 	void Switch::connectionClosed(Stream * stream, bool abnormal)
 	{
-		// TODO: implement
+		// is this stream associated with a module?
+		auto streamModuleMapIt(moduleSpecificStreams.find(stream));
+		if (streamModuleMapIt != moduleSpecificStreams.end())
+		{
+			// yes, de-associate
+			moduleSpecificStreams.erase(streamModuleMapIt);
+		}
+		// no, is it a data stream (and therefore an Aseba stream)?
+		else if (dataStreams.find(stream) != dataStreams.end())
+		{
+			// yes, add to reconnection list
+			toReconnectTargets.insert(stream->getTargetName());
+			// clear the global id to stream entries
+			for (auto& globalIdStreamKV: globalIdStreamMap)
+			{
+				if (globalIdStreamKV.second == stream)
+					globalIdStreamKV.second = nullptr;
+			}
+		}
+		// no, it is a tcpin stream, do nothing
+		
+		if (abnormal)
+			LOG_VERBOSE << "Core | Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+		else
+			LOG_VERBOSE << "Core | Normal connection closed to " << stream->getTargetName() << endl;
 	}
 		
 	
@@ -180,7 +226,7 @@ namespace Aseba
 			}
 			catch (const Dashel::DashelException& e)
 			{
-				cerr << "Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
+				LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
 			}
 		}
 	}
@@ -190,6 +236,10 @@ namespace Aseba
 		CmdMessage *cmdMessage(dynamic_cast<CmdMessage *>(message));
 		if (cmdMessage)
 		{
+			// find the attached stream
+			auto streamIt(globalIdStreamMap.find(cmdMessage->dest));
+			if (streamIt == globalIdStreamMap.end())
+				return; // no stream attached, thus ignore
 			// command message, send only to the stream who has this node, and remap node
 			for (const auto& idRemapTablesKV: idRemapTables)
 			{
@@ -198,7 +248,10 @@ namespace Aseba
 					if (localToGlobalIdKV.second == cmdMessage->dest)
 					{
 						cmdMessage->dest = localToGlobalIdKV.first;
-						Stream* stream(idRemapTablesKV.first);
+						
+						Stream* stream(streamIt->second);
+						if (!stream)
+							return; // stream is nullptr, meaning the target is currently disconnected, thus ignore
 						try
 						{
 							message->serialize(stream);
@@ -206,31 +259,44 @@ namespace Aseba
 						}
 						catch (const Dashel::DashelException& e)
 						{
-							cerr << "Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
+							LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
 						}
 						return; // global identifiers are unique and each node are connected on a single stream, so we can stop here
 					}
-						
 				}
 			}
+			// the global id was found in the stream map, but not in the remap tables, this is an error
+			assert(false);
 		}
 		else
 			broadcastMessage(message, exceptedThis);
 	}
 	
-	Switch::IdRemapTables::iterator Switch::newRemapTable(Dashel::Stream* stream)
+	//! Create a new Id remap table for this stream
+	Switch::IdRemapTables::iterator Switch::newRemapTable(Stream* stream)
 	{
-		return idRemapTables.emplace(stream, IdRemapTable()).first;
+		return idRemapTables.emplace(stream->getTargetName(), IdRemapTable()).first;
 	}
 	
-	Switch::IdRemapTable::iterator Switch::newRemapEntry(IdRemapTable& remapTable, unsigned localId)
+	//! Create a new entry in the remapTable for stream for new node
+	Switch::IdRemapTable::iterator Switch::newRemapEntry(IdRemapTable& remapTable, Stream* stream, unsigned localId)
 	{
 		unsigned globalId(localId);
 		// get next free global id
-		while (globalIds.find(globalId) != globalIds.end())
+		while (globalIdStreamMap.find(globalId) != globalIdStreamMap.end())
 			++globalId;
-		globalIds.insert(globalId);
+		globalIdStreamMap.emplace(globalId, stream);
 		return remapTable.emplace(localId, globalId).first;
 	}
+
+	//! Return whether the given stream is an Aseba stream handled by this Switch
+// 	bool Switch::isAsebaStream(Dashel::Stream* stream) const
+// 	{
+// 		if (moduleSpecificStreams.find(stream) != moduleSpecificStreams.end())
+// 			return false;
+// 		if (dataStreams.find(stream) == dataStreams.end())
+// 			return false;
+// 		return true;
+// 	}
 	
 } // namespace Aseba

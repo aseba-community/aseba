@@ -18,10 +18,26 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "Arguments.h"
 
 namespace Aseba
 {
+	//! Find key in the list of arguments, return true and fill values (if given) if found, otherwise return false
+	bool Arguments::find(const std::string &key, std::vector<std::string>* values) const
+	{
+		return (find_if(begin(), end(), [&key, &values] (const Argument& arg)
+		{
+			if (arg.name == key)
+			{
+				if (values)
+					*values = arg.values;
+				return true;
+			}
+			return false;
+		}) != end());
+	}
+	
 	//! Parse the current argument arg in whose parameters start at argCounter in argv
 	//! Return true as soon as an argument name is matched, and update parseArgs, return false if no match is found
 	bool ArgumentDescriptions::parse(const char* arg, int argc, const char* argv[], int& argCounter, Arguments& parsedArgs)

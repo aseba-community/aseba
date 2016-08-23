@@ -44,8 +44,15 @@ namespace Aseba
 		std::vector<std::string> values; //!< values as string, could be converted by user class
 	};
 
+	//! Filled command-line arguments, typedef for constructor inheritance
+	typedef std::vector<Argument> ArgumentsBase;
+	
 	//! Filled command-line arguments
-	typedef std::vector<Argument> Arguments;
+	struct Arguments: public ArgumentsBase
+	{
+		using ArgumentsBase::ArgumentsBase;
+		bool find(const std::string &key, std::vector<std::string>* values = nullptr) const;
+	};
 	
 	//! Possible command-line arguments, typedef for constructor inheritance
 	typedef std::vector<ArgumentDescription> ArgumentDescriptionsBase;

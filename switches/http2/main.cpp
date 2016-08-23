@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "Switch.h"
+#include "Globals.h"
 
 #include "../../common/consts.h"
 #include "../../common/types.h"
@@ -103,23 +104,32 @@ int main(int argc, const char *argv[])
 		// all given arguments must be handled, otherwise it is an error
 		// because we do not know how many values to consume
 		if (strncmp(arg, "-", 1) == 0)
-			throw runtime_error(string("Unhandled argument ") + arg);
+		{
+			cerr << string("Unhandled command line argument: ") + arg << endl;
+			exit(2);
+		}
 		// register additional dashel targets
 		dashelTargetList.push_back(arg);
 		
 		argFound: ;
 	}
 	
-	// set module arguments
+	// set Switch and module arguments
+	asebaSwitch->processArguments(arguments);
 	for (auto const& module: modules)
 		module->processArguments(arguments);
 	
 	// add command line targets
 	for (auto const& target: dashelTargetList) 
 	{
-		Dashel::Stream* stream(asebaSwitch->connect(target));
-		asebaSwitch->handleAutomaticReconnection(stream);
-		// TODO: handle exception
+		try
+		{
+			Dashel::Stream* stream(asebaSwitch->connect(target));
+		}
+		catch (const Dashel::DashelException& e)
+		{
+			LOG_ERROR << "Core | Error connecting target " << target << " : " << e.what() << endl;
+		}
 	}
 	
 	// run switch, catch Dashel exceptions
@@ -136,10 +146,10 @@ int main(int argc, const char *argv[])
 // 			}
 // 		}
 	}
-	catch(Dashel::DashelException e)
+	catch (const Dashel::DashelException& e)
 	{
-		cerr << "Unhandled Dashel exception: " << e.what() << endl;
-		return 1;
+		LOG_ERROR << "Core | Unhandled Dashel exception: " << e.what() << endl;
+		return 1; 
 	}
 
 	return 0;

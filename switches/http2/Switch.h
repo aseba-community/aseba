@@ -31,14 +31,14 @@ namespace Aseba
 	{
 	protected:
 		//! A set of streams
-		typedef std::set<Dashel::Stream*> StreamSet;
+		typedef std::set<std::string> StreamTargetSet;
 		
 		//! A map of local to global node id, to be used on a given stream
 		typedef std::map<unsigned, unsigned> IdRemapTable;
 		//! The global remap table for all Aseba streams
-		typedef std::map<Dashel::Stream*, IdRemapTable> IdRemapTables;
-		//! All global identifiers
-		typedef std::set<unsigned> GlobalIds;
+		typedef std::map<std::string, IdRemapTable> IdRemapTables;
+		//! All global identifiers with their current associated stream
+		typedef std::map<unsigned, Dashel::Stream*> GlobalIdStreamMap;
 		
 		//! A vector of modules
 		typedef std::vector<Module*> Modules;
@@ -57,17 +57,18 @@ namespace Aseba
 		
 	public:
 		// public API for main
+		Switch();
 		void dumpArgumentsDescription(std::ostream &stream) const;
 		ArgumentDescriptions describeArguments() const;
 		void processArguments(const Arguments& arguments);
 		
 		// public API for modules
-		void handleAutomaticReconnection(Dashel::Stream* stream);
 		void registerModuleNotification(Module* module);
 		void delegateHandlingToModule(Dashel::Stream* stream, Module* owner);
 		
 	protected:
 		// from Hub
+		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream * stream);
 		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal);
 		
@@ -79,15 +80,19 @@ namespace Aseba
 		void broadcastMessage(const Message* message, const Dashel::Stream* exceptedThis);
 		void sendMessageWithRemap(Message* message, const Dashel::Stream* exceptedThis);
 		IdRemapTables::iterator newRemapTable(Dashel::Stream* stream);
-		IdRemapTable::iterator newRemapEntry(IdRemapTable& remapTable, unsigned localId);
+		IdRemapTable::iterator newRemapEntry(IdRemapTable& remapTable, Dashel::Stream* stream, unsigned localId);
+		//bool isAsebaStream(Dashel::Stream* stream) const;
 		
 	protected:
+		bool printMessageContent; //!< if true, print the content of each message
+		int runDuration; //!< if positive, run only for duration (in seconds)
+		
 		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
 		
-		StreamSet automaticReconnectionStreams; //!< streams that must be reconnected automatically if disconnected
+		StreamTargetSet toReconnectTargets; //!< set of targets to attempt automatic reconnection, will be Aseba streams afterwards
 		
-		IdRemapTables idRemapTables; //!< tables for remapping identifiers for different streams
-		GlobalIds globalIds; //!< all known global identifiers
+		IdRemapTables idRemapTables; //!< tables for remapping identifiers for different Aseba Dashel targets
+		GlobalIdStreamMap globalIdStreamMap; //!< all known global identifiers with their current associated stream
 		
 		Modules notifiedModules; //!< modules wanting to receive notification of messages
 		StreamModuleMap moduleSpecificStreams; //!< streams whose data processing responsibility are delegated to a module
