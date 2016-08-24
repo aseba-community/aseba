@@ -176,7 +176,9 @@ namespace Aseba
 		// it is an Aseba stream, receive message
 		const unique_ptr<Message> message(Message::receive(stream));
 		
-		// TODO: block list nodes from clients
+		// block list nodes from clients as this listing is implemented by us
+		if (dynamic_cast<ListNodes*>(message.get()))
+			return;
 		
 		// remap identifier if message not from IDE, update tables if previously unseen id
 		if (message->source != 0)
