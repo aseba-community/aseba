@@ -35,7 +35,7 @@ namespace Aseba
 		
 		//! A map of local to global node id, to be used on a given stream
 		typedef std::map<unsigned, unsigned> IdRemapTable;
-		//! The global remap table for all Aseba streams
+		//! The global remap table for all Aseba targets
 		typedef std::map<std::string, IdRemapTable> IdRemapTables;
 		//! All global identifiers with their current associated stream
 		typedef std::map<unsigned, Dashel::Stream*> GlobalIdStreamMap;
@@ -85,6 +85,7 @@ namespace Aseba
 		IdRemapTables::iterator newRemapTable(Dashel::Stream* stream);
 		IdRemapTable::iterator newRemapEntry(IdRemapTable& remapTable, Dashel::Stream* stream, unsigned localId);
 		bool run1s();
+		void reconnectDisconnectedTargets();
 		//bool isAsebaStream(Dashel::Stream* stream) const;
 		
 	protected:

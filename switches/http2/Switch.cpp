@@ -119,17 +119,24 @@ namespace Aseba
 			++elapsedTime;
 			if (runDuration >= 0 && elapsedTime > runDuration)
 				break;
-			// every second, see if new nodes have appeared or reconnected
-			pingNetwork();
 		}
 	}
 	
 	//! Run the Dashel::Hub for 1 second, return true if execution should continue, false if a termination signal was caught
 	bool Switch::run1s()
 	{
+		// get initial time
+		UnifiedTime startTime;
+		
+		// attempt to reconnect disconnected targets
+		reconnectDisconnectedTargets();
+		
+		// see if new nodes have appeared or reconnected
+		pingNetwork();
+		
+		// run switch for one second
 		const int duration(1000);
 		int timeout(duration);
-		UnifiedTime startTime;
 		while (timeout > 0)
 		{
 			if (!step(timeout))
@@ -169,7 +176,7 @@ namespace Aseba
 		// it is an Aseba stream, receive message
 		const unique_ptr<Message> message(Message::receive(stream));
 		
-		// TODO: block list nodes
+		// TODO: block list nodes from clients
 		
 		// remap identifier if message not from IDE, update tables if previously unseen id
 		if (message->source != 0)
@@ -227,6 +234,8 @@ namespace Aseba
 			}
 		}
 		// no, it is a tcpin stream, do nothing
+		else
+			return;
 		
 		if (abnormal)
 			LOG_VERBOSE << "Core | Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
@@ -344,6 +353,41 @@ namespace Aseba
 		// fill remap tables
 		globalIdStreamMap.emplace(globalId, stream);
 		return remapTable.emplace(localId, globalId).first;
+	}
+	
+	//! Attempt to reconnect disconnected targets
+	void Switch::reconnectDisconnectedTargets()
+	{
+		auto targetIt(toReconnectTargets.begin());
+		while (targetIt != toReconnectTargets.end())
+		{
+			const string& target(*targetIt);
+			try
+			{
+				// attempt reconnection
+				Stream* stream(connect(target));
+				
+				// update global id to stream table
+				const auto idRemapTableIt(idRemapTables.find(target));
+				assert(idRemapTableIt != idRemapTables.end());
+				const IdRemapTable& idRemapTable(idRemapTableIt->second);
+				for (const auto& localToGlobalIdKV: idRemapTable)
+				{
+					const unsigned globalId(localToGlobalIdKV.second);
+					globalIdStreamMap[globalId] = stream;
+				}
+				
+				LOG_VERBOSE << "Core | Reconnected to target " << target << endl;
+				
+				targetIt = toReconnectTargets.erase(targetIt);
+			}
+			catch(const Dashel::DashelException& e)
+			{
+				LOG_VERBOSE << "Core | Failed to reconnect to target " << target << endl;
+				
+				++targetIt;
+			}
+		}
 	}
 
 	//! Return whether the given stream is an Aseba stream handled by this Switch
