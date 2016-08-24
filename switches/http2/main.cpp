@@ -135,16 +135,7 @@ int main(int argc, const char *argv[])
 	// run switch, catch Dashel exceptions
 	try
 	{
-		// run the switch
 		asebaSwitch->run();
-		
-// 		while(Kiterations < 0 || Kiterations > 0) {
-// 			interface->step();
-// 
-// 			if(Kiterations > 0) {
-// 				Kiterations--;
-// 			}
-// 		}
 	}
 	catch (const Dashel::DashelException& e)
 	{

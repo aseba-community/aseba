@@ -109,6 +109,36 @@ namespace Aseba
 		LOG_VERBOSE << "Core | Aseba listening stream on " << serverStream->getTargetName() << endl;
 	}
 	
+	//! Run the Switch until a termination signal was caught or a specific given duration has elapsed
+	void Switch::run()
+	{
+		int elapsedTime(0);
+		while (run1s())
+		{
+			// count time and stop if maximum is reached
+			++elapsedTime;
+			if (runDuration >= 0 && elapsedTime > runDuration)
+				break;
+			// every second, see if new nodes have appeared or reconnected
+			pingNetwork();
+		}
+	}
+	
+	//! Run the Dashel::Hub for 1 second, return true if execution should continue, false if a termination signal was caught
+	bool Switch::run1s()
+	{
+		const int duration(1000);
+		int timeout(duration);
+		UnifiedTime startTime;
+		while (timeout > 0)
+		{
+			if (!step(timeout))
+				return false;
+			timeout = duration - (UnifiedTime() - startTime).value;
+		}
+		return true;
+	}
+	
 	//! Register a module to be notified of incoming messages
 	void Switch::registerModuleNotification(Module* module)
 	{

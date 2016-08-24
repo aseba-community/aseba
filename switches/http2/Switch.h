@@ -58,9 +58,12 @@ namespace Aseba
 	public:
 		// public API for main
 		Switch();
+		
 		void dumpArgumentsDescription(std::ostream &stream) const;
 		ArgumentDescriptions describeArguments() const;
 		void processArguments(const Arguments& arguments);
+		
+		void run();
 		
 		// public API for modules
 		void registerModuleNotification(Module* module);
@@ -81,6 +84,7 @@ namespace Aseba
 		void sendMessageWithRemap(Message* message, const Dashel::Stream* exceptedThis);
 		IdRemapTables::iterator newRemapTable(Dashel::Stream* stream);
 		IdRemapTable::iterator newRemapEntry(IdRemapTable& remapTable, Dashel::Stream* stream, unsigned localId);
+		bool run1s();
 		//bool isAsebaStream(Dashel::Stream* stream) const;
 		
 	protected:
