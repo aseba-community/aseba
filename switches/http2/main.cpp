@@ -39,7 +39,7 @@ using namespace std;
 using namespace Aseba;
 
 //! List of instanciated modules
-typedef vector<unique_ptr<Module>> Modules;
+typedef Switch::Modules Modules;
 
 //! Show version
 void dumpVersion(std::ostream &stream, const char *programName)
@@ -77,9 +77,7 @@ int main(int argc, const char *argv[])
 	unique_ptr<Switch> asebaSwitch(new Switch());
 	
 	// create modules
-	Modules modules;
-	modules.push_back(unique_ptr<Module>(new HttpModule(asebaSwitch.get())));
-	// TODO: add more modules
+	asebaSwitch->registerModule(new HttpModule());
 	
 	// parse command line
 	vector<string> dashelTargetList;
@@ -91,14 +89,14 @@ int main(int argc, const char *argv[])
 		
 		// show help/version and quit
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
-			dumpHelp(cout, argv[0], asebaSwitch.get(), modules), exit(0);
+			dumpHelp(cout, argv[0], asebaSwitch.get(), asebaSwitch->getModules()), exit(0);
 		if((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
 			dumpVersion(cout, argv[0]), exit(0);
 		// find whether the switch knows this argument
 		if (asebaSwitch->describeArguments().parse(arg, argc, argv, argCounter, arguments))
 			goto argFound;
 		// find whether a module knows this argument
-		for (auto const& module: modules)
+		for (auto const& module: asebaSwitch->getModules())
 			if (module->describeArguments().parse(arg, argc, argv, argCounter, arguments))
 				goto argFound;
 		// all given arguments must be handled, otherwise it is an error
@@ -116,15 +114,15 @@ int main(int argc, const char *argv[])
 	
 	// set Switch and module arguments
 	asebaSwitch->processArguments(arguments);
-	for (auto const& module: modules)
-		module->processArguments(arguments);
+	for (auto const& module: asebaSwitch->getModules())
+		module->processArguments(asebaSwitch.get(), arguments);
 	
 	// add command line targets
 	for (auto const& target: dashelTargetList) 
 	{
 		try
 		{
-			Dashel::Stream* stream(asebaSwitch->connect(target));
+			asebaSwitch->connect(target);
 		}
 		catch (const Dashel::DashelException& e)
 		{

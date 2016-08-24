@@ -18,17 +18,28 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <ostream>
 #include "HttpModule.h"
+#include "../../Globals.h"
 #include "../../Switch.h"
 
 namespace Aseba
 {
-	HttpModule::HttpModule(Switch* asebaSwitch)
+	using namespace std;
+	using namespace Dashel;
+	
+	HttpModule::HttpModule():
+		serverPort(3000)
 	{
-		asebaSwitch->registerModuleNotification(this);
-	}
 		
-	void HttpModule::dumpArgumentsDescription(std::ostream &stream) const
+	}
+	
+	string HttpModule::name() const
+	{
+		return "HTTP";
+	}
+	
+	void HttpModule::dumpArgumentsDescription(ostream &stream) const
 	{
 		stream << "  HTTP module, provides access to the network from a web application\n";
 		stream << "    -w, --http      : listens to incoming HTTP connections on this port (default: 3000)\n";
@@ -40,6 +51,28 @@ namespace Aseba
 			{ "-w", 1 },
 			{ "--http", 1 }
 		};
+	}
+	
+	void HttpModule::processArguments(Switch* asebaSwitch, const Arguments& arguments)
+	{
+		strings args;
+		if (arguments.find("-w", &args) || arguments.find("--http", &args))
+			serverPort = stoi(args[0]);
+		// TODO: add an option to avoid creating an HTTP port
+		// TODO: catch the connection exception for HTTP port, decide what to do
+		ostringstream oss;
+		oss << "tcpin:port=" << serverPort;
+		Stream* serverStream(asebaSwitch->connect(oss.str()));
+		LOG_VERBOSE << "HTTP | HTTP Listening stream on " << serverStream->getTargetName() << endl;
+	}
+	
+	bool HttpModule::connectionCreated(Dashel::Stream * stream)
+	{
+		// take ownership of the stream if it was created by our server stream
+		if (stream->getTarget().isSet("connectionPort") &&
+			stoi(stream->getTargetParameter("connectionPort")) == serverPort)
+			return true;
+		return false;
 	}
 	
 	void HttpModule::incomingData(Dashel::Stream * stream)

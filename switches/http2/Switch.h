@@ -29,6 +29,10 @@ namespace Aseba
 {
 	class Switch: public Dashel::Hub, public NodesManager
 	{
+	public:
+		//! A vector of modules
+		typedef std::vector<std::unique_ptr<Module>> Modules;
+		
 	protected:
 		//! A set of streams
 		typedef std::set<std::string> StreamTargetSet;
@@ -40,8 +44,6 @@ namespace Aseba
 		//! All global identifiers with their current associated stream
 		typedef std::map<unsigned, Dashel::Stream*> GlobalIdStreamMap;
 		
-		//! A vector of modules
-		typedef std::vector<Module*> Modules;
 		//! An association of stream to module
 		typedef std::map<Dashel::Stream*, Module*> StreamModuleMap;
 		
@@ -65,9 +67,10 @@ namespace Aseba
 		
 		void run();
 		
+		const Modules& getModules() const { return modules; }
+		
 		// public API for modules
-		void registerModuleNotification(Module* module);
-		void delegateHandlingToModule(Dashel::Stream* stream, Module* owner);
+		void registerModule(Module* module);
 		
 	protected:
 		// from Hub
@@ -99,7 +102,7 @@ namespace Aseba
 		IdRemapTables idRemapTables; //!< tables for remapping identifiers for different Aseba Dashel targets
 		GlobalIdStreamMap globalIdStreamMap; //!< all known global identifiers with their current associated stream
 		
-		Modules notifiedModules; //!< modules wanting to receive notification of messages
+		Modules modules; //!< modules wanting to receive notification of messages
 		StreamModuleMap moduleSpecificStreams; //!< streams whose data processing responsibility are delegated to a module
 	};
 	

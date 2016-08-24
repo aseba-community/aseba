@@ -146,21 +146,25 @@ namespace Aseba
 		return true;
 	}
 	
-	//! Register a module to be notified of incoming messages
-	void Switch::registerModuleNotification(Module* module)
+	//! Register a module, the switch takes ownership of the module and will notify it of incoming events
+	void Switch::registerModule(Module* module)
 	{
-		notifiedModules.push_back(module);
-	}
-	
-	//! Delegate the handling of a stream, including receiving data, to a module
-	void Switch::delegateHandlingToModule(Stream* stream, Module* owner)
-	{
-		moduleSpecificStreams[stream] = owner;
+		modules.push_back(unique_ptr<Module>(module));
 	}
 	
 	void Switch::connectionCreated(Stream *stream)
 	{
 		LOG_VERBOSE << "Core | Incoming connection from " << stream->getTargetName() << endl;
+		// give modules the opportunity to take ownership of the stream
+		for (auto& module: modules)
+		{
+			if (module->connectionCreated(stream))
+			{
+				moduleSpecificStreams[stream] = module.get();
+				LOG_VERBOSE << "Core | Handling of stream " << stream->getTargetName() << " delegated to module " << module->name() << endl;
+				break;
+			}
+		}
 	}
 	
 	void Switch::incomingData(Stream * stream)
@@ -207,7 +211,7 @@ namespace Aseba
 		processMessage(message.get());
 		
 		// allow every module a chance to process the message
-		for (auto& module: notifiedModules)
+		for (auto& module: modules)
 			module->processMessage(*message);
 		
 		// resend on the network

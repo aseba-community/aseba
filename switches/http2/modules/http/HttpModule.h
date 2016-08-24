@@ -28,14 +28,20 @@ namespace Aseba
 	class HttpModule: public Module
 	{
 	public:
-		HttpModule(Switch*);
+		HttpModule();
 		
+		virtual std::string name() const;
 		virtual void dumpArgumentsDescription(std::ostream &stream) const;
 		virtual ArgumentDescriptions describeArguments() const;
+		virtual void processArguments(Switch* asebaSwitch, const Arguments& arguments);
 		
+		virtual bool connectionCreated(Dashel::Stream * stream);
 		virtual void incomingData(Dashel::Stream * stream);
 		virtual void connectionClosed(Dashel::Stream * stream);
 		virtual void processMessage(const Message& message);
+	
+	protected:
+		unsigned serverPort;
 	};
 }
 

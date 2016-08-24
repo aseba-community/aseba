@@ -36,19 +36,24 @@ namespace Aseba
 	class Module
 	{
 	public:
+		//! return the name of this module
+		virtual std::string name() const = 0;
 		//! Dump a short description of this module and the list of arguments it eats
 		virtual void dumpArgumentsDescription(std::ostream &stream) const = 0;
 		//! Give the list of arguments this module can understand
 		virtual ArgumentDescriptions describeArguments() const { return ArgumentDescriptions(); }
 		//! Pass all parsed arguments to this module
-		virtual void processArguments(const Arguments& arguments) {}
+		virtual void processArguments(Switch* asebaSwitch, const Arguments& arguments) {}
 		
 		// main features
 		
+		//! Notify the module of the creation of a new stream.
+		//! Give this module the opportunity to take ownership of the newly-created stream by returning true
+		virtual bool connectionCreated(Dashel::Stream * stream) { return false; }
 		//! Read data on a stream that is handled by this module (was registered by Switch::delegateHandlingToModule)
-		virtual void incomingData(Dashel::Stream * stream) = 0;
+		virtual void incomingData(Dashel::Stream * stream) {}
 		//! A stream handled by this module has been closed
-		virtual void connectionClosed(Dashel::Stream * stream) = 0;
+		virtual void connectionClosed(Dashel::Stream * stream) {}
 		
 		//! Give the module the possibility to handle an Aseba message, whose id is global
 		virtual void processMessage(const Message& message) = 0;
