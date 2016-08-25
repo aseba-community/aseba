@@ -33,7 +33,7 @@
 
 // modules
 
-#include "modules/http/HttpModule.h"
+#include "http/HttpDispatcher.h"
 
 using namespace std;
 using namespace Aseba;
@@ -77,7 +77,7 @@ int main(int argc, const char *argv[])
 	unique_ptr<Switch> asebaSwitch(new Switch());
 	
 	// create modules
-	asebaSwitch->registerModule(new HttpModule());
+	asebaSwitch->registerModule(new HttpDispatcher());
 	
 	// parse command line
 	vector<string> dashelTargetList;

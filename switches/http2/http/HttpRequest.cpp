@@ -19,11 +19,11 @@
 */
 
 #include <iostream>
-#include "../../common/utils/utils.h"
-#include "../../common/utils/FormatableString.h"
+#include "../../../common/utils/utils.h"
+#include "../../../common/utils/FormatableString.h"
 #include "HttpRequest.h"
-#include "DashelUtils.h"
-#include "Globals.h"
+#include "../DashelUtils.h"
+#include "../Globals.h"
 
 namespace Aseba
 {
@@ -100,11 +100,9 @@ namespace Aseba
 
 	void readContent(Stream* stream, const HttpRequest::Headers& headers, vector<uint8_t>& content)
 	{
+		// if this function is called, there must be content to read
 		auto contentLengthIt(headers.find("Content-Length"));
-		if (contentLengthIt == headers.end())
-			throw HttpRequest::Error("Invalid header, missing \"Content-Length\" field", HttpStatus::BAD_REQUEST);
-		
-		// to make our life easier, we will require the presence of Content-Length in order to parse content
+		assert (contentLengthIt != headers.end());
 		const size_t contentLength(atoi(contentLengthIt->second.c_str()));
 		if (contentLength > HttpRequest::CONTENT_BYTES_LIMIT)
 			throw HttpRequest::Error(FormatableString("Request content length is %0 which exceeds limit %1").arg(contentLength).arg(HttpRequest::CONTENT_BYTES_LIMIT), HttpStatus::BAD_REQUEST);
@@ -128,8 +126,13 @@ namespace Aseba
 		Headers headers;
 		readHeaders(stream, headers);
 		
+		cerr << toString(method) << " " << toString(protocol) << " " << uri << endl;
+		for (auto p: headers)
+			cerr << p.first << ": " << p.second << endl;
+		
 		vector<uint8_t> content;
-		readContent(stream, headers, content);
+		if (headers.find("Content-Length") != headers.end())
+			readContent(stream, headers, content);
 		
 		HttpRequest request = {
 			method,

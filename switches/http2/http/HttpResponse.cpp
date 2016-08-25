@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include "HttpResponse.h"
-#include "Globals.h"
+#include "../Globals.h"
 
 namespace Aseba
 {
@@ -83,6 +83,7 @@ namespace Aseba
 
 		// send content payload
 		stream->write(&content[0], content.size());
+		stream->flush();
 		
 		if (_globals.verbose)
 		{

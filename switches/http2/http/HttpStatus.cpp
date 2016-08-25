@@ -19,7 +19,7 @@
 */
 
 #include <map>
-#include "../../common/utils/FormatableString.h"
+#include "../../../common/utils/FormatableString.h"
 #include "HttpStatus.h"
 
 namespace Aseba

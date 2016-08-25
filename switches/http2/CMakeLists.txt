@@ -45,15 +45,15 @@
 #endif(LIBXML2_FOUND)
 
 	set(switch_SRCS
-		modules/http/HttpModule.cpp
+		http/HttpStatus.cpp
+		http/HttpMethod.cpp
+		http/HttpProtocol.cpp
+		http/HttpRequest.cpp
+		http/HttpResponse.cpp
+		http/HttpDispatcher.cpp
 		Globals.cpp
 		DashelUtils.cpp
 		Arguments.cpp
-		HttpStatus.cpp
-		HttpMethod.cpp
-		HttpProtocol.cpp
-		HttpRequest.cpp
-		HttpResponse.cpp
 		Switch.cpp
 		main.cpp
 	)

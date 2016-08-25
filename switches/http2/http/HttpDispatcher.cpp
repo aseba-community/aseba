@@ -19,33 +19,33 @@
 */
 
 #include <ostream>
-#include "HttpModule.h"
-#include "../../Globals.h"
-#include "../../Switch.h"
+#include "HttpDispatcher.h"
+#include "../Globals.h"
+#include "../Switch.h"
 
 namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
 	
-	HttpModule::HttpModule():
+	HttpDispatcher::HttpDispatcher():
 		serverPort(3000)
 	{
 		
 	}
 	
-	string HttpModule::name() const
+	string HttpDispatcher::name() const
 	{
-		return "HTTP";
+		return "HTTP Dispatcher";
 	}
 	
-	void HttpModule::dumpArgumentsDescription(ostream &stream) const
+	void HttpDispatcher::dumpArgumentsDescription(ostream &stream) const
 	{
 		stream << "  HTTP module, provides access to the network from a web application\n";
 		stream << "    -w, --http      : listens to incoming HTTP connections on this port (default: 3000)\n";
 	}
 	
-	ArgumentDescriptions HttpModule::describeArguments() const
+	ArgumentDescriptions HttpDispatcher::describeArguments() const
 	{
 		return {
 			{ "-w", 1 },
@@ -53,12 +53,12 @@ namespace Aseba
 		};
 	}
 	
-	void HttpModule::processArguments(Switch* asebaSwitch, const Arguments& arguments)
+	void HttpDispatcher::processArguments(Switch* asebaSwitch, const Arguments& arguments)
 	{
 		strings args;
 		if (arguments.find("-w", &args) || arguments.find("--http", &args))
 			serverPort = stoi(args[0]);
-		// TODO: add an option to avoid creating an HTTP port
+		// TODO: add an option to avoid creating an HTTP port, or maybe not creating this module?
 		// TODO: catch the connection exception for HTTP port, decide what to do
 		ostringstream oss;
 		oss << "tcpin:port=" << serverPort;
@@ -66,7 +66,7 @@ namespace Aseba
 		LOG_VERBOSE << "HTTP | HTTP Listening stream on " << serverStream->getTargetName() << endl;
 	}
 	
-	bool HttpModule::connectionCreated(Dashel::Stream * stream)
+	bool HttpDispatcher::connectionCreated(Switch* asebaSwitch, Dashel::Stream * stream)
 	{
 		// take ownership of the stream if it was created by our server stream
 		if (stream->getTarget().isSet("connectionPort") &&
@@ -75,17 +75,27 @@ namespace Aseba
 		return false;
 	}
 	
-	void HttpModule::incomingData(Dashel::Stream * stream)
+	void HttpDispatcher::incomingData(Switch* asebaSwitch, Dashel::Stream * stream)
+	{
+		HttpRequest request(HttpRequest::receive(stream));
+		
+		
+		HttpResponse response;
+		string rs("<html><body>hello world</body></html>");
+		response.content.insert(response.content.end(), rs.begin(), rs.end());
+		
+		response.send(stream);
+		
+		// TODO: handle exceptions
+		// TODO: dispatch
+	}
+	
+	void HttpDispatcher::connectionClosed(Switch* asebaSwitch, Dashel::Stream * stream)
 	{
 		
 	}
 	
-	void HttpModule::connectionClosed(Dashel::Stream * stream)
-	{
-		
-	}
-	
-	void HttpModule::processMessage(const Message& message)
+	void HttpDispatcher::processMessage(Switch* asebaSwitch, const Message& message)
 	{
 		
 	}

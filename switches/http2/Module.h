@@ -49,14 +49,14 @@ namespace Aseba
 		
 		//! Notify the module of the creation of a new stream.
 		//! Give this module the opportunity to take ownership of the newly-created stream by returning true
-		virtual bool connectionCreated(Dashel::Stream * stream) { return false; }
+		virtual bool connectionCreated(Switch* asebaSwitch, Dashel::Stream * stream) { return false; }
 		//! Read data on a stream that is handled by this module (was registered by Switch::delegateHandlingToModule)
-		virtual void incomingData(Dashel::Stream * stream) {}
+		virtual void incomingData(Switch* asebaSwitch, Dashel::Stream * stream) {}
 		//! A stream handled by this module has been closed
-		virtual void connectionClosed(Dashel::Stream * stream) {}
+		virtual void connectionClosed(Switch* asebaSwitch, Dashel::Stream * stream) {}
 		
 		//! Give the module the possibility to handle an Aseba message, whose id is global
-		virtual void processMessage(const Message& message) = 0;
+		virtual void processMessage(Switch* asebaSwitch, const Message& message) = 0;
 	};
 	
 } // namespace Aseba

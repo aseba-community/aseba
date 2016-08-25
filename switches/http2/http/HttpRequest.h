@@ -28,6 +28,7 @@
 #include "HttpStatus.h"
 #include "HttpMethod.h"
 #include "HttpProtocol.h"
+#include "../../../common/utils/utils.h"
 
 namespace Aseba
 {

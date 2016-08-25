@@ -158,7 +158,7 @@ namespace Aseba
 		// give modules the opportunity to take ownership of the stream
 		for (auto& module: modules)
 		{
-			if (module->connectionCreated(stream))
+			if (module->connectionCreated(this, stream))
 			{
 				moduleSpecificStreams[stream] = module.get();
 				LOG_VERBOSE << "Core | Handling of stream " << stream->getTargetName() << " delegated to module " << module->name() << endl;
@@ -173,7 +173,7 @@ namespace Aseba
 		auto moduleIt(moduleSpecificStreams.find(stream));
 		if (moduleIt != moduleSpecificStreams.end())
 		{
-			moduleIt->second->incomingData(stream);
+			moduleIt->second->incomingData(this, stream);
 			return;
 		}
 		
@@ -212,7 +212,7 @@ namespace Aseba
 		
 		// allow every module a chance to process the message
 		for (auto& module: modules)
-			module->processMessage(*message);
+			module->processMessage(this, *message);
 		
 		// resend on the network
 		sendMessageWithRemap(message.get(), stream);
@@ -225,6 +225,7 @@ namespace Aseba
 		if (streamModuleMapIt != moduleSpecificStreams.end())
 		{
 			// yes, de-associate
+			streamModuleMapIt->second->connectionClosed(this, stream);
 			moduleSpecificStreams.erase(streamModuleMapIt);
 		}
 		// no, is it a data stream (and therefore an Aseba stream)?

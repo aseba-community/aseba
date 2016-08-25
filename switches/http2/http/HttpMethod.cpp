@@ -19,35 +19,38 @@
 */
 
 #include <map>
-#include "../../common/utils/FormatableString.h"
-#include "HttpProtocol.h"
+#include "../../../common/utils/FormatableString.h"
+#include "HttpMethod.h"
 
 namespace Aseba
 {
 	using namespace std;
 	
-	//! List of names of all known HTTP protocols
-	static const map<HttpProtocol, string> protocolNames = {
-		{ HttpProtocol::HTTP_1_0, "HTTP/1.0" },
-		{ HttpProtocol::HTTP_1_1, "HTTP/1.1" }
+	//! List of names of all known HTTP methods
+	static const map<HttpMethod, string> methodNames = {
+		{ HttpMethod::GET, "GET" },
+		{ HttpMethod::PUT, "PUT" },
+		{ HttpMethod::POST, "POST" },
+		{ HttpMethod::OPTIONS, "OPTIONS" },
+		{ HttpMethod::DELETE, "DELETE" }
 	};
 	
-	//! Return a string representing the protocol
-	std::string toString(const HttpProtocol& protocol)
+	//! Return a string representing the method
+	std::string toString(const HttpMethod& method)
 	{
-		const auto protocolIt(protocolNames.find(protocol));
-		if (protocolIt == protocolNames.end())
+		const auto methodIt(methodNames.find(method));
+		if (methodIt == methodNames.end())
 			abort(); // if this arrives, the table above is not in sync with the enum content
-		return protocolIt->second;
+		return methodIt->second;
 	}
 	
-	//! Return the protocol from a string, or throw InvalidHttpProtocol if it is not found
-	HttpProtocol fromProtocolString(const std::string& protocol)
+	//! Return the method from a string, or throw InvalidHttpMethod if it is not found
+	HttpMethod fromMethodString(const std::string& method)
 	{
-		for (const auto& protocolKV: protocolNames)
-			if (protocolKV.second == protocol)
-				return protocolKV.first;
-		throw InvalidHttpProtocol(FormatableString("Invalid protocol %0").arg(protocol));
+		for (const auto& methodKV: methodNames)
+			if (methodKV.second == method)
+				return methodKV.first;
+		throw InvalidHttpMethod(FormatableString("Invalid method %0").arg(method));
 	}
 
 } // namespace Aseba
