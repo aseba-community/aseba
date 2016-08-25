@@ -82,7 +82,7 @@ public:
 		vm.variablesSize = sizeof(variables) / sizeof(sint16);
 	}
 	
-	Dashel::Stream* listen(const int port, int deltaNodeId)
+	Dashel::Stream* listen(const int port, const int deltaNodeId)
 	{
 		vm.nodeId = 1 + deltaNodeId;
 		strncpy(mutableName, "dummynode-0", 12);
