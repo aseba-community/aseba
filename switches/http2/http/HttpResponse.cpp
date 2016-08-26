@@ -85,17 +85,40 @@ namespace Aseba
 		stream->write(&content[0], content.size());
 		stream->flush();
 		
-		if (_globals.verbose)
+		if (_globals.dump)
 		{
-			cerr << " Sent HTTP response " << status << " and " << content.size() << " byte(s) payload" << endl;
-			dump(cerr);
+			dumpTime(cout, _globals.rawTime);
+			cout << "HTTP | On stream " << stream->getTargetName() << ", sent ";
+			dump(cout);
+			cout << endl;
 		}
+		else
+			LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", sent response " << status << " and " << content.size() << " byte(s) payload" << endl;
 	}
 	
 	//! Write the response as JSON
 	void HttpResponse::dump(ostream& os)
 	{
-		// TODO: write json
+		os << "{ ";
+		os << "protocol: \"" << toString(protocol) << "\", ";
+		os << "status: \"" << HttpStatus::toString(status) << "\", ";
+		os << "headers: { ";
+		unsigned i(0);
+		for (auto p: headers)
+		{
+			if (i++ != 0)
+				os << ", ";
+			os << p.first << ": \"" << p.second << "\"";
+		}
+		os << " }";
+		if (content.size() > 0)
+		{
+			// note: as this is debug dump, the escaping of " and non-printable characters in content is not handled
+			os << ", content: \"";
+			os.write(reinterpret_cast<const char*>(&content[0]), content.size());
+			os << "\"";
+		}
+		os << " }";
 	}
 	
 } // namespace Aseba

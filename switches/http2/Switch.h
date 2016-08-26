@@ -90,12 +90,12 @@ namespace Aseba
 		bool run1s();
 		void reconnectDisconnectedTargets();
 		//bool isAsebaStream(Dashel::Stream* stream) const;
+	
+	public:
+		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
 		
 	protected:
-		bool printMessageContent; //!< if true, print the content of each message
 		int runDuration; //!< if positive, run only for duration (in seconds)
-		
-		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
 		
 		StreamTargetSet toReconnectTargets; //!< set of targets to attempt automatic reconnection, will be Aseba streams afterwards
 		

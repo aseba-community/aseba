@@ -54,7 +54,6 @@ namespace Aseba
 	// Switch
 	
 	Switch::Switch():
-		printMessageContent(false),
 		runDuration(-1)
 	{
 	}
@@ -93,8 +92,8 @@ namespace Aseba
 		_globals.rawTime = arguments.find("--rawtime");
 		
 		// switch-specific arguments
-		printMessageContent = arguments.find("-d") || arguments.find("--dump");
-		_globals.verbose = _globals.verbose || printMessageContent;
+		_globals.dump = arguments.find("-d") || arguments.find("--dump");
+		_globals.verbose = _globals.verbose || _globals.dump;
 		strings args;
 		if (arguments.find("--duration", &args))
 			runDuration = stoi(args[0]);
@@ -178,6 +177,7 @@ namespace Aseba
 		}
 		
 		// it is an Aseba stream, receive message
+		// TODO: handle Dashel exception
 		const unique_ptr<Message> message(Message::receive(stream));
 		
 		// block list nodes from clients as this listing is implemented by us
@@ -198,10 +198,9 @@ namespace Aseba
 		}
 		
 		// dump message if enabled
-		if (printMessageContent)
+		if (_globals.dump)
 		{
-			dumpTime(cout, _globals.rawTime);
-			cout << "Core | Message from " << stream->getTargetName() << " : ";
+			LOG_VERBOSE << "Core | Message from " << stream->getTargetName() << " : ";
 			message->dump(wcout);
 			wcout << endl;
 		}
@@ -245,7 +244,7 @@ namespace Aseba
 			return;
 		
 		if (abnormal)
-			LOG_VERBOSE << "Core | Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+			LOG_ERROR << "Core | Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
 		else
 			LOG_VERBOSE << "Core | Normal connection closed to " << stream->getTargetName() << endl;
 	}
@@ -259,7 +258,7 @@ namespace Aseba
 	void Switch::sendMessage(const Message& message)
 	{
 		// dump message if enabled
-		if (printMessageContent)
+		if (_globals.dump)
 		{
 			dumpTime(cout, _globals.rawTime);
 			cout << "Core | Message from self : ";
@@ -291,7 +290,7 @@ namespace Aseba
 			}
 			catch (const Dashel::DashelException& e)
 			{
-				LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
+				LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << ": " << e.what() << endl;
 			}
 		}
 	}
@@ -324,7 +323,7 @@ namespace Aseba
 						}
 						catch (const Dashel::DashelException& e)
 						{
-							LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << endl;
+							LOG_ERROR << "Core | Error while rebroadcasting to stream " << stream << " of target " << stream->getTargetName() << ": " << e.what() << endl;
 						}
 						return; // global identifiers are unique and each node are connected on a single stream, so we can stop here
 					}
@@ -390,7 +389,7 @@ namespace Aseba
 			}
 			catch(const Dashel::DashelException& e)
 			{
-				LOG_VERBOSE << "Core | Failed to reconnect to target " << target << endl;
+				LOG_VERBOSE << "Core | Failed to reconnect to target " << target << ": " << e.what() << endl;
 				
 				++targetIt;
 			}

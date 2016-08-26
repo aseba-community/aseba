@@ -126,10 +126,6 @@ namespace Aseba
 		Headers headers;
 		readHeaders(stream, headers);
 		
-		cerr << toString(method) << " " << toString(protocol) << " " << uri << endl;
-		for (auto p: headers)
-			cerr << p.first << ": " << p.second << endl;
-		
 		vector<uint8_t> content;
 		if (headers.find("Content-Length") != headers.end())
 			readContent(stream, headers, content);
@@ -143,11 +139,15 @@ namespace Aseba
 			content
 		};
 		
-		if (_globals.verbose)
+		if (_globals.dump)
 		{
-			cerr << " Received HTTP request" << endl;
-			request.dump(cerr);
+			dumpTime(cout, _globals.rawTime);
+			cout << "HTTP | On stream " << stream->getTargetName() << ", received ";
+			request.dump(cout);
+			cout << endl;
 		}
+		else
+			LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", received " << toString(method) << " " << uri << " with " << content.size() << " byte(s) payload" << endl;
 		
 		return request;
 	}
@@ -155,6 +155,26 @@ namespace Aseba
 	//! Write the request as JSON
 	void HttpRequest::dump(ostream& os)
 	{
-		// TODO: write json
+		os << "{ ";
+		os << "method: \"" << toString(method) << "\", ";
+		os << "protocol: \"" << toString(protocol) << "\", ";
+		os << "uri: \"" << uri << "\", ";
+		os << "headers: { ";
+		unsigned i(0);
+		for (auto p: headers)
+		{
+			if (i++ != 0)
+				os << ", ";
+			os << p.first << ": \"" << p.second << "\"";
+		}
+		os << " }";
+		if (content.size() > 0)
+		{
+			// note: as this is debug dump, the escaping of " and non-printable characters in content is not handled
+			os << ", content: \"";
+			os.write(reinterpret_cast<const char*>(&content[0]), content.size());
+			os << "\"";
+		}
+		os << " }";
 	}
 };

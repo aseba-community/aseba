@@ -32,8 +32,9 @@ namespace Aseba
 	class HttpDispatcher: public Module
 	{
 	public:
-		typedef std::function<HttpResponse(Switch*, const HttpRequest&, const strings&)> Handler;
-		// TODO: think about SSE handling architecture
+		//! A Handler takes a pointer to the switch, the stream, the request, the filled path templates map in the URI.
+		typedef std::map<std::string, std::string> PathTemplateMap;
+		typedef std::function<void(Switch*, Dashel::Stream*, const HttpRequest&, const PathTemplateMap &)> Handler;
 		
 	public:
 		HttpDispatcher();
@@ -48,12 +49,25 @@ namespace Aseba
 		virtual void connectionClosed(Switch* asebaSwitch, Dashel::Stream * stream);
 		virtual void processMessage(Switch* asebaSwitch, const Message& message);
 		
-		void registerHandler(const strings& uriPath, Handler handler);
-	
+	protected:
+		void registerHandler(Handler handler, const HttpMethod& method, const strings& uriPath);
+		
+		void getEventsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
+		void testHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
+		
 	protected:
 		unsigned serverPort;
 		
-		std::map<strings, Handler> handlers;
+		//! Multimap of a named Aseba event to Dashel streams, if name is empty it means all events
+		typedef std::multimap<std::string, Dashel::Stream*> EventStreams;
+		//! Ongoing SSE for Aseba events
+		EventStreams eventStreams;
+		//! Map of splitted URI (including path templates) to handlers
+		typedef std::map<strings, Handler> URIHandlerMap;
+		//! Map of method to map of splitted URI to handlers
+		typedef std::map<HttpMethod, URIHandlerMap> HandlersMap;
+		//! Handlers for known method + URI couples
+		HandlersMap handlers;
 	};
 }
 

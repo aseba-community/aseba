@@ -21,6 +21,12 @@
 #ifndef ASEBA_SWITCH_GLOBALS
 #define ASEBA_SWITCH_GLOBALS
 
+#include "../../common/utils/utils.h"
+
+#define LOG_DUMP \
+    if (!Aseba::_globals.dump) {} \
+    else Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
+
 #define LOG_VERBOSE \
     if (!Aseba::_globals.verbose) {} \
     else Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
@@ -33,6 +39,7 @@ namespace Aseba
 	struct Globals
 	{
 		bool verbose; //!< whether to be verbose
+		bool dump; //!< whether to print the content of all messages
 		bool rawTime; //!< if true, use raw time for logging
 	};
 	
