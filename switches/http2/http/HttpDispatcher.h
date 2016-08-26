@@ -34,6 +34,7 @@ namespace Aseba
 	public:
 		//! A Handler takes a pointer to the switch, the stream, the request, the filled path templates map in the URI.
 		typedef std::map<std::string, std::string> PathTemplateMap;
+		//! A callback to an handler for HTTP requests
 		typedef std::function<void(Switch*, Dashel::Stream*, const HttpRequest&, const PathTemplateMap &)> Handler;
 		
 	public:
@@ -56,7 +57,7 @@ namespace Aseba
 		void testHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
 		
 	protected:
-		unsigned serverPort;
+		unsigned serverPort; //!< port this server is listening on
 		
 		//! Multimap of a named Aseba event to Dashel streams, if name is empty it means all events
 		typedef std::multimap<std::string, Dashel::Stream*> EventStreams;

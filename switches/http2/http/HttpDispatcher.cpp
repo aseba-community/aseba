@@ -190,17 +190,41 @@ namespace Aseba
 		if (!userMessage)
 			return;
 		
-		// send all messages, including anonymous ones, to the general events SSEs
+		// find name and build event
+		string eventName;
+		if (userMessage->type >= asebaSwitch->commonDefinitions.events.size())
+			eventName = to_string(userMessage->type);
+		else
+			eventName = WStringToUTF8(asebaSwitch->commonDefinitions.events[userMessage->type].name);
+		string sseEventEvent = "event: " + eventName + "\r\n\r\n";
+		string sseEventData("data: [");
+		unsigned i(0);
+		for (auto v: userMessage->data)
+		{
+			if (i++ > 0)
+				sseEventData += ", ";
+			sseEventData += to_string(v);
+		}
+		sseEventData += "]\r\n\r\n";
+			
+		// send all messages with the name of the event to the general events SSEs
 		auto generalEventsRange(eventStreams.equal_range(""));
 		for (auto generalEventIt = generalEventsRange.first; generalEventIt != generalEventsRange.second; ++generalEventIt)
-			// TODO send on generalEventIt->second
-			;
+		{
+			Stream *stream(generalEventIt->second);
+			stream->write(sseEventEvent.c_str(), sseEventEvent.length());
+			stream->write(sseEventData.c_str(), sseEventData.length());
+			stream->flush();
+		}
 		
-		// retrieve event name from Id
-		//asebaSwitch->commonDefinitions.
-		// send on SSE associated to this name
-		// TODO
-		
+		// send message to the registered event with the right name
+		auto specificEventsRange(eventStreams.equal_range(eventName));
+		for (auto specificEventIt = specificEventsRange.first; specificEventIt != specificEventsRange.second; ++specificEventIt)
+		{
+			Stream *stream(specificEventIt->second);
+			stream->write(sseEventData.c_str(), sseEventData.length());
+			stream->flush();
+		}
 	}
 	
 	void HttpDispatcher::registerHandler(Handler handler, const HttpMethod& method, const strings& uriPath)
@@ -210,16 +234,29 @@ namespace Aseba
 	
 	void HttpDispatcher::getEventsHandler(Switch* asebaSwitch, Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
 	{
-		// TODO: handle Dashel exception
 		HttpResponse response;
 		const auto nameIt(filledPathTemplates.find("name"));
 		if (nameIt != filledPathTemplates.end())
 		{
-			// Check if name exists
-			// TODO
+			// check if name exists
+			const wstring name(UTF8ToWString(nameIt->second));
+			if (asebaSwitch->commonDefinitions.events.contains(name))
+			{
+				// if name exists, subscribe
+				LOG_VERBOSE << "HTTP | Registered stream " << stream->getTargetName() << " for SSE on specific Aseba event " << nameIt->second << endl;
+				eventStreams.emplace(nameIt->second, stream);
+				response.setServerSideEvent();
+			}
+			else
+			{
+				// otherwise produce an error
+				LOG_VERBOSE << "HTTP | Stream " << stream->getTargetName() << " requested SSE registration on Aseba event " << nameIt->second << ", which does not exist" << endl;
+				response.status = HttpStatus::NOT_FOUND;
+			}
 		}
 		else
 		{
+			LOG_VERBOSE << "HTTP | Registered stream " << stream->getTargetName() << " for SSE on all Aseba events" << endl;
 			eventStreams.emplace("", stream);
 			response.setServerSideEvent();
 		}
