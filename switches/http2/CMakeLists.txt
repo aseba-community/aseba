@@ -45,12 +45,14 @@
 #endif(LIBXML2_FOUND)
 
 	set(switch_SRCS
+		http/JsonParser.cpp
 		http/HttpStatus.cpp
 		http/HttpMethod.cpp
 		http/HttpProtocol.cpp
 		http/HttpRequest.cpp
 		http/HttpResponse.cpp
 		http/HttpDispatcher.cpp
+		http/ConstantsHandlers.cpp
 		Globals.cpp
 		DashelUtils.cpp
 		Arguments.cpp

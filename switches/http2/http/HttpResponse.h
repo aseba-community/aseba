@@ -39,12 +39,18 @@ namespace Aseba
 		//! Headers are a map of key-value as strings
 		typedef std::map<std::string, std::string> Headers;
 		
+	protected:
+		HttpResponse(const HttpStatus::Code status = HttpStatus::OK);
+		
 	public:
-		HttpResponse();
+		static HttpResponse fromStatus(const HttpStatus::Code status = HttpStatus::OK);
+		static HttpResponse fromPlainString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
+		static HttpResponse fromHTMLString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
+		static HttpResponse fromJSONString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
+		static HttpResponse createSSE();
+		
 		void send(Dashel::Stream* stream);
 		void dump(std::ostream& os);
-		
-		void setServerSideEvent();
 		
 		std::string getHeader(const std::string& header) const;
 

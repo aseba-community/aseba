@@ -36,11 +36,13 @@ namespace Aseba
 	static const map<HttpStatus::Code, string> statusNames = {
 		{ HttpStatus::OK, "OK" },
 		{ HttpStatus::CREATED, "Created" },
+		{ HttpStatus::NO_CONTENT, "No Content" },
 		{ HttpStatus::BAD_REQUEST, "Bad Request" },
 		{ HttpStatus::FORBIDDEN, "Forbidden" },
 		{ HttpStatus::NOT_FOUND, "Not Found" },
 		{ HttpStatus::METHOD_NOT_ALLOWED, "Method Not Allowed" },
 		{ HttpStatus::REQUEST_TIMEOUT, "Request Timeout" },
+		{ HttpStatus::CONFLICT, "Conflict" },
 		{ HttpStatus::INTERNAL_SERVER_ERROR, "Internal Server Error" },
 		{ HttpStatus::NOT_IMPLEMENTED, "Not Implemented" },
 		{ HttpStatus::SERVICE_UNAVAILABLE, "Service Unavailable" },

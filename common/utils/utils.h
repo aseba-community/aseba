@@ -167,6 +167,16 @@ namespace Aseba
 		return v < minV ? minV : (v > maxV ? maxV : v);
 	}
 	
+	//! An helper struct to read an istream from a memory buffer
+	struct membuf : std::streambuf
+	{
+		membuf(char const* base, size_t size)
+		{
+			char* p(const_cast<char*>(base));
+			this->setg(p, p, p + size);
+		}
+	};
+	
 	/*@}*/
 	
 };

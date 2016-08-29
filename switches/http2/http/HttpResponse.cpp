@@ -27,23 +27,57 @@ namespace Aseba
 	using namespace std;
 	using namespace Dashel;
 
-	//! Constructor, sets status to OK and sets content type to JSON
-	HttpResponse::HttpResponse():
+	//! Constructor, protected to force the use of factories that set correct content-type
+	HttpResponse::HttpResponse(const HttpStatus::Code status):
 		protocol(HttpProtocol::HTTP_1_1),
-		status(HttpStatus::OK)
+		status(status)
 	{
 		// these can be overwritten later
-		headers["Content-Length"] = "";
-		headers["Content-Type"] = "application/json";
-		headers["Access-Control-Allow-Origin"] = "*";
+		headers.emplace("Content-Length", "");
+		headers.emplace("Access-Control-Allow-Origin", "*");
 	}
-
-	//! Set headers to make this response Server-Side Event declaration for the client
-	void HttpResponse::setServerSideEvent()
+	
+	//! Factory, from status only
+	HttpResponse HttpResponse::fromStatus(const HttpStatus::Code status)
 	{
-		headers["Content-Type"] = "text/event-stream";
-		headers["Cache-Control"] = "no-cache";
-		headers["Connection"] = "keep-alive";
+		return HttpResponse(status);
+	}
+	
+	//! Factory, from a plain string
+	HttpResponse HttpResponse::fromPlainString(const std::string& content, const HttpStatus::Code status)
+	{
+		HttpResponse response(status);
+		response.headers.emplace("Content-Type", "text/plain; charset=UTF-8");
+		response.content.insert(response.content.end(), content.begin(), content.end());
+		return response;
+	}
+	
+	//! Factory, from an UTF-8 encoded HTML string
+	HttpResponse HttpResponse::fromHTMLString(const std::string& content, const HttpStatus::Code status)
+	{
+		HttpResponse response(status);
+		response.headers.emplace("Content-Type", "text/html; charset=UTF-8");
+		response.content.insert(response.content.end(), content.begin(), content.end());
+		return response;
+	}
+	
+	//! Factory, from a JSON string
+	HttpResponse HttpResponse::fromJSONString(const std::string& content, const HttpStatus::Code status)
+	{
+		HttpResponse response(status);
+		response.headers.emplace("Content-Type", "application/json"); // JSON content is UTF-8 encoded
+		response.content.insert(response.content.end(), content.begin(), content.end());
+		return response;
+	}
+	
+	//! Factory, creates a Server-Side Event declaration for the client
+	HttpResponse HttpResponse::createSSE()
+	{
+		HttpResponse response;
+		response.headers["Content-Type"] = "text/event-stream";
+		response.headers["Cache-Control"] = "no-cache";
+		response.headers["Connection"] = "keep-alive";
+		return response;
 	}
 	
 	//! Return a header or an empty string if not present

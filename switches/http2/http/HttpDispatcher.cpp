@@ -22,6 +22,7 @@
 #include <functional>
 #include "HttpDispatcher.h"
 #include "HttpStatus.h"
+#include "JsonParser.h"
 #include "../Globals.h"
 #include "../Switch.h"
 
@@ -33,11 +34,26 @@ namespace Aseba
 	
 	#define REGISTER_HANDLER(handler, method, ...) \
 		registerHandler(bind(&HttpDispatcher::handler, this, _1, _2, _3, _4), HttpMethod::method,  __VA_ARGS__);
+		
+	#define RQ_MAP_GET_FIELD(itName, mapName, fieldName) \
+		const auto itName(mapName.find(#fieldName)); \
+		if (itName == mapName.end()) \
+		{ \
+			HttpResponse::fromPlainString("Cannot find field " #fieldName " in request content", HttpStatus::BAD_REQUEST).send(stream); \
+			return; \
+		}
 	
 	HttpDispatcher::HttpDispatcher():
 		serverPort(3000)
 	{
 		// register all handlers
+		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
+		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
+		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" });
+		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
+		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
+		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
+		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events", "{name}" });
 		REGISTER_HANDLER(testHandler, GET, { "test" });
@@ -143,9 +159,7 @@ namespace Aseba
 				
 				// no matching method or URI found, not found
 				LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", request error, " << toString(request.method) << " " << request.uri << " is not found" << endl;
-				HttpResponse response;
-				response.status = HttpStatus::NOT_FOUND;
-				response.send(stream);
+				HttpResponse::fromPlainString(FormatableString("No handler found for %0 %1").arg(toString(request.method)).arg(request.uri), HttpStatus::NOT_FOUND).send(stream);
 				
 				// TODO; add timeout for closing unused connections for a while
 				// FIXME: what about protocols incompatibilities?
@@ -155,9 +169,7 @@ namespace Aseba
 				// show error
 				LOG_ERROR << "HTTP | On stream " << stream->getTargetName() << ", request error " << HttpStatus::toString(e.errorCode) << " while receiving" << endl;
 				// send an error
-				HttpResponse response;
-				response.status = e.errorCode;
-				response.send(stream);
+				HttpResponse::fromPlainString(FormatableString("Error %0 while reading request").arg(HttpStatus::toString(e.errorCode)), e.errorCode).send(stream);
 				// fail stream
 				stream->fail(DashelException::Unknown, 0, FormatableString("HTTP request error: %0").arg(e.what()).c_str());
 			}
@@ -227,14 +239,17 @@ namespace Aseba
 		}
 	}
 	
-	void HttpDispatcher::registerHandler(Handler handler, const HttpMethod& method, const strings& uriPath)
+	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath)
 	{
 		handlers[method][uriPath] = handler;
 	}
 	
+	// handlers
+	
+	// to be moved in their own CPP file
+	
 	void HttpDispatcher::getEventsHandler(Switch* asebaSwitch, Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
 	{
-		HttpResponse response;
 		const auto nameIt(filledPathTemplates.find("name"));
 		if (nameIt != filledPathTemplates.end())
 		{
@@ -245,30 +260,26 @@ namespace Aseba
 				// if name exists, subscribe
 				LOG_VERBOSE << "HTTP | Registered stream " << stream->getTargetName() << " for SSE on specific Aseba event " << nameIt->second << endl;
 				eventStreams.emplace(nameIt->second, stream);
-				response.setServerSideEvent();
+				HttpResponse::createSSE().send(stream);
 			}
 			else
 			{
 				// otherwise produce an error
 				LOG_VERBOSE << "HTTP | Stream " << stream->getTargetName() << " requested SSE registration on Aseba event " << nameIt->second << ", which does not exist" << endl;
-				response.status = HttpStatus::NOT_FOUND;
+				HttpResponse::fromPlainString(FormatableString("Event %0 does not exist").arg(nameIt->second), HttpStatus::NOT_FOUND).send(stream);
 			}
 		}
 		else
 		{
 			LOG_VERBOSE << "HTTP | Registered stream " << stream->getTargetName() << " for SSE on all Aseba events" << endl;
 			eventStreams.emplace("", stream);
-			response.setServerSideEvent();
+			HttpResponse::createSSE().send(stream);
 		}
-		response.send(stream);
 	}
 	
 	void HttpDispatcher::testHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
 	{
-		HttpResponse response;
-		string rs("{ content: \"hello world\" }");
-		response.content.insert(response.content.end(), rs.begin(), rs.end());
-		response.send(stream);
+		HttpResponse::fromHTMLString("{ content: \"hello world\" }").send(stream);
 	}
 
 	
