@@ -25,7 +25,7 @@
 #include "../Module.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
-#include "../../../common/utils/utils.h"
+#include "Json.h"
 
 namespace Aseba
 {
@@ -53,7 +53,10 @@ namespace Aseba
 	protected:
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath);
 		
+		// TODO: add handler support class
+		
 		// constants, in ConstantsHandlers.cpp
+		// handlers
 		void getConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
 		void putConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
 		void postConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
@@ -61,6 +64,8 @@ namespace Aseba
 		void getConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
 		void putConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
 		void deleteConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
+		// support
+		void updateConstantValue(Switch* asebaSwitch, Dashel::Stream* stream, const json& constantDescription, const std::string& name, const std::wstring& wname, size_t position = size_t(-1));
 		bool findConstant(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates, std::string& name, size_t& position);
 		
 		// events

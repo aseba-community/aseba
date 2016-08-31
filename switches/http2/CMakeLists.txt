@@ -45,7 +45,7 @@
 #endif(LIBXML2_FOUND)
 
 	set(switch_SRCS
-		http/JsonParser.cpp
+		http/Json.cpp
 		http/HttpStatus.cpp
 		http/HttpMethod.cpp
 		http/HttpProtocol.cpp

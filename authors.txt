@@ -1,7 +1,7 @@
 Aseba - an event-based framework for distributed robot control
 Copyright (C) 2007--2016:
 	
-	Stéphane Magnenat <stephane at magnenat dot net> [1] [2]
+	Stéphane Magnenat <stephane at magnenat dot net> [1] [2] [3]
 	(http://stephane.magnenat.net)
 	original idea, architecture, core coder
 	
@@ -66,4 +66,4 @@ Creative Commons Attribution-ShareAlike 3.0 License
 The icons used in studio are from http://www.everaldo.com/crystal/
 They can be found here: http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/
 
-
+The JSON parser is from Niels Lohmann: https://github.com/nlohmann/json
