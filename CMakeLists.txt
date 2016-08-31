@@ -1,6 +1,8 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
-cmake_minimum_required(VERSION 2.6)
+
+# ensure a minimal version of CMake
+cmake_minimum_required(VERSION 2.8.10)
 
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
