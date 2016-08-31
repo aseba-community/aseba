@@ -31,11 +31,20 @@ namespace Aseba
 {
 	class HttpDispatcher: public Module
 	{
-	public:
+	protected:
 		//! A Handler takes a pointer to the switch, the stream, the request, the filled path templates map in the URI.
 		typedef std::map<std::string, std::string> PathTemplateMap;
+		//! All information a handler needs to have to process a request
+		struct HandlerContext
+		{
+			Switch * const asebaSwitch;
+			Dashel::Stream * const stream;
+			const HttpRequest& request;
+			const PathTemplateMap &filledPathTemplates;
+			const json parsedContent;
+		};
 		//! A callback to an handler for HTTP requests
-		typedef std::function<void(Switch*, Dashel::Stream*, const HttpRequest&, const PathTemplateMap &)> Handler;
+		typedef std::function<void(HandlerContext&)> Handler;
 		
 	public:
 		HttpDispatcher();
@@ -57,20 +66,21 @@ namespace Aseba
 		
 		// constants, in ConstantsHandlers.cpp
 		// handlers
-		void getConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void putConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void postConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void deleteConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void getConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void putConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void deleteConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
+		void getConstantsHandler(HandlerContext& context);
+		void putConstantsHandler(HandlerContext& context);
+		void postConstantsHandler(HandlerContext& context);
+		void deleteConstantsHandler(HandlerContext& context);
+		void getConstantHandler(HandlerContext& context);
+		void putConstantHandler(HandlerContext& context);
+		void deleteConstantHandler(HandlerContext& context);
 		// support
-		void updateConstantValue(Switch* asebaSwitch, Dashel::Stream* stream, const json& constantDescription, const std::string& name, const std::wstring& wname, size_t position = size_t(-1));
-		bool findConstant(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates, std::string& name, size_t& position);
+		void updateConstantValue(HandlerContext& context, const std::string& name, size_t position);
+		bool findConstant(HandlerContext& context, std::string& name, size_t& position);
+		bool validateInt16Value(HandlerContext& context, const std::string& name, int value);
 		
 		// events
-		void getEventsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
-		void testHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates);
+		void getEventsHandler(HandlerContext& context);
+		void testHandler(HandlerContext& context);
 		
 	protected:
 		unsigned serverPort; //!< port this server is listening on

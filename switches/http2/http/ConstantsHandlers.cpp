@@ -18,8 +18,6 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <ostream>
-#include <functional>
 #include "HttpDispatcher.h"
 #include "HttpStatus.h"
 #include "../Globals.h"
@@ -30,98 +28,164 @@ namespace Aseba
 	using namespace std;
 	using namespace Dashel;
 	
-	#define RQ_MAP_GET_FIELD(itName, mapName, fieldName) \
-		const auto itName(mapName.find(#fieldName)); \
-		if (itName == mapName.end()) \
+	#define RQ_GET_VALUE(stream, jsonObject, fieldType, fieldName) \
+		const auto _it ## fieldName(jsonObject.find(#fieldName)); \
+		if (_it ## fieldName == jsonObject.end()) \
 		{ \
-			HttpResponse::fromPlainString("Cannot find field " #fieldName " in request content", HttpStatus::BAD_REQUEST).send(stream); \
+			HttpResponse::fromPlainString("Cannot find field " #fieldName " in object" + jsonObject.dump(), HttpStatus::BAD_REQUEST).send(stream); \
+			return; \
+		} \
+		fieldType fieldName; \
+		try \
+		{ \
+			fieldName = _it ## fieldName.value().get<fieldType>(); \
+		} \
+		catch (const domain_error& e) \
+		{ \
+			HttpResponse::fromPlainString("Field " #fieldName " has invalid value " + _it ## fieldName.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream); \
 			return; \
 		}
 	
-	void HttpDispatcher::getConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
+	//! handler for GET /constants/
+	void HttpDispatcher::getConstantsHandler(HandlerContext& context)
 	{
 		json response(json::array());
-		for (const auto& constant: asebaSwitch->commonDefinitions.constants)
+		for (const auto& constant: context.asebaSwitch->commonDefinitions.constants)
 			response.push_back(WStringToUTF8(constant.name));
-		HttpResponse::fromJSONString(response.dump()).send(stream);
+		HttpResponse::fromJSONString(response.dump()).send(context.stream);
 	}
 
-	void HttpDispatcher::putConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
+	//! handler for PUT /constants/
+	void HttpDispatcher::putConstantsHandler(HandlerContext& context)
 	{
-		// TODO
+		// make sure we have an array
+		if (!context.parsedContent.is_array())
+		{
+			HttpResponse::fromPlainString("Not a JSON array", HttpStatus::BAD_REQUEST).send(context.stream);
+			return;
+		}
+		
+		// check the validity of each element of the array
+		for (const auto& element: context.parsedContent)
+		{
+			// get name and value
+			RQ_GET_VALUE(context.stream, element, string, name);
+			RQ_GET_VALUE(context.stream, element, int, value);
+			
+			// make sure the value is in a valid range
+			if (!validateInt16Value(context, name, value))
+				return;
+		}
+		
+		// clear all constants
+		context.asebaSwitch->commonDefinitions.constants.clear();
+		
+		// add each constant from the request's content
+		for (const auto& element: context.parsedContent)
+		{
+			// get name and value
+			RQ_GET_VALUE(context.stream, element, string, name);
+			RQ_GET_VALUE(context.stream, element, int, value);
+			context.asebaSwitch->commonDefinitions.constants.push_back({ UTF8ToWString(name), value });
+		}
+		
+		// return success
+		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
 	
-	void HttpDispatcher::postConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
+	//! handler for POST /constants/
+	void HttpDispatcher::postConstantsHandler(HandlerContext& context)
 	{
-		// parse JSON content
-		json constantDescription;
-		try
-		{
-			constantDescription = parse(request.content);
-		}
-		catch (const invalid_argument& e)
-		{
-			HttpResponse::fromPlainString(string("Malformed JSON in query: ") + e.what(), HttpStatus::BAD_REQUEST).send(stream);
-			return;
-		}
-		
-		// if constant's name is not provided, respond an error and return
-		RQ_MAP_GET_FIELD(nameIt, constantDescription, name);
-		
-		// if constant does already exist, respond an error
-		string name;
-		try
-		{
-			name = nameIt.value().get<string>();
-		}
-		catch (const domain_error& e)
-		{
-			HttpResponse::fromPlainString("Invalid name field " + nameIt.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream);
-			return;
-		}
+		// get the name, and check presence
+		RQ_GET_VALUE(context.stream, context.parsedContent, string, name);
 		const wstring wname(UTF8ToWString(name));
-		if (asebaSwitch->commonDefinitions.constants.contains(wname))
+		if (context.asebaSwitch->commonDefinitions.constants.contains(wname))
 		{
-			HttpResponse::fromPlainString(FormatableString("Constant %0 already exists").arg(name), HttpStatus::CONFLICT).send(stream);
+			HttpResponse::fromPlainString(FormatableString("Constant %0 already exists").arg(name), HttpStatus::CONFLICT).send(context.stream);
 			return;
 		}
+		
+		// create the constant with a default value
+		context.asebaSwitch->commonDefinitions.constants.push_back({wname, 0});
+		const size_t position(context.asebaSwitch->commonDefinitions.constants.size() - 1);
 		
 		// updated the value and return an answer
-		updateConstantValue(asebaSwitch, stream, constantDescription, name, wname);
+		updateConstantValue(context, name, position);
 	}
 	
-	void HttpDispatcher::updateConstantValue(Switch* asebaSwitch, Dashel::Stream* stream, const json& constantDescription, const string& name, const wstring& wname, size_t position)
+	//! handler for DELETE /constants/
+	void HttpDispatcher::deleteConstantsHandler(HandlerContext& context)
 	{
-		// if constant's value is not provided, respond an error and return
-		RQ_MAP_GET_FIELD(valueIt, constantDescription, value);
+		// clear all constants
+		context.asebaSwitch->commonDefinitions.constants.clear();
 		
-		// check the value and its bounds
-		int value;
-		try
-		{
-			value = valueIt.value().get<int>();
-		}
-		catch (const domain_error& e)
-		{
-			HttpResponse::fromPlainString("Invalid value field " + valueIt.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream);
+		// return success
+		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
+	}
+
+	//! handler for GET /constants/{name}
+	void HttpDispatcher::getConstantHandler(HandlerContext& context)
+	{
+		// find the constant
+		string name;
+		size_t position(0);
+		if (!findConstant(context, name, position))
 			return;
-		}
-		if (value < -32768 || value > 32767)
-		{
-			HttpResponse::fromPlainString(FormatableString("Value %0 of constant %1 is outside bounds [-32768:32767]").arg(value).arg(name), HttpStatus::BAD_REQUEST).send(stream);
-			return;
-		}
 		
-		// everything is ok, add constant
-		if (position == size_t(-1))
-		{
-			asebaSwitch->commonDefinitions.constants.push_back({wname, value});
-			position = asebaSwitch->commonDefinitions.constants.size() - 1;
+		// return the constant
+		const NamedValue& constant(context.asebaSwitch->commonDefinitions.constants[position]);
+		HttpResponse::fromJSONString(json(
+			{
+				{ "id", position },
+				{ "name",  name },
+				{ "value", constant.value }
+	
 		}
-		else
-		{
-			asebaSwitch->commonDefinitions.constants[position] = {wname, value};
-		}
+		).dump()).send(context.stream);
+	}
+
+	//! handler for PUT /constants/{name}
+	void HttpDispatcher::putConstantHandler(HandlerContext& context)
+	{
+		// find the constant
+		string name;
+		size_t position(0);
+		if (!findConstant(context, name, position))
+			return;
+		
+		// updated the value and return an answer
+		updateConstantValue(context, name, position);
+	}
+
+	//! handler for DELETE /constants/{name}
+	void HttpDispatcher::deleteConstantHandler(HandlerContext& context)
+	{
+		// find the constant
+		string name;
+		size_t position(0);
+		if (!findConstant(context, name, position))
+			return;
+		
+		// delete the constant
+		NamedValuesVector& constants(context.asebaSwitch->commonDefinitions.constants);
+		constants.erase(constants.begin() + position);
+		
+		// return success
+		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
+	}
+	
+	//! set the value of a content from the request
+	void HttpDispatcher::updateConstantValue(HandlerContext& context, const string& name, size_t position)
+	{
+		// get the value, and check bounds
+		RQ_GET_VALUE(context.stream, context.parsedContent, int, value);
+		
+		// make sure the value is in a valid range
+		if (!validateInt16Value(context, name, value))
+			return;
+		
+		// sets the value
+		context.asebaSwitch->commonDefinitions.constants[position].value = value;
 		
 		// return answer
 		HttpResponse::fromJSONString(json(
@@ -130,84 +194,36 @@ namespace Aseba
 				{ "name",  name },
 				{ "value", value }
 			}
-		).dump()).send(stream);
-	}
-	
-	void HttpDispatcher::deleteConstantsHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
-	{
-		asebaSwitch->commonDefinitions.constants.clear();
-		return HttpResponse::fromPlainString("All constants erased").send(stream);
-	}
-
-	void HttpDispatcher::getConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
-	{
-		// find the constant
-		string name;
-		size_t position(0);
-		if (!findConstant(asebaSwitch, stream, request, filledPathTemplates, name, position))
-			return;
-		
-		// return the constant
-		const NamedValue& constant(asebaSwitch->commonDefinitions.constants[position]);
-		HttpResponse::fromJSONString(FormatableString("{ \"id\": %0, \"name\": \"%1\", \"value\": %2 }").arg(position).arg(WStringToUTF8(constant.name)).arg(constant.value)).send(stream);
-	}
-
-	void HttpDispatcher::putConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
-	{
-		// find the constant
-		string name;
-		size_t position(0);
-		if (!findConstant(asebaSwitch, stream, request, filledPathTemplates, name, position))
-			return;
-		
-		// parse JSON content
-		json constantDescription;
-		try
-		{
-			constantDescription = parse(request.content);
-		}
-		catch (const invalid_argument& e)
-		{
-			HttpResponse::fromPlainString(string("Malformed JSON in query: ") + e.what(), HttpStatus::BAD_REQUEST).send(stream);
-			return;
-		}
-		
-		// updated the value and return an answer
-		// FIXME: duplication of conversion to wstring
-		updateConstantValue(asebaSwitch, stream, constantDescription, name, UTF8ToWString(name), position);
-	}
-
-	void HttpDispatcher::deleteConstantHandler(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates)
-	{
-		// find the constant
-		string name;
-		size_t position(0);
-		if (!findConstant(asebaSwitch, stream, request, filledPathTemplates, name, position))
-			return;
-		
-		// delete the constant
-		asebaSwitch->commonDefinitions.constants.erase(asebaSwitch->commonDefinitions.constants.begin() + position);
-		
-		// return success
-		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(stream);
+		).dump()).send(context.stream);
 	}
 	
 	//! try to find a constant, return true and update position if found, return false and send an error if not found
-	bool HttpDispatcher::findConstant(Switch* asebaSwitch, Dashel::Stream* stream, const HttpRequest& request, const PathTemplateMap &filledPathTemplates, string& name, size_t& position)
+	bool HttpDispatcher::findConstant(HandlerContext& context, string& name, size_t& position)
 	{
 		// retrieve name
-		const auto templateIt(filledPathTemplates.find("name"));
-		assert(templateIt != filledPathTemplates.end());
+		const auto templateIt(context.filledPathTemplates.find("name"));
+		assert(templateIt != context.filledPathTemplates.end());
 		name = templateIt->second;
 		
 		// if constant does not exist, respond an error
 		position = 0;
-		if (!asebaSwitch->commonDefinitions.constants.contains(UTF8ToWString(name), &position))
+		if (!context.asebaSwitch->commonDefinitions.constants.contains(UTF8ToWString(name), &position))
 		{
-			HttpResponse::fromPlainString(FormatableString("Constant %0 does not exist").arg(name), HttpStatus::NOT_FOUND).send(stream);
+			HttpResponse::fromPlainString(FormatableString("Constant %0 does not exist").arg(name), HttpStatus::NOT_FOUND).send(context.stream);
 			return false;
 		}
 		
+		return true;
+	}
+	
+	//! Return true if the value is valid, return false and send an error if not
+	bool HttpDispatcher::validateInt16Value(HandlerContext& context, const string& name, int value)
+	{
+		if (value < -32768 || value > 32767)
+		{
+			HttpResponse::fromPlainString(FormatableString("Value %0 of constant %1 is outside bounds [-32768:32767]").arg(value).arg(name), HttpStatus::BAD_REQUEST).send(context.stream);
+			return false;
+		}
 		return true;
 	}
 

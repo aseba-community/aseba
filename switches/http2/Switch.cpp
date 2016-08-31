@@ -200,7 +200,7 @@ namespace Aseba
 		// dump message if enabled
 		if (_globals.dump)
 		{
-			LOG_VERBOSE << "Core | Message from " << stream->getTargetName() << " : ";
+			LOG_DUMP << "Core | Message from " << stream->getTargetName() << " : ";
 			message->dump(wcout);
 			wcout << endl;
 		}
@@ -260,8 +260,7 @@ namespace Aseba
 		// dump message if enabled
 		if (_globals.dump)
 		{
-			dumpTime(cout, _globals.rawTime);
-			cout << "Core | Message from self : ";
+			LOG_DUMP << "Core | Message from self : ";
 			message.dump(wcout);
 			wcout << endl;
 		}

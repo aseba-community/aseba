@@ -139,15 +139,15 @@ namespace Aseba
 			content
 		};
 		
+		LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", received " << toString(method) << " " << uri << " with " << content.size() << " byte(s) payload" << endl;
 		if (_globals.dump)
 		{
+			cout << "\x1B[30;1m";
 			dumpTime(cout, _globals.rawTime);
-			cout << "HTTP | On stream " << stream->getTargetName() << ", received ";
+			cout << "HTTP | On stream " << stream->getTargetName() << ": ";
 			request.dump(cout);
 			cout << endl;
 		}
-		else
-			LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", received " << toString(method) << " " << uri << " with " << content.size() << " byte(s) payload" << endl;
 		
 		return request;
 	}
@@ -165,13 +165,13 @@ namespace Aseba
 		{
 			if (i++ != 0)
 				os << ", ";
-			os << p.first << ": \"" << p.second << "\"";
+			os << "\"" << p.first << "\": \"" << p.second << "\"";
 		}
 		os << " }";
 		if (content.size() > 0)
 		{
 			// note: as this is debug dump, the escaping of " and non-printable characters in content is not handled
-			os << ", content: \"";
+			os << ", \"content\": \"";
 			os.write(reinterpret_cast<const char*>(&content[0]), content.size());
 			os << "\"";
 		}

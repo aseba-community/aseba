@@ -25,14 +25,14 @@
 
 #define LOG_DUMP \
     if (!Aseba::_globals.dump) {} \
-    else Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
+    else std::cout << "\x1B[30;1m", Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
 
 #define LOG_VERBOSE \
     if (!Aseba::_globals.verbose) {} \
-    else Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
+    else std::cout << "\x1B[0m", Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
 
 #define LOG_ERROR \
-	Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+	std::cerr << "\x1B[31m", Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
 
 namespace Aseba
 {
