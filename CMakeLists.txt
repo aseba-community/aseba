@@ -2,25 +2,39 @@
 # vim: ts=4:sw=4:noexpandtab
 cmake_minimum_required(VERSION 2.6)
 
-project(aseba)
-enable_testing()
-
+# additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
 
-add_definitions(-Wall)
-add_definitions(-DASEBA_ASSERT)
+# project name
+project(aseba)
 
-# enable C++11, we restrict ourself to the subset supported by gcc 4.6 and later
+# check the compiler version as we neeed c++ >= 4.9 and clang >= 3.3 for full C++11 support
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	# using Clang
+	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3)
+		message(FATAL_ERROR, "Your clang compiler has version ${CMAKE_CXX_COMPILER_VERSION}, while version 3.3 or later is required for full C++11 support")
+	endif ()
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+		message(FATAL_ERROR, "Your g++ compiler has version ${CMAKE_CXX_COMPILER_VERSION}, while version 4.9 or later is required for full C++11 support")
+	endif ()
+endif()
+# enable C++11 support
 if (CMAKE_VERSION VERSION_LESS "3.1")
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set (CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
-	else (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	else ()
 		set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-	endif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-else (CMAKE_VERSION VERSION_LESS "3.1")
+	endif ()
+else ()
 	set (CMAKE_CXX_STANDARD 11)
-endif (CMAKE_VERSION VERSION_LESS "3.1")
+endif ()
+
+# testing and defines
+enable_testing()
+add_definitions(-Wall)
+add_definitions(-DASEBA_ASSERT)
 
 # Remove -Wl,--no-undefined which CMake 3.0.2 (on OpenSUSE 13.2) adds to the
 # linker options when building shared libs. That breaks building libs that use
