@@ -140,41 +140,21 @@ namespace Aseba
 		};
 		
 		LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", received " << toString(method) << " " << uri << " with " << content.size() << " byte(s) payload" << endl;
-		if (_globals.dump)
-		{
-			cout << "\x1B[30;1m";
-			dumpTime(cout, _globals.rawTime);
-			cout << "HTTP | On stream " << stream->getTargetName() << ": ";
-			request.dump(cout);
-			cout << endl;
-		}
+		LOG_DUMP << "HTTP | On stream " << stream->getTargetName() << ": " << json(request) << endl;
 		
 		return request;
 	}
 
 	//! Write the request as JSON
-	void HttpRequest::dump(ostream& os)
+	HttpRequest::operator json() const
 	{
-		os << "{ ";
-		os << "method: \"" << toString(method) << "\", ";
-		os << "protocol: \"" << toString(protocol) << "\", ";
-		os << "uri: \"" << uri << "\", ";
-		os << "headers: { ";
-		unsigned i(0);
-		for (auto p: headers)
-		{
-			if (i++ != 0)
-				os << ", ";
-			os << "\"" << p.first << "\": \"" << p.second << "\"";
-		}
-		os << " }";
-		if (content.size() > 0)
-		{
-			// note: as this is debug dump, the escaping of " and non-printable characters in content is not handled
-			os << ", \"content\": \"";
-			os.write(reinterpret_cast<const char*>(&content[0]), content.size());
-			os << "\"";
-		}
-		os << " }";
+		// TODO: if content is printable, show as string
+		return {
+			{ "method", toString(method) },
+			{ "protocol", toString(protocol) },
+			{ "uri", uri },
+			{ "headers", headers },
+			{ "content", content }
+		};
 	}
 };

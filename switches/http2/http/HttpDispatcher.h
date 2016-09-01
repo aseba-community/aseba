@@ -25,7 +25,6 @@
 #include "../Module.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
-#include "Json.h"
 
 namespace Aseba
 {

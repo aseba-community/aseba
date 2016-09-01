@@ -70,6 +70,16 @@ namespace Aseba
 		return response;
 	}
 	
+	//! Factory, from a JSON object
+	HttpResponse HttpResponse::fromJSON(const json& content, const HttpStatus::Code status)
+	{
+		HttpResponse response(status);
+		response.headers.emplace("Content-Type", "application/json"); // JSON content is UTF-8 encoded
+		const string serializedContent(content.dump());
+		response.content.insert(response.content.end(), serializedContent.begin(), serializedContent.end());
+		return response;
+	}
+	
 	//! Factory, creates a Server-Side Event declaration for the client
 	HttpResponse HttpResponse::createSSE()
 	{
@@ -127,39 +137,19 @@ namespace Aseba
 		{
 			LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", sent response " << status << " and " << content.size() << " byte(s) payload" << endl;
 		}
-		if (_globals.dump)
-		{
-			cout << "\x1B[30;1m";
-			dumpTime(cout, _globals.rawTime);
-			cout << "HTTP | On stream " << stream->getTargetName() << ": ";
-			dump(cout);
-			cout << endl;
-		}
+		LOG_DUMP << "HTTP | On stream " << stream->getTargetName() << ": " << json(*this) << endl;
 	}
 	
 	//! Write the response as JSON
-	void HttpResponse::dump(ostream& os)
+	HttpResponse::operator json() const
 	{
-		os << "{ ";
-		os << "protocol: \"" << toString(protocol) << "\", ";
-		os << "status: \"" << HttpStatus::toString(status) << "\", ";
-		os << "headers: { ";
-		unsigned i(0);
-		for (auto p: headers)
-		{
-			if (i++ != 0)
-				os << ", ";
-			os << "\"" << p.first << "\": \"" << p.second << "\"";
-		}
-		os << " }";
-		if (content.size() > 0)
-		{
-			// note: as this is debug dump, the escaping of " and non-printable characters in content is not handled
-			os << ", \"content\": \"";
-			os.write(reinterpret_cast<const char*>(&content[0]), content.size());
-			os << "\"";
-		}
-		os << " }";
+		// TODO: if content is printable, show as string
+		return {
+			{ "protocol", toString(protocol) },
+			{ "status", HttpStatus::toString(status) },
+			{ "headers", headers },
+			{ "content", content }
+		};
 	}
 	
 } // namespace Aseba

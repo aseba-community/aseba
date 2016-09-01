@@ -28,6 +28,7 @@
 #include "HttpStatus.h"
 #include "HttpMethod.h"
 #include "HttpProtocol.h"
+#include "Json.h"
 #include "../../../common/utils/utils.h"
 
 namespace Aseba
@@ -54,7 +55,7 @@ namespace Aseba
 
 	public:
 		static HttpRequest receive(Dashel::Stream* stream);
-		void dump(std::ostream& os);
+		operator json() const;
 	
 	public:
 		const HttpMethod method;

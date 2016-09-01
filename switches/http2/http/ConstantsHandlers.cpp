@@ -52,7 +52,7 @@ namespace Aseba
 		json response(json::array());
 		for (const auto& constant: context.asebaSwitch->commonDefinitions.constants)
 			response.push_back(WStringToUTF8(constant.name));
-		HttpResponse::fromJSONString(response.dump()).send(context.stream);
+		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
 	//! handler for PUT /constants/
@@ -134,14 +134,12 @@ namespace Aseba
 		
 		// return the constant
 		const NamedValue& constant(context.asebaSwitch->commonDefinitions.constants[position]);
-		HttpResponse::fromJSONString(json(
-			{
-				{ "id", position },
-				{ "name",  name },
-				{ "value", constant.value }
+		HttpResponse::fromJSON({
+			{ "id", position },
+			{ "name",  name },
+			{ "value", constant.value }
 	
-		}
-		).dump()).send(context.stream);
+		}).send(context.stream);
 	}
 
 	//! handler for PUT /constants/{name}
@@ -188,13 +186,11 @@ namespace Aseba
 		context.asebaSwitch->commonDefinitions.constants[position].value = value;
 		
 		// return answer
-		HttpResponse::fromJSONString(json(
-			{
-				{ "id", position },
-				{ "name",  name },
-				{ "value", value }
-			}
-		).dump()).send(context.stream);
+		HttpResponse::fromJSON({
+			{ "id", position },
+			{ "name",  name },
+			{ "value", value }
+		}).send(context.stream);
 	}
 	
 	//! try to find a constant, return true and update position if found, return false and send an error if not found

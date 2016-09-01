@@ -29,6 +29,8 @@
 #include "HttpStatus.h"
 #include "HttpMethod.h"
 #include "HttpProtocol.h"
+#include "HttpResponse.h"
+#include "Json.h"
 
 namespace Aseba
 {
@@ -47,10 +49,11 @@ namespace Aseba
 		static HttpResponse fromPlainString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse fromHTMLString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse fromJSONString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
+		static HttpResponse fromJSON(const json& content, const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse createSSE();
 		
 		void send(Dashel::Stream* stream);
-		void dump(std::ostream& os);
+		operator json() const;
 		
 		std::string getHeader(const std::string& header) const;
 
