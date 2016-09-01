@@ -46,6 +46,8 @@ namespace Aseba
 		serverPort(3000)
 	{
 		// register all handlers
+		REGISTER_HANDLER(optionsHandler, OPTIONS, {});
+		REGISTER_HANDLER(getTestHandler, GET, { "test" });
 		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
 		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
 		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" });
@@ -55,7 +57,6 @@ namespace Aseba
 		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events", "{name}" });
-		REGISTER_HANDLER(testHandler, GET, { "test" });
 	}
 	
 	string HttpDispatcher::name() const
@@ -256,7 +257,15 @@ namespace Aseba
 		handlers[method][uriPath] = handler;
 	}
 	
-	void HttpDispatcher::testHandler(HandlerContext& context)
+	void HttpDispatcher::optionsHandler(HandlerContext& context)
+	{
+		HttpResponse response(HttpResponse::fromStatus());
+		response.headers.emplace("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+		response.headers.emplace("Access-Control-Allow-Headers", "Content-Type");
+		response.send(context.stream);
+	}
+	
+	void HttpDispatcher::getTestHandler(HandlerContext& context)
 	{
 		HttpResponse::fromHTMLString("{ content: \"hello world\" }").send(context.stream);
 	}

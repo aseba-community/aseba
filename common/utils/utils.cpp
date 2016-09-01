@@ -277,7 +277,9 @@ namespace Aseba
 		size_t nextPos(0);
 		while ((nextPos=s.find_first_of(delim, delimPos)) != T::npos)
 		{
-			result.push_back(s.substr(delimPos, nextPos-delimPos));
+			const T element(s.substr(delimPos, nextPos-delimPos));
+			if (element.length() > 0)
+				result.push_back(element);
 			delimPos = s.find_first_not_of(delim, nextPos);
 		}
 		if (delimPos != T::npos && delimPos < s.size())

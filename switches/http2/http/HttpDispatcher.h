@@ -62,6 +62,10 @@ namespace Aseba
 	protected:
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath);
 		
+		// options and test
+		void optionsHandler(HandlerContext& context);
+		void getTestHandler(HandlerContext& context);
+		
 		// TODO: add handler support class
 		
 		// constants, in ConstantsHandlers.cpp
@@ -80,7 +84,6 @@ namespace Aseba
 		
 		// events
 		void getEventsHandler(HandlerContext& context);
-		void testHandler(HandlerContext& context);
 		
 	protected:
 		unsigned serverPort; //!< port this server is listening on
