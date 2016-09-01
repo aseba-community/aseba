@@ -19,6 +19,8 @@
 */
 
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 #include "HttpResponse.h"
 #include "../Globals.h"
 
@@ -143,12 +145,17 @@ namespace Aseba
 	//! Write the response as JSON
 	HttpResponse::operator json() const
 	{
-		// TODO: if content is printable, show as string
+		// if content is printable, show as string, otherwise as int array
+		json serializedContent;
+		if (all_of(content.begin(), content.end(), [](uint8_t c) { return isprint(c); }))
+			serializedContent = string(reinterpret_cast<const char*>(&content[0]), content.size());
+		else
+			serializedContent = content;
 		return {
 			{ "protocol", toString(protocol) },
 			{ "status", HttpStatus::toString(status) },
 			{ "headers", headers },
-			{ "content", content }
+			{ "content", serializedContent }
 		};
 	}
 	

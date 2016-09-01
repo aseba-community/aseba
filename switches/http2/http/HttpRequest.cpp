@@ -148,13 +148,18 @@ namespace Aseba
 	//! Write the request as JSON
 	HttpRequest::operator json() const
 	{
-		// TODO: if content is printable, show as string
+		// if content is printable, show as string, otherwise as int array
+		json serializedContent;
+		if (all_of(content.begin(), content.end(), [](uint8_t c) { return isprint(c); }))
+			serializedContent = string(reinterpret_cast<const char*>(&content[0]), content.size());
+		else
+			serializedContent = content;
 		return {
 			{ "method", toString(method) },
 			{ "protocol", toString(protocol) },
 			{ "uri", uri },
 			{ "headers", headers },
-			{ "content", content }
+			{ "content", serializedContent }
 		};
 	}
 };
