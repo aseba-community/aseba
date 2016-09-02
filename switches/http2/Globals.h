@@ -23,16 +23,22 @@
 
 #include "../../common/utils/utils.h"
 
+#ifndef _WIN32
+#define COLOR_OUTPUT_ANSI(X) # X
+#else // _WIN32
+#define COLOR_OUTPUT_ANSI(X) ""
+#endif // _WIN32
+
 #define LOG_DUMP \
     if (!Aseba::_globals.dump) {} \
-    else std::cout << "\x1B[30;1m", Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
+    else std::cout << COLOR_OUTPUT_ANSI(\x1B[30;1m), Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
 
 #define LOG_VERBOSE \
     if (!Aseba::_globals.verbose) {} \
-    else std::cout << "\x1B[0m", Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
+    else std::cout << COLOR_OUTPUT_ANSI(\x1B[0m), Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
 
 #define LOG_ERROR \
-	std::cerr << "\x1B[31m", Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+	std::cerr << COLOR_OUTPUT_ANSI(\x1B[31m), Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
 
 namespace Aseba
 {
