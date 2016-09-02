@@ -48,6 +48,7 @@ namespace Aseba
 		// register all handlers
 		REGISTER_HANDLER(optionsHandler, OPTIONS, {});
 		REGISTER_HANDLER(getTestHandler, GET, { "test" });
+		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
 		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
 		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
 		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" });
@@ -268,6 +269,22 @@ namespace Aseba
 	void HttpDispatcher::getTestHandler(HandlerContext& context)
 	{
 		HttpResponse::fromHTMLString("{ content: \"hello world\" }").send(context.stream);
+	}
+	
+	void HttpDispatcher::getApiDocs(HandlerContext& context)
+	{
+		json response;
+		for (const auto& handlerMapKV: handlers)
+		{
+			for (const auto& handlerKV: handlerMapKV.second)
+			{
+				response.push_back({
+					{ "method", toString(handlerMapKV.first) },
+					{ "uri", handlerKV.first }
+				});
+			}
+		}
+		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
 	

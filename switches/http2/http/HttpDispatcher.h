@@ -64,6 +64,7 @@ namespace Aseba
 		// options and test
 		void optionsHandler(HandlerContext& context);
 		void getTestHandler(HandlerContext& context);
+		void getApiDocs(HandlerContext& context);
 		
 		// TODO: add handler support class
 		
