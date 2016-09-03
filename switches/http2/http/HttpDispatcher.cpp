@@ -257,6 +257,15 @@ namespace Aseba
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath)
 	{
 		handlers[method][uriPath] = handler;
+
+		std::stringstream opId;
+		opId << toString(method);
+		for (auto elt: uriPath) // copy elt so can remove braces
+		{
+			elt.erase(std::remove_if(elt.begin(), elt.end(), [](char c){ return c=='}'||c=='{'; }), elt.end());
+			opId << "-" << elt;
+		}
+		apidocs[method][uriPath] = json{ {"operationId", opId.str()} };
 	}
 	
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
@@ -287,24 +296,16 @@ namespace Aseba
 			{
 				if (handlerKV.first.size() == 0)
 					break;
-				auto method = toString(handlerMapKV.first);
-				// build uri and opId strings with delimiters
+				// build uri string with slash delimiters
 				std::stringstream uri;
-				std::stringstream opId;
-				opId << method;
 				for (auto elt: handlerKV.first) // copy so can modify
-				{
 					uri << "/" << elt;
-					elt.erase(std::remove(elt.begin(), elt.end(), '{'), elt.end());
-					elt.erase(std::remove(elt.begin(), elt.end(), '}'), elt.end());
-					opId << "-" << elt;
-				}
-				// method must be lower case for OAS 2.0
+				// method key must be lower case for OAS 2.0
+				auto method = toString(handlerMapKV.first);
 				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
+
 				// apidoc for this operation should have been registered
 				json doc = apidocs[handlerMapKV.first][handlerKV.first];
-				if (doc.size() == 0)
-					doc = json{ {"operationId", opId.str()} };
 				// patch this operation into the apidocs
 				response["paths"][uri.str()][method] = doc;
 			}
