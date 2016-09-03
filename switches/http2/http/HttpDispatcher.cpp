@@ -51,7 +51,8 @@ namespace Aseba
 		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
 		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
 		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
-		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" });
+		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" },
+						 R"({"tags":["Definitions – Constants"],"summary":"Create Constant Definition","description":"","operationId":"POST-constant-definition","responses":{"201":{"description":"","schema":{"$ref":"#/definitions/constant-definition-full"}},"400":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid value"}},"403":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid constant name"}},"409":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Constant already exists"}}},"consumes":["application/json"],"produces":["application/json"],"parameters":[{"name":"body","in":"body","schema":{"$ref":"#/definitions/constant-definition-partial"}}]})"_json);
 		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
 		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
 		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
@@ -258,6 +259,12 @@ namespace Aseba
 		handlers[method][uriPath] = handler;
 	}
 	
+	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
+	{
+		handlers[method][uriPath] = handler;
+		apidocs[method][uriPath] = apidoc;
+	}
+
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
 	{
 		HttpResponse response(HttpResponse::fromStatus());
@@ -273,15 +280,33 @@ namespace Aseba
 	
 	void HttpDispatcher::getApiDocs(HandlerContext& context)
 	{
-		json response;
+		json response = R"({"swagger":"2.0","schemes":["http"],"host":"localhost:3000","info":{"version":"1","title":"Aseba","description":"REST API for Aseba"},"parameters":{"trait:serverSentEventStream:todo":{"name":"todo","in":"query","required":false,"type":"integer"}},"responses":{"trait:serverSentEventStream:200":{"description":"stream of server-sent events","schema":{"type":"string"}}}})"_json;
 		for (const auto& handlerMapKV: handlers)
 		{
 			for (const auto& handlerKV: handlerMapKV.second)
 			{
-				response.push_back({
-					{ "method", toString(handlerMapKV.first) },
-					{ "uri", handlerKV.first }
-				});
+				if (handlerKV.first.size() == 0)
+					break;
+				auto method = toString(handlerMapKV.first);
+				// build uri and opId strings with delimiters
+				std::stringstream uri;
+				std::stringstream opId;
+				opId << method;
+				for (auto elt: handlerKV.first) // copy so can modify
+				{
+					uri << "/" << elt;
+					elt.erase(std::remove(elt.begin(), elt.end(), '{'), elt.end());
+					elt.erase(std::remove(elt.begin(), elt.end(), '}'), elt.end());
+					opId << "-" << elt;
+				}
+				// method must be lower case for OAS 2.0
+				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
+				// apidoc for this operation should have been registered
+				json doc = apidocs[handlerMapKV.first][handlerKV.first];
+				if (doc.size() == 0)
+					doc = json{ {"operationId", opId.str()} };
+				// patch this operation into the apidocs
+				response["paths"][uri.str()][method] = doc;
 			}
 		}
 		HttpResponse::fromJSON(response).send(context.stream);
