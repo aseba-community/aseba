@@ -60,11 +60,13 @@ namespace Aseba
 		
 	protected:
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath);
+		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc);
 		
 		// options and test
 		void optionsHandler(HandlerContext& context);
 		void getTestHandler(HandlerContext& context);
 		void getApiDocs(HandlerContext& context);
+		virtual json buildApiDocs();
 		
 		// TODO: add handler support class
 		
@@ -98,6 +100,9 @@ namespace Aseba
 		typedef std::map<HttpMethod, URIHandlerMap> HandlersMap;
 		//! Handlers for known method + URI couples
 		HandlersMap handlers;
+		//! Map of method, split URI to JSON-formatted OAS documentation
+		typedef std::map<HttpMethod, std::map<strings, json>> ApidocsMap;
+		ApidocsMap apidocs;
 	};
 }
 

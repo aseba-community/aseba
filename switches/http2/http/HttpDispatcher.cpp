@@ -51,7 +51,8 @@ namespace Aseba
 		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
 		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
 		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
-		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" });
+		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" },
+						 R"({"tags":["Definitions – Constants"],"summary":"Create Constant Definition","description":"","operationId":"POST-constant-definition","responses":{"201":{"description":"","schema":{"$ref":"#/definitions/constant-definition-full"}},"400":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid value"}},"403":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid constant name"}},"409":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Constant already exists"}}},"consumes":["application/json"],"produces":["application/json"],"parameters":[{"name":"body","in":"body","schema":{"$ref":"#/definitions/constant-definition-partial"}}]})"_json);
 		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
 		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
 		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
@@ -256,11 +257,24 @@ namespace Aseba
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath)
 	{
 		handlers[method][uriPath] = handler;
+
+		// Since opId wasn't supplied by apidocs, construct an opId from the method and the URI Template path elements.
+		// For example, endpoint GET /nodes/{node}/variables has default opId GET-nodes-node-variables.
+		auto opPath{uriPath}; // copy path elements so can remove braces
+		for (auto & element: opPath)
+			element.erase(std::remove_if(element.begin(), element.end(), [](char c){ return c=='}'||c=='{'; }), element.end());
+		apidocs[method][uriPath] = json{ {"operationId", toString(method) + "-" + join(opPath,"-")} };
 	}
 	
+	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
+	{
+		handlers[method][uriPath] = handler;
+		apidocs[method][uriPath] = apidoc;
+	}
+
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
 	{
-		HttpResponse response(HttpResponse::fromStatus());
+		HttpResponse response{HttpResponse::fromJSON(buildApiDocs())};
 		response.headers.emplace("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
 		response.headers.emplace("Access-Control-Allow-Headers", "Content-Type");
 		response.send(context.stream);
@@ -273,18 +287,33 @@ namespace Aseba
 	
 	void HttpDispatcher::getApiDocs(HandlerContext& context)
 	{
-		json response;
+		json response{buildApiDocs()};
+		HttpResponse::fromJSON(response).send(context.stream);
+	}
+
+	json HttpDispatcher::buildApiDocs()
+	{
+		json documentation = R"({"swagger":"2.0","schemes":["http"],"host":"localhost:3000","info":{"version":"1","title":"Aseba","description":"REST API for Aseba"},"parameters":{"trait:serverSentEventStream:todo":{"name":"todo","in":"query","required":false,"type":"integer"}},"responses":{"trait:serverSentEventStream:200":{"description":"stream of server-sent events","schema":{"type":"string"}}}})"_json;
 		for (const auto& handlerMapKV: handlers)
 		{
 			for (const auto& handlerKV: handlerMapKV.second)
 			{
-				response.push_back({
-					{ "method", toString(handlerMapKV.first) },
-					{ "uri", handlerKV.first }
-				});
+				if (handlerKV.first.size() == 0)
+					break;
+
+				auto uri = "/" + join(handlerKV.first,"/");
+
+				// method key must be lower case for OAS 2.0
+				auto method = toString(handlerMapKV.first);
+				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
+
+				// apidoc for this operation should have been registered
+				json doc = apidocs[handlerMapKV.first][handlerKV.first];
+				// insert this operation's documentation into the apidocs at .paths.URI.METHOD
+				documentation["paths"][uri][method] = doc;
 			}
 		}
-		HttpResponse::fromJSON(response).send(context.stream);
+		return documentation;
 	}
 
 	
