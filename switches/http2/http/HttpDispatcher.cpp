@@ -258,12 +258,14 @@ namespace Aseba
 	{
 		handlers[method][uriPath] = handler;
 
+		// Since opId wasn't supplied by apidocs, construct an opId from the method and the URI Template path elements.
+		// For example, endpoint GET /nodes/{node}/variables has default opId GET-nodes-node-variables.
 		std::stringstream opId;
 		opId << toString(method);
-		for (auto elt: uriPath) // copy elt so can remove braces
+		for (auto element: uriPath) // copy path element so can remove braces
 		{
-			elt.erase(std::remove_if(elt.begin(), elt.end(), [](char c){ return c=='}'||c=='{'; }), elt.end());
-			opId << "-" << elt;
+			element.erase(std::remove_if(element.begin(), element.end(), [](char c){ return c=='}'||c=='{'; }), element.end());
+			opId << "-" << element;
 		}
 		apidocs[method][uriPath] = json{ {"operationId", opId.str()} };
 	}
@@ -276,7 +278,7 @@ namespace Aseba
 
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
 	{
-		HttpResponse response(HttpResponse::fromStatus());
+		HttpResponse response{HttpResponse::fromJSON(buildApiDocs())};
 		response.headers.emplace("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
 		response.headers.emplace("Access-Control-Allow-Headers", "Content-Type");
 		response.send(context.stream);
@@ -289,7 +291,13 @@ namespace Aseba
 	
 	void HttpDispatcher::getApiDocs(HandlerContext& context)
 	{
-		json response = R"({"swagger":"2.0","schemes":["http"],"host":"localhost:3000","info":{"version":"1","title":"Aseba","description":"REST API for Aseba"},"parameters":{"trait:serverSentEventStream:todo":{"name":"todo","in":"query","required":false,"type":"integer"}},"responses":{"trait:serverSentEventStream:200":{"description":"stream of server-sent events","schema":{"type":"string"}}}})"_json;
+		json response{buildApiDocs()};
+		HttpResponse::fromJSON(response).send(context.stream);
+	}
+
+	json HttpDispatcher::buildApiDocs()
+	{
+		json documentation = R"({"swagger":"2.0","schemes":["http"],"host":"localhost:3000","info":{"version":"1","title":"Aseba","description":"REST API for Aseba"},"parameters":{"trait:serverSentEventStream:todo":{"name":"todo","in":"query","required":false,"type":"integer"}},"responses":{"trait:serverSentEventStream:200":{"description":"stream of server-sent events","schema":{"type":"string"}}}})"_json;
 		for (const auto& handlerMapKV: handlers)
 		{
 			for (const auto& handlerKV: handlerMapKV.second)
@@ -298,19 +306,19 @@ namespace Aseba
 					break;
 				// build uri string with slash delimiters
 				std::stringstream uri;
-				for (auto elt: handlerKV.first) // copy so can modify
-					uri << "/" << elt;
+				for (auto & element: handlerKV.first)
+					uri << "/" << element;
 				// method key must be lower case for OAS 2.0
 				auto method = toString(handlerMapKV.first);
 				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
 
 				// apidoc for this operation should have been registered
 				json doc = apidocs[handlerMapKV.first][handlerKV.first];
-				// patch this operation into the apidocs
-				response["paths"][uri.str()][method] = doc;
+				// insert this operation's documentation into the apidocs at .paths.URI.METHOD
+				documentation["paths"][uri.str()][method] = doc;
 			}
 		}
-		HttpResponse::fromJSON(response).send(context.stream);
+		return documentation;
 	}
 
 	

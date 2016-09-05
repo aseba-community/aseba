@@ -66,6 +66,7 @@ namespace Aseba
 		void optionsHandler(HandlerContext& context);
 		void getTestHandler(HandlerContext& context);
 		void getApiDocs(HandlerContext& context);
+		virtual json buildApiDocs();
 		
 		// TODO: add handler support class
 		
