@@ -260,14 +260,10 @@ namespace Aseba
 
 		// Since opId wasn't supplied by apidocs, construct an opId from the method and the URI Template path elements.
 		// For example, endpoint GET /nodes/{node}/variables has default opId GET-nodes-node-variables.
-		std::stringstream opId;
-		opId << toString(method);
-		for (auto element: uriPath) // copy path element so can remove braces
-		{
+		auto opPath{uriPath}; // copy path elements so can remove braces
+		for (auto & element: opPath)
 			element.erase(std::remove_if(element.begin(), element.end(), [](char c){ return c=='}'||c=='{'; }), element.end());
-			opId << "-" << element;
-		}
-		apidocs[method][uriPath] = json{ {"operationId", opId.str()} };
+		apidocs[method][uriPath] = json{ {"operationId", toString(method) + "-" + join(opPath,"-")} };
 	}
 	
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
@@ -304,10 +300,9 @@ namespace Aseba
 			{
 				if (handlerKV.first.size() == 0)
 					break;
-				// build uri string with slash delimiters
-				std::stringstream uri;
-				for (auto & element: handlerKV.first)
-					uri << "/" << element;
+
+				auto uri = "/" + join(handlerKV.first,"/");
+
 				// method key must be lower case for OAS 2.0
 				auto method = toString(handlerMapKV.first);
 				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
@@ -315,7 +310,7 @@ namespace Aseba
 				// apidoc for this operation should have been registered
 				json doc = apidocs[handlerMapKV.first][handlerKV.first];
 				// insert this operation's documentation into the apidocs at .paths.URI.METHOD
-				documentation["paths"][uri.str()][method] = doc;
+				documentation["paths"][uri][method] = doc;
 			}
 		}
 		return documentation;
