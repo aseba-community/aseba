@@ -22,6 +22,7 @@
 #include <functional>
 #include "HttpDispatcher.h"
 #include "HttpStatus.h"
+#include "HttpHandlers.h"
 #include "../Globals.h"
 #include "../Switch.h"
 
@@ -30,10 +31,7 @@ namespace Aseba
 	using namespace std;
 	using namespace std::placeholders;
 	using namespace Dashel;
-	
-	#define REGISTER_HANDLER(handler, method, ...) \
-		registerHandler(bind(&HttpDispatcher::handler, this, _1), HttpMethod::method,  __VA_ARGS__);
-		
+			
 	#define RQ_MAP_GET_FIELD(itName, mapName, fieldName) \
 		const auto itName(mapName.find(#fieldName)); \
 		if (itName == mapName.end()) \
@@ -43,20 +41,61 @@ namespace Aseba
 		}
 	
 	HttpDispatcher::HttpDispatcher():
-		serverPort(3000)
+		serverPort(3000),
+		definitions( R"({
+			"constant-definition": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"minLength": 1,
+						"pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+					},
+					"value": {
+						"type": "integer"
+					},
+					"description": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"value"
+				],
+				"example": {
+					"name": "timeout",
+					"value": 50,
+					"description": "Timeout in ms"
+				}
+			},
+			"constant-definition-update": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"minLength": 1,
+						"pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+					},
+					"value": {
+						"type": "integer"
+					},
+					"description": {
+						"type": "string"
+					}
+				},
+				"example": {
+					"value": 150
+				}
+			}
+		})"_json)
 	{
 		// register all handlers
 		REGISTER_HANDLER(optionsHandler, OPTIONS, {});
 		REGISTER_HANDLER(getTestHandler, GET, { "test" });
 		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
-		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
-		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
-		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" },
-						 R"({"tags":["Definitions – Constants"],"summary":"Create Constant Definition","description":"","operationId":"POST-constant-definition","responses":{"201":{"description":"","schema":{"$ref":"#/definitions/constant-definition-full"}},"400":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid value"}},"403":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Invalid constant name"}},"409":{"description":"","schema":{"type":"string"},"examples":{"application/json":"Constant already exists"}}},"consumes":["application/json"],"produces":["application/json"],"parameters":[{"name":"body","in":"body","schema":{"$ref":"#/definitions/constant-definition-partial"}}]})"_json);
-		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
-		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
-		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
-		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" });
+
+		registerContantsHandlers();
+		
 		REGISTER_HANDLER(getEventsHandler, GET, { "events" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events", "{name}" });
 	}
@@ -164,7 +203,7 @@ namespace Aseba
 								});
 								//LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", dispatching " << toString(request.method) << " " << request.uri << " to handler" << endl;
 								// dispatch
-								uriHandlerKV.second(context);
+								uriHandlerKV.second.first(context);
 							}
 							catch (const invalid_argument& e)
 							{
@@ -256,20 +295,17 @@ namespace Aseba
 	
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath)
 	{
-		handlers[method][uriPath] = handler;
-
 		// Since opId wasn't supplied by apidocs, construct an opId from the method and the URI Template path elements.
 		// For example, endpoint GET /nodes/{node}/variables has default opId GET-nodes-node-variables.
 		auto opPath{uriPath}; // copy path elements so can remove braces
 		for (auto & element: opPath)
 			element.erase(std::remove_if(element.begin(), element.end(), [](char c){ return c=='}'||c=='{'; }), element.end());
-		apidocs[method][uriPath] = json{ {"operationId", toString(method) + "-" + join(opPath,"-")} };
+		handlers[method][uriPath] = { handler, json{ {"operationId", toString(method) + "-" + join(opPath,"-")} }};
 	}
 	
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
 	{
-		handlers[method][uriPath] = handler;
-		apidocs[method][uriPath] = apidoc;
+		handlers[method][uriPath] = { handler, apidoc };
 	}
 
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
@@ -307,12 +343,12 @@ namespace Aseba
 				auto method = toString(handlerMapKV.first);
 				std::transform(method.begin(), method.end(), method.begin(), ::tolower);
 
-				// apidoc for this operation should have been registered
-				json doc = apidocs[handlerMapKV.first][handlerKV.first];
 				// insert this operation's documentation into the apidocs at .paths.URI.METHOD
-				documentation["paths"][uri][method] = doc;
+				documentation["paths"][uri][method] = handlerKV.second.second;
 			}
 		}
+		// add definitions
+		documentation["definitions"] = definitions;
 		return documentation;
 	}
 

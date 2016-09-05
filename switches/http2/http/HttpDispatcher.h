@@ -44,6 +44,8 @@ namespace Aseba
 		};
 		//! A callback to an handler for HTTP requests
 		typedef std::function<void(HandlerContext&)> Handler;
+        //! A pair of Handler function and its documentation
+        typedef std::pair<Handler, json> HandlerDescription;
 		
 	public:
 		HttpDispatcher();
@@ -72,6 +74,7 @@ namespace Aseba
 		
 		// constants, in ConstantsHandlers.cpp
 		// handlers
+		void registerContantsHandlers();
 		void getConstantsHandler(HandlerContext& context);
 		void putConstantsHandler(HandlerContext& context);
 		void postConstantsHandler(HandlerContext& context);
@@ -89,20 +92,18 @@ namespace Aseba
 		
 	protected:
 		unsigned serverPort; //!< port this server is listening on
+		const json definitions; //!< the JSON models used in the API
 		
 		//! Multimap of a named Aseba event to Dashel streams, if name is empty it means all events
 		typedef std::multimap<std::string, Dashel::Stream*> EventStreams;
 		//! Ongoing SSE for Aseba events
 		EventStreams eventStreams;
 		//! Map of splitted URI (including path templates) to handlers
-		typedef std::map<strings, Handler> URIHandlerMap;
+		typedef std::map<strings, HandlerDescription> URIHandlerMap;
 		//! Map of method to map of splitted URI to handlers
 		typedef std::map<HttpMethod, URIHandlerMap> HandlersMap;
 		//! Handlers for known method + URI couples
 		HandlersMap handlers;
-		//! Map of method, split URI to JSON-formatted OAS documentation
-		typedef std::map<HttpMethod, std::map<strings, json>> ApidocsMap;
-		ApidocsMap apidocs;
 	};
 }
 

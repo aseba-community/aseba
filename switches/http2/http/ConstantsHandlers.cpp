@@ -20,6 +20,7 @@
 
 #include "HttpDispatcher.h"
 #include "HttpStatus.h"
+#include "HttpHandlers.h"
 #include "../Globals.h"
 #include "../Switch.h"
 
@@ -45,6 +46,93 @@ namespace Aseba
 			HttpResponse::fromPlainString("Field " #fieldName " has invalid value " + _it ## fieldName.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream); \
 			return; \
 		}
+	
+	//! Register all constant-related handlers
+	void HttpDispatcher::registerContantsHandlers()
+	{
+		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
+		
+		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
+		
+		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" }, { R"({
+			"tags": [
+				"Constants"
+			],
+			"summary": "Create Constant",
+			"description": "",
+			"operationId": "POST-constant",
+			"responses": {
+				"201": {
+					"description": "",
+					"schema": {
+						"$ref": "#/definitions/constant-definition"
+					},
+					"examples": {
+						"application/json": {
+							"name": "base.address",
+							"value": 100,
+							"description": "Lowest address from which to start numbering"
+						}
+					}
+				},
+				"400": {
+					"description": "",
+					"schema": {
+						"type": "string"
+					},
+					"examples": {
+						"application/json": "Invalid value"
+					}
+				},
+				"403": {
+					"description": "",
+					"schema": {
+						"type": "string"
+					},
+					"examples": {
+						"application/json": "Invalid constant name"
+					}
+				},
+				"409": {
+					"description": "",
+					"schema": {
+						"type": "string"
+					},
+					"examples": {
+						"application/json": "Constant already exists"
+					}
+				}
+			},
+			"consumes": [
+				"application/json"
+			],
+			"produces": [
+				"application/json"
+			],
+			"parameters": [
+				{
+					"name": "body",
+					"in": "body",
+					"schema": {
+						"$ref": "#/definitions/constant-definition",
+						"example": {
+							"name": "base.address",
+							"value": 100,
+							"description": "Lowest address from which to start numbering"
+						}
+					}
+				}
+			]
+		})"_json });
+		
+		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
+		
+		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
+		
+		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
+		
+		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" });
+	}
 	
 	//! handler for GET /constants/
 	void HttpDispatcher::getConstantsHandler(HandlerContext& context)
