@@ -94,7 +94,7 @@ namespace Aseba
 		REGISTER_HANDLER(getTestHandler, GET, { "test" });
 		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
 
-		registerContantsHandlers();
+		registerConstantsHandlers();
 		
 		REGISTER_HANDLER(getEventsHandler, GET, { "events" });
 		REGISTER_HANDLER(getEventsHandler, GET, { "events", "{name}" });
