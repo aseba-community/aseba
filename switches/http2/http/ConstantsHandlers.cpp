@@ -48,7 +48,7 @@ namespace Aseba
 		}
 	
 	//! Register all constant-related handlers
-	void HttpDispatcher::registerContantsHandlers()
+	void HttpDispatcher::registerConstantsHandlers()
 	{
 		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
 		

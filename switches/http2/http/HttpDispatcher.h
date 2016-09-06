@@ -74,7 +74,7 @@ namespace Aseba
 		
 		// constants, in ConstantsHandlers.cpp
 		// handlers
-		void registerContantsHandlers();
+		void registerConstantsHandlers();
 		void getConstantsHandler(HandlerContext& context);
 		void putConstantsHandler(HandlerContext& context);
 		void postConstantsHandler(HandlerContext& context);
