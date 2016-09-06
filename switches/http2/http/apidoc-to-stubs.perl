@@ -2,18 +2,30 @@
 
 use JSON::PP;
 
-my $coder = JSON::PP->new->ascii->pretty->allow_nonref;
+my $coder = JSON::PP->new->ascii->pretty->allow_nonref->canonical;
 my $apidoc = $coder->decode( join('',<>) );
 
 my %groups;
 
+# Declare models
+snip();
+my $models = $apidoc->{definitions};
+foreach my $model (sort keys %{$models}) {
+	eval { delete $models->{$model}->{example}; }
+}
+print "\t\t//! Models shared by endpoints\n";
+print "\t\tdefinitions( R\"(\n", indented_json($coder->encode($models)), ")\"_json });\n\n\n";
+
+# Find endpoint groups
 foreach my $path (keys %{$apidoc->{paths}}) {
 	my $group = camelcase( (split /[\/\#]/, $path)[1] );
 	$groups{$group} ||= [];
 	push $groups{$group}, $path;
 }
 
+# For each group, for each endpoint, register endpoint and generate handler stub
 foreach my $group (sort keys %groups) {
+	snip();
 	print "\t//! Register all $group-related handlers\n\tvoid HttpDispatcher::register",
 		ucfirst($group),"Handlers()\n\t{\n";
 
@@ -74,4 +86,8 @@ sub camelcase {
 sub indented_json {
 	my ($object, $indent) = @_;
 	return join("\n",map { $_=~s{   }{\t}g; "\t\t\t$_" } split(/\n/,$object));
+}
+
+sub snip {
+	print "//---",("---snip---" x 7),"---\n\n";
 }
