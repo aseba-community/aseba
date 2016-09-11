@@ -1,0 +1,12 @@
+# SCENARIO deque.get error get more elements than there are in the deque
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+var result1[5]
+
+# 	WHEN Get more elements than are in deque, starting from index
+
+call deque.get(dq, result1, 2)
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS

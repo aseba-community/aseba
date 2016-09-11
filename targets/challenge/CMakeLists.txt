@@ -5,7 +5,7 @@ if (QT4_FOUND AND ENKI_FOUND)
 	set(QT_USE_QTOPENGL ON)
 	include(${QT_USE_FILE})
 	
-	include_directories(${ENKI_INCLUDE_DIR})
+	include_directories(${enki_INCLUDE_DIR})
 	
 	set(challenge_SRCS
 		challenge.cpp
@@ -25,7 +25,7 @@ if (QT4_FOUND AND ENKI_FOUND)
 	
 	add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS} ${challenge_MOCS})
 	
-	target_link_libraries(asebachallenge asebavmbuffer asebavm ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebachallenge asebavmbuffer asebavm ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 	install(TARGETS asebachallenge RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 endif (QT4_FOUND AND ENKI_FOUND)

@@ -15,8 +15,27 @@ if(DNSSD_FOUND)
 		zeroconf/zeroconf.cpp
 		zeroconf/txtrecord.cpp
 		zeroconf/target.cpp
+		zeroconf/zeroconf-thread.cpp
+		zeroconf/zeroconf-dashelhub.cpp
 	)
+	find_library(AVAHI_COMMON_LIBRARIES avahi-common)
+	if(AVAHI_COMMON_LIBRARIES)
+		set(ASEBACOMMON_SRC ${ASEBACOMMON_SRC} zeroconf/avahi-compat-libdns_sd/compat.c)
+	endif(AVAHI_COMMON_LIBRARIES)
 endif(DNSSD_FOUND)
+
+if (QT4_FOUND)
+	set(QT_DONT_USE_QTGUI ON)
+	include(${QT_USE_FILE})
+	qt4_wrap_cpp(asebacommon_zeroconf_MOCS
+		zeroconf/zeroconf-qt.h
+	)
+	set(ASEBACOMMON_SRC
+		${ASEBACOMMON_SRC}
+		${asebacommon_zeroconf_MOCS}
+		zeroconf/zeroconf-qt.cpp
+	)
+endif (QT4_FOUND)
 
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
@@ -45,6 +64,9 @@ set (ASEBACORE_HDR_COMMON
 )
 set (ASEBACORE_HDR_ZEROCONF
 	zeroconf/zeroconf.h
+	zeroconf/zeroconf-thread.h
+	zeroconf/zeroconf-dashelhub.h
+	zeroconf/zeroconf-qt.h
 )
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/common/utils

@@ -1,4 +1,4 @@
-#include "../vm/natives.h"
+#include "../../vm/natives.h"
 
 // C++
 #include <iostream>

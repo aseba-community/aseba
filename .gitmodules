@@ -1,6 +1,3 @@
-[submodule "tests/externals/Catch"]
-	path = tests/externals/Catch
-	url = https://github.com/philsquared/Catch
 [submodule "clients/studio/plugins/ThymioBlockly/blockly"]
 	path = clients/studio/plugins/ThymioBlockly/blockly
 	url = https://github.com/aseba-community/blockly.git

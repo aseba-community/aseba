@@ -29,7 +29,7 @@ namespace Aseba
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
 	//! Note that later the port will become nonzero if the target is resolved.
-	Zeroconf::Target::Target(const std::string & name, const int port) :
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
 	name(name),
 	port(port),
 	local(port != 0)
@@ -37,7 +37,7 @@ namespace Aseba
 
 	//! This target describes an existing Dashel stream
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
-	Zeroconf::Target::Target(const Dashel::Stream* stream) :
+	Zeroconf::TargetInformation::TargetInformation(const Dashel::Stream* stream) :
 	name("Aseba Local " + stream->getTargetParameter("port")),
 	port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
@@ -58,6 +58,24 @@ namespace Aseba
 	void Zeroconf::Target::resolve()
 	{
 		container->resolveTarget(this);
+	}
+
+	//! Ask the containing Zeroconf to indicate that this register is completed
+	void Zeroconf::Target::registerCompleted() const
+	{
+		container->registerCompleted(this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::resolveCompleted() const
+	{
+		container->resolveCompleted(this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::updateCompleted() const
+	{
+		container->updateCompleted(this);
 	}
 
 } // namespace Aseba

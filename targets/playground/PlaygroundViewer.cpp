@@ -200,7 +200,7 @@ namespace Enki
 	
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
-		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
+		managedObjectsAliases[&typeid(DashelAsebaFeedableEPuck)] = &typeid(EPuck);
 		managedObjectsAliases[&typeid(DashelAsebaThymio2)] = &typeid(Thymio2);
 	}
 	
