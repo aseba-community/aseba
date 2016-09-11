@@ -162,4 +162,14 @@ namespace Aseba
 			{ "content", serializedContent }
 		};
 	}
+	
+	//! Return a header or an empty string if not present
+	std::string HttpRequest::getHeader(const std::string& header) const
+	{
+		const auto headerIt(headers.find(header));
+		if (headerIt != headers.end())
+			return headerIt->second;
+		else
+			return "";
+	}
 };

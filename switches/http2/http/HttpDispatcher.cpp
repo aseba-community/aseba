@@ -199,8 +199,32 @@ namespace Aseba
 									stream,
 									request,
 									filledPathTemplates,
-									request.content.size() > 0 ? parse(request.content) : json()
+									(request.content.size() > 0 && request.getHeader("Content-Type") == "application/json") ? parse(request.content) : json()
 								});
+								
+								// if request content is JSON, validate
+								const json& doc(uriHandlerKV.second.second);
+								auto parametersIt(doc.find("parameters"));
+								if (parametersIt != doc.end())
+								{
+									for (const auto& parameter: *parametersIt)
+									{
+										const string name(parameter.at("name").get<string>());
+										const string in(parameter.at("in").get<string>());
+										if (name == "body" && in == "body")
+										{
+											// make a copy of the schema
+											json schema(parameter.at("schema"));
+											// resolve the references
+											resolveReferences(schema);
+											cerr << schema.dump() << endl;
+											
+											// validate body
+											// TODO
+										}
+									}
+								}
+								
 								//LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", dispatching " << toString(request.method) << " " << request.uri << " to handler" << endl;
 								// dispatch
 								uriHandlerKV.second.first(context);
@@ -307,6 +331,41 @@ namespace Aseba
 	{
 		handlers[method][uriPath] = { handler, apidoc };
 	}
+	
+	//! Resolve the $ref field in JSON objects
+	void HttpDispatcher::resolveReferences(json& object) const
+	{
+		// if not an object, return
+		if (!object.is_object())
+			return;
+		
+		// import the content from referred element
+		auto refIt(object.find("$ref"));
+		if (refIt != object.end())
+		{
+			// get referred content, assert if not found as this is a bug in the built-in documentation
+			const string ref(refIt->get<string>());
+			const string defPath("#/definitions/");
+			const size_t defPathLength(defPath.length());
+			assert (ref.compare(0, defPathLength, "#/definitions/") == 0);
+			const string defKey(ref.substr(defPathLength));
+			auto refSubstIt(definitions.find(defKey));
+			assert (refSubstIt != definitions.end());
+			auto refSubst(*refSubstIt);
+			// import referred content
+			for (json::iterator it = refSubst.begin(); it != refSubst.end(); ++it)
+				object[it.key()] = it.value();
+		}
+		
+		// remove the "$ref" entry
+		object.erase("$ref");
+		
+		// further resolve the references
+		for (json::iterator it = object.begin(); it != object.end(); ++it)
+			resolveReferences(it.value());
+	}
+	
+	// handlers
 
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
 	{

@@ -56,6 +56,8 @@ namespace Aseba
 	public:
 		static HttpRequest receive(Dashel::Stream* stream);
 		operator json() const;
+		
+		std::string getHeader(const std::string& header) const;
 	
 	public:
 		const HttpMethod method;

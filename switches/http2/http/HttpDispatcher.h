@@ -63,6 +63,7 @@ namespace Aseba
 	protected:
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath);
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc);
+		void resolveReferences(json& object) const;
 		
 		// options and test
 		void optionsHandler(HandlerContext& context);
