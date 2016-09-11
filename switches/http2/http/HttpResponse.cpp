@@ -35,8 +35,8 @@ namespace Aseba
 		status(status)
 	{
 		// these can be overwritten later
-		headers.emplace("Content-Length", "");
-		headers.emplace("Access-Control-Allow-Origin", "*");
+		headers.emplace("content-length", "");
+		headers.emplace("access-control-allow-origin", "*");
 	}
 	
 	//! Factory, from status only
@@ -49,7 +49,7 @@ namespace Aseba
 	HttpResponse HttpResponse::fromPlainString(const std::string& content, const HttpStatus::Code status)
 	{
 		HttpResponse response(status);
-		response.headers.emplace("Content-Type", "text/plain; charset=UTF-8");
+		response.headers.emplace("content-type", "text/plain; charset=UTF-8");
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
@@ -58,7 +58,7 @@ namespace Aseba
 	HttpResponse HttpResponse::fromHTMLString(const std::string& content, const HttpStatus::Code status)
 	{
 		HttpResponse response(status);
-		response.headers.emplace("Content-Type", "text/html; charset=UTF-8");
+		response.headers.emplace("content-type", "text/html; charset=UTF-8");
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
@@ -67,7 +67,7 @@ namespace Aseba
 	HttpResponse HttpResponse::fromJSONString(const std::string& content, const HttpStatus::Code status)
 	{
 		HttpResponse response(status);
-		response.headers.emplace("Content-Type", "application/json"); // JSON content is UTF-8 encoded
+		response.headers.emplace("content-type", "application/json"); // JSON content is UTF-8 encoded
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
@@ -76,7 +76,7 @@ namespace Aseba
 	HttpResponse HttpResponse::fromJSON(const json& content, const HttpStatus::Code status)
 	{
 		HttpResponse response(status);
-		response.headers.emplace("Content-Type", "application/json"); // JSON content is UTF-8 encoded
+		response.headers.emplace("content-type", "application/json"); // JSON content is UTF-8 encoded
 		const string serializedContent(content.dump());
 		response.content.insert(response.content.end(), serializedContent.begin(), serializedContent.end());
 		return response;
@@ -86,16 +86,18 @@ namespace Aseba
 	HttpResponse HttpResponse::createSSE()
 	{
 		HttpResponse response;
-		response.headers["Content-Type"] = "text/event-stream";
-		response.headers["Cache-Control"] = "no-cache";
-		response.headers["Connection"] = "keep-alive";
+		response.headers["content-type"] = "text/event-stream";
+		response.headers["cache-control"] = "no-cache";
+		response.headers["connection"] = "keep-alive";
 		return response;
 	}
 	
 	//! Return a header or an empty string if not present
 	std::string HttpResponse::getHeader(const std::string& header) const
 	{
-		const auto headerIt(headers.find(header));
+		string lcHeader;
+		transform(header.begin(), header.end(), back_inserter(lcHeader), ::tolower);
+		const auto headerIt(headers.find(lcHeader));
 		if (headerIt != headers.end())
 			return headerIt->second;
 		else
@@ -113,9 +115,9 @@ namespace Aseba
 		// write headers
 		for (const auto& headerKV: headers)
 		{
-			if (headerKV. first == "Content-Length") // override with actual size
+			if (headerKV. first == "content-length") // override with actual size
 			{
-				if (getHeader("Content-Type") != "text/event-stream") // but only if this is not an event stream
+				if (getHeader("content-type") != "text/event-stream") // but only if this is not an event stream
 					reply << headerKV.first << ": " << content.size() << "\r\n";
 			}
 			else

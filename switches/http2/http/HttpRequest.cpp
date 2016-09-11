@@ -19,6 +19,9 @@
 */
 
 #include <iostream>
+#include <cctype>
+#include <algorithm>
+#include <string> 
 #include "../../../common/utils/utils.h"
 #include "../../../common/utils/FormatableString.h"
 #include "HttpRequest.h"
@@ -90,6 +93,7 @@ namespace Aseba
 			if (firstColon != string::npos)
 			{
 				string header = headerLine.substr(0, firstColon);
+				transform(header.begin(), header.end(), header.begin(), ::tolower);
 				string value = headerLine.substr(firstColon + 2);
 				headers[header] = value;
 			}
@@ -101,7 +105,7 @@ namespace Aseba
 	void readContent(Stream* stream, const HttpRequest::Headers& headers, vector<uint8_t>& content)
 	{
 		// if this function is called, there must be content to read
-		auto contentLengthIt(headers.find("Content-Length"));
+		auto contentLengthIt(headers.find("content-length"));
 		assert (contentLengthIt != headers.end());
 		const size_t contentLength(atoi(contentLengthIt->second.c_str()));
 		if (contentLength > HttpRequest::CONTENT_BYTES_LIMIT)
@@ -127,7 +131,7 @@ namespace Aseba
 		readHeaders(stream, headers);
 		
 		vector<uint8_t> content;
-		if (headers.find("Content-Length") != headers.end())
+		if (headers.find("content-length") != headers.end())
 			readContent(stream, headers, content);
 		
 		HttpRequest request = {
@@ -166,7 +170,9 @@ namespace Aseba
 	//! Return a header or an empty string if not present
 	std::string HttpRequest::getHeader(const std::string& header) const
 	{
-		const auto headerIt(headers.find(header));
+		string lcHeader;
+		transform(header.begin(), header.end(), back_inserter(lcHeader), ::tolower);
+		const auto headerIt(headers.find(lcHeader));
 		if (headerIt != headers.end())
 			return headerIt->second;
 		else
