@@ -15,8 +15,19 @@ if(DNSSD_INCLUDE_DIR)
 		zeroconf/zeroconf.cpp
 		zeroconf/txtrecord.cpp
 		zeroconf/target.cpp
+		zeroconf/zeroconf-thread.cpp
+		zeroconf/zeroconf-dashelhub.cpp
 	)
 endif(DNSSD_INCLUDE_DIR)
+
+if (QT4_FOUND)
+	set(QT_DONT_USE_QTGUI ON)
+	include(${QT_USE_FILE})
+	set(ASEBACOMMON_SRC
+		${ASEBACOMMON_SRC}
+		zeroconf/zeroconf-qt.cpp
+	)
+endif (QT4_FOUND)
 
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
@@ -42,6 +53,9 @@ set (ASEBACORE_HDR_COMMON
 )
 set (ASEBACORE_HDR_ZEROCONF
 	zeroconf/zeroconf.h
+	zeroconf/zeroconf-thread.h
+	zeroconf/zeroconf-dashelhub.h
+	zeroconf/zeroconf-qt.h
 )
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/common/utils
