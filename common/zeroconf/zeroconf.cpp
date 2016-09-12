@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <netinet/in.h>
 #include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include <dashel/dashel.h>

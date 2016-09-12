@@ -70,7 +70,7 @@ namespace Aseba
 		size_t pos = 0;
 		while (pos < txtLen)
 		{
-			auto length{size_t(txtRecord[pos++])};
+			auto length = size_t(txtRecord[pos++]);
 			string data{reinterpret_cast<const char*>(txtRecord)+pos, min(length,txtLen-pos)};
 			auto key_pos = data.find('=');
 			fields[data.substr(0, key_pos)] = (key_pos==std::string::npos) ? "" : data.substr(key_pos+1);

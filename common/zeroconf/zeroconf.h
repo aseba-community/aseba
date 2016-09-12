@@ -24,6 +24,7 @@
 #include "../types.h"
 #include "../consts.h"
 #include <typeinfo>
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <sstream>
