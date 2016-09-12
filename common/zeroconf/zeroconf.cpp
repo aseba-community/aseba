@@ -18,7 +18,12 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef WIN32
 #include <netinet/in.h>
+#else
+#include <winsock2.h>
+#endif
+
 #include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include <dashel/dashel.h>
