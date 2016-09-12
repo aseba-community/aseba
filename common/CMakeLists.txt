@@ -7,9 +7,9 @@ set (ASEBACOMMON_SRC
 	msg/NodesManager.cpp
 )
 
-find_path(DNSSD_INCLUDE_DIR dns_sd.h)
-if(DNSSD_INCLUDE_DIR)
-	set(ZEROCONF_FOUND 1)
+find_package(DNSSD)
+if(DNSSD_FOUND)
+	include_directories(${DNSSD_INCLUDE_DIRS})
 	set(ASEBACOMMON_SRC
 		${ASEBACOMMON_SRC}
 		zeroconf/zeroconf.cpp
@@ -18,7 +18,7 @@ if(DNSSD_INCLUDE_DIR)
 		zeroconf/zeroconf-thread.cpp
 		zeroconf/zeroconf-dashelhub.cpp
 	)
-endif(DNSSD_INCLUDE_DIR)
+endif(DNSSD_FOUND)
 
 if (QT4_FOUND)
 	set(QT_DONT_USE_QTGUI ON)
@@ -66,8 +66,8 @@ install(FILES ${ASEBACORE_HDR_MSG}
 install(FILES ${ASEBACORE_HDR_COMMON}
 	DESTINATION include/aseba/common
 )
-if(ZEROCONF_FOUND)
+if(DNSSD_FOUND)
 	install(FILES ${ASEBACORE_HDR_ZEROCONF}
 		DESTINATION include/aseba/common/msg
 	)
-endif(ZEROCONF_FOUND)
+endif(DNSSD_FOUND)

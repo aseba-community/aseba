@@ -70,7 +70,7 @@ namespace Aseba
 		size_t pos = 0;
 		while (pos < txtLen)
 		{
-			auto length{size_t(txtRecord[pos++])};
+			size_t length{size_t(txtRecord[pos++])};
 			string data{reinterpret_cast<const char*>(txtRecord)+pos, min(length,txtLen-pos)};
 			auto key_pos = data.find('=');
 			fields[data.substr(0, key_pos)] = (key_pos==std::string::npos) ? "" : data.substr(key_pos+1);
@@ -86,7 +86,7 @@ namespace Aseba
 			char length;
 			txt >> length;
 			string data;
-			txt >> std::setw(int(length)) >> data;
+			txt >> setw(int(length)) >> data;
 			auto key_pos = data.find('=');
 			fields[data.substr(0, key_pos)] = (key_pos==std::string::npos) ? "" : data.substr(key_pos+1);
 		} while (txt.peek() != std::char_traits<char>::eof());
@@ -96,14 +96,14 @@ namespace Aseba
 	string Zeroconf::TxtRecord::record() const
 	{
 		ostringstream txt;
-		serialize_field(txt, "txtvers");
-		serialize_field(txt, "protovers");
-		serialize_field(txt, "type");
-		serialize_field(txt, "ids");
-		serialize_field(txt, "pids");
+		serializeField(txt, "txtvers");
+		serializeField(txt, "protovers");
+		serializeField(txt, "type");
+		serializeField(txt, "ids");
+		serializeField(txt, "pids");
 		return txt.str();
 	}
-	void Zeroconf::TxtRecord::serialize_field(ostringstream& txt, const std::string& key) const
+	void Zeroconf::TxtRecord::serializeField(ostringstream& txt, const std::string& key) const
 	{
 		if (fields.find(key) != fields.end()) // key will be absent if it was boolean and false
 		{
