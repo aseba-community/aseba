@@ -32,6 +32,7 @@ endif (QT4_FOUND)
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
+target_include_directories(asebacommon PUBLIC ${DNSSD_INCLUDE_DIRS})
 
 install(TARGETS asebacommon 
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
