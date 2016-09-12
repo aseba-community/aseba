@@ -79,7 +79,7 @@ namespace Aseba
 		const char* record = txt.c_str();
 		target->zdr.~ZeroconfDiscoveryRequest();
 		auto err = DNSServiceRegister(&(target->zdr.serviceref),
-					      kDNSServiceFlagsDefault,
+					      0, // no flags
 					      0, // default all interfaces
 					      target->name.c_str(),
 					      "_aseba._tcp",
@@ -188,7 +188,7 @@ namespace Aseba
 			      targets.end());
 		browseZDR.~ZeroconfDiscoveryRequest();
 		auto err = DNSServiceBrowse(&browseZDR.serviceref,
-					    kDNSServiceFlagsDefault,
+					    0, // no flags
 					    0, // default all interfaces
 					    "_aseba._tcp",
 					    NULL, // use default domain, usually "local."
