@@ -128,12 +128,12 @@ include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(DNSSD DEFAULT_MSG
                                   _dnssd_LIBRARY _dnssd_INCLUDE_DIR)
 
-if(_dnssd_EPIC_FAIL)
-    # Zero out everything, we didn't meet version requirements
-    set(DNSSD_FOUND FALSE)
-    set(_dnssd_LIBRARY)
-    set(_dnssd_INCLUDE_DIR)
-endif()
+# if(_dnssd_EPIC_FAIL)
+#     # Zero out everything, we didn't meet version requirements
+#     set(DNSSD_FOUND FALSE)
+#     set(_dnssd_LIBRARY)
+#     set(_dnssd_INCLUDE_DIR)
+# endif()
 
 set(DNSSD_INCLUDE_DIRS ${_dnssd_INCLUDE_DIR})
 set(DNSSD_LIBRARIES ${_dnssd_LIBRARY})
