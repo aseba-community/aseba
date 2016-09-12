@@ -152,7 +152,7 @@ namespace Aseba
 		ZeroconfDiscoveryRequest zdr;
 
 	public:
-		Target(const std::string & name, const int & port);
+		Target(const std::string & name, const int port);
 		Target(const Dashel::Stream* dashel_stream);
 		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
 		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
@@ -202,7 +202,7 @@ namespace Aseba
 
 	private:
 		std::map<std::string, std::string> fields;
-		virtual void serialize_field(std::ostringstream& txt, const std::string& key) const; //!< serialize a field into the encoded TXT record
+		virtual void serializeField(std::ostringstream& txt, const std::string& key) const; //!< serialize a field into the encoded TXT record
 	};
 
 	/*@}*/

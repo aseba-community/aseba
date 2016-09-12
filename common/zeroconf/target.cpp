@@ -31,7 +31,7 @@ namespace Aseba
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
 	//! Note that later the port will become nonzero if the target is resolved.
-	Zeroconf::Target::Target(const std::string & name, const int & port) :
+	Zeroconf::Target::Target(const std::string & name, const int port) :
 	name(name),
 	port(port),
 	local(port != 0)
