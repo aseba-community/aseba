@@ -24,7 +24,6 @@
 #include <winsock2.h>
 #endif
 
-#include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include <dashel/dashel.h>
 #include "zeroconf.h"

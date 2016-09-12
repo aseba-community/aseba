@@ -21,18 +21,13 @@
 #ifndef ASEBA_ZEROCONF
 #define ASEBA_ZEROCONF
 
-#include "../types.h"
-#include "../consts.h"
-#include <typeinfo>
 #include <algorithm>
 #include <string>
 #include <iostream>
-#include <sstream>
 #include <iomanip>
 #include <map>
 #include <vector>
-#include <thread>
-#include <dns_sd.h>
+#include "dns_sd.h"
 
 namespace Dashel
 {
