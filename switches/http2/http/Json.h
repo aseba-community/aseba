@@ -30,6 +30,14 @@ namespace Aseba
 	
 	json parse(const std::vector<uint8_t>& rawData);
 	
+	void validate(const json& schema, const json& data, const std::string& context = "/");
+	
+	using logic_error = std::logic_error;
+	struct InvalidJsonSchema: public logic_error
+	{
+		using logic_error::logic_error;
+	};
+	
 } // namespace Aseba
 
 #endif // ASEBA_HTTP_JSON

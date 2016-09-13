@@ -33,7 +33,7 @@ namespace Aseba
 		const auto _it ## fieldName(jsonObject.find(#fieldName)); \
 		if (_it ## fieldName == jsonObject.end()) \
 		{ \
-			HttpResponse::fromPlainString("Cannot find field " #fieldName " in object" + jsonObject.dump(), HttpStatus::BAD_REQUEST).send(stream); \
+			HttpResponse::fromPlainString("Cannot find field " #fieldName " in object " + jsonObject.dump(), HttpStatus::BAD_REQUEST).send(stream); \
 			return; \
 		} \
 		fieldType fieldName; \

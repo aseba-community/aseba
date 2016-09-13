@@ -25,11 +25,113 @@ namespace Aseba
 {
 	using namespace std;
 	
+	//! Parse rawData as a string into JSON
 	json parse(const vector<uint8_t>& rawData)
 	{
 		membuf sbuf(reinterpret_cast<const char*>(&rawData[0]), rawData.size());
 		istream is(&sbuf);
 		return json::parse(is);
+	}
+	
+	//! Valide data as JSON schema (see http://json-schema.org/latest/json-schema-core.html)
+	//! context is used to produced informative dump
+	void validate(const json& schema, const json& data, const string& context)
+	{
+		// constant type-to-string map
+		const map<json::value_t, string> typeToString{
+			{ json::value_t::null, "null" },
+			{ json::value_t::boolean, "boolean" },
+			{ json::value_t::number_integer, "integer number" },
+			{ json::value_t::number_float, "float number" },
+			{ json::value_t::object, "object" },
+			{ json::value_t::array, "array" },
+			{ json::value_t::string, "string" }
+		};
+		
+		// do type-specific checks
+		const string type = schema.at("type");
+		// TODO: currently this validator does not support multiple types (type as array)
+		if (type == "array")
+		{
+			// check it is array
+			if (!data.is_array())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected array, found: " + typeToString.at(data.type()));
+			
+			// TODO
+		}
+		else if (type == "boolean")
+		{
+			// check it is boolean
+			if (!data.is_boolean())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected boolean, found: " + typeToString.at(data.type()));
+		}
+		else if (type == "integer")
+		{
+			// check it is number
+			if (!data.is_number())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected integer, found: " + typeToString.at(data.type()));
+			
+			// TODO: check range
+		}
+		else if (type == "number")
+		{
+			// check it is number
+			if (!data.is_number())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected number, found: " + typeToString.at(data.type()));
+			
+			// TODO: check range
+		}
+		else if (type == "null")
+		{
+			// check it is null
+			if (!data.is_null())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected null, found: " + typeToString.at(data.type()));
+		}
+		else if (type == "object")
+		{
+			// check it is object
+			if (!data.is_object())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected object, found: " + typeToString.at(data.type()));
+			
+			// check that all elements of the array are valid properties
+			const json properties(schema.at("properties"));
+			assert(properties.is_object());
+			for (json::const_iterator it = data.begin(); it != data.end(); ++it)
+			{
+				// the element must exist in the schema
+				const auto propertyIt(properties.find(it.key()));
+				if (propertyIt == properties.end())
+					throw InvalidJsonSchema("In " + context + ": Invalid key: " + it.key() + " in JSON object: " + data.dump());
+				// validate element
+				validate(propertyIt.value(), it.value(), context + it.key() + "/");
+			}
+			
+			// are some fields required?
+			const auto requiredIt(schema.find("required"));
+			if (requiredIt != schema.end())
+			{
+				const json required(*requiredIt);
+				assert(required.is_array());
+				for (const auto& name: required)
+				{
+					if (data.find(name) == data.end())
+						throw InvalidJsonSchema("In " + context + ": Required property: " + name.get<string>() +  " not found in JSON object: " + data.dump());
+				}
+			}
+		}
+		else if (type == "string")
+		{
+			// check it is string
+			if (!data.is_string())
+				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected string, found: " + typeToString.at(data.type()));
+			
+			// TODO: regexp
+		}
+		else
+		{
+			// this means something is broken in our schema
+			assert(false);
+		}
 	}
 	
 }; // namespace Aseba

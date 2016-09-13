@@ -213,14 +213,29 @@ namespace Aseba
 										const string in(parameter.at("in").get<string>());
 										if (name == "body" && in == "body")
 										{
-											// make a copy of the schema
+											// make sure we received JSON content
+											const string contentType(request.getHeader("Content-Type"));
+											if (contentType != "application/json")
+											{
+												HttpResponse::fromPlainString(string("Expected application/json as Content-Type, received: ") + contentType, HttpStatus::BAD_REQUEST).send(stream);
+												return;
+											}
+											
+											// make a copy of the schema and resolve the references
 											json schema(parameter.at("schema"));
-											// resolve the references
 											resolveReferences(schema);
 											cerr << schema.dump() << endl;
 											
 											// validate body
-											// TODO
+											try
+											{
+												validate(schema, context.parsedContent);
+											}
+											catch(const InvalidJsonSchema& e)
+											{
+												HttpResponse::fromPlainString(string("Invalid JSON in query: ") + e.what(), HttpStatus::BAD_REQUEST).send(stream);
+												return;
+											}
 										}
 									}
 								}
