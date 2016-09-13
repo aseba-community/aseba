@@ -18,6 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "../utils/utils.h"
+#include "../utils/FormatableString.h"
 #include "zeroconf-dashelhub.h"
 
 using namespace std;
@@ -28,7 +30,46 @@ namespace Aseba
 
 	void DashelhubZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
-		// TODO
+		if (int socket = DNSServiceRefSockFD(zdr.serviceref) != -1)
+		{
+			string dashel_target = FormatableString("tcp:sock=%0").arg(socket);
+			if (auto stream = connect(dashel_target))
+				zeroconfStreams[stream] = zdr.serviceref;
+		}
+	}
+
+	void DashelhubZeroconf::browse()
+	{
+		Zeroconf::browse();
+	}
+
+	void DashelhubZeroconf::run()
+	{
+		Dashel::Hub::run();
+	}
+
+	void DashelhubZeroconf::run2s()
+	{
+		int timeout{2000};
+		UnifiedTime startTime;
+		while (timeout > 0)
+		{
+			if (!step(100))
+				break;
+			const UnifiedTime now;
+			timeout -= (now - startTime).value;
+			startTime = now;
+		}
+	}
+
+	void DashelhubZeroconf::incomingData(Dashel::Stream *stream)
+	{
+		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
+		{
+			DNSServiceErrorType err = DNSServiceProcessResult(zeroconfStreams[stream]);
+			if (err != kDNSServiceErr_NoError)
+				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult: error %0").arg(err));
+		}
 	}
 
 } // namespace Aseba

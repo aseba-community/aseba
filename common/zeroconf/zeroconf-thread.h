@@ -19,6 +19,7 @@
 */
 
 #include <atomic>
+#include <thread>
 #include "zeroconf.h"
 
 namespace Aseba

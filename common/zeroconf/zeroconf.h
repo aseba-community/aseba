@@ -80,9 +80,14 @@ namespace Aseba
 
 	protected:
 		std::vector<Target> targets; //!< the targets in this container
-		void registerTarget(Target * target, const TxtRecord& txtrec); //!< requested through target
-		void updateTarget(const Target * target, const TxtRecord& txtrec); //!< requested through target
-		void resolveTarget(Target * target); //!< requested through target
+		virtual void registerTarget(Target * target, const TxtRecord& txtrec); //!< requested through target
+		virtual void updateTarget(const Target * target, const TxtRecord& txtrec); //!< requested through target
+		virtual void resolveTarget(Target * target); //!< requested through target
+		
+		virtual void registerCompleted(const Aseba::Zeroconf::Target *) {} //!< called when a register is completed
+		virtual void resolveCompleted(const Aseba::Zeroconf::Target *) {} //!< called when a resolve is completed
+		virtual void updateCompleted(const Aseba::Zeroconf::Target *) {} //!< called when an update is completed
+		virtual void browseCompleted() {} //!< called when browsing is completed
 
 	public:
 		//! An error in registering or browsing Zeroconf
@@ -152,7 +157,9 @@ namespace Aseba
 		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
 		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
 		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
-
+		virtual void registerCompleted() const; //!< Ask the containing Zeroconf to indicate that this register is completed
+		virtual void resolveCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
+		virtual void updateCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
 		virtual bool operator==(const Target &other) const

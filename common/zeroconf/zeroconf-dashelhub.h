@@ -25,8 +25,12 @@ namespace Aseba
 {
 	//! Use the Dashel run loop to watch the DNS Service for updates, and trigger callback
 	//! processing as necessary.
-	class DashelhubZeroconf : Zeroconf, Dashel::Hub
+	class DashelhubZeroconf : public Zeroconf, public Dashel::Hub
 	{
+	public:
+		void browse();
+		void run();
+		void run2s();
 	protected:
 		//! Set up function called after a discovery request has been made. The file
 		//! descriptor associated with zdr.serviceref must be watched, to know when to
@@ -34,8 +38,12 @@ namespace Aseba
 		//! registered with the discovery request.
 		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
 
+		//! From Dashel::Hub
+		void incomingData(Dashel::Stream *stream);
+
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.
-		std::vector<Dashel::Stream *> zeroconfStreams;
+		// TODO: should be ZeroconfDiscoveryRequest& not DNSServiceRef
+		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
 	};
 }
