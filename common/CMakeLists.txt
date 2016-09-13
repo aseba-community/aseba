@@ -6,9 +6,22 @@ set (ASEBACOMMON_SRC
 	msg/msg.cpp
 	msg/NodesManager.cpp
 )
+
+find_package(DNSSD)
+if(DNSSD_FOUND)
+	include_directories(${DNSSD_INCLUDE_DIRS})
+	set(ASEBACOMMON_SRC
+		${ASEBACOMMON_SRC}
+		zeroconf/zeroconf.cpp
+		zeroconf/txtrecord.cpp
+		zeroconf/target.cpp
+	)
+endif(DNSSD_FOUND)
+
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
+target_include_directories(asebacommon PUBLIC ${DNSSD_INCLUDE_DIRS})
 
 install(TARGETS asebacommon 
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
@@ -28,6 +41,9 @@ set (ASEBACORE_HDR_COMMON
 	types.h
 	productids.h
 )
+set (ASEBACORE_HDR_ZEROCONF
+	zeroconf/zeroconf.h
+)
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/common/utils
 )
@@ -37,3 +53,8 @@ install(FILES ${ASEBACORE_HDR_MSG}
 install(FILES ${ASEBACORE_HDR_COMMON}
 	DESTINATION include/aseba/common
 )
+if(DNSSD_FOUND)
+	install(FILES ${ASEBACORE_HDR_ZEROCONF}
+		DESTINATION include/aseba/common/msg
+	)
+endif(DNSSD_FOUND)
