@@ -52,7 +52,9 @@ namespace Aseba
 						"pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
 					},
 					"value": {
-						"type": "integer"
+						"type": "integer",
+						"minimum": -32768,
+						"maximum": 32767
 					},
 					"description": {
 						"type": "string"
@@ -71,13 +73,10 @@ namespace Aseba
 			"constant-definition-update": {
 				"type": "object",
 				"properties": {
-					"name": {
-						"type": "string",
-						"minLength": 1,
-						"pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
-					},
 					"value": {
-						"type": "integer"
+						"type": "integer",
+						"minimum": -32768,
+						"maximum": 32767
 					},
 					"description": {
 						"type": "string"

@@ -19,6 +19,7 @@
 */
 
 #include "../../../common/utils/utils.h"
+#include "../../../common/utils/FormatableString.h"
 #include "Json.h"
 
 namespace Aseba
@@ -71,7 +72,13 @@ namespace Aseba
 			if (!data.is_number())
 				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected integer, found " + typeToString.at(data.type()));
 			
-			// TODO: check range
+			// check bounds if given
+			auto minimumIt(schema.find("minimum"));
+			if ((minimumIt != schema.end()) && (data.get<int>() < minimumIt->get<int>()))
+				throw InvalidJsonSchema(FormatableString("In %0, value %1 is smaller than minimum %2").arg(context).arg(data.get<int>()).arg(minimumIt->get<int>()));
+			auto maximumIt(schema.find("maximum"));
+			if ((maximumIt != schema.end()) && (data.get<int>() > maximumIt->get<int>()))
+				throw InvalidJsonSchema(FormatableString("In %0, value %1 is larger than maximum %2").arg(context).arg(data.get<int>()).arg(maximumIt->get<int>()));
 		}
 		else if (type == "number")
 		{
@@ -79,7 +86,13 @@ namespace Aseba
 			if (!data.is_number())
 				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected number, found " + typeToString.at(data.type()));
 			
-			// TODO: check range
+			// check bounds if given
+			auto minimumIt(schema.find("minimum"));
+			if ((minimumIt != schema.end()) && (data.get<double>() < minimumIt->get<double>()))
+				throw InvalidJsonSchema(FormatableString("In %0, value %1 is smaller than minimum %2").arg(context).arg(data.get<double>()).arg(minimumIt->get<double>()));
+			auto maximumIt(schema.find("maximum"));
+			if ((maximumIt != schema.end()) && (data.get<double>() > maximumIt->get<double>()))
+				throw InvalidJsonSchema(FormatableString("In %0, value %1 is larger than maximum %2").arg(context).arg(data.get<double>()).arg(maximumIt->get<double>()));
 		}
 		else if (type == "null")
 		{
