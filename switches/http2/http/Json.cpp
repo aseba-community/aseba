@@ -55,7 +55,7 @@ namespace Aseba
 		{
 			// check it is array
 			if (!data.is_array())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected array, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected array, found " + typeToString.at(data.type()));
 			
 			// TODO
 		}
@@ -63,13 +63,13 @@ namespace Aseba
 		{
 			// check it is boolean
 			if (!data.is_boolean())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected boolean, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected boolean, found " + typeToString.at(data.type()));
 		}
 		else if (type == "integer")
 		{
 			// check it is number
 			if (!data.is_number())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected integer, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected integer, found " + typeToString.at(data.type()));
 			
 			// TODO: check range
 		}
@@ -77,7 +77,7 @@ namespace Aseba
 		{
 			// check it is number
 			if (!data.is_number())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected number, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected number, found " + typeToString.at(data.type()));
 			
 			// TODO: check range
 		}
@@ -85,13 +85,13 @@ namespace Aseba
 		{
 			// check it is null
 			if (!data.is_null())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected null, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected null, found " + typeToString.at(data.type()));
 		}
 		else if (type == "object")
 		{
 			// check it is object
 			if (!data.is_object())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected object, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected object, found " + typeToString.at(data.type()));
 			
 			// check that all elements of the array are valid properties
 			const json properties(schema.at("properties"));
@@ -101,7 +101,7 @@ namespace Aseba
 				// the element must exist in the schema
 				const auto propertyIt(properties.find(it.key()));
 				if (propertyIt == properties.end())
-					throw InvalidJsonSchema("In " + context + ": Invalid key: " + it.key() + " in JSON object: " + data.dump());
+					throw InvalidJsonSchema("In " + context + ", invalid key \"" + it.key() + "\" in JSON object " + data.dump());
 				// validate element
 				validate(propertyIt.value(), it.value(), context + it.key() + "/");
 			}
@@ -115,7 +115,7 @@ namespace Aseba
 				for (const auto& name: required)
 				{
 					if (data.find(name) == data.end())
-						throw InvalidJsonSchema("In " + context + ": Required property: " + name.get<string>() +  " not found in JSON object: " + data.dump());
+						throw InvalidJsonSchema("In " + context + ", required property \"" + name.get<string>() +  "\" not found in JSON object " + data.dump());
 				}
 			}
 		}
@@ -123,7 +123,7 @@ namespace Aseba
 		{
 			// check it is string
 			if (!data.is_string())
-				throw InvalidJsonSchema("In " + context + ": Wrong JSON type, expected string, found: " + typeToString.at(data.type()));
+				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected string, found " + typeToString.at(data.type()));
 			
 			// TODO: regexp
 		}
