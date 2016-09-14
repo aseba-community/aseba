@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <regex>
 #include "../../../common/utils/utils.h"
 #include "../../../common/utils/FormatableString.h"
 #include "Json.h"
@@ -152,7 +153,19 @@ namespace Aseba
 			if (!data.is_string())
 				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected string, found " + typeToString.at(data.type()));
 			
-			// TODO: regexp
+			// check minLength
+			auto minLengthIt(schema.find("minLength"));
+			if ((minLengthIt != schema.end()) && (data.get<string>().size() < minLengthIt->get<size_t>()))
+				throw InvalidJsonSchema(FormatableString("In %0, string \"%1\" is smaller than minimum length %2").arg(context).arg(data.get<string>()).arg(minLengthIt->get<unsigned>()));
+				
+			// check content using regular expression
+			auto patternIt(schema.find("pattern"));
+			if (patternIt != schema.end())
+			{
+				regex re(patternIt->get<string>());
+				if (!regex_match(data.get<string>(), re))
+					throw InvalidJsonSchema(FormatableString("In %0, string \"%1\" does not match pattern \"%2\"").arg(context).arg(data.get<string>()).arg(patternIt->get<string>()));
+			}
 		}
 		else
 		{
