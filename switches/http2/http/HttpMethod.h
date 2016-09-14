@@ -36,10 +36,11 @@ namespace Aseba
 		DELETE
 	};
 	
+	using domain_error = std::domain_error;
 	//! Invalid method
-	struct InvalidHttpMethod: public std::runtime_error
+	struct InvalidHttpMethod: public domain_error
 	{
-		InvalidHttpMethod(const std::string& method): std::runtime_error(method) {}
+		using domain_error::domain_error;
 	};
 	
 	std::string toString(const HttpMethod& method);

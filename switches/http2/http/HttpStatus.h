@@ -47,7 +47,7 @@ namespace Aseba
 		};
 		
 		//! An HTTP error, providing a status code
-		struct InvalidCode: public std::runtime_error
+		struct InvalidCode: public std::domain_error
 		{
 			InvalidCode(Code code);
 		};

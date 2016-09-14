@@ -33,10 +33,11 @@ namespace Aseba
 		HTTP_1_1
 	};
 	
+	using domain_error = std::domain_error;
 	//! Invalid protocol
-	struct InvalidHttpProtocol: public std::runtime_error
+	struct InvalidHttpProtocol: public domain_error
 	{
-		InvalidHttpProtocol(const std::string& protocol): std::runtime_error(protocol) {}
+		using domain_error::domain_error;
 	};
 	
 	std::string toString(const HttpProtocol& protocol);

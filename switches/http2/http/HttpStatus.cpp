@@ -28,7 +28,7 @@ namespace Aseba
 	
 	//! Construct an exception telling a code is invalid
 	HttpStatus::InvalidCode::InvalidCode(Code code):
-		runtime_error(FormatableString("Invalid code %0").arg(code))
+		domain_error(FormatableString("Invalid code %0").arg(code))
 	{
 	}
 	
