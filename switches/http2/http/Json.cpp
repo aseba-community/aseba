@@ -58,7 +58,21 @@ namespace Aseba
 			if (!data.is_array())
 				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected array, found " + typeToString.at(data.type()));
 			
-			// TODO
+			// check number of items
+			auto minItemsIt(schema.find("minItems"));
+			if ((minItemsIt != schema.end()) && (data.size() < minItemsIt->get<size_t>()))
+				throw InvalidJsonSchema(FormatableString("In %0, number of elements %1 is smaller than minimum %2").arg(context).arg(data.size()).arg(minItemsIt->get<int>()));
+			auto maxItemsIt(schema.find("maxItems"));
+			if ((maxItemsIt != schema.end()) && (data.size() > maxItemsIt->get<size_t>()))
+				throw InvalidJsonSchema(FormatableString("In %0, number of elements %1 is smaller than maximum %2").arg(context).arg(data.size()).arg(maxItemsIt->get<int>()));
+			
+			// iterate the items
+			const json itemSchema(schema.at("items"));
+			unsigned i(0);
+			for (const auto& item: data)
+			{
+				validate(itemSchema, item, context + to_string(i++) + "/");
+			}
 		}
 		else if (type == "boolean")
 		{
