@@ -30,10 +30,11 @@ namespace Aseba
 
 	void DashelhubZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
-		if (int socket = DNSServiceRefSockFD(zdr.serviceref) != -1)
+		int socket = DNSServiceRefSockFD(zdr.serviceref);
+		if (socket != -1)
 		{
-			string dashel_target = FormatableString("tcp:sock=%0").arg(socket);
-			if (auto stream = connect(dashel_target))
+			string dashelTarget = FormatableString("tcp:sock=%0").arg(socket);
+			if (auto stream = connect(dashelTarget))
 				zeroconfStreams[stream] = zdr.serviceref;
 		}
 	}
@@ -66,9 +67,10 @@ namespace Aseba
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
-			DNSServiceErrorType err = DNSServiceProcessResult(zeroconfStreams[stream]);
+			auto serviceref = zeroconfStreams[stream];
+			DNSServiceErrorType err = DNSServiceProcessResult(serviceref);
 			if (err != kDNSServiceErr_NoError)
-				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult: error %0").arg(err));
+				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceref));
 		}
 	}
 
