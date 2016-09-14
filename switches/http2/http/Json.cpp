@@ -40,7 +40,7 @@ namespace Aseba
 	void validate(const json& schema, const json& data, const string& context)
 	{
 		// constant type-to-string map
-		const map<json::value_t, string> typeToString{
+		const map<json::value_t, string> typeToString {
 			{ json::value_t::null, "null" },
 			{ json::value_t::boolean, "boolean" },
 			{ json::value_t::number_integer, "integer number" },
@@ -57,7 +57,7 @@ namespace Aseba
 		{
 			// check it is array
 			if (!data.is_array())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected array, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected array, found %1").arg(context).arg(typeToString.at(data.type())));
 			
 			// check number of items
 			auto minItemsIt(schema.find("minItems"));
@@ -79,13 +79,13 @@ namespace Aseba
 		{
 			// check it is boolean
 			if (!data.is_boolean())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected boolean, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected boolean, found %1").arg(context).arg(typeToString.at(data.type())));
 		}
 		else if (type == "integer")
 		{
 			// check it is number
 			if (!data.is_number())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected integer, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected integer, found %1").arg(context).arg(typeToString.at(data.type())));
 			
 			// check bounds if given
 			auto minimumIt(schema.find("minimum"));
@@ -99,7 +99,7 @@ namespace Aseba
 		{
 			// check it is number
 			if (!data.is_number())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected number, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected number, found %1").arg(context).arg(typeToString.at(data.type())));
 			
 			// check bounds if given
 			auto minimumIt(schema.find("minimum"));
@@ -113,13 +113,13 @@ namespace Aseba
 		{
 			// check it is null
 			if (!data.is_null())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected null, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected null, found %1").arg(context).arg(typeToString.at(data.type())));
 		}
 		else if (type == "object")
 		{
 			// check it is object
 			if (!data.is_object())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected object, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected object, found %1").arg(context).arg(typeToString.at(data.type())));
 			
 			// check that all elements of the array are valid properties
 			const json properties(schema.at("properties"));
@@ -129,7 +129,7 @@ namespace Aseba
 				// the element must exist in the schema
 				const auto propertyIt(properties.find(it.key()));
 				if (propertyIt == properties.end())
-					throw InvalidJsonSchema("In " + context + ", invalid key \"" + it.key() + "\" in JSON object " + data.dump());
+					throw InvalidJsonSchema(FormatableString("In %0, invalid key \"%1\"").arg(context).arg(it.key()));
 				// validate element
 				validate(propertyIt.value(), it.value(), context + it.key() + "/");
 			}
@@ -143,7 +143,7 @@ namespace Aseba
 				for (const auto& name: required)
 				{
 					if (data.find(name) == data.end())
-						throw InvalidJsonSchema("In " + context + ", required property \"" + name.get<string>() +  "\" not found in JSON object " + data.dump());
+						throw InvalidJsonSchema(FormatableString("In %0, required property \"%1\" not found in object").arg(context).arg(name.get<string>()));
 				}
 			}
 		}
@@ -151,7 +151,7 @@ namespace Aseba
 		{
 			// check it is string
 			if (!data.is_string())
-				throw InvalidJsonSchema("In " + context + ", wrong JSON type, expected string, found " + typeToString.at(data.type()));
+				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected string, found %1").arg(context).arg(typeToString.at(data.type())));
 			
 			// check minLength
 			auto minLengthIt(schema.find("minLength"));
