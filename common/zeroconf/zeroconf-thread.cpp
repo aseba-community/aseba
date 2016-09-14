@@ -35,6 +35,17 @@ namespace Aseba
 		watcher.join(); // tell watcher to stop, to avoid std::terminate
 	}
 
+	void ThreadZeroconf::browse()
+	{
+		Zeroconf::browse();
+	}
+
+	void ThreadZeroconf::run()
+	{
+		watcher.join();
+	}
+
+
 	void ThreadZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
 		zeroconfDRs.insert(&zdr);

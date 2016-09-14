@@ -20,18 +20,22 @@
 
 #include <atomic>
 #include <thread>
+#include <set>
 #include "zeroconf.h"
 
 namespace Aseba
 {
 	//! Run a thread to watch the DNS Service for updates, and trigger callback
 	//! processing as necessary.
-	class ThreadZeroconf : Zeroconf
+	class ThreadZeroconf : public Zeroconf
 	{
 	public:
 		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
 		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
 		~ThreadZeroconf(); // needed to terminate thread
+
+		void browse();
+		void run();
 
 	protected:
 		//! Set up function called after a discovery request has been made. The file

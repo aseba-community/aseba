@@ -27,12 +27,17 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
+		std::set<const Aseba::Zeroconf::Target*> todo;
+
 		void browseCompleted()
 		{
 			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
 			for (auto & target: targets)
+			{
+				todo.insert(&target);
 				// Resolve the host name and port of this target, retrieve TXT record
 				target.resolve();
+			}
 		}
 
 		void resolveCompleted(const Aseba::Zeroconf::Target * target)
@@ -52,6 +57,20 @@ namespace Aseba
 					std::cout << " " << field.second;
 				std::cout << std::endl;
 			}
+			todo.erase(todo.find(target));
+		}
+
+	public:
+		void run()
+		{
+			do
+			{
+				sleep(5);
+			} while (todo.size() > 0);
+		}
+		void browse()
+		{
+			ThreadZeroconf::browse();
 		}
 	};
 }
@@ -61,4 +80,5 @@ int main(int argc, char* argv[])
 	// Browse for _aseba._tcp services on all interfaces
 	Aseba::TargetLister lister;
 	lister.browse();
+	lister.run();
 }
