@@ -22,9 +22,14 @@ endif(DNSSD_FOUND)
 
 if (QT4_FOUND)
 	set(QT_DONT_USE_QTGUI ON)
+	set(CMAKE_AUTOMOC ON)	
 	include(${QT_USE_FILE})
+	# qt4_wrap_cpp(asebacommon_zeroconf_MOCS
+	# 	zeroconf/zeroconf-qt.h
+	# )
 	set(ASEBACOMMON_SRC
 		${ASEBACOMMON_SRC}
+		# ${asebacommon_zeroconf_MOCS}
 		zeroconf/zeroconf-qt.cpp
 	)
 endif (QT4_FOUND)

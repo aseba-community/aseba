@@ -18,15 +18,54 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QSocketNotifier>
+#include <QSignalMapper>
+#include "../utils/FormatableString.h"
 #include "zeroconf-qt.h"
 
 using namespace std;
 
 namespace Aseba
 {
+	QtZeroconf::QtZeroconf()
+	{
+		zeroconfMapper = new QSignalMapper();
+		//QObject::connect(zeroconfMapper, SIGNAL(mapped(::Aseba::Zeroconf::ZeroconfDiscoveryRequest &)), this, SLOT(incomingData(::Aseba::Zeroconf::ZeroconfDiscoveryRequest &)));
+	}
+	
 	void QtZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
-		// TODO
+		int socket = DNSServiceRefSockFD(zdr.serviceref);
+		if (socket != -1)
+		{
+			auto qzdr = dynamic_cast<QtZeroconfDiscoveryRequest*>(&zdr);
+			if (! qzdr->notifier)
+				qzdr->notifier = new QSocketNotifier{socket, QSocketNotifier::Read, this};
+			QObject::connect(qzdr->notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
+			zeroconfSockets[socket] = zdr;
+		}
 	}
+
+	void QtZeroconf::browse()
+	{
+		Zeroconf::browse();
+	}
+
+	void QtZeroconf::run()
+	{
+	}
+
+	void QtZeroconf::doIncoming(int socket)
+	{
+		incomingData(zeroconfSockets.at(socket));
+	}
+
+	void QtZeroconf::incomingData(ZeroconfDiscoveryRequest & zdr)
+	{
+		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceref);
+		if (err != kDNSServiceErr_NoError)
+			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceref));
+	}
+
 
 } // namespace Aseba
