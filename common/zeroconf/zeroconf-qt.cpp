@@ -27,22 +27,14 @@ using namespace std;
 
 namespace Aseba
 {
-	QtZeroconf::QtZeroconf()
-	{
-		zeroconfMapper = new QSignalMapper();
-		//QObject::connect(zeroconfMapper, SIGNAL(mapped(::Aseba::Zeroconf::ZeroconfDiscoveryRequest &)), this, SLOT(incomingData(::Aseba::Zeroconf::ZeroconfDiscoveryRequest &)));
-	}
-	
 	void QtZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
 		int socket = DNSServiceRefSockFD(zdr.serviceref);
 		if (socket != -1)
 		{
-			auto qzdr = dynamic_cast<QtZeroconfDiscoveryRequest*>(&zdr);
-			if (! qzdr->notifier)
-				qzdr->notifier = new QSocketNotifier{socket, QSocketNotifier::Read, this};
-			QObject::connect(qzdr->notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
-			zeroconfSockets[socket] = zdr;
+			auto notifier = new QSocketNotifier(socket, QSocketNotifier::Read, this);
+			QObject::connect(notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
+			zeroconfSockets.emplace(socket, ZdrQSocketNotifierPair{zdr, notifier});
 		}
 	}
 
@@ -51,13 +43,9 @@ namespace Aseba
 		Zeroconf::browse();
 	}
 
-	void QtZeroconf::run()
-	{
-	}
-
 	void QtZeroconf::doIncoming(int socket)
 	{
-		incomingData(zeroconfSockets.at(socket));
+		incomingData(zeroconfSockets.at(socket).first);
 	}
 
 	void QtZeroconf::incomingData(ZeroconfDiscoveryRequest & zdr)

@@ -60,16 +60,11 @@ namespace Aseba
 				std::cout << std::endl;
 			}
 			todo.erase(todo.find(target));
+			if (todo.size() == 0)
+				QCoreApplication::exit(0);
 		}
 
 	public:
-		void run()
-		{
-			do
-			{
-				sleep(5);
-			} while (todo.size() > 0);
-		}
 		void browse()
 		{
 			QtZeroconf::browse();
@@ -80,9 +75,10 @@ namespace Aseba
 int main(int argc, char* argv[])
 {
 	QCoreApplication app(argc, argv);
+
 	// Browse for _aseba._tcp services on all interfaces
 	Aseba::TargetLister lister;
 	lister.browse();
-	lister.run();
-	app.exec();
+
+	return app.exec();
 }

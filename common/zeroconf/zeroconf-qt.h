@@ -18,7 +18,6 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include <QCoreApplication>
 #include <QSocketNotifier>
 #include <QSignalMapper>
 #include "zeroconf.h"
@@ -33,31 +32,21 @@ namespace Aseba
 
 	public:
 		void browse();
-		void run();
-		QtZeroconf();
 
 	protected:
-		//! Encapsulate ZeroconfDiscoveryRequest in a QObject
-		class QtZeroconfDiscoveryRequest : public QObject, protected ZeroconfDiscoveryRequest
-		{
-			friend QtZeroconf;
-			QSocketNotifier * notifier;
-		};
-
 		//! Set up function called after a discovery request has been made. The file
 		//! descriptor associated with zdr.serviceref must be watched, to know when to
 		//! call DNSServiceProcessResult, which in turn calls the callback that was
 		//! registered with the discovery request.
 		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
-		virtual void incomingData(::Aseba::Zeroconf::ZeroconfDiscoveryRequest & zdr);
+		virtual void incomingData(ZeroconfDiscoveryRequest & zdr);
 
 	protected slots:
 		void doIncoming(int socket);
 
 	private:
 		//! Collection of QSocketNotifier that watch the serviceref file descriptors.
-		//std::map<ZeroconfDiscoveryRequest &, std::unique_ptr<QSocketNotifier>> zeroconfSockets;
-		std::map<int, ZeroconfDiscoveryRequest &> zeroconfSockets;
-		QSignalMapper * zeroconfMapper;
+		typedef std::pair<ZeroconfDiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
+		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
 	};
 }
