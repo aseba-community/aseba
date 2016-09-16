@@ -19,6 +19,7 @@
 */
 
 #include <iostream>
+#include "../../common/utils/utils.h"
 #include "../../common/zeroconf/zeroconf-thread.h"
 
 namespace Aseba
@@ -63,9 +64,10 @@ namespace Aseba
 	public:
 		void run()
 		{
+			UnifiedTime sleep{5,0};
 			do
 			{
-				sleep(5);
+				sleep.sleep();
 			} while (todo.size() > 0);
 		}
 		void browse()
