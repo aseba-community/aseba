@@ -34,9 +34,8 @@ target_link_libraries(asebatargetlist-thread ${ASEBA_CORE_LIBRARIES} ${DNSSD_LIB
 # Using QtZeroconf
 
 if (QT4_FOUND)
-        set(QT_USE_QTNETWORK ON)
+	set(QT_USE_QTNETWORK ON)
 	set(QT_DONT_USE_QTGUI ON)
-        set(CMAKE_AUTOMOC ON)
 	include(${QT_USE_FILE})
 
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

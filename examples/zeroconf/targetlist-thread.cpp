@@ -28,7 +28,7 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
-		std::set<const Aseba::Zeroconf::Target*> todo;
+		set<const Aseba::Zeroconf::Target*> todo;
 
 		void browseCompleted()
 		{
@@ -44,19 +44,19 @@ namespace Aseba
 		void resolveCompleted(const Aseba::Zeroconf::Target * target)
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
-			std::cout << target->host << ";port=" << target->port;
-			std::cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << std::endl;
+			cout << target->host << ";port=" << target->port;
+			cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << endl;
 			// also output properties, typically the DNS-encoded full host name and fields from TXT record
 			for (auto const& field: target->properties)
 			{
-				std::cout << "\t" << field.first << ":";
+				cout << "\t" << field.first << ":";
 				// ids and pids are a special case because they contain vectors of 16-bit integers
 				if (field.first.rfind("ids") == field.first.size()-3)
 					for (size_t i = 0; i < field.second.length(); i += 2)
-						std::cout << " " << (int(field.second[i])<<8) + int(field.second[i+1]);
+						cout << " " << (int(field.second[i])<<8) + int(field.second[i+1]);
 				else
-					std::cout << " " << field.second;
-				std::cout << std::endl;
+					cout << " " << field.second;
+				cout << endl;
 			}
 			todo.erase(todo.find(target));
 		}
