@@ -64,7 +64,7 @@ namespace Aseba
 	public:
 		void run()
 		{
-			UnifiedTime sleep{5,0};
+			UnifiedTime sleep{2,0};
 			do
 			{
 				sleep.sleep();

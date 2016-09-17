@@ -33,7 +33,7 @@ namespace Aseba
 		int socket = DNSServiceRefSockFD(zdr.serviceref);
 		if (socket != -1)
 		{
-			string dashelTarget = FormatableString("tcp:sock=%0").arg(socket);
+			string dashelTarget = FormatableString("poll:sock=%0").arg(socket);
 			if (auto stream = connect(dashelTarget))
 				zeroconfStreams[stream] = zdr.serviceref;
 		}

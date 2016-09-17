@@ -20,7 +20,8 @@
 
 #include <iostream>
 #include <dashel/dashel.h>
-#include "../../common/zeroconf/zeroconf.h"
+#include "../../common/utils/utils.h"
+//#include "../../common/zeroconf/zeroconf.h"
 #include "../../common/zeroconf/zeroconf-dashelhub.h"
 
 namespace Aseba
@@ -30,12 +31,17 @@ namespace Aseba
 
 	class TargetLister : public DashelhubZeroconf
 	{
+		set<const Aseba::Zeroconf::Target*> todo;
+
 		void browseCompleted()
 		{
 			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
 			for (auto & target: targets)
+			{
+				todo.insert(&target);
 				// Resolve the host name and port of this target, retrieve TXT record
 				target.resolve();
+			}
 		}
 
 		void resolveCompleted(const Aseba::Zeroconf::Target * target)
@@ -55,6 +61,16 @@ namespace Aseba
 					cout << " " << field.second;
 				cout << endl;
 			}
+			todo.erase(todo.find(target));
+		}
+
+	public:
+		void run()
+		{
+			do
+			{
+				run2s();
+			} while (todo.size() > 0);
 		}
 
 	};
