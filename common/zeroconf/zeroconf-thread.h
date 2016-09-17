@@ -22,6 +22,7 @@
 #define ASEBA_ZEROCONF_THREAD
 
 #include <atomic>
+#include <mutex>
 #include <thread>
 #include <set>
 #include "zeroconf.h"
