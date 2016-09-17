@@ -128,7 +128,7 @@ namespace Aseba
 		//! Can be overridden in derived classes to set up asynchronous processing.
 		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
 
-	private:
+	protected:
 		//! callbacks for the DNS Service Discovery API
 		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
@@ -167,7 +167,7 @@ namespace Aseba
 			return name == other.name && domain == other.domain;
 		}
 
-	private:
+	protected:
 		friend Zeroconf;
 		Zeroconf * container; //!< Back reference to containing Aseba::Zeroconf object
 	};

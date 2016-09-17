@@ -22,63 +22,55 @@
 #include <set>
 #include <QCoreApplication>
 #include "../../common/zeroconf/zeroconf-qt.h"
+#include "targetlist-qt.h"
 
-namespace Aseba
+using namespace std;
+
+QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
 {
-	using namespace std;
+	connect(&targets, SIGNAL(zeroconfBrowseCompleted()), this, SLOT(browseCompleted()));
+	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::Target *)), this, SLOT(resolveCompleted(const Aseba::Zeroconf::Target *)));
+}
 
-	class TargetLister : public QtZeroconf
+void QtTargetLister::browseCompleted()
+{
+	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
+	for (auto & target: targets)
 	{
-		set<const Aseba::Zeroconf::Target*> todo;
+		todo.insert(&target);
+		// Resolve the host name and port of this target, retrieve TXT record
+		target.resolve();
+	}
+}
 
-		void browseCompleted()
-		{
-			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-			for (auto & target: targets)
-			{
-				todo.insert(&target);
-				// Resolve the host name and port of this target, retrieve TXT record
-				target.resolve();
-			}
-		}
-
-		void resolveCompleted(const Aseba::Zeroconf::Target * target)
-		{
-			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
-			cout << target->host << ";port=" << target->port;
-			cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << endl;
-			// also output properties, typically the DNS-encoded full host name and fields from TXT record
-			for (auto const& field: target->properties)
-			{
-				cout << "\t" << field.first << ":";
-				// ids and pids are a special case because they contain vectors of 16-bit integers
-				if (field.first.rfind("ids") == field.first.size()-3)
-					for (size_t i = 0; i < field.second.length(); i += 2)
-						cout << " " << (int(field.second[i])<<8) + int(field.second[i+1]);
-				else
-					cout << " " << field.second;
-				cout << endl;
-			}
-			todo.erase(todo.find(target));
-			if (todo.size() == 0)
-				QCoreApplication::exit(0);
-		}
-
-	public:
-		void browse()
-		{
-			QtZeroconf::browse();
-		}
-	};
+void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::Target * target)
+{
+	// output could be JSON but for now is Dashel target [Target name (DNS domain)]
+	cout << target->host << ";port=" << target->port;
+	cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << endl;
+	// also output properties, typically the DNS-encoded full host name and fields from TXT record
+	for (auto const& field: target->properties)
+	{
+		cout << "\t" << field.first << ":";
+		// ids and pids are a special case because they contain vectors of 16-bit integers
+		if (field.first.rfind("ids") == field.first.size()-3)
+			for (size_t i = 0; i < field.second.length(); i += 2)
+				cout << " " << (int(field.second[i])<<8) + int(field.second[i+1]);
+		else
+			cout << " " << field.second;
+		cout << endl;
+	}
+	todo.erase(todo.find(target));
+	if (todo.size() == 0)
+		exit(0); // QCoreApplication::exit
 }
 
 int main(int argc, char* argv[])
 {
-	QCoreApplication app(argc, argv);
+	QtTargetLister app(argc, argv);
 
 	// Browse for _aseba._tcp services on all interfaces
-	Aseba::TargetLister lister;
-	lister.browse();
+	app.targets.browse();
 
 	return app.exec();
 }

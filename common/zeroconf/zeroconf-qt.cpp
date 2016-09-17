@@ -55,5 +55,4 @@ namespace Aseba
 			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceref));
 	}
 
-
 } // namespace Aseba

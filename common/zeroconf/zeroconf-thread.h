@@ -18,6 +18,9 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef ASEBA_ZEROCONF_THREAD
+#define ASEBA_ZEROCONF_THREAD
+
 #include <atomic>
 #include <thread>
 #include <set>
@@ -51,3 +54,5 @@ namespace Aseba
 		void handleDnsServiceEvents(); //! run the handleDSEvents_thread
 	};
 }
+
+#endif /* ASEBA_ZEROCONF_THREAD */

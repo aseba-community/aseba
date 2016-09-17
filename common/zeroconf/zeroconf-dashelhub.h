@@ -18,6 +18,9 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef ASEBA_ZEROCONF_DASHELHUB
+#define ASEBA_ZEROCONF_DASHELHUB
+
 #include <dashel/dashel.h>
 #include "zeroconf.h"
 
@@ -47,3 +50,5 @@ namespace Aseba
 		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
 	};
 }
+
+#endif /* ASEBA_ZEROCONF_DASHELHUB */
