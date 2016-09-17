@@ -65,12 +65,18 @@ namespace Aseba
 		}
 
 	public:
-		void run()
+		void run2s()
 		{
-			do
+			int timeout{2000};
+			UnifiedTime startTime;
+			while (timeout > 0)
 			{
-				run2s();
-			} while (todo.size() > 0);
+				if (!step(100))
+					break;
+				const UnifiedTime now;
+				timeout -= (now - startTime).value;
+				startTime = now;
+			}
 		}
 
 	};
@@ -81,5 +87,5 @@ int main(int argc, char* argv[])
 	// Browse for _aseba._tcp services on all interfaces
 	Aseba::TargetLister lister;
 	lister.browse();
-	lister.run();
+	lister.run2s();
 }

@@ -44,25 +44,6 @@ namespace Aseba
 		Zeroconf::browse();
 	}
 
-	void DashelhubZeroconf::run()
-	{
-		Dashel::Hub::run();
-	}
-
-	void DashelhubZeroconf::run2s()
-	{
-		int timeout{2000};
-		UnifiedTime startTime;
-		while (timeout > 0)
-		{
-			if (!step(100))
-				break;
-			const UnifiedTime now;
-			timeout -= (now - startTime).value;
-			startTime = now;
-		}
-	}
-
 	void DashelhubZeroconf::incomingData(Dashel::Stream *stream)
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())

@@ -52,6 +52,8 @@ namespace Aseba
 		std::set<ZeroconfDiscoveryRequest *> zeroconfDRs;
 	private:
 		void handleDnsServiceEvents(); //! run the handleDSEvents_thread
+		std::recursive_mutex watcherLock;
+		std::exception_ptr watcherException{nullptr};
 	};
 }
 

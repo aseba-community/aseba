@@ -32,8 +32,6 @@ namespace Aseba
 	{
 	public:
 		void browse();
-		void run();
-		void run2s();
 	protected:
 		//! Set up function called after a discovery request has been made. The file
 		//! descriptor associated with zdr.serviceref must be watched, to know when to

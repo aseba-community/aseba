@@ -43,29 +43,33 @@ namespace Aseba
 	void ThreadZeroconf::run()
 	{
 		watcher.join();
+		if (watcherException)
+			std::rethrow_exception(watcherException);
 	}
-
 
 	void ThreadZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
+		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.insert(&zdr);
 	}
 
 	void ThreadZeroconf::eraseDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
 	{
+		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.erase(zeroconfDRs.find(&zdr));
 	}
 
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{
-		struct timeval tv{1,0}; //!< maximum time to learn about a new service (5 sec)
+		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)
 
 		while (running)
 		{
-			if (zeroconfDRs.size() == 0)
-			{
-				continue;
-			}
+			{// lock
+				std::lock_guard<std::recursive_mutex> locker(watcherLock);
+				if (zeroconfDRs.size() == 0)
+					continue;
+			}// unlock
 			fd_set fds;
 			int max_fds(0);
 			FD_ZERO(&fds);
@@ -73,28 +77,41 @@ namespace Aseba
 
 			int fd_count(0);
 
-			for (auto const& zdr: zeroconfDRs)
-			{
-				int fd = DNSServiceRefSockFD(zdr->serviceref);
-				if (fd != -1)
-				{
-					max_fds = max_fds > fd ? max_fds : fd;
-					FD_SET(fd, &fds);
-					serviceFd[zdr->serviceref] = fd;
-					fd_count++;
-				}
-			}
-			int result = select(max_fds+1, &fds, (fd_set*)NULL, (fd_set*)NULL, &tv);
-			if (result > 0)
-			{
+			{// lock
+				std::lock_guard<std::recursive_mutex> locker(watcherLock);
 				for (auto const& zdr: zeroconfDRs)
-					if (FD_ISSET(serviceFd[zdr->serviceref], &fds))
-						DNSServiceProcessResult(zdr->serviceref);
+				{
+					int fd = DNSServiceRefSockFD(zdr->serviceref);
+					if (fd != -1)
+					{
+						max_fds = max_fds > fd ? max_fds : fd;
+						FD_SET(fd, &fds);
+						serviceFd[zdr->serviceref] = fd;
+						fd_count++;
+					}
+				}
+			}// unlock
+			int result = select(max_fds+1, &fds, (fd_set*)NULL, (fd_set*)NULL, &tv);
+			try {
+				if (result > 0)
+				{
+					// lock
+					std::lock_guard<std::recursive_mutex> locker(watcherLock);
+
+					for (auto const& zdr: zeroconfDRs)
+						if (FD_ISSET(serviceFd[zdr->serviceref], &fds))
+							DNSServiceProcessResult(zdr->serviceref);
+					// unlock
+				}
+				else if (result < 0)
+					throw Zeroconf::Error(FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
+
+				else
+					; // timeout, check for new services
 			}
-			else if (result < 0)
-				throw Zeroconf::Error(FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
-			else
-				; // timeout, check for new services
+			catch (...) {
+				watcherException = std::current_exception();
+			}
 		}
 	}
 } // namespace Aseba
