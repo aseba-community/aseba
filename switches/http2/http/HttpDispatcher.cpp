@@ -95,8 +95,8 @@ namespace Aseba
 
 		registerConstantsHandlers();
 		
-		REGISTER_HANDLER(getEventsHandler, GET, { "events" });
-		REGISTER_HANDLER(getEventsHandler, GET, { "events", "{name}" });
+		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events" });
+		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events", "{name}" });
 	}
 	
 	string HttpDispatcher::name() const

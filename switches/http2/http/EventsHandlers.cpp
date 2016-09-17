@@ -28,8 +28,8 @@ namespace Aseba
 	using namespace std;
 	using namespace Dashel;
 	
-	//! handler for GET /events
-	void HttpDispatcher::getEventsHandler(HandlerContext& context)
+	//! handler for GET /streams/events
+	void HttpDispatcher::getStreamsEventsHandler(HandlerContext& context)
 	{
 		Switch* asebaSwitch(context.asebaSwitch);
 		Stream* stream(context.stream);

@@ -88,8 +88,8 @@ namespace Aseba
 		bool findConstant(HandlerContext& context, std::string& name, size_t& position);
 		bool validateInt16Value(HandlerContext& context, const std::string& name, int value);
 		
-		// events
-		void getEventsHandler(HandlerContext& context);
+		// streams
+		void getStreamsEventsHandler(HandlerContext& context);
 		
 	protected:
 		unsigned serverPort; //!< port this server is listening on
