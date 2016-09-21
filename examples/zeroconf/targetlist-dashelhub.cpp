@@ -71,8 +71,15 @@ namespace Aseba
 			UnifiedTime startTime;
 			while (timeout > 0)
 			{
-				if (!step(100))
-					break;
+				try
+				{
+					if (!step(100))
+						break;
+				}
+				catch (Aseba:: Zeroconf::Error e)
+				{
+					std::cout << "caught " << e.what() << std::endl;
+				}
 				const UnifiedTime now;
 				timeout -= (now - startTime).value;
 				startTime = now;

@@ -89,6 +89,8 @@ namespace Aseba
 		virtual void updateCompleted(const Aseba::Zeroconf::Target *) {} //!< called when an update is completed
 		virtual void browseCompleted() {} //!< called when browsing is completed
 
+		bool browseAlreadyCompleted;
+
 	public:
 		//! An error in registering or browsing Zeroconf
 		struct Error:public std::runtime_error
@@ -119,10 +121,6 @@ namespace Aseba
 		ZeroconfDiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
 
 	protected:
-		//! Called when the browsing process is complete.
-		//! Can be overridden in derived classes to schedule an update to the UI.
-		virtual void browseComplete() {}
-
 		//! The discovery request can be processed immediately, or can be registered with
 		//! an event loop for asynchronous processing.
 		//! Can be overridden in derived classes to set up asynchronous processing.
