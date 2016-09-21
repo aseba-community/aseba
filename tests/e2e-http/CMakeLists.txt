@@ -1,53 +1,55 @@
 add_custom_command(
-    OUTPUT run-e2e-http.sh
-    COMMAND perl ARGS ${CMAKE_CURRENT_SOURCE_DIR}/../patch-script.perl 
-    	    ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-http.sh.in 
-	    ${CMAKE_CURRENT_BINARY_DIR}/run-e2e-http.sh 
-	    ASEBAHTTP=$<TARGET_FILE:asebahttp> 
-	    ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode> 
-	    ASEBASWITCH=$<TARGET_FILE:asebaswitch> 
-	    ASEBAMASSLOADER=$<TARGET_FILE:asebamassloader>
-	    DASHELPORTLIST=${dashel_DIR}/portlist
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-http.sh.in
+	OUTPUT run-e2e-http.sh
+	COMMAND ${CMAKE_COMMAND}
+		-D in=${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-http.sh.in
+		-D out=${CMAKE_CURRENT_BINARY_DIR}/run-e2e-http.sh
+		-D ASEBAHTTP=$<TARGET_FILE:asebahttp> 
+		-D ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode> 
+		-D ASEBASWITCH=$<TARGET_FILE:asebaswitch> 
+		-D ASEBAMASSLOADER=$<TARGET_FILE:asebamassloader>
+		-D DASHELPORTLIST=${dashel_DIR}/portlist
+		-P ${CMAKE_CURRENT_SOURCE_DIR}/../patch-script.cmake
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-http.sh.in
 )
 add_custom_target(
-    create-run-e2e-http ALL
-    DEPENDS run-e2e-http.sh
+	create-run-e2e-http ALL
+	DEPENDS run-e2e-http.sh
 )
 
 add_custom_command(
-    OUTPUT run-e2e-switch.sh
-    COMMAND perl ARGS ${CMAKE_CURRENT_SOURCE_DIR}/../patch-script.perl 
-    	    ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in 
-	    ${CMAKE_CURRENT_BINARY_DIR}/run-e2e-switch.sh 
-	    ASEBAHTTP=$<TARGET_FILE:asebahttp> 
-	    ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode> 
-	    ASEBASWITCH=$<TARGET_FILE:asebaswitch> 
-	    ASEBAMASSLOADER=$<TARGET_FILE:asebamassloader>
-	    DASHELPORTLIST=${dashel_DIR}/portlist
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in
+	OUTPUT run-e2e-switch.sh
+	COMMAND ${CMAKE_COMMAND}
+		-D in=${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in 
+		-D out=${CMAKE_CURRENT_BINARY_DIR}/run-e2e-switch.sh 
+		-D ASEBAHTTP=$<TARGET_FILE:asebahttp> 
+		-D ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode> 
+		-D ASEBASWITCH=$<TARGET_FILE:asebaswitch> 
+		-D ASEBAMASSLOADER=$<TARGET_FILE:asebamassloader>
+		-D DASHELPORTLIST=${dashel_DIR}/portlist
+		-P ${CMAKE_CURRENT_SOURCE_DIR}/../patch-script.cmake
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in
 )
 add_custom_target(
-    create-run-e2e-switch ALL
-    DEPENDS run-e2e-switch.sh
+	create-run-e2e-switch ALL
+	DEPENDS run-e2e-switch.sh
 )
 
 find_program( HAVE_NPM npm )
 
 if (HAVE_NPM)
-    if (WIN32)
-        set(NPM_INSTALL cmd //c npm install)
-    else (WIN32)
-        set(NPM_INSTALL npm install)
-    endif (WIN32)
-    add_custom_target(
+	if (WIN32)
+		set(NPM_INSTALL cmd //c npm install)
+	else (WIN32)
+		set(NPM_INSTALL npm install)
+	endif (WIN32)
+	add_custom_target(
 	install_jasmine ALL
 	COMMAND ${NPM_INSTALL}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Installing jasmine"
-    )
+	)
 endif (HAVE_NPM)
 
 configure_file(3000-1-http_spec.js ${CMAKE_CURRENT_BINARY_DIR}/3000-1-http_spec.js COPYONLY)

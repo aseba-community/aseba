@@ -9,9 +9,9 @@ add_library(asebavmdummycallbacks STATIC
 # shared lib, it must be a dependency so that it can be used to resolve refs 
 # in asebavmdummycallbacks.
 if (BUILD_SHARED_LIBS)
-  target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
 else (BUILD_SHARED_LIBS)
-  target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
 endif (BUILD_SHARED_LIBS)
 
 add_executable(asebatest
@@ -210,11 +210,12 @@ if (LIBXML2_FOUND)
 
 add_custom_command(
 	OUTPUT run-test-asebahttp.sh
-	COMMAND perl ARGS ${CMAKE_CURRENT_SOURCE_DIR}/patch-script.perl	
-		${CMAKE_CURRENT_SOURCE_DIR}/run-test-asebahttp.sh.in
-		${CMAKE_CURRENT_BINARY_DIR}/run-test-asebahttp.sh
-		ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode>
-		TESTASEBAHTTP=$<TARGET_FILE:test-asebahttp>
+	COMMAND ${CMAKE_COMMAND}
+		-D in=${CMAKE_CURRENT_SOURCE_DIR}/run-test-asebahttp.sh.in
+		-D out=${CMAKE_CURRENT_BINARY_DIR}/run-test-asebahttp.sh
+		-D ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode>
+		-D TESTASEBAHTTP=$<TARGET_FILE:test-asebahttp>
+		-P ${CMAKE_CURRENT_SOURCE_DIR}/patch-script.cmake
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-test-asebahttp.sh.in
 )

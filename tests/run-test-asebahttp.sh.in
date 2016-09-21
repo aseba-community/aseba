@@ -7,9 +7,9 @@ which killall >/dev/null 2>&1 \
     && killall aseba{dummynode,switch,massloader,http,scratch} \
     || ps | egrep 'aseba(dummynode|switch|massloader|http)' | while read pid rest; do kill $pid; done
 
-ASEBADUMMYNODE 0 &
+@ASEBADUMMYNODE@ 0 &
 sleep 2
-TESTASEBAHTTP
+@TESTASEBAHTTP@
 status=$?
 kill %%
 exit $status
