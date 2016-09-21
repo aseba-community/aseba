@@ -135,6 +135,10 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(DNSSD DEFAULT_MSG
 #     set(_dnssd_INCLUDE_DIR)
 # endif()
 
+find_library(AVAHI_COMMON_LIBRARIES avahi-common)
+find_library(AVAHI_CLIENT_LIBRARIES avahi-client)
+set(_dnssd_LIBRARY ${_dnssd_LIBRARY} ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} -lpthread)
+
 set(DNSSD_INCLUDE_DIRS ${_dnssd_INCLUDE_DIR})
 set(DNSSD_LIBRARIES ${_dnssd_LIBRARY})
 

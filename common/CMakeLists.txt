@@ -18,6 +18,10 @@ if(DNSSD_FOUND)
 		zeroconf/zeroconf-thread.cpp
 		zeroconf/zeroconf-dashelhub.cpp
 	)
+	find_library(AVAHI_COMMON_LIBRARIES avahi-common)
+	if(AVAHI_COMMON_LIBRARIES)
+		set(ASEBACOMMON_SRC ${ASEBACOMMON_SRC} zeroconf/avahi-compat-libdns_sd/compat.c)
+	endif(AVAHI_COMMON_LIBRARIES)
 endif(DNSSD_FOUND)
 
 if (QT4_FOUND)
