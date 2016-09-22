@@ -24,6 +24,7 @@
 #include <pthread.h>
 #include <assert.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -638,8 +639,8 @@ static void service_browser_callback(
             if (!sdref->browse_list)
                 break;
 
-            for (browse_list_t *entry = sdref->browse_list;
-                 entry; ) {
+            browse_list_t *entry = sdref->browse_list;
+            while ( entry ) {
 
                 /* send it */
                 int new_flags = entry->flags;
@@ -951,8 +952,8 @@ static void domain_browser_callback(
             if (!sdref->domain_list)
                 break;
 
-            for (domain_list_t *entry = sdref->domain_list;
-                 entry; ) {
+            domain_list_t *entry = sdref->domain_list;
+            while ( entry ) {
 
                 /* send it */
                 int new_flags = entry->flags;
@@ -1470,8 +1471,8 @@ static void query_resolver_callback(
         if (!sdref->query_list)
             break;
 
-        for (query_list_t *entry = sdref->query_list;
-             entry; ) {
+        query_list_t *entry = sdref->query_list;
+	while (entry ) {
 
             /* send it */
             int new_flags = entry->flags;
