@@ -78,7 +78,7 @@ namespace Aseba
 				}
 				catch (Aseba:: Zeroconf::Error e)
 				{
-					std::err << "caught " << e.what() << std::endl;
+					cerr << "caught " << e.what() << std::endl;
 				}
 				const UnifiedTime now;
 				timeout -= (now - startTime).value;
