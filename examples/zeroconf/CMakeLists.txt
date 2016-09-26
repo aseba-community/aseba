@@ -1,4 +1,7 @@
 find_package(DNSSD)
+if(AVAHI_COMMON_LIBRARIES)
+	add_definitions(-DDNSSD_AVAHI)
+endif(AVAHI_COMMON_LIBRARIES)
 
 add_executable(asebatargetadvertise
 	targetadvertise.cpp
