@@ -1,5 +1,5 @@
 The asebaswitch REST API provides access to the core functions in asebacommon and asebacompiler for managing
-robot targets and their programs. The current version is [aseba-v1.json](http/aseba-v1.json).
+robot targets and their programs. The current version is [aseba-v1.json](aseba-v1.json).
 
 The API is specified using the [OAI OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification). The
 specification, in JSON or equivalently YAML, can be edited using [Swagger Editor](http://swagger.io/swagger-editor/)
@@ -13,5 +13,6 @@ C++ stubs for HTTP handlers can be generated here from the OAS apidocs using
 ./apidoc-repair.perl aseba-v1.json | ./apidoc-to-stubs.perl > stubs.cpp
 ```
 
-The program `apidoc-repair.perl` removes all examples and moves response descriptions temporarily attached to the schema.
+The program `apidoc-repair.perl` removes optional elements such as examples and moves response descriptions 
+temporarily attached to the schema instead of the response.
 The program `apidoc-to-stubs.perl` maps the corrected endpoints to asebaswitch HTTP handlers.
