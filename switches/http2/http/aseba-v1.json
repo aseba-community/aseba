@@ -1,0 +1,3423 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1",
+        "title": "generic",
+        "description": "## Welcome\n\nThis is a place to put general notes and extra information, for internal use.\n\nTo get started designing/documenting this API, select a version on the left."
+    },
+    "host": "localhost:3000",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/javascript"
+    ],
+    "produces": [
+        "application/javascript"
+    ],
+    "paths": {
+        "/network": {
+            "get": {
+                "operationId": "GET-network",
+                "summary": "Get Network Definition",
+                "tags": [
+                    "Network"
+                ],
+                "description": "Convenience endpoint to retrieve complete information about the network's definition.\nCombines #endpoint:n8TKTxgPZpLrH5nyG, #endpoint:hv8uTQvCZsm6WXzAk, and #endpoint:SvmraRxfzSboWWrNg.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:querySelectEmbed:embed"
+                    },
+                    {
+                        "$ref": "#/parameters/trait:querySelectFields:fields"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "description": "Lost in Space",
+                                "author": "Warren Gamaliel Harding",
+                                "events": [],
+                                "constants": [
+                                    {
+                                        "name": "date",
+                                        "value": 1921
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "id": 1,
+                                        "name": "thymio-II",
+                                        "pid": 8
+                                    },
+                                    {
+                                        "id": 211,
+                                        "name": "thymio wireless",
+                                        "pid": 8
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reset": {
+            "get": {
+                "operationId": "GET-reset",
+                "summary": "Reset Nodes in Network",
+                "tags": [
+                    "Reset",
+                    "Network"
+                ],
+                "description": "Send reset request to all nodes in network.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "reset request sent"
+                    }
+                }
+            }
+        },
+        "/api-docs": {
+            "get": {
+                "operationId": "GET-api-docs",
+                "summary": "API Documentation",
+                "tags": [
+                    "Network"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "swagger": "2.0",
+                                "schemes": [
+                                    "http"
+                                ],
+                                "host": "localhost:3000",
+                                "info": {
+                                    "version": "1",
+                                    "title": "Aseba",
+                                    "description": "Aseba REST API"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/streams/events": {
+            "get": {
+                "operationId": "GET-streams-events",
+                "summary": "Subscribe Network Events Stream",
+                "tags": [
+                    "Events",
+                    "Streams"
+                ],
+                "description": "Subscribe to server-sent event stream for all events.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:serverSentEventStream:todo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/responses/trait:serverSentEventStream:200"
+                    },
+                    "default": {
+                        "description": "event stream not subscribed"
+                    }
+                }
+            }
+        },
+        "/streams/events/{event}": {
+            "parameters": [
+                {
+                    "name": "event",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-streams-events-event",
+                "summary": "Subscribe Network Event Stream",
+                "tags": [
+                    "Events",
+                    "Streams"
+                ],
+                "description": "Subscribe to a server-sent event stream for the given event",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:serverSentEventStream:todo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "application/json": "data: R_state_update 16912 0 22874 0 32190 0 0 0 0 90 0 0 0 0 361 380 0 5 0 0 0 0 0 0 0 0 0\n\ndata: R_state_update 16912 0 23130 0 32190 0 0 0 0 90 0 0 0 0 369 367 1 1 0 0 0 0 0 0 0 0 0\n\ndata: R_state_update 16912 0 23130 0 32190 0 0 0 0 90 0 0 0 0 373 354 4 0 0 0 0 0 0 0 0 0 0\n\ndata: R_state_update 16912 0 23130 0 32190 0 0 0 0 90 0 0 0 0 372 358 1 3 0 0 0 0 0 0 0 0 0\n\ndata: R_state_update 16912 0 22874 0 32190 0 0 0 0 90 0 0 0 0 370 384 0 0 3 0 0 0 3 0 0 0 0\n\ndata: R_state_update 16912 0 23130 -1 32190 0 0 0 0 90 0 0 0 0 371 361 0 0 1 1 0 0 0 0 0 0 0\n\ndata: R_state_update 16912 0 23130 -1 32190 0 0 0 0 90 0 0 0 0 368 360 0 0 3 0 1 0 1 0 0 0 0\n\ndata: R_state_update 16912 0 23130 0 32190 0 0 0 0 90 0 0 0 0 371 370 0 0 0 0 0 0 2 0 0 0 0\n\ndata: R_state_update 16912 0 22618 -1 32190 0 0 0 0 90 0 0 0 0 357 402 0 0 0 2 0 0 1 0 0 0 0\n\ndata: R_state_update 16912 0 23130 0 32190 0 0 0 0 90 0 0 0 0 382 376 0 1 0 1 0 0 2 0 0 0 0"
+                        }
+                    },
+                    "404": {
+                        "description": "no such node, event stream not subscribed",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown event"
+                        },
+                        "examples": {
+                            "application/json": "Unknown event"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "POST-streams-events-event",
+                "summary": "Emit Event on Network Event Stream",
+                "tags": [
+                    "Nodes",
+                    "Streams"
+                ],
+                "description": "Emit an event on the network.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": [
+                                "array",
+                                "null"
+                            ],
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "slot update accepted",
+                        "schema": {
+                            "type": "null"
+                        }
+                    },
+                    "404": {
+                        "description": "no such slot",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown event"
+                        },
+                        "examples": {
+                            "application/json": "Unknown event"
+                        }
+                    }
+                }
+            }
+        },
+        "/streams/debugs": {
+            "get": {
+                "operationId": "GET-streams-debugs",
+                "summary": "Subscribe Network Debugs Stream",
+                "tags": [
+                    "Streams"
+                ],
+                "description": "Subscribe to server-sent event stream for debugging information, including execution state changes.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:serverSentEventStream:todo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/streams/connections": {
+            "get": {
+                "operationId": "GET-streams-connections",
+                "summary": "Subscribe Network Connections Stream",
+                "tags": [
+                    "Streams"
+                ],
+                "description": "Subscribe to server-sent event stream for node instance connection and disconnection",
+                "consumes": [
+                    "text/plain"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:serverSentEventStream:todo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/streams/debugs/{node}": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-streams-debugs-node",
+                "summary": "Subscribe Node Debugs Stream",
+                "tags": [
+                    "Streams"
+                ],
+                "description": "Subscribe to server-sent event stream for debugging information for the given node.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:serverSentEventStream:todo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/responses/trait:serverSentEventStream:200"
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes/{node}/description": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-nodes-node-description",
+                "summary": "Get Node Description",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "Return the #model:qnq7DXyawr5Gv8BKo (hardwired properties) of the given node.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:querySelectFields:fields"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/node-description"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": 1,
+                                "name": "thymio-II",
+                                "protocolVersion": 5,
+                                "vm-properties": {
+                                    "bytecodeSize": 1534,
+                                    "variablesSize": 585,
+                                    "stackSize": 32
+                                },
+                                "native-variables": [
+                                    {
+                                        "name": "motor.right.pwm",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "motor.right.speed",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "motor.right.target",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "prox.comm.rx",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "prox.comm.tx",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "prox.ground.ambiant",
+                                        "size": 2
+                                    },
+                                    {
+                                        "name": "prox.ground.delta",
+                                        "size": 2
+                                    },
+                                    {
+                                        "name": "prox.ground.reflected",
+                                        "size": 2
+                                    },
+                                    {
+                                        "name": "prox.horizontal",
+                                        "size": 7
+                                    },
+                                    {
+                                        "name": "rc5.address",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "rc5.command",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "temperature",
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "timer.period",
+                                        "size": 2
+                                    }
+                                ],
+                                "native-functions": [
+                                    {
+                                        "name": "sound.record",
+                                        "description": "Start recording of rN.wav",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "N"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sound.play",
+                                        "description": "Start playback of pN.wav",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "N"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sound.replay",
+                                        "description": "Start playback of rN.wav",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "N"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sound.system",
+                                        "description": "Start playback of system sound N",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "N"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.circle",
+                                        "description": "Set circular ring leds",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "l0"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l1"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l2"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l3"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l4"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l5"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l6"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l7"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.top",
+                                        "description": "Set RGB top led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "red"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "green"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "blue"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.bottom.right",
+                                        "description": "Set RGB botom right led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "red"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "green"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "blue"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.bottom.left",
+                                        "description": "Set RGB botom left led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "red"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "green"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "blue"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.buttons",
+                                        "description": "Set buttons leds",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "l0"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l1"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l2"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l3"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.prox.h",
+                                        "description": "Set horizontal proximity leds",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "l0"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l1"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l2"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l3"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l4"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l5"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l6"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l7"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.prox.v",
+                                        "description": "Set vertical proximity leds",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "l0"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "l1"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.rc",
+                                        "description": "Set rc led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "led"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.sound",
+                                        "description": "Set sound led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "led"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "leds.temperature",
+                                        "description": "Set ntc led",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "red"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "blue"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sound.freq",
+                                        "description": "Play frequency",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "Hz"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "ds"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sound.wave",
+                                        "description": "Set the primary wave of the tone generator",
+                                        "parameters": [
+                                            {
+                                                "size": 142,
+                                                "name": "wave"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "prox.comm.enable",
+                                        "description": "Enable or disable the proximity communication",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "state"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sd.open",
+                                        "description": "Open a file on the SD card",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "number"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "status"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sd.write",
+                                        "description": "Write data to the opened file",
+                                        "parameters": [
+                                            {
+                                                "size": -1,
+                                                "name": "data"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "written"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sd.read",
+                                        "description": "Read data from the opened file",
+                                        "parameters": [
+                                            {
+                                                "size": -1,
+                                                "name": "data"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "read"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sd.seek",
+                                        "description": "Seek the opened file",
+                                        "parameters": [
+                                            {
+                                                "size": 1,
+                                                "name": "position"
+                                            },
+                                            {
+                                                "size": 1,
+                                                "name": "status"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "native-events": [
+                                    {
+                                        "name": "button.backward",
+                                        "description": "Backward button status changed"
+                                    },
+                                    {
+                                        "name": "button.left",
+                                        "description": "Left button status changed"
+                                    },
+                                    {
+                                        "name": "button.center",
+                                        "description": "Center button status changed"
+                                    },
+                                    {
+                                        "name": "button.forward",
+                                        "description": "Forward button status changed"
+                                    },
+                                    {
+                                        "name": "button.right",
+                                        "description": "Right button status changed"
+                                    },
+                                    {
+                                        "name": "buttons",
+                                        "description": "Buttons values updated"
+                                    },
+                                    {
+                                        "name": "prox",
+                                        "description": "Proximity values updated"
+                                    },
+                                    {
+                                        "name": "prox.comm",
+                                        "description": "Data received on the proximity communication"
+                                    },
+                                    {
+                                        "name": "tap",
+                                        "description": "A tap is detected"
+                                    },
+                                    {
+                                        "name": "acc",
+                                        "description": "Accelerometer values updated"
+                                    },
+                                    {
+                                        "name": "mic",
+                                        "description": "Fired when microphone intensity is above threshold"
+                                    },
+                                    {
+                                        "name": "sound.finished",
+                                        "description": "Fired when the playback of a user initiated sound is finished"
+                                    },
+                                    {
+                                        "name": "temperature",
+                                        "description": "Temperature value updated"
+                                    },
+                                    {
+                                        "name": "rc5",
+                                        "description": "RC5 message received"
+                                    },
+                                    {
+                                        "name": "motor",
+                                        "description": "Motor timer"
+                                    },
+                                    {
+                                        "name": "timer0",
+                                        "description": "Timer 0"
+                                    },
+                                    {
+                                        "name": "timer1",
+                                        "description": "Timer 1"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes/{node}/variables": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-nodes-node-variables-variable",
+                "summary": "Get Node Variables",
+                "tags": [
+                    "Nodes"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/variables"
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "name": "fizzbin",
+                                    "size": 2,
+                                    "description": "Fizzbin scores"
+                                },
+                                {
+                                    "name": "_productid",
+                                    "size": 1,
+                                    "description": "Hard-coded product id",
+                                    "hidden": true
+                                },
+                                {
+                                    "name": "motor.right.speed",
+                                    "size": 1
+                                },
+                                {
+                                    "name": "motor.right.target",
+                                    "size": 1
+                                },
+                                {
+                                    "name": "motor.left.speed",
+                                    "size": 1
+                                },
+                                {
+                                    "name": "motor.left.target",
+                                    "size": 1
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes/{node}/variables/{variable}": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "variable",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-nodes-node-variables-variable",
+                "summary": "Read Node Variable",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "Read values vector from a variable.\nThe variable may be a native variable or a variable defined in the program. \n\nError 404 is returned for an unknown node, or an unknown variable in a known node.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "variable slot",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "no such variable slot",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node or unknown variable"
+                        },
+                        "examples": {
+                            "application/json": "Unknown variable"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "PUT-nodes-node-variables-variable",
+                "summary": "Update Node Variable",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "Assign a values vector to a variable. The variable may be a native variable or a variable defined in the program.\n\nError 404 is returned for an unknown node, or an unknown variable in a known node.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "array"
+                            ],
+                            "items": {
+                                "type": "integer"
+                            },
+                            "example": [
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "null"
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid values vector"
+                        },
+                        "examples": {
+                            "application/json": "Invalid values vector"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node or unknown variable"
+                        },
+                        "examples": {
+                            "application/json": "Unknown variable"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes/{node}/program": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-nodes-node-program",
+                "summary": "Get Node Program",
+                "tags": [
+                    "Nodes"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:querySelectEmbed:embed"
+                    },
+                    {
+                        "$ref": "#/parameters/trait:querySelectFields:fields"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/compilation-result"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "success": true,
+                                "bytecode": "QUJPAAAABQAIAAoA0sQEQjkKCgADAP//AwAAIK3ebEAAIO++bUAAAHmL",
+                                "symbols": {
+                                    "variables": [
+                                        {
+                                            "name": "fizzbin",
+                                            "size": 2,
+                                            "address": 0
+                                        }
+                                    ],
+                                    "subroutines": []
+                                },
+                                "linenumbers": [
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ]
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "PUT-nodes-node-program",
+                "summary": "Update Node Program",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "The request body is on content type `text/plain ` and is interpreted as  the source code of an Aseba program that must be compiled.\n \nA future extension will accept `application/json` requests containing a #model:cZHWP4fZsNXLFQJse and a #model:cFt9qnmHAwFAYXhS5.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/compilation-result"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "success": true,
+                                "bytecode": "QUJPAAAABQAIAAoA0sQEQjkKCgADAP//AwAAIK3ebEAAIO++bUAAAHmL",
+                                "symbols": {
+                                    "variables": [
+                                        {
+                                            "name": "fizzbin",
+                                            "size": 2,
+                                            "address": 0
+                                        }
+                                    ],
+                                    "subroutines": []
+                                },
+                                "linenumbers": [
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ]
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/compilation-result"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "success": false,
+                                "error": {
+                                    "pos": 8,
+                                    "message": "Error at Line: 1 Col: 9 : event.missing is not a known event.\n\nDumping tokens:\n   1:0    onevent keyword\n   1:8    string : event.missing\n   1:20   end of stream",
+                                    "rowcol": [
+                                        1,
+                                        9
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes/{node}": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-nodes-node",
+                "summary": "Get Node",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "Node Description, Variables, and Program",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:querySelectFields:fields"
+                    },
+                    {
+                        "$ref": "#/parameters/trait:querySelectEmbed:embed"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "node details returned",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "$ref": "#/definitions/node-description"
+                                },
+                                "variables": {
+                                    "$ref": "#/definitions/variables"
+                                },
+                                "program": {
+                                    "$ref": "#/definitions/compilation-result"
+                                }
+                            },
+                            "required": [
+                                "description",
+                                "variables"
+                            ]
+                        },
+                        "examples": {
+                            "application/json": {
+                                "variables": [
+                                    {
+                                        "name": "fizzbin",
+                                        "size": 2,
+                                        "description": "Fizzbin scores"
+                                    }
+                                ],
+                                "program": {
+                                    "success": true,
+                                    "bytecode": "QUJPAAAABQAIAAoA0sQEQjkKCgADAP//AwAAIK3ebEAAIO++bUAAAHmL",
+                                    "symbols": {
+                                        "variables": [
+                                            {
+                                                "name": "fizzbin",
+                                                "size": 2,
+                                                "address": 0
+                                            }
+                                        ],
+                                        "subroutines": []
+                                    },
+                                    "linenumbers": [
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1,
+                                        1
+                                    ]
+                                },
+                                "description": {
+                                    "id": 1,
+                                    "name": "dummynode-0",
+                                    "protocolVersion": 5,
+                                    "vm-properties": {
+                                        "bytecodeSize": 512,
+                                        "variablesSize": 1059,
+                                        "stackSize": 64
+                                    },
+                                    "native-variables": [
+                                        {
+                                            "name": "_productid",
+                                            "size": 1,
+                                            "hidden": true
+                                        },
+                                        {
+                                            "name": "id",
+                                            "size": 1
+                                        },
+                                        {
+                                            "name": "source",
+                                            "size": 1
+                                        },
+                                        {
+                                            "name": "args",
+                                            "size": 32
+                                        }
+                                    ],
+                                    "native-functions": [
+                                        {
+                                            "name": "math.copy",
+                                            "description": "copies src to dest element by element",
+                                            "parameters": [
+                                                {
+                                                    "size": -1,
+                                                    "name": "dest"
+                                                },
+                                                {
+                                                    "size": -1,
+                                                    "name": "src"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "math.fill",
+                                            "description": "fills dest with constant value",
+                                            "parameters": [
+                                                {
+                                                    "size": -1,
+                                                    "name": "dest"
+                                                },
+                                                {
+                                                    "size": 1,
+                                                    "name": "value"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "native-events": [
+                                        {
+                                            "name": "timer",
+                                            "description": "periodic timer at 50 Hz"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no such node",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            }
+        },
+        "/nodes": {
+            "get": {
+                "operationId": "GET-nodes",
+                "summary": "Get All Nodes",
+                "tags": [
+                    "Nodes"
+                ],
+                "description": "List signatures (ids, names, product ids) of connected nodes",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trait:querySelectEmbed:embed"
+                    },
+                    {
+                        "$ref": "#/parameters/trait:querySelectFields:fields"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "node list returned",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/node-signature"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "id": 1,
+                                    "name": "thymio-II",
+                                    "pid": 8
+                                },
+                                {
+                                    "id": 211,
+                                    "name": "thymio wireless",
+                                    "pid": 8
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/debugs/{node}": {
+            "parameters": [
+                {
+                    "name": "node",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "operationId": "POST-debugs-node",
+                "summary": "Change Debug State",
+                "tags": [
+                    "Nodes",
+                    "Debug"
+                ],
+                "description": "Change the debug state of a node instance.\n\nPOST because this is a controller.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/vm-execution-state",
+                            "example": {
+                                "flags": {
+                                    "vm_step_by_step": false
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "slot update accepted",
+                        "schema": {
+                            "type": "null"
+                        }
+                    },
+                    "404": {
+                        "description": "no such slot",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown node"
+                        },
+                        "examples": {
+                            "application/json": "Unknown node"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "operationId": "GET-debugs-node",
+                "summary": "Get Debug State",
+                "tags": [
+                    "Debug"
+                ],
+                "description": "Obtain current debug state for the given node.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/vm-execution-state"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "pc": 12,
+                                "flags": {
+                                    "vm_event_active": false,
+                                    "vm_step_by_step": true,
+                                    "vm_event_running": false
+                                },
+                                "breakpoints": [
+                                    {
+                                        "pc": 12,
+                                        "linenumber": 2
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/debugs": {
+            "get": {
+                "operationId": "GET-debugs",
+                "summary": "Get All Debug States",
+                "tags": [
+                    "Debug"
+                ],
+                "description": "Obtain current debug state for all nodes.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "state": {
+                                        "$ref": "#/definitions/vm-execution-state"
+                                    }
+                                }
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "id": 1,
+                                    "state": {
+                                        "pc": 0,
+                                        "flags": {
+                                            "vm_event_active": false,
+                                            "vm_step_by_step": false,
+                                            "vm_event_running": false
+                                        },
+                                        "breakpoints": []
+                                    }
+                                },
+                                {
+                                    "id": 2,
+                                    "state": {
+                                        "pc": 12,
+                                        "flags": {
+                                            "vm_event_active": false,
+                                            "vm_step_by_step": true,
+                                            "vm_event_running": false
+                                        },
+                                        "breakpoints": [
+                                            {
+                                                "pc": 12,
+                                                "linenumber": 2
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/constants/{name}": {
+            "parameters": [
+                {
+                    "name": "name",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-constants-constant",
+                "summary": "Get Constant",
+                "tags": [
+                    "Constants"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/constant-definition"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "name": "timeout",
+                                "value": 50,
+                                "description": "Timeout in ms"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown constant"
+                        },
+                        "examples": {
+                            "application/json": "Unknown constant"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "PUT-constant",
+                "summary": "Update Constant",
+                "tags": [
+                    "Constants"
+                ],
+                "description": "Since the name is known from path parameter *name*, it is only supplied in the #model:PjNWMPh4ACC7kxrss request if the name should be changed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/constant-definition-update",
+                            "example": {
+                                "value": 501
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/constant-definition"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "name": "base.address",
+                                "value": 501,
+                                "description": "Lowest address from which to start numbering"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid value"
+                        },
+                        "examples": {
+                            "application/json": "Invalid value"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown constant"
+                        },
+                        "examples": {
+                            "application/json": "Unknown constant"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DELETE-constant",
+                "summary": "Delete Constant",
+                "tags": [
+                    "Constants"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown constant"
+                        },
+                        "examples": {
+                            "application/json": "Unknown constant"
+                        }
+                    }
+                }
+            }
+        },
+        "/constants": {
+            "get": {
+                "operationId": "GET-constants",
+                "summary": "Get All Constants",
+                "tags": [
+                    "Constants"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/constant-definition"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "name": "timeout",
+                                    "value": 50,
+                                    "description": "Timeout in ms"
+                                },
+                                {
+                                    "name": "base.address",
+                                    "value": 100,
+                                    "description": "Lowest address from which to start numbering"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "POST-constant",
+                "summary": "Create Constant",
+                "tags": [
+                    "Constants"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/constant-definition",
+                            "example": {
+                                "name": "base.address",
+                                "value": 100,
+                                "description": "Lowest address from which to start numbering"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/constant-definition"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "name": "base.address",
+                                "value": 100,
+                                "description": "Lowest address from which to start numbering"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid value"
+                        },
+                        "examples": {
+                            "application/json": "Invalid value"
+                        }
+                    },
+                    "403": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid constant name"
+                        },
+                        "examples": {
+                            "application/json": "Invalid constant name"
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Constant already exists"
+                        },
+                        "examples": {
+                            "application/json": "Constant already exists"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DELETE-constants",
+                "summary": "Delete All Constants",
+                "tags": [
+                    "Constants"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/events/{event}": {
+            "parameters": [
+                {
+                    "name": "event",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "operationId": "GET-events-event",
+                "summary": "Get Event",
+                "tags": [
+                    "Events"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/event-definition-full"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": 12,
+                                "name": "ping",
+                                "size": 1,
+                                "description": "Ping all nodes with last timestamp",
+                                "parameters": [
+                                    {
+                                        "param": "timestamp",
+                                        "size": 1,
+                                        "description": "Last timestamp"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown event"
+                        },
+                        "examples": {
+                            "application/json": "Unknown event"
+                        }
+                    }
+                }
+            }
+        },
+        "/events": {
+            "get": {
+                "operationId": "GET-events",
+                "summary": "Get All Events",
+                "tags": [
+                    "Events"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/event-definition-full"
+                            }
+                        },
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "id": 1,
+                                    "name": "ping",
+                                    "size": 1,
+                                    "description": "Ping all nodes with last timestamp",
+                                    "parameters": [
+                                        {
+                                            "param": "timestamp",
+                                            "size": 1,
+                                            "description": "Last timestamp"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": 2,
+                                    "name": "whoami",
+                                    "size": 0,
+                                    "description": "Ask who this node is"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "POST-event",
+                "summary": "Create Event",
+                "tags": [
+                    "Events"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/event-definition",
+                            "example": {
+                                "name": "ping",
+                                "size": 1,
+                                "description": "Ping all nodes with last timestamp",
+                                "parameters": [
+                                    {
+                                        "param": "timestamp",
+                                        "size": 1,
+                                        "description": "Last timestamp"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/event-definition-full"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": 12,
+                                "name": "ping",
+                                "size": 1,
+                                "description": "Ping all nodes with last timestamp",
+                                "parameters": [
+                                    {
+                                        "param": "timestamp",
+                                        "size": 1,
+                                        "description": "Last timestamp"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid value"
+                        },
+                        "examples": {
+                            "application/json": "Invalid value"
+                        }
+                    },
+                    "403": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid name"
+                        },
+                        "examples": {
+                            "application/json": "Invalid name"
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Event with this name already exists"
+                        },
+                        "examples": {
+                            "application/json": "Event with this name already exists"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DELETE-events",
+                "summary": "Delete All Events",
+                "tags": [
+                    "Events"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/events/{name}": {
+            "parameters": [
+                {
+                    "name": "name",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "operationId": "PUT-event",
+                "summary": "Update Event",
+                "tags": [
+                    "Events"
+                ],
+                "description": "Since the name is known from path parameter *name*, it is only supplied in the #model:EJKRFJthJFQcuf2gP request if the name should be changed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/event-definition-update",
+                            "example": {
+                                "size": 2,
+                                "description": "Ping all nodes with last timestamp pair",
+                                "parameters": [
+                                    {
+                                        "param": "timestamp",
+                                        "size": 2
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/event-definition-full"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "id": 12,
+                                "name": "ping",
+                                "size": 2,
+                                "description": "Ping all nodes with last timestamp pair",
+                                "parameters": [
+                                    {
+                                        "param": "timestamp",
+                                        "size": 2,
+                                        "description": "Last timestamp"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Invalid value"
+                        },
+                        "examples": {
+                            "application/json": "Invalid value"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown event"
+                        },
+                        "examples": {
+                            "application/json": "Unknown event"
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Event with this name already exists"
+                        },
+                        "examples": {
+                            "application/json": "Event with this name already exists"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DELETE-event",
+                "summary": "Delete Event",
+                "tags": [
+                    "Events"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Unknown event"
+                        },
+                        "examples": {
+                            "application/json": "Unknown event"
+                        }
+                    }
+                }
+            }
+        },
+        "/breakpoints": {
+            "get": {
+                "operationId": "GET-breakpoints",
+                "summary": "Get Breakpoints",
+                "tags": [
+                    "Breakpoints"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/breakpoint-pc"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "POST-breakpoint",
+                "summary": "Create Breakpoint",
+                "tags": [
+                    "Breakpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/breakpoint-pc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/breakpoint-pc"
+                        }
+                    },
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Breakpoint out of bytecode bounds"
+                        }
+                    },
+                    "403": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Maximum number of breakpoints exceeded"
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "Breakpoint already exists at that pc"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DELETE-breakpoints",
+                "summary": "Delete All Breakpoints",
+                "tags": [
+                    "Breakpoints"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/breakpoints/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "operationId": "DELETE-breakpoint",
+                "summary": "Delete Breakpoint",
+                "tags": [
+                    "Breakpoints"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "type": "string",
+                            "description": "No breakpoint at that pc"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "trait:querySelectEmbed:embed": {
+            "name": "embed",
+            "in": "query",
+            "type": "array",
+            "uniqueItems": false,
+            "items": {
+                "type": "string"
+            }
+        },
+        "trait:querySelectFields:fields": {
+            "name": "fields",
+            "in": "query",
+            "type": "array",
+            "uniqueItems": false,
+            "items": {
+                "type": "string"
+            }
+        },
+        "trait:serverSentEventStream:todo": {
+            "name": "todo",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+        }
+    },
+    "responses": {
+        "trait:serverSentEventStream:200": {
+            "description": "stream of server-sent events",
+            "schema": {
+                "type": "string"
+            }
+        }
+    },
+    "definitions": {
+        "network": {
+            "type": "object",
+            "properties": {
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/event-definition-full"
+                    }
+                },
+                "constants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/constant-definition"
+                    }
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node-signature"
+                    }
+                },
+                "author": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "lang": {
+                                "type": "string"
+                            },
+                            "text": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "events",
+                "constants",
+                "nodes"
+            ],
+            "example": {
+                "description": "Lost in Space",
+                "author": "Warren Gamaliel Harding",
+                "events": [],
+                "constants": [
+                    {
+                        "name": "date",
+                        "value": 1921
+                    }
+                ],
+                "nodes": [
+                    {
+                        "id": 1,
+                        "name": "thymio-II",
+                        "pid": 8
+                    },
+                    {
+                        "id": 211,
+                        "name": "thymio wireless",
+                        "pid": 8
+                    }
+                ]
+            }
+        },
+        "constant-definition": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+                },
+                "value": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ],
+            "example": {
+                "name": "timeout",
+                "value": 50,
+                "description": "Timeout in ms"
+            }
+        },
+        "event-definition": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+                },
+                "size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": false,
+                    "maximum": 258
+                },
+                "description": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "param": {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+                            },
+                            "size": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 258
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "param"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "size"
+            ],
+            "example": {
+                "name": "ping",
+                "size": 1,
+                "description": "Ping all nodes with last timestamp",
+                "parameters": [
+                    {
+                        "param": "timestamp",
+                        "size": 1,
+                        "description": "Last timestamp"
+                    }
+                ]
+            }
+        },
+        "event-definition-full": {
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/event-definition"
+                }
+            ],
+            "example": {
+                "id": 12,
+                "name": "ping",
+                "size": 1,
+                "description": "Ping all nodes with last timestamp",
+                "parameters": [
+                    {
+                        "param": "timestamp",
+                        "size": 1,
+                        "description": "Last timestamp"
+                    }
+                ]
+            }
+        },
+        "node-description": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "protocolVersion": {
+                    "type": "integer"
+                },
+                "vm-properties": {
+                    "type": "object",
+                    "description": "",
+                    "properties": {
+                        "bytecodeSize": {
+                            "type": "integer"
+                        },
+                        "variablesSize": {
+                            "type": "integer"
+                        },
+                        "stackSize": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "native-variables": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "size": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "native-functions": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "parameters": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "size": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "native-events": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "protocolVersion",
+                "native-variables",
+                "native-functions"
+            ],
+            "example": {
+                "id": 1,
+                "name": "thymio-II",
+                "protocolVersion": 5,
+                "vm-properties": {
+                    "bytecodeSize": 1534,
+                    "variablesSize": 585,
+                    "stackSize": 32
+                },
+                "native-variables": [
+                    {
+                        "name": "motor.right.pwm",
+                        "size": 1
+                    },
+                    {
+                        "name": "motor.right.speed",
+                        "size": 1
+                    },
+                    {
+                        "name": "motor.right.target",
+                        "size": 1
+                    },
+                    {
+                        "name": "prox.comm.rx",
+                        "size": 1
+                    },
+                    {
+                        "name": "prox.comm.tx",
+                        "size": 1
+                    },
+                    {
+                        "name": "prox.ground.ambiant",
+                        "size": 2
+                    },
+                    {
+                        "name": "prox.ground.delta",
+                        "size": 2
+                    },
+                    {
+                        "name": "prox.ground.reflected",
+                        "size": 2
+                    },
+                    {
+                        "name": "prox.horizontal",
+                        "size": 7
+                    },
+                    {
+                        "name": "rc5.address",
+                        "size": 1
+                    },
+                    {
+                        "name": "rc5.command",
+                        "size": 1
+                    },
+                    {
+                        "name": "temperature",
+                        "size": 1
+                    },
+                    {
+                        "name": "timer.period",
+                        "size": 2
+                    }
+                ],
+                "native-functions": [
+                    {
+                        "name": "sound.record",
+                        "description": "Start recording of rN.wav",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "N"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sound.play",
+                        "description": "Start playback of pN.wav",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "N"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sound.replay",
+                        "description": "Start playback of rN.wav",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "N"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sound.system",
+                        "description": "Start playback of system sound N",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "N"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.circle",
+                        "description": "Set circular ring leds",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "l0"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l1"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l2"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l3"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l4"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l5"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l6"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l7"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.top",
+                        "description": "Set RGB top led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "red"
+                            },
+                            {
+                                "size": 1,
+                                "name": "green"
+                            },
+                            {
+                                "size": 1,
+                                "name": "blue"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.bottom.right",
+                        "description": "Set RGB botom right led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "red"
+                            },
+                            {
+                                "size": 1,
+                                "name": "green"
+                            },
+                            {
+                                "size": 1,
+                                "name": "blue"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.bottom.left",
+                        "description": "Set RGB botom left led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "red"
+                            },
+                            {
+                                "size": 1,
+                                "name": "green"
+                            },
+                            {
+                                "size": 1,
+                                "name": "blue"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.buttons",
+                        "description": "Set buttons leds",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "l0"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l1"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l2"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l3"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.prox.h",
+                        "description": "Set horizontal proximity leds",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "l0"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l1"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l2"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l3"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l4"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l5"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l6"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l7"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.prox.v",
+                        "description": "Set vertical proximity leds",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "l0"
+                            },
+                            {
+                                "size": 1,
+                                "name": "l1"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.rc",
+                        "description": "Set rc led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "led"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.sound",
+                        "description": "Set sound led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "led"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "leds.temperature",
+                        "description": "Set ntc led",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "red"
+                            },
+                            {
+                                "size": 1,
+                                "name": "blue"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sound.freq",
+                        "description": "Play frequency",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "Hz"
+                            },
+                            {
+                                "size": 1,
+                                "name": "ds"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sound.wave",
+                        "description": "Set the primary wave of the tone generator",
+                        "parameters": [
+                            {
+                                "size": 142,
+                                "name": "wave"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "prox.comm.enable",
+                        "description": "Enable or disable the proximity communication",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "state"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sd.open",
+                        "description": "Open a file on the SD card",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "number"
+                            },
+                            {
+                                "size": 1,
+                                "name": "status"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sd.write",
+                        "description": "Write data to the opened file",
+                        "parameters": [
+                            {
+                                "size": -1,
+                                "name": "data"
+                            },
+                            {
+                                "size": 1,
+                                "name": "written"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sd.read",
+                        "description": "Read data from the opened file",
+                        "parameters": [
+                            {
+                                "size": -1,
+                                "name": "data"
+                            },
+                            {
+                                "size": 1,
+                                "name": "read"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sd.seek",
+                        "description": "Seek the opened file",
+                        "parameters": [
+                            {
+                                "size": 1,
+                                "name": "position"
+                            },
+                            {
+                                "size": 1,
+                                "name": "status"
+                            }
+                        ]
+                    }
+                ],
+                "native-events": [
+                    {
+                        "name": "button.backward",
+                        "description": "Backward button status changed"
+                    },
+                    {
+                        "name": "button.left",
+                        "description": "Left button status changed"
+                    },
+                    {
+                        "name": "button.center",
+                        "description": "Center button status changed"
+                    },
+                    {
+                        "name": "button.forward",
+                        "description": "Forward button status changed"
+                    },
+                    {
+                        "name": "button.right",
+                        "description": "Right button status changed"
+                    },
+                    {
+                        "name": "buttons",
+                        "description": "Buttons values updated"
+                    },
+                    {
+                        "name": "prox",
+                        "description": "Proximity values updated"
+                    },
+                    {
+                        "name": "prox.comm",
+                        "description": "Data received on the proximity communication"
+                    },
+                    {
+                        "name": "tap",
+                        "description": "A tap is detected"
+                    },
+                    {
+                        "name": "acc",
+                        "description": "Accelerometer values updated"
+                    },
+                    {
+                        "name": "mic",
+                        "description": "Fired when microphone intensity is above threshold"
+                    },
+                    {
+                        "name": "sound.finished",
+                        "description": "Fired when the playback of a user initiated sound is finished"
+                    },
+                    {
+                        "name": "temperature",
+                        "description": "Temperature value updated"
+                    },
+                    {
+                        "name": "rc5",
+                        "description": "RC5 message received"
+                    },
+                    {
+                        "name": "motor",
+                        "description": "Motor timer"
+                    },
+                    {
+                        "name": "timer0",
+                        "description": "Timer 0"
+                    },
+                    {
+                        "name": "timer1",
+                        "description": "Timer 1"
+                    }
+                ]
+            }
+        },
+        "constant-definition-update": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "value": 150
+            }
+        },
+        "event-definition-update": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": false,
+                    "maximum": 258
+                },
+                "description": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "param": {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+                            },
+                            "size": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 258
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "param"
+                        ]
+                    }
+                }
+            },
+            "example": {
+                "size": 2,
+                "description": "Ping all nodes with last timestamp pair",
+                "parameters": [
+                    {
+                        "param": "timestamp",
+                        "size": 2
+                    }
+                ]
+            }
+        },
+        "vm-execution-state": {
+            "type": "object",
+            "properties": {
+                "pc": {
+                    "type": "integer"
+                },
+                "flags": {
+                    "type": [
+                        "object"
+                    ],
+                    "properties": {
+                        "vm_event_active": {
+                            "type": "boolean"
+                        },
+                        "vm_step_by_step": {
+                            "type": "boolean"
+                        },
+                        "vm_event_running": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "example": {
+                "pc": 0,
+                "flags": {
+                    "vm_event_active": false,
+                    "vm_step_by_step": false,
+                    "vm_event_running": false
+                },
+                "breakpoints": []
+            }
+        },
+        "symbol-table": {
+            "type": "object",
+            "properties": {
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "size": {
+                                "type": "integer"
+                            },
+                            "address": {
+                                "type": "integer"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "size"
+                        ]
+                    }
+                },
+                "subroutines": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "address": {
+                                "type": "integer"
+                            },
+                            "line": {
+                                "type": "integer"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "address"
+                        ]
+                    }
+                },
+                "linenumbers": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "function refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
+                "event refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
+                "constant refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "variables",
+                "subroutines"
+            ],
+            "example": {
+                "variables": [
+                    {
+                        "name": "fizzbin",
+                        "size": 2,
+                        "address": 0
+                    }
+                ],
+                "subroutines": []
+            }
+        },
+        "compilation-result": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "bytecode": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "symbols": {
+                    "$ref": "#/definitions/symbol-table"
+                },
+                "error": {
+                    "type": "object",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "pos": {
+                            "type": "integer"
+                        },
+                        "rowcol": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "required": [
+                        "message",
+                        "pos"
+                    ]
+                }
+            },
+            "required": [
+                "success"
+            ],
+            "example": {
+                "success": true,
+                "bytecode": "QUJPAAAABQAIAAoA0sQEQjkKCgADAP//AwAAIK3ebEAAIO++bUAAAHmL",
+                "symbols": {
+                    "variables": [
+                        {
+                            "name": "fizzbin",
+                            "size": 2,
+                            "address": 0
+                        }
+                    ],
+                    "subroutines": []
+                },
+                "linenumbers": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "bytecode": {
+            "type": [
+                "string",
+                "array"
+            ],
+            "items": {
+                "type": "integer"
+            },
+            "example": "QUJPAAAABQAIAAoA0sQEQjkKCgADAP//AwAAIK3ebEAAIO++bUAAAHmL"
+        },
+        "variables": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "value": {
+                        "type": "integer",
+                        "minimum": -32768,
+                        "maximum": 32767
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "size"
+                ]
+            },
+            "example": [
+                {
+                    "name": "fizzbin",
+                    "size": 2,
+                    "description": "Fizzbin scores"
+                },
+                {
+                    "name": "_productid",
+                    "size": 1,
+                    "description": "Hard-coded product id",
+                    "hidden": true
+                },
+                {
+                    "name": "motor.right.speed",
+                    "size": 1
+                },
+                {
+                    "name": "motor.right.target",
+                    "size": 1
+                },
+                {
+                    "name": "motor.left.speed",
+                    "size": 1
+                },
+                {
+                    "name": "motor.left.target",
+                    "size": 1
+                }
+            ]
+        },
+        "node-signature": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "pid": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "id": 1,
+                "name": "thymio-II",
+                "pid": 8
+            }
+        },
+        "breakpoint-pc": {
+            "type": "integer"
+        }
+    }
+}

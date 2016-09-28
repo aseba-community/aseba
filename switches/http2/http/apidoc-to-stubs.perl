@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use JSON::PP;
+use Data::Dumper;
 
 my $coder = JSON::PP->new->ascii->pretty->allow_nonref->canonical;
 my $apidoc = $coder->decode( join('',<>) );
@@ -10,11 +11,9 @@ my %groups;
 # Declare models
 snip();
 my $models = $apidoc->{definitions};
-foreach my $model (sort keys %{$models}) {
-	eval { delete $models->{$model}->{example}; }
-}
+
 print "\t\t//! Models shared by endpoints\n";
-print "\t\tdefinitions( R\"(\n", indented_json($coder->encode($models)), ")\"_json });\n\n\n";
+print "\t\tdefinitions( R\"#json#(\n", indented_json($coder->encode($models)), ")#json#\"_json });\n\n\n";
 
 # Find endpoint groups
 foreach my $path (keys %{$apidoc->{paths}}) {
@@ -33,22 +32,13 @@ foreach my $group (sort keys %groups) {
 		foreach my $method (grep { /get|put|post|delete|options/ }
 		keys %{$apidoc->{paths}->{$path}}) {
 			my $doc = $apidoc->{paths}->{$path}->{$method};
-			foreach my $response (keys %{$doc->{responses}}) {
-				eval { delete $doc->{responses}->{$response}->{examples} };
-				if (! $doc->{responses}->{$response}->{description} and
-		  $doc->{responses}->{$response}->{schema}->{description}) {
-			  $doc->{responses}->{$response}->{description} = $doc->{responses}->{$response}->{schema}->{description};
-		  }
-			}
-			eval { delete $doc->{parameters}->{schema}->{example} };
-
 			my @path = split /\//, $path;
 
-			printf("\t\tREGISTER_HANDLER(%s, %s, { %s }, { R\"(\n",
+			printf("\t\tREGISTER_HANDLER(%s, %s, { %s }, { R\"#json#(\n",
 			       camelcase($doc->{operationId})."Handler", uc($method),
 			join(", ",map { "\"$_\"" } @path[1..$#path]));
 			print indented_json($coder->encode($doc));
-			print ")\"_json });\n";
+			print ")#json#\"_json });\n";
 		}
 	}
 
@@ -57,7 +47,8 @@ foreach my $group (sort keys %groups) {
 	foreach my $path (sort @{$groups{$group}}) {
 		foreach my $method (grep { /get|put|post|delete|options/ }
 		keys %{$apidoc->{paths}->{$path}}) {
-			my ($produces) = @{$apidoc->{paths}->{$path}->{$method}->{produces}};
+			my $pref = $apidoc->{paths}->{$path}->{$method}->{produces};
+			my ($produces) = $pref ? @{$pref} : "";
 			print "\t//! handler for ",uc($method)," $path ".($produces ? "-> $produces" : "")."\n";
 			printf("\tvoid HttpDispatcher::%s(HandlerContext& context)\n\t\{\n",
 			       camelcase($apidoc->{paths}->{$path}->{$method}->{operationId})."Handler");
