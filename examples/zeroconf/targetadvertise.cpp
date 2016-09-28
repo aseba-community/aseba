@@ -115,17 +115,17 @@ namespace Aseba
 	class Advertiser: public Hub
 	{
 	protected:
-		map<Stream*,StreamNodesManager> streamMap;
+		map<Stream*,unique_ptr<StreamNodesManager>> streamMap;
 		Aseba::Zeroconf zeroconf;
 
 	protected:
 		void incomingData(Stream *stream)
 		{
 			Message *message(Message::receive(stream));
-			streamMap.at(stream).processMessage(message);
+			streamMap.at(stream)->processMessage(message);
 			const Variables *variables(dynamic_cast<Variables *>(message));
 			if (variables)
-				streamMap.at(stream).incomingVariable(variables);
+				streamMap.at(stream)->incomingVariable(variables);
 		}
 
 	public:
@@ -136,7 +136,7 @@ namespace Aseba
 				try
 				{
 					if (Dashel::Stream* cxn = connect(dashel))
-						streamMap.emplace(cxn,StreamNodesManager(cxn));
+						streamMap.emplace(cxn, std::unique_ptr<StreamNodesManager>(new StreamNodesManager(cxn)));
 				}
 				catch(Dashel::DashelException e)
 				{
@@ -156,13 +156,13 @@ namespace Aseba
 		void advertiseNodes(Aseba::Zeroconf & zeroconf)
 		{
 			for (auto & stream: streamMap)
-				stream.second.advertiseNodes(zeroconf);
+				stream.second->advertiseNodes(zeroconf);
 		}
 
 		void requestProductIds()
 		{
 			for (auto & stream: streamMap)
-				stream.second.requestProductIds();
+				stream.second->requestProductIds();
 			run5s(); // wait for product id values
 		}
 
