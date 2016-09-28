@@ -1,15 +1,15 @@
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
 
+# project name
+project(aseba)
+
 # ensure a minimal version of CMake
 cmake_minimum_required(VERSION 2.8.10)
 
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
-
-# project name
-project(aseba)
 
 # check the compiler version as we need full C++11 support
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -48,28 +48,17 @@ else ()
 	set (CMAKE_CXX_STANDARD 11)
 endif ()
 
-# testing and defines
-enable_testing()
-add_definitions(-Wall)
-add_definitions(-DASEBA_ASSERT)
-
-# enable C++11, we restrict ourself to the subset supported by gcc 4.6 and later
-if (CMAKE_VERSION VERSION_LESS "3.1")
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set (CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
-	else (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-	endif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-else (CMAKE_VERSION VERSION_LESS "3.1")
-	set (CMAKE_CXX_STANDARD 11)
-endif (CMAKE_VERSION VERSION_LESS "3.1")
-
 # Remove -Wl,--no-undefined which CMake 3.0.2 (on OpenSUSE 13.2) adds to the
 # linker options when building shared libs. That breaks building libs that use
 # callbacks that will be provided by other libs when the executable is linked.
 if (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 	STRING(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 endif (DEFINED CMAKE_SHARED_LINKER_FLAGS)
+
+# testing and defines
+enable_testing()
+add_definitions(-Wall)
+add_definitions(-DASEBA_ASSERT)
 
 # Dashel
 find_package(dashel REQUIRED)
