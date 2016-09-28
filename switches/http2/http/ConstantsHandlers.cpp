@@ -66,13 +66,6 @@ namespace Aseba
 					"description": "",
 					"schema": {
 						"$ref": "#/definitions/constant-definition"
-					},
-					"examples": {
-						"application/json": {
-							"name": "base.address",
-							"value": 100,
-							"description": "Lowest address from which to start numbering"
-						}
 					}
 				},
 				"400": {

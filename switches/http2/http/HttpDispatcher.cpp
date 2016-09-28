@@ -63,12 +63,7 @@ namespace Aseba
 				"required": [
 					"name",
 					"value"
-				],
-				"example": {
-					"name": "timeout",
-					"value": 50,
-					"description": "Timeout in ms"
-				}
+				]
 			},
 			"constant-definition-update": {
 				"type": "object",
@@ -81,9 +76,6 @@ namespace Aseba
 					"description": {
 						"type": "string"
 					}
-				},
-				"example": {
-					"value": 150
 				}
 			}
 		})"_json)
