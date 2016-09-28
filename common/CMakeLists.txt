@@ -16,12 +16,14 @@ if(DNSSD_FOUND)
 		zeroconf/txtrecord.cpp
 		zeroconf/target.cpp
 	)
-	target_include_directories(asebacommon PUBLIC ${DNSSD_INCLUDE_DIRS})
 endif(DNSSD_FOUND)
 
 add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
+if(DNSSD_FOUND)
+	target_include_directories(asebacommon PUBLIC ${DNSSD_INCLUDE_DIRS})
+endif(DNSSD_FOUND)
 
 install(TARGETS asebacommon 
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
