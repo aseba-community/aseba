@@ -641,7 +641,6 @@ namespace Enki
 				camera.yaw += 2*M_PI;
 			camera.pitch = -M_PI/7;
 		}
-		ViewerWidget::timerEvent(event);
 	}
 /*
 	void ChallengeViewer::mouseMoveEvent ( QMouseEvent * event )

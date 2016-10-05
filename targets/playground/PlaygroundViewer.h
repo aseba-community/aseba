@@ -32,6 +32,8 @@
 #include <viewer/Viewer.h>
 #include <QProcess>
 
+#include <QMainWindow>
+
 #define LOG_COLOR(t,c) Enki::PlaygroundViewer::getInstance()->log(t,c)
 #define LOG_INFO(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::white)
 #define LOG_WARN(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::yellow)
@@ -43,7 +45,7 @@ namespace Enki
 {
 	class World;
 	
-	class PlaygroundViewer : public ViewerWidget
+	class PlaygroundViewer : public QMainWindow
 	{
 		Q_OBJECT
 		
@@ -53,16 +55,24 @@ namespace Enki
 		QColor logColor[LOG_HISTORY_COUNT];
 		Aseba::UnifiedTime logTime[LOG_HISTORY_COUNT];
 		unsigned logPos;
+		const int timerPeriodMs;
 		unsigned energyPool;
-		
+
+		ViewerWidget* viewer;
+
 	public:
 		PlaygroundViewer(World* world);
 		virtual ~PlaygroundViewer();
 		
 		World* getWorld() const;
+		ViewerWidget* getViewer();
 		static PlaygroundViewer* getInstance();
 		
 		void log(const QString& entry, const QColor& color);
+		void timerEvent(QTimerEvent* event);
+		void startSimulation();
+		void setCamera(QPointF planPosition, double altitude, double yaw, double pitch);
+		void keyPressEvent(QKeyEvent* event);
 		
 	public slots:
 		void processStarted();
