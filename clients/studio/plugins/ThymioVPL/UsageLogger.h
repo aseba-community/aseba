@@ -85,7 +85,7 @@ public:
 	void logAddEventBlock(int row, Block *block);
 	void logAddActionBlock(int row, Block *block, int position);
 	void logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag);
-	void logAccEventBlockMode(QString name, QString type, int mode);
+	void logEventBlockMode(QString name, QString type, int mode);
 	void logDropButton(BlockButton *block, QDropEvent *event);
 	void logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event);
 	void logUserEvent(unsigned id, const VariablesDataVector& data);

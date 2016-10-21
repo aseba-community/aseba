@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSvgItem>
@@ -37,10 +38,20 @@
 namespace Aseba { namespace ThymioVPL
 {
 	// Buttons Event
-	ArrowButtonsEventBlock::ArrowButtonsEventBlock(QGraphicsItem *parent) : 
-		BlockWithButtons("event", "button", true, parent)
+	const QRectF ArrowButtonsEventBlock::buttonPoses[3] = {
+		QRectF(32+(40+36)*0, 204, 40, 40),
+		QRectF(32+(40+36)*1, 204, 40, 40),
+		QRectF(32+(40+36)*2, 204, 40, 40)
+	};
+	
+	ArrowButtonsEventBlock::ArrowButtonsEventBlock(bool advanced, QGraphicsItem *parent) : 
+		BlockWithButtons("event", "button", true, parent),
+		advanced(advanced),
+		mode(MODE_ARROW)
 	{
 		const QColor color(Qt::red);
+		
+		// robot arrows
 		
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
@@ -49,24 +60,339 @@ namespace Aseba { namespace ThymioVPL
 
 			qreal offset = (qreal)i;
 			button->setRotation(-90*offset);
-			button->setPos(128 - 70*qSin(1.57079633*offset), 
-						   128 - 70*qCos(1.57079633*offset));
 			button->addState(color);
 			buttons.push_back(button);
 
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
-			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
 		}
-
+		// center
 		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
-		button->setPos(QPointF(128, 128));
+		
 		button->addState(color);
 		buttons.push_back(button);
+		
 		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
-		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),4,this));
+		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
+		setButtonsPos(advanced);
+		
+		// rc arrows
+		
+		// top, left, bottom, right
+		for(int i=0; i<4; i++) 
+		{
+			button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::QUARTER_CIRCLE_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
+
+			qreal offset = (qreal)i;
+			button->setRotation(-90*offset+45);
+			button->setPos(128 - 54*qSin(1.57079633*offset),
+						   100 - 54*qCos(1.57079633*offset));
+			button->addState(color);
+			button->setVisible(false);
+			buttons.push_back(button);
+
+			connect(button, SIGNAL(stateChanged()), SLOT(ensureSingleRCArrowButtonSelected()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
+			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
+		}
+		// center
+		button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
+		
+		button->addState(color);
+		button->setPos(128, 100);
+		button->setVisible(false);
+		button->setValue(1);
+		buttons.push_back(button);
+		
+		connect(button, SIGNAL(stateChanged()), SLOT(ensureSingleRCArrowButtonSelected()));
+		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
+		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
+		
+		// rc keypad
+		
+		for (int row=0; row<4; ++row)
+			for (int col=0; col<3; ++col)
+			{
+				button = new GeometryShapeButton(QRectF(0, 0, 48, 30), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
+				
+				button->addState(color);
+				button->setPos(40+col*64, 12+row*48);
+				button->setVisible(false);
+				if (row == 0 && col == 0)
+					button->setValue(1);
+				buttons.push_back(button);
+				
+				connect(button, SIGNAL(stateChanged()), SLOT(ensureSingleRCKeypadButtonSelected()));
+				connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
+				connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
+				USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
+			}
 	}
+	
+	void ArrowButtonsEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	{
+		Q_UNUSED(option);
+		Q_UNUSED(widget);
+		
+		// if simple mode, simply return
+		if (!advanced)
+		{
+			// paint parent
+			BlockWithButtons::paint(painter, option, widget);
+			return;
+		}
+		
+		// paint block
+		Block::paint(painter, option, widget);
+		
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Qt::white);
+		if (mode == MODE_ARROW)
+		{
+			painter->drawChord(128-110, 128-122, 220, 130, 0, 2880);
+			painter->drawRoundedRect(128-110, 128-63, 220, 127, 5, 5);
+		}
+		else
+			painter->drawRoundedRect(128-110, 128-122, 220, 186, 5, 5);
+		
+		// draw buttons
+		for (unsigned i=0; i<3; ++i)
+		{
+			if (mode == i)
+			{
+				painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Qt::red);
+			}
+			else
+			{
+				painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				painter->setBrush(Style::unusedButtonFillColor);
+			}
+			painter->drawEllipse(buttonPoses[i]);
+		}
+	}
+	
+	int ArrowButtonsEventBlock::getValue(unsigned i) const
+	{
+		if (i < 5 && mode == MODE_ARROW)
+			return BlockWithButtons::getValue(i);
+		else if (i == 5)
+			return mode;
+		else if (i == 6 && mode == MODE_RC_ARROW)
+			return getSelectedRCArrowButton();
+		else if (i == 6 && mode == MODE_RC_KEYPAD)
+			return getSelectedRCKeypadButton();
+		else
+			return 0;
+	}
+	
+	void ArrowButtonsEventBlock::setValue(unsigned i, int value)
+	{
+		if (i < 5)
+		{
+			BlockWithButtons::setValue(i, value);
+		}
+		else if (i == 5)
+		{
+			setMode(value);
+		}
+		else if (i == 6 && mode == MODE_RC_ARROW)
+		{
+			assert(value >= 0);
+			assert(value < 5);
+			buttons.at(5+value)->setValue(1);
+			ensureSingleRCArrowButtonSelected(value);
+			emit contentChanged();
+		}
+		else if (i == 6 && mode == MODE_RC_KEYPAD)
+		{
+			assert(value >= 0);
+			assert(value < 12);
+			buttons.at(10+value)->setValue(1);
+			ensureSingleRCKeypadButtonSelected(value);
+			emit contentChanged();
+		}
+	}
+	
+	QVector<quint16> ArrowButtonsEventBlock::getValuesCompressed() const
+	{
+		QVector<quint16> result;
+		// mode
+		result.push_back(mode);
+		if (mode == MODE_ARROW)
+		{
+			// robot buttons
+			unsigned value(0);
+			for (int i=0; i<5; ++i)
+			{
+				value *= buttons[i]->valuesCount();
+				value += buttons[i]->getValue();
+			}
+			assert(value <= 65535);
+			result.push_back(value);
+		}
+		else if (mode == MODE_RC_ARROW)
+		{
+			const int value(getSelectedRCArrowButton());
+			assert(value >= 0);
+			result.push_back(unsigned(value));
+		}
+		else if (mode == MODE_RC_KEYPAD)
+		{
+			const int value(getSelectedRCKeypadButton());
+			assert(value >= 0);
+			result.push_back(unsigned(value));
+		}
+		else
+			assert(false);
+		return result;
+	}
+	
+	bool ArrowButtonsEventBlock::isAnyAdvancedFeature() const
+	{
+		return mode != MODE_ARROW;
+	}
+	
+	void ArrowButtonsEventBlock::setAdvanced(bool advanced)
+	{
+		if (!advanced)
+		{
+			setMode(MODE_ARROW);
+		}
+		this->advanced = advanced;
+		setButtonsPos(advanced);
+		update();
+	}
+	
+	void ArrowButtonsEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
+	{
+		if (event->button() == Qt::LeftButton)
+		{
+			for (unsigned i=0; i<3; ++i)
+			{
+				if (buttonPoses[i].contains(event->pos()))
+				{
+					setMode(i);
+					USAGE_LOG(logEventBlockMode(this->name, this->type,i));
+					emit undoCheckpoint();
+					return;
+				}
+			}
+		}
+		
+		Block::mousePressEvent(event);
+	}
+	
+	void ArrowButtonsEventBlock::setMode(unsigned mode)
+	{
+		if (!advanced)
+			return;
+		
+		if (mode != this->mode)
+		{
+			this->mode = mode;
+			
+			if (mode == MODE_ARROW)
+			{
+				for (size_t i = 0; i<5; ++i)
+					buttons[i]->setVisible(true);
+				for (size_t i = 5; i<10; ++i)
+					buttons[i]->setVisible(false);
+				for (size_t i = 10; i<22; ++i)
+					buttons[i]->setVisible(false);
+			}
+			else if (mode == MODE_RC_ARROW)
+			{
+				for (size_t i = 0; i<5; ++i)
+					buttons[i]->setVisible(false);
+				for (size_t i = 5; i<10; ++i)
+					buttons[i]->setVisible(true);
+				for (size_t i = 10; i<22; ++i)
+					buttons[i]->setVisible(false);
+				// select one if none is selected
+				if (getSelectedRCArrowButton() < 0)
+					buttons[9]->setValue(1);
+			}
+			else if (mode == MODE_RC_KEYPAD)
+			{
+				for (size_t i = 0; i<5; ++i)
+					buttons[i]->setVisible(false);
+				for (size_t i = 5; i<10; ++i)
+					buttons[i]->setVisible(false);
+				for (size_t i = 10; i<22; ++i)
+					buttons[i]->setVisible(true);
+				// select one if none is selected
+				if (getSelectedRCKeypadButton() < 0)
+					buttons[10]->setValue(1);
+			}
+			else
+				assert(false);
+			
+			update();
+			emit contentChanged();
+		}
+	}
+	
+	void ArrowButtonsEventBlock::setButtonsPos(bool advanced)
+	{
+		if (advanced)
+		{
+			for (int i=0; i<4; i++)
+			{
+				qreal offset = (qreal)i;
+				buttons[i]->setPos(128 - 64*qSin(1.57079633*offset), 
+								   100 - 64*qCos(1.57079633*offset));
+			}
+			buttons[4]->setPos(128, 100);
+		}
+		else
+		{
+			for (int i=0; i<4; i++)
+			{
+				qreal offset = (qreal)i;
+				buttons[i]->setPos(128 - 70*qSin(1.57079633*offset), 
+								   128 - 70*qCos(1.57079633*offset));
+			}
+			buttons[4]->setPos(128, 128);
+		}
+	}
+	
+	//! Return the currently-selected RC arrow button, or -1 if none is selected
+	int ArrowButtonsEventBlock::getSelectedRCArrowButton() const
+	{
+		for (size_t i=5; i<10; ++i)
+			if (buttons[i]->getValue())
+				return i-5;
+		return -1;
+	}
+	
+	//! Return the currently-selected RC keypad, or -1 if none is selected
+	int ArrowButtonsEventBlock::getSelectedRCKeypadButton() const
+	{
+		for (size_t i=10; i<buttons.size(); ++i)
+				if (buttons[i]->getValue())
+					return i-10;
+		return -1;
+	}
+	
+	void ArrowButtonsEventBlock::ensureSingleRCArrowButtonSelected(int current)
+	{
+		for (size_t i=5; i<10; ++i)
+			if ((current + 5 != i) && buttons[i] != sender())
+				buttons[i]->setValue(0);
+	}
+	
+	void ArrowButtonsEventBlock::ensureSingleRCKeypadButtonSelected(int current)
+	{
+		for (size_t i=10; i<buttons.size(); ++i)
+			if ((current + 10 != i) && buttons[i] != sender())
+				buttons[i]->setValue(0);
+	}
+	
 	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
@@ -254,7 +580,7 @@ namespace Aseba { namespace ThymioVPL
 				if (buttonPoses[i].contains(event->pos()))
 				{
 					setMode(i);
-					USAGE_LOG(logAccEventBlockMode(this->name, this->type,i));
+					USAGE_LOG(logEventBlockMode(this->name, this->type,i));
 					emit undoCheckpoint();
 					return;
 				}
@@ -365,7 +691,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (!advanced)
 		{
-			setMode(0);
+			setMode(MODE_TAP);
 			tapAdvancedSvg->setVisible(false);
 			tapSimpleSvg->setVisible(true);
 		}

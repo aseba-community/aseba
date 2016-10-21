@@ -43,6 +43,63 @@ namespace Aseba { namespace ThymioVPL
 		
 		return streamVal.str();
 	}
+	
+	//////
+	
+	void Compiler::CodeGenerator::EventHandler::generateAdditionalCode()
+	{
+		if (isStateSet)
+			code.append(EventHandler::PairCodeAndIndex(
+				L"\tcall math.copy(state, new_state)"
+				L"\n\tcallsub display_state\n\n",
+			-1));
+	}
+	
+	void Compiler::CodeGenerator::ButtonEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent buttons\n", -1));
+	}
+	
+	void Compiler::CodeGenerator::ProxEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent prox\n", -1));
+	}
+	
+	void Compiler::CodeGenerator::TapEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent tap\n", -1));
+	}
+	
+	void Compiler::CodeGenerator::AccEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent acc\n", -1));
+	}
+	
+	void Compiler::CodeGenerator::ClapEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent mic\n", -1));
+	}
+	
+	void Compiler::CodeGenerator::TimeoutEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(
+			L"\nonevent timer0\n"
+			L"\ttimer.period[0] = 0\n",
+		-1));
+	}
+	
+	void Compiler::CodeGenerator::RemoteControlEventHandler::generateAdditionalCode()
+	{
+		EventHandler::generateAdditionalCode();
+		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent rc5\n", -1));
+		code.append(EventHandler::PairCodeAndIndex(L"\trc5.command = -1\n", -1));
+	};
 
 	//////
 	
@@ -50,52 +107,97 @@ namespace Aseba { namespace ThymioVPL
 	Compiler::CodeGenerator::CodeGenerator() : 
 		advancedMode(false),
 		useSound(false),
-		useTimer(false),
-		useMicrophone(false),
-		useAccAngle(false),
 		inWhenBlock(false),
 		inIfBlock(false)
 	{
-		initEventToCodePosMap();
+		eventHandlers["button"] = new ButtonEventHandler();
+		eventHandlers["prox"] = new ProxEventHandler();
+		eventHandlers["tap"] = new TapEventHandler();
+		eventHandlers["acc"] = new AccEventHandler();
+		eventHandlers["clap"] = new ClapEventHandler();
+		eventHandlers["timeout"] = new TimeoutEventHandler();
+		eventHandlers["rc5"] = new RemoteControlEventHandler();
+	}
+	
+	Compiler::CodeGenerator::~CodeGenerator()
+	{
+		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
+			delete *it;
 	}
 	
 	//! reset the compiler to its initial state, for advanced or basic mode
 	void Compiler::CodeGenerator::reset(bool advanced) 
 	{
-		eventToCodePosMap.clear();
-		initEventToCodePosMap();
+		clearEventHandlers();
 		
 		generatedCode.clear();
 		setToCodeIdMap.clear();
 		
 		advancedMode = advanced;
 		useSound = false;
-		useTimer= false;
-		useMicrophone = false;
-		useAccAngle = false;
 		inWhenBlock = false;
 		inIfBlock = false;
 	}
 	
-	//! Initialize the event to code position map
-	void Compiler::CodeGenerator::initEventToCodePosMap() 
+	//! Initialize the map of events and their code
+	void Compiler::CodeGenerator::clearEventHandlers() 
 	{
-		eventToCodePosMap["button"] = qMakePair(-1,0);
-		eventToCodePosMap["prox"] = qMakePair(-1,0);
-		eventToCodePosMap["tap"] = qMakePair(-1,0);
-		eventToCodePosMap["acc"] = qMakePair(-1,0);
-		eventToCodePosMap["clap"] = qMakePair(-1,0);
-		eventToCodePosMap["timeout"] = qMakePair(-1,0);
+		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
+			(*it)->clear();
+	}
+	
+	//! Link all event handles together into their
+	void Compiler::CodeGenerator::link()
+	{
+		// complete the code of the different event handlers
+		bool wasCode(false);
+		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
+		{
+			EventHandler* eventHandler(*it);
+			if (!eventHandler->code.isEmpty())
+			{
+				wasCode = true;
+				eventHandler->generateAdditionalCode();
+			}
+		}
+		
+		// if no code, do not generate any initial code
+		if (!wasCode)
+			return;
+		
+		// generate initialisation code
+		generatedCode.push_back(generateInitialisationCode());
+		
+		// collect code from all handlers
+		map<unsigned, size_t> rowIdToCode;
+		int maxRow(0);
+		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
+		{
+			EventHandler* eventHandler(*it);
+			for (QVector<EventHandler::PairCodeAndIndex>::const_iterator jt(eventHandler->code.begin()); jt != eventHandler->code.end(); ++jt)
+			{
+				const EventHandler::PairCodeAndIndex codeAndIndex(*jt);
+				rowIdToCode[codeAndIndex.second] = generatedCode.size();
+				generatedCode.push_back(codeAndIndex.first);
+				maxRow = std::max(maxRow, codeAndIndex.second);
+			}
+		}
+		
+		// copy the collected set to the vector
+		setToCodeIdMap.resize(maxRow+1);
+		for (unsigned i = 0; i <= maxRow; ++i)
+		{
+			map<unsigned, size_t>::const_iterator codeIndex(rowIdToCode.find(i));
+			if (codeIndex != rowIdToCode.end())
+				setToCodeIdMap[i] = codeIndex->second;
+			else
+				setToCodeIdMap[i] = -1;
+		}
 	}
 	
 	//! Add initialization code after all pairs have been parsed
-	void Compiler::CodeGenerator::addInitialisationCode()
+	wstring Compiler::CodeGenerator::generateInitialisationCode() const
 	{
-		// if no code, no need for initialisation
-		if (generatedCode.empty())
-			return;
-		
-		// build initialisation code
 		wstring text;
 		if (advancedMode)
 		{
@@ -104,7 +206,7 @@ namespace Aseba { namespace ThymioVPL
 			text += L"var new_state[4] = [0,0,0,0]\n";
 			text += L"\n";
 		}
-		if (useAccAngle)
+		if (!eventHandlers["acc"]->code.isEmpty())
 		{
 			text += L"# variable for angle\n";
 			text += L"var angle\n";
@@ -128,12 +230,17 @@ namespace Aseba { namespace ThymioVPL
 			text += L"end\n";
 			text += L"call sound.wave(wave)\n";
 		}
-		if (useTimer)
+		if (!eventHandlers["rc5"]->code.isEmpty())
+		{
+			text += L"# set a sentinel value to detect RC5 data reception\n";
+			text += L"rc5.command = -1\n";
+		}
+		if (!eventHandlers["timeout"]->code.isEmpty())
 		{
 			text += L"# stop timer 0\n";
 			text += L"timer.period[0] = 0\n";
 		}
-		if (useMicrophone)
+		if (!eventHandlers["clap"]->code.isEmpty())
 		{
 			text += L"# setup threshold for detecting claps\n";
 			text += L"mic.threshold = 250\n";
@@ -159,7 +266,7 @@ namespace Aseba { namespace ThymioVPL
 			text += L"\t\tnote_index += 1\n";
 			text += L"\tend\n";
 		}
-		generatedCode[0] = text + generatedCode[0];
+		return text;
 	}
 	
 	wstring Compiler::CodeGenerator::indentText() const
@@ -183,132 +290,63 @@ namespace Aseba { namespace ThymioVPL
 		else
 			lookupEventName = eventName;
 		
+		// the second and third modes of buttons are rc
+		if ((eventName == "button") && (eventActionsSet.getEventBlock()->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW))
+			lookupEventName = "rc5";
+		
 		// the first mode of the acc event is just a tap
 		if ((eventName == "acc") && (eventActionsSet.getEventBlock()->getValue(0) == AccEventBlock::MODE_TAP))
 			lookupEventName = "tap";
 		
-		// lookup corresponding block
-		int block = eventToCodePosMap[lookupEventName].first;
-		int size = eventToCodePosMap[lookupEventName].second;
-		unsigned currentBlock(0);
+		// get the corresponding event handler
+		EventHandlers::iterator eventIt(eventHandlers.find(lookupEventName));
+		assert(eventIt != eventHandlers.end());
+		EventHandler* eventHandler(*eventIt);
 		
-		// if block does not exist, create it for the corresponding event and set the usage flag
-		if (block < 0)
+		// add a new entry
+		// if non-conditional code, put before any conditional code
+		size_t codeEntryIndex(eventHandler->code.size());
+		if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
 		{
-			block = generatedCode.size();
-			
-			if (lookupEventName == "button")
+			// find where "if" block starts for the current event handler
+			for (size_t i = 0; i < eventHandler->code.size(); ++i)
 			{
-				generatedCode.push_back(L"\nonevent buttons\n");
-				size++;
+				if ((eventHandler->code[i].first.find(L"if ") != wstring::npos) ||
+					(eventHandler->code[i].first.find(L"when ") != wstring::npos))
+				{
+					codeEntryIndex = i;
+					break;
+				}
 			}
-			else if (lookupEventName == "prox")
-			{
-				generatedCode.push_back(L"\nonevent prox\n");
-				size++;
-			}
-			else if (lookupEventName == "tap")
-			{
-				generatedCode.push_back(L"\nonevent tap\n");
-				size++;
-			}
-			else if (lookupEventName == "acc")
-			{
-				useAccAngle = true;
-				generatedCode.push_back(L"\nonevent acc\n");
-				size++;
-			}
-			else if (lookupEventName == "clap")
-			{
-				useMicrophone = true;
-				generatedCode.push_back(L"\nonevent mic\n");
-				size++;
-			}
-			else if (lookupEventName == "timeout")
-			{
-				useTimer = true;
-				generatedCode.push_back(
-					L"\nonevent timer0"
-					L"\n\ttimer.period[0] = 0\n"
-				);
-				size++;
-			}
-			else
-			{
-				// internal compiler error, invalid event found
-				abort();
-			}
-			
-			// FIXME: do this in a second pass, once we have written all the code for this event, and only if the state is actually assigned
-			// if in advanced mode, copy setting of state
-			if (eventActionsSet.isAdvanced())
-			{
-				generatedCode.push_back(
-					L"\n\tcall math.copy(state, new_state)"
-					L"\n\tcallsub display_state\n"
-				);
-				eventToCodePosMap[lookupEventName] = qMakePair(block, size+1);
-			}
-			else
-				eventToCodePosMap[lookupEventName] = qMakePair(block, size);
-
-			// prepare to add the new code block
-			currentBlock = block + size;
 		}
-		else
-		{
-			// get current block, insert and update map
-			currentBlock = (eventActionsSet.isAdvanced() ? block + size : block + size + 1);
-			eventToCodePosMap[lookupEventName].second++;
-			for (EventToCodePosMap::iterator itr(eventToCodePosMap.begin()); itr != eventToCodePosMap.end(); ++itr)
-				if (itr->first > block)
-					itr->first++;
-			
-			// if non-conditional code
-			if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
-			{
-				// find where "if" block starts for the current event
-				for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
-					if (setToCodeIdMap[i] >= block && setToCodeIdMap[i] < (int)currentBlock &&
-						generatedCode[setToCodeIdMap[i]].find(L"if ") != wstring::npos)
-						currentBlock = setToCodeIdMap[i];
-			}
-			
-			// make "space" for this block
-			for (unsigned int i=0; i<setToCodeIdMap.size(); i++)
-				if(setToCodeIdMap[i] >= (int)currentBlock)
-					setToCodeIdMap[i]++;
-		}
-		
-		// add the code block
-		Q_ASSERT(currentBlock <= generatedCode.size());
-		generatedCode.insert(generatedCode.begin() + currentBlock, L"");
-		setToCodeIdMap.push_back(currentBlock);
+		eventHandler->code.insert(codeEntryIndex, EventHandler::PairCodeAndIndex(L"", eventActionsSet.getRow()));
+		wstring& currentCode(eventHandler->code[codeEntryIndex].first);
 		
 		// add event and actions details
-		visitEventAndStateFilter(eventActionsSet.getEventBlock(), eventActionsSet.getStateFilterBlock(), currentBlock);
+		visitEventAndStateFilter(eventActionsSet.getEventBlock(), eventActionsSet.getStateFilterBlock(), currentCode);
 		for (int i=0; i<eventActionsSet.actionBlocksCount(); ++i)
-			visitAction(eventActionsSet.getActionBlock(i), currentBlock);
+			visitAction(eventActionsSet.getActionBlock(i), currentCode, eventHandler->isStateSet);
 		
 		// possibly add the debug event
-		visitExecFeedback(eventActionsSet, currentBlock);
+		visitExecFeedback(eventActionsSet, currentCode);
 		if (debugLog)
-			visitDebugLog(eventActionsSet, currentBlock);
+			visitDebugLog(eventActionsSet, currentCode);
 		
 		// possibly close condition and add code
-		visitEndOfLine(currentBlock);
+		visitEndOfLine(currentCode);
+		currentCode.append(L"\n");
 	}
 	
 	//! Generate the debug log event for this set
-	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, wstring& currentCode)
 	{
 		wstring text(indentText());
 		text += L"emit pair_run " + toWstring(eventActionsSet.getRow()) + L"\n";
-		generatedCode[currentBlock].append(text);
+		currentCode.append(text);
 	}
 	
 	//! Generate the debug log event for this set
-	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, wstring& currentCode)
 	{
 		wstring text(indentText());
 		text += L"_emit debug_log [";
@@ -321,10 +359,10 @@ namespace Aseba { namespace ThymioVPL
 		text.erase(text.size() - 2);
 		
 		text += L"]\n";
-		generatedCode[currentBlock].append(text);
+		currentCode.append(text);
 	}
 
-	void Compiler::CodeGenerator::visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, wstring& currentCode)
 	{
 		// generate event code
 		wstring text;
@@ -399,22 +437,22 @@ namespace Aseba { namespace ThymioVPL
 			inIfBlock = true;
 		}
 		
-		generatedCode[currentBlock] = text;
+		currentCode = text;
 	}
 	
 	//! End the generated code of a VPL line, close whens and ifs
-	void Compiler::CodeGenerator::visitEndOfLine(unsigned currentBlock)
+	void Compiler::CodeGenerator::visitEndOfLine(wstring& currentCode)
 	{
 		if (inIfBlock)
 		{
 			if (inWhenBlock)
-				generatedCode[currentBlock].append(L"\t");
-			generatedCode[currentBlock].append(L"\tend\n");
+				currentCode.append(L"\t");
+			currentCode.append(L"\tend\n");
 			inIfBlock = false;
 		}
 		if (inWhenBlock)
 		{
-			generatedCode[currentBlock].append(L"\tend\n");
+			currentCode.append(L"\tend\n");
 			inWhenBlock = false;
 		}
 	}
@@ -422,25 +460,62 @@ namespace Aseba { namespace ThymioVPL
 	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block* block)
 	{
 		wstring text;
-		bool first(true);
-		for (unsigned i=0; i<block->valuesCount(); ++i)
+		
+		const int mode(block->getValue(5));
+		if (mode == ArrowButtonsEventBlock::MODE_ARROW)
 		{
-			if (block->getValue(i) > 0)
+			bool first(true);
+			for (unsigned i=0; i<5; ++i)
 			{
-				static const wchar_t* directions[] = {
-					L"forward",
-					L"left",
-					L"backward",
-					L"right",
-					L"center"
-				};
-				text += (first ? L"": L" and ");
-				text += L"button.";
-				text += directions[i];
-				text += L" == 1";
-				first = false;
+				if (block->getValue(i) > 0)
+				{
+					static const wchar_t* directions[] = {
+						L"forward",
+						L"left",
+						L"backward",
+						L"right",
+						L"center"
+					};
+					text += (first ? L"": L" and ");
+					text += L"button.";
+					text += directions[i];
+					text += L" == 1";
+					first = false;
+				}
 			}
 		}
+		else if (mode == ArrowButtonsEventBlock::MODE_RC_ARROW)
+		{
+			const int value(block->getValue(6));
+			assert(value >= 0);
+			assert(value < 5);
+			// top, left, bottom, right, center
+			const unsigned mapping[5][3] = {
+				{80, 32, -1},
+				{85, 17, 77},
+				{81, 33, -1},
+				{86, 16, 78},
+				{87, -1, -1}
+			};
+			
+			text += L"rc5.command == " + toWstring(mapping[value][0]);
+			if (mapping[value][1] != -1)
+				text += L" or rc5.command == " + toWstring(mapping[value][1]);
+			if (mapping[value][2] != -1)
+				text += L" or rc5.command == " + toWstring(mapping[value][2]);
+		}
+		else if (mode == ArrowButtonsEventBlock::MODE_RC_KEYPAD)
+		{
+			const int value(block->getValue(6));
+			assert(value >= 0);
+			assert(value < 12);
+			// row, then column
+			const unsigned mapping[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 0, 16 };
+			text += L"rc5.command == " + toWstring(mapping[value]);
+		}
+		else
+			assert(false);
+		
 		return text;
 	}
 	
@@ -557,7 +632,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! Visit an action block, if 0 return directly
-	void Compiler::CodeGenerator::visitAction(const Block* block, unsigned currentBlock)
+	void Compiler::CodeGenerator::visitAction(const Block* block, wstring& currentCode, bool& isStateSet)
 	{
 		if (!block)
 			return;
@@ -586,7 +661,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else if (block->getName() == "setstate")
 		{
-			text += visitActionSetState(block);
+			text += visitActionSetState(block, isStateSet);
 		}
 		else
 		{
@@ -594,7 +669,7 @@ namespace Aseba { namespace ThymioVPL
 			abort();
 		}
 		
-		generatedCode[currentBlock].append(text);
+		currentCode.append(text);
 	}
 	
 	wstring Compiler::CodeGenerator::visitActionMove(const Block* block)
@@ -734,7 +809,7 @@ namespace Aseba { namespace ThymioVPL
 		return text;
 	}
 	
-	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block)
+	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block, bool& isStateSet)
 	{
 		wstring text;
 		const wstring indString(indentText());
@@ -742,8 +817,8 @@ namespace Aseba { namespace ThymioVPL
 		{
 			switch (block->getValue(i))
 			{
-				case 1: text += indString + L"new_state[" + toWstring(i) + L"] = 1\n"; break;
-				case 2: text += indString + L"new_state[" + toWstring(i) + L"] = 0\n"; break;
+				case 1: text += indString + L"new_state[" + toWstring(i) + L"] = 1\n"; isStateSet = true; break;
+				case 2: text += indString + L"new_state[" + toWstring(i) + L"] = 0\n"; isStateSet = true; break;
 				default: break; // do nothing
 			}
 		}

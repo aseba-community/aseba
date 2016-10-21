@@ -90,7 +90,10 @@ namespace Aseba { namespace ThymioVPL {
 	void renderBlocks()
 	{
 		// events
-		renderBlock<ArrowButtonsEventBlock>("event-buttons");
+		renderBlock<ArrowButtonsEventBlock>("event-buttons", false);
+		renderBlock<ArrowButtonsEventBlock>("event-buttons-advanced", true);
+		renderBlockValue<ArrowButtonsEventBlock>("event-rc-arrow", 5, 1);
+		renderBlockValue<ArrowButtonsEventBlock>("event-rc-keypad", 5, 2);
 		renderBlock<ProxEventBlock>("event-prox", false);
 		renderBlock<ProxEventBlock>("event-prox-advanced", true);
 		renderBlock<ProxGroundEventBlock>("event-prox-ground", false);

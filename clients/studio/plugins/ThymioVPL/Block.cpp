@@ -79,7 +79,7 @@ namespace Aseba { namespace ThymioVPL
 	Block* Block::createBlock(const QString& name, bool advanced, QGraphicsItem *parent)
 	{
 		if ( name == "button" )
-			return new ArrowButtonsEventBlock(parent);
+			return new ArrowButtonsEventBlock(advanced, parent);
 		else if ( name == "prox" )
 			return new ProxEventBlock(advanced, parent);
 		else if ( name == "proxground" )
@@ -271,7 +271,7 @@ namespace Aseba { namespace ThymioVPL
 		return element.attribute("name");
 	}
 	
-		void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+	void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
