@@ -98,7 +98,6 @@ namespace Aseba { namespace ThymioVPL
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent rc5\n", -1));
-		code.append(EventHandler::PairCodeAndIndex(L"\trc5.command = -1\n", -1));
 	};
 
 	//////
@@ -229,11 +228,6 @@ namespace Aseba { namespace ThymioVPL
 			text += L"\twave[i] = wave_intensity/256\n";
 			text += L"end\n";
 			text += L"call sound.wave(wave)\n";
-		}
-		if (!eventHandlers["rc5"]->code.isEmpty())
-		{
-			text += L"# set a sentinel value to detect RC5 data reception\n";
-			text += L"rc5.command = -1\n";
 		}
 		if (!eventHandlers["timeout"]->code.isEmpty())
 		{
@@ -376,8 +370,13 @@ namespace Aseba { namespace ThymioVPL
 				text += visitEventAccPre(block);
 			}
 			
-			// test code
-			text += L"\twhen ";
+			// test code, special case for remote control
+			if ((block->getName() == "button") && (block->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW))
+				text += L"\tif ";
+			else
+				text += L"\twhen ";
+			
+			// event-specific code
 			if (block->getName() == "button")
 			{
 				text += visitEventArrowButtons(block);
