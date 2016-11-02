@@ -80,6 +80,79 @@ namespace Enki
 	{
 		thisStepCollided = true;
 	}
+
+	inline double distance(double x1, double y1, double z1, double x2, double y2, double z2)
+	{
+		return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+	}
+
+	void AsebaThymio2::clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ)
+	{
+		pointX -= pos.x;
+		pointY -= pos.y;
+		double relativeX =  cos(angle)*pointX + sin(angle)*pointY;
+		double relativeY = -sin(angle)*pointX + cos(angle)*pointY;
+
+		if (pressed && buttonCode == LEFT_MOUSE_BUTTON)
+		{
+			if (distance(relativeX,relativeY,pointZ,2.5,0,5.3) < 0.55)
+			{
+				variables.buttonCenter = 1;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,4.0,0,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 1;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,1.0,0,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 1;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,2.5,-1.5,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 1;
+			}
+			else if (distance(relativeX,relativeY,pointZ,2.5,1.5,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 1;
+				variables.buttonRight = 0;
+			}
+			else
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+		}
+		else
+		{
+			variables.buttonCenter = 0;
+			variables.buttonBackward = 0;
+			variables.buttonForward = 0;
+			variables.buttonLeft = 0;
+			variables.buttonRight = 0;
+		}
+	}
 	
 	void AsebaThymio2::controlStep(double dt)
 	{
@@ -91,12 +164,12 @@ namespace Enki
 		variables.proxHorizontal[4] = static_cast<sint16>(infraredSensor4.getValue());
 		variables.proxHorizontal[5] = static_cast<sint16>(infraredSensor5.getValue());
 		variables.proxHorizontal[6] = static_cast<sint16>(infraredSensor6.getValue());
-        variables.proxGroundReflected[0] = static_cast<sint16>(groundSensor0.getValue());
-        variables.proxGroundReflected[1] = static_cast<sint16>(groundSensor1.getValue());
-        variables.proxGroundDelta[0] = static_cast<sint16>(groundSensor0.getValue());
-        variables.proxGroundDelta[1] = static_cast<sint16>(groundSensor1.getValue());
-        variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
-        variables.motorRightSpeed = rightSpeed * 500. / 16.6;
+		variables.proxGroundReflected[0] = static_cast<sint16>(groundSensor0.getValue());
+		variables.proxGroundReflected[1] = static_cast<sint16>(groundSensor1.getValue());
+		variables.proxGroundDelta[0] = static_cast<sint16>(groundSensor0.getValue());
+		variables.proxGroundDelta[1] = static_cast<sint16>(groundSensor1.getValue());
+		variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
+		variables.motorRightSpeed = rightSpeed * 500. / 16.6;
 		
 		// do a network step, if there are some events from the network, they will be executed
 		Hub::step();

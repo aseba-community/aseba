@@ -29,6 +29,7 @@
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
 #include "EPuck.h"
+#include "Thymio2.h"
 #include "../../common/utils/utils.h"
 
 #ifdef Q_OS_WIN32
@@ -133,7 +134,7 @@ namespace Enki
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
 		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-		// TODO: add display of Thymio 2 in EnkiViewer, then add alias here
+		managedObjectsAliases[&typeid(AsebaThymio2)] = &typeid(Thymio2);
 	}
 	
 	void PlaygroundViewer::sceneCompletedHook()
