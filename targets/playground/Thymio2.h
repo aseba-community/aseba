@@ -120,6 +120,10 @@ namespace Enki
 		// from PhysicalObject
 		
 		virtual void collisionEvent(PhysicalObject *o);
+
+		// from Robot
+
+		virtual void clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ);
 		
 		// from Thymio2
 		

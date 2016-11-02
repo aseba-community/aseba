@@ -104,8 +104,7 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
+
 	ASEBA_UNUSED(l0);
 	ASEBA_UNUSED(l1);
 	ASEBA_UNUSED(l2);
@@ -114,14 +113,28 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	ASEBA_UNUSED(l5);
 	ASEBA_UNUSED(l6);
 	ASEBA_UNUSED(l7);
+
+	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
+	World* world(playgroundViewer->getWorld());
+	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	{
+		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
+		if (thymio2 && (&(thymio2->vm) == vm))
+		{
+			thymio2->setLedIntensity(Thymio2::RING_0, l0/32.);
+			thymio2->setLedIntensity(Thymio2::RING_1, l1/32.);
+			thymio2->setLedIntensity(Thymio2::RING_2, l2/32.);
+			thymio2->setLedIntensity(Thymio2::RING_3, l3/32.);
+			thymio2->setLedIntensity(Thymio2::RING_4, l4/32.);
+			thymio2->setLedIntensity(Thymio2::RING_5, l5/32.);
+			thymio2->setLedIntensity(Thymio2::RING_6, l6/32.);
+			thymio2->setLedIntensity(Thymio2::RING_7, l7/32.);
+			return;
+		}
+	}
 }
 
-static double paramToColor(sint16 param)
-{
-	return (param*5.46875+80) / 255.;
-}
-
-static double _fmax(double x, double y)
+static sint16 _imax(sint16 x, sint16 y)
 {
 	if (x > y)
 		return x;
@@ -131,16 +144,16 @@ static double _fmax(double x, double y)
 
 extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 {
-	const double r(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double g(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double b(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double a(_fmax(_fmax(r, g), b));
-	
+	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 a(_imax(_imax(r, g), b));
+	const double param(1./_imax(_imax(r, g),_imax(1,b)));
+
 	ASEBA_UNUSED(r);
 	ASEBA_UNUSED(g);
 	ASEBA_UNUSED(b);
 	
-	// find related VM
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
 	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
@@ -148,8 +161,8 @@ extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
 		if (thymio2 && (&(thymio2->vm) == vm))
 		{
-			// change color of Enki object
-			thymio2->setColor(Color(1.- a + a*r, 1.- a + a*g, 1. - a + a*b));
+			thymio2->setLedColor(Thymio2::TOP, Color(param*r,param*g,param*b,a/32.));
+			return;
 		}
 	}
 }
@@ -159,11 +172,24 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
+	const sint16 a(_imax(_imax(r, g), b));
+	const double param(1./_imax(_imax(r, g),_imax(1,b)));
+
 	ASEBA_UNUSED(r);
 	ASEBA_UNUSED(g);
 	ASEBA_UNUSED(b);
+
+	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
+	World* world(playgroundViewer->getWorld());
+	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	{
+		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
+		if (thymio2 && (&(thymio2->vm) == vm))
+		{
+			thymio2->setLedColor(Thymio2::BOTTOM_RIGHT, Color(param*r,param*g,param*b,a/32.));
+			return;
+		}
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
@@ -171,11 +197,24 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
+	const sint16 a(_imax(_imax(r, g), b));
+	const double param(1./_imax(_imax(r, g),_imax(1,b)));
+
 	ASEBA_UNUSED(r);
 	ASEBA_UNUSED(g);
 	ASEBA_UNUSED(b);
+
+	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
+	World* world(playgroundViewer->getWorld());
+	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	{
+		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
+		if (thymio2 && (&(thymio2->vm) == vm))
+		{
+			thymio2->setLedColor(Thymio2::BOTTOM_LEFT, Color(param*r,param*g,param*b,a/32.));
+			return;
+		}
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
@@ -184,12 +223,26 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
+
 	ASEBA_UNUSED(l0);
 	ASEBA_UNUSED(l1);
 	ASEBA_UNUSED(l2);
 	ASEBA_UNUSED(l3);
+
+	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
+	World* world(playgroundViewer->getWorld());
+	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	{
+		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
+		if (thymio2 && (&(thymio2->vm) == vm))
+		{
+			thymio2->setLedIntensity(Thymio2::BUTTON_UP,    l0/32.);
+			thymio2->setLedIntensity(Thymio2::BUTTON_RIGHT, l1/32.);
+			thymio2->setLedIntensity(Thymio2::BUTTON_DOWN,  l2/32.);
+			thymio2->setLedIntensity(Thymio2::BUTTON_LEFT,  l3/32.);
+			return;
+		}
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
@@ -202,8 +255,7 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
+
 	ASEBA_UNUSED(l0);
 	ASEBA_UNUSED(l1);
 	ASEBA_UNUSED(l2);
@@ -212,13 +264,32 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 	ASEBA_UNUSED(l5);
 	ASEBA_UNUSED(l6);
 	ASEBA_UNUSED(l7);
+
+	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
+	World* world(playgroundViewer->getWorld());
+	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	{
+		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
+		if (thymio2 && (&(thymio2->vm) == vm))
+		{
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_0, l0/32.);
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_1, l1/32.);
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_2, l2/32.);
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_3, l3/32.);
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_4, l4/32.);
+			thymio2->setLedIntensity(Thymio2::IR_FRONT_5, l5/32.);
+			thymio2->setLedIntensity(Thymio2::IR_BACK_0,  l6/32.);
+			thymio2->setLedIntensity(Thymio2::IR_BACK_1,  l7/32.);
+			return;
+		}
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_prox_v(AsebaVMState *vm)
 {
 	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
+
 	// do nothing for now
 	ASEBA_UNUSED(l0);
 	ASEBA_UNUSED(l1);
