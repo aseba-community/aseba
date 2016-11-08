@@ -184,7 +184,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		// copy the collected set to the vector
 		setToCodeIdMap.resize(maxRow+1);
-		for (unsigned i = 0; i <= maxRow; ++i)
+		for (int i = 0; i <= maxRow; ++i)
 		{
 			map<unsigned, size_t>::const_iterator codeIndex(rowIdToCode.find(i));
 			if (codeIndex != rowIdToCode.end())
@@ -303,7 +303,7 @@ namespace Aseba { namespace ThymioVPL
 		if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
 		{
 			// find where "if" block starts for the current event handler
-			for (size_t i = 0; i < eventHandler->code.size(); ++i)
+			for (int i = 0; i < eventHandler->code.size(); ++i)
 			{
 				if ((eventHandler->code[i].first.find(L"if ") != wstring::npos) ||
 					(eventHandler->code[i].first.find(L"when ") != wstring::npos))
@@ -490,17 +490,17 @@ namespace Aseba { namespace ThymioVPL
 			assert(value < 5);
 			// top, left, bottom, right, center
 			const unsigned mapping[5][3] = {
-				{80, 32, -1},
+				{80, 32, unsigned(-1) },
 				{85, 17, 77},
-				{81, 33, -1},
+				{81, 33, unsigned(-1) },
 				{86, 16, 78},
-				{87, -1, -1}
+				{87, unsigned(-1), unsigned(-1)}
 			};
 			
 			text += L"rc5.command == " + toWstring(mapping[value][0]);
-			if (mapping[value][1] != -1)
+			if (mapping[value][1] != unsigned(-1))
 				text += L" or rc5.command == " + toWstring(mapping[value][1]);
-			if (mapping[value][2] != -1)
+			if (mapping[value][2] != unsigned(-1))
 				text += L" or rc5.command == " + toWstring(mapping[value][2]);
 		}
 		else if (mode == ArrowButtonsEventBlock::MODE_RC_KEYPAD)
