@@ -105,15 +105,6 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
-	ASEBA_UNUSED(l4);
-	ASEBA_UNUSED(l5);
-	ASEBA_UNUSED(l6);
-	ASEBA_UNUSED(l7);
-
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
 	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
@@ -134,26 +125,14 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	}
 }
 
-static sint16 _imax(sint16 x, sint16 y)
-{
-	if (x > y)
-		return x;
-	else
-		return y;
-}
-
 extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 {
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(_imax(_imax(r, g), b));
-	const double param(1./_imax(_imax(r, g),_imax(1,b)));
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
-	
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
 	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
@@ -172,12 +151,8 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(_imax(_imax(r, g), b));
-	const double param(1./_imax(_imax(r, g),_imax(1,b)));
-
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
@@ -197,12 +172,8 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(_imax(_imax(r, g), b));
-	const double param(1./_imax(_imax(r, g),_imax(1,b)));
-
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
@@ -223,11 +194,6 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
 
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
@@ -255,15 +221,6 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
-	ASEBA_UNUSED(l4);
-	ASEBA_UNUSED(l5);
-	ASEBA_UNUSED(l6);
-	ASEBA_UNUSED(l7);
 
 	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
 	World* world(playgroundViewer->getWorld());
