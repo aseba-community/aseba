@@ -371,7 +371,8 @@ namespace Aseba { namespace ThymioVPL
 			}
 			
 			// test code, special case for remote control
-			if ((block->getName() == "button") && (block->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW))
+			const bool isIf((block->getName() == "button") && (block->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW));
+			if (isIf)
 				text += L"\tif ";
 			else
 				text += L"\twhen ";
@@ -399,7 +400,10 @@ namespace Aseba { namespace ThymioVPL
 				abort();
 			}
 			
-			text += L" do\n";
+			if (isIf)
+				text += L" then\n ";
+			else
+				text += L" do\n";
 			
 			inWhenBlock = true;
 		}
