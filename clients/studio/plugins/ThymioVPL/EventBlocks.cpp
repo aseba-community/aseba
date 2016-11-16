@@ -384,6 +384,8 @@ namespace Aseba { namespace ThymioVPL
 		for (size_t i=5; i<10; ++i)
 			if ((current + 5 != i) && buttons[i] != sender())
 				buttons[i]->setValue(0);
+			else if (buttons[i] == sender())
+				buttons[i]->setValue(1);
 	}
 	
 	void ArrowButtonsEventBlock::ensureSingleRCKeypadButtonSelected(int current)
@@ -391,6 +393,8 @@ namespace Aseba { namespace ThymioVPL
 		for (size_t i=10; i<buttons.size(); ++i)
 			if ((current + 10 != i) && buttons[i] != sender())
 				buttons[i]->setValue(0);
+			else if (buttons[i] == sender())
+				buttons[i]->setValue(1);
 	}
 	
 	
