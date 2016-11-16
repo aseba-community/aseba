@@ -142,6 +142,9 @@ namespace Enki
 				variables.buttonForward = 0;
 				variables.buttonLeft = 0;
 				variables.buttonRight = 0;
+				
+				// not a putton, tap event
+				execLocalEvent(EVENT_TAP);
 			}
 		}
 		else
