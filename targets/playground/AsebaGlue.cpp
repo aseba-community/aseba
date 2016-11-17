@@ -164,6 +164,34 @@ namespace Aseba
 		}
 		toDisconnect.clear();
 	}
+	
+	SimpleEnkiTimer::SimpleEnkiTimer(Callback callback, double period):
+		callback(callback),
+		period(period),
+		left(period)
+	{
+		
+	}
+	
+	void SimpleEnkiTimer::step(double dt)
+	{
+		if (period == 0)
+			return;
+		
+		assert(dt >= 0);
+		left -= dt;
+		while (left < 0)
+		{
+			callback();
+			left += period;
+		}
+	}
+	
+	void SimpleEnkiTimer::setPeriod(double period)
+	{
+		this->period = period;
+		left = period;
+	}
 
 } // Aseba
 

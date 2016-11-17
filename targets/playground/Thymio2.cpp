@@ -32,9 +32,9 @@ namespace Enki
 	
 	AsebaThymio2::AsebaThymio2(unsigned port):
 		SimpleDashelConnection(port),
-		timer0(new QTimer(this)),
-		timer1(new QTimer(this)),
-		timer100Hz(new QTimer(this)),
+		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
+		timer1(bind(&AsebaThymio2::timer1Timeout, this), 0),
+		timer100Hz(bind(&AsebaThymio2::timer100HzTimeout, this), 0.01),
 		counter100Hz(0),
 		lastStepCollided(false),
 		thisStepCollided(false)
@@ -65,11 +65,6 @@ namespace Enki
 		variables.temperature = 220;
 		
 		vmStateToEnvironment[&vm] = qMakePair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
-		
-		QObject::connect(timer0, SIGNAL(timeout()), SLOT(timer0Timeout()));
-		QObject::connect(timer1, SIGNAL(timeout()), SLOT(timer1Timeout()));
-		QObject::connect(timer100Hz, SIGNAL(timeout()), SLOT(timer100HzTimeout()));
-		timer100Hz->start(10);
 	}
 	
 	AsebaThymio2::~AsebaThymio2()
@@ -174,6 +169,11 @@ namespace Enki
 		variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
 		variables.motorRightSpeed = rightSpeed * 500. / 16.6;
 		
+		// run timers
+		timer0.step(dt);
+		timer1.step(dt);
+		timer100Hz.step(dt);
+		
 		// do a network step, if there are some events from the network, they will be executed
 		Hub::step();
 		
@@ -188,18 +188,12 @@ namespace Enki
 		if (variables.timerPeriod[0] != oldTimerPeriod[0])
 		{
 			oldTimerPeriod[0] = variables.timerPeriod[0];
-			if (variables.timerPeriod[0])
-				timer0->start(variables.timerPeriod[0]);
-			else
-				timer0->stop();
+			timer0.setPeriod(variables.timerPeriod[0] / 1000.);
 		}
 		if (variables.timerPeriod[1] != oldTimerPeriod[1])
 		{
 			oldTimerPeriod[1] = variables.timerPeriod[1];
-			if (variables.timerPeriod[1])
-				timer1->start(variables.timerPeriod[1]);
-			else
-				timer1->stop();
+			timer1.setPeriod(variables.timerPeriod[1] / 1000.);
 		}
 		
 		// set motion
