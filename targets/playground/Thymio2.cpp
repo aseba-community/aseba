@@ -27,6 +27,7 @@
 
 namespace Enki
 {
+	using namespace std;
 	using namespace Aseba;
 	
 	AsebaThymio2::AsebaThymio2(unsigned port):
@@ -83,17 +84,16 @@ namespace Enki
 
 	inline double distance(double x1, double y1, double z1, double x2, double y2, double z2)
 	{
-		return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+		return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
 	}
 
 	void AsebaThymio2::clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ)
 	{
 		pointX -= pos.x;
 		pointY -= pos.y;
-		double relativeX =  cos(angle)*pointX + sin(angle)*pointY;
-		double relativeY = -sin(angle)*pointX + cos(angle)*pointY;
-
-		if (pressed && buttonCode == LEFT_MOUSE_BUTTON)
+		const double relativeX =  cos(angle)*pointX + sin(angle)*pointY;
+		const double relativeY = -sin(angle)*pointX + cos(angle)*pointY;
+		if (pressed && (buttonCode & LEFT_MOUSE_BUTTON))
 		{
 			if (distance(relativeX,relativeY,pointZ,2.5,0,5.3) < 0.55)
 			{
