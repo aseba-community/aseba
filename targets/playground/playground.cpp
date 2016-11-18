@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 	);
 	
 	// Create viewer
-	Enki::PlaygroundViewer viewer(&world);
+	Enki::PlaygroundViewer viewer(&world, worldE.attribute("energyScoringSystemEnabled", "false").toLower() == "true");
 	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");

@@ -52,11 +52,12 @@ namespace Enki
 		QString logText[LOG_HISTORY_COUNT];
 		QColor logColor[LOG_HISTORY_COUNT];
 		Aseba::UnifiedTime logTime[LOG_HISTORY_COUNT];
+		bool energyScoringSystemEnabled;
 		unsigned logPos;
 		unsigned energyPool;
 		
 	public:
-		PlaygroundViewer(World* world);
+		PlaygroundViewer(World* world, bool energyScoringSystemEnabled = false);
 		virtual ~PlaygroundViewer();
 		
 		World* getWorld() const;

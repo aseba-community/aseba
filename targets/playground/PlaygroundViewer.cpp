@@ -44,9 +44,10 @@ namespace Enki
 	
 	static PlaygroundViewer* playgroundViewer = 0;
 
-	PlaygroundViewer::PlaygroundViewer(World* world) : 
+	PlaygroundViewer::PlaygroundViewer(World* world, bool energyScoringSystemEnabled) : 
 		ViewerWidget(world),
 		font("Courier", 10),
+		energyScoringSystemEnabled(energyScoringSystemEnabled),
 		logPos(0),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
@@ -143,27 +144,30 @@ namespace Enki
 		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
 		qglColor(Qt::black);
 		
-		// TODO: clean-up that
-		int i = 0;
-		QString scoreString("Id.: E./Score. - ");
-		int totalScore = 0;
-		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		// TODO: once we have ECS-enabled Enki, use modules for playground as well
+		if (energyScoringSystemEnabled)
 		{
-			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
-			if (epuck)
+			int i = 0;
+			QString scoreString("Id.: E./Score. - ");
+			int totalScore = 0;
+			for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
 			{
-				totalScore += (int)epuck->score;
-				if (i != 0)
-					scoreString += " - ";
-				scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
-				renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
-				i++;
+				AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
+				if (epuck)
+				{
+					totalScore += (int)epuck->score;
+					if (i != 0)
+						scoreString += " - ";
+					scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
+					renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
+					i++;
+				}
 			}
+			
+			renderText(16, height() * 3 / 4 - 40, scoreString, font);
+			
+			renderText(16, height() * 3 / 4 - 20, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		}
-		
-		renderText(16, 22, scoreString, font);
-		
-		renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		
 		// console background
 		glEnable(GL_BLEND);
