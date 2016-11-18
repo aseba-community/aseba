@@ -1,30 +1,7 @@
-if (QT4_FOUND AND ENKI_FOUND)
-	# SDL
-# 	find_package(SDL)
-# 	if (SDL_FOUND)
-# 		include_directories(${SDL_INCLUDE_DIR})
-# 		set(EXTRA_LIBS ${SDL_LIBRARY})
-# 		add_definitions("-DUSE_SDL")
-# 	elseif (SDL_FOUND)
-# 		set(EXTRA_LIBS "")
-# 	endif (SDL_FOUND)
-
-	find_package(OpenGL REQUIRED)
-	
-	set(QT_USE_QTMAIN ON)
-	set(QT_USE_QTOPENGL ON)
-	set(QT_USE_QTXML ON)
-	if (QT_QTDBUS_FOUND AND NOT WIN32)
-		# force disable D-Bus on Windows, because it generates compilation
-		# errors in interaction with QtOpenGL includes
-		set(QT_USE_QTDBUS ON)
-		add_definitions("-DHAVE_DBUS")
-	endif (QT_QTDBUS_FOUND AND NOT WIN32)
-	include(${QT_USE_FILE})
-	
+if (ENKI_FOUND)
 	include_directories(${ENKI_INCLUDE_DIR})
 	
-	set(playground_SRCS
+	set (ASEBASIM_SRC
 		AsebaGlue.cpp
 		Door.cpp
 		EPuck.cpp
@@ -32,19 +9,51 @@ if (QT4_FOUND AND ENKI_FOUND)
 		Thymio2.cpp
 		Thymio2-natives.cpp
 		Thymio2-descriptions.c
-		PlaygroundViewer.cpp
-		PlaygroundDBusAdaptors.cpp
-		playground.cpp
 	)
-	qt4_wrap_cpp(playground_MOCS
+	
+	qt4_wrap_cpp(ASEBASIM_MOCS
 		Thymio2.h
-		PlaygroundViewer.h
-		PlaygroundDBusAdaptors.h
+	)
+
+	add_library(asebasim ${ASEBASIM_SRC} ${ASEBASIM_MOCS})
+	set_target_properties(asebasim PROPERTIES VERSION ${LIB_VERSION_STRING} 
+											SOVERSION ${LIB_VERSION_MAJOR})
+	
+	install(TARGETS asebasim 
+			LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+			ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 	)
 	
-	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${playground_RCC_SRCS})
-	
-	target_link_libraries(asebaplayground asebavmbuffer asebavm ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
-	install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+	if (QT4_FOUND)
 
-endif (QT4_FOUND AND ENKI_FOUND)
+		find_package(OpenGL REQUIRED)
+		
+		set(QT_USE_QTMAIN ON)
+		set(QT_USE_QTOPENGL ON)
+		set(QT_USE_QTXML ON)
+		if (QT_QTDBUS_FOUND AND NOT WIN32)
+			# force disable D-Bus on Windows, because it generates compilation
+			# errors in interaction with QtOpenGL includes
+			set(QT_USE_QTDBUS ON)
+			add_definitions("-DHAVE_DBUS")
+		endif (QT_QTDBUS_FOUND AND NOT WIN32)
+		include(${QT_USE_FILE})
+		
+		set(playground_SRCS
+			PlaygroundViewer.cpp
+			PlaygroundDBusAdaptors.cpp
+			playground.cpp
+		)
+		qt4_wrap_cpp(playground_MOCS
+			Thymio2.h
+			PlaygroundViewer.h
+			PlaygroundDBusAdaptors.h
+		)
+		
+		add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS})
+		
+		target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm ${ENKI_VIEWER_LIBRARY} ${ENKI_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
+		install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+
+	endif (QT4_FOUND)
+endif (ENKI_FOUND)
