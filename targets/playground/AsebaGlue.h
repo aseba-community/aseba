@@ -27,7 +27,6 @@
 #include <dashel/dashel.h>
 #include <valarray>
 #include <vector>
-#include <functional>
 #include <QMap>
 #include <QPair>
 
@@ -76,23 +75,6 @@ namespace Aseba
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		
 		void closeOldStreams();
-	};
-	
-	// Simple timer
-	class SimpleEnkiTimer
-	{
-	public:
-		typedef const std::function< void() > Callback; 
-		Callback callback;
-		double period;
-		
-	protected:
-		double left = 0;
-		
-	public:
-		SimpleEnkiTimer(Callback callback, double period);
-		void step(double dt);
-		void setPeriod(double period);
 	};
 	
 } // Aseba

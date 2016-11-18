@@ -22,6 +22,7 @@
 #define __CHALLENGE_THYMIO2_H
 
 #include "AsebaGlue.h"
+#include "../../common/utils/utils.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/thymio2/Thymio2.h>
 
@@ -102,10 +103,10 @@ namespace Enki
 		} variables;
 		
 	protected:
-		Aseba::SimpleEnkiTimer timer0;
-		Aseba::SimpleEnkiTimer timer1;
+		Aseba::SoftTimer timer0;
+		Aseba::SoftTimer timer1;
 		sint16 oldTimerPeriod[2];
-		Aseba::SimpleEnkiTimer timer100Hz;
+		Aseba::SoftTimer timer100Hz;
 		unsigned counter100Hz;
 		bool lastStepCollided;
 		bool thisStepCollided;
