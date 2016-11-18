@@ -164,9 +164,9 @@ namespace Enki
 				}
 			}
 			
-			renderText(16, height() * 3 / 4 - 40, scoreString, font);
+			renderText(16, height() * 7 / 8 - 40, scoreString, font);
 			
-			renderText(16, height() * 3 / 4 - 20, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
+			renderText(16, height() * 7 / 8 - 20, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		}
 		
 		// console background
@@ -179,9 +179,11 @@ namespace Enki
 		glBegin(GL_QUADS);
 			glVertex2f(-1,-1);
 			glVertex2f(1,-1);
-			glVertex2f(1,-0.5);
-			glVertex2f(-1,-0.5);
+			glVertex2f(1,-0.75);
+			glVertex2f(-1,-0.75);
 		glEnd();
+		glDisable(GL_BLEND);
+		
 		// console text
 		for (unsigned i=0; i<LOG_HISTORY_COUNT; ++i)
 		{
@@ -189,7 +191,7 @@ namespace Enki
 			if (!logText[j].isEmpty())
 			{
 				qglColor(logColor[j]);
-				renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+				renderText(8,(height()*7)/8 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
 			}
 		}
 	}
