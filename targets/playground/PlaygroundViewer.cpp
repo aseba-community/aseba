@@ -28,9 +28,13 @@
 
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
+#include "EnkiGlue.h"
 #include "EPuck.h"
 #include "Thymio2.h"
 #include "../../common/utils/utils.h"
+#include <QMessageBox>
+#include <QApplication>
+#include <QtDebug>
 
 #ifdef Q_OS_WIN32
 	#define Q_PID_PRINT size_t
@@ -41,9 +45,14 @@
 namespace Enki
 {
 	using namespace Aseba;
+	using namespace std::placeholders;
 	
-	static PlaygroundViewer* playgroundViewer = 0;
-
+	const std::map<EnvironmentNotificationType, QColor> notificationLogTypeToColor = {
+		{ EnvironmentNotificationType::LOG_INFO, Qt::white },
+		{ EnvironmentNotificationType::LOG_WARNING, Qt::yellow },
+		{ EnvironmentNotificationType::LOG_ERROR, Qt::red }
+	};
+	
 	PlaygroundViewer::PlaygroundViewer(World* world, bool energyScoringSystemEnabled) : 
 		ViewerWidget(world),
 		font("Courier", 10),
@@ -51,10 +60,13 @@ namespace Enki
 		logPos(0),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
-		//font.setPixelSize(14);
-		if (playgroundViewer)
-			abort();
-		playgroundViewer = this;
+		// register callbacks
+		if (Enki::getWorld)
+			qDebug() << "An Enki::World getter callback already exists, replacing";
+		Enki::getWorld = std::bind(&PlaygroundViewer::getWorld, this);
+		if (Enki::notifyEnvironment)
+			qDebug() << "An Aseba environment notification callback already exists, replacing";
+		Enki::notifyEnvironment = std::bind(&PlaygroundViewer::notifyAsebaEnvironment, this, _1, _2, _3);
 	}
 	
 	PlaygroundViewer::~PlaygroundViewer()
@@ -67,9 +79,42 @@ namespace Enki
 		return world;
 	}
 	
-	PlaygroundViewer* PlaygroundViewer::getInstance()
+	void PlaygroundViewer::notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments)
 	{
-		return playgroundViewer;
+		if (type == EnvironmentNotificationType::DISPLAY_INFO)
+		{
+			if (description == "missing Thymio2 feature")
+			{
+				addInfoMessage(QObject::tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(QObject::tr("https://www.thymio.org/en:thymiobuy")));
+			}
+			else
+				qDebug() << "Unknown description for notifying DISPLAY_INFO" << QString::fromStdString(description);
+		}
+		else if (type == EnvironmentNotificationType::LOG_INFO)
+		{
+			// TODO: parse
+			log(description, notificationLogTypeToColor.at(type));
+		}
+		else if (type == EnvironmentNotificationType::LOG_WARNING)
+		{
+			// TODO: parse
+			log(description, notificationLogTypeToColor.at(type));
+		}
+		else if (type == EnvironmentNotificationType::LOG_ERROR)
+		{
+			// TODO: parse
+			log(description, notificationLogTypeToColor.at(type));
+		}
+		else if (type == EnvironmentNotificationType::FATAL_ERROR)
+		{
+			if (description == "cannot create listening port")
+			{
+				QMessageBox::critical(0, QApplication::tr("Aseba Playground"), QApplication::tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
+				abort();
+			}
+			else
+				qDebug() << "Unknown description for notifying FATAL_ERROR" << QString::fromStdString(description);
+		}
 	}
 	
 	void PlaygroundViewer::log(const QString& entry, const QColor& color)
@@ -78,6 +123,16 @@ namespace Enki
 		logColor[logPos] = color;
 		logTime[logPos] = Aseba::UnifiedTime();
 		logPos = (logPos+1) % LOG_HISTORY_COUNT;
+	}
+	
+	void PlaygroundViewer::log(const std::string& entry, const QColor& color)
+	{
+		log(QString::fromStdString(entry), color);
+	}
+	
+	void PlaygroundViewer::log(const char* entry, const QColor& color)
+	{
+		log(QString(entry), color);
 	}
 	
 	void PlaygroundViewer::processStarted()

@@ -20,7 +20,7 @@
 
 #include "Thymio2-natives.h"
 #include "Thymio2.h"
-#include "PlaygroundViewer.h"
+#include "EnkiGlue.h"
 #include "../../common/consts.h"
 
 using namespace Enki;
@@ -37,23 +37,9 @@ static sint16 clampValueTo32(sint16 v)
 		return v;
 }
 
-AsebaThymio2 *getAsebaThymio2(AsebaVMState *vm)
-{
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
-	{
-		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
-		if (thymio2 && (&(thymio2->vm) == vm))
-			return thymio2;
-	}
-	return 0;
-}
-
 void notifyMissingFeature()
 {
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	playgroundViewer->addInfoMessage(QObject::tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(QObject::tr("https://www.thymio.org/en:thymiobuy")));
+	SEND_NOTIFICATION(DISPLAY_INFO, "missing Thymio2 feature");
 }
 
 // simulated native functions
@@ -137,7 +123,7 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedIntensity(Thymio2::RING_0, l0/32.);
@@ -159,7 +145,7 @@ extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 	const sint16 a(std::max(std::max(r, g), b));
 	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::TOP, Color(param*r,param*g,param*b,a/32.));
@@ -174,7 +160,7 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 	const sint16 a(std::max(std::max(r, g), b));
 	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::BOTTOM_RIGHT, Color(param*r,param*g,param*b,a/32.));
@@ -189,7 +175,7 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 	const sint16 a(std::max(std::max(r, g), b));
 	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::BOTTOM_LEFT, Color(param*r,param*g,param*b,a/32.));
@@ -203,7 +189,7 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedIntensity(Thymio2::BUTTON_UP,    l0/32.);
@@ -224,7 +210,7 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	AsebaThymio2* thymio2(getAsebaThymio2(vm));
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
 	{
 		thymio2->setLedIntensity(Thymio2::IR_FRONT_0, l0/32.);

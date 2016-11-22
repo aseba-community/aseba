@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_ASEBA_GLUE_H
-#define __CHALLENGE_ASEBA_GLUE_H
+#ifndef __PLAYGROUND_ASEBA_GLUE_H
+#define __PLAYGROUND_ASEBA_GLUE_H
 
 #include "../../common/types.h"
 #include "../../common/consts.h"
@@ -56,19 +56,26 @@ namespace Aseba
 	extern VMStateToEnvironment vmStateToEnvironment;
 	
 	// Implementation of the connection using Dashel
+	
+	class RecvBufferNodeConnection: public AbstractNodeConnection
+	{
+	protected:
+		uint16 lastMessageSource;
+		std::valarray<uint8> lastMessageData;
+		
+	public:
+		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source);
+	};
 
-	class SimpleDashelConnection: public AbstractNodeConnection, public Dashel::Hub
+	class SimpleDashelConnection: public RecvBufferNodeConnection, public Dashel::Hub
 	{
 		Dashel::Stream* stream;
 		std::vector<Dashel::Stream*> toDisconnect; // all streams that must be disconnected at next step
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
 
 	public:
 		SimpleDashelConnection(unsigned port);
 		
 		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length);
-		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source);
 		
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);
@@ -79,4 +86,4 @@ namespace Aseba
 	
 } // Aseba
 
-#endif // __CHALLENGE_ASEBA_GLUE_H
+#endif // __PLAYGROUND_ASEBA_GLUE_H

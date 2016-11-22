@@ -22,7 +22,7 @@
 #define ASEBA_ASSERT
 #endif
 
-#include <QDebug>
+#include "EnkiGlue.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <string>
@@ -35,12 +35,11 @@
 #include "../../common/utils/FormatableString.h"
 // #include "../../vm/vm.h"
 
-
 namespace Aseba
 {
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	VMStateToEnvironment vmStateToEnvironment;
-
+	
 	// SimpleDashelConnection
 
 	SimpleDashelConnection::SimpleDashelConnection(unsigned port):
@@ -75,12 +74,16 @@ namespace Aseba
 			}
 			catch (Dashel::DashelException e)
 			{
-				LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
+				SEND_NOTIFICATION(LOG_ERROR, "cannot read from socket", stream->getTargetName(), e.what());
+// 				if (Enki::notifyEnvironment)
+// 					Enki::notifyEnvironment(Enki::EnvironmentNotificationType::LOG_ERROR,
+// 						FormatableString("Target %0, cannot read from socket: %1").arg(stream->getTargetName()).arg(e.what())
+// 					);
 			}
 		}
 	}
 
-	uint16 SimpleDashelConnection::getBuffer(uint8* data, uint16 maxLength, uint16* source)
+	uint16 RecvBufferNodeConnection::getBuffer(uint8* data, uint16 maxLength, uint16* source)
 	{
 		if (lastMessageData.size())
 		{
@@ -103,7 +106,8 @@ namespace Aseba
 			
 			// set new stream as current stream
 			this->stream = stream;
-			LOG_INFO(QString("New client connected from ") + stream->getTargetName().c_str());
+			SEND_NOTIFICATION(LOG_INFO, "new client connected", stream->getTargetName());
+			//LOG_INFO(QString("New client connected from ") + stream->getTargetName().c_str());
 		}
 	}
 
@@ -135,7 +139,8 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException e)
 		{
-			LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
+			SEND_NOTIFICATION(LOG_ERROR, "cannot read from socket", stream->getTargetName(), e.what());
+			//LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
 		}
 	}
 
@@ -151,7 +156,9 @@ namespace Aseba
 					it.key()->breakpointsCount = 0;
 			}
 		}
-		LOG_INFO(QString("Client disconnected properly from ") + stream->getTargetName().c_str());
+		SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
+		//LOG_INFO(QString("Client disconnected properly from ") + stream->getTargetName().c_str());
+
 	}
 	
 	void SimpleDashelConnection::closeOldStreams()
@@ -159,7 +166,8 @@ namespace Aseba
 		// disconnect old streams
 		for (size_t i = 0; i < toDisconnect.size(); ++i)
 		{
-			LOG_WARN(QString("Old client disconnected from ") + toDisconnect[i]->getTargetName().c_str());
+			SEND_NOTIFICATION(LOG_WARNING, "old client disconnected", toDisconnect[i]->getTargetName());
+			//LOG_WARN(QString("Old client disconnected from ") + toDisconnect[i]->getTargetName().c_str());
 			closeStream(toDisconnect[i]);
 		}
 		toDisconnect.clear();
@@ -237,25 +245,25 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
 	const Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
-	qDebug() << QString::fromStdString(Aseba::FormatableString("\nFatal error: glue %0 with node id %1 of type %2 at has produced exception: ").arg(glue).arg(vm->nodeId).arg(typeid(glue).name()));
+	std::cerr << Aseba::FormatableString("\nFatal error: glue %0 with node id %1 of type %2 at has produced exception: ").arg(glue).arg(vm->nodeId).arg(typeid(glue).name()) << std::endl;
 	switch (reason)
 	{
-		case ASEBA_ASSERT_UNKNOWN: qDebug() << "undefined"; break;
-		case ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR: qDebug() << "unknown unary operator"; break;
-		case ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR: qDebug() << "unknown binary operator"; break;
-		case ASEBA_ASSERT_UNKNOWN_BYTECODE: qDebug() << "unknown bytecode"; break;
-		case ASEBA_ASSERT_STACK_OVERFLOW: qDebug() << "stack overflow"; break;
-		case ASEBA_ASSERT_STACK_UNDERFLOW: qDebug() << "stack underflow"; break;
-		case ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS: qDebug() << "out of variables bounds"; break;
-		case ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS: qDebug() << "out of bytecode bounds"; break;
-		case ASEBA_ASSERT_STEP_OUT_OF_RUN: qDebug() << "step out of run"; break;
-		case ASEBA_ASSERT_BREAKPOINT_OUT_OF_BYTECODE_BOUNDS: qDebug() << "breakpoint out of bytecode bounds"; break;
-		case ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG: qDebug() << "tried to emit a buffer too long"; break;
-		default: qDebug() << "unknown exception"; break;
+		case ASEBA_ASSERT_UNKNOWN: std::cerr << "undefined" << std::endl; break;
+		case ASEBA_ASSERT_UNKNOWN_UNARY_OPERATOR: std::cerr << "unknown unary operator" << std::endl; break;
+		case ASEBA_ASSERT_UNKNOWN_BINARY_OPERATOR: std::cerr << "unknown binary operator" << std::endl; break;
+		case ASEBA_ASSERT_UNKNOWN_BYTECODE: std::cerr << "unknown bytecode" << std::endl; break;
+		case ASEBA_ASSERT_STACK_OVERFLOW: std::cerr << "stack overflow" << std::endl; break;
+		case ASEBA_ASSERT_STACK_UNDERFLOW: std::cerr << "stack underflow" << std::endl; break;
+		case ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS: std::cerr << "out of variables bounds" << std::endl; break;
+		case ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS: std::cerr << "out of bytecode bounds" << std::endl; break;
+		case ASEBA_ASSERT_STEP_OUT_OF_RUN: std::cerr << "step out of run" << std::endl; break;
+		case ASEBA_ASSERT_BREAKPOINT_OUT_OF_BYTECODE_BOUNDS: std::cerr << "breakpoint out of bytecode bounds" << std::endl; break;
+		case ASEBA_ASSERT_EMIT_BUFFER_TOO_LONG: std::cerr << "tried to emit a buffer too long" << std::endl; break;
+		default: std::cerr << "unknown exception" << std::endl; break;
 	}
-	qDebug() << ".\npc = " << vm->pc << ", sp = " << vm->sp;
-	//qDebug() << "\nResetting VM" << std::endl;
-	qDebug() << "\nAborting playground, please report bug to \nhttps://github.com/aseba-community/aseba/issues/new";
+	std::cerr << ".\npc = " << vm->pc << ", sp = " << vm->sp << std::endl;
+	//std::cerr << "\nResetting VM" << std::endl;
+	std::cerr << "\nAborting playground, please report bug to \nhttps://github.com/aseba-community/aseba/issues/new" << std::endl;
 	abort();
 	AsebaVMInit(vm);
 }

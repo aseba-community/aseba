@@ -30,24 +30,20 @@
 
 using namespace Enki;
 
+unsigned Enki::energyPool = INITIAL_POOL_ENERGY;
+
 extern "C" void PlaygroundEPuckNative_energysend(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	// find related VM
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
+	if (epuck)
 	{
-		AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*objectIt);
-		if (epuck && (&(epuck->vm) == vm) && (epuck->energy > EPUCK_INITIAL_ENERGY))
-		{
-			uint16 amount = vm->variables[index];
-			
-			unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
-			playgroundViewer->energyPool += toSend;
-			epuck->energy -= toSend;
-		}
+		const uint16 amount = vm->variables[index];
+		
+		unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
+		energyPool += toSend;
+		epuck->energy -= toSend;
 	}
 }
 
@@ -58,20 +54,14 @@ extern "C" void PlaygroundEPuckNative_energyreceive(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	// find related VM
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
+	if (epuck)
 	{
-		AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*objectIt);
-		if (epuck && (&(epuck->vm) == vm))
-		{
-			uint16 amount = vm->variables[index];
-			
-			unsigned toReceive = std::min((unsigned)amount, (unsigned)playgroundViewer->energyPool);
-			playgroundViewer->energyPool -= toReceive;
-			epuck->energy += toReceive;
-		}
+		uint16 amount = vm->variables[index];
+		
+		unsigned toReceive = std::min((unsigned)amount, energyPool);
+		energyPool -= toReceive;
+		epuck->energy += toReceive;
 	}
 }
 
@@ -82,8 +72,7 @@ extern "C" void PlaygroundEPuckNative_energyamount(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	vm->variables[index] = playgroundViewer->energyPool;
+	vm->variables[index] = energyPool;
 }
 
 extern "C" AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyamount;

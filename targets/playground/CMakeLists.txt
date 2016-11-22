@@ -2,6 +2,7 @@ if (ENKI_FOUND)
 	include_directories(${ENKI_INCLUDE_DIR})
 	
 	set (ASEBASIM_SRC
+		EnkiGlue.cpp
 		AsebaGlue.cpp
 		Door.cpp
 		EPuck.cpp

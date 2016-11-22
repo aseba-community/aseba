@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_THYMIO2_H
-#define __CHALLENGE_THYMIO2_H
+#ifndef __PLAYGROUND_THYMIO2_H
+#define __PLAYGROUND_THYMIO2_H
 
 #include "AsebaGlue.h"
 #include "../../common/utils/utils.h"
@@ -145,4 +145,4 @@ namespace Enki
 	};
 } // Enki
 
-#endif // __CHALLENGE_EPUCK_H
+#endif // __PLAYGROUND_THYMIO2_H

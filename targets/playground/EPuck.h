@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_EPUCK_H
-#define __CHALLENGE_EPUCK_H
+#ifndef __PLAYGROUND_EPUCK_H
+#define __PLAYGROUND_EPUCK_H
 
 #include "AsebaGlue.h"
 #include <enki/PhysicalEngine.h>
@@ -27,6 +27,9 @@
 
 namespace Enki
 {
+	// FIXME: this is ugly and should be attached to Enki::World after ECS refactoring
+	extern unsigned energyPool;
+	
 	class EPuckFeeding : public LocalInteraction
 	{
 	public:
@@ -113,4 +116,4 @@ namespace Enki
 	};
 } // Enki
 
-#endif // __CHALLENGE_EPUCK_H
+#endif // __PLAYGROUND_EPUCK_H
