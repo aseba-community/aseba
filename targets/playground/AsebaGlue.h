@@ -27,8 +27,7 @@
 #include <dashel/dashel.h>
 #include <valarray>
 #include <vector>
-#include <QMap>
-#include <QPair>
+#include <map>
 
 namespace Aseba
 {
@@ -50,8 +49,8 @@ namespace Aseba
 
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	
-	typedef QPair<AbstractNodeGlue*, AbstractNodeConnection*> NodeEnvironment;
-	typedef QMap<AsebaVMState*, NodeEnvironment> VMStateToEnvironment;
+	typedef std::pair<AbstractNodeGlue*, AbstractNodeConnection*> NodeEnvironment;
+	typedef std::map<AsebaVMState*, NodeEnvironment> VMStateToEnvironment;
 
 	extern VMStateToEnvironment vmStateToEnvironment;
 	

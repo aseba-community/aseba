@@ -184,12 +184,12 @@ namespace Enki
 		variables.id = id;
 		variables.productId = ASEBA_PID_PLAYGROUND_EPUCK;
 		
-		vmStateToEnvironment[&vm] = qMakePair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
+		vmStateToEnvironment[&vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
 	}
 	
 	AsebaFeedableEPuck::~AsebaFeedableEPuck()
 	{
-		vmStateToEnvironment.remove(&vm);
+		vmStateToEnvironment.erase(&vm);
 	}
 	
 	void AsebaFeedableEPuck::controlStep(double dt)

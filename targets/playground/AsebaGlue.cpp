@@ -27,6 +27,7 @@
 #include <typeinfo>
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include "AsebaGlue.h"
 #include "EnkiGlue.h"
 #include "../../transport/buffer/vm-buffer.h"
@@ -120,12 +121,12 @@ namespace Aseba
 			stream->read(&lastMessageData[0], lastMessageData.size());
 		
 			// execute event on all VM that are linked to this connection
-			for (VMStateToEnvironment::iterator it(Aseba::vmStateToEnvironment.begin()); it != vmStateToEnvironment.end(); ++it)
+			for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
 			{
-				if (it.value().second == this)
+				if (vmStateToEnvironmentKV.second.second == this)
 				{
-					AsebaProcessIncomingEvents(it.key());
-					AsebaVMRun(it.key(), 1000);
+					AsebaProcessIncomingEvents(vmStateToEnvironmentKV.first);
+					AsebaVMRun(vmStateToEnvironmentKV.first, 1000);
 				}
 			}
 		}
@@ -141,10 +142,10 @@ namespace Aseba
 		{
 			this->stream = 0;
 			// clear breakpoints on all VM that are linked to this connection
-			for (VMStateToEnvironment::iterator it(Aseba::vmStateToEnvironment.begin()); it != vmStateToEnvironment.end(); ++it)
+			for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
 			{
-				if (it.value().second == this)
-					it.key()->breakpointsCount = 0;
+				if (vmStateToEnvironmentKV.second.second == this)
+					vmStateToEnvironmentKV.first->breakpointsCount = 0;
 			}
 		}
 		SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
@@ -173,7 +174,7 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 
 extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeConnection* connection(environment.second);
 	assert(connection);
 	connection->sendBuffer(vm->nodeId, data, length);
@@ -181,7 +182,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 
 extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeConnection* connection(environment.second);
 	assert(connection);
 	return connection->getBuffer(data, maxLength, source);
@@ -189,7 +190,7 @@ extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength
 
 extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	const Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
 	return glue->getDescription();
@@ -197,7 +198,7 @@ extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 
 extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	const Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
 	return glue->getLocalEventsDescriptions();
@@ -205,7 +206,7 @@ extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(As
 
 extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	const Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
 	return glue->getNativeFunctionsDescriptions();
@@ -213,7 +214,7 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 
 extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
 	glue->callNativeFunction(id);
@@ -231,7 +232,7 @@ extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
 
 extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 {
-	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.value(vm));
+	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	const Aseba::AbstractNodeGlue* glue(environment.first);
 	assert(glue);
 	std::cerr << Aseba::FormatableString("\nFatal error: glue %0 with node id %1 of type %2 at has produced exception: ").arg(glue).arg(vm->nodeId).arg(typeid(glue).name()) << std::endl;

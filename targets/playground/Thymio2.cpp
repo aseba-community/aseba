@@ -64,12 +64,12 @@ namespace Enki
 		
 		variables.temperature = 220;
 		
-		vmStateToEnvironment[&vm] = qMakePair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
+		vmStateToEnvironment[&vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
 	}
 	
 	AsebaThymio2::~AsebaThymio2()
 	{
-		vmStateToEnvironment.remove(&vm);
+		vmStateToEnvironment.erase(&vm);
 	}
 	
 	void AsebaThymio2::collisionEvent(PhysicalObject *o)
