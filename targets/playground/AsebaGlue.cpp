@@ -22,18 +22,15 @@
 #define ASEBA_ASSERT
 #endif
 
-#include "EnkiGlue.h"
-#include <QMessageBox>
-#include <QApplication>
+
 #include <string>
 #include <typeinfo>
 #include <algorithm>
 #include <cassert>
 #include "AsebaGlue.h"
-#include "PlaygroundViewer.h"
+#include "EnkiGlue.h"
 #include "../../transport/buffer/vm-buffer.h"
 #include "../../common/utils/FormatableString.h"
-// #include "../../vm/vm.h"
 
 namespace Aseba
 {
@@ -47,11 +44,11 @@ namespace Aseba
 	{
 		try
 		{
-			Dashel::Hub::connect(QString("tcpin:port=%1").arg(port).toStdString());
+			Dashel::Hub::connect(FormatableString("tcpin:port=%0").arg(port));
 		}
 		catch (Dashel::DashelException e)
 		{
-			QMessageBox::critical(0, QApplication::tr("Aseba Playground"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
+			SEND_NOTIFICATION(FATAL_ERROR, "cannot create listening port", std::to_string(port), e.what());
 			abort();
 		}
 	}
@@ -75,10 +72,6 @@ namespace Aseba
 			catch (Dashel::DashelException e)
 			{
 				SEND_NOTIFICATION(LOG_ERROR, "cannot read from socket", stream->getTargetName(), e.what());
-// 				if (Enki::notifyEnvironment)
-// 					Enki::notifyEnvironment(Enki::EnvironmentNotificationType::LOG_ERROR,
-// 						FormatableString("Target %0, cannot read from socket: %1").arg(stream->getTargetName()).arg(e.what())
-// 					);
 			}
 		}
 	}
@@ -107,7 +100,6 @@ namespace Aseba
 			// set new stream as current stream
 			this->stream = stream;
 			SEND_NOTIFICATION(LOG_INFO, "new client connected", stream->getTargetName());
-			//LOG_INFO(QString("New client connected from ") + stream->getTargetName().c_str());
 		}
 	}
 
@@ -140,7 +132,6 @@ namespace Aseba
 		catch (Dashel::DashelException e)
 		{
 			SEND_NOTIFICATION(LOG_ERROR, "cannot read from socket", stream->getTargetName(), e.what());
-			//LOG_ERR(QString("Target %0, cannot read from socket: %1").arg(stream->getTargetName().c_str()).arg(e.what()));
 		}
 	}
 
@@ -157,7 +148,6 @@ namespace Aseba
 			}
 		}
 		SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
-		//LOG_INFO(QString("Client disconnected properly from ") + stream->getTargetName().c_str());
 
 	}
 	
@@ -167,7 +157,6 @@ namespace Aseba
 		for (size_t i = 0; i < toDisconnect.size(); ++i)
 		{
 			SEND_NOTIFICATION(LOG_WARNING, "old client disconnected", toDisconnect[i]->getTargetName());
-			//LOG_WARN(QString("Old client disconnected from ") + toDisconnect[i]->getTargetName().c_str());
 			closeStream(toDisconnect[i]);
 		}
 		toDisconnect.clear();

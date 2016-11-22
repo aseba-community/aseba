@@ -85,31 +85,43 @@ namespace Enki
 		{
 			if (description == "missing Thymio2 feature")
 			{
-				addInfoMessage(QObject::tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(QObject::tr("https://www.thymio.org/en:thymiobuy")));
+				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
 			}
 			else
 				qDebug() << "Unknown description for notifying DISPLAY_INFO" << QString::fromStdString(description);
 		}
-		else if (type == EnvironmentNotificationType::LOG_INFO)
+		else if ((type == EnvironmentNotificationType::LOG_INFO) ||
+				 (type == EnvironmentNotificationType::LOG_WARNING) ||
+				 (type == EnvironmentNotificationType::LOG_ERROR))
 		{
-			// TODO: parse
-			log(description, notificationLogTypeToColor.at(type));
-		}
-		else if (type == EnvironmentNotificationType::LOG_WARNING)
-		{
-			// TODO: parse
-			log(description, notificationLogTypeToColor.at(type));
-		}
-		else if (type == EnvironmentNotificationType::LOG_ERROR)
-		{
-			// TODO: parse
-			log(description, notificationLogTypeToColor.at(type));
+			if (description == "cannot read from socket")
+			{
+				log(tr("Target %0, cannot read from socket: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "new client connected")
+			{
+				log(tr("New client connected from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "cannot read from socket")
+			{
+				log(tr("Target %0, cannot read from socket: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "client disconnected properly")
+			{
+				log(tr("Client disconnected properly from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "old client disconnected")
+			{
+				log(tr("Old client disconnected from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else
+				log(description, notificationLogTypeToColor.at(type));
 		}
 		else if (type == EnvironmentNotificationType::FATAL_ERROR)
 		{
 			if (description == "cannot create listening port")
 			{
-				QMessageBox::critical(0, QApplication::tr("Aseba Playground"), QApplication::tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
+				QMessageBox::critical(0, tr("Aseba Playground"), tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
 				abort();
 			}
 			else
