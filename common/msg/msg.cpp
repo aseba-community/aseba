@@ -187,7 +187,7 @@ namespace Aseba
 		// create message
 		Message *message = messageTypesInitializer.createMessage(type);
 		
-		// preapare message
+		// prepare message
 		message->source = source;
 		message->type = type;
 		
@@ -202,6 +202,23 @@ namespace Aseba
 			abort();
 		}
 		
+		return message;
+	}
+
+	Message* Message::clone() const
+	{
+		// create message
+		Message *message = messageTypesInitializer.createMessage(type);
+
+		// fill headers
+		message->source = source;
+		message->type = type;
+
+		// copy content through the serialization buffer
+		SerializationBuffer content;
+		serializeSpecific(content);
+		message->deserializeSpecific(content);
+
 		return message;
 	}
 	

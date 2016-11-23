@@ -12,12 +12,8 @@ if (ENKI_FOUND)
 		Thymio2-natives.cpp
 		Thymio2-descriptions.c
 	)
-	
-	qt4_wrap_cpp(ASEBASIM_MOCS
-		Thymio2.h
-	)
 
-	add_library(asebasim ${ASEBASIM_SRC} ${ASEBASIM_MOCS})
+	add_library(asebasim ${ASEBASIM_SRC})
 	set_target_properties(asebasim PROPERTIES VERSION ${LIB_VERSION_STRING} 
 											SOVERSION ${LIB_VERSION_MAJOR})
 	

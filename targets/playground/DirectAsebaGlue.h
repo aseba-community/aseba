@@ -76,7 +76,7 @@ namespace Enki
 			while (!inQueue.empty())
 			{
 				// serialize message into reception buffer
-				const auto message(inQueue.front());
+				const auto message(inQueue.front().get());
 				lastMessageSource = message->source;
 				Aseba::Message::SerializationBuffer content;
 				message->serializeSpecific(content);

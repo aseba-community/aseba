@@ -1,3 +1,5 @@
+add_subdirectory(simulator)
+
 # two test executable
 add_library(asebavmdummycallbacks STATIC
 	asebavmdummycallbacks.cpp
