@@ -74,12 +74,9 @@ namespace Enki
 		virtual void controlStep(double dt);
 	};
 	
-	class AsebaFeedableEPuck : public FeedableEPuck, public Aseba::AbstractNodeGlue, public Aseba::SimpleDashelConnection
+	class AsebaFeedableEPuck : public FeedableEPuck, public Aseba::SingleVMNodeGlue
 	{
 	public:
-		AsebaVMState vm;
-		std::valarray<unsigned short> bytecode;
-		std::valarray<signed short> stack;
 		struct Variables
 		{
 			sint16 id;
@@ -100,8 +97,7 @@ namespace Enki
 		} variables;
 		
 	public:
-		AsebaFeedableEPuck(unsigned port, int id);
-		virtual ~AsebaFeedableEPuck();
+		AsebaFeedableEPuck(int id);
 		
 		// from FeedableEPuck
 		

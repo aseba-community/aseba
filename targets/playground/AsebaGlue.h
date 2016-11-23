@@ -24,7 +24,6 @@
 #include "../../common/types.h"
 #include "../../common/consts.h"
 #include "../../vm/natives.h"
-#include <dashel/dashel.h>
 #include <valarray>
 #include <vector>
 #include <map>
@@ -35,10 +34,22 @@ namespace Aseba
 
 	struct AbstractNodeGlue
 	{
+		// to be implemente by robots
 		virtual const AsebaVMDescription* getDescription() const = 0;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const = 0;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const = 0;
 		virtual void callNativeFunction(uint16 id) = 0;
+		
+		// to be implemented by subclasses of robots for communicating with the external world
+		virtual void externalInputStep(double dt) = 0;
+	};
+	
+	struct SingleVMNodeGlue: AbstractNodeGlue
+	{
+		// VM implementation
+		AsebaVMState vm;
+		std::valarray<unsigned short> bytecode;
+		std::valarray<signed short> stack;
 	};
 
 	struct AbstractNodeConnection
@@ -54,7 +65,7 @@ namespace Aseba
 
 	extern VMStateToEnvironment vmStateToEnvironment;
 	
-	// Implementation of the connection using Dashel
+	// Buffer for data reception
 	
 	class RecvBufferNodeConnection: public AbstractNodeConnection
 	{
@@ -64,23 +75,6 @@ namespace Aseba
 		
 	public:
 		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source);
-	};
-
-	class SimpleDashelConnection: public RecvBufferNodeConnection, public Dashel::Hub
-	{
-		Dashel::Stream* stream;
-		std::vector<Dashel::Stream*> toDisconnect; // all streams that must be disconnected at next step
-
-	public:
-		SimpleDashelConnection(unsigned port);
-		
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length);
-		
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-		
-		void closeOldStreams();
 	};
 	
 } // Aseba

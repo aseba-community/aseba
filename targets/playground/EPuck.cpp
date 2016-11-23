@@ -163,8 +163,7 @@ namespace Enki
 	
 	// AsebaFeedableEPuck
 	
-	AsebaFeedableEPuck::AsebaFeedableEPuck(unsigned port, int id):
-		SimpleDashelConnection(port)
+	AsebaFeedableEPuck::AsebaFeedableEPuck(int id)
 	{
 		vm.nodeId = id;
 		
@@ -183,23 +182,10 @@ namespace Enki
 		
 		variables.id = id;
 		variables.productId = ASEBA_PID_PLAYGROUND_EPUCK;
-		
-		vmStateToEnvironment[&vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
-	}
-	
-	AsebaFeedableEPuck::~AsebaFeedableEPuck()
-	{
-		vmStateToEnvironment.erase(&vm);
 	}
 	
 	void AsebaFeedableEPuck::controlStep(double dt)
 	{
-		// do a network step
-		Hub::step();
-		
-		// disconnect old streams
-		closeOldStreams();
-		
 		// get physical variables
 		variables.prox[0] = static_cast<sint16>(infraredSensor0.getValue());
 		variables.prox[1] = static_cast<sint16>(infraredSensor1.getValue());
@@ -217,6 +203,11 @@ namespace Enki
 		}
 		
 		variables.energy = static_cast<sint16>(energy);
+		
+		// process external inputs (incoming event from network or environment, etc.)
+		externalInputStep(dt);
+		
+		// FIXME: running the VM should be done in a soft timer to be independant of time step
 		
 		// run VM
 		AsebaVMRun(&vm, 1000);

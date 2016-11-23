@@ -28,7 +28,7 @@
 
 namespace Enki
 {
-	class AsebaThymio2 : public Thymio2, public Aseba::AbstractNodeGlue, public Aseba::SimpleDashelConnection
+	class AsebaThymio2 : public Thymio2, public Aseba::SingleVMNodeGlue
 	{
 	public:
 		enum Thymio2Events
@@ -54,9 +54,6 @@ namespace Enki
 		};
 		
 	public:
-		AsebaVMState vm;
-		std::valarray<unsigned short> bytecode;
-		std::valarray<signed short> stack;
 		struct Variables
 		{
 			sint16 id;
@@ -112,8 +109,7 @@ namespace Enki
 		bool thisStepCollided;
 		
 	public:
-		AsebaThymio2(unsigned port);
-		virtual ~AsebaThymio2();
+		AsebaThymio2();
 		
 		// from PhysicalObject
 		
@@ -135,6 +131,7 @@ namespace Enki
 		virtual void callNativeFunction(uint16 id);
 		
 	protected:
+		
 		void timer0Timeout();
 		void timer1Timeout();
 		void timer100HzTimeout();
@@ -143,6 +140,7 @@ namespace Enki
 		friend class Thymio2Interface;
 		void execLocalEvent(uint16 number);
 	};
+	
 } // Enki
 
 #endif // __PLAYGROUND_THYMIO2_H

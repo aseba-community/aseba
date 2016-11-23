@@ -29,8 +29,7 @@
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
 #include "EnkiGlue.h"
-#include "EPuck.h"
-#include "Thymio2.h"
+#include "DashelAsebaGlue.h"
 #include "../../common/utils/utils.h"
 #include <QMessageBox>
 #include <QApplication>
@@ -202,7 +201,7 @@ namespace Enki
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
 		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-		managedObjectsAliases[&typeid(AsebaThymio2)] = &typeid(Thymio2);
+		managedObjectsAliases[&typeid(DashelAsebaThymio2)] = &typeid(Thymio2);
 	}
 	
 	void PlaygroundViewer::sceneCompletedHook()

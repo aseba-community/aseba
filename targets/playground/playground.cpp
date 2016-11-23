@@ -26,10 +26,8 @@
 */
 
 
-#include "AsebaGlue.h"
+#include "DashelAsebaGlue.h"
 #include "Door.h"
-#include "EPuck.h"
-#include "Thymio2.h"
 #include "PlaygroundViewer.h"
 #include <QtXml>
 #include <QApplication>
@@ -331,7 +329,7 @@ int main(int argc, char *argv[])
 	while (!ePuckE.isNull())
 	{
 		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());	
-		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(port, asebaServerCount + 1));
+		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, asebaServerCount + 1));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
@@ -346,7 +344,7 @@ int main(int argc, char *argv[])
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(port));
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();

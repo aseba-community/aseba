@@ -41,6 +41,7 @@ if (ENKI_FOUND)
 		include(${QT_USE_FILE})
 		
 		set(playground_SRCS
+			DashelAsebaGlue.cpp
 			PlaygroundViewer.cpp
 			PlaygroundDBusAdaptors.cpp
 			playground.cpp

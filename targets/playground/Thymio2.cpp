@@ -21,7 +21,6 @@
 #include "Thymio2.h"
 #include "Thymio2-natives.h"
 #include "Parameters.h"
-#include "PlaygroundViewer.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
 
@@ -30,8 +29,7 @@ namespace Enki
 	using namespace std;
 	using namespace Aseba;
 	
-	AsebaThymio2::AsebaThymio2(unsigned port):
-		SimpleDashelConnection(port),
+	AsebaThymio2::AsebaThymio2():
 		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
 		timer1(bind(&AsebaThymio2::timer1Timeout, this), 0),
 		timer100Hz(bind(&AsebaThymio2::timer100HzTimeout, this), 0.01),
@@ -63,13 +61,6 @@ namespace Enki
 		variables.productId = ASEBA_PID_THYMIO2;
 		
 		variables.temperature = 220;
-		
-		vmStateToEnvironment[&vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
-	}
-	
-	AsebaThymio2::~AsebaThymio2()
-	{
-		vmStateToEnvironment.erase(&vm);
 	}
 	
 	void AsebaThymio2::collisionEvent(PhysicalObject *o)
@@ -174,11 +165,8 @@ namespace Enki
 		timer1.step(dt);
 		timer100Hz.step(dt);
 		
-		// do a network step, if there are some events from the network, they will be executed
-		Hub::step();
-		
-		// disconnect old streams
-		closeOldStreams();
+		// process external inputs (incoming event from network or environment, etc.)
+		externalInputStep(dt);
 		
 		// set physical variables
 		leftSpeed = double(variables.motorLeftTarget) * 16.6 / 500.;
