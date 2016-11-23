@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 		
 		if (fileName.isEmpty())
 		{
-			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog\n";
+			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog" << std::endl;
 			exit(1);
 		}
 		
@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
-		viewer.log(QString("New e-puck on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New e-puck on port %0").arg(port), Qt::white);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 		thymio->pos.y = thymioE.attribute("y").toDouble();
 		thymio->angle = thymioE.attribute("angle").toDouble();
 		world.addObject(thymio);
-		viewer.log(QString("New Thymio II on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New Thymio II on port %0").arg(port), Qt::white);
 		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
 	
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
 		QStringList args(command.split(" ", QString::SkipEmptyParts));
 		if (args.size() == 0)
 		{
-			viewer.log("Missing program in command", Qt::red);
+			viewer.log(app.tr("Missing program in command"), Qt::red);
 		}
 		else
 		{
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Show and run
-	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowTitle(app.tr("Aseba Playground - Simulate your robots!"));
 	viewer.show();
 	
 	// If D-Bus is used, register the viewer object
