@@ -4,6 +4,7 @@ if (ENKI_FOUND)
 	set (ASEBASIM_SRC
 		EnkiGlue.cpp
 		AsebaGlue.cpp
+		DirectAsebaGlue.cpp
 		Door.cpp
 		EPuck.cpp
 		EPuck-descriptions.c

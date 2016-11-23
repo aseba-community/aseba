@@ -73,7 +73,7 @@ namespace Enki
 		
 	protected:
 		
-		// from Aseba::SimpleDashelConnection
+		// from AbstractNodeGlue
 		
 		virtual void externalInputStep(double dt)
 		{
