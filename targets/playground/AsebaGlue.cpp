@@ -18,6 +18,10 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef ASEBA_ASSERT
+#define ASEBA_ASSERT
+#endif
+
 #include <string>
 #include <typeinfo>
 #include <algorithm>
@@ -25,11 +29,8 @@
 #include <cstring>
 #include "AsebaGlue.h"
 #include "EnkiGlue.h"
+#include "../../vm/vm.h"
 #include "../../common/utils/FormatableString.h"
-
-#ifndef ASEBA_ASSERT
-#define ASEBA_ASSERT
-#endif
 
 namespace Aseba
 {
