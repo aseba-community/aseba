@@ -101,7 +101,7 @@ pipeline {
 			steps {
 				unstash 'aseba'
 				dir('build/aseba') {
-					sh "ctest -E 'e2e.*|simulate.*|.*http.*|valgrind.*'"
+					sh "LANG=C ctest -E 'e2e.*|simulate.*|.*http.*|valgrind.*'"
 				}
 			}
 		}
