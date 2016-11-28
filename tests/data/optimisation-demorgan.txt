@@ -1,0 +1,14 @@
+var a = 0
+var b = 0
+
+when not (a == 0 and 0 == 0) do
+	a = 1
+end
+
+when not (a > b and 0 == 0) do
+	a = 1
+end
+
+when not (a > b and b+1 == a) do
+	b = 1
+end
