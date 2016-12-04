@@ -1,0 +1,18 @@
+# SCENARIO Can insert and retrieve at either end
+# 	GIVEN An empty Deque of size 5
+
+var dq[7] = [ 5, 3, 30, 40, 50, 10, 20 ]
+var require1[3]
+
+# 	WHEN Get 3 elements from position 1
+
+call deque.get(dq, require1, 1)
+
+# 		THEN Obtain 20, 30, 40
+# 			REQUIRE result == 20, 30, 40
+
+# 	WHEN Set 2 elements 3, 4 at position 2
+# 		THEN 30, 40 become 3, 4
+# 			REQUIRE contents == 10, 20, 3, 4, 50
+
+call deque.set(dq, [3,4], 2)

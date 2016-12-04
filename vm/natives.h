@@ -205,9 +205,46 @@ uint16 AsebaGetRandom(void);
 void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
+	
+/*! Function that reports size of deque dest in size */
+void AsebaNative_deqsize(AsebaVMState *vm);
+/*! Description of AsebaNative_deqsize */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqsize;
+/*! Function that copies index-th len-dest elements of deque src to dest */
+void AsebaNative_deqget(AsebaVMState *vm);
+/*! Description of AsebaNative_deqget */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqget;
+/*! Function that copies len-src elements of src to index-th position of deque dest */
+void AsebaNative_deqset(AsebaVMState *vm);
+/*! Description of AsebaNative_deqset */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqset;
+/*! Function that copies len-src elements of src before index-th position of deque dest */
+void AsebaNative_deqinsert(AsebaVMState *vm);
+/*! Description of AsebaNative_deqinsert */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqinsert;
+/*! Function that erases len elements from deque dest starting from index-th position */
+void AsebaNative_deqerase(AsebaVMState *vm);
+/*! Description of AsebaNative_deqerase */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqerase;
+/*! Function that copies len-src elements of src before the front of deque dest */
+void AsebaNative_deqpushfront(AsebaVMState *vm);
+/*! Description of AsebaNative_deqpushfront */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqpushfront;
+/*! Function that copies len-src elements of src after the end of deque dest */
+void AsebaNative_deqpushback(AsebaVMState *vm);
+/*! Description of AsebaNative_deqpushback */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqpushback;
+/*! Function that erases len elements from deque dest starting at the front */
+void AsebaNative_deqpopfront(AsebaVMState *vm);
+/*! Description of AsebaNative_deqpopfront */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqpopfront;
+/*! Function that erases len elements from deque dest starting from the end */
+void AsebaNative_deqpopback(AsebaVMState *vm);
+/*! Description of AsebaNative_deqpopback */
+extern const AsebaNativeFunctionDescription AsebaNativeDescription_deqpopback;
 
 /*! Embedded targets must know the size of ASEBA_NATIVES_STD_FUNCTIONS without having to compute them by hand, please update this when adding a new function */
-#define ASEBA_NATIVES_STD_COUNT 21
+#define ASEBA_NATIVES_STD_COUNT 30
 
 /*! snippet to include standard native functions */
 #define ASEBA_NATIVES_STD_FUNCTIONS \
@@ -231,7 +268,16 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	AsebaNative_mathcos, \
 	AsebaNative_mathrot2, \
 	AsebaNative_mathsqrt, \
-	AsebaNative_rand
+	AsebaNative_rand, \
+	AsebaNative_deqsize, \
+	AsebaNative_deqget, \
+	AsebaNative_deqset, \
+	AsebaNative_deqinsert, \
+	AsebaNative_deqerase, \
+	AsebaNative_deqpushfront, \
+	AsebaNative_deqpushback, \
+	AsebaNative_deqpopfront, \
+	AsebaNative_deqpopback
 
 /*! snippet to include descriptions of standard native functions */
 #define ASEBA_NATIVES_STD_DESCRIPTIONS \
@@ -255,7 +301,16 @@ extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
 	&AsebaNativeDescription_mathcos, \
 	&AsebaNativeDescription_mathrot2, \
 	&AsebaNativeDescription_mathsqrt, \
-	&AsebaNativeDescription_rand
+	&AsebaNativeDescription_rand, \
+	&AsebaNativeDescription_deqsize, \
+	&AsebaNativeDescription_deqget, \
+	&AsebaNativeDescription_deqset, \
+	&AsebaNativeDescription_deqinsert, \
+	&AsebaNativeDescription_deqerase, \
+	&AsebaNativeDescription_deqpushfront, \
+	&AsebaNativeDescription_deqpushback, \
+	&AsebaNativeDescription_deqpopfront, \
+	&AsebaNativeDescription_deqpopback
 
 /*@}*/
 

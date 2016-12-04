@@ -1,0 +1,11 @@
+# SCENARIO deque.erase error toobig erase more elements than there are beyond the index in the deque
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+
+# 	WHEN Erase more elements than there are beyond the index in the deque
+
+call deque.erase(dq, 1, 3) # note that there are 3 elements in the deque but only 2 after index 1
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS
