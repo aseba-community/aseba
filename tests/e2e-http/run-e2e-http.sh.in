@@ -1,0 +1,61 @@
+#!/bin/bash
+
+[ "$MSYSTEM" = "MINGW32" ] && TCP="tcp:127.0.0.1" || TCP="tcp:"
+
+# clean up previous session
+which killall >/dev/null 2>&1 \
+    && killall aseba{dummynode,switch,massloader,http,scratch} \
+    || ps | egrep 'aseba(dummynode|switch|massloader|http)' | while read pid rest; do kill $pid; done
+for i in 0 1 2 3 4 5 6 7 8; do ASEBADUMMYNODE $i & done
+sleep 3
+
+# localhost:3000 bridges a switch with 4 cooperating nodes:
+#   dummynode-0 targetId=1 aeslId=1 LISTENER1
+#   dummynode-1 targetId=2 aeslId=2 LISTENER2
+#   dummynode-2 targetId=3 aeslId=3 LISTENER3
+#   dummynode-3 targetId=4 aeslId=4 CLOCK
+# it also offers Dashel target tcp:;port=33330
+ASEBASWITCH -p 33332 $(for i in 0 1 2 3; do echo $TCP';port='$[ 33333 + $i ]; done) 1>&2 &
+ASEBAMASSLOADER ping0123.aesl $TCP';port=33332' 1>&2 & sleep 10 ; kill $!
+ASEBASWITCH -d -p 33331 $TCP';port=33332' 1>&2 2| head -20 1>&2
+ASEBAHTTP --http 3000 --aesl ping0123.aesl --port 33330 \
+    $TCP';port=33332' 1>&2 &
+
+# localhost:3001 is its own switch with 4 cooperating nodes:
+#   dummynode-4 targetId=5 aeslId=1 LISTENER1
+#   dummynode-5 targetId=6 aeslId=1 LISTENER1 (same role as dummynode-4)
+#   dummynode-6 targetId=7 aeslId=4 CLOCK)
+#   dummynode-7 targetId=8 aeslId=4 LISTENER2 (same id dummynode-5)
+ASEBAHTTP --http 3001 --aesl ping0123.aesl \
+    $TCP';port=33337;remapTarget=5;remapLocal=1' \
+    $TCP';port=33338;remapTarget=6;remapAesl=1' \
+    $TCP';port=33339;remapTarget=7;remapAesl=4' \
+    $TCP';port=33340;remapTarget=8;remapAesl=2;remapLocal=6' \
+    $TCP';port=33341;remapTarget=9;remapAesl=3' 1>&2 &
+
+sleep 30 # let switches start up
+
+# localhost:3003 is a switch that cascades localhost:3001 through its Dashel target tcp:;port=33330
+ASEBAHTTP --http 3003 --aesl ping0123.aesl \
+	  'tcp:;port=33330' 1>&2 &
+
+sleep 30 # let switches start up
+
+# run e2e tests
+# jasmine-node --verbose --color *_spec.js
+export PATH=${PATH}:./node_modules/jasmine-node/bin
+jasmine-node 3000-*_spec.js
+jasmine-node 3001-*_spec.js
+jasmine-node 3003-*_spec.js
+status=$?
+
+# optional tests with a real Thymio-II
+[ -x "DASHELPORTLIST" ] && target=$(DASHELPORTLIST | grep -m1 Thymio) &&
+    ( ASEBAHTTP --http 3002 --aesl thymio.aesl "ser:name=Thymio" & ) &&
+    sleep 5 &&
+    jasmine-node 3002-*_spec.js
+
+# clean up
+[ -z "$(jobs -p)" ] || kill %%
+
+exit $status
