@@ -154,6 +154,9 @@ int main(int argc, char *argv[])
 		QImage image(groundTextureFileName);
 		if (!image.isNull())
 		{
+			// flip vertically as y-coordinate is inverted in an image
+			image = image.mirrored();
+			// convert to a specific format and copy the underlying data to Enki
 			image = image.convertToFormat(QImage::Format_ARGB32);
 			groundTexture.width = image.width();
 			groundTexture.height = image.height();
