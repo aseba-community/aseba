@@ -20,7 +20,7 @@
 
 #include "Thymio2-natives.h"
 #include "Thymio2.h"
-#include "PlaygroundViewer.h"
+#include "EnkiGlue.h"
 #include "../../common/consts.h"
 
 using namespace Enki;
@@ -37,6 +37,11 @@ static sint16 clampValueTo32(sint16 v)
 		return v;
 }
 
+void notifyMissingFeature()
+{
+	SEND_NOTIFICATION(DISPLAY_INFO, "missing Thymio2 feature");
+}
+
 // simulated native functions
 
 // sound
@@ -47,6 +52,8 @@ extern "C" void PlaygroundThymio2Native_sound_record(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sound_play(AsebaVMState *vm)
@@ -55,6 +62,8 @@ extern "C" void PlaygroundThymio2Native_sound_play(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
@@ -63,6 +72,8 @@ extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
 
 	// do nothing for now
 	ASEBA_UNUSED(number);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
@@ -71,6 +82,9 @@ extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
+	
+	if (number != -1)
+		notifyMissingFeature();
 }
 
 
@@ -82,6 +96,8 @@ extern "C" void PlaygroundThymio2Native_sound_freq(AsebaVMState * vm)
 	// do nothing for now
 	ASEBA_UNUSED(freq);
 	ASEBA_UNUSED(time);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sound_wave(AsebaVMState * vm)
@@ -90,6 +106,8 @@ extern "C" void PlaygroundThymio2Native_sound_wave(AsebaVMState * vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(waveAddr);
+	
+	notifyMissingFeature();
 }
 
 // leds
@@ -104,53 +122,33 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
-	ASEBA_UNUSED(l4);
-	ASEBA_UNUSED(l5);
-	ASEBA_UNUSED(l6);
-	ASEBA_UNUSED(l7);
-}
 
-static double paramToColor(sint16 param)
-{
-	return (param*5.46875+80) / 255.;
-}
-
-static double _fmax(double x, double y)
-{
-	if (x > y)
-		return x;
-	else
-		return y;
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		thymio2->setLedIntensity(Thymio2::RING_0, l0/32.);
+		thymio2->setLedIntensity(Thymio2::RING_1, l1/32.);
+		thymio2->setLedIntensity(Thymio2::RING_2, l2/32.);
+		thymio2->setLedIntensity(Thymio2::RING_3, l3/32.);
+		thymio2->setLedIntensity(Thymio2::RING_4, l4/32.);
+		thymio2->setLedIntensity(Thymio2::RING_5, l5/32.);
+		thymio2->setLedIntensity(Thymio2::RING_6, l6/32.);
+		thymio2->setLedIntensity(Thymio2::RING_7, l7/32.);
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 {
-	const double r(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double g(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double b(paramToColor(clampValueTo32(vm->variables[AsebaNativePopArg(vm)])));
-	const double a(_fmax(_fmax(r, g), b));
-	
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
-	
-	// find related VM
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
 	{
-		AsebaThymio2 *thymio2 = dynamic_cast<AsebaThymio2*>(*objectIt);
-		if (thymio2 && (&(thymio2->vm) == vm))
-		{
-			// change color of Enki object
-			thymio2->setColor(Color(1.- a + a*r, 1.- a + a*g, 1. - a + a*b));
-		}
+		thymio2->setLedColor(Thymio2::TOP, Color(param*r,param*g,param*b,a/32.));
 	}
 }
 
@@ -159,11 +157,14 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		thymio2->setLedColor(Thymio2::BOTTOM_RIGHT, Color(param*r,param*g,param*b,a/32.));
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
@@ -171,11 +172,14 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(g);
-	ASEBA_UNUSED(b);
+	const sint16 a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		thymio2->setLedColor(Thymio2::BOTTOM_LEFT, Color(param*r,param*g,param*b,a/32.));
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
@@ -184,12 +188,15 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
+
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		thymio2->setLedIntensity(Thymio2::BUTTON_UP,    l0/32.);
+		thymio2->setLedIntensity(Thymio2::BUTTON_RIGHT, l1/32.);
+		thymio2->setLedIntensity(Thymio2::BUTTON_DOWN,  l2/32.);
+		thymio2->setLedIntensity(Thymio2::BUTTON_LEFT,  l3/32.);
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
@@ -202,26 +209,31 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
-	// do nothing for now
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
-	ASEBA_UNUSED(l2);
-	ASEBA_UNUSED(l3);
-	ASEBA_UNUSED(l4);
-	ASEBA_UNUSED(l5);
-	ASEBA_UNUSED(l6);
-	ASEBA_UNUSED(l7);
+
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_0, l0/32.);
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_1, l1/32.);
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_2, l2/32.);
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_3, l3/32.);
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_4, l4/32.);
+		thymio2->setLedIntensity(Thymio2::IR_FRONT_5, l5/32.);
+		thymio2->setLedIntensity(Thymio2::IR_BACK_0,  l6/32.);
+		thymio2->setLedIntensity(Thymio2::IR_BACK_1,  l7/32.);
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_leds_prox_v(AsebaVMState *vm)
 {
 	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	
+
 	// do nothing for now
 	ASEBA_UNUSED(l0);
 	ASEBA_UNUSED(l1);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_leds_rc(AsebaVMState *vm)
@@ -230,6 +242,8 @@ extern "C" void PlaygroundThymio2Native_leds_rc(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(l0);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_leds_sound(AsebaVMState *vm)
@@ -238,6 +252,8 @@ extern "C" void PlaygroundThymio2Native_leds_sound(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(l0);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_leds_temperature(AsebaVMState *vm)
@@ -248,6 +264,8 @@ extern "C" void PlaygroundThymio2Native_leds_temperature(AsebaVMState *vm)
 	// do nothing for now
 	ASEBA_UNUSED(r);
 	ASEBA_UNUSED(b);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_prox_comm_enable(AsebaVMState *vm)
@@ -256,6 +274,8 @@ extern "C" void PlaygroundThymio2Native_prox_comm_enable(AsebaVMState *vm)
 	
 	// do nothing for now
 	ASEBA_UNUSED(enable);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
@@ -266,6 +286,8 @@ extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
 	// do nothing for now
 	ASEBA_UNUSED(number);
 	ASEBA_UNUSED(statusAddr);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
@@ -278,6 +300,8 @@ extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
 	ASEBA_UNUSED(dataAddr);
 	ASEBA_UNUSED(statusAddr);
 	ASEBA_UNUSED(dataLength);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
@@ -290,6 +314,8 @@ extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
 	ASEBA_UNUSED(dataAddr);
 	ASEBA_UNUSED(statusAddr);
 	ASEBA_UNUSED(dataLength);
+	
+	notifyMissingFeature();
 }
 
 extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
@@ -300,4 +326,6 @@ extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
 	// do nothing for now
 	ASEBA_UNUSED(seek);
 	ASEBA_UNUSED(statusAddr);
+	
+	notifyMissingFeature();
 }

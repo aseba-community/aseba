@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_THYMIO2_NATIVES_H
-#define __CHALLENGE_THYMIO2_NATIVES_H
+#ifndef __PLAYGROUND_THYMIO2_NATIVES_H
+#define __PLAYGROUND_THYMIO2_NATIVES_H
 
 #include "../../vm/vm.h"
 #include "../../vm/natives.h"
@@ -143,4 +143,4 @@ extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sd_
 	PlaygroundThymio2Native_sd_read, \
 	PlaygroundThymio2Native_sd_seek
 
-#endif // __CHALLENGE_THYMIO2_NATIVES_H
+#endif // __PLAYGROUND_THYMIO2_NATIVES_H

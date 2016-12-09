@@ -1,0 +1,159 @@
+<!DOCTYPE aseba-playground>
+
+<!-- Aseba playground for practicing algorithms for R2T2, Remote Rescue using Thymio2 -->
+<!-- 1. Push the blue obstacle out of the way to free the access to the door -->
+<!-- 2. Find the spots on the floor and place one robot on each -->
+<!-- 3. Look at the generator by placing a robot in front of each window -->
+<!-- 4. Restart the generator by blinking the LEDs in sequence -->
+
+<!-- This is the final position of the complete scenario. 	-->
+<!-- Sector A: Thymio-II targets 33333 - 33336 			-->
+<!-- Sector B: Thymio-II targets 33337 - 33340 			-->
+<!-- Sector C: Thymio-II targets 33341 - 33344 			-->
+<!-- Sector D: Thymio-II targets 33345 - 33348 			-->
+<!-- Generator: E-puck targets 33331 (center), 33332 (runner) 	-->
+
+<aseba-playground>
+	<author name="Francesco Mondada" email="francesco dot mondada at epfl dot ch" />
+	<author name="Norbert Crot" email="norbert dot crot at epfl dot ch" />
+	<author name="David James Sherman" email="david dot sherman at inria dot fr" />
+	<description lang="en">Final position of R2T2. <br/>
+	  <i>Remote Rescue using Thymio2</i> is a multi-team exercise
+	  with 16 robots that must collaborate to restart a failed generator on a Mars base.
+	  Completing the exercise requires 4 steps:
+	  <ol>
+	    <li>Push the blue obstacle out of the way to free the access to the door </li>
+	    <li>Find the spots on the floor and place one robot on each </li>
+	    <li>Look at the generator by placing a robot in front of each window </li>
+	    <li>Restart the generator by blinking the LEDs in sequence </li>
+	  </ol>
+	  This playground represents the <b>final position</b> of the complete scenario.
+	  <ul>
+	    <li><b>Sector A:</b> Thymio-II targets 33333&ndash;33336 </li>
+	    <li><b>Sector B:</b> Thymio-II targets 33337&ndash;33340 </li>
+	    <li><b>Sector C:</b> Thymio-II targets 33341&ndash;33344 </li>
+	    <li><b>Sector D:</b> Thymio-II targets 33345&ndash;33348 </li>
+	    <li><b>Generator:</b> E-puck targets 33331 (center), 33332 (runner) </li>
+	  </ul>
+	</description>
+	<description lang="fr">Position finale de R2T2. <br/>
+	  <i>Remote Rescue using Thymio2</i> est un exercice multi-équipe
+	  avec 16 robots qui doivent collaborer pour rédémarrer un générateur endommagé sur une base martienne.
+	  Pour réussir l'exercice il faut accomplir 4 étapes :
+	  <ol>
+	    <li>Pousser l'obstacle bleue pour libérer l'accès à la porte </li>
+	    <li>Trouver les points blancs et placer un robbot dessus </li>
+	    <li>Contrôler le générateur en plaçant un robot devant chaque fenêtre </li>
+	    <li>Rédémarrer le generateur en cligotant les LEDs en cadence </li>
+	  </ol>
+	  Ce terrain représente la <b>position finale</b> du scénario complet.
+	  <ul>
+	    <li><b>Sector A:</b> cibles Thymio-II 33333&ndash;33336 </li>
+	    <li><b>Sector B:</b> cibles Thymio-II 33337&ndash;33340 </li>
+	    <li><b>Sector C:</b> cibles Thymio-II 33341&ndash;33344 </li>
+	    <li><b>Sector D:</b> cibles Thymio-II 33345&ndash;33348 </li>
+	    <li><b>Generator:</b> cibles E-puck 33331 (centre), 33332 (coureur) </li>
+	  </ul>
+	</description>
+	<externalLink lang="en" type="wiki" target="https://www.thymio.org/en:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+	<externalLink lang="fr" type="wiki" target="https://www.thymio.org/fr:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+	<externalLink lang="it" type="wiki" target="https://www.thymio.org/it:thymio-r2t2">Remote Rescue using Thymio2</externalLink>
+
+	<color name="white" r="1.0" g="1.0" b="1.0" />
+	<color name="wall" r="0.9" g="0.9" b="0.9" />
+	<color name="red" r="0.77" g="0.2" b="0.15" />
+	<color name="green" r="0" g="0.5" b="0.17" />
+	<color name="blue" r="0" g="0.38" b="0.61" />
+	<color name="cornflower" r="0.39" g="0.58" b="0.93" />
+
+	<world w="480" h="480" color="white" groundTexture="r2t2-complete.png" />
+	<wall x="278.25" y="77.26" l1="48.50" l2="2.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="202.65" y="415.14" l1="48.50" l2="2.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="409.40" y="283.99" l1="48.50" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="71.52" y="208.39" l1="48.50" l2="2.00" h="15.00" color="wall" angle="1.571" />
+	<wall x="190.50" y="77.26" l1="71.00" l2="2.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="290.40" y="415.14" l1="71.00" l2="2.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="409.40" y="196.24" l1="71.00" l2="2.00" h="15.00" color="wall" angle="1.571" />
+	<wall x="71.52" y="296.14" l1="71.00" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="156.00" y="89.26" l1="2.00" l2="26.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="324.90" y="403.14" l1="2.00" l2="26.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="397.40" y="161.74" l1="2.00" l2="26.00" h="15.00" color="wall" angle="1.571" />
+	<wall x="83.52" y="330.64" l1="2.00" l2="26.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="190.50" y="101.26" l1="71.00" l2="2.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="290.40" y="391.14" l1="71.00" l2="2.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="385.40" y="196.24" l1="71.00" l2="2.00" h="15.00" color="wall" angle="1.571" />
+	<wall x="95.52" y="296.14" l1="71.00" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="290.00" y="101.26" l1="72.00" l2="2.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="190.90" y="391.14" l1="72.00" l2="2.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="385.40" y="295.74" l1="72.00" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="95.52" y="196.64" l1="72.00" l2="2.00" h="15.00" color="wall" angle="1.571" />
+	<wall x="340.00" y="116.26" l1="44.43" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="140.90" y="376.14" l1="44.43" l2="2.00" h="15.00" color="wall" angle="-2.356" />
+	<wall x="370.40" y="345.74" l1="44.43" l2="2.00" h="15.00" color="wall" angle="-0.785" />
+	<wall x="110.52" y="146.64" l1="44.43" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="142.00" y="148.76" l1="205.65" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="338.90" y="343.64" l1="205.65" l2="2.00" h="15.00" color="wall" angle="-2.356" />
+	<wall x="339.00" y="148.76" l1="205.65" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="141.90" y="343.64" l1="205.65" l2="2.00" h="15.00" color="wall" angle="-0.785" />
+	<wall x="240.50" y="198.76" l1="2.00" l2="21.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="240.40" y="293.64" l1="2.00" l2="21.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="287.90" y="246.24" l1="2.00" l2="21.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="193.02" y="246.14" l1="2.00" l2="21.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="141.00" y="116.26" l1="44.43" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="339.90" y="376.14" l1="44.43" l2="2.00" h="15.00" color="wall" angle="-0.785" />
+	<wall x="370.40" y="146.74" l1="44.43" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="110.52" y="345.64" l1="44.43" l2="2.00" h="15.00" color="wall" angle="-2.356" />
+	<wall x="240.50" y="209.76" l1="11.00" l2="2.00" h="15.00" color="wall" angle="0.000" />
+	<wall x="240.40" y="282.64" l1="11.00" l2="2.00" h="15.00" color="wall" angle="3.142" />
+	<wall x="276.90" y="246.24" l1="11.00" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="204.02" y="246.14" l1="11.00" l2="2.00" h="15.00" color="wall" angle="-1.570" />
+	<wall x="214.25" y="220.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="266.65" y="271.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-0.785" />
+	<wall x="266.15" y="219.99" l1="11.19" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="214.77" y="272.39" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-2.356" />
+	<wall x="266.75" y="220.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="0.785" />
+	<wall x="214.15" y="271.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-2.356" />
+	<wall x="266.15" y="272.49" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-0.785" />
+	<wall x="214.77" y="219.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="2.356" />
+	<wall x="254.75" y="212.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="0.391" />
+	<wall x="226.15" y="279.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-2.750" />
+	<wall x="274.15" y="260.49" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-1.179" />
+	<wall x="206.77" y="231.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="1.962" />
+	<wall x="226.25" y="212.51" l1="11.19" l2="2.00" h="15.00" color="wall" angle="2.751" />
+	<wall x="254.65" y="279.89" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-0.390" />
+	<wall x="274.15" y="231.99" l1="11.19" l2="2.00" h="15.00" color="wall" angle="1.180" />
+	<wall x="206.77" y="260.39" l1="11.19" l2="2.00" h="15.00" color="wall" angle="-1.961" />
+	<wall x="222.00" y="202.51" l1="20.85" l2="2.00" h="15.00" color="wall" angle="1.190" />
+	<wall x="258.90" y="289.89" l1="20.85" l2="2.00" h="15.00" color="wall" angle="-1.951" />
+	<wall x="284.15" y="227.74" l1="20.85" l2="2.00" h="15.00" color="wall" angle="2.761" />
+	<wall x="196.77" y="264.64" l1="20.85" l2="2.00" h="15.00" color="wall" angle="-0.380" />
+	<wall x="259.25" y="202.51" l1="21.04" l2="2.00" h="15.00" color="wall" angle="1.976" />
+	<wall x="221.65" y="289.89" l1="21.04" l2="2.00" h="15.00" color="wall" angle="-1.165" />
+	<wall x="284.15" y="264.99" l1="21.04" l2="2.00" h="15.00" color="wall" angle="-2.736" />
+	<wall x="196.77" y="227.39" l1="21.04" l2="2.00" h="15.00" color="wall" angle="0.405" />
+
+	<wall x="189.50" y="89.26" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="0.000" />
+	<wall x="291.40" y="403.14" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="3.142" />
+	<wall x="397.40" y="195.24" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="1.571" />
+	<wall x="83.52" y="297.14" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="-1.570" />
+
+	<thymio2 x="265.01" y="209.69" port="33333" angle="2.163" /> <!-- A -->
+	<thymio2 x="249.15" y="203.07" port="33334" angle="1.770" /> <!-- A -->
+	<thymio2 x="231.97" y="203.02" port="33335" angle="1.377" /> <!-- A -->
+	<thymio2 x="216.08" y="209.56" port="33336" angle="0.984" /> <!-- A -->
+	<thymio2 x="203.91" y="221.69" port="33337" angle="0.591" /> <!-- B -->
+	<thymio2 x="197.31" y="237.55" port="33338" angle="0.198" /> <!-- B -->
+	<thymio2 x="197.28" y="254.73" port="33339" angle="-0.194" /> <!-- B -->
+	<thymio2 x="203.84" y="270.61" port="33340" angle="-0.587" /> <!-- B -->
+	<thymio2 x="215.98" y="282.77" port="33341" angle="-0.980" /> <!-- C -->
+	<thymio2 x="231.85" y="289.35" port="33342" angle="-1.373" /> <!-- C -->
+	<thymio2 x="248.82" y="289.40" port="33343" angle="-1.762" /> <!-- C -->
+	<thymio2 x="264.73" y="282.90" port="33344" angle="-2.155" /> <!-- C -->
+	<thymio2 x="276.93" y="270.80" port="33345" angle="-2.548" /> <!-- D -->
+	<thymio2 x="283.57" y="254.96" port="33346" angle="-2.941" /> <!-- D -->
+	<thymio2 x="283.64" y="237.77" port="33347" angle="2.949" /> <!-- D -->
+	<thymio2 x="277.12" y="221.88" port="33348" angle="2.556" /> <!-- D -->
+
+	<e-puck x="240.45" y="246.20" port="33331" angle="-1.570" />
+	<e-puck x="268.45" y="246.20" port="33332" angle="-1.570" />
+</aseba-playground>
