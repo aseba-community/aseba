@@ -30,6 +30,7 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
+#include <algorithm>
 #ifndef __APPLE__
 	#include <malloc.h>
 #endif
