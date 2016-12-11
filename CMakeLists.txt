@@ -10,6 +10,7 @@ cmake_minimum_required(VERSION 2.8.10)
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
+include(ExternalProject)
 
 # check the compiler version as we need full C++11 support
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -53,7 +54,7 @@ endif ()
 # callbacks that will be provided by other libs when the executable is linked.
 if (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 	STRING(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-endif (DEFINED CMAKE_SHARED_LINKER_FLAGS)
+endif(DEFINED CMAKE_SHARED_LINKER_FLAGS)
 
 # testing and defines
 enable_testing()
@@ -61,19 +62,35 @@ add_definitions(-Wall)
 add_definitions(-DASEBA_ASSERT)
 
 # Dashel
-find_package(dashel REQUIRED)
-include_directories(${dashel_INCLUDE_DIRS})
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared instead of static libs")
+add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/dashel")
+include_directories("${aseba_SOURCE_DIR}/thirdparty/dashel")
+if (APPLE)
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(IOKIT_LIBRARY IOKit)
+    set(DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+        ${COREFOUNDATION_LIBRARY} ${IOKIT_LIBRARY}
+        )
+elseif(WIN32)
+    set(DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+		winspool ws2_32 setupapi
+        )
+else()
+    set(DASHEL_LIBRARIES
+        "${aseba_BINARY_DIR}/thirdparty/dashel/libdashel.a"
+        )
+endif()
+
 
 # Enki
-find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
-find_library(ENKI_LIBRARY enki)
-find_library(ENKI_VIEWER_LIBRARY enkiviewer)
-if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	set(ENKI_FOUND 1)
-	message(STATUS "Enki found")
-else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	message(STATUS "Enki *not* found, simulation targets disabled")
-endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+set(ENKI_FOUND 1)
+set(ENKI_INCLUDE_DIR "${aseba_SOURCE_DIR}/thirdparty/enki")
+set(ENKI_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/enki/libenki.a")
+set(ENKI_VIEWER_LIBRARY "${aseba_BINARY_DIR}/thirdparty/enki/viewer/libenkiviewer.a")
+include_directories("${ENKI_INCLUDE_DIR}" "${aseba_BINARY_DIR}/thirdparty/enki/viewer")
+add_subdirectory("${aseba_SOURCE_DIR}/thirdparty/enki" "${aseba_BINARY_DIR}/thirdparty/enki")
 
 # Qt
 if (UNIX AND NOT APPLE)
@@ -83,8 +100,18 @@ else (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 # Qwt
-find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
-find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
+ExternalProject_Add(qwt
+    PREFIX ${aseba_BINARY_DIR}/thirdparty/qwt
+    SOURCE_DIR ${aseba_SOURCE_DIR}/thirdparty/qwt
+    CONFIGURE_COMMAND qmake PREFIX=${aseba_BINARY_DIR}/thirdparty/qwt ${aseba_SOURCE_DIR}/thirdparty/qwt
+    BUILD_COMMAND make
+)
+if(APPLE)
+    set(QWT_INCLUDE_DIR "${aseba_BINARY_DIR}/thirdparty/qwt/src/qwt-build/lib/qwt.framework/Headers")
+
+
+else()
+endif()
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
@@ -98,7 +125,7 @@ add_subdirectory(common)
 add_subdirectory(transport)
 
 # define the core libraries variable, to be used by all Aseba programs
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${DASHEL_LIBRARIES})
 
 # Target and client specific libraries
 add_subdirectory(vm)
