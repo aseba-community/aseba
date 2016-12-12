@@ -25,6 +25,7 @@
 #include <ostream>
 #include <cctype>
 #include <cstdio>
+#include <cwctype>
 
 namespace Aseba
 {

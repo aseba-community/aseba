@@ -26,7 +26,8 @@
 #include "FormatableString.h"
 #include <dashel/dashel.h>
 #include <memory>
-#include <unistd.h>
+#include <algorithm>
+#include <iterator>
 
 namespace Aseba 
 {
@@ -248,7 +249,7 @@ namespace Aseba
 					break;
 			}*/
 			// give 10 ms to the robot the time to reset
-			usleep(10000);
+			UnifiedTime(10).sleep();
 			pageSize = 2048;
 		}
 		else

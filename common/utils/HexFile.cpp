@@ -27,6 +27,7 @@
 #include <cassert>
 #include <algorithm>
 #include <valarray>
+#include <iterator>
 
 namespace Aseba
 {

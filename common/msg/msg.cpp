@@ -25,6 +25,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <iterator>
 #include <dashel/dashel.h>
 
 using namespace std;
