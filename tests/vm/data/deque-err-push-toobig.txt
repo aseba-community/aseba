@@ -1,0 +1,31 @@
+# SCENARIO Push-Pop deque.push error push beyond deque limits
+# 	GIVEN A Deque of size 4
+
+var dq[6]
+var require1
+var require2
+
+#	WHEN Push front [21,22]
+
+call deque.push_front(dq, [21,22])
+
+#		THEN Deque contains one tuple
+#			REQUIRE size == 2
+
+call deque.size(dq, require1)
+
+#	WHEN Push back [31,32]
+
+call deque.push_back(dq, [31,32])
+
+#		THEN Deque contains two tuples
+#			REQUIRE size == 4
+
+call deque.size(dq, require2)
+
+# 	WHEN Push front [11,12] beyond deque limits
+
+call deque.push_front(dq, [11,12])
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS

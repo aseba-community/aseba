@@ -1,0 +1,33 @@
+# SCENARIO Can remove elements
+# 	GIVEN A Deque containing 10, 20, 30, 40, 50
+
+var dq[7] = [ 5, 0, 10, 20, 30, 40, 50 ]
+var require1[1]
+var require2[4]
+var require3[1]
+var require4[3]
+var require5[1]
+
+# 	WHEN Erase element 1
+
+call deque.erase(dq, 1, 1)
+
+# 		THEN Deque contains 10, 30, 40, 50
+# 			REQUIRE size == 3
+# 			REQUIRE contents is 10, 30, 40, 50
+# 			REQUIRE j == 1
+
+require1 = dq[0]
+call deque.get(dq, require2, 0)
+require3 = dq[1]
+
+# 	WHEN Erase element 2
+
+call deque.erase(dq, 2, 1)
+
+# 		THEN Deque contains 10, 30, 50
+# 			REQUIRE contents is 10, 30, 50
+# 			REQUIRE j ==1
+
+call deque.get(dq, require4, 0)
+require5 = dq[1]

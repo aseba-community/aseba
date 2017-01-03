@@ -1,0 +1,30 @@
+# SCENARIO Insert wraps around
+# 	GIVEN A Deque of size 5 containing 30, 40, 50
+
+var dq[7] = [ 3, 0, 30, 40, 50, 0, 0 ]
+var require1[4]
+var require2[1]
+var require3[5]
+var require4[1]
+
+# 	WHEN Insert 20 at 0
+
+call deque.insert(dq, [20], 0)
+
+# 		THEN Insertion wrapped backwards
+# 			REQUIRE contents is 20, 30, 40, 50
+# 			REQUIRE j == 4
+
+call deque.get(dq, require1, 0)
+require2 = dq[1]
+
+# 	WHEN Insert 10 at 0
+
+call deque.insert(dq, [10], 0)
+
+# 		THEN Insertion wrapped backwards
+# 			REQUIRE contents is 10, 20, 30, 40, 50
+# 			REQUIRE j == 3
+
+call deque.get(dq, require3, 0)
+require4 = dq[1]

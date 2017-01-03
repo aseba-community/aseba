@@ -1,0 +1,11 @@
+# SCENARIO deque.erase error with negative index
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+
+# 	WHEN Erase with negative index
+
+call deque.erase(dq, -5, 1)
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS

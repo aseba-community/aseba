@@ -1,0 +1,11 @@
+# SCENARIO deque.set error with negative index
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+
+# 	WHEN Set with negative index
+
+call deque.set(dq, 11, -1)
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS
