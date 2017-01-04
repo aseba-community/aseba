@@ -217,6 +217,7 @@ pipeline {
 								[ -d source ] || ln -s . source
 								export your_qt_path=$(otool -L dist/macos/bin/asebastudio | grep QtCore | perl -pe "s{\\s*(/.*)lib/QtCore.*}{\\$1}")
 								export your_qwt_path=$(otool -L dist/macos/bin/asebastudio | grep qwt.framework | perl -pe "s{\\s*(/.*)lib/QtCore.*}{\\$1}")
+								export your_certificate=none
 								mkdir -p build/packager &&
 									(cd build/packager && bash -x ../../packager/packager_script && mv Aseba*.dmg ../..)
 							'''
