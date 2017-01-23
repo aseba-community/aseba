@@ -1,0 +1,11 @@
+# SCENARIO deque.insert error with negative index
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+
+# 	WHEN Insert with negative index
+
+call deque.insert(dq, 11, -16)
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS

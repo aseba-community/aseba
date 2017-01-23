@@ -27,6 +27,7 @@
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
+#include <algorithm>
 
 #define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 #define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))

@@ -26,15 +26,6 @@ Copyright (C) 2007--2016:
 	Manon Briod <manon dot briod at epfl dot ch> [1]
 	VPL design - funded by Gebert Rüf Stiftung
 	
-	Sandra Moser [2]
-	German translation
-	
-	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
-	Spanish translation
-	
-	Ezio Somá <ezio dot soma at gmail dot com>
-	Italian translation
-	
 	Michael Bonani <michael dot bonani at mobsya dot org> [3]
 	French translation, packaging, testing
 	
@@ -46,8 +37,20 @@ Copyright (C) 2007--2016:
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
 	inputs on challenge, graphics design on challenge
+
+	Sandra Moser [2]
+	German translation
 	
+	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
+	Spanish translation
 	
+	Ezio Somá <ezio dot soma at gmail dot com>
+	Italian translation
+
+	Detlef Rick <detlef dot rick at gymnasium-hittfeld dot de>
+	German translation
+	
+		
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
 	EPFL, Lausanne (http://www.epfl.ch)
