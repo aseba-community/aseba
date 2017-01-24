@@ -634,12 +634,12 @@ namespace Enki
 	{
 		if (autoCamera)
 		{
-			altitude = 70;
-			yaw += 0.002;
-			pos = QPointF(-world->w/2 + 120*sin(yaw+M_PI/2), -world->h/2 + 120*cos(yaw+M_PI/2));
-			if (yaw > 2*M_PI)
-				yaw -= 2*M_PI;
-			pitch = M_PI/7	;
+			camera.altitude = 70;
+			camera.yaw -= 0.002;
+			camera.pos = QPointF(world->w/2 - 120*sin(-camera.yaw+M_PI/2), world->h/2 - 120*cos(-camera.yaw+M_PI/2));
+			if (camera.yaw < 0)
+				camera.yaw += 2*M_PI;
+			camera.pitch = -M_PI/7;
 		}
 		ViewerWidget::timerEvent(event);
 	}

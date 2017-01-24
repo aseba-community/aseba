@@ -68,6 +68,7 @@ namespace Aseba
 		void serialize(Dashel::Stream* stream) const;
 		static Message *receive(Dashel::Stream* stream);
 		static Message *create(uint16 source, uint16 type, SerializationBuffer& buffer);
+		Message* clone() const;
 		void dump(std::wostream &stream) const;
 		
 		virtual void serializeSpecific(SerializationBuffer& buffer) const = 0;

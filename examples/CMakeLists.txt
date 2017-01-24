@@ -17,3 +17,4 @@ include_directories(${aseba_INCLUDE_DIR})
 # Different types of examples
 add_subdirectory(clients)
 add_subdirectory(switches)
+add_subdirectory(zeroconf)
