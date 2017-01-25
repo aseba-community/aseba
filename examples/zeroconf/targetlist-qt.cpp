@@ -29,7 +29,7 @@ using namespace std;
 QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
 {
 	connect(&targets, SIGNAL(zeroconfBrowseCompleted()), this, SLOT(browseCompleted()));
-	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::Target *)), this, SLOT(resolveCompleted(const Aseba::Zeroconf::Target *)));
+	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation)), this, SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation)));
 }
 
 void QtTargetLister::browseCompleted()
@@ -37,19 +37,19 @@ void QtTargetLister::browseCompleted()
 	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
 	for (auto & target: targets)
 	{
-		todo.insert(&target);
+		todo.insert(Aseba::Zeroconf::TargetInformation(target));
 		// Resolve the host name and port of this target, retrieve TXT record
 		target.resolve();
 	}
 }
 
-void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::Target * target)
+void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation target)
 {
 	// output could be JSON but for now is Dashel target [Target name (DNS domain)]
-	cout << target->host << ";port=" << target->port;
-	cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << endl;
+	cout << target.host << ";port=" << target.port;
+	cout << " [" << target.name << " (" << target.regtype+"."+target.domain << ")]" << endl;
 	// also output properties, typically the DNS-encoded full host name and fields from TXT record
-	for (auto const& field: target->properties)
+	for (auto const& field: target.properties)
 	{
 		cout << "\t" << field.first << ":";
 		// ids and pids are a special case because they contain vectors of 16-bit integers
@@ -60,6 +60,8 @@ void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::Target * target)
 			cout << " " << field.second;
 		cout << endl;
 	}
+//	todo.erase(std::find_if(std::begin(todo), std::end(todo),
+//							[&] (Aseba::Zeroconf::TargetInformation const& p) { return p == target; }));
 	todo.erase(todo.find(target));
 	if (todo.size() == 0)
 		exit(0); // QCoreApplication::exit

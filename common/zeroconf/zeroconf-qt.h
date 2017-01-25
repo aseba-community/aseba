@@ -38,9 +38,9 @@ namespace Aseba
 
 	signals:
 		void zeroconfBrowseCompleted(); //!< emitted when browsing is completed
-		void zeroconfRegisterCompleted(const Aseba::Zeroconf::Target *); //!< emitted when a register is completed
-		void zeroconfResolveCompleted(const Aseba::Zeroconf::Target *); //!< emitted when a resolve is completed
-		void zeroconfUpdateCompleted(const Aseba::Zeroconf::Target *); //!< emitted when an update is completed
+		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation); //!< emitted when a register is completed
+		void zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation); //!< emitted when a resolve is completed
+		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation); //!< emitted when an update is completed
 
 	protected:
 		//! Set up function called after a discovery request has been made. The file
@@ -53,17 +53,17 @@ namespace Aseba
 		//! Emit signal when register completed. If you override this method you take responsibility for emitting signals as you see fit.
 		void registerCompleted(const Aseba::Zeroconf::Target * target)
 		{
-			emit zeroconfRegisterCompleted(target);
+			emit zeroconfRegisterCompleted(Aseba::Zeroconf::TargetInformation(*target));
 		}
 		//! Emit signal when resolve completed. If you override this method you take responsibility for emitting signals as you see fit.
 		void resolveCompleted(const Aseba::Zeroconf::Target * target)
 		{
-			emit zeroconfResolveCompleted(target);
+			emit zeroconfResolveCompleted(Aseba::Zeroconf::TargetInformation(*target));
 		}
 		//! Emit signal when update completed. If you override this method you take responsibility for emitting signals as you see fit.
 		void updateCompleted(const Aseba::Zeroconf::Target * target)
 		{
-			emit zeroconfUpdateCompleted(target);
+			emit zeroconfUpdateCompleted(Aseba::Zeroconf::TargetInformation(*target));
 		}
 		//! Emit signal when browse completed. If you override this method you take responsibility for emitting signals as you see fit.
 		void browseCompleted()
