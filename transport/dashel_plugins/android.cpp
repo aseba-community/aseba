@@ -28,7 +28,6 @@
 #include "android.h"
 
 #include <sys/ioctl.h>
-#include <linux/usb_ch9.h>
 #include <linux/usbdevice_fs.h>
 
 
