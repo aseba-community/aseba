@@ -76,17 +76,16 @@ namespace Aseba
 		// constants, in ConstantsHandlers.cpp
 		// handlers
 		void registerConstantsHandlers();
+		void postConstantHandler(HandlerContext& context);
 		void getConstantsHandler(HandlerContext& context);
-		void putConstantsHandler(HandlerContext& context);
-		void postConstantsHandler(HandlerContext& context);
 		void deleteConstantsHandler(HandlerContext& context);
+		//void putConstantsHandler(HandlerContext& context)
 		void getConstantHandler(HandlerContext& context);
-		void putConstantHandler(HandlerContext& context);
 		void deleteConstantHandler(HandlerContext& context);
+		void putConstantHandler(HandlerContext& context);
 		// support
-		void updateConstantValue(HandlerContext& context, const std::string& name, size_t position);
+		void updateConstantValue(HandlerContext& context, const std::string& name, size_t position, bool created);
 		bool findConstant(HandlerContext& context, std::string& name, size_t& position);
-		bool validateInt16Value(HandlerContext& context, const std::string& name, int value);
 		
 		// streams
 		void getStreamsEventsHandler(HandlerContext& context);

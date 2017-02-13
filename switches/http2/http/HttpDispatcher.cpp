@@ -42,43 +42,529 @@ namespace Aseba
 	
 	HttpDispatcher::HttpDispatcher():
 		serverPort(3000),
-		definitions( R"({
-			"constant-definition": {
-				"type": "object",
-				"properties": {
-					"name": {
-						"type": "string",
-						"minLength": 1,
-						"pattern": "^[A-Za-z_][A-Za-z0-9_\\.]*"
-					},
-					"value": {
-						"type": "integer",
-						"minimum": -32768,
-						"maximum": 32767
-					},
-					"description": {
-						"type": "string"
-					}
+		// Models shared by endpoints
+		definitions( R"#json#(
+			{
+				"breakpoint-pc" : {
+					"type" : "integer"
 				},
-				"required": [
-					"name",
-					"value"
-				]
-			},
-			"constant-definition-update": {
-				"type": "object",
-				"properties": {
-					"value": {
-						"type": "integer",
-						"minimum": -32768,
-						"maximum": 32767
+				"bytecode" : {
+					"items" : {
+						"type" : "integer"
 					},
-					"description": {
-						"type": "string"
-					}
+					"type" : [
+						"string",
+						"array"
+					]
+				},
+				"compilation-result" : {
+					"properties" : {
+						"bytecode" : {
+							"items" : {
+								"type" : "integer"
+							},
+							"type" : [
+								"string",
+								"array"
+							]
+						},
+						"error" : {
+							"properties" : {
+								"message" : {
+									"type" : "string"
+								},
+								"pos" : {
+									"type" : "integer"
+								},
+								"rowcol" : {
+									"items" : {
+										"type" : "integer"
+									},
+									"maxItems" : 2,
+									"minItems" : 2,
+									"type" : "array"
+								}
+							},
+							"required" : [
+								"message",
+								"pos"
+							],
+							"type" : "object"
+						},
+						"success" : {
+							"type" : "boolean"
+						},
+						"symbols" : {
+							"$ref" : "#/definitions/symbol-table"
+						}
+					},
+					"required" : [
+						"success"
+					],
+					"type" : "object"
+				},
+				"constant-definition" : {
+					"properties" : {
+						"description" : {
+							"type" : "string"
+						},
+						"name" : {
+							"minLength" : 1,
+							"pattern" : "^[A-Za-z_][A-Za-z0-9_\\.]*",
+							"type" : "string"
+						},
+						"value" : {
+							"maximum" : 32767,
+							"minimum" : -32768,
+							"type" : "integer"
+						}
+					},
+					"required" : [
+						"name",
+						"value"
+					],
+					"type" : "object"
+				},
+				"constant-definition-update" : {
+					"properties" : {
+						"description" : {
+							"type" : "string"
+						},
+						"value" : {
+							"maximum" : 32767,
+							"minimum" : -32768,
+							"type" : "integer"
+						}
+					},
+					"type" : "object"
+				},
+				"event-definition" : {
+					"properties" : {
+						"description" : {
+							"type" : "string"
+						},
+						"name" : {
+							"minLength" : 1,
+							"pattern" : "^[A-Za-z_][A-Za-z0-9_\\.]*",
+							"type" : "string"
+						},
+						"parameters" : {
+							"items" : {
+								"properties" : {
+									"description" : {
+										"type" : "string"
+									},
+									"param" : {
+										"minLength" : 1,
+										"pattern" : "^[A-Za-z_][A-Za-z0-9_\\.]*",
+										"type" : "string"
+									},
+									"size" : {
+										"maximum" : 258,
+										"minimum" : 1,
+										"type" : "integer"
+									}
+								},
+								"required" : [
+									"param"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"size" : {
+							"exclusiveMinimum" : false,
+							"maximum" : 258,
+							"minimum" : 0,
+							"type" : "integer"
+						}
+					},
+					"required" : [
+						"name",
+						"size"
+					],
+					"type" : "object"
+				},
+				"event-definition-full" : {
+					"allOf" : [
+						{
+							"properties" : {
+								"id" : {
+									"minimum" : 1,
+									"type" : "number"
+								}
+							},
+							"required" : [
+								"id"
+							],
+							"type" : "object"
+						},
+						{
+							"$ref" : "#/definitions/event-definition"
+						}
+					]
+				},
+				"event-definition-update" : {
+					"properties" : {
+						"description" : {
+							"type" : "string"
+						},
+						"parameters" : {
+							"items" : {
+								"properties" : {
+									"description" : {
+										"type" : "string"
+									},
+									"param" : {
+										"minLength" : 1,
+										"pattern" : "^[A-Za-z_][A-Za-z0-9_\\.]*",
+										"type" : "string"
+									},
+									"size" : {
+										"maximum" : 258,
+										"minimum" : 1,
+										"type" : "integer"
+									}
+								},
+								"required" : [
+									"param"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"size" : {
+							"exclusiveMinimum" : false,
+							"maximum" : 258,
+							"minimum" : 0,
+							"type" : "integer"
+						}
+					},
+					"type" : "object"
+				},
+				"network" : {
+					"properties" : {
+						"author" : {
+							"type" : "string"
+						},
+						"constants" : {
+							"items" : {
+								"$ref" : "#/definitions/constant-definition"
+							},
+							"type" : "array"
+						},
+						"description" : {
+							"items" : {
+								"properties" : {
+									"lang" : {
+										"type" : "string"
+									},
+									"text" : {
+										"type" : "string"
+									}
+								},
+								"type" : "object"
+							},
+							"type" : [
+								"string",
+								"array"
+							]
+						},
+						"events" : {
+							"items" : {
+								"$ref" : "#/definitions/event-definition-full"
+							},
+							"type" : "array"
+						},
+						"nodes" : {
+							"items" : {
+								"$ref" : "#/definitions/node-signature"
+							},
+							"type" : "array"
+						}
+					},
+					"required" : [
+						"events",
+						"constants",
+						"nodes"
+					],
+					"type" : "object"
+				},
+				"node-description" : {
+					"properties" : {
+						"id" : {
+							"type" : "integer"
+						},
+						"name" : {
+							"type" : "string"
+						},
+						"native-events" : {
+							"items" : {
+								"properties" : {
+									"description" : {
+										"type" : "string"
+									},
+									"name" : {
+										"type" : "string"
+									}
+								},
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"native-functions" : {
+							"description" : "",
+							"items" : {
+								"properties" : {
+									"description" : {
+										"type" : "string"
+									},
+									"name" : {
+										"type" : "string"
+									},
+									"parameters" : {
+										"items" : {
+											"properties" : {
+												"name" : {
+													"type" : "string"
+												},
+												"size" : {
+													"type" : "integer"
+												}
+											},
+											"type" : "object"
+										},
+										"type" : "array"
+									}
+								},
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"native-variables" : {
+							"description" : "",
+							"items" : {
+								"properties" : {
+									"name" : {
+										"type" : "string"
+									},
+									"size" : {
+										"type" : "integer"
+									}
+								},
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"protocolVersion" : {
+							"type" : "integer"
+						},
+						"vm-properties" : {
+							"description" : "",
+							"properties" : {
+								"bytecodeSize" : {
+									"type" : "integer"
+								},
+								"stackSize" : {
+									"type" : "integer"
+								},
+								"variablesSize" : {
+									"type" : "integer"
+								}
+							},
+							"type" : "object"
+						}
+					},
+					"required" : [
+						"id",
+						"name",
+						"protocolVersion",
+						"native-variables",
+						"native-functions"
+					],
+					"type" : "object"
+				},
+				"node-signature" : {
+					"properties" : {
+						"id" : {
+							"type" : "integer"
+						},
+						"name" : {
+							"type" : "string"
+						},
+						"pid" : {
+							"type" : "integer"
+						}
+					},
+					"type" : "object"
+				},
+				"symbol-table" : {
+					"properties" : {
+						"constant refs" : {
+							"items" : {
+								"properties" : {
+									"name" : {
+										"type" : "string"
+									},
+									"value" : {
+										"type" : "integer"
+									}
+								},
+								"required" : [
+									"name"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"event refs" : {
+							"items" : {
+								"properties" : {
+									"id" : {
+										"type" : "integer"
+									},
+									"name" : {
+										"type" : "string"
+									}
+								},
+								"required" : [
+									"name"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"function refs" : {
+							"items" : {
+								"properties" : {
+									"id" : {
+										"type" : "string"
+									},
+									"name" : {
+										"type" : "string"
+									}
+								},
+								"required" : [
+									"name"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"linenumbers" : {
+							"items" : {
+								"type" : "integer"
+							},
+							"type" : "array"
+						},
+						"subroutines" : {
+							"items" : {
+								"properties" : {
+									"address" : {
+										"type" : "integer"
+									},
+									"description" : {
+										"type" : "string"
+									},
+									"line" : {
+										"type" : "integer"
+									},
+									"name" : {
+										"type" : "string"
+									}
+								},
+								"required" : [
+									"name",
+									"address"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						},
+						"variables" : {
+							"items" : {
+								"properties" : {
+									"address" : {
+										"type" : "integer"
+									},
+									"description" : {
+										"type" : "string"
+									},
+									"name" : {
+										"type" : "string"
+									},
+									"size" : {
+										"type" : "integer"
+									}
+								},
+								"required" : [
+									"name",
+									"size"
+								],
+								"type" : "object"
+							},
+							"type" : "array"
+						}
+					},
+					"required" : [
+						"variables",
+						"subroutines"
+					],
+					"type" : "object"
+				},
+				"variables" : {
+					"items" : {
+						"properties" : {
+							"description" : {
+								"type" : "string"
+							},
+							"name" : {
+								"pattern" : "^[A-Za-z_][A-Za-z0-9_\\.]*",
+								"type" : "string"
+							},
+							"size" : {
+								"minimum" : 0,
+								"type" : "integer"
+							},
+							"value" : {
+								"maximum" : 32767,
+								"minimum" : -32768,
+								"type" : "integer"
+							}
+						},
+						"required" : [
+							"name",
+							"size"
+						],
+						"type" : "object"
+					},
+					"type" : "array"
+				},
+				"vm-execution-state" : {
+					"properties" : {
+						"flags" : {
+							"properties" : {
+								"vm_event_active" : {
+									"type" : "boolean"
+								},
+								"vm_event_running" : {
+									"type" : "boolean"
+								},
+								"vm_step_by_step" : {
+									"type" : "boolean"
+								}
+							},
+							"type" : [
+								"object"
+							]
+						},
+						"pc" : {
+							"type" : "integer"
+						}
+					},
+					"type" : "object"
 				}
-			}
-		})"_json)
+			})#json#"_json )
 	{
 		// register all handlers
 		REGISTER_HANDLER(optionsHandler, OPTIONS, {});

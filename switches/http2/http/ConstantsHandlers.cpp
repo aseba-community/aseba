@@ -28,7 +28,7 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+	/*
 	#define RQ_GET_VALUE(stream, jsonObject, fieldType, fieldName) \
 		const auto _it ## fieldName(jsonObject.find(#fieldName)); \
 		if (_it ## fieldName == jsonObject.end()) \
@@ -46,96 +46,249 @@ namespace Aseba
 			HttpResponse::fromPlainString("Field " #fieldName " has invalid value " + _it ## fieldName.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream); \
 			return; \
 		}
+	*/
 	
-	//! Register all constant-related handlers
+	//! Register all constants-related handlers
 	void HttpDispatcher::registerConstantsHandlers()
 	{
-		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" });
-		
-		REGISTER_HANDLER(putConstantsHandler, PUT, { "constants" });
-		
-		REGISTER_HANDLER(postConstantsHandler, POST, { "constants" }, { R"({
-			"tags": [
-				"Constants"
-			],
-			"summary": "Create Constant",
-			"description": "",
-			"operationId": "POST-constant",
-			"responses": {
-				"201": {
-					"description": "",
-					"schema": {
-						"$ref": "#/definitions/constant-definition"
-					}
-				},
-				"400": {
-					"description": "",
-					"schema": {
-						"type": "string"
-					},
-					"examples": {
-						"application/json": "Invalid value"
-					}
-				},
-				"403": {
-					"description": "",
-					"schema": {
-						"type": "string"
-					},
-					"examples": {
-						"application/json": "Invalid constant name"
-					}
-				},
-				"409": {
-					"description": "",
-					"schema": {
-						"type": "string"
-					},
-					"examples": {
-						"application/json": "Constant already exists"
-					}
-				}
-			},
-			"consumes": [
-				"application/json"
-			],
-			"produces": [
-				"application/json"
-			],
-			"parameters": [
-				{
-					"name": "body",
-					"in": "body",
-					"schema": {
-						"$ref": "#/definitions/constant-definition",
-						"example": {
-							"name": "base.address",
-							"value": 100,
-							"description": "Lowest address from which to start numbering"
+		REGISTER_HANDLER(postConstantHandler, POST, { "constants" }, { R"#json#(
+			{
+				"consumes" : [
+					"application/json"
+				],
+				"operationId" : "POST-constant",
+				"parameters" : [
+					{
+						"in" : "body",
+						"name" : "body",
+						"schema" : {
+							"$ref" : "#/definitions/constant-definition",
+							"example" : {
+								"description" : "Lowest address from which to start numbering",
+								"name" : "base.address",
+								"value" : 100
+							}
 						}
 					}
-				}
-			]
-		})"_json });
-		
-		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" });
-		
-		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" });
-		
-		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" });
-		
-		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" });
+				],
+				"produces" : [
+					"application/json"
+				],
+				"responses" : {
+					"201" : {
+						"description" : "Create Constant",
+						"schema" : {
+							"$ref" : "#/definitions/constant-definition"
+						}
+					},
+					"400" : {
+						"description" : "Invalid value",
+						"schema" : {
+							"type" : "string"
+						}
+					},
+					"403" : {
+						"description" : "Invalid constant name",
+						"schema" : {
+							"type" : "string"
+						}
+					},
+					"409" : {
+						"description" : "Constant already exists",
+						"schema" : {
+							"type" : "string"
+						}
+					}
+				},
+				"summary" : "Create Constant",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
+		REGISTER_HANDLER(getConstantsHandler, GET, { "constants" }, { R"#json#(
+			{
+				"operationId" : "GET-constants",
+				"produces" : [
+					"application/json"
+				],
+				"responses" : {
+					"200" : {
+						"description" : "Get All Constants",
+						"schema" : {
+							"items" : {
+								"$ref" : "#/definitions/constant-definition"
+							},
+							"type" : "array"
+						}
+					}
+				},
+				"summary" : "Get All Constants",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
+		REGISTER_HANDLER(deleteConstantsHandler, DELETE, { "constants" }, { R"#json#(
+			{
+				"operationId" : "DELETE-constants",
+				"responses" : {
+					"204" : {
+						"description" : "Delete All Constants",
+						"schema" : {
+							"type" : "object"
+						}
+					}
+				},
+				"summary" : "Delete All Constants",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
+		REGISTER_HANDLER(getConstantHandler, GET, { "constants", "{name}" }, { R"#json#(
+			{
+				"operationId" : "GET-constant",
+				"produces" : [
+					"application/json"
+				],
+				"responses" : {
+					"200" : {
+						"description" : "Get Constant",
+						"schema" : {
+							"$ref" : "#/definitions/constant-definition"
+						}
+					},
+					"404" : {
+						"description" : "Unknown constant",
+						"schema" : {
+							"type" : "string"
+						}
+					}
+				},
+				"summary" : "Get Constant",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
+		REGISTER_HANDLER(deleteConstantHandler, DELETE, { "constants", "{name}" }, { R"#json#(
+			{
+				"operationId" : "DELETE-constant",
+				"produces" : [
+					"application/json"
+				],
+				"responses" : {
+					"204" : {
+						"description" : "Delete Constant",
+						"schema" : {
+							"type" : "object"
+						}
+					},
+					"404" : {
+						"description" : "Unknown constant",
+						"schema" : {
+							"type" : "string"
+						}
+					}
+				},
+				"summary" : "Delete Constant",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
+		REGISTER_HANDLER(putConstantHandler, PUT, { "constants", "{name}" }, { R"#json#(
+			{
+				"consumes" : [
+					"application/json"
+				],
+				"description" : "Since the name is known from path parameter *name*, it is only supplied in the #model:PjNWMPh4ACC7kxrss request if the name should be changed.",
+				"operationId" : "PUT-constant",
+				"parameters" : [
+					{
+						"in" : "body",
+						"name" : "body",
+						"schema" : {
+							"$ref" : "#/definitions/constant-definition-update",
+							"example" : {
+								"value" : 501
+							}
+						}
+					}
+				],
+				"produces" : [
+					"application/json"
+				],
+				"responses" : {
+					"200" : {
+						"description" : "Update Constant",
+						"schema" : {
+							"$ref" : "#/definitions/constant-definition"
+						}
+					},
+					"400" : {
+						"description" : "Invalid value",
+						"schema" : {
+							"type" : "string"
+						}
+					},
+					"404" : {
+						"description" : "Unknown constant",
+						"schema" : {
+							"type" : "string"
+						}
+					}
+				},
+				"summary" : "Update Constant",
+				"tags" : [
+					"Constants"
+				]
+			})#json#"_json });
 	}
-	
-	//! handler for GET /constants/
+
+	// handlers
+
+	//! handler for POST /constants -> application/json
+	void HttpDispatcher::postConstantHandler(HandlerContext& context)
+	{
+		const string name(context.parsedContent["name"].get<string>());
+		const wstring wname(UTF8ToWString(name));
+		if (context.asebaSwitch->commonDefinitions.constants.contains(wname))
+		{
+			HttpResponse::fromPlainString(FormatableString("Constant %0 already exists").arg(name), HttpStatus::CONFLICT).send(context.stream);
+			return;
+		}
+		
+		// create the constant with a default value
+		context.asebaSwitch->commonDefinitions.constants.push_back({wname, 0});
+		const size_t position(context.asebaSwitch->commonDefinitions.constants.size() - 1);
+		
+		// update the value and return an answer
+		updateConstantValue(context, name, position, true);
+	}
+
+	//! handler for GET /constants -> application/json
 	void HttpDispatcher::getConstantsHandler(HandlerContext& context)
 	{
 		json response(json::array());
+		unsigned i(0);
 		for (const auto& constant: context.asebaSwitch->commonDefinitions.constants)
-			response.push_back(WStringToUTF8(constant.name));
+			response.push_back({
+				{ "id", i++ },
+				{ "name", WStringToUTF8(constant.name) },
+				{ "value", constant.value}
+			});
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
+	//! handler for DELETE /constants 
+	void HttpDispatcher::deleteConstantsHandler(HandlerContext& context)
+	{
+		// clear all constants
+		context.asebaSwitch->commonDefinitions.constants.clear();
+		
+		// return success
+		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
+	}
+	
+	/*
+	// TODO: add to scheme
 	//! handler for PUT /constants/
 	void HttpDispatcher::putConstantsHandler(HandlerContext& context)
 	{
@@ -172,39 +325,9 @@ namespace Aseba
 		
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
-	}
-	
-	//! handler for POST /constants/
-	void HttpDispatcher::postConstantsHandler(HandlerContext& context)
-	{
-		// get the name, and check presence
-		RQ_GET_VALUE(context.stream, context.parsedContent, string, name);
-		const wstring wname(UTF8ToWString(name));
-		if (context.asebaSwitch->commonDefinitions.constants.contains(wname))
-		{
-			HttpResponse::fromPlainString(FormatableString("Constant %0 already exists").arg(name), HttpStatus::CONFLICT).send(context.stream);
-			return;
-		}
-		
-		// create the constant with a default value
-		context.asebaSwitch->commonDefinitions.constants.push_back({wname, 0});
-		const size_t position(context.asebaSwitch->commonDefinitions.constants.size() - 1);
-		
-		// updated the value and return an answer
-		updateConstantValue(context, name, position);
-	}
-	
-	//! handler for DELETE /constants/
-	void HttpDispatcher::deleteConstantsHandler(HandlerContext& context)
-	{
-		// clear all constants
-		context.asebaSwitch->commonDefinitions.constants.clear();
-		
-		// return success
-		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
-	}
+	}*/
 
-	//! handler for GET /constants/{name}
+	//! handler for GET /constants/{name} -> application/json
 	void HttpDispatcher::getConstantHandler(HandlerContext& context)
 	{
 		// find the constant
@@ -223,20 +346,7 @@ namespace Aseba
 		}).send(context.stream);
 	}
 
-	//! handler for PUT /constants/{name}
-	void HttpDispatcher::putConstantHandler(HandlerContext& context)
-	{
-		// find the constant
-		string name;
-		size_t position(0);
-		if (!findConstant(context, name, position))
-			return;
-		
-		// updated the value and return an answer
-		updateConstantValue(context, name, position);
-	}
-
-	//! handler for DELETE /constants/{name}
+	//! handler for DELETE /constants/{name} -> application/json
 	void HttpDispatcher::deleteConstantHandler(HandlerContext& context)
 	{
 		// find the constant
@@ -252,18 +362,27 @@ namespace Aseba
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
-	
-	//! set the value of a content from the request
-	void HttpDispatcher::updateConstantValue(HandlerContext& context, const string& name, size_t position)
+
+	//! handler for PUT /constants/{name} -> application/json
+	void HttpDispatcher::putConstantHandler(HandlerContext& context)
 	{
-		// get the value, and check bounds
-		RQ_GET_VALUE(context.stream, context.parsedContent, int, value);
-		
-		// make sure the value is in a valid range
-		if (!validateInt16Value(context, name, value))
+		// find the constant
+		string name;
+		size_t position(0);
+		if (!findConstant(context, name, position))
 			return;
 		
+		// updated the value and return an answer
+		updateConstantValue(context, name, position, false);
+	}
+
+	// support
+
+	//! set the value of a content from the request
+	void HttpDispatcher::updateConstantValue(HandlerContext& context, const string& name, size_t position, bool created)
+	{
 		// sets the value
+		const int value(context.parsedContent["value"].get<int>());
 		context.asebaSwitch->commonDefinitions.constants[position].value = value;
 		
 		// return answer
@@ -271,7 +390,7 @@ namespace Aseba
 			{ "id", position },
 			{ "name",  name },
 			{ "value", value }
-		}).send(context.stream);
+		}, created ? HttpStatus::CREATED : HttpStatus::OK).send(context.stream);
 	}
 	
 	//! try to find a constant, return true and update position if found, return false and send an error if not found
@@ -290,17 +409,6 @@ namespace Aseba
 			return false;
 		}
 		
-		return true;
-	}
-	
-	//! Return true if the value is valid, return false and send an error if not
-	bool HttpDispatcher::validateInt16Value(HandlerContext& context, const string& name, int value)
-	{
-		if (value < -32768 || value > 32767)
-		{
-			HttpResponse::fromPlainString(FormatableString("Value %0 of constant %1 is outside bounds [-32768:32767]").arg(value).arg(name), HttpStatus::BAD_REQUEST).send(context.stream);
-			return false;
-		}
 		return true;
 	}
 
