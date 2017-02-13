@@ -26,10 +26,8 @@
 */
 
 
-#include "AsebaGlue.h"
+#include "DashelAsebaGlue.h"
 #include "Door.h"
-#include "EPuck.h"
-#include "Thymio2.h"
 #include "PlaygroundViewer.h"
 #include <QtXml>
 #include <QApplication>
@@ -80,7 +78,7 @@ int main(int argc, char *argv[])
 		
 		if (fileName.isEmpty())
 		{
-			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog\n";
+			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog" << std::endl;
 			exit(1);
 		}
 		
@@ -156,6 +154,9 @@ int main(int argc, char *argv[])
 		QImage image(groundTextureFileName);
 		if (!image.isNull())
 		{
+			// flip vertically as y-coordinate is inverted in an image
+			image = image.mirrored();
+			// convert to a specific format and copy the underlying data to Enki
 			image = image.convertToFormat(QImage::Format_ARGB32);
 			groundTexture.width = image.width();
 			groundTexture.height = image.height();
@@ -176,7 +177,7 @@ int main(int argc, char *argv[])
 	);
 	
 	// Create viewer
-	Enki::PlaygroundViewer viewer(&world);
+	Enki::PlaygroundViewer viewer(&world, worldE.attribute("energyScoringSystemEnabled", "false").toLower() == "true");
 	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
@@ -331,13 +332,13 @@ int main(int argc, char *argv[])
 	while (!ePuckE.isNull())
 	{
 		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());	
-		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(port, asebaServerCount + 1));
+		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, asebaServerCount + 1));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
-		viewer.log(QString("New e-puck on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New e-puck on port %0").arg(port), Qt::white);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
@@ -346,13 +347,13 @@ int main(int argc, char *argv[])
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(port));
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();
 		thymio->angle = thymioE.attribute("angle").toDouble();
 		world.addObject(thymio);
-		viewer.log(QString("New Thymio II on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New Thymio II on port %0").arg(port), Qt::white);
 		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
 	
@@ -381,7 +382,7 @@ int main(int argc, char *argv[])
 		QStringList args(command.split(" ", QString::SkipEmptyParts));
 		if (args.size() == 0)
 		{
-			viewer.log("Missing program in command", Qt::red);
+			viewer.log(app.tr("Missing program in command"), Qt::red);
 		}
 		else
 		{
@@ -396,7 +397,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Show and run
-	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowTitle(app.tr("Aseba Playground - Simulate your robots!"));
 	viewer.show();
 	
 	// If D-Bus is used, register the viewer object

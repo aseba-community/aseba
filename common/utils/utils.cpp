@@ -40,6 +40,7 @@
 #include <cctype>
 #include <locale>
 #include <string>
+#include <stdexcept>
 #include <stdint.h>
 #include "utils.h"
 
@@ -128,6 +129,38 @@ namespace Aseba
 		else
 			stream << UnifiedTime().toHumanReadableStringFromEpoch();
 		stream << " ";
+	}
+	
+	SoftTimer::SoftTimer(Callback callback, double period):
+		callback(callback),
+		period(period),
+		left(period)
+	{
+		if (period < 0)
+			throw std::domain_error("Period must be greater or equal to zero");
+	}
+	
+	void SoftTimer::step(double dt)
+	{
+		if (period == 0)
+			return;
+		
+		assert(dt >= 0);
+		left -= dt;
+		while (left < 0)
+		{
+			callback();
+			left += period;
+		}
+	}
+	
+	void SoftTimer::setPeriod(double period)
+	{
+		if (period < 0)
+			throw std::domain_error("Period must be greater or equal to zero");
+		
+		this->period = period;
+		left = period;
 	}
 	
 	std::string WStringToUTF8(const std::wstring& s)

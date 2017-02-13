@@ -21,19 +21,18 @@
 #include "Thymio2.h"
 #include "Thymio2-natives.h"
 #include "Parameters.h"
-#include "PlaygroundViewer.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
 
 namespace Enki
 {
+	using namespace std;
 	using namespace Aseba;
 	
-	AsebaThymio2::AsebaThymio2(unsigned port):
-		SimpleDashelConnection(port),
-		timer0(new QTimer(this)),
-		timer1(new QTimer(this)),
-		timer100Hz(new QTimer(this)),
+	AsebaThymio2::AsebaThymio2():
+		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
+		timer1(bind(&AsebaThymio2::timer1Timeout, this), 0),
+		timer100Hz(bind(&AsebaThymio2::timer100HzTimeout, this), 0.01),
 		counter100Hz(0),
 		lastStepCollided(false),
 		thisStepCollided(false)
@@ -62,23 +61,86 @@ namespace Enki
 		variables.productId = ASEBA_PID_THYMIO2;
 		
 		variables.temperature = 220;
-		
-		vmStateToEnvironment[&vm] = qMakePair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
-		
-		QObject::connect(timer0, SIGNAL(timeout()), SLOT(timer0Timeout()));
-		QObject::connect(timer1, SIGNAL(timeout()), SLOT(timer1Timeout()));
-		QObject::connect(timer100Hz, SIGNAL(timeout()), SLOT(timer100HzTimeout()));
-		timer100Hz->start(10);
-	}
-	
-	AsebaThymio2::~AsebaThymio2()
-	{
-		vmStateToEnvironment.remove(&vm);
 	}
 	
 	void AsebaThymio2::collisionEvent(PhysicalObject *o)
 	{
 		thisStepCollided = true;
+	}
+
+	inline double distance(double x1, double y1, double z1, double x2, double y2, double z2)
+	{
+		return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+	}
+
+	void AsebaThymio2::clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ)
+	{
+		pointX -= pos.x;
+		pointY -= pos.y;
+		const double relativeX =  cos(angle)*pointX + sin(angle)*pointY;
+		const double relativeY = -sin(angle)*pointX + cos(angle)*pointY;
+		if (pressed && (buttonCode & LEFT_MOUSE_BUTTON))
+		{
+			if (distance(relativeX,relativeY,pointZ,2.5,0,5.3) < 0.55)
+			{
+				variables.buttonCenter = 1;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,4.0,0,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 1;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,1.0,0,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 1;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+			}
+			else if (distance(relativeX,relativeY,pointZ,2.5,-1.5,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 1;
+			}
+			else if (distance(relativeX,relativeY,pointZ,2.5,1.5,5.3) < 0.65)
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 1;
+				variables.buttonRight = 0;
+			}
+			else
+			{
+				variables.buttonCenter = 0;
+				variables.buttonBackward = 0;
+				variables.buttonForward = 0;
+				variables.buttonLeft = 0;
+				variables.buttonRight = 0;
+				
+				// not a putton, tap event
+				execLocalEvent(EVENT_TAP);
+			}
+		}
+		else
+		{
+			variables.buttonCenter = 0;
+			variables.buttonBackward = 0;
+			variables.buttonForward = 0;
+			variables.buttonLeft = 0;
+			variables.buttonRight = 0;
+		}
 	}
 	
 	void AsebaThymio2::controlStep(double dt)
@@ -91,18 +153,20 @@ namespace Enki
 		variables.proxHorizontal[4] = static_cast<sint16>(infraredSensor4.getValue());
 		variables.proxHorizontal[5] = static_cast<sint16>(infraredSensor5.getValue());
 		variables.proxHorizontal[6] = static_cast<sint16>(infraredSensor6.getValue());
-        variables.proxGroundReflected[0] = static_cast<sint16>(groundSensor0.getValue());
-        variables.proxGroundReflected[1] = static_cast<sint16>(groundSensor1.getValue());
-        variables.proxGroundDelta[0] = static_cast<sint16>(groundSensor0.getValue());
-        variables.proxGroundDelta[1] = static_cast<sint16>(groundSensor1.getValue());
-        variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
-        variables.motorRightSpeed = rightSpeed * 500. / 16.6;
+		variables.proxGroundReflected[0] = static_cast<sint16>(groundSensor0.getValue());
+		variables.proxGroundReflected[1] = static_cast<sint16>(groundSensor1.getValue());
+		variables.proxGroundDelta[0] = static_cast<sint16>(groundSensor0.getValue());
+		variables.proxGroundDelta[1] = static_cast<sint16>(groundSensor1.getValue());
+		variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
+		variables.motorRightSpeed = rightSpeed * 500. / 16.6;
 		
-		// do a network step, if there are some events from the network, they will be executed
-		Hub::step();
+		// run timers
+		timer0.step(dt);
+		timer1.step(dt);
+		timer100Hz.step(dt);
 		
-		// disconnect old streams
-		closeOldStreams();
+		// process external inputs (incoming event from network or environment, etc.)
+		externalInputStep(dt);
 		
 		// set physical variables
 		leftSpeed = double(variables.motorLeftTarget) * 16.6 / 500.;
@@ -112,18 +176,12 @@ namespace Enki
 		if (variables.timerPeriod[0] != oldTimerPeriod[0])
 		{
 			oldTimerPeriod[0] = variables.timerPeriod[0];
-			if (variables.timerPeriod[0])
-				timer0->start(variables.timerPeriod[0]);
-			else
-				timer0->stop();
+			timer0.setPeriod(variables.timerPeriod[0] / 1000.);
 		}
 		if (variables.timerPeriod[1] != oldTimerPeriod[1])
 		{
 			oldTimerPeriod[1] = variables.timerPeriod[1];
-			if (variables.timerPeriod[1])
-				timer1->start(variables.timerPeriod[1]);
-			else
-				timer1->stop();
+			timer1.setPeriod(variables.timerPeriod[1] / 1000.);
 		}
 		
 		// set motion

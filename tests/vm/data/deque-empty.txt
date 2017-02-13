@@ -1,0 +1,9 @@
+# SCENARIO An empty array is a Deque
+# 	GIVEN An empty array of size N*K+2
+
+var dq[5]
+var require1
+
+# 		REQUIRE size == 0
+
+require1 = dq[0]

@@ -1138,5 +1138,405 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_rand =
 	}
 };
 
+// standard native functions for deque
+
+// A deque of capacity K is stored in an array of size K+2 that contains N, J, and a
+// gap buffer [Finseth 1991]. Operations on the deque may use an index I relative to
+// the front of the deque. For example a deque of capacity 8 containing N=6 elements
+// stored starting at position J=3, and an index I=2 pointing before the third element:
+// +---+---+---+---+---+---+---+---+---+
+// + 6 | 3 | 5 |   |   | 0 | 1 | 2 | 4 |
+// +---+---+---+---+---+---+---+---+---+
+//   N   J              *J      *I
+// Deque operations that accept another array as an addend will treat it as a tuple of
+// elements, to be inserted, copied, or set as a unit. The push_* and pop_* operations
+// respect the size of the addend, and a deque can get or pop a tuple into an interval
+// in another array. For example, call.pop_front(result[3:5], dq) will pop three elements
+// from a deque stored in array dq into positions 3:5 of the array result. It is the
+// programmer's responsibility to use consistent tuple sizes.
+
+// Inserting and erasing must shift existing elements in the deque. The deque_shift private
+// function replaces the following specific loops:
+//
+// Insert in left half: shift prefix elements left
+//		for (k = 0; k <= index_val - 1 + src_length - 1; k++)
+//			vm->variables[dest + 2 + ((dq_start + k) % dq_capacity)] = vm->variables[dest + 2 + ((dq_start + k + src_length) % dq_capacity)];
+// Insert in right half: shift prefix elements left
+//		for (k = dq_size + src_length - 1; k > index_val + src_length - 1; k--)
+//			vm->variables[dest + 2 + ((dq_start + k) % dq_capacity)] = vm->variables[dest + 2 + ((dq_start + k - src_length) % dq_capacity)];
+// Erase in left half: shift prefix elements right
+//		for (k = index_val; k > 0; k--)
+//			vm->variables[dest + 2 + ((dq_start + k) % dq_capacity)] = vm->variables[dest + 2 + ((dq_start + k - 1) % dq_capacity)];
+// Erase in right half: shift prefix elements left
+//		for (k = index_val; k < dq_size - 1; k++)
+//			vm->variables[dest + 2 + ((dq_start + k) % dq_capacity)] = vm->variables[dest + 2 + ((dq_start + k + 1) % dq_capacity)];
+
+static void deque_shift(AsebaVMState *vm, uint16 dq, uint16 dq_capacity, uint16 target, sint16 last, sint16 delta)
+{
+	for ( ; (delta < 0 ? target >= last : target <= last) ; (delta < 0 ? target-- : target++) )
+		vm->variables[dq + 2 + (target % dq_capacity)] = vm->variables[dq + 2 + ((target + delta) % dq_capacity)];
+}
+
+static void deque_throw_exception(AsebaVMState *vm)
+{
+	vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
+	AsebaSendMessage(vm, ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS, &(vm->pc), sizeof(vm->pc));
+	return;
+}
+
+void AsebaNative_deqsize(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 size = AsebaNativePopArg(vm);
+	
+	// variable size
+	(void)/* uint16 deque_length = */ AsebaNativePopArg(vm);
+
+	vm->variables[size++] = vm->variables[deque++];
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqsize =
+{
+	"deque.size",
+	"report size of dest",
+	{
+		{ -1, "deque" },
+		{  1, "size" },
+		{ 0, 0 }
+	}
+};
+
+static void _AsebaNative_deqget(AsebaVMState *vm, uint16 dest, uint16 deque, uint16 index_val, uint16 dest_length, uint16 deque_length)
+{
+	// infer deque parameters
+	uint16 dq_size = vm->variables[deque];
+	uint16 dq_start = vm->variables[deque + 1];
+	uint16 dq_capacity = deque_length - 2;
+
+	// Check for deque size exception
+	if (dest_length > dq_size - index_val)
+		return deque_throw_exception(vm);
+
+	// copy elements from deque
+	uint16 i;
+
+	for (i = 0; i < dest_length; i++)
+	{
+		vm->variables[dest++] = vm->variables[deque + 2 + ((dq_start + index_val + i) % dq_capacity)];
+	}
+}
+
+void AsebaNative_deqget(AsebaVMState *vm)
+{
+	// variable pos
+    uint16 deque = AsebaNativePopArg(vm);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 index = AsebaNativePopArg(vm);
+	uint16 index_val = vm->variables[index];
+	
+	// variable size
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 dest_length = AsebaNativePopArg(vm);
+	
+	// Check for parameter range exception
+	if (vm->variables[index] < 0 || vm->variables[index] > deque_length - 2 - 1)
+		return deque_throw_exception(vm);
+	
+	// Do it
+	_AsebaNative_deqget(vm, dest, deque, index_val, dest_length, deque_length);
+}
+	
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqget =
+{
+	"deque.get",
+	"fill dest from deque at index",
+	{
+		{ -1, "deque" },
+		{ -2, "dest" },
+		{  1, "index" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_deqset(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 index = AsebaNativePopArg(vm);
+	uint16 index_val = vm->variables[index];
+	
+	// variable size
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 src_length = AsebaNativePopArg(vm);
+
+	// Infer deque parameters
+	uint16 dq_size = vm->variables[deque];
+	uint16 dq_start = vm->variables[deque + 1];
+	uint16 dq_capacity = deque_length - 2;
+	
+	// Check for deque size and parameter range exception
+	if (vm->variables[index] < 0 || vm->variables[index] > deque_length - 2 - 1
+		|| src_length > dq_size - index_val)
+	{
+		return deque_throw_exception(vm);
+	}
+	
+	// Copy elements into deque
+	uint16 i;
+	
+	for (i = 0; i < src_length; i++)
+	{
+		vm->variables[deque + 2 + ((dq_start + index_val + i) % dq_capacity)] = vm->variables[src++];
+	}
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqset =
+{
+	"deque.set",
+	"copies src to deque at index",
+	{
+		{ -1, "deque" },
+		{ -2, "src" },
+		{  1, "index" },
+		{ 0, 0 }
+	}
+};
+	
+static void _AsebaNative_deqinsert(AsebaVMState *vm, uint16 deque, uint16 src, uint16 index_val, uint16 deque_length, uint16 src_length)
+{
+	// infer deque parameters
+	uint16 dq_size = vm->variables[deque];
+	uint16 dq_start = vm->variables[deque + 1];
+	uint16 dq_capacity = deque_length - 2;
+	
+	// Check for deque size exception
+	if (src_length > dq_capacity - dq_size)
+		return deque_throw_exception(vm);
+
+	// Insert src elements as a block
+	// if in left half, shift prefix elements left
+	if (index_val < dq_size / 2)
+	{
+		vm->variables[deque + 1] = dq_start = (dq_start == 0) ? dq_capacity - src_length : (dq_start - src_length + dq_capacity) % dq_capacity;
+		deque_shift(vm, deque, dq_capacity,
+					/* from */ dq_start,
+					/* to   */ index_val-1 + src_length-1,
+					src_length);
+	}
+	// else in right half, shift suffix elements right
+	else
+	{
+		deque_shift(vm, deque, dq_capacity,
+					/* from */ dq_start + dq_size + src_length - 1,
+					/* to   */ dq_start + index_val + src_length,
+					-src_length);
+	}
+	// insert elements in position
+	uint16 i;
+	for (i = 0; i < src_length; i++)
+		vm->variables[deque + 2 + ((dq_start + index_val + i) % dq_capacity)] = vm->variables[src + i];
+	vm->variables[deque] = dq_size = dq_size + src_length;
+}
+
+void AsebaNative_deqinsert(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 index = AsebaNativePopArg(vm);
+	uint16 index_val = vm->variables[index];
+	
+	// variable size
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 src_length = AsebaNativePopArg(vm);
+	
+	// Check for parameter range exception
+	if (vm->variables[index] < 0 || index_val > deque_length - 2 - 1)
+		return deque_throw_exception(vm);
+	
+	// Do it
+	_AsebaNative_deqinsert(vm, deque, src, index_val, deque_length, src_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqinsert =
+{
+	"deque.insert",
+	"shift deque at index by len(src) and insert src",
+	{
+		{ -1, "deque" },
+		{ -2, "src" },
+		{  1, "index" },
+		{ 0, 0 }
+	}
+};
+	
+static void _AsebaNative_deqerase(AsebaVMState *vm, uint16 deque, uint16 index_val, uint16 len_val, uint16 deque_length)
+{
+	// infer deque parameters
+	uint16 dq_size = vm->variables[deque];
+	uint16 dq_start = vm->variables[deque + 1];
+	uint16 dq_capacity = deque_length - 2;
+	
+	// Check for deque size exception
+	if (len_val > dq_size - index_val)
+		return deque_throw_exception(vm);
+
+	// Erase elements as a block
+	// if in left half, shift prefix elements right
+	if (index_val < dq_size / 2)
+	{
+		deque_shift(vm, deque, dq_capacity,
+					/* from */ dq_start + index_val + len_val - 1,
+					/* to   */ dq_start + len_val,
+					-len_val);
+		vm->variables[deque + 1] = dq_start = (dq_start + len_val) % dq_capacity;
+	}
+	// else in right half, shift suffix elements left
+	else
+	{
+		deque_shift(vm, deque, dq_capacity,
+					/* from */ dq_start + index_val,
+					/* to   */ dq_start + dq_size - 1 - len_val,
+					len_val);
+	}
+	vm->variables[deque] = dq_size = dq_size - len_val;
+}
+
+void AsebaNative_deqerase(AsebaVMState *vm)
+{
+	// variable pos
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 index = AsebaNativePopArg(vm);
+	uint16 len = AsebaNativePopArg(vm);
+	uint16 index_val = vm->variables[index];
+	uint16 len_val = vm->variables[len];
+	
+	// variable size
+	uint16 deque_length = AsebaNativePopArg(vm);
+	
+	// Check for parameter range exception
+	if (vm->variables[index] < 0 || index_val > deque_length - 2 - 1)
+		return deque_throw_exception(vm);
+	
+	// Do it
+	_AsebaNative_deqerase(vm, deque, index_val, len_val, deque_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqerase =
+{
+	"deque.erase",
+	"shift deque at index by len to erase",
+	{
+		{ -1, "deque" },
+		{  1, "index" },
+		{  1, "len" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_deqpushfront(AsebaVMState *vm)
+{
+	// Pop arguments off
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 src_length = AsebaNativePopArg(vm);
+
+	// Now call insert with proper arguments
+	// Low-level function will check capacity and raise exception if necessary
+	_AsebaNative_deqinsert(vm, deque, src, 0, deque_length, src_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqpushfront =
+{
+	"deque.push_front",
+	"insert src before the front of deque",
+	{
+		{ -1, "deque" },
+		{ -2, "src" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_deqpushback(AsebaVMState *vm)
+{
+	// Pop arguments off
+	uint16 deque = AsebaNativePopArg(vm);
+	uint16 src = AsebaNativePopArg(vm);
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 src_length = AsebaNativePopArg(vm);
+    
+	uint16 index_val = vm->variables[deque]; // length of deque is index value
+	
+	// Now call insert with proper arguments
+	// Low-level function will check capacity and raise exception if necessary
+	_AsebaNative_deqinsert(vm, deque, src, index_val, deque_length, src_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqpushback =
+{
+	"deque.push_back",
+	"insert src after the back of deque",
+	{
+		{ -1, "deque" },
+		{ -2, "src" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_deqpopfront(AsebaVMState *vm)
+{
+	// Pop arguments off
+    uint16 deque = AsebaNativePopArg(vm);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 dest_length = AsebaNativePopArg(vm);
+
+	// Now call insert and erase with proper arguments
+	// Low-level functions will check capacity and raise exception if necessary
+	_AsebaNative_deqget(vm, dest, deque, 0, dest_length, deque_length);
+	_AsebaNative_deqerase(vm, deque, 0, dest_length, deque_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqpopfront =
+{
+	"deque.pop_front",
+	"fill dest from front of deque then erase elements",
+	{
+		{ -1, "deque" },
+		{ -2, "dest" },
+		{ 0, 0 }
+	}
+};
+
+void AsebaNative_deqpopback(AsebaVMState *vm)
+{
+	// Pop arguments off
+    uint16 deque = AsebaNativePopArg(vm);
+	uint16 dest = AsebaNativePopArg(vm);
+	uint16 deque_length = AsebaNativePopArg(vm);
+	uint16 dest_length = AsebaNativePopArg(vm);
+
+    uint16 index_val = vm->variables[deque]; // length of deque is index value, from which tuple length will be subtracted
+	
+	// Now call insert and erase with proper arguments
+	// Low-level function will check capacity and raise exception if necessary
+	_AsebaNative_deqget(vm, dest, deque, index_val - dest_length, dest_length, deque_length);
+	_AsebaNative_deqerase(vm, deque, index_val - dest_length, dest_length, deque_length);
+}
+
+const AsebaNativeFunctionDescription AsebaNativeDescription_deqpopback =
+{
+	"deque.pop_back",
+	"fill dest from back of deque then erase elements",
+	{
+		{ -1, "deque" },
+		{ -2, "dest" },
+		{ 0, 0 }
+	}
+};
+
 
 /*@}*/

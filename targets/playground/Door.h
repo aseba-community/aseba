@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_DOOR_H
-#define __CHALLENGE_DOOR_H
+#ifndef __PLAYGROUND_DOOR_H
+#define __PLAYGROUND_DOOR_H
 
 #include <enki/PhysicalEngine.h>
 
@@ -89,4 +89,4 @@ namespace Enki
 	};
 } // Enki
 
-#endif // __CHALLENGE_DOOR_H
+#endif // __PLAYGROUND_DOOR_H

@@ -1,0 +1,105 @@
+# SCENARIO Insert wraps around
+# 	GIVEN A Deque of size 8
+
+var dq[10]
+var require1[3]
+var require2[1]
+var require3[6]
+var require4[1]
+var require5[4]
+var require6[1]
+var require7[3]
+var require8[6]
+var require9[1]
+var require10[8]
+var require11[1]
+var require12[6]
+var require13[1]
+var require14[1]
+var require15[1]
+
+# 	WHEN Insert tuple 11, 12, 13 at 0
+
+call deque.insert(dq, [11, 12, 13], 0)
+
+# 		THEN Treated as three inserts, 13, 12 then 11
+# 			REQUIRE contents is 11, 12, 13
+# 			REQUIRE size == 3
+
+call deque.get(dq, require1, 0)
+require2 = dq[0]
+
+# 	WHEN Insert 21, 22, 23 at 0
+
+call deque.insert(dq, [21, 22, 23], 3)
+
+# 		THEN Treated as three inserts, 23, 22 then 21
+# 			REQUIRE contents is 11, 12, 13, 21, 22, 23
+# 			REQUIRE size == 6
+
+call deque.get(dq, require3, 0)
+require4 = dq[0]
+
+# 	WHEN remove 2 from 2
+
+call deque.erase(dq, 2, 2)
+
+# 		THEN Don't respect tuple boundaries. Will shift right in left half
+# 			REQUIRE contents is 11, 12, 22, 23
+# 			REQUIRE size == 4
+
+call deque.get(dq, require5, 0)
+call deque.size(dq, require6)
+
+# 	WHEN get 3 from 1
+
+call deque.get(dq, require7, 1)
+
+# 		THEN Retrieve 12, 22, 23
+# 			REQUIRE retrieve 12, 22, 23
+
+# 	WHEN Insert 31, 32 at 1
+
+call deque.insert(dq, [31, 32], 1)
+
+# 		THEN Will shift left in left half
+# 			REQUIRE contents is 11, 31, 32, 12, 22, 23
+# 			REQUIRE size == 6
+
+call deque.get(dq, require8, 0)
+call deque.size(dq, require9)
+
+# 	WHEN Insert 41, 42 at 4
+
+call deque.insert(dq, [41, 42], 4)
+
+# 		THEN Will shift right in right half
+# 			REQUIRE contents is 11, 31, 32, 12, 41, 42, 22, 23
+# 			REQUIRE size == 8
+
+call deque.get(dq, require10, 0)
+call deque.size(dq, require11)
+
+# 	WHEN remove 2 from 5
+
+call deque.erase(dq, 5, 2)
+
+# 		THEN Don't respect tuple boundaries. Will shift left in right half
+# 			REQUIRE contents is 11, 31, 32, 12, 41, 23
+# 			REQUIRE size == 6
+
+call deque.get(dq, require12, 0)
+call deque.size(dq, require13)
+
+# 	WHEN erase 5 from 1
+
+call deque.erase(dq, 1, 5)
+
+# 		THEN Leave only 11
+# 			REQUIRE contents is 11
+# 			REQUIRE size == 1
+
+call deque.get(dq, require14, 0)
+require15 = dq[0]
+
+call math.fill(dq, 0)

@@ -1,3 +1,4 @@
+add_subdirectory(simulator)
 add_subdirectory(vm)
 add_subdirectory(compiler)
 

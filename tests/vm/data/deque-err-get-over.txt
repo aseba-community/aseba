@@ -1,0 +1,12 @@
+# SCENARIO deque.get error beyond number of elements after the index
+# 	GIVEN A Deque of size 5
+
+var dq[7] = [ 3, 3, 13, 0, 0, 11, 12 ]
+var result[3]
+
+# 	WHEN Get beyond number of elements after the index
+
+call deque.get(dq, result[0:2], 1) # note that there are 3 elements in the deque but only 2 after index 1
+
+# 		THEN Throws exception
+# 			REQUIRE THROWS ARRAY_ACCESS_OUT_OF_BOUNDS

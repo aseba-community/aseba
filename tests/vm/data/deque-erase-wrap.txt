@@ -1,0 +1,20 @@
+# SCENARIO Erase wraps around
+# 	GIVEN A Deque of size 5 containing 30, 40
+
+var dq[7] = [ 2, 0, 30, 40, 0, 0, 0 ]
+var require1[2]
+var require2[1]
+
+# 	WHEN Insert 20 then 10 at 0, then erase 2 twice
+
+call deque.insert(dq, [20], 0)
+call deque.insert(dq, [10], 0)
+call deque.erase(dq, 2, 1)
+call deque.erase(dq, 2, 1)
+
+# 		THEN Erasure wrapped backwards
+# 			REQUIRE contents is 10, 20
+# 			REQUIRE j == 3
+
+call deque.get(dq, require1, 0)
+require2 = dq[1]

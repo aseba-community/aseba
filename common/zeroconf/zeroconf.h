@@ -57,6 +57,7 @@ namespace Aseba
 	{
 	public:
 		class TxtRecord;
+		class TargetInformation;
 		class Target;
 //		typedef std::map<std::string, Zeroconf::Target*> NameTargetMap;
 
@@ -129,13 +130,13 @@ namespace Aseba
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
 		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
-
+	
 	/**
 	 \addtogroup zeroconf
 
-		A Zeroconf::Target allows client classes to choose and access Aseba targets.
+		A Zeroconf::TargetInformation allows client classes to choose and access Aseba targets.
 	 */
-	class Zeroconf::Target
+	class Zeroconf::TargetInformation
 	{
 	public:
 		std::string name;
@@ -144,21 +145,34 @@ namespace Aseba
 		std::string regtype{"_aseba._tcp"};
 		std::string host{"localhost"};
 		bool local{true};
-		ZeroconfDiscoveryRequest zdr;
-
+		
 	public:
-		Target(const std::string & name, const int port);
-		Target(const Dashel::Stream* dashel_stream);
-		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
-		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
-		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
-
+		TargetInformation(const std::string & name, const int port);
+		TargetInformation(const Dashel::Stream* dashel_stream);
+		
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
-		virtual bool operator==(const Target &other) const
+		virtual bool operator==(const TargetInformation &other) const
 		{
 			return name == other.name && domain == other.domain;
 		}
+	};
+
+	/**
+	 \addtogroup zeroconf
+
+		A Zeroconf::Target allows client classes to choose and access Aseba targets.
+	 */
+	class Zeroconf::Target: public Zeroconf::TargetInformation
+	{
+	public:
+		ZeroconfDiscoveryRequest zdr;
+
+	public:
+		using TargetInformation::TargetInformation;
+		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
+		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
+		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
 
 	private:
 		friend Zeroconf;

@@ -22,6 +22,8 @@
 #include "../common/utils/utils.h"
 #include <cassert>
 #include <cstdlib>
+#include <algorithm>
+#include <iterator>
 
 namespace Aseba
 {

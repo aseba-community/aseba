@@ -28,8 +28,12 @@
 
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
-#include "EPuck.h"
+#include "EnkiGlue.h"
+#include "DashelAsebaGlue.h"
 #include "../../common/utils/utils.h"
+#include <QMessageBox>
+#include <QApplication>
+#include <QtDebug>
 
 #ifdef Q_OS_WIN32
 	#define Q_PID_PRINT size_t
@@ -40,19 +44,28 @@
 namespace Enki
 {
 	using namespace Aseba;
+	using namespace std::placeholders;
 	
-	static PlaygroundViewer* playgroundViewer = 0;
-
-	PlaygroundViewer::PlaygroundViewer(World* world) : 
+	const std::map<EnvironmentNotificationType, QColor> notificationLogTypeToColor = {
+		{ EnvironmentNotificationType::LOG_INFO, Qt::white },
+		{ EnvironmentNotificationType::LOG_WARNING, Qt::yellow },
+		{ EnvironmentNotificationType::LOG_ERROR, Qt::red }
+	};
+	
+	PlaygroundViewer::PlaygroundViewer(World* world, bool energyScoringSystemEnabled) : 
 		ViewerWidget(world),
 		font("Courier", 10),
+		energyScoringSystemEnabled(energyScoringSystemEnabled),
 		logPos(0),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
-		//font.setPixelSize(14);
-		if (playgroundViewer)
-			abort();
-		playgroundViewer = this;
+		// register callbacks
+		if (Enki::getWorld)
+			qDebug() << "An Enki::World getter callback already exists, replacing";
+		Enki::getWorld = std::bind(&PlaygroundViewer::getWorld, this);
+		if (Enki::notifyEnvironment)
+			qDebug() << "An Aseba environment notification callback already exists, replacing";
+		Enki::notifyEnvironment = std::bind(&PlaygroundViewer::notifyAsebaEnvironment, this, _1, _2, _3);
 	}
 	
 	PlaygroundViewer::~PlaygroundViewer()
@@ -65,9 +78,54 @@ namespace Enki
 		return world;
 	}
 	
-	PlaygroundViewer* PlaygroundViewer::getInstance()
+	void PlaygroundViewer::notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments)
 	{
-		return playgroundViewer;
+		if (type == EnvironmentNotificationType::DISPLAY_INFO)
+		{
+			if (description == "missing Thymio2 feature")
+			{
+				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
+			}
+			else
+				qDebug() << "Unknown description for notifying DISPLAY_INFO" << QString::fromStdString(description);
+		}
+		else if ((type == EnvironmentNotificationType::LOG_INFO) ||
+				 (type == EnvironmentNotificationType::LOG_WARNING) ||
+				 (type == EnvironmentNotificationType::LOG_ERROR))
+		{
+			if (description == "cannot read from socket")
+			{
+				log(tr("Target %0, cannot read from socket: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "new client connected")
+			{
+				log(tr("New client connected from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "cannot read from socket")
+			{
+				log(tr("Target %0, cannot read from socket: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "client disconnected properly")
+			{
+				log(tr("Client disconnected properly from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "old client disconnected")
+			{
+				log(tr("Old client disconnected from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else
+				log(description, notificationLogTypeToColor.at(type));
+		}
+		else if (type == EnvironmentNotificationType::FATAL_ERROR)
+		{
+			if (description == "cannot create listening port")
+			{
+				QMessageBox::critical(0, tr("Aseba Playground"), tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
+				abort();
+			}
+			else
+				qDebug() << "Unknown description for notifying FATAL_ERROR" << QString::fromStdString(description);
+		}
 	}
 	
 	void PlaygroundViewer::log(const QString& entry, const QColor& color)
@@ -76,6 +134,16 @@ namespace Enki
 		logColor[logPos] = color;
 		logTime[logPos] = Aseba::UnifiedTime();
 		logPos = (logPos+1) % LOG_HISTORY_COUNT;
+	}
+	
+	void PlaygroundViewer::log(const std::string& entry, const QColor& color)
+	{
+		log(QString::fromStdString(entry), color);
+	}
+	
+	void PlaygroundViewer::log(const char* entry, const QColor& color)
+	{
+		log(QString(entry), color);
 	}
 	
 	void PlaygroundViewer::processStarted()
@@ -132,8 +200,8 @@ namespace Enki
 	
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
-		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
-		// TODO: add display of Thymio 2 in EnkiViewer, then add alias here
+		managedObjectsAliases[&typeid(DashelAsebaFeedableEPuck)] = &typeid(EPuck);
+		managedObjectsAliases[&typeid(DashelAsebaThymio2)] = &typeid(Thymio2);
 	}
 	
 	void PlaygroundViewer::sceneCompletedHook()
@@ -142,27 +210,30 @@ namespace Enki
 		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
 		qglColor(Qt::black);
 		
-		// TODO: clean-up that
-		int i = 0;
-		QString scoreString("Id.: E./Score. - ");
-		int totalScore = 0;
-		for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
+		// TODO: once we have ECS-enabled Enki, use modules for playground as well
+		if (energyScoringSystemEnabled)
 		{
-			AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
-			if (epuck)
+			int i = 0;
+			QString scoreString("Id.: E./Score. - ");
+			int totalScore = 0;
+			for (World::ObjectsIterator it = world->objects.begin(); it != world->objects.end(); ++it)
 			{
-				totalScore += (int)epuck->score;
-				if (i != 0)
-					scoreString += " - ";
-				scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
-				renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
-				i++;
+				AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*it);
+				if (epuck)
+				{
+					totalScore += (int)epuck->score;
+					if (i != 0)
+						scoreString += " - ";
+					scoreString += QString("%0: %1/%2").arg(epuck->vm.nodeId).arg(epuck->variables.energy).arg((int)epuck->score);
+					renderText(epuck->pos.x, epuck->pos.y, 10, QString("%0").arg(epuck->vm.nodeId), font);
+					i++;
+				}
 			}
+			
+			renderText(16, height() * 7 / 8 - 40, scoreString, font);
+			
+			renderText(16, height() * 7 / 8 - 20, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		}
-		
-		renderText(16, 22, scoreString, font);
-		
-		renderText(16, 42, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		
 		// console background
 		glEnable(GL_BLEND);
@@ -174,9 +245,11 @@ namespace Enki
 		glBegin(GL_QUADS);
 			glVertex2f(-1,-1);
 			glVertex2f(1,-1);
-			glVertex2f(1,-0.5);
-			glVertex2f(-1,-0.5);
+			glVertex2f(1,-0.75);
+			glVertex2f(-1,-0.75);
 		glEnd();
+		glDisable(GL_BLEND);
+		
 		// console text
 		for (unsigned i=0; i<LOG_HISTORY_COUNT; ++i)
 		{
@@ -184,7 +257,7 @@ namespace Enki
 			if (!logText[j].isEmpty())
 			{
 				qglColor(logColor[j]);
-				renderText(8,(height()*3)/4 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
+				renderText(8,(height()*7)/8 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
 			}
 		}
 	}

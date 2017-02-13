@@ -26,6 +26,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <vector>
+#include <functional>
 #include "../types.h"
 
 namespace Aseba
@@ -113,6 +114,30 @@ namespace Aseba
 	
 	//! Dump the current time to a stream
 	void dumpTime(std::ostream &stream, bool raw = false);
+	
+	// Soft timer
+	class SoftTimer
+	{
+	public:
+		//! A callback function
+		typedef const std::function< void() > Callback; 
+		//! The callback function, cannot change once initialized
+		Callback callback;
+		//! The current period, 0 disables the timer
+		double period;
+		
+	protected:
+		//! time left until next call to callback
+		double left = 0;
+		
+	public:
+		//! Constructor, using callback and firing every period s, 0 disables the timer
+		SoftTimer(Callback callback, double period);
+		//! Step dt s, calls callback any necessary number of times
+		void step(double dt);
+		//! Set the period in s, 0 disables the timer
+		void setPeriod(double period);
+	};
 	
 	//! Transform a wstring into an UTF8 string, this function is thread-safe
 	std::string WStringToUTF8(const std::wstring& s);

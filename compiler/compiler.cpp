@@ -32,6 +32,7 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
+#include <iterator>
 
 namespace Aseba
 {
