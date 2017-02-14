@@ -572,6 +572,9 @@ namespace Aseba
 		REGISTER_HANDLER(getApiDocs, GET, { "apidocs" });
 
 		registerConstantsHandlers();
+		registerEventsHandlers();
+		
+		// TODO: at some point, call a registerStreamsHandlers();
 		
 		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events" });
 		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events", "{name}" });

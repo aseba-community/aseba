@@ -247,7 +247,7 @@ namespace Aseba
 			response.push_back({
 				{ "id", i++ },
 				{ "name", WStringToUTF8(constant.name) },
-				{ "value", constant.value}
+				{ "value", constant.value }
 			});
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
@@ -353,7 +353,7 @@ namespace Aseba
 
 	// support
 
-	//! set the value of a content from the request
+	//! set the value of a constant from the request
 	void HttpDispatcher::updateConstantValue(HandlerContext& context, const string& name, size_t position, bool created)
 	{
 		// sets the value

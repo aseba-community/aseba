@@ -87,6 +87,19 @@ namespace Aseba
 		void updateConstantValue(HandlerContext& context, const std::string& name, size_t position, bool created);
 		bool findConstant(HandlerContext& context, std::string& name, size_t& position);
 		
+		// events, in EventsHandlers.cpp
+		// handlers
+		void registerEventsHandlers();
+		void postEventHandler(HandlerContext& context);
+		void getEventsHandler(HandlerContext& context);
+		void deleteEventsHandler(HandlerContext& context);
+		void getEventHandler(HandlerContext& context);
+		void deleteEventHandler(HandlerContext& context);
+		void putEventHandler(HandlerContext& context);
+		// support
+		void updateEventValue(HandlerContext& context, const std::string& name, size_t position, bool created);
+		bool findEvent(HandlerContext& context, std::string& name, size_t& position);
+		
 		// streams
 		void getStreamsEventsHandler(HandlerContext& context);
 		

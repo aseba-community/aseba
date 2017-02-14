@@ -109,7 +109,7 @@ frisby.create('Get all events after titi was added')
 .expectHeader('Content-Type', 'application/json')
 .expectJSON([
 	{ id: 0, name: "toto", size: 0 },
-	{ id: 1, name: "titi", size: 258 }
+	{ id: 1, name: "titi", size: 3 }
 ])
 .toss();
 
@@ -128,7 +128,7 @@ frisby.create('Get all events after toto was deleted')
 .expectStatus(200)
 .expectHeader('Content-Type', 'application/json')
 .expectJSON([
-	{ id: 0, name: "titi", size: 258 }
+	{ id: 0, name: "titi", size: 3 }
 ])
 .toss();
 

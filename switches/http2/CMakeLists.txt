@@ -54,6 +54,7 @@
 		http/HttpDispatcher.cpp
 		http/EventsHandlers.cpp
 		http/ConstantsHandlers.cpp
+		http/EventsHandlers.cpp
 		Globals.cpp
 		DashelUtils.cpp
 		Arguments.cpp
