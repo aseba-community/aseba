@@ -64,17 +64,17 @@ frisby.create('Fail to create constant titi with too small value')
 
 frisby.create('Fail to create constant with empty name')
 .post('http://localhost:' + port + '/constants', { name: "", value: 0 }, {json: true})
-.expectStatus(403)
+.expectStatus(400)
 .toss();
 
 frisby.create('Fail to create constant starting with a number')
 .post('http://localhost:' + port + '/constants', { name: "42", value: 0 }, {json: true})
-.expectStatus(403)
+.expectStatus(400)
 .toss();
 
 frisby.create('Fail to create constant starting with a special character')
 .post('http://localhost:' + port + '/constants', { name: "#", value: 0 }, {json: true})
-.expectStatus(403)
+.expectStatus(400)
 .toss();
 
 frisby.create('Create constant titi')

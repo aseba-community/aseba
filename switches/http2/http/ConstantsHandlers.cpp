@@ -28,25 +28,6 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	/*
-	#define RQ_GET_VALUE(stream, jsonObject, fieldType, fieldName) \
-		const auto _it ## fieldName(jsonObject.find(#fieldName)); \
-		if (_it ## fieldName == jsonObject.end()) \
-		{ \
-			HttpResponse::fromPlainString("Cannot find field " #fieldName " in object " + jsonObject.dump(), HttpStatus::BAD_REQUEST).send(stream); \
-			return; \
-		} \
-		fieldType fieldName; \
-		try \
-		{ \
-			fieldName = _it ## fieldName.value().get<fieldType>(); \
-		} \
-		catch (const domain_error& e) \
-		{ \
-			HttpResponse::fromPlainString("Field " #fieldName " has invalid value " + _it ## fieldName.value().dump() + ": " + e.what(), HttpStatus::BAD_REQUEST).send(stream); \
-			return; \
-		}
-	*/
 	
 	//! Register all constants-related handlers
 	void HttpDispatcher::registerConstantsHandlers()
@@ -82,13 +63,7 @@ namespace Aseba
 						}
 					},
 					"400" : {
-						"description" : "Invalid value",
-						"schema" : {
-							"type" : "string"
-						}
-					},
-					"403" : {
-						"description" : "Invalid constant name",
+						"description" : "Invalid name or invalid value",
 						"schema" : {
 							"type" : "string"
 						}
