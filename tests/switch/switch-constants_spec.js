@@ -1,13 +1,6 @@
 var frisby = require('frisby');
 var port = 3000
 
-frisby.create('Verify no root endpoint')
-.get('http://localhost:' + port + '/')
-.expectStatus(404)
-.toss();
-
-// constants
-
 frisby.create('Clear all constants')
 .delete('http://localhost:' + port + '/constants')
 .expectStatus(204)
@@ -125,7 +118,7 @@ frisby.create('Delete constant toto')
 .expectStatus(204)
 .toss();
 
-frisby.create('Failt to delete constant toto twice')
+frisby.create('Fail to delete constant toto twice')
 .delete('http://localhost:' + port + '/constants/toto')
 .expectStatus(404)
 .toss();
