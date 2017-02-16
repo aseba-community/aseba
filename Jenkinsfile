@@ -7,7 +7,7 @@
 // Jenkins jobs, but for now we conservatively recompile them.
 
 pipeline {
-	agent label:'' // use any available Jenkins agent
+	agent any
 
 	// Jenkins will prompt for parameters when a branch is build manually
 	// but will use default parameters when the entire project is built.
@@ -45,8 +45,8 @@ pipeline {
 					"debian" : {
 						node('debian') {
 							unstash 'source'
-							CMake([sourceDir: '$workDir/externals/dashel', label: 'debian', preloadScript: 'set -x',
-								buildDir: '$workDir/build/dashel/debian'])
+							CMake([sourceDir: pwd()+'/externals/dashel', label: 'debian', preloadScript: 'set -x',
+								buildDir: pwd()+'/build/dashel/debian'])
 							stash includes: 'dist/**', name: 'dist-dashel-debian'
 						}
 					},
@@ -54,8 +54,8 @@ pipeline {
 						node('macos') {
 							// sh 'rm -rf build/* dist/*'
 							unstash 'source'
-							CMake([sourceDir: '$workDir/externals/dashel', label: 'macos', preloadScript: 'set -x',
-								buildDir: '$workDir/build/dashel/macos'])
+							CMake([sourceDir: pwd()+'/externals/dashel', label: 'macos', preloadScript: 'set -x',
+								buildDir: pwd()+'/build/dashel/macos'])
 							stash includes: 'dist/**', name: 'dist-dashel-macos'
 						}
 					},
@@ -63,8 +63,8 @@ pipeline {
 						node('windows') {
 							// sh 'rm -rf build/* dist/*'
 							unstash 'source'
-							CMake([sourceDir: '$workDir/externals/dashel', label: 'windows', preloadScript: 'set -x',
-								buildDir: '$workDir/build/dashel/windows'])
+							CMake([sourceDir: pwd()+'/externals/dashel', label: 'windows', preloadScript: 'set -x',
+								buildDir: pwd()+'/build/dashel/windows'])
 							stash includes: 'dist/**', name: 'dist-dashel-windows'
 						}
 					}
@@ -82,25 +82,25 @@ pipeline {
 									python -c "import sys; print 'lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/dist-packages'"
 								''', returnStdout: true).trim()
 							}
-							CMake([sourceDir: '$workDir/externals/enki', label: 'debian', preloadScript: 'set -x',
+							CMake([sourceDir: pwd()+'/externals/enki', label: 'debian', preloadScript: 'set -x',
 								getCmakeArgs: "-DPYTHON_CUSTOM_TARGET:PATH=${env.debian_python}",
-								buildDir: '$workDir/build/enki/debian'])
+								buildDir: pwd()+'/build/enki/debian'])
 							stash includes: 'dist/**', name: 'dist-enki-debian'
 						}
 					},
 					"macos" : {
 						node('macos') {
 							unstash 'source'
-							CMake([sourceDir: '$workDir/externals/enki', label: 'macos', preloadScript: 'set -x',
-								buildDir: '$workDir/build/enki/macos'])
+							CMake([sourceDir: pwd()+'/externals/enki', label: 'macos', preloadScript: 'set -x',
+								buildDir: pwd()+'/build/enki/macos'])
 							stash includes: 'dist/**', name: 'dist-enki-macos'
 						}
 					},
 					"windows" : {
 						node('windows') {
 							unstash 'source'
-							CMake([sourceDir: '$workDir/externals/enki', label: 'windows', preloadScript: 'set -x',
-								buildDir: '$workDir/build/enki/windows'])
+							CMake([sourceDir: pwd()+'/externals/enki', label: 'windows', preloadScript: 'set -x',
+								buildDir: pwd()+'/build/enki/windows'])
 							stash includes: 'dist/**', name: 'dist-enki-windows'
 						}
 					}
@@ -119,7 +119,7 @@ pipeline {
 								env.debian_enki_DIR = sh ( script: 'dirname $(find $PWD/dist/debian -name enkiConfig.cmake | head -1)', returnStdout: true).trim()
 							}
 							unstash 'source'
-							CMake([sourceDir: '$workDir/aseba', label: 'debian', preloadScript: 'set -x',
+							CMake([sourceDir: pwd()+'/aseba', label: 'debian', preloadScript: 'set -x',
 								envs: [ "dashel_DIR=${env.debian_dashel_DIR}", "enki_DIR=${env.debian_enki_DIR}" ] ])
 							stash includes: 'dist/**', name: 'dist-aseba-debian'
 							stash includes: 'build/**', name: 'build-aseba-debian'
@@ -135,7 +135,7 @@ pipeline {
 							}
 							echo "Found dashel_DIR=${env.dashel_DIR} enki_DIR=${env.enki_DIR}"
 							unstash 'source'
-							CMake([sourceDir: '$workDir/aseba', label: 'macos', preloadScript: 'set -x',
+							CMake([sourceDir: pwd()+'/aseba', label: 'macos', preloadScript: 'set -x',
 								envs: [ "dashel_DIR=${env.macos_dashel_DIR}", "enki_DIR=${env.macos_enki_DIR}" ] ])
 							stash includes: 'dist/**', name: 'dist-aseba-macos'
 							stash includes: 'build/**', name: 'build-aseba-macos'
@@ -150,7 +150,7 @@ pipeline {
 								env.windows_enki_DIR = sh ( script: 'dirname $(find $PWD/dist/windows -name enkiConfig.cmake | head -1)', returnStdout: true).trim()
 							}
 							unstash 'source'
-							CMake([sourceDir: '$workDir/aseba', label: 'windows', preloadScript: 'set -x',
+							CMake([sourceDir: pwd()+'/aseba', label: 'windows', preloadScript: 'set -x',
 								envs: [ "dashel_DIR=${env.windows_dashel_DIR}", "enki_DIR=${env.windows_enki_DIR}" ] ])
 							stash includes: 'dist/**', name: 'dist-aseba-windows'
 							// stash includes: 'build/**', name: 'build-aseba-windows'
