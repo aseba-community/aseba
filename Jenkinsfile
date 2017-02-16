@@ -12,8 +12,8 @@ pipeline {
 	// Jenkins will prompt for parameters when a branch is build manually
 	// but will use default parameters when the entire project is built.
 	parameters {
-		stringParam(defaultValue: 'master', description: 'Dashel branch', name: 'branch_dashel')
-		stringParam(defaultValue: 'master', description: 'Enki branch', name: 'branch_enki')
+		string(defaultValue: 'master', description: 'Dashel branch', name: 'branch_dashel')
+		string(defaultValue: 'master', description: 'Enki branch', name: 'branch_enki')
 	}
 	
 	stages {
