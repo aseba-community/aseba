@@ -175,7 +175,9 @@ pipeline {
 		stage('Extended Test') {
 			// Extended tests are only run for the master branch.
 			when {
-				env.BRANCH == 'master'
+				expression {
+					return env.BRANCH == 'master'
+				}
 			}
 			steps {
 				node('debian') {
@@ -189,7 +191,9 @@ pipeline {
 		stage('Package') {
 			// Packages are only built for the master branch
 			when {
-				env.BRANCH == 'master'
+				expression {
+					return env.BRANCH == 'master'
+				}
 			}
 			steps {
 				parallel (
