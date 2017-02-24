@@ -43,6 +43,7 @@ namespace Aseba
 		{ HttpStatus::METHOD_NOT_ALLOWED, "Method Not Allowed" },
 		{ HttpStatus::REQUEST_TIMEOUT, "Request Timeout" },
 		{ HttpStatus::CONFLICT, "Conflict" },
+		{ HttpStatus::UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type" },
 		{ HttpStatus::INTERNAL_SERVER_ERROR, "Internal Server Error" },
 		{ HttpStatus::NOT_IMPLEMENTED, "Not Implemented" },
 		{ HttpStatus::SERVICE_UNAVAILABLE, "Service Unavailable" },
