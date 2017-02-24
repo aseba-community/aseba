@@ -430,6 +430,8 @@ namespace Aseba
 	BytecodeVector::EventAddressesToIdsMap BytecodeVector::getEventAddressesToIds() const
 	{
 		EventAddressesToIdsMap eventAddr;
+		if (empty())
+			return eventAddr;
 		const unsigned eventVectSize = (*this)[0];
 		unsigned pc = 1;
 		while (pc < eventVectSize)

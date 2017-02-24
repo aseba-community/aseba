@@ -225,7 +225,7 @@ namespace Aseba
 		
 		std::wstring compilationLog; //!< detailed log of compilation
 		
-		//! Constructor, sets succes to false and allocatedVariablesCount to 0
+		//! Constructor, sets success to false and allocatedVariablesCount to 0
 		CompilationResult(): success(false), allocatedVariablesCount(0) {}
 	};
 	
