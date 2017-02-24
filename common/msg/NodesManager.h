@@ -35,11 +35,12 @@ namespace Aseba
 	//! For now, it does not support the disconnection of a whole network nor the update of the description of any node
 	class NodesManager
 	{
-	protected:
+	public:
 		//! Potentially partial Descriptions of nodes along with their reception status
 		struct Node: public TargetDescription
 		{
 			Node(const TargetDescription& targetDescription);
+			virtual ~Node() {}
 			
 			unsigned namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
 			unsigned localEventsReceptionCounter; //!< what is the status of the reception of local events
@@ -50,8 +51,11 @@ namespace Aseba
 			
 			bool isComplete() const;
 		};
+		
 		//! Map from nodes id to nodes descriptions
 		typedef std::map<unsigned, std::unique_ptr<Node> > NodesMap;
+		
+	protected:
 		NodesMap nodes; //!< all known nodes descriptions and connection status
 		std::set<unsigned> mismatchingNodes; //<! seen nodes with mismatching protocol versions
 		
