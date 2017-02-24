@@ -47,6 +47,7 @@ namespace Aseba
 		{
 			variables = compiler.getVariablesMap();
 			subroutinesNames = compiler.getSubroutinesNames();
+			subroutineTable = compiler.getSubroutineTable();
 		}
 	}
 	
@@ -394,6 +395,8 @@ namespace Aseba
 			}
 		}
 	}
+	
+	// FIXME: implement nodeProtocolVersionMismatch from NodesManager
 
 	//! Return whether the given stream is an Aseba stream handled by this Switch
 // 	bool Switch::isAsebaStream(Dashel::Stream* stream) const

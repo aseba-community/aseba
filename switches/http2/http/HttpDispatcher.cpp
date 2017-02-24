@@ -573,6 +573,7 @@ namespace Aseba
 
 		registerConstantsHandlers();
 		registerEventsHandlers();
+		registerNodesHandlers();
 		
 		// TODO: at some point, call a registerStreamsHandlers();
 		
@@ -682,15 +683,39 @@ namespace Aseba
 									(request.content.size() > 0 && request.getHeader("Content-Type") == "application/json") ? parse(request.content) : json()
 								});
 								
-								// if request content is JSON, validate
 								const json& doc(uriHandlerKV.second.second);
+								
+								// if specified, check that the handler can consume the provided Content-Type
+								auto consumesIt(doc.find("consumes"));
+								if (consumesIt != doc.end())
+								{
+									bool found(false);
+									for (const string& consumedType: *consumesIt)
+									{
+										const string contentType(request.getHeader("Content-Type"));
+										if (contentType.substr(0, contentType.find(';')) == consumedType)
+											found = true;
+									}
+									if (!found)
+									{
+										HttpResponse::fromPlainString(FormatableString("Content-Type %0 is not supported").arg(request.getHeader("Content-Type")), HttpStatus::UNSUPPORTED_MEDIA_TYPE).send(stream);
+										return;
+									}
+								}
+								
+								// if request content is JSON, validate
 								auto parametersIt(doc.find("parameters"));
 								if (parametersIt != doc.end())
 								{
 									for (const auto& parameter: *parametersIt)
 									{
-										const string name(parameter.at("name").get<string>());
-										const string in(parameter.at("in").get<string>());
+										const auto nameIt(parameter.find("name"));
+										const auto inIt(parameter.find("in"));
+										// skip a parameter if it has no "name" or no "in" fields
+										if (nameIt == parameter.end() || inIt == parameter.end())
+											continue;
+										const string name(nameIt->get<string>());
+										const string in(inIt->get<string>());
 										if (name == "body" && in == "body")
 										{
 											// make sure we received JSON content

@@ -55,7 +55,10 @@ namespace Aseba
 			void compile(const CommonDefinitions& commonDefinitions);
 			
 			std::wstring code; //!< the source code of the program
+			Compiler::SubroutineTable subroutineTable; //!< all subroutines with their address and source lines
 		};
+		
+		friend class HttpDispatcher;
 		
 	public:
 		// public API for main
