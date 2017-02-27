@@ -22,17 +22,23 @@
 #define ASEBA_SWITCH_DISPATCHER_HTTP
 
 #include <functional>
+#include <unordered_map>
 #include "../Module.h"
+#include "../Switch.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
 namespace Aseba
 {
+	//! The HTTP dispatcher provides an HTTP REST interface to the Aseba network
 	class HttpDispatcher: public Module
 	{
 	protected:
+		// types for calling handlers
+		
 		//! A Handler takes a pointer to the switch, the stream, the request, the filled path templates map in the URI.
 		typedef std::map<std::string, std::string> PathTemplateMap;
+		
 		//! All information a handler needs to have to process a request
 		struct HandlerContext
 		{
@@ -44,8 +50,54 @@ namespace Aseba
 		};
 		//! A callback to an handler for HTTP requests
 		typedef std::function<void(HandlerContext&)> Handler;
-        //! A pair of Handler function and its documentation
-        typedef std::pair<Handler, json> HandlerDescription;
+		
+		//! A (node id, node pointer) pair
+		typedef std::pair<unsigned, Switch::NodeWithProgram*> NodeEntry;
+		
+		// types for selecting which handler to call
+		
+		//! A pair of Handler function and its documentation
+		typedef std::pair<Handler, json> HandlerDescription;
+		//! Map of splitted URI (including path templates) to handlers
+		typedef std::map<strings, HandlerDescription> URIHandlerMap;
+		//! Map of method to map of splitted URI to handlers
+		typedef std::map<HttpMethod, URIHandlerMap> HandlersMap;
+	
+		// types for reading variables' values
+		
+		//! The result of a search for a variable
+		struct VariableSearchResult
+		{
+			bool found; //! whether the search was successful (node and variable's name found)
+			unsigned nodeId; //! node identifier holding the variable
+			unsigned pos; //! address of the variable inside the node
+			unsigned size; //! size of the variable
+		};
+		//! The key indexing a pending variable read request
+		struct VariableRequestKey
+		{
+			unsigned nodeId; //!< the node containing the variable being read
+			unsigned pos; //!< the address within the node of the variable being read
+			//! Comparison operator, equal if both nodeId and pos are equal
+			bool operator== (const VariableRequestKey& that) const { return nodeId == that.nodeId && pos == that.pos; }
+		};
+		//! Hash function for VariableRequestKey
+		struct VariableRequestKeyHash
+		{
+			size_t operator()(const VariableRequestKey& key) const;
+		};
+		//! Pending variable read operations for this dispatcher
+		//! We use a multimap as the same variable might have been requested more than once by several clients, and therefore
+		//! should be returned to each of them.
+		//! Note that unordered_multimap does not specify a policy for equal keys, so under heavy load and
+		//! a LIFO policy, the earliest clients might starve.
+		//! If this prove a problem in practice, we'll swith to a unordered_map pointing to a dequeue.
+		typedef std::unordered_multimap<VariableRequestKey, Dashel::Stream*, VariableRequestKeyHash> PendingReads;
+		
+		// types for SSE
+		
+		//! Multimap of a named Aseba event to Dashel streams, if name is empty it means all events
+		typedef std::multimap<std::string, Dashel::Stream*> EventStreams;
 		
 	public:
 		HttpDispatcher();
@@ -100,24 +152,42 @@ namespace Aseba
 		void updateEventValue(HandlerContext& context, const std::string& name, size_t position, bool created);
 		bool findEvent(HandlerContext& context, std::string& name, size_t& position);
 		
+		// nodes, in NodesHandlers.cpp
+		void registerNodesHandlers();
+		// handlers
+		void getNodesHandler(HandlerContext& context);
+		void getNodesNodeHandler(HandlerContext& context);
+		void getNodesNodeDescriptionHandler(HandlerContext& context);
+		void putNodesNodeProgramHandler(HandlerContext& context);
+		void getNodesNodeProgramHandler(HandlerContext& context);
+		void getNodesNodeVariablesHandler(HandlerContext& context);
+		void putNodesNodeVariablesVariableHandler(HandlerContext& context);
+		void getNodesNodeVariablesVariableHandler(HandlerContext& context);
+		// support
+		json jsonNodeDescription(const NodeEntry& node) const;
+		json jsonNodeProgram(const NodeEntry& node) const;
+		json jsonNodeSymbolEventsVector(const NodeEntry& node) const;
+		json jsonNodeVariables(const NodeEntry& node) const;
+		json jsonNodeNativeEvents(const NodeEntry& node) const;
+		json jsonNodeNativeFunctions(const NodeEntry& node) const;
+		json jsonNodeNativeVariables(const NodeEntry& node) const;
+		json jsonNodeSymbolTable(const NodeEntry& node) const;
+		json jsonNodeSymbolVariables(const NodeEntry& node) const;
+		json jsonNodeSymbolSubroutines(const NodeEntry& node) const;
+		VariableSearchResult findVariable(HandlerContext& context) const;
+		NodeEntry findNode(HandlerContext& context) const;
+		
 		// streams
 		void getStreamsEventsHandler(HandlerContext& context);
 		
 	protected:
 		unsigned serverPort; //!< port this server is listening on
 		const json definitions; //!< the JSON models used in the API
-		
-		//! Multimap of a named Aseba event to Dashel streams, if name is empty it means all events
-		typedef std::multimap<std::string, Dashel::Stream*> EventStreams;
-		//! Ongoing SSE for Aseba events
-		EventStreams eventStreams;
-		//! Map of splitted URI (including path templates) to handlers
-		typedef std::map<strings, HandlerDescription> URIHandlerMap;
-		//! Map of method to map of splitted URI to handlers
-		typedef std::map<HttpMethod, URIHandlerMap> HandlersMap;
-		//! Handlers for known method + URI couples
-		HandlersMap handlers;
+		HandlersMap handlers; //!< handlers for known method + URI couples
+		PendingReads pendingReads; //!< pending variable read requests
+		EventStreams eventStreams; //!< ongoing SSE for Aseba events
 	};
-}
+	
+} // namespace Aseba
 
 #endif // ASEBA_SWITCH_DISPATCHER_HTTP

@@ -26,6 +26,7 @@
 #include "../Globals.h"
 #include "../Switch.h"
 
+
 namespace Aseba
 {
 	using namespace std;
@@ -39,6 +40,7 @@ namespace Aseba
 			HttpResponse::fromPlainString("Cannot find field " #fieldName " in request content", HttpStatus::BAD_REQUEST).send(stream); \
 			return; \
 		}
+	
 	
 	HttpDispatcher::HttpDispatcher():
 		serverPort(3000),
@@ -780,7 +782,7 @@ namespace Aseba
 	
 	void HttpDispatcher::connectionClosed(Switch* asebaSwitch, Dashel::Stream * stream)
 	{
-		// Remove the SSE associated to this stream
+		// Remove the SSE associated to this stream if any
 		auto eventStreamIt(eventStreams.begin()); 
 		while (eventStreamIt != eventStreams.end())
 		{
@@ -789,11 +791,33 @@ namespace Aseba
 			else
 				++eventStreamIt;
 		}
+		// Remove the pending variable read requests associated to this stream if any
+		// Note: this is slow if there are a lot of pending reads, but as we do not expect
+		// to be the case, a linear read is acceptable
+		for (auto pendingReadIt(pendingReads.begin()); pendingReadIt != pendingReads.end();)
+		{
+			if (pendingReadIt->second == stream)
+				pendingReadIt = pendingReads.erase(pendingReadIt);
+			else
+				++pendingReadIt;
+		}
 	}
 	
 	void HttpDispatcher::processMessage(Switch* asebaSwitch, const Message& message)
 	{
-		// TODO: handle answers for requests of variables
+		// handle answers for pending variable read requests
+		const Variables *variables = dynamic_cast<const Variables *>(&message);
+		if (variables)
+		{
+			auto pendingReadsIt(pendingReads.find({ message.source, variables->start }));
+			if (pendingReadsIt != pendingReads.end())
+			{
+				// a match is found, send the content and remove the request
+				HttpResponse::fromJSON(variables->variables).send(pendingReadsIt->second);
+				pendingReads.erase(pendingReadsIt);
+			}
+			return;
+		}
 		
 		// consider user messages for forwarding to SSE
 		const UserMessage* userMessage(dynamic_cast<const UserMessage*>(&message));
@@ -930,6 +954,5 @@ namespace Aseba
 		documentation["definitions"] = definitions;
 		return documentation;
 	}
-
 	
 } // namespace Aseba

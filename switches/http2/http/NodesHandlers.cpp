@@ -29,6 +29,12 @@ namespace Aseba
 	using namespace std;
 	using namespace Dashel;
 	
+	//! Hash the key, shift up nodeId 16 bits and xor with pos
+	size_t HttpDispatcher::VariableRequestKeyHash::operator()(const VariableRequestKey& key) const
+	{
+		return hash<unsigned>{}(key.nodeId << 16) ^ hash<unsigned>{}(key.pos);
+	}
+	
 	//! Register all nodes-related handlers
 	void HttpDispatcher::registerNodesHandlers()
 	{
@@ -254,12 +260,16 @@ namespace Aseba
 								3
 							],
 							"items" : {
-								"type" : "integer"
+								"type" : "integer",
+								"maximum" : 32767,
+								"minimum" : -32768
 							},
 							"type" : [
 								"integer",
 								"array"
-							]
+							],
+							"maximum" : 32767,
+							"minimum" : -32768
 						}
 					}
 				],
@@ -423,15 +433,47 @@ namespace Aseba
 	//! handler for PUT /nodes/{node}/variables/{variable} -> application/json
 	void HttpDispatcher::putNodesNodeVariablesVariableHandler(HandlerContext& context)
 	{
-		// TODO: write a variable
-		HttpResponse::fromJSON({}).send(context.stream);
+		//unsigned nodeId, pos, size;
+		const auto variable(findVariable(context));
+		if (!variable.found)
+			return;
+		
+		if (context.parsedContent.is_number())
+		{
+			// we have a single integer
+			const sint16 value(context.parsedContent.get<int>());
+			context.asebaSwitch->sendMessage(SetVariables(variable.nodeId, variable.pos, { value } ));
+		}
+		else
+		{
+			// we have a vector of integers
+			const size_t count(context.parsedContent.size());
+			if (count > variable.size)
+			{
+				HttpResponse::fromPlainString(FormatableString("Trying to write %0 elements while variable has only %1 elements").arg(count).arg(variable.size), HttpStatus::BAD_REQUEST).send(context.stream);
+				return;
+			}
+			
+			const vector<sint16> data = context.parsedContent;
+			context.asebaSwitch->sendMessage(SetVariables(variable.nodeId, variable.pos, data));
+		}
+		// send success
+		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
 
 	//! handler for GET /nodes/{node}/variables/{variable} -> application/json
 	void HttpDispatcher::getNodesNodeVariablesVariableHandler(HandlerContext& context)
 	{
-		// TODO: get a variable durative action
-		HttpResponse::fromJSON({}).send(context.stream);
+		//unsigned nodeId, pos, size;
+		const auto variable(findVariable(context));
+		if (!variable.found)
+			return;
+
+		// request variable from node and keep track of request
+		context.asebaSwitch->sendMessage(GetVariables(variable.nodeId, variable.pos, variable.size));
+		pendingReads.emplace(VariableRequestKey{ variable.nodeId, variable.pos }, context.stream);
+		
+		// do not send any answer yet
 	}
 	
 	// support
@@ -577,8 +619,31 @@ namespace Aseba
 		return {};
 	}
 	
+	//! Return true and fills nodeId, pos and size if a variable is found, 
+	HttpDispatcher::VariableSearchResult HttpDispatcher::findVariable(HandlerContext& context) const
+	{
+		const NodeEntry node(findNode(context));
+		if (!node.second)
+			return { false };
+		
+		// Get variable name from template
+		const auto templateIt(context.filledPathTemplates.find("variable"));
+		assert(templateIt != context.filledPathTemplates.end());
+		const wstring variableName(UTF8ToWString(templateIt->second));
+		
+		// Find variable
+		auto variableIt(node.second->variables.find(variableName));
+		if (variableIt == node.second->variables.end())
+		{
+			HttpResponse::fromPlainString(FormatableString("Node %0 does not contain variable %1").arg(node.first).arg(templateIt->second), HttpStatus::NOT_FOUND).send(context.stream);
+			return { false };
+		}
+		
+		return { true, node.first, variableIt->second.first, variableIt->second.second };
+	}
+	
 	//! Return a node from the request, or produce an error and return null if the node is not found
-	HttpDispatcher::NodeEntry HttpDispatcher::findNode(HandlerContext& context)
+	HttpDispatcher::NodeEntry HttpDispatcher::findNode(HandlerContext& context) const
 	{
 		// FIXME: if node is not an integer, stoul will generate an exception. We should catch it and add support for name-based indexing
 		// retrieve name
