@@ -31,6 +31,7 @@ namespace Aseba
 	json parse(const std::vector<uint8_t>& rawData);
 	
 	void validate(const json& schema, const json& data, const std::string& context = "/");
+	void validateType(const json& schema, const std::string& type, const json& data, const std::string& context);
 	
 	using logic_error = std::logic_error;
 	struct InvalidJsonSchema: public logic_error

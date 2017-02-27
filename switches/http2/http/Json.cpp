@@ -39,26 +39,57 @@ namespace Aseba
 	//! context is used to produced informative dump
 	void validate(const json& schema, const json& data, const string& context)
 	{
-		// constant type-to-string map
-		const map<json::value_t, string> typeToString {
+		// get the list of accepted types, if a single type is given, transform it into a list
+		auto acceptedTypes(schema.at("type"));
+		if (!acceptedTypes.is_array())
+			acceptedTypes = json::array({ acceptedTypes.get<string>() });
+		
+		// constant type-to-string map for matching
+		const map<json::value_t, string> typeToStringMatch{
+			{ json::value_t::null, "null" },
+			{ json::value_t::boolean, "boolean" },
+			{ json::value_t::number_integer, "integer" },
+			{ json::value_t::number_unsigned, "integer" },
+			{ json::value_t::number_float, "number" },
+			{ json::value_t::object, "object" },
+			{ json::value_t::array, "array" },
+			{ json::value_t::string, "string" }
+		};
+		
+		// iterate over all accepted type
+		for (const auto& acceptedType: acceptedTypes)
+		{
+			if (typeToStringMatch.at(data.type()) == acceptedType)
+			{
+				validateType(schema, acceptedType, data, context);
+				return;
+			}
+		}
+		
+		// if no match were found, the type is not accepted
+		throw InvalidJsonSchema(FormatableString("In %0, type %1 is not in the list of accepted types %2").arg(context).arg(typeToStringMatch.at(data.type())).arg(acceptedTypes.dump()));
+	}
+	
+	//! Valide data as JSON schema for a specific type, data is assumed to be of the right type
+	void validateType(const json& schema, const string& type, const json& data, const string& context)
+	{
+		// Note: type could be passed as a json::value_t and a static map of function could be used
+		// for faster checks. However, performance here is not a critical element as schemas are small.
+		
+		// constant type-to-string map for debugging
+		const map<json::value_t, string> typeToStringDebug {
 			{ json::value_t::null, "null" },
 			{ json::value_t::boolean, "boolean" },
 			{ json::value_t::number_integer, "integer number" },
+			{ json::value_t::number_unsigned, "unsigned integer number" },
 			{ json::value_t::number_float, "float number" },
 			{ json::value_t::object, "object" },
 			{ json::value_t::array, "array" },
 			{ json::value_t::string, "string" }
 		};
 		
-		// do type-specific checks
-		const string type = schema.at("type");
-		// TODO: currently this validator does not support multiple types (type as array)
 		if (type == "array")
 		{
-			// check it is array
-			if (!data.is_array())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected array, found %1").arg(context).arg(typeToString.at(data.type())));
-			
 			// check number of items
 			auto minItemsIt(schema.find("minItems"));
 			if ((minItemsIt != schema.end()) && (data.size() < minItemsIt->get<size_t>()))
@@ -77,16 +108,10 @@ namespace Aseba
 		}
 		else if (type == "boolean")
 		{
-			// check it is boolean
-			if (!data.is_boolean())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected boolean, found %1").arg(context).arg(typeToString.at(data.type())));
+			// do nothing
 		}
 		else if (type == "integer")
 		{
-			// check it is number
-			if (!data.is_number())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected integer, found %1").arg(context).arg(typeToString.at(data.type())));
-			
 			// check bounds if given
 			auto minimumIt(schema.find("minimum"));
 			if ((minimumIt != schema.end()) && (data.get<int>() < minimumIt->get<int>()))
@@ -97,10 +122,6 @@ namespace Aseba
 		}
 		else if (type == "number")
 		{
-			// check it is number
-			if (!data.is_number())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected number, found %1").arg(context).arg(typeToString.at(data.type())));
-			
 			// check bounds if given
 			auto minimumIt(schema.find("minimum"));
 			if ((minimumIt != schema.end()) && (data.get<double>() < minimumIt->get<double>()))
@@ -111,16 +132,10 @@ namespace Aseba
 		}
 		else if (type == "null")
 		{
-			// check it is null
-			if (!data.is_null())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected null, found %1").arg(context).arg(typeToString.at(data.type())));
+			// do nothing
 		}
 		else if (type == "object")
 		{
-			// check it is object
-			if (!data.is_object())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected object, found %1").arg(context).arg(typeToString.at(data.type())));
-			
 			// check that all elements of the array are valid properties
 			const json properties(schema.at("properties"));
 			assert(properties.is_object());
@@ -149,10 +164,6 @@ namespace Aseba
 		}
 		else if (type == "string")
 		{
-			// check it is string
-			if (!data.is_string())
-				throw InvalidJsonSchema(FormatableString("In %0, wrong type, expected string, found %1").arg(context).arg(typeToString.at(data.type())));
-			
 			// check minLength
 			auto minLengthIt(schema.find("minLength"));
 			if ((minLengthIt != schema.end()) && (data.get<string>().size() < minLengthIt->get<size_t>()))
