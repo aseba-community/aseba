@@ -42,6 +42,7 @@
 
 namespace Aseba
 {
+	//! Global switch-wide settings, set through command line arguments
 	struct Globals
 	{
 		bool verbose; //!< whether to be verbose
