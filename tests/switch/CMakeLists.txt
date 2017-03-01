@@ -24,6 +24,7 @@ if (NODE_EXECUTABLE AND NPM_EXECUTABLE)
 				-D in=${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in
 				-D out=${CMAKE_CURRENT_BINARY_DIR}/run-e2e-switch.sh
 				-D ASEBASWITCH=$<TARGET_FILE:asebaswitch>
+				-D ASEBADUMMYNODE=$<TARGET_FILE:asebadummynode>
 				-P ${CMAKE_CURRENT_SOURCE_DIR}/../patch-script.cmake
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/run-e2e-switch.sh.in

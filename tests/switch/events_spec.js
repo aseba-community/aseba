@@ -1,3 +1,5 @@
+// this test only requires the switch
+
 var frisby = require('frisby');
 var port = 3000
 

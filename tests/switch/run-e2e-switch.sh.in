@@ -3,19 +3,31 @@
 # clean up previous session
 which killall >/dev/null 2>&1 \
     && killall aseba{switch,dummynode} \
-    || ps | egrep 'aseba(switch|dummynode)' | while read pid rest; do kill $pid; done
-sleep 3
+    || ps | egrep 'aseba(switch|dummynode)' | while read pid rest; do
+		kill $pid;
+done
+
+# run dummy nodes
+for i in 0 1; do
+	@ASEBADUMMYNODE@ $i &
+done
+sleep 2 # let dummynodes start up
 
 # run switch
-@ASEBASWITCH@ 1>&2 &
-
-sleep 5 # let switch start up
+@ASEBASWITCH@ --dump --port 33335 "tcp:localhost;33333" "tcp:localhost;33334" 1>&2 &
+sleep 3 # let switch start up
 
 # run e2e tests
 node_modules/jasmine-node/bin/jasmine-node .
 status=$?
 
-# clean up
+# clean up switch
 [ -z "$(jobs -p)" ] || kill %%
+sleep 1
+# clean up dummies
+for i in 0 1; do
+	[ -z "$(jobs -p)" ] || kill %%
+	sleep 1
+done
 
 exit $status
