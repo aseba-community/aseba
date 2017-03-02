@@ -331,10 +331,13 @@ namespace Aseba
 	
 	void UserMessage::dumpSpecific(wostream &stream) const
 	{
-		stream << dec << "user message of size " << data.size() << " : ";
-		for (size_t i = 0 ; i < data.size(); i++)
-			stream << setw(4) << data[i] << " ";
-		stream << dec << setfill(wchar_t(' '));
+		stream << dec << "user message of size " << data.size() << " : [ ";
+		for (size_t i = 0; i < data.size(); i++) {
+			stream << data[i];
+			if (i+1 != data.size())
+				stream << ", ";
+		}
+		stream << " ]";
 	}
 	
 	//
@@ -654,10 +657,13 @@ namespace Aseba
 	
 	void Variables::dumpSpecific(wostream &stream) const
 	{
-		stream << "start " << start << ", variables vector of size " << variables.size();
-		/*for (size_t i = 0; i < variables.size(); i++)
-			stream << "\n " << i << " : " << variables[i];
-		stream << "\n";*/
+		stream <<  "start " << start << ", variables vector of size " << variables.size() << " : [ ";
+		for (size_t i = 0; i < variables.size(); i++) {
+			stream << variables[i];
+			if (i+1 != variables.size())
+				stream << ", ";
+		}
+		stream << " ]";
 	}
 	
 	//
@@ -1036,6 +1042,12 @@ namespace Aseba
 	{
 		CmdMessage::dumpSpecific(stream);
 		
-		stream << "start " << start << ", variables vector of size " << variables.size();
+		stream << "start " << start << ", variables vector of size " << variables.size() << " : [ ";
+		for (size_t i = 0; i < variables.size(); i++) {
+			stream << variables[i];
+			if (i+1 != variables.size())
+				stream << ", ";
+		}
+		stream << " ]";
 	}
 } // namespace Aseba
