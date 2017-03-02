@@ -105,6 +105,7 @@ public:
 
 		// init VM
 		AsebaVMInit(&vm);
+		variables.id = vm.nodeId;
 
 		// return stream
 		return listen_stream;
