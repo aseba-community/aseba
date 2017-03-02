@@ -256,6 +256,12 @@ namespace Aseba
 		return new NodeWithProgram(targetDescription);
 	}
 	
+	//! Node description has been received, do a first compilation
+	void Switch::nodeDescriptionReceived(unsigned nodeId)
+	{
+		polymorphic_downcast<NodeWithProgram*>(nodes.at(nodeId).get())->compile(commonDefinitions);
+	}
+	
 	void Switch::sendMessage(const Message& message)
 	{
 		// dump message if enabled

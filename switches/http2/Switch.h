@@ -83,6 +83,7 @@ namespace Aseba
 		
 		// from NodesManager
 		virtual Node* createNode(const TargetDescription& targetDescription);
+		virtual void nodeDescriptionReceived(unsigned nodeId);
 		virtual void sendMessage(const Message& message);
 		
 		// support functions
