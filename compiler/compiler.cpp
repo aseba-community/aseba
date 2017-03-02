@@ -339,6 +339,9 @@ namespace Aseba
 			*dump << "\n\n";
 		}
 		
+		// clear error description
+		errorDescription = Error();
+		
 		return true;
 	}
 	

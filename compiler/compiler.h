@@ -185,7 +185,7 @@ namespace Aseba
 		//! Create an error at pos
 		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
 		//! Create an empty error
-		Error() { message = L"not defined"; }
+		Error() { message = L"no error"; }
 
 		//! Return a string describing the error
 		std::wstring toWString() const;
