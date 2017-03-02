@@ -300,7 +300,7 @@ namespace Aseba
 						"name" : {
 							"type" : "string"
 						},
-						"native-events" : {
+						"nativeEvents" : {
 							"items" : {
 								"properties" : {
 									"description" : {
@@ -314,7 +314,7 @@ namespace Aseba
 							},
 							"type" : "array"
 						},
-						"native-functions" : {
+						"nativeFunctions" : {
 							"description" : "",
 							"items" : {
 								"properties" : {
@@ -343,7 +343,7 @@ namespace Aseba
 							},
 							"type" : "array"
 						},
-						"native-variables" : {
+						"nativeVariables" : {
 							"description" : "",
 							"items" : {
 								"properties" : {
@@ -361,7 +361,7 @@ namespace Aseba
 						"protocolVersion" : {
 							"type" : "integer"
 						},
-						"vm-properties" : {
+						"vmProperties" : {
 							"description" : "",
 							"properties" : {
 								"bytecodeSize" : {
