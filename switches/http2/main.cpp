@@ -80,7 +80,6 @@ int main(int argc, const char *argv[])
 	asebaSwitch->registerModule(new HttpDispatcher());
 	
 	// parse command line
-	vector<string> dashelTargetList;
 	Arguments arguments;
 	int argCounter = 1;
 	while (argCounter < argc)
@@ -106,8 +105,8 @@ int main(int argc, const char *argv[])
 			cerr << string("Unhandled command line argument: ") + arg << endl;
 			exit(2);
 		}
-		// register additional dashel targets
-		dashelTargetList.push_back(arg);
+		// register command line Aseba target
+		asebaSwitch->addAsebaTarget(arg);
 		
 		argFound: ;
 	}
@@ -116,19 +115,6 @@ int main(int argc, const char *argv[])
 	asebaSwitch->processArguments(arguments);
 	for (auto const& module: asebaSwitch->getModules())
 		module->processArguments(asebaSwitch.get(), arguments);
-	
-	// add command line targets
-	for (auto const& target: dashelTargetList) 
-	{
-		try
-		{
-			asebaSwitch->connect(target);
-		}
-		catch (const Dashel::DashelException& e)
-		{
-			LOG_ERROR << "Core | Error connecting target " << target << " : " << e.what() << endl;
-		}
-	}
 	
 	// run switch, catch Dashel exceptions
 	try

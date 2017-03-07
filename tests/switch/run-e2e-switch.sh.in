@@ -7,15 +7,32 @@ which killall >/dev/null 2>&1 \
 		kill $pid;
 done
 
-# run dummy nodes
-for i in 0 1; do
-	@ASEBADUMMYNODE@ $i &
-done
-sleep 2 # let dummynodes start up
+# first dummy node
+@ASEBADUMMYNODE@ 0 &
+dummy0pid=$!
+sleep 2
 
 # run switch
 @ASEBASWITCH@ --dump --port 33335 "tcp:localhost;33333" "tcp:localhost;33334" 1>&2 &
-sleep 3 # let switch start up
+switchpid=$!
+sleep 3
+
+# run a second dummy node, switch should connect
+@ASEBADUMMYNODE@ 1 &
+dummy1pid=$!
+sleep 2
+
+# kill first dummy node
+kill $dummy0pid
+sleep 2
+
+# restart first dummy
+@ASEBADUMMYNODE@ 0 &
+dummy0pid=$!
+sleep 3
+
+# at this point, both dummynodes should be running, and the switch should be
+# connected to them
 
 # run e2e tests
 status=0
@@ -26,13 +43,16 @@ for filename in *.js; do
 done
 echo "Failed $status test set(s)"
 
-# clean up switch
-[ -z "$(jobs -p)" ] || kill %%
+# stop second dummynode
+kill $dummy1pid
 sleep 1
-# clean up dummies
-for i in 0 1; do
-	[ -z "$(jobs -p)" ] || kill %%
-	sleep 1
-done
+
+# stop switch
+kill $switchpid
+sleep 1
+
+# stop first dummynode
+kill $dummy0pid
+sleep 1
 
 exit $status

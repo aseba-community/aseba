@@ -109,6 +109,12 @@ namespace Aseba
 		LOG_VERBOSE << "Core | Aseba listening stream on " << serverStream->getTargetName() << endl;
 	}
 	
+	//! Add an Aseba target to connect to
+	void Switch::addAsebaTarget(const std::string& target)
+	{
+		toConnectTargets.insert(target);
+	}
+	
 	//! Run the Switch until a termination signal was caught or a specific given duration has elapsed
 	void Switch::run()
 	{
@@ -127,6 +133,9 @@ namespace Aseba
 	{
 		// get initial time
 		UnifiedTime startTime;
+		
+		// attempt to connect to not-yet-connected targets
+		connectNewTargets();
 		
 		// attempt to reconnect disconnected targets
 		reconnectDisconnectedTargets();
@@ -365,6 +374,31 @@ namespace Aseba
 		// fill remap tables
 		globalIdStreamMap.emplace(globalId, stream);
 		return remapTable.emplace(localId, globalId).first;
+	}
+	
+	//! Attempt to connect to not-yet-connected targets
+	void Switch::connectNewTargets()
+	{
+		auto targetIt(toConnectTargets.begin());
+		while (targetIt != toConnectTargets.end())
+		{
+			const string& target(*targetIt);
+			try
+			{
+				// Aseba targets are simply connected
+				connect(target);
+				
+				LOG_VERBOSE << "Core | Connected to target " << target << endl;
+				
+				targetIt = toConnectTargets.erase(targetIt);
+			}
+			catch (const Dashel::DashelException& e)
+			{
+				LOG_ERROR << "Core | Error connecting target " << target << " : " << e.what() << endl;
+				
+				++targetIt;
+			}
+		}
 	}
 	
 	//! Attempt to reconnect disconnected targets

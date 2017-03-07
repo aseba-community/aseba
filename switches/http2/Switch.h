@@ -68,6 +68,8 @@ namespace Aseba
 		ArgumentDescriptions describeArguments() const;
 		void processArguments(const Arguments& arguments);
 		
+		void addAsebaTarget(const std::string& target);
+		
 		void run();
 		
 		const Modules& getModules() const { return modules; }
@@ -92,6 +94,7 @@ namespace Aseba
 		IdRemapTables::iterator newRemapTable(Dashel::Stream* stream);
 		IdRemapTable::iterator newRemapEntry(IdRemapTable& remapTable, Dashel::Stream* stream, unsigned localId);
 		bool run1s();
+		void connectNewTargets();
 		void reconnectDisconnectedTargets();
 		//bool isAsebaStream(Dashel::Stream* stream) const;
 	
@@ -101,6 +104,7 @@ namespace Aseba
 	protected:
 		int runDuration; //!< if positive, run only for duration (in seconds)
 		
+		StreamTargetSet toConnectTargets; //!< set of targets to attempt automatic connection, will be Aseba streams afterwards
 		StreamTargetSet toReconnectTargets; //!< set of targets to attempt automatic reconnection, will be Aseba streams afterwards
 		
 		IdRemapTables idRemapTables; //!< tables for remapping identifiers for different Aseba Dashel targets
