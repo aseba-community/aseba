@@ -54,7 +54,7 @@ void dumpVersion(std::ostream &stream, const char *programName)
 //! Show usage
 void dumpHelp(ostream &stream, const char *programName, const Switch* asebaSwitch, const Modules& modules)
 {
-	stream << "Usage: " << programName << " [options] [additional targets]*\n";
+	stream << "Usage: " << programName << " [options] [additional target]*\n";
 	stream << "Aseba Switch, connects Aseba networks together and with HTTP.\n\n";
 	stream << "Valid command-line options:\n";
 	stream << "  General\n";
