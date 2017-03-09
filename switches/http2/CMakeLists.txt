@@ -56,6 +56,7 @@
 		http/ConstantsHandlers.cpp
 		http/EventsHandlers.cpp
 		http/NodesHandlers.cpp
+		http/DebugsHandlers.cpp
 		Globals.cpp
 		DashelUtils.cpp
 		Arguments.cpp

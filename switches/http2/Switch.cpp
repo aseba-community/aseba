@@ -219,6 +219,23 @@ namespace Aseba
 		// createNode() might be called if it is a previously unseen node node
 		processMessage(message.get());
 		
+		// if execution state changed, update local copy
+		const ExecutionStateChanged *execStateChanged(dynamic_cast<const ExecutionStateChanged *>(message.get()));
+		if (execStateChanged)
+		{
+			auto nodeIt(nodes.find(message->source));
+			if (nodeIt != nodes.end())
+			{
+				auto node(polymorphic_downcast<Switch::NodeWithProgram*>(nodeIt->second.get()));
+				node->pc = execStateChanged->pc;
+				node->executionFlags = execStateChanged->flags;
+				// TODO: notifiy listeners if any
+			}
+		}
+		// FIXME: we should catch if a third party upload a bytecode to a node,
+		// in that case we should take note that we do not know what the execution state means
+		// regarding our source code
+		
 		// allow every module a chance to process the message
 		for (auto& module: modules)
 			module->processMessage(this, *message);

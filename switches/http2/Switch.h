@@ -56,6 +56,12 @@ namespace Aseba
 			
 			std::wstring code; //!< the source code of the program
 			Compiler::SubroutineTable subroutineTable; //!< all subroutines with their address and source lines
+			
+			// FIXME: these variables make sense for a low-level interface,
+			// but maybe we want something closer to what DashelTarget proposes,
+			// at the level of a line in code
+			uint16 pc = 0; //!< last known program counter
+			uint16 executionFlags = 0; //!< last known execution flags
 		};
 		
 		friend class HttpDispatcher;

@@ -642,29 +642,4 @@ namespace Aseba
 		return { true, node.first, variableIt->second.first, variableIt->second.second };
 	}
 	
-	//! Return a node from the request, or produce an error and return null if the node is not found
-	HttpDispatcher::NodeEntry HttpDispatcher::findNode(HandlerContext& context) const
-	{
-		const auto templateIt(context.filledPathTemplates.find("node"));
-		assert(templateIt != context.filledPathTemplates.end());
-		try
-		{
-			const unsigned nodeId(stoul(templateIt->second));
-		
-			// retrieve node
-			const auto nodeIt(context.asebaSwitch->nodes.find(nodeId));
-			if (nodeIt == context.asebaSwitch->nodes.end())
-			{
-				HttpResponse::fromPlainString(FormatableString("Node %0 does not exist or is not available").arg(nodeId), HttpStatus::NOT_FOUND).send(context.stream);
-				return NodeEntry(0, nullptr);
-			}
-			return NodeEntry(nodeIt->first, polymorphic_downcast<Switch::NodeWithProgram*>(nodeIt->second.get()));
-		}
-		catch (const invalid_argument& e)
-		{
-			HttpResponse::fromPlainString(FormatableString("Node parameter %0 is not an integer node identifier").arg(templateIt->second), HttpStatus::NOT_FOUND).send(context.stream);
-			return NodeEntry(0, nullptr);
-		}
-	}
-	
 } // namespace Aseba

@@ -116,6 +116,7 @@ namespace Aseba
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath);
 		void registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc);
 		void resolveReferences(json& object) const;
+		NodeEntry findNode(HandlerContext& context) const;
 		
 		// options and test
 		void optionsHandler(HandlerContext& context);
@@ -175,7 +176,15 @@ namespace Aseba
 		json jsonNodeSymbolVariables(const NodeEntry& node) const;
 		json jsonNodeSymbolSubroutines(const NodeEntry& node) const;
 		VariableSearchResult findVariable(HandlerContext& context) const;
-		NodeEntry findNode(HandlerContext& context) const;
+		
+		// debugs, in DebugsHandlers.cpp
+		void registerDebugsHandlers();
+		// handlers
+		void getDebugsHandler(HandlerContext& context);
+		void getDebugsNodeHandler(HandlerContext& context);
+		void postDebugsNodeHandler(HandlerContext& context);
+		// support
+		json jsonDebugsNodeHandler(const NodeEntry& node) const;
 		
 		// streams
 		void getStreamsEventsHandler(HandlerContext& context);
