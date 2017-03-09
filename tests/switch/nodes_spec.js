@@ -142,4 +142,27 @@ frisby.create('Fail to put out of bound value -32769 into the variable args for 
 .expectStatus(400)
 .toss();
 
-// TODO: write program and check compilation result
+// program
+
+frisby.create('Fail to compile an erroneous program')
+.put('http://localhost:' + port + '/nodes/1/program', new Buffer('var_typo a'), {json: false, headers: {'content-type': 'text/plain'}})
+.expectStatus(400)
+.expectJSON({
+	success: false
+})
+.toss();
+
+frisby.create('Compile a valid program program on node 1')
+.put('http://localhost:' + port + '/nodes/1/program', new Buffer('var a = 0\nvar b = 0\nvar c = a + b'), {json: false, headers: {'content-type': 'text/plain'}})
+.expectStatus(200)
+.expectJSON({
+	success: true
+})
+.after(function(err, res, body) {
+	frisby.create('Get variable a from node 1')
+	.get('http://localhost:' + port + '/nodes/1/variables/a')
+	.expectStatus(200)
+	.expectHeader('Content-Type', 'application/json')
+	.toss();
+})
+.toss();
