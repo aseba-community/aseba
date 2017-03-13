@@ -191,10 +191,10 @@ namespace Aseba
 					"application/json"
 				],
 				"responses" : {
-					"200" : {
+					"204" : {
 						"description" : "Update Constant",
 						"schema" : {
-							"$ref" : "#/definitions/constant-definition"
+							"type" : "null"
 						}
 					},
 					"400" : {
@@ -261,46 +261,6 @@ namespace Aseba
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
-	
-	/*
-	// TODO: add to scheme
-	//! handler for PUT /constants/
-	void HttpDispatcher::putConstantsHandler(HandlerContext& context)
-	{
-		// make sure we have an array
-		if (!context.parsedContent.is_array())
-		{
-			HttpResponse::fromPlainString("Not a JSON array", HttpStatus::BAD_REQUEST).send(context.stream);
-			return;
-		}
-		
-		// check the validity of each element of the array
-		for (const auto& element: context.parsedContent)
-		{
-			// get name and value
-			RQ_GET_VALUE(context.stream, element, string, name);
-			RQ_GET_VALUE(context.stream, element, int, value);
-			
-			// make sure the value is in a valid range
-			if (!validateInt16Value(context, name, value))
-				return;
-		}
-		
-		// clear all constants
-		context.asebaSwitch->commonDefinitions.constants.clear();
-		
-		// add each constant from the request's content
-		for (const auto& element: context.parsedContent)
-		{
-			// get name and value
-			RQ_GET_VALUE(context.stream, element, string, name);
-			RQ_GET_VALUE(context.stream, element, int, value);
-			context.asebaSwitch->commonDefinitions.constants.push_back({ UTF8ToWString(name), value });
-		}
-		
-		// return success
-		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
-	}*/
 
 	//! handler for GET /constants/{name} -> application/json
 	void HttpDispatcher::getConstantHandler(HandlerContext& context)
@@ -361,11 +321,14 @@ namespace Aseba
 		context.asebaSwitch->commonDefinitions.constants[position].value = value;
 		
 		// return answer
-		HttpResponse::fromJSON({
-			{ "id", position },
-			{ "name",  name },
-			{ "value", value }
-		}, created ? HttpStatus::CREATED : HttpStatus::OK).send(context.stream);
+		if (created)
+			HttpResponse::fromJSON({
+				{ "id", position },
+				{ "name",  name },
+				{ "value", value }
+			}, HttpStatus::CREATED).send(context.stream);
+		else
+			HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
 	
 	//! try to find a constant, return true and update position if found, return false and send an error if not found

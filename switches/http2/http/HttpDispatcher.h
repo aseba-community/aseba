@@ -166,6 +166,7 @@ namespace Aseba
 		// support
 		json jsonNodeDescription(const NodeEntry& node) const;
 		json jsonNodeProgram(const NodeEntry& node) const;
+		json jsonNodeCompilationResult(const NodeEntry& node) const;
 		json jsonNodeSymbolEventsVector(const NodeEntry& node) const;
 		json jsonNodeNativeEvents(const NodeEntry& node) const;
 		json jsonNodeNativeFunctions(const NodeEntry& node) const;

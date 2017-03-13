@@ -85,9 +85,7 @@ frisby.create('Create constant titi')
 
 frisby.create('Set the value of constant titi to 3')
 .put('http://localhost:' + port + '/constants/titi', { value: 3 }, {json: true})
-.expectStatus(200)
-.expectHeader('Content-Type', 'application/json')
-.expectJSON({ id: 1, name: "titi", value: 3 })
+.expectStatus(204)
 .toss();
 
 frisby.create('Fail to set the value of unknown constant tutu')

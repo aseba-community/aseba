@@ -34,8 +34,10 @@ frisby.create('Get the informations for node 1')
 // Note: it seems frisby does not make an error if some of these entries are not present, why?
 .expectJSONTypes({
 	description: Object,
-	program: Object,
-	variables: Object
+	program: {
+		source: String,
+		compilationResult: Object
+	}
 })
 .toss();
 

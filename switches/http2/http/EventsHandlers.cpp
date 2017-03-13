@@ -217,10 +217,10 @@ namespace Aseba
 					"application/json"
 				],
 				"responses" : {
-					"200" : {
+					"204" : {
 						"description" : "Update Event",
 						"schema" : {
-							"$ref" : "#/definitions/event-definition-full"
+							"type" : "null"
 						}
 					},
 					"400" : {
@@ -378,11 +378,14 @@ namespace Aseba
 		context.asebaSwitch->commonDefinitions.events[position].value = value;
 		
 		// return answer
-		HttpResponse::fromJSON({
-			{ "id", position },
-			{ "name",  name },
-			{ "size", value }
-		}, created ? HttpStatus::CREATED : HttpStatus::OK).send(context.stream);
+		if (created)
+			HttpResponse::fromJSON({
+				{ "id", position },
+				{ "name",  name },
+				{ "size", value }
+			}, HttpStatus::CREATED).send(context.stream);
+		else
+			HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
 	
 	//! try to find an event, return true and update position if found, return false and send an error if not found

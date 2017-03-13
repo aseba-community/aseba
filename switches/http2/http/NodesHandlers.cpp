@@ -93,7 +93,7 @@ namespace Aseba
 									"$ref" : "#/definitions/node-description"
 								},
 								"program" : {
-									"$ref" : "#/definitions/compilation-result"
+									"$ref" : "#/definitions/node-program"
 								},
 								"variables" : {
 									"$ref" : "#/definitions/variables"
@@ -202,7 +202,7 @@ namespace Aseba
 					"200" : {
 						"description" : "Get Node Program",
 						"schema" : {
-							"$ref" : "#/definitions/compilation-result"
+							"$ref" : "#/definitions/node-program"
 						}
 					},
 					"404" : {
@@ -405,9 +405,9 @@ namespace Aseba
 		node.second->compile(context.asebaSwitch->commonDefinitions);
 		
 		if (node.second->success)
-			HttpResponse::fromJSON(jsonNodeProgram(node)).send(context.stream);
+			HttpResponse::fromJSON(jsonNodeCompilationResult(node)).send(context.stream);
 		else
-			HttpResponse::fromJSON(jsonNodeProgram(node), HttpStatus::BAD_REQUEST).send(context.stream);
+			HttpResponse::fromJSON(jsonNodeCompilationResult(node), HttpStatus::BAD_REQUEST).send(context.stream);
 	}
 
 	//! handler for GET /nodes/{node}/program -> application/json
@@ -536,8 +536,17 @@ namespace Aseba
 		return response;
 	}
 	
-	//! Return the compiled program of a node in JSON
+	//! Return the source and the compiled program of a node in JSON
 	json HttpDispatcher::jsonNodeProgram(const NodeEntry& node) const
+	{
+		return {
+			{ "source", WStringToUTF8(node.second->code) },
+			{ "compilationResult", jsonNodeCompilationResult(node) }
+		};
+	}
+	
+	//! Return the compiled program of a node in JSON
+	json HttpDispatcher::jsonNodeCompilationResult(const NodeEntry& node) const
 	{
 		return {
 			{ "success", node.second->success },

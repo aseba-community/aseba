@@ -85,9 +85,7 @@ frisby.create('Create event titi')
 
 frisby.create('Set the size of event titi to 3')
 .put('http://localhost:' + port + '/events/titi', { size: 3 }, {json: true})
-.expectStatus(200)
-.expectHeader('Content-Type', 'application/json')
-.expectJSON({ id: 1, name: "titi", size: 3 })
+.expectStatus(204)
 .toss();
 
 frisby.create('Fail to set the size of unknown event tutu')

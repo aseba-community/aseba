@@ -244,54 +244,6 @@ namespace Aseba
 					},
 					"type" : "object"
 				},
-				"network" : {
-					"properties" : {
-						"author" : {
-							"type" : "string"
-						},
-						"constants" : {
-							"items" : {
-								"$ref" : "#/definitions/constant-definition"
-							},
-							"type" : "array"
-						},
-						"description" : {
-							"items" : {
-								"properties" : {
-									"lang" : {
-										"type" : "string"
-									},
-									"text" : {
-										"type" : "string"
-									}
-								},
-								"type" : "object"
-							},
-							"type" : [
-								"string",
-								"array"
-							]
-						},
-						"events" : {
-							"items" : {
-								"$ref" : "#/definitions/event-definition-full"
-							},
-							"type" : "array"
-						},
-						"nodes" : {
-							"items" : {
-								"$ref" : "#/definitions/node-signature"
-							},
-							"type" : "array"
-						}
-					},
-					"required" : [
-						"events",
-						"constants",
-						"nodes"
-					],
-					"type" : "object"
-				},
 				"node-description" : {
 					"properties" : {
 						"id" : {
@@ -383,6 +335,20 @@ namespace Aseba
 						"protocolVersion",
 						"native-variables",
 						"native-functions"
+					],
+					"type" : "object"
+				},
+				"node-program" : {
+					"properties" : {
+						"compilationResult" : {
+							"$ref" : "#/definitions/compilation-result"
+						},
+						"source" : {
+							"type" : "string"
+						}
+					},
+					"required" : [
+						"compilationResult", "source"
 					],
 					"type" : "object"
 				},
