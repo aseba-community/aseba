@@ -161,14 +161,12 @@ namespace Aseba
 		void getNodesNodeDescriptionHandler(HandlerContext& context);
 		void putNodesNodeProgramHandler(HandlerContext& context);
 		void getNodesNodeProgramHandler(HandlerContext& context);
-		void getNodesNodeVariablesHandler(HandlerContext& context);
 		void putNodesNodeVariablesVariableHandler(HandlerContext& context);
 		void getNodesNodeVariablesVariableHandler(HandlerContext& context);
 		// support
 		json jsonNodeDescription(const NodeEntry& node) const;
 		json jsonNodeProgram(const NodeEntry& node) const;
 		json jsonNodeSymbolEventsVector(const NodeEntry& node) const;
-		json jsonNodeVariables(const NodeEntry& node) const;
 		json jsonNodeNativeEvents(const NodeEntry& node) const;
 		json jsonNodeNativeFunctions(const NodeEntry& node) const;
 		json jsonNodeNativeVariables(const NodeEntry& node) const;

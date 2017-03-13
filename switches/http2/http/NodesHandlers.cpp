@@ -217,7 +217,8 @@ namespace Aseba
 					"Nodes"
 				]
 			})#json#"_json });
-		REGISTER_HANDLER(getNodesNodeVariablesHandler, GET, { "nodes", "{node}", "variables" }, { R"#json#(
+		// disabled because of duplication with /nodes/{node}/program/symbols/variables
+		/*REGISTER_HANDLER(getNodesNodeVariablesHandler, GET, { "nodes", "{node}", "variables" }, { R"#json#(
 			{
 				"operationId" : "GET-nodes-node-variables",
 				"produces" : [
@@ -241,7 +242,7 @@ namespace Aseba
 				"tags" : [
 					"Nodes"
 				]
-			})#json#"_json });
+			})#json#"_json });*/
 		REGISTER_HANDLER(putNodesNodeVariablesVariableHandler, PUT, { "nodes", "{node}", "variables", "{variable}" }, { R"#json#(
 			{
 				"consumes" : [
@@ -379,7 +380,6 @@ namespace Aseba
 		json response;
 		response["description"] = jsonNodeDescription(node);
 		response["program"] = jsonNodeProgram(node);
-		response["variables"] = jsonNodeVariables(node);
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
@@ -420,6 +420,8 @@ namespace Aseba
 		HttpResponse::fromJSON(jsonNodeProgram(node)).send(context.stream);
 	}
 
+	// disabled because of duplication with /nodes/{node}/program/symbols/variables
+	/*
 	//! handler for GET /nodes/{node}/variables -> application/json
 	void HttpDispatcher::getNodesNodeVariablesHandler(HandlerContext& context)
 	{
@@ -428,7 +430,7 @@ namespace Aseba
 			return;
 		
 		HttpResponse::fromJSON(jsonNodeVariables(node)).send(context.stream);
-	}
+	}*/
 
 	//! handler for PUT /nodes/{node}/variables/{variable} -> application/json
 	void HttpDispatcher::putNodesNodeVariablesVariableHandler(HandlerContext& context)
@@ -562,7 +564,6 @@ namespace Aseba
 			{ "subroutines", jsonNodeSymbolSubroutines(node) },
 			{ "lineNumbers", apply(node.second->bytecode, [](const BytecodeElement& element) { return element.line; } ) },
 		};
-		// TODO: add back allocatedVariablesCount, maxStackDepth, callDepth, lastLine, eventsVector to spec
 	}
 	
 	//! Return the events vector part of the symbol table of a node in JSON
@@ -607,16 +608,6 @@ namespace Aseba
 			});
 		}
 		return response;
-	}
-	
-	
-	//! Return the variables of a node in JSON
-	json HttpDispatcher::jsonNodeVariables(const NodeEntry& node) const
-	{
-		// TODO: "#/definitions/variables"
-		// FIXME: when and how to update
-		
-		return {};
 	}
 	
 	//! Return true and fills nodeId, pos and size if a variable is found, 
