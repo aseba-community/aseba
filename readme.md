@@ -10,7 +10,7 @@ For more information, see: http://aseba.wikidot.com
 
 ## Quick building instructions
 
-To compile Aseba, you need CMake 2.6 or later (http://www.cmake.org/).
+To compile Aseba, you need CMake 2.8.10 or later (http://www.cmake.org/).
 The CMake website provides documentation on how to use CMake on the different
 platforms: http://www.cmake.org/cmake/help/runningcmake.html
 
