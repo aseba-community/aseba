@@ -1,6 +1,6 @@
 # Aseba
 
-	Copyright (C) 2007--2016:
+	Copyright (C) 2007--2017:
 	Stephane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
 	and other contributors, see authors.txt for details
 	Released under LGPL3, see license.txt for details
@@ -58,40 +58,40 @@ Once this script has run, you can find the executables in `build-aseba/`, in the
 
 Directories containing source code:
 * `common`: definitions common to both targets, studio and tools
- * `msg`: message serialization/de-serialization in C++
- * `utils`: some miscellaneous utility functions
+  * `msg`: message serialization/de-serialization in C++
+  * `utils`: some miscellaneous utility functions
 * `compiler`: compiler
 * `vm`: virtual machine and the standard library of native functions
 * `targets`: some targets running virtual machines:
- * `dummy`: simple PC target just running a vm
- * `challenge`: competitive robot simulator using Enki
- * `playground`: generic robot simulator using Enki
- * `enki-marxbot`: simplified simulation of the marXbot robot
- * `dspic33`: common code for running aseba on dspic33
- * `can-translator`: translator UART<->CAN on dsPIC
- * `mobots-mx31`: script for Mobots robots using iMX31 board
+  * `dummy`: simple PC target just running a vm
+  * `challenge`: competitive robot simulator using Enki
+  * `playground`: generic robot simulator using Enki
+  * `enki-marxbot`: simplified simulation of the marXbot robot
+  * `dspic33`: common code for running aseba on dspic33
+  * `can-translator`: translator UART<->CAN on dsPIC
+  * `mobots-mx31`: script for Mobots robots using iMX31 board
 * `transport`: different transport layers:
- * `buffer`: in-memory buffers
- * `dashel-plugins`: extensions to Dashel: socketcan on Linux and Android serial port
- * `can`: CAN bus
- * `microchip_usb`: serial-over-USB implementation for PIC24 microcontrollers
+  * `buffer`: in-memory buffers
+  * `dashel-plugins`: extensions to Dashel: socketcan on Linux and Android serial port
+  * `can`: CAN bus
+  * `microchip_usb`: serial-over-USB implementation for PIC24 microcontrollers
 * `switches`: software switches to create networks:
- * `switch`: connect several aseba nodes and tools together
- * `medulla`: like switch, but provides a DBus interface as well
+  * `switch`: connect several aseba nodes and tools together
+  * `medulla`: like switch, but provides a DBus interface as well
 * `clients`: clients:
- * `cmd`: command line tool for sending messages
- * `dump`: tool to dump all incoming messages
- * `eventlogger`: tool to log all incoming messages
- * `exec`: tool to execute an external command upon the reception of an event
- * `replay`: can record and replay messages
- * `studio`: integrated development environment
- * `thymioupdater`: firmware updater for the Thymio II robot
- * `massloader`: very quickly load the same code to several robots
+  * `cmd`: command line tool for sending messages
+  * `dump`: tool to dump all incoming messages
+  * `eventlogger`: tool to log all incoming messages
+  * `exec`: tool to execute an external command upon the reception of an event
+  * `replay`: can record and replay messages
+  * `studio`: integrated development environment
+  * `thymioupdater`: firmware updater for the Thymio II robot
+  * `massloader`: very quickly load the same code to several robots
 * `tests`: unit tests
 * `examples/clients`: examples how to build your own clients
- * `cpp-shell`: command-line using the C++ library
- * `cpp-qt-gui`: GUI using the C++ library and Qt
- * `python-dbus`: library to access Aseba from Python using D-Bus
+  * `cpp-shell`: command-line using the C++ library
+  * `cpp-qt-gui`: GUI using the C++ library and Qt
+  * `python-dbus`: library to access Aseba from Python using D-Bus
 
 Other directories:
 * `android`: files to build Android package
