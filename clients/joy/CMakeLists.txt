@@ -10,7 +10,7 @@ if (SDL2_FOUND)
 	install(TARGETS asebajoy RUNTIME
 		DESTINATION bin
 	)
-elseif (SDL2_FOUND)
+else (SDL2_FOUND)
 	message(STATUS "SDL2 *not* found, disabling joystick/joypad support")
 endif (SDL2_FOUND)
 
