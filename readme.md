@@ -17,15 +17,20 @@ platforms: http://www.cmake.org/cmake/help/runningcmake.html
 Aseba depends on the following libraries:
 - Dashel (http://home.gna.org/dashel/)
 - Enki (http://home.gna.org/enki/, optional, for simulators)
-- Qt4 (http://qt-project.org/, for IDE)
-- Qwt (http://qwt.sourceforge.net/, optional, for graphs)
+- Qt4 (http://qt-project.org/, optional, for simulators and IDE)
+- Qwt (http://qwt.sourceforge.net/, optional, for graphs in IDE)
 - libxml2 (http://www.xmlsoft.org/, optional, for switches)
+- libSDL2 (https://www.libsdl.org/, optional, for joystick support)
 - libudev (http://www.freedesktop.org/software/systemd/man/libudev.html, optional, for serial port enumeration on Linux)
 
-On Linux, most of these are packages available in your distribution.
-For instance, on Ubuntu, you can install them, along cmake and the compiler, with:
+### Linux
+
+On Linux, all but the first two are packages available in your distribution.
+For instance, on Debian derivatives such as Ubuntu, you can install them, along cmake and the compiler, with:
 
 	sudo apt-get install libqt4-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev libxml2-dev cmake g++ git make
+
+_On other Linux distributions, please see what are the corresponding packages and install them. For instance in Fedora `libudev-dev` is replaced by `systemd-devel`_. 
 
 Dashel and Enki are developed by us, so you need to fetch and compile them.
 Then, you can fetch Aseba, tell it where it can find Dashel and Enki, and compile it.
@@ -48,11 +53,32 @@ The following script does this for you:
 	cd ..
 	# fetch and compile aseba, telling it where to find dashel and enki
 	git clone --recursive https://github.com/aseba-community/aseba.git
+	# cd aseba && git checkout release-1.5.x && cd ..
 	cd build-aseba
 	cmake ../aseba -DCMAKE_BUILD_TYPE=RelWithDebInfo -Ddashel_DIR=../build-dashel -Denki_DIR=../build-enki
 	make
-
+	
 Once this script has run, you can find the executables in `build-aseba/`, in their respective sub-directories. 
+For example, you can then launch studio by typing:
+
+    clients/studio/asebastudio
+
+#### A note about permissions
+
+If you will be connecting to your robot through a serial port, you might need to add yourself to the group that has permission for that port.
+In many distributions, this is the "dialout" group and you can add yourself to that group and use the associated permissions by running the following commands:
+
+    sudo usermod -a -G dialout $USER
+    newgrp dialout
+
+#### Compiling a different branch
+
+This will compile the master version of Aseba.
+If you want to compile a specific branch instead, for instance `release-1.5.x`, just uncomment the line `cd aseba && git checkout release-1.5.x && cd ..`.
+Change `release-1.5.x` with the branch or tag you want to compile.
+
+### macOS
+
 
 ## Understanding source tree
 
