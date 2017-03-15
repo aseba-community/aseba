@@ -65,7 +65,7 @@ find_package(dashel REQUIRED)
 include_directories(${dashel_INCLUDE_DIRS})
 
 # Enki
-find_package(enki REQUIRED)
+find_package(enki)
 
 # Qt
 if (UNIX AND NOT APPLE)
