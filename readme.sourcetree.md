@@ -1,6 +1,6 @@
 # Understanding the Aseba source tree
 
-This file describes the source tree of ASeba
+This file describes the source tree of Aseba.
 
 These directories contain source code:
 * `common`: definitions common to both targets, studio and tools
