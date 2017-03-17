@@ -3,7 +3,7 @@ Copyright (C) 2007--2016:
 	
 	Stéphane Magnenat <stephane at magnenat dot net> [1] [2]
 	(http://stephane.magnenat.net)
-	original idea, architecture, core coder
+	project leader, original idea, architecture, core coder
 	
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
 	core coder, Windows maintainer (until 2015)
