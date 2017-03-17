@@ -33,7 +33,7 @@ If you use Aseba in an academic project leading to a publication, please cite:
 If you are interested in contributing to Aseba, please have a look at the [contributor guide](https://www.thymio.org/contribute#toc3).
 Then, [fork the repository](https://github.com/aseba-community/aseba#fork-destination-box) and submit pull requests.
 The [description of the source tree](readme.sourcetree.md) will be helpful.
-Do not hesitate to get in touch with us on our [development mailing list](http://gna.org/mail/?group=aseba).
+Do not hesitate to get in touch with us on our [development mailing list](https://mail.gna.org/listinfo/aseba-dev).
 
 Enjoy Aseba!
 
