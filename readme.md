@@ -1,13 +1,11 @@
 # Aseba
 
-Aseba means **a**ctuator and **s**ensor **e**vent-**b**ased **a**rchitecture.
-
-> Copyright (C) 2007–2017:
-> Stephane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-> and other contributors, see [authors.txt](authors.txt) for details.
-> Released under LGPL3, see [license.txt](license.txt) for details.
+Copyright (C) 2007–2017:
+Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net) and other contributors, see [authors.txt](authors.txt) for details.
+Released under LGPL3, see [license.txt](license.txt) for details.
 	
-Aseba is a set of tools which allow beginners to program robots easily and efficiently.
+Aseba means **a**ctuator and **s**ensor **e**vent-**b**ased **a**rchitecture.
+It is a set of tools which allow beginners to program robots easily and efficiently.
 For more information, see: http://aseba.wikidot.com
 
 ## Supported platforms
