@@ -59,7 +59,11 @@ The following script does this for you:
 	make
 	
 Once this script has run, you can find the executables in `build-aseba/`, in their respective sub-directories. 
-For example, you can then launch studio by typing:
+You can install them system-wide by running:
+
+    sudo make install
+    
+Or launch them directly from their built location; for example, you can then launch studio by typing:
 
     clients/studio/asebastudio
 
@@ -79,6 +83,49 @@ Change `release-1.5.x` with the branch or tag you want to compile.
 
 ### macOS
 
+It is very easy to compile from source Aseba for OS X, using [homebrew](https://brew.sh).
+
+#### Preliminary, check your shell
+
+Open a terminal and check which shell you have by typing:
+
+    echo $SHELL
+
+If the answer is `/bin/tcsh`, please run the commands in bash. To do so, type:
+
+    bash
+
+Otherwise skip this step and continue.
+
+#### Preliminary, install homebrew
+
+You should not have ad hoc package system installed such as MacPorts.
+To install homebrew, run the following command:
+
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    
+#### Add the Aseba repository
+
+In the terminal, run the following command:
+
+    brew tap stephanemagnenat/aseba
+
+#### Install Aseba
+
+You can choose to install either the stable version or the latest development version.
+In the terminal, run the following command:
+
+##### For the stable version
+
+    brew install aseba
+
+##### For the development version
+
+    brew reinstall --HEAD aseba
+
+## Enjoy Aseba
+
+TODO: write this part
 
 ## Understanding source tree
 
