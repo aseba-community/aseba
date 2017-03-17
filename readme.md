@@ -8,7 +8,7 @@
 Aseba is a set of tools which allow beginners to program robots easily and efficiently.
 For more information, see: http://aseba.wikidot.com
 
-## Supproted platforms
+## Supported platforms
 
 The following platforms are supported:
 - Linux ([compilation instructions](compile.Linux.md))

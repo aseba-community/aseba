@@ -1,6 +1,6 @@
 # Compile Aseba on Linux
 
-Aseba depends on several libraries, see the list in compile.deps.md.
+Aseba depends on [several open-source libraries](compile.deps.md).
 On Linux, most are available as packages in your distribution.
 For instance, on Debian derivatives such as Ubuntu, you can install them, along cmake and the compiler, with:
 
