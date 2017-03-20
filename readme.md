@@ -13,7 +13,7 @@ For more information, see: http://aseba.wikidot.com
 The following platforms are supported:
 - Linux ([compilation instructions](compile.Linux.md))
 - macOS ([compilation instructions](compile.macOS.md))
-- Windows (compilation instructions coming soon)
+- Windows ([compilation instructions](compile.Windows.md))
 - embedded systems ([see the dependency list](compile.deps.md))
 
 ## Use Aseba
