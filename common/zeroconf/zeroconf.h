@@ -158,31 +158,13 @@ namespace Aseba
 		{
 			return name == other.name && domain == other.domain;
 		}
-	};
-
-	/**
-	 \addtogroup zeroconf
-
-		A Zeroconf::Target allows client classes to choose and access Aseba targets.
-	 */
-	class Zeroconf::Target: public Zeroconf::TargetInformation
-	{
-	public:
-		ZeroconfDiscoveryRequest zdr;
-
-	public:
-		using TargetInformation::TargetInformation;
-		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
-		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
-		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
-=======
 		
 		virtual bool operator<(const TargetInformation &other) const
 		{
 			return name < other.name && port < other.port;
 		}
+
 	};
->>>>>>> 7db93555fb98d904d8956190b736dfaadaf4e1a4
 
 	/**
 	 \addtogroup zeroconf
@@ -202,7 +184,6 @@ namespace Aseba
 		virtual void registerCompleted() const; //!< Ask the containing Zeroconf to indicate that this register is completed
 		virtual void resolveCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
 		virtual void updateCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
-
 
 	protected:
 		friend Zeroconf;
