@@ -1,0 +1,91 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="5" name="Q_motion_started"/>
+<event size="5" name="Q_motion_ended"/>
+<event size="8" name="V_leds_circle"/>
+<event size="1" name="A_sound_system"/>
+<event size="23" name="R_state_update"/>
+
+
+<!--list of constants-->
+<constant value="4" name="QUEUE"/>
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node thymio-II-->
+<node nodeId="1" name="thymio-II">### Support for end-to-end testing of asebascratch with Thymio-II
+### David J Sherman - david.sherman@inria.fr
+
+var beacon = 0
+var R_state.do = 0
+var R_state[23]
+var leds_circle[8]  
+
+### Compressed state 258 bits
+# acc 			5 bit x 3	R_state[0]
+# buttons, tap	6 bit		R_state[1]
+# mic.intensity	8 bit		R_state[1]
+# angle 			8 bit x 2	R_state[2]
+# distance 		8 bit x 2	R_state[3:4]
+# motor target	9 bit x 2	R_state[5:6]
+# motor speed	9 bit x 2	R_state[7:8]
+# odo theta		9 bit		R_state[9]
+# odo x y	   16 bit x 2	R_state[10:11]
+# prox rx tx	   11 bit x 2	R_state[12:13]
+# prox gnd	    5 bit x 2	R_state[14:15]
+# prox horiz	   12 bit x 7	R_state[16:22]
+# temperature	4 bit		R_state[23]
+
+onevent motor
+R_state = [ acc[0]&lt;&lt;10 + acc[1]&lt;&lt;5 + acc[2],
+            0 + (button.backward&lt;&lt;4) + (button.center&lt;&lt;3) +
+            		(button.forward&lt;&lt;2) + (button.left&lt;&lt;1) + button.right,
+            	0,
+            	0,
+            	0,
+            	motor.left.target,
+           	motor.right.target,
+            	motor.left.speed,
+            	motor.right.speed,
+            	0,
+            	0,
+            	0,
+            	prox.comm.rx,
+            	prox.comm.tx,
+            	prox.ground.delta[0]&lt;&lt;8 + prox.ground.delta[1],
+            	prox.horizontal,
+            	temperature]
+
+### Event handlers for native functions
+
+onevent V_leds_circle # eight around the buttonsin a circle 
+call leds.circle(event.args[0],event.args[1],event.args[2],
+	             event.args[3],event.args[4],event.args[5],
+	             event.args[6],event.args[7])
+leds_circle = event.args[0:7]
+
+onevent A_sound_system # play a system sound
+call sound.system(event.args[0])
+
+### One-second beacon
+
+onevent acc
+if beacon%24 == 0 then
+	emit Q_motion_started([beacon>>1, 1,2,3,4])
+elseif beacon%32 == 8 then
+	emit Q_motion_ended([beacon>>1, 0,0,0,0])
+end
+if R_state.do==1 and beacon%16==0 then
+	emit R_state_update(R_state)
+end
+beacon += 1
+</node>
+
+
+</network>
