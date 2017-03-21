@@ -659,7 +659,7 @@ namespace Aseba
 		}
 		else
 			dashelInterface.unlock();
-		qDebug() << "getVariables duration: " << timer.elapsed();
+		//qDebug() << "getVariables duration: " << timer.elapsed();
 		
 		QDateTime curTime(QDateTime::currentDateTime());
 		//qDebug() << "variable rate" << lastTime.msecsTo(curTime);
