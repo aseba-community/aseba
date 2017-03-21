@@ -37,8 +37,8 @@ public:
 
 public slots:
 	void browseCompleted();
-	void resolveCompleted(const Aseba::Zeroconf::TargetInformation target);
+	void resolveCompleted(const Aseba::Zeroconf::TargetInformation& target);
 
 private:
-	set<const Aseba::Zeroconf::TargetInformation> todo;
+	set<Aseba::Zeroconf::TargetInformation> todo;
 };

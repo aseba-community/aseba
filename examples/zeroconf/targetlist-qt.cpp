@@ -29,7 +29,7 @@ using namespace std;
 QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
 {
 	connect(&targets, SIGNAL(zeroconfBrowseCompleted()), this, SLOT(browseCompleted()));
-	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation)), this, SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation)));
+	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation&)), SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation&)));
 }
 
 void QtTargetLister::browseCompleted()
@@ -43,7 +43,7 @@ void QtTargetLister::browseCompleted()
 	}
 }
 
-void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation target)
+void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation& target)
 {
 	// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 	cout << target.host << ";port=" << target.port;
