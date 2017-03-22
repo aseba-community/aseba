@@ -79,7 +79,7 @@ Then, install the build dependencies for Dashel and Enki, build them as packages
     sudo mk-build-deps -i         # install dependencies
     debuild -i -us -uc -b         # build package
     cd ..
-    sudo dpkg -i libenki*.deb   # install package
+    sudo dpkg -i libenki*.deb     # install package
     # build Aseba package
     cd aseba
     sudo mk-build-deps -i         # install dependencies
