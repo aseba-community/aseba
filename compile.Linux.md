@@ -4,7 +4,7 @@ Aseba depends on [several open-source libraries](compile.deps.md).
 On Linux, most are available as packages in your distribution.
 For instance, on Debian derivatives such as Ubuntu, you can install them, along cmake and the compiler, with:
 
-	sudo apt-get install libqt4-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev libxml2-dev cmake g++ git make
+	sudo apt-get install libqt4-dev libqtwebkit-dev qt4-dev-tools libqwt5-qt4-dev libudev-dev libxml2-dev cmake g++ git make
 
 _On other Linux distributions, please see what are the corresponding packages and install them. For instance in Fedora `libudev-dev` is replaced by `systemd-devel`_. 
 
