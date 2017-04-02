@@ -93,16 +93,16 @@ namespace Aseba
 		Node* memoryVector = children[0];
 
 		// create a vector of 1's
-		std::auto_ptr<TupleVectorNode> constant(new TupleVectorNode(sourcePos));
+		std::unique_ptr<TupleVectorNode> constant(new TupleVectorNode(sourcePos));
 		for (unsigned int i = 0; i < memoryVector->getVectorSize(); i++)
 			constant->addImmediateValue(1);
 
 		// expand to "vector (op)= 1"
-		std::auto_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector, constant.get()));
+		std::unique_ptr<ArithmeticAssignmentNode> assignment(new ArithmeticAssignmentNode(sourcePos, arithmeticOp, memoryVector, constant.get()));
 		constant.release();
 
 		// perform the expansion of ArithmeticAssignmentNode
-		std::auto_ptr<Node> finalBlock(assignment->expandAbstractNodes(dump));
+		std::unique_ptr<Node> finalBlock(assignment->expandAbstractNodes(dump));
 
 		if (assignment.get() != finalBlock.get())
 			// delete the orphaned node
@@ -129,8 +129,8 @@ namespace Aseba
 		Node* rightVector = children[1];
 
 		// create the replacement node
-		std::auto_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector, rightVector));
-		std::auto_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos, leftVector->deepCopy(), binary.release()));
+		std::unique_ptr<BinaryArithmeticNode> binary(new BinaryArithmeticNode(sourcePos, op, leftVector, rightVector));
+		std::unique_ptr<AssignmentNode> assignment(new AssignmentNode(sourcePos, leftVector->deepCopy(), binary.release()));
 
 		// let our children to stay with the new AssignmentNode
 		// otherwise they will be freed when we are cleared
@@ -197,7 +197,7 @@ namespace Aseba
 	Node* Node::expandVectorialNodes(std::wostream *dump, Compiler* compiler, unsigned int index)
 	{
 		// duplicate me
-		std::auto_ptr<Node> newMe(this->shallowCopy());
+		std::unique_ptr<Node> newMe(this->shallowCopy());
 		newMe->children.clear();
 
 		// recursively walk the tree and expand children (of the newly created tree)
@@ -226,10 +226,10 @@ namespace Aseba
 		{
 			// in such case, there is a risk of involuntary overwriting the content
 			// we need to throw in a temporary variable to avoid this risk
-			std::auto_ptr<BlockNode> tempBlock(new BlockNode(sourcePos));
+			std::unique_ptr<BlockNode> tempBlock(new BlockNode(sourcePos));
 
 			// tempVar = rightVector
-			std::auto_ptr<AssignmentNode> temp(compiler->allocateTemporaryVariable(sourcePos, rightVector->deepCopy()));
+			std::unique_ptr<AssignmentNode> temp(compiler->allocateTemporaryVariable(sourcePos, rightVector->deepCopy()));
 			MemoryVectorNode* tempVar = dynamic_cast<MemoryVectorNode*>(temp->children[0]);
 			assert(tempVar);
 			tempBlock->children.push_back(temp.release());
@@ -242,7 +242,7 @@ namespace Aseba
 		}
 		// else
 
-		std::auto_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
+		std::unique_ptr<BlockNode> block(new BlockNode(sourcePos)); // top-level block
 
 		for (unsigned int i = 0; i < leftVector->getVectorSize(); i++)
 		{
@@ -311,7 +311,7 @@ namespace Aseba
 			// indirect access foo[expr]
 			// => use a ArrayWriteNode (lvalue) or ArrayReadNode (rvalue)
 
-			std::auto_ptr<Node> array;
+			std::unique_ptr<Node> array;
 			if (write == true)
 				array.reset(new ArrayWriteNode(sourcePos, arrayAddr, arraySize, arrayName));
 			else

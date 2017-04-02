@@ -93,8 +93,8 @@ namespace Aseba
 		
 		// current operation
 		bool getInProgress;
-		std::auto_ptr<Value> getValue;
-		std::auto_ptr<Operation> currentOperation;
+		std::unique_ptr<Value> getValue;
+		std::unique_ptr<Operation> currentOperation;
 		// and pending ones
 		std::queue<std::string> nextOperationsOp;
 		std::queue<std::string> nextOperationsArg0;

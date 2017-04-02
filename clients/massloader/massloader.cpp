@@ -102,7 +102,7 @@ namespace Aseba
 		try
 		{
 			// get message
-			auto_ptr<Message> message(Message::receive(stream));
+			unique_ptr<Message> message(Message::receive(stream));
 			/*wcerr << L"  msg: ";
 			message->dump(wcerr);
 			wcerr << endl;*/

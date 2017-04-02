@@ -74,7 +74,7 @@ namespace Aseba
 		// get data
 		while (true)
 		{
-			auto_ptr<Message> message(Message::receive(stream));
+			unique_ptr<Message> message(Message::receive(stream));
 			
 			// handle ack
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
@@ -142,7 +142,7 @@ namespace Aseba
 			// wait ACK
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
@@ -169,7 +169,7 @@ namespace Aseba
 				/*
 				while (true)
 				{
-					auto_ptr<Message> message(Message::receive(stream));
+					unique_ptr<Message> message(Message::receive(stream));
 					
 					// handle ack
 					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
@@ -193,7 +193,7 @@ namespace Aseba
 		while (true)
 		{
 			writePageWaitAck();
-			auto_ptr<Message> message(Message::receive(stream));
+			unique_ptr<Message> message(Message::receive(stream));
 			
 			// handle ack
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
@@ -243,7 +243,7 @@ namespace Aseba
 			// wait for disconnected message
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				Disconnected* disconnectedMessage(dynamic_cast<Disconnected*>(message.get()));
 				if (disconnectedMessage)
 					break;
@@ -257,7 +257,7 @@ namespace Aseba
 			// get bootloader description
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message.get());
 				if (bDescMessage && (bDescMessage->source == bootloaderDest))
 				{

@@ -174,7 +174,7 @@ namespace Aseba
 		}
 		
 		// parsing
-		std::auto_ptr<Node> program;
+		std::unique_ptr<Node> program;
 		try
 		{
 			program.reset(parseProgram());
