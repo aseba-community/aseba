@@ -23,6 +23,11 @@
 
 int main(int argc, char* argv[])
 {
+#ifdef DNSSD_AVAHI
+	std::cerr << "Avahi's Bonjour compatibility is broken when used synchronously (#233)" << std::endl;
+	exit(1);
+#endif // DNSSD_AVAHI
+
 	// Browse for _aseba._tcp services on all interfaces
 	Aseba::Zeroconf zs;
 	zs.browse();

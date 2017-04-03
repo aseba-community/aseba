@@ -1,0 +1,25 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+<event size="0" name="roll"/>
+
+
+<!--list of constants-->
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node dummynode-2-->
+<node nodeId="3" name="dummynode-2">var dice[2] = [1,1]
+
+onevent roll
+call math.rand(dice[0])
+call math.rand(dice[1])
+dice[0:1] = [1 + abs(dice[0]%6), 1 + abs(dice[1]%6)]</node>
+
+
+</network>
