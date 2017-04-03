@@ -35,11 +35,11 @@ namespace Aseba
 		template<size_t size>
 		static inline void swapp(void *data)
 		{
-			uint8 temp[size];
+			uint8_t temp[size];
 			for (size_t i = 0; i < size; ++i)
-				temp[i] = reinterpret_cast<uint8*>(data);
+				temp[i] = reinterpret_cast<uint8_t*>(data);
 			for (size_t i = 0; i < size; ++i)
-				reinterpret_cast<uint8*>(data)[i] = temp[size-1-i];
+				reinterpret_cast<uint8_t*>(data)[i] = temp[size-1-i];
 		}
 		
 		/*! Swap value v (generic, mutable-value version) */
@@ -69,16 +69,16 @@ namespace Aseba
 	//! Swap bytes for 16-bit word
 	template<> inline void ByteSwapper::swapp<2>(void *data)
 	{
-		const uint16 a=*reinterpret_cast<uint16*>(data);
-		*reinterpret_cast<uint16*>(data)=
+		const uint16_t a=*reinterpret_cast<uint16_t*>(data);
+		*reinterpret_cast<uint16_t*>(data)=
 			((a&0x00ff)<< 8)|
 			((a>> 8)&0x00ff);
 	}
 	//! Swap bytes for 32-bit word
 	template<> inline void ByteSwapper::swapp<4>(void *data)
 	{
-		const uint32 a=*reinterpret_cast<uint32*>(data);
-		*reinterpret_cast<uint32*>(data)=
+		const uint32_t a=*reinterpret_cast<uint32_t*>(data);
+		*reinterpret_cast<uint32_t*>(data)=
 			((a&0x000000ff)<<24)|
 			((a&0x0000ff00)<< 8)|
 			((a>> 8)&0x0000ff00)|
@@ -87,8 +87,8 @@ namespace Aseba
 	//! Swap bytes for 64-bit word
 	template<> inline void ByteSwapper::swapp<8>(void *data)
 	{
-		const uint64 a=*reinterpret_cast<uint64*>(data);
-		*reinterpret_cast<uint64*>(data)=
+		const uint64_t a=*reinterpret_cast<uint64_t*>(data);
+		*reinterpret_cast<uint64_t*>(data)=
 			((a&0x00000000000000ffLL)<<56)|
 			((a&0x000000000000ff00LL)<<40)|
 			((a&0x0000000000ff0000LL)<<24)|

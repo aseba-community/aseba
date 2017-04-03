@@ -104,7 +104,7 @@ namespace Aseba
 				{
 					if (cmdMessage->dest == remapIt->second.first)
 					{
-						const uint16 oldDest(cmdMessage->dest);
+						const uint16_t oldDest(cmdMessage->dest);
 						cmdMessage->dest = remapIt->second.second;
 						message->serialize(destStream);
 						cmdMessage->dest = oldDest;
@@ -150,7 +150,7 @@ namespace Aseba
 		}
 	}
 	
-	void Switch::remapId(Dashel::Stream* stream, const uint16 localId, const uint16 targetId)
+	void Switch::remapId(Dashel::Stream* stream, const uint16_t localId, const uint16_t targetId)
 	{
 		idRemapTable[stream] = IdPair(localId, targetId);
 	}
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
 			const int remappedTargetId(remapIdDecoder.get<int>("remapTarget"));
 			if (target.find("remapLocal=") != std::string::npos)
 			{
-				aswitch.remapId(stream, uint16(remappedLocalId), uint16(remappedTargetId));
+				aswitch.remapId(stream, uint16_t(remappedLocalId), uint16_t(remappedTargetId));
 				if (verbose)
 					std::cout << "* Remapping local " << remappedLocalId << " with remote " << remappedTargetId << std::endl;
 			}

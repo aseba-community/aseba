@@ -468,7 +468,7 @@ namespace Aseba { namespace ThymioVPL
 		emit contentChanged();
 	}
 	
-	QVector<quint16> BlockWithButtons::getValuesCompressed() const
+	QVector<uint16_t> BlockWithButtons::getValuesCompressed() const
 	{
 		unsigned value(0);
 		for (int i=0; i<buttons.size(); ++i)
@@ -477,7 +477,7 @@ namespace Aseba { namespace ThymioVPL
 			value += buttons[i]->getValue();
 		}
 		assert(value <= 65535);
-		return QVector<quint16>(1, value);
+		return QVector<uint16_t>(1, value);
 	}
 	
 	
@@ -675,9 +675,9 @@ namespace Aseba { namespace ThymioVPL
 		updateIndicationLEDsOpacity();
 	}
 	
-	QVector<quint16> BlockWithButtonsAndRange::getValuesCompressed() const
+	QVector<uint16_t> BlockWithButtonsAndRange::getValuesCompressed() const
 	{
-		QVector<quint16> values(BlockWithButtons::getValuesCompressed());
+		QVector<uint16_t> values(BlockWithButtons::getValuesCompressed());
 		values.append(low);
 		values.append(high);
 		return values;

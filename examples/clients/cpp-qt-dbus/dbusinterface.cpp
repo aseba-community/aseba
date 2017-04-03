@@ -157,7 +157,7 @@ namespace Aseba
 	}
 
 	//Send Aseba Event using the ID of the Event
-	void DBusInterface::sendEvent(quint16 eventID, const Values& value)
+	void DBusInterface::sendEvent(uint16_t eventID, const Values& value)
 	{
 		QDBusArgument argument;
 		argument<<eventID;

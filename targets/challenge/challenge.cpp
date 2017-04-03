@@ -160,37 +160,37 @@ namespace Enki
 		std::valarray<signed short> stack;
 		struct Variables
 		{
-			sint16 productId; // product id
-			sint16 speedL; // left motor speed
-			sint16 speedR; // right motor speed
-			sint16 colorR; // body red [0..100] %
-			sint16 colorG; // body green [0..100] %
-			sint16 colorB; // body blue [0..100] %
+			int16_t productId; // product id
+			int16_t speedL; // left motor speed
+			int16_t speedR; // right motor speed
+			int16_t colorR; // body red [0..100] %
+			int16_t colorG; // body green [0..100] %
+			int16_t colorB; // body blue [0..100] %
 			#ifdef SIMPLIFIED_EPUCK
-			sint16 dist_A[8];	// proximity sensors in dist [cm] as variables, normal e-puck order
-			sint16 dist_B[8];	// proximity sensors in dist [cm] as array, normal e-puck order
+			int16_t dist_A[8];	// proximity sensors in dist [cm] as variables, normal e-puck order
+			int16_t dist_B[8];	// proximity sensors in dist [cm] as array, normal e-puck order
 			#else
-			sint16 prox[8];		// proximity sensors, normal e-puck order
+			int16_t prox[8];		// proximity sensors, normal e-puck order
 			#endif
 			#ifdef SIMPLIFIED_EPUCK
-			sint16 camR_A[3]; // camera red as variables (left, middle, right) [0..100] %
-			sint16 camR_B[3]; // camera red as array (left, middle, right) [0..100] %
-			sint16 camG_A[3]; // camera green as variables (left, middle, right) [0..100] %
-			sint16 camG_B[3]; // camera green as array (left, middle, right) [0..100] %
-			sint16 camB_A[3]; // camera blue as variables (left, middle, right) [0..100] %
-			sint16 camB_B[3]; // camera blue as array (left, middle, right) [0..100] %
+			int16_t camR_A[3]; // camera red as variables (left, middle, right) [0..100] %
+			int16_t camR_B[3]; // camera red as array (left, middle, right) [0..100] %
+			int16_t camG_A[3]; // camera green as variables (left, middle, right) [0..100] %
+			int16_t camG_B[3]; // camera green as array (left, middle, right) [0..100] %
+			int16_t camB_A[3]; // camera blue as variables (left, middle, right) [0..100] %
+			int16_t camB_B[3]; // camera blue as array (left, middle, right) [0..100] %
 			#else
-			sint16 camR[60]; // camera red (left, middle, right) [0..100] %
-			sint16 camG[60]; // camera green (left, middle, right) [0..100] %
-			sint16 camB[60]; // camera blue (left, middle, right) [0..100] %
+			int16_t camR[60]; // camera red (left, middle, right) [0..100] %
+			int16_t camG[60]; // camera green (left, middle, right) [0..100] %
+			int16_t camB[60]; // camera blue (left, middle, right) [0..100] %
 			#endif
-			sint16 energy;
-			sint16 user[1024];
+			int16_t energy;
+			int16_t user[1024];
 		} variables;
 		int port;
 		
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
+		uint16_t lastMessageSource;
+		std::valarray<uint8_t> lastMessageData;
 		
 	public:
 		AsebaFeedableEPuck(int id) :
@@ -208,8 +208,8 @@ namespace Enki
 			vm.stack = &stack[0];
 			vm.stackSize = stack.size();
 			
-			vm.variables = reinterpret_cast<sint16 *>(&variables);
-			vm.variablesSize = sizeof(variables) / sizeof(sint16);
+			vm.variables = reinterpret_cast<int16_t *>(&variables);
+			vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 			
 			port = PORT_BASE+id;
 			try
@@ -251,8 +251,8 @@ namespace Enki
 		
 		void incomingData(Dashel::Stream *stream)
 		{
-			uint16 temp;
-			uint16 len;
+			uint16_t temp;
+			uint16_t len;
 			
 			stream->read(&temp, 2);
 			len = bswap16(temp);
@@ -261,7 +261,7 @@ namespace Enki
 			lastMessageData.resize(len+2);
 			stream->read(&lastMessageData[0], lastMessageData.size());
 			
-			if (bswap16(*(uint16*)&lastMessageData[0]) >= 0xA000)
+			if (bswap16(*(uint16_t*)&lastMessageData[0]) >= 0xA000)
 				AsebaProcessIncomingEvents(&vm);
 			else
 				qDebug() << this << " : Non debug event dropped.";
@@ -281,7 +281,7 @@ namespace Enki
 				qDebug() << this << " : Client has disconnected properly.";
 		}
 		
-		double toDoubleClamp(sint16 val, double mul, double min, double max)
+		double toDoubleClamp(int16_t val, double mul, double min, double max)
 		{
 			double v = static_cast<double>(val) * mul;
 			if (v > max)
@@ -295,25 +295,25 @@ namespace Enki
 		{
 			// get physical variables
 			#ifdef SIMPLIFIED_EPUCK
-			variables.dist_A[0] = static_cast<sint16>(infraredSensor0.getDist());
-			variables.dist_A[1] = static_cast<sint16>(infraredSensor1.getDist());
-			variables.dist_A[2] = static_cast<sint16>(infraredSensor2.getDist());
-			variables.dist_A[3] = static_cast<sint16>(infraredSensor3.getDist());
-			variables.dist_A[4] = static_cast<sint16>(infraredSensor4.getDist());
-			variables.dist_A[5] = static_cast<sint16>(infraredSensor5.getDist());
-			variables.dist_A[6] = static_cast<sint16>(infraredSensor6.getDist());
-			variables.dist_A[7] = static_cast<sint16>(infraredSensor7.getDist());
+			variables.dist_A[0] = static_cast<int16_t>(infraredSensor0.getDist());
+			variables.dist_A[1] = static_cast<int16_t>(infraredSensor1.getDist());
+			variables.dist_A[2] = static_cast<int16_t>(infraredSensor2.getDist());
+			variables.dist_A[3] = static_cast<int16_t>(infraredSensor3.getDist());
+			variables.dist_A[4] = static_cast<int16_t>(infraredSensor4.getDist());
+			variables.dist_A[5] = static_cast<int16_t>(infraredSensor5.getDist());
+			variables.dist_A[6] = static_cast<int16_t>(infraredSensor6.getDist());
+			variables.dist_A[7] = static_cast<int16_t>(infraredSensor7.getDist());
 			for (size_t i = 0; i < 8; ++i)
 				variables.dist_B[i] = variables.dist_A[i];
 			#else
-			variables.prox[0] = static_cast<sint16>(infraredSensor0.getValue());
-			variables.prox[1] = static_cast<sint16>(infraredSensor1.getValue());
-			variables.prox[2] = static_cast<sint16>(infraredSensor2.getValue());
-			variables.prox[3] = static_cast<sint16>(infraredSensor3.getValue());
-			variables.prox[4] = static_cast<sint16>(infraredSensor4.getValue());
-			variables.prox[5] = static_cast<sint16>(infraredSensor5.getValue());
-			variables.prox[6] = static_cast<sint16>(infraredSensor6.getValue());
-			variables.prox[7] = static_cast<sint16>(infraredSensor7.getValue());
+			variables.prox[0] = static_cast<int16_t>(infraredSensor0.getValue());
+			variables.prox[1] = static_cast<int16_t>(infraredSensor1.getValue());
+			variables.prox[2] = static_cast<int16_t>(infraredSensor2.getValue());
+			variables.prox[3] = static_cast<int16_t>(infraredSensor3.getValue());
+			variables.prox[4] = static_cast<int16_t>(infraredSensor4.getValue());
+			variables.prox[5] = static_cast<int16_t>(infraredSensor5.getValue());
+			variables.prox[6] = static_cast<int16_t>(infraredSensor6.getValue());
+			variables.prox[7] = static_cast<int16_t>(infraredSensor7.getValue());
 			#endif
 			
 			#ifdef SIMPLIFIED_EPUCK
@@ -329,20 +329,20 @@ namespace Enki
 					sumG += camera.image[index].g();
 					sumB += camera.image[index].b();
 				}
-				variables.camR_A[i] = variables.camR_B[i] = static_cast<sint16>(sumR * 100. / 20.);
-				variables.camG_A[i] = variables.camG_B[i] = static_cast<sint16>(sumG * 100. / 20.);
-				variables.camB_A[i] = variables.camB_B[i] = static_cast<sint16>(sumB * 100. / 20.);
+				variables.camR_A[i] = variables.camR_B[i] = static_cast<int16_t>(sumR * 100. / 20.);
+				variables.camG_A[i] = variables.camG_B[i] = static_cast<int16_t>(sumG * 100. / 20.);
+				variables.camB_A[i] = variables.camB_B[i] = static_cast<int16_t>(sumB * 100. / 20.);
 			}
 			#else
 			for (size_t i = 0; i < 60; i++)
 			{
-				variables.camR[i] = static_cast<sint16>(camera.image[i].r() * 100.);
-				variables.camG[i] = static_cast<sint16>(camera.image[i].g() * 100.);
-				variables.camB[i] = static_cast<sint16>(camera.image[i].b() * 100.);
+				variables.camR[i] = static_cast<int16_t>(camera.image[i].r() * 100.);
+				variables.camG[i] = static_cast<int16_t>(camera.image[i].g() * 100.);
+				variables.camB[i] = static_cast<int16_t>(camera.image[i].b() * 100.);
 			}
 			#endif
 			
-			variables.energy = static_cast<sint16>(energy);
+			variables.energy = static_cast<int16_t>(energy);
 			
 			// do a network step
 			Hub::step();
@@ -978,14 +978,14 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 {
 }
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
 {
 	Dashel::Stream* stream = asebaEPuckMap[vm]->stream;
 	assert(stream);
 
 	try
 	{
-		uint16 temp;
+		uint16_t temp;
 		temp = bswap16(length - 2);
 		stream->write(&temp, 2);
 		temp = bswap16(vm->nodeId);
@@ -999,7 +999,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	}
 }
 
-extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	if (asebaEPuckMap[vm]->lastMessageData.size())
 	{
@@ -1029,7 +1029,7 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }

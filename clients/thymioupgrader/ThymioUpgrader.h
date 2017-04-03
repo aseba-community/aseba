@@ -35,7 +35,7 @@ namespace Aseba
 		
 	protected:
 		virtual void writeHexGotDescription(unsigned pagesCount);
-		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple);
+		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple);
 		virtual void errorWritePageNonFatal(unsigned pageNumber);
 	
 	protected:

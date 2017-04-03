@@ -79,21 +79,21 @@ namespace Enki
 	public:
 		struct Variables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 productId; 
-			sint16 speedL; // left motor speed
-			sint16 speedR; // right motor speed
-			sint16 colorR; // body red [0..100] %
-			sint16 colorG; // body green [0..100] %
-			sint16 colorB; // body blue [0..100] %
-			sint16 prox[8];	// 
-			sint16 camR[60]; // camera red (left, middle, right) [0..100] %
-			sint16 camG[60]; // camera green (left, middle, right) [0..100] %
-			sint16 camB[60]; // camera blue (left, middle, right) [0..100] %
-			sint16 energy;
-			sint16 user[256];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t productId; 
+			int16_t speedL; // left motor speed
+			int16_t speedR; // right motor speed
+			int16_t colorR; // body red [0..100] %
+			int16_t colorG; // body green [0..100] %
+			int16_t colorB; // body blue [0..100] %
+			int16_t prox[8];	// 
+			int16_t camR[60]; // camera red (left, middle, right) [0..100] %
+			int16_t camG[60]; // camera green (left, middle, right) [0..100] %
+			int16_t camB[60]; // camera blue (left, middle, right) [0..100] %
+			int16_t energy;
+			int16_t user[256];
 		} variables;
 		
 	public:
@@ -108,7 +108,7 @@ namespace Enki
 		virtual const AsebaVMDescription* getDescription() const;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
-		virtual void callNativeFunction(uint16 id);
+		virtual void callNativeFunction(uint16_t id);
 	};
 } // Enki
 

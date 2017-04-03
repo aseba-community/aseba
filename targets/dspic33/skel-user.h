@@ -57,11 +57,11 @@
 
 struct _vmVariables {
 	// NodeID
-	sint16 id;
+	int16_t id;
 	// source
-	sint16 source;
+	int16_t source;
 		// args
-	sint16 args[VM_VARIABLES_ARG_SIZE];
+	int16_t args[VM_VARIABLES_ARG_SIZE];
 
 	/****
     ---> PUT YOUR VARIABLES HERE <---
@@ -69,7 +69,7 @@ struct _vmVariables {
 
 
 	// free space
-	sint16 freeSpace[VM_VARIABLES_FREE_SPACE];
+	int16_t freeSpace[VM_VARIABLES_FREE_SPACE];
 };
 
 

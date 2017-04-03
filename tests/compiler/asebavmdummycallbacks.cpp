@@ -34,7 +34,7 @@ extern "C" bool AsebaExecutionErrorOccurred()
 	return executionError;
 }
 
-extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, const void *data, uint16 size)
+extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16_t type, const void *data, uint16_t size)
 {
 	switch (type)
 	{
@@ -55,13 +55,13 @@ extern "C" void AsebaSendMessage(AsebaVMState *vm, uint16 type, const void *data
 }
 
 #ifdef __BIG_ENDIAN__
-extern "C" void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count)
+extern "C" void AsebaSendMessageWords(AsebaVMState *vm, uint16_t type, const uint16_t* data, uint16_t count)
 {
 	AsebaSendMessage(vm, type, data, count*2);
 }
 #endif
 
-extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length)
+extern "C" void AsebaSendVariables(AsebaVMState *vm, uint16_t start, uint16_t length)
 {
 	std::cerr << "AsebaSendVariables at pos " << start << ", length " << length << std::endl;
 }
@@ -81,7 +81,7 @@ static AsebaNativeFunctionPointer nativeFunctions[] =
 	ASEBA_NATIVES_STD_FUNCTIONS,
 };
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }

@@ -1005,7 +1005,7 @@ namespace Aseba
         if (result)
         {
             // send bytecode
-            sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+            sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
             // run node
             Run msg(nodeId);
             msg.serialize(asebaStream);

@@ -41,7 +41,7 @@ namespace Aseba
 		MessageQueue outQueue;
 
 	public:
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length);
+		virtual void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length);
 	};
 	
 } // namespace Aseba
@@ -81,7 +81,7 @@ namespace Enki
 				Aseba::Message::SerializationBuffer content;
 				message->serializeSpecific(content);
 				lastMessageData.resize(content.rawData.size() + 2);
-				*reinterpret_cast<uint16*>(&lastMessageData[0]) = message->type;
+				*reinterpret_cast<uint16_t*>(&lastMessageData[0]) = message->type;
 				std::copy(&content.rawData[0], &content.rawData[content.rawData.size()], &lastMessageData[2]);
 
 				// execute event on all VM that are linked to this connection

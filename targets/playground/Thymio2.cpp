@@ -50,8 +50,8 @@ namespace Enki
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 		
-		vm.variables = reinterpret_cast<sint16 *>(&variables);
-		vm.variablesSize = sizeof(variables) / sizeof(sint16);
+		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 		
 		AsebaVMInit(&vm);
 		
@@ -146,17 +146,17 @@ namespace Enki
 	void AsebaThymio2::controlStep(double dt)
 	{
 		// get physical variables
-		variables.proxHorizontal[0] = static_cast<sint16>(infraredSensor0.getValue());
-		variables.proxHorizontal[1] = static_cast<sint16>(infraredSensor1.getValue());
-		variables.proxHorizontal[2] = static_cast<sint16>(infraredSensor2.getValue());
-		variables.proxHorizontal[3] = static_cast<sint16>(infraredSensor3.getValue());
-		variables.proxHorizontal[4] = static_cast<sint16>(infraredSensor4.getValue());
-		variables.proxHorizontal[5] = static_cast<sint16>(infraredSensor5.getValue());
-		variables.proxHorizontal[6] = static_cast<sint16>(infraredSensor6.getValue());
-		variables.proxGroundReflected[0] = static_cast<sint16>(groundSensor0.getValue());
-		variables.proxGroundReflected[1] = static_cast<sint16>(groundSensor1.getValue());
-		variables.proxGroundDelta[0] = static_cast<sint16>(groundSensor0.getValue());
-		variables.proxGroundDelta[1] = static_cast<sint16>(groundSensor1.getValue());
+		variables.proxHorizontal[0] = static_cast<int16_t>(infraredSensor0.getValue());
+		variables.proxHorizontal[1] = static_cast<int16_t>(infraredSensor1.getValue());
+		variables.proxHorizontal[2] = static_cast<int16_t>(infraredSensor2.getValue());
+		variables.proxHorizontal[3] = static_cast<int16_t>(infraredSensor3.getValue());
+		variables.proxHorizontal[4] = static_cast<int16_t>(infraredSensor4.getValue());
+		variables.proxHorizontal[5] = static_cast<int16_t>(infraredSensor5.getValue());
+		variables.proxHorizontal[6] = static_cast<int16_t>(infraredSensor6.getValue());
+		variables.proxGroundReflected[0] = static_cast<int16_t>(groundSensor0.getValue());
+		variables.proxGroundReflected[1] = static_cast<int16_t>(groundSensor1.getValue());
+		variables.proxGroundDelta[0] = static_cast<int16_t>(groundSensor0.getValue());
+		variables.proxGroundDelta[1] = static_cast<int16_t>(groundSensor1.getValue());
 		variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
 		variables.motorRightSpeed = rightSpeed * 500. / 16.6;
 		
@@ -254,7 +254,7 @@ namespace Enki
 		PLAYGROUND_THYMIO2_NATIVES_FUNCTIONS
 	};
 	
-	void AsebaThymio2::callNativeFunction(uint16 id)
+	void AsebaThymio2::callNativeFunction(uint16_t id)
 	{
 		nativeFunctions[id](&vm);
 	}
@@ -285,7 +285,7 @@ namespace Enki
 			execLocalEvent(EVENT_TEMPERATURE);
 	}
 	
-	void AsebaThymio2::execLocalEvent(uint16 number)
+	void AsebaThymio2::execLocalEvent(uint16_t number)
 	{
 		// in step-by-step, only setup an event if none is being executed currently
 		if (AsebaMaskIsSet(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) && AsebaMaskIsSet(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))

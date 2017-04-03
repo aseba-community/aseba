@@ -837,7 +837,7 @@ namespace Aseba
 		target->reboot(id);
 	}
 	
-	static void write16(QIODevice& dev, const uint16 v)
+	static void write16(QIODevice& dev, const uint16_t v)
 	{
 		dev.write((const char*)&v, 2);
 	}
@@ -853,7 +853,7 @@ namespace Aseba
 			dev.write((const char *)&data[0], 2);
 	}
 	
-	static uint16 crcXModem(const uint16 oldCrc, const QString& s)
+	static uint16_t crcXModem(const uint16_t oldCrc, const QString& s)
 	{
 		return crcXModem(oldCrc, s.toStdWString());
 	}
@@ -882,10 +882,10 @@ namespace Aseba
 		
 		// bytecode
 		write16(file, bytecode.size());
-		uint16 crc(0);
+		uint16_t crc(0);
 		for (size_t i = 0; i < bytecode.size(); ++i)
 		{
-			const uint16 bc(bytecode[i]);
+			const uint16_t bc(bytecode[i]);
 			write16(file, bc);
 			crc = crcXModem(crc, bc);
 		}

@@ -38,7 +38,7 @@ namespace Aseba
 	public:
 		SimpleDashelConnection(unsigned port);
 		
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length);
+		virtual void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length);
 		
 		virtual void connectionCreated(Dashel::Stream *stream);
 		virtual void incomingData(Dashel::Stream *stream);

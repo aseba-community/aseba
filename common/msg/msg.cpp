@@ -89,13 +89,13 @@ namespace Aseba
 		
 		//! Register a message type by storing a pointer to its constructor
 		template<typename Sub>
-		void registerMessageType(uint16 type)
+		void registerMessageType(uint16_t type)
 		{
 			messagesTypes[type] = &Creator<Sub>;
 		}
 		
 		//! Create an instance of a registered message type
-		Message *createMessage(uint16 type)
+		Message *createMessage(uint16_t type)
 		{
 			if (messagesTypes.find(type) == messagesTypes.end())
 				return new UserMessage;
@@ -107,7 +107,7 @@ namespace Aseba
 		void dumpKnownMessagesTypes(wostream &stream) const
 		{
 			stream << hex << showbase;
-			for (map<uint16, CreatorFunc>::const_iterator it = messagesTypes.begin(); it != messagesTypes.end(); ++it)
+			for (map<uint16_t, CreatorFunc>::const_iterator it = messagesTypes.begin(); it != messagesTypes.end(); ++it)
 				stream << "\t" << setw(4) << it->first << "\n";
 			stream << dec << noshowbase;
 		}
@@ -115,7 +115,7 @@ namespace Aseba
 	protected:
 		//! Pointer to constructor of class Message
 		typedef Message* (*CreatorFunc)();
-		map<uint16, CreatorFunc> messagesTypes; //!< table of known messages types
+		map<uint16_t, CreatorFunc> messagesTypes; //!< table of known messages types
 		
 		//! Create a new message of type Sub
 		template<typename Sub>
@@ -127,7 +127,7 @@ namespace Aseba
 	
 	//
 	
-	Message::Message(uint16 type) :
+	Message::Message(uint16_t type) :
 		source(ASEBA_DEST_DEBUG),
 		type(type)
 	{
@@ -142,7 +142,7 @@ namespace Aseba
 	{
 		SerializationBuffer buffer;
 		serializeSpecific(buffer);
-		uint16 len = static_cast<uint16>(buffer.rawData.size());
+		uint16_t len = static_cast<uint16_t>(buffer.rawData.size());
 		
 		if (len > ASEBA_MAX_EVENT_ARG_SIZE)
 		{
@@ -151,7 +151,7 @@ namespace Aseba
 			cerr << endl;
 			abort();
 		}
-		uint16 t;
+		uint16_t t;
 		swapEndian(len);
 		stream->write(&len, 2);
 		t = swapEndianCopy(source);
@@ -165,7 +165,7 @@ namespace Aseba
 	Message *Message::receive(Stream* stream)
 	{
 		// read header
-		uint16 len, source, type;
+		uint16_t len, source, type;
 		stream->read(&len, 2);
 		swapEndian(len);
 		stream->read(&source, 2);
@@ -183,7 +183,7 @@ namespace Aseba
 		return create(source, type, buffer);
 	}
 	
-	Message *Message::create(uint16 source, uint16 type, SerializationBuffer& buffer)
+	Message *Message::create(uint16_t source, uint16_t type, SerializationBuffer& buffer)
 	{
 		// create message
 		Message *message = messageTypesInitializer.createMessage(type);
@@ -238,7 +238,7 @@ namespace Aseba
 		rawData.reserve(pos + sizeof(T));
 		
 		const T swappedVal(swapEndianCopy(val));
-		const uint8 *ptr = reinterpret_cast<const uint8 *>(&swappedVal);
+		const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&swappedVal);
 
 		copy(ptr, ptr + sizeof(T), back_inserter(rawData));
 	}
@@ -255,7 +255,7 @@ namespace Aseba
 			abort();
 		}
 		
-		add(static_cast<uint8>(val.length()));
+		add(static_cast<uint8_t>(val.length()));
 		for (size_t i = 0; i < val.length(); i++)
 			add(val[i]);
 	}
@@ -275,7 +275,7 @@ namespace Aseba
 		size_t pos = readPos;
 		readPos += sizeof(T);
 		T val;
-		uint8 *ptr = reinterpret_cast<uint8 *>(&val);
+		uint8_t *ptr = reinterpret_cast<uint8_t *>(&val);
 		copy(rawData.begin() + pos, rawData.begin() + pos + sizeof(T), ptr);
 		swapEndian(val);
 		return val;
@@ -285,10 +285,10 @@ namespace Aseba
 	string Message::SerializationBuffer::get()
 	{
 		string s;
-		size_t len = get<uint8>();
+		size_t len = get<uint8_t>();
 		s.resize(len);
 		for (size_t i = 0; i < len; i++)
-			s[i] = get<uint8>();
+			s[i] = get<uint8_t>();
 		return s;
 	}
 	
@@ -301,7 +301,7 @@ namespace Aseba
 	
 	//
 
-	UserMessage::UserMessage(uint16 type, const sint16* data, const size_t length):
+	UserMessage::UserMessage(uint16_t type, const int16_t* data, const size_t length):
 		Message(type)
 	{
 		this->data.resize(length);
@@ -326,7 +326,7 @@ namespace Aseba
 		data.resize(buffer.rawData.size() / 2);
 		
 		for (size_t i = 0; i < data.size(); i++)
-			data[i] = buffer.get<sint16>();
+			data[i] = buffer.get<int16_t>();
 	}
 	
 	void UserMessage::dumpSpecific(wostream &stream) const
@@ -346,7 +346,7 @@ namespace Aseba
 	
 	void CmdMessage::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		dest = buffer.get<uint16>();
+		dest = buffer.get<uint16_t>();
 	}
 	
 	void CmdMessage::dumpSpecific(wostream &stream) const
@@ -365,9 +365,9 @@ namespace Aseba
 	
 	void BootloaderDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pageSize = buffer.get<uint16>();
-		pagesStart = buffer.get<uint16>();
-		pagesCount = buffer.get<uint16>();
+		pageSize = buffer.get<uint16_t>();
+		pagesStart = buffer.get<uint16_t>();
+		pagesCount = buffer.get<uint16_t>();
 	}
 	
 	void BootloaderDescription::dumpSpecific(wostream &stream) const
@@ -387,7 +387,7 @@ namespace Aseba
 	void BootloaderDataRead::deserializeSpecific(SerializationBuffer& buffer)
 	{
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			data[i] = buffer.get<uint8>();
+			data[i] = buffer.get<uint8_t>();
 	}
 	
 	void BootloaderDataRead::dumpSpecific(wostream &stream) const
@@ -409,9 +409,9 @@ namespace Aseba
 	
 	void BootloaderAck::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		errorCode = buffer.get<uint16>();
+		errorCode = buffer.get<uint16_t>();
 		if (errorCode == 2)
-			errorAddress = buffer.get<uint16>();
+			errorAddress = buffer.get<uint16_t>();
 	}
 	
 	void BootloaderAck::dumpSpecific(wostream &stream) const
@@ -436,7 +436,7 @@ namespace Aseba
 	
 	void ListNodes::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		version = buffer.get<uint16>();
+		version = buffer.get<uint16_t>();
 	}
 	
 	void ListNodes::dumpSpecific(std::wostream  &stream) const
@@ -453,7 +453,7 @@ namespace Aseba
 	
 	void NodePresent::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		version = buffer.get<uint16>();
+		version = buffer.get<uint16_t>();
 	}
 	
 	void NodePresent::dumpSpecific(std::wostream  &stream) const
@@ -470,7 +470,7 @@ namespace Aseba
 	
 	void GetDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		version = buffer.get<uint16>();
+		version = buffer.get<uint16_t>();
 	}
 	
 	void GetDescription::dumpSpecific(std::wostream  &stream) const
@@ -491,7 +491,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		version = buffer.get<uint16>();
+		version = buffer.get<uint16_t>();
 	}
 	
 	void GetNodeDescription::dumpSpecific(wostream &stream) const
@@ -506,38 +506,38 @@ namespace Aseba
 	void Description::serializeSpecific(SerializationBuffer& buffer) const
 	{
 		buffer.add(WStringToUTF8(name));
-		buffer.add(static_cast<uint16>(protocolVersion));
+		buffer.add(static_cast<uint16_t>(protocolVersion));
 		
-		buffer.add(static_cast<uint16>(bytecodeSize));
-		buffer.add(static_cast<uint16>(stackSize));
-		buffer.add(static_cast<uint16>(variablesSize));
+		buffer.add(static_cast<uint16_t>(bytecodeSize));
+		buffer.add(static_cast<uint16_t>(stackSize));
+		buffer.add(static_cast<uint16_t>(variablesSize));
 		
-		buffer.add(static_cast<uint16>(namedVariables.size()));
+		buffer.add(static_cast<uint16_t>(namedVariables.size()));
 		// named variables are sent separately
 		
-		buffer.add(static_cast<uint16>(localEvents.size()));
+		buffer.add(static_cast<uint16_t>(localEvents.size()));
 		// local events are sent separately
 		
-		buffer.add(static_cast<uint16>(nativeFunctions.size()));
+		buffer.add(static_cast<uint16_t>(nativeFunctions.size()));
 		// native functions are sent separately
 	}
 	
 	void Description::deserializeSpecific(SerializationBuffer& buffer)
 	{
 		name = UTF8ToWString(buffer.get<string>());
-		protocolVersion = buffer.get<uint16>();
+		protocolVersion = buffer.get<uint16_t>();
 		
-		bytecodeSize = buffer.get<uint16>();
-		stackSize = buffer.get<uint16>();
-		variablesSize = buffer.get<uint16>();
+		bytecodeSize = buffer.get<uint16_t>();
+		stackSize = buffer.get<uint16_t>();
+		variablesSize = buffer.get<uint16_t>();
 		
-		namedVariables.resize(buffer.get<uint16>());
+		namedVariables.resize(buffer.get<uint16_t>());
 		// named variables are received separately
 		
-		localEvents.resize(buffer.get<uint16>());
+		localEvents.resize(buffer.get<uint16_t>());
 		// local events are received separately
 		
-		nativeFunctions.resize(buffer.get<uint16>());
+		nativeFunctions.resize(buffer.get<uint16_t>());
 		// native functions are received separately
 	}
 	
@@ -560,13 +560,13 @@ namespace Aseba
 	
 	void NamedVariableDescription::serializeSpecific(SerializationBuffer& buffer) const
 	{
-		buffer.add(static_cast<sint16>(size));
+		buffer.add(static_cast<int16_t>(size));
 		buffer.add(WStringToUTF8(name));
 	}
 	
 	void NamedVariableDescription::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		size = buffer.get<uint16>();
+		size = buffer.get<uint16_t>();
 		name = UTF8ToWString(buffer.get<string>());
 	}
 	
@@ -601,10 +601,10 @@ namespace Aseba
 		buffer.add(WStringToUTF8(name));
 		buffer.add(WStringToUTF8(description));
 		
-		buffer.add(static_cast<uint16>(parameters.size()));
+		buffer.add(static_cast<uint16_t>(parameters.size()));
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			buffer.add(static_cast<sint16>(parameters[j].size));
+			buffer.add(static_cast<int16_t>(parameters[j].size));
 			buffer.add(WStringToUTF8(parameters[j].name));
 		}
 	}
@@ -614,10 +614,10 @@ namespace Aseba
 		name = UTF8ToWString(buffer.get<string>());
 		description = UTF8ToWString(buffer.get<string>());
 		
-		parameters.resize(buffer.get<uint16>());
+		parameters.resize(buffer.get<uint16_t>());
 		for (size_t j = 0; j < parameters.size(); j++)
 		{
-			parameters[j].size = buffer.get<sint16>();
+			parameters[j].size = buffer.get<int16_t>();
 			parameters[j].name = UTF8ToWString(buffer.get<string>());
 		}
 	}
@@ -646,10 +646,10 @@ namespace Aseba
 	
 	void Variables::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		start = buffer.get<uint16>();
+		start = buffer.get<uint16_t>();
 		variables.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < variables.size(); i++)
-			variables[i] = buffer.get<sint16>();
+			variables[i] = buffer.get<int16_t>();
 	}
 	
 	void Variables::dumpSpecific(wostream &stream) const
@@ -671,9 +671,9 @@ namespace Aseba
 	
 	void ArrayAccessOutOfBounds::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
-		size = buffer.get<uint16>();
-		index = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
+		size = buffer.get<uint16_t>();
+		index = buffer.get<uint16_t>();
 	}
 	
 	void ArrayAccessOutOfBounds::dumpSpecific(wostream &stream) const
@@ -690,7 +690,7 @@ namespace Aseba
 	
 	void DivisionByZero::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
 	}
 	
 	void DivisionByZero::dumpSpecific(wostream &stream) const
@@ -707,7 +707,7 @@ namespace Aseba
 	
 	void EventExecutionKilled::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
 	}
 	
 	void EventExecutionKilled::dumpSpecific(wostream &stream) const
@@ -725,7 +725,7 @@ namespace Aseba
 	
 	void NodeSpecificError::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
 		message = UTF8ToWString(buffer.get<std::string>());
 	}
 	
@@ -744,8 +744,8 @@ namespace Aseba
 	
 	void ExecutionStateChanged::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
-		flags = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
+		flags = buffer.get<uint16_t>();
 	}
 	
 	void ExecutionStateChanged::dumpSpecific(wostream &stream) const
@@ -765,8 +765,8 @@ namespace Aseba
 	
 	void BreakpointSetResult::deserializeSpecific(SerializationBuffer& buffer)
 	{
-		pc = buffer.get<uint16>();
-		success = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
+		success = buffer.get<uint16_t>();
 	}
 	
 	void BreakpointSetResult::dumpSpecific(wostream &stream) const
@@ -787,7 +787,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		pageNumber = buffer.get<uint16>();
+		pageNumber = buffer.get<uint16_t>();
 	}
 	
 	void BootloaderReadPage::dumpSpecific(wostream &stream) const
@@ -810,7 +810,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		pageNumber = buffer.get<uint16>();
+		pageNumber = buffer.get<uint16_t>();
 	}
 	
 	void BootloaderWritePage::dumpSpecific(wostream &stream) const
@@ -835,7 +835,7 @@ namespace Aseba
 		CmdMessage::deserializeSpecific(buffer);
 		
 		for (size_t i = 0 ; i < sizeof(data); i++)
-			data[i] = buffer.get<uint8>();
+			data[i] = buffer.get<uint8_t>();
 	}
 	
 	void BootloaderPageDataWrite::dumpSpecific(wostream &stream) const
@@ -863,10 +863,10 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		start = buffer.get<uint16>();
+		start = buffer.get<uint16_t>();
 		bytecode.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < bytecode.size(); i++)
-			bytecode[i] = buffer.get<uint16>();
+			bytecode[i] = buffer.get<uint16_t>();
 	}
 	
 	void SetBytecode::dumpSpecific(wostream &stream) const
@@ -876,7 +876,7 @@ namespace Aseba
 		stream << bytecode.size() << " words of bytecode of starting at " << start;
 	}
 	
-	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode)
+	void sendBytecode(Dashel::Stream* stream, uint16_t dest, const std::vector<uint16_t>& bytecode)
 	{
 		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-2;
 		unsigned bytecodeStart = 0;
@@ -901,7 +901,7 @@ namespace Aseba
 		}
 	}
 	
-	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode)
+	void sendBytecode(std::vector<Message*>& messagesVector, uint16_t dest, const std::vector<uint16_t>& bytecode)
 	{
 		unsigned bytecodePayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-2;
 		unsigned bytecodeStart = 0;
@@ -939,7 +939,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		pc = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
 	}
 	
 	void BreakpointSet::dumpSpecific(wostream &stream) const
@@ -962,7 +962,7 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		pc = buffer.get<uint16>();
+		pc = buffer.get<uint16_t>();
 	}
 	
 	void BreakpointClear::dumpSpecific(wostream &stream) const
@@ -974,7 +974,7 @@ namespace Aseba
 	
 	//
 	
-	GetVariables::GetVariables(uint16 dest, uint16 start, uint16 length) :
+	GetVariables::GetVariables(uint16_t dest, uint16_t start, uint16_t length) :
 		CmdMessage(ASEBA_MESSAGE_GET_VARIABLES, dest),
 		start(start),
 		length(length)
@@ -993,8 +993,8 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		start = buffer.get<uint16>();
-		length = buffer.get<uint16>();
+		start = buffer.get<uint16_t>();
+		length = buffer.get<uint16_t>();
 	}
 	
 	void GetVariables::dumpSpecific(wostream &stream) const
@@ -1006,7 +1006,7 @@ namespace Aseba
 	
 	//
 	
-	SetVariables::SetVariables(uint16 dest, uint16 start, const VariablesVector& variables) :
+	SetVariables::SetVariables(uint16_t dest, uint16_t start, const VariablesVector& variables) :
 		CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, dest),
 		start(start),
 		variables(variables)
@@ -1026,10 +1026,10 @@ namespace Aseba
 	{
 		CmdMessage::deserializeSpecific(buffer);
 		
-		start = buffer.get<uint16>();
+		start = buffer.get<uint16_t>();
 		variables.resize((buffer.rawData.size() - buffer.readPos) / 2);
 		for (size_t i = 0; i < variables.size(); i++)
-			variables[i] = buffer.get<sint16>();
+			variables[i] = buffer.get<int16_t>();
 	}
 	
 	void SetVariables::dumpSpecific(wostream &stream) const

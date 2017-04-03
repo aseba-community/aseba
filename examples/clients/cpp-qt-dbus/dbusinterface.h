@@ -62,7 +62,7 @@ namespace Aseba
 		void setVariable(const QString& node, const QString& variable, const Values& value);
 		void connectEvent(const QString& eventName, EventCallback callback);
 
-		void sendEvent(quint16 eventID, const Values& value);
+		void sendEvent(uint16_t eventID, const Values& value);
 		void sendEventName(const QString& eventName, const Values& value);
 
 	public slots:

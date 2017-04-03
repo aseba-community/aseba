@@ -101,7 +101,7 @@ namespace Aseba { namespace Http
 			/**
 			 * Notifies all HTTP event subscribers about an SSE event with a given name and a vector of argument data
 			 */
-			virtual void notifyEventSubscribers(const std::string& event, const std::vector<sint16>& data = std::vector<sint16>());
+			virtual void notifyEventSubscribers(const std::string& event, const std::vector<int16_t>& data = std::vector<int16_t>());
 
 			/**
 			 * Adds an event subscription to a HTTP connection specified by one of its requests that should receive the

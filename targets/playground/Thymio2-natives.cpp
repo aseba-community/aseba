@@ -27,7 +27,7 @@ using namespace Enki;
 
 // utility functions
 
-static sint16 clampValueTo32(sint16 v)
+static int16_t clampValueTo32(int16_t v)
 {
 	if (v > 32)
 		return 32;
@@ -48,7 +48,7 @@ void notifyMissingFeature()
 
 extern "C" void PlaygroundThymio2Native_sound_record(AsebaVMState *vm)
 {
-	const sint16 number(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
@@ -58,7 +58,7 @@ extern "C" void PlaygroundThymio2Native_sound_record(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sound_play(AsebaVMState *vm)
 {
-	const sint16 number(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
@@ -68,7 +68,7 @@ extern "C" void PlaygroundThymio2Native_sound_play(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
 {
-	const sint16 number(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 
 	// do nothing for now
 	ASEBA_UNUSED(number);
@@ -78,7 +78,7 @@ extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
 {
-	const sint16 number(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
@@ -90,8 +90,8 @@ extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sound_freq(AsebaVMState * vm)
 {
-	const sint16 freq(vm->variables[AsebaNativePopArg(vm)]);
-	const sint16 time(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t freq(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t time(vm->variables[AsebaNativePopArg(vm)]);
 	
 	// do nothing for now
 	ASEBA_UNUSED(freq);
@@ -102,7 +102,7 @@ extern "C" void PlaygroundThymio2Native_sound_freq(AsebaVMState * vm)
 
 extern "C" void PlaygroundThymio2Native_sound_wave(AsebaVMState * vm)
 {
-	const uint16 waveAddr(AsebaNativePopArg(vm));
+	const uint16_t waveAddr(AsebaNativePopArg(vm));
 	
 	// do nothing for now
 	ASEBA_UNUSED(waveAddr);
@@ -114,14 +114,14 @@ extern "C" void PlaygroundThymio2Native_sound_wave(AsebaVMState * vm)
 
 extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l4(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l4(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -139,11 +139,11 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 {
-	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(std::max(std::max(r, g), b));
-	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+	const int16_t r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((int16_t)1,b)));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -154,11 +154,11 @@ extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 {
-	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(std::max(std::max(r, g), b));
-	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+	const int16_t r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((int16_t)1,b)));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -169,11 +169,11 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 {
-	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 a(std::max(std::max(r, g), b));
-	const double param(1./std::max(std::max(r, g),std::max((sint16)1,b)));
+	const int16_t r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t g(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t a(std::max(std::max(r, g), b));
+	const double param(1./std::max(std::max(r, g),std::max((int16_t)1,b)));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -184,10 +184,10 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -201,14 +201,14 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l4(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l2(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l3(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l4(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l5(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l6(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l7(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
 	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
 	if (thymio2)
@@ -226,8 +226,8 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_prox_v(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
 	// do nothing for now
 	ASEBA_UNUSED(l0);
@@ -238,7 +238,7 @@ extern "C" void PlaygroundThymio2Native_leds_prox_v(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_rc(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	
 	// do nothing for now
 	ASEBA_UNUSED(l0);
@@ -248,7 +248,7 @@ extern "C" void PlaygroundThymio2Native_leds_rc(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_sound(AsebaVMState *vm)
 {
-	const sint16 l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	
 	// do nothing for now
 	ASEBA_UNUSED(l0);
@@ -258,8 +258,8 @@ extern "C" void PlaygroundThymio2Native_leds_sound(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_leds_temperature(AsebaVMState *vm)
 {
-	const sint16 r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
-	const sint16 b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
+	const int16_t b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
 	// do nothing for now
 	ASEBA_UNUSED(r);
@@ -270,7 +270,7 @@ extern "C" void PlaygroundThymio2Native_leds_temperature(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_prox_comm_enable(AsebaVMState *vm)
 {
-	const sint16 enable(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t enable(vm->variables[AsebaNativePopArg(vm)]);
 	
 	// do nothing for now
 	ASEBA_UNUSED(enable);
@@ -280,8 +280,8 @@ extern "C" void PlaygroundThymio2Native_prox_comm_enable(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
 {
-	const sint16 number(vm->variables[AsebaNativePopArg(vm)]);
-	const uint16 statusAddr(AsebaNativePopArg(vm));
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
+	const uint16_t statusAddr(AsebaNativePopArg(vm));
 	
 	// do nothing for now
 	ASEBA_UNUSED(number);
@@ -292,9 +292,9 @@ extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
 {
-	const uint16 dataAddr(AsebaNativePopArg(vm));
-	const uint16 statusAddr(AsebaNativePopArg(vm));
-	const uint16 dataLength(AsebaNativePopArg(vm));
+	const uint16_t dataAddr(AsebaNativePopArg(vm));
+	const uint16_t statusAddr(AsebaNativePopArg(vm));
+	const uint16_t dataLength(AsebaNativePopArg(vm));
 	
 	// do nothing for now
 	ASEBA_UNUSED(dataAddr);
@@ -306,9 +306,9 @@ extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
 {
-	const uint16 dataAddr(AsebaNativePopArg(vm));
-	const uint16 statusAddr(AsebaNativePopArg(vm));
-	const uint16 dataLength(AsebaNativePopArg(vm));
+	const uint16_t dataAddr(AsebaNativePopArg(vm));
+	const uint16_t statusAddr(AsebaNativePopArg(vm));
+	const uint16_t dataLength(AsebaNativePopArg(vm));
 	
 	// do nothing for now
 	ASEBA_UNUSED(dataAddr);
@@ -320,8 +320,8 @@ extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
 
 extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
 {
-	const sint16 seek(vm->variables[AsebaNativePopArg(vm)]);
-	const sint16 statusAddr(AsebaNativePopArg(vm));
+	const int16_t seek(vm->variables[AsebaNativePopArg(vm)]);
+	const int16_t statusAddr(AsebaNativePopArg(vm));
 	
 	// do nothing for now
 	ASEBA_UNUSED(seek);

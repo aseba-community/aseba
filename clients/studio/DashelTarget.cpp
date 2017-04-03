@@ -426,7 +426,7 @@ namespace Aseba
 		}
 	}
 	
-	void DashelInterface::nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion)
+	void DashelInterface::nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion)
 	{
 		// show a different warning in function of the mismatch
 		if (protocolVersion > ASEBA_PROTOCOL_VERSION)
@@ -573,7 +573,7 @@ namespace Aseba
 			// send bytecode
 			try
 			{
-				sendBytecode(dashelInterface.stream, node, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+				sendBytecode(dashelInterface.stream, node, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}

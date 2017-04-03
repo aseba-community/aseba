@@ -46,7 +46,7 @@ extern "C" {
 /*! Description of a variable */
 typedef struct
 {
-	uint16 size;			/*!< size of the variable */
+	uint16_t size;			/*!< size of the variable */
 	const char* name;		/*!< name of the variable */
 } AsebaVariableDescription;
 
@@ -70,7 +70,7 @@ typedef void (*AsebaNativeFunctionPointer)(AsebaVMState *vm);
 /*! Description of an argument of a native function */
 typedef struct
 {
-	sint16 size;		/*!< size of the argument in number of values; if negative, template parameter */
+	int16_t size;		/*!< size of the argument in number of values; if negative, template parameter */
 	const char* name;	/*!< name of the argument */
 } AsebaNativeFunctionArgumentDescription;
 
@@ -85,7 +85,7 @@ typedef struct
 // support functions
 
 /*! Return an argument on the stack, including the value of template parameters */
-static inline sint16 AsebaNativePopArg(AsebaVMState *vm)
+static inline int16_t AsebaNativePopArg(AsebaVMState *vm)
 {
 	return vm->stack[vm->sp--];
 }
@@ -198,9 +198,9 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm);
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_vecnonzerosequence;
 
 /*! Functon to set the seed of random generator */
-void AsebaSetRandomSeed(uint16 seed);
+void AsebaSetRandomSeed(uint16_t seed);
 /*! Functon to get a random number */
-uint16 AsebaGetRandom(void);
+uint16_t AsebaGetRandom(void);
 /*! Function to get a 16-bit signed random number */
 void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */

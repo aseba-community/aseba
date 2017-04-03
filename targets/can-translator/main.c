@@ -76,9 +76,9 @@ static void can_tx_cb(void)
 	
 	// A message is waiting on the uart (it's complete but still waiting because we were full)
 	// Check if we can send it now
-	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16 *)uartRecvBuffer)[0])) 
+	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16_t *)uartRecvBuffer)[0])) 
 	{
-		uint16 source = ((uint16 *)uartRecvBuffer)[1];
+		uint16_t source = ((uint16_t *)uartRecvBuffer)[1];
 		if (AsebaCanSendSpecificSource(uartRecvBuffer+4, uartRecvPos-4, source) == 1)
 		{
 			uartRecvPos = 0;
@@ -97,15 +97,15 @@ static void can_rx_cb(const can_frame* frame)
 	// we do a nasty cast because the two data structure are compatible, i.e. they have the same leading members
 	AsebaCanFrameReceived((CanFrame *) frame);
 	
-	uint16 source;
+	uint16_t source;
 		
 	if(uartSendPos == uartSendSize) 
 	{
 		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 		if (amount > 0)
 		{
-			((uint16 *)uartSendBuffer)[0] = (uint16)amount - 2;
-			((uint16 *)uartSendBuffer)[1] = source;
+			((uint16_t *)uartSendBuffer)[0] = (uint16_t)amount - 2;
+			((uint16_t *)uartSendBuffer)[1] = source;
 			uartSendSize = (unsigned)amount + 4;
 
 			if(uart_transmit_byte(U_UART, uartSendBuffer[0]))
@@ -128,10 +128,10 @@ static bool uart_rx_cb(int __attribute((unused)) uart_id, unsigned char data, vo
 	uartRecvBuffer[uartRecvPos++] = data;
 	
 	// if we have received the header and all the message payload data forward it to the can layer
-	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16 *)uartRecvBuffer)[0])) 
+	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16_t *)uartRecvBuffer)[0])) 
 	{
 			
-		uint16 source = ((uint16 *)uartRecvBuffer)[1];
+		uint16_t source = ((uint16_t *)uartRecvBuffer)[1];
 		if (AsebaCanSendSpecificSource(uartRecvBuffer+4, uartRecvPos-4, source) == 1)
 		{
 			// Was able to queue frame to can layer. Setup the buffer pointer for next reception
@@ -165,13 +165,13 @@ static bool uart_tx_cb(int __attribute((unused)) uart_id, unsigned char* data, v
 		// We finished sending the previous packet
 	
 		// ...and if there is a new message on CAN, read it
-		uint16 source;
+		uint16_t source;
 			
 		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 		if (amount > 0)
 		{
-			((uint16 *)uartSendBuffer)[0] = (uint16)amount - 2;
-			((uint16 *)uartSendBuffer)[1] = source;
+			((uint16_t *)uartSendBuffer)[0] = (uint16_t)amount - 2;
+			((uint16_t *)uartSendBuffer)[1] = source;
 			uartSendSize = (unsigned)amount + 4;
 			uartSendPos = 1;
 			*data = uartSendBuffer[0];
@@ -189,7 +189,7 @@ void AsebaIdle(void) {
 	OUTPUT_ERROR(5);
 }
 
-uint16 AsebaShouldDropPacket(uint16 source, const uint8* data) {
+uint16_t AsebaShouldDropPacket(uint16_t source, const uint8_t* data) {
 	return 0;
 }	
 

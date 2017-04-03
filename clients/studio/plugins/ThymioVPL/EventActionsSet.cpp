@@ -348,20 +348,20 @@ namespace Aseba { namespace ThymioVPL
 		clearBlinkTimer->start(300);
 	}
 	
-	//! Return the content compressed into a uint16 vector, to be used as debug events
-	QVector<quint16> EventActionsSet::getContentCompressed() const
+	//! Return the content compressed into a uint16_t vector, to be used as debug events
+	QVector<uint16_t> EventActionsSet::getContentCompressed() const
 	{
 		// invalid sets have no content
 		if ((!event) || actions.empty())
-			return QVector<quint16>();
+			return QVector<uint16_t>();
 		
 		// the first word of the content is the number of the set
-		QVector<quint16> content(1, row);
+		QVector<uint16_t> content(1, row);
 		// the second word is the number of blocks in this set
 		content.push_back(1 + (stateFilter ? 1 : 0) + actions.size());
 		
-		// the next words are the types of the blocks, as uint4, compressed 4-by-4 into uint16s, big-endian
-		quint16 curWord(event->getNameAsUInt4());
+		// the next words are the types of the blocks, as uint4, compressed 4-by-4 into uint16_ts, big-endian
+		uint16_t curWord(event->getNameAsUInt4());
 		unsigned bitUsed(4);
 		if (stateFilter)
 		{

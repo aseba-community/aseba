@@ -560,7 +560,7 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 	if (result)
 	{
 		// send bytecode
-		sendBytecode(targetStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+		sendBytecode(targetStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 		// run node
 		Run msg(nodeId);
 		msg.serialize(targetStream);

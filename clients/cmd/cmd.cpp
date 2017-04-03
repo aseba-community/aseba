@@ -140,7 +140,7 @@ namespace Aseba
 	
 	protected:
 		// reporting function
-		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple)
+		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple)
 		{
 			cout << "Writing page " << pageNumber << "... ";
 			cout.flush();
@@ -228,8 +228,8 @@ namespace Aseba
 			if (argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = argc;
-			uint16 type = atoi(argv[1]);
-			uint16 length = argc-2;
+			uint16_t type = atoi(argv[1]);
+			uint16_t length = argc-2;
 			
 			UserMessage::DataVector data(length);
 			for (size_t i = 0; i < length; i++)
@@ -248,12 +248,12 @@ namespace Aseba
 			
 			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 			
-			vector<uint8> data(bootloader.getPageSize());
+			vector<uint8_t> data(bootloader.getPageSize());
 			if (bootloader.readPage(atoi(argv[2]), &data[0]))
 			{
 				ofstream file("page.bin");
 				if (file.good())
-					copy(data.begin(), data.end(), ostream_iterator<uint8>(file));
+					copy(data.begin(), data.end(), ostream_iterator<uint8_t>(file));
 				else
 					errorOpenFile("page.bin");
 			}
@@ -267,12 +267,12 @@ namespace Aseba
 			argEaten = 2;
 			
 			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
-			vector <uint8> data(2048);
+			vector <uint8_t> data(2048);
 			cout << "Page: " << atoi(argv[2]) << endl;
 			if(bootloader.readPageSimple(atoi(argv[2]), &data[0])) {
 				ofstream file("page.bin");
 				if(file.good())
-					copy(data.begin(),data.end(),ostream_iterator<uint8>(file));
+					copy(data.begin(),data.end(),ostream_iterator<uint8_t>(file));
 				else
 					errorOpenFile("page.bin");
 			}
@@ -345,7 +345,7 @@ namespace Aseba
 		}
 		else if (strcmp(cmd, "eb") == 0)
 		{
-			uint16 dest;
+			uint16_t dest;
 			
 			if(argc < 2)
 				errorMissingArgument(argv[0]);
@@ -380,7 +380,7 @@ namespace Aseba
 		}
 		else if (strcmp(cmd, "sb") == 0)
 		{
-			uint16 dest;
+			uint16_t dest;
 			
 			if(argc < 2)
 				errorMissingArgument(argv[0]);
@@ -394,7 +394,7 @@ namespace Aseba
 		}
 		else if (strcmp(cmd, "sleep") == 0)
 		{
-			uint16 dest;
+			uint16_t dest;
 			if(argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;

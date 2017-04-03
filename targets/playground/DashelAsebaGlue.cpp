@@ -41,13 +41,13 @@ namespace Aseba
 		}
 	}
 
-	void SimpleDashelConnection::sendBuffer(uint16 nodeId, const uint8* data, uint16 length)
+	void SimpleDashelConnection::sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length)
 	{
 		if (stream)
 		{
 			try
 			{
-				uint16 temp;
+				uint16_t temp;
 				
 				// this may happen if target has disconnected
 				temp = bswap16(length - 2);
@@ -85,8 +85,8 @@ namespace Aseba
 		try
 		{
 			// receive data
-			uint16 temp;
-			uint16 len;
+			uint16_t temp;
+			uint16_t len;
 			
 			stream->read(&temp, 2);
 			len = bswap16(temp);

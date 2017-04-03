@@ -31,10 +31,10 @@ class EventDataWrapper : public QwtSeriesData<QPointF>
 {
 private:
 	std::vector<double>& _x;
-	std::vector<sint16>& _y;
+	std::vector<int16_t>& _y;
 	
 public:
-	EventDataWrapper(std::vector<double>& _x, std::vector<sint16>& _y) :
+	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) :
 		_x(_x),
 		_y(_y)
 	{ }
@@ -47,10 +47,10 @@ class EventDataWrapper : public QwtData
 {
 private:
 	std::vector<double>& _x;
-	std::vector<sint16>& _y;
+	std::vector<int16_t>& _y;
 	
 public:
-	EventDataWrapper(std::vector<double>& _x, std::vector<sint16>& _y) :
+	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) :
 		_x(_x),
 		_y(_y)
 	{ }
@@ -66,7 +66,7 @@ class EventLogger : public Hub, public QwtPlot
 protected:
 	Stream* stream;
 	int eventId;
-	vector<vector<sint16> > values;
+	vector<vector<int16_t> > values;
 	vector<double> timeStamps;
 	QTime startingTime;
 	ofstream outputFile;

@@ -65,13 +65,13 @@ namespace Aseba
 		int getPageSize() const { return pageSize; }
 		
 		//! Read a page
-		bool readPage(unsigned pageNumber, uint8* data);
+		bool readPage(unsigned pageNumber, uint8_t* data);
 		
 		//! Read a page, simplified protocol
-		bool readPageSimple(unsigned pageNumber, uint8 * data);
+		bool readPageSimple(unsigned pageNumber, uint8_t * data);
 		
 		//! Write a page, if simple is true, use simplified protocol, otherwise use complete protocol
-		bool writePage(unsigned pageNumber, const uint8 *data, bool simple);
+		bool writePage(unsigned pageNumber, const uint8_t *data, bool simple);
 		
 		//! Write an hex file
 		void writeHex(const std::string &fileName, bool reset, bool simple);
@@ -83,7 +83,7 @@ namespace Aseba
 		// reporting function
 		
 		// progress
-		virtual void writePageStart(unsigned pageNumber, const uint8* data, bool simple) {}
+		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple) {}
 		virtual void writePageWaitAck() {}
 		virtual void writePageSuccess() {}
 		virtual void writePageFailure() {}

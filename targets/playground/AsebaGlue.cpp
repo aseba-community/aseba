@@ -39,7 +39,7 @@ namespace Aseba
 	
 	// RecvBufferNodeConnection
 
-	uint16 RecvBufferNodeConnection::getBuffer(uint8* data, uint16 maxLength, uint16* source)
+	uint16_t RecvBufferNodeConnection::getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source)
 	{
 		if (lastMessageData.size())
 		{
@@ -60,7 +60,7 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 	// not implemented in playground
 }
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
 {
 	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeConnection* connection(environment.second);
@@ -68,7 +68,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	connection->sendBuffer(vm->nodeId, data, length);
 }
 
-extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeConnection* connection(environment.second);
@@ -100,7 +100,7 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return glue->getNativeFunctionsDescriptions();
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 {
 	const Aseba::NodeEnvironment& environment(Aseba::vmStateToEnvironment.find(vm)->second);
 	Aseba::AbstractNodeGlue* glue(environment.first);

@@ -49,7 +49,7 @@ extern "C" {
 /*!	the data that physically go on the CAN bus. Used to communicate with the CAN data layer */
 typedef struct
 {
-	uint8 data[8] __attribute__((aligned(sizeof(int)))); /*!< data payload */
+	uint8_t data[8] __attribute__((aligned(sizeof(int)))); /*!< data payload */
 	unsigned id:11; /*!< CAN identifier */
 	unsigned len:4; /*!< amount of bytes used in data */
 	unsigned used:1; /*!< when frame is in a circular buffer, tell if it frame is used */
@@ -75,14 +75,14 @@ typedef void (*AsebaCanSendFrameFP)(const CanFrame *frame);
 	@param recvQueue pointer to receive queue data
 	@param recvQueueSize number of frame in recvQueue
 */
-void AsebaCanInit(uint16 id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP, AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP, CanFrame* sendQueue, size_t sendQueueSize, CanFrame* recvQueue, size_t recvQueueSize);
+void AsebaCanInit(uint16_t id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP, AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP, CanFrame* sendQueue, size_t sendQueueSize, CanFrame* recvQueue, size_t recvQueueSize);
 
 /*! Send data as an aseba packet.
 	@param data pointer to the data to send
 	@param size amount of data to send
 	@return 1 on success, 0 on failure
 */
-uint16 AsebaCanSend(const uint8 *data, size_t size);
+uint16_t AsebaCanSend(const uint8_t *data, size_t size);
 
 /*! Send data as an aseba packet.
 	@param data pointer to the data to send
@@ -90,7 +90,7 @@ uint16 AsebaCanSend(const uint8 *data, size_t size);
 	@param source identifier to use as source
 	@return 1 on success, 0 on failure
 */
-uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source);
+uint16_t AsebaCanSendSpecificSource(const uint8_t *data, size_t size, uint16_t source);
 
 /*! Copy data from a received packet to the caller-provided buffer.
 	Remove the packet from the reception queue afterwards.
@@ -99,7 +99,7 @@ uint16 AsebaCanSendSpecificSource(const uint8 *data, size_t size, uint16 source)
 	@param source the identifier of the source of the received packet
 	@return the amount of data copied. 0 if no data were available.
 */
-uint16 AsebaCanRecv(uint8 *data, size_t size, uint16 *source);
+uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source);
 
 /*! Wait until the send queue is empty
 */
@@ -115,7 +115,7 @@ void AsebaCanRecvFreeQueue(void);
 void AsebaIdle(void);
 
 /*! Return true if VM will ignore the packet, false otherwise */
-uint16 AsebaShouldDropPacket(uint16 source, const uint8* data);
+uint16_t AsebaShouldDropPacket(uint16_t source, const uint8_t* data);
 
 // to be called by data layer on interrupts
 
@@ -126,7 +126,7 @@ void AsebaCanFrameReceived(const CanFrame *frame);
 void AsebaCanFrameSent(void);
 
 /*! Return true if the recv buffer is empty, false otherwise */
-uint16 AsebaCanRecvBufferEmpty(void);
+uint16_t AsebaCanRecvBufferEmpty(void);
 
 /*@}*/
 

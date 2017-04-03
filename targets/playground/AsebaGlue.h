@@ -38,7 +38,7 @@ namespace Aseba
 		virtual const AsebaVMDescription* getDescription() const = 0;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const = 0;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const = 0;
-		virtual void callNativeFunction(uint16 id) = 0;
+		virtual void callNativeFunction(uint16_t id) = 0;
 		
 		// to be implemented by subclasses of robots for communicating with the external world
 		virtual void externalInputStep(double dt) = 0;
@@ -54,8 +54,8 @@ namespace Aseba
 
 	struct AbstractNodeConnection
 	{
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length) = 0;
-		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source) = 0;
+		virtual void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length) = 0;
+		virtual uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source) = 0;
 	};
 
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
@@ -70,11 +70,11 @@ namespace Aseba
 	class RecvBufferNodeConnection: public AbstractNodeConnection
 	{
 	protected:
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
+		uint16_t lastMessageSource;
+		std::valarray<uint8_t> lastMessageData;
 		
 	public:
-		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source);
+		virtual uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source);
 	};
 	
 } // Aseba

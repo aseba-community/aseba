@@ -95,10 +95,10 @@ namespace Aseba
 			UnifiedTime timeStamp(UnifiedTime::fromRawTimeString(tokenizedLine.front()));
 			tokenizedLine.pop_front();
 			
-			const uint16 source = strtol(tokenizedLine.front().c_str(), 0, 16);
+			const uint16_t source = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
 			
-			const uint16 type = strtol(tokenizedLine.front().c_str(), 0, 16);
+			const uint16_t type = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
 			
 			Message::SerializationBuffer buffer;

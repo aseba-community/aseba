@@ -181,7 +181,7 @@ namespace Aseba
 						
 						if (result)
 						{
-							sendBytecode(stream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+							sendBytecode(stream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 							Run(nodeId).serialize(stream);
 							stream->flush();
 							wcerr << QString("! %1 bytecodes loaded to target %0, you can disconnect target !").arg(element.attribute("name")).arg(bytecode.size()).toStdWString() << endl;

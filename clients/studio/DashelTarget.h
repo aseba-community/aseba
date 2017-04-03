@@ -122,7 +122,7 @@ namespace Aseba
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		
 		// from NodesManager
-		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion);
+		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 		virtual void nodeConnected(unsigned nodeId);
 		virtual void nodeDisconnected(unsigned nodeId);

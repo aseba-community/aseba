@@ -138,7 +138,7 @@ bool HttpInterface::sendEvent(const std::vector<std::string>& args)
 	return true;
 }
 
-void HttpInterface::notifyEventSubscribers(const std::string& event, const std::vector<sint16>& data)
+void HttpInterface::notifyEventSubscribers(const std::string& event, const std::vector<int16_t>& data)
 {
 	// set up SSE message
 	std::stringstream reply;
@@ -356,7 +356,7 @@ void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
 			sendHttpResponses();
 
 			// notify event subscribers about the disconnected node
-			std::vector<sint16> data;
+			std::vector<int16_t> data;
 			data.push_back(node.globalId);
 
 			notifyEventSubscribers("disconnect", data);

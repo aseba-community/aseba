@@ -123,8 +123,8 @@ namespace Enki
 			return;
 		}
 		
-		const sint16 bValue(value ? 1 : 0);
-		sint16* memoryValue(&thymio->variables.buttonBackward + number);
+		const int16_t bValue(value ? 1 : 0);
+		int16_t* memoryValue(&thymio->variables.buttonBackward + number);
 		if (bValue != *memoryValue)
 		{
 			*memoryValue = bValue;

@@ -56,53 +56,53 @@ namespace Enki
 	public:
 		struct Variables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 productId;
-			sint16 fwversion[2];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t productId;
+			int16_t fwversion[2];
 			
-			sint16 buttonBackward;
-			sint16 buttonLeft;
-			sint16 buttonCenter;
-			sint16 buttonForward;
-			sint16 buttonRight;
+			int16_t buttonBackward;
+			int16_t buttonLeft;
+			int16_t buttonCenter;
+			int16_t buttonForward;
+			int16_t buttonRight;
 			
-			sint16 proxHorizontal[7];
+			int16_t proxHorizontal[7];
 			
-			sint16 proxCommRx;
-			sint16 proxCommTx;
+			int16_t proxCommRx;
+			int16_t proxCommTx;
 			
-			sint16 proxGroundAmbiant[2];
-			sint16 proxGroundReflected[2];
-			sint16 proxGroundDelta[2];
+			int16_t proxGroundAmbiant[2];
+			int16_t proxGroundReflected[2];
+			int16_t proxGroundDelta[2];
 			
-			sint16 motorLeftTarget;
-			sint16 motorRightTarget;
-			sint16 motorLeftSpeed;
-			sint16 motorRightSpeed;
-			sint16 motorLeftPwm;
-			sint16 motorRightPwm;
+			int16_t motorLeftTarget;
+			int16_t motorRightTarget;
+			int16_t motorLeftSpeed;
+			int16_t motorRightSpeed;
+			int16_t motorLeftPwm;
+			int16_t motorRightPwm;
 			
-			sint16 acc[3];
+			int16_t acc[3];
 			
-			sint16 temperature;
+			int16_t temperature;
 			
-			sint16 rc5adress;
-			sint16 rc5command;
+			int16_t rc5adress;
+			int16_t rc5command;
 			
-			sint16 micIntensity;
-			sint16 micThreshold;
+			int16_t micIntensity;
+			int16_t micThreshold;
 			
-			sint16 timerPeriod[2];
+			int16_t timerPeriod[2];
 			
-			sint16 freeSpace[512];
+			int16_t freeSpace[512];
 		} variables;
 		
 	protected:
 		Aseba::SoftTimer timer0;
 		Aseba::SoftTimer timer1;
-		sint16 oldTimerPeriod[2];
+		int16_t oldTimerPeriod[2];
 		Aseba::SoftTimer timer100Hz;
 		unsigned counter100Hz;
 		bool lastStepCollided;
@@ -128,7 +128,7 @@ namespace Enki
 		virtual const AsebaVMDescription* getDescription() const;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
-		virtual void callNativeFunction(uint16 id);
+		virtual void callNativeFunction(uint16_t id);
 		
 	protected:
 		
@@ -138,7 +138,7 @@ namespace Enki
 		
 	protected:
 		friend class Thymio2Interface;
-		void execLocalEvent(uint16 number);
+		void execLocalEvent(uint16_t number);
 	};
 	
 } // Enki

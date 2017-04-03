@@ -670,7 +670,7 @@ namespace Aseba
 		
 		if (result)
 		{
-			sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+			sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 			Run(nodeId).serialize(asebaStream);
 			UserMessage(eventId(L"start")).serialize(asebaStream);
 			asebaStream->flush();

@@ -59,7 +59,7 @@ namespace Aseba
 				@param localId the new local node id to use
 				@param targetId the target node id to remap
 			*/
-			void remapId(Dashel::Stream* stream, const uint16 localId, const uint16 targetId);
+			void remapId(Dashel::Stream* stream, const uint16_t localId, const uint16_t targetId);
 			
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
@@ -73,7 +73,7 @@ namespace Aseba
 			bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 			
 			//! A pair of id: local, target
-			typedef std::pair<uint16, uint16> IdPair;
+			typedef std::pair<uint16_t, uint16_t> IdPair;
 			//! A table allowing to remap the aseba node id of streams
 			typedef std::map<Dashel::Stream*, IdPair> IdRemapTable;
 			IdRemapTable idRemapTable; //!< table for remapping id

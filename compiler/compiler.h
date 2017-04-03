@@ -107,7 +107,7 @@ namespace Aseba
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
 		TargetDescription() : protocolVersion(0), bytecodeSize(0), variablesSize(0), stackSize(0) { }
-		uint16 crc() const;
+		uint16_t crc() const;
 		VariablesMap getVariablesMap(unsigned& freeVariableIndex) const;
 		FunctionsMap getFunctionsMap() const;
 	};

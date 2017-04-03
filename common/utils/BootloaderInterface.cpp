@@ -56,7 +56,7 @@ namespace Aseba
 		
 	}
 	
-	bool BootloaderInterface::readPage(unsigned pageNumber, uint8* data)
+	bool BootloaderInterface::readPage(unsigned pageNumber, uint8_t* data)
 	{
 		if ((pageNumber < pagesStart) || (pageNumber >= pagesStart + pagesCount))
 		{
@@ -80,7 +80,7 @@ namespace Aseba
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == dest))
 			{
-				uint16 errorCode = ackMessage->errorCode;
+				uint16_t errorCode = ackMessage->errorCode;
 				if (errorCode == BootloaderAck::SUCCESS)
 				{
 					if (dataRead < pageSize)
@@ -107,7 +107,7 @@ namespace Aseba
 		return true;
 	}
 	
-	bool BootloaderInterface::readPageSimple(unsigned pageNumber, uint8 * data)
+	bool BootloaderInterface::readPageSimple(unsigned pageNumber, uint8_t * data)
 	{
 		BootloaderReadPage message;
 		message.dest = dest;
@@ -119,7 +119,7 @@ namespace Aseba
 		return true;
 	}
 	
-	bool BootloaderInterface::writePage(unsigned pageNumber, const uint8 *data, bool simple)
+	bool BootloaderInterface::writePage(unsigned pageNumber, const uint8_t *data, bool simple)
 	{
 		writePageStart(pageNumber, data, simple);
 		
@@ -148,7 +148,7 @@ namespace Aseba
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 				if (ackMessage && (ackMessage->source == bootloaderDest))
 				{
-					uint16 errorCode = ackMessage->errorCode;
+					uint16_t errorCode = ackMessage->errorCode;
 					if(errorCode == BootloaderAck::SUCCESS)
 						break;
 					else
@@ -175,7 +175,7 @@ namespace Aseba
 					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
 					if (ackMessage && (ackMessage->source == dest))
 					{
-						uint16 errorCode = ackMessage->errorCode;
+						uint16_t errorCode = ackMessage->errorCode;
 						if(errorCode == BootloaderAck::SUCCESS)
 							break;
 						else
@@ -199,7 +199,7 @@ namespace Aseba
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == bootloaderDest))
 			{
-				uint16 errorCode = ackMessage->errorCode;
+				uint16_t errorCode = ackMessage->errorCode;
 				if(errorCode == BootloaderAck::SUCCESS)
 				{
 					writePageSuccess();
@@ -270,7 +270,7 @@ namespace Aseba
 		}
 		
 		// Build a map of pages out of the map of addresses
-		typedef map<uint32, vector<uint8> > PageMap;
+		typedef map<uint32_t, vector<uint8_t> > PageMap;
 		PageMap pageMap;
 		for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
 		{
@@ -293,7 +293,7 @@ namespace Aseba
 				if (pageMap.find(pageIndex) == pageMap.end())
 				{
 				//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
-					pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
+					pageMap[pageIndex] = vector<uint8_t>(pageSize, (uint8_t)0);
 				}
 				// copy data
 				unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
@@ -356,13 +356,13 @@ namespace Aseba
 		
 		// Create memory
 		unsigned address = pagesStart * pageSize;
-		hexFile.data[address] = vector<uint8>();
+		hexFile.data[address] = vector<uint8_t>();
 		hexFile.data[address].reserve(pagesCount * pageSize);
 		
 		// Read pages
 		for (unsigned page = pagesStart; page < pagesCount; page++)
 		{
-			vector<uint8> buffer((uint8)0, pageSize);
+			vector<uint8_t> buffer((uint8_t)0, pageSize);
 			
 			if (!readPage(page, &buffer[0]))
 				throw Error(FormatableString("Error, cannot read page %0").arg(page));

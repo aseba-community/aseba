@@ -55,19 +55,19 @@ namespace Aseba
 			template<typename T> T get();
 			void dump(std::wostream &stream) const;
 			
-			std::vector<uint8> rawData;
+			std::vector<uint8_t> rawData;
 			size_t readPos;
 		};
 		
-		uint16 source;
-		uint16 type;
+		uint16_t source;
+		uint16_t type;
 		
-		Message(uint16 type);
+		Message(uint16_t type);
 		virtual ~Message();
 		
 		void serialize(Dashel::Stream* stream) const;
 		static Message *receive(Dashel::Stream* stream);
-		static Message *create(uint16 source, uint16 type, SerializationBuffer& buffer);
+		static Message *create(uint16_t source, uint16_t type, SerializationBuffer& buffer);
 		Message* clone() const;
 		void dump(std::wostream &stream) const;
 		
@@ -83,13 +83,13 @@ namespace Aseba
 	class UserMessage : public Message
 	{
 	public:
-		typedef std::vector<sint16> DataVector;
+		typedef std::vector<int16_t> DataVector;
 		DataVector data;
 	
 	public:
 		UserMessage() : Message(ASEBA_MESSAGE_INVALID) { }
-		UserMessage(uint16 type, const DataVector& data = DataVector()) : Message(type), data(data) { }
-		UserMessage(uint16 type, const sint16* data, const size_t length);
+		UserMessage(uint16_t type, const DataVector& data = DataVector()) : Message(type), data(data) { }
+		UserMessage(uint16_t type, const int16_t* data, const size_t length);
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -102,10 +102,10 @@ namespace Aseba
 	class CmdMessage : public Message
 	{
 	public:
-		uint16 dest;
+		uint16_t dest;
 	
 	public:
-		CmdMessage(uint16 type, uint16 dest) : Message(type), dest(dest) { }
+		CmdMessage(uint16_t type, uint16_t dest) : Message(type), dest(dest) { }
 		
 	protected:	
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -118,9 +118,9 @@ namespace Aseba
 	class BootloaderDescription : public Message
 	{
 	public:
-		uint16 pageSize;
-		uint16 pagesStart;
-		uint16 pagesCount;
+		uint16_t pageSize;
+		uint16_t pagesStart;
+		uint16_t pagesCount;
 		
 	public:
 		BootloaderDescription() : Message(ASEBA_MESSAGE_BOOTLOADER_DESCRIPTION) { }
@@ -136,7 +136,7 @@ namespace Aseba
 	class BootloaderDataRead : public Message
 	{
 	public:
-		uint8 data[4];
+		uint8_t data[4];
 		
 	public:
 		BootloaderDataRead() : Message(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ) { }
@@ -161,8 +161,8 @@ namespace Aseba
 		};
 		
 	public:
-		uint16 errorCode;
-		uint16 errorAddress;
+		uint16_t errorCode;
+		uint16_t errorAddress;
 		
 	public:
 		BootloaderAck() : Message(ASEBA_MESSAGE_BOOTLOADER_ACK) { }
@@ -178,7 +178,7 @@ namespace Aseba
 	class ListNodes : public Message
 	{
 	public:
-		uint16 version;
+		uint16_t version;
 		
 	public:
 		ListNodes() : Message(ASEBA_MESSAGE_LIST_NODES), version(ASEBA_PROTOCOL_VERSION) { }
@@ -194,7 +194,7 @@ namespace Aseba
 	class NodePresent : public Message
 	{
 	public:
-		uint16 version;
+		uint16_t version;
 		
 	public:
 		NodePresent() : Message(ASEBA_MESSAGE_NODE_PRESENT), version(ASEBA_PROTOCOL_VERSION) { }
@@ -210,7 +210,7 @@ namespace Aseba
 	class GetDescription : public Message
 	{
 	public:
-		uint16 version;
+		uint16_t version;
 		
 	public:
 		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION), version(ASEBA_PROTOCOL_VERSION) { }
@@ -226,11 +226,11 @@ namespace Aseba
 	class GetNodeDescription : public CmdMessage
 	{
 	public:
-		uint16 version;
+		uint16_t version;
 		
 	public:
 		GetNodeDescription() : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, ASEBA_DEST_INVALID), version(ASEBA_PROTOCOL_VERSION) { }
-		GetNodeDescription(uint16 dest) : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, dest), version(ASEBA_PROTOCOL_VERSION) { }
+		GetNodeDescription(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, dest), version(ASEBA_PROTOCOL_VERSION) { }
 	
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -308,8 +308,8 @@ namespace Aseba
 	class Variables : public Message
 	{
 	public:
-		uint16 start;
-		std::vector<sint16> variables;
+		uint16_t start;
+		std::vector<int16_t> variables;
 		
 	public:
 		Variables() : Message(ASEBA_MESSAGE_VARIABLES) { }
@@ -325,9 +325,9 @@ namespace Aseba
 	class ArrayAccessOutOfBounds : public Message
 	{
 	public:
-		uint16 pc;
-		uint16 size;
-		uint16 index;
+		uint16_t pc;
+		uint16_t size;
+		uint16_t index;
 		
 	public:
 		ArrayAccessOutOfBounds() : Message(ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS) { }
@@ -343,7 +343,7 @@ namespace Aseba
 	class DivisionByZero : public Message
 	{
 	public:
-		uint16 pc;
+		uint16_t pc;
 		
 	public:
 		DivisionByZero() : Message(ASEBA_MESSAGE_DIVISION_BY_ZERO) { }
@@ -359,7 +359,7 @@ namespace Aseba
 	class EventExecutionKilled : public Message
 	{
 	public:
-		uint16 pc;
+		uint16_t pc;
 		
 	public:
 		EventExecutionKilled() : Message(ASEBA_MESSAGE_EVENT_EXECUTION_KILLED) { }
@@ -375,7 +375,7 @@ namespace Aseba
 	class NodeSpecificError : public Message
 	{
 	public:
-		uint16 pc;
+		uint16_t pc;
 		std::wstring message;
 		
 	public:
@@ -392,8 +392,8 @@ namespace Aseba
 	class ExecutionStateChanged : public Message
 	{
 	public:
-		uint16 pc;
-		uint16 flags;
+		uint16_t pc;
+		uint16_t flags;
 		
 	public:
 		ExecutionStateChanged() : Message(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED) { }
@@ -409,8 +409,8 @@ namespace Aseba
 	class BreakpointSetResult : public Message
 	{
 	public:
-		uint16 pc;
-		uint16 success;
+		uint16_t pc;
+		uint16_t success;
 		
 	public:
 		BreakpointSetResult() : Message(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT) { }
@@ -427,7 +427,7 @@ namespace Aseba
 	{
 	public:
 		BootloaderReset() : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_RESET, ASEBA_DEST_INVALID) { }
-		BootloaderReset(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_RESET, dest) { }
+		BootloaderReset(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_RESET, dest) { }
 	
 	protected:
 		virtual operator const char * () const { return "bootloader reset"; }
@@ -437,11 +437,11 @@ namespace Aseba
 	class BootloaderReadPage : public CmdMessage
 	{
 	public:
-		uint16 pageNumber;
+		uint16_t pageNumber;
 		
 	public:
 		BootloaderReadPage() : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE, ASEBA_DEST_INVALID) { }
-		BootloaderReadPage(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE, dest) { }
+		BootloaderReadPage(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE, dest) { }
 	
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -454,11 +454,11 @@ namespace Aseba
 	class BootloaderWritePage : public CmdMessage
 	{
 	public:
-		uint16 pageNumber;
+		uint16_t pageNumber;
 		
 	public:
 		BootloaderWritePage() : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE, ASEBA_DEST_INVALID) { }
-		BootloaderWritePage(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE, dest) { }
+		BootloaderWritePage(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE, dest) { }
 	
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -471,11 +471,11 @@ namespace Aseba
 	class BootloaderPageDataWrite : public CmdMessage
 	{
 	public:
-		uint8 data[4];
+		uint8_t data[4];
 		
 	public:
 		BootloaderPageDataWrite() : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE, ASEBA_DEST_INVALID) { }
-		BootloaderPageDataWrite(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE, dest) { }
+		BootloaderPageDataWrite(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE, dest) { }
 	
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -488,12 +488,12 @@ namespace Aseba
 	class SetBytecode : public CmdMessage
 	{
 	public:
-		uint16 start;
-		std::vector<uint16> bytecode;
+		uint16_t start;
+		std::vector<uint16_t> bytecode;
 		
 	public:
 		SetBytecode() : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, ASEBA_DEST_INVALID), start(0) { }
-		SetBytecode(uint16 dest, uint16 start) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest), start(start) { }
+		SetBytecode(uint16_t dest, uint16_t start) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest), start(start) { }
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -503,16 +503,16 @@ namespace Aseba
 	};
 	
 	//! Call the SetBytecode multiple time in order to send all the bytecode 
-	void sendBytecode(Dashel::Stream* stream, uint16 dest, const std::vector<uint16>& bytecode);
+	void sendBytecode(Dashel::Stream* stream, uint16_t dest, const std::vector<uint16_t>& bytecode);
 	//! Call the SetBytecode multiple time in order to send all the bytecode 
-	void sendBytecode(std::vector<Message*>& messagesVector, uint16 dest, const std::vector<uint16>& bytecode);
+	void sendBytecode(std::vector<Message*>& messagesVector, uint16_t dest, const std::vector<uint16_t>& bytecode);
 	
 	//! Reset a node
 	class Reset : public CmdMessage
 	{
 	public:
 		Reset() : CmdMessage(ASEBA_MESSAGE_RESET, ASEBA_DEST_INVALID) { }
-		Reset(uint16 dest) : CmdMessage(ASEBA_MESSAGE_RESET, dest) { }
+		Reset(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_RESET, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "reset"; }
@@ -523,7 +523,7 @@ namespace Aseba
 	{
 	public:
 		Run() : CmdMessage(ASEBA_MESSAGE_RUN, ASEBA_DEST_INVALID) { }
-		Run(uint16 dest) : CmdMessage(ASEBA_MESSAGE_RUN, dest) { }
+		Run(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_RUN, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "run"; }
@@ -534,7 +534,7 @@ namespace Aseba
 	{
 	public:
 		Pause() : CmdMessage(ASEBA_MESSAGE_PAUSE, ASEBA_DEST_INVALID) { }
-		Pause(uint16 dest) : CmdMessage(ASEBA_MESSAGE_PAUSE, dest) { }
+		Pause(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_PAUSE, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "pause"; }
@@ -545,7 +545,7 @@ namespace Aseba
 	{
 	public:
 		Step() : CmdMessage(ASEBA_MESSAGE_STEP, ASEBA_DEST_INVALID) { }
-		Step(uint16 dest) : CmdMessage(ASEBA_MESSAGE_STEP, dest) { }
+		Step(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_STEP, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "step"; }
@@ -556,7 +556,7 @@ namespace Aseba
 	{
 	public:
 		Stop() : CmdMessage(ASEBA_MESSAGE_STOP, ASEBA_DEST_INVALID) { }
-		Stop(uint16 dest) : CmdMessage(ASEBA_MESSAGE_STOP, dest) { }
+		Stop(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_STOP, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "stop"; }
@@ -567,7 +567,7 @@ namespace Aseba
 	{
 	public:
 		GetExecutionState() : CmdMessage(ASEBA_MESSAGE_GET_EXECUTION_STATE, ASEBA_DEST_INVALID) { }
-		GetExecutionState(uint16 dest) : CmdMessage(ASEBA_MESSAGE_GET_EXECUTION_STATE, dest) { }
+		GetExecutionState(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_GET_EXECUTION_STATE, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "get execution state"; }
@@ -577,11 +577,11 @@ namespace Aseba
 	class BreakpointSet : public CmdMessage
 	{
 	public:
-		uint16 pc;
+		uint16_t pc;
 		
 	public:
 		BreakpointSet() : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, ASEBA_DEST_INVALID) { }
-		BreakpointSet(uint16 dest, uint16 pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, dest), pc(pc) { }
+		BreakpointSet(uint16_t dest, uint16_t pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, dest), pc(pc) { }
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -594,11 +594,11 @@ namespace Aseba
 	class BreakpointClear : public CmdMessage
 	{
 	public:
-		uint16 pc;
+		uint16_t pc;
 		
 	public:
 		BreakpointClear() : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, ASEBA_DEST_INVALID) { }
-		BreakpointClear(uint16 dest, uint16 pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, dest), pc(pc) { }
+		BreakpointClear(uint16_t dest, uint16_t pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, dest), pc(pc) { }
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -612,7 +612,7 @@ namespace Aseba
 	{
 	public:
 		BreakpointClearAll() : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR_ALL, ASEBA_DEST_INVALID) { }
-		BreakpointClearAll(uint16 dest) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR_ALL, dest) { }
+		BreakpointClearAll(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR_ALL, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "breakpoint clear all"; }
@@ -622,12 +622,12 @@ namespace Aseba
 	class GetVariables : public CmdMessage
 	{
 	public:
-		uint16 start;
-		uint16 length;
+		uint16_t start;
+		uint16_t length;
 		
 	public:
 		GetVariables() : CmdMessage(ASEBA_MESSAGE_GET_VARIABLES, ASEBA_DEST_INVALID) { }
-		GetVariables(uint16 dest, uint16 start, uint16 length);
+		GetVariables(uint16_t dest, uint16_t start, uint16_t length);
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -640,13 +640,13 @@ namespace Aseba
 	class SetVariables : public CmdMessage
 	{
 	public:
-		uint16 start;
-		typedef std::vector<sint16> VariablesVector;
+		uint16_t start;
+		typedef std::vector<int16_t> VariablesVector;
 		VariablesVector variables;
 		
 	public:
 		SetVariables() : CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, ASEBA_DEST_INVALID) { }
-		SetVariables(uint16 dest, uint16 start, const VariablesVector& variables);
+		SetVariables(uint16_t dest, uint16_t start, const VariablesVector& variables);
 		
 	protected:
 		virtual void serializeSpecific(SerializationBuffer& buffer) const;
@@ -660,7 +660,7 @@ namespace Aseba
 	{
 	public:
 		WriteBytecode() : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, ASEBA_DEST_INVALID) { }
-		WriteBytecode(uint16 dest) : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, dest) { }
+		WriteBytecode(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "save bytecode"; }
@@ -671,7 +671,7 @@ namespace Aseba
 	{
 	public:
 		Reboot() : CmdMessage(ASEBA_MESSAGE_REBOOT, ASEBA_DEST_INVALID) { }
-		Reboot(uint16 dest) : CmdMessage(ASEBA_MESSAGE_REBOOT, dest) { }
+		Reboot(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_REBOOT, dest) { }
 		
 	protected:
 		virtual operator const char * () const { return "reboot"; }
@@ -684,7 +684,7 @@ namespace Aseba
 	{
 	public:
 		Sleep() : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, ASEBA_DEST_INVALID) { }
-		Sleep(uint16 dest) : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, dest) { }
+		Sleep(uint16_t dest) : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, dest) { }
 	
 	protected:
 		virtual operator const char * () const { return "sleep"; }

@@ -130,9 +130,9 @@ namespace Aseba { namespace ThymioVPL
 			sliders[i]->setSliderPosition(value/50);
 	}
 	
-	QVector<quint16> MoveActionBlock::getValuesCompressed() const
+	QVector<uint16_t> MoveActionBlock::getValuesCompressed() const
 	{
-		return QVector<quint16>(1, 
+		return QVector<uint16_t>(1, 
 			((sliders[0]->value()+10) << 8) |
 			 (sliders[1]->value()+10)
 		);
@@ -191,7 +191,7 @@ namespace Aseba { namespace ThymioVPL
 			sliders[i]->setSliderPosition(value);
 	}
 	
-	QVector<quint16> ColorActionBlock::getValuesCompressed() const
+	QVector<uint16_t> ColorActionBlock::getValuesCompressed() const
 	{
 		unsigned value(0);
 		for (int i=0; i<sliders.size(); ++i)
@@ -200,7 +200,7 @@ namespace Aseba { namespace ThymioVPL
 			value += sliders[i]->value();
 		}
 		assert(value <= 65535);
-		return QVector<quint16>(1, value);
+		return QVector<uint16_t>(1, value);
 	}
 	
 	void ColorActionBlock::valueChangeDetected()
@@ -398,7 +398,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 	}
 	
-	QVector<quint16> SoundActionBlock::getValuesCompressed() const
+	QVector<uint16_t> SoundActionBlock::getValuesCompressed() const
 	{
 		unsigned compressedNotes = 0;
 		unsigned compressedDurations = 0;
@@ -409,7 +409,7 @@ namespace Aseba { namespace ThymioVPL
 			compressedDurations *= 3;
 			compressedDurations += durations[i];
 		}
-		return (QVector<quint16>() << compressedNotes << compressedDurations);
+		return (QVector<uint16_t>() << compressedNotes << compressedDurations);
 	}
 	
 	// TimerActionBlock
@@ -543,9 +543,9 @@ namespace Aseba { namespace ThymioVPL
 		setDuration(value);
 	}
 	
-	QVector<quint16> TimerActionBlock::getValuesCompressed() const
+	QVector<uint16_t> TimerActionBlock::getValuesCompressed() const
 	{
-		return QVector<quint16>(1, duration);
+		return QVector<uint16_t>(1, duration);
 	}
 	
 	void TimerActionBlock::setDuration(unsigned duration)

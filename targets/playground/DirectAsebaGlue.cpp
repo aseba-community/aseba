@@ -25,12 +25,12 @@
 
 namespace Aseba
 {
-	void DirectConnection::sendBuffer(uint16 nodeId, const uint8* data, uint16 length)
+	void DirectConnection::sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length)
 	{
 		// deserialize message
 		Message::SerializationBuffer content;
 		std::copy(data+2, data+length, std::back_inserter(content.rawData));
-		const uint16 type(*reinterpret_cast<const uint16*>(data));
+		const uint16_t type(*reinterpret_cast<const uint16_t*>(data));
 		outQueue.emplace(Message::create(nodeId, type, content));
 	}
 	

@@ -58,7 +58,7 @@ namespace Aseba
 		QCheckBox *timeWindowCheckBox;
 		QDoubleSpinBox *timeWindowLength;
 		
-		std::vector<std::deque<sint16> > values;
+		std::vector<std::deque<int16_t> > values;
 		std::deque<double> timeStamps;
 		QTime startingTime;
 	
