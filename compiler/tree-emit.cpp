@@ -403,7 +403,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
-		UNUSED(immediateChild);
+		ASEBA_UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
 		
@@ -418,7 +418,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
-		UNUSED(immediateChild);
+		ASEBA_UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
 		
@@ -435,7 +435,7 @@ namespace Aseba
 		// constant index should have been optimized out already
 		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		assert(immediateChild == 0);
-		UNUSED(immediateChild);
+		ASEBA_UNUSED(immediateChild);
 		
 		// load variable
 		children[0]->emit(bytecodes);

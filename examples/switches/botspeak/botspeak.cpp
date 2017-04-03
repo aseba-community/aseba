@@ -835,7 +835,7 @@ namespace Aseba
 		size_t id;
 		const bool ok(commonDefinitions.events.contains(eventName, &id));
 		assert(ok);
-		UNUSED(ok);
+		ASEBA_UNUSED(ok);
 		return id;
 	}
 	
