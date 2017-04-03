@@ -64,15 +64,15 @@ namespace Aseba
 			bool wasUnsigned = false;
 			// all values are assumed to be signed 16-bits
 			if ((value.length() > 1) && (value[1] == 'x')) {
-				decode = wcstol(value.c_str() + 2, NULL, 16);
+				decode = wcstol(value.c_str() + 2, nullptr, 16);
 				wasUnsigned = true;
 			}
 			else if ((value.length() > 1) && (value[1] == 'b')) {
-				decode = wcstol(value.c_str() + 2, NULL, 2);
+				decode = wcstol(value.c_str() + 2, nullptr, 2);
 				wasUnsigned = true;
 			}
 			else
-				decode = wcstol(value.c_str(), NULL, 10);
+				decode = wcstol(value.c_str(), nullptr, 10);
 			if (decode >= 65536)
 				throw TranslatableError(pos, ERROR_INT16_OUT_OF_RANGE).arg(decode);
 			if (wasUnsigned && decode > 32767)

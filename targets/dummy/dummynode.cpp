@@ -271,7 +271,7 @@ extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 
 static const AsebaLocalEventDescription localEvents[] = {
 	{ "timer", "periodic timer at a given frequency" },
-	{ NULL, NULL }
+	{ nullptr, nullptr }
 };
 
 extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)

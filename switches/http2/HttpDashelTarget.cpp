@@ -273,7 +273,7 @@ const HttpDashelTarget::Node *HttpDashelTarget::getNodeById(unsigned globalNodeI
 	if(query != nodes.end()) {
 		return &query->second;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -283,7 +283,7 @@ const HttpDashelTarget::Node *HttpDashelTarget::getNodeByLocalId(unsigned localN
 	if(query != globalIds.end()) {
 		return getNodeById(query->second);
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 

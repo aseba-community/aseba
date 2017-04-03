@@ -118,11 +118,11 @@ void UsageLogger::logGUIEvents(unsigned int senderId, QObject *originalSender, Q
 		
 		if(slider != 0){
 			int sliderValue = slider->value();
-			logBlockAction(SLIDER,b->getName(),b->getType(), row, senderId, &sliderValue, NULL, NULL,NULL);
+			logBlockAction(SLIDER,b->getName(),b->getType(), row, senderId, &sliderValue, nullptr, nullptr, nullptr);
 		}
 		else if(button != 0){
 			int buttonValue = button->getValue();
-			logBlockAction(BUTTON,b->getName(),b->getType(), row, senderId, NULL, NULL, NULL, &buttonValue);
+			logBlockAction(BUTTON,b->getName(),b->getType(), row, senderId, nullptr, nullptr, nullptr, &buttonValue);
 		}
 	}
 }
@@ -234,26 +234,26 @@ void UsageLogger::logMenuAction(MenuEntry entry){
 }
 
 void UsageLogger::logBlockMouseMove(QString name, QString type, QGraphicsSceneMouseEvent *event){
-	logMouseAction(MOVE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+	logMouseAction(MOVE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
 }
 
 void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsSceneMouseEvent *event){
-	logMouseAction(RELEASE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+	logMouseAction(RELEASE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
 }
 void UsageLogger::logButtonDrag(QString name, QString type, QMouseEvent *event, QDrag *drag){
-	logMouseAction(DRAG_BUTTON,event->posF().x(),event->posF().y(),mapButtons(event->button()),NULL,name.toUtf8().constData(),type.toUtf8().constData());
+	logMouseAction(DRAG_BUTTON,event->posF().x(),event->posF().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
 }
 
 void UsageLogger::logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag){
-	logMouseAction(DRAG_ACTION_SET,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),&row,NULL,NULL);
+	logMouseAction(DRAG_ACTION_SET,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),&row,nullptr,nullptr);
 }
 
 void UsageLogger::logDropButton(BlockButton *button, QDropEvent *event){
-	logMouseAction(DROP_BUTTON,event->pos().x(),event->pos().y(),mapButtons(event->mouseButtons()),NULL,button->getName().toUtf8().constData(),NULL);
+	logMouseAction(DROP_BUTTON,event->pos().x(),event->pos().y(),mapButtons(event->mouseButtons()),nullptr,button->getName().toUtf8().constData(),nullptr);
 }
 
 void UsageLogger::logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *event){
-	logMouseAction(DROP_ACTION_SET,event->pos().x(),event->pos().y(),mapButtons(event->buttons()),&row,NULL,NULL);
+	logMouseAction(DROP_ACTION_SET,event->pos().x(),event->pos().y(),mapButtons(event->buttons()),&row,nullptr,nullptr);
 }
 
 void UsageLogger::logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType){
@@ -389,7 +389,7 @@ Action * UsageLogger::getActionWithCurrentState()
 	}
 	
 	TimeStamp *t = new TimeStamp();
-	t->set_timestamp(time(NULL));
+	t->set_timestamp(time(nullptr));
 	t->set_milliseconds(getMilliseconds());
 	action->set_allocated_time(t);
 	
@@ -414,7 +414,7 @@ QString UsageLogger::getTimeStampString(){
 
 // Taken from stackoverflow
 void UsageLogger::gen_random(char *s, const int len) {
-	srand(time(NULL));
+	srand(time(nullptr));
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -429,7 +429,7 @@ void UsageLogger::gen_random(char *s, const int len) {
 unsigned int UsageLogger::getMilliseconds(){
 	unsigned int millis = 0;
 	timeval t;
-	gettimeofday(&t, NULL);
+	gettimeofday(&t, nullptr);
 	millis = t.tv_usec;
 	return millis;
 }

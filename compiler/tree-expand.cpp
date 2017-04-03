@@ -285,7 +285,7 @@ namespace Aseba
 		assert(index < getVectorSize());
 
 		// get the optional index given in the Aseba code
-		TupleVectorNode* accessIndex = NULL;
+		TupleVectorNode* accessIndex = nullptr;
 		if (children.size() > 0)
 			accessIndex = dynamic_cast<TupleVectorNode*>(children[0]);
 

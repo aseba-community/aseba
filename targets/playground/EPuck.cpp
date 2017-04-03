@@ -256,7 +256,7 @@ namespace Enki
 	static const AsebaLocalEventDescription localEvents[] = {
 		{ "ir_sensors", "IR sensors updated" },
 		{"camera", "camera updated"},
-		{ NULL, NULL }
+		{ nullptr, nullptr }
 	};
 	
 	const AsebaLocalEventDescription * AsebaFeedableEPuck::getLocalEventsDescriptions() const

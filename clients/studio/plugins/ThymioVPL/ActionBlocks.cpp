@@ -363,7 +363,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			note = noteVal;
 			update();
-			USAGE_LOG(logBlockAction(SET_NOTE, getName(), getType(), UsageLogger::getRow(this), noteIdx, NULL, &noteVal, NULL,NULL));
+			USAGE_LOG(logBlockAction(SET_NOTE, getName(), getType(), UsageLogger::getRow(this), noteIdx, nullptr, &noteVal, nullptr, nullptr));
 			emit contentChanged();
 		}
 	}
@@ -375,7 +375,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			duration = durationVal;
 			update();
-			USAGE_LOG(logBlockAction(SET_DURATION, getName(), getType(), UsageLogger::getRow(this), noteIdx, NULL, &durationVal, NULL,NULL));
+			USAGE_LOG(logBlockAction(SET_DURATION, getName(), getType(), UsageLogger::getRow(this), noteIdx, nullptr, &durationVal, nullptr, nullptr));
 			emit contentChanged();
 		}
 	}
@@ -513,7 +513,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			dragging = false;
 			emitUndoCheckpointAndClearIfChanged();
-			USAGE_LOG(logBlockAction(TIMER, getName(), getType(), UsageLogger::getRow(this), 0, NULL, NULL, &this->duration, NULL));
+			USAGE_LOG(logBlockAction(TIMER, getName(), getType(), UsageLogger::getRow(this), 0, nullptr, nullptr, &this->duration, nullptr));
 		}
 		else
 			Block::mouseReleaseEvent(event);

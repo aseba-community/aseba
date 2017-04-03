@@ -287,7 +287,7 @@ namespace Aseba
 		// parse all vars declarations
 		while (tokens.front() == Token::TOKEN_STR_var)
 		{
-			// we may receive NULL pointers because non initialized variables produce no code
+			// we may receive null pointers because non initialized variables produce no code
 			Node *child = parseVarDef();
 			if (child)
 				block->children.push_back(child);
@@ -295,7 +295,7 @@ namespace Aseba
 		// parse the rest of the code
 		while (tokens.front() != Token::TOKEN_END_OF_STREAM)
 		{
-			// only var declaration are allowed to return NULL node, so we assert on node
+			// only var declaration are allowed to return null node, so we assert on node
 			Node *child = parseStatement();
 			assert(child);
 			block->children.push_back(child);
@@ -428,7 +428,7 @@ namespace Aseba
 		if (temp.get())
 			return temp.release();
 		else
-			return NULL;
+			return nullptr;
 	}
 
 	AssignmentNode *Compiler::parseVarDefInit(MemoryVectorNode* lValue)
@@ -440,7 +440,7 @@ namespace Aseba
 
 			// try old style initialization 1,2,3
 			std::unique_ptr<Node> rValue(parseTupleVector(true));
-			if (rValue.get() == NULL)
+			if (rValue.get() == nullptr)
 			{
 				// no -> other type of initialization
 				rValue.reset(parseBinaryOrExpression());
@@ -455,7 +455,7 @@ namespace Aseba
 			return new AssignmentNode(pos, lValue, rValue.release());
 		}
 
-		return NULL;
+		return nullptr;
 	}
 	
 
@@ -509,7 +509,7 @@ namespace Aseba
 		else
 			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		
-		return NULL;
+		return nullptr;
 	}
 
 	//! Parse "if" grammar element.
@@ -1131,7 +1131,7 @@ namespace Aseba
 				return parseConstantAndVariable();
 			}
 			
-			default: internalCompilerError(); return NULL;
+			default: internalCompilerError(); return nullptr;
 		}
 	}
 
@@ -1153,7 +1153,7 @@ namespace Aseba
 			)
 			{
 				// no
-				return NULL;
+				return nullptr;
 			}
 		}
 
@@ -1229,7 +1229,7 @@ namespace Aseba
 			int start;
 			std::unique_ptr<Node> startIndex(tryParsingConstantExpression(pos, start));
 
-			if (startIndex.get() == NULL)
+			if (startIndex.get() == nullptr)
 			{
 				// constant index
 				std::unique_ptr<TupleVectorNode> index(new TupleVectorNode(pos));
@@ -1244,7 +1244,7 @@ namespace Aseba
 					int end;
 					std::unique_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
 
-					if (endIndex.get() != NULL)
+					if (endIndex.get() != nullptr)
 						throw TranslatableError(pos, ERROR_INDEX_EXPECTING_CONSTANT);
 
 					// check if second index is within bounds
@@ -1304,7 +1304,7 @@ namespace Aseba
 	}
 
 	//! Use parseBinaryOrExpression() and try to reduce the result into an integer
-	//! If successful, return NULL and the integer in constantResult
+	//! If successful, return nullptr and the integer in constantResult
 	//! If unsuccessful, return the parsed tree (constantResult useless in this case)
 	Node* Compiler::tryParsingConstantExpression(SourcePos pos, int& constantResult)
 	{
@@ -1314,7 +1314,7 @@ namespace Aseba
 		{
 			constantResult = expectConstantExpression(pos, tree->deepCopy());
 			tree.reset();
-			return NULL;
+			return nullptr;
 		}
 		catch (TranslatableError error)
 		{
@@ -1340,14 +1340,14 @@ namespace Aseba
 		//std::cerr << "Tree before expanding" << std::endl;
 		//tempTree1->dump(std::wcerr, indent);
 
-		tempTree1->expandAbstractNodes(NULL);	// root node (AssignmentNode) is not abstract, so modify in place
-		std::unique_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(NULL));
+		tempTree1->expandAbstractNodes(nullptr);	// root node (AssignmentNode) is not abstract, so modify in place
+		std::unique_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(nullptr));
 
 		//std::cerr << "Tree after expanding" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);
 
 		tempTree1.reset();
-		tempTree2->optimize(NULL);
+		tempTree2->optimize(nullptr);
 
 		//std::cerr << "Tree after optimization" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);

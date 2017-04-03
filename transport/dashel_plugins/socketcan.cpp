@@ -112,7 +112,7 @@ class CanStream: public SelectableStream
 			string ifName;
 			if(target.isSet("if"))
 			{
-				target.addParam("if", NULL, true);
+				target.addParam("if", nullptr, true);
 				ifName = target.get("if");
 			}
 			fd = socket(PF_CAN, SOCK_RAW, CAN_RAW);

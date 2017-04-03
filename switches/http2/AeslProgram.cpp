@@ -31,7 +31,7 @@ AeslProgram::AeslProgram(const std::string& filename) :
 	loaded(false)
 {
 	// local file or URL
-	xmlDoc *doc(xmlReadFile(filename.c_str(), NULL, 0));
+	xmlDoc *doc(xmlReadFile(filename.c_str(), nullptr, 0));
 	if(!doc) {
 		cerr << "Cannot read AESL script XML from file " << filename << endl;
 	} else {
@@ -45,7 +45,7 @@ AeslProgram::AeslProgram(const char *buffer, const int size) :
 	loaded(false)
 {
 	// local file or URL
-	xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
+	xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", nullptr, 0));
 	if(!doc) {
 		cerr << "Cannot read AESL script XML from memory " << buffer << endl;
 	} else {
@@ -98,8 +98,8 @@ void AeslProgram::load(xmlDoc *doc)
 			xmlChar *name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
 			xmlChar *value(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
 			if(name && value) commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *) name), atoi((const char *) value)));
-			xmlFree(name);  // nop if name is NULL
-			xmlFree(value); // nop if value is NULL
+			xmlFree(name);  // nop if name is nullptr
+			xmlFree(value); // nop if value is nullptr
 		}
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}
@@ -121,10 +121,10 @@ void AeslProgram::load(xmlDoc *doc)
 			xmlChar *storedId(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("nodeId")));
 			xmlChar *text(xmlNodeGetContent(nodeset->nodeTab[i]));
 
-			if(text != NULL) {
+			if(text != nullptr) {
 				NodeEntry entry;
-				entry.nodeName = (name == NULL ? "": (const char *) name);
-				entry.nodeId = (storedId == NULL ? "": (const char *) storedId);
+				entry.nodeName = (name == nullptr ? "": (const char *) name);
+				entry.nodeId = (storedId == nullptr ? "": (const char *) storedId);
 				entry.code = (const char *) text;
 
 				entries.push_back(entry);
@@ -134,9 +134,9 @@ void AeslProgram::load(xmlDoc *doc)
 			}
 
 			// free attribute and content
-			xmlFree(name);     // nop if name is NULL
-			xmlFree(storedId); // nop if name is NULL
-			xmlFree(text);     // nop if text is NULL
+			xmlFree(name);     // nop if name is nullptr
+			xmlFree(storedId); // nop if name is nullptr
+			xmlFree(text);     // nop if text is nullptr
 		}
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}

@@ -223,7 +223,7 @@ namespace Enki
 		{ "motor", "Motor timer"},
 		{ "timer0", "Timer 0"},
 		{ "timer1", "Timer 1"},
-		{ NULL, NULL }
+		{ nullptr, nullptr }
 	};
 	
 	const AsebaLocalEventDescription * AsebaThymio2::getLocalEventsDescriptions() const

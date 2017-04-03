@@ -884,7 +884,7 @@ namespace Aseba { namespace ThymioVPL
 		int nptrs = backtrace(buffer, SIZE);
 		printf("backtrace() returned %d addresses\n", nptrs);
 		strings = backtrace_symbols(buffer, nptrs);
-		if (strings == NULL) {
+		if (strings == nullptr) {
 			perror("backtrace_symbols");
 			exit(EXIT_FAILURE);
 		}

@@ -73,11 +73,11 @@ namespace Aseba
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
 		
-		// optimise true block, which may be NULL afterwards
+		// optimise true block, which may be null afterwards
 		children[1] = children[1]->optimize(dump);
 		Node *trueBlock = children[1];
 		
-		// optimise false block, which may be NULL afterwards
+		// optimise false block, which may be null afterwards
 		Node *falseBlock;
 		if (children.size() > 2)
 		{
@@ -89,7 +89,7 @@ namespace Aseba
 		else
 			falseBlock = 0;
 		
-		// check if both block are NULL or do not contain any data, in this case return
+		// check if both block are null or do not contain any data, in this case return
 		if (
 			((trueBlock == 0) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) && 
 			((falseBlock == 0) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty()))
@@ -98,7 +98,7 @@ namespace Aseba
 			if (dump)
 				*dump << sourcePos.toWString() << L" if test removed because it had no associated code\n";
 			delete this;
-			return NULL;
+			return nullptr;
 		}
 		
 		// check for if on constants
@@ -164,7 +164,7 @@ namespace Aseba
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
 		
-		// block may be NULL
+		// block may be nullptr
 		children[1] = children[1]->optimize(dump);
 		
 		// check for loops on constants
@@ -180,7 +180,7 @@ namespace Aseba
 				if (dump)
 					*dump << sourcePos.toWString() << L" while removed because condition is always false\n";
 				delete this;
-				return NULL;
+				return nullptr;
 			}
 		}
 		
@@ -190,7 +190,7 @@ namespace Aseba
 			if (dump)
 				*dump << sourcePos.toWString() << L" while removed because it contained no statement\n";
 			delete this;
-			return NULL;
+			return nullptr;
 		}
 		
 		// fold operation inside loop

@@ -48,7 +48,7 @@ namespace Aseba
 	{
 		#ifndef WIN32
 		struct timeval tv;
-		gettimeofday(&tv, NULL);
+		gettimeofday(&tv, nullptr);
 		value = (Value(tv.tv_sec) * 1000) + Value(tv.tv_usec) / 1000;
 		#else // WIN32
 		FILETIME        ft;

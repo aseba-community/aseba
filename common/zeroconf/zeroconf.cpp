@@ -82,8 +82,8 @@ namespace Aseba
 					      0, // default all interfaces
 					      target->name.c_str(),
 					      "_aseba._tcp",
-					      NULL, // use default domain, usually "local."
-					      NULL, // use this host name
+					      nullptr, // use default domain, usually "local."
+					      nullptr, // use this host name
 					      htons(target->port),
 					      len, // TXT length
 					      record, // TXT record
@@ -122,8 +122,8 @@ namespace Aseba
 	{
 		const string rawdata{txtrec.record()};
 		DNSServiceErrorType err = DNSServiceUpdateRecord(target->zdr.serviceref,
-								 NULL,
-								 NULL,
+								 nullptr,
+								 0,
 								 rawdata.length(),
 								 rawdata.c_str(),
 								 0);
@@ -190,7 +190,7 @@ namespace Aseba
 					    0, // no flags
 					    0, // default all interfaces
 					    "_aseba._tcp",
-					    NULL, // use default domain, usually "local."
+					    nullptr, // use default domain, usually "local."
 					    cb_Browse,
 					    this); // context pointer is this Zeroconf object
 		if (err != kDNSServiceErr_NoError)

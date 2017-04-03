@@ -36,7 +36,7 @@ Dummy* dummy;
 
 TEST_CASE( "Dashel::Hub create" ) {
     dummy = new Dummy;
-    REQUIRE( dummy->instream != NULL );
+    REQUIRE( dummy->instream != nullptr );
 }
 
 Aseba::HttpRequest req;
@@ -44,7 +44,7 @@ Aseba::HttpRequest req;
 TEST_CASE( "HttpRequest using default constructor", "[init]" ) {
     REQUIRE( req.method.empty() );
     REQUIRE( req.uri.empty() );
-    REQUIRE( req.stream == NULL );
+    REQUIRE( req.stream == nullptr );
     REQUIRE( req.tokens.empty() );
     REQUIRE( req.headers.empty() );
     REQUIRE( req.content.empty() );
@@ -75,7 +75,7 @@ SCENARIO( "HttpRequest should be initialized", "[init]" ) {
 
 SCENARIO( "HttpRequests should be read from file", "[read]" ) {
     GIVEN( "Stream was initialized" ) {
-        REQUIRE( dummy->instream != NULL );
+        REQUIRE( dummy->instream != nullptr );
         WHEN( "read request 1 from file" ) {
             req.initialize(dummy->instream);
             req.incomingData(); // from dummy->instream
@@ -104,10 +104,10 @@ SCENARIO( "HttpRequests should be read from file", "[read]" ) {
 };
 
 TEST_CASE_METHOD(Aseba::HttpInterface, "Aseba::HttpInterface should be initialized", "[create]") {
-    REQUIRE( this != NULL );
+    REQUIRE( this != nullptr );
     for (int i = 50; --i; )
         this->step(20);
-    REQUIRE( asebaStream != NULL );
+    REQUIRE( asebaStream != nullptr );
     REQUIRE( ! nodesDescriptions.empty() );
     REQUIRE( nodesDescriptions[1].name.size() != 0 );
 };

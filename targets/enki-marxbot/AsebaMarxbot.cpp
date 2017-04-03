@@ -142,7 +142,7 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { NULL, NULL } };
+static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { nullptr, nullptr } };
 
 extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
 {

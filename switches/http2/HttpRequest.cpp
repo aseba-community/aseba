@@ -84,7 +84,7 @@ bool HttpRequest::receive()
 
 HttpResponse& HttpRequest::respond()
 {
-	if(response == NULL) {
+	if(response == nullptr) {
 		response = createResponse();
 		response->setVerbose(verbose);
 	}

@@ -403,7 +403,7 @@ void Shell::load(const strings& args)
 	
 	// open document
 	const string& fileName(args[1]);
-	xmlDoc *doc(xmlReadFile(fileName.c_str(), NULL, 0));
+	xmlDoc *doc(xmlReadFile(fileName.c_str(), nullptr, 0));
 	if (!doc)
 	{
 		wcerr << "cannot read XML from file " << UTF8ToWString(fileName) << endl;

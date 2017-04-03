@@ -68,7 +68,7 @@ HttpInterface::~HttpInterface()
 bool HttpInterface::addTarget(const std::string& address)
 {
 	if(targetAddressStreams.find(address) == targetAddressStreams.end()) { // target is not yet in our list of targets
-		targetAddressStreams[address] = NULL; // mark this as a new target to initialize
+		targetAddressStreams[address] = nullptr; // mark this as a new target to initialize
 		targetAddressReconnectionTime[address] = UnifiedTime(0);
 		return true;
 	}
@@ -82,11 +82,11 @@ void HttpInterface::step()
 	for(map<string, Dashel::Stream *>::iterator iter = targetAddressStreams.begin(); iter != end; iter++) {
 		const std::string& address = iter->first;
 
-		if(iter->second == NULL) {
+		if(iter->second == nullptr) {
 			UnifiedTime now;
 			if((now - targetAddressReconnectionTime[address]).value > RECONNECT_TIMEOUT) {
 				// trying to reconnect to disconnected targets
-				Dashel::Stream *stream = NULL;
+				Dashel::Stream *stream = nullptr;
 				try {
 					stream = connect(address);
 					targets[stream] = new HttpDashelTarget(this, address, stream);
@@ -99,7 +99,7 @@ void HttpInterface::step()
 						cerr << "Failed to connect target " << address << ": " << e.what() << endl;
 					}
 
-					if(stream != NULL) { // uncreate target
+					if(stream != nullptr) { // uncreate target
 						std::map<Dashel::Stream *, HttpDashelTarget *>::iterator query = targets.find(stream);
 						if(query != targets.end()) {
 							delete query->second;
@@ -171,7 +171,7 @@ void HttpInterface::notifyEventSubscribers(const std::string& event, const std::
 
 void HttpInterface::addEventSubscription(HttpRequest *request, const std::string& subscription)
 {
-	assert(dynamic_cast<DashelHttpRequest *>(request) != NULL);
+	assert(dynamic_cast<DashelHttpRequest *>(request) != nullptr);
 	DashelHttpRequest *dashelHttpRequest = static_cast<DashelHttpRequest *>(request);
 	Dashel::Stream *stream = dashelHttpRequest->getStream();
 
@@ -275,7 +275,7 @@ std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> HttpInterface::get
 		return getNodeById(nodeId);
 	}
 
-	return make_pair((HttpDashelTarget *) NULL, (const HttpDashelTarget::Node *) NULL);
+	return make_pair((HttpDashelTarget *) nullptr, (const HttpDashelTarget::Node *) nullptr);
 }
 
 std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> HttpInterface::getNodeById(unsigned nodeId)
@@ -286,12 +286,12 @@ std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> HttpInterface::get
 		HttpDashelTarget *target = query->second.first;
 		const HttpDashelTarget::Node *node = target->getNodeById(nodeId);
 
-		if(node != NULL) {
+		if(node != nullptr) {
 			return make_pair(target, node);
 		}
 	}
 
-	return make_pair((HttpDashelTarget *) NULL, (const HttpDashelTarget::Node *) NULL);
+	return make_pair((HttpDashelTarget *) nullptr, (const HttpDashelTarget::Node *) nullptr);
 }
 
 std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpInterface::getNodesByNameOrId(const std::string& nameOrId)
@@ -300,7 +300,7 @@ std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpIn
 
 	if(result.empty()) {
 		std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> nodeReference = getNodeByIdString(nameOrId);
-		if(nodeReference.first != NULL) {
+		if(nodeReference.first != nullptr) {
 			result.insert(nodeReference);
 		}
 	}
@@ -366,7 +366,7 @@ void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
 			cerr << "Target " << target->getAddress() << " disconnected, trying to reconnect..." << endl;
 		}
 
-		targetAddressStreams[target->getAddress()] = NULL;
+		targetAddressStreams[target->getAddress()] = nullptr;
 		targetAddressReconnectionTime[target->getAddress()] = UnifiedTime(0);
 		targets.erase(targetQuery);
 
@@ -401,9 +401,9 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 
 		// See if we know this node already or if the source is 0 (meaning coming from IDE)
 		const HttpDashelTarget::Node *node = target->getNodeByLocalId(message->source);
-		if(node != NULL || message->source == 0) { // else if we cannot remap the source, discard the message and do not relay it
+		if(node != nullptr || message->source == 0) { // else if we cannot remap the source, discard the message and do not relay it
 			// remap source node to global node id if not sent from IDE
-			if (node != NULL)
+			if (node != nullptr)
 				message->source = node->globalId;
 
 			// check for execution error messages
@@ -417,19 +417,19 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 
 			// if variables, check for pending requests
 			const Variables *variables(dynamic_cast<Variables *>(message));
-			if(variables != NULL) {
+			if(variables != nullptr) {
 				incomingVariables(target, variables);
 			}
 
 			// if event, retransmit it on an HTTP SSE channel if one exists
 			const UserMessage *userMessage(dynamic_cast<UserMessage *>(message));
-			if(userMessage != NULL) {
+			if(userMessage != nullptr) {
 				incomingUserMessage(target, userMessage);
 			}
 
 			// act like asebaswitch: rebroadcast this message to the other streams
 			CmdMessage *cmdMessage(dynamic_cast<CmdMessage *>(message));
-			if(cmdMessage != NULL) { // targeted message, only rebroadcast to correct target with remapped destination
+			if(cmdMessage != nullptr) { // targeted message, only rebroadcast to correct target with remapped destination
 				std::map< unsigned, std::pair<HttpDashelTarget *, unsigned> >::iterator query = nodeIds.find(cmdMessage->dest);
 				if(query != nodeIds.end()) { // only relay it to known targets, else if we cannot remap the target, discard the message and do not relay it
 					HttpDashelTarget *target = query->second.first;
@@ -583,7 +583,7 @@ void HttpInterface::incomingVariables(HttpDashelTarget *target, const Variables 
 
 	const HttpDashelTarget::Node *node = target->getNodeById(variables->source);
 
-	if(node != NULL) {
+	if(node != nullptr) {
 		map< unsigned, set< pair<Dashel::Stream *, DashelHttpRequest *> > >::const_iterator query = node->pendingVariables.find(variables->start);
 
 		if(query != node->pendingVariables.end()) {
@@ -647,7 +647,7 @@ void HttpInterface::incomingErrorMessage(HttpDashelTarget *target, const Message
 		cerr << "Incoming error message for target " << target->getAddress() << endl;
 	}
 
-	const char *errorString = NULL;
+	const char *errorString = nullptr;
 	if(message->type == ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS) {
 		errorString = "array_access_out_of_bounds";
 	} else if(message->type == ASEBA_MESSAGE_DIVISION_BY_ZERO) {

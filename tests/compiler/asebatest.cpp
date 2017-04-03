@@ -41,17 +41,17 @@ void dump_source(const std::wstring& source);
 
 static const char short_options [] = "fcepnvsdumi:";
 static const struct option long_options[] = { 
-	{ "fail",	no_argument,			NULL,	'f'},
-	{ "comp_fail",	no_argument,		NULL,	'c'},
-	{ "exec_fail",	no_argument,		NULL,	'e'},
-	{ "post_fail",	no_argument,		NULL,	'p'},
-	{ "memcmp_fail",no_argument,		NULL,	'n'},
-	{ "event",		no_argument,		NULL,	'v'},
-	{ "source",		no_argument,		NULL,	's'},
-	{ "dump",		no_argument,		NULL,	'd'},
-	{ "memdump",	no_argument,		NULL,	'u'},
-	{ "memcmp", 	required_argument,	NULL,	'm'},
-	{ "steps", 		required_argument,	NULL,	'i'},
+	{ "fail",	no_argument,			nullptr,	'f'},
+	{ "comp_fail",	no_argument,		nullptr,	'c'},
+	{ "exec_fail",	no_argument,		nullptr,	'e'},
+	{ "post_fail",	no_argument,		nullptr,	'p'},
+	{ "memcmp_fail",no_argument,		nullptr,	'n'},
+	{ "event",		no_argument,		nullptr,	'v'},
+	{ "source",		no_argument,		nullptr,	's'},
+	{ "dump",		no_argument,		nullptr,	'd'},
+	{ "memdump",	no_argument,		nullptr,	'u'},
+	{ "memcmp", 	required_argument,	nullptr,	'm'},
+	{ "steps", 		required_argument,	nullptr,	'i'},
 	{ 0, 0, 0, 0 } 
 };
 
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
 	if (dump)
 		compiler.compile(ifs, bytecode, varCount, outError, &(std::wcout));
 	else
-		compiler.compile(ifs, bytecode, varCount, outError, NULL);
+		compiler.compile(ifs, bytecode, varCount, outError, nullptr);
 
 	//ifs.close();
 	
