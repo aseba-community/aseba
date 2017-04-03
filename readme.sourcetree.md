@@ -2,6 +2,13 @@
 
 This file describes the source tree of Aseba.
 
+## Conventions
+
+Aseba is written in C++11, with the exception of embedded code such as the VM which is C99.
+While the existing code is not fully migrated to C++11 features yet, all new code should make best use of modern C++11 features.
+
+## Content of Aseba sources
+
 These directories contain source code:
 * `common`: definitions common to both targets, studio and tools
   * `msg`: message serialization/de-serialization in C++
