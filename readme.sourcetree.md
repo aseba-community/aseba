@@ -6,6 +6,7 @@ This file describes the source tree of Aseba.
 
 Aseba is written in C++11, with the exception of embedded code such as the VM which is C99.
 While the existing code is not fully migrated to C++11 features yet, all new code should make best use of modern C++11 features.
+Issue [#615](https://github.com/aseba-community/aseba/issues/615) describes the state of C++11 within Aseba, and a list of C++11 features that should be used.
 
 ## Content of Aseba sources
 
