@@ -123,10 +123,10 @@ struct AsebaNode
 			std::string name(nativeDesc->name);
 			std::string doc(nativeDesc->doc);
 			
-			TargetDescription::NativeFunction native(
+			TargetDescription::NativeFunction native{
 				std::wstring(name.begin(), name.end()),
 				std::wstring(doc.begin(), doc.end())
-			);
+			};
 			
 			const AsebaNativeFunctionArgumentDescription* params(nativeDesc->arguments);
 			while (params->size)

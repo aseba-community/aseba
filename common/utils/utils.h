@@ -51,11 +51,18 @@ namespace Aseba
 	static inline Derived polymorphic_downcast_or_null(Base base)
 	{
 		if (!base)
-			return 0;
+			return nullptr;
 		Derived derived = dynamic_cast<Derived>(base);
 		if (!derived)
 			abort();
 		return derived;
+	}
+	
+	//! Create a unique_ptr by perfect forwarding, to be removed once we switch to C++14
+	template<typename T, typename... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 	
 	//! Time or durations, in milliseconds

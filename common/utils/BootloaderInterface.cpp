@@ -80,8 +80,7 @@ namespace Aseba
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == dest))
 			{
-				uint16_t errorCode = ackMessage->errorCode;
-				if (errorCode == BootloaderAck::SUCCESS)
+				if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 				{
 					if (dataRead < pageSize)
 						cerr << "Warning, got acknowledgement but page not fully read (" << dataRead << "/" << pageSize << ") bytes.\n";
@@ -97,7 +96,7 @@ namespace Aseba
 			{
 				if (dataRead >= pageSize)
 					cerr << "Warning, reading oversized page (" << dataRead << "/" << pageSize << ") bytes.\n";
-				copy(dataMessage->data, dataMessage->data + sizeof(dataMessage->data), data);
+				copy(dataMessage->data.cbegin(), dataMessage->data.cend(), data);
 				data += sizeof(dataMessage->data);
 				dataRead += sizeof(dataMessage->data);
 				cout << "Page read so far (" << dataRead << "/" << pageSize << ") bytes.\n";
@@ -148,8 +147,7 @@ namespace Aseba
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 				if (ackMessage && (ackMessage->source == bootloaderDest))
 				{
-					uint16_t errorCode = ackMessage->errorCode;
-					if(errorCode == BootloaderAck::SUCCESS)
+					if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 						break;
 					else
 						return false;
@@ -161,7 +159,7 @@ namespace Aseba
 			{
 				BootloaderPageDataWrite pageData;
 				pageData.dest = bootloaderDest;
-				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
+				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data.begin());
 				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
 				//cout << "." << std::flush;
@@ -175,8 +173,7 @@ namespace Aseba
 					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
 					if (ackMessage && (ackMessage->source == dest))
 					{
-						uint16_t errorCode = ackMessage->errorCode;
-						if(errorCode == BootloaderAck::SUCCESS)
+						if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 							break;
 						else
 							return false;
@@ -199,8 +196,7 @@ namespace Aseba
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == bootloaderDest))
 			{
-				uint16_t errorCode = ackMessage->errorCode;
-				if(errorCode == BootloaderAck::SUCCESS)
+				if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 				{
 					writePageSuccess();
 					return true;

@@ -217,7 +217,7 @@ namespace Aseba
 		int noNodeCount = 0;
 		QDomNode domNode = document.documentElement().firstChild();
 		
-		// FIXME: this code depends on event and contants being before any code
+		// FIXME: this code depends on event and constants being before any code
 		bool wasError = false;
 		while (!domNode.isNull())
 		{
@@ -242,14 +242,11 @@ namespace Aseba
 						
 						if (result)
 						{
-							typedef std::vector<Message*> MessageVector;
+							typedef std::vector<std::unique_ptr<Message>> MessageVector;
 							MessageVector messages;
 							sendBytecode(messages, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
-							for (MessageVector::const_iterator it = messages.begin(); it != messages.end(); ++it)
-							{
-								hub->sendMessage(*it);
-								delete *it;
-							}
+							for (const auto& message: messages)
+								hub->sendMessage(*message);
 							Run msg(nodeId);
 							hub->sendMessage(msg);
 						}

@@ -125,9 +125,9 @@ int main()
 	}
 
 	// fill the bytecode messages
-	vector<Message*> setBytecodeMessages;
+	vector<unique_ptr<Message>> setBytecodeMessages;
 	sendBytecode(setBytecodeMessages, nodeId, vector<uint16_t>(bytecode.begin(), bytecode.end()));
-	for_each(setBytecodeMessages.begin(), setBytecodeMessages.end(), [=](Message* message){ thymio->inQueue.emplace(message); });
+	for_each(setBytecodeMessages.begin(), setBytecodeMessages.end(), [=](unique_ptr<Message>& message){ thymio->inQueue.emplace(move(message)); });
 
 	// then run the code...
 	thymio->inQueue.emplace(new Run(nodeId));

@@ -1,6 +1,8 @@
-add_subdirectory(simulator)
-add_subdirectory(vm)
+add_subdirectory(msg)
 add_subdirectory(compiler)
+add_subdirectory(vm)
+add_subdirectory(simulator)
+
 
 # test asebahttp
 # FIXME: port to asebahttp2
