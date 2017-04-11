@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <vector>
 #include <functional>
+#include <memory>
 #include "../types.h"
 
 namespace Aseba
