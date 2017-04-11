@@ -283,11 +283,23 @@ extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	const uint16_t statusAddr(AsebaNativePopArg(vm));
 	
-	// do nothing for now
-	ASEBA_UNUSED(number);
-	ASEBA_UNUSED(statusAddr);
-	
-	notifyMissingFeature();
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		int16_t result(0);
+		// number must be [0:32767], or -1
+		if (number < -1)
+		{
+			result = -1;
+		}
+		// try to open
+		else if (!thymio2->openSDCardFile(number))
+		{
+			result = -1;
+		}
+		
+		vm->variables[statusAddr] = result;
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
@@ -296,12 +308,20 @@ extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
 	const uint16_t statusAddr(AsebaNativePopArg(vm));
 	const uint16_t dataLength(AsebaNativePopArg(vm));
 	
-	// do nothing for now
-	ASEBA_UNUSED(dataAddr);
-	ASEBA_UNUSED(statusAddr);
-	ASEBA_UNUSED(dataLength);
-	
-	notifyMissingFeature();
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		int16_t result(0);
+		
+		if (thymio2->sdCardFile)
+			thymio2->sdCardFile.write(reinterpret_cast<const char*>(&vm->variables[dataAddr]), dataLength*2);
+		
+		if (thymio2->sdCardFile)
+			result = dataLength;
+		// a failed write will report 0. It is unlikely that a partial write occurs, but if so it is not handled properly.
+		
+		vm->variables[statusAddr] = result;
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
@@ -310,12 +330,21 @@ extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
 	const uint16_t statusAddr(AsebaNativePopArg(vm));
 	const uint16_t dataLength(AsebaNativePopArg(vm));
 	
-	// do nothing for now
-	ASEBA_UNUSED(dataAddr);
-	ASEBA_UNUSED(statusAddr);
-	ASEBA_UNUSED(dataLength);
-	
-	notifyMissingFeature();
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		int16_t result(0);
+		
+		if (thymio2->sdCardFile)
+			thymio2->sdCardFile.read(reinterpret_cast<char*>(&vm->variables[dataAddr]), dataLength*2);
+		
+		if (thymio2->sdCardFile)
+			result = dataLength;
+		else
+			result = thymio2->sdCardFile.gcount() / 2;
+		
+		vm->variables[statusAddr] = result;
+	}
 }
 
 extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
@@ -323,9 +352,25 @@ extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
 	const int16_t seek(vm->variables[AsebaNativePopArg(vm)]);
 	const int16_t statusAddr(AsebaNativePopArg(vm));
 	
-	// do nothing for now
-	ASEBA_UNUSED(seek);
-	ASEBA_UNUSED(statusAddr);
-	
-	notifyMissingFeature();
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+	{
+		int16_t result(0);
+		
+		// if bad, try to close and re-open
+		if (!thymio2->sdCardFile)
+			thymio2->openSDCardFile(thymio2->sdCardFileNumber);
+		
+		// if good, try to seek
+		if (thymio2->sdCardFile)
+		{
+			thymio2->sdCardFile.seekp(seek);
+			thymio2->sdCardFile.seekg(seek);
+		}
+		
+		if (!thymio2->sdCardFile)
+			result = -1;
+		
+		vm->variables[statusAddr] = result;
+	}
 }

@@ -59,13 +59,6 @@ namespace Enki
 		logPos(0),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
-		// register callbacks
-		if (Enki::getWorld)
-			qDebug() << "An Enki::World getter callback already exists, replacing";
-		Enki::getWorld = std::bind(&PlaygroundViewer::getWorld, this);
-		if (Enki::notifyEnvironment)
-			qDebug() << "An Aseba environment notification callback already exists, replacing";
-		Enki::notifyEnvironment = std::bind(&PlaygroundViewer::notifyAsebaEnvironment, this, _1, _2, _3);
 	}
 	
 	PlaygroundViewer::~PlaygroundViewer()

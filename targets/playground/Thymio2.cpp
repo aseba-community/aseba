@@ -21,6 +21,7 @@
 #include "Thymio2.h"
 #include "Thymio2-natives.h"
 #include "Parameters.h"
+#include "EnkiGlue.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
 
@@ -29,7 +30,9 @@ namespace Enki
 	using namespace std;
 	using namespace Aseba;
 	
-	AsebaThymio2::AsebaThymio2():
+	AsebaThymio2::AsebaThymio2(const std::string& robotName):
+		robotName(robotName),
+		sdCardFileNumber(-1),
 		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
 		timer1(bind(&AsebaThymio2::timer1Timeout, this), 0),
 		timer100Hz(bind(&AsebaThymio2::timer100HzTimeout, this), 0.01),
@@ -259,6 +262,42 @@ namespace Enki
 		nativeFunctions[id](&vm);
 	}
 	
+	//! Open the virtual SD card file number, if -1, close current one
+	bool AsebaThymio2::openSDCardFile(int number)
+	{
+		// close current file, ignore errors
+		if (sdCardFile.is_open())
+		{
+			sdCardFile.close();
+			sdCardFileNumber = -1;
+		}
+		
+		// if we have to open another file
+		if (number >= 0)
+		{
+			// path for the file
+			if (!Enki::simulatorEnvironment)
+				return false;
+			const string fileName(Enki::simulatorEnvironment->getSDFilePath(robotName, unsigned(number)));
+			// try to open file
+			sdCardFile.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::binary);
+			if (sdCardFile.fail())
+			{
+				// failed... maybe the file does not exist, try with trunc
+				sdCardFile.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+			}
+			if (sdCardFile.fail())
+			{
+				// still failed, then it is an error
+				return false;
+			}
+			else
+			{
+				sdCardFileNumber = number;
+			}
+		}
+		return true;
+	}
 	
 	void AsebaThymio2::timer0Timeout()
 	{

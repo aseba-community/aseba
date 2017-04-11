@@ -71,6 +71,7 @@ namespace Enki
 		virtual void sceneCompletedHook();
 	
 	protected:
+		friend class PlaygroundSimulatorEnvironment;
 		friend class EnkiWorldInterface;
 		World* getWorld() const;
 		void notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments);

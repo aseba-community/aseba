@@ -22,8 +22,6 @@
 
 namespace Enki
 {
-	GetWorld getWorld;
-	
-	NotifyEnvironment notifyEnvironment;
+	std::unique_ptr<SimulatorEnvironment> simulatorEnvironment;
 	
 } // namespace Enki

@@ -25,7 +25,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include "../../common/utils/FormatableString.h"
 #include "DashelAsebaGlue.h"
 #include "Door.h"
 #include "PlaygroundViewer.h"
@@ -34,14 +34,61 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
+#include <QString>
+#include <QDesktopServices>
+#include <QDir>
+#include <QHash>
 
 #ifdef HAVE_DBUS
 #include "PlaygroundDBusAdaptors.h"
 #endif // HAVE_DBUS
 
+namespace Enki
+{
+	//! The simulator environment for playground
+	class PlaygroundSimulatorEnvironment: public SimulatorEnvironment
+	{
+	public:
+		const QString sceneFileName;
+		PlaygroundViewer& viewer;
+		
+	public:
+		PlaygroundSimulatorEnvironment(const QString& sceneFileName, PlaygroundViewer& viewer):
+			sceneFileName(sceneFileName),
+			viewer(viewer)
+		{}
+		
+		virtual void notify(const EnvironmentNotificationType type, const std::string& description, const strings& arguments) override
+		{
+			viewer.notifyAsebaEnvironment(type, description, arguments);
+		}
+		
+		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const override
+		{
+			auto fileName(QString("%1/%2/%3/U%4.DAT")
+				.arg(QDesktopServices::storageLocation(QDesktopServices::DataLocation))
+				.arg(qHash(QDir(sceneFileName).canonicalPath()), 8, 16, QChar('0'))
+				.arg(QString::fromStdString(robotName))
+				.arg(fileNumber)
+			);
+			QDir().mkpath(QFileInfo(fileName).absolutePath());
+			// dump
+			std::cerr << fileName.toStdString() << std::endl;
+			return fileName.toStdString();
+		}
+		
+		virtual World* getWorld() const override
+		{
+			return viewer.getWorld();
+		}
+	};
+}
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	app.setOrganizationName("Aseba"); // FIXME: we should be consistent here
+	app.setApplicationName("Playground");
 	
 	/*
 	// Translation support
@@ -56,13 +103,13 @@ int main(int argc, char *argv[])
 	
 	// create document
 	QDomDocument domDocument("aseba-playground");
+	QString sceneFileName;
 	
 	// Get cmd line arguments
-	QString fileName;
 	bool ask = true;
 	if (argc > 1)
 	{
-		fileName = argv[1];
+		sceneFileName = argv[1];
 		ask = false;
 	}
 	
@@ -72,17 +119,17 @@ int main(int argc, char *argv[])
 		if (ask)
 		{
 			QString lastFileName = QSettings("EPFL-LSRO-Mobots", "Aseba Playground").value("last file").toString();
-			fileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
+			sceneFileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
 		}
 		ask = true;
 		
-		if (fileName.isEmpty())
+		if (sceneFileName.isEmpty())
 		{
 			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog" << std::endl;
 			exit(1);
 		}
 		
-		QFile file(fileName);
+		QFile file(sceneFileName);
 		if (file.open(QIODevice::ReadOnly))
 		{
 			QString errorStr;
@@ -91,14 +138,14 @@ int main(int argc, char *argv[])
 			{
 				QMessageBox::information(0, "Aseba Playground",
 										app.tr("Parse error at file %1, line %2, column %3:\n%4")
-										.arg(fileName)
+										.arg(sceneFileName)
 										.arg(errorLine)
 										.arg(errorColumn)
 										.arg(errorStr));
 			}
 			else
 			{
-				QSettings("EPFL-LSRO-Mobots", "Aseba Playground").setValue("last file", fileName);
+				QSettings("EPFL-LSRO-Mobots", "Aseba Playground").setValue("last file", sceneFileName);
 				break;
 			}
 		}
@@ -150,7 +197,7 @@ int main(int argc, char *argv[])
 	Enki::World::GroundTexture groundTexture;
 	if (worldE.hasAttribute("groundTexture"))
 	{
-		const QString groundTextureFileName(QFileInfo(fileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
+		const QString groundTextureFileName(QFileInfo(sceneFileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
 		QImage image(groundTextureFileName);
 		if (!image.isNull())
 		{
@@ -178,6 +225,9 @@ int main(int argc, char *argv[])
 	
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world, worldE.attribute("energyScoringSystemEnabled", "false").toLower() == "true");
+	if (Enki::simulatorEnvironment)
+		qDebug() << "A simulator environment already exists, replacing";
+	Enki::simulatorEnvironment.reset(new Enki::PlaygroundSimulatorEnvironment(sceneFileName, viewer));
 	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
@@ -343,11 +393,12 @@ int main(int argc, char *argv[])
 	}
 	
 	// Scan for Thymio 2
+	unsigned thymioNumber(0);
 	QDomElement thymioE(domDocument.documentElement().firstChildElement("thymio2"));
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port));
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, Aseba::FormatableString("thymio2_%0").arg(thymioNumber++)));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();

@@ -32,11 +32,6 @@ namespace Enki
 {
 	// Interface for Aseba-enabled Enki objects and their native functions
 	
-	//! A function that returns a world
-	typedef std::function<World*()> GetWorld;
-	//! A global function that returns the world
-	extern GetWorld getWorld;
-	
 	//! Types of notifications that can be sent to the environment
 	enum class EnvironmentNotificationType
 	{
@@ -49,23 +44,35 @@ namespace Enki
 	
 	//! A vector of string
 	typedef std::vector<std::string> strings;
-	//! A function that notifies the environment of something happening inside a robot, takes a type, a description and a vector of arguments
-	typedef std::function<void(const EnvironmentNotificationType, const std::string&, const strings&)> NotifyEnvironment;
-	//! A global function that notifies the environment
-	extern NotifyEnvironment notifyEnvironment;
+	
+	//! An interface to a simulation environment
+	struct SimulatorEnvironment
+	{
+		//! Default virtual destructor
+		virtual ~SimulatorEnvironment() = default;
+		//! Notifies the environment of something happening inside a robot, takes a type, a description and a vector of arguments
+		virtual void notify(const EnvironmentNotificationType type, const std::string& description, const strings& arguments) = 0;
+		//! Return a writable local file path for this scenario and a given robot name and file number
+		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const = 0;
+		//! Return the current world
+		virtual World* getWorld() const = 0;
+	};
+	
+	//! A global pointer to the environment
+	extern std::unique_ptr<SimulatorEnvironment> simulatorEnvironment;
 	
 	//! Helper macro to write notification sending in a convenient way
 	#define SEND_NOTIFICATION(type, description, ...) \
-	if (Enki::notifyEnvironment) \
-		Enki::notifyEnvironment(Enki::EnvironmentNotificationType::type, description, {__VA_ARGS__});
+	if (Enki::simulatorEnvironment) \
+		Enki::simulatorEnvironment->notify(Enki::EnvironmentNotificationType::type, description, {__VA_ARGS__});
 	
 	//! Return the Enki object of a given type associated with a given vm
 	template<typename ObjectType>
 	ObjectType *getEnkiObject(AsebaVMState *vm)
 	{
-		if (!getWorld())
+		if (!Enki::simulatorEnvironment)
 			return nullptr;
-		World* world(getWorld());
+		World* world(Enki::simulatorEnvironment->getWorld());
 		if (!world)
 			return nullptr;
 		for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)

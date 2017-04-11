@@ -25,6 +25,7 @@
 #include "../../common/utils/utils.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/thymio2/Thymio2.h>
+#include <fstream>
 
 namespace Enki
 {
@@ -99,17 +100,23 @@ namespace Enki
 			int16_t freeSpace[512];
 		} variables;
 		
+	public:
+		const std::string robotName;
+		std::fstream sdCardFile;
+		int sdCardFileNumber;
+		
 	protected:
 		Aseba::SoftTimer timer0;
 		Aseba::SoftTimer timer1;
 		int16_t oldTimerPeriod[2];
 		Aseba::SoftTimer timer100Hz;
 		unsigned counter100Hz;
+		
 		bool lastStepCollided;
 		bool thisStepCollided;
 		
 	public:
-		AsebaThymio2();
+		AsebaThymio2(const std::string& robotName);
 		
 		// from PhysicalObject
 		
@@ -129,6 +136,10 @@ namespace Enki
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
 		virtual void callNativeFunction(uint16_t id);
+		
+		// for Thymio2-natives.cpp
+		
+		bool openSDCardFile(int number);
 		
 	protected:
 		
