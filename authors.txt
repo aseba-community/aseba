@@ -50,7 +50,12 @@ Copyright (C) 2007--2016:
 	Detlef Rick <detlef dot rick at gymnasium-hittfeld dot de>
 	German translation
 	
-		
+	Ioanna Theodoropoulou <ioannatheodoropou at hotmail dot com>
+	Greek translation
+	
+	Vassilis Komis <komis at upatras dot gr>
+	Greek translation
+	
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
 	EPFL, Lausanne (http://www.epfl.ch)
