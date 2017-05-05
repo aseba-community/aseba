@@ -44,7 +44,6 @@
 namespace Enki
 {
 	using namespace Aseba;
-	using namespace std::placeholders;
 	
 	const std::map<EnvironmentNotificationType, QColor> notificationLogTypeToColor = {
 		{ EnvironmentNotificationType::LOG_INFO, Qt::white },
@@ -101,6 +100,10 @@ namespace Enki
 			else if (description == "client disconnected properly")
 			{
 				log(tr("Client disconnected properly from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
+			}
+			else if (description == "client disconnected abnormally")
+			{
+				log(tr("Client disconnected abnormally from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
 			}
 			else if (description == "old client disconnected")
 			{
