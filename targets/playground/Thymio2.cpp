@@ -76,73 +76,72 @@ namespace Enki
 		return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
 	}
 
-	void AsebaThymio2::clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ)
+	void AsebaThymio2::mousePressEvent(unsigned button, double pointX, double pointY, double pointZ)
 	{
-		pointX -= pos.x;
-		pointY -= pos.y;
-		const double relativeX =  cos(angle)*pointX + sin(angle)*pointY;
-		const double relativeY = -sin(angle)*pointX + cos(angle)*pointY;
-		if (pressed && (buttonCode & LEFT_MOUSE_BUTTON))
+		if (button == MOUSE_BUTTON_LEFT)
 		{
-			if (distance(relativeX,relativeY,pointZ,2.5,0,5.3) < 0.55)
+			if (distance(pointX, pointY, pointZ, 4.8, 0, 5.3) < 0.55)
 			{
 				variables.buttonCenter = 1;
-				variables.buttonBackward = 0;
-				variables.buttonForward = 0;
-				variables.buttonLeft = 0;
-				variables.buttonRight = 0;
+				execLocalEvent(EVENT_B_CENTER);
 			}
-			else if (distance(relativeX,relativeY,pointZ,4.0,0,5.3) < 0.65)
+			else if (distance(pointX, pointY, pointZ, 6.3, 0, 5.3) < 0.65)
 			{
-				variables.buttonCenter = 0;
-				variables.buttonBackward = 0;
 				variables.buttonForward = 1;
-				variables.buttonLeft = 0;
-				variables.buttonRight = 0;
+				execLocalEvent(EVENT_B_FORWARD);
 			}
-			else if (distance(relativeX,relativeY,pointZ,1.0,0,5.3) < 0.65)
+			else if (distance(pointX, pointY, pointZ, 3.3, 0, 5.3) < 0.65)
 			{
-				variables.buttonCenter = 0;
 				variables.buttonBackward = 1;
-				variables.buttonForward = 0;
-				variables.buttonLeft = 0;
-				variables.buttonRight = 0;
+				execLocalEvent(EVENT_B_BACKWARD);
 			}
-			else if (distance(relativeX,relativeY,pointZ,2.5,-1.5,5.3) < 0.65)
+			else if (distance(pointX, pointY, pointZ, 4.8, -1.5, 5.3) < 0.65)
 			{
-				variables.buttonCenter = 0;
-				variables.buttonBackward = 0;
-				variables.buttonForward = 0;
-				variables.buttonLeft = 0;
 				variables.buttonRight = 1;
+				execLocalEvent(EVENT_B_RIGHT);
 			}
-			else if (distance(relativeX,relativeY,pointZ,2.5,1.5,5.3) < 0.65)
+			else if (distance(pointX, pointY, pointZ, 4.8, 1.5, 5.3) < 0.65)
 			{
-				variables.buttonCenter = 0;
-				variables.buttonBackward = 0;
-				variables.buttonForward = 0;
 				variables.buttonLeft = 1;
-				variables.buttonRight = 0;
+				execLocalEvent(EVENT_B_LEFT);
 			}
 			else
 			{
-				variables.buttonCenter = 0;
-				variables.buttonBackward = 0;
-				variables.buttonForward = 0;
-				variables.buttonLeft = 0;
-				variables.buttonRight = 0;
-				
 				// not a putton, tap event
 				execLocalEvent(EVENT_TAP);
 			}
 		}
-		else
+	}
+	
+	void AsebaThymio2::mouseReleaseEvent(unsigned button)
+	{
+		if (button == MOUSE_BUTTON_LEFT)
 		{
-			variables.buttonCenter = 0;
-			variables.buttonBackward = 0;
-			variables.buttonForward = 0;
-			variables.buttonLeft = 0;
-			variables.buttonRight = 0;
+			if (variables.buttonCenter == 1)
+			{
+				variables.buttonCenter = 0;
+				execLocalEvent(EVENT_B_CENTER);
+			}
+			if (variables.buttonForward == 1)
+			{
+				variables.buttonForward = 0;
+				execLocalEvent(EVENT_B_FORWARD);
+			}
+			if (variables.buttonBackward == 1)
+			{
+				variables.buttonBackward = 0;
+				execLocalEvent(EVENT_B_BACKWARD);
+			}
+			if (variables.buttonRight == 1)
+			{
+				variables.buttonRight = 0;
+				execLocalEvent(EVENT_B_RIGHT);
+			}
+			if (variables.buttonLeft == 1)
+			{
+				variables.buttonLeft = 0;
+				execLocalEvent(EVENT_B_LEFT);
+			}
 		}
 	}
 	

@@ -124,7 +124,8 @@ namespace Enki
 
 		// from Robot
 
-		virtual void clickedInteraction(bool pressed, unsigned int buttonCode, double pointX, double pointY, double pointZ);
+		virtual void mousePressEvent(unsigned button, double pointX, double pointY, double pointZ);
+		virtual void mouseReleaseEvent(unsigned button);
 		
 		// from Thymio2
 		
