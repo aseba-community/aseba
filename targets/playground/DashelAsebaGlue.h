@@ -44,6 +44,8 @@ namespace Aseba
 		virtual void incomingData(Dashel::Stream *stream);
 		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 		
+	protected:
+		void clearBreakpoints();
 		void closeOldStreams();
 	};
 	

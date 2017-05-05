@@ -71,7 +71,10 @@ namespace Aseba
 		{
 			// schedule current stream for disconnection
 			if (this->stream)
+			{
 				toDisconnect.push_back(this->stream);
+				clearBreakpoints();
+			}
 			
 			// set new stream as current stream
 			this->stream = stream;
@@ -81,7 +84,15 @@ namespace Aseba
 
 	void SimpleDashelConnection::incomingData(Dashel::Stream *stream)
 	{
-		assert(stream == this->stream);
+		// if we receive data from an old connection, disregard as we'll close the old stream soon
+		if (stream != this->stream)
+		{
+			// read one byte to avoid deadlock
+			char c;
+			stream->read(&c, 1);
+			return;
+		}
+		
 		try
 		{
 			// receive data
@@ -113,23 +124,35 @@ namespace Aseba
 
 	void SimpleDashelConnection::connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
+		// if the stream being closed is the current one (not old), clear breakpoints and reset current
 		if (stream == this->stream)
 		{
+			clearBreakpoints();
 			this->stream = 0;
-			// clear breakpoints on all VM that are linked to this connection
-			for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
-			{
-				if (vmStateToEnvironmentKV.second.second == this)
-					vmStateToEnvironmentKV.first->breakpointsCount = 0;
-			}
 		}
-		SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
-
+		if (abnormal)
+		{
+			SEND_NOTIFICATION(LOG_WARNING, "client disconnected abnormally", stream->getTargetName());
+		}
+		else
+		{
+			SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
+		}
 	}
 	
+	//! Clear breakpoints on all VM that are linked to this connection
+	void SimpleDashelConnection::clearBreakpoints()
+	{
+		for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
+		{
+			if (vmStateToEnvironmentKV.second.second == this)
+				vmStateToEnvironmentKV.first->breakpointsCount = 0;
+		}
+	}
+	
+	//! disconnect old streams
 	void SimpleDashelConnection::closeOldStreams()
 	{
-		// disconnect old streams
 		for (size_t i = 0; i < toDisconnect.size(); ++i)
 		{
 			SEND_NOTIFICATION(LOG_WARNING, "old client disconnected", toDisconnect[i]->getTargetName());
