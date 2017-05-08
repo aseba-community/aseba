@@ -34,6 +34,9 @@ namespace Aseba
 
 	struct AbstractNodeGlue
 	{
+		// default virtual destructor
+		virtual ~AbstractNodeGlue() = default;
+		
 		// to be implemente by robots
 		virtual const AsebaVMDescription* getDescription() const = 0;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const = 0;

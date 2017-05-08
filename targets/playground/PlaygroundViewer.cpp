@@ -257,4 +257,14 @@ namespace Enki
 			}
 		}
 	}
+	
+	void PlaygroundViewer::timerEvent(QTimerEvent * event)
+	{
+		// if the object being moved is Aseba-enabled, make sure it processes network events
+		AbstractNodeGlue* asebaObject(dynamic_cast<AbstractNodeGlue*>(selectedObject));
+		if (asebaObject)
+			asebaObject->externalInputStep(double(timerPeriodMs)/1000.);
+		
+		ViewerWidget::timerEvent(event);
+	}
 } // Enki
