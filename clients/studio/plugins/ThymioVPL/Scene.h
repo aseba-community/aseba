@@ -48,6 +48,7 @@ namespace Aseba { namespace ThymioVPL
 		void clear(bool advanced);
 		bool isModified() const { return sceneModified; }
 		void setModified(bool mod);
+		bool isSynchronizing() const { return synchronizing; }
 		void setScale(qreal scale);
 		void setAdvanced(bool advanced);
 		bool getAdvanced() const { return advancedMode; }
@@ -89,8 +90,10 @@ namespace Aseba { namespace ThymioVPL
 		void undoCheckpoint();
 		void modifiedStatusChanged(bool modified);
 		void sceneSizeChanged();
+		void timer1PeriodChanged(unsigned period);
 		
 	public slots:
+		void synchronizeTimer1Period(unsigned period);
 		void recompile();
 		void recompileWithoutSetModified();
 		
@@ -121,6 +124,7 @@ namespace Aseba { namespace ThymioVPL
 		qreal buttonSetHeight;
 		bool advancedMode;
 		unsigned zoomLevel;
+		bool synchronizing;
 	};
 } } // namespace ThymioVPL / namespace Aseba
 

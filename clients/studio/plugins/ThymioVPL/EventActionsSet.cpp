@@ -525,7 +525,8 @@ namespace Aseba { namespace ThymioVPL
 	//! Select only this set and nothing else
 	void EventActionsSet::setSoleSelection()
 	{
-		if (scene())
+		// selection setting takes a long time, skip redundant calls while the scene is synchronizing blocks
+		if (scene() && !static_cast<Scene*>(scene())->isSynchronizing())
 		{
 			scene()->clearSelection();
 			setSelected(true);
@@ -706,6 +707,9 @@ namespace Aseba { namespace ThymioVPL
 			disconnect(blockPointer, SIGNAL(contentChanged()), this,  SIGNAL(contentChanged()));
 			
 			// remove and delete block
+			if (blockPointer->scene()) {
+				blockPointer->scene()->removeItem(blockPointer);
+			}
 			blockPointer->deleteLater();
 		}
 		

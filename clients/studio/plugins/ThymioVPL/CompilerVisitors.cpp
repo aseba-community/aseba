@@ -51,10 +51,12 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode(false),
 		useSound(false),
 		useTimer(false),
+		timer1Period(0),
 		useMicrophone(false),
 		useAccAngle(false),
 		inWhenBlock(false),
-		inIfBlock(false)
+		inIfBlock(false),
+		additionalIndent(0)
 	{
 		initEventToCodePosMap();
 	}
@@ -71,10 +73,12 @@ namespace Aseba { namespace ThymioVPL
 		advancedMode = advanced;
 		useSound = false;
 		useTimer= false;
+		timer1Period = 0;
 		useMicrophone = false;
 		useAccAngle = false;
 		inWhenBlock = false;
 		inIfBlock = false;
+		additionalIndent = 0;
 	}
 	
 	//! Initialize the event to code position map
@@ -86,6 +90,7 @@ namespace Aseba { namespace ThymioVPL
 		eventToCodePosMap["acc"] = qMakePair(-1,0);
 		eventToCodePosMap["clap"] = qMakePair(-1,0);
 		eventToCodePosMap["timeout"] = qMakePair(-1,0);
+		eventToCodePosMap["periodic"] = qMakePair(-1,0);
 	}
 	
 	//! Add initialization code after all pairs have been parsed
@@ -133,6 +138,12 @@ namespace Aseba { namespace ThymioVPL
 			text += L"# stop timer 0\n";
 			text += L"timer.period[0] = 0\n";
 		}
+		if (timer1Period)
+		{
+			text += L"# start timer 1\n";
+			text += L"var timer1_phase = 0\n";
+			text += L"timer.period[1] = " + toWstring(timer1Period/2) + L"\n";
+		}
 		if (useMicrophone)
 		{
 			text += L"# setup threshold for detecting claps\n";
@@ -164,7 +175,7 @@ namespace Aseba { namespace ThymioVPL
 	
 	wstring Compiler::CodeGenerator::indentText() const
 	{
-		wstring text(L"\t");
+		wstring text(1 + additionalIndent, L'\t');
 		if (inWhenBlock)
 			text += L"\t";
 		if (inIfBlock)
@@ -196,6 +207,7 @@ namespace Aseba { namespace ThymioVPL
 		if (block < 0)
 		{
 			block = generatedCode.size();
+			int insertOffset = 0;
 			
 			if (lookupEventName == "button")
 			{
@@ -233,6 +245,21 @@ namespace Aseba { namespace ThymioVPL
 				);
 				size++;
 			}
+			else if (lookupEventName == "periodic")
+			{
+				timer1Period = eventActionsSet.getEventBlock()->getValue(0);
+				generatedCode.push_back(
+					L"\nonevent timer1\n"
+					L"\tif timer1_phase == 0 then\n"
+				);
+				generatedCode.push_back(L"\telse\n");
+				generatedCode.push_back(
+					L"\tend\n"
+					L"\ttimer1_phase = timer1_phase ^ 1\n"
+				);
+				size += 3;
+				insertOffset = (eventActionsSet.getEventBlock()->getValue(1) == 0) ? -2 : -1;
+			}
 			else
 			{
 				// internal compiler error, invalid event found
@@ -247,22 +274,43 @@ namespace Aseba { namespace ThymioVPL
 					L"\n\tcall math.copy(state, new_state)"
 					L"\n\tcallsub display_state\n"
 				);
-				eventToCodePosMap[lookupEventName] = qMakePair(block, size+1);
+				size++;
+				insertOffset--;
 			}
-			else
-				eventToCodePosMap[lookupEventName] = qMakePair(block, size);
+			eventToCodePosMap[lookupEventName] = qMakePair(block, size);
 
 			// prepare to add the new code block
-			currentBlock = block + size;
+			currentBlock = block + size + insertOffset;
 		}
 		else
 		{
 			// get current block, insert and update map
+			// caution: size as stored in eventToCodePosMap is one less than the number of blocks for the event
 			currentBlock = (eventActionsSet.isAdvanced() ? block + size : block + size + 1);
 			eventToCodePosMap[lookupEventName].second++;
 			for (EventToCodePosMap::iterator itr(eventToCodePosMap.begin()); itr != eventToCodePosMap.end(); ++itr)
 				if (itr->first > block)
 					itr->first++;
+			
+			// find the if/else branch corresponding to the phase setting of the periodic event block
+			if (lookupEventName == "periodic")
+			{
+				int elseBlock = 0;
+				for (unsigned int i = block; i < currentBlock; i++)
+					if (generatedCode[i] == L"\telse\n")
+						elseBlock = i;
+				
+				if (eventActionsSet.getEventBlock()->getValue(1) == 0)
+				{
+					block += 1;
+					currentBlock = elseBlock;
+				}
+				else
+				{
+					block = elseBlock + 1;
+					currentBlock -= 1;
+				}
+			}
 			
 			// if non-conditional code
 			if (!eventActionsSet.isAnyAdvancedFeature() && !eventActionsSet.getEventBlock()->isAnyValueSet())
@@ -296,7 +344,7 @@ namespace Aseba { namespace ThymioVPL
 			visitDebugLog(eventActionsSet, currentBlock);
 		
 		// possibly close condition and add code
-		visitEndOfLine(currentBlock);
+		visitEndOfLine(eventActionsSet, currentBlock);
 	}
 	
 	//! Generate the debug log event for this set
@@ -367,12 +415,16 @@ namespace Aseba { namespace ThymioVPL
 			inWhenBlock = true;
 		}
 		
+		if (block->getName() == "periodic")
+		{
+			additionalIndent++;
+		}
+		
 		// if state filter does generate a test
 		if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
 		{
-			if (inWhenBlock)
-				text += L"\t";
-			text += L"\tif ";
+			text += indentText();
+			text += L"if ";
 			bool first(true);
 			for (unsigned i=0; i<stateFilterBlock->valuesCount(); ++i)
 			{
@@ -403,19 +455,23 @@ namespace Aseba { namespace ThymioVPL
 	}
 	
 	//! End the generated code of a VPL line, close whens and ifs
-	void Compiler::CodeGenerator::visitEndOfLine(unsigned currentBlock)
+	void Compiler::CodeGenerator::visitEndOfLine(const EventActionsSet& eventActionsSet, unsigned currentBlock)
 	{
 		if (inIfBlock)
 		{
-			if (inWhenBlock)
-				generatedCode[currentBlock].append(L"\t");
-			generatedCode[currentBlock].append(L"\tend\n");
 			inIfBlock = false;
+			generatedCode[currentBlock].append(indentText());
+			generatedCode[currentBlock].append(L"end\n");
 		}
 		if (inWhenBlock)
 		{
-			generatedCode[currentBlock].append(L"\tend\n");
 			inWhenBlock = false;
+			generatedCode[currentBlock].append(indentText());
+			generatedCode[currentBlock].append(L"end\n");
+		}
+		if (eventActionsSet.getEventBlock()->getName() == "periodic")
+		{
+			additionalIndent--;
 		}
 	}
 	

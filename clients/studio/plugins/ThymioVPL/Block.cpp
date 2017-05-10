@@ -90,6 +90,8 @@ namespace Aseba { namespace ThymioVPL
 			return new ClapEventBlock(parent);
 		else if ( name == "timeout" )
 			return new TimeoutEventBlock(parent);
+		else if ( name == "periodic" )
+			return new PeriodicEventBlock(parent);
 		else if ( name == "statefilter" )
 			return new StateFilterCheckBlock(parent);
 		else if ( name == "move" )
@@ -187,6 +189,8 @@ namespace Aseba { namespace ThymioVPL
 			return 12;
 		else if ( name == "setstate" )
 			return 13;
+		else if ( name == "periodic" )
+			return 14;
 		else
 			throw std::runtime_error("unknown name");
 	}
