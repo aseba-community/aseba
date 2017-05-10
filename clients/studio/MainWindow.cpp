@@ -2584,7 +2584,7 @@ namespace Aseba
 		int eventNbArgs = 0;
 
 		// prompt the user for the named value
-		const bool ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, 32767, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
+		const bool ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, ASEBA_MAX_EVENT_ARG_COUNT, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
 
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())
