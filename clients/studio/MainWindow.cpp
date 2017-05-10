@@ -1651,7 +1651,7 @@ namespace Aseba
 						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
 						"<p>Read more on <a href=\"%5\">aseba.wikidot.com</a></p>" \
-						"<p>(c) 2006-2015 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
+						"<p>(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
 						"<p>Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.</p>");
 		
 		text = text.
