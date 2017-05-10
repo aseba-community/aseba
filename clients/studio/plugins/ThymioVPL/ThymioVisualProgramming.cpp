@@ -224,6 +224,7 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("proxground", this));
 		eventButtons.push_back(new BlockButton("acc", this));
 		eventButtons.push_back(new BlockButton("clap", this));
+		eventButtons.push_back(new BlockButton("periodic", this));
 		eventButtons.push_back(new BlockButton("timeout", this));
 		
 		eventsLabel = new QLabel(tr("Events"));
@@ -1123,7 +1124,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// FIXME: scale computation should be updated 
 		// desired sizes for height
-		const int idealContentHeight(6*256);
+		const int idealContentHeight(7*256);
 		const int uncompressibleHeight(
 			max(actionsLabel->height(), eventsLabel->height()) +
 			desiredToolbarIconSize * 2 + 

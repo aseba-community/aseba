@@ -24,6 +24,8 @@
 #include "Block.h"
 
 class QGraphicsSvgItem;
+class QSvgRenderer;
+class QTimeLine;
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -107,6 +109,48 @@ namespace Aseba { namespace ThymioVPL
 		TimeoutEventBlock(QGraphicsItem *parent=0);
 		
 		virtual bool isAdvancedBlock() const { return true; }
+	};
+
+	class PeriodicEventBlock: public Block
+	{
+		Q_OBJECT
+		
+	public:
+		PeriodicEventBlock(QGraphicsItem *parent=0);
+		
+		void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		
+		virtual unsigned valuesCount() const { return 1; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
+		
+		// on event blocks, this is only called to determine "does this block generate a 'when' condition", which this one does not, even though it always has a value
+		virtual bool isAnyValueSet() const { return false; }
+	
+	signals:
+		void periodChanged(unsigned period);
+		
+	protected slots:
+		void valueChanged(qreal value);
+		void setPeriod(unsigned period);
+		
+	protected:
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+		
+		virtual QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+		
+		QRectF rangeRect() const;
+		float pixelToVal(float pixel) const;
+		float valToPixel(float val) const;
+		
+	protected:
+		unsigned period;
+		QSvgRenderer *svgRenderer;
+		QTimeLine *timer;
+		bool lastPressedIn;
 	};
 	
 	/*@}*/
