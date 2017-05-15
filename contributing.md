@@ -64,7 +64,7 @@ We follow these naming conventions:
 ### Reminder
 
 * Do not forget to bump version numbers in `common/consts.h`, in the library version numbers in the `.so`, in the `Doxyfile`, and for the packages (deb,rpm) rules before doing a release.
-* When you make changes, including bug fixes to release branches, do not forget to update the release notes.
+* When you make changes, including bug fixes to release branches, do not forget to update the [changelog](changelog.md) following the guidelines on [keepachangelog.com](http://keepachangelog.com).
 
 ## C++ coding style
 
