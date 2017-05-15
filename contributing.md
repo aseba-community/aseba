@@ -68,7 +68,62 @@ We follow these naming conventions:
 
 ## C++ coding style
 
-To be written...
+The intended purpose is to have coherent-looking code through the project.
+Sorry if this different to your usual conventions.
+Aseba is currently programming in C++11, with a planned switch to C++14 once most supported operating systems ship compliant compilers by default.
+
+### Readability and maintainability are paramount
+
+All new code written in Aseba should be clear and its behavior obvious.
+Do not use clever tricks, avoid over-design, do not be obsessed about pure OO or getters/setters.
+Everything should be kept as simple as possible, but no simpler.
+This is a fundamental principle, and all new code should be kept with KISS—keep it simple, stupid—in mind.
+
+### Indentation
+
+Code should be indented by tabs.
+A tab should be equivalent to 4 spaces.
+
+### Class and struct naming
+
+Aseba uses [CamelCase](https://en.wikipedia.org/wiki/Camel_case), that is, classes should begin with capitals, new words should be denoted by a capital, and words should not be separated by underscores or dashes.
+For example, use:
+```C++
+class TotoIsMyFriend { };     // correct
+```
+instead of:
+```C++
+class toto_is_my_friend{};    // wrong
+```
+Class members, variables, and C function follow the same convention but without the initial capital: 
+```C++
+void totoIsMyFriend(void);    // correct
+```
+instead of:
+```C++
+void Toto-is-my-friend(void); // wrong
+```
+
+### Bracket placement
+
+Brackets `{}` should be placed alone on a line, except if there is no or only one function call within them.
+For example, use:
+```C++
+class Toto
+{
+    int i;
+    void totoIsMyFriend(void) { return i; };
+}; // correct
+```
+instead of:
+```C++
+class Toto {
+    int i;
+    void Toto-is-my-friend(void) {
+        return i;
+    };
+}; // wrong
+```
 
 ## Naming conventions
 
