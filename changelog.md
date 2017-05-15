@@ -63,7 +63,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - All: Corrected multiple bugs, see commit log for details.
 
 
-## [1.4.0] - 2015.10.22
+## [1.4.0] - 2015-10-22
 ### Added
 - Compiler: Added anonymous _emit keyword.
 - VPL: New visual design.
