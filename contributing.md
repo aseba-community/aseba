@@ -74,8 +74,8 @@ Aseba is currently programming in C++11, with a planned switch to C++14 once mos
 
 ### Readability and maintainability are paramount
 
-All new code written in Aseba should be clear and its behavior obvious.
-Do not use clever tricks, avoid over-design, do not be obsessed about pure OO or getters/setters.
+All new code written in Aseba should be elegant and its behavior obvious.
+Do not use clever tricks, avoid over-design, do not be obsessed about pure object-oriented style or getters/setters.
 Everything should be kept as simple as possible, but no simpler.
 This is a fundamental principle, and all new code should be kept with KISS—keep it simple, stupid—in mind.
 
