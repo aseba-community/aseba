@@ -47,13 +47,13 @@ namespace Aseba
 			std::rethrow_exception(watcherException);
 	}
 
-	void ThreadZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
+	void ThreadZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.insert(&zdr);
 	}
 
-	void ThreadZeroconf::eraseDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
+	void ThreadZeroconf::eraseDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.erase(zeroconfDRs.find(&zdr));

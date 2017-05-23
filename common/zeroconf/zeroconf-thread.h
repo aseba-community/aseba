@@ -46,11 +46,11 @@ namespace Aseba
 		//! descriptor associated with zdr.serviceref must be watched, to know when to
 		//! call DNSServiceProcessResult, which in turn calls the callback that was
 		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
-		virtual void eraseDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
+		virtual void eraseDiscoveryRequest(DiscoveryRequest & zdr);
 
 	private:
-		std::set<ZeroconfDiscoveryRequest *> zeroconfDRs;
+		std::set<DiscoveryRequest *> zeroconfDRs;
 	private:
 		void handleDnsServiceEvents(); //! run the handleDSEvents_thread
 		std::recursive_mutex watcherLock;

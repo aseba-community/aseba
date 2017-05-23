@@ -76,7 +76,7 @@ namespace Aseba
 
 		//! Aseba::Zeroconf is a factory for creating and inserting targets
 		virtual Target& insert(const std::string & name, const int & port);
-		virtual Target& insert(const Dashel::Stream* dashel_stream);
+		virtual Target& insert(const Dashel::Stream* dashelStream);
 
 		//! Aseba::Zeroconf can update its knowledge of non-local targets by browsing the network
 		virtual void browse();
@@ -103,31 +103,31 @@ namespace Aseba
 
 	protected:
 		//! Private class that encapsulates an active service request to the mDNS-SD daemon
-		class ZeroconfDiscoveryRequest
+		class DiscoveryRequest
 		{
 		public:
 			DNSServiceRef serviceref{nullptr};
 			bool in_process{true}; //!< flag to signal when this request is no longer active
 		public:
-			virtual ~ZeroconfDiscoveryRequest()
+			virtual ~DiscoveryRequest()
 			{   // release the service reference
 				if (serviceref)
 					DNSServiceRefDeallocate(serviceref);
 				serviceref = 0;
 			}
-			virtual bool operator==(const ZeroconfDiscoveryRequest &other) const
+			virtual bool operator==(const DiscoveryRequest &other) const
 			{
 				return serviceref == other.serviceref;
 			}
 		};
 
-		ZeroconfDiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
+		DiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
 
 	protected:
 		//! The discovery request can be processed immediately, or can be registered with
 		//! an event loop for asynchronous processing.
 		//! Can be overridden in derived classes to set up asynchronous processing.
-		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
 
 	protected:
 		//! callbacks for the DNS Service Discovery API
@@ -150,11 +150,12 @@ namespace Aseba
 		std::string regtype{"_aseba._tcp"};
 		std::string host{"localhost"};
 		bool local{true};
-	public:
-		TargetInformation(const std::string & name, const int port);
-		TargetInformation(const Dashel::Stream* dashel_stream);
 		
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
+		
+	public:
+		TargetInformation(const std::string & name, const int port);
+		TargetInformation(const Dashel::Stream* dashelStream);
 
 		virtual bool operator==(const TargetInformation &other) const
 		{
@@ -165,7 +166,6 @@ namespace Aseba
 		{
 			return name < other.name && port < other.port;
 		}
-
 	};
 
 	/**
@@ -176,7 +176,7 @@ namespace Aseba
 	class Zeroconf::Target: public Zeroconf::TargetInformation
 	{
 	public:
-		ZeroconfDiscoveryRequest zdr;
+		DiscoveryRequest zdr;
 
 	public:
 		using TargetInformation::TargetInformation;

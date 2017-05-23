@@ -47,8 +47,8 @@ namespace Aseba
 		//! descriptor associated with zdr.serviceref must be watched, to know when to
 		//! call DNSServiceProcessResult, which in turn calls the callback that was
 		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
-		virtual void incomingData(ZeroconfDiscoveryRequest & zdr);
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
+		virtual void incomingData(DiscoveryRequest & zdr);
 
 		//! Emit signal when register completed. If you override this method you take responsibility for emitting signals as you see fit.
 		void registerCompleted(const Aseba::Zeroconf::Target * target)
@@ -76,7 +76,7 @@ namespace Aseba
 
 	private:
 		//! Collection of QSocketNotifier that watch the serviceref file descriptors.
-		typedef std::pair<ZeroconfDiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
+		typedef std::pair<DiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
 		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
 
 	};

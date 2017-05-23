@@ -27,7 +27,7 @@ using namespace std;
 
 namespace Aseba
 {
-	void QtZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
+	void QtZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		int socket = DNSServiceRefSockFD(zdr.serviceref);
 		if (socket != -1)
@@ -48,7 +48,7 @@ namespace Aseba
 		incomingData(zeroconfSockets.at(socket).first);
 	}
 
-	void QtZeroconf::incomingData(ZeroconfDiscoveryRequest & zdr)
+	void QtZeroconf::incomingData(DiscoveryRequest & zdr)
 	{
 		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceref);
 		if (err != kDNSServiceErr_NoError)

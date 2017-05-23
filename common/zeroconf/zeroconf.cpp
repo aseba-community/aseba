@@ -37,15 +37,15 @@ namespace Aseba
 	//! Create a target in the Zeroconf container, described by a name and a port
 	Zeroconf::Target& Zeroconf::insert(const std::string & name, const int & port)
 	{
-		targets.push_back({name, port});
+		targets.emplace_back(name, port);
 		targets.back().container = this;
 		return targets.back();
 	}
 
 	//! Create a target in the Zeroconf container, described by a Dashel stream
-	Zeroconf::Target& Zeroconf::insert(const Dashel::Stream* dashel_stream)
+	Zeroconf::Target& Zeroconf::insert(const Dashel::Stream* dashelStream)
 	{
-		targets.push_back({dashel_stream});
+		targets.emplace_back(dashelStream);
 		targets.back().container = this;
 		return targets.back();
 	}
@@ -63,7 +63,7 @@ namespace Aseba
 	// Overideable method to wait for responses from the DNS service.
 	// Basic behavior is to block until daemon replies.
 	// The serviceref is released by callbacks.
-	void Zeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
+	void Zeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		while (zdr.in_process) {
 			DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceref);
@@ -78,7 +78,7 @@ namespace Aseba
 		string txt{txtrec.record()};
 		uint16_t len = txt.size();
 		const char* record = txt.c_str();
-		target->zdr.~ZeroconfDiscoveryRequest();
+		target->zdr.~DiscoveryRequest();
 		auto err = DNSServiceRegister(&(target->zdr.serviceref),
 					      0, // no flags
 					      0, // default all interfaces
@@ -137,7 +137,7 @@ namespace Aseba
 	//! A remote target can ask Zeroconf to resolve its host name and port
 	void Zeroconf::resolveTarget(Zeroconf::Target * target)
 	{
-		target->zdr.~ZeroconfDiscoveryRequest();
+		target->zdr.~DiscoveryRequest();
 		auto err = DNSServiceResolve(&(target->zdr.serviceref),
 						 0, // no flags
 						 0, // default all interfaces
@@ -190,7 +190,7 @@ namespace Aseba
 		targets.erase(std::remove_if(targets.begin(),targets.end(),
 					     [](const Target& t) { return ! t.local; }),
 			      targets.end());
-		browseZDR.~ZeroconfDiscoveryRequest();
+		browseZDR.~DiscoveryRequest();
 		auto err = DNSServiceBrowse(&browseZDR.serviceref,
 					    0, // no flags
 					    0, // default all interfaces
@@ -204,7 +204,7 @@ namespace Aseba
 			processDiscoveryRequest(browseZDR);
 	}
 
-	//! DNSSD callback for browse, update ZeroconfDiscoveryRequest record with results of browse
+	//! DNSSD callback for browse, update DiscoveryRequest record with results of browse
 	void DNSSD_API Zeroconf::cb_Browse(DNSServiceRef sdRef,
 					   DNSServiceFlags flags,
 					   uint32_t interfaceIndex,

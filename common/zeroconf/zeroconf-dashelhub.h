@@ -37,14 +37,14 @@ namespace Aseba
 		//! descriptor associated with zdr.serviceref must be watched, to know when to
 		//! call DNSServiceProcessResult, which in turn calls the callback that was
 		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
 
 		//! From Dashel::Hub
 		void incomingData(Dashel::Stream *stream);
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.
-		// TODO: should be ZeroconfDiscoveryRequest& not DNSServiceRef
+		// TODO: should be DiscoveryRequest& not DNSServiceRef
 		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
 	};
 }

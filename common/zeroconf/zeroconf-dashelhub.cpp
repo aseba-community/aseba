@@ -28,7 +28,7 @@ namespace Aseba
 {
 	using namespace Dashel;
 
-	void DashelhubZeroconf::processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr)
+	void DashelhubZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		int socket = DNSServiceRefSockFD(zdr.serviceref);
 		if (socket != -1)
