@@ -64,12 +64,11 @@ namespace Aseba
 		{
 			Error(const std::string& what): std::runtime_error(what) {}
 		};
-//		typedef std::map<std::string, Zeroconf::Target*> NameTargetMap;
 
 	public:
 		virtual ~Zeroconf() = default;
 		
-		//! Aseba::Zeroconf is a container of targets
+		// Aseba::Zeroconf is a container of targets
 		virtual void erase(std::vector<Target>::iterator position) { targets.erase(position); }
 		virtual void clear() { targets.clear(); }
 		virtual bool empty() { return targets.empty(); }
@@ -79,11 +78,11 @@ namespace Aseba
 		virtual std::vector<Target>::iterator end() { return targets.end(); }
 		virtual std::vector<Target>::iterator find(const std::string & name);
 
-		//! Aseba::Zeroconf is a factory for creating and inserting targets
+		// Aseba::Zeroconf is a factory for creating and inserting targets
 		virtual Target& insert(const std::string & name, const int & port);
 		virtual Target& insert(const Dashel::Stream* dashelStream);
 
-		//! Aseba::Zeroconf can update its knowledge of non-local targets by browsing the network
+		// Aseba::Zeroconf can update its knowledge of non-local targets by browsing the network
 		virtual void browse();
 
 	protected:
@@ -104,19 +103,12 @@ namespace Aseba
 		class DiscoveryRequest
 		{
 		public:
-			DNSServiceRef serviceref{nullptr};
-			bool in_process{true}; //!< flag to signal when this request is no longer active
+			DNSServiceRef serviceRef{nullptr};
+			bool inProcess{true}; //!< flag to signal when this request is no longer active
+		
 		public:
-			virtual ~DiscoveryRequest()
-			{   // release the service reference
-				if (serviceref)
-					DNSServiceRefDeallocate(serviceref);
-				serviceref = 0;
-			}
-			virtual bool operator==(const DiscoveryRequest &other) const
-			{
-				return serviceref == other.serviceref;
-			}
+			~DiscoveryRequest();
+			bool operator==(const DiscoveryRequest &other) const;
 		};
 
 		DiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target

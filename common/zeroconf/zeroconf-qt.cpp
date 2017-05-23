@@ -29,7 +29,7 @@ namespace Aseba
 {
 	void QtZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
-		int socket = DNSServiceRefSockFD(zdr.serviceref);
+		int socket = DNSServiceRefSockFD(zdr.serviceRef);
 		if (socket != -1)
 		{
 			auto notifier = new QSocketNotifier(socket, QSocketNotifier::Read, this);
@@ -50,9 +50,9 @@ namespace Aseba
 
 	void QtZeroconf::incomingData(DiscoveryRequest & zdr)
 	{
-		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceref);
+		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);
 		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceref));
+			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceRef));
 	}
 
 } // namespace Aseba

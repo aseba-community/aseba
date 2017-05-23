@@ -81,12 +81,12 @@ namespace Aseba
 				std::lock_guard<std::recursive_mutex> locker(watcherLock);
 				for (auto const& zdr: zeroconfDRs)
 				{
-					int fd = DNSServiceRefSockFD(zdr->serviceref);
+					int fd = DNSServiceRefSockFD(zdr->serviceRef);
 					if (fd != -1)
 					{
 						max_fds = max_fds > fd ? max_fds : fd;
 						FD_SET(fd, &fds);
-						serviceFd[zdr->serviceref] = fd;
+						serviceFd[zdr->serviceRef] = fd;
 						fd_count++;
 					}
 				}
@@ -99,8 +99,8 @@ namespace Aseba
 					std::lock_guard<std::recursive_mutex> locker(watcherLock);
 
 					for (auto const& zdr: zeroconfDRs)
-						if (FD_ISSET(serviceFd[zdr->serviceref], &fds))
-							DNSServiceProcessResult(zdr->serviceref);
+						if (FD_ISSET(serviceFd[zdr->serviceRef], &fds))
+							DNSServiceProcessResult(zdr->serviceRef);
 					// unlock
 				}
 				else if (result < 0)

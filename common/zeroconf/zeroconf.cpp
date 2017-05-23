@@ -57,14 +57,28 @@ namespace Aseba
 			[&] (const Zeroconf::Target& t) { return t.name.find(name) == 0; }
 		);
 	}
+	
+	// Release the service reference
+	Zeroconf::DiscoveryRequest::~DiscoveryRequest()
+	{   
+		if (serviceRef)
+			DNSServiceRefDeallocate(serviceRef);
+		serviceRef = 0;
+	}
+	
+	//! Are the serviceRef equals?
+	bool Zeroconf::DiscoveryRequest::operator==(const DiscoveryRequest &other) const
+	{
+		return serviceRef == other.serviceRef;
+	}
 
 	// Overideable method to wait for responses from the DNS service.
 	// Basic behavior is to block until daemon replies.
-	// The serviceref is released by callbacks.
+	// The serviceRef is released by callbacks.
 	void Zeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
-		while (zdr.in_process) {
-			DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceref);
+		while (zdr.inProcess) {
+			DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);
 			if (err != kDNSServiceErr_NoError)
 				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult: error %0").arg(err));
 		}
@@ -77,7 +91,7 @@ namespace Aseba
 		uint16_t len = txt.size();
 		const char* record = txt.c_str();
 		target->zdr.~DiscoveryRequest();
-		auto err = DNSServiceRegister(&(target->zdr.serviceref),
+		auto err = DNSServiceRegister(&(target->zdr.serviceRef),
 					      0, // no flags
 					      0, // default all interfaces
 					      target->name.c_str(),
@@ -112,7 +126,7 @@ namespace Aseba
 
 			target->name = name;
 			target->domain = domain;
-			target->zdr.in_process = false;
+			target->zdr.inProcess = false;
 			target->registerCompleted();
 		}
 	}
@@ -121,7 +135,7 @@ namespace Aseba
 	void Zeroconf::updateTarget(const Zeroconf::Target * target, const TxtRecord& txtrec)
 	{
 		const string rawdata{txtrec.record()};
-		DNSServiceErrorType err = DNSServiceUpdateRecord(target->zdr.serviceref,
+		DNSServiceErrorType err = DNSServiceUpdateRecord(target->zdr.serviceRef,
 								 nullptr, // update primary TXT record
 								 0, // no flags
 								 rawdata.length(),
@@ -136,7 +150,7 @@ namespace Aseba
 	void Zeroconf::resolveTarget(Zeroconf::Target * target)
 	{
 		target->zdr.~DiscoveryRequest();
-		auto err = DNSServiceResolve(&(target->zdr.serviceref),
+		auto err = DNSServiceResolve(&(target->zdr.serviceRef),
 						 0, // no flags
 						 0, // default all interfaces
 						 target->name.c_str(),
@@ -175,7 +189,7 @@ namespace Aseba
 			for (auto const & field: tnew)
 				target->properties[field.first] = field.second;
 			target->properties["fullname"] = string(fullname);
-			target->zdr.in_process = false;
+			target->zdr.inProcess = false;
 			target->resolveCompleted();
 		}
 	}
@@ -189,7 +203,7 @@ namespace Aseba
 					     [](const Target& t) { return ! t.local; }),
 			      targets.end());
 		browseZDR.~DiscoveryRequest();
-		auto err = DNSServiceBrowse(&browseZDR.serviceref,
+		auto err = DNSServiceBrowse(&browseZDR.serviceRef,
 					    0, // no flags
 					    0, // default all interfaces
 					    "_aseba._tcp",
@@ -229,7 +243,7 @@ namespace Aseba
 			}
 			if ( ! (flags & kDNSServiceFlagsMoreComing))
 			{
-				zref->browseZDR.in_process = false;
+				zref->browseZDR.inProcess = false;
 				zref->browseAlreadyCompleted = true;
 				zref->browseCompleted();
 			}
