@@ -6,7 +6,7 @@ Released under LGPL3, see [license.txt](license.txt) for details.
 	
 Aseba means **a**ctuator and **s**ensor **e**vent-**b**ased **a**rchitecture.
 It is a set of tools which allow beginners to program robots easily and efficiently.
-For more information, see: http://aseba.wikidot.com
+For more information, see: https://www.thymio.org
 
 ## Supported platforms
 
@@ -18,7 +18,7 @@ The following platforms are supported:
 
 ## Use Aseba
 
-Informations on how to use Aseba is available on [http://aseba.wikidot.com](https://www.thymio.org/en:asebausermanual).
+Informations on how to use Aseba is available on [https://www.thymio.org](https://www.thymio.org/en:asebausermanual).
 
 If you use Aseba in an academic project leading to a publication, please cite:
 
