@@ -142,12 +142,12 @@ namespace Aseba
 	class Zeroconf::TargetInformation
 	{
 	public:
-		std::string name;
-		int port;
-		std::string domain{"local."};
-		std::string regtype{"_aseba._tcp"};
-		std::string host{"localhost"};
-		bool local{true};
+		std::string name; //!< the full name of this target
+		int port; //!< the Dashel target connection port
+		std::string domain{"local."}; //!< the domain of the host
+		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
+		std::string host{"localhost"}; //!< the Dashel target hostname
+		bool local{true}; //!< whether this host is local
 		
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 		
@@ -155,12 +155,13 @@ namespace Aseba
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashelStream);
 
-		virtual bool operator==(const TargetInformation &other) const
+		//! Are both name and domain equal?
+		bool operator==(const TargetInformation &other) const
 		{
 			return name == other.name && domain == other.domain;
 		}
-		
-		virtual bool operator<(const TargetInformation &other) const
+		//! Are this name and this port lower than other ones?
+		bool operator<(const TargetInformation &other) const
 		{
 			return name < other.name && port < other.port;
 		}
@@ -177,12 +178,12 @@ namespace Aseba
 		Target(const std::string & name, const int port, Zeroconf * container);
 		Target(const Dashel::Stream* dashelStream, Zeroconf * container);
 
-		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
-		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
-		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
-		virtual void registerCompleted() const; //!< Ask the containing Zeroconf to indicate that this register is completed
-		virtual void resolveCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
-		virtual void updateCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
+		void advertise(const TxtRecord& txtrec);
+		void updateTxtRecord(const TxtRecord& txtrec);
+		void resolve();
+		void registerCompleted() const;
+		void resolveCompleted() const;
+		void updateCompleted() const;
 
 	public:
 		DiscoveryRequest zdr; //!< Attached discovery request
