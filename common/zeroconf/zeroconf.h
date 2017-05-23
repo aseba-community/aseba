@@ -62,6 +62,8 @@ namespace Aseba
 //		typedef std::map<std::string, Zeroconf::Target*> NameTargetMap;
 
 	public:
+		virtual ~Zeroconf() = default;
+		
 		//! Aseba::Zeroconf is a container of targets
 		virtual void erase(std::vector<Target>::iterator position) { targets.erase(position); }
 		virtual void clear() { targets.clear(); }
@@ -81,9 +83,16 @@ namespace Aseba
 
 	protected:
 		std::vector<Target> targets; //!< the targets in this container
-		void registerTarget(Target * target, const TxtRecord& txtrec); //!< requested through target
-		void updateTarget(const Target * target, const TxtRecord& txtrec); //!< requested through target
-		void resolveTarget(Target * target); //!< requested through target
+		virtual void registerTarget(Target * target, const TxtRecord& txtrec); //!< requested through target
+		virtual void updateTarget(const Target * target, const TxtRecord& txtrec); //!< requested through target
+		virtual void resolveTarget(Target * target); //!< requested through target
+		
+		virtual void registerCompleted(const Aseba::Zeroconf::Target *) {} //!< called when a register is completed
+		virtual void resolveCompleted(const Aseba::Zeroconf::Target *) {} //!< called when a resolve is completed
+		virtual void updateCompleted(const Aseba::Zeroconf::Target *) {} //!< called when an update is completed
+		virtual void browseCompleted() {} //!< called when browsing is completed
+
+		bool browseAlreadyCompleted;
 
 	public:
 		//! An error in registering or browsing Zeroconf
@@ -115,16 +124,12 @@ namespace Aseba
 		ZeroconfDiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
 
 	protected:
-		//! Called when the browsing process is complete.
-		//! Can be overridden in derived classes to schedule an update to the UI.
-		virtual void browseComplete() {}
-
 		//! The discovery request can be processed immediately, or can be registered with
 		//! an event loop for asynchronous processing.
 		//! Can be overridden in derived classes to set up asynchronous processing.
 		virtual void processDiscoveryRequest(ZeroconfDiscoveryRequest & zdr);
 
-	private:
+	protected:
 		//! callbacks for the DNS Service Discovery API
 		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
@@ -145,7 +150,6 @@ namespace Aseba
 		std::string regtype{"_aseba._tcp"};
 		std::string host{"localhost"};
 		bool local{true};
-		
 	public:
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashel_stream);
@@ -156,6 +160,12 @@ namespace Aseba
 		{
 			return name == other.name && domain == other.domain;
 		}
+		
+		virtual bool operator<(const TargetInformation &other) const
+		{
+			return name < other.name && port < other.port;
+		}
+
 	};
 
 	/**
@@ -173,8 +183,11 @@ namespace Aseba
 		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
 		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
 		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
+		virtual void registerCompleted() const; //!< Ask the containing Zeroconf to indicate that this register is completed
+		virtual void resolveCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
+		virtual void updateCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
 
-	private:
+	protected:
 		friend Zeroconf;
 		Zeroconf * container; //!< Back reference to containing Aseba::Zeroconf object
 	};

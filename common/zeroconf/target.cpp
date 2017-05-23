@@ -60,4 +60,22 @@ namespace Aseba
 		container->resolveTarget(this);
 	}
 
+	//! Ask the containing Zeroconf to indicate that this register is completed
+	void Zeroconf::Target::registerCompleted() const
+	{
+		container->registerCompleted(this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::resolveCompleted() const
+	{
+		container->resolveCompleted(this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::updateCompleted() const
+	{
+		container->updateCompleted(this);
+	}
+
 } // namespace Aseba

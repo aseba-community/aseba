@@ -37,7 +37,7 @@ namespace Aseba
 	//! Create a target in the Zeroconf container, described by a name and a port
 	Zeroconf::Target& Zeroconf::insert(const std::string & name, const int & port)
 	{
-		targets.push_back({name,port});
+		targets.push_back({name, port});
 		targets.back().container = this;
 		return targets.back();
 	}
@@ -53,9 +53,11 @@ namespace Aseba
 	//! Search the Zeroconf container by human-readable target name
 	std::vector<Zeroconf::Target>::iterator Zeroconf::find(const std::string & name)
 	{
-		return find_if(targets.begin(),
-			       targets.end(),
-			       [&] (const Zeroconf::Target& t) { return t.name.find(name) == 0; } );
+		return find_if(
+			targets.begin(),
+			targets.end(),
+			[&] (const Zeroconf::Target& t) { return t.name.find(name) == 0; }
+		);
 	}
 
 	// Overideable method to wait for responses from the DNS service.
@@ -113,22 +115,23 @@ namespace Aseba
 			target->name = name;
 			target->domain = domain;
 			target->zdr.in_process = false;
+			target->registerCompleted();
 		}
 	}
-
 
 	//! A target can ask Zeroconf to update its TXT record
 	void Zeroconf::updateTarget(const Zeroconf::Target * target, const TxtRecord& txtrec)
 	{
 		const string rawdata{txtrec.record()};
 		DNSServiceErrorType err = DNSServiceUpdateRecord(target->zdr.serviceref,
-								 nullptr,
-								 0,
+								 nullptr, // update primary TXT record
+								 0, // no flags
 								 rawdata.length(),
 								 rawdata.c_str(),
 								 0);
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceUpdateRecord: error %0").arg(err));
+		target->updateCompleted();
 	}
 
 	//! A remote target can ask Zeroconf to resolve its host name and port
@@ -136,8 +139,8 @@ namespace Aseba
 	{
 		target->zdr.~ZeroconfDiscoveryRequest();
 		auto err = DNSServiceResolve(&(target->zdr.serviceref),
-						 kDNSServiceFlagsForceMulticast,
-						 0,
+						 0, // no flags
+						 0, // default all interfaces
 						 target->name.c_str(),
 						 target->regtype.c_str(),
 						 target->domain.c_str(),
@@ -175,12 +178,14 @@ namespace Aseba
 				target->properties[field.first] = field.second;
 			target->properties["fullname"] = string(fullname);
 			target->zdr.in_process = false;
+			target->resolveCompleted();
 		}
 	}
 
 	//! Update the set of known targets with remote ones found by browsing DNS
 	void Zeroconf::browse()
 	{
+		browseAlreadyCompleted = false;
 		// remove previously discovered targets
 		targets.erase(std::remove_if(targets.begin(),targets.end(),
 					     [](const Target& t) { return ! t.local; }),
@@ -207,22 +212,29 @@ namespace Aseba
 					   const char *name,
 					   const char *regtype,
 					   const char *domain,
-void *context)
+					   void *context)
 	{
 		if (errorCode != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceBrowseReply: error %0").arg(errorCode));
 		else
 		{
 			Zeroconf *zref = static_cast<Zeroconf *>(context);
+			if (zref->browseAlreadyCompleted)
+			{
+				throw Zeroconf::Error(FormatableString("DNSServiceBrowseReply: %0 arrived after browseCompleted()").arg(zref));
+			}
 			if (flags & kDNSServiceFlagsAdd)
 			{
 				auto it = zref->find(name);
-				auto target = (it == zref->targets.end()) ? zref->insert(string(name), 0) : *it; // since port==0 at creation it will be marked as nonlocal
+				auto& target = (it == zref->targets.end()) ? zref->insert(string(name), 0) : *it; // since port==0 at creation it will be marked as nonlocal
 				target.properties = { {"name",string(name)}, {"domain",string(domain)} };
 			}
 			if ( ! (flags & kDNSServiceFlagsMoreComing))
+			{
 				zref->browseZDR.in_process = false;
-				//zref->browseZDR = ZeroconfDiscoveryRequest{}; // erase serviceref and terminate browsing
+				zref->browseAlreadyCompleted = true;
+				zref->browseCompleted();
+			}
 		}
 	}
 
