@@ -215,10 +215,10 @@ namespace Aseba
 		TxtRecord(const unsigned char * txtRecord, uint16_t txtLen);
 		
 		// Different kinds of keys can be encoded into TXT records
-		virtual void assign(const std::string& key, const std::string& value);
-		virtual void assign(const std::string& key, const int value);
-		virtual void assign(const std::string& key, const std::vector<unsigned int>& values);
-		virtual void assign(const std::string& key, const bool value);
+		void assign(const std::string& key, const std::string& value);
+		void assign(const std::string& key, const int value);
+		void assign(const std::string& key, const std::vector<unsigned int>& values);
+		void assign(const std::string& key, const bool value);
 
 		const std::string at (const std::string& k) const { return fields.at(k); }
 		Fields::const_iterator begin() const { return fields.begin(); }
