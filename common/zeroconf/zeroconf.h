@@ -59,6 +59,11 @@ namespace Aseba
 		class TxtRecord;
 		class TargetInformation;
 		class Target;
+		//! An error in registering or browsing Zeroconf
+		struct Error: public std::runtime_error
+		{
+			Error(const std::string& what): std::runtime_error(what) {}
+		};
 //		typedef std::map<std::string, Zeroconf::Target*> NameTargetMap;
 
 	public:
@@ -93,13 +98,6 @@ namespace Aseba
 		virtual void browseCompleted() {} //!< called when browsing is completed
 
 		bool browseAlreadyCompleted;
-
-	public:
-		//! An error in registering or browsing Zeroconf
-		struct Error:public std::runtime_error
-		{
-			Error(const std::string& what): std::runtime_error(what) {}
-		};
 
 	protected:
 		//! Private class that encapsulates an active service request to the mDNS-SD daemon
@@ -176,10 +174,9 @@ namespace Aseba
 	class Zeroconf::Target: public Zeroconf::TargetInformation
 	{
 	public:
-		DiscoveryRequest zdr;
+		Target(const std::string & name, const int port, Zeroconf * container);
+		Target(const Dashel::Stream* dashelStream, Zeroconf * container);
 
-	public:
-		using TargetInformation::TargetInformation;
 		virtual void advertise(const TxtRecord& txtrec); //!< Inform the DNS service about this target
 		virtual void updateTxtRecord(const TxtRecord& txtrec); //!< Update this target's description in the DNS service
 		virtual void resolve(); //!< Ask the DNS service for the host name and port of this target
@@ -187,8 +184,10 @@ namespace Aseba
 		virtual void resolveCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
 		virtual void updateCompleted() const; //!< Ask the containing Zeroconf to indicate this resolve is completed
 
+	public:
+		DiscoveryRequest zdr; //!< Attached discovery request
+
 	protected:
-		friend Zeroconf;
 		Zeroconf * container; //!< Back reference to containing Aseba::Zeroconf object
 	};
 
@@ -207,24 +206,31 @@ namespace Aseba
 	class Zeroconf::TxtRecord
 	{
 	public:
+		//! The fields are contained as a map of strings to strings, the constraints are enforced through the assign functions.
+		using Fields = std::map<std::string, std::string>;
+		
+	public:
 		TxtRecord(const unsigned int protovers, const std::string& type, const std::vector<unsigned int>& ids, const std::vector<unsigned int>& pids);
 		TxtRecord(const std::string & txtRecord);
 		TxtRecord(const unsigned char * txtRecord, uint16_t txtLen);
-		//! Different kinds of keys can be encoded into TXT records
+		
+		// Different kinds of keys can be encoded into TXT records
 		virtual void assign(const std::string& key, const std::string& value);
 		virtual void assign(const std::string& key, const int value);
 		virtual void assign(const std::string& key, const std::vector<unsigned int>& values);
 		virtual void assign(const std::string& key, const bool value);
-		//! Retrieve the encoded TXT record
-		virtual std::string record() const;
 
-		virtual const std::string at (const std::string& k) const { return fields.at(k); }
-		virtual std::map<std::string, std::string>::iterator begin() { return fields.begin(); }
-		virtual std::map<std::string, std::string>::iterator end() { return fields.end(); }
+		const std::string at (const std::string& k) const { return fields.at(k); }
+		Fields::const_iterator begin() const { return fields.begin(); }
+		Fields::const_iterator end() const { return fields.end(); }
+
+		std::string record() const;
 
 	private:
-		std::map<std::string, std::string> fields;
-		virtual void serializeField(std::ostringstream& txt, const std::string& key) const; //!< serialize a field into the encoded TXT record
+		virtual void serializeField(std::ostringstream& txt, const std::string& key) const; 
+
+	private:
+		Fields fields;
 	};
 
 	/*@}*/

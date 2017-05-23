@@ -41,6 +41,22 @@ namespace Aseba
 		name("Aseba Local " + stream->getTargetParameter("port")),
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
+	
+	//! This target is described by a human-readable name and a port.
+	//! If a port is nonzero at creation then this is a local target to be remembered
+	//! otherwise it is a remote one discovered through browsing and may be refreshed.
+	//! Note that later the port will become nonzero if the target is resolved.
+	Zeroconf::Target::Target(const std::string & name, const int port, Zeroconf * container):
+		Zeroconf::TargetInformation(name, port),
+		container(container)
+	{}
+	
+	//! This target describes an existing Dashel stream
+	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
+	Zeroconf::Target::Target(const Dashel::Stream* dashelStream, Zeroconf * container):
+		Zeroconf::TargetInformation(dashelStream),
+		container(container)
+	{}
 
 	//! Ask the containing Zeroconf to register a target with the DNS service, now that its description is complete
 	void Zeroconf::Target::advertise(const TxtRecord& txtrec)

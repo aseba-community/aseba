@@ -37,16 +37,14 @@ namespace Aseba
 	//! Create a target in the Zeroconf container, described by a name and a port
 	Zeroconf::Target& Zeroconf::insert(const std::string & name, const int & port)
 	{
-		targets.emplace_back(name, port);
-		targets.back().container = this;
+		targets.emplace_back(name, port, this);
 		return targets.back();
 	}
 
 	//! Create a target in the Zeroconf container, described by a Dashel stream
 	Zeroconf::Target& Zeroconf::insert(const Dashel::Stream* dashelStream)
 	{
-		targets.emplace_back(dashelStream);
-		targets.back().container = this;
+		targets.emplace_back(dashelStream, this);
 		return targets.back();
 	}
 
