@@ -220,7 +220,7 @@ namespace Aseba
 		std::string record() const;
 
 	private:
-		virtual void serializeField(std::ostringstream& txt, const std::string& key) const; 
+		void serializeField(std::ostringstream& txt, const std::string& key) const;
 
 	private:
 		Fields fields;
