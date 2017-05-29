@@ -28,8 +28,6 @@
 #include "mainwindow.h"
 #include "dashelinterface.h"
 
-#include <mainwindow.moc>
-
 MainWindow::MainWindow( QWidget *parent) :
 	QWidget(parent)
 {

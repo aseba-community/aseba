@@ -26,8 +26,6 @@
 #include <QMessageBox>
 #include <QDebug>
 
-#include <dashelinterface.moc>
-
 
 DashelInterface::DashelInterface() :
 	stream(0), isRunning(false), isConnected(false)
