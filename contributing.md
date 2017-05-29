@@ -79,6 +79,11 @@ Do not use clever tricks, avoid over-design, do not be obsessed about pure objec
 Everything should be kept as simple as possible, but no simpler.
 This is a fundamental principle, and all new code should be kept with KISS—keep it simple, stupid—in mind.
 
+### File formats
+
+Source files must use Unix End-Of-Line characters (\n) and be encoded in UTF-8.
+Header files have included guards of the form `__FILE_NAME_H` for a file named `FileName.h`.
+
 ### Indentation
 
 Code should be indented by tabs.
