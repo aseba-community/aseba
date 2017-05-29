@@ -5,7 +5,7 @@
 project(aseba)
 
 # ensure a minimal version of CMake
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 2.8.12)
 
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
@@ -73,6 +73,17 @@ find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit O
 # Qwt
 find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
 find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
+
+# Zeroconf
+find_package(DNSSD)
+if (DNSSD_FOUND)
+	if(AVAHI_COMMON_LIBRARIES)
+		add_definitions(-DDNSSD_AVAHI)
+	endif(AVAHI_COMMON_LIBRARIES)
+	include_directories(${DNSSD_INCLUDE_DIRS})
+	find_package(Threads REQUIRED)
+	set(DNSSD_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
