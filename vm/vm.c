@@ -722,12 +722,35 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 /*! Reset all when flags in their default states in the bytecode */
 static void AsebaVMResetWhenFlags(AsebaVMState *vm)
 {
-	uint16_t i;
-	for (i = 0; i < vm->bytecodeSize; i++)
+	// start at the end of event vector table
+	const uint16_t eventVectSize = vm->bytecode[0];
+	uint16_t pc = eventVectSize*2 + 1;
+	while (pc < vm->bytecodeSize)
 	{
-		uint16_t bytecode = vm->bytecode[i];
-		if ((bytecode >> 12) == ASEBA_BYTECODE_CONDITIONAL_BRANCH)
-			BIT_CLR(vm->bytecode[i], ASEBA_IF_WAS_TRUE_BIT);
+		// Iterate through all bytecode, skipping multi-word instructions.
+		// Single-word instructions are commented-out and handled by the
+		// default case, but are written down for the sake of completeness.
+		switch (vm->bytecode[pc] >> 12)
+		{
+			//case ASEBA_BYTECODE_STOP:               pc += 1; break;
+			//case ASEBA_BYTECODE_SMALL_IMMEDIATE:    pc += 1; break;
+			  case ASEBA_BYTECODE_LARGE_IMMEDIATE:    pc += 2; break;
+			//case ASEBA_BYTECODE_LOAD:               pc += 1; break;
+			//case ASEBA_BYTECODE_STORE:              pc += 1; break;
+			  case ASEBA_BYTECODE_LOAD_INDIRECT:      pc += 2; break;
+			  case ASEBA_BYTECODE_STORE_INDIRECT:     pc += 2; break;
+			//case ASEBA_BYTECODE_UNARY_ARITHMETIC:   pc += 1; break;
+			//case ASEBA_BYTECODE_BINARY_ARITHMETIC:  pc += 1; break;
+			//case ASEBA_BYTECODE_JUMP:               pc += 1; break;
+			  case ASEBA_BYTECODE_CONDITIONAL_BRANCH: 
+				BIT_CLR(vm->bytecode[pc], ASEBA_IF_WAS_TRUE_BIT);
+			                                        pc += 2; break;
+			  case ASEBA_BYTECODE_EMIT:               pc += 3; break;
+			//case ASEBA_BYTECODE_NATIVE_CALL:        pc += 1; break;
+			//case ASEBA_BYTECODE_SUB_CALL:           pc += 1; break;
+			//case ASEBA_BYTECODE_SUB_RET:            pc += 1; break;
+			  default:                                pc += 1; break;
+		}
 	}
 }
 
