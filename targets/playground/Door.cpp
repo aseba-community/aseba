@@ -101,7 +101,7 @@ namespace Enki
 	
 	// AreaActivating
 	
-	AreaActivating::AreaActivating(Robot *owner, const Polygone& activeArea) :
+	AreaActivating::AreaActivating(Robot *owner, const Polygon& activeArea) :
 		activeArea(activeArea),
 		active(false)
 	{
@@ -129,7 +129,7 @@ namespace Enki
 	
 	// DoorButton
 	
-	DoorButton::DoorButton(const Point& pos, const Point& size, const Polygone& activeArea, Door* attachedDoor) :
+	DoorButton::DoorButton(const Point& pos, const Point& size, const Polygon& activeArea, Door* attachedDoor) :
 		areaActivating(this, activeArea),
 		wasActive(false),
 		attachedDoor(attachedDoor)

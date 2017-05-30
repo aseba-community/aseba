@@ -168,12 +168,12 @@ int main(int argc, char *argv[])
 	}
 	
 	// Scan for areas
-	typedef QMap<QString, Enki::Polygone> AreasMap;
+	typedef QMap<QString, Enki::Polygon> AreasMap;
 	AreasMap areasMap;
 	QDomElement areaE = domDocument.documentElement().firstChildElement("area");
 	while (!areaE.isNull())
 	{
-		Enki::Polygone p;
+		Enki::Polygon p;
 		QDomElement pointE = areaE.firstChildElement("point");
 		while (!pointE.isNull())
 		{
@@ -353,7 +353,7 @@ int main(int argc, char *argv[])
 			continue;
 		}
 		
-		const Enki::Polygone& area = *areasMap.find(activationE.attribute("area"));
+		const Enki::Polygon& area = *areasMap.find(activationE.attribute("area"));
 		Enki::Door* door = *doorsMap.find(activationE.attribute("door"));
 		
 		Enki::DoorButton* activation = new Enki::DoorButton(
