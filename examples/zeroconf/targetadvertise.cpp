@@ -69,7 +69,7 @@ namespace Aseba
 			{
 				zeroconf.insert(stream).advertise(txt);
 			}
-			catch (runtime_error(e))
+			catch (const runtime_error& e)
 			{
 				cerr << "Can't advertise stream " << stream->getTargetName() << " (" << join(names," ") << "): " << e.what() << endl;
 			}
