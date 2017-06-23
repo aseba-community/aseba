@@ -79,6 +79,21 @@ Do not use clever tricks, avoid over-design, do not be obsessed about pure objec
 Everything should be kept as simple as possible, but no simpler.
 This is a fundamental principle, and all new code should be kept with KISS—keep it simple, stupid—in mind.
 
+### Pointers, references and ownership
+
+Please follow as much as possible the [resource acquisition is initialization](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) programming idiom.
+Whenever possible, use simple to understand and exception-safe ownership, such as `std::unique_ptr<T>`.
+When passing objects to non-owning classes and methods, use a reference if the object cannot be `nullptr`, or a normal pointer if it can.
+If a reference cannot be used because the target objects might be copyable, use `std::reference_wrapper<T>`.
+Use STL containers as much as possible, and avoid duplicating the information whenever possible.
+
+### Class hierarchy and inheritance
+
+Use simple and clean class hierarchy whenever possible, use virtual inheritance only in the last resort.
+If a member can simply be accessed as public, let it so, do not put it private and add accessors.
+Always put a virtual destructor in base classes having virtual members, you can generate the default one using `virtual ~C() = default;`.
+Always use `virtual` and `override` keywords for inherited virtual methods.
+
 ### File formats
 
 Source files must use Unix End-Of-Line characters (\n) and be encoded in UTF-8.
