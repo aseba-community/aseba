@@ -34,27 +34,26 @@ namespace Aseba
 	class ThreadZeroconf : public Zeroconf
 	{
 	public:
-		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
-		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
-		~ThreadZeroconf(); // needed to terminate thread
+		virtual ~ThreadZeroconf() override;
 
-		void browse();
 		void run();
 
 	protected:
-		//! Set up function called after a discovery request has been made. The file
-		//! descriptor associated with zdr.serviceref must be watched, to know when to
-		//! call DNSServiceProcessResult, which in turn calls the callback that was
-		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
-		virtual void eraseDiscoveryRequest(DiscoveryRequest & zdr);
+		// From Zeroconf
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
+		//virtual void eraseDiscoveryRequest(DiscoveryRequest & zdr) override;
+
+	protected:
+		void handleDnsServiceEvents();
 
 	private:
+		//! all the requests we are handling
 		std::set<DiscoveryRequest *> zeroconfDRs;
-	private:
-		void handleDnsServiceEvents(); //! run the handleDSEvents_thread
-		std::recursive_mutex watcherLock;
-		std::exception_ptr watcherException{nullptr};
+		// threading support
+		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
+		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
+		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs
+		std::exception_ptr watcherException{nullptr}; //!< pointer to rethrow exceptions in the outer thread
 	};
 }
 

@@ -29,11 +29,11 @@ int main(int argc, char* argv[])
 #endif // DNSSD_AVAHI
 
 	// Browse for _aseba._tcp services on all interfaces
-	Aseba::Zeroconf zs;
-	zs.browse();
+	Aseba::Zeroconf zeroconf;
+	zeroconf.browse();
 
 	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-	for (auto & target: zs)
+	for (auto & target: zeroconf.targets)
 	{
 		// Resolve the host name and port of this target, retrieve TXT record
 		target.resolve();

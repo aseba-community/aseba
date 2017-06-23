@@ -28,6 +28,10 @@ namespace Aseba
 {
 	using namespace Dashel;
 
+	//! Set up function called after a discovery request has been made. The file
+	//! descriptor associated with zdr.serviceref must be watched, to know when to
+	//! call DNSServiceProcessResult, which in turn calls the callback that was
+	//! registered with the discovery request.
 	void DashelhubZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		int socket = DNSServiceRefSockFD(zdr.serviceRef);
@@ -37,11 +41,6 @@ namespace Aseba
 			if (auto stream = connect(dashelTarget))
 				zeroconfStreams[stream] = zdr.serviceRef;
 		}
-	}
-
-	void DashelhubZeroconf::browse()
-	{
-		Zeroconf::browse();
 	}
 
 	void DashelhubZeroconf::incomingData(Dashel::Stream *stream)

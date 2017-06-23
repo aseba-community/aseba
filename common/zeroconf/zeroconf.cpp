@@ -37,19 +37,19 @@ namespace Aseba
 	//! Create a target in the Zeroconf container, described by a name and a port
 	Zeroconf::Target& Zeroconf::insert(const std::string & name, const int & port)
 	{
-		targets.emplace_back(name, port, this);
+		targets.push_back(Target(name, port, *this));
 		return targets.back();
 	}
 
 	//! Create a target in the Zeroconf container, described by a Dashel stream
 	Zeroconf::Target& Zeroconf::insert(const Dashel::Stream* dashelStream)
 	{
-		targets.emplace_back(dashelStream, this);
+		targets.push_back(Target(dashelStream, *this));
 		return targets.back();
 	}
 
 	//! Search the Zeroconf container by human-readable target name
-	std::vector<Zeroconf::Target>::iterator Zeroconf::find(const std::string & name)
+	Zeroconf::Targets::iterator Zeroconf::find(const std::string & name)
 	{
 		return find_if(
 			targets.begin(),
@@ -77,7 +77,8 @@ namespace Aseba
 	// The serviceRef is released by callbacks.
 	void Zeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
-		while (zdr.inProcess) {
+		while (zdr.inProcess)
+		{
 			DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);
 			if (err != kDNSServiceErr_NoError)
 				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult: error %0").arg(err));
@@ -85,28 +86,28 @@ namespace Aseba
 	}
 
 	//! A target can ask Zeroconf to register it in DNS, with additional information in a TXT record
-	void Zeroconf::registerTarget(Zeroconf::Target * target, const TxtRecord& txtrec)
+	void Zeroconf::registerTarget(Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
 		string txt{txtrec.record()};
 		uint16_t len = txt.size();
 		const char* record = txt.c_str();
-		target->zdr.~DiscoveryRequest();
-		auto err = DNSServiceRegister(&(target->zdr.serviceRef),
+		target.zdr.~DiscoveryRequest();
+		auto err = DNSServiceRegister(&(target.zdr.serviceRef),
 					      0, // no flags
 					      0, // default all interfaces
-					      target->name.c_str(),
+					      target.name.c_str(),
 					      "_aseba._tcp",
 					      nullptr, // use default domain, usually "local."
 					      nullptr, // use this host name
-					      htons(target->port),
+					      htons(target.port),
 					      len, // TXT length
 					      record, // TXT record
 					      cb_Register,
-					      target); // context pointer is Zeroconf::Target object
+					      &target); // context pointer is Zeroconf::Target object
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
 		else
-			processDiscoveryRequest(target->zdr);
+			processDiscoveryRequest(target.zdr);
 	}
 
 	//! DNSSD callback for registerTarget, update Zeroconf::Target record with results of registration
@@ -132,10 +133,10 @@ namespace Aseba
 	}
 
 	//! A target can ask Zeroconf to update its TXT record
-	void Zeroconf::updateTarget(const Zeroconf::Target * target, const TxtRecord& txtrec)
+	void Zeroconf::updateTarget(const Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
 		const string rawdata{txtrec.record()};
-		DNSServiceErrorType err = DNSServiceUpdateRecord(target->zdr.serviceRef,
+		DNSServiceErrorType err = DNSServiceUpdateRecord(target.zdr.serviceRef,
 								 nullptr, // update primary TXT record
 								 0, // no flags
 								 rawdata.length(),
@@ -143,25 +144,25 @@ namespace Aseba
 								 0);
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceUpdateRecord: error %0").arg(err));
-		target->updateCompleted();
+		target.updateCompleted();
 	}
 
 	//! A remote target can ask Zeroconf to resolve its host name and port
-	void Zeroconf::resolveTarget(Zeroconf::Target * target)
+	void Zeroconf::resolveTarget(Zeroconf::Target & target)
 	{
-		target->zdr.~DiscoveryRequest();
-		auto err = DNSServiceResolve(&(target->zdr.serviceRef),
+		target.zdr.~DiscoveryRequest();
+		auto err = DNSServiceResolve(&(target.zdr.serviceRef),
 						 0, // no flags
 						 0, // default all interfaces
-						 target->name.c_str(),
-						 target->regtype.c_str(),
-						 target->domain.c_str(),
+						 target.name.c_str(),
+						 target.regtype.c_str(),
+						 target.domain.c_str(),
 						 cb_Resolve,
-						 target);
+						 &target);
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceQueryRecord: error %0").arg(err));
 		else
-			processDiscoveryRequest(target->zdr);
+			processDiscoveryRequest(target.zdr);
 	}
 
 	//! DNSSD callback for resolveTarget, update Zeroconf::Target record with results of lookup

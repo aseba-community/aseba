@@ -27,6 +27,10 @@ using namespace std;
 
 namespace Aseba
 {
+	//! Set up function called after a discovery request has been made. The file
+	//! descriptor associated with zdr.serviceref must be watched, to know when to
+	//! call DNSServiceProcessResult, which in turn calls the callback that was
+	//! registered with the discovery request.
 	void QtZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		int socket = DNSServiceRefSockFD(zdr.serviceRef);
@@ -38,16 +42,41 @@ namespace Aseba
 		}
 	}
 
-	void QtZeroconf::browse()
+	//! Emit signal when register completed.
+	//! If you override this method you take responsibility for emitting signals as you see fit.
+	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::Target & target)
 	{
-		Zeroconf::browse();
+		emit zeroconfRegisterCompleted(target);
 	}
 
+	//! Emit signal when resolve completed.
+	//! If you override this method you take responsibility for emitting signals as you see fit.
+	void QtZeroconf::resolveCompleted(const Aseba::Zeroconf::Target & target)
+	{
+		emit zeroconfResolveCompleted(target);
+	}
+
+	//! Emit signal when update completed.
+	//! If you override this method you take responsibility for emitting signals as you see fit.
+	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::Target & target)
+	{
+		emit zeroconfUpdateCompleted(target);
+	}
+
+	//! Emit signal when browse completed.
+	//! If you override this method you take responsibility for emitting signals as you see fit.
+	void QtZeroconf::browseCompleted()
+	{
+		emit zeroconfBrowseCompleted();
+	}
+
+	//! Data are available on a zeroconf socket
 	void QtZeroconf::doIncoming(int socket)
 	{
 		incomingData(zeroconfSockets.at(socket).first);
 	}
 
+	//! Process incoming data associated to a discovery request
 	void QtZeroconf::incomingData(DiscoveryRequest & zdr)
 	{
 		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);

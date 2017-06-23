@@ -33,52 +33,31 @@ namespace Aseba
 	{
 		Q_OBJECT
 
-	public:
-		void browse();
-
 	signals:
 		void zeroconfBrowseCompleted(); //!< emitted when browsing is completed
-		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation&); //!< emitted when a register is completed
-		void zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation&); //!< emitted when a resolve is completed
-		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation&); //!< emitted when an update is completed
-
-	protected:
-		//! Set up function called after a discovery request has been made. The file
-		//! descriptor associated with zdr.serviceref must be watched, to know when to
-		//! call DNSServiceProcessResult, which in turn calls the callback that was
-		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
-		virtual void incomingData(DiscoveryRequest & zdr);
-
-		//! Emit signal when register completed. If you override this method you take responsibility for emitting signals as you see fit.
-		void registerCompleted(const Aseba::Zeroconf::Target * target)
-		{
-			emit zeroconfRegisterCompleted(*target);
-		}
-		//! Emit signal when resolve completed. If you override this method you take responsibility for emitting signals as you see fit.
-		void resolveCompleted(const Aseba::Zeroconf::Target * target)
-		{
-			emit zeroconfResolveCompleted(*target);
-		}
-		//! Emit signal when update completed. If you override this method you take responsibility for emitting signals as you see fit.
-		void updateCompleted(const Aseba::Zeroconf::Target * target)
-		{
-			emit zeroconfUpdateCompleted(*target);
-		}
-		//! Emit signal when browse completed. If you override this method you take responsibility for emitting signals as you see fit.
-		void browseCompleted()
-		{
-			emit zeroconfBrowseCompleted();
-		}
+		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
+		void zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a resolve is completed
+		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
 
 	protected slots:
 		void doIncoming(int socket);
 
-	private:
-		//! Collection of QSocketNotifier that watch the serviceref file descriptors.
-		typedef std::pair<DiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
-		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
+	protected:
+		// From Zeroconf
+		virtual void registerCompleted(const Aseba::Zeroconf::Target & target) override;
+		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override;
+		virtual void updateCompleted(const Aseba::Zeroconf::Target & target) override;
+		virtual void browseCompleted() override;
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
 
+	protected:
+		void incomingData(DiscoveryRequest & zdr);
+
+	private:
+		//! A discovery request and its associated QSocketNotifier to connect to Qt's event loop
+		typedef std::pair<DiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
+		//! A collection of QSocketNotifier that watch the serviceref file descriptors.
+		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
 	};
 
 }

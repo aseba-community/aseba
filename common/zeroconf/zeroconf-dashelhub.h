@@ -30,17 +30,12 @@ namespace Aseba
 	//! processing as necessary.
 	class DashelhubZeroconf : public Zeroconf, public Dashel::Hub
 	{
-	public:
-		void browse();
 	protected:
-		//! Set up function called after a discovery request has been made. The file
-		//! descriptor associated with zdr.serviceref must be watched, to know when to
-		//! call DNSServiceProcessResult, which in turn calls the callback that was
-		//! registered with the discovery request.
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
+		// From Zeroconf
+		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
 
-		//! From Dashel::Hub
-		void incomingData(Dashel::Stream *stream);
+		// From Dashel::Hub
+		virtual void incomingData(Dashel::Stream *stream) override;
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.

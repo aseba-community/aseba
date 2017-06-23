@@ -29,17 +29,14 @@ namespace Aseba
 {
 	using namespace Dashel;
 
+	//! Destructor, need to terminate the thread
 	ThreadZeroconf::~ThreadZeroconf()
 	{
 		running = false;
 		watcher.join(); // tell watcher to stop, to avoid std::terminate
 	}
 
-	void ThreadZeroconf::browse()
-	{
-		Zeroconf::browse();
-	}
-
+	//! Wait for the watcher thread to complete, rethrowing exceptions
 	void ThreadZeroconf::run()
 	{
 		watcher.join();
@@ -47,18 +44,23 @@ namespace Aseba
 			std::rethrow_exception(watcherException);
 	}
 
+	//! Set up function called after a discovery request has been made. The file
+	//! descriptor associated with zdr.serviceref must be watched, to know when to
+	//! call DNSServiceProcessResult, which in turn calls the callback that was
+	//! registered with the discovery request.
 	void ThreadZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.insert(&zdr);
 	}
 
-	void ThreadZeroconf::eraseDiscoveryRequest(DiscoveryRequest & zdr)
+	/*void ThreadZeroconf::eraseDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		std::lock_guard<std::recursive_mutex> locker(watcherLock);
 		zeroconfDRs.erase(zeroconfDRs.find(&zdr));
-	}
+	}*/
 
+	//! Run the handleDSEvents_thread
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{
 		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)
@@ -91,7 +93,7 @@ namespace Aseba
 					}
 				}
 			}// unlock
-			int result = select(max_fds+1, &fds, (fd_set*)NULL, (fd_set*)NULL, &tv);
+			int result = select(max_fds+1, &fds, (fd_set*)nullptr, (fd_set*)nullptr, &tv);
 			try {
 				if (result > 0)
 				{

@@ -19,6 +19,8 @@
 */
 
 #include <iostream>
+#include <functional>
+#include <unordered_set>
 #include "../../common/utils/utils.h"
 #include "../../common/zeroconf/zeroconf-thread.h"
 
@@ -28,26 +30,26 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
-		set<const Aseba::Zeroconf::Target*> todo;
+		unordered_set<reference_wrapper<const Aseba::Zeroconf::Target>> todo;
 
-		void browseCompleted()
+		virtual void browseCompleted() override
 		{
 			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
 			for (auto & target: targets)
 			{
-				todo.insert(&target);
+				todo.insert(target);
 				// Resolve the host name and port of this target, retrieve TXT record
 				target.resolve();
 			}
 		}
 
-		void resolveCompleted(const Aseba::Zeroconf::Target * target)
+		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
-			cout << target->host << ";port=" << target->port;
-			cout << " [" << target->name << " (" << target->regtype+"."+target->domain << ")]" << endl;
+			cout << target.host << ";port=" << target.port;
+			cout << " [" << target.name << " (" << target.regtype + "." + target.domain << ")]" << endl;
 			// also output properties, typically the DNS-encoded full host name and fields from TXT record
-			for (auto const& field: target->properties)
+			for (auto const& field: target.properties)
 			{
 				cout << "\t" << field.first << ":";
 				// ids and pids are a special case because they contain vectors of 16-bit integers
@@ -70,7 +72,8 @@ namespace Aseba
 				sleep.sleep();
 			} while (todo.size() > 0);
 		}
-		void browse()
+
+		virtual void browse() override
 		{
 			ThreadZeroconf::browse();
 		}
