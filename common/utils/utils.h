@@ -28,6 +28,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <cmath>
 #include "../types.h"
 
 namespace Aseba
@@ -65,6 +66,18 @@ namespace Aseba
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
+	
+	//! Hash references to T using their underlying pointer
+	template<typename T>
+	struct PointerHash
+	{
+		//! Use the pointer shifted right by the number of 0 LSB
+		size_t operator()(const T& value) const
+		{
+			static const size_t shift = (size_t)std::log2(1 + sizeof(&value));
+			return (size_t)(&value) >> shift;
+		}
+	};
 	
 	//! Time or durations, in milliseconds
 	struct UnifiedTime
@@ -182,5 +195,19 @@ namespace Aseba
 	/*@}*/
 	
 };
+
+namespace std
+{
+	//! Generic hash for reference_wrapper
+	template<typename T>
+	struct hash<reference_wrapper<T>>
+	{
+		//! Hashes the reference to the underlying value
+		size_t operator()(const reference_wrapper<T>& r) const
+		{
+			return std::hash<T>()(r.get());
+		}
+	};
+}
 
 #endif
