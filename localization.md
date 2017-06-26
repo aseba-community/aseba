@@ -15,7 +15,7 @@ Here are the steps to help us:
 ### Your language is German, Spanish, Greek, French, Italian, Japanese or Chinese
 
 In that case, the translation files already exist.
-To modify the translation, first [fork the Aseba repository](https://github.com/aseba-community/aseba#fork-destination-box).
+To modify the translation, first [fork the Aseba repository](https://github.com/aseba-community/aseba#fork-destination-box) ([understand github forking](https://help.github.com/articles/fork-a-repo/)).
 Then, modify the relevant file, these are:
 * For Studio: `clients/studio/asebastudio_LL.ts` and `clients/studio/compiler_LL.ts`
 * For Thymio Firmware Updater: `clients/thymioupgrader/thymioupgrader_LL.ts`
