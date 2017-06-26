@@ -16,7 +16,7 @@ Here are the steps to help us:
 
 In that case, the translation files already exist.
 To modify the translation, first [fork the Aseba repository](https://github.com/aseba-community/aseba#fork-destination-box) ([understand github forking](https://help.github.com/articles/fork-a-repo/)).
-Then, modify the relevant file, these are:
+Then, modify the relevant files, these are:
 * For Studio: `clients/studio/asebastudio_LL.ts` and `clients/studio/compiler_LL.ts`
 * For Thymio Firmware Updater: `clients/thymioupgrader/thymioupgrader_LL.ts`
 * For Thymio Wireless Configurator: `clients/thymiownetconfig/thymiownetconfig_LL.ts`
@@ -28,7 +28,7 @@ Then, submit a [pull request](https://help.github.com/articles/about-pull-reques
 ### Your language is a new one
 
 Please open an [new issue](https://github.com/aseba-community/aseba/issues/new) requesting the addition of your language.
-Once the issue is processed, follow the instruction above.
+Once the issue is processed, follow the instructions above.
 
 ### Useful Resources
 
