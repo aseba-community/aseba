@@ -39,8 +39,7 @@ namespace Aseba
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.
-		// TODO: should be DiscoveryRequest& not DNSServiceRef
-		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
+		std::map<Dashel::Stream *, std::reference_wrapper<DiscoveryRequest>> zeroconfStreams;
 	};
 }
 

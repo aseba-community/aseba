@@ -39,7 +39,7 @@ namespace Aseba
 		{
 			string dashelTarget = FormatableString("tcppoll:sock=%0").arg(socket);
 			if (auto stream = connect(dashelTarget))
-				zeroconfStreams[stream] = zdr.serviceRef;
+				zeroconfStreams.emplace(stream, ref(zdr));
 		}
 	}
 
@@ -47,7 +47,7 @@ namespace Aseba
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
-			auto serviceRef = zeroconfStreams[stream];
+			auto serviceRef = zeroconfStreams.at(stream).get().serviceRef;
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
 				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
