@@ -37,6 +37,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "Options:\n";
 	stream << "-v, --verbose   : makes the switch verbose\n";
 	stream << "-p, --port port : listens to incoming connection HTTP on this port\n";
+	stream << "--doc dir       : also serves static files in directory dir\n";
 	stream << "-K, --Kiter n   : run I/O loop n thousand times (for profiling)\n";
 	stream << "-h, --help      : shows this help\n";
 	stream << "-V, --version   : shows the version number\n";
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 	std::vector < std::string > dashelTargetList;
 	bool verbose = false;
 	int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
+	char const *docRoot = nullptr;
 
 	// process command line
 	int argCounter = 1;
@@ -71,6 +73,7 @@ int main(int argc, char *argv[])
 		else if((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0)) dumpHelp(std::cout, argv[0]), exit(1);
 		else if((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0)) dumpVersion (std::cout), exit(1);
 		else if((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0)) httpPort = argv[argCounter++];
+		else if(strcmp(arg, "--doc") == 0) docRoot = argv[argCounter++];
 		else if((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0)) Kiterations = atoi(argv[argCounter++]);
 		else if(strncmp(arg, "-", 1) != 0) dashelTargetList.push_back(arg);
 	}
@@ -82,6 +85,10 @@ int main(int argc, char *argv[])
 	try {
 		std::auto_ptr<Aseba::Http::HttpInterface> interface(new Aseba::Http::HttpInterface(httpPort));
 		interface->setVerbose(verbose);
+
+		if (docRoot != nullptr) {
+			interface->setDocumentRoot(docRoot);
+		}
 
 		int numTargets = (int) dashelTargetList.size();
 		for(int i = 0; i < numTargets; i++) {

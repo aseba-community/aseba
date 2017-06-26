@@ -118,6 +118,20 @@ namespace Aseba { namespace Http
 			virtual void setVerbose(bool verbose) { this->verbose = verbose; }
 			virtual bool isVerbose() const { return verbose; }
 
+			virtual void setDocumentRoot(const std::string &docRoot) {
+				this->docRoot = docRoot;
+				if (docRoot.length() > 0 && docRoot.back() != '/')
+					this->docRoot += "/";
+				this->serveLocalFiles = true;
+			}
+
+			virtual std::string prependDocumentRoot(std::string &filename) const {
+				std::string path;
+				if (serveLocalFiles)
+					path = docRoot + filename;
+				return path;
+			}
+
 			/**
 			 * Runs the current AESL program for the interface by compiling all the code entries for matching nodes on the
 			 * network and running them. In case false is returned on failure, errorString will contain a description of the
@@ -153,6 +167,8 @@ namespace Aseba { namespace Http
 
 		private:
 			bool verbose;
+			bool serveLocalFiles;	// true to also serve local files in docRoot
+			std::string docRoot;
 			AeslProgram program;
 			Dashel::Stream *httpStream;
 			std::map<Dashel::Stream *, HttpConnection> httpConnections;
