@@ -31,6 +31,10 @@ namespace Aseba
 {
 	//! Run a thread to watch the DNS Service for updates, and trigger callback
 	//! processing as necessary.
+	//! This class creates a thread processing zeroconf requests in background
+	//! until this object is destroyed.
+	//! Completion callbacks such as browseCompleted are called within the background
+	//! thread with the watcherLock held.
 	class ThreadZeroconf : public Zeroconf
 	{
 	public:
