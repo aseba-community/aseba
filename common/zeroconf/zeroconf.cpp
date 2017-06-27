@@ -127,6 +127,7 @@ namespace Aseba
 
 			target->name = name;
 			target->domain = domain;
+			target->regtype = regtype;
 			target->zdr.inProcess = false;
 			target->registerCompleted();
 		}

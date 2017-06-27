@@ -137,12 +137,15 @@ namespace Aseba
 	class Zeroconf::TargetInformation
 	{
 	public:
+		// unique identification of a target information
 		std::string name; //!< the full name of this target
-		int port; //!< the Dashel target connection port
 		std::string domain{"local."}; //!< the domain of the host
 		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
-		std::string host{"localhost"}; //!< the Dashel target hostname
+
+		// additional metadata about this target after resolution
 		bool local{true}; //!< whether this host is local
+		std::string host; //!< the Dashel target connection port
+		int port; //!< the Dashel target connection port
 
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
@@ -150,15 +153,23 @@ namespace Aseba
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashelStream);
 
-		//! Are both name and domain equal?
+		//! Are all fields equal?
 		bool operator==(const TargetInformation &other) const
 		{
-			return name == other.name && domain == other.domain;
+			return
+				name == other.name &&
+				domain == other.domain &&
+				regtype == other.regtype
+			;
 		}
-		//! Are this name and this port lower than other ones?
+		//! Are all fields of this lower than fileds of that, in order?
 		bool operator<(const TargetInformation &other) const
 		{
-			return name < other.name && port < other.port;
+			return
+				name < other.name &&
+				domain < other.domain &&
+				regtype < other.regtype
+			;
 		}
 	};
 
