@@ -47,6 +47,7 @@ namespace Aseba
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
+			const char status = stream->read<char>();
 			auto serviceRef = zeroconfStreams.at(stream).get().serviceRef;
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
