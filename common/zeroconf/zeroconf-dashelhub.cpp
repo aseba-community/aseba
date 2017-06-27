@@ -18,6 +18,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "../consts.h"
 #include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include "zeroconf-dashelhub.h"
@@ -54,6 +55,7 @@ namespace Aseba
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
 			const char status = stream->read<char>();
+			ASEBA_UNUSED(status);
 			auto serviceRef = zeroconfStreams.at(stream).get().serviceRef;
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
