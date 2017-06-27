@@ -36,6 +36,7 @@ namespace Aseba
 
 		// From Dashel::Hub
 		virtual void incomingData(Dashel::Stream *stream) override;
+		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal) override;
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.

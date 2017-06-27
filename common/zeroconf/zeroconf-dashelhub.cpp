@@ -54,4 +54,9 @@ namespace Aseba
 		}
 	}
 
+	void DashelhubZeroconf::connectionClosed(Stream * stream, bool abnormal)
+	{
+		zeroconfStreams.erase(stream);
+	}
+
 } // namespace Aseba
