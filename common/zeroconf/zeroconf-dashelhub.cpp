@@ -28,6 +28,11 @@ namespace Aseba
 {
 	using namespace Dashel;
 
+	//! Constructor, taking a reference to a Dashel::Hub
+	DashelhubZeroconf::DashelhubZeroconf(Hub& hub):
+		hub(hub)
+	{}
+
 	//! Set up function called after a discovery request has been made. The file
 	//! descriptor associated with zdr.serviceref must be watched, to know when to
 	//! call DNSServiceProcessResult, which in turn calls the callback that was
@@ -38,12 +43,13 @@ namespace Aseba
 		if (socket != -1)
 		{
 			string dashelTarget = FormatableString("tcppoll:sock=%0").arg(socket);
-			if (auto stream = connect(dashelTarget))
+			if (auto stream = hub.connect(dashelTarget))
 				zeroconfStreams.emplace(stream, ref(zdr));
 		}
 	}
 
-	void DashelhubZeroconf::incomingData(Dashel::Stream *stream)
+	//! Check if data were coming on one of our streams, and if so process
+	void DashelhubZeroconf::dashelIncomingData(Dashel::Stream * stream)
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
@@ -55,7 +61,8 @@ namespace Aseba
 		}
 	}
 
-	void DashelhubZeroconf::connectionClosed(Stream * stream, bool abnormal)
+	//! Check if one of our streams was disconnected, and if so take note
+	void DashelhubZeroconf::dashelConnectionClosed(Stream * stream)
 	{
 		zeroconfStreams.erase(stream);
 	}

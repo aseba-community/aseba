@@ -28,19 +28,24 @@ namespace Aseba
 {
 	//! Use the Dashel run loop to watch the DNS Service for updates, and trigger callback
 	//! processing as necessary.
-	class DashelhubZeroconf : public Zeroconf, public Dashel::Hub
+	class DashelhubZeroconf : public Zeroconf
 	{
+	public:
+		DashelhubZeroconf(Dashel::Hub& hub);
+
+		// To be called from similar functions in Dashel::Hub
+		void dashelIncomingData(Dashel::Stream * stream);
+		void dashelConnectionClosed(Dashel::Stream * stream);
+
 	protected:
 		// From Zeroconf
 		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
 
-		// From Dashel::Hub
-		virtual void incomingData(Dashel::Stream *stream) override;
-		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal) override;
-
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.
 		std::map<Dashel::Stream *, std::reference_wrapper<DiscoveryRequest>> zeroconfStreams;
+		//! Reference to the hub to create connections from processDiscoveryRequest
+		Dashel::Hub& hub;
 	};
 }
 

@@ -30,10 +30,22 @@ namespace Aseba
 	using namespace Dashel;
 	using namespace std;
 
-	class TargetLister : public DashelhubZeroconf
+	class TargetLister : public Dashel::Hub, public DashelhubZeroconf
 	{
 		unordered_set<reference_wrapper<const Aseba::Zeroconf::Target>> todo;
 
+		// from Dashel::Hub
+		virtual void incomingData(Dashel::Stream *stream) override
+		{
+			dashelIncomingData(stream);
+		}
+
+		virtual void connectionClosed(Stream * stream, bool abnormal) override
+		{
+			dashelConnectionClosed(stream);
+		}
+
+		// from DashelhubZeroconf
 		virtual void browseCompleted() override
 		{
 			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
@@ -66,6 +78,11 @@ namespace Aseba
 		}
 
 	public:
+		// Constructor, register self
+		TargetLister():
+			DashelhubZeroconf(static_cast<Dashel::Hub&>(*this))
+		{}
+
 		void run()
 		{
 			do
