@@ -83,6 +83,7 @@ if (DNSSD_FOUND)
 	include_directories(${DNSSD_INCLUDE_DIRS})
 	find_package(Threads REQUIRED)
 	set(DNSSD_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	add_definitions(-DZEROCONF_SUPPORT)
 endif()
 
 # Aseba itself

@@ -27,6 +27,9 @@
 #include "../../common/productids.h"
 #include "../../common/consts.h"
 #include "../../common/utils/utils.h"
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#endif // ZEROCONF_SUPPORT
 #include "../../transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <iostream>
@@ -62,10 +65,17 @@ public:
 	Dashel::Stream* stream;
 	// all streams that must be disconnected at next step
 	std::vector<Dashel::Stream*> toDisconnect;
-	
+#ifdef ZEROCONF_SUPPORT
+	// to advertise
+	Aseba::DashelhubZeroconf zeroconf;
+#endif // ZEROCONF_SUPPORT
+
 public:
 	
 	AsebaNode()
+#ifdef ZEROCONF_SUPPORT
+		:zeroconf(*this)
+#endif // ZEROCONF_SUPPORT
 	{
 		// setup variables
 		vm.nodeId = 1;
@@ -88,14 +98,14 @@ public:
 		strncpy(mutableName, "dummynode-0", 12);
 		mutableName[10] = '0' + deltaNodeId;
 		nodeDescription.name = mutableName;
-		Dashel::Stream* listen_stream;
+		Dashel::Stream* listenStream;
 		
 		// connect network
 		try
 		{
 			std::ostringstream oss;
 			oss << "tcpin:port=" << port;
-			listen_stream = Dashel::Hub::connect(oss.str());
+			listenStream = Dashel::Hub::connect(oss.str());
 		}
 		catch (Dashel::DashelException e)
 		{
@@ -106,8 +116,21 @@ public:
 		// init VM
 		AsebaVMInit(&vm);
 
+#ifdef ZEROCONF_SUPPORT
+		// advertise target
+		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { mutableName }, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
+		try
+		{
+			zeroconf.insert(listenStream).advertise(txt);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << "Can't advertise stream " << stream->getTargetName() << ": " << e.what() << std::endl;
+		}
+#endif // ZEROCONF_SUPPORT
+
 		// return stream
-		return listen_stream;
+		return listenStream;
 	}
 	
 	virtual void connectionCreated(Dashel::Stream *stream)
@@ -127,6 +150,9 @@ public:
 	
 	virtual void connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelConnectionClosed(stream);
+#endif // ZEROCONF_SUPPORT
 		this->stream = 0;
 		// clear breakpoints
 		vm.breakpointsCount = 0;
@@ -139,6 +165,9 @@ public:
 	
 	virtual void incomingData(Dashel::Stream *stream)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelIncomingData(stream);
+#endif // ZEROCONF_SUPPORT
 		// only process data for the current stream
 		if (stream != this->stream)
 			return;
