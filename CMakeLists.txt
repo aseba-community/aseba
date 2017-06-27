@@ -87,7 +87,7 @@ endif()
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
-set(LIB_VERSION_MAJOR 2) # Must be bumped for incompatible ABI changes
+set(LIB_VERSION_MAJOR 3) # Must be bumped for incompatible ABI changes
 set(LIB_VERSION_MINOR 0)
 set(LIB_VERSION_PATCH 0)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
