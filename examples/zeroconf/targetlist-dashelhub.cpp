@@ -74,7 +74,7 @@ namespace Aseba
 					cout << " " << field.second;
 				cout << endl;
 			}
-			todo.erase(todo.find(ref(target)));
+			todo.erase(todo.find(target));
 		}
 
 	public:
