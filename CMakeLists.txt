@@ -89,7 +89,6 @@ if (DNSSD_FOUND)
 	endif(AVAHI_COMMON_LIBRARIES)
 	include_directories(${DNSSD_INCLUDE_DIRS})
 	find_package(Threads REQUIRED)
-	set(DNSSD_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 	add_definitions(-DZEROCONF_SUPPORT)
 endif()
 
@@ -106,6 +105,12 @@ add_subdirectory(transport)
 
 # define the core libraries variable, to be used by all Aseba programs
 set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+if (DNSSD_FOUND)
+	set(ASEBA_ZEROCONF_LIBRARIES asebazeroconf ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	if (QT4_FOUND)
+		set(ASEBA_ZEROCONFQT_LIBRARIES asebazeroconfqt asebazeroconf ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	endif()
+endif()
 
 # Target and client specific libraries
 add_subdirectory(vm)

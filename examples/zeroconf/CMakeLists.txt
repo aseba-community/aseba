@@ -3,12 +3,12 @@
 add_executable(asebatargetadvertise
 	targetadvertise.cpp
 )
-target_link_libraries(asebatargetadvertise ${ASEBA_CORE_LIBRARIES} ${DNSSD_LIBRARIES})
+target_link_libraries(asebatargetadvertise ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 add_executable(asebatargetlist
 	targetlist.cpp
 )
-target_link_libraries(asebatargetlist ${ASEBA_CORE_LIBRARIES} ${DNSSD_LIBRARIES})
+target_link_libraries(asebatargetlist ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 install(TARGETS asebatargetadvertise asebatargetlist RUNTIME
 	DESTINATION bin
@@ -20,7 +20,7 @@ install(TARGETS asebatargetadvertise asebatargetlist RUNTIME
 add_executable(asebatargetlist-dashelhub
 	targetlist-dashelhub.cpp
 )
-target_link_libraries(asebatargetlist-dashelhub ${ASEBA_CORE_LIBRARIES} ${DNSSD_LIBRARIES})
+target_link_libraries(asebatargetlist-dashelhub ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 
 # Using ThreadZeroconf
@@ -28,7 +28,7 @@ target_link_libraries(asebatargetlist-dashelhub ${ASEBA_CORE_LIBRARIES} ${DNSSD_
 add_executable(asebatargetlist-thread
 	targetlist-thread.cpp
 )
-target_link_libraries(asebatargetlist-thread ${ASEBA_CORE_LIBRARIES} ${DNSSD_LIBRARIES})
+target_link_libraries(asebatargetlist-thread ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
 
 # Using QtZeroconf
@@ -47,5 +47,5 @@ if (QT4_FOUND)
 		${examples_targetlist_qt_MOCS}
 		targetlist-qt.cpp
 	)
-	target_link_libraries(asebatargetlist-qt ${ASEBA_CORE_LIBRARIES} ${QT_LIBRARIES} ${DNSSD_LIBRARIES})
+	target_link_libraries(asebatargetlist-qt ${ASEBA_ZEROCONFQT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${QT_LIBRARIES})
 endif (QT4_FOUND)

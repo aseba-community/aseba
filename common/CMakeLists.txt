@@ -7,44 +7,13 @@ set (ASEBACOMMON_SRC
 	msg/NodesManager.cpp
 )
 
-if (DNSSD_FOUND)
-	set(ASEBACOMMON_SRC
-		${ASEBACOMMON_SRC}
-		zeroconf/zeroconf.cpp
-		zeroconf/txtrecord.cpp
-		zeroconf/target.cpp
-		zeroconf/zeroconf-thread.cpp
-		zeroconf/zeroconf-dashelhub.cpp
-	)
-	find_library(AVAHI_COMMON_LIBRARIES avahi-common)
-	if (AVAHI_COMMON_LIBRARIES)
-		set(ASEBACOMMON_SRC ${ASEBACOMMON_SRC} zeroconf/avahi-compat-libdns_sd/compat.c)
-	endif ()
-	if (QT4_FOUND)
-		set(QT_DONT_USE_QTGUI ON)
-		include(${QT_USE_FILE})
-		qt4_wrap_cpp(asebacommon_zeroconf_MOCS
-			zeroconf/zeroconf-qt.h
-		)
-		set(ASEBACOMMON_SRC
-			${ASEBACOMMON_SRC}
-			${asebacommon_zeroconf_MOCS}
-			zeroconf/zeroconf-qt.cpp
-		)
-	endif (QT4_FOUND)
-endif (DNSSD_FOUND)
-
 add_library(asebacommon ${ASEBACOMMON_SRC})
-set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING} 
-                                        SOVERSION ${LIB_VERSION_MAJOR})
-if(DNSSD_FOUND)
-	target_include_directories(asebacommon PUBLIC ${DNSSD_INCLUDE_DIRS})
-endif(DNSSD_FOUND)
+set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING})
 
 install(TARGETS asebacommon 
-		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
-		ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
-) 
+	LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
+	ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
+)
 
 set (ASEBACORE_HDR_UTILS 
 	utils/utils.h
@@ -59,12 +28,6 @@ set (ASEBACORE_HDR_COMMON
 	types.h
 	productids.h
 )
-set (ASEBACORE_HDR_ZEROCONF
-	zeroconf/zeroconf.h
-	zeroconf/zeroconf-thread.h
-	zeroconf/zeroconf-dashelhub.h
-	zeroconf/zeroconf-qt.h
-)
 install(FILES ${ASEBACORE_HDR_UTILS}
 	DESTINATION include/aseba/common/utils
 )
@@ -74,8 +37,5 @@ install(FILES ${ASEBACORE_HDR_MSG}
 install(FILES ${ASEBACORE_HDR_COMMON}
 	DESTINATION include/aseba/common
 )
-if (DNSSD_FOUND)
-	install(FILES ${ASEBACORE_HDR_ZEROCONF}
-		DESTINATION include/aseba/common/msg
-	)
-endif (DNSSD_FOUND)
+
+add_subdirectory(zeroconf)
