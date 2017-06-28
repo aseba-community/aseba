@@ -42,6 +42,26 @@ namespace Aseba
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
+	//! Are all fields equal?
+	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	{
+		return
+			lhs.name == rhs.name &&
+			lhs.domain == rhs.domain &&
+			lhs.regtype == rhs.regtype
+		;
+	}
+
+	//! Are all fields of this lower than fileds of that, in order?
+	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	{
+		return
+			lhs.name < rhs.name &&
+			lhs.domain < rhs.domain &&
+			lhs.regtype < rhs.regtype
+		;
+	}
+
 	//! This target is described by a human-readable name and a port.
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
@@ -97,7 +117,7 @@ namespace Aseba
 	//! Are the target information and the container equals?
 	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs)
 	{
-		return lhs.Zeroconf::TargetInformation::operator== (rhs) &&
+		return static_cast<const Zeroconf::TargetInformation>(lhs) == static_cast<const Zeroconf::TargetInformation>(rhs) &&
 			&lhs.container == &rhs.container;
 	}
 

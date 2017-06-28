@@ -153,25 +153,12 @@ namespace Aseba
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashelStream);
 
-		//! Are all fields equal?
-		bool operator==(const TargetInformation &other) const
-		{
-			return
-				name == other.name &&
-				domain == other.domain &&
-				regtype == other.regtype
-			;
-		}
-		//! Are all fields of this lower than fileds of that, in order?
-		bool operator<(const TargetInformation &other) const
-		{
-			return
-				name < other.name &&
-				domain < other.domain &&
-				regtype < other.regtype
-			;
-		}
+		friend bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
+		friend bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 	};
+
+	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
+	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -249,6 +236,12 @@ namespace Aseba
 } // namespace Aseba
 
 namespace std {
+	//! Hash for a zeroconf target information, use the generic point-based comparison
+	template <>
+	struct hash<Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<Aseba::Zeroconf::TargetInformation> {};
+	//! Hash for a const zeroconf target information, use the generic point-based comparison
+	template <>
+	struct hash<const Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<const Aseba::Zeroconf::TargetInformation> {};
 	//! Hash for a zeroconf target, use the generic point-based comparison
 	template <>
 	struct hash<Aseba::Zeroconf::Target>: public Aseba::PointerHash<Aseba::Zeroconf::Target> {};

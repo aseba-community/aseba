@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-#include <set>
+#include <functional>
+#include <unordered_set>
 #include <QCoreApplication>
 #include "../../common/zeroconf/zeroconf-qt.h"
 
@@ -38,5 +38,5 @@ public slots:
 	void resolveCompleted(const Aseba::Zeroconf::TargetInformation& target);
 
 private:
-	std::set<Aseba::Zeroconf::TargetInformation> todo;
+	std::unordered_set<std::reference_wrapper<const Aseba::Zeroconf::TargetInformation>> todo;
 };

@@ -19,7 +19,6 @@
 */
 
 #include <iostream>
-#include <set>
 #include <QCoreApplication>
 #include "targetlist-qt.h"
 
@@ -36,7 +35,7 @@ void QtTargetLister::browseCompleted()
 	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
 	for (auto & target: targets.targets)
 	{
-		todo.insert(Aseba::Zeroconf::TargetInformation(target));
+		todo.insert(target);
 		// Resolve the host name and port of this target, retrieve TXT record
 		target.resolve();
 	}
