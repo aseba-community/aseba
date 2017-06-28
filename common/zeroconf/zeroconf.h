@@ -111,8 +111,9 @@ namespace Aseba
 		
 		public:
 			~DiscoveryRequest();
-			bool operator==(const DiscoveryRequest &other) const;
 		};
+		friend struct std::hash<DiscoveryRequest>;
+		friend bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
 
 		DiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
 
@@ -128,7 +129,9 @@ namespace Aseba
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
 		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
-	
+
+	bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
+
 	/**
 	 \addtogroup zeroconf
 
@@ -236,6 +239,9 @@ namespace Aseba
 } // namespace Aseba
 
 namespace std {
+	//! Hash for a discovery request, use the generic point-based comparison
+	template <>
+	struct hash<Aseba::Zeroconf::DiscoveryRequest>: public Aseba::PointerHash<Aseba::Zeroconf::DiscoveryRequest> {};
 	//! Hash for a zeroconf target information, use the generic point-based comparison
 	template <>
 	struct hash<Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<Aseba::Zeroconf::TargetInformation> {};

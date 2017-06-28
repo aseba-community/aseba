@@ -51,7 +51,7 @@ namespace Aseba
 	void ThreadZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
 	{
 		std::lock_guard<std::recursive_mutex> locker(watcherLock);
-		zeroconfDRs.insert(&zdr);
+		zeroconfDRs.insert(zdr);
 	}
 
 	//! Run the handleDSEvents_thread
@@ -75,14 +75,15 @@ namespace Aseba
 
 			{// lock
 				std::lock_guard<std::recursive_mutex> locker(watcherLock);
-				for (auto const& zdr: zeroconfDRs)
+				for (auto const& zdrRef: zeroconfDRs)
 				{
-					int fd = DNSServiceRefSockFD(zdr->serviceRef);
+					DiscoveryRequest& zdr(zdrRef.get());
+					int fd = DNSServiceRefSockFD(zdr.serviceRef);
 					if (fd != -1)
 					{
 						max_fds = max_fds > fd ? max_fds : fd;
 						FD_SET(fd, &fds);
-						serviceFd[zdr->serviceRef] = fd;
+						serviceFd[zdr.serviceRef] = fd;
 						fd_count++;
 					}
 				}
@@ -94,9 +95,12 @@ namespace Aseba
 					// lock
 					std::lock_guard<std::recursive_mutex> locker(watcherLock);
 
-					for (auto const& zdr: zeroconfDRs)
-						if (FD_ISSET(serviceFd[zdr->serviceRef], &fds))
-							DNSServiceProcessResult(zdr->serviceRef);
+					for (auto const& zdrRef: zeroconfDRs)
+					{
+						DiscoveryRequest& zdr(zdrRef.get());
+						if (FD_ISSET(serviceFd[zdr.serviceRef], &fds))
+							DNSServiceProcessResult(zdr.serviceRef);
+					}
 					// unlock
 				}
 				else if (result < 0)

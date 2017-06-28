@@ -67,9 +67,9 @@ namespace Aseba
 	}
 	
 	//! Are the serviceRef equals?
-	bool Zeroconf::DiscoveryRequest::operator==(const DiscoveryRequest &other) const
+	bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs)
 	{
-		return serviceRef == other.serviceRef;
+		return lhs.serviceRef == rhs.serviceRef;
 	}
 
 	// Overideable method to wait for responses from the DNS service.

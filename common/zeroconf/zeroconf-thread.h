@@ -24,7 +24,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
-#include <set>
+#include <unordered_set>
 #include "zeroconf.h"
 
 namespace Aseba
@@ -52,7 +52,7 @@ namespace Aseba
 
 	private:
 		//! all the requests we are handling
-		std::set<DiscoveryRequest *> zeroconfDRs;
+		std::unordered_set<std::reference_wrapper<DiscoveryRequest>> zeroconfDRs;
 		// threading support
 		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs
