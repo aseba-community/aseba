@@ -68,7 +68,14 @@ include_directories(${dashel_INCLUDE_DIRS})
 find_package(enki)
 
 # Qt
-find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit OPTIONAL_COMPONENTS QtDBus)
+# FindQt4 has a bug and does not support OPTIONAL_COMPONENTS
+# see https://cmake.org/pipermail/cmake/2016-March/063047.html
+#find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit OPTIONAL_COMPONENTS QtDBus)
+# So we use a two-step mechanism, first try with DBus, and if not found, try without
+find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit QtDBus)
+if (NOT QT_QTDBUS_FOUND)
+	find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit)
+endif ()
 
 # Qwt
 find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
