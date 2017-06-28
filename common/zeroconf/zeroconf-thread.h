@@ -55,9 +55,9 @@ namespace Aseba
 		std::set<DiscoveryRequest *> zeroconfDRs;
 		// threading support
 		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
-		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs
 		std::exception_ptr watcherException{nullptr}; //!< pointer to rethrow exceptions in the outer thread
+		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
 	};
 }
 
