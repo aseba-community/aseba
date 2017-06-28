@@ -107,6 +107,7 @@ namespace Aseba
 			}
 			catch (...) {
 				watcherException = std::current_exception();
+				break;
 			}
 		}
 	}
