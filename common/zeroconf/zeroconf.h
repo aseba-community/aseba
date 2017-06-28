@@ -143,9 +143,9 @@ namespace Aseba
 		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
 
 		// additional metadata about this target after resolution
-		bool local{true}; //!< whether this host is local
 		std::string host; //!< the Dashel target connection port
 		int port; //!< the Dashel target connection port
+		bool local{true}; //!< whether this host is local
 
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
