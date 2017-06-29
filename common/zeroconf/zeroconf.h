@@ -78,7 +78,19 @@ namespace Aseba
 		Target& insert(const std::string & name, const int & port);
 		Target& insert(const Dashel::Stream * dashelStream);
 
-		// Support methods to access targets
+		// Aseba::Zeroconf is a container of targets
+		void erase(std::vector<Target>::iterator position) { targets.erase(position); }
+		void clear() { targets.clear(); }
+		bool empty() const { return targets.empty(); }
+		size_t size() const { return targets.size(); }
+		Target & front() { return targets.front(); }
+		const Target & front() const { return targets.front(); }
+		std::vector<Target>::iterator begin() { return targets.begin(); }
+		std::vector<Target>::iterator end() { return targets.end(); }
+		std::vector<Target>::const_iterator begin() const { return targets.begin(); }
+		std::vector<Target>::const_iterator end() const { return targets.end(); }
+		std::vector<Target>::const_iterator cbegin() const { return targets.cbegin(); }
+		std::vector<Target>::const_iterator cend() const { return targets.cend(); }
 		Targets::iterator find(const std::string & name);
 
 		// Aseba::Zeroconf can update its knowledge of non-local targets by browsing the network
