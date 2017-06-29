@@ -2,6 +2,7 @@ add_subdirectory(msg)
 add_subdirectory(compiler)
 add_subdirectory(vm)
 add_subdirectory(simulator)
+add_subdirectory(zeroconf)
 
 
 # test asebahttp
