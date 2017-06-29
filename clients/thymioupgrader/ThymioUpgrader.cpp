@@ -85,7 +85,7 @@ namespace Aseba
 		this->pagesDoneCount = 0;
 	}
 	
-	void QtBootloaderInterface::writePageStart(unsigned pageNumber, const uint8* data, bool simple)
+	void QtBootloaderInterface::writePageStart(unsigned pageNumber, const uint8_t* data, bool simple)
 	{
 		pagesDoneCount += 1;
 		emit flashProgress((100*pagesDoneCount)/pagesCount);

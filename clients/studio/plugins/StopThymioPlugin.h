@@ -41,7 +41,7 @@ namespace Aseba
 		void stopThymio();
 		
 	private:
-		std::auto_ptr<DevelopmentEnvironmentInterface> de;
+		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 	};
 	
 	/*@}*/

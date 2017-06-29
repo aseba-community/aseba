@@ -18,17 +18,15 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_ASEBA_GLUE_H
-#define __CHALLENGE_ASEBA_GLUE_H
+#ifndef __PLAYGROUND_ASEBA_GLUE_H
+#define __PLAYGROUND_ASEBA_GLUE_H
 
 #include "../../common/types.h"
 #include "../../common/consts.h"
 #include "../../vm/natives.h"
-#include <dashel/dashel.h>
 #include <valarray>
 #include <vector>
-#include <QMap>
-#include <QPair>
+#include <map>
 
 namespace Aseba
 {
@@ -36,47 +34,52 @@ namespace Aseba
 
 	struct AbstractNodeGlue
 	{
+		// default virtual destructor
+		virtual ~AbstractNodeGlue() = default;
+		
+		// to be implemente by robots
 		virtual const AsebaVMDescription* getDescription() const = 0;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const = 0;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const = 0;
-		virtual void callNativeFunction(uint16 id) = 0;
+		virtual void callNativeFunction(uint16_t id) = 0;
+		
+		// to be implemented by subclasses of robots for communicating with the external world
+		virtual void externalInputStep(double dt) = 0;
+	};
+	
+	struct SingleVMNodeGlue: AbstractNodeGlue
+	{
+		// VM implementation
+		AsebaVMState vm;
+		std::valarray<unsigned short> bytecode;
+		std::valarray<signed short> stack;
 	};
 
 	struct AbstractNodeConnection
 	{
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length) = 0;
-		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source) = 0;
+		virtual void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length) = 0;
+		virtual uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source) = 0;
 	};
 
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	
-	typedef QPair<AbstractNodeGlue*, AbstractNodeConnection*> NodeEnvironment;
-	typedef QMap<AsebaVMState*, NodeEnvironment> VMStateToEnvironment;
+	typedef std::pair<AbstractNodeGlue*, AbstractNodeConnection*> NodeEnvironment;
+	typedef std::map<AsebaVMState*, NodeEnvironment> VMStateToEnvironment;
 
 	extern VMStateToEnvironment vmStateToEnvironment;
 	
-	// Implementation of the connection using Dashel
-
-	class SimpleDashelConnection: public AbstractNodeConnection, public Dashel::Hub
+	// Buffer for data reception
+	
+	class RecvBufferNodeConnection: public AbstractNodeConnection
 	{
-		Dashel::Stream* stream;
-		std::vector<Dashel::Stream*> toDisconnect; // all streams that must be disconnected at next step
-		uint16 lastMessageSource;
-		std::valarray<uint8> lastMessageData;
-
+	protected:
+		uint16_t lastMessageSource;
+		std::valarray<uint8_t> lastMessageData;
+		
 	public:
-		SimpleDashelConnection(unsigned port);
-		
-		virtual void sendBuffer(uint16 nodeId, const uint8* data, uint16 length);
-		virtual uint16 getBuffer(uint8* data, uint16 maxLength, uint16* source);
-		
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-		
-		void closeOldStreams();
+		virtual uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source);
 	};
 	
 } // Aseba
 
-#endif // __CHALLENGE_ASEBA_GLUE_H
+#endif // __PLAYGROUND_ASEBA_GLUE_H

@@ -55,7 +55,7 @@ namespace Enki
 			unsigned short source;
 			std::valarray<unsigned char> data;
 			
-			Event(unsigned short source, const uint8* data, uint16 length) :
+			Event(unsigned short source, const uint8_t* data, uint16_t length) :
 				source(source),
 				data(length)
 			{
@@ -64,8 +64,8 @@ namespace Enki
 			
 			Event(Dashel::Stream* stream)
 			{
-				uint16 temp;
-				uint16 len;
+				uint16_t temp;
+				uint16_t len;
 				stream->read(&temp, 2);
 				len = bswap16(temp);
 				stream->read(&temp, 2);
@@ -90,38 +90,38 @@ namespace Enki
 	private:
 		struct BaseVariables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
 		};
 		
 		struct MotorVariables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 speed;
-			sint16 odo[2];
-			sint16 user[220];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t speed;
+			int16_t odo[2];
+			int16_t user[220];
 		};
 		
 		struct ProximitySensorVariables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 bumpers[24];
-			sint16 ground[12];
-			sint16 user[188];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t bumpers[24];
+			int16_t ground[12];
+			int16_t user[188];
 		};
 		
 		struct DistanceSensorVariables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 distances[180];
-			sint16 user[44];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t distances[180];
+			int16_t user[44];
 		};
 		
 		MotorVariables leftMotorVariables;

@@ -69,9 +69,9 @@ namespace Aseba
 			{
 				zeroconf.insert(stream).advertise(txt);
 			}
-			catch (runtime_error(e))
+			catch (const runtime_error& e)
 			{
-				std::cout << "Can't advertise stream " << stream->getTargetName() << " (" << join(names," ") << "): " << e.what() << std::endl;
+				cerr << "Can't advertise stream " << stream->getTargetName() << " (" << join(names," ") << "): " << e.what() << endl;
 			}
 		}
 
@@ -140,7 +140,7 @@ namespace Aseba
 				}
 				catch(Dashel::DashelException e)
 				{
-					std::cout << "Can't connect target " << dashel << ": " << e.what() << std::endl;
+					cerr << "Can't connect target " << dashel << ": " << e.what() << endl;
 				}
 			}
 

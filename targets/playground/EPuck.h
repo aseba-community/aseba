@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_EPUCK_H
-#define __CHALLENGE_EPUCK_H
+#ifndef __PLAYGROUND_EPUCK_H
+#define __PLAYGROUND_EPUCK_H
 
 #include "AsebaGlue.h"
 #include <enki/PhysicalEngine.h>
@@ -27,6 +27,9 @@
 
 namespace Enki
 {
+	// FIXME: this is ugly and should be attached to Enki::World after ECS refactoring
+	extern unsigned energyPool;
+	
 	class EPuckFeeding : public LocalInteraction
 	{
 	public:
@@ -71,34 +74,30 @@ namespace Enki
 		virtual void controlStep(double dt);
 	};
 	
-	class AsebaFeedableEPuck : public FeedableEPuck, public Aseba::AbstractNodeGlue, public Aseba::SimpleDashelConnection
+	class AsebaFeedableEPuck : public FeedableEPuck, public Aseba::SingleVMNodeGlue
 	{
 	public:
-		AsebaVMState vm;
-		std::valarray<unsigned short> bytecode;
-		std::valarray<signed short> stack;
 		struct Variables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 productId; 
-			sint16 speedL; // left motor speed
-			sint16 speedR; // right motor speed
-			sint16 colorR; // body red [0..100] %
-			sint16 colorG; // body green [0..100] %
-			sint16 colorB; // body blue [0..100] %
-			sint16 prox[8];	// 
-			sint16 camR[60]; // camera red (left, middle, right) [0..100] %
-			sint16 camG[60]; // camera green (left, middle, right) [0..100] %
-			sint16 camB[60]; // camera blue (left, middle, right) [0..100] %
-			sint16 energy;
-			sint16 user[256];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t productId; 
+			int16_t speedL; // left motor speed
+			int16_t speedR; // right motor speed
+			int16_t colorR; // body red [0..100] %
+			int16_t colorG; // body green [0..100] %
+			int16_t colorB; // body blue [0..100] %
+			int16_t prox[8];	// 
+			int16_t camR[60]; // camera red (left, middle, right) [0..100] %
+			int16_t camG[60]; // camera green (left, middle, right) [0..100] %
+			int16_t camB[60]; // camera blue (left, middle, right) [0..100] %
+			int16_t energy;
+			int16_t user[256];
 		} variables;
 		
 	public:
-		AsebaFeedableEPuck(unsigned port, int id);
-		virtual ~AsebaFeedableEPuck();
+		AsebaFeedableEPuck(int id);
 		
 		// from FeedableEPuck
 		
@@ -109,8 +108,8 @@ namespace Enki
 		virtual const AsebaVMDescription* getDescription() const;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
-		virtual void callNativeFunction(uint16 id);
+		virtual void callNativeFunction(uint16_t id);
 	};
 } // Enki
 
-#endif // __CHALLENGE_EPUCK_H
+#endif // __PLAYGROUND_EPUCK_H

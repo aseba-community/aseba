@@ -28,7 +28,6 @@
 #include "android.h"
 
 #include <sys/ioctl.h>
-#include <linux/usb_ch9.h>
 #include <linux/usbdevice_fs.h>
 
 
@@ -70,7 +69,7 @@ void AndroidStream::schedule_read() {
 }
 
 void AndroidStream::set_ctrl_line(unsigned int status) {
-    usb_control_msg(0x21, 0x22, status, 0, NULL, 0, 1000);
+    usb_control_msg(0x21, 0x22, status, 0, nullptr, 0, 1000);
 }
 
 AndroidStream::AndroidStream(const string &targetName) :
@@ -187,7 +186,7 @@ bool AndroidStream::isDataInRecvBuffer() const
 void AndroidStream::lock_java()
 {
     // Kind of mutex_lock();	    
-    if(s_javaVM->AttachCurrentThread(&env, NULL)<0)
+    if(s_javaVM->AttachCurrentThread(&env, nullptr)<0)
         throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed", this);
 }
 

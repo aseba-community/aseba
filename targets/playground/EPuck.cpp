@@ -30,24 +30,20 @@
 
 using namespace Enki;
 
+unsigned Enki::energyPool = INITIAL_POOL_ENERGY;
+
 extern "C" void PlaygroundEPuckNative_energysend(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	// find related VM
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
+	if (epuck)
 	{
-		AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*objectIt);
-		if (epuck && (&(epuck->vm) == vm) && (epuck->energy > EPUCK_INITIAL_ENERGY))
-		{
-			uint16 amount = vm->variables[index];
-			
-			unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
-			playgroundViewer->energyPool += toSend;
-			epuck->energy -= toSend;
-		}
+		const uint16_t amount = vm->variables[index];
+		
+		unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
+		energyPool += toSend;
+		epuck->energy -= toSend;
 	}
 }
 
@@ -58,20 +54,14 @@ extern "C" void PlaygroundEPuckNative_energyreceive(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	// find related VM
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	World* world(playgroundViewer->getWorld());
-	for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
+	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
+	if (epuck)
 	{
-		AsebaFeedableEPuck *epuck = dynamic_cast<AsebaFeedableEPuck*>(*objectIt);
-		if (epuck && (&(epuck->vm) == vm))
-		{
-			uint16 amount = vm->variables[index];
-			
-			unsigned toReceive = std::min((unsigned)amount, (unsigned)playgroundViewer->energyPool);
-			playgroundViewer->energyPool -= toReceive;
-			epuck->energy += toReceive;
-		}
+		uint16_t amount = vm->variables[index];
+		
+		unsigned toReceive = std::min((unsigned)amount, energyPool);
+		energyPool -= toReceive;
+		epuck->energy += toReceive;
 	}
 }
 
@@ -82,8 +72,7 @@ extern "C" void PlaygroundEPuckNative_energyamount(AsebaVMState *vm)
 {
 	int index = AsebaNativePopArg(vm);
 	
-	PlaygroundViewer* playgroundViewer(PlaygroundViewer::getInstance());
-	vm->variables[index] = playgroundViewer->energyPool;
+	vm->variables[index] = energyPool;
 }
 
 extern "C" AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyamount;
@@ -174,8 +163,7 @@ namespace Enki
 	
 	// AsebaFeedableEPuck
 	
-	AsebaFeedableEPuck::AsebaFeedableEPuck(unsigned port, int id):
-		SimpleDashelConnection(port)
+	AsebaFeedableEPuck::AsebaFeedableEPuck(int id)
 	{
 		vm.nodeId = id;
 		
@@ -187,47 +175,39 @@ namespace Enki
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 		
-		vm.variables = reinterpret_cast<sint16 *>(&variables);
-		vm.variablesSize = sizeof(variables) / sizeof(sint16);
+		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 		
 		AsebaVMInit(&vm);
 		
 		variables.id = id;
 		variables.productId = ASEBA_PID_PLAYGROUND_EPUCK;
-		
-		vmStateToEnvironment[&vm] = qMakePair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
-	}
-	
-	AsebaFeedableEPuck::~AsebaFeedableEPuck()
-	{
-		vmStateToEnvironment.remove(&vm);
 	}
 	
 	void AsebaFeedableEPuck::controlStep(double dt)
 	{
-		// do a network step
-		Hub::step();
-		
-		// disconnect old streams
-		closeOldStreams();
-		
 		// get physical variables
-		variables.prox[0] = static_cast<sint16>(infraredSensor0.getValue());
-		variables.prox[1] = static_cast<sint16>(infraredSensor1.getValue());
-		variables.prox[2] = static_cast<sint16>(infraredSensor2.getValue());
-		variables.prox[3] = static_cast<sint16>(infraredSensor3.getValue());
-		variables.prox[4] = static_cast<sint16>(infraredSensor4.getValue());
-		variables.prox[5] = static_cast<sint16>(infraredSensor5.getValue());
-		variables.prox[6] = static_cast<sint16>(infraredSensor6.getValue());
-		variables.prox[7] = static_cast<sint16>(infraredSensor7.getValue());
+		variables.prox[0] = static_cast<int16_t>(infraredSensor0.getValue());
+		variables.prox[1] = static_cast<int16_t>(infraredSensor1.getValue());
+		variables.prox[2] = static_cast<int16_t>(infraredSensor2.getValue());
+		variables.prox[3] = static_cast<int16_t>(infraredSensor3.getValue());
+		variables.prox[4] = static_cast<int16_t>(infraredSensor4.getValue());
+		variables.prox[5] = static_cast<int16_t>(infraredSensor5.getValue());
+		variables.prox[6] = static_cast<int16_t>(infraredSensor6.getValue());
+		variables.prox[7] = static_cast<int16_t>(infraredSensor7.getValue());
 		for (size_t i = 0; i < 60; i++)
 		{
-			variables.camR[i] = static_cast<sint16>(camera.image[i].r() * 100.);
-			variables.camG[i] = static_cast<sint16>(camera.image[i].g() * 100.);
-			variables.camB[i] = static_cast<sint16>(camera.image[i].b() * 100.);
+			variables.camR[i] = static_cast<int16_t>(camera.image[i].r() * 100.);
+			variables.camG[i] = static_cast<int16_t>(camera.image[i].g() * 100.);
+			variables.camB[i] = static_cast<int16_t>(camera.image[i].b() * 100.);
 		}
 		
-		variables.energy = static_cast<sint16>(energy);
+		variables.energy = static_cast<int16_t>(energy);
+		
+		// process external inputs (incoming event from network or environment, etc.)
+		externalInputStep(dt);
+		
+		// FIXME: running the VM should be done in a soft timer to be independant of time step
 		
 		// run VM
 		AsebaVMRun(&vm, 1000);
@@ -276,7 +256,7 @@ namespace Enki
 	static const AsebaLocalEventDescription localEvents[] = {
 		{ "ir_sensors", "IR sensors updated" },
 		{"camera", "camera updated"},
-		{ NULL, NULL }
+		{ nullptr, nullptr }
 	};
 	
 	const AsebaLocalEventDescription * AsebaFeedableEPuck::getLocalEventsDescriptions() const
@@ -311,7 +291,7 @@ namespace Enki
 		PlaygroundEPuckNative_energyamount
 	};
 	
-	void AsebaFeedableEPuck::callNativeFunction(uint16 id)
+	void AsebaFeedableEPuck::callNativeFunction(uint16_t id)
 	{
 		nativeFunctions[id](&vm);
 	}

@@ -116,7 +116,7 @@ namespace Aseba
 
 	protected:
 		template <class T> struct WidgetCache {
-			WidgetCache(): widget(NULL){}
+			WidgetCache() {}
 			WidgetCache(QWidget* widget, T value):widget(widget),value(value){}
 			QWidget* widget;
 			T value;

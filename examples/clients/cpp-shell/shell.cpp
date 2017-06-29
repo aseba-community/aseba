@@ -403,7 +403,7 @@ void Shell::load(const strings& args)
 	
 	// open document
 	const string& fileName(args[1]);
-	xmlDoc *doc(xmlReadFile(fileName.c_str(), NULL, 0));
+	xmlDoc *doc(xmlReadFile(fileName.c_str(), nullptr, 0));
 	if (!doc)
 	{
 		wcerr << "cannot read XML from file " << UTF8ToWString(fileName) << endl;
@@ -560,7 +560,7 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 	if (result)
 	{
 		// send bytecode
-		sendBytecode(targetStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+		sendBytecode(targetStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 		// run node
 		Run msg(nodeId);
 		msg.serialize(targetStream);

@@ -91,7 +91,7 @@ namespace Aseba { namespace ThymioBlockly
 		void showAtSavedPosition();
 		
 	protected:
-		std::auto_ptr<DevelopmentEnvironmentInterface> de;
+		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		QWebView *webview;
 		mutable AsebaJavascriptInterface asebaJavascriptInterface;
 		QString currentSavedXml;

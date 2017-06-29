@@ -26,6 +26,9 @@
 #include <cassert>
 #include <cstdlib>
 #include <vector>
+#include <functional>
+#include <memory>
+#include <cmath>
 #include "../types.h"
 
 namespace Aseba
@@ -34,9 +37,6 @@ namespace Aseba
 	\defgroup utils General helper functions and classes
 	*/
 	/*@{*/
-	
-	//! Macro to avoid the warning "unused variable", if we have a valid reason to keep this variable
-	#define UNUSED(expr) do { (void)(expr); } while (0)
 	
 	//! Asserts a dynamic cast. Similar to the one in boost/cast.hpp
 	template<typename Derived, typename Base>
@@ -53,12 +53,31 @@ namespace Aseba
 	static inline Derived polymorphic_downcast_or_null(Base base)
 	{
 		if (!base)
-			return 0;
+			return nullptr;
 		Derived derived = dynamic_cast<Derived>(base);
 		if (!derived)
 			abort();
 		return derived;
 	}
+	
+	//! Create a unique_ptr by perfect forwarding, to be removed once we switch to C++14
+	template<typename T, typename... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}
+	
+	//! Hash references to T using their underlying pointer
+	template<typename T>
+	struct PointerHash
+	{
+		//! Use the pointer shifted right by the number of 0 LSB
+		size_t operator()(const T& value) const
+		{
+			static const size_t shift = (size_t)std::log2(1 + sizeof(&value));
+			return (size_t)(&value) >> shift;
+		}
+	};
 	
 	//! Time or durations, in milliseconds
 	struct UnifiedTime
@@ -114,6 +133,30 @@ namespace Aseba
 	//! Dump the current time to a stream
 	void dumpTime(std::ostream &stream, bool raw = false);
 	
+	// Soft timer
+	class SoftTimer
+	{
+	public:
+		//! A callback function
+		typedef const std::function< void() > Callback; 
+		//! The callback function, cannot change once initialized
+		Callback callback;
+		//! The current period, 0 disables the timer
+		double period;
+		
+	protected:
+		//! time left until next call to callback
+		double left = 0;
+		
+	public:
+		//! Constructor, using callback and firing every period s, 0 disables the timer
+		SoftTimer(Callback callback, double period);
+		//! Step dt s, calls callback any necessary number of times
+		void step(double dt);
+		//! Set the period in s, 0 disables the timer
+		void setPeriod(double period);
+	};
+	
 	//! Transform a wstring into an UTF8 string, this function is thread-safe
 	std::string WStringToUTF8(const std::wstring& s);
 	
@@ -121,10 +164,10 @@ namespace Aseba
 	std::wstring UTF8ToWString(const std::string& s);
 	
 	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a wstring
-	uint16 crcXModem(const uint16 oldCrc, const std::wstring& s);
+	uint16_t crcXModem(const uint16_t oldCrc, const std::wstring& s);
 	
-	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a uint16 value
-	uint16 crcXModem(const uint16 oldCrc, const uint16 v);
+	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a uint16_t value
+	uint16_t crcXModem(const uint16_t oldCrc, const uint16_t v);
 	
 	//! Split a string using given delimiters
 	template<typename T>
@@ -152,5 +195,19 @@ namespace Aseba
 	/*@}*/
 	
 };
+
+namespace std
+{
+	//! Generic hash for reference_wrapper
+	template<typename T>
+	struct hash<reference_wrapper<T>>
+	{
+		//! Hashes the reference to the underlying value
+		size_t operator()(const reference_wrapper<T>& r) const
+		{
+			return std::hash<T>()(r.get());
+		}
+	};
+}
 
 #endif

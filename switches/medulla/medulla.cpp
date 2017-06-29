@@ -48,16 +48,16 @@ namespace Aseba
 	/** \addtogroup medulla */
 	/*@{*/
 	
-	std::vector<sint16> toAsebaVector(const Values& values)
+	std::vector<int16_t> toAsebaVector(const Values& values)
 	{
-		std::vector<sint16> data;
+		std::vector<int16_t> data;
 		data.reserve(values.size());
 		for (int i = 0; i < values.size(); ++i)
 			data.push_back(values[i]);
 		return data;
 	}
 	
-	Values fromAsebaVector(const std::vector<sint16>& values)
+	Values fromAsebaVector(const std::vector<int16_t>& values)
 	{
 		Values data;
 		for (size_t i = 0; i < values.size(); ++i)
@@ -65,12 +65,12 @@ namespace Aseba
 		return data;
 	}
 	
-	void EventFilterInterface::emitEvent(const quint16 id, const QString& name, const Values& data)
+	void EventFilterInterface::emitEvent(const uint16_t id, const QString& name, const Values& data)
 	{
 		emit Event(id, name, data);
 	}
 	
-	void EventFilterInterface::ListenEvent(const quint16 event)
+	void EventFilterInterface::ListenEvent(const uint16_t event)
 	{
 		network->listenEvent(this, event);
 	}
@@ -84,7 +84,7 @@ namespace Aseba
 			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 	
-	void EventFilterInterface::IgnoreEvent(const quint16 event)
+	void EventFilterInterface::IgnoreEvent(const uint16_t event)
 	{
 		network->ignoreEvent(this, event);
 	}
@@ -162,7 +162,7 @@ namespace Aseba
 		delete message;
 	}
 	
-	void AsebaNetworkInterface::sendEventOnDBus(const quint16 event, const Values& data)
+	void AsebaNetworkInterface::sendEventOnDBus(const uint16_t event, const Values& data)
 	{
 		QList<EventFilterInterface*> filters = eventsFilters.values(event);
 		QString name;
@@ -174,19 +174,19 @@ namespace Aseba
 			filters.at(i)->emitEvent(event, name, data);
 	}
 	
-	void AsebaNetworkInterface::listenEvent(EventFilterInterface* filter, quint16 event)
+	void AsebaNetworkInterface::listenEvent(EventFilterInterface* filter, uint16_t event)
 	{
 		eventsFilters.insert(event, filter);
 	}
 	
-	void AsebaNetworkInterface::ignoreEvent(EventFilterInterface* filter, quint16 event)
+	void AsebaNetworkInterface::ignoreEvent(EventFilterInterface* filter, uint16_t event)
 	{
 		eventsFilters.remove(event, filter);
 	}
 	
 	void AsebaNetworkInterface::filterDestroyed(EventFilterInterface* filter)
 	{
-		QList<quint16> events = eventsFilters.keys(filter);
+		QList<uint16_t> events = eventsFilters.keys(filter);
 		for (int i = 0; i < events.size(); ++i)
 			eventsFilters.remove(events.at(i), filter);
 	}
@@ -217,7 +217,7 @@ namespace Aseba
 		int noNodeCount = 0;
 		QDomNode domNode = document.documentElement().firstChild();
 		
-		// FIXME: this code depends on event and contants being before any code
+		// FIXME: this code depends on event and constants being before any code
 		bool wasError = false;
 		while (!domNode.isNull())
 		{
@@ -242,14 +242,11 @@ namespace Aseba
 						
 						if (result)
 						{
-							typedef std::vector<Message*> MessageVector;
+							typedef std::vector<std::unique_ptr<Message>> MessageVector;
 							MessageVector messages;
-							sendBytecode(messages, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
-							for (MessageVector::const_iterator it = messages.begin(); it != messages.end(); ++it)
-							{
-								hub->sendMessage(*it);
-								delete *it;
-							}
+							sendBytecode(messages, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
+							for (const auto& message: messages)
+								hub->sendMessage(*message);
 							Run msg(nodeId);
 							hub->sendMessage(msg);
 						}
@@ -325,7 +322,7 @@ namespace Aseba
 		return nodeIt.value();	
 	}
 	
-	QString AsebaNetworkInterface::GetNodeName(const quint16 nodeId, const QDBusMessage &message) const
+	QString AsebaNetworkInterface::GetNodeName(const uint16_t nodeId, const QDBusMessage &message) const
 	{
 		const QString nodeName(QString::fromStdWString(getNodeName(nodeId)));
 		if (nodeName.isEmpty())
@@ -480,7 +477,7 @@ namespace Aseba
 		return Values();
 	}
 	
-	void AsebaNetworkInterface::SendEvent(const quint16 event, const Values& data)
+	void AsebaNetworkInterface::SendEvent(const uint16_t event, const Values& data)
 	{
 		// send event to DBus listeners
 		sendEventOnDBus(event, data);

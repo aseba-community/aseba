@@ -27,6 +27,9 @@
 #include "../../common/productids.h"
 #include "../../common/consts.h"
 #include "../../common/utils/utils.h"
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#endif // ZEROCONF_SUPPORT
 #include "../../transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <iostream>
@@ -45,27 +48,34 @@ private:
 	std::valarray<signed short> stack;
 	struct Variables
 	{
-		sint16 id;
-		sint16 source;
-		sint16 args[32];
-		sint16 productId;
-		sint16 timerPeriod;
-		sint16 user[1024];
+		int16_t id;
+		int16_t source;
+		int16_t args[32];
+		int16_t productId;
+		int16_t timerPeriod;
+		int16_t user[1024];
 	} variables;
 	char mutableName[12];
 	
 public:
 	// public because accessed from a glue function
-	uint16 lastMessageSource;
-	std::valarray<uint8> lastMessageData;
+	uint16_t lastMessageSource;
+	std::valarray<uint8_t> lastMessageData;
 	// this must be public because of bindings to C functions
 	Dashel::Stream* stream;
 	// all streams that must be disconnected at next step
 	std::vector<Dashel::Stream*> toDisconnect;
-	
+#ifdef ZEROCONF_SUPPORT
+	// to advertise
+	Aseba::DashelhubZeroconf zeroconf;
+#endif // ZEROCONF_SUPPORT
+
 public:
 	
 	AsebaNode()
+#ifdef ZEROCONF_SUPPORT
+		:zeroconf(*this)
+#endif // ZEROCONF_SUPPORT
 	{
 		// setup variables
 		vm.nodeId = 1;
@@ -78,8 +88,8 @@ public:
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 		
-		vm.variables = reinterpret_cast<sint16 *>(&variables);
-		vm.variablesSize = sizeof(variables) / sizeof(sint16);
+		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 	}
 	
 	Dashel::Stream* listen(const int port, const int deltaNodeId)
@@ -88,14 +98,14 @@ public:
 		strncpy(mutableName, "dummynode-0", 12);
 		mutableName[10] = '0' + deltaNodeId;
 		nodeDescription.name = mutableName;
-		Dashel::Stream* listen_stream;
+		Dashel::Stream* listenStream;
 		
 		// connect network
 		try
 		{
 			std::ostringstream oss;
 			oss << "tcpin:port=" << port;
-			listen_stream = Dashel::Hub::connect(oss.str());
+			listenStream = Dashel::Hub::connect(oss.str());
 		}
 		catch (Dashel::DashelException e)
 		{
@@ -106,8 +116,21 @@ public:
 		// init VM
 		AsebaVMInit(&vm);
 
+#ifdef ZEROCONF_SUPPORT
+		// advertise target
+		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { mutableName }, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
+		try
+		{
+			zeroconf.insert(listenStream).advertise(txt);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << "Can't advertise stream " << stream->getTargetName() << ": " << e.what() << std::endl;
+		}
+#endif // ZEROCONF_SUPPORT
+
 		// return stream
-		return listen_stream;
+		return listenStream;
 	}
 	
 	virtual void connectionCreated(Dashel::Stream *stream)
@@ -127,6 +150,9 @@ public:
 	
 	virtual void connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelConnectionClosed(stream);
+#endif // ZEROCONF_SUPPORT
 		this->stream = 0;
 		// clear breakpoints
 		vm.breakpointsCount = 0;
@@ -139,12 +165,15 @@ public:
 	
 	virtual void incomingData(Dashel::Stream *stream)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelIncomingData(stream);
+#endif // ZEROCONF_SUPPORT
 		// only process data for the current stream
 		if (stream != this->stream)
 			return;
 		
-		uint16 temp;
-		uint16 len;
+		uint16_t temp;
+		uint16_t len;
 		
 		stream->read(&temp, 2);
 		len = bswap16(temp);
@@ -208,14 +237,14 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 	std::cerr << "Received request to go into sleep" << std::endl;
 }
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
 {
 	Dashel::Stream* stream = node.stream;
 	if (stream)
 	{
 		try
 		{
-			uint16 temp;
+			uint16_t temp;
 			temp = bswap16(length - 2);
 			stream->write(&temp, 2);
 			temp = bswap16(vm->nodeId);
@@ -230,7 +259,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	}
 }
 
-extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	if (node.lastMessageData.size())
 	{
@@ -263,7 +292,7 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }
@@ -271,7 +300,7 @@ extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
 
 static const AsebaLocalEventDescription localEvents[] = {
 	{ "timer", "periodic timer at a given frequency" },
-	{ NULL, NULL }
+	{ nullptr, nullptr }
 };
 
 extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)

@@ -27,6 +27,7 @@
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
+#include <algorithm>
 
 #define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
 #define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))
@@ -277,7 +278,7 @@ namespace Aseba
 	//! Parse "program" grammar element.
 	Node* Compiler::parseProgram()
 	{
-		std::auto_ptr<ProgramNode> block(new ProgramNode(tokens.front().pos));
+		std::unique_ptr<ProgramNode> block(new ProgramNode(tokens.front().pos));
 		// parse all declarations for constants
 		while (tokens.front() == Token::TOKEN_STR_const)
 		{
@@ -286,7 +287,7 @@ namespace Aseba
 		// parse all vars declarations
 		while (tokens.front() == Token::TOKEN_STR_var)
 		{
-			// we may receive NULL pointers because non initialized variables produce no code
+			// we may receive null pointers because non initialized variables produce no code
 			Node *child = parseVarDef();
 			if (child)
 				block->children.push_back(child);
@@ -294,7 +295,7 @@ namespace Aseba
 		// parse the rest of the code
 		while (tokens.front() != Token::TOKEN_END_OF_STREAM)
 		{
-			// only var declaration are allowed to return NULL node, so we assert on node
+			// only var declaration are allowed to return null node, so we assert on node
 			Node *child = parseStatement();
 			assert(child);
 			block->children.push_back(child);
@@ -402,8 +403,8 @@ namespace Aseba
 			throw TranslatableError(varPos, ERROR_VAR_CONST_COLLISION).arg(varName);
 		
 		// optional assignation
-		std::auto_ptr<MemoryVectorNode> me(new MemoryVectorNode(varPos, varAddr, varSize, varName));
-		std::auto_ptr<Node> temp;
+		std::unique_ptr<MemoryVectorNode> me(new MemoryVectorNode(varPos, varAddr, varSize, varName));
+		std::unique_ptr<Node> temp;
 		temp.reset(parseVarDefInit(me.get()));
 		if (temp.get())
 		{
@@ -427,7 +428,7 @@ namespace Aseba
 		if (temp.get())
 			return temp.release();
 		else
-			return NULL;
+			return nullptr;
 	}
 
 	AssignmentNode *Compiler::parseVarDefInit(MemoryVectorNode* lValue)
@@ -438,8 +439,8 @@ namespace Aseba
 			tokens.pop_front();
 
 			// try old style initialization 1,2,3
-			std::auto_ptr<Node> rValue(parseTupleVector(true));
-			if (rValue.get() == NULL)
+			std::unique_ptr<Node> rValue(parseTupleVector(true));
+			if (rValue.get() == nullptr)
 			{
 				// no -> other type of initialization
 				rValue.reset(parseBinaryOrExpression());
@@ -454,7 +455,7 @@ namespace Aseba
 			return new AssignmentNode(pos, lValue, rValue.release());
 		}
 
-		return NULL;
+		return nullptr;
 	}
 	
 
@@ -469,7 +470,7 @@ namespace Aseba
 							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
 
 		// parse left value
-		std::auto_ptr<Node> lValue(parseBinaryOrExpression());
+		std::unique_ptr<Node> lValue(parseBinaryOrExpression());
 
 		SourcePos pos = tokens.front().pos;
 		Compiler::Token op = tokens.front();
@@ -484,7 +485,7 @@ namespace Aseba
 		{
 			tokens.pop_front();
 
-			std::auto_ptr<UnaryArithmeticAssignmentNode> assignment(
+			std::unique_ptr<UnaryArithmeticAssignmentNode> assignment(
 						new UnaryArithmeticAssignmentNode(
 							pos,
 							op,
@@ -496,7 +497,7 @@ namespace Aseba
 		{
 			tokens.pop_front();
 
-			std::auto_ptr<ArithmeticAssignmentNode> assignment(
+			std::unique_ptr<ArithmeticAssignmentNode> assignment(
 						ArithmeticAssignmentNode::fromArithmeticAssignmentToken(
 							pos,
 							op,
@@ -508,7 +509,7 @@ namespace Aseba
 		else
 			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		
-		return NULL;
+		return nullptr;
 	}
 
 	//! Parse "if" grammar element.
@@ -516,7 +517,7 @@ namespace Aseba
 	{
 		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_elseif, Token::TOKEN_STR_end };
 		
-		std::auto_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
+		std::unique_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
 		
 		// eat "if" / "when"
 		ifNode->edgeSensitive = edgeSensitive;
@@ -582,7 +583,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// variable
-		std::auto_ptr<MemoryVectorNode> variable(parseVariable());
+		std::unique_ptr<MemoryVectorNode> variable(parseVariable());
 		MemoryVectorNode* variableRef = variable.get();		// used to create copies
 		SourcePos varPos = variable->sourcePos;
 		
@@ -636,7 +637,7 @@ namespace Aseba
 		tokens.pop_front();
 		
 		// create enclosing block and initial variable state
-		std::auto_ptr<BlockNode> blockNode(new BlockNode(whilePos));
+		std::unique_ptr<BlockNode> blockNode(new BlockNode(whilePos));
 		blockNode->children.push_back(new AssignmentNode(
 						      rangeStartIndexPos,
 						      variable.release(),
@@ -688,7 +689,7 @@ namespace Aseba
 	//! Parse "while" grammar element.
 	Node* Compiler::parseWhile()
 	{
-		std::auto_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
+		std::unique_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
 		
 		// eat "while"
 		tokens.pop_front();
@@ -732,7 +733,7 @@ namespace Aseba
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
 		
-		std::auto_ptr<EmitNode> emitNode(new EmitNode(pos));
+		std::unique_ptr<EmitNode> emitNode(new EmitNode(pos));
 		
 		// event id
 		emitNode->eventId = expectGlobalEventId();
@@ -742,7 +743,7 @@ namespace Aseba
 		unsigned eventSize = commonDefinitions->events[emitNode->eventId].value;
 		if (eventSize > 0)
 		{
-			std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+			std::unique_ptr<Node> preNode(parseBinaryOrExpression());
 			bool memoryAllocated = false;
 
 			// allocate memory?
@@ -824,13 +825,13 @@ namespace Aseba
 	//! Parse "or" grammar element.
 	Node* Compiler::parseOr()
 	{
-		std::auto_ptr<Node> node(parseAnd());
+		std::unique_ptr<Node> node(parseAnd());
 		
 		while (tokens.front() == Token::TOKEN_OP_OR)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseAnd());
+			std::unique_ptr<Node> subExpression(parseAnd());
 			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_OR, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -843,13 +844,13 @@ namespace Aseba
 	//! Parse "and" grammar element.
 	Node* Compiler::parseAnd()
 	{
-		std::auto_ptr<Node> node(parseNot());
+		std::unique_ptr<Node> node(parseNot());
 		
 		while (tokens.front() == Token::TOKEN_OP_AND)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseNot());
+			std::unique_ptr<Node> subExpression(parseNot());
 			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_AND, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -878,7 +879,7 @@ namespace Aseba
 			return parseCondition();
 		/*
 		
-		std::auto_ptr<BinaryArithmeticNode> expression(parseCondition());
+		std::unique_ptr<BinaryArithmeticNode> expression(parseCondition());
 		
 		// recurse on parenthesis
 		if (tokens.front() == Token::TOKEN_PAR_OPEN)
@@ -907,7 +908,7 @@ namespace Aseba
 	{
 		/*const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
-		std::auto_ptr<Node> leftExprNode(parseBinaryOrExpression());
+		std::unique_ptr<Node> leftExprNode(parseBinaryOrExpression());
 		
 		EXPECT_ONE_OF(conditionTypes);
 		
@@ -919,14 +920,14 @@ namespace Aseba
 		
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
 		
-		std::auto_ptr<Node> node(parseBinaryOrExpression());
+		std::unique_ptr<Node> node(parseBinaryOrExpression());
 		
 		while (IS_ONE_OF(conditionTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseBinaryOrExpression());
+			std::unique_ptr<Node> subExpression(parseBinaryOrExpression());
 			Node* temp = BinaryArithmeticNode::fromComparison(pos, op, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -939,13 +940,13 @@ namespace Aseba
 	//! Parse "binary or" grammar element.
 	Node *Compiler::parseBinaryOrExpression()
 	{
-		std::auto_ptr<Node> node(parseBinaryXorExpression());
+		std::unique_ptr<Node> node(parseBinaryXorExpression());
 		
 		while (tokens.front() == Token::TOKEN_OP_BIT_OR)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseBinaryXorExpression());
+			std::unique_ptr<Node> subExpression(parseBinaryXorExpression());
 			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_OR, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -958,13 +959,13 @@ namespace Aseba
 	//! Parse "binary xor" grammar element.
 	Node *Compiler::parseBinaryXorExpression()
 	{
-		std::auto_ptr<Node> node(parseBinaryAndExpression());
+		std::unique_ptr<Node> node(parseBinaryAndExpression());
 		
 		while (tokens.front() == Token::TOKEN_OP_BIT_XOR)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseBinaryAndExpression());
+			std::unique_ptr<Node> subExpression(parseBinaryAndExpression());
 			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_XOR, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -977,13 +978,13 @@ namespace Aseba
 	//! Parse "binary and" grammar element.
 	Node *Compiler::parseBinaryAndExpression()
 	{
-		std::auto_ptr<Node> node(parseShiftExpression());
+		std::unique_ptr<Node> node(parseShiftExpression());
 		
 		while (tokens.front() == Token::TOKEN_OP_BIT_AND)
 		{
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseShiftExpression());
+			std::unique_ptr<Node> subExpression(parseShiftExpression());
 			Node* temp = new BinaryArithmeticNode(pos, ASEBA_OP_BIT_AND, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -998,14 +999,14 @@ namespace Aseba
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_SHIFT_LEFT, Token::TOKEN_OP_SHIFT_RIGHT };
 		
-		std::auto_ptr<Node> node(parseAddExpression());
+		std::unique_ptr<Node> node(parseAddExpression());
 		
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseAddExpression());
+			std::unique_ptr<Node> subExpression(parseAddExpression());
 			Node* temp = BinaryArithmeticNode::fromShiftExpression(pos, op, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -1020,14 +1021,14 @@ namespace Aseba
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_ADD, Token::TOKEN_OP_NEG };
 		
-		std::auto_ptr<Node> node(parseMultExpression());
+		std::unique_ptr<Node> node(parseMultExpression());
 		
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseMultExpression());
+			std::unique_ptr<Node> subExpression(parseMultExpression());
 			Node* temp = BinaryArithmeticNode::fromAddExpression(pos, op, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -1042,14 +1043,14 @@ namespace Aseba
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_MULT, Token::TOKEN_OP_DIV, Token::TOKEN_OP_MOD };
 		
-		std::auto_ptr<Node> node(parseUnaryExpression());
+		std::unique_ptr<Node> node(parseUnaryExpression());
 		
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
 			SourcePos pos = tokens.front().pos;
 			tokens.pop_front();
-			std::auto_ptr<Node> subExpression(parseUnaryExpression());
+			std::unique_ptr<Node> subExpression(parseUnaryExpression());
 			Node* temp = BinaryArithmeticNode::fromMultExpression(pos, op, node.get(), subExpression.get());
 			subExpression.release();
 			node.release();
@@ -1073,7 +1074,7 @@ namespace Aseba
 			{
 				tokens.pop_front();
 				
-				std::auto_ptr<Node> expression(parseOr());
+				std::unique_ptr<Node> expression(parseOr());
 				
 				expect(Token::TOKEN_PAR_CLOSE);
 				tokens.pop_front();
@@ -1120,7 +1121,7 @@ namespace Aseba
 			case Token::TOKEN_INT_LITERAL:
 			{
 				// immediate
-				std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(pos, expectInt16Literal()));
+				std::unique_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(pos, expectInt16Literal()));
 				tokens.pop_front();
 				return arrayCtor.release();
 			}
@@ -1130,7 +1131,7 @@ namespace Aseba
 				return parseConstantAndVariable();
 			}
 			
-			default: internalCompilerError(); return NULL;
+			default: internalCompilerError(); return nullptr;
 		}
 	}
 
@@ -1152,12 +1153,12 @@ namespace Aseba
 			)
 			{
 				// no
-				return NULL;
+				return nullptr;
 			}
 		}
 
 		SourcePos varPos = tokens.front().pos;
-		std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(varPos));
+		std::unique_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(varPos));
 
 		do
 		{
@@ -1193,7 +1194,7 @@ namespace Aseba
 		std::wstring varName = tokens.front().sValue;
 		if (constantExists(varName))
 		{
-			std::auto_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(tokens.front().pos));
+			std::unique_ptr<TupleVectorNode> arrayCtor(new TupleVectorNode(tokens.front().pos));
 			arrayCtor->addImmediateValue(expectConstant());
 			tokens.pop_front();
 			return arrayCtor.release();
@@ -1211,7 +1212,7 @@ namespace Aseba
 		SourcePos varPos = tokens.front().pos;
 		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
 
-		std::auto_ptr<MemoryVectorNode> vector(
+		std::unique_ptr<MemoryVectorNode> vector(
 					new MemoryVectorNode(
 						varPos,
 						varIt->second.first,
@@ -1226,12 +1227,12 @@ namespace Aseba
 			tokens.pop_front();
 
 			int start;
-			std::auto_ptr<Node> startIndex(tryParsingConstantExpression(pos, start));
+			std::unique_ptr<Node> startIndex(tryParsingConstantExpression(pos, start));
 
-			if (startIndex.get() == NULL)
+			if (startIndex.get() == nullptr)
 			{
 				// constant index
-				std::auto_ptr<TupleVectorNode> index(new TupleVectorNode(pos));
+				std::unique_ptr<TupleVectorNode> index(new TupleVectorNode(pos));
 				index->addImmediateValue(start);
 
 				// do we have array subscript?
@@ -1241,9 +1242,9 @@ namespace Aseba
 					tokens.pop_front();
 
 					int end;
-					std::auto_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
+					std::unique_ptr<Node> endIndex(tryParsingConstantExpression(pos, end));
 
-					if (endIndex.get() != NULL)
+					if (endIndex.get() != nullptr)
 						throw TranslatableError(pos, ERROR_INDEX_EXPECTING_CONSTANT);
 
 					// check if second index is within bounds
@@ -1303,17 +1304,17 @@ namespace Aseba
 	}
 
 	//! Use parseBinaryOrExpression() and try to reduce the result into an integer
-	//! If successful, return NULL and the integer in constantResult
+	//! If successful, return nullptr and the integer in constantResult
 	//! If unsuccessful, return the parsed tree (constantResult useless in this case)
 	Node* Compiler::tryParsingConstantExpression(SourcePos pos, int& constantResult)
 	{
-		std::auto_ptr<Node> tree(parseBinaryOrExpression());
+		std::unique_ptr<Node> tree(parseBinaryOrExpression());
 
 		try
 		{
 			constantResult = expectConstantExpression(pos, tree->deepCopy());
 			tree.reset();
-			return NULL;
+			return nullptr;
 		}
 		catch (TranslatableError error)
 		{
@@ -1331,7 +1332,7 @@ namespace Aseba
 
 		// create a temporary "var = expr" tree
 		// used to access the facility offered by the AssignmentNode (size check,...)
-		std::auto_ptr<Node> tempTree1(new AssignmentNode(pos, new MemoryVectorNode(pos, 0, 1, L"fake"), tree));
+		std::unique_ptr<Node> tempTree1(new AssignmentNode(pos, new MemoryVectorNode(pos, 0, 1, L"fake"), tree));
 
 		//tempTree1->children.push_back(parseBinaryOrExpression());
 
@@ -1339,14 +1340,14 @@ namespace Aseba
 		//std::cerr << "Tree before expanding" << std::endl;
 		//tempTree1->dump(std::wcerr, indent);
 
-		tempTree1->expandAbstractNodes(NULL);	// root node (AssignmentNode) is not abstract, so modify in place
-		std::auto_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(NULL));
+		tempTree1->expandAbstractNodes(nullptr);	// root node (AssignmentNode) is not abstract, so modify in place
+		std::unique_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(nullptr));
 
 		//std::cerr << "Tree after expanding" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);
 
 		tempTree1.reset();
-		tempTree2->optimize(NULL);
+		tempTree2->optimize(nullptr);
 
 		//std::cerr << "Tree after optimization" << std::endl;
 		//tempTree2->dump(std::wcerr, indent);
@@ -1384,7 +1385,7 @@ namespace Aseba
 		FunctionsMap::const_iterator funcIt(findFunction(funcName, pos));
 		
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
-		std::auto_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
+		std::unique_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
 		
 		tokens.pop_front();
 		
@@ -1417,7 +1418,7 @@ namespace Aseba
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
 
-				std::auto_ptr<Node> preNode(parseBinaryOrExpression());
+				std::unique_ptr<Node> preNode(parseBinaryOrExpression());
 				
 				// get the address and size
 				varAddr = preNode->getVectorAddr();

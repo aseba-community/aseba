@@ -58,7 +58,7 @@ extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
 {
 }
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 length)
+extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
 {
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
 	Dashel::Stream* stream = marxBot.stream;
@@ -68,7 +68,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	// send to stream
 	try
 	{
-		uint16 temp;
+		uint16_t temp;
 		temp = bswap16(length - 2);
 		stream->write(&temp, 2);
 		temp = bswap16(vm->nodeId);
@@ -93,7 +93,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8* data, uint16 leng
 	}
 }
 
-extern "C" uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	// TODO: improve this, it is rather ugly
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
@@ -142,14 +142,14 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 	return nativeFunctionsDescriptions;
 }
 
-static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { NULL, NULL } };
+static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { nullptr, nullptr } };
 
 extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
 {
 	return localEvents;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16 id)
+extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }
@@ -218,26 +218,26 @@ namespace Enki
 		// setup modules specific data
 		leftMotor.vm.nodeId = 1;
 		leftMotorVariables.id = 1;
-		leftMotor.vm.variables = reinterpret_cast<sint16 *>(&leftMotorVariables);
-		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(sint16);
+		leftMotor.vm.variables = reinterpret_cast<int16_t *>(&leftMotorVariables);
+		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(int16_t);
 		modules.push_back(&leftMotor);
 		
 		rightMotor.vm.nodeId = 2;
 		rightMotorVariables.id = 2;
-		rightMotor.vm.variables = reinterpret_cast<sint16 *>(&rightMotorVariables);
-		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(sint16);
+		rightMotor.vm.variables = reinterpret_cast<int16_t *>(&rightMotorVariables);
+		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(int16_t);
 		modules.push_back(&rightMotor);
 		
 		proximitySensors.vm.nodeId = 3;
 		proximitySensorVariables.id = 3;
-		proximitySensors.vm.variables = reinterpret_cast<sint16 *>(&proximitySensorVariables);
-		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(sint16);
+		proximitySensors.vm.variables = reinterpret_cast<int16_t *>(&proximitySensorVariables);
+		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(int16_t);
 		modules.push_back(&proximitySensors);
 		
 		distanceSensors.vm.nodeId = 4;
 		distanceSensorVariables.id = 4;
-		distanceSensors.vm.variables = reinterpret_cast<sint16 *>(&distanceSensorVariables);
-		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(sint16);
+		distanceSensors.vm.variables = reinterpret_cast<int16_t *>(&distanceSensorVariables);
+		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(int16_t);
 		modules.push_back(&distanceSensors);
 		
 		// fill map
@@ -308,7 +308,7 @@ namespace Enki
 		rightMotorVariables.odo[1] = odoRight >> 16;
 		
 		for (size_t i = 0; i < 24; i++)
-			proximitySensorVariables.bumpers[i] = static_cast<sint16>(getVirtualBumper(i));
+			proximitySensorVariables.bumpers[i] = static_cast<int16_t>(getVirtualBumper(i));
 		std::fill(proximitySensorVariables.ground, proximitySensorVariables.ground + 12, 0);
 		
 		for (size_t i = 0; i < 180; i++)
@@ -316,7 +316,7 @@ namespace Enki
 			if (rotatingDistanceSensor.zbuffer[i] > 32767)
 				distanceSensorVariables.distances[i] = 32767;
 			else
-				distanceSensorVariables.distances[i] = static_cast<sint16>(rotatingDistanceSensor.zbuffer[i]);
+				distanceSensorVariables.distances[i] = static_cast<int16_t>(rotatingDistanceSensor.zbuffer[i]);
 		}
 		
 		// do a network step

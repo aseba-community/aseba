@@ -69,28 +69,28 @@ enum
 typedef struct
 {
 	// node id
-	uint16 nodeId;
+	uint16_t nodeId;
 	
 	// bytecode
-	uint16 bytecodeSize; /*!< total amount of bytecode space */
-	uint16 * bytecode; /*!< bytecode space of size bytecodeSize */
+	uint16_t bytecodeSize; /*!< total amount of bytecode space */
+	uint16_t * bytecode; /*!< bytecode space of size bytecodeSize */
 	
 	// variables
-	uint16 variablesSize; /*!< total amount of variables space */
-	sint16 * variables; /*!< variables of size variableCount */
+	uint16_t variablesSize; /*!< total amount of variables space */
+	int16_t * variables; /*!< variables of size variableCount */
 	
 	// execution stack
-	uint16 stackSize; /*!< depth of execution stack */
-	sint16 * stack; /*!< execution stack of size stackSize */
+	uint16_t stackSize; /*!< depth of execution stack */
+	int16_t * stack; /*!< execution stack of size stackSize */
 	
 	// execution
-	uint16 flags;
-	uint16 pc;
-	sint16 sp;
+	uint16_t flags;
+	uint16_t pc;
+	int16_t sp;
 	
 	// breakpoint
-	uint16 breakpoints[ASEBA_MAX_BREAKPOINTS];
-	uint16 breakpointsCount;
+	uint16_t breakpoints[ASEBA_MAX_BREAKPOINTS];
+	uint16_t breakpointsCount;
 } AsebaVMState;
 
 // Macros to work with masks
@@ -116,51 +116,51 @@ typedef struct
 void AsebaVMInit(AsebaVMState *vm);
 
 /*!	Return the starting address of an event, or 0 if the event is not handled. */
-uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event);
+uint16_t AsebaVMGetEventAddress(AsebaVMState *vm, uint16_t event);
 
 /*! Setup VM to execute an event.
 	If event is not handled, VM is not ready for run.
 	Return the starting address of the event, or 0 if the event is not handled. */
-uint16 AsebaVMSetupEvent(AsebaVMState *vm, uint16 event);
+uint16_t AsebaVMSetupEvent(AsebaVMState *vm, uint16_t event);
 
 /*! Run the VM depending on the current execution mode.
 	Either run or step, depending of the current mode.
 	If stepsLimit > 0, execute at maximim stepsLimit
 	Return 1 if anything was executed, 0 otherwise. */
-uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit);
+uint16_t AsebaVMRun(AsebaVMState *vm, uint16_t stepsLimit);
 
 /*! Execute a debug action from a debug message. 
-	dataLength is given in number of uint16. */
-void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength);
+	dataLength is given in number of uint16_t. */
+void AsebaVMDebugMessage(AsebaVMState *vm, uint16_t id, uint16_t *data, uint16_t dataLength);
 
 /*! Can be called by glue code (including native functions), to stop vm and emit a node specific error */
 void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message);
 
 /*! Return non-zero if VM will ignore the packet, 0 otherwise */
-uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data);
+uint16_t AsebaVMShouldDropPacket(AsebaVMState *vm, uint16_t source, const uint8_t* data);
 
 // Functions implemented outside by the glue/transport layer
 
 /*! Called by AsebaStep if there is a message (not an user event) to send.
 	size is given in number of bytes. */
-void AsebaSendMessage(AsebaVMState *vm, uint16 id, const void *data, uint16 size);
+void AsebaSendMessage(AsebaVMState *vm, uint16_t id, const void *data, uint16_t size);
 
 #ifdef __BIG_ENDIAN__
 /*! Called by AsebaStep if there is a message (not an user event) to send.
 	count is given in number of words. */
-void AsebaSendMessageWords(AsebaVMState *vm, uint16 type, const uint16* data, uint16 count);
+void AsebaSendMessageWords(AsebaVMState *vm, uint16_t type, const uint16_t* data, uint16_t count);
 #else
 	#define AsebaSendMessageWords(vm,type,data,size) AsebaSendMessage(vm,type,data,(size)*2)
 #endif
 
 /*! Called by AsebaVMDebugMessage when some variables must be sent efficiently */
-void AsebaSendVariables(AsebaVMState *vm, uint16 start, uint16 length);
+void AsebaSendVariables(AsebaVMState *vm, uint16_t start, uint16_t length);
 
 /*! Called by AsebaVMDebugMessage when VM must send its description on the network. */
 void AsebaSendDescription(AsebaVMState *vm);
 
 /*! Called by AsebaStep to perform a native function call. */
-void AsebaNativeFunction(AsebaVMState *vm, uint16 id);
+void AsebaNativeFunction(AsebaVMState *vm, uint16_t id);
 
 /*! Called by AsebaVMDebugMessage when VM must write its bytecode to flash, write an empty function to leave feature unsupported */
 void AsebaWriteBytecode(AsebaVMState *vm);

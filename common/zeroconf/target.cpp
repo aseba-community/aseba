@@ -29,35 +29,96 @@ namespace Aseba
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
 	//! Note that later the port will become nonzero if the target is resolved.
-	Zeroconf::Target::Target(const std::string & name, const int port) :
-	name(name),
-	port(port),
-	local(port != 0)
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
+		name(name),
+		port(port),
+		local(port != 0)
 	{}
 
 	//! This target describes an existing Dashel stream
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
-	Zeroconf::Target::Target(const Dashel::Stream* stream) :
-	name("Aseba Local " + stream->getTargetParameter("port")),
-	port(atoi(stream->getTargetParameter("port").c_str()))
+	Zeroconf::TargetInformation::TargetInformation(const Dashel::Stream* stream) :
+		name("Aseba Local " + stream->getTargetParameter("port")),
+		port(atoi(stream->getTargetParameter("port").c_str()))
+	{}
+
+	//! Are all fields equal?
+	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	{
+		return
+			lhs.name == rhs.name &&
+			lhs.domain == rhs.domain &&
+			lhs.regtype == rhs.regtype
+		;
+	}
+
+	//! Are all fields of this lower than fileds of that, in order?
+	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	{
+		return
+			lhs.name < rhs.name &&
+			lhs.domain < rhs.domain &&
+			lhs.regtype < rhs.regtype
+		;
+	}
+
+	//! This target is described by a human-readable name and a port.
+	//! If a port is nonzero at creation then this is a local target to be remembered
+	//! otherwise it is a remote one discovered through browsing and may be refreshed.
+	//! Note that later the port will become nonzero if the target is resolved.
+	Zeroconf::Target::Target(const std::string & name, const int port, Zeroconf & container):
+		Zeroconf::TargetInformation(name, port),
+		container(container)
+	{}
+
+	//! This target describes an existing Dashel stream
+	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
+	Zeroconf::Target::Target(const Dashel::Stream* dashelStream, Zeroconf & container):
+		Zeroconf::TargetInformation(dashelStream),
+		container(container)
 	{}
 
 	//! Ask the containing Zeroconf to register a target with the DNS service, now that its description is complete
 	void Zeroconf::Target::advertise(const TxtRecord& txtrec)
 	{
-		container->registerTarget(this, txtrec);
+		container.get().registerTarget(*this, txtrec);
 	}
 
 	//! Ask the containing Zeroconf to replace this target's TXT record with a new one, typically when node, pid lists change
 	void Zeroconf::Target::updateTxtRecord(const TxtRecord& txtrec)
 	{
-		container->updateTarget(this, txtrec);
+		container.get().updateTarget(*this, txtrec);
 	}
 
 	//! Ask the containing Zeroconf to resolve this target's actual host name and port, using mDNS-SD
 	void Zeroconf::Target::resolve()
 	{
-		container->resolveTarget(this);
+		container.get().resolveTarget(*this);
+	}
+
+	//! Ask the containing Zeroconf to indicate that this register is completed
+	void Zeroconf::Target::registerCompleted() const
+	{
+		container.get().registerCompleted(*this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::resolveCompleted() const
+	{
+		container.get().resolveCompleted(*this);
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed
+	void Zeroconf::Target::updateCompleted() const
+	{
+		container.get().updateCompleted(*this);
+	}
+
+	//! Are the target information and the container equals?
+	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs)
+	{
+		return static_cast<const Zeroconf::TargetInformation>(lhs) == static_cast<const Zeroconf::TargetInformation>(rhs) &&
+			&lhs.container == &rhs.container;
 	}
 
 } // namespace Aseba

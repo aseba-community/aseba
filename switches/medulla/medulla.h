@@ -53,22 +53,22 @@ namespace Aseba
 		
 		public:
 			EventFilterInterface(AsebaNetworkInterface* network) : network(network) { ListenEvent(0); }
-			void emitEvent(const quint16 id, const QString& name, const Values& data);
+			void emitEvent(const uint16_t id, const QString& name, const Values& data);
 			
 		public slots:
-			Q_SCRIPTABLE Q_NOREPLY void ListenEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void ListenEvent(const uint16_t event);
 			Q_SCRIPTABLE Q_NOREPLY void ListenEventName(const QString& name, const QDBusMessage &message);
-			Q_SCRIPTABLE Q_NOREPLY void IgnoreEvent(const quint16 event);
+			Q_SCRIPTABLE Q_NOREPLY void IgnoreEvent(const uint16_t event);
 			Q_SCRIPTABLE Q_NOREPLY void IgnoreEventName(const QString& name, const QDBusMessage &message);
 			Q_SCRIPTABLE Q_NOREPLY void Free();
 		
 		signals:
-			Q_SCRIPTABLE void Event(const quint16, const QString& name, const Values& values);
-			Q_SCRIPTABLE void Test0(const quint16);
+			Q_SCRIPTABLE void Event(const uint16_t, const QString& name, const Values& values);
+			Q_SCRIPTABLE void Test0(const uint16_t);
 			Q_SCRIPTABLE void Test1(const QString& );
 			Q_SCRIPTABLE void Test2(const Values& );
-			Q_SCRIPTABLE void Test0_1(const quint16, const QString& );
-			Q_SCRIPTABLE void Test0_2(const quint16, const Values& );
+			Q_SCRIPTABLE void Test0_1(const uint16_t, const QString& );
+			Q_SCRIPTABLE void Test0_2(const uint16_t, const Values& );
 			Q_SCRIPTABLE void Test1_2(const QString&, const Values& );
 		
 		protected:
@@ -96,21 +96,21 @@ namespace Aseba
 			friend class Hub;
 			void processMessage(Message *message, const Dashel::Stream* sourceStream);
 			friend class EventFilterInterface;
-			void sendEventOnDBus(const quint16 event, const Values& data);
-			void listenEvent(EventFilterInterface* filter, quint16 event);
-			void ignoreEvent(EventFilterInterface* filter, quint16 event);
+			void sendEventOnDBus(const uint16_t event, const Values& data);
+			void listenEvent(EventFilterInterface* filter, uint16_t event);
+			void ignoreEvent(EventFilterInterface* filter, uint16_t event);
 			void filterDestroyed(EventFilterInterface* filter);
 		
 		public slots:
 			Q_NOREPLY void LoadScripts(const QString& fileName, const QDBusMessage &message);
 			QStringList GetNodesList() const;
 			qint16 GetNodeId(const QString& node, const QDBusMessage &message) const;
-			QString GetNodeName(const quint16 nodeId, const QDBusMessage &message) const;
+			QString GetNodeName(const uint16_t nodeId, const QDBusMessage &message) const;
 			bool IsConnected(const QString& node, const QDBusMessage &message) const;
 			QStringList GetVariablesList(const QString& node) const;
 			Q_NOREPLY void SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const;
 			Values GetVariable(const QString& node, const QString& variable, const QDBusMessage &message);
-			Q_NOREPLY void SendEvent(const quint16 event, const Values& data);
+			Q_NOREPLY void SendEvent(const uint16_t event, const Values& data);
 			Q_NOREPLY void SendEventName(const QString& name, const Values& data, const QDBusMessage &message);
 			QDBusObjectPath CreateEventFilter();
 			void PingNetwork();
@@ -129,7 +129,7 @@ namespace Aseba
 			UserDefinedVariablesMap userDefinedVariablesMap;
 			typedef QList<RequestData*> RequestsList;
 			RequestsList pendingReads;
-			typedef QMultiMap<quint16, EventFilterInterface*> EventsFiltersMap;
+			typedef QMultiMap<uint16_t, EventFilterInterface*> EventsFiltersMap;
 			EventsFiltersMap eventsFilters;
 			bool systemBus;
 			unsigned eventsFiltersCounter;

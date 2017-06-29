@@ -26,7 +26,8 @@
 #include "FormatableString.h"
 #include <dashel/dashel.h>
 #include <memory>
-#include <unistd.h>
+#include <algorithm>
+#include <iterator>
 
 namespace Aseba 
 {
@@ -55,7 +56,7 @@ namespace Aseba
 		
 	}
 	
-	bool BootloaderInterface::readPage(unsigned pageNumber, uint8* data)
+	bool BootloaderInterface::readPage(unsigned pageNumber, uint8_t* data)
 	{
 		if ((pageNumber < pagesStart) || (pageNumber >= pagesStart + pagesCount))
 		{
@@ -73,14 +74,13 @@ namespace Aseba
 		// get data
 		while (true)
 		{
-			auto_ptr<Message> message(Message::receive(stream));
+			unique_ptr<Message> message(Message::receive(stream));
 			
 			// handle ack
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == dest))
 			{
-				uint16 errorCode = ackMessage->errorCode;
-				if (errorCode == BootloaderAck::SUCCESS)
+				if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 				{
 					if (dataRead < pageSize)
 						cerr << "Warning, got acknowledgement but page not fully read (" << dataRead << "/" << pageSize << ") bytes.\n";
@@ -96,7 +96,7 @@ namespace Aseba
 			{
 				if (dataRead >= pageSize)
 					cerr << "Warning, reading oversized page (" << dataRead << "/" << pageSize << ") bytes.\n";
-				copy(dataMessage->data, dataMessage->data + sizeof(dataMessage->data), data);
+				copy(dataMessage->data.cbegin(), dataMessage->data.cend(), data);
 				data += sizeof(dataMessage->data);
 				dataRead += sizeof(dataMessage->data);
 				cout << "Page read so far (" << dataRead << "/" << pageSize << ") bytes.\n";
@@ -106,7 +106,7 @@ namespace Aseba
 		return true;
 	}
 	
-	bool BootloaderInterface::readPageSimple(unsigned pageNumber, uint8 * data)
+	bool BootloaderInterface::readPageSimple(unsigned pageNumber, uint8_t * data)
 	{
 		BootloaderReadPage message;
 		message.dest = dest;
@@ -118,7 +118,7 @@ namespace Aseba
 		return true;
 	}
 	
-	bool BootloaderInterface::writePage(unsigned pageNumber, const uint8 *data, bool simple)
+	bool BootloaderInterface::writePage(unsigned pageNumber, const uint8_t *data, bool simple)
 	{
 		writePageStart(pageNumber, data, simple);
 		
@@ -141,14 +141,13 @@ namespace Aseba
 			// wait ACK
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 				if (ackMessage && (ackMessage->source == bootloaderDest))
 				{
-					uint16 errorCode = ackMessage->errorCode;
-					if(errorCode == BootloaderAck::SUCCESS)
+					if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 						break;
 					else
 						return false;
@@ -160,7 +159,7 @@ namespace Aseba
 			{
 				BootloaderPageDataWrite pageData;
 				pageData.dest = bootloaderDest;
-				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data);
+				copy(data + dataWritten, data + dataWritten + sizeof(pageData.data), pageData.data.begin());
 				pageData.serialize(stream);
 				dataWritten += sizeof(pageData.data);
 				//cout << "." << std::flush;
@@ -168,14 +167,13 @@ namespace Aseba
 				/*
 				while (true)
 				{
-					auto_ptr<Message> message(Message::receive(stream));
+					unique_ptr<Message> message(Message::receive(stream));
 					
 					// handle ack
 					BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
 					if (ackMessage && (ackMessage->source == dest))
 					{
-						uint16 errorCode = ackMessage->errorCode;
-						if(errorCode == BootloaderAck::SUCCESS)
+						if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 							break;
 						else
 							return false;
@@ -192,14 +190,13 @@ namespace Aseba
 		while (true)
 		{
 			writePageWaitAck();
-			auto_ptr<Message> message(Message::receive(stream));
+			unique_ptr<Message> message(Message::receive(stream));
 			
 			// handle ack
 			BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message.get());
 			if (ackMessage && (ackMessage->source == bootloaderDest))
 			{
-				uint16 errorCode = ackMessage->errorCode;
-				if(errorCode == BootloaderAck::SUCCESS)
+				if (ackMessage->errorCode == BootloaderAck::ErrorCode::SUCCESS)
 				{
 					writePageSuccess();
 					return true;
@@ -242,13 +239,13 @@ namespace Aseba
 			// wait for disconnected message
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				Disconnected* disconnectedMessage(dynamic_cast<Disconnected*>(message.get()));
 				if (disconnectedMessage)
 					break;
 			}*/
 			// give 10 ms to the robot the time to reset
-			usleep(10000);
+			UnifiedTime(10).sleep();
 			pageSize = 2048;
 		}
 		else
@@ -256,7 +253,7 @@ namespace Aseba
 			// get bootloader description
 			while (true)
 			{
-				auto_ptr<Message> message(Message::receive(stream));
+				unique_ptr<Message> message(Message::receive(stream));
 				BootloaderDescription *bDescMessage = dynamic_cast<BootloaderDescription *>(message.get());
 				if (bDescMessage && (bDescMessage->source == bootloaderDest))
 				{
@@ -269,7 +266,7 @@ namespace Aseba
 		}
 		
 		// Build a map of pages out of the map of addresses
-		typedef map<uint32, vector<uint8> > PageMap;
+		typedef map<uint32_t, vector<uint8_t> > PageMap;
 		PageMap pageMap;
 		for (HexFile::ChunkMap::iterator it = hexFile.data.begin(); it != hexFile.data.end(); it ++)
 		{
@@ -292,7 +289,7 @@ namespace Aseba
 				if (pageMap.find(pageIndex) == pageMap.end())
 				{
 				//	std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
-					pageMap[pageIndex] = vector<uint8>(pageSize, (uint8)0);
+					pageMap[pageIndex] = vector<uint8_t>(pageSize, (uint8_t)0);
 				}
 				// copy data
 				unsigned amountToCopy = min(pageSize - byteIndex, chunkSize - chunkDataIndex);
@@ -355,13 +352,13 @@ namespace Aseba
 		
 		// Create memory
 		unsigned address = pagesStart * pageSize;
-		hexFile.data[address] = vector<uint8>();
+		hexFile.data[address] = vector<uint8_t>();
 		hexFile.data[address].reserve(pagesCount * pageSize);
 		
 		// Read pages
 		for (unsigned page = pagesStart; page < pagesCount; page++)
 		{
-			vector<uint8> buffer((uint8)0, pageSize);
+			vector<uint8_t> buffer((uint8_t)0, pageSize);
 			
 			if (!readPage(page, &buffer[0]))
 				throw Error(FormatableString("Error, cannot read page %0").arg(page));

@@ -24,6 +24,7 @@
 #include <QObject>
 #include <valarray>
 #include "../../compiler/compiler.h"
+#include "../../common/msg/msg.h"
 
 namespace Aseba
 {
@@ -87,7 +88,7 @@ namespace Aseba
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
 		
 		//! We received an ack from the bootloader
-		void bootloaderAck(unsigned errorCode, unsigned errorAddress);
+		void bootloaderAck(BootloaderAck::ErrorCode errorCode, unsigned errorAddress);
 		
 	public:
 		//! Virtual destructor.

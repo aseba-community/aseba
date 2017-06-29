@@ -124,7 +124,7 @@ namespace Aseba { namespace ThymioVPL
 		friend class Aseba::ThymioVPL::BlockButton;
 		friend class Aseba::ThymioVPL::Scene;
 		
-		std::auto_ptr<DevelopmentEnvironmentInterface> de;
+		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		ResizingView *view;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself

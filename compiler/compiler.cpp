@@ -32,6 +32,7 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
+#include <iterator>
 
 namespace Aseba
 {
@@ -39,9 +40,9 @@ namespace Aseba
 	/*@{*/
 	
 	//! Compute the XModem CRC of the description, as defined in AS001 at https://aseba.wikidot.com/asebaspecifications
-	uint16 TargetDescription::crc() const
+	uint16_t TargetDescription::crc() const
 	{
-		uint16 crc(0);
+		uint16_t crc(0);
 		crc = crcXModem(crc, bytecodeSize);
 		crc = crcXModem(crc, variablesSize);
 		crc = crcXModem(crc, stackSize);
@@ -173,7 +174,7 @@ namespace Aseba
 		}
 		
 		// parsing
-		std::auto_ptr<Node> program;
+		std::unique_ptr<Node> program;
 		try
 		{
 			program.reset(parseProgram());

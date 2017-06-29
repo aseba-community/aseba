@@ -27,6 +27,7 @@
 #include <cassert>
 #include <algorithm>
 #include <valarray>
+#include <iterator>
 
 namespace Aseba
 {
@@ -84,7 +85,7 @@ namespace Aseba
 			throw FileOpeningError(fileName);
 		
 		int lineCounter = 0;
-		uint32 baseAddress = 0;
+		uint32_t baseAddress = 0;
 		
 		while (ifs.good())
 		{
@@ -94,19 +95,19 @@ namespace Aseba
 			if (c != ':')
 				throw InvalidRecord(lineCounter);
 			
-			uint8 computedCheckSum = 0;
+			uint8_t computedCheckSum = 0;
 			
 			// record data length
-			uint8 dataLength = getUint8(ifs);
+			uint8_t dataLength = getUint8(ifs);
 			computedCheckSum += dataLength;
 			
 			// short address
-			uint16 lowAddress = getUint16(ifs);
+			uint16_t lowAddress = getUint16(ifs);
 			computedCheckSum += lowAddress;
 			computedCheckSum += lowAddress >> 8;
 			
 			// record type
-			uint8 recordType = getUint8(ifs);
+			uint8_t recordType = getUint8(ifs);
 			computedCheckSum += recordType;
 			
 			switch (recordType)
@@ -115,23 +116,23 @@ namespace Aseba
 				// data record
 				{
 					// read data
-					std::vector<uint8> recordData;
+					std::vector<uint8_t> recordData;
 					for (int i = 0; i != dataLength; i++)
 					{
-						uint8 d = getUint8(ifs);
+						uint8_t d = getUint8(ifs);
 						computedCheckSum += d;
 						recordData.push_back(d);
 						//std::cout << "data " << std::hex << (unsigned)d << "\n";
 					}
 					
 					// verify checksum
-					uint8 checkSum = getUint8(ifs);
+					uint8_t checkSum = getUint8(ifs);
 					computedCheckSum = 1 + ~computedCheckSum;
 					if (checkSum != computedCheckSum)
 						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
 					
 					// compute address
-					uint32 address = lowAddress;
+					uint32_t address = lowAddress;
 					address += baseAddress;
 					//std::cout << "data record at address 0x" << std::hex << address << "\n";
 					
@@ -183,7 +184,7 @@ namespace Aseba
 						throw InvalidRecord(lineCounter);
 					
 					// read data
-					uint16 highAddress = getUint16(ifs);
+					uint16_t highAddress = getUint16(ifs);
 					computedCheckSum += highAddress;
 					computedCheckSum += highAddress >> 8;
 					baseAddress = highAddress;
@@ -191,7 +192,7 @@ namespace Aseba
 					//std::cout << "Extended segment address record (?!): 0x" << std::hex << baseAddress << "\n";
 					
 					// verify checksum
-					uint8 checkSum = getUint8(ifs);
+					uint8_t checkSum = getUint8(ifs);
 					computedCheckSum = 1 + ~computedCheckSum;
 					if (checkSum != computedCheckSum)
 						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
@@ -205,7 +206,7 @@ namespace Aseba
 						throw InvalidRecord(lineCounter);
 					
 					// read data
-					uint16 highAddress = getUint16(ifs);
+					uint16_t highAddress = getUint16(ifs);
 					computedCheckSum += highAddress;
 					computedCheckSum += highAddress >> 8;
 					baseAddress = highAddress;
@@ -213,7 +214,7 @@ namespace Aseba
 					//std::cout << "Linear address record: 0x" << std::hex << baseAddress << "\n";
 					
 					// verify checksum
-					uint8 checkSum = getUint8(ifs);
+					uint8_t checkSum = getUint8(ifs);
 					computedCheckSum = 1 + ~computedCheckSum;
 					if (checkSum != computedCheckSum)
 						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
@@ -231,7 +232,7 @@ namespace Aseba
 
 					computedCheckSum = 1 + ~computedCheckSum;
 
-					uint8 checkSum = getUint8(ifs);
+					uint8_t checkSum = getUint8(ifs);
 
 					if (checkSum != computedCheckSum)
 						throw WrongCheckSum(lineCounter, checkSum, computedCheckSum);
@@ -255,7 +256,7 @@ namespace Aseba
 	{
 		assert(addr16 <= 65535);
 		
-		uint8 checkSum = 0;
+		uint8_t checkSum = 0;
 		
 		stream << ":02000004";
 		checkSum += 0x02;
@@ -278,12 +279,12 @@ namespace Aseba
 		stream << "\n";
 	}
 	
-	void HexFile::writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8 *data) const
+	void HexFile::writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data) const
 	{
 		assert(addr16 <= 65535);
 		assert(count8 <= 255);
 		
-		uint8 checkSum = 0;
+		uint8_t checkSum = 0;
 		
 		stream << ":";
 		
@@ -319,7 +320,7 @@ namespace Aseba
 	void HexFile::strip(unsigned pageSize)
 	{
 		// Build a page map.
-		typedef std::map<uint32, std::vector<uint8> > PageMap;
+		typedef std::map<uint32_t, std::vector<uint8_t> > PageMap;
 		PageMap pageMap;
 		for (ChunkMap::iterator it = data.begin(); it != data.end(); it ++)
 		{
@@ -342,7 +343,7 @@ namespace Aseba
 				if (pageMap.find(pageIndex) == pageMap.end())
 				{
 				//      std::cout << "New page N° " << pageIndex << " for address 0x" << std::hex << chunkAddress << endl;
-					pageMap[pageIndex] = std::vector<uint8>(pageSize, (uint8)0xFF); // New page is created uninitialized
+					pageMap[pageIndex] = std::vector<uint8_t>(pageSize, (uint8_t)0xFF); // New page is created uninitialized
 				}
 				// copy data
 				unsigned amountToCopy = std::min(pageSize - byteIndex, chunkSize - chunkDataIndex);
@@ -405,7 +406,7 @@ namespace Aseba
 				// write data
 				unsigned rowCount = std::min(amount - count, (unsigned)16);
 				unsigned lowAddress = (address + count) & 0xFFFF;
-				std::valarray<uint8> buffer(rowCount);
+				std::valarray<uint8_t> buffer(rowCount);
 				std::copy(it->second.begin() + count, it->second.begin() + count + rowCount, &buffer[0]);
 				writeData(ofs, lowAddress, rowCount , &buffer[0]);
 				

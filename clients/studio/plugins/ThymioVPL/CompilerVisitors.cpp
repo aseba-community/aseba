@@ -315,8 +315,8 @@ namespace Aseba { namespace ThymioVPL
 		
 		wstringstream ostr;
 		ostr << hex << showbase;
-		const QVector<quint16> compressedContent(eventActionsSet.getContentCompressed());
-        copy(compressedContent.begin(), compressedContent.end(), ostream_iterator<quint16, wchar_t>(ostr, L", "));
+		const QVector<uint16_t> compressedContent(eventActionsSet.getContentCompressed());
+        copy(compressedContent.begin(), compressedContent.end(), ostream_iterator<uint16_t, wchar_t>(ostr, L", "));
 		text += ostr.str();
 		text.erase(text.size() - 2);
 		

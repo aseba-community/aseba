@@ -56,7 +56,7 @@ namespace Aseba
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 		
 	private:
-		std::auto_ptr<DevelopmentEnvironmentInterface> de;
+		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		enum ValuesRange
 		{
 			VALUES_RANGE_AUTO = 0,

@@ -18,20 +18,19 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_THYMIO2_H
-#define __CHALLENGE_THYMIO2_H
+#ifndef __PLAYGROUND_THYMIO2_H
+#define __PLAYGROUND_THYMIO2_H
 
 #include "AsebaGlue.h"
+#include "../../common/utils/utils.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/thymio2/Thymio2.h>
-#include <QTimer>
+#include <fstream>
 
 namespace Enki
 {
-	class AsebaThymio2 : public QObject, public Thymio2, public Aseba::AbstractNodeGlue, public Aseba::SimpleDashelConnection
+	class AsebaThymio2 : public Thymio2, public Aseba::SingleVMNodeGlue
 	{
-		Q_OBJECT
-		
 	public:
 		enum Thymio2Events
 		{
@@ -56,70 +55,77 @@ namespace Enki
 		};
 		
 	public:
-		AsebaVMState vm;
-		std::valarray<unsigned short> bytecode;
-		std::valarray<signed short> stack;
 		struct Variables
 		{
-			sint16 id;
-			sint16 source;
-			sint16 args[32];
-			sint16 productId;
-			sint16 fwversion[2];
+			int16_t id;
+			int16_t source;
+			int16_t args[32];
+			int16_t productId;
+			int16_t fwversion[2];
 			
-			sint16 buttonBackward;
-			sint16 buttonLeft;
-			sint16 buttonCenter;
-			sint16 buttonForward;
-			sint16 buttonRight;
+			int16_t buttonBackward;
+			int16_t buttonLeft;
+			int16_t buttonCenter;
+			int16_t buttonForward;
+			int16_t buttonRight;
 			
-			sint16 proxHorizontal[7];
+			int16_t proxHorizontal[7];
 			
-			sint16 proxCommRx;
-			sint16 proxCommTx;
+			int16_t proxCommRx;
+			int16_t proxCommTx;
 			
-			sint16 proxGroundAmbiant[2];
-			sint16 proxGroundReflected[2];
-			sint16 proxGroundDelta[2];
+			int16_t proxGroundAmbiant[2];
+			int16_t proxGroundReflected[2];
+			int16_t proxGroundDelta[2];
 			
-			sint16 motorLeftTarget;
-			sint16 motorRightTarget;
-			sint16 motorLeftSpeed;
-			sint16 motorRightSpeed;
-			sint16 motorLeftPwm;
-			sint16 motorRightPwm;
+			int16_t motorLeftTarget;
+			int16_t motorRightTarget;
+			int16_t motorLeftSpeed;
+			int16_t motorRightSpeed;
+			int16_t motorLeftPwm;
+			int16_t motorRightPwm;
 			
-			sint16 acc[3];
+			int16_t acc[3];
 			
-			sint16 temperature;
+			int16_t temperature;
 			
-			sint16 rc5adress;
-			sint16 rc5command;
+			int16_t rc5adress;
+			int16_t rc5command;
 			
-			sint16 micIntensity;
-			sint16 micThreshold;
+			int16_t micIntensity;
+			int16_t micThreshold;
 			
-			sint16 timerPeriod[2];
+			int16_t timerPeriod[2];
 			
-			sint16 freeSpace[512];
+			int16_t freeSpace[512];
 		} variables;
 		
+	public:
+		const std::string robotName;
+		std::fstream sdCardFile;
+		int sdCardFileNumber;
+		
 	protected:
-		QTimer* timer0;
-		QTimer* timer1;
-		sint16 oldTimerPeriod[2];
-		QTimer* timer100Hz;
+		Aseba::SoftTimer timer0;
+		Aseba::SoftTimer timer1;
+		int16_t oldTimerPeriod[2];
+		Aseba::SoftTimer timer100Hz;
 		unsigned counter100Hz;
+		
 		bool lastStepCollided;
 		bool thisStepCollided;
 		
 	public:
-		AsebaThymio2(unsigned port);
-		virtual ~AsebaThymio2();
+		AsebaThymio2(const std::string& robotName);
 		
 		// from PhysicalObject
 		
 		virtual void collisionEvent(PhysicalObject *o);
+
+		// from Robot
+
+		virtual void mousePressEvent(unsigned button, double pointX, double pointY, double pointZ);
+		virtual void mouseReleaseEvent(unsigned button);
 		
 		// from Thymio2
 		
@@ -130,17 +136,23 @@ namespace Enki
 		virtual const AsebaVMDescription* getDescription() const;
 		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
 		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
-		virtual void callNativeFunction(uint16 id);
+		virtual void callNativeFunction(uint16_t id);
 		
-	protected slots:
+		// for Thymio2-natives.cpp
+		
+		bool openSDCardFile(int number);
+		
+	protected:
+		
 		void timer0Timeout();
 		void timer1Timeout();
 		void timer100HzTimeout();
 		
 	protected:
 		friend class Thymio2Interface;
-		void execLocalEvent(uint16 number);
+		void execLocalEvent(uint16_t number);
 	};
+	
 } // Enki
 
-#endif // __CHALLENGE_EPUCK_H
+#endif // __PLAYGROUND_THYMIO2_H

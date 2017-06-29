@@ -1,0 +1,41 @@
+# SCENARIO Can insert and retrieve at either end
+# 	GIVEN An empty Deque of size 5
+
+var dq[7]
+var require1[1]
+var require2[1]
+var require3[1]
+var require4[1]
+var require5[1]
+
+# 	WHEN Insert elements 30, 20, 10 at 0
+
+call deque.insert(dq, [30], 0)
+call deque.insert(dq, [20], 0)
+call deque.insert(dq, [10], 0)
+
+# 		THEN Deque contains three elements
+# 			REQUIRE size == 3
+
+require1 = dq[0]
+
+# 	WHEN Get element 0
+# 		THEN Obtain 10
+# 			REQUIRE result == 10
+
+call deque.get(dq, require2, 0)
+
+# 	WHEN Get element 2
+# 		THEN Obtain 30
+# 			REQUIRE result == 30
+
+call deque.get(dq, require3, 2)
+
+# 	WHEN Insert element 40 at 3 then get element 3
+# 		THEN Obtain 40
+# 			REQUIRE result == 40
+# 			REQUIRE size == 4
+
+call deque.insert(dq, 40, 3)
+call deque.get(dq, require4, 3)
+require5 = dq[0]

@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __CHALLENGE_DOOR_H
-#define __CHALLENGE_DOOR_H
+#ifndef __PLAYGROUND_DOOR_H
+#define __PLAYGROUND_DOOR_H
 
 #include <enki/PhysicalEngine.h>
 
@@ -61,13 +61,13 @@ namespace Enki
 	class AreaActivating: public LocalInteraction
 	{
 	public:
-		const Polygone activeArea;
+		const Polygon activeArea;
 		
 	protected:
 		bool active;
 		
 	public:
-		AreaActivating(Robot *owner, const Polygone& activeArea);
+		AreaActivating(Robot *owner, const Polygon& activeArea);
 		
 		virtual void init(double dt, World *w);
 		virtual void objectStep (double dt, World *w, PhysicalObject *po);
@@ -83,10 +83,10 @@ namespace Enki
 		Door *const attachedDoor;
 	
 	public:
-		DoorButton(const Point& pos, const Point& size, const Polygone& activeArea, Door* attachedDoor);
+		DoorButton(const Point& pos, const Point& size, const Polygon& activeArea, Door* attachedDoor);
 		
 		virtual void controlStep(double dt);
 	};
 } // Enki
 
-#endif // __CHALLENGE_DOOR_H
+#endif // __PLAYGROUND_DOOR_H

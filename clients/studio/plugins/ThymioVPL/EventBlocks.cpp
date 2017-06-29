@@ -240,9 +240,9 @@ namespace Aseba { namespace ThymioVPL
 			setOrientation(value);
 	}
 	
-	QVector<quint16> AccEventBlock::getValuesCompressed() const
+	QVector<uint16_t> AccEventBlock::getValuesCompressed() const
 	{
-		return QVector<quint16>(1, (orientation<<2) | mode);
+		return QVector<uint16_t>(1, (orientation<<2) | mode);
 	}
 	
 	void AccEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)

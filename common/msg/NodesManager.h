@@ -85,7 +85,7 @@ namespace Aseba
 		virtual void sendMessage(const Message& message) = 0;
 		
 		//! Virtual function that is called when a version mismatches, called once per node
-		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16 protocolVersion) { }
+		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion) { }
 		
 		//! Virtual function that is called when a node is first seen, meaning its description has been fully received
 		virtual void nodeDescriptionReceived(unsigned nodeId) { }

@@ -49,13 +49,13 @@ void AsebaVMInit(AsebaVMState *vm)
 	
 	// fill with no event
 	vm->bytecode[0] = 0;
-	memset(vm->variables, 0, vm->variablesSize*sizeof(sint16));
+	memset(vm->variables, 0, vm->variablesSize*sizeof(int16_t));
 }
 
-uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event)
+uint16_t AsebaVMGetEventAddress(AsebaVMState *vm, uint16_t event)
 {
-	uint16 eventVectorSize = vm->bytecode[0];
-	uint16 i;
+	uint16_t eventVectorSize = vm->bytecode[0];
+	uint16_t i;
 
 	// look into event vectors and if event match execute corresponding bytecode
 	for (i = 1; i < eventVectorSize; i += 2)
@@ -65,9 +65,9 @@ uint16 AsebaVMGetEventAddress(AsebaVMState *vm, uint16 event)
 }
 
 
-uint16 AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
+uint16_t AsebaVMSetupEvent(AsebaVMState *vm, uint16_t event)
 {
-	uint16 address = AsebaVMGetEventAddress(vm, event);
+	uint16_t address = AsebaVMGetEventAddress(vm, event);
 	if (address)
 	{
 		// if currently executing a thread, notify kill
@@ -87,7 +87,7 @@ uint16 AsebaVMSetupEvent(AsebaVMState *vm, uint16 event)
 	return address;
 }
 
-static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16 valueTwo, uint16 op)
+static int16_t AsebaVMDoBinaryOperation(AsebaVMState *vm, int16_t valueOne, int16_t valueTwo, uint16_t op)
 {
 	switch (op)
 	{
@@ -147,7 +147,7 @@ static sint16 AsebaVMDoBinaryOperation(AsebaVMState *vm, sint16 valueOne, sint16
 	}
 }
 
-static sint16 AsebaVMDoUnaryOperation(AsebaVMState *vm, sint16 value, uint16 op)
+static int16_t AsebaVMDoUnaryOperation(AsebaVMState *vm, int16_t value, uint16_t op)
 {
 	ASEBA_UNUSED(vm);
 	switch (op)
@@ -168,7 +168,7 @@ static sint16 AsebaVMDoUnaryOperation(AsebaVMState *vm, sint16 value, uint16 op)
 	VM must be ready for run otherwise trashes may occur. */
 void AsebaVMStep(AsebaVMState *vm)
 {
-	uint16 bytecode = vm->bytecode[vm->pc];
+	uint16_t bytecode = vm->bytecode[vm->pc];
 	
 	#ifdef ASEBA_ASSERT
 	if (AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
@@ -187,7 +187,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Small Immediate
 		case ASEBA_BYTECODE_SMALL_IMMEDIATE:
 		{
-			sint16 value = ((sint16)(bytecode << 4)) >> 4;
+			int16_t value = ((int16_t)(bytecode << 4)) >> 4;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -223,7 +223,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Load
 		case ASEBA_BYTECODE_LOAD:
 		{
-			uint16 variableIndex = bytecode & 0x0fff;
+			uint16_t variableIndex = bytecode & 0x0fff;
 			
 			// check sp and variable index
 			#ifdef ASEBA_ASSERT
@@ -244,7 +244,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Store
 		case ASEBA_BYTECODE_STORE:
 		{
-			uint16 variableIndex = bytecode & 0x0fff;
+			uint16_t variableIndex = bytecode & 0x0fff;
 			
 			// check sp and variable index
 			#ifdef ASEBA_ASSERT
@@ -265,9 +265,9 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Load Indirect
 		case ASEBA_BYTECODE_LOAD_INDIRECT:
 		{
-			uint16 arrayIndex;
-			uint16 arraySize;
-			uint16 variableIndex;
+			uint16_t arrayIndex;
+			uint16_t arraySize;
+			uint16_t variableIndex;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -283,7 +283,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			// check variable index
 			if (variableIndex >= arraySize)
 			{
-				uint16 buffer[3];
+				uint16_t buffer[3];
 				buffer[0] = vm->pc;
 				buffer[1] = arraySize;
 				buffer[2] = variableIndex;
@@ -305,10 +305,10 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Store Indirect
 		case ASEBA_BYTECODE_STORE_INDIRECT:
 		{
-			uint16 arrayIndex;
-			uint16 arraySize;
-			uint16 variableIndex;
-			sint16 variableValue;
+			uint16_t arrayIndex;
+			uint16_t arraySize;
+			uint16_t variableIndex;
+			int16_t variableValue;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -320,12 +320,12 @@ void AsebaVMStep(AsebaVMState *vm)
 			arrayIndex = bytecode & 0x0fff;
 			arraySize = vm->bytecode[vm->pc + 1];
 			variableValue = vm->stack[vm->sp - 1];
-			variableIndex = (uint16)vm->stack[vm->sp];
+			variableIndex = (uint16_t)vm->stack[vm->sp];
 			
 			// check variable index
 			if (variableIndex >= arraySize)
 			{
-				uint16 buffer[3];
+				uint16_t buffer[3];
 				buffer[0] = vm->pc;
 				buffer[1] = arraySize;
 				buffer[2] = variableIndex;
@@ -348,7 +348,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Unary Arithmetic
 		case ASEBA_BYTECODE_UNARY_ARITHMETIC:
 		{
-			sint16 value, opResult;
+			int16_t value, opResult;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -373,7 +373,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Binary Arithmetic
 		case ASEBA_BYTECODE_BINARY_ARITHMETIC:
 		{
-			sint16 valueOne, valueTwo, opResult;
+			int16_t valueOne, valueTwo, opResult;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -400,7 +400,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Jump
 		case ASEBA_BYTECODE_JUMP:
 		{
-			sint16 disp = ((sint16)(bytecode << 4)) >> 4;
+			int16_t disp = ((int16_t)(bytecode << 4)) >> 4;
 			
 			// check pc
 			#ifdef ASEBA_ASSERT
@@ -416,9 +416,9 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Conditional Branch
 		case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
 		{
-			sint16 conditionResult;
-			sint16 valueOne, valueTwo;
-			sint16 disp;
+			int16_t conditionResult;
+			int16_t valueOne, valueTwo;
+			int16_t disp;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -441,7 +441,7 @@ void AsebaVMStep(AsebaVMState *vm)
 			else
 			{
 				// if false disp
-				disp = (sint16)vm->bytecode[vm->pc + 1];
+				disp = (int16_t)vm->bytecode[vm->pc + 1];
 			}
 			
 			// write back condition result
@@ -465,8 +465,8 @@ void AsebaVMStep(AsebaVMState *vm)
 		case ASEBA_BYTECODE_EMIT:
 		{
 			// emit event
-			uint16 start = vm->bytecode[vm->pc + 1];
-			uint16 length = vm->bytecode[vm->pc + 2];
+			uint16_t start = vm->bytecode[vm->pc + 1];
+			uint16_t length = vm->bytecode[vm->pc + 2];
 			
 			#ifdef ASEBA_ASSERT
 			if (length > ASEBA_MAX_EVENT_ARG_SIZE)
@@ -493,7 +493,7 @@ void AsebaVMStep(AsebaVMState *vm)
 		// Bytecode: Subroutine call
 		case ASEBA_BYTECODE_SUB_CALL:
 		{
-			uint16 dest = bytecode & 0x0fff;
+			uint16_t dest = bytecode & 0x0fff;
 			
 			// check sp
 			#ifdef ASEBA_ASSERT
@@ -533,11 +533,11 @@ void AsebaVMStep(AsebaVMState *vm)
 
 void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
 {
-	uint16 msgLen = strlen(message);
+	uint16_t msgLen = strlen(message);
 #if defined(__GNUC__)
-	uint8 buffer[msgLen+3];
+	uint8_t buffer[msgLen+3];
 #elif defined(_MSC_VER)
-	uint8 * buffer = _alloca(msgLen+3);
+	uint8_t * buffer = _alloca(msgLen+3);
 #else
 	#error "Please provide a stack memory allocator for your compiler"
 #endif
@@ -547,8 +547,8 @@ void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
 	
 	vm->flags = ASEBA_VM_STEP_BY_STEP_MASK;
 	
-	((uint16*)buffer)[0] = bswap16(vm->pc);
-	buffer[2] = (uint8)msgLen;
+	((uint16_t*)buffer)[0] = bswap16(vm->pc);
+	buffer[2] = (uint8_t)msgLen;
 	memcpy(buffer+3, message, msgLen);
 	
 	AsebaSendMessage(vm, ASEBA_MESSAGE_NODE_SPECIFIC_ERROR, buffer, msgLen+3);
@@ -557,9 +557,9 @@ void AsebaVMEmitNodeSpecificError(AsebaVMState *vm, const char* message)
 /*! Execute on bytecode of the current VM thread and check for potential breakpoints.
 	Return 1 if breakpoint was seen, 0 otherwise.
 	VM must be ready for run otherwise trashes may occur. */
-uint16 AsebaVMCheckBreakpoint(AsebaVMState *vm)
+uint16_t AsebaVMCheckBreakpoint(AsebaVMState *vm)
 {
-	uint16 i;
+	uint16_t i;
 	for (i = 0; i < vm->breakpointsCount; i++)
 	{
 		if (vm->breakpoints[i] == vm->pc)
@@ -574,7 +574,7 @@ uint16 AsebaVMCheckBreakpoint(AsebaVMState *vm)
 
 /*! Run without support of breakpoints.
 	Check ASEBA_VM_EVENT_RUNNING_MASK to exit on interrupts or stepsLimit if > 0. */
-void AsebaDebugBareRun(AsebaVMState *vm, uint16 stepsLimit)
+void AsebaDebugBareRun(AsebaVMState *vm, uint16_t stepsLimit)
 {
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 	
@@ -605,7 +605,7 @@ void AsebaDebugBareRun(AsebaVMState *vm, uint16 stepsLimit)
 
 /*! Run with support of breakpoints.
 	Also check ASEBA_VM_EVENT_RUNNING_MASK to exit on interrupts. */
-void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
+void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16_t stepsLimit)
 {
 	AsebaMaskSet(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 	
@@ -648,7 +648,7 @@ void AsebaDebugBreakpointRun(AsebaVMState *vm, uint16 stepsLimit)
 	AsebaMaskClear(vm->flags, ASEBA_VM_EVENT_RUNNING_MASK);
 }
 
-uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit)
+uint16_t AsebaVMRun(AsebaVMState *vm, uint16_t stepsLimit)
 {
 	// if there is nothing to execute, just return
 	if (AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
@@ -669,7 +669,7 @@ uint16 AsebaVMRun(AsebaVMState *vm, uint16 stepsLimit)
 
 
 /*! Set a breakpoint at a specific location. */
-uint8 AsebaVMSetBreakpoint(AsebaVMState *vm, uint16 pc)
+uint8_t AsebaVMSetBreakpoint(AsebaVMState *vm, uint16_t pc)
 {
 	#ifdef ASEBA_ASSERT
 	if (pc >= vm->bytecodeSize)
@@ -686,14 +686,14 @@ uint8 AsebaVMSetBreakpoint(AsebaVMState *vm, uint16 pc)
 }
 
 /*! Clear the breakpoint at a specific location. */
-uint16 AsebaVMClearBreakpoint(AsebaVMState *vm, uint16 pc)
+uint16_t AsebaVMClearBreakpoint(AsebaVMState *vm, uint16_t pc)
 {
-	uint16 i;
+	uint16_t i;
 	for (i = 0; i < vm->breakpointsCount; i++)
 	{
 		if (vm->breakpoints[i] == pc)
 		{
-			uint16 j;
+			uint16_t j;
 			// displace
 			vm->breakpointsCount--;
 			for (j = i; j < vm->breakpointsCount; j++)
@@ -713,7 +713,7 @@ void AsebaVMClearBreakpoints(AsebaVMState *vm)
 /*! Send an execution state changed message */
 void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 {
-	uint16 buffer[2];
+	uint16_t buffer[2];
 	buffer[0] = vm->pc;
 	buffer[1] = vm->flags;
 	AsebaSendMessageWords(vm, ASEBA_MESSAGE_EXECUTION_STATE_CHANGED, buffer, 2);
@@ -722,21 +722,44 @@ void AsebaVMSendExecutionStateChanged(AsebaVMState *vm)
 /*! Reset all when flags in their default states in the bytecode */
 static void AsebaVMResetWhenFlags(AsebaVMState *vm)
 {
-	uint16 i;
-	for (i = 0; i < vm->bytecodeSize; i++)
+	// start at the end of event vector table
+	const uint16_t eventVectSize = vm->bytecode[0];
+	uint16_t pc = eventVectSize*2 + 1;
+	while (pc < vm->bytecodeSize)
 	{
-		uint16 bytecode = vm->bytecode[i];
-		if ((bytecode >> 12) == ASEBA_BYTECODE_CONDITIONAL_BRANCH)
-			BIT_CLR(vm->bytecode[i], ASEBA_IF_WAS_TRUE_BIT);
+		// Iterate through all bytecode, skipping multi-word instructions.
+		// Single-word instructions are commented-out and handled by the
+		// default case, but are written down for the sake of completeness.
+		switch (vm->bytecode[pc] >> 12)
+		{
+			//case ASEBA_BYTECODE_STOP:               pc += 1; break;
+			//case ASEBA_BYTECODE_SMALL_IMMEDIATE:    pc += 1; break;
+			  case ASEBA_BYTECODE_LARGE_IMMEDIATE:    pc += 2; break;
+			//case ASEBA_BYTECODE_LOAD:               pc += 1; break;
+			//case ASEBA_BYTECODE_STORE:              pc += 1; break;
+			  case ASEBA_BYTECODE_LOAD_INDIRECT:      pc += 2; break;
+			  case ASEBA_BYTECODE_STORE_INDIRECT:     pc += 2; break;
+			//case ASEBA_BYTECODE_UNARY_ARITHMETIC:   pc += 1; break;
+			//case ASEBA_BYTECODE_BINARY_ARITHMETIC:  pc += 1; break;
+			//case ASEBA_BYTECODE_JUMP:               pc += 1; break;
+			  case ASEBA_BYTECODE_CONDITIONAL_BRANCH: 
+				BIT_CLR(vm->bytecode[pc], ASEBA_IF_WAS_TRUE_BIT);
+			                                        pc += 2; break;
+			  case ASEBA_BYTECODE_EMIT:               pc += 3; break;
+			//case ASEBA_BYTECODE_NATIVE_CALL:        pc += 1; break;
+			//case ASEBA_BYTECODE_SUB_CALL:           pc += 1; break;
+			//case ASEBA_BYTECODE_SUB_RET:            pc += 1; break;
+			  default:                                pc += 1; break;
+		}
 	}
 }
 
-void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataLength)
+void AsebaVMDebugMessage(AsebaVMState *vm, uint16_t id, uint16_t *data, uint16_t dataLength)
 {
 	// react to global presence
 	if (id == ASEBA_MESSAGE_GET_DESCRIPTION)
 	{
-		const uint16 protocolVersion = bswap16(data[0]);
+		const uint16_t protocolVersion = bswap16(data[0]);
 		// up to protocol version 4 included, target must answer to GetDescription
 		if (protocolVersion <= 4)
 			AsebaSendDescription(vm);
@@ -745,7 +768,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	// react to global list nodes
 	if (id == ASEBA_MESSAGE_LIST_NODES)
 	{
-		const uint16 protocolVersion = ASEBA_PROTOCOL_VERSION;
+		const uint16_t protocolVersion = ASEBA_PROTOCOL_VERSION;
 		AsebaSendMessageWords(vm, ASEBA_MESSAGE_NODE_PRESENT, &protocolVersion, 1);
 		return;
 	}
@@ -765,9 +788,9 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	{
 		case ASEBA_MESSAGE_SET_BYTECODE:
 		{
-			uint16 start = bswap16(data[0]);
-			uint16 length = dataLength - 1;
-			uint16 i;
+			uint16_t start = bswap16(data[0]);
+			uint16_t length = dataLength - 1;
+			uint16_t i;
 			#ifdef ASEBA_ASSERT
 			if (start + length > vm->bytecodeSize)
 				AsebaAssert(vm, ASEBA_ASSERT_OUT_OF_BYTECODE_BOUNDS);
@@ -818,7 +841,7 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_BREAKPOINT_SET:
 		{
-			uint16 buffer[2];
+			uint16_t buffer[2];
 			buffer[0] = bswap16(data[0]);
 			buffer[1] = AsebaVMSetBreakpoint(vm, buffer[0]);
 			AsebaSendMessageWords(vm, ASEBA_MESSAGE_BREAKPOINT_SET_RESULT, buffer, 2);
@@ -835,8 +858,8 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_GET_VARIABLES:
 		{
-			uint16 start = bswap16(data[0]);
-			uint16 length = bswap16(data[1]);
+			uint16_t start = bswap16(data[0]);
+			uint16_t length = bswap16(data[1]);
 			#ifdef ASEBA_ASSERT
 			if (start + length > vm->variablesSize)
 				AsebaAssert(vm, ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS);
@@ -847,9 +870,9 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 		
 		case ASEBA_MESSAGE_SET_VARIABLES:
 		{
-			uint16 start = bswap16(data[0]);
-			uint16 length = dataLength - 1;
-			uint16 i;
+			uint16_t start = bswap16(data[0]);
+			uint16_t length = dataLength - 1;
+			uint16_t i;
 			#ifdef ASEBA_ASSERT
 			if (start + length > vm->variablesSize)
 				AsebaAssert(vm, ASEBA_ASSERT_OUT_OF_VARIABLES_BOUNDS);
@@ -880,10 +903,10 @@ void AsebaVMDebugMessage(AsebaVMState *vm, uint16 id, uint16 *data, uint16 dataL
 	}
 }
 
-uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* data)
+uint16_t AsebaVMShouldDropPacket(AsebaVMState *vm, uint16_t source, const uint8_t* data)
 {
 	ASEBA_UNUSED(source);
-	uint16 type = bswap16(((const uint16*)data)[0]);
+	uint16_t type = bswap16(((const uint16_t*)data)[0]);
 	if (type < 0x8000)
 	{
 		// user message
@@ -892,7 +915,7 @@ uint16 AsebaVMShouldDropPacket(AsebaVMState *vm, uint16 source, const uint8* dat
 	else if (type >= 0xA000)
 	{
 		// debug message
-		uint16 dest = bswap16(((const uint16*)data)[1]);
+		uint16_t dest = bswap16(((const uint16_t*)data)[1]);
 		if ((type == ASEBA_MESSAGE_GET_DESCRIPTION) ||
 			(type == ASEBA_MESSAGE_LIST_NODES))
 			return 0;

@@ -25,25 +25,70 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include "AsebaGlue.h"
+#include "../../common/utils/FormatableString.h"
+#include "DashelAsebaGlue.h"
 #include "Door.h"
-#include "EPuck.h"
-#include "Thymio2.h"
 #include "PlaygroundViewer.h"
 #include <QtXml>
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
+#include <QString>
+#include <QDesktopServices>
+#include <QDir>
+#include <QHash>
 
 #ifdef HAVE_DBUS
 #include "PlaygroundDBusAdaptors.h"
 #endif // HAVE_DBUS
 
+namespace Enki
+{
+	//! The simulator environment for playground
+	class PlaygroundSimulatorEnvironment: public SimulatorEnvironment
+	{
+	public:
+		const QString sceneFileName;
+		PlaygroundViewer& viewer;
+		
+	public:
+		PlaygroundSimulatorEnvironment(const QString& sceneFileName, PlaygroundViewer& viewer):
+			sceneFileName(sceneFileName),
+			viewer(viewer)
+		{}
+		
+		virtual void notify(const EnvironmentNotificationType type, const std::string& description, const strings& arguments) override
+		{
+			viewer.notifyAsebaEnvironment(type, description, arguments);
+		}
+		
+		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const override
+		{
+			auto fileName(QString("%1/%2/%3/U%4.DAT")
+				.arg(QDesktopServices::storageLocation(QDesktopServices::DataLocation))
+				.arg(qHash(QDir(sceneFileName).canonicalPath()), 8, 16, QChar('0'))
+				.arg(QString::fromStdString(robotName))
+				.arg(fileNumber)
+			);
+			QDir().mkpath(QFileInfo(fileName).absolutePath());
+			// dump
+			std::cerr << fileName.toStdString() << std::endl;
+			return fileName.toStdString();
+		}
+		
+		virtual World* getWorld() const override
+		{
+			return viewer.getWorld();
+		}
+	};
+}
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
+	app.setOrganizationName("Aseba"); // FIXME: we should be consistent here
+	app.setApplicationName("Playground");
 	
 	/*
 	// Translation support
@@ -58,13 +103,13 @@ int main(int argc, char *argv[])
 	
 	// create document
 	QDomDocument domDocument("aseba-playground");
+	QString sceneFileName;
 	
 	// Get cmd line arguments
-	QString fileName;
 	bool ask = true;
 	if (argc > 1)
 	{
-		fileName = argv[1];
+		sceneFileName = argv[1];
 		ask = false;
 	}
 	
@@ -74,17 +119,17 @@ int main(int argc, char *argv[])
 		if (ask)
 		{
 			QString lastFileName = QSettings("EPFL-LSRO-Mobots", "Aseba Playground").value("last file").toString();
-			fileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
+			sceneFileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
 		}
 		ask = true;
 		
-		if (fileName.isEmpty())
+		if (sceneFileName.isEmpty())
 		{
-			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog\n";
+			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog" << std::endl;
 			exit(1);
 		}
 		
-		QFile file(fileName);
+		QFile file(sceneFileName);
 		if (file.open(QIODevice::ReadOnly))
 		{
 			QString errorStr;
@@ -93,14 +138,14 @@ int main(int argc, char *argv[])
 			{
 				QMessageBox::information(0, "Aseba Playground",
 										app.tr("Parse error at file %1, line %2, column %3:\n%4")
-										.arg(fileName)
+										.arg(sceneFileName)
 										.arg(errorLine)
 										.arg(errorColumn)
 										.arg(errorStr));
 			}
 			else
 			{
-				QSettings("EPFL-LSRO-Mobots", "Aseba Playground").setValue("last file", fileName);
+				QSettings("EPFL-LSRO-Mobots", "Aseba Playground").setValue("last file", sceneFileName);
 				break;
 			}
 		}
@@ -123,12 +168,12 @@ int main(int argc, char *argv[])
 	}
 	
 	// Scan for areas
-	typedef QMap<QString, Enki::Polygone> AreasMap;
+	typedef QMap<QString, Enki::Polygon> AreasMap;
 	AreasMap areasMap;
 	QDomElement areaE = domDocument.documentElement().firstChildElement("area");
 	while (!areaE.isNull())
 	{
-		Enki::Polygone p;
+		Enki::Polygon p;
 		QDomElement pointE = areaE.firstChildElement("point");
 		while (!pointE.isNull())
 		{
@@ -152,10 +197,13 @@ int main(int argc, char *argv[])
 	Enki::World::GroundTexture groundTexture;
 	if (worldE.hasAttribute("groundTexture"))
 	{
-		const QString groundTextureFileName(QFileInfo(fileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
+		const QString groundTextureFileName(QFileInfo(sceneFileName).absolutePath() + QDir::separator() + worldE.attribute("groundTexture"));
 		QImage image(groundTextureFileName);
 		if (!image.isNull())
 		{
+			// flip vertically as y-coordinate is inverted in an image
+			image = image.mirrored();
+			// convert to a specific format and copy the underlying data to Enki
 			image = image.convertToFormat(QImage::Format_ARGB32);
 			groundTexture.width = image.width();
 			groundTexture.height = image.height();
@@ -176,7 +224,10 @@ int main(int argc, char *argv[])
 	);
 	
 	// Create viewer
-	Enki::PlaygroundViewer viewer(&world);
+	Enki::PlaygroundViewer viewer(&world, worldE.attribute("energyScoringSystemEnabled", "false").toLower() == "true");
+	if (Enki::simulatorEnvironment)
+		qDebug() << "A simulator environment already exists, replacing";
+	Enki::simulatorEnvironment.reset(new Enki::PlaygroundSimulatorEnvironment(sceneFileName, viewer));
 	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
@@ -302,7 +353,7 @@ int main(int argc, char *argv[])
 			continue;
 		}
 		
-		const Enki::Polygone& area = *areasMap.find(activationE.attribute("area"));
+		const Enki::Polygon& area = *areasMap.find(activationE.attribute("area"));
 		Enki::Door* door = *doorsMap.find(activationE.attribute("door"));
 		
 		Enki::DoorButton* activation = new Enki::DoorButton(
@@ -331,28 +382,29 @@ int main(int argc, char *argv[])
 	while (!ePuckE.isNull())
 	{
 		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());	
-		Enki::AsebaFeedableEPuck* epuck(new Enki::AsebaFeedableEPuck(port, asebaServerCount + 1));
+		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, asebaServerCount + 1));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
-		viewer.log(QString("New e-puck on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New e-puck on port %0").arg(port), Qt::white);
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
 	// Scan for Thymio 2
+	unsigned thymioNumber(0);
 	QDomElement thymioE(domDocument.documentElement().firstChildElement("thymio2"));
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaThymio2* thymio(new Enki::AsebaThymio2(port));
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, Aseba::FormatableString("thymio2_%0").arg(thymioNumber++)));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();
 		thymio->angle = thymioE.attribute("angle").toDouble();
 		world.addObject(thymio);
-		viewer.log(QString("New Thymio II on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New Thymio II on port %0").arg(port), Qt::white);
 		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
 	
@@ -381,7 +433,7 @@ int main(int argc, char *argv[])
 		QStringList args(command.split(" ", QString::SkipEmptyParts));
 		if (args.size() == 0)
 		{
-			viewer.log("Missing program in command", Qt::red);
+			viewer.log(app.tr("Missing program in command"), Qt::red);
 		}
 		else
 		{
@@ -396,7 +448,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Show and run
-	viewer.setWindowTitle("Playground - Stephane Magnenat (code) - Basilio Noris (gfx)");
+	viewer.setWindowTitle(app.tr("Aseba Playground - Simulate your robots!"));
 	viewer.show();
 	
 	// If D-Bus is used, register the viewer object

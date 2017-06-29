@@ -82,7 +82,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const = 0;
 		virtual int getValue(unsigned i) const = 0;
 		virtual void setValue(unsigned i, int value) = 0;
-		virtual QVector<quint16> getValuesCompressed() const = 0;
+		virtual QVector<uint16_t> getValuesCompressed() const = 0;
 		virtual bool isAnyValueSet() const;
 		void resetValues();
 		
@@ -135,7 +135,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const { return 0; }
 		virtual int getValue(unsigned i) const { return -1; }
 		virtual void setValue(unsigned i, int value) {}
-		virtual QVector<quint16> getValuesCompressed() const { return QVector<quint16>(); }
+		virtual QVector<uint16_t> getValuesCompressed() const { return QVector<uint16_t>(); }
 	};
 	
 	class BlockWithBody: public Block
@@ -160,7 +160,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
-		virtual QVector<quint16> getValuesCompressed() const;
+		virtual QVector<uint16_t> getValuesCompressed() const;
 		
 	protected:
 		QList<GeometryShapeButton*> buttons;
@@ -185,7 +185,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual unsigned valuesCount() const;
 		virtual int getValue(unsigned i) const;
 		virtual void setValue(unsigned i, int value);
-		virtual QVector<quint16> getValuesCompressed() const;
+		virtual QVector<uint16_t> getValuesCompressed() const;
 		virtual bool isAnyValueSet() const;
 		
 		virtual bool isAnyAdvancedFeature() const;

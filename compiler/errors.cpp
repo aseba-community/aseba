@@ -203,7 +203,7 @@ namespace Aseba
 		return oss.str();
 	}
 
-	ErrorMessages::ErrorCallback TranslatableError::translateCB = NULL;
+	ErrorMessages::ErrorCallback TranslatableError::translateCB = nullptr;
 
 	TranslatableError::TranslatableError(const SourcePos& pos, ErrorCode error)
 	{

@@ -51,10 +51,10 @@ namespace Aseba
 	{
 	private:
 		std::deque<double>& _x;
-		std::deque<sint16>& _y;
+		std::deque<int16_t>& _y;
 		
 	public:
-		EventDataWrapper(std::deque<double>& _x, std::deque<sint16>& _y) :
+		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) :
 			_x(_x),
 			_y(_y)
 		{ }
@@ -67,10 +67,10 @@ namespace Aseba
 	{
 	private:
 		std::deque<double>& _x;
-		std::deque<sint16>& _y;
+		std::deque<int16_t>& _y;
 		
 	public:
-		EventDataWrapper(std::deque<double>& _x, std::deque<sint16>& _y) :
+		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) :
 			_x(_x),
 			_y(_y)
 		{ }

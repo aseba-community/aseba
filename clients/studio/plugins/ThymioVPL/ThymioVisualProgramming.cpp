@@ -884,7 +884,7 @@ namespace Aseba { namespace ThymioVPL
 		int nptrs = backtrace(buffer, SIZE);
 		printf("backtrace() returned %d addresses\n", nptrs);
 		strings = backtrace_symbols(buffer, nptrs);
-		if (strings == NULL) {
+		if (strings == nullptr) {
 			perror("backtrace_symbols");
 			exit(EXIT_FAILURE);
 		}
@@ -1017,11 +1017,11 @@ namespace Aseba { namespace ThymioVPL
 			USAGE_LOG(logUserEvent(id,data));
 		
 		// a set was executed on target, highlight in program if the code in the robot is the same as in this editor
-		if (id == 0 && runButton->isEnabled() && !runAnimTimer)
+		if (id == 0 && runButton->isEnabled() && !runAnimTimer && !data.empty())
 		{
 			const unsigned index(data[0]);
-			assert (index < scene->setsCount());
-			(*(scene->setsBegin() + index))->blink();
+			if (index < scene->setsCount())
+				(*(scene->setsBegin() + index))->blink();
 		}
 	}
 	

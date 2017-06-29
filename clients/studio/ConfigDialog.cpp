@@ -236,7 +236,7 @@ namespace Aseba
 		if (me)
 		{
 			delete me;
-			me = NULL;
+			me = nullptr;
 		}
 	}
 
@@ -249,7 +249,7 @@ namespace Aseba
 
 	}
 
-	ConfigDialog* ConfigDialog::me = NULL;
+	ConfigDialog* ConfigDialog::me = nullptr;
 
 	ConfigDialog::ConfigDialog(QWidget* parent):
 		QDialog(parent)

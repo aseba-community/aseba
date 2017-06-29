@@ -1,18 +1,18 @@
 Aseba - an event-based framework for distributed robot control
-Copyright (C) 2007--2016:
+Copyright (C) 2007--2017:
 	
-	Stéphane Magnenat <stephane at magnenat dot net> [1] [2]
+	Stéphane Magnenat <stephane at magnenat dot net> [1] [2] [3] [4]
 	(http://stephane.magnenat.net)
-	original idea, architecture, core coder
+	project leader, original idea, architecture, core programmer
 	
 	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	core coder, Windows maintainer (until 2015)
+	core programmer, Windows maintainer (until 2015)
 	
-	Philippe Retornaz <philippe dot retornaz at epfl dot ch> [1]
-	coder, embedded integration
+	Philippe Rétornaz <philippe dot retornaz at epfl dot ch> [1]
+	programmer, embedded integration
 	
 	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
-	coder, VPL
+	programmer, VPL
 	
 	David James Sherman <david dot sherman at inria dot fr>
 	asebahttp, Scratch integration
@@ -37,7 +37,7 @@ Copyright (C) 2007--2016:
 	
 	Basilio Noris <basilio dot noris at epfl dot ch>
 	inputs on challenge, graphics design on challenge
-
+	
 	Sandra Moser [2]
 	German translation
 	
@@ -46,20 +46,30 @@ Copyright (C) 2007--2016:
 	
 	Ezio Somá <ezio dot soma at gmail dot com>
 	Italian translation
-
+	
 	Detlef Rick <detlef dot rick at gymnasium-hittfeld dot de>
 	German translation
 	
-		
+	Shiling Wang <shilingwang0621 at gmail dot com>
+	Chinese translation
+	
+	Ioanna Theodoropoulou <ioannatheodoropou at hotmail dot com>
+	Greek translation
+	
+	Vassilis Komis <komis at upatras dot gr>
+	Greek translation
+
 	[1] Mobots group (http://mobots.epfl.ch)
 	Laboratory of Robotics Systems (http://lsro.epfl.ch)
 	EPFL, Lausanne (http://www.epfl.ch)
 	
 	[2] Autonomous Systems Lab (http://www.asl.ethz.ch)
 	ETHZ, Zurich (http://www.ethz.ch)
-	(from September 2010 to June 2014)
 	
 	[3] Mobsya Association (http://www.mobsya.org)
+	
+	[4] Game Technology Center (http://www.gtc.inf.ethz.ch/)
+	ETHZ, Zurich (http://www.ethz.ch)
 
 
 The user manual is fetched from the Wiki at http://aseba.wikidot.com,

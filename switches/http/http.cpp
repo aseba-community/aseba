@@ -836,7 +836,7 @@ namespace Aseba
     void HttpInterface::aeslLoadFile(const std::string& filename)
     {
         // local file or URL
-        xmlDoc *doc(xmlReadFile(filename.c_str(), NULL, 0));
+        xmlDoc *doc(xmlReadFile(filename.c_str(), nullptr, 0));
         if (!doc)
             wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
         else
@@ -853,7 +853,7 @@ namespace Aseba
     void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
     {
         // open document
-        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
+        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", nullptr, 0));
         if (!doc)
             wcerr << "cannot read XML from memory " << buffer << endl;
         else
@@ -918,8 +918,8 @@ namespace Aseba
                 if (name && value)
                     commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name),
                                                                      atoi((const char *)value)));
-                xmlFree(name);  // nop if name is NULL
-                xmlFree(value); // nop if value is NULL
+                xmlFree(name);  // nop if name is nullptr
+                xmlFree(value); // nop if value is nullptr
             }
             xmlXPathFreeObject(obj); // also frees nodeset
         }
@@ -962,9 +962,9 @@ namespace Aseba
                         noNodeCount++;
                 }
                 // free attribute and content
-                xmlFree(name);     // nop if name is NULL
-                xmlFree(storedId); // nop if name is NULL
-                xmlFree(text);     // nop if text is NULL
+                xmlFree(name);     // nop if name is nullptr
+                xmlFree(storedId); // nop if name is nullptr
+                xmlFree(text);     // nop if text is nullptr
             }
             xmlXPathFreeObject(obj); // also frees nodeset
         }
@@ -1005,7 +1005,7 @@ namespace Aseba
         if (result)
         {
             // send bytecode
-            sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+            sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
             // run node
             Run msg(nodeId);
             msg.serialize(asebaStream);

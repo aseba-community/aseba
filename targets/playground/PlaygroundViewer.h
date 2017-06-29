@@ -28,14 +28,10 @@
 #ifndef __PLAYGROUND_VIEWER_H
 #define __PLAYGROUND_VIEWER_H
 
+#include "EnkiGlue.h"
 #include "../../common/utils/utils.h"
 #include <viewer/Viewer.h>
 #include <QProcess>
-
-#define LOG_COLOR(t,c) Enki::PlaygroundViewer::getInstance()->log(t,c)
-#define LOG_INFO(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::white)
-#define LOG_WARN(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::yellow)
-#define LOG_ERR(t) Enki::PlaygroundViewer::getInstance()->log(t,Qt::red)
 
 #define LOG_HISTORY_COUNT 20
 
@@ -52,27 +48,34 @@ namespace Enki
 		QString logText[LOG_HISTORY_COUNT];
 		QColor logColor[LOG_HISTORY_COUNT];
 		Aseba::UnifiedTime logTime[LOG_HISTORY_COUNT];
+		bool energyScoringSystemEnabled;
 		unsigned logPos;
 		unsigned energyPool;
 		
 	public:
-		PlaygroundViewer(World* world);
+		PlaygroundViewer(World* world, bool energyScoringSystemEnabled = false);
 		virtual ~PlaygroundViewer();
 		
-		World* getWorld() const;
-		static PlaygroundViewer* getInstance();
-		
 		void log(const QString& entry, const QColor& color);
+		void log(const std::string& entry, const QColor& color);
+		void log(const char* entry, const QColor& color);
 		
 	public slots:
 		void processStarted();
 		void processError(QProcess::ProcessError error);
 		void processReadyRead();
 		void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-		
+	
 	protected:
 		virtual void renderObjectsTypesHook();
 		virtual void sceneCompletedHook();
+		virtual void timerEvent(QTimerEvent * event);
+	
+	protected:
+		friend class PlaygroundSimulatorEnvironment;
+		friend class EnkiWorldInterface;
+		World* getWorld() const;
+		void notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments);
 	};
 }
 

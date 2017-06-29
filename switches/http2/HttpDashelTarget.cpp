@@ -206,7 +206,7 @@ bool HttpDashelTarget::compileAndRunCode(unsigned globalNodeId, const std::strin
 	if(compiler.compile(is, bytecode, allocatedVariablesCount, error)) {
 		try {
 			// send bytecode
-			sendBytecode(stream, node.localId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+			sendBytecode(stream, node.localId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 
 			// run node
 			Run msg(node.localId);
@@ -273,7 +273,7 @@ const HttpDashelTarget::Node *HttpDashelTarget::getNodeById(unsigned globalNodeI
 	if(query != nodes.end()) {
 		return &query->second;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -283,7 +283,7 @@ const HttpDashelTarget::Node *HttpDashelTarget::getNodeByLocalId(unsigned localN
 	if(query != globalIds.end()) {
 		return getNodeById(query->second);
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -334,7 +334,7 @@ void HttpDashelTarget::nodeDescriptionReceived(unsigned localNodeId)
 			cerr << "Target " << address << " received description for node " << node.globalId << " (" << node.name << ")" << endl;
 		}
 
-		std::vector<sint16> data;
+		std::vector<int16_t> data;
 		data.push_back(node.globalId);
 
 		interface->notifyEventSubscribers("connect", data);

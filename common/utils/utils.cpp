@@ -35,6 +35,7 @@
 #include <cassert>
 #include <limits>
 #include <vector>
+#include <stdexcept>
 #include <stdint.h>
 #include "utils.h"
 
@@ -47,7 +48,7 @@ namespace Aseba
 	{
 		#ifndef WIN32
 		struct timeval tv;
-		gettimeofday(&tv, NULL);
+		gettimeofday(&tv, nullptr);
 		value = (Value(tv.tv_sec) * 1000) + Value(tv.tv_usec) / 1000;
 		#else // WIN32
 		FILETIME        ft;
@@ -123,6 +124,38 @@ namespace Aseba
 		else
 			stream << UnifiedTime().toHumanReadableStringFromEpoch();
 		stream << " ";
+	}
+	
+	SoftTimer::SoftTimer(Callback callback, double period):
+		callback(callback),
+		period(period),
+		left(period)
+	{
+		if (period < 0)
+			throw std::domain_error("Period must be greater or equal to zero");
+	}
+	
+	void SoftTimer::step(double dt)
+	{
+		if (period == 0)
+			return;
+		
+		assert(dt >= 0);
+		left -= dt;
+		while (left < 0)
+		{
+			callback();
+			left += period;
+		}
+	}
+	
+	void SoftTimer::setPeriod(double period)
+	{
+		if (period < 0)
+			throw std::domain_error("Period must be greater or equal to zero");
+		
+		this->period = period;
+		left = period;
 	}
 	
 	std::string WStringToUTF8(const std::wstring& s)
@@ -227,11 +260,11 @@ namespace Aseba
 	 * Released under http://www.nongnu.org/avr-libc/LICENSE.txt
 	 * which is GPL- and DFSG- compatible
 	 */
-	static uint16 crc_xmodem_update (uint16 crc, uint8 data)
+	static uint16_t crc_xmodem_update (uint16_t crc, uint8_t data)
 	{
 		int i;
 
-		crc = crc ^ ((uint16)data << 8);
+		crc = crc ^ ((uint16_t)data << 8);
 		for (i=0; i<8; i++)
 		{
 			if (crc & 0x8000)
@@ -243,25 +276,25 @@ namespace Aseba
 		return crc;
 	}
 	
-	static uint16 crc_xmodem_update (uint16 crc, const uint8* data, size_t len)
+	static uint16_t crc_xmodem_update (uint16_t crc, const uint8_t* data, size_t len)
 	{
 		for (size_t i = 0; i < len; ++i)
 			crc = crc_xmodem_update(crc, data[i]);
 		return crc;
 	}
 	
-	uint16 crcXModem(const uint16 oldCrc, const std::wstring& s)
+	uint16_t crcXModem(const uint16_t oldCrc, const std::wstring& s)
 	{
 		std::string utf8s(WStringToUTF8(s));
 		size_t l = utf8s.size();
 		if (l & 0x1)
 			++l;
-		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8*>(utf8s.c_str()), l);
+		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8_t*>(utf8s.c_str()), l);
 	}
 	
-	uint16 crcXModem(const uint16 oldCrc, const uint16 v)
+	uint16_t crcXModem(const uint16_t oldCrc, const uint16_t v)
 	{
-		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8*>(&v), 2);
+		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8_t*>(&v), 2);
 	}
 	
 	template<typename T>

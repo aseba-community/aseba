@@ -1,10 +1,11 @@
 // Aseba
-#include "../compiler/compiler.h"
-#include "../vm/vm.h"
-#include "../vm/natives.h"
-#include "../common/consts.h"
-#include "../common/utils/utils.h"
-#include "../common/utils/FormatableString.h"
+#include "../../compiler/compiler.h"
+#include "../../vm/vm.h"
+#include "../../vm/natives.h"
+#include "../../common/consts.h"
+#include "../../common/msg/msg.h"
+#include "../../common/utils/utils.h"
+#include "../../common/utils/FormatableString.h"
 using namespace Aseba;
 
 // C++
@@ -41,17 +42,17 @@ void dump_source(const std::wstring& source);
 
 static const char short_options [] = "fcepnvsdumi:";
 static const struct option long_options[] = { 
-	{ "fail",	no_argument,			NULL,	'f'},
-	{ "comp_fail",	no_argument,		NULL,	'c'},
-	{ "exec_fail",	no_argument,		NULL,	'e'},
-	{ "post_fail",	no_argument,		NULL,	'p'},
-	{ "memcmp_fail",no_argument,		NULL,	'n'},
-	{ "event",		no_argument,		NULL,	'v'},
-	{ "source",		no_argument,		NULL,	's'},
-	{ "dump",		no_argument,		NULL,	'd'},
-	{ "memdump",	no_argument,		NULL,	'u'},
-	{ "memcmp", 	required_argument,	NULL,	'm'},
-	{ "steps", 		required_argument,	NULL,	'i'},
+	{ "fail",	no_argument,			nullptr,	'f'},
+	{ "comp_fail",	no_argument,		nullptr,	'c'},
+	{ "exec_fail",	no_argument,		nullptr,	'e'},
+	{ "post_fail",	no_argument,		nullptr,	'p'},
+	{ "memcmp_fail",no_argument,		nullptr,	'n'},
+	{ "event",		no_argument,		nullptr,	'v'},
+	{ "source",		no_argument,		nullptr,	's'},
+	{ "dump",		no_argument,		nullptr,	'd'},
+	{ "memdump",	no_argument,		nullptr,	'u'},
+	{ "memcmp", 	required_argument,	nullptr,	'm'},
+	{ "steps", 		required_argument,	nullptr,	'i'},
 	{ 0, 0, 0, 0 } 
 };
 
@@ -62,7 +63,7 @@ static void usage (int argc, char** argv)
 			<< "    -f | --fail         Return EXIT_SUCCESS if anything fails" << std::endl
 			<< "    -c | --comp_fail    Return EXIT_SUCCESS if compilation fails" << std::endl
 			<< "    -e | --exec_fail    Return EXIT_SUCCESS if execution fails" << std::endl
-			<< "    -p | --post_fail    Return EXIT_SUCCESS if post-execution state fails" << std::endl
+			<< "    -p | --post_fail    Return EXIT_SUCCESS if still executing after init" << std::endl
 			<< "    -n | --memcmp_fail  Return EXIT_SUCCESS if memory comparison fails" << std::endl
 			<< "    -v | --event        Generate one internal event after executing the starting code" << std::endl
 			<< "    -s | --source       Dump the source code" << std::endl
@@ -84,13 +85,13 @@ struct AsebaNode
 	
 	struct Variables
 	{
-		sint16 user[256];
+		int16_t user[256];
 	} variables;
 
 	AsebaNode()
 	{
 		// create VM
-		vm.nodeId = 0;
+		vm.nodeId = 1;
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
@@ -99,8 +100,8 @@ struct AsebaNode
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 		
-		vm.variables = reinterpret_cast<sint16 *>(&variables);
-		vm.variablesSize = sizeof(variables) / sizeof(sint16);
+		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 		
 		AsebaVMInit(&vm);
 		
@@ -123,10 +124,10 @@ struct AsebaNode
 			std::string name(nativeDesc->name);
 			std::string doc(nativeDesc->doc);
 			
-			TargetDescription::NativeFunction native(
+			TargetDescription::NativeFunction native{
 				std::wstring(name.begin(), name.end()),
 				std::wstring(doc.begin(), doc.end())
-			);
+			};
 			
 			const AsebaNativeFunctionArgumentDescription* params(nativeDesc->arguments);
 			while (params->size)
@@ -158,29 +159,38 @@ struct AsebaNode
 
 	bool loadBytecode(const BytecodeVector& bytecode)
 	{
-		size_t i = 0;
-		for (BytecodeVector::const_iterator it(bytecode.begin()); it != bytecode.end(); ++it)
-		{
-			if (i == vm.bytecodeSize)
-				return false;
-			const BytecodeElement& be(*it);
-			vm.bytecode[i++] = be.bytecode;
-		}
+		if (bytecode.size() > vm.bytecodeSize)
+			return false;
+		
+		std::vector<std::unique_ptr<Message>> messagesVector;
+		sendBytecode(messagesVector, 1, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
+		for (auto& message: messagesVector)
+			processMessage(*message);
 		return true;
 	}
 	
 	void run(int stepCount)
 	{
-		// run VM
-		AsebaVMSetupEvent(&vm, ASEBA_EVENT_INIT);
+		// bytecode was loaded, send run message to VM
+		processMessage(Run(1));
 		AsebaVMRun(&vm, stepCount);
 	}
 	
 	void runEvent(int stepCount)
 	{
-		// run VM with user event
+		// reset VM and run it with user event
+		vm.flags = 0;
 		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
 		AsebaVMRun(&vm, stepCount);
+	}
+	
+	void processMessage(const Message& message)
+	{
+		Message::SerializationBuffer data;
+		message.serializeSpecific(data);
+		assert(data.rawData.size() % 2 == 0);
+		const uint16_t length(data.rawData.size() / 2);
+		AsebaVMDebugMessage(&vm, message.type, reinterpret_cast<uint16_t*>(&data.rawData[0]), length);
 	}
 };
 
@@ -330,7 +340,7 @@ int main(int argc, char** argv)
 	if (dump)
 		compiler.compile(ifs, bytecode, varCount, outError, &(std::wcout));
 	else
-		compiler.compile(ifs, bytecode, varCount, outError, NULL);
+		compiler.compile(ifs, bytecode, varCount, outError, nullptr);
 
 	//ifs.close();
 	
@@ -344,6 +354,10 @@ int main(int argc, char** argv)
 	}
 	node.run(stepCount);
 	
+	// is execution completed?
+	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
+	checkForError("PostInitExecution", should_postexecution_fail, stillExecuting, WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
+	
 	// setup extra event
 	if (event)
 	{
@@ -351,10 +365,6 @@ int main(int argc, char** argv)
 	}
 	
 	checkForError("Execution", should_execution_fail, AsebaExecutionErrorOccurred());
-	
-	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
-	
-	checkForError("PostExecution", should_postexecution_fail, stillExecuting, WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
 
 	if (memDump)
 	{

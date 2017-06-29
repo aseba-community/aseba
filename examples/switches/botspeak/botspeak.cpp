@@ -670,7 +670,7 @@ namespace Aseba
 		
 		if (result)
 		{
-			sendBytecode(asebaStream, nodeId, std::vector<uint16>(bytecode.begin(), bytecode.end()));
+			sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 			Run(nodeId).serialize(asebaStream);
 			UserMessage(eventId(L"start")).serialize(asebaStream);
 			asebaStream->flush();
@@ -835,7 +835,7 @@ namespace Aseba
 		size_t id;
 		const bool ok(commonDefinitions.events.contains(eventName, &id));
 		assert(ok);
-		UNUSED(ok);
+		ASEBA_UNUSED(ok);
 		return id;
 	}
 	

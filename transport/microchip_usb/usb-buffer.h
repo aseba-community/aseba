@@ -56,8 +56,8 @@ int AsebaUsbBulkRecv(unsigned char *data, unsigned char size);
  * Interface usb-buffer <-> Aseba VM (Main() code)
  *************/
 
-void AsebaSendBuffer(AsebaVMState *vm, const uint8 * data, uint16 length);
-uint16 AsebaGetBuffer(AsebaVMState *vm, uint8* data, uint16 maxLength, uint16* source);
+void AsebaSendBuffer(AsebaVMState *vm, const uint8_t * data, uint16_t length);
+uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source);
 
 
 /*************

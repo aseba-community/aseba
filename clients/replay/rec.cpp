@@ -58,7 +58,7 @@ namespace Aseba
 			cout << hex << setw(4) << setfill('0') << message->type << dec << " ";
 			cout << dec << buffer.rawData.size() << " ";
 			cout << hex;
-			for (std::vector<uint8>::const_iterator it = buffer.rawData.begin(); it != buffer.rawData.end(); ++it)
+			for (std::vector<uint8_t>::const_iterator it = buffer.rawData.begin(); it != buffer.rawData.end(); ++it)
 					cout << setw(2) << setfill('0') << unsigned(*it) << " ";
 			cout << dec << endl;
 		}

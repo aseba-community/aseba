@@ -96,7 +96,7 @@ namespace Aseba
 	protected:
 		friend struct ThymioVPLStandaloneInterface;
 		
-		std::auto_ptr<Target> target; //!< pointer to target
+		std::unique_ptr<Target> target; //!< pointer to target
 		
 		const bool useAnyTarget; //!< if true, allow to connect to non-Thymoi II targets
 		const bool debugLog; //!< if true, generate debug log events

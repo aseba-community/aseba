@@ -837,7 +837,7 @@ namespace Aseba
 		target->reboot(id);
 	}
 	
-	static void write16(QIODevice& dev, const uint16 v)
+	static void write16(QIODevice& dev, const uint16_t v)
 	{
 		dev.write((const char*)&v, 2);
 	}
@@ -853,7 +853,7 @@ namespace Aseba
 			dev.write((const char *)&data[0], 2);
 	}
 	
-	static uint16 crcXModem(const uint16 oldCrc, const QString& s)
+	static uint16_t crcXModem(const uint16_t oldCrc, const QString& s)
 	{
 		return crcXModem(oldCrc, s.toStdWString());
 	}
@@ -882,10 +882,10 @@ namespace Aseba
 		
 		// bytecode
 		write16(file, bytecode.size());
-		uint16 crc(0);
+		uint16_t crc(0);
 		for (size_t i = 0; i < bytecode.size(); ++i)
 		{
-			const uint16 bc(bytecode[i]);
+			const uint16_t bc(bytecode[i]);
 			write16(file, bc);
 			crc = crcXModem(crc, bc);
 		}
@@ -1651,7 +1651,7 @@ namespace Aseba
 						"<br/>(supported stream types: %4)"\
 						"</li></ul>" \
 						"<p>Read more on <a href=\"%5\">aseba.wikidot.com</a></p>" \
-						"<p>(c) 2006-2015 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
+						"<p>(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
 						"<p>Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.</p>");
 		
 		text = text.
@@ -2584,7 +2584,7 @@ namespace Aseba
 		int eventNbArgs = 0;
 
 		// prompt the user for the named value
-		const bool ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, 32767, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
+		const bool ok = NewNamedValueDialog::getNamedValue(&eventName, &eventNbArgs, 0, ASEBA_MAX_EVENT_ARG_COUNT, tr("Add a new event"), tr("Name:"), tr("Number of arguments", "For the newly created event"));
 
 		eventName = eventName.trimmed();
 		if (ok && !eventName.isEmpty())

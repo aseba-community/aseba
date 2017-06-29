@@ -30,6 +30,7 @@
 #include <iomanip>
 #include <memory>
 #include <limits>
+#include <algorithm>
 #ifndef __APPLE__
 	#include <malloc.h>
 #endif
@@ -74,34 +75,35 @@ namespace Aseba
 	//! Compute the edit distance between two vector-style containers, inspired from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
 	template <class T> unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)
 	{
-		const size_t len1 = s1.size() + 1, len2 = s2.size() + 1;
-		const size_t matSize(len1*len2);
-		unsigned *d(reinterpret_cast<unsigned*>(alloca(matSize*sizeof(unsigned))));
-
-		d[0] = 0;
-		for(unsigned i = 1; i < len1; ++i)
-			d[i*len2+0] = i;
-		for(unsigned i = 1; i < len2; ++i)
-			d[i] = i;
-
-		for(unsigned i = 1; i < len1; ++i)
+		// Dynamic programming implementation.
+		// Uses only O(len(s2)) space and O(len(s1)*len(s2)) time.
+		const auto l1(s1.size());
+		const auto l2(s2.size());
+		// States on s1 are folded into current (Dn) and last (Do),
+		// achieving O(len(s2)) in space.
+		std::vector<int> Do(l2+1, 0);
+		std::vector<int> Dn(l2+1, 0);
+		
+		// first row, nothing matches empty string
+		for (size_t j = 1; j <= l2; ++j)
+			Do[j] = Do[j-1] + 1;
+		// note: j indices for accessing s2 are shifted by 1 compared to i indices for accessing s
+		// all rows
+		for (size_t i = 0; i < l1; ++i)
 		{
-			bool wasBelowMax(false);
-			for(unsigned j = 1; j < len2; ++j)
+			// all elements in row i+1
+			Dn[0] = Do[0] + 1; // nothing matches empty string
+			for (size_t j = 1; j <= l2; ++j)
 			{
-				const unsigned cost = std::min(std::min(
-					d[(i - 1)*len2+j] + 1,
-					d[i*len2+(j - 1)] + 1),
-					d[(i - 1)*len2+(j - 1)] + (s1[i - 1] == s2[j - 1] ? 0 : 1)
+				Dn[j] = std::min(std::min(
+					Do[j] + 1,
+					Dn[j-1] + 1),
+					Do[j-1] + (s1[i] == s2[j-1] ? 0 : 1)
 				);
-				if (cost < maxDist)
-					wasBelowMax = true;
-				d[i*len2+j] = cost;
 			}
-			if (!wasBelowMax)
-				return maxDist;
+			std::swap(Dn, Do);
 		}
-		return d[matSize-1];
+		return Do.back();
 	}
 	
 	//! Helper function to find for something in one of the map, using edit-distance to check for candidates if not found

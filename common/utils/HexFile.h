@@ -57,10 +57,10 @@ namespace Aseba
 		struct WrongCheckSum : Error
 		{
 			int line;
-			uint8 recordCheckSum;
-			uint8 computedCheckSum;
+			uint8_t recordCheckSum;
+			uint8_t computedCheckSum;
 			
-			WrongCheckSum (int line, uint8 recordCheckSum, uint8 computedCheckSum) :
+			WrongCheckSum (int line, uint8_t recordCheckSum, uint8_t computedCheckSum) :
 				line(line),
 				recordCheckSum(recordCheckSum),
 				computedCheckSum(computedCheckSum)
@@ -71,9 +71,9 @@ namespace Aseba
 		struct UnknownRecordType : Error
 		{
 			int line;
-			uint8 recordType;
+			uint8_t recordType;
 			
-			UnknownRecordType(int line, uint8 recordType) : line(line), recordType(recordType) { }
+			UnknownRecordType(int line, uint8_t recordType) : line(line), recordType(recordType) { }
 			virtual std::string toString() const;
 		};
 		
@@ -86,7 +86,7 @@ namespace Aseba
 		};
 		
 	public:
-		typedef std::map<uint32, std::vector<uint8> > ChunkMap;
+		typedef std::map<uint32_t, std::vector<uint8_t> > ChunkMap;
 		ChunkMap data;
 
 	public:
@@ -99,7 +99,7 @@ namespace Aseba
 		unsigned getUint8(std::istream &stream);
 		unsigned getUint16(std::istream &stream);
 		void writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16) const;
-		void writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8 *data) const;
+		void writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data) const;
 	};
 }
 

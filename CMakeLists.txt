@@ -5,7 +5,7 @@
 project(aseba)
 
 # ensure a minimal version of CMake
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 2.8.12)
 
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
@@ -65,30 +65,36 @@ find_package(dashel REQUIRED)
 include_directories(${dashel_INCLUDE_DIRS})
 
 # Enki
-find_path(ENKI_INCLUDE_DIR enki/PhysicalEngine.h)
-find_library(ENKI_LIBRARY enki)
-find_library(ENKI_VIEWER_LIBRARY enkiviewer)
-if (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	set(ENKI_FOUND 1)
-	message(STATUS "Enki found")
-else (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
-	message(STATUS "Enki *not* found, simulation targets disabled")
-endif (ENKI_INCLUDE_DIR AND ENKI_LIBRARY AND ENKI_VIEWER_LIBRARY)
+find_package(enki)
 
 # Qt
-if (UNIX AND NOT APPLE)
-	find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit QtDBus)
-else (UNIX AND NOT APPLE)
+# FindQt4 has a bug and does not support OPTIONAL_COMPONENTS
+# see https://cmake.org/pipermail/cmake/2016-March/063047.html
+#find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit OPTIONAL_COMPONENTS QtDBus)
+# So we use a two-step mechanism, first try with DBus, and if not found, try without
+find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit QtDBus)
+if (NOT QT_QTDBUS_FOUND)
 	find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit)
-endif (UNIX AND NOT APPLE)
+endif ()
 
 # Qwt
 find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
 find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
 
+# Zeroconf
+find_package(DNSSD)
+if (DNSSD_FOUND)
+	if(AVAHI_COMMON_LIBRARIES)
+		add_definitions(-DDNSSD_AVAHI)
+	endif(AVAHI_COMMON_LIBRARIES)
+	include_directories(${DNSSD_INCLUDE_DIRS})
+	find_package(Threads REQUIRED)
+	add_definitions(-DZEROCONF_SUPPORT)
+endif()
+
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
-set(LIB_VERSION_MAJOR 2) # Must be bumped for incompatible ABI changes
+set(LIB_VERSION_MAJOR 3) # Must be bumped for incompatible ABI changes
 set(LIB_VERSION_MINOR 0)
 set(LIB_VERSION_PATCH 0)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
@@ -99,6 +105,17 @@ add_subdirectory(transport)
 
 # define the core libraries variable, to be used by all Aseba programs
 set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+if (DNSSD_FOUND)
+	if (AVAHI_COMMON_LIBRARIES)
+		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	else()
+		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	endif()
+	set(ASEBA_ZEROCONF_LIBRARIES asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
+	if (QT4_FOUND)
+		set(ASEBA_ZEROCONFQT_LIBRARIES asebazeroconfqt asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
+	endif()
+endif()
 
 # Target and client specific libraries
 add_subdirectory(vm)
