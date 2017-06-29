@@ -657,9 +657,9 @@ namespace Aseba
             }
             busy_threads_timeout[i] -= UnifiedTime(33);
             result << " " << i;
-            // temp for testing, check whether Q_motion_ended event had arrived
-            if (std::count(busy_threads.begin(), busy_threads.end(), i) == 0 && i != 0)
-                cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
+            // // temp for testing, check whether Q_motion_ended event had arrived
+            // if (std::count(busy_threads.begin(), busy_threads.end(), i) == 0 && i != 0)
+            //     cerr << "Warning " << i << " in Qid but not in busy_threads" << endl;
         }
         result << endl;
         
@@ -696,10 +696,14 @@ namespace Aseba
         {
             result << "b_touching/front " << ((cv[0]+cv[1]+cv[2]+cv[3]+cv[4])/1000 > 0 ? "true" : "false") << endl;
             result << "b_touching/back " << ((cv[5]+cv[6])/1000 > 0 ? "true" : "false") << endl;
+            for (unsigned i=0; i <= 6; i++)
+                result << "proximity/" << i << " " << cv[i] << endl;
         }
         if (getCachedVal(nodeId, "prox.ground.delta", cv))
         {
             result << "b_touching/ground " << ((cv[0]+cv[1])/500 > 0 ? "true" : "false") << endl;
+            for (unsigned i=0; i <= 1; i++)
+                result << "ground/" << i << " " << cv[i] << endl;
         }
         
         // derived 3: proximity distances; formatted for menus
