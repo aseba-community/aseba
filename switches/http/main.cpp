@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  
+//
 //
 //  Created by David Sherman on 2014-12-30.
 //
@@ -9,22 +9,22 @@
 /*
 	Aseba - an event-based framework for distributed robot control
 	Copyright (C) 2007--2016:
-		Stephane Magnenat <stephane at magnenat dot net>
-		(http://stephane.magnenat.net)
-		and other contributors, see authors.txt for details
-	
+	Stephane Magnenat <stephane at magnenat dot net>
+	(http://stephane.magnenat.net)
+	and other contributors, see authors.txt for details
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #include <cstdlib>
 #include <cstring>
@@ -34,6 +34,7 @@
 #include "../../common/consts.h"
 #include "../../common/types.h"
 #include "../../common/utils/utils.h"
+#include "../../common/msg/NodesManager.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 
 //! Show usage
@@ -44,7 +45,8 @@ void dumpHelp(std::ostream &stream, const char *programName)
     stream << "Options:\n";
     stream << "-v, --verbose   : makes the switch verbose\n";
     stream << "-d, --dump      : makes the switch dump the content of messages\n";
-    stream << "-p, --port port : listens to incoming connection HTTP on this port\n";
+    stream << "-p, --http port : listens to incoming HTTP connection on this port\n";
+    stream << "-s, --port port : listens to incoming Aseba connection on this port\n";
     stream << "-a, --aesl file : load program definitions from AESL file\n";
     stream << "-K, --Kiter n   : run I/O loop n thousand times (for profiling)\n";
     stream << "-h, --help      : shows this help\n";
@@ -67,20 +69,21 @@ void dumpVersion(std::ostream &stream)
 int main(int argc, char *argv[])
 {
     Dashel::initPlugins();
-    
+
     std::string http_port = "3000";
+    std::string aseba_port;
     std::string aesl_filename;
-    std::string dashel_target;
+    std::vector<std::string> dashel_target_list;
     bool verbose = false;
     bool dump = false;
     int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
-        
+
     // process command line
     int argCounter = 1;
     while (argCounter < argc)
     {
         const char *arg = argv[argCounter++];
-        
+
         if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
             verbose = true;
         else if ((strcmp(arg, "-d") == 0) || (strcmp(arg, "--dump") == 0))
@@ -89,37 +92,43 @@ int main(int argc, char *argv[])
             dumpHelp(std::cout, argv[0]), exit(1);
         else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
             dumpVersion(std::cout), exit(1);
-        else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0))
+        else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--http") == 0))
             http_port = argv[argCounter++];
+        else if ((strcmp(arg, "-s") == 0) || (strcmp(arg, "--port") == 0))
+            aseba_port = argv[argCounter++];
         else if ((strcmp(arg, "-a") == 0) || (strcmp(arg, "--aesl") == 0))
             aesl_filename = argv[argCounter++];
         else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
             Kiterations = atoi(argv[argCounter++]);
         else if (strncmp(arg, "-", 1) != 0)
-            dashel_target = arg;
+            dashel_target_list.push_back(arg);
     }
-    
+
     // initialize Dashel plugins
     Dashel::initPlugins();
-    
+
     // create and run bridge, catch Dashel exceptions
     try
     {
-        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target, http_port, 1000*Kiterations));
-        
-        for (int i = 0; i < 500; i++)
-            network->step(10); // wait for description, variables, etc
-        if (aesl_filename.size() > 0)
-        {
-            network->aeslLoadFile(aesl_filename);
-        }
-        else
-        {
-            const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-            network->aeslLoadMemory(failsafe,strlen(failsafe));
-        }
-        
-        network->run();
+        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, aseba_port,
+                                                               Kiterations > 0 ? 1000*Kiterations : 5, dump));
+
+        for (auto nodeId: network->allNodeIds())
+            try {
+                if (aesl_filename.size() > 0)
+                    network->aeslLoadFile(nodeId, aesl_filename);
+                else
+                {
+                    const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+                    network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+                }
+            } catch ( std::runtime_error(e) ) {
+                std::cerr << "Error loading aesl for nodeId " << nodeId << std::endl;
+            }
+
+        do {
+            network->pingNetwork(); // possibly not, if do_ping == false
+        } while (network->run1s());
         delete network;
     }
     catch(Dashel::DashelException e)
