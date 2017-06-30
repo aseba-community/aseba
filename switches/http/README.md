@@ -6,7 +6,7 @@ Provide a simple REST interface with introspection for Aseba devices.
 
 - GET  /nodes                                 - JSON list of all known nodes
 - GET  /nodes/:NODENAME                       - JSON attributes for :NODENAME
-- PUT  /nodes/:NODENAME                       - write new Aesl program (file= in multipart/form-data)
+- PUT  /nodes/:NODENAME                       - write new Aesl program
 - GET  /nodes/:NODENAME/:VARIABLE             - retrieve JSON value for :VARIABLE
 - POST /nodes/:NODENAME/:VARIABLE             - send new values(s) for :VARIABLE
 - POST /nodes/:NODENAME/:EVENT                - call an event :EVENT
@@ -33,7 +33,7 @@ Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests
 Example [Node-RED](http://nodered.org) flows can be found in ../../examples/http/node-red.
 
 DONE:
-- Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
+- Dashel connection to nodes and round-robin scheduling between Aseba and HTTP connections
 - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
 - GET /nodes, GET /nodes/:NODENAME with introspection
 - POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE\[/:VALUE\]*)
@@ -45,9 +45,9 @@ DONE:
 - Aesl program bytecode upload (PUT /nodes/:NODENAME)
   use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
 - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
+- connect more than one node on an aesl bus like asebaswitch
 
 TODO:
-- handle more than just one Thymio-II node
 - gracefully shut down TCP/IP connections (half-close, wait, close)
 
 This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,

@@ -1,21 +1,22 @@
-
 /*
  asebahttp - a switch to bridge Aseba to HTTP
- 2014-12-01 David James Sherman <david dot sherman at inria dot fr>
+ 2014-12-01
+ 2015-01-01
+ 2016-01-27 David James Sherman <david dot sherman at inria dot fr>
  
  Provide a simple REST interface with introspection for Aseba devices.
  
     GET  /nodes                                 - JSON list of all known nodes
     GET  /nodes/:NODENAME                       - JSON attributes for :NODENAME
-    PUT  /nodes/:NODENAME                       - write new Aesl program (file= in multipart/form-data)
+    PUT  /nodes/:NODENAME                       - write new Aesl program
     GET  /nodes/:NODENAME/:VARIABLE             - retrieve JSON value for :VARIABLE
     POST /nodes/:NODENAME/:VARIABLE             - send new values(s) for :VARIABLE
     POST /nodes/:NODENAME/:EVENT                - call an event :EVENT
     GET  /events[/:EVENT]*                      - create SSE stream for all known nodes
     GET  /nodes/:NODENAME/events[/:EVENT]*      - create SSE stream for :NODENAME
  
- Typical use: asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II & After vmcode.aesl is compiled 
- and uploaded, check with curl http://127.0.0.1:3000/nodes/thymio-II
+ Typical use: asebahttp --port 3000 --aesl vmcode.aesl ser:name=Thymio-II & 
+ After vmcode.aesl is compiled and uploaded, check with curl http://127.0.0.1:3000/nodes/thymio-II
  
  Substitute appropriate values for :NODENAME, :VARIABLE, :EVENT and their parameters. In most cases, 
  :NODENAME is thymio-II. For example.
@@ -31,8 +32,8 @@
  Start an 'asebadummynode 0' and run 'make test' to execute some basic unit tests. Example Node-RED flows 
  can be found in ../../examples/http/node-red.
  
- DONE (mostly):
-    - Dashel connection to one Thymio-II and round-robin scheduling between Aseba and HTTP connections
+ DONE:
+    - Dashel connection to nodes and round-robin scheduling between Aseba and HTTP connections
     - read Aesl program at launch, upload to Thymio-II, and record interface for introspection
     - GET /nodes, GET /nodes/:NODENAME with introspection
     - POST /nodes/:NODENAME/:VARIABLE (sloppily allows GET /nodes/:NODENAME/:VARIABLE/:VALUE[/:VALUE]*)
@@ -42,11 +43,11 @@
     - JSON format for variable reporting (GET /nodes/:NODENAME/:VARIABLE)
     - implement SSE streams and event filtering (GET /events) and (GET /nodes/:NODENAME/events)
     - Aesl program bytecode upload (PUT /nodes/:NODENAME)
-      use curl --data-ascii "file=$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
+      use curl -H 'Content-Type: application/octet-stream' --data-ascii "$(cat vmcode.aesl)" -X PUT http://127.0.0.1:3000/nodes/thymio-II
     - accept JSON payload rather than HTML form for updates and events (POST /.../:VARIABLE) and (POST /.../:EVENT)
+    - connect more than one node on an aesl bus like asebaswitch
  
  TODO:
-    - handle more than just one Thymio-II node
     - gracefully shut down TCP/IP connections (half-close, wait, close)
  
  This code borrows from the rest of Aseba, especially switches/medulla and examples/clients/cpp-shell,
@@ -134,113 +135,141 @@ namespace Aseba
     //-- Subclassing Dashel::Hub -----------------------------------------------------------
     
     
-    HttpInterface::HttpInterface(const std::string& asebaTarget, const std::string& http_port, const int iterations) :
+    HttpInterface::HttpInterface(const strings& targets, const std::string& http_port, const std::string& aseba_port, const int iterations, bool dump) :
     Hub(false),  // don't resolve hostnames for incoming connections (there are a lot of them!)
-    asebaStream(0),
-    httpStream(0),
-    nodeId(0),
-    nodeDescriptionComplete(false),
+    asebaStreams(),
+    inHttpStream(0),
+    inAsebaStream(0),
+    inHttpPort(http_port),
+    inAsebaPort(aseba_port),
     verbose(false),
-    iterations(iterations)
+    iterations(iterations),
+    do_dump(dump),
+    do_ping(true)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
-        // connect to the Aseba target
-        std::cout << "HttpInterface connect asebaTarget " << asebaTarget << "\n";
-        connect(asebaTarget); // triggers connectionCreated, which assigns asebaStream
-        
-        // request a description for aseba target
-        broadcastGetDescription();
-        
-        // listen for incoming HTTP requests
-        httpStream = connect("tcpin:port=" + http_port);
+        // listen for incoming HTTP and Aseba requests
+        if (! inHttpPort.empty())
+            inHttpStream = connect("tcpin:port=" + inHttpPort);
+        if (! inAsebaPort.empty())
+            inAsebaStream = connect("tcpin:port=" + inAsebaPort);
+
+        // connect to each Aseba target
+        for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
+        {
+            try {
+                if (verbose)
+                    std::cout << "HttpInterface connect asebaTarget " << *it << "\n";
+                if (Dashel::Stream *cxn = connect(*it)) // triggers connectionCreated
+                {
+                    asebaStreams[cxn].clear(); // no node id until description is received
+                    Dashel::ParameterSet parser;
+                    parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
+                    parser.add((*it).c_str());
+                    const unsigned localId(parser.get<unsigned>("remapLocal"));
+                    const unsigned targetId(parser.get<unsigned>("remapTarget"));
+                    const unsigned aeslId(parser.get<unsigned>("remapAesl"));
+                    // remember localId and aeslId as wishes to be answered when node description arrives
+                    if (localId > 0 && targetId > 0)
+                        localIdWishes[cxn][targetId] = localId;
+                    if (aeslId > 0)
+                        aeslIdWishes[cxn][targetId] = aeslId;
+                }
+            }
+            catch(Dashel::DashelException e)
+            {
+                std::cout << "HttpInterface can't connect target " << *it << ": " << e.what() << std::endl;
+            }
+        }
+      
+        // wait for descriptions
+        for (int i = 0; i < 20; i++) // 20 seconds
+        {
+            // ask for descriptions
+            // if (do_ping) // redundant, pingNetwork looks at do_ping flag
+            this->pingNetwork();
+            this->run1s();
+            if (nodeDescriptionsReceived.size() >= targets.size())
+                break;
+        }
+
     }
     
     void HttpInterface::broadcastGetDescription()
     {
         GetDescription getDescription;
-        getDescription.serialize(asebaStream);
-        asebaStream->flush();
-    }
-    
-    bool HttpInterface::run2s()
-	{
-		int timeout(2000);
-		UnifiedTime startTime;
-		while (timeout > 0)
-		{
-			if (!step(timeout))
-				return false;
-			timeout -= (Aseba::UnifiedTime() - startTime).value;
-		}
-		return true;
-	}
-    
-    void HttpInterface::run()
-    {
-        do
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
         {
-            sendAvailableResponses();
-			pingNetwork();
-            if (!run2s())
-				break;
-            if (verbose && streamsToShutdown.size() > 0)
-            {
-                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
-                for (std::set<Dashel::Stream*>::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
-                    cerr << " " << *si;
-                cerr << endl;
-            }
-            if (!streamsToShutdown.empty())
-            {
-                std::set<Dashel::Stream*>::iterator i = streamsToShutdown.begin();
-                Dashel::Stream* stream_to_shutdown = *i;
-                streamsToShutdown.erase(*i); // invalidates iterator
-                try
-                {
-                    if (verbose)
-                        cerr << stream_to_shutdown << " shutting down stream" << endl;
-                    shutdownStream(stream_to_shutdown);
-                }
-                catch(Dashel::DashelException& e)
-                { }
-            }
-        } while (iterations-- != 0 and asebaStream != 0);
-        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
-            unscheduleAllResponses(i->first);
+            getDescription.serialize(it->first);
+            it->first->flush();
+        }
     }
+    
+    void HttpInterface::pingNetwork()
+    {
+        if (do_ping)
+            NodesManager::pingNetwork();
+    }
+    
+//    void HttpInterface::run()
+//    {
+//        do
+//        {
+//            sendAvailableResponses();
+//            if (!run1s())
+//                break;
+//            if (verbose && streamsToShutdown.size() > 0)
+//            {
+//                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
+//                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+//                    cerr << " " << *si;
+//                cerr << endl;
+//            }
+//            if (!streamsToShutdown.empty())
+//            {
+//                StreamSet::iterator i = streamsToShutdown.begin();
+//                Dashel::Stream* stream_to_shutdown = *i;
+//                streamsToShutdown.erase(*i); // invalidates iterator
+//                try
+//                {
+//                    if (verbose)
+//                        cerr << stream_to_shutdown << " shutting down stream" << endl;
+//                    shutdownStream(stream_to_shutdown);
+//                }
+//                catch(Dashel::DashelException& e)
+//                { }
+//            }
+//        } while (iterations-- != 0 and asebaStreams.size() != 0);
+//        for (StreamResponseQueueMap::iterator i = pendingResponses.begin(); i != pendingResponses.end(); i++)
+//            unscheduleAllResponses(i->first);
+//    }
     
     void HttpInterface::connectionCreated(Dashel::Stream *stream)
     {
-        if (!asebaStream)
-        {
-            // this is the connection to the Thymio-II
-            std::cout << "Incoming Aseba connection from " << stream->getTargetName() << endl;
-            asebaStream = stream;
-        }
-        else
-        {
-            // this is an incoming HTTP connection
-            if (verbose)
-                cerr << stream << " Connection created to " << stream->getTargetName() << endl;
-            
-            assert( pendingResponses[stream].empty() );
-        }
+        if (verbose)
+            std::cout << stream << " Incoming connection from " << stream->getTargetName() << endl;
+        // assert( pendingResponses[stream].empty() );
     }
     
     void HttpInterface::connectionClosed(Stream * stream, bool abnormal)
     {
-        if (stream == asebaStream)
+        if (asebaStreams.count(stream) != 0) // this is a dashel target
         {
-            // first close all HTTP connections
+            // first close all HTTP connections to this target
             for (StreamResponseQueueMap::iterator m = pendingResponses.begin(); m != pendingResponses.end(); m++)
-                closeStream(m->first);
-            // then stop the hub
-            asebaStream = 0;
+                if (m->first == stream)
+                    closeStream(m->first);
+            // then remove this stream
+            asebaStreams.erase(stream);
             if (verbose)
-                cerr << "Connection closed to Aseba target" << endl;
-            stop();
+                cerr << "Connection closed to Aseba target " << stream->getTargetName() << endl;
+            if (asebaStreams.size() == 0)
+            {
+                cerr << "Last dashel connection closed, stopping hub" << endl;
+                stop();
+            }
         }
-        else
+        else                                 // this is the HTTP stream
         {
             if (verbose)
                 cerr << stream << " Connection closed to " << stream->getTargetName() << endl;
@@ -252,84 +281,241 @@ namespace Aseba
         }
     }
     
-    void HttpInterface::sendMessage(const Message& message)
-	{
-		message.serialize(asebaStream);
-		asebaStream->flush();
-	}
-    
-    void HttpInterface::nodeDescriptionReceived(unsigned nodeId)
+    bool HttpInterface::run1s()
     {
-        if (verbose)
-            wcerr << this << L"Received description for " << getNodeName(nodeId) << endl;
-        if (!nodeId) return;
-        this->nodeId = nodeId;
-        nodeDescriptionComplete = true;
+        int timeout(1000);
+        UnifiedTime startTime;
+        while (timeout > 0)
+        {
+            // special handling for HTTP streams
+            sendAvailableResponses();
+            if (verbose && streamsToShutdown.size() > 0)
+            {
+                cerr << "HttpInterface::run "<< streamsToShutdown.size() <<" streams to shut down";
+                for (StreamSet::iterator si = streamsToShutdown.begin(); si != streamsToShutdown.end(); si++)
+                    cerr << " " << *si;
+                cerr << endl;
+            }
+            if (!streamsToShutdown.empty())
+            {
+                StreamSet::iterator i = streamsToShutdown.begin();
+                Dashel::Stream* stream_to_shutdown = *i;
+                streamsToShutdown.erase(*i); // invalidates iterator
+                try
+                {
+                    if (verbose)
+                        cerr << stream_to_shutdown << " shutting down stream" << endl;
+                    shutdownStream(stream_to_shutdown);
+                }
+                catch(Dashel::DashelException& e)
+                { }
+            }
+
+            // standard Aseba run loop
+            if (!step(50))
+                return false;
+            const UnifiedTime now;
+            timeout -= (now - startTime).value;
+            startTime = now;
+            if (iterations > 0 && --iterations == 0) // never if infinite Kiter (iterations < 0)
+                return false;
+        }
+        return true;
     }
     
-    bool HttpInterface::descriptionReceived()
+    void HttpInterface::sendMessage(const Message& message)
     {
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
+        {
+            // patch message source if target id is remapped
+            // but really, node id remapping should be handled closer to the dashel target
+            NodeIdSubstitution subs = targetToNodeIdSubstitutions[it->first];
+            const CmdMessage *cmdMsg(dynamic_cast<const CmdMessage *>(&message));
+            if (cmdMsg)
+            {
+                for (NodeIdSubstitution::iterator m = subs.begin(); m != subs.end(); ++m)
+                    if (m->first != m->second && m->second == cmdMsg->dest)
+                    {   // ugly hack to copy normally const message
+                        CmdMessage patched_message = *cmdMsg;
+                        patched_message.dest = m->first;
+                        patched_message.serialize(it->first);
+                        it->first->flush();
+//                        patched_message.dump(std::wcout);
+//                        std::wcout << std::endl;
+                        return; // found a substitution, message sent to break out
+                    }
+            }
+            
+            // serialize and send message
+            message.serialize(it->first);
+            it->first->flush();
+        }
+    }
+
+    void HttpInterface::propagateCmdMessage(Message* message)
+    {
+        CmdMessage *cmdMsg(dynamic_cast<CmdMessage *>(message));
+        if (cmdMsg)
+        {
+            for (auto& stream_nodeid: asebaStreams)
+            {
+                NodeIdSubstitution subs = targetToNodeIdSubstitutions[stream_nodeid.first];
+
+                // UGLY: subs doesn't have a reverse index, so we have to scan through
+                // FRAGILE: rely on identity substitution in targetToNodeIdSubstitutions
+                for (NodeIdSubstitution::iterator node2sub = subs.begin(); node2sub != subs.end(); ++node2sub)
+                    if (node2sub->second == cmdMsg->dest) // the dest node is remapped to here, so reverse the map
+                    {
+                        if (node2sub->second != node2sub->second)
+                        {
+                            const uint16_t oldDest(cmdMsg->dest); // save previous value
+                            cmdMsg->dest = node2sub->first; // original node id is rewritten destination
+                            message->serialize(stream_nodeid.first); // send message with rewritten destination
+                            cmdMsg->dest = oldDest; // restore previous value
+                        }
+                        else
+                            message->serialize(stream_nodeid.first);
+                    }
+                stream_nodeid.first->flush();
+            }
+        }
+    }
+    
+    void HttpInterface::nodeDescriptionReceived(unsigned targetId)
+    {
+        if (!targetId) return;
+        unsigned nodeId = targetId;
+        nodeDescriptionsReceived.insert(nodeId);
+        // stop pinging while description is coming
+        do_ping = false;
+        // verbose
         if (verbose)
-            wcerr << this << L"check descriptionReceived: nodeId = " << nodeId << L", flag = " << nodeDescriptionComplete << L", name=" << getNodeName(nodeId) << endl;
-        //return (nodeId > 0);
-        return nodeDescriptionComplete;
+            wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
+        // if we known a program for this target and it hasn't been sent yet, send it
+        if (nodeProgramsSent.find(targetId) == nodeProgramsSent.end() && nodeProgram.find(targetId) != nodeProgram.end())
+            compileAndSendCode(targetId, nodeProgram[targetId]);
     }
     
     void HttpInterface::incomingData(Stream *stream)
     {
-        if (stream == asebaStream) {
-            // incoming Aseba message
-            if (verbose)
-                cerr << "incoming for asebaStream " << stream << endl;
-            
-            Message *message(Message::receive(stream));
-            
-            // pass message to description manager, which builds
-            // the node descriptions in background
-            NodesManager::processMessage(message);
-            
-            // if variables, check for pending requests
-            const Variables *variables(dynamic_cast<Variables *>(message));
-            if (variables)
-                incomingVariables(variables);
-            
-            // if event, retransmit it on an HTTP SSE channel if one exists
-            const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
-            if (userMsg)
-                incomingUserMsg(userMsg);
-            
-            delete message;
+        if (asebaStreams.count(stream) != 0)
+        {
+            // this is a dashel target
+            incomingDataTarget(stream);
+        }
+        else if (stream->getTargetParameter("connectionPort").compare(inAsebaPort) == 0)
+        {
+            // this is a new Aseba connection
+            incomingDataAseba(stream);
+            incomingDataTarget(stream);
         }
         else
         {
-            // incoming HTTP request
-            if (verbose)
-                cerr << "incoming for HTTP stream " << stream << endl;
-            HttpRequest* req = new HttpRequest; // [promise] we will eventually delete req in sendAvailableResponses, unscheduleResponse, or stream shutdown
-            if ( ! req->initialize(stream))
-            {   // protocol failure, shut down connection
-                stream->write("HTTP/1.1 400 Bad request\r\n");
-                stream->fail(DashelException::Unknown, 0, "400 Bad request");
-                unscheduleAllResponses(stream);
-                delete req; // not yet in queue, so delete it here [promise]
-                return;
-            }
-            
-            if (verbose)
-            {
-                cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
-                for (unsigned int i = 0; i < req->tokens.size(); ++i)
-                    cerr << req->tokens[i] << " ";
-                cerr << "] " << req->protocol_version << " new req " << req << endl;
-            }
-            // continue with incomingData
-            scheduleResponse(stream, req);
-            req->incomingData(); // read request all at once
-            if (req->ready)
-                routeRequest(req);
-            // run response queues immediately to save time
-            sendAvailableResponses();
+            // this is an HTTP stream
+            incomingDataHTTP(stream);
         }
+    }
+    
+    // incoming HTTP request
+    void HttpInterface::incomingDataHTTP(Stream *stream)
+    {
+        if (verbose)
+            cerr << "incoming for HTTP stream " << stream << endl;
+        HttpRequest* req = new HttpRequest; // [promise] we will eventually delete req in sendAvailableResponses, unscheduleResponse, or stream shutdown
+        if ( ! req->initialize(stream))
+        {   // protocol failure, shut down connection
+            stream->write("HTTP/1.1 400 Bad request\r\n");
+            stream->fail(DashelException::Unknown, 0, "400 Bad request");
+            unscheduleAllResponses(stream);
+            delete req; // not yet in queue, so delete it here [promise]
+            return;
+        }
+        
+        if (verbose)
+        {
+            cerr << stream << " Request " << req->method.c_str() << " " << req->uri.c_str() << " [ ";
+            for (unsigned int i = 0; i < req->tokens.size(); ++i)
+                cerr << req->tokens[i] << " ";
+            cerr << "] " << req->protocol_version << " new req " << req << endl;
+        }
+        // continue with incomingData
+        scheduleResponse(stream, req);
+        req->incomingData(); // read request all at once
+        if (req->ready)
+            routeRequest(req);
+        // run response queues immediately to save time
+        sendAvailableResponses();
+    }
+    
+    // incoming Aseba request
+    void HttpInterface::incomingDataAseba(Stream *stream)
+    {
+        if (verbose)
+            cerr << "new incoming for asebaStream " << stream << " con port " << stream->getTargetParameter("connectionPort") << endl;
+        asebaStreams[stream].clear();
+    }
+    
+    // incoming Aseba message
+    void HttpInterface::incomingDataTarget(Stream *stream)
+    {
+//        if (verbose)
+//            cerr << "incoming for asebaStream " << stream << endl;
+//        
+        Message *message(Message::receive(stream));
+        
+        // rewrite message source using targetToNodeIdSubstitutions
+        unsigned newId = updateNodeId(stream, message->source);
+        message->source = newId;
+        
+        // pass message to description manager, which builds the node descriptions in background
+        // warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
+        NodesManager::processMessage(message);
+        
+        // if description, record the stream -- node id correspondence
+        const Description *description = dynamic_cast<const Description *>(message);
+        if (description)
+            asebaStreams[stream].insert(message->source);
+        
+        // if variables, check for pending requests
+        const Variables *variables(dynamic_cast<Variables *>(message));
+        if (variables)
+            incomingVariables(variables);
+        
+        // if event, retransmit it on an HTTP SSE channel if one exists
+        const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
+        if (userMsg)
+            incomingUserMsg(userMsg);
+        
+        // act like asebaswitch: rebroadcast this message to the other streams
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); ++it)
+        {
+            Stream* outStream = it->first;
+            if (outStream == stream)
+                continue; // don't echo!
+            try
+            {
+                message->serialize(outStream);
+                outStream->flush();
+            }
+            catch (DashelException e)
+            {
+                std::cerr << "error while writing to stream " << outStream << std::endl;
+            }
+        }
+        // propagate rewritten Cmd message to all connected Aseba streams
+        propagateCmdMessage(message);
+
+        //
+        if (do_dump)
+        {
+            dumpTime(cout, true);
+            std::wcout << message->source << " ";
+            std::wcout << message->type << " ";
+            message->dump(std::wcout);
+            std::wcout << endl;
+        }
+
+        delete message;
     }
     
     // Incoming Variables
@@ -380,11 +566,13 @@ namespace Aseba
         if (verbose)
             cerr << "incomingUserMsg msg ("<< userMsg->type <<","<< &userMsg->data <<")" << endl;
         
+        unsigned nodeId = userMsg->source;
+        
         // skip if event not known (yet, aesl probably not loaded)
-        try { commonDefinitions.events.at(userMsg->type); }
+        try { commonDefinitions[nodeId].events.at(userMsg->type); }
         catch (const std::out_of_range& oor) { return; }
         
-        if (commonDefinitions.events[userMsg->type].name.find(L"R_state")==0)
+        if (commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state")==0)
         {
             // update variables
         }
@@ -392,7 +580,7 @@ namespace Aseba
         {
             // set up SSE message
             std::stringstream reply;
-            string event_name = WStringToUTF8(commonDefinitions.events[userMsg->type].name);
+            string event_name = WStringToUTF8(commonDefinitions[nodeId].events[userMsg->type].name);
             reply << "data: " << event_name;
             for (size_t i = 0; i < userMsg->data.size(); ++i)
                 reply << " " << userMsg->data[i];
@@ -406,7 +594,11 @@ namespace Aseba
             {
                 if (subscriber->second.count("*") >= 1 || subscriber->second.count(event_name) >= 1)
                 {
-                    appendResponse(subscriber->first, 200, true, reply.str().c_str());
+                    if (subscriber->first->sse_todo > 0)
+                        subscriber->first->sse_todo -= 1;
+                    appendResponse(subscriber->first, 200,
+                                   (subscriber->first->sse_todo != 0),
+                                   reply.str().c_str());
                 }
             }
         }
@@ -456,21 +648,41 @@ namespace Aseba
     void HttpInterface::evNodes(HttpRequest* req, strings& args)
     {
         bool do_one_node(args.size() > 0);
+        int successful_output = 0;
         
         std::stringstream json;
-        json << (do_one_node ? "" : "[");
+        json << (do_one_node ? "" : "["); // hack, should first select list of matching nodes, then check size
         
         for (NodesMap::iterator descIt = nodes.begin();
              descIt != nodes.end(); ++descIt)
         {
             const Node& description(descIt->second);
             string nodeName = WStringToUTF8(description.name);
+            unsigned nodeId = descIt->first;
             
-            json << "{";
-            json << "\"name\":\"" << nodeName << "\",\"protocolVersion\":" << description.protocolVersion;
-            
-            if (do_one_node)
+            if (! do_one_node)
             {
+                json << (descIt == nodes.begin() ? "" : ",");
+                json << "{";
+                json << "\"node\":" << nodeId;
+                json << ",\"name\":\"" << nodeName << "\"";
+                json << ",\"protocolVersion\":" << description.protocolVersion;
+                json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
+                json << "}";
+                successful_output++;
+            }
+            else // (do_one_node)
+            {
+	      if (! (int(nodeId) == atoi(args[0].c_str()) ||
+                       nodeName.find(args[0])==0) )
+                    continue; // this is not a match, skip to next candidate
+
+                json << "{"; // begin node
+                json << "\"node\":" << nodeId;
+                json << ",\"name\":\"" << nodeName << "\"";
+                json << ",\"protocolVersion\":" << description.protocolVersion;
+                json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
+
                 json << ",\"bytecodeSize\":" << description.bytecodeSize;
                 json << ",\"variablesSize\":" <<description.variablesSize;
                 json << ",\"stackSize\":" << description.stackSize;
@@ -478,10 +690,13 @@ namespace Aseba
                 // named variables
                 json << ",\"namedVariables\":{";
                 bool seen_named_variables = false;
-                for (NodeNameVariablesMap::const_iterator n(allVariables.find(nodeName));
-                     n != allVariables.end(); ++n)
-                {
-                    VariablesMap vm = n->second;
+                
+//                for (NodeIdVariablesMap::const_iterator n = allVariables.find(nodeId);
+//                     n != allVariables.end(); ++n)
+                VariablesMap vm = allVariables[nodeId];
+                if (! vm.empty()) {
+//                    unsigned this_node = n->first;
+//                    VariablesMap vm = n->second;
                     for (VariablesMap::iterator i = vm.begin();
                          i != vm.end(); ++i)
                     {
@@ -512,102 +727,113 @@ namespace Aseba
                 
                 // constants from introspection
                 json << ",\"constants\":{";
-                for (size_t i = 0; i < commonDefinitions.constants.size(); ++i)
+                for (size_t i = 0; i < commonDefinitions[nodeId].constants.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << WStringToUTF8(commonDefinitions.constants[i].name) << "\":"
-                    << commonDefinitions.constants[i].value;
+                    << "\"" << WStringToUTF8(commonDefinitions[nodeId].constants[i].name) << "\":"
+                    << commonDefinitions[nodeId].constants[i].value;
                 json << "}";
                 
                 // events from introspection
                 json << ",\"events\":{";
-                for (size_t i = 0; i < commonDefinitions.events.size(); ++i)
+                for (size_t i = 0; i < commonDefinitions[nodeId].events.size(); ++i)
                     json << (i == 0 ? "" : ",")
-                    << "\"" << WStringToUTF8(commonDefinitions.events[i].name) << "\":"
-                    << commonDefinitions.events[i].value;
+                    << "\"" << WStringToUTF8(commonDefinitions[nodeId].events[i].name) << "\":"
+                    << commonDefinitions[nodeId].events[i].value;
                 json << "}";
+
+                json << "}"; // end node
+                successful_output++;
+
+                break; // only show first matching node :-(
             }
-            json << "}";
         }
         
         json <<(do_one_node ? "" : "]");
-        finishResponse(req,200,json.str());
+        if (json.str().size() == 0)
+            json << "[]";
+        finishResponse(req, successful_output > 0 ? 200 : 404, json.str());
     }
     
     // Handler: Variable get/set or Event call
     
     void HttpInterface::evVariableOrEvent(HttpRequest* req, strings& args)
     {
-        string nodeName(args[0]);
+        std::vector<unsigned> todo = getIdsFromURI(args);
         size_t eventPos;
         
-        if ( ! commonDefinitions.events.contains(UTF8ToWString(args[1]), &eventPos))
+        for (std::vector<unsigned>::const_iterator it = todo.begin(); it != todo.end(); ++it)
         {
-            // this is a variable
-            if (req->method.find("POST") == 0 || args.size() >= 3)
+            unsigned nodeId = *it;
+            if ( ! commonDefinitions[nodeId].events.contains(UTF8ToWString(args[1]), &eventPos))
             {
-                // set variable value
-                strings values;
-                if (args.size() >= 3)
-                    values.assign(args.begin()+1, args.end());
+                // this is a variable
+                if (req->method.find("POST") == 0 || args.size() >= 3)
+                {
+                    // set variable value
+                    strings values;
+                    if (args.size() >= 3)
+                        values.assign(args.begin()+1, args.end());
+                    else
+                    {
+                        // Parse POST form data
+                        values.push_back(args[1]);
+                        parse_json_form(req->content, values);
+                    }
+                    if (values.size() == 0)
+                    {
+                        finishResponse(req, 404, "");
+                        if (verbose)
+                            cerr << req << " evVariableOrEevent 404 can't set variable " << args[0] << ", no values" <<  endl;
+                        continue;
+                    }
+                    sendSetVariable(nodeId, values);
+                    finishResponse(req, 204, ""); // succeeds with 204 NO CONTENT
+                    if (verbose)
+                        cerr << req << " evVariableOrEevent 204 set variable " << values[0] <<  endl;
+                }
                 else
                 {
-                    // Parse POST form data
-                    values.push_back(args[1]);
-                    parse_json_form(req->content, values);
-                }
-                if (values.size() == 0)
-                {
-                    finishResponse(req, 404, "");
+                    // get variable value
+                    strings values;
+                    values.assign(args.begin()+1, args.begin()+2);
+                    
+                    unsigned start;
+                    if ( ! getVarPos(nodeId, values[0], start))
+                    {
+                        finishResponse(req, 404, "");
+                        if (verbose)
+                            cerr << req << " evVariableOrEevent 404 no such variable " << values[0] <<  endl;
+                        continue;
+                    }
+                    
+                    sendGetVariables(nodeId, values);
+                    pendingVariables[std::make_pair(nodeId,start)].insert(req);
+                    
                     if (verbose)
-                        cerr << req << " evVariableOrEevent 404 can't set variable " << args[0] << ", no values" <<  endl;
-                    return;
+                        cerr << req << " evVariableOrEevent schedule var " << values[0]
+                        << "(" << nodeId << "," << start << ") add " << req << " to subscribers" <<  endl;
+                    continue;
                 }
-                sendSetVariable(nodeName, values);
-                finishResponse(req, 200, "");
-                if (verbose)
-                    cerr << req << " evVariableOrEevent 200 set variable " << values[0] <<  endl;
             }
             else
             {
-                // get variable value
-                strings values;
-                values.assign(args.begin()+1, args.begin()+2);
-                
-                unsigned source, start;
-                if ( ! getNodeAndVarPos(nodeName, values[0], source, start))
+                // this is an event
+                // arguments are args 1..N
+                strings data;
+                data.push_back(args[1]);
+                if (args.size() >= 3)
+                    for (size_t i=2; i<args.size(); ++i)
+                        data.push_back((args[i].c_str()));
+                else if (req->method.find("POST") == 0)
                 {
-                    finishResponse(req, 404, "");
-                    if (verbose)
-                        cerr << req << " evVariableOrEevent 404 no such variable " << values[0] <<  endl;
-                    return;
+                    // Parse POST form data
+                    string formdata(req->content.c_str(), req->content.size());
+                    parse_json_form(formdata, data);
                 }
-                
-                sendGetVariables(nodeName, values);
-                pendingVariables[std::make_pair(source,start)].insert(req);
-                
-                if (verbose)
-                    cerr << req << " evVariableOrEevent schedule var " << values[0]
-                    << "(" << source << "," << start << ") add " << req << " to subscribers" <<  endl;
-                return;
+                sendEvent(nodeId, data);
+                finishResponse(req, 204, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
+                continue;
             }
-        }
-        else
-        {
-            // this is an event
-            // arguments are args 1..N
-            strings data;
-            data.push_back(args[1]);
-            if (args.size() >= 3)
-                for (size_t i=2; i<args.size(); ++i)
-                    data.push_back((args[i].c_str()));
-            else if (req->method.find("POST") == 0)
-            {
-                // Parse POST form data
-                parse_json_form(std::string(req->content, req->content.size()), data);
-            }
-            sendEvent(nodeName, data);
-            finishResponse(req, 200, ""); // or perhaps {"return_value":null,"cmd":"sendEvent","name":nodeName}?
-            return;
         }
     }
     
@@ -638,14 +864,18 @@ namespace Aseba
         if (verbose)
             cerr << "PUT /nodes/" << args[0].c_str() << " trying to load aesl script\n";
         const char* buffer = req->content.c_str();
-        size_t pos = req->content.find("file=");
-        if (pos != std::string::npos)
+        std::vector<unsigned> todo = getIdsFromURI(args);
+        for (std::vector<unsigned>::const_iterator node_it = todo.begin(); node_it != todo.end(); ++node_it)
         {
-            aeslLoadMemory(buffer+pos+5, req->content.size()-pos-5);
-            finishResponse(req, 200, "");
+            try {
+                aeslLoadMemory(*node_it, buffer, req->content.size());
+            } catch ( runtime_error(e) ) {
+                finishResponse(req, 400, e.what());
+                return;
+            }
         }
-        else
-            finishResponse(req, 400, "");
+
+        finishResponse(req, 204, "");
     }
     
     // Handler: Reset nodes and rerun
@@ -655,34 +885,43 @@ namespace Aseba
         for (NodesMap::iterator descIt = nodes.begin();
              descIt != nodes.end(); ++descIt)
         {
-            bool ok;
-            nodeId = getNodeId(descIt->second.name, 0, &ok);
+            bool ok = true;
+            // nodeId = getNodeId(descIt->second.name, 0, &ok);
             if (!ok)
                 continue;
             string nodeName = WStringToUTF8(descIt->second.name);
             
-            Reset(nodeId).serialize(asebaStream); // reset node
-            asebaStream->flush();
-            Run(nodeId).serialize(asebaStream);   // re-run node
-            asebaStream->flush();
-            if (nodeName.find("thymio-II") == 0)
+            for (StreamNodeIdMap::iterator it=asebaStreams.begin(); it!=asebaStreams.end(); ++it)
             {
-                strings args;
-                args.push_back("motor.left.target");
-                args.push_back("0");
-                sendSetVariable(nodeName, args);
-                args[0] = "motor.right.target";
-                sendSetVariable(nodeName, args);
-            }
-            size_t eventPos;
-            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
-            {
-                strings data;
-                data.push_back("reset");
-                sendEvent(nodeName,data);
+                Dashel::Stream* stream = it->first;
+                for (auto nodeId: it->second) {
+//                    unsigned nodeId = it->second;
+                    Reset(nodeId).serialize(stream); // reset node
+                    stream->flush();
+                    Run(nodeId).serialize(stream);   // re-run node
+                    stream->flush();
+                    if (descIt->second.name.find(L"thymio-II") == 0)
+                    {   // Special case for Thymio-II. Should we instead just check whether motor.*.target exists?
+                        strings args;
+                        args.push_back("motor.left.target");
+                        args.push_back("0");
+                        sendSetVariable(nodeId, args);
+                        args[0] = "motor.right.target";
+                        sendSetVariable(nodeId, args);
+                    }
+                    size_t eventPos;
+                    if (commonDefinitions[nodeId].events.contains(UTF8ToWString("reset"), &eventPos))
+                    {
+                        // bug: assumes AESL file is common to all nodes
+                        // can we get this from the node description?
+                        strings data;
+                        data.push_back("reset");
+                        sendEvent(nodeId,data);
+                    }
+                }
             }
             
-            finishResponse(req, 200, "");
+            finishResponse(req, 204, "");
         }
     }
     
@@ -690,87 +929,109 @@ namespace Aseba
     
     //-- Sending messages on the Aseba bus -------------------------------------------------
     
-    void HttpInterface::sendEvent(const std::string nodeName, const strings& args)
+    void HttpInterface::sendEvent(const unsigned nodeId, const strings& args)
     {
         size_t eventPos;
-        
-        if (commonDefinitions.events.contains(UTF8ToWString(args[0]), &eventPos))
+
+        // bug: assumes AESL file is common to all nodes
+        // can we get this from the node description?
+        if (commonDefinitions[nodeId].events.contains(UTF8ToWString(args[0]), &eventPos))
         {
+            Dashel::Stream* stream;
+            try {
+                stream = getStreamFromNodeId(nodeId); // may fail
+            }
+            catch(runtime_error(e))
+            {
+                cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+                // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+                return; // hack, should be using exceptions for HTTP errors
+            }
             // build event and emit
             UserMessage::DataVector data;
             for (size_t i=1; i<args.size(); ++i)
                 data.push_back(atoi(args[i].c_str()));
             UserMessage userMessage(eventPos, data);
-            userMessage.serialize(asebaStream);
-            asebaStream->flush();
+            userMessage.serialize(stream);
+            stream->flush();
         }
         else if (verbose)
-            cerr << "sendEvent " << nodeName << ": no event " << args[0] << endl;
+            cerr << "sendEvent node id " << nodeId << ": no event " << args[0] << endl;
     }
     
-    std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const std::string nodeName, const strings& args)
+    std::pair<unsigned,unsigned> HttpInterface::sendGetVariables(const unsigned nodeId, const strings& args)
     {
-        unsigned nodePos, varPos;
+        unsigned varPos;
+        Dashel::Stream* stream;
+        try {
+            stream = getStreamFromNodeId(nodeId); // may fail
+        }
+        catch(runtime_error(e))
+        {
+            cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+            // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+            return std::pair<unsigned,unsigned>(0,0); // hack, should be using exceptions for HTTP errors
+        }
         for (strings::const_iterator it(args.begin()); it != args.end(); ++it)
         {
             // get node id, variable position and length
             if (verbose)
-                cerr << "getVariables " << nodeName << " " << *it;
-            const bool exists(getNodeAndVarPos(nodeName, *it, nodePos, varPos));
+                cerr << "getVariables node id " << nodeId << " " << *it;
+            const bool exists(getVarPos(nodeId, *it, varPos));
             if (!exists)
                 continue;
             
-            VariablesMap vm = allVariables[nodeName];
+            VariablesMap vm = allVariables[nodeId];
             const unsigned length(vm[UTF8ToWString(*it)].second);
             
             if (verbose)
-                cerr << " (" << nodePos << "," << varPos << "):" << length << "\n";
+                cerr << " (" << nodeId << "," << varPos << "):" << length << "\n";
             // send the message
-            GetVariables getVariables(nodePos, varPos, length);
-            getVariables.serialize(asebaStream);
+            GetVariables getVariables(nodeId, varPos, length);
+            getVariables.serialize(stream);
         }
-        asebaStream->flush();
-        return std::pair<unsigned,unsigned>(nodePos,varPos); // just last one
+        stream->flush();
+        return std::pair<unsigned,unsigned>(nodeId,varPos); // just last one
     }
     
-    void HttpInterface::sendSetVariable(const std::string nodeName, const strings& args)
+    void HttpInterface::sendSetVariable(const unsigned nodeId, const strings& args)
     {
         // get node id, variable position and length
         if (verbose)
-            cerr << "setVariables " << nodeName << " " << args[0];
-        unsigned nodePos, varPos;
-        const bool exists(getNodeAndVarPos(nodeName, args[0], nodePos, varPos));
+            cerr << "setVariables " << nodeId << " " << args[0];
+        unsigned varPos;
+        const bool exists(getVarPos(nodeId, args[0], varPos));
         if (!exists)
             return;
         
         if (verbose)
-            cerr << " (" << nodePos << "," << varPos << "):" << args.size()-1 << endl;
+            cerr << " (" << nodeId << "," << varPos << "):" << args.size()-1 << endl;
         // send the message
         SetVariables::VariablesVector data;
+        Dashel::Stream* stream;
+        try {
+            stream = getStreamFromNodeId(nodeId); // may fail
+        }
+        catch(runtime_error(e))
+        {
+            cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+            // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+            return; // hack, should be using exceptions for HTTP errors
+        }
         for (size_t i=1; i<args.size(); ++i)
             data.push_back(atoi(args[i].c_str()));
-        SetVariables setVariables(nodePos, varPos, data);
-        setVariables.serialize(asebaStream);
-        asebaStream->flush();
+        SetVariables setVariables(nodeId, varPos, data);
+        setVariables.serialize(stream);
+        stream->flush();
     }
     
-    // Utility: find variable address
-    bool HttpInterface::getNodeAndVarPos(const string& nodeName, const string& variableName,
-                                         unsigned& nodeId, unsigned& pos)
+    // Utility: find variable address from node id and variable name
+    bool HttpInterface::getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos)
     {
-        // make sure the node exists
-        bool ok;
-        nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
-        if (!ok)
-        {
-            if (verbose)
-                wcerr << "invalid node name " << UTF8ToWString(nodeName) << endl;
-            return false;
-        }
         pos = unsigned(-1);
         
         // check whether variable is known from a compilation, if so, get position
-        const NodeNameVariablesMap::const_iterator allVarMapIt(allVariables.find(nodeName));
+        const NodeIdVariablesMap::const_iterator allVarMapIt(allVariables.find(nodeId));
         if (allVarMapIt != allVariables.end())
         {
             const VariablesMap& varMap(allVarMapIt->second);
@@ -787,24 +1048,24 @@ namespace Aseba
             if (!ok)
             {
                 if (verbose)
-                    wcerr << "no variable " << UTF8ToWString(variableName) << " in node " << UTF8ToWString(nodeName);
+                    wcerr << "no variable " << UTF8ToWString(variableName) << " in node id " << nodeId;
                 return false;
             }
         }
         return true;
     }
-    
+
     // Utility: request update of all variables, used for variable caching
-    void HttpInterface::updateVariables(const std::string nodeName)
+    void HttpInterface::updateVariables(const unsigned nodeId)
     {
         strings all_variables;
-        for(VariablesMap::iterator it = allVariables[nodeName].begin(); it != allVariables[nodeName].end(); ++it)
+        for(VariablesMap::iterator it = allVariables[nodeId].begin(); it != allVariables[nodeId].end(); ++it)
             all_variables.push_back(WStringToUTF8(it->first));
-        sendGetVariables(nodeName, all_variables);
+        sendGetVariables(nodeId, all_variables);
     }
     
     // Utility: extract argument values from JSON request body
-    void HttpInterface::parse_json_form(std::string content, strings& values)
+    void HttpInterface::parse_json_form(const std::string content, strings& values)
     {
         std::string buffer = content;
         buffer.erase(std::remove_if(buffer.begin(), buffer.end(), ::isspace), buffer.end());
@@ -831,48 +1092,83 @@ namespace Aseba
         return;
     }
     
+    // Utility: search stream map to find a given node id
+    std::vector<unsigned> HttpInterface::getIdsFromURI(const strings& args)
+    {
+        std::vector<unsigned> found;
+        // first, look for named nodes
+        for (NodesMap::iterator descIt = nodes.begin();
+             descIt != nodes.end(); ++descIt)
+            if (descIt->second.name.find(UTF8ToWString(args[0])) == 0)
+                found.push_back(descIt->first);
+        if (found.size() > 0)
+            return found;
+
+        // otherwise, try to convert to a node id
+        unsigned nodeId;
+        if (istringstream ( args[0] ) >> nodeId)
+            found.push_back(nodeId);
+        return found;
+    }
+    
+    
+    // Utility: search stream map to find a given node id
+    Dashel::Stream* HttpInterface::getStreamFromNodeId(const unsigned nodeId)
+    {
+        for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
+            if ((it->second).count(nodeId))
+                return it->first;
+        // otherwise, raise exception
+        throw runtime_error(FormatableString("getStreamFromNodeId: can't find stream for node id %0").arg(nodeId));
+        return NULL;
+    }
+
+    
     
     // Load Aesl file from file
-    void HttpInterface::aeslLoadFile(const std::string& filename)
+    void HttpInterface::aeslLoadFile(const unsigned nodeId, const std::string& filename)
     {
         // local file or URL
-        xmlDoc *doc(xmlReadFile(filename.c_str(), nullptr, 0));
+        xmlDoc *doc(xmlReadFile(filename.c_str(), NULL, 0));
         if (!doc)
-            wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
+            throw runtime_error(FormatableString("Cannot read aesl script XML from file %1 for nodeId %0").arg(nodeId).arg(filename));
+//            wcerr << "cannot read aesl script XML from file " << UTF8ToWString(filename) << endl;
         else
         {
-            aeslLoad(doc);
-            //if (verbose)
-            cerr << "Loaded aesl script from " << filename.c_str() << "\n";
+            aeslLoad(nodeId, doc);
+            if (verbose)
+                cerr << "Loaded aesl script from " << filename.c_str() << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
     }
     
     // Load Aesl file from memory
-    void HttpInterface::aeslLoadMemory(const char * buffer, const int size)
+    void HttpInterface::aeslLoadMemory(const unsigned nodeId, const char * buffer, const int size)
     {
         // open document
-        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", nullptr, 0));
+        xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", NULL, 0));
         if (!doc)
-            wcerr << "cannot read XML from memory " << buffer << endl;
+            throw runtime_error(FormatableString("Cannot read aesl script XML from memory for nodeId %0").arg(nodeId));
+//            wcerr << "cannot read XML from memory " << buffer << endl;
         else
         {
-            aeslLoad(doc);
-            //if (verbose)
-            cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
+            aeslLoad(nodeId, doc);
+            if (verbose)
+                cerr << "Loaded aesl script in-memory buffer " << buffer << "\n";
         }
         xmlFreeDoc(doc);
         xmlCleanupParser();
     }
     
     // Parse Aesl program using XPath
-    void HttpInterface::aeslLoad(xmlDoc* doc)
+    void HttpInterface::aeslLoad(const unsigned nodeId, xmlDoc* doc)
     {
         // clear existing data
-        commonDefinitions.events.clear();
-        commonDefinitions.constants.clear();
-        allVariables.clear();
+        commonDefinitions[nodeId].events.clear();
+        commonDefinitions[nodeId].constants.clear();
+        allVariables[nodeId].clear();
+        nodeProgram[nodeId].clear();
         
         // load new data
         int noNodeCount(0);
@@ -900,7 +1196,7 @@ namespace Aseba
                         break;
                     }
                     else
-                        commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
+                        commonDefinitions[nodeId].events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
                 }
                 xmlFree(name);
                 xmlFree(size);
@@ -916,10 +1212,10 @@ namespace Aseba
                 xmlChar *name  (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
                 xmlChar *value (xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
                 if (name && value)
-                    commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name),
+                    commonDefinitions[nodeId].constants.push_back(NamedValue(UTF8ToWString((const char *)name),
                                                                      atoi((const char *)value)));
-                xmlFree(name);  // nop if name is nullptr
-                xmlFree(value); // nop if value is nullptr
+                xmlFree(name);  // nop if name is NULL
+                xmlFree(value); // nop if value is NULL
             }
             xmlXPathFreeObject(obj); // also frees nodeset
         }
@@ -951,20 +1247,22 @@ namespace Aseba
                     wcerr << "missing text in \"node\" entry" << endl;
                 else
                 {
-                    const string _name((const char *)name);
                     // get the identifier of the node and compile the code
-                    unsigned preferedId = storedId ? unsigned(atoi((char*)storedId)) : 0;
-                    bool ok;
-                    unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-                    if (ok)
-                        wasError = !compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name);
-                    else
-                        noNodeCount++;
+                    wstring program = UTF8ToWString((const char *)text);
+                    unsigned preferredId = nodeToAeslIdSubstitutions[nodeId] ? nodeToAeslIdSubstitutions[nodeId] : nodeId;
+                    if (preferredId == unsigned(atoi((char*)storedId))
+                        || (nodeProgram[nodeId].size()==0 && i == nodeset->nodeNr - 1)) // hack: failsafe is last program in set
+                    {
+                        nodeProgram[nodeId] = program;
+                        if (nodeDescriptionsReceived.find(nodeId) != nodeDescriptionsReceived.end())
+                            compileAndSendCode(nodeId,program);
+                    }
+                    // else send to all XML nodes (really should only send to those without preferred!)
                 }
                 // free attribute and content
-                xmlFree(name);     // nop if name is nullptr
-                xmlFree(storedId); // nop if name is nullptr
-                xmlFree(text);     // nop if text is nullptr
+                xmlFree(name);     // nop if name is NULL
+                xmlFree(storedId); // nop if name is NULL
+                xmlFree(text);     // nop if text is NULL
             }
             xmlXPathFreeObject(obj); // also frees nodeset
         }
@@ -972,14 +1270,15 @@ namespace Aseba
         // release memory
         xmlXPathFreeContext(context);
         
-        // check if there was an error
-        if (wasError)
-        {
-            wcerr << "There was an error while loading script " << endl;
-            commonDefinitions.events.clear();
-            commonDefinitions.constants.clear();
-            allVariables.clear();
-        }
+//        // check if there was an error
+//        if (wasError)
+//        {
+//            wcerr << "There was an error while loading script " << endl;
+//            commonDefinitions[nodeId].events.clear();
+//            commonDefinitions[nodeId].constants.clear();
+//            allVariables.clear();
+//            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
+//        }
         
         // check if there was some matching problem
         if (noNodeCount)
@@ -989,34 +1288,57 @@ namespace Aseba
     }
     
     // Upload bytecode to node
-    bool HttpInterface::compileAndSendCode(const wstring& source, unsigned nodeId, const string& nodeName)
+    bool HttpInterface::compileAndSendCode(const unsigned nodeId, const wstring& program)
     {
         // compile code
-        std::wistringstream is(source);
+        std::wistringstream is(program);
         Error error;
         BytecodeVector bytecode;
         unsigned allocatedVariablesCount;
         
+        bool is_failsafe = (program.empty() || program.compare(UTF8ToWString("<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n")) == 0);
+        
         Compiler compiler;
         compiler.setTargetDescription(getDescription(nodeId));
-        compiler.setCommonDefinitions(&commonDefinitions);
+        compiler.setCommonDefinitions(&(commonDefinitions[nodeId]));
         bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
         
         if (result)
         {
-            // send bytecode
-            sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
-            // run node
-            Run msg(nodeId);
-            msg.serialize(asebaStream);
-            asebaStream->flush();
+            Dashel::Stream* stream;
+            try {
+                stream = getStreamFromNodeId(nodeId); // may fail
+            }
+            catch(runtime_error(e))
+            {
+                cerr << "sendEvent node id " << nodeId << ": bad node id" << endl;
+                // HTTP response should be 400 BAD REQUEST, response body should be bad node id
+                return false; // hack, should be using exceptions for HTTP errors
+            }
+
+            if (! is_failsafe) {
+                // send bytecode
+                sendBytecode(stream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
+                // run node
+                Run msg(nodeId);
+                msg.serialize(stream);
+                stream->flush();
+            }
             // retrieve user-defined variables for use in get/set
-            allVariables[nodeName] = *compiler.getVariablesMap();
+            allVariables[nodeId] = *compiler.getVariablesMap();
+            // remember that this node has received a program
+            nodeProgramsSent.insert(nodeId);
             return true;
         }
         else
         {
-            wcerr << "compilation for node " << UTF8ToWString(nodeName) << " failed: " << error.toWString() << endl;
+            wcerr << "Compilation for node " << getNodeName(nodeId) << " failed: " << error.toWString() << endl;
+            commonDefinitions[nodeId].events.clear();
+            commonDefinitions[nodeId].constants.clear();
+            // allVariables.clear();
+            throw runtime_error(FormatableString("Error compiling aesl script XML for nodeId %0").arg(nodeId));
+
+            // HTTP response should be 400 BAD REQUEST, response body should be compiler messages
             return false;
         }
     }
@@ -1114,8 +1436,56 @@ namespace Aseba
             if (verbose)
                 cerr << m->first << " available responses sent, now " << m->second.size() << " in queue" << endl;
             
-            if (close_this_stream)
+            if (close_this_stream || q->size() == 0)
                 streamsToShutdown.insert(m->first);
+        }
+    }
+    
+    std::set<unsigned> HttpInterface::allNodeIds()
+    {
+        std::set<unsigned> nodeIds;
+        for(auto i: nodes)
+            nodeIds.insert( i.first );
+        for(auto k: targetToNodeIdSubstitutions)
+            for(auto t: targetToNodeIdSubstitutions[k.first])
+                nodeIds.insert( t.second );
+        return nodeIds;
+    }
+    
+    unsigned HttpInterface::updateNodeId(Dashel::Stream* stream, unsigned targetId)
+    {
+        NodeIdSubstitution known = targetToNodeIdSubstitutions[stream];
+        NodeIdSubstitution::iterator it = known.find(targetId);
+        if (it != known.end())
+            // already know about this targetId in this stream, return its assigned nodeId
+            return it->second;
+        else
+        {
+            // this is a new source, find an available nodeId
+            NodeIdSubstitution localWishes = localIdWishes[stream];
+            std::set<unsigned> used = allNodeIds();
+            unsigned newId = targetId ? targetId : 1;
+            NodeIdSubstitution::iterator localWish = localWishes.find(targetId);
+            if (localWish != localWishes.end())
+                newId = localWish->second;
+            while (used.count(newId) != 0 && (newId += 20)); // unsigned newId will wrap around
+            if (newId == 0) //
+                throw runtime_error(FormatableString("Can't allocate an unused node id for target id %0 in stream %1").arg(targetId).arg(stream));
+
+            // remember the assigned nodeId for this targetId in this stream
+            targetToNodeIdSubstitutions[stream][targetId] = newId;
+
+            // if we had a promise for aeslId, add the substitution
+            NodeIdSubstitution aeslWishes = aeslIdWishes[stream];
+            NodeIdSubstitution::iterator aeslWish = aeslWishes.find(targetId);
+            if (aeslWish != aeslWishes.end())
+                nodeToAeslIdSubstitutions[newId] = aeslWish->second;
+            else if (localWish != localWishes.end())
+                nodeToAeslIdSubstitutions[newId] = localWish->second;
+            else
+                nodeToAeslIdSubstitutions[newId] = targetId;
+            
+            return newId;
         }
     }
     //== end of class HttpInterface ============================================================
@@ -1158,6 +1528,7 @@ namespace Aseba
         result.clear();  // outgoing payload
         outheaders.clear();  // outgoing payload
         more = false;
+        sse_todo = -1;
         headers_done = false;
         status_sent = false;
         
@@ -1174,6 +1545,10 @@ namespace Aseba
         tokens = split<string>(uri, "/");
         if (tokens[0].size() == 0)
             tokens.erase(tokens.begin(),tokens.begin()+1);
+        
+        strings query = split<string>(uri, "?");
+        if (query.size() > 1 && query[1].find("todo=",0,5)==0)
+            sse_todo = atoi(query[1].substr(5).c_str());
         return true;
     }
     
@@ -1192,9 +1567,11 @@ namespace Aseba
                 //                std::regex_match (header_field,field,e);
                 //                if (field.size() == 3)
                 //                    headers[field[1]] = field[2];
-                if (header_field.find("Content-Length: ",0,16)==0)
+                if (header_field.find("Content-Length: ",0,16)==0 ||
+                    header_field.find("content-length: ",0,16)==0)
                     headers["Content-Length"] = header_field.substr(16,term-16);
-                else if (header_field.find("Connection: ",0,12)==0)
+                else if (header_field.find("Connection: ",0,12)==0 ||
+                         header_field.find("connection: ",0,12)==0)
                     headers["Connection"] = header_field.substr(12,term-12);
             }
             else
@@ -1239,6 +1616,7 @@ namespace Aseba
         {
             case 200: reply << "OK";                    break;
             case 201: reply << "Created";               break;
+            case 204: reply << "No Content";            break;
             case 400: reply << "Bad Request";           break;
             case 403: reply << "Forbidden";             break;
             case 408: reply << "Request Timeout";       break;
@@ -1248,9 +1626,10 @@ namespace Aseba
             case 404:
             default:  reply << "Not Found";
         }
+        reply << "\r\n";
         if (outheaders.size() == 0)
         {
-            reply << "\r\nContent-Length: " << result.size() << "\r\n";
+            reply << "Content-Length: " << result.size() << "\r\n";
             reply << "Content-Type: application/json\r\n"; // NO ";charset=UTF-8" cf. RFC 7159
             reply << "Access-Control-Allow-Origin: *\r\n";
             if (headers["Connection"].find("Keep-Alive")==0)

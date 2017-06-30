@@ -4,8 +4,7 @@
 # need libxml2 to read aesl files
 find_package(LibXml2)
 if (LIBXML2_FOUND)
-	
-        include_directories(${LIBXML2_INCLUDE_DIR})
+	include_directories(${LIBXML2_INCLUDE_DIR})
 
 	set(http_SRCS
 		http.cpp
@@ -38,8 +37,5 @@ if (LIBXML2_FOUND)
 	install(FILES ${ASEBACORE_HDR_HTTP}
 		DESTINATION include/aseba/switches/http
 	)
-
-	configure_file(dummynode-1-tick.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1-tick.aesl COPYONLY)
-	configure_file(dummynode-1.aesl ${CMAKE_CURRENT_BINARY_DIR}/dummynode-1.aesl COPYONLY)
 
 endif (LIBXML2_FOUND)

@@ -1,0 +1,25 @@
+{
+    "name": "e2e-http",
+    "author": "David James Sherman",
+    "description": "Aseba HTTP REST services",
+    "main": "3000-1-http_spec.js",
+    "version": "0.0.1",
+    "license": "CECILL-2.1",
+    "dependencies": {
+        "frisby": "latest",
+        "jasmine-node": "latest"
+    },
+    "devDependencies": {
+	"frisby": "^0.8.5"
+    },
+    "scripts": {
+	"test": "jasmine-node --verbose --color ."
+    },
+    "repository": {
+	"type": "git",
+	"url": "https://github.com/davidjsherman/aseba.git"
+    },
+    "keywords": [
+	"Aseba", "HTTP", "REST"
+    ]
+}
