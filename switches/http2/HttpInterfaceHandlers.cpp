@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <map>
 #include <set>
 #include <vector>
@@ -38,6 +39,7 @@ using Aseba::Http::NodesHandler;
 using Aseba::Http::OptionsHandler;
 using Aseba::Http::ResetHandler;
 using Aseba::Http::VariableOrEventHandler;
+using Aseba::Http::FileHandler;
 using std::cerr;
 using std::endl;
 using std::map;
@@ -474,4 +476,87 @@ void VariableOrEventHandler::parseJsonForm(std::string content, std::vector<std:
 	}
 
 	return;
+}
+
+FileHandler::FileHandler(HttpInterface *interface): InterfaceHttpHandler(interface)
+{
+}
+
+FileHandler::~FileHandler()
+{
+}
+
+std::string FileHandler::filePath(HttpRequest *request) const
+{
+	// check that url has a single leading slash, not followed by a dot
+	// if invalid, return empty string
+	std::string url = request->getUri();
+	if (url.length() < 2 || url[0] != '/' || url[1] == '.')
+		return std::string();
+	std::string filename = url.substr(1);
+	return getInterface()->prependDocumentRoot(filename);
+}
+
+bool FileHandler::doesFileExist(HttpRequest *request) const
+{
+	std::string path = filePath(request);
+	if (path.empty())
+		return false;
+	std::ifstream f(path.c_str());
+  return f.good();
+}
+
+bool FileHandler::checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const
+{
+	return request->getMethod() == "GET"
+		&& doesFileExist(request);
+}
+
+static std::string getSuffix(std::string &path)
+{
+	auto i = path.rfind(".");
+	std::string suffix;
+	if (i != std::string::npos)
+		suffix = path.substr(i + 1);
+	return suffix;
+}
+
+std::map<std::string, std::string> const FileHandler::suffixMapping = {
+	{ "css", "text/css" },
+	{ "gif", "image/gif" },
+	{ "htm", "text/html" },
+	{ "html", "text/html" },
+	{ "jpg", "image/jpg" },
+	{ "js", "text/javascript" },
+	{ "pdf", "application/pdf" },
+	{ "png", "image/png" },
+	{ "txt", "text/plain" },
+	{ "xml", "application/xml" }
+};
+
+void FileHandler::handleRequest(HttpRequest *request, const std::vector<std::string>& tokens)
+{
+	std::string path = filePath(request);
+	std::ifstream f(path.c_str());
+	if (f.good())
+	{
+		auto type = suffixMapping.find(getSuffix(path));
+		if (type != suffixMapping.end())
+		{
+			std::stringbuf content;
+			while (!f.eof())
+			{
+				const size_t bufferSize = 1024;
+				char buffer[bufferSize];
+				f.read(buffer, bufferSize);
+				content.sputn(buffer, f.gcount());
+			}
+			request->respond().setHeader("Content-Type", type->second);
+			request->respond().setContent(content.str());
+			return;
+		}
+	}
+
+	// not served
+	request->respond().setStatus(HttpResponse::HTTP_STATUS_NOT_FOUND);
 }

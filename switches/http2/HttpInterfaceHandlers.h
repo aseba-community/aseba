@@ -94,6 +94,21 @@ namespace Aseba { namespace Http
 		private:
 			void parseJsonForm(std::string content, std::vector<std::string>& values);
 	};
+
+	class FileHandler: public InterfaceHttpHandler
+	{
+	public:
+		FileHandler(HttpInterface *interface);
+		virtual ~FileHandler();
+
+		virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const;
+		virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
+
+	private:
+		std::string filePath(HttpRequest *request) const;
+		bool doesFileExist(HttpRequest *request) const;
+		static std::map<std::string, std::string> const suffixMapping;
+	};
 } }
 
 #endif

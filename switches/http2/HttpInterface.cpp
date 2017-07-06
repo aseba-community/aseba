@@ -55,6 +55,7 @@ HttpInterface::HttpInterface(const std::string& httpPort) :
 	addSubhandler(new NodesHandler(this));
 	addSubhandler(new EventsHandler(this));
 	addSubhandler(new ResetHandler(this));
+	addSubhandler(new FileHandler(this));
 
 	// listen for incoming HTTP requests
 	httpStream = connect("tcpin:port=" + httpPort);
