@@ -433,22 +433,36 @@ namespace Aseba
                 req->tokens.erase(req->tokens.begin(),req->tokens.begin()+1);
                 evSubscribe(req, req->tokens);
             }
+            else if((req->tokens.size() >= 2 && req->tokens[1].find("!reset")==0))
+            {
+                evReset(req, req->tokens, true);
+            }
+            else if((req->tokens.size() >= 2 && req->tokens[1].find("!stop")==0))
+            {
+                evReset(req, req->tokens, false);
+            }
             else
-            {   // request for a varibale or an event
+            {   // request for a variable or an event
                 evVariableOrEvent(req, req->tokens);
             }
             return;
         }
-        if (req->tokens[0].find("events")==0)
+        else if (req->tokens[0].find("events")==0)
         {   // subscribe to event stream for all nodes
-            return evSubscribe(req, req->tokens);
+            evSubscribe(req, req->tokens);
         }
-        if (req->tokens[0].find("reset")==0 || req->tokens[0].find("reset_all")==0)
+        else if (req->tokens[0].find("stop")==0 || req->tokens[0].find("stop_all")==0)
+        {   // stop nodes: reset but do not rerun
+            evResetAll(req, req->tokens, false);
+        }
+        else if (req->tokens[0].find("reset")==0 || req->tokens[0].find("reset_all")==0)
         {   // reset nodes
-            return evReset(req, req->tokens);
+            evResetAll(req, req->tokens, true);
         }
         else
+        {
             finishResponse(req, 404, "");
+        }
     }
     
     // Handler: Node descriptions
@@ -648,44 +662,75 @@ namespace Aseba
             finishResponse(req, 400, "");
     }
     
-    // Handler: Reset nodes and rerun
-    
-    void HttpInterface::evReset(HttpRequest* req, strings& args)
+    // Handler: Reset nodes and optionally rerun
+
+    void HttpInterface::evResetAll(HttpRequest* req, strings& args, bool rerun)
     {
         for (NodesMap::iterator descIt = nodes.begin();
              descIt != nodes.end(); ++descIt)
         {
-            bool ok;
-            nodeId = getNodeId(descIt->second.name, 0, &ok);
-            if (!ok)
-                continue;
-            string nodeName = WStringToUTF8(descIt->second.name);
-            
-            Reset(nodeId).serialize(asebaStream); // reset node
-            asebaStream->flush();
-            Run(nodeId).serialize(asebaStream);   // re-run node
-            asebaStream->flush();
-            if (nodeName.find("thymio-II") == 0)
-            {
-                strings args;
-                args.push_back("motor.left.target");
-                args.push_back("0");
-                sendSetVariable(nodeName, args);
-                args[0] = "motor.right.target";
-                sendSetVariable(nodeName, args);
-            }
-            size_t eventPos;
-            if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
-            {
-                strings data;
-                data.push_back("reset");
-                sendEvent(nodeName,data);
-            }
-            
-            finishResponse(req, 200, "");
+            resetNode(WStringToUTF8(descIt->second.name), rerun);
+
         }
+        finishResponse(req, 200, "");
+
+    }
+
+    // Handler: Reset one node and optionally rerun
+    
+    void HttpInterface::evReset(HttpRequest* req, strings& args, bool rerun)
+    {
+        resetNode(string(args[0]), rerun);
+        finishResponse(req, 200, "");
     }
     
+    // Util: reset a node
+
+    bool HttpInterface::resetNode(const std::string& nodeName, bool rerun)
+    {
+        bool ok;
+        nodeId = getNodeId(UTF8ToWString(nodeName), 0, &ok);
+
+        if (!ok)
+        {
+            if (verbose)
+               cerr << "invalid node name " << nodeName << endl;
+               return false;
+        }
+
+        Reset(nodeId).serialize(asebaStream); // reset node
+        asebaStream->flush();
+
+        if(rerun)
+        {
+            Run(nodeId).serialize(asebaStream);   // re-run node
+            asebaStream->flush();
+        }
+
+        if (nodeName.find("thymio-II") == 0)
+        {
+            strings args;
+            args.push_back("motor.left.target");
+            args.push_back("0");
+            sendSetVariable(nodeName, args);
+            args[0] = "motor.right.target";
+            sendSetVariable(nodeName, args);
+        }
+        size_t eventPos;
+        if (commonDefinitions.events.contains(UTF8ToWString("reset"), &eventPos))
+        {
+            strings data;
+            data.push_back("reset");
+            sendEvent(nodeName,data);
+        }
+
+        if(verbose)
+        {
+            cerr << nodeName << " has been " << (rerun ? "rerun" : "reset") << endl;
+        }
+
+        return true;
+    }
     
     
     //-- Sending messages on the Aseba bus -------------------------------------------------
