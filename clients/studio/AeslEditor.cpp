@@ -728,6 +728,13 @@ namespace Aseba
 
 	void AeslEditor::keyPressEvent(QKeyEvent * event)
 	{
+		// if read-only, only call parent
+		if (isReadOnly())
+		{
+			QTextEdit::keyPressEvent(event);
+			return;
+		}
+
 		// handle special pressed
 		if (handleCompleter(event))
 			return;
