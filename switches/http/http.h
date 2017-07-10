@@ -109,6 +109,7 @@ namespace Aseba
         virtual void evNodes(HttpRequest* req, strings& args);
         virtual void evVariableOrEvent(HttpRequest* req, strings& args);
         virtual void evSubscribe(HttpRequest* req, strings& args);
+        virtual void evOptions(HttpRequest* req, strings& args);
         virtual void evLoad(HttpRequest* req, strings& args);
         virtual void evReset(HttpRequest* req, strings& args);
         virtual void aeslLoadFile(const unsigned nodeId, const std::string& filename);
