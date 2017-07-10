@@ -617,6 +617,8 @@ namespace Aseba
             {   // one named node
                 if (req->method.find("PUT")==0)
                     evLoad(req, req->tokens);  // load bytecode for one node
+                else if (req->method.find("OPTIONS")==0)
+                    evOptions(req, req->tokens);	// get supported methods for CORS preflight
                 else
                     evNodes(req, req->tokens); // get info for one node
             }
@@ -857,6 +859,22 @@ namespace Aseba
         // connection must stay open!
     }
     
+	// Handler: Reply with supported methods to support CORS preflight
+
+    void HttpInterface::evOptions(HttpRequest* req, strings& args)
+    {
+        strings headers;
+        headers.push_back("Content-Type: text/plain");
+        headers.push_back("Content-Length: 0");
+        headers.push_back("Access-Control-Allow-Origin: *");
+        headers.push_back("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
+        headers.push_back("Allow: GET, POST, PUT, OPTIONS");
+        headers.push_back("Connection: keep-alive");
+        addHeaders(req, headers);
+        appendResponse(req,200,true,"");
+        // connection must stay open!
+    }
+
     // Handler: Compile and store a program into the node, and remember it for introspection
     
     void HttpInterface::evLoad(HttpRequest* req, strings& args)
@@ -1505,7 +1523,8 @@ namespace Aseba
     {
         strings parts = split<string>(start_line, " ");
         if (parts.size() == 3
-            && (parts[0].find("GET",0)==0 || parts[0].find("PUT",0)==0 || parts[0].find("POST",0)==0)
+            && (parts[0].find("GET",0)==0 || parts[0].find("PUT",0)==0 || parts[0].find("POST",0)==0
+                || parts[0].find("OPTIONS",0)==0)
             && (parts[2].find("HTTP/1.1\r\n",0)==0 || parts[2].find("HTTP/1.0\r\n",0)==0) )
         {
             // valid start-line, parse uri
