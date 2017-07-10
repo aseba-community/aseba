@@ -852,6 +852,7 @@ namespace Aseba
         
         strings headers;
         headers.push_back("Content-Type: text/event-stream");
+        headers.push_back("Access-Control-Allow-Origin: *");
         headers.push_back("Cache-Control: no-cache");
         headers.push_back("Connection: keep-alive");
         addHeaders(req, headers);
