@@ -568,19 +568,22 @@ namespace Aseba
         
         unsigned nodeId = userMsg->source;
         
-        // skip if event not known (yet, aesl probably not loaded)
-        try { commonDefinitions[nodeId].events.at(userMsg->type); }
-        catch (const std::out_of_range& oor) { return; }
-        
-        if (commonDefinitions[userMsg->source].events[userMsg->type].name.find(L"R_state")==0)
-        {
-            // update variables
-        }
         if (eventSubscriptions.size() > 0)
         {
             // set up SSE message
             std::stringstream reply;
-            string event_name = WStringToUTF8(commonDefinitions[nodeId].events[userMsg->type].name);
+            string event_name;
+            try
+            {
+                commonDefinitions[nodeId].events.at(userMsg->type);
+                event_name = WStringToUTF8(commonDefinitions[nodeId].events[userMsg->type].name);
+            }
+            catch (const std::out_of_range& oor)
+            {
+                // event not known (yet, aesl probably not loaded)
+                // use type instead (0-based index)
+                event_name = std::to_string(userMsg->type);
+            }
             reply << "data: " << event_name;
             for (size_t i = 0; i < userMsg->data.size(); ++i)
                 reply << " " << userMsg->data[i];
