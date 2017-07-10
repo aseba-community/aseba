@@ -48,6 +48,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
     stream << "-p, --http port : listens to incoming HTTP connection on this port\n";
     stream << "-s, --port port : listens to incoming Aseba connection on this port\n";
     stream << "-a, --aesl file : load program definitions from AESL file\n";
+    stream << "--autorestart   : restart switch in case of error (else exit)\n";
     stream << "-K, --Kiter n   : run I/O loop n thousand times (for profiling)\n";
     stream << "-h, --help      : shows this help\n";
     stream << "-V, --version   : shows the version number\n";
@@ -64,7 +65,6 @@ void dumpVersion(std::ostream &stream)
     stream << "Aseba library licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-
 // Main
 int main(int argc, char *argv[])
 {
@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
     std::vector<std::string> dashel_target_list;
     bool verbose = false;
     bool dump = false;
+    bool autoRestart = false;
     int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
 
     // process command line
@@ -98,6 +99,8 @@ int main(int argc, char *argv[])
             aseba_port = argv[argCounter++];
         else if ((strcmp(arg, "-a") == 0) || (strcmp(arg, "--aesl") == 0))
             aesl_filename = argv[argCounter++];
+        else if (strcmp(arg, "--autorestart") == 0)
+            autoRestart = true;
         else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
             Kiterations = atoi(argv[argCounter++]);
         else if (strncmp(arg, "-", 1) != 0)
@@ -108,37 +111,40 @@ int main(int argc, char *argv[])
     Dashel::initPlugins();
 
     // create and run bridge, catch Dashel exceptions
-    try
+    do
     {
-        Aseba::HttpInterface* network(new Aseba::HttpInterface(dashel_target_list, http_port, aseba_port,
-                                                               Kiterations > 0 ? 1000*Kiterations : 5, dump));
+        try
+        {
+            Aseba::HttpInterface network(dashel_target_list, http_port, aseba_port,
+                                         Kiterations > 0 ? 1000*Kiterations : 5, dump);
 
-        for (auto nodeId: network->allNodeIds())
-            try {
-                if (aesl_filename.size() > 0)
-                    network->aeslLoadFile(nodeId, aesl_filename);
-                else
-                {
-                    const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
-                    network->aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+            for (auto nodeId: network.allNodeIds())
+                try {
+                    if (aesl_filename.size() > 0)
+                        network.aeslLoadFile(nodeId, aesl_filename);
+                    else
+                    {
+                        const char* failsafe = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+                        network.aeslLoadMemory(nodeId, failsafe,strlen(failsafe));
+                    }
+                } catch ( std::runtime_error(e) ) {
+                    std::cerr << "Error loading aesl for nodeId " << nodeId << std::endl;
                 }
-            } catch ( std::runtime_error(e) ) {
-                std::cerr << "Error loading aesl for nodeId " << nodeId << std::endl;
-            }
 
-        do {
-            network->pingNetwork(); // possibly not, if do_ping == false
-        } while (network->run1s());
-        delete network;
-    }
-    catch(Dashel::DashelException e)
-    {
-        std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
-        return 1;
-    }
-    catch (Aseba::InterruptException& e) {
-        std::cerr << " attempting graceful network shutdown" << std::endl;
-    }
+            do {
+                network.pingNetwork(); // possibly not, if do_ping == false
+            } while (network.run1s());
+            return 0; // normal exit (exit autoRestart loop)
+        }
+        catch(Dashel::DashelException e)
+        {
+            std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
+        }
+        catch (Aseba::InterruptException& e) {
+            std::cerr << " attempting graceful network shutdown" << std::endl;
+            return 0; // normal exit (exit autoRestart loop)
+        }
+    } while (autoRestart);
 
-    return 0;
+    return 1; // error following an exception
 }
