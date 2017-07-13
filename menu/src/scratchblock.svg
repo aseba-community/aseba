@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1024 1024" style="enable-background:new 0 0 1024 1024;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#1E94D2;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:url(#SVGID_1_);}
+</style>
+<g>
+	<path id="path111_3_" class="st0" d="M1010,0H14C6.2,0,0,6.3,0,14v996c0,7.8,6.3,14,14,14h996c7.8,0,14-6.3,14-14V14
+		C1024.1,6.3,1017.7,0,1010,0z"/>
+	<g>
+		<g>
+			<g transform="translate(0 0)">
+				<g transform="translate(2 0)">
+					<path class="st1" d="M179.1,235.1L179.1,235.1c70.4-43.1,158.5-45.3,231-5.7H488l8.7,8.7v63.5l-8.7,8.7H257l-8.7,8.7h-23.1
+						l-8.7-8.7h-28.8l-8.7-8.7V235.1z"/>
+				</g>
+				<g transform="translate(2 38)">
+					<path class="st1" d="M175.8,295.2l8.7-8.7h28.8l8.7,8.7H245l8.7-8.7h153.1l8.7,8.7v46.2l-8.7,8.7H297l-8.7,8.7h-23.1l-8.7-8.7
+						h-31.8l-5.7,5.7v326.3l5.7,5.7h181.9l8.7,8.7v28.8l-8.7,8.7H184.4l-8.7-8.7V295.2z"/>
+				</g>
+			</g>
+		</g>
+		
+			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="442.5677" y1="808.18" x2="653.6039" y2="285.9875" gradientTransform="matrix(1 0 0 -1 0 1024.72)">
+			<stop  offset="0" style="stop-color:#000000"/>
+			<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+		</linearGradient>
+		<polygon class="st2" points="849.1,441 1024,780.4 400,986 257.4,631.5 314.5,469.8 		"/>
+		<g id="g161_4_">
+			<path id="path163_4_" class="st1" d="M417.9,495.5c-57.2,0-103.4,46.3-103.4,103.4s46.3,103.4,103.4,103.4
+				s103.4-46.3,103.4-103.4C521.4,541.7,475,495.5,417.9,495.5z"/>
+			<path id="path165_4_" class="st1" d="M838,430.7h-10.8h-287H277.7c-11.2,0-20.3,9.2-20.3,20.3v181.5c0,11.2,9.2,20.3,20.3,20.3
+				h15.2v-54c0-69,56-124.9,124.9-124.9c69.1,0,124.9,56,124.9,124.9v54h156.7h127.6h10.8c6.2,0.3,11.2-4.7,11.2-10.9V442
+				C849.2,435.8,844.1,430.7,838,430.7z"/>
+		</g>
+	</g>
+</g>
+</svg>
