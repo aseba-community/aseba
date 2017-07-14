@@ -102,7 +102,7 @@ namespace Aseba
         
     public:
         //default values needed for unit testing
-        HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false);
+        HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false, bool verbose=false);
         //virtual void run();
         virtual void pingNetwork();
         virtual void broadcastGetDescription();

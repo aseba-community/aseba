@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         try
         {
             Aseba::HttpInterface network(dashel_target_list, http_port, aseba_port,
-                                         Kiterations > 0 ? 1000*Kiterations : 5, dump);
+                                         Kiterations > 0 ? 1000*Kiterations : 5, dump, verbose);
 
             for (auto nodeId: network.allNodeIds())
                 try {
