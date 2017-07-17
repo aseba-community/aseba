@@ -3,10 +3,10 @@
 DEBVERS := $(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
 VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*//')
 
-build: clean
+build:
 	mkdir debian/build
 	cd debian/build && cmake -D USER_BUILD_VERSION=${DEBVERS} -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..
-	cd debian/build && make
+	cd debian/build && $(MAKE)
 
 clean:
 	rm -rf debian/files debian/substvars debian/tmp debian/build
@@ -15,8 +15,7 @@ binary: binary-arch binary-indep
 
 binary-indep:
 
-binary-arch:
-	rm -rf debian/tmp
+binary-arch: build
 	install -d debian/tmp/DEBIAN
 	install -d debian/tmp/usr/bin
 	install -d debian/tmp/usr/share/doc/aseba
@@ -37,7 +36,7 @@ binary-arch:
 	cp menu/src/*.svg debian/tmp/usr/share/icons/hicolor/scalable/apps
 	strip --strip-unneeded -R .note -R .comment  debian/build/*/*.a
 	strip --strip-unneeded -R .note -R .comment  debian/build/*/*/*.a
-	cd debian/build && make install
+	cd debian/build && $(MAKE) install
 	cp debian/README.Debian debian/tmp/usr/share/doc/aseba/
 	dpkg-shlibdeps debian/tmp/usr/bin/*
 	chown -R root.root debian/tmp
