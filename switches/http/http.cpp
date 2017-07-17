@@ -144,8 +144,7 @@ namespace Aseba
     inAsebaPort(aseba_port),
     verbose(verbose),
     iterations(iterations),
-    do_dump(dump),
-    do_ping(true)
+    do_dump(dump)
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -186,7 +185,6 @@ namespace Aseba
         for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
-            // if (do_ping) // redundant, pingNetwork looks at do_ping flag
             this->pingNetwork();
             this->run1s();
             if (nodeDescriptionsReceived.size() >= targets.size())
@@ -203,12 +201,6 @@ namespace Aseba
             getDescription.serialize(it->first);
             it->first->flush();
         }
-    }
-    
-    void HttpInterface::pingNetwork()
-    {
-        if (do_ping)
-            NodesManager::pingNetwork();
     }
     
 //    void HttpInterface::run()
@@ -386,8 +378,6 @@ namespace Aseba
         if (!targetId) return;
         unsigned nodeId = targetId;
         nodeDescriptionsReceived.insert(nodeId);
-        // stop pinging while description is coming
-        do_ping = false;
         // verbose
         if (verbose)
             wcerr << this << L" Received description for node " << targetId << " " << getNodeName(targetId) << " given nodeId " << nodeId << endl;
