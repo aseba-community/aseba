@@ -5,10 +5,9 @@
 Bugs and improvements are tracked using [github's issues](https://guides.github.com/features/issues/).
 If you found a bug or wish to suggest an improvement, please first look at the [existing issues](https://github.com/aseba-community/aseba/issues) to see if it has already been reported.
 If not, please [open a new issue](https://github.com/aseba-community/aseba/issues/new).
+Similarly, to contact us, please also open an issue with your question.
 
 If you want to help us translating Aseba or its documentation, please read the [localization guide](localization.md).
-
-To reach us, join the [development mailing list](https://mail.gna.org/listinfo/aseba-dev).
 
 ## Software development work flow
 
