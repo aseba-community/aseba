@@ -323,6 +323,7 @@ namespace Enki
 			execLocalEvent(EVENT_TEMPERATURE);
 	}
 	
+	//! Execute a local event, killing the execution of the current one if not in step-by-step mode
 	void AsebaThymio2::execLocalEvent(uint16_t number)
 	{
 		// in step-by-step, only setup an event if none is being executed currently

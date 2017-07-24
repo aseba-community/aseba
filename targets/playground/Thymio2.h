@@ -142,15 +142,14 @@ namespace Enki
 		
 		bool openSDCardFile(int number);
 		
+		// for debug purposes
+		void execLocalEvent(uint16_t number);
+
 	protected:
 		
 		void timer0Timeout();
 		void timer1Timeout();
 		void timer100HzTimeout();
-		
-	protected:
-		friend class Thymio2Interface;
-		void execLocalEvent(uint16_t number);
 	};
 	
 } // Enki
