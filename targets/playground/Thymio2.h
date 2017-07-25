@@ -26,6 +26,7 @@
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/thymio2/Thymio2.h>
 #include <fstream>
+#include <utility>
 
 namespace Enki
 {
@@ -104,6 +105,17 @@ namespace Enki
 		const std::string robotName;
 		std::fstream sdCardFile;
 		int sdCardFileNumber;
+		
+		// Logging of Thymio native function calls
+		//! A log entry consists of the number of the Thymio native function and the values of the arguments
+		using NativeCallLogEntry = std::pair<unsigned, std::vector<int16_t>>;
+		//! The log is a vector of entries
+		using NativeCallLog = std::vector<NativeCallLogEntry>;
+		//! The log of native calls, filled if logThymioNativeCalls is true.
+		//! The code which set it is responsible to clear the log from time to time
+		NativeCallLog thymioNativeCallLog;
+		//! Whether thymioNativeCallLog should be filled each time a Thymio native function is called
+		bool logThymioNativeCalls { false } ;
 		
 	protected:
 		Aseba::SoftTimer timer0;

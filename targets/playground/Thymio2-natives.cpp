@@ -42,6 +42,19 @@ void notifyMissingFeature()
 	SEND_NOTIFICATION(DISPLAY_INFO, "missing Thymio2 feature");
 }
 
+void logNativeFromThymio2(AsebaThymio2& thymio2, unsigned id, std::vector<int16_t>&& args)
+{
+	if (thymio2.logThymioNativeCalls)
+		thymio2.thymioNativeCallLog.emplace_back(AsebaThymio2::NativeCallLogEntry(id, std::move(args)));
+}
+
+void logNativeFromVM(AsebaVMState *vm, unsigned id, std::vector<int16_t>&& args)
+{
+	AsebaThymio2* thymio2(getEnkiObject<AsebaThymio2>(vm));
+	if (thymio2)
+		logNativeFromThymio2(*thymio2, id, std::move(args));
+}
+
 // simulated native functions
 
 // sound
@@ -50,8 +63,7 @@ extern "C" void PlaygroundThymio2Native_sound_record(AsebaVMState *vm)
 {
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
-	// do nothing for now
-	ASEBA_UNUSED(number);
+	logNativeFromVM(vm, 0, { number });
 	
 	notifyMissingFeature();
 }
@@ -60,8 +72,7 @@ extern "C" void PlaygroundThymio2Native_sound_play(AsebaVMState *vm)
 {
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
-	// do nothing for now
-	ASEBA_UNUSED(number);
+	logNativeFromVM(vm, 1, { number });
 	
 	notifyMissingFeature();
 }
@@ -70,8 +81,7 @@ extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
 {
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 
-	// do nothing for now
-	ASEBA_UNUSED(number);
+	logNativeFromVM(vm, 2, { number });
 	
 	notifyMissingFeature();
 }
@@ -80,8 +90,7 @@ extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
 {
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
 	
-	// do nothing for now
-	ASEBA_UNUSED(number);
+	logNativeFromVM(vm, 3, { number });
 	
 	if (number != -1)
 		notifyMissingFeature();
@@ -93,9 +102,7 @@ extern "C" void PlaygroundThymio2Native_sound_freq(AsebaVMState * vm)
 	const int16_t freq(vm->variables[AsebaNativePopArg(vm)]);
 	const int16_t time(vm->variables[AsebaNativePopArg(vm)]);
 	
-	// do nothing for now
-	ASEBA_UNUSED(freq);
-	ASEBA_UNUSED(time);
+	logNativeFromVM(vm, 8, { freq, time });
 	
 	notifyMissingFeature();
 }
@@ -104,8 +111,8 @@ extern "C" void PlaygroundThymio2Native_sound_wave(AsebaVMState * vm)
 {
 	const uint16_t waveAddr(AsebaNativePopArg(vm));
 	
-	// do nothing for now
-	ASEBA_UNUSED(waveAddr);
+	// Note: if necessary, copy data of the wave form to the log
+	logNativeFromVM(vm, 15, { static_cast<int16_t>(waveAddr) });
 	
 	notifyMissingFeature();
 }
@@ -134,6 +141,8 @@ extern "C" void PlaygroundThymio2Native_leds_circle(AsebaVMState *vm)
 		thymio2->setLedIntensity(Thymio2::RING_5, l5/32.);
 		thymio2->setLedIntensity(Thymio2::RING_6, l6/32.);
 		thymio2->setLedIntensity(Thymio2::RING_7, l7/32.);
+		
+		logNativeFromThymio2(*thymio2, 4, { l0, l1, l2, l3, l4, l5, l6, l7 });
 	}
 }
 
@@ -149,6 +158,8 @@ extern "C" void PlaygroundThymio2Native_leds_top(AsebaVMState *vm)
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::TOP, Color(param*r,param*g,param*b,a/32.));
+		
+		logNativeFromThymio2(*thymio2, 5, { r, g, b });
 	}
 }
 
@@ -164,6 +175,8 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_right(AsebaVMState *vm)
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::BOTTOM_RIGHT, Color(param*r,param*g,param*b,a/32.));
+		
+		logNativeFromThymio2(*thymio2, 6, { r, g, b });
 	}
 }
 
@@ -179,6 +192,8 @@ extern "C" void PlaygroundThymio2Native_leds_bottom_left(AsebaVMState *vm)
 	if (thymio2)
 	{
 		thymio2->setLedColor(Thymio2::BOTTOM_LEFT, Color(param*r,param*g,param*b,a/32.));
+		
+		logNativeFromThymio2(*thymio2, 7, { r, g, b });
 	}
 }
 
@@ -196,6 +211,8 @@ extern "C" void PlaygroundThymio2Native_leds_buttons(AsebaVMState *vm)
 		thymio2->setLedIntensity(Thymio2::BUTTON_RIGHT, l1/32.);
 		thymio2->setLedIntensity(Thymio2::BUTTON_DOWN,  l2/32.);
 		thymio2->setLedIntensity(Thymio2::BUTTON_LEFT,  l3/32.);
+		
+		logNativeFromThymio2(*thymio2, 9, { l0, l1, l2, l3 });
 	}
 }
 
@@ -221,6 +238,8 @@ extern "C" void PlaygroundThymio2Native_leds_prox_h(AsebaVMState *vm)
 		thymio2->setLedIntensity(Thymio2::IR_FRONT_5, l5/32.);
 		thymio2->setLedIntensity(Thymio2::IR_BACK_0,  l6/32.);
 		thymio2->setLedIntensity(Thymio2::IR_BACK_1,  l7/32.);
+		
+		logNativeFromThymio2(*thymio2, 10, { l0, l1, l2, l3, l4, l5, l6, l7 });
 	}
 }
 
@@ -229,9 +248,7 @@ extern "C" void PlaygroundThymio2Native_leds_prox_v(AsebaVMState *vm)
 	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const int16_t l1(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	// do nothing for now
-	ASEBA_UNUSED(l0);
-	ASEBA_UNUSED(l1);
+	logNativeFromVM(vm, 11, { l0, l1 });
 	
 	notifyMissingFeature();
 }
@@ -240,8 +257,7 @@ extern "C" void PlaygroundThymio2Native_leds_rc(AsebaVMState *vm)
 {
 	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	
-	// do nothing for now
-	ASEBA_UNUSED(l0);
+	logNativeFromVM(vm, 12, { l0 });
 	
 	notifyMissingFeature();
 }
@@ -250,8 +266,7 @@ extern "C" void PlaygroundThymio2Native_leds_sound(AsebaVMState *vm)
 {
 	const int16_t l0(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	
-	// do nothing for now
-	ASEBA_UNUSED(l0);
+	logNativeFromVM(vm, 13, { l0 });
 	
 	notifyMissingFeature();
 }
@@ -261,9 +276,7 @@ extern "C" void PlaygroundThymio2Native_leds_temperature(AsebaVMState *vm)
 	const int16_t r(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 	const int16_t b(clampValueTo32(vm->variables[AsebaNativePopArg(vm)]));
 
-	// do nothing for now
-	ASEBA_UNUSED(r);
-	ASEBA_UNUSED(b);
+	logNativeFromVM(vm, 14, { r, b });
 	
 	notifyMissingFeature();
 }
@@ -272,8 +285,7 @@ extern "C" void PlaygroundThymio2Native_prox_comm_enable(AsebaVMState *vm)
 {
 	const int16_t enable(vm->variables[AsebaNativePopArg(vm)]);
 	
-	// do nothing for now
-	ASEBA_UNUSED(enable);
+	logNativeFromVM(vm, 16, { enable });
 	
 	notifyMissingFeature();
 }
@@ -299,6 +311,8 @@ extern "C" void PlaygroundThymio2Native_sd_open(AsebaVMState *vm)
 		}
 		
 		vm->variables[statusAddr] = result;
+		
+		logNativeFromThymio2(*thymio2, 17, { number, result });
 	}
 }
 
@@ -321,6 +335,11 @@ extern "C" void PlaygroundThymio2Native_sd_write(AsebaVMState *vm)
 		// a failed write will report 0. It is unlikely that a partial write occurs, but if so it is not handled properly.
 		
 		vm->variables[statusAddr] = result;
+		
+		// log the data written and the status
+		std::vector<int16_t> data(&vm->variables[dataAddr], &vm->variables[dataAddr+dataLength]);
+		data.push_back(result);
+		logNativeFromThymio2(*thymio2, 18, std::move(data));
 	}
 }
 
@@ -344,6 +363,11 @@ extern "C" void PlaygroundThymio2Native_sd_read(AsebaVMState *vm)
 			result = thymio2->sdCardFile.gcount() / 2;
 		
 		vm->variables[statusAddr] = result;
+		
+		// log the data read and the status
+		std::vector<int16_t> data(&vm->variables[dataAddr], &vm->variables[dataAddr+dataLength]);
+		data.push_back(result);
+		logNativeFromThymio2(*thymio2, 19, std::move(data));
 	}
 }
 
@@ -372,5 +396,7 @@ extern "C" void PlaygroundThymio2Native_sd_seek(AsebaVMState *vm)
 			result = -1;
 		
 		vm->variables[statusAddr] = result;
+		
+		logNativeFromThymio2(*thymio2, 20, { seek, result } );
 	}
 }
