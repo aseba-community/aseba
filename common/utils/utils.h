@@ -36,7 +36,7 @@
 #ifdef __ANDROID__
 namespace std
 {
-    size_t log2(size_t v) { return log2(v); }
+    size_t log2(size_t v);
 }
 #endif // __ANDROID__
 

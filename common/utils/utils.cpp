@@ -39,6 +39,15 @@
 #include <stdint.h>
 #include "utils.h"
 
+// workaround for broken libstdc++ on Android
+// see https://github.com/android-ndk/ndk/issues/82
+#ifdef __ANDROID__
+namespace std
+{
+    size_t log2(size_t v) { return log2(v); }
+}
+#endif // __ANDROID__
+
 namespace Aseba
 {
 	/** \addtogroup utils */
