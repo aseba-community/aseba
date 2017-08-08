@@ -73,6 +73,8 @@ add_test(division-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CM
 add_test(if-not-optimisation ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/if-not-optimisation.txt)
 add_test(callsub-before-sub-decl ${EXECUTABLE_OUTPUT_PATH}/asebatest ${CMAKE_CURRENT_SOURCE_DIR}/data/callsub-before-sub-decl.txt)
 add_test(return-in-if ${EXECUTABLE_OUTPUT_PATH}/asebatest --event --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/return-in-if.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/return-in-if.txt)
+add_test(sort-basic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/sort-basic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/sort-basic.txt)
+add_test(sort-duplicates ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/sort-duplicates.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/sort-duplicates.txt)
 
 # the following tests should fail
 add_test(division-by-zero-dyn ${EXECUTABLE_OUTPUT_PATH}/asebatest --exec_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/division-by-zero-dyn.txt)

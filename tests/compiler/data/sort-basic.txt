@@ -1,0 +1,17 @@
+var random0[] =             [1, 5, 8, 3, 4, 2, 6, 9, 7]
+var random1[] =             [7, 3, 4, 2, 6, 9, 5, 8, 1]
+var sortedAscend[] =        [1, 2, 3, 4, 5, 6, 7, 8, 9]
+var sortedDescend[] =       [9, 8, 7, 6, 5, 4, 3, 2, 1]
+var interleavedAscend[] =   [1, 9, 2, 8, 3, 7, 4, 6, 5]
+var interleavedDescend[] =  [9, 1, 8, 2, 7, 3, 6, 4, 5]
+var interleavedAscend2[] =  [5, 6, 4, 7, 3, 8, 2, 9, 1]
+var interleavedDescend2[] = [5, 4, 6, 3, 7, 2, 8, 1, 9]
+
+call math.sort(random0)
+call math.sort(random1)
+call math.sort(sortedAscend)
+call math.sort(sortedDescend)
+call math.sort(interleavedAscend)
+call math.sort(interleavedDescend)
+call math.sort(interleavedAscend2)
+call math.sort(interleavedDescend2)
