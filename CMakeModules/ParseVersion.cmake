@@ -1,4 +1,4 @@
-# This module checks for SVN / Git binaries, extracts the revision number, and writes it in version.h
+# This module checks for Git binaries, extracts the revision number, and writes it in version.h
 # The user can provide a version number through the USER_BUILD_VERSION variable
 
 # version management
@@ -7,37 +7,6 @@ if (USER_BUILD_VERSION)
 	file(WRITE ${CMAKE_BINARY_DIR}/version.h "#define ASEBA_BUILD_VERSION \"${USER_BUILD_VERSION}\"\n")
 	return()
 endif (USER_BUILD_VERSION)
-
-##########
-# detect subversion
-##########
-find_package(Subversion)
-
-if (Subversion_FOUND)
-	message(STATUS "Subversion executable found")
-else (Subversion_FOUND)
-	message(STATUS "Subversion executable NOT found")
-endif (Subversion_FOUND)
-
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
-	set(HAS_SVN_REP 1)
-endif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.svn/")
-
-# react accordingly
-if (Subversion_FOUND AND HAS_SVN_REP)
-	message(STATUS "SVN repository found")
-	set(HAS_DYN_VERSION)
-	# extract working copy information for SOURCE_DIR into MY_XXX variables
-	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} ASEBA)
-	# write a file with the SVNVERSION define
-	file(WRITE ${CMAKE_BINARY_DIR}/version.h.txt "#define ASEBA_BUILD_VERSION \"svn-${ASEBA_WC_REVISION}\"\n")
-	# copy the file to the final header only if the version changes
-	# reduces needless rebuilds
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different version.h.txt version.h)
-	add_custom_target(versionheader ALL DEPENDS ${CMAKE_BINARY_DIR}/version.h)
-	set_source_files_properties(${CMAKE_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
-	return()
-endif (Subversion_FOUND AND HAS_SVN_REP)
 
 ##########
 # detect git
