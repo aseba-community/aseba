@@ -59,7 +59,10 @@ namespace Aseba
 			for (auto& streamRequestKV: zeroconfStreams)
 			{
 				if (streamRequestKV.second == zdr)
+				{
 					zeroconfStreams.erase(streamRequestKV.first);
+					return;
+				}
 			}
 		}
 	}
