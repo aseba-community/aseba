@@ -36,6 +36,8 @@ namespace Aseba
 		// To be called from similar functions in Dashel::Hub
 		void dashelIncomingData(Dashel::Stream * stream);
 		void dashelConnectionClosed(Dashel::Stream * stream);
+		// To be called instead the functions in Dashel::Hub
+		void dashelStep(int timeout = 0);
 
 	protected:
 		// From Zeroconf
@@ -47,6 +49,8 @@ namespace Aseba
 		std::map<Dashel::Stream *, std::reference_wrapper<DiscoveryRequest>> zeroconfStreams;
 		//! Reference to the hub to create connections from processDiscoveryRequest
 		Dashel::Hub& hub;
+		//!
+		std::set<Dashel::Stream *> pendingReleaseStreams;
 	};
 }
 

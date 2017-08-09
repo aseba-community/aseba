@@ -59,10 +59,7 @@ namespace Aseba
 			for (auto& streamRequestKV: zeroconfStreams)
 			{
 				if (streamRequestKV.second == zdr)
-				{
-					zeroconfStreams.erase(streamRequestKV.first);
-					return;
-				}
+					pendingReleaseStreams.insert(streamRequestKV.first);
 			}
 		}
 	}
@@ -85,6 +82,14 @@ namespace Aseba
 	void DashelhubZeroconf::dashelConnectionClosed(Stream * stream)
 	{
 		zeroconfStreams.erase(stream);
+	}
+
+	void DashelhubZeroconf::dashelStep(int timeout)
+	{
+		hub.step(timeout);
+		for (auto stream: pendingReleaseStreams)
+			hub.closeStream(stream);
+		pendingReleaseStreams.clear();
 	}
 
 } // namespace Aseba
