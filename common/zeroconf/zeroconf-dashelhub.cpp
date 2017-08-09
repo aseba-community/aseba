@@ -56,10 +56,16 @@ namespace Aseba
 		int socket = DNSServiceRefSockFD(zdr.serviceRef);
 		if (socket != -1)
 		{
-			for (auto& streamRequestKV: zeroconfStreams)
+			auto streamRequestIt(zeroconfStreams.begin());
+			while (streamRequestIt != zeroconfStreams.end())
 			{
-				if (streamRequestKV.second == zdr)
-					pendingReleaseStreams.insert(streamRequestKV.first);
+				if (streamRequestIt->second == zdr)
+				{
+					pendingReleaseStreams.insert(streamRequestIt->first);
+					streamRequestIt = zeroconfStreams.erase(streamRequestIt);
+				}
+				else
+					++streamRequestIt;
 			}
 		}
 	}
