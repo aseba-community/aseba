@@ -30,20 +30,7 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
-		unordered_set<reference_wrapper<const Aseba::Zeroconf::Target>> todo;
-
-		virtual void browseCompleted() override
-		{
-			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-			for (auto & target: targets)
-			{
-				todo.insert(target);
-				// Resolve the host name and port of this target, retrieve TXT record
-				target.resolve();
-			}
-		}
-
-		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override
+		virtual void targetFound(const Aseba::Zeroconf::Target & target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 			cout << target.host << ";port=" << target.port;
@@ -60,7 +47,6 @@ namespace Aseba
 					cout << " " << field.second;
 				cout << endl;
 			}
-			todo.erase(todo.find(target));
 		}
 
 	public:
@@ -70,7 +56,8 @@ namespace Aseba
 			do
 			{
 				sleep.sleep();
-			} while (todo.size() > 0);
+			} while (true);// while (todo.size() > 0);;
+			// FIXME: stop after a while
 		}
 
 		virtual void browse() override

@@ -34,9 +34,5 @@ public:
 	QtTargetLister(int argc, char* argv[]);
 
 public slots:
-	void browseCompleted();
-	void resolveCompleted(const Aseba::Zeroconf::TargetInformation& target);
-
-private:
-	std::unordered_set<std::reference_wrapper<const Aseba::Zeroconf::TargetInformation>> todo;
+	void targetFound(const Aseba::Zeroconf::TargetInformation& target);
 };

@@ -45,7 +45,7 @@ namespace Aseba
 	protected:
 		// From Zeroconf
 		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
-		//virtual void eraseDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
 
 	protected:
 		void handleDnsServiceEvents();

@@ -49,6 +49,21 @@ namespace Aseba
 		}
 	}
 
+	void DashelhubZeroconf::releaseDiscoveryRequest(DiscoveryRequest & zdr)
+	{
+		if (!zdr.serviceRef)
+			return;
+		int socket = DNSServiceRefSockFD(zdr.serviceRef);
+		if (socket != -1)
+		{
+			for (auto& streamRequestKV: zeroconfStreams)
+			{
+				if (streamRequestKV.second == zdr)
+					zeroconfStreams.erase(streamRequestKV.first);
+			}
+		}
+	}
+
 	//! Check if data were coming on one of our streams, and if so process
 	void DashelhubZeroconf::dashelIncomingData(Dashel::Stream * stream)
 	{

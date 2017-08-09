@@ -40,6 +40,7 @@ namespace Aseba
 	protected:
 		// From Zeroconf
 		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.

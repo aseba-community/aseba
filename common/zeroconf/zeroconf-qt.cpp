@@ -42,6 +42,17 @@ namespace Aseba
 		}
 	}
 
+	void QtZeroconf::releaseDiscoveryRequest(DiscoveryRequest & zdr)
+	{
+		if (!zdr.serviceRef)
+			return;
+		int socket = DNSServiceRefSockFD(zdr.serviceRef);
+		if (socket != -1)
+		{
+			zeroconfSockets.erase(socket);
+		}
+	}
+
 	//! Emit signal when register completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
 	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::Target & target)
@@ -51,9 +62,9 @@ namespace Aseba
 
 	//! Emit signal when resolve completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::resolveCompleted(const Aseba::Zeroconf::Target & target)
+	void QtZeroconf::targetFound(const Aseba::Zeroconf::Target & target)
 	{
-		emit zeroconfResolveCompleted(target);
+		emit zeroconfTargetFound(target);
 	}
 
 	//! Emit signal when update completed.
@@ -61,13 +72,6 @@ namespace Aseba
 	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::Target & target)
 	{
 		emit zeroconfUpdateCompleted(target);
-	}
-
-	//! Emit signal when browse completed.
-	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::browseCompleted()
-	{
-		emit zeroconfBrowseCompleted();
 	}
 
 	//! Data are available on a zeroconf socket

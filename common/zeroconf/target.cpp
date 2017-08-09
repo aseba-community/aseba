@@ -25,14 +25,19 @@ using namespace std;
 
 namespace Aseba
 {
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain):
+		name(name),
+		regtype(regtype),
+		domain(domain)
+	{}
+
 	//! This target is described by a human-readable name and a port.
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
 	//! Note that later the port will become nonzero if the target is resolved.
 	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
 		name(name),
-		port(port),
-		local(port != 0)
+		port(port)
 	{}
 
 	//! This target describes an existing Dashel stream
@@ -62,6 +67,11 @@ namespace Aseba
 		;
 	}
 
+	Zeroconf::Target::Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container):
+		Zeroconf::TargetInformation(name, regtype, domain),
+		container(container)
+	{}
+
 	//! This target is described by a human-readable name and a port.
 	//! If a port is nonzero at creation then this is a local target to be remembered
 	//! otherwise it is a remote one discovered through browsing and may be refreshed.
@@ -90,12 +100,6 @@ namespace Aseba
 		container.get().updateTarget(*this, txtrec);
 	}
 
-	//! Ask the containing Zeroconf to resolve this target's actual host name and port, using mDNS-SD
-	void Zeroconf::Target::resolve()
-	{
-		container.get().resolveTarget(*this);
-	}
-
 	//! Ask the containing Zeroconf to indicate that this register is completed
 	void Zeroconf::Target::registerCompleted() const
 	{
@@ -103,9 +107,10 @@ namespace Aseba
 	}
 
 	//! Ask the containing Zeroconf to indicate this resolve is completed
-	void Zeroconf::Target::resolveCompleted() const
+	void Zeroconf::Target::resolveCompleted()
 	{
-		container.get().resolveCompleted(*this);
+		container.get().targetFound(*this);
+		container.get().releaseDiscoveryRequest(zdr);
 	}
 
 	//! Ask the containing Zeroconf to indicate this resolve is completed

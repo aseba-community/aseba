@@ -5,16 +5,6 @@ add_executable(asebatargetadvertise
 )
 target_link_libraries(asebatargetadvertise ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
-add_executable(asebatargetlist
-	targetlist.cpp
-)
-target_link_libraries(asebatargetlist ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-
-install(TARGETS asebatargetadvertise asebatargetlist RUNTIME
-	DESTINATION bin
-)
-
-
 # Using DashelhubZeroconf
 
 add_executable(asebatargetlist-dashelhub
@@ -22,14 +12,12 @@ add_executable(asebatargetlist-dashelhub
 )
 target_link_libraries(asebatargetlist-dashelhub ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 
-
 # Using ThreadZeroconf
 
 add_executable(asebatargetlist-thread
 	targetlist-thread.cpp
 )
 target_link_libraries(asebatargetlist-thread ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
-
 
 # Using QtZeroconf
 

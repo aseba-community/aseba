@@ -30,18 +30,7 @@ QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, 
 	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation&)), SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation&)));
 }
 
-void QtTargetLister::browseCompleted()
-{
-	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-	for (auto & target: targets.targets)
-	{
-		todo.insert(target);
-		// Resolve the host name and port of this target, retrieve TXT record
-		target.resolve();
-	}
-}
-
-void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation& target)
+void QtTargetLister::targetFound(const Aseba::Zeroconf::TargetInformation& target)
 {
 	// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 	cout << target.host << ";port=" << target.port;
@@ -58,9 +47,9 @@ void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation& 
 			cout << " " << field.second;
 		cout << endl;
 	}
-	todo.erase(todo.find(target));
-	if (todo.size() == 0)
-		exit(0); // QCoreApplication::exit
+	// FIXME: stop after a while
+	/*if (todo.size() == 0)
+		exit(0); // QCoreApplication::exit*/
 }
 
 int main(int argc, char* argv[])

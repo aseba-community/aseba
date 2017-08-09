@@ -54,6 +54,12 @@ namespace Aseba
 		zeroconfDRs.insert(zdr);
 	}
 
+	void ThreadZeroconf::releaseDiscoveryRequest(DiscoveryRequest & zdr)
+	{
+		std::lock_guard<std::recursive_mutex> locker(watcherLock);
+		zeroconfDRs.erase(zdr);
+	}
+
 	//! Run the handleDSEvents_thread
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{

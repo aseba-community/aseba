@@ -34,9 +34,8 @@ namespace Aseba
 		Q_OBJECT
 
 	signals:
-		void zeroconfBrowseCompleted(); //!< emitted when browsing is completed
 		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
-		void zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a resolve is completed
+		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
 
 	protected slots:
@@ -45,10 +44,11 @@ namespace Aseba
 	protected:
 		// From Zeroconf
 		virtual void registerCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override;
+		virtual void targetFound(const Aseba::Zeroconf::Target & target) override;
 		virtual void updateCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void browseCompleted() override;
+
 		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
 
 	protected:
 		void incomingData(DiscoveryRequest & zdr);
@@ -59,7 +59,6 @@ namespace Aseba
 		//! A collection of QSocketNotifier that watch the serviceref file descriptors.
 		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
 	};
-
 }
 
 #endif /* ASEBA_ZEROCONF_QT */
