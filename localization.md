@@ -2,7 +2,7 @@
 
 Several Aseba tools are translated into several languages.
 For now, Aseba Studio, Aseba Challenge, and the error messages from the Aseba compiler are available in French, German, Spanish, Italian, Greek, Chinese.
-The translations for Japanese are in progress…
+The translations for Japanese are incomplete.
 
 ## Help us
 
