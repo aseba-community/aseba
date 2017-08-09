@@ -20,6 +20,7 @@
 
 #include "../../common/msg/msg.h"
 #include <iostream>
+#include <functional>
 
 using namespace Aseba;
 using namespace std;
