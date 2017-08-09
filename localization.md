@@ -44,4 +44,4 @@ Databases with existing translations:
 
 ### For Maintainers
 
-In [https://github.com/aseba-community/aseba/tree/master/maintainer/translations /maintainer/translations] you will find a set of scripts to help you maintain the translation files.
+In [`/maintainer/translations`](https://github.com/aseba-community/aseba/tree/master/maintainer/translations) you will find a set of scripts to help you maintain the translation files.
