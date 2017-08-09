@@ -149,7 +149,7 @@ namespace Aseba
 		if (err != kDNSServiceErr_NoError)
 		{
 			delete target; // because DNSServiceResolve will NOT call cb_Resolve
-			throw Zeroconf::Error(FormatableString("DNSServiceQueryRecord: error %0").arg(err));
+			throw Zeroconf::Error(FormatableString("DNSServiceResolve: error %0").arg(err));
 		}
 		else
 			processDiscoveryRequest(target->zdr);
@@ -200,7 +200,7 @@ namespace Aseba
 					    this
 		);
 		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
+			throw Zeroconf::Error(FormatableString("DNSServiceBrowse: error %0").arg(err));
 		else
 			processDiscoveryRequest(browseZDR);
 	}
