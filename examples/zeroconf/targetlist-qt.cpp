@@ -26,8 +26,7 @@ using namespace std;
 
 QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
 {
-	connect(&targets, SIGNAL(zeroconfBrowseCompleted()), this, SLOT(browseCompleted()));
-	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation&)), SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation&)));
+	connect(&targets, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(targetFound(const Aseba::Zeroconf::TargetInformation&)));
 }
 
 void QtTargetLister::targetFound(const Aseba::Zeroconf::TargetInformation& target)
