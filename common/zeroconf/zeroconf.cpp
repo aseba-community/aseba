@@ -170,8 +170,8 @@ namespace Aseba
 		Zeroconf::Target *target = static_cast<Zeroconf::Target *>(context);
 		if (errorCode != kDNSServiceErr_NoError)
 		{
-			delete target;
-			throw Zeroconf::Error(FormatableString("DNSServiceRegisterReply: error %0").arg(errorCode));
+			target->resolveFailed(); // target will delete itself
+			throw Zeroconf::Error(FormatableString("DNSServiceResolveReply: error %0").arg(errorCode));
 		}
 		else
 		{
@@ -182,8 +182,7 @@ namespace Aseba
 			for (auto const & field: tnew)
 				target->properties[field.first] = field.second;
 			target->properties["fullname"] = string(fullname);
-			target->resolveCompleted();
-			delete target;
+			target->resolveCompleted(); // target will delete itself
 		}
 	}
 

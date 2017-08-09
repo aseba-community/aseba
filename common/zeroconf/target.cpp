@@ -106,11 +106,19 @@ namespace Aseba
 		container.get().registerCompleted(*this);
 	}
 
-	//! Ask the containing Zeroconf to indicate this resolve is completed
+	//! Release the discovery request, then delete itself
+	void Zeroconf::Target::resolveFailed()
+	{
+		container.get().releaseDiscoveryRequest(zdr);
+		delete this;
+	}
+
+	//! Ask the containing Zeroconf to indicate this resolve is completed, release the discovery request, then delete itself
 	void Zeroconf::Target::resolveCompleted()
 	{
 		container.get().targetFound(*this);
 		container.get().releaseDiscoveryRequest(zdr);
+		delete this;
 	}
 
 	//! Ask the containing Zeroconf to indicate this resolve is completed

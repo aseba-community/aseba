@@ -191,6 +191,7 @@ namespace Aseba
 		void advertise(const TxtRecord & txtrec);
 		void updateTxtRecord(const TxtRecord & txtrec);
 		void registerCompleted() const;
+		void resolveFailed();
 		void resolveCompleted();
 		void updateCompleted() const;
 
