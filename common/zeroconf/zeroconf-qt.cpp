@@ -49,7 +49,12 @@ namespace Aseba
 		int socket = DNSServiceRefSockFD(zdr.serviceRef);
 		if (socket != -1)
 		{
-			zeroconfSockets.erase(socket);
+			auto socketNotifierIt(zeroconfSockets.find(socket));
+			if (socketNotifierIt != zeroconfSockets.end())
+			{
+				socketNotifierIt->second.second->deleteLater();
+				zeroconfSockets.erase(socketNotifierIt);
+			}
 		}
 	}
 
