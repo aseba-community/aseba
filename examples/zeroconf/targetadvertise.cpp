@@ -67,8 +67,7 @@ namespace Aseba
 			Aseba::Zeroconf::TxtRecord txt{protocolVersion, join(names," "), ids, pids};
 			try
 			{
-				//zeroconf.insert(stream).advertise(txt);
-				zeroconf.advertise(stream, txt);
+				zeroconf.advertise("Aseba Local " + stream->getTargetParameter("port"), stream, txt);
 			}
 			catch (const runtime_error& e)
 			{

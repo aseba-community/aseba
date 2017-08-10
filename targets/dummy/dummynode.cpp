@@ -27,6 +27,7 @@
 #include "../../common/productids.h"
 #include "../../common/consts.h"
 #include "../../common/utils/utils.h"
+#include "../../common/utils/FormatableString.h"
 #ifdef ZEROCONF_SUPPORT
 #include "../../common/zeroconf/zeroconf-dashelhub.h"
 #endif // ZEROCONF_SUPPORT
@@ -121,8 +122,7 @@ public:
 		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { mutableName }, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
 		try
 		{
-			//zeroconf.insert(listenStream).advertise(txt);
-			zeroconf.advertise(listenStream, txt);
+			zeroconf.advertise(Aseba::FormatableString("Aseba Dummy Node %0").arg(deltaNodeId), listenStream, txt);
 		}
 		catch (const std::runtime_error& e)
 		{

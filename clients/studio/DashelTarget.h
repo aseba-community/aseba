@@ -34,6 +34,9 @@
 #include <QSet>
 #include <map>
 #include <dashel/dashel.h>
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-qt.h"
+#endif // ZEROCONF_SUPPORT
 
 class QPushButton;
 class QGroupBox;
@@ -68,6 +71,9 @@ namespace Aseba
 		QGroupBox* customGroupBox;
 		QLineEdit* custom;
 		QComboBox* languageSelectionBox;
+#ifdef ZEROCONF_SUPPORT
+		Aseba::QtZeroconf zeroconf;
+#endif // ZEROCONF_SUPPORT
 		
 	public:
 		DashelConnectionDialog();
@@ -79,6 +85,9 @@ namespace Aseba
 		virtual void timerEvent ( QTimerEvent * event );
 		
 	protected slots:
+#ifdef ZEROCONF_SUPPORT
+		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
+#endif // ZEROCONF_SUPPORT
 		void netGroupChecked();
 		void serialGroupChecked();
 		void customGroupChecked();
