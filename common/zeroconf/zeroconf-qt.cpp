@@ -31,30 +31,30 @@ namespace Aseba
 	//! descriptor associated with zdr.serviceref must be watched, to know when to
 	//! call DNSServiceProcessResult, which in turn calls the callback that was
 	//! registered with the discovery request.
-	void QtZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
+	void QtZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
-		if (socket != -1)
-		{
-			auto notifier = new QSocketNotifier(socket, QSocketNotifier::Read, this);
-			QObject::connect(notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
-			zeroconfSockets.emplace(socket, ZdrQSocketNotifierPair{zdr, notifier});
-		}
+		assert(serviceRef);
+
+		auto notifier = new ServiceRefSocketNotifier(serviceRef, this);
+		QObject::connect(notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
+		zeroconfSockets.emplace(notifier->socket(), notifier);
 	}
 
-	void QtZeroconf::releaseDiscoveryRequest(DiscoveryRequest & zdr)
+	void QtZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
 	{
-		if (!zdr.serviceRef)
+		if (!serviceRef)
 			return;
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
-		if (socket != -1)
+
+		// safety check
+		int socket = DNSServiceRefSockFD(serviceRef);
+		assert(socket != -1);
+
+		// remove the notifier and delete it later
+		auto socketNotifierIt(zeroconfSockets.find(socket));
+		if (socketNotifierIt != zeroconfSockets.end())
 		{
-			auto socketNotifierIt(zeroconfSockets.find(socket));
-			if (socketNotifierIt != zeroconfSockets.end())
-			{
-				socketNotifierIt->second.second->deleteLater();
-				zeroconfSockets.erase(socketNotifierIt);
-			}
+			socketNotifierIt->second->deleteLater();
+			zeroconfSockets.erase(socketNotifierIt);
 		}
 	}
 
@@ -82,15 +82,25 @@ namespace Aseba
 	//! Data are available on a zeroconf socket
 	void QtZeroconf::doIncoming(int socket)
 	{
-		incomingData(zeroconfSockets.at(socket).first);
+		incomingData(zeroconfSockets.at(socket)->serviceRef);
 	}
 
 	//! Process incoming data associated to a discovery request
-	void QtZeroconf::incomingData(DiscoveryRequest & zdr)
+	void QtZeroconf::incomingData(DNSServiceRef serviceRef)
 	{
-		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);
+		DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceRef));
+			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
+	}
+
+	QtZeroconf::ServiceRefSocketNotifier::ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent):
+		QSocketNotifier(DNSServiceRefSockFD(serviceRef), QSocketNotifier::Read, parent),
+		serviceRef(serviceRef)
+	{ }
+
+	QtZeroconf::ServiceRefSocketNotifier::~ServiceRefSocketNotifier()
+	{
+		DNSServiceRefDeallocate(serviceRef);
 	}
 
 } // namespace Aseba

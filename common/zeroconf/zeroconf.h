@@ -112,30 +112,18 @@ namespace Aseba
 		virtual void updateCompleted(const Aseba::Zeroconf::Target &) {}
 
 	protected:
-		//! Private class that encapsulates an active service request to the mDNS-SD daemon
-		class DiscoveryRequest
-		{
-		public:
-			DNSServiceRef serviceRef{nullptr};
-		
-		public:
-			~DiscoveryRequest();
-		};
-		friend struct std::hash<DiscoveryRequest>;
-		friend bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
-
-		struct DiscoveredService;
-		using DiscoveredServices = std::vector<DiscoveredService>;
-		DiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
+		DNSServiceRef browseServiceRef{nullptr}; //! the zdr for browse requests isn't attached to a target
 
 	protected:
+		// FIXME: updated doc
 		//! The discovery request can be processed immediately, or can be registered with
 		//! an event loop for asynchronous processing.
 		//! Must be overridden in derived classes to set up asynchronous processing.
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) = 0;
+		virtual void processServiceRef(DNSServiceRef serviceRef) = 0;
+		// FIXME: updated doc
 		//! The discovery request must be unregistered with the event loop.
 		//! Must be overridden in derived classes to cleap up asynchronous processing.
-		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) = 0;
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
 		// callbacks for the DNS Service Discovery API
@@ -143,8 +131,6 @@ namespace Aseba
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
 		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
-
-	bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -188,6 +174,8 @@ namespace Aseba
 		Target(const Dashel::Stream* dashelStream, Zeroconf & container);
 
 	public:
+		~Target();
+
 		void advertise(const TxtRecord & txtrec);
 		void updateTxtRecord(const TxtRecord & txtrec);
 		void registerCompleted() const;
@@ -198,7 +186,7 @@ namespace Aseba
 		friend bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs);
 
 	public:
-		DiscoveryRequest zdr; //!< Attached discovery request
+		DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
 
 	protected:
 		std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
@@ -251,9 +239,6 @@ namespace Aseba
 } // namespace Aseba
 
 namespace std {
-	//! Hash for a discovery request, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::DiscoveryRequest>: public Aseba::PointerHash<Aseba::Zeroconf::DiscoveryRequest> {};
 	//! Hash for a zeroconf target information, use the generic point-based comparison
 	template <>
 	struct hash<Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<Aseba::Zeroconf::TargetInformation> {};

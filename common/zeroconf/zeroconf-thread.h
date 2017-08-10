@@ -44,15 +44,16 @@ namespace Aseba
 
 	protected:
 		// From Zeroconf
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
-		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void processServiceRef(DNSServiceRef serviceRef) override;
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	protected:
 		void handleDnsServiceEvents();
 
 	private:
 		//! all the requests we are handling
-		std::unordered_set<std::reference_wrapper<DiscoveryRequest>> zeroconfDRs;
+		std::unordered_set<DNSServiceRef> serviceRefs;
+		std::unordered_set<DNSServiceRef> pendingReleaseServiceRefs;
 		// threading support
 		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs

@@ -38,35 +38,37 @@ namespace Aseba
 	//! descriptor associated with zdr.serviceref must be watched, to know when to
 	//! call DNSServiceProcessResult, which in turn calls the callback that was
 	//! registered with the discovery request.
-	void DashelhubZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
+	void DashelhubZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
+		assert(serviceRef);
+
+		int socket = DNSServiceRefSockFD(serviceRef);
 		if (socket != -1)
 		{
 			string dashelTarget = FormatableString("tcppoll:sock=%0").arg(socket);
 			if (auto stream = hub.connect(dashelTarget))
-				zeroconfStreams.emplace(stream, ref(zdr));
+				zeroconfStreams.emplace(stream, serviceRef);
 		}
 	}
 
-	void DashelhubZeroconf::releaseDiscoveryRequest(DiscoveryRequest & zdr)
+	void DashelhubZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
 	{
-		if (!zdr.serviceRef)
+		if (!serviceRef)
 			return;
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
-		if (socket != -1)
+
+		int socket = DNSServiceRefSockFD(serviceRef);
+		assert (socket != -1);
+
+		auto streamRequestIt(zeroconfStreams.begin());
+		while (streamRequestIt != zeroconfStreams.end())
 		{
-			auto streamRequestIt(zeroconfStreams.begin());
-			while (streamRequestIt != zeroconfStreams.end())
+			if (streamRequestIt->second == serviceRef)
 			{
-				if (streamRequestIt->second == zdr)
-				{
-					pendingReleaseStreams.insert(streamRequestIt->first);
-					streamRequestIt = zeroconfStreams.erase(streamRequestIt);
-				}
-				else
-					++streamRequestIt;
+				pendingReleaseStreams[streamRequestIt->first] = streamRequestIt->second;
+				streamRequestIt = zeroconfStreams.erase(streamRequestIt);
 			}
+			else
+				++streamRequestIt;
 		}
 	}
 
@@ -75,7 +77,7 @@ namespace Aseba
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
-			auto serviceRef = zeroconfStreams.at(stream).get().serviceRef;
+			auto serviceRef = zeroconfStreams.at(stream);
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
 				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
@@ -91,8 +93,11 @@ namespace Aseba
 	void DashelhubZeroconf::dashelStep(int timeout)
 	{
 		hub.step(timeout);
-		for (auto stream: pendingReleaseStreams)
-			hub.closeStream(stream);
+		for (auto& streamKV: pendingReleaseStreams)
+		{
+			hub.closeStream(streamKV.first);
+			DNSServiceRefDeallocate(streamKV.second);
+		}
 		pendingReleaseStreams.clear();
 	}
 

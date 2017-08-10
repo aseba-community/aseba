@@ -43,16 +43,16 @@ namespace Aseba
 
 	protected:
 		// From Zeroconf
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
-		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void processServiceRef(DNSServiceRef serviceRef) override;
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	private:
 		//! Collection of (tcp:) SocketStreams that watch the serviceref file descriptors.
-		std::map<Dashel::Stream *, std::reference_wrapper<DiscoveryRequest>> zeroconfStreams;
+		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
 		//! Reference to the hub to create connections from processDiscoveryRequest
 		Dashel::Hub& hub;
 		//! Streams that dashelStep() will call closeStream() on, after the current Hub::step() is finished
-		std::set<Dashel::Stream *> pendingReleaseStreams;
+		std::map<Dashel::Stream *, DNSServiceRef> pendingReleaseStreams;
 	};
 }
 

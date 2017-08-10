@@ -88,6 +88,12 @@ namespace Aseba
 		container(container)
 	{}
 
+	Zeroconf::Target::~Target()
+	{
+		if (serviceRef)
+			container.get().releaseServiceRef(serviceRef);
+	}
+
 	//! Ask the containing Zeroconf to register a target with the DNS service, now that its description is complete
 	void Zeroconf::Target::advertise(const TxtRecord& txtrec)
 	{
@@ -109,7 +115,6 @@ namespace Aseba
 	//! Release the discovery request, then delete itself
 	void Zeroconf::Target::resolveFailed()
 	{
-		container.get().releaseDiscoveryRequest(zdr);
 		delete this;
 	}
 
@@ -117,7 +122,6 @@ namespace Aseba
 	void Zeroconf::Target::resolveCompleted()
 	{
 		container.get().targetFound(*this);
-		container.get().releaseDiscoveryRequest(zdr);
 		delete this;
 	}
 

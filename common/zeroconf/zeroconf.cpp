@@ -57,29 +57,15 @@ namespace Aseba
 			[&] (const Zeroconf::Target& t) { return t.name.find(name) == 0; }
 		);
 	}
-	
-	// Release the service reference
-	Zeroconf::DiscoveryRequest::~DiscoveryRequest()
-	{   
-		if (serviceRef)
-			DNSServiceRefDeallocate(serviceRef);
-		serviceRef = 0;
-	}
-	
-	//! Are the serviceRef equals?
-	bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs)
-	{
-		return lhs.serviceRef == rhs.serviceRef;
-	}
 
 	//! A target can ask Zeroconf to register it in DNS, with additional information in a TXT record
 	void Zeroconf::registerTarget(Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
+		assert(!target.serviceRef); // TODO: send exception
 		string txt{txtrec.record()};
 		uint16_t len = txt.size();
 		const char* record = txt.c_str();
-		target.zdr.~DiscoveryRequest();
-		auto err = DNSServiceRegister(&(target.zdr.serviceRef),
+		auto err = DNSServiceRegister(&(target.serviceRef),
 					      0, // no flags
 					      0, // default all interfaces
 					      target.name.c_str(),
@@ -94,7 +80,7 @@ namespace Aseba
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
 		else
-			processDiscoveryRequest(target.zdr);
+			processServiceRef(target.serviceRef);
 	}
 
 	//! DNSSD callback for registerTarget, update Zeroconf::Target record with results of registration
@@ -122,8 +108,9 @@ namespace Aseba
 	//! A target can ask Zeroconf to update its TXT record
 	void Zeroconf::updateTarget(const Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
+		assert(target.serviceRef); // TODO: send exception
 		const string rawdata{txtrec.record()};
-		DNSServiceErrorType err = DNSServiceUpdateRecord(target.zdr.serviceRef,
+		DNSServiceErrorType err = DNSServiceUpdateRecord(target.serviceRef,
 								 nullptr, // update primary TXT record
 								 0, // no flags
 								 rawdata.length(),
@@ -138,7 +125,7 @@ namespace Aseba
 	void Zeroconf::resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain)
 	{
 		auto target(new Target(name, regtype, domain, *this));
-		auto err = DNSServiceResolve(&(target->zdr.serviceRef),
+		auto err = DNSServiceResolve(&target->serviceRef,
 						 0, // no flags
 						 0, // default all interfaces
 						 name.c_str(),
@@ -152,7 +139,7 @@ namespace Aseba
 			throw Zeroconf::Error(FormatableString("DNSServiceResolve: error %0").arg(err));
 		}
 		else
-			processDiscoveryRequest(target->zdr);
+			processServiceRef(target->serviceRef);
 	}
 
 	//! DNSSD callback for resolveTarget, update Zeroconf::Target record with results of lookup
@@ -189,9 +176,8 @@ namespace Aseba
 	//! Update the set of known targets with remote ones found by browsing DNS.
 	void Zeroconf::browse()
 	{
-		releaseDiscoveryRequest(browseZDR);
-		browseZDR.~DiscoveryRequest();
-		auto err = DNSServiceBrowse(&browseZDR.serviceRef,
+		releaseServiceRef(browseServiceRef);
+		auto err = DNSServiceBrowse(&browseServiceRef,
 					    0, // no flags
 					    0, // default all interfaces
 					    "_aseba._tcp",
@@ -202,7 +188,7 @@ namespace Aseba
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceBrowse: error %0").arg(err));
 		else
-			processDiscoveryRequest(browseZDR);
+			processServiceRef(browseServiceRef);
 	}
 
 	//! DNSSD callback for browse, update DiscoveryRequest record with results of browse

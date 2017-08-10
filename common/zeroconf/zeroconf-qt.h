@@ -47,17 +47,23 @@ namespace Aseba
 		virtual void targetFound(const Aseba::Zeroconf::Target & target) override;
 		virtual void updateCompleted(const Aseba::Zeroconf::Target & target) override;
 
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
-		virtual void releaseDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void processServiceRef(DNSServiceRef serviceRef) override;
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	protected:
-		void incomingData(DiscoveryRequest & zdr);
+		void incomingData(DNSServiceRef serviceRef);
 
 	private:
-		//! A discovery request and its associated QSocketNotifier to connect to Qt's event loop
-		typedef std::pair<DiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
+		struct ServiceRefSocketNotifier;
 		//! A collection of QSocketNotifier that watch the serviceref file descriptors.
-		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
+		std::map<int, ServiceRefSocketNotifier*> zeroconfSockets;
+	};
+
+	struct QtZeroconf::ServiceRefSocketNotifier: QSocketNotifier
+	{
+		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent);
+		~ServiceRefSocketNotifier();
+		DNSServiceRef serviceRef;
 	};
 }
 
