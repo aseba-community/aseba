@@ -121,7 +121,8 @@ public:
 		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { mutableName }, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
 		try
 		{
-			zeroconf.insert(listenStream).advertise(txt);
+			//zeroconf.insert(listenStream).advertise(txt);
+			zeroconf.advertise(listenStream, txt);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -193,7 +194,7 @@ public:
 		// wait a given time, return if stop was called
 		Aseba::UnifiedTime startTime;
 		int timeout(variables.timerPeriod > 0 ? variables.timerPeriod : -1);
-		while (step(timeout))
+		while (zeroconf.dashelStep(timeout))
 		{
 			if (variables.timerPeriod > 0)
 			{

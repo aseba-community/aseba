@@ -67,6 +67,7 @@ namespace Aseba
 		;
 	}
 
+	// TODO: write doc
 	Zeroconf::Target::Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container):
 		Zeroconf::TargetInformation(name, regtype, domain),
 		container(container)
@@ -88,22 +89,10 @@ namespace Aseba
 		container(container)
 	{}
 
+	//! Destructor, release the serviceRef through the container
 	Zeroconf::Target::~Target()
 	{
-		if (serviceRef)
-			container.get().releaseServiceRef(serviceRef);
-	}
-
-	//! Ask the containing Zeroconf to register a target with the DNS service, now that its description is complete
-	void Zeroconf::Target::advertise(const TxtRecord& txtrec)
-	{
-		container.get().registerTarget(*this, txtrec);
-	}
-
-	//! Ask the containing Zeroconf to replace this target's TXT record with a new one, typically when node, pid lists change
-	void Zeroconf::Target::updateTxtRecord(const TxtRecord& txtrec)
-	{
-		container.get().updateTarget(*this, txtrec);
+		container.get().releaseServiceRef(serviceRef);
 	}
 
 	//! Ask the containing Zeroconf to indicate that this register is completed
@@ -112,23 +101,16 @@ namespace Aseba
 		container.get().registerCompleted(*this);
 	}
 
-	//! Release the discovery request, then delete itself
-	void Zeroconf::Target::resolveFailed()
-	{
-		delete this;
-	}
-
-	//! Ask the containing Zeroconf to indicate this resolve is completed, release the discovery request, then delete itself
-	void Zeroconf::Target::resolveCompleted()
-	{
-		container.get().targetFound(*this);
-		delete this;
-	}
-
 	//! Ask the containing Zeroconf to indicate this resolve is completed
 	void Zeroconf::Target::updateCompleted() const
 	{
 		container.get().updateCompleted(*this);
+	}
+
+	//! Ask the containing Zeroconf to indicate that this target has been found
+	void Zeroconf::Target::targetFound() const
+	{
+		container.get().targetFound(*this);
 	}
 
 	//! Are the target information and the container equals?

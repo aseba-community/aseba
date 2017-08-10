@@ -67,7 +67,8 @@ namespace Aseba
 			Aseba::Zeroconf::TxtRecord txt{protocolVersion, join(names," "), ids, pids};
 			try
 			{
-				zeroconf.insert(stream).advertise(txt);
+				//zeroconf.insert(stream).advertise(txt);
+				zeroconf.advertise(stream, txt);
 			}
 			catch (const runtime_error& e)
 			{
@@ -119,13 +120,18 @@ namespace Aseba
 		Aseba::DashelhubZeroconf zeroconf;
 
 	protected:
-		void incomingData(Stream *stream)
+		virtual void incomingData(Stream *stream) override
 		{
 			Message *message(Message::receive(stream));
 			streamMap.at(stream).processMessage(message);
 			const Variables *variables(dynamic_cast<Variables *>(message));
 			if (variables)
 				streamMap.at(stream).incomingVariable(variables);
+		}
+
+		virtual void connectionClosed(Stream *stream, bool abnormal) override
+		{
+			zeroconf.forget(stream);
 		}
 
 	public:

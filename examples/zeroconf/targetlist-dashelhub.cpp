@@ -43,7 +43,7 @@ namespace Aseba
 			dashelConnectionClosed(stream);
 		}
 
-		virtual void targetFound(const Aseba::Zeroconf::Target & target) override
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 			cout << target.host << ";port=" << target.port;

@@ -35,17 +35,17 @@ namespace Aseba
 
 	signals:
 		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
-		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
+		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 
 	protected slots:
 		void doIncoming(int socket);
 
 	protected:
 		// From Zeroconf
-		virtual void registerCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void targetFound(const Aseba::Zeroconf::Target & target) override;
-		virtual void updateCompleted(const Aseba::Zeroconf::Target & target) override;
+		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
 
 		virtual void processServiceRef(DNSServiceRef serviceRef) override;
 		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;

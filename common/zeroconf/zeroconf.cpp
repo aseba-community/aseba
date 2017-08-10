@@ -34,34 +34,40 @@ namespace Aseba
 {
 	using namespace Dashel;
 
-	//! Create a target in the Zeroconf container, described by a name and a port
-	Zeroconf::Target& Zeroconf::insert(const std::string & name, const int & port)
+	Zeroconf::Targets::iterator Zeroconf::getTargetBeingProcessed(DNSServiceRef serviceRef)
 	{
-		targets.push_back(Target(name, port, *this));
-		return targets.back();
-	}
-
-	//! Create a target in the Zeroconf container, described by a Dashel stream
-	Zeroconf::Target& Zeroconf::insert(const Dashel::Stream* dashelStream)
-	{
-		targets.push_back(Target(dashelStream, *this));
-		return targets.back();
-	}
-
-	//! Search the Zeroconf container by human-readable target name
-	Zeroconf::Targets::iterator Zeroconf::find(const std::string & name)
-	{
-		return find_if(
-			targets.begin(),
-			targets.end(),
-			[&] (const Zeroconf::Target& t) { return t.name.find(name) == 0; }
+		return find_if(targetsBeingProcessed.begin(), targetsBeingProcessed.end(),
+			[=] (const Target& target) { return target.serviceRef == serviceRef; }
 		);
+	}
+
+	void Zeroconf::advertise(const std::string & name, const int & port, const TxtRecord & txtrec)
+	{
+		// TODO: handle update
+		targetsBeingProcessed.emplace_back(name, port, *this);
+		registerTarget(targetsBeingProcessed.back(), txtrec);
+	}
+
+	void Zeroconf::advertise(const Dashel::Stream * dashelStream, const TxtRecord & txtrec)
+	{
+		// TODO: handle update
+		targetsBeingProcessed.emplace_back(dashelStream, *this);
+		registerTarget(targetsBeingProcessed.back(), txtrec);
+	}
+
+	void Zeroconf::forget(const std::string & name, const int & port)
+	{
+		// TODO: implement
+	}
+
+	void Zeroconf::forget(const Dashel::Stream * dashelStream)
+	{
+		// TODO: implement
 	}
 
 	//! A target can ask Zeroconf to register it in DNS, with additional information in a TXT record
 	void Zeroconf::registerTarget(Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
-		assert(!target.serviceRef); // TODO: send exception
 		string txt{txtrec.record()};
 		uint16_t len = txt.size();
 		const char* record = txt.c_str();
@@ -76,7 +82,7 @@ namespace Aseba
 					      len, // TXT length
 					      record, // TXT record
 					      cb_Register,
-					      &target); // context pointer is Zeroconf::Target object
+					      this); // context pointer is Zeroconf
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
 		else
@@ -96,19 +102,24 @@ namespace Aseba
 			throw Zeroconf::Error(FormatableString("DNSServiceRegisterReply: error %0").arg(errorCode));
 		else
 		{
-			Zeroconf::Target *target = static_cast<Zeroconf::Target *>(context);
-
-			target->name = name;
-			target->domain = domain;
-			target->regtype = regtype;
-			target->registerCompleted();
+			// retrieve target
+			auto zeroconf(static_cast<Zeroconf *>(context));
+			auto targetIt(zeroconf->getTargetBeingProcessed(sdRef));
+			if (targetIt == zeroconf->targetsBeingProcessed.end())
+				return;
+			auto target(*targetIt);
+			// fill informations
+			target.name = name;
+			target.domain = domain;
+			target.regtype = regtype;
+			target.registerCompleted();
 		}
 	}
 
 	//! A target can ask Zeroconf to update its TXT record
-	void Zeroconf::updateTarget(const Zeroconf::Target & target, const TxtRecord& txtrec)
+	void Zeroconf::updateTarget(Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
-		assert(target.serviceRef); // TODO: send exception
+		assert(target.serviceRef);
 		const string rawdata{txtrec.record()};
 		DNSServiceErrorType err = DNSServiceUpdateRecord(target.serviceRef,
 								 nullptr, // update primary TXT record
@@ -124,22 +135,23 @@ namespace Aseba
 	//! A remote target can ask Zeroconf to resolve its host name and port
 	void Zeroconf::resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain)
 	{
-		auto target(new Target(name, regtype, domain, *this));
-		auto err = DNSServiceResolve(&target->serviceRef,
+		targetsBeingProcessed.emplace_back(name, regtype, domain, *this);
+		auto target(targetsBeingProcessed.back());
+		auto err = DNSServiceResolve(&target.serviceRef,
 						 0, // no flags
 						 0, // default all interfaces
 						 name.c_str(),
 						 regtype.c_str(),
 						 domain.c_str(),
 						 cb_Resolve,
-						 target);
+						 this);
 		if (err != kDNSServiceErr_NoError)
 		{
-			delete target; // because DNSServiceResolve will NOT call cb_Resolve
+			targetsBeingProcessed.pop_back();
 			throw Zeroconf::Error(FormatableString("DNSServiceResolve: error %0").arg(err));
 		}
 		else
-			processServiceRef(target->serviceRef);
+			processServiceRef(target.serviceRef);
 	}
 
 	//! DNSSD callback for resolveTarget, update Zeroconf::Target record with results of lookup
@@ -154,22 +166,27 @@ namespace Aseba
 					    const unsigned char * txtRecord,
 					    void *context)
 	{
-		Zeroconf::Target *target = static_cast<Zeroconf::Target *>(context);
+		auto zeroconf(static_cast<Zeroconf *>(context));
+		auto targetIt(zeroconf->getTargetBeingProcessed(sdRef));
+		if (targetIt == zeroconf->targetsBeingProcessed.end())
+			return;
 		if (errorCode != kDNSServiceErr_NoError)
 		{
-			target->resolveFailed(); // target will delete itself
+			zeroconf->targetsBeingProcessed.erase(targetIt);
 			throw Zeroconf::Error(FormatableString("DNSServiceResolveReply: error %0").arg(errorCode));
 		}
 		else
 		{
-			target->host = hosttarget;
-			target->port = ntohs(port);
+			auto target(*targetIt);
+			target.host = hosttarget;
+			target.port = ntohs(port);
 			Aseba::Zeroconf::TxtRecord tnew{ txtRecord,txtLen };
-			target->properties.clear();
+			target.properties.clear();
 			for (auto const & field: tnew)
-				target->properties[field.first] = field.second;
-			target->properties["fullname"] = string(fullname);
-			target->resolveCompleted(); // target will delete itself
+				target.properties[field.first] = field.second;
+			target.properties["fullname"] = string(fullname);
+			target.targetFound();
+			zeroconf->targetsBeingProcessed.erase(targetIt);
 		}
 	}
 
@@ -202,14 +219,14 @@ namespace Aseba
 					   void *context)
 	{
 		if (errorCode != kDNSServiceErr_NoError)
+		{
 			throw Zeroconf::Error(FormatableString("DNSServiceBrowseReply: error %0").arg(errorCode));
+		}
 		else
 		{
-			Zeroconf *zeroconf = static_cast<Zeroconf *>(context);
+			auto zeroconf(static_cast<Zeroconf *>(context));
 			if (flags & kDNSServiceFlagsAdd)
-			{
 				zeroconf->resolveTarget(name, regtype, domain);
-			}
 		}
 	}
 

@@ -34,6 +34,7 @@ namespace Aseba
 	{
 		running = false;
 		watcher.join(); // tell watcher to stop, to avoid std::terminate
+		// TODO: delete all remaining references + browseServiceRef
 	}
 
 	//! Wait for the watcher thread to complete, rethrowing exceptions

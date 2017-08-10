@@ -30,7 +30,7 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
-		virtual void targetFound(const Aseba::Zeroconf::Target & target) override
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 			cout << target.host << ";port=" << target.port;
@@ -58,11 +58,6 @@ namespace Aseba
 				sleep.sleep();
 			} while (true);// while (todo.size() > 0);;
 			// FIXME: stop after a while
-		}
-
-		virtual void browse() override
-		{
-			ThreadZeroconf::browse();
 		}
 	};
 }

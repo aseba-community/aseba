@@ -34,6 +34,8 @@ namespace Aseba
 		hub(hub)
 	{}
 
+	// TODO: add destructor to delete all remaining references + browseServiceRef
+
 	//! Set up function called after a discovery request has been made. The file
 	//! descriptor associated with zdr.serviceref must be watched, to know when to
 	//! call DNSServiceProcessResult, which in turn calls the callback that was
@@ -90,15 +92,16 @@ namespace Aseba
 		zeroconfStreams.erase(stream);
 	}
 
-	void DashelhubZeroconf::dashelStep(int timeout)
+	bool DashelhubZeroconf::dashelStep(int timeout)
 	{
-		hub.step(timeout);
+		bool ret(hub.step(timeout));
 		for (auto& streamKV: pendingReleaseStreams)
 		{
 			hub.closeStream(streamKV.first);
 			DNSServiceRefDeallocate(streamKV.second);
 		}
 		pendingReleaseStreams.clear();
+		return ret;
 	}
 
 } // namespace Aseba
