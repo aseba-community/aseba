@@ -33,7 +33,8 @@ namespace Aseba
 	ThreadZeroconf::~ThreadZeroconf()
 	{
 		running = false;
-		watcher.join(); // tell watcher to stop, to avoid std::terminate
+		threadWait.notify_one();
+		watcher.join(); // tell watcher to stop
 		// clear all targets
 		targets.clear();
 		// deallocate remaining service references
@@ -55,9 +56,11 @@ namespace Aseba
 	void ThreadZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
 		assert(serviceRef);
-
-		std::lock_guard<std::recursive_mutex> locker(watcherLock);
-		serviceRefs.insert(serviceRef);
+		{
+			std::lock_guard<std::recursive_mutex> locker(watcherLock);
+			serviceRefs.insert(serviceRef);
+		}
+		threadWait.notify_one();
 	}
 
 	//! With the lock held, move the provided service reference from serviceRefs to
@@ -78,14 +81,15 @@ namespace Aseba
 	{
 		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)
 
-		while (running)
+		while (true)
 		{
 			{// lock
-				std::lock_guard<std::recursive_mutex> locker(watcherLock);
-				// FIXME: use condition variable to avoid infinite loops here
-				if (serviceRefs.size() == 0)
-					continue;
+				std::unique_lock<std::recursive_mutex> locker(watcherLock);
+				// we use a condition variable to avoid infinite loops here
+				threadWait.wait(locker, [&] { return !serviceRefs.empty() || !running; });
 			}// unlock
+			if (!running)
+				break;
 			fd_set fds;
 			int max_fds(0);
 			FD_ZERO(&fds);

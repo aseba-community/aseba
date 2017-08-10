@@ -24,6 +24,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <condition_variable>
 #include <unordered_set>
 #include "zeroconf.h"
 
@@ -59,6 +60,7 @@ namespace Aseba
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs
 		std::exception_ptr watcherException{nullptr}; //!< pointer to rethrow exceptions in the outer thread
 		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
+		std::condition_variable_any threadWait; //!< notify that either the serviceRefs array has at least one element or that we should stop
 	};
 }
 
