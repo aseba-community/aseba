@@ -3,6 +3,7 @@ add_subdirectory(compiler)
 add_subdirectory(vm)
 add_subdirectory(simulator)
 #add_subdirectory(e2e-http)
+add_subdirectory(zeroconf)
 
 
 # test asebahttp
