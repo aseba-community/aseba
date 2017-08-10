@@ -27,61 +27,89 @@ using namespace std;
 
 namespace Aseba
 {
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
-	void QtZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
+	//! Destructor, clear all targets
+	QtZeroconf::~QtZeroconf()
 	{
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
-		if (socket != -1)
+		// clear all targets
+		targets.clear();
+	}
+
+	//! Create a socket notifier for the provided service reference, and start watching
+	//! its file descriptor for activity.
+	void QtZeroconf::processServiceRef(DNSServiceRef serviceRef)
+	{
+		assert(serviceRef);
+
+		auto notifier = new ServiceRefSocketNotifier(serviceRef, this);
+		QObject::connect(notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
+		zeroconfSockets.emplace(notifier->socket(), notifier);
+	}
+
+	//! Remove the socket notifier associated with the provided service reference,
+	//! and later deallocate it (through Qt's deleteLater mechanism).
+	void QtZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
+	{
+		if (!serviceRef)
+			return;
+
+		// safety check
+		int socket = DNSServiceRefSockFD(serviceRef);
+		assert(socket != -1);
+
+		// remove the notifier and delete it later
+		auto socketNotifierIt(zeroconfSockets.find(socket));
+		if (socketNotifierIt != zeroconfSockets.end())
 		{
-			auto notifier = new QSocketNotifier(socket, QSocketNotifier::Read, this);
-			QObject::connect(notifier, SIGNAL(activated(int)), this, SLOT(doIncoming(int)));
-			zeroconfSockets.emplace(socket, ZdrQSocketNotifierPair{zdr, notifier});
+			socketNotifierIt->second->deleteLater();
+			zeroconfSockets.erase(socketNotifierIt);
 		}
 	}
 
 	//! Emit signal when register completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::Target & target)
+	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::TargetInformation & target)
 	{
 		emit zeroconfRegisterCompleted(target);
 	}
 
-	//! Emit signal when resolve completed.
-	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::resolveCompleted(const Aseba::Zeroconf::Target & target)
-	{
-		emit zeroconfResolveCompleted(target);
-	}
-
 	//! Emit signal when update completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::Target & target)
+	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::TargetInformation & target)
 	{
 		emit zeroconfUpdateCompleted(target);
 	}
 
-	//! Emit signal when browse completed.
+	//! Emit signal when resolve completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::browseCompleted()
+	void QtZeroconf::targetFound(const Aseba::Zeroconf::TargetInformation & target)
 	{
-		emit zeroconfBrowseCompleted();
+		emit zeroconfTargetFound(target);
 	}
 
 	//! Data are available on a zeroconf socket
 	void QtZeroconf::doIncoming(int socket)
 	{
-		incomingData(zeroconfSockets.at(socket).first);
+		incomingData(zeroconfSockets.at(socket)->serviceRef);
 	}
 
-	//! Process incoming data associated to a discovery request
-	void QtZeroconf::incomingData(DiscoveryRequest & zdr)
+	//! Process incoming data associated to a service reference
+	void QtZeroconf::incomingData(DNSServiceRef serviceRef)
 	{
-		DNSServiceErrorType err = DNSServiceProcessResult(zdr.serviceRef);
+		DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(zdr.serviceRef));
+			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
+	}
+
+	//! Create a Qt socket notifier in read mode for the file descriptor of the provided service reference
+	QtZeroconf::ServiceRefSocketNotifier::ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent):
+		QSocketNotifier(DNSServiceRefSockFD(serviceRef), QSocketNotifier::Read, parent),
+		serviceRef(serviceRef)
+	{ }
+
+	//! Deallocate the service reference
+	QtZeroconf::ServiceRefSocketNotifier::~ServiceRefSocketNotifier()
+	{
+		DNSServiceRefDeallocate(serviceRef);
 	}
 
 } // namespace Aseba

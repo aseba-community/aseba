@@ -20,28 +20,22 @@
 
 #include <iostream>
 #include <QCoreApplication>
+#include <QTimer>
 #include "targetlist-qt.h"
 
 using namespace std;
 
-QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
+QtTargetLister::QtTargetLister(int argc, char* argv[]) :
+	QCoreApplication(argc, argv)
 {
-	connect(&targets, SIGNAL(zeroconfBrowseCompleted()), this, SLOT(browseCompleted()));
-	connect(&targets, SIGNAL(zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation&)), SLOT(resolveCompleted(const Aseba::Zeroconf::TargetInformation&)));
+	connect(&targets, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(targetFound(const Aseba::Zeroconf::TargetInformation&)));
+	// Browse for _aseba._tcp services on all interfaces
+	targets.browse();
+	// Run for 10 seconds
+	QTimer::singleShot(10000, this, SLOT(quit()));
 }
 
-void QtTargetLister::browseCompleted()
-{
-	// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-	for (auto & target: targets.targets)
-	{
-		todo.insert(target);
-		// Resolve the host name and port of this target, retrieve TXT record
-		target.resolve();
-	}
-}
-
-void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation& target)
+void QtTargetLister::targetFound(const Aseba::Zeroconf::TargetInformation& target)
 {
 	// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 	cout << target.host << ";port=" << target.port;
@@ -58,17 +52,10 @@ void QtTargetLister::resolveCompleted(const Aseba::Zeroconf::TargetInformation& 
 			cout << " " << field.second;
 		cout << endl;
 	}
-	todo.erase(todo.find(target));
-	if (todo.size() == 0)
-		exit(0); // QCoreApplication::exit
 }
 
 int main(int argc, char* argv[])
 {
 	QtTargetLister app(argc, argv);
-
-	// Browse for _aseba._tcp services on all interfaces
-	app.targets.browse();
-
 	return app.exec();
 }

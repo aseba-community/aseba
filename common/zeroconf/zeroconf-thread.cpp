@@ -29,11 +29,19 @@ namespace Aseba
 {
 	using namespace Dashel;
 
-	//! Destructor, need to terminate the thread
+	//! Destructor, need to terminate the thread, clear all targets, and deallocate remaining service references
 	ThreadZeroconf::~ThreadZeroconf()
 	{
 		running = false;
-		watcher.join(); // tell watcher to stop, to avoid std::terminate
+		threadWait.notify_one();
+		watcher.join(); // tell watcher to stop
+		// clear all targets
+		targets.clear();
+		// deallocate remaining service references
+		for (auto serviceRef: serviceRefs)
+			DNSServiceRefDeallocate(serviceRef);
+		for (auto serviceRef: pendingReleaseServiceRefs)
+			DNSServiceRefDeallocate(serviceRef);
 	}
 
 	//! Wait for the watcher thread to complete, rethrowing exceptions
@@ -44,28 +52,44 @@ namespace Aseba
 			std::rethrow_exception(watcherException);
 	}
 
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
-	void ThreadZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
+	//! With the lock held, insert the provided service reference to serviceRefs
+	void ThreadZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
-		std::lock_guard<std::recursive_mutex> locker(watcherLock);
-		zeroconfDRs.insert(zdr);
+		assert(serviceRef);
+		{
+			std::lock_guard<std::recursive_mutex> locker(watcherLock);
+			serviceRefs.insert(serviceRef);
+		}
+		threadWait.notify_one();
 	}
 
-	//! Run the handleDSEvents_thread
+	//! With the lock held, move the provided service reference from serviceRefs to
+	//! pendingReleaseServiceRefs, so that it will be released after the current call to select has completed.
+	void ThreadZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
+	{
+		if (!serviceRef)
+			return;
+
+		std::lock_guard<std::recursive_mutex> locker(watcherLock);
+		serviceRefs.erase(serviceRef);
+		pendingReleaseServiceRefs.insert(serviceRef);
+	}
+
+	//! When serviceRefs is not empty, for each service reference collect their associated
+	//! file descriptor and wait on them for activity using select.
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{
 		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)
 
-		while (running)
+		while (true)
 		{
 			{// lock
-				std::lock_guard<std::recursive_mutex> locker(watcherLock);
-				if (zeroconfDRs.size() == 0)
-					continue;
+				std::unique_lock<std::recursive_mutex> locker(watcherLock);
+				// we use a condition variable to avoid infinite loops here
+				threadWait.wait(locker, [&] { return !serviceRefs.empty() || !running; });
 			}// unlock
+			if (!running)
+				break;
 			fd_set fds;
 			int max_fds(0);
 			FD_ZERO(&fds);
@@ -75,39 +99,51 @@ namespace Aseba
 
 			{// lock
 				std::lock_guard<std::recursive_mutex> locker(watcherLock);
-				for (auto const& zdrRef: zeroconfDRs)
+				for (auto serviceRef: serviceRefs)
 				{
-					DiscoveryRequest& zdr(zdrRef.get());
-					int fd = DNSServiceRefSockFD(zdr.serviceRef);
+					int fd = DNSServiceRefSockFD(serviceRef);
 					if (fd != -1)
 					{
 						max_fds = max_fds > fd ? max_fds : fd;
 						FD_SET(fd, &fds);
-						serviceFd[zdr.serviceRef] = fd;
+						serviceFd[serviceRef] = fd;
 						fd_count++;
 					}
 				}
 			}// unlock
 			int result = select(max_fds+1, &fds, (fd_set*)nullptr, (fd_set*)nullptr, &tv);
 			try {
-				if (result > 0)
+				if (result >= 0)
 				{
 					// lock
 					std::lock_guard<std::recursive_mutex> locker(watcherLock);
 
-					for (auto const& zdrRef: zeroconfDRs)
+					// release old service refs
+					for (auto serviceRef: pendingReleaseServiceRefs)
+						DNSServiceRefDeallocate(serviceRef);
+					pendingReleaseServiceRefs.clear();
+
+					// check for activity
+					if (result > 0)
 					{
-						DiscoveryRequest& zdr(zdrRef.get());
-						if (FD_ISSET(serviceFd[zdr.serviceRef], &fds))
-							DNSServiceProcessResult(zdr.serviceRef);
+						// no timeout
+						for (auto serviceRef: serviceRefs)
+						{
+							auto fdIt(serviceFd.find(serviceRef));
+							if (fdIt != serviceFd.end())
+							{
+								if (FD_ISSET(fdIt->second, &fds))
+									DNSServiceProcessResult(serviceRef);
+							}
+						}
 					}
+					else
+						; // timeout
+
 					// unlock
 				}
-				else if (result < 0)
-					throw Zeroconf::Error(FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
-
 				else
-					; // timeout, check for new services
+					throw Zeroconf::Error(FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
 			}
 			catch (...) {
 				watcherException = std::current_exception();

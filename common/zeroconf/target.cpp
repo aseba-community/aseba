@@ -25,75 +25,74 @@ using namespace std;
 
 namespace Aseba
 {
-	//! This target is described by a human-readable name and a port.
-	//! If a port is nonzero at creation then this is a local target to be remembered
-	//! otherwise it is a remote one discovered through browsing and may be refreshed.
-	//! Note that later the port will become nonzero if the target is resolved.
-	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
+	//! This target is described by a human-readable name, regtype, and domain.
+	//! It corresponds to a remote target on which that we want to resolve
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain):
 		name(name),
-		port(port),
-		local(port != 0)
+		regtype(regtype),
+		domain(domain)
 	{}
 
-	//! This target describes an existing Dashel stream
-	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
+	//! This target is described by a human-readable name and a port.
+	//! It corresponds to a local target being advertised.
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
+		name(name),
+		port(port)
+	{}
+
+	//! This target describes an existing Dashel stream.
+	//! It corresponds to a local target being advertised.
+	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
 	Zeroconf::TargetInformation::TargetInformation(const Dashel::Stream* stream) :
 		name("Aseba Local " + stream->getTargetParameter("port")),
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
-	//! Are all fields equal?
-	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
+	Zeroconf::Target::Target(Target && rhs):
+		TargetInformation(move(rhs)),
+		container(move(rhs.container))
 	{
-		return
-			lhs.name == rhs.name &&
-			lhs.domain == rhs.domain &&
-			lhs.regtype == rhs.regtype
-		;
+		serviceRef = rhs.serviceRef;
+		rhs.serviceRef = nullptr;
 	}
 
-	//! Are all fields of this lower than fileds of that, in order?
-	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
+	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
+	Zeroconf::Target& Zeroconf::Target::operator=(Target&& rhs)
 	{
-		return
-			lhs.name < rhs.name &&
-			lhs.domain < rhs.domain &&
-			lhs.regtype < rhs.regtype
-		;
+		TargetInformation::operator = (std::move(rhs));
+		serviceRef = rhs.serviceRef;
+		rhs.serviceRef = nullptr;
+		return *this;
 	}
+
+	//! This target is described by a human-readable name, regtype and domain.
+	//! It corresponds to a remote target on which that we want to resolve.
+	Zeroconf::Target::Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container):
+		Zeroconf::TargetInformation(name, regtype, domain),
+		container(container)
+	{}
 
 	//! This target is described by a human-readable name and a port.
-	//! If a port is nonzero at creation then this is a local target to be remembered
-	//! otherwise it is a remote one discovered through browsing and may be refreshed.
-	//! Note that later the port will become nonzero if the target is resolved.
+	//! It corresponds to a local target being advertised.
 	Zeroconf::Target::Target(const std::string & name, const int port, Zeroconf & container):
 		Zeroconf::TargetInformation(name, port),
 		container(container)
 	{}
 
 	//! This target describes an existing Dashel stream
+	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
 	Zeroconf::Target::Target(const Dashel::Stream* dashelStream, Zeroconf & container):
 		Zeroconf::TargetInformation(dashelStream),
 		container(container)
 	{}
 
-	//! Ask the containing Zeroconf to register a target with the DNS service, now that its description is complete
-	void Zeroconf::Target::advertise(const TxtRecord& txtrec)
+	//! Destructor, release the serviceRef through the container,
+	//! which thus must be a valid object at that time.
+	Zeroconf::Target::~Target()
 	{
-		container.get().registerTarget(*this, txtrec);
-	}
-
-	//! Ask the containing Zeroconf to replace this target's TXT record with a new one, typically when node, pid lists change
-	void Zeroconf::Target::updateTxtRecord(const TxtRecord& txtrec)
-	{
-		container.get().updateTarget(*this, txtrec);
-	}
-
-	//! Ask the containing Zeroconf to resolve this target's actual host name and port, using mDNS-SD
-	void Zeroconf::Target::resolve()
-	{
-		container.get().resolveTarget(*this);
+		container.get().releaseServiceRef(serviceRef);
 	}
 
 	//! Ask the containing Zeroconf to indicate that this register is completed
@@ -103,22 +102,15 @@ namespace Aseba
 	}
 
 	//! Ask the containing Zeroconf to indicate this resolve is completed
-	void Zeroconf::Target::resolveCompleted() const
-	{
-		container.get().resolveCompleted(*this);
-	}
-
-	//! Ask the containing Zeroconf to indicate this resolve is completed
 	void Zeroconf::Target::updateCompleted() const
 	{
 		container.get().updateCompleted(*this);
 	}
 
-	//! Are the target information and the container equals?
-	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs)
+	//! Ask the containing Zeroconf to indicate that this target has been found
+	void Zeroconf::Target::targetFound() const
 	{
-		return static_cast<const Zeroconf::TargetInformation>(lhs) == static_cast<const Zeroconf::TargetInformation>(rhs) &&
-			&lhs.container == &rhs.container;
+		container.get().targetFound(*this);
 	}
 
 } // namespace Aseba

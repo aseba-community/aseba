@@ -34,32 +34,41 @@ namespace Aseba
 		Q_OBJECT
 
 	signals:
-		void zeroconfBrowseCompleted(); //!< emitted when browsing is completed
 		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
-		void zeroconfResolveCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a resolve is completed
 		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
+		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
+
+	public:
+		virtual ~QtZeroconf();
 
 	protected slots:
 		void doIncoming(int socket);
 
 	protected:
 		// From Zeroconf
-		virtual void registerCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void updateCompleted(const Aseba::Zeroconf::Target & target) override;
-		virtual void browseCompleted() override;
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr) override;
+		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
+
+		virtual void processServiceRef(DNSServiceRef serviceRef) override;
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	protected:
-		void incomingData(DiscoveryRequest & zdr);
+		void incomingData(DNSServiceRef serviceRef);
 
 	private:
-		//! A discovery request and its associated QSocketNotifier to connect to Qt's event loop
-		typedef std::pair<DiscoveryRequest &, QSocketNotifier*> ZdrQSocketNotifierPair;
+		struct ServiceRefSocketNotifier;
 		//! A collection of QSocketNotifier that watch the serviceref file descriptors.
-		std::map<int, ZdrQSocketNotifierPair> zeroconfSockets;
+		std::map<int, ServiceRefSocketNotifier*> zeroconfSockets;
 	};
 
+	//! Extends a Qt socket notifier with the associated service reference
+	struct QtZeroconf::ServiceRefSocketNotifier: QSocketNotifier
+	{
+		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent);
+		~ServiceRefSocketNotifier();
+		DNSServiceRef serviceRef; //!< the associated service reference
+	};
 }
 
 #endif /* ASEBA_ZEROCONF_QT */

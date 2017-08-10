@@ -32,8 +32,6 @@ namespace Aseba
 
 	class TargetLister : public Dashel::Hub, public DashelhubZeroconf
 	{
-		unordered_set<reference_wrapper<const Aseba::Zeroconf::Target>> todo;
-
 		// from Dashel::Hub
 		virtual void incomingData(Dashel::Stream *stream) override
 		{
@@ -45,19 +43,7 @@ namespace Aseba
 			dashelConnectionClosed(stream);
 		}
 
-		// from DashelhubZeroconf
-		virtual void browseCompleted() override
-		{
-			// Aseba::Zeroconf is a smart container for Aseba::Zeroconf::Target
-			for (auto & target: targets)
-			{
-				todo.insert(target);
-				// Resolve the host name and port of this target, retrieve TXT record
-				target.resolve();
-			}
-		}
-
-		virtual void resolveCompleted(const Aseba::Zeroconf::Target & target) override
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 			cout << target.host << ";port=" << target.port;
@@ -74,7 +60,6 @@ namespace Aseba
 					cout << " " << field.second;
 				cout << endl;
 			}
-			todo.erase(todo.find(target));
 		}
 
 	public:
@@ -85,10 +70,15 @@ namespace Aseba
 
 		void run()
 		{
+			UnifiedTime left(10, 0);
 			do
 			{
-				step(-1);
-			} while (todo.size() > 0);
+				UnifiedTime start;
+				dashelStep(left.value);
+				auto elapsed(UnifiedTime() - start);
+				if (elapsed > left)
+					break;
+			} while(true);
 		}
 	};
 }

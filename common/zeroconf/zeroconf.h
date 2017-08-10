@@ -54,86 +54,59 @@ namespace Aseba
 	/*@{*/
 
 	//! Aseba::Zeroconf provides methods for registering targets, updating target
-	//! descriptions, and browsing for targets. It runs a thread that watches the
-	//! DNS Service for updates, and triggers callback processing as necessary.
+	//! descriptions, and browsing for targets. The communication with the DNSSD
+	//! deamon is done through sockets, whose synchronisations are handled by
+	//! different subclasses: ThreadZeroconf, DashelhubZeroconf, and QtZeroconf.
 	class Zeroconf
 	{
 	public:
-		class TxtRecord;
-		class TargetInformation;
+		struct Error;
+		struct TargetInformation;
 		class Target;
-		//! An error in registering or browsing Zeroconf
-		struct Error: public std::runtime_error
-		{
-			Error(const std::string & what): std::runtime_error(what) {}
-		};
-		//! A vector of Target
+		class TxtRecord;
 		using Targets = std::vector<Target>;
 
 	public:
 		//! Default virtual destructor
 		virtual ~Zeroconf() = default;
 
-		// Aseba::Zeroconf is a factory for creating and inserting targets
-		Target& insert(const std::string & name, const int & port);
-		Target& insert(const Dashel::Stream * dashelStream);
+		// Aseba::Zeroconf can advertise local targets
+		void advertise(const std::string & name, const int & port, const TxtRecord & txtrec);
+		void advertise(const Dashel::Stream * stream, const TxtRecord & txtrec);
+		void forget(const std::string & name, const int & port);
+		void forget(const Dashel::Stream * stream);
 
-		// Aseba::Zeroconf is a container of targets
-		void erase(std::vector<Target>::iterator position) { targets.erase(position); }
-		void clear() { targets.clear(); }
-		bool empty() const { return targets.empty(); }
-		size_t size() const { return targets.size(); }
-		Target & front() { return targets.front(); }
-		const Target & front() const { return targets.front(); }
-		std::vector<Target>::iterator begin() { return targets.begin(); }
-		std::vector<Target>::iterator end() { return targets.end(); }
-		std::vector<Target>::const_iterator begin() const { return targets.begin(); }
-		std::vector<Target>::const_iterator end() const { return targets.end(); }
-		std::vector<Target>::const_iterator cbegin() const { return targets.cbegin(); }
-		std::vector<Target>::const_iterator cend() const { return targets.cend(); }
-		Targets::iterator find(const std::string & name);
-
-		// Aseba::Zeroconf can update its knowledge of non-local targets by browsing the network
-		virtual void browse();
-
-	public:
-		Targets targets; //!< the known targets, local or remote
+		// Aseba::Zeroconf can request the listing of non-local targets by browsing the network
+		void browse();
 
 	protected:
-		// Requested through target
-		virtual void registerTarget(Target & target, const TxtRecord & txtrec);
-		virtual void updateTarget(const Target & target, const TxtRecord & txtrec);
-		virtual void resolveTarget(Target & target);
-		
-		virtual void registerCompleted(const Aseba::Zeroconf::Target &) {} //!< Called when a register is completed
-		virtual void resolveCompleted(const Aseba::Zeroconf::Target &) {} //!< Called when a register is completed
-		virtual void updateCompleted(const Aseba::Zeroconf::Target &) {} //!< Called when a register is completed
-
-		virtual void browseCompleted() {} //!< Called when browsing is completed
-
-		bool browseAlreadyCompleted; //!< true if browse() was called and the callback browseCompleted() was called as well
+		// helper functions
+		void registerTarget(Target & target, const TxtRecord & txtrec);
+		void updateTarget(Target & target, const TxtRecord & txtrec);
+		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
+		Targets::iterator getTarget(DNSServiceRef serviceRef);
+		Targets::iterator getTarget(const std::string & name, const int & port);
+		Targets::iterator getTarget(const Dashel::Stream * stream);
 
 	protected:
-		//! Private class that encapsulates an active service request to the mDNS-SD daemon
-		class DiscoveryRequest
-		{
-		public:
-			DNSServiceRef serviceRef{nullptr};
-			bool inProcess{true}; //!< flag to signal when this request is no longer active
-		
-		public:
-			~DiscoveryRequest();
-		};
-		friend struct std::hash<DiscoveryRequest>;
-		friend bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
+		// information callback for sub-class
+		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a register is completed
+		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a txt update is completed
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
 
-		DiscoveryRequest browseZDR; //! the zdr for browse requests isn't attached to a target
+		// serviceRef registering/de-registering, to be implemented by subclasses
+		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available.
+		//! The service reference must be valid.
+		virtual void processServiceRef(DNSServiceRef serviceRef) = 0;
+		//! Stop watching the file description associated with the service reference, and deallocate it afterwards (calling DNSServiceRefDeallocate).
+		//! If the service reference is a nullptr, do nothing.
+		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
-		//! The discovery request can be processed immediately, or can be registered with
-		//! an event loop for asynchronous processing.
-		//! Can be overridden in derived classes to set up asynchronous processing.
-		virtual void processDiscoveryRequest(DiscoveryRequest & zdr);
+		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
+		Targets targets;
+		//! The serviceRef for browse requests isn't attached to a target
+		DNSServiceRef browseServiceRef{nullptr};
 
 	protected:
 		// callbacks for the DNS Service Discovery API
@@ -142,38 +115,36 @@ namespace Aseba
 		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
 
-	bool operator==(const Zeroconf::DiscoveryRequest& lhs, const Zeroconf::DiscoveryRequest& rhs);
+	/**
+	 \addtogroup zeroconf
+		An error in registering or browsing Zeroconf
+	*/
+	struct Zeroconf::Error: public std::runtime_error
+	{
+		Error(const std::string & what): std::runtime_error(what) {}
+	};
 
 	/**
 	 \addtogroup zeroconf
-
 		A Zeroconf::TargetInformation allows client classes to choose and access Aseba targets.
 	*/
-	class Zeroconf::TargetInformation
+	struct Zeroconf::TargetInformation
 	{
-	public:
-		// unique identification of a target information
+		// informations from discovery
 		std::string name; //!< the full name of this target
-		std::string domain{"local."}; //!< the domain of the host
 		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
+		std::string domain{"local."}; //!< the domain of the host
 
 		// additional metadata about this target after resolution
-		std::string host; //!< the Dashel target connection port
+		std::string host; //!< the Dashel target connection ports
 		int port; //!< the Dashel target connection port
-		bool local{true}; //!< whether this host is local
 
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
-	public:
+		TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain);
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashelStream);
-
-		friend bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
-		friend bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 	};
-
-	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
-	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -182,29 +153,30 @@ namespace Aseba
 	 */
 	class Zeroconf::Target: public Zeroconf::TargetInformation
 	{
-	private:
-		friend class Zeroconf;
+	public:
+		Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container);
 		Target(const std::string & name, const int port, Zeroconf & container);
 		Target(const Dashel::Stream* dashelStream, Zeroconf & container);
 
-	public:
-		void advertise(const TxtRecord & txtrec);
-		void updateTxtRecord(const TxtRecord & txtrec);
-		void resolve();
+		// disable copy constructor and copy assigment operator
+		Target(const Target &) = delete;
+		Target& operator=(const Target&) = delete;
+		// implement move versions instead
+		Target(Target && rhs);
+		Target& operator=(Target&& rhs);
+
+		~Target();
+
 		void registerCompleted() const;
-		void resolveCompleted() const;
 		void updateCompleted() const;
-
-		friend bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs);
+		void targetFound() const;
 
 	public:
-		DiscoveryRequest zdr; //!< Attached discovery request
+		DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
 
 	protected:
 		std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
 	};
-
-	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -227,7 +199,7 @@ namespace Aseba
 		TxtRecord(const unsigned int protovers, const std::string& type, const std::vector<unsigned int>& ids, const std::vector<unsigned int>& pids);
 		TxtRecord(const std::string & txtRecord);
 		TxtRecord(const unsigned char * txtRecord, uint16_t txtLen);
-		
+
 		// Different kinds of keys can be encoded into TXT records
 		void assign(const std::string& key, const std::string& value);
 		void assign(const std::string& key, const int value);
@@ -249,23 +221,5 @@ namespace Aseba
 
 	/*@}*/
 } // namespace Aseba
-
-namespace std {
-	//! Hash for a discovery request, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::DiscoveryRequest>: public Aseba::PointerHash<Aseba::Zeroconf::DiscoveryRequest> {};
-	//! Hash for a zeroconf target information, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<Aseba::Zeroconf::TargetInformation> {};
-	//! Hash for a const zeroconf target information, use the generic point-based comparison
-	template <>
-	struct hash<const Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<const Aseba::Zeroconf::TargetInformation> {};
-	//! Hash for a zeroconf target, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::Target>: public Aseba::PointerHash<Aseba::Zeroconf::Target> {};
-	//! Hash for a const zeroconf target, use the generic point-based comparison
-	template <>
-	struct hash<const Aseba::Zeroconf::Target>: public Aseba::PointerHash<const Aseba::Zeroconf::Target> {};
-} // namespace std
 
 #endif /* ASEBA_ZEROCONF */

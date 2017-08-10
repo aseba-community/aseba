@@ -34,18 +34,51 @@ namespace Aseba
 		hub(hub)
 	{}
 
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
-	void DashelhubZeroconf::processDiscoveryRequest(DiscoveryRequest & zdr)
+	//! Clear all targets and clean-up remaining streams
+	DashelhubZeroconf::~DashelhubZeroconf()
 	{
-		int socket = DNSServiceRefSockFD(zdr.serviceRef);
+		// clear all targets
+		targets.clear();
+		// clean-up remaining streams
+		cleanUpStreams(zeroconfStreams);
+		cleanUpStreams(pendingReleaseStreams);
+	}
+
+	//! Create a Dashel tcppoll stream to watch the underlying file description of the provided service reference
+	void DashelhubZeroconf::processServiceRef(DNSServiceRef serviceRef)
+	{
+		assert(serviceRef);
+
+		int socket = DNSServiceRefSockFD(serviceRef);
 		if (socket != -1)
 		{
 			string dashelTarget = FormatableString("tcppoll:sock=%0").arg(socket);
-			if (auto stream = hub.connect(dashelTarget))
-				zeroconfStreams.emplace(stream, ref(zdr));
+			auto stream = hub.connect(dashelTarget);
+			assert(stream);
+			zeroconfStreams.emplace(stream, serviceRef);
+		}
+	}
+
+	//! Move the Dashel stream corresponding to the provided service reference to pendingReleaseStreams,
+	//! the list of streams that will be released after the end of the current Dashel step.
+	void DashelhubZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
+	{
+		if (!serviceRef)
+			return;
+
+		int socket = DNSServiceRefSockFD(serviceRef);
+		assert (socket != -1);
+
+		auto streamIt(zeroconfStreams.begin());
+		while (streamIt != zeroconfStreams.end())
+		{
+			if (streamIt->second == serviceRef)
+			{
+				pendingReleaseStreams[streamIt->first] = streamIt->second;
+				streamIt = zeroconfStreams.erase(streamIt);
+			}
+			else
+				++streamIt;
 		}
 	}
 
@@ -54,9 +87,7 @@ namespace Aseba
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
-			const char status = stream->read<char>();
-			ASEBA_UNUSED(status);
-			auto serviceRef = zeroconfStreams.at(stream).get().serviceRef;
+			auto serviceRef = zeroconfStreams.at(stream);
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
 				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
@@ -67,6 +98,25 @@ namespace Aseba
 	void DashelhubZeroconf::dashelConnectionClosed(Stream * stream)
 	{
 		zeroconfStreams.erase(stream);
+	}
+
+	//! Call Dashel::step and then delete all streams whose release where pending
+	bool DashelhubZeroconf::dashelStep(int timeout)
+	{
+		bool ret(hub.step(timeout));
+		cleanUpStreams(pendingReleaseStreams);
+		return ret;
+	}
+
+	//! Close all streams and deallocate their service reference
+	void DashelhubZeroconf::cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams)
+	{
+		for (auto& streamKV: streams)
+		{
+			hub.closeStream(streamKV.first);
+			DNSServiceRefDeallocate(streamKV.second);
+		}
+		streams.clear();
 	}
 
 } // namespace Aseba

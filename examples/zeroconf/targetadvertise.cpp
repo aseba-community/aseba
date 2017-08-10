@@ -25,7 +25,7 @@
 #include "../../common/msg/msg.h"
 #include "../../common/msg/NodesManager.h"
 #include "../../common/utils/utils.h"
-#include "../../common/zeroconf/zeroconf.h"
+#include "../../common/zeroconf/zeroconf-dashelhub.h"
 
 namespace Aseba
 {
@@ -41,7 +41,7 @@ namespace Aseba
 
 	public:
 		StreamNodesManager(Stream* stream) :
-		stream(stream)
+			stream(stream)
 		{}
 
 		void advertiseNodes(Aseba::Zeroconf & zeroconf)
@@ -67,7 +67,8 @@ namespace Aseba
 			Aseba::Zeroconf::TxtRecord txt{protocolVersion, join(names," "), ids, pids};
 			try
 			{
-				zeroconf.insert(stream).advertise(txt);
+				//zeroconf.insert(stream).advertise(txt);
+				zeroconf.advertise(stream, txt);
 			}
 			catch (const runtime_error& e)
 			{
@@ -116,10 +117,10 @@ namespace Aseba
 	{
 	protected:
 		map<Stream*,StreamNodesManager> streamMap;
-		Aseba::Zeroconf zeroconf;
+		Aseba::DashelhubZeroconf zeroconf;
 
 	protected:
-		void incomingData(Stream *stream)
+		virtual void incomingData(Stream *stream) override
 		{
 			Message *message(Message::receive(stream));
 			streamMap.at(stream).processMessage(message);
@@ -128,8 +129,14 @@ namespace Aseba
 				streamMap.at(stream).incomingVariable(variables);
 		}
 
+		virtual void connectionClosed(Stream *stream, bool abnormal) override
+		{
+			zeroconf.forget(stream);
+		}
+
 	public:
-		Advertiser(const vector<string> & dashel_targets)
+		Advertiser(const vector<string> & dashel_targets):
+			zeroconf(*this)
 		{
 			for (auto const & dashel: dashel_targets)
 			{
@@ -153,7 +160,7 @@ namespace Aseba
 			run5s(); // wait for descriptions
 		}
 
-		void advertiseNodes(Aseba::Zeroconf & zeroconf)
+		void advertiseNodes()
 		{
 			for (auto & stream: streamMap)
 				stream.second.advertiseNodes(zeroconf);
@@ -196,9 +203,7 @@ int main(int argc, char* argv[])
 
 	Aseba::Advertiser hub(dashel_targets);
 	hub.requestProductIds();
-
-	Aseba::Zeroconf zeroconf;
-	hub.advertiseNodes(zeroconf);
+	hub.advertiseNodes();
 
 	hub.run();
 }
