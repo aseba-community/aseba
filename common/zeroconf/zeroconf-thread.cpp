@@ -35,7 +35,7 @@ namespace Aseba
 		running = false;
 		watcher.join(); // tell watcher to stop, to avoid std::terminate
 		// clear all targets
-		targetsBeingProcessed.clear();
+		targets.clear();
 		// deallocate remaining service references
 		for (auto serviceRef: serviceRefs)
 			DNSServiceRefDeallocate(serviceRef);

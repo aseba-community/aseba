@@ -38,7 +38,7 @@ namespace Aseba
 	DashelhubZeroconf::~DashelhubZeroconf()
 	{
 		// clear all targets
-		targetsBeingProcessed.clear();
+		targets.clear();
 		// clean-up remaining streams
 		cleanUpStreams(zeroconfStreams);
 		cleanUpStreams(pendingReleaseStreams);

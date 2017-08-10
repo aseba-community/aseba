@@ -31,7 +31,7 @@ namespace Aseba
 	QtZeroconf::~QtZeroconf()
 	{
 		// clear all targets
-		targetsBeingProcessed.clear();
+		targets.clear();
 	}
 
 	//! Set up function called after a discovery request has been made. The file

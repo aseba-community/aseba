@@ -34,28 +34,56 @@ namespace Aseba
 {
 	using namespace Dashel;
 
+	//! Advertise a target with a given name and port, with associated txtrec.
+	//! If the target already exists, its txtrec is updated.
 	void Zeroconf::advertise(const std::string & name, const int & port, const TxtRecord & txtrec)
 	{
-		// TODO: handle update
-		targetsBeingProcessed.emplace_back(name, port, *this);
-		registerTarget(targetsBeingProcessed.back(), txtrec);
+		auto targetIt(getTarget(name, port));
+		if (targetIt == targets.end())
+		{
+			// Target does not exist, create
+			targets.emplace_back(name, port, *this);
+			registerTarget(targets.back(), txtrec);
+		}
+		else
+		{
+			// Target does exist, update
+			updateTarget(*targetIt, txtrec);
+		}
 	}
 
-	void Zeroconf::advertise(const Dashel::Stream * dashelStream, const TxtRecord & txtrec)
+	//! Advertise a target for a given Dashel stream, with associated txtrec.
+	//! If the target already exists, its txtrec is updated.
+	void Zeroconf::advertise(const Dashel::Stream * stream, const TxtRecord & txtrec)
 	{
-		// TODO: handle update
-		targetsBeingProcessed.emplace_back(dashelStream, *this);
-		registerTarget(targetsBeingProcessed.back(), txtrec);
+		auto targetIt(getTarget(stream));
+		if (targetIt == targets.end())
+		{
+			// Target does not exist, create
+			targets.emplace_back(stream, *this);
+			registerTarget(targets.back(), txtrec);
+		}
+		else
+		{
+			// Target does exist, update
+			updateTarget(*targetIt, txtrec);
+		}
 	}
 
+	//! Forget a target with a given name and port, if the target is unknown, do nothing.
 	void Zeroconf::forget(const std::string & name, const int & port)
 	{
-		// TODO: implement
+		auto targetIt(getTarget(name, port));
+		if (targetIt != targets.end())
+			targets.erase(targetIt);
 	}
 
-	void Zeroconf::forget(const Dashel::Stream * dashelStream)
+	//! Forget a target for a given Dashel stream, if the target is unknown, do nothing.
+	void Zeroconf::forget(const Dashel::Stream * stream)
 	{
-		// TODO: implement
+		auto targetIt(getTarget(stream));
+		if (targetIt != targets.end())
+			targets.erase(targetIt);
 	}
 
 	//! A target can ask Zeroconf to register it in DNS, with additional information in a TXT record
@@ -97,8 +125,8 @@ namespace Aseba
 		{
 			// retrieve target
 			auto zeroconf(static_cast<Zeroconf *>(context));
-			auto targetIt(zeroconf->getTargetBeingProcessed(sdRef));
-			if (targetIt == zeroconf->targetsBeingProcessed.end())
+			auto targetIt(zeroconf->getTarget(sdRef));
+			if (targetIt == zeroconf->targets.end())
 				return;
 			Target& target(*targetIt);
 			// fill informations
@@ -128,8 +156,8 @@ namespace Aseba
 	//! A remote target can ask Zeroconf to resolve its host name and port
 	void Zeroconf::resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain)
 	{
-		targetsBeingProcessed.emplace_back(name, regtype, domain, *this);
-		Target& target(targetsBeingProcessed.back());
+		targets.emplace_back(name, regtype, domain, *this);
+		Target& target(targets.back());
 		auto err = DNSServiceResolve(&target.serviceRef,
 						 0, // no flags
 						 0, // default all interfaces
@@ -140,7 +168,7 @@ namespace Aseba
 						 this);
 		if (err != kDNSServiceErr_NoError)
 		{
-			targetsBeingProcessed.pop_back();
+			targets.pop_back();
 			throw Zeroconf::Error(FormatableString("DNSServiceResolve: error %0").arg(err));
 		}
 		else
@@ -160,12 +188,12 @@ namespace Aseba
 					    void *context)
 	{
 		auto zeroconf(static_cast<Zeroconf *>(context));
-		auto targetIt(zeroconf->getTargetBeingProcessed(sdRef));
-		if (targetIt == zeroconf->targetsBeingProcessed.end())
+		auto targetIt(zeroconf->getTarget(sdRef));
+		if (targetIt == zeroconf->targets.end())
 			return;
 		if (errorCode != kDNSServiceErr_NoError)
 		{
-			zeroconf->targetsBeingProcessed.erase(targetIt);
+			zeroconf->targets.erase(targetIt);
 			throw Zeroconf::Error(FormatableString("DNSServiceResolveReply: error %0").arg(errorCode));
 		}
 		else
@@ -179,7 +207,7 @@ namespace Aseba
 				target.properties[field.first] = field.second;
 			target.properties["fullname"] = string(fullname);
 			target.targetFound();
-			zeroconf->targetsBeingProcessed.erase(targetIt);
+			zeroconf->targets.erase(targetIt);
 		}
 	}
 
@@ -223,11 +251,26 @@ namespace Aseba
 		}
 	}
 
-	Zeroconf::Targets::iterator Zeroconf::getTargetBeingProcessed(DNSServiceRef serviceRef)
+	//! Return an iterator to the target holding a given service reference, return targets.end() if not found.
+	Zeroconf::Targets::iterator Zeroconf::getTarget(DNSServiceRef serviceRef)
 	{
-		return find_if(targetsBeingProcessed.begin(), targetsBeingProcessed.end(),
+		return find_if(targets.begin(), targets.end(),
 			[=] (const Target& target) { return target.serviceRef == serviceRef; }
 		);
+	}
+
+	//! Return an iterator to the target with a name and port, return targets.end() if not found.
+	Zeroconf::Targets::iterator Zeroconf::getTarget(const std::string & name, const int & port)
+	{
+		return find_if(targets.begin(), targets.end(),
+			[=] (const Target& target) { return target.name == name && target.port == port; }
+		);
+	}
+
+	//! Return an iterator to the target for a given Dashel stream, return targets.end() if not found.
+	Zeroconf::Targets::iterator Zeroconf::getTarget(const Dashel::Stream * stream)
+	{
+		return getTarget(stream->getTargetParameter("port"), atoi(stream->getTargetParameter("port").c_str()));
 	}
 
 } // namespace Aseba

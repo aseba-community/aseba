@@ -71,9 +71,9 @@ namespace Aseba
 
 		// Aseba::Zeroconf can advertise local targets
 		void advertise(const std::string & name, const int & port, const TxtRecord & txtrec);
-		void advertise(const Dashel::Stream * dashelStream, const TxtRecord & txtrec);
+		void advertise(const Dashel::Stream * stream, const TxtRecord & txtrec);
 		void forget(const std::string & name, const int & port);
-		void forget(const Dashel::Stream * dashelStream);
+		void forget(const Dashel::Stream * stream);
 
 		// Aseba::Zeroconf can request the listing of non-local targets by browsing the network
 		void browse();
@@ -83,7 +83,9 @@ namespace Aseba
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
-		Targets::iterator getTargetBeingProcessed(DNSServiceRef serviceRef);
+		Targets::iterator getTarget(DNSServiceRef serviceRef);
+		Targets::iterator getTarget(const std::string & name, const int & port);
+		Targets::iterator getTarget(const Dashel::Stream * stream);
 
 	protected:
 		// information callback for sub-class
@@ -92,19 +94,14 @@ namespace Aseba
 		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
 
 		// serviceRef registering/de-registering, to be implemented by subclasses
-		// FIXME: updated doc
-		//! The discovery request can be processed immediately, or can be registered with
-		//! an event loop for asynchronous processing.
-		//! Must be overridden in derived classes to set up asynchronous processing.
+		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available
 		virtual void processServiceRef(DNSServiceRef serviceRef) = 0;
-		// FIXME: updated doc
-		//! The discovery request must be unregistered with the event loop.
-		//! Must be overridden in derived classes to cleap up asynchronous processing.
+		//! Stop watching the file description associated with the service reference, and deallocate it afterwards (calling DNSServiceRefDeallocate)
 		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
 		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
-		Targets targetsBeingProcessed;
+		Targets targets;
 		//! The serviceRef for browse requests isn't attached to a target
 		DNSServiceRef browseServiceRef{nullptr};
 
