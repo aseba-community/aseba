@@ -100,7 +100,7 @@ namespace Aseba
 			auto targetIt(zeroconf->getTargetBeingProcessed(sdRef));
 			if (targetIt == zeroconf->targetsBeingProcessed.end())
 				return;
-			auto target(*targetIt);
+			Target& target(*targetIt);
 			// fill informations
 			target.name = name;
 			target.domain = domain;
@@ -129,7 +129,7 @@ namespace Aseba
 	void Zeroconf::resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain)
 	{
 		targetsBeingProcessed.emplace_back(name, regtype, domain, *this);
-		auto target(targetsBeingProcessed.back());
+		Target& target(targetsBeingProcessed.back());
 		auto err = DNSServiceResolve(&target.serviceRef,
 						 0, // no flags
 						 0, // default all interfaces
@@ -170,7 +170,7 @@ namespace Aseba
 		}
 		else
 		{
-			auto target(*targetIt);
+			Target& target(*targetIt);
 			target.host = hosttarget;
 			target.port = ntohs(port);
 			Aseba::Zeroconf::TxtRecord tnew{ txtRecord,txtLen };
