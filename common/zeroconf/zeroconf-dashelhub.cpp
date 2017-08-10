@@ -48,8 +48,9 @@ namespace Aseba
 		if (socket != -1)
 		{
 			string dashelTarget = FormatableString("tcppoll:sock=%0").arg(socket);
-			if (auto stream = hub.connect(dashelTarget))
-				zeroconfStreams.emplace(stream, serviceRef);
+			auto stream = hub.connect(dashelTarget);
+			assert(stream);
+			zeroconfStreams.emplace(stream, serviceRef);
 		}
 	}
 
