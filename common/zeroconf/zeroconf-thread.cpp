@@ -51,11 +51,7 @@ namespace Aseba
 			std::rethrow_exception(watcherException);
 	}
 
-	// FIXME: updated doc
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
+	//! With the lock held, insert the provided service reference to serviceRefs
 	void ThreadZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
 		assert(serviceRef);
@@ -64,6 +60,8 @@ namespace Aseba
 		serviceRefs.insert(serviceRef);
 	}
 
+	//! With the lock held, move the provided service reference from serviceRefs to
+	//! pendingReleaseServiceRefs, so that it will be released after the current call to select has completed.
 	void ThreadZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
 	{
 		if (!serviceRef)
@@ -74,7 +72,8 @@ namespace Aseba
 		pendingReleaseServiceRefs.insert(serviceRef);
 	}
 
-	//! Run the handleDSEvents_thread
+	//! When serviceRefs is not empty, for each service reference collect their associated
+	//! file descriptor and wait on them for activity using select.
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{
 		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)

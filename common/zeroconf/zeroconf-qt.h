@@ -62,11 +62,12 @@ namespace Aseba
 		std::map<int, ServiceRefSocketNotifier*> zeroconfSockets;
 	};
 
+	//! Extends a Qt socket notifier with the associated service reference
 	struct QtZeroconf::ServiceRefSocketNotifier: QSocketNotifier
 	{
 		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent);
 		~ServiceRefSocketNotifier();
-		DNSServiceRef serviceRef;
+		DNSServiceRef serviceRef; //!< the associated service reference
 	};
 }
 

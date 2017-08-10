@@ -33,8 +33,8 @@ namespace Aseba
 	//! processing as necessary.
 	//! This class creates a thread processing zeroconf requests in background
 	//! until this object is destroyed.
-	//! Completion callbacks such as browseCompleted are called within the background
-	//! thread with the watcherLock held.
+	//! Completion callbacks such as registeredCompleted, updateCompleted and
+	//! targetFound are called within the background thread with the watcherLock held.
 	class ThreadZeroconf : public Zeroconf
 	{
 	public:
@@ -51,9 +51,9 @@ namespace Aseba
 		void handleDnsServiceEvents();
 
 	private:
-		//! all the requests we are handling
-		std::unordered_set<DNSServiceRef> serviceRefs;
-		std::unordered_set<DNSServiceRef> pendingReleaseServiceRefs;
+		// all the requests we are handling
+		std::unordered_set<DNSServiceRef> serviceRefs; //!< service references to wait for activity using select
+		std::unordered_set<DNSServiceRef> pendingReleaseServiceRefs; //!< service references to be released once select exits
 		// threading support
 		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs

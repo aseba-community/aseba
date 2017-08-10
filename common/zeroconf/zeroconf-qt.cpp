@@ -34,10 +34,8 @@ namespace Aseba
 		targets.clear();
 	}
 
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
+	//! Create a socket notifier for the provided service reference, and start watching
+	//! its file descriptor for activity.
 	void QtZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
 		assert(serviceRef);
@@ -47,6 +45,8 @@ namespace Aseba
 		zeroconfSockets.emplace(notifier->socket(), notifier);
 	}
 
+	//! Remove the socket notifier associated with the provided service reference,
+	//! and later deallocate it (through Qt's deleteLater mechanism).
 	void QtZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
 	{
 		if (!serviceRef)
@@ -92,7 +92,7 @@ namespace Aseba
 		incomingData(zeroconfSockets.at(socket)->serviceRef);
 	}
 
-	//! Process incoming data associated to a discovery request
+	//! Process incoming data associated to a service reference
 	void QtZeroconf::incomingData(DNSServiceRef serviceRef)
 	{
 		DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
@@ -100,11 +100,13 @@ namespace Aseba
 			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
 	}
 
+	//! Create a Qt socket notifier in read mode for the file descriptor of the provided service reference
 	QtZeroconf::ServiceRefSocketNotifier::ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent):
 		QSocketNotifier(DNSServiceRefSockFD(serviceRef), QSocketNotifier::Read, parent),
 		serviceRef(serviceRef)
 	{ }
 
+	//! Deallocate the service reference
 	QtZeroconf::ServiceRefSocketNotifier::~ServiceRefSocketNotifier()
 	{
 		DNSServiceRefDeallocate(serviceRef);

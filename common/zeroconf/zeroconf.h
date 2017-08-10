@@ -54,8 +54,9 @@ namespace Aseba
 	/*@{*/
 
 	//! Aseba::Zeroconf provides methods for registering targets, updating target
-	//! descriptions, and browsing for targets. It runs a thread that watches the
-	//! DNS Service for updates, and triggers callback processing as necessary.
+	//! descriptions, and browsing for targets. The communication with the DNSSD
+	//! deamon is done through sockets, whose synchronisations are handled by
+	//! different subclasses: ThreadZeroconf, DashelhubZeroconf, and QtZeroconf.
 	class Zeroconf
 	{
 	public:
@@ -90,13 +91,15 @@ namespace Aseba
 	protected:
 		// information callback for sub-class
 		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a register is completed
-		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {}
+		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a txt update is completed
 		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
 
 		// serviceRef registering/de-registering, to be implemented by subclasses
-		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available
+		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available.
+		//! The service reference must be valid.
 		virtual void processServiceRef(DNSServiceRef serviceRef) = 0;
-		//! Stop watching the file description associated with the service reference, and deallocate it afterwards (calling DNSServiceRefDeallocate)
+		//! Stop watching the file description associated with the service reference, and deallocate it afterwards (calling DNSServiceRefDeallocate).
+		//! If the service reference is a nullptr, do nothing.
 		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
@@ -141,13 +144,7 @@ namespace Aseba
 		TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain);
 		TargetInformation(const std::string & name, const int port);
 		TargetInformation(const Dashel::Stream* dashelStream);
-
-		friend bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
-		friend bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 	};
-
-	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
-	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -174,16 +171,12 @@ namespace Aseba
 		void updateCompleted() const;
 		void targetFound() const;
 
-		friend bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs);
-
 	public:
 		DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
 
 	protected:
 		std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
 	};
-
-	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs);
 
 	/**
 	 \addtogroup zeroconf
@@ -228,20 +221,5 @@ namespace Aseba
 
 	/*@}*/
 } // namespace Aseba
-
-namespace std {
-	//! Hash for a zeroconf target information, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<Aseba::Zeroconf::TargetInformation> {};
-	//! Hash for a const zeroconf target information, use the generic point-based comparison
-	template <>
-	struct hash<const Aseba::Zeroconf::TargetInformation>: public Aseba::PointerHash<const Aseba::Zeroconf::TargetInformation> {};
-	//! Hash for a zeroconf target, use the generic point-based comparison
-	template <>
-	struct hash<Aseba::Zeroconf::Target>: public Aseba::PointerHash<Aseba::Zeroconf::Target> {};
-	//! Hash for a const zeroconf target, use the generic point-based comparison
-	template <>
-	struct hash<const Aseba::Zeroconf::Target>: public Aseba::PointerHash<const Aseba::Zeroconf::Target> {};
-} // namespace std
 
 #endif /* ASEBA_ZEROCONF */

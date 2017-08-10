@@ -25,6 +25,8 @@ using namespace std;
 
 namespace Aseba
 {
+	//! This target is described by a human-readable name, regtype, and domain.
+	//! It corresponds to a remote target on which that we want to resolve
 	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain):
 		name(name),
 		regtype(regtype),
@@ -32,21 +34,21 @@ namespace Aseba
 	{}
 
 	//! This target is described by a human-readable name and a port.
-	//! If a port is nonzero at creation then this is a local target to be remembered
-	//! otherwise it is a remote one discovered through browsing and may be refreshed.
-	//! Note that later the port will become nonzero if the target is resolved.
+	//! It corresponds to a local target being advertised.
 	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
 		name(name),
 		port(port)
 	{}
 
-	//! This target describes an existing Dashel stream
-	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
+	//! This target describes an existing Dashel stream.
+	//! It corresponds to a local target being advertised.
+	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
 	Zeroconf::TargetInformation::TargetInformation(const Dashel::Stream* stream) :
 		name("Aseba Local " + stream->getTargetParameter("port")),
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
+	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
 	Zeroconf::Target::Target(Target && rhs):
 		TargetInformation(move(rhs)),
 		container(move(rhs.container))
@@ -55,6 +57,7 @@ namespace Aseba
 		rhs.serviceRef = nullptr;
 	}
 
+	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
 	Zeroconf::Target& Zeroconf::Target::operator=(Target&& rhs)
 	{
 		TargetInformation::operator = (std::move(rhs));
@@ -63,28 +66,8 @@ namespace Aseba
 		return *this;
 	}
 
-	//! Are all fields equal?
-	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
-	{
-		return
-			lhs.name == rhs.name &&
-			lhs.domain == rhs.domain &&
-			lhs.regtype == rhs.regtype
-		;
-	}
-
-	//! Are all fields of this lower than fileds of that, in order?
-	bool operator<(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
-	{
-		return
-			lhs.name < rhs.name &&
-			lhs.domain < rhs.domain &&
-			lhs.regtype < rhs.regtype
-		;
-	}
-
 	//! This target is described by a human-readable name, regtype and domain.
-	//! It corresponds to a remote target on which that we want to resolve
+	//! It corresponds to a remote target on which that we want to resolve.
 	Zeroconf::Target::Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container):
 		Zeroconf::TargetInformation(name, regtype, domain),
 		container(container)
@@ -105,7 +88,8 @@ namespace Aseba
 		container(container)
 	{}
 
-	//! Destructor, release the serviceRef through the container
+	//! Destructor, release the serviceRef through the container,
+	//! which thus must be a valid object at that time.
 	Zeroconf::Target::~Target()
 	{
 		container.get().releaseServiceRef(serviceRef);
@@ -127,13 +111,6 @@ namespace Aseba
 	void Zeroconf::Target::targetFound() const
 	{
 		container.get().targetFound(*this);
-	}
-
-	//! Are the target information and the container equals?
-	bool operator==(const Zeroconf::Target& lhs, const Zeroconf::Target& rhs)
-	{
-		return static_cast<const Zeroconf::TargetInformation>(lhs) == static_cast<const Zeroconf::TargetInformation>(rhs) &&
-			&lhs.container == &rhs.container;
 	}
 
 } // namespace Aseba

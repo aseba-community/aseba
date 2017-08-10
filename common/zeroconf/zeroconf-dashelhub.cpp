@@ -44,10 +44,7 @@ namespace Aseba
 		cleanUpStreams(pendingReleaseStreams);
 	}
 
-	//! Set up function called after a discovery request has been made. The file
-	//! descriptor associated with zdr.serviceref must be watched, to know when to
-	//! call DNSServiceProcessResult, which in turn calls the callback that was
-	//! registered with the discovery request.
+	//! Create a Dashel tcppoll stream to watch the underlying file description of the provided service reference
 	void DashelhubZeroconf::processServiceRef(DNSServiceRef serviceRef)
 	{
 		assert(serviceRef);
@@ -62,6 +59,8 @@ namespace Aseba
 		}
 	}
 
+	//! Move the Dashel stream corresponding to the provided service reference to pendingReleaseStreams,
+	//! the list of streams that will be released after the end of the current Dashel step.
 	void DashelhubZeroconf::releaseServiceRef(DNSServiceRef serviceRef)
 	{
 		if (!serviceRef)
