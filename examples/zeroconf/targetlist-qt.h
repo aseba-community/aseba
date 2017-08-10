@@ -27,7 +27,7 @@ class QtTargetLister : public QCoreApplication
 {
 	Q_OBJECT
 
-public:
+protected:
 	Aseba::QtZeroconf targets;
 
 public:

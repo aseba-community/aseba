@@ -70,11 +70,15 @@ namespace Aseba
 
 		void run()
 		{
+			UnifiedTime left(10, 0);
 			do
 			{
-				dashelStep(-1);
-			} while (true);
-			// FIXME : stop after a while (todo.size() > 0);
+				UnifiedTime start;
+				dashelStep(left.value);
+				auto elapsed(UnifiedTime() - start);
+				if (elapsed > left)
+					break;
+			} while(true);
 		}
 	};
 }

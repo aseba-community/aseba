@@ -52,12 +52,8 @@ namespace Aseba
 	public:
 		void run()
 		{
-			UnifiedTime sleep{2,0};
-			do
-			{
-				sleep.sleep();
-			} while (true);// while (todo.size() > 0);;
-			// FIXME: stop after a while
+			// run 10 seconds
+			UnifiedTime(10, 0).sleep();
 		}
 	};
 }

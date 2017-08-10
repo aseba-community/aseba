@@ -20,13 +20,19 @@
 
 #include <iostream>
 #include <QCoreApplication>
+#include <QTimer>
 #include "targetlist-qt.h"
 
 using namespace std;
 
-QtTargetLister::QtTargetLister(int argc, char* argv[]) : QCoreApplication(argc, argv)
+QtTargetLister::QtTargetLister(int argc, char* argv[]) :
+	QCoreApplication(argc, argv)
 {
 	connect(&targets, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(targetFound(const Aseba::Zeroconf::TargetInformation&)));
+	// Browse for _aseba._tcp services on all interfaces
+	targets.browse();
+	// Run for 10 seconds
+	QTimer::singleShot(10000, this, SLOT(quit()));
 }
 
 void QtTargetLister::targetFound(const Aseba::Zeroconf::TargetInformation& target)
@@ -46,17 +52,10 @@ void QtTargetLister::targetFound(const Aseba::Zeroconf::TargetInformation& targe
 			cout << " " << field.second;
 		cout << endl;
 	}
-	// FIXME: stop after a while
-	/*if (todo.size() == 0)
-		exit(0); // QCoreApplication::exit*/
 }
 
 int main(int argc, char* argv[])
 {
 	QtTargetLister app(argc, argv);
-
-	// Browse for _aseba._tcp services on all interfaces
-	app.targets.browse();
-
 	return app.exec();
 }
