@@ -59,15 +59,10 @@ namespace Aseba
 	class Zeroconf
 	{
 	public:
-		class TxtRecord;
+		struct Error;
 		struct TargetInformation;
 		class Target;
-		//! An error in registering or browsing Zeroconf
-		struct Error: public std::runtime_error
-		{
-			Error(const std::string & what): std::runtime_error(what) {}
-		};
-		//! A vector of Target
+		class TxtRecord;
 		using Targets = std::vector<Target>;
 
 	public:
@@ -110,7 +105,7 @@ namespace Aseba
 		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
-		//! A map of all targets being processed indexed by their serviceRef
+		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
 		Targets targetsBeingProcessed;
 		//! The serviceRef for browse requests isn't attached to a target
 		DNSServiceRef browseServiceRef{nullptr};
@@ -120,6 +115,15 @@ namespace Aseba
 		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
 		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
 		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
+	};
+
+	/**
+	 \addtogroup zeroconf
+		An error in registering or browsing Zeroconf
+	*/
+	struct Zeroconf::Error: public std::runtime_error
+	{
+		Error(const std::string & what): std::runtime_error(what) {}
 	};
 
 	/**
