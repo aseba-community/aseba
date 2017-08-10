@@ -29,12 +29,18 @@ namespace Aseba
 {
 	using namespace Dashel;
 
-	//! Destructor, need to terminate the thread
+	//! Destructor, need to terminate the thread, clear all targets, and deallocate remaining service references
 	ThreadZeroconf::~ThreadZeroconf()
 	{
 		running = false;
 		watcher.join(); // tell watcher to stop, to avoid std::terminate
-		// TODO: delete all remaining references + browseServiceRef
+		// clear all targets
+		targetsBeingProcessed.clear();
+		// deallocate remaining service references
+		for (auto serviceRef: serviceRefs)
+			DNSServiceRefDeallocate(serviceRef);
+		for (auto serviceRef: pendingReleaseServiceRefs)
+			DNSServiceRefDeallocate(serviceRef);
 	}
 
 	//! Wait for the watcher thread to complete, rethrowing exceptions

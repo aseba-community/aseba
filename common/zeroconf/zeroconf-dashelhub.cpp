@@ -34,7 +34,15 @@ namespace Aseba
 		hub(hub)
 	{}
 
-	// TODO: add destructor to delete all remaining references + browseServiceRef
+	//! Clear all targets and clean-up remaining streams
+	DashelhubZeroconf::~DashelhubZeroconf()
+	{
+		// clear all targets
+		targetsBeingProcessed.clear();
+		// clean-up remaining streams
+		cleanUpStreams(zeroconfStreams);
+		cleanUpStreams(pendingReleaseStreams);
+	}
 
 	//! Set up function called after a discovery request has been made. The file
 	//! descriptor associated with zdr.serviceref must be watched, to know when to
@@ -93,16 +101,23 @@ namespace Aseba
 		zeroconfStreams.erase(stream);
 	}
 
+	//! Call Dashel::step and then delete all streams whose release where pending
 	bool DashelhubZeroconf::dashelStep(int timeout)
 	{
 		bool ret(hub.step(timeout));
-		for (auto& streamKV: pendingReleaseStreams)
+		cleanUpStreams(pendingReleaseStreams);
+		return ret;
+	}
+
+	//! Close all streams and deallocate their service reference
+	void DashelhubZeroconf::cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams)
+	{
+		for (auto& streamKV: streams)
 		{
 			hub.closeStream(streamKV.first);
 			DNSServiceRefDeallocate(streamKV.second);
 		}
-		pendingReleaseStreams.clear();
-		return ret;
+		streams.clear();
 	}
 
 } // namespace Aseba

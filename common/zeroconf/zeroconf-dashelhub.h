@@ -34,6 +34,7 @@ namespace Aseba
 	{
 	public:
 		DashelhubZeroconf(Dashel::Hub& hub);
+		~DashelhubZeroconf();
 
 		// To be called from similar functions in Dashel::Hub
 		void dashelIncomingData(Dashel::Stream * stream);
@@ -53,6 +54,9 @@ namespace Aseba
 		Dashel::Hub& hub;
 		//! Streams that dashelStep() will call closeStream() on, after the current Hub::step() is finished
 		std::map<Dashel::Stream *, DNSServiceRef> pendingReleaseStreams;
+
+	private:
+		void cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams);
 	};
 }
 

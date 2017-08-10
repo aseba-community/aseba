@@ -27,7 +27,12 @@ using namespace std;
 
 namespace Aseba
 {
-	// TODO: add destructor to delete all remaining references + browseServiceRef
+	//! Destructor, clear all targets
+	QtZeroconf::~QtZeroconf()
+	{
+		// clear all targets
+		targetsBeingProcessed.clear();
+	}
 
 	//! Set up function called after a discovery request has been made. The file
 	//! descriptor associated with zdr.serviceref must be watched, to know when to

@@ -38,6 +38,9 @@ namespace Aseba
 		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 
+	public:
+		virtual ~QtZeroconf();
+
 	protected slots:
 		void doIncoming(int socket);
 
