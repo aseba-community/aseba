@@ -34,13 +34,6 @@ namespace Aseba
 {
 	using namespace Dashel;
 
-	Zeroconf::Targets::iterator Zeroconf::getTargetBeingProcessed(DNSServiceRef serviceRef)
-	{
-		return find_if(targetsBeingProcessed.begin(), targetsBeingProcessed.end(),
-			[=] (const Target& target) { return target.serviceRef == serviceRef; }
-		);
-	}
-
 	void Zeroconf::advertise(const std::string & name, const int & port, const TxtRecord & txtrec)
 	{
 		// TODO: handle update
@@ -228,6 +221,13 @@ namespace Aseba
 			if (flags & kDNSServiceFlagsAdd)
 				zeroconf->resolveTarget(name, regtype, domain);
 		}
+	}
+
+	Zeroconf::Targets::iterator Zeroconf::getTargetBeingProcessed(DNSServiceRef serviceRef)
+	{
+		return find_if(targetsBeingProcessed.begin(), targetsBeingProcessed.end(),
+			[=] (const Target& target) { return target.serviceRef == serviceRef; }
+		);
 	}
 
 } // namespace Aseba

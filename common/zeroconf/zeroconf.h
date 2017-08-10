@@ -79,12 +79,10 @@ namespace Aseba
 		void browse();
 
 	protected:
-		// Requested through target
+		// helper functions
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
-
-		// helper function
 		Targets::iterator getTargetBeingProcessed(DNSServiceRef serviceRef);
 
 	protected:
