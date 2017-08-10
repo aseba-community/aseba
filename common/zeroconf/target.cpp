@@ -47,6 +47,22 @@ namespace Aseba
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
+	Zeroconf::Target::Target(Target && rhs):
+		TargetInformation(move(rhs)),
+		container(move(rhs.container))
+	{
+		serviceRef = rhs.serviceRef;
+		rhs.serviceRef = nullptr;
+	}
+
+	Zeroconf::Target& Zeroconf::Target::operator=(Target&& rhs)
+	{
+		TargetInformation::operator = (std::move(rhs));
+		serviceRef = rhs.serviceRef;
+		rhs.serviceRef = nullptr;
+		return *this;
+	}
+
 	//! Are all fields equal?
 	bool operator==(const Zeroconf::TargetInformation& lhs, const Zeroconf::TargetInformation& rhs)
 	{

@@ -91,7 +91,7 @@ namespace Aseba
 		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {}
 		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
 
-		// serviceRef registering/deregisctering, to be implemented by subclasses
+		// serviceRef registering/de-registering, to be implemented by subclasses
 		// FIXME: updated doc
 		//! The discovery request can be processed immediately, or can be registered with
 		//! an event loop for asynchronous processing.
@@ -163,6 +163,13 @@ namespace Aseba
 		Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container);
 		Target(const std::string & name, const int port, Zeroconf & container);
 		Target(const Dashel::Stream* dashelStream, Zeroconf & container);
+
+		// disable copy constructor and copy assigment operator
+		Target(const Target &) = delete;
+		Target& operator=(const Target&) = delete;
+		// implement move versions instead
+		Target(Target && rhs);
+		Target& operator=(Target&& rhs);
 
 		~Target();
 
