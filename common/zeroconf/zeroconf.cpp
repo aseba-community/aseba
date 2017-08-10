@@ -54,13 +54,13 @@ namespace Aseba
 
 	//! Advertise a target for a given Dashel stream, with associated txtrec.
 	//! If the target already exists, its txtrec is updated.
-	void Zeroconf::advertise(const Dashel::Stream * stream, const TxtRecord & txtrec)
+	void Zeroconf::advertise(const std::string & name, const Dashel::Stream * stream, const TxtRecord & txtrec)
 	{
 		auto targetIt(getTarget(stream));
 		if (targetIt == targets.end())
 		{
 			// Target does not exist, create
-			targets.emplace_back(stream, *this);
+			targets.emplace_back(name, stream, *this);
 			registerTarget(targets.back(), txtrec);
 		}
 		else

@@ -20,6 +20,7 @@
 
 #include <dashel/dashel.h>
 #include "zeroconf.h"
+#include "../../common/utils/FormatableString.h"
 
 using namespace std;
 
@@ -43,10 +44,16 @@ namespace Aseba
 	//! This target describes an existing Dashel stream.
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
-	Zeroconf::TargetInformation::TargetInformation(const Dashel::Stream* stream) :
-		name("Aseba Local " + stream->getTargetParameter("port")),
+	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const Dashel::Stream* stream) :
+		name(name),
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
+
+	//! Return a valid Dashel target string
+	std::string Zeroconf::TargetInformation::dashel() const
+	{
+		return FormatableString("tcp:%0;port=%1").arg(host).arg(port);
+	}
 
 	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
 	Zeroconf::Target::Target(Target && rhs):
@@ -83,8 +90,8 @@ namespace Aseba
 	//! This target describes an existing Dashel stream
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
-	Zeroconf::Target::Target(const Dashel::Stream* dashelStream, Zeroconf & container):
-		Zeroconf::TargetInformation(dashelStream),
+	Zeroconf::Target::Target(const std::string & name, const Dashel::Stream* dashelStream, Zeroconf & container):
+		Zeroconf::TargetInformation(name, dashelStream),
 		container(container)
 	{}
 

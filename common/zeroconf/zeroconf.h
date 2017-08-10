@@ -72,7 +72,7 @@ namespace Aseba
 
 		// Aseba::Zeroconf can advertise local targets
 		void advertise(const std::string & name, const int & port, const TxtRecord & txtrec);
-		void advertise(const Dashel::Stream * stream, const TxtRecord & txtrec);
+		void advertise(const std::string & name, const Dashel::Stream * stream, const TxtRecord & txtrec);
 		void forget(const std::string & name, const int & port);
 		void forget(const Dashel::Stream * stream);
 
@@ -143,7 +143,9 @@ namespace Aseba
 
 		TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain);
 		TargetInformation(const std::string & name, const int port);
-		TargetInformation(const Dashel::Stream* dashelStream);
+		TargetInformation(const std::string & name, const Dashel::Stream* dashelStream);
+
+		std::string dashel() const;
 	};
 
 	/**
@@ -156,7 +158,7 @@ namespace Aseba
 	public:
 		Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container);
 		Target(const std::string & name, const int port, Zeroconf & container);
-		Target(const Dashel::Stream* dashelStream, Zeroconf & container);
+		Target(const std::string & name, const Dashel::Stream* dashelStream, Zeroconf & container);
 
 		// disable copy constructor and copy assigment operator
 		Target(const Target &) = delete;
