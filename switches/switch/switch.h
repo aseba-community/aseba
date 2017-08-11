@@ -24,6 +24,9 @@
 #include <dashel/dashel.h>
 #include <map>
 #include "../../common/types.h"
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#endif // ZEROCONF_SUPPORT
 
 namespace Aseba
 {
@@ -43,8 +46,8 @@ namespace Aseba
 				@param dump should we dump content of each message
 				@param forward should we only forward messages instead of transmit them back to the sender
 			*/
-			Switch(unsigned port, bool verbose, bool dump, bool forward, bool rawTime);
-			
+			Switch(unsigned port, std::string name, bool verbose, bool dump, bool forward, bool rawTime);
+
 			/*! Forwards the data received for a connections to the other ones.
 				If forward is false, transmit it back to the sender too.
 				@param stream the stream the packet was received from
@@ -61,12 +64,22 @@ namespace Aseba
 			*/
 			void remapId(Dashel::Stream* stream, const uint16_t localId, const uint16_t targetId);
 			
+#ifdef ZEROCONF_SUPPORT
+			/*! The switch provides a Zeroconf service, used to advertise the switch
+			    and potentially the nodes it provides.
+			*/
+			Aseba::DashelhubZeroconf zeroconf;
+#endif // ZEROCONF_SUPPORT
+
 		private:
 			virtual void connectionCreated(Dashel::Stream *stream);
 			virtual void incomingData(Dashel::Stream *stream);
 			virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
 
 		private:
+#ifdef ZEROCONF_SUPPORT
+			std::string zeroconfName; //!< name of this switch, if we want to advertise it
+#endif // ZEROCONF_SUPPORT
 			bool verbose; //!< should we print a notification on each message
 			bool dump; //!< should we dump content of CAN messages
 			bool forward; //!< should we only forward messages instead of transmit them back to the sender
