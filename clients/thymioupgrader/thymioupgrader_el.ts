@@ -6,121 +6,121 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="108"/>
         <source>Thymio Firmware Upgrader</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναβάθμιση υλικολογισμικού του Thymio</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="129"/>
         <source>Latest official firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Πιο πρόσφατο επίσημο υλικολογισμικό</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="139"/>
         <source>Custom firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Αρχείο προσαρμοσμένου υλικολογισμικού</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="142"/>
         <source>Select...</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλογή...</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="158"/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναβάθμιση</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="161"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Ακύρωση</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="234"/>
         <source>Select hex file</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλογή δεκαεξαδικού αρχείου</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="234"/>
         <source>Hex files (*.hex)</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεκαεξαδικά αρχεία (*.hex)</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="289"/>
         <location filename="ThymioUpgrader.cpp" line="368"/>
         <source>Cannot connect to Thymio II</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν είναι δυνατή η σύνδεση με το Thymio II</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="289"/>
         <location filename="ThymioUpgrader.cpp" line="368"/>
         <source>Cannot connect to Thymio II: %1.&lt;p&gt;Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν είναι δυνατή η σύνδεση με το Thymio II: %1.&lt;p&gt;Πιθανότατα ένα άλλο πρόγραμμα είναι συνδεδεμένο αυτή τη στιγμή με το Thymio II. Βεβαιωθείτε ότι δεν εκτελούνται το Studio ή άλλη Αναβάθμιση και προσπαθήστε ξανά.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="295"/>
         <source>Thymio node identifier: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναγνωριστικό κόμβου Thymio: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="315"/>
         <source>Current firmware: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Τρέχον υλικολογισμικό: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="328"/>
         <source>version %1 - production</source>
-        <translation type="unfinished"></translation>
+        <translation>έκδοση %1 - παραγωγή</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="330"/>
         <source>version %1 - development %2</source>
-        <translation type="unfinished"></translation>
+        <translation>έκδοση %1 - ανάπτυξη %2</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="336"/>
         <source>Pre-upgrade warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Προειδοποίηση προ-αναβάθμισης</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="336"/>
-        <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the upgrade!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <source>You are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the upgrade!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
+        <translation>Πρόκειται να γράψετε νέο υλικολογισμικό στο Thymio II. Βεβαιωθείτε ότι το ρομπότ είναι φορτισμένο και ότι το καλώδιο USB είναι κατάλληλα συνδεδεμένο.&lt;p&gt;&lt;b&gt;Μην αποσυνδέσετε το ρομπότ κατά τη διάρκεια της αναβάθμισης!&lt;/b&gt;&lt;/p&gt;Είστε βέβαιοι ότι επιθυμείτε να συνεχίσετε;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="384"/>
         <location filename="ThymioUpgrader.cpp" line="388"/>
         <location filename="ThymioUpgrader.cpp" line="392"/>
         <source>Upgrade Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Σφάλμα Αναβάθμισης</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="384"/>
         <source>Unable to read Hex file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν είναι δυνατή η ανάγνωση του Δεκαεξαδικού αρχείου: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="388"/>
         <source>A bootloader error happened during the upgrade process: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Παρουσιάστηκε σφάλμα φόρτωσης εκκίνησης κατά τη διαδικασία αναβάθμισης: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="392"/>
         <source>A communication error happened during the upgrade process: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Παρουσιάστηκε σφάλμα επικοινωνίας κατά τη διαδικασία αναβάθμισης: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="468"/>
         <source>Official firmware: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Επίσημο υλικολογισμικό: %1</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="474"/>
         <source>Cannot open temporary file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν είναι δυνατό το άνοιγμα προσωρινού αρχείου!</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="482"/>
         <source>Error connecting to official firmware server!</source>
-        <translation type="unfinished"></translation>
+        <translation>Σφάλμα σύνδεσης με τον εξυπηρετητή επίσημου υλικολογισμικού!</translation>
     </message>
 </context>
 <context>
@@ -128,32 +128,32 @@
     <message>
         <location filename="ThymioUpgrader.cpp" line="523"/>
         <source>Wireless Thymio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Βρέθηκε ασύρματο Thymio</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="523"/>
         <source>&lt;p&gt;&lt;b&gt;Wireless connection to Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Βρέθηκε ασύρματη σύνδεση με Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Συνδέστε ένα Thymio στον υπολογιστή σας χρησιμοποιώντας το USB καλώδιο.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="528"/>
         <source>Thymio not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Δε βρέθηκε Thymio</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="528"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Δεν είναι δυνατή η εύρεση του Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Συνδέστε ένα Thymio στον υπολογιστή σας χρησιμοποιώντας το USB καλώδιο.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="533"/>
         <source>Multiple Thymios found</source>
-        <translation type="unfinished"></translation>
+        <translation>Βρέθηκαν πολλά Thymios</translation>
     </message>
     <message>
         <location filename="ThymioUpgrader.cpp" line="533"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Thymio found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single Thymio to your computer using the USB cable.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Βρέθηκαν περισσότερα από ένα Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Συνδέστε μόνο ένα Thymio στον υπολογιστή σας χρησιμοποιώντας το USB καλώδιο.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>
