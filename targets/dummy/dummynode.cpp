@@ -194,7 +194,11 @@ public:
 		// wait a given time, return if stop was called
 		Aseba::UnifiedTime startTime;
 		int timeout(variables.timerPeriod > 0 ? variables.timerPeriod : -1);
+#ifdef ZEROCONF_SUPPORT
 		while (zeroconf.dashelStep(timeout))
+#else // ZEROCONF_SUPPORT
+		while (step(timeout))
+#endif // ZEROCONF_SUPPORT
 		{
 			if (variables.timerPeriod > 0)
 			{
