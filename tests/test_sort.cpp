@@ -167,7 +167,7 @@ int main()
 		for (int i = 0; i < 16; i++) {
 			// first generate data
 			vector<vector<int16_t>> test_data;
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < 1000; j++) {
 				vector<int16_t> data(cur_size, 0);
 				generate(data.begin(), data.end(), test_case.func);
 				test_data.push_back(data);
