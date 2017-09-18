@@ -5,5 +5,6 @@
 	<file>thymiownetconfig_de.qm</file>
 	<file>thymiownetconfig_it.qm</file>
 	<file>thymiownetconfig_es.qm</file>
+	<file>thymiownetconfig_el.qm</file>
 </qresource>
 </RCC>
