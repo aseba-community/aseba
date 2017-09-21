@@ -52,7 +52,7 @@ namespace Aseba
 			}
 	}
 
-	Node* Node::deepCopy()
+	Node* Node::deepCopy() const
 	{
 		Node* newCopy = shallowCopy();
 		for (size_t i = 0; i < children.size(); i++)

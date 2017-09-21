@@ -58,9 +58,9 @@ namespace Aseba
 		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }		
 		virtual ~Node();
 		//! Return a shallow copy of the object (children point to the same objects)
-		virtual Node* shallowCopy() = 0;
+		virtual Node* shallowCopy() const = 0;
 		//! Return a deep copy of the object (children are also copied)
-		virtual Node* deepCopy();
+		virtual Node* deepCopy() const;
 		
 		//! Check the consistency in vectors' size
 		virtual void checkVectorSize() const;
@@ -107,7 +107,7 @@ namespace Aseba
 	{
 		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual BlockNode* shallowCopy() { return new BlockNode(*this); }
+		virtual BlockNode* shallowCopy() const override { return new BlockNode(*this); }
 
 		virtual Node* optimize(std::wostream* dump);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -120,7 +120,7 @@ namespace Aseba
 	{
 		//! Constructor
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
-		virtual ProgramNode* shallowCopy() { return new ProgramNode(*this); }
+		virtual ProgramNode* shallowCopy() const override { return new ProgramNode(*this); }
 
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual void emit(PreLinkBytecode& bytecodes) const;
@@ -136,7 +136,7 @@ namespace Aseba
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		AssignmentNode(const SourcePos& sourcePos, Node* left, Node* right);
-		virtual AssignmentNode* shallowCopy() { return new AssignmentNode(*this); }
+		virtual AssignmentNode* shallowCopy() const override { return new AssignmentNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
@@ -158,7 +158,7 @@ namespace Aseba
 		
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual IfWhenNode* shallowCopy() { return new IfWhenNode(*this); }
+		virtual IfWhenNode* shallowCopy() const override { return new IfWhenNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck(Compiler* compiler);
@@ -181,7 +181,7 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedIfWhenNode* shallowCopy() { return new FoldedIfWhenNode(*this); }
+		virtual FoldedIfWhenNode* shallowCopy() const override { return new FoldedIfWhenNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -198,7 +198,7 @@ namespace Aseba
 	{
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual WhileNode* shallowCopy() { return new WhileNode(*this); }
+		virtual WhileNode* shallowCopy() const override { return new WhileNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual ReturnType typeCheck(Compiler* compiler);
@@ -218,7 +218,7 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedWhileNode* shallowCopy() { return new FoldedWhileNode(*this); }
+		virtual FoldedWhileNode* shallowCopy() const override { return new FoldedWhileNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual Node* optimize(std::wostream* dump);
@@ -235,7 +235,7 @@ namespace Aseba
 		unsigned eventId; //!< the event id associated with this context
 		
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
-		virtual EventDeclNode* shallowCopy() { return new EventDeclNode(*this); }
+		virtual EventDeclNode* shallowCopy() const override { return new EventDeclNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -254,7 +254,7 @@ namespace Aseba
 		
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
-		virtual EmitNode* shallowCopy() { return new EmitNode(*this); }
+		virtual EmitNode* shallowCopy() const override { return new EmitNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -270,7 +270,7 @@ namespace Aseba
 		unsigned subroutineId; //!< the associated subroutine
 		
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual SubDeclNode* shallowCopy() { return new SubDeclNode(*this); }
+		virtual SubDeclNode* shallowCopy() const override { return new SubDeclNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -287,7 +287,7 @@ namespace Aseba
 		unsigned subroutineId;
 
 		CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName);
-		virtual CallSubNode* shallowCopy() { return new CallSubNode(*this); }
+		virtual CallSubNode* shallowCopy() const override { return new CallSubNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
@@ -305,7 +305,7 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual BinaryArithmeticNode* shallowCopy() { return new BinaryArithmeticNode(*this); }
+		virtual BinaryArithmeticNode* shallowCopy() const override { return new BinaryArithmeticNode(*this); }
 
 		void deMorganNotRemoval();
 		
@@ -332,7 +332,7 @@ namespace Aseba
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
-		virtual UnaryArithmeticNode* shallowCopy() { return new UnaryArithmeticNode(*this); }
+		virtual UnaryArithmeticNode* shallowCopy() const override { return new UnaryArithmeticNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler);
 		virtual Node* optimize(std::wostream* dump);
@@ -351,7 +351,7 @@ namespace Aseba
 		
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
-		virtual ImmediateNode* shallowCopy() { return new ImmediateNode(*this); }
+		virtual ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
 
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
@@ -372,7 +372,7 @@ namespace Aseba
 		
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual StoreNode* shallowCopy() { return new StoreNode(*this); }
+		virtual StoreNode* shallowCopy() const override { return new StoreNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -392,7 +392,7 @@ namespace Aseba
 
 		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual LoadNode* shallowCopy() { return new LoadNode(*this); }
+		virtual LoadNode* shallowCopy() const override { return new LoadNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -414,7 +414,7 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayWriteNode* shallowCopy() { return new ArrayWriteNode(*this); }
+		virtual ArrayWriteNode* shallowCopy() const override { return new ArrayWriteNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -435,7 +435,7 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayReadNode* shallowCopy() { return new ArrayReadNode(*this); }
+		virtual ArrayReadNode* shallowCopy() const override { return new ArrayReadNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -457,7 +457,7 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		
 		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
-		virtual LoadNativeArgNode* shallowCopy() { return new LoadNativeArgNode(*this); }
+		virtual LoadNativeArgNode* shallowCopy() const override { return new LoadNativeArgNode(*this); }
 		
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -475,7 +475,7 @@ namespace Aseba
 		std::vector<unsigned> templateArgs; //!< sizes of templated arguments
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
-		virtual CallNode* shallowCopy() { return new CallNode(*this); }
+		virtual CallNode* shallowCopy() const override { return new CallNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump);
@@ -490,7 +490,7 @@ namespace Aseba
 	struct ReturnNode : Node
 	{
 		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
-		virtual ReturnNode* shallowCopy() { return new ReturnNode(*this); }
+		virtual ReturnNode* shallowCopy() const override { return new ReturnNode(*this); }
 
 		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
 		virtual Node* optimize(std::wostream* dump) { return this; }
@@ -526,7 +526,7 @@ namespace Aseba
 		//! Constructor
 		TupleVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
 		TupleVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { children.push_back(new ImmediateNode(sourcePos, value)); }
-		virtual TupleVectorNode* shallowCopy() { return new TupleVectorNode(*this); }
+		virtual TupleVectorNode* shallowCopy() const override { return new TupleVectorNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
@@ -557,7 +557,7 @@ namespace Aseba
 		bool write; //!< expand to a node for storing or loading data?
 
 		MemoryVectorNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual MemoryVectorNode* shallowCopy() { return new MemoryVectorNode(*this); }
+		virtual MemoryVectorNode* shallowCopy() const override { return new MemoryVectorNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
@@ -581,7 +581,7 @@ namespace Aseba
 
 		//! Constructor
 		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual ArithmeticAssignmentNode* shallowCopy() { return new ArithmeticAssignmentNode(*this); }
+		virtual ArithmeticAssignmentNode* shallowCopy() const override { return new ArithmeticAssignmentNode(*this); }
 
 		virtual void checkVectorSize() const;
 		virtual Node* expandAbstractNodes(std::wostream* dump);
@@ -605,7 +605,7 @@ namespace Aseba
 
 		//! Constructor
 		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory);
-		virtual UnaryArithmeticAssignmentNode* shallowCopy() { return new UnaryArithmeticAssignmentNode(*this); }
+		virtual UnaryArithmeticAssignmentNode* shallowCopy() const override { return new UnaryArithmeticAssignmentNode(*this); }
 
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0) { abort(); } // should not happen
