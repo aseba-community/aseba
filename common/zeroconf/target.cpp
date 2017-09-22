@@ -19,6 +19,8 @@
  */
 
 #include <dashel/dashel.h>
+
+#include <utility>
 #include "zeroconf.h"
 #include "../../common/utils/FormatableString.h"
 
@@ -28,24 +30,24 @@ namespace Aseba
 {
 	//! This target is described by a human-readable name, regtype, and domain.
 	//! It corresponds to a remote target on which that we want to resolve
-	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain):
-		name(name),
-		regtype(regtype),
-		domain(domain)
+	Zeroconf::TargetInformation::TargetInformation(std::string name, std::string regtype, std::string domain):
+		name(std::move(name)),
+		regtype(std::move(regtype)),
+		domain(std::move(domain))
 	{}
 
 	//! This target is described by a human-readable name and a port.
 	//! It corresponds to a local target being advertised.
-	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const int port) :
-		name(name),
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const int port) :
+		name(std::move(name)),
 		port(port)
 	{}
 
 	//! This target describes an existing Dashel stream.
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
-	Zeroconf::TargetInformation::TargetInformation(const std::string & name, const Dashel::Stream* stream) :
-		name(name),
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const Dashel::Stream* stream) :
+		name(std::move(name)),
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
@@ -75,23 +77,23 @@ namespace Aseba
 
 	//! This target is described by a human-readable name, regtype and domain.
 	//! It corresponds to a remote target on which that we want to resolve.
-	Zeroconf::Target::Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container):
-		Zeroconf::TargetInformation(name, regtype, domain),
+	Zeroconf::Target::Target(std::string name, std::string regtype, std::string domain, Zeroconf & container):
+		Zeroconf::TargetInformation(std::move(name), std::move(regtype), std::move(domain)),
 		container(container)
 	{}
 
 	//! This target is described by a human-readable name and a port.
 	//! It corresponds to a local target being advertised.
-	Zeroconf::Target::Target(const std::string & name, const int port, Zeroconf & container):
-		Zeroconf::TargetInformation(name, port),
+	Zeroconf::Target::Target(std::string name, const int port, Zeroconf & container):
+		Zeroconf::TargetInformation(std::move(name), port),
 		container(container)
 	{}
 
 	//! This target describes an existing Dashel stream
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
-	Zeroconf::Target::Target(const std::string & name, const Dashel::Stream* dashelStream, Zeroconf & container):
-		Zeroconf::TargetInformation(name, dashelStream),
+	Zeroconf::Target::Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf & container):
+		Zeroconf::TargetInformation(std::move(name), dashelStream),
 		container(container)
 	{}
 

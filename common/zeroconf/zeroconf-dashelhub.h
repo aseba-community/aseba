@@ -34,7 +34,7 @@ namespace Aseba
 	{
 	public:
 		DashelhubZeroconf(Dashel::Hub& hub);
-		~DashelhubZeroconf();
+		~DashelhubZeroconf() override;
 
 		// To be called from similar functions in Dashel::Hub
 		void dashelIncomingData(Dashel::Stream * stream);
@@ -44,8 +44,8 @@ namespace Aseba
 
 	protected:
 		// From Zeroconf
-		virtual void processServiceRef(DNSServiceRef serviceRef) override;
-		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
+		void processServiceRef(DNSServiceRef serviceRef) override;
+		void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	private:
 		//! Reference to the hub to create connections from processDiscoveryRequest

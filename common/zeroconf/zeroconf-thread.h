@@ -39,14 +39,14 @@ namespace Aseba
 	class ThreadZeroconf : public Zeroconf
 	{
 	public:
-		virtual ~ThreadZeroconf() override;
+		~ThreadZeroconf() override;
 
 		void run();
 
 	protected:
 		// From Zeroconf
-		virtual void processServiceRef(DNSServiceRef serviceRef) override;
-		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
+		void processServiceRef(DNSServiceRef serviceRef) override;
+		void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	protected:
 		void handleDnsServiceEvents();

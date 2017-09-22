@@ -141,9 +141,9 @@ namespace Aseba
 
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
-		TargetInformation(const std::string & name, const std::string & regtype, const std::string & domain);
-		TargetInformation(const std::string & name, const int port);
-		TargetInformation(const std::string & name, const Dashel::Stream* dashelStream);
+		TargetInformation(std::string name, std::string regtype, std::string domain);
+		TargetInformation(std::string name, const int port);
+		TargetInformation(std::string name, const Dashel::Stream* dashelStream);
 
 		std::string dashel() const;
 	};
@@ -156,9 +156,9 @@ namespace Aseba
 	class Zeroconf::Target: public Zeroconf::TargetInformation
 	{
 	public:
-		Target(const std::string & name, const std::string & regtype, const std::string & domain, Zeroconf & container);
-		Target(const std::string & name, const int port, Zeroconf & container);
-		Target(const std::string & name, const Dashel::Stream* dashelStream, Zeroconf & container);
+		Target(std::string name, std::string regtype, std::string domain, Zeroconf & container);
+		Target(std::string name, const int port, Zeroconf & container);
+		Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf & container);
 
 		// disable copy constructor and copy assigment operator
 		Target(const Target &) = delete;

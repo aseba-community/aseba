@@ -39,19 +39,19 @@ namespace Aseba
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 
 	public:
-		virtual ~QtZeroconf();
+		~QtZeroconf() override;
 
 	protected slots:
 		void doIncoming(int socket);
 
 	protected:
 		// From Zeroconf
-		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
-		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
-		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
+		void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
+		void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
 
-		virtual void processServiceRef(DNSServiceRef serviceRef) override;
-		virtual void releaseServiceRef(DNSServiceRef serviceRef) override;
+		void processServiceRef(DNSServiceRef serviceRef) override;
+		void releaseServiceRef(DNSServiceRef serviceRef) override;
 
 	protected:
 		void incomingData(DNSServiceRef serviceRef);
@@ -66,7 +66,7 @@ namespace Aseba
 	struct QtZeroconf::ServiceRefSocketNotifier: QSocketNotifier
 	{
 		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent);
-		~ServiceRefSocketNotifier();
+		~ServiceRefSocketNotifier() override;
 		DNSServiceRef serviceRef; //!< the associated service reference
 	};
 }
