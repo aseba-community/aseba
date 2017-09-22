@@ -49,9 +49,9 @@ namespace Aseba
 		//! A type a node can return
 		enum ReturnType
 		{
-			TYPE_UNIT = 0,
-			TYPE_BOOL,
-			TYPE_INT
+			UNIT = 0,
+			BOOL,
+			INT
 		};
 		
 		//! Constructor
@@ -247,7 +247,7 @@ namespace Aseba
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		EventDeclNode* shallowCopy() const override { return new EventDeclNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -266,7 +266,7 @@ namespace Aseba
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
 		EmitNode* shallowCopy() const override { return new EmitNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -282,7 +282,7 @@ namespace Aseba
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
 		SubDeclNode* shallowCopy() const override { return new SubDeclNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -364,7 +364,7 @@ namespace Aseba
 		ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
 
 		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
 		void emit(PreLinkBytecode& bytecodes) const override;
@@ -384,7 +384,7 @@ namespace Aseba
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		StoreNode* shallowCopy() const override { return new StoreNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -404,7 +404,7 @@ namespace Aseba
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		LoadNode* shallowCopy() const override { return new LoadNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
 		void emit(PreLinkBytecode& bytecodes) const override;
@@ -426,7 +426,7 @@ namespace Aseba
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
 		ArrayWriteNode* shallowCopy() const override { return new ArrayWriteNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -447,7 +447,7 @@ namespace Aseba
 		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
 		ArrayReadNode* shallowCopy() const override { return new ArrayReadNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
@@ -469,7 +469,7 @@ namespace Aseba
 		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
 		LoadNativeArgNode* shallowCopy() const override { return new LoadNativeArgNode(*this); }
 		
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
 		void emit(PreLinkBytecode& bytecodes) const override;
@@ -487,7 +487,7 @@ namespace Aseba
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		CallNode* shallowCopy() const override { return new CallNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
 		void emit(PreLinkBytecode& bytecodes) const override;
@@ -502,7 +502,7 @@ namespace Aseba
 		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		ReturnNode* shallowCopy() const override { return new ReturnNode(*this); }
 
-		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
 		Node* optimize(std::wostream* dump) override { return this; }
 		unsigned getStackDepth() const override { return 0; }
 		void emit(PreLinkBytecode& bytecodes) const override;

@@ -31,10 +31,9 @@ namespace Aseba
 	{
 		switch (type)
 		{
-			case TYPE_UNIT: return L"unit"; 
-			case TYPE_BOOL: return L"bool";
-			case TYPE_INT: return L"integer";
-			default: abort(); return L"unknown";
+			case ReturnType::UNIT: return L"unit";
+			case ReturnType::BOOL: return L"bool";
+			case ReturnType::INT: return L"integer";
 		}
 	}
 	
@@ -50,22 +49,22 @@ namespace Aseba
 		{
 			(*it)->typeCheck(compiler);
 		}
-		return TYPE_UNIT;
+		return ReturnType::UNIT;
 	}
 	
 	Node::ReturnType AssignmentNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_UNIT, children[0]->typeCheck(compiler));
-		expectType(TYPE_INT, children[1]->typeCheck(compiler));
-		return TYPE_UNIT;
+		expectType(ReturnType::UNIT, children[0]->typeCheck(compiler));
+		expectType(ReturnType::INT, children[1]->typeCheck(compiler));
+		return ReturnType::UNIT;
 	}
 	
 	Node::ReturnType IfWhenNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
-		expectType(TYPE_UNIT, children[1]->typeCheck(compiler));
+		expectType(ReturnType::BOOL, children[0]->typeCheck(compiler));
+		expectType(ReturnType::UNIT, children[1]->typeCheck(compiler));
 		if (children.size() > 2)
-			expectType(TYPE_UNIT, children[2]->typeCheck(compiler));
+			expectType(ReturnType::UNIT, children[2]->typeCheck(compiler));
 		
 		auto* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		auto* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
@@ -77,13 +76,13 @@ namespace Aseba
 		
 		if (!ok)
 			throw TranslatableError(children[0]->sourcePos, ERROR_EXPECTING_CONDITION).arg(children[0]->toNodeName());
-		return TYPE_UNIT;
+		return ReturnType::UNIT;
 	}
 	
 	Node::ReturnType WhileNode::typeCheck(Compiler* compiler)
 	{
-		expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
-		expectType(TYPE_UNIT, children[1]->typeCheck(compiler));
+		expectType(ReturnType::BOOL, children[0]->typeCheck(compiler));
+		expectType(ReturnType::UNIT, children[1]->typeCheck(compiler));
 		
 		auto* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		auto* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
@@ -95,13 +94,13 @@ namespace Aseba
 		
 		if (!ok)
 			throw TranslatableError(children[0]->sourcePos, ERROR_EXPECTING_CONDITION).arg(children[0]->toNodeName());
-		return TYPE_UNIT;
+		return ReturnType::UNIT;
 	}
 	
 	Node::ReturnType CallSubNode::typeCheck(Compiler* compiler)
 	{
 		subroutineId = compiler->findSubroutine(subroutineName, sourcePos)->second;
-		return TYPE_UNIT;
+		return ReturnType::UNIT;
 	}
 
 	Node::ReturnType BinaryArithmeticNode::typeCheck(Compiler* compiler)
@@ -118,9 +117,9 @@ namespace Aseba
 			case ASEBA_OP_BIT_OR:
 			case ASEBA_OP_BIT_XOR:
 			case ASEBA_OP_BIT_AND:
-				expectType(TYPE_INT, children[0]->typeCheck(compiler));
-				expectType(TYPE_INT, children[1]->typeCheck(compiler));
-				return TYPE_INT;
+				expectType(ReturnType::INT, children[0]->typeCheck(compiler));
+				expectType(ReturnType::INT, children[1]->typeCheck(compiler));
+				return ReturnType::INT;
 			
 			case ASEBA_OP_EQUAL:
 			case ASEBA_OP_NOT_EQUAL:
@@ -128,19 +127,19 @@ namespace Aseba
 			case ASEBA_OP_BIGGER_EQUAL_THAN:
 			case ASEBA_OP_SMALLER_THAN:
 			case ASEBA_OP_SMALLER_EQUAL_THAN:
-				expectType(TYPE_INT, children[0]->typeCheck(compiler));
-				expectType(TYPE_INT, children[1]->typeCheck(compiler));
-				return TYPE_BOOL;
+				expectType(ReturnType::INT, children[0]->typeCheck(compiler));
+				expectType(ReturnType::INT, children[1]->typeCheck(compiler));
+				return ReturnType::BOOL;
 			
 			case ASEBA_OP_OR:
 			case ASEBA_OP_AND:
-				expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
-				expectType(TYPE_BOOL, children[1]->typeCheck(compiler));
-				return TYPE_BOOL;
+				expectType(ReturnType::BOOL, children[0]->typeCheck(compiler));
+				expectType(ReturnType::BOOL, children[1]->typeCheck(compiler));
+				return ReturnType::BOOL;
 				
 			default:
 				abort();
-				return TYPE_UNIT;
+				return ReturnType::UNIT;
 		}
 	}
 	
@@ -151,16 +150,16 @@ namespace Aseba
 			case ASEBA_UNARY_OP_SUB:
 			case ASEBA_UNARY_OP_ABS:
 			case ASEBA_UNARY_OP_BIT_NOT:
-				expectType(TYPE_INT, children[0]->typeCheck(compiler));
-				return TYPE_INT;
+				expectType(ReturnType::INT, children[0]->typeCheck(compiler));
+				return ReturnType::INT;
 			
 			case ASEBA_UNARY_OP_NOT:
-				expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
-				return TYPE_BOOL;
+				expectType(ReturnType::BOOL, children[0]->typeCheck(compiler));
+				return ReturnType::BOOL;
 			
 			default:
 				abort();
-				return TYPE_UNIT;
+				return ReturnType::UNIT;
 		}
 	}
 	
