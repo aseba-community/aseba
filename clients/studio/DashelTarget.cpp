@@ -147,10 +147,13 @@ namespace Aseba
 		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
+#ifdef ZEROCONF_SUPPORT
 		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
 		zeroconf.browse();
+#endif // ZEROCONF_SUPPORT
 	}
 	
+#ifdef ZEROCONF_SUPPORT
 	//! A target was found on zeroconf, add it to the list if not already present
 	void DashelConnectionDialog::zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target)
 	{
@@ -173,6 +176,7 @@ namespace Aseba
 		serial->addItem(item);
 		// TODO: make it pretty
 	}
+#endif // ZEROCONF_SUPPORT
 	
 	//! Update the port list, if toSelect is not empty, select the added item matching this name, return whether an item was selected
 	bool DashelConnectionDialog::updatePortList(const QString& toSelect)
