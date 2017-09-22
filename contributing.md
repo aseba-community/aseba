@@ -91,7 +91,7 @@ Use STL containers as much as possible, and avoid duplicating the information wh
 Use simple and clean class hierarchy whenever possible, use virtual inheritance only in the last resort.
 If a member can simply be accessed as public, let it so, do not put it private and add accessors.
 Always put a virtual destructor in base classes having virtual members, you can generate the default one using `virtual ~C() = default;`.
-Always use `virtual` and `override` keywords for inherited virtual methods.
+Always use `override` keyword for inherited virtual methods, do no re-specify `virtual`, as an overriden method must be virtual.
 
 ### File formats
 
