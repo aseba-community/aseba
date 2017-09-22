@@ -138,25 +138,25 @@ namespace Aseba
 					
 					// is some place to add
 					bool found = false;
-					for (ChunkMap::iterator it = data.begin(); it != data.end(); ++it)
+					for (auto & it : data)
 					{
-						size_t chunkSize = it->second.size();
-						if (address == it->first + chunkSize)
+						size_t chunkSize = it.second.size();
+						if (address == it.first + chunkSize)
 						{
 							// copy new
-							std::copy(recordData.begin(), recordData.end(), std::back_inserter(it->second));
+							std::copy(recordData.begin(), recordData.end(), std::back_inserter(it.second));
 							found = true;
 							//std::cout << "tail fusable chunk found\n";
 							break;
 						}
-						else if (address + recordData.size() == it->first)
+						else if (address + recordData.size() == it.first)
 						{
 							// resize
-							it->second.resize(chunkSize + recordData.size());
+							it.second.resize(chunkSize + recordData.size());
 							// move
-							std::copy_backward(it->second.begin(), it->second.begin() + chunkSize, it->second.end());
+							std::copy_backward(it.second.begin(), it.second.begin() + chunkSize, it.second.end());
 							// copy new
-							std::copy(recordData.begin(), recordData.end(), it->second.begin());
+							std::copy(recordData.begin(), recordData.end(), it.second.begin());
 							found = true;
 							//std::cout << "head fusable chunk found\n";
 							break;
@@ -169,7 +169,7 @@ namespace Aseba
 				
 				case 1:
 				// end of file record
-				for (ChunkMap::iterator it = data.begin(); it != data.end(); ++it)
+				for (auto it = data.begin(); it != data.end(); ++it)
 				{
 					//std::cout << "End of file found. Address " << it->first << " size " << it->second.size() << "\n";
 				}
@@ -322,14 +322,14 @@ namespace Aseba
 		// Build a page map.
 		typedef std::map<uint32_t, std::vector<uint8_t> > PageMap;
 		PageMap pageMap;
-		for (ChunkMap::iterator it = data.begin(); it != data.end(); it ++)
+		for (auto & it : data)
 		{
 			// get page number
-			unsigned chunkAddress = it->first;
+			unsigned chunkAddress = it.first;
 			// index inside data chunk
 			unsigned chunkDataIndex = 0;
 			// size of chunk in bytes
-			unsigned chunkSize = it->second.size();
+			unsigned chunkSize = it.second.size();
 
 			// copy data from chunk to page
 			do
@@ -347,7 +347,7 @@ namespace Aseba
 				}
 				// copy data
 				unsigned amountToCopy = std::min(pageSize - byteIndex, chunkSize - chunkDataIndex);
-				copy(it->second.begin() + chunkDataIndex, it->second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
+				copy(it.second.begin() + chunkDataIndex, it.second.begin() + chunkDataIndex + amountToCopy, pageMap[pageIndex].begin() + byteIndex);
 
 				// increment chunk data pointer
 				chunkDataIndex += amountToCopy;
@@ -358,17 +358,17 @@ namespace Aseba
 		// Now, for each page, drop it if empty
 		data.clear();
 		
-		for(PageMap::iterator it = pageMap.begin(); it != pageMap.end(); it++)
+		for(auto & it : pageMap)
 		{
 			int isempty = 1;
 			unsigned int i;
 			for(i = 0; i < pageSize; i+=4)
-				if(it->second[i] != 0xff || it->second[i+1] != 0xff || it->second[i+2] != 0xff) {
+				if(it.second[i] != 0xff || it.second[i+1] != 0xff || it.second[i+2] != 0xff) {
 					isempty = 0;
 					break;
 				}
 			if(!isempty)
-				data[it->first * pageSize] = it->second;
+				data[it.first * pageSize] = it.second;
 		}
 
 
@@ -388,11 +388,11 @@ namespace Aseba
 		ofs.fill('0');
 		
 		// for each chunk
-		for (ChunkMap::const_iterator it = data.begin(); it != data.end(); it++)
+		for (const auto & it : data)
 		{
 			// split address
-			unsigned address = it->first;
-			unsigned amount = it->second.size();
+			unsigned address = it.first;
+			unsigned amount = it.second.size();
 			
 			for (unsigned count = 0; count < amount;)
 			{
@@ -407,7 +407,7 @@ namespace Aseba
 				unsigned rowCount = std::min(amount - count, (unsigned)16);
 				unsigned lowAddress = (address + count) & 0xFFFF;
 				std::valarray<uint8_t> buffer(rowCount);
-				std::copy(it->second.begin() + count, it->second.begin() + count + rowCount, &buffer[0]);
+				std::copy(it.second.begin() + count, it.second.begin() + count + rowCount, &buffer[0]);
 				writeData(ofs, lowAddress, rowCount , &buffer[0]);
 				
 				// increment counters

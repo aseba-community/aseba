@@ -24,6 +24,7 @@
 #include "../types.h"
 #include "FormatableString.h"
 #include <map>
+#include <utility>
 #include <vector>
 #include <string>
 
@@ -34,7 +35,7 @@ namespace Aseba
 	public:
 		struct Error
 		{
-			virtual ~Error () { }
+			virtual ~Error () = default;
 			virtual std::string toString() const = 0;
 		};
 		
@@ -43,7 +44,7 @@ namespace Aseba
 			int line;
 			
 			EarlyEOF(int line) : line(line) { }
-			virtual std::string toString() const;
+			std::string toString() const override;
 		};
 		
 		struct InvalidRecord : Error
@@ -51,7 +52,7 @@ namespace Aseba
 			int line;
 			
 			InvalidRecord(int line) : line(line) { }
-			virtual std::string toString() const;
+			std::string toString() const override;
 		};
 		
 		struct WrongCheckSum : Error
@@ -65,7 +66,7 @@ namespace Aseba
 				recordCheckSum(recordCheckSum),
 				computedCheckSum(computedCheckSum)
 			{ }
-			virtual std::string toString() const;
+			std::string toString() const override;
 		};
 		
 		struct UnknownRecordType : Error
@@ -74,15 +75,15 @@ namespace Aseba
 			uint8_t recordType;
 			
 			UnknownRecordType(int line, uint8_t recordType) : line(line), recordType(recordType) { }
-			virtual std::string toString() const;
+			std::string toString() const override;
 		};
 		
 		struct FileOpeningError : Error
 		{
 			std::string fileName;
 			
-			FileOpeningError(const std::string &fileName) : fileName(fileName) { }
-			virtual std::string toString() const;
+			FileOpeningError(std::string fileName) : fileName(std::move(fileName)) { }
+			std::string toString() const override;
 		};
 		
 	public:

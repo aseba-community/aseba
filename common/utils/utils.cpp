@@ -27,8 +27,8 @@
 	#include <windows.h>
 	#define atoll _atoi64
 #endif // WIN32
-#include <time.h>
-#include <errno.h>
+#include <ctime>
+#include <cerrno>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
@@ -36,7 +36,7 @@
 #include <limits>
 #include <vector>
 #include <stdexcept>
-#include <stdint.h>
+#include <cstdint>
 #include "utils.h"
 
 // workaround for broken libstdc++ on Android
@@ -87,7 +87,7 @@ namespace Aseba
 		struct timespec ts;
 		ts.tv_sec = (value / 1000);
 		ts.tv_nsec = ((value % 1000) * 1000000);
-		nanosleep(&ts, 0);
+		nanosleep(&ts, nullptr);
 		#else // WIN32
 		assert(value <= 4294967295);
 		Sleep((DWORD)value);
@@ -170,10 +170,9 @@ namespace Aseba
 	std::string WStringToUTF8(const std::wstring& s)
 	{
 		std::string os;
-		for (size_t i = 0; i < s.length(); ++i)
+		for (wchar_t c : s)
 		{
-			const wchar_t c(s[i]);
-			if (c < 0x80)
+				if (c < 0x80)
 			{
 				os += static_cast<uint8_t>(c);
 			}
@@ -228,9 +227,9 @@ namespace Aseba
 	std::wstring UTF8ToWString(const std::string& s)
 	{
 		std::wstring res;
-		for (size_t i = 0; i < s.length(); ++i)
+		for (const char & c : s)
 		{
-			const char *a = &s[i];
+			const char *a = &c;
 			if (!(*a&128))
 			{
 				//Byte represents an ASCII character. Direct copy will do.
