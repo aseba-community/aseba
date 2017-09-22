@@ -78,7 +78,7 @@ if (NOT QT_QTDBUS_FOUND)
 endif ()
 
 # Qwt
-find_path(QWT_INCLUDE_DIR qwt_plot.h /usr/include/qwt5-qt4 /usr/include/qwt-qt4 /usr/local/include/qwt-qt4 /usr/include/qwt /usr/local/include/qwt)
+find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/ /usr/local/include PATH_SUFFIXES qwt5-qt4 qwt-qt4 qwt)
 find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
 
 # Zeroconf
