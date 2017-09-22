@@ -67,7 +67,13 @@ namespace Aseba
 		using Targets = std::vector<Target>;
 
 	public:
-		//! Default virtual destructor
+		// Default constructors and assignment operators
+		Zeroconf() = default;
+		Zeroconf(const Zeroconf&) = default;
+		Zeroconf& operator=(const Zeroconf&) = default;
+		Zeroconf(Zeroconf&&) = default;
+		Zeroconf& operator=(Zeroconf&& rhs) = default;
+		// Default virtual destructor
 		virtual ~Zeroconf() = default;
 
 		// Aseba::Zeroconf can advertise local targets

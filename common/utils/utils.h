@@ -196,7 +196,7 @@ namespace Aseba
 	
 	//! Clamp a value to a range
 	template<typename T>
-	T clamp(T v, T minV, T maxV)
+	constexpr T clamp(T v, T minV, T maxV)
 	{
 		return v < minV ? minV : (v > maxV ? maxV : v);
 	}
@@ -212,7 +212,7 @@ namespace std
 	struct hash<reference_wrapper<T>>
 	{
 		//! Hashes the reference to the underlying value
-		size_t operator()(const reference_wrapper<T>& r) const
+		size_t operator()(const reference_wrapper<T>& r) const noexcept
 		{
 			return std::hash<T>()(r.get());
 		}
