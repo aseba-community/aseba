@@ -55,7 +55,17 @@ namespace Aseba
 		};
 		
 		//! Constructor
-		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }		
+		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
+	protected:
+		// default copy-constructor, protected because we only want children to use it in their override of shallowCopy()
+		Node(const Node&) = default;
+	public:
+		// deleted assignment operator
+		Node& operator=(const Node&) = delete;
+		// deleted move constructor and assignment operator
+		Node(Node&&) = delete;
+		Node& operator=(Node&& rhs) = delete;
+		//! Destructor, delete all children
 		virtual ~Node();
 		//! Return a shallow copy of the object (children point to the same objects)
 		virtual Node* shallowCopy() const = 0;
