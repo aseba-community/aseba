@@ -24,6 +24,7 @@
 #include "../types.h"
 #include "../consts.h"
 #include "../../compiler/compiler.h"
+#include <utility>
 #include <vector>
 #include <string>
 #include <array>
@@ -111,14 +112,14 @@ namespace Aseba
 	
 	public:
 		UserMessage() : Message(ASEBA_MESSAGE_INVALID) { }
-		UserMessage(uint16_t type, const DataVector& data = DataVector()) : Message(type), data(data) { }
+		UserMessage(uint16_t type, DataVector  data = DataVector()) : Message(type), data(std::move(data)) { }
 		UserMessage(uint16_t type, const int16_t* data, const size_t length);
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "user message"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "user message"; }
 	};
 	
 	bool operator ==(const UserMessage &lhs, const UserMessage &rhs);
@@ -133,10 +134,10 @@ namespace Aseba
 		CmdMessage(uint16_t type, uint16_t dest) : Message(type), dest(dest) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "command message super class"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "command message super class"; }
 	};
 	
 	bool operator ==(const CmdMessage &lhs, const CmdMessage &rhs);
@@ -153,10 +154,10 @@ namespace Aseba
 		BootloaderDescription() : Message(ASEBA_MESSAGE_BOOTLOADER_DESCRIPTION) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "bootloader description"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "bootloader description"; }
 	};
 	
 	bool operator ==(const BootloaderDescription &lhs, const BootloaderDescription &rhs);
@@ -171,10 +172,10 @@ namespace Aseba
 		BootloaderDataRead() : Message(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "bootloader page data read"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "bootloader page data read"; }
 	};
 	
 	bool operator ==(const BootloaderDataRead &lhs, const BootloaderDataRead &rhs);
@@ -199,10 +200,10 @@ namespace Aseba
 		BootloaderAck() : Message(ASEBA_MESSAGE_BOOTLOADER_ACK) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "bootloader ack"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "bootloader ack"; }
 	};
 	
 	bool operator ==(const BootloaderAck &lhs, const BootloaderAck &rhs);
@@ -217,10 +218,10 @@ namespace Aseba
 		ListNodes() : Message(ASEBA_MESSAGE_LIST_NODES) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &) const override;
-		virtual operator const char * () const override { return "list nodes"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &) const override;
+		operator const char * () const override { return "list nodes"; }
 	};
 	
 	bool operator ==(const ListNodes &lhs, const ListNodes &rhs);
@@ -235,10 +236,10 @@ namespace Aseba
 		NodePresent() : Message(ASEBA_MESSAGE_NODE_PRESENT) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &) const override;
-		virtual operator const char * () const override { return "node present"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &) const override;
+		operator const char * () const override { return "node present"; }
 	};
 	
 	bool operator ==(const NodePresent &lhs, const NodePresent &rhs);
@@ -253,10 +254,10 @@ namespace Aseba
 		GetDescription() : Message(ASEBA_MESSAGE_GET_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &) const override;
-		virtual operator const char * () const override { return "presence"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &) const override;
+		operator const char * () const override { return "presence"; }
 	};
 	
 	bool operator ==(const GetDescription &lhs, const GetDescription &rhs);
@@ -271,10 +272,10 @@ namespace Aseba
 		GetNodeDescription(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_GET_NODE_DESCRIPTION, dest) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &) const override;
-		virtual operator const char * () const override { return "get node description"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &) const override;
+		operator const char * () const override { return "get node description"; }
 	};
 	
 	bool operator ==(const GetNodeDescription &lhs, const GetNodeDescription &rhs);
@@ -286,10 +287,10 @@ namespace Aseba
 		Description() : Message(ASEBA_MESSAGE_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "description"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "description"; }
 	};
 	
 	bool operator ==(const Description &lhs, const Description &rhs);
@@ -301,10 +302,10 @@ namespace Aseba
 		NamedVariableDescription() : Message(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "named variable"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "named variable"; }
 	};
 	
 	bool operator ==(const NamedVariableDescription &lhs, const NamedVariableDescription &rhs);
@@ -316,10 +317,10 @@ namespace Aseba
 		LocalEventDescription() : Message(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "local event"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "local event"; }
 	};
 	
 	bool operator ==(const LocalEventDescription &lhs, const LocalEventDescription &rhs);
@@ -331,10 +332,10 @@ namespace Aseba
 		NativeFunctionDescription() : Message(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "native function description"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "native function description"; }
 	};
 	
 	bool operator ==(const NativeFunctionDescription &lhs, const NativeFunctionDescription &rhs);
@@ -346,10 +347,10 @@ namespace Aseba
 		Disconnected() : Message(ASEBA_MESSAGE_DISCONNECTED) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override {}
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override {}
-		virtual void dumpSpecific(std::wostream &) const override {}
-		virtual operator const char * () const override { return "disconnected"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override {}
+		void deserializeSpecific(SerializationBuffer& buffer) override {}
+		void dumpSpecific(std::wostream &) const override {}
+		operator const char * () const override { return "disconnected"; }
 	};
 	
 	bool operator ==(const Disconnected &lhs, const Disconnected &rhs);
@@ -365,10 +366,10 @@ namespace Aseba
 		Variables() : Message(ASEBA_MESSAGE_VARIABLES) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "variables"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "variables"; }
 	};
 	
 	bool operator ==(const Variables &lhs, const Variables &rhs);
@@ -385,10 +386,10 @@ namespace Aseba
 		ArrayAccessOutOfBounds() : Message(ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "array access out of bounds"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "array access out of bounds"; }
 	};
 	
 	bool operator ==(const ArrayAccessOutOfBounds &lhs, const ArrayAccessOutOfBounds &rhs);
@@ -403,10 +404,10 @@ namespace Aseba
 		DivisionByZero() : Message(ASEBA_MESSAGE_DIVISION_BY_ZERO) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "division by zero"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "division by zero"; }
 	};
 	
 	bool operator ==(const DivisionByZero &lhs, const DivisionByZero &rhs);
@@ -421,10 +422,10 @@ namespace Aseba
 		EventExecutionKilled() : Message(ASEBA_MESSAGE_EVENT_EXECUTION_KILLED) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "event execution killed"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "event execution killed"; }
 	};
 	
 	bool operator ==(const EventExecutionKilled &lhs, const EventExecutionKilled &rhs);
@@ -440,10 +441,10 @@ namespace Aseba
 		NodeSpecificError() : Message(ASEBA_MESSAGE_NODE_SPECIFIC_ERROR) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &) const override;
-		virtual operator const char * () const override { return "node specific error"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &) const override;
+		operator const char * () const override { return "node specific error"; }
 	};
 	
 	bool operator ==(const NodeSpecificError &lhs, const NodeSpecificError &rhs);
@@ -459,10 +460,10 @@ namespace Aseba
 		ExecutionStateChanged() : Message(ASEBA_MESSAGE_EXECUTION_STATE_CHANGED) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "execution state"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "execution state"; }
 	};
 	
 	bool operator ==(const ExecutionStateChanged &lhs, const ExecutionStateChanged &rhs);
@@ -478,10 +479,10 @@ namespace Aseba
 		BreakpointSetResult() : Message(ASEBA_MESSAGE_BREAKPOINT_SET_RESULT) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "breakpoint set result"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "breakpoint set result"; }
 	};
 	
 	bool operator ==(const BreakpointSetResult &lhs, const BreakpointSetResult &rhs);
@@ -493,7 +494,7 @@ namespace Aseba
 		BootloaderReset(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_RESET, dest) { }
 	
 	protected:
-		virtual operator const char * () const override { return "bootloader reset"; }
+		operator const char * () const override { return "bootloader reset"; }
 	};
 	
 	bool operator ==(const BootloaderReset &lhs, const BootloaderReset &rhs);
@@ -508,10 +509,10 @@ namespace Aseba
 		BootloaderReadPage(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_READ_PAGE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "bootloader read page"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "bootloader read page"; }
 	};
 	
 	bool operator ==(const BootloaderReadPage &lhs, const BootloaderReadPage &rhs);
@@ -526,10 +527,10 @@ namespace Aseba
 		BootloaderWritePage(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override{ return "bootloader write page"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override{ return "bootloader write page"; }
 	};
 	
 	bool operator ==(const BootloaderWritePage &lhs, const BootloaderWritePage &rhs);
@@ -544,10 +545,10 @@ namespace Aseba
 		BootloaderPageDataWrite(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE, dest) { }
 	
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "bootloader page data write"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "bootloader page data write"; }
 	};
 	
 	bool operator ==(const BootloaderPageDataWrite &lhs, const BootloaderPageDataWrite &rhs);
@@ -564,10 +565,10 @@ namespace Aseba
 		SetBytecode(uint16_t dest, uint16_t start) : CmdMessage(ASEBA_MESSAGE_SET_BYTECODE, dest), start(start) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "set bytecode"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "set bytecode"; }
 	};
 	
 	bool operator ==(const SetBytecode &lhs, const SetBytecode &rhs);
@@ -584,7 +585,7 @@ namespace Aseba
 		Reset(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_RESET, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "reset"; }
+		operator const char * () const override { return "reset"; }
 	};
 	
 	bool operator ==(const Reset &lhs, const Reset &rhs);
@@ -596,7 +597,7 @@ namespace Aseba
 		Run(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_RUN, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "run"; }
+		operator const char * () const override { return "run"; }
 	};
 	
 	bool operator ==(const Run &lhs, const Run &rhs);
@@ -608,7 +609,7 @@ namespace Aseba
 		Pause(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_PAUSE, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "pause"; }
+		operator const char * () const override { return "pause"; }
 	};
 	
 	bool operator ==(const Pause &lhs, const Pause &rhs);
@@ -620,7 +621,7 @@ namespace Aseba
 		Step(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_STEP, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "step"; }
+		operator const char * () const override { return "step"; }
 	};
 	
 	bool operator ==(const Step &lhs, const Step &rhs);
@@ -632,7 +633,7 @@ namespace Aseba
 		Stop(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_STOP, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "stop"; }
+		operator const char * () const override { return "stop"; }
 	};
 	
 	bool operator ==(const Stop &lhs, const Stop &rhs);
@@ -644,7 +645,7 @@ namespace Aseba
 		GetExecutionState(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_GET_EXECUTION_STATE, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "get execution state"; }
+		operator const char * () const override { return "get execution state"; }
 	};
 	
 	bool operator ==(const GetExecutionState &lhs, const GetExecutionState &rhs);
@@ -660,10 +661,10 @@ namespace Aseba
 		BreakpointSet(uint16_t dest, uint16_t pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_SET, dest), pc(pc) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "breakpoint set"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "breakpoint set"; }
 	};
 	
 	bool operator ==(const BreakpointSet &lhs, const BreakpointSet &rhs);
@@ -679,10 +680,10 @@ namespace Aseba
 		BreakpointClear(uint16_t dest, uint16_t pc) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR, dest), pc(pc) { }
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "breakpoint clear"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "breakpoint clear"; }
 	};
 	
 	bool operator ==(const BreakpointClear &lhs, const BreakpointClear &rhs);
@@ -694,7 +695,7 @@ namespace Aseba
 		BreakpointClearAll(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_BREAKPOINT_CLEAR_ALL, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "breakpoint clear all"; }
+		operator const char * () const override { return "breakpoint clear all"; }
 	};
 	
 	bool operator ==(const BreakpointClearAll &lhs, const BreakpointClearAll &rhs);
@@ -711,10 +712,10 @@ namespace Aseba
 		GetVariables(uint16_t dest, uint16_t start, uint16_t length);
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "get variables"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "get variables"; }
 	};
 	
 	bool operator ==(const GetVariables &lhs, const GetVariables &rhs);
@@ -729,13 +730,13 @@ namespace Aseba
 		
 	public:
 		SetVariables() : CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, ASEBA_DEST_INVALID) { }
-		SetVariables(uint16_t dest, uint16_t start, const VariablesVector& variables);
+		SetVariables(uint16_t dest, uint16_t start, VariablesVector variables);
 		
 	protected:
-		virtual void serializeSpecific(SerializationBuffer& buffer) const override;
-		virtual void deserializeSpecific(SerializationBuffer& buffer) override;
-		virtual void dumpSpecific(std::wostream &stream) const override;
-		virtual operator const char * () const override { return "set variables"; }
+		void serializeSpecific(SerializationBuffer& buffer) const override;
+		void deserializeSpecific(SerializationBuffer& buffer) override;
+		void dumpSpecific(std::wostream &stream) const override;
+		operator const char * () const override { return "set variables"; }
 	};
 	
 	bool operator ==(const SetVariables &lhs, const SetVariables &rhs);
@@ -747,7 +748,7 @@ namespace Aseba
 		WriteBytecode(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_WRITE_BYTECODE, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "save bytecode"; }
+		operator const char * () const override { return "save bytecode"; }
 	};
 	
 	bool operator ==(const WriteBytecode &lhs, const WriteBytecode &rhs);
@@ -759,7 +760,7 @@ namespace Aseba
 		Reboot(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_REBOOT, dest) { }
 		
 	protected:
-		virtual operator const char * () const override { return "reboot"; }
+		operator const char * () const override { return "reboot"; }
 	};
 	
 	bool operator ==(const Reboot &lhs, const Reboot &rhs);
@@ -773,7 +774,7 @@ namespace Aseba
 		Sleep(uint16_t dest = ASEBA_DEST_INVALID) : CmdMessage(ASEBA_MESSAGE_SUSPEND_TO_RAM, dest) { }
 	
 	protected:
-		virtual operator const char * () const override { return "sleep"; }
+		operator const char * () const override { return "sleep"; }
 	};
 	
 	bool operator ==(const Sleep &lhs, const Sleep &rhs);

@@ -26,6 +26,7 @@
 #include <iomanip>
 #include <map>
 #include <iterator>
+#include <utility>
 #include <dashel/dashel.h>
 
 using namespace std;
@@ -114,7 +115,7 @@ namespace Aseba
 	
 	protected:
 		//! Pointer to constructor of class Message
-		typedef Message* (*CreatorFunc)();
+		using CreatorFunc = Message *(*)();
 		map<uint16_t, CreatorFunc> messagesTypes; //!< table of known messages types
 		
 		//! Create a new message of type Sub
@@ -157,7 +158,7 @@ namespace Aseba
 	{
 		SerializationBuffer buffer;
 		serializeSpecific(buffer);
-		uint16_t len = static_cast<uint16_t>(buffer.rawData.size());
+		auto len = static_cast<uint16_t>(buffer.rawData.size());
 		
 		if (len > ASEBA_MAX_EVENT_ARG_SIZE)
 		{
@@ -261,7 +262,7 @@ namespace Aseba
 		rawData.reserve(pos + sizeof(T));
 		
 		const T swappedVal(swapEndianCopy(val));
-		const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&swappedVal);
+		const auto *ptr = reinterpret_cast<const uint8_t *>(&swappedVal);
 
 		copy(ptr, ptr + sizeof(T), back_inserter(rawData));
 	}
@@ -298,7 +299,7 @@ namespace Aseba
 		size_t pos = readPos;
 		readPos += sizeof(T);
 		T val;
-		uint8_t *ptr = reinterpret_cast<uint8_t *>(&val);
+		auto *ptr = reinterpret_cast<uint8_t *>(&val);
 		copy(rawData.cbegin() + pos, rawData.cbegin() + pos + sizeof(T), ptr);
 		swapEndian(val);
 		return val;
@@ -1329,10 +1330,10 @@ namespace Aseba
 	
 	//
 	
-	SetVariables::SetVariables(uint16_t dest, uint16_t start, const VariablesVector& variables) :
+	SetVariables::SetVariables(uint16_t dest, uint16_t start, VariablesVector variables) :
 		CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, dest),
 		start(start),
-		variables(variables)
+		variables(std::move(variables))
 	{
 	}
 	

@@ -26,20 +26,11 @@ using namespace std;
 
 namespace Aseba
 {
-	NodesManager::Node::Node() :
-		namedVariablesReceptionCounter(0),
-		localEventsReceptionCounter(0),
-		nativeFunctionReceptionCounter(0),
-		connected(true)
-	{
-	}
-	
 	NodesManager::Node::Node(const TargetDescription& targetDescription) :
 		TargetDescription(targetDescription),
 		namedVariablesReceptionCounter(0),
 		localEventsReceptionCounter(0),
-		nativeFunctionReceptionCounter(0),
-		connected(true)
+		nativeFunctionReceptionCounter(0)
 	{
 	}
 	
@@ -60,16 +51,16 @@ namespace Aseba
 		const UnifiedTime now;
 		const UnifiedTime delayToDisconnect(3000);
 		bool isAnyConnected(false);
-		for (NodesMap::iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		for (auto & node : nodes)
 		{
 			// if node supports listing, 
-			if (nodeIt->second.protocolVersion >= 5 && (now - nodeIt->second.lastSeen) > delayToDisconnect && nodeIt->second.connected)
+			if (node.second.protocolVersion >= 5 && (now - node.second.lastSeen) > delayToDisconnect && node.second.connected)
 			{
-				nodeIt->second.connected = false;
-				nodeDisconnected(nodeIt->first);
+				node.second.connected = false;
+				nodeDisconnected(node.first);
 			}
 			// is this node connected?
-			isAnyConnected = isAnyConnected || nodeIt->second.connected;
+			isAnyConnected = isAnyConnected || node.second.connected;
 		}
 		
 		// if no node is connected, broadcast get description as well, for old targets (protocol 4)
@@ -83,7 +74,7 @@ namespace Aseba
 	void NodesManager::processMessage(const Message* message)
 	{
 		// check whether the node is known
-		NodesMap::iterator nodeIt(nodes.find(message->source));
+		auto nodeIt(nodes.find(message->source));
 		if (nodeIt == nodes.end())
 		{
 			// node is not known, so ignore excepted if the message type 
@@ -119,10 +110,10 @@ namespace Aseba
 		// if we have a disconnection message
 		{
 			// FIXME: handle disconnected state
-			const Disconnected *disconnected = dynamic_cast<const Disconnected *>(message);
+			const auto *disconnected = dynamic_cast<const Disconnected *>(message);
 			if (disconnected)
 			{
-				NodesMap::iterator nodeIt = nodes.find(disconnected->source);
+				auto nodeIt = nodes.find(disconnected->source);
 				assert (nodeIt != nodes.end());
 				nodes.erase(nodeIt);
 			}
@@ -130,10 +121,10 @@ namespace Aseba
 		
 		// if we have an initial description
 		{
-			const Description *description = dynamic_cast<const Description *>(message);
+			const auto *description = dynamic_cast<const Description *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto nodeIt = nodes.find(description->source);
 				
 				// We can receive a description twice, for instance if there is another IDE connected
 				if (nodeIt != nodes.end() || (mismatchingNodes.find(description->source) != mismatchingNodes.end()))
@@ -156,10 +147,10 @@ namespace Aseba
 		
 		// if we have a named variable description
 		{
-			const NamedVariableDescription *description = dynamic_cast<const NamedVariableDescription *>(message);
+			const auto *description = dynamic_cast<const NamedVariableDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array if array is empty
@@ -173,10 +164,10 @@ namespace Aseba
 		
 		// if we have a local event description
 		{
-			const LocalEventDescription *description = dynamic_cast<const LocalEventDescription *>(message);
+			const auto *description = dynamic_cast<const LocalEventDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array if array is empty
@@ -190,10 +181,10 @@ namespace Aseba
 		
 		// if we have a native function description
 		{
-			const NativeFunctionDescription *description = dynamic_cast<const NativeFunctionDescription *>(message);
+			const auto *description = dynamic_cast<const NativeFunctionDescription *>(message);
 			if (description)
 			{
-				NodesMap::iterator nodeIt = nodes.find(description->source);
+				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
 				
 				// copy description into array
@@ -218,7 +209,7 @@ namespace Aseba
 	
 	std::wstring NodesManager::getNodeName(unsigned nodeId) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto nodeIt = nodes.find(nodeId);
 		if (nodeIt != nodes.end())
 		{
 			return nodeIt->second.name;
@@ -234,17 +225,17 @@ namespace Aseba
 		// search for the first node with a given name
 		bool found(false);
 		unsigned foundId(0);
-		for (NodesMap::const_iterator nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+		for (const auto & node : nodes)
 		{
-			if (nodeIt->second.name == name)
+			if (node.second.name == name)
 			{
 				if (ok)
 					*ok = true;
 				
-				if (nodeIt->first == preferedId)
-					return nodeIt->first;
+				if (node.first == preferedId)
+					return node.first;
 				else if (!found)
-					foundId = nodeIt->first;
+					foundId = node.first;
 				
 				found = true;
 			}
@@ -262,14 +253,14 @@ namespace Aseba
 	
 	const TargetDescription * NodesManager::getDescription(unsigned nodeId, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt == nodes.end())
 		{
 			if (ok)
 				*ok = false;
-			return 0;
+			return nullptr;
 		}
 		
 		if (ok)
@@ -279,21 +270,21 @@ namespace Aseba
 	
 	unsigned NodesManager::getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt != nodes.end())
 		{
 			size_t pos = 0;
-			for (size_t i = 0; i < nodeIt->second.namedVariables.size(); ++i)
+			for (const auto & namedVariable : nodeIt->second.namedVariables)
 			{
-				if (nodeIt->second.namedVariables[i].name == name)
+				if (namedVariable.name == name)
 				{
 					if (ok)
 						*ok = true;
 					return pos;
 				}
-				pos += nodeIt->second.namedVariables[i].size;
+				pos += namedVariable.size;
 			}
 		}
 		
@@ -305,18 +296,18 @@ namespace Aseba
 	
 	unsigned NodesManager::getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
-		NodesMap::const_iterator nodeIt = nodes.find(nodeId);
+		auto nodeIt = nodes.find(nodeId);
 		
 		// node not found
 		if (nodeIt != nodes.end())
 		{
-			for (size_t i = 0; i < nodeIt->second.namedVariables.size(); ++i)
+			for (const auto & namedVariable : nodeIt->second.namedVariables)
 			{
-				if (nodeIt->second.namedVariables[i].name == name)
+				if (namedVariable.name == name)
 				{
 					if (ok)
 						*ok = true;
-					return nodeIt->second.namedVariables[i].size;
+					return namedVariable.size;
 				}
 			}
 		}

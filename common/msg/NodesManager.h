@@ -38,14 +38,14 @@ namespace Aseba
 		//! Potentially partial Descriptions of nodes along with their reception status
 		struct Node: public TargetDescription
 		{
-			Node();
+			Node() = default;
 			Node(const TargetDescription& targetDescription);
 			
-			unsigned namedVariablesReceptionCounter; //!< what is the status of the reception of named variables
-			unsigned localEventsReceptionCounter; //!< what is the status of the reception of local events
-			unsigned nativeFunctionReceptionCounter; //!< what is the status of the reception of native functions
+			unsigned namedVariablesReceptionCounter{0}; //!< what is the status of the reception of named variables
+			unsigned localEventsReceptionCounter{0}; //!< what is the status of the reception of local events
+			unsigned nativeFunctionReceptionCounter{0}; //!< what is the status of the reception of native functions
 			
-			bool connected; //!< whether this node is considered connected, on a "physical" level
+			bool connected{true}; //!< whether this node is considered connected, on a "physical" level
 			UnifiedTime lastSeen; //!< when this node was last seen?
 			
 			bool isComplete() const;
@@ -57,7 +57,7 @@ namespace Aseba
 		
 	public:
 		//! Virtual destructor
-		virtual ~NodesManager() {}
+		virtual ~NodesManager() = default;
 		
 		//! Ping the network to detect new nodes and ensure existing nodes are still here
 		void pingNetwork();
@@ -67,13 +67,13 @@ namespace Aseba
 		//! Return the name corresponding to a node identifier; if invalid, return the empty string
 		std::wstring getNodeName(unsigned nodeId) const;
 		//! Return the id of the node corresponding to name and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false. If several nodes have this name, either return preferedId if it exists otherwise return the first found.
-		unsigned getNodeId(const std::wstring& name, unsigned preferedId = 0, bool *ok = 0) const;
+		unsigned getNodeId(const std::wstring& name, unsigned preferedId = 0, bool *ok = nullptr) const;
 		//! Return the description of a node and set ok to true, if provided; if invalid, return 0 and set ok to false
-		const TargetDescription *getDescription(unsigned nodeId, bool *ok = 0) const;
+		const TargetDescription *getDescription(unsigned nodeId, bool *ok = nullptr) const;
 		//! Return the position of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
+		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = nullptr) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok = 0) const;
+		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok = nullptr) const;
 		//! Reset all descriptions, for instance when a network was disconnected and is reconnected
 		void reset();
 		
