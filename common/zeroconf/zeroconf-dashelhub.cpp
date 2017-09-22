@@ -22,6 +22,7 @@
 #include "../utils/utils.h"
 #include "../utils/FormatableString.h"
 #include "zeroconf-dashelhub.h"
+#include "dns_sd.h"
 
 using namespace std;
 

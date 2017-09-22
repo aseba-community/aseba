@@ -27,12 +27,22 @@
 #include "../utils/FormatableString.h"
 #include <dashel/dashel.h>
 #include "zeroconf.h"
+#include "dns_sd.h"
 
 using namespace std;
 
 namespace Aseba
 {
 	using namespace Dashel;
+
+	//! Callbacks for the DNS Service Discovery API, in a class to make it friend with Zeroconf
+	//! while not exposing the #include "dns_sd.h" in zeroconf.h
+	struct ZeroconfCallbacks
+	{
+		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
+		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
+		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
+	};
 
 	//! Advertise a target with a given name and port, with associated txtrec.
 	//! If the target already exists, its txtrec is updated.
@@ -102,7 +112,7 @@ namespace Aseba
 					      htons(target.port),
 					      len, // TXT length
 					      record, // TXT record
-					      cb_Register,
+					      ZeroconfCallbacks::cb_Register,
 					      this); // context pointer is Zeroconf
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
@@ -111,7 +121,7 @@ namespace Aseba
 	}
 
 	//! DNSSD callback for registerTarget, update Zeroconf::Target record with results of registration
-	void DNSSD_API Zeroconf::cb_Register(DNSServiceRef sdRef,
+	void DNSSD_API ZeroconfCallbacks::cb_Register(DNSServiceRef sdRef,
 					     DNSServiceFlags flags,
 					     DNSServiceErrorType errorCode,
 					     const char *name,
@@ -128,7 +138,7 @@ namespace Aseba
 			auto targetIt(zeroconf->getTarget(sdRef));
 			if (targetIt == zeroconf->targets.end())
 				return;
-			Target& target(*targetIt);
+			Zeroconf::Target& target(*targetIt);
 			// fill informations
 			target.name = name;
 			target.domain = domain;
@@ -164,7 +174,7 @@ namespace Aseba
 						 name.c_str(),
 						 regtype.c_str(),
 						 domain.c_str(),
-						 cb_Resolve,
+						 ZeroconfCallbacks::cb_Resolve,
 						 this);
 		if (err != kDNSServiceErr_NoError)
 		{
@@ -176,7 +186,7 @@ namespace Aseba
 	}
 
 	//! DNSSD callback for resolveTarget, update Zeroconf::Target record with results of lookup
-	void DNSSD_API Zeroconf::cb_Resolve(DNSServiceRef sdRef,
+	void DNSSD_API ZeroconfCallbacks::cb_Resolve(DNSServiceRef sdRef,
 					    DNSServiceFlags flags,
 					    uint32_t interfaceIndex,
 					    DNSServiceErrorType errorCode,
@@ -198,7 +208,7 @@ namespace Aseba
 		}
 		else
 		{
-			Target& target(*targetIt);
+			Zeroconf::Target& target(*targetIt);
 			target.host = hosttarget;
 			target.port = ntohs(port);
 			Aseba::Zeroconf::TxtRecord tnew{ txtRecord,txtLen };
@@ -220,7 +230,7 @@ namespace Aseba
 					    0, // default all interfaces
 					    "_aseba._tcp",
 					    nullptr, // use default domain, usually "local."
-					    cb_Browse,
+					    ZeroconfCallbacks::cb_Browse,
 					    this
 		);
 		if (err != kDNSServiceErr_NoError)
@@ -230,7 +240,7 @@ namespace Aseba
 	}
 
 	//! DNSSD callback for browse, update DiscoveryRequest record with results of browse
-	void DNSSD_API Zeroconf::cb_Browse(DNSServiceRef sdRef,
+	void DNSSD_API ZeroconfCallbacks::cb_Browse(DNSServiceRef sdRef,
 					   DNSServiceFlags flags,
 					   uint32_t interfaceIndex,
 					   DNSServiceErrorType errorCode,

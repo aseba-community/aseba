@@ -29,13 +29,15 @@
 #include <vector>
 #include <functional>
 #include <cmath>
-#include "dns_sd.h"
 #include "../utils/utils.h"
 
 namespace Dashel
 {
 	class Stream;
 }
+
+struct _DNSServiceRef_t;
+typedef struct _DNSServiceRef_t *DNSServiceRef;
 
 namespace Aseba
 {
@@ -87,6 +89,7 @@ namespace Aseba
 
 	protected:
 		// helper functions
+		friend struct ZeroconfCallbacks;
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
@@ -113,12 +116,6 @@ namespace Aseba
 		Targets targets;
 		//! The serviceRef for browse requests isn't attached to a target
 		DNSServiceRef browseServiceRef{nullptr};
-
-	protected:
-		// callbacks for the DNS Service Discovery API
-		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
-		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
-		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
 
 	/**

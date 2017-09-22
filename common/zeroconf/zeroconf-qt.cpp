@@ -22,6 +22,7 @@
 #include <QSignalMapper>
 #include "../utils/FormatableString.h"
 #include "zeroconf-qt.h"
+#include "dns_sd.h"
 
 using namespace std;
 
