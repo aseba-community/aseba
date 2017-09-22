@@ -34,6 +34,7 @@ namespace Aseba
 			case ReturnType::UNIT: return L"unit";
 			case ReturnType::BOOL: return L"bool";
 			case ReturnType::INT: return L"integer";
+			default: return L""; // cannot because ReturnType is a class enum, but gcc is too dump to notice
 		}
 	}
 	
