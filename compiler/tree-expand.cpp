@@ -20,6 +20,7 @@
 
 #include "compiler.h"
 #include "tree.h"
+#include "../common/utils/utils.h"
 #include "../common/utils/FormatableString.h"
 
 #include <cassert>
@@ -61,7 +62,7 @@ namespace Aseba
 		Node * child;
 		// recursively walk the tree and expand children
 		// if the child return a new pointer, delete the orphaned node
-		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		for (auto it = children.begin(); it != children.end();)
 		{
 			child = (*it)->expandAbstractNodes(dump);
 			if (child != *(it)) {
@@ -168,16 +169,16 @@ namespace Aseba
 	 * helper function to know if a MemoryVectorNode belonging to the tree of 'root' as a name
 	 * matching 'name'
 	 */
-	static bool matchNameInMemoryVector(Node *root, std::wstring name)
+	static bool matchNameInMemoryVector(const Node *root, std::wstring name)
 	{
 		// do I match?
-		MemoryVectorNode* vector = dynamic_cast<MemoryVectorNode*>(root);
+		auto* vector = dynamic_cast<const MemoryVectorNode*>(root);
 		if (vector && vector->arrayName == name)
 			return true;
 
 		// search inside children
-		for (unsigned int i = 0; i < root->children.size(); i++)
-			if (matchNameInMemoryVector(root->children[i], name))
+		for (const auto child : root->children)
+			if (matchNameInMemoryVector(child, name))
 				return true;
 
 		// definitly no match
@@ -201,8 +202,8 @@ namespace Aseba
 		newMe->children.clear();
 
 		// recursively walk the tree and expand children (of the newly created tree)
-		for (unsigned int i = 0; i < this->children.size(); i++)
-			newMe->children.push_back(this->children[i]->expandVectorialNodes(dump, compiler, index));
+		for (auto & child : this->children)
+			newMe->children.push_back(child->expandVectorialNodes(dump, compiler, index));
 
 		return newMe.release();
 	}
@@ -213,7 +214,7 @@ namespace Aseba
 		assert(children.size() == 2);
 
 		// left vector should reference a memory location
-		MemoryVectorNode* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
+		auto* leftVector = dynamic_cast<MemoryVectorNode*>(children[0]);
 		if (!leftVector)
 			throw TranslatableError(sourcePos, ERROR_INCORRECT_LEFT_VALUE).arg(children[0]->toNodeName());
 		leftVector->setWrite(true);
@@ -230,12 +231,12 @@ namespace Aseba
 
 			// tempVar = rightVector
 			std::unique_ptr<AssignmentNode> temp(compiler->allocateTemporaryVariable(sourcePos, rightVector->deepCopy()));
-			MemoryVectorNode* tempVar = dynamic_cast<MemoryVectorNode*>(temp->children[0]);
+			auto* tempVar = dynamic_cast<MemoryVectorNode*>(temp->children[0]);
 			assert(tempVar);
 			tempBlock->children.push_back(temp.release());
 
 			// leftVector = tempVar
-			temp.reset(new AssignmentNode(sourcePos, leftVector->deepCopy(), tempVar->deepCopy()));
+			temp = make_unique<AssignmentNode>(sourcePos, leftVector->deepCopy(), tempVar->deepCopy());
 			tempBlock->children.push_back(temp.release());
 
 			return tempBlock->expandVectorialNodes(dump, compiler); // tempBlock will be reclaimed
@@ -263,20 +264,20 @@ namespace Aseba
 
 		// as a TupleVectorNode can be composed of several sub-vectors, find which child
 		// corresponds to the index
-		for (size_t i = 0; i < children.size(); i++)
+		for (auto & child : children)
 		{
 			prevTotal = total;
-			total += children[i]->getVectorSize();
+			total += child->getVectorSize();
 			if (index < total)
 			{
 				// the index points to this child
-				return children[i]->expandVectorialNodes(dump, compiler, index-prevTotal);
+				return child->expandVectorialNodes(dump, compiler, index-prevTotal);
 			}
 		}
 
 		// should not happen !!
 		assert(0);
-		return 0;
+		return nullptr;
 	}
 
 	//! Expand to memory[index]
@@ -313,9 +314,9 @@ namespace Aseba
 
 			std::unique_ptr<Node> array;
 			if (write == true)
-				array.reset(new ArrayWriteNode(sourcePos, arrayAddr, arraySize, arrayName));
+				array = make_unique<ArrayWriteNode>(sourcePos, arrayAddr, arraySize, arrayName);
 			else
-				array.reset(new ArrayReadNode(sourcePos, arrayAddr, arraySize, arrayName));
+				array = make_unique<ArrayReadNode>(sourcePos, arrayAddr, arraySize, arrayName);
 
 			array->children.push_back(children[0]->expandVectorialNodes(dump, compiler, index));
 			return array.release();
@@ -338,7 +339,7 @@ namespace Aseba
 	void Node::checkVectorSize() const
 	{
 		// recursively walk the tree and expand children
-		for (NodesVector::const_iterator it = children.begin(); it != children.end();)
+		for (auto it = children.begin(); it != children.end();)
 		{
 			(*it)->checkVectorSize();
 			++it;
@@ -450,9 +451,9 @@ namespace Aseba
 		unsigned size = E_NOVAL;
 		unsigned new_size = E_NOVAL;
 
-		for (NodesVector::const_iterator it = children.begin(); it != children.end(); ++it)
+		for (auto it : children)
 		{
-			new_size = (*it)->getVectorSize();
+			new_size = it->getVectorSize();
 			if (size == E_NOVAL)
 				size = new_size;
 			else if (size != new_size)
@@ -485,7 +486,7 @@ namespace Aseba
 		// index(es) given?
 		if (children.size() == 1)
 		{
-			TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
+			auto* index = dynamic_cast<TupleVectorNode*>(children[0]);
 			if (index)
 			{
 				shift = index->getImmediateValue(0);
@@ -508,7 +509,7 @@ namespace Aseba
 
 		if (children.size() == 1)
 		{
-			TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
+			auto* index = dynamic_cast<TupleVectorNode*>(children[0]);
 			if (index)
 			{
 				unsigned numberOfIndex = index->getVectorSize();
@@ -550,7 +551,7 @@ namespace Aseba
 	{
 		if (children.empty())
 			return true;
-		TupleVectorNode* index = dynamic_cast<TupleVectorNode*>(children[0]);
+		auto* index = dynamic_cast<TupleVectorNode*>(children[0]);
 		if (index && index->children.size() <= 2 && index->isImmediateVector())
 			return true;
 		return false;
@@ -561,7 +562,7 @@ namespace Aseba
 		NodesVector::const_iterator it;
 		for (it = children.begin(); it != children.end(); it++)
 		{
-			ImmediateNode* node = dynamic_cast<ImmediateNode*>(*it);
+			auto* node = dynamic_cast<ImmediateNode*>(*it);
 			if (!node)
 				return false;
 		}
@@ -573,7 +574,7 @@ namespace Aseba
 	{
 		assert(index < getVectorSize());
 		assert(isImmediateVector());
-		ImmediateNode* node = dynamic_cast<ImmediateNode*>(children[index]);
+		auto* node = dynamic_cast<ImmediateNode*>(children[index]);
 		assert(node);
 		return node->value;
 	}

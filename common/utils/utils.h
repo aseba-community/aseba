@@ -51,7 +51,7 @@ namespace Aseba
 	template<typename Derived, typename Base>
 	static inline Derived polymorphic_downcast(Base base)
 	{
-		Derived derived = dynamic_cast<Derived>(base);
+		auto derived = dynamic_cast<Derived>(base);
 		if (!derived)
 			abort();
 		return derived;
@@ -63,7 +63,7 @@ namespace Aseba
 	{
 		if (!base)
 			return nullptr;
-		Derived derived = dynamic_cast<Derived>(base);
+		auto derived = dynamic_cast<Derived>(base);
 		if (!derived)
 			abort();
 		return derived;
@@ -83,7 +83,7 @@ namespace Aseba
 		//! Use the pointer shifted right by the number of 0 LSB
 		size_t operator()(const T& value) const
 		{
-			static const size_t shift = (size_t)std::log2(1 + sizeof(&value));
+			static const auto shift = (size_t)std::log2(1 + sizeof(&value));
 			return (size_t)(&value) >> shift;
 		}
 	};
@@ -92,7 +92,7 @@ namespace Aseba
 	struct UnifiedTime
 	{
 		//! storage for time
-		typedef long long unsigned Value;
+		using Value = unsigned long long;
 		//! time
 		Value value;
 		
@@ -112,13 +112,13 @@ namespace Aseba
 		//! Multiply time by an amount
 		void operator *=(const long long unsigned factor) { value *= factor; }
 		//! Add times
-		UnifiedTime operator +(const UnifiedTime &that) const { return UnifiedTime(value + that.value); }
+		UnifiedTime operator +(const UnifiedTime &that) const { return {value + that.value}; }
 		//! Substract times
-		UnifiedTime operator -(const UnifiedTime &that) const { return UnifiedTime(value - that.value); }
+		UnifiedTime operator -(const UnifiedTime &that) const { return {value - that.value}; }
 		//! Divide time by an amount
-		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return UnifiedTime(value / factor); }
+		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return {value / factor}; }
 		//! Multiply time by an amount
-		UnifiedTime operator *(const long long unsigned factor) const { return UnifiedTime(value * factor); }
+		UnifiedTime operator *(const long long unsigned factor) const { return {value * factor}; }
 		bool operator <(const UnifiedTime &that) const { return value < that.value; }
 		bool operator <=(const UnifiedTime &that) const { return value <= that.value; }
 		bool operator >(const UnifiedTime &that) const { return value > that.value; }
@@ -147,7 +147,7 @@ namespace Aseba
 	{
 	public:
 		//! A callback function
-		typedef const std::function< void() > Callback; 
+		using Callback = const std::function<void ()>;
 		//! The callback function, cannot change once initialized
 		Callback callback;
 		//! The current period, 0 disables the timer

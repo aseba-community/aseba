@@ -21,6 +21,7 @@
 #ifndef __ASEBA_COMPILER_H
 #define __ASEBA_COMPILER_H
 
+#include <utility>
 #include <vector>
 #include <deque>
 #include <string>
@@ -60,8 +61,8 @@ namespace Aseba
 		//! Description of target VM named variable
 		struct NamedVariable
 		{
-			NamedVariable(const std::wstring &name, unsigned size) : name(name), size(size) {}
-			NamedVariable() : size(0) {}
+			NamedVariable(std::wstring name, unsigned size) : name(std::move(name)), size(size) {}
+			NamedVariable() = default;
 			
 			std::wstring name; //!< name of the variable
 			unsigned size = 0; //!< size of variable in words
@@ -77,8 +78,8 @@ namespace Aseba
 		//! Typed parameter of native functions
 		struct NativeFunctionParameter
 		{
-			NativeFunctionParameter(const std::wstring &name, int size) : name(name), size(size) {}
-			NativeFunctionParameter() : size(0) {}
+			NativeFunctionParameter(std::wstring name, int size) : name(std::move(name)), size(size) {}
+			NativeFunctionParameter()  = default;
 			
 			std::wstring name; //!< name of the parameter
 			int size = 0; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
@@ -93,17 +94,17 @@ namespace Aseba
 		};
 		
 		std::wstring name; //!< node name
-		unsigned protocolVersion; //!< version of the aseba protocol
+		unsigned protocolVersion{0}; //!< version of the aseba protocol
 		
-		unsigned bytecodeSize; //!< total amount of bytecode space
-		unsigned variablesSize; //!< total amount of variables space
-		unsigned stackSize; //!< depth of execution stack
+		unsigned bytecodeSize{0}; //!< total amount of bytecode space
+		unsigned variablesSize{0}; //!< total amount of variables space
+		unsigned stackSize{0}; //!< depth of execution stack
 		
 		std::vector<NamedVariable> namedVariables; //!< named variables
 		std::vector<LocalEvent> localEvents; //!< events available locally on target
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 		
-		TargetDescription() : protocolVersion(0), bytecodeSize(0), variablesSize(0), stackSize(0) { }
+		TargetDescription()  = default;
 		uint16_t crc() const;
 		VariablesMap getVariablesMap(unsigned& freeVariableIndex) const;
 		FunctionsMap getFunctionsMap() const;
@@ -112,25 +113,25 @@ namespace Aseba
 	//! A bytecode element 
 	struct BytecodeElement
 	{
-		BytecodeElement() : bytecode(0xffff), line(0) { }
+		BytecodeElement() = default;
 		BytecodeElement(unsigned short bytecode) : bytecode(bytecode), line(0) { }
 		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) { }
 		operator unsigned short () const { return bytecode; }
 		unsigned getWordSize() const;
 		
-		unsigned short bytecode; //! bytecode itself
-		unsigned short line; //!< line in source code
+		unsigned short bytecode{0xffff}; //! bytecode itself
+		unsigned short line{0}; //!< line in source code
 	};
 	
 	//! Bytecode array in the form of a dequeue, for construction
 	struct BytecodeVector: std::deque<BytecodeElement>
 	{
 		//! Constructor
-		BytecodeVector() : maxStackDepth(0), callDepth(0), lastLine(0) { }
+		BytecodeVector() = default;
 		
-		unsigned maxStackDepth; //!< maximum depth of the stack used by all the computations of the bytecode
-		unsigned callDepth; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
-		unsigned lastLine; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
+		unsigned maxStackDepth{0}; //!< maximum depth of the stack used by all the computations of the bytecode
+		unsigned callDepth{0}; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
+		unsigned lastLine{0}; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
 		
 		void push_back(const BytecodeElement& be)
 		{
@@ -152,13 +153,13 @@ namespace Aseba
 	//! Position in a source file or string. First is line, second is column
 	struct SourcePos
 	{
-		unsigned character; //!< position in source text
-		unsigned row; //!< line in source text
-		unsigned column; //!< column in source text
-		bool valid; //!< true if character, row and column hold valid values
+		unsigned character{0}; //!< position in source text
+		unsigned row{0}; //!< line in source text
+		unsigned column{0}; //!< column in source text
+		bool valid{false}; //!< true if character, row and column hold valid values
 		
 		SourcePos(unsigned character, unsigned row, unsigned column) : character(character - 1), row(row), column(column - 1) { valid = true; }
-		SourcePos() : character(0), row(0), column(0), valid(false) { }
+		SourcePos() = default;
 		std::wstring toWString() const;
 	};
 	
@@ -169,7 +170,7 @@ namespace Aseba
 			ErrorMessages();
 
 			//! Type of the callback
-			typedef const std::wstring (*ErrorCallback)(ErrorCode error);
+			using ErrorCallback = const std::wstring (*)(ErrorCode);
 			//! Default callback
 			static const std::wstring defaultCallback(ErrorCode error);
 	};
@@ -180,7 +181,7 @@ namespace Aseba
 		SourcePos pos; //!< position of error in source string
 		std::wstring message; //!< message
 		//! Create an error at pos
-		Error(const SourcePos& pos, const std::wstring& message) : pos(pos), message(message) { }
+		Error(const SourcePos& pos, std::wstring  message) : pos(pos), message(std::move(message)) { }
 		//! Create an empty error
 		Error() { message = L"not defined"; }
 
@@ -198,7 +199,7 @@ namespace Aseba
 		TranslatableError &arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
 		TranslatableError &arg(const std::wstring& value);
 
-		Error toError(void);
+		Error toError();
 		static void setTranslateCB(ErrorMessages::ErrorCallback newCB);
 
 		static ErrorMessages::ErrorCallback translateCB;
@@ -206,35 +207,35 @@ namespace Aseba
 	};
 
 	//! Vector of names of variables
-	typedef std::vector<std::wstring> VariablesNamesVector;
+	using VariablesNamesVector = std::vector<std::wstring>;
 	
 	//! A name - value pair
 	struct NamedValue
 	{
 		//! Create a filled pair
-		NamedValue(const std::wstring& name, int value) : name(name), value(value) {}
+		NamedValue(std::wstring  name, int value) : name(std::move(name)), value(value) {}
 		
 		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
 	};
 	
 	//! An event description is a name - value pair
-	typedef NamedValue EventDescription;
+	using EventDescription = NamedValue;
 	
 	//! An constant definition is a name - value pair
-	typedef NamedValue ConstantDefinition;
+	using ConstantDefinition = NamedValue;
 	
 	//! Generic vector of name - value pairs
 	struct NamedValuesVector: public std::vector<NamedValue>
 	{
-		bool contains(const std::wstring& s, size_t* position = 0) const;
+		bool contains(const std::wstring& s, size_t* position = nullptr) const;
 	};
 	
 	//! Vector of events descriptions
-	typedef NamedValuesVector EventsDescriptionsVector;
+	using EventsDescriptionsVector = NamedValuesVector;
 	
 	//! Vector of constants definitions
-	typedef NamedValuesVector ConstantsDefinitions;
+	using ConstantsDefinitions = NamedValuesVector;
 	
 	//! Definitions common to several nodes, such as events or some constants
 	struct CommonDefinitions
@@ -249,7 +250,7 @@ namespace Aseba
 	};
 	
 	//! Vector of data of variables
-	typedef std::vector<short int> VariablesDataVector;
+	using VariablesDataVector = std::vector<short>;
 	
 	//! Aseba Event Scripting Language compiler
 	class Compiler
@@ -328,12 +329,12 @@ namespace Aseba
 				TOKEN_OP_PLUS_PLUS,
 				TOKEN_OP_MINUS_MINUS
 
-			} type; //!< type of this token
+			} type{TOKEN_END_OF_STREAM}; //!< type of this token
 			std::wstring sValue; //!< string version of the value
-			int iValue; //!< int version of the value, 0 if not applicable
+			int iValue{0}; //!< int version of the value, 0 if not applicable
 			SourcePos pos;//!< position of token in source code
 			
-			Token() : type(TOKEN_END_OF_STREAM), iValue(0) {}
+			Token()  = default;
 			Token(Type type, SourcePos pos = SourcePos(), const std::wstring& value = L"");
 			const std::wstring typeName() const;
 			std::wstring toWString() const;
@@ -347,14 +348,14 @@ namespace Aseba
 			unsigned address;
 			unsigned line;
 			
-			SubroutineDescriptor(const std::wstring& name, unsigned address, unsigned line) : name(name), address(address), line(line) {}
+			SubroutineDescriptor(std::wstring  name, unsigned address, unsigned line) : name(std::move(name)), address(address), line(line) {}
 		};
 		//! Lookup table for subroutines id => (name, address, line)
-		typedef std::vector<SubroutineDescriptor> SubroutineTable;
+		using SubroutineTable = std::vector<SubroutineDescriptor>;
 		//! Reverse Lookup table for subroutines name => id
 		typedef std::map<std::wstring, unsigned> SubroutineReverseTable;
 		//! Lookup table to keep track of implemented events
-		typedef std::set<unsigned> ImplementedEvents;
+		using ImplementedEvents = std::set<unsigned int>;
 		//! Lookup table for constant name => value
 		typedef std::map<std::wstring, int> ConstantsMap;
 		//! Lookup table for event name => id
@@ -370,7 +371,7 @@ namespace Aseba
 		const VariablesMap *getVariablesMap() const { return &variablesMap; }
 		const SubroutineTable *getSubroutineTable() const { return &subroutineTable; }
 		void setCommonDefinitions(const CommonDefinitions *definitions);
-		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = 0);
+		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = nullptr);
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
 		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		static bool isKeyword(const std::wstring& word);

@@ -46,22 +46,22 @@ namespace Aseba
 		crc = crcXModem(crc, bytecodeSize);
 		crc = crcXModem(crc, variablesSize);
 		crc = crcXModem(crc, stackSize);
-		for (size_t i = 0; i < namedVariables.size(); ++i)
+		for (const auto & namedVariable : namedVariables)
 		{
-			crc = crcXModem(crc, namedVariables[i].size);
-			crc = crcXModem(crc, namedVariables[i].name);
+			crc = crcXModem(crc, namedVariable.size);
+			crc = crcXModem(crc, namedVariable.name);
 		}
-		for (size_t i = 0; i < localEvents.size(); ++i)
+		for (const auto & localEvent : localEvents)
 		{
-			crc = crcXModem(crc, localEvents[i].name);
+			crc = crcXModem(crc, localEvent.name);
 		}
-		for (size_t i = 0; i < nativeFunctions.size(); ++i)
+		for (const auto & nativeFunction : nativeFunctions)
 		{
-			crc = crcXModem(crc, nativeFunctions[i].name);
-			for (size_t j = 0; j < nativeFunctions[i].parameters.size(); ++j)
+			crc = crcXModem(crc, nativeFunction.name);
+			for (size_t j = 0; j < nativeFunction.parameters.size(); ++j)
 			{
-				crc = crcXModem(crc, nativeFunctions[i].parameters[j].size);
-				crc = crcXModem(crc, nativeFunctions[i].parameters[j].name);
+				crc = crcXModem(crc, nativeFunction.parameters[j].size);
+				crc = crcXModem(crc, nativeFunction.parameters[j].name);
 			}
 		}
 		return crc;
@@ -72,11 +72,11 @@ namespace Aseba
 	{
 		freeVariableIndex = 0;
 		VariablesMap variablesMap;
-		for (unsigned i = 0; i < namedVariables.size(); i++)
+		for (const auto & namedVariable : namedVariables)
 		{
-			variablesMap[namedVariables[i].name] =
-			std::make_pair(freeVariableIndex, namedVariables[i].size);
-			freeVariableIndex += namedVariables[i].size;
+			variablesMap[namedVariable.name] =
+			std::make_pair(freeVariableIndex, namedVariable.size);
+			freeVariableIndex += namedVariable.size;
 		}
 		return variablesMap;
 	}
@@ -114,8 +114,8 @@ namespace Aseba
 	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
 	Compiler::Compiler()
 	{
-		targetDescription = 0;
-		commonDefinitions = 0;
+		targetDescription = nullptr;
+		commonDefinitions = nullptr;
 		freeVariableIndex = 0;
 		endVariableIndex = 0;
 		TranslatableError::setTranslateCB(ErrorMessages::defaultCallback);
@@ -343,33 +343,24 @@ namespace Aseba
 		bytecode.push_back(addr);
 		
 		// events
-		for (PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.begin();
-			it != preLinkBytecode.events.end();
-			++it
-		)
+		for (const auto & event : preLinkBytecode.events)
 		{
-			bytecode.push_back(it->first);		// id
+			bytecode.push_back(event.first);		// id
 			bytecode.push_back(addr);			// addr
-			addr += it->second.size();			// next bytecode addr
+			addr += event.second.size();			// next bytecode addr
 		}
 		
 		// evPreLinkBytecode::ents bytecode
-		for (PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.begin();
-			it != preLinkBytecode.events.end();
-			++it
-		)
+		for (const auto & event : preLinkBytecode.events)
 		{
-			std::copy(it->second.begin(), it->second.end(), std::back_inserter(bytecode));
+			std::copy(event.second.begin(), event.second.end(), std::back_inserter(bytecode));
 		}
 		
 		// subrountines bytecode
-		for (PreLinkBytecode::SubroutinesBytecode::const_iterator it = preLinkBytecode.subroutines.begin();
-			it != preLinkBytecode.subroutines.end();
-			++it
-		)
+		for (const auto & subroutine : preLinkBytecode.subroutines)
 		{
-			subroutineTable[it->first].address = bytecode.size();
-			std::copy(it->second.begin(), it->second.end(), std::back_inserter(bytecode));
+			subroutineTable[subroutine.first].address = bytecode.size();
+			std::copy(subroutine.second.begin(), subroutine.second.end(), std::back_inserter(bytecode));
 		}
 		
 		// resolve subroutines call addresses
@@ -475,14 +466,14 @@ namespace Aseba
 					}
 				}
 				
-				PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.events.find(eventId);
+				auto it = preLinkBytecode.events.find(eventId);
 				assert(it != preLinkBytecode.events.end());
 				dump << " (max stack " << it->second.maxStackDepth << ")\n";
 			}
 			
 			if (subroutinesAddr.find(pc) != subroutinesAddr.end())
 			{
-				PreLinkBytecode::EventsBytecode::const_iterator it = preLinkBytecode.subroutines.find(subroutinesAddr[pc]);
+				auto it = preLinkBytecode.subroutines.find(subroutinesAddr[pc]);
 				assert(it != preLinkBytecode.subroutines.end());
 				dump << "sub " << subroutineTable[subroutinesAddr[pc]].name << ": (max stack " << it->second.maxStackDepth << ")\n";
 			}
@@ -576,9 +567,9 @@ namespace Aseba
 				{
 					unsigned address = (bytecode[pc] & 0x0fff);
 					std::wstring name(L"unknown");
-					for (size_t i = 0; i < subroutineTable.size(); i++)
-						if (subroutineTable[i].address == address)
-							name = subroutineTable[i].name;
+					for (const auto & i : subroutineTable)
+						if (i.address == address)
+							name = i.name;
 					dump << "SUB_CALL to " << name << " @ " << address << "\n";
 					pc++;
 				}

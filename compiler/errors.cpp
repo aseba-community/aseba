@@ -211,7 +211,7 @@ namespace Aseba
 		message = translateCB(error);
 	}
 
-	Error TranslatableError::toError(void)
+	Error TranslatableError::toError()
 	{
 		return Error(pos, message);
 	}

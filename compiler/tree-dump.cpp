@@ -77,8 +77,8 @@ namespace Aseba
 			dest << L"    ";
 		dest << toWString() << L"\n";
 		indent++;
-		for (size_t i = 0; i < children.size(); i++)
-			children[i]->dump(dest, indent);
+		for (auto child : children)
+			child->dump(dest, indent);
 		indent--;
 	}
 

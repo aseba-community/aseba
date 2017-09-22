@@ -658,9 +658,9 @@ namespace Aseba
 			// start and end indexes are the same, loop
 		
 			// create while and condition
-			WhileNode* whileNode = new WhileNode(whilePos);
+			auto* whileNode = new WhileNode(whilePos);
 			blockNode->children.push_back(whileNode);
-			BinaryArithmeticNode* comparisonNode = new BinaryArithmeticNode(whilePos);
+			auto* comparisonNode = new BinaryArithmeticNode(whilePos);
 			whileNode->children.push_back(comparisonNode);
 			comparisonNode->children.push_back(variableRef->deepCopy());
 			if (rangeStartIndex <= rangeEndIndex)
@@ -675,7 +675,7 @@ namespace Aseba
 				whileNode->children[1]->children.push_back(parseBlockStatement());
 			
 			// increment variable
-			AssignmentNode* assignmentNode = new AssignmentNode(varPos,
+			auto* assignmentNode = new AssignmentNode(varPos,
 										variableRef->deepCopy(),
 										new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
 			whileNode->children[1]->children.push_back(assignmentNode);
@@ -799,7 +799,7 @@ namespace Aseba
 			throw TranslatableError(tokens.front().pos, ERROR_SUBROUTINE_ALREADY_DEF).arg(name);
 		
 		const unsigned subroutineId = subroutineTable.size();
-		subroutineTable.push_back(SubroutineDescriptor(name, 0, pos.row));
+		subroutineTable.emplace_back(name, 0, pos.row);
 		subroutineReverseTable[name] = subroutineId;
 		
 		tokens.pop_front();
@@ -1177,7 +1177,7 @@ namespace Aseba
 			else
 				tokens.pop_front();
 		}
-		while (1);
+		while (true);
 
 		if (!compatibility)
 		{
@@ -1210,7 +1210,7 @@ namespace Aseba
 		expect(Token::TOKEN_STRING_LITERAL);
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
-		VariablesMap::const_iterator varIt(findVariable(varName, varPos));
+		auto varIt(findVariable(varName, varPos));
 
 		std::unique_ptr<MemoryVectorNode> vector(
 					new MemoryVectorNode(
@@ -1356,12 +1356,12 @@ namespace Aseba
 		// valid optimization?
 		if ( !tempTree2.get() || tempTree2->children.size() == 0 )
 			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
-		AssignmentNode* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
+		auto* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
 		if ( !assignment || assignment->children.size() != 2 )
 			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 
 		// resolve to an ImmediateNode?
-		ImmediateNode* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
+		auto* immediate = dynamic_cast<ImmediateNode*>(assignment->children[1]);
 		if (immediate)
 			result = immediate->value;
 		else
@@ -1382,7 +1382,7 @@ namespace Aseba
 		expect(Token::TOKEN_STRING_LITERAL);
 		
 		std::wstring funcName = tokens.front().sValue;
-		FunctionsMap::const_iterator funcIt(findFunction(funcName, pos));
+		auto funcIt(findFunction(funcName, pos));
 		
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
 		std::unique_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
@@ -1402,8 +1402,8 @@ namespace Aseba
 		{
 			// count the number of template parameters and build array
 			int minTemplateId = 0;
-			for (unsigned i = 0; i < function.parameters.size(); i++)
-				minTemplateId = std::min(function.parameters[i].size, minTemplateId);
+			for (const auto & parameter : function.parameters)
+				minTemplateId = std::min(parameter.size, minTemplateId);
 			std::valarray<int> templateParameters(-1, -minTemplateId);
 			
 			// trees for arguments
@@ -1432,7 +1432,7 @@ namespace Aseba
 					preNode.release();
 					preNode.reset(temp);
 					varAddr = preNode->getVectorAddr();
-					BlockNode* block(new BlockNode(varPos));
+					auto* block(new BlockNode(varPos));
 					block->children.push_back(preNode.release());
 					block->children.push_back(new ImmediateNode(varPos, varAddr));
 					callNode->children.push_back(block);

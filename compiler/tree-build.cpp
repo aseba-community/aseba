@@ -21,6 +21,7 @@
 #include "tree.h"
 #include <cstdlib>
 #include <iostream>
+#include <utility>
 
 
 namespace Aseba
@@ -44,12 +45,15 @@ namespace Aseba
 	//! Destructor, delete all children.
 	Node::~Node()
 	{
-		// we assume that if children is 0, another node has taken ownership of it
-		for (size_t i = 0; i < children.size(); i++)
-			if (children[i]) {
-				delete children[i];
-				children[i] = 0;
+		// we assume that if children is nullptr, another node has taken ownership of it
+		for (auto & child : children)
+		{
+			if (child)
+			{
+				delete child;
+				child = nullptr;
 			}
+		}
 	}
 
 	Node* Node::deepCopy() const
@@ -86,9 +90,9 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	CallSubNode::CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName) :
+	CallSubNode::CallSubNode(const SourcePos& sourcePos, std::wstring  subroutineName) :
 		Node(sourcePos),
-		subroutineName(subroutineName),
+		subroutineName(std::move(subroutineName)),
 		subroutineId(-1)
 	{
 	
@@ -167,21 +171,21 @@ namespace Aseba
 	}
 	
 	//! Constructor
-	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
-		arrayName(arrayName)
+		arrayName(std::move(arrayName))
 	{
 	
 	}
 	
 	//! Constructor
-	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName) :
 		Node(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
-		arrayName(arrayName)
+		arrayName(std::move(arrayName))
 	{
 	
 	}
@@ -202,16 +206,16 @@ namespace Aseba
 		
 		// get the child from memoryNode
 		children.push_back(memoryNode->children[0]);
-		memoryNode->children[0] = 0;
+		memoryNode->children[0] = nullptr;
 		delete memoryNode;
 	}
 
 	//! Constructor
-	MemoryVectorNode::MemoryVectorNode(const SourcePos &sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName) :
+	MemoryVectorNode::MemoryVectorNode(const SourcePos &sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName) :
 		AbstractTreeNode(sourcePos),
 		arrayAddr(arrayAddr),
 		arraySize(arraySize),
-		arrayName(arrayName),
+		arrayName(std::move(arrayName)),
 		write(false)
 	{
 

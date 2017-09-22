@@ -67,7 +67,7 @@ namespace Aseba
 		//! Second pass to expand "abstract" nodes into more concrete ones
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		//! Third pass to expand vectorial operations into mutliple scalar ones
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
 		virtual ReturnType typeCheck(Compiler* compiler);
 		//! Optimize this node, return the optimized node
@@ -97,7 +97,7 @@ namespace Aseba
 		virtual unsigned getVectorSize() const;
 
 		//! Vector for children of a node
-		typedef std::vector<Node *> NodesVector;
+		using NodesVector = std::vector<Node *>;
 		NodesVector children; //!< children of this node
 		SourcePos sourcePos; //!< position is source
 	};
@@ -107,12 +107,12 @@ namespace Aseba
 	{
 		//! Constructor
 		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual BlockNode* shallowCopy() const override { return new BlockNode(*this); }
+		BlockNode* shallowCopy() const override { return new BlockNode(*this); }
 
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const { return L"Block"; }
-		virtual std::wstring toNodeName() const { return L"block"; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override { return L"Block"; }
+		std::wstring toNodeName() const override { return L"block"; }
 	};
 	
 	//! Node for L"program", i.e. a block node with some special behaviour later on
@@ -120,12 +120,12 @@ namespace Aseba
 	{
 		//! Constructor
 		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
-		virtual ProgramNode* shallowCopy() const override { return new ProgramNode(*this); }
+		ProgramNode* shallowCopy() const override { return new ProgramNode(*this); }
 
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const { return L"ProgramBlock"; }
-		virtual std::wstring toNodeName() const { return L"program block"; }
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override { return L"ProgramBlock"; }
+		std::wstring toNodeName() const override { return L"program block"; }
 	};
 	
 	//! Node for assignation.
@@ -136,15 +136,15 @@ namespace Aseba
 		//! Constructor
 		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		AssignmentNode(const SourcePos& sourcePos, Node* left, Node* right);
-		virtual AssignmentNode* shallowCopy() const override { return new AssignmentNode(*this); }
+		AssignmentNode* shallowCopy() const override { return new AssignmentNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const { return L"Assign"; }
-		virtual std::wstring toNodeName() const { return L"assignment"; }
+		void checkVectorSize() const override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override { return L"Assign"; }
+		std::wstring toNodeName() const override { return L"assignment"; }
 	};
 	
 	//! Node for L"if" and L"when".
@@ -158,14 +158,14 @@ namespace Aseba
 		
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual IfWhenNode* shallowCopy() const override { return new IfWhenNode(*this); }
+		IfWhenNode* shallowCopy() const override { return new IfWhenNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"if/when"; }
+		void checkVectorSize() const override;
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"if/when"; }
 	};
 	
 	//! Node for L"if" and L"when" with operator folded inside.
@@ -181,14 +181,14 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedIfWhenNode* shallowCopy() const override { return new FoldedIfWhenNode(*this); }
+		FoldedIfWhenNode* shallowCopy() const override { return new FoldedIfWhenNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"folded if/when"; }
+		void checkVectorSize() const override;
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"folded if/when"; }
 	};
 	
 	//! Node for L"while".
@@ -198,14 +198,14 @@ namespace Aseba
 	{
 		//! Constructor
 		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual WhileNode* shallowCopy() const override { return new WhileNode(*this); }
+		WhileNode* shallowCopy() const override { return new WhileNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"while"; }
+		void checkVectorSize() const override;
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"while"; }
 	};
 	
 	//! Node for L"while" with operator folded inside.
@@ -218,14 +218,14 @@ namespace Aseba
 		
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		virtual FoldedWhileNode* shallowCopy() const override { return new FoldedWhileNode(*this); }
+		FoldedWhileNode* shallowCopy() const override { return new FoldedWhileNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"folded while"; }
+		void checkVectorSize() const override;
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"folded while"; }
 	};
 	
 	//! Node for L"onevent" 
@@ -235,13 +235,13 @@ namespace Aseba
 		unsigned eventId; //!< the event id associated with this context
 		
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
-		virtual EventDeclNode* shallowCopy() const override { return new EventDeclNode(*this); }
+		EventDeclNode* shallowCopy() const override { return new EventDeclNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"event declaration"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"event declaration"; }
 	};
 	
 	//! Node for L"emit".
@@ -254,13 +254,13 @@ namespace Aseba
 		
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
-		virtual EmitNode* shallowCopy() const override { return new EmitNode(*this); }
+		EmitNode* shallowCopy() const override { return new EmitNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"emit"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"emit"; }
 	};
 	
 	//! Node for L"sub"
@@ -270,13 +270,13 @@ namespace Aseba
 		unsigned subroutineId; //!< the associated subroutine
 		
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
-		virtual SubDeclNode* shallowCopy() const override { return new SubDeclNode(*this); }
+		SubDeclNode* shallowCopy() const override { return new SubDeclNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"subroutine declaration"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"subroutine declaration"; }
 	};
 	
 	//! Node for L"callsub"
@@ -286,14 +286,14 @@ namespace Aseba
 		std::wstring subroutineName; //!< the subroutine to call
 		unsigned subroutineId;
 
-		CallSubNode(const SourcePos& sourcePos, const std::wstring& subroutineName);
-		virtual CallSubNode* shallowCopy() const override { return new CallSubNode(*this); }
+		CallSubNode(const SourcePos& sourcePos, std::wstring  subroutineName);
+		CallSubNode* shallowCopy() const override { return new CallSubNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"subroutine call"; }
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"subroutine call"; }
 	};
 	
 	//! Node for binary arithmetic.
@@ -305,16 +305,16 @@ namespace Aseba
 		
 		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual BinaryArithmeticNode* shallowCopy() const override { return new BinaryArithmeticNode(*this); }
+		BinaryArithmeticNode* shallowCopy() const override { return new BinaryArithmeticNode(*this); }
 
 		void deMorganNotRemoval();
 		
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"binary function"; }
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"binary function"; }
 		
 		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
@@ -332,13 +332,13 @@ namespace Aseba
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
-		virtual UnaryArithmeticNode* shallowCopy() const override { return new UnaryArithmeticNode(*this); }
+		UnaryArithmeticNode* shallowCopy() const override { return new UnaryArithmeticNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler);
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"unary function"; }
+		ReturnType typeCheck(Compiler* compiler) override;
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"unary function"; }
 	};
 	
 	//! Node for pushing immediate value on stack.
@@ -351,17 +351,17 @@ namespace Aseba
 		
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
-		virtual ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
+		ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
 
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"constant"; }
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"constant"; }
 
-		virtual unsigned getVectorSize() const { return 1; }
+		unsigned getVectorSize() const override { return 1; }
 	};
 	
 	//! Node for storing a variable from stack.
@@ -372,16 +372,16 @@ namespace Aseba
 		
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual StoreNode* shallowCopy() const override { return new StoreNode(*this); }
+		StoreNode* shallowCopy() const override { return new StoreNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"variable access (write)"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"variable access (write)"; }
 
-		virtual unsigned getVectorAddr() const { return varAddr; }
-		virtual unsigned getVectorSize() const { return 1; }
+		unsigned getVectorAddr() const override { return varAddr; }
+		unsigned getVectorSize() const override { return 1; }
 	};
 	
 	//! Node for loading a variable on stack.
@@ -392,17 +392,17 @@ namespace Aseba
 
 		//! Constructor
 		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
-		virtual LoadNode* shallowCopy() const override { return new LoadNode(*this); }
+		LoadNode* shallowCopy() const override { return new LoadNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"variable access (read)"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"variable access (read)"; }
 
-		virtual unsigned getVectorAddr() const { return varAddr; }
-		virtual unsigned getVectorSize() const { return 1; }
+		unsigned getVectorAddr() const override { return varAddr; }
+		unsigned getVectorSize() const override { return 1; }
 	};
 
 	//! Node for writing to an array. Value to store is supposed to be on the stack already
@@ -413,17 +413,17 @@ namespace Aseba
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
 		std::wstring arrayName; //!< name of the array (for debug)
 		
-		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayWriteNode* shallowCopy() const override { return new ArrayWriteNode(*this); }
+		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
+		ArrayWriteNode* shallowCopy() const override { return new ArrayWriteNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"array access (write)"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"array access (write)"; }
 
-		virtual unsigned getVectorAddr() const { return arrayAddr; }
-		virtual unsigned getVectorSize() const { return 1; }
+		unsigned getVectorAddr() const override { return arrayAddr; }
+		unsigned getVectorSize() const override { return 1; }
 	};
 	
 	//! Node for reading from an array.
@@ -434,17 +434,17 @@ namespace Aseba
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
 		std::wstring arrayName; //!< name of the array (for debug)
 
-		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual ArrayReadNode* shallowCopy() const override { return new ArrayReadNode(*this); }
+		ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
+		ArrayReadNode* shallowCopy() const override { return new ArrayReadNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"array access (read)"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		Node* optimize(std::wostream* dump) override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"array access (read)"; }
 
-		virtual unsigned getVectorAddr() const { return arrayAddr; }
-		virtual unsigned getVectorSize() const { return 1; }
+		unsigned getVectorAddr() const override { return arrayAddr; }
+		unsigned getVectorSize() const override { return 1; }
 	};
 	
 	//! Node for loading the address of the argument of a native function
@@ -457,14 +457,14 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		
 		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
-		virtual LoadNativeArgNode* shallowCopy() const override { return new LoadNativeArgNode(*this); }
+		LoadNativeArgNode* shallowCopy() const override { return new LoadNativeArgNode(*this); }
 		
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_INT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"load native arg"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_INT; }
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"load native arg"; }
 	};
 
 	//! Node for calling a native function
@@ -475,14 +475,14 @@ namespace Aseba
 		std::vector<unsigned> templateArgs; //!< sizes of templated arguments
 		
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
-		virtual CallNode* shallowCopy() const override { return new CallNode(*this); }
+		CallNode* shallowCopy() const override { return new CallNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump);
-		virtual unsigned getStackDepth() const;
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"native function call"; }
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override;
+		unsigned getStackDepth() const override;
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"native function call"; }
 	};
 	
 	//! Node for returning from an event or subroutine
@@ -490,14 +490,14 @@ namespace Aseba
 	struct ReturnNode : Node
 	{
 		ReturnNode(const SourcePos& sourcePos) : Node(sourcePos) {}
-		virtual ReturnNode* shallowCopy() const override { return new ReturnNode(*this); }
+		ReturnNode* shallowCopy() const override { return new ReturnNode(*this); }
 
-		virtual ReturnType typeCheck(Compiler* compiler) { return TYPE_UNIT; }
-		virtual Node* optimize(std::wostream* dump) { return this; }
-		virtual unsigned getStackDepth() const { return 0; }
-		virtual void emit(PreLinkBytecode& bytecodes) const;
-		virtual std::wstring toWString() const { return L"Return"; }
-		virtual std::wstring toNodeName() const { return L"return"; } 
+		ReturnType typeCheck(Compiler* compiler) override { return TYPE_UNIT; }
+		Node* optimize(std::wostream* dump) override { return this; }
+		unsigned getStackDepth() const override { return 0; }
+		void emit(PreLinkBytecode& bytecodes) const override;
+		std::wstring toWString() const override { return L"Return"; }
+		std::wstring toNodeName() const override { return L"return"; }
 	};
 
 	/*** Nodes for abstract operations (e.g. vectors) ***/
@@ -510,13 +510,13 @@ namespace Aseba
 		//! Constructor
 		AbstractTreeNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 
-		virtual Node* expandAbstractNodes(std::wostream* dump) = 0;
+		Node* expandAbstractNodes(std::wostream* dump) override = 0;
 
 		// Following operations should not be performed on abstraction nodes
-		virtual ReturnType typeCheck(Compiler* compiler) { abort(); }
-		virtual Node* optimize(std::wostream* dump) { abort(); }
-		virtual unsigned getStackDepth() const { abort(); }
-		virtual void emit(PreLinkBytecode& bytecodes) const { abort(); }
+		ReturnType typeCheck(Compiler* compiler) override { abort(); }
+		Node* optimize(std::wostream* dump) override { abort(); }
+		unsigned getStackDepth() const override { abort(); }
+		void emit(PreLinkBytecode& bytecodes) const override { abort(); }
 	};
 
 	//! Node for assembling values into an array
@@ -526,15 +526,15 @@ namespace Aseba
 		//! Constructor
 		TupleVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
 		TupleVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { children.push_back(new ImmediateNode(sourcePos, value)); }
-		virtual TupleVectorNode* shallowCopy() const override { return new TupleVectorNode(*this); }
+		TupleVectorNode* shallowCopy() const override { return new TupleVectorNode(*this); }
 
-		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"array of constants"; }
-		virtual void dump(std::wostream& dest, unsigned& indent) const;
+		Node* expandAbstractNodes(std::wostream* dump) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"array of constants"; }
+		void dump(std::wostream& dest, unsigned& indent) const override;
 
-		virtual unsigned getVectorSize() const;
+		unsigned getVectorSize() const override;
 
 		virtual bool isImmediateVector() const;
 		virtual int getImmediateValue(unsigned index) const;
@@ -556,16 +556,16 @@ namespace Aseba
 		std::wstring arrayName; //!< name of the array (for debug)
 		bool write; //!< expand to a node for storing or loading data?
 
-		MemoryVectorNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, const std::wstring &arrayName);
-		virtual MemoryVectorNode* shallowCopy() const override { return new MemoryVectorNode(*this); }
+		MemoryVectorNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
+		MemoryVectorNode* shallowCopy() const override { return new MemoryVectorNode(*this); }
 
-		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0);
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"vector access"; }
+		Node* expandAbstractNodes(std::wostream* dump) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"vector access"; }
 
-		virtual unsigned getVectorAddr() const;
-		virtual unsigned getVectorSize() const;
+		unsigned getVectorAddr() const override;
+		unsigned getVectorSize() const override;
 		bool isAddressStatic() const;
 
 		virtual void setWrite(bool write) { this->write = write; }
@@ -581,13 +581,13 @@ namespace Aseba
 
 		//! Constructor
 		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
-		virtual ArithmeticAssignmentNode* shallowCopy() const override { return new ArithmeticAssignmentNode(*this); }
+		ArithmeticAssignmentNode* shallowCopy() const override { return new ArithmeticAssignmentNode(*this); }
 
-		virtual void checkVectorSize() const;
-		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0) { abort(); } // should not happen
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"arithmetic assignment"; }
+		void checkVectorSize() const override;
+		Node* expandAbstractNodes(std::wostream* dump) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override { abort(); } // should not happen
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"arithmetic assignment"; }
 
 		static ArithmeticAssignmentNode* fromArithmeticAssignmentToken(const SourcePos& sourcePos, Compiler::Token::Type token, Node *left, Node *right);
 
@@ -605,12 +605,12 @@ namespace Aseba
 
 		//! Constructor
 		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory);
-		virtual UnaryArithmeticAssignmentNode* shallowCopy() const override { return new UnaryArithmeticAssignmentNode(*this); }
+		UnaryArithmeticAssignmentNode* shallowCopy() const override { return new UnaryArithmeticAssignmentNode(*this); }
 
-		virtual Node* expandAbstractNodes(std::wostream* dump);
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=0, unsigned int index = 0) { abort(); } // should not happen
-		virtual std::wstring toWString() const;
-		virtual std::wstring toNodeName() const { return L"unary arithmetic assignment"; }
+		Node* expandAbstractNodes(std::wostream* dump) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override { abort(); } // should not happen
+		std::wstring toWString() const override;
+		std::wstring toNodeName() const override { return L"unary arithmetic assignment"; }
 	};
 
 	/*@}*/

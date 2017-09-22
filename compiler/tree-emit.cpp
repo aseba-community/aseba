@@ -61,9 +61,9 @@ namespace Aseba
 	void PreLinkBytecode::fixup(const Compiler::SubroutineTable &subroutineTable)
 	{
 		// clear empty events entries
-		for (EventsBytecode::iterator it = events.begin(); it != events.end();)
+		for (auto it = events.begin(); it != events.end();)
 		{
-			EventsBytecode::iterator curIt = it;
+			auto curIt = it;
 			++it;
 			size_t bytecodeSize = curIt->second.size();
 			if (bytecodeSize == 0)
@@ -73,14 +73,14 @@ namespace Aseba
 		}
 		
 		// add terminals
-		for (EventsBytecode::iterator it = events.begin(); it != events.end(); ++it)
+		for (auto & event : events)
 		{
-			BytecodeVector& bytecode = it->second;
+			BytecodeVector& bytecode = event.second;
 			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
-		for (SubroutinesBytecode::iterator it = subroutines.begin(); it != subroutines.end(); ++it)
+		for (auto & subroutine : subroutines)
 		{
-			BytecodeVector& bytecode = it->second;
+			BytecodeVector& bytecode = subroutine.second;
 			if (bytecode.size())
 			{
 				bytecode.changeStopToRetSub();
@@ -88,7 +88,7 @@ namespace Aseba
 					bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
 			}
 			else
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[it->first].line));
+				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[subroutine.first].line));
 		}
 	}
 	
@@ -96,16 +96,16 @@ namespace Aseba
 	unsigned Node::getStackDepth() const
 	{
 		unsigned stackDepth = 0;
-		for (size_t i = 0; i < children.size(); i++)
-			stackDepth = std::max(stackDepth, children[i]->getStackDepth());
+		for (auto child : children)
+			stackDepth = std::max(stackDepth, child->getStackDepth());
 		return stackDepth;
 	}
 	
 	
 	void BlockNode::emit(PreLinkBytecode& bytecodes) const
 	{
-		for (size_t i = 0; i < children.size(); i++)
-			children[i]->emit(bytecodes);
+		for (auto child : children)
+			child->emit(bytecodes);
 	}
 	
 	void ProgramNode::emit(PreLinkBytecode& bytecodes) const
@@ -115,10 +115,10 @@ namespace Aseba
 		// analyze blocks for stack depth
 		BytecodeVector* currentBytecode = &bytecodes.events[ASEBA_EVENT_INIT];
 		unsigned maxStackDepth = 0;
-		for (size_t i = 0; i < children.size(); i++)
+		for (auto child : children)
 		{
-			EventDeclNode* eventDecl = dynamic_cast<EventDeclNode*>(children[i]);
-			SubDeclNode* subDecl = dynamic_cast<SubDeclNode*>(children[i]);
+			auto* eventDecl = dynamic_cast<EventDeclNode*>(child);
+			auto* subDecl = dynamic_cast<SubDeclNode*>(child);
 			if (eventDecl || subDecl)
 			{
 				currentBytecode->maxStackDepth = maxStackDepth;
@@ -130,7 +130,7 @@ namespace Aseba
 					currentBytecode = &bytecodes.subroutines[subDecl->subroutineId];
 			}
 			else
-				maxStackDepth = std::max(maxStackDepth, children[i]->getStackDepth());
+				maxStackDepth = std::max(maxStackDepth, child->getStackDepth());
 		}
 		currentBytecode->maxStackDepth = maxStackDepth;
 	}
@@ -317,8 +317,8 @@ namespace Aseba
 	void EmitNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// emit code for children. They might contain code to store constants somewhere
-		for (size_t i = 0; i < children.size(); i++)
-			children[i]->emit(bytecodes);
+		for (auto child : children)
+			child->emit(bytecodes);
 
 		unsigned short bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_EMIT) | eventId;
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
@@ -401,8 +401,8 @@ namespace Aseba
 	void ArrayWriteNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// constant index should have been optimized out already
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
-		assert(immediateChild == 0);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		assert(immediateChild == nullptr);
 		ASEBA_UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
@@ -416,8 +416,8 @@ namespace Aseba
 	void ArrayReadNode::emit(PreLinkBytecode& bytecodes) const
 	{
 		// constant index should have been optimized out already
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
-		assert(immediateChild == 0);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		assert(immediateChild == nullptr);
 		ASEBA_UNUSED(immediateChild);
 		
 		children[0]->emit(bytecodes);
@@ -433,8 +433,8 @@ namespace Aseba
 		unsigned short bytecode;
 		
 		// constant index should have been optimized out already
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
-		assert(immediateChild == 0);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		assert(immediateChild == nullptr);
 		ASEBA_UNUSED(immediateChild);
 		
 		// load variable
@@ -478,7 +478,7 @@ namespace Aseba
 		}
 		
 		// emit code for argument addresses in reverse order
-		for (NodesVector::const_reverse_iterator it(children.rbegin()); it != children.rend(); ++it)
+		for (auto it(children.rbegin()); it != children.rend(); ++it)
 			(*it)->emit(bytecodes);
 		
 		// generate call itself

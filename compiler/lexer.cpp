@@ -198,12 +198,12 @@ namespace Aseba
 				case '\t': break;
 				case '\n': pos.row++; pos.column = -1; break; // -1 so next call to pos.column++ result set 0
 				case '\r': pos.column = -1; break; // -1 so next call to pos.column++ result set 0
-				case '(': tokens.push_back(Token(Token::TOKEN_PAR_OPEN, pos)); break;
-				case ')': tokens.push_back(Token(Token::TOKEN_PAR_CLOSE, pos)); break;
-				case '[': tokens.push_back(Token(Token::TOKEN_BRACKET_OPEN, pos)); break;
-				case ']': tokens.push_back(Token(Token::TOKEN_BRACKET_CLOSE, pos)); break;
-				case ':': tokens.push_back(Token(Token::TOKEN_COLON, pos)); break;
-				case ',': tokens.push_back(Token(Token::TOKEN_COMMA, pos)); break;
+				case '(': tokens.emplace_back(Token::TOKEN_PAR_OPEN, pos); break;
+				case ')': tokens.emplace_back(Token::TOKEN_PAR_CLOSE, pos); break;
+				case '[': tokens.emplace_back(Token::TOKEN_BRACKET_OPEN, pos); break;
+				case ']': tokens.emplace_back(Token::TOKEN_BRACKET_CLOSE, pos); break;
+				case ':': tokens.emplace_back(Token::TOKEN_COLON, pos); break;
+				case ',': tokens.emplace_back(Token::TOKEN_COMMA, pos); break;
 				
 				// special case for comment
 				case '#':
@@ -270,7 +270,7 @@ namespace Aseba
 						break;
 					if (testNextCharacter(source, pos, '+', Token::TOKEN_OP_PLUS_PLUS))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_ADD, pos));
+					tokens.emplace_back(Token::TOKEN_OP_ADD, pos);
 					break;
 
 				case '-':
@@ -278,47 +278,47 @@ namespace Aseba
 						break;
 					if (testNextCharacter(source, pos, '-', Token::TOKEN_OP_MINUS_MINUS))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_NEG, pos));
+					tokens.emplace_back(Token::TOKEN_OP_NEG, pos);
 					break;
 
 				case '*':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_MULT_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_MULT, pos));
+					tokens.emplace_back(Token::TOKEN_OP_MULT, pos);
 					break;
 
 				case '/':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_DIV_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_DIV, pos));
+					tokens.emplace_back(Token::TOKEN_OP_DIV, pos);
 					break;
 
 				case '%':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_MOD_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_MOD, pos));
+					tokens.emplace_back(Token::TOKEN_OP_MOD, pos);
 					break;
 
 				case '|':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_OR_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_BIT_OR, pos));
+					tokens.emplace_back(Token::TOKEN_OP_BIT_OR, pos);
 					break;
 
 				case '^':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_XOR_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_BIT_XOR, pos));
+					tokens.emplace_back(Token::TOKEN_OP_BIT_XOR, pos);
 					break;
 
 				case '&':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIT_AND_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_BIT_AND, pos));
+					tokens.emplace_back(Token::TOKEN_OP_BIT_AND, pos);
 					break;
 
 				case '~':
-					tokens.push_back(Token(Token::TOKEN_OP_BIT_NOT, pos));
+					tokens.emplace_back(Token::TOKEN_OP_BIT_NOT, pos);
 					break;
 
 				case '!':
@@ -330,7 +330,7 @@ namespace Aseba
 				case '=':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_ASSIGN, pos));
+					tokens.emplace_back(Token::TOKEN_ASSIGN, pos);
 					break;
 				
 				// cases that require two characters look-ahead
@@ -341,13 +341,13 @@ namespace Aseba
 						getNextCharacter(source, pos);
 						if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SHIFT_LEFT_EQUAL))
 							break;
-						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_LEFT, pos));
+						tokens.emplace_back(Token::TOKEN_OP_SHIFT_LEFT, pos);
 						break;
 					}
 					// <
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SMALLER_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_SMALLER, pos));
+					tokens.emplace_back(Token::TOKEN_OP_SMALLER, pos);
 					break;
 				
 				case '>':
@@ -357,13 +357,13 @@ namespace Aseba
 						getNextCharacter(source, pos);
 						if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_SHIFT_RIGHT_EQUAL))
 							break;
-						tokens.push_back(Token(Token::TOKEN_OP_SHIFT_RIGHT, pos));
+						tokens.emplace_back(Token::TOKEN_OP_SHIFT_RIGHT, pos);
 						break;
 					}
 					// >
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_BIGGER_EQUAL))
 						break;
-					tokens.push_back(Token(Token::TOKEN_OP_BIGGER, pos));
+					tokens.emplace_back(Token::TOKEN_OP_BIGGER, pos);
 					break;
 				
 				// cases that require to look for a while
@@ -416,62 +416,62 @@ namespace Aseba
 								if (!std::iswdigit(s[i]))
 									throw TranslatableError(pos, ERROR_IN_NUMBER);
 						}
-						tokens.push_back(Token(Token::TOKEN_INT_LITERAL, pos, s));
+						tokens.emplace_back(Token::TOKEN_INT_LITERAL, pos, s);
 					}
 					else
 					{
 						// check if it is a known keyword
 						// FIXME: clean-up that with a table
 						if (s == L"when")
-							tokens.push_back(Token(Token::TOKEN_STR_when, pos));
+							tokens.emplace_back(Token::TOKEN_STR_when, pos);
 						else if (s == L"emit")
-							tokens.push_back(Token(Token::TOKEN_STR_emit, pos));
+							tokens.emplace_back(Token::TOKEN_STR_emit, pos);
 						else if (s == L"_emit")
-							tokens.push_back(Token(Token::TOKEN_STR_hidden_emit, pos));
+							tokens.emplace_back(Token::TOKEN_STR_hidden_emit, pos);
 						else if (s == L"for")
-							tokens.push_back(Token(Token::TOKEN_STR_for, pos));
+							tokens.emplace_back(Token::TOKEN_STR_for, pos);
 						else if (s == L"in")
-							tokens.push_back(Token(Token::TOKEN_STR_in, pos));
+							tokens.emplace_back(Token::TOKEN_STR_in, pos);
 						else if (s == L"step")
-							tokens.push_back(Token(Token::TOKEN_STR_step, pos));
+							tokens.emplace_back(Token::TOKEN_STR_step, pos);
 						else if (s == L"while")
-							tokens.push_back(Token(Token::TOKEN_STR_while, pos));
+							tokens.emplace_back(Token::TOKEN_STR_while, pos);
 						else if (s == L"do")
-							tokens.push_back(Token(Token::TOKEN_STR_do, pos));
+							tokens.emplace_back(Token::TOKEN_STR_do, pos);
 						else if (s == L"if")
-							tokens.push_back(Token(Token::TOKEN_STR_if, pos));
+							tokens.emplace_back(Token::TOKEN_STR_if, pos);
 						else if (s == L"then")
-							tokens.push_back(Token(Token::TOKEN_STR_then, pos));
+							tokens.emplace_back(Token::TOKEN_STR_then, pos);
 						else if (s == L"else")
-							tokens.push_back(Token(Token::TOKEN_STR_else, pos));
+							tokens.emplace_back(Token::TOKEN_STR_else, pos);
 						else if (s == L"elseif")
-							tokens.push_back(Token(Token::TOKEN_STR_elseif, pos));
+							tokens.emplace_back(Token::TOKEN_STR_elseif, pos);
 						else if (s == L"end")
-							tokens.push_back(Token(Token::TOKEN_STR_end, pos));
+							tokens.emplace_back(Token::TOKEN_STR_end, pos);
 						else if (s == L"var")
-							tokens.push_back(Token(Token::TOKEN_STR_var, pos));
+							tokens.emplace_back(Token::TOKEN_STR_var, pos);
 						else if (s == L"const")
-							tokens.push_back(Token(Token::TOKEN_STR_const, pos));
+							tokens.emplace_back(Token::TOKEN_STR_const, pos);
 						else if (s == L"call")
-							tokens.push_back(Token(Token::TOKEN_STR_call, pos));
+							tokens.emplace_back(Token::TOKEN_STR_call, pos);
 						else if (s == L"sub")
-							tokens.push_back(Token(Token::TOKEN_STR_sub, pos));
+							tokens.emplace_back(Token::TOKEN_STR_sub, pos);
 						else if (s == L"callsub")
-							tokens.push_back(Token(Token::TOKEN_STR_callsub, pos));
+							tokens.emplace_back(Token::TOKEN_STR_callsub, pos);
 						else if (s == L"onevent")
-							tokens.push_back(Token(Token::TOKEN_STR_onevent, pos));
+							tokens.emplace_back(Token::TOKEN_STR_onevent, pos);
 						else if (s == L"abs")
-							tokens.push_back(Token(Token::TOKEN_STR_abs, pos));
+							tokens.emplace_back(Token::TOKEN_STR_abs, pos);
 						else if (s == L"return")
-							tokens.push_back(Token(Token::TOKEN_STR_return, pos));
+							tokens.emplace_back(Token::TOKEN_STR_return, pos);
 						else if (s == L"or")
-							tokens.push_back(Token(Token::TOKEN_OP_OR, pos));
+							tokens.emplace_back(Token::TOKEN_OP_OR, pos);
 						else if (s == L"and")
-							tokens.push_back(Token(Token::TOKEN_OP_AND, pos));
+							tokens.emplace_back(Token::TOKEN_OP_AND, pos);
 						else if (s == L"not")
-							tokens.push_back(Token(Token::TOKEN_OP_NOT, pos));
+							tokens.emplace_back(Token::TOKEN_OP_NOT, pos);
 						else
-							tokens.push_back(Token(Token::TOKEN_STRING_LITERAL, pos, s));
+							tokens.emplace_back(Token::TOKEN_STRING_LITERAL, pos, s);
 					}
 					
 					pos.column += posIncrement;
@@ -481,7 +481,7 @@ namespace Aseba
 			} // switch (c)
 		} // while (source.good())
 		
-		tokens.push_back(Token(Token::TOKEN_END_OF_STREAM, pos));
+		tokens.emplace_back(Token::TOKEN_END_OF_STREAM, pos);
 	}
 
 	wchar_t Compiler::getNextCharacter(std::wistream &source, SourcePos &pos)
@@ -495,7 +495,7 @@ namespace Aseba
 	{
 		if ((int)source.peek() == int(test))
 		{
-			tokens.push_back(Token(tokenIfTrue, pos));
+			tokens.emplace_back(tokenIfTrue, pos);
 			getNextCharacter(source, pos);
 			return true;
 		}
@@ -505,8 +505,8 @@ namespace Aseba
 	//! Debug print of tokens
 	void Compiler::dumpTokens(std::wostream &dest) const
 	{
-		for (unsigned i = 0; i < tokens.size(); i++)
-			dest << tokens[i].toWString() << std::endl;
+		for (const auto & token : tokens)
+			dest << token.toWString() << std::endl;
 	}
 	
 	//! Return whether a string is a language keyword

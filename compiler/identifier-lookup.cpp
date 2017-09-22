@@ -110,13 +110,13 @@ namespace Aseba
 	template <typename MapType>
 	typename MapType::const_iterator findInTable(const MapType& map, const std::wstring& name, const SourcePos& pos, const ErrorCode notFoundError, const ErrorCode misspelledError)
 	{
-		typename MapType::const_iterator it(map.find(name));
+		auto it(map.find(name));
 		if (it == map.end())
 		{
 			const unsigned maxDist(3);
 			std::wstring bestName;
 			unsigned bestDist(std::numeric_limits<unsigned>::max());
-			for (typename MapType::const_iterator jt(map.begin()); jt != map.end(); ++jt)
+			for (auto jt(map.begin()); jt != map.end(); ++jt)
 			{
 				const std::wstring thatName(jt->first);
 				const unsigned d(editDistance<std::wstring>(name, thatName, maxDist));

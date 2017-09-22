@@ -40,12 +40,12 @@ namespace Aseba
 	{
 	protected:
 		//! String type
-		typedef std::basic_string<charT> S;
+		using S = std::basic_string<charT>;
 		
 		/*!
 		* Next argument to be replaced.
 		*/
-		int argLevel;
+		int argLevel{0};
 	
 		/*!
 		* Replace the next argument by replacement.
@@ -80,14 +80,14 @@ namespace Aseba
 		
 	public:
 		
-		BasicFormatableString() : S(), argLevel(0) { }
+		BasicFormatableString() : S() { }
 		/*!
 		* Creates a new FormatableString with format string set to s.
 		* \param s A string with indicators for argument substitution.
 		* Each indicator is the % symbol followed by a number. The number
 		* is the index of the corresponding argument (starting at %0).
 		*/
-		BasicFormatableString(const S &s) : S(s), argLevel(0) { }
+		BasicFormatableString(const S &s) : S(s) { }
 		
 		/*!
 		* Replace the next arg by an int value.
@@ -164,8 +164,8 @@ namespace Aseba
 		BasicFormatableString& operator=(const S& str);
 	};
 	
-	typedef BasicFormatableString<char> FormatableString;
-	typedef BasicFormatableString<wchar_t> WFormatableString;
+	using FormatableString = BasicFormatableString<char>;
+	using WFormatableString = BasicFormatableString<wchar_t>;
 	
 	/*@}*/
 }

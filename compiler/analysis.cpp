@@ -32,7 +32,7 @@ namespace Aseba
 	bool Compiler::verifyStackCalls(PreLinkBytecode& preLinkBytecode)
 	{
 		// check stack for events
-		for (PreLinkBytecode::EventsBytecode::iterator it = preLinkBytecode.events.begin(); it != preLinkBytecode.events.end(); ++it)
+		for (auto it = preLinkBytecode.events.begin(); it != preLinkBytecode.events.end(); ++it)
 		{
 			if (it->second.maxStackDepth > targetDescription->stackSize)
 				return false;
@@ -45,7 +45,7 @@ namespace Aseba
 					case ASEBA_BYTECODE_SUB_CALL:
 					{
 						unsigned id = bytecode[pc] & 0x0fff;
-						PreLinkBytecode::SubroutinesBytecode::iterator destIt = preLinkBytecode.subroutines.find(id);
+						auto destIt = preLinkBytecode.subroutines.find(id);
 						assert(destIt != preLinkBytecode.subroutines.end());
 						destIt->second.callDepth = 1;
 						pc += 1;
@@ -75,7 +75,7 @@ namespace Aseba
 		do
 		{
 			wasActivity = false;
-			for (PreLinkBytecode::SubroutinesBytecode::iterator it = preLinkBytecode.subroutines.begin(); it != preLinkBytecode.subroutines.end(); ++it)
+			for (auto it = preLinkBytecode.subroutines.begin(); it != preLinkBytecode.subroutines.end(); ++it)
 			{
 				unsigned myDepth = it->second.callDepth;
 				if (myDepth + it->second.maxStackDepth > targetDescription->stackSize)
@@ -91,7 +91,7 @@ namespace Aseba
 						case ASEBA_BYTECODE_SUB_CALL:
 						{
 							unsigned id = bytecode[pc] & 0x0fff;
-							PreLinkBytecode::SubroutinesBytecode::iterator destIt = preLinkBytecode.subroutines.find(id);
+							auto destIt = preLinkBytecode.subroutines.find(id);
 							assert(destIt != preLinkBytecode.subroutines.end());
 							if (myDepth + 1 > destIt->second.callDepth)
 							{

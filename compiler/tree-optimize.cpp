@@ -33,7 +33,7 @@ namespace Aseba
 	
 	Node* BlockNode::optimize(std::wostream* dump)
 	{
-		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		for (auto it = children.begin(); it != children.end();)
 		{
 			// generic optimization and removal
 			Node *optimizedChild = (*it)->optimize(dump);
@@ -83,16 +83,16 @@ namespace Aseba
 		{
 			children[2] = children[2]->optimize(dump);
 			falseBlock = children[2];
-			if (children[2] == 0)
+			if (children[2] == nullptr)
 				children.resize(2);
 		}
 		else
-			falseBlock = 0;
+			falseBlock = nullptr;
 		
 		// check if both block are null or do not contain any data, in this case return
 		if (
-			((trueBlock == 0) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) && 
-			((falseBlock == 0) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty()))
+			((trueBlock == nullptr) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) &&
+			((falseBlock == nullptr) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty()))
 		)
 		{
 			if (dump)
@@ -102,14 +102,14 @@ namespace Aseba
 		}
 		
 		// check for if on constants
-		ImmediateNode* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
 		if (constantExpression)
 		{
 			if (constantExpression->value != 0)
 			{
 				if (dump)
 					*dump << sourcePos.toWString() << L" if test simplified because condition was always true\n";
-				children[1] = 0;
+				children[1] = nullptr;
 				delete this;
 				return trueBlock;
 			}
@@ -118,19 +118,19 @@ namespace Aseba
 				if (dump)
 					*dump << sourcePos.toWString() << L" if test simplified because condition was always false\n";
 				if (children.size() > 2)
-					children[2] = 0;
+					children[2] = nullptr;
 				delete this;
 				return falseBlock;
 			}
 		}
 		
 		// create a dummy block for true if none exist
-		if (trueBlock == 0)
+		if (trueBlock == nullptr)
 			children[1] = new BlockNode(sourcePos);
 		
 		// fold operation inside if
-		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
-		FoldedIfWhenNode *foldedNode = new FoldedIfWhenNode(sourcePos);
+		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		auto *foldedNode = new FoldedIfWhenNode(sourcePos);
 		foldedNode->op = operation->op;
 		foldedNode->edgeSensitive = edgeSensitive;
 		foldedNode->endLine = endLine;
@@ -138,11 +138,11 @@ namespace Aseba
 		foldedNode->children.push_back(operation->children[1]);
 		operation->children.clear();
 		foldedNode->children.push_back(children[1]);
-		children[1] = 0;
+		children[1] = nullptr;
 		if (children.size() > 2)
 		{
 			foldedNode->children.push_back(children[2]);
-			children[2] = 0;
+			children[2] = nullptr;
 		}
 		
 		if (dump)
@@ -156,7 +156,7 @@ namespace Aseba
 	Node* FoldedIfWhenNode::optimize(std::wostream* dump)
 	{
 		abort();
-		return 0;
+		return nullptr;
 	}
 	
 	Node* WhileNode::optimize(std::wostream* dump)
@@ -168,7 +168,7 @@ namespace Aseba
 		children[1] = children[1]->optimize(dump);
 		
 		// check for loops on constants
-		ImmediateNode* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
 		if (constantExpression)
 		{
 			if (constantExpression->value != 0)
@@ -185,7 +185,7 @@ namespace Aseba
 		}
 		
 		// check for loops with empty content
-		if ((children[1] == 0) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
+		if ((children[1] == nullptr) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
 		{
 			if (dump)
 				*dump << sourcePos.toWString() << L" while removed because it contained no statement\n";
@@ -194,14 +194,14 @@ namespace Aseba
 		}
 		
 		// fold operation inside loop
-		BinaryArithmeticNode* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
-		FoldedWhileNode *foldedNode = new FoldedWhileNode(sourcePos);
+		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		auto *foldedNode = new FoldedWhileNode(sourcePos);
 		foldedNode->op = operation->op;
 		foldedNode->children.push_back(operation->children[0]);
 		foldedNode->children.push_back(operation->children[1]);
 		operation->children.clear();
 		foldedNode->children.push_back(children[1]);
-		children[1] = 0;
+		children[1] = nullptr;
 		
 		if (dump)
 			*dump << sourcePos.toWString() << L" while condition folded inside node\n";
@@ -214,7 +214,7 @@ namespace Aseba
 	Node* FoldedWhileNode::optimize(std::wostream* dump)
 	{
 		abort();
-		return 0;
+		return nullptr;
 	}
 	
 	Node* EventDeclNode::optimize(std::wostream* dump)
@@ -224,7 +224,7 @@ namespace Aseba
 	
 	Node* EmitNode::optimize(std::wostream* dump)
 	{
-		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		for (auto it = children.begin(); it != children.end();)
 		{
 			// generic optimization and removal
 			*it = (*it)->optimize(dump);
@@ -253,8 +253,8 @@ namespace Aseba
 		
 		// constants elimination
 		// if both children are constants, pre-compute the result
-		ImmediateNode* immediateLeftChild = dynamic_cast<ImmediateNode*>(children[0]);
-		ImmediateNode* immediateRightChild = dynamic_cast<ImmediateNode*>(children[1]);
+		auto* immediateLeftChild = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* immediateRightChild = dynamic_cast<ImmediateNode*>(children[1]);
 		if (immediateLeftChild && immediateRightChild)
 		{
 			int valueOne = immediateLeftChild->value;
@@ -308,7 +308,7 @@ namespace Aseba
 		// neutral element optimisation
 		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
 		{
-			Node **survivor(0);
+			Node **survivor(nullptr);
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
 			{
 				if (immediateRightChild && (immediateRightChild->value == 1))
@@ -349,7 +349,7 @@ namespace Aseba
 				if (dump)
 					*dump << sourcePos.toWString() << L" operation with neutral element removed\n";
 				Node *returNode = *survivor;
-				*survivor = 0;
+				*survivor = nullptr;
 				delete this;
 				return returNode;
 			}
@@ -455,7 +455,7 @@ namespace Aseba
 		assert(children[0]);
 		
 		// constants elimination
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		if (immediateChild)
 		{
 			int result;
@@ -482,7 +482,7 @@ namespace Aseba
 		}
 		else if (op == ASEBA_UNARY_OP_NOT)
 		{
-			BinaryArithmeticNode* binaryNodeChild(dynamic_cast<BinaryArithmeticNode*>(children[0]));
+			auto* binaryNodeChild(dynamic_cast<BinaryArithmeticNode*>(children[0]));
 			if (binaryNodeChild)
 			{
 				// de Morgan removal of not
@@ -523,7 +523,7 @@ namespace Aseba
 		
 		// if the index is just an integer and not an expression of any variable,
 		// replace array acces by simple load and verify boundary conditions
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		if (immediateChild)
 		{
 			unsigned index = immediateChild->value;
@@ -553,7 +553,7 @@ namespace Aseba
 		
 		// if the index is just an integer and not an expression of any variable,
 		// replace array acces by simple load and verify boundary conditions
-		ImmediateNode* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
+		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		if (immediateChild)
 		{
 			unsigned index = immediateChild->value;
@@ -581,13 +581,13 @@ namespace Aseba
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
 		// we should not have an immediate
-		assert(dynamic_cast<ImmediateNode*>(children[0]) == 0);
+		assert(dynamic_cast<ImmediateNode*>(children[0]) == nullptr);
 		return this;
 	}
 	
 	Node* CallNode::optimize(std::wostream* dump)
 	{
-		for (NodesVector::iterator it = children.begin(); it != children.end();)
+		for (auto it = children.begin(); it != children.end();)
 		{
 			// generic optimization and removal
 			*it = (*it)->optimize(dump);

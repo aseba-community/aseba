@@ -67,8 +67,8 @@ namespace Aseba
 		if (children.size() > 2)
 			expectType(TYPE_UNIT, children[2]->typeCheck(compiler));
 		
-		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
-		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
+		auto* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		auto* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
 		bool ok(false);
 		if (binaryOp && binaryOp->op >= ASEBA_OP_EQUAL && binaryOp->op <= ASEBA_OP_AND)
 			ok = true;
@@ -85,8 +85,8 @@ namespace Aseba
 		expectType(TYPE_BOOL, children[0]->typeCheck(compiler));
 		expectType(TYPE_UNIT, children[1]->typeCheck(compiler));
 		
-		BinaryArithmeticNode* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
-		UnaryArithmeticNode* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
+		auto* binaryOp = dynamic_cast<BinaryArithmeticNode*>(children[0]);
+		auto* unaryOp = dynamic_cast<UnaryArithmeticNode*>(children[0]);
 		bool ok(false);
 		if (binaryOp && binaryOp->op >= ASEBA_OP_EQUAL && binaryOp->op <= ASEBA_OP_AND)
 			ok = true;
