@@ -45,7 +45,7 @@ class QSpinBox;
 class QListWidget;
 class QComboBox;
 class QTranslator;
-
+class QListWidgetItem;
 
 namespace Dashel
 {
@@ -63,13 +63,8 @@ namespace Aseba
 		
 	protected:
 		QPushButton* connectButton;
-		QGroupBox* netGroupBox;
-		QLineEdit* host;
-		QSpinBox* port;
-		QGroupBox* serialGroupBox;
-		QListWidget* serial;
-		QGroupBox* customGroupBox;
-		QLineEdit* custom;
+		QListWidget* discoveredList;
+		QLineEdit* currentTarget;
 		QComboBox* languageSelectionBox;
 #ifdef ZEROCONF_SUPPORT
 		Aseba::QtZeroconf zeroconf;
@@ -88,10 +83,8 @@ namespace Aseba
 #ifdef ZEROCONF_SUPPORT
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
 #endif // ZEROCONF_SUPPORT
-		void netGroupChecked();
-		void serialGroupChecked();
-		void customGroupChecked();
-		void setupOkStateFromListSelection();
+		void updateCurrentTarget();
+		QListWidgetItem* addEntry(const QString& text, const QString dashelTarget);
 	};
 	
 	class Message;

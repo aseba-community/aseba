@@ -65,49 +65,18 @@ namespace Aseba
 		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		const PortsMap ports = SerialPortEnumerator::getPorts();
 		QSettings settings;
-		unsigned sectionEnabled(settings.value("connection dialog enabled group", 0).toUInt());
-		if ((sectionEnabled == 0) && (ports.size() == 0))
-			sectionEnabled = 1;
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
-		serialGroupBox = new QGroupBox(tr("Discovered"));
-		serialGroupBox->setCheckable(true);
-		serialGroupBox->setChecked(sectionEnabled == 0);
-		QHBoxLayout* serialLayout = new QHBoxLayout();
-		serial = new QListWidget();
-		serial->setSelectionMode(QAbstractItemView::SingleSelection);
-		serialLayout->addWidget(serial);
-		serialGroupBox->setLayout(serialLayout);
-		mainLayout->addWidget(serialGroupBox);
+		discoveredList = new QListWidget();
+		discoveredList->setSelectionMode(QAbstractItemView::SingleSelection);
+		QPalette p = discoveredList->palette();
+		p.setColor(QPalette::Highlight, QColor("blue").lighter(175));
+		discoveredList->setPalette(p);
+		mainLayout->addWidget(discoveredList);
 		
-		if (!updatePortList(settings.value("serial name").toString()) && sectionEnabled == 0)
-			sectionEnabled = 1;
-		
-		netGroupBox = new QGroupBox(tr("Network (TCP)"));
-		netGroupBox->setCheckable(true);
-		netGroupBox->setChecked(sectionEnabled == 1);
-		QGridLayout* netLayout = new QGridLayout;
-		netLayout->addWidget(new QLabel(tr("Host")), 0, 0);
-		netLayout->addWidget(new QLabel(tr("Port")), 0, 1);
-		host = new QLineEdit(settings.value("tcp host", ASEBA_DEFAULT_HOST).toString());
-		netLayout->addWidget(host, 1, 0);
-		port = new QSpinBox();
-		port->setMinimum(0);
-		port->setMaximum(65535);
-		port->setValue(settings.value("tcp port", ASEBA_DEFAULT_PORT).toInt());
-		netLayout->addWidget(port, 1, 1);
-		netGroupBox->setLayout(netLayout);
-		mainLayout->addWidget(netGroupBox);
-		
-		customGroupBox = new QGroupBox(tr("Custom"));
-		customGroupBox->setCheckable(true);
-		customGroupBox->setChecked(sectionEnabled == 2);
-		QHBoxLayout* customLayout = new QHBoxLayout();
-		custom = new QLineEdit(settings.value("custom target", ASEBA_DEFAULT_TARGET).toString());
-		customLayout->addWidget(custom);
-		customGroupBox->setLayout(customLayout);
-		mainLayout->addWidget(customGroupBox);
+		currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
+		mainLayout->addWidget(currentTarget);
 		
 		languageSelectionBox = new QComboBox;
 		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
@@ -141,10 +110,8 @@ namespace Aseba
 		
 		startTimer(1000);
 		
-		connect(serial, SIGNAL(itemSelectionChanged()), SLOT(setupOkStateFromListSelection()));
-		connect(serialGroupBox, SIGNAL(clicked()), SLOT(serialGroupChecked()));
-		connect(netGroupBox, SIGNAL(clicked()), SLOT(netGroupChecked()));
-		connect(customGroupBox, SIGNAL(clicked()), SLOT(customGroupChecked()));
+		connect(discoveredList, SIGNAL(itemSelectionChanged()), SLOT(updateCurrentTarget()));
+		connect(currentTarget, SIGNAL(textEdited(const QString &)), discoveredList, SLOT(clearSelection()));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
 #ifdef ZEROCONF_SUPPORT
@@ -158,11 +125,11 @@ namespace Aseba
 	void DashelConnectionDialog::zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		const auto dashelTarget(QString::fromUtf8(target.dashel().c_str()));
-		qDebug() << dashelTarget;
+		//qDebug() << dashelTarget;
 		// only add new Dashel targets
-		for (int i = 0; i < serial->count(); ++i)
+		for (int i = 0; i < discoveredList->count(); ++i)
 		{
-			const QListWidgetItem *item(serial->item(i));
+			const QListWidgetItem *item(discoveredList->item(i));
 			auto itemDashelTarget(item->data(Qt::UserRole));
 			if (itemDashelTarget == dashelTarget)
 				return;
@@ -170,11 +137,8 @@ namespace Aseba
 		// create and add the item
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		const auto title(QString("%1 on %2:%3").arg(name).arg(host).arg(target.port));
-		QListWidgetItem* item = new QListWidgetItem(title);
-		item->setData(Qt::UserRole, dashelTarget);
-		serial->addItem(item);
-		// TODO: make it pretty
+		const auto title(tr("<b>%1</b> using network<br>at <tt>%2:%3</tt>").arg(name).arg(host).arg(target.port));
+		addEntry(title, dashelTarget);
 	}
 #endif // ZEROCONF_SUPPORT
 	
@@ -183,26 +147,26 @@ namespace Aseba
 	{
 		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		const PortsMap ports = SerialPortEnumerator::getPorts();
-		bool serialPortSet(false);
-		std::vector<bool> seen(serial->count(), false);
+		bool discoveredListPortSet(false);
+		std::vector<bool> seen(discoveredList->count(), false);
 		// FIXME: change this algo from O(n^2) to O(n log(n))
 		// add newly seen devices
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
-			const QVariant serialDashelTarget(QString("ser:device=%0").arg(QString::fromUtf8(it->second.first.c_str())));
+			const QString discoveredListDashelTarget(QString("ser:device=%0").arg(QString::fromUtf8(it->second.first.c_str())));
 			// look if item is already in the list
 			bool found(false);
-			for (int i = 0; i < serial->count(); ++i)
+			for (int i = 0; i < discoveredList->count(); ++i)
 			{
-				const QListWidgetItem *item(serial->item(i));
+				const QListWidgetItem *item(discoveredList->item(i));
 				auto dashelTarget(item->data(Qt::UserRole));
 				// this entry is the same as the detected port
-				if (dashelTarget == serialDashelTarget)
+				if (dashelTarget == discoveredListDashelTarget)
 				{
 					seen[i] = true;
 					found = true;
 				}
-				// this entry is not a serial port
+				// this entry is not a discoveredList port
 				if (!dashelTarget.toString().startsWith("ser:"))
 				{
 					seen[i] = true;
@@ -212,13 +176,12 @@ namespace Aseba
 			if (!found)
 			{
 				const QString text(it->second.second.c_str());
-				QListWidgetItem* item = new QListWidgetItem(text);
-				item->setData(Qt::UserRole, serialDashelTarget);
-				serial->addItem(item);
+				// TODO: parse and beautify text
+				auto item = addEntry(text, discoveredListDashelTarget);
 				if (!toSelect.isEmpty() && (toSelect == text))
 				{
-					serial->setCurrentItem(item);
-					serialPortSet = true;
+					discoveredList->setCurrentItem(item);
+					discoveredListPortSet = true;
 				}
 			}
 		}
@@ -226,10 +189,22 @@ namespace Aseba
 		for (int i=seen.size()-1; i>=0; --i)
 		{
 			if (!seen[i])
-				delete serial->takeItem(i);
+				delete discoveredList->takeItem(i);
 		}
 		
-		return serialPortSet;
+		return discoveredListPortSet;
+	}
+	
+	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& text, const QString dashelTarget)
+	{
+		QListWidgetItem* item = new QListWidgetItem();
+		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
+		item->setData(Qt::UserRole, dashelTarget);
+		discoveredList->addItem(item);
+		auto* label(new QLabel("<p style=\"line-height:140%\">" + text + "</p>", discoveredList));
+		label->setStyleSheet("QLabel { border-bottom: 1px solid gray }");
+		discoveredList->setItemWidget(item, label);
+		return item;
 	}
 	
 	void DashelConnectionDialog::timerEvent(QTimerEvent * event)
@@ -240,35 +215,8 @@ namespace Aseba
 	std::string DashelConnectionDialog::getTarget()
 	{
 		QSettings settings;
-		if (serialGroupBox->isChecked())
-		{
-			const QItemSelectionModel* model(serial->selectionModel());
-			assert(model && !model->selectedRows().isEmpty());
-			const QModelIndex item(model->selectedRows().first());
-			settings.setValue("connection dialog enabled group", 0);
-			settings.setValue("serial name", item.data());
-			return item.data(Qt::UserRole).toString().toLocal8Bit().constData();
-		}
-		else if (netGroupBox->isChecked())
-		{
-			settings.setValue("connection dialog enabled group", 1);
-			settings.setValue("tcp host", host->text());
-			settings.setValue("tcp port", port->value());
-			std::ostringstream oss;
-			oss << "tcp:host=" << host->text().toLocal8Bit().constData() << ";port=" << port->value();
-			return oss.str();
-		}
-		else if (customGroupBox->isChecked())
-		{
-			settings.setValue("connection dialog enabled group", 2);
-			settings.setValue("custom target", custom->text());
-			return custom->text().toLocal8Bit().constData();
-		}
-		else
-		{
-			assert(false);
-			return "";
-		}
+		settings.setValue("current target", currentTarget->text());
+		return currentTarget->text().toLocal8Bit().constData();
 	}
 	
 	QString DashelConnectionDialog::getLocaleName()
@@ -276,33 +224,17 @@ namespace Aseba
 		return languageSelectionBox->itemData(languageSelectionBox->currentIndex()).toString();
 	}
 	
-	void DashelConnectionDialog::netGroupChecked()
+	void DashelConnectionDialog::updateCurrentTarget()
 	{
-		netGroupBox->setChecked(true);
-		serialGroupBox->setChecked(false);
-		customGroupBox->setChecked(false);
-		setupOkStateFromListSelection();
-	}
-	
-	void DashelConnectionDialog::serialGroupChecked()
-	{
-		netGroupBox->setChecked(false);
-		serialGroupBox->setChecked(true);
-		customGroupBox->setChecked(false);
-		setupOkStateFromListSelection();
-	}
-	
-	void DashelConnectionDialog::customGroupChecked()
-	{
-		netGroupBox->setChecked(false);
-		serialGroupBox->setChecked(false);
-		customGroupBox->setChecked(true);
-		setupOkStateFromListSelection();
-	}
-	
-	void DashelConnectionDialog::setupOkStateFromListSelection()
-	{
-		connectButton->setEnabled(serial->selectionModel()->hasSelection() || (!serialGroupBox->isChecked()));
+		const QItemSelectionModel* model(discoveredList->selectionModel());
+		if (model && !model->selectedRows().isEmpty())
+		{
+			QSettings settings;
+			const QModelIndex item(model->selectedRows().first());
+			// FIXME: clean-up this setting and make sure they work
+			settings.setValue("discoveredList name", item.data());
+			currentTarget->setText(item.data(Qt::UserRole).toString());
+		}
 	}
 	
 	
