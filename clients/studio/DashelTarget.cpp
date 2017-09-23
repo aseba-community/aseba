@@ -62,22 +62,25 @@ namespace Aseba
 	
 	DashelConnectionDialog::DashelConnectionDialog()
 	{
-		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
-		const PortsMap ports = SerialPortEnumerator::getPorts();
 		QSettings settings;
 		
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 		
+		// discovered targets
 		discoveredList = new QListWidget();
 		discoveredList->setSelectionMode(QAbstractItemView::SingleSelection);
 		QPalette p = discoveredList->palette();
 		p.setColor(QPalette::Highlight, QColor("blue").lighter(175));
 		discoveredList->setPalette(p);
+		mainLayout->addWidget(new QLabel(tr("Discovered targets")));
 		mainLayout->addWidget(discoveredList);
 		
+		// selected target
+		mainLayout->addWidget(new QLabel(tr("Selected target")));
 		currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
 		mainLayout->addWidget(currentTarget);
 		
+		// language dialogue
 		languageSelectionBox = new QComboBox;
 		languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
 		languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
@@ -97,8 +100,10 @@ namespace Aseba
 				break;
 			}
 		}
+		mainLayout->addWidget(new QLabel(tr("Language")));
 		mainLayout->addWidget(languageSelectionBox);
 		
+		// ok/cancel buttons
 		QHBoxLayout* buttonLayout = new QHBoxLayout();
 		connectButton = new QPushButton(QIcon(":/images/ok.png"), tr("Connect"));
 		buttonLayout->addWidget(connectButton);
@@ -107,9 +112,9 @@ namespace Aseba
 		mainLayout->addLayout(buttonLayout);
 		
 		setWindowTitle(tr("Aseba Target Selection"));
+		resize(720, 580);
 		
-		startTimer(1000);
-		
+		// connect signals and slots
 		connect(discoveredList, SIGNAL(itemSelectionChanged()), SLOT(updateCurrentTarget()));
 		connect(currentTarget, SIGNAL(textEdited(const QString &)), discoveredList, SLOT(clearSelection()));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
@@ -118,6 +123,8 @@ namespace Aseba
 		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
 		zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
+		
+		startTimer(1000);
 	}
 	
 #ifdef ZEROCONF_SUPPORT
@@ -137,8 +144,7 @@ namespace Aseba
 		// create and add the item
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		const auto title(tr("<b>%1</b> using network<br>at <tt>%2:%3</tt>").arg(name).arg(host).arg(target.port));
-		addEntry(title, dashelTarget);
+		addEntry(name, tr("network"), dashelTarget);
 	}
 #endif // ZEROCONF_SUPPORT
 	
@@ -177,7 +183,7 @@ namespace Aseba
 			{
 				const QString text(it->second.second.c_str());
 				// TODO: parse and beautify text
-				auto item = addEntry(text, discoveredListDashelTarget);
+				auto item = addEntry(text, tr("local serial port"), discoveredListDashelTarget);
 				if (!toSelect.isEmpty() && (toSelect == text))
 				{
 					discoveredList->setCurrentItem(item);
@@ -195,13 +201,16 @@ namespace Aseba
 		return discoveredListPortSet;
 	}
 	
-	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& text, const QString dashelTarget)
+	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& type, const QString& dashelTarget)
 	{
-		QListWidgetItem* item = new QListWidgetItem();
+		auto* item = new QListWidgetItem();
 		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
 		item->setData(Qt::UserRole, dashelTarget);
 		discoveredList->addItem(item);
-		auto* label(new QLabel("<p style=\"line-height:140%\">" + text + "</p>", discoveredList));
+		auto* label(new QLabel(
+			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – %2<br/><span style=\"color:gray;\">%3</span></p>")
+			.arg(title).arg(type).arg(dashelTarget),
+		discoveredList));
 		label->setStyleSheet("QLabel { border-bottom: 1px solid gray }");
 		discoveredList->setItemWidget(item, label);
 		return item;
@@ -229,10 +238,7 @@ namespace Aseba
 		const QItemSelectionModel* model(discoveredList->selectionModel());
 		if (model && !model->selectedRows().isEmpty())
 		{
-			QSettings settings;
 			const QModelIndex item(model->selectedRows().first());
-			// FIXME: clean-up this setting and make sure they work
-			settings.setValue("discoveredList name", item.data());
 			currentTarget->setText(item.data(Qt::UserRole).toString());
 		}
 	}
