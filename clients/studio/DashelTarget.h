@@ -84,7 +84,7 @@ namespace Aseba
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
 #endif // ZEROCONF_SUPPORT
 		void updateCurrentTarget();
-		QListWidgetItem* addEntry(const QString& title, const QString& type, const QString& dashelTarget);
+		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "");
 	};
 	
 	class Message;

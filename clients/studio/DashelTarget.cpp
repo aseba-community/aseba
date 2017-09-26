@@ -142,9 +142,16 @@ namespace Aseba
 				return;
 		}
 		// create and add the item
+		QString additionalInfo;
+		try
+		{
+			additionalInfo = QString(tr(" – type %1")).arg(QString::fromStdString(target.properties.at("type")));
+		}
+		catch (std::out_of_range& e)
+		{}
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		addEntry(name, tr("network"), dashelTarget);
+		addEntry(name, tr("network"), dashelTarget, additionalInfo);
 	}
 #endif // ZEROCONF_SUPPORT
 	
@@ -201,15 +208,15 @@ namespace Aseba
 		return discoveredListPortSet;
 	}
 	
-	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& type, const QString& dashelTarget)
+	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo)
 	{
 		auto* item = new QListWidgetItem();
 		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
 		item->setData(Qt::UserRole, dashelTarget);
 		discoveredList->addItem(item);
 		auto* label(new QLabel(
-			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – %2<br/><span style=\"color:gray;\">%3</span></p>")
-			.arg(title).arg(type).arg(dashelTarget),
+			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b>%2 – %3<br/><span style=\"color:gray;\">%4</span></p>")
+			.arg(title).arg(additionalInfo).arg(connectionType).arg(dashelTarget),
 		discoveredList));
 		label->setStyleSheet("QLabel { border-bottom: 1px solid gray }");
 		discoveredList->setItemWidget(item, label);
