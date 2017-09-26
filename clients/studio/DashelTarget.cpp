@@ -30,6 +30,7 @@
 #include <QtGui>
 #include <QLibraryInfo>
 #include <stdexcept>
+#include <regex>
 
 #ifdef WIN32 // for Sleep
 #include <windows.h>
@@ -161,6 +162,7 @@ namespace Aseba
 		typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 		const PortsMap ports = SerialPortEnumerator::getPorts();
 		bool discoveredListPortSet(false);
+		const std::regex extractName("^(.*)\\ \\((.*)\\)$");
 		std::vector<bool> seen(discoveredList->count(), false);
 		// FIXME: change this algo from O(n^2) to O(n log(n))
 		// add newly seen devices
@@ -188,9 +190,17 @@ namespace Aseba
 			// if not, add it
 			if (!found)
 			{
-				const QString text(it->second.second.c_str());
-				// TODO: parse and beautify text
-				auto item = addEntry(text, tr("local serial port"), discoveredListDashelTarget);
+				QString text;
+				QString additionalInfo;
+				std::smatch match;
+				if (regex_match(it->second.second, match, extractName) && match.size() > 2)
+				{
+					text = QString::fromStdString(match.str(1));
+					additionalInfo = tr(" – device %1").arg(QString::fromStdString(match.str(2)));
+				}
+				else
+					text =  QString::fromStdString(it->second.second);
+				auto item = addEntry(text, tr("local serial port"), discoveredListDashelTarget, additionalInfo);
 				if (!toSelect.isEmpty() && (toSelect == text))
 				{
 					discoveredList->setCurrentItem(item);
@@ -215,8 +225,8 @@ namespace Aseba
 		item->setData(Qt::UserRole, dashelTarget);
 		discoveredList->addItem(item);
 		auto* label(new QLabel(
-			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b>%2 – %3<br/><span style=\"color:gray;\">%4</span></p>")
-			.arg(title).arg(additionalInfo).arg(connectionType).arg(dashelTarget),
+			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – %2%3<br/><span style=\"color:gray;\">%4</span></p>")
+			.arg(title).arg(connectionType).arg(additionalInfo).arg(dashelTarget),
 		discoveredList));
 		label->setStyleSheet("QLabel { border-bottom: 1px solid gray }");
 		discoveredList->setItemWidget(item, label);
