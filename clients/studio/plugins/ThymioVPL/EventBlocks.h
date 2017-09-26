@@ -32,8 +32,47 @@ namespace Aseba { namespace ThymioVPL
 	
 	class ArrowButtonsEventBlock : public BlockWithButtons
 	{
+		Q_OBJECT
+		
 	public:
-		ArrowButtonsEventBlock(QGraphicsItem *parent=0);
+		enum
+		{
+			MODE_ARROW = 0,
+			MODE_RC_ARROW,
+			MODE_RC_KEYPAD
+		};
+		
+	public:
+		ArrowButtonsEventBlock(bool advanced, QGraphicsItem *parent=0);
+		
+		virtual unsigned valuesCount() const { return 7; }
+		virtual int getValue(unsigned i) const;
+		virtual void setValue(unsigned i, int value);
+		virtual QVector<quint16> getValuesCompressed() const;
+		
+		virtual bool isAnyAdvancedFeature() const;
+		virtual void setAdvanced(bool advanced);
+		
+		unsigned getMode() const { return mode; }
+		int getSelectedRCArrowButton() const;
+		int getSelectedRCKeypadButton() const;
+		
+	protected:
+		virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent * event);
+		
+		void setMode(unsigned mode);
+		void setButtonsPos(bool advanced);
+		
+	protected slots:
+		void ensureSingleRCArrowButtonSelected(int current = -1);
+		void ensureSingleRCKeypadButtonSelected(int current = -1);
+		
+	protected:
+		static const QRectF buttonPoses[3];
+		
+		bool advanced;
+		unsigned mode;
 	};
 	
 	class ProxEventBlock : public BlockWithButtonsAndRange

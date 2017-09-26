@@ -210,14 +210,14 @@ void UsageLogger::logAddBlock(BlockType type,int row, Block *block){
 	storeAction(wrapper);
 }
 
-void UsageLogger::logAccEventBlockMode(QString name, QString type, int mode){
+void UsageLogger::logEventBlockMode(QString name, QString type, int mode){
 	Action * wrapper = getActionWithCurrentState();
 	AccBlockModeAction *a = new AccBlockModeAction();
 	
 	a->set_blockname(name.toUtf8().constData());
 	a->set_blocktype(type.toUtf8().constData());
 	a->set_mode(mode);
-	wrapper->set_type(Action_ActionType_ACC_BLOCK_MODE);
+	wrapper->set_type(Action_ActionType_BLOCK_MODE);
 	wrapper->set_allocated_accblockmodeaction(a);
 	storeAction(wrapper);
 }

@@ -112,7 +112,7 @@ namespace Aseba { namespace ThymioVPL
 			codeGenerator.visit(eventActionsSet, scene->debugLog());
 		}
 		
-		codeGenerator.addInitialisationCode();
+		codeGenerator.link();
 		
 		return CompilationResult();
 	}

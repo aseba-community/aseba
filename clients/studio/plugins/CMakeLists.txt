@@ -24,6 +24,7 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/ResizingView.h
 	ThymioVPL/Buttons.h
 	ThymioVPL/Block.h
+	ThymioVPL/EventBlocks.h
 	ThymioVPL/ActionBlocks.h
 	ThymioVPL/EventActionsSet.h
 	ThymioVPL/Scene.h

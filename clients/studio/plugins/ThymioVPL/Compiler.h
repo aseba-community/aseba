@@ -21,6 +21,7 @@
 #ifndef VPL_COMPILER_H
 #define VPL_COMPILER_H
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <map>
@@ -29,6 +30,7 @@
 #include <utility>
 #include <QMap>
 #include <QPair>
+#include <QVector>
 
 namespace Aseba { namespace ThymioVPL
 {
@@ -72,48 +74,97 @@ namespace Aseba { namespace ThymioVPL
 		{
 		public:
 			CodeGenerator();
+			~CodeGenerator();
 			
 			void reset(bool advanced);
-			void addInitialisationCode();
 			void visit(const EventActionsSet& eventActionsSet, bool debugLog);
+			void link();
 			
 		protected:
-			void initEventToCodePosMap();
+			void clearEventHandlers();
+			std::wstring generateInitialisationCode() const;
+			
 			std::wstring indentText() const;
 			
-			void visitEndOfLine(unsigned currentBlock);
+			void visitEndOfLine(std::wstring& currentCode);
 			
-			void visitExecFeedback(const EventActionsSet& eventActionsSet, unsigned currentBlock);
-			void visitDebugLog(const EventActionsSet& eventActionsSet, unsigned currentBlock);
+			void visitExecFeedback(const EventActionsSet& eventActionsSet, std::wstring& currentCode);
+			void visitDebugLog(const EventActionsSet& eventActionsSet, std::wstring& currentCode);
 			
-			void visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, unsigned currentBlock);
+			void visitEventAndStateFilter(const Block* block, const Block* stateFilterBlock, std::wstring& currentCode);
 			std::wstring visitEventArrowButtons(const Block* block);
 			std::wstring visitEventProx(const Block* block);
 			std::wstring visitEventProxGround(const Block* block);
 			std::wstring visitEventAccPre(const Block* block);
 			std::wstring visitEventAcc(const Block* block);
 			
-			void visitAction(const Block* block, unsigned currentBlock);
+			void visitAction(const Block* block, std::wstring& currentCode, bool& isStateSet);
 			std::wstring visitActionMove(const Block* block);
 			std::wstring visitActionTopColor(const Block* block);
 			std::wstring visitActionBottomColor(const Block* block);
 			std::wstring visitActionSound(const Block* block);
 			std::wstring visitActionTimer(const Block* block);
-			std::wstring visitActionSetState(const Block* block);
+			std::wstring visitActionSetState(const Block* block, bool& isStateSet);
 			
 		public:
 			std::vector<std::wstring> generatedCode;
 			std::vector<int> setToCodeIdMap;
 			
 		protected:
-			typedef QMap<QString, QPair<int, int> > EventToCodePosMap;
-			EventToCodePosMap eventToCodePosMap;
+			struct EventHandler
+			{
+				typedef QPair<std::wstring, int> PairCodeAndIndex;
+				QVector<PairCodeAndIndex> code;
+				bool isStateSet;
+				
+				virtual ~EventHandler() {}
+				
+				void clear() { code.clear(); isStateSet = false; }
+				
+				virtual void generateAdditionalCode();
+			};
+			
+			struct ButtonEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct ProxEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct TapEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct AccEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct ClapEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct TimeoutEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			struct RemoteControlEventHandler: EventHandler
+			{
+				virtual void generateAdditionalCode();
+			};
+			
+			typedef QMap<QString, EventHandler* > EventHandlers;
+			EventHandlers eventHandlers;
+			std::wstring initCode;
 			
 			bool advancedMode;
 			bool useSound;
-			bool useTimer;
-			bool useMicrophone;
-			bool useAccAngle;
 			bool inWhenBlock;
 			bool inIfBlock;
 		};

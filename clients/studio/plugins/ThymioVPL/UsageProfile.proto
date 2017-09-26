@@ -130,7 +130,7 @@ message Action{
 	enum ActionType{
 		ADVANCED_MODE=1;
 		ADD_BLOCK = 2;
-		ACC_BLOCK_MODE = 3;
+		BLOCK_MODE = 3;
 		MENU = 4;
 		MOUSE_ACTION =5;
 		DEVICE_ACTION =6;
