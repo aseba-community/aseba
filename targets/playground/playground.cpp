@@ -383,26 +383,32 @@ int main(int argc, char *argv[])
 		activationE = activationE.nextSiblingElement ("activation");
 	}
 	
+	// TODO: use one loop for all robots
+	
 	// Scan for e-puck
 	// TODO: make sure we do not try to open twice the same ports
 	//QSet<unsigned> portUsed;
+	unsigned epuckNumber(0);
 	QDomElement ePuckE = domDocument.documentElement().firstChildElement("e-puck");
 	unsigned asebaServerCount(0);
 	while (!ePuckE.isNull())
 	{
-		// TODO: allow user-specified names for e-puck
 		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, asebaServerCount + 1));
+		const int16_t nodeId(ePuckE.attribute("nodeId", "1").toInt());
+		const auto qRobotName(ePuckE.attribute("name", QString("E-Puck %0").arg(epuckNumber)));
+		const auto cppRobotName(qRobotName.toStdString());
+		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, cppRobotName, nodeId));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
 		epuck->pos.y = ePuckE.attribute("y").toDouble();
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
-		viewer.log(app.tr("New e-puck on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg("Simulated E-Puck").arg(port), Qt::white);
 #ifdef ZEROCONF_SUPPORT
 		const Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Simulated E-Puck", { epuck->vm.nodeId }, { static_cast<unsigned int>(epuck->variables.productId) }};
-		zeroconf.advertise("E-puck", port, txt);
+		zeroconf.advertise(cppRobotName, port, txt);
 #endif // ZEROCONF_SUPPORT
+		++epuckNumber;
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
@@ -412,9 +418,10 @@ int main(int argc, char *argv[])
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
+		const int16_t nodeId(thymioE.attribute("nodeId", "1").toInt());
 		const auto qRobotName(thymioE.attribute("name", QString("Thymio II %0").arg(thymioNumber)));
 		const auto cppRobotName(qRobotName.toStdString());
-		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, cppRobotName));
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, cppRobotName, nodeId));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();

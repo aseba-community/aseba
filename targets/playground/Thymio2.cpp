@@ -30,8 +30,8 @@ namespace Enki
 	using namespace std;
 	using namespace Aseba;
 	
-	AsebaThymio2::AsebaThymio2(const std::string& robotName):
-		robotName(robotName),
+	AsebaThymio2::AsebaThymio2(std::string robotName, int16_t nodeId):
+		SingleVMNodeGlue(std::move(robotName), nodeId),
 		sdCardFileNumber(-1),
 		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
 		timer1(bind(&AsebaThymio2::timer1Timeout, this), 0),
@@ -42,8 +42,6 @@ namespace Enki
 	{
 		oldTimerPeriod[0] = 0;
 		oldTimerPeriod[1] = 0;
-		
-		vm.nodeId = 1;
 		
 		bytecode.resize(766+768);
 		vm.bytecode = &bytecode[0];

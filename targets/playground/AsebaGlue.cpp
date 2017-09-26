@@ -37,6 +37,14 @@ namespace Aseba
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	VMStateToEnvironment vmStateToEnvironment;
 	
+	// SingleVMNodeGlue
+	
+	SingleVMNodeGlue::SingleVMNodeGlue(std::string robotName, int16_t nodeId):
+		robotName(std::move(robotName))
+	{
+		vm.nodeId = nodeId;
+	}
+	
 	// RecvBufferNodeConnection
 
 	uint16_t RecvBufferNodeConnection::getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source)

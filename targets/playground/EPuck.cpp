@@ -163,10 +163,9 @@ namespace Enki
 	
 	// AsebaFeedableEPuck
 	
-	AsebaFeedableEPuck::AsebaFeedableEPuck(int id)
+	AsebaFeedableEPuck::AsebaFeedableEPuck(std::string robotName, int16_t nodeId):
+		Aseba::SingleVMNodeGlue(std::move(robotName), nodeId)
 	{
-		vm.nodeId = id;
-		
 		bytecode.resize(1024);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
@@ -180,7 +179,7 @@ namespace Enki
 		
 		AsebaVMInit(&vm);
 		
-		variables.id = id;
+		variables.id = vm.nodeId;
 		variables.productId = ASEBA_PID_PLAYGROUND_EPUCK;
 	}
 	

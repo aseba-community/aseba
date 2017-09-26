@@ -27,11 +27,12 @@
 #include <valarray>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace Aseba
 {
 	// Abstractions to virtualise VM and connection
-
+	
 	struct AbstractNodeGlue
 	{
 		// default virtual destructor
@@ -49,10 +50,15 @@ namespace Aseba
 	
 	struct SingleVMNodeGlue: AbstractNodeGlue
 	{
+		// Robot name
+		const std::string robotName;
+		
 		// VM implementation
 		AsebaVMState vm;
 		std::valarray<unsigned short> bytecode;
 		std::valarray<signed short> stack;
+		
+		SingleVMNodeGlue(std::string robotName, int16_t nodeId);
 	};
 
 	struct AbstractNodeConnection

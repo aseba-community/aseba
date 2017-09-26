@@ -102,7 +102,6 @@ namespace Enki
 		} variables;
 		
 	public:
-		const std::string robotName;
 		std::fstream sdCardFile;
 		int sdCardFileNumber;
 		
@@ -128,7 +127,7 @@ namespace Enki
 		bool thisStepCollided;
 		
 	public:
-		AsebaThymio2(const std::string& robotName);
+		AsebaThymio2(std::string robotName, int16_t nodeId);
 		
 		// from PhysicalObject
 		

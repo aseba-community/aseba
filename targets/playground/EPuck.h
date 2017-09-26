@@ -97,7 +97,7 @@ namespace Enki
 		} variables;
 		
 	public:
-		AsebaFeedableEPuck(int id);
+		AsebaFeedableEPuck(std::string robotName, int16_t nodeId);
 		
 		// from FeedableEPuck
 		

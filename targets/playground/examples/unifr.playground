@@ -47,10 +47,10 @@
 	<activation x="110.4" y="55.2" l1="1.6" l2="3.2" area="right" door="entrance" />
 	<activation x="66.2" y="49.6" l1="1.6" l2="1.6" area="center" door="exit" />
 	
-	<e-puck x="15" y="30" port="33334"/>
-	<e-puck x="15" y="40" port="33335"/>
-	<e-puck x="20" y="30" port="33336"/>
-	<e-puck x="20" y="40" port="33337"/>
+	<e-puck x="15" y="30" port="33334" name="E-Puck A" />
+	<e-puck x="15" y="40" port="33335" name="E-Puck B" />
+	<e-puck x="20" y="30" port="33336" name="E-Puck C" />
+	<e-puck x="20" y="40" port="33337" name="E-Puck D" />
 	
 	<process command=":asebaswitch -v tcp:localhost;33334 tcp:localhost;33335 tcp:localhost;33336 tcp:localhost;33337" />
 </aseba-playground>

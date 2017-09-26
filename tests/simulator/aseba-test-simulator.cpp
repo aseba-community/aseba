@@ -86,7 +86,7 @@ int main()
 	World world(40, 20);
 	simulatorEnvironment.reset(new TestSimulatorEnvironment(world));
 	
-	DirectAsebaThymio2* thymio(new DirectAsebaThymio2("thymio2_0"));
+	DirectAsebaThymio2* thymio(new DirectAsebaThymio2("thymio2_0", 1));
 	thymio->pos = {10, 10};
 	world.addObject(thymio);
 	
