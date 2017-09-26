@@ -498,7 +498,7 @@ namespace Aseba { namespace ThymioVPL
 				{85, 17, 77},
 				{81, 33, unsigned(-1) },
 				{86, 16, 78},
-				{87, unsigned(-1), unsigned(-1)}
+				{87, 13, unsigned(-1)}
 			};
 			
 			text += L"rc5.command == " + toWstring(mapping[value][0]);
