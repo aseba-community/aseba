@@ -88,6 +88,46 @@ namespace Enki
 	};
 }
 
+// support for robot factory
+struct RobotInstance
+{
+	Enki::Robot* robot;
+#ifdef ZEROCONF_SUPPORT
+	const Aseba::Zeroconf::TxtRecord zeroconfProperties;
+#endif // ZEROCONF_SUPPORT
+};
+
+template<typename RobotT>
+RobotInstance createRobotSingleVMNode(unsigned port, std::string robotName, std::string typeName, int16_t nodeId)
+{
+	auto robot(new RobotT(port, std::move(robotName), nodeId));
+#ifdef ZEROCONF_SUPPORT
+	const Aseba::Zeroconf::TxtRecord txt
+	{
+		ASEBA_PROTOCOL_VERSION,
+		std::move(typeName),
+		{ robot->vm.nodeId },
+		{ static_cast<unsigned int>(robot->variables.productId) }
+	};
+	return { robot, txt };
+#else // ZEROCONF_SUPPORT
+	return { robot };
+#endif // ZEROCONF_SUPPORT
+}
+
+using RobotFactory = std::function<RobotInstance(unsigned, std::string, std::string, int16_t)>;
+struct RobotType
+{
+	RobotType(std::string prettyName, RobotFactory factory):
+		prettyName(std::move(prettyName)),
+		factory(std::move(factory))
+	{}
+	const std::string prettyName;
+	const RobotFactory factory;
+	unsigned number = 0;
+};
+
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
@@ -383,57 +423,51 @@ int main(int argc, char *argv[])
 		activationE = activationE.nextSiblingElement ("activation");
 	}
 	
-	// TODO: use one loop for all robots
-	
-	// Scan for e-puck
-	// TODO: make sure we do not try to open twice the same ports
-	//QSet<unsigned> portUsed;
-	unsigned epuckNumber(0);
-	QDomElement ePuckE = domDocument.documentElement().firstChildElement("e-puck");
+	// load all robots in one loop
+	std::map<std::string, RobotType> robotTypes {
+		{ "thymio2", { "Thymio II", createRobotSingleVMNode<Enki::DashelAsebaThymio2> } },
+		{ "e-puck", { "E-Puck", createRobotSingleVMNode<Enki::DashelAsebaFeedableEPuck> } },
+	};
+	QDomElement robotE = domDocument.documentElement().firstChildElement("robot");
 	unsigned asebaServerCount(0);
-	while (!ePuckE.isNull())
+	while (!robotE.isNull())
 	{
-		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		const int16_t nodeId(ePuckE.attribute("nodeId", "1").toInt());
-		const auto qRobotName(ePuckE.attribute("name", QString("E-Puck %0").arg(epuckNumber)));
-		const auto cppRobotName(qRobotName.toStdString());
-		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, cppRobotName, nodeId));
-		asebaServerCount++;
-		epuck->pos.x = ePuckE.attribute("x").toDouble();
-		epuck->pos.y = ePuckE.attribute("y").toDouble();
-		epuck->angle = ePuckE.attribute("angle").toDouble();
-		world.addObject(epuck);
-		viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg("Simulated E-Puck").arg(port), Qt::white);
+		const auto type(robotE.attribute("type", "thymio2"));
+		auto typeIt(robotTypes.find(type.toStdString()));
+		if (typeIt != robotTypes.end())
+		{
+			// retrieve informations
+			const auto& cppTypeName(typeIt->second.prettyName);
+			const auto qTypeName(QString::fromStdString(cppTypeName));
+			auto& countOfThisType(typeIt->second.number);
+			const auto qRobotName(robotE.attribute("name", QString("%1 %2").arg(qTypeName).arg(countOfThisType)));
+			const auto cppRobotName(qRobotName.toStdString());
+			const unsigned port(robotE.attribute("port", QString("%1").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
+			const int16_t nodeId(robotE.attribute("nodeId", "1").toInt());
+			
+			// create
+			const auto& creator(typeIt->second.factory);
+			auto instance(creator(port, cppRobotName, cppTypeName, nodeId));
+			auto robot(instance.robot);
+			asebaServerCount++;
+			countOfThisType++;
+			
+			// setup in the world
+			robot->pos.x = robotE.attribute("x").toDouble();
+			robot->pos.y = robotE.attribute("y").toDouble();
+			robot->angle = robotE.attribute("angle").toDouble();
+			world.addObject(robot);
+			
+			// advertise
+			viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg(qTypeName).arg(port), Qt::white);
 #ifdef ZEROCONF_SUPPORT
-		const Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Simulated E-Puck", { epuck->vm.nodeId }, { static_cast<unsigned int>(epuck->variables.productId) }};
-		zeroconf.advertise(cppRobotName, port, txt);
+			zeroconf.advertise(cppRobotName, port, instance.zeroconfProperties);
 #endif // ZEROCONF_SUPPORT
-		++epuckNumber;
-		ePuckE = ePuckE.nextSiblingElement ("e-puck");
-	}
-	
-	// Scan for Thymio 2
-	unsigned thymioNumber(0);
-	QDomElement thymioE(domDocument.documentElement().firstChildElement("thymio2"));
-	while (!thymioE.isNull())
-	{
-		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		const int16_t nodeId(thymioE.attribute("nodeId", "1").toInt());
-		const auto qRobotName(thymioE.attribute("name", QString("Thymio II %0").arg(thymioNumber)));
-		const auto cppRobotName(qRobotName.toStdString());
-		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, cppRobotName, nodeId));
-		asebaServerCount++;
-		thymio->pos.x = thymioE.attribute("x").toDouble();
-		thymio->pos.y = thymioE.attribute("y").toDouble();
-		thymio->angle = thymioE.attribute("angle").toDouble();
-		world.addObject(thymio);
-		viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg("Simulated Thymio II").arg(port), Qt::white);
-#ifdef ZEROCONF_SUPPORT
-		const Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Simulated Thymio II", { thymio->vm.nodeId }, { static_cast<unsigned int>(thymio->variables.productId) }};
-		zeroconf.advertise(cppRobotName, port, txt);
-#endif // ZEROCONF_SUPPORT
-		++thymioNumber;
-		thymioE = thymioE.nextSiblingElement ("thymio2");
+		}
+		else
+			viewer.log("Error, unknown robot type " + type, Qt::red);
+		
+		robotE = robotE.nextSiblingElement ("robot");
 	}
 	
 	// Scan for external processes

@@ -15,5 +15,5 @@
 	<world w="200.0" h="120.0" color="white" groundTexture="thymio-barcodelightpainting.png" />
 	<camera x="100" y="40" altitude="110" yaw=" 1.57" pitch="-1.5" />
 	
-	<thymio2 x="50" y="52" name="Thymio" />
+	<robot type="thymio2" x="50" y="52" name="Thymio" />
 </aseba-playground>

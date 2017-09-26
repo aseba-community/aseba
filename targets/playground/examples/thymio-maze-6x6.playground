@@ -17,8 +17,8 @@
 	<color name="blue" r="0" g="0.38" b="0.61" />
 
 	<world w="240" h="240" color="white" groundTexture="thymio-maze-6x6.png" />
-	<thymio2 x="145" y="20" port="33333" angle="0.00" name="Thymio 0" />
-	<thymio2 x="220" y="180" port="33334" angle="1.57" name="Thymio 1" />
+	<robot type="thymio2" x="145" y="20" port="33333" angle="0.00" name="Thymio 0" />
+	<robot type="thymio2" x="220" y="180" port="33334" angle="1.57" name="Thymio 1" />
 	<wall x="120.00" y="105.00" l1="2.00" l2="32.00" h="10.00" color="wall" />
 	<wall x="125.00" y="85.00" l1="16.14" l2="2.00" h="10.00" color="wall" angle="2.356" />
 	<wall x="145.00" y="80.00" l1="32.00" l2="2.00" h="10.00" color="wall" />

@@ -138,26 +138,26 @@
 	<wall x="397.40" y="245.24" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="1.571" />
 	<wall x="83.52" y="247.14" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" angle="1.571" />
 
-	<thymio2 x="346.00" y="108.00" port="33333" angle="-2.360" name="Thymio A0" /> <!-- A -->
-	<thymio2 x="357.00" y="119.00" port="33334" angle="-2.360" name="Thymio A1" /> <!-- A -->
-	<thymio2 x="368.00" y="108.00" port="33335" angle="-2.360" name="Thymio A2" /> <!-- A -->
-	<thymio2 x="379.00" y="97.00"  port="33336" angle="-2.360" name="Thymio A3" /> <!-- A -->
+	<robot type="robot type="thymio2"" x="346.00" y="108.00" port="33333" angle="-2.360" name="Thymio A0" /> <!-- A -->
+	<robot type="robot type="thymio2"" x="357.00" y="119.00" port="33334" angle="-2.360" name="Thymio A1" /> <!-- A -->
+	<robot type="robot type="thymio2"" x="368.00" y="108.00" port="33335" angle="-2.360" name="Thymio A2" /> <!-- A -->
+	<robot type="robot type="thymio2"" x="379.00" y="97.00"  port="33336" angle="-2.360" name="Thymio A3" /> <!-- A -->
 
-	<thymio2 x="102.26" y="140.64" port="33337" angle="2.359" name="Thymio B0" /> <!-- B -->
-	<thymio2 x="113.26" y="129.64" port="33338" angle="2.359" name="Thymio B1" /> <!-- B -->
-	<thymio2 x="102.26" y="118.64" port="33339" angle="2.359" name="Thymio B2" /> <!-- B -->
-	<thymio2 x="91.26" y="107.64"  port="33340" angle="2.359" name="Thymio B3" /> <!-- B -->
+	<robot type="robot type="thymio2"" x="102.26" y="140.64" port="33337" angle="2.359" name="Thymio B0" /> <!-- B -->
+	<robot type="robot type="thymio2"" x="113.26" y="129.64" port="33338" angle="2.359" name="Thymio B1" /> <!-- B -->
+	<robot type="robot type="thymio2"" x="102.26" y="118.64" port="33339" angle="2.359" name="Thymio B2" /> <!-- B -->
+	<robot type="robot type="thymio2"" x="91.26" y="107.64"  port="33340" angle="2.359" name="Thymio B3" /> <!-- B -->
 
-	<thymio2 x="134.90" y="384.40" port="33341" angle="0.789" name="Thymio C0" /> <!-- C -->
-	<thymio2 x="123.90" y="373.40" port="33342" angle="0.789" name="Thymio C1" /> <!-- C -->
-	<thymio2 x="112.90" y="384.40" port="33343" angle="0.789" name="Thymio C2" /> <!-- C -->
-	<thymio2 x="101.90" y="395.40" port="33344" angle="0.789" name="Thymio C3" /> <!-- C -->
+	<robot type="robot type="thymio2"" x="134.90" y="384.40" port="33341" angle="0.789" name="Thymio C0" /> <!-- C -->
+	<robot type="robot type="thymio2"" x="123.90" y="373.40" port="33342" angle="0.789" name="Thymio C1" /> <!-- C -->
+	<robot type="robot type="thymio2"" x="112.90" y="384.40" port="33343" angle="0.789" name="Thymio C2" /> <!-- C -->
+	<robot type="robot type="thymio2"" x="101.90" y="395.40" port="33344" angle="0.789" name="Thymio C3" /> <!-- C -->
 
-	<thymio2 x="378.66" y="351.74" port="33345" angle="-0.782" name="Thymio D0" /> <!-- D -->
-	<thymio2 x="367.66" y="362.74" port="33346" angle="-0.782" name="Thymio D1" /> <!-- D -->
-	<thymio2 x="378.66" y="373.74" port="33347" angle="-0.782" name="Thymio D2" /> <!-- D -->
-	<thymio2 x="389.66" y="384.74" port="33348" angle="-0.782" name="Thymio D3" /> <!-- D -->
+	<robot type="robot type="thymio2"" x="378.66" y="351.74" port="33345" angle="-0.782" name="Thymio D0" /> <!-- D -->
+	<robot type="robot type="thymio2"" x="367.66" y="362.74" port="33346" angle="-0.782" name="Thymio D1" /> <!-- D -->
+	<robot type="robot type="thymio2"" x="378.66" y="373.74" port="33347" angle="-0.782" name="Thymio D2" /> <!-- D -->
+	<robot type="robot type="thymio2"" x="389.66" y="384.74" port="33348" angle="-0.782" name="Thymio D3" /> <!-- D -->
 
-	<e-puck x="240.45" y="246.20" port="33331" angle="1.571" />
-	<e-puck x="268.45" y="246.20" port="33332" angle="1.571" />
+	<robot type="e-puck" x="240.45" y="246.20" port="33331" angle="1.571" />
+	<robot type="e-puck" x="268.45" y="246.20" port="33332" angle="1.571" />
 </aseba-playground>

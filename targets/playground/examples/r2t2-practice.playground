@@ -63,8 +63,8 @@
 
 	<wall x="171.50" y="89.26" l1="46.00" l2="14.00" h="15.00" mass="200" color="cornflower" />
 
-	<thymio2 x="278" y="108" port="33333" angle="3.93" name="Thymio A0" />
-	<thymio2 x="289" y="119" port="33334" angle="3.93" name="Thymio A1" />
-	<thymio2 x="300" y="108" port="33335" angle="3.93" name="Thymio A2" />
-	<thymio2 x="311" y="97" port="33336" angle="3.93" name="Thymio A3" />
+	<robot type="thymio2" x="278" y="108" port="33333" angle="3.93" name="Thymio A0" />
+	<robot type="thymio2" x="289" y="119" port="33334" angle="3.93" name="Thymio A1" />
+	<robot type="thymio2" x="300" y="108" port="33335" angle="3.93" name="Thymio A2" />
+	<robot type="thymio2" x="311" y="97" port="33336" angle="3.93" name="Thymio A3" />
 </aseba-playground>
