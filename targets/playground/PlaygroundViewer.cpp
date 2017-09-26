@@ -33,6 +33,8 @@
 #include "../../common/utils/utils.h"
 #include <QMessageBox>
 #include <QApplication>
+#include <QMouseEvent>
+#include <QToolTip>
 #include <QtDebug>
 
 #ifdef Q_OS_WIN32
@@ -58,6 +60,7 @@ namespace Enki
 		logPos(0),
 		energyPool(INITIAL_POOL_ENERGY)
 	{
+		setMouseTracking(true);
 	}
 	
 	PlaygroundViewer::~PlaygroundViewer()
@@ -256,6 +259,16 @@ namespace Enki
 				renderText(8,(height()*7)/8 + 14 + i*14, QString::fromStdString(logTime[j].toHumanReadableStringFromEpoch()) + " " + logText[j],font);
 			}
 		}
+	}
+	
+	void PlaygroundViewer::mouseMoveEvent(QMouseEvent * event)
+	{
+		ViewerWidget::mouseMoveEvent(event);
+		auto* pointedRobot(dynamic_cast<NamedRobot*>(getPointedObject()));
+		if (pointedRobot)
+			QToolTip::showText(event->globalPos(), QString::fromStdString(pointedRobot->robotName));
+		else
+			QToolTip::showText(event->globalPos(), "");
 	}
 	
 	void PlaygroundViewer::timerEvent(QTimerEvent * event)

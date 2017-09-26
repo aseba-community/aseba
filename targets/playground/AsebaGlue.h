@@ -48,11 +48,16 @@ namespace Aseba
 		virtual void externalInputStep(double dt) = 0;
 	};
 	
-	struct SingleVMNodeGlue: AbstractNodeGlue
+	struct NamedRobot
 	{
 		// Robot name
 		const std::string robotName;
 		
+		NamedRobot(std::string robotName);
+	};
+	
+	struct SingleVMNodeGlue: NamedRobot, AbstractNodeGlue
+	{
 		// VM implementation
 		AsebaVMState vm;
 		std::valarray<unsigned short> bytecode;

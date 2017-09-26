@@ -69,6 +69,7 @@ namespace Enki
 	protected:
 		virtual void renderObjectsTypesHook();
 		virtual void sceneCompletedHook();
+		virtual void mouseMoveEvent(QMouseEvent*);
 		virtual void timerEvent(QTimerEvent * event);
 	
 	protected:

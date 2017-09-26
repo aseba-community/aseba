@@ -37,10 +37,15 @@ namespace Aseba
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	VMStateToEnvironment vmStateToEnvironment;
 	
+	NamedRobot::NamedRobot(std::string robotName):
+		robotName(std::move(robotName))
+	{
+	}
+	
 	// SingleVMNodeGlue
 	
 	SingleVMNodeGlue::SingleVMNodeGlue(std::string robotName, int16_t nodeId):
-		robotName(std::move(robotName))
+		NamedRobot(std::move(robotName))
 	{
 		vm.nodeId = nodeId;
 	}
