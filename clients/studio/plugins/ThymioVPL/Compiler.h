@@ -46,7 +46,8 @@ namespace Aseba { namespace ThymioVPL
 			NO_ERROR = 0,
 			MISSING_EVENT,
 			MISSING_ACTION,
-			DUPLICATED_EVENT
+			DUPLICATED_EVENT,
+			INEFFECTIVE_EVENT
 		};
 		
 		//! Result of a compilation

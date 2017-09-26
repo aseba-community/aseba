@@ -510,7 +510,7 @@ namespace Aseba { namespace ThymioVPL
 		
 		const bool isWarning(
 			isSetLast(lastCompilationResult.errorLine) &&
-			((lastCompilationResult.errorType == Compiler::MISSING_ACTION) || (lastCompilationResult.errorType == Compiler::MISSING_EVENT))
+			((lastCompilationResult.errorType == Compiler::MISSING_ACTION) || (lastCompilationResult.errorType == Compiler::MISSING_EVENT) || (lastCompilationResult.errorType == Compiler::INEFFECTIVE_EVENT))
 		);
 		
 		warningGraphicsItem->setVisible(isWarning);

@@ -986,6 +986,17 @@ namespace Aseba { namespace ThymioVPL
 			showCompilationError->show();
 			emit compilationOutcome(false);
 		}
+		else if ((compilation.errorType == Compiler::INEFFECTIVE_EVENT) && (scene->isSetLast(compilation.errorLine)))
+		{
+			compilationResult->setText(tr("Please select at least one sensor"));
+			compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
+			compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/missing_block.svgz", fontSize*1.2));
+			runButton->setEnabled(false);
+			// error, cannot upload, stop animation
+			stopRunButtonAnimationTimer();
+			showCompilationError->show();
+			emit compilationOutcome(false);
+		}
 		else
 		{
 			compilationResult->setStyleSheet("QLabel { font-size: 10pt; color: rgb(231,19,0); }");

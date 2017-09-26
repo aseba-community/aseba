@@ -1175,7 +1175,7 @@ namespace Aseba { namespace ThymioVPL
 		painter->setPen(Qt::NoPen);
 		//painter->setBrush(Qt::red);
 		painter->setBrush(QColor(Qt::red).lighter());
-		if (errorType == Compiler::MISSING_EVENT)
+		if (errorType == Compiler::MISSING_EVENT || errorType == Compiler::INEFFECTIVE_EVENT)
 		{
 			const qreal x(Style::blockSpacing + Style::blockWidth / 2);
 			const qreal y(Style::blockSpacing + Style::blockHeight + Style::blockSpacing + 20);

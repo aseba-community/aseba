@@ -84,6 +84,7 @@ namespace Aseba { namespace ThymioVPL
 		virtual void setValue(unsigned i, int value) = 0;
 		virtual QVector<uint16_t> getValuesCompressed() const = 0;
 		virtual bool isAnyValueSet() const;
+		virtual bool needsAnyValueSet() const;
 		void resetValues();
 		
 		virtual bool isAdvancedBlock() const { return false; }

@@ -34,18 +34,21 @@ namespace Aseba { namespace ThymioVPL
 	{
 	public:
 		ArrowButtonsEventBlock(QGraphicsItem *parent=0);
+		virtual bool needsAnyValueSet() const;
 	};
 	
 	class ProxEventBlock : public BlockWithButtonsAndRange
 	{
 	public:
 		ProxEventBlock(bool advanced, QGraphicsItem *parent=0);
+		virtual bool needsAnyValueSet() const;
 	};
 
 	class ProxGroundEventBlock : public BlockWithButtonsAndRange
 	{
 	public:
 		ProxGroundEventBlock(bool advanced, QGraphicsItem *parent=0);
+		virtual bool needsAnyValueSet() const;
 	};
 
 	class AccEventBlock : public Block

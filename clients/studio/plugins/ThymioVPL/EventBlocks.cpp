@@ -68,6 +68,11 @@ namespace Aseba { namespace ThymioVPL
 		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),4,this));
 	}
 	
+	bool ArrowButtonsEventBlock::needsAnyValueSet() const
+	{
+		return true;
+	}
+	
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, Qt::black, Qt::white, advanced, parent)
@@ -132,6 +137,11 @@ namespace Aseba { namespace ThymioVPL
 		updateIndicationLEDsOpacity();
 	}
 	
+	bool ProxEventBlock::needsAnyValueSet() const
+	{
+		return true;
+	}
+	
 	
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
@@ -164,6 +174,11 @@ namespace Aseba { namespace ThymioVPL
 		}
 		
 		updateIndicationLEDsOpacity();
+	}
+	
+	bool ProxGroundEventBlock::needsAnyValueSet() const
+	{
+		return true;
 	}
 	
 	
