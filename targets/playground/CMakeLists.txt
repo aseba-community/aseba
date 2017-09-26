@@ -51,7 +51,7 @@ if (ENKI_FOUND)
 		
 		add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS})
 		
-		target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_ZEROCONFQT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
+		target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm ${ASEBA_ZEROCONFQT_LIBRARIES} ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
 		install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 	endif (QT4_FOUND)
