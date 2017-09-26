@@ -119,10 +119,10 @@ public:
 
 #ifdef ZEROCONF_SUPPORT
 		// advertise target
-		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { mutableName }, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
+		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
 		try
 		{
-			zeroconf.advertise(Aseba::FormatableString("Aseba Dummy Node %0").arg(deltaNodeId), listenStream, txt);
+			zeroconf.advertise(Aseba::FormatableString("Dummy Node %0").arg(deltaNodeId), listenStream, txt);
 		}
 		catch (const std::runtime_error& e)
 		{

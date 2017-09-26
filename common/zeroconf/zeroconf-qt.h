@@ -39,6 +39,7 @@ namespace Aseba
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
 
 	public:
+		QtZeroconf(QObject *parent = nullptr): QObject(parent) {}
 		~QtZeroconf() override;
 
 	protected slots:

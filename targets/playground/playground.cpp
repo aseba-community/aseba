@@ -43,6 +43,10 @@
 #include "PlaygroundDBusAdaptors.h"
 #endif // HAVE_DBUS
 
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-qt.h"
+#endif // ZEROCONF_SUPPORT
+
 namespace Enki
 {
 	//! The simulator environment for playground
@@ -229,6 +233,11 @@ int main(int argc, char *argv[])
 		qDebug() << "A simulator environment already exists, replacing";
 	Enki::simulatorEnvironment.reset(new Enki::PlaygroundSimulatorEnvironment(sceneFileName, viewer));
 	
+	// Zeroconf support to advertise targets
+#ifdef ZEROCONF_SUPPORT
+	Aseba::QtZeroconf zeroconf;
+#endif // ZEROCONF_SUPPORT
+	
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
 	if (!cameraE.isNull())
@@ -381,7 +390,8 @@ int main(int argc, char *argv[])
 	unsigned asebaServerCount(0);
 	while (!ePuckE.isNull())
 	{
-		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());	
+		// TODO: allow user-specified names for e-puck
+		const unsigned port(ePuckE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
 		Enki::AsebaFeedableEPuck* epuck(new Enki::DashelAsebaFeedableEPuck(port, asebaServerCount + 1));
 		asebaServerCount++;
 		epuck->pos.x = ePuckE.attribute("x").toDouble();
@@ -389,6 +399,10 @@ int main(int argc, char *argv[])
 		epuck->angle = ePuckE.attribute("angle").toDouble();
 		world.addObject(epuck);
 		viewer.log(app.tr("New e-puck on port %0").arg(port), Qt::white);
+#ifdef ZEROCONF_SUPPORT
+		const Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Simulated E-Puck", { epuck->vm.nodeId }, { static_cast<unsigned int>(epuck->variables.productId) }};
+		zeroconf.advertise("E-puck", port, txt);
+#endif // ZEROCONF_SUPPORT
 		ePuckE = ePuckE.nextSiblingElement ("e-puck");
 	}
 	
@@ -398,13 +412,20 @@ int main(int argc, char *argv[])
 	while (!thymioE.isNull())
 	{
 		const unsigned port(thymioE.attribute("port", QString("%0").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
-		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, Aseba::FormatableString("thymio2_%0").arg(thymioNumber++)));
+		const auto qRobotName(thymioE.attribute("name", QString("Thymio II %0").arg(thymioNumber)));
+		const auto cppRobotName(qRobotName.toStdString());
+		Enki::AsebaThymio2* thymio(new Enki::DashelAsebaThymio2(port, cppRobotName));
 		asebaServerCount++;
 		thymio->pos.x = thymioE.attribute("x").toDouble();
 		thymio->pos.y = thymioE.attribute("y").toDouble();
 		thymio->angle = thymioE.attribute("angle").toDouble();
 		world.addObject(thymio);
-		viewer.log(app.tr("New Thymio II on port %0").arg(port), Qt::white);
+		viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg("Simulated Thymio II").arg(port), Qt::white);
+#ifdef ZEROCONF_SUPPORT
+		const Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Simulated Thymio II", { thymio->vm.nodeId }, { static_cast<unsigned int>(thymio->variables.productId) }};
+		zeroconf.advertise(cppRobotName, port, txt);
+#endif // ZEROCONF_SUPPORT
+		++thymioNumber;
 		thymioE = thymioE.nextSiblingElement ("thymio2");
 	}
 	
@@ -454,7 +475,8 @@ int main(int argc, char *argv[])
 	// If D-Bus is used, register the viewer object
 	#ifdef HAVE_DBUS
 	new Enki::EnkiWorldInterface(&viewer);
-	QDBusConnection::sessionBus().registerObject("/world", &viewer);	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
+	QDBusConnection::sessionBus().registerObject("/world", &viewer);
+	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
 	#endif // HAVE_DBUS
 	
 	// Run the application
