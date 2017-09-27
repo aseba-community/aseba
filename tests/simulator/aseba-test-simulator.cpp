@@ -19,7 +19,7 @@
 */
 
 #include "../../targets/playground/EnkiGlue.h"
-#include "../../targets/playground/DirectAsebaGlue.h"
+#include "../../targets/playground/Robots.h"
 #include "../../common/msg/NodesManager.h"
 #include <iostream>
 #include <iterator>

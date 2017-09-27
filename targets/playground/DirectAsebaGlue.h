@@ -26,8 +26,6 @@
 #include "../../common/msg/msg.h"
 #include "../../transport/buffer/vm-buffer.h"
 #include "AsebaGlue.h"
-#include "Thymio2.h"
-#include "EPuck.h"
 
 // Implementation of the connection using direct connection
 
@@ -99,10 +97,6 @@ namespace Enki
 			}
 		}
 	};
-	
-	typedef DirectlyConnected<AsebaThymio2> DirectAsebaThymio2;
-	typedef DirectlyConnected<AsebaFeedableEPuck> DirectAsebaFeedableEPuck;
-	
 } // namespace Enki
 
 

@@ -22,8 +22,6 @@
 #define __PLAYGROUND_DASHEL_ASEBA_GLUE_H
 
 #include "AsebaGlue.h"
-#include "Thymio2.h"
-#include "EPuck.h"
 #include <dashel/dashel.h>
 
 // Implementation of the connection using Dashel
@@ -86,9 +84,6 @@ namespace Enki
 			closeOldStreams();
 		}
 	};
-	
-	typedef DashelConnected<AsebaThymio2> DashelAsebaThymio2;
-	typedef DashelConnected<AsebaFeedableEPuck> DashelAsebaFeedableEPuck;
 	
 } // namespace Enki
 

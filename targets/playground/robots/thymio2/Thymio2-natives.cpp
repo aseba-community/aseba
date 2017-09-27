@@ -20,8 +20,8 @@
 
 #include "Thymio2-natives.h"
 #include "Thymio2.h"
-#include "EnkiGlue.h"
-#include "../../common/consts.h"
+#include "../../EnkiGlue.h"
+#include "../../../../common/consts.h"
 
 using namespace Enki;
 

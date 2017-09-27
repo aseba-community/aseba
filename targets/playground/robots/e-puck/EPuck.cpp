@@ -19,10 +19,10 @@
 */
 
 #include "EPuck.h"
-#include "Parameters.h"
-#include "PlaygroundViewer.h"
-#include "../../common/productids.h"
-#include "../../common/utils/utils.h"
+#include "../../Parameters.h"
+#include "../../PlaygroundViewer.h"
+#include "../../../../common/productids.h"
+#include "../../../../common/utils/utils.h"
 
 // Native functions
 

@@ -21,7 +21,7 @@
 #ifndef __PLAYGROUND_EPUCK_H
 #define __PLAYGROUND_EPUCK_H
 
-#include "AsebaGlue.h"
+#include "../../AsebaGlue.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>
 

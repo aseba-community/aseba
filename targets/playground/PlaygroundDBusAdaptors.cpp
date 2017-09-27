@@ -29,7 +29,7 @@
 
 #include "PlaygroundDBusAdaptors.h"
 #include "PlaygroundViewer.h"
-#include "Thymio2.h"
+#include "robots/thymio2/Thymio2.h"
 #include <QDBusConnection>
 #include <QDBusMetaType>
 #include <QtDebug>

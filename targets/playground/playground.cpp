@@ -29,6 +29,7 @@
 #include "DashelAsebaGlue.h"
 #include "Door.h"
 #include "PlaygroundViewer.h"
+#include "Robots.h"
 #include <QtXml>
 #include <QApplication>
 #include <QFileDialog>

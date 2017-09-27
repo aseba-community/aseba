@@ -6,11 +6,11 @@ if (ENKI_FOUND)
 		AsebaGlue.cpp
 		DirectAsebaGlue.cpp
 		Door.cpp
-		EPuck.cpp
-		EPuck-descriptions.c
-		Thymio2.cpp
-		Thymio2-natives.cpp
-		Thymio2-descriptions.c
+		robots/e-puck/EPuck.cpp
+		robots/e-puck/EPuck-descriptions.c
+		robots/thymio2/Thymio2.cpp
+		robots/thymio2/Thymio2-natives.cpp
+		robots/thymio2/Thymio2-descriptions.c
 	)
 
 	add_library(asebasim ${ASEBASIM_SRC})
@@ -44,7 +44,7 @@ if (ENKI_FOUND)
 			playground.cpp
 		)
 		qt4_wrap_cpp(playground_MOCS
-			Thymio2.h
+			robots/thymio2/Thymio2.h
 			PlaygroundViewer.h
 			PlaygroundDBusAdaptors.h
 		)

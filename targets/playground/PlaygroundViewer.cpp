@@ -28,8 +28,7 @@
 
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
-#include "EnkiGlue.h"
-#include "DashelAsebaGlue.h"
+#include "Robots.h"
 #include "../../common/utils/utils.h"
 #include <QMessageBox>
 #include <QApplication>
