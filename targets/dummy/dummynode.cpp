@@ -58,6 +58,9 @@ private:
 	} variables;
 	char mutableName[12];
 	
+	// stream for listening to incoming connections
+	Dashel::Stream* listenStream;
+	
 public:
 	// public because accessed from a glue function
 	uint16_t lastMessageSource;
@@ -99,7 +102,6 @@ public:
 		strncpy(mutableName, "dummynode-0", 12);
 		mutableName[10] = '0' + deltaNodeId;
 		nodeDescription.name = mutableName;
-		Dashel::Stream* listenStream;
 		
 		// connect network
 		try
@@ -118,21 +120,32 @@ public:
 		AsebaVMInit(&vm);
 
 #ifdef ZEROCONF_SUPPORT
-		// advertise target
-		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
-		try
-		{
-			zeroconf.advertise(Aseba::FormatableString("Dummy Node %0").arg(deltaNodeId), listenStream, txt);
-		}
-		catch (const std::runtime_error& e)
-		{
-			std::cerr << "Can't advertise stream " << stream->getTargetName() << ": " << e.what() << std::endl;
-		}
+		// advertise our status
+		updateZeroconfStatus();
 #endif // ZEROCONF_SUPPORT
 
 		// return stream
 		return listenStream;
 	}
+
+#ifdef ZEROCONF_SUPPORT
+	void updateZeroconfStatus()
+	{
+		// we need a valid listen stream to advertise
+		if (!listenStream)
+			return;
+		// advertise target
+		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", stream != nullptr, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
+		try
+		{
+			zeroconf.advertise(Aseba::FormatableString("Dummy Node %0").arg(vm.nodeId - 1), listenStream, txt);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << "Can't advertise stream " << stream->getTargetName() << ": " << e.what() << std::endl;
+		}
+	}
+#endif // ZEROCONF_SUPPORT
 	
 	virtual void connectionCreated(Dashel::Stream *stream)
 	{
@@ -146,6 +159,10 @@ public:
 			// set new stream as current stream
 			this->stream = stream;
 			std::cerr << this << " : New client connected." << std::endl;
+#ifdef ZEROCONF_SUPPORT
+			// we are not available any more
+			updateZeroconfStatus();
+#endif // ZEROCONF_SUPPORT
 		}
 	}
 	
@@ -154,7 +171,7 @@ public:
 #ifdef ZEROCONF_SUPPORT
 		zeroconf.dashelConnectionClosed(stream);
 #endif // ZEROCONF_SUPPORT
-		this->stream = 0;
+		this->stream = nullptr;
 		// clear breakpoints
 		vm.breakpointsCount = 0;
 		
@@ -162,6 +179,10 @@ public:
 			std::cerr << this << " : Client has disconnected unexpectedly." << std::endl;
 		else
 			std::cerr << this << " : Client has disconnected properly." << std::endl;
+#ifdef ZEROCONF_SUPPORT
+		// we are now available again
+		updateZeroconfStatus();
+#endif // ZEROCONF_SUPPORT
 	}
 	
 	virtual void incomingData(Dashel::Stream *stream)

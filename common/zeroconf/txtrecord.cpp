@@ -27,11 +27,12 @@ using namespace std;
 namespace Aseba
 {
 	//! TXT data for an Aseba target, with node ids and product ids
-	Zeroconf::TxtRecord::TxtRecord(const unsigned int protovers, const std::string& type, const std::vector<unsigned int>& ids, const std::vector<unsigned int>& pids)
+	Zeroconf::TxtRecord::TxtRecord(const unsigned int protovers, const std::string& type, bool busy, const std::vector<unsigned int>& ids, const std::vector<unsigned int>& pids)
 	{
 		assign("txtvers", 1);
 		assign("protovers", int(protovers));
 		assign("type", type);
+		assign("busy", busy);
 		assign("ids", ids);
 		assign("pids", pids);
 	}
@@ -104,6 +105,7 @@ namespace Aseba
 		serializeField(txt, "txtvers");
 		serializeField(txt, "protovers");
 		serializeField(txt, "type");
+		serializeField(txt, "busy");
 		serializeField(txt, "ids");
 		serializeField(txt, "pids");
 		return txt.str();

@@ -107,6 +107,7 @@ RobotInstance createRobotSingleVMNode(unsigned port, std::string robotName, std:
 	{
 		ASEBA_PROTOCOL_VERSION,
 		std::move(typeName),
+		false,
 		{ robot->vm.nodeId },
 		{ static_cast<unsigned int>(robot->variables.productId) }
 	};
