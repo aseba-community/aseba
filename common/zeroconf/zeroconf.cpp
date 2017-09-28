@@ -46,7 +46,7 @@ namespace Aseba
 
 	//! Advertise a target with a given name and port, with associated txtrec.
 	//! If the target already exists, its txtrec is updated.
-	void Zeroconf::advertise(const std::string & name, const int & port, const TxtRecord & txtrec)
+	void Zeroconf::advertise(const std::string & name, const int port, const TxtRecord & txtrec)
 	{
 		auto targetIt(getTarget(name, port));
 		if (targetIt == targets.end())
@@ -81,7 +81,7 @@ namespace Aseba
 	}
 
 	//! Forget a target with a given name and port, if the target is unknown, do nothing.
-	void Zeroconf::forget(const std::string & name, const int & port)
+	void Zeroconf::forget(const std::string & name, const int port)
 	{
 		auto targetIt(getTarget(name, port));
 		if (targetIt != targets.end())
@@ -270,7 +270,7 @@ namespace Aseba
 	}
 
 	//! Return an iterator to the target with a name and port, return targets.end() if not found.
-	Zeroconf::Targets::iterator Zeroconf::getTarget(const std::string & name, const int & port)
+	Zeroconf::Targets::iterator Zeroconf::getTarget(const std::string & name, const int port)
 	{
 		return find_if(targets.begin(), targets.end(),
 			[=] (const Target& target) { return target.name == name && target.port == port; }
