@@ -122,10 +122,11 @@ namespace Aseba
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
 #ifdef ZEROCONF_SUPPORT
 		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
-		zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
 		
+		// start timer and force a first update
 		startTimer(1000);
+		timerEvent(nullptr);
 	}
 	
 #ifdef ZEROCONF_SUPPORT
@@ -133,15 +134,23 @@ namespace Aseba
 	void DashelConnectionDialog::zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		const auto dashelTarget(QString::fromUtf8(target.dashel().c_str()));
-		//qDebug() << dashelTarget;
+		const auto busy(target.properties.find("busy") != target.properties.end());
 		// only add new Dashel targets
 		for (int i = 0; i < discoveredList->count(); ++i)
 		{
-			const QListWidgetItem *item(discoveredList->item(i));
+			QListWidgetItem *item(discoveredList->item(i));
 			auto itemDashelTarget(item->data(Qt::UserRole));
 			if (itemDashelTarget == dashelTarget)
+			{
+				if (busy)
+					delete discoveredList->takeItem(discoveredList->row(item));
 				return;
+			}
 		}
+		// not found, if busy return
+		if (busy)
+			return;
+		qDebug() << "adding entry";
 		// create and add the item
 		QString additionalInfo;
 		try
@@ -236,6 +245,9 @@ namespace Aseba
 	void DashelConnectionDialog::timerEvent(QTimerEvent * event)
 	{
 		updatePortList("");
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.browse();
+#endif // ZEROCONF_SUPPORT
 	}
 	
 	std::string DashelConnectionDialog::getTarget()
