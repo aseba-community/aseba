@@ -29,6 +29,8 @@
 #include <QInputDialog>
 #include <QtGui>
 #include <QLibraryInfo>
+#include <QHostInfo>
+#include <QNetworkInterface>
 #include <stdexcept>
 #include <regex>
 
@@ -59,6 +61,15 @@ namespace Aseba
 			QMessageBox::critical(nullptr, QObject::tr("Unexpected Dashel Error"), QObject::tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
 			break;
 		}
+	}
+	
+	bool hasIntersection(const QList<QHostAddress> & addressesA, const QList<QHostAddress> & addressesB)
+	{
+		for (int i = 0; i < addressesA.size(); ++i)
+			for (int j = 0; j < addressesB.size(); ++j)
+				if (addressesA[i] == addressesB[j])
+					return true;
+		return false;
 	}
 	
 	DashelConnectionDialog::DashelConnectionDialog()
@@ -150,18 +161,22 @@ namespace Aseba
 		// not found, if busy return
 		if (busy)
 			return;
-		qDebug() << "adding entry";
+		// resolve hostname and see if it is local
+		const auto localAddresses(QNetworkInterface().allAddresses());
+		const auto hostAddresses(QHostInfo::fromName(QString::fromStdString(target.host)).addresses());
+		const bool isLocal(hasIntersection(localAddresses, hostAddresses));
 		// create and add the item
 		QString additionalInfo;
 		try
 		{
-			additionalInfo = QString(tr(" – type %1")).arg(QString::fromStdString(target.properties.at("type")));
+			if (target.properties.find("type") != target.properties.end())
+				additionalInfo = QString(tr(" – type %1")).arg(QString::fromStdString(target.properties.at("type")));
 		}
 		catch (std::out_of_range& e)
 		{}
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		addEntry(name, tr("network"), dashelTarget, additionalInfo);
+		addEntry(name, isLocal ? tr("local on computer") : tr("distant on network"), dashelTarget, additionalInfo);
 	}
 #endif // ZEROCONF_SUPPORT
 	
@@ -209,7 +224,7 @@ namespace Aseba
 				}
 				else
 					text =  QString::fromStdString(it->second.second);
-				auto item = addEntry(text, tr("local serial port"), discoveredListDashelTarget, additionalInfo);
+				auto item = addEntry(text, tr("serial port or USB"), discoveredListDashelTarget, additionalInfo);
 				if (!toSelect.isEmpty() && (toSelect == text))
 				{
 					discoveredList->setCurrentItem(item);
