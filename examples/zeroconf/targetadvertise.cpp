@@ -130,7 +130,7 @@ namespace Aseba
 
 		virtual void connectionClosed(Stream *stream, bool abnormal) override
 		{
-			zeroconf.forget(stream);
+			zeroconf.forget("Aseba Local " + stream->getTargetParameter("port"), stream);
 		}
 
 	public:

@@ -66,7 +66,7 @@ namespace Aseba
 	//! If the target already exists, its txtrec is updated.
 	void Zeroconf::advertise(const std::string & name, const Dashel::Stream * stream, const TxtRecord & txtrec)
 	{
-		auto targetIt(getTarget(stream));
+		auto targetIt(getTarget(name, stream));
 		if (targetIt == targets.end())
 		{
 			// Target does not exist, create
@@ -89,9 +89,9 @@ namespace Aseba
 	}
 
 	//! Forget a target for a given Dashel stream, if the target is unknown, do nothing.
-	void Zeroconf::forget(const Dashel::Stream * stream)
+	void Zeroconf::forget(const std::string & name, const Dashel::Stream * stream)
 	{
-		auto targetIt(getTarget(stream));
+		auto targetIt(getTarget(name, stream));
 		if (targetIt != targets.end())
 			targets.erase(targetIt);
 	}
@@ -278,9 +278,9 @@ namespace Aseba
 	}
 
 	//! Return an iterator to the target for a given Dashel stream, return targets.end() if not found.
-	Zeroconf::Targets::iterator Zeroconf::getTarget(const Dashel::Stream * stream)
+	Zeroconf::Targets::iterator Zeroconf::getTarget(const std::string & name, const Dashel::Stream * stream)
 	{
-		return getTarget(stream->getTargetParameter("port"), atoi(stream->getTargetParameter("port").c_str()));
+		return getTarget(name, atoi(stream->getTargetParameter("port").c_str()));
 	}
 
 } // namespace Aseba

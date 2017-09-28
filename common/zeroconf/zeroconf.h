@@ -82,7 +82,7 @@ namespace Aseba
 		void advertise(const std::string & name, const int & port, const TxtRecord & txtrec);
 		void advertise(const std::string & name, const Dashel::Stream * stream, const TxtRecord & txtrec);
 		void forget(const std::string & name, const int & port);
-		void forget(const Dashel::Stream * stream);
+		void forget(const std::string & name, const Dashel::Stream * stream);
 
 		// Aseba::Zeroconf can request the listing of non-local targets by browsing the network
 		void browse();
@@ -95,7 +95,7 @@ namespace Aseba
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
 		Targets::iterator getTarget(DNSServiceRef serviceRef);
 		Targets::iterator getTarget(const std::string & name, const int & port);
-		Targets::iterator getTarget(const Dashel::Stream * stream);
+		Targets::iterator getTarget(const std::string & name, const Dashel::Stream * stream);
 
 	protected:
 		// information callback for sub-class
