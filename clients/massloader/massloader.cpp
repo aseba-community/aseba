@@ -79,9 +79,8 @@ namespace Aseba
 						step(delta);
 					}
 					
-					// requests description
-					GetDescription().serialize(stream);
-					stream->flush();
+					// requests descriptions
+					pingNetwork();
 					// then run
 					run();
 				}
