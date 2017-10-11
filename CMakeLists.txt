@@ -131,3 +131,8 @@ add_subdirectory(examples)
 
 # Unit tests
 add_subdirectory(tests)
+
+# User entries
+if (UNIX)
+	add_subdirectory(menu/freedesktop)
+endif()
