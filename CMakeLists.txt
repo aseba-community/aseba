@@ -134,5 +134,5 @@ add_subdirectory(tests)
 
 # User entries
 if (UNIX)
-	add_subdirectory(menu/freedesktop)
+	add_subdirectory(menu)
 endif()
