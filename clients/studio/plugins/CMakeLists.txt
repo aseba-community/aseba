@@ -17,7 +17,7 @@ set(qt_plugins_SRCS
 	ThymioVPL/LogSignalMapper.cpp
 )
 
-qt4_wrap_cpp(qt_plugins_MOCS
+qt5_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h
 	StopThymioPlugin.h
 	ThymioVPL/ThymioVisualProgramming.h
@@ -43,6 +43,9 @@ if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 	set(qt_plugins_SRCS ${qt_plugins_SRCS} ThymioVPL/UsageProfile.pb.cc ThymioVPL/UsageLogger.cpp)
 endif (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 
-
 add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 
+qt5_use_modules(asebaqtplugins Widgets Xml Svg WebKitWidgets)
+if (Qt5X11Extras_FOUND)
+	qt5_use_modules(asebaqtplugins X11Extras)
+endif ()

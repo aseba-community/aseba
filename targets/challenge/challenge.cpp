@@ -39,6 +39,7 @@
 #include <enki/robots/e-puck/EPuck.h>
 #include <iostream>
 #include <QtGui>
+#include <QtWidgets>
 #include <QtDebug>
 #include "challenge.h"
 #include <string.h>
@@ -1117,8 +1118,6 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	
 	// Translation support
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);

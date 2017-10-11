@@ -305,7 +305,7 @@ namespace Aseba
 				#ifdef ANDROID
 				fileName = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
 				#else // ANDROID
-				fileName = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString();
+				fileName = settings.value("ThymioVPLStandalone/fileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString();
 				#endif // ANDROID
 				// keep only the path of the directory
 				fileName = QFileInfo(fileName).dir().path();
@@ -372,7 +372,8 @@ namespace Aseba
 			#ifdef ANDROID
 			dir = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
 			#else // ANDROID
-			dir = settings.value("ThymioVPLStandalone/fileName", QDesktopServices::displayName(QDesktopServices::DocumentsLocation)).toString();
+			const QStringList stdLocations(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation));
+			dir = settings.value("ThymioVPLStandalone/fileName", !stdLocations.empty() ? stdLocations[0] : "").toString();
 			#endif // ANDROID
 		}
 		else

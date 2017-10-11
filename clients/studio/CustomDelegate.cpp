@@ -19,7 +19,7 @@
 */
 
 #include "CustomDelegate.h"
-#include <QtGui>
+#include <QtWidgets>
 
 namespace Aseba
 {

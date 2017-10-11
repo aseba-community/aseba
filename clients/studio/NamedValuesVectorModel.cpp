@@ -177,11 +177,6 @@ namespace Aseba
 		return false;
 	}
 
-	Qt::DropActions NamedValuesVectorModel::supportedDragActions()
-	{
-		return Qt::CopyAction | Qt::MoveAction;
-	}
-
 	Qt::DropActions NamedValuesVectorModel::supportedDropActions() const
 	{
 		return Qt::CopyAction | Qt::MoveAction;

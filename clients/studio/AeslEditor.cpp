@@ -21,7 +21,7 @@
 #include "AeslEditor.h"
 #include "CustomWidgets.h"
 #include "../../common/utils/utils.h"
-#include <QtGui>
+#include <QtWidgets>
 #include <QtGlobal>
 
 namespace Aseba

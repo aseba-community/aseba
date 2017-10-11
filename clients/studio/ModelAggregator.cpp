@@ -66,7 +66,7 @@ namespace Aseba
 
 	QModelIndex ModelAggregator::index(int row, int column, const QModelIndex &parent) const
 	{
-		return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
+		return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
 	}
 
 	QModelIndex ModelAggregator::parent(const QModelIndex &child) const
@@ -109,7 +109,7 @@ namespace Aseba
 
 	QModelIndex TreeChainsawFilter::index(int row, int column, const QModelIndex &parent) const
 	{
-		return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
+		return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
 	}
 
 	QModelIndex TreeChainsawFilter::parent(const QModelIndex &child) const
@@ -179,7 +179,7 @@ namespace Aseba
 			// leaf!
 			ModelIndexLink indexLink;
 			indexLink.source = parent;
-			indexLink.proxy = createIndex(rowCounter++, 0, 0);
+			indexLink.proxy = createIndex(rowCounter++, 0);
 			indexList.append(indexLink);
 			return;
 		}

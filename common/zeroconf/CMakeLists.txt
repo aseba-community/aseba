@@ -33,10 +33,8 @@ if (DNSSD_FOUND)
 	)
 
 	# Zeroconf with Qt
-	if (QT4_FOUND)
-		set(QT_DONT_USE_QTGUI ON)
-		include(${QT_USE_FILE})
-		qt4_wrap_cpp(asebacommon_zeroconf_MOCS
+	if (Qt5Core_FOUND)
+		qt5_wrap_cpp(asebacommon_zeroconf_MOCS
 			zeroconf-qt.h
 		)
 		set(ASEBA_ZEROCONFQT_SRC
@@ -46,6 +44,7 @@ if (DNSSD_FOUND)
 		add_library(asebazeroconfqt ${ASEBA_ZEROCONFQT_SRC})
 		set_target_properties(asebazeroconfqt PROPERTIES VERSION ${LIB_VERSION_STRING})
 		target_include_directories(asebazeroconfqt PUBLIC ${DNSSD_INCLUDE_DIRS})
+		qt5_use_modules(asebazeroconfqt Network)
 		
 		install(TARGETS asebazeroconfqt
 			LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
@@ -58,8 +57,7 @@ if (DNSSD_FOUND)
 		install(FILES ${ASEBAZEROCONFQT_HDR}
 			DESTINATION include/aseba/common/zeroconf
 		)
-		
-	endif (QT4_FOUND)
-endif (DNSSD_FOUND)
+	endif ()
+endif ()
 
 

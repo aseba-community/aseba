@@ -80,6 +80,8 @@ namespace Aseba
 		TargetVariablesModel(QObject *parent = 0);
 		virtual ~TargetVariablesModel();
 		
+		Qt::DropActions supportedDropActions() const;
+		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;
 		QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -139,6 +141,8 @@ namespace Aseba
 	public:
 		TargetFunctionsModel(const TargetDescription *descriptionRead, bool showHidden, QObject *parent = 0);
 		~TargetFunctionsModel();
+		
+		Qt::DropActions supportedDropActions() const;
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		int columnCount(const QModelIndex &parent = QModelIndex()) const;

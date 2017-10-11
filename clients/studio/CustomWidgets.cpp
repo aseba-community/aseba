@@ -22,6 +22,7 @@
 #include <QMimeData>
 #include <QResizeEvent>
 #include <QPainter>
+#include <QDrag>
 
 namespace Aseba
 {

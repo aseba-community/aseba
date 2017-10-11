@@ -93,13 +93,13 @@ def init_commands():
     global _git
 
     print "First, we will test for a valid lupdate binary..."
-    _lupdate = _find_cmd(["lupdate", "lupdate-qt4"], "-version")
+    _lupdate = _find_cmd(["lupdate"], "-version")
     if _lupdate == "":
         print sys.stderr, "No valide lupdate found :-("
         exit(1)
 
     print "...and for a valid lrelease..."
-    _lrelease = _find_cmd(["lrelease", "lrelease-qt4"], "-version")
+    _lrelease = _find_cmd(["lrelease"], "-version")
     if _lrelease == "":
         print sys.stderr, "No valide lrelease found :-("
         exit(1)

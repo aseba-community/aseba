@@ -1,14 +1,12 @@
-if (QT4_FOUND)
-	set(QT_USE_QTMAIN ON)
-	include(${QT_USE_FILE})
+if (Qt5Widgets_FOUND)
 	
 	set(thymiownetconfig_SRCS
 		ThymioWNetConfig.cpp)
-	qt4_wrap_cpp(thymiownetconfig_MOCS
-		ThymioWNetConfig.h
-	)
+ 	qt5_wrap_cpp(thymiownetconfig_MOCS
+ 		ThymioWNetConfig.h
+ 	)
 	
-	qt4_add_resources(resfiles thymiownetconfig.qrc)
+	qt5_add_resources(resfiles thymiownetconfig.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	
@@ -17,11 +15,11 @@ if (QT4_FOUND)
 		add_dependencies(thymiownetconfig versionheader)
 	endif (HAS_DYN_VERSION)
 
-	target_link_libraries(thymiownetconfig ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(thymiownetconfig Qt5::Widgets ${ASEBA_CORE_LIBRARIES})
 
 	install(TARGETS thymiownetconfig RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
-endif (QT4_FOUND)
+endif ()
 
 if (UNIX)
 	add_executable(thymiownetconfig-cli thymiownetconfig-cli.c)

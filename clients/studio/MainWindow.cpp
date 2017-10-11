@@ -33,6 +33,7 @@
 #include "../../common/utils/utils.h"
 #include "../../common/about/AboutDialog.h"
 #include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 #include <sstream>
 #include <iostream>
@@ -861,7 +862,7 @@ namespace Aseba
 	void NodeTab::saveBytecode()
 	{
 		const QString& nodeName(target->getName(id));
-		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "Aseba Binary Object (*.abo);;All Files (*)");
+		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Aseba Binary Object (*.abo);;All Files (*)");
 		
 		QFile file(bytecodeFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -1711,9 +1712,14 @@ namespace Aseba
 				QSettings settings;
 				QStringList recentFiles = settings.value("recent files").toStringList();
 				if (recentFiles.size() > 0)
+				{
 					dir = recentFiles[0];
+				}
 				else
-					dir = QDesktopServices::displayName(QDesktopServices::DocumentsLocation);
+				{
+					const QStringList stdLocations(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation));
+					dir = !stdLocations.empty() ? stdLocations[0] : "";
+				}
 			}
 			
 			fileName = QFileDialog::getOpenFileName(this,
@@ -1899,7 +1905,7 @@ namespace Aseba
 			fileName = QFileDialog::getSaveFileName(
 				this,
 				tr("Save Script"),
-				actualFileName.isEmpty() ? QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) : actualFileName,
+				actualFileName.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) : actualFileName,
 				"Aseba scripts (*.aesl)"
 			);
 		
@@ -2016,7 +2022,7 @@ namespace Aseba
 	
 	void MainWindow::exportMemoriesContent()
 	{
-		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
 		
 		QFile file(exportFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))

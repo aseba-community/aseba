@@ -71,8 +71,9 @@ namespace Enki
 		
 		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const override
 		{
+			auto paths = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
 			auto fileName(QString("%1/%2/%3/U%4.DAT")
-				.arg(QDesktopServices::storageLocation(QDesktopServices::DataLocation))
+				.arg(paths.empty() ? "" : paths.first())
 				.arg(qHash(QDir(sceneFileName).canonicalPath()), 8, 16, QChar('0'))
 				.arg(QString::fromStdString(robotName))
 				.arg(fileNumber)
