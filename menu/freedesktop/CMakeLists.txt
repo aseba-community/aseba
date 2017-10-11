@@ -1,5 +1,5 @@
 file(GLOB files "*.desktop")
 foreach(file ${files})
-	install(FILES ${file} DESTINATION usr/share/applications)
+	install(FILES ${file} DESTINATION share/applications)
 endforeach()
 add_subdirectory(48x48)
