@@ -91,6 +91,10 @@ namespace Aseba
 		mainLayout->addWidget(new QLabel(tr("Selected target")));
 		currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
 		mainLayout->addWidget(currentTarget);
+		auto targetDocLink(new QLabel(tr("<a href=\"http://aseba-community.github.io/dashel#TargetNamingSec\">Learn more about Dashel targets...</a>")));
+		targetDocLink->setOpenExternalLinks(true);
+		targetDocLink->setAlignment(Qt::AlignRight);
+		mainLayout->addWidget(targetDocLink);
 		
 		// language dialogue
 		languageSelectionBox = new QComboBox;
