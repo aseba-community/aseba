@@ -478,6 +478,7 @@ namespace Aseba
 		resetButton->setEnabled(false);
 		runInterruptButton = new QPushButton(QIcon(":/images/play.png"), tr("Run"));
 		runInterruptButton->setEnabled(false);
+		runInterruptButton->setProperty("isRunning", false);
 		nextButton = new QPushButton(QIcon(":/images/step.png"), tr("Next"));
 		nextButton->setEnabled(false);
 		refreshMemoryButton = new QPushButton(QIcon(":/images/rescan.png"), tr("refresh"));
@@ -791,7 +792,7 @@ namespace Aseba
 	
 	void NodeTab::runInterruptClicked()
 	{
-		if (runInterruptButton->text() == tr("Run"))
+		if (!runInterruptButton->property("isRunning").toBool())
 			target->run(id);
 		else
 			target->pause(id);
@@ -1343,6 +1344,8 @@ namespace Aseba
 			runInterruptButton->setText(tr("Pause"));
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
 			
+			runInterruptButton->setProperty("isRunning", true);
+
 			nextButton->setEnabled(false);
 
 			if (clearEditorProperty("active"))
@@ -1354,7 +1357,8 @@ namespace Aseba
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
-			
+			runInterruptButton->setProperty("isRunning", false);
+
 			nextButton->setEnabled(true);
 
 			// go to this line and next line is visible
@@ -1368,7 +1372,8 @@ namespace Aseba
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
-			
+			runInterruptButton->setProperty("isRunning", false);
+
 			nextButton->setEnabled(false);
 			
 			if (clearEditorProperty("active"))
