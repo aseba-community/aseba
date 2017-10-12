@@ -437,10 +437,16 @@ namespace Aseba { namespace ThymioBlockly
 	QDomDocument ThymioBlockly::saveToDom() const
 	{
 		asebaJavascriptInterface.requestSave();
-		if (currentSavedXml.isEmpty() || currentSavedXml == "<xml></xml>") {
+		qDebug() << "saved xml" << currentSavedXml;
+		if (currentSavedXml.isEmpty() ||
+			currentSavedXml == "<xml></xml>" ||
+			currentSavedXml == "<xml xmlns=\"http://www.w3.org/1999/xhtml\"></xml>"
+		)
+		{
 			return QDomDocument();
 		}
-		else {
+		else
+		{
 			QDomDocument document("tool-plugin-data");
 			if (document.setContent(currentSavedXml)) {
 				return document;

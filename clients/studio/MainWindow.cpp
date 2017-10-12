@@ -2747,7 +2747,7 @@ namespace Aseba
 		// check if there is an absent node tab with this id and name, and copy data
 		const int absentIndex(getAbsentIndexFromId(node));
 		const AbsentNodeTab* absentTab(getAbsentTabFromId(node));
-		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
+		if (absentTab && nodes->tabText(absentIndex).replace(QString("&"), QString("")) == target->getName(node))
 		{
 			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
 			tab->restorePlugins(absentTab->savePlugins(), false);
@@ -2775,7 +2775,7 @@ namespace Aseba
 			return;
 		}
 		const NodeTab* tab = getTabFromId(node);
-		const QString& tabName = nodes->tabText(index);
+		auto tabName = nodes->tabText(index).replace(QString("&"), QString(""));
 		
 		nodes->addTab(
 			new AbsentNodeTab(
