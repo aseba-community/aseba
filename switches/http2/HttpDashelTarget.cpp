@@ -62,7 +62,7 @@ bool HttpDashelTarget::sendEvent(const std::vector<std::string>& args)
 	if(interface->getProgram().getCommonDefinitions().events.contains(UTF8ToWString(args[0]), &eventPos)) {
 		try {
 			// build event and emit
-			UserMessage::DataVector data;
+			VariablesDataVector data;
 			for(size_t i = 1; i < args.size(); ++i) {
 				data.push_back(atoi(args[i].c_str()));
 			}
@@ -161,7 +161,7 @@ bool HttpDashelTarget::sendSetVariable(unsigned globalNodeId, const std::vector<
 
 	try {
 		// send the message
-		SetVariables::VariablesVector data;
+		VariablesDataVector data;
 		for(size_t i = 1; i < args.size(); ++i) {
 			data.push_back(atoi(args[i].c_str()));
 		}

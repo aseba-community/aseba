@@ -23,7 +23,7 @@
 
 #include "../types.h"
 #include "../consts.h"
-#include "../../compiler/compiler.h"
+#include "TargetDescription.h"
 #include <utility>
 #include <vector>
 #include <string>
@@ -50,6 +50,9 @@ namespace Aseba
 	bool operator ==(const TargetDescription::LocalEvent &lhs, const TargetDescription::LocalEvent &rhs);
 	bool operator ==(const TargetDescription::NativeFunctionParameter &lhs, const TargetDescription::NativeFunctionParameter &rhs);
 	bool operator ==(const TargetDescription::NativeFunction &lhs, const TargetDescription::NativeFunction &rhs);
+	
+	//! Vector of data of variables
+	using VariablesDataVector = std::vector<int16_t>;
 
 	//! Parent class of any message exchanged over the network
 	class Message
@@ -107,12 +110,11 @@ namespace Aseba
 	class UserMessage : public Message
 	{
 	public:
-		using DataVector = std::vector<int16_t>;
-		DataVector data;
+		VariablesDataVector data;
 	
 	public:
 		UserMessage() : Message(ASEBA_MESSAGE_INVALID) { }
-		UserMessage(uint16_t type, DataVector  data = DataVector()) : Message(type), data(std::move(data)) { }
+		UserMessage(uint16_t type, VariablesDataVector data = VariablesDataVector()) : Message(type), data(std::move(data)) { }
 		UserMessage(uint16_t type, const int16_t* data, const size_t length);
 		
 	protected:
@@ -360,7 +362,7 @@ namespace Aseba
 	{
 	public:
 		uint16_t start;
-		std::vector<int16_t> variables;
+		VariablesDataVector variables;
 		
 	public:
 		Variables() : Message(ASEBA_MESSAGE_VARIABLES) { }
@@ -725,12 +727,11 @@ namespace Aseba
 	{
 	public:
 		uint16_t start;
-		using VariablesVector = std::vector<int16_t>;
-		VariablesVector variables;
+		VariablesDataVector variables;
 		
 	public:
 		SetVariables() : CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, ASEBA_DEST_INVALID) { }
-		SetVariables(uint16_t dest, uint16_t start, VariablesVector variables);
+		SetVariables(uint16_t dest, uint16_t start, VariablesDataVector variables);
 		
 	protected:
 		void serializeSpecific(SerializationBuffer& buffer) const override;

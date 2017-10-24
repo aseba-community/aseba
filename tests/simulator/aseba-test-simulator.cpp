@@ -21,6 +21,7 @@
 #include "../../targets/playground/EnkiGlue.h"
 #include "../../targets/playground/Robots.h"
 #include "../../common/msg/NodesManager.h"
+#include "../../compiler/compiler.h"
 #include <iostream>
 #include <iterator>
 #include <QString>

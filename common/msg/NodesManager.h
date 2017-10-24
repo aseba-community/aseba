@@ -24,6 +24,7 @@
 #include "msg.h"
 #include "../utils/utils.h"
 #include <string>
+#include <set>
 
 namespace Aseba
 {

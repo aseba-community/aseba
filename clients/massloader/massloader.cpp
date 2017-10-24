@@ -26,6 +26,7 @@
 #include "../../common/msg/msg.h"
 #include "../../common/msg/NodesManager.h"
 #include "../../common/utils/utils.h"
+#include "../../compiler/compiler.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include <QCoreApplication>
 #include <QString>

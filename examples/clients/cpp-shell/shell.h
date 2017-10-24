@@ -25,6 +25,7 @@
 #include <string>
 #include <dashel/dashel.h>
 #include "common/msg/NodesManager.h"
+#include "compiler/compiler.h"
 
 /*
 	This is the main class of the Aseba client, called Shell

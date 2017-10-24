@@ -360,7 +360,7 @@ void Shell::setVariable(const strings& args)
 		return;
 	
 	// send the message
-	SetVariables::VariablesVector data;
+	VariablesDataVector data;
 	for (size_t i=3; i<args.size(); ++i)
 		data.push_back(atoi(args[i].c_str()));
  	SetVariables setVariables(nodeId, pos, data);
@@ -384,7 +384,7 @@ void Shell::emit(const strings& args)
 	}
 	
 	// build event and emit
-	UserMessage::DataVector data;
+	VariablesDataVector data;
 	for (size_t i=2; i<args.size(); ++i)
 		data.push_back(atoi(args[i].c_str()));
 	UserMessage userMessage(pos, data);

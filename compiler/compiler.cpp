@@ -39,59 +39,6 @@ namespace Aseba
 	/** \addtogroup compiler */
 	/*@{*/
 	
-	//! Compute the XModem CRC of the description, as defined in AS001 at https://aseba.wikidot.com/asebaspecifications
-	uint16_t TargetDescription::crc() const
-	{
-		uint16_t crc(0);
-		crc = crcXModem(crc, bytecodeSize);
-		crc = crcXModem(crc, variablesSize);
-		crc = crcXModem(crc, stackSize);
-		for (const auto & namedVariable : namedVariables)
-		{
-			crc = crcXModem(crc, namedVariable.size);
-			crc = crcXModem(crc, namedVariable.name);
-		}
-		for (const auto & localEvent : localEvents)
-		{
-			crc = crcXModem(crc, localEvent.name);
-		}
-		for (const auto & nativeFunction : nativeFunctions)
-		{
-			crc = crcXModem(crc, nativeFunction.name);
-			for (size_t j = 0; j < nativeFunction.parameters.size(); ++j)
-			{
-				crc = crcXModem(crc, nativeFunction.parameters[j].size);
-				crc = crcXModem(crc, nativeFunction.parameters[j].name);
-			}
-		}
-		return crc;
-	}
-	
-	//! Get a VariablesMap out of namedVariables, overwrite freeVariableIndex
-	VariablesMap TargetDescription::getVariablesMap(unsigned& freeVariableIndex) const
-	{
-		freeVariableIndex = 0;
-		VariablesMap variablesMap;
-		for (const auto & namedVariable : namedVariables)
-		{
-			variablesMap[namedVariable.name] =
-			std::make_pair(freeVariableIndex, namedVariable.size);
-			freeVariableIndex += namedVariable.size;
-		}
-		return variablesMap;
-	}
-	
-	//! Get a FunctionsMap out of nativeFunctions
-	FunctionsMap TargetDescription::getFunctionsMap() const
-	{
-		FunctionsMap functionsMap;
-		for (unsigned i = 0; i < nativeFunctions.size(); i++)
-		{
-			functionsMap[nativeFunctions[i].name] = i;
-		}
-		return functionsMap;
-	}
-	
 	//! Return the number of words this element takes in memory
 	unsigned BytecodeElement::getWordSize() const
 	{

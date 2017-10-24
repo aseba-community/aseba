@@ -5,6 +5,7 @@ set (ASEBACOMMON_SRC
 	utils/BootloaderInterface.cpp
 	msg/msg.cpp
 	msg/NodesManager.cpp
+	msg/TargetDescription.cpp
 )
 
 add_library(asebacommon ${ASEBACOMMON_SRC})

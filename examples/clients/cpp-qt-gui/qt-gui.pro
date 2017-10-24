@@ -16,7 +16,6 @@ INCLUDEPATH += "../../../../dashel"
 
 LIBS += "../../../../dashel-build/libdashel.a"
 LIBS += "../../../../aseba-build/transport/dashel_plugins/libasebadashelplugins.a"
-LIBS += "../../../../aseba-build/compiler/libasebacompiler.a"
 LIBS += "../../../../aseba-build/common/libasebacommon.a"
 
 unix:LIBS += -ludev

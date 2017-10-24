@@ -177,7 +177,7 @@ namespace Aseba
 		// output result
 		bridge->outputBotspeak(result);
 		// write back result
-		SetVariables(bridge->nodeId, lhs.address, SetVariables::VariablesVector(1, result)).serialize(bridge->asebaStream);
+		SetVariables(bridge->nodeId, lhs.address, VariablesDataVector(1, result)).serialize(bridge->asebaStream);
 		// update outputs
 		UserMessage(bridge->eventId(L"update_outputs")).serialize(bridge->asebaStream);
 		bridge->asebaStream->flush();

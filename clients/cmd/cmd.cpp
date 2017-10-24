@@ -231,7 +231,7 @@ namespace Aseba
 			uint16_t type = atoi(argv[1]);
 			uint16_t length = argc-2;
 			
-			UserMessage::DataVector data(length);
+			VariablesDataVector data(length);
 			for (size_t i = 0; i < length; i++)
 				data[i] = atoi(argv[i+2]);
 			

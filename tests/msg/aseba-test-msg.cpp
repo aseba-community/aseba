@@ -125,7 +125,7 @@ int main()
 			[](UserMessage& m) { m.data[1] = 3; },
 			[](UserMessage& m) { m.data[2] = 2; }
 		},
-		0, UserMessage::DataVector{1, 2, 3}
+		0, VariablesDataVector{1, 2, 3}
 	);
 	
 	testMessage<BootloaderDescription>(

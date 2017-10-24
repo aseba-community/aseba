@@ -76,7 +76,7 @@ void DashelInterface::sendEvent(unsigned id, const QVector<int>& values)
 {
 	if (this->isConnected)
 	{
-		Aseba::UserMessage::DataVector data(values.size());
+		Aseba::VariablesDataVector data(values.size());
 		QVectorIterator<int> it(values);
 		unsigned i = 0;
 		while (it.hasNext())

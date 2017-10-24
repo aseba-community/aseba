@@ -1330,7 +1330,7 @@ namespace Aseba
 	
 	//
 	
-	SetVariables::SetVariables(uint16_t dest, uint16_t start, VariablesVector variables) :
+	SetVariables::SetVariables(uint16_t dest, uint16_t start, VariablesDataVector variables) :
 		CmdMessage(ASEBA_MESSAGE_SET_VARIABLES, dest),
 		start(start),
 		variables(std::move(variables))

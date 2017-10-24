@@ -960,7 +960,7 @@ namespace Aseba
                 return; // hack, should be using exceptions for HTTP errors
             }
             // build event and emit
-            UserMessage::DataVector data;
+            VariablesDataVector data;
             for (size_t i=1; i<args.size(); ++i)
                 data.push_back(atoi(args[i].c_str()));
             UserMessage userMessage(eventPos, data);
@@ -1019,7 +1019,7 @@ namespace Aseba
         if (verbose)
             cerr << " (" << nodeId << "," << varPos << "):" << args.size()-1 << endl;
         // send the message
-        SetVariables::VariablesVector data;
+        VariablesDataVector data;
         Dashel::Stream* stream;
         try {
             stream = getStreamFromNodeId(nodeId); // may fail
