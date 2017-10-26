@@ -190,9 +190,6 @@ namespace Aseba
 		void clear() { events.clear(); constants.clear(); }
 	};
 	
-	//! Vector of data of variables
-	using VariablesDataVector = std::vector<short>;
-	
 	//! Aseba Event Scripting Language compiler
 	class Compiler
 	{

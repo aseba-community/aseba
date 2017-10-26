@@ -29,6 +29,7 @@
 #include <set>
 #include <memory>
 #include <dashel/dashel.h>
+#include "../../common/msg/msg.h"
 #include "../../compiler/compiler.h"
 
 
