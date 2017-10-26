@@ -105,26 +105,25 @@ namespace Aseba
 	};
 	
 	//! Return error messages based on error ID (needed to translate messages for other applications)
-	class ErrorMessages
+	struct ErrorMessages
 	{
-		public:
-			ErrorMessages();
+		ErrorMessages();
 
-			//! Type of the callback
-			using ErrorCallback = const std::wstring (*)(ErrorCode);
-			//! Default callback
-			static const std::wstring defaultCallback(ErrorCode error);
+		//! Type of the callback
+		using ErrorCallback = const std::wstring (*)(ErrorCode);
+		//! Default callback
+		static const std::wstring defaultCallback(ErrorCode error);
 	};
 
 	//! Compilation error
 	struct Error
 	{
 		SourcePos pos; //!< position of error in source string
-		std::wstring message; //!< message
+		std::wstring message = L"not defined"; //!< message
 		//! Create an error at pos
 		Error(const SourcePos& pos, std::wstring  message) : pos(pos), message(std::move(message)) { }
 		//! Create an empty error
-		Error() { message = L"not defined"; }
+		Error() = default;
 
 		//! Return a string describing the error
 		std::wstring toWString() const;
