@@ -138,7 +138,10 @@ public:
 		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", stream != nullptr, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
 		try
 		{
-			zeroconf.advertise(Aseba::FormatableString("Dummy Node %0").arg(vm.nodeId - 1), listenStream, txt);
+			if (stream)
+				zeroconf.forget(Aseba::FormatableString("Dummy Node %0").arg(vm.nodeId - 1), listenStream);
+			else
+				zeroconf.advertise(Aseba::FormatableString("Dummy Node %0").arg(vm.nodeId - 1), listenStream, txt);
 		}
 		catch (const std::runtime_error& e)
 		{
