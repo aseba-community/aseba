@@ -102,6 +102,7 @@ namespace Aseba
 		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a register is completed
 		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a txt update is completed
 		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
+		virtual void targetRemoved(const std::string & name, const std::string & regtype, const std::string & domain) {}
 
 		// serviceRef registering/de-registering, to be implemented by subclasses
 		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available.

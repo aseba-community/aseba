@@ -86,6 +86,13 @@ namespace Aseba
 	{
 		emit zeroconfTargetFound(target);
 	}
+	
+	//! Emit signal when target is removed.
+	//! If you override this method you take responsibility for emitting signals as you see fit.
+	void QtZeroconf::targetRemoved(const std::string & name, const std::string & regtype, const std::string & domain)
+	{
+		emit zeroconfTargetRemoved(name, regtype, domain);
+	}
 
 	//! Data are available on a zeroconf socket
 	void QtZeroconf::doIncoming(int socket)

@@ -258,6 +258,8 @@ namespace Aseba
 			auto zeroconf(static_cast<Zeroconf *>(context));
 			if (flags & kDNSServiceFlagsAdd)
 				zeroconf->resolveTarget(name, regtype, domain);
+			else
+				zeroconf->targetRemoved(name, regtype, domain);
 		}
 	}
 

@@ -137,6 +137,8 @@ namespace Aseba
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
 #ifdef ZEROCONF_SUPPORT
 		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
+		connect(&zeroconf, SIGNAL(zeroconfTargetRemoved(const std::string &, const std::string &, const std::string &)), SLOT(zeroconfTargetRemoved(const std::string &, const std::string &, const std::string &)));
+		zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
 		
 		// start timer and force a first update
@@ -180,7 +182,21 @@ namespace Aseba
 		{}
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		addEntry(name, isLocal ? tr("local on computer") : tr("distant on network"), dashelTarget, additionalInfo);
+		addEntry(name, isLocal ? tr("local on computer") : tr("distant on network"), dashelTarget, additionalInfo, { name });
+	}
+	
+	//! A target was removed from zeroconf, remove it to the list if not already present
+	void DashelConnectionDialog::zeroconfTargetRemoved(const std::string & name, const std::string & regtype, const std::string & domain)
+	{
+		for (int i = 0; i < discoveredList->count(); ++i)
+		{
+			const QListWidgetItem *item(discoveredList->item(i));
+			if (item->data(Qt::UserRole + 1).toString().toStdString() == name)
+			{
+				delete discoveredList->takeItem(i);
+				return;
+			}
+		}
 	}
 #endif // ZEROCONF_SUPPORT
 	
@@ -246,11 +262,13 @@ namespace Aseba
 		return discoveredListPortSet;
 	}
 	
-	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo)
+	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo, const QVariantList& additionalData)
 	{
 		auto* item = new QListWidgetItem();
 		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
 		item->setData(Qt::UserRole, dashelTarget);
+		for (int i = 0; i < additionalData.size(); ++i)
+			item->setData(Qt::UserRole + 1 + i, additionalData[i]);
 		discoveredList->addItem(item);
 		auto* label(new QLabel(
 			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – %2%3<br/><span style=\"color:gray;\">%4</span></p>")
@@ -265,7 +283,8 @@ namespace Aseba
 	{
 		updatePortList("");
 #ifdef ZEROCONF_SUPPORT
-		zeroconf.browse();
+		// temporarily commented as this leads to an error in resolving a target received from the old browse (see issue #696)
+		//zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
 	}
 	

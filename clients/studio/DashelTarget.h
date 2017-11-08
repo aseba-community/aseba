@@ -32,6 +32,7 @@
 #include <QTime>
 #include <QMap>
 #include <QSet>
+#include <QVariant>
 #include <map>
 #include <dashel/dashel.h>
 #ifdef ZEROCONF_SUPPORT
@@ -82,9 +83,10 @@ namespace Aseba
 	protected slots:
 #ifdef ZEROCONF_SUPPORT
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
+		void zeroconfTargetRemoved(const std::string & name, const std::string & regtype, const std::string & domain);
 #endif // ZEROCONF_SUPPORT
 		void updateCurrentTarget();
-		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "");
+		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
 	};
 	
 	class Message;
