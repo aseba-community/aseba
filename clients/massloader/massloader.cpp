@@ -43,10 +43,11 @@ namespace Aseba
 	{
 	protected:
 		QString fileName;
+		bool once;
 		Stream* stream;
 		
 	public:
-		MassLoader(const QString& fileName):fileName(fileName),stream(0) {}
+		MassLoader(const QString& fileName, bool once):fileName(fileName),once(once),stream(nullptr) {}
 		void loadToTarget(const std::string& target);
 		
 	protected:
@@ -62,33 +63,53 @@ namespace Aseba
 	
 	void MassLoader::loadToTarget(const std::string& target)
 	{
+		bool first(true);
 		while (true)
 		{
+			if (first)
+				first = false;
+			else
+				UnifiedTime(100).sleep();
+			
 			try
 			{
+				// attempt to open stream
 				stream = connect(target);
-				if (stream)
+				// verify that stream is valid
+				if (!stream)
+					continue;
+				
+				// TODO: make this timeout a parameter
+				// wait 1 s
+				UnifiedTime now;
+				while (true)
 				{
-					// TODO: make this timeout a parameter
-					// wait 1 s
-					UnifiedTime now;
-					while (true)
-					{
-						const UnifiedTime::Value delta((UnifiedTime() - now).value);
-						if (delta >= 1000)
-							break;
-						step(delta);
-					}
-					
-					// requests descriptions
-					pingNetwork();
-					// then run
-					run();
+					const UnifiedTime::Value delta((UnifiedTime() - now).value);
+					if (delta >= 1000)
+						break;
+					step(delta);
+				}
+				
+				// verify that stream is still valid
+				if (!stream)
+					continue;
+				
+				// requests descriptions
+				pingNetwork();
+				// then run
+				run();
+				// if we were interested to load only once, step for 1 second at most and then stop execution
+				if (once)
+				{
+					step(1000);
+					return;
 				}
 			}
-			catch (DashelException e)
-			{}
-			UnifiedTime(50).sleep();
+			catch (const DashelException& e)
+			{
+				// ignore Dsahel exceptions
+			}
+			
 		}
 	}
 	
@@ -109,7 +130,7 @@ namespace Aseba
 			// process it
 			processMessage(message.get());
 		}
-		catch (DashelException e)
+		catch (const DashelException& e)
 		{
 			wcerr << L"Error while reading data: " << e.what() << endl;
 		}
@@ -119,7 +140,7 @@ namespace Aseba
 	{
 		//cerr << "Connection closed to " << stream->getTargetName() << endl;
 		assert(stream == this->stream);
-		this->stream = 0;
+		this->stream = nullptr;
 		stop();
 		reset();
 	}
@@ -185,6 +206,8 @@ namespace Aseba
 							Run(nodeId).serialize(stream);
 							stream->flush();
 							wcerr << QString("! %1 bytecodes loaded to target %0, you can disconnect target !").arg(element.attribute("name")).arg(bytecode.size()).toStdWString() << endl;
+							if (once) // if we have to run only once, stop now
+								stop();
 						}
 						else
 						{
@@ -226,14 +249,18 @@ int main(int argc, char *argv[])
 	
 	if (app.arguments().size() < 2)
 	{
-		std::wcerr << L"Usage: " << app.arguments().first().toStdWString() << L" filename [target]" << std::endl;
+		std::wcerr << L"Usage: " << app.arguments().first().toStdWString() << L" [--once] filename [target]" << std::endl;
 		return 1;
 	}
 	
-	if (app.arguments().size() >= 3)
-		target = app.arguments().at(2);
+	const bool once = (app.arguments().at(1) == "--once");
+	const int fileNameArgPos(once ? 2 : 1);
+	const int targeetArgPos(once ? 3 : 2);
 	
-	Aseba::MassLoader massLoader(app.arguments().at(1));
+	if (app.arguments().size() > targeetArgPos)
+		target = app.arguments().at(targeetArgPos);
+	
+	Aseba::MassLoader massLoader(app.arguments().at(fileNameArgPos), once);
 	massLoader.loadToTarget(target.toStdString());
 	return 0;
 }
