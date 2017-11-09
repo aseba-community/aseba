@@ -40,6 +40,8 @@ namespace Aseba
 	{
 		// clear all targets
 		targets.clear();
+		// release browse serviceRef
+		releaseServiceRef(browseServiceRef);
 		// clean-up remaining streams
 		cleanUpStreams(zeroconfStreams);
 		cleanUpStreams(pendingReleaseStreams);

@@ -33,6 +33,8 @@ namespace Aseba
 	{
 		// clear all targets
 		targets.clear();
+		// release browse serviceRef
+		releaseServiceRef(browseServiceRef);
 	}
 
 	//! Create a socket notifier for the provided service reference, and start watching
