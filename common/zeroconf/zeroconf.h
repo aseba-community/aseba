@@ -63,9 +63,12 @@ namespace Aseba
 	{
 	public:
 		struct Error;
+		struct TargetKey;
 		struct TargetInformation;
 		class Target;
 		class TxtRecord;
+		//! The list of targets being processed.
+		//! We do not care much of the O(n) performance when fetching a target as this vector is small and the lookup infrequent.
 		using Targets = std::vector<Target>;
 
 	public:
@@ -131,18 +134,25 @@ namespace Aseba
 
 	/**
 	 \addtogroup zeroconf
-		A Zeroconf::TargetInformation allows client classes to choose and access Aseba targets.
+		A Zeroconf::TargetKey allows to uniquely identify a target on the network within Zeroconf.
+		It contains the informations returned by browse().
 	*/
-	struct Zeroconf::TargetInformation
+	struct Zeroconf::TargetKey
 	{
-		// informations from discovery
 		std::string name; //!< the full name of this target
 		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
 		std::string domain{"local."}; //!< the domain of the host
+	};
 
-		// additional metadata about this target after resolution
+	/**
+	 \addtogroup zeroconf
+		A Zeroconf::TargetInformation allows client classes to choose and access Aseba targets.
+	*/
+	struct Zeroconf::TargetInformation: Zeroconf::TargetKey
+	{
+		// metadata about this target after resolution
 		std::string host; //!< the Dashel target connection ports
-		int port; //!< the Dashel target connection port
+		int port{0}; //!< the Dashel target connection port
 
 		std::map<std::string, std::string> properties; //!< User-modifiable metadata about this target
 
@@ -165,6 +175,8 @@ namespace Aseba
 		Target(std::string name, const int port, Zeroconf & container);
 		Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf & container);
 
+		~Target();
+
 		// disable copy constructor and copy assigment operator
 		Target(const Target &) = delete;
 		Target& operator=(const Target&) = delete;
@@ -172,16 +184,16 @@ namespace Aseba
 		Target(Target && rhs);
 		Target& operator=(Target&& rhs);
 
-		~Target();
+	protected:
+		// we do not want user code to use callbacks or play with the serviceRef
+		friend class Zeroconf; friend struct ZeroconfCallbacks;
 
 		void registerCompleted() const;
 		void updateCompleted() const;
 		void targetFound() const;
 
-	public:
 		DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
 
-	protected:
 		std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
 	};
 

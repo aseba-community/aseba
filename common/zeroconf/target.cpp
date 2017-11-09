@@ -31,23 +31,21 @@ namespace Aseba
 	//! This target is described by a human-readable name, regtype, and domain.
 	//! It corresponds to a remote target on which that we want to resolve
 	Zeroconf::TargetInformation::TargetInformation(std::string name, std::string regtype, std::string domain):
-		name(std::move(name)),
-		regtype(std::move(regtype)),
-		domain(std::move(domain))
+		Zeroconf::TargetKey{std::move(name), std::move(regtype), std::move(domain)}
 	{}
 
 	//! This target is described by a human-readable name and a port.
 	//! It corresponds to a local target being advertised.
-	Zeroconf::TargetInformation::TargetInformation(std::string name, const int port) :
-		name(std::move(name)),
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const int port):
+		Zeroconf::TargetKey{std::move(name)},
 		port(port)
 	{}
 
 	//! This target describes an existing Dashel stream.
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
-	Zeroconf::TargetInformation::TargetInformation(std::string name, const Dashel::Stream* stream) :
-		name(std::move(name)),
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const Dashel::Stream* stream):
+		Zeroconf::TargetKey{std::move(name)},
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
