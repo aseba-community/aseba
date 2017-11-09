@@ -224,7 +224,9 @@ namespace Aseba
 	//! Update the set of known targets with remote ones found by browsing DNS.
 	void Zeroconf::browse()
 	{
-		releaseServiceRef(browseServiceRef);
+		// browse() does nothing if called more then once
+		if (browseServiceRef)
+			return;
 		auto err = DNSServiceBrowse(&browseServiceRef,
 					    0, // no flags
 					    0, // default all interfaces

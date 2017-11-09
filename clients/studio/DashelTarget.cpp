@@ -282,10 +282,6 @@ namespace Aseba
 	void DashelConnectionDialog::timerEvent(QTimerEvent * event)
 	{
 		updatePortList("");
-#ifdef ZEROCONF_SUPPORT
-		// temporarily commented as this leads to an error in resolving a target received from the old browse (see issue #696)
-		//zeroconf.browse();
-#endif // ZEROCONF_SUPPORT
 	}
 	
 	std::string DashelConnectionDialog::getTarget()
