@@ -69,7 +69,7 @@ We follow these naming conventions:
 
 The intended purpose is to have coherent-looking code through the project.
 Sorry if this different to your usual conventions.
-Aseba is currently programming in C++11, with a planned switch to C++14 once most supported operating systems ship compliant compilers by default.
+Aseba is currently programming in C++14.
 
 ### Readability and maintainability are paramount
 

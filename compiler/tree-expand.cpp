@@ -236,7 +236,7 @@ namespace Aseba
 			tempBlock->children.push_back(temp.release());
 
 			// leftVector = tempVar
-			temp = make_unique<AssignmentNode>(sourcePos, leftVector->deepCopy(), tempVar->deepCopy());
+			temp = std::make_unique<AssignmentNode>(sourcePos, leftVector->deepCopy(), tempVar->deepCopy());
 			tempBlock->children.push_back(temp.release());
 
 			return tempBlock->expandVectorialNodes(dump, compiler); // tempBlock will be reclaimed
@@ -314,9 +314,9 @@ namespace Aseba
 
 			std::unique_ptr<Node> array;
 			if (write == true)
-				array = make_unique<ArrayWriteNode>(sourcePos, arrayAddr, arraySize, arrayName);
+				array = std::make_unique<ArrayWriteNode>(sourcePos, arrayAddr, arraySize, arrayName);
 			else
-				array = make_unique<ArrayReadNode>(sourcePos, arrayAddr, arraySize, arrayName);
+				array = std::make_unique<ArrayReadNode>(sourcePos, arrayAddr, arraySize, arrayName);
 
 			array->children.push_back(children[0]->expandVectorialNodes(dump, compiler, index));
 			return array.release();
