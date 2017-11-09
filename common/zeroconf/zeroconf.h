@@ -114,6 +114,7 @@ namespace Aseba
 
 	protected:
 		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
+		//! This is mostly targets being advertised, but also targets being resolved.
 		Targets targets;
 		//! The serviceRef for browse requests isn't attached to a target
 		DNSServiceRef browseServiceRef{nullptr};

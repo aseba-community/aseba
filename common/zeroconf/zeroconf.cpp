@@ -39,9 +39,9 @@ namespace Aseba
 	//! while not exposing the #include "dns_sd.h" in zeroconf.h
 	struct ZeroconfCallbacks
 	{
-		static void DNSSD_API cb_Register(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
-		static void DNSSD_API cb_Browse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
-		static void DNSSD_API cb_Resolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
+		static void DNSSD_API registerReply(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char *name, const char *regtype, const char *domain, void *context);
+		static void DNSSD_API browseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context);
+		static void DNSSD_API resolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
 
 	//! Advertise a target with a given name and port, with associated txtrec.
@@ -112,7 +112,7 @@ namespace Aseba
 					      htons(target.port),
 					      len, // TXT length
 					      record, // TXT record
-					      ZeroconfCallbacks::cb_Register,
+					      ZeroconfCallbacks::registerReply,
 					      this); // context pointer is Zeroconf
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
@@ -121,7 +121,7 @@ namespace Aseba
 	}
 
 	//! DNSSD callback for registerTarget, update Zeroconf::Target record with results of registration
-	void DNSSD_API ZeroconfCallbacks::cb_Register(DNSServiceRef sdRef,
+	void DNSSD_API ZeroconfCallbacks::registerReply(DNSServiceRef sdRef,
 					     DNSServiceFlags flags,
 					     DNSServiceErrorType errorCode,
 					     const char *name,
@@ -163,6 +163,50 @@ namespace Aseba
 		target.updateCompleted();
 	}
 
+	//! Update the set of known targets with remote ones found by browsing DNS.
+	void Zeroconf::browse()
+	{
+		// browse() does nothing if called more then once
+		if (browseServiceRef)
+			return;
+		auto err = DNSServiceBrowse(&browseServiceRef,
+					    0, // no flags
+					    0, // default all interfaces
+					    "_aseba._tcp",
+					    nullptr, // use default domain, usually "local."
+					    ZeroconfCallbacks::browseReply,
+					    this
+		);
+		if (err != kDNSServiceErr_NoError)
+			throw Zeroconf::Error(FormatableString("DNSServiceBrowse: error %0").arg(err));
+		else
+			processServiceRef(browseServiceRef);
+	}
+
+	//! DNSSD callback for browse, update DiscoveryRequest record with results of browse
+	void DNSSD_API ZeroconfCallbacks::browseReply(DNSServiceRef sdRef,
+					   DNSServiceFlags flags,
+					   uint32_t interfaceIndex,
+					   DNSServiceErrorType errorCode,
+					   const char *name,
+					   const char *regtype,
+					   const char *domain,
+					   void *context)
+	{
+		if (errorCode != kDNSServiceErr_NoError)
+		{
+			throw Zeroconf::Error(FormatableString("DNSServiceBrowseReply: error %0").arg(errorCode));
+		}
+		else
+		{
+			auto zeroconf(static_cast<Zeroconf *>(context));
+			if (flags & kDNSServiceFlagsAdd)
+				zeroconf->resolveTarget(name, regtype, domain);
+			else
+				zeroconf->targetRemoved(name, regtype, domain);
+		}
+	}
+
 	//! A remote target can ask Zeroconf to resolve its host name and port
 	void Zeroconf::resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain)
 	{
@@ -174,7 +218,7 @@ namespace Aseba
 						 name.c_str(),
 						 regtype.c_str(),
 						 domain.c_str(),
-						 ZeroconfCallbacks::cb_Resolve,
+						 ZeroconfCallbacks::resolveReply,
 						 this);
 		if (err != kDNSServiceErr_NoError)
 		{
@@ -186,7 +230,7 @@ namespace Aseba
 	}
 
 	//! DNSSD callback for resolveTarget, update Zeroconf::Target record with results of lookup
-	void DNSSD_API ZeroconfCallbacks::cb_Resolve(DNSServiceRef sdRef,
+	void DNSSD_API ZeroconfCallbacks::resolveReply(DNSServiceRef sdRef,
 					    DNSServiceFlags flags,
 					    uint32_t interfaceIndex,
 					    DNSServiceErrorType errorCode,
@@ -218,50 +262,6 @@ namespace Aseba
 			target.properties["fullname"] = string(fullname);
 			target.targetFound();
 			zeroconf->targets.erase(targetIt);
-		}
-	}
-
-	//! Update the set of known targets with remote ones found by browsing DNS.
-	void Zeroconf::browse()
-	{
-		// browse() does nothing if called more then once
-		if (browseServiceRef)
-			return;
-		auto err = DNSServiceBrowse(&browseServiceRef,
-					    0, // no flags
-					    0, // default all interfaces
-					    "_aseba._tcp",
-					    nullptr, // use default domain, usually "local."
-					    ZeroconfCallbacks::cb_Browse,
-					    this
-		);
-		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceBrowse: error %0").arg(err));
-		else
-			processServiceRef(browseServiceRef);
-	}
-
-	//! DNSSD callback for browse, update DiscoveryRequest record with results of browse
-	void DNSSD_API ZeroconfCallbacks::cb_Browse(DNSServiceRef sdRef,
-					   DNSServiceFlags flags,
-					   uint32_t interfaceIndex,
-					   DNSServiceErrorType errorCode,
-					   const char *name,
-					   const char *regtype,
-					   const char *domain,
-					   void *context)
-	{
-		if (errorCode != kDNSServiceErr_NoError)
-		{
-			throw Zeroconf::Error(FormatableString("DNSServiceBrowseReply: error %0").arg(errorCode));
-		}
-		else
-		{
-			auto zeroconf(static_cast<Zeroconf *>(context));
-			if (flags & kDNSServiceFlagsAdd)
-				zeroconf->resolveTarget(name, regtype, domain);
-			else
-				zeroconf->targetRemoved(name, regtype, domain);
 		}
 	}
 
