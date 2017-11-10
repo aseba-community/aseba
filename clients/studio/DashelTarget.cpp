@@ -89,7 +89,9 @@ namespace Aseba
 		
 		// selected target
 		mainLayout->addWidget(new QLabel(tr("Selected target")));
-		currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
+		// for now, we show a default target for network connections
+		//currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
+		currentTarget = new QLineEdit("tcp:HOST;port=33333");
 		mainLayout->addWidget(currentTarget);
 		auto targetDocLink(new QLabel(tr("<a href=\"http://aseba-community.github.io/dashel#TargetNamingSec\">Learn more about Dashel targets...</a>")));
 		targetDocLink->setOpenExternalLinks(true);
