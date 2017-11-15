@@ -37,7 +37,7 @@ namespace Aseba
 		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
 		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
 		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
-		void zeroconfTargetRemoved(const std::string & name, const std::string & regtype, const std::string & domain); //!< emitted when target is removed
+		void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a previously found target is removed
 
 	public:
 		QtZeroconf(QObject *parent = nullptr): QObject(parent) {}
@@ -51,7 +51,7 @@ namespace Aseba
 		void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
 		void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
 		void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
-		void targetRemoved(const std::string & name, const std::string & regtype, const std::string & domain) override;
+		void targetRemoved(const Aseba::Zeroconf::TargetInformation &) override;
 
 		void processServiceRef(DNSServiceRef serviceRef) override;
 		void releaseServiceRef(DNSServiceRef serviceRef) override;

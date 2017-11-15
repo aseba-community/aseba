@@ -28,6 +28,31 @@ using namespace std;
 
 namespace Aseba
 {
+	//! Return the hash of the key of target
+	std::size_t Zeroconf::TargetInformationKeyHash::operator()(TargetInformation const& target) const noexcept
+	{
+		auto nameHash = std::hash<std::string>{}(target.name);
+		auto regTypeHash = std::hash<std::string>{}(target.regtype);
+		auto domainHash = std::hash<std::string>{}(target.domain);
+		return nameHash ^ regTypeHash ^ domainHash;
+	}
+
+	//! Return whether the keys of lhs and rhs are equal
+	bool Zeroconf::TargetInformationKeyCompareEqual::operator()( const TargetInformation& lhs, const TargetInformation& rhs ) const
+	{
+		return static_cast<const TargetKey&>(lhs) == static_cast<const TargetKey&>(rhs);
+	};
+
+	//! Two target keys are equal if all their members are equal
+	bool operator ==(const Zeroconf::TargetKey &lhs, const Zeroconf::TargetKey &rhs)
+	{
+		return
+			lhs.name == rhs.name &&
+			lhs.regtype == rhs.regtype &&
+			lhs.domain == rhs.domain
+		;
+	}
+
 	//! This target is described by a human-readable name, regtype, and domain.
 	//! It corresponds to a remote target on which that we want to resolve
 	Zeroconf::TargetInformation::TargetInformation(std::string name, std::string regtype, std::string domain):

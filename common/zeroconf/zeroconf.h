@@ -29,6 +29,7 @@
 #include <vector>
 #include <functional>
 #include <cmath>
+#include <unordered_set>
 #include "../utils/utils.h"
 
 namespace Dashel
@@ -70,6 +71,18 @@ namespace Aseba
 		//! The list of targets being processed.
 		//! We do not care much of the O(n) performance when fetching a target as this vector is small and the lookup infrequent.
 		using Targets = std::vector<Target>;
+		//! Compute the hash of a TargetInformation object, using data from its parent TargetKey
+		struct TargetInformationKeyHash
+		{
+			std::size_t operator()(TargetInformation const& target) const noexcept;
+		};
+		//! Compute whether two TargetInformation objects are equal, using data from their parent TargetKey
+		struct TargetInformationKeyCompareEqual
+		{
+			bool operator()( const TargetInformation& lhs, const TargetInformation& rhs ) const;
+		};
+		//! Detected targets is a set of TargetInformation indexed by their TargetKey
+		using DetectedTargets = std::unordered_set<TargetInformation, TargetInformationKeyHash, TargetInformationKeyCompareEqual>;
 
 	public:
 		// Default constructors and assignment operators
@@ -105,7 +118,7 @@ namespace Aseba
 		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a register is completed
 		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a txt update is completed
 		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
-		virtual void targetRemoved(const std::string & name, const std::string & regtype, const std::string & domain) {}
+		virtual void targetRemoved(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a previously found target is removed
 
 		// serviceRef registering/de-registering, to be implemented by subclasses
 		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available.
@@ -116,6 +129,8 @@ namespace Aseba
 		virtual void releaseServiceRef(DNSServiceRef serviceRef) = 0;
 
 	protected:
+		//! All target that have been detected from the network
+		DetectedTargets detectedTargets;
 		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
 		//! This is mostly targets being advertised, but also targets being resolved.
 		Targets targets;
@@ -143,6 +158,8 @@ namespace Aseba
 		std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
 		std::string domain{"local."}; //!< the domain of the host
 	};
+
+	bool operator ==(const Zeroconf::TargetKey &lhs, const Zeroconf::TargetKey &rhs);
 
 	/**
 	 \addtogroup zeroconf

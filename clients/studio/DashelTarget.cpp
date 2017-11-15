@@ -139,7 +139,7 @@ namespace Aseba
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
 #ifdef ZEROCONF_SUPPORT
 		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
-		connect(&zeroconf, SIGNAL(zeroconfTargetRemoved(const std::string &, const std::string &, const std::string &)), SLOT(zeroconfTargetRemoved(const std::string &, const std::string &, const std::string &)));
+		connect(&zeroconf, SIGNAL(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)));
 		zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
 		
@@ -188,12 +188,12 @@ namespace Aseba
 	}
 	
 	//! A target was removed from zeroconf, remove it to the list if not already present
-	void DashelConnectionDialog::zeroconfTargetRemoved(const std::string & name, const std::string & regtype, const std::string & domain)
+	void DashelConnectionDialog::zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		for (int i = 0; i < discoveredList->count(); ++i)
 		{
 			const QListWidgetItem *item(discoveredList->item(i));
-			if (item->data(Qt::UserRole + 1).toString().toStdString() == name)
+			if (item->data(Qt::UserRole + 1).toString().toStdString() == target.name)
 			{
 				delete discoveredList->takeItem(i);
 				return;

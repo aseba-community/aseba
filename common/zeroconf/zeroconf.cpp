@@ -201,9 +201,19 @@ namespace Aseba
 		{
 			auto zeroconf(static_cast<Zeroconf *>(context));
 			if (flags & kDNSServiceFlagsAdd)
+			{
 				zeroconf->resolveTarget(name, regtype, domain);
+			}
 			else
-				zeroconf->targetRemoved(name, regtype, domain);
+			{
+				Zeroconf::TargetInformation targetInformationKey(name, regtype, domain);
+				auto targetInformationIt(zeroconf->detectedTargets.find(targetInformationKey));
+				if (targetInformationIt != zeroconf->detectedTargets.end())
+				{
+					zeroconf->targetRemoved(*targetInformationIt);
+					zeroconf->detectedTargets.erase(targetInformationIt);
+				}
+			}
 		}
 	}
 
@@ -260,6 +270,7 @@ namespace Aseba
 			for (auto const & field: tnew)
 				target.properties[field.first] = field.second;
 			target.properties["fullname"] = string(fullname);
+			zeroconf->detectedTargets.insert(target);
 			target.targetFound();
 			zeroconf->targets.erase(targetIt);
 		}
