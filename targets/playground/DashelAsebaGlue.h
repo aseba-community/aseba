@@ -67,10 +67,11 @@ namespace Enki
 	public:
 		template<typename... Params>
 #ifdef ZEROCONF_SUPPORT
-		DashelConnected(Aseba::Zeroconf& zeroconf, unsigned port, Params... parameters):
+		DashelConnected(Aseba::Zeroconf& zeroconf, std::string robotTypeName, unsigned port, Params... parameters):
 			AsebaRobot(parameters...),
 			Aseba::SimpleDashelConnection(port),
-			zeroconf(zeroconf)
+			zeroconf(zeroconf),
+			robotTypeName(std::move(robotTypeName))
 #else // ZEROCONF_SUPPORT
 		DashelConnected(unsigned port, Params... parameters):
 			AsebaRobot(parameters...),
@@ -102,6 +103,7 @@ namespace Enki
 		
 #ifdef ZEROCONF_SUPPORT
 		Aseba::Zeroconf& zeroconf;
+		std::string robotTypeName;
 		
 		void connectionCreated(Dashel::Stream *stream) override
 		{
@@ -123,7 +125,7 @@ namespace Enki
 					zeroconf.forget(this->robotName, listenStream);
 				else
 					zeroconf.advertise(this->robotName, listenStream,
-						{ ASEBA_PROTOCOL_VERSION, this->robotName, stream != nullptr, { this->vm.nodeId }, { static_cast<unsigned int>(this->variables.productId) }}
+						{ ASEBA_PROTOCOL_VERSION, this->robotTypeName, stream != nullptr, { this->vm.nodeId }, { static_cast<unsigned int>(this->variables.productId) }}
 					);
 			}
 			catch (const std::runtime_error& e)

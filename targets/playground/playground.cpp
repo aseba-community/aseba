@@ -39,6 +39,7 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QHash>
+#include <QHostInfo>
 
 #ifdef HAVE_DBUS
 #include "PlaygroundDBusAdaptors.h"
@@ -101,7 +102,7 @@ using RobotFactory = std::function<Enki::Robot*(unsigned, std::string, std::stri
 template<typename RobotT>
 Enki::Robot* createRobotSingleVMNode(Aseba::Zeroconf& zeroconf, unsigned port, std::string robotName, std::string typeName, int16_t nodeId)
 {
-	return new RobotT(zeroconf, port, std::move(robotName), nodeId);
+	return new RobotT(zeroconf, std::move(typeName), port, std::move(robotName), nodeId);
 }
 #else // ZEROCONF_SUPPORT
 template<typename RobotT>
@@ -436,8 +437,9 @@ int main(int argc, char *argv[])
 			const auto& cppTypeName(typeIt->second.prettyName);
 			const auto qTypeName(QString::fromStdString(cppTypeName));
 			auto& countOfThisType(typeIt->second.number);
-			const auto qRobotName(robotE.attribute("name", QString("%1 %2").arg(qTypeName).arg(countOfThisType)));
-			const auto cppRobotName(qRobotName.toStdString());
+			const auto qRobotNameRaw(robotE.attribute("name", QString("%1 %2").arg(qTypeName).arg(countOfThisType)));
+			const auto qRobotNameFull(QObject::tr("%2 on %3").arg(qRobotNameRaw).arg(QHostInfo::localHostName()));
+			const auto cppRobotName(qRobotNameFull.toStdString());
 			const unsigned port(robotE.attribute("port", QString("%1").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
 			const int16_t nodeId(robotE.attribute("nodeId", "1").toInt());
 			
@@ -458,7 +460,7 @@ int main(int argc, char *argv[])
 			world.addObject(robot);
 			
 			// log
-			viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg(qTypeName).arg(port), Qt::white);
+			viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotNameRaw).arg(qTypeName).arg(port), Qt::white);
 		}
 		else
 			viewer.log("Error, unknown robot type " + type, Qt::red);
