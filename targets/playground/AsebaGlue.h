@@ -88,7 +88,7 @@ namespace Aseba
 		std::valarray<uint8_t> lastMessageData;
 		
 	public:
-		virtual uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source);
+		uint16_t getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source) override;
 	};
 	
 } // Aseba

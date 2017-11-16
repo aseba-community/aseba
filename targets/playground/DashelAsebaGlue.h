@@ -36,11 +36,11 @@ namespace Aseba
 	public:
 		SimpleDashelConnection(unsigned port);
 		
-		virtual void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length);
+		void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length) override;
 		
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+		void connectionCreated(Dashel::Stream *stream) override;
+		void incomingData(Dashel::Stream *stream) override;
+		void connectionClosed(Dashel::Stream *stream, bool abnormal) override;
 		
 	protected:
 		void clearBreakpoints();
@@ -75,7 +75,7 @@ namespace Enki
 		
 		// from AbstractNodeGlue
 		
-		virtual void externalInputStep(double dt)
+		virtual void externalInputStep(double dt) override
 		{
 			// do a network step, if there are some events from the network, they will be executed
 			Hub::step();
