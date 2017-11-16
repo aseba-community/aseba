@@ -41,6 +41,8 @@ namespace Aseba
 		void dashelConnectionClosed(Dashel::Stream * stream);
 		// To be called instead the functions in Dashel::Hub
 		bool dashelStep(int timeout = 0);
+		// Helper function for integration
+		bool isStreamHandled(Dashel::Stream * stream) const;
 
 	protected:
 		// From Zeroconf

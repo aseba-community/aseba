@@ -111,6 +111,16 @@ namespace Aseba
 		return ret;
 	}
 
+	//! Return whether stream is handled by Zeroconf
+	bool DashelhubZeroconf::isStreamHandled(Dashel::Stream * stream) const
+	{
+		if (zeroconfStreams.count(stream) != 0)
+			return true;
+		if (pendingReleaseStreams.count(stream) != 0)
+			return true;
+		return false;
+	}
+
 	//! Close all streams and deallocate their service reference
 	void DashelhubZeroconf::cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams)
 	{

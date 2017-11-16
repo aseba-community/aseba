@@ -85,6 +85,7 @@
 #include "http.h"
 #include "../../common/consts.h"
 #include "../../common/types.h"
+#include "../../common/productids.h"
 #include "../../common/utils/utils.h"
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 
@@ -98,6 +99,15 @@
 #if DASHEL_VERSION_INT < 10003
 #	error "You need at least Dashel version 1.0.3 to compile Http"
 #endif // DAHSEL_VERSION_INT
+
+#ifdef ZEROCONF_SUPPORT
+// zeroconf requires gethostname
+#ifdef _WIN32
+#include <winsock2.h>
+#else // _WIN32
+#include <unistd.h>
+#endif // _WIN32
+#endif // ZEROCONF_SUPPORT
 
 //== Some utility functions and diverse hacks ==============================================
 
@@ -145,6 +155,9 @@ namespace Aseba
     verbose(verbose),
     iterations(iterations),
     do_dump(dump)
+#ifdef ZEROCONF_SUPPORT
+    ,zeroconf(*this)
+#endif // ZEROCONF_SUPPORT
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
         // listen for incoming HTTP and Aseba requests
@@ -152,6 +165,7 @@ namespace Aseba
             inHttpStream = connect("tcpin:port=" + inHttpPort);
         if (! inAsebaPort.empty())
             inAsebaStream = connect("tcpin:port=" + inAsebaPort);
+
 
         // connect to each Aseba target
         for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
@@ -245,6 +259,13 @@ namespace Aseba
     
     void HttpInterface::connectionClosed(Stream * stream, bool abnormal)
     {
+#ifdef ZEROCONF_SUPPORT
+        if (zeroconf.isStreamHandled(stream))
+        {
+            zeroconf.dashelConnectionClosed(stream);
+            return;
+        }
+#endif // ZEROCONF_SUPPORT
         if (asebaStreams.count(stream) != 0) // this is a dashel target
         {
             // first close all HTTP connections to this target
@@ -304,7 +325,11 @@ namespace Aseba
             }
 
             // standard Aseba run loop
+#ifdef ZEROCONF_SUPPORT
             if (!step(50))
+#else // ZEROCONF_SUPPORT
+            if (!zeroconf.dashelStep(50))
+#endif // ZEROCONF_SUPPORT
                 return false;
             const UnifiedTime now;
             timeout -= (now - startTime).value;
@@ -384,10 +409,43 @@ namespace Aseba
         // if we known a program for this target and it hasn't been sent yet, send it
         if (nodeProgramsSent.find(targetId) == nodeProgramsSent.end() && nodeProgram.find(targetId) != nodeProgram.end())
             compileAndSendCode(targetId, nodeProgram[targetId]);
+#ifdef ZEROCONF_SUPPORT
+        if (!inAsebaStream)
+            return;
+        // update zeroconf TXT field
+        try
+        {
+            char hostname[256];
+            if (gethostname(hostname, sizeof(hostname)) != 0)
+                strcpy(hostname, "unknown host");
+            std::vector<unsigned int> ids;
+            std::vector<unsigned int> pids;
+            for (const auto& nodeKV: nodes)
+            {
+                ids.push_back(nodeKV.first);
+                // TODO: add support for productId, this requires reading the right target variable
+                // probably this should be done in the new Switch, not here
+                pids.push_back(ASEBA_PID_UNDEFINED);
+            }
+            Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Http", false, ids, pids };
+            zeroconf.advertise(Aseba::FormatableString("Http on %0").arg(hostname), inAsebaStream, txt);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::cerr << "Can't advertise stream " << inAsebaStream->getTargetName() << ": " << e.what() << std::endl;
+        }
+#endif // ZEROCONF_SUPPORT
     }
     
     void HttpInterface::incomingData(Stream *stream)
     {
+#ifdef ZEROCONF_SUPPORT
+        if (zeroconf.isStreamHandled(stream))
+        {
+            zeroconf.dashelIncomingData(stream);
+            return;
+        }
+#endif // ZEROCONF_SUPPORT
         if (asebaStreams.count(stream) != 0)
         {
             // this is a dashel target
