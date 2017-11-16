@@ -82,8 +82,8 @@ namespace Aseba
 
 	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
 	Zeroconf::Target::Target(Target && rhs):
-		TargetInformation(move(rhs)),
-		container(move(rhs.container))
+		TargetInformation(std::move(rhs)),
+		container(std::move(rhs.container))
 	{
 		serviceRef = rhs.serviceRef;
 		rhs.serviceRef = nullptr;
@@ -92,7 +92,10 @@ namespace Aseba
 	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
 	Zeroconf::Target& Zeroconf::Target::operator=(Target&& rhs)
 	{
+		if (serviceRef)
+			container.get().releaseServiceRef(serviceRef);
 		TargetInformation::operator = (std::move(rhs));
+		container = std::move(rhs.container);
 		serviceRef = rhs.serviceRef;
 		rhs.serviceRef = nullptr;
 		return *this;

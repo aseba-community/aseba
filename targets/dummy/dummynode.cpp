@@ -145,7 +145,7 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			std::cerr << "Can't advertise stream " << stream->getTargetName() << ": " << e.what() << std::endl;
+			std::cerr << "Can't advertise stream " << listenStream->getTargetName() << ": " << e.what() << std::endl;
 		}
 	}
 #endif // ZEROCONF_SUPPORT
