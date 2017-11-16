@@ -611,7 +611,7 @@ namespace Aseba
                 if (req->method.find("PUT")==0)
                     evLoad(req, req->tokens);  // load bytecode for one node
                 else if (req->method.find("OPTIONS")==0)
-                    evOptions(req, req->tokens);	// get supported methods for CORS preflight
+                    evOptions(req, req->tokens);    // get supported methods for CORS preflight
                 else
                     evNodes(req, req->tokens); // get info for one node
             }
@@ -668,7 +668,7 @@ namespace Aseba
             }
             else // (do_one_node)
             {
-	      if (! (int(nodeId) == atoi(args[0].c_str()) ||
+                if (! (int(nodeId) == atoi(args[0].c_str()) ||
                        nodeName.find(args[0])==0) )
                     continue; // this is not a match, skip to next candidate
 
@@ -853,7 +853,7 @@ namespace Aseba
         // connection must stay open!
     }
     
-	// Handler: Reply with supported methods to support CORS preflight
+    // Handler: Reply with supported methods to support CORS preflight
 
     void HttpInterface::evOptions(HttpRequest* req, strings& args)
     {
