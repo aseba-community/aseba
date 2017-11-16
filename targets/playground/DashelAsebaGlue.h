@@ -22,7 +22,12 @@
 #define __PLAYGROUND_DASHEL_ASEBA_GLUE_H
 
 #include "AsebaGlue.h"
+#include "EnkiGlue.h"
 #include <dashel/dashel.h>
+
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-qt.h"
+#endif // ZEROCONF_SUPPORT
 
 // Implementation of the connection using Dashel
 
@@ -30,7 +35,9 @@ namespace Aseba
 {
 	class SimpleDashelConnection: public RecvBufferNodeConnection, public Dashel::Hub
 	{
-		Dashel::Stream* stream;
+	protected:
+		Dashel::Stream* listenStream = nullptr;
+		Dashel::Stream* stream = nullptr;
 		std::vector<Dashel::Stream*> toDisconnect; // all streams that must be disconnected at next step
 
 	public:
@@ -59,11 +66,21 @@ namespace Enki
 	{
 	public:
 		template<typename... Params>
+#ifdef ZEROCONF_SUPPORT
+		DashelConnected(Aseba::Zeroconf& zeroconf, unsigned port, Params... parameters):
+			AsebaRobot(parameters...),
+			Aseba::SimpleDashelConnection(port),
+			zeroconf(zeroconf)
+#else // ZEROCONF_SUPPORT
 		DashelConnected(unsigned port, Params... parameters):
 			AsebaRobot(parameters...),
 			Aseba::SimpleDashelConnection(port)
+#endif // ZEROCONF_SUPPORT
 		{
 			Aseba::vmStateToEnvironment[&this->vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
+#ifdef ZEROCONF_SUPPORT
+			updateZeroconfStatus();
+#endif // ZEROCONF_SUPPORT
 		}
 		
 		virtual ~DashelConnected()
@@ -72,7 +89,6 @@ namespace Enki
 		}
 		
 	protected:
-		
 		// from AbstractNodeGlue
 		
 		virtual void externalInputStep(double dt) override
@@ -83,6 +99,39 @@ namespace Enki
 			// disconnect old streams
 			closeOldStreams();
 		}
+		
+#ifdef ZEROCONF_SUPPORT
+		Aseba::Zeroconf& zeroconf;
+		
+		void connectionCreated(Dashel::Stream *stream) override
+		{
+			Aseba::SimpleDashelConnection::connectionCreated(stream);
+			updateZeroconfStatus();
+		}
+		
+		void connectionClosed(Dashel::Stream *stream, bool abnormal) override
+		{
+			Aseba::SimpleDashelConnection::connectionClosed(stream, abnormal);
+			updateZeroconfStatus();
+		}
+		
+		void updateZeroconfStatus()
+		{
+			try
+			{
+				if (stream)
+					zeroconf.forget(this->robotName, listenStream);
+				else
+					zeroconf.advertise(this->robotName, listenStream,
+						{ ASEBA_PROTOCOL_VERSION, this->robotName, stream != nullptr, { this->vm.nodeId }, { static_cast<unsigned int>(this->variables.productId) }}
+					);
+			}
+			catch (const std::runtime_error& e)
+			{
+				SEND_NOTIFICATION(LOG_ERROR, "cannot advertise stream", listenStream->getTargetName(), e.what());
+			}
+		}
+#endif // ZEROCONF_SUPPORT
 	};
 	
 } // namespace Enki

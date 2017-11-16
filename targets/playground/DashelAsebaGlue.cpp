@@ -27,14 +27,13 @@ namespace Aseba
 {
 	// SimpleDashelConnection
 
-	SimpleDashelConnection::SimpleDashelConnection(unsigned port):
-		stream(0)
+	SimpleDashelConnection::SimpleDashelConnection(unsigned port)
 	{
 		try
 		{
-			Dashel::Hub::connect(FormatableString("tcpin:port=%0").arg(port));
+			listenStream = Dashel::Hub::connect(FormatableString("tcpin:port=%0").arg(port));
 		}
-		catch (Dashel::DashelException e)
+		catch (const Dashel::DashelException& e)
 		{
 			SEND_NOTIFICATION(FATAL_ERROR, "cannot create listening port", std::to_string(port), e.what());
 			abort();
@@ -128,7 +127,7 @@ namespace Aseba
 		if (stream == this->stream)
 		{
 			clearBreakpoints();
-			this->stream = 0;
+			this->stream = nullptr;
 		}
 		if (abnormal)
 		{
@@ -150,7 +149,7 @@ namespace Aseba
 		}
 	}
 	
-	//! disconnect old streams
+	//! Disconnect old streams
 	void SimpleDashelConnection::closeOldStreams()
 	{
 		for (size_t i = 0; i < toDisconnect.size(); ++i)

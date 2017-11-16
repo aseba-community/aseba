@@ -89,44 +89,38 @@ namespace Enki
 	};
 }
 
-// support for robot factory
-struct RobotInstance
-{
-	Enki::Robot* robot;
+//! A function to create a robot of a given type
 #ifdef ZEROCONF_SUPPORT
-	const Aseba::Zeroconf::TxtRecord zeroconfProperties;
-#endif // ZEROCONF_SUPPORT
-};
-
-template<typename RobotT>
-RobotInstance createRobotSingleVMNode(unsigned port, std::string robotName, std::string typeName, int16_t nodeId)
-{
-	auto robot(new RobotT(port, std::move(robotName), nodeId));
-#ifdef ZEROCONF_SUPPORT
-	const Aseba::Zeroconf::TxtRecord txt
-	{
-		ASEBA_PROTOCOL_VERSION,
-		std::move(typeName),
-		false,
-		{ robot->vm.nodeId },
-		{ static_cast<unsigned int>(robot->variables.productId) }
-	};
-	return { robot, txt };
+using RobotFactory = std::function<Enki::Robot*(Aseba::Zeroconf&, unsigned, std::string, std::string, int16_t)>;
 #else // ZEROCONF_SUPPORT
-	return { robot };
+using RobotFactory = std::function<Enki::Robot*(unsigned, std::string, std::string, int16_t)>;
 #endif // ZEROCONF_SUPPORT
-}
 
-using RobotFactory = std::function<RobotInstance(unsigned, std::string, std::string, int16_t)>;
+//! A factory function to create a robot with a single VM
+#ifdef ZEROCONF_SUPPORT
+template<typename RobotT>
+Enki::Robot* createRobotSingleVMNode(Aseba::Zeroconf& zeroconf, unsigned port, std::string robotName, std::string typeName, int16_t nodeId)
+{
+	return new RobotT(zeroconf, port, std::move(robotName), nodeId);
+}
+#else // ZEROCONF_SUPPORT
+template<typename RobotT>
+Enki::Robot* createRobotSingleVMNode(unsigned port, std::string robotName, std::string typeName, int16_t nodeId)
+{
+	return new RobotT(port, std::move(robotName), nodeId);
+}
+#endif // ZEROCONF_SUPPORT
+
+//! A type of robot
 struct RobotType
 {
 	RobotType(std::string prettyName, RobotFactory factory):
 		prettyName(std::move(prettyName)),
 		factory(std::move(factory))
 	{}
-	const std::string prettyName;
-	const RobotFactory factory;
-	unsigned number = 0;
+	const std::string prettyName; //!< a nice-looking name of this type
+	const RobotFactory factory; //!< the factory function to create a robot of this type
+	unsigned number = 0; //!< number of robots of this type instantiated
 };
 
 
@@ -449,8 +443,11 @@ int main(int argc, char *argv[])
 			
 			// create
 			const auto& creator(typeIt->second.factory);
-			auto instance(creator(port, cppRobotName, cppTypeName, nodeId));
-			auto robot(instance.robot);
+#ifdef ZEROCONF_SUPPORT
+			auto robot(creator(zeroconf, port, cppRobotName, cppTypeName, nodeId));
+#else // ZEROCONF_SUPPORT
+			auto robot(creator(port, cppRobotName, cppTypeName, nodeId));
+#endif // ZEROCONF_SUPPORT
 			asebaServerCount++;
 			countOfThisType++;
 			
@@ -460,11 +457,8 @@ int main(int argc, char *argv[])
 			robot->angle = robotE.attribute("angle").toDouble();
 			world.addObject(robot);
 			
-			// advertise
+			// log
 			viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotName).arg(qTypeName).arg(port), Qt::white);
-#ifdef ZEROCONF_SUPPORT
-			zeroconf.advertise(cppRobotName, port, instance.zeroconfProperties);
-#endif // ZEROCONF_SUPPORT
 		}
 		else
 			viewer.log("Error, unknown robot type " + type, Qt::red);
