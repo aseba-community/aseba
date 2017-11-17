@@ -210,6 +210,16 @@ namespace Aseba
 		bool discoveredListPortSet(false);
 		const std::regex extractName("^(.*)\\ \\((.*)\\)$");
 		std::vector<bool> seen(discoveredList->count(), false);
+		
+		// mark non-serial targets as seen
+		for (int i = 0; i < discoveredList->count(); ++i)
+		{
+			const QListWidgetItem *item(discoveredList->item(i));
+			auto dashelTarget(item->data(Qt::UserRole));
+			if (!dashelTarget.toString().startsWith("ser:"))
+				seen[i] = true;
+		}
+		
 		// FIXME: change this algo from O(n^2) to O(n log(n))
 		// add newly seen devices
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
@@ -226,11 +236,6 @@ namespace Aseba
 				{
 					seen[i] = true;
 					found = true;
-				}
-				// this entry is not a discoveredList port
-				if (!dashelTarget.toString().startsWith("ser:"))
-				{
-					seen[i] = true;
 				}
 			}
 			// if not, add it
