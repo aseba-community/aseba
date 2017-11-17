@@ -142,6 +142,8 @@ namespace Aseba
 		//! The list of targets being processed.
 		//! We do not care much of the O(n) performance when fetching a target as this vector is small and the lookup infrequent.
 		using Targets = std::vector<Target>;
+		//! A set of reference wrapper to targets, through their DNSServiceRef
+		using TargetRefSet = std::unordered_set<DNSServiceRef>;
 
 		//! Compute the hash of a TargetInformation object, using data from its parent TargetKey
 		struct TargetInformationKeyHash
@@ -221,7 +223,6 @@ namespace Aseba
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
-		Targets::iterator getTarget(const Target& target);
 		Targets::iterator getTarget(DNSServiceRef serviceRef);
 		Targets::iterator getTarget(const std::string & name, const int port);
 		Targets::iterator getTarget(const std::string & name, const Dashel::Stream * stream);
@@ -247,6 +248,9 @@ namespace Aseba
 		//! A list of all targets currently being processed, i.e. whose serviceRefs are handled by subclasses
 		//! This is mostly targets being advertised, but also targets being resolved.
 		Targets targets;
+		//! Targets that were requested to be de-registered while not having completed registration yet
+		TargetRefSet targetsToRemoveUponRegistration;
+
 		//! The serviceRef for browse requests isn't attached to a target
 		DNSServiceRef browseServiceRef{nullptr};
 	};

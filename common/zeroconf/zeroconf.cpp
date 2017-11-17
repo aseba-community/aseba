@@ -105,9 +105,12 @@ namespace Aseba
 		if (targetIt != targets.end())
 		{
 			const Target& target(*targetIt);
-			if (target.state != Target::State::REGISTERED) // || target.state != Target::State::REGISTRATING)
+			if (target.state != Target::State::REGISTERED && target.state != Target::State::REGISTRATING)
 				throw Zeroconf::Error(FormatableString("forget: target in invalid state: %0").arg(target.stateToString.at(target.state)));
-			targets.erase(targetIt);
+			if (target.state == Target::State::REGISTRATING)
+				targetsToRemoveUponRegistration.insert(target.serviceRef);
+			else
+				targets.erase(targetIt);
 		}
 	}
 
@@ -133,7 +136,7 @@ namespace Aseba
 		if (err != kDNSServiceErr_NoError)
 		{
 			// register failed, remove target and throw exception
-			auto targetIt(getTarget(target));
+			auto targetIt(getTarget(target.serviceRef));
 			assert(targetIt != targets.end());
 			targets.erase(targetIt);
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
@@ -168,8 +171,15 @@ namespace Aseba
 			target.name = name;
 			target.domain = domain;
 			target.regtype = regtype;
-			target.registerCompleted();
 			target.state = Zeroconf::Target::State::REGISTERED;
+			target.registerCompleted();
+			// find if this target should be directly deleted
+			auto targetRemoveIt(zeroconf->targetsToRemoveUponRegistration.find(target.serviceRef));
+			if (targetRemoveIt != zeroconf->targetsToRemoveUponRegistration.end())
+			{
+				zeroconf->targetsToRemoveUponRegistration.erase(targetRemoveIt);
+				zeroconf->targets.erase(zeroconf->getTarget(*targetRemoveIt));
+			}
 		}
 	}
 
@@ -303,15 +313,6 @@ namespace Aseba
 			target.targetFound();
 			zeroconf->targets.erase(targetIt);
 		}
-	}
-
-	//! Return an iterator to the target passed by reference, comparing their address, return targets.end() if not found.
-	Zeroconf::Targets::iterator Zeroconf::getTarget(const Target& target)
-	{
-		const Target* targetPointer(&target);
-		return find_if(targets.begin(), targets.end(),
-			[=] (const Target& candidate) { return &candidate == targetPointer; }
-		);
 	}
 
 	//! Return an iterator to the target holding a given service reference, return targets.end() if not found.
