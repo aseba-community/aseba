@@ -44,7 +44,7 @@ namespace Aseba
 		static void DNSSD_API resolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
 
-	const std::unordered_map<Zeroconf::Target::State, const char*> Zeroconf::Target::stateToString {
+	const Zeroconf::Target::StateNameMap Zeroconf::Target::stateToString {
 		{ State::UNINITIALIZED, "uninitialized" },
 		{ State::REGISTRATING, "registering" },
 		{ State::REGISTERED, "registered" },

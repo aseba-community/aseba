@@ -135,7 +135,8 @@ namespace Aseba
 
 			std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
 
-			static const std::unordered_map<Zeroconf::Target::State, const char*> stateToString; //!< A map to display State as string
+			using StateNameMap = std::unordered_map<State, const char*, Aseba::EnumHash<State>>;
+			static const StateNameMap stateToString; //!< A map to display State as string
 		};
 
 		//! The list of targets being processed.

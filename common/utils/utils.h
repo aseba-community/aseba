@@ -81,6 +81,19 @@ namespace Aseba
 		}
 	};
 	
+	//! Hash for enum types as this C++14 feature is not implemented for g++ < 6.1
+	template<class E>
+	class EnumHash
+	{
+		using sfinae = typename std::enable_if<std::is_enum<E>::value, E>::type;
+	public:
+		size_t operator()(const E&e) const
+		{
+			using int_type = std::underlying_type_t<E>;
+			return std::hash<int_type>{}(static_cast<int_type>(e));
+		}
+	};
+	
 	//! Time or durations, in milliseconds
 	struct UnifiedTime
 	{
@@ -197,19 +210,5 @@ namespace Aseba
 	/*@}*/
 	
 };
-
-namespace std
-{
-	//! Generic hash for reference_wrapper
-	template<typename T>
-	struct hash<reference_wrapper<T>>
-	{
-		//! Hashes the reference to the underlying value
-		size_t operator()(const reference_wrapper<T>& r) const noexcept
-		{
-			return std::hash<T>()(r.get());
-		}
-	};
-}
 
 #endif
