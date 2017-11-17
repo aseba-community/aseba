@@ -44,6 +44,13 @@ namespace Aseba
 		static void DNSSD_API resolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullname, const char *hosttarget, uint16_t port, /* In network byte order */ uint16_t txtLen, const unsigned char *txtRecord, void *context);
 	};
 
+	const std::unordered_map<Zeroconf::Target::State, const char*> Zeroconf::Target::stateToString {
+		{ State::UNINITIALIZED, "uninitialized" },
+		{ State::REGISTRATING, "registering" },
+		{ State::REGISTERED, "registered" },
+		{ State::RESOLVING, "resolving" }
+	};
+
 	//! Advertise a target with a given name and port, with associated txtrec.
 	//! If the target already exists, its txtrec is updated.
 	void Zeroconf::advertise(const std::string & name, const int port, const TxtRecord & txtrec)
@@ -83,17 +90,25 @@ namespace Aseba
 	//! Forget a target with a given name and port, if the target is unknown, do nothing.
 	void Zeroconf::forget(const std::string & name, const int port)
 	{
-		auto targetIt(getTarget(name, port));
-		if (targetIt != targets.end())
-			targets.erase(targetIt);
+		forget(getTarget(name, port));
 	}
 
 	//! Forget a target for a given Dashel stream, if the target is unknown, do nothing.
 	void Zeroconf::forget(const std::string & name, const Dashel::Stream * stream)
 	{
-		auto targetIt(getTarget(name, stream));
+		forget(getTarget(name, stream));
+	}
+
+	//! Forget a target referenced by its iterator
+	void Zeroconf::forget(Targets::iterator targetIt)
+	{
 		if (targetIt != targets.end())
+		{
+			const Target& target(*targetIt);
+			if (target.state != Target::State::REGISTERED) // || target.state != Target::State::REGISTRATING)
+				throw Zeroconf::Error(FormatableString("forget: target in invalid state: %0").arg(target.stateToString.at(target.state)));
 			targets.erase(targetIt);
+		}
 	}
 
 	//! A target can ask Zeroconf to register it in DNS, with additional information in a TXT record
@@ -114,6 +129,7 @@ namespace Aseba
 					      record, // TXT record
 					      ZeroconfCallbacks::registerReply,
 					      this); // context pointer is Zeroconf
+		target.state = Zeroconf::Target::State::REGISTRATING;
 		if (err != kDNSServiceErr_NoError)
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
 		else
@@ -144,6 +160,7 @@ namespace Aseba
 			target.domain = domain;
 			target.regtype = regtype;
 			target.registerCompleted();
+			target.state = Zeroconf::Target::State::REGISTERED;
 		}
 	}
 
@@ -151,6 +168,8 @@ namespace Aseba
 	void Zeroconf::updateTarget(Zeroconf::Target & target, const TxtRecord& txtrec)
 	{
 		assert(target.serviceRef);
+		if (target.state != Target::State::REGISTERED)
+			throw Zeroconf::Error(FormatableString("updateTarget: target in invalid state: %0").arg(target.stateToString.at(target.state)));
 		const string rawdata{txtrec.record()};
 		DNSServiceErrorType err = DNSServiceUpdateRecord(target.serviceRef,
 								 nullptr, // update primary TXT record
@@ -230,6 +249,7 @@ namespace Aseba
 						 domain.c_str(),
 						 ZeroconfCallbacks::resolveReply,
 						 this);
+		target.state = Zeroconf::Target::State::RESOLVING;
 		if (err != kDNSServiceErr_NoError)
 		{
 			targets.pop_back();

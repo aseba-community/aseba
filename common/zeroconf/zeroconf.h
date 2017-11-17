@@ -30,6 +30,7 @@
 #include <functional>
 #include <cmath>
 #include <unordered_set>
+#include <unordered_map>
 #include "../utils/utils.h"
 
 namespace Dashel
@@ -121,7 +122,20 @@ namespace Aseba
 
 			DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
 
+			//! Possible states of a target with respect to the daemon
+			enum class State
+			{
+				UNINITIALIZED, //!< just created, not initialized
+				REGISTRATING, //!< being registered with the daemon
+				REGISTERED, //!< fully registered
+				RESOLVING //!< being resolved with the daemon
+			};
+
+			State state = State::UNINITIALIZED; //!< State of this target, by default not initalized
+
 			std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
+
+			static const std::unordered_map<Zeroconf::Target::State, const char*> stateToString;
 		};
 
 		//! The list of targets being processed.
@@ -202,6 +216,7 @@ namespace Aseba
 	protected:
 		// helper functions
 		friend struct ZeroconfCallbacks;
+		void forget(Targets::iterator targetIt);
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);

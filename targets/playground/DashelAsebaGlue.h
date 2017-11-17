@@ -130,7 +130,7 @@ namespace Enki
 			}
 			catch (const std::runtime_error& e)
 			{
-				SEND_NOTIFICATION(LOG_ERROR, "cannot advertise stream", listenStream->getTargetName(), e.what());
+				SEND_NOTIFICATION(LOG_ERROR, stream ? "Cannot de-advertise stream" : "Cannot advertise stream", listenStream->getTargetName(), e.what());
 			}
 		}
 #endif // ZEROCONF_SUPPORT
