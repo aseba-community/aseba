@@ -135,7 +135,7 @@ namespace Aseba
 
 			std::reference_wrapper<Zeroconf> container; //!< Back reference to containing Aseba::Zeroconf object
 
-			static const std::unordered_map<Zeroconf::Target::State, const char*> stateToString;
+			static const std::unordered_map<Zeroconf::Target::State, const char*> stateToString; //!< A map to display State as string
 		};
 
 		//! The list of targets being processed.
@@ -220,6 +220,7 @@ namespace Aseba
 		void registerTarget(Target & target, const TxtRecord & txtrec);
 		void updateTarget(Target & target, const TxtRecord & txtrec);
 		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
+		Targets::iterator getTarget(const Target& target);
 		Targets::iterator getTarget(DNSServiceRef serviceRef);
 		Targets::iterator getTarget(const std::string & name, const int port);
 		Targets::iterator getTarget(const std::string & name, const Dashel::Stream * stream);

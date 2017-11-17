@@ -131,7 +131,13 @@ namespace Aseba
 					      this); // context pointer is Zeroconf
 		target.state = Zeroconf::Target::State::REGISTRATING;
 		if (err != kDNSServiceErr_NoError)
+		{
+			// register failed, remove target and throw exception
+			auto targetIt(getTarget(target));
+			assert(targetIt != targets.end());
+			targets.erase(targetIt);
 			throw Zeroconf::Error(FormatableString("DNSServiceRegister: error %0").arg(err));
+		}
 		else
 			processServiceRef(target.serviceRef);
 	}
@@ -145,15 +151,18 @@ namespace Aseba
 					     const char *domain,
 					     void *context)
 	{
+		// retrieve target
+		auto zeroconf(static_cast<Zeroconf *>(context));
+		auto targetIt(zeroconf->getTarget(sdRef));
+		if (targetIt == zeroconf->targets.end())
+			return;
 		if (errorCode != kDNSServiceErr_NoError)
+		{
+			zeroconf->targets.erase(targetIt);
 			throw Zeroconf::Error(FormatableString("DNSServiceRegisterReply: error %0").arg(errorCode));
+		}
 		else
 		{
-			// retrieve target
-			auto zeroconf(static_cast<Zeroconf *>(context));
-			auto targetIt(zeroconf->getTarget(sdRef));
-			if (targetIt == zeroconf->targets.end())
-				return;
 			Zeroconf::Target& target(*targetIt);
 			// fill informations
 			target.name = name;
@@ -294,6 +303,15 @@ namespace Aseba
 			target.targetFound();
 			zeroconf->targets.erase(targetIt);
 		}
+	}
+
+	//! Return an iterator to the target passed by reference, comparing their address, return targets.end() if not found.
+	Zeroconf::Targets::iterator Zeroconf::getTarget(const Target& target)
+	{
+		const Target* targetPointer(&target);
+		return find_if(targets.begin(), targets.end(),
+			[=] (const Target& candidate) { return &candidate == targetPointer; }
+		);
 	}
 
 	//! Return an iterator to the target holding a given service reference, return targets.end() if not found.
