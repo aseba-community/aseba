@@ -99,7 +99,9 @@ namespace Aseba
 	//! Data are available on a zeroconf socket
 	void QtZeroconf::doIncoming(int socket)
 	{
-		incomingData(zeroconfSockets.at(socket)->serviceRef);
+		auto streamIt(zeroconfSockets.find(socket));
+		if (streamIt != zeroconfSockets.end())
+			incomingData(streamIt->second->serviceRef);
 	}
 
 	//! Process incoming data associated to a service reference
