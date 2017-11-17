@@ -112,7 +112,12 @@ namespace Enki
 				log(tr("Old client disconnected from %0").arg(QString::fromStdString(arguments.at(0))), notificationLogTypeToColor.at(type));
 			}
 			else
-				log(description, notificationLogTypeToColor.at(type));
+			{
+				QString fullDescription(QString::fromStdString(description));
+				for (const auto& argument: arguments)
+					fullDescription += " " + QString::fromStdString(argument);
+				log(fullDescription, notificationLogTypeToColor.at(type));
+			}
 		}
 		else if (type == EnvironmentNotificationType::FATAL_ERROR)
 		{
