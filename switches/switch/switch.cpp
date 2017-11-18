@@ -32,6 +32,10 @@
 #include "../../common/utils/utils.h"
 #include "../../common/msg/msg.h"
 #include "../../common/msg/endian.h"
+#ifdef ZEROCONF_SUPPORT
+#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "../../common/productids.h"
+#endif // ZEROCONF_SUPPORT
 
 namespace Aseba 
 {
@@ -42,10 +46,14 @@ namespace Aseba
 	/*@{*/
 
 	//! Broadcast messages form any data stream to all others data streams including itself.
-	Switch::Switch(unsigned port, bool verbose, bool dump, bool forward, bool rawTime) :
+	Switch::Switch(unsigned port, std::string name, bool verbose, bool dump, bool forward, bool rawTime) :
 		#ifdef DASHEL_VERSION_INT
 		Dashel::Hub(verbose || dump),
 		#endif // DASHEL_VERSION_INT
+#ifdef ZEROCONF_SUPPORT
+		zeroconf(*this),
+		zeroconfName(name),
+#endif // ZEROCONF_SUPPORT
 		verbose(verbose),
 		dump(dump),
 		forward(forward),
@@ -53,7 +61,19 @@ namespace Aseba
 	{
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
-		connect(oss.str());
+		auto tcpin = connect(oss.str());
+#ifdef ZEROCONF_SUPPORT
+		// advertise target
+		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { zeroconfName }, { 100 }, { ASEBA_PID_UNDEFINED }}; // no productId reserved for switch
+		try
+		{
+			zeroconf.advertise(zeroconfName, tcpin, txt);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << "Can't advertise switch " << zeroconfName << ": " << e.what() << std::endl;
+		}
+#endif // ZEROCONF_SUPPORT
 	}
 	
 	void Switch::connectionCreated(Stream *stream)
@@ -67,6 +87,10 @@ namespace Aseba
 	
 	void Switch::incomingData(Stream *stream)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelIncomingData(stream);
+#endif // ZEROCONF_SUPPORT
+
 		Message* message(Message::receive(stream));
 		
 		// remap source
@@ -128,6 +152,10 @@ namespace Aseba
 	
 	void Switch::connectionClosed(Stream *stream, bool abnormal)
 	{
+#ifdef ZEROCONF_SUPPORT
+		zeroconf.dashelConnectionClosed(stream);
+#endif // ZEROCONF_SUPPORT
+
 		if (verbose)
 		{
 			dumpTime(cout, rawTime);
@@ -168,6 +196,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 	stream << "-d, --dump      : makes the switch dump all data\n";
 	stream << "-l, --loop      : makes the switch transmit messages back to the send, not only forward them.\n";
 	stream << "-p port         : listens to incoming connection on this port\n";
+	stream << "-n, --name name : use this name if advertising\n";
 	stream << "--rawtime       : shows time in the form of sec:usec since 1970\n";
 	stream << "-h, --help      : shows this help\n";
 	stream << "-V, --version   : shows the version number\n";
@@ -187,6 +216,7 @@ int main(int argc, char *argv[])
 {
 	Dashel::initPlugins();
 	unsigned port = ASEBA_DEFAULT_PORT;
+	std::string name = "Aseba Switch";
 	bool verbose = false;
 	bool dump = false;
 	bool forward = true;
@@ -222,6 +252,16 @@ int main(int argc, char *argv[])
 			arg = argv[++argCounter];
 			port = atoi(arg);
 		}
+		else if ((strcmp(arg, "-n") == 0) || (strcmp(arg, "--name") == 0))
+		{
+			if (argCounter + 1 >= argc)
+			{
+				std::cerr << "name needed" << std::endl;
+				return 1;
+			}
+			arg = argv[++argCounter];
+			name = arg;
+		}
 		else if (strcmp(arg, "--rawtime") == 0)
 		{
 			rawTime = true;
@@ -245,7 +285,7 @@ int main(int argc, char *argv[])
 	
 	try
 	{
-		Aseba::Switch aswitch(port, verbose, dump, forward, rawTime);
+		Aseba::Switch aswitch(port, name, verbose, dump, forward, rawTime);
 		for (size_t i = 0; i < additionalTargets.size(); i++)
 		{
 			const std::string& target(additionalTargets[i]);
@@ -265,7 +305,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		/*
-		Uncomment this and comment aswitch.run() to flood all pears with dummy user messages
+		Uncomment this and comment aswitch.run() to flood all peers with dummy user messages
 		while (1)
 		{
 			aswitch.step(10);
