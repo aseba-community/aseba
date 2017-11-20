@@ -326,9 +326,9 @@ namespace Aseba
 
             // standard Aseba run loop
 #ifdef ZEROCONF_SUPPORT
-            if (!step(50))
-#else // ZEROCONF_SUPPORT
             if (!zeroconf.dashelStep(50))
+#else // ZEROCONF_SUPPORT
+            if (!step(50))
 #endif // ZEROCONF_SUPPORT
                 return false;
             const UnifiedTime now;
