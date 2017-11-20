@@ -52,5 +52,5 @@
 	<robot type="e-puck" x="20" y="30" port="33336" name="E-Puck C" nodeId="3" />
 	<robot type="e-puck" x="20" y="40" port="33337" name="E-Puck D" nodeId="4" />
 	
-	<process command=":asebaswitch -v tcp:localhost;33334 tcp:localhost;33335 tcp:localhost;33336 tcp:localhost;33337" />
+	<process command=":asebaswitch -n unifr.playground -v tcp:localhost;33334 tcp:localhost;33335 tcp:localhost;33336 tcp:localhost;33337" />
 </aseba-playground>
