@@ -172,7 +172,7 @@ namespace Aseba
 		std::string os;
 		for (wchar_t c : s)
 		{
-				if (c < 0x80)
+			if (c < 0x80)
 			{
 				os += static_cast<uint8_t>(c);
 			}
@@ -227,6 +227,7 @@ namespace Aseba
 	std::wstring UTF8ToWString(const std::string& s)
 	{
 		std::wstring res;
+		size_t left(s.size());
 		for (const char & c : s)
 		{
 			const char *a = &c;
@@ -244,12 +245,16 @@ namespace Aseba
 			{
 				//Byte represents the start of an encoded character in the range
 				//U+0080 to U+07FF
+				if (left < 2)
+					throw std::runtime_error("Invalid UTF8 string");
 				res += ((*a&31)<<6)|(a[1]&63);
 			}
 			else if ((*a&240)==224)
 			{
 				//Byte represents the start of an encoded character in the range
 				//U+07FF to U+FFFF
+				if (left < 3)
+					throw std::runtime_error("Invalid UTF8 string");
 				res += ((*a&15)<<12)|((a[1]&63)<<6)|(a[2]&63);
 			}
 			else if ((*a&248)==240)
@@ -258,6 +263,7 @@ namespace Aseba
 				//U+FFFF limit of 16-bit integers
 				res += '?';
 			}
+			--left;
 		}
 		// TODO: add >UTF16 support
 		return res;

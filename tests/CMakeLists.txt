@@ -1,3 +1,11 @@
+find_program(valgrind_FOUND valgrind)
+if (valgrind_FOUND)
+	message(STATUS "valgrind executable found: " ${valgrind_FOUND})
+else ()
+	message(WARNING "valgrind executable not found! Disabling memory leaks and trashs tests")
+endif ()
+
+add_subdirectory(common)
 add_subdirectory(msg)
 add_subdirectory(compiler)
 add_subdirectory(vm)
