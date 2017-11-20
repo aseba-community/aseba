@@ -22,6 +22,7 @@
 #include <netinet/in.h>
 #else
 #include <winsock2.h>
+#undef REGISTERED // Win32 API defines REGISTERED as a global macro, so we undef it to avoid conflict with a value of Target::State
 #endif
 
 #include "../utils/FormatableString.h"
