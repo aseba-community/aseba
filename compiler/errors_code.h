@@ -2,6 +2,11 @@
 #ifndef __ERRORS_H
 #define __ERRORS_H
 
+// Mask conflict with /mingw32/i686-w64-mingw32/include/corerror.h (Windows error codes)
+#ifdef WIN32
+#undef ERROR_STACK_OVERFLOW
+#endif
+
 /*
 This file was automatically generated. Do not modify it,
 or your changes will be lost!
