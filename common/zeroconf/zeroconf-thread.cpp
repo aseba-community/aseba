@@ -23,6 +23,9 @@
 #include <dashel/dashel.h>
 #include "zeroconf-thread.h"
 #include "dns_sd.h"
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 
 using namespace std;
 

@@ -44,6 +44,11 @@ else ()
 	set (CMAKE_CXX_STANDARD 14)
 endif ()
 
+# reduce the amount of recursive include trash on Windows
+if (WIN32)
+	add_definitions(-DWIN32_LEAN_AND_MEAN)
+endif()
+
 # Remove -Wl,--no-undefined which CMake 3.0.2 (on OpenSUSE 13.2) adds to the
 # linker options when building shared libs. That breaks building libs that use
 # callbacks that will be provided by other libs when the executable is linked.
