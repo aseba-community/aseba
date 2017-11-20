@@ -174,7 +174,7 @@ namespace Aseba
 			using Fields = std::map<std::string, std::string>;
 
 		public:
-			TxtRecord(const unsigned int protovers, const std::string& type, bool busy, const std::vector<unsigned int>& ids, const std::vector<unsigned int>& pids);
+			TxtRecord(const unsigned int protovers, const std::string& type, bool busy = false, const std::vector<unsigned int>& ids = {}, const std::vector<unsigned int>& pids = {});
 			TxtRecord(const std::string & txtRecord);
 			TxtRecord(const unsigned char * txtRecord, uint16_t txtLen);
 

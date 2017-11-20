@@ -30,11 +30,21 @@
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include "../../common/consts.h"
 #include "../../common/utils/utils.h"
+#include "../../common/utils/FormatableString.h"
 #include "../../common/msg/msg.h"
 #include "../../common/msg/endian.h"
 #ifdef ZEROCONF_SUPPORT
 #include "../../common/zeroconf/zeroconf-dashelhub.h"
 #include "../../common/productids.h"
+#endif // ZEROCONF_SUPPORT
+
+#ifdef ZEROCONF_SUPPORT
+// zeroconf requires gethostname
+#ifdef _WIN32
+#include <winsock2.h>
+#else // _WIN32
+#include <unistd.h>
+#endif // _WIN32
 #endif // ZEROCONF_SUPPORT
 
 namespace Aseba 
@@ -52,7 +62,7 @@ namespace Aseba
 		#endif // DASHEL_VERSION_INT
 #ifdef ZEROCONF_SUPPORT
 		zeroconf(*this),
-		zeroconfName(name),
+		zeroconfName(std::move(name)),
 #endif // ZEROCONF_SUPPORT
 		verbose(verbose),
 		dump(dump),
@@ -64,10 +74,13 @@ namespace Aseba
 		auto tcpin = connect(oss.str());
 #ifdef ZEROCONF_SUPPORT
 		// advertise target
-		Aseba::Zeroconf::TxtRecord txt{ASEBA_PROTOCOL_VERSION, { zeroconfName }, { 100 }, { ASEBA_PID_UNDEFINED }}; // no productId reserved for switch
 		try
 		{
-			zeroconf.advertise(zeroconfName, tcpin, txt);
+			char hostname[256];
+			if (gethostname(hostname, sizeof(hostname)) != 0)
+				strcpy(hostname, "unknown host");
+			Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, zeroconfName };
+			zeroconf.advertise(Aseba::FormatableString("%0 on %1").arg(zeroconfName).arg(hostname), tcpin, txt);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -88,7 +101,11 @@ namespace Aseba
 	void Switch::incomingData(Stream *stream)
 	{
 #ifdef ZEROCONF_SUPPORT
-		zeroconf.dashelIncomingData(stream);
+		if (zeroconf.isStreamHandled(stream))
+		{
+			zeroconf.dashelIncomingData(stream);
+			return;
+		}
 #endif // ZEROCONF_SUPPORT
 
 		Message* message(Message::receive(stream));
@@ -153,7 +170,11 @@ namespace Aseba
 	void Switch::connectionClosed(Stream *stream, bool abnormal)
 	{
 #ifdef ZEROCONF_SUPPORT
-		zeroconf.dashelConnectionClosed(stream);
+		if (zeroconf.isStreamHandled(stream))
+		{
+			zeroconf.dashelConnectionClosed(stream);
+			return;
+		}
 #endif // ZEROCONF_SUPPORT
 
 		if (verbose)
@@ -311,7 +332,11 @@ int main(int argc, char *argv[])
 			aswitch.step(10);
 			aswitch.broadcastDummyUserMessage();
 		}*/
-		aswitch.run();
+#ifdef ZEROCONF_SUPPORT
+		while(aswitch.zeroconf.dashelStep(-1));
+#else // ZEROCONF_SUPPORT
+		while(aswitch.step(-1));
+#endif // ZEROCONF_SUPPORT
 	}
 	catch(Dashel::DashelException e)
 	{
