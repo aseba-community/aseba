@@ -141,6 +141,7 @@ namespace Aseba
 		
 		// connect signals and slots
 		connect(discoveredList, SIGNAL(itemSelectionChanged()), SLOT(updateCurrentTarget()));
+		connect(discoveredList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(connectToItem(QListWidgetItem *)));
 		connect(currentTarget, SIGNAL(textEdited(const QString &)), discoveredList, SLOT(clearSelection()));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
@@ -318,6 +319,12 @@ namespace Aseba
 			const QModelIndex item(model->selectedRows().first());
 			currentTarget->setText(item.data(Qt::UserRole).toString());
 		}
+	}
+	
+	void DashelConnectionDialog::connectToItem(QListWidgetItem *item)
+	{
+		currentTarget->setText(item->data(Qt::UserRole).toString());
+		accept();
 	}
 	
 	void DashelConnectionDialog::targetTemplateSerial()

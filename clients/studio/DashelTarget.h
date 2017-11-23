@@ -86,6 +86,7 @@ namespace Aseba
 		void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation& target);
 #endif // ZEROCONF_SUPPORT
 		void updateCurrentTarget();
+		void connectToItem(QListWidgetItem *item);
 		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
 	
 	private slots:
