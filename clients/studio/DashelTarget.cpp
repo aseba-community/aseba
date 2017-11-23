@@ -89,14 +89,21 @@ namespace Aseba
 		
 		// selected target
 		mainLayout->addWidget(new QLabel(tr("Selected target")));
-		// for now, we show a default target for network connections
-		//currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
-		currentTarget = new QLineEdit("tcp:HOST;port=33333");
-		mainLayout->addWidget(currentTarget);
-		auto targetDocLink(new QLabel(tr("<a href=\"http://aseba-community.github.io/dashel#TargetNamingSec\">Learn more about Dashel targets...</a>")));
-		targetDocLink->setOpenExternalLinks(true);
-		targetDocLink->setAlignment(Qt::AlignRight);
-		mainLayout->addWidget(targetDocLink);
+		QHBoxLayout* targetLayout = new QHBoxLayout();
+		currentTarget = new QLineEdit(settings.value("current target", ASEBA_DEFAULT_TARGET).toString());
+		targetLayout->addWidget(currentTarget);
+		auto templateButton = new QPushButton(QIcon(":/images/info.png"), "");
+		templateButton->setMaximumSize(80, 50);
+		templateButton->setFocusPolicy(Qt::NoFocus);	// otherwise it's displayed in red once clicked
+		auto templateMenu = new QMenu("Target");
+		templateMenu->addAction(tr("Serial port"), this, SLOT(targetTemplateSerial()));
+		templateMenu->addAction(tr("Local TCP"), this, SLOT(targetTemplateLocalTCP()));
+		templateMenu->addAction(tr("TCP"), this, SLOT(targetTemplateTCP()));
+		templateMenu->addSeparator();
+		templateMenu->addAction(tr("Documentation"), this, SLOT(targetTemplateDoc()));
+		templateButton->setMenu(templateMenu);
+		targetLayout->addWidget(templateButton);
+		mainLayout->addLayout(targetLayout);
 		
 		// language dialogue
 		languageSelectionBox = new QComboBox;
@@ -311,6 +318,26 @@ namespace Aseba
 			const QModelIndex item(model->selectedRows().first());
 			currentTarget->setText(item.data(Qt::UserRole).toString());
 		}
+	}
+	
+	void DashelConnectionDialog::targetTemplateSerial()
+	{
+		currentTarget->setText("ser:device=/dev/ttyDev");
+	}
+	
+	void DashelConnectionDialog::targetTemplateLocalTCP()
+	{
+		currentTarget->setText("tcp:host=localhost;port=33333");
+	}
+	
+	void DashelConnectionDialog::targetTemplateTCP()
+	{
+		currentTarget->setText("tcp:host=192.168.1.200;port=33333");
+	}
+	
+	void DashelConnectionDialog::targetTemplateDoc()
+	{
+		QDesktopServices::openUrl(QUrl("http://aseba-community.github.io/dashel#TargetNamingSec"));
 	}
 	
 	

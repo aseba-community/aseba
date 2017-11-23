@@ -87,6 +87,12 @@ namespace Aseba
 #endif // ZEROCONF_SUPPORT
 		void updateCurrentTarget();
 		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
+	
+	private slots:
+		void targetTemplateSerial();
+		void targetTemplateLocalTCP();
+		void targetTemplateTCP();
+		void targetTemplateDoc();
 	};
 	
 	class Message;
