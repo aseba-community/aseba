@@ -721,7 +721,7 @@ namespace Aseba
                 json << ",\"name\":\"" << nodeName << "\"";
                 json << ",\"protocolVersion\":" << description.protocolVersion;
                 json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
-                json << ",\"connected\":" << description.connected << "\"";
+                json << ",\"connected\":" << description.connected;
                 json << "}";
                 successful_output++;
             }
@@ -736,7 +736,7 @@ namespace Aseba
                 json << ",\"name\":\"" << nodeName << "\"";
                 json << ",\"protocolVersion\":" << description.protocolVersion;
                 json << ",\"aeslId\":" << (nodeToAeslIdSubstitutions.find(nodeId) != nodeToAeslIdSubstitutions.end() ? nodeToAeslIdSubstitutions[nodeId] : nodeId);
-                json << ",\"connected\":" << description.connected << "\"";
+                json << ",\"connected\":" << description.connected;
 
                 json << ",\"bytecodeSize\":" << description.bytecodeSize;
                 json << ",\"variablesSize\":" <<description.variablesSize;
