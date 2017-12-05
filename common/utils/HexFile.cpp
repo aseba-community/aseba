@@ -31,6 +31,11 @@
 
 namespace Aseba
 {
+	const char* HexFile::Error::what() const noexcept
+	{
+		return toString().c_str();
+	}
+	
 	std::string HexFile::EarlyEOF::toString() const
 	{
 		return FormatableString("Early end of file after %0 lines").arg(line);
@@ -252,7 +257,7 @@ namespace Aseba
 		throw EarlyEOF(lineCounter);
 	}
 	
-	void HexFile::writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16) const
+	void HexFile::writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16)
 	{
 		assert(addr16 <= 65535);
 		
@@ -279,7 +284,7 @@ namespace Aseba
 		stream << "\n";
 	}
 	
-	void HexFile::writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data) const
+	void HexFile::writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data)
 	{
 		assert(addr16 <= 65535);
 		assert(count8 <= 255);
