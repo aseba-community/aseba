@@ -1,0 +1,131 @@
+Aseba - an event-based framework for distributed robot control
+Copyright (C) 2007--2017 the authors, a detailed list can be fetched from the git history.
+The main authors are:
+
+*	[Stéphane Magnenat](http://stephane.magnenat.net) <stephane at magnenat dot net> while at [[1]](#Mobots) [^2] [^3] [^4]
+	project leader, original idea, architecture, core programmer all areas
+	contributed to: all
+
+*	Florian Vaussard <florian dot vaussard at epfl dot ch> [^1]
+	core programmer, Windows maintainer until 2015
+	contributed to: core, studio, packaging
+
+*	[David James Sherman](http://www.labri.fr/perso/david/Site/David_James_Sherman.html) <david dot sherman at inria dot fr>
+	core programmer, asebahttp, Zeroconf, Scratch integration
+	contributed to: core, simulator
+
+*	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [^2]
+	programmer, VPL
+	contributed to: vpl
+
+*	Thibault Laine <thibault dot laine at inria dot fr>
+	programmer, Playground
+	contributed to: simulator
+
+*	Philippe Rétornaz <philippe dot retornaz at epfl dot ch> [^1]
+	programmer, embedded integration
+	contributed to: core
+
+*	Fabian Hahn <fabian at hahn dot graphics> [^1]
+	programmer, Blockly integration
+	contributed to: blockly
+
+The following people have provided additional contributions:
+
+*	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [^1]
+	VPL re-design - funded by Gebert Rüf Stiftung
+	contributed to: vpl
+
+*	Fanny Riedo <fanny dot riedo at mobsya dot org> [^1] [^3]
+	macOS packaging, translation, quality insurance
+	contributed to: packaging, translation
+
+*	Michael Bonani <michael dot bonani at mobsya dot org> [^3]
+	French translation, packaging, quality insurance
+	contributed to: packaging, translation
+
+*	Dean Brettle <dean at brettle dot com>
+	RPM packaging
+	contributed to: packaging
+
+*	Martin Voelkle
+	bug reporting and fixing
+	contributed to: vpl
+
+*	Yves Piguet
+	bug reporting and fixing
+	contributed to: core, studio
+
+*	Corentin Jabot
+	bug fixing and coding contributions
+	contributed to: core
+
+*	Valentin Longchamp <valentin dot longchamp at epfl dot ch> [^1]
+	inputs on framework architecture, additional coding
+	contributed to: core
+
+*	Severin Klingler <severin dot klinger at ethz dot ch>
+	VPL logging
+	contributed to: vpl
+
+*	Stefan Witwicki
+	Examples
+	contributed to: example
+
+*	Basilio Noris <basilio dot noris at epfl dot ch>
+	inputs on challenge, graphics design on challenge
+	contributed to: simulator
+
+*	Sandra Moser [^2]
+	German translation
+	contributed to: translation
+
+*	Francisco Javier Botero Herrera <fboteroh at gmail dot com>
+	Spanish translation
+	contributed to: translation
+
+*	Ezio Somá <ezio dot soma at gmail dot com>
+	Italian translation
+	contributed to: translation
+
+*	Detlef Rick <detlef dot rick at gymnasium-hittfeld dot de>
+	German translation
+	contributed to: translation
+
+*	Shiling Wang <shilingwang0621 at gmail dot com>
+	Chinese translation
+	contributed to: translation
+
+*	Ioanna Theodoropoulou <ioannatheodoropou at hotmail dot com>
+	Greek translation
+	contributed to: translation
+
+*	Vassilis Komis <komis at upatras dot gr>
+	Greek translation
+	contributed to: translation
+
+#### Institutions
+
+##### Mobots
+
+[Mobots group](http://mobots.epfl.ch),
+[Laboratory of Robotics Systems](http://lsro.epfl.ch),
+[EPFL](http://www.epfl.ch), Lausanne
+
+[^2]: Autonomous Systems Lab (http://www.asl.ethz.ch)
+ETHZ, Zurich (http://www.ethz.ch)
+
+[^3]: Mobsya Association (http://www.mobsya.org)
+
+[^4]: Game Technology Center (http://www.gtc.inf.ethz.ch/)
+ETHZ, Zurich (http://www.ethz.ch)
+
+
+The user manual is fetched from the Wiki at http://aseba.wikidot.com,
+see there for the list of contributors. The license is
+Creative Commons Attribution-ShareAlike 3.0 License
+
+The icons used in studio are from http://www.everaldo.com/crystal/
+They can be found here: http://websvn.kde.org/branches/KDE/3.5/kdelibs/pics/crystalsvg/
+
+
