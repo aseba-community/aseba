@@ -130,8 +130,6 @@ sub tableborder
 	end
 
 sub motorbound
-	motor.left.target = prox.horizontal[5] / temp
-	motor.right.target = prox.horizontal[6] / temp
 	call math.min(motor.left.target, motor.left.target, vmax)
 	call math.max(motor.left.target, motor.left.target, vmin)
 	call math.min(motor.right.target, motor.right.target, vmax)
@@ -351,8 +349,11 @@ if run_behavior == START then
 			temp2 = prox.horizontal[0]*-4+prox.horizontal[1]*-3+prox.horizontal[3]*3+prox.horizontal[4]*4
 			motor.left.target = speed - (temp+temp2) / (2000/speed)
 			motor.right.target = speed - (temp-temp2) / (2000/speed)
+			callsub motorbound
 		elseif speed &lt; 0 then
 			temp = -300 / speed
+			motor.left.target = prox.horizontal[5] / temp
+			motor.right.target = prox.horizontal[6] / temp
 			callsub motorbound
 		end
 		callsub tableborder
@@ -372,6 +373,8 @@ if run_behavior == START then
 			motor.right.target = -(temp-temp2)
 		elseif prox.horizontal[5]>OBSTACLE or prox.horizontal[6]>OBSTACLE  then
 			temp = 4
+			motor.left.target = prox.horizontal[5] / temp
+			motor.right.target = prox.horizontal[6] / temp
 		callsub motorbound
 		else
 			motor.left.target = 0
