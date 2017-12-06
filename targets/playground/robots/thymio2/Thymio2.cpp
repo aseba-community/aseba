@@ -146,13 +146,13 @@ namespace Enki
 	void AsebaThymio2::controlStep(double dt)
 	{
 		// get physical variables
-		variables.proxHorizontal[0] = static_cast<int16_t>(infraredSensor0.getValue());
-		variables.proxHorizontal[1] = static_cast<int16_t>(infraredSensor1.getValue());
-		variables.proxHorizontal[2] = static_cast<int16_t>(infraredSensor2.getValue());
-		variables.proxHorizontal[3] = static_cast<int16_t>(infraredSensor3.getValue());
-		variables.proxHorizontal[4] = static_cast<int16_t>(infraredSensor4.getValue());
-		variables.proxHorizontal[5] = static_cast<int16_t>(infraredSensor5.getValue());
-		variables.proxHorizontal[6] = static_cast<int16_t>(infraredSensor6.getValue());
+		variables.proxHorizontal[0] = getSaturatedProxHorizontal(0);
+		variables.proxHorizontal[1] = getSaturatedProxHorizontal(1);
+		variables.proxHorizontal[2] = getSaturatedProxHorizontal(2);
+		variables.proxHorizontal[3] = getSaturatedProxHorizontal(3);
+		variables.proxHorizontal[4] = getSaturatedProxHorizontal(4);
+		variables.proxHorizontal[5] = getSaturatedProxHorizontal(5);
+		variables.proxHorizontal[6] = getSaturatedProxHorizontal(6);
 		variables.proxGroundReflected[0] = static_cast<int16_t>(groundSensor0.getValue());
 		variables.proxGroundReflected[1] = static_cast<int16_t>(groundSensor1.getValue());
 		variables.proxGroundDelta[0] = static_cast<int16_t>(groundSensor0.getValue());
@@ -319,6 +319,33 @@ namespace Enki
 			execLocalEvent(EVENT_ACC);
 		if (counter100Hz % 100 == 0)
 			execLocalEvent(EVENT_TEMPERATURE);
+	}
+	
+	//! Simulate the behaviour of the Thymio firmware, that is, returning 0 when objects are out of range
+	int16_t AsebaThymio2::getSaturatedProxHorizontal(unsigned i) const
+	{
+		const IRSensor* sensor(nullptr);
+		switch (i)
+		{
+			case 0: sensor = &infraredSensor0; break;
+			case 1: sensor = &infraredSensor1; break;
+			case 2: sensor = &infraredSensor2; break;
+			case 3: sensor = &infraredSensor3; break;
+			case 4: sensor = &infraredSensor4; break;
+			case 5: sensor = &infraredSensor5; break;
+			case 6: sensor = &infraredSensor6; break;
+			default: break;
+		}
+		assert(sensor);
+		
+		double dist(0);
+		for (unsigned j = 0; j < sensor->getRayCount(); ++j)
+			dist += sensor->getRayDist(j);
+		dist /= sensor->getRayCount();
+		cerr << "range dist " << sensor->getRange() << " " << dist << endl;
+		if (dist >= sensor->getRange() - 1e-4)
+			return 0;
+		return static_cast<int16_t>(sensor->getValue());
 	}
 	
 	//! Execute a local event, killing the execution of the current one if not in step-by-step mode

@@ -161,6 +161,7 @@ namespace Enki
 		void timer0Timeout();
 		void timer1Timeout();
 		void timer100HzTimeout();
+		int16_t getSaturatedProxHorizontal(unsigned i) const;
 	};
 	
 } // Enki
