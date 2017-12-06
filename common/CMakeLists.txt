@@ -23,6 +23,7 @@ set (ASEBACORE_HDR_UTILS
 set (ASEBACORE_HDR_MSG
 	msg/msg.h
 	msg/NodesManager.h
+	msg/TargetDescription.h
 )
 set (ASEBACORE_HDR_COMMON
 	consts.h

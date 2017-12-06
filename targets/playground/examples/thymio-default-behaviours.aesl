@@ -1,0 +1,469 @@
+<!DOCTYPE aesl-source>
+<network>
+
+
+<!--list of global events-->
+
+
+<!--list of constants-->
+<constant value="0" name="MENU"/>
+<constant value="1" name="FRIENDLY"/>
+<constant value="2" name="EXPLORER"/>
+<constant value="3" name="FEARFUL"/>
+<constant value="4" name="INVESTIGATOR"/>
+<constant value="5" name="OBEDIENT"/>
+<constant value="6" name="ATTENTIVE"/>
+<constant value="1" name="START"/>
+<constant value="0" name="STOP"/>
+<constant value="500" name="SOUND_DETECT_THRESHOLD"/>
+<constant value="1000" name="OBSTACLE"/>
+<constant value="300" name="SPEED_LINE"/>
+<constant value="0" name="STATE_BLACK"/>
+<constant value="1" name="STATE_WHITE"/>
+<constant value="-1" name="DIR_LEFT"/>
+<constant value="-2" name="DIR_L_LEFT"/>
+<constant value="1" name="DIR_RIGHT"/>
+<constant value="2" name="DIR_L_RIGHT"/>
+<constant value="10" name="DIR_LOST"/>
+<constant value="0" name="DIR_FRONT"/>
+
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+
+<!--node thymio-II-->
+<node nodeId="1" name="thymio-II">var state = FRIENDLY
+var run_behavior = STOP
+
+var l[8]
+var led_state = 0
+var led_delta = 1
+var led_pulse
+var temp
+var ledtemp
+var i
+
+var speed_diff
+var speed = 300
+var speed_l = 0
+var max
+var mi
+var t
+var sound_done = 0
+
+var argmin
+var argmax
+var does_see_friend = 0
+
+var r
+var g
+var b
+
+var temp2
+var vmin = -600
+var vmax = 600
+
+var fixed
+
+var acc_calc
+var counter
+var acc_abs
+var stepsound
+
+var black_level = 200
+var white_level = 400
+var status=0
+
+var s[2]
+var dir
+
+var rc5_speed_l
+var rc5_speed_t
+
+timer.period[0] = 20
+call leds.top(0,32,0)
+
+# subroutines
+sub ledpulse
+	# Pulse body color
+	led_pulse = led_pulse + 1
+	if led_pulse > 0 then
+		ledtemp=led_pulse
+		if led_pulse > 40 then
+			led_pulse = -128
+		end
+	else 
+		ledtemp = -led_pulse/4
+	end
+
+sub change_state
+	if state > 6 then
+		state = 1
+	elseif state &lt; 1 then
+		state = 6
+	end
+	if state == FRIENDLY then
+		call leds.top(0,32,0)
+	elseif state == EXPLORER then
+		call leds.top(15,15,0)
+	elseif state == FEARFUL then
+		call leds.top(32,0,0)
+	elseif state == INVESTIGATOR then
+		call leds.top(0,15,15)
+	elseif state == OBEDIENT then
+		call leds.top(15,0,15)
+	elseif state == ATTENTIVE then
+		call leds.top(0,0,32)
+	end
+
+sub tableborder
+# Detect table border, and stop if we are at the border
+	if prox.ground.reflected[0] &lt; 130 or prox.ground.reflected[1] &lt; 130 then 
+		motor.left.target = 0
+		motor.right.target = 0
+		call leds.bottom.left(32,0,0)
+		call leds.bottom.right(32,0,0)
+	elseif does_see_friend &lt;= 0 and sound_done == 0 then
+		call leds.bottom.left(0,0,0)
+		call leds.bottom.right(0,0,0)
+	end
+
+sub motorbound
+	motor.left.target = prox.horizontal[5] / temp
+	motor.right.target = prox.horizontal[6] / temp
+	call math.min(motor.left.target, motor.left.target, vmax)
+	call math.max(motor.left.target, motor.left.target, vmin)
+	call math.min(motor.right.target, motor.right.target, vmax)
+	call math.max(motor.right.target, motor.right.target, vmin)
+
+sub setmotor
+	call math.min(rc5_speed_t, rc5_speed_t, vmax)
+	call math.max(rc5_speed_t, rc5_speed_t, vmin)
+	call math.min(rc5_speed_l, rc5_speed_l, vmax)
+	call math.max(rc5_speed_l, rc5_speed_l, vmin)	
+	motor.left.target = rc5_speed_l + rc5_speed_t
+	motor.right.target = rc5_speed_l - rc5_speed_t
+
+onevent button.center
+if button.center == 1 then
+	if run_behavior == STOP then
+		run_behavior = START
+		if state == FRIENDLY then
+		# initialization
+			call leds.circle(0,0,0,32,32,32,0,0)
+			call prox.comm.enable(1)
+			speed = SPEED_LINE
+		elseif state == EXPLORER then
+			speed = 200
+		elseif state == INVESTIGATOR then
+			speed = SPEED_LINE
+		elseif state == ATTENTIVE then
+			# disabled for simulation
+		end
+	else 
+		motor.left.target = 0
+		motor.right.target = 0
+		call leds.circle(0,0,0,0,0,0,0,0)
+		call leds.bottom.left(0,0,0)
+		call leds.bottom.right(0,0,0)
+		callsub change_state
+		run_behavior = STOP
+		call prox.comm.enable(0)
+	end
+end
+
+
+onevent button.forward
+if button.forward == 1 then
+	if run_behavior == STOP then
+		state++
+		callsub change_state
+	else
+		if state == FRIENDLY or state == EXPLORER then
+			# Increase speed
+			speed += 50
+			if speed > 500 then
+				speed = 500
+			end
+		elseif state == OBEDIENT then
+			if rc5_speed_t !=0 then
+				rc5_speed_t = 0
+			else
+				rc5_speed_l = rc5_speed_l+200
+			end
+			callsub setmotor
+		elseif state == ATTENTIVE then
+			# disabled for simulation
+		end
+	end
+end
+
+onevent button.backward
+if button.backward == 1 then
+	if run_behavior == STOP then
+		state--
+		callsub change_state
+	else
+		if state == FRIENDLY or state == EXPLORER then
+			speed = speed - 50
+			if speed &lt; -300 then
+				speed = -300
+			end
+		elseif state == OBEDIENT then
+			if rc5_speed_t != 0 then
+				rc5_speed_t = 0
+			else
+				rc5_speed_l = rc5_speed_l - 200
+			end
+			callsub setmotor
+		elseif state == ATTENTIVE then
+			# disabled for simulation
+		end
+	end
+end
+
+onevent button.left
+if button.left == 1 then
+	if run_behavior == STOP then
+		state++
+		callsub change_state
+	else
+		if state == OBEDIENT then
+			rc5_speed_t = -200
+			callsub setmotor
+		elseif state == ATTENTIVE then
+			# disabled for simulation
+		end
+	end
+end
+
+onevent button.right
+if button.right == 1 then
+	if run_behavior == STOP then
+		state--
+		callsub change_state
+	else
+		if state == OBEDIENT then
+			rc5_speed_t = 200
+			callsub setmotor
+		elseif state == ATTENTIVE then
+			# disabled for simulation
+		end
+	end
+end
+
+onevent timer0
+if run_behavior == START then
+	if state != FEARFUL then
+		callsub ledpulse 
+	end
+	if state == FRIENDLY then
+		# Pulse body color
+		call leds.top(0, ledtemp, 0)
+	elseif state == EXPLORER then
+		# Led ring animation
+		call math.fill(l, 0)
+		led_state = led_state + 2
+		if  led_state > 255 then
+			led_state = 0
+		end
+		fixed = led_state /32
+		l[fixed] = 32
+		l[(fixed - 1) &amp; 0x7] = 32 - (led_state &amp; 0x1F)
+		l[(fixed + 1) &amp; 0x7] = led_state &amp; 0x1F
+		call leds.circle(l[0], l[1], l[2], l[3], l[4], l[5], l[6], l[7])
+		
+		# Body color pulse
+		call leds.top(ledtemp,ledtemp, 0)
+	elseif state == INVESTIGATOR then
+		call leds.top(0, ledtemp, ledtemp)
+	elseif state == OBEDIENT then
+		call leds.top(ledtemp, 0, ledtemp)
+	elseif state == ATTENTIVE then
+		call leds.top(0, 0, ledtemp)
+	end
+end	
+	
+onevent prox 
+if run_behavior == START then
+	if state == FRIENDLY then
+		# Follower
+		speed_l = 0   
+		call math.stat(prox.horizontal[0:4], event.args[0],max, event.args[0]) # find max value
+		call math.argbounds(prox.horizontal[0:4], event.args[0], mi) # find max index
+		t = 2 - mi
+		speed_diff = t * (speed / 2) # differential
+		# Adapt speed to go forward or backward
+		if max > 3500 then
+			speed_l = (3500 - max) / 2
+		end
+		if max > 4000 then
+			speed_l = -speed 
+		end
+		if max &lt; 3000 then
+			t = 300 - (max - 1000) / 7
+			speed_l = t
+		end
+		if max &lt; 2000 then
+			speed_l = speed 
+		end
+		if speed_l > speed then
+			speed_l = speed
+		end
+		if speed_l &lt; -speed then
+			speed_l = -speed
+		end
+		
+		if max &lt; SOUND_DETECT_THRESHOLD then
+			# Stop if nothing
+			if does_see_friend &lt;= 0 then
+				motor.left.target = 0
+				motor.right.target = 0
+			else
+			# Go forward if see friend in front
+				motor.left.target = speed
+				motor.right.target = speed
+			end
+		else 
+			# normal following behavior
+			motor.right.target = speed_diff + speed_l
+			motor.left.target = speed_l - speed_diff
+		end
+		# sound
+		when max > SOUND_DETECT_THRESHOLD do
+			call sound.system(6)
+		end
+		
+		if speed_diff == 0 and speed_l == 0 and sound_done == 0 and max > SOUND_DETECT_THRESHOLD then
+			sound_done = 1
+			call sound.system(7)
+		end
+		if speed_diff != 0 or max &lt; SOUND_DETECT_THRESHOLD then
+			sound_done = 0
+		end
+		callsub tableborder
+		
+	elseif state == EXPLORER then
+		# Breitenberg obtacle avoidance
+		if speed > 0 then
+			temp = (prox.horizontal[0]*1+prox.horizontal[1]*2+prox.horizontal[2]*3+prox.horizontal[3]*2+prox.horizontal[4]*1)
+			temp2 = prox.horizontal[0]*-4+prox.horizontal[1]*-3+prox.horizontal[3]*3+prox.horizontal[4]*4
+			motor.left.target = speed - (temp+temp2) / (2000/speed)
+			motor.right.target = speed - (temp-temp2) / (2000/speed)
+		elseif speed &lt; 0 then
+			temp = -300 / speed
+			callsub motorbound
+		end
+		callsub tableborder
+	elseif state == FEARFUL then
+		# Breitenberg obtacle avoidance
+		if prox.horizontal[1]>OBSTACLE and prox.horizontal[2]>OBSTACLE and prox.horizontal[3]>OBSTACLE and (prox.horizontal[5]>OBSTACLE or prox.horizontal[6]>OBSTACLE) and (prox.ground.reflected[0]>130 and prox.ground.reflected[1]>130) then
+			motor.left.target = 0
+			motor.right.target = 0
+			if  stepsound == 0 then
+				call sound.system(4)
+				stepsound = 1
+			end    
+		elseif prox.horizontal[0]>OBSTACLE or prox.horizontal[1]>OBSTACLE or prox.horizontal[2]>OBSTACLE or prox.horizontal[3]>OBSTACLE or prox.horizontal[4]>OBSTACLE then
+			temp = (prox.horizontal[0]/5+prox.horizontal[1]/4+prox.horizontal[2]/3+prox.horizontal[3]/4+prox.horizontal[4]/5)
+			temp2 = prox.horizontal[0]/6+prox.horizontal[1]/5+prox.horizontal[3]/-5+prox.horizontal[4]/-6
+			motor.left.target = -(temp+temp2)
+			motor.right.target = -(temp-temp2)
+		elseif prox.horizontal[5]>OBSTACLE or prox.horizontal[6]>OBSTACLE  then
+			temp = 4
+		callsub motorbound
+		else
+			motor.left.target = 0
+			motor.right.target = 0
+		end
+	callsub tableborder
+	
+	elseif state == INVESTIGATOR then
+		# Line Follower
+		if prox.ground.delta[0] &lt; black_level then
+			s[0] = STATE_BLACK
+		end
+		if prox.ground.delta[0] > white_level  then
+			s[0] = STATE_WHITE
+		end
+		
+		if prox.ground.delta[1] &lt; black_level then
+			s[1] = STATE_BLACK
+		end
+		if prox.ground.delta[1] > white_level then
+			s[1] = STATE_WHITE
+		end
+		
+		if s[0] == STATE_BLACK and s[1] == STATE_BLACK then
+			# Black line right under us
+			dir = DIR_FRONT
+		elseif s[0] == STATE_WHITE and s[1] == STATE_BLACK then
+			dir = DIR_RIGHT
+		elseif s[1] == STATE_WHITE and s[0] == STATE_BLACK then
+			dir = DIR_LEFT
+		else 
+			# Lost
+			if dir > 0 then
+				dir = DIR_L_RIGHT
+			elseif dir &lt; 0 then
+				dir = DIR_L_LEFT
+			else
+				dir = DIR_LOST
+			end
+		end
+		
+		if dir == DIR_FRONT then
+			motor.left.target = speed
+			motor.right.target = speed
+			call leds.circle(32,0,0,0,32,0,0,0)
+		elseif dir == DIR_RIGHT then
+			motor.left.target = speed
+			motor.right.target = 0
+			call leds.circle(0,32,0,32,0,0,0,0)
+		elseif dir == DIR_LEFT then
+			motor.left.target = 0
+			motor.right.target = speed
+			call leds.circle(0,0,0,0,0,32,0,32)
+		elseif dir == DIR_L_LEFT then
+			motor.left.target = -speed
+			motor.right.target = speed
+			call leds.circle(0,0,0,0,0,0,32,0)
+		elseif dir == DIR_L_RIGHT then
+			motor.left.target = speed
+			motor.right.target = -speed
+			call leds.circle(0,0,32,0,0,0,0,0)
+		elseif dir == DIR_LOST then
+			motor.left.target = speed
+			motor.right.target = -speed
+		end
+	elseif state == ATTENTIVE then
+		# no microphone in simulator
+	end
+end
+
+
+onevent acc
+if run_behavior == START and state == FEARFUL then
+	callsub ledpulse
+	callsub ledpulse
+	callsub ledpulse
+	call leds.top(ledtemp, 0, 0)
+end
+
+onevent tap
+if run_behavior == START and state == FEARFUL then
+	call sound.system(5)
+	call leds.top(32,0,0)
+end
+
+onevent sound.finished
+if run_behavior == START and state == FEARFUL then
+	stepsound = 0
+	if acc_calc &lt; 14 then 
+		call sound.system(4)
+	end
+end</node>
+
+
+</network>

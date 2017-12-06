@@ -30,13 +30,18 @@
 
 namespace Aseba
 {
+	/** \addtogroup utils */
+	/*@{*/
+	
+	//! A class to read and write .hex files
 	class HexFile
 	{
 	public:
-		struct Error
+		struct Error : std::exception
 		{
 			virtual ~Error () = default;
 			virtual std::string toString() const = 0;
+			virtual const char* what() const noexcept override;
 		};
 		
 		struct EarlyEOF : Error
@@ -96,12 +101,14 @@ namespace Aseba
 		void strip(unsigned pageSize);
 	
 	protected:
-		unsigned getUint4(std::istream &stream);
-		unsigned getUint8(std::istream &stream);
-		unsigned getUint16(std::istream &stream);
-		void writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16) const;
-		void writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data) const;
+		static unsigned getUint4(std::istream &stream);
+		static unsigned getUint8(std::istream &stream);
+		static unsigned getUint16(std::istream &stream);
+		static void writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16);
+		static void writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data);
 	};
+	
+	/*@}*/
 }
 
 #endif
