@@ -44,6 +44,7 @@
 
 namespace Aseba
 {
+	// Assume T is a sorted container
 	template <class T>
 	static bool haveCommonElements(const T& container1, const T& container2)
 	{
@@ -86,7 +87,7 @@ namespace Aseba
 		titleLayout->addStretch();
 		
 		// create widget for holding tabs
-		auto tabs = new QTabWidget();
+		auto tabs = new QTabWidget;
 		
 		// about tab
 		const QString aboutText =
@@ -168,7 +169,6 @@ namespace Aseba
 #endif // HAVE_ENKI
 			"</ul>"
 		;
-		//qDebug() << libraryText;
 		auto libraryTextLabel = new QLabel(libraryText);
 		libraryTextLabel->setOpenExternalLinks(true);
 		auto libraryEnclosingLayout = new QHBoxLayout;
