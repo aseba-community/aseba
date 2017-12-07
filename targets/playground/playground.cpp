@@ -131,6 +131,9 @@ int main(int argc, char *argv[])
 	app.setOrganizationName("Aseba"); // FIXME: we should be consistent here
 	app.setApplicationName("Playground");
 	
+	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	
 	/*
 	// Translation support
 	QTranslator qtTranslator;
