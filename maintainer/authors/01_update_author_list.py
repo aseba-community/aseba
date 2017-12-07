@@ -116,8 +116,6 @@ with open(authors_dest_file, 'wb') as f:
 					author["name"] = name.strip(' \t\n\r')
 				if '>' in rest:
 					email = rest.split('>')[0]
-					email = email.replace(' at ', '@')
-					email = email.replace(' dot ','.')
 					author["email"] = email.strip(' \t\n\r')
 		elif authorLine == 1:
 			author["role"] = line

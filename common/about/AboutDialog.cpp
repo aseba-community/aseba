@@ -40,6 +40,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <regex>
 
 namespace Aseba
 {
@@ -122,11 +123,13 @@ namespace Aseba
 			personListWidget->setSelectionMode(QAbstractItemView::NoSelection);
 			for (const auto& person: *personList.second)
 			{
+				auto email = std::regex_replace(person.email, std::regex(" at "), "@");
+				email = std::regex_replace(email, std::regex(" dot "), ".");
 				if (!haveCommonElements(person.tags, parameters.tags) && !person.tags.count("all"))
 					continue;
 				const QString text = "<b>" + QString::fromStdString(person.name) + "</b><br/>" +
 					QString::fromStdString(person.role) + "<br/>" +
-					(person.email.empty() ? "" : " <a href=\"mailto:" + QString::fromStdString(person.email) + "\">email</a>") +
+					(email.empty() ? "" : " <a href=\"mailto:" + QString::fromStdString(email) + "\">email</a>") +
 					(person.web.empty() ? "" : " <a href=\"" + QString::fromStdString(person.web) + "\">web</a>")
 				;
 				auto label = new QLabel(text);

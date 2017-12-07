@@ -28,49 +28,49 @@ namespace Aseba
 	static const AuthorInfos authorList = {
 		{
 			u8"Stéphane Magnenat",
-			u8"stephane@magnenat.net",
+			u8"stephane at magnenat dot net",
 			u8"http://stephane.magnenat.net",
 			u8"project leader, original idea, architecture, core programmer all areas",
 			{ u8"all", }
 		},
 		{
 			u8"Florian Vaussard",
-			u8"florian.vaussard@bluewin.ch",
+			u8"florian dot vaussard at bluewin dot ch",
 			u8"",
 			u8"core software engineer, Windows maintainer until 2015",
 			{ u8"core", u8"studio", u8"packaging", }
 		},
 		{
 			u8"David James Sherman",
-			u8"david.sherman@inria.fr",
+			u8"david dot sherman at inria dot fr",
 			u8"http://www.labri.fr/perso/david/Site/David_James_Sherman.html",
 			u8"core software engineer, asebahttp, Zeroconf, Scratch integration",
 			{ u8"core", u8"simulator", }
 		},
 		{
 			u8"Jiwon Shin",
-			u8"jiwon@shin.ch",
+			u8"jiwon at shin dot ch",
 			u8"",
 			u8"software engineer for VPL",
 			{ u8"vpl", }
 		},
 		{
 			u8"Thibault Laine",
-			u8"thibault.laine@inria.fr",
+			u8"thibault dot laine at inria dot fr",
 			u8"",
 			u8"software engineer for Playground",
 			{ u8"simulator", }
 		},
 		{
 			u8"Philippe Rétornaz",
-			u8"philippe.retornaz@a3.epfl.ch",
+			u8"philippe dot retornaz at a3 dot epfl dot ch",
 			u8"",
 			u8"software engineer for embedded integration",
 			{ u8"core", }
 		},
 		{
 			u8"Fabian Hahn",
-			u8"fabian@hahn.graphics",
+			u8"fabian at hahn dot graphics",
 			u8"",
 			u8"software engineer for Blockly integration",
 			{ u8"blockly", }
@@ -80,35 +80,35 @@ namespace Aseba
 	static const AuthorInfos thankToList = {
 		{
 			u8"Maria María Beltrán",
-			u8"mari_tran@yahoo.com",
+			u8"mari_tran at yahoo dot com",
 			u8"",
 			u8"VPL re-design - funded by Gebert Rüf Stiftung",
 			{ u8"vpl", }
 		},
 		{
 			u8"Fanny Riedo",
-			u8"fanny.riedo@mobsya.org",
+			u8"fanny dot riedo at mobsya dot org",
 			u8"",
 			u8"macOS packaging, translation, quality insurance",
 			{ u8"packaging", u8"translation", }
 		},
 		{
 			u8"Michael Bonani",
-			u8"michael.bonani@mobsya.org",
+			u8"michael dot bonani at mobsya dot org",
 			u8"",
 			u8"French translation, packaging, quality insurance",
 			{ u8"packaging", u8"translation", }
 		},
 		{
 			u8"Dean Brettle",
-			u8"dean@brettle.com",
+			u8"dean at brettle dot com",
 			u8"",
 			u8"RPM packaging",
 			{ u8"packaging", }
 		},
 		{
 			u8"Martin Voelkle",
-			u8"martin.voelkle@sampla.ch",
+			u8"martin dot voelkle at sampla dot ch",
 			u8"",
 			u8"bug reporting and fixing",
 			{ u8"vpl", }
@@ -122,21 +122,21 @@ namespace Aseba
 		},
 		{
 			u8"Corentin Jabot",
-			u8"",
+			u8"corentin dot jabot at gmail dot com",
 			u8"",
 			u8"bug fixing and coding contributions",
 			{ u8"core", }
 		},
 		{
 			u8"Valentin Longchamp",
-			u8"valentin.longchamp@gmail.com",
+			u8"valentin dot longchamp at gmail dot com",
 			u8"",
 			u8"inputs on framework architecture, additional coding",
 			{ u8"core", }
 		},
 		{
 			u8"Severin Klingler",
-			u8"severin.klinger@ethz.ch",
+			u8"severin dot klinger at ethz dot ch",
 			u8"",
 			u8"VPL logging",
 			{ u8"vpl", }
@@ -150,7 +150,7 @@ namespace Aseba
 		},
 		{
 			u8"Basilio Noris",
-			u8"basilio.noris@gmail.com",
+			u8"basilio dot noris at gmail dot com",
 			u8"",
 			u8"inputs on challenge, graphics design on challenge",
 			{ u8"simulator", }
@@ -164,42 +164,42 @@ namespace Aseba
 		},
 		{
 			u8"Francisco Javier Botero Herrera",
-			u8"fboteroh@gmail.com",
+			u8"fboteroh at gmail dot com",
 			u8"",
 			u8"Spanish translation",
 			{ u8"translation", }
 		},
 		{
 			u8"Ezio Somá",
-			u8"ezio.soma@gmail.com",
+			u8"ezio dot soma at gmail dot com",
 			u8"",
 			u8"Italian translation",
 			{ u8"translation", }
 		},
 		{
 			u8"Detlef Rick",
-			u8"detlef.rick@gymnasium-hittfeld.de",
+			u8"detlef dot rick at gymnasium-hittfeld dot de",
 			u8"",
 			u8"German translation",
 			{ u8"translation", }
 		},
 		{
 			u8"Shiling Wang",
-			u8"shilingwang0621@gmail.com",
+			u8"shilingwang0621 at gmail dot com",
 			u8"",
 			u8"Chinese translation",
 			{ u8"translation", }
 		},
 		{
 			u8"Ioanna Theodoropoulou",
-			u8"ioannatheodoropou@hotmail.com",
+			u8"ioannatheodoropou at hotmail dot com",
 			u8"",
 			u8"Greek translation",
 			{ u8"translation", }
 		},
 		{
 			u8"Vassilis Komis",
-			u8"komis@upatras.gr",
+			u8"komis at upatras dot gr",
 			u8"",
 			u8"Greek translation",
 			{ u8"translation", }

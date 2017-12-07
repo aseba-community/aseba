@@ -61,7 +61,7 @@ The following people have provided additional contributions:
 	bug reporting and fixing
 	contributed to: core, studio
 
-*	Corentin Jabot
+*	Corentin Jabot <corentin dot jabot at gmail dot com>
 	bug fixing and coding contributions
 	contributed to: core
 
