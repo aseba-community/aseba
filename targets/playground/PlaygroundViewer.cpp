@@ -79,7 +79,7 @@ namespace Enki
 		{
 			if (description == "missing Thymio2 feature")
 			{
-				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
+				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio."), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
 			}
 			else
 				qDebug() << "Unknown description for notifying DISPLAY_INFO" << QString::fromStdString(description);

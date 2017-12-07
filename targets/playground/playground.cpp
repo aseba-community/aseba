@@ -134,16 +134,14 @@ int main(int argc, char *argv[])
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
-	/*
 	// Translation support
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name());
 	app.installTranslator(&qtTranslator);
 	
 	QTranslator translator;
-	translator.load(QString(":/asebachallenge_") + QLocale::system().name());
+	translator.load(QString(":/asebaplayground_") + QLocale::system().name());
 	app.installTranslator(&translator);
-	*/
 	
 	// create document
 	QDomDocument domDocument("aseba-playground");
@@ -169,7 +167,7 @@ int main(int argc, char *argv[])
 		
 		if (sceneFileName.isEmpty())
 		{
-			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog" << std::endl;
+			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog." << std::endl;
 			exit(1);
 		}
 		

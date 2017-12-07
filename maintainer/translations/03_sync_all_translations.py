@@ -34,6 +34,9 @@ translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([
 # compiler
 translation_tools.do_lupdate_lrelease_all(studio_path, "compiler", compiler_ts_path)
 
+# playground
+translation_tools.do_lupdate_lrelease_all(playground_path, "asebaplayground", playground_path)
+
 # challenge
 translation_tools.do_lupdate_lrelease_all(challenge_path, "asebachallenge", challenge_cpp)
 

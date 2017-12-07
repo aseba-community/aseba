@@ -1,5 +1,12 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+	<file>asebaplayground_fr.qm</file>
+	<file>asebaplayground_de.qm</file>
+	<file>asebaplayground_es.qm</file>
+	<file>asebaplayground_it.qm</file>
+	<file>asebaplayground_ja.qm</file>
+	<file>asebaplayground_zh.qm</file>
+	<file>asebaplayground_el.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 	<file>images/icons/asebaplayground.svgz</file>
 </qresource>

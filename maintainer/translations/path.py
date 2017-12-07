@@ -23,6 +23,7 @@ import os.path
 
 STUDIO_PATH = "../../clients/studio/"
 COMPILER_PATH = '../../compiler'
+PLAYGROUND_PATH = "../../targets/playground/"
 CHALLENGE_PATH = "../../targets/challenge/"
 THYMIOUPGRADER_PATH = "../../clients/thymioupgrader/"
 THYMIOWNETCONFIG_PATH = "../../clients/thymiownetconfig/"
@@ -33,6 +34,7 @@ updatedoc_path = os.path.abspath(os.path.join(my_path, "../updatedoc/"))
 compiler_path = os.path.abspath(COMPILER_PATH)
 studio_path = os.path.abspath(STUDIO_PATH)
 compiler_ts_path = os.path.join(studio_path, "translations/")
+playground_path = os.path.abspath(PLAYGROUND_PATH)
 challenge_path = os.path.abspath(CHALLENGE_PATH)
 thymioupgrader_path = os.path.abspath(THYMIOUPGRADER_PATH)
 thymiownetconfig_path = os.path.abspath(THYMIOWNETCONFIG_PATH)
