@@ -26,6 +26,7 @@
 */
 /*@{*/
 
+
 /*! version of Aseba as string */
 #define ASEBA_VERSION "1.5.98"
 
@@ -49,6 +50,12 @@
 
 /*! default port for aseba */
 #define ASEBA_DEFAULT_PORT 33333
+
+/*! Name of the organization supporting Aseba and related software*/
+#define ASEBA_ORGANIZATION_NAME "Aseba community"
+
+/*! Domain of the organization supporting Aseba and related software*/
+#define ASEBA_ORGANIZATION_DOMAIN "aseba.io"
 
 
 /*! List of bytecodes identifiers */
