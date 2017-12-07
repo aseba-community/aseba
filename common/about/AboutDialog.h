@@ -24,6 +24,7 @@
 #include <QDialog>
 #include <QString>
 #include <QUrl>
+#include <set>
 
 namespace Aseba
 {
@@ -33,6 +34,7 @@ namespace Aseba
 	class AboutBox: public QDialog
 	{
 	public:
+		using Tags = std::set<std::string>;
 		struct Parameters
 		{
 			QString applicationName;
@@ -40,7 +42,7 @@ namespace Aseba
 			QString description;
 			QUrl helpUrl;
 			QString usage;
-			QStringList tags;
+			Tags tags;
 		};
 	public:
 		AboutBox(QWidget* parent, const Parameters& parameters);

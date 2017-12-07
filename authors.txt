@@ -1,38 +1,43 @@
 Aseba - an event-based framework for distributed robot control.
 Copyright (C) 2007--2017 the authors, a complete list can be fetched from the git history.
-The main authors are:
 
-*	[Stéphane Magnenat](http://stephane.magnenat.net) <stephane at magnenat dot net> [0] [1] [2] [3] [4]
+# Authors
+
+The following people have created significant portions of Aseba:
+
+*	[Stéphane Magnenat](http://stephane.magnenat.net) <stephane at magnenat dot net> [1] [2] [3] [4]
 	project leader, original idea, architecture, core programmer all areas
 	contributed to: all
 
-*	Florian Vaussard <florian dot vaussard at epfl dot ch> [1]
-	core programmer, Windows maintainer until 2015
+*	Florian Vaussard <florian dot vaussard at bluewin dot ch> [1]
+	core software engineer, Windows maintainer until 2015
 	contributed to: core, studio, packaging
 
 *	[David James Sherman](http://www.labri.fr/perso/david/Site/David_James_Sherman.html) <david dot sherman at inria dot fr>
-	core programmer, asebahttp, Zeroconf, Scratch integration
+	core software engineer, asebahttp, Zeroconf, Scratch integration
 	contributed to: core, simulator
 
-*	Jiwon Shin <jiwon dot shin at mavt dot ethz dot ch> [2]
-	programmer, VPL
+*	Jiwon Shin <jiwon at shin dot ch> [2]
+	software engineer for VPL
 	contributed to: vpl
 
 *	Thibault Laine <thibault dot laine at inria dot fr>
-	programmer, Playground
+	software engineer for Playground
 	contributed to: simulator
 
-*	Philippe Rétornaz <philippe dot retornaz at epfl dot ch> [1]
-	programmer, embedded integration
+*	Philippe Rétornaz <philippe dot retornaz at a3 dot epfl dot ch> [1]
+	software engineer for embedded integration
 	contributed to: core
 
 *	Fabian Hahn <fabian at hahn dot graphics> [1]
-	programmer, Blockly integration
+	software engineer for Blockly integration
 	contributed to: blockly
+
+# Contributors
 
 The following people have provided additional contributions:
 
-*	Maria María Beltrán <maria dot beltranreyes at epfl dot ch> [1]
+*	Maria María Beltrán <mari_tran at yahoo dot com> [1]
 	VPL re-design - funded by Gebert Rüf Stiftung
 	contributed to: vpl
 
@@ -48,7 +53,7 @@ The following people have provided additional contributions:
 	RPM packaging
 	contributed to: packaging
 
-*	Martin Voelkle
+*	Martin Voelkle <martin dot voelkle at sampla dot ch>
 	bug reporting and fixing
 	contributed to: vpl
 
@@ -60,7 +65,7 @@ The following people have provided additional contributions:
 	bug fixing and coding contributions
 	contributed to: core
 
-*	Valentin Longchamp <valentin dot longchamp at epfl dot ch> [1]
+*	Valentin Longchamp <valentin dot longchamp at gmail dot com> [1]
 	inputs on framework architecture, additional coding
 	contributed to: core
 
@@ -72,7 +77,7 @@ The following people have provided additional contributions:
 	Examples
 	contributed to: example
 
-*	Basilio Noris <basilio dot noris at epfl dot ch>
+*	Basilio Noris <basilio dot noris at gmail dot com>
 	inputs on challenge, graphics design on challenge
 	contributed to: simulator
 
@@ -104,23 +109,19 @@ The following people have provided additional contributions:
 	Greek translation
 	contributed to: translation
 
-#### Institutions
+# Institutions
 
-##### Mobots
+The following institutions have supported the development of Aseba:
 
-[0]: personal contribution
+[1]: Mobots group, EPFL (http://mobots.epfl.ch)
 
-[1]: Mobots group (http://mobots.epfl.ch)
-EPFL, Lausanne (http://www.epfl.ch)
-
-[2]: Autonomous Systems Lab (http://www.asl.ethz.ch)
-ETHZ, Zurich (http://www.ethz.ch)
+[2]: Autonomous Systems Lab, ETH Zurich (http://www.asl.ethz.ch)
 
 [3]: Mobsya Association (http://www.mobsya.org)
 
-[4]: Game Technology Center (http://www.gtc.inf.ethz.ch/)
-ETHZ, Zurich (http://www.ethz.ch)
+[4]: Game Technology Center, ETH Zurich (http://www.gtc.inf.ethz.ch/)
 
+# Other contributions
 
 The user manual is fetched from the Wiki at http://aseba.wikidot.com,
 see there for the list of contributors. The license is

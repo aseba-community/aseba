@@ -1648,7 +1648,7 @@ namespace Aseba
 			tr("Aseba Studio is an environment for interactively programming robots with a text language."),
 			tr("https://www.thymio.org/en:asebastudio"),
 			"",
-			{ "core", "studio", "vpl", "packaging" }
+			{ "core", "studio", "vpl", "packaging", "translation" }
 		};
 		AboutBox aboutBox(this, aboutParameters);
 		aboutBox.exec();

@@ -20,6 +20,7 @@
 
 #include "AboutDialog.h"
 #include "../consts.h"
+#include "../authors.h"
 #include "dashel/dashel.h"
 #include <version.h>
 #include <QVBoxLayout>
@@ -27,6 +28,7 @@
 #include <QLabel>
 #include <QIcon>
 #include <QPushButton>
+#include <QListWidget>
 #include <QTabWidget>
 #include <QSvgRenderer>
 #include <QPainter>
@@ -35,8 +37,32 @@
 #endif // HAVE_QWT
 #include <QtDebug>
 
+#include <vector>
+#include <string>
+#include <algorithm>
+
 namespace Aseba
 {
+	template <class T>
+	static bool haveCommonElements(const T& container1, const T& container2)
+	{
+		using I = typename T::const_iterator;
+		I first1(container1.begin());
+		I last1(container1.end());
+		I first2(container2.begin());
+		I last2(container2.end());
+		while (first1 != last1 && first2 != last2)
+		{
+			if (*first1 < *first2)
+				++first1;
+			else if (*first2 < *first1)
+				++first2;
+			else
+				return true;
+		}
+		return false;
+	}
+
 	AboutBox::AboutBox(QWidget* parent, const Parameters& parameters):
 		QDialog(parent)
 	{
@@ -89,10 +115,34 @@ namespace Aseba
 			tabs->addTab(usageEnclosingWidget, tr("Usage"));
 		}
 		
-		// author informations
-		// TODO: fill information
-		tabs->addTab(new QWidget, tr("Authors"));
-		tabs->addTab(new QWidget, tr("Thanks To"));
+		// author and thanksTo informations
+		for (const auto& personList : { std::make_pair(tr("Authors"), &authorList), std::make_pair(tr("Thanks To"), &thankToList) })
+		{
+			auto personListWidget = new QListWidget;
+			personListWidget->setSelectionMode(QAbstractItemView::NoSelection);
+			for (const auto& person: *personList.second)
+			{
+				if (!haveCommonElements(person.tags, parameters.tags) && !person.tags.count("all"))
+					continue;
+				const QString text = "<b>" + QString::fromStdString(person.name) + "</b><br/>" +
+					QString::fromStdString(person.role) + "<br/>" +
+					(person.email.empty() ? "" : " <a href=\"mailto:" + QString::fromStdString(person.email) + "\">email</a>") +
+					(person.web.empty() ? "" : " <a href=\"" + QString::fromStdString(person.web) + "\">web</a>")
+				;
+				auto label = new QLabel(text);
+				label->setOpenExternalLinks(true);
+				label->setStyleSheet("QLabel { margin: 3px }");
+				auto item = new QListWidgetItem;
+				item->setSizeHint(QSize(200, personListWidget->fontInfo().pixelSize() * 4));
+				personListWidget->addItem(item);
+				personListWidget->setItemWidget(item, label);
+			}
+			auto personListEnclosingLayout = new QHBoxLayout;
+			personListEnclosingLayout->addWidget(personListWidget);
+			auto personListEnclosingWidget = new QWidget;
+			personListEnclosingWidget->setLayout(personListEnclosingLayout);
+			tabs->addTab(personListEnclosingWidget, personList.first);
+		}
 		
 		// libraries tab
 		const QString welcomeText = tr("The following software are used in Aseba:");
