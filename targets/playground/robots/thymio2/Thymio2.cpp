@@ -342,7 +342,6 @@ namespace Enki
 		for (unsigned j = 0; j < sensor->getRayCount(); ++j)
 			dist += sensor->getRayDist(j);
 		dist /= sensor->getRayCount();
-		cerr << "range dist " << sensor->getRange() << " " << dist << endl;
 		if (dist >= sensor->getRange() - 1e-4)
 			return 0;
 		return static_cast<int16_t>(sensor->getValue());

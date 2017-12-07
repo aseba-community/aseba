@@ -31,7 +31,6 @@
 #include "../../common/consts.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
-#include "../../common/authors.h"
 #include "../../common/about/AboutDialog.h"
 #include <QtGui>
 #include <QtXml>
