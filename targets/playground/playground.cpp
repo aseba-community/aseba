@@ -129,7 +129,8 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(asebaqtabout);
 	QApplication app(argc, argv);
-	app.setOrganizationName("Aseba"); // FIXME: we should be consistent here
+	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
+	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	app.setApplicationName("Playground");
 	
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
