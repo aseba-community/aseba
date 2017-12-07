@@ -137,7 +137,7 @@ namespace Aseba
 				label->setOpenExternalLinks(true);
 				label->setStyleSheet("QLabel { margin: 3px }");
 				auto item = new QListWidgetItem;
-				item->setSizeHint(QSize(200, personListWidget->fontInfo().pixelSize() * 4));
+				item->setSizeHint(QSize(200, personListWidget->fontMetrics().height() * 4));
 				personListWidget->addItem(item);
 				personListWidget->setItemWidget(item, label);
 			}

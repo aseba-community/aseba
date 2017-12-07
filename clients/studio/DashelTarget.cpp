@@ -280,7 +280,7 @@ namespace Aseba
 	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo, const QVariantList& additionalData)
 	{
 		auto* item = new QListWidgetItem();
-		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
+		item->setSizeHint(QSize(200, discoveredList->fontMetrics().height() * 3.8));
 		item->setData(Qt::UserRole, dashelTarget);
 		for (int i = 0; i < additionalData.size(); ++i)
 			item->setData(Qt::UserRole + 1 + i, additionalData[i]);
