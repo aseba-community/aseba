@@ -88,7 +88,7 @@ print "Generating files...\n"
 os.chdir(studio_path)
 
 # lupdate / lrelease asebastudio_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("asebastudio", code, " ".join([studio_path, plugin_path, vpl_path, blockly_path]))
+translation_tools.do_lupdate_lrelease("asebastudio", code, " ".join([studio_path, plugin_path, vpl_path]))
 
 # lupdate / lrelease compiler_x.{ts,qm}
 translation_tools.do_lupdate_lrelease("compiler", code, compiler_ts_path)
