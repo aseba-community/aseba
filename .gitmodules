@@ -1,4 +1,1 @@
-[submodule "blockly"]
-	path = clients/studio/plugins/ThymioBlockly/blockly
-	url = https://github.com/aseba-community/blockly.git
-	branch = aseba-1.6
+

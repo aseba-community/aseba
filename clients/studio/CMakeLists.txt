@@ -33,17 +33,12 @@ if (DNSSD_FOUND)
 	set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${ASEBA_ZEROCONFQT_LIBRARIES})
 endif()
 
-if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOUND AND Qt5Svg_FOUND AND Qt5WebKitWidgets_FOUND)
+if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOUND AND Qt5Svg_FOUND)
 
 	# add a console for debug messages under Windows
 	if (WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-Wl,-subsystem,console ${CMAKE_EXE_LINKER_FLAGS}")
 	endif ()
-
-	if(UNIX AND NOT APPLE)
-		set(ASEBA_ENABLE_BLOCKLY_PLUGIN TRUE)
-		add_definitions(-DASEBA_ENABLE_BLOCKLY_PLUGIN)
-	endif(UNIX AND NOT APPLE)
 
 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 		message(STATUS "Qwt found, enabling plotting in Studio")
@@ -142,7 +137,7 @@ if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOU
 		endif ()
 
 		add_dependencies(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler )
-		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::WebKitWidgets Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
 
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif ()
