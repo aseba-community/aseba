@@ -355,7 +355,9 @@ namespace Aseba { namespace ThymioVPL
 			"",
 			{ "core", "vpl", "packaging", "translation" }
 		};
-		AboutBox aboutBox(this, aboutParameters);
+		// we use nullptr here as parent might disappear under our eyes if the Thymio node gets disconnected
+		AboutBox aboutBox(nullptr, aboutParameters);
+		
 		aboutBox.exec();
 	}
 	
