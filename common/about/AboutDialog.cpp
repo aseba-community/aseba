@@ -72,6 +72,7 @@ namespace Aseba
 		auto titleLayout = new QHBoxLayout();
 		QSvgRenderer iconRenderer(parameters.iconFile);
 		QPixmap iconPixmap(64, 64);
+		iconPixmap.fill(Qt::transparent);
 		QPainter iconPainter(&iconPixmap);
 		iconRenderer.render(&iconPainter);
 		auto iconLabel = new QLabel();
