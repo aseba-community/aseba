@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de">
+<TS version="2.0" language="de">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -87,24 +87,24 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation type="vanished">Netzwerk (TCP)</translation>
+        <translation>Netzwerk (TCP)</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">Host</translation>
+        <translation>Host</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">Port</translation>
+        <translation>Port</translation>
     </message>
     <message>
         <source>Serial</source>
         <translatorcomment>Serielle Schnittstelle</translatorcomment>
-        <translation type="vanished">Seriell</translation>
+        <translation>Seriell</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="vanished">Benutzerdefiniert</translation>
+        <translation>Benutzerdefiniert</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -468,7 +468,7 @@ Occurrences</source>
     </message>
     <message>
         <source>Help filter not found</source>
-        <translation type="vanished">Hilfefilter nicht gefunden</translation>
+        <translation>Hilfefilter nicht gefunden</translation>
     </message>
 </context>
 <context>
@@ -535,13 +535,13 @@ Occurrences</source>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation type="unfinished">8-Bit-Bereich (0–255)</translation>
+        <translation>8-Bit-Bereich (0–255)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>percent range (0–100)</source>
         <oldsource>percent range (0â100)</oldsource>
-        <translation type="unfinished">Prozent-Bereich (0–100)</translation>
+        <translation>Prozent-Bereich (0–100)</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -562,7 +562,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation type="vanished">Über Aseba Studio</translation>
+        <translation>Über Aseba Studio</translation>
     </message>
     <message>
         <location line="+115"/>
@@ -906,7 +906,7 @@ Ereignis %0: </translation>
     </message>
     <message>
         <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;h1&gt;Über Aseba&lt;/h1&gt;Versionsinformationen&lt;ul&gt;&lt;li&gt;Aseba Ver. %0&lt;br/&gt;(Build Ver. %1/Protokoll Ver. %2)&lt;/li&gt;&lt;li&gt;Dashel Ver. %3&lt;br/&gt;(unterstützt Stream-Typen: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Lesen Sie mehr auf &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; und anderen Mitwirkenden (klicken Sie auf &quot;Details einblenden&quot; für die vollständige Liste)&lt;/p&gt;&lt;p&gt;Aseba ist Open-Source unter der &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL Version 3&lt;/a&gt; lizenziert.&lt;/p&gt;</translation>
+        <translation>&lt;h1&gt;Über Aseba&lt;/h1&gt;Versionsinformationen&lt;ul&gt;&lt;li&gt;Aseba Ver. %0&lt;br/&gt;(Build Ver. %1/Protokoll Ver. %2)&lt;/li&gt;&lt;li&gt;Dashel Ver. %3&lt;br/&gt;(unterstützt Stream-Typen: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Lesen Sie mehr auf &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; und anderen Mitwirkenden (klicken Sie auf &quot;Details einblenden&quot; für die vollständige Liste)&lt;/p&gt;&lt;p&gt;Aseba ist Open-Source unter der &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL Version 3&lt;/a&gt; lizenziert.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1265,7 +1265,7 @@ Ereignis %0: </translation>
     <message>
         <location line="+1"/>
         <source>https://www.thymio.org/en:asebastudio</source>
-        <translation type="unfinished"></translation>
+        <translation>https://www.thymio.org/de:asebastudio</translation>
     </message>
     <message>
         <location line="+1857"/>
@@ -1791,7 +1791,7 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Visuelle Programmiersprache für Thymio</translation>
     </message>
@@ -1850,7 +1850,6 @@ Ereignis %0: </translation>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location line="+38"/>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
@@ -1859,7 +1858,7 @@ Ereignis %0: </translation>
         <translation type="obsolete">Verlassen</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location line="-179"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
@@ -1892,7 +1891,17 @@ Ereignis %0: </translation>
         <translation type="obsolete">&lt;b&gt;Aktionen&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+89"/>
+        <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>https://www.thymio.org/en:thymiovpl</source>
+        <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Export program as image</source>
         <translation>Programm als Bilddatei exportieren</translation>
     </message>

@@ -53,6 +53,7 @@
 
 #include "../../TargetModels.h"
 #include "../../../../common/utils/utils.h"
+#include "../../../../common/about/AboutDialog.h"
 
 
 // for backtrace
@@ -343,10 +344,19 @@ namespace Aseba { namespace ThymioVPL
 		saveGeometryIfVisible();
 	}
 	
-	void ThymioVisualProgramming::openHelp() const
+	void ThymioVisualProgramming::openHelp()
 	{
 		USAGE_LOG(logOpenHelp());
-		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:thymiovpl")));
+		const AboutBox::Parameters aboutParameters = {
+			"Thymio VPL",
+			":/images/icons/thymiovpl.svgz",
+			tr("The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks."),
+			tr("https://www.thymio.org/en:thymiovpl"),
+			"",
+			{ "core", "vpl", "packaging", "translation" }
+		};
+		AboutBox aboutBox(this, aboutParameters);
+		aboutBox.exec();
 	}
 	
 	void ThymioVisualProgramming::saveSnapshot() const

@@ -1533,7 +1533,7 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Οπτική Γλώσσα Προγραμματισμού του Thymio</translation>
     </message>
@@ -1613,12 +1613,21 @@ event %0 : </source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location line="+38"/>
-        <source>http://aseba.wikidot.com/en:thymiovpl</source>
-        <translation>http://aseba.wikidot.com/en:thymiovpl</translation>
+        <location line="+41"/>
+        <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+1"/>
+        <source>https://www.thymio.org/en:thymiovpl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://aseba.wikidot.com/en:thymiovpl</source>
+        <translation type="vanished">http://aseba.wikidot.com/en:thymiovpl</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Export program as image</source>
         <translation>Εξαγωγή προγράμματος ως εικόνα</translation>
     </message>

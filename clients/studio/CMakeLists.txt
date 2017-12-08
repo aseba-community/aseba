@@ -170,7 +170,8 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 		rendervplblocks.cpp
 	)
 	add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
+	# Note: it is ugly to link so much libraries that are not used, but it allows to avoid splitting VPL into several libraries
+	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (QT4_FOUND AND QT_QTWEBKIT_FOUND)

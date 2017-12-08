@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr">
+<TS version="2.0" language="fr">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -87,58 +87,58 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation type="vanished">Réseau (TCP)</translation>
+        <translation>Réseau (TCP)</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">Hôte</translation>
+        <translation>Hôte</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">Port</translation>
+        <translation>Port</translation>
     </message>
     <message>
         <source>Serial</source>
-        <translation type="vanished">Port série</translation>
+        <translation>Port série</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="vanished">Personnalisé</translation>
+        <translation>Personnalisé</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
         <source>Discovered targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Cibles découvertes</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Selected target</source>
-        <translation type="unfinished"></translation>
+        <translation>Cible sélectionnée</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port série</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP local</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Documentation</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -158,27 +158,27 @@
     <message>
         <location line="+50"/>
         <source> – type %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – type %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>local on computer</source>
-        <translation type="unfinished"></translation>
+        <translation>local sur l&apos;ordinateur</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>distant on network</source>
-        <translation type="unfinished"></translation>
+        <translation>distant sur le réseau</translation>
     </message>
     <message>
         <location line="+63"/>
         <source> – device %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – périphérique %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>serial port or USB</source>
-        <translation type="unfinished"></translation>
+        <translation>port série ou USB</translation>
     </message>
 </context>
 <context>
@@ -467,7 +467,7 @@ les occ&amp;urences</translation>
     </message>
     <message>
         <source>Help filter not found</source>
-        <translation type="vanished">Filtre d&apos;aide non trouvé</translation>
+        <translation>Filtre d&apos;aide non trouvé</translation>
     </message>
 </context>
 <context>
@@ -538,13 +538,13 @@ les occ&amp;urences</translation>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation type="unfinished">domaine de 8 bits (0–255)</translation>
+        <translation>domaine de 8 bits (0–255)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>percent range (0–100)</source>
         <oldsource>percent range (0â100)</oldsource>
-        <translation type="unfinished">domaine en pourcent (0–100)</translation>
+        <translation>domaine en pourcent (0–100)</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -556,7 +556,7 @@ les occ&amp;urences</translation>
     <name>Aseba::MainWindow</name>
     <message>
         <source>About Aseba Studio</source>
-        <translation type="vanished">A propos d&apos;Aseba Studio</translation>
+        <translation>A propos d&apos;Aseba Studio</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="+1558"/>
@@ -735,12 +735,12 @@ event %0 : </source>
     <message>
         <location line="-1684"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio est un environnement pour programmer des robots interactivement avec un langage texte.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>https://www.thymio.org/en:asebastudio</source>
-        <translation type="unfinished"></translation>
+        <translation>https://www.thymio.org/fr:asebastudio</translation>
     </message>
     <message>
         <location line="+1683"/>
@@ -986,7 +986,7 @@ event %0 : </source>
     </message>
     <message>
         <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;h1&gt;À propos d&apos;Aseba&lt;/h1&gt;Informations de version&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1 / protocole ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(types de flux supportés: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Plus d&apos;information sur &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; et autres contributeurs (cliquez « Montrer les détails » pour la liste complète)&lt;/p&gt;&lt;p&gt;Aseba est un logiciel libre sous license &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</translation>
+        <translation>&lt;h1&gt;À propos d&apos;Aseba&lt;/h1&gt;Informations de version&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1 / protocole ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(types de flux supportés: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Plus d&apos;information sur &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; et autres contributeurs (cliquez « Montrer les détails » pour la liste complète)&lt;/p&gt;&lt;p&gt;Aseba est un logiciel libre sous license &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+24"/>
@@ -1836,7 +1836,7 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Langage de programmation visuelle pour Thymio</translation>
     </message>
@@ -1895,7 +1895,6 @@ event %0 : </source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location line="+38"/>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation>http://aseba.wikidot.com/fr:thymiovpl</translation>
     </message>
@@ -1904,7 +1903,7 @@ event %0 : </source>
         <translation type="obsolete">Quitter</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location line="-179"/>
         <source>Undo</source>
         <translation>Annuler</translation>
     </message>
@@ -1937,7 +1936,17 @@ event %0 : </source>
         <translation type="obsolete">&lt;b&gt;Actions&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+89"/>
+        <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
+        <translation>Le langage de programmation visuel (VPL) pour le robot Thymio permet de programmer en associant des blocs d&apos;événements et d&apos;actions.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>https://www.thymio.org/en:thymiovpl</source>
+        <translation>http://aseba.wikidot.com/fr:thymiovpl</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Export program as image</source>
         <translation>Exporter en tant qu&apos;image</translation>
     </message>

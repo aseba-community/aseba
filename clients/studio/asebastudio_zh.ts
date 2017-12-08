@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh">
+<TS version="2.0" language="zh">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -82,23 +82,23 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation type="vanished">网络(TCP)</translation>
+        <translation>网络(TCP)</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">主机</translation>
+        <translation>主机</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">端口</translation>
+        <translation>端口</translation>
     </message>
     <message>
         <source>Serial</source>
-        <translation type="vanished">串行端口</translation>
+        <translation>串行端口</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="vanished">用户</translation>
+        <translation>用户</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -421,7 +421,7 @@ Occurrences</source>
     </message>
     <message>
         <source>Help filter not found</source>
-        <translation type="vanished">找不到相关的帮助文件</translation>
+        <translation>找不到相关的帮助文件</translation>
     </message>
 </context>
 <context>
@@ -488,13 +488,13 @@ Occurrences</source>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation type="unfinished">8位范围(0至255)</translation>
+        <translation>8位范围(0至255)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>percent range (0–100)</source>
         <oldsource>percent range (0â100)</oldsource>
-        <translation type="unfinished">百分比范围(0至100)</translation>
+        <translation>百分比范围(0至100)</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -511,7 +511,7 @@ Occurrences</source>
     </message>
     <message>
         <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;h1&gt;关于Aseba&lt;/h1&gt;版本信息&lt;ul&gt;&lt;li&gt;Aseba版本: %0&lt;br/&gt;(build版本. %1/协议版本. %2)&lt;/li&gt;&lt;li&gt;Dashel版本. %3&lt;br/&gt;(支持的数据流类型: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;更多资料 &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; 以及其他参与者 (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseb为开源项目,许可证 &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL版本 3&lt;/a&gt;.&lt;/p&gt;</translation>
+        <translation>&lt;h1&gt;关于Aseba&lt;/h1&gt;版本信息&lt;ul&gt;&lt;li&gt;Aseba版本: %0&lt;br/&gt;(build版本. %1/协议版本. %2)&lt;/li&gt;&lt;li&gt;Dashel版本. %3&lt;br/&gt;(支持的数据流类型: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;更多资料 &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; 以及其他参与者 (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseb为开源项目,许可证 &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL版本 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+1726"/>
@@ -520,7 +520,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation type="vanished">关于Aseba Studio</translation>
+        <translation>关于Aseba Studio</translation>
     </message>
     <message>
         <location line="-1684"/>
@@ -1451,7 +1451,7 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Thymio可视化程序设计语言</translation>
     </message>
@@ -1531,12 +1531,21 @@ event %0 : </source>
         <translation>行动</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+41"/>
+        <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>https://www.thymio.org/en:thymiovpl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
         <translation>http://aseba.wikidot.com/en:thymiovpl</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Export program as image</source>
         <translation>将程序数出为图像</translation>
     </message>

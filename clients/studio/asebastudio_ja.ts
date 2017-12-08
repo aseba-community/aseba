@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja">
+<TS version="2.0" language="ja">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -83,19 +83,19 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation type="vanished">ネットワーク</translation>
+        <translation>ネットワーク</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">ホスト</translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">ポート</translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <source>Serial</source>
-        <translation type="vanished">シリアル</translation>
+        <translation>シリアル</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -519,7 +519,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation type="vanished">Aseba Studio について</translation>
+        <translation>Aseba Studio について</translation>
     </message>
     <message>
         <location line="-1611"/>
@@ -1464,7 +1464,7 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1519,12 +1519,7 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+38"/>
-        <source>http://aseba.wikidot.com/en:thymiovpl</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+620"/>
+        <location line="+667"/>
         <source>Please add an event</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1534,7 +1529,7 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-848"/>
+        <location line="-857"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1559,7 +1554,17 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+89"/>
+        <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>https://www.thymio.org/en:thymiovpl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Export program as image</source>
         <translation type="unfinished"></translation>
     </message>
