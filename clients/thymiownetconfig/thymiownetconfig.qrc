@@ -5,6 +5,9 @@
 	<file>thymiownetconfig_de.qm</file>
 	<file>thymiownetconfig_it.qm</file>
 	<file>thymiownetconfig_es.qm</file>
+	<file>thymiownetconfig_ja.qm</file>
+	<file>thymiownetconfig_zh.qm</file>
 	<file>thymiownetconfig_el.qm</file>
+	<!-- insert translation here (DO NOT REMOVE) -->
 </qresource>
 </RCC>
