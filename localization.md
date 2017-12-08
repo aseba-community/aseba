@@ -16,7 +16,7 @@ Here are the steps to help us:
 
 In that case, the translation files already exist.
 To modify the translation, first [fork the Aseba repository](https://github.com/aseba-community/aseba#fork-destination-box) ([understand github forking](https://help.github.com/articles/fork-a-repo/)).
-Then, modify the relevant files, these are:
+Then, modify the relevant files using Qt Linguist, these files are:
 * For about boxes: `common/about/qtabout_LL.ts`
 * For Studio: `clients/studio/asebastudio_LL.ts` and `clients/studio/compiler_LL.ts`
 * For Thymio Firmware Updater: `clients/thymioupgrader/thymioupgrader_LL.ts`
