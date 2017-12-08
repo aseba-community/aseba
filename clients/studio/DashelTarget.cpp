@@ -921,41 +921,36 @@ namespace Aseba
 			delete message;
 	}
 	
-	struct ReconnectionDialog: public QMessageBox
-	{
-		ReconnectionDialog(DashelInterface& dashelInterface):
-			dashelInterface(dashelInterface),
-			counter(0)
-		{
-			setWindowTitle(tr("Connection closed"));
-			setText(tr("Warning, connection closed: I am trying to reconnect."));
-			addButton(tr("Stop trying"), QMessageBox::RejectRole);
-			setEscapeButton(QMessageBox::Cancel);
-			if (dashelInterface.lastConnectedTargetName.find("ser:") != 0)
-				setIcon(QMessageBox::Warning);
-			
-			startTimer(200);
-		}
 	
-	protected:
-		virtual void timerEvent ( QTimerEvent * event )
-		{
-			if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
-			{
-				// serial port, show Thymio animation
-				const unsigned iconStep(counter%15);
-				if (iconStep < 8)
-					setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
-			}
-			const unsigned connectStep(counter%5);
-			if ((connectStep == 0) && dashelInterface.attemptToReconnect())
-				accept();
-			counter++;
-		}
+	ReconnectionDialog::ReconnectionDialog(DashelInterface& dashelInterface):
+		dashelInterface(dashelInterface),
+		counter(0)
+	{
+		setWindowTitle(tr("Connection closed"));
+		setText(tr("Warning, connection closed: I am trying to reconnect."));
+		addButton(tr("Stop trying"), QMessageBox::RejectRole);
+		setEscapeButton(QMessageBox::Cancel);
+		if (dashelInterface.lastConnectedTargetName.find("ser:") != 0)
+			setIcon(QMessageBox::Warning);
 		
-		DashelInterface& dashelInterface;
-		unsigned counter;
-	};
+		startTimer(200);
+	}
+	
+	void ReconnectionDialog::timerEvent ( QTimerEvent * event )
+	{
+		if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
+		{
+			// serial port, show Thymio animation
+			const unsigned iconStep(counter%15);
+			if (iconStep < 8)
+				setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
+		}
+		const unsigned connectStep(counter%5);
+		if ((connectStep == 0) && dashelInterface.attemptToReconnect())
+			accept();
+		counter++;
+	}
+	
 
 	void DashelTarget::disconnectionFromDashel()
 	{
