@@ -21,8 +21,9 @@
 import sys
 import os.path
 
+QTABOUT_PATH = "../../common/about/"
 STUDIO_PATH = "../../clients/studio/"
-COMPILER_PATH = '../../compiler'
+COMPILER_PATH = "../../compiler"
 PLAYGROUND_PATH = "../../targets/playground/"
 CHALLENGE_PATH = "../../targets/challenge/"
 THYMIOUPGRADER_PATH = "../../clients/thymioupgrader/"
@@ -31,6 +32,7 @@ THYMIOWNETCONFIG_PATH = "../../clients/thymiownetconfig/"
 # will be the working directory
 my_path = os.path.dirname(os.path.abspath(sys.argv[0])) # getcwd won't work in all cases
 updatedoc_path = os.path.abspath(os.path.join(my_path, "../updatedoc/"))
+qtabout_path = os.path.abspath(QTABOUT_PATH)
 compiler_path = os.path.abspath(COMPILER_PATH)
 studio_path = os.path.abspath(STUDIO_PATH)
 compiler_ts_path = os.path.join(studio_path, "translations/")

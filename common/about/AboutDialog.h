@@ -33,6 +33,8 @@ namespace Aseba
 	
 	class AboutBox: public QDialog
 	{
+		Q_OBJECT
+		
 	public:
 		using Tags = std::set<std::string>;
 		struct Parameters

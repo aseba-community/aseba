@@ -163,7 +163,7 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
 	
-	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
+	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 	
 	# Render blocks helper
 	set(rendervplblocks_SRCS

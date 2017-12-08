@@ -28,6 +28,9 @@ import translation_tools
 
 translation_tools.init_commands()
 
+# qtabout
+translation_tools.do_lupdate_lrelease_all(qtabout_path, "qtabout", qtabout_path)
+
 # asebastudio
 translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path]))
 

@@ -354,9 +354,11 @@ namespace Aseba
 	{
 		// first use local name
 		const QString& systemLocale(QLocale::system().name());
+		assert(translators.size() == 4);
 		translators[0]->load(QString("qt_") + systemLocale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 		translators[1]->load(QString(":/asebastudio_") + systemLocale);
 		translators[2]->load(QString(":/compiler_") + systemLocale);
+		translators[3]->load(QString(":/qtabout_") + systemLocale);
 		
 		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
@@ -402,11 +404,12 @@ namespace Aseba
 				stream = Hub::connect(testTarget);
 				lastConnectedTarget = testTarget;
 				lastConnectedTargetName = stream->getTargetName();
-				assert(translators.size() == 3);
+				assert(translators.size() == 4);
 				language = targetSelector.getLocaleName();
 				translators[0]->load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 				translators[1]->load(QString(":/asebastudio_") + language);
 				translators[2]->load(QString(":/compiler_") + language);
+				translators[3]->load(QString(":/qtabout_") + language);
 				break;
 			}
 			catch (DashelException e)

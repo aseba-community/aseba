@@ -127,6 +127,7 @@ struct RobotType
 
 int main(int argc, char *argv[])
 {
+	Q_INIT_RESOURCE(asebaqtabout);
 	QApplication app(argc, argv);
 	app.setOrganizationName("Aseba"); // FIXME: we should be consistent here
 	app.setApplicationName("Playground");
@@ -142,6 +143,10 @@ int main(int argc, char *argv[])
 	QTranslator translator;
 	translator.load(QString(":/asebaplayground_") + QLocale::system().name());
 	app.installTranslator(&translator);
+	
+	QTranslator aboutTranslator;
+	aboutTranslator.load(QString(":/qtabout_") + QLocale::system().name());
+	app.installTranslator(&aboutTranslator);
 	
 	// create document
 	QDomDocument domDocument("aseba-playground");

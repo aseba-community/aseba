@@ -52,6 +52,8 @@ void usage(const char *execName)
 
 int main(int argc, char *argv[])
 {
+	Q_INIT_RESOURCE(asebaqtabout);
+	
 	bool autoRefresh(false);
 	bool showDoc(false);
 	QApplication app(argc, argv);
@@ -121,9 +123,11 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		// this translator is useful only for normal GUI
+		// these translators are useful only for normal GUI
 		QTranslator compilerTranslator;
 		app.installTranslator(&compilerTranslator);
+		QTranslator aboutTranslator;
+		app.installTranslator(&aboutTranslator);
 	
 		// start normal aseba studio
 		try
@@ -132,6 +136,7 @@ int main(int argc, char *argv[])
 			translators.push_back(&qtTranslator);
 			translators.push_back(&translator);
 			translators.push_back(&compilerTranslator);
+			translators.push_back(&aboutTranslator);
 			Aseba::MainWindow window(translators, commandLineTarget, autoRefresh);
 			window.show();
 			return app.exec();

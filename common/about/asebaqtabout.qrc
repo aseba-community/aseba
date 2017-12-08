@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>qtabout_fr.qm</file>
+	<file>qtabout_de.qm</file>
+	<file>qtabout_es.qm</file>
+	<file>qtabout_it.qm</file>
+	<file>qtabout_ja.qm</file>
+	<file>qtabout_zh.qm</file>
+	<file>qtabout_el.qm</file>
+	<!-- insert translation here (DO NOT REMOVE) -->
+</qresource>
+</RCC>
