@@ -142,6 +142,31 @@ namespace Aseba
 				personListWidget->addItem(item);
 				personListWidget->setItemWidget(item, label);
 			}
+			if (personList.second == &thankToList)
+			{
+				using Institution = std::pair<QString, QString>;
+				using Institutions = std::vector<Institution>;
+				const Institutions institutions = {
+					{ "Mobots group, EPFL", "http://mobots.epfl.ch" },
+					{ "Autonomous Systems Lab, ETH Zurich", "http://www.asl.ethz.ch/" },
+					{ "Mobsya Association", "http://www.mobsya.org" },
+					{ "Game Technology Center, ETH Zurich", "http://www.gtc.inf.ethz.ch/" },
+					{ "Inria, France", "https://www.inria.fr/en/" }
+				};
+				for (const auto& institution: institutions)
+				{
+					const QString text(QString("<b>%1</b><br/><a href=\"%2\">web</a>").arg(institution.first).arg(institution.second));
+					auto label = new QLabel(text);
+					label->setOpenExternalLinks(true);
+					label->setStyleSheet("QLabel { margin: 3px }");
+					auto item = new QListWidgetItem;
+					item->setSizeHint(QSize(200, personListWidget->fontMetrics().height() * 3));
+					personListWidget->addItem(item);
+					personListWidget->setItemWidget(item, label);
+				}
+				// TODO: add institutions + thank you
+			}
+			
 			auto personListEnclosingLayout = new QHBoxLayout;
 			personListEnclosingLayout->addWidget(personListWidget);
 			auto personListEnclosingWidget = new QWidget;

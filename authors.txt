@@ -13,7 +13,7 @@ The following people have created significant portions of Aseba:
 	core software engineer, Windows maintainer until 2015
 	contributed to: core, studio, packaging
 
-*	[David James Sherman](http://www.labri.fr/perso/david/Site/David_James_Sherman.html) <david dot sherman at inria dot fr>
+*	[David James Sherman](http://www.labri.fr/perso/david/Site/David_James_Sherman.html) <david dot sherman at inria dot fr> [5]
 	core software engineer, asebahttp, Zeroconf, Scratch integration
 	contributed to: core, simulator
 
@@ -21,7 +21,7 @@ The following people have created significant portions of Aseba:
 	software engineer for VPL
 	contributed to: vpl
 
-*	Thibault Laine <thibault dot laine at inria dot fr>
+*	Thibault Laine <thibault dot laine at inria dot fr> [5]
 	software engineer for Playground
 	contributed to: simulator
 
@@ -53,11 +53,11 @@ The following people have provided additional contributions:
 	RPM packaging
 	contributed to: packaging
 
-*	Martin Voelkle <martin dot voelkle at sampla dot ch>
+*	Martin Voelkle <martin dot voelkle at sampla dot ch> [1]
 	bug reporting and fixing
 	contributed to: vpl
 
-*	Yves Piguet
+*	Yves Piguet [1]
 	bug reporting and fixing
 	contributed to: core, studio
 
@@ -111,7 +111,8 @@ The following people have provided additional contributions:
 
 # Institutions
 
-The following institutions have supported the development of Aseba:
+Many of the authors and contributors have spent their free time on Aseba.
+In addition, the following institutions have supported the development:
 
 [1]: Mobots group, EPFL (http://mobots.epfl.ch)
 
@@ -120,6 +121,8 @@ The following institutions have supported the development of Aseba:
 [3]: Mobsya Association (http://www.mobsya.org)
 
 [4]: Game Technology Center, ETH Zurich (http://www.gtc.inf.ethz.ch/)
+
+[5]: Inria, France (https://www.inria.fr/en/)
 
 # Other contributions
 
