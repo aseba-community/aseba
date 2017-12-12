@@ -51,7 +51,7 @@ def do_lupdate_lrelease(output_name, lang_code, input_files):
     filename = "{}_{}.ts".format(output_name, lang_code)
     filename_qm = "{}_{}.qm".format(output_name, lang_code)
     # _lupdate
-    retcode = _verbose_call("{} -no-recursive {} -target-language {} -ts {}".format(_lupdate, input_files, lang_code, filename))
+    retcode = _verbose_call("{} -no-recursive {} -target-language {} -locations relative -ts {}".format(_lupdate, input_files, lang_code, filename))
     if retcode != 0:
         print sys.stderr, "Ooops... Something wrong happened with lupdate {}".format(filename)
         exit(3)

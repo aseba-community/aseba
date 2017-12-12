@@ -18,33 +18,39 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASEBA_JAVASCRIPT_INTERFACE_H
-#define ASEBA_JAVASCRIPT_INTERFACE_H
+#ifndef ASEBA_ABOUT_DIALOG
+#define ASEBA_ABOUT_DIALOG
 
-#include <QObject>
+#include <QDialog>
+#include <QString>
+#include <QUrl>
+#include <set>
 
-namespace Aseba { namespace ThymioBlockly
+namespace Aseba
 {
-	/** \addtogroup studio */
+	/** \addtogroup common */
 	/*@{*/
-	class AsebaJavascriptInterface : public QObject
+	
+	class AboutBox: public QDialog
 	{
 		Q_OBJECT
-
-		public:
-			void requestReset() { emit reset(); }
-			void requestLoad(const QString& xml) { emit load(xml); }
-			void requestSave() { emit save(); }
-
-		signals:
-			void reset();
-			void load(const QString& xml);
-			void save();
-			void compiled(const QString& code);
-			void saved(const QString& xml);
+		
+	public:
+		using Tags = std::set<std::string>;
+		struct Parameters
+		{
+			QString applicationName;
+			QString iconFile;
+			QString description;
+			QUrl helpUrl;
+			QString usage;
+			Tags tags;
+		};
+	public:
+		AboutBox(QWidget* parent, const Parameters& parameters);
 	};
-
+	
 	/*@}*/
-} } // namespace ThymioBlockly / namespace Aseba
+} // namespace Aseba
 
-#endif
+#endif // ASEBA_ABOUT_DIALOG

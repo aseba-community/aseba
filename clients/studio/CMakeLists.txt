@@ -49,12 +49,9 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 	endif (WIN32)
 	
 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
-		message(STATUS "Qwt found")
 		include_directories (${QWT_INCLUDE_DIR})
 		set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${QWT_LIBRARIES})
 		add_definitions(-DHAVE_QWT)
-	else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
-		message(STATUS "Qwt not found")
 	endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 
 	# generates the documentation
@@ -142,7 +139,7 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 			add_dependencies(asebastudio versionheader)
 		endif (HAS_DYN_VERSION)
 
-		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 		
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif (QT_QTHELP_FOUND)
@@ -166,14 +163,15 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
 		add_dependencies(thymiovpl versionheader)
 	endif (HAS_DYN_VERSION)
 	
-	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
+	target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 	
 	# Render blocks helper
 	set(rendervplblocks_SRCS
 		rendervplblocks.cpp
 	)
 	add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
+	# Note: it is ugly to link so much libraries that are not used, but it allows to avoid splitting VPL into several libraries
+	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} ${QT_LIBRARIES})
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (QT4_FOUND AND QT_QTWEBKIT_FOUND)

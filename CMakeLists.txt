@@ -81,6 +81,11 @@ endif ()
 # Qwt
 find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/ /usr/local/include PATH_SUFFIXES qwt5-qt4 qwt-qt4 qwt)
 find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
+if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+	message(STATUS "Qwt found")
+else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+	message(STATUS "Qwt not found")
+endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 
 # Zeroconf
 find_package(DNSSD)

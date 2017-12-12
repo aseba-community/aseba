@@ -280,7 +280,7 @@ namespace Aseba
 	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo, const QVariantList& additionalData)
 	{
 		auto* item = new QListWidgetItem();
-		item->setSizeHint(QSize(200, discoveredList->fontInfo().pixelSize() * 4));
+		item->setSizeHint(QSize(200, discoveredList->fontMetrics().height() * 3.8));
 		item->setData(Qt::UserRole, dashelTarget);
 		for (int i = 0; i < additionalData.size(); ++i)
 			item->setData(Qt::UserRole + 1 + i, additionalData[i]);
@@ -354,9 +354,11 @@ namespace Aseba
 	{
 		// first use local name
 		const QString& systemLocale(QLocale::system().name());
+		assert(translators.size() == 4);
 		translators[0]->load(QString("qt_") + systemLocale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 		translators[1]->load(QString(":/asebastudio_") + systemLocale);
 		translators[2]->load(QString(":/compiler_") + systemLocale);
+		translators[3]->load(QString(":/qtabout_") + systemLocale);
 		
 		// try to connect to cammand line target, if any
 		DashelConnectionDialog targetSelector;
@@ -402,11 +404,12 @@ namespace Aseba
 				stream = Hub::connect(testTarget);
 				lastConnectedTarget = testTarget;
 				lastConnectedTargetName = stream->getTargetName();
-				assert(translators.size() == 3);
+				assert(translators.size() == 4);
 				language = targetSelector.getLocaleName();
 				translators[0]->load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 				translators[1]->load(QString(":/asebastudio_") + language);
 				translators[2]->load(QString(":/compiler_") + language);
+				translators[3]->load(QString(":/qtabout_") + language);
 				break;
 			}
 			catch (DashelException e)
@@ -918,41 +921,36 @@ namespace Aseba
 			delete message;
 	}
 	
-	struct ReconnectionDialog: public QMessageBox
-	{
-		ReconnectionDialog(DashelInterface& dashelInterface):
-			dashelInterface(dashelInterface),
-			counter(0)
-		{
-			setWindowTitle(tr("Connection closed"));
-			setText(tr("Warning, connection closed: I am trying to reconnect."));
-			addButton(tr("Stop trying"), QMessageBox::RejectRole);
-			setEscapeButton(QMessageBox::Cancel);
-			if (dashelInterface.lastConnectedTargetName.find("ser:") != 0)
-				setIcon(QMessageBox::Warning);
-			
-			startTimer(200);
-		}
 	
-	protected:
-		virtual void timerEvent ( QTimerEvent * event )
-		{
-			if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
-			{
-				// serial port, show Thymio animation
-				const unsigned iconStep(counter%15);
-				if (iconStep < 8)
-					setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
-			}
-			const unsigned connectStep(counter%5);
-			if ((connectStep == 0) && dashelInterface.attemptToReconnect())
-				accept();
-			counter++;
-		}
+	ReconnectionDialog::ReconnectionDialog(DashelInterface& dashelInterface):
+		dashelInterface(dashelInterface),
+		counter(0)
+	{
+		setWindowTitle(tr("Connection closed"));
+		setText(tr("Warning, connection closed: I am trying to reconnect."));
+		addButton(tr("Stop trying"), QMessageBox::RejectRole);
+		setEscapeButton(QMessageBox::Cancel);
+		if (dashelInterface.lastConnectedTargetName.find("ser:") != 0)
+			setIcon(QMessageBox::Warning);
 		
-		DashelInterface& dashelInterface;
-		unsigned counter;
-	};
+		startTimer(200);
+	}
+	
+	void ReconnectionDialog::timerEvent ( QTimerEvent * event )
+	{
+		if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
+		{
+			// serial port, show Thymio animation
+			const unsigned iconStep(counter%15);
+			if (iconStep < 8)
+				setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
+		}
+		const unsigned connectStep(counter%5);
+		if ((connectStep == 0) && dashelInterface.attemptToReconnect())
+			accept();
+		counter++;
+	}
+	
 
 	void DashelTarget::disconnectionFromDashel()
 	{

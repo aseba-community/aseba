@@ -67,10 +67,12 @@ namespace Enki
 		void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 	
 	protected:
-		virtual void renderObjectsTypesHook();
-		virtual void sceneCompletedHook();
-		virtual void mouseMoveEvent(QMouseEvent*);
-		virtual void timerEvent(QTimerEvent * event);
+		void renderObjectsTypesHook() override;
+		void sceneCompletedHook() override;
+		void mouseMoveEvent(QMouseEvent*) override;
+		void timerEvent(QTimerEvent * event) override;
+		
+		void helpActivated() override;
 	
 	protected:
 		friend class PlaygroundSimulatorEnvironment;

@@ -28,11 +28,17 @@ import translation_tools
 
 translation_tools.init_commands()
 
+# qtabout
+translation_tools.do_lupdate_lrelease_all(qtabout_path, "qtabout", qtabout_path)
+
 # asebastudio
-translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path, blockly_path]))
+translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path]))
 
 # compiler
 translation_tools.do_lupdate_lrelease_all(studio_path, "compiler", compiler_ts_path)
+
+# playground
+translation_tools.do_lupdate_lrelease_all(playground_path, "asebaplayground", playground_path)
 
 # challenge
 translation_tools.do_lupdate_lrelease_all(challenge_path, "asebachallenge", challenge_cpp)

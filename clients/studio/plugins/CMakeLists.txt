@@ -15,7 +15,6 @@ set(qt_plugins_SRCS
 	ThymioVPL/Style.cpp
 	ThymioVPL/Utils.cpp
 	ThymioVPL/LogSignalMapper.cpp
-	ThymioBlockly/ThymioBlockly.cpp
 )
 qt4_wrap_cpp(qt_plugins_MOCS
 	VariablesViewPlugin.h
@@ -30,8 +29,6 @@ qt4_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/Scene.h
 	ThymioVPL/UsageLogger.h
 	ThymioVPL/LogSignalMapper.h
-	ThymioBlockly/ThymioBlockly.h
-	ThymioBlockly/AsebaJavascriptInterface.h
 )
 
 if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)

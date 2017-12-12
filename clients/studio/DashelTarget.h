@@ -33,6 +33,7 @@
 #include <QMap>
 #include <QSet>
 #include <QVariant>
+#include <QMessageBox>
 #include <map>
 #include <dashel/dashel.h>
 #ifdef ZEROCONF_SUPPORT
@@ -140,6 +141,20 @@ namespace Aseba
 	public:
 		// from NodesManager, now as public as we want DashelTarget to call this method
 		virtual void sendMessage(const Message& message);
+	};
+	
+	class ReconnectionDialog: public QMessageBox
+	{
+		Q_OBJECT
+		
+	public:
+		ReconnectionDialog(DashelInterface& dashelInterface);
+	
+	protected:
+		virtual void timerEvent ( QTimerEvent * event );
+		
+		DashelInterface& dashelInterface;
+		unsigned counter;
 	};
 	
 	class DashelTarget: public Target

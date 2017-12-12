@@ -31,7 +31,7 @@
 #include "../../common/consts.h"
 #include "../../common/productids.h"
 #include "../../common/utils/utils.h"
-#include "../../common/authors.h"
+#include "../../common/about/AboutDialog.h"
 #include <QtGui>
 #include <QtXml>
 #include <sstream>
@@ -1641,36 +1641,15 @@ namespace Aseba
 	
 	void MainWindow::about()
 	{
-		QMessageBox aboutBox(this);
-		
-		QString text = tr("<h1>About Aseba</h1>" \
-						"Version information" \
-						"<ul><li>Aseba ver. %0"\
-						"<br/>(build ver. %1/protocol ver. %2)" \
-						"</li><li>Dashel ver. %3"\
-						"<br/>(supported stream types: %4)"\
-						"</li></ul>" \
-						"<p>Read more on <a href=\"%5\">aseba.wikidot.com</a></p>" \
-						"<p>(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and other contributors (click \"Show details\" for full list)</p>" \
-						"<p>Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.</p>");
-		
-		text = text.
-			arg(ASEBA_VERSION).
-			arg(ASEBA_BUILD_VERSION).
-			arg(ASEBA_PROTOCOL_VERSION).
-			arg(DASHEL_VERSION).
-			arg(QString::fromStdString(Dashel::streamTypeRegistry.list())).
-			arg(tr("http://aseba.wikidot.com/en:start"));
-		
-		QSvgRenderer iconRenderer(QString(":/images/icons/asebastudio.svgz"));
-		QPixmap iconPixmap(128,128);
-		QPainter iconPainter(&iconPixmap);
-		iconRenderer.render(&iconPainter);
-		aboutBox.setIconPixmap(iconPixmap);
-		aboutBox.setText(text);
-		aboutBox.setDetailedText(ASEBA_AUTHORS_FULL_LIST);
-		aboutBox.setWindowTitle(tr("About Aseba Studio"));
-		aboutBox.setStandardButtons(QMessageBox::Ok);
+		const AboutBox::Parameters aboutParameters = {
+			"Aseba Studio",
+			":/images/icons/asebastudio.svgz",
+			tr("Aseba Studio is an environment for interactively programming robots with a text language."),
+			tr("https://www.thymio.org/en:asebastudio"),
+			"",
+			{ "core", "studio", "vpl", "packaging", "translation" }
+		};
+		AboutBox aboutBox(this, aboutParameters);
 		aboutBox.exec();
 	}
 	

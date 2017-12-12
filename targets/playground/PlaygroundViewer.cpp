@@ -30,6 +30,7 @@
 #include "Parameters.h"
 #include "Robots.h"
 #include "../../common/utils/utils.h"
+#include "../../common/about/AboutDialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QMouseEvent>
@@ -78,7 +79,7 @@ namespace Enki
 		{
 			if (description == "missing Thymio2 feature")
 			{
-				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio"), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
+				addInfoMessage(tr("You are using a feature not available in the simulator, click here to buy a real Thymio."), 5.0, Qt::blue, QUrl(tr("https://www.thymio.org/en:thymiobuy")));
 			}
 			else
 				qDebug() << "Unknown description for notifying DISPLAY_INFO" << QString::fromStdString(description);
@@ -123,7 +124,7 @@ namespace Enki
 		{
 			if (description == "cannot create listening port")
 			{
-				QMessageBox::critical(0, tr("Aseba Playground"), tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
+				QMessageBox::critical(0, "Aseba Playground", tr("Cannot create listening port %0: %1").arg(QString::fromStdString(arguments.at(0))).arg(QString::fromStdString(arguments.at(1))));
 				abort();
 			}
 			else
@@ -283,5 +284,27 @@ namespace Enki
 			asebaObject->externalInputStep(double(timerPeriodMs)/1000.);
 		
 		ViewerWidget::timerEvent(event);
+	}
+	
+	//! Help button or F1 have been pressed, show dialog box
+	void PlaygroundViewer::helpActivated()
+	{
+		const AboutBox::Parameters aboutParameters = {
+			"Aseba Playground",
+			":/images/icons/asebaplayground.svgz",
+			tr("Aseba Playground is a simulator for robots that can be programmed through Aseba."),
+			tr("https://www.thymio.org/en:thymiosimulation"),
+			tr("You can move the camera and objects/robots the following way:") +
+			"<ul>" +
+			"<li>" + tr("Left click on an object: Select the object.") + "</li>" +
+			"<li>" + tr("Left click outside an object: De-select the object.") + "</li>" +
+			"<li>" + tr("Left drag: If an object is selected, move it, otherwise move the camera.") + "</li>" +
+			"<li>" + tr("Right drag: If an object is selected, rotate it, otherwise rotate the camera.") + "</li>" +
+			"<li>" + tr("Mouse wheel or left drag + shift: Zoom camera.") + "</li>" +
+			"</ul>",
+			{ "core", "simulator", "packaging", "translation" }
+		};
+		AboutBox aboutBox(this, aboutParameters);
+		aboutBox.exec();
 	}
 } // Enki

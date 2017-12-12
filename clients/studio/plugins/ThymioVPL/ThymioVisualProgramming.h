@@ -87,7 +87,7 @@ namespace Aseba { namespace ThymioVPL
 		bool closeFile();
 		
 	private slots:
-		void openHelp() const;
+		void openHelp();
 		void saveSnapshot() const;
 		void showVPLModal();
 		

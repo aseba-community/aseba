@@ -40,4 +40,5 @@ install(FILES ${ASEBACORE_HDR_COMMON}
 	DESTINATION include/aseba/common
 )
 
+add_subdirectory(about)
 add_subdirectory(zeroconf)

@@ -37,6 +37,8 @@ if (ENKI_FOUND)
 		endif (QT_QTDBUS_FOUND AND NOT WIN32)
 		include(${QT_USE_FILE})
 		
+		qt4_add_resources(resfiles asebaplayground.qrc)
+		
 		set(playground_SRCS
 			DashelAsebaGlue.cpp
 			PlaygroundViewer.cpp
@@ -49,9 +51,9 @@ if (ENKI_FOUND)
 			PlaygroundDBusAdaptors.h
 		)
 		
-		add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS})
+		add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${resfiles})
 		
-		target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm ${ASEBA_ZEROCONFQT_LIBRARIES} ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
+		target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm asebaqtabout ${ASEBA_ZEROCONFQT_LIBRARIES} ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${EXTRA_LIBS})
 		install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 	endif (QT4_FOUND)

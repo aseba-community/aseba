@@ -73,12 +73,13 @@ void usage(const char *execName)
 
 int main(int argc, char *argv[])
 {
+	Q_INIT_RESOURCE(asebaqtabout);
 	QApplication app(argc, argv);
 	Dashel::initPlugins();
 	
 	// Information used by QSettings with default constructor
-	QCoreApplication::setOrganizationName("EPFL-LSRO-Mobots");
-	QCoreApplication::setOrganizationDomain("mobots.epfl.ch");
+	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
+	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	QCoreApplication::setApplicationName("Thymio VPL");
 
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
@@ -136,6 +137,9 @@ int main(int argc, char *argv[])
 
 	QTranslator compilerTranslator;
 	app.installTranslator(&compilerTranslator);
+	
+	QTranslator aboutTranslator;
+	app.installTranslator(&aboutTranslator);
 #ifdef ANDROID
 	if (commandLineTarget.length() == 0) {
 		commandLineTarget = "android:";
@@ -148,6 +152,7 @@ int main(int argc, char *argv[])
 		translators.push_back(&qtTranslator);
 		translators.push_back(&translator);
 		translators.push_back(&compilerTranslator);
+		translators.push_back(&aboutTranslator);
 		
 		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget, debugLog, execFeedback);
 		vpl.show();
