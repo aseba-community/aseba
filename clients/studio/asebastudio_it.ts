@@ -6,7 +6,7 @@
     <message>
         <location filename="AeslEditor.cpp" line="+499"/>
         <source>Clear breakpoint</source>
-        <translation>Azzera breakpoint</translation>
+        <translation>Azzera i breakpoint</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -65,18 +65,18 @@
     <message>
         <location line="+0"/>
         <source>Constant %0 is already defined.</source>
-        <translation>La Costante %0 è già definita.</translation>
+        <translation>La costante %0 è già definita.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The name is a keyword</source>
         <oldsource>Name is a keyword</oldsource>
-        <translation>Il Nome scelto è una parola chiave</translation>
+        <translation>Il nome scelto è una parola chiave</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation>Il Nome &lt;tt&gt;%0&lt;/tt&gt; non può essere usato come costante, perchè è una parola chiave del linguaggio.</translation>
+        <translation>Il nome &lt;tt&gt;%0&lt;/tt&gt; non può essere usato come costante, perché si tratta di una parola chiave del linguaggio.</translation>
     </message>
     <message>
         <source>Name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
@@ -103,42 +103,42 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation>Custom</translation>
+        <translation>Personalizzato</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
         <source>Discovered targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Target identificati</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Selected target</source>
-        <translation type="unfinished"></translation>
+        <translation>Target selezionati</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Porta seriale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP Locale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Documentazione</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -158,27 +158,27 @@
     <message>
         <location line="+50"/>
         <source> – type %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – tipo %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>local on computer</source>
-        <translation type="unfinished"></translation>
+        <translation>locale sul computer</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>distant on network</source>
-        <translation type="unfinished"></translation>
+        <translation>distante sulla rete</translation>
     </message>
     <message>
         <location line="+63"/>
         <source> – device %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – apparecchio %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>serial port or USB</source>
-        <translation type="unfinished"></translation>
+        <translation>porta seriale o USB</translation>
     </message>
 </context>
 <context>
@@ -220,12 +220,12 @@
     <message>
         <location filename="ConfigDialog.cpp" line="-119"/>
         <source>Editor Setup</source>
-        <translation>Configurazione Editor</translation>
+        <translation>Configurazione dell&apos;Editor</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Autocompletion</source>
-        <translation>Autocompletamento</translation>
+        <translation>Auto-completamento</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -249,7 +249,7 @@
         <location line="+24"/>
         <location line="+93"/>
         <source>Recording...</source>
-        <translation>In registrazione...</translation>
+        <translation>Sto registrando...</translation>
     </message>
     <message>
         <location line="-90"/>
@@ -270,12 +270,12 @@
     <message>
         <location line="+12"/>
         <source>Save &amp;As...</source>
-        <translation>S&amp;Alva come...</translation>
+        <translation>S&amp;alva con nome...</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Paused...</source>
-        <translation>In Pausa...</translation>
+        <translation>In pausa...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -285,7 +285,7 @@
     <message>
         <location line="+27"/>
         <source>Save plot data to file</source>
-        <translation>Salva dati per grafico su file</translation>
+        <translation>Salva i dati per il grafico su file</translation>
     </message>
 </context>
 <context>
@@ -303,17 +303,17 @@
     <message>
         <location line="+7"/>
         <source>&amp;Case sensitive</source>
-        <translation>&amp;Sensibile al Maiuscolo  </translation>
+        <translation>&amp;Sensibile al Maiuscolo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Whole words</source>
-        <translation>Parola &amp;intera</translation>
+        <translation>&amp;Parola intera</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Re&amp;gular expressions</source>
-        <translation>&amp;Espressione Regolare</translation>
+        <translation>&amp;Espressioni Regolari</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -333,7 +333,7 @@
     <message>
         <location line="+9"/>
         <source>&amp;Replace</source>
-        <translation>S&amp;ostituisci</translation>
+        <translation>&amp;Sostituisci</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -344,24 +344,24 @@
         <location line="+6"/>
         <source>Replace and
 Find &amp;Next</source>
-        <translation>Sostituisci e trova il pr&amp;ossimo</translation>
+        <translation>Sostituisci e trova il &amp;prossimo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace and
 Find Previo&amp;us</source>
-        <translation>Sostit&amp;uisci e trova precedente</translation>
+        <translation>&amp;Sostituisci e trova precedente</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace &amp;All
 Occurrences</source>
-        <translation>Sostituisci tutte le occorren&amp;ze</translation>
+        <translation>Sostituisci tutte le &amp;occorrenze</translation>
     </message>
     <message>
         <location line="+103"/>
         <source>End of document reached!</source>
-        <translation>Fine documento raggiunta!</translation>
+        <translation>Fine del documento raggiunta!</translation>
     </message>
 </context>
 <context>
@@ -515,7 +515,7 @@ Occurrences</source>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation>gamma 8 bit (0-255)</translation>
+        <translation>gamma a 8 bit (0-255)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -769,7 +769,7 @@ event %0 : </source>
     <message>
         <location line="+20"/>
         <source>&lt;b&gt;Constants&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Constanti&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Costanti&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+46"/>
@@ -794,7 +794,7 @@ event %0 : </source>
     <message>
         <location line="+23"/>
         <source>Clear</source>
-        <translation>Azzera</translation>
+        <translation>Pulisci</translation>
     </message>
     <message>
         <location line="+137"/>
@@ -834,7 +834,7 @@ event %0 : </source>
     <message>
         <location line="+4"/>
         <source>Web site Aseba...</source>
-        <translation>Sito Web Aseba...</translation>
+        <translation>Sito web Aseba...</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -854,7 +854,7 @@ event %0 : </source>
     <message>
         <location line="+1"/>
         <source>About &amp;Qt...</source>
-        <translation>A prosito di &amp;Qt...</translation>
+        <translation>Informazioni su &amp;Qt...</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -879,7 +879,7 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>Challenge tutorial...</source>
-        <translation>Tutorial per Challenge...</translation>
+        <translation>Tutorial per il programma Challenge...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -889,7 +889,7 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>MarXbot user manual...</source>
-        <translation>Manuale utente di MarXbot...</translation>
+        <translation>Manuale utente del robot MarXbot...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -914,7 +914,7 @@ event %0 : </source>
     <message>
         <location line="+2"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Apertura...</translation>
+        <translation>&amp;Apri...</translation>
     </message>
     <message>
         <source>Ctrl+O</source>
@@ -939,7 +939,7 @@ event %0 : </source>
     <message>
         <location line="+2"/>
         <source>Save &amp;As...</source>
-        <translation>Salva &amp;come...</translation>
+        <translation>Salva &amp;con nome...</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -949,7 +949,7 @@ event %0 : </source>
     <message>
         <location line="+2"/>
         <source>&amp;Import memories content...</source>
-        <translation>&amp;Importazione contenuti delle memorie...</translation>
+        <translation>&amp;Importa contenuti delle memorie...</translation>
     </message>
     <message>
         <source>Ctrl+Q</source>
@@ -1034,7 +1034,7 @@ event %0 : </source>
     <message>
         <location line="+10"/>
         <source>Comment the selection</source>
-        <translation>Commentare la selezione</translation>
+        <translation>Commenta la selezione</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1045,7 +1045,7 @@ event %0 : </source>
     <message>
         <location line="+3"/>
         <source>Uncomment the selection</source>
-        <translation>Scommentare la selezione</translation>
+        <translation>Decommenta la selezione</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1061,12 +1061,12 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>Copy &amp;all</source>
-        <translation>Copi&amp;a tutto</translation>
+        <translation>Copia &amp;tutto</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Show &amp;keywords</source>
-        <translation>Mostra parole c&amp;hiave</translation>
+        <translation>Mostra parole &amp;chiave</translation>
     </message>
     <message>
         <source>Show memory usage</source>
@@ -1089,7 +1089,7 @@ event %0 : </source>
     <message>
         <location line="-1866"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio è un ambiente per la programmazione interattiva di robot utilizzando un linguaggio di testo.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1257,7 +1257,7 @@ event %0 : </source>
     <message>
         <location line="+1"/>
         <source>The document &quot;%0&quot; has been modified.</source>
-        <translation>Il documento &quot;%0&quot; è stato modificato.</translation>
+        <translation>Il documento &quot;%0&quot;é stato modificato.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1450,7 +1450,7 @@ event %0 : </source>
     <message>
         <location line="+1"/>
         <source>Stop trying</source>
-        <translation>Rinunciare alla riconnessione </translation>
+        <translation>Rinunciare alla riconnessione</translation>
     </message>
 </context>
 <context>
@@ -1458,7 +1458,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/StopThymioPlugin.cpp" line="+34"/>
         <source>Stop Thymio</source>
-        <translation>Fermare Thymio</translation>
+        <translation>Ferma Thymio</translation>
     </message>
 </context>
 <context>
@@ -1575,27 +1575,27 @@ event %0 : </source>
     <message>
         <location line="+2"/>
         <source>horizontal proximity sensors</source>
-        <translation>sensori orizzontali di distanza</translation>
+        <translation>sensori orizzontali di prossimità</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ground proximity sensors</source>
-        <translation>sensori di distanza dal terreno</translation>
+        <translation>sensori di prossimità del terreno</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>tap detection / tilt</source>
-        <translation>rilevamento tap /inclinazione</translation>
+        <translation>rilevamento urto /inclinazione</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>clap detection</source>
-        <translation>rilevamento clap</translation>
+        <translation>rilevamento rumore forte</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>timer elapsed</source>
-        <translation>tempo scaduto</translation>
+        <translation>tempo trascorso</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1710,12 +1710,12 @@ event %0 : </source>
     <message>
         <location line="+7"/>
         <source>Save as</source>
-        <translation>Salva come</translation>
+        <translation>Salva con nome</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Load &amp; Run</source>
-        <translation>Carica ed esegui</translation>
+        <translation>Carica &amp; Esegui</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1729,7 +1729,7 @@ event %0 : </source>
     <message>
         <location line="+10"/>
         <source>Advanced mode</source>
-        <translation>Modo avanzato</translation>
+        <translation>Modalità avanzata</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -1767,7 +1767,7 @@ event %0 : </source>
     <message>
         <location line="+57"/>
         <source>Screenshot</source>
-        <translation>Cattura di schermo</translation>
+        <translation>Cattura della schermata</translation>
     </message>
     <message>
         <source>&lt;b&gt;Events&lt;/b&gt;</source>
@@ -1781,7 +1781,7 @@ event %0 : </source>
     <message>
         <location line="+8"/>
         <source>show line</source>
-        <translation>mostrare linea</translation>
+        <translation>mostra la linea</translation>
     </message>
     <message>
         <source>&lt;b&gt;Actions&lt;/b&gt;</source>
@@ -1790,7 +1790,7 @@ event %0 : </source>
     <message>
         <location line="+89"/>
         <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il linguaggio di programmazione visiva (VPL) per il robot Thymio permette di programmare associando blocchi di eventi alle azioni.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1805,17 +1805,17 @@ event %0 : </source>
     <message>
         <location line="+66"/>
         <source>Launch VPL</source>
-        <translation>Lancio VPL</translation>
+        <translation>Lancia VPL</translation>
     </message>
     <message>
         <location line="+165"/>
         <source>Returning to simple mode</source>
-        <translation>Ritornare al modo semplice </translation>
+        <translation>Ritornare alla modalità di base </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation>State utilizzando il modo avanzato (gestione stati). Il ritorno al modo semplice annullerà qualsiasi filtro di stati o blocco di impostazione degli stati. &lt;p&gt; Siete sicuri di voler continuare?</translation>
+        <translation>Attualmente state usando degli stati. Tornando alla modalità di base si scarta qualsiasi icona evento di stato o icona di azione impostazione dello stato. &lt;p&gt;Si è sicuro di voler continuare?</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -1889,17 +1889,17 @@ event %0 : </source>
     <message>
         <location line="-221"/>
         <source>You need to connect a Thymio II to use this application.</source>
-        <translation>È necessario collegare un Thymio II per utilizzare questa applicazione.</translation>
+        <translation>È necessario collegare un Thymio per utilizzare questa applicazione.</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Save Script</source>
-        <translation>Salva script</translation>
+        <translation>Salva lo Script</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>Open Script</source>
-        <translation>Apri Script</translation>
+        <translation>Apri lo Script</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -1915,12 +1915,12 @@ event %0 : </source>
     <message>
         <location line="+53"/>
         <source>This application only supports a single robot at a time.</source>
-        <translation>Questa applicazione supporta un solo robot alla volta.</translation>
+        <translation>Quest&apos;applicazione supporta un solo robot alla volta.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation>Collegamento a Thymio perso ... assicurarsi che Thymio sia acceso e collegare il cavo USB o il dongle</translation>
+        <translation>Collegamento a Thymio perso... assicurarsi che Thymio sia acceso e collegare il cavo USB o il dongle</translation>
     </message>
     <message>
         <location line="+64"/>
