@@ -7,7 +7,7 @@
         <location filename="ThymioWNetConfig.cpp" line="+85"/>
         <source>Wireless Thymio Network Configurator</source>
         <oldsource>Thymio Wireless Network Configurator</oldsource>
-        <translation>Configuratore di rete per Wireless Thymio </translation>
+        <translation>Configuratore di rete per Wireless Thymio</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -27,38 +27,38 @@
     <message>
         <location line="+2"/>
         <source>Channel:</source>
-        <translation>Canale :</translation>
+        <translation>Canale:</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Network identifier:</source>
-        <translation>Identificatore di rete :</translation>
+        <translation>Identificatore di rete:</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Dongle node identifier:</source>
-        <translation>Identificativo del nodo del dongle:</translation>
+        <translation>Identificativo del nodo del Dongle:</translation>
     </message>
     <message>
         <location line="+7"/>
         <location line="+90"/>
         <source>Enable pairing</source>
-        <translation type="unfinished">Attivare l&apos;abbinamento</translation>
+        <translation>Abilita accoppiamento robot-dongle</translation>
     </message>
     <message>
         <location line="-89"/>
         <source>Flash into dongle</source>
-        <translation>Salvare nello dongle</translation>
+        <translation>Salvare nel Dongle</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Quit</source>
-        <translation>Chiudere</translation>
+        <translation>Esci</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Wireless dongle firmware version %0</source>
-        <translation>Versione del firmware del wireless dongle %0</translation>
+        <translation>Versione del firmware del Wireless Dongle %0</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -68,7 +68,7 @@
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Wireless Thymio dongle is connected!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Impossibile connettersi al dongle !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Assicurarsi che un dongle wireless Thymio è collegato !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossibile connettersi al dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Assicurarsi che un dongle wireless Thymio sia collegato!&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Thymio Wireless dongle is connected!&lt;/p&gt;</source>
@@ -77,7 +77,7 @@
     <message>
         <location line="+52"/>
         <source>Disable pairing</source>
-        <translation type="unfinished">Disattivare l&apos;abbinamento</translation>
+        <translation>Disattivare l&apos;accoppiamento robot-dongle</translation>
     </message>
 </context>
 <context>
@@ -111,22 +111,22 @@
     <message>
         <location line="+51"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find a Wireless Thymio dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a dongle into one of your USB ports and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Non riesci a trovare un dongle wireless Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un dongle in una delle porte USB e riprovare.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Non riesco a trovare un Dongle Wireless Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collega un Dongle in una delle porte USB libere e riprova.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Wireless Thymio dongle not found</source>
-        <translation type="unfinished">Nessun wireless Thymio dongle trovato</translation>
+        <translation>Nessun Dongle Wireless Thymio trovato</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Wireless Thymio dongles found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single dongle into your computer and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Più di un dongle wireless Thymio trovato !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un solo dongle nel computer e riprovare.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Più di un Dongle Wireless Thymio trovato !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collegare un solo Dongle nel computer e riprovare.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Multiple Wireless Thymio dongles found</source>
-        <translation>Molteplici dongle wireless Thymio trovati</translation>
+        <translation>Molteplici Dongle Wireless Thymio trovati</translation>
     </message>
 </context>
 </TS>
