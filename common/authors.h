@@ -68,13 +68,6 @@ namespace Aseba
 			u8"software engineer for embedded integration",
 			{ u8"core", }
 		},
-		{
-			u8"Fabian Hahn",
-			u8"fabian at hahn dot graphics",
-			u8"",
-			u8"software engineer for Blockly integration",
-			{ u8"blockly", }
-		},
 	};
 	
 	static const AuthorInfos thankToList = {
@@ -114,7 +107,7 @@ namespace Aseba
 			{ u8"vpl", }
 		},
 		{
-			u8"Yves Piguet",
+			u8"Yves Piguet ",
 			u8"",
 			u8"",
 			u8"bug reporting and fixing",
@@ -140,6 +133,13 @@ namespace Aseba
 			u8"",
 			u8"VPL logging",
 			{ u8"vpl", }
+		},
+		{
+			u8"Francesco Mondada",
+			u8"francesco dot mondada at epfl dot ch",
+			u8"",
+			u8"bug reporting and dissemination",
+			{ u8"studio", u8"vpl", }
 		},
 		{
 			u8"Stefan Witwicki",
