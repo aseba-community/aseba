@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="it_IT">
+<TS version="2.1" language="it_IT">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -76,7 +76,7 @@
     <message>
         <location line="+0"/>
         <source>The name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation>Il Nome &lt;tt&gt;%0&lt;/tt&gt; non può essere usato come costante, perchè è una parola chiave del linguaggio.</translation>
+        <translation>Il Nome &lt;tt&gt;%0&lt;/tt&gt; non può essere usato come costante, perché è una parola chiave del linguaggio.</translation>
     </message>
     <message>
         <source>Name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
@@ -103,42 +103,42 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation>Custom</translation>
+        <translation>Personalizzato</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
         <source>Discovered targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Destinazioni identificate</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Selected target</source>
-        <translation type="unfinished"></translation>
+        <translation>Destinazioni selezionate</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Porta Seriale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP Locale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Documentazione</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -158,27 +158,27 @@
     <message>
         <location line="+50"/>
         <source> – type %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – tipo %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>local on computer</source>
-        <translation type="unfinished"></translation>
+        <translation>locale sul computer</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>distant on network</source>
-        <translation type="unfinished"></translation>
+        <translation>distante sulla rete</translation>
     </message>
     <message>
         <location line="+63"/>
         <source> – device %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – apparecchio %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>serial port or USB</source>
-        <translation type="unfinished"></translation>
+        <translation>porta seriale o USB</translation>
     </message>
 </context>
 <context>
@@ -270,7 +270,7 @@
     <message>
         <location line="+12"/>
         <source>Save &amp;As...</source>
-        <translation>S&amp;Alva come...</translation>
+        <translation>S&amp;alva come...</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -303,12 +303,12 @@
     <message>
         <location line="+7"/>
         <source>&amp;Case sensitive</source>
-        <translation>&amp;Sensibile al Maiuscolo  </translation>
+        <translation>&amp;Sensibile al Maiuscolo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Whole words</source>
-        <translation>Parola &amp;intera</translation>
+        <translation>&amp;Parola intera</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -333,7 +333,7 @@
     <message>
         <location line="+9"/>
         <source>&amp;Replace</source>
-        <translation>S&amp;ostituisci</translation>
+        <translation>&amp;Sostituisci</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -344,24 +344,24 @@
         <location line="+6"/>
         <source>Replace and
 Find &amp;Next</source>
-        <translation>Sostituisci e trova il pr&amp;ossimo</translation>
+        <translation>Sostituisci e trova il &amp;prossimo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace and
 Find Previo&amp;us</source>
-        <translation>Sostit&amp;uisci e trova precedente</translation>
+        <translation>&amp;Sostituisci e trova precedente</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace &amp;All
 Occurrences</source>
-        <translation>Sostituisci tutte le occorren&amp;ze</translation>
+        <translation>Sostituisci tutte le &amp;occorrenze</translation>
     </message>
     <message>
         <location line="+103"/>
         <source>End of document reached!</source>
-        <translation>Fine documento raggiunta!</translation>
+        <translation>Fine  del  documento raggiunta!</translation>
     </message>
 </context>
 <context>
@@ -1045,7 +1045,7 @@ event %0 : </source>
     <message>
         <location line="+3"/>
         <source>Uncomment the selection</source>
-        <translation>Scommentare la selezione</translation>
+        <translation>Decommentare la selezione</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1061,12 +1061,12 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>Copy &amp;all</source>
-        <translation>Copi&amp;a tutto</translation>
+        <translation>Copia &amp;tutto</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Show &amp;keywords</source>
-        <translation>Mostra parole c&amp;hiave</translation>
+        <translation>Mostra parole &amp;chiave</translation>
     </message>
     <message>
         <source>Show memory usage</source>
@@ -1089,7 +1089,7 @@ event %0 : </source>
     <message>
         <location line="-1866"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio è un ambiente per la programmazione interattiva di robot utilizzando un linguaggio di testo.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1790,7 +1790,7 @@ event %0 : </source>
     <message>
         <location line="+89"/>
         <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il linguaggio di programmazione visiva (VPL) per il robot Thymio permette di programmare associando blocchi di eventi e azioni.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1805,17 +1805,17 @@ event %0 : </source>
     <message>
         <location line="+66"/>
         <source>Launch VPL</source>
-        <translation>Lancio VPL</translation>
+        <translation>Lancia VPL</translation>
     </message>
     <message>
         <location line="+165"/>
         <source>Returning to simple mode</source>
-        <translation>Ritornare al modo semplice </translation>
+        <translation>Ritornare alla modalità di base </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation>State utilizzando il modo avanzato (gestione stati). Il ritorno al modo semplice annullerà qualsiasi filtro di stati o blocco di impostazione degli stati. &lt;p&gt; Siete sicuri di voler continuare?</translation>
+        <translation>Attualmente state usando degli stati. Tornando alla modalità di base si scarta qualsiasi icona evento di stato o icona di azione impostazione dello stato. &lt;p&gt;Si è sicuro di voler continuare?</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -1889,17 +1889,17 @@ event %0 : </source>
     <message>
         <location line="-221"/>
         <source>You need to connect a Thymio II to use this application.</source>
-        <translation>È necessario collegare un Thymio II per utilizzare questa applicazione.</translation>
+        <translation>È necessario collegare un Thymio per utilizzare questa applicazione.</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Save Script</source>
-        <translation>Salva script</translation>
+        <translation>Salva lo Script</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>Open Script</source>
-        <translation>Apri Script</translation>
+        <translation>Apri lo Script</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -1915,12 +1915,12 @@ event %0 : </source>
     <message>
         <location line="+53"/>
         <source>This application only supports a single robot at a time.</source>
-        <translation>Questa applicazione supporta un solo robot alla volta.</translation>
+        <translation>Quest&apos;applicazione supporta un solo robot alla volta.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation>Collegamento a Thymio perso ... assicurarsi che Thymio sia acceso e collegare il cavo USB o il dongle</translation>
+        <translation>Collegamento a Thymio perso... assicurarsi che Thymio sia acceso e collegare il cavo USB o il dongle</translation>
     </message>
     <message>
         <location line="+64"/>
