@@ -109,6 +109,10 @@ The following people have provided additional contributions:
 	Greek translation
 	contributed to: translation
 
+*	Paolo Rossetti <paolo dot rossetti at mobsya dot org>
+	Italian translation
+	contributed to: translation
+
 # Institutions
 
 Many of the authors and contributors have spent their free time on Aseba.
