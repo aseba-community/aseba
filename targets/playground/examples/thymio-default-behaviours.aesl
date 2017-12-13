@@ -81,6 +81,9 @@ var dir
 var rc5_speed_l
 var rc5_speed_t
 
+var avoidanceKernel1[5] = [1, 2, 3, 2, 1]
+var avoidanceKernel2[5] = [-4, -3, 1, 3, 4]
+
 timer.period[0] = 20
 call leds.top(0,32,0)
 
@@ -341,15 +344,20 @@ if run_behavior == START then
 			sound_done = 0
 		end
 		callsub tableborder
-		
+
 	elseif state == EXPLORER then
 		# Breitenberg obtacle avoidance
 		if speed > 0 then
-			temp = (prox.horizontal[0]*1+prox.horizontal[1]*2+prox.horizontal[2]*3+prox.horizontal[3]*2+prox.horizontal[4]*1)
-			temp2 = prox.horizontal[0]*-4+prox.horizontal[1]*-3+prox.horizontal[3]*3+prox.horizontal[4]*4
-			motor.left.target = speed - (temp+temp2) / (2000/speed)
-			motor.right.target = speed - (temp-temp2) / (2000/speed)
+			call math.dot(temp,  avoidanceKernel1[0:4], prox.horizontal[0:4], 1)
+			call math.dot(temp2, avoidanceKernel2[0:4], prox.horizontal[0:4], 1)
 			callsub motorbound
+
+			call math.muldiv(temp, temp, 2000, speed)
+			call math.muldiv(temp2, temp2, 2000, speed)
+
+			motor.left.target  = (speed - temp) - temp2
+			motor.right.target =  speed - (temp-temp2)
+
 		elseif speed &lt; 0 then
 			temp = -300 / speed
 			motor.left.target = prox.horizontal[5] / temp
