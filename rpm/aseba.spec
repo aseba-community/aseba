@@ -16,6 +16,10 @@ Version:        %{source_major}.%{source_minor}.%{source_patch}
 # associated with the Catch submodule. Run 'git submodule' to find it.
 %global catchcommit 3b18d9e962835100d7e12ac80d22882e408e40dc
 
+# Update the following line with the git commit has of the revision of blockly
+# associated with the blockly submodule. Run 'git submodule' to find it.
+%global blocklycommit 38e4085359a7b9578d0d5d26e9e291413d97e335
+
 # Update the following line to set commit_is_tagged_as_source_release to 0 if
 # and only if the commit hash is not from a git tag for an existing source
 # release (i.e. it is a commit hash for a pre-release or post-release
@@ -50,6 +54,7 @@ License:        LGPLv3
 URL:            http://aseba.wikidot.com
 Source0:        https://github.com/aseba-community/aseba/archive/%{commit}.tar.gz
 Source1:        https://github.com/philsquared/Catch/archive/%{catchcommit}.tar.gz
+Source2:        https://github.com/aseba-community/blockly/archive/%{blocklycommit}.tar.gz
 Patch0:         aseba-rpm.patch
 
 BuildRequires: ImageMagick
@@ -116,6 +121,8 @@ developing applications that use %{name}.
 %setup -q -T -D -b 2 -n %{name}-%{commit}
 rm -rf tests/externals/Catch
 mv ../Catch-%{catchcommit} tests/externals/Catch
+rm -rf clients/studio/plugins/ThymioBlockly/blockly
+mv ../blockly-%{blocklycommit} clients/studio/plugins/ThymioBlockly/blockly
 %patch0 -p1
 
 %build
@@ -180,9 +187,6 @@ fi
 %{_libdir}/*.so
 
 %changelog
-* Tue Dec 06 2017 Corentin Jabot <corentinjabot@gmail.com> - 1.6.0
-- Remove Blockly plugin
-
 * Mon Jun 13 2016 Dean Brettle <dean@brettle.com> - 1.5.3-4
 - Use libQtWebKit-devel on SUSE
 
