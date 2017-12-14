@@ -32,8 +32,10 @@
 #include "plugins/VariablesViewPlugin.h"
 #include "plugins/StopThymioPlugin.h"
 #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
-#include "plugins/ThymioBlockly/ThymioBlockly.h"
 
+#ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
+    #include "plugins/ThymioBlockly/ThymioBlockly.h"
+#endif
 namespace Aseba
 {	
 	/** \addtogroup studio */
@@ -105,7 +107,9 @@ namespace Aseba
 		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND_EPUCK << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
 		reg("LinearCameraViewPlugin", linearCameraPids, &createInstance<LinearCameraViewPlugin>);
 		reg("ThymioVisualProgramming", ASEBA_PID_THYMIO2, &createInstance<ThymioVPL::ThymioVisualProgramming>);
+#ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
 		reg("ThymioBlockly", ASEBA_PID_THYMIO2, &createInstance<ThymioBlockly::ThymioBlockly>);
+#endif
 		reg("StopThymioPlugin", ASEBA_PID_THYMIO2, &createInstance<StopThymioPlugin>);
 	}
 	
