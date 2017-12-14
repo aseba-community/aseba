@@ -32,7 +32,7 @@ translation_tools.init_commands()
 translation_tools.do_lupdate_lrelease_all(qtabout_path, "qtabout", qtabout_path)
 
 # asebastudio
-translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path]))
+translation_tools.do_lupdate_lrelease_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path, blockly_path]))
 
 # compiler
 translation_tools.do_lupdate_lrelease_all(studio_path, "compiler", compiler_ts_path)

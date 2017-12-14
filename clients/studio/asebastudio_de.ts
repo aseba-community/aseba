@@ -1571,6 +1571,83 @@ Ereignis %0: </translation>
     </message>
 </context>
 <context>
+    <name>Aseba::ThymioBlockly::ThymioBlockly</name>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <source>Thymio Blockly Interface</source>
+        <translation>Blockly-Oberfläche für Thymio</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <source>New</source>
+        <translation>Neu</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <source>Open</source>
+        <translation>Öffnen</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <source>Save as</source>
+        <translation>Speichern unter</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <source>Load &amp; Run</source>
+        <translation>Laden und ausführen</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <source>Stop</source>
+        <translation>Stopp</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
+        <source>Help</source>
+        <translation>Hilfe</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <source>Screenshot</source>
+        <translation>Bildschirmfoto</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="223"/>
+        <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
+        <translation>http://aseba.wikidot.com/de:blocklyprogramming</translation>
+    </message>
+    <message>
+        <source>http://aseba.wikidot.com/en:thymiovpl</source>
+        <translation type="obsolete">http://aseba.wikidot.com/de:thymiovpl</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="238"/>
+        <source>Export program as image</source>
+        <translation>Programm als Bild exportieren</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="260"/>
+        <source>Launch Blockly</source>
+        <translation>Blockly starten</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="398"/>
+        <source>Warning</source>
+        <translation>Achtung</translation>
+    </message>
+    <message>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="399"/>
+        <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
+        <translation>Das Blockly-Dokument wurde bearbeitet. Möchten Sie diese Änderungen speichern?</translation>
+    </message>
+</context>
+<context>
     <name>Aseba::ThymioBootloaderDialog</name>
     <message>
         <source>Thymio Firmware Updater</source>

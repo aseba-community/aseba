@@ -104,9 +104,44 @@
 	<file>images/icons/vpl-advanced_on.svgz</file>
 	<file>images/icons/asebastudio.svgz</file>
 	<file>images/icons/thymiovpl.svgz</file>
+	<file>images/icons/thymioblockly.svgz</file>
 	<file>images/vpl/success.svgz</file>
 	<file>images/vpl/missing_block.svgz</file>
 	<file>images/vpl/error.svgz</file>
 	<file>images/vpl/blink.svg</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.de.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.fr.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.es.html</file>
+	<file>plugins/ThymioBlockly/blockly/tests/asebastudio.it.html</file>
+	<file>plugins/ThymioBlockly/blockly/blockly_compressed.js</file>
+	<file>plugins/ThymioBlockly/blockly/blocks_compressed.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/en.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/de.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/fr.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/es.js</file>
+	<file>plugins/ThymioBlockly/blockly/msg/js/it.js</file>
+	<file>plugins/ThymioBlockly/blockly/aesl_compressed.js</file>
+	<file>plugins/ThymioBlockly/blockly/overrides_compressed.js</file>
+	<file>plugins/ThymioBlockly/blockly/media/1x1.gif</file>
+	<file>plugins/ThymioBlockly/blockly/media/anon.jpeg</file>
+	<file>plugins/ThymioBlockly/blockly/media/click.mp3</file>
+	<file>plugins/ThymioBlockly/blockly/media/click.ogg</file>
+	<file>plugins/ThymioBlockly/blockly/media/click.wav</file>
+	<file>plugins/ThymioBlockly/blockly/media/delete.mp3</file>
+	<file>plugins/ThymioBlockly/blockly/media/delete.ogg</file>
+	<file>plugins/ThymioBlockly/blockly/media/delete.wav</file>
+	<file>plugins/ThymioBlockly/blockly/media/disconnect.mp3</file>
+	<file>plugins/ThymioBlockly/blockly/media/disconnect.ogg</file>
+	<file>plugins/ThymioBlockly/blockly/media/disconnect.wav</file>
+	<file>plugins/ThymioBlockly/blockly/media/handclosed.cur</file>
+	<file>plugins/ThymioBlockly/blockly/media/handdelete.cur</file>
+	<file>plugins/ThymioBlockly/blockly/media/handopen.cur</file>
+	<file>plugins/ThymioBlockly/blockly/media/icons.svg</file>
+	<file>plugins/ThymioBlockly/blockly/media/progress.gif</file>
+	<file>plugins/ThymioBlockly/blockly/media/quote0.png</file>
+	<file>plugins/ThymioBlockly/blockly/media/quote1.png</file>
+	<file>plugins/ThymioBlockly/blockly/media/sprites.png</file>
+	<file>plugins/ThymioBlockly/blockly/media/sprites.svg</file>
 </qresource>
 </RCC>
