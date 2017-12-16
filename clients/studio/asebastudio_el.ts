@@ -1446,72 +1446,72 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+71"/>
         <source>Thymio Blockly Interface</source>
         <translation>Διεπαφή Thymio Blockly</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <location line="+14"/>
         <source>New</source>
         <translation>Δημιουργία</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <location line="+7"/>
         <source>Open</source>
         <translation>Άνοιγμα</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <location line="+7"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <location line="+7"/>
         <source>Save as</source>
         <translation>Αποθήκευση ως</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <location line="+21"/>
         <source>Load &amp; Run</source>
         <translation>Φόρτωση &amp; Εκτέλεση</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <location line="+10"/>
         <source>Stop</source>
         <translation>Σταμάτημα</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
+        <location line="+21"/>
         <source>Help</source>
         <translation>Βοήθεια</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <location line="+7"/>
         <source>Screenshot</source>
         <translation>Στιγμιότυπο οθόνης</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="223"/>
+        <location line="+58"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
         <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="238"/>
+        <location line="+15"/>
         <source>Export program as image</source>
         <translation>Εξαγωγή προγράμματος ως εικόνα</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="260"/>
+        <location line="+22"/>
         <source>Launch Blockly</source>
         <translation>Εκκίνηση Blockly</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="398"/>
+        <location line="+138"/>
         <source>Warning</source>
         <translation>Προειδοποίηση</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="399"/>
+        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation>Το έγγραφο Blockly έχει τροποποιηθεί.&lt;p&gt;Επιθυμείτε να αποθηκεύσετε τις αλλαγές;</translation>
     </message>
@@ -1700,7 +1700,7 @@ event %0 : </source>
         <translation type="vanished">http://aseba.wikidot.com/en:thymiovpl</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Export program as image</source>
         <translation>Εξαγωγή προγράμματος ως εικόνα</translation>
     </message>

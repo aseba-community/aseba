@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -87,24 +87,24 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation>Netzwerk (TCP)</translation>
+        <translation type="vanished">Netzwerk (TCP)</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation>Host</translation>
+        <translation type="vanished">Host</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation>Port</translation>
+        <translation type="vanished">Port</translation>
     </message>
     <message>
         <source>Serial</source>
         <translatorcomment>Serielle Schnittstelle</translatorcomment>
-        <translation>Seriell</translation>
+        <translation type="vanished">Seriell</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>Benutzerdefiniert</translation>
+        <translation type="vanished">Benutzerdefiniert</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -468,7 +468,7 @@ Occurrences</source>
     </message>
     <message>
         <source>Help filter not found</source>
-        <translation>Hilfefilter nicht gefunden</translation>
+        <translation type="vanished">Hilfefilter nicht gefunden</translation>
     </message>
 </context>
 <context>
@@ -562,7 +562,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation>Über Aseba Studio</translation>
+        <translation type="vanished">Über Aseba Studio</translation>
     </message>
     <message>
         <location line="+115"/>
@@ -906,7 +906,7 @@ Ereignis %0: </translation>
     </message>
     <message>
         <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;h1&gt;Über Aseba&lt;/h1&gt;Versionsinformationen&lt;ul&gt;&lt;li&gt;Aseba Ver. %0&lt;br/&gt;(Build Ver. %1/Protokoll Ver. %2)&lt;/li&gt;&lt;li&gt;Dashel Ver. %3&lt;br/&gt;(unterstützt Stream-Typen: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Lesen Sie mehr auf &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; und anderen Mitwirkenden (klicken Sie auf &quot;Details einblenden&quot; für die vollständige Liste)&lt;/p&gt;&lt;p&gt;Aseba ist Open-Source unter der &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL Version 3&lt;/a&gt; lizenziert.&lt;/p&gt;</translation>
+        <translation type="vanished">&lt;h1&gt;Über Aseba&lt;/h1&gt;Versionsinformationen&lt;ul&gt;&lt;li&gt;Aseba Ver. %0&lt;br/&gt;(Build Ver. %1/Protokoll Ver. %2)&lt;/li&gt;&lt;li&gt;Dashel Ver. %3&lt;br/&gt;(unterstützt Stream-Typen: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Lesen Sie mehr auf &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; und anderen Mitwirkenden (klicken Sie auf &quot;Details einblenden&quot; für die vollständige Liste)&lt;/p&gt;&lt;p&gt;Aseba ist Open-Source unter der &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL Version 3&lt;/a&gt; lizenziert.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1573,52 +1573,52 @@ Ereignis %0: </translation>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+71"/>
         <source>Thymio Blockly Interface</source>
         <translation>Blockly-Oberfläche für Thymio</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <location line="+14"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <location line="+7"/>
         <source>Open</source>
         <translation>Öffnen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <location line="+7"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <location line="+7"/>
         <source>Save as</source>
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <location line="+21"/>
         <source>Load &amp; Run</source>
         <translation>Laden und ausführen</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <location line="+10"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
+        <location line="+21"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <location line="+7"/>
         <source>Screenshot</source>
         <translation>Bildschirmfoto</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="223"/>
+        <location line="+58"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
         <translation>http://aseba.wikidot.com/de:blocklyprogramming</translation>
     </message>
@@ -1627,22 +1627,22 @@ Ereignis %0: </translation>
         <translation type="obsolete">http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="238"/>
+        <location line="+15"/>
         <source>Export program as image</source>
         <translation>Programm als Bild exportieren</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="260"/>
+        <location line="+22"/>
         <source>Launch Blockly</source>
         <translation>Blockly starten</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="398"/>
+        <location line="+138"/>
         <source>Warning</source>
         <translation>Achtung</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="399"/>
+        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation>Das Blockly-Dokument wurde bearbeitet. Möchten Sie diese Änderungen speichern?</translation>
     </message>
@@ -1928,7 +1928,7 @@ Ereignis %0: </translation>
     </message>
     <message>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
-        <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
+        <translation type="vanished">http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
     <message>
         <source>Quit</source>
@@ -1978,7 +1978,7 @@ Ereignis %0: </translation>
         <translation>http://aseba.wikidot.com/de:thymiovpl</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Export program as image</source>
         <translation>Programm als Bilddatei exportieren</translation>
     </message>

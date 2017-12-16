@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh">
+<TS version="2.1" language="zh">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -82,23 +82,23 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation>网络(TCP)</translation>
+        <translation type="vanished">网络(TCP)</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation>主机</translation>
+        <translation type="vanished">主机</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation>端口</translation>
+        <translation type="vanished">端口</translation>
     </message>
     <message>
         <source>Serial</source>
-        <translation>串行端口</translation>
+        <translation type="vanished">串行端口</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>用户</translation>
+        <translation type="vanished">用户</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -421,7 +421,7 @@ Occurrences</source>
     </message>
     <message>
         <source>Help filter not found</source>
-        <translation>找不到相关的帮助文件</translation>
+        <translation type="vanished">找不到相关的帮助文件</translation>
     </message>
 </context>
 <context>
@@ -511,7 +511,7 @@ Occurrences</source>
     </message>
     <message>
         <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;h1&gt;关于Aseba&lt;/h1&gt;版本信息&lt;ul&gt;&lt;li&gt;Aseba版本: %0&lt;br/&gt;(build版本. %1/协议版本. %2)&lt;/li&gt;&lt;li&gt;Dashel版本. %3&lt;br/&gt;(支持的数据流类型: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;更多资料 &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; 以及其他参与者 (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseb为开源项目,许可证 &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL版本 3&lt;/a&gt;.&lt;/p&gt;</translation>
+        <translation type="vanished">&lt;h1&gt;关于Aseba&lt;/h1&gt;版本信息&lt;ul&gt;&lt;li&gt;Aseba版本: %0&lt;br/&gt;(build版本. %1/协议版本. %2)&lt;/li&gt;&lt;li&gt;Dashel版本. %3&lt;br/&gt;(支持的数据流类型: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;更多资料 &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; 以及其他参与者 (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseb为开源项目,许可证 &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL版本 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+1726"/>
@@ -520,7 +520,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation>关于Aseba Studio</translation>
+        <translation type="vanished">关于Aseba Studio</translation>
     </message>
     <message>
         <location line="-1684"/>
@@ -1364,72 +1364,72 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+71"/>
         <source>Thymio Blockly Interface</source>
         <translation>Thymio模块化界面</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <location line="+14"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <location line="+7"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <location line="+7"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <location line="+7"/>
         <source>Save as</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <location line="+21"/>
         <source>Load &amp; Run</source>
         <translation>加载并运行</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <location line="+10"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
+        <location line="+21"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <location line="+7"/>
         <source>Screenshot</source>
         <translation>截屏</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="223"/>
+        <location line="+58"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
         <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="238"/>
+        <location line="+15"/>
         <source>Export program as image</source>
         <translation>将程序输出为图像</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="260"/>
+        <location line="+22"/>
         <source>Launch Blockly</source>
         <translation>启动模块</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="398"/>
+        <location line="+138"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="399"/>
+        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation>模块化文件已被修改.是否保存改动?</translation>
     </message>
@@ -1615,10 +1615,10 @@ event %0 : </source>
     </message>
     <message>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
-        <translation>http://aseba.wikidot.com/en:thymiovpl</translation>
+        <translation type="vanished">http://aseba.wikidot.com/en:thymiovpl</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Export program as image</source>
         <translation>将程序数出为图像</translation>
     </message>

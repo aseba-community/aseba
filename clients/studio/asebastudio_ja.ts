@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ja">
+<TS version="2.1" language="ja">
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
@@ -83,19 +83,19 @@
     <name>Aseba::DashelConnectionDialog</name>
     <message>
         <source>Network (TCP)</source>
-        <translation>ネットワーク</translation>
+        <translation type="vanished">ネットワーク</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation>ホスト</translation>
+        <translation type="vanished">ホスト</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation>ポート</translation>
+        <translation type="vanished">ポート</translation>
     </message>
     <message>
         <source>Serial</source>
-        <translation>シリアル</translation>
+        <translation type="vanished">シリアル</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -519,7 +519,7 @@ Occurrences</source>
     </message>
     <message>
         <source>About Aseba Studio</source>
-        <translation>Aseba Studio について</translation>
+        <translation type="vanished">Aseba Studio について</translation>
     </message>
     <message>
         <location line="-1611"/>
@@ -1376,72 +1376,72 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="71"/>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+71"/>
         <source>Thymio Blockly Interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="85"/>
+        <location line="+14"/>
         <source>New</source>
         <translation>新規</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="92"/>
+        <location line="+7"/>
         <source>Open</source>
         <translation>開ける</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="99"/>
+        <location line="+7"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="106"/>
+        <location line="+7"/>
         <source>Save as</source>
         <translation>名前を付けて保存</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="127"/>
+        <location line="+21"/>
         <source>Load &amp; Run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="137"/>
+        <location line="+10"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="158"/>
+        <location line="+21"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="165"/>
+        <location line="+7"/>
         <source>Screenshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="223"/>
+        <location line="+58"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="238"/>
+        <location line="+15"/>
         <source>Export program as image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="260"/>
+        <location line="+22"/>
         <source>Launch Blockly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="398"/>
+        <location line="+138"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="399"/>
+        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1592,7 +1592,7 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+667"/>
+        <location line="+669"/>
         <source>Please add an event</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1602,7 +1602,7 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-857"/>
+        <location line="-859"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1637,7 +1637,7 @@ event %0 : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Export program as image</source>
         <translation type="unfinished"></translation>
     </message>
