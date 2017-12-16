@@ -164,7 +164,33 @@ namespace Aseba
 					personListWidget->addItem(item);
 					personListWidget->setItemWidget(item, label);
 				}
-				// TODO: add institutions + thank you
+				struct Grant
+				{
+					QString funder;
+					QString id;
+					QString name;
+				};
+				using Grants = std::vector<Grant>;
+				const Grants grants = {
+					{ "Swiss National Center of Competence in Research", "", "Robotics" },
+					{ "GebertRuf Stiftung", "GRS-017/13", "Robot Design for Understanding" },
+					{ "Swiss Commission for Technology and Innovation",  "17479.2", "Combining Augmented Reality and Robotics for Innovative Accessible Educational Tools" }
+				};
+				for (const auto& grant: grants)
+				{
+					QString text;
+					if (!grant.id.isEmpty())
+						text = tr("<b>%1</b> grant %2<br/>%3").arg(grant.funder).arg(grant.id).arg(grant.name);
+					else
+						text = QString("<b>%1</b><br/>%2").arg(grant.funder).arg(grant.name);
+					auto label = new QLabel(text);
+					label->setOpenExternalLinks(true);
+					label->setStyleSheet("QLabel { margin: 3px }");
+					auto item = new QListWidgetItem;
+					item->setSizeHint(QSize(200, personListWidget->fontMetrics().height() * 3));
+					personListWidget->addItem(item);
+					personListWidget->setItemWidget(item, label);
+				}
 			}
 			
 			auto personListEnclosingLayout = new QHBoxLayout;
