@@ -49,7 +49,12 @@
         <translation>Remerciements</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+61"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; grant %2&lt;br/&gt;%3</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; subvention %2&lt;br/&gt;%3</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>The following software are used in Aseba:</source>
         <translation>Les logiciels suivants sont utilisés dans Aseba :</translation>
     </message>
