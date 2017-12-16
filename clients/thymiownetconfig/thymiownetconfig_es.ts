@@ -7,7 +7,7 @@
         <location filename="ThymioWNetConfig.cpp" line="+85"/>
         <source>Wireless Thymio Network Configurator</source>
         <oldsource>Thymio Wireless Network Configurator</oldsource>
-        <translation type="unfinished">Wireless Thymio Network Configurator</translation>
+        <translation>Asstente para configurar red de Thymio inalámbrico</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -27,7 +27,7 @@
     <message>
         <location line="+2"/>
         <source>Channel:</source>
-        <translation>Canal :</translation>
+        <translation>Canal:</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -37,7 +37,7 @@
     <message>
         <location line="+10"/>
         <source>Dongle node identifier:</source>
-        <translation>Identificador de nudo del dongle :</translation>
+        <translation>Identificador del adaptador inalámbrico del nodo:</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -48,7 +48,7 @@
     <message>
         <location line="-89"/>
         <source>Flash into dongle</source>
-        <translation>Guardar en el dongle</translation>
+        <translation>Guardar en llave inalámbrica</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -58,7 +58,7 @@
     <message>
         <location line="+19"/>
         <source>Wireless dongle firmware version %0</source>
-        <translation>Versión del firmware del dongle wireless %0</translation>
+        <translation>Versión del firmware de la llave  inalámbrica %0</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -68,7 +68,7 @@
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Wireless Thymio dongle is connected!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;No se puede conectar con un dongle !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Asegúrese de que un dongle wireless Thymio está conectado !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;No se puede conectar con lel adaptador inalámbrico!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Asegúrese de que esté conectado!&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;b&gt;Cannot connect to dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Make sure a Thymio Wireless dongle is connected!&lt;/p&gt;</source>
@@ -77,7 +77,7 @@
     <message>
         <location line="+52"/>
         <source>Disable pairing</source>
-        <translation>Inhabilitar acoplamiento</translation>
+        <translation>desactivar acoplamiento</translation>
     </message>
 </context>
 <context>
@@ -111,22 +111,22 @@
     <message>
         <location line="+51"/>
         <source>Wireless Thymio dongle not found</source>
-        <translation>Wireless Thymio Dongle no encontrado</translation>
+        <translation>No se encontró el adaptador inalámbrico Thymio</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find a Wireless Thymio dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a dongle into one of your USB ports and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;No se ha podido encontrar un dongle wireless Thymio !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte un dongle en uno de los puertos USB y vuelva a intentarlo.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;No se encontró un adaptador inalámbrico Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte un adaptador inalámbrico en uno de los puertos USB de su PC y vuelva a intentarlo.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Multiple Wireless Thymio dongles found</source>
-        <translation>Múltiples dongles Wireless Thymio encontrados</translation>
+        <translation>se encontraron varios adaptadores inalámbricos Thymio</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;More than one Wireless Thymio dongles found!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a single dongle into your computer and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Más de un dongle Wireless Thymio encontrado !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte un solo dongle en el ordenador y vuelva a intentarlo.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Se encontró más de un adaptador inalámbrico Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte solo un adaptador al PC y vuelva a intentarlo.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

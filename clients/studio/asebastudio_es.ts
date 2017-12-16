@@ -71,12 +71,12 @@
         <location line="+6"/>
         <source>The name is a keyword</source>
         <oldsource>Name is a keyword</oldsource>
-        <translation>El nombre es una palabra clave</translation>
+        <translation>El nombre es un comando</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation>El nombre &lt;tt&gt;%0&lt;/tt&gt; no puede ser una constante, porque es una palabra clave propia del lenguaje.</translation>
+        <translation>El nombre &lt;tt&gt;%0&lt;/tt&gt; no puede ser una constante, porque es una comado propio del lenguaje.</translation>
     </message>
 </context>
 <context>
@@ -104,37 +104,37 @@
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
         <source>Discovered targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Objetivos encontrados</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Selected target</source>
-        <translation type="unfinished"></translation>
+        <translation>Objetivo seleccionado</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Puerto serial</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP local</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Docuemntación</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Idioma</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -154,27 +154,27 @@
     <message>
         <location line="+50"/>
         <source> – type %1</source>
-        <translation type="unfinished"></translation>
+        <translation> - tipo %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>local on computer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">local en PC</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>distant on network</source>
-        <translation type="unfinished"></translation>
+        <translation>a distancia en la red</translation>
     </message>
     <message>
         <location line="+63"/>
         <source> – device %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – dispositivo %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>serial port or USB</source>
-        <translation type="unfinished"></translation>
+        <translation>Puerto serial o USB</translation>
     </message>
 </context>
 <context>
@@ -187,7 +187,7 @@
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Thymio no encontrado!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte a Thymio a su computador usando el cable usb o adaptador inalámbrico, y asegúrese de que ningún otro programa esté usando el robot.&lt;/p&gt;</translation>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Thymio no encontrado!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Conecte el Thymio a su PC usando el cable USB o adaptador inalámbrico, y asegúrese de que ningún otro programa esté usando el robot.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -197,7 +197,7 @@
     <message>
         <location line="+0"/>
         <source>Cannot connect to target %0</source>
-        <translation>No se pudo conectar al objetivo %0</translation>
+        <translation>No se logró conectar al objetivo %0</translation>
     </message>
 </context>
 <context>
@@ -422,7 +422,7 @@ Occurrences</source>
     <message>
         <location filename="HelpViewer.cpp" line="+59"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
-        <translation>El archivo de ayuda %0 no se cargó correctamente. El error es: %1.El archivo de ayuda puede encontrarse en el directorio temporal del sistema. Revise por favor su instalación o reporte este error.</translation>
+        <translation>El archivo de ayuda %0 no se cargó correctamente. El error es: %1.El archivo de ayuda debe estar en el directorio temporal del sistema. Revise por favor su instalación o reporte este error.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -561,7 +561,7 @@ Occurrences</source>
     <message>
         <location line="-1684"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio es un entorno para la programación interactiva de robots con un lenguaje de texto.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -661,7 +661,7 @@ Occurrences</source>
     <message>
         <location line="+1"/>
         <source>You gave %0 arguments where event %1 requires %2</source>
-        <translation>Ingresó %0 argumentos, pero  el evento %1 requiere %2</translation>
+        <translation>Ingresó %0 argumentos, pero el evento %1 requiere %2</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -699,6 +699,7 @@ Occurrences</source>
         <location line="-91"/>
         <source>Number of arguments</source>
         <comment>For the newly created event</comment>
+        <translatorcomment>Para el nuevo evento</translatorcomment>
         <translation>Número de argumentos</translation>
     </message>
     <message>
@@ -877,7 +878,7 @@ evento %0 : </translation>
     <message>
         <location line="+2"/>
         <source>http://aseba.wikidot.com/en:thymiotutoriel</source>
-        <translation>http://aseba.wikidot.com/en:thymiotutoriel</translation>
+        <translation>http://aseba.wikidot.com/es:thymiotutoriel</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -887,7 +888,7 @@ evento %0 : </translation>
     <message>
         <location line="+2"/>
         <source>http://aseba.wikidot.com/en:thymioapi</source>
-        <translation>http://aseba.wikidot.com/en:thymioapi</translation>
+        <translation>http://aseba.wikidot.com/es:thymioapi</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -897,12 +898,12 @@ evento %0 : </translation>
     <message>
         <location line="+2"/>
         <source>http://aseba.wikidot.com/en:gettingstarted</source>
-        <translation>http://aseba.wikidot.com/en:gettingstarted</translation>
+        <translation>http://aseba.wikidot.com/es:gettingstarted</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>MarXbot user manual...</source>
-        <translation>Manuel del usuario de MarXbot...</translation>
+        <translation>Manual del usuario de MarXbot...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1674,7 +1675,7 @@ evento %0 : </translation>
     <message>
         <location line="+2"/>
         <source>horizontal proximity sensors</source>
-        <translation>sensores de proximidad horizontales</translation>
+        <translation>sensores de proximidad horizontal</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1889,7 +1890,7 @@ evento %0 : </translation>
     <message>
         <location line="+89"/>
         <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1977,8 +1978,7 @@ evento %0 : </translation>
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="+172"/>
         <source>Connecting to Thymio...</source>
-        <translation>
-Conectándose a Thymio...</translation>
+        <translation>Conectándose a Thymio...</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -2020,7 +2020,7 @@ Conectándose a Thymio...</translation>
     <message>
         <location line="+8"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation>Se perdió la conexión con Thymio... verifique que Thymio esté encendido y conectado a traves del cable usb o del adaptador inalámbrico</translation>
+        <translation type="unfinished">Se perdió la conexión con Thymio... verifique que Thymio esté encendido y conectado a traves del cable USB o del adaptador inalámbrico</translation>
     </message>
     <message>
         <location line="+64"/>
