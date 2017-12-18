@@ -160,47 +160,23 @@ namespace Aseba
 #endif // ZEROCONF_SUPPORT
     // created empty: pendingResponses, pendingVariables, eventSubscriptions, httpRequests, streamsToShutdown
     {
+        for (strings::const_iterator it = targets.cbegin(); it != targets.end(); ++it)
+        {
+            streamInitParameters.insert(std::pair<std::string, Dashel::Stream*>(*it, NULL));
+        }
         // listen for incoming HTTP and Aseba requests
         if (! inHttpPort.empty())
             inHttpStream = connect("tcpin:port=" + inHttpPort);
         if (! inAsebaPort.empty())
             inAsebaStream = connect("tcpin:port=" + inAsebaPort);
-
-
-        // connect to each Aseba target
-        for (strings::const_iterator it = targets.begin(); it != targets.end(); it++)
-        {
-            try {
-                if (verbose)
-                    std::cout << "HttpInterface connect asebaTarget " << *it << "\n";
-                if (Dashel::Stream *cxn = connect(*it)) // triggers connectionCreated
-                {
-                    asebaStreams[cxn].clear(); // no node id until description is received
-                    Dashel::ParameterSet parser;
-                    parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
-                    parser.add((*it).c_str());
-                    const unsigned localId(parser.get<unsigned>("remapLocal"));
-                    const unsigned targetId(parser.get<unsigned>("remapTarget"));
-                    const unsigned aeslId(parser.get<unsigned>("remapAesl"));
-                    // remember localId and aeslId as wishes to be answered when node description arrives
-                    if (localId > 0 && targetId > 0)
-                        localIdWishes[cxn][targetId] = localId;
-                    if (aeslId > 0)
-                        aeslIdWishes[cxn][targetId] = aeslId;
-                }
-            }
-            catch(Dashel::DashelException e)
-            {
-                std::cout << "HttpInterface can't connect target " << *it << ": " << e.what() << std::endl;
-            }
-        }
       
         // wait for descriptions
         for (int i = 0; i < 20; i++) // 20 seconds
         {
             // ask for descriptions
             this->pingNetwork();
-            this->run1s();
+            if (!run1s())
+                break;
             if (nodeDescriptionsReceived.size() >= targets.size())
                 break;
         }
@@ -263,35 +239,16 @@ namespace Aseba
         if (zeroconf.isStreamHandled(stream))
         {
             zeroconf.dashelConnectionClosed(stream);
-            return;
         }
 #endif // ZEROCONF_SUPPORT
-        if (asebaStreams.count(stream) != 0) // this is a dashel target
-        {
-            // first close all HTTP connections to this target
-            for (StreamResponseQueueMap::iterator m = pendingResponses.begin(); m != pendingResponses.end(); m++)
-                if (m->first == stream)
-                    closeStream(m->first);
-            // then remove this stream
-            asebaStreams.erase(stream);
+            discardStream(stream);
             if (verbose)
-                cerr << "Connection closed to Aseba target " << stream->getTargetName() << endl;
-            if (asebaStreams.size() == 0)
-            {
-                cerr << "Last dashel connection closed, stopping hub" << endl;
-                stop();
-            }
-        }
-        else                                 // this is the HTTP stream
-        {
-            if (verbose)
-                cerr << stream << " Connection closed to " << stream->getTargetName() << endl;
+                cout << stream << " Connection closed to " << stream->getTargetName() << endl;
             unscheduleAllResponses(stream);
             pendingResponses.erase(stream);
             unsigned num = streamsToShutdown.erase(stream);
             if (verbose)
-                cerr << stream << " Connection closed, removed " << num << " pending shutdowns" << endl;
-        }
+                cout << stream << " Connection closed, removed " << num << " pending shutdowns" << endl;
     }
     
     bool HttpInterface::run1s()
@@ -300,6 +257,41 @@ namespace Aseba
         UnifiedTime startTime;
         while (timeout > 0)
         {
+            // connect to each Aseba target
+            std::map<std::string, Dashel::Stream*>::iterator it = streamInitParameters.begin();
+            for (; it != streamInitParameters.end(); it++)
+            {
+                if (it->second)
+                    continue;
+
+                try {
+                    if (verbose)
+                        std::cout << "HttpInterface connect asebaTarget " << it->first << "\n";
+                    if ((it->second = connect(it->first))) // triggers connectionCreated
+                    {
+                        asebaStreams[it->second].clear(); // no node id until description is received
+                        Dashel::ParameterSet parser;
+                        parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
+                        parser.add(it->first.c_str());
+                        const unsigned localId(parser.get<unsigned>("remapLocal"));
+                        const unsigned targetId(parser.get<unsigned>("remapTarget"));
+                        const unsigned aeslId(parser.get<unsigned>("remapAesl"));
+                        // remember localId and aeslId as wishes to be answered when node description arrives
+                        if (localId > 0 && targetId > 0)
+                            localIdWishes[it->second][targetId] = localId;
+                        if (aeslId > 0)
+                            aeslIdWishes[it->second][targetId] = aeslId;
+
+                        GetNodeDescription().serialize(it->second);
+                        it->second->flush();
+                    }
+                }
+                catch(Dashel::DashelException e)
+                {
+                    std::cout << "HttpInterface can't connect target " << it->first << ": " << e.what() << std::endl;
+                }
+            }
+
             // special handling for HTTP streams
             sendAvailableResponses();
             if (verbose && streamsToShutdown.size() > 0)
@@ -522,8 +514,13 @@ namespace Aseba
         // if description, record the stream -- node id correspondence
         const Description *description = dynamic_cast<const Description *>(message);
         if (description)
+        {
+            const std::string target = targetFromString(stream);
+            if (!target.empty())
+                targetsToNodeId[target] = message->source;
             asebaStreams[stream].insert(message->source);
-        
+        }
+
         // if variables, check for pending requests
         const Variables *variables(dynamic_cast<Variables *>(message));
         if (variables)
@@ -1188,8 +1185,22 @@ namespace Aseba
     Dashel::Stream* HttpInterface::getStreamFromNodeId(const unsigned nodeId)
     {
         for (StreamNodeIdMap::iterator it = asebaStreams.begin(); it != asebaStreams.end(); it++ )
-            if ((it->second).count(nodeId))
+        {
+            if (it->second.find(nodeId) != it->second.end())
                 return it->first;
+        }
+        for (std::map<std::string, unsigned>::const_iterator it = targetsToNodeId.begin(); it != targetsToNodeId.end(); ++it)
+        {
+            if (it->second != nodeId)
+                continue;
+            std::map<std::string, Dashel::Stream*>::iterator found = streamInitParameters.find(it->first);
+            if (found != streamInitParameters.end())
+            {
+                if(found->second)
+                    return found->second;
+                break;
+            }
+        }
         // otherwise, raise exception
         throw runtime_error(FormatableString("getStreamFromNodeId: can't find stream for node id %0").arg(nodeId));
         return NULL;
@@ -1560,6 +1571,31 @@ namespace Aseba
             return newId;
         }
     }
+
+    void HttpInterface::discardStream(Dashel::Stream* stream) {
+        //closeStream(stream);
+        if (asebaStreams.count(stream))
+            asebaStreams.erase(stream);
+
+        for (std::map<std::string, Dashel::Stream*>::iterator it = streamInitParameters.begin();
+            it != streamInitParameters.end(); ++it)
+        {
+            if (it->second == stream)
+                it->second = NULL;
+        }
+    }
+
+    std::string HttpInterface::targetFromString(Dashel::Stream* stream) const
+    {
+        for (std::map<std::string, Dashel::Stream*>::const_iterator it = streamInitParameters.begin();
+            it != streamInitParameters.end(); ++it)
+        {
+            if (it->second == stream)
+                return it->first;
+        }
+        return std::string();
+    }
+
     //== end of class HttpInterface ============================================================
     
     
