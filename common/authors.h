@@ -204,6 +204,20 @@ namespace Aseba
 			u8"Greek translation",
 			{ u8"translation", }
 		},
+		{
+			u8"Basil Stotz",
+			u8"basil dot stotz at gmail dot com",
+			u8"",
+			u8"Italian translation",
+			{ u8"translation", }
+		},
+		{
+			u8"Paolo Rossetti",
+			u8"paolo dot rossetti at mobsya dot org",
+			u8"",
+			u8"Italian translation",
+			{ u8"translation", }
+		},
 	};
 } // namespace Aseba
 
