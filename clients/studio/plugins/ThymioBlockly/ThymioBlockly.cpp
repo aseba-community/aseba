@@ -46,6 +46,7 @@
 
 #include "../../TargetModels.h"
 #include "../../../../common/utils/utils.h"
+#include "../../../../common/about/AboutDialog.h"
 
 using namespace std;
 
@@ -220,7 +221,18 @@ namespace Aseba { namespace ThymioBlockly
 	
 	void ThymioBlockly::openHelp() const
 	{
-		QDesktopServices::openUrl(QUrl(tr("http://aseba.wikidot.com/en:blocklyprogramming")));
+		const AboutBox::Parameters aboutParameters = {
+			"Thymio Blockly",
+			":/images/icons/thymioblockly.svgz",
+			tr("Blockly for Thymio robot allows to program by visually assembling elements.\nBlockly is a <a href=\"https://developers.google.com/blockly/\">third-party software from Google</a>."),
+			tr("http://aseba.wikidot.com/en:blocklyprogramming"),
+			"",
+			{ "core", "blockly", "packaging", "translation" }
+		};
+		// we use nullptr here as parent might disappear under our eyes if the Thymio node gets disconnected
+		AboutBox aboutBox(nullptr, aboutParameters);
+		
+		aboutBox.exec();
 	}
 	
 	void ThymioBlockly::saveSnapshot() const

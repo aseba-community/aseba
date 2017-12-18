@@ -29,6 +29,11 @@ The following people have created significant portions of Aseba:
 	software engineer for embedded integration
 	contributed to: core
 
+*	Fabian Hahn <fabian at hahn dot graphics> [1]
+	software engineer for Blockly integration
+	contributed to: blockly
+
+
 # Contributors
 
 The following people have provided additional contributions:

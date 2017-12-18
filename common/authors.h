@@ -68,6 +68,13 @@ namespace Aseba
 			u8"software engineer for embedded integration",
 			{ u8"core", }
 		},
+		{
+			u8"Fabian Hahn",
+			u8"fabian at hahn dot graphics",
+			u8"",
+			u8"software engineer for Blockly integration",
+			{ u8"blockly", }
+		},
 	};
 	
 	static const AuthorInfos thankToList = {
