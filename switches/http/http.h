@@ -72,7 +72,8 @@ namespace Aseba
         typedef std::map<unsigned, std::wstring>                NodeIdProgramMap;
 
     protected:
-        // streams
+        std::map<std::string, Dashel::Stream*> streamInitParameters;
+        std::map<std::string, unsigned> targetsToNodeId;
         StreamNodeIdMap             asebaStreams;
         Dashel::Stream*             inHttpStream;
         Dashel::Stream*             inAsebaStream;
@@ -162,6 +163,8 @@ namespace Aseba
         virtual void parse_json_form(const std::string content, strings& values);
         std::vector<unsigned> getIdsFromURI(const strings& args);
         Dashel::Stream* getStreamFromNodeId(const unsigned nodeId);
+        void discardStream(Dashel::Stream* stream);
+        std::string targetFromString(Dashel::Stream* stream) const;
     };
     
     class HttpRequest
