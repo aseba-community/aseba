@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Compiler: Implemented optimisation of absorbing element.
 - Asebahttp: New experimental bridge for accessing Aseba through http.
 - Playground: Added Thymio support with several example scenes.
+- Playground: Added pick up of objects.
 - Internationalization: Added Greek language.
 - Internationalization: Added Chinese language.
 
@@ -31,8 +32,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Core: Work-around bugs in old Android libstd++ version.
 - Core: Fixed disconnection of Dashel stream on Android.
+- Studio: Fixed reconnection on Windows 10.
 - VM: Fixed a critical bug in VM where a reset would modify bytecodes.
-- Packaging: Windows: Sign packages.
+- Packaging: Windows: Sign packages and drivers.
 - All: Fixed minor bugs.
 
 ## [1.5.5] - 2016-12-05
