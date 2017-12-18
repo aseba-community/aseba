@@ -76,7 +76,7 @@ The following people have provided additional contributions:
 
 *	Francesco Mondada <francesco dot mondada at epfl dot ch>
 	bug reporting and dissemination
-	contributed to: studio, vpl
+	contributed to: studio, vpl, blockly
 
 *	Stefan Witwicki
 	Examples

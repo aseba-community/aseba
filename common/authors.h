@@ -146,7 +146,7 @@ namespace Aseba
 			u8"francesco dot mondada at epfl dot ch",
 			u8"",
 			u8"bug reporting and dissemination",
-			{ u8"studio", u8"vpl", }
+			{ u8"studio", u8"vpl", u8"blockly", }
 		},
 		{
 			u8"Stefan Witwicki",
