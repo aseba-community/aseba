@@ -350,14 +350,11 @@ if run_behavior == START then
 		if speed > 0 then
 			call math.dot(temp,  avoidanceKernel1[0:4], prox.horizontal[0:4], 0)
 			call math.dot(temp2, avoidanceKernel2[0:4], prox.horizontal[0:4], 0)
-			callsub motorbound
-
-			call math.muldiv(temp, temp, 2000, speed)
-			call math.muldiv(temp2, temp2, 2000, speed)
-
+			call math.muldiv(temp, temp, speed, 2000)
+			call math.muldiv(temp2, temp2, speed, 2000)
 			motor.left.target  = speed - (temp + temp2)
 			motor.right.target = speed - (temp - temp2)
-
+			callsub motorbound
 		elseif speed &lt; 0 then
 			temp = -300 / speed
 			motor.left.target = prox.horizontal[5] / temp
