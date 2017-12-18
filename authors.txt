@@ -74,6 +74,10 @@ The following people have provided additional contributions:
 	VPL logging
 	contributed to: vpl
 
+*	Vincent Becker <vincent dot becker at mobsya dot org>
+	Textures for Thymio 3D model
+	contributed to: simulator
+
 *	Francesco Mondada <francesco dot mondada at epfl dot ch>
 	bug reporting and dissemination
 	contributed to: studio, vpl, blockly

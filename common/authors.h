@@ -142,6 +142,13 @@ namespace Aseba
 			{ u8"vpl", }
 		},
 		{
+			u8"Vincent Becker",
+			u8"vincent dot becker at mobsya dot org",
+			u8"",
+			u8"Textures for Thymio 3D model",
+			{ u8"simulator", }
+		},
+		{
 			u8"Francesco Mondada",
 			u8"francesco dot mondada at epfl dot ch",
 			u8"",
