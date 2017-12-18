@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de">
+<TS version="2.0" language="de">
 <context>
     <name>Aseba::ThymioWNetConfigDialog</name>
     <message>
@@ -37,7 +37,7 @@
     <message>
         <location line="+10"/>
         <source>Dongle node identifier:</source>
-        <translation type="unfinished">Dongle Knotenidentifizierer :</translation>
+        <translation>Dongle Knotenidentifizierer :</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -116,7 +116,7 @@
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find a Wireless Thymio dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a dongle into one of your USB ports and try again.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Es kann keine Wireless Thymio Dongle finden!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Schließen Sie einen Dongle in einen der USB-Anschlüsse und versuchen es noch einmal.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Es konnte kein Wireless Thymio Dongle gefunden werden!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Schließen Sie einen Dongle an einen der USB-Anschlüsse und versuchen es noch einmal.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+5"/>
