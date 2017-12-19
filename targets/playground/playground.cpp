@@ -484,6 +484,7 @@ int main(int argc, char *argv[])
 		// create process
 		processes.push_back(new QProcess());
 		processes.back()->setProcessChannelMode(QProcess::MergedChannels);
+		processes.back()->setWorkingDirectory(QFileInfo(sceneFileName).canonicalPath());
 		// make sure it is killed when we close the window
 		QObject::connect(processes.back(), SIGNAL(started()), &viewer, SLOT(processStarted()));
 		QObject::connect(processes.back(), SIGNAL(error(QProcess::ProcessError)), &viewer, SLOT(processError(QProcess::ProcessError)));
