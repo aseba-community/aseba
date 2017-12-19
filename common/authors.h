@@ -68,6 +68,13 @@ namespace Aseba
 			u8"software engineer for embedded integration",
 			{ u8"core", }
 		},
+		{
+			u8"Fabian Hahn",
+			u8"fabian at hahn dot graphics",
+			u8"",
+			u8"software engineer for Blockly integration",
+			{ u8"blockly", }
+		},
 	};
 	
 	static const AuthorInfos thankToList = {
@@ -135,11 +142,18 @@ namespace Aseba
 			{ u8"vpl", }
 		},
 		{
+			u8"Vincent Becker",
+			u8"vincent dot becker at mobsya dot org",
+			u8"",
+			u8"Textures for Thymio 3D model",
+			{ u8"simulator", }
+		},
+		{
 			u8"Francesco Mondada",
 			u8"francesco dot mondada at epfl dot ch",
 			u8"",
 			u8"bug reporting and dissemination",
-			{ u8"studio", u8"vpl", }
+			{ u8"studio", u8"vpl", u8"blockly", }
 		},
 		{
 			u8"Stefan Witwicki",
@@ -202,6 +216,20 @@ namespace Aseba
 			u8"komis at upatras dot gr",
 			u8"",
 			u8"Greek translation",
+			{ u8"translation", }
+		},
+		{
+			u8"Basil Stotz",
+			u8"basil dot stotz at gmail dot com",
+			u8"",
+			u8"Italian translation",
+			{ u8"translation", }
+		},
+		{
+			u8"Paolo Rossetti",
+			u8"paolo dot rossetti at mobsya dot org",
+			u8"",
+			u8"Italian translation",
 			{ u8"translation", }
 		},
 	};

@@ -29,6 +29,11 @@ The following people have created significant portions of Aseba:
 	software engineer for embedded integration
 	contributed to: core
 
+*	Fabian Hahn <fabian at hahn dot graphics> [1]
+	software engineer for Blockly integration
+	contributed to: blockly
+
+
 # Contributors
 
 The following people have provided additional contributions:
@@ -69,9 +74,13 @@ The following people have provided additional contributions:
 	VPL logging
 	contributed to: vpl
 
+*	Vincent Becker <vincent dot becker at mobsya dot org>
+	Textures for Thymio 3D model
+	contributed to: simulator
+
 *	Francesco Mondada <francesco dot mondada at epfl dot ch>
 	bug reporting and dissemination
-	contributed to: studio, vpl
+	contributed to: studio, vpl, blockly
 
 *	Stefan Witwicki
 	Examples
@@ -107,6 +116,10 @@ The following people have provided additional contributions:
 
 *	Vassilis Komis <komis at upatras dot gr>
 	Greek translation
+	contributed to: translation
+
+*	Basil Stotz <basil dot stotz at gmail dot com>
+	Italian translation
 	contributed to: translation
 
 *	Paolo Rossetti <paolo dot rossetti at mobsya dot org>

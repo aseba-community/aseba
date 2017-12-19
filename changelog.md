@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Infrastructure: Added Jenkins file.
+- Core: Zeroconf support for robot discovery over the network.
+- Core: About box to VPL and Playground.
+- VM: Added deque functions to stdnative library.
+- Compiler: Implemented optimisation of absorbing element.
+- Asebahttp: New experimental bridge for accessing Aseba through http.
+- Playground: Added Thymio support with several example scenes.
+- Playground: Added pick up of objects.
+- Internationalization: Added Greek language.
+- Internationalization: Added Chinese language.
+
+### Changed
+- Core: Aseba now depends on (a subset of) C++14.
+- Core: Moved part of the code to C++11/14.
+- Core: Use C99 fixed-size types instead of custom ones.
+- Core: Rewritten author book-keeping scripts and vastly improved about boxes.
+- Blockly: Moved into a standalone web-based application on Windown and macOS.
+- VPL: Support for codes for centre button.
+- Internationalization: Updated translations.
+
+### Removed
+- Infrastructure: Removed support for subversion.
+
+### Fixed
+- Core: Work-around bugs in old Android libstd++ version.
+- Core: Fixed disconnection of Dashel stream on Android.
+- Studio: Fixed reconnection on Windows 10.
+- VM: Fixed a critical bug in VM where a reset would modify bytecodes.
+- Packaging: Windows: Sign packages and drivers.
+- All: Fixed minor bugs.
 
 ## [1.5.5] - 2016-12-05
 ### Fixed
