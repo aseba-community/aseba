@@ -1,0 +1,15 @@
+<!DOCTYPE aseba-playground>
+<aseba-playground>
+	<author name="Mobsya" email="info at mobsya dot org" />
+	<thanks name="Tungsteno Design" />
+
+	<color name="white" r="1.0" g="1.0" b="1.0" />
+	<color name="orange" r="1" g="0.3" b="0" />
+
+	<world w="104.1" h="79.4" color="white" groundTexture="piste-thymio-challenge-pack.svgz" />
+	<wall x="50" y="35" l1="10" l2="5" h="5" mass="10" color="orange" angle="0.000" />
+	<robot type="thymio2" x="70" y="15" name="Thymio"/>
+	
+	<process command=":asebahttp -n ThymioChallenge -v  --autorestart -s 33333 tcp:localhost;33333" />
+
+</aseba-playground>
