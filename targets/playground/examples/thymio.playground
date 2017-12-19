@@ -15,4 +15,6 @@
 	<cylinder x="15" y="50" r="3" h="10" color="wall" />
 	
 	<robot type="thymio2" x="15" y="30"/>
+	
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
 </aseba-playground>

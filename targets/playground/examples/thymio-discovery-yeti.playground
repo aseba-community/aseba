@@ -19,4 +19,6 @@
 	<world w="104.1" h="79.4" color="white" groundTexture="thymio-track-yeti.png" />
 	
 	<robot type="thymio2" x="70" y="15" name="Thymio"/>
+	
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
 </aseba-playground>
