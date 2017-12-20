@@ -5,7 +5,7 @@
 	<color name="green" r="0" g="0." b="0.17" />
 	<color name="blue" r="0" g="0.38" b="0.61" />
 	
-	<world w="110.4" h="110.4" color="wall"/>
+	<world w="110.4" h="110.4" color="wall" />
 	
 	<wall x="32.8" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
 	<wall x="77.6" y="55.2" l1="1.6" l2="46.4" h="10" color="wall" />
@@ -14,7 +14,7 @@
 	
 	<cylinder x="15" y="50" r="3" h="10" color="wall" />
 	
-	<robot type="thymio2" x="15" y="30"/>
+	<robot type="thymio2" x="15" y="30" port="33333" />
 	
 	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
 </aseba-playground>

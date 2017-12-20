@@ -15,5 +15,6 @@
 	<world w="200.0" h="120.0" color="white" groundTexture="thymio-barcodelightpainting.png" />
 	<camera x="100" y="40" altitude="110" yaw=" 1.57" pitch="-1.5" />
 	
-	<robot type="thymio2" x="50" y="52" name="Thymio" />
+	<robot type="thymio2" x="50" y="52" port="33333" name="Thymio" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
 </aseba-playground>

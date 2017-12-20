@@ -86,4 +86,6 @@
 	</area>
 	<door openedX="180.00" openedY="200.00" closedX="220.00" closedY="200.00" l1="40.00" l2="1.80" h="10.00" moveDuration="3" name="exit" color="blue" />
 	<activation x="95.00" y="228.00" l1="7.00" l2="7.00" area="cage" door="exit" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33334" />
 </aseba-playground>

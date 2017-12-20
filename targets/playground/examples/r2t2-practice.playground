@@ -67,4 +67,8 @@
 	<robot type="thymio2" x="289" y="119" port="33334" angle="3.93" name="Thymio A1" />
 	<robot type="thymio2" x="300" y="108" port="33335" angle="3.93" name="Thymio A2" />
 	<robot type="thymio2" x="311" y="97" port="33336" angle="3.93" name="Thymio A3" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33334" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33335" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33336" />
 </aseba-playground>
