@@ -18,7 +18,7 @@
 	
 	<world w="104.1" h="79.4" color="white" groundTexture="thymio-track-maisondailleurs.png" />
 	
-	<robot type="thymio2" x="70" y="15" name="Thymio"/>
+	<robot type="thymio2" x="70" y="15" name="Thymio" port="33303"/>
 	
-	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebahttp --http 0 --port 33333 --aesl thymio-default-behaviours.aesl tcp:localhost;33303" />
 </aseba-playground>
