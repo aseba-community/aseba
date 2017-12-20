@@ -59,6 +59,9 @@ namespace Aseba
 		// from NodesManager
 		virtual void sendMessage(const Message& message);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
+		
+		// self
+		void waitMs(int duration);
 	};
 	
 	void MassLoader::loadToTarget(const std::string& target)
@@ -81,14 +84,7 @@ namespace Aseba
 				
 				// TODO: make this timeout a parameter
 				// wait 1 s
-				UnifiedTime now;
-				while (true)
-				{
-					const UnifiedTime::Value delta((UnifiedTime() - now).value);
-					if (delta >= 1000)
-						break;
-					step(delta);
-				}
+				waitMs(1000);
 				
 				// verify that stream is still valid
 				if (!stream)
@@ -98,10 +94,13 @@ namespace Aseba
 				pingNetwork();
 				// then run
 				run();
-				// if we were interested to load only once, step for 1 second at most and then stop execution
+				// if we were interested to load only once, step for 1 second at most, then run for 1 second, and then stop execution
 				if (once)
 				{
+					// wait max 1s until Hub::stop() is called
 					step(1000);
+					// wait 1s more
+					waitMs(1000);
 					return;
 				}
 			}
@@ -236,6 +235,18 @@ namespace Aseba
 				}
 			}
 			domNode = domNode.nextSibling();
+		}
+	}
+	
+	void MassLoader::waitMs(int duration)
+	{
+		UnifiedTime now;
+		while (true)
+		{
+			const UnifiedTime::Value delta((UnifiedTime() - now).value);
+			if (delta >= duration)
+				break;
+			step(delta);
 		}
 	}
 }
