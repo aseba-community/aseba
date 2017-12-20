@@ -16,6 +16,6 @@
 	<wall x="50" y="35" l1="10" l2="5" h="5" mass="10" color="orange" angle="0.000" />
 	<robot type="thymio2" x="70" y="15" port="33330" name="Thymio" />
 	
-	<process command=":asebahttp -v --autorestart --port 33333 --aesl thymio-default-behaviours.aesl tcp:localhost;33330" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebahttp --autorestart --port 33333 tcp:localhost;33330" />
 </aseba-playground>
-
