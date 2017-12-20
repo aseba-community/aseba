@@ -16,5 +16,5 @@
 	
 	<robot type="thymio2" x="15" y="30" port="33303"/>
 	
-	<process command=":asebahttp --port 33333 --aesl thymio-default-behaviours.aesl tcp:localhost;33303" />
+	<process command=":asebahttp --http 0 --port 33333 --aesl thymio-default-behaviours.aesl tcp:localhost;33303" />
 </aseba-playground>
