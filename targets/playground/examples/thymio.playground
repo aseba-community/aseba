@@ -14,7 +14,7 @@
 	
 	<cylinder x="15" y="50" r="3" h="10" color="wall" />
 	
-	<robot type="thymio2" x="15" y="30"/>
+	<robot type="thymio2" x="15" y="30" port="33303"/>
 	
-	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebahttp --port 33333 --aesl thymio-default-behaviours.aesl tcp:localhost;33303" />
 </aseba-playground>
