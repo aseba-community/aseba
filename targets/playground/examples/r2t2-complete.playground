@@ -160,4 +160,21 @@
 
 	<robot type="e-puck" x="240.45" y="246.20" port="33331" angle="1.571" />
 	<robot type="e-puck" x="268.45" y="246.20" port="33332" angle="1.571" />
+
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33333" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33334" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33335" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33336" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33337" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33338" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33339" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33340" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33341" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33342" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33343" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33344" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33345" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33346" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33347" />
+	<process command=":asebamassloader --once thymio-default-behaviours.aesl tcp:localhost;33348" />
 </aseba-playground>
