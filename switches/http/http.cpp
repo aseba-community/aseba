@@ -169,7 +169,10 @@ namespace Aseba
             inHttpStream = connect("tcpin:port=" + inHttpPort);
         if (! inAsebaPort.empty())
             inAsebaStream = connect("tcpin:port=" + inAsebaPort);
-      
+
+        //attempt to connect to targets here first.
+        //This needs to be done once, before we load aesl files
+        connectToTargets();
         // wait for descriptions
         for (int i = 0; i < 20; i++) // 20 seconds
         {
@@ -257,40 +260,8 @@ namespace Aseba
         UnifiedTime startTime;
         while (timeout > 0)
         {
-            // connect to each Aseba target
-            std::map<std::string, Dashel::Stream*>::iterator it = streamInitParameters.begin();
-            for (; it != streamInitParameters.end(); it++)
-            {
-                if (it->second)
-                    continue;
-
-                try {
-                    if (verbose)
-                        std::cout << "HttpInterface connect asebaTarget " << it->first << "\n";
-                    if ((it->second = connect(it->first))) // triggers connectionCreated
-                    {
-                        asebaStreams[it->second].clear(); // no node id until description is received
-                        Dashel::ParameterSet parser;
-                        parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
-                        parser.add(it->first.c_str());
-                        const unsigned localId(parser.get<unsigned>("remapLocal"));
-                        const unsigned targetId(parser.get<unsigned>("remapTarget"));
-                        const unsigned aeslId(parser.get<unsigned>("remapAesl"));
-                        // remember localId and aeslId as wishes to be answered when node description arrives
-                        if (localId > 0 && targetId > 0)
-                            localIdWishes[it->second][targetId] = localId;
-                        if (aeslId > 0)
-                            aeslIdWishes[it->second][targetId] = aeslId;
-
-                        GetNodeDescription().serialize(it->second);
-                        it->second->flush();
-                    }
-                }
-                catch(Dashel::DashelException e)
-                {
-                    std::cout << "HttpInterface can't connect target " << it->first << ": " << e.what() << std::endl;
-                }
-            }
+           //Attempt to reconnect to disconnected targets
+           connectToTargets();
 
             // special handling for HTTP streams
             sendAvailableResponses();
@@ -331,6 +302,44 @@ namespace Aseba
         }
         return true;
     }
+	
+	void HttpInterface::connectToTargets()
+	{
+		// connect to each Aseba target
+		std::map<std::string, Dashel::Stream*>::iterator it = streamInitParameters.begin();
+		for (; it != streamInitParameters.end(); it++)
+		{
+			if (it->second)
+				continue;
+
+			try {
+				if (verbose)
+					std::cout << "HttpInterface connect asebaTarget " << it->first << "\n";
+				if ((it->second = connect(it->first))) // triggers connectionCreated
+				{
+					asebaStreams[it->second].clear(); // no node id until description is received
+					Dashel::ParameterSet parser;
+					parser.add("dummy:remapLocal=0;remapTarget=0;remapAesl=0");
+					parser.add(it->first.c_str());
+					const unsigned localId(parser.get<unsigned>("remapLocal"));
+					const unsigned targetId(parser.get<unsigned>("remapTarget"));
+					const unsigned aeslId(parser.get<unsigned>("remapAesl"));
+					// remember localId and aeslId as wishes to be answered when node description arrives
+					if (localId > 0 && targetId > 0)
+						localIdWishes[it->second][targetId] = localId;
+					if (aeslId > 0)
+						aeslIdWishes[it->second][targetId] = aeslId;
+
+					GetNodeDescription().serialize(it->second);
+					it->second->flush();
+				}
+			}
+			catch(Dashel::DashelException e)
+			{
+				std::cout << "HttpInterface can't connect target " << it->first << ": " << e.what() << std::endl;
+			}
+		}
+	}
     
     void HttpInterface::sendMessage(const Message& message)
     {

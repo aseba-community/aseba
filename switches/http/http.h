@@ -165,6 +165,7 @@ namespace Aseba
         Dashel::Stream* getStreamFromNodeId(const unsigned nodeId);
         void discardStream(Dashel::Stream* stream);
         std::string targetFromString(Dashel::Stream* stream) const;
+        void connectToTargets();
     };
     
     class HttpRequest
