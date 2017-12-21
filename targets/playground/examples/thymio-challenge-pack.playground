@@ -2,6 +2,12 @@
 <aseba-playground>
 	<author name="Mobsya" email="info at mobsya dot org" />
 	<thanks name="Tungsteno Design" />
+	
+	<description lang="en">A ground board for Thymio Challenge Pack.</description>
+	<description lang="fr">Un plateau de sol pour le kit Thymio Challenge Pack.</description>
+	
+	<externalLink lang="en" type="wiki" target="en:thymiochallengepack" />
+	<externalLink lang="fr" type="wiki" target="fr:thymiochallengepack" />
 
 	<color name="white" r="1.0" g="1.0" b="1.0" />
 	<color name="orange" r="1" g="0.3" b="0" />
