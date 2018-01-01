@@ -7,7 +7,6 @@ pipeline {
 	agent any
 
 	// Jenkins will prompt for parameters when a branch is build manually
-	// but will use default parameters when the entire project is built.
 	parameters {
 		string(defaultValue: 'aseba-community/dashel/master', description: 'Dashel project', name: 'project_dashel')
 		string(defaultValue: 'enki-community/enki/master', description: 'Enki project', name: 'project_enki')
@@ -27,13 +26,17 @@ pipeline {
 
 				// Dashel and Enki are retrieved from archived artifacts
 				script {
+					// Failsafe values for the benefit of automatic jobs
+					def pr_dashel = env.project_dashel ?: 'aseba-community/dashel/master'
+					def pr_enki = env.project_enki ?: 'enki-community/enki/master'
+
 					def p = ['debian','macos','windows'].collectEntries{
 						[ (it): {
 								node(it) {
-									copyArtifacts projectName: "${env.project_dashel}",
+									copyArtifacts projectName: "${pr_dashel}",
 										  filter: 'dist/'+it+'/**',
 										  selector: lastSuccessful()
-									copyArtifacts projectName: "${env.project_enki}",
+									copyArtifacts projectName: "${pr_enki}",
 										  filter: 'dist/'+it+'/**',
 										  selector: lastSuccessful()
 									stash includes: 'dist/**', name: 'dist-externals-' + it
