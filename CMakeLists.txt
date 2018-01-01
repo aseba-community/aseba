@@ -1,3 +1,4 @@
+# emacs: -*- CMake -*-
 # kate: replace-tabs off; tab-width 4; indent-width 4; tab-indents true; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
 
@@ -116,6 +117,9 @@ if (DNSSD_FOUND)
 		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 	else()
 		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+		if (WIN32)
+			set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES} -lws2_32)
+		endif()
 	endif()
 	set(ASEBA_ZEROCONF_LIBRARIES asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
 	if (QT4_FOUND)
