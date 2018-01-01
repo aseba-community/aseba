@@ -71,10 +71,12 @@ pipeline {
 						unstash 'dist-externals-macos'
 						script {
 							env.macos_enki_DIR = sh ( script: 'dirname $(find $PWD/dist/macos -name enkiConfig.cmake | head -1)', returnStdout: true).trim()
+							env.macos_dashel_DIR = sh ( script: 'dirname $(find $PWD/dist/macos -name dashelConfig.cmake | head -1)', returnStdout: true).trim()
 						}
 						echo "macos_enki_DIR=${env.macos_enki_DIR}"
+						echo "macos_dashel_DIR=${env.macos_dashel_DIR}"
 						CMake([label: 'macos',
-							   envs: [ "enki_DIR=${env.macos_enki_DIR}" ] ])
+							   envs: [ "enki_DIR=${env.macos_enki_DIR}", "dashel_DIR=${env.macos_dashel_DIR}" ] ])
 						stash includes: 'dist/**', name: 'dist-aseba-macos'
 					}
 				}
