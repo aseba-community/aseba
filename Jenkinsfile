@@ -11,6 +11,17 @@ pipeline {
 		string(defaultValue: 'aseba-community/dashel/master', description: 'Dashel project', name: 'project_dashel')
 		string(defaultValue: 'enki-community/enki/master', description: 'Enki project', name: 'project_enki')
 	}
+
+	// Trigger the build
+	triggers {
+		// Poll GitHub every two hours, in case webhooks aren't used
+		pollSCM('H */2 * * *')
+		// Rebuild if Dashel or Enki masters have been rebuilt
+		upstream(
+			upstreamProjects: 'aseba-community/dashel/master,enki-community/enki/master',
+			threshold: hudson.model.Result.SUCCESS
+		)
+	}
 	
 	// Everything will be built in the build/ directory.
 	// Everything will be installed in the dist/ directory.
