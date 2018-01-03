@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Thymio Web Bridge
+GenericName=Thymio Web Bridge
+Exec=asebahttp --autorestart -s 33333 "ser:name=Thymio"
+Categories=Education;Science;
+Icon=asebachallenge
+Terminal=true
