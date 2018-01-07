@@ -58,7 +58,7 @@ The following people have provided additional contributions:
 	bug reporting and fixing
 	contributed to: vpl
 
-*	Yves Piguet [1]
+*	[Yves Piguet](https://www.calerga.com/people/piguet.html) <yves dot piguet at epfl dot ch> [1]
 	bug reporting and fixing
 	contributed to: core, studio
 
@@ -78,7 +78,7 @@ The following people have provided additional contributions:
 	Textures for Thymio 3D model
 	contributed to: simulator
 
-*	Francesco Mondada <francesco dot mondada at epfl dot ch>
+*	[Francesco Mondada](https://people.epfl.ch/francesco.mondada) <francesco dot mondada at epfl dot ch>
 	bug reporting and dissemination
 	contributed to: studio, vpl, blockly
 

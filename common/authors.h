@@ -114,9 +114,9 @@ namespace Aseba
 			{ u8"vpl", }
 		},
 		{
-			u8"Yves Piguet ",
-			u8"",
-			u8"",
+			u8"Yves Piguet",
+			u8"yves dot piguet at epfl dot ch",
+			u8"https://www.calerga.com/people/piguet.html",
 			u8"bug reporting and fixing",
 			{ u8"core", u8"studio", }
 		},
@@ -151,7 +151,7 @@ namespace Aseba
 		{
 			u8"Francesco Mondada",
 			u8"francesco dot mondada at epfl dot ch",
-			u8"",
+			u8"https://people.epfl.ch/francesco.mondada",
 			u8"bug reporting and dissemination",
 			{ u8"studio", u8"vpl", u8"blockly", }
 		},
