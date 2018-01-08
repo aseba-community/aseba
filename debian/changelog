@@ -1,3 +1,9 @@
+aseba (1.6.0) xenial; urgency=medium
+
+  * Upstream 1.6.0
+
+ -- Stéphane Magnenat <stephane@nospam.magnenat.net>  Mon, 08 Jan 2018 12:15:43 +0100
+
 aseba (1.5.3) trusty; urgency=medium
 
   * Upstream 1.5.3
