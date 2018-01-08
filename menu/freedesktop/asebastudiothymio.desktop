@@ -12,7 +12,7 @@ GenericName[de]=Integrierte Entwicklungsumgebung
 GenericName[it]=Ambiente di sviluppo integrato
 GenericName[es]=Ambiente de desarrollo integrado
 GenericName[pt]=Ambiente de desenvolvimento integrado
-Exec=asebastudio "ser:name=Thymio-II" -ar
+Exec=asebastudio "ser:name=Thymio-II"
 TryExec=asebastudio
 Categories=Education;Science;
 Icon=asebastudiothymio
