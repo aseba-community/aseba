@@ -1364,7 +1364,7 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+71"/>
+        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
         <source>Thymio Blockly Interface</source>
         <translation>Thymio模块化界面</translation>
     </message>
@@ -1409,12 +1409,18 @@ event %0 : </source>
         <translation>截屏</translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+61"/>
+        <source>Blockly for Thymio robot allows to program by visually assembling elements.
+Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
         <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+22"/>
         <source>Export program as image</source>
         <translation>将程序输出为图像</translation>
     </message>
