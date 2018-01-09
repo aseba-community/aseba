@@ -62,18 +62,22 @@ namespace Enki
 		void autoCameraStateChanged(bool state);
 	
 	protected:
-		virtual void timerEvent(QTimerEvent * event);
-		//virtual void mouseMoveEvent ( QMouseEvent * event );
-		virtual void keyPressEvent ( QKeyEvent * event );
-		virtual void keyReleaseEvent ( QKeyEvent * event );
+		void timerEvent(QTimerEvent * event) override;
+		void keyPressEvent ( QKeyEvent * event ) override;
+		void keyReleaseEvent ( QKeyEvent * event ) override;
 		
 		void drawQuad2D(double x, double y, double w, double ar);
 		
-		virtual void initializeGL();
+		void initializeGL() override;
 		
-		virtual void renderObjectsTypesHook();
-		virtual void displayObjectHook(PhysicalObject *object);
-		virtual void sceneCompletedHook();
+		void displayWidgets() override;
+		void clickWidget(QMouseEvent *event) override;
+		
+		void renderObjectsTypesHook() override;
+		void displayObjectHook(PhysicalObject *object) override;
+		void sceneCompletedHook() override;
+		
+		void helpActivated();
 	};
 
 	class ChallengeApplication : public QWidget

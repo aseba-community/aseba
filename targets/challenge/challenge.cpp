@@ -703,6 +703,16 @@ namespace Enki
 		ViewerWidget::initializeGL();
 	}
 	
+	void ChallengeViewer::displayWidgets()
+	{
+		// do not display any Enki widgets in challenge
+	}
+	
+	void ChallengeViewer::clickWidget(QMouseEvent *event)
+	{
+		// do not handle any Enki widgets in challenge
+	}
+	
 	void ChallengeViewer::renderObjectsTypesHook()
 	{
 		// render vrcs specific static types
@@ -866,6 +876,11 @@ namespace Enki
 		static int imageCounter = 0;
 		if (savingVideo)
 			grabFrameBuffer().save(QString("frame%0.bmp").arg(imageCounter++), "BMP");
+	}
+	
+	void ChallengeViewer::helpActivated()
+	{
+		// do not react to Enki's help activation
 	}
 
 
