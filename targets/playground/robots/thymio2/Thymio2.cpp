@@ -57,11 +57,15 @@ namespace Enki
 		AsebaVMInit(&vm);
 		
 		variables.id = vm.nodeId;
-		variables.fwversion[0] = 10; // this simulated Thymio complies with firmware 10 public API
+		variables.fwversion[0] = 11; // this simulated Thymio complies with firmware 11 public API
 		variables.fwversion[1] = 0;
 		variables.productId = ASEBA_PID_THYMIO2;
 		
 		variables.temperature = 220;
+		
+		variables.sdPresent = openSDCardFile(0) ? 1 : 0;
+		if (variables.sdPresent)
+			openSDCardFile(-1);
 	}
 	
 	void AsebaThymio2::collisionEvent(PhysicalObject *o)

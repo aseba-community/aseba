@@ -86,6 +86,16 @@ extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm)
 	notifyMissingFeature();
 }
 
+extern "C" void PlaygroundThymio2Native_sound_duration(AsebaVMState *vm)
+{
+	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);
+	const uint16_t durationAddr(AsebaNativePopArg(vm));
+
+	logNativeFromVM(vm, 21, { number, static_cast<int16_t>(durationAddr) });
+	
+	notifyMissingFeature();
+}
+
 extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm)
 {
 	const int16_t number(vm->variables[AsebaNativePopArg(vm)]);

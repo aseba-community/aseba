@@ -98,6 +98,8 @@ namespace Enki
 			
 			int16_t timerPeriod[2];
 			
+			int16_t sdPresent;
+			
 			int16_t freeSpace[512];
 		} variables;
 		

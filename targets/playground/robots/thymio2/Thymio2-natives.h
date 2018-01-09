@@ -35,6 +35,9 @@ extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sou
 extern "C" void PlaygroundThymio2Native_sound_replay(AsebaVMState *vm);
 extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sound_replay;
 
+extern "C" void PlaygroundThymio2Native_sound_duration(AsebaVMState *vm);
+extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sound_duration;
+
 extern "C" void PlaygroundThymio2Native_sound_system(AsebaVMState *vm);
 extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sound_system;
 
@@ -118,7 +121,8 @@ extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sd_
 	&PlaygroundThymio2NativeDescription_sd_open, \
 	&PlaygroundThymio2NativeDescription_sd_write, \
 	&PlaygroundThymio2NativeDescription_sd_read, \
-	&PlaygroundThymio2NativeDescription_sd_seek
+	&PlaygroundThymio2NativeDescription_sd_seek, \
+	&PlaygroundThymio2NativeDescription_sound_duration
 	
 #define PLAYGROUND_THYMIO2_NATIVES_FUNCTIONS \
 	PlaygroundThymio2Native_sound_record, \
@@ -141,6 +145,7 @@ extern "C" AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sd_
 	PlaygroundThymio2Native_sd_open, \
 	PlaygroundThymio2Native_sd_write, \
 	PlaygroundThymio2Native_sd_read, \
-	PlaygroundThymio2Native_sd_seek
+	PlaygroundThymio2Native_sd_seek, \
+	PlaygroundThymio2Native_sound_duration
 
 #endif // __PLAYGROUND_THYMIO2_NATIVES_H

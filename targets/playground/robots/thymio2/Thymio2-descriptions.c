@@ -65,6 +65,8 @@ AsebaVMDescription PlaygroundThymio2VMDescription = {
 		{ 1, "mic.threshold"},
 		
 		{ 2, "timer.period"},
+		
+		{ 1, "sd.present"},
         
 		{ 0, NULL }
 	}
@@ -98,6 +100,16 @@ AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sound_replay =
 	"Start playback of rN.wav",
 	{
 		{1,"N"},
+		{0,0},
+	}
+};
+
+AsebaNativeFunctionDescription PlaygroundThymio2NativeDescription_sound_duration = {
+	"sound.duration",
+	"Give duration in 1/10s of rN.wav",
+	{
+		{1,"N"},
+		{1,"duration"},
 		{0,0},
 	}
 };
