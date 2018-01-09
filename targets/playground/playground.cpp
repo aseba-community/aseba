@@ -134,8 +134,6 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	app.setApplicationName("Playground");
 	
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	// Translation support
 	QTranslator qtTranslator;

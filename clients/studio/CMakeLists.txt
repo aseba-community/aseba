@@ -92,7 +92,7 @@ if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOU
 		translations/CompilerTranslator.h
 	)
 	add_library(asebaqtcommon STATIC ${qt_common_SRCS} ${qt_common_MOCS})
-	qt5_use_modules(asebaqtcommon Widgets Xml Network)
+	qt5_use_modules(asebaqtcommon Gui Widgets Xml Network)
 
 	# plugins
 	add_subdirectory(plugins)
@@ -141,7 +141,8 @@ if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOU
 			add_dependencies(asebastudio versionheader)
 		endif ()
 
-		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebacompiler asebaqtabout ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::WebKitWidgets Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
+		add_dependencies(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler )
+		target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::WebKitWidgets Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
 
 		install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 	endif ()
@@ -172,7 +173,9 @@ if (Qt5Widgets_FOUND AND Qt5Xml_FOUND AND Qt5Network_FOUND AND Qt5Concurrent_FOU
 		rendervplblocks.cpp
 	)
 	add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Svg Qt5::Widgets)
+	add_dependencies(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler)
+	qt5_use_modules(rendervplblocks Xml)
+	target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler ${ASEBA_CORE_LIBRARIES} ${ADDITIONAL_LIBRARIES} Qt5::Svg Qt5::Widgets)
 
 	install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif ()

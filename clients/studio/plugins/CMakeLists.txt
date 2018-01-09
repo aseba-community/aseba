@@ -34,7 +34,7 @@ qt5_wrap_cpp(qt_plugins_MOCS
 
 if(ASEBA_ENABLE_BLOCKLY_PLUGIN)
 	list(APPEND qt_plugins_SRCS ThymioBlockly/ThymioBlockly.cpp)
-	qt4_wrap_cpp(qt_plugins_MOCS ThymioBlockly/AsebaJavascriptInterface.h ThymioBlockly/ThymioBlockly.h)
+	qt5_wrap_cpp(qt_plugins_MOCS ThymioBlockly/AsebaJavascriptInterface.h ThymioBlockly/ThymioBlockly.h)
 endif(ASEBA_ENABLE_BLOCKLY_PLUGIN)
 
 if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)

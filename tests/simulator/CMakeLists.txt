@@ -7,4 +7,7 @@ if (ENKI_FOUND)
     # the following tests should succeed
     add_test(robot-simulator-thymio ${EXECUTABLE_OUTPUT_PATH}/aseba-test-simulator)
 
+    qt5_use_modules(aseba-test-simulator  Core)
+
+
 endif()
