@@ -11,7 +11,7 @@
     <message>
         <location line="+2"/>
         <source>Set breakpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレークポイントを設定</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -24,7 +24,7 @@
     <message>
         <location filename="MainWindow.cpp" line="+162"/>
         <source>Aseba Studio: Output of last compilation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio: 最新のコンパイルを出力</translation>
     </message>
 </context>
 <context>
@@ -32,27 +32,28 @@
     <message>
         <location filename="ConfigDialog.cpp" line="+275"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>汎用</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>エディター</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>そのままにしています</translatorcomment>
+        <translation>Ok</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Aseba Studio - Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio - 設定</translation>
     </message>
 </context>
 <context>
@@ -60,23 +61,23 @@
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="+319"/>
         <source>Constant already defined</source>
-        <translation type="unfinished">この定数はも確定した</translation>
+        <translation>この定数はすでに定義されています</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Constant %0 is already defined.</source>
-        <translation type="unfinished">%0の定数はも確定した。</translation>
+        <translation>定数%0はすでに定義されています。</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The name is a keyword</source>
         <oldsource>Name is a keyword</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>名前はキーワードです</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The name &lt;tt&gt;%0&lt;/tt&gt; cannot be used as a constant, because it is a language keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>名前 &lt;tt&gt;%0&lt;/tt&gt; は言語キーワドなので定数として使用できません。</translation>
     </message>
 </context>
 <context>
@@ -96,6 +97,10 @@
     <message>
         <source>Serial</source>
         <translation type="vanished">シリアル</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="vanished">カスタム</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
@@ -145,7 +150,7 @@
     <message>
         <location line="+4"/>
         <source>Aseba Target Selection</source>
-        <translation type="unfinished">Asebaの？？選択</translation>
+        <translation>Asebaの標的選択</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -178,22 +183,22 @@
     <message>
         <location line="+124"/>
         <source>Thymio not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioが見つかりません</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Thymioが見つかりません!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;USBケーブル/ドングルを使用してThymioをコンピューターに接続し、他のプログラムがThymioを使用していないことを確認してください。&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Connection to command line target failed</source>
-        <translation type="unfinished"></translation>
+        <translation>コマンドライン標的へ接続できませんでした</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Cannot connect to target %0</source>
-        <translation type="unfinished"></translation>
+        <translation>標的%0に接続できません</translation>
     </message>
 </context>
 <context>
@@ -201,17 +206,17 @@
     <message>
         <location filename="ConfigDialog.cpp" line="-119"/>
         <source>Editor Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>エディターセットアップ</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Autocompletion</source>
-        <translation type="unfinished"></translation>
+        <translation>オートコンプリート</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>キーワード</translation>
     </message>
 </context>
 <context>
@@ -219,18 +224,18 @@
     <message>
         <location filename="EventViewer.cpp" line="+95"/>
         <source>Time (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>時間（秒）</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Values</source>
-        <translation type="unfinished"></translation>
+        <translation>値</translation>
     </message>
     <message>
         <location line="+24"/>
         <location line="+93"/>
         <source>Recording...</source>
-        <translation type="unfinished"></translation>
+        <translation>記録中...</translation>
     </message>
     <message>
         <location line="-90"/>
@@ -246,7 +251,7 @@
     <message>
         <location line="+5"/>
         <source>time &amp;window:</source>
-        <translation type="unfinished"></translation>
+        <translation>時間ウインドウ:</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -256,17 +261,17 @@
     <message>
         <location line="+60"/>
         <source>Paused...</source>
-        <translation type="unfinished"></translation>
+        <translation>一時停止...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Record</source>
-        <translation type="unfinished"></translation>
+        <translation>記録</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Save plot data to file</source>
-        <translation type="unfinished"></translation>
+        <translation>プロットデータをフィアルに保存</translation>
     </message>
 </context>
 <context>
@@ -274,75 +279,76 @@
     <message>
         <location filename="FindDialog.cpp" line="+41"/>
         <source>Aseba Studio - Search and Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio - 検索置換</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Search for:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Case sensitive</source>
-        <translation type="unfinished"></translation>
+        <translation>大文字と小文字を区別する</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Whole words</source>
-        <translation type="unfinished"></translation>
+        <translation>単語全体</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Re&amp;gular expressions</source>
-        <translation type="unfinished"></translation>
+        <translation>正規表現</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&amp;Find Next</source>
-        <translation type="unfinished"></translation>
+        <translation>次を検索</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Find &amp;Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>前を検索</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Find from &amp;Top</source>
-        <translation type="unfinished"></translation>
+        <translation>上から検索</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&amp;Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>置換</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>w&amp;ith:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>文脈が分からないため不完全です</translatorcomment>
+        <translation>と:</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Replace and
 Find &amp;Next</source>
-        <translation type="unfinished"></translation>
+        <translation>置換して次を検索</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace and
 Find Previo&amp;us</source>
-        <translation type="unfinished"></translation>
+        <translation>置換して前を検索</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Replace &amp;All
 Occurrences</source>
-        <translation type="unfinished"></translation>
+        <translation>全て置換</translation>
     </message>
     <message>
         <location line="+103"/>
         <source>End of document reached!</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの最後に到達しました!</translation>
     </message>
 </context>
 <context>
@@ -350,27 +356,27 @@ Occurrences</source>
     <message>
         <location filename="ConfigDialog.cpp" line="-45"/>
         <source>General Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>一般セットアップ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウト</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Show keyword toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>キーボードツールバーを表示</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Show memory usage</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ使用量を表示</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Show hidden variables</source>
-        <translation type="unfinished"></translation>
+        <translation>陰の変数を表示</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -383,38 +389,42 @@ Occurrences</source>
     <message>
         <location filename="HelpViewer.cpp" line="+59"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプファイル%0を正しく読み込めませんでした。エラー: %1.ヘルプファイルはシステムの一次ディレクトリにあります。インストールの確認もしくはバグの報告をしてください。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Help file not found</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプファイルが見つかりません</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>前</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>次</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>ホーム</translation>
     </message>
     <message>
         <location line="+28"/>
         <location line="+73"/>
         <source>Aseba Studio Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studioヘルプ</translation>
     </message>
     <message>
         <location line="-50"/>
         <source>The help filter for the langauge &quot;%0&quot; has not been found. Falling back to the default language (%1). This is probably a bug, please report it.</source>
-        <translation type="unfinished"></translation>
+        <translation>言語&quot;%0&quot;のヘルプファイルが見つかりません。デフォルトの言語(%1)に戻ります。バグの可能性がありますので報告してください。</translation>
+    </message>
+    <message>
+        <source>Help filter not found</source>
+        <translation type="vanished">ヘルプフィルターが見つかりません</translation>
     </message>
 </context>
 <context>
@@ -422,22 +432,22 @@ Occurrences</source>
     <message>
         <location filename="plugins/VariablesViewPlugin.cpp" line="+69"/>
         <source>Linear Camera View Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>直線カメラビューのプラグイン</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>linear camera viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>直線カメラビューア</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Cannot initialize linear camera view plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>直線カメラビュープラグインを初期化できません</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>One or more variable not found in %1, %2, or %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1、%2、%3で1つ以上の変数が見つかりません。</translation>
     </message>
 </context>
 <context>
@@ -445,54 +455,54 @@ Occurrences</source>
     <message>
         <location line="-102"/>
         <source>Please choose your variables</source>
-        <translation type="unfinished"></translation>
+        <translation>変数を選択してください</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>red component</source>
-        <translation type="unfinished"></translation>
+        <translation>赤コンポーネント</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>green component</source>
-        <translation type="unfinished"></translation>
+        <translation>緑コンポーネント</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>blue component</source>
-        <translation type="unfinished"></translation>
+        <translation>青コンポーネント</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>range of values</source>
-        <translation type="unfinished"></translation>
+        <translation>値域</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>auto range</source>
-        <translation type="unfinished"></translation>
+        <translation>オートレンジ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">8ビットレンジ(0â255)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>percent range (0–100)</source>
         <oldsource>percent range (0â100)</oldsource>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">パーセントレンジ(0â100)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Linear Camera View Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>直線カメラビューのプラグイン</translation>
     </message>
 </context>
 <context>
@@ -540,12 +550,12 @@ Occurrences</source>
     <message>
         <location line="-16"/>
         <source>%0 scripts have no corresponding nodes in the current network and have not been loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>%0スクリプトは対応するノードが現在のネットワークに存在しないため読み込めませんでした。</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLソースファイルのエラー:%1行、%2列の%0</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -555,34 +565,34 @@ Occurrences</source>
     <message>
         <location line="+118"/>
         <source>Export memory content</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ内容を出力</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Import memory content</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ内容をインポート</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>%0 on node %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ノード%1の%0</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>The following nodes are not present in the current network and their associated content was not imported:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>次のノードは現在のネットワークには存在せず関連する内容は取り込まれませんでした:</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The following variables are not present in the current network and their associated content was not imported:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>次の変数は現在のネットワークには存在せず関連する内容は取り込まれませんでした:</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Some content was not imported</source>
-        <translation type="unfinished"></translation>
+        <translation>いくつかの内容が取り込まれませんでした</translation>
     </message>
     <message>
         <location line="+78"/>
@@ -592,47 +602,47 @@ Occurrences</source>
     <message>
         <location line="+0"/>
         <source>Line:</source>
-        <translation>行：</translation>
+        <translation>行:</translation>
     </message>
     <message>
         <location line="+159"/>
         <source>Specify event arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>イベント引数を指定</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Please specify the %0 arguments of event %1</source>
-        <translation type="unfinished"></translation>
+        <translation>イベント%1の%0引数を指定してください</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Wrong number of arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>引数の数が間違っています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You gave %0 arguments where event %1 requires %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%0引数が入力されましたがイベント%1に必要なのは%2です</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Invalid value</source>
-        <translation type="unfinished"></translation>
+        <translation>無効値</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid value for argument %0 of event %1</source>
-        <translation type="unfinished"></translation>
+        <translation>イベント%1の引数%0の無効値</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Plot event %1</source>
-        <translation type="unfinished"></translation>
+        <translation>プロットイベン%1</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>plot of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1のプロット</translation>
     </message>
     <message>
         <location line="+136"/>
@@ -644,13 +654,13 @@ Occurrences</source>
         <location line="-550"/>
         <location line="+91"/>
         <source>Name:</source>
-        <translation>名前：</translation>
+        <translation>名前:</translation>
     </message>
     <message>
         <location line="-91"/>
         <source>Number of arguments</source>
         <comment>For the newly created event</comment>
-        <translation type="unfinished"></translation>
+        <translation>引数の数</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -665,17 +675,17 @@ Occurrences</source>
     <message>
         <location line="+4"/>
         <source>Invalid event name</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なイベント名前</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Event %0 has an invalid name. Valid names start with an alphabetical character or an &quot;_&quot;, and continue with any number of alphanumeric characters, &quot;_&quot; and &quot;.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>イベント%0の名前が無効です。有効な名前は英字もしくは&quot;_&quot;に続く英数字、&quot;_&quot;、&quot;.&quot;から始まります</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Desynchronised! Please reload.</source>
-        <translation type="unfinished"></translation>
+        <translation>非同期化されました!リロードしてください。</translation>
     </message>
     <message>
         <location line="+53"/>
@@ -699,30 +709,34 @@ Occurrences</source>
         <translation type="obsolete">%0の定数はも確定した。</translation>
     </message>
     <message>
+        <source>&lt;h1&gt;About Aseba&lt;/h1&gt;Version information&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(supported stream types: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Read more on &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; and other contributors (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseba is open-source licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation type="vanished">&lt;h1&gt;Asebaについて&lt;/h1&gt;バージョン情報&lt;ul&gt;&lt;li&gt;Asebaバージョン%0&lt;br/&gt;(ビルドバージョン%1/プロトコルバージョン%2)&lt;/li&gt;&lt;li&gt;Dashelバージョン%3&lt;br/&gt;(サポートされているストリームタイプ: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;もっと読むには&lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;へ&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt;他寄稿（完全リストは&quot;詳細を表示&quot;をクリック）&lt;/p&gt;&lt;p&gt;Asebaは&lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL version 3&lt;/a&gt;によるオープンソースライセンスです。&lt;/p&gt;</translation>
+    </message>
+    <message>
         <location line="+138"/>
         <source>
 event %0 : </source>
-        <translation>イベント　%0：</translation>
+        <translation>イベント　%0:</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>array access at %0 out of bounds [0..%1]</source>
-        <translation type="unfinished"></translation>
+        <translation>%0の配列アクセスは境界[0..%1]を超えた読み取りです</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>division by zero</source>
-        <translation type="unfinished"></translation>
+        <translation>ゼロ除算</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>event execution killed</source>
-        <translation type="unfinished"></translation>
+        <translation>イベントの実行を強制終了する</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>%0:%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%0:%1: %2</translation>
     </message>
     <message>
         <location line="+183"/>
@@ -747,12 +761,12 @@ event %0 : </source>
     <message>
         <location line="+5"/>
         <source>Plot this event</source>
-        <translation type="unfinished"></translation>
+        <translation>このイベントをプロットする</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>&lt;b&gt;Global Events&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;グローバルイベント&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -762,27 +776,28 @@ event %0 : </source>
     <message>
         <location line="+137"/>
         <source>...inside %0</source>
-        <translation type="unfinished"></translation>
+        <translation>...%0の中</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>...%0</source>
-        <translation type="unfinished"></translation>
+        <translation>...%0</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>...of %0</source>
-        <translation type="unfinished"></translation>
+        <translation>...%0の</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>...inside all nodes</source>
-        <translation type="unfinished"></translation>
+        <translation>
+...全てのノードの中</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>...all nodes</source>
-        <translation type="unfinished"></translation>
+        <translation>...全てのノード</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -822,7 +837,7 @@ event %0 : </source>
     <message>
         <location line="+29"/>
         <source>Thymio programming tutorial...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioプログラミングチュートリアル...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -832,7 +847,7 @@ event %0 : </source>
     <message>
         <location line="+3"/>
         <source>Thymio programming interface...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioプログラミングインターフェイス...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -842,7 +857,7 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>Challenge tutorial...</source>
-        <translation type="unfinished"></translation>
+        <translation>チュートリアルに挑戦...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -877,12 +892,12 @@ event %0 : </source>
     <message>
         <location line="+2"/>
         <source>Open &amp;Recent</source>
-        <translation type="unfinished"></translation>
+        <translation>最近のものを開く</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>&amp;Save...</source>
-        <translation>保存</translation>
+        <translation>保存...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -892,17 +907,17 @@ event %0 : </source>
     <message>
         <location line="+4"/>
         <source>Export &amp;memories content...</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ内容を出力...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Import memories content...</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ内容を取り込む...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>中止</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -947,24 +962,24 @@ event %0 : </source>
     <message>
         <location line="+10"/>
         <source>Comment the selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択にコメントする</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ctrl+D</source>
         <comment>Edit|Comment the selection</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+D</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Uncomment the selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択のコメントを削除する</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Shift+Ctrl+D</source>
         <comment>Edit|Uncomment the selection</comment>
-        <translation type="unfinished"></translation>
+        <translation>Shift+Ctrl+D</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -974,17 +989,17 @@ event %0 : </source>
     <message>
         <location line="+6"/>
         <source>Copy &amp;all</source>
-        <translation type="unfinished"></translation>
+        <translation>全てコピー</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Show &amp;keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>キーワードを表示</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>S&amp;how hidden variables and functions</source>
-        <translation type="unfinished"></translation>
+        <translation>陰の定数と関数を表示する</translation>
     </message>
     <message>
         <source>Show Line Numbers</source>
@@ -1004,12 +1019,12 @@ event %0 : </source>
     <message>
         <location line="+36"/>
         <source>Show &amp;memory usage</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ使用量を表示する</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Show &amp;Line Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>行番号を表示する</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1020,12 +1035,12 @@ event %0 : </source>
     <message>
         <location line="+4"/>
         <source>&amp;Increase font size</source>
-        <translation type="unfinished"></translation>
+        <translation>フォントサイズを大きくする</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Decrease font size</source>
-        <translation type="unfinished"></translation>
+        <translation>フォントサイズを小さくする</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1040,46 +1055,46 @@ event %0 : </source>
     <message>
         <location line="+5"/>
         <source>&amp;Load all</source>
-        <translation type="unfinished"></translation>
+        <translation>全て読み込み</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>F7</source>
         <comment>Load|Load all</comment>
-        <translation type="unfinished">F7</translation>
+        <translation>F7</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Reset all</source>
-        <translation type="unfinished"></translation>
+        <translation>全てリセット</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>F8</source>
         <comment>Debug|Reset all</comment>
-        <translation type="unfinished">F8</translation>
+        <translation>F8</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ru&amp;n all</source>
-        <translation type="unfinished"></translation>
+        <translation>全て実行</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>F9</source>
         <comment>Debug|Run all</comment>
-        <translation type="unfinished">F9</translation>
+        <translation>F9</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Pause all</source>
-        <translation type="unfinished"></translation>
+        <translation>全て一時停止</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>F10</source>
         <comment>Debug|Pause all</comment>
-        <translation type="unfinished">F10</translation>
+        <translation>F10</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1115,22 +1130,22 @@ event %0 : </source>
     <message>
         <location line="+5"/>
         <source>&amp;Show last compilation messages</source>
-        <translation type="unfinished"></translation>
+        <translation>最後のコンパイルメッセージを表示</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Write the program(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>プログラムを書く...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Reboot...</source>
-        <translation type="unfinished"></translation>
+        <translation>再起動...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Save the binary code...</source>
-        <translation type="unfinished"></translation>
+        <translation>バイナリコードを保存する...</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1146,22 +1161,22 @@ event %0 : </source>
     <message>
         <location line="-69"/>
         <source>Aseba Studio - Confirmation Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio - 確認ダイアログ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The document &quot;%0&quot; has been modified.</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメント&quot;%0&quot;は変更されました。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Do you want to save your changes or discard them?</source>
-        <translation type="unfinished"></translation>
+        <translation>変更を保存しますか、削除しますか?</translation>
     </message>
     <message>
         <location line="+65"/>
         <source>[modified] </source>
-        <translation type="unfinished"></translation>
+        <translation>[変更済み]</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1174,12 +1189,12 @@ event %0 : </source>
     <message>
         <location filename="NamedValuesVectorModel.cpp" line="+44"/>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>隠す</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
 </context>
 <context>
@@ -1188,13 +1203,13 @@ event %0 : </source>
         <location filename="MainWindow.cpp" line="-2169"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
-        <translation type="unfinished"></translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Default description</source>
         <comment>When no description is given for the named value</comment>
-        <translation type="unfinished"></translation>
+        <translation>デフォルトの説明</translation>
     </message>
 </context>
 <context>
@@ -1202,23 +1217,23 @@ event %0 : </source>
     <message>
         <location line="-1089"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;キーワード&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+738"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明な</translation>
     </message>
     <message>
         <location line="-736"/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込む</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>リセット</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1226,27 +1241,27 @@ event %0 : </source>
         <location line="+561"/>
         <location line="+14"/>
         <source>Run</source>
-        <translation type="unfinished"></translation>
+        <translation>実行</translation>
     </message>
     <message>
         <location line="-888"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>次</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>リフレッシュ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>auto</source>
-        <translation type="unfinished"></translation>
+        <translation>オート</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&lt;b&gt;Execution&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;実行&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1256,38 +1271,38 @@ event %0 : </source>
     <message>
         <location line="+7"/>
         <source>F&amp;ilter:</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター:</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Native Functions</source>
-        <translation type="unfinished"></translation>
+        <translation>ネイティブ関数</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local Events</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカルイベント</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Local Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカルツール</translation>
     </message>
     <message>
         <location line="+303"/>
         <source>Save the binary code of %0</source>
-        <translation type="unfinished"></translation>
+        <translation>%0のバイナリコードを保存</translation>
     </message>
     <message>
         <location line="+250"/>
         <source>Aseba Studio: Output of last compilation for %0</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studio: %0の最後のコンパイルの出力</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+39"/>
         <source>Compilation success.</source>
-        <translation type="unfinished"></translation>
+        <translation>コンパイル成功。</translation>
     </message>
     <message>
         <location line="-19"/>
@@ -1297,17 +1312,18 @@ event %0 : </source>
     <message>
         <location line="+1"/>
         <source>bytecode: %1 on %2 (%3%)</source>
-        <translation type="unfinished"></translation>
+        <translation>バイトコード; %2 (%3%)の%1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;b&gt;Memory usage&lt;/b&gt; : %1, %2</source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;b&gt;メモリ使用量&lt;/b&gt; : %1、%2</translation>
     </message>
     <message>
         <location line="+199"/>
         <source>running</source>
-        <translation type="unfinished"></translation>
+        <translation>実行中</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1317,12 +1333,12 @@ event %0 : </source>
     <message>
         <location line="+10"/>
         <source>step by step</source>
-        <translation type="unfinished"></translation>
+        <translation>段階を追って</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>停止しました</translation>
     </message>
 </context>
 <context>
@@ -1330,17 +1346,17 @@ event %0 : </source>
     <message>
         <location filename="DashelTarget.cpp" line="+541"/>
         <source>Connection closed</source>
-        <translation type="unfinished"></translation>
+        <translation>接続をクローズ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Warning, connection closed: I am trying to reconnect.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告、接続がクローズされました: 再接続を試みています。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop trying</source>
-        <translation type="unfinished"></translation>
+        <translation>試行を停止</translation>
     </message>
 </context>
 <context>
@@ -1348,7 +1364,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/StopThymioPlugin.cpp" line="+34"/>
         <source>Stop Thymio</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymoを停止</translation>
     </message>
 </context>
 <context>
@@ -1357,7 +1373,7 @@ event %0 : </source>
         <location filename="TargetModels.cpp" line="+602"/>
         <location line="+19"/>
         <source>hidden</source>
-        <translation type="unfinished"></translation>
+        <translation>隠れた</translation>
     </message>
 </context>
 <context>
@@ -1365,12 +1381,12 @@ event %0 : </source>
     <message>
         <location line="-441"/>
         <source>names</source>
-        <translation type="unfinished"></translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>values</source>
-        <translation type="unfinished"></translation>
+        <translation>値</translation>
     </message>
 </context>
 <context>
@@ -1378,7 +1394,7 @@ event %0 : </source>
     <message>
         <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
         <source>Thymio Blockly Interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymio Blocklyのインターフェイス</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1403,12 +1419,12 @@ event %0 : </source>
     <message>
         <location line="+21"/>
         <source>Load &amp; Run</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み&amp;実行</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1418,7 +1434,7 @@ event %0 : </source>
     <message>
         <location line="+7"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーンショット</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -1429,27 +1445,27 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+1"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation type="unfinished"></translation>
+        <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Export program as image</source>
-        <translation type="unfinished"></translation>
+        <translation>プログラムを画像に出力する</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Launch Blockly</source>
-        <translation type="unfinished"></translation>
+        <translation>Blocklyを起動</translation>
     </message>
     <message>
         <location line="+138"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Blocklyのドキュメントは変更されています。&lt;p&gt;変更を保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -1457,67 +1473,67 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location filename="plugins/ThymioVPL/Block.cpp" line="+131"/>
         <source>buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>ボタン</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>horizontal proximity sensors</source>
-        <translation type="unfinished"></translation>
+        <translation>横並び近接センサー</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ground proximity sensors</source>
-        <translation type="unfinished"></translation>
+        <translation>接地近接センサー</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>tap detection / tilt</source>
-        <translation type="unfinished"></translation>
+        <translation>タップの感知/傾く</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>clap detection</source>
-        <translation type="unfinished"></translation>
+        <translation>手を叩く音の感知</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>timer elapsed</source>
-        <translation type="unfinished"></translation>
+        <translation>タイマーが経過しました</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>state filter</source>
-        <translation type="unfinished"></translation>
+        <translation>状態フィルター</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>motors</source>
-        <translation type="unfinished"></translation>
+        <translation>モーター</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>top colour</source>
-        <translation type="unfinished"></translation>
+        <translation>上部色</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>bottom colour</source>
-        <translation type="unfinished"></translation>
+        <translation>底部色</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>music</source>
-        <translation type="unfinished"></translation>
+        <translation>音楽</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>timer</source>
-        <translation type="unfinished"></translation>
+        <translation>タイマー</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>state</source>
-        <translation type="unfinished"></translation>
+        <translation>状態</translation>
     </message>
 </context>
 <context>
@@ -1526,18 +1542,18 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+616"/>
         <location line="+20"/>
         <source>Loading</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み中</translation>
     </message>
     <message>
         <location line="-19"/>
         <source>Error in XML source file at %0:%1: cannot create block %2</source>
         <oldsource>Error in XML source file at %0:%1 cannot create block %2</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>%0:%1のXMLソースファイルでエラー: ブロック%2を作成できません</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Error in XML source file at %0:%1: unknown block type %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%0:%1のXMLソースファイルでエラー: %2は不明なタイプのブロックです</translation>
     </message>
 </context>
 <context>
@@ -1545,7 +1561,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
         <source>Thymio Visual Programming Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioビジュアルプログラミング言語</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1560,7 +1576,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+7"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1570,17 +1586,17 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+39"/>
         <source>Load &amp; Run</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み&amp;実行</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Advanced mode</source>
-        <translation type="unfinished"></translation>
+        <translation>アドバンスモード</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -1590,47 +1606,51 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+38"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>イベント</translation>
     </message>
     <message>
         <location line="+82"/>
         <source>Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>アクション</translation>
+    </message>
+    <message>
+        <source>http://aseba.wikidot.com/en:thymiovpl</source>
+        <translation type="vanished">http://aseba.wikidot.com/en:thymiovpl</translation>
     </message>
     <message>
         <location line="+669"/>
         <source>Please add an event</source>
-        <translation type="unfinished"></translation>
+        <translation>イベントを追加してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Please add an action</source>
-        <translation type="unfinished"></translation>
+        <translation>アクションを追加してください</translation>
     </message>
     <message>
         <location line="-859"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>元に戻す</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>やり直す</translation>
     </message>
     <message>
         <location line="+57"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーンショット</translation>
     </message>
     <message>
         <location line="+57"/>
         <source>Compilation success.</source>
-        <translation type="unfinished"></translation>
+        <translation>コンパイル成功。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>show line</source>
-        <translation type="unfinished"></translation>
+        <translation>行を表示</translation>
     </message>
     <message>
         <location line="+89"/>
@@ -1645,42 +1665,42 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+23"/>
         <source>Export program as image</source>
-        <translation type="unfinished"></translation>
+        <translation>プログラムを画像に出力する</translation>
     </message>
     <message>
         <location line="+66"/>
         <source>Launch VPL</source>
-        <translation type="unfinished"></translation>
+        <translation>VPLを起動</translation>
     </message>
     <message>
         <location line="+165"/>
         <source>Returning to simple mode</source>
-        <translation type="unfinished"></translation>
+        <translation>シンプルモードに戻る</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You are currently using states. Returning to simple mode will discard any state filter or state setting card.&lt;p&gt;Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>現在状態を使用しています。シンプルモードに戻ると状態フィルターや状態設定カードは削除されます。&lt;p&gt;本当に継続しますか?</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The VPL document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>VPLドキュメントは変更されています。&lt;p&gt;変更を保存しますか?</translation>
     </message>
     <message>
         <location line="+75"/>
         <source>Incompatible Version</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないバージョン</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>This file is incompatible with this version of ThymioVPL. It might not work correctly.</source>
-        <translation type="unfinished"></translation>
+        <translation>このファイルはこのバージョンのThymio VPLと互換性がありません。正しく作動しない可能性があります。</translation>
     </message>
     <message>
         <source>Loading</source>
@@ -1692,12 +1712,12 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+75"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter your user or group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名かグループ名を入力してください:</translation>
     </message>
 </context>
 <context>
@@ -1705,18 +1725,18 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location filename="ThymioVPLStandalone.cpp" line="+172"/>
         <source>Connecting to Thymio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioに接続しています...</translation>
     </message>
     <message>
         <location line="+102"/>
         <location line="+222"/>
         <source>Thymio VPL Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymio VPLのエラー</translation>
     </message>
     <message>
         <location line="-221"/>
         <source>You need to connect a Thymio II to use this application.</source>
-        <translation type="unfinished"></translation>
+        <translation>このアプリケーションを使用するにはThymio IIを接続してください。</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -1737,22 +1757,22 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="-7"/>
         <source>No Thymio VPL data were found in the script file, file ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリプトファイル内でThymio VPLのデータが見つからずファイルは無視されました。</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>This application only supports a single robot at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>このアプリケーションは一度に1のロボットのみをサポートします。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>Thymioとの接続が失われました...Thymioの電源が入っていることを確認し、ケーブル/ドングルが接続されていることを確認して下さい</translation>
     </message>
     <message>
         <location line="+64"/>
         <source>[modified] </source>
-        <translation type="unfinished"></translation>
+        <translation>[変更済み]</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1762,12 +1782,12 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+4"/>
         <source>%0 %1- Thymio Visual Programming Language - ver. %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%0 %1- Thymioビジュアルプログラミング言語 - ver. %2</translation>
     </message>
     <message>
         <location line="-123"/>
         <source>Error in XML source file: %0 at line %1, column %2</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLソースファイルのエラー:%1行、%2列の%0</translation>
     </message>
 </context>
 <context>
@@ -1791,17 +1811,17 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <location filename="DashelTarget.cpp" line="-413"/>
         <location line="+7"/>
         <source>Protocol version mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>プロトコルバージョンの不一致</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseba Studioはノード%0（%2）より古いプロトコル（%1）を使用していますのでAseba Studioをアップグレードしてください。</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>ノード%0Aseba Studio（%1）より古いプロトコル（%2）を使用していますのノードファームウェアをアップグレードしてください。</translation>
     </message>
 </context>
 <context>
@@ -1809,37 +1829,37 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location filename="plugins/ThymioVPL/Compiler.cpp" line="+58"/>
         <source>Compilation success</source>
-        <translation type="unfinished"></translation>
+        <translation>コンパイル成功</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Line %0: Missing event</source>
-        <translation type="unfinished"></translation>
+        <translation>%0行: イベントが不足しています</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Line %0: Missing action</source>
-        <translation type="unfinished"></translation>
+        <translation>%0行: アクションが不足しています</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>The event in line %0 is the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%0行のイベント%1行のイベントと同じです</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The event and the state condition in line %0 are the same as in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%0行のイベントと状態条件は%1のものと同じです</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Unknown VPL error</source>
-        <translation type="unfinished"></translation>
+        <translation>不明なVPLエラー</translation>
     </message>
     <message>
         <location filename="DashelTarget.cpp" line="-465"/>
         <source>Unexpected Dashel Error</source>
-        <translation type="unfinished"></translation>
+        <translation>予期しないDashelエラー</translation>
     </message>
     <message>
         <location line="+0"/>

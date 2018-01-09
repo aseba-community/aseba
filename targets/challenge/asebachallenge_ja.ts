@@ -31,7 +31,7 @@
     <message>
         <location line="+4"/>
         <source>Help</source>
-        <translation>ヘルプ</translation>
+        <translation type="unfinished">ヘルプ</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -49,7 +49,7 @@
     <message>
         <location line="+0"/>
         <source>Robot name:</source>
-        <translation>ロボットの名前：</translation>
+        <translation>ロボットの名前:</translation>
     </message>
 </context>
 <context>
@@ -75,12 +75,12 @@
     <message>
         <location line="-890"/>
         <source>Aseba Challenge</source>
-        <translation></translation>
+        <translation>Aseba Challenge</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Cannot create listening port %0: %1</source>
-        <translation>待ち受けポート（%0）を作成できません：%1</translation>
+        <translation>待ち受けポートを作成できません</translation>
     </message>
 </context>
 </TS>

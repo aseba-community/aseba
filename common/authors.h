@@ -205,6 +205,13 @@ namespace Aseba
 			{ u8"translation", }
 		},
 		{
+			u8"Mamoru Oichi",
+			u8"moichi at exseed-inc dot jp",
+			u8"",
+			u8"Japanese translation",
+			{ u8"translation", }
+		},
+		{
 			u8"Ioanna Theodoropoulou",
 			u8"ioannatheodoropou at hotmail dot com",
 			u8"",

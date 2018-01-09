@@ -110,6 +110,10 @@ The following people have provided additional contributions:
 	Chinese translation
 	contributed to: translation
 
+*	Mamoru Oichi <moichi at exseed-inc dot jp>
+	Japanese translation
+	contributed to: translation
+
 *	Ioanna Theodoropoulou <ioannatheodoropou at hotmail dot com>
 	Greek translation
 	contributed to: translation
