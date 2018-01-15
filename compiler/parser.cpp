@@ -399,7 +399,7 @@ namespace Aseba
 			throw TranslatableError(varPos, ERROR_VAR_ALREADY_DEFINED).arg(varName);
 
 		// check if variable conflicts with a constant
-		if(commonDefinitions->constants.contains(varName))
+		if (constantsMap.find(varName) != constantsMap.end())
 			throw TranslatableError(varPos, ERROR_VAR_CONST_COLLISION).arg(varName);
 		
 		// optional assignation

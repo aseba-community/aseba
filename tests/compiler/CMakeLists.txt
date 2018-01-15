@@ -115,6 +115,7 @@ add_test(array-constant-access-fail ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_f
 add_test(constdef-collision-1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-1.txt)
 add_test(constdef-collision-2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-2.txt)
 add_test(constdef-overriding ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-overriding.txt)
+add_test(constdef-collision-var ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/constdef-collision-var.txt)
 add_test(literal-overflow-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-fail1.txt)
 add_test(literal-overflow-fail2 ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-overflow-check-fail2.txt)
 add_test(literal-hex-overflow-fail1 ${EXECUTABLE_OUTPUT_PATH}/asebatest --comp_fail ${CMAKE_CURRENT_SOURCE_DIR}/data/literal-hex-overflow1.txt)
