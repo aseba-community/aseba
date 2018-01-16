@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -41,7 +41,7 @@ namespace Aseba
 	{
 		throw TranslatableError(tokens.front().pos, ERROR_INTERNAL);
 	}
-	
+
 	//! Check if next token is of type, produce an exception otherwise
 	void Compiler::expect(const Token::Type& type) const
 	{
@@ -51,7 +51,7 @@ namespace Aseba
 					.arg(Token(type).typeName())
 					.arg(tokens.front().typeName());
 	}
-	
+
 	//! Check if next token is an unsigned 12 bits integer literal. If so, return it, if not, throw an exception
 	unsigned Compiler::expectUInt12Literal() const
 	{
@@ -62,7 +62,7 @@ namespace Aseba
 					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
-	
+
 	//! Check if next token is an unsigned 16 bits integer literal. If so, return it, if not, throw an exception
 	unsigned Compiler::expectUInt16Literal() const
 	{
@@ -73,7 +73,7 @@ namespace Aseba
 					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
-	
+
 	//! Check if next token is the positive part of a 16 bits signed integer literal. If so, return it, if not, throw an exception
 	unsigned Compiler::expectPositiveInt16Literal() const
 	{
@@ -84,7 +84,7 @@ namespace Aseba
 					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
-	
+
 	//! Check if next token is the absolute part of a 16 bits signed integer literal. If so, return it, if not, throw an exception
 	int Compiler::expectAbsoluteInt16Literal(bool negative) const
 	{
@@ -98,7 +98,7 @@ namespace Aseba
 					.arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
-	
+
 	//! Check if next toxen is a valid positive part of a 16 bits signed integer constant
 	unsigned Compiler::expectPositiveConstant() const
 	{
@@ -106,7 +106,7 @@ namespace Aseba
 		const std::wstring name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const ConstantsMap::const_iterator constIt(findConstant(name, pos));
-		
+
 		const int value = constIt->second;
 		if (value < 0 || value > 32767)
 			throw TranslatableError(tokens.front().pos,
@@ -115,7 +115,7 @@ namespace Aseba
 					.arg(value);
 		return value;
 	}
-	
+
 	//! Check if next toxen is a valid 16 bits signed integer constant
 	int Compiler::expectConstant() const
 	{
@@ -123,7 +123,7 @@ namespace Aseba
 		const std::wstring name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const ConstantsMap::const_iterator constIt(findConstant(name, pos));
-		
+
 		const int value = constIt->second;
 		if (value < -32768 || value > 32767)
 			throw TranslatableError(tokens.front().pos,
@@ -132,7 +132,7 @@ namespace Aseba
 					.arg(value);
 		return value;
 	}
-	
+
 	//! Check and return either the positive part of a 16 bits signed integer or the value of a valid constant
 	unsigned Compiler::expectPositiveInt16LiteralOrConstant() const
 	{
@@ -160,7 +160,7 @@ namespace Aseba
 				return expectAbsoluteInt16Literal(false);
 		}
 	}
-	
+
 	//! Check and return either a 16 bits signed integer or the value of a valid constant
 	int Compiler::expectInt16LiteralOrConstant()
 	{
@@ -169,50 +169,50 @@ namespace Aseba
 		else
 			return expectConstant();
 	}
-	
+
 	//! Check if next token is a known global event identifier
 	unsigned Compiler::expectGlobalEventId() const
 	{
 		assert(commonDefinitions);
-		
+
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		const std::wstring & name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const EventsMap::const_iterator eventIt(findGlobalEvent(name, pos));
-		
+
 		return eventIt->second;
 	}
-	
+
 	//! Check if next token is a known local or global event identifier
 	unsigned Compiler::expectAnyEventId() const
 	{
 		assert(targetDescription);
-		
+
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		const std::wstring & name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const EventsMap::const_iterator eventIt(findAnyEvent(name, pos));
-		
+
 		return eventIt->second;
 	}
-	
+
 	//! Return the name of an event given its identifier
 	std::wstring Compiler::eventName(unsigned eventId) const
 	{
 		// search for global
 		if (eventId < commonDefinitions->events.size())
 			return commonDefinitions->events[eventId].name;
-		
+
 		// then for local
 		int localId = ASEBA_EVENT_LOCAL_EVENTS_START - eventId;
 		if ((localId >= 0) && (localId < (int)targetDescription->localEvents.size()))
 			return targetDescription->localEvents[localId].name;
-		
+
 		return L"unknown";
 	}
-	
+
 	//! Return true if next token is of the following types
 	template <int length>
 	bool Compiler::isOneOf(const Token::Type types[length]) const
@@ -224,7 +224,7 @@ namespace Aseba
 		}
 		return false;
 	}
-	
+
 	//! Check if next token is of one of the following types, produce an exception otherwise
 	template <int length>
 	void Compiler::expectOneOf(const Token::Type types[length]) const
@@ -258,7 +258,7 @@ namespace Aseba
 		// free space check
 		if (freeVariableIndex + endVariableIndex > targetDescription->variablesSize)
 			throw TranslatableError(varPos, ERROR_NOT_ENOUGH_TEMP_SPACE);
-		
+
 		return varAddr;
 	}
 
@@ -274,7 +274,7 @@ namespace Aseba
 		MemoryVectorNode* lValue = new MemoryVectorNode(varPos, addr, size, WFormatableString(L"temp%0").arg(uid++));
 		return new AssignmentNode(varPos, lValue, rValue);
 	}
-	
+
 	//! Parse "program" grammar element.
 	Node* Compiler::parseProgram()
 	{
@@ -302,7 +302,7 @@ namespace Aseba
 		}
 		return block.release();
 	}
-	
+
 	//! Parse "statement" grammar element.
 	Node* Compiler::parseStatement()
 	{
@@ -317,7 +317,7 @@ namespace Aseba
 			default: return parseBlockStatement();
 		}
 	}
-	
+
 	//! Parse "block statement" grammar element.
 	Node* Compiler::parseBlockStatement()
 	{
@@ -335,7 +335,7 @@ namespace Aseba
 			default: return parseAssignment();
 		}
 	}
-	
+
 	//! Parse "return statement" grammar element.
 	Node* Compiler::parseReturn()
 	{
@@ -367,33 +367,33 @@ namespace Aseba
 			throw TranslatableError(tokens.front().pos,
 				ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		tokens.pop_front();
-		int constValue = expectConstantExpression(constPos, parseBinaryOrExpression());
+		int constValue = expectConstantExpression(constPos, parseExpression());
 
 		// save constant
 		constantsMap[constName] = constValue;
 	}
-	
+
 	//! Parse "var def" grammar element.
 	Node* Compiler::parseVarDef()
 	{
 		tokens.pop_front();
-		
+
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
 			throw TranslatableError(tokens.front().pos,
 				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
-		
+
 		// save variable
 		std::wstring varName = tokens.front().sValue;
 		SourcePos varPos = tokens.front().pos;
 		unsigned varSize = Node::E_NOVAL;
 		unsigned varAddr = freeVariableIndex;
-		
+
 		tokens.pop_front();
-		
+
 		// optional array
 		varSize = parseVariableDefSize();
-		
+
 		// check if variable exists
 		if (variablesMap.find(varName) != variablesMap.end())
 			throw TranslatableError(varPos, ERROR_VAR_ALREADY_DEFINED).arg(varName);
@@ -401,7 +401,7 @@ namespace Aseba
 		// check if variable conflicts with a constant
 		if (constantsMap.find(varName) != constantsMap.end())
 			throw TranslatableError(varPos, ERROR_VAR_CONST_COLLISION).arg(varName);
-		
+
 		// optional assignation
 		std::unique_ptr<MemoryVectorNode> me(new MemoryVectorNode(varPos, varAddr, varSize, varName));
 		std::unique_ptr<Node> temp;
@@ -443,7 +443,7 @@ namespace Aseba
 			if (rValue.get() == nullptr)
 			{
 				// no -> other type of initialization
-				rValue.reset(parseBinaryOrExpression());
+				rValue.reset(parseExpression());
 			}
 
 			if (lValue->getVectorSize() == Node::E_NOVAL)
@@ -457,20 +457,20 @@ namespace Aseba
 
 		return nullptr;
 	}
-	
+
 
 	//! Parse "assignment" grammar element
 	Node* Compiler::parseAssignment()
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		static const Token::Type compoundBinaryAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
 							   Token::TOKEN_OP_MULT_EQUAL, Token::TOKEN_OP_DIV_EQUAL, Token::TOKEN_OP_MOD_EQUAL,
 							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL,
 							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
 
 		// parse left value
-		std::unique_ptr<Node> lValue(parseBinaryOrExpression());
+		std::unique_ptr<Node> lValue(parseExpression());
 
 		SourcePos pos = tokens.front().pos;
 		Compiler::Token op = tokens.front();
@@ -479,7 +479,7 @@ namespace Aseba
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
 			tokens.pop_front();
-			return new AssignmentNode(pos, lValue.release(), parseBinaryOrExpression());
+			return new AssignmentNode(pos, lValue.release(), parseExpression());
 		}
 		else if ((tokens.front() == Token::TOKEN_OP_PLUS_PLUS) || (tokens.front() == Token::TOKEN_OP_MINUS_MINUS))
 		{
@@ -502,13 +502,13 @@ namespace Aseba
 							pos,
 							op,
 							lValue.release(),
-							parseBinaryOrExpression()));
+							parseExpression()));
 
 			return assignment.release();
 		}
 		else
 			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
-		
+
 		return nullptr;
 	}
 
@@ -516,45 +516,45 @@ namespace Aseba
 	Node* Compiler::parseIfWhen(bool edgeSensitive)
 	{
 		const Token::Type elseEndTypes[] = { Token::TOKEN_STR_else, Token::TOKEN_STR_elseif, Token::TOKEN_STR_end };
-		
+
 		std::unique_ptr<IfWhenNode> ifNode(new IfWhenNode(tokens.front().pos));
-		
+
 		// eat "if" / "when"
 		ifNode->edgeSensitive = edgeSensitive;
 		tokens.pop_front();
-		
+
 		// condition
 		ifNode->children.push_back(parseOr());
-		
+
 		// then keyword
 		if (edgeSensitive)
 			expect(Token::TOKEN_STR_do);
 		else
 			expect(Token::TOKEN_STR_then);
 		tokens.pop_front();
-		
+
 		// parse true condition
 		ifNode->children.push_back(new BlockNode(tokens.front().pos));
 		while (!IS_ONE_OF(elseEndTypes))
 			ifNode->children[1]->children.push_back(parseBlockStatement());
-		
+
 		/*// parse false condition (only for if)
 		if (!edgeSensitive && (tokens.front() == Token::TOKEN_STR_else))
 		{
 			tokens.pop_front();
-			
+
 			ifNode->children.push_back(new BlockNode(tokens.front().pos));
 			while (tokens.front() != Token::TOKEN_STR_end)
 				ifNode->children[2]->children.push_back(parseBlockStatement());
 		}*/
-		
+
 		// parse false condition (only for if)
 		if (!edgeSensitive)
 		{
 			if (tokens.front() == Token::TOKEN_STR_else)
 			{
 				tokens.pop_front();
-				
+
 				ifNode->children.push_back(new BlockNode(tokens.front().pos));
 				while (tokens.front() != Token::TOKEN_STR_end)
 					ifNode->children[2]->children.push_back(parseBlockStatement());
@@ -566,45 +566,45 @@ namespace Aseba
 				return ifNode.release();
 			}
 		}
-		
+
 		// end keyword
 		ifNode->endLine = tokens.front().pos.row;
 		expect(Token::TOKEN_STR_end);
 		tokens.pop_front();
-		
+
 		return ifNode.release();
 	}
-	
+
 	//! Parse "for" grammar element.
 	Node* Compiler::parseFor()
 	{
 		// eat "for"
 		SourcePos whilePos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		// variable
 		std::unique_ptr<MemoryVectorNode> variable(parseVariable());
 		MemoryVectorNode* variableRef = variable.get();		// used to create copies
 		SourcePos varPos = variable->sourcePos;
-		
+
 		// in keyword
 		expect(Token::TOKEN_STR_in);
 		tokens.pop_front();
-		
+
 		// range start index
 		int rangeStartIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeStartIndexPos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		// : keyword
 		expect(Token::TOKEN_COLON);
 		tokens.pop_front();
-		
+
 		// range end index
 		int rangeEndIndex = expectInt16LiteralOrConstant();
 		SourcePos rangeEndIndexPos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		// check for step
 		int step = 1;
 		if (tokens.front() == Token::TOKEN_STR_step)
@@ -615,7 +615,7 @@ namespace Aseba
 				throw TranslatableError(tokens.front().pos, ERROR_FOR_NULL_STEPS);
 			tokens.pop_front();
 		}
-		
+
 		// check conditions
 		if (step > 0)
 		{
@@ -631,11 +631,11 @@ namespace Aseba
 			if (rangeEndIndex == -32768)
 				throw TranslatableError(rangeEndIndexPos, ERROR_FOR_INVALID_DEC_END_INDEX);
 		}
-		
+
 		// do keyword
 		expect(Token::TOKEN_STR_do);
 		tokens.pop_front();
-		
+
 		// create enclosing block and initial variable state
 		std::unique_ptr<BlockNode> blockNode(new BlockNode(whilePos));
 		blockNode->children.push_back(new AssignmentNode(
@@ -643,12 +643,12 @@ namespace Aseba
 						      variable.release(),
 						      new TupleVectorNode(rangeStartIndexPos, rangeStartIndex))
 					      );
-		
+
 		// build while content
 		if (rangeStartIndex == rangeEndIndex)
 		{
 			// start and end indexes are the same, do not loop
-			
+
 			// if start and end indexes are the same, do not loop
 			while (tokens.front() != Token::TOKEN_STR_end)
 					blockNode->children.push_back(parseBlockStatement());
@@ -656,7 +656,7 @@ namespace Aseba
 		else
 		{
 			// start and end indexes are the same, loop
-		
+
 			// create while and condition
 			auto* whileNode = new WhileNode(whilePos);
 			blockNode->children.push_back(whileNode);
@@ -668,82 +668,82 @@ namespace Aseba
 			else
 				comparisonNode->op = ASEBA_OP_BIGGER_EQUAL_THAN;
 			comparisonNode->children.push_back(new TupleVectorNode(rangeEndIndexPos, rangeEndIndex));
-			
+
 			// block and end keyword
 			whileNode->children.push_back(new BlockNode(tokens.front().pos));
 			while (tokens.front() != Token::TOKEN_STR_end)
 				whileNode->children[1]->children.push_back(parseBlockStatement());
-			
+
 			// increment variable
 			auto* assignmentNode = new AssignmentNode(varPos,
 										variableRef->deepCopy(),
 										new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
 			whileNode->children[1]->children.push_back(assignmentNode);
 		}
-		
+
 		tokens.pop_front();
-		
+
 		return blockNode.release();
 	}
-	
+
 	//! Parse "while" grammar element.
 	Node* Compiler::parseWhile()
 	{
 		std::unique_ptr<WhileNode> whileNode(new WhileNode(tokens.front().pos));
-		
+
 		// eat "while"
 		tokens.pop_front();
-		
+
 		// condition
 		whileNode->children.push_back(parseOr());
-		
+
 		// do keyword
 		expect(Token::TOKEN_STR_do);
 		tokens.pop_front();
-		
+
 		// block and end keyword
 		whileNode->children.push_back(new BlockNode(tokens.front().pos));
 		while (tokens.front() != Token::TOKEN_STR_end)
 			whileNode->children[1]->children.push_back(parseBlockStatement());
-		
+
 		tokens.pop_front();
-		
+
 		return whileNode.release();
 	}
-	
+
 	//! Parse "onevent" grammar element
 	Node* Compiler::parseOnEvent()
 	{
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		const unsigned eventId = expectAnyEventId();
 		if (implementedEvents.find(eventId) != implementedEvents.end())
 			throw TranslatableError(tokens.front().pos, ERROR_EVENT_ALREADY_IMPL).arg(eventName(eventId));
 		implementedEvents.insert(eventId);
-		
+
 		tokens.pop_front();
-		
+
 		return new EventDeclNode(pos, eventId);
 	}
-	
+
 	//! Parse "event" grammar element
 	Node* Compiler::parseEmit(bool shorterArgsAllowed)
 	{
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		std::unique_ptr<EmitNode> emitNode(new EmitNode(pos));
-		
+
 		// event id
 		emitNode->eventId = expectGlobalEventId();
 		tokens.pop_front();
-		
+
 		// event argument
 		unsigned eventSize = commonDefinitions->events[emitNode->eventId].value;
 		if (eventSize > 0)
 		{
-			std::unique_ptr<Node> preNode(parseBinaryOrExpression());
+			std::unique_ptr<Node> preNode(parseExpression());
 			bool memoryAllocated = false;
 
 			// allocate memory?
@@ -781,52 +781,52 @@ namespace Aseba
 			emitNode->arrayAddr = 0;
 			emitNode->arraySize = 0;
 		}
-		
+
 		return emitNode.release();
 	}
-	
+
 	//! Parse "sub" grammar element, declaration of subroutine
 	Node* Compiler::parseSubDecl()
 	{
 		const SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		const std::wstring& name = tokens.front().sValue;
 		const SubroutineReverseTable::const_iterator it = subroutineReverseTable.find(name);
 		if (it != subroutineReverseTable.end())
 			throw TranslatableError(tokens.front().pos, ERROR_SUBROUTINE_ALREADY_DEF).arg(name);
-		
+
 		const unsigned subroutineId = subroutineTable.size();
 		subroutineTable.emplace_back(name, 0, pos.row);
 		subroutineReverseTable[name] = subroutineId;
-		
+
 		tokens.pop_front();
-		
+
 		return new SubDeclNode(pos, subroutineId);
 	}
-	
+
 	//! Parse "subcall" grammar element, call of subroutine
 	Node* Compiler::parseCallSub()
 	{
 		const SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		const std::wstring name = tokens.front().sValue;
-		
+
 		tokens.pop_front();
-		
+
 		return new CallSubNode(pos, name);
 	}
-	
+
 	//! Parse "or" grammar element.
 	Node* Compiler::parseOr()
 	{
 		std::unique_ptr<Node> node(parseAnd());
-		
+
 		while (tokens.front() == Token::TOKEN_OP_OR)
 		{
 			SourcePos pos = tokens.front().pos;
@@ -837,15 +837,15 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "and" grammar element.
 	Node* Compiler::parseAnd()
 	{
 		std::unique_ptr<Node> node(parseNot());
-		
+
 		while (tokens.front() == Token::TOKEN_OP_AND)
 		{
 			SourcePos pos = tokens.front().pos;
@@ -856,15 +856,15 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "not" grammar element.
 	Node* Compiler::parseNot()
 	{
 		SourcePos pos = tokens.front().pos;
-		
+
 		// eat all trailing not
 		bool odd = false;
 		while (tokens.front() == Token::TOKEN_OP_NOT)
@@ -872,22 +872,22 @@ namespace Aseba
 			odd = !odd;
 			tokens.pop_front();
 		}
-		
+
 		if (odd)
 			return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_NOT, parseCondition());
 		else
 			return parseCondition();
 		/*
-		
+
 		std::unique_ptr<BinaryArithmeticNode> expression(parseCondition());
-		
+
 		// recurse on parenthesis
 		if (tokens.front() == Token::TOKEN_PAR_OPEN)
 		{
 			tokens.pop_front();
-			
+
 			expression.reset(parseOr());
-			
+
 			expect(Token::TOKEN_PAR_CLOSE);
 			tokens.pop_front();
 		}
@@ -898,30 +898,18 @@ namespace Aseba
 		// apply de Morgan to remove the not
 		if (odd)
 			expression->deMorganNotRemoval();
-		
+
 		return expression.release();
 		*/
 	}
-	
+
 	//! Parse "condition" grammar element.
 	Node* Compiler::parseCondition()
 	{
-		/*const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
-		
-		std::unique_ptr<Node> leftExprNode(parseBinaryOrExpression());
-		
-		EXPECT_ONE_OF(conditionTypes);
-		
-		Token::Type op = tokens.front();
-		SourcePos pos = tokens.front().pos;
-		tokens.pop_front();
-		Node *rightExprNode = parseBinaryOrExpression();
-		return BinaryArithmeticNode::fromComparison(pos, op, leftExprNode.release(), rightExprNode);*/
-		
 		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
-		
+
 		std::unique_ptr<Node> node(parseBinaryOrExpression());
-		
+
 		while (IS_ONE_OF(conditionTypes))
 		{
 			Token::Type op = tokens.front();
@@ -933,15 +921,22 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
+	//! Parse expression.
+	Node *Compiler::parseExpression()
+	{
+		// start from lowest-priority operator
+		return parseOr();
+	}
+
 	//! Parse "binary or" grammar element.
 	Node *Compiler::parseBinaryOrExpression()
 	{
 		std::unique_ptr<Node> node(parseBinaryXorExpression());
-		
+
 		while (tokens.front() == Token::TOKEN_OP_BIT_OR)
 		{
 			SourcePos pos = tokens.front().pos;
@@ -952,15 +947,15 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "binary xor" grammar element.
 	Node *Compiler::parseBinaryXorExpression()
 	{
 		std::unique_ptr<Node> node(parseBinaryAndExpression());
-		
+
 		while (tokens.front() == Token::TOKEN_OP_BIT_XOR)
 		{
 			SourcePos pos = tokens.front().pos;
@@ -971,15 +966,15 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "binary and" grammar element.
 	Node *Compiler::parseBinaryAndExpression()
 	{
 		std::unique_ptr<Node> node(parseShiftExpression());
-		
+
 		while (tokens.front() == Token::TOKEN_OP_BIT_AND)
 		{
 			SourcePos pos = tokens.front().pos;
@@ -990,17 +985,17 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "shift_expression" grammar element.
 	Node *Compiler::parseShiftExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_SHIFT_LEFT, Token::TOKEN_OP_SHIFT_RIGHT };
-		
+
 		std::unique_ptr<Node> node(parseAddExpression());
-		
+
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
@@ -1012,17 +1007,17 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "add_expression" grammar element.
 	Node *Compiler::parseAddExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_ADD, Token::TOKEN_OP_NEG };
-		
+
 		std::unique_ptr<Node> node(parseMultExpression());
-		
+
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
@@ -1034,17 +1029,17 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "mult_expression" grammar element.
 	Node *Compiler::parseMultExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_MULT, Token::TOKEN_OP_DIV, Token::TOKEN_OP_MOD };
-		
+
 		std::unique_ptr<Node> node(parseUnaryExpression());
-		
+
 		while (IS_ONE_OF(opTypes))
 		{
 			Token::Type op = tokens.front();
@@ -1056,29 +1051,29 @@ namespace Aseba
 			node.release();
 			node.reset(temp);
 		}
-		
+
 		return node.release();
 	}
-	
+
 	//! Parse "unary_expression" grammar element.
 	Node *Compiler::parseUnaryExpression()
 	{
 		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_BRACKET_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_BIT_NOT, Token::TOKEN_STR_abs, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
-		
+
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
-	
+
 		switch (tokens.front())
 		{
 			case Token::TOKEN_PAR_OPEN:
 			{
 				tokens.pop_front();
-				
+
 				std::unique_ptr<Node> expression(parseOr());
-				
+
 				expect(Token::TOKEN_PAR_CLOSE);
 				tokens.pop_front();
-				
+
 				return expression.release();
 			}
 
@@ -1086,7 +1081,7 @@ namespace Aseba
 			{
 				return parseTupleVector();
 			}
-			
+
 			case Token::TOKEN_OP_NEG:
 			{
 				// do we have an immediate after? If yes, we have a negative number (special case)
@@ -1101,23 +1096,23 @@ namespace Aseba
 					tokens.pop_front();
 					return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
 				}
-				
+
 			}
-			
+
 			case Token::TOKEN_OP_BIT_NOT:
 			{
 				tokens.pop_front();
-				
+
 				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_BIT_NOT, parseUnaryExpression());
 			};
-			
+
 			case Token::TOKEN_STR_abs:
 			{
 				tokens.pop_front();
-				
+
 				return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_ABS, parseUnaryExpression());
 			}
-			
+
 			case Token::TOKEN_INT_LITERAL:
 			{
 				// immediate
@@ -1125,12 +1120,12 @@ namespace Aseba
 				tokens.pop_front();
 				return arrayCtor.release();
 			}
-			
+
 			case Token::TOKEN_STRING_LITERAL:
 			{
 				return parseConstantAndVariable();
 			}
-			
+
 			default: internalCompilerError(); return nullptr;
 		}
 	}
@@ -1169,7 +1164,7 @@ namespace Aseba
 			}
 			else
 			{
-				arrayCtor->children.push_back(parseBinaryOrExpression());
+				arrayCtor->children.push_back(parseExpression());
 			}
 
 			if (tokens.front() != Token::TOKEN_COMMA)
@@ -1284,7 +1279,7 @@ namespace Aseba
 			}
 			else
 			{
-				result = expectConstantExpression(pos, parseBinaryOrExpression());
+				result = expectConstantExpression(pos, parseExpression());
 
 				if (result < 0)
 					// what??
@@ -1303,12 +1298,12 @@ namespace Aseba
 		return result;
 	}
 
-	//! Use parseBinaryOrExpression() and try to reduce the result into an integer
+	//! Use parseExpression() and try to reduce the result into an integer
 	//! If successful, return nullptr and the integer in constantResult
 	//! If unsuccessful, return the parsed tree (constantResult useless in this case)
 	Node* Compiler::tryParsingConstantExpression(SourcePos pos, int& constantResult)
 	{
-		std::unique_ptr<Node> tree(parseBinaryOrExpression());
+		std::unique_ptr<Node> tree(parseExpression());
 
 		try
 		{
@@ -1334,7 +1329,7 @@ namespace Aseba
 		// used to access the facility offered by the AssignmentNode (size check,...)
 		std::unique_ptr<Node> tempTree1(new AssignmentNode(pos, new MemoryVectorNode(pos, 0, 1, L"fake"), tree));
 
-		//tempTree1->children.push_back(parseBinaryOrExpression());
+		//tempTree1->children.push_back(parseExpression());
 
 		//unsigned indent = 0;
 		//std::cerr << "Tree before expanding" << std::endl;
@@ -1372,26 +1367,26 @@ namespace Aseba
 
 		return result;
 	}
-	
+
 	//! Parse "function_call" grammar element.
 	Node* Compiler::parseFunctionCall()
 	{
 		SourcePos pos = tokens.front().pos;
 		tokens.pop_front();
-		
+
 		expect(Token::TOKEN_STRING_LITERAL);
-		
+
 		std::wstring funcName = tokens.front().sValue;
 		auto funcIt(findFunction(funcName, pos));
-		
+
 		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
 		std::unique_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
-		
+
 		tokens.pop_front();
-		
+
 		expect(Token::TOKEN_PAR_OPEN);
 		tokens.pop_front();
-		
+
 		if (function.parameters.size() == 0)
 		{
 			if (tokens.front() != Token::TOKEN_PAR_CLOSE)
@@ -1405,21 +1400,21 @@ namespace Aseba
 			for (const auto & parameter : function.parameters)
 				minTemplateId = std::min(parameter.size, minTemplateId);
 			std::valarray<int> templateParameters(-1, -minTemplateId);
-			
+
 			// trees for arguments
 			for (unsigned i = 0; i < function.parameters.size(); i++)
 			{
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
 					throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i);
-				
+
 				// we need to fill those two variables
 				unsigned varAddr;
 				unsigned varSize;
 				SourcePos varPos = tokens.front().pos;
 
-				std::unique_ptr<Node> preNode(parseBinaryOrExpression());
-				
+				std::unique_ptr<Node> preNode(parseExpression());
+
 				// get the address and size
 				varAddr = preNode->getVectorAddr();
 				varSize = preNode->getVectorSize();
@@ -1455,7 +1450,7 @@ namespace Aseba
 					// we will just store the address
 					callNode->children.push_back(new ImmediateNode(varPos, varAddr));
 				}
-				
+
 				// check if variable size is correct
 				if (function.parameters[i].size > 0)
 				{
@@ -1480,7 +1475,7 @@ namespace Aseba
 					// any size, store variable size
 					callNode->templateArgs.push_back(varSize);
 				}
-				
+
 				// parse comma or end parenthesis
 				if (i + 1 == function.parameters.size())
 				{
@@ -1498,13 +1493,13 @@ namespace Aseba
 				}
 				tokens.pop_front();
 			} // for
-			
+
 			// store template parameters size when initialized
 			for (unsigned i = 0; i < templateParameters.size(); i++)
 				if (templateParameters[i] >= 0)
 					callNode->templateArgs.push_back(templateParameters[i]);
 		} // if
-		
+
 		// return the node for the function call
 		return callNode.release();
 	}
