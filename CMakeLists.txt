@@ -57,6 +57,14 @@ if (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 	STRING(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 endif (DEFINED CMAKE_SHARED_LINKER_FLAGS)
 
+
+if (UNIX)
+    if (ASEBA_STATICLIBSTDC)
+		set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++")
+		set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
+	endif ()
+endif ()
+
 # testing and defines
 enable_testing()
 add_definitions(-Wall)
