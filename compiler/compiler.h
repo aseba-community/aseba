@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -50,8 +50,8 @@ namespace Aseba
 	struct AssignmentNode;
 	struct TupleVectorNode;
 	struct MemoryVectorNode;
-	
-	//! A bytecode element 
+
+	//! A bytecode element
 	struct BytecodeElement
 	{
 		BytecodeElement() = default;
@@ -59,38 +59,38 @@ namespace Aseba
 		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) { }
 		operator unsigned short () const { return bytecode; }
 		unsigned getWordSize() const;
-		
+
 		unsigned short bytecode{0xffff}; //! bytecode itself
 		unsigned short line{0}; //!< line in source code
 	};
-	
+
 	//! Bytecode array in the form of a dequeue, for construction
 	struct BytecodeVector: std::deque<BytecodeElement>
 	{
 		//! Constructor
 		BytecodeVector() = default;
-		
+
 		unsigned maxStackDepth{0}; //!< maximum depth of the stack used by all the computations of the bytecode
 		unsigned callDepth{0}; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
 		unsigned lastLine{0}; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
-		
+
 		void push_back(const BytecodeElement& be)
 		{
 			std::deque<BytecodeElement>::push_back(be);
 			lastLine = be.line;
 		}
-		
+
 		void changeStopToRetSub();
 		unsigned short getTypeOfLast() const;
-		
+
 		//! A map of event addresses to identifiers
 		typedef std::map<unsigned, unsigned> EventAddressesToIdsMap;
 		EventAddressesToIdsMap getEventAddressesToIds() const;
 	};
-	
+
 	// predeclaration
 	struct PreLinkBytecode;
-	
+
 	//! Position in a source file or string. First is line, second is column
 	struct SourcePos
 	{
@@ -98,12 +98,12 @@ namespace Aseba
 		unsigned row{0}; //!< line in source text
 		unsigned column{0}; //!< column in source text
 		bool valid{false}; //!< true if character, row and column hold valid values
-		
+
 		SourcePos(unsigned character, unsigned row, unsigned column) : character(character - 1), row(row), column(column - 1) { valid = true; }
 		SourcePos() = default;
 		std::wstring toWString() const;
 	};
-	
+
 	//! Return error messages based on error ID (needed to translate messages for other applications)
 	struct ErrorMessages
 	{
@@ -148,35 +148,35 @@ namespace Aseba
 
 	//! Vector of names of variables
 	using VariablesNamesVector = std::vector<std::wstring>;
-	
+
 	//! A name - value pair
 	struct NamedValue
 	{
 		//! Create a filled pair
 		NamedValue(std::wstring  name, int value) : name(std::move(name)), value(value) {}
-		
+
 		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
 	};
-	
+
 	//! An event description is a name - value pair
 	using EventDescription = NamedValue;
-	
+
 	//! An constant definition is a name - value pair
 	using ConstantDefinition = NamedValue;
-	
+
 	//! Generic vector of name - value pairs
 	struct NamedValuesVector: public std::vector<NamedValue>
 	{
 		bool contains(const std::wstring& s, size_t* position = nullptr) const;
 	};
-	
+
 	//! Vector of events descriptions
 	using EventsDescriptionsVector = NamedValuesVector;
-	
+
 	//! Vector of constants definitions
 	using ConstantsDefinitions = NamedValuesVector;
-	
+
 	//! Definitions common to several nodes, such as events or some constants
 	struct CommonDefinitions
 	{
@@ -184,11 +184,11 @@ namespace Aseba
 		EventsDescriptionsVector events;
 		//! All globally defined constants
 		ConstantsDefinitions constants;
-		
+
 		//! Clear all the content
 		void clear() { events.clear(); constants.clear(); }
 	};
-	
+
 	//! Aseba Event Scripting Language compiler
 	class Compiler
 	{
@@ -270,21 +270,21 @@ namespace Aseba
 			std::wstring sValue; //!< string version of the value
 			int iValue{0}; //!< int version of the value, 0 if not applicable
 			SourcePos pos;//!< position of token in source code
-			
+
 			Token()  = default;
 			Token(Type type, SourcePos pos = SourcePos(), const std::wstring& value = L"");
 			const std::wstring typeName() const;
 			std::wstring toWString() const;
 			operator Type () const { return type; }
 		};
-		
+
 		//! Description of a subroutine
 		struct SubroutineDescriptor
 		{
 			std::wstring name;
 			unsigned address;
 			unsigned line;
-			
+
 			SubroutineDescriptor(std::wstring  name, unsigned address, unsigned line) : name(std::move(name)), address(address), line(line) {}
 		};
 		//! Lookup table for subroutines id => (name, address, line)
@@ -300,7 +300,7 @@ namespace Aseba
 
 		friend struct AssignmentNode;
 		friend struct CallSubNode;
-	
+
 	public:
 		Compiler();
 		void setTargetDescription(const TargetDescription *description);
@@ -312,7 +312,7 @@ namespace Aseba
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
 		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		static bool isKeyword(const std::wstring& word);
-		
+
 	protected:
 		void internalCompilerError() const;
 		void expect(const Token::Type& type) const;
@@ -352,14 +352,14 @@ namespace Aseba
 		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
 		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::wostream& dump) const;
-		
+
 	protected:
 		Node* parseProgram();
-		
+
 		Node* parseStatement();
-		
+
 		Node* parseBlockStatement();
-		
+
 		Node* parseReturn();
 		void parseConstDef();
 		Node* parseVarDef();
@@ -372,17 +372,19 @@ namespace Aseba
 		Node* parseEmit(bool shorterArgsAllowed = false);
 		Node* parseSubDecl();
 		Node* parseCallSub();
-		
+
+		Node* parseExpression();
+
 		Node* parseOr();
 		Node* parseAnd();
 		Node* parseNot();
-		
+
 		Node* parseCondition();
-		
+
 		Node *parseBinaryOrExpression();
 		Node *parseBinaryXorExpression();
 		Node *parseBinaryAndExpression();
-		
+
 		Node* parseShiftExpression();
 		Node* parseAddExpression();
 		Node* parseMultExpression();
@@ -395,7 +397,7 @@ namespace Aseba
 		unsigned parseVariableDefSize();
 		Node* tryParsingConstantExpression(SourcePos pos, int& constantResult);
 		int expectConstantExpression(SourcePos pos, Node* tree);
-	
+
 	protected:
 		std::deque<Token> tokens; //!< parsed tokens
 		VariablesMap variablesMap; //!< variables lookup
@@ -413,28 +415,27 @@ namespace Aseba
 
 		ErrorMessages translator;
 	}; // Compiler
-	
+
 	//! Bytecode use for compilation previous to linking
 	struct PreLinkBytecode
 	{
 		//! Map of events id to event bytecode
 		typedef std::map<unsigned, BytecodeVector> EventsBytecode;
 		EventsBytecode events; //!< bytecode for events
-		
+
 		//! Map of routines id to routine bytecode
 		typedef std::map<unsigned, BytecodeVector> SubroutinesBytecode;
 		SubroutinesBytecode subroutines; //!< bytecode for routines
-		
+
 		BytecodeVector *current; //!< pointer to bytecode being constructed
-		
+
 		PreLinkBytecode();
-		
+
 		void fixup(const Compiler::SubroutineTable &subroutineTable);
 	};
-	
+
 	/*@}*/
-	
+
 } // namespace Aseba
 
 #endif
-

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -30,7 +30,7 @@ namespace Aseba
 {
 	/** \addtogroup compiler */
 	/*@{*/
-	
+
 	Node* BlockNode::optimize(std::wostream* dump)
 	{
 		for (auto it = children.begin(); it != children.end();)
@@ -44,7 +44,7 @@ namespace Aseba
 			}
 			else
 				*it = optimizedChild;
-			
+
 			// special case for empty blocks
 			if (dynamic_cast<BlockNode *>(*it) && (*it)->children.empty())
 			{
@@ -52,13 +52,13 @@ namespace Aseba
 				it = children.erase(it);
 				continue;
 			}
-			
+
 			++it;
 		}
-		
+
 		return this;
 	}
-	
+
 	Node* AssignmentNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
@@ -67,16 +67,16 @@ namespace Aseba
 		assert(children[1]);
 		return this;
 	}
-	
+
 	Node* IfWhenNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		
+
 		// optimise true block, which may be null afterwards
 		children[1] = children[1]->optimize(dump);
 		Node *trueBlock = children[1];
-		
+
 		// optimise false block, which may be null afterwards
 		Node *falseBlock;
 		if (children.size() > 2)
@@ -88,7 +88,7 @@ namespace Aseba
 		}
 		else
 			falseBlock = nullptr;
-		
+
 		// check if both block are null or do not contain any data, in this case return
 		if (
 			((trueBlock == nullptr) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) &&
@@ -100,7 +100,7 @@ namespace Aseba
 			delete this;
 			return nullptr;
 		}
-		
+
 		// check for if on constants
 		auto* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
 		if (constantExpression)
@@ -123,20 +123,32 @@ namespace Aseba
 				return falseBlock;
 			}
 		}
-		
+
 		// create a dummy block for true if none exist
 		if (trueBlock == nullptr)
 			children[1] = new BlockNode(sourcePos);
-		
+
 		// fold operation inside if
-		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		auto* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		auto *foldedNode = new FoldedIfWhenNode(sourcePos);
-		foldedNode->op = operation->op;
+		if (operation)
+		{
+			// top-level node is a binary op: fold it into opcode
+			foldedNode->op = operation->op;
+			foldedNode->children.push_back(operation->children[0]);
+			foldedNode->children.push_back(operation->children[1]);
+			operation->children.clear();
+		}
+		else
+		{
+			// top-level is not a binary op: compile as "expr != 0"
+			foldedNode->op = ASEBA_OP_NOT_EQUAL;
+			foldedNode->children.push_back(children[0]);
+			children[0] = nullptr;
+			foldedNode->children.push_back(new ImmediateNode(sourcePos, 0));
+		}
 		foldedNode->edgeSensitive = edgeSensitive;
 		foldedNode->endLine = endLine;
-		foldedNode->children.push_back(operation->children[0]);
-		foldedNode->children.push_back(operation->children[1]);
-		operation->children.clear();
 		foldedNode->children.push_back(children[1]);
 		children[1] = nullptr;
 		if (children.size() > 2)
@@ -144,29 +156,29 @@ namespace Aseba
 			foldedNode->children.push_back(children[2]);
 			children[2] = nullptr;
 		}
-		
+
 		if (dump)
 			*dump << sourcePos.toWString() << L" if condition folded inside node\n";
-		
+
 		delete this;
-		
+
 		return foldedNode;
 	}
-	
+
 	Node* FoldedIfWhenNode::optimize(std::wostream* dump)
 	{
 		abort();
 		return nullptr;
 	}
-	
+
 	Node* WhileNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		
+
 		// block may be nullptr
 		children[1] = children[1]->optimize(dump);
-		
+
 		// check for loops on constants
 		auto* constantExpression = dynamic_cast<ImmediateNode*>(children[0]);
 		if (constantExpression)
@@ -183,7 +195,7 @@ namespace Aseba
 				return nullptr;
 			}
 		}
-		
+
 		// check for loops with empty content
 		if ((children[1] == nullptr) || (dynamic_cast<BlockNode*>(children[1]) && children[1]->children.empty()))
 		{
@@ -192,36 +204,48 @@ namespace Aseba
 			delete this;
 			return nullptr;
 		}
-		
+
 		// fold operation inside loop
-		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
+		auto* operation = dynamic_cast<BinaryArithmeticNode*>(children[0]);
 		auto *foldedNode = new FoldedWhileNode(sourcePos);
-		foldedNode->op = operation->op;
-		foldedNode->children.push_back(operation->children[0]);
-		foldedNode->children.push_back(operation->children[1]);
-		operation->children.clear();
+		if (operation)
+		{
+			// top-level node is a binary op: fold it into opcode
+			foldedNode->op = operation->op;
+			foldedNode->children.push_back(operation->children[0]);
+			foldedNode->children.push_back(operation->children[1]);
+			operation->children.clear();
+		}
+		else
+		{
+			// top-level is not a binary op: compile as "expr != 0"
+			foldedNode->op = ASEBA_OP_NOT_EQUAL;
+			foldedNode->children.push_back(children[0]);
+			children[0] = nullptr;
+			foldedNode->children.push_back(new ImmediateNode(sourcePos, 0));
+		}
 		foldedNode->children.push_back(children[1]);
 		children[1] = nullptr;
-		
+
 		if (dump)
 			*dump << sourcePos.toWString() << L" while condition folded inside node\n";
-		
+
 		delete this;
-		
+
 		return foldedNode;
 	}
-	
+
 	Node* FoldedWhileNode::optimize(std::wostream* dump)
 	{
 		abort();
 		return nullptr;
 	}
-	
+
 	Node* EventDeclNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* EmitNode::optimize(std::wostream* dump)
 	{
 		for (auto it = children.begin(); it != children.end();)
@@ -233,24 +257,24 @@ namespace Aseba
 
 		return this;
 	}
-	
+
 	Node* SubDeclNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* CallSubNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* BinaryArithmeticNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
 		children[1] = children[1]->optimize(dump);
 		assert(children[1]);
-		
+
 		// constants elimination
 		// if both children are constants, pre-compute the result
 		auto* immediateLeftChild = dynamic_cast<ImmediateNode*>(children[0]);
@@ -261,7 +285,7 @@ namespace Aseba
 			int valueTwo = immediateRightChild->value;
 			int result;
 			SourcePos pos = sourcePos;
-			
+
 			switch (op)
 			{
 				case ASEBA_OP_SHIFT_LEFT: result = valueOne << valueTwo; break;
@@ -269,7 +293,7 @@ namespace Aseba
 				case ASEBA_OP_ADD: result = valueOne + valueTwo; break;
 				case ASEBA_OP_SUB: result = valueOne - valueTwo; break;
 				case ASEBA_OP_MULT: result = valueOne * valueTwo; break;
-				case ASEBA_OP_DIV: 
+				case ASEBA_OP_DIV:
 					if (valueTwo == 0)
 						throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 					else
@@ -281,30 +305,30 @@ namespace Aseba
 					else
 						result = valueOne % valueTwo;
 				break;
-				
+
 				case ASEBA_OP_BIT_OR: result = valueOne | valueTwo; break;
 				case ASEBA_OP_BIT_XOR: result = valueOne ^ valueTwo; break;
 				case ASEBA_OP_BIT_AND: result = valueOne & valueTwo; break;
-				
+
 				case ASEBA_OP_EQUAL: result = valueOne == valueTwo; break;
 				case ASEBA_OP_NOT_EQUAL: result = valueOne != valueTwo; break;
 				case ASEBA_OP_BIGGER_THAN: result = valueOne > valueTwo; break;
 				case ASEBA_OP_BIGGER_EQUAL_THAN: result = valueOne >= valueTwo; break;
 				case ASEBA_OP_SMALLER_THAN: result = valueOne < valueTwo; break;
 				case ASEBA_OP_SMALLER_EQUAL_THAN: result = valueOne <= valueTwo; break;
-				
+
 				case ASEBA_OP_OR: result = valueOne || valueTwo; break;
 				case ASEBA_OP_AND: result = valueOne && valueTwo; break;
-				
+
 				default: abort();
 			}
-			
+
 			if (dump)
 				*dump << sourcePos.toWString() << L" binary arithmetic expression simplified\n";
 			delete this;
 			return new ImmediateNode(pos, result);
 		}
-		
+
 		// neutral element optimisation
 		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
 		{
@@ -354,7 +378,7 @@ namespace Aseba
 				return returNode;
 			}
 		}
-		
+
 		// absorbing element optimisation
 		{
 			SourcePos pos = sourcePos;
@@ -391,9 +415,9 @@ namespace Aseba
 					return new ImmediateNode(pos, 1);
 				}
 			}
-				
+
 		}
-		
+
 		// POT mult/div to shift conversion
 		if (immediateRightChild && isPOT(immediateRightChild->value))
 		{
@@ -412,16 +436,16 @@ namespace Aseba
 					*dump << sourcePos.toWString() << L" division transformed to right shift\n";
 			}
 		}
-		
+
 		// detect static division by zero
 		if (op == ASEBA_OP_DIV && immediateRightChild && immediateRightChild->value == 0)
 		{
 			throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 		}
-		
+
 		return this;
 	}
-	
+
 	//! Recursively apply de Morgan law as long as nodes are logic operations, and then invert comparisons
 	void BinaryArithmeticNode::deMorganNotRemoval()
 	{
@@ -448,23 +472,23 @@ namespace Aseba
 			default: abort();
 		};
 	}
-	
+
 	Node* UnaryArithmeticNode::optimize(std::wostream* dump)
 	{
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		
+
 		// constants elimination
 		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
 		if (immediateChild)
 		{
 			int result;
 			SourcePos pos = sourcePos;
-			
+
 			switch (op)
 			{
 				case ASEBA_UNARY_OP_SUB: result = -immediateChild->value; break;
-				case ASEBA_UNARY_OP_ABS: 
+				case ASEBA_UNARY_OP_ABS:
 					if (immediateChild->value == -32768)
 						throw TranslatableError(sourcePos, ERROR_ABS_NOT_POSSIBLE);
 					else
@@ -474,7 +498,7 @@ namespace Aseba
 				case ASEBA_UNARY_OP_NOT: result = !immediateChild->value; break;
 				default: abort();
 			}
-			
+
 			if (dump)
 				*dump << sourcePos.toWString() << L" unary arithmetic expression simplified\n";
 			delete this;
@@ -499,28 +523,28 @@ namespace Aseba
 		else
 			return this;
 	}
-	
+
 	Node* ImmediateNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* LoadNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* StoreNode::optimize(std::wostream* dump)
 	{
 		return this;
 	}
-	
+
 	Node* ArrayReadNode::optimize(std::wostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		
+
 		// if the index is just an integer and not an expression of any variable,
 		// replace array acces by simple load and verify boundary conditions
 		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
@@ -532,10 +556,10 @@ namespace Aseba
 				throw TranslatableError(sourcePos,
 					ERROR_ARRAY_OUT_OF_BOUND_READ).arg(index).arg(arrayName).arg(arraySize);
 			}
-			
+
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
-			
+
 			if (dump)
 				*dump << sourcePos.toWString() << L" array access transformed to single variable access\n";
 			delete this;
@@ -544,13 +568,13 @@ namespace Aseba
 		else
 			return this;
 	}
-	
+
 	Node* ArrayWriteNode::optimize(std::wostream* dump)
 	{
 		// optimize index expression
 		children[0] = children[0]->optimize(dump);
 		assert(children[0]);
-		
+
 		// if the index is just an integer and not an expression of any variable,
 		// replace array acces by simple load and verify boundary conditions
 		auto* immediateChild = dynamic_cast<ImmediateNode*>(children[0]);
@@ -562,10 +586,10 @@ namespace Aseba
 				throw TranslatableError(sourcePos,
 					ERROR_ARRAY_OUT_OF_BOUND_WRITE).arg(index).arg(arrayName).arg(arraySize);
 			}
-			
+
 			unsigned varAddr = arrayAddr + index;
 			SourcePos pos = sourcePos;
-			
+
 			if (dump)
 				*dump << sourcePos.toWString() << L" array access transformed to single variable access\n";
 			delete this;
@@ -574,7 +598,7 @@ namespace Aseba
 		else
 			return this;
 	}
-	
+
 	Node* LoadNativeArgNode::optimize(std::wostream* dump)
 	{
 		// optimize index expression
@@ -584,7 +608,7 @@ namespace Aseba
 		assert(dynamic_cast<ImmediateNode*>(children[0]) == nullptr);
 		return this;
 	}
-	
+
 	Node* CallNode::optimize(std::wostream* dump)
 	{
 		for (auto it = children.begin(); it != children.end();)
@@ -597,7 +621,7 @@ namespace Aseba
 
 		return this;
 	}
-	
+
 	/*@}*/
-	
+
 } // namespace Aseba
