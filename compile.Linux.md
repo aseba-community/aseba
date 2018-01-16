@@ -42,7 +42,11 @@ You can install them system-wide by running:
 Or launch them directly from their built location; for example, you can then launch studio by typing:
 
     clients/studio/asebastudio
+    
+Tests can be run with:
 
+    make test
+    
 ## A note about permissions
 
 If you will be connecting to your robot through a serial port, you might need to add yourself to the group that has permission for that port.
