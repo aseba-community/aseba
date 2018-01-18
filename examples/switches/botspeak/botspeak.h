@@ -34,7 +34,7 @@ namespace Aseba
 	*/
 	/*@{*/
 
-	class BotSpeakBridge:  public Dashel::Hub, public Aseba::NodesManager
+	class BotSpeakBridge : public Dashel::Hub, public Aseba::NodesManager
 	{
 	protected:
 		typedef std::vector<std::string> StringVector;
@@ -111,15 +111,15 @@ namespace Aseba
 
 	protected:
 		// reimplemented from parent classes
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal);
-		virtual void incomingData(Dashel::Stream *stream);
+		virtual void connectionCreated(Dashel::Stream* stream);
+		virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
+		virtual void incomingData(Dashel::Stream* stream);
 		virtual void sendMessage(const Message& message);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 
 		// main handlers for activites on streams
-		void incomingAsebaData(Dashel::Stream *stream);
-		void incomingBotspeakData(Dashel::Stream *stream);
+		void incomingAsebaData(Dashel::Stream* stream);
+		void incomingBotspeakData(Dashel::Stream* stream);
 
 		// commands implementation
 		void processCommand(const std::string& command);
@@ -138,11 +138,10 @@ namespace Aseba
 		unsigned getVarSize(const std::string& varName);
 		unsigned eventId(const std::wstring& eventName) const;
 		void outputBotspeak(int value);
-		void outputBotspeak(const std::string& message, bool noEol=false);
+		void outputBotspeak(const std::string& message, bool noEol = false);
 	};
 
 	/*@}*/
 };
 
 #endif // BOTSPEAK_H
-

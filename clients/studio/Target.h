@@ -36,7 +36,7 @@ namespace Aseba
 	//! The interface to an aseba network. Used to interact with the nodes
 	/*! The target is responsible for maintaining the state of the network, querying new nodes, etc.
 	*/
-	class Target: public QObject
+	class Target : public QObject
 	{
 		Q_OBJECT
 
@@ -82,7 +82,7 @@ namespace Aseba
 		void variablesMemoryEstimatedDirty(unsigned node);
 
 		//! The content of the variables memory of a node has changed.
-		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
+		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector& variables);
 
 		//! The result of a set breakpoint call
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
@@ -92,7 +92,7 @@ namespace Aseba
 
 	public:
 		//! Virtual destructor.
-		virtual ~Target() { }
+		virtual ~Target() {}
 
 	public:
 		//! Return the language that we choosen for this connection
@@ -105,10 +105,10 @@ namespace Aseba
 		const QString getName(unsigned node) const;
 
 		//! Return a constant description of a node. Returned value is always valid if node exists
-		virtual const TargetDescription * const getDescription(unsigned node) const = 0;
+		virtual const TargetDescription* const getDescription(unsigned node) const = 0;
 
 		//! Upload bytecode to target.
-		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode) = 0;
+		virtual void uploadBytecode(unsigned node, const BytecodeVector& bytecode) = 0;
 
 		//! Save the bytecode currently on target
 		virtual void writeBytecode(unsigned node) = 0;
@@ -117,12 +117,12 @@ namespace Aseba
 		virtual void reboot(unsigned node) = 0;
 
 		//! Send an event to the aseba network.
-		virtual void sendEvent(unsigned id, const VariablesDataVector &data) = 0;
+		virtual void sendEvent(unsigned id, const VariablesDataVector& data) = 0;
 
 		// variables
 
 		//! Set part of variables memory
-		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector &data) = 0;
+		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector& data) = 0;
 
 		//! Get part of variables memory
 		virtual void getVariables(unsigned node, unsigned start, unsigned length) = 0;

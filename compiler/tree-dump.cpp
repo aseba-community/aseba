@@ -152,10 +152,7 @@ namespace Aseba
 		return s;
 	}
 
-	std::wstring SubDeclNode::toWString() const
-	{
-		return WFormatableString(L"Sub: %0").arg(subroutineId);
-	}
+	std::wstring SubDeclNode::toWString() const { return WFormatableString(L"Sub: %0").arg(subroutineId); }
 
 	std::wstring CallSubNode::toWString() const
 	{
@@ -178,20 +175,11 @@ namespace Aseba
 		return s;
 	}
 
-	std::wstring ImmediateNode::toWString() const
-	{
-		return WFormatableString(L"Immediate: %0").arg(value);
-	}
+	std::wstring ImmediateNode::toWString() const { return WFormatableString(L"Immediate: %0").arg(value); }
 
-	std::wstring LoadNode::toWString() const
-	{
-		return WFormatableString(L"Load: addr %0").arg(varAddr);
-	}
+	std::wstring LoadNode::toWString() const { return WFormatableString(L"Load: addr %0").arg(varAddr); }
 
-	std::wstring StoreNode::toWString() const
-	{
-		return WFormatableString(L"Store: addr %0").arg(varAddr);
-	}
+	std::wstring StoreNode::toWString() const { return WFormatableString(L"Store: addr %0").arg(varAddr); }
 
 	std::wstring ArrayReadNode::toWString() const
 	{
@@ -205,7 +193,11 @@ namespace Aseba
 
 	std::wstring LoadNativeArgNode::toWString() const
 	{
-		return WFormatableString(L"LoadNativeArgNode: addr %0 size %1 (var %2) using temp %3").arg(arrayAddr).arg(arraySize).arg(arrayName).arg(tempAddr);
+		return WFormatableString(L"LoadNativeArgNode: addr %0 size %1 (var %2) using temp %3")
+			.arg(arrayAddr)
+			.arg(arraySize)
+			.arg(arrayName)
+			.arg(tempAddr);
 	}
 
 	std::wstring CallNode::toWString() const
@@ -223,7 +215,10 @@ namespace Aseba
 
 	std::wstring MemoryVectorNode::toWString() const
 	{
-		return WFormatableString(L"Memory Vector Access: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
+		return WFormatableString(L"Memory Vector Access: addr %0 size %1 (var %2)")
+			.arg(arrayAddr)
+			.arg(arraySize)
+			.arg(arrayName);
 	}
 
 	std::wstring ArithmeticAssignmentNode::toWString() const
@@ -235,14 +230,14 @@ namespace Aseba
 
 	std::wstring UnaryArithmeticAssignmentNode::toWString() const
 	{
-		 std::wstring s = L"UnaryArithmeticAssign: ";
-		 if (arithmeticOp == ASEBA_OP_ADD)
-			 s += L"++";
-		 else if (arithmeticOp == ASEBA_OP_SUB)
-			 s += L"--";
-		 else
-			 s += L"unknown";
-		 return s;
+		std::wstring s = L"UnaryArithmeticAssign: ";
+		if (arithmeticOp == ASEBA_OP_ADD)
+			s += L"++";
+		else if (arithmeticOp == ASEBA_OP_SUB)
+			s += L"--";
+		else
+			s += L"unknown";
+		return s;
 	}
 
 	/*@}*/

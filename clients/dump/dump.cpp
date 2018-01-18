@@ -45,25 +45,21 @@ namespace Aseba
 		bool rawTime; //!< should displayed timestamps be of the form sec:usec since 1970
 
 	public:
-		Dump(bool rawTime) :
-			rawTime(rawTime)
-		{
-		}
+		Dump(bool rawTime) : rawTime(rawTime) {}
 
 	protected:
-
-		void connectionCreated(Stream *stream)
+		void connectionCreated(Stream* stream)
 		{
 			dumpTime(cout, rawTime);
-			cout << stream->getTargetName()  << " connection created." << endl;
+			cout << stream->getTargetName() << " connection created." << endl;
 		}
 
-		void incomingData(Stream *stream)
+		void incomingData(Stream* stream)
 		{
-			Message *message = Message::receive(stream);
+			Message* message = Message::receive(stream);
 
 			dumpTime(cout, rawTime);
-			cout << stream->getTargetName()  << " ";
+			cout << stream->getTargetName() << " ";
 			if (message)
 				message->dump(wcout);
 			else
@@ -71,7 +67,7 @@ namespace Aseba
 			cout << endl;
 		}
 
-		void connectionClosed(Stream *stream, bool abnormal)
+		void connectionClosed(Stream* stream, bool abnormal)
 		{
 			dumpTime(cout);
 			cout << stream->getTargetName() << " connection closed";
@@ -86,7 +82,7 @@ namespace Aseba
 
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba dump, print the content of aseba messages, usage:\n";
 	stream << programName << " [options] [targets]*\n";
@@ -99,14 +95,14 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "Aseba dump " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	bool rawTime = false;
@@ -116,7 +112,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if (strcmp(arg, "--rawtime") == 0)
 		{
@@ -149,7 +145,7 @@ int main(int argc, char *argv[])
 			dump.connect(targets[i]);
 		dump.run();
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}

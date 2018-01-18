@@ -28,12 +28,12 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	class StopThymioPlugin: public QObject, public NodeToolInterface
+	class StopThymioPlugin : public QObject, public NodeToolInterface
 	{
 		Q_OBJECT
 
 	public:
-		StopThymioPlugin(DevelopmentEnvironmentInterface *_de);
+		StopThymioPlugin(DevelopmentEnvironmentInterface* _de);
 		virtual void closeAsSoonAsPossible() {}
 		virtual QWidget* createMenuEntry();
 

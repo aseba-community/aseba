@@ -51,7 +51,8 @@ namespace Enki
 		//! Default virtual destructor
 		virtual ~SimulatorEnvironment() = default;
 		//! Notifies the environment of something happening inside a robot, takes a type, a description and a vector of arguments
-		virtual void notify(const EnvironmentNotificationType type, const std::string& description, const strings& arguments) = 0;
+		virtual void notify(
+			const EnvironmentNotificationType type, const std::string& description, const strings& arguments) = 0;
 		//! Return a writable local file path for this scenario and a given robot name and file number
 		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const = 0;
 		//! Return the current world
@@ -61,14 +62,14 @@ namespace Enki
 	//! A global pointer to the environment
 	extern std::unique_ptr<SimulatorEnvironment> simulatorEnvironment;
 
-	//! Helper macro to write notification sending in a convenient way
-	#define SEND_NOTIFICATION(type, description, ...) \
-	if (Enki::simulatorEnvironment) \
-		Enki::simulatorEnvironment->notify(Enki::EnvironmentNotificationType::type, description, {__VA_ARGS__});
+//! Helper macro to write notification sending in a convenient way
+#define SEND_NOTIFICATION(type, description, ...) \
+	if (Enki::simulatorEnvironment)               \
+		Enki::simulatorEnvironment->notify(Enki::EnvironmentNotificationType::type, description, { __VA_ARGS__ });
 
 	//! Return the Enki object of a given type associated with a given vm
 	template<typename ObjectType>
-	ObjectType *getEnkiObject(AsebaVMState *vm)
+	ObjectType* getEnkiObject(AsebaVMState* vm)
 	{
 		if (!Enki::simulatorEnvironment)
 			return nullptr;
@@ -77,7 +78,7 @@ namespace Enki
 			return nullptr;
 		for (World::ObjectsIterator objectIt = world->objects.begin(); objectIt != world->objects.end(); ++objectIt)
 		{
-			ObjectType *enkiObject = dynamic_cast<ObjectType*>(*objectIt);
+			ObjectType* enkiObject = dynamic_cast<ObjectType*>(*objectIt);
 			if (enkiObject && (&(enkiObject->vm) == vm))
 				return enkiObject;
 		}

@@ -38,12 +38,12 @@ namespace Aseba
 		StudioAeslEditor(const ScriptTab* tab);
 
 	protected:
-		virtual void dropEvent(QDropEvent *event);
-		virtual void insertFromMimeData ( const QMimeData * source );
+		virtual void dropEvent(QDropEvent* event);
+		virtual void insertFromMimeData(const QMimeData* source);
 
 	protected:
 		const ScriptTab* tab;
-		QWidget *dropSourceWidget;
+		QWidget* dropSourceWidget;
 	};
 
 	/*@}*/

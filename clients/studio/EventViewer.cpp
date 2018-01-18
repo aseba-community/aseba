@@ -20,34 +20,34 @@
 
 #ifdef HAVE_QWT
 
-#include "EventViewer.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QPushButton>
-#include <QDoubleSpinBox>
-#include <QFile>
-#include <QFileDialog>
-#include <QSettings>
-#include <QStandardPaths>
-#include <QtDebug>
+#	include "EventViewer.h"
+#	include <QVBoxLayout>
+#	include <QHBoxLayout>
+#	include <QCheckBox>
+#	include <QPushButton>
+#	include <QDoubleSpinBox>
+#	include <QFile>
+#	include <QFileDialog>
+#	include <QSettings>
+#	include <QStandardPaths>
+#	include <QtDebug>
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_legend.h>
+#	include <qwt_plot.h>
+#	include <qwt_plot_curve.h>
+#	include <qwt_legend.h>
 
-#if QWT_VERSION >= 0x060000
-	#include <qwt_series_data.h>
-#else
-	#include <qwt_data.h>
-#endif
+#	if QWT_VERSION >= 0x060000
+#		include <qwt_series_data.h>
+#	else
+#		include <qwt_data.h>
+#	endif
 
 namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
 
-	#if QWT_VERSION >= 0x060000
+#	if QWT_VERSION >= 0x060000
 	class EventDataWrapper : public QwtSeriesData<QPointF>
 	{
 	private:
@@ -55,15 +55,12 @@ namespace Aseba
 		std::deque<int16_t>& _y;
 
 	public:
-		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) :
-			_x(_x),
-			_y(_y)
-		{ }
-		virtual QRectF boundingRect () const { return qwtBoundingRect(*this); }
-		virtual QPointF sample (size_t i) const { return QPointF(_x[i], double(_y[i])); }
-		virtual size_t size () const { return _x.size(); }
+		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) : _x(_x), _y(_y) {}
+		virtual QRectF boundingRect() const { return qwtBoundingRect(*this); }
+		virtual QPointF sample(size_t i) const { return QPointF(_x[i], double(_y[i])); }
+		virtual size_t size() const { return _x.size(); }
 	};
-	#else
+#	else
 	class EventDataWrapper : public QwtData
 	{
 	private:
@@ -71,18 +68,18 @@ namespace Aseba
 		std::deque<int16_t>& _y;
 
 	public:
-		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) :
-			_x(_x),
-			_y(_y)
-		{ }
-		virtual QwtData *   copy () const { return new EventDataWrapper(*this); }
-		virtual size_t   size () const { return _x.size(); }
-		virtual double x (size_t i) const { return _x[i]; }
-		virtual double y (size_t i) const { return (double)_y[i]; }
+		EventDataWrapper(std::deque<double>& _x, std::deque<int16_t>& _y) : _x(_x), _y(_y) {}
+		virtual QwtData* copy() const { return new EventDataWrapper(*this); }
+		virtual size_t size() const { return _x.size(); }
+		virtual double x(size_t i) const { return _x[i]; }
+		virtual double y(size_t i) const { return (double)_y[i]; }
 	};
-	#endif
+#	endif
 
-	EventViewer::EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers) :
+	EventViewer::EventViewer(unsigned eventId,
+		const QString& eventName,
+		unsigned eventVariablesCount,
+		MainWindow::EventViewers* eventsViewers) :
 		eventId(eventId),
 		eventsViewers(eventsViewers),
 		values(eventVariablesCount),
@@ -96,27 +93,27 @@ namespace Aseba
 		plot->setAxisTitle(plot->xBottom, tr("Time (seconds)"));
 		plot->setAxisTitle(plot->yLeft, tr("Values"));
 
-		QwtLegend *legend = new QwtLegend;
+		QwtLegend* legend = new QwtLegend;
 		//legend->setItemMode(QwtLegend::CheckableItem);
 		plot->insertLegend(legend, QwtPlot::BottomLegend);
 
 		for (size_t i = 0; i < values.size(); i++)
 		{
-			QwtPlotCurve *curve = new QwtPlotCurve(QString("%0").arg(i));
-			#if QWT_VERSION >= 0x060000
+			QwtPlotCurve* curve = new QwtPlotCurve(QString("%0").arg(i));
+#	if QWT_VERSION >= 0x060000
 			curve->setData(new EventDataWrapper(timeStamps, values[i]));
-			#else
+#	else
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
-			#endif
+#	endif
 			curve->attach(plot);
 			curve->setPen(QPen(QColor::fromHsv((i * 360) / values.size(), 255, 100), 2));
 		}
 
-		QVBoxLayout *layout = new QVBoxLayout(this);
+		QVBoxLayout* layout = new QVBoxLayout(this);
 		layout->addWidget(plot);
 
 		// add control
-		QHBoxLayout *controlLayout = new QHBoxLayout;
+		QHBoxLayout* controlLayout = new QHBoxLayout;
 
 		status = new QLabel(tr("Recording..."));
 		controlLayout->addWidget(status);
@@ -125,7 +122,7 @@ namespace Aseba
 		connect(pauseRunButton, SIGNAL(clicked()), SLOT(pauseRunCapture()));
 		controlLayout->addWidget(pauseRunButton);
 
-		QPushButton *clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), tr("&Clear"));
+		QPushButton* clearButton = new QPushButton(QPixmap(QString(":/images/reset.png")), tr("&Clear"));
 		connect(clearButton, SIGNAL(clicked()), SLOT(clearPlot()));
 		controlLayout->addWidget(clearButton);
 
@@ -142,7 +139,7 @@ namespace Aseba
 		controlLayout->addWidget(timeWindowLength);
 		controlLayout->addStretch();
 
-		QPushButton *saveToFileButton = new QPushButton(QPixmap(QString(":/images/filesaveas.png")), tr("Save &As..."));
+		QPushButton* saveToFileButton = new QPushButton(QPixmap(QString(":/images/filesaveas.png")), tr("Save &As..."));
 		connect(saveToFileButton, SIGNAL(clicked()), SLOT(saveToFile()));
 		controlLayout->addWidget(saveToFileButton);
 
@@ -168,10 +165,7 @@ namespace Aseba
 		if (timeWindowCheckBox->isChecked())
 		{
 			// remove old data
-			while (
-				(!timeStamps.empty()) &&
-				(elapsedTime - timeStamps[0] > timeWindowLength->value())
-			)
+			while ((!timeStamps.empty()) && (elapsedTime - timeStamps[0] > timeWindowLength->value()))
 			{
 				timeStamps.pop_front();
 				for (size_t i = 0; i < values.size(); i++)
@@ -229,7 +223,10 @@ namespace Aseba
 	void EventViewer::saveToFile()
 	{
 		QSettings settings;
-		QString lastFileName(settings.value("EventViewer/exportFileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString());
+		QString lastFileName(settings
+								 .value("EventViewer/exportFileName",
+									 QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation))
+								 .toString());
 		QString filter = "Text files (*.txt);;CSV files (*.csv);;All Files (*)";
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, filter);
 

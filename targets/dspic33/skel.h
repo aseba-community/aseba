@@ -38,8 +38,6 @@
 #include <skel-user.h>
 
 
-
-
 extern struct _vmVariables vmVariables;
 
 extern unsigned int events_flags;
@@ -53,9 +51,6 @@ extern AsebaVMState vmState;
 #define SET_EVENT(event) atomic_or(&events_flags, 1 << event)
 #define CLEAR_EVENT(event) atomic_and(&events_flags, ~(1 << event))
 #define IS_EVENT(event) (events_flags & (1 << event))
-
-
-
 
 
 // Call this when everything is initialised and you are ready to give full control to the VM

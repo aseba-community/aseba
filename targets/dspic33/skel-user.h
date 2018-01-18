@@ -26,7 +26,7 @@
 #define DMA_CAN_TX DMA_CHANNEL_1
 
 // GPIO to use to set CAN speed
-#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD,11)
+#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD, 11)
 
 // CAN interrupt priority
 #define PRIO_CAN 5
@@ -50,17 +50,17 @@
 
 
 /* The number of opcode an aseba script can have */
-#define VM_BYTECODE_SIZE 766  // PUT HERE 766 + 768 * a, where a is >= 0
+#define VM_BYTECODE_SIZE 766 // PUT HERE 766 + 768 * a, where a is >= 0
 #define VM_STACK_SIZE 32
 
 
-
-struct _vmVariables {
+struct _vmVariables
+{
 	// NodeID
 	int16_t id;
 	// source
 	int16_t source;
-		// args
+	// args
 	int16_t args[VM_VARIABLES_ARG_SIZE];
 
 	/****
@@ -88,10 +88,10 @@ enum Events
 // The glue provide a way to store and retrive it from flash.
 // The only way to write it is to do it from inside the VM (native function)
 // The native function access it as a integer array. So, use only int inside this structure
-struct private_settings {
+struct private_settings
+{
 	/* ADD here the settings to save into flash */
 	/* The minimum size is one integer, the maximum size is 95 integer (Check done at compilation) */
 	int first_setting;
 	int second_setting;
 };
-

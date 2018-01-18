@@ -36,7 +36,7 @@ namespace Aseba
 		for (auto it = children.begin(); it != children.end();)
 		{
 			// generic optimization and removal
-			Node *optimizedChild = (*it)->optimize(dump);
+			Node* optimizedChild = (*it)->optimize(dump);
 			if (!optimizedChild)
 			{
 				it = children.erase(it);
@@ -46,7 +46,7 @@ namespace Aseba
 				*it = optimizedChild;
 
 			// special case for empty blocks
-			if (dynamic_cast<BlockNode *>(*it) && (*it)->children.empty())
+			if (dynamic_cast<BlockNode*>(*it) && (*it)->children.empty())
 			{
 				delete *it;
 				it = children.erase(it);
@@ -75,10 +75,10 @@ namespace Aseba
 
 		// optimise true block, which may be null afterwards
 		children[1] = children[1]->optimize(dump);
-		Node *trueBlock = children[1];
+		Node* trueBlock = children[1];
 
 		// optimise false block, which may be null afterwards
-		Node *falseBlock;
+		Node* falseBlock;
 		if (children.size() > 2)
 		{
 			children[2] = children[2]->optimize(dump);
@@ -90,10 +90,8 @@ namespace Aseba
 			falseBlock = nullptr;
 
 		// check if both block are null or do not contain any data, in this case return
-		if (
-			((trueBlock == nullptr) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty())) &&
-			((falseBlock == nullptr) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty()))
-		)
+		if (((trueBlock == nullptr) || (dynamic_cast<BlockNode*>(trueBlock) && trueBlock->children.empty()))
+			&& ((falseBlock == nullptr) || (dynamic_cast<BlockNode*>(falseBlock) && falseBlock->children.empty())))
 		{
 			if (dump)
 				*dump << sourcePos.toWString() << L" if test removed because it had no associated code\n";
@@ -130,7 +128,7 @@ namespace Aseba
 
 		// fold operation inside if
 		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
-		auto *foldedNode = new FoldedIfWhenNode(sourcePos);
+		auto* foldedNode = new FoldedIfWhenNode(sourcePos);
 		foldedNode->op = operation->op;
 		foldedNode->edgeSensitive = edgeSensitive;
 		foldedNode->endLine = endLine;
@@ -195,7 +193,7 @@ namespace Aseba
 
 		// fold operation inside loop
 		auto* operation = polymorphic_downcast<BinaryArithmeticNode*>(children[0]);
-		auto *foldedNode = new FoldedWhileNode(sourcePos);
+		auto* foldedNode = new FoldedWhileNode(sourcePos);
 		foldedNode->op = operation->op;
 		foldedNode->children.push_back(operation->children[0]);
 		foldedNode->children.push_back(operation->children[1]);
@@ -217,10 +215,7 @@ namespace Aseba
 		return nullptr;
 	}
 
-	Node* EventDeclNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* EventDeclNode::optimize(std::wostream* dump) { return this; }
 
 	Node* EmitNode::optimize(std::wostream* dump)
 	{
@@ -234,15 +229,9 @@ namespace Aseba
 		return this;
 	}
 
-	Node* SubDeclNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* SubDeclNode::optimize(std::wostream* dump) { return this; }
 
-	Node* CallSubNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* CallSubNode::optimize(std::wostream* dump) { return this; }
 
 	Node* BinaryArithmeticNode::optimize(std::wostream* dump)
 	{
@@ -274,13 +263,13 @@ namespace Aseba
 						throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 					else
 						result = valueOne / valueTwo;
-				break;
+					break;
 				case ASEBA_OP_MOD:
 					if (valueTwo == 0)
 						throw TranslatableError(sourcePos, ERROR_DIVISION_BY_ZERO);
 					else
 						result = valueOne % valueTwo;
-				break;
+					break;
 
 				case ASEBA_OP_BIT_OR: result = valueOne | valueTwo; break;
 				case ASEBA_OP_BIT_XOR: result = valueOne ^ valueTwo; break;
@@ -308,7 +297,7 @@ namespace Aseba
 		// neutral element optimisation
 		// multiplications/division by 1, addition/substraction of 0, OR with 0 or false, AND with -1 or true
 		{
-			Node **survivor(nullptr);
+			Node** survivor(nullptr);
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_DIV)
 			{
 				if (immediateRightChild && (immediateRightChild->value == 1))
@@ -348,7 +337,7 @@ namespace Aseba
 			{
 				if (dump)
 					*dump << sourcePos.toWString() << L" operation with neutral element removed\n";
-				Node *returNode = *survivor;
+				Node* returNode = *survivor;
 				*survivor = nullptr;
 				delete this;
 				return returNode;
@@ -360,8 +349,8 @@ namespace Aseba
 			SourcePos pos = sourcePos;
 			if (op == ASEBA_OP_MULT || op == ASEBA_OP_BIT_AND || op == ASEBA_OP_AND)
 			{
-				if ((immediateRightChild && (immediateRightChild->value == 0)) ||
-					(immediateLeftChild && (immediateLeftChild->value == 0)))
+				if ((immediateRightChild && (immediateRightChild->value == 0))
+					|| (immediateLeftChild && (immediateLeftChild->value == 0)))
 				{
 					if (dump)
 						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
@@ -371,8 +360,8 @@ namespace Aseba
 			}
 			if (op == ASEBA_OP_BIT_OR)
 			{
-				if ((immediateRightChild && (immediateRightChild->value == -1)) ||
-					(immediateLeftChild && (immediateLeftChild->value == -1)))
+				if ((immediateRightChild && (immediateRightChild->value == -1))
+					|| (immediateLeftChild && (immediateLeftChild->value == -1)))
 				{
 					if (dump)
 						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
@@ -382,8 +371,8 @@ namespace Aseba
 			}
 			if (op == ASEBA_OP_OR)
 			{
-				if ((immediateRightChild && (immediateRightChild->value != 0)) ||
-					(immediateLeftChild && (immediateLeftChild->value != 0)))
+				if ((immediateRightChild && (immediateRightChild->value != 0))
+					|| (immediateLeftChild && (immediateLeftChild->value != 0)))
 				{
 					if (dump)
 						*dump << sourcePos.toWString() << L" operation with absorbing element removed\n";
@@ -391,7 +380,6 @@ namespace Aseba
 					return new ImmediateNode(pos, 1);
 				}
 			}
-
 		}
 
 		// POT mult/div to shift conversion
@@ -439,12 +427,12 @@ namespace Aseba
 				op = ASEBA_OP_AND;
 				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
 				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
-			break;
+				break;
 			case ASEBA_OP_AND:
 				op = ASEBA_OP_OR;
 				polymorphic_downcast<BinaryArithmeticNode*>(children[0])->deMorganNotRemoval();
 				polymorphic_downcast<BinaryArithmeticNode*>(children[1])->deMorganNotRemoval();
-			break;
+				break;
 			default: abort();
 		};
 	}
@@ -469,7 +457,7 @@ namespace Aseba
 						throw TranslatableError(sourcePos, ERROR_ABS_NOT_POSSIBLE);
 					else
 						result = abs(immediateChild->value);
-				break;
+					break;
 				case ASEBA_UNARY_OP_BIT_NOT: result = ~immediateChild->value; break;
 				case ASEBA_UNARY_OP_NOT: result = !immediateChild->value; break;
 				default: abort();
@@ -500,20 +488,11 @@ namespace Aseba
 			return this;
 	}
 
-	Node* ImmediateNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* ImmediateNode::optimize(std::wostream* dump) { return this; }
 
-	Node* LoadNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* LoadNode::optimize(std::wostream* dump) { return this; }
 
-	Node* StoreNode::optimize(std::wostream* dump)
-	{
-		return this;
-	}
+	Node* StoreNode::optimize(std::wostream* dump) { return this; }
 
 	Node* ArrayReadNode::optimize(std::wostream* dump)
 	{
@@ -529,8 +508,10 @@ namespace Aseba
 			unsigned index = immediateChild->value;
 			if (index >= arraySize)
 			{
-				throw TranslatableError(sourcePos,
-					ERROR_ARRAY_OUT_OF_BOUND_READ).arg(index).arg(arrayName).arg(arraySize);
+				throw TranslatableError(sourcePos, ERROR_ARRAY_OUT_OF_BOUND_READ)
+					.arg(index)
+					.arg(arrayName)
+					.arg(arraySize);
 			}
 
 			unsigned varAddr = arrayAddr + index;
@@ -559,8 +540,10 @@ namespace Aseba
 			unsigned index = immediateChild->value;
 			if (index >= arraySize)
 			{
-				throw TranslatableError(sourcePos,
-					ERROR_ARRAY_OUT_OF_BOUND_WRITE).arg(index).arg(arrayName).arg(arraySize);
+				throw TranslatableError(sourcePos, ERROR_ARRAY_OUT_OF_BOUND_WRITE)
+					.arg(index)
+					.arg(arrayName)
+					.arg(arraySize);
 			}
 
 			unsigned varAddr = arrayAddr + index;

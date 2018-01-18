@@ -21,27 +21,25 @@
 
 /* Descriptors */
 
-const AsebaVMDescription vmDescription = {
-	"myasebaname", 	// Name of the microcontroller
+const AsebaVMDescription vmDescription = { "myasebaname", // Name of the microcontroller
 	{
-		{ 1, "_id" },	// Do not touch it
+		{ 1, "_id" }, // Do not touch it
 		{ 1, "event.source" }, // nor this one
-		{ VM_VARIABLES_ARG_SIZE, "event.args" },	// neither this one
-		
-		
-		 /******
+		{ VM_VARIABLES_ARG_SIZE, "event.args" }, // neither this one
+
+
+		/******
           ---> PUT YOUR VARIABLES DESCRIPTIONS HERE <---
          first value is the number of element in the array (1 if not an array)
          second value is the name of the variable which will be displayed in aseba studio
          ******/
 
 
-		{ 0, NULL }	// null terminated
-	}
-};
+		{ 0, NULL } // null terminated
+	} };
 
 
-static const AsebaLocalEventDescription localEvents[] = { 
+static const AsebaLocalEventDescription localEvents[] = {
 	/*******
 	---> PUT YOUR EVENT DESCRIPTIONS HERE <---
 	First value is event "name" (will be used as "onvent name" in asebastudio
@@ -55,9 +53,9 @@ static const AsebaNativeFunctionDescription* nativeFunctionsDescription[] = {
 	&AsebaNativeDescription__system_settings_read,
 	&AsebaNativeDescription__system_settings_write,
 	&AsebaNativeDescription__system_settings_flash,
-	
+
 	ASEBA_NATIVES_STD_DESCRIPTIONS,
-	0	// null terminated
+	0 // null terminated
 };
 
 static AsebaNativeFunctionPointer nativeFunctions[] = {
@@ -68,6 +66,3 @@ static AsebaNativeFunctionPointer nativeFunctions[] = {
 
 	ASEBA_NATIVES_STD_FUNCTIONS,
 };
-
-
-

@@ -33,33 +33,33 @@ class MainWindow : public QWidget
 {
 	Q_OBJECT
 
-	public:
-		explicit MainWindow(QWidget *parent = 0);
-		~MainWindow();
+public:
+	explicit MainWindow(QWidget* parent = 0);
+	~MainWindow();
 
-	protected:
-		DashelInterface dashelInterface;
+protected:
+	DashelInterface dashelInterface;
 
-		//
-		QLineEdit* ip;
-		QLineEdit* port;
-		QLabel* status;
-		QPushButton* connectBtn;
-		//
-		QLineEdit* msgId;
-		QLineEdit* msgValue;
-		QPushButton* sendMsg;
-		//
-		QPushButton* quitBtn;
+	//
+	QLineEdit* ip;
+	QLineEdit* port;
+	QLabel* status;
+	QPushButton* connectBtn;
+	//
+	QLineEdit* msgId;
+	QLineEdit* msgValue;
+	QPushButton* sendMsg;
+	//
+	QPushButton* quitBtn;
 
-	protected slots:
-		void connectToDashel();
-		void sendUserMessage();
+protected slots:
+	void connectToDashel();
+	void sendUserMessage();
 
-		// interface with Dashel
-		void connectionFromDashel();
-		void disconnectionFromDashel();
-		void messageFromDashel(Aseba::UserMessage *message);
+	// interface with Dashel
+	void connectionFromDashel();
+	void disconnectionFromDashel();
+	void messageFromDashel(Aseba::UserMessage* message);
 };
 
 #endif // MAINWINDOW_H

@@ -138,9 +138,7 @@ namespace Aseba
 				expectType(ReturnType::BOOL, children[1]->typeCheck(compiler));
 				return ReturnType::BOOL;
 
-			default:
-				abort();
-				return ReturnType::UNIT;
+			default: abort(); return ReturnType::UNIT;
 		}
 	}
 
@@ -158,13 +156,10 @@ namespace Aseba
 				expectType(ReturnType::BOOL, children[0]->typeCheck(compiler));
 				return ReturnType::BOOL;
 
-			default:
-				abort();
-				return ReturnType::UNIT;
+			default: abort(); return ReturnType::UNIT;
 		}
 	}
 
 	/*@}*/
 
 } // namespace Aseba
-

@@ -22,14 +22,15 @@
 #define ASEBA_VM_BUFFER
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "../../common/types.h"
 #include "../../vm/vm.h"
 #include "../../vm/natives.h"
 
-/**
+	/**
 	\defgroup transport-buffer Helper for transport layers using buffers
 
 	This helper provides to the VM:
@@ -52,29 +53,29 @@ extern "C" {
 	* AsebaNativeFunction()
 	* AsebaAssert(), if ASEBA_ASSERT is defined
 */
-/*@{*/
+	/*@{*/
 
-// functions this helper provides
+	// functions this helper provides
 
-/*! Read messages and process messages from transport layer, if any */
-void AsebaProcessIncomingEvents(AsebaVMState *vm);
+	/*! Read messages and process messages from transport layer, if any */
+	void AsebaProcessIncomingEvents(AsebaVMState* vm);
 
-// functions this helper needs
+	// functions this helper needs
 
-extern void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length);
+	extern void AsebaSendBuffer(AsebaVMState* vm, const uint8_t* data, uint16_t length);
 
-extern uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source);
+	extern uint16_t AsebaGetBuffer(AsebaVMState* vm, uint8_t* data, uint16_t maxLength, uint16_t* source);
 
-extern const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm);
+	extern const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState* vm);
 
-extern const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm);
+	extern const AsebaLocalEventDescription* AsebaGetLocalEventsDescriptions(AsebaVMState* vm);
 
-extern const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm);
+	extern const AsebaNativeFunctionDescription* const* AsebaGetNativeFunctionsDescriptions(AsebaVMState* vm);
 
-/*@}*/
+	/*@}*/
 
 #ifdef __cplusplus
 }
-#endif
+#	endif
 
 #endif

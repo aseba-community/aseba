@@ -23,7 +23,7 @@
 
 #include <enki/robots/marxbot/Marxbot.h>
 #ifndef ASEBA_ASSERT
-#define ASEBA_ASSERT
+#	define ASEBA_ASSERT
 #endif
 #include "../../vm/vm.h"
 #include "../../common/consts.h"
@@ -55,9 +55,7 @@ namespace Enki
 			unsigned short source;
 			std::valarray<unsigned char> data;
 
-			Event(unsigned short source, const uint8_t* data, uint16_t length) :
-				source(source),
-				data(length)
+			Event(unsigned short source, const uint8_t* data, uint16_t length) : source(source), data(length)
 			{
 				memcpy(&this->data[0], data, length);
 			}
@@ -136,11 +134,10 @@ namespace Enki
 
 	public:
 		// public because accessed from a glue function
-		std::vector<Module *> modules;
+		std::vector<Module*> modules;
 		static int marxbotNumber;
 
 	public:
-
 		//! Constructor, connect to a host and register VMs
 		AsebaMarxbot();
 		//! Destructor, unregister VMs
@@ -148,16 +145,14 @@ namespace Enki
 		//! In addition to DifferentialWheeled::step(), update aseba variables and initiate periodic events.
 		virtual void controlStep(double dt);
 
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+		virtual void connectionCreated(Dashel::Stream* stream);
+		virtual void incomingData(Dashel::Stream* stream);
+		virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
 
 		// this must be public because of bindings to C functions
 		Dashel::Stream* stream;
 		// all streams that must be disconnected at next step
 		std::vector<Dashel::Stream*> toDisconnect;
 	};
-
 }
 #endif
-

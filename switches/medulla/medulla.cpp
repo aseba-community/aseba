@@ -70,32 +70,28 @@ namespace Aseba
 		emit Event(id, name, data);
 	}
 
-	void EventFilterInterface::ListenEvent(const uint16_t event)
-	{
-		network->listenEvent(this, event);
-	}
+	void EventFilterInterface::ListenEvent(const uint16_t event) { network->listenEvent(this, event); }
 
-	void EventFilterInterface::ListenEventName(const QString& name, const QDBusMessage &message)
+	void EventFilterInterface::ListenEventName(const QString& name, const QDBusMessage& message)
 	{
 		size_t event;
 		if (network->commonDefinitions.events.contains(name.toStdWString(), &event))
 			network->listenEvent(this, event);
 		else
-			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			network->DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 
-	void EventFilterInterface::IgnoreEvent(const uint16_t event)
-	{
-		network->ignoreEvent(this, event);
-	}
+	void EventFilterInterface::IgnoreEvent(const uint16_t event) { network->ignoreEvent(this, event); }
 
-	void EventFilterInterface::IgnoreEventName(const QString& name, const QDBusMessage &message)
+	void EventFilterInterface::IgnoreEventName(const QString& name, const QDBusMessage& message)
 	{
 		size_t event;
 		if (network->commonDefinitions.events.contains(name.toStdWString(), &event))
 			network->ignoreEvent(this, event);
 		else
-			network->DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			network->DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 
 	void EventFilterInterface::Free()
@@ -117,12 +113,12 @@ namespace Aseba
 		DBusConnectionBus().registerService("ch.epfl.mobots.Aseba");
 
 		// regular network pinging
-		QTimer *timer = new QTimer(this);
+		QTimer* timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(PingNetwork()));
 		timer->start(1000);
 	}
 
-	void AsebaNetworkInterface::processMessage(Message *message, const Dashel::Stream* sourceStream)
+	void AsebaNetworkInterface::processMessage(Message* message, const Dashel::Stream* sourceStream)
 	{
 		// send messages to Dashel peers
 		hub->sendMessage(message, sourceStream);
@@ -131,14 +127,14 @@ namespace Aseba
 		NodesManager::processMessage(message);
 
 		// if user message, send to D-Bus as well
-		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+		UserMessage* userMessage = dynamic_cast<UserMessage*>(message);
 		if (userMessage)
 		{
 			sendEventOnDBus(userMessage->type, fromAsebaVector(userMessage->data));
 		}
 
 		// if variables, check for pending answers
-		Variables *variables = dynamic_cast<Variables *>(message);
+		Variables* variables = dynamic_cast<Variables*>(message);
 		if (variables)
 		{
 			const unsigned nodeId(variables->source);
@@ -148,7 +144,7 @@ namespace Aseba
 				RequestData* request(*it);
 				if (request->nodeId == nodeId && request->pos == pos)
 				{
-					QDBusMessage &reply(request->reply);
+					QDBusMessage& reply(request->reply);
 					Values values(fromAsebaVector(variables->variables));
 					reply << QVariant::fromValue(values);
 					DBusConnectionBus().send(reply);
@@ -191,12 +187,13 @@ namespace Aseba
 			eventsFilters.remove(events.at(i), filter);
 	}
 
-	void AsebaNetworkInterface::LoadScripts(const QString& fileName, const QDBusMessage &message)
+	void AsebaNetworkInterface::LoadScripts(const QString& fileName, const QDBusMessage& message)
 	{
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("file %0 does not exists").arg(fileName)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("file %0 does not exists").arg(fileName)));
 			return;
 		}
 
@@ -206,7 +203,11 @@ namespace Aseba
 		int errorColumn;
 		if (!document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::Other, QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)));
+			DBusConnectionBus().send(message.createErrorReply(QDBusError::Other,
+				QString("Error in XML source file: %0 at line %1, column %2")
+					.arg(errorMsg)
+					.arg(errorLine)
+					.arg(errorColumn)));
 			return;
 		}
 
@@ -227,7 +228,8 @@ namespace Aseba
 				if (element.tagName() == "node")
 				{
 					bool ok;
-					const unsigned nodeId(getNodeId(element.attribute("name").toStdWString(), element.attribute("nodeId", 0).toUInt(), &ok));
+					const unsigned nodeId(getNodeId(
+						element.attribute("name").toStdWString(), element.attribute("nodeId", 0).toUInt(), &ok));
 					if (ok)
 					{
 						std::wistringstream is(element.firstChild().toText().data().toStdWString());
@@ -245,14 +247,15 @@ namespace Aseba
 							typedef std::vector<std::unique_ptr<Message>> MessageVector;
 							MessageVector messages;
 							sendBytecode(messages, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
-							for (const auto& message: messages)
+							for (const auto& message : messages)
 								hub->sendMessage(*message);
 							Run msg(nodeId);
 							hub->sendMessage(msg);
 						}
 						else
 						{
-							DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString::fromStdWString(error.toWString())));
+							DBusConnectionBus().send(message.createErrorReply(
+								QDBusError::Failed, QString::fromStdWString(error.toWString())));
 							wasError = true;
 							break;
 						}
@@ -268,7 +271,11 @@ namespace Aseba
 					const unsigned eventSize(element.attribute("size").toUInt());
 					if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
 					{
-						DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed, QString("Event %1 has a length %2 larger than maximum %3").arg(eventName).arg(eventSize).arg(ASEBA_MAX_EVENT_ARG_SIZE)));
+						DBusConnectionBus().send(message.createErrorReply(QDBusError::Failed,
+							QString("Event %1 has a length %2 larger than maximum %3")
+								.arg(eventName)
+								.arg(eventSize)
+								.arg(ASEBA_MAX_EVENT_ARG_SIZE)));
 						wasError = true;
 						break;
 					}
@@ -279,7 +286,8 @@ namespace Aseba
 				}
 				else if (element.tagName() == "constant")
 				{
-					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
+					commonDefinitions.constants.push_back(
+						NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toInt()));
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -288,7 +296,8 @@ namespace Aseba
 		// check if there was an error
 		if (wasError)
 		{
-			std::wcerr << QString("There was an error while loading script %1").arg(fileName).toStdWString() << std::endl;
+			std::wcerr << QString("There was an error while loading script %1").arg(fileName).toStdWString()
+					   << std::endl;
 			commonDefinitions.events.clear();
 			commonDefinitions.constants.clear();
 			userDefinedVariablesMap.clear();
@@ -297,7 +306,11 @@ namespace Aseba
 		// check if there was some matching problem
 		if (noNodeCount)
 		{
-			std::wcerr << QString("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount).toStdWString() << std::endl;
+			std::wcerr << QString(
+							  "%0 scripts have no corresponding nodes in the current network and have not been loaded.")
+							  .arg(noNodeCount)
+							  .toStdWString()
+					   << std::endl;
 		}
 	}
 
@@ -311,34 +324,37 @@ namespace Aseba
 		return list;
 	}
 
-	qint16 AsebaNetworkInterface::GetNodeId(const QString& node, const QDBusMessage &message) const
+	qint16 AsebaNetworkInterface::GetNodeId(const QString& node, const QDBusMessage& message) const
 	{
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return 0;
 		}
 		return nodeIt.value();
 	}
 
-	QString AsebaNetworkInterface::GetNodeName(const uint16_t nodeId, const QDBusMessage &message) const
+	QString AsebaNetworkInterface::GetNodeName(const uint16_t nodeId, const QDBusMessage& message) const
 	{
 		const QString nodeName(QString::fromStdWString(getNodeName(nodeId)));
 		if (nodeName.isEmpty())
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(nodeId)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(nodeId)));
 			return 0;
 		}
 		return nodeName;
 	}
 
-	bool AsebaNetworkInterface::IsConnected(const QString& node, const QDBusMessage &message) const
+	bool AsebaNetworkInterface::IsConnected(const QString& node, const QDBusMessage& message) const
 	{
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return 0;
 		}
 		return nodes.find(nodeIt.value())->second.connected;
@@ -379,13 +395,17 @@ namespace Aseba
 		}
 	}
 
-	void AsebaNetworkInterface::SetVariable(const QString& node, const QString& variable, const Values& data, const QDBusMessage &message) const
+	void AsebaNetworkInterface::SetVariable(const QString& node,
+		const QString& variable,
+		const Values& data,
+		const QDBusMessage& message) const
 	{
 		// make sure the node exists
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return;
 		}
 		const unsigned nodeId(nodeIt.value());
@@ -411,7 +431,8 @@ namespace Aseba
 			pos = getVariablePos(nodeId, variable.toStdWString(), &ok);
 			if (!ok)
 			{
-				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs,
+					QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
 				return;
 			}
 		}
@@ -420,13 +441,14 @@ namespace Aseba
 		hub->sendMessage(msg);
 	}
 
-	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage &message)
+	Values AsebaNetworkInterface::GetVariable(const QString& node, const QString& variable, const QDBusMessage& message)
 	{
 		// make sure the node exists
 		NodesNamesMap::const_iterator nodeIt(nodesNames.find(node));
 		if (nodeIt == nodesNames.end())
 		{
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("node %0 does not exists").arg(node)));
 			return Values();
 		}
 		const unsigned nodeId(nodeIt.value());
@@ -455,7 +477,8 @@ namespace Aseba
 			length = getVariableSize(nodeId, variable.toStdWString(), &ok2);
 			if (!(ok1 && ok2))
 			{
-				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
+				DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs,
+					QString("variable %0 does not exists in node %1").arg(variable).arg(node)));
 				return Values();
 			}
 		}
@@ -467,7 +490,7 @@ namespace Aseba
 		}
 
 		// build bookkeeping for async reply
-		RequestData *request = new RequestData;
+		RequestData* request = new RequestData;
 		request->nodeId = nodeId;
 		request->pos = pos;
 		message.setDelayedReply(true);
@@ -487,31 +510,27 @@ namespace Aseba
 		hub->sendMessage(msg);
 	}
 
-	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage &message)
+	void AsebaNetworkInterface::SendEventName(const QString& name, const Values& data, const QDBusMessage& message)
 	{
 		size_t event;
 		if (commonDefinitions.events.contains(name.toStdWString(), &event))
 			SendEvent(event, data);
 		else
-			DBusConnectionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
+			DBusConnectionBus().send(
+				message.createErrorReply(QDBusError::InvalidArgs, QString("no event named %0").arg(name)));
 	}
 
 	QDBusObjectPath AsebaNetworkInterface::CreateEventFilter()
 	{
 		QDBusObjectPath path(QString("/events_filters/%0").arg(eventsFiltersCounter++));
-		DBusConnectionBus().registerObject(path.path(), new EventFilterInterface(this), QDBusConnection::ExportScriptableContents);
+		DBusConnectionBus().registerObject(
+			path.path(), new EventFilterInterface(this), QDBusConnection::ExportScriptableContents);
 		return path;
 	}
 
-	void AsebaNetworkInterface::PingNetwork()
-	{
-		pingNetwork();
-	}
+	void AsebaNetworkInterface::PingNetwork() { pingNetwork(); }
 
-	void AsebaNetworkInterface::sendMessage(const Message& message)
-	{
-		hub->sendMessage(message);
-	}
+	void AsebaNetworkInterface::sendMessage(const Message& message) { hub->sendMessage(message); }
 
 	void AsebaNetworkInterface::nodeDescriptionReceived(unsigned nodeId)
 	{
@@ -529,9 +548,9 @@ namespace Aseba
 	// the following methods run in the main thread (event loop)
 
 	Hub::Hub(unsigned port, bool verbose, bool dump, bool forward, bool rawTime, bool systemBus) :
-		#ifdef DASHEL_VERSION_INT
+#ifdef DASHEL_VERSION_INT
 		Dashel::Hub(verbose || dump),
-		#endif // DASHEL_VERSION_INT
+#endif // DASHEL_VERSION_INT
 		verbose(verbose),
 		dump(dump),
 		forward(forward),
@@ -539,13 +558,16 @@ namespace Aseba
 	{
 		// TODO: work in progress to remove ugly delay
 		AsebaNetworkInterface* network(new AsebaNetworkInterface(this, systemBus));
-		QObject::connect(this, SIGNAL(messageAvailable(Message*, const Dashel::Stream*)), network, SLOT(processMessage(Message*, const Dashel::Stream*)));
+		QObject::connect(this,
+			SIGNAL(messageAvailable(Message*, const Dashel::Stream*)),
+			network,
+			SLOT(processMessage(Message*, const Dashel::Stream*)));
 		ostringstream oss;
 		oss << "tcpin:port=" << port;
 		Dashel::Hub::connect(oss.str());
 	}
 
-	void Hub::sendMessage(const Message *message, const Stream* sourceStream)
+	void Hub::sendMessage(const Message* message, const Stream* sourceStream)
 	{
 		// dump if requested
 		if (dump)
@@ -559,7 +581,7 @@ namespace Aseba
 		lock();
 
 		// write on all connected streams
-		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
+		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end(); ++it)
 		{
 			Stream* destStream(*it);
 
@@ -581,25 +603,19 @@ namespace Aseba
 		unlock();
 	}
 
-	void Hub::sendMessage(const Message& message, const Stream* sourceStream)
-	{
-		sendMessage(&message, sourceStream);
-	}
+	void Hub::sendMessage(const Message& message, const Stream* sourceStream) { sendMessage(&message, sourceStream); }
 
 	// the following methods run in the blocking reception thread
 
 	// In QThread main function, we just make our Dashel hub switch listen for incoming data
-	void Hub::run()
-	{
-		Dashel::Hub::run();
-	}
+	void Hub::run() { Dashel::Hub::run(); }
 
 	// the following method run in the blocking reception thread
 
-	void Hub::incomingData(Stream *stream)
+	void Hub::incomingData(Stream* stream)
 	{
 		// receive message
-		Message *message(0);
+		Message* message(0);
 		try
 		{
 			message = Message::receive(stream);
@@ -614,7 +630,7 @@ namespace Aseba
 		emit messageAvailable(message, stream);
 	}
 
-	void Hub::connectionCreated(Stream *stream)
+	void Hub::connectionCreated(Stream* stream)
 	{
 		if (verbose)
 		{
@@ -629,7 +645,8 @@ namespace Aseba
 		{
 			dumpTime(cout);
 			if (abnormal)
-				cout << "Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+				cout << "Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason()
+					 << endl;
 			else
 				cout << "Normal connection closed to " << stream->getTargetName() << endl;
 		}
@@ -639,7 +656,7 @@ namespace Aseba
 };
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba medulla, connects aseba components together and with D-Bus, usage:\n";
 	stream << programName << " [options] [additional targets]*\n";
@@ -657,14 +674,14 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "Aseba medulla " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QCoreApplication app(argc, argv);
 	Dashel::initPlugins();
@@ -681,7 +698,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
 		{
@@ -732,7 +749,7 @@ int main(int argc, char *argv[])
 		for (size_t i = 0; i < additionalTargets.size(); i++)
 			((Dashel::Hub&)hub).connect(additionalTargets[i]);
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
@@ -741,5 +758,3 @@ int main(int argc, char *argv[])
 
 	return app.exec();
 }
-
-

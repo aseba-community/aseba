@@ -29,7 +29,7 @@ namespace Aseba
 	{
 		// deserialize message
 		Message::SerializationBuffer content;
-		std::copy(data+2, data+length, std::back_inserter(content.rawData));
+		std::copy(data + 2, data + length, std::back_inserter(content.rawData));
 		const uint16_t type(*reinterpret_cast<const uint16_t*>(data));
 		outQueue.emplace(Message::create(nodeId, type, content));
 	}

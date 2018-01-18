@@ -22,18 +22,15 @@
 #include "can-net.h"
 #include "../../common/consts.h"
 
-void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
+void AsebaSendBuffer(AsebaVMState* vm, const uint8_t* data, uint16_t length)
 {
 	ASEBA_UNUSED(vm);
 	while (AsebaCanSend(data, length) == 0)
 		AsebaIdle();
 }
 
-uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
+uint16_t AsebaGetBuffer(AsebaVMState* vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	ASEBA_UNUSED(vm);
 	return AsebaCanRecv(data, maxLength, source);
 }
-
-
-

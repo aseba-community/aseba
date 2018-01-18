@@ -29,15 +29,18 @@
 
 #include "HttpRequest.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	/**
+	namespace Http
+	{
+		/**
 	 * Represents HTTP responses being sent as a reply to incoming HTTP requests.
 	 */
-	class HttpResponse
-	{
+		class HttpResponse
+		{
 		public:
-			typedef enum {
+			typedef enum
+			{
 				HTTP_STATUS_OK = 200,
 				HTTP_STATUS_CREATED = 201,
 				HTTP_STATUS_BAD_REQUEST = 400,
@@ -49,7 +52,7 @@ namespace Aseba { namespace Http
 				HTTP_STATUS_SERVICE_UNAVAILABLE = 503,
 			} HttpStatus;
 
-			HttpResponse(const HttpRequest *originatingRequest);
+			HttpResponse(const HttpRequest* originatingRequest);
 			virtual ~HttpResponse();
 
 			/**
@@ -57,7 +60,7 @@ namespace Aseba { namespace Http
 			 */
 			virtual void send();
 
-			virtual const HttpRequest *getOriginatingRequest() const { return originatingRequest; }
+			virtual const HttpRequest* getOriginatingRequest() const { return originatingRequest; }
 			virtual void setVerbose(bool verbose) { this->verbose = verbose; }
 
 			virtual void setStatus(HttpStatus status) { this->status = status; }
@@ -67,12 +70,16 @@ namespace Aseba { namespace Http
 			virtual void setContent(const std::string& content) { this->content = content; }
 			virtual const std::string& getContent() const { return content; }
 
-			std::string getHeader(const std::string& header) const {
+			std::string getHeader(const std::string& header) const
+			{
 				std::map<std::string, std::string>::const_iterator query = headers.find(header);
 
-				if(query != headers.end()) {
+				if (query != headers.end())
+				{
 					return query->second;
-				} else {
+				}
+				else
+				{
 					return "";
 				}
 			}
@@ -81,39 +88,38 @@ namespace Aseba { namespace Http
 			virtual void addStatusReply(std::ostringstream& reply);
 			virtual void addHeadersReply(std::ostringstream& reply);
 
-			virtual void writeRaw(const char *buffer, int length) = 0;
+			virtual void writeRaw(const char* buffer, int length) = 0;
 
 		private:
-			const HttpRequest *originatingRequest;
+			const HttpRequest* originatingRequest;
 			bool verbose;
 
 			HttpStatus status;
 			std::map<std::string, std::string> headers;
 			std::string content;
-	};
+		};
 
-	class DashelHttpResponse : public HttpResponse
-	{
+		class DashelHttpResponse : public HttpResponse
+		{
 		public:
-			DashelHttpResponse(DashelHttpRequest *originatingRequest) :
+			DashelHttpResponse(DashelHttpRequest* originatingRequest) :
 				HttpResponse(originatingRequest),
 				stream(originatingRequest->getStream())
-			{
-
-			}
+			{}
 
 			virtual ~DashelHttpResponse() {}
 
 		protected:
-			virtual void writeRaw(const char *buffer, int length)
+			virtual void writeRaw(const char* buffer, int length)
 			{
 				stream->write(buffer, length);
 				stream->flush();
 			}
 
 		private:
-			Dashel::Stream *stream;
-	};
-} }
+			Dashel::Stream* stream;
+		};
+	}
+}
 
 #endif

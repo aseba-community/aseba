@@ -39,7 +39,7 @@ namespace Aseba
 	using namespace Dashel;
 	using namespace std;
 
-	class MassLoader: public Hub, public NodesManager
+	class MassLoader : public Hub, public NodesManager
 	{
 	protected:
 		QString fileName;
@@ -47,14 +47,14 @@ namespace Aseba
 		Stream* stream;
 
 	public:
-		MassLoader(const QString& fileName, bool once):fileName(fileName),once(once),stream(nullptr) {}
+		MassLoader(const QString& fileName, bool once) : fileName(fileName), once(once), stream(nullptr) {}
 		void loadToTarget(const std::string& target);
 
 	protected:
 		// from Hub
-		virtual void connectionCreated(Stream *stream);
-		virtual void incomingData(Stream *stream);
-		virtual void connectionClosed(Stream *stream, bool abnormal);
+		virtual void connectionCreated(Stream* stream);
+		virtual void incomingData(Stream* stream);
+		virtual void connectionClosed(Stream* stream, bool abnormal);
 
 		// from NodesManager
 		virtual void sendMessage(const Message& message);
@@ -108,16 +108,15 @@ namespace Aseba
 			{
 				// ignore Dsahel exceptions
 			}
-
 		}
 	}
 
-	void MassLoader::connectionCreated(Stream *stream)
+	void MassLoader::connectionCreated(Stream* stream)
 	{
 		//cerr << "Connection created to " << stream->getTargetName() << endl;
 	}
 
-	void MassLoader::incomingData(Stream *stream)
+	void MassLoader::incomingData(Stream* stream)
 	{
 		try
 		{
@@ -135,7 +134,7 @@ namespace Aseba
 		}
 	}
 
-	void MassLoader::connectionClosed(Stream *stream, bool abnormal)
+	void MassLoader::connectionClosed(Stream* stream, bool abnormal)
 	{
 		//cerr << "Connection closed to " << stream->getTargetName() << endl;
 		assert(stream == this->stream);
@@ -172,7 +171,12 @@ namespace Aseba
 		int errorColumn;
 		if (!document.setContent(&file, false, &errorMsg, &errorLine, &errorColumn))
 		{
-			wcerr << QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn).toStdWString() << endl;
+			wcerr << QString("Error in XML source file: %0 at line %1, column %2")
+						 .arg(errorMsg)
+						 .arg(errorLine)
+						 .arg(errorColumn)
+						 .toStdWString()
+				  << endl;
 			return;
 		}
 
@@ -186,7 +190,8 @@ namespace Aseba
 				if (element.tagName() == "node")
 				{
 					bool ok;
-					const unsigned nodeId(getNodeId(element.attribute("name").toStdWString(), element.attribute("nodeId", 0).toUInt(), &ok));
+					const unsigned nodeId(getNodeId(
+						element.attribute("name").toStdWString(), element.attribute("nodeId", 0).toUInt(), &ok));
 					if (ok)
 					{
 						std::wistringstream is(element.firstChild().toText().data().toStdWString());
@@ -204,7 +209,11 @@ namespace Aseba
 							sendBytecode(stream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 							Run(nodeId).serialize(stream);
 							stream->flush();
-							wcerr << QString("! %1 bytecodes loaded to target %0, you can disconnect target !").arg(element.attribute("name")).arg(bytecode.size()).toStdWString() << endl;
+							wcerr << QString("! %1 bytecodes loaded to target %0, you can disconnect target !")
+										 .arg(element.attribute("name"))
+										 .arg(bytecode.size())
+										 .toStdWString()
+								  << endl;
 							if (once) // if we have to run only once, stop now
 								stop();
 						}
@@ -221,7 +230,12 @@ namespace Aseba
 					const unsigned eventSize(element.attribute("size").toUInt());
 					if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
 					{
-						wcerr << QString("Event %1 has a length %2 larger than maximum %3").arg(eventName).arg(eventSize).arg(ASEBA_MAX_EVENT_ARG_SIZE).toStdWString() << endl;
+						wcerr << QString("Event %1 has a length %2 larger than maximum %3")
+									 .arg(eventName)
+									 .arg(eventSize)
+									 .arg(ASEBA_MAX_EVENT_ARG_SIZE)
+									 .toStdWString()
+							  << endl;
 						break;
 					}
 					else
@@ -231,7 +245,8 @@ namespace Aseba
 				}
 				else if (element.tagName() == "constant")
 				{
-					commonDefinitions.constants.push_back(NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toUInt()));
+					commonDefinitions.constants.push_back(
+						NamedValue(element.attribute("name").toStdWString(), element.attribute("value").toUInt()));
 				}
 			}
 			domNode = domNode.nextSibling();
@@ -251,7 +266,7 @@ namespace Aseba
 	}
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QCoreApplication app(argc, argv);
 	Dashel::initPlugins();
@@ -260,7 +275,8 @@ int main(int argc, char *argv[])
 
 	if (app.arguments().size() < 2)
 	{
-		std::wcerr << L"Usage: " << app.arguments().first().toStdWString() << L" [--once] filename [target]" << std::endl;
+		std::wcerr << L"Usage: " << app.arguments().first().toStdWString() << L" [--once] filename [target]"
+				   << std::endl;
 		return 1;
 	}
 

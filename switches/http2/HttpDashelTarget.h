@@ -28,13 +28,15 @@
 #include "../../common/msg/NodesManager.h"
 #include "AeslProgram.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	class HttpInterface; // foward declaration
-	class HttpRequest; // foward declaration
-	class DashelHttpRequest; // foward declaration
+	namespace Http
+	{
+		class HttpInterface; // foward declaration
+		class HttpRequest; // foward declaration
+		class DashelHttpRequest; // foward declaration
 
-	/**
+		/**
 	 * A HTTP Dashel target represents a connection that was established to one of the specified peers
 	 * on the Aseba network. It is typically identified by its address which also specifies the target
 	 * for the corresponding Dashel stream.
@@ -43,18 +45,19 @@ namespace Aseba { namespace Http
 	 * Aseba network. Nodes also store a list of their defined variables for the currently compiled
 	 * AESL program, as well as a list of pending variable values requested by HTTP requests.
 	 */
-	class HttpDashelTarget : public NodesManager
-	{
+		class HttpDashelTarget : public NodesManager
+		{
 		public:
-			struct Node {
+			struct Node
+			{
 				unsigned localId;
 				unsigned globalId;
 				std::string name;
 				VariablesMap variablesMap;
-				std::map< unsigned, std::set< std::pair<Dashel::Stream *, DashelHttpRequest *> > > pendingVariables;
+				std::map<unsigned, std::set<std::pair<Dashel::Stream*, DashelHttpRequest*> > > pendingVariables;
 			};
 
-			HttpDashelTarget(HttpInterface *interface, const std::string& address, Dashel::Stream *stream);
+			HttpDashelTarget(HttpInterface* interface, const std::string& address, Dashel::Stream* stream);
 			virtual ~HttpDashelTarget();
 
 			/**
@@ -73,7 +76,8 @@ namespace Aseba { namespace Http
 			 *
 			 * Returns true if the request was successfully sent to the specified node.
 			 */
-			virtual bool sendGetVariables(unsigned globalNodeId, const std::vector<std::string>& args, HttpRequest *request);
+			virtual bool sendGetVariables(
+				unsigned globalNodeId, const std::vector<std::string>& args, HttpRequest* request);
 
 			/**
 			 * Send a set variables request to one of this target's specified nodes. The first element
@@ -99,28 +103,30 @@ namespace Aseba { namespace Http
 			 */
 			virtual bool removePendingVariable(unsigned globalNodeId, unsigned start);
 
-			virtual std::set<const Node *> getNodesByName(const std::string& name) const;
-			virtual const Node *getNodeById(unsigned globalNodeId) const;
-			virtual const Node *getNodeByLocalId(unsigned localNodeId) const;
+			virtual std::set<const Node*> getNodesByName(const std::string& name) const;
+			virtual const Node* getNodeById(unsigned globalNodeId) const;
+			virtual const Node* getNodeByLocalId(unsigned localNodeId) const;
 
 			virtual const std::string& getAddress() const { return address; }
-			virtual Dashel::Stream *getStream() { return stream; }
+			virtual Dashel::Stream* getStream() { return stream; }
 			virtual const std::map<unsigned, Node>& getNodes() const { return nodes; }
 
 		protected:
-			virtual bool getVariableInfo(const Node& node, const std::string& variableName, unsigned& position, unsigned& size);
+			virtual bool getVariableInfo(
+				const Node& node, const std::string& variableName, unsigned& position, unsigned& size);
 			virtual void sendMessage(const Message& message);
 			virtual void nodeDescriptionReceived(unsigned localNodeId);
 
 
 		private:
-			HttpInterface *interface;
+			HttpInterface* interface;
 			std::string address;
-			Dashel::Stream *stream;
+			Dashel::Stream* stream;
 
 			std::map<unsigned, Node> nodes;
 			std::map<unsigned, unsigned> globalIds;
-	};
-} }
+		};
+	}
+}
 
 #endif

@@ -23,37 +23,38 @@
 #include <QSettings>
 #include <QtWidgets>
 
-#define BOOL_TO_CHECKED(value)	(value == true ? Qt::Checked : Qt::Unchecked)
-#define CHECKED_TO_BOOL(value)	(value == Qt::Checked ? true : false)
+#define BOOL_TO_CHECKED(value) (value == true ? Qt::Checked : Qt::Unchecked)
+#define CHECKED_TO_BOOL(value) (value == Qt::Checked ? true : false)
 
 #define CONFIG_PROPERTY_CHECKBOX_HANDLER(name, page, keyword) \
-	const bool ConfigDialog::get##name() { \
-		if (me) \
-			return me->page->checkboxCache[#keyword].value; \
-		else \
-			return false; \
-	} \
-	\
-	void ConfigDialog::set##name(bool value) { \
-		if (me && !me->isVisible()) \
-			me->page->checkboxCache[#keyword].value = value; \
+	const bool ConfigDialog::get##name()                      \
+	{                                                         \
+		if (me)                                               \
+			return me->page->checkboxCache[#keyword].value;   \
+		else                                                  \
+			return false;                                     \
+	}                                                         \
+                                                              \
+	void ConfigDialog::set##name(bool value)                  \
+	{                                                         \
+		if (me && !me->isVisible())                           \
+			me->page->checkboxCache[#keyword].value = value;  \
 	}
 
 
-#define TITLE_SPACING		10
-#define HORIZONTAL_STRUT	700
+#define TITLE_SPACING 10
+#define HORIZONTAL_STRUT 700
 
 namespace Aseba
 {
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers,		generalpage,	showlinenumbers		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden,			generalpage,	showhidden		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar,		generalpage,	keywordToolbar		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage,		generalpage,	memoryusage		)
-	CONFIG_PROPERTY_CHECKBOX_HANDLER(AutoCompletion,		editorpage,	autoKeyword		)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowLineNumbers, generalpage, showlinenumbers)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowHidden, generalpage, showhidden)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowKeywordToolbar, generalpage, keywordToolbar)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(ShowMemoryUsage, generalpage, memoryusage)
+	CONFIG_PROPERTY_CHECKBOX_HANDLER(AutoCompletion, editorpage, autoKeyword)
 
 	/*** ConfigPage ***/
-	ConfigPage::ConfigPage(QString title, QWidget *parent):
-		QWidget(parent)
+	ConfigPage::ConfigPage(QString title, QWidget* parent) : QWidget(parent)
 	{
 		QLabel* myTitle = new QLabel(title);
 		// bold & align center
@@ -85,7 +86,8 @@ namespace Aseba
 		// update cache and widgets from disk
 		QSettings settings;
 		// iterate on checkboxes
-		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end();
+			 it++)
 		{
 			QString name = it->first;
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
@@ -93,8 +95,8 @@ namespace Aseba
 			if (settings.contains(name))
 			{
 				bool value = settings.value(name, false).toBool();
-				checkbox->setCheckState(BOOL_TO_CHECKED(value));	// update widget
-				(it->second).value = value;				// update cache
+				checkbox->setCheckState(BOOL_TO_CHECKED(value)); // update widget
+				(it->second).value = value; // update cache
 			}
 		}
 	}
@@ -104,7 +106,8 @@ namespace Aseba
 		// write the cache on disk
 		QSettings settings;
 		// iterate on checkboxes
-		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end();
+			 it++)
 		{
 			QString name = it->first;
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
@@ -124,7 +127,8 @@ namespace Aseba
 	{
 		// sync the cache with the widgets' state
 		// iterate on checkboxes
-		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end();
+			 it++)
 		{
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
 			Q_ASSERT(checkbox);
@@ -143,7 +147,8 @@ namespace Aseba
 	void ConfigPage::reloadFromCache()
 	{
 		// update widgets based on the cache
-		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end(); it++)
+		for (std::map<QString, WidgetCache<bool> >::iterator it = checkboxCache.begin(); it != checkboxCache.end();
+			 it++)
 		{
 			QCheckBox* checkbox = dynamic_cast<QCheckBox*>((it->second).widget);
 			Q_ASSERT(checkbox);
@@ -153,8 +158,7 @@ namespace Aseba
 
 
 	/*** GeneralPage ***/
-	GeneralPage::GeneralPage(QWidget *parent):
-		ConfigPage(tr("General Setup"), parent)
+	GeneralPage::GeneralPage(QWidget* parent) : ConfigPage(tr("General Setup"), parent)
 	{
 		QGroupBox* gb1 = new QGroupBox(tr("Layout"));
 		QVBoxLayout* gb1layout = new QVBoxLayout();
@@ -190,8 +194,7 @@ namespace Aseba
 
 
 	/*** EditorPage ***/
-	EditorPage::EditorPage(QWidget *parent):
-		ConfigPage(tr("Editor Setup"), parent)
+	EditorPage::EditorPage(QWidget* parent) : ConfigPage(tr("Editor Setup"), parent)
 	{
 		//
 		QGroupBox* gb1 = new QGroupBox(tr("Autocompletion"));
@@ -246,20 +249,13 @@ namespace Aseba
 		me->reloadFromCache();
 		me->saveState();
 		me->show();
-
 	}
 
 	ConfigDialog* ConfigDialog::me = nullptr;
 
-	ConfigDialog::ConfigDialog(QWidget* parent):
-		QDialog(parent)
-	{
-	}
+	ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent) {}
 
-	ConfigDialog::~ConfigDialog()
-	{
-		writeSettings();
-	}
+	ConfigDialog::~ConfigDialog() { writeSettings(); }
 
 	void ConfigDialog::setupWidgets()
 	{
@@ -388,6 +384,4 @@ namespace Aseba
 				config->writeSettings();
 		}
 	}
-
 }
-

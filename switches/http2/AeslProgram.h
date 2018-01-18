@@ -26,7 +26,7 @@
 
 #if defined(_WIN32) && defined(__MINGW32__)
 /* This is a workaround for MinGW32, see libxml/xmlexports.h */
-#define IN_LIBXML
+#	define IN_LIBXML
 #endif
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -35,26 +35,29 @@
 
 #include "../../compiler/compiler.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	/**
+	namespace Http
+	{
+		/**
 	 * Class representing an AESL program with several code entries that can later be compiled and
 	 * executed on nodes matching a specified node name or id.
 	 *
 	 * AESL programs can be constructed either from a file or a memory buffer - in either case make
 	 * sure to call isLoaded() to see if they were successfully parsed.
 	 */
-	class AeslProgram
-	{
+		class AeslProgram
+		{
 		public:
-			struct NodeEntry {
+			struct NodeEntry
+			{
 				std::string nodeName;
 				std::string nodeId;
 				std::string code;
 			};
 
 			AeslProgram(const std::string& filename);
-			AeslProgram(const char *buffer, const int size);
+			AeslProgram(const char* buffer, const int size);
 			virtual ~AeslProgram();
 
 			virtual bool isLoaded() const { return loaded; }
@@ -62,13 +65,14 @@ namespace Aseba { namespace Http
 			virtual const CommonDefinitions& getCommonDefinitions() const { return commonDefinitions; }
 
 		protected:
-			void load(xmlDoc *doc);
+			void load(xmlDoc* doc);
 
 		private:
 			bool loaded;
 			std::vector<NodeEntry> entries;
 			CommonDefinitions commonDefinitions;
-	};
-} }
+		};
+	}
+}
 
 #endif

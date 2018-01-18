@@ -21,11 +21,11 @@
 #include <cstdlib>
 #include <cstring>
 #ifndef WIN32
-	#include <sys/time.h>
+#	include <sys/time.h>
 #else // WIN32
-	#include <sys/types.h>
-	#include <windows.h>
-	#define atoll _atoi64
+#	include <sys/types.h>
+#	include <windows.h>
+#	define atoll _atoi64
 #endif // WIN32
 #include <ctime>
 #include <cerrno>
@@ -44,7 +44,7 @@
 #ifdef __ANDROID__
 namespace std
 {
-    size_t log2(size_t v) { return log2(v); }
+	size_t log2(size_t v) { return log2(v); }
 }
 #endif // __ANDROID__
 
@@ -55,43 +55,37 @@ namespace Aseba
 
 	UnifiedTime::UnifiedTime()
 	{
-		#ifndef WIN32
+#ifndef WIN32
 		struct timeval tv;
 		gettimeofday(&tv, nullptr);
 		value = (Value(tv.tv_sec) * 1000) + Value(tv.tv_usec) / 1000;
-		#else // WIN32
-		FILETIME        ft;
-		LARGE_INTEGER   li;
-		__int64         t;
+#else // WIN32
+		FILETIME ft;
+		LARGE_INTEGER li;
+		__int64 t;
 		GetSystemTimeAsFileTime(&ft);
 		li.LowPart = ft.dwLowDateTime;
 		li.HighPart = ft.dwHighDateTime;
-		t = li.QuadPart;                        // In 100-nanosecond intervals
-		value = t / 10000l;                      // In milliseconds
-		#endif // WIN32
+		t = li.QuadPart; // In 100-nanosecond intervals
+		value = t / 10000l; // In milliseconds
+#endif // WIN32
 	}
 
-	UnifiedTime::UnifiedTime(Value ms) :
-		value(ms)
-	{
-	}
+	UnifiedTime::UnifiedTime(Value ms) : value(ms) {}
 
-	UnifiedTime::UnifiedTime(Value seconds, Value milliseconds) :
-		value(seconds * 1000 + milliseconds)
-	{
-	}
+	UnifiedTime::UnifiedTime(Value seconds, Value milliseconds) : value(seconds * 1000 + milliseconds) {}
 
 	void UnifiedTime::sleep() const
 	{
-		#ifndef WIN32
+#ifndef WIN32
 		struct timespec ts;
 		ts.tv_sec = (value / 1000);
 		ts.tv_nsec = ((value % 1000) * 1000000);
 		nanosleep(&ts, nullptr);
-		#else // WIN32
+#else // WIN32
 		assert(value <= 4294967295);
 		Sleep((DWORD)value);
-		#endif // WIN32
+#endif // WIN32
 	}
 
 	std::string UnifiedTime::toHumanReadableStringFromEpoch() const
@@ -100,7 +94,7 @@ namespace Aseba
 		Value seconds(value / 1000);
 		Value milliseconds(value % 1000);
 		time_t t(seconds);
-		char *timeString = ctime(&t);
+		char* timeString = ctime(&t);
 		timeString[strlen(timeString) - 1] = 0;
 		oss << "[";
 		oss << timeString << " ";
@@ -122,11 +116,12 @@ namespace Aseba
 	{
 		size_t dotPos(rawTimeString.find('.'));
 		assert(dotPos != std::string::npos);
-		return UnifiedTime(atoll(rawTimeString.substr(0, dotPos).c_str()), atoll(rawTimeString.substr(dotPos + 1, std::string::npos).c_str()));
+		return UnifiedTime(atoll(rawTimeString.substr(0, dotPos).c_str()),
+			atoll(rawTimeString.substr(dotPos + 1, std::string::npos).c_str()));
 	}
 
 
-	void dumpTime(std::ostream &stream, bool raw)
+	void dumpTime(std::ostream& stream, bool raw)
 	{
 		if (raw)
 			stream << UnifiedTime().toRawTimeString();
@@ -135,10 +130,7 @@ namespace Aseba
 		stream << " ";
 	}
 
-	SoftTimer::SoftTimer(Callback callback, double period):
-		callback(callback),
-		period(period),
-		left(period)
+	SoftTimer::SoftTimer(Callback callback, double period) : callback(callback), period(period), left(period)
 	{
 		if (period < 0)
 			throw std::domain_error("Period must be greater or equal to zero");
@@ -178,14 +170,14 @@ namespace Aseba
 			}
 			else if (c < 0x800)
 			{
-				os += static_cast<uint8_t>(((c>>6)&0x1F)|0xC0);
-				os += static_cast<uint8_t>((c&0x3F)|0x80);
+				os += static_cast<uint8_t>(((c >> 6) & 0x1F) | 0xC0);
+				os += static_cast<uint8_t>((c & 0x3F) | 0x80);
 			}
 			else if (c < 0xd800)
 			{
-				os += static_cast<uint8_t>(((c>>12)&0x0F)|0xE0);
-				os += static_cast<uint8_t>(((c>>6)&0x3F)|0x80);
-				os += static_cast<uint8_t>((c&0x3F)|0x80);
+				os += static_cast<uint8_t>(((c >> 12) & 0x0F) | 0xE0);
+				os += static_cast<uint8_t>(((c >> 6) & 0x3F) | 0x80);
+				os += static_cast<uint8_t>((c & 0x3F) | 0x80);
 			}
 			else
 			{
@@ -228,36 +220,36 @@ namespace Aseba
 	{
 		std::wstring res;
 		size_t left(s.size());
-		for (const char & c : s)
+		for (const char& c : s)
 		{
-			const char *a = &c;
-			if (!(*a&128))
+			const char* a = &c;
+			if (!(*a & 128))
 			{
 				//Byte represents an ASCII character. Direct copy will do.
 				res += *a;
 			}
-			else if ((*a&192)==128)
+			else if ((*a & 192) == 128)
 			{
 				//Byte is the middle of an encoded character. Ignore.
 				continue;
 			}
-			else if ((*a&224)==192)
+			else if ((*a & 224) == 192)
 			{
 				//Byte represents the start of an encoded character in the range
 				//U+0080 to U+07FF
 				if (left < 2)
 					throw std::runtime_error("Invalid UTF8 string");
-				res += ((*a&31)<<6)|(a[1]&63);
+				res += ((*a & 31) << 6) | (a[1] & 63);
 			}
-			else if ((*a&240)==224)
+			else if ((*a & 240) == 224)
 			{
 				//Byte represents the start of an encoded character in the range
 				//U+07FF to U+FFFF
 				if (left < 3)
 					throw std::runtime_error("Invalid UTF8 string");
-				res += ((*a&15)<<12)|((a[1]&63)<<6)|(a[2]&63);
+				res += ((*a & 15) << 12) | ((a[1] & 63) << 6) | (a[2] & 63);
 			}
-			else if ((*a&248)==240)
+			else if ((*a & 248) == 240)
 			{
 				//Byte represents the start of an encoded character beyond the
 				//U+FFFF limit of 16-bit integers
@@ -274,12 +266,12 @@ namespace Aseba
 	 * Released under http://www.nongnu.org/avr-libc/LICENSE.txt
 	 * which is GPL- and DFSG- compatible
 	 */
-	static uint16_t crc_xmodem_update (uint16_t crc, uint8_t data)
+	static uint16_t crc_xmodem_update(uint16_t crc, uint8_t data)
 	{
 		int i;
 
 		crc = crc ^ ((uint16_t)data << 8);
-		for (i=0; i<8; i++)
+		for (i = 0; i < 8; i++)
 		{
 			if (crc & 0x8000)
 				crc = (crc << 1) ^ 0x1021;
@@ -290,7 +282,7 @@ namespace Aseba
 		return crc;
 	}
 
-	static uint16_t crc_xmodem_update (uint16_t crc, const uint8_t* data, size_t len)
+	static uint16_t crc_xmodem_update(uint16_t crc, const uint8_t* data, size_t len)
 	{
 		for (size_t i = 0; i < len; ++i)
 			crc = crc_xmodem_update(crc, data[i]);
@@ -317,9 +309,9 @@ namespace Aseba
 		std::vector<T> result;
 		size_t delimPos(0);
 		size_t nextPos(0);
-		while ((nextPos=s.find_first_of(delim, delimPos)) != T::npos)
+		while ((nextPos = s.find_first_of(delim, delimPos)) != T::npos)
 		{
-			result.push_back(s.substr(delimPos, nextPos-delimPos));
+			result.push_back(s.substr(delimPos, nextPos - delimPos));
 			delimPos = s.find_first_not_of(delim, nextPos);
 		}
 		if (delimPos != T::npos && delimPos < s.size())

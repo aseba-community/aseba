@@ -23,15 +23,15 @@
 
 #ifdef HAVE_QWT
 
-#ifdef _MSC_VER
-#define QWT_DLL
-#endif // _MSC_VER
+#	ifdef _MSC_VER
+#		define QWT_DLL
+#	endif // _MSC_VER
 
-#include <deque>
-#include <QTime>
+#	include <deque>
+#	include <QTime>
 
-#include "MainWindow.h"
-#include "../../common/types.h"
+#	include "MainWindow.h"
+#	include "../../common/types.h"
 
 class QwtPlot;
 class QDoubleSpinBox;
@@ -44,7 +44,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	class EventViewer:  public QWidget
+	class EventViewer : public QWidget
 	{
 		Q_OBJECT
 
@@ -53,20 +53,21 @@ namespace Aseba
 		MainWindow::EventViewers* eventsViewers;
 		bool isCapturing;
 		QwtPlot* plot;
-		QLabel *status;
-		QPushButton *pauseRunButton;
-		QCheckBox *timeWindowCheckBox;
-		QDoubleSpinBox *timeWindowLength;
+		QLabel* status;
+		QPushButton* pauseRunButton;
+		QCheckBox* timeWindowCheckBox;
+		QDoubleSpinBox* timeWindowLength;
 
 		std::vector<std::deque<int16_t> > values;
 		std::deque<double> timeStamps;
 		QTime startingTime;
 
 	public:
-		EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount, MainWindow::EventViewers* eventsViewers);
+		EventViewer(unsigned eventId, const QString& eventName, unsigned eventVariablesCount,
+			MainWindow::EventViewers* eventsViewers);
 		virtual ~EventViewer();
 
-		void detachFromMain() { eventsViewers=0; }
+		void detachFromMain() { eventsViewers = 0; }
 		void addData(const VariablesDataVector& data);
 
 	protected slots:
@@ -78,6 +79,6 @@ namespace Aseba
 	/*@}*/
 } // namespace Aseba
 
-#endif // HAVE_QWT
+#	endif // HAVE_QWT
 
 #endif // EVENT_VIEWER_H

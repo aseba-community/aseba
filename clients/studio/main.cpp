@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void usage(const char *execName)
+void usage(const char* execName)
 {
 	cout << "Usage: " << execName << " (OPTIONS|TARGET)* " << endl;
 	cout << "  where" << endl;
@@ -50,7 +50,7 @@ void usage(const char *execName)
 	\defgroup studio Integrated Development Editor
 */
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Q_INIT_RESOURCE(asebaqtabout);
 
@@ -145,5 +145,3 @@ int main(int argc, char *argv[])
 		}
 	}
 }
-
-

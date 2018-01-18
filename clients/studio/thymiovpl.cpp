@@ -46,18 +46,19 @@ Possible issues:
 
 using namespace std;
 
-void usage(const char *execName)
+void usage(const char* execName)
 {
 	cout << "Thymio VPL, a standalone VPL editor" << endl << endl;
 	cout << "Usage: " << execName << " (OPTIONS|TARGET)* " << endl;
 	cout << "  where" << endl;
 	cout << "OPTION is one of:" << endl;
-	cout << " -anytarget     allows to connect to non-Thymio-II targets, note that the generated code will not compile" << endl;
+	cout << " -anytarget     allows to connect to non-Thymio-II targets, note that the generated code will not compile"
+		 << endl;
 	cout << " -debuglog      emit debug log events" << endl;
 	cout << " -execfeedback  blink set being executed" << endl;
-	#ifdef PROTOBUF_FOUND // only show if it actually works
+#ifdef PROTOBUF_FOUND // only show if it actually works
 	cout << " -usagelog      create a usage log of all the user events" << endl;
-	#endif // PROTOBUF_FOUND
+#endif // PROTOBUF_FOUND
 	cout << " -h             this help" << endl;
 	cout << "TARGET is a Dashel target (the last one is always considered)" << endl;
 	cout << endl;
@@ -71,7 +72,7 @@ void usage(const char *execName)
 	\defgroup thymiovpl VPL-only container application
 */
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Q_INIT_RESOURCE(asebaqtabout);
 	QApplication app(argc, argv);
@@ -138,7 +139,8 @@ int main(int argc, char *argv[])
 	QTranslator aboutTranslator;
 	app.installTranslator(&aboutTranslator);
 #ifdef ANDROID
-	if (commandLineTarget.length() == 0) {
+	if (commandLineTarget.length() == 0)
+	{
 		commandLineTarget = "android:";
 	}
 #endif
@@ -162,5 +164,3 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 }
-
-

@@ -40,7 +40,7 @@ namespace Aseba
 	using namespace std;
 
 	//! Show list of known commands
-	void dumpCommandList(ostream &stream)
+	void dumpCommandList(ostream& stream)
 	{
 		stream << "* presence : broadcast presence message (node detection version < 5)\n";
 		stream << "* listnodes : list nodes on network (node detection version >= 5)\n";
@@ -57,7 +57,7 @@ namespace Aseba
 	}
 
 	//! Show usage
-	void dumpHelp(ostream &stream, const char *programName)
+	void dumpHelp(ostream& stream, const char* programName)
 	{
 		stream << "Aseba cmd, send message over the aseba network, usage:\n";
 		stream << programName << " [-t target] [cmd destId (args)] ... [cmd destId (args)]\n";
@@ -71,7 +71,7 @@ namespace Aseba
 	}
 
 	//! Show version
-	void dumpVersion(std::ostream &stream)
+	void dumpVersion(std::ostream& stream)
 	{
 		stream << "Aseba cmd " << ASEBA_VERSION << std::endl;
 		stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
@@ -79,7 +79,7 @@ namespace Aseba
 	}
 
 	//! Produce an error message and dump help and quit
-	void errorMissingArgument(const char *programName)
+	void errorMissingArgument(const char* programName)
 	{
 		cerr << "Error, missing argument.\n";
 		dumpHelp(cerr, programName);
@@ -87,7 +87,7 @@ namespace Aseba
 	}
 
 	//! Produce an error message and dump help and quit
-	void errorUnknownCommand(const char *cmd)
+	void errorUnknownCommand(const char* cmd)
 	{
 		cerr << "Error, unknown command " << cmd << endl;
 		cerr << "Known commands are:\n";
@@ -103,7 +103,7 @@ namespace Aseba
 	}
 
 	//! Produce an error message and quit
-	void errorOpenFile(const char *fileName)
+	void errorOpenFile(const char* fileName)
 	{
 		cerr << "Error, can't open file " << fileName << endl;
 		exit(7);
@@ -117,7 +117,7 @@ namespace Aseba
 	}
 
 	//! Produce an error message and quit
-	void errorHexFile(const string &message)
+	void errorHexFile(const string& message)
 	{
 		cerr << "HEX file error: " << message << endl;
 		exit(10);
@@ -131,12 +131,10 @@ namespace Aseba
 	}
 
 
-	class CmdBootloaderInterface:public BootloaderInterface
+	class CmdBootloaderInterface : public BootloaderInterface
 	{
 	public:
-		CmdBootloaderInterface(Stream* stream, int dest):
-			BootloaderInterface(stream, dest)
-		{}
+		CmdBootloaderInterface(Stream* stream, int dest) : BootloaderInterface(stream, dest) {}
 
 	protected:
 		// reporting function
@@ -153,40 +151,25 @@ namespace Aseba
 			cout.flush();
 		}
 
-		virtual void writePageSuccess()
-		{
-			cout << "Success" << endl;
-		}
+		virtual void writePageSuccess() { cout << "Success" << endl; }
 
-		virtual void writePageFailure()
-		{
-			cout << "Failure" << endl;
-		}
+		virtual void writePageFailure() { cout << "Failure" << endl; }
 
-		virtual void writeHexStart(const string &fileName, bool reset, bool simple)
+		virtual void writeHexStart(const string& fileName, bool reset, bool simple)
 		{
 			cout << "Flashing " << fileName << endl;
 		}
 
-		virtual void writeHexEnteringBootloader()
-		{
-			cout << "Entering bootloader" << endl;
-		}
+		virtual void writeHexEnteringBootloader() { cout << "Entering bootloader" << endl; }
 
 		virtual void writeHexGotDescription(unsigned pagesCount)
 		{
 			cout << "In bootloader, about to write " << pagesCount << " pages" << endl;
 		}
 
-		virtual void writeHexWritten()
-		{
-			cout << "Write completed" << endl;
-		}
+		virtual void writeHexWritten() { cout << "Write completed" << endl; }
 
-		virtual void writeHexExitingBootloader()
-		{
-			cout << "Exiting bootloader" << endl;
-		}
+		virtual void writeHexExitingBootloader() { cout << "Exiting bootloader" << endl; }
 
 		virtual void errorWritePageNonFatal(unsigned pageNumber)
 		{
@@ -195,9 +178,9 @@ namespace Aseba
 	};
 
 	//! Process a command, return the number of arguments eaten (not counting the command itself)
-	int processCommand(Stream* stream, int argc, char *argv[])
+	int processCommand(Stream* stream, int argc, char* argv[])
 	{
-		const char *cmd = argv[0];
+		const char* cmd = argv[0];
 		int argEaten = 0;
 
 		if (strcmp(cmd, "presence") == 0)
@@ -229,11 +212,11 @@ namespace Aseba
 				errorMissingArgument(argv[0]);
 			argEaten = argc;
 			uint16_t type = atoi(argv[1]);
-			uint16_t length = argc-2;
+			uint16_t length = argc - 2;
 
 			VariablesDataVector data(length);
 			for (size_t i = 0; i < length; i++)
-				data[i] = atoi(argv[i+2]);
+				data[i] = atoi(argv[i + 2]);
 
 			UserMessage message(type, data);
 			message.serialize(stream);
@@ -260,19 +243,20 @@ namespace Aseba
 			else
 				errorReadPage(atoi(argv[2]));
 		}
-		else if(strcmp(cmd, "rdpageusb") == 0)
+		else if (strcmp(cmd, "rdpageusb") == 0)
 		{
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
 
 			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
-			vector <uint8_t> data(2048);
+			vector<uint8_t> data(2048);
 			cout << "Page: " << atoi(argv[2]) << endl;
-			if(bootloader.readPageSimple(atoi(argv[2]), &data[0])) {
+			if (bootloader.readPageSimple(atoi(argv[2]), &data[0]))
+			{
 				ofstream file("page.bin");
-				if(file.good())
-					copy(data.begin(),data.end(),ostream_iterator<uint8_t>(file));
+				if (file.good())
+					copy(data.begin(), data.end(), ostream_iterator<uint8_t>(file));
 				else
 					errorOpenFile("page.bin");
 			}
@@ -299,18 +283,18 @@ namespace Aseba
 				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.writeHex(argv[2], reset, false);
 			}
-			catch (HexFile::Error &e)
+			catch (HexFile::Error& e)
 			{
 				errorHexFile(e.toString());
 			}
 		}
-		else if (strcmp(cmd,"wusb") == 0)
+		else if (strcmp(cmd, "wusb") == 0)
 		{
 			bool reset = 0;
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
-			if(argc > 3 && !strcmp(argv[3], "reset"))
+			if (argc > 3 && !strcmp(argv[3], "reset"))
 			{
 				reset = 1;
 				argEaten = 3;
@@ -320,7 +304,7 @@ namespace Aseba
 				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.writeHex(argv[2], reset, true);
 			}
-			catch (HexFile::Error &e)
+			catch (HexFile::Error& e)
 			{
 				errorHexFile(e.toString());
 			}
@@ -338,7 +322,7 @@ namespace Aseba
 				CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 				bootloader.readHex(argv[2]);
 			}
-			catch (HexFile::Error &e)
+			catch (HexFile::Error& e)
 			{
 				errorHexFile(e.toString());
 			}
@@ -347,7 +331,7 @@ namespace Aseba
 		{
 			uint16_t dest;
 
-			if(argc < 2)
+			if (argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;
 
@@ -362,10 +346,10 @@ namespace Aseba
 			// WRONG; FIXME
 			while (true)
 			{
-				Message *message = Message::receive(stream);
+				Message* message = Message::receive(stream);
 
 				// handle ack
-				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
+				BootloaderAck* ackMessage = dynamic_cast<BootloaderAck*>(message);
 				if (ackMessage && (ackMessage->source == dest))
 				{
 					cout << "Device is now in user-code" << endl;
@@ -382,7 +366,7 @@ namespace Aseba
 		{
 			uint16_t dest;
 
-			if(argc < 2)
+			if (argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;
 
@@ -395,7 +379,7 @@ namespace Aseba
 		else if (strcmp(cmd, "sleep") == 0)
 		{
 			uint16_t dest;
-			if(argc < 2)
+			if (argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;
 
@@ -404,18 +388,19 @@ namespace Aseba
 			Sleep msg(dest);
 			msg.serialize(stream);
 			stream->flush();
-		} else
+		}
+		else
 			errorUnknownCommand(cmd);
 
 		return argEaten;
 	}
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 
-	const char *target = ASEBA_DEFAULT_TARGET;
+	const char* target = ASEBA_DEFAULT_TARGET;
 	int argCounter = 1;
 
 	if (argc == 1)
@@ -426,7 +411,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 		if (strcmp(arg, "-t") == 0)
 		{
 			if (++argCounter < argc)
@@ -453,8 +438,8 @@ int main(int argc, char *argv[])
 			// process command
 			try
 			{
-				 argCounter += Aseba::processCommand(stream, argc - argCounter, &argv[argCounter]);
-				 stream->flush();
+				argCounter += Aseba::processCommand(stream, argc - argCounter, &argv[argCounter]);
+				stream->flush();
 			}
 			catch (Dashel::DashelException e)
 			{
@@ -469,4 +454,3 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
-

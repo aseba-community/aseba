@@ -36,7 +36,7 @@
 #ifdef __ANDROID__
 namespace std
 {
-    size_t log2(size_t v);
+	size_t log2(size_t v);
 }
 #endif // __ANDROID__
 
@@ -86,8 +86,9 @@ namespace Aseba
 	class EnumHash
 	{
 		using sfinae = typename std::enable_if<std::is_enum<E>::value, E>::type;
+
 	public:
-		size_t operator()(const E&e) const
+		size_t operator()(const E& e) const
 		{
 			using int_type = std::underlying_type_t<E>;
 			return std::hash<int_type>{}(static_cast<int_type>(e));
@@ -110,27 +111,35 @@ namespace Aseba
 		UnifiedTime(Value seconds, Value milliseconds);
 
 		//! Add times
-		void operator +=(const UnifiedTime &that) { value += that.value; }
+		void operator+=(const UnifiedTime& that) { value += that.value; }
 		//! Substract times
-		void operator -=(const UnifiedTime &that) { value -= that.value; }
+		void operator-=(const UnifiedTime& that) { value -= that.value; }
 		//! Divide time by an amount
-		void operator /=(const long long unsigned factor) {  assert(factor); value /= factor; }
+		void operator/=(const long long unsigned factor)
+		{
+			assert(factor);
+			value /= factor;
+		}
 		//! Multiply time by an amount
-		void operator *=(const long long unsigned factor) { value *= factor; }
+		void operator*=(const long long unsigned factor) { value *= factor; }
 		//! Add times
-		UnifiedTime operator +(const UnifiedTime &that) const { return {value + that.value}; }
+		UnifiedTime operator+(const UnifiedTime& that) const { return { value + that.value }; }
 		//! Substract times
-		UnifiedTime operator -(const UnifiedTime &that) const { return {value - that.value}; }
+		UnifiedTime operator-(const UnifiedTime& that) const { return { value - that.value }; }
 		//! Divide time by an amount
-		UnifiedTime operator /(const long long unsigned factor) const { assert(factor); return {value / factor}; }
+		UnifiedTime operator/(const long long unsigned factor) const
+		{
+			assert(factor);
+			return { value / factor };
+		}
 		//! Multiply time by an amount
-		UnifiedTime operator *(const long long unsigned factor) const { return {value * factor}; }
-		bool operator <(const UnifiedTime &that) const { return value < that.value; }
-		bool operator <=(const UnifiedTime &that) const { return value <= that.value; }
-		bool operator >(const UnifiedTime &that) const { return value > that.value; }
-		bool operator >=(const UnifiedTime &that) const { return value >= that.value; }
-		bool operator ==(const UnifiedTime &that) const { return value == that.value; }
-		bool operator !=(const UnifiedTime &that) const { return value != that.value; }
+		UnifiedTime operator*(const long long unsigned factor) const { return { value * factor }; }
+		bool operator<(const UnifiedTime& that) const { return value < that.value; }
+		bool operator<=(const UnifiedTime& that) const { return value <= that.value; }
+		bool operator>(const UnifiedTime& that) const { return value > that.value; }
+		bool operator>=(const UnifiedTime& that) const { return value >= that.value; }
+		bool operator==(const UnifiedTime& that) const { return value == that.value; }
+		bool operator!=(const UnifiedTime& that) const { return value != that.value; }
 
 		//! Sleep for this amount of time
 		void sleep() const;
@@ -146,14 +155,14 @@ namespace Aseba
 	};
 
 	//! Dump the current time to a stream
-	void dumpTime(std::ostream &stream, bool raw = false);
+	void dumpTime(std::ostream& stream, bool raw = false);
 
 	// Soft timer
 	class SoftTimer
 	{
 	public:
 		//! A callback function
-		using Callback = const std::function<void ()>;
+		using Callback = const std::function<void()>;
 		//! The callback function, cannot change once initialized
 		Callback callback;
 		//! The current period, 0 disables the timer
@@ -208,7 +217,6 @@ namespace Aseba
 	}
 
 	/*@}*/
-
 };
 
 #endif

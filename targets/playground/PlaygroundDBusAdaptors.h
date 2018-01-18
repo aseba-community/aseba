@@ -30,11 +30,11 @@
 
 #ifdef HAVE_DBUS
 
-#include <QDBusAbstractAdaptor>
-#include <QDBusObjectPath>
-#include <QDBusConnection>
-#include <QDBusMessage>
-#include <QStringList>
+#	include <QDBusAbstractAdaptor>
+#	include <QDBusObjectPath>
+#	include <QDBusConnection>
+#	include <QDBusMessage>
+#	include <QStringList>
 
 namespace Enki
 {
@@ -43,7 +43,7 @@ namespace Enki
 	class PhysicalObject;
 	class AsebaThymio2;
 
-	class PhysicalObjectInterface: public QObject
+	class PhysicalObjectInterface : public QObject
 	{
 		Q_OBJECT
 		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.EnkiPhysicalObject")
@@ -69,7 +69,7 @@ namespace Enki
 		void Free();
 	};
 
-	class Thymio2Interface: public QObject
+	class Thymio2Interface : public QObject
 	{
 		Q_OBJECT
 		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.PlaygroundThymio2")
@@ -84,25 +84,25 @@ namespace Enki
 	public slots:
 		void Clap();
 		void Tap();
-		void SetButton(unsigned number, bool value, const QDBusMessage &message);
+		void SetButton(unsigned number, bool value, const QDBusMessage& message);
 		void Free();
 	};
 
-	class EnkiWorldInterface: public QDBusAbstractAdaptor
+	class EnkiWorldInterface : public QDBusAbstractAdaptor
 	{
 		Q_OBJECT
 		Q_CLASSINFO("D-Bus Interface", "ch.epfl.mobots.EnkiWorld")
 
 	private:
-		PlaygroundViewer *playground;
+		PlaygroundViewer* playground;
 
 	public:
-		EnkiWorldInterface(PlaygroundViewer *playground);
+		EnkiWorldInterface(PlaygroundViewer* playground);
 
 	public slots:
 		QStringList PhysicalObjectsByType(QString type) const;
 		QStringList AllPhysicalObjects() const;
-		QDBusObjectPath PhysicalObject(QString number, const QDBusMessage &message);
+		QDBusObjectPath PhysicalObject(QString number, const QDBusMessage& message);
 
 	protected:
 		friend class PhysicalObjectInterface;
@@ -111,8 +111,6 @@ namespace Enki
 	};
 }
 
-#endif // HAVE_DBUS
+#	endif // HAVE_DBUS
 
 #endif // __PLAYGROUND_DBUS_ADAPTORS_H
-
-

@@ -23,92 +23,95 @@
 
 #include "HttpHandler.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	/**
+	namespace Http
+	{
+		/**
 	 * Handles OPTIONS requests for CORS preflighting requests
 	 */
-	class OptionsHandler : public HttpHandler
-	{
+		class OptionsHandler : public HttpHandler
+		{
 		public:
 			OptionsHandler();
 			virtual ~OptionsHandler();
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const;
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
-	};
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const;
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
+		};
 
-	class NodesHandler : public HierarchicalTokenHttpHandler, public InterfaceHttpHandler
-	{
+		class NodesHandler : public HierarchicalTokenHttpHandler, public InterfaceHttpHandler
+		{
 		public:
-			NodesHandler(HttpInterface *interface);
+			NodesHandler(HttpInterface* interface);
 			virtual ~NodesHandler();
-	};
+		};
 
-	class EventsHandler : public TokenHttpHandler, public InterfaceHttpHandler
-	{
+		class EventsHandler : public TokenHttpHandler, public InterfaceHttpHandler
+		{
 		public:
-			EventsHandler(HttpInterface *interface);
+			EventsHandler(HttpInterface* interface);
 			virtual ~EventsHandler();
 
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
-	};
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
+		};
 
-	class ResetHandler : public TokenHttpHandler, public InterfaceHttpHandler
-	{
+		class ResetHandler : public TokenHttpHandler, public InterfaceHttpHandler
+		{
 		public:
-			ResetHandler(HttpInterface *interface);
+			ResetHandler(HttpInterface* interface);
 			virtual ~ResetHandler();
 
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
-	};
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
+		};
 
-	class LoadHandler : public virtual InterfaceHttpHandler
-	{
+		class LoadHandler : public virtual InterfaceHttpHandler
+		{
 		public:
-			LoadHandler(HttpInterface *interface);
+			LoadHandler(HttpInterface* interface);
 			virtual ~LoadHandler();
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const;
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
-	};
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const;
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
+		};
 
-	class NodeInfoHandler : public virtual InterfaceHttpHandler
-	{
+		class NodeInfoHandler : public virtual InterfaceHttpHandler
+		{
 		public:
-			NodeInfoHandler(HttpInterface *interface);
+			NodeInfoHandler(HttpInterface* interface);
 			virtual ~NodeInfoHandler();
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const;
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
-	};
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const;
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
+		};
 
-	class VariableOrEventHandler : public virtual WildcardHttpHandler, public virtual InterfaceHttpHandler
-	{
+		class VariableOrEventHandler : public virtual WildcardHttpHandler, public virtual InterfaceHttpHandler
+		{
 		public:
-			VariableOrEventHandler(HttpInterface *interface);
+			VariableOrEventHandler(HttpInterface* interface);
 			virtual ~VariableOrEventHandler();
 
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
 
 		private:
 			void parseJsonForm(std::string content, std::vector<std::string>& values);
-	};
+		};
 
-	class FileHandler: public InterfaceHttpHandler
-	{
-	public:
-		FileHandler(HttpInterface *interface);
-		virtual ~FileHandler();
+		class FileHandler : public InterfaceHttpHandler
+		{
+		public:
+			FileHandler(HttpInterface* interface);
+			virtual ~FileHandler();
 
-		virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const;
-		virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens);
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const;
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens);
 
-	private:
-		std::string filePath(HttpRequest *request) const;
-		bool doesFileExist(HttpRequest *request) const;
-		static std::map<std::string, std::string> const suffixMapping;
-	};
-} }
+		private:
+			std::string filePath(HttpRequest* request) const;
+			bool doesFileExist(HttpRequest* request) const;
+			static std::map<std::string, std::string> const suffixMapping;
+		};
+	}
+}
 
 #endif

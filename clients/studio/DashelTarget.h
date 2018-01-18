@@ -37,7 +37,7 @@
 #include <map>
 #include <dashel/dashel.h>
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-qt.h"
+#	include "../../common/zeroconf/zeroconf-qt.h"
 #endif // ZEROCONF_SUPPORT
 
 class QPushButton;
@@ -79,7 +79,7 @@ namespace Aseba
 
 	protected:
 		bool updatePortList(const QString& toSelect);
-		virtual void timerEvent ( QTimerEvent * event );
+		virtual void timerEvent(QTimerEvent* event);
 
 	protected slots:
 #ifdef ZEROCONF_SUPPORT
@@ -87,8 +87,9 @@ namespace Aseba
 		void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation& target);
 #endif // ZEROCONF_SUPPORT
 		void updateCurrentTarget();
-		void connectToItem(QListWidgetItem *item);
-		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
+		void connectToItem(QListWidgetItem* item);
+		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget,
+			const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
 
 	private slots:
 		void targetTemplateSerial();
@@ -100,7 +101,7 @@ namespace Aseba
 	class Message;
 	class UserMessage;
 
-	class DashelInterface: public QThread, public Dashel::Hub, public NodesManager
+	class DashelInterface : public QThread, public Dashel::Hub, public NodesManager
 	{
 		Q_OBJECT
 
@@ -119,7 +120,7 @@ namespace Aseba
 		virtual void stop();
 
 	signals:
-		void messageAvailable(Message *message);
+		void messageAvailable(Message* message);
 		void dashelDisconnection();
 		void nodeDescriptionReceivedSignal(unsigned nodeId);
 		void nodeConnectedSignal(unsigned nodeId);
@@ -130,20 +131,22 @@ namespace Aseba
 		virtual void run();
 
 		// from Dashel::Hub
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+		virtual void incomingData(Dashel::Stream* stream);
+		virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
 
 		// from NodesManager
-		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion);
+		virtual void nodeProtocolVersionMismatch(
+			unsigned nodeId, const std::wstring& nodeName, uint16_t protocolVersion);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 		virtual void nodeConnected(unsigned nodeId);
 		virtual void nodeDisconnected(unsigned nodeId);
+
 	public:
 		// from NodesManager, now as public as we want DashelTarget to call this method
 		virtual void sendMessage(const Message& message);
 	};
 
-	class ReconnectionDialog: public QMessageBox
+	class ReconnectionDialog : public QMessageBox
 	{
 		Q_OBJECT
 
@@ -151,13 +154,13 @@ namespace Aseba
 		ReconnectionDialog(DashelInterface& dashelInterface);
 
 	protected:
-		virtual void timerEvent ( QTimerEvent * event );
+		virtual void timerEvent(QTimerEvent* event);
 
 		DashelInterface& dashelInterface;
 		unsigned counter;
 	};
 
-	class DashelTarget: public Target
+	class DashelTarget : public Target
 	{
 		Q_OBJECT
 
@@ -173,7 +176,7 @@ namespace Aseba
 			ExecutionMode executionMode; //!< last known execution mode if this node
 		};
 
-		typedef void (DashelTarget::*MessageHandler)(Message *message);
+		typedef void (DashelTarget::*MessageHandler)(Message* message);
 		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
 		typedef std::map<unsigned, Node> NodesMap;
 
@@ -181,7 +184,7 @@ namespace Aseba
 
 		MessagesHandlersMap messagesHandlersMap;
 
-		QQueue<UserMessage *> userEventsQueue;
+		QQueue<UserMessage*> userEventsQueue;
 		NodesMap nodes;
 		QTimer userEventsTimer;
 		// Note: this timer is here rather than in DashelInterface because writeBlocked is here, if wiretBlocked is removed, this timer should be moved
@@ -198,15 +201,15 @@ namespace Aseba
 
 		virtual void disconnect();
 
-		virtual const TargetDescription * const getDescription(unsigned node) const;
+		virtual const TargetDescription* const getDescription(unsigned node) const;
 
-		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
+		virtual void uploadBytecode(unsigned node, const BytecodeVector& bytecode);
 		virtual void writeBytecode(unsigned node);
 		virtual void reboot(unsigned node);
 
-		virtual void sendEvent(unsigned id, const VariablesDataVector &data);
+		virtual void sendEvent(unsigned id, const VariablesDataVector& data);
 
-		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector &data);
+		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector& data);
 		virtual void getVariables(unsigned node, unsigned start, unsigned length);
 
 		virtual void reset(unsigned node);
@@ -226,22 +229,22 @@ namespace Aseba
 	protected slots:
 		void updateUserEvents();
 		void listNodes();
-		void messageFromDashel(Message *message);
+		void messageFromDashel(Message* message);
 		void disconnectionFromDashel();
 		void nodeDescriptionReceived(unsigned node);
 
 	protected:
-		void receivedDescription(Message *message);
-		void receivedLocalEventDescription(Message *message);
-		void receivedNativeFunctionDescription(Message *message);
-		void receivedVariables(Message *message);
-		void receivedArrayAccessOutOfBounds(Message *message);
-		void receivedDivisionByZero(Message *message);
-		void receivedEventExecutionKilled(Message *message);
-		void receivedNodeSpecificError(Message *message);
-		void receivedExecutionStateChanged(Message *message);
-		void receivedBreakpointSetResult(Message *message);
-		void receivedBootloaderAck(Message *message);
+		void receivedDescription(Message* message);
+		void receivedLocalEventDescription(Message* message);
+		void receivedNativeFunctionDescription(Message* message);
+		void receivedVariables(Message* message);
+		void receivedArrayAccessOutOfBounds(Message* message);
+		void receivedDivisionByZero(Message* message);
+		void receivedEventExecutionKilled(Message* message);
+		void receivedNodeSpecificError(Message* message);
+		void receivedExecutionStateChanged(Message* message);
+		void receivedBreakpointSetResult(Message* message);
+		void receivedBootloaderAck(Message* message);
 
 	protected:
 		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);

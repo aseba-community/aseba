@@ -27,8 +27,8 @@
 #include <map>
 
 #define CONFIG_PROPERTY_CHECKBOX_DECLARE(name) \
-public: \
-	static const bool get##name(void); \
+public:                                        \
+	static const bool get##name(void);         \
 	static void set##name(bool);
 
 class QStackedWidget;
@@ -43,7 +43,7 @@ namespace Aseba
 	class EditorPage;
 
 	// ConfigDialog
-	class ConfigDialog: public QDialog
+	class ConfigDialog : public QDialog
 	{
 		Q_OBJECT
 
@@ -73,7 +73,7 @@ namespace Aseba
 		void setupWidgets();
 
 	protected:
-		static ConfigDialog* me;	// pointer to the singleton
+		static ConfigDialog* me; // pointer to the singleton
 
 		QPushButton* okButton;
 		QPushButton* cancelButton;
@@ -98,13 +98,13 @@ namespace Aseba
 	};
 
 	// ConfigPage
-	class ConfigPage: public QWidget
+	class ConfigPage : public QWidget
 	{
 		Q_OBJECT
 
 	public:
 		ConfigPage(QString title = QString(), QWidget* parent = 0);
-		~ConfigPage(){}
+		~ConfigPage() {}
 
 		friend class ConfigDialog;
 
@@ -120,26 +120,28 @@ namespace Aseba
 		QCheckBox* newCheckbox(QString label, QString ID, bool checked = false);
 
 	protected:
-		template <class T> struct WidgetCache {
+		template<class T>
+		struct WidgetCache
+		{
 			WidgetCache() {}
-			WidgetCache(QWidget* widget, T value):widget(widget),value(value){}
+			WidgetCache(QWidget* widget, T value) : widget(widget), value(value) {}
 			QWidget* widget;
 			T value;
 		};
 		std::map<QString, WidgetCache<bool> > checkboxCache;
-		std::map<QString, WidgetCache<bool> > checkboxCacheSave;	// used to save the state prior to changes
+		std::map<QString, WidgetCache<bool> > checkboxCacheSave; // used to save the state prior to changes
 
 		QVBoxLayout* mainLayout;
 	};
 
 	// GeneralPage
-	class GeneralPage: public ConfigPage
+	class GeneralPage : public ConfigPage
 	{
 		Q_OBJECT
 
 	public:
 		GeneralPage(QWidget* parent = 0);
-		~GeneralPage(){}
+		~GeneralPage() {}
 
 		friend class ConfigDialog;
 
@@ -149,13 +151,13 @@ namespace Aseba
 	};
 
 	// EditorPage
-	class EditorPage: public ConfigPage
+	class EditorPage : public ConfigPage
 	{
 		Q_OBJECT
 
 	public:
 		EditorPage(QWidget* parent = 0);
-		~EditorPage(){}
+		~EditorPage() {}
 
 		friend class ConfigDialog;
 
@@ -166,4 +168,3 @@ namespace Aseba
 }
 
 #endif // CONFIG_DIALOG_H
-

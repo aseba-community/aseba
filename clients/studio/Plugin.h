@@ -50,7 +50,7 @@ namespace Aseba
 		//! Virtual destructor
 		virtual ~DevelopmentEnvironmentInterface() {}
 		//! Return the target Aseba network
-		virtual Target * getTarget() = 0;
+		virtual Target* getTarget() = 0;
 		//! Return the node ID of the node this plugin talks to
 		virtual unsigned getNodeId() const = 0;
 		//! Return the product ID of the node this plugin talks to
@@ -64,11 +64,11 @@ namespace Aseba
 		//! Stop execution of the node
 		virtual void stop() = 0;
 		//! Return the variables model of the node
-		virtual TargetVariablesModel * getVariablesModel() = 0;
+		virtual TargetVariablesModel* getVariablesModel() = 0;
 		//! Set variables on the node
-		virtual void setVariableValues(unsigned addr, const VariablesDataVector &data) = 0;
+		virtual void setVariableValues(unsigned addr, const VariablesDataVector& data) = 0;
 		//! Request the DE to save the current file
-		virtual bool saveFile(bool as=false) = 0;
+		virtual bool saveFile(bool as = false) = 0;
 		//! Request the DE to open an existing file
 		virtual void openFile() = 0;
 		//! Request the DE to create a new empty file
@@ -87,8 +87,8 @@ namespace Aseba
 
 		virtual ~NodeToolInterface() {}
 
-		virtual void aboutToLoad() {};
-		virtual void loadFromDom(const QDomDocument& content, bool fromFile) {};
+		virtual void aboutToLoad(){};
+		virtual void loadFromDom(const QDomDocument& content, bool fromFile){};
 		virtual QDomDocument saveToDom() const { return QDomDocument(); }
 		SavedContent getSaved() const { return SavedContent(name, saveToDom()); }
 		virtual void codeChangedInEditor() {}
@@ -98,7 +98,7 @@ namespace Aseba
 	};
 
 	//! A list of NodeToolInterface pointers
-	struct NodeToolInterfaces: std::vector<NodeToolInterface*>
+	struct NodeToolInterfaces : std::vector<NodeToolInterface*>
 	{
 		bool containsNamed(const QString& name) const;
 		NodeToolInterface* getNamed(const QString& name) const;

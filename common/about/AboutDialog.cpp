@@ -33,7 +33,7 @@
 #include <QSvgRenderer>
 #include <QPainter>
 #ifdef HAVE_QWT
-	#include <qwt_global.h>
+#	include <qwt_global.h>
 #endif // HAVE_QWT
 #include <QtDebug>
 
@@ -45,7 +45,7 @@
 namespace Aseba
 {
 	// Assume T is a sorted container
-	template <class T>
+	template<class T>
 	static bool haveCommonElements(const T& container1, const T& container2)
 	{
 		using I = typename T::const_iterator;
@@ -65,8 +65,7 @@ namespace Aseba
 		return false;
 	}
 
-	AboutBox::AboutBox(QWidget* parent, const Parameters& parameters):
-		QDialog(parent)
+	AboutBox::AboutBox(QWidget* parent, const Parameters& parameters) : QDialog(parent)
 	{
 		// title entry
 		auto titleLayout = new QHBoxLayout();
@@ -79,11 +78,9 @@ namespace Aseba
 		iconLabel->setPixmap(iconPixmap);
 		titleLayout->addWidget(iconLabel);
 		titleLayout->addSpacing(16);
-		auto titleLabel = new QLabel(QString(
-			"<p style=\"font-size: large\">%1</p><p>%2</p>")
-			.arg(parameters.applicationName)
-			.arg(tr("Version %1").arg(ASEBA_VERSION))
-		);
+		auto titleLabel = new QLabel(QString("<p style=\"font-size: large\">%1</p><p>%2</p>")
+										 .arg(parameters.applicationName)
+										 .arg(tr("Version %1").arg(ASEBA_VERSION)));
 		titleLayout->addWidget(titleLabel);
 		titleLayout->addStretch();
 
@@ -92,14 +89,29 @@ namespace Aseba
 
 		//clang-format off
 		// about tab
-		const QString aboutText =
-			"<p>" + parameters.description + "</p>" +
-			(parameters.helpUrl.isEmpty() ? "" : "<p>" + tr("You can find more information online at <a href=\"%1\">%2</a>.").arg(parameters.helpUrl.toString()).arg(parameters.helpUrl.toString(QUrl::RemoveScheme|QUrl::RemoveUserInfo|QUrl::StripTrailingSlash).remove(0,2)) + "</p>" ) +
-			"<p>" + tr("This program is part of Aseba, a set of tools which allow beginners to program robots easily and efficiently. For more information about Aseba, visit %1.").arg("<a href=\"http://aseba.io\">aseba.io</a>") + "</p>" +
-			"<p>" + tr("(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and <a href=\"https://github.com/aseba-community/aseba/blob/master/authors.txt\">other contributors</a>. See tabs \"Authors\" and \"Thanks To\" for more information.") + " " +
-			tr("Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.") + "</p>"
-		//clang-format on
-		;
+		const QString aboutText = "<p>" + parameters.description + "</p>"
+			+ (parameters.helpUrl.isEmpty() ? ""
+											: "<p>"
+						  + tr("You can find more information online at <a href=\"%1\">%2</a>.")
+								.arg(parameters.helpUrl.toString())
+								.arg(parameters.helpUrl
+										 .toString(QUrl::RemoveScheme | QUrl::RemoveUserInfo | QUrl::StripTrailingSlash)
+										 .remove(0, 2))
+						  + "</p>")
+			+ "<p>"
+			+ tr("This program is part of Aseba, a set of tools which allow beginners to program robots easily and "
+				 "efficiently. For more information about Aseba, visit %1.")
+				  .arg("<a href=\"http://aseba.io\">aseba.io</a>")
+			+ "</p>" + "<p>"
+			+ tr("(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and <a "
+				 "href=\"https://github.com/aseba-community/aseba/blob/master/authors.txt\">other contributors</a>. "
+				 "See tabs \"Authors\" and \"Thanks To\" for more information.")
+			+ " "
+			+ tr("Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL "
+				 "version 3</a>.")
+			+ "</p>"
+			//clang-format on
+			;
 		auto aboutTextLabel = new QLabel(aboutText);
 		aboutTextLabel->setWordWrap(true);
 		aboutTextLabel->setOpenExternalLinks(true);
@@ -121,21 +133,21 @@ namespace Aseba
 		}
 
 		// author and thanksTo informations
-		for (const auto& personList : { std::make_pair(tr("Authors"), &authorList), std::make_pair(tr("Thanks To"), &thankToList) })
+		for (const auto& personList :
+			{ std::make_pair(tr("Authors"), &authorList), std::make_pair(tr("Thanks To"), &thankToList) })
 		{
 			auto personListWidget = new QListWidget;
 			personListWidget->setSelectionMode(QAbstractItemView::NoSelection);
-			for (const auto& person: *personList.second)
+			for (const auto& person : *personList.second)
 			{
 				auto email = std::regex_replace(person.email, std::regex(" at "), "@");
 				email = std::regex_replace(email, std::regex(" dot "), ".");
 				if (!haveCommonElements(person.tags, parameters.tags) && !person.tags.count("all"))
 					continue;
-				const QString text = "<b>" + QString::fromStdString(person.name) + "</b><br/>" +
-					QString::fromStdString(person.role) + "<br/>" +
-					(email.empty() ? "" : " <a href=\"mailto:" + QString::fromStdString(email) + "\">email</a>") +
-					(person.web.empty() ? "" : " <a href=\"" + QString::fromStdString(person.web) + "\">web</a>")
-				;
+				const QString text = "<b>" + QString::fromStdString(person.name) + "</b><br/>"
+					+ QString::fromStdString(person.role) + "<br/>"
+					+ (email.empty() ? "" : " <a href=\"mailto:" + QString::fromStdString(email) + "\">email</a>")
+					+ (person.web.empty() ? "" : " <a href=\"" + QString::fromStdString(person.web) + "\">web</a>");
 				auto label = new QLabel(text);
 				label->setOpenExternalLinks(true);
 				label->setStyleSheet("QLabel { margin: 3px }");
@@ -149,17 +161,16 @@ namespace Aseba
 				//clang-format off
 				using Institution = std::pair<QString, QString>;
 				using Institutions = std::vector<Institution>;
-				const Institutions institutions = {
-					{ "Mobots group, EPFL", "http://mobots.epfl.ch" },
+				const Institutions institutions = { { "Mobots group, EPFL", "http://mobots.epfl.ch" },
 					{ "Autonomous Systems Lab, ETH Zurich", "http://www.asl.ethz.ch/" },
 					{ "Mobsya Association", "http://www.mobsya.org" },
 					{ "Game Technology Center, ETH Zurich", "http://www.gtc.inf.ethz.ch/" },
-					{ "Inria, France", "https://www.inria.fr/en/" }
-				};
+					{ "Inria, France", "https://www.inria.fr/en/" } };
 				//clang-format on
-				for (const auto& institution: institutions)
+				for (const auto& institution : institutions)
 				{
-					const QString text(QString("<b>%1</b><br/><a href=\"%2\">web</a>").arg(institution.first).arg(institution.second));
+					const QString text(
+						QString("<b>%1</b><br/><a href=\"%2\">web</a>").arg(institution.first).arg(institution.second));
 					auto label = new QLabel(text);
 					label->setOpenExternalLinks(true);
 					label->setStyleSheet("QLabel { margin: 3px }");
@@ -177,13 +188,13 @@ namespace Aseba
 
 				//clang-format off
 				using Grants = std::vector<Grant>;
-				const Grants grants = {
-					{ "Swiss National Center of Competence in Research", "", "Robotics" },
+				const Grants grants = { { "Swiss National Center of Competence in Research", "", "Robotics" },
 					{ "GebertRuf Stiftung", "GRS-017/13", "Robot Design for Understanding" },
-					{ "Swiss Commission for Technology and Innovation",  "17479.2", "Combining Augmented Reality and Robotics for Innovative Accessible Educational Tools" }
-				};
+					{ "Swiss Commission for Technology and Innovation",
+						"17479.2",
+						"Combining Augmented Reality and Robotics for Innovative Accessible Educational Tools" } };
 				//clang-format on
-				for (const auto& grant: grants)
+				for (const auto& grant : grants)
 				{
 					QString text;
 					if (!grant.id.isEmpty())
@@ -211,24 +222,23 @@ namespace Aseba
 		//clang-format off
 		const QString welcomeText = tr("The following software are used in Aseba:");
 		const QString libEntryText = tr("<b><a href=\"%3\">%1</a></b> version %2");
-		const QString asebaBuildInfo = tr("build version %1, protocol version %2").arg(ASEBA_BUILD_VERSION).arg(ASEBA_PROTOCOL_VERSION);
-		const QString dashelStreamInfo = tr("supported stream types: %1").arg(QString::fromStdString(Dashel::streamTypeRegistry.list()));
+		const QString asebaBuildInfo =
+			tr("build version %1, protocol version %2").arg(ASEBA_BUILD_VERSION).arg(ASEBA_PROTOCOL_VERSION);
+		const QString dashelStreamInfo =
+			tr("supported stream types: %1").arg(QString::fromStdString(Dashel::streamTypeRegistry.list()));
 		const QString liStart = "<li style=\"margin-top:5px; margin-bottom:5px;\">";
-		const QString libraryText =
-			welcomeText + "<ul>" +
-			liStart + libEntryText.arg("Aseba").arg(ASEBA_VERSION).arg("http://aseba.io") + "<br/>" +
-			asebaBuildInfo + "</li>" +
-			liStart + libEntryText.arg("Dashel").arg(DASHEL_VERSION).arg("http://aseba-community.github.io/dashel/") + "<br/>" +
-			dashelStreamInfo + "</li>" +
-			liStart + libEntryText.arg("Qt").arg(qVersion()).arg("https://www.qt.io/") + "</li>" +
+		const QString libraryText = welcomeText + "<ul>" + liStart
+			+ libEntryText.arg("Aseba").arg(ASEBA_VERSION).arg("http://aseba.io") + "<br/>" + asebaBuildInfo + "</li>"
+			+ liStart + libEntryText.arg("Dashel").arg(DASHEL_VERSION).arg("http://aseba-community.github.io/dashel/")
+			+ "<br/>" + dashelStreamInfo + "</li>" + liStart
+			+ libEntryText.arg("Qt").arg(qVersion()).arg("https://www.qt.io/") + "</li>" +
 #ifdef HAVE_QWT
 			liStart + libEntryText.arg("Qwt").arg(QWT_VERSION_STR).arg("http://qwt.sourceforge.net/") + "</li>" +
 #endif // HAVE_QWT
 #ifdef HAVE_ENKI
 			liStart + libEntryText.arg("Enki").arg("2.0~pre").arg("https://github.com/enki-community/enki") + "</li>" +
 #endif // HAVE_ENKI
-			"</ul>"
-		;
+			"</ul>";
 		//clang-format on
 		auto libraryTextLabel = new QLabel(libraryText);
 		libraryTextLabel->setOpenExternalLinks(true);

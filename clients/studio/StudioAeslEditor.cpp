@@ -30,13 +30,9 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	StudioAeslEditor::StudioAeslEditor(const ScriptTab* tab) :
-		tab(tab),
-		dropSourceWidget(0)
-	{
-	}
+	StudioAeslEditor::StudioAeslEditor(const ScriptTab* tab) : tab(tab), dropSourceWidget(0) {}
 
-	void StudioAeslEditor::dropEvent(QDropEvent *event)
+	void StudioAeslEditor::dropEvent(QDropEvent* event)
 	{
 		dropSourceWidget = dynamic_cast<QWidget*>(event->source());
 		QTextEdit::dropEvent(event);
@@ -44,7 +40,7 @@ namespace Aseba
 		setFocus(Qt::MouseFocusReason);
 	}
 
-	void StudioAeslEditor::insertFromMimeData ( const QMimeData * source )
+	void StudioAeslEditor::insertFromMimeData(const QMimeData* source)
 	{
 		QTextCursor cursor(this->textCursor());
 
@@ -71,7 +67,7 @@ namespace Aseba
 				prefix = "call ";
 				midfix = "(";
 				// fill call from doc
-				const TargetDescription *desc = nodeTab->vmFunctionsModel->descriptionRead;
+				const TargetDescription* desc = nodeTab->vmFunctionsModel->descriptionRead;
 				const std::wstring funcName = source->text().toStdWString();
 				for (size_t i = 0; i < desc->nativeFunctions.size(); i++)
 				{
@@ -124,7 +120,6 @@ namespace Aseba
 		}
 		else
 			cursor.insertText(source->text());
-
 	}
 
 	/*@}*/

@@ -63,7 +63,7 @@ namespace Aseba
 		}
 	}
 
-	void SimpleDashelConnection::connectionCreated(Dashel::Stream *stream)
+	void SimpleDashelConnection::connectionCreated(Dashel::Stream* stream)
 	{
 		const std::string& targetName(stream->getTargetName());
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
@@ -81,7 +81,7 @@ namespace Aseba
 		}
 	}
 
-	void SimpleDashelConnection::incomingData(Dashel::Stream *stream)
+	void SimpleDashelConnection::incomingData(Dashel::Stream* stream)
 	{
 		// if we receive data from an old connection, disregard as we'll close the old stream soon
 		if (stream != this->stream)
@@ -102,11 +102,11 @@ namespace Aseba
 			len = bswap16(temp);
 			stream->read(&temp, 2);
 			lastMessageSource = bswap16(temp);
-			lastMessageData.resize(len+2);
+			lastMessageData.resize(len + 2);
 			stream->read(&lastMessageData[0], lastMessageData.size());
 
 			// execute event on all VM that are linked to this connection
-			for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
+			for (auto vmStateToEnvironmentKV : vmStateToEnvironment)
 			{
 				if (vmStateToEnvironmentKV.second.second == this)
 				{
@@ -121,7 +121,7 @@ namespace Aseba
 		}
 	}
 
-	void SimpleDashelConnection::connectionClosed(Dashel::Stream *stream, bool abnormal)
+	void SimpleDashelConnection::connectionClosed(Dashel::Stream* stream, bool abnormal)
 	{
 		// if the stream being closed is the current one (not old), clear breakpoints and reset current
 		if (stream == this->stream)
@@ -142,7 +142,7 @@ namespace Aseba
 	//! Clear breakpoints on all VM that are linked to this connection
 	void SimpleDashelConnection::clearBreakpoints()
 	{
-		for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
+		for (auto vmStateToEnvironmentKV : vmStateToEnvironment)
 		{
 			if (vmStateToEnvironmentKV.second.second == this)
 				vmStateToEnvironmentKV.first->breakpointsCount = 0;

@@ -39,7 +39,7 @@ namespace Aseba
 	public:
 		struct Error : std::exception
 		{
-			virtual ~Error () = default;
+			virtual ~Error() = default;
 			virtual std::string toString() const = 0;
 			virtual const char* what() const noexcept override;
 		};
@@ -48,7 +48,7 @@ namespace Aseba
 		{
 			int line;
 
-			EarlyEOF(int line) : line(line) { }
+			EarlyEOF(int line) : line(line) {}
 			std::string toString() const override;
 		};
 
@@ -56,7 +56,7 @@ namespace Aseba
 		{
 			int line;
 
-			InvalidRecord(int line) : line(line) { }
+			InvalidRecord(int line) : line(line) {}
 			std::string toString() const override;
 		};
 
@@ -66,11 +66,11 @@ namespace Aseba
 			uint8_t recordCheckSum;
 			uint8_t computedCheckSum;
 
-			WrongCheckSum (int line, uint8_t recordCheckSum, uint8_t computedCheckSum) :
+			WrongCheckSum(int line, uint8_t recordCheckSum, uint8_t computedCheckSum) :
 				line(line),
 				recordCheckSum(recordCheckSum),
 				computedCheckSum(computedCheckSum)
-			{ }
+			{}
 			std::string toString() const override;
 		};
 
@@ -79,7 +79,7 @@ namespace Aseba
 			int line;
 			uint8_t recordType;
 
-			UnknownRecordType(int line, uint8_t recordType) : line(line), recordType(recordType) { }
+			UnknownRecordType(int line, uint8_t recordType) : line(line), recordType(recordType) {}
 			std::string toString() const override;
 		};
 
@@ -87,7 +87,7 @@ namespace Aseba
 		{
 			std::string fileName;
 
-			FileOpeningError(std::string fileName) : fileName(std::move(fileName)) { }
+			FileOpeningError(std::string fileName) : fileName(std::move(fileName)) {}
 			std::string toString() const override;
 		};
 
@@ -96,20 +96,19 @@ namespace Aseba
 		ChunkMap data;
 
 	public:
-		void read(const std::string &fileName);
-		void write(const std::string &fileName) const;
+		void read(const std::string& fileName);
+		void write(const std::string& fileName) const;
 		void strip(unsigned pageSize);
 
 	protected:
-		static unsigned getUint4(std::istream &stream);
-		static unsigned getUint8(std::istream &stream);
-		static unsigned getUint16(std::istream &stream);
-		static void writeExtendedLinearAddressRecord(std::ofstream &stream, unsigned addr16);
-		static void writeData(std::ofstream &stream, unsigned addr16, unsigned count8, uint8_t *data);
+		static unsigned getUint4(std::istream& stream);
+		static unsigned getUint8(std::istream& stream);
+		static unsigned getUint16(std::istream& stream);
+		static void writeExtendedLinearAddressRecord(std::ofstream& stream, unsigned addr16);
+		static void writeData(std::ofstream& stream, unsigned addr16, unsigned count8, uint8_t* data);
 	};
 
 	/*@}*/
 }
 
 #endif
-

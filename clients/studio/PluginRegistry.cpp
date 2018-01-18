@@ -34,7 +34,7 @@
 #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
 
 #ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
-    #include "plugins/ThymioBlockly/ThymioBlockly.h"
+#	include "plugins/ThymioBlockly/ThymioBlockly.h"
 #endif
 namespace Aseba
 {
@@ -95,7 +95,7 @@ namespace Aseba
 	}
 
 	//! Print the list of registered classes to stream
-	void NodeToolRegistrar::dump(std::ostream &stream)
+	void NodeToolRegistrar::dump(std::ostream& stream)
 	{
 		for (PidCreatorMap::const_iterator it = pidCreators.begin(); it != pidCreators.end(); ++it)
 			stream << "- " << it->first << "\n";

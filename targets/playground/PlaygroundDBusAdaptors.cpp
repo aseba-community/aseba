@@ -27,21 +27,21 @@
 
 #ifdef HAVE_DBUS
 
-#include "PlaygroundDBusAdaptors.h"
-#include "PlaygroundViewer.h"
-#include "robots/thymio2/Thymio2.h"
-#include <QDBusConnection>
-#include <QDBusMetaType>
-#include <QtDebug>
+#	include "PlaygroundDBusAdaptors.h"
+#	include "PlaygroundViewer.h"
+#	include "robots/thymio2/Thymio2.h"
+#	include <QDBusConnection>
+#	include <QDBusMetaType>
+#	include <QtDebug>
 
 namespace Enki
 {
-	PhysicalObjectInterface::PhysicalObjectInterface(EnkiWorldInterface* enkiWorldInterface, PhysicalObject* physicalObject):
+	PhysicalObjectInterface::PhysicalObjectInterface(EnkiWorldInterface* enkiWorldInterface,
+		PhysicalObject* physicalObject) :
 		QObject(enkiWorldInterface),
 		enkiWorldInterface(enkiWorldInterface),
 		physicalObject(physicalObject)
-	{
-	}
+	{}
 
 	double PhysicalObjectInterface::getX() const
 	{
@@ -85,18 +85,14 @@ namespace Enki
 		physicalObject->angle = angle;
 	}
 
-	void PhysicalObjectInterface::Free()
-	{
-		deleteLater();
-	}
+	void PhysicalObjectInterface::Free() { deleteLater(); }
 
 
-	Thymio2Interface::Thymio2Interface(EnkiWorldInterface* enkiWorldInterface, AsebaThymio2* thymio):
+	Thymio2Interface::Thymio2Interface(EnkiWorldInterface* enkiWorldInterface, AsebaThymio2* thymio) :
 		QObject(enkiWorldInterface),
 		enkiWorldInterface(enkiWorldInterface),
 		thymio(thymio)
-	{
-	}
+	{}
 
 	void Thymio2Interface::Clap()
 	{
@@ -112,14 +108,16 @@ namespace Enki
 		thymio->execLocalEvent(AsebaThymio2::EVENT_TAP);
 	}
 
-	void Thymio2Interface::SetButton(unsigned number, bool value, const QDBusMessage &message)
+	void Thymio2Interface::SetButton(unsigned number, bool value, const QDBusMessage& message)
 	{
 		if (!enkiWorldInterface->isPointerValid(thymio))
 			return;
 
 		if (number > 4)
 		{
-			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("Button number %0 does not exist on Thymio II, it only has 5 buttons numbered from 0 to 4.").arg(number)));
+			QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs,
+				QString("Button number %0 does not exist on Thymio II, it only has 5 buttons numbered from 0 to 4.")
+					.arg(number)));
 			return;
 		}
 
@@ -132,20 +130,15 @@ namespace Enki
 		}
 	}
 
-	void Thymio2Interface::Free()
-	{
-		deleteLater();
-	}
+	void Thymio2Interface::Free() { deleteLater(); }
 
 
-	EnkiWorldInterface::EnkiWorldInterface(PlaygroundViewer *playground):
+	EnkiWorldInterface::EnkiWorldInterface(PlaygroundViewer* playground) :
 		QDBusAbstractAdaptor(playground),
 		playground(playground)
-	{
+	{}
 
-	}
-
-	static QString ptrToString(void *ptr)
+	static QString ptrToString(void* ptr)
 	{
 		return QString("%1").arg((quintptr)ptr, QT_POINTER_SIZE * 2, 16, QChar('0'));
 	}
@@ -163,12 +156,9 @@ namespace Enki
 		return objectNames;
 	}
 
-	QStringList EnkiWorldInterface::AllPhysicalObjects() const
-	{
-		return PhysicalObjectsByType("");
-	}
+	QStringList EnkiWorldInterface::AllPhysicalObjects() const { return PhysicalObjectsByType(""); }
 
-	QDBusObjectPath EnkiWorldInterface::PhysicalObject(QString number, const QDBusMessage &message)
+	QDBusObjectPath EnkiWorldInterface::PhysicalObject(QString number, const QDBusMessage& message)
 	{
 		const World* world(playground->getWorld());
 		for (World::ObjectsIterator it(world->objects.begin()); it != world->objects.end(); ++it)
@@ -178,18 +168,22 @@ namespace Enki
 				QDBusObjectPath path(QString("/world/objects/%0").arg(number));
 
 				// interface to Enki's physical object
-				QDBusConnection::sessionBus().registerObject(path.path(), new PhysicalObjectInterface(this, *it), QDBusConnection::ExportAllContents);
+				QDBusConnection::sessionBus().registerObject(
+					path.path(), new PhysicalObjectInterface(this, *it), QDBusConnection::ExportAllContents);
 
 				// if robot is Thymio2, provide robot-specific interface
 				AsebaThymio2* thymio2(dynamic_cast<AsebaThymio2*>(*it));
 				qDebug() << "thymio" << thymio2;
 				if (thymio2)
-					QDBusConnection::sessionBus().registerObject(path.path() + "/thymio2", new Thymio2Interface(this, thymio2), QDBusConnection::ExportAllContents);
+					QDBusConnection::sessionBus().registerObject(path.path() + "/thymio2",
+						new Thymio2Interface(this, thymio2),
+						QDBusConnection::ExportAllContents);
 
 				return path;
 			}
 		}
-		QDBusConnection::sessionBus().send(message.createErrorReply(QDBusError::InvalidArgs, QString("object %0 does not exists").arg(number)));
+		QDBusConnection::sessionBus().send(
+			message.createErrorReply(QDBusError::InvalidArgs, QString("object %0 does not exists").arg(number)));
 		return QDBusObjectPath("/");
 	}
 

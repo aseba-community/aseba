@@ -35,12 +35,12 @@ namespace Enki
 	public:
 		double energy;
 
-	public :
-		EPuckFeeding(Robot *owner);
+	public:
+		EPuckFeeding(Robot* owner);
 
-		virtual void objectStep(double dt, World *w, PhysicalObject *po);
+		virtual void objectStep(double dt, World* w, PhysicalObject* po);
 
-		virtual void finalize(double dt, World *w);
+		virtual void finalize(double dt, World* w);
 	};
 
 	class EPuckFeeder : public Robot
@@ -52,15 +52,15 @@ namespace Enki
 		EPuckFeeder();
 	};
 
-	class ScoreModifier: public GlobalInteraction
+	class ScoreModifier : public GlobalInteraction
 	{
 	public:
 		ScoreModifier(Robot* owner) : GlobalInteraction(owner) {}
 
-		virtual void step(double dt, World *w);
+		virtual void step(double dt, World* w);
 	};
 
-	class FeedableEPuck: public EPuck
+	class FeedableEPuck : public EPuck
 	{
 	public:
 		double energy;
@@ -88,7 +88,7 @@ namespace Enki
 			int16_t colorR; // body red [0..100] %
 			int16_t colorG; // body green [0..100] %
 			int16_t colorB; // body blue [0..100] %
-			int16_t prox[8];	//
+			int16_t prox[8]; //
 			int16_t camR[60]; // camera red (left, middle, right) [0..100] %
 			int16_t camG[60]; // camera green (left, middle, right) [0..100] %
 			int16_t camB[60]; // camera blue (left, middle, right) [0..100] %
@@ -106,8 +106,8 @@ namespace Enki
 		// from AbstractNodeGlue
 
 		virtual const AsebaVMDescription* getDescription() const;
-		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
-		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
+		virtual const AsebaLocalEventDescription* getLocalEventsDescriptions() const;
+		virtual const AsebaNativeFunctionDescription* const* getNativeFunctionsDescriptions() const;
 		virtual void callNativeFunction(uint16_t id);
 	};
 } // Enki

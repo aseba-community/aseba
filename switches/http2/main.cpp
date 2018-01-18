@@ -30,7 +30,7 @@
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba http, connects aseba components together and with HTTP, usage:\n";
 	stream << programName << " [options] [additional targets]*\n";
@@ -45,7 +45,7 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "asebahttp2" << std::endl;
 	stream << "Aseba version " << ASEBA_VERSION << std::endl;
@@ -54,55 +54,70 @@ void dumpVersion(std::ostream &stream)
 }
 
 // Main
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 
 	std::string httpPort = "3000";
-	std::vector < std::string > dashelTargetList;
+	std::vector<std::string> dashelTargetList;
 	bool verbose = false;
 	int Kiterations = -1; // set to > 0 to limit run time e.g. for valgrind
-	char const *docRoot = nullptr;
+	char const* docRoot = nullptr;
 
 	// process command line
 	int argCounter = 1;
-	while(argCounter < argc) {
-		const char *arg = argv[argCounter++];
+	while (argCounter < argc)
+	{
+		const char* arg = argv[argCounter++];
 
-		if((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0)) verbose = true;
-		else if((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0)) dumpHelp(std::cout, argv[0]), exit(1);
-		else if((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0)) dumpVersion (std::cout), exit(1);
-		else if((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0)) httpPort = argv[argCounter++];
-		else if(strcmp(arg, "--doc") == 0) docRoot = argv[argCounter++];
-		else if((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0)) Kiterations = atoi(argv[argCounter++]);
-		else if(strncmp(arg, "-", 1) != 0) dashelTargetList.push_back(arg);
+		if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
+			verbose = true;
+		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
+			dumpHelp(std::cout, argv[0]), exit(1);
+		else if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
+			dumpVersion(std::cout), exit(1);
+		else if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0))
+			httpPort = argv[argCounter++];
+		else if (strcmp(arg, "--doc") == 0)
+			docRoot = argv[argCounter++];
+		else if ((strcmp(arg, "-K") == 0) || (strcmp(arg, "--Kiter") == 0))
+			Kiterations = atoi(argv[argCounter++]);
+		else if (strncmp(arg, "-", 1) != 0)
+			dashelTargetList.push_back(arg);
 	}
 
 	// initialize Dashel plugins
 	Dashel::initPlugins();
 
 	// create and run bridge, catch Dashel exceptions
-	try {
+	try
+	{
 		std::auto_ptr<Aseba::Http::HttpInterface> interface(new Aseba::Http::HttpInterface(httpPort));
 		interface->setVerbose(verbose);
 
-		if (docRoot != nullptr) {
+		if (docRoot != nullptr)
+		{
 			interface->setDocumentRoot(docRoot);
 		}
 
-		int numTargets = (int) dashelTargetList.size();
-		for(int i = 0; i < numTargets; i++) {
+		int numTargets = (int)dashelTargetList.size();
+		for (int i = 0; i < numTargets; i++)
+		{
 			interface->addTarget(dashelTargetList[i]);
 		}
 
-		while(Kiterations < 0 || Kiterations > 0) {
+		while (Kiterations < 0 || Kiterations > 0)
+		{
 			interface->step();
 
-			if(Kiterations > 0) {
+			if (Kiterations > 0)
+			{
 				Kiterations--;
 			}
 		}
-	} catch(Dashel::DashelException e) {
+	}
+	catch (Dashel::DashelException e)
+	{
 		std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
 		return 1;
 	}

@@ -25,7 +25,8 @@ namespace Enki
 {
 	// SlidingDoor
 
-	SlidingDoor::SlidingDoor(const Point& closedPos, const Point& openedPos, const Point& size, double height, double moveDuration) :
+	SlidingDoor::SlidingDoor(
+		const Point& closedPos, const Point& openedPos, const Point& size, double height, double moveDuration) :
 		closedPos(closedPos),
 		openedPos(openedPos),
 		moveDuration(moveDuration),
@@ -41,32 +42,27 @@ namespace Enki
 		double alpha;
 		switch (mode)
 		{
-			case MODE_CLOSED:
-			pos = closedPos;
-			break;
+			case MODE_CLOSED: pos = closedPos; break;
 
 			case MODE_OPENING:
-			alpha = (cos((moveTimeLeft*M_PI)/moveDuration) + 1.) / 2.;
-			pos = openedPos * alpha + closedPos * (1 - alpha);
-			moveTimeLeft -= dt;
-			if (moveTimeLeft < 0)
-				mode = MODE_OPENED;
-			break;
+				alpha = (cos((moveTimeLeft * M_PI) / moveDuration) + 1.) / 2.;
+				pos = openedPos * alpha + closedPos * (1 - alpha);
+				moveTimeLeft -= dt;
+				if (moveTimeLeft < 0)
+					mode = MODE_OPENED;
+				break;
 
-			case MODE_OPENED:
-			pos = openedPos;
-			break;
+			case MODE_OPENED: pos = openedPos; break;
 
 			case MODE_CLOSING:
-			alpha = (cos((moveTimeLeft*M_PI)/moveDuration) + 1.) / 2.;
-			pos = closedPos * alpha + openedPos * (1 - alpha);
-			moveTimeLeft -= dt;
-			if (moveTimeLeft < 0)
-				mode = MODE_CLOSED;
-			break;
+				alpha = (cos((moveTimeLeft * M_PI) / moveDuration) + 1.) / 2.;
+				pos = closedPos * alpha + openedPos * (1 - alpha);
+				moveTimeLeft -= dt;
+				if (moveTimeLeft < 0)
+					mode = MODE_CLOSED;
+				break;
 
-			default:
-			break;
+			default: break;
 		}
 		PhysicalObject::controlStep(dt);
 	}
@@ -101,20 +97,15 @@ namespace Enki
 
 	// AreaActivating
 
-	AreaActivating::AreaActivating(Robot *owner, const Polygon& activeArea) :
-		activeArea(activeArea),
-		active(false)
+	AreaActivating::AreaActivating(Robot* owner, const Polygon& activeArea) : activeArea(activeArea), active(false)
 	{
 		r = activeArea.getBoundingRadius();
 		this->owner = owner;
 	}
 
-	void AreaActivating::init(double dt, World *w)
-	{
-		active = false;
-	}
+	void AreaActivating::init(double dt, World* w) { active = false; }
 
-	void AreaActivating::objectStep (double dt, World *w, PhysicalObject *po)
+	void AreaActivating::objectStep(double dt, World* w, PhysicalObject* po)
 	{
 		if (po != owner && dynamic_cast<Robot*>(po))
 		{
@@ -122,10 +113,7 @@ namespace Enki
 		}
 	}
 
-	bool AreaActivating::isActive() const
-	{
-		return active;
-	}
+	bool AreaActivating::isActive() const { return active; }
 
 	// DoorButton
 

@@ -26,7 +26,7 @@ namespace Aseba
 
 	class MessageHub;
 
-	class QtBootloaderInterface:public QObject, public BootloaderInterface
+	class QtBootloaderInterface : public QObject, public BootloaderInterface
 	{
 		Q_OBJECT
 
@@ -62,8 +62,12 @@ namespace Aseba
 			QString title;
 			QString text;
 
-			FlashResult():status(SUCCESS) {}
-			FlashResult(Status status, const QString& title, const QString& text):status(status), title(title), text(text) {}
+			FlashResult() : status(SUCCESS) {}
+			FlashResult(Status status, const QString& title, const QString& text) :
+				status(status),
+				title(title),
+				text(text)
+			{}
 		};
 
 	private:
@@ -73,7 +77,7 @@ namespace Aseba
 		unsigned currentDevStatus;
 		unsigned officialVersion;
 		unsigned officialDevStatus;
-		QTemporaryFile  officialHexFile;
+		QTemporaryFile officialHexFile;
 
 		QGroupBox* officialGroupBox;
 		QGroupBox* fileGroupBox;
@@ -90,7 +94,7 @@ namespace Aseba
 		QPushButton* quitButton;
 		QFuture<FlashResult> flashFuture;
 		QFutureWatcher<FlashResult> flashFutureWatcher;
-		QNetworkAccessManager *networkManager;
+		QNetworkAccessManager* networkManager;
 
 	public:
 		ThymioUpgraderDialog(const std::string& target);
@@ -120,4 +124,3 @@ namespace Aseba
 } // namespace Aseba
 
 #endif // THYMIO_FLASHER_H
-

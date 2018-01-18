@@ -76,7 +76,7 @@ namespace Aseba
 				const size_t next = input.find(' ', pos);
 				string word;
 				if (next != string::npos)
-					word = input.substr(pos, next-pos);
+					word = input.substr(pos, next - pos);
 				else
 					word = input.substr(pos);
 				if (!word.empty())
@@ -128,7 +128,7 @@ namespace Aseba
 			}
 
 			// write message on all connected streams
-			for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
+			for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end(); ++it)
 			{
 				Stream* destStream(*it);
 				if (destStream != in)
@@ -146,13 +146,12 @@ namespace Aseba
 		}
 
 	protected:
-
-		void connectionCreated(Stream *stream)
+		void connectionCreated(Stream* stream)
 		{
 			//cerr << "got connection " << stream->getTargetName()  << endl;
 		}
 
-		void incomingData(Stream *stream)
+		void incomingData(Stream* stream)
 		{
 			char c(stream->read<char>());
 			if (stream == in)
@@ -164,7 +163,7 @@ namespace Aseba
 			}
 		}
 
-		void connectionClosed(Stream *stream, bool abnormal)
+		void connectionClosed(Stream* stream, bool abnormal)
 		{
 			if (stream == in)
 				stop();
@@ -176,7 +175,7 @@ namespace Aseba
 
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba play, play recorded user messages from a file or stdin, usage:\n";
 	stream << programName << " [options] [targets]*\n";
@@ -192,14 +191,14 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "Aseba play " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	bool respectTimings = true;
@@ -211,7 +210,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if (strcmp(arg, "--fastest") == 0)
 		{
@@ -263,7 +262,7 @@ int main(int argc, char *argv[])
 			player.connect(targets[i]);
 		player.run();
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}

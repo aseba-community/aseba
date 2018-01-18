@@ -20,49 +20,14 @@
 
 #include "../../vm/natives.h"
 
-AsebaVMDescription vmLeftMotorDescription = {
-	"left motor",
-	{
-		{ 1, "id" },
-		{ 1, "source" },
-		{ 32, "args" },
-		{ 1, "speed" },
-		{ 2, "odo" },
-		{ 0, NULL }
-	}
-};
+AsebaVMDescription vmLeftMotorDescription = { "left motor",
+	{ { 1, "id" }, { 1, "source" }, { 32, "args" }, { 1, "speed" }, { 2, "odo" }, { 0, NULL } } };
 
-AsebaVMDescription vmRightMotorDescription = {
-	"right motor",
-	{
-		{ 1, "id" },
-		{ 1, "source" },
-		{ 32, "args" },
-		{ 1, "speed" },
-		{ 2, "odo" },
-		{ 0, NULL }
-	}
-};
+AsebaVMDescription vmRightMotorDescription = { "right motor",
+	{ { 1, "id" }, { 1, "source" }, { 32, "args" }, { 1, "speed" }, { 2, "odo" }, { 0, NULL } } };
 
-AsebaVMDescription vmProximitySensorsDescription = {
-	"proximity sensors",
-	{
-		{ 1, "id" },
-		{ 1, "source" },
-		{ 32, "args" },
-		{ 24, "bumpers" },
-		{ 12, "ground" },
-		{ 0, NULL }
-	}
-};
+AsebaVMDescription vmProximitySensorsDescription = { "proximity sensors",
+	{ { 1, "id" }, { 1, "source" }, { 32, "args" }, { 24, "bumpers" }, { 12, "ground" }, { 0, NULL } } };
 
-AsebaVMDescription vmDistanceSensorsDescription = {
-	"distance sensors",
-	{
-		{ 1, "id" },
-		{ 1, "source" },
-		{ 32, "args" },
-		{ 180, "distances" },
-		{ 0, NULL }
-	}
-};
+AsebaVMDescription vmDistanceSensorsDescription = { "distance sensors",
+	{ { 1, "id" }, { 1, "source" }, { 32, "args" }, { 180, "distances" }, { 0, NULL } } };

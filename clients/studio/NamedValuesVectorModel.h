@@ -32,28 +32,28 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	class NamedValuesVectorModel: public QAbstractTableModel
+	class NamedValuesVectorModel : public QAbstractTableModel
 	{
 		Q_OBJECT
 
 	public:
-		NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		NamedValuesVectorModel(NamedValuesVector* namedValues, const QString& tooltipText, QObject* parent = 0);
+		NamedValuesVectorModel(NamedValuesVector* namedValues, QObject* parent = 0);
 
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		int rowCount(const QModelIndex& parent = QModelIndex()) const;
+		int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
+		Qt::ItemFlags flags(const QModelIndex& index) const;
 
-		QStringList mimeTypes () const;
+		QStringList mimeTypes() const;
 		void setExtraMimeType(QString mime) { privateMimeType = mime; }
-		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
-		bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+		QMimeData* mimeData(const QModelIndexList& indexes) const;
+		bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
 		Qt::DropActions supportedDropActions() const;
 
-		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		bool setData(const QModelIndex& index, const QVariant& value, int role);
 		bool checkIfModified() { return wasModified; }
 		void clearWasModified() { wasModified = false; }
 		void setEditable(bool editable);
@@ -81,29 +81,29 @@ namespace Aseba
 		bool editable;
 	};
 
-	class ConstantsModel: public NamedValuesVectorModel
+	class ConstantsModel : public NamedValuesVectorModel
 	{
 		Q_OBJECT
 
 	public:
-		ConstantsModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		ConstantsModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		ConstantsModel(NamedValuesVector* namedValues, const QString& tooltipText, QObject* parent = 0);
+		ConstantsModel(NamedValuesVector* namedValues, QObject* parent = 0);
 
 		virtual bool validateName(const QString& name) const;
 	};
 
-	class MaskableNamedValuesVectorModel: public NamedValuesVectorModel
+	class MaskableNamedValuesVectorModel : public NamedValuesVectorModel
 	{
 		Q_OBJECT
 
 	public:
-		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent = 0);
-		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent = 0);
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, const QString& tooltipText, QObject* parent = 0);
+		MaskableNamedValuesVectorModel(NamedValuesVector* namedValues, QObject* parent = 0);
 
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
+		QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+		Qt::ItemFlags flags(const QModelIndex& index) const;
 
 		bool isVisible(const unsigned id);
 
@@ -112,7 +112,7 @@ namespace Aseba
 	public slots:
 		void addNamedValue(const NamedValue& namedValue);
 		void delNamedValue(int index);
-		void toggle(const QModelIndex &index);
+		void toggle(const QModelIndex& index);
 
 	private:
 		std::vector<bool> viewEvent;

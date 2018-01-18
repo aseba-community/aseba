@@ -38,20 +38,20 @@ namespace Aseba
 
 	class ThymioVPLStandalone;
 
-	struct ThymioVPLStandaloneInterface: DevelopmentEnvironmentInterface
+	struct ThymioVPLStandaloneInterface : DevelopmentEnvironmentInterface
 	{
 		ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone);
 
-		Target * getTarget();
+		Target* getTarget();
 		unsigned getNodeId() const;
 		unsigned getProductId() const;
 		void setCommonDefinitions(const CommonDefinitions& commonDefinitions);
 		void displayCode(const QList<QString>& code, int line);
 		void loadAndRun();
 		void stop();
-		TargetVariablesModel * getVariablesModel();
-		void setVariableValues(unsigned, const VariablesDataVector &);
-		bool saveFile(bool as=false);
+		TargetVariablesModel* getVariablesModel();
+		void setVariableValues(unsigned, const VariablesDataVector&);
+		bool saveFile(bool as = false);
 		void openFile();
 		bool newFile();
 		void clearOpenedFileName(bool isModified);
@@ -68,21 +68,22 @@ namespace Aseba
 	class AeslEditor;
 
 	//! Container for VPL standalone and its code viewer
-	class ThymioVPLStandalone: public QSplitter, public VariableListener
+	class ThymioVPLStandalone : public QSplitter, public VariableListener
 	{
 		Q_OBJECT
 
 	public:
-		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget, bool debugLog, bool execFeedback);
+		ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget,
+			bool debugLog, bool execFeedback);
 		~ThymioVPLStandalone();
 
 	protected:
 		void setupWidgets();
 		void setupConnections();
-		void resizeEvent( QResizeEvent *event );
+		void resizeEvent(QResizeEvent* event);
 		void resetSizes();
 		void variableValueUpdated(const QString& name, const VariablesDataVector& values);
-		void closeEvent ( QCloseEvent * event );
+		void closeEvent(QCloseEvent* event);
 		bool saveFile(bool as);
 		void openFile();
 
@@ -91,7 +92,7 @@ namespace Aseba
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
 		void variablesMemoryEstimatedDirty(unsigned node);
-		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
+		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector& variables);
 		void updateWindowTitle(bool modified);
 		void toggleFullScreen();
 

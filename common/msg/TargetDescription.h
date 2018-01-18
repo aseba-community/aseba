@@ -60,7 +60,7 @@ namespace Aseba
 		struct NativeFunctionParameter
 		{
 			NativeFunctionParameter(std::wstring name, int size) : name(std::move(name)), size(size) {}
-			NativeFunctionParameter()  = default;
+			NativeFunctionParameter() = default;
 
 			std::wstring name; //!< name of the parameter
 			int size = 0; //!< if > 0 size of the parameter, if < 0 template id, if 0 any size
@@ -71,21 +71,22 @@ namespace Aseba
 		{
 			std::wstring name; //!< name of the function
 			std::wstring description; //!< description (some short documentation) of the function
-			std::vector<NativeFunctionParameter> parameters; //!< for each argument of the function, its size in words or, if negative, its template ID
+			std::vector<NativeFunctionParameter>
+				parameters; //!< for each argument of the function, its size in words or, if negative, its template ID
 		};
 
 		std::wstring name; //!< node name
-		unsigned protocolVersion{0}; //!< version of the aseba protocol
+		unsigned protocolVersion{ 0 }; //!< version of the aseba protocol
 
-		unsigned bytecodeSize{0}; //!< total amount of bytecode space
-		unsigned variablesSize{0}; //!< total amount of variables space
-		unsigned stackSize{0}; //!< depth of execution stack
+		unsigned bytecodeSize{ 0 }; //!< total amount of bytecode space
+		unsigned variablesSize{ 0 }; //!< total amount of variables space
+		unsigned stackSize{ 0 }; //!< depth of execution stack
 
 		std::vector<NamedVariable> namedVariables; //!< named variables
 		std::vector<LocalEvent> localEvents; //!< events available locally on target
 		std::vector<NativeFunction> nativeFunctions; //!< native functions
 
-		TargetDescription()  = default;
+		TargetDescription() = default;
 		uint16_t crc() const;
 		VariablesMap getVariablesMap(unsigned& freeVariableIndex) const;
 		FunctionsMap getFunctionsMap() const;

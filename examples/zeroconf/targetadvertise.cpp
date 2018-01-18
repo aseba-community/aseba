@@ -37,20 +37,18 @@ namespace Aseba
 	{
 	private:
 		Stream* stream; //!< encapsulated stream
-		map<unsigned, pair<unsigned,unsigned>> pidMap; //!< remember each node's _productId pos and value
+		map<unsigned, pair<unsigned, unsigned>> pidMap; //!< remember each node's _productId pos and value
 
 	public:
-		StreamNodesManager(Stream* stream) :
-			stream(stream)
-		{}
+		StreamNodesManager(Stream* stream) : stream(stream) {}
 
-		void advertiseNodes(Aseba::Zeroconf & zeroconf)
+		void advertiseNodes(Aseba::Zeroconf& zeroconf)
 		{
 			vector<unsigned int> ids;
 			vector<unsigned int> pids;
 			vector<string> names;
-			unsigned protocolVersion{99};
-			for (auto const & node: nodes)
+			unsigned protocolVersion{ 99 };
+			for (auto const& node : nodes)
 			{
 				bool ok;
 				auto description = getDescription(node.first, &ok);
@@ -64,34 +62,35 @@ namespace Aseba
 				}
 			}
 
-			Aseba::Zeroconf::TxtRecord txt{protocolVersion, join(names," "), false, ids, pids};
+			Aseba::Zeroconf::TxtRecord txt{ protocolVersion, join(names, " "), false, ids, pids };
 			try
 			{
 				zeroconf.advertise("Aseba Local " + stream->getTargetParameter("port"), stream, txt);
 			}
 			catch (const runtime_error& e)
 			{
-				cerr << "Can't advertise stream " << stream->getTargetName() << " (" << join(names," ") << "): " << e.what() << endl;
+				cerr << "Can't advertise stream " << stream->getTargetName() << " (" << join(names, " ")
+					 << "): " << e.what() << endl;
 			}
 		}
 
 		void requestProductIds()
 		{
-			for (auto const & node: nodes)
+			for (auto const& node : nodes)
 			{
 				bool ok;
 				auto pos = getVariablePos(node.first, L"_productId", &ok);
 				if (ok)
 				{
-					pidMap[node.first] = make_pair(pos,0);
-					GetVariables getVariables(node.first,pos,1);
+					pidMap[node.first] = make_pair(pos, 0);
+					GetVariables getVariables(node.first, pos, 1);
 					getVariables.serialize(stream);
 					stream->flush();
 				}
 			}
 		}
 
-		void incomingVariable(const Variables * message)
+		void incomingVariable(const Variables* message)
 		{
 			auto nodeId = message->source;
 			if (pidMap.find(nodeId) != pidMap.end() && pidMap.at(nodeId).first == message->start)
@@ -104,54 +103,50 @@ namespace Aseba
 			stream->flush();
 		}
 
-		void processMessage(const Message* message)
-		{
-			NodesManager::processMessage(message);
-		}
+		void processMessage(const Message* message) { NodesManager::processMessage(message); }
 	};
 
 	//! Dashel::Hub::Advertiser collects node descriptions from a set of tcp Dashel streams
 	//! and advertises them on the local network using Zeroconf.
-	class Advertiser: public Hub
+	class Advertiser : public Hub
 	{
 	protected:
-		map<Stream*,StreamNodesManager> streamMap;
+		map<Stream*, StreamNodesManager> streamMap;
 		Aseba::DashelhubZeroconf zeroconf;
 
 	protected:
-		virtual void incomingData(Stream *stream) override
+		virtual void incomingData(Stream* stream) override
 		{
-			Message *message(Message::receive(stream));
+			Message* message(Message::receive(stream));
 			streamMap.at(stream).processMessage(message);
-			const Variables *variables(dynamic_cast<Variables *>(message));
+			const Variables* variables(dynamic_cast<Variables*>(message));
 			if (variables)
 				streamMap.at(stream).incomingVariable(variables);
 		}
 
-		virtual void connectionClosed(Stream *stream, bool abnormal) override
+		virtual void connectionClosed(Stream* stream, bool abnormal) override
 		{
 			zeroconf.forget("Aseba Local " + stream->getTargetParameter("port"), stream);
 		}
 
 	public:
-		Advertiser(const vector<string> & dashel_targets):
-			zeroconf(*this)
+		Advertiser(const vector<string>& dashel_targets) : zeroconf(*this)
 		{
-			for (auto const & dashel: dashel_targets)
+			for (auto const& dashel : dashel_targets)
 			{
 				try
 				{
 					if (Dashel::Stream* cxn = connect(dashel))
-						streamMap.emplace(cxn,StreamNodesManager(cxn));
+						streamMap.emplace(cxn, StreamNodesManager(cxn));
 				}
-				catch(Dashel::DashelException e)
+				catch (Dashel::DashelException e)
 				{
 					cerr << "Can't connect target " << dashel << ": " << e.what() << endl;
 				}
 			}
 
 			ListNodes listNodes;
-			for (auto const & stream: streamMap)
+			for (auto const& stream : streamMap)
 			{
 				listNodes.serialize(stream.first);
 				stream.first->flush();
@@ -161,20 +156,20 @@ namespace Aseba
 
 		void advertiseNodes()
 		{
-			for (auto & stream: streamMap)
+			for (auto& stream : streamMap)
 				stream.second.advertiseNodes(zeroconf);
 		}
 
 		void requestProductIds()
 		{
-			for (auto & stream: streamMap)
+			for (auto& stream : streamMap)
 				stream.second.requestProductIds();
 			run5s(); // wait for product id values
 		}
 
 		void run5s()
 		{
-			int timeout{5000};
+			int timeout{ 5000 };
 			UnifiedTime startTime;
 			while (timeout > 0)
 			{

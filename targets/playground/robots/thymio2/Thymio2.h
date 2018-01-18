@@ -116,7 +116,7 @@ namespace Enki
 		//! The code which set it is responsible to clear the log from time to time
 		NativeCallLog thymioNativeCallLog;
 		//! Whether thymioNativeCallLog should be filled each time a Thymio native function is called
-		bool logThymioNativeCalls { false } ;
+		bool logThymioNativeCalls{ false };
 
 	protected:
 		Aseba::SoftTimer timer0;
@@ -133,7 +133,7 @@ namespace Enki
 
 		// from PhysicalObject
 
-		virtual void collisionEvent(PhysicalObject *o);
+		virtual void collisionEvent(PhysicalObject* o);
 
 		// from Robot
 
@@ -147,8 +147,8 @@ namespace Enki
 		// from AbstractNodeGlue
 
 		virtual const AsebaVMDescription* getDescription() const;
-		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const;
-		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const;
+		virtual const AsebaLocalEventDescription* getLocalEventsDescriptions() const;
+		virtual const AsebaNativeFunctionDescription* const* getNativeFunctionsDescriptions() const;
 		virtual void callNativeFunction(uint16_t id);
 
 		// for Thymio2-natives.cpp
@@ -159,7 +159,6 @@ namespace Enki
 		void execLocalEvent(uint16_t number);
 
 	protected:
-
 		void timer0Timeout();
 		void timer1Timeout();
 		void timer100HzTimeout();

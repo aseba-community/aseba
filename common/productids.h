@@ -43,7 +43,7 @@ typedef enum
 } AsebaProductIds;
 
 /*! name of the product-id variable */
-#define ASEBA_PID_VAR_NAME "_productId"
+#	define ASEBA_PID_VAR_NAME "_productId"
 
 /*@}*/
 

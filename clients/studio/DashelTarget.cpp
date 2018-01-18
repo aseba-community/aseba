@@ -35,7 +35,7 @@
 #include <regex>
 
 #ifdef WIN32 // for Sleep
-#include <windows.h>
+#	include <windows.h>
 #endif
 
 namespace Aseba
@@ -48,22 +48,25 @@ namespace Aseba
 
 	void handleDashelException(Dashel::DashelException e)
 	{
-		switch(e.source)
+		switch (e.source)
 		{
-		case Dashel::DashelException::ConnectionLost:
-		case Dashel::DashelException::IOError:
-			// "normal" disconnections, managed internally in Dashel::Hub, so don't care about
-			break;
-		case Dashel::DashelException::ConnectionFailed:
-			// should not happen here, but can because of typos in Dashel, catch it for now
-			break;
-		default:
-			QMessageBox::critical(nullptr, QObject::tr("Unexpected Dashel Error"), QObject::tr("A communication error happened:") + " (" + QString::number(e.source) + ") " + e.what());
-			break;
+			case Dashel::DashelException::ConnectionLost:
+			case Dashel::DashelException::IOError:
+				// "normal" disconnections, managed internally in Dashel::Hub, so don't care about
+				break;
+			case Dashel::DashelException::ConnectionFailed:
+				// should not happen here, but can because of typos in Dashel, catch it for now
+				break;
+			default:
+				QMessageBox::critical(nullptr,
+					QObject::tr("Unexpected Dashel Error"),
+					QObject::tr("A communication error happened:") + " (" + QString::number(e.source) + ") "
+						+ e.what());
+				break;
 		}
 	}
 
-	bool hasIntersection(const QList<QHostAddress> & addressesA, const QList<QHostAddress> & addressesB)
+	bool hasIntersection(const QList<QHostAddress>& addressesA, const QList<QHostAddress>& addressesB)
 	{
 		for (int i = 0; i < addressesA.size(); ++i)
 			for (int j = 0; j < addressesB.size(); ++j)
@@ -94,7 +97,7 @@ namespace Aseba
 		targetLayout->addWidget(currentTarget);
 		auto templateButton = new QPushButton(QIcon(":/images/info.png"), "");
 		templateButton->setMaximumSize(80, 50);
-		templateButton->setFocusPolicy(Qt::NoFocus);	// otherwise it's displayed in red once clicked
+		templateButton->setFocusPolicy(Qt::NoFocus); // otherwise it's displayed in red once clicked
 		auto templateMenu = new QMenu("Target");
 		templateMenu->addAction(tr("Serial port"), this, SLOT(targetTemplateSerial()));
 		templateMenu->addAction(tr("Local TCP"), this, SLOT(targetTemplateLocalTCP()));
@@ -141,13 +144,17 @@ namespace Aseba
 
 		// connect signals and slots
 		connect(discoveredList, SIGNAL(itemSelectionChanged()), SLOT(updateCurrentTarget()));
-		connect(discoveredList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(connectToItem(QListWidgetItem *)));
-		connect(currentTarget, SIGNAL(textEdited(const QString &)), discoveredList, SLOT(clearSelection()));
+		connect(discoveredList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(connectToItem(QListWidgetItem*)));
+		connect(currentTarget, SIGNAL(textEdited(const QString&)), discoveredList, SLOT(clearSelection()));
 		connect(connectButton, SIGNAL(clicked(bool)), SLOT(accept()));
 		connect(cancelButton, SIGNAL(clicked(bool)), SLOT(reject()));
 #ifdef ZEROCONF_SUPPORT
-		connect(&zeroconf, SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
-		connect(&zeroconf, SIGNAL(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)), SLOT(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)));
+		connect(&zeroconf,
+			SIGNAL(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)),
+			SLOT(zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&)));
+		connect(&zeroconf,
+			SIGNAL(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)),
+			SLOT(zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation&)));
 		zeroconf.browse();
 #endif // ZEROCONF_SUPPORT
 
@@ -165,7 +172,7 @@ namespace Aseba
 		// only add new Dashel targets
 		for (int i = 0; i < discoveredList->count(); ++i)
 		{
-			QListWidgetItem *item(discoveredList->item(i));
+			QListWidgetItem* item(discoveredList->item(i));
 			auto itemDashelTarget(item->data(Qt::UserRole));
 			if (itemDashelTarget == dashelTarget)
 			{
@@ -189,10 +196,12 @@ namespace Aseba
 				additionalInfo = QString(tr(" – type %1")).arg(QString::fromStdString(target.properties.at("type")));
 		}
 		catch (std::out_of_range& e)
-		{}
+		{
+		}
 		const auto name(QString::fromUtf8(target.name.c_str()));
 		const auto host(QString::fromUtf8(target.host.c_str()));
-		addEntry(name, isLocal ? tr("local on computer") : tr("distant on network"), dashelTarget, additionalInfo, { name });
+		addEntry(
+			name, isLocal ? tr("local on computer") : tr("distant on network"), dashelTarget, additionalInfo, { name });
 	}
 
 	//! A target was removed from zeroconf, remove it to the list if not already present
@@ -200,7 +209,7 @@ namespace Aseba
 	{
 		for (int i = 0; i < discoveredList->count(); ++i)
 		{
-			const QListWidgetItem *item(discoveredList->item(i));
+			const QListWidgetItem* item(discoveredList->item(i));
 			if (item->data(Qt::UserRole + 1).toString().toStdString() == target.name)
 			{
 				delete discoveredList->takeItem(i);
@@ -222,7 +231,7 @@ namespace Aseba
 		// mark non-serial targets as seen
 		for (int i = 0; i < discoveredList->count(); ++i)
 		{
-			const QListWidgetItem *item(discoveredList->item(i));
+			const QListWidgetItem* item(discoveredList->item(i));
 			auto dashelTarget(item->data(Qt::UserRole));
 			if (!dashelTarget.toString().startsWith("ser:"))
 				seen[i] = true;
@@ -232,12 +241,13 @@ namespace Aseba
 		// add newly seen devices
 		for (PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 		{
-			const QString discoveredListDashelTarget(QString("ser:device=%0").arg(QString::fromUtf8(it->second.first.c_str())));
+			const QString discoveredListDashelTarget(
+				QString("ser:device=%0").arg(QString::fromUtf8(it->second.first.c_str())));
 			// look if item is already in the list
 			bool found(false);
 			for (int i = 0; i < discoveredList->count(); ++i)
 			{
-				const QListWidgetItem *item(discoveredList->item(i));
+				const QListWidgetItem* item(discoveredList->item(i));
 				auto dashelTarget(item->data(Qt::UserRole));
 				// this entry is the same as the detected port
 				if (dashelTarget == discoveredListDashelTarget)
@@ -258,7 +268,7 @@ namespace Aseba
 					additionalInfo = tr(" – device %1").arg(QString::fromStdString(match.str(2)));
 				}
 				else
-					text =  QString::fromStdString(it->second.second);
+					text = QString::fromStdString(it->second.second);
 				auto item = addEntry(text, tr("serial port or USB"), discoveredListDashelTarget, additionalInfo);
 				if (!toSelect.isEmpty() && (toSelect == text))
 				{
@@ -268,7 +278,7 @@ namespace Aseba
 			}
 		}
 		// now removed unseen devices
-		for (int i=seen.size()-1; i>=0; --i)
+		for (int i = seen.size() - 1; i >= 0; --i)
 		{
 			if (!seen[i])
 				delete discoveredList->takeItem(i);
@@ -277,7 +287,11 @@ namespace Aseba
 		return discoveredListPortSet;
 	}
 
-	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo, const QVariantList& additionalData)
+	QListWidgetItem* DashelConnectionDialog::addEntry(const QString& title,
+		const QString& connectionType,
+		const QString& dashelTarget,
+		const QString& additionalInfo,
+		const QVariantList& additionalData)
 	{
 		auto* item = new QListWidgetItem();
 		item->setSizeHint(QSize(200, discoveredList->fontMetrics().height() * 3.8));
@@ -285,19 +299,19 @@ namespace Aseba
 		for (int i = 0; i < additionalData.size(); ++i)
 			item->setData(Qt::UserRole + 1 + i, additionalData[i]);
 		discoveredList->addItem(item);
-		auto* label(new QLabel(
-			QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – %2%3<br/><span style=\"color:gray;\">%4</span></p>")
-			.arg(title).arg(connectionType).arg(additionalInfo).arg(dashelTarget),
-		discoveredList));
+		auto* label(new QLabel(QString("<p style=\"line-height:120%;margin-left:10px;margin-right:10px;\"><b>%1</b> – "
+									   "%2%3<br/><span style=\"color:gray;\">%4</span></p>")
+								   .arg(title)
+								   .arg(connectionType)
+								   .arg(additionalInfo)
+								   .arg(dashelTarget),
+			discoveredList));
 		label->setStyleSheet("QLabel { border-bottom: 1px solid gray }");
 		discoveredList->setItemWidget(item, label);
 		return item;
 	}
 
-	void DashelConnectionDialog::timerEvent(QTimerEvent * event)
-	{
-		updatePortList("");
-	}
+	void DashelConnectionDialog::timerEvent(QTimerEvent* event) { updatePortList(""); }
 
 	std::string DashelConnectionDialog::getTarget()
 	{
@@ -321,26 +335,17 @@ namespace Aseba
 		}
 	}
 
-	void DashelConnectionDialog::connectToItem(QListWidgetItem *item)
+	void DashelConnectionDialog::connectToItem(QListWidgetItem* item)
 	{
 		currentTarget->setText(item->data(Qt::UserRole).toString());
 		accept();
 	}
 
-	void DashelConnectionDialog::targetTemplateSerial()
-	{
-		currentTarget->setText("ser:device=/dev/ttyDev");
-	}
+	void DashelConnectionDialog::targetTemplateSerial() { currentTarget->setText("ser:device=/dev/ttyDev"); }
 
-	void DashelConnectionDialog::targetTemplateLocalTCP()
-	{
-		currentTarget->setText("tcp:host=localhost;port=33333");
-	}
+	void DashelConnectionDialog::targetTemplateLocalTCP() { currentTarget->setText("tcp:host=localhost;port=33333"); }
 
-	void DashelConnectionDialog::targetTemplateTCP()
-	{
-		currentTarget->setText("tcp:host=192.168.1.200;port=33333");
-	}
+	void DashelConnectionDialog::targetTemplateTCP() { currentTarget->setText("tcp:host=192.168.1.200;port=33333"); }
 
 	void DashelConnectionDialog::targetTemplateDoc()
 	{
@@ -383,9 +388,14 @@ namespace Aseba
 #ifndef ANDROID
 			// have user-friendly Thymio-specific message
 			if (commandLineTarget == "ser:name=Thymio-II")
-				QMessageBox::warning(0, tr("Thymio not found"), tr("<p><b>Cannot find Thymio!</b></p><p>Connect a Thymio to your computer using the USB cable/dongle, and make sure no other program is using Thymio.</p>"));
+				QMessageBox::warning(0,
+					tr("Thymio not found"),
+					tr("<p><b>Cannot find Thymio!</b></p><p>Connect a Thymio to your computer using the USB "
+					   "cable/dongle, and make sure no other program is using Thymio.</p>"));
 			else
-				QMessageBox::warning(0, tr("Connection to command line target failed"), tr("Cannot connect to target %0").arg(commandLineTarget));
+				QMessageBox::warning(0,
+					tr("Connection to command line target failed"),
+					tr("Cannot connect to target %0").arg(commandLineTarget));
 #endif
 		}
 
@@ -460,10 +470,10 @@ namespace Aseba
 			Dashel::Hub::run();
 	}
 
-	void DashelInterface::incomingData(Stream *stream)
+	void DashelInterface::incomingData(Stream* stream)
 	{
 
-		Message *message = Message::receive(stream);
+		Message* message = Message::receive(stream);
 		emit messageAvailable(message);
 	}
 
@@ -497,7 +507,7 @@ namespace Aseba
 				stream->flush();
 				unlock();
 			}
-			catch(Dashel::DashelException e)
+			catch (Dashel::DashelException e)
 			{
 				unlock();
 				handleDashelException(e);
@@ -509,39 +519,38 @@ namespace Aseba
 		}
 	}
 
-	void DashelInterface::nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion)
+	void DashelInterface::nodeProtocolVersionMismatch(unsigned nodeId,
+		const std::wstring& nodeName,
+		uint16_t protocolVersion)
 	{
 		// show a different warning in function of the mismatch
 		if (protocolVersion > ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
 				QApplication::tr("Protocol version mismatch"),
-				QApplication::tr("Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.").arg(QString::fromStdWString(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
-			);
+				QApplication::tr(
+					"Aseba Studio uses an older protocol (%1) than node %0 (%2), please upgrade Aseba Studio.")
+					.arg(QString::fromStdWString(nodeName.c_str()))
+					.arg(ASEBA_PROTOCOL_VERSION)
+					.arg(protocolVersion));
 		}
 		else if (protocolVersion < ASEBA_PROTOCOL_VERSION)
 		{
 			QMessageBox::warning(0,
 				QApplication::tr("Protocol version mismatch"),
-				QApplication::tr("Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.").arg(QString::fromStdWString(nodeName.c_str())).arg(ASEBA_PROTOCOL_VERSION).arg(protocolVersion)
-			);
+				QApplication::tr(
+					"Node %0 uses an older protocol (%2) than Aseba Studio (%1), please upgrade the node firmware.")
+					.arg(QString::fromStdWString(nodeName.c_str()))
+					.arg(ASEBA_PROTOCOL_VERSION)
+					.arg(protocolVersion));
 		}
 	}
 
-	void DashelInterface::nodeDescriptionReceived(unsigned nodeId)
-	{
-		emit nodeDescriptionReceivedSignal(nodeId);
-	}
+	void DashelInterface::nodeDescriptionReceived(unsigned nodeId) { emit nodeDescriptionReceivedSignal(nodeId); }
 
-	void DashelInterface::nodeConnected(unsigned nodeId)
-	{
-		emit nodeConnectedSignal(nodeId);
-	}
+	void DashelInterface::nodeConnected(unsigned nodeId) { emit nodeConnectedSignal(nodeId); }
 
-	void DashelInterface::nodeDisconnected(unsigned nodeId)
-	{
-		emit nodeDisconnectedSignal(nodeId);
-	}
+	void DashelInterface::nodeDisconnected(unsigned nodeId) { emit nodeDisconnectedSignal(nodeId); }
 
 
 	enum InNextState
@@ -551,12 +560,7 @@ namespace Aseba
 		WAITING_LINE_CHANGE
 	};
 
-	DashelTarget::Node::Node() :
-		steppingInNext(NOT_IN_NEXT),
-		lineInNext(0),
-		executionMode(EXECUTION_UNKNOWN)
-	{
-	}
+	DashelTarget::Node::Node() : steppingInNext(NOT_IN_NEXT), lineInNext(0), executionMode(EXECUTION_UNKNOWN) {}
 
 	DashelTarget::DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget) :
 		dashelInterface(translators, commandLineTarget),
@@ -566,22 +570,28 @@ namespace Aseba
 		connect(&userEventsTimer, SIGNAL(timeout()), SLOT(updateUserEvents()));
 
 		// we connect the events from the stream listening thread to slots living in our gui thread
-		connect(&dashelInterface, SIGNAL(messageAvailable(Message *)), SLOT(messageFromDashel(Message *)), Qt::QueuedConnection);
+		connect(&dashelInterface,
+			SIGNAL(messageAvailable(Message*)),
+			SLOT(messageFromDashel(Message*)),
+			Qt::QueuedConnection);
 		connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
 
 		// we also connect to the description manager to know when we have a new node available
-		connect(&dashelInterface, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
+		connect(
+			&dashelInterface, SIGNAL(nodeDescriptionReceivedSignal(unsigned)), SLOT(nodeDescriptionReceived(unsigned)));
 		// note: queued connections are necessary to prevent multiple locking of Hub by the GUI thread
 		connect(&dashelInterface, SIGNAL(nodeConnectedSignal(unsigned)), SIGNAL(nodeConnected(unsigned)));
 		connect(&dashelInterface, SIGNAL(nodeDisconnectedSignal(unsigned)), SIGNAL(nodeDisconnected(unsigned)));
 
 		// table for handling incoming messages
 		messagesHandlersMap[ASEBA_MESSAGE_VARIABLES] = &Aseba::DashelTarget::receivedVariables;
-		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] = &Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
+		messagesHandlersMap[ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS] =
+			&Aseba::DashelTarget::receivedArrayAccessOutOfBounds;
 		messagesHandlersMap[ASEBA_MESSAGE_DIVISION_BY_ZERO] = &Aseba::DashelTarget::receivedDivisionByZero;
 		messagesHandlersMap[ASEBA_MESSAGE_EVENT_EXECUTION_KILLED] = &Aseba::DashelTarget::receivedEventExecutionKilled;
 		messagesHandlersMap[ASEBA_MESSAGE_NODE_SPECIFIC_ERROR] = &Aseba::DashelTarget::receivedNodeSpecificError;
-		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] = &Aseba::DashelTarget::receivedExecutionStateChanged;
+		messagesHandlersMap[ASEBA_MESSAGE_EXECUTION_STATE_CHANGED] =
+			&Aseba::DashelTarget::receivedExecutionStateChanged;
 		messagesHandlersMap[ASEBA_MESSAGE_BREAKPOINT_SET_RESULT] = &Aseba::DashelTarget::receivedBreakpointSetResult;
 		messagesHandlersMap[ASEBA_MESSAGE_BOOTLOADER_ACK] = &Aseba::DashelTarget::receivedBootloaderAck;
 
@@ -618,7 +628,7 @@ namespace Aseba
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}
-			catch(Dashel::DashelException e)
+			catch (Dashel::DashelException e)
 			{
 				dashelInterface.unlock();
 				handleDashelException(e);
@@ -636,12 +646,12 @@ namespace Aseba
 		return nodeIds;
 	}
 
-	const TargetDescription * const DashelTarget::getDescription(unsigned node) const
+	const TargetDescription* const DashelTarget::getDescription(unsigned node) const
 	{
 		return dashelInterface.getDescription(node);
 	}
 
-	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector &bytecode)
+	void DashelTarget::uploadBytecode(unsigned node, const BytecodeVector& bytecode)
 	{
 		dashelInterface.lock();
 		if (dashelInterface.stream && !writeBlocked)
@@ -660,7 +670,7 @@ namespace Aseba
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}
-			catch(Dashel::DashelException e)
+			catch (Dashel::DashelException e)
 			{
 				dashelInterface.unlock();
 				handleDashelException(e);
@@ -688,7 +698,7 @@ namespace Aseba
 		}
 	}
 
- 	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector &data)
+	void DashelTarget::sendEvent(unsigned id, const VariablesDataVector& data)
 	{
 		if (!writeBlocked)
 		{
@@ -697,7 +707,7 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector &data)
+	void DashelTarget::setVariables(unsigned node, unsigned start, const VariablesDataVector& data)
 	{
 		if (!writeBlocked)
 		{
@@ -717,7 +727,7 @@ namespace Aseba
 		dashelInterface.lock();
 		if (dashelInterface.stream && !writeBlocked)
 		{
-			const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT-1;
+			const unsigned variablesPayloadSize = ASEBA_MAX_EVENT_ARG_COUNT - 1;
 
 			try
 			{
@@ -734,7 +744,7 @@ namespace Aseba
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}
-			catch(Dashel::DashelException e)
+			catch (Dashel::DashelException e)
 			{
 				dashelInterface.unlock();
 				handleDashelException(e);
@@ -774,7 +784,7 @@ namespace Aseba
 				dashelInterface.stream->flush();
 				dashelInterface.unlock();
 			}
-			catch(Dashel::DashelException e)
+			catch (Dashel::DashelException e)
 			{
 				dashelInterface.unlock();
 				handleDashelException(e);
@@ -851,15 +861,9 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::blockWrite()
-	{
-		writeBlocked = true;
-	}
+	void DashelTarget::blockWrite() { writeBlocked = true; }
 
-	void DashelTarget::unblockWrite()
-	{
-		writeBlocked = false;
-	}
+	void DashelTarget::unblockWrite() { writeBlocked = false; }
 
 	void DashelTarget::updateUserEvents()
 	{
@@ -881,12 +885,9 @@ namespace Aseba
 	}
 
 	//! regularly probe aseba network for new connections
-	void DashelTarget::listNodes()
-	{
-		dashelInterface.pingNetwork();
-	}
+	void DashelTarget::listNodes() { dashelInterface.pingNetwork(); }
 
-	void DashelTarget::messageFromDashel(Message *message)
+	void DashelTarget::messageFromDashel(Message* message)
 	{
 		bool deleteMessage = true;
 		//message->dump(std::cout);
@@ -900,7 +901,7 @@ namespace Aseba
 		MessagesHandlersMap::const_iterator messageHandler = messagesHandlersMap.find(message->type);
 		if (messageHandler == messagesHandlersMap.end())
 		{
-			UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+			UserMessage* userMessage = dynamic_cast<UserMessage*>(message);
 			if (userMessage)
 			{
 				userEventsQueue.enqueue(userMessage);
@@ -922,7 +923,7 @@ namespace Aseba
 	}
 
 
-	ReconnectionDialog::ReconnectionDialog(DashelInterface& dashelInterface):
+	ReconnectionDialog::ReconnectionDialog(DashelInterface& dashelInterface) :
 		dashelInterface(dashelInterface),
 		counter(0)
 	{
@@ -936,16 +937,16 @@ namespace Aseba
 		startTimer(200);
 	}
 
-	void ReconnectionDialog::timerEvent ( QTimerEvent * event )
+	void ReconnectionDialog::timerEvent(QTimerEvent* event)
 	{
 		if (dashelInterface.lastConnectedTargetName.find("ser:") == 0)
 		{
 			// serial port, show Thymio animation
-			const unsigned iconStep(counter%15);
+			const unsigned iconStep(counter % 15);
 			if (iconStep < 8)
 				setIconPixmap(QPixmap(QString(":/images/thymio-plugin-anim%0.png").arg(iconStep)));
 		}
-		const unsigned connectStep(counter%5);
+		const unsigned connectStep(counter % 5);
 		if ((connectStep == 0) && dashelInterface.attemptToReconnect())
 			accept();
 		counter++;
@@ -967,19 +968,19 @@ namespace Aseba
 		node.lineInNext = 0;
 	}
 
-	void DashelTarget::receivedVariables(Message *message)
+	void DashelTarget::receivedVariables(Message* message)
 	{
 		VariablesCounter++;
 		//qDebug() << "diff get recv variables" << int(getVariablesCounter) - int(VariablesCounter);
 
-		Variables *variables = polymorphic_downcast<Variables *>(message);
+		Variables* variables = polymorphic_downcast<Variables*>(message);
 
 		emit variablesMemoryChanged(variables->source, variables->start, variables->variables);
 	}
 
-	void DashelTarget::receivedArrayAccessOutOfBounds(Message *message)
+	void DashelTarget::receivedArrayAccessOutOfBounds(Message* message)
 	{
-		ArrayAccessOutOfBounds *aa = polymorphic_downcast<ArrayAccessOutOfBounds *>(message);
+		ArrayAccessOutOfBounds* aa = polymorphic_downcast<ArrayAccessOutOfBounds*>(message);
 
 		int line = getLineFromPC(aa->source, aa->pc);
 		if (line >= 0)
@@ -989,9 +990,9 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::receivedDivisionByZero(Message *message)
+	void DashelTarget::receivedDivisionByZero(Message* message)
 	{
-		DivisionByZero *dz = polymorphic_downcast<DivisionByZero *>(message);
+		DivisionByZero* dz = polymorphic_downcast<DivisionByZero*>(message);
 
 		int line = getLineFromPC(dz->source, dz->pc);
 		if (line >= 0)
@@ -1001,9 +1002,9 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::receivedEventExecutionKilled(Message *message)
+	void DashelTarget::receivedEventExecutionKilled(Message* message)
 	{
-		EventExecutionKilled *eek = polymorphic_downcast<EventExecutionKilled *>(message);
+		EventExecutionKilled* eek = polymorphic_downcast<EventExecutionKilled*>(message);
 
 		int line = getLineFromPC(eek->source, eek->pc);
 		if (line >= 0)
@@ -1012,24 +1013,24 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::receivedNodeSpecificError(Message *message)
+	void DashelTarget::receivedNodeSpecificError(Message* message)
 	{
-		NodeSpecificError *nse = polymorphic_downcast<NodeSpecificError *>(message);
+		NodeSpecificError* nse = polymorphic_downcast<NodeSpecificError*>(message);
 
 		int line = getLineFromPC(nse->source, nse->pc);
 		// The NodeSpecificError can be triggered even if the pc is not valid
-//		if (line >= 0)
-//		{
-			emit nodeSpecificError(nse->source, line, QString::fromStdWString(nse->message));
-			emit executionModeChanged(nse->source, EXECUTION_STOP);
-//		}
+		//		if (line >= 0)
+		//		{
+		emit nodeSpecificError(nse->source, line, QString::fromStdWString(nse->message));
+		emit executionModeChanged(nse->source, EXECUTION_STOP);
+		//		}
 	}
 
-	void DashelTarget::receivedExecutionStateChanged(Message *message)
+	void DashelTarget::receivedExecutionStateChanged(Message* message)
 	{
-		ExecutionStateChanged *ess = polymorphic_downcast<ExecutionStateChanged *>(message);
+		ExecutionStateChanged* ess = polymorphic_downcast<ExecutionStateChanged*>(message);
 
-		Node &node = nodes[ess->source];
+		Node& node = nodes[ess->source];
 		int line = getLineFromPC(ess->source, ess->pc);
 
 		assert(writeBlocked == false);
@@ -1064,7 +1065,7 @@ namespace Aseba
 								dashelInterface.stream->flush();
 								dashelInterface.unlock();
 							}
-							catch(Dashel::DashelException e)
+							catch (Dashel::DashelException e)
 							{
 								dashelInterface.unlock();
 								handleDashelException(e);
@@ -1075,10 +1076,8 @@ namespace Aseba
 					}
 					else if (node.steppingInNext == WAITING_LINE_CHANGE)
 					{
-						if (
-							(node.eventAddressToId.find(ess->pc) != node.eventAddressToId.end()) ||
-							(line != static_cast<int>(node.lineInNext))
-						)
+						if ((node.eventAddressToId.find(ess->pc) != node.eventAddressToId.end())
+							|| (line != static_cast<int>(node.lineInNext)))
 						{
 							node.steppingInNext = NOT_IN_NEXT;
 							emit executionPosChanged(ess->source, line);
@@ -1096,7 +1095,7 @@ namespace Aseba
 									dashelInterface.stream->flush();
 									dashelInterface.unlock();
 								}
-								catch(Dashel::DashelException e)
+								catch (Dashel::DashelException e)
 								{
 									dashelInterface.unlock();
 									handleDashelException(e);
@@ -1132,16 +1131,16 @@ namespace Aseba
 		}
 	}
 
-	void DashelTarget::receivedBreakpointSetResult(Message *message)
+	void DashelTarget::receivedBreakpointSetResult(Message* message)
 	{
-		BreakpointSetResult *bsr = polymorphic_downcast<BreakpointSetResult *>(message);
+		BreakpointSetResult* bsr = polymorphic_downcast<BreakpointSetResult*>(message);
 		unsigned node = bsr->source;
 		emit breakpointSetResult(node, getLineFromPC(node, bsr->pc), bsr->success);
 	}
 
-	void DashelTarget::receivedBootloaderAck(Message *message)
+	void DashelTarget::receivedBootloaderAck(Message* message)
 	{
-		BootloaderAck *ack = polymorphic_downcast<BootloaderAck*>(message);
+		BootloaderAck* ack = polymorphic_downcast<BootloaderAck*>(message);
 		emit bootloaderAck(ack->errorCode, ack->errorAddress);
 	}
 

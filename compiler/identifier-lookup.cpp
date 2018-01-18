@@ -32,7 +32,7 @@
 #include <limits>
 #include <algorithm>
 #ifndef __APPLE__
-	#include <malloc.h>
+#	include <malloc.h>
 #endif
 
 namespace Aseba
@@ -73,7 +73,8 @@ namespace Aseba
 	}
 
 	//! Compute the edit distance between two vector-style containers, inspired from http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.2B.2B
-	template <class T> unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)
+	template<class T>
+	unsigned int editDistance(const T& s1, const T& s2, const unsigned maxDist)
 	{
 		// Dynamic programming implementation.
 		// Uses only O(len(s2)) space and O(len(s1)*len(s2)) time.
@@ -81,12 +82,12 @@ namespace Aseba
 		const auto l2(s2.size());
 		// States on s1 are folded into current (Dn) and last (Do),
 		// achieving O(len(s2)) in space.
-		std::vector<int> Do(l2+1, 0);
-		std::vector<int> Dn(l2+1, 0);
+		std::vector<int> Do(l2 + 1, 0);
+		std::vector<int> Dn(l2 + 1, 0);
 
 		// first row, nothing matches empty string
 		for (size_t j = 1; j <= l2; ++j)
-			Do[j] = Do[j-1] + 1;
+			Do[j] = Do[j - 1] + 1;
 		// note: j indices for accessing s2 are shifted by 1 compared to i indices for accessing s
 		// all rows
 		for (size_t i = 0; i < l1; ++i)
@@ -95,11 +96,7 @@ namespace Aseba
 			Dn[0] = Do[0] + 1; // nothing matches empty string
 			for (size_t j = 1; j <= l2; ++j)
 			{
-				Dn[j] = std::min(std::min(
-					Do[j] + 1,
-					Dn[j-1] + 1),
-					Do[j-1] + (s1[i] == s2[j-1] ? 0 : 1)
-				);
+				Dn[j] = std::min(std::min(Do[j] + 1, Dn[j - 1] + 1), Do[j - 1] + (s1[i] == s2[j - 1] ? 0 : 1));
 			}
 			std::swap(Dn, Do);
 		}
@@ -107,8 +104,12 @@ namespace Aseba
 	}
 
 	//! Helper function to find for something in one of the map, using edit-distance to check for candidates if not found
-	template <typename MapType>
-	typename MapType::const_iterator findInTable(const MapType& map, const std::wstring& name, const SourcePos& pos, const ErrorCode notFoundError, const ErrorCode misspelledError)
+	template<typename MapType>
+	typename MapType::const_iterator findInTable(const MapType& map,
+		const std::wstring& name,
+		const SourcePos& pos,
+		const ErrorCode notFoundError,
+		const ErrorCode misspelledError)
 	{
 		auto it(map.find(name));
 		if (it == map.end())
@@ -137,19 +138,22 @@ namespace Aseba
 	//! Look for a variable of a given name, and if found, return an iterator; if not, return an exception
 	VariablesMap::const_iterator Compiler::findVariable(const std::wstring& varName, const SourcePos& varPos) const
 	{
-		return findInTable<VariablesMap>(variablesMap, varName, varPos, ERROR_VARIABLE_NOT_DEFINED, ERROR_VARIABLE_NOT_DEFINED_GUESS);
+		return findInTable<VariablesMap>(
+			variablesMap, varName, varPos, ERROR_VARIABLE_NOT_DEFINED, ERROR_VARIABLE_NOT_DEFINED_GUESS);
 	}
 
 	//! Look for a function of a given name, and if found, return an iterator; if not, return an exception
 	FunctionsMap::const_iterator Compiler::findFunction(const std::wstring& funcName, const SourcePos& funcPos) const
 	{
-		return findInTable<FunctionsMap>(functionsMap, funcName, funcPos, ERROR_FUNCTION_NOT_DEFINED, ERROR_FUNCTION_NOT_DEFINED_GUESS);
+		return findInTable<FunctionsMap>(
+			functionsMap, funcName, funcPos, ERROR_FUNCTION_NOT_DEFINED, ERROR_FUNCTION_NOT_DEFINED_GUESS);
 	}
 
 	//! Look for a constant of a given name, and if found, return an iterator; if not, return an exception
 	Compiler::ConstantsMap::const_iterator Compiler::findConstant(const std::wstring& name, const SourcePos& pos) const
 	{
-		return findInTable<ConstantsMap>(constantsMap, name, pos, ERROR_CONSTANT_NOT_DEFINED, ERROR_CONSTANT_NOT_DEFINED_GUESS);
+		return findInTable<ConstantsMap>(
+			constantsMap, name, pos, ERROR_CONSTANT_NOT_DEFINED, ERROR_CONSTANT_NOT_DEFINED_GUESS);
 	}
 
 	//! Return true if a constant of a given name exists
@@ -163,7 +167,8 @@ namespace Aseba
 	{
 		try
 		{
-			return findInTable<EventsMap>(globalEventsMap, name, pos, ERROR_EVENT_NOT_DEFINED, ERROR_EVENT_NOT_DEFINED_GUESS);
+			return findInTable<EventsMap>(
+				globalEventsMap, name, pos, ERROR_EVENT_NOT_DEFINED, ERROR_EVENT_NOT_DEFINED_GUESS);
 		}
 		catch (TranslatableError e)
 		{
@@ -180,9 +185,11 @@ namespace Aseba
 	}
 
 	//! Look for a subroutine of a given name, and if found, return an iterator; if not, return an exception
-	Compiler::SubroutineReverseTable::const_iterator Compiler::findSubroutine(const std::wstring& name, const SourcePos& pos) const
+	Compiler::SubroutineReverseTable::const_iterator Compiler::findSubroutine(const std::wstring& name,
+		const SourcePos& pos) const
 	{
-		return findInTable<SubroutineReverseTable>(subroutineReverseTable, name, pos, ERROR_SUBROUTINE_NOT_DEFINED, ERROR_SUBROUTINE_NOT_DEFINED_GUESS);
+		return findInTable<SubroutineReverseTable>(
+			subroutineReverseTable, name, pos, ERROR_SUBROUTINE_NOT_DEFINED, ERROR_SUBROUTINE_NOT_DEFINED_GUESS);
 	}
 
 	//! Build variables and functions maps
@@ -205,7 +212,7 @@ namespace Aseba
 		constantsMap.clear();
 		for (unsigned i = 0; i < commonDefinitions->constants.size(); i++)
 		{
-			const NamedValue &constant(commonDefinitions->constants[i]);
+			const NamedValue& constant(commonDefinitions->constants[i]);
 			constantsMap[constant.name] = constant.value;
 		}
 

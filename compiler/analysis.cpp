@@ -55,17 +55,11 @@ namespace Aseba
 					case ASEBA_BYTECODE_LARGE_IMMEDIATE:
 					case ASEBA_BYTECODE_LOAD_INDIRECT:
 					case ASEBA_BYTECODE_STORE_INDIRECT:
-					case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
-						pc += 2;
-					break;
+					case ASEBA_BYTECODE_CONDITIONAL_BRANCH: pc += 2; break;
 
-					case ASEBA_BYTECODE_EMIT:
-						pc += 3;
-					break;
+					case ASEBA_BYTECODE_EMIT: pc += 3; break;
 
-					default:
-						pc += 1;
-					break;
+					default: pc += 1; break;
 				}
 			}
 		}
@@ -105,22 +99,15 @@ namespace Aseba
 						case ASEBA_BYTECODE_LARGE_IMMEDIATE:
 						case ASEBA_BYTECODE_LOAD_INDIRECT:
 						case ASEBA_BYTECODE_STORE_INDIRECT:
-						case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
-							pc += 2;
-						break;
+						case ASEBA_BYTECODE_CONDITIONAL_BRANCH: pc += 2; break;
 
-						case ASEBA_BYTECODE_EMIT:
-							pc += 3;
-						break;
+						case ASEBA_BYTECODE_EMIT: pc += 3; break;
 
-						default:
-							pc += 1;
-						break;
+						default: pc += 1; break;
 					}
 				}
 			}
-		}
-		while (wasActivity);
+		} while (wasActivity);
 
 		return true;
 	}
@@ -128,4 +115,3 @@ namespace Aseba
 	/*@}*/
 
 } // namespace Aseba
-

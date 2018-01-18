@@ -25,14 +25,14 @@
 
 namespace Enki
 {
-	class Door: public PhysicalObject
+	class Door : public PhysicalObject
 	{
 	public:
 		virtual void open() = 0;
 		virtual void close() = 0;
 	};
 
-	class SlidingDoor: public Door
+	class SlidingDoor : public Door
 	{
 	public:
 		const Point closedPos;
@@ -50,7 +50,8 @@ namespace Enki
 		double moveTimeLeft;
 
 	public:
-		SlidingDoor(const Point& closedPos, const Point& openedPos, const Point& size, double height, double moveDuration);
+		SlidingDoor(
+			const Point& closedPos, const Point& openedPos, const Point& size, double height, double moveDuration);
 
 		virtual void controlStep(double dt);
 
@@ -58,7 +59,7 @@ namespace Enki
 		virtual void close(void);
 	};
 
-	class AreaActivating: public LocalInteraction
+	class AreaActivating : public LocalInteraction
 	{
 	public:
 		const Polygon activeArea;
@@ -67,20 +68,20 @@ namespace Enki
 		bool active;
 
 	public:
-		AreaActivating(Robot *owner, const Polygon& activeArea);
+		AreaActivating(Robot* owner, const Polygon& activeArea);
 
-		virtual void init(double dt, World *w);
-		virtual void objectStep (double dt, World *w, PhysicalObject *po);
+		virtual void init(double dt, World* w);
+		virtual void objectStep(double dt, World* w, PhysicalObject* po);
 
 		bool isActive() const;
 	};
 
-	class DoorButton: public Robot
+	class DoorButton : public Robot
 	{
 	protected:
 		AreaActivating areaActivating;
 		bool wasActive;
-		Door *const attachedDoor;
+		Door* const attachedDoor;
 
 	public:
 		DoorButton(const Point& pos, const Point& size, const Polygon& activeArea, Door* attachedDoor);

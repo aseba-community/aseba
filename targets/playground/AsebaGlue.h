@@ -40,8 +40,8 @@ namespace Aseba
 
 		// to be implemente by robots
 		virtual const AsebaVMDescription* getDescription() const = 0;
-		virtual const AsebaLocalEventDescription * getLocalEventsDescriptions() const = 0;
-		virtual const AsebaNativeFunctionDescription * const * getNativeFunctionsDescriptions() const = 0;
+		virtual const AsebaLocalEventDescription* getLocalEventsDescriptions() const = 0;
+		virtual const AsebaNativeFunctionDescription* const* getNativeFunctionsDescriptions() const = 0;
 		virtual void callNativeFunction(uint16_t id) = 0;
 
 		// to be implemented by subclasses of robots for communicating with the external world
@@ -56,7 +56,7 @@ namespace Aseba
 		NamedRobot(std::string robotName);
 	};
 
-	struct SingleVMNodeGlue: NamedRobot, AbstractNodeGlue
+	struct SingleVMNodeGlue : NamedRobot, AbstractNodeGlue
 	{
 		// VM implementation
 		AsebaVMState vm;
@@ -81,7 +81,7 @@ namespace Aseba
 
 	// Buffer for data reception
 
-	class RecvBufferNodeConnection: public AbstractNodeConnection
+	class RecvBufferNodeConnection : public AbstractNodeConnection
 	{
 	protected:
 		uint16_t lastMessageSource;

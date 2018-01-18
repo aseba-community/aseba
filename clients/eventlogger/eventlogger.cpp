@@ -10,7 +10,7 @@
 #include <iostream>
 
 #ifdef _MSC_VER
-#define QWT_DLL
+#	define QWT_DLL
 #endif // _MSC_VER
 
 #include <qwt_plot.h>
@@ -18,9 +18,9 @@
 #include <qwt_legend.h>
 
 #if QWT_VERSION >= 0x060000
-	#include <qwt_series_data.h>
+#	include <qwt_series_data.h>
 #else
-	#include <qwt_data.h>
+#	include <qwt_data.h>
 #endif
 
 using namespace Dashel;
@@ -35,13 +35,10 @@ private:
 	std::vector<int16_t>& _y;
 
 public:
-	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) :
-		_x(_x),
-		_y(_y)
-	{ }
-	virtual QRectF boundingRect () const { return qwtBoundingRect(*this); }
-	virtual QPointF sample (size_t i) const { return QPointF(_x[i], double(_y[i])); }
-	virtual size_t size () const { return _x.size(); }
+	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) : _x(_x), _y(_y) {}
+	virtual QRectF boundingRect() const { return qwtBoundingRect(*this); }
+	virtual QPointF sample(size_t i) const { return QPointF(_x[i], double(_y[i])); }
+	virtual size_t size() const { return _x.size(); }
 };
 #else
 class EventDataWrapper : public QwtData
@@ -51,14 +48,11 @@ private:
 	std::vector<int16_t>& _y;
 
 public:
-	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) :
-		_x(_x),
-		_y(_y)
-	{ }
-	virtual QwtData *   copy () const { return new EventDataWrapper(*this); }
-	virtual size_t   size () const { return _x.size(); }
-	virtual double x (size_t i) const { return _x[i]; }
-	virtual double y (size_t i) const { return (double)_y[i]; }
+	EventDataWrapper(std::vector<double>& _x, std::vector<int16_t>& _y) : _x(_x), _y(_y) {}
+	virtual QwtData* copy() const { return new EventDataWrapper(*this); }
+	virtual size_t size() const { return _x.size(); }
+	virtual double x(size_t i) const { return _x[i]; }
+	virtual double y(size_t i) const { return (double)_y[i]; }
 };
 #endif
 
@@ -87,18 +81,18 @@ public:
 		setAxisTitle(xBottom, tr("Time (seconds)"));
 		setAxisTitle(yLeft, tr("Values"));
 
-		QwtLegend *legend = new QwtLegend;
+		QwtLegend* legend = new QwtLegend;
 		//legend->setItemMode(QwtLegend::CheckableItem);
 		insertLegend(legend, QwtPlot::BottomLegend);
 
 		for (size_t i = 0; i < values.size(); i++)
 		{
-			QwtPlotCurve *curve = new QwtPlotCurve(QString("%0").arg(i));
-			#if QWT_VERSION >= 0x060000
+			QwtPlotCurve* curve = new QwtPlotCurve(QString("%0").arg(i));
+#if QWT_VERSION >= 0x060000
 			curve->setData(new EventDataWrapper(timeStamps, values[i]));
-			#else
+#else
 			curve->setData(EventDataWrapper(timeStamps, values[i]));
-			#endif
+#endif
 			curve->attach(this);
 			curve->setPen(QColor::fromHsv((i * 360) / values.size(), 255, 100));
 		}
@@ -112,16 +106,16 @@ public:
 	}
 
 protected:
-	virtual void timerEvent ( QTimerEvent * event )
+	virtual void timerEvent(QTimerEvent* event)
 	{
 		if (!step(0))
 			close();
 	}
 
-	void incomingData(Stream *stream)
+	void incomingData(Stream* stream)
 	{
-		Message *message = Message::receive(stream);
-		UserMessage *userMessage = dynamic_cast<UserMessage *>(message);
+		Message* message = Message::receive(stream);
+		UserMessage* userMessage = dynamic_cast<UserMessage*>(message);
 		if (userMessage)
 		{
 			if (userMessage->type == eventId)
@@ -153,7 +147,7 @@ protected:
 		delete message;
 	}
 
-	void connectionClosed(Stream *stream, bool abnormal)
+	void connectionClosed(Stream* stream, bool abnormal)
 	{
 		dumpTime(cerr);
 		cout << "Connection closed to " << stream->getTargetName();
@@ -164,7 +158,7 @@ protected:
 	}
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	if (argc < 4)
@@ -182,7 +176,7 @@ int main(int argc, char *argv[])
 		logger.show();
 		res = app.exec();
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 2;

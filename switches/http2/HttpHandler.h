@@ -27,11 +27,13 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	class HttpInterface; // forward declaration
+	namespace Http
+	{
+		class HttpInterface; // forward declaration
 
-	/**
+		/**
 	 * Base class for HTTP handlers. Handlers need to be able to check if they are responsible for an
 	 * incoming request, and the need to handle it in some way if a previous call to the checking
 	 * function was successful.
@@ -39,60 +41,61 @@ namespace Aseba { namespace Http
 	 * This base class is intended to be used with multiple inheritance, so make sure to always
 	 * virtually inheriting from it.
 	 */
-	class HttpHandler
-	{
+		class HttpHandler
+		{
 		public:
-			HttpHandler() { }
-			virtual ~HttpHandler() { }
+			HttpHandler() {}
+			virtual ~HttpHandler() {}
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const = 0;
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens) = 0;
-	};
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const = 0;
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens) = 0;
+		};
 
-	class InterfaceHttpHandler : public virtual HttpHandler
-	{
+		class InterfaceHttpHandler : public virtual HttpHandler
+		{
 		public:
-			InterfaceHttpHandler(HttpInterface *interface_) :
-				interface(interface_)
-			{
+			InterfaceHttpHandler(HttpInterface* interface_) : interface(interface_) {}
 
-			}
-
-			virtual const HttpInterface *getInterface() const { return interface; }
+			virtual const HttpInterface* getInterface() const { return interface; }
 
 		protected:
-			virtual HttpInterface *getInterface() { return interface; }
+			virtual HttpInterface* getInterface() { return interface; }
 
 		private:
-			HttpInterface *interface;
-	};
+			HttpInterface* interface;
+		};
 
-	class WildcardHttpHandler : public virtual HttpHandler
-	{
+		class WildcardHttpHandler : public virtual HttpHandler
+		{
 		public:
-			WildcardHttpHandler() { }
-			virtual ~WildcardHttpHandler() { }
+			WildcardHttpHandler() {}
+			virtual ~WildcardHttpHandler() {}
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const { return true; }
-	};
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const
+			{
+				return true;
+			}
+		};
 
-	class HierarchicalHttpHandler : public virtual HttpHandler
-	{
+		class HierarchicalHttpHandler : public virtual HttpHandler
+		{
 		public:
-			HierarchicalHttpHandler() { }
+			HierarchicalHttpHandler() {}
 
 			virtual ~HierarchicalHttpHandler()
 			{
-				for(int i = 0; i < getNumSubhandlers(); i++)
+				for (int i = 0; i < getNumSubhandlers(); i++)
 				{
 					delete subhandlers[i];
 				}
 			}
 
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens)
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens)
 			{
-				for(int i = 0; i < getNumSubhandlers(); i++) {
-					if(subhandlers[i]->checkIfResponsible(request, tokens)) {
+				for (int i = 0; i < getNumSubhandlers(); i++)
+				{
+					if (subhandlers[i]->checkIfResponsible(request, tokens))
+					{
 						subhandlers[i]->handleRequest(request, tokens);
 						return;
 					}
@@ -101,34 +104,37 @@ namespace Aseba { namespace Http
 				request->respond().setStatus(HttpResponse::HTTP_STATUS_NOT_FOUND);
 			}
 
-			virtual void addSubhandler(HttpHandler *subhandler) { subhandlers.push_back(subhandler); }
-			virtual int getNumSubhandlers() const { return (int) subhandlers.size(); }
+			virtual void addSubhandler(HttpHandler* subhandler) { subhandlers.push_back(subhandler); }
+			virtual int getNumSubhandlers() const { return (int)subhandlers.size(); }
 
 		private:
-			std::vector<HttpHandler *> subhandlers;
-	};
+			std::vector<HttpHandler*> subhandlers;
+		};
 
-	class RootHttpHandler : public WildcardHttpHandler, public HierarchicalHttpHandler
-	{
+		class RootHttpHandler : public WildcardHttpHandler, public HierarchicalHttpHandler
+		{
 		public:
-			RootHttpHandler() { }
-			virtual ~RootHttpHandler() { }
-	};
+			RootHttpHandler() {}
+			virtual ~RootHttpHandler() {}
+		};
 
-	class TokenHttpHandler : public virtual HttpHandler
-	{
+		class TokenHttpHandler : public virtual HttpHandler
+		{
 		public:
-			TokenHttpHandler() { }
-			virtual ~TokenHttpHandler() { }
+			TokenHttpHandler() {}
+			virtual ~TokenHttpHandler() {}
 
-			virtual bool checkIfResponsible(HttpRequest *request, const std::vector<std::string>& tokens) const
+			virtual bool checkIfResponsible(HttpRequest* request, const std::vector<std::string>& tokens) const
 			{
-				if(tokens.empty()) {
+				if (tokens.empty())
+				{
 					return false;
 				}
 
-				for(int i = 0; i < getNumTokens(); i++) {
-					if(this->tokens[i] == tokens[0]) {
+				for (int i = 0; i < getNumTokens(); i++)
+				{
+					if (this->tokens[i] == tokens[0])
+					{
 						return true;
 					}
 				}
@@ -138,26 +144,27 @@ namespace Aseba { namespace Http
 
 			virtual void addToken(const std::string& token) { tokens.push_back(token); }
 			virtual const std::vector<std::string>& getTokens() const { return tokens; }
-			virtual int getNumTokens() const { return (int) tokens.size(); }
+			virtual int getNumTokens() const { return (int)tokens.size(); }
 
 		private:
 			std::vector<std::string> tokens;
-	};
+		};
 
-	class HierarchicalTokenHttpHandler : public HierarchicalHttpHandler, public TokenHttpHandler
-	{
+		class HierarchicalTokenHttpHandler : public HierarchicalHttpHandler, public TokenHttpHandler
+		{
 		public:
-			HierarchicalTokenHttpHandler() { }
-			virtual ~HierarchicalTokenHttpHandler() { }
+			HierarchicalTokenHttpHandler() {}
+			virtual ~HierarchicalTokenHttpHandler() {}
 
-			virtual void handleRequest(HttpRequest *request, const std::vector<std::string>& tokens)
+			virtual void handleRequest(HttpRequest* request, const std::vector<std::string>& tokens)
 			{
 				assert(!tokens.empty());
 				std::vector<std::string> newTokens(tokens.begin() + 1, tokens.end()); // eat first token
 
 				HierarchicalHttpHandler::handleRequest(request, newTokens);
 			}
-	};
-} }
+		};
+	}
+}
 
 #endif

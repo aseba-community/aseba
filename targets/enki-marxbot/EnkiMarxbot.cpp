@@ -28,20 +28,17 @@
 
 namespace Enki
 {
-	class MarxbotViewer: public ViewerWidget
+	class MarxbotViewer : public ViewerWidget
 	{
 	public:
 		MarxbotViewer(World* world) : ViewerWidget(world) {}
 
-		void renderObjectsTypesHook()
-		{
-			managedObjectsAliases[&typeid(AsebaMarxbot)] = &typeid(Marxbot);
-		}
+		void renderObjectsTypesHook() { managedObjectsAliases[&typeid(AsebaMarxbot)] = &typeid(Marxbot); }
 	};
 }
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 
@@ -52,7 +49,7 @@ int main(int argc, char *argv[])
 	Enki::MarxbotViewer viewer(&world);
 
 	// Create a Khepera and position it
-	Enki::AsebaMarxbot *marXbot = new Enki::AsebaMarxbot();
+	Enki::AsebaMarxbot* marXbot = new Enki::AsebaMarxbot();
 	marXbot->pos = Enki::Point(100, 100);
 
 	// objects are garbage collected by the world on destruction
@@ -63,4 +60,3 @@ int main(int argc, char *argv[])
 
 	return app.exec();
 }
-

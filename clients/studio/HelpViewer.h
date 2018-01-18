@@ -32,7 +32,7 @@ namespace Aseba
 {
 	class HelpBrowser;
 
-	class HelpViewer: public QWidget
+	class HelpViewer : public QWidget
 	{
 		Q_OBJECT
 
@@ -40,7 +40,8 @@ namespace Aseba
 		HelpViewer(QWidget* parent = 0);
 		~HelpViewer();
 
-		enum helpType {
+		enum helpType
+		{
 			USERMANUAL,
 			STUDIO,
 			LANGUAGE
@@ -59,7 +60,7 @@ namespace Aseba
 		bool readSettings();
 		void writeSettings();
 
-		QHelpEngine *helpEngine;
+		QHelpEngine* helpEngine;
 		HelpBrowser* viewer;
 		QPushButton* previous;
 		QPushButton* next;
@@ -79,7 +80,7 @@ namespace Aseba
 		void sourceChanged(const QUrl& src);
 	};
 
-	class HelpBrowser: public QTextBrowser
+	class HelpBrowser : public QTextBrowser
 	{
 	public:
 		HelpBrowser(QHelpEngine* helpEngine, QWidget* parent = 0);
@@ -92,4 +93,3 @@ namespace Aseba
 }
 
 #endif // HELP_VIEWER_H
-

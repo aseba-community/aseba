@@ -30,16 +30,16 @@ namespace Aseba
 		crc = crcXModem(crc, bytecodeSize);
 		crc = crcXModem(crc, variablesSize);
 		crc = crcXModem(crc, stackSize);
-		for (const auto & namedVariable : namedVariables)
+		for (const auto& namedVariable : namedVariables)
 		{
 			crc = crcXModem(crc, namedVariable.size);
 			crc = crcXModem(crc, namedVariable.name);
 		}
-		for (const auto & localEvent : localEvents)
+		for (const auto& localEvent : localEvents)
 		{
 			crc = crcXModem(crc, localEvent.name);
 		}
-		for (const auto & nativeFunction : nativeFunctions)
+		for (const auto& nativeFunction : nativeFunctions)
 		{
 			crc = crcXModem(crc, nativeFunction.name);
 			for (size_t j = 0; j < nativeFunction.parameters.size(); ++j)
@@ -56,10 +56,9 @@ namespace Aseba
 	{
 		freeVariableIndex = 0;
 		VariablesMap variablesMap;
-		for (const auto & namedVariable : namedVariables)
+		for (const auto& namedVariable : namedVariables)
 		{
-			variablesMap[namedVariable.name] =
-			std::make_pair(freeVariableIndex, namedVariable.size);
+			variablesMap[namedVariable.name] = std::make_pair(freeVariableIndex, namedVariable.size);
 			freeVariableIndex += namedVariable.size;
 		}
 		return variablesMap;

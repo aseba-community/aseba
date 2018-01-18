@@ -114,7 +114,7 @@ typedef enum
 	ASEBA_UNARY_OP_SUB = 0x0,
 	ASEBA_UNARY_OP_ABS,
 	ASEBA_UNARY_OP_BIT_NOT,
-	ASEBA_UNARY_OP_NOT	// < not used for the VM, only for parsing, reduced by compiler using de Morgan and comparison inversion
+	ASEBA_UNARY_OP_NOT // < not used for the VM, only for parsing, reduced by compiler using de Morgan and comparison inversion
 } AsebaUnaryOperator;
 
 /*! Mask of available unary operators */
@@ -212,23 +212,27 @@ typedef enum
 /*! Limits for static buffers allocation */
 typedef enum
 {
-	ASEBA_MAX_EVENT_ARG_COUNT = 258,	/*!< Maximum number of arguments in an event (in word) */
+	ASEBA_MAX_EVENT_ARG_COUNT = 258, /*!< Maximum number of arguments in an event (in word) */
 } AsebaLimits;
 
 /*! Maximum size of arguments in a user-defined event (in bytes) */
-#define ASEBA_MAX_EVENT_ARG_SIZE (ASEBA_MAX_EVENT_ARG_COUNT*2)
+#	define ASEBA_MAX_EVENT_ARG_SIZE (ASEBA_MAX_EVENT_ARG_COUNT * 2)
 
 /*! Maximum size of an event (in bytes), including its type, but not the source and the length */
-#define ASEBA_MAX_INNER_PACKET_SIZE (ASEBA_MAX_EVENT_ARG_SIZE+2)
+#	define ASEBA_MAX_INNER_PACKET_SIZE (ASEBA_MAX_EVENT_ARG_SIZE + 2)
 
 /*! Maximum size of an event (in bytes), including its type plus the source and the length */
-#define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE+4)
+#	define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE + 4)
 
 /*! *DEPRECATED*, please use one of the more explicit defines above */
-#define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE
+#	define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE
 
 /*! Macro to avoid the warning "unused variable", if we have a valid reason to keep this variable */
-#define ASEBA_UNUSED(x) do { (void)(x); } while (0)
+#	define ASEBA_UNUSED(x) \
+		do                  \
+		{                   \
+			(void)(x);      \
+		} while (0)
 
 /*@}*/
 

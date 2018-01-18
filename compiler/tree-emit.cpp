@@ -58,7 +58,7 @@ namespace Aseba
 
 	//! Fixup prelinked bytecodes by making sure that each vector is closed correctly,
 	//! i.e. with a STOP for events and a RET for subroutines
-	void PreLinkBytecode::fixup(const Compiler::SubroutineTable &subroutineTable)
+	void PreLinkBytecode::fixup(const Compiler::SubroutineTable& subroutineTable)
 	{
 		// clear empty events entries
 		for (auto it = events.begin(); it != events.end();)
@@ -73,12 +73,12 @@ namespace Aseba
 		}
 
 		// add terminals
-		for (auto & event : events)
+		for (auto& event : events)
 		{
 			BytecodeVector& bytecode = event.second;
 			bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_STOP), bytecode.lastLine));
 		}
-		for (auto & subroutine : subroutines)
+		for (auto& subroutine : subroutines)
 		{
 			BytecodeVector& bytecode = subroutine.second;
 			if (bytecode.size())
@@ -88,7 +88,8 @@ namespace Aseba
 					bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), bytecode.lastLine));
 			}
 			else
-				bytecode.push_back(BytecodeElement(AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[subroutine.first].line));
+				bytecode.push_back(BytecodeElement(
+					AsebaBytecodeFromId(ASEBA_BYTECODE_SUB_RET), subroutineTable[subroutine.first].line));
 		}
 	}
 
@@ -141,16 +142,13 @@ namespace Aseba
 		assert(children.size() % 2 == 0);
 		for (size_t i = 0; i < children.size(); i += 2)
 		{
-			children[i+1]->emit(bytecodes);
-			children[i+0]->emit(bytecodes);
+			children[i + 1]->emit(bytecodes);
+			children[i + 0]->emit(bytecodes);
 		}
 	}
 
 
-	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const
-	{
-		abort();
-	}
+	void IfWhenNode::emit(PreLinkBytecode& bytecodes) const { abort(); }
 
 
 	void FoldedIfWhenNode::emit(PreLinkBytecode& bytecodes) const
@@ -217,10 +215,10 @@ namespace Aseba
 			bytecode = AsebaBytecodeFromId(ASEBA_BYTECODE_JUMP) | (bfb.size() + 1);
 			unsigned short jumpLine;
 			if (btb.size())
-				jumpLine = (btb.end()-1)->line;
+				jumpLine = (btb.end() - 1)->line;
 			else
 				jumpLine = sourcePos.row;
-			bytecodes.current->push_back(BytecodeElement(bytecode , jumpLine));
+			bytecodes.current->push_back(BytecodeElement(bytecode, jumpLine));
 
 			std::copy(bfb.begin(), bfb.end(), std::back_inserter(*bytecodes.current));
 		}
@@ -238,10 +236,7 @@ namespace Aseba
 	}
 
 
-	void WhileNode::emit(PreLinkBytecode& bytecodes) const
-	{
-		abort();
-	}
+	void WhileNode::emit(PreLinkBytecode& bytecodes) const { abort(); }
 
 
 	void FoldedWhileNode::emit(PreLinkBytecode& bytecodes) const
@@ -368,15 +363,9 @@ namespace Aseba
 	}
 
 
-	void ImmediateNode::emit(PreLinkBytecode& bytecodes) const
-	{
-		addImmediateToBytecodes(value, sourcePos, bytecodes);
-	}
+	void ImmediateNode::emit(PreLinkBytecode& bytecodes) const { addImmediateToBytecodes(value, sourcePos, bytecodes); }
 
-	unsigned ImmediateNode::getStackDepth() const
-	{
-		return 1;
-	}
+	unsigned ImmediateNode::getStackDepth() const { return 1; }
 
 
 	void LoadNode::emit(PreLinkBytecode& bytecodes) const
@@ -385,10 +374,7 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 
-	unsigned LoadNode::getStackDepth() const
-	{
-		return 1;
-	}
+	unsigned LoadNode::getStackDepth() const { return 1; }
 
 
 	void StoreNode::emit(PreLinkBytecode& bytecodes) const
@@ -461,10 +447,7 @@ namespace Aseba
 		bytecodes.current->push_back(BytecodeElement(bytecode, sourcePos.row));
 	}
 
-	unsigned LoadNativeArgNode::getStackDepth() const
-	{
-		return std::max(children[0]->getStackDepth(), unsigned(2));
-	}
+	unsigned LoadNativeArgNode::getStackDepth() const { return std::max(children[0]->getStackDepth(), unsigned(2)); }
 
 
 	void CallNode::emit(PreLinkBytecode& bytecodes) const
@@ -490,7 +473,7 @@ namespace Aseba
 	{
 		unsigned stackDepth = 0;
 		for (size_t i = 0; i < children.size(); i++)
-			stackDepth = std::max(stackDepth, unsigned(templateArgs.size()+i)+children[i]->getStackDepth());
+			stackDepth = std::max(stackDepth, unsigned(templateArgs.size() + i) + children[i]->getStackDepth());
 
 		return stackDepth;
 	}

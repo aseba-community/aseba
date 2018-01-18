@@ -41,24 +41,20 @@ class Joystick
 {
 protected:
 	int number;
-	SDL_Joystick *joy;
+	SDL_Joystick* joy;
 	int oa[5];
 	int ob[9];
 	int ohat;
 
 public:
-	Joystick(int number, SDL_Joystick *joy):
-		number(number), joy(joy)
+	Joystick(int number, SDL_Joystick* joy) : number(number), joy(joy)
 	{
-		fill(oa, oa+5, 0);
-		fill(ob, ob+9, 0);
+		fill(oa, oa + 5, 0);
+		fill(ob, ob + 9, 0);
 		ohat = 0;
 	}
 
-	~Joystick()
-	{
-		SDL_JoystickClose(joy);
-	}
+	~Joystick() { SDL_JoystickClose(joy); }
 
 	void process(Stream* stream)
 	{
@@ -116,7 +112,7 @@ public:
 	JoystickReader(const char* target)
 	{
 		// SDL inint stuff
-		if((SDL_Init(SDL_INIT_JOYSTICK)==-1))
+		if ((SDL_Init(SDL_INIT_JOYSTICK) == -1))
 		{
 			cerr << "Error : Could not initialize SDL: " << SDL_GetError() << endl;
 			exit(EXIT_COULD_NOT_INIT_SDL);
@@ -171,12 +167,9 @@ public:
 	}
 
 protected:
-	void incomingData(Stream *stream)
-	{
-		delete Message::receive(stream);
-	}
+	void incomingData(Stream* stream) { delete Message::receive(stream); }
 
-	void connectionClosed(Stream *stream, bool abnormal)
+	void connectionClosed(Stream* stream, bool abnormal)
 	{
 		dumpTime(cerr);
 		cerr << "Connection closed to " << stream->getTargetName();
@@ -187,9 +180,9 @@ protected:
 	}
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	const char *target = ASEBA_DEFAULT_TARGET;
+	const char* target = ASEBA_DEFAULT_TARGET;
 
 	if (argc >= 2)
 		target = argv[1];
@@ -201,7 +194,7 @@ int main(int argc, char *argv[])
 			reader.processJoysticks();
 		return 0;
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 		return EXIT_DASHEL_EXCEPTION_OCCURED;

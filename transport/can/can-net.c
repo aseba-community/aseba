@@ -28,7 +28,7 @@
 #define TYPE_PACKET_STOP 0x2
 
 #define CANID_TO_TYPE(canid) ((canid) >> 8)
-#define CANID_TO_ID(canid) ((canid) & 0xff)
+#define CANID_TO_ID(canid) ((canid)&0xff)
 #define TO_CANID(type, id) (((type) << 8) | (id))
 
 #define ASEBA_MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -39,19 +39,19 @@ static struct AsebaCan
 {
 	// data
 	uint16_t id; /*!< identifier of this node on CAN */
-	
+
 	// pointer to physical layer functions
 	AsebaCanSendFrameFP sendFrameFP;
 	AsebaCanIntVoidFP isFrameRoomFP;
 	AsebaCanVoidVoidFP receivedPacketDroppedFP;
 	AsebaCanVoidVoidFP sentPacketDroppedFP;
-	
+
 	// send buffer
 	CanFrame* sendQueue;
 	size_t sendQueueSize;
 	uint16_t sendQueueInsertPos;
 	uint16_t sendQueueConsumePos;
-	
+
 	// reception buffer
 	CanFrame* recvQueue;
 	size_t recvQueueSize;
@@ -59,7 +59,7 @@ static struct AsebaCan
 	uint16_t recvQueueConsumePos;
 
 	uint16_t volatile sendQueueLock;
-	
+
 } asebaCan;
 
 /** \addtogroup can */
@@ -79,8 +79,8 @@ static uint16_t AsebaCanSendQueueGetUsedFrames(void)
 {
 	uint16_t ipos, cpos;
 	ipos = asebaCan.sendQueueInsertPos;
-	cpos =  asebaCan.sendQueueConsumePos;
-	
+	cpos = asebaCan.sendQueueConsumePos;
+
 	if (ipos >= cpos)
 		return ipos - cpos;
 	else
@@ -94,14 +94,14 @@ static uint16_t AsebaCanSendQueueGetFreeFrames(void)
 }
 
 /*! Insert a frame in the send queue, do not check for overwrite */
-static void AsebaCanSendQueueInsert(uint16_t canid, const uint8_t *data, size_t size)
+static void AsebaCanSendQueueInsert(uint16_t canid, const uint8_t* data, size_t size)
 {
 	uint16_t temp;
 	memcpy(asebaCan.sendQueue[asebaCan.sendQueueInsertPos].data, data, size);
 	asebaCan.sendQueue[asebaCan.sendQueueInsertPos].id = canid;
 	asebaCan.sendQueue[asebaCan.sendQueueInsertPos].len = size;
 
-	
+
 	temp = asebaCan.sendQueueInsertPos + 1;
 	if (temp >= asebaCan.sendQueueSize)
 		temp = 0;
@@ -112,25 +112,24 @@ static void AsebaCanSendQueueInsert(uint16_t canid, const uint8_t *data, size_t 
 static void AsebaCanSendQueueToPhysicalLayer(void)
 {
 	uint16_t temp;
-	
+
 	while (asebaCan.isFrameRoomFP() && (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos))
 	{
 		asebaCan.sendQueueLock = 1;
-		if(!(asebaCan.isFrameRoomFP() && (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos))) 
+		if (!(asebaCan.isFrameRoomFP() && (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos)))
 		{
 			asebaCan.sendQueueLock = 0;
 			continue;
 		}
-		
+
 		asebaCan.sendFrameFP(asebaCan.sendQueue + asebaCan.sendQueueConsumePos);
-		
+
 		temp = asebaCan.sendQueueConsumePos + 1;
 		if (temp >= asebaCan.sendQueueSize)
 			temp = 0;
-		asebaCan.sendQueueConsumePos = temp; 
+		asebaCan.sendQueueConsumePos = temp;
 		asebaCan.sendQueueLock = 0;
 	}
-
 }
 
 /*! Returned the maximum number of used frames in the reception queue*/
@@ -159,7 +158,7 @@ static void AsebaCanRecvQueueGarbageCollect(void)
 	{
 		if (asebaCan.recvQueue[asebaCan.recvQueueConsumePos].used)
 			break;
-		
+
 		temp = asebaCan.recvQueueConsumePos + 1;
 		if (temp >= asebaCan.recvQueueSize)
 			temp = 0;
@@ -171,14 +170,14 @@ static void AsebaCanRecvQueueGarbageCollect(void)
 static void AsebaCanRecvQueueFreeFrames(uint16_t id)
 {
 	uint16_t i;
-	
+
 	// for all used frames...
 	for (i = asebaCan.recvQueueConsumePos; i != asebaCan.recvQueueInsertPos;)
 	{
 		// if frame is of a specific id, mark frame as unused
 		if (CANID_TO_ID(asebaCan.recvQueue[i].id) == id)
 			asebaCan.recvQueue[i].used = 0;
-		
+
 		i++;
 		if (i >= asebaCan.recvQueueSize)
 			i = 0;
@@ -186,38 +185,40 @@ static void AsebaCanRecvQueueFreeFrames(uint16_t id)
 }
 
 
-void AsebaCanInit(uint16_t id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP, AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP, CanFrame* sendQueue, size_t sendQueueSize, CanFrame* recvQueue, size_t recvQueueSize)
+void AsebaCanInit(uint16_t id, AsebaCanSendFrameFP sendFrameFP, AsebaCanIntVoidFP isFrameRoomFP,
+	AsebaCanVoidVoidFP receivedPacketDroppedFP, AsebaCanVoidVoidFP sentPacketDroppedFP, CanFrame* sendQueue,
+	size_t sendQueueSize, CanFrame* recvQueue, size_t recvQueueSize)
 {
 	asebaCan.id = id;
-	
+
 	asebaCan.sendFrameFP = sendFrameFP;
-	asebaCan.isFrameRoomFP= isFrameRoomFP;
+	asebaCan.isFrameRoomFP = isFrameRoomFP;
 	asebaCan.receivedPacketDroppedFP = receivedPacketDroppedFP;
 	asebaCan.sentPacketDroppedFP = sentPacketDroppedFP;
-	
+
 	asebaCan.sendQueue = sendQueue;
 	asebaCan.sendQueueSize = sendQueueSize;
 	asebaCan.sendQueueInsertPos = 0;
 	asebaCan.sendQueueConsumePos = 0;
-	
+
 	asebaCan.recvQueue = recvQueue;
 	asebaCan.recvQueueSize = recvQueueSize;
 	asebaCan.recvQueueInsertPos = 0;
 	asebaCan.recvQueueConsumePos = 0;
-	
+
 	asebaCan.sendQueueLock = 0;
 }
 
-uint16_t AsebaCanSend(const uint8_t *data, size_t size)
+uint16_t AsebaCanSend(const uint8_t* data, size_t size)
 {
 	return AsebaCanSendSpecificSource(data, size, asebaCan.id);
 }
 
-uint16_t AsebaCanSendSpecificSource(const uint8_t *data, size_t size, uint16_t source)
+uint16_t AsebaCanSendSpecificSource(const uint8_t* data, size_t size, uint16_t source)
 {
 	// send everything we can to maximize the space in the buffer
 	AsebaCanSendQueueToPhysicalLayer();
-	
+
 	// check free space
 	uint16_t frameRequired = AsebaCanGetMinMultipleOfHeight(size);
 	if (AsebaCanSendQueueGetFreeFrames() <= frameRequired)
@@ -225,7 +226,7 @@ uint16_t AsebaCanSendSpecificSource(const uint8_t *data, size_t size, uint16_t s
 		asebaCan.sentPacketDroppedFP();
 		return 0;
 	}
-		
+
 	// insert
 	if (size <= 8)
 	{
@@ -234,7 +235,7 @@ uint16_t AsebaCanSendSpecificSource(const uint8_t *data, size_t size, uint16_t s
 	else
 	{
 		size_t pos = 8;
-		
+
 		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_START, source), data, 8);
 		while (pos + 8 < size)
 		{
@@ -243,15 +244,15 @@ uint16_t AsebaCanSendSpecificSource(const uint8_t *data, size_t size, uint16_t s
 		}
 		AsebaCanSendQueueInsert(TO_CANID(TYPE_PACKET_STOP, source), data + pos, size - pos);
 	}
-	
+
 	// send everything we can to minimize the transmission delay
 	AsebaCanSendQueueToPhysicalLayer();
-	
+
 	return 1;
 }
 
 
-uint16_t AsebaCanRecvBufferEmpty(void) 
+uint16_t AsebaCanRecvBufferEmpty(void)
 {
 	return asebaCan.recvQueueInsertPos == asebaCan.recvQueueConsumePos;
 }
@@ -265,22 +266,23 @@ void AsebaCanFrameSent()
 
 void AsebaCanFlushQueue(void)
 {
-	while(asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos || !asebaCan.isFrameRoomFP())
+	while (asebaCan.sendQueueConsumePos != asebaCan.sendQueueInsertPos || !asebaCan.isFrameRoomFP())
 		AsebaIdle();
 }
 
-uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source)
+uint16_t AsebaCanRecv(uint8_t* data, size_t size, uint16_t* source)
 {
 	int stopPos = -1;
 	uint16_t stopId;
 	uint16_t pos = 0;
 	uint16_t i;
-	
+
 	// first scan for "short packets" and "stops"
-	for (i = asebaCan.recvQueueConsumePos; i != asebaCan.recvQueueInsertPos; )
+	for (i = asebaCan.recvQueueConsumePos; i != asebaCan.recvQueueInsertPos;)
 	{
-		if(asebaCan.recvQueue[i].used) {
-			
+		if (asebaCan.recvQueue[i].used)
+		{
+
 			if (CANID_TO_TYPE(asebaCan.recvQueue[i].id) == TYPE_SMALL_PACKET)
 			{
 				// copy data
@@ -288,10 +290,10 @@ uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source)
 				memcpy(data, asebaCan.recvQueue[i].data, len);
 				*source = CANID_TO_ID(asebaCan.recvQueue[i].id);
 				asebaCan.recvQueue[i].used = 0;
-				
+
 				// garbage collect
 				AsebaCanRecvQueueGarbageCollect();
-				
+
 				return len;
 			}
 			// stop found, we thus must have seen start before
@@ -306,32 +308,32 @@ uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source)
 		if (i >= asebaCan.recvQueueSize)
 			i = 0;
 	}
-	
+
 	// if we haven't found anything
 	if (stopPos < 0)
 		return 0;
-	
+
 	// collect data
 	*source = CANID_TO_ID(stopId);
 	i = asebaCan.recvQueueConsumePos;
 	while (1)
 	{
-		if(asebaCan.recvQueue[i].used) {
+		if (asebaCan.recvQueue[i].used)
+		{
 
 			if (CANID_TO_ID(asebaCan.recvQueue[i].id) == stopId)
 			{
-			if (pos < size)
-					{
+				if (pos < size)
+				{
 					uint16_t amount = ASEBA_MIN(asebaCan.recvQueue[i].len, size - pos);
 					memcpy(data + pos, asebaCan.recvQueue[i].data, amount);
 					pos += amount;
 				}
 				asebaCan.recvQueue[i].used = 0;
 			}
-			
+
 			if (i == stopPos)
 				break;
-	
 		}
 		i++;
 		if (i >= asebaCan.recvQueueSize)
@@ -340,18 +342,18 @@ uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source)
 
 	// garbage collect
 	AsebaCanRecvQueueGarbageCollect();
-	
+
 	return pos;
 }
 
 #define MAX_DROPPING_SOURCE 20
 static uint16_t dropping[MAX_DROPPING_SOURCE];
 
-void AsebaCanFrameReceived(const CanFrame *frame)
+void AsebaCanFrameReceived(const CanFrame* frame)
 {
-	
+
 	uint16_t source = CANID_TO_ID(frame->id);
-	
+
 	// check whether this packet should be filtered or not
 	if (CANID_TO_TYPE(frame->id) == TYPE_SMALL_PACKET)
 	{
@@ -386,15 +388,16 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 			}
 		}
 	}
-	
+
 	if (AsebaCanRecvQueueGetMinFreeFrames() <= 1)
 	{
 		// if packet is stop, free associated frames, otherwise this could lead to everlasting used frames
-		if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP) {
+		if (CANID_TO_TYPE(frame->id) == TYPE_PACKET_STOP)
+		{
 			AsebaCanRecvQueueFreeFrames(source);
 			AsebaCanRecvQueueGarbageCollect();
 		}
-		
+
 		// notify user
 		asebaCan.receivedPacketDroppedFP();
 	}
@@ -414,12 +417,12 @@ void AsebaCanFrameReceived(const CanFrame *frame)
 void AsebaCanRecvFreeQueue(void)
 {
 	size_t i;
-	for(i = 0; i < asebaCan.recvQueueSize; i++)
+	for (i = 0; i < asebaCan.recvQueueSize; i++)
 		asebaCan.recvQueue[i].used = 0;
 	asebaCan.recvQueueInsertPos = 0;
 	asebaCan.recvQueueConsumePos = 0;
-	
-	for(i = 0; i < MAX_DROPPING_SOURCE; i++) 
+
+	for (i = 0; i < MAX_DROPPING_SOURCE; i++)
 		dropping[i] = 0;
 }
 

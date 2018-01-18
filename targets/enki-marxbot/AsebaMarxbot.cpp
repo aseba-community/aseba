@@ -40,25 +40,18 @@
 // Implementation of aseba glue code
 
 // map for aseba glue code
-typedef std::map<AsebaVMState*, Enki::AsebaMarxbot*>  VmSocketMap;
+typedef std::map<AsebaVMState*, Enki::AsebaMarxbot*> VmSocketMap;
 static VmSocketMap asebaSocketMaps;
 
-static AsebaNativeFunctionPointer nativeFunctions[] =
-{
+static AsebaNativeFunctionPointer nativeFunctions[] = {
 	ASEBA_NATIVES_STD_FUNCTIONS,
 };
 
-static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-{
-	ASEBA_NATIVES_STD_DESCRIPTIONS,
-	0
-};
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] = { ASEBA_NATIVES_STD_DESCRIPTIONS, 0 };
 
-extern "C" void AsebaPutVmToSleep(AsebaVMState *vm)
-{
-}
+extern "C" void AsebaPutVmToSleep(AsebaVMState* vm) {}
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
+extern "C" void AsebaSendBuffer(AsebaVMState* vm, const uint8_t* data, uint16_t length)
 {
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
 	Dashel::Stream* stream = marxBot.stream;
@@ -93,7 +86,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t 
 	}
 }
 
-extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState* vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	// TODO: improve this, it is rather ugly
 	Enki::AsebaMarxbot& marxBot = *asebaSocketMaps[vm];
@@ -123,7 +116,7 @@ extern "C" AsebaVMDescription vmRightMotorDescription;
 extern "C" AsebaVMDescription vmProximitySensorsDescription;
 extern "C" AsebaVMDescription vmDistanceSensorsDescription;
 
-extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
+extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState* vm)
 {
 	switch (vm->nodeId)
 	{
@@ -137,38 +130,35 @@ extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
 	return 0;
 }
 
-extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaNativeFunctionDescription* const* AsebaGetNativeFunctionsDescriptions(AsebaVMState* vm)
 {
 	return nativeFunctionsDescriptions;
 }
 
-static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" }, { nullptr, nullptr } };
+static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at 50 Hz" },
+	{ nullptr, nullptr } };
 
-extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaLocalEventDescription* AsebaGetLocalEventsDescriptions(AsebaVMState* vm)
 {
 	return localEvents;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
+extern "C" void AsebaNativeFunction(AsebaVMState* vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }
 
-extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
-{
-}
+extern "C" void AsebaWriteBytecode(AsebaVMState* vm) {}
 
-extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
-{
-}
+extern "C" void AsebaResetIntoBootloader(AsebaVMState* vm) {}
 
-extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
+extern "C" void AsebaAssert(AsebaVMState* vm, AsebaAssertReason reason)
 {
 	std::cerr << "\nFatal error: ";
 	switch (vm->nodeId)
 	{
 		case 1: std::cerr << "left motor module"; break;
-		case 2:	std::cerr << "right motor module"; break;
+		case 2: std::cerr << "right motor module"; break;
 		case 3: std::cerr << "proximity sensors module"; break;
 		case 4: std::cerr << "distance sensors module"; break;
 		default: std::cerr << "unknown module"; break;
@@ -212,31 +202,30 @@ namespace Enki
 		vm.stackSize = stack.size();
 	}
 
-	AsebaMarxbot::AsebaMarxbot() :
-		stream(0)
+	AsebaMarxbot::AsebaMarxbot() : stream(0)
 	{
 		// setup modules specific data
 		leftMotor.vm.nodeId = 1;
 		leftMotorVariables.id = 1;
-		leftMotor.vm.variables = reinterpret_cast<int16_t *>(&leftMotorVariables);
+		leftMotor.vm.variables = reinterpret_cast<int16_t*>(&leftMotorVariables);
 		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(int16_t);
 		modules.push_back(&leftMotor);
 
 		rightMotor.vm.nodeId = 2;
 		rightMotorVariables.id = 2;
-		rightMotor.vm.variables = reinterpret_cast<int16_t *>(&rightMotorVariables);
+		rightMotor.vm.variables = reinterpret_cast<int16_t*>(&rightMotorVariables);
 		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(int16_t);
 		modules.push_back(&rightMotor);
 
 		proximitySensors.vm.nodeId = 3;
 		proximitySensorVariables.id = 3;
-		proximitySensors.vm.variables = reinterpret_cast<int16_t *>(&proximitySensorVariables);
+		proximitySensors.vm.variables = reinterpret_cast<int16_t*>(&proximitySensorVariables);
 		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(int16_t);
 		modules.push_back(&proximitySensors);
 
 		distanceSensors.vm.nodeId = 4;
 		distanceSensorVariables.id = 4;
-		distanceSensors.vm.variables = reinterpret_cast<int16_t *>(&distanceSensorVariables);
+		distanceSensors.vm.variables = reinterpret_cast<int16_t*>(&distanceSensorVariables);
 		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(int16_t);
 		modules.push_back(&distanceSensors);
 
@@ -254,7 +243,9 @@ namespace Enki
 		}
 		catch (Dashel::DashelException e)
 		{
-			QMessageBox::critical(0, QApplication::tr("Aseba Marxbot"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
+			QMessageBox::critical(0,
+				QApplication::tr("Aseba Marxbot"),
+				QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
 			abort();
 		}
 		marxbotNumber++;
@@ -299,11 +290,11 @@ namespace Enki
 		DifferentialWheeled::controlStep(dt);
 
 		// get physical variables
-		int odoLeft = static_cast<int>((leftOdometry * 16  * 134) / (2 * M_PI));
+		int odoLeft = static_cast<int>((leftOdometry * 16 * 134) / (2 * M_PI));
 		leftMotorVariables.odo[0] = odoLeft & 0xffff;
 		leftMotorVariables.odo[1] = odoLeft >> 16;
 
-		int odoRight = static_cast<int>((rightOdometry * 16  * 134) / (2 * M_PI));
+		int odoRight = static_cast<int>((rightOdometry * 16 * 134) / (2 * M_PI));
 		rightMotorVariables.odo[0] = odoRight & 0xffff;
 		rightMotorVariables.odo[1] = odoRight >> 16;
 
@@ -345,12 +336,13 @@ namespace Enki
 			AsebaVMRun(vm, 65535);
 
 			// reschedule a periodic event if we are not in step by step
-			if (AsebaMaskIsClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+			if (AsebaMaskIsClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK)
+				|| AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 				AsebaVMSetupEvent(vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 		}
 	}
 
-	void AsebaMarxbot::connectionCreated(Dashel::Stream *stream)
+	void AsebaMarxbot::connectionCreated(Dashel::Stream* stream)
 	{
 		std::string targetName = stream->getTargetName();
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
@@ -365,7 +357,7 @@ namespace Enki
 		}
 	}
 
-	void AsebaMarxbot::incomingData(Stream *stream)
+	void AsebaMarxbot::incomingData(Stream* stream)
 	{
 		Event event(stream);
 
@@ -378,7 +370,7 @@ namespace Enki
 		}
 	}
 
-	void AsebaMarxbot::connectionClosed(Dashel::Stream *stream, bool abnormal)
+	void AsebaMarxbot::connectionClosed(Dashel::Stream* stream, bool abnormal)
 	{
 		if (stream == this->stream)
 		{
@@ -393,4 +385,3 @@ namespace Enki
 			qDebug() << this << " : Client has disconnected properly.";
 	}
 }
-

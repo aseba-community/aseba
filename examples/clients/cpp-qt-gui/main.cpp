@@ -25,13 +25,13 @@
 #include "mainwindow.h"
 #include "transport/dashel_plugins/dashel-plugins.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
-	
+
 	// initialize Dashel plugins
 	Dashel::initPlugins();
-	
+
 	MainWindow w;
 	w.show();
 

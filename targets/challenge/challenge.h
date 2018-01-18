@@ -62,19 +62,19 @@ namespace Enki
 		void autoCameraStateChanged(bool state);
 
 	protected:
-		void timerEvent(QTimerEvent * event) override;
-		void keyPressEvent ( QKeyEvent * event ) override;
-		void keyReleaseEvent ( QKeyEvent * event ) override;
+		void timerEvent(QTimerEvent* event) override;
+		void keyPressEvent(QKeyEvent* event) override;
+		void keyReleaseEvent(QKeyEvent* event) override;
 
 		void drawQuad2D(double x, double y, double w, double ar);
 
 		void initializeGL() override;
 
 		void displayWidgets() override;
-		void clickWidget(QMouseEvent *event) override;
+		void clickWidget(QMouseEvent* event) override;
 
 		void renderObjectsTypesHook() override;
-		void displayObjectHook(PhysicalObject *object) override;
+		void displayObjectHook(PhysicalObject* object) override;
 		void sceneCompletedHook() override;
 
 		void helpActivated();
@@ -99,7 +99,7 @@ namespace Enki
 		void windowClosed();
 
 	protected:
-		virtual void closeEvent ( QCloseEvent * event );
+		virtual void closeEvent(QCloseEvent* event);
 	};
 }
 
@@ -114,4 +114,3 @@ public:
 };
 
 #endif
-

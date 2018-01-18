@@ -31,7 +31,7 @@
 
 namespace Aseba
 {
-	class DirectConnection: public RecvBufferNodeConnection
+	class DirectConnection : public RecvBufferNodeConnection
 	{
 	public:
 		typedef std::queue<std::unique_ptr<Message>> MessageQueue;
@@ -50,23 +50,19 @@ namespace Aseba
 namespace Enki
 {
 	template<typename AsebaRobot>
-	class DirectlyConnected: public AsebaRobot, public Aseba::DirectConnection
+	class DirectlyConnected : public AsebaRobot, public Aseba::DirectConnection
 	{
 	public:
 		template<typename... Params>
-		DirectlyConnected(Params... parameters):
-			AsebaRobot(parameters...)
+		DirectlyConnected(Params... parameters) : AsebaRobot(parameters...)
 		{
-			Aseba::vmStateToEnvironment[&this->vm] = std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection *)this);
+			Aseba::vmStateToEnvironment[&this->vm] =
+				std::make_pair((Aseba::AbstractNodeGlue*)this, (Aseba::AbstractNodeConnection*)this);
 		}
 
-		virtual ~DirectlyConnected()
-		{
-			Aseba::vmStateToEnvironment.erase(&this->vm);
-		}
+		virtual ~DirectlyConnected() { Aseba::vmStateToEnvironment.erase(&this->vm); }
 
 	protected:
-
 		// from AbstractNodeGlue
 
 		virtual void externalInputStep(double dt)
@@ -83,7 +79,7 @@ namespace Enki
 				std::copy(&content.rawData[0], &content.rawData[content.rawData.size()], &lastMessageData[2]);
 
 				// execute event on all VM that are linked to this connection
-				for (auto vmStateToEnvironmentKV: Aseba::vmStateToEnvironment)
+				for (auto vmStateToEnvironmentKV : Aseba::vmStateToEnvironment)
 				{
 					if (vmStateToEnvironmentKV.second.second == this)
 					{

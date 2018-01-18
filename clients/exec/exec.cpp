@@ -42,20 +42,15 @@ namespace Aseba
 	{
 	private:
 		const unsigned messageId; //!< message identifier to look for
-		const char *programName; //!< program to execute
+		const char* programName; //!< program to execute
 
 	public:
-		Exec(const unsigned messageId, const char *programName) :
-			messageId(messageId),
-			programName(programName)
-		{
-		}
+		Exec(const unsigned messageId, const char* programName) : messageId(messageId), programName(programName) {}
 
 	protected:
-
-		void incomingData(Stream *stream)
+		void incomingData(Stream* stream)
 		{
-			Message *message = Message::receive(stream);
+			Message* message = Message::receive(stream);
 
 			if (message->type == messageId)
 			{
@@ -73,7 +68,7 @@ namespace Aseba
 
 
 //! Show usage
-void DumpHelp(std::ostream &stream, const char *programName)
+void DumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba Exec, execute an external command upon a given message, usage:\n";
 	stream << programName << " MSG_ID PROG_NAME [options] [targets]*\n";
@@ -85,14 +80,14 @@ void DumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void DumpVersion(std::ostream &stream)
+void DumpVersion(std::ostream& stream)
 {
 	stream << "Aseba Exec " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	std::vector<std::string> targets;
@@ -104,11 +99,11 @@ int main(int argc, char *argv[])
 	}
 
 	const unsigned msgId(atoi(argv[1]));
-	const char *programName(argv[2]);
+	const char* programName(argv[2]);
 	int argCounter = 3;
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
@@ -137,7 +132,7 @@ int main(int argc, char *argv[])
 			Exec.connect(targets[i]);
 		Exec.run();
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}

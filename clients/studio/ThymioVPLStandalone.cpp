@@ -36,31 +36,20 @@
 
 namespace Aseba
 {
- 	/** \addtogroup studio */
+	/** \addtogroup studio */
 	/*@{*/
 
 	using namespace ThymioVPL;
 	using namespace std;
 
-	ThymioVPLStandaloneInterface::ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone):
-		vplStandalone(vplStandalone)
-	{
-	};
+	ThymioVPLStandaloneInterface::ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone) :
+		vplStandalone(vplStandalone){};
 
-	Target* ThymioVPLStandaloneInterface::getTarget()
-	{
-		return vplStandalone->target.get();
-	}
+	Target* ThymioVPLStandaloneInterface::getTarget() { return vplStandalone->target.get(); }
 
-	unsigned ThymioVPLStandaloneInterface::getNodeId() const
-	{
-		return vplStandalone->id;
-	}
+	unsigned ThymioVPLStandaloneInterface::getNodeId() const { return vplStandalone->id; }
 
-	unsigned ThymioVPLStandaloneInterface::getProductId() const
-	{
-		return ASEBA_PID_THYMIO2;
-	}
+	unsigned ThymioVPLStandaloneInterface::getProductId() const { return ASEBA_PID_THYMIO2; }
 
 	void ThymioVPLStandaloneInterface::setCommonDefinitions(const CommonDefinitions& commonDefinitions)
 	{
@@ -78,30 +67,18 @@ namespace Aseba
 		getTarget()->run(vplStandalone->id);
 	}
 
-	void ThymioVPLStandaloneInterface::stop()
-	{
-		getTarget()->stop(vplStandalone->id);
-	}
+	void ThymioVPLStandaloneInterface::stop() { getTarget()->stop(vplStandalone->id); }
 
-	TargetVariablesModel * ThymioVPLStandaloneInterface::getVariablesModel()
-	{
-		return vplStandalone->variablesModel;
-	}
+	TargetVariablesModel* ThymioVPLStandaloneInterface::getVariablesModel() { return vplStandalone->variablesModel; }
 
-	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
+	void ThymioVPLStandaloneInterface::setVariableValues(unsigned addr, const VariablesDataVector& data)
 	{
 		getTarget()->setVariables(vplStandalone->id, addr, data);
 	}
 
-	bool ThymioVPLStandaloneInterface::saveFile(bool as)
-	{
-		return vplStandalone->saveFile(as);
-	}
+	bool ThymioVPLStandaloneInterface::saveFile(bool as) { return vplStandalone->saveFile(as); }
 
-	void ThymioVPLStandaloneInterface::openFile()
-	{
-		vplStandalone->openFile();
-	}
+	void ThymioVPLStandaloneInterface::openFile() { vplStandalone->openFile(); }
 
 	bool ThymioVPLStandaloneInterface::newFile()
 	{
@@ -120,15 +97,13 @@ namespace Aseba
 		// do nothing
 	}
 
-	QString ThymioVPLStandaloneInterface::openedFileName() const
-	{
-		return vplStandalone->fileName;
-	}
+	QString ThymioVPLStandaloneInterface::openedFileName() const { return vplStandalone->fileName; }
 
 
 	//////
 
-	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget, bool useAnyTarget, bool debugLog, bool execFeedback):
+	ThymioVPLStandalone::ThymioVPLStandalone(QVector<QTranslator*> translators, const QString& commandLineTarget,
+		bool useAnyTarget, bool debugLog, bool execFeedback) :
 		VariableListener(new TargetVariablesModel(this)),
 		// create target
 		target(new DashelTarget(translators, commandLineTarget)),
@@ -148,10 +123,10 @@ namespace Aseba
 		setupConnections();
 		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
 
-		// resize if not android
-		#ifndef ANDROID
-		resize(1000,700);
-		#endif // ANDROID
+// resize if not android
+#ifndef ANDROID
+		resize(1000, 700);
+#endif // ANDROID
 	}
 
 	ThymioVPLStandalone::~ThymioVPLStandalone()
@@ -166,9 +141,9 @@ namespace Aseba
 		// VPL part
 		updateWindowTitle(false);
 		vplLayout = new QVBoxLayout;
-		#ifdef Q_WS_MACX
-		vplLayout->setContentsMargins(0,0,0,0);
-		#endif // Q_WS_MACX
+#ifdef Q_WS_MACX
+		vplLayout->setContentsMargins(0, 0, 0, 0);
+#endif // Q_WS_MACX
 		disconnectedMessage = new QLabel(tr("Connecting to Thymio..."));
 		disconnectedMessage->setAlignment(Qt::AlignCenter);
 		disconnectedMessage->setWordWrap(true);
@@ -181,13 +156,11 @@ namespace Aseba
 		// editor part
 		editor = new AeslEditor;
 		editor->setReadOnly(true);
-		#ifdef ANDROID
+#ifdef ANDROID
 		editor->setTextInteractionFlags(Qt::NoTextInteraction);
-		editor->setStyleSheet(
-			"QTextEdit { font-size: 10pt; font-family: \"Courrier\" }"
-		);
+		editor->setStyleSheet("QTextEdit { font-size: 10pt; font-family: \"Courrier\" }");
 		editor->setTabStopWidth(QFontMetrics(editor->font()).width(' '));
-		#endif // ANDROID
+#endif // ANDROID
 		new AeslHighlighter(editor, editor->document());
 
 		/*QVBoxLayout* layout = new QVBoxLayout;
@@ -207,7 +180,7 @@ namespace Aseba
 		addWidget(editor);
 
 		// shortcut
-		QShortcut * shwHide = new QShortcut(QKeySequence("Ctrl+f"), this);
+		QShortcut* shwHide = new QShortcut(QKeySequence("Ctrl+f"), this);
 		connect(shwHide, SIGNAL(activated()), SLOT(toggleFullScreen()));
 	}
 
@@ -227,11 +200,15 @@ namespace Aseba
 		connect(target, SIGNAL(nodeSpecificError(unsigned, unsigned, QString)), SLOT(nodeSpecificError(unsigned, unsigned, QString)));
 		*/
 
-		connect(target.get(), SIGNAL(variablesMemoryEstimatedDirty(unsigned)), SLOT(variablesMemoryEstimatedDirty(unsigned)));
-		connect(target.get(), SIGNAL(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)), SLOT(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)));
+		connect(target.get(),
+			SIGNAL(variablesMemoryEstimatedDirty(unsigned)),
+			SLOT(variablesMemoryEstimatedDirty(unsigned)));
+		connect(target.get(),
+			SIGNAL(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector&)),
+			SLOT(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector&)));
 	}
 
-	void ThymioVPLStandalone::resizeEvent( QResizeEvent *event )
+	void ThymioVPLStandalone::resizeEvent(QResizeEvent* event)
 	{
 		if (event->size().height() > event->size().width())
 			setOrientation(Qt::Vertical);
@@ -270,17 +247,15 @@ namespace Aseba
 			// make sure that pid is ASEBA_PID_THYMIO2, otherwise print an error and quit
 			if (values[0] != ASEBA_PID_THYMIO2)
 			{
-				QMessageBox::critical(this,
-					tr("Thymio VPL Error"),
-					tr("You need to connect a Thymio II to use this application.")
-				);
+				QMessageBox::critical(
+					this, tr("Thymio VPL Error"), tr("You need to connect a Thymio II to use this application."));
 				close();
 			}
 		}
 	}
 
 	//! Received a close event, forward to VPL
-	void ThymioVPLStandalone::closeEvent ( QCloseEvent * event )
+	void ThymioVPLStandalone::closeEvent(QCloseEvent* event)
 	{
 		if (vpl && !vpl->closeFile())
 			event->ignore();
@@ -302,16 +277,18 @@ namespace Aseba
 			{
 				// get last file name
 
-				#ifdef ANDROID
+#ifdef ANDROID
 				fileName = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
-				#else // ANDROID
-				fileName = settings.value("ThymioVPLStandalone/fileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString();
-				#endif // ANDROID
-				// keep only the path of the directory
+#else // ANDROID
+				fileName = settings
+							   .value("ThymioVPLStandalone/fileName",
+								   QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation))
+							   .toString();
+#endif // ANDROID \
+	// keep only the path of the directory
 				fileName = QFileInfo(fileName).dir().path();
 			}
-			fileName = QFileDialog::getSaveFileName(0,
-				tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
+			fileName = QFileDialog::getSaveFileName(0, tr("Save Script"), fileName, "Aseba scripts (*.aesl)");
 		}
 
 		if (fileName.isEmpty())
@@ -369,19 +346,19 @@ namespace Aseba
 		if (fileName.isEmpty())
 		{
 			QSettings settings;
-			#ifdef ANDROID
+#ifdef ANDROID
 			dir = settings.value("ThymioVPLStandalone/fileName", "/sdcard/").toString();
-			#else // ANDROID
+#else // ANDROID
 			const QStringList stdLocations(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation));
-			dir = settings.value("ThymioVPLStandalone/fileName", !stdLocations.empty() ? stdLocations[0] : "").toString();
-			#endif // ANDROID
+			dir =
+				settings.value("ThymioVPLStandalone/fileName", !stdLocations.empty() ? stdLocations[0] : "").toString();
+#endif // ANDROID
 		}
 		else
 			dir = fileName;
 
 		// get file name
-		const QString newFileName(QFileDialog::getOpenFileName(0,
-				tr("Open Script"), dir, "Aseba scripts (*.aesl)"));
+		const QString newFileName(QFileDialog::getOpenFileName(0, tr("Open Script"), dir, "Aseba scripts (*.aesl)"));
 		QFile file(newFileName);
 		if (!file.open(QFile::ReadOnly))
 			return;
@@ -405,9 +382,8 @@ namespace Aseba
 					if (element.tagName() == "node")
 					{
 						// if node corresponds to the connected robot
-						if ((element.attribute("name") == target->getName(id)) &&
-							((element.attribute("nodeId").toUInt() == id) || (target->getNodesList().size() == 1))
-						)
+						if ((element.attribute("name") == target->getName(id))
+							&& ((element.attribute("nodeId").toUInt() == id) || (target->getNodesList().size() == 1)))
 						{
 							// restore VPL
 							QDomElement toolsPlugins(element.firstChildElement("toolsPlugins"));
@@ -419,7 +395,8 @@ namespace Aseba
 								{
 									// restore VPL data
 									QDomDocument pluginDataDocument("tool-plugin-data");
-									pluginDataDocument.appendChild(pluginDataDocument.importNode(toolPlugin.firstChildElement(), true));
+									pluginDataDocument.appendChild(
+										pluginDataDocument.importNode(toolPlugin.firstChildElement(), true));
 									vpl->loadFromDom(pluginDataDocument, true);
 									dataLoaded = true;
 									break;
@@ -440,18 +417,15 @@ namespace Aseba
 			}
 			else
 			{
-				QMessageBox::warning(this,
-					tr("Loading"),
-					tr("No Thymio VPL data were found in the script file, file ignored.")
-				);
+				QMessageBox::warning(
+					this, tr("Loading"), tr("No Thymio VPL data were found in the script file, file ignored."));
 			}
 		}
 		else
 		{
 			QMessageBox::warning(this,
 				tr("Loading"),
-				tr("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)
-			);
+				tr("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn));
 		}
 
 		file.close();
@@ -493,17 +467,15 @@ namespace Aseba
 		if (vpl)
 		{
 			QMessageBox::critical(
-				this,
-				tr("Thymio VPL Error"),
-				tr("This application only supports a single robot at a time.")
-			);
+				this, tr("Thymio VPL Error"), tr("This application only supports a single robot at a time."));
 			close();
 			return;
 		}
 
 		// hide the disconnected message
 		disconnectedMessage->hide();
-		disconnectedMessage->setText(tr("Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle"));
+		disconnectedMessage->setText(
+			tr("Connection to Thymio lost... make sure Thymio is on and connect the USB cable/dongle"));
 
 		// save node information
 		id = node;
@@ -555,7 +527,8 @@ namespace Aseba
 	}
 
 	//! Content of target memory has changed
-	void ThymioVPLStandalone::variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables)
+	void ThymioVPLStandalone::variablesMemoryChanged(
+		unsigned node, unsigned start, const VariablesDataVector& variables)
 	{
 		// update variables model
 		if (node == id)
@@ -573,8 +546,10 @@ namespace Aseba
 		if (!fileName.isEmpty())
 			docName = fileName.mid(fileName.lastIndexOf("/") + 1);
 
-		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language - ver. %2").arg(docName).arg(modifiedText).arg(ASEBA_VERSION));
-
+		setWindowTitle(tr("%0 %1- Thymio Visual Programming Language - ver. %2")
+						   .arg(docName)
+						   .arg(modifiedText)
+						   .arg(ASEBA_VERSION));
 	}
 
 	//! Toggle on/off full screen

@@ -31,12 +31,12 @@ namespace Aseba
 		virtual ~LinearCameraViewVariablesDialog() {}
 	};
 
-	class LinearCameraViewPlugin: public QWidget, public NodeToolInterface, public VariableListener
+	class LinearCameraViewPlugin : public QWidget, public NodeToolInterface, public VariableListener
 	{
 		Q_OBJECT
 
 	public:
-		LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de);
+		LinearCameraViewPlugin(DevelopmentEnvironmentInterface* _de);
 
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
@@ -51,8 +51,8 @@ namespace Aseba
 		void enablePlugin();
 		void disablePlugin();
 
-		virtual void timerEvent ( QTimerEvent * event );
-		virtual void closeEvent ( QCloseEvent * event );
+		virtual void timerEvent(QTimerEvent* event);
+		virtual void closeEvent(QCloseEvent* event);
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 
 	private:
@@ -63,7 +63,7 @@ namespace Aseba
 			VALUES_RANGE_8BITS,
 			VALUES_RANGE_PERCENT
 		} valuesRange;
-		QLabel *image;
+		QLabel* image;
 		QString redName, greenName, blueName;
 		unsigned redPos, greenPos, bluePos;
 		unsigned redSize, greenSize, blueSize;

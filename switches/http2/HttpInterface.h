@@ -35,9 +35,11 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	/**
+	namespace Http
+	{
+		/**
 	 * The HTTP interface is the central class implementing the asebahttp switch. It manages three kinds of Dashel streams:
 	 *  - httpStream: a listening server socket waiting for incoming HTTP connections
 	 *  - httpConnections: incoming HTTP client connections making requests to the interface
@@ -64,12 +66,13 @@ namespace Aseba { namespace Http
 	 * is assumed that all nodes share the AESL file and different code entries are provided for the different nodes to
 	 * be programmed.
 	 */
-	class HttpInterface : public Dashel::Hub, public RootHttpHandler
-	{
+		class HttpInterface : public Dashel::Hub, public RootHttpHandler
+		{
 		public:
-			struct HttpConnection {
-				Dashel::Stream *stream;
-				std::deque<DashelHttpRequest *> queue;
+			struct HttpConnection
+			{
+				Dashel::Stream* stream;
+				std::deque<DashelHttpRequest*> queue;
 				std::set<std::string> eventSubscriptions;
 			};
 
@@ -101,31 +104,34 @@ namespace Aseba { namespace Http
 			/**
 			 * Notifies all HTTP event subscribers about an SSE event with a given name and a vector of argument data
 			 */
-			virtual void notifyEventSubscribers(const std::string& event, const std::vector<int16_t>& data = std::vector<int16_t>());
+			virtual void notifyEventSubscribers(
+				const std::string& event, const std::vector<int16_t>& data = std::vector<int16_t>());
 
 			/**
 			 * Adds an event subscription to a HTTP connection specified by one of its requests that should receive the
 			 * streamed SSE updates. If subscription is "*", the connection will subscribe to all events.
 			 */
-			virtual void addEventSubscription(HttpRequest *request, const std::string& subscription);
+			virtual void addEventSubscription(HttpRequest* request, const std::string& subscription);
 
 			/**
 			 * Registers a node on the HTTP interface with its target and its local node id. This method will remap the id
 			 * to a non-colliding global node id and return it.
 			 */
-			virtual unsigned registerNode(HttpDashelTarget *target, unsigned localNodeId);
+			virtual unsigned registerNode(HttpDashelTarget* target, unsigned localNodeId);
 
 			virtual void setVerbose(bool verbose) { this->verbose = verbose; }
 			virtual bool isVerbose() const { return verbose; }
 
-			virtual void setDocumentRoot(const std::string &docRoot) {
+			virtual void setDocumentRoot(const std::string& docRoot)
+			{
 				this->docRoot = docRoot;
 				if (docRoot.length() > 0 && docRoot.back() != '/')
 					this->docRoot += "/";
 				this->serveLocalFiles = true;
 			}
 
-			virtual std::string prependDocumentRoot(std::string &filename) const {
+			virtual std::string prependDocumentRoot(std::string& filename) const
+			{
 				std::string path;
 				if (serveLocalFiles)
 					path = docRoot + filename;
@@ -141,16 +147,19 @@ namespace Aseba { namespace Http
 			virtual void setProgram(const AeslProgram& program) { this->program = program; }
 			virtual const AeslProgram& getProgram() const { return program; }
 
-			virtual std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > getNodesByName(const std::string& name);
-			virtual std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> getNodeByIdString(const std::string& nodeIdString);
-			virtual std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> getNodeById(unsigned nodeId);
-			virtual std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > getNodesByNameOrId(const std::string& nameOrId);
-			virtual std::map<Dashel::Stream *, HttpDashelTarget *>& getTargets() { return targets; }
+			virtual std::set<std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > getNodesByName(
+				const std::string& name);
+			virtual std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> getNodeByIdString(
+				const std::string& nodeIdString);
+			virtual std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> getNodeById(unsigned nodeId);
+			virtual std::set<std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > getNodesByNameOrId(
+				const std::string& nameOrId);
+			virtual std::map<Dashel::Stream*, HttpDashelTarget*>& getTargets() { return targets; }
 
 		protected:
-			virtual void connectionCreated(Dashel::Stream *stream);
-			virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
-			virtual void incomingData(Dashel::Stream *stream);
+			virtual void connectionCreated(Dashel::Stream* stream);
+			virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
+			virtual void incomingData(Dashel::Stream* stream);
 
 			/**
 			 * Sends all queued responses for HTTP requests. This method does not actually handle the requests, it simply
@@ -161,26 +170,26 @@ namespace Aseba { namespace Http
 			virtual void closeClosingHttpConnections();
 			virtual void closeHttpConnection(HttpConnection& connection);
 
-			virtual void incomingVariables(HttpDashelTarget *target, const Variables *variables);
-			virtual void incomingUserMessage(HttpDashelTarget *target, const UserMessage *userMessage);
-			virtual void incomingErrorMessage(HttpDashelTarget *target, const Message *message);
+			virtual void incomingVariables(HttpDashelTarget* target, const Variables* variables);
+			virtual void incomingUserMessage(HttpDashelTarget* target, const UserMessage* userMessage);
+			virtual void incomingErrorMessage(HttpDashelTarget* target, const Message* message);
 
 		private:
 			bool verbose;
-			bool serveLocalFiles;	// true to also serve local files in docRoot
+			bool serveLocalFiles; // true to also serve local files in docRoot
 			std::string docRoot;
 			AeslProgram program;
-			Dashel::Stream *httpStream;
-			std::map<Dashel::Stream *, HttpConnection> httpConnections;
-			std::set<Dashel::Stream *> closingHttpConnections;
-			std::map<std::string, Dashel::Stream *> targetAddressStreams;
+			Dashel::Stream* httpStream;
+			std::map<Dashel::Stream*, HttpConnection> httpConnections;
+			std::set<Dashel::Stream*> closingHttpConnections;
+			std::map<std::string, Dashel::Stream*> targetAddressStreams;
 			std::map<std::string, UnifiedTime> targetAddressReconnectionTime;
-			std::map<Dashel::Stream *, HttpDashelTarget *> targets;
-			std::map< unsigned, std::pair<HttpDashelTarget *, unsigned> > nodeIds;
+			std::map<Dashel::Stream*, HttpDashelTarget*> targets;
+			std::map<unsigned, std::pair<HttpDashelTarget*, unsigned> > nodeIds;
 
 			static const std::string defaultProgram;
-
-	};
-} }
+		};
+	}
+}
 
 #endif

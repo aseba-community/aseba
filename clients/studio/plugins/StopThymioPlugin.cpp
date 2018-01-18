@@ -25,14 +25,12 @@
 
 namespace Aseba
 {
-	StopThymioPlugin::StopThymioPlugin(DevelopmentEnvironmentInterface *_de) :
-		de(_de)
-	{}
+	StopThymioPlugin::StopThymioPlugin(DevelopmentEnvironmentInterface* _de) : de(_de) {}
 
 	QWidget* StopThymioPlugin::createMenuEntry()
 	{
-		QPushButton *button(new QPushButton(QIcon(":/images/icons/stop.svgz"), tr("Stop Thymio")));
-		button->setIconSize(QSize(32,32));
+		QPushButton* button(new QPushButton(QIcon(":/images/icons/stop.svgz"), tr("Stop Thymio")));
+		button->setIconSize(QSize(32, 32));
 		connect(button, SIGNAL(clicked()), SLOT(stopThymio()));
 		return button;
 	}

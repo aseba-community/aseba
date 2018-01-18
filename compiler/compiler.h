@@ -55,24 +55,26 @@ namespace Aseba
 	struct BytecodeElement
 	{
 		BytecodeElement() = default;
-		BytecodeElement(unsigned short bytecode) : bytecode(bytecode), line(0) { }
-		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) { }
-		operator unsigned short () const { return bytecode; }
+		BytecodeElement(unsigned short bytecode) : bytecode(bytecode), line(0) {}
+		BytecodeElement(unsigned short bytecode, unsigned short line) : bytecode(bytecode), line(line) {}
+		operator unsigned short() const { return bytecode; }
 		unsigned getWordSize() const;
 
-		unsigned short bytecode{0xffff}; //! bytecode itself
-		unsigned short line{0}; //!< line in source code
+		unsigned short bytecode{ 0xffff }; //! bytecode itself
+		unsigned short line{ 0 }; //!< line in source code
 	};
 
 	//! Bytecode array in the form of a dequeue, for construction
-	struct BytecodeVector: std::deque<BytecodeElement>
+	struct BytecodeVector : std::deque<BytecodeElement>
 	{
 		//! Constructor
 		BytecodeVector() = default;
 
-		unsigned maxStackDepth{0}; //!< maximum depth of the stack used by all the computations of the bytecode
-		unsigned callDepth{0}; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
-		unsigned lastLine{0}; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
+		unsigned maxStackDepth{ 0 }; //!< maximum depth of the stack used by all the computations of the bytecode
+		unsigned callDepth{ 0 }; //!< for callable bytecode (i.e. subroutines), used in analysis of stack check
+		unsigned lastLine{
+			0
+		}; //!< last line added, normally equal *this[this->size()-1].line, but may differ for instance on loops
 
 		void push_back(const BytecodeElement& be)
 		{
@@ -94,12 +96,18 @@ namespace Aseba
 	//! Position in a source file or string. First is line, second is column
 	struct SourcePos
 	{
-		unsigned character{0}; //!< position in source text
-		unsigned row{0}; //!< line in source text
-		unsigned column{0}; //!< column in source text
-		bool valid{false}; //!< true if character, row and column hold valid values
+		unsigned character{ 0 }; //!< position in source text
+		unsigned row{ 0 }; //!< line in source text
+		unsigned column{ 0 }; //!< column in source text
+		bool valid{ false }; //!< true if character, row and column hold valid values
 
-		SourcePos(unsigned character, unsigned row, unsigned column) : character(character - 1), row(row), column(column - 1) { valid = true; }
+		SourcePos(unsigned character, unsigned row, unsigned column) :
+			character(character - 1),
+			row(row),
+			column(column - 1)
+		{
+			valid = true;
+		}
 		SourcePos() = default;
 		std::wstring toWString() const;
 	};
@@ -121,7 +129,7 @@ namespace Aseba
 		SourcePos pos; //!< position of error in source string
 		std::wstring message = L"not defined"; //!< message
 		//! Create an error at pos
-		Error(const SourcePos& pos, std::wstring  message) : pos(pos), message(std::move(message)) { }
+		Error(const SourcePos& pos, std::wstring message) : pos(pos), message(std::move(message)) {}
 		//! Create an empty error
 		Error() = default;
 
@@ -133,11 +141,11 @@ namespace Aseba
 	{
 		TranslatableError() : Error() {}
 		TranslatableError(const SourcePos& pos, ErrorCode error);
-		TranslatableError &arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
-		TranslatableError &arg(long int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
-		TranslatableError &arg(unsigned value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
-		TranslatableError &arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
-		TranslatableError &arg(const std::wstring& value);
+		TranslatableError& arg(int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError& arg(long int value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError& arg(unsigned value, int fieldWidth = 0, int base = 10, wchar_t fillChar = ' ');
+		TranslatableError& arg(float value, int fieldWidth = 0, int precision = 6, wchar_t fillChar = ' ');
+		TranslatableError& arg(const std::wstring& value);
 
 		Error toError();
 		static void setTranslateCB(ErrorMessages::ErrorCallback newCB);
@@ -153,7 +161,7 @@ namespace Aseba
 	struct NamedValue
 	{
 		//! Create a filled pair
-		NamedValue(std::wstring  name, int value) : name(std::move(name)), value(value) {}
+		NamedValue(std::wstring name, int value) : name(std::move(name)), value(value) {}
 
 		std::wstring name; //!< name part of the pair
 		int value; //!< value part of the pair
@@ -166,7 +174,7 @@ namespace Aseba
 	using ConstantDefinition = NamedValue;
 
 	//! Generic vector of name - value pairs
-	struct NamedValuesVector: public std::vector<NamedValue>
+	struct NamedValuesVector : public std::vector<NamedValue>
 	{
 		bool contains(const std::wstring& s, size_t* position = nullptr) const;
 	};
@@ -186,7 +194,11 @@ namespace Aseba
 		ConstantsDefinitions constants;
 
 		//! Clear all the content
-		void clear() { events.clear(); constants.clear(); }
+		void clear()
+		{
+			events.clear();
+			constants.clear();
+		}
 	};
 
 	//! Aseba Event Scripting Language compiler
@@ -233,49 +245,49 @@ namespace Aseba
 				TOKEN_OP_AND,
 				TOKEN_OP_NOT,
 
-				TOKEN_OP_EQUAL,			// group of tokens, don't split or mess up
-				TOKEN_OP_NOT_EQUAL,		//
-				TOKEN_OP_BIGGER,		//
-				TOKEN_OP_BIGGER_EQUAL,		//
-				TOKEN_OP_SMALLER,		//
-				TOKEN_OP_SMALLER_EQUAL,		//
+				TOKEN_OP_EQUAL, // group of tokens, don't split or mess up
+				TOKEN_OP_NOT_EQUAL, //
+				TOKEN_OP_BIGGER, //
+				TOKEN_OP_BIGGER_EQUAL, //
+				TOKEN_OP_SMALLER, //
+				TOKEN_OP_SMALLER_EQUAL, //
 
-				TOKEN_OP_ADD,			// group of 2 tokens, don't split or mess up
-				TOKEN_OP_NEG,			//
-				TOKEN_OP_MULT,			// group of 3 tokens, don't split or mess up
-				TOKEN_OP_DIV,			//
-				TOKEN_OP_MOD,			//
-				TOKEN_OP_SHIFT_LEFT,		// group of 2 tokens, don't split or mess up
-				TOKEN_OP_SHIFT_RIGHT,		//
-				TOKEN_OP_BIT_OR,		// group of 4 tokens, don't split or mess up
-				TOKEN_OP_BIT_XOR,		//
-				TOKEN_OP_BIT_AND,		//
-				TOKEN_OP_BIT_NOT,		//
+				TOKEN_OP_ADD, // group of 2 tokens, don't split or mess up
+				TOKEN_OP_NEG, //
+				TOKEN_OP_MULT, // group of 3 tokens, don't split or mess up
+				TOKEN_OP_DIV, //
+				TOKEN_OP_MOD, //
+				TOKEN_OP_SHIFT_LEFT, // group of 2 tokens, don't split or mess up
+				TOKEN_OP_SHIFT_RIGHT, //
+				TOKEN_OP_BIT_OR, // group of 4 tokens, don't split or mess up
+				TOKEN_OP_BIT_XOR, //
+				TOKEN_OP_BIT_AND, //
+				TOKEN_OP_BIT_NOT, //
 
-				TOKEN_OP_ADD_EQUAL,		// group of 12 tokens, don't split or mess up
-				TOKEN_OP_NEG_EQUAL,		//
-				TOKEN_OP_MULT_EQUAL,		//
-				TOKEN_OP_DIV_EQUAL,		//
-				TOKEN_OP_MOD_EQUAL,		//
-				TOKEN_OP_SHIFT_LEFT_EQUAL,	//
-				TOKEN_OP_SHIFT_RIGHT_EQUAL,	//
-				TOKEN_OP_BIT_OR_EQUAL,		//
-				TOKEN_OP_BIT_XOR_EQUAL,		//
-				TOKEN_OP_BIT_AND_EQUAL,		//
+				TOKEN_OP_ADD_EQUAL, // group of 12 tokens, don't split or mess up
+				TOKEN_OP_NEG_EQUAL, //
+				TOKEN_OP_MULT_EQUAL, //
+				TOKEN_OP_DIV_EQUAL, //
+				TOKEN_OP_MOD_EQUAL, //
+				TOKEN_OP_SHIFT_LEFT_EQUAL, //
+				TOKEN_OP_SHIFT_RIGHT_EQUAL, //
+				TOKEN_OP_BIT_OR_EQUAL, //
+				TOKEN_OP_BIT_XOR_EQUAL, //
+				TOKEN_OP_BIT_AND_EQUAL, //
 
 				TOKEN_OP_PLUS_PLUS,
 				TOKEN_OP_MINUS_MINUS
 
-			} type{TOKEN_END_OF_STREAM}; //!< type of this token
+			} type{ TOKEN_END_OF_STREAM }; //!< type of this token
 			std::wstring sValue; //!< string version of the value
-			int iValue{0}; //!< int version of the value, 0 if not applicable
-			SourcePos pos;//!< position of token in source code
+			int iValue{ 0 }; //!< int version of the value, 0 if not applicable
+			SourcePos pos; //!< position of token in source code
 
-			Token()  = default;
+			Token() = default;
 			Token(Type type, SourcePos pos = SourcePos(), const std::wstring& value = L"");
 			const std::wstring typeName() const;
 			std::wstring toWString() const;
-			operator Type () const { return type; }
+			operator Type() const { return type; }
 		};
 
 		//! Description of a subroutine
@@ -285,7 +297,11 @@ namespace Aseba
 			unsigned address;
 			unsigned line;
 
-			SubroutineDescriptor(std::wstring  name, unsigned address, unsigned line) : name(std::move(name)), address(address), line(line) {}
+			SubroutineDescriptor(std::wstring name, unsigned address, unsigned line) :
+				name(std::move(name)),
+				address(address),
+				line(line)
+			{}
 		};
 		//! Lookup table for subroutines id => (name, address, line)
 		using SubroutineTable = std::vector<SubroutineDescriptor>;
@@ -303,12 +319,13 @@ namespace Aseba
 
 	public:
 		Compiler();
-		void setTargetDescription(const TargetDescription *description);
-		const TargetDescription *getTargetDescription() const { return targetDescription;}
-		const VariablesMap *getVariablesMap() const { return &variablesMap; }
-		const SubroutineTable *getSubroutineTable() const { return &subroutineTable; }
-		void setCommonDefinitions(const CommonDefinitions *definitions);
-		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount, Error &errorDescription, std::wostream* dump = nullptr);
+		void setTargetDescription(const TargetDescription* description);
+		const TargetDescription* getTargetDescription() const { return targetDescription; }
+		const VariablesMap* getVariablesMap() const { return &variablesMap; }
+		const SubroutineTable* getSubroutineTable() const { return &subroutineTable; }
+		void setCommonDefinitions(const CommonDefinitions* definitions);
+		bool compile(std::wistream& source, BytecodeVector& bytecode, unsigned& allocatedVariablesCount,
+			Error& errorDescription, std::wostream* dump = nullptr);
 		void setTranslateCallback(ErrorMessages::ErrorCallback newCB) { TranslatableError::setTranslateCB(newCB); }
 		static std::wstring translate(ErrorCode error) { return TranslatableError::translateCB(error); }
 		static bool isKeyword(const std::wstring& word);
@@ -328,9 +345,9 @@ namespace Aseba
 		unsigned expectGlobalEventId() const;
 		unsigned expectAnyEventId() const;
 		std::wstring eventName(unsigned eventId) const;
-		template <int length>
+		template<int length>
 		bool isOneOf(const Token::Type types[length]) const;
-		template <int length>
+		template<int length>
 		void expectOneOf(const Token::Type types[length]) const;
 
 		void freeTemporaryMemory();
@@ -348,7 +365,7 @@ namespace Aseba
 		void tokenize(std::wistream& source);
 		wchar_t getNextCharacter(std::wistream& source, SourcePos& pos);
 		bool testNextCharacter(std::wistream& source, SourcePos& pos, wchar_t test, Token::Type tokenIfTrue);
-		void dumpTokens(std::wostream &dest) const;
+		void dumpTokens(std::wostream& dest) const;
 		bool verifyStackCalls(PreLinkBytecode& preLinkBytecode);
 		bool link(const PreLinkBytecode& preLinkBytecode, BytecodeVector& bytecode);
 		void disassemble(BytecodeVector& bytecode, const PreLinkBytecode& preLinkBytecode, std::wostream& dump) const;
@@ -379,9 +396,9 @@ namespace Aseba
 
 		Node* parseCondition();
 
-		Node *parseBinaryOrExpression();
-		Node *parseBinaryXorExpression();
-		Node *parseBinaryAndExpression();
+		Node* parseBinaryOrExpression();
+		Node* parseBinaryXorExpression();
+		Node* parseBinaryAndExpression();
 
 		Node* parseShiftExpression();
 		Node* parseAddExpression();
@@ -408,8 +425,8 @@ namespace Aseba
 		SubroutineReverseTable subroutineReverseTable; //!< subroutine reverse lookup
 		unsigned freeVariableIndex; //!< index pointing to the first free variable
 		unsigned endVariableIndex; //!< (endMemory - endVariableIndex) is pointing to the first free variable at the end
-		const TargetDescription *targetDescription; //!< description of the target VM
-		const CommonDefinitions *commonDefinitions; //!< common definitions, such as events or some constants
+		const TargetDescription* targetDescription; //!< description of the target VM
+		const CommonDefinitions* commonDefinitions; //!< common definitions, such as events or some constants
 
 		ErrorMessages translator;
 	}; // Compiler
@@ -425,11 +442,11 @@ namespace Aseba
 		typedef std::map<unsigned, BytecodeVector> SubroutinesBytecode;
 		SubroutinesBytecode subroutines; //!< bytecode for routines
 
-		BytecodeVector *current; //!< pointer to bytecode being constructed
+		BytecodeVector* current; //!< pointer to bytecode being constructed
 
 		PreLinkBytecode();
 
-		void fixup(const Compiler::SubroutineTable &subroutineTable);
+		void fixup(const Compiler::SubroutineTable& subroutineTable);
 	};
 
 	/*@}*/
@@ -437,4 +454,3 @@ namespace Aseba
 } // namespace Aseba
 
 #endif
-

@@ -43,13 +43,12 @@ namespace Aseba
 	class Recorder : public Hub
 	{
 	protected:
-
-		void incomingData(Stream *stream)
+		void incomingData(Stream* stream)
 		{
 			dumpTime(cout, true);
 
 			// receive and deserialize message
-			Message *message = Message::receive(stream);
+			Message* message = Message::receive(stream);
 			Message::SerializationBuffer buffer;
 			message->serializeSpecific(buffer);
 
@@ -59,7 +58,7 @@ namespace Aseba
 			cout << dec << buffer.rawData.size() << " ";
 			cout << hex;
 			for (std::vector<uint8_t>::const_iterator it = buffer.rawData.begin(); it != buffer.rawData.end(); ++it)
-					cout << setw(2) << setfill('0') << unsigned(*it) << " ";
+				cout << setw(2) << setfill('0') << unsigned(*it) << " ";
 			cout << dec << endl;
 		}
 	};
@@ -69,7 +68,7 @@ namespace Aseba
 
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba rec, record the user messages to stdout for later replay, usage:\n";
 	stream << programName << " [options] [targets]*\n";
@@ -81,14 +80,14 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "Aseba rec " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	std::vector<std::string> targets;
@@ -97,7 +96,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
@@ -126,7 +125,7 @@ int main(int argc, char *argv[])
 			recorder.connect(targets[i]);
 		recorder.run();
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}

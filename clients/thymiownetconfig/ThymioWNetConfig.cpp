@@ -21,7 +21,7 @@
 class Hex16SpinBox : public QSpinBox
 {
 public:
-	Hex16SpinBox(QWidget *parent = 0) : QSpinBox(parent)
+	Hex16SpinBox(QWidget* parent = 0) : QSpinBox(parent)
 	{
 		validator = new QRegExpValidator(QRegExp("[0-9A-Fa-f]{1,4}"), this);
 		setPrefix("0x");
@@ -29,17 +29,11 @@ public:
 	}
 
 protected:
-	QString textFromValue(int value) const
-	{
-		return QString::number(value, 16).toUpper();
-	}
+	QString textFromValue(int value) const { return QString::number(value, 16).toUpper(); }
 
-	int valueFromText(const QString &text) const
-	{
-		return text.toInt(0, 16);
-	}
+	int valueFromText(const QString& text) const { return text.toInt(0, 16); }
 
-	QValidator::State validate(QString &text, int &pos) const
+	QValidator::State validate(QString& text, int& pos) const
 	{
 		QString copy(text);
 		if (copy.startsWith("0x"))
@@ -48,7 +42,7 @@ protected:
 	}
 
 private:
-	QRegExpValidator *validator;
+	QRegExpValidator* validator;
 };
 
 namespace Aseba
@@ -58,14 +52,13 @@ namespace Aseba
 
 	typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 
-	#ifdef MSVC
-		#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
-	#else
-		#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
-	#endif
+#ifdef MSVC
+#	define PACK(__Declaration__) __pragma(pack(push, 1)) __Declaration__ __pragma(pack(pop))
+#else
+#	define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))
+#endif
 
-	PACK(struct Settings
-	{
+	PACK(struct Settings {
 		unsigned short nodeId;
 		unsigned short panId;
 		unsigned char channel;
@@ -77,9 +70,7 @@ namespace Aseba
 	static Settings settings;
 
 
-	ThymioWNetConfigDialog::ThymioWNetConfigDialog(const std::string& target):
-		target(target),
-		pairing(false)
+	ThymioWNetConfigDialog::ThymioWNetConfigDialog(const std::string& target) : target(target), pairing(false)
 	{
 		// Create the gui ...
 		setWindowTitle(tr("Wireless Thymio Network Configurator"));
@@ -87,7 +78,7 @@ namespace Aseba
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 		// image
-		QHBoxLayout *imageLayout = new QHBoxLayout();
+		QHBoxLayout* imageLayout = new QHBoxLayout();
 		QLabel* image = new QLabel(this);
 		QPixmap logo(":/images/thymiownetconfig.svgz");
 		image->setPixmap(logo.scaledToWidth(384));
@@ -115,7 +106,7 @@ namespace Aseba
 
 		// network identifier
 		networkId = new Hex16SpinBox();
-		networkId->setRange(1,65534);
+		networkId->setRange(1, 65534);
 		QHBoxLayout* networkIdLayout = new QHBoxLayout();
 		networkIdLayout->addWidget(new QLabel(tr("Network identifier:")));
 		networkIdLayout->addStretch();
@@ -125,7 +116,7 @@ namespace Aseba
 
 		// network identifier
 		nodeId = new Hex16SpinBox();
-		nodeId->setRange(1,65534);
+		nodeId->setRange(1, 65534);
 		QHBoxLayout* nodeIdLayout = new QHBoxLayout();
 		nodeIdLayout->addWidget(new QLabel(tr("Dongle node identifier:")));
 		nodeIdLayout->addStretch();
@@ -154,7 +145,7 @@ namespace Aseba
 			settings.version = 0;
 			settings.ctrl = 0;
 			stream->write(&settings, sizeof(settings));
-			stream->read(&settings, sizeof(settings)-1);
+			stream->read(&settings, sizeof(settings) - 1);
 			versionLabel->setText(tr("Wireless dongle firmware version %0").arg(settings.version));
 			networkId->setValue(settings.panId);
 			nodeId->setValue(settings.nodeId);
@@ -164,11 +155,12 @@ namespace Aseba
 				channel1->setChecked(true);
 			if (settings.channel == 25)
 				channel2->setChecked(true);
-
 		}
 		catch (Dashel::DashelException& e)
 		{
-			QMessageBox::critical(0, tr("Connection error"), tr("<p><b>Cannot connect to dongle!</b></p><p>Make sure a Wireless Thymio dongle is connected!</p>"));
+			QMessageBox::critical(0,
+				tr("Connection error"),
+				tr("<p><b>Cannot connect to dongle!</b></p><p>Make sure a Wireless Thymio dongle is connected!</p>"));
 			return;
 		}
 
@@ -179,16 +171,14 @@ namespace Aseba
 		connect(channel1, SIGNAL(toggled(bool)), SLOT(updateSettings()));
 		connect(channel2, SIGNAL(toggled(bool)), SLOT(updateSettings()));
 
- 		connect(pairButton, SIGNAL(clicked()), SLOT(togglePairingMode()));
- 		connect(flashButton, SIGNAL(clicked()), SLOT(flashSettings()));
- 		connect(quitButton, SIGNAL(clicked()), SLOT(quit()));
+		connect(pairButton, SIGNAL(clicked()), SLOT(togglePairingMode()));
+		connect(flashButton, SIGNAL(clicked()), SLOT(flashSettings()));
+		connect(quitButton, SIGNAL(clicked()), SLOT(quit()));
 
 		show();
 	}
 
-	ThymioWNetConfigDialog::~ThymioWNetConfigDialog()
-	{
-	}
+	ThymioWNetConfigDialog::~ThymioWNetConfigDialog() {}
 
 	void ThymioWNetConfigDialog::updateSettings()
 	{
@@ -202,21 +192,21 @@ namespace Aseba
 			settings.channel = 25;
 		settings.ctrl = 0;
 		stream->write(&settings, sizeof(settings));
-		stream->read(&settings, sizeof(settings)-1);
+		stream->read(&settings, sizeof(settings) - 1);
 	}
 
 	void ThymioWNetConfigDialog::flashSettings()
 	{
 		settings.ctrl = 0x1;
 		stream->write(&settings, sizeof(settings));
-		stream->read(&settings, sizeof(settings)-1);
+		stream->read(&settings, sizeof(settings) - 1);
 	}
 
 	void ThymioWNetConfigDialog::togglePairingMode()
 	{
 		settings.ctrl = 0x4;
 		stream->write(&settings, sizeof(settings));
-		stream->read(&settings, sizeof(settings)-1);
+		stream->read(&settings, sizeof(settings) - 1);
 
 		if (!pairing)
 		{
@@ -235,13 +225,13 @@ namespace Aseba
 		{
 			settings.ctrl = 0x4;
 			stream->write(&settings, sizeof(settings));
-			stream->read(&settings, sizeof(settings)-1);
+			stream->read(&settings, sizeof(settings) - 1);
 		}
 		close();
 	}
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 
@@ -249,7 +239,8 @@ int main(int argc, char *argv[])
 	QTranslator translator;
 	app.installTranslator(&qtTranslator);
 	app.installTranslator(&translator);
-	qtTranslator.load(QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	qtTranslator.load(
+		QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	translator.load(QString(":/thymiownetconfig_") + QLocale::system().name());
 
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
@@ -258,8 +249,8 @@ int main(int argc, char *argv[])
 	bool thymiosFound(false);
 	for (Aseba::PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 	{
-		if ((it->second.second.compare(0, 18, "Thymio-II Wireless") == 0) ||
-			(it->second.second.compare(0, 18, "Thymio_II Wireless") == 0))
+		if ((it->second.second.compare(0, 18, "Thymio-II Wireless") == 0)
+			|| (it->second.second.compare(0, 18, "Thymio_II Wireless") == 0))
 		{
 			if (thymioFound)
 				thymiosFound = true;
@@ -269,12 +260,18 @@ int main(int argc, char *argv[])
 	}
 	if (!thymioFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Wireless Thymio dongle not found"), QApplication::tr("<p><b>Cannot find a Wireless Thymio dongle!</b></p><p>Plug a dongle into one of your USB ports and try again.</p>"));
+		QMessageBox::critical(0,
+			QApplication::tr("Wireless Thymio dongle not found"),
+			QApplication::tr("<p><b>Cannot find a Wireless Thymio dongle!</b></p><p>Plug a dongle into one of your USB "
+							 "ports and try again.</p>"));
 		return 1;
 	}
 	if (thymiosFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Multiple Wireless Thymio dongles found"), QApplication::tr("<p><b>More than one Wireless Thymio dongles found!</b></p><p>Plug a single dongle into your computer and try again.</p>"));
+		QMessageBox::critical(0,
+			QApplication::tr("Multiple Wireless Thymio dongles found"),
+			QApplication::tr("<p><b>More than one Wireless Thymio dongles found!</b></p><p>Plug a single dongle into "
+							 "your computer and try again.</p>"));
 		return 2;
 	}
 

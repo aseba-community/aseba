@@ -29,27 +29,23 @@
 #include <typeinfo>
 #include <algorithm>
 
-#define IS_ONE_OF(array) (isOneOf<sizeof(array)/sizeof(Token::Type)>(array))
-#define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array)/sizeof(Token::Type)>(array))
+#define IS_ONE_OF(array) (isOneOf<sizeof(array) / sizeof(Token::Type)>(array))
+#define EXPECT_ONE_OF(array) (expectOneOf<sizeof(array) / sizeof(Token::Type)>(array))
 
-#define STRICT		false
+#define STRICT false
 
 namespace Aseba
 {
 	//! There is a bug in the compiler, ask for a bug report
-	void Compiler::internalCompilerError() const
-	{
-		throw TranslatableError(tokens.front().pos, ERROR_INTERNAL);
-	}
+	void Compiler::internalCompilerError() const { throw TranslatableError(tokens.front().pos, ERROR_INTERNAL); }
 
 	//! Check if next token is of type, produce an exception otherwise
 	void Compiler::expect(const Token::Type& type) const
 	{
 		if (tokens.front() != type)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_EXPECTING)
-					.arg(Token(type).typeName())
-					.arg(tokens.front().typeName());
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING)
+				.arg(Token(type).typeName())
+				.arg(tokens.front().typeName());
 	}
 
 	//! Check if next token is an unsigned 12 bits integer literal. If so, return it, if not, throw an exception
@@ -57,9 +53,7 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 4095)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_UINT12_OUT_OF_RANGE)
-					.arg(tokens.front().iValue);
+			throw TranslatableError(tokens.front().pos, ERROR_UINT12_OUT_OF_RANGE).arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 
@@ -68,9 +62,7 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 65535)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_UINT16_OUT_OF_RANGE)
-					.arg(tokens.front().iValue);
+			throw TranslatableError(tokens.front().pos, ERROR_UINT16_OUT_OF_RANGE).arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 
@@ -79,9 +71,7 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_INT_LITERAL);
 		if (tokens.front().iValue < 0 || tokens.front().iValue > 32767)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_PINT16_OUT_OF_RANGE)
-					.arg(tokens.front().iValue);
+			throw TranslatableError(tokens.front().pos, ERROR_PINT16_OUT_OF_RANGE).arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 
@@ -93,9 +83,7 @@ namespace Aseba
 		if (negative)
 			limit++;
 		if (tokens.front().iValue < 0 || tokens.front().iValue > limit)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_INT16_OUT_OF_RANGE)
-					.arg(tokens.front().iValue);
+			throw TranslatableError(tokens.front().pos, ERROR_INT16_OUT_OF_RANGE).arg(tokens.front().iValue);
 		return tokens.front().iValue;
 	}
 
@@ -109,10 +97,9 @@ namespace Aseba
 
 		const int value = constIt->second;
 		if (value < 0 || value > 32767)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_PCONSTANT_OUT_OF_RANGE)
-					.arg(tokens.front().sValue)
-					.arg(value);
+			throw TranslatableError(tokens.front().pos, ERROR_PCONSTANT_OUT_OF_RANGE)
+				.arg(tokens.front().sValue)
+				.arg(value);
 		return value;
 	}
 
@@ -126,10 +113,9 @@ namespace Aseba
 
 		const int value = constIt->second;
 		if (value < -32768 || value > 32767)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_CONSTANT_OUT_OF_RANGE)
-					.arg(tokens.front().sValue)
-					.arg(value);
+			throw TranslatableError(tokens.front().pos, ERROR_CONSTANT_OUT_OF_RANGE)
+				.arg(tokens.front().sValue)
+				.arg(value);
 		return value;
 	}
 
@@ -152,7 +138,8 @@ namespace Aseba
 		}
 		else
 		{
-			if (tokens.front().iValue < 0) {
+			if (tokens.front().iValue < 0)
+			{
 				tokens.front().iValue *= -1;
 				return -expectAbsoluteInt16Literal(true);
 			}
@@ -177,7 +164,7 @@ namespace Aseba
 
 		expect(Token::TOKEN_STRING_LITERAL);
 
-		const std::wstring & name = tokens.front().sValue;
+		const std::wstring& name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const EventsMap::const_iterator eventIt(findGlobalEvent(name, pos));
 
@@ -191,7 +178,7 @@ namespace Aseba
 
 		expect(Token::TOKEN_STRING_LITERAL);
 
-		const std::wstring & name = tokens.front().sValue;
+		const std::wstring& name = tokens.front().sValue;
 		const SourcePos pos = tokens.front().pos;
 		const EventsMap::const_iterator eventIt(findAnyEvent(name, pos));
 
@@ -214,7 +201,7 @@ namespace Aseba
 	}
 
 	//! Return true if next token is of the following types
-	template <int length>
+	template<int length>
 	bool Compiler::isOneOf(const Token::Type types[length]) const
 	{
 		for (size_t i = 0; i < length; i++)
@@ -226,7 +213,7 @@ namespace Aseba
 	}
 
 	//! Check if next token is of one of the following types, produce an exception otherwise
-	template <int length>
+	template<int length>
 	void Compiler::expectOneOf(const Token::Type types[length]) const
 	{
 		if (!isOneOf<length>(types))
@@ -239,14 +226,13 @@ namespace Aseba
 					expectedTypes += L", ";
 			}
 
-			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ONE_OF).arg(expectedTypes).arg(tokens.front().typeName());
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ONE_OF)
+				.arg(expectedTypes)
+				.arg(tokens.front().typeName());
 		}
 	}
 
-	void Compiler::freeTemporaryMemory()
-	{
-		endVariableIndex = 0;
-	}
+	void Compiler::freeTemporaryMemory() { endVariableIndex = 0; }
 
 	unsigned Compiler::allocateTemporaryMemory(const SourcePos varPos, const unsigned size)
 	{
@@ -288,7 +274,7 @@ namespace Aseba
 		while (tokens.front() == Token::TOKEN_STR_var)
 		{
 			// we may receive null pointers because non initialized variables produce no code
-			Node *child = parseVarDef();
+			Node* child = parseVarDef();
 			if (child)
 				block->children.push_back(child);
 		}
@@ -296,7 +282,7 @@ namespace Aseba
 		while (tokens.front() != Token::TOKEN_END_OF_STREAM)
 		{
 			// only var declaration are allowed to return null node, so we assert on node
-			Node *child = parseStatement();
+			Node* child = parseStatement();
 			assert(child);
 			block->children.push_back(child);
 		}
@@ -351,8 +337,7 @@ namespace Aseba
 
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
 
 		std::wstring constName = tokens.front().sValue;
 		SourcePos constPos = tokens.front().pos;
@@ -364,8 +349,7 @@ namespace Aseba
 
 		// mandatory assignation, must resolve to a constant expression
 		if (tokens.front() != Token::TOKEN_ASSIGN)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_ASSIGNMENT).arg(tokens.front().toWString());
 		tokens.pop_front();
 		int constValue = expectConstantExpression(constPos, parseBinaryOrExpression());
 
@@ -380,8 +364,7 @@ namespace Aseba
 
 		// check for string literal
 		if (tokens.front() != Token::TOKEN_STRING_LITERAL)
-			throw TranslatableError(tokens.front().pos,
-				ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
+			throw TranslatableError(tokens.front().pos, ERROR_EXPECTING_IDENTIFIER).arg(tokens.front().toWString());
 
 		// save variable
 		std::wstring varName = tokens.front().sValue;
@@ -431,7 +414,7 @@ namespace Aseba
 			return nullptr;
 	}
 
-	AssignmentNode *Compiler::parseVarDefInit(MemoryVectorNode* lValue)
+	AssignmentNode* Compiler::parseVarDefInit(MemoryVectorNode* lValue)
 	{
 		if (tokens.front() == Token::TOKEN_ASSIGN)
 		{
@@ -464,10 +447,16 @@ namespace Aseba
 	{
 		expect(Token::TOKEN_STRING_LITERAL);
 
-		static const Token::Type compoundBinaryAssignment[] = { Token::TOKEN_OP_ADD_EQUAL, Token::TOKEN_OP_NEG_EQUAL,
-							   Token::TOKEN_OP_MULT_EQUAL, Token::TOKEN_OP_DIV_EQUAL, Token::TOKEN_OP_MOD_EQUAL,
-							   Token::TOKEN_OP_BIT_AND_EQUAL, Token::TOKEN_OP_BIT_OR_EQUAL, Token::TOKEN_OP_BIT_XOR_EQUAL,
-							   Token::TOKEN_OP_SHIFT_LEFT_EQUAL, Token::TOKEN_OP_SHIFT_RIGHT_EQUAL};
+		static const Token::Type compoundBinaryAssignment[] = { Token::TOKEN_OP_ADD_EQUAL,
+			Token::TOKEN_OP_NEG_EQUAL,
+			Token::TOKEN_OP_MULT_EQUAL,
+			Token::TOKEN_OP_DIV_EQUAL,
+			Token::TOKEN_OP_MOD_EQUAL,
+			Token::TOKEN_OP_BIT_AND_EQUAL,
+			Token::TOKEN_OP_BIT_OR_EQUAL,
+			Token::TOKEN_OP_BIT_XOR_EQUAL,
+			Token::TOKEN_OP_SHIFT_LEFT_EQUAL,
+			Token::TOKEN_OP_SHIFT_RIGHT_EQUAL };
 
 		// parse left value
 		std::unique_ptr<Node> lValue(parseBinaryOrExpression());
@@ -486,10 +475,7 @@ namespace Aseba
 			tokens.pop_front();
 
 			std::unique_ptr<UnaryArithmeticAssignmentNode> assignment(
-						new UnaryArithmeticAssignmentNode(
-							pos,
-							op,
-							lValue.release()));
+				new UnaryArithmeticAssignmentNode(pos, op, lValue.release()));
 
 			return assignment.release();
 		}
@@ -498,11 +484,8 @@ namespace Aseba
 			tokens.pop_front();
 
 			std::unique_ptr<ArithmeticAssignmentNode> assignment(
-						ArithmeticAssignmentNode::fromArithmeticAssignmentToken(
-							pos,
-							op,
-							lValue.release(),
-							parseBinaryOrExpression()));
+				ArithmeticAssignmentNode::fromArithmeticAssignmentToken(
+					pos, op, lValue.release(), parseBinaryOrExpression()));
 
 			return assignment.release();
 		}
@@ -584,7 +567,7 @@ namespace Aseba
 
 		// variable
 		std::unique_ptr<MemoryVectorNode> variable(parseVariable());
-		MemoryVectorNode* variableRef = variable.get();		// used to create copies
+		MemoryVectorNode* variableRef = variable.get(); // used to create copies
 		SourcePos varPos = variable->sourcePos;
 
 		// in keyword
@@ -639,10 +622,7 @@ namespace Aseba
 		// create enclosing block and initial variable state
 		std::unique_ptr<BlockNode> blockNode(new BlockNode(whilePos));
 		blockNode->children.push_back(new AssignmentNode(
-						      rangeStartIndexPos,
-						      variable.release(),
-						      new TupleVectorNode(rangeStartIndexPos, rangeStartIndex))
-					      );
+			rangeStartIndexPos, variable.release(), new TupleVectorNode(rangeStartIndexPos, rangeStartIndex)));
 
 		// build while content
 		if (rangeStartIndex == rangeEndIndex)
@@ -651,7 +631,7 @@ namespace Aseba
 
 			// if start and end indexes are the same, do not loop
 			while (tokens.front() != Token::TOKEN_STR_end)
-					blockNode->children.push_back(parseBlockStatement());
+				blockNode->children.push_back(parseBlockStatement());
 		}
 		else
 		{
@@ -676,8 +656,9 @@ namespace Aseba
 
 			// increment variable
 			auto* assignmentNode = new AssignmentNode(varPos,
-										variableRef->deepCopy(),
-										new BinaryArithmeticNode(varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
+				variableRef->deepCopy(),
+				new BinaryArithmeticNode(
+					varPos, ASEBA_OP_ADD, variableRef->deepCopy(), new TupleVectorNode(varPos, step)));
 			whileNode->children[1]->children.push_back(assignmentNode);
 		}
 
@@ -768,12 +749,18 @@ namespace Aseba
 			if (shorterArgsAllowed)
 			{
 				if (emitNode->arraySize > eventSize)
-					throw TranslatableError(pos, ERROR_EVENT_ARG_TOO_BIG).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
+					throw TranslatableError(pos, ERROR_EVENT_ARG_TOO_BIG)
+						.arg(commonDefinitions->events[emitNode->eventId].name)
+						.arg(eventSize)
+						.arg(emitNode->arraySize);
 			}
 			else
 			{
 				if (emitNode->arraySize != eventSize)
-					throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE).arg(commonDefinitions->events[emitNode->eventId].name).arg(eventSize).arg(emitNode->arraySize);
+					throw TranslatableError(pos, ERROR_EVENT_WRONG_ARG_SIZE)
+						.arg(commonDefinitions->events[emitNode->eventId].name)
+						.arg(eventSize)
+						.arg(emitNode->arraySize);
 			}
 		}
 		else
@@ -918,7 +905,12 @@ namespace Aseba
 		Node *rightExprNode = parseBinaryOrExpression();
 		return BinaryArithmeticNode::fromComparison(pos, op, leftExprNode.release(), rightExprNode);*/
 
-		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL, Token::TOKEN_OP_NOT_EQUAL, Token::TOKEN_OP_BIGGER, Token::TOKEN_OP_BIGGER_EQUAL, Token::TOKEN_OP_SMALLER, Token::TOKEN_OP_SMALLER_EQUAL };
+		const Token::Type conditionTypes[] = { Token::TOKEN_OP_EQUAL,
+			Token::TOKEN_OP_NOT_EQUAL,
+			Token::TOKEN_OP_BIGGER,
+			Token::TOKEN_OP_BIGGER_EQUAL,
+			Token::TOKEN_OP_SMALLER,
+			Token::TOKEN_OP_SMALLER_EQUAL };
 
 		std::unique_ptr<Node> node(parseBinaryOrExpression());
 
@@ -938,7 +930,7 @@ namespace Aseba
 	}
 
 	//! Parse "binary or" grammar element.
-	Node *Compiler::parseBinaryOrExpression()
+	Node* Compiler::parseBinaryOrExpression()
 	{
 		std::unique_ptr<Node> node(parseBinaryXorExpression());
 
@@ -957,7 +949,7 @@ namespace Aseba
 	}
 
 	//! Parse "binary xor" grammar element.
-	Node *Compiler::parseBinaryXorExpression()
+	Node* Compiler::parseBinaryXorExpression()
 	{
 		std::unique_ptr<Node> node(parseBinaryAndExpression());
 
@@ -976,7 +968,7 @@ namespace Aseba
 	}
 
 	//! Parse "binary and" grammar element.
-	Node *Compiler::parseBinaryAndExpression()
+	Node* Compiler::parseBinaryAndExpression()
 	{
 		std::unique_ptr<Node> node(parseShiftExpression());
 
@@ -995,7 +987,7 @@ namespace Aseba
 	}
 
 	//! Parse "shift_expression" grammar element.
-	Node *Compiler::parseShiftExpression()
+	Node* Compiler::parseShiftExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_SHIFT_LEFT, Token::TOKEN_OP_SHIFT_RIGHT };
 
@@ -1017,7 +1009,7 @@ namespace Aseba
 	}
 
 	//! Parse "add_expression" grammar element.
-	Node *Compiler::parseAddExpression()
+	Node* Compiler::parseAddExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_ADD, Token::TOKEN_OP_NEG };
 
@@ -1039,7 +1031,7 @@ namespace Aseba
 	}
 
 	//! Parse "mult_expression" grammar element.
-	Node *Compiler::parseMultExpression()
+	Node* Compiler::parseMultExpression()
 	{
 		const Token::Type opTypes[] = { Token::TOKEN_OP_MULT, Token::TOKEN_OP_DIV, Token::TOKEN_OP_MOD };
 
@@ -1061,9 +1053,15 @@ namespace Aseba
 	}
 
 	//! Parse "unary_expression" grammar element.
-	Node *Compiler::parseUnaryExpression()
+	Node* Compiler::parseUnaryExpression()
 	{
-		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN, Token::TOKEN_BRACKET_OPEN, Token::TOKEN_OP_NEG, Token::TOKEN_OP_BIT_NOT, Token::TOKEN_STR_abs, Token::TOKEN_STRING_LITERAL, Token::TOKEN_INT_LITERAL };
+		const Token::Type acceptableTypes[] = { Token::TOKEN_PAR_OPEN,
+			Token::TOKEN_BRACKET_OPEN,
+			Token::TOKEN_OP_NEG,
+			Token::TOKEN_OP_BIT_NOT,
+			Token::TOKEN_STR_abs,
+			Token::TOKEN_STRING_LITERAL,
+			Token::TOKEN_INT_LITERAL };
 
 		EXPECT_ONE_OF(acceptableTypes);
 		SourcePos pos = tokens.front().pos;
@@ -1082,26 +1080,25 @@ namespace Aseba
 				return expression.release();
 			}
 
-			case Token::TOKEN_BRACKET_OPEN:
-			{
-				return parseTupleVector();
+			case Token::TOKEN_BRACKET_OPEN: { return parseTupleVector();
 			}
 
 			case Token::TOKEN_OP_NEG:
 			{
 				// do we have an immediate after? If yes, we have a negative number (special case)
-				if (tokens.size() >= 2 && tokens[1] == Token::TOKEN_INT_LITERAL) {
+				if (tokens.size() >= 2 && tokens[1] == Token::TOKEN_INT_LITERAL)
+				{
 					// immediate -> negate it, then perform again the switch
 					tokens.pop_front();
 					tokens[0].iValue *= -1;
 					tokens[0].sValue = L"-" + tokens[0].sValue;
-					return parseUnaryExpression();	// recursive call
+					return parseUnaryExpression(); // recursive call
 				}
-				else {
+				else
+				{
 					tokens.pop_front();
 					return new UnaryArithmeticNode(pos, ASEBA_UNARY_OP_SUB, parseUnaryExpression());
 				}
-
 			}
 
 			case Token::TOKEN_OP_BIT_NOT:
@@ -1126,9 +1123,7 @@ namespace Aseba
 				return arrayCtor.release();
 			}
 
-			case Token::TOKEN_STRING_LITERAL:
-			{
-				return parseConstantAndVariable();
+			case Token::TOKEN_STRING_LITERAL: { return parseConstantAndVariable();
 			}
 
 			default: internalCompilerError(); return nullptr;
@@ -1146,11 +1141,8 @@ namespace Aseba
 		else
 		{
 			// check if 2nd token is a comma
-			if ( !(
-				(tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA) ||
-				(tokens.size() >= 3 && tokens[0] == Token::TOKEN_OP_NEG && tokens[2] == Token::TOKEN_COMMA)
-				)
-			)
+			if (!((tokens.size() >= 2 && tokens[1] == Token::TOKEN_COMMA)
+					|| (tokens.size() >= 3 && tokens[0] == Token::TOKEN_OP_NEG && tokens[2] == Token::TOKEN_COMMA)))
 			{
 				// no
 				return nullptr;
@@ -1176,8 +1168,7 @@ namespace Aseba
 				break;
 			else
 				tokens.pop_front();
-		}
-		while (true);
+		} while (true);
 
 		if (!compatibility)
 		{
@@ -1213,11 +1204,7 @@ namespace Aseba
 		auto varIt(findVariable(varName, varPos));
 
 		std::unique_ptr<MemoryVectorNode> vector(
-					new MemoryVectorNode(
-						varPos,
-						varIt->second.first,
-						varIt->second.second,
-						varName));
+			new MemoryVectorNode(varPos, varIt->second.first, varIt->second.second, varName));
 
 		// check if it is a const array access
 		tokens.pop_front();
@@ -1340,7 +1327,7 @@ namespace Aseba
 		//std::cerr << "Tree before expanding" << std::endl;
 		//tempTree1->dump(std::wcerr, indent);
 
-		tempTree1->expandAbstractNodes(nullptr);	// root node (AssignmentNode) is not abstract, so modify in place
+		tempTree1->expandAbstractNodes(nullptr); // root node (AssignmentNode) is not abstract, so modify in place
 		std::unique_ptr<Node> tempTree2(tempTree1->expandVectorialNodes(nullptr));
 
 		//std::cerr << "Tree after expanding" << std::endl;
@@ -1354,10 +1341,10 @@ namespace Aseba
 		//std::cerr << std::endl;
 
 		// valid optimization?
-		if ( !tempTree2.get() || tempTree2->children.size() == 0 )
+		if (!tempTree2.get() || tempTree2->children.size() == 0)
 			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 		auto* assignment = dynamic_cast<AssignmentNode*>(tempTree2->children[0]);
-		if ( !assignment || assignment->children.size() != 2 )
+		if (!assignment || assignment->children.size() != 2)
 			throw TranslatableError(pos, ERROR_NOT_CONST_EXPR);
 
 		// resolve to an ImmediateNode?
@@ -1384,7 +1371,7 @@ namespace Aseba
 		std::wstring funcName = tokens.front().sValue;
 		auto funcIt(findFunction(funcName, pos));
 
-		const TargetDescription::NativeFunction &function = targetDescription->nativeFunctions[funcIt->second];
+		const TargetDescription::NativeFunction& function = targetDescription->nativeFunctions[funcIt->second];
 		std::unique_ptr<CallNode> callNode(new CallNode(pos, funcIt->second));
 
 		tokens.pop_front();
@@ -1402,7 +1389,7 @@ namespace Aseba
 		{
 			// count the number of template parameters and build array
 			int minTemplateId = 0;
-			for (const auto & parameter : function.parameters)
+			for (const auto& parameter : function.parameters)
 				minTemplateId = std::min(parameter.size, minTemplateId);
 			std::valarray<int> templateParameters(-1, -minTemplateId);
 
@@ -1411,7 +1398,10 @@ namespace Aseba
 			{
 				// check if it is an argument
 				if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-					throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i);
+					throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG)
+						.arg(funcName)
+						.arg((unsigned int)function.parameters.size())
+						.arg(i);
 
 				// we need to fill those two variables
 				unsigned varAddr;
@@ -1443,10 +1433,8 @@ namespace Aseba
 					// free space check
 					const unsigned tempAddr = allocateTemporaryMemory(varPos, 1);
 					// create a load native argument node to get address at run time
-					callNode->children.push_back(new LoadNativeArgNode(
-						polymorphic_downcast<MemoryVectorNode*>(preNode.get()),
-						tempAddr
-					));
+					callNode->children.push_back(
+						new LoadNativeArgNode(polymorphic_downcast<MemoryVectorNode*>(preNode.get()), tempAddr));
 					preNode.release();
 				}
 				// otherwise it is resolved
@@ -1460,7 +1448,12 @@ namespace Aseba
 				if (function.parameters[i].size > 0)
 				{
 					if (varSize != (unsigned)function.parameters[i].size)
-						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(function.parameters[i].size);
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE)
+							.arg(i)
+							.arg(function.parameters[i].name)
+							.arg(funcName)
+							.arg(varSize)
+							.arg(function.parameters[i].size);
 				}
 				else if (function.parameters[i].size < 0)
 				{
@@ -1472,7 +1465,12 @@ namespace Aseba
 					}
 					else if ((unsigned)templateParameters[templateIndex] != varSize)
 					{
-						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE_TEMPLATE).arg(i).arg(function.parameters[i].name).arg(funcName).arg(varSize).arg(templateParameters[templateIndex]);
+						throw TranslatableError(varPos, ERROR_FUNCTION_WRONG_ARG_SIZE_TEMPLATE)
+							.arg(i)
+							.arg(function.parameters[i].name)
+							.arg(funcName)
+							.arg(varSize)
+							.arg(templateParameters[templateIndex]);
 					}
 				}
 				else
@@ -1485,14 +1483,19 @@ namespace Aseba
 				if (i + 1 == function.parameters.size())
 				{
 					if (tokens.front() == Token::TOKEN_COMMA)
-						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_TOO_MANY_ARG).arg(funcName).arg((unsigned int)function.parameters.size());
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_TOO_MANY_ARG)
+							.arg(funcName)
+							.arg((unsigned int)function.parameters.size());
 					else
 						expect(Token::TOKEN_PAR_CLOSE);
 				}
 				else
 				{
 					if (tokens.front() == Token::TOKEN_PAR_CLOSE)
-						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG).arg(funcName).arg((unsigned int)function.parameters.size()).arg(i + 1);
+						throw TranslatableError(tokens.front().pos, ERROR_FUNCTION_NO_ENOUGH_ARG)
+							.arg(funcName)
+							.arg((unsigned int)function.parameters.size())
+							.arg(i + 1);
 					else
 						expect(Token::TOKEN_COMMA);
 				}

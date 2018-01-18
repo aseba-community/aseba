@@ -30,19 +30,19 @@ namespace Aseba
 
 	class TargetLister : public ThreadZeroconf
 	{
-		virtual void targetFound(const Aseba::Zeroconf::TargetInformation & target) override
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation& target) override
 		{
 			// output could be JSON but for now is Dashel target [Target name (DNS domain)]
 			cout << target.host << ";port=" << target.port;
 			cout << " [" << target.name << " (" << target.regtype + "." + target.domain << ")]" << endl;
 			// also output properties, typically the DNS-encoded full host name and fields from TXT record
-			for (auto const& field: target.properties)
+			for (auto const& field : target.properties)
 			{
 				cout << "\t" << field.first << ":";
 				// ids and pids are a special case because they contain vectors of 16-bit integers
-				if (field.first.rfind("ids") == field.first.size()-3)
+				if (field.first.rfind("ids") == field.first.size() - 3)
 					for (size_t i = 0; i < field.second.length(); i += 2)
-						cout << " " << (int(field.second[i])<<8) + int(field.second[i+1]);
+						cout << " " << (int(field.second[i]) << 8) + int(field.second[i + 1]);
 				else
 					cout << " " << field.second;
 				cout << endl;

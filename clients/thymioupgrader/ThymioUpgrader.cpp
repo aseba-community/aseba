@@ -34,14 +34,13 @@ namespace Aseba
 	using namespace std;
 
 	//! Hub that receives messages and deletes them
-	class MessageHub: public Hub
+	class MessageHub : public Hub
 	{
 	public:
 		QQueue<Message*> messages;
 
 	public:
-		MessageHub()
-		{}
+		MessageHub() {}
 
 		virtual ~MessageHub()
 		{
@@ -49,20 +48,11 @@ namespace Aseba
 				delete messages.dequeue();
 		}
 
-		virtual void incomingData(Stream * stream)
-		{
-			messages.enqueue(Message::receive(stream));
-		}
+		virtual void incomingData(Stream* stream) { messages.enqueue(Message::receive(stream)); }
 
-		bool isMessage() const
-		{
-			return !messages.empty();
-		}
+		bool isMessage() const { return !messages.empty(); }
 
-		Message* getMessage() const
-		{
-			return messages.head();
-		}
+		Message* getMessage() const { return messages.head(); }
 
 		void clearMessage()
 		{
@@ -73,7 +63,7 @@ namespace Aseba
 
 	typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 
-	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest, int bootloaderDest):
+	QtBootloaderInterface::QtBootloaderInterface(Stream* stream, int dest, int bootloaderDest) :
 		BootloaderInterface(stream, dest, bootloaderDest),
 		pagesCount(0),
 		pagesDoneCount(0)
@@ -88,7 +78,7 @@ namespace Aseba
 	void QtBootloaderInterface::writePageStart(unsigned pageNumber, const uint8_t* data, bool simple)
 	{
 		pagesDoneCount += 1;
-		emit flashProgress((100*pagesDoneCount)/pagesCount);
+		emit flashProgress((100 * pagesDoneCount) / pagesCount);
 	}
 
 	void QtBootloaderInterface::errorWritePageNonFatal(unsigned pageNumber)
@@ -97,7 +87,7 @@ namespace Aseba
 	}
 
 
-	ThymioUpgraderDialog::ThymioUpgraderDialog(const std::string& target):
+	ThymioUpgraderDialog::ThymioUpgraderDialog(const std::string& target) :
 		target(target),
 		currentVersion(0),
 		currentDevStatus(-1),
@@ -110,7 +100,7 @@ namespace Aseba
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 		// image
-		QHBoxLayout *imageLayout = new QHBoxLayout();
+		QHBoxLayout* imageLayout = new QHBoxLayout();
 		QLabel* image = new QLabel(this);
 		QPixmap logo(":/images/thymioupgrader.svgz");
 		image->setPixmap(logo.scaledToWidth(384));
@@ -127,7 +117,7 @@ namespace Aseba
 
 		// latest file
 		officialGroupBox = new QGroupBox(tr("Latest official firmware"));
-		QVBoxLayout *officialLayout = new QVBoxLayout();
+		QVBoxLayout* officialLayout = new QVBoxLayout();
 		officialFirmwareText = new QLabel("Connection to official firmware server in progress...");
 		officialFirmwareText->setWordWrap(true);
 		officialLayout->addWidget(officialFirmwareText);
@@ -137,7 +127,7 @@ namespace Aseba
 
 		// file selector
 		fileGroupBox = new QGroupBox(tr("Custom firmware file"));
-		QHBoxLayout *fileLayout = new QHBoxLayout();
+		QHBoxLayout* fileLayout = new QHBoxLayout();
 		lineEdit = new QLineEdit(this);
 		fileButton = new QPushButton(tr("Select..."), this);
 		fileButton->setIcon(QIcon(":/images/fileopen.svgz"));
@@ -154,7 +144,7 @@ namespace Aseba
 		mainLayout->addWidget(progressBar);
 
 		// flash and quit buttons
-		QHBoxLayout *flashLayout = new QHBoxLayout();
+		QHBoxLayout* flashLayout = new QHBoxLayout();
 		flashButton = new QPushButton(tr("Upgrade"), this);
 		flashButton->setEnabled(false);
 		flashLayout->addWidget(flashButton);
@@ -179,10 +169,7 @@ namespace Aseba
 		show();
 	}
 
-	ThymioUpgraderDialog::~ThymioUpgraderDialog()
-	{
-		flashFuture.waitForFinished();
-	}
+	ThymioUpgraderDialog::~ThymioUpgraderDialog() { flashFuture.waitForFinished(); }
 
 	void ThymioUpgraderDialog::officialGroupChecked(bool on)
 	{
@@ -243,7 +230,8 @@ namespace Aseba
 
 		// list nodes to get ids
 		ListNodes().serialize(stream);
-		GetDescription().serialize(stream);;
+		GetDescription().serialize(stream);
+		;
 		stream->flush();
 
 		// process data for up to two seconds
@@ -286,7 +274,11 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException& e)
 		{
-			QMessageBox::warning(this, tr("Cannot connect to Thymio II"), tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.</p>").arg(e.what()));
+			QMessageBox::warning(this,
+				tr("Cannot connect to Thymio II"),
+				tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the "
+				   "Thymio II. Make sure that there are no Studio or other Upgrader running and try again.</p>")
+					.arg(e.what()));
 			return;
 		}
 
@@ -312,7 +304,8 @@ namespace Aseba
 				{
 					const unsigned currentVersion = variables->variables[0];
 					const unsigned currentDevStatus = variables->variables[1];
-					firmwareVersion->setText(tr("Current firmware: %1").arg(versionDevStatusToString(currentVersion, currentDevStatus)));
+					firmwareVersion->setText(
+						tr("Current firmware: %1").arg(versionDevStatusToString(currentVersion, currentDevStatus)));
 					hub.clearMessage();
 					break;
 				}
@@ -333,7 +326,13 @@ namespace Aseba
 	void ThymioUpgraderDialog::doFlash(void)
 	{
 		// warning message
-		const int warnRet = QMessageBox::warning(this, tr("Pre-upgrade warning"), tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.<p><b>Do not unplug the robot during the upgrade!</b></p>Are you sure you want to proceed?"), QMessageBox::No|QMessageBox::Yes, QMessageBox::No);
+		const int warnRet = QMessageBox::warning(this,
+			tr("Pre-upgrade warning"),
+			tr("Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that "
+			   "the USB cable is properly connected.<p><b>Do not unplug the robot during the upgrade!</b></p>Are you "
+			   "sure you want to proceed?"),
+			QMessageBox::No | QMessageBox::Yes,
+			QMessageBox::No);
 		if (warnRet != QMessageBox::Yes)
 			return;
 
@@ -354,7 +353,8 @@ namespace Aseba
 		flashFutureWatcher.setFuture(flashFuture);
 	}
 
-	ThymioUpgraderDialog::FlashResult ThymioUpgraderDialog::flashThread(const std::string& _target, const std::string& hexFileName) const
+	ThymioUpgraderDialog::FlashResult ThymioUpgraderDialog::flashThread(const std::string& _target,
+		const std::string& hexFileName) const
 	{
 		// open stream
 		MessageHub hub;
@@ -365,7 +365,11 @@ namespace Aseba
 		}
 		catch (Dashel::DashelException& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Cannot connect to Thymio II"), tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the Thymio II. Make sure that there are no Studio or other Upgrader running and try again.</p>").arg(e.what()));
+			return FlashResult(FlashResult::WARNING,
+				tr("Cannot connect to Thymio II"),
+				tr("Cannot connect to Thymio II: %1.<p>Most probably another program is currently connected to the "
+				   "Thymio II. Make sure that there are no Studio or other Upgrader running and try again.</p>")
+					.arg(e.what()));
 		}
 
 		// do flash
@@ -376,20 +380,26 @@ namespace Aseba
 
 			// then flash
 			QtBootloaderInterface bootloaderInterface(stream, nodeId, 1);
-			connect(&bootloaderInterface, SIGNAL(flashProgress(int)), this, SLOT(flashProgress(int)), Qt::QueuedConnection);
+			connect(
+				&bootloaderInterface, SIGNAL(flashProgress(int)), this, SLOT(flashProgress(int)), Qt::QueuedConnection);
 			bootloaderInterface.writeHex(hexFileName, true, true);
 		}
 		catch (HexFile::Error& e)
 		{
-			return FlashResult(FlashResult::WARNING, tr("Upgrade Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
+			return FlashResult(
+				FlashResult::WARNING, tr("Upgrade Error"), tr("Unable to read Hex file: %1").arg(e.toString().c_str()));
 		}
 		catch (BootloaderInterface::Error& e)
 		{
-			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A bootloader error happened during the upgrade process: %1").arg(e.what()));
+			return FlashResult(FlashResult::FAILURE,
+				tr("Upgrade Error"),
+				tr("A bootloader error happened during the upgrade process: %1").arg(e.what()));
 		}
 		catch (Dashel::DashelException& e)
 		{
-			return FlashResult(FlashResult::FAILURE, tr("Upgrade Error"), tr("A communication error happened during the upgrade process: %1").arg(e.what()));
+			return FlashResult(FlashResult::FAILURE,
+				tr("Upgrade Error"),
+				tr("A communication error happened during the upgrade process: %1").arg(e.what()));
 		}
 
 		// sleep 100 ms
@@ -398,10 +408,7 @@ namespace Aseba
 		return FlashResult();
 	}
 
-	void ThymioUpgraderDialog::flashProgress(int percentage)
-	{
-		progressBar->setValue(percentage);
-	}
+	void ThymioUpgraderDialog::flashProgress(int percentage) { progressBar->setValue(percentage); }
 
 	void ThymioUpgraderDialog::flashFinished()
 	{
@@ -452,7 +459,6 @@ namespace Aseba
 					officialVersion = firmwareMeta.attribute("version").toUInt();
 					officialDevStatus = firmwareMeta.attribute("devStatus").toUInt();
 					networkManager->get(QNetworkRequest(QUrl(firmwareMeta.attribute("url"))));
-
 				}
 				else
 				{
@@ -465,7 +471,8 @@ namespace Aseba
 				{
 					officialHexFile.write(reply->readAll());
 					officialHexFile.waitForBytesWritten(-1);
-					officialFirmwareText->setText(tr("Official firmware: %1").arg(versionDevStatusToString(officialVersion, officialDevStatus)));
+					officialFirmwareText->setText(
+						tr("Official firmware: %1").arg(versionDevStatusToString(officialVersion, officialDevStatus)));
 					officialGroupBox->setCheckable(true);
 					fileGroupBox->setCheckable(true);
 					selectOfficialFirmware();
@@ -483,7 +490,7 @@ namespace Aseba
 	}
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 
@@ -491,7 +498,8 @@ int main(int argc, char *argv[])
 	QTranslator translator;
 	app.installTranslator(&qtTranslator);
 	app.installTranslator(&translator);
-	qtTranslator.load(QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	qtTranslator.load(
+		QString("qt_") + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	translator.load(QString(":/thymioupgrader_") + QLocale::system().name());
 
 	const Aseba::PortsMap ports = Dashel::SerialPortEnumerator::getPorts();
@@ -501,13 +509,13 @@ int main(int argc, char *argv[])
 	bool thymiosFound(false);
 	for (Aseba::PortsMap::const_iterator it = ports.begin(); it != ports.end(); ++it)
 	{
-		if ((it->second.second.compare(0, 18, "Thymio-II Wireless") == 0) ||
-			(it->second.second.compare(0, 18, "Thymio_II Wireless") == 0))
+		if ((it->second.second.compare(0, 18, "Thymio-II Wireless") == 0)
+			|| (it->second.second.compare(0, 18, "Thymio_II Wireless") == 0))
 		{
 			wirelessThymioFound = true;
 		}
-		else if ((it->second.second.compare(0, 9, "Thymio-II") == 0) ||
-				 (it->second.second.compare(0, 9, "Thymio_II") == 0))
+		else if ((it->second.second.compare(0, 9, "Thymio-II") == 0)
+			|| (it->second.second.compare(0, 9, "Thymio_II") == 0))
 		{
 			if (thymioFound)
 				thymiosFound = true;
@@ -518,17 +526,26 @@ int main(int argc, char *argv[])
 	}
 	if (wirelessThymioFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Wireless Thymio found"), QApplication::tr("<p><b>Wireless connection to Thymio found!</b></p><p>Plug a single Thymio to your computer using the USB cable.</p>"));
+		QMessageBox::critical(0,
+			QApplication::tr("Wireless Thymio found"),
+			QApplication::tr("<p><b>Wireless connection to Thymio found!</b></p><p>Plug a single Thymio to your "
+							 "computer using the USB cable.</p>"));
 		return 3;
 	}
 	if (!thymioFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Thymio not found"), QApplication::tr("<p><b>Cannot find Thymio!</b></p><p>Plug a Thymio to your computer using the USB cable.</p>"));
+		QMessageBox::critical(0,
+			QApplication::tr("Thymio not found"),
+			QApplication::tr(
+				"<p><b>Cannot find Thymio!</b></p><p>Plug a Thymio to your computer using the USB cable.</p>"));
 		return 1;
 	}
 	if (thymiosFound)
 	{
-		QMessageBox::critical(0, QApplication::tr("Multiple Thymios found"), QApplication::tr("<p><b>More than one Thymio found!</b></p><p>Plug a single Thymio to your computer using the USB cable.</p>"));
+		QMessageBox::critical(0,
+			QApplication::tr("Multiple Thymios found"),
+			QApplication::tr("<p><b>More than one Thymio found!</b></p><p>Plug a single Thymio to your computer using "
+							 "the USB cable.</p>"));
 		return 2;
 	}
 

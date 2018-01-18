@@ -37,16 +37,16 @@ namespace Aseba
 	{
 	protected:
 		//! Potentially partial Descriptions of nodes along with their reception status
-		struct Node: public TargetDescription
+		struct Node : public TargetDescription
 		{
 			Node() = default;
 			Node(const TargetDescription& targetDescription);
 
-			unsigned namedVariablesReceptionCounter{0}; //!< what is the status of the reception of named variables
-			unsigned localEventsReceptionCounter{0}; //!< what is the status of the reception of local events
-			unsigned nativeFunctionReceptionCounter{0}; //!< what is the status of the reception of native functions
+			unsigned namedVariablesReceptionCounter{ 0 }; //!< what is the status of the reception of named variables
+			unsigned localEventsReceptionCounter{ 0 }; //!< what is the status of the reception of local events
+			unsigned nativeFunctionReceptionCounter{ 0 }; //!< what is the status of the reception of native functions
 
-			bool connected{true}; //!< whether this node is considered connected, on a "physical" level
+			bool connected{ true }; //!< whether this node is considered connected, on a "physical" level
 			UnifiedTime lastSeen; //!< when this node was last seen?
 
 			bool isComplete() const;
@@ -68,13 +68,13 @@ namespace Aseba
 		//! Return the name corresponding to a node identifier; if invalid, return the empty string
 		std::wstring getNodeName(unsigned nodeId) const;
 		//! Return the id of the node corresponding to name and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false. If several nodes have this name, either return preferedId if it exists otherwise return the first found.
-		unsigned getNodeId(const std::wstring& name, unsigned preferedId = 0, bool *ok = nullptr) const;
+		unsigned getNodeId(const std::wstring& name, unsigned preferedId = 0, bool* ok = nullptr) const;
 		//! Return the description of a node and set ok to true, if provided; if invalid, return 0 and set ok to false
-		const TargetDescription *getDescription(unsigned nodeId, bool *ok = nullptr) const;
+		const TargetDescription* getDescription(unsigned nodeId, bool* ok = nullptr) const;
 		//! Return the position of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok = nullptr) const;
+		unsigned getVariablePos(unsigned nodeId, const std::wstring& name, bool* ok = nullptr) const;
 		//! Return the length of a variable and set ok to true, if provided; if invalid, return 0xFFFFFFFF and set ok to false
-		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok = nullptr) const;
+		unsigned getVariableSize(unsigned nodeId, const std::wstring& name, bool* ok = nullptr) const;
 		//! Reset all descriptions, for instance when a network was disconnected and is reconnected
 		void reset();
 
@@ -86,16 +86,18 @@ namespace Aseba
 		virtual void sendMessage(const Message& message) = 0;
 
 		//! Virtual function that is called when a version mismatches, called once per node
-		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion) { }
+		virtual void nodeProtocolVersionMismatch(
+			unsigned nodeId, const std::wstring& nodeName, uint16_t protocolVersion)
+		{}
 
 		//! Virtual function that is called when a node is first seen, meaning its description has been fully received
-		virtual void nodeDescriptionReceived(unsigned nodeId) { }
+		virtual void nodeDescriptionReceived(unsigned nodeId) {}
 
 		//! Virtual function that is called when a node is connected, we know its description has been fully received
-		virtual void nodeConnected(unsigned nodeId) { }
+		virtual void nodeConnected(unsigned nodeId) {}
 
 		//! Virtual function that is called when a node is explicitly connected or has not been seen for a while
-		virtual void nodeDisconnected(unsigned nodeId) { }
+		virtual void nodeDisconnected(unsigned nodeId) {}
 	};
 
 	/*@}*/

@@ -47,9 +47,9 @@ namespace Aseba
 	{
 	public:
 		//! An error in link with the bootloader
-		struct Error:public std::runtime_error
+		struct Error : public std::runtime_error
 		{
-			Error(const std::string& what): std::runtime_error(what) {}
+			Error(const std::string& what) : std::runtime_error(what) {}
 		};
 
 	public:
@@ -68,16 +68,16 @@ namespace Aseba
 		bool readPage(unsigned pageNumber, uint8_t* data);
 
 		//! Read a page, simplified protocol
-		bool readPageSimple(unsigned pageNumber, uint8_t * data);
+		bool readPageSimple(unsigned pageNumber, uint8_t* data);
 
 		//! Write a page, if simple is true, use simplified protocol, otherwise use complete protocol
-		bool writePage(unsigned pageNumber, const uint8_t *data, bool simple);
+		bool writePage(unsigned pageNumber, const uint8_t* data, bool simple);
 
 		//! Write an hex file
-		void writeHex(const std::string &fileName, bool reset, bool simple);
+		void writeHex(const std::string& fileName, bool reset, bool simple);
 
 		//! Read an hex file and write it to fileName
-		void readHex(const std::string &fileName);
+		void readHex(const std::string& fileName);
 
 	protected:
 		// reporting function
@@ -88,7 +88,7 @@ namespace Aseba
 		virtual void writePageSuccess() {}
 		virtual void writePageFailure() {}
 
-		virtual void writeHexStart(const std::string &fileName, bool reset, bool simple) {}
+		virtual void writeHexStart(const std::string& fileName, bool reset, bool simple) {}
 		virtual void writeHexEnteringBootloader() {}
 		virtual void writeHexGotDescription(unsigned pagesCount) {}
 		virtual void writeHexWritten() {}

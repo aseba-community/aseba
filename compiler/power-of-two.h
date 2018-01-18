@@ -28,7 +28,7 @@ namespace Aseba
 	/*@{*/
 
 	//! Return true if number is a power of two
-	template <typename T>
+	template<typename T>
 	bool isPOT(T number)
 	{
 		if (number == 0)
@@ -39,7 +39,7 @@ namespace Aseba
 	}
 
 	//! If number is a power of two, number = (1 << shift) and this function returns shift, otherwise return value is undefined
-	template <typename T>
+	template<typename T>
 	unsigned shiftFromPOT(T number)
 	{
 		unsigned i = 0;

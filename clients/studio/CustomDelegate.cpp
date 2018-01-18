@@ -26,18 +26,17 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	SpinBoxDelegate::SpinBoxDelegate(int minValue, int maxValue, QObject *parent) :
+	SpinBoxDelegate::SpinBoxDelegate(int minValue, int maxValue, QObject* parent) :
 		QItemDelegate(parent),
 		minValue(minValue),
 		maxValue(maxValue)
-	{
-	}
+	{}
 
-	QWidget *SpinBoxDelegate::createEditor(QWidget *parent,
-		const QStyleOptionViewItem &/* option */,
-		const QModelIndex &/* index */) const
+	QWidget* SpinBoxDelegate::createEditor(QWidget* parent,
+		const QStyleOptionViewItem& /* option */,
+		const QModelIndex& /* index */) const
 	{
-		QSpinBox *editor = new QSpinBox(parent);
+		QSpinBox* editor = new QSpinBox(parent);
 		editor->setMinimum(minValue);
 		editor->setMaximum(maxValue);
 		editor->installEventFilter(const_cast<SpinBoxDelegate*>(this));
@@ -45,26 +44,26 @@ namespace Aseba
 		return editor;
 	}
 
-	void SpinBoxDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+	void SpinBoxDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 	{
 		int value = index.model()->data(index, Qt::DisplayRole).toInt();
 
-		QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+		QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
 		spinBox->setValue(value);
 	}
 
-	void SpinBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-		const QModelIndex &index) const
+	void SpinBoxDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 	{
-		QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+		QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
 		spinBox->interpretText();
 		int value = spinBox->value();
 
 		model->setData(index, value);
 	}
 
-	void SpinBoxDelegate::updateEditorGeometry(QWidget *editor,
-		const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+	void SpinBoxDelegate::updateEditorGeometry(QWidget* editor,
+		const QStyleOptionViewItem& option,
+		const QModelIndex& /* index */) const
 	{
 		editor->setGeometry(option.rect);
 	}

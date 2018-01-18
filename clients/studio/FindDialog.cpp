@@ -34,23 +34,21 @@
 
 namespace Aseba
 {
-	FindDialog::FindDialog(QWidget *parent, QTextEdit* editor):
-		QDialog(parent),
-		editor(editor)
+	FindDialog::FindDialog(QWidget* parent, QTextEdit* editor) : QDialog(parent), editor(editor)
 	{
 		setWindowTitle(tr("Aseba Studio - Search and Replace"));
 
 		QLabel* label = new QLabel(tr("&Search for:"));
 		findLineEdit = new QLineEdit;
 		label->setBuddy(findLineEdit);
-		QHBoxLayout *entryLayout = new QHBoxLayout;
+		QHBoxLayout* entryLayout = new QHBoxLayout;
 		entryLayout->addWidget(label);
 		entryLayout->addWidget(findLineEdit);
 
 		caseCheckBox = new QCheckBox(tr("&Case sensitive"));
 		wholeWordsCheckBox = new QCheckBox(tr("&Whole words"));
 		regularExpressionsCheckBox = new QCheckBox(tr("Re&gular expressions"));
-		QHBoxLayout *optionsLayout = new QHBoxLayout;
+		QHBoxLayout* optionsLayout = new QHBoxLayout;
 		optionsLayout->addWidget(caseCheckBox);
 		optionsLayout->addWidget(wholeWordsCheckBox);
 		optionsLayout->addWidget(regularExpressionsCheckBox);
@@ -59,7 +57,7 @@ namespace Aseba
 		findNextButton->setDefault(true);
 		findPreviousButton = new QPushButton(tr("Find &Previous"));
 		findFromTopButton = new QPushButton(tr("Find from &Top"));
-		QHBoxLayout *buttonsLayout = new QHBoxLayout;
+		QHBoxLayout* buttonsLayout = new QHBoxLayout;
 		buttonsLayout->addWidget(findNextButton);
 		buttonsLayout->addWidget(findPreviousButton);
 		buttonsLayout->addWidget(findFromTopButton);
@@ -71,7 +69,7 @@ namespace Aseba
 		replaceGroupBox->setCheckable(true);
 		replaceGroupBox->setChecked(false);
 		label = new QLabel(tr("w&ith:"));
-		QHBoxLayout *entryLayout2 = new QHBoxLayout;
+		QHBoxLayout* entryLayout2 = new QHBoxLayout;
 		replaceLineEdit = new QLineEdit;
 		label->setBuddy(replaceLineEdit);
 		entryLayout2->addWidget(label);
@@ -79,11 +77,11 @@ namespace Aseba
 		replaceFindNextButton = new QPushButton(tr("Replace and\nFind &Next"));
 		replaceFindPreviousButton = new QPushButton(tr("Replace and\nFind Previo&us"));
 		replaceAllButton = new QPushButton(tr("Replace &All\nOccurrences"));
-		QHBoxLayout *buttonsLayout2 = new QHBoxLayout;
+		QHBoxLayout* buttonsLayout2 = new QHBoxLayout;
 		buttonsLayout2->addWidget(replaceFindNextButton);
 		buttonsLayout2->addWidget(replaceFindPreviousButton);
 		buttonsLayout2->addWidget(replaceAllButton);
-		QVBoxLayout *replaceLayout = new QVBoxLayout;
+		QVBoxLayout* replaceLayout = new QVBoxLayout;
 		replaceLayout->addLayout(entryLayout2);
 		replaceLayout->addLayout(buttonsLayout2);
 		replaceGroupBox->setLayout(replaceLayout);
@@ -105,25 +103,13 @@ namespace Aseba
 		connect(replaceAllButton, SIGNAL(clicked()), SLOT(replaceAll()));
 	}
 
-	void FindDialog::setFindText(const QString& text)
-	{
-		findLineEdit->setText(text);
-	}
+	void FindDialog::setFindText(const QString& text) { findLineEdit->setText(text); }
 
-	void FindDialog::findNext()
-	{
-		find(editor->textCursor(), QTextDocument::FindFlag(0));
-	}
+	void FindDialog::findNext() { find(editor->textCursor(), QTextDocument::FindFlag(0)); }
 
-	void FindDialog::findPrevious()
-	{
-		find(editor->textCursor(), QTextDocument::FindBackward);
-	}
+	void FindDialog::findPrevious() { find(editor->textCursor(), QTextDocument::FindBackward); }
 
-	void FindDialog::findFromTop()
-	{
-		find(QTextCursor(editor->document()), QTextDocument::FindFlag(0));
-	}
+	void FindDialog::findFromTop() { find(QTextCursor(editor->document()), QTextDocument::FindFlag(0)); }
 
 	void FindDialog::replaceFindNext()
 	{
@@ -166,13 +152,13 @@ namespace Aseba
 				cs = Qt::CaseSensitive;
 			else
 				cs = Qt::CaseInsensitive;
-			nc = editor->document()->find(QRegExp(findLineEdit->text(), cs), cc ,flags);
+			nc = editor->document()->find(QRegExp(findLineEdit->text(), cs), cc, flags);
 		}
 		else
 		{
 			if (caseCheckBox->isChecked())
 				flags |= QTextDocument::FindCaseSensitively;
-			nc = editor->document()->find(findLineEdit->text(), cc ,flags);
+			nc = editor->document()->find(findLineEdit->text(), cc, flags);
 		}
 
 		// do something with found text
@@ -204,7 +190,7 @@ namespace Aseba
 			const int l = replaceLineEdit->text().length();
 			cc.insertText(replaceLineEdit->text());
 			cc.setPosition(p);
-			cc.setPosition(p+l, QTextCursor::KeepAnchor);
+			cc.setPosition(p + l, QTextCursor::KeepAnchor);
 			editor->setTextCursor(cc);
 		}
 	}

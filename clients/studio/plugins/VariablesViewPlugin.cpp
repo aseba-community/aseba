@@ -56,13 +56,13 @@ namespace Aseba
 	}
 
 	//! Construct the plugin, taking ownership of an interface to a development environment
-	LinearCameraViewPlugin::LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de) :
+	LinearCameraViewPlugin::LinearCameraViewPlugin(DevelopmentEnvironmentInterface* _de) :
 		VariableListener(_de->getVariablesModel()),
 		de(_de),
 		componentsReceived(0),
 		timerId(0)
 	{
-		QVBoxLayout *layout = new QVBoxLayout(this);
+		QVBoxLayout* layout = new QVBoxLayout(this);
 		image = new QLabel;
 		image->setScaledContents(true);
 		layout->addWidget(image);
@@ -73,16 +73,13 @@ namespace Aseba
 
 	QWidget* LinearCameraViewPlugin::createMenuEntry()
 	{
-		QCheckBox *checkbox = new QCheckBox(tr("linear camera viewer"));
+		QCheckBox* checkbox = new QCheckBox(tr("linear camera viewer"));
 		connect(checkbox, SIGNAL(clicked(bool)), SLOT(setEnabled(bool)));
 		connect(this, SIGNAL(dialogBoxResult(bool)), checkbox, SLOT(setChecked(bool)));
 		return checkbox;
 	}
 
-	void LinearCameraViewPlugin::closeAsSoonAsPossible()
-	{
-		close();
-	}
+	void LinearCameraViewPlugin::closeAsSoonAsPossible() { close(); }
 
 	void LinearCameraViewPlugin::setEnabled(bool enabled)
 	{
@@ -118,7 +115,9 @@ namespace Aseba
 
 		if (!ok)
 		{
-			QMessageBox::warning(this, tr("Cannot initialize linear camera view plugin"), tr("One or more variable not found in %1, %2, or %3.").arg(redName).arg(greenName).arg(blueName));
+			QMessageBox::warning(this,
+				tr("Cannot initialize linear camera view plugin"),
+				tr("One or more variable not found in %1, %2, or %3.").arg(redName).arg(greenName).arg(blueName));
 			unsubscribeToVariablesOfInterest();
 			emit dialogBoxResult(false);
 			return;
@@ -157,14 +156,14 @@ namespace Aseba
 		}
 	}
 
-	void LinearCameraViewPlugin::timerEvent ( QTimerEvent * event )
+	void LinearCameraViewPlugin::timerEvent(QTimerEvent* event)
 	{
 		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
 		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
 		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
 	}
 
-	void LinearCameraViewPlugin::closeEvent ( QCloseEvent * event )
+	void LinearCameraViewPlugin::closeEvent(QCloseEvent* event)
 	{
 		disablePlugin();
 		emit dialogBoxResult(false);
@@ -228,9 +227,7 @@ namespace Aseba
 				}
 				break;
 
-				default:
-				assert(false);
-				break;
+				default: assert(false); break;
 			}
 
 			for (int i = 0; i < width; i++)

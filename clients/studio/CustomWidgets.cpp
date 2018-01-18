@@ -30,22 +30,22 @@ namespace Aseba
 	/*@{*/
 
 
-	QStringList DraggableListWidget::mimeTypes () const
+	QStringList DraggableListWidget::mimeTypes() const
 	{
 		QStringList types;
 		types << "text/plain";
 		return types;
 	}
 
-	QMimeData * DraggableListWidget::mimeData ( const QList<QListWidgetItem *> items ) const
+	QMimeData* DraggableListWidget::mimeData(const QList<QListWidgetItem*> items) const
 	{
 		QString texts;
-		foreach (QListWidgetItem *item, items)
+		foreach (QListWidgetItem* item, items)
 		{
 			texts += item->text();
 		}
 
-		QMimeData *mimeData = new QMimeData();
+		QMimeData* mimeData = new QMimeData();
 		mimeData->setText(texts);
 		return mimeData;
 	}
@@ -60,14 +60,14 @@ namespace Aseba
 
 	void FixedWidthTableView::setSecondColumnLongestContent(const QString& content)
 	{
-		Q_ASSERT((model ()->columnCount() == 2) || (model ()->columnCount() == 3));
+		Q_ASSERT((model()->columnCount() == 2) || (model()->columnCount() == 3));
 		QFontMetrics fm(font());
 		col1Width = fm.width(content);
 	}
 
-	void FixedWidthTableView::resizeEvent ( QResizeEvent * event )
+	void FixedWidthTableView::resizeEvent(QResizeEvent* event)
 	{
-		Q_ASSERT((model ()->columnCount() == 2) || (model ()->columnCount() == 3));
+		Q_ASSERT((model()->columnCount() == 2) || (model()->columnCount() == 3));
 		if (model()->columnCount() == 2)
 		{
 			int col0Width = event->size().width() - col1Width;
@@ -91,14 +91,14 @@ namespace Aseba
 
 		QMimeData* mimeData = model()->mimeData(list);
 
-		QDrag *drag = new QDrag(this);
+		QDrag* drag = new QDrag(this);
 		drag->setMimeData(mimeData);
 		QPixmap pixmap = getDragPixmap(mimeData->text());
 		drag->setPixmap(pixmap);
-		QPoint hotpoint(pixmap.width()+10, pixmap.height()/2);
+		QPoint hotpoint(pixmap.width() + 10, pixmap.height() / 2);
 		drag->setHotSpot(hotpoint);
 
-		if (drag->exec(Qt::CopyAction|Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
+		if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
 		{
 			// item moved
 		}
@@ -108,7 +108,7 @@ namespace Aseba
 		}
 	}
 
-	void FixedWidthTableView::dragEnterEvent(QDragEnterEvent *event)
+	void FixedWidthTableView::dragEnterEvent(QDragEnterEvent* event)
 	{
 		if (modelMatchMimeFormat(event->mimeData()->formats()))
 		{
@@ -119,12 +119,9 @@ namespace Aseba
 			event->ignore();
 	}
 
-	void FixedWidthTableView::dragMoveEvent(QDragMoveEvent *event)
-	{
-		event->accept();
-	}
+	void FixedWidthTableView::dragMoveEvent(QDragMoveEvent* event) { event->accept(); }
 
-	void FixedWidthTableView::dropEvent(QDropEvent *event)
+	void FixedWidthTableView::dropEvent(QDropEvent* event)
 	{
 		int row = rowAt(event->pos().y());
 		int col = columnAt(event->pos().x());

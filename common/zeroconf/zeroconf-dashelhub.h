@@ -37,12 +37,12 @@ namespace Aseba
 		~DashelhubZeroconf() override;
 
 		// To be called from similar functions in Dashel::Hub
-		void dashelIncomingData(Dashel::Stream * stream);
-		void dashelConnectionClosed(Dashel::Stream * stream);
+		void dashelIncomingData(Dashel::Stream* stream);
+		void dashelConnectionClosed(Dashel::Stream* stream);
 		// To be called instead the functions in Dashel::Hub
 		bool dashelStep(int timeout = 0);
 		// Helper function for integration
-		bool isStreamHandled(Dashel::Stream * stream) const;
+		bool isStreamHandled(Dashel::Stream* stream) const;
 
 	protected:
 		// From Zeroconf
@@ -53,12 +53,12 @@ namespace Aseba
 		//! Reference to the hub to create connections from processDiscoveryRequest
 		Dashel::Hub& hub;
 		//! Collection of (tcp:) SocketStreams that watch the serviceRef file descriptors.
-		std::map<Dashel::Stream *, DNSServiceRef> zeroconfStreams;
+		std::map<Dashel::Stream*, DNSServiceRef> zeroconfStreams;
 		//! Streams that dashelStep() will call closeStream() on, after the current Hub::step() is finished
-		std::map<Dashel::Stream *, DNSServiceRef> pendingReleaseStreams;
+		std::map<Dashel::Stream*, DNSServiceRef> pendingReleaseStreams;
 
 	private:
-		void cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams);
+		void cleanUpStreams(std::map<Dashel::Stream*, DNSServiceRef>& streams);
 	};
 }
 

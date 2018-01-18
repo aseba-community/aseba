@@ -40,7 +40,7 @@
 	The second reconstruct target descriptions by filtering
 	Aseba messages through NodesManager::processMessage().
 */
-struct Shell: public Dashel::Hub, public Aseba::NodesManager
+struct Shell : public Dashel::Hub, public Aseba::NodesManager
 {
 public:
 	typedef std::vector<std::string> strings;
@@ -68,11 +68,11 @@ protected:
 	// reimplemented from parent classes
 	virtual void sendMessage(const Aseba::Message& message);
 	virtual void nodeDescriptionReceived(unsigned nodeId);
-	virtual void incomingData(Dashel::Stream *stream);
+	virtual void incomingData(Dashel::Stream* stream);
 
 	// main handlers for activites on streams
-	void incomingTargetData(Dashel::Stream *stream);
-	void incomingShellData(Dashel::Stream *stream);
+	void incomingTargetData(Dashel::Stream* stream);
+	void incomingShellData(Dashel::Stream* stream);
 
 	// process curShellCmd once a '\n' is detected on shellStream
 	void processShellCmd();
@@ -88,7 +88,8 @@ protected:
 	void run(const strings& args);
 
 	// helper functions
-	bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
+	bool getNodeAndVarPos(
+		const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
 	bool compileAndSendCode(const std::wstring& source, unsigned nodeId, const std::string& nodeName);
 };
 

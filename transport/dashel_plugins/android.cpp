@@ -42,212 +42,222 @@ static jmethodID s_DashelSerialGetEpOutMethodID;
 using namespace Dashel;
 using namespace std;
 
-void AndroidStream::usb_control_msg(int type, int req, int value, int index, char * bytes, int size, int timeout) {
-    struct usbdevfs_ctrltransfer ctrl;
-    ctrl.bRequestType = type;
-    ctrl.bRequest = req;
-    ctrl.wValue = value;
-    ctrl.wIndex = index;
-    ctrl.wLength = size;
-    ctrl.data = bytes;
-    ctrl.timeout = timeout;
-
-    ioctl(fd, USBDEVFS_CONTROL, &ctrl);
-}
-
-void AndroidStream::schedule_read() {
-    urb_is_in_flight = 1;
-    memset(&rx_urb, 0, sizeof(rx_urb));
-    rx_urb.type = USBDEVFS_URB_TYPE_BULK;
-    rx_urb.endpoint = epin;
-    rx_urb.buffer = rx_data;
-    rx_urb.buffer_length = sizeof(rx_data);
-    if(ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0) {
-        disconnected = 1;
-        throw DashelException(DashelException::IOError, 0, "Unable to read", this);
-    }
-}
-
-void AndroidStream::set_ctrl_line(unsigned int status) {
-    usb_control_msg(0x21, 0x22, status, 0, nullptr, 0, 1000);
-}
-
-AndroidStream::AndroidStream(const string &targetName) :
-            Stream("android"),
-            SelectableStream("android")
+void AndroidStream::usb_control_msg(int type, int req, int value, int index, char* bytes, int size, int timeout)
 {
-   pollEvent = POLLOUT;
-   lock_java();
+	struct usbdevfs_ctrltransfer ctrl;
+	ctrl.bRequestType = type;
+	ctrl.bRequest = req;
+	ctrl.wValue = value;
+	ctrl.wIndex = index;
+	ctrl.wLength = size;
+	ctrl.data = bytes;
+	ctrl.timeout = timeout;
 
-    // Create an instance of DashelSerial in the java world
-    m_DashelSerialObject = env->NewGlobalRef(env->NewObject(s_DashelSerialClassID,s_DashelSerialConstructorMethodID));
-    if(!m_DashelSerialObject) {
-        unlock_java();
-        throw DashelException(DashelException::ConnectionFailed, 0, "Unable to create java object");
-    }
+	ioctl(fd, USBDEVFS_CONTROL, &ctrl);
+}
 
-    // Now, open the device and claim interface (in the Java code).
-    fd = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialOpenDeviceMethodID);
+void AndroidStream::schedule_read()
+{
+	urb_is_in_flight = 1;
+	memset(&rx_urb, 0, sizeof(rx_urb));
+	rx_urb.type = USBDEVFS_URB_TYPE_BULK;
+	rx_urb.endpoint = epin;
+	rx_urb.buffer = rx_data;
+	rx_urb.buffer_length = sizeof(rx_data);
+	if (ioctl(fd, USBDEVFS_SUBMITURB, &rx_urb) < 0)
+	{
+		disconnected = 1;
+		throw DashelException(DashelException::IOError, 0, "Unable to read", this);
+	}
+}
 
-    if(fd < 0) {
-        env->DeleteGlobalRef(m_DashelSerialObject);
-        unlock_java();
-        throw  DashelException(DashelException::ConnectionFailed, 0, "Unable to grab fd");
-    }
+void AndroidStream::set_ctrl_line(unsigned int status)
+{
+	usb_control_msg(0x21, 0x22, status, 0, nullptr, 0, 1000);
+}
 
-    epin = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpInMethodID);
-    epout = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpOutMethodID);
+AndroidStream::AndroidStream(const string& targetName) : Stream("android"), SelectableStream("android")
+{
+	pollEvent = POLLOUT;
+	lock_java();
 
-    unlock_java();
+	// Create an instance of DashelSerial in the java world
+	m_DashelSerialObject = env->NewGlobalRef(env->NewObject(s_DashelSerialClassID, s_DashelSerialConstructorMethodID));
+	if (!m_DashelSerialObject)
+	{
+		unlock_java();
+		throw DashelException(DashelException::ConnectionFailed, 0, "Unable to create java object");
+	}
 
-    disconnected = 0;
+	// Now, open the device and claim interface (in the Java code).
+	fd = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialOpenDeviceMethodID);
 
-    // software-open the port
-    set_ctrl_line(1);
+	if (fd < 0)
+	{
+		env->DeleteGlobalRef(m_DashelSerialObject);
+		unlock_java();
+		throw DashelException(DashelException::ConnectionFailed, 0, "Unable to grab fd");
+	}
 
-    schedule_read();
+	epin = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpInMethodID);
+	epout = env->CallIntMethod(m_DashelSerialObject, s_DashelSerialGetEpOutMethodID);
+
+	unlock_java();
+
+	disconnected = 0;
+
+	// software-open the port
+	set_ctrl_line(1);
+
+	schedule_read();
 }
 
 AndroidStream::~AndroidStream()
 {
-    set_ctrl_line(0); // software-close the port
+	set_ctrl_line(0); // software-close the port
 
-    lock_java();
-    env->CallBooleanMethod(m_DashelSerialObject, s_DashelSerialCloseDeviceMethodID);
-    env->DeleteGlobalRef(m_DashelSerialObject);
-    unlock_java();
+	lock_java();
+	env->CallBooleanMethod(m_DashelSerialObject, s_DashelSerialCloseDeviceMethodID);
+	env->DeleteGlobalRef(m_DashelSerialObject);
+	unlock_java();
 }
 
-void AndroidStream::write(const void *data, const size_t size)
+void AndroidStream::write(const void* data, const size_t size)
 {
-    struct usbdevfs_bulktransfer bulk;
-    bulk.ep = epout;
-    bulk.len = size;
+	struct usbdevfs_bulktransfer bulk;
+	bulk.ep = epout;
+	bulk.len = size;
 	bulk.timeout = -1;
-    bulk.data = (void *) data;
+	bulk.data = (void*)data;
 	const int result = ioctl(fd, USBDEVFS_BULK, &bulk);
-	if (result < 0) {
+	if (result < 0)
+	{
 		disconnected = 1;
 		throw DashelException(DashelException::IOError, result, "Unable to write", this);
-    }
+	}
 }
 
 void AndroidStream::flush()
 {
-    // Nothing to do, everything is written immediately.
+	// Nothing to do, everything is written immediately.
 }
 
-void AndroidStream::read(void *data, size_t size)
+void AndroidStream::read(void* data, size_t size)
 {
-    struct usbdevfs_urb * urb;
-    while(size) {
-        if(urb_is_in_flight) {
+	struct usbdevfs_urb* urb;
+	while (size)
+	{
+		if (urb_is_in_flight)
+		{
 			const int result = ioctl(fd, USBDEVFS_REAPURB, &urb);
-			if (result < 0) {
+			if (result < 0)
+			{
 				disconnected = 1;
 				throw DashelException(DashelException::IOError, result, "Unable to read", this);
-            }
-            urb_is_in_flight = 0;
-        }
-        size_t cpy = size > (size_t) rx_urb.actual_length ? (size_t) rx_urb.actual_length : size;
+			}
+			urb_is_in_flight = 0;
+		}
+		size_t cpy = size > (size_t)rx_urb.actual_length ? (size_t)rx_urb.actual_length : size;
 
-        memcpy(data,rx_urb.buffer,cpy);
+		memcpy(data, rx_urb.buffer, cpy);
 
-        rx_urb.buffer = (void *) (((size_t) rx_urb.buffer) + cpy);
-        data = (void *) (((size_t) data) + cpy);
-        size -= cpy;
-        rx_urb.actual_length -= cpy;
+		rx_urb.buffer = (void*)(((size_t)rx_urb.buffer) + cpy);
+		data = (void*)(((size_t)data) + cpy);
+		size -= cpy;
+		rx_urb.actual_length -= cpy;
 
-        if (!rx_urb.actual_length)
-            schedule_read();
-    }
+		if (!rx_urb.actual_length)
+			schedule_read();
+	}
 }
 
 bool AndroidStream::receiveDataAndCheckDisconnection()
 {
-    struct usbdevfs_urb * urb;
+	struct usbdevfs_urb* urb;
 
-    // Reap everthing
-    if(ioctl(fd, USBDEVFS_REAPURBNDELAY, &urb) >= 0)
-        urb_is_in_flight = 0;
+	// Reap everthing
+	if (ioctl(fd, USBDEVFS_REAPURBNDELAY, &urb) >= 0)
+		urb_is_in_flight = 0;
 
-    if(disconnected == 1)
-	return true;
-    return false;
+	if (disconnected == 1)
+		return true;
+	return false;
 }
 
 bool AndroidStream::isDataInRecvBuffer() const
 {
-    if(urb_is_in_flight)
-        return false;
-    return true;
+	if (urb_is_in_flight)
+		return false;
+	return true;
 }
 
 void AndroidStream::lock_java()
 {
-    // Kind of mutex_lock();
-    if(s_javaVM->AttachCurrentThread(&env, nullptr)<0)
-        throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed", this);
+	// Kind of mutex_lock();
+	if (s_javaVM->AttachCurrentThread(&env, nullptr) < 0)
+		throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed", this);
 }
 
 void AndroidStream::unlock_java()
 {
-    s_javaVM->DetachCurrentThread();
+	s_javaVM->DetachCurrentThread();
 }
 
 
 namespace Dashel
 {
-	void initPlugins()
-	{
-        Dashel::streamTypeRegistry.reg("android", &createInstance<AndroidStream>);
-	}
+	void initPlugins() { Dashel::streamTypeRegistry.reg("android", &createInstance<AndroidStream>); }
 }
 
 
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void * /*reserved*/)
+JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
 {
-    JNIEnv *env;
-    if(vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        return -1;
-    }
+	JNIEnv* env;
+	if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+	{
+		return -1;
+	}
 
-    s_javaVM = vm;
+	s_javaVM = vm;
 
-    // Do a kind of "linking".
-    jclass clazz = env->FindClass("org/mobsya/thymiovpl/DashelSerial");
-    if(!clazz)
-    {
-        return -1;
-    }
+	// Do a kind of "linking".
+	jclass clazz = env->FindClass("org/mobsya/thymiovpl/DashelSerial");
+	if (!clazz)
+	{
+		return -1;
+	}
 
-    s_DashelSerialClassID = (jclass) env->NewGlobalRef(clazz);
+	s_DashelSerialClassID = (jclass)env->NewGlobalRef(clazz);
 
-    s_DashelSerialConstructorMethodID = env->GetMethodID(s_DashelSerialClassID, "<init>", "()V");
-    if(!s_DashelSerialConstructorMethodID) {
-        return -1;
-    }
+	s_DashelSerialConstructorMethodID = env->GetMethodID(s_DashelSerialClassID, "<init>", "()V");
+	if (!s_DashelSerialConstructorMethodID)
+	{
+		return -1;
+	}
 
-    s_DashelSerialOpenDeviceMethodID = env->GetMethodID(s_DashelSerialClassID, "OpenDevice", "()I");
-    if(! s_DashelSerialOpenDeviceMethodID) {
-        return -1;
-    }
+	s_DashelSerialOpenDeviceMethodID = env->GetMethodID(s_DashelSerialClassID, "OpenDevice", "()I");
+	if (!s_DashelSerialOpenDeviceMethodID)
+	{
+		return -1;
+	}
 
-    s_DashelSerialCloseDeviceMethodID = env->GetMethodID(s_DashelSerialClassID, "CloseDevice", "()Z");
-    if(! s_DashelSerialCloseDeviceMethodID) {
-        return -1;
-    }
+	s_DashelSerialCloseDeviceMethodID = env->GetMethodID(s_DashelSerialClassID, "CloseDevice", "()Z");
+	if (!s_DashelSerialCloseDeviceMethodID)
+	{
+		return -1;
+	}
 
-    s_DashelSerialGetEpInMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpIn", "()I");
-    if(! s_DashelSerialGetEpInMethodID) {
-        return -1;
-    }
+	s_DashelSerialGetEpInMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpIn", "()I");
+	if (!s_DashelSerialGetEpInMethodID)
+	{
+		return -1;
+	}
 
-    s_DashelSerialGetEpOutMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpOut", "()I");
-    if(! s_DashelSerialGetEpOutMethodID) {
-        return -1;
-    }
+	s_DashelSerialGetEpOutMethodID = env->GetMethodID(s_DashelSerialClassID, "GetEpOut", "()I");
+	if (!s_DashelSerialGetEpOutMethodID)
+	{
+		return -1;
+	}
 
-    return JNI_VERSION_1_6;
+	return JNI_VERSION_1_6;
 }
-

@@ -32,9 +32,13 @@
    word supported on Aseba targets. */
 #ifdef __BIG_ENDIAN__
 /* gcc-specific extension, but anyway __BIG_ENDIAN__ is for Mac PPC, which use gcc */
-#define bswap16(v) ({uint16_t _v = v; _v = (_v << 8) | (_v >> 8);})
+#	define bswap16(v)                  \
+		({                              \
+			uint16_t _v = v;            \
+			_v = (_v << 8) | (_v >> 8); \
+		})
 #else
-#define bswap16(v) (v)
+#	define bswap16(v) (v)
 #endif
 
 /*@}*/

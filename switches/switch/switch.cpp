@@ -34,17 +34,17 @@
 #include "../../common/msg/msg.h"
 #include "../../common/msg/endian.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
-#include "../../common/productids.h"
+#	include "../../common/zeroconf/zeroconf-dashelhub.h"
+#	include "../../common/productids.h"
 #endif // ZEROCONF_SUPPORT
 
 #ifdef ZEROCONF_SUPPORT
 // zeroconf requires gethostname
-#ifdef _WIN32
-#include <winsock2.h>
-#else // _WIN32
-#include <unistd.h>
-#endif // _WIN32
+#	ifdef _WIN32
+#		include <winsock2.h>
+#	else // _WIN32
+#		include <unistd.h>
+#	endif // _WIN32
 #endif // ZEROCONF_SUPPORT
 
 namespace Aseba
@@ -57,9 +57,9 @@ namespace Aseba
 
 	//! Broadcast messages form any data stream to all others data streams including itself.
 	Switch::Switch(unsigned port, std::string name, bool verbose, bool dump, bool forward, bool rawTime) :
-		#ifdef DASHEL_VERSION_INT
+#ifdef DASHEL_VERSION_INT
 		Dashel::Hub(verbose || dump),
-		#endif // DASHEL_VERSION_INT
+#endif // DASHEL_VERSION_INT
 #ifdef ZEROCONF_SUPPORT
 		zeroconf(*this),
 		zeroconfName(std::move(name)),
@@ -89,7 +89,7 @@ namespace Aseba
 #endif // ZEROCONF_SUPPORT
 	}
 
-	void Switch::connectionCreated(Stream *stream)
+	void Switch::connectionCreated(Stream* stream)
 	{
 		if (verbose)
 		{
@@ -98,7 +98,7 @@ namespace Aseba
 		}
 	}
 
-	void Switch::incomingData(Stream *stream)
+	void Switch::incomingData(Stream* stream)
 	{
 #ifdef ZEROCONF_SUPPORT
 		if (zeroconf.isStreamHandled(stream))
@@ -113,9 +113,7 @@ namespace Aseba
 		// remap source
 		{
 			const IdRemapTable::const_iterator remapIt(idRemapTable.find(stream));
-			if (remapIt != idRemapTable.end() &&
-				(message->source == remapIt->second.second)
-			)
+			if (remapIt != idRemapTable.end() && (message->source == remapIt->second.second))
 				message->source = remapIt->second.first;
 		}
 
@@ -130,7 +128,7 @@ namespace Aseba
 
 		// write on all connected streams
 		CmdMessage* cmdMessage(dynamic_cast<CmdMessage*>(message));
-		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
+		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end(); ++it)
 		{
 			Stream* destStream = *it;
 
@@ -140,8 +138,7 @@ namespace Aseba
 			try
 			{
 				const IdRemapTable::const_iterator remapIt(idRemapTable.find(destStream));
-				if (cmdMessage &&
-					remapIt != idRemapTable.end())
+				if (cmdMessage && remapIt != idRemapTable.end())
 				{
 					if (cmdMessage->dest == remapIt->second.first)
 					{
@@ -167,7 +164,7 @@ namespace Aseba
 		delete message;
 	}
 
-	void Switch::connectionClosed(Stream *stream, bool abnormal)
+	void Switch::connectionClosed(Stream* stream, bool abnormal)
 	{
 #ifdef ZEROCONF_SUPPORT
 		if (zeroconf.isStreamHandled(stream))
@@ -181,7 +178,8 @@ namespace Aseba
 		{
 			dumpTime(cout, rawTime);
 			if (abnormal)
-				cout << "* Abnormal connection closed to " << stream->getTargetName() << " : " << stream->getFailReason() << endl;
+				cout << "* Abnormal connection closed to " << stream->getTargetName() << " : "
+					 << stream->getFailReason() << endl;
 			else
 				cout << "* Normal connection closed to " << stream->getTargetName() << endl;
 		}
@@ -192,7 +190,7 @@ namespace Aseba
 		Aseba::UserMessage uMsg;
 		uMsg.type = 0;
 		//for (int i = 0; i < 80; i++)
-		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
+		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end(); ++it)
 		{
 			uMsg.serialize(*it);
 			(*it)->flush();
@@ -208,7 +206,7 @@ namespace Aseba
 };
 
 //! Show usage
-void dumpHelp(std::ostream &stream, const char *programName)
+void dumpHelp(std::ostream& stream, const char* programName)
 {
 	stream << "Aseba switch, connects aseba components together, usage:\n";
 	stream << programName << " [options] [additional targets]*\n";
@@ -226,14 +224,14 @@ void dumpHelp(std::ostream &stream, const char *programName)
 }
 
 //! Show version
-void dumpVersion(std::ostream &stream)
+void dumpVersion(std::ostream& stream)
 {
 	stream << "Aseba switch " << ASEBA_VERSION << std::endl;
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Dashel::initPlugins();
 	unsigned port = ASEBA_DEFAULT_PORT;
@@ -248,7 +246,7 @@ int main(int argc, char *argv[])
 
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter];
+		const char* arg = argv[argCounter];
 
 		if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
 		{
@@ -322,7 +320,8 @@ int main(int argc, char *argv[])
 			{
 				aswitch.remapId(stream, uint16_t(remappedLocalId), uint16_t(remappedTargetId));
 				if (verbose)
-					std::cout << "* Remapping local " << remappedLocalId << " with remote " << remappedTargetId << std::endl;
+					std::cout << "* Remapping local " << remappedLocalId << " with remote " << remappedTargetId
+							  << std::endl;
 			}
 		}
 		/*
@@ -333,17 +332,17 @@ int main(int argc, char *argv[])
 			aswitch.broadcastDummyUserMessage();
 		}*/
 #ifdef ZEROCONF_SUPPORT
-		while(aswitch.zeroconf.dashelStep(-1));
+		while (aswitch.zeroconf.dashelStep(-1))
+			;
 #else // ZEROCONF_SUPPORT
-		while(aswitch.step(-1));
+		while (aswitch.step(-1))
+			;
 #endif // ZEROCONF_SUPPORT
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
 
 	return 0;
 }
-
-

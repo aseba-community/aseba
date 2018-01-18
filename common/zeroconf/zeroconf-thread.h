@@ -54,13 +54,15 @@ namespace Aseba
 	private:
 		// all the requests we are handling
 		std::unordered_set<DNSServiceRef> serviceRefs; //!< service references to wait for activity using select
-		std::unordered_set<DNSServiceRef> pendingReleaseServiceRefs; //!< service references to be released once select exits
+		std::unordered_set<DNSServiceRef>
+			pendingReleaseServiceRefs; //!< service references to be released once select exits
 		// threading support
-		std::atomic_bool running{true}; //!< are we watching for DNS service updates?
+		std::atomic_bool running{ true }; //!< are we watching for DNS service updates?
 		std::recursive_mutex watcherLock; //!< the lock for accessing zeroconfDRs
-		std::exception_ptr watcherException{nullptr}; //!< pointer to rethrow exceptions in the outer thread
-		std::thread watcher{&ThreadZeroconf::handleDnsServiceEvents, this}; //!< thread in which select loop occurs
-		std::condition_variable_any threadWait; //!< notify that either the serviceRefs array has at least one element or that we should stop
+		std::exception_ptr watcherException{ nullptr }; //!< pointer to rethrow exceptions in the outer thread
+		std::thread watcher{ &ThreadZeroconf::handleDnsServiceEvents, this }; //!< thread in which select loop occurs
+		std::condition_variable_any
+			threadWait; //!< notify that either the serviceRefs array has at least one element or that we should stop
 	};
 }
 

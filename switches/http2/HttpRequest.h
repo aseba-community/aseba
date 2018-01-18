@@ -26,11 +26,13 @@
 #include <vector>
 #include <dashel/dashel.h>
 
-namespace Aseba { namespace Http
+namespace Aseba
 {
-	class HttpResponse; // forward declaration
+	namespace Http
+	{
+		class HttpResponse; // forward declaration
 
-	/**
+		/**
 	 * Represents HTTP requests being parsed and responded to.
 	 *
 	 * Incoming requests start out without a HTTP response and are stalled in the HTTP interface
@@ -38,8 +40,8 @@ namespace Aseba { namespace Http
 	 * can have only one response, calling respond() repeatedly will simply return a reference
 	 * to the same response, which makes it very easy to add things like multiple output headers.
 	 */
-	class HttpRequest
-	{
+		class HttpRequest
+		{
 		public:
 			static const int CONTENT_BYTES_LIMIT = 40000;
 
@@ -74,12 +76,16 @@ namespace Aseba { namespace Http
 			virtual const std::map<std::string, std::string>& getHeaders() const { return headers; }
 			virtual const std::string& getContent() const { return content; }
 
-			std::string getHeader(const std::string& header) const {
+			std::string getHeader(const std::string& header) const
+			{
 				std::map<std::string, std::string>::const_iterator query = headers.find(header);
 
-				if(query != headers.end()) {
+				if (query != headers.end())
+				{
 					return query->second;
-				} else {
+				}
+				else
+				{
 					return "";
 				}
 			}
@@ -89,15 +95,15 @@ namespace Aseba { namespace Http
 			virtual bool readHeaders();
 			virtual bool readContent();
 
-			virtual HttpResponse *createResponse() = 0;
+			virtual HttpResponse* createResponse() = 0;
 
 			virtual std::string readLine() = 0;
-			virtual void readRaw(char *buffer, int size) = 0;
+			virtual void readRaw(char* buffer, int size) = 0;
 
 		private:
 			static std::string trim(const std::string& s)
 			{
-				static const char *whitespaceChars = "\n\r\t ";
+				static const char* whitespaceChars = "\n\r\t ";
 				std::string::size_type start = s.find_first_not_of(whitespaceChars);
 				std::string::size_type end = s.find_last_not_of(whitespaceChars);
 
@@ -107,7 +113,7 @@ namespace Aseba { namespace Http
 			bool verbose;
 			bool valid;
 			bool blocking;
-			HttpResponse *response;
+			HttpResponse* response;
 
 			std::string method;
 			std::string uri;
@@ -115,25 +121,26 @@ namespace Aseba { namespace Http
 			std::vector<std::string> tokens;
 			std::map<std::string, std::string> headers;
 			std::string content;
-	};
+		};
 
-	class DashelHttpRequest : public HttpRequest
-	{
+		class DashelHttpRequest : public HttpRequest
+		{
 		public:
-    		DashelHttpRequest(Dashel::Stream *stream);
+			DashelHttpRequest(Dashel::Stream* stream);
 			virtual ~DashelHttpRequest();
 
-			virtual Dashel::Stream *getStream() { return stream; }
+			virtual Dashel::Stream* getStream() { return stream; }
 
 		protected:
-			virtual HttpResponse *createResponse();
+			virtual HttpResponse* createResponse();
 
 			virtual std::string readLine();
-			virtual void readRaw(char *buffer, int size);
+			virtual void readRaw(char* buffer, int size);
 
 		private:
-			Dashel::Stream *stream;
-	};
-} }
+			Dashel::Stream* stream;
+		};
+	}
+}
 
 #endif

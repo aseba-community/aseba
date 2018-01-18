@@ -27,20 +27,21 @@ namespace Aseba
 	DBusInterface::DBusInterface() :
 		bus(QDBusConnection::sessionBus()),
 		callbacks({}),
-		dbusMainInterface("ch.epfl.mobots.Aseba", "/", "ch.epfl.mobots.AsebaNetwork",bus)
+		dbusMainInterface("ch.epfl.mobots.Aseba", "/", "ch.epfl.mobots.AsebaNetwork", bus)
 	{
 		checkConnection();
 
 		// setup event filter
 		QDBusMessage eventfilterMessage = dbusMainInterface.call("CreateEventFilter");
 		QDBusObjectPath eventfilterPath = eventfilterMessage.arguments().at(0).value<QDBusObjectPath>();
-		eventfilterInterface = new QDBusInterface("ch.epfl.mobots.Aseba", eventfilterPath.path(), "ch.epfl.mobots.EventFilter",bus);
-		if(!bus.connect("ch.epfl.mobots.Aseba",
-						eventfilterPath.path(),
-						"ch.epfl.mobots.EventFilter",
-						"Event",
-						this,
-						SLOT(dispatchEvent(const QDBusMessage&))))
+		eventfilterInterface =
+			new QDBusInterface("ch.epfl.mobots.Aseba", eventfilterPath.path(), "ch.epfl.mobots.EventFilter", bus);
+		if (!bus.connect("ch.epfl.mobots.Aseba",
+				eventfilterPath.path(),
+				"ch.epfl.mobots.EventFilter",
+				"Event",
+				this,
+				SLOT(dispatchEvent(const QDBusMessage&))))
 		{
 			qDebug() << "failed to connect eventfilter signal to dispatchEvent slot!";
 		}
@@ -70,10 +71,10 @@ namespace Aseba
 	std::string DBusInterface::toString(const Values& v)
 	{
 		std::string out = "[";
-		for (int i=0;i<v.size();i++)
+		for (int i = 0; i < v.size(); i++)
 		{
 			out += std::to_string(v[i]);
-			if(i <(v.size()-1))
+			if (i < (v.size() - 1))
 			{
 				out += ",";
 			}
@@ -87,19 +88,20 @@ namespace Aseba
 	{
 		if (!QDBusConnection::sessionBus().isConnected())
 		{
-			fprintf(stderr, "Cannot connect to the D-Bus session bus.\n"
-							"To start it, run:\n"
-							"\teval `dbus-launch --auto-syntax`\n");
+			fprintf(stderr,
+				"Cannot connect to the D-Bus session bus.\n"
+				"To start it, run:\n"
+				"\teval `dbus-launch --auto-syntax`\n");
 			qDebug() << "error";
 			return false;
 		}
 		qDebug() << "You are connected to the D-Bus session bus";
 
-		QDBusMessage nodelist=dbusMainInterface.call("GetNodesList");
+		QDBusMessage nodelist = dbusMainInterface.call("GetNodesList");
 
-		for (int i=0;i<nodelist.arguments().size();++i)
+		for (int i = 0; i < nodelist.arguments().size(); ++i)
 		{
-			nodeList<<nodelist.arguments().at(i).value<QString>();
+			nodeList << nodelist.arguments().at(i).value<QString>();
 		}
 
 		displayNodeList();
@@ -123,27 +125,27 @@ namespace Aseba
 		QFileInfo fi(script);
 		// include absolute path
 		QString path_to_script = fi.absoluteFilePath();
-		if(!file.exists())
+		if (!file.exists())
 		{
 			qDebug() << "Cannot find file: " << path_to_script << ".";
 		}
 		else
 		{
 			// load the script
-			dbusMainInterface.call("LoadScripts",path_to_script);
+			dbusMainInterface.call("LoadScripts", path_to_script);
 		}
 	}
 
 	//Get an Aseba variable from a Aseba node
 	Values DBusInterface::getVariable(const QString& node, const QString& variable)
 	{
-		return dBusMessagetoValues(dbusMainInterface.call( "GetVariable",node, variable),0);
+		return dBusMessagetoValues(dbusMainInterface.call("GetVariable", node, variable), 0);
 	}
 
 	//Set an Aseba variable from a Aseba node
 	void DBusInterface::setVariable(const QString& node, const QString& variable, const Values& value)
 	{
-		dbusMainInterface.call("SetVariable",node,variable,valuetoVariant(value));
+		dbusMainInterface.call("SetVariable", node, variable, valuetoVariant(value));
 	}
 
 	// Flag an event to listen for, and associate callback function (passed by pointer)
@@ -160,26 +162,26 @@ namespace Aseba
 	void DBusInterface::sendEvent(uint16_t eventID, const Values& value)
 	{
 		QDBusArgument argument;
-		argument<<eventID;
+		argument << eventID;
 		QVariant variant;
 		variant.setValue(argument);
-		dbusMainInterface.call("SendEvent",variant,valuetoVariant(value));
+		dbusMainInterface.call("SendEvent", variant, valuetoVariant(value));
 	}
 
 	//Send Aseba Event using the name of the Event
 	void DBusInterface::sendEventName(const QString& eventName, const Values& value)
 	{
-		dbusMainInterface.call("SendEventName",eventName,valuetoVariant(value));
+		dbusMainInterface.call("SendEventName", eventName, valuetoVariant(value));
 	}
 
 	//Callback (slot) used to retrieve subscribed event information
 	void DBusInterface::dispatchEvent(const QDBusMessage& message)
 	{
 		// unpack event
-		QString eventReceivedName= message.arguments().at(1).value<QString>();
-		Values eventReceivedValues = dBusMessagetoValues(message,2);
+		QString eventReceivedName = message.arguments().at(1).value<QString>();
+		Values eventReceivedValues = dBusMessagetoValues(message, 2);
 		// find and trigger matching callback
-		if( callbacks.count(eventReceivedName) > 0)
+		if (callbacks.count(eventReceivedName) > 0)
 		{
 			callbacks[eventReceivedName](eventReceivedValues);
 		}

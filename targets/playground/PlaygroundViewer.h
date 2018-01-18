@@ -70,7 +70,7 @@ namespace Enki
 		void renderObjectsTypesHook() override;
 		void sceneCompletedHook() override;
 		void mouseMoveEvent(QMouseEvent*) override;
-		void timerEvent(QTimerEvent * event) override;
+		void timerEvent(QTimerEvent* event) override;
 
 		void helpActivated() override;
 
@@ -78,7 +78,8 @@ namespace Enki
 		friend class PlaygroundSimulatorEnvironment;
 		friend class EnkiWorldInterface;
 		World* getWorld() const;
-		void notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments);
+		void notifyAsebaEnvironment(
+			const EnvironmentNotificationType type, const std::string& description, const strings& arguments);
 	};
 }
 

@@ -48,11 +48,9 @@ namespace Aseba
 		void flashSettings();
 		void togglePairingMode();
 		void quit();
-
 	};
 
 	/*@}*/
 } // namespace Aseba
 
 #endif // THYMIO_WNET_CONFIG_H
-

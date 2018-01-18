@@ -25,7 +25,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	void ClickableLabel::mouseReleaseEvent(QMouseEvent * event)
+	void ClickableLabel::mouseReleaseEvent(QMouseEvent* event)
 	{
 		QLabel::mouseReleaseEvent(event);
 		emit clicked();

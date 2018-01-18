@@ -55,10 +55,12 @@ namespace Aseba
 		};
 
 		//! Constructor
-		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
+		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) {}
+
 	protected:
 		// default copy-constructor, protected because we only want children to use it in their override of shallowCopy()
 		Node(const Node&) = default;
+
 	public:
 		// deleted assignment operator
 		Node& operator=(const Node&) = delete;
@@ -77,7 +79,7 @@ namespace Aseba
 		//! Second pass to expand "abstract" nodes into more concrete ones
 		virtual Node* expandAbstractNodes(std::wostream* dump);
 		//! Third pass to expand vectorial operations into mutliple scalar ones
-		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0);
+		virtual Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0);
 		//! Typecheck this node, throw an exception if there is any type violation
 		virtual ReturnType typeCheck(Compiler* compiler);
 		//! Optimize this node, return the optimized node
@@ -107,7 +109,7 @@ namespace Aseba
 		virtual unsigned getVectorSize() const;
 
 		//! Vector for children of a node
-		using NodesVector = std::vector<Node *>;
+		using NodesVector = std::vector<Node*>;
 		NodesVector children; //!< children of this node
 		SourcePos sourcePos; //!< position is source
 	};
@@ -116,7 +118,7 @@ namespace Aseba
 	struct BlockNode : Node
 	{
 		//! Constructor
-		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		BlockNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		BlockNode* shallowCopy() const override { return new BlockNode(*this); }
 
 		Node* optimize(std::wostream* dump) override;
@@ -126,13 +128,13 @@ namespace Aseba
 	};
 
 	//! Node for L"program", i.e. a block node with some special behaviour later on
-	struct ProgramNode: BlockNode
+	struct ProgramNode : BlockNode
 	{
 		//! Constructor
-		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) { }
+		ProgramNode(const SourcePos& sourcePos) : BlockNode(sourcePos) {}
 		ProgramNode* shallowCopy() const override { return new ProgramNode(*this); }
 
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override { return L"ProgramBlock"; }
 		std::wstring toNodeName() const override { return L"program block"; }
@@ -144,12 +146,12 @@ namespace Aseba
 	struct AssignmentNode : Node
 	{
 		//! Constructor
-		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		AssignmentNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		AssignmentNode(const SourcePos& sourcePos, Node* left, Node* right);
 		AssignmentNode* shallowCopy() const override { return new AssignmentNode(*this); }
 
 		void checkVectorSize() const override;
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override;
 		ReturnType typeCheck(Compiler* compiler) override;
 		Node* optimize(std::wostream* dump) override;
 		void emit(PreLinkBytecode& bytecodes) const override;
@@ -163,11 +165,12 @@ namespace Aseba
 	//! children[2] is false block
 	struct IfWhenNode : Node
 	{
-		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
+		bool
+			edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		unsigned endLine; //!< line of end keyword
 
 		//! Constructor
-		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		IfWhenNode* shallowCopy() const override { return new IfWhenNode(*this); }
 
 		void checkVectorSize() const override;
@@ -186,11 +189,12 @@ namespace Aseba
 	struct FoldedIfWhenNode : Node
 	{
 		AsebaBinaryOperator op; //!< operator
-		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
+		bool
+			edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		unsigned endLine; //!< line of end keyword
 
 		//! Constructor
-		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		FoldedIfWhenNode* shallowCopy() const override { return new FoldedIfWhenNode(*this); }
 
 		void checkVectorSize() const override;
@@ -207,7 +211,7 @@ namespace Aseba
 	struct WhileNode : Node
 	{
 		//! Constructor
-		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		WhileNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		WhileNode* shallowCopy() const override { return new WhileNode(*this); }
 
 		void checkVectorSize() const override;
@@ -227,7 +231,7 @@ namespace Aseba
 		AsebaBinaryOperator op; //!< operator
 
 		//! Constructor
-		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
+		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) {}
 		FoldedWhileNode* shallowCopy() const override { return new FoldedWhileNode(*this); }
 
 		void checkVectorSize() const override;
@@ -263,7 +267,7 @@ namespace Aseba
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument
 
 		//! Constructor
-		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
+		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) {}
 		EmitNode* shallowCopy() const override { return new EmitNode(*this); }
 
 		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
@@ -296,7 +300,7 @@ namespace Aseba
 		std::wstring subroutineName; //!< the subroutine to call
 		unsigned subroutineId;
 
-		CallSubNode(const SourcePos& sourcePos, std::wstring  subroutineName);
+		CallSubNode(const SourcePos& sourcePos, std::wstring subroutineName);
 		CallSubNode* shallowCopy() const override { return new CallSubNode(*this); }
 
 		ReturnType typeCheck(Compiler* compiler) override;
@@ -313,8 +317,8 @@ namespace Aseba
 	{
 		AsebaBinaryOperator op; //!< operator
 
-		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
+		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node* left, Node* right);
 		BinaryArithmeticNode* shallowCopy() const override { return new BinaryArithmeticNode(*this); }
 
 		void deMorganNotRemoval();
@@ -326,11 +330,16 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"binary function"; }
 
-		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
-		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
-		static BinaryArithmeticNode *fromAddExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
-		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
-		static BinaryArithmeticNode *fromBinaryExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
+		static BinaryArithmeticNode* fromComparison(
+			const SourcePos& sourcePos, Compiler::Token::Type op, Node* left, Node* right);
+		static BinaryArithmeticNode* fromShiftExpression(
+			const SourcePos& sourcePos, Compiler::Token::Type op, Node* left, Node* right);
+		static BinaryArithmeticNode* fromAddExpression(
+			const SourcePos& sourcePos, Compiler::Token::Type op, Node* left, Node* right);
+		static BinaryArithmeticNode* fromMultExpression(
+			const SourcePos& sourcePos, Compiler::Token::Type op, Node* left, Node* right);
+		static BinaryArithmeticNode* fromBinaryExpression(
+			const SourcePos& sourcePos, Compiler::Token::Type op, Node* left, Node* right);
 	};
 
 	//! Node for unary arithmetic
@@ -340,8 +349,8 @@ namespace Aseba
 		AsebaUnaryOperator op; //!< operator
 
 		//! Constructor
-		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
-		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
+		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) {}
+		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node* child);
 		UnaryArithmeticNode* shallowCopy() const override { return new UnaryArithmeticNode(*this); }
 
 		ReturnType typeCheck(Compiler* compiler) override;
@@ -360,10 +369,10 @@ namespace Aseba
 		int value; //!< value to push on stack
 
 		//! Constructor
-		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
+		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) {}
 		ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
 
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override;
 		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
@@ -381,7 +390,7 @@ namespace Aseba
 		unsigned varAddr; //!< address of variable to store to
 
 		//! Constructor
-		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
+		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) {}
 		StoreNode* shallowCopy() const override { return new StoreNode(*this); }
 
 		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::UNIT; }
@@ -401,7 +410,7 @@ namespace Aseba
 		unsigned varAddr; //!< address of variable to load from
 
 		//! Constructor
-		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
+		LoadNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) {}
 		LoadNode* shallowCopy() const override { return new LoadNode(*this); }
 
 		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
@@ -535,11 +544,14 @@ namespace Aseba
 	{
 		//! Constructor
 		TupleVectorNode(const SourcePos& sourcePos) : AbstractTreeNode(sourcePos) {}
-		TupleVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos) { children.push_back(new ImmediateNode(sourcePos, value)); }
+		TupleVectorNode(const SourcePos& sourcePos, int value) : AbstractTreeNode(sourcePos)
+		{
+			children.push_back(new ImmediateNode(sourcePos, value));
+		}
 		TupleVectorNode* shallowCopy() const override { return new TupleVectorNode(*this); }
 
 		Node* expandAbstractNodes(std::wostream* dump) override;
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override;
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"array of constants"; }
 		void dump(std::wostream& dest, unsigned& indent) const override;
@@ -570,7 +582,7 @@ namespace Aseba
 		MemoryVectorNode* shallowCopy() const override { return new MemoryVectorNode(*this); }
 
 		Node* expandAbstractNodes(std::wostream* dump) override;
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override;
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override;
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"vector access"; }
 
@@ -590,16 +602,20 @@ namespace Aseba
 		AsebaBinaryOperator op; //!< operator
 
 		//! Constructor
-		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
+		ArithmeticAssignmentNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node* left, Node* right);
 		ArithmeticAssignmentNode* shallowCopy() const override { return new ArithmeticAssignmentNode(*this); }
 
 		void checkVectorSize() const override;
 		Node* expandAbstractNodes(std::wostream* dump) override;
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override { abort(); } // should not happen
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override
+		{
+			abort();
+		} // should not happen
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"arithmetic assignment"; }
 
-		static ArithmeticAssignmentNode* fromArithmeticAssignmentToken(const SourcePos& sourcePos, Compiler::Token::Type token, Node *left, Node *right);
+		static ArithmeticAssignmentNode* fromArithmeticAssignmentToken(
+			const SourcePos& sourcePos, Compiler::Token::Type token, Node* left, Node* right);
 
 	protected:
 		const static AsebaBinaryOperator operatorMap[];
@@ -614,11 +630,14 @@ namespace Aseba
 		AsebaBinaryOperator arithmeticOp; //!< operator
 
 		//! Constructor
-		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node *memory);
+		UnaryArithmeticAssignmentNode(const SourcePos& sourcePos, Compiler::Token::Type token, Node* memory);
 		UnaryArithmeticAssignmentNode* shallowCopy() const override { return new UnaryArithmeticAssignmentNode(*this); }
 
 		Node* expandAbstractNodes(std::wostream* dump) override;
-		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler=nullptr, unsigned int index = 0) override { abort(); } // should not happen
+		Node* expandVectorialNodes(std::wostream* dump, Compiler* compiler = nullptr, unsigned int index = 0) override
+		{
+			abort();
+		} // should not happen
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"unary arithmetic assignment"; }
 	};

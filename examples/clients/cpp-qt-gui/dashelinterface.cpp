@@ -27,14 +27,9 @@
 #include <QDebug>
 
 
-DashelInterface::DashelInterface() :
-	stream(0), isRunning(false), isConnected(false)
-{
-}
+DashelInterface::DashelInterface() : stream(0), isRunning(false), isConnected(false) {}
 
-DashelInterface::~DashelInterface()
-{
-}
+DashelInterface::~DashelInterface() {}
 
 // Connect to any kind of valid Dashel target (TCP, serial, CAN,...)
 void DashelInterface::connectAseba(const QString& dashelTarget)
@@ -60,10 +55,10 @@ void DashelInterface::disconnectAseba()
 
 // Message coming from a node.
 // Consider _only_ UserMessage. Discard other types of messages (debug, etc.)
-void DashelInterface::incomingData(Dashel::Stream *stream)
+void DashelInterface::incomingData(Dashel::Stream* stream)
 {
-	Aseba::Message *message = Aseba::Message::receive(stream);
-	Aseba::UserMessage *userMessage = dynamic_cast<Aseba::UserMessage *>(message);
+	Aseba::Message* message = Aseba::Message::receive(stream);
+	Aseba::UserMessage* userMessage = dynamic_cast<Aseba::UserMessage*>(message);
 
 	if (userMessage)
 		emit messageAvailable(userMessage);
@@ -89,10 +84,10 @@ void DashelInterface::sendEvent(unsigned id, const QVector<int>& values)
 // Dashel connection was closed
 void DashelInterface::connectionClosed(Dashel::Stream* stream, bool abnormal)
 {
-		Q_UNUSED(stream);
-		Q_UNUSED(abnormal);
-		emit dashelDisconnection();
-		this->stream = 0;
+	Q_UNUSED(stream);
+	Q_UNUSED(abnormal);
+	emit dashelDisconnection();
+	this->stream = 0;
 }
 
 // internals
@@ -112,12 +107,10 @@ void DashelInterface::run()
 		catch (Dashel::DashelException e)
 		{
 			qDebug() << "Cannot connect to target: " << dashelParams;
-			sleep(1000000L);	// 1s
+			sleep(1000000L); // 1s
 		}
-
 	}
 
 	while (isRunning)
 		Dashel::Hub::run();
 }
-

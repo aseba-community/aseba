@@ -34,11 +34,11 @@ class QGroupBox;
 
 namespace Aseba
 {
-	class FindDialog: public QDialog
+	class FindDialog : public QDialog
 	{
-		 Q_OBJECT
+		Q_OBJECT
 	public:
-		FindDialog(QWidget *parent = 0, QTextEdit* editor = 0);
+		FindDialog(QWidget* parent = 0, QTextEdit* editor = 0);
 		void setFindText(const QString& text);
 
 	protected slots:
@@ -58,25 +58,25 @@ namespace Aseba
 		QGroupBox* replaceGroupBox;
 
 	protected:
-		QLineEdit *findLineEdit;
-		QLineEdit *replaceLineEdit;
+		QLineEdit* findLineEdit;
+		QLineEdit* replaceLineEdit;
 
 		// options
-		QCheckBox *caseCheckBox;
-		QCheckBox *wholeWordsCheckBox;
-		QCheckBox *regularExpressionsCheckBox;
+		QCheckBox* caseCheckBox;
+		QCheckBox* wholeWordsCheckBox;
+		QCheckBox* regularExpressionsCheckBox;
 
 		// type of search
-		QPushButton *findNextButton;
-		QPushButton *findPreviousButton;
-		QPushButton *findFromTopButton;
-		QPushButton *replaceFindNextButton;
-		QPushButton *replaceFindPreviousButton;
-		QPushButton *replaceAllButton;
+		QPushButton* findNextButton;
+		QPushButton* findPreviousButton;
+		QPushButton* findFromTopButton;
+		QPushButton* replaceFindNextButton;
+		QPushButton* replaceFindPreviousButton;
+		QPushButton* replaceAllButton;
 		//QPushButton *findFromTopButton;
 
 		// warning lineEdit
-		QLabel *warningText;
+		QLabel* warningText;
 	};
 }
 

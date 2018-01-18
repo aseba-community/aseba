@@ -44,7 +44,7 @@ namespace Aseba
 	class VariableListener
 	{
 	protected:
-		TargetVariablesModel *variablesModel;
+		TargetVariablesModel* variablesModel;
 
 	public:
 		VariableListener(TargetVariablesModel* variablesModel);
@@ -61,7 +61,7 @@ namespace Aseba
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values) = 0;
 	};
 
-	class TargetVariablesModel: public QAbstractItemModel
+	class TargetVariablesModel : public QAbstractItemModel
 	{
 		Q_OBJECT
 
@@ -77,24 +77,24 @@ namespace Aseba
 		};
 
 	public:
-		TargetVariablesModel(QObject *parent = 0);
+		TargetVariablesModel(QObject* parent = 0);
 		virtual ~TargetVariablesModel();
 
 		Qt::DropActions supportedDropActions() const;
 
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
-		QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-		QModelIndex parent(const QModelIndex &index) const;
+		int rowCount(const QModelIndex& parent = QModelIndex()) const;
+		int columnCount(const QModelIndex& parent = QModelIndex()) const;
+		QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+		QModelIndex parent(const QModelIndex& index) const;
 
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
+		Qt::ItemFlags flags(const QModelIndex& index) const;
 
-		bool setData(const QModelIndex &index, const QVariant &value, int role);
+		bool setData(const QModelIndex& index, const QVariant& value, int role);
 
-		QStringList mimeTypes () const;
-		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
+		QStringList mimeTypes() const;
+		QMimeData* mimeData(const QModelIndexList& indexes) const;
 
 		const QList<Variable>& getVariables() const { return variables; }
 		unsigned getVariablePos(const QString& name) const;
@@ -102,13 +102,13 @@ namespace Aseba
 		VariablesDataVector getVariableValue(const QString& name) const;
 
 	public slots:
-		void updateVariablesStructure(const VariablesMap *variablesMap);
-		void setVariablesData(unsigned start, const VariablesDataVector &data);
+		void updateVariablesStructure(const VariablesMap* variablesMap);
+		void setVariablesData(unsigned start, const VariablesDataVector& data);
 		bool setVariableValues(const QString& name, const VariablesDataVector& values);
 
 	signals:
 		//! Emitted on setData, when the user change the data, not when nodes have sent updated variables
-		void variableValuesChanged(unsigned index, const VariablesDataVector &values);
+		void variableValuesChanged(unsigned index, const VariablesDataVector& values);
 
 	private:
 		friend class VariableListener;
@@ -131,7 +131,7 @@ namespace Aseba
 		VariableListenersNameMap variableListenersMap;
 	};
 
-	class TargetFunctionsModel: public QAbstractItemModel
+	class TargetFunctionsModel : public QAbstractItemModel
 	{
 		Q_OBJECT
 
@@ -139,23 +139,23 @@ namespace Aseba
 		struct TreeItem;
 
 	public:
-		TargetFunctionsModel(const TargetDescription *descriptionRead, bool showHidden, QObject *parent = 0);
+		TargetFunctionsModel(const TargetDescription* descriptionRead, bool showHidden, QObject* parent = 0);
 		~TargetFunctionsModel();
 
 		Qt::DropActions supportedDropActions() const;
 
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		int rowCount(const QModelIndex& parent = QModelIndex()) const;
+		int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
-		QModelIndex parent(const QModelIndex &index) const;
-		QModelIndex index(int row, int column, const QModelIndex &parent) const;
+		QModelIndex parent(const QModelIndex& index) const;
+		QModelIndex index(int row, int column, const QModelIndex& parent) const;
 
-		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		Qt::ItemFlags flags(const QModelIndex & index) const;
+		Qt::ItemFlags flags(const QModelIndex& index) const;
 
-		QStringList mimeTypes () const;
-		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
+		QStringList mimeTypes() const;
+		QMimeData* mimeData(const QModelIndexList& indexes) const;
 
 	public slots:
 		void recreateTreeFromDescription(bool showHidden);
@@ -163,18 +163,18 @@ namespace Aseba
 	private:
 		friend class AeslEditor;
 		friend class StudioAeslEditor;
-		TreeItem *getItem(const QModelIndex &index) const;
+		TreeItem* getItem(const QModelIndex& index) const;
 		QString getToolTip(const TargetDescription::NativeFunction& function) const;
 
 		TreeItem* root; //!< root of functions description tree
-		const TargetDescription *descriptionRead; //!< description for read access
+		const TargetDescription* descriptionRead; //!< description for read access
 		QRegExp regExp;
 	};
 
-	class TargetSubroutinesModel: public QStringListModel
+	class TargetSubroutinesModel : public QStringListModel
 	{
 	public:
-		TargetSubroutinesModel(QObject * parent = 0);
+		TargetSubroutinesModel(QObject* parent = 0);
 
 		void updateSubroutineTable(const Compiler::SubroutineTable& subroutineTable);
 	};

@@ -29,8 +29,8 @@
 
 namespace Aseba
 {
-	#ifdef ANDROID
-	long int wcstol_fix( const wchar_t * str, wchar_t ** endptr, int base )
+#ifdef ANDROID
+	long int wcstol_fix(const wchar_t* str, wchar_t** endptr, int base)
 	{
 		long int v(0);
 		while (*str)
@@ -42,32 +42,31 @@ namespace Aseba
 			}
 			else
 			{
-				const long int maskedVal(str[0] & (~(1<<5)));
+				const long int maskedVal(str[0] & (~(1 << 5)));
 				v += (maskedVal - 'A') + 10;
 			}
 			++str;
 		}
 		return v;
 	}
-	#define wcstol wcstol_fix
-	#endif // ANDROID
+#	define wcstol wcstol_fix
+#endif // ANDROID
 
 	//! Construct a new token of given type and value
-	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) :
-		type(type),
-		sValue(value),
-		pos(pos)
+	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) : type(type), sValue(value), pos(pos)
 	{
 		if (type == TOKEN_INT_LITERAL)
 		{
 			long int decode;
 			bool wasUnsigned = false;
 			// all values are assumed to be signed 16-bits
-			if ((value.length() > 1) && (value[1] == 'x')) {
+			if ((value.length() > 1) && (value[1] == 'x'))
+			{
 				decode = wcstol(value.c_str() + 2, nullptr, 16);
 				wasUnsigned = true;
 			}
-			else if ((value.length() > 1) && (value[1] == 'b')) {
+			else if ((value.length() > 1) && (value[1] == 'b'))
+			{
 				decode = wcstol(value.c_str() + 2, nullptr, 2);
 				wasUnsigned = true;
 			}
@@ -196,7 +195,10 @@ namespace Aseba
 				case ' ': break;
 				//case '\t': pos.column += tabSize - 1; break;
 				case '\t': break;
-				case '\n': pos.row++; pos.column = -1; break; // -1 so next call to pos.column++ result set 0
+				case '\n':
+					pos.row++;
+					pos.column = -1;
+					break; // -1 so next call to pos.column++ result set 0
 				case '\r': pos.column = -1; break; // -1 so next call to pos.column++ result set 0
 				case '(': tokens.emplace_back(Token::TOKEN_PAR_OPEN, pos); break;
 				case ')': tokens.emplace_back(Token::TOKEN_PAR_CLOSE, pos); break;
@@ -317,9 +319,7 @@ namespace Aseba
 					tokens.emplace_back(Token::TOKEN_OP_BIT_AND, pos);
 					break;
 
-				case '~':
-					tokens.emplace_back(Token::TOKEN_OP_BIT_NOT, pos);
-					break;
+				case '~': tokens.emplace_back(Token::TOKEN_OP_BIT_NOT, pos); break;
 
 				case '!':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_NOT_EQUAL))
@@ -407,7 +407,6 @@ namespace Aseba
 							}
 							else
 								throw TranslatableError(pos, ERROR_NUMBER_INVALID_BASE);
-
 						}
 						else
 						{
@@ -484,14 +483,14 @@ namespace Aseba
 		tokens.emplace_back(Token::TOKEN_END_OF_STREAM, pos);
 	}
 
-	wchar_t Compiler::getNextCharacter(std::wistream &source, SourcePos &pos)
+	wchar_t Compiler::getNextCharacter(std::wistream& source, SourcePos& pos)
 	{
 		pos.column++;
 		pos.character++;
 		return source.get();
 	}
 
-	bool Compiler::testNextCharacter(std::wistream &source, SourcePos &pos, wchar_t test, Token::Type tokenIfTrue)
+	bool Compiler::testNextCharacter(std::wistream& source, SourcePos& pos, wchar_t test, Token::Type tokenIfTrue)
 	{
 		if ((int)source.peek() == int(test))
 		{
@@ -503,9 +502,9 @@ namespace Aseba
 	}
 
 	//! Debug print of tokens
-	void Compiler::dumpTokens(std::wostream &dest) const
+	void Compiler::dumpTokens(std::wostream& dest) const
 	{
-		for (const auto & token : tokens)
+		for (const auto& token : tokens)
 			dest << token.toWString() << std::endl;
 	}
 

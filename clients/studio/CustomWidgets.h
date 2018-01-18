@@ -29,11 +29,11 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	class DraggableListWidget: public QListWidget
+	class DraggableListWidget : public QListWidget
 	{
 	protected:
-		virtual QStringList mimeTypes () const;
-		virtual QMimeData * mimeData ( const QList<QListWidgetItem *> items ) const;
+		virtual QStringList mimeTypes() const;
+		virtual QMimeData* mimeData(const QList<QListWidgetItem*> items) const;
 	};
 
 	class FixedWidthTableView : public QTableView
@@ -46,12 +46,12 @@ namespace Aseba
 		void setSecondColumnLongestContent(const QString& content);
 
 	protected:
-		virtual void resizeEvent ( QResizeEvent * event );
+		virtual void resizeEvent(QResizeEvent* event);
 
 		void startDrag(Qt::DropActions supportedActions);
-		void dragEnterEvent(QDragEnterEvent *event);
-		void dragMoveEvent(QDragMoveEvent *event);
-		void dropEvent(QDropEvent *event);
+		void dragEnterEvent(QDragEnterEvent* event);
+		void dragMoveEvent(QDragMoveEvent* event);
+		void dropEvent(QDropEvent* event);
 
 		QPixmap getDragPixmap(QString text);
 		bool modelMatchMimeFormat(QStringList candidates);

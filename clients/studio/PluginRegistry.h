@@ -58,7 +58,7 @@ namespace Aseba
 
 		void update(const QString& name, NodeTab* node, NodeToolInterfaces& tools) const;
 
-		void dump(std::ostream &stream);
+		void dump(std::ostream& stream);
 
 	protected:
 		typedef QPair<CreatorFunc, QString> CreatorFuncNamePair;
@@ -68,7 +68,7 @@ namespace Aseba
 		NamedCreatorMap namedCreators;
 	};
 
-	struct NodeToolRegistrer: NodeToolRegistrar
+	struct NodeToolRegistrer : NodeToolRegistrar
 	{
 		NodeToolRegistrer();
 	};

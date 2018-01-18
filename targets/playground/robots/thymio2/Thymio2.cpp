@@ -30,7 +30,7 @@ namespace Enki
 	using namespace std;
 	using namespace Aseba;
 
-	AsebaThymio2::AsebaThymio2(std::string robotName, int16_t nodeId):
+	AsebaThymio2::AsebaThymio2(std::string robotName, int16_t nodeId) :
 		SingleVMNodeGlue(std::move(robotName), nodeId),
 		sdCardFileNumber(-1),
 		timer0(bind(&AsebaThymio2::timer0Timeout, this), 0),
@@ -43,7 +43,7 @@ namespace Enki
 		oldTimerPeriod[0] = 0;
 		oldTimerPeriod[1] = 0;
 
-		bytecode.resize(766+768);
+		bytecode.resize(766 + 768);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
 
@@ -51,7 +51,7 @@ namespace Enki
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 
-		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variables = reinterpret_cast<int16_t*>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 
 		AsebaVMInit(&vm);
@@ -68,14 +68,11 @@ namespace Enki
 			openSDCardFile(-1);
 	}
 
-	void AsebaThymio2::collisionEvent(PhysicalObject *o)
-	{
-		thisStepCollided = true;
-	}
+	void AsebaThymio2::collisionEvent(PhysicalObject* o) { thisStepCollided = true; }
 
 	inline double distance(double x1, double y1, double z1, double x2, double y2, double z2)
 	{
-		return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+		return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
 	}
 
 	void AsebaThymio2::mousePressEvent(unsigned button, double pointX, double pointY, double pointZ)
@@ -202,66 +199,49 @@ namespace Enki
 
 	extern "C" AsebaVMDescription PlaygroundThymio2VMDescription;
 
-	const AsebaVMDescription* AsebaThymio2::getDescription() const
-	{
-		return &PlaygroundThymio2VMDescription;
-	}
+	const AsebaVMDescription* AsebaThymio2::getDescription() const { return &PlaygroundThymio2VMDescription; }
 
 	// local events, static so only visible in this file
 
-	static const AsebaLocalEventDescription localEvents[] = {
-		{ "button.backward", "Backward button status changed"},
-		{ "button.left", "Left button status changed"},
-		{ "button.center", "Center button status changed"},
-		{ "button.forward", "Forward button status changed"},
-		{ "button.right", "Right button status changed"},
-		{ "buttons", "Buttons values updated"},
-		{ "prox", "Proximity values updated"},
-		{ "prox.comm", "Data received on the proximity communication"},
-		{ "tap", "A tap is detected"},
-		{ "acc", "Accelerometer values updated"},
-		{ "mic", "Fired when microphone intensity is above threshold"},
-		{ "sound.finished", "Fired when the playback of a user initiated sound is finished"},
-		{ "temperature", "Temperature value updated"},
-		{ "rc5", "RC5 message received"},
-		{ "motor", "Motor timer"},
-		{ "timer0", "Timer 0"},
-		{ "timer1", "Timer 1"},
-		{ nullptr, nullptr }
-	};
+	static const AsebaLocalEventDescription localEvents[] = { { "button.backward", "Backward button status changed" },
+		{ "button.left", "Left button status changed" },
+		{ "button.center", "Center button status changed" },
+		{ "button.forward", "Forward button status changed" },
+		{ "button.right", "Right button status changed" },
+		{ "buttons", "Buttons values updated" },
+		{ "prox", "Proximity values updated" },
+		{ "prox.comm", "Data received on the proximity communication" },
+		{ "tap", "A tap is detected" },
+		{ "acc", "Accelerometer values updated" },
+		{ "mic", "Fired when microphone intensity is above threshold" },
+		{ "sound.finished", "Fired when the playback of a user initiated sound is finished" },
+		{ "temperature", "Temperature value updated" },
+		{ "rc5", "RC5 message received" },
+		{ "motor", "Motor timer" },
+		{ "timer0", "Timer 0" },
+		{ "timer1", "Timer 1" },
+		{ nullptr, nullptr } };
 
-	const AsebaLocalEventDescription * AsebaThymio2::getLocalEventsDescriptions() const
-	{
-		return localEvents;
-	}
+	const AsebaLocalEventDescription* AsebaThymio2::getLocalEventsDescriptions() const { return localEvents; }
 
 
 	// array of descriptions of native functions, static so only visible in this file
 
-	static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-	{
-		ASEBA_NATIVES_STD_DESCRIPTIONS,
+	static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] = { ASEBA_NATIVES_STD_DESCRIPTIONS,
 		PLAYGROUND_THYMIO2_NATIVES_DESCRIPTIONS,
-		0
-	};
+		0 };
 
-	const AsebaNativeFunctionDescription * const * AsebaThymio2::getNativeFunctionsDescriptions() const
+	const AsebaNativeFunctionDescription* const* AsebaThymio2::getNativeFunctionsDescriptions() const
 	{
 		return nativeFunctionsDescriptions;
 	}
 
 	// array of native functions, static so only visible in this file
 
-	static AsebaNativeFunctionPointer nativeFunctions[] =
-	{
-		ASEBA_NATIVES_STD_FUNCTIONS,
-		PLAYGROUND_THYMIO2_NATIVES_FUNCTIONS
-	};
+	static AsebaNativeFunctionPointer nativeFunctions[] = { ASEBA_NATIVES_STD_FUNCTIONS,
+		PLAYGROUND_THYMIO2_NATIVES_FUNCTIONS };
 
-	void AsebaThymio2::callNativeFunction(uint16_t id)
-	{
-		nativeFunctions[id](&vm);
-	}
+	void AsebaThymio2::callNativeFunction(uint16_t id) { nativeFunctions[id](&vm); }
 
 	//! Open the virtual SD card file number, if -1, close current one
 	bool AsebaThymio2::openSDCardFile(int number)
@@ -300,15 +280,9 @@ namespace Enki
 		return true;
 	}
 
-	void AsebaThymio2::timer0Timeout()
-	{
-		execLocalEvent(EVENT_TIMER0);
-	}
+	void AsebaThymio2::timer0Timeout() { execLocalEvent(EVENT_TIMER0); }
 
-	void AsebaThymio2::timer1Timeout()
-	{
-		execLocalEvent(EVENT_TIMER1);
-	}
+	void AsebaThymio2::timer1Timeout() { execLocalEvent(EVENT_TIMER1); }
 
 	void AsebaThymio2::timer100HzTimeout()
 	{
@@ -355,11 +329,12 @@ namespace Enki
 	void AsebaThymio2::execLocalEvent(uint16_t number)
 	{
 		// in step-by-step, only setup an event if none is being executed currently
-		if (AsebaMaskIsSet(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) && AsebaMaskIsSet(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+		if (AsebaMaskIsSet(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK)
+			&& AsebaMaskIsSet(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 			return;
 
 		variables.source = vm.nodeId;
-		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-number);
+		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START - number);
 		AsebaVMRun(&vm, 1000);
 	}
 

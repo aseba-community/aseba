@@ -31,7 +31,7 @@ namespace Aseba
 	/** \addtogroup common */
 	/*@{*/
 
-	class AboutBox: public QDialog
+	class AboutBox : public QDialog
 	{
 		Q_OBJECT
 
@@ -46,6 +46,7 @@ namespace Aseba
 			QString usage;
 			Tags tags;
 		};
+
 	public:
 		AboutBox(QWidget* parent, const Parameters& parameters);
 	};

@@ -25,10 +25,7 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	const QString Target::getName(unsigned node) const
-	{
-		return QString::fromStdWString(getDescription(node)->name);
-	}
+	const QString Target::getName(unsigned node) const { return QString::fromStdWString(getDescription(node)->name); }
 
 	/*@}*/
 }

@@ -28,8 +28,7 @@
 #include "mainwindow.h"
 #include "dashelinterface.h"
 
-MainWindow::MainWindow( QWidget *parent) :
-	QWidget(parent)
+MainWindow::MainWindow(QWidget* parent) : QWidget(parent)
 {
 	ip = new QLineEdit("127.0.0.1");
 	port = new QLineEdit("33333");
@@ -74,7 +73,10 @@ MainWindow::MainWindow( QWidget *parent) :
 	connect(quitBtn, SIGNAL(clicked()), this, SLOT(close()));
 
 	// connect signals from dashel
-	connect(&dashelInterface, SIGNAL(messageAvailable(Aseba::UserMessage *)), SLOT(messageFromDashel(Aseba::UserMessage *)), Qt::QueuedConnection);
+	connect(&dashelInterface,
+		SIGNAL(messageAvailable(Aseba::UserMessage*)),
+		SLOT(messageFromDashel(Aseba::UserMessage*)),
+		Qt::QueuedConnection);
 	connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
 	connect(&dashelInterface, SIGNAL(dashelConnection()), SLOT(connectionFromDashel()), Qt::QueuedConnection);
 }
@@ -115,7 +117,7 @@ void MainWindow::sendUserMessage()
  * userMessage->data
  * 	Data associated with the event
  */
-void MainWindow::messageFromDashel(Aseba::UserMessage *message)
+void MainWindow::messageFromDashel(Aseba::UserMessage* message)
 {
 	// Process the message _here_
 	// ...
@@ -149,4 +151,3 @@ void MainWindow::disconnectionFromDashel()
 
 	QMessageBox::warning(0, tr("Oops"), tr("Disconnected from Dashel"));
 }
-

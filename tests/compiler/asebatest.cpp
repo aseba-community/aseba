@@ -17,21 +17,17 @@ using namespace Aseba;
 #include <valarray>
 
 // C
-#include <getopt.h>		// getopt_long()
-#include <stdlib.h>		// exit()
+#include <getopt.h> // getopt_long()
+#include <stdlib.h> // exit()
 
 // defines
-#define DEFAULT_STEPS	1000
+#define DEFAULT_STEPS 1000
 
 extern "C" bool AsebaExecutionErrorOccurred();
 
-static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-{
-	ASEBA_NATIVES_STD_DESCRIPTIONS,
-	0
-};
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] = { ASEBA_NATIVES_STD_DESCRIPTIONS, 0 };
 
-extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaNativeFunctionDescription* const* AsebaGetNativeFunctionsDescriptions(AsebaVMState* vm)
 {
 	return nativeFunctionsDescriptions;
 }
@@ -40,40 +36,37 @@ extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunction
 std::wstring read_source(const std::string& filename);
 void dump_source(const std::wstring& source);
 
-static const char short_options [] = "fcepnvsdumi:";
-static const struct option long_options[] = {
-	{ "fail",	no_argument,			nullptr,	'f'},
-	{ "comp_fail",	no_argument,		nullptr,	'c'},
-	{ "exec_fail",	no_argument,		nullptr,	'e'},
-	{ "post_fail",	no_argument,		nullptr,	'p'},
-	{ "memcmp_fail",no_argument,		nullptr,	'n'},
-	{ "event",		no_argument,		nullptr,	'v'},
-	{ "source",		no_argument,		nullptr,	's'},
-	{ "dump",		no_argument,		nullptr,	'd'},
-	{ "memdump",	no_argument,		nullptr,	'u'},
-	{ "memcmp", 	required_argument,	nullptr,	'm'},
-	{ "steps", 		required_argument,	nullptr,	'i'},
-	{ 0, 0, 0, 0 }
-};
+static const char short_options[] = "fcepnvsdumi:";
+static const struct option long_options[] = { { "fail", no_argument, nullptr, 'f' },
+	{ "comp_fail", no_argument, nullptr, 'c' },
+	{ "exec_fail", no_argument, nullptr, 'e' },
+	{ "post_fail", no_argument, nullptr, 'p' },
+	{ "memcmp_fail", no_argument, nullptr, 'n' },
+	{ "event", no_argument, nullptr, 'v' },
+	{ "source", no_argument, nullptr, 's' },
+	{ "dump", no_argument, nullptr, 'd' },
+	{ "memdump", no_argument, nullptr, 'u' },
+	{ "memcmp", required_argument, nullptr, 'm' },
+	{ "steps", required_argument, nullptr, 'i' },
+	{ 0, 0, 0, 0 } };
 
-static void usage (int argc, char** argv)
+static void usage(int argc, char** argv)
 {
-	std::cerr 	<< "Usage: " << argv[0] << " [options] source" << std::endl << std::endl
-			<< "Options:" << std::endl
-			<< "    -f | --fail         Return EXIT_SUCCESS if anything fails" << std::endl
-			<< "    -c | --comp_fail    Return EXIT_SUCCESS if compilation fails" << std::endl
-			<< "    -e | --exec_fail    Return EXIT_SUCCESS if execution fails" << std::endl
-			<< "    -p | --post_fail    Return EXIT_SUCCESS if still executing after init" << std::endl
-			<< "    -n | --memcmp_fail  Return EXIT_SUCCESS if memory comparison fails" << std::endl
-			<< "    -v | --event        Generate one internal event after executing the starting code" << std::endl
-			<< "    -s | --source       Dump the source code" << std::endl
-			<< "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
-			<< "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
-			<< "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl
-			<< "    -i | --steps        Number of VM execution steps (default: " << DEFAULT_STEPS << ")" << std::endl;
+	std::cerr << "Usage: " << argv[0] << " [options] source" << std::endl
+			  << std::endl
+			  << "Options:" << std::endl
+			  << "    -f | --fail         Return EXIT_SUCCESS if anything fails" << std::endl
+			  << "    -c | --comp_fail    Return EXIT_SUCCESS if compilation fails" << std::endl
+			  << "    -e | --exec_fail    Return EXIT_SUCCESS if execution fails" << std::endl
+			  << "    -p | --post_fail    Return EXIT_SUCCESS if still executing after init" << std::endl
+			  << "    -n | --memcmp_fail  Return EXIT_SUCCESS if memory comparison fails" << std::endl
+			  << "    -v | --event        Generate one internal event after executing the starting code" << std::endl
+			  << "    -s | --source       Dump the source code" << std::endl
+			  << "    -d | --dump         Dump the compilation result (tokens, tree, bytecode)" << std::endl
+			  << "    -u | --memdump      Dump the memory content at the end of the execution" << std::endl
+			  << "    -m | --memcmp file  Compare result of the VM execution with file" << std::endl
+			  << "    -i | --steps        Number of VM execution steps (default: " << DEFAULT_STEPS << ")" << std::endl;
 }
-
-
 
 
 struct AsebaNode
@@ -100,7 +93,7 @@ struct AsebaNode
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 
-		vm.variables = reinterpret_cast<int16_t *>(&variables);
+		vm.variables = reinterpret_cast<int16_t*>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 
 		AsebaVMInit(&vm);
@@ -124,10 +117,8 @@ struct AsebaNode
 			std::string name(nativeDesc->name);
 			std::string doc(nativeDesc->doc);
 
-			TargetDescription::NativeFunction native{
-				std::wstring(name.begin(), name.end()),
-				std::wstring(doc.begin(), doc.end())
-			};
+			TargetDescription::NativeFunction native{ std::wstring(name.begin(), name.end()),
+				std::wstring(doc.begin(), doc.end()) };
 
 			const AsebaNativeFunctionArgumentDescription* params(nativeDesc->arguments);
 			while (params->size)
@@ -136,8 +127,7 @@ struct AsebaNode
 				name = param.name;
 				int size = param.size;
 				native.parameters.push_back(
-					TargetDescription::NativeFunctionParameter(std::wstring(name.begin(), name.end()), size)
-				);
+					TargetDescription::NativeFunctionParameter(std::wstring(name.begin(), name.end()), size));
 				++params;
 			}
 
@@ -152,10 +142,7 @@ struct AsebaNode
 		d.localEvents.push_back(testLocalEvent);
 	}
 
-	const TargetDescription* getTargetDescription() const
-	{
-		return &d;
-	}
+	const TargetDescription* getTargetDescription() const { return &d; }
 
 	bool loadBytecode(const BytecodeVector& bytecode)
 	{
@@ -164,7 +151,7 @@ struct AsebaNode
 
 		std::vector<std::unique_ptr<Message>> messagesVector;
 		sendBytecode(messagesVector, 1, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
-		for (auto& message: messagesVector)
+		for (auto& message : messagesVector)
 			processMessage(*message);
 		return true;
 	}
@@ -180,7 +167,7 @@ struct AsebaNode
 	{
 		// reset VM and run it with user event
 		vm.flags = 0;
-		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
+		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START - 0);
 		AsebaVMRun(&vm, stepCount);
 	}
 
@@ -239,17 +226,17 @@ int main(int argc, char** argv)
 	std::locale::global(std::locale(""));
 
 	// parse the arguments
-	for(;;)
+	for (;;)
 	{
 		int index;
 		int c;
 
 		c = getopt_long(argc, argv, short_options, long_options, &index);
 
-		if (c==-1)
+		if (c == -1)
 			break;
 
-		switch(c)
+		switch (c)
 		{
 			case 0: // getopt_long() flag
 				break;
@@ -259,49 +246,30 @@ int main(int argc, char** argv)
 				should_postexecution_fail = true;
 				should_memcmp_fail = true;
 				break;
-			case 'c':
-				should_compilation_fail = true;
-				break;
-			case 'e':
-				should_execution_fail = true;
-				break;
-			case 'p':
-				should_postexecution_fail = true;
-				break;
-			case 'n':
-				should_memcmp_fail = true;
-				break;
-			case 'v':
-				event = true;
-				break;
-			case 's':
-				source = true;
-				break;
-			case 'd':
-				dump = true;
-				break;
-			case 'u':
-				memDump = true;
-				break;
+			case 'c': should_compilation_fail = true; break;
+			case 'e': should_execution_fail = true; break;
+			case 'p': should_postexecution_fail = true; break;
+			case 'n': should_memcmp_fail = true; break;
+			case 'v': event = true; break;
+			case 's': source = true; break;
+			case 'd': dump = true; break;
+			case 'u': memDump = true; break;
 			case 'm':
 				memCmp = true;
 				memCmpFileName = optarg;
 				break;
-			case 'i':
-				stepCount = atoi(optarg);
-				break;
-			default:
-				usage(argc, argv);
-				exit(EXIT_FAILURE);
+			case 'i': stepCount = atoi(optarg); break;
+			default: usage(argc, argv); exit(EXIT_FAILURE);
 		}
 	}
 
-	const bool should_any_fail(should_compilation_fail || should_execution_fail || should_postexecution_fail || should_memcmp_fail);
+	const bool should_any_fail(
+		should_compilation_fail || should_execution_fail || should_postexecution_fail || should_memcmp_fail);
 
 	std::string filename;
 
 	// check for the source file
-	if (optind == (argc-1))
+	if (optind == (argc - 1))
 	{
 		filename.assign(argv[optind]);
 	}
@@ -356,7 +324,10 @@ int main(int argc, char** argv)
 
 	// is execution completed?
 	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
-	checkForError("PostInitExecution", should_postexecution_fail, stillExecuting, WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
+	checkForError("PostInitExecution",
+		should_postexecution_fail,
+		stillExecuting,
+		WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
 
 	// setup extra event
 	if (event)
@@ -395,7 +366,8 @@ int main(int argc, char** argv)
 				break;
 			if (node.vm.variables[i] != v)
 			{
-				std::cerr << "VM variable value at pos " << i << " after execution differs from dump; expected: " << v << ", found: " << node.vm.variables[i] << std::endl;
+				std::cerr << "VM variable value at pos " << i << " after execution differs from dump; expected: " << v
+						  << ", found: " << node.vm.variables[i] << std::endl;
 				if (should_memcmp_fail)
 				{
 					std::cerr << "Failure was expected" << std::endl;
@@ -422,16 +394,16 @@ int main(int argc, char** argv)
 std::wstring read_source(const std::string& filename)
 {
 	std::ifstream ifs;
-	ifs.open( filename.c_str(),std::ifstream::binary);
+	ifs.open(filename.c_str(), std::ifstream::binary);
 	if (!ifs.is_open())
 	{
 		std::cerr << "Error opening source file " << filename << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	ifs.seekg (0, std::ios::end);
+	ifs.seekg(0, std::ios::end);
 	std::streampos length = ifs.tellg();
-	ifs.seekg (0, std::ios::beg);
+	ifs.seekg(0, std::ios::beg);
 
 	std::string utf8Source;
 	utf8Source.resize(length);
@@ -475,4 +447,3 @@ void dump_source(const std::wstring& source)
 	}
 	std::cout << std::endl;
 }
-
