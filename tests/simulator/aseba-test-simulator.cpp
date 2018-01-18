@@ -24,7 +24,6 @@
 #include "../../compiler/compiler.h"
 #include <iostream>
 #include <iterator>
-#include <QString>
 
 using namespace Aseba;
 using namespace Enki;

@@ -20,7 +20,7 @@
 
 #include "StudioAeslEditor.h"
 #include "MainWindow.h"
-#include <QtGui>
+#include <QtWidgets>
 #include <QtGlobal>
 
 #include <cassert>
@@ -38,7 +38,7 @@ namespace Aseba
 	
 	void StudioAeslEditor::dropEvent(QDropEvent *event)
 	{
-		dropSourceWidget = event->source();
+		dropSourceWidget = dynamic_cast<QWidget*>(event->source());
 		QTextEdit::dropEvent(event);
 		dropSourceWidget = 0;
 		setFocus(Qt::MouseFocusReason);

@@ -9,7 +9,7 @@ project(aseba)
 cmake_minimum_required(VERSION 2.8.12)
 
 # additional CMake modules
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
 
 # check the compiler version as we need full C++11 support
@@ -49,6 +49,10 @@ endif ()
 if (WIN32)
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 endif()
+# check that the Qt5 installation is given as prefix
+if ((APPLE OR WIN32) AND NOT CMAKE_PREFIX_PATH)
+	message(FATAL_ERROR "You must set CMAKE_PREFIX_PATH to the location of your Qt5 installation")
+endif ()
 
 # Remove -Wl,--no-undefined which CMake 3.0.2 (on OpenSUSE 13.2) adds to the
 # linker options when building shared libs. That breaks building libs that use
@@ -70,23 +74,31 @@ include_directories(${dashel_INCLUDE_DIRS})
 find_package(enki)
 
 # Qt
-# FindQt4 has a bug and does not support OPTIONAL_COMPONENTS
-# see https://cmake.org/pipermail/cmake/2016-March/063047.html
-#find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit OPTIONAL_COMPONENTS QtDBus)
-# So we use a two-step mechanism, first try with DBus, and if not found, try without
-find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit QtDBus)
-if (NOT QT_QTDBUS_FOUND)
-	find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml QtHelp QtSvg QtWebKit)
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5Network)
+find_package(Qt5Help)
+find_package(Qt5Multimedia)
+find_package(Qt5Concurrent)
+find_package(Qt5Xml)
+find_package(Qt5WebKitWidgets)
+find_package(Qt5Svg)
+find_package(Qt5X11Extras)
+find_package(Qt5Test)
+if (UNIX AND NOT APPLE)
+	find_package(Qt5DBus)
 endif ()
 
 # Qwt
-find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/ /usr/local/include PATH_SUFFIXES qwt5-qt4 qwt-qt4 qwt)
-find_library(QWT_LIBRARIES NAMES qwt5-qt4 qwt-qt4 qwt PATHS /usr/lib /usr/local/lib)
+find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/ /usr/local/include PATH_SUFFIXES qwt5-qt5 qwt-qt5 qwt)
+find_library(QWT_LIBRARIES NAMES qwt5-qt5 qwt-qt5 qwt PATHS /usr/lib /usr/local/lib)
 if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 	message(STATUS "Qwt found")
 else (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
 	message(STATUS "Qwt not found")
 endif (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+
 
 # Zeroconf
 find_package(DNSSD)
@@ -122,7 +134,7 @@ if (DNSSD_FOUND)
 		endif()
 	endif()
 	set(ASEBA_ZEROCONF_LIBRARIES asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
-	if (QT4_FOUND)
+	if (Qt5Core_FOUND)
 		set(ASEBA_ZEROCONFQT_LIBRARIES asebazeroconfqt asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
 	endif()
 endif()

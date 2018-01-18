@@ -1,7 +1,4 @@
-if (QT4_FOUND)
-	set(QT_USE_QTMAIN ON)
-	set(QT_USE_QTCONCURRENT ON)
-	include(${QT_USE_FILE})
+if (Qt5Widgets_FOUND AND Qt5Concurrent_FOUND AND Qt5Network_FOUND AND Qt5Xml_FOUND)
 
 	# add a console for debug messages under Windows
 	if (WIN32)
@@ -10,11 +7,11 @@ if (QT4_FOUND)
 	
 	set(thymioupgrader_SRCS
 		ThymioUpgrader.cpp)
-	qt4_wrap_cpp(thymioupgrader_MOCS
+	qt5_wrap_cpp(thymioupgrader_MOCS
 		ThymioUpgrader.h
 	)
 	
-	qt4_add_resources(resfiles thymioupgrader.qrc)
+	qt5_add_resources(resfiles thymioupgrader.qrc)
 	
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	
@@ -23,8 +20,8 @@ if (QT4_FOUND)
 		add_dependencies(thymioupgrader versionheader)
 	endif (HAS_DYN_VERSION)
 
-	target_link_libraries(thymioupgrader ${QT_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(thymioupgrader Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets ${ASEBA_CORE_LIBRARIES})
 
 	install(TARGETS thymioupgrader RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
-endif (QT4_FOUND)
+endif ()

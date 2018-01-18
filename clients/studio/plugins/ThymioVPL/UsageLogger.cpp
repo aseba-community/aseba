@@ -241,7 +241,7 @@ void UsageLogger::logBlockMouseRelease(QString name, QString type, QGraphicsScen
 	logMouseAction(RELEASE_BLOCK,event->scenePos().x(),event->scenePos().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
 }
 void UsageLogger::logButtonDrag(QString name, QString type, QMouseEvent *event, QDrag *drag){
-	logMouseAction(DRAG_BUTTON,event->posF().x(),event->posF().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
+	logMouseAction(DRAG_BUTTON,event->pos().x(),event->pos().y(),mapButtons(event->button()),nullptr,name.toUtf8().constData(),type.toUtf8().constData());
 }
 
 void UsageLogger::logActionSetDrag(int row,QGraphicsSceneMouseEvent *event, QDrag *drag){

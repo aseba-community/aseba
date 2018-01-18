@@ -20,7 +20,7 @@
 
 #include "EPuck.h"
 #include "../../Parameters.h"
-#include "../../PlaygroundViewer.h"
+#include "../../EnkiGlue.h"
 #include "../../../../common/productids.h"
 #include "../../../../common/utils/utils.h"
 

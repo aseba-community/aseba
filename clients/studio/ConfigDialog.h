@@ -23,14 +23,19 @@
 
 #include <QWidget>
 #include <QString>
-#include <QtGui>
-
+#include <QDialog>
 #include <map>
 
 #define CONFIG_PROPERTY_CHECKBOX_DECLARE(name) \
 public: \
 	static const bool get##name(void); \
 	static void set##name(bool);
+
+class QStackedWidget;
+class QVBoxLayout;
+class QPushButton;
+class QListWidget;
+class QCheckBox;
 
 namespace Aseba
 {

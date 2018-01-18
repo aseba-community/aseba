@@ -1,9 +1,7 @@
-if (QT4_FOUND AND ENKI_FOUND)
+if (Qt5Widgets_FOUND AND Qt5OpenGL_FOUND AND ENKI_FOUND)
 	find_package(OpenGL REQUIRED)
 	
-	set(QT_USE_QTMAIN ON)
-	set(QT_USE_QTOPENGL ON)
-	include(${QT_USE_FILE})
+	set(CMAKE_AUTOMOC ON)
 	
 	include_directories(${enki_INCLUDE_DIR})
 	
@@ -17,15 +15,12 @@ if (QT4_FOUND AND ENKI_FOUND)
 		objects/food_charge3.cpp
 		objects/food_ring.cpp
 	)
-	qt4_wrap_cpp(challenge_MOCS
-		challenge.h
-	)
 	
-	qt4_add_resources(challenge_RCC_SRCS challenge-textures.qrc)
+	qt5_add_resources(challenge_RCC_SRCS challenge-textures.qrc)
 	
-	add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS} ${challenge_MOCS})
+	add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS})
 	
-	target_link_libraries(asebachallenge asebavmbuffer asebavm ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebachallenge asebavmbuffer asebavm ${enki_VIEWER_LIBRARIES} ${enki_LIBRARY} Qt5::OpenGL Qt5::Widgets ${OPENGL_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
 	install(TARGETS asebachallenge RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
-endif (QT4_FOUND AND ENKI_FOUND)
+endif ()

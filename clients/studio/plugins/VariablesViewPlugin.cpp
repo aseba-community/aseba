@@ -1,7 +1,7 @@
 #include "VariablesViewPlugin.h"
 #include "../Target.h"
 #include "../../../common/productids.h"
-#include <QtGui>
+#include <QtWidgets>
 #include <QtDebug>
 #include <limits>
 #include <cassert>

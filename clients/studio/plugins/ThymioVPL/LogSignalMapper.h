@@ -21,6 +21,7 @@
 #ifndef LOG_SIGNAL_MAPPER_H
 #define LOG_SIGNAL_MAPPER_H
 
+#include <QObject>
 #include <QPair>
 #include <QHash>
 

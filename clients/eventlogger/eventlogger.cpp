@@ -4,6 +4,7 @@
 #include "../../transport/dashel_plugins/dashel-plugins.h"
 #include <cmath>
 #include <QtGui>
+#include <QApplication>
 #include <cassert>
 #include <fstream>
 #include <iostream>

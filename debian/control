@@ -3,11 +3,11 @@ Maintainer: Stephane Magnenat <stephane@nospam.magnenant.net>
 Section:devel
 Priority:optional
 Standards-Version: 3.7.2
-Build-Depends: cmake (>=2.6), libdashel (>=1.1.0), libenki (>=2.0~git.20180109), libqt4-dev, libqt4-opengl-dev, libqtwebkit-dev, qt4-dev-tools, libqwt5-qt4-dev, libudev-dev, libxml2-dev, libsdl2-dev, libavahi-compat-libdnssd-dev, g++ (>=5.0) | g++-5 | g++-7
+Build-Depends: cmake (>=2.6), libdashel (>=1.1.0), libenki (>=2.0~git.20180108), qttools5-dev-tools, qtbase5-dev, libqt5opengl5-dev, libqt5svg5-dev, libqt5webkit5-dev, libqt5x11extras5-dev, libqwt-qt5-dev, libudev-dev, libxml2-dev, g++ (>=5.0) | g++-5 | g++-7
 
 Package:aseba
 Architecture: any
-Depends: libqt4-sql-sqlite, ${shlibs:Depends}
+Depends: libqt5sql5-sqlite, ${shlibs:Depends}
 Description: Aseba is an event-based framework for distributed mobile robots control.
  Its core is a lightweight virtual machine, small enough to run on any 16 bits microcontroller.
  In Aseba, all virtual machines are linked in a network and all their programs are developed

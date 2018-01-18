@@ -63,9 +63,6 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	QCoreApplication::setApplicationName("Aseba Studio");
-
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	// override dashel signal handling
 	signal(SIGTERM, SIG_DFL);

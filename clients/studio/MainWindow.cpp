@@ -33,6 +33,7 @@
 #include "../../common/utils/utils.h"
 #include "../../common/about/AboutDialog.h"
 #include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 #include <sstream>
 #include <iostream>
@@ -477,6 +478,7 @@ namespace Aseba
 		resetButton->setEnabled(false);
 		runInterruptButton = new QPushButton(QIcon(":/images/play.png"), tr("Run"));
 		runInterruptButton->setEnabled(false);
+		runInterruptButton->setProperty("isRunning", false);
 		nextButton = new QPushButton(QIcon(":/images/step.png"), tr("Next"));
 		nextButton->setEnabled(false);
 		refreshMemoryButton = new QPushButton(QIcon(":/images/rescan.png"), tr("refresh"));
@@ -790,7 +792,7 @@ namespace Aseba
 	
 	void NodeTab::runInterruptClicked()
 	{
-		if (runInterruptButton->text() == tr("Run"))
+		if (!runInterruptButton->property("isRunning").toBool())
 			target->run(id);
 		else
 			target->pause(id);
@@ -861,7 +863,7 @@ namespace Aseba
 	void NodeTab::saveBytecode()
 	{
 		const QString& nodeName(target->getName(id));
-		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "Aseba Binary Object (*.abo);;All Files (*)");
+		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Aseba Binary Object (*.abo);;All Files (*)");
 		
 		QFile file(bytecodeFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -1342,6 +1344,8 @@ namespace Aseba
 			runInterruptButton->setText(tr("Pause"));
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
 			
+			runInterruptButton->setProperty("isRunning", true);
+
 			nextButton->setEnabled(false);
 
 			if (clearEditorProperty("active"))
@@ -1353,7 +1357,8 @@ namespace Aseba
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
-			
+			runInterruptButton->setProperty("isRunning", false);
+
 			nextButton->setEnabled(true);
 
 			// go to this line and next line is visible
@@ -1367,7 +1372,8 @@ namespace Aseba
 			
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
-			
+			runInterruptButton->setProperty("isRunning", false);
+
 			nextButton->setEnabled(false);
 			
 			if (clearEditorProperty("active"))
@@ -1711,9 +1717,14 @@ namespace Aseba
 				QSettings settings;
 				QStringList recentFiles = settings.value("recent files").toStringList();
 				if (recentFiles.size() > 0)
+				{
 					dir = recentFiles[0];
+				}
 				else
-					dir = QDesktopServices::displayName(QDesktopServices::DocumentsLocation);
+				{
+					const QStringList stdLocations(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation));
+					dir = !stdLocations.empty() ? stdLocations[0] : "";
+				}
 			}
 			
 			fileName = QFileDialog::getOpenFileName(this,
@@ -1899,7 +1910,7 @@ namespace Aseba
 			fileName = QFileDialog::getSaveFileName(
 				this,
 				tr("Save Script"),
-				actualFileName.isEmpty() ? QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) : actualFileName,
+				actualFileName.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) : actualFileName,
 				"Aseba scripts (*.aesl)"
 			);
 		
@@ -2016,7 +2027,7 @@ namespace Aseba
 	
 	void MainWindow::exportMemoriesContent()
 	{
-		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
+		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
 		
 		QFile file(exportFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -2736,7 +2747,7 @@ namespace Aseba
 		// check if there is an absent node tab with this id and name, and copy data
 		const int absentIndex(getAbsentIndexFromId(node));
 		const AbsentNodeTab* absentTab(getAbsentTabFromId(node));
-		if (absentTab && nodes->tabText(absentIndex) == target->getName(node))
+		if (absentTab && nodes->tabText(absentIndex).replace(QString("&"), QString("")) == target->getName(node))
 		{
 			tab->editor->document()->setPlainText(absentTab->editor->document()->toPlainText());
 			tab->restorePlugins(absentTab->savePlugins(), false);
@@ -2764,7 +2775,7 @@ namespace Aseba
 			return;
 		}
 		const NodeTab* tab = getTabFromId(node);
-		const QString& tabName = nodes->tabText(index);
+		auto tabName = nodes->tabText(index).replace(QString("&"), QString(""));
 		
 		nodes->addTab(
 			new AbsentNodeTab(

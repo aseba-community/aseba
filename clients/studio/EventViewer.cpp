@@ -29,6 +29,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QtDebug>
 
 #include <qwt_plot.h>
@@ -228,7 +229,7 @@ namespace Aseba
 	void EventViewer::saveToFile()
 	{
 		QSettings settings;
-		QString lastFileName(settings.value("EventViewer/exportFileName", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation)).toString());
+		QString lastFileName(settings.value("EventViewer/exportFileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString());
 		QString filter = "Text files (*.txt);;CSV files (*.csv);;All Files (*)";
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Save plot data to file"), lastFileName, filter);
 		

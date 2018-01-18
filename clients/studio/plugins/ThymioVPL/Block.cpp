@@ -300,7 +300,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		QImage img(image(factor));
 		
-		// Set transparent block FIXME: test ugly
+		// Set transparent block FIXME: test ugly, and should test whether QX11Extras module has been found rather than the platform
 		#ifdef Q_WS_X11
 		if (!QX11Info::isCompositingManagerRunning())
 		{

@@ -82,9 +82,6 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	QCoreApplication::setApplicationName("Thymio VPL");
 
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-	
 	// override dashel signal handling
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);

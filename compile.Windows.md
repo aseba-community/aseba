@@ -21,7 +21,7 @@ Then restart the shell and update the packages by typing:
 
 In the msys2 shell, install the dependencies by typing:
 
-	pacman -S mingw-w64-i686-{toolchain,cmake,qt4,qwt-qt4,libxml2,SDL2} git make
+	pacman -S mingw-w64-i686-{toolchain,cmake,qt5,qwt-qt5,libxml2,SDL2} git make
 
 If you want to build Windows 64 binaries, replace `i686` by `x86_64`
 

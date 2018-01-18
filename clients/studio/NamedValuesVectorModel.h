@@ -51,7 +51,6 @@ namespace Aseba
 		void setExtraMimeType(QString mime) { privateMimeType = mime; }
 		QMimeData * mimeData ( const QModelIndexList & indexes ) const;
 		bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
-		Qt::DropActions supportedDragActions();
 		Qt::DropActions supportedDropActions() const;
 		
 		bool setData(const QModelIndex &index, const QVariant &value, int role);

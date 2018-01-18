@@ -27,7 +27,7 @@
 #include <sstream>
 #include <cassert>
 #include <QInputDialog>
-#include <QtGui>
+#include <QtWidgets>
 #include <QLibraryInfo>
 #include <QHostInfo>
 #include <QNetworkInterface>

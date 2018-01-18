@@ -71,8 +71,9 @@ namespace Enki
 		
 		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const override
 		{
+			auto paths = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
 			auto fileName(QString("%1/%2/%3/U%4.DAT")
-				.arg(QDesktopServices::storageLocation(QDesktopServices::DataLocation))
+				.arg(paths.empty() ? "" : paths.first())
 				.arg(qHash(QDir(sceneFileName).canonicalPath()), 8, 16, QChar('0'))
 				.arg(QString::fromStdString(robotName))
 				.arg(fileNumber)
@@ -133,8 +134,6 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	app.setApplicationName("Playground");
 	
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	// Translation support
 	QTranslator qtTranslator;

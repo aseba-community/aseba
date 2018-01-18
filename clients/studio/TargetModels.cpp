@@ -20,7 +20,7 @@
 
 #include "TargetModels.h"
 #include <QtDebug>
-#include <QtGui>
+#include <QtWidgets>
 
 namespace Aseba
 {
@@ -68,6 +68,16 @@ namespace Aseba
 		}
 	}
 	
+	TargetVariablesModel::TargetVariablesModel(QObject *parent) :
+		QAbstractItemModel(parent)
+	{
+	}
+	
+	Qt::DropActions TargetVariablesModel::supportedDropActions() const
+	{
+		return Qt::CopyAction;
+	}
+	
 	int TargetVariablesModel::rowCount(const QModelIndex &parent) const
 	{
 		if (parent.isValid())
@@ -79,12 +89,6 @@ namespace Aseba
 		}
 		else
 			return variables.size();
-	}
-	
-	TargetVariablesModel::TargetVariablesModel(QObject *parent) :
-		QAbstractItemModel(parent)
-	{
-		setSupportedDragActions(Qt::CopyAction);
 	}
 	
 	int TargetVariablesModel::columnCount(const QModelIndex & parent) const
@@ -526,13 +530,17 @@ namespace Aseba
 		regExp("\\b")
 	{
 		Q_ASSERT(descriptionRead);
-		setSupportedDragActions(Qt::CopyAction);
 		recreateTreeFromDescription(showHidden);
 	}
 	
 	TargetFunctionsModel::~TargetFunctionsModel()
 	{
 		delete root;
+	}
+	
+	Qt::DropActions TargetFunctionsModel::supportedDropActions() const
+	{
+		return Qt::CopyAction;
 	}
 	
 	TargetFunctionsModel::TreeItem *TargetFunctionsModel::getItem(const QModelIndex &index) const

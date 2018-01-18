@@ -21,19 +21,8 @@ target_link_libraries(asebatargetlist-thread ${ASEBA_ZEROCONF_LIBRARIES} ${ASEBA
 
 # Using QtZeroconf
 
-if (QT4_FOUND)
-	set(QT_USE_QTNETWORK ON)
-	set(QT_DONT_USE_QTGUI ON)
-	qt4_wrap_cpp(examples_targetlist_qt_MOCS
-		targetlist-qt.h
-	)
-	include(${QT_USE_FILE})
-
-	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-
-	add_executable(asebatargetlist-qt
-		${examples_targetlist_qt_MOCS}
-		targetlist-qt.cpp
-	)
-	target_link_libraries(asebatargetlist-qt ${ASEBA_ZEROCONFQT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} ${QT_LIBRARIES})
-endif (QT4_FOUND)
+if (Qt5Core_FOUND AND Qt5Network_FOUND)
+	set(CMAKE_AUTOMOC ON)
+	add_executable(asebatargetlist-qt targetlist-qt.cpp)
+	target_link_libraries(asebatargetlist-qt ${ASEBA_ZEROCONFQT_LIBRARIES} ${ASEBA_CORE_LIBRARIES} Qt5::Core Qt5::Network)
+endif ()
