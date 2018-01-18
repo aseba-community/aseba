@@ -110,7 +110,7 @@ The name of a variable is defined by these rules:
 -  The name is case sensitive: a variable named "foo" is different from
    one named "Foo"
 -  The name cannot be identical with one of Aseba's keywords (see
-   `reserved keywords <#restricted-keywords>`__)
+   `reserved keywords <Reserved keywords_>`_)
 
 Variables may be initialised in the declaration, using the assignment
 symbol and combined with any valid mathematical expression. A variable
@@ -128,13 +128,29 @@ Example:
 Reserved keywords
 ~~~~~~~~~~~~~~~~~
 
-` <>`__
 
 The following keywords cannot be used as valid names for variables, as
 they are already used by the Aseba language.
 
-Keywords abs call callsub do else elseif emit end for if in onevent
-return step sub then var when while
+ - `abs`
+ - `call`
+ - `callsub`
+ - `do`
+ - `else`
+ - `elseif`
+ - `emit`
+ - `end`
+ - `for`
+ - `if`
+ - `in`
+ - `onevent`
+ - `return`
+ - `step`
+ - `sub`
+ - `then`
+ - `var`
+ - `when`
+ - `while`
 
 Constants
 ~~~~~~~~~
@@ -634,4 +650,4 @@ What to read next?
 
 You might be interested to read:
 
--  `Description of the native functions standard library <asebastdnative.rs
+-  `Description of the native functions standard library <std-natives.rst>`__

@@ -32,8 +32,8 @@ same name is fired.
 Distance sensors
 ----------------
 
-.. rubric:: Horizontal
-   :name: horizontal
+Horizontal
+~~~~~~~~~~
 
 Thymio has 7 distance sensors around its periphery. An array of 7
 variables, ``prox.horizontal``, holds the values of these sensors:
@@ -51,8 +51,8 @@ to several thousand (the robot is very close to an obstacle). Thymio
 updates this array at a frequency of 10 Hz, and generates the ``prox``
 event after every update.
 
-.. rubric:: Ground
-   :name: ground
+Ground
+~~~~~~
 
 Thymio holds 2 ground distance sensors. These sensors are located at the
 front of the robot. As black grounds appear like no ground at all (black
@@ -69,7 +69,7 @@ on the ground. Three arrays hold the values of these sensors:
 
 For each array, the index 0 corresponds to the left sensor and the index
 1 to the right sensor. As with the distance sensors, Thymio updates this
-array at a frequency of 10 Hz, , and generates the (same) ``prox`` event
+array at a frequency of 10 Hz and generates the (same) ``prox`` event
 after every update.
 
 Local communication
@@ -144,8 +144,8 @@ longer reflect the sensor values.
 Native functions allow the various LEDs to be controlled. For all LEDs,
 their intensity values range from 0 (off) to 32 (fully lit).
 
-.. rubric:: The LED circle on top of the robot
-   :name: the-led-circle-on-top-of-the-robot
+The LED circle on top of the robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 8 yellow LEDs make up a circle on top of the robot, around the buttons.
 
@@ -158,8 +158,8 @@ angle.
    where ``led 0`` sets the intensity of the LED at the front of the
    robot, the others are numbered clockwise.
 
-.. rubric:: The RGB LEDs
-   :name: the-rgb-leds
+The RGB LEDs
+~~~~~~~~~~~~
 
 There are two RGB LEDs on the top of robot, driven together. These are
 the LEDs that show the behaviour of the robot. There are two other RGB
@@ -173,8 +173,8 @@ LEDs on the bottom of the robot, which can be driven separately.
 -  ``leds.bottom.right(red, green, blue)`` sets the intensities of the
    bottom-right LED.
 
-.. rubric:: The LEDs of proximity sensors.
-   :name: the-leds-of-proximity-sensors.
+The LEDs of proximity sensors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Every proximity sensor has a companion red LED on its side (the front
 sensor has two LEDs, one on each side).
@@ -189,8 +189,8 @@ sensor, with an intensity inversely proportional to the distance.
 -  ``leds.prox.v(led 1, led 2)`` sets the LEDs associated with the
    bottom sensors, left and right.
 
-.. rubric:: The Button LEDs
-   :name: the-button-leds
+The Button LEDs
+~~~~~~~~~~~~~~~
 
 Four red LEDs are placed between the buttons.
 
@@ -200,8 +200,8 @@ is pressed. When the centre button is pressed, all four LEDs light up.
 -  ``leds.buttons(led 1, led 2, led 3, led 4)`` control these LEDs, with
    ``led 1`` corresponding to the front LED, then clockwise numbering.
 
-.. rubric:: The LED of the RC receiver
-   :name: the-led-of-the-rc-receiver
+The LED of the RC receiver
+--------------------------
 
 This red LED is located close to the remote-control (infrared) receiver.
 
@@ -210,8 +210,8 @@ This red LED is located close to the remote-control (infrared) receiver.
 
 -  ``leds.rc(led)`` controls this LED.
 
-.. rubric:: The LEDs of the temperature sensor
-   :name: the-leds-of-the-temperature-sensor
+The LEDs of the temperature sensor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These two LEDs (one red and one blue) are located close to the
 temperature sensor.
@@ -221,8 +221,8 @@ between 28° and 15°, blue if the temperature is below 15°.
 
 -  ``leds.temperature(red, blue)`` controls this LED.
 
-.. rubric:: The microphone LED
-   :name: the-microphone-led
+The microphone LED
+~~~~~~~~~~~~~~~~~~
 
 This blue LED is located close to the microphone.
 
@@ -258,8 +258,8 @@ motor commands from the variables ``motor.left.pwm`` and
 Sound
 =====
 
-.. rubric:: Sound-intensity detection
-   :name: toc8
+Sound-intensity detection
+-------------------------
 
 | The Thymio can detect when the ambient sound is above a given
   intensity and emit an event.
@@ -268,8 +268,8 @@ Sound
   limit intensity for the event. If ``mic.intensity`` is above
   ``mic.threshold``, then the event ``mic`` is generated.
 
-.. rubric:: Playing and recording sounds
-   :name: toc9
+Playing and recording sounds
+----------------------------
 
 You can play synthetic or system sounds. Moreover, if you have installed
 a `micro-SD <http://en.wikipedia.org/wiki/MicroSD#microSD>`__ card
@@ -280,16 +280,16 @@ unsigned, 8 kHz. When Thymio finishes playing a sound requested through
 Aseba, it fires the event ``sound.finished``. It does not fire an event
 if playing is interrupted or if a new sound is played.
 
-.. rubric:: Synthetic sound
-   :name: synthetic-sound
+Synthetic sound
+---------------
 
 The native function ``sound.freq`` plays a frequency, specified in Hz,
 for a certain duration, specified in 1/60 s. Specifying a 0 duration
 plays the sound continuously and specifying a -1 duration stops the
 sound.
 
-.. rubric:: Changing the primary wave
-   :name: changing-the-primary-wave
+Changing the primary wave
+-------------------------
 
 Synthetic sound generation works by re-sampling a primary wave. By
 default, it is a triangular wave, but you can define your own wave using
@@ -300,8 +300,8 @@ As Thymio plays sounds at 7812.5 Hz, this array is played completely at
 the frequency of 7812.5/142 = ~55 Hz. Playing a sound of a higher
 frequency skips samples in the array.
 
-.. rubric:: Recording
-   :name: recording
+Recording
+---------
 
 You can record sounds using the ``sound.record`` native function. This
 function takes as parameter a record number from 0 to 32767. Files are
@@ -309,8 +309,8 @@ stored on the micro-SD card under the name ``Rx.wav`` where ``x`` is the
 parameter passed to the ``sound.record`` function. To stop a recording,
 call the ``sound.record`` function with the value of -1.
 
-.. rubric:: Replaying
-   :name: replaying
+Replaying
+---------
 
 You can replay a recorded sound using the ``sound.replay`` native
 function. This function takes as parameter a record number from 0 to
@@ -318,8 +318,8 @@ function. This function takes as parameter a record number from 0 to
 the parameter passed to the ``sound.replay`` function. To stop a replay,
 call the ``sound.replay`` function with the value of -1.
 
-.. rubric:: Duration (from firmware version 11)
-   :name: duration-from-firmware-version-11
+Duration (from firmware version 11)
+-----------------------------------
 
 You can retrieve the duration of a recorded sound using the
 ``sound.duration(x,duration)`` native function. Its first parameter,
@@ -327,8 +327,8 @@ You can retrieve the duration of a recorded sound using the
 from the SD card. The result in 1/10 of seconds is put in the variable
 ``duration`` as second parameter.
 
-.. rubric:: Creating sound on your computer
-   :name: creating-sound-on-your-computer
+Creating sound on your computer
+-------------------------------
 
 You can create sounds for Thymio using your computer. An efficient way
 to do so is to use the `Audacity <http://audacity.sourceforge.net/>`__
@@ -355,8 +355,8 @@ Here's an `instructional
 video <http://www.youtube.com/watch?v=aWtPvnLYMps>`__ on how to do the
 above.
 
-.. rubric:: Play
-   :name: play
+Play
+----
 
 You can play a user-defined sound using the ``sound.play`` native
 function, which takes a record number from 0 to 32767 as parameter. The
@@ -365,8 +365,9 @@ where ``x`` is the parameter passed to the ``sound.play`` function. To
 stop playing a sound, call the ``sound.play`` function with the value
 -1.
 
-.. rubric:: System sound
-   :name: system-sound
+System sound
+------------
+
 
 You can play a system sound using the ``sound.system`` native function,
 which takes a record number from 0 to 32767 as parameter. Some sounds
@@ -376,8 +377,8 @@ be named ``Sx.wav`` where ``x`` is the parameter passed to the
 ``sound.system`` function. To stop playing a sound, call the
 ``sound.system`` function with the value -1.
 
-.. rubric:: System sound library
-   :name: system-sound-library
+System sound library
+--------------------
 
 The following sounds are available:
 
